@@ -1,0 +1,459 @@
+<html>
+
+<head>
+<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+<style>
+body{
+    background-color: #87AEC5;    
+    font-family: arial;
+    font-size: 80%;
+    margin: 0px;
+    padding: 0px;
+    background-image: url('images/header.gif');
+    background-repeat: repeat-x;
+}
+#container { position: relative; }
+#imageView { border: 1px solid #000; }
+#imageTemp { position: absolute; top: 1px; left: 1px; }
+</style>
+</head>
+
+<body>
+     
+<script type="text/javascript" src="js/reader/LocalFileReader.js"></script>
+<script type="text/javascript" src="js/dicom/DicomInputStreamReader.js"></script>
+<script type="text/javascript" src="js/dicom/DicomElement.js"></script>
+<script type="text/javascript" src="js/dicom/DicomParser.js"></script>
+<script type="text/javascript" src="js/dicom/LookupTable.js"></script>
+<script type="text/javascript" src="js/tools/rect.js"></script>
+<script type="text/javascript" src="js/tools/pencil.js"></script>
+<script type="text/javascript" src="js/tools/line.js"></script>
+<script type="text/javascript" src="js/tools/windowLevel.js"></script>
+
+<script type="text/vbscript">
+Function BinFileReaderImpl_IE_VBAjaxLoader(fileName)
+    Dim xhr
+    Set xhr = CreateObject("Microsoft.XMLHTTP")
+    xhr.Open "GET", fileName, False
+    xhr.setRequestHeader "Accept-Charset", "x-user-defined"
+    xhr.send
+    Dim byteArray()
+    if xhr.Status = 200 Then
+        Dim byteString
+        Dim i
+        byteString=xhr.responseBody
+        ReDim byteArray(LenB(byteString))
+        For i = 1 To LenB(byteString)
+            byteArray(i-1) = AscB(MidB(byteString, i, 1))
+        Next
+    End If
+    BinFileReaderImpl_IE_VBAjaxLoader=byteArray
+End Function
+</script>
+<script type="text/javascript">
+
+    var wadoURL;
+    var wc;
+    var ww;
+    var windowCenter;
+    var windowWidth;
+    var rescaleSlope;
+    var rescaleIntercept;
+    var spacingX;
+    var spacingY;
+    var lookupTable;
+    var huLookupTable;    
+    var pixelBuffer = new Array(512*512*2);
+    var imageLoaded=0;
+    var row=512;
+    var column=512;
+    var lookupObj;
+    
+    // The active tool instance.
+    var selectedTool = false;
+    var defaultTool = 'windowLevel';
+    // This object holds the implementation of each drawing tool.
+    var tools = {};
+    tools.rect = tools_rect;
+    tools.pencil = tools_pencil;
+    tools.line = tools_line;
+    tools.windowLevel = tools_windowLevel;
+    
+    var baseCanvas;
+    var baseContext;    
+    var canvas;
+    var context;    
+    var myImageData;
+    
+    var fontSize = 10;
+    var lineHeight = fontSize + fontSize/3;
+
+    String.prototype.replaceAll = function(pcFrom, pcTo){
+        var i = this.indexOf(pcFrom);
+        var c = this;
+        while (i > -1)
+        {
+            c = c.replace(pcFrom, pcTo);
+            i = c.indexOf(pcFrom);
+        }
+        return c;
+    }
+    
+    function initCanvas()
+    {
+        // Find the canvas element.
+        baseCanvas = document.getElementById('imageView');
+        if (!baseCanvas)
+        {
+            alert('Error: I cannot find the canvas element!');
+            return;
+        }
+
+        if (!baseCanvas.getContext)
+        {
+            alert('Error: no canvas.getContext!');
+            return;
+        }
+
+        // Get the 2D canvas context.
+        baseContext = baseCanvas.getContext('2d');
+        if (!baseContext)
+        {
+            alert('Error: failed to getContext!');
+            return;
+        }
+
+        // Add the temporary canvas.
+        var container = baseCanvas.parentNode;
+        canvas = document.createElement('canvas');
+        if (!canvas)
+        {
+            alert('Error: I cannot create a new canvas element!');
+            return;
+        }
+
+        canvas.id = 'imageTemp';
+        canvas.width = baseCanvas.width;
+        canvas.height = baseCanvas.height;
+        container.appendChild(canvas);
+        context = canvas.getContext('2d');
+        
+        // style
+        context.strokeStyle = '#f00'; // red
+    }
+    
+    function initTools()
+    {
+        // Get the tool select input.
+        var tool_select = document.getElementById('dtool');
+        if (!tool_select)
+        {
+            alert('Error: failed to get the dtool element!');
+            return;
+        }
+        tool_select.addEventListener('change', event_tool_change, false);
+
+        // Activate the default tool.
+        if (tools[defaultTool])
+        {
+            selectedTool = new tools[defaultTool]();
+            tool_select.value = defaultTool;
+        }
+    }
+
+    // The event handler for any changes made to the tool selector.
+    function event_tool_change(event)
+    {
+        if (tools[this.value])
+        {
+            selectedTool = new tools[this.value]();
+        }
+    }
+
+    // This function draws the #imageTemp canvas on top of #imageView,
+    // after which #imageTemp is cleared. This function is called each time when the
+    // user completes a drawing operation.
+    function img_update() 
+    {
+        baseContext.drawImage(canvas, 0, 0);
+        context.clearRect(0, 0, canvas.width, canvas.height);
+    } 
+
+    // The general-purpose event handler. This function just determines the mouse 
+    // position relative to the canvas element.
+    function ev_canvas(event)
+    {
+        //event._x = event.pageX - canvas.offsetLeft;
+        //event._y = event.pageY - canvas.offsetTop;
+
+        if (event.layerX || event.layerX == 0)
+        { 
+            // Firefox
+            event._x = event.layerX;
+            event._y = event.layerY;
+        }
+        else if (event.offsetX || event.offsetX == 0)
+        {
+            // Opera
+            event._x = event.offsetX;
+            event._y = event.offsetY;
+        }
+
+        if(event._x>=0 && event._y>=0 && event._x<column && event._y<row)
+        {
+            // Call the event handler of the tool.
+            var func = selectedTool[event.type];
+            if (func)
+            {
+                func(event);
+            }
+        }
+    }
+
+    function changePreset()
+    {    
+        applyPreset(parseInt(document.getElementById("presetsMenu").options[
+            document.getElementById("presetsMenu").selectedIndex].value));
+    }
+    
+    function applyPreset(preset)    
+    {    
+        switch (preset)
+        {
+            case 1:    
+            wc=windowCenter;
+            ww=windowWidth;
+            lookupObj.setWindowingdata(wc,ww);        
+            genImage();    
+            break;
+            
+            case 2:    
+            wc=350;
+            ww=40;
+            lookupObj.setWindowingdata(wc,ww);        
+            genImage();    
+            break;
+            
+            case 3:
+            wc=-600;
+            ww=1500;
+            lookupObj.setWindowingdata(wc,ww);        
+            genImage();
+            break;
+            
+            case 4:
+            wc=40;
+            ww=80;
+            lookupObj.setWindowingdata(wc,ww);        
+            genImage();
+            break;
+            
+            case 5:
+            wc=480;
+            ww=2500;
+            lookupObj.setWindowingdata(wc,ww);        
+            genImage();
+            break;
+            
+            case 6:
+            wc=90;
+            ww=350;
+            lookupObj.setWindowingdata(wc,ww);        
+            genImage();
+            break;
+        }
+    }
+    
+    function showHUvalue(x,y)
+    {
+        var t = (y*column)+x;        
+        var hupanel = document.getElementById("huDisplayPanel");
+        hupanel.innerHTML="X = "+x+"<br>Y = "+y+"<br>HU = "+huLookupTable[pixelBuffer[t]];
+        
+        // display on canvas
+        context.clearRect(0, 0, 150, 150);
+        context.fillStyle = "#fff";
+        context.font = "normal "+fontSize+"px sans-serif";
+        context.textBaseline = "top";
+        context.textAlign = "left";
+        context.fillText("X = "+x, 0, 0);
+        context.fillText("Y = "+y, 0, lineHeight);
+        context.fillText("HU = "+huLookupTable[pixelBuffer[t]], 0, 2*lineHeight);
+        context.fillText("spacingX = "+spacingX, 0, 3*lineHeight);
+        context.fillText("spacingY = "+spacingY, 0, 4*lineHeight);
+    }
+    
+    function showWindowingValue(windowCenter,windowWidth)
+    {
+        var windowingPanel=document.getElementById("windowingPanel");
+        windowingPanel.innerHTML="WindowCenter = "+windowCenter+"<br>WindowWidth = "+windowWidth;
+        
+        // display on canvas
+        context.clearRect(canvas.width-150, 0, canvas.width, 150);
+        context.fillStyle = "#fff";
+        context.font = "normal "+fontSize+"px sans-serif";
+        context.textBaseline = "top";
+        context.textAlign = "right";
+        context.fillText("WindowCenter = "+windowCenter, canvas.width, 0);
+        context.fillText("WindowWidth = "+windowWidth, canvas.width, lineHeight);
+    }
+     
+    function loadDicom(evt) 
+    {
+        //wadoURL= document.htmlForm.wadoURLField.value;             
+        file = evt.target.files[0]
+        
+        var myreader = new FileReader();
+        myreader.onload = function() {
+            return function(e) {
+              wadoURL = e.target.result
+              parseAndLoadDicom();
+              var span = document.createElement('span');
+              span.innerHTML = ['<p><b>', e.target.result.length, '</b></p>'].join('');
+              document.getElementById('list').insertBefore(span, null);
+            };
+        }();
+        myreader.readAsBinaryString(file);
+
+        //parseAndLoadDicom();
+    }
+    
+    function getContextPath()
+    {
+        var path = top.location.pathname;
+        if (document.all)
+        {
+            path = path.replace(/\\/g,"/");
+        }
+        path = path.substr(0,path.lastIndexOf("/")+1);        
+        return path;
+    }
+    
+    function parseAndLoadDicom()
+    {    
+        var reader=new DicomInputStreamReader();    
+        //reader.readDicom("http://"+top.location.host+"/"+getContextPath()+"/dcmstream?wadourl="+wadoURL.replaceAll("&","-"));
+        reader.readDicom(wadoURL);
+        var dicomBuffer=reader.getInputBuffer();
+        var dicomReader=reader.getReader();
+        var dicomParser=new DicomParser(dicomBuffer,dicomReader);
+        dicomParser.parseAll();        
+        var elementindex=0;
+        for(;elementindex<dicomParser.dicomElement.length;elementindex++)
+        {
+            var dicomElement=dicomParser.dicomElement[elementindex];            
+            if(dicomElement.name=="windowWidth")
+            {
+                windowWidth=ww=dicomElement.value[0];
+            }
+            else if(dicomElement.name=="windowCenter")
+            {
+                windowCenter=wc=dicomElement.value[0];            
+            }
+            else if(dicomElement.name=="rescaleIntercept")
+            {
+                rescaleIntercept=parseInt(dicomElement.value);
+            }
+            else if(dicomElement.name=="rescaleSlope")
+            {
+                rescaleSlope=parseInt(dicomElement.value);    
+            }
+            else if(dicomElement.name=="pixelSpacing")
+            {
+                spacingX=parseFloat(dicomElement.value[0]);    
+                spacingY=parseFloat(dicomElement.value[1]);    
+            }
+        }        
+        pixelBuffer=dicomParser.pixelBuffer;            
+        lookupObj=new LookupTable();
+        lookupObj.setData(wc,ww,rescaleSlope,rescaleIntercept);
+        lookupObj.calculateHULookup();
+        huLookupTable=lookupObj.huLookup;        
+        
+        initCanvas();
+        //canvas = document.getElementById("canvas");
+        //context = canvas.getContext("2d");                    
+        
+        baseContext.fillRect(0,0,512,512);    
+        myImageData = baseContext.getImageData(0,0,512,512);        
+        genImage();        
+        imageLoaded=1;
+        
+        initTools();
+        
+        // Attach the mousedown, mousemove and mouseup event listeners.
+        canvas.addEventListener('mousedown', ev_canvas, false);
+        canvas.addEventListener('mousemove', ev_canvas, false);
+        canvas.addEventListener('mouseup',   ev_canvas, false);
+    }
+    
+    function genImage()
+    {        
+        lookupObj.calculateLookup();
+        lookupTable=lookupObj.ylookup;
+        var n=0;    
+        for(var yPix=0; yPix<row; yPix++)
+        {
+            for(var xPix=0; xPix<column;xPix++)
+            {        
+                var offset = (yPix * column + xPix) * 4;                    
+                var pxValue=lookupTable[pixelBuffer[n]];    
+                n++;               
+                myImageData.data[offset] = parseInt(pxValue);
+                myImageData.data[offset+1] = parseInt(pxValue);
+                myImageData.data[offset+2] = parseInt(pxValue);
+            }
+        }            
+        baseContext.putImageData(myImageData, 0,0);
+        //img_update();
+    }    
+</script>
+
+<!-- Top banner -->
+<div style="margin: 20px 0px 0px 0px; height: 40px; width: 100%; color: #FFFFFF;"
+    align="center">
+
+<input type="file" id="files" name="files[]" multiple />
+<output id="list"></output>
+
+<script type="text/javascript">
+    document.getElementById('files').addEventListener('change', loadDicom, false);
+</script>
+
+</div>
+
+<!-- Menu -->
+<div id="mainMenu" style="margin: 70px 0px 0px 0px; width:20%; float:left;" align="left">
+<label>Tool: <select id="dtool">
+  <option value="windowLevel"">Window/Level</option>
+  <option value="rect"">Draw: Rectangle</option>
+  <option value="pencil">Draw: Pencil</option>
+  <option value="line">Draw: Line</option>
+</select></label>
+
+<br>&nbsp;
+
+<br>Preset:
+<select name="presetsMenu" id="presetsMenu" onchange="changePreset();">
+<option value="1" selected>Default</option>
+<option value="2" >Abdomen</option>
+<option value="3" >Lung</option>
+<option value="4" >Brain</option>
+<option value="5" >Bone</option>
+<option value="6" >Head/Neck</option>
+</select>
+
+<br>&nbsp;
+
+<div id="windowingPanel" style="color:#000000;"></div>
+<div id="huDisplayPanel" style="color:#000000;"></div>
+</div>
+
+<!-- Canvas -->
+<div id="container" style="margin: 70px 0px 0px 0px; height: 580px; float: left;" align="center">
+<canvas id="imageView" width="512" height="512" ></canvas>
+</div>
+
+</body>
+</html>
+
