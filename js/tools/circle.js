@@ -24,6 +24,7 @@ function tools_circle()
 
         context.clearRect(0, 0, canvas.width, canvas.height);
         context.fillStyle = lineColor;
+        context.strokeStyle = lineColor;
 
         var a = Math.abs(tool.x0-ev._x);
         var b = Math.abs(tool.y0-ev._y);

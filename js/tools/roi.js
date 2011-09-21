@@ -10,6 +10,7 @@ function tools_roi()
 
     // This is called when you start holding down the mouse button.
     this.mousedown = function(ev){
+        context.strokeStyle = lineColor;
         context.fillStyle = lineColor;
         context.beginPath();
         context.moveTo(ev._x, ev._y);

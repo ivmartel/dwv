@@ -29,6 +29,7 @@ function tools_rect()
 
         context.clearRect(0, 0, canvas.width, canvas.height);
         context.fillStyle = lineColor;
+        context.strokeStyle = lineColor;
 
         if (!w || !h)
         {

@@ -26,7 +26,7 @@ body{
 <script type="text/javascript" src="js/dicom/DicomParser.js"></script>
 <script type="text/javascript" src="js/dicom/LookupTable.js"></script>
 <script type="text/javascript" src="js/tools/rect.js"></script>
-<script type="text/javascript" src="js/tools/pencil.js"></script>
+<script type="text/javascript" src="js/tools/roi.js"></script>
 <script type="text/javascript" src="js/tools/line.js"></script>
 <script type="text/javascript" src="js/tools/circle.js"></script>
 <script type="text/javascript" src="js/tools/windowLevel.js"></script>
@@ -99,6 +99,27 @@ End Function
         return c;
     }
     
+    function mouseOverColor()
+    {
+        document.body.style.cursor="pointer";
+    }
+    
+    function setLineColor(color)
+    {
+        // set global var
+        lineColor = color;
+        // reset borders
+        var tr = document.getElementById("colours");
+        var tds = tr.getElementsByTagName("td");
+        for (var i = 0; i < tds.length; i++)
+        {
+            tds[i].style.border = "#fff solid 2px";
+        }
+        // set selected border
+        var td = document.getElementById(color);
+        td.style.border = "#00f solid 2px";
+    }
+    
     function initCanvas()
     {
         // Find the canvas element.
@@ -137,9 +158,6 @@ End Function
         canvas.height = baseCanvas.height;
         container.appendChild(canvas);
         context = canvas.getContext('2d');
-        
-        // style
-        context.strokeStyle = lineColor;
     }
     
     function initTools()
@@ -377,8 +395,6 @@ End Function
         huLookupTable=lookupObj.huLookup;        
         
         initCanvas();
-        //canvas = document.getElementById("canvas");
-        //context = canvas.getContext("2d");                    
         
         baseContext.fillRect(0,0,512,512);    
         myImageData = baseContext.getImageData(0,0,512,512);        
@@ -386,6 +402,7 @@ End Function
         imageLoaded=1;
         
         initTools();
+        setLineColor(lineColor);
         
         // Attach the mousedown, mousemove and mouseup event listeners.
         canvas.addEventListener('mousedown', ev_canvas, false);
@@ -411,7 +428,6 @@ End Function
             }
         }            
         baseContext.putImageData(myImageData, 0,0);
-        //img_update();
     }    
 </script>
 
@@ -437,6 +453,30 @@ End Function
   <option value="roi">Draw: ROI</option>
   <option value="line">Draw: Line</option>
 </select></label>
+
+<br>&nbsp;
+
+<br>Color: 
+<table name="colourChooser" id="colourChooser" cellpadding='0' cellspacing='0' border='0'>
+<tr id="colours" onmouseover="mouseOverColor()" >
+<td id="#000" onclick="setLineColor('#000')" 
+    style="width:20px; height:20px; background:#000; border:#fff solid 2px;">&nbsp;</td>
+<td id="#fff" onclick="setLineColor('#fff')" 
+    style="width:20px; height:20px; background:#fff; border:#fff solid 2px;">&nbsp;</td>
+<td id="#f00" onclick="setLineColor('#f00')" 
+    style="width:20px; height:20px; background:#f00; border:#fff solid 2px;">&nbsp;</td>
+<td id="#0f0" onclick="setLineColor('#0f0')" 
+    style="width:20px; height:20px; background:#0f0; border:#fff solid 2px;">&nbsp;</td>
+<td id="#00f" onclick="setLineColor('#00f')" 
+    style="width:20px; height:20px; background:#00f; border:#fff solid 2px;">&nbsp;</td>
+<td id="#ff0" onclick="setLineColor('#ff0')" 
+    style="width:20px; height:20px; background:#ff0; border:#fff solid 2px;">&nbsp;</td>
+<td id="#f0f" onclick="setLineColor('#f0f')" 
+    style="width:20px; height:20px; background:#f0f; border:#fff solid 2px;">&nbsp;</td>
+<td id="#0ff" onclick="setLineColor('#0ff')" 
+    style="width:20px; height:20px; background:#0ff; border:#fff solid 2px;">&nbsp;</td>
+</tr>
+</table>
 
 <br>&nbsp;
 
