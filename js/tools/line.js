@@ -1,5 +1,5 @@
 /**
-* rect.js
+* line.js
 * Line painting tool.
 * WARNING: draws on the context var.
 */
@@ -23,6 +23,7 @@ function tools_line()
         }
 
         context.clearRect(0, 0, canvas.width, canvas.height);
+        context.fillStyle = lineColor;
 
         context.beginPath();
         context.moveTo(tool.x0, tool.y0);
@@ -34,8 +35,8 @@ function tools_line()
         var a = Math.abs(tool.x0-ev._x)*spacingX;
         var b = Math.abs(tool.y0-ev._y)*spacingY;
         var size = Math.round(Math.sqrt(a*a+b*b));
-        context.fillStyle = "#f00";
-        context.fillText(size,ev._x+10, ev._y-10)
+        context.font = fontStr
+        context.fillText(size+"mm",ev._x+fontSize, ev._y+fontSize)
     };
 
     // This is called when you release the mouse button.

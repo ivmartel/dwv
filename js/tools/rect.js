@@ -28,13 +28,20 @@ function tools_rect()
         var h = Math.abs(ev._y - tool.y0);
 
         context.clearRect(0, 0, canvas.width, canvas.height);
+        context.fillStyle = lineColor;
 
         if (!w || !h)
         {
             return;
         }
 
+        context.beginPath();
         context.strokeRect(x, y, w, h);
+    
+        // surface
+        var surf = Math.round((w*spacingX)*(h*spacingY));
+        context.font = fontStr
+        context.fillText(surf+"mm2",ev._x+fontSize, ev._y+fontSize)
     };
 
     // This is called when you release the mouse button.

@@ -28,6 +28,7 @@ body{
 <script type="text/javascript" src="js/tools/rect.js"></script>
 <script type="text/javascript" src="js/tools/pencil.js"></script>
 <script type="text/javascript" src="js/tools/line.js"></script>
+<script type="text/javascript" src="js/tools/circle.js"></script>
 <script type="text/javascript" src="js/tools/windowLevel.js"></script>
 
 <script type="text/vbscript">
@@ -74,19 +75,18 @@ End Function
     var defaultTool = 'windowLevel';
     // This object holds the implementation of each drawing tool.
     var tools = {};
-    tools.rect = tools_rect;
-    tools.pencil = tools_pencil;
-    tools.line = tools_line;
-    tools.windowLevel = tools_windowLevel;
-    
     var baseCanvas;
     var baseContext;    
     var canvas;
     var context;    
     var myImageData;
     
-    var fontSize = 10;
-    var lineHeight = fontSize + fontSize/3;
+    // style
+    var fontSize = 12;
+    var fontStr = "normal "+fontSize+"px sans-serif";
+    var lineHeight = fontSize + fontSize/5;
+    var lineColor = "#ff0";
+    var textColor = "#fff";
 
     String.prototype.replaceAll = function(pcFrom, pcTo){
         var i = this.indexOf(pcFrom);
@@ -139,11 +139,18 @@ End Function
         context = canvas.getContext('2d');
         
         // style
-        context.strokeStyle = '#f00'; // red
+        context.strokeStyle = lineColor;
     }
     
     function initTools()
     {
+        // tool list
+        tools.rect = tools_rect;
+        tools.roi = tools_roi;
+        tools.line = tools_line;
+        tools.circle = tools_circle;
+        tools.windowLevel = tools_windowLevel;
+    
         // Get the tool select input.
         var tool_select = document.getElementById('dtool');
         if (!tool_select)
@@ -267,15 +274,15 @@ End Function
     function showHUvalue(x,y)
     {
         var t = (y*column)+x;        
-        var hupanel = document.getElementById("huDisplayPanel");
-        hupanel.innerHTML="X = "+x+"<br>Y = "+y+"<br>HU = "+huLookupTable[pixelBuffer[t]];
         
-        // display on canvas
+        // style
         context.clearRect(0, 0, 150, 150);
-        context.fillStyle = "#fff";
-        context.font = "normal "+fontSize+"px sans-serif";
+        context.fillStyle = textColor;
+        context.font = fontStr
         context.textBaseline = "top";
         context.textAlign = "left";
+        
+        // text
         context.fillText("X = "+x, 0, 0);
         context.fillText("Y = "+y, 0, lineHeight);
         context.fillText("HU = "+huLookupTable[pixelBuffer[t]], 0, 2*lineHeight);
@@ -285,15 +292,14 @@ End Function
     
     function showWindowingValue(windowCenter,windowWidth)
     {
-        var windowingPanel=document.getElementById("windowingPanel");
-        windowingPanel.innerHTML="WindowCenter = "+windowCenter+"<br>WindowWidth = "+windowWidth;
-        
-        // display on canvas
+        // style
         context.clearRect(canvas.width-150, 0, canvas.width, 150);
-        context.fillStyle = "#fff";
-        context.font = "normal "+fontSize+"px sans-serif";
+        context.fillStyle = textColor;
+        context.font = fontStr
         context.textBaseline = "top";
         context.textAlign = "right";
+        
+        // text
         context.fillText("WindowCenter = "+windowCenter, canvas.width, 0);
         context.fillText("WindowWidth = "+windowWidth, canvas.width, lineHeight);
     }
@@ -423,17 +429,18 @@ End Function
 </div>
 
 <!-- Menu -->
-<div id="mainMenu" style="margin: 70px 0px 0px 0px; width:20%; float:left;" align="left">
+<div id="mainMenu" style="margin: 70px 0px 0px 0px; padding: 10px; width:20%; float:left;" align="left">
 <label>Tool: <select id="dtool">
-  <option value="windowLevel"">Window/Level</option>
-  <option value="rect"">Draw: Rectangle</option>
-  <option value="pencil">Draw: Pencil</option>
+  <option value="windowLevel">Window/Level</option>
+  <option value="rect">Draw: Rectangle</option>
+  <option value="circle">Draw: Circle</option>
+  <option value="roi">Draw: ROI</option>
   <option value="line">Draw: Line</option>
 </select></label>
 
 <br>&nbsp;
 
-<br>Preset:
+<br><label>Preset:
 <select name="presetsMenu" id="presetsMenu" onchange="changePreset();">
 <option value="1" selected>Default</option>
 <option value="2" >Abdomen</option>
@@ -441,12 +448,8 @@ End Function
 <option value="4" >Brain</option>
 <option value="5" >Bone</option>
 <option value="6" >Head/Neck</option>
-</select>
+</select></label>
 
-<br>&nbsp;
-
-<div id="windowingPanel" style="color:#000000;"></div>
-<div id="huDisplayPanel" style="color:#000000;"></div>
 </div>
 
 <!-- Canvas -->
