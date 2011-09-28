@@ -304,8 +304,6 @@ End Function
         context.fillText("X = "+x, 0, 0);
         context.fillText("Y = "+y, 0, lineHeight);
         context.fillText("HU = "+huLookupTable[pixelBuffer[t]], 0, 2*lineHeight);
-        context.fillText("spacingX = "+spacingX, 0, 3*lineHeight);
-        context.fillText("spacingY = "+spacingY, 0, 4*lineHeight);
     }
     
     function showWindowingValue(windowCenter,windowWidth)
@@ -361,7 +359,11 @@ End Function
         var dicomBuffer=reader.getInputBuffer();
         var dicomReader=reader.getReader();
         var dicomParser=new DicomParser(dicomBuffer,dicomReader);
-        dicomParser.parseAll();        
+        dicomParser.parseAll();     
+        
+        // tag list table      
+        var table = document.getElementById("tagList")
+   
         var elementindex=0;
         for(;elementindex<dicomParser.dicomElement.length;elementindex++)
         {
@@ -387,7 +389,17 @@ End Function
                 spacingX=parseFloat(dicomElement.value[0]);    
                 spacingY=parseFloat(dicomElement.value[1]);    
             }
-        }        
+
+            var lastRow = table.rows.length;
+            var row = table.insertRow(lastRow);
+            var cell0 = row.insertCell(0);
+            cell0.appendChild(document.createTextNode(dicomElement.group+", "+dicomElement.element));
+            var cell1 = row.insertCell(1);
+            cell1.appendChild(document.createTextNode(dicomElement.name));
+            var cell2 = row.insertCell(2);
+            cell2.appendChild(document.createTextNode(dicomElement.value));
+        } 
+               
         pixelBuffer=dicomParser.pixelBuffer;            
         lookupObj=new LookupTable();
         lookupObj.setData(wc,ww,rescaleSlope,rescaleIntercept);
@@ -434,14 +446,7 @@ End Function
 <!-- Top banner -->
 <div style="margin: 20px 0px 0px 0px; height: 40px; width: 100%; color: #FFFFFF;"
     align="center">
-
-<input type="file" id="files" name="files[]" multiple />
-<output id="list"></output>
-
-<script type="text/javascript">
-    document.getElementById('files').addEventListener('change', loadDicom, false);
-</script>
-
+<h1>DICOM Web Viewer</h1>
 </div>
 
 <!-- Menu -->
@@ -495,6 +500,36 @@ End Function
 <!-- Canvas -->
 <div id="container" style="margin: 70px 0px 0px 0px; height: 580px; float: left;" align="center">
 <canvas id="imageView" width="512" height="512" ></canvas>
+</div>
+
+<!-- Tags -->
+<div id="right" style="margin: 70px 0px 0px 30px; height: 580px; float: right;">
+<form>
+Path: <input type="file" id="files" name="files[]" multiple />
+</form>
+
+<script type="text/javascript">
+    document.getElementById('files').addEventListener('change', loadDicom, false);
+</script>
+
+<form>
+Search Tags: <input type="text" id="tagSearch" name="tagSearch" multiple />
+<input type="submit" value="Submit" />
+</form>
+
+<table name="tagList" id="tagList" border="1">
+<tr>
+<th>Tag</th>
+<th>Name</th>
+<th>Value</th>
+</tr>
+</table>
+
+</div>
+
+<!-- Footer -->
+<div id="footer">
+<p>see <a href="https://github.com/ivmartel/dwv">dwv</a></p>
 </div>
 
 </body>

@@ -23,15 +23,12 @@ function getPixelBuffer()
 function parseAll()
 {
 	var index = 0;
-	//read spacing value
+	index=this.readTag(index,8,0,96,0,"modality");
+	index=this.readTag(index,16,0,16,0,"patientName");
 	index=this.readTag(index,40,0,48,0,"pixelSpacing");
-	//read wc value
 	index=this.readTag(index,40,0,80,16,"windowCenter");
-	//read ww value
 	index=this.readTag(index,40,0,81,16,"windowWidth");
-	//read rescale slope value
 	index=this.readTag(index,40,0,82,16,"rescaleIntercept");
-	//read rescale intercept value
 	index=this.readTag(index,40,0,83,16,"rescaleSlope");
 	//move to pixel data
 	index=this.moveToPixelDataTag(index);
