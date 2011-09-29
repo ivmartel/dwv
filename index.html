@@ -1,21 +1,9 @@
 <html>
 
 <head>
+<title>DICOM Web Viewer</title>
 <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
-<style>
-body{
-    background-color: #87AEC5;    
-    font-family: arial;
-    font-size: 80%;
-    margin: 0px;
-    padding: 0px;
-    background-image: url('images/header.gif');
-    background-repeat: repeat-x;
-}
-#container { position: relative; }
-#imageView { border: 1px solid #000; }
-#imageTemp { position: absolute; top: 1px; left: 1px; }
-</style>
+<link rel="stylesheet" href="style.css">
 </head>
 
 <body>
@@ -85,7 +73,7 @@ End Function
     var fontSize = 12;
     var fontStr = "normal "+fontSize+"px sans-serif";
     var lineHeight = fontSize + fontSize/5;
-    var lineColor = "#ff0";
+    var lineColor = "yellow";
     var textColor = "#fff";
 
     String.prototype.replaceAll = function(pcFrom, pcTo){
@@ -443,14 +431,13 @@ End Function
     }    
 </script>
 
-<!-- Top banner -->
-<div style="margin: 20px 0px 0px 0px; height: 40px; width: 100%; color: #FFFFFF;"
-    align="center">
+<!-- Header -->
+<div id="header" align="center">
 <h1>DICOM Web Viewer</h1>
 </div>
 
-<!-- Menu -->
-<div id="mainMenu" style="margin: 70px 0px 0px 0px; padding: 10px; width:20%; float:left;" align="left">
+<!-- Left -->
+<div id="left" align="left">
 <label>Tool: <select id="dtool">
   <option value="windowLevel">Window/Level</option>
   <option value="rect">Draw: Rectangle</option>
@@ -462,24 +449,16 @@ End Function
 <br>&nbsp;
 
 <br>Color: 
-<table name="colourChooser" id="colourChooser" cellpadding='0' cellspacing='0' border='0'>
+<table name="colourChooser" class="colourChooser">
 <tr id="colours" onmouseover="mouseOverColor()" >
-<td id="#000" onclick="setLineColor('#000')" 
-    style="width:20px; height:20px; background:#000; border:#fff solid 2px;">&nbsp;</td>
-<td id="#fff" onclick="setLineColor('#fff')" 
-    style="width:20px; height:20px; background:#fff; border:#fff solid 2px;">&nbsp;</td>
-<td id="#f00" onclick="setLineColor('#f00')" 
-    style="width:20px; height:20px; background:#f00; border:#fff solid 2px;">&nbsp;</td>
-<td id="#0f0" onclick="setLineColor('#0f0')" 
-    style="width:20px; height:20px; background:#0f0; border:#fff solid 2px;">&nbsp;</td>
-<td id="#00f" onclick="setLineColor('#00f')" 
-    style="width:20px; height:20px; background:#00f; border:#fff solid 2px;">&nbsp;</td>
-<td id="#ff0" onclick="setLineColor('#ff0')" 
-    style="width:20px; height:20px; background:#ff0; border:#fff solid 2px;">&nbsp;</td>
-<td id="#f0f" onclick="setLineColor('#f0f')" 
-    style="width:20px; height:20px; background:#f0f; border:#fff solid 2px;">&nbsp;</td>
-<td id="#0ff" onclick="setLineColor('#0ff')" 
-    style="width:20px; height:20px; background:#0ff; border:#fff solid 2px;">&nbsp;</td>
+<td id="black" onclick="setLineColor('black')">&nbsp;</td>
+<td id="white" onclick="setLineColor('white')">&nbsp;</td>
+<td id="red" onclick="setLineColor('red')">&nbsp;</td>
+<td id="green" onclick="setLineColor('green')">&nbsp;</td>
+<td id="blue" onclick="setLineColor('blue')">&nbsp;</td>
+<td id="yellow" onclick="setLineColor('yellow')">&nbsp;</td>
+<td id="lime" onclick="setLineColor('lime')">&nbsp;</td>
+<td id="fuchsia" onclick="setLineColor('fuchsia')">&nbsp;</td>
 </tr>
 </table>
 
@@ -497,13 +476,13 @@ End Function
 
 </div>
 
-<!-- Canvas -->
-<div id="container" style="margin: 70px 0px 0px 0px; height: 580px; float: left;" align="center">
+<!-- Container -->
+<div id="container" align="center">
 <canvas id="imageView" width="512" height="512" ></canvas>
 </div>
 
-<!-- Tags -->
-<div id="right" style="margin: 70px 0px 0px 30px; height: 580px; float: right;">
+<!-- Right -->
+<div id="right">
 <form>
 Path: <input type="file" id="files" name="files[]" multiple />
 </form>
@@ -517,7 +496,7 @@ Search Tags: <input type="text" id="tagSearch" name="tagSearch" multiple />
 <input type="submit" value="Submit" />
 </form>
 
-<table name="tagList" id="tagList" border="1">
+<table name="tagList" id="tagList">
 <tr>
 <th>Tag</th>
 <th>Name</th>
