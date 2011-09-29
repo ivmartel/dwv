@@ -1,0 +1,30 @@
+body{
+    background-color: #87AEC5;    
+    font-family: Verdana, Arial, Helvetica, sans-serif ;
+    font-size: 80%;
+    margin: 0px;
+    padding: 0px;
+    background-image: url('images/header.gif');
+    background-repeat: repeat-x;
+}
+/* layout */
+#header { margin: 20px 0px 0px 0px; height: 40px; width: 100%; color: #fff; }
+#footer {}
+#left { margin: 70px 0px 0px 0px; padding: 10px; width:20%; float:left; }
+#right { margin: 70px 0px 0px 30px; height: 580px; float: right; }
+#container { position: relative; margin: 70px 0px 0px 0px; height: 580px; float: left; }
+
+#imageView { border: 1px solid #000; }
+#imageTemp { position: absolute; top: 1px; left: 1px; }
+
+/* colourChooser */
+table.colourChooser td { width:20px; height:20px; border:#fff solid 2px; }
+table.colourChooser #black { background: black; }
+table.colourChooser #white { background: white; }
+table.colourChooser #red { background: red; }
+table.colourChooser #green { background: green; }
+table.colourChooser #blue { background: blue; }
+table.colourChooser #yellow { background: yellow; }
+table.colourChooser #lime { background: lime; }
+table.colourChooser #fuchsia { background:fuchsia; }
+
