@@ -92,6 +92,11 @@ End Function
         document.body.style.cursor="pointer";
     }
     
+    function mouseOutColor()
+    {
+        document.body.style.cursor="auto";
+    }
+    
     function setLineColor(color)
     {
         // set global var
@@ -448,7 +453,7 @@ Tool: <select id="dtool">
 
 <br>Color: 
 <table name="colourChooser" class="colourChooser">
-<tr id="colours" onmouseover="mouseOverColor()" >
+<tr id="colours" onmouseover="mouseOverColor()" onmouseout="mouseOutColor()">
 <td id="black" onclick="setLineColor('black')">&nbsp;</td>
 <td id="white" onclick="setLineColor('white')">&nbsp;</td>
 <td id="red" onclick="setLineColor('red')">&nbsp;</td>
