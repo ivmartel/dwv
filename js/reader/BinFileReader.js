@@ -132,3 +132,27 @@ function BinFileReader(fileURL){
 	else
 		BinFileReaderImpl.apply(this, [fileURL]);
 }
+
+/*
+// to add in the index.html
+<script type="text/vbscript">
+Function BinFileReaderImpl_IE_VBAjaxLoader(fileName)
+    Dim xhr
+    Set xhr = CreateObject("Microsoft.XMLHTTP")
+    xhr.Open "GET", fileName, False
+    xhr.setRequestHeader "Accept-Charset", "x-user-defined"
+    xhr.send
+    Dim byteArray()
+    if xhr.Status = 200 Then
+        Dim byteString
+        Dim i
+        byteString=xhr.responseBody
+        ReDim byteArray(LenB(byteString))
+        For i = 1 To LenB(byteString)
+            byteArray(i-1) = AscB(MidB(byteString, i, 1))
+        Next
+    End If
+    BinFileReaderImpl_IE_VBAjaxLoader=byteArray
+End Function
+</script>
+*/

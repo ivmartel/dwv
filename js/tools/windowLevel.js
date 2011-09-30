@@ -51,5 +51,116 @@ function tools_windowLevel()
             img_update();
         }
     };
+    
+    function showHUvalue(x,y)
+    {
+        var t = (y*column)+x;        
+        
+        // style
+        context.clearRect(0, 0, 150, 150);
+        context.fillStyle = textColor;
+        context.font = fontStr
+        context.textBaseline = "top";
+        context.textAlign = "left";
+        
+        // text
+        context.fillText("X = "+x, 0, 0);
+        context.fillText("Y = "+y, 0, lineHeight);
+        context.fillText("HU = "+huLookupTable[pixelBuffer[t]], 0, 2*lineHeight);
+    }
+    
+    function showWindowingValue(windowCenter,windowWidth)
+    {
+        // style
+        context.clearRect(canvas.width-150, 0, canvas.width, 150);
+        context.fillStyle = textColor;
+        context.font = fontStr
+        context.textBaseline = "top";
+        context.textAlign = "right";
+        
+        // text
+        context.fillText("WindowCenter = "+windowCenter, canvas.width, 0);
+        context.fillText("WindowWidth = "+windowWidth, canvas.width, lineHeight);
+    }
+
 } // tools_windowLevel
+
+function getPresetSelector()
+{
+    var paragraph = document.createElement("p");  
+    paragraph.appendChild(document.createTextNode("WL Preset: "));
+    
+    var selector = document.createElement("select");
+    selector.id = "presetsMenu";
+    selector.name = "presetsMenu";
+    selector.onchange = changePreset;
+    selector.selectedIndex = 1;
+    paragraph.appendChild(selector);
+
+    var options = new Array("Default", "Abdomen", "Lung", "Brain", "Bone", "Head");
+    var option;
+    for ( var i = 0; i < options.length; ++i )
+    {
+        option = document.createElement("option");
+        option.value = i+1;
+        option.appendChild(document.createTextNode(options[i]));
+        selector.appendChild(option);
+    }
+
+    document.getElementById('presetSelector').appendChild(paragraph);
+}
+
+function changePreset()
+{    
+    applyPreset(parseInt(document.getElementById("presetsMenu").options[
+        document.getElementById("presetsMenu").selectedIndex].value));
+}
+
+function applyPreset(preset)    
+{    
+    switch (preset)
+    {
+        case 1:    
+        wc=windowCenter;
+        ww=windowWidth;
+        lookupObj.setWindowingdata(wc,ww);        
+        genImage();    
+        break;
+        
+        case 2:    
+        wc=350;
+        ww=40;
+        lookupObj.setWindowingdata(wc,ww);        
+        genImage();    
+        break;
+        
+        case 3:
+        wc=-600;
+        ww=1500;
+        lookupObj.setWindowingdata(wc,ww);        
+        genImage();
+        break;
+        
+        case 4:
+        wc=40;
+        ww=80;
+        lookupObj.setWindowingdata(wc,ww);        
+        genImage();
+        break;
+        
+        case 5:
+        wc=480;
+        ww=2500;
+        lookupObj.setWindowingdata(wc,ww);        
+        genImage();
+        break;
+        
+        case 6:
+        wc=90;
+        ww=350;
+        lookupObj.setWindowingdata(wc,ww);        
+        genImage();
+        break;
+    }
+}
 

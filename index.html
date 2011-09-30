@@ -19,26 +19,6 @@
 <script type="text/javascript" src="js/tools/circle.js"></script>
 <script type="text/javascript" src="js/tools/windowLevel.js"></script>
 
-<script type="text/vbscript">
-Function BinFileReaderImpl_IE_VBAjaxLoader(fileName)
-    Dim xhr
-    Set xhr = CreateObject("Microsoft.XMLHTTP")
-    xhr.Open "GET", fileName, False
-    xhr.setRequestHeader "Accept-Charset", "x-user-defined"
-    xhr.send
-    Dim byteArray()
-    if xhr.Status = 200 Then
-        Dim byteString
-        Dim i
-        byteString=xhr.responseBody
-        ReDim byteArray(LenB(byteString))
-        For i = 1 To LenB(byteString)
-            byteArray(i-1) = AscB(MidB(byteString, i, 1))
-        Next
-    End If
-    BinFileReaderImpl_IE_VBAjaxLoader=byteArray
-End Function
-</script>
 <script type="text/javascript">
 
     var wadoURL;
@@ -76,17 +56,6 @@ End Function
     var lineColor = "yellow";
     var textColor = "#fff";
 
-    String.prototype.replaceAll = function(pcFrom, pcTo){
-        var i = this.indexOf(pcFrom);
-        var c = this;
-        while (i > -1)
-        {
-            c = c.replace(pcFrom, pcTo);
-            i = c.indexOf(pcFrom);
-        }
-        return c;
-    }
-    
     function mouseOverColor()
     {
         document.body.style.cursor="pointer";
@@ -228,91 +197,6 @@ End Function
         }
     }
 
-    function changePreset()
-    {    
-        applyPreset(parseInt(document.getElementById("presetsMenu").options[
-            document.getElementById("presetsMenu").selectedIndex].value));
-    }
-    
-    function applyPreset(preset)    
-    {    
-        switch (preset)
-        {
-            case 1:    
-            wc=windowCenter;
-            ww=windowWidth;
-            lookupObj.setWindowingdata(wc,ww);        
-            genImage();    
-            break;
-            
-            case 2:    
-            wc=350;
-            ww=40;
-            lookupObj.setWindowingdata(wc,ww);        
-            genImage();    
-            break;
-            
-            case 3:
-            wc=-600;
-            ww=1500;
-            lookupObj.setWindowingdata(wc,ww);        
-            genImage();
-            break;
-            
-            case 4:
-            wc=40;
-            ww=80;
-            lookupObj.setWindowingdata(wc,ww);        
-            genImage();
-            break;
-            
-            case 5:
-            wc=480;
-            ww=2500;
-            lookupObj.setWindowingdata(wc,ww);        
-            genImage();
-            break;
-            
-            case 6:
-            wc=90;
-            ww=350;
-            lookupObj.setWindowingdata(wc,ww);        
-            genImage();
-            break;
-        }
-    }
-    
-    function showHUvalue(x,y)
-    {
-        var t = (y*column)+x;        
-        
-        // style
-        context.clearRect(0, 0, 150, 150);
-        context.fillStyle = textColor;
-        context.font = fontStr
-        context.textBaseline = "top";
-        context.textAlign = "left";
-        
-        // text
-        context.fillText("X = "+x, 0, 0);
-        context.fillText("Y = "+y, 0, lineHeight);
-        context.fillText("HU = "+huLookupTable[pixelBuffer[t]], 0, 2*lineHeight);
-    }
-    
-    function showWindowingValue(windowCenter,windowWidth)
-    {
-        // style
-        context.clearRect(canvas.width-150, 0, canvas.width, 150);
-        context.fillStyle = textColor;
-        context.font = fontStr
-        context.textBaseline = "top";
-        context.textAlign = "right";
-        
-        // text
-        context.fillText("WindowCenter = "+windowCenter, canvas.width, 0);
-        context.fillText("WindowWidth = "+windowWidth, canvas.width, lineHeight);
-    }
-     
     function loadDicom(evt) 
     {
         //wadoURL= document.htmlForm.wadoURLField.value;             
@@ -347,7 +231,6 @@ End Function
     function parseAndLoadDicom()
     {    
         var reader=new DicomInputStreamReader();    
-        //reader.readDicom("http://"+top.location.host+"/"+getContextPath()+"/dcmstream?wadourl="+wadoURL.replaceAll("&","-"));
         reader.readDicom(wadoURL);
         var dicomBuffer=reader.getInputBuffer();
         var dicomReader=reader.getReader();
@@ -465,17 +348,8 @@ Tool: <select id="dtool">
 </tr>
 </table>
 
-<br>&nbsp;
-
-<br>Preset:
-<select name="presetsMenu" id="presetsMenu" onchange="changePreset();">
-<option value="1" selected>Default</option>
-<option value="2" >Abdomen</option>
-<option value="3" >Lung</option>
-<option value="4" >Brain</option>
-<option value="5" >Bone</option>
-<option value="6" >Head/Neck</option>
-</select>
+<div id="presetSelector"></div>
+<script type="text/javascript">getPresetSelector();</script>
 
 </div>
 
