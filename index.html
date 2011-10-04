@@ -21,9 +21,7 @@
 
 <script type="text/javascript">
 
-    var wadoURL;
-    var wc;
-    var ww;
+    // DICOM values
     var windowCenter;
     var windowWidth;
     var rescaleSlope;
@@ -31,9 +29,11 @@
     var spacingX;
     var spacingY;
     var lookupTable;
-    var huLookupTable;    
+    var huLookupTable; 
+       
     var pixelBuffer = new Array(512*512*2);
     var imageLoaded=0;
+    
     var row=512;
     var column=512;
     var lookupObj;
@@ -170,9 +170,6 @@
     // position relative to the canvas element.
     function ev_canvas(event)
     {
-        //event._x = event.pageX - canvas.offsetLeft;
-        //event._y = event.pageY - canvas.offsetTop;
-
         if (event.layerX || event.layerX == 0)
         { 
             // Firefox
@@ -199,7 +196,6 @@
 
     function loadDicom(evt) 
     {
-        //wadoURL= document.htmlForm.wadoURLField.value;             
         file = evt.target.files[0]
         
         var myreader = new FileReader();
@@ -207,14 +203,12 @@
             return function(e) {
               wadoURL = e.target.result
               parseAndLoadDicom();
-              var span = document.createElement('span');
+              var span = document.createElement('div');
               span.innerHTML = ['<p><b>', e.target.result.length, '</b></p>'].join('');
-              document.getElementById('list').insertBefore(span, null);
+              document.getElementById('tagSearch').insertBefore(span, null);
             };
         }();
         myreader.readAsBinaryString(file);
-
-        //parseAndLoadDicom();
     }
     
     function getContextPath()
@@ -246,11 +240,11 @@
             var dicomElement=dicomParser.dicomElement[elementindex];            
             if(dicomElement.name=="windowWidth")
             {
-                windowWidth=ww=dicomElement.value[0];
+                windowWidth=dicomElement.value[0];
             }
             else if(dicomElement.name=="windowCenter")
             {
-                windowCenter=wc=dicomElement.value[0];            
+                windowCenter=dicomElement.value[0];            
             }
             else if(dicomElement.name=="rescaleIntercept")
             {
@@ -278,7 +272,7 @@
                
         pixelBuffer=dicomParser.pixelBuffer;            
         lookupObj=new LookupTable();
-        lookupObj.setData(wc,ww,rescaleSlope,rescaleIntercept);
+        lookupObj.setData(windowCenter,windowWidth,rescaleSlope,rescaleIntercept);
         lookupObj.calculateHULookup();
         huLookupTable=lookupObj.huLookup;        
         

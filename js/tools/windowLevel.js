@@ -29,11 +29,11 @@ function tools_windowLevel()
                                                                            
         var diffX = ev._x - tool.x0;
         var diffY = tool.y0 - ev._y;                                
-        wc = parseInt(wc) + diffY;
-        ww = parseInt(ww) + diffX;                        
+        windowCenter = parseInt(windowCenter) + diffY;
+        windowWidth = parseInt(windowWidth) + diffX;                        
         
-        showWindowingValue(wc,ww);    
-        lookupObj.setWindowingdata(wc,ww);                                
+        showWindowingValue(windowCenter,windowWidth);    
+        lookupObj.setWindowingdata(windowCenter,windowWidth);                                
         genImage();
         
         tool.x0 = ev._x;             
@@ -118,6 +118,7 @@ function changePreset()
 
 function applyPreset(preset)    
 {    
+    var ww, wc;
     switch (preset)
     {
         case 1:    
