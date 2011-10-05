@@ -51,7 +51,7 @@ DicomParser.prototype.setDicomElement=function(name,vr,vl,group,element,value,of
 
 DicomParser.prototype.readTag=function(index,firstContent,secondContent,thirdContent,fourthContent,tagName)
 {
-    var vr, vl, val, tagValue;
+    var vr, vl, value;
     var i=index;
     for(; i<this.inputBuffer.length; i++) 
     {
@@ -63,12 +63,19 @@ DicomParser.prototype.readTag=function(index,firstContent,secondContent,thirdCon
             i=i+4;
             vr = this.reader.readString(2,i);
             vl = this.reader.readNumber(2,i+2);
-            val = this.reader.readString(vl,i+4);
-            tagValue = val.split("\\");                
+            if( vr == "US")
+            {
+                value = [this.reader.readNumber(vl,i+4)];
+            }
+            else
+            {
+                value = this.reader.readString(vl,i+4);
+                value = value.split("\\");                
+            }    
             this.setDicomElement(tagName,vr,vl,
                 firstContent+secondContent,
                 thirdContent+fourthContent,
-                tagValue,i-4);
+                value,i-4);
             i=i+4+vl;                       
             break;
         }    
