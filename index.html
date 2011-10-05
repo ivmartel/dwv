@@ -29,7 +29,7 @@
     var huLookupTable; 
     var lookupObj;
        
-    var pixelBuffer = new Array(512*512*2);
+    var pixelBuffer;
     var imageLoaded=0;
     
     // The active tool instance.
@@ -109,6 +109,9 @@
             return;
         }
 
+        baseCanvas.width = image.getSize()[0];
+        baseCanvas.height = image.getSize()[1];
+        
         canvas.id = 'imageTemp';
         canvas.width = baseCanvas.width;
         canvas.height = baseCanvas.height;
@@ -246,7 +249,7 @@
             var dicomElement=dicomParser.dicomElement[elementindex];            
             if(dicomElement.name=="numberOfRows")
             {
-                numberOfRows=parseInt(dicomElement.value[0]);
+                numberOfRows=dicomElement.value[0];
             }
             else if(dicomElement.name=="numberOfColumns")
             {
@@ -287,17 +290,17 @@
         pixelBuffer=dicomParser.pixelBuffer;
         
         image = new DicomImage(
-            [512, 512],
+            [numberOfRows, numberOfColumns],
             [rowSpacing, columnSpacing]);
-                  
+            
         lookupObj = new LookupTable();
         lookupObj.setData(windowCenter,windowWidth,rescaleSlope,rescaleIntercept);
         lookupObj.calculateHULookup();
         
         initCanvas();
         
-        baseContext.fillRect(0,0,512,512);    
-        myImageData = baseContext.getImageData(0,0,512,512);        
+        baseContext.fillRect(0,0,numberOfRows,numberOfColumns);    
+        myImageData = baseContext.getImageData(0,0,numberOfRows,numberOfColumns);        
         genImage();        
         imageLoaded=1;
         
@@ -366,7 +369,7 @@ Tool: <select id="dtool">
 
 <!-- Container -->
 <div id="container">
-<canvas id="imageView" width="512" height="512" ></canvas>
+<canvas id="imageView" width="200" height="200" ></canvas>
 </div>
 
 <!-- Right -->
