@@ -35,8 +35,8 @@ function tools_circle()
         context.stroke();
         
         // surface
-        a = a*spacingX;
-        b = b*spacingY;
+        a = a*image.getSpacing()[0];
+        b = b*image.getSpacing()[1];
         radius = Math.sqrt(a*a+b*b);
         var surf = Math.round(Math.PI*radius*radius);
         context.font = fontStr
