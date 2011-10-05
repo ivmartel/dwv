@@ -32,9 +32,7 @@ function tools_windowLevel()
         var windowCenter = parseInt(lookupObj.windowCenter) + diffY;
         var windowWidth = parseInt(lookupObj.windowWidth) + diffX;                        
         
-        showWindowingValue(windowCenter,windowWidth);    
-        lookupObj.setWindowingdata(windowCenter,windowWidth);                                
-        genImage();
+        updateWindowingData(windowCenter,windowWidth);    
         
         tool.x0 = ev._x;             
         tool.y0 = ev._y;
@@ -52,38 +50,38 @@ function tools_windowLevel()
         }
     };
     
-    function showHUvalue(x,y)
-    {
-        var t = (y*image.getSize()[0])+x;        
-        
-        // style
-        context.clearRect(0, 0, 150, 150);
-        context.fillStyle = textColor;
-        context.font = fontStr
-        context.textBaseline = "top";
-        context.textAlign = "left";
-        
-        // text
-        context.fillText("X = "+x, 0, 0);
-        context.fillText("Y = "+y, 0, lineHeight);
-        context.fillText("HU = "+lookupObj.huLookup[pixelBuffer[t]], 0, 2*lineHeight);
-    }
-    
-    function showWindowingValue(windowCenter,windowWidth)
-    {
-        // style
-        context.clearRect(canvas.width-150, 0, canvas.width, 150);
-        context.fillStyle = textColor;
-        context.font = fontStr
-        context.textBaseline = "top";
-        context.textAlign = "right";
-        
-        // text
-        context.fillText("WindowCenter = "+windowCenter, canvas.width, 0);
-        context.fillText("WindowWidth = "+windowWidth, canvas.width, lineHeight);
-    }
-
 } // tools_windowLevel
+
+function showHUvalue(x,y)
+{
+    var t = (y*image.getSize()[0])+x;        
+    
+    // style
+    context.clearRect(0, 0, 150, 150);
+    context.fillStyle = textColor;
+    context.font = fontStr
+    context.textBaseline = "top";
+    context.textAlign = "left";
+    
+    // text
+    context.fillText("X = "+x, 0, 0);
+    context.fillText("Y = "+y, 0, lineHeight);
+    context.fillText("HU = "+lookupObj.huLookup[pixelBuffer[t]], 0, 2*lineHeight);
+}
+
+function showWindowingValue(windowCenter,windowWidth)
+{
+    // style
+    context.clearRect(canvas.width-150, 0, canvas.width, 150);
+    context.fillStyle = textColor;
+    context.font = fontStr
+    context.textBaseline = "top";
+    context.textAlign = "right";
+    
+    // text
+    context.fillText("WindowCenter = "+windowCenter, canvas.width, 0);
+    context.fillText("WindowWidth = "+windowWidth, canvas.width, lineHeight);
+}
 
 function getPresetSelector()
 {
@@ -110,6 +108,13 @@ function getPresetSelector()
     document.getElementById('presetSelector').appendChild(paragraph);
 }
 
+function updateWindowingData(wc,ww)
+{
+    lookupObj.setWindowingdata(wc,ww);
+    this.showWindowingValue(wc,ww);
+    genImage();
+}
+
 function changePreset()
 {    
     applyPreset(parseInt(document.getElementById("presetsMenu").options[
@@ -124,43 +129,37 @@ function applyPreset(preset)
         case 1: // default
             wc=lookupObj.defaultWindowCenter;
             ww=lookupObj.defaultWindowWidth;
-            lookupObj.setWindowingdata(wc,ww);        
-            genImage();    
+            updateWindowingData(wc,ww);
             break;
         
         case 2: // abdomen
             wc=350;
             ww=40;
-            lookupObj.setWindowingdata(wc,ww);        
-            genImage();    
+            updateWindowingData(wc,ww);
             break;
         
         case 3: // lung
             wc=-600;
             ww=1500;
-            lookupObj.setWindowingdata(wc,ww);        
-            genImage();
+            updateWindowingData(wc,ww);
             break;
         
         case 4: // brain
             wc=40;
             ww=80;
-            lookupObj.setWindowingdata(wc,ww);        
-            genImage();
+            updateWindowingData(wc,ww);
             break;
         
         case 5: // bone
             wc=480;
             ww=2500;
-            lookupObj.setWindowingdata(wc,ww);        
-            genImage();
+            updateWindowingData(wc,ww);
             break;
         
         case 6: // head
             wc=90;
             ww=350;
-            lookupObj.setWindowingdata(wc,ww);        
-            genImage();
+            updateWindowingData(wc,ww);
             break;
     }
 }
