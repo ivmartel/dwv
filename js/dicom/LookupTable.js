@@ -12,6 +12,8 @@ function LookupTable()
 	this.rescaleIntercept;
 	this.windowCenter;
 	this.windowWidth;
+	this.defaultWindowCenter;
+	this.defaultWindowWidth;
 	// methods
 	this.calculateHULookup=calculateHULookup;
 	this.calculateLookup=calculateLookup;
@@ -21,6 +23,8 @@ LookupTable.prototype.setData=function(wc,ww,rs,ri)
 {	
 	this.windowCenter=wc;
 	this.windowWidth=ww;
+	this.defaultWindowCenter=wc;
+	this.defaultWindowWidth=ww;
 	this.rescaleSlope=rs;
 	this.rescaleIntercept=ri;	
 }	

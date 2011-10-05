@@ -121,47 +121,47 @@ function applyPreset(preset)
     var ww, wc;
     switch (preset)
     {
-        case 1:    
-        wc=windowCenter;
-        ww=windowWidth;
-        lookupObj.setWindowingdata(wc,ww);        
-        genImage();    
-        break;
+        case 1: // default
+            wc=lookupObj.defaultWindowCenter;
+            ww=lookupObj.defaultWindowWidth;
+            lookupObj.setWindowingdata(wc,ww);        
+            genImage();    
+            break;
         
-        case 2:    
-        wc=350;
-        ww=40;
-        lookupObj.setWindowingdata(wc,ww);        
-        genImage();    
-        break;
+        case 2: // abdomen
+            wc=350;
+            ww=40;
+            lookupObj.setWindowingdata(wc,ww);        
+            genImage();    
+            break;
         
-        case 3:
-        wc=-600;
-        ww=1500;
-        lookupObj.setWindowingdata(wc,ww);        
-        genImage();
-        break;
+        case 3: // lung
+            wc=-600;
+            ww=1500;
+            lookupObj.setWindowingdata(wc,ww);        
+            genImage();
+            break;
         
-        case 4:
-        wc=40;
-        ww=80;
-        lookupObj.setWindowingdata(wc,ww);        
-        genImage();
-        break;
+        case 4: // brain
+            wc=40;
+            ww=80;
+            lookupObj.setWindowingdata(wc,ww);        
+            genImage();
+            break;
         
-        case 5:
-        wc=480;
-        ww=2500;
-        lookupObj.setWindowingdata(wc,ww);        
-        genImage();
-        break;
+        case 5: // bone
+            wc=480;
+            ww=2500;
+            lookupObj.setWindowingdata(wc,ww);        
+            genImage();
+            break;
         
-        case 6:
-        wc=90;
-        ww=350;
-        lookupObj.setWindowingdata(wc,ww);        
-        genImage();
-        break;
+        case 6: // head
+            wc=90;
+            ww=350;
+            lookupObj.setWindowingdata(wc,ww);        
+            genImage();
+            break;
     }
 }
 
