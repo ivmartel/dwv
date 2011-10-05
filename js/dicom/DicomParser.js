@@ -51,19 +51,20 @@ DicomParser.prototype.setDicomElement=function(name,vr,vl,group,element,value,of
 
 DicomParser.prototype.readTag=function(index,firstContent,secondContent,thirdContent,fourthContent,tagName)
 {
+    var vr, vl, val, tagValue;
     var i=index;
     for(; i<this.inputBuffer.length; i++) 
     {
-        if(this.reader.readNumber(1,i)==firstContent 
-            && this.reader.readNumber(1,i+1)==secondContent
-            && this.reader.readNumber(1,i+2)==thirdContent
-            && this.reader.readNumber(1,i+3)==fourthContent)
+        if(this.reader.readNumber(1,i) == firstContent 
+            && this.reader.readNumber(1,i+1) == secondContent
+            && this.reader.readNumber(1,i+2) == thirdContent
+            && this.reader.readNumber(1,i+3) == fourthContent)
         {
             i=i+4;
-            var vr= this.reader.readString(2,i);
-            var vl=this.reader.readNumber(2,i+2);
-            var val=this.reader.readString(vl,i+4);
-            var tagValue=val.split("\\");                
+            vr = this.reader.readString(2,i);
+            vl = this.reader.readNumber(2,i+2);
+            val = this.reader.readString(vl,i+4);
+            tagValue = val.split("\\");                
             this.setDicomElement(tagName,vr,vl,
                 firstContent+secondContent,
                 thirdContent+fourthContent,
