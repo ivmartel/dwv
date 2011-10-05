@@ -3,7 +3,7 @@
 * WindowLevel tool.
 * WARNING: draws on the context var using external methods.
 */
-function tools_windowLevel()
+function tools_windowLevel(lookupTable)
 {
     var tool = this;
     this.started = false;
