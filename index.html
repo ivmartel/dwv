@@ -12,6 +12,7 @@
 <script type="text/javascript" src="js/dicom/DicomInputStreamReader.js"></script>
 <script type="text/javascript" src="js/dicom/DicomElement.js"></script>
 <script type="text/javascript" src="js/dicom/DicomParser.js"></script>
+<script type="text/javascript" src="js/dicom/DicomImage.js"></script>
 <script type="text/javascript" src="js/dicom/LookupTable.js"></script>
 <script type="text/javascript" src="js/tools/rect.js"></script>
 <script type="text/javascript" src="js/tools/roi.js"></script>
@@ -22,21 +23,14 @@
 <script type="text/javascript">
 
     // DICOM values
-    var windowCenter;
-    var windowWidth;
-    var rescaleSlope;
-    var rescaleIntercept;
-    var spacingX;
-    var spacingY;
+    var image;
+    
     var lookupTable;
     var huLookupTable; 
+    var lookupObj;
        
     var pixelBuffer = new Array(512*512*2);
     var imageLoaded=0;
-    
-    var row=512;
-    var column=512;
-    var lookupObj;
     
     // The active tool instance.
     var selectedTool = false;
@@ -183,7 +177,10 @@
             event._y = event.offsetY;
         }
 
-        if(event._x>=0 && event._y>=0 && event._x<column && event._y<row)
+        if(event._x >= 0 
+            && event._y >= 0 
+            && event._x < image.getSize()[0] 
+            && event._y < image.getSize()[1] )
         {
             // Call the event handler of the tool.
             var func = selectedTool[event.type];
@@ -233,12 +230,34 @@
         
         // tag list table      
         var table = document.getElementById("tagList")
-   
+        
+        var numberOfRows;
+        var numberOfColumns;
+        var rowSpacing;
+        var columnSpacing;
+        var windowWidth;
+        var windowCenter;
+        var rescaleIntercept;
+        var rescaleSlope;
+        
         var elementindex=0;
         for(;elementindex<dicomParser.dicomElement.length;elementindex++)
         {
             var dicomElement=dicomParser.dicomElement[elementindex];            
-            if(dicomElement.name=="windowWidth")
+            if(dicomElement.name=="numberOfRows")
+            {
+                numberOfRows=parseInt(dicomElement.value[0]);
+            }
+            else if(dicomElement.name=="numberOfColumns")
+            {
+                numberOfColumns=dicomElement.value[0];
+            }
+            else if(dicomElement.name=="pixelSpacing")
+            {
+                rowSpacing=parseFloat(dicomElement.value[0]);    
+                columnSpacing=parseFloat(dicomElement.value[1]);    
+            }
+            else if(dicomElement.name=="windowWidth")
             {
                 windowWidth=dicomElement.value[0];
             }
@@ -246,18 +265,13 @@
             {
                 windowCenter=dicomElement.value[0];            
             }
-            else if(dicomElement.name=="rescaleIntercept")
-            {
-                rescaleIntercept=parseInt(dicomElement.value);
-            }
             else if(dicomElement.name=="rescaleSlope")
             {
                 rescaleSlope=parseInt(dicomElement.value);    
             }
-            else if(dicomElement.name=="pixelSpacing")
+            else if(dicomElement.name=="rescaleIntercept")
             {
-                spacingX=parseFloat(dicomElement.value[0]);    
-                spacingY=parseFloat(dicomElement.value[1]);    
+                rescaleIntercept=parseInt(dicomElement.value);
             }
 
             var lastRow = table.rows.length;
@@ -270,8 +284,13 @@
             cell2.appendChild(document.createTextNode(dicomElement.value));
         } 
                
-        pixelBuffer=dicomParser.pixelBuffer;            
-        lookupObj=new LookupTable();
+        pixelBuffer=dicomParser.pixelBuffer;
+        
+        image = new DicomImage(
+            [512, 512],
+            [rowSpacing, columnSpacing]);
+                  
+        lookupObj = new LookupTable();
         lookupObj.setData(windowCenter,windowWidth,rescaleSlope,rescaleIntercept);
         lookupObj.calculateHULookup();
         huLookupTable=lookupObj.huLookup;        
@@ -297,11 +316,11 @@
         lookupObj.calculateLookup();
         lookupTable=lookupObj.ylookup;
         var n=0;    
-        for(var yPix=0; yPix<row; yPix++)
+        for(var yPix=0; yPix<image.getSize()[1]; yPix++)
         {
-            for(var xPix=0; xPix<column;xPix++)
+            for(var xPix=0; xPix<image.getSize()[0];xPix++)
             {        
-                var offset = (yPix * column + xPix) * 4;                    
+                var offset = (yPix * image.getSize()[0] + xPix) * 4;                    
                 var pxValue=lookupTable[pixelBuffer[n]];    
                 n++;               
                 myImageData.data[offset] = parseInt(pxValue);

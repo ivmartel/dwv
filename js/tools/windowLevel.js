@@ -3,7 +3,7 @@
 * WindowLevel tool.
 * WARNING: draws on the context var using external methods.
 */
-function tools_windowLevel()
+function tools_windowLevel(lookupTable)
 {
     var tool = this;
     this.started = false;
@@ -29,8 +29,8 @@ function tools_windowLevel()
                                                                            
         var diffX = ev._x - tool.x0;
         var diffY = tool.y0 - ev._y;                                
-        windowCenter = parseInt(windowCenter) + diffY;
-        windowWidth = parseInt(windowWidth) + diffX;                        
+        var windowCenter = parseInt(lookupObj.windowCenter) + diffY;
+        var windowWidth = parseInt(lookupObj.windowWidth) + diffX;                        
         
         showWindowingValue(windowCenter,windowWidth);    
         lookupObj.setWindowingdata(windowCenter,windowWidth);                                
@@ -54,7 +54,7 @@ function tools_windowLevel()
     
     function showHUvalue(x,y)
     {
-        var t = (y*column)+x;        
+        var t = (y*image.getSize()[0])+x;        
         
         // style
         context.clearRect(0, 0, 150, 150);

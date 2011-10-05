@@ -33,8 +33,8 @@ function tools_line()
         context.closePath();
         
         // size
-        var a = Math.abs(tool.x0-ev._x)*spacingX;
-        var b = Math.abs(tool.y0-ev._y)*spacingY;
+        var a = Math.abs(tool.x0-ev._x)*image.getSpacing()[0];
+        var b = Math.abs(tool.y0-ev._y)*image.getSpacing()[1];
         var size = Math.round(Math.sqrt(a*a+b*b));
         context.font = fontStr
         context.fillText(size+"mm",ev._x+fontSize, ev._y+fontSize)

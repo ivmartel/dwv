@@ -40,7 +40,7 @@ function tools_rect()
         context.strokeRect(x, y, w, h);
     
         // surface
-        var surf = Math.round((w*spacingX)*(h*spacingY));
+        var surf = Math.round((w*image.getSpacing()[0])*(h*image.getSpacing()[1]));
         context.font = fontStr
         context.fillText(surf+"mm2",ev._x+fontSize, ev._y+fontSize)
     };
