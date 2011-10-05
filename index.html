@@ -293,7 +293,6 @@
         lookupObj = new LookupTable();
         lookupObj.setData(windowCenter,windowWidth,rescaleSlope,rescaleIntercept);
         lookupObj.calculateHULookup();
-        huLookupTable=lookupObj.huLookup;        
         
         initCanvas();
         
@@ -314,14 +313,13 @@
     function genImage()
     {        
         lookupObj.calculateLookup();
-        lookupTable=lookupObj.ylookup;
         var n=0;    
         for(var yPix=0; yPix<image.getSize()[1]; yPix++)
         {
             for(var xPix=0; xPix<image.getSize()[0];xPix++)
             {        
                 var offset = (yPix * image.getSize()[0] + xPix) * 4;                    
-                var pxValue=lookupTable[pixelBuffer[n]];    
+                var pxValue=lookupObj.ylookup[pixelBuffer[n]];    
                 n++;               
                 myImageData.data[offset] = parseInt(pxValue);
                 myImageData.data[offset+1] = parseInt(pxValue);

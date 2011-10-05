@@ -66,7 +66,7 @@ function tools_windowLevel()
         // text
         context.fillText("X = "+x, 0, 0);
         context.fillText("Y = "+y, 0, lineHeight);
-        context.fillText("HU = "+huLookupTable[pixelBuffer[t]], 0, 2*lineHeight);
+        context.fillText("HU = "+lookupObj.huLookup[pixelBuffer[t]], 0, 2*lineHeight);
     }
     
     function showWindowingValue(windowCenter,windowWidth)
