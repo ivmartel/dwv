@@ -1,7 +1,13 @@
 /**
 * circle.js
 * Circle painting tool.
-* WARNING: draws on the context var.
+* WARNING: depends on the folowing external vars:
+* - gContext
+* - gCanvas
+* - gLineColor
+* - gImage
+* - gFontSize
+* - gImgUpdate()
 */
 function tools_circle()
 {
@@ -22,25 +28,25 @@ function tools_circle()
             return;
         }
 
-        context.clearRect(0, 0, canvas.width, canvas.height);
-        context.fillStyle = lineColor;
-        context.strokeStyle = lineColor;
+        gContext.clearRect(0, 0, gCanvas.width, gCanvas.height);
+        gContext.fillStyle = gLineColor;
+        gContext.strokeStyle = gLineColor;
 
         var a = Math.abs(tool.x0-ev._x);
         var b = Math.abs(tool.y0-ev._y);
         var radius = Math.round(Math.sqrt(a*a+b*b));
         
-        context.beginPath();
-        context.arc(tool.x0, tool.y0, radius, 0, 2*Math.PI);
-        context.stroke();
+        gContext.beginPath();
+        gContext.arc(tool.x0, tool.y0, radius, 0, 2*Math.PI);
+        gContext.stroke();
         
         // surface
-        a = a*image.getSpacing()[0];
-        b = b*image.getSpacing()[1];
+        a = a*gImage.getSpacing()[0];
+        b = b*gImage.getSpacing()[1];
         radius = Math.sqrt(a*a+b*b);
         var surf = Math.round(Math.PI*radius*radius);
-        context.font = fontStr
-        context.fillText(surf+"mm2",ev._x+fontSize, ev._y+fontSize)
+        gContext.font = gFontStr
+        gContext.fillText(surf+"mm2",ev._x+gFontSize, ev._y+gFontSize)
     };
 
     // This is called when you release the mouse button.
@@ -49,7 +55,7 @@ function tools_circle()
         {
             tool.mousemove(ev);
             tool.started = false;
-            img_update();
+            gImgUpdate();
         }
     };
 } // tools_circle

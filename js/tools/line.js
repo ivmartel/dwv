@@ -1,7 +1,13 @@
 /**
 * line.js
 * Line painting tool.
-* WARNING: draws on the context var.
+* WARNING: depends on the folowing external vars:
+* - gContext
+* - gCanvas
+* - gLineColor
+* - gImage
+* - gFontSize
+* - gImgUpdate()
 */
 function tools_line()
 {
@@ -22,22 +28,22 @@ function tools_line()
             return;
         }
 
-        context.clearRect(0, 0, canvas.width, canvas.height);
-        context.fillStyle = lineColor;
-        context.strokeStyle = lineColor;
+        gContext.clearRect(0, 0, gCanvas.width, gCanvas.height);
+        gContext.fillStyle = gLineColor;
+        gContext.strokeStyle = gLineColor;
 
-        context.beginPath();
-        context.moveTo(tool.x0, tool.y0);
-        context.lineTo(ev._x, ev._y);
-        context.stroke();
-        context.closePath();
+        gContext.beginPath();
+        gContext.moveTo(tool.x0, tool.y0);
+        gContext.lineTo(ev._x, ev._y);
+        gContext.stroke();
+        gContext.closePath();
         
         // size
-        var a = Math.abs(tool.x0-ev._x)*image.getSpacing()[0];
-        var b = Math.abs(tool.y0-ev._y)*image.getSpacing()[1];
+        var a = Math.abs(tool.x0-ev._x)*gImage.getSpacing()[0];
+        var b = Math.abs(tool.y0-ev._y)*gImage.getSpacing()[1];
         var size = Math.round(Math.sqrt(a*a+b*b));
-        context.font = fontStr
-        context.fillText(size+"mm",ev._x+fontSize, ev._y+fontSize)
+        gContext.font = gFontStr
+        gContext.fillText(size+"mm",ev._x+gFontSize, ev._y+gFontSize)
     };
 
     // This is called when you release the mouse button.
@@ -46,7 +52,7 @@ function tools_line()
         {
             tool.mousemove(ev);
             tool.started = false;
-            img_update();
+            gImgUpdate();
         }
     };
 } // tools_line

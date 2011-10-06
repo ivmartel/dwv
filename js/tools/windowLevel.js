@@ -1,7 +1,14 @@
 /**
 * windowLevel.js
 * WindowLevel tool.
-* WARNING: draws on the context var using external methods.
+* WARNING: depends on the folowing external vars:
+* - gContext
+* - gLineColor
+* - gImage
+* - gFontSize
+* - gImgUpdate()
+* - gImageLoaded
+* - gLookupObj
 */
 function tools_windowLevel()
 {
@@ -25,19 +32,19 @@ function tools_windowLevel()
 
         //showHUvalue(ev._x, ev._y);
         
-        imageLoaded = 0; 
+        gImageLoaded = 0; 
                                                                            
         var diffX = ev._x - tool.x0;
         var diffY = tool.y0 - ev._y;                                
-        var windowCenter = parseInt(lookupObj.windowCenter) + diffY;
-        var windowWidth = parseInt(lookupObj.windowWidth) + diffX;                        
+        var windowCenter = parseInt(gLookupObj.windowCenter) + diffY;
+        var windowWidth = parseInt(gLookupObj.windowWidth) + diffX;                        
         
         updateWindowingData(windowCenter,windowWidth);    
         
         tool.x0 = ev._x;             
         tool.y0 = ev._y;
         
-        imageLoaded = 1;                                        
+        gImageLoaded = 1;                                        
     };
 
     // This is called when you release the mouse button.
@@ -46,7 +53,7 @@ function tools_windowLevel()
         {
             tool.mousemove(ev);
             tool.started = false;
-            img_update();
+            gImgUpdate();
         }
     };
     
@@ -54,36 +61,36 @@ function tools_windowLevel()
 
 function showHUvalue(x,y)
 {
-    var t = (y*image.getSize()[0])+x;        
+    var t = (y*gImage.getSize()[0])+x;        
     
     // style
-    context.clearRect(0, 0, 150, 150);
-    context.fillStyle = textColor;
-    context.font = fontStr
-    context.textBaseline = "top";
-    context.textAlign = "left";
+    gContext.clearRect(0, 0, 150, 150);
+    gContext.fillStyle = gTextColor;
+    gContext.font = gFontStr
+    gContext.textBaseline = "top";
+    gContext.textAlign = "left";
     
     // text
-    context.fillText("X = "+x, 0, 0);
-    context.fillText("Y = "+y, 0, lineHeight);
-    context.fillText("HU = "+lookupObj.huLookup[pixelBuffer[t]], 0, 2*lineHeight);
+    gContext.fillText("X = "+x, 0, 0);
+    gContext.fillText("Y = "+y, 0, gLineHeight);
+    gContext.fillText("HU = "+gLookupObj.huLookup[gPixelBuffer[t]], 0, 2*gLineHeight);
 }
 
 function showWindowingValue(windowCenter,windowWidth)
 {
     // style
-    context.clearRect(canvas.width-150, 0, canvas.width, 150);
-    context.fillStyle = textColor;
-    context.font = fontStr
-    context.textBaseline = "top";
-    context.textAlign = "right";
+    gContext.clearRect(gCanvas.width-150, 0, gCanvas.width, 150);
+    gContext.fillStyle = gTextColor;
+    gContext.font = gFontStr
+    gContext.textBaseline = "top";
+    gContext.textAlign = "right";
     
     // text
-    context.fillText("WindowCenter = "+windowCenter, canvas.width, 0);
-    context.fillText("WindowWidth = "+windowWidth, canvas.width, lineHeight);
+    gContext.fillText("WindowCenter = "+windowCenter, gCanvas.width, 0);
+    gContext.fillText("WindowWidth = "+windowWidth, gCanvas.width, gLineHeight);
 }
 
-function getPresetSelector()
+function gGetPresetSelector()
 {
     var paragraph = document.createElement("p");  
     paragraph.appendChild(document.createTextNode("WL Preset: "));
@@ -110,9 +117,9 @@ function getPresetSelector()
 
 function updateWindowingData(wc,ww)
 {
-    lookupObj.setWindowingdata(wc,ww);
+    gLookupObj.setWindowingdata(wc,ww);
     this.showWindowingValue(wc,ww);
-    genImage();
+    gGenImage();
 }
 
 function changePreset()
@@ -127,8 +134,8 @@ function applyPreset(preset)
     switch (preset)
     {
         case 1: // default
-            wc=lookupObj.defaultWindowCenter;
-            ww=lookupObj.defaultWindowWidth;
+            wc=gLookupObj.defaultWindowCenter;
+            ww=gLookupObj.defaultWindowWidth;
             updateWindowingData(wc,ww);
             break;
         

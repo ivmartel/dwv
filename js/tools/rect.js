@@ -1,7 +1,13 @@
 /**
 * rect.js
 * Rectangle painting tool.
-* WARNING: draws on the context var.
+* WARNING: depends on the folowing external vars:
+* - gContext
+* - gCanvas
+* - gLineColor
+* - gImage
+* - gFontSize
+* - gImgUpdate()
 */
 function tools_rect()
 {
@@ -27,22 +33,22 @@ function tools_rect()
         var w = Math.abs(ev._x - tool.x0);
         var h = Math.abs(ev._y - tool.y0);
 
-        context.clearRect(0, 0, canvas.width, canvas.height);
-        context.fillStyle = lineColor;
-        context.strokeStyle = lineColor;
+        gContext.clearRect(0, 0, gCanvas.width, gCanvas.height);
+        gContext.fillStyle = gLineColor;
+        gContext.strokeStyle = gLineColor;
 
         if (!w || !h)
         {
             return;
         }
 
-        context.beginPath();
-        context.strokeRect(x, y, w, h);
+        gContext.beginPath();
+        gContext.strokeRect(x, y, w, h);
     
         // surface
-        var surf = Math.round((w*image.getSpacing()[0])*(h*image.getSpacing()[1]));
-        context.font = fontStr
-        context.fillText(surf+"mm2",ev._x+fontSize, ev._y+fontSize)
+        var surf = Math.round((w*gImage.getSpacing()[0])*(h*gImage.getSpacing()[1]));
+        gContext.font = gFontStr
+        gContext.fillText(surf+"mm2",ev._x+gFontSize, ev._y+gFontSize)
     };
 
     // This is called when you release the mouse button.
@@ -51,7 +57,7 @@ function tools_rect()
         {
             tool.mousemove(ev);
             tool.started = false;
-            img_update();
+            gImgUpdate();
         }
     };
 } // tools_rect

@@ -23,47 +23,47 @@
 <script type="text/javascript">
 
     // DICOM values
-    var image;
+    var gImage;
     
-    var lookupTable;
-    var huLookupTable; 
-    var lookupObj;
+    var gIookupTable;
+    var gHuLookupTable; 
+    var gLookupObj;
        
-    var pixelBuffer;
-    var imageLoaded=0;
+    var gPixelBuffer;
+    var gImageLoaded=0;
     
     // The active tool instance.
-    var selectedTool = false;
-    var defaultTool = 'windowLevel';
+    var gSelectedTool = false;
+    var gDefaultTool = 'windowLevel';
     // This object holds the implementation of each drawing tool.
-    var tools = {};
-    var baseCanvas;
-    var baseContext;    
-    var canvas;
-    var context;    
-    var myImageData;
+    var gTools = {};
+    var gBaseCanvas;
+    var gBaseContext;    
+    var gCanvas;
+    var gContext;    
+    var gMyImageData;
     
     // style
-    var fontSize = 12;
-    var fontStr = "normal "+fontSize+"px sans-serif";
-    var lineHeight = fontSize + fontSize/5;
-    var lineColor = "yellow";
-    var textColor = "#fff";
+    var gFontSize = 12;
+    var gFontStr = "normal "+gFontSize+"px sans-serif";
+    var gLineHeight = gFontSize + gFontSize/5;
+    var gLineColor = "yellow";
+    var gTextColor = "#fff";
 
-    function mouseOverColor()
+    function gMouseOverColor()
     {
         document.body.style.cursor="pointer";
     }
     
-    function mouseOutColor()
+    function gMouseOutColor()
     {
         document.body.style.cursor="auto";
     }
     
-    function setLineColor(color)
+    function gSetLineColor(color)
     {
         // set global var
-        lineColor = color;
+        gLineColor = color;
         // reset borders
         var tr = document.getElementById("colours");
         var tds = tr.getElementsByTagName("td");
@@ -76,57 +76,57 @@
         td.style.border = "#00f solid 2px";
     }
     
-    function initCanvas()
+    function gInitCanvas()
     {
         // Find the canvas element.
-        baseCanvas = document.getElementById('imageView');
-        if (!baseCanvas)
+        gBaseCanvas = document.getElementById('imageView');
+        if (!gBaseCanvas)
         {
             alert('Error: I cannot find the canvas element!');
             return;
         }
 
-        if (!baseCanvas.getContext)
+        if (!gBaseCanvas.getContext)
         {
             alert('Error: no canvas.getContext!');
             return;
         }
 
         // Get the 2D canvas context.
-        baseContext = baseCanvas.getContext('2d');
-        if (!baseContext)
+        gBaseContext = gBaseCanvas.getContext('2d');
+        if (!gBaseContext)
         {
             alert('Error: failed to getContext!');
             return;
         }
 
         // Add the temporary canvas.
-        var container = baseCanvas.parentNode;
-        canvas = document.createElement('canvas');
-        if (!canvas)
+        var container = gBaseCanvas.parentNode;
+        gCanvas = document.createElement('canvas');
+        if (!gCanvas)
         {
             alert('Error: I cannot create a new canvas element!');
             return;
         }
 
-        baseCanvas.width = image.getSize()[0];
-        baseCanvas.height = image.getSize()[1];
+        gBaseCanvas.width = gImage.getSize()[0];
+        gBaseCanvas.height = gImage.getSize()[1];
         
-        canvas.id = 'imageTemp';
-        canvas.width = baseCanvas.width;
-        canvas.height = baseCanvas.height;
-        container.appendChild(canvas);
-        context = canvas.getContext('2d');
+        gCanvas.id = 'imageTemp';
+        gCanvas.width = gBaseCanvas.width;
+        gCanvas.height = gBaseCanvas.height;
+        container.appendChild(gCanvas);
+        gContext = gCanvas.getContext('2d');
     }
     
-    function initTools()
+    function gInitTools()
     {
         // tool list
-        tools.rect = tools_rect;
-        tools.roi = tools_roi;
-        tools.line = tools_line;
-        tools.circle = tools_circle;
-        tools.windowLevel = tools_windowLevel;
+        gTools.rect = tools_rect;
+        gTools.roi = tools_roi;
+        gTools.line = tools_line;
+        gTools.circle = tools_circle;
+        gTools.windowLevel = tools_windowLevel;
     
         // Get the tool select input.
         var tool_select = document.getElementById('dtool');
@@ -135,37 +135,37 @@
             alert('Error: failed to get the dtool element!');
             return;
         }
-        tool_select.addEventListener('change', event_tool_change, false);
+        tool_select.addEventListener('change', gEventToolChange, false);
 
         // Activate the default tool.
-        if (tools[defaultTool])
+        if (gTools[gDefaultTool])
         {
-            selectedTool = new tools[defaultTool]();
-            tool_select.value = defaultTool;
+            gSelectedTool = new gTools[gDefaultTool]();
+            tool_select.value = gDefaultTool;
         }
     }
 
     // The event handler for any changes made to the tool selector.
-    function event_tool_change(event)
+    function gEventToolChange(event)
     {
-        if (tools[this.value])
+        if (gTools[this.value])
         {
-            selectedTool = new tools[this.value]();
+            gSelectedTool = new gTools[this.value]();
         }
     }
 
     // This function draws the #imageTemp canvas on top of #imageView,
     // after which #imageTemp is cleared. This function is called each time when the
     // user completes a drawing operation.
-    function img_update() 
+    function gImgUpdate() 
     {
-        baseContext.drawImage(canvas, 0, 0);
-        context.clearRect(0, 0, canvas.width, canvas.height);
+        gBaseContext.drawImage(gCanvas, 0, 0);
+        gContext.clearRect(0, 0, gCanvas.width, gCanvas.height);
     } 
 
     // The general-purpose event handler. This function just determines the mouse 
     // position relative to the canvas element.
-    function ev_canvas(event)
+    function gEvCanvas(event)
     {
         if (event.layerX || event.layerX == 0)
         { 
@@ -182,11 +182,11 @@
 
         if(event._x >= 0 
             && event._y >= 0 
-            && event._x < image.getSize()[0] 
-            && event._y < image.getSize()[1] )
+            && event._x < gImage.getSize()[0] 
+            && event._y < gImage.getSize()[1] )
         {
             // Call the event handler of the tool.
-            var func = selectedTool[event.type];
+            var func = gSelectedTool[event.type];
             if (func)
             {
                 func(event);
@@ -194,24 +194,23 @@
         }
     }
 
-    function loadDicom(evt) 
+    function gLoadDicom(evt) 
     {
         file = evt.target.files[0]
         
         var myreader = new FileReader();
         myreader.onload = function() {
             return function(e) {
-              wadoURL = e.target.result
-              parseAndLoadDicom();
-              var span = document.createElement('div');
-              span.innerHTML = ['<p><b>', e.target.result.length, '</b></p>'].join('');
-              document.getElementById('tagSearch').insertBefore(span, null);
+                gParseAndLoadDicom(e.target.result);
+                var span = document.createElement('div');
+                span.innerHTML = ['<p><b>', e.target.result.length, '</b></p>'].join('');
+                document.getElementById('tagSearch').insertBefore(span, null);
             };
         }();
         myreader.readAsBinaryString(file);
     }
     
-    function getContextPath()
+    function gGetContextPath()
     {
         var path = top.location.pathname;
         if (document.all)
@@ -222,13 +221,13 @@
         return path;
     }
     
-    function parseAndLoadDicom()
+    function gParseAndLoadDicom(file)
     {    
-        var reader=new DicomInputStreamReader();    
-        reader.readDicom(wadoURL);
-        var dicomBuffer=reader.getInputBuffer();
-        var dicomReader=reader.getReader();
-        var dicomParser=new DicomParser(dicomBuffer,dicomReader);
+        var reader = new DicomInputStreamReader();    
+        reader.readDicom(file);
+        var dicomBuffer = reader.getInputBuffer();
+        var dicomReader = reader.getReader();
+        var dicomParser = new DicomParser(dicomBuffer,dicomReader);
         dicomParser.parseAll();     
         
         // tag list table      
@@ -287,49 +286,49 @@
             cell2.appendChild(document.createTextNode(dicomElement.value));
         } 
                
-        pixelBuffer=dicomParser.pixelBuffer;
+        gPixelBuffer = dicomParser.pixelBuffer;
         
-        image = new DicomImage(
+        gImage = new DicomImage(
             [numberOfRows, numberOfColumns],
             [rowSpacing, columnSpacing]);
             
-        lookupObj = new LookupTable();
-        lookupObj.setData(windowCenter,windowWidth,rescaleSlope,rescaleIntercept);
-        lookupObj.calculateHULookup();
+        gLookupObj = new LookupTable();
+        gLookupObj.setData( windowCenter, windowWidth, rescaleSlope, rescaleIntercept);
+        gLookupObj.calculateHULookup();
         
-        initCanvas();
+        gInitCanvas();
         
-        baseContext.fillRect(0,0,numberOfRows,numberOfColumns);    
-        myImageData = baseContext.getImageData(0,0,numberOfRows,numberOfColumns);        
-        genImage();        
-        imageLoaded=1;
+        gBaseContext.fillRect( 0, 0, numberOfRows, numberOfColumns );    
+        gMyImageData = gBaseContext.getImageData( 0, 0, numberOfRows, numberOfColumns);        
+        gGenImage();        
+        gImageLoaded=1;
         
-        initTools();
-        setLineColor(lineColor);
+        gInitTools();
+        gSetLineColor(gLineColor);
         
         // Attach the mousedown, mousemove and mouseup event listeners.
-        canvas.addEventListener('mousedown', ev_canvas, false);
-        canvas.addEventListener('mousemove', ev_canvas, false);
-        canvas.addEventListener('mouseup',   ev_canvas, false);
+        gCanvas.addEventListener('mousedown', gEvCanvas, false);
+        gCanvas.addEventListener('mousemove', gEvCanvas, false);
+        gCanvas.addEventListener('mouseup',   gEvCanvas, false);
     }
     
-    function genImage()
+    function gGenImage()
     {        
-        lookupObj.calculateLookup();
+        gLookupObj.calculateLookup();
         var n=0;    
-        for(var yPix=0; yPix<image.getSize()[1]; yPix++)
+        for(var yPix=0; yPix < gImage.getSize()[1]; yPix++)
         {
-            for(var xPix=0; xPix<image.getSize()[0];xPix++)
+            for(var xPix=0; xPix < gImage.getSize()[0];xPix++)
             {        
-                var offset = (yPix * image.getSize()[0] + xPix) * 4;                    
-                var pxValue=lookupObj.ylookup[pixelBuffer[n]];    
+                var offset = (yPix * gImage.getSize()[0] + xPix) * 4;                    
+                var pxValue = gLookupObj.ylookup[ gPixelBuffer[n] ];    
                 n++;               
-                myImageData.data[offset] = parseInt(pxValue);
-                myImageData.data[offset+1] = parseInt(pxValue);
-                myImageData.data[offset+2] = parseInt(pxValue);
+                gMyImageData.data[offset] = parseInt(pxValue);
+                gMyImageData.data[offset+1] = parseInt(pxValue);
+                gMyImageData.data[offset+2] = parseInt(pxValue);
             }
         }            
-        baseContext.putImageData(myImageData, 0,0);
+        gBaseContext.putImageData(gMyImageData, 0,0);
     }    
 </script>
 
@@ -350,20 +349,20 @@ Tool: <select id="dtool">
 
 <br>Color: 
 <table name="colourChooser" class="colourChooser">
-<tr id="colours" onmouseover="mouseOverColor()" onmouseout="mouseOutColor()">
-<td id="black" onclick="setLineColor('black')">&nbsp;</td>
-<td id="white" onclick="setLineColor('white')">&nbsp;</td>
-<td id="red" onclick="setLineColor('red')">&nbsp;</td>
-<td id="green" onclick="setLineColor('green')">&nbsp;</td>
-<td id="blue" onclick="setLineColor('blue')">&nbsp;</td>
-<td id="yellow" onclick="setLineColor('yellow')">&nbsp;</td>
-<td id="lime" onclick="setLineColor('lime')">&nbsp;</td>
-<td id="fuchsia" onclick="setLineColor('fuchsia')">&nbsp;</td>
+<tr id="colours" onmouseover="gMouseOverColor()" onmouseout="gMouseOutColor()">
+<td id="black" onclick="gSetLineColor('black')">&nbsp;</td>
+<td id="white" onclick="gSetLineColor('white')">&nbsp;</td>
+<td id="red" onclick="gSetLineColor('red')">&nbsp;</td>
+<td id="green" onclick="gSetLineColor('green')">&nbsp;</td>
+<td id="blue" onclick="gSetLineColor('blue')">&nbsp;</td>
+<td id="yellow" onclick="gSetLineColor('yellow')">&nbsp;</td>
+<td id="lime" onclick="gSetLineColor('lime')">&nbsp;</td>
+<td id="fuchsia" onclick="gSetLineColor('fuchsia')">&nbsp;</td>
 </tr>
 </table>
 
 <div id="presetSelector"></div>
-<script type="text/javascript">getPresetSelector();</script>
+<script type="text/javascript">gGetPresetSelector();</script>
 
 </div>
 
@@ -379,7 +378,7 @@ Path: <input type="file" id="files" name="files[]" multiple />
 </form>
 
 <script type="text/javascript">
-    document.getElementById('files').addEventListener('change', loadDicom, false);
+    document.getElementById('files').addEventListener('change', gLoadDicom, false);
 </script>
 
 <form>
