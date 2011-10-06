@@ -6,7 +6,7 @@ function ToolBox()
 {
     this.tools = {};
     this.selectedTool = 0;
-    this.defaultToolName = 'windowLevel';
+    this.defaultToolName = 'zoom';
 }
 
 ToolBox.prototype.getTools = function() {
@@ -40,6 +40,7 @@ ToolBox.prototype.init = function()
     this.tools.line = tools_line;
     this.tools.circle = tools_circle;
     this.tools.windowLevel = tools_windowLevel;
+    this.tools.zoom = tools_zoom;
 
     // Get the tool select input.
     var tool_select = document.getElementById('dtool');
@@ -87,7 +88,7 @@ function gGetToolBox()
     selector.disabled = 1;
     paragraph.appendChild(selector);
 
-    var options = new Array("windowLevel", "rect", "circle", "roi", "line");
+    var options = new Array("windowLevel", "rect", "circle", "roi", "line", "zoom");
     var option;
     for( var i = 0; i < options.length; ++i )
     {
