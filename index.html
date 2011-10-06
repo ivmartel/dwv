@@ -141,6 +141,9 @@
             gSelectedTool = new gTools[gDefaultTool]();
             tool_select.value = gDefaultTool;
         }
+        
+        document.getElementById('dtool').disabled = 0;
+        document.getElementById('presetsMenu').disabled = 0;
     }
 
     // The event handler for any changes made to the tool selector.
@@ -335,7 +338,7 @@
 
 <!-- Left -->
 <div id="left">
-Tool: <select id="dtool">
+Tool: <select id="dtool" disabled>
   <option value="windowLevel">Window/Level</option>
   <option value="rect">Draw: Rectangle</option>
   <option value="circle">Draw: Circle</option>

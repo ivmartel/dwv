@@ -99,6 +99,7 @@ function gGetPresetSelector()
     selector.name = "presetsMenu";
     selector.onchange = changePreset;
     selector.selectedIndex = 1;
+    selector.disabled = 1;
     paragraph.appendChild(selector);
 
     var options = new Array("Default", "Abdomen", "Lung", "Brain", "Bone", "Head");
