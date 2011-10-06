@@ -171,17 +171,6 @@
         myreader.readAsBinaryString(file);
     }
     
-    function gGetContextPath()
-    {
-        var path = top.location.pathname;
-        if (document.all)
-        {
-            path = path.replace(/\\/g,"/");
-        }
-        path = path.substr(0,path.lastIndexOf("/")+1);        
-        return path;
-    }
-    
     function gParseAndLoadDicom(file)
     {    
         var reader = new DicomInputStreamReader();    
@@ -247,6 +236,8 @@
             cell2.appendChild(document.createTextNode(dicomElement.value));
         } 
                
+        document.getElementById("tags").style.display='';
+        
         gPixelBuffer = dicomParser.pixelBuffer;
         
         gImage = new DicomImage(
@@ -323,18 +314,22 @@ Color:
 <script type="text/javascript">gGetPresetSelector();</script>
 
 </div>
+<!-- Left [end] -->
 
 <!-- Container -->
 <div id="container">
 <canvas id="imageView" width="200" height="200" ></canvas>
 </div>
+<!-- Container [end] -->
 
 <!-- Right -->
 <div id="right">
-<form>
-Path: <input type="file" id="files" name="files[]" multiple />
-</form>
 
+<p><form>
+Path: <input type="file" id="files" name="files[]" multiple />
+</form></p>
+
+<div id="tags"  style="display:none;">
 <script type="text/javascript">
     document.getElementById('files').addEventListener('change', gLoadDicom, false);
 </script>
@@ -353,6 +348,9 @@ Search Tags: <input type="text" id="tagSearch" name="tagSearch" multiple />
 </table>
 
 </div>
+
+</div>
+ <!-- Right [end] -->
 
 </body>
 </html>
