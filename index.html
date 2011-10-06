@@ -32,7 +32,6 @@
        
     var gPixelBuffer;
     var gImageLoaded=0;
-    var gMyImageData;
     
     // tools
     var gTools = {};
@@ -300,7 +299,7 @@
         gInitCanvas();
         
         gBaseContext.fillRect( 0, 0, numberOfRows, numberOfColumns );    
-        gMyImageData = gBaseContext.getImageData( 0, 0, numberOfRows, numberOfColumns);        
+               
         gGenImage();        
         gImageLoaded=1;
         
@@ -315,6 +314,7 @@
     
     function gGenImage()
     {        
+        var imageData = gBaseContext.getImageData( 0, 0, gImage.getSize()[0], gImage.getSize()[1]); 
         gLookupObj.calculateLookup();
         var n=0;    
         for(var yPix=0; yPix < gImage.getSize()[1]; yPix++)
@@ -324,12 +324,12 @@
                 var offset = (yPix * gImage.getSize()[0] + xPix) * 4;                    
                 var pxValue = gLookupObj.ylookup[ gPixelBuffer[n] ];    
                 n++;               
-                gMyImageData.data[offset] = parseInt(pxValue);
-                gMyImageData.data[offset+1] = parseInt(pxValue);
-                gMyImageData.data[offset+2] = parseInt(pxValue);
+                imageData.data[offset] = parseInt(pxValue);
+                imageData.data[offset+1] = parseInt(pxValue);
+                imageData.data[offset+2] = parseInt(pxValue);
             }
         }            
-        gBaseContext.putImageData(gMyImageData, 0,0);
+        gBaseContext.putImageData(imageData, 0,0);
     }    
 </script>
 
