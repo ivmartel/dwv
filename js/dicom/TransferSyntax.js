@@ -4,8 +4,8 @@
  *  Author: BabuHussain<babuhussain.a@raster.in>
  */
 function TransferSyntax()
-{	
-	this._uid;
+{    
+    this._uid;
 
     this._bigEndian;
 

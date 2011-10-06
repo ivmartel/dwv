@@ -31,17 +31,18 @@
        
     var gPixelBuffer;
     var gImageLoaded=0;
+    var gMyImageData;
     
-    // The active tool instance.
+    // tools
+    var gTools = {};
     var gSelectedTool = false;
     var gDefaultTool = 'windowLevel';
-    // This object holds the implementation of each drawing tool.
-    var gTools = {};
+    
+    // display
     var gBaseCanvas;
     var gBaseContext;    
     var gCanvas;
     var gContext;    
-    var gMyImageData;
     
     // style
     var gFontSize = 12;

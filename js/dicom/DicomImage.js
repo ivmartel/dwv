@@ -21,4 +21,4 @@ DicomImage.prototype.getSize = function() {
 DicomImage.prototype.getSpacing = function() {
     return this.spacing;
 };
-	
+
