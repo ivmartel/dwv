@@ -4,9 +4,8 @@
 * WARNING: depends on the folowing external vars:
 * - gContext
 * - gCanvas
-* - gLineColor
 * - gImage
-* - gFontSize
+* - gStyle
 * - gImgUpdate()
 */
 function tools_rect()
@@ -34,8 +33,8 @@ function tools_rect()
         var h = Math.abs(ev._y - tool.y0);
 
         gContext.clearRect(0, 0, gCanvas.width, gCanvas.height);
-        gContext.fillStyle = gLineColor;
-        gContext.strokeStyle = gLineColor;
+        gContext.fillStyle = gStyle.getLineColor();
+        gContext.strokeStyle = gStyle.getLineColor();
 
         if (!w || !h)
         {
@@ -47,8 +46,8 @@ function tools_rect()
     
         // surface
         var surf = Math.round((w*gImage.getSpacing()[0])*(h*gImage.getSpacing()[1]));
-        gContext.font = gFontStr
-        gContext.fillText(surf+"mm2",ev._x+gFontSize, ev._y+gFontSize)
+        gContext.font = gStyle.getFontStr();
+        gContext.fillText(surf+"mm2",ev._x+gStyle.getFontSize(), ev._y+gStyle.getFontSize())
     };
 
     // This is called when you release the mouse button.

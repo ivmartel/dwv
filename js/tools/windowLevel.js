@@ -3,12 +3,11 @@
 * WindowLevel tool.
 * WARNING: depends on the folowing external vars:
 * - gContext
-* - gLineColor
 * - gImage
-* - gFontSize
-* - gImgUpdate()
+* - gStyle
 * - gImageLoaded
 * - gLookupObj
+* - gImgUpdate()
 */
 function tools_windowLevel()
 {
@@ -65,29 +64,29 @@ function showHUvalue(x,y)
     
     // style
     gContext.clearRect(0, 0, 150, 150);
-    gContext.fillStyle = gTextColor;
-    gContext.font = gFontStr
+    gContext.fillStyle = gStyle.getTextColor();
+    gContext.font = gStyle.getFontStr();
     gContext.textBaseline = "top";
     gContext.textAlign = "left";
     
     // text
     gContext.fillText("X = "+x, 0, 0);
-    gContext.fillText("Y = "+y, 0, gLineHeight);
-    gContext.fillText("HU = "+gLookupObj.huLookup[gPixelBuffer[t]], 0, 2*gLineHeight);
+    gContext.fillText("Y = "+y, 0, gStyle.getLineHeight());
+    gContext.fillText("HU = "+gLookupObj.huLookup[gPixelBuffer[t]], 0, 2*gStyle.getLineHeight());
 }
 
 function showWindowingValue(windowCenter,windowWidth)
 {
     // style
     gContext.clearRect(gCanvas.width-150, 0, gCanvas.width, 150);
-    gContext.fillStyle = gTextColor;
-    gContext.font = gFontStr
+    gContext.fillStyle = gStyle.getTextColor();
+    gContext.font = gStyle.getFontStr();
     gContext.textBaseline = "top";
     gContext.textAlign = "right";
     
     // text
     gContext.fillText("WindowCenter = "+windowCenter, gCanvas.width, 0);
-    gContext.fillText("WindowWidth = "+windowWidth, gCanvas.width, gLineHeight);
+    gContext.fillText("WindowWidth = "+windowWidth, gCanvas.width, gStyle.getLineHeight());
 }
 
 function gGetPresetSelector()

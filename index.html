@@ -19,6 +19,7 @@
 <script type="text/javascript" src="js/tools/line.js"></script>
 <script type="text/javascript" src="js/tools/circle.js"></script>
 <script type="text/javascript" src="js/tools/windowLevel.js"></script>
+<script type="text/javascript" src="js/style.js"></script>
 
 <script type="text/javascript">
 
@@ -45,11 +46,7 @@
     var gContext;    
     
     // style
-    var gFontSize = 12;
-    var gFontStr = "normal "+gFontSize+"px sans-serif";
-    var gLineHeight = gFontSize + gFontSize/5;
-    var gLineColor = "yellow";
-    var gTextColor = "#fff";
+    var gStyle = new Style();
 
     function gMouseOverColor()
     {
@@ -64,7 +61,7 @@
     function gSetLineColor(color)
     {
         // set global var
-        gLineColor = color;
+        gStyle.setLineColor(color);
         // reset borders
         var tr = document.getElementById("colours");
         var tds = tr.getElementsByTagName("td");
@@ -305,7 +302,7 @@
         gImageLoaded=1;
         
         gInitTools();
-        gSetLineColor(gLineColor);
+        gSetLineColor(gStyle.getLineColor());
         
         // Attach the mousedown, mousemove and mouseup event listeners.
         gCanvas.addEventListener('mousedown', gEvCanvas, false);

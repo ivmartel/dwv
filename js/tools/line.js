@@ -4,9 +4,8 @@
 * WARNING: depends on the folowing external vars:
 * - gContext
 * - gCanvas
-* - gLineColor
 * - gImage
-* - gFontSize
+* - gStyle
 * - gImgUpdate()
 */
 function tools_line()
@@ -29,8 +28,8 @@ function tools_line()
         }
 
         gContext.clearRect(0, 0, gCanvas.width, gCanvas.height);
-        gContext.fillStyle = gLineColor;
-        gContext.strokeStyle = gLineColor;
+        gContext.fillStyle = gStyle.getLineColor();
+        gContext.strokeStyle = gStyle.getLineColor();
 
         gContext.beginPath();
         gContext.moveTo(tool.x0, tool.y0);
@@ -42,8 +41,8 @@ function tools_line()
         var a = Math.abs(tool.x0-ev._x)*gImage.getSpacing()[0];
         var b = Math.abs(tool.y0-ev._y)*gImage.getSpacing()[1];
         var size = Math.round(Math.sqrt(a*a+b*b));
-        gContext.font = gFontStr
-        gContext.fillText(size+"mm",ev._x+gFontSize, ev._y+gFontSize)
+        gContext.font = gStyle.getFontStr();
+        gContext.fillText(size+"mm",ev._x+gStyle.getFontSize(), ev._y+gStyle.getFontSize())
     };
 
     // This is called when you release the mouse button.

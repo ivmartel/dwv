@@ -3,7 +3,7 @@
 * Region of interest painting tool.
 * WARNING: depends on the folowing external vars:
 * - gContext
-* - gLineColor
+* - gStyle
 * - gImgUpdate()
 */
 function tools_roi()
@@ -13,8 +13,8 @@ function tools_roi()
 
     // This is called when you start holding down the mouse button.
     this.mousedown = function(ev){
-        gContext.strokeStyle = gLineColor;
-        gContext.fillStyle = gLineColor;
+        gContext.strokeStyle = gStyle.getLineColor();
+        gContext.fillStyle = gStyle.getLineColor();
         gContext.beginPath();
         gContext.moveTo(ev._x, ev._y);
         tool.started = true;
