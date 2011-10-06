@@ -19,6 +19,7 @@
 <script type="text/javascript" src="js/tools/line.js"></script>
 <script type="text/javascript" src="js/tools/circle.js"></script>
 <script type="text/javascript" src="js/tools/windowLevel.js"></script>
+<script type="text/javascript" src="js/tools/toolbox.js"></script>
 <script type="text/javascript" src="js/style.js"></script>
 
 <script type="text/javascript">
@@ -34,9 +35,7 @@
     var gImageLoaded=0;
     
     // tools
-    var gTools = {};
-    var gSelectedTool = false;
-    var gDefaultTool = 'windowLevel';
+    var gToolBox = new ToolBox;
     
     // display
     var gBaseCanvas;
@@ -116,44 +115,6 @@
         gContext = gCanvas.getContext('2d');
     }
     
-    function gInitTools()
-    {
-        // tool list
-        gTools.rect = tools_rect;
-        gTools.roi = tools_roi;
-        gTools.line = tools_line;
-        gTools.circle = tools_circle;
-        gTools.windowLevel = tools_windowLevel;
-    
-        // Get the tool select input.
-        var tool_select = document.getElementById('dtool');
-        if (!tool_select)
-        {
-            alert('Error: failed to get the dtool element!');
-            return;
-        }
-        tool_select.addEventListener('change', gEventToolChange, false);
-
-        // Activate the default tool.
-        if (gTools[gDefaultTool])
-        {
-            gSelectedTool = new gTools[gDefaultTool]();
-            tool_select.value = gDefaultTool;
-        }
-        
-        document.getElementById('dtool').disabled = 0;
-        document.getElementById('presetsMenu').disabled = 0;
-    }
-
-    // The event handler for any changes made to the tool selector.
-    function gEventToolChange(event)
-    {
-        if (gTools[this.value])
-        {
-            gSelectedTool = new gTools[this.value]();
-        }
-    }
-
     // This function draws the #imageTemp canvas on top of #imageView,
     // after which #imageTemp is cleared. This function is called each time when the
     // user completes a drawing operation.
@@ -186,7 +147,7 @@
             && event._y < gImage.getSize()[1] )
         {
             // Call the event handler of the tool.
-            var func = gSelectedTool[event.type];
+            var func = gToolBox.getSelectedTool()[event.type];
             if (func)
             {
                 func(event);
@@ -303,7 +264,7 @@
         gGenImage();        
         gImageLoaded=1;
         
-        gInitTools();
+        gToolBox.init();
         gSetLineColor(gStyle.getLineColor());
         
         // Attach the mousedown, mousemove and mouseup event listeners.
@@ -338,17 +299,12 @@
 
 <!-- Left -->
 <div id="left">
-Tool: <select id="dtool" disabled>
-  <option value="windowLevel">Window/Level</option>
-  <option value="rect">Draw: Rectangle</option>
-  <option value="circle">Draw: Circle</option>
-  <option value="roi">Draw: ROI</option>
-  <option value="line">Draw: Line</option>
-</select>
 
-<br>&nbsp;
+<div id="toolbox"></div>
+<script type="text/javascript">gGetToolBox();</script>
 
-<br>Color: 
+<div id="colourChooser" style="display:none;">
+Color: 
 <table name="colourChooser" class="colourChooser">
 <tr id="colours" onmouseover="gMouseOverColor()" onmouseout="gMouseOutColor()">
 <td id="black" onclick="gSetLineColor('black')">&nbsp;</td>
@@ -361,6 +317,7 @@ Tool: <select id="dtool" disabled>
 <td id="fuchsia" onclick="gSetLineColor('fuchsia')">&nbsp;</td>
 </tr>
 </table>
+</div>
 
 <div id="presetSelector"></div>
 <script type="text/javascript">gGetPresetSelector();</script>

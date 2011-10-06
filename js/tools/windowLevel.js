@@ -56,6 +56,12 @@ function tools_windowLevel()
         }
     };
     
+    this.enable = function(value){
+        var str = "none";
+        if( value ) str = "";
+        document.getElementById("presetSelector").style.display=str;
+    };
+    
 } // tools_windowLevel
 
 function showHUvalue(x,y)
@@ -99,7 +105,6 @@ function gGetPresetSelector()
     selector.name = "presetsMenu";
     selector.onchange = changePreset;
     selector.selectedIndex = 1;
-    selector.disabled = 1;
     paragraph.appendChild(selector);
 
     var options = new Array("Default", "Abdomen", "Lung", "Brain", "Bone", "Head");
@@ -112,6 +117,7 @@ function gGetPresetSelector()
         selector.appendChild(option);
     }
 
+    document.getElementById('presetSelector').style.display="none";
     document.getElementById('presetSelector').appendChild(paragraph);
 }
 

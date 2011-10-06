@@ -57,5 +57,12 @@ function tools_circle()
             gImgUpdate();
         }
     };
+
+    this.enable = function(value){
+        var str = "none";
+        if( value ) str = "";
+        document.getElementById("colourChooser").style.display=str;
+    };
+
 } // tools_circle
 
