@@ -2,8 +2,8 @@
 * rect.js
 * Rectangle painting tool.
 * WARNING: depends on the folowing external vars:
-* - gContext
-* - gCanvas
+* - gDrawContext
+* - gDrawCanvas
 * - gImage
 * - gStyle
 * - gImgUpdate()
@@ -32,22 +32,22 @@ function tools_rect()
         var w = Math.abs(ev._x - tool.x0);
         var h = Math.abs(ev._y - tool.y0);
 
-        gContext.clearRect(0, 0, gCanvas.width, gCanvas.height);
-        gContext.fillStyle = gStyle.getLineColor();
-        gContext.strokeStyle = gStyle.getLineColor();
+        gDrawContext.clearRect(0, 0, gDrawCanvas.width, gDrawCanvas.height);
+        gDrawContext.fillStyle = gStyle.getLineColor();
+        gDrawContext.strokeStyle = gStyle.getLineColor();
 
         if (!w || !h)
         {
             return;
         }
 
-        gContext.beginPath();
-        gContext.strokeRect(x, y, w, h);
+        gDrawContext.beginPath();
+        gDrawContext.strokeRect(x, y, w, h);
     
         // surface
         var surf = Math.round((w*gImage.getSpacing()[0])*(h*gImage.getSpacing()[1]));
-        gContext.font = gStyle.getFontStr();
-        gContext.fillText(surf+"mm2",ev._x+gStyle.getFontSize(), ev._y+gStyle.getFontSize())
+        gDrawContext.font = gStyle.getFontStr();
+        gDrawContext.fillText(surf+"mm2",ev._x+gStyle.getFontSize(), ev._y+gStyle.getFontSize())
     };
 
     // This is called when you release the mouse button.
@@ -56,7 +56,7 @@ function tools_rect()
         {
             tool.mousemove(ev);
             tool.started = false;
-            gImgUpdate();
+            gContextUpdate();
         }
     };
         

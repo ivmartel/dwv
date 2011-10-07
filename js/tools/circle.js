@@ -2,8 +2,8 @@
 * circle.js
 * Circle painting tool.
 * WARNING: depends on the folowing external vars:
-* - gContext
-* - gCanvas
+* - gDrawContext
+* - gDrawCanvas
 * - gImage
 * - gStyle
 * - gImgUpdate()
@@ -27,25 +27,25 @@ function tools_circle()
             return;
         }
 
-        gContext.clearRect(0, 0, gCanvas.width, gCanvas.height);
-        gContext.fillStyle = gStyle.getLineColor();
-        gContext.strokeStyle = gStyle.getLineColor();
+        gDrawContext.clearRect(0, 0, gDrawCanvas.width, gDrawCanvas.height);
+        gDrawContext.fillStyle = gStyle.getLineColor();
+        gDrawContext.strokeStyle = gStyle.getLineColor();
 
         var a = Math.abs(tool.x0-ev._x);
         var b = Math.abs(tool.y0-ev._y);
         var radius = Math.round(Math.sqrt(a*a+b*b));
         
-        gContext.beginPath();
-        gContext.arc(tool.x0, tool.y0, radius, 0, 2*Math.PI);
-        gContext.stroke();
+        gDrawContext.beginPath();
+        gDrawContext.arc(tool.x0, tool.y0, radius, 0, 2*Math.PI);
+        gDrawContext.stroke();
         
         // surface
         a = a*gImage.getSpacing()[0];
         b = b*gImage.getSpacing()[1];
         radius = Math.sqrt(a*a+b*b);
         var surf = Math.round(Math.PI*radius*radius);
-        gContext.font = gStyle.getFontStr();
-        gContext.fillText(surf+"mm2",ev._x+gStyle.getFontSize(), ev._y+gStyle.getFontSize())
+        gDrawContext.font = gStyle.getFontStr();
+        gDrawContext.fillText(surf+"mm2",ev._x+gStyle.getFontSize(), ev._y+gStyle.getFontSize())
     };
 
     // This is called when you release the mouse button.
@@ -54,7 +54,7 @@ function tools_circle()
         {
             tool.mousemove(ev);
             tool.started = false;
-            gImgUpdate();
+            gContextUpdate();
         }
     };
 

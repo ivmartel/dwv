@@ -2,7 +2,7 @@
 * windowLevel.js
 * WindowLevel tool.
 * WARNING: depends on the folowing external vars:
-* - gContext
+* - gDrawContext
 * - gImage
 * - gStyle
 * - gImageLoaded
@@ -52,7 +52,7 @@ function tools_windowLevel()
         {
             tool.mousemove(ev);
             tool.started = false;
-            gImgUpdate();
+            gContextUpdate();
         }
     };
     
@@ -69,30 +69,30 @@ function showHUvalue(x,y)
     var t = (y*gImage.getSize()[0])+x;        
     
     // style
-    gContext.clearRect(0, 0, 150, 150);
-    gContext.fillStyle = gStyle.getTextColor();
-    gContext.font = gStyle.getFontStr();
-    gContext.textBaseline = "top";
-    gContext.textAlign = "left";
+    gDrawContext.clearRect(0, 0, 150, 150);
+    gDrawContext.fillStyle = gStyle.getTextColor();
+    gDrawContext.font = gStyle.getFontStr();
+    gDrawContext.textBaseline = "top";
+    gDrawContext.textAlign = "left";
     
     // text
-    gContext.fillText("X = "+x, 0, 0);
-    gContext.fillText("Y = "+y, 0, gStyle.getLineHeight());
-    gContext.fillText("HU = "+gLookupObj.huLookup[gPixelBuffer[t]], 0, 2*gStyle.getLineHeight());
+    gDrawContext.fillText("X = "+x, 0, 0);
+    gDrawContext.fillText("Y = "+y, 0, gStyle.getLineHeight());
+    gDrawContext.fillText("HU = "+gLookupObj.huLookup[gPixelBuffer[t]], 0, 2*gStyle.getLineHeight());
 }
 
 function showWindowingValue(windowCenter,windowWidth)
 {
     // style
-    gContext.clearRect(gCanvas.width-150, 0, gCanvas.width, 150);
-    gContext.fillStyle = gStyle.getTextColor();
-    gContext.font = gStyle.getFontStr();
-    gContext.textBaseline = "top";
-    gContext.textAlign = "right";
+    gDrawContext.clearRect(gDrawCanvas.width-150, 0, gDrawCanvas.width, 150);
+    gDrawContext.fillStyle = gStyle.getTextColor();
+    gDrawContext.font = gStyle.getFontStr();
+    gDrawContext.textBaseline = "top";
+    gDrawContext.textAlign = "right";
     
     // text
-    gContext.fillText("WindowCenter = "+windowCenter, gCanvas.width, 0);
-    gContext.fillText("WindowWidth = "+windowWidth, gCanvas.width, gStyle.getLineHeight());
+    gDrawContext.fillText("WindowCenter = "+windowCenter, gDrawCanvas.width, 0);
+    gDrawContext.fillText("WindowWidth = "+windowWidth, gDrawCanvas.width, gStyle.getLineHeight());
 }
 
 function gGetPresetSelector()

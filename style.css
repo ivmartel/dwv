@@ -37,7 +37,7 @@ h1 { color: #fff; margin: 10px; padding: 10px; }
 #imageView { 
     border: 1px solid #000;
 }
-#imageTemp {
+#imageDraw {
     position: absolute; 
     top: 1px; 
     left: 1px;

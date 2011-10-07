@@ -2,7 +2,7 @@
 * roi.js
 * Region of interest painting tool.
 * WARNING: depends on the folowing external vars:
-* - gContext
+* - gDrawContext
 * - gStyle
 * - gImgUpdate()
 */
@@ -13,10 +13,10 @@ function tools_roi()
 
     // This is called when you start holding down the mouse button.
     this.mousedown = function(ev){
-        gContext.strokeStyle = gStyle.getLineColor();
-        gContext.fillStyle = gStyle.getLineColor();
-        gContext.beginPath();
-        gContext.moveTo(ev._x, ev._y);
+        gDrawContext.strokeStyle = gStyle.getLineColor();
+        gDrawContext.fillStyle = gStyle.getLineColor();
+        gDrawContext.beginPath();
+        gDrawContext.moveTo(ev._x, ev._y);
         tool.started = true;
     };
 
@@ -27,8 +27,8 @@ function tools_roi()
             return;
         }
 
-        gContext.lineTo(ev._x, ev._y);
-        gContext.stroke();
+        gDrawContext.lineTo(ev._x, ev._y);
+        gDrawContext.stroke();
     };
 
     // This is called when you release the mouse button.
@@ -36,10 +36,10 @@ function tools_roi()
         if (tool.started)
         {
             tool.mousemove(ev);
-            gContext.closePath();
-            gContext.stroke();
+            gDrawContext.closePath();
+            gDrawContext.stroke();
             tool.started = false;
-            gImgUpdate();
+            gContextUpdate();
         }
     };
         

@@ -17,26 +17,44 @@ function tools_zoom()
     this.mousedown = function(ev){
         tool.started = true;
         tool.x0 = ev._x;
+        tool.y0 = ev._y;
     };
 
     // This function is called every time you move the mouse.
     this.mousemove = function(ev){
         if (!tool.started)
         {
+            // zoom mode
+            tool.x0 = ev._x;
+            tool.y0 = ev._y;
             return;
         }
 
-        var imageData = gBaseContext.getImageData(0, 0, gImage.getSize()[0], gImage.getSize()[1]);
-        var newCanvas = document.getElementById("imageView");
-        newCanvas.width = imageData.width;
-        newCanvas.height = imageData.height;
-        newCanvas.getContext("2d").putImageData(imageData, 0, 0);
-
-        var zoom = 1 + (ev._x - tool.x0)/1000;
-        if( zoom > 1.1 ) zoom = 1;
-        gContext.scale(zoom, zoom);
+        // get the image data
+        var imageData = gBaseContext.getImageData( 0, 0, gImage.getSize()[0], gImage.getSize()[1]); 
+       
+        // copy it to the draw context
+        gDrawContext.clearRect(0, 0, gImage.getSize()[0],gImage.getSize()[1]);
+        gDrawContext.putImageData(imageData, 0, 0);
         
-        gContext.drawImage(newCanvas, ev._x, ev._y);
+        // save base settings
+        gBaseContext.save();
+
+        // translate the base context
+        gBaseContext.clearRect(0, 0, gImage.getSize()[0],gImage.getSize()[1]);
+        var tx = ev._x - tool.x0;
+        var ty = ev._y - tool.y0;
+        gBaseContext.translate( tx, ty );
+		
+        // put the draw canvas in the base context
+        gBaseContext.drawImage(gDrawCanvas, 0, 0);
+        
+        // restore base settings
+        gBaseContext.restore();
+        
+        // do not cumulate
+        tool.x0 = ev._x;
+        tool.y0 = ev._y;
     };
 
     // This is called when you release the mouse button.
@@ -48,6 +66,33 @@ function tools_zoom()
         }
     };
     
+    // This is called when you use the mouse wheel.
+    this.DOMMouseScroll = function(ev){
+        // get the image data
+        var imageData = gBaseContext.getImageData( 0, 0, gImage.getSize()[0], gImage.getSize()[1]); 
+       
+        // copy it to the draw context
+        gDrawContext.clearRect(0, 0, gImage.getSize()[0],gImage.getSize()[1]);
+        gDrawContext.putImageData(imageData, 0, 0);
+        
+        // save base settings
+        gBaseContext.save();
+
+        // translate the base context
+        gBaseContext.clearRect(0, 0, gImage.getSize()[0],gImage.getSize()[1]);
+        var zoom = Math.pow(1.1,ev.detail);
+        
+        gBaseContext.translate(tool.x0,tool.y0);
+        gBaseContext.scale( zoom, zoom );
+        gBaseContext.translate(-tool.x0,-tool.y0);
+		
+        // put the draw canvas in the base context
+        gBaseContext.drawImage(gDrawCanvas, 0, 0);
+        
+        // restore base settings
+        gBaseContext.restore();
+    };
+
     this.enable = function(value){
         // nothing to do.
     };

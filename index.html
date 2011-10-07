@@ -41,8 +41,8 @@
     // display
     var gBaseCanvas;
     var gBaseContext;    
-    var gCanvas;
-    var gContext;    
+    var gDrawCanvas;
+    var gDrawContext;    
     
     // style
     var gStyle = new Style();
@@ -97,10 +97,10 @@
             return;
         }
 
-        // Add the temporary canvas.
+        // Add the drawing canvas.
         var container = gBaseCanvas.parentNode;
-        gCanvas = document.createElement('canvas');
-        if (!gCanvas)
+        gDrawCanvas = document.createElement('canvas');
+        if (!gDrawCanvas)
         {
             alert('Error: I cannot create a new canvas element!');
             return;
@@ -109,20 +109,20 @@
         gBaseCanvas.width = gImage.getSize()[0];
         gBaseCanvas.height = gImage.getSize()[1];
         
-        gCanvas.id = 'imageTemp';
-        gCanvas.width = gBaseCanvas.width;
-        gCanvas.height = gBaseCanvas.height;
-        container.appendChild(gCanvas);
-        gContext = gCanvas.getContext('2d');
+        gDrawCanvas.id = 'imageDraw';
+        gDrawCanvas.width = gBaseCanvas.width;
+        gDrawCanvas.height = gBaseCanvas.height;
+        container.appendChild(gDrawCanvas);
+        gDrawContext = gDrawCanvas.getContext('2d');
     }
     
-    // This function draws the #imageTemp canvas on top of #imageView,
-    // after which #imageTemp is cleared. This function is called each time when the
+    // This function draws the #imageDraw canvas on top of #imageView,
+    // after which #imageDraw is cleared. This function is called each time when the
     // user completes a drawing operation.
-    function gImgUpdate() 
+    function gContextUpdate() 
     {
-        gBaseContext.drawImage(gCanvas, 0, 0);
-        gContext.clearRect(0, 0, gCanvas.width, gCanvas.height);
+        gBaseContext.drawImage(gDrawCanvas, 0, 0);
+        gDrawContext.clearRect(0, 0, gDrawCanvas.width, gDrawCanvas.height);
     } 
 
     // The general-purpose event handler. This function just determines the mouse 
@@ -158,8 +158,11 @@
 
     function gLoadDicom(evt) 
     {
-        file = evt.target.files[0]
-        
+        gLoadDicomFile(evt.target.files[0]);
+    }
+    
+    function gLoadDicomFile(file) 
+    {
         var myreader = new FileReader();
         myreader.onload = function() {
             return function(e) {
@@ -251,8 +254,7 @@
         
         gInitCanvas();
         
-        gBaseContext.fillRect( 0, 0, numberOfRows, numberOfColumns );    
-               
+        gBaseContext.fillRect( 0, 0, gImage.getSize()[0], gImage.getSize()[1] );    
         gGenImage();        
         gImageLoaded=1;
         
@@ -260,10 +262,10 @@
         gSetLineColor(gStyle.getLineColor());
         
         // Attach the mousedown, mousemove and mouseup event listeners.
-        gCanvas.addEventListener('mousedown', gEvCanvas, false);
-        gCanvas.addEventListener('mousemove', gEvCanvas, false);
-        gCanvas.addEventListener('mouseup',   gEvCanvas, false);
-    }
+        gDrawCanvas.addEventListener('mousedown', gEvCanvas, false);
+        gDrawCanvas.addEventListener('mousemove', gEvCanvas, false);
+        gDrawCanvas.addEventListener('mouseup',   gEvCanvas, false);
+        gDrawCanvas.addEventListener('DOMMouseScroll',gEvCanvas,false);    }
     
     function gGenImage()
     {        
@@ -351,7 +353,7 @@ Search Tags: <input type="text" id="tagSearch" name="tagSearch" multiple />
 </div>
 
 </div>
- <!-- Right [end] -->
+<!-- Right [end] -->
 
 </body>
 </html>
