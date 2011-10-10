@@ -6,17 +6,17 @@
 * - gStyle
 * - gImgUpdate()
 */
-function tools_roi()
+function tools_roi(app)
 {
     var tool = this;
     this.started = false;
 
     // This is called when you start holding down the mouse button.
     this.mousedown = function(ev){
-        gDrawContext.strokeStyle = gStyle.getLineColor();
-        gDrawContext.fillStyle = gStyle.getLineColor();
-        gDrawContext.beginPath();
-        gDrawContext.moveTo(ev._x, ev._y);
+    	app.gDrawContext.strokeStyle = app.gStyle.getLineColor();
+    	app.gDrawContext.fillStyle = app.gStyle.getLineColor();
+    	app.gDrawContext.beginPath();
+        app.gDrawContext.moveTo(ev._x, ev._y);
         tool.started = true;
     };
 
@@ -27,8 +27,8 @@ function tools_roi()
             return;
         }
 
-        gDrawContext.lineTo(ev._x, ev._y);
-        gDrawContext.stroke();
+        app.gDrawContext.lineTo(ev._x, ev._y);
+        app.gDrawContext.stroke();
     };
 
     // This is called when you release the mouse button.
@@ -36,10 +36,10 @@ function tools_roi()
         if (tool.started)
         {
             tool.mousemove(ev);
-            gDrawContext.closePath();
-            gDrawContext.stroke();
+            app.gDrawContext.closePath();
+            app. gDrawContext.stroke();
             tool.started = false;
-            gContextUpdate();
+            app.gContextUpdate();
         }
     };
         

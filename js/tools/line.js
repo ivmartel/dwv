@@ -8,7 +8,7 @@
 * - gStyle
 * - gImgUpdate()
 */
-function tools_line()
+function tools_line(app)
 {
     var tool = this;
     this.started = false;
@@ -27,22 +27,28 @@ function tools_line()
             return;
         }
 
-        gDrawContext.clearRect(0, 0, gDrawCanvas.width, gDrawCanvas.height);
-        gDrawContext.fillStyle = gStyle.getLineColor();
-        gDrawContext.strokeStyle = gStyle.getLineColor();
+        app.gDrawContext.clearRect(
+        		0, 0, 
+        		app.gDrawCanvas.width, 
+        		app.gDrawCanvas.height);
+        app.gDrawContext.fillStyle = app.gStyle.getLineColor();
+        app.gDrawContext.strokeStyle = app.gStyle.getLineColor();
 
-        gDrawContext.beginPath();
-        gDrawContext.moveTo(tool.x0, tool.y0);
-        gDrawContext.lineTo(ev._x, ev._y);
-        gDrawContext.stroke();
-        gDrawContext.closePath();
+        app.gDrawContext.beginPath();
+        app.gDrawContext.moveTo(tool.x0, tool.y0);
+        app.gDrawContext.lineTo(ev._x, ev._y);
+        app.gDrawContext.stroke();
+        app.gDrawContext.closePath();
         
         // size
-        var a = Math.abs(tool.x0-ev._x)*gImage.getSpacing()[0];
-        var b = Math.abs(tool.y0-ev._y)*gImage.getSpacing()[1];
+        var a = Math.abs(tool.x0-ev._x) * app.gImage.getSpacing()[0];
+        var b = Math.abs(tool.y0-ev._y) * app.gImage.getSpacing()[1];
         var size = Math.round(Math.sqrt(a*a+b*b));
-        gDrawContext.font = gStyle.getFontStr();
-        gDrawContext.fillText(size+"mm",ev._x+gStyle.getFontSize(), ev._y+gStyle.getFontSize());
+        app.gDrawContext.font = app.gStyle.getFontStr();
+        app.gDrawContext.fillText(
+        		size+"mm",
+        		ev._x + app.gStyle.getFontSize(), 
+        		ev._y + app.gStyle.getFontSize());
     };
 
     // This is called when you release the mouse button.
@@ -51,7 +57,7 @@ function tools_line()
         {
             tool.mousemove(ev);
             tool.started = false;
-            gContextUpdate();
+            app.gContextUpdate();
         }
     };
     

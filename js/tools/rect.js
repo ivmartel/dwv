@@ -8,7 +8,7 @@
 * - gStyle
 * - gImgUpdate()
 */
-function tools_rect()
+function tools_rect(app)
 {
     var tool = this;
     this.started = false;
@@ -32,22 +32,28 @@ function tools_rect()
         var w = Math.abs(ev._x - tool.x0);
         var h = Math.abs(ev._y - tool.y0);
 
-        gDrawContext.clearRect(0, 0, gDrawCanvas.width, gDrawCanvas.height);
-        gDrawContext.fillStyle = gStyle.getLineColor();
-        gDrawContext.strokeStyle = gStyle.getLineColor();
+        app.gDrawContext.clearRect(
+        		0, 0, 
+        		app.gDrawCanvas.width, 
+        		app.gDrawCanvas.height);
+        app.gDrawContext.fillStyle = app.gStyle.getLineColor();
+        app.gDrawContext.strokeStyle = app.gStyle.getLineColor();
 
         if (!w || !h)
         {
             return;
         }
 
-        gDrawContext.beginPath();
-        gDrawContext.strokeRect(x, y, w, h);
+        app.gDrawContext.beginPath();
+        app.gDrawContext.strokeRect(x, y, w, h);
     
         // surface
-        var surf = Math.round((w*gImage.getSpacing()[0])*(h*gImage.getSpacing()[1]));
-        gDrawContext.font = gStyle.getFontStr();
-        gDrawContext.fillText(surf+"mm2",ev._x+gStyle.getFontSize(), ev._y+gStyle.getFontSize());
+        var surf = Math.round((w*app.gImage.getSpacing()[0])*(h*app.gImage.getSpacing()[1]));
+        app.gDrawContext.font = app.gStyle.getFontStr();
+        app.gDrawContext.fillText(
+        		surf+"mm2",
+        		ev._x + app.gStyle.getFontSize(), 
+        		ev._y + app.gStyle.getFontSize());
     };
 
     // This is called when you release the mouse button.
@@ -56,7 +62,7 @@ function tools_rect()
         {
             tool.mousemove(ev);
             tool.started = false;
-            gContextUpdate();
+            app.gContextUpdate();
         }
     };
         

@@ -8,7 +8,7 @@
 * - gStyle
 * - gImgUpdate()
 */
-function tools_zoom()
+function tools_zoom(app)
 {
     var tool = this;
     this.started = false;
@@ -31,26 +31,35 @@ function tools_zoom()
         }
 
         // get the image data
-        var imageData = gBaseContext.getImageData( 0, 0, gImage.getSize()[0], gImage.getSize()[1]); 
+        var imageData = app.gBaseContext.getImageData( 
+    			0, 0, 
+    			app.gImage.getSize()[0], 
+    			app.gImage.getSize()[1]); 
        
         // copy it to the draw context
-        gDrawContext.clearRect(0, 0, gImage.getSize()[0],gImage.getSize()[1]);
-        gDrawContext.putImageData(imageData, 0, 0);
+        app.gDrawContext.clearRect(
+        		0, 0, 
+        		app.gImage.getSize()[0],
+        		app.gImage.getSize()[1]);
+        app.gDrawContext.putImageData(imageData, 0, 0);
         
         // save base settings
-        gBaseContext.save();
+        app.gBaseContext.save();
 
         // translate the base context
-        gBaseContext.clearRect(0, 0, gImage.getSize()[0],gImage.getSize()[1]);
+        app.gBaseContext.clearRect(
+        		0, 0, 
+        		app.gImage.getSize()[0],
+        		app.gImage.getSize()[1]);
         var tx = ev._x - tool.x0;
         var ty = ev._y - tool.y0;
-        gBaseContext.translate( tx, ty );
+        app.gBaseContext.translate( tx, ty );
 		
         // put the draw canvas in the base context
-        gBaseContext.drawImage(gDrawCanvas, 0, 0);
+        app.gBaseContext.drawImage(app.gDrawCanvas, 0, 0);
         
         // restore base settings
-        gBaseContext.restore();
+        app.gBaseContext.restore();
         
         // do not cumulate
         tool.x0 = ev._x;
@@ -68,42 +77,51 @@ function tools_zoom()
     
     // This is called when you use the mouse wheel.
     this.DOMMouseScroll = function(ev){
-        gZoom(ev.detail, tool.x0, tool.y0);
+        zoom(ev.detail, tool.x0, tool.y0);
     };
 
     this.mousewheel = function(ev){
-        gZoom(ev.wheelDelta/40, tool.x0, tool.y0);
+        zoom(ev.wheelDelta/40, tool.x0, tool.y0);
     };
     
     this.enable = function(value){
         // nothing to do.
     };
 
+    function zoom(step, cx, cy)
+    {
+         // get the image data
+        var imageData = app.gBaseContext.getImageData( 
+        		0, 0, 
+    			app.gImage.getSize()[0], 
+    			app.gImage.getSize()[1]); 
+       
+        // copy it to the draw context
+        app.gDrawContext.clearRect(
+        		0, 0, 
+        		app.gImage.getSize()[0],
+        		app.gImage.getSize()[1]);
+        app.gDrawContext.putImageData(imageData, 0, 0);
+        
+        // save base settings
+        app.gBaseContext.save();
+
+        // translate the base context
+        app.gBaseContext.clearRect(
+        		0, 0, 
+        		app.gImage.getSize()[0],
+        		app.gImage.getSize()[1]);
+        var zoom = Math.pow(1.1,step);
+        
+        app.gBaseContext.translate(cx, cy);
+        app.gBaseContext.scale( zoom, zoom );
+        app.gBaseContext.translate(-cx, -cy);
+        
+        // put the draw canvas in the base context
+        app.gBaseContext.drawImage(app.gDrawCanvas, 0, 0);
+        
+        // restore base settings
+        app.gBaseContext.restore();
+    }
+
 } // tools_zoom
-
-function gZoom(step, cx, cy)
-{
-     // get the image data
-    var imageData = gBaseContext.getImageData( 0, 0, gImage.getSize()[0], gImage.getSize()[1]); 
-   
-    // copy it to the draw context
-    gDrawContext.clearRect(0, 0, gImage.getSize()[0],gImage.getSize()[1]);
-    gDrawContext.putImageData(imageData, 0, 0);
-    
-    // save base settings
-    gBaseContext.save();
-
-    // translate the base context
-    gBaseContext.clearRect(0, 0, gImage.getSize()[0],gImage.getSize()[1]);
-    var zoom = Math.pow(1.1,step);
-    
-    gBaseContext.translate(cx, cy);
-    gBaseContext.scale( zoom, zoom );
-    gBaseContext.translate(-cx, -cy);
-    
-    // put the draw canvas in the base context
-    gBaseContext.drawImage(gDrawCanvas, 0, 0);
-    
-    // restore base settings
-    gBaseContext.restore();
-}

@@ -9,7 +9,7 @@
 * - gLookupObj
 * - gImgUpdate()
 */
-function tools_windowLevel()
+function tools_windowLevel(app)
 {
     var tool = this;
     this.started = false;
@@ -29,21 +29,15 @@ function tools_windowLevel()
             return;
         }
 
-        //showHUvalue(ev._x, ev._y);
-        
-        gImageLoaded = 0; 
-                                                                           
         var diffX = ev._x - tool.x0;
         var diffY = tool.y0 - ev._y;                                
-        var windowCenter = parseInt(gLookupObj.windowCenter) + diffY;
-        var windowWidth = parseInt(gLookupObj.windowWidth) + diffX;                        
+        var windowCenter = parseInt(app.gLookupObj.windowCenter) + diffY;
+        var windowWidth = parseInt(app.gLookupObj.windowWidth) + diffX;                        
         
         updateWindowingData(windowCenter,windowWidth);    
         
         tool.x0 = ev._x;             
         tool.y0 = ev._y;
-        
-        gImageLoaded = 1;                                        
     };
 
     // This is called when you release the mouse button.
@@ -52,7 +46,7 @@ function tools_windowLevel()
         {
             tool.mousemove(ev);
             tool.started = false;
-            gContextUpdate();
+            app.gContextUpdate();
         }
     };
     
@@ -62,38 +56,97 @@ function tools_windowLevel()
         document.getElementById("presetSelector").style.display=str;
     };
     
+    function showHUvalue(x,y)
+    {
+        var t = (y*app.gImage.getSize()[0])+x;        
+        
+        // style
+        app.gDrawContext.clearRect(0, 0, 150, 150);
+        app.gDrawContext.fillStyle = app.gStyle.getTextColor();
+        app.gDrawContext.font = app.gStyle.getFontStr();
+        app.gDrawContext.textBaseline = "top";
+        app.gDrawContext.textAlign = "left";
+        
+        // text
+        app.gDrawContext.fillText("X = "+x, 0, 0);
+        app.gDrawContext.fillText("Y = "+y, 0, app.gStyle.getLineHeight());
+        app.gDrawContext.fillText(
+        		"HU = "+app.gLookupObj.huLookup[app.gPixelBuffer[t]], 
+        		0, 
+        		2*app.gStyle.getLineHeight());
+    }
+
+    function showWindowingValue(windowCenter,windowWidth)
+    {
+        // style
+    	app.gDrawContext.clearRect(app.gDrawCanvas.width-150, 0, app.gDrawCanvas.width, 150);
+    	app.gDrawContext.fillStyle = app.gStyle.getTextColor();
+    	app.gDrawContext.font = app.gStyle.getFontStr();
+    	app.gDrawContext.textBaseline = "top";
+    	app.gDrawContext.textAlign = "right";
+        
+        // text
+    	app.gDrawContext.fillText("WindowCenter = "+windowCenter, app.gDrawCanvas.width, 0);
+    	app.gDrawContext.fillText("WindowWidth = "+windowWidth, app.gDrawCanvas.width, app.gStyle.getLineHeight());
+    }
+
+    function updateWindowingData(wc,ww)
+    {
+    	app.gLookupObj.setWindowingdata(wc,ww);
+        showWindowingValue(wc,ww);
+        app.gGenImage();
+    }
+
+    this.changePreset = function()
+    {    
+        applyPreset(parseInt(document.getElementById("presetsMenu").options[
+            document.getElementById("presetsMenu").selectedIndex].value));
+    };
+
+    function applyPreset(preset)    
+    {    
+        var ww, wc;
+        switch (preset)
+        {
+            case 1: // default
+                wc=app.gLookupObj.defaultWindowCenter;
+                ww=app.gLookupObj.defaultWindowWidth;
+                updateWindowingData(wc,ww);
+                break;
+            
+            case 2: // abdomen
+                wc=350;
+                ww=40;
+                updateWindowingData(wc,ww);
+                break;
+            
+            case 3: // lung
+                wc=-600;
+                ww=1500;
+                updateWindowingData(wc,ww);
+                break;
+            
+            case 4: // brain
+                wc=40;
+                ww=80;
+                updateWindowingData(wc,ww);
+                break;
+            
+            case 5: // bone
+                wc=480;
+                ww=2500;
+                updateWindowingData(wc,ww);
+                break;
+            
+            case 6: // head
+                wc=90;
+                ww=350;
+                updateWindowingData(wc,ww);
+                break;
+        }
+    }
+
 } // tools_windowLevel
-
-function showHUvalue(x,y)
-{
-    var t = (y*gImage.getSize()[0])+x;        
-    
-    // style
-    gDrawContext.clearRect(0, 0, 150, 150);
-    gDrawContext.fillStyle = gStyle.getTextColor();
-    gDrawContext.font = gStyle.getFontStr();
-    gDrawContext.textBaseline = "top";
-    gDrawContext.textAlign = "left";
-    
-    // text
-    gDrawContext.fillText("X = "+x, 0, 0);
-    gDrawContext.fillText("Y = "+y, 0, gStyle.getLineHeight());
-    gDrawContext.fillText("HU = "+gLookupObj.huLookup[gPixelBuffer[t]], 0, 2*gStyle.getLineHeight());
-}
-
-function showWindowingValue(windowCenter,windowWidth)
-{
-    // style
-    gDrawContext.clearRect(gDrawCanvas.width-150, 0, gDrawCanvas.width, 150);
-    gDrawContext.fillStyle = gStyle.getTextColor();
-    gDrawContext.font = gStyle.getFontStr();
-    gDrawContext.textBaseline = "top";
-    gDrawContext.textAlign = "right";
-    
-    // text
-    gDrawContext.fillText("WindowCenter = "+windowCenter, gDrawCanvas.width, 0);
-    gDrawContext.fillText("WindowWidth = "+windowWidth, gDrawCanvas.width, gStyle.getLineHeight());
-}
 
 function gGetPresetSelector()
 {
@@ -103,7 +156,7 @@ function gGetPresetSelector()
     var selector = document.createElement("select");
     selector.id = "presetsMenu";
     selector.name = "presetsMenu";
-    selector.onchange = changePreset;
+    selector.onchange = app.gToolBox.changePreset;
     selector.selectedIndex = 1;
     paragraph.appendChild(selector);
 
@@ -120,60 +173,3 @@ function gGetPresetSelector()
     document.getElementById('presetSelector').style.display="none";
     document.getElementById('presetSelector').appendChild(paragraph);
 }
-
-function updateWindowingData(wc,ww)
-{
-    gLookupObj.setWindowingdata(wc,ww);
-    this.showWindowingValue(wc,ww);
-    gGenImage();
-}
-
-function changePreset()
-{    
-    applyPreset(parseInt(document.getElementById("presetsMenu").options[
-        document.getElementById("presetsMenu").selectedIndex].value));
-}
-
-function applyPreset(preset)    
-{    
-    var ww, wc;
-    switch (preset)
-    {
-        case 1: // default
-            wc=gLookupObj.defaultWindowCenter;
-            ww=gLookupObj.defaultWindowWidth;
-            updateWindowingData(wc,ww);
-            break;
-        
-        case 2: // abdomen
-            wc=350;
-            ww=40;
-            updateWindowingData(wc,ww);
-            break;
-        
-        case 3: // lung
-            wc=-600;
-            ww=1500;
-            updateWindowingData(wc,ww);
-            break;
-        
-        case 4: // brain
-            wc=40;
-            ww=80;
-            updateWindowingData(wc,ww);
-            break;
-        
-        case 5: // bone
-            wc=480;
-            ww=2500;
-            updateWindowingData(wc,ww);
-            break;
-        
-        case 6: // head
-            wc=90;
-            ww=350;
-            updateWindowingData(wc,ww);
-            break;
-    }
-}
-
