@@ -8,17 +8,20 @@
 */
 function DicomImage(size, spacing){
 
-    // size: [0]=row, [1]=column
+	var self = this;
+	// size: [0]=row, [1]=column
     this.size = size;
     // size: [0]=row, [1]=column
     this.spacing = spacing;
+
+    this.getSize = function() {
+        return self.size;
+    };
+
+    this.getSpacing = function() {
+        return self.spacing;
+    };
 }
 
-DicomImage.prototype.getSize = function() {
-    return this.size;
-};
 
-DicomImage.prototype.getSpacing = function() {
-    return this.spacing;
-};
 
