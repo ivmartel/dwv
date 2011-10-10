@@ -4,35 +4,58 @@
 */
 function DwvApp()
 {
+	// Local object.
 	var self = this;
 	
-	// image details
-    this.gImage;
+	// Image details.
+    var image = null;
     
-    // 
-    this.gLookupTable;
+    // Lookup object.
+    var lookupObj = null;
 
-    // 
-    this.gLookupObj;
+    // Pixel buffer.
+    var pixelBuffer = null;
 
-    // 
-    this.gPixelBuffer;
-
-    // tools
-    this.gToolBox = new ToolBox(this);
-    
     // Base context.
-    this.gBaseContext;    
+    var baseContext = null;    
 
     // Drawing canvas.
-    this.gDrawCanvas;
+    var drawCanvas = null;
 
     // Drawing context.
-    this.gDrawContext;   
+    var drawContext = null;   
     
-    // style
-    this.gStyle = new Style();
+    // Tool box.
+    var toolBox = new ToolBox(this);
+    
+    // Style.
+    var style = new Style();
+    
 
+    // Get the image details.
+    this.getImage = function() { return image; };
+    
+    // Get the lookup object.
+    this.getLookupObj = function() { return lookupObj; };
+
+    // Get the pixel buffer.
+    this.getPixelBuffer = function() { return pixelBuffer; };
+
+    // Get the tool box.
+    this.getToolBox = function() { return toolBox; };
+
+    // Get the base context.
+    this.getBaseContext = function() { return baseContext; };
+
+    // Get the drawing canvas.
+    this.getDrawCanvas = function() { return drawCanvas; };
+
+    // Get the drawing context.
+    this.getDrawContext = function() { return drawContext; };
+
+    // Get the drawing context.
+    this.getStyle = function() { return style; };
+    
     /**
      * @private
      * @param color
@@ -40,7 +63,7 @@ function DwvApp()
     this.setLineColor = function(color)
     {
         // set global var
-        self.gStyle.setLineColor(color);
+        self.getStyle().setLineColor(color);
         // reset borders
         var tr = document.getElementById("colours");
         var tds = tr.getElementsByTagName("td");
@@ -73,8 +96,8 @@ function DwvApp()
         }
 
         // Get the 2D canvas context.
-        self.gBaseContext = baseCanvas.getContext('2d');
-        if (!self.gBaseContext)
+        baseContext = baseCanvas.getContext('2d');
+        if (!baseContext)
         {
             alert('Error: failed to getContext!');
             return;
@@ -82,21 +105,21 @@ function DwvApp()
 
         // Add the drawing canvas.
         var container = baseCanvas.parentNode;
-        self.gDrawCanvas = document.createElement('canvas');
-        if (!self.gDrawCanvas)
+        drawCanvas = document.createElement('canvas');
+        if (!drawCanvas)
         {
             alert('Error: I cannot create a new canvas element!');
             return;
         }
 
-        baseCanvas.width = self.gImage.getSize()[0];
-        baseCanvas.height = self.gImage.getSize()[1];
+        baseCanvas.width = image.getSize()[0];
+        baseCanvas.height = image.getSize()[1];
         
-        self.gDrawCanvas.id = 'imageDraw';
-        self.gDrawCanvas.width = baseCanvas.width;
-        self.gDrawCanvas.height = baseCanvas.height;
-        container.appendChild(self.gDrawCanvas);
-        self.gDrawContext = self.gDrawCanvas.getContext('2d');
+        drawCanvas.id = 'imageDraw';
+        drawCanvas.width = baseCanvas.width;
+        drawCanvas.height = baseCanvas.height;
+        container.appendChild(drawCanvas);
+        drawContext = drawCanvas.getContext('2d');
     }
     
     /**
@@ -107,8 +130,10 @@ function DwvApp()
      */
     this.updateContext = function() 
     {
-    	self.gBaseContext.drawImage(self.gDrawCanvas, 0, 0);
-    	self.gDrawContext.clearRect(0, 0, self.gDrawCanvas.width, self.gDrawCanvas.height);
+    	self.getBaseContext().drawImage(self.getDrawCanvas(), 0, 0);
+    	self.getDrawContext().clearRect(0, 0, 
+    			self.getDrawCanvas().width, 
+    			self.getDrawCanvas().height);
     };
 
     /**
@@ -133,11 +158,11 @@ function DwvApp()
 
         if(event._x >= 0 
             && event._y >= 0 
-            && event._x < self.gImage.getSize()[0] 
-            && event._y < self.gImage.getSize()[1] )
+            && event._x < image.getSize()[0] 
+            && event._y < image.getSize()[1] )
         {
             // Call the event handler of the tool.
-            var func = self.gToolBox.getSelectedTool()[event.type];
+            var func = self.getToolBox().getSelectedTool()[event.type];
             if (func)
             {
                 func(event);
@@ -242,30 +267,30 @@ function DwvApp()
                
         document.getElementById("tags").style.display='';
         
-        self.gPixelBuffer = dicomParser.pixelBuffer;
+        pixelBuffer = dicomParser.pixelBuffer;
         
-        self.gImage = new DicomImage(
+        image = new DicomImage(
             [numberOfRows, numberOfColumns],
             [rowSpacing, columnSpacing]);
             
-        self.gLookupObj = new LookupTable();
-        self.gLookupObj.setData( windowCenter, windowWidth, rescaleSlope, rescaleIntercept);
-        self.gLookupObj.calculateHULookup();
+        lookupObj = new LookupTable();
+        lookupObj.setData( windowCenter, windowWidth, rescaleSlope, rescaleIntercept);
+        lookupObj.calculateHULookup();
         
         initCanvas();
         
-        self.gBaseContext.fillRect( 0, 0, self.gImage.getSize()[0], self.gImage.getSize()[1] );    
+        baseContext.fillRect( 0, 0, image.getSize()[0], image.getSize()[1] );    
         self.generateImage();        
         
-        self.gToolBox.init();
-        self.setLineColor(self.gStyle.getLineColor());
+        toolBox.init();
+        self.setLineColor(style.getLineColor());
         
         // Attach the mousedown, mousemove and mouseup event listeners.
-        self.gDrawCanvas.addEventListener('mousedown', evCanvas, false);
-        self.gDrawCanvas.addEventListener('mousemove', evCanvas, false);
-        self.gDrawCanvas.addEventListener('mouseup', evCanvas, false);
-        self.gDrawCanvas.addEventListener('mousewheel', evCanvas, false);
-        self.gDrawCanvas.addEventListener('DOMMouseScroll', evCanvas,false);
+        drawCanvas.addEventListener('mousedown', evCanvas, false);
+        drawCanvas.addEventListener('mousemove', evCanvas, false);
+        drawCanvas.addEventListener('mouseup', evCanvas, false);
+        drawCanvas.addEventListener('mousewheel', evCanvas, false);
+        drawCanvas.addEventListener('DOMMouseScroll', evCanvas,false);
     }
     
     /**
@@ -273,24 +298,24 @@ function DwvApp()
      */
     this.generateImage = function()
     {        
-        var imageData = self.gBaseContext.getImageData( 
+        var imageData = self.getBaseContext().getImageData( 
         		0, 0, 
-        		self.gImage.getSize()[0], 
-        		self.gImage.getSize()[1]); 
-        self.gLookupObj.calculateLookup();
+        		self.getImage().getSize()[0], 
+        		self.getImage().getSize()[1]); 
+        self.getLookupObj().calculateLookup();
         var n=0;    
-        for(var yPix=0; yPix < self.gImage.getSize()[1]; yPix++)
+        for(var yPix=0; yPix < self.getImage().getSize()[1]; yPix++)
         {
-            for(var xPix=0; xPix < self.gImage.getSize()[0];xPix++)
+            for(var xPix=0; xPix < self.getImage().getSize()[0];xPix++)
             {        
-                var offset = (yPix * self.gImage.getSize()[0] + xPix) * 4;                    
-                var pxValue = self.gLookupObj.ylookup[ self.gPixelBuffer[n] ];    
+                var offset = (yPix * self.getImage().getSize()[0] + xPix) * 4;                    
+                var pxValue = self.getLookupObj().ylookup[ self.getPixelBuffer()[n] ];    
                 n++;               
                 imageData.data[offset] = parseInt(pxValue);
                 imageData.data[offset+1] = parseInt(pxValue);
                 imageData.data[offset+2] = parseInt(pxValue);
             }
         }            
-        self.gBaseContext.putImageData(imageData, 0,0);
+        self.getBaseContext().putImageData(imageData, 0,0);
     };
 }

@@ -71,9 +71,9 @@ ToolBox.prototype.enable = function(value)
 // The event handler for any changes made to the tool selector.
 function gEventToolChange(event)
 {
-    if( app.gToolBox.hasTool(this.value) )
+    if( app.getToolBox().hasTool(this.value) )
     {
-    	app.gToolBox.setSelectedTool(this.value);
+    	app.getToolBox().setSelectedTool(this.value);
     }
 }
 

@@ -24,8 +24,8 @@ function tools_windowLevel(app)
 
         var diffX = ev._x - tool.x0;
         var diffY = tool.y0 - ev._y;                                
-        var windowCenter = parseInt(app.gLookupObj.windowCenter) + diffY;
-        var windowWidth = parseInt(app.gLookupObj.windowWidth) + diffX;                        
+        var windowCenter = parseInt(app.getLookupObj().windowCenter) + diffY;
+        var windowWidth = parseInt(app.getLookupObj().windowWidth) + diffX;                        
         
         updateWindowingData(windowCenter,windowWidth);    
         
@@ -51,46 +51,46 @@ function tools_windowLevel(app)
     
     function showHUvalue(x,y)
     {
-        var t = (y*app.gImage.getSize()[0])+x;        
+        var t = (y*app.getImage().getSize()[0])+x;        
         
         // style
-        app.gDrawContext.clearRect(0, 0, 150, 150);
-        app.gDrawContext.fillStyle = app.gStyle.getTextColor();
-        app.gDrawContext.font = app.gStyle.getFontStr();
-        app.gDrawContext.textBaseline = "top";
-        app.gDrawContext.textAlign = "left";
+        app.getDrawContext().clearRect(0, 0, 150, 150);
+        app.getDrawContext().fillStyle = app.getStyle().getTextColor();
+        app.getDrawContext().font = app.getStyle().getFontStr();
+        app.getDrawContext().textBaseline = "top";
+        app.getDrawContext().textAlign = "left";
         
         // text
-        app.gDrawContext.fillText("X = "+x, 0, 0);
-        app.gDrawContext.fillText("Y = "+y, 0, app.gStyle.getLineHeight());
-        app.gDrawContext.fillText(
-        		"HU = "+app.gLookupObj.huLookup[app.gPixelBuffer[t]], 
+        app.getDrawContext().fillText("X = "+x, 0, 0);
+        app.getDrawContext().fillText("Y = "+y, 0, app.getStyle().getLineHeight());
+        app.getDrawContext().fillText(
+        		"HU = "+app.getLookupObj().huLookup[app.getPixelBuffer()[t]], 
         		0, 
-        		2*app.gStyle.getLineHeight());
+        		2*app.getStyle().getLineHeight());
     }
 
     function showWindowingValue(windowCenter,windowWidth)
     {
         // style
-    	app.gDrawContext.clearRect(app.gDrawCanvas.width-150, 0, app.gDrawCanvas.width, 150);
-    	app.gDrawContext.fillStyle = app.gStyle.getTextColor();
-    	app.gDrawContext.font = app.gStyle.getFontStr();
-    	app.gDrawContext.textBaseline = "top";
-    	app.gDrawContext.textAlign = "right";
+    	app.getDrawContext().clearRect(app.getDrawCanvas().width-150, 0, app.getDrawCanvas().width, 150);
+    	app.getDrawContext().fillStyle = app.getStyle().getTextColor();
+    	app.getDrawContext().font = app.getStyle().getFontStr();
+    	app.getDrawContext().textBaseline = "top";
+    	app.getDrawContext().textAlign = "right";
         
         // text
-    	app.gDrawContext.fillText("WindowCenter = "+windowCenter, app.gDrawCanvas.width, 0);
-    	app.gDrawContext.fillText("WindowWidth = "+windowWidth, app.gDrawCanvas.width, app.gStyle.getLineHeight());
+    	app.getDrawContext().fillText("WindowCenter = "+windowCenter, app.getDrawCanvas().width, 0);
+    	app.getDrawContext().fillText("WindowWidth = "+windowWidth, app.getDrawCanvas().width, app.getStyle().getLineHeight());
     }
 
     function updateWindowingData(wc,ww)
     {
-    	app.gLookupObj.setWindowingdata(wc,ww);
+    	app.getLookupObj().setWindowingdata(wc,ww);
         showWindowingValue(wc,ww);
         app.generateImage();
     }
 
-    this.changePreset = function()
+    this.changePreset = function()getStyle()
     {    
         applyPreset(parseInt(document.getElementById("presetsMenu").options[
             document.getElementById("presetsMenu").selectedIndex].value));
@@ -102,8 +102,8 @@ function tools_windowLevel(app)
         switch (preset)
         {
             case 1: // default
-                wc=app.gLookupObj.defaultWindowCenter;
-                ww=app.gLookupObj.defaultWindowWidth;
+                wc=app.getLookupObj().defaultWindowCenter;
+                ww=app.getLookupObj().defaultWindowWidth;
                 updateWindowingData(wc,ww);
                 break;
             
@@ -149,7 +149,7 @@ function gGetPresetSelector()
     var selector = document.createElement("select");
     selector.id = "presetsMenu";
     selector.name = "presetsMenu";
-    selector.onchange = app.gToolBox.changePreset;
+    selector.onchange = app.getToolBox().changePreset;
     selector.selectedIndex = 1;
     paragraph.appendChild(selector);
 

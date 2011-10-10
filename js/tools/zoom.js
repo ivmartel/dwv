@@ -25,35 +25,35 @@ function tools_zoom(app)
         }
 
         // get the image data
-        var imageData = app.gBaseContext.getImageData( 
+        var imageData = app.getBaseContext().getImageData( 
     			0, 0, 
-    			app.gImage.getSize()[0], 
-    			app.gImage.getSize()[1]); 
+    			app.getImage().getSize()[0], 
+    			app.getImage().getSize()[1]); 
        
         // copy it to the draw context
-        app.gDrawContext.clearRect(
+        app.getDrawContext().clearRect(
         		0, 0, 
-        		app.gImage.getSize()[0],
-        		app.gImage.getSize()[1]);
-        app.gDrawContext.putImageData(imageData, 0, 0);
+        		app.getImage().getSize()[0],
+        		app.getImage().getSize()[1]);
+        app.getDrawContext().putImageData(imageData, 0, 0);
         
         // save base settings
-        app.gBaseContext.save();
+        app.getBaseContext().save();
 
         // translate the base context
-        app.gBaseContext.clearRect(
+        app.getBaseContext().clearRect(
         		0, 0, 
-        		app.gImage.getSize()[0],
-        		app.gImage.getSize()[1]);
+        		app.getImage().getSize()[0],
+        		app.getImage().getSize()[1]);
         var tx = ev._x - tool.x0;
         var ty = ev._y - tool.y0;
-        app.gBaseContext.translate( tx, ty );
+        app.getBaseContext().translate( tx, ty );
 		
         // put the draw canvas in the base context
-        app.gBaseContext.drawImage(app.gDrawCanvas, 0, 0);
+        app.getBaseContext().drawImage(app.getDrawCanvas(), 0, 0);
         
         // restore base settings
-        app.gBaseContext.restore();
+        app.getBaseContext().restore();
         
         // do not cumulate
         tool.x0 = ev._x;
@@ -85,37 +85,37 @@ function tools_zoom(app)
     function zoom(step, cx, cy)
     {
          // get the image data
-        var imageData = app.gBaseContext.getImageData( 
+        var imageData = app.getBaseContext().getImageData( 
         		0, 0, 
-    			app.gImage.getSize()[0], 
-    			app.gImage.getSize()[1]); 
+    			app.getImage().getSize()[0], 
+    			app.getImage().getSize()[1]); 
        
         // copy it to the draw context
-        app.gDrawContext.clearRect(
+        app.getDrawContext().clearRect(
         		0, 0, 
-        		app.gImage.getSize()[0],
-        		app.gImage.getSize()[1]);
-        app.gDrawContext.putImageData(imageData, 0, 0);
+        		app.getImage().getSize()[0],
+        		app.getImage().getSize()[1]);
+        app.getDrawContext().putImageData(imageData, 0, 0);
         
         // save base settings
-        app.gBaseContext.save();
+        app.getBaseContext().save();
 
         // translate the base context
-        app.gBaseContext.clearRect(
+        app.getBaseContext().clearRect(
         		0, 0, 
-        		app.gImage.getSize()[0],
-        		app.gImage.getSize()[1]);
+        		app.getImage().getSize()[0],
+        		app.getImage().getSize()[1]);
         var zoom = Math.pow(1.1,step);
         
-        app.gBaseContext.translate(cx, cy);
-        app.gBaseContext.scale( zoom, zoom );
-        app.gBaseContext.translate(-cx, -cy);
+        app.getBaseContext().translate(cx, cy);
+        app.getBaseContext().scale( zoom, zoom );
+        app.getBaseContext().translate(-cx, -cy);
         
         // put the draw canvas in the base context
-        app.gBaseContext.drawImage(app.gDrawCanvas, 0, 0);
+        app.getBaseContext().drawImage(app.getDrawCanvas(), 0, 0);
         
         // restore base settings
-        app.gBaseContext.restore();
+        app.getBaseContext().restore();
     }
 
 } // tools_zoom

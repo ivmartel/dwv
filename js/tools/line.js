@@ -21,28 +21,28 @@ function tools_line(app)
             return;
         }
 
-        app.gDrawContext.clearRect(
+        app.getDrawContext().clearRect(
         		0, 0, 
-        		app.gDrawCanvas.width, 
-        		app.gDrawCanvas.height);
-        app.gDrawContext.fillStyle = app.gStyle.getLineColor();
-        app.gDrawContext.strokeStyle = app.gStyle.getLineColor();
+        		app.getDrawCanvas().width, 
+        		app.getDrawCanvas().height);
+        app.getDrawContext().fillStyle = app.getStyle().getLineColor();
+        app.getDrawContext().strokeStyle = app.getStyle().getLineColor();
 
-        app.gDrawContext.beginPath();
-        app.gDrawContext.moveTo(tool.x0, tool.y0);
-        app.gDrawContext.lineTo(ev._x, ev._y);
-        app.gDrawContext.stroke();
-        app.gDrawContext.closePath();
+        app.getDrawContext().beginPath();
+        app.getDrawContext().moveTo(tool.x0, tool.y0);
+        app.getDrawContext().lineTo(ev._x, ev._y);
+        app.getDrawContext().stroke();
+        app.getDrawContext().closePath();
         
         // size
-        var a = Math.abs(tool.x0-ev._x) * app.gImage.getSpacing()[0];
-        var b = Math.abs(tool.y0-ev._y) * app.gImage.getSpacing()[1];
+        var a = Math.abs(tool.x0-ev._x) * app.getImage().getSpacing()[0];
+        var b = Math.abs(tool.y0-ev._y) * app.getImage().getSpacing()[1];
         var size = Math.round(Math.sqrt(a*a+b*b));
-        app.gDrawContext.font = app.gStyle.getFontStr();
-        app.gDrawContext.fillText(
+        app.getDrawContext().font = app.getStyle().getFontStr();
+        app.getDrawContext().fillText(
         		size+"mm",
-        		ev._x + app.gStyle.getFontSize(), 
-        		ev._y + app.gStyle.getFontSize());
+        		ev._x + app.getStyle().getFontSize(), 
+        		ev._y + app.getStyle().getFontSize());
     };
 
     // This is called when you release the mouse button.
