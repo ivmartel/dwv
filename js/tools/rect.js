@@ -1,12 +1,6 @@
 /**
 * rect.js
 * Rectangle painting tool.
-* WARNING: depends on the folowing external vars:
-* - gDrawContext
-* - gDrawCanvas
-* - gImage
-* - gStyle
-* - gImgUpdate()
 */
 function tools_rect(app)
 {

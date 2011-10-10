@@ -1,13 +1,6 @@
 /**
 * windowLevel.js
 * WindowLevel tool.
-* WARNING: depends on the folowing external vars:
-* - gDrawContext
-* - gImage
-* - gStyle
-* - gImageLoaded
-* - gLookupObj
-* - gImgUpdate()
 */
 function tools_windowLevel(app)
 {

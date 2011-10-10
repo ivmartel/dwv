@@ -1,12 +1,6 @@
 /**
 * circle.js
 * Circle painting tool.
-* WARNING: depends on the following external vars:
-* - gDrawContext
-* - gDrawCanvas
-* - gImage
-* - gStyle
-* - gImgUpdate()
 */
 function tools_circle(app)
 {

@@ -1,10 +1,6 @@
 /**
 * roi.js
 * Region of interest painting tool.
-* WARNING: depends on the folowing external vars:
-* - gDrawContext
-* - gStyle
-* - gImgUpdate()
 */
 function tools_roi(app)
 {

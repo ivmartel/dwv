@@ -1,12 +1,6 @@
 /**
 * zoom.js
 * Zooming tool.
-* WARNING: depends on the folowing external vars:
-* - gContext
-* - gCanvas
-* - gImage
-* - gStyle
-* - gImgUpdate()
 */
 function tools_zoom(app)
 {
