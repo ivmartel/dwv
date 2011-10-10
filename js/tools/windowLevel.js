@@ -90,7 +90,7 @@ function tools_windowLevel(app)
         app.generateImage();
     }
 
-    this.changePreset = function()getStyle()
+    this.changePreset = function()
     {    
         applyPreset(parseInt(document.getElementById("presetsMenu").options[
             document.getElementById("presetsMenu").selectedIndex].value));
