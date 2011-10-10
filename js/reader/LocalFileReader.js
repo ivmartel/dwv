@@ -14,7 +14,7 @@ function LocalFileReader(fileURL)
 
 	var filePointer = 0;
 	var fileSize = -1;
-	var fileContents;
+	var fileContents = 0;
 
 	this.getFileSize = function(){
 		return fileSize;
