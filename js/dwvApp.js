@@ -18,9 +18,6 @@ function DwvApp()
     // 
     this.gPixelBuffer;
 
-    // 
-    var gImageLoaded = 0;
-    
     // tools
     this.gToolBox = new ToolBox(this);
     
@@ -259,7 +256,6 @@ function DwvApp()
         
         self.gBaseContext.fillRect( 0, 0, self.gImage.getSize()[0], self.gImage.getSize()[1] );    
         self.generateImage();        
-        gImageLoaded=1;
         
         self.gToolBox.init();
         self.setLineColor(self.gStyle.getLineColor());
