@@ -68,34 +68,42 @@ function tools_zoom()
     
     // This is called when you use the mouse wheel.
     this.DOMMouseScroll = function(ev){
-        // get the image data
-        var imageData = gBaseContext.getImageData( 0, 0, gImage.getSize()[0], gImage.getSize()[1]); 
-       
-        // copy it to the draw context
-        gDrawContext.clearRect(0, 0, gImage.getSize()[0],gImage.getSize()[1]);
-        gDrawContext.putImageData(imageData, 0, 0);
-        
-        // save base settings
-        gBaseContext.save();
-
-        // translate the base context
-        gBaseContext.clearRect(0, 0, gImage.getSize()[0],gImage.getSize()[1]);
-        var zoom = Math.pow(1.1,ev.detail);
-        
-        gBaseContext.translate(tool.x0,tool.y0);
-        gBaseContext.scale( zoom, zoom );
-        gBaseContext.translate(-tool.x0,-tool.y0);
-		
-        // put the draw canvas in the base context
-        gBaseContext.drawImage(gDrawCanvas, 0, 0);
-        
-        // restore base settings
-        gBaseContext.restore();
+        gZoom(ev.detail, tool.x0, tool.y0);
     };
 
+    this.mousewheel = function(ev){
+        gZoom(ev.wheelDelta/40, tool.x0, tool.y0);
+    };
+    
     this.enable = function(value){
         // nothing to do.
     };
 
 } // tools_zoom
 
+function gZoom(step, cx, cy)
+{
+     // get the image data
+    var imageData = gBaseContext.getImageData( 0, 0, gImage.getSize()[0], gImage.getSize()[1]); 
+   
+    // copy it to the draw context
+    gDrawContext.clearRect(0, 0, gImage.getSize()[0],gImage.getSize()[1]);
+    gDrawContext.putImageData(imageData, 0, 0);
+    
+    // save base settings
+    gBaseContext.save();
+
+    // translate the base context
+    gBaseContext.clearRect(0, 0, gImage.getSize()[0],gImage.getSize()[1]);
+    var zoom = Math.pow(1.1,step);
+    
+    gBaseContext.translate(cx, cy);
+    gBaseContext.scale( zoom, zoom );
+    gBaseContext.translate(-cx, -cy);
+    
+    // put the draw canvas in the base context
+    gBaseContext.drawImage(gDrawCanvas, 0, 0);
+    
+    // restore base settings
+    gBaseContext.restore();
+}
