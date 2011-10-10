@@ -28,7 +28,7 @@ LookupTable.prototype.setData=function(wc,ww,rs,ri)
     this.rescaleSlope=rs;
     this.rescaleIntercept=ri;    
 };
-var setWindowingdata=function(wc,ww)
+function setWindowingdata(wc,ww)
 {
     this.windowCenter=wc;
     this.windowWidth=ww;    
