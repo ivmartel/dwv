@@ -109,7 +109,7 @@ function LocalFileReader(fileURL)
 
 		this.readByteAt = function(i){
 			return fileContents[i];
-		}
+		};
 	}
 	
 	function LocalFileReaderImpl(fileURL)
@@ -119,7 +119,7 @@ function LocalFileReader(fileURL)
         
 		this.readByteAt = function(i){
 			return fileContents.charCodeAt(i) & 0xff;
-		}
+		};
 	}
 	
 	if(/msie/i.test(navigator.userAgent) && !/opera/i.test(navigator.userAgent))

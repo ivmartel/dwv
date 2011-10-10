@@ -45,7 +45,7 @@ function tools_circle()
         radius = Math.sqrt(a*a+b*b);
         var surf = Math.round(Math.PI*radius*radius);
         gDrawContext.font = gStyle.getFontStr();
-        gDrawContext.fillText(surf+"mm2",ev._x+gStyle.getFontSize(), ev._y+gStyle.getFontSize())
+        gDrawContext.fillText(surf+"mm2",ev._x+gStyle.getFontSize(), ev._y+gStyle.getFontSize());
     };
 
     // This is called when you release the mouse button.

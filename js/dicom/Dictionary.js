@@ -3029,6 +3029,6 @@ function Dictionary() {
                 'ItemDelimitationItem');
         newDictionary[0xFFFE][0xE0DD] = new Array('NONE', '1',
                 'SequenceDelimitationItem');
-    }
+    };
 }
 

@@ -5,7 +5,7 @@
  */
 function UID () {
     this.init=function() {       
-    }
+    };
     /** Private Study Root Query/Retrieve Information Model - FIND - SOP Class */
     this. PrivateStudyRootQueryRetrieveInformationModelFIND = "1.2.40.0.13.1.5.1.4.1.2.2.1";
 

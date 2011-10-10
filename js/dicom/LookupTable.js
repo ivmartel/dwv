@@ -27,12 +27,12 @@ LookupTable.prototype.setData=function(wc,ww,rs,ri)
     this.defaultWindowWidth=ww;
     this.rescaleSlope=rs;
     this.rescaleIntercept=ri;    
-}    
+};
 var setWindowingdata=function(wc,ww)
 {
     this.windowCenter=wc;
     this.windowWidth=ww;    
-}
+};
 function calculateHULookup()
 {
     this.huLookup = new Array(4096);         

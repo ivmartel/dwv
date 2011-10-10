@@ -17,15 +17,15 @@ function BinFileReader(fileURL){
 
 	this.getFileSize = function(){
 		return fileSize;
-	}
+	};
 
 	this.getFilePointer = function(){
 		return filePointer;
-	}
+	};
 	this.readBytes=function()
 	{
 		return fileContents;
-	}
+	};
 	this.movePointerTo = function(iTo){
 		if(iTo < 0) filePointer = 0;
 		else if(iTo > this.getFileSize()) throwException(_exception.EOFReached);
@@ -105,7 +105,7 @@ function BinFileReader(fileURL){
 
 		this.readByteAt = function(i){
 			return fileContents[i];
-		}
+		};
 	}
 	
 	function BinFileReaderImpl(fileURL){
@@ -125,7 +125,7 @@ function BinFileReader(fileURL){
 		fileSize = fileContents.length;
 		this.readByteAt = function(i){
 			return fileContents.charCodeAt(i) & 0xff;
-		}
+		};
 	}
 	if(/msie/i.test(navigator.userAgent) && !/opera/i.test(navigator.userAgent))
 		BinFileReaderImpl_IE.apply(this, [fileURL]);

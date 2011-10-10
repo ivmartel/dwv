@@ -21,7 +21,7 @@ ToolBox.prototype.setSelectedTool = function(toolName) {
     // disable old one
     if( this.selectedTool )
     {
-        this.enable(false)
+        this.enable(false);
     }
     // enable new one
     this.selectedTool = new this.tools[toolName]();
@@ -58,7 +58,7 @@ ToolBox.prototype.init = function()
         tool_select.value = this.defaultToolName;
     }
     this.enable(true);
-}
+};
 
 ToolBox.prototype.enable = function(value)
 {
@@ -66,7 +66,7 @@ ToolBox.prototype.enable = function(value)
     document.getElementById('dtool').disabled = !value;
     // enable selected tool
     this.selectedTool.enable(value);
-}
+};
 
 // The event handler for any changes made to the tool selector.
 function gEventToolChange(event)

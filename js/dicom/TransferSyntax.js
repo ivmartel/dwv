@@ -31,31 +31,31 @@ function TransferSyntax()
     this.uid=function()
     {
         return this._uid;
-    }
+    };
     this.bigEndian=function()
     {
         return this._bigEndian;
-    }
+    };
 
     this.explicitVR=function()
     {
         return this._explicitVR;
-    }
+    };
 
     this.deflated=function()
     {
         return this._deflated;
-    }
+    };
 
     this.encapsulated=function()
     {
         return this._encapsulated;
-    }
+    };
 
     this.uncompressed=function()
     {
         return !this._deflated && !this._encapsulated;
-    } 
+    }; 
     this.valueOf=function(uid)
     {
         if (uid == null)
@@ -69,7 +69,7 @@ function TransferSyntax()
         if (uid ==DeflatedExplicitVRLittleEndian._uid)
             return DeflatedExplicitVRLittleEndian;
         return new TransferSyntax(uid, true, false, false, true);
-    }    
+    };
 }
 function initializer(uid,explicitVR,bigEndian,deflated,encapsulated)
 {

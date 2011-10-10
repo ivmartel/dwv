@@ -47,7 +47,7 @@ function tools_rect()
         // surface
         var surf = Math.round((w*gImage.getSpacing()[0])*(h*gImage.getSpacing()[1]));
         gDrawContext.font = gStyle.getFontStr();
-        gDrawContext.fillText(surf+"mm2",ev._x+gStyle.getFontSize(), ev._y+gStyle.getFontSize())
+        gDrawContext.fillText(surf+"mm2",ev._x+gStyle.getFontSize(), ev._y+gStyle.getFontSize());
     };
 
     // This is called when you release the mouse button.

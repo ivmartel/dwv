@@ -51,7 +51,7 @@ DicomParser.prototype.setDicomElement=function(name,vr,vl,group,element,value,of
     }
     
     this.dicomElement[elementIndex++]=new DicomElement(name,vr,vl,group,element,value,offset);
-}
+};
 
 DicomParser.prototype.readTag=function(index,firstContent,secondContent,thirdContent,fourthContent,tagName)
 {
@@ -85,7 +85,7 @@ DicomParser.prototype.readTag=function(index,firstContent,secondContent,thirdCon
         }    
     }
     return i;
-}
+};
 
 DicomParser.prototype.moveToPixelDataTag=function(index)
 {
@@ -101,7 +101,7 @@ DicomParser.prototype.moveToPixelDataTag=function(index)
         }    
     } 
     return this.pixelDataOffset;
-}
+};
 
 DicomParser.prototype.readImage=function(index)
 {
@@ -112,5 +112,5 @@ DicomParser.prototype.readImage=function(index)
         this.pixelBuffer[pixelIndex]=this.reader.readNumber(2,i);
         pixelIndex++;
     }
-}
+};
 
