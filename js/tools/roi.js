@@ -35,7 +35,7 @@ function tools_roi(app)
             app.gDrawContext.closePath();
             app. gDrawContext.stroke();
             tool.started = false;
-            app.gContextUpdate();
+            app.updateContext();
         }
     };
         

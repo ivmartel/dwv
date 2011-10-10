@@ -39,7 +39,7 @@ function tools_windowLevel(app)
         {
             tool.mousemove(ev);
             tool.started = false;
-            app.gContextUpdate();
+            app.updateContext();
         }
     };
     
@@ -87,7 +87,7 @@ function tools_windowLevel(app)
     {
     	app.gLookupObj.setWindowingdata(wc,ww);
         showWindowingValue(wc,ww);
-        app.gGenImage();
+        app.generateImage();
     }
 
     this.changePreset = function()

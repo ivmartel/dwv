@@ -51,7 +51,7 @@ function tools_line(app)
         {
             tool.mousemove(ev);
             tool.started = false;
-            app.gContextUpdate();
+            app.updateContext();
         }
     };
     

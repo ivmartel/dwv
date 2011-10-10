@@ -54,14 +54,14 @@
 Color: 
 <table name="colourChooser" class="colourChooser">
 <tr id="colours" onmouseover="gMouseOverColor()" onmouseout="gMouseOutColor()">
-<td id="black" onclick="app.gSetLineColor('black')">&nbsp;</td>
-<td id="white" onclick="app.gSetLineColor('white')">&nbsp;</td>
-<td id="red" onclick="app.gSetLineColor('red')">&nbsp;</td>
-<td id="green" onclick="app.gSetLineColor('green')">&nbsp;</td>
-<td id="blue" onclick="app.gSetLineColor('blue')">&nbsp;</td>
-<td id="yellow" onclick="app.gSetLineColor('yellow')">&nbsp;</td>
-<td id="lime" onclick="app.gSetLineColor('lime')">&nbsp;</td>
-<td id="fuchsia" onclick="app.gSetLineColor('fuchsia')">&nbsp;</td>
+<td id="black" onclick="app.setLineColor('black')">&nbsp;</td>
+<td id="white" onclick="app.setLineColor('white')">&nbsp;</td>
+<td id="red" onclick="app.setLineColor('red')">&nbsp;</td>
+<td id="green" onclick="app.setLineColor('green')">&nbsp;</td>
+<td id="blue" onclick="app.setLineColor('blue')">&nbsp;</td>
+<td id="yellow" onclick="app.setLineColor('yellow')">&nbsp;</td>
+<td id="lime" onclick="app.setLineColor('lime')">&nbsp;</td>
+<td id="fuchsia" onclick="app.setLineColor('fuchsia')">&nbsp;</td>
 </tr>
 </table>
 </div>
@@ -87,7 +87,7 @@ Path: <input type="file" id="files" name="files[]" multiple />
 
 <div id="tags"  style="display:none;">
 <script type="text/javascript">
-    document.getElementById('files').addEventListener('change', app.gLoadDicom, false);
+    document.getElementById('files').addEventListener('change', app.loadDicom, false);
 </script>
 
 <form>

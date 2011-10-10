@@ -13,9 +13,6 @@ function DwvApp()
     this.gLookupTable;
 
     // 
-    var gHuLookupTable; 
-
-    // 
     this.gLookupObj;
 
     // 
@@ -27,17 +24,14 @@ function DwvApp()
     // tools
     this.gToolBox = new ToolBox(this);
     
-    // display
-    var gBaseCanvas;
-
-    // 
+    // Base context.
     this.gBaseContext;    
 
-    // 
+    // Drawing canvas.
     this.gDrawCanvas;
 
-    // 
-    this.gDrawContext;    
+    // Drawing context.
+    this.gDrawContext;   
     
     // style
     this.gStyle = new Style();
@@ -46,7 +40,7 @@ function DwvApp()
      * @private
      * @param color
      */
-    this.gSetLineColor = function(color)
+    this.setLineColor = function(color)
     {
         // set global var
         self.gStyle.setLineColor(color);
@@ -65,24 +59,24 @@ function DwvApp()
     /**
      * @private
      */
-    function gInitCanvas()
+    function initCanvas()
     {
         // Find the canvas element.
-        gBaseCanvas = document.getElementById('imageView');
-        if (!gBaseCanvas)
+        var baseCanvas = document.getElementById('imageView');
+        if (!baseCanvas)
         {
             alert('Error: I cannot find the canvas element!');
             return;
         }
 
-        if (!gBaseCanvas.getContext)
+        if (!baseCanvas.getContext)
         {
             alert('Error: no canvas.getContext!');
             return;
         }
 
         // Get the 2D canvas context.
-        self.gBaseContext = gBaseCanvas.getContext('2d');
+        self.gBaseContext = baseCanvas.getContext('2d');
         if (!self.gBaseContext)
         {
             alert('Error: failed to getContext!');
@@ -90,7 +84,7 @@ function DwvApp()
         }
 
         // Add the drawing canvas.
-        var container = gBaseCanvas.parentNode;
+        var container = baseCanvas.parentNode;
         self.gDrawCanvas = document.createElement('canvas');
         if (!self.gDrawCanvas)
         {
@@ -98,12 +92,12 @@ function DwvApp()
             return;
         }
 
-        gBaseCanvas.width = self.gImage.getSize()[0];
-        gBaseCanvas.height = self.gImage.getSize()[1];
+        baseCanvas.width = self.gImage.getSize()[0];
+        baseCanvas.height = self.gImage.getSize()[1];
         
         self.gDrawCanvas.id = 'imageDraw';
-        self.gDrawCanvas.width = gBaseCanvas.width;
-        self.gDrawCanvas.height = gBaseCanvas.height;
+        self.gDrawCanvas.width = baseCanvas.width;
+        self.gDrawCanvas.height = baseCanvas.height;
         container.appendChild(self.gDrawCanvas);
         self.gDrawContext = self.gDrawCanvas.getContext('2d');
     }
@@ -114,7 +108,7 @@ function DwvApp()
      * after which #imageDraw is cleared. This function is called each time when the
      * user completes a drawing operation.
      */
-    this.gContextUpdate = function() 
+    this.updateContext = function() 
     {
     	self.gBaseContext.drawImage(self.gDrawCanvas, 0, 0);
     	self.gDrawContext.clearRect(0, 0, self.gDrawCanvas.width, self.gDrawCanvas.height);
@@ -125,7 +119,7 @@ function DwvApp()
      * The general-purpose event handler. This function just determines the mouse 
    	 * position relative to the canvas element.
      */
-    function gEvCanvas(event)
+    function evCanvas(event)
     {
         if (event.layerX || event.layerX == 0)
         { 
@@ -157,21 +151,21 @@ function DwvApp()
     /**
      * @public
      */
-    this.gLoadDicom = function(evt) 
+    this.loadDicom = function(evt) 
     {
-        gLoadDicomFile(evt.target.files[0]);
+        loadDicomFile(evt.target.files[0]);
     };
     
     /**
      * @private
      * @param file
      */
-    function gLoadDicomFile(file) 
+    function loadDicomFile(file) 
     {
         var myreader = new FileReader();
         myreader.onload = function() {
             return function(e) {
-                gParseAndLoadDicom(e.target.result);
+                parseAndLoadDicom(e.target.result);
                 var span = document.createElement('div');
                 span.innerHTML = ['<p><b>', e.target.result.length, '</b></p>'].join('');
                 document.getElementById('tagSearch').insertBefore(span, null);
@@ -184,7 +178,7 @@ function DwvApp()
      * @private
      * @param file
      */
-    function gParseAndLoadDicom(file)
+    function parseAndLoadDicom(file)
     {    
         var reader = new DicomInputStreamReader();    
         reader.readDicom(file);
@@ -261,27 +255,27 @@ function DwvApp()
         self.gLookupObj.setData( windowCenter, windowWidth, rescaleSlope, rescaleIntercept);
         self.gLookupObj.calculateHULookup();
         
-        gInitCanvas();
+        initCanvas();
         
         self.gBaseContext.fillRect( 0, 0, self.gImage.getSize()[0], self.gImage.getSize()[1] );    
-        self.gGenImage();        
+        self.generateImage();        
         gImageLoaded=1;
         
         self.gToolBox.init();
-        self.gSetLineColor(self.gStyle.getLineColor());
+        self.setLineColor(self.gStyle.getLineColor());
         
         // Attach the mousedown, mousemove and mouseup event listeners.
-        self.gDrawCanvas.addEventListener('mousedown', gEvCanvas, false);
-        self.gDrawCanvas.addEventListener('mousemove', gEvCanvas, false);
-        self.gDrawCanvas.addEventListener('mouseup', gEvCanvas, false);
-        self.gDrawCanvas.addEventListener('mousewheel', gEvCanvas, false);
-        self.gDrawCanvas.addEventListener('DOMMouseScroll',gEvCanvas,false);
+        self.gDrawCanvas.addEventListener('mousedown', evCanvas, false);
+        self.gDrawCanvas.addEventListener('mousemove', evCanvas, false);
+        self.gDrawCanvas.addEventListener('mouseup', evCanvas, false);
+        self.gDrawCanvas.addEventListener('mousewheel', evCanvas, false);
+        self.gDrawCanvas.addEventListener('DOMMouseScroll', evCanvas,false);
     }
     
     /**
      * @private
      */
-    this.gGenImage = function()
+    this.generateImage = function()
     {        
         var imageData = self.gBaseContext.getImageData( 
         		0, 0, 

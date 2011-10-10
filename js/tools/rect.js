@@ -56,7 +56,7 @@ function tools_rect(app)
         {
             tool.mousemove(ev);
             tool.started = false;
-            app.gContextUpdate();
+            app.updateContext();
         }
     };
         
