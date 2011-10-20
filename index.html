@@ -38,6 +38,7 @@
 <!-- Left -->
 <div id="left">
 
+<!-- toolbox -->
 <div id="toolbox"></div>
 <script type="text/javascript">app.getToolBox().appendHtml();</script>
 
@@ -59,14 +60,17 @@
 <!-- Right -->
 <div id="right">
 
+<!-- input file -->
 <p><form>
 Path: <input type="file" id="files" name="files[]" multiple />
 </form></p>
 
-<div id="tags"  style="display:none;">
 <script type="text/javascript">
     document.getElementById('files').addEventListener('change', app.loadDicom, false);
 </script>
+
+<!-- tags -->
+<div id="tags" style="display:none;">
 
 <form>
 Search Tags: <input type="text" id="tagSearch" name="tagSearch" multiple />
