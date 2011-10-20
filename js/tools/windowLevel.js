@@ -45,14 +45,8 @@ tool.WindowLevel = function(app)
     };
     
     this.enable = function(bool){
-    	if( bool )
-		{
-    		this.appendHtml();
-		}
-    	else
-		{
-    		this.clearHtml();
-		}
+    	if( bool ) this.appendHtml();
+    	else this.clearHtml();
     };
     
 }; // WindowLevel function
@@ -67,7 +61,6 @@ tool.WindowLevel.prototype.appendHtml = function()
     selector.name = "presetsMenu";
     selector.onchange = changePreset;
     selector.selectedIndex = 1;
-    paragraph.appendChild(selector);
 
     var options = new Array("Default", "Abdomen", "Lung", "Brain", "Bone", "Head");
     var option;
@@ -79,6 +72,7 @@ tool.WindowLevel.prototype.appendHtml = function()
         selector.appendChild(option);
     }
 
+    paragraph.appendChild(selector);
     document.getElementById('presetSelector').appendChild(paragraph);
 };
 
@@ -129,7 +123,7 @@ function updateWindowingData(wc,ww)
     app.generateImage();
 }
 
-function changePreset()
+function changePreset(event)
 {    
     applyPreset(parseInt(document.getElementById("presetsMenu").options[
         document.getElementById("presetsMenu").selectedIndex].value));
