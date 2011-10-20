@@ -9,7 +9,7 @@ function ToolBox(app)
 {
     this.tools = {};
     this.selectedTool = 0;
-    this.defaultToolName = 'zoom';
+    this.defaultToolName = 'windowLevel';
 }
 
 ToolBox.prototype.getTools = function() {
@@ -60,7 +60,6 @@ ToolBox.prototype.init = function()
         this.setSelectedTool(this.defaultToolName);
         tool_select.value = this.defaultToolName;
     }
-    this.enable(true);
 };
 
 ToolBox.prototype.enable = function(value)
