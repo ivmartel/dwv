@@ -4,27 +4,27 @@
 */
 tool.Rect = function(app)
 {
-    var tool = this;
+    var self = this;
     this.started = false;
 
     // This is called when you start holding down the mouse button.
     this.mousedown = function(ev){
-        tool.started = true;
-        tool.x0 = ev._x;
-        tool.y0 = ev._y;
+        self.started = true;
+        self.x0 = ev._x;
+        self.y0 = ev._y;
     };
 
     // This function is called every time you move the mouse.
     this.mousemove = function(ev){
-        if (!tool.started)
+        if (!self.started)
         {
             return;
         }
 
-        var x = Math.min(ev._x, tool.x0);
-        var y = Math.min(ev._y, tool.y0);
-        var w = Math.abs(ev._x - tool.x0);
-        var h = Math.abs(ev._y - tool.y0);
+        var x = Math.min(ev._x, self.x0);
+        var y = Math.min(ev._y, self.y0);
+        var w = Math.abs(ev._x - self.x0);
+        var h = Math.abs(ev._y - self.y0);
 
         app.getDrawContext().clearRect(
         		0, 0, 
@@ -52,10 +52,10 @@ tool.Rect = function(app)
 
     // This is called when you release the mouse button.
     this.mouseup = function(ev){
-        if (tool.started)
+        if (self.started)
         {
-            tool.mousemove(ev);
-            tool.started = false;
+            self.mousemove(ev);
+            self.started = false;
             app.updateContext();
         }
     };

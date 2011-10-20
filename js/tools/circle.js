@@ -4,19 +4,19 @@
 */
 tool.Circle = function(app)
 {
-    var tool = this;
+    var self = this;
     this.started = false;
 
     // This is called when you start holding down the mouse button.
     this.mousedown = function(ev){
-        tool.started = true;
-        tool.x0 = ev._x;
-        tool.y0 = ev._y;
+    	self.started = true;
+    	self.x0 = ev._x;
+    	self.y0 = ev._y;
     };
 
     // This function is called every time you move the mouse.
     this.mousemove = function(ev){
-        if (!tool.started)
+        if (!self.started)
         {
             return;
         }
@@ -28,12 +28,12 @@ tool.Circle = function(app)
         app.getDrawContext().fillStyle = app.getStyle().getLineColor();
         app.getDrawContext().strokeStyle = app.getStyle().getLineColor();
 
-        var a = Math.abs(tool.x0-ev._x);
-        var b = Math.abs(tool.y0-ev._y);
+        var a = Math.abs(self.x0-ev._x);
+        var b = Math.abs(self.y0-ev._y);
         var radius = Math.round(Math.sqrt(a*a+b*b));
         
         app.getDrawContext().beginPath();
-        app.getDrawContext().arc(tool.x0, tool.y0, radius, 0, 2*Math.PI);
+        app.getDrawContext().arc(self.x0, self.y0, radius, 0, 2*Math.PI);
         app.getDrawContext().stroke();
         
         // surface
@@ -49,10 +49,10 @@ tool.Circle = function(app)
 
     // This is called when you release the mouse button.
     this.mouseup = function(ev){
-        if (tool.started)
+        if (self.started)
         {
-            tool.mousemove(ev);
-            tool.started = false;
+        	self.mousemove(ev);
+        	self.started = false;
             app.updateContext();
         }
     };

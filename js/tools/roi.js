@@ -4,7 +4,7 @@
 */
 tool.Roi = function(app)
 {
-    var tool = this;
+    var self = this;
     this.started = false;
 
     // This is called when you start holding down the mouse button.
@@ -13,12 +13,12 @@ tool.Roi = function(app)
     	app.getDrawContext().fillStyle = app.getStyle().getLineColor();
     	app.getDrawContext().beginPath();
         app.getDrawContext().moveTo(ev._x, ev._y);
-        tool.started = true;
+        self.started = true;
     };
 
     // This function is called every time you move the mouse.
     this.mousemove = function(ev){
-        if (!tool.started)
+        if (!self.started)
         {
             return;
         }
@@ -29,12 +29,12 @@ tool.Roi = function(app)
 
     // This is called when you release the mouse button.
     this.mouseup = function(ev){
-        if (tool.started)
+        if (self.started)
         {
-            tool.mousemove(ev);
+            self.mousemove(ev);
             app.getDrawContext().closePath();
             app.getDrawContext().stroke();
-            tool.started = false;
+            self.started = false;
             app.updateContext();
         }
     };

@@ -4,19 +4,19 @@
 */
 tool.Line = function(app)
 {
-    var tool = this;
+    var self = this;
     this.started = false;
 
     // This is called when you start holding down the mouse button.
     this.mousedown = function(ev){
-        tool.started = true;
-        tool.x0 = ev._x;
-        tool.y0 = ev._y;
+    	self.started = true;
+    	self.x0 = ev._x;
+    	self.y0 = ev._y;
     };
 
     // This function is called every time you move the mouse.
     this.mousemove = function(ev){
-        if (!tool.started)
+        if (!self.started)
         {
             return;
         }
@@ -29,14 +29,14 @@ tool.Line = function(app)
         app.getDrawContext().strokeStyle = app.getStyle().getLineColor();
 
         app.getDrawContext().beginPath();
-        app.getDrawContext().moveTo(tool.x0, tool.y0);
+        app.getDrawContext().moveTo(self.x0, self.y0);
         app.getDrawContext().lineTo(ev._x, ev._y);
         app.getDrawContext().stroke();
         app.getDrawContext().closePath();
         
         // size
-        var a = Math.abs(tool.x0-ev._x) * app.getImage().getSpacing()[0];
-        var b = Math.abs(tool.y0-ev._y) * app.getImage().getSpacing()[1];
+        var a = Math.abs(self.x0-ev._x) * app.getImage().getSpacing()[0];
+        var b = Math.abs(self.y0-ev._y) * app.getImage().getSpacing()[1];
         var size = Math.round(Math.sqrt(a*a+b*b));
         app.getDrawContext().font = app.getStyle().getFontStr();
         app.getDrawContext().fillText(
@@ -47,10 +47,10 @@ tool.Line = function(app)
 
     // This is called when you release the mouse button.
     this.mouseup = function(ev){
-        if (tool.started)
+        if (self.started)
         {
-            tool.mousemove(ev);
-            tool.started = false;
+            self.mousemove(ev);
+            self.started = false;
             app.updateContext();
         }
     };
