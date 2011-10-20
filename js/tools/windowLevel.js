@@ -25,8 +25,8 @@ tool.WindowLevel = function(app)
 
         var diffX = ev._x - self.x0;
         var diffY = self.y0 - ev._y;                                
-        var windowCenter = parseInt(app.getLookupObj().windowCenter) + diffY;
-        var windowWidth = parseInt(app.getLookupObj().windowWidth) + diffX;                        
+        var windowCenter = parseInt(app.getImage().getLookup().windowCenter) + diffY;
+        var windowWidth = parseInt(app.getImage().getLookup().windowWidth) + diffX;                        
         
         updateWindowingData(windowCenter,windowWidth);    
         
@@ -84,8 +84,6 @@ tool.WindowLevel.prototype.clearHtml = function()
 
 function showHUvalue(x,y)
 {
-    var t = (y*app.getImage().getSize()[0])+x;        
-    
     // style
     app.getDrawContext().clearRect(0, 0, 150, 150);
     app.getDrawContext().fillStyle = app.getStyle().getTextColor();
@@ -97,7 +95,7 @@ function showHUvalue(x,y)
     app.getDrawContext().fillText("X = "+x, 0, 0);
     app.getDrawContext().fillText("Y = "+y, 0, app.getStyle().getLineHeight());
     app.getDrawContext().fillText(
-    		"HU = "+app.getLookupObj().huLookup[app.getPixelBuffer()[t]], 
+    		"HU = "+app.getImage().getValue(x,y), 
     		0, 
     		2*app.getStyle().getLineHeight());
 }
@@ -118,7 +116,7 @@ function showWindowingValue(windowCenter,windowWidth)
 
 function updateWindowingData(wc,ww)
 {
-	app.getLookupObj().setWindowingdata(wc,ww);
+	app.getImage().getLookup().setWindowingdata(wc,ww);
     showWindowingValue(wc,ww);
     app.generateImage();
 }
@@ -135,8 +133,8 @@ function applyPreset(preset)
     switch (preset)
     {
         case 1: // default
-            wc=app.getLookupObj().defaultWindowCenter;
-            ww=app.getLookupObj().defaultWindowWidth;
+            wc=app.getImage().getLookup().defaultWindowCenter;
+            ww=app.getImage().getLookup().defaultWindowWidth;
             updateWindowingData(wc,ww);
             break;
         

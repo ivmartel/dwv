@@ -10,12 +10,6 @@ function DwvApp()
 	// Image details.
     var image = null;
     
-    // Lookup object.
-    var lookupObj = null;
-
-    // Pixel buffer.
-    var pixelBuffer = null;
-
     // Base context.
     var baseContext = null;    
 
@@ -35,12 +29,6 @@ function DwvApp()
     // Get the image details.
     this.getImage = function() { return image; };
     
-    // Get the lookup object.
-    this.getLookupObj = function() { return lookupObj; };
-
-    // Get the pixel buffer.
-    this.getPixelBuffer = function() { return pixelBuffer; };
-
     // Get the tool box.
     this.getToolBox = function() { return toolBox; };
 
@@ -261,15 +249,11 @@ function DwvApp()
                
         document.getElementById("tags").style.display='';
         
-        pixelBuffer = dicomParser.pixelBuffer;
-        
         image = new DicomImage(
             [numberOfRows, numberOfColumns],
-            [rowSpacing, columnSpacing]);
-            
-        lookupObj = new LookupTable();
-        lookupObj.setData( windowCenter, windowWidth, rescaleSlope, rescaleIntercept);
-        lookupObj.calculateHULookup();
+            [rowSpacing, columnSpacing],
+            dicomParser.pixelBuffer );
+        image.setLookup( windowCenter, windowWidth, rescaleSlope, rescaleIntercept);
         
         initCanvas();
         
@@ -295,20 +279,7 @@ function DwvApp()
         		0, 0, 
         		self.getImage().getSize()[0], 
         		self.getImage().getSize()[1]); 
-        self.getLookupObj().calculateLookup();
-        var n=0;    
-        for(var yPix=0; yPix < self.getImage().getSize()[1]; yPix++)
-        {
-            for(var xPix=0; xPix < self.getImage().getSize()[0];xPix++)
-            {        
-                var offset = (yPix * self.getImage().getSize()[0] + xPix) * 4;                    
-                var pxValue = self.getLookupObj().ylookup[ self.getPixelBuffer()[n] ];    
-                n++;               
-                imageData.data[offset] = parseInt(pxValue);
-                imageData.data[offset+1] = parseInt(pxValue);
-                imageData.data[offset+2] = parseInt(pxValue);
-            }
-        }            
+        self.getImage().generateImageData( imageData );         
         self.getBaseContext().putImageData(imageData, 0,0);
     };
 }
