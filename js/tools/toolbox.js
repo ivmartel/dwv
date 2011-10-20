@@ -54,7 +54,7 @@ ToolBox.prototype.init = function()
     // Activate the default tool.
     if (this.tools[this.defaultToolName])
     {
-        this.selectedTool = new this.tools[this.defaultToolName](app);
+        this.setSelectedTool(this.defaultToolName);
         tool_select.value = this.defaultToolName;
     }
     this.enable(true);
@@ -76,6 +76,10 @@ ToolBox.prototype.eventToolChange = function(event)
     {
     	app.getToolBox().setSelectedTool(toolName);
     }
+	else
+	{
+		alert("Unknown tool: '" + toolName + "'");
+	}
 };
 
 ToolBox.prototype.appendHtml = function()
@@ -101,4 +105,3 @@ ToolBox.prototype.appendHtml = function()
 
     document.getElementById('toolbox').appendChild(paragraph);
 };
-
