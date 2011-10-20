@@ -2,7 +2,7 @@
 * line.js
 * Line painting tool.
 */
-function tools_line(app)
+tool.Line = function(app)
 {
     var tool = this;
     this.started = false;
@@ -61,5 +61,5 @@ function tools_line(app)
         document.getElementById("colourChooser").style.display=str;
     };
 
-} // tools_line
+}; // Line
 

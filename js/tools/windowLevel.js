@@ -2,7 +2,7 @@
 * windowLevel.js
 * WindowLevel tool.
 */
-function tools_windowLevel(app)
+tool.WindowLevel = function(app)
 {
     var tool = this;
     this.started = false;
@@ -55,9 +55,9 @@ function tools_windowLevel(app)
 		}
     };
     
-} // tools_windowLevel
+}; // WindowLevel function
 
-tools_windowLevel.prototype.appendHtml = function()
+tool.WindowLevel.prototype.appendHtml = function()
 {
     var paragraph = document.createElement("p");  
     paragraph.appendChild(document.createTextNode("WL Preset: "));
@@ -82,7 +82,7 @@ tools_windowLevel.prototype.appendHtml = function()
     document.getElementById('presetSelector').appendChild(paragraph);
 };
 
-tools_windowLevel.prototype.clearHtml = function()
+tool.WindowLevel.prototype.clearHtml = function()
 {
 	node = document.getElementById('presetSelector');
 	while (node.hasChildNodes()) node.removeChild(node.firstChild);
@@ -177,5 +177,3 @@ function applyPreset(preset)
             break;
     }
 }
-
-

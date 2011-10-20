@@ -2,7 +2,7 @@
 * circle.js
 * Circle painting tool.
 */
-function tools_circle(app)
+tool.Circle = function(app)
 {
     var tool = this;
     this.started = false;
@@ -63,5 +63,4 @@ function tools_circle(app)
         document.getElementById("colourChooser").style.display=str;
     };
 
-} // tools_circle
-
+}; // Circle function

@@ -2,7 +2,7 @@
 * zoom.js
 * Zooming tool.
 */
-function tools_zoom(app)
+tool.Zoom = function(app)
 {
     var tool = this;
     this.started = false;
@@ -118,4 +118,4 @@ function tools_zoom(app)
         app.getBaseContext().restore();
     }
 
-} // tools_zoom
+}; // Zoom function

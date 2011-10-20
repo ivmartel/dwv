@@ -2,7 +2,7 @@
 * roi.js
 * Region of interest painting tool.
 */
-function tools_roi(app)
+tool.Roi = function(app)
 {
     var tool = this;
     this.started = false;
@@ -45,5 +45,4 @@ function tools_roi(app)
         document.getElementById("colourChooser").style.display=str;
     };
 
-} // tools_roi
-
+}; // Roi function

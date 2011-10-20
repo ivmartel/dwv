@@ -2,7 +2,7 @@
 * rect.js
 * Rectangle painting tool.
 */
-function tools_rect(app)
+tool.Rect = function(app)
 {
     var tool = this;
     this.started = false;
@@ -66,5 +66,4 @@ function tools_rect(app)
         document.getElementById("colourChooser").style.display=str;
     };
 
-} // tools_rect
-
+}; // Rect function

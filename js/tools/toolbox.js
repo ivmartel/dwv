@@ -1,3 +1,6 @@
+// tool namespace
+var tool = tool || {};
+
 /**
 * toolbox.js
 * Tool box.
@@ -35,12 +38,12 @@ ToolBox.prototype.hasTool = function(toolName) {
 ToolBox.prototype.init = function()
 {
     // tool list
-    this.tools.rect = tools_rect;
-    this.tools.roi = tools_roi;
-    this.tools.line = tools_line;
-    this.tools.circle = tools_circle;
-    this.tools.windowLevel = tools_windowLevel;
-    this.tools.zoom = tools_zoom;
+    this.tools.rect = tool.Rect;
+    this.tools.roi = tool.Roi;
+    this.tools.line = tool.Line;
+    this.tools.circle = tool.Circle;
+    this.tools.windowLevel = tool.WindowLevel;
+    this.tools.zoom = tool.Zoom;
 
     // Get the tool select input.
     var tool_select = document.getElementById('dtool');
