@@ -6,6 +6,7 @@ function tools_windowLevel(app)
 {
     var tool = this;
     this.started = false;
+    this.displayed = false;
 
     // This is called when you start holding down the mouse button.
     this.mousedown = function(ev){
@@ -43,15 +44,20 @@ function tools_windowLevel(app)
         }
     };
     
-    this.enable = function(value){
-        var str = "none";
-        if( value ) str = "";
-        document.getElementById("presetSelector").style.display=str;
+    this.enable = function(bool){
+    	if( bool )
+		{
+    		this.appendHtml();
+		}
+    	else
+		{
+    		this.clearHtml();
+		}
     };
     
 } // tools_windowLevel
 
-function gGetPresetSelector()
+tools_windowLevel.prototype.appendHtml = function()
 {
     var paragraph = document.createElement("p");  
     paragraph.appendChild(document.createTextNode("WL Preset: "));
@@ -73,9 +79,14 @@ function gGetPresetSelector()
         selector.appendChild(option);
     }
 
-    document.getElementById('presetSelector').style.display="none";
     document.getElementById('presetSelector').appendChild(paragraph);
-}
+};
+
+tools_windowLevel.prototype.clearHtml = function()
+{
+	node = document.getElementById('presetSelector');
+	while (node.hasChildNodes()) node.removeChild(node.firstChild);
+};
 
 function showHUvalue(x,y)
 {
