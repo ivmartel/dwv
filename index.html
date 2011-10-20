@@ -48,8 +48,9 @@
 <div id="left">
 
 <div id="toolbox"></div>
-<script type="text/javascript">gGetToolBox();</script>
+<script type="text/javascript">app.getToolBox().appendHtml();</script>
 
+<!-- displayed when drawing -->
 <div id="colourChooser" style="display:none;">
 Color: 
 <table name="colourChooser" class="colourChooser">
@@ -66,6 +67,7 @@ Color:
 </table>
 </div>
 
+<!-- displayed when window/level -->
 <div id="presetSelector"></div>
 <script type="text/javascript">gGetPresetSelector();</script>
 
@@ -110,4 +112,3 @@ Search Tags: <input type="text" id="tagSearch" name="tagSearch" multiple />
 
 </body>
 </html>
-

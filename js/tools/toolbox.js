@@ -49,7 +49,7 @@ ToolBox.prototype.init = function()
         alert('Error: failed to get the dtool element!');
         return;
     }
-    tool_select.addEventListener('change', gEventToolChange, false);
+    tool_select.addEventListener('change', this.eventToolChange, false);
     
     // Activate the default tool.
     if (this.tools[this.defaultToolName])
@@ -69,15 +69,16 @@ ToolBox.prototype.enable = function(value)
 };
 
 // The event handler for any changes made to the tool selector.
-function gEventToolChange(event)
+ToolBox.prototype.eventToolChange = function(event)
 {
-    if( app.getToolBox().hasTool(this.value) )
+    toolName = this.value;
+	if( app.getToolBox().hasTool(toolName) )
     {
-    	app.getToolBox().setSelectedTool(this.value);
+    	app.getToolBox().setSelectedTool(toolName);
     }
-}
+};
 
-function gGetToolBox()
+ToolBox.prototype.appendHtml = function()
 {
     var paragraph = document.createElement("p");  
     paragraph.appendChild(document.createTextNode("Tool: "));
@@ -99,5 +100,5 @@ function gGetToolBox()
     }
 
     document.getElementById('toolbox').appendChild(paragraph);
-}
+};
 
