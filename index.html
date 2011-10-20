@@ -15,6 +15,7 @@
 <script type="text/javascript" src="js/dicom/DicomImage.js"></script>
 <script type="text/javascript" src="js/dicom/LookupTable.js"></script>
 <script type="text/javascript" src="js/tools/toolbox.js"></script>
+<script type="text/javascript" src="js/tools/draw.js"></script>
 <script type="text/javascript" src="js/tools/rect.js"></script>
 <script type="text/javascript" src="js/tools/roi.js"></script>
 <script type="text/javascript" src="js/tools/line.js"></script>
@@ -29,16 +30,6 @@
     // main application
     var app = new DwvApp();
     
-    function gMouseOverColor()
-    {
-        document.body.style.cursor="pointer";
-    }
-    
-    function gMouseOutColor()
-    {
-        document.body.style.cursor="auto";
-    }
-    
 --></script>
 
 <!-- Header -->
@@ -51,21 +42,7 @@
 <script type="text/javascript">app.getToolBox().appendHtml();</script>
 
 <!-- displayed when drawing -->
-<div id="colourChooser" style="display:none;">
-Color: 
-<table name="colourChooser" class="colourChooser">
-<tr id="colours" onmouseover="gMouseOverColor()" onmouseout="gMouseOutColor()">
-<td id="black" onclick="app.setLineColor('black')">&nbsp;</td>
-<td id="white" onclick="app.setLineColor('white')">&nbsp;</td>
-<td id="red" onclick="app.setLineColor('red')">&nbsp;</td>
-<td id="green" onclick="app.setLineColor('green')">&nbsp;</td>
-<td id="blue" onclick="app.setLineColor('blue')">&nbsp;</td>
-<td id="yellow" onclick="app.setLineColor('yellow')">&nbsp;</td>
-<td id="lime" onclick="app.setLineColor('lime')">&nbsp;</td>
-<td id="fuchsia" onclick="app.setLineColor('fuchsia')">&nbsp;</td>
-</tr>
-</table>
-</div>
+<div id="colourChooser"></div>
 
 <!-- displayed when window/level -->
 <div id="presetSelector"></div>

@@ -58,22 +58,16 @@ function DwvApp()
     
     /**
      * @private
-     * @param color
+     * @param event
      */
-    this.setLineColor = function(color)
+    this.setLineColor = function(event)
     {
-        // set global var
+        // get the color
+    	var color = event.srcElement.id;
+    	// set style var
         self.getStyle().setLineColor(color);
         // reset borders
-        var tr = document.getElementById("colours");
-        var tds = tr.getElementsByTagName("td");
-        for (var i = 0; i < tds.length; i++)
-        {
-            tds[i].style.border = "#fff solid 2px";
-        }
-        // set selected border
-        var td = document.getElementById(color);
-        td.style.border = "#00f solid 2px";
+        tool.draw.setLineColor(color);
     };
     
     /**
@@ -283,7 +277,6 @@ function DwvApp()
         self.generateImage();        
         
         toolBox.init();
-        self.setLineColor(style.getLineColor());
         
         // Attach the mousedown, mousemove and mouseup event listeners.
         drawCanvas.addEventListener('mousedown', evCanvas, false);

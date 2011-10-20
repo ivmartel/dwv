@@ -56,9 +56,8 @@ tool.Line = function(app)
     };
     
     this.enable = function(value){
-        var str = "none";
-        if( value ) str = "";
-        document.getElementById("colourChooser").style.display=str;
+        if( value ) tool.draw.appendColourChooserHtml(app);
+        else tool.draw.clearColourChooserHtml();
     };
 
 }; // Line
