@@ -35,9 +35,9 @@ function DicomImage(size, spacing, buffer){
     };
 }
 
-DicomImage.prototype.getValue = function( x, y )
+DicomImage.prototype.getValue = function( i, j )
 {
-	return this.getValueAtOffset( ( y * this.size[0] ) + x );
+	return this.getValueAtOffset( ( j * this.size[0] ) + i );
 };
 
 DicomImage.prototype.getValueAtOffset = function( offset )
@@ -55,19 +55,19 @@ DicomImage.prototype.setLookup = function( windowCenter, windowWidth, rescaleSlo
 DicomImage.prototype.generateImageData = function( array )
 {        
     this.lookup.calculateLookup();
-    var n = 0;
-    var offset = 0;
+    var imageOffset = 0;
+    var colorOffset = 0;
     var pxValue = 0;
-    for(var yPix=0; yPix < this.size[1]; yPix++)
+    for(var j=0; j < this.size[1]; ++j)
     {
-        for(var xPix=0; xPix < this.size[0]; xPix++)
+        for(var i=0; i < this.size[0]; ++i)
         {        
-            offset = (yPix * this.size[0] + xPix) * 4;                    
-            pxValue = this.lookup.ylookup[ this.buffer[n] ];    
-            n++;               
-            array.data[offset] = parseInt(pxValue);
-            array.data[offset+1] = parseInt(pxValue);
-            array.data[offset+2] = parseInt(pxValue);
+        	colorOffset = (j * this.size[0] + i) * 4;                    
+            pxValue = parseInt( this.lookup.ylookup[ this.buffer[imageOffset] ] );    
+            imageOffset++;               
+            array.data[colorOffset] = pxValue;
+            array.data[colorOffset+1] = pxValue;
+            array.data[colorOffset+2] = pxValue;
         }
     }            
 };
