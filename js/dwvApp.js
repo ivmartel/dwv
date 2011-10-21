@@ -123,32 +123,38 @@ function DwvApp()
      * The general-purpose event handler. This function just determines the mouse 
    	 * position relative to the canvas element.
      */
-    function evCanvas(event)
+    function evenHandler(event)
     {
-        if (event.layerX || event.layerX == 0)
-        { 
-            // Firefox
-            event._x = event.layerX;
-            event._y = event.layerY;
+    	// if mouse envent, chekc that it is in the canvas
+    	if( event.type = MouseEvent )
+		{
+	    	if (event.layerX || event.layerX == 0)
+	        { 
+	            // Firefox
+	            event._x = event.layerX;
+	            event._y = event.layerY;
+	        }
+	        else if (event.offsetX || event.offsetX == 0)
+	        {
+	            // Opera
+	            event._x = event.offsetX;
+	            event._y = event.offsetY;
+	        }
+	
+	        if(event._x < 0 
+	            || event._y < 0 
+	            || event._x >= image.getSize()[0] 
+	            || event._y >= image.getSize()[1] )
+	        {
+	        	return;
+	        }
         }
-        else if (event.offsetX || event.offsetX == 0)
+            
+    	// Call the event handler of the tool.
+        var func = self.getToolBox().getSelectedTool()[event.type];
+        if (func)
         {
-            // Opera
-            event._x = event.offsetX;
-            event._y = event.offsetY;
-        }
-
-        if(event._x >= 0 
-            && event._y >= 0 
-            && event._x < image.getSize()[0] 
-            && event._y < image.getSize()[1] )
-        {
-            // Call the event handler of the tool.
-            var func = self.getToolBox().getSelectedTool()[event.type];
-            if (func)
-            {
-                func(event);
-            }
+            func(event);
         }
     }
 
@@ -263,11 +269,13 @@ function DwvApp()
         toolBox.init();
         
         // Attach the mousedown, mousemove and mouseup event listeners.
-        drawCanvas.addEventListener('mousedown', evCanvas, false);
-        drawCanvas.addEventListener('mousemove', evCanvas, false);
-        drawCanvas.addEventListener('mouseup', evCanvas, false);
-        drawCanvas.addEventListener('mousewheel', evCanvas, false);
-        drawCanvas.addEventListener('DOMMouseScroll', evCanvas,false);
+        drawCanvas.addEventListener('mousedown', evenHandler, false);
+        drawCanvas.addEventListener('mousemove', evenHandler, false);
+        drawCanvas.addEventListener('mouseup', evenHandler, false);
+        drawCanvas.addEventListener('mousewheel', evenHandler, false);
+        drawCanvas.addEventListener('DOMMouseScroll', evenHandler, false);
+        
+        window.addEventListener('keydown', evenHandler, true);
     }
     
     /**
