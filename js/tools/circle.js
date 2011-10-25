@@ -120,7 +120,7 @@ UndoStack.prototype.add = function(cmd) {
 	this.maxCmds = this.curCmd;
 };
 UndoStack.prototype.undo = function(){ 
-	this.stack[this.curCmd--]();
+	this.stack[--this.curCmd]();
 }; 
 UndoStack.prototype.redo = function(){ 
 	this.stack[this.curCmd++]();
