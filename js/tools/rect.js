@@ -26,28 +26,32 @@ tool.Rect = function(app)
         var w = Math.abs(ev._x - self.x0);
         var h = Math.abs(ev._y - self.y0);
 
-        app.getDrawContext().clearRect(
-        		0, 0, 
-        		app.getDrawCanvas().width, 
-        		app.getDrawCanvas().height);
-        app.getDrawContext().fillStyle = app.getStyle().getLineColor();
-        app.getDrawContext().strokeStyle = app.getStyle().getLineColor();
-
         if (!w || !h)
         {
             return;
         }
 
-        app.getDrawContext().beginPath();
-        app.getDrawContext().strokeRect(x, y, w, h);
+        var canvas = app.getDrawCanvas();
+        var context = app.getDrawContext();
+        var style = app.getStyle();
+        
+        context.clearRect(
+        		0, 0, 
+        		canvas.width, 
+        		canvas.height);
+        context.fillStyle = style.getLineColor();
+        context.strokeStyle = style.getLineColor();
+
+        context.beginPath();
+        context.strokeRect(x, y, w, h);
     
         // surface
         var surf = Math.round((w*app.getImage().getSpacing()[0])*(h*app.getImage().getSpacing()[1]));
-        app.getDrawContext().font = app.getStyle().getFontStr();
-        app.getDrawContext().fillText(
+        context.font = style.getFontStr();
+        context.fillText(
         		surf+"mm2",
-        		ev._x + app.getStyle().getFontSize(), 
-        		ev._y + app.getStyle().getFontSize());
+        		ev._x + style.getFontSize(), 
+        		ev._y + style.getFontSize());
     };
 
     // This is called when you release the mouse button.

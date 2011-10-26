@@ -21,28 +21,32 @@ tool.Line = function(app)
             return;
         }
 
-        app.getDrawContext().clearRect(
+        var canvas = app.getDrawCanvas();
+        var context = app.getDrawContext();
+        var style = app.getStyle();
+        
+        context.clearRect(
         		0, 0, 
-        		app.getDrawCanvas().width, 
-        		app.getDrawCanvas().height);
-        app.getDrawContext().fillStyle = app.getStyle().getLineColor();
-        app.getDrawContext().strokeStyle = app.getStyle().getLineColor();
+        		canvas.width, 
+        		canvas.height);
+        context.fillStyle = style.getLineColor();
+        context.strokeStyle = style.getLineColor();
 
-        app.getDrawContext().beginPath();
-        app.getDrawContext().moveTo(self.x0, self.y0);
-        app.getDrawContext().lineTo(ev._x, ev._y);
-        app.getDrawContext().stroke();
-        app.getDrawContext().closePath();
+        context.beginPath();
+        context.moveTo(self.x0, self.y0);
+        context.lineTo(ev._x, ev._y);
+        context.stroke();
+        context.closePath();
         
         // size
         var a = Math.abs(self.x0-ev._x) * app.getImage().getSpacing()[0];
         var b = Math.abs(self.y0-ev._y) * app.getImage().getSpacing()[1];
         var size = Math.round(Math.sqrt(a*a+b*b));
-        app.getDrawContext().font = app.getStyle().getFontStr();
-        app.getDrawContext().fillText(
+        context.font = style.getFontStr();
+        context.fillText(
         		size+"mm",
-        		ev._x + app.getStyle().getFontSize(), 
-        		ev._y + app.getStyle().getFontSize());
+        		ev._x + style.getFontSize(), 
+        		ev._y + style.getFontSize());
     };
 
     // This is called when you release the mouse button.
@@ -61,4 +65,3 @@ tool.Line = function(app)
     };
 
 }; // Line
-

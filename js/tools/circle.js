@@ -90,22 +90,27 @@ Circle = function(center, radius)
 
 DrawCircleCommand = function(circle, app)
 {
+	// app members can change 
+	var lineColor = app.getStyle().getLineColor();
+	var canvas = app.getDrawCanvas();
+	var context = app.getDrawContext();
+	
 	this.draw = function()
 	{
-	    app.getDrawContext().clearRect(
+		context.clearRect(
 	    		0, 0, 
-	    		app.getDrawCanvas().width, 
-	    		app.getDrawCanvas().height);
-	    app.getDrawContext().fillStyle = app.getStyle().getLineColor();
-	    app.getDrawContext().strokeStyle = app.getStyle().getLineColor();
+	    		canvas.width, 
+	    		canvas.height);
+		context.fillStyle = lineColor;
+		context.strokeStyle = lineColor;
 	
-	    app.getDrawContext().beginPath();
-	    app.getDrawContext().arc(
+		context.beginPath();
+		context.arc(
 	    		circle.getCenter().getX(), 
 	    		circle.getCenter().getY(), 
 	    		circle.getRadius(),
 	    		0, 2*Math.PI);
-	    app.getDrawContext().stroke();
+		context.stroke();
 	};
 }; // Circle command
 

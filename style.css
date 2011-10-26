@@ -34,10 +34,10 @@ h1 { color: #fff; margin: 10px; padding: 10px; }
     border: 1px solid white;
 }
 
-#imageView { 
+#imageLayer { 
     border: 1px solid #000;
 }
-#imageDraw {
+#drawLayer {
     position: absolute; 
     top: 1px; 
     left: 1px;

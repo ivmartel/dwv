@@ -9,10 +9,11 @@ tool.Roi = function(app)
 
     // This is called when you start holding down the mouse button.
     this.mousedown = function(ev){
-    	app.getDrawContext().strokeStyle = app.getStyle().getLineColor();
-    	app.getDrawContext().fillStyle = app.getStyle().getLineColor();
-    	app.getDrawContext().beginPath();
-        app.getDrawContext().moveTo(ev._x, ev._y);
+    	var context = app.getDrawContext();
+    	context.strokeStyle = app.getStyle().getLineColor();
+    	context.fillStyle = app.getStyle().getLineColor();
+    	context.beginPath();
+    	context.moveTo(ev._x, ev._y);
         self.started = true;
     };
 
@@ -23,8 +24,9 @@ tool.Roi = function(app)
             return;
         }
 
-        app.getDrawContext().lineTo(ev._x, ev._y);
-        app.getDrawContext().stroke();
+        var context = app.getDrawContext();
+        context.lineTo(ev._x, ev._y);
+        context.stroke();
     };
 
     // This is called when you release the mouse button.
@@ -32,8 +34,9 @@ tool.Roi = function(app)
         if (self.started)
         {
             self.mousemove(ev);
-            app.getDrawContext().closePath();
-            app.getDrawContext().stroke();
+            var context = app.getDrawContext();
+            context.closePath();
+            context.stroke();
             self.started = false;
             app.updateContext();
         }

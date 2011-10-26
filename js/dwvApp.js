@@ -10,8 +10,11 @@ function DwvApp()
 	// Image details.
     var image = null;
     
+    // Base canvas.
+    var imageCanvas = null;    
+
     // Base context.
-    var baseContext = null;    
+    var imageContext = null;    
 
     // Drawing canvas.
     var drawCanvas = null;
@@ -32,8 +35,11 @@ function DwvApp()
     // Get the tool box.
     this.getToolBox = function() { return toolBox; };
 
-    // Get the base context.
-    this.getBaseContext = function() { return baseContext; };
+    // Get the image canvas.
+    this.getImageCanvas = function() { return imageCanvas; };
+
+    // Get the image context.
+    this.getImageContext = function() { return imageContext; };
 
     // Get the drawing canvas.
     this.getDrawCanvas = function() { return drawCanvas; };
@@ -64,44 +70,54 @@ function DwvApp()
     function initCanvas()
     {
         // Find the canvas element.
-        var baseCanvas = document.getElementById('imageView');
-        if (!baseCanvas)
+        imageCanvas = document.getElementById('imageLayer');
+        if (!imageCanvas)
         {
             alert('Error: I cannot find the canvas element!');
             return;
         }
 
-        if (!baseCanvas.getContext)
+        if (!imageCanvas.getContext)
         {
             alert('Error: no canvas.getContext!');
             return;
         }
 
         // Get the 2D canvas context.
-        baseContext = baseCanvas.getContext('2d');
-        if (!baseContext)
+        imageContext = imageCanvas.getContext('2d');
+        if (!imageContext)
         {
             alert('Error: failed to getContext!');
             return;
         }
 
-        // Add the drawing canvas.
-        var container = baseCanvas.parentNode;
-        drawCanvas = document.createElement('canvas');
+        imageCanvas.width = image.getSize()[0];
+        imageCanvas.height = image.getSize()[1];
+
+        // Find the canvas element.
+        drawCanvas = document.getElementById('drawLayer');
         if (!drawCanvas)
         {
-            alert('Error: I cannot create a new canvas element!');
+            alert('Error: I cannot find the canvas element!');
             return;
         }
 
-        baseCanvas.width = image.getSize()[0];
-        baseCanvas.height = image.getSize()[1];
-        
-        drawCanvas.id = 'imageDraw';
-        drawCanvas.width = baseCanvas.width;
-        drawCanvas.height = baseCanvas.height;
-        container.appendChild(drawCanvas);
+        if (!drawCanvas.getContext)
+        {
+            alert('Error: no canvas.getContext!');
+            return;
+        }
+
+        // Get the 2D canvas context.
         drawContext = drawCanvas.getContext('2d');
+        if (!drawContext)
+        {
+            alert('Error: failed to getContext!');
+            return;
+        }
+
+        drawCanvas.width = image.getSize()[0];
+        drawCanvas.height = image.getSize()[1];
     }
     
     /**
@@ -112,7 +128,7 @@ function DwvApp()
      */
     this.updateContext = function() 
     {
-    	self.getBaseContext().drawImage(self.getDrawCanvas(), 0, 0);
+    	self.getImageContext().drawImage(self.getDrawCanvas(), 0, 0);
     	self.getDrawContext().clearRect(0, 0, 
     			self.getDrawCanvas().width, 
     			self.getDrawCanvas().height);
@@ -263,7 +279,7 @@ function DwvApp()
         
         initCanvas();
         
-        baseContext.fillRect( 0, 0, image.getSize()[0], image.getSize()[1] );    
+        imageContext.fillRect( 0, 0, image.getSize()[0], image.getSize()[1] );    
         self.generateImage();        
         
         toolBox.init();
@@ -283,11 +299,11 @@ function DwvApp()
      */
     this.generateImage = function()
     {        
-        var imageData = self.getBaseContext().getImageData( 
+        var imageData = self.getImageContext().getImageData( 
         		0, 0, 
         		self.getImage().getSize()[0], 
         		self.getImage().getSize()[1]); 
         self.getImage().generateImageData( imageData );         
-        self.getBaseContext().putImageData(imageData, 0,0);
+        self.getImageContext().putImageData(imageData, 0,0);
     };
 }
