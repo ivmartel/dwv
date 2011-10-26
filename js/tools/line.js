@@ -21,14 +21,10 @@ tool.Line = function(app)
             return;
         }
 
-    	var canvas = app.getTempLayer().getCanvas();
     	var context = app.getTempLayer().getContext();
         var style = app.getStyle();
         
-        context.clearRect(
-        		0, 0, 
-        		canvas.width, 
-        		canvas.height);
+        app.getTempLayer().clearContextRect();
         context.fillStyle = style.getLineColor();
         context.strokeStyle = style.getLineColor();
 

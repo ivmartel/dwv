@@ -93,15 +93,11 @@ DrawCircleCommand = function(circle, app)
 {
 	// app members can change 
 	var lineColor = app.getStyle().getLineColor();
-	var canvas = app.getTempLayer().getCanvas();
 	var context = app.getTempLayer().getContext();
 	
 	this.draw = function()
 	{
-		context.clearRect(
-	    		0, 0, 
-	    		canvas.width, 
-	    		canvas.height);
+		app.getTempLayer().clearContextRect();
 		context.fillStyle = lineColor;
 		context.strokeStyle = lineColor;
 	

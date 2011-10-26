@@ -35,20 +35,14 @@ tool.Zoom = function(app)
     			app.getImage().getSize()[1]); 
        
         // copy it to the draw context
-        tempContext.clearRect(
-        		0, 0, 
-        		app.getImage().getSize()[0],
-        		app.getImage().getSize()[1]);
+        app.getTempLayer().clearContextRect();
         tempContext.putImageData(imageData, 0, 0);
         
         // save base settings
         drawContext.save();
 
         // translate the base context
-        drawContext.clearRect(
-        		0, 0, 
-        		app.getImage().getSize()[0],
-        		app.getImage().getSize()[1]);
+        app.getDrawLayer().clearContextRect();
         var tx = ev._x - self.x0;
         var ty = ev._y - self.y0;
         drawContext.translate( tx, ty );
@@ -99,20 +93,14 @@ tool.Zoom = function(app)
     			app.getImage().getSize()[1]); 
        
         // copy it to the draw context
-        tempContext.clearRect(
-        		0, 0, 
-        		app.getImage().getSize()[0],
-        		app.getImage().getSize()[1]);
+        app.getTempLayer().clearContextRect();
         tempContext.putImageData(imageData, 0, 0);
         
         // save base settings
         drawContext.save();
 
         // translate the base context
-        drawContext.clearRect(
-        		0, 0, 
-        		app.getImage().getSize()[0],
-        		app.getImage().getSize()[1]);
+        app.getDrawLayer().clearContextRect();
         var zoom = Math.pow(1.1,step);
         
         drawContext.translate(cx, cy);
