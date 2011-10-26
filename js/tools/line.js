@@ -21,8 +21,8 @@ tool.Line = function(app)
             return;
         }
 
-        var canvas = app.getDrawCanvas();
-        var context = app.getDrawContext();
+    	var canvas = app.getTempLayer().getCanvas();
+    	var context = app.getTempLayer().getContext();
         var style = app.getStyle();
         
         context.clearRect(
@@ -55,7 +55,7 @@ tool.Line = function(app)
         {
             self.mousemove(ev);
             self.started = false;
-            app.updateContext();
+            app.mergeTempLayer();
         }
     };
     

@@ -40,7 +40,7 @@ tool.WindowLevel = function(app)
         {
             self.mousemove(ev);
             self.started = false;
-            app.updateContext();
+            app.mergeTempLayer();
         }
     };
     
@@ -84,34 +84,41 @@ tool.WindowLevel.prototype.clearHtml = function()
 
 function showHUvalue(x,y)
 {
+	var context = app.getTempLayer().getContext();
+    var style = app.getStyle();
+
     // style
-    app.getDrawContext().clearRect(0, 0, 150, 150);
-    app.getDrawContext().fillStyle = app.getStyle().getTextColor();
-    app.getDrawContext().font = app.getStyle().getFontStr();
-    app.getDrawContext().textBaseline = "top";
-    app.getDrawContext().textAlign = "left";
+    context.clearRect(0, 0, 150, 150);
+    context.fillStyle = style.getTextColor();
+    context.font = style.getFontStr();
+    context.textBaseline = "top";
+    context.textAlign = "left";
     
     // text
-    app.getDrawContext().fillText("X = "+x, 0, 0);
-    app.getDrawContext().fillText("Y = "+y, 0, app.getStyle().getLineHeight());
-    app.getDrawContext().fillText(
+    context.fillText("X = "+x, 0, 0);
+    context.fillText("Y = "+y, 0, style.getLineHeight());
+    context.fillText(
     		"HU = "+app.getImage().getValue(x,y), 
     		0, 
-    		2*app.getStyle().getLineHeight());
+    		2*style.getLineHeight());
 }
 
 function showWindowingValue(windowCenter,windowWidth)
 {
-    // style
-	app.getDrawContext().clearRect(app.getDrawCanvas().width-150, 0, app.getDrawCanvas().width, 150);
-	app.getDrawContext().fillStyle = app.getStyle().getTextColor();
-	app.getDrawContext().font = app.getStyle().getFontStr();
-	app.getDrawContext().textBaseline = "top";
-	app.getDrawContext().textAlign = "right";
+	var canvas = app.getTempLayer().getCanvas();
+	var context = app.getTempLayer().getContext();
+    var style = app.getStyle();
+	
+	// style
+    context.clearRect(canvas.width-150, 0, canvas.width, 150);
+    context.fillStyle = style.getTextColor();
+    context.font = style.getFontStr();
+    context.textBaseline = "top";
+    context.textAlign = "right";
     
     // text
-	app.getDrawContext().fillText("WindowCenter = "+windowCenter, app.getDrawCanvas().width, 0);
-	app.getDrawContext().fillText("WindowWidth = "+windowWidth, app.getDrawCanvas().width, app.getStyle().getLineHeight());
+    context.fillText("WindowCenter = "+windowCenter, canvas.width, 0);
+    context.fillText("WindowWidth = "+windowWidth, canvas.width, style.getLineHeight());
 }
 
 function updateWindowingData(wc,ww)

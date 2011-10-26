@@ -38,8 +38,9 @@ tool.Circle = function(app)
         b = b * app.getImage().getSpacing()[1];
         radius = Math.sqrt(a*a+b*b);
         var surf = Math.round(Math.PI*radius*radius);
-        app.getDrawContext().font = app.getStyle().getFontStr();
-        app.getDrawContext().fillText(surf+"mm2",
+        var context = app.getTempLayer().getContext();
+        context.font = app.getStyle().getFontStr();
+        context.fillText(surf+"mm2",
         		ev._x+app.getStyle().getFontSize(),
         		ev._y+app.getStyle().getFontSize());
     };
@@ -50,7 +51,7 @@ tool.Circle = function(app)
         {
         	self.mousemove(ev);
         	self.started = false;
-            app.updateContext();
+            app.mergeTempLayer();
         }
     };
 
@@ -92,8 +93,8 @@ DrawCircleCommand = function(circle, app)
 {
 	// app members can change 
 	var lineColor = app.getStyle().getLineColor();
-	var canvas = app.getDrawCanvas();
-	var context = app.getDrawContext();
+	var canvas = app.getTempLayer().getCanvas();
+	var context = app.getTempLayer().getContext();
 	
 	this.draw = function()
 	{

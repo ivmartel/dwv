@@ -42,6 +42,11 @@ h1 { color: #fff; margin: 10px; padding: 10px; }
     top: 1px; 
     left: 1px;
 }
+#tempLayer {
+    position: absolute; 
+    top: 1px; 
+    left: 1px;
+}
 
 /* tag list */
 table.tagList { border-collapse:collapse; }

@@ -12,9 +12,10 @@ function DwvApp()
     
     // Image layer.
     var imageLayer = null;
-    
     // Draw layer.
     var drawLayer = null;
+    // Temporary layer.
+    var tempLayer = null;
 
     // Tool box.
     var toolBox = new ToolBox(this);
@@ -28,23 +29,12 @@ function DwvApp()
     // Get the tool box.
     this.getToolBox = function() { return toolBox; };
 
-    // Get the image canvas.
+    // Get the image layer.
     this.getImageLayer = function() { return imageLayer; };
-
-    // Get the image canvas.
+    // Get the draw layer.
     this.getDrawLayer = function() { return drawLayer; };
-
-    // Get the image canvas.
-    this.getImageCanvas = function() { return imageLayer.getCanvas(); };
-
-    // Get the image context.
-    this.getImageContext = function() { return imageLayer.getContext(); };
-
-    // Get the drawing canvas.
-    this.getDrawCanvas = function() { return drawLayer.getCanvas(); };
-
-    // Get the drawing context.
-    this.getDrawContext = function() { return drawLayer.getContext(); };
+    // Get the temporary layer.
+    this.getTempLayer = function() { return tempLayer; };
 
     // Get the drawing context.
     this.getStyle = function() { return style; };
@@ -69,9 +59,9 @@ function DwvApp()
      * after which #imageDraw is cleared. This function is called each time when the
      * user completes a drawing operation.
      */
-    this.updateContext = function() 
+    this.mergeTempLayer = function() 
     {
-    	self.getImageLayer().merge(self.getDrawLayer());
+    	self.getDrawLayer().merge(self.getTempLayer());
     };
 
     /**
@@ -217,23 +207,27 @@ function DwvApp()
             dicomParser.pixelBuffer );
         image.setLookup( windowCenter, windowWidth, rescaleSlope, rescaleIntercept);
         
+        // image layer
         imageLayer = new Layer("imageLayer");
         imageLayer.init(image.getSize()[0], image.getSize()[1]);
-        
+        imageLayer.fillContext();
+        // draw layer
         drawLayer = new Layer("drawLayer");
         drawLayer.init(image.getSize()[0], image.getSize()[1]);
+        // temp layer
+        tempLayer = new Layer("tempLayer");
+        tempLayer.init(image.getSize()[0], image.getSize()[1]);
         
-        imageLayer.getContext().fillRect( 0, 0, image.getSize()[0], image.getSize()[1] );    
         self.generateImage();        
         
         toolBox.init();
         
         // Attach the mousedown, mousemove and mouseup event listeners.
-        drawLayer.getCanvas().addEventListener('mousedown', evenHandler, false);
-        drawLayer.getCanvas().addEventListener('mousemove', evenHandler, false);
-        drawLayer.getCanvas().addEventListener('mouseup', evenHandler, false);
-        drawLayer.getCanvas().addEventListener('mousewheel', evenHandler, false);
-        drawLayer.getCanvas().addEventListener('DOMMouseScroll', evenHandler, false);
+        tempLayer.getCanvas().addEventListener('mousedown', evenHandler, false);
+        tempLayer.getCanvas().addEventListener('mousemove', evenHandler, false);
+        tempLayer.getCanvas().addEventListener('mouseup', evenHandler, false);
+        tempLayer.getCanvas().addEventListener('mousewheel', evenHandler, false);
+        tempLayer.getCanvas().addEventListener('DOMMouseScroll', evenHandler, false);
         
         window.addEventListener('keydown', evenHandler, true);
     }
@@ -243,11 +237,11 @@ function DwvApp()
      */
     this.generateImage = function()
     {        
-        var imageData = self.getImageContext().getImageData( 
+        var imageData = self.getImageLayer().getContext().getImageData( 
         		0, 0, 
         		self.getImage().getSize()[0], 
         		self.getImage().getSize()[1]); 
         self.getImage().generateImageData( imageData );         
-        self.getImageContext().putImageData(imageData, 0,0);
+        self.getImageLayer().getContext().putImageData(imageData, 0,0);
     };
 }

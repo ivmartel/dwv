@@ -38,6 +38,11 @@ function Layer(name)
 	    canvas.height = height;
 	};
 	
+	this.fillContext = function()
+	{
+	    context.fillRect( 0, 0, canvas.width, canvas.height );
+	};
+	
 	this.clearContext = function()
 	{
 		context.clearRect(0, 0, canvas.width, canvas.height);
@@ -49,5 +54,11 @@ function Layer(name)
 		context.drawImage(layerToMerge.getCanvas(), 0, 0);
     	// empty merged layer
 		layerToMerge.clearContext();
+	};
+	
+	this.setLineColor = function(color)
+	{
+		context.fillStyle = color;
+		context.strokeStyle = color;
 	};
 }

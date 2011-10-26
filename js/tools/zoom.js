@@ -24,36 +24,40 @@ tool.Zoom = function(app)
             return;
         }
 
+        var drawContext = app.getDrawLayer().getContext();
+        var tempContext = app.getTempLayer().getContext();
+        var tempCanvas = app.getTempLayer().getCanvas();
+        
         // get the image data
-        var imageData = app.getImageContext().getImageData( 
+        var imageData = drawContext.getImageData( 
     			0, 0, 
     			app.getImage().getSize()[0], 
     			app.getImage().getSize()[1]); 
        
         // copy it to the draw context
-        app.getDrawContext().clearRect(
+        tempContext.clearRect(
         		0, 0, 
         		app.getImage().getSize()[0],
         		app.getImage().getSize()[1]);
-        app.getDrawContext().putImageData(imageData, 0, 0);
+        tempContext.putImageData(imageData, 0, 0);
         
         // save base settings
-        app.getImageContext().save();
+        drawContext.save();
 
         // translate the base context
-        app.getImageContext().clearRect(
+        drawContext.clearRect(
         		0, 0, 
         		app.getImage().getSize()[0],
         		app.getImage().getSize()[1]);
         var tx = ev._x - self.x0;
         var ty = ev._y - self.y0;
-        app.getImageContext().translate( tx, ty );
+        drawContext.translate( tx, ty );
 		
         // put the draw canvas in the base context
-        app.getImageContext().drawImage(app.getDrawCanvas(), 0, 0);
+        drawContext.drawImage(tempCanvas, 0, 0);
         
         // restore base settings
-        app.getImageContext().restore();
+        drawContext.restore();
         
         // do not cumulate
         self.x0 = ev._x;
@@ -84,38 +88,42 @@ tool.Zoom = function(app)
 
     function zoom(step, cx, cy)
     {
-         // get the image data
-        var imageData = app.getImageContext().getImageData( 
+        var drawContext = app.getDrawLayer().getContext();
+        var tempContext = app.getTempLayer().getContext();
+        var tempCanvas = app.getTempLayer().getCanvas();
+
+        // get the image data
+        var imageData = drawContext.getImageData( 
         		0, 0, 
     			app.getImage().getSize()[0], 
     			app.getImage().getSize()[1]); 
        
         // copy it to the draw context
-        app.getDrawContext().clearRect(
+        tempContext.clearRect(
         		0, 0, 
         		app.getImage().getSize()[0],
         		app.getImage().getSize()[1]);
-        app.getDrawContext().putImageData(imageData, 0, 0);
+        tempContext.putImageData(imageData, 0, 0);
         
         // save base settings
-        app.getImageContext().save();
+        drawContext.save();
 
         // translate the base context
-        app.getImageContext().clearRect(
+        drawContext.clearRect(
         		0, 0, 
         		app.getImage().getSize()[0],
         		app.getImage().getSize()[1]);
         var zoom = Math.pow(1.1,step);
         
-        app.getImageContext().translate(cx, cy);
-        app.getImageContext().scale( zoom, zoom );
-        app.getImageContext().translate(-cx, -cy);
+        drawContext.translate(cx, cy);
+        drawContext.scale( zoom, zoom );
+        drawContext.translate(-cx, -cy);
         
         // put the draw canvas in the base context
-        app.getImageContext().drawImage(app.getDrawCanvas(), 0, 0);
+        drawContext.drawImage(tempCanvas, 0, 0);
         
         // restore base settings
-        app.getImageContext().restore();
+        drawContext.restore();
     }
 
 }; // Zoom function
