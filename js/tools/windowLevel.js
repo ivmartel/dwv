@@ -48,7 +48,11 @@ tool.WindowLevel = function(app)
     	if( bool ) this.appendHtml();
     	else this.clearHtml();
     };
-    
+
+    this.keydown = function(event){
+    	app.handleKeyDown(event);
+    };
+
 }; // WindowLevel function
 
 tool.WindowLevel.prototype.appendHtml = function()

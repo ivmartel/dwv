@@ -6,7 +6,7 @@ tool.Circle = function(app)
 {
     var self = this;
     this.started = false;
-    this.undoStack = new UndoStack();
+    var command = null;
 
     // This is called when you start holding down the mouse button.
     this.mousedown = function(ev){
@@ -21,37 +21,39 @@ tool.Circle = function(app)
         {
             return;
         }
-
-        var a = Math.abs(self.x0-ev._x);
-        var b = Math.abs(self.y0-ev._y);
-        var radius = Math.round(Math.sqrt(a*a+b*b));
-
+    	// radius
+        var a = Math.abs(self.x0 - ev._x);
+        var b = Math.abs(self.y0 - ev._y);
+        var radius = Math.round( Math.sqrt( a * a + b * b ) );
+        // check zero radius
+        if( radius == 0 )
+        {
+        	return
+        }
+        // centre
         var centre = new Point2D(self.x0, self.y0);
+        // create circle
         var circle = new Circle(centre, radius);
-        
-        var command = new DrawCircleCommand(circle, app);
-        self.undoStack.add(command.draw);
+        // create draw command
+        command = new DrawCircleCommand(circle, app);
+		// clear the temporary layer
+        app.getTempLayer().clearContextRect();
+        // draw
         command.draw();
-        
-        // surface
-        a = a * app.getImage().getSpacing()[0];
-        b = b * app.getImage().getSpacing()[1];
-        radius = Math.sqrt(a*a+b*b);
-        var surf = Math.round(Math.PI*radius*radius);
-        var context = app.getTempLayer().getContext();
-        context.font = app.getStyle().getFontStr();
-        context.fillText(surf+"mm2",
-        		ev._x+app.getStyle().getFontSize(),
-        		ev._y+app.getStyle().getFontSize());
     };
 
     // This is called when you release the mouse button.
     this.mouseup = function(ev){
         if (self.started)
         {
+            // draw
         	self.mousemove(ev);
+            // save command in undo stack
+        	app.getUndoStack().add(command.draw);
+            // set flag
         	self.started = false;
-            app.mergeTempLayer();
+            // merge temporary layer
+        	app.mergeTempLayer();
         }
     };
 
@@ -61,34 +63,16 @@ tool.Circle = function(app)
     };
     
     this.keydown = function(event){
-    	if( event.keyCode == 85 ) // u
-		{
-    		self.undoStack.undo();
-		}
-    	else if( event.keyCode == 82 ) // r
-		{
-    		self.undoStack.redo();
-		}
+    	app.handleKeyDown(event);
     };
 
-}; // Circle function
+}; // Circle tool class
 
-
-Point2D = function(x,y)
-{
-    this.getX = function() { return x; };
-    this.getY = function() { return y; };
-}; // Point2D
-
-Circle = function(center, radius)
-{
-	var surface = Math.PI*radius*radius;
-
-    this.getCenter = function() { return center; };
-    this.getRadius = function() { return radius; };
-    this.getSurface = function() { return surface; };
-}; // Circle
-
+/**
+ * Draw circle command.
+ * @param circle The circle to draw.
+ * @param app The application to draw the circle on.
+ */
 DrawCircleCommand = function(circle, app)
 {
 	// app members can change 
@@ -97,10 +81,10 @@ DrawCircleCommand = function(circle, app)
 	
 	this.draw = function()
 	{
-		app.getTempLayer().clearContextRect();
+		// style
 		context.fillStyle = lineColor;
 		context.strokeStyle = lineColor;
-	
+		// path
 		context.beginPath();
 		context.arc(
 	    		circle.getCenter().getX(), 
@@ -108,22 +92,13 @@ DrawCircleCommand = function(circle, app)
 	    		circle.getRadius(),
 	    		0, 2*Math.PI);
 		context.stroke();
+		// surface
+        var surf = circle.getWorldSurface( 
+        	app.getImage().getSpacing()[0], 
+        	app.getImage().getSpacing()[1] );
+        context.font = app.getStyle().getFontStr();
+        context.fillText( Math.round(surf) + "mm2",
+        		circle.getCenter().getX() + app.getStyle().getFontSize(),
+        		circle.getCenter().getY() + app.getStyle().getFontSize());
 	};
-}; // Circle command
-
-function UndoStack()
-{ 
-	this.stack = []; 
-	this.maxCmds = 0;
-	this.curCmd = 0;
-} 
-UndoStack.prototype.add = function(cmd) { 
-	this.stack[this.curCmd++] = cmd;
-	this.maxCmds = this.curCmd;
-};
-UndoStack.prototype.undo = function(){ 
-	this.stack[--this.curCmd]();
-}; 
-UndoStack.prototype.redo = function(){ 
-	this.stack[this.curCmd++]();
-};
+}; // Circle command class

@@ -23,6 +23,9 @@ function DwvApp()
     // Style.
     var style = new Style();
     
+    // UndoStack
+    var undoStack = new UndoStack(this);
+    
     // Get the image details.
     this.getImage = function() { return image; };
     
@@ -38,7 +41,10 @@ function DwvApp()
 
     // Get the drawing context.
     this.getStyle = function() { return style; };
-    
+
+    // Get the image details.
+    this.getUndoStack = function() { return undoStack; };
+
     /**
      * @private
      * @param event
@@ -64,6 +70,21 @@ function DwvApp()
     	self.getDrawLayer().merge(self.getTempLayer());
     };
 
+    /**
+     * Handle key event
+     */
+    this.handleKeyDown = function(event)
+    {
+    	if( event.keyCode == 85 ) // u
+		{
+    		self.getUndoStack().undo();
+		}
+    	else if( event.keyCode == 82 ) // r
+		{
+    		self.getUndoStack().redo();
+		}
+    };
+    
     /**
      * @private
      * The general-purpose event handler. This function just determines the mouse 

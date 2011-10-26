@@ -20,43 +20,36 @@ tool.Rect = function(app)
         {
             return;
         }
-
-        var x = Math.min(ev._x, self.x0);
-        var y = Math.min(ev._y, self.y0);
-        var w = Math.abs(ev._x - self.x0);
-        var h = Math.abs(ev._y - self.y0);
-
-        if (!w || !h)
-        {
-            return;
-        }
-
-    	var context = app.getTempLayer().getContext();
-        var style = app.getStyle();
-        
+        // points
+        var beginPoint = new Point2D(self.x0, self.y0);
+        var endPoint = new Point2D(ev._x, ev._y);
+        // check for equality
+        if( beginPoint.equal(endPoint) )
+    	{
+        	return;
+    	}
+        // create line
+        var line = new Rectangle(beginPoint, endPoint);
+        // create draw command
+        command = new DrawRectangleCommand(line, app);
+        // clear the temporary layer
         app.getTempLayer().clearContextRect();
-        context.fillStyle = style.getLineColor();
-        context.strokeStyle = style.getLineColor();
-
-        context.beginPath();
-        context.strokeRect(x, y, w, h);
-    
-        // surface
-        var surf = Math.round((w*app.getImage().getSpacing()[0])*(h*app.getImage().getSpacing()[1]));
-        context.font = style.getFontStr();
-        context.fillText(
-        		surf+"mm2",
-        		ev._x + style.getFontSize(), 
-        		ev._y + style.getFontSize());
+        // draw
+        command.draw();
     };
 
     // This is called when you release the mouse button.
     this.mouseup = function(ev){
         if (self.started)
         {
-            self.mousemove(ev);
-            self.started = false;
-            app.mergeTempLayer();
+            // draw
+        	self.mousemove(ev);
+            // save command in undo stack
+        	app.getUndoStack().add(command.draw);
+            // set flag
+        	self.started = false;
+            // merge temporary layer
+        	app.mergeTempLayer();
         }
     };
         
@@ -65,4 +58,42 @@ tool.Rect = function(app)
         else tool.draw.clearColourChooserHtml();
     };
 
+    this.keydown = function(event){
+    	app.handleKeyDown(event);
+    };
+
 }; // Rect function
+
+/**
+ * Draw rectangle command.
+ * @param rectangle The rectangle to draw.
+ * @param app The application to draw the line on.
+ */
+DrawRectangleCommand = function(rectangle, app)
+{
+	// app members can change 
+	var lineColor = app.getStyle().getLineColor();
+	var context = app.getTempLayer().getContext();
+	
+	this.draw = function()
+	{
+		// style
+		context.fillStyle = lineColor;
+		context.strokeStyle = lineColor;
+		// path
+        context.beginPath();
+        context.strokeRect( 
+        		rectangle.getBegin().getX(), 
+        		rectangle.getBegin().getY(),
+        		rectangle.getWidth(),
+        		rectangle.getHeight() );
+		// length
+        var surf = rectangle.getWorldSurface( 
+        	app.getImage().getSpacing()[0], 
+        	app.getImage().getSpacing()[1] );
+        context.font = app.getStyle().getFontStr();
+        context.fillText( Math.round(surf) + "mm2",
+        		rectangle.getEnd().getX() + app.getStyle().getFontSize(),
+        		rectangle.getEnd().getY() + app.getStyle().getFontSize());
+	}; 
+}; // Rectangle command class

@@ -80,6 +80,10 @@ tool.Zoom = function(app)
         // nothing to do.
     };
 
+    this.keydown = function(event){
+    	app.handleKeyDown(event);
+    };
+
     function zoom(step, cx, cy)
     {
         var drawContext = app.getDrawLayer().getContext();

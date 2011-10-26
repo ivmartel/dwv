@@ -6,7 +6,8 @@ tool.Line = function(app)
 {
     var self = this;
     this.started = false;
-
+    var command = null;
+    
     // This is called when you start holding down the mouse button.
     this.mousedown = function(ev){
     	self.started = true;
@@ -20,38 +21,36 @@ tool.Line = function(app)
         {
             return;
         }
-
-    	var context = app.getTempLayer().getContext();
-        var style = app.getStyle();
-        
+        // points
+        var beginPoint = new Point2D(self.x0, self.y0);
+        var endPoint = new Point2D(ev._x, ev._y);
+        // check for equality
+        if( beginPoint.equal(endPoint) )
+    	{
+        	return;
+    	}
+        // create line
+        var line = new Line(beginPoint, endPoint);
+        // create draw command
+        command = new DrawLineCommand(line, app);
+        // clear the temporary layer
         app.getTempLayer().clearContextRect();
-        context.fillStyle = style.getLineColor();
-        context.strokeStyle = style.getLineColor();
-
-        context.beginPath();
-        context.moveTo(self.x0, self.y0);
-        context.lineTo(ev._x, ev._y);
-        context.stroke();
-        context.closePath();
-        
-        // size
-        var a = Math.abs(self.x0-ev._x) * app.getImage().getSpacing()[0];
-        var b = Math.abs(self.y0-ev._y) * app.getImage().getSpacing()[1];
-        var size = Math.round(Math.sqrt(a*a+b*b));
-        context.font = style.getFontStr();
-        context.fillText(
-        		size+"mm",
-        		ev._x + style.getFontSize(), 
-        		ev._y + style.getFontSize());
+        // draw
+        command.draw();
     };
 
     // This is called when you release the mouse button.
     this.mouseup = function(ev){
         if (self.started)
         {
-            self.mousemove(ev);
-            self.started = false;
-            app.mergeTempLayer();
+            // draw
+        	self.mousemove(ev);
+            // save command in undo stack
+        	app.getUndoStack().add(command.draw);
+            // set flag
+        	self.started = false;
+            // merge temporary layer
+        	app.mergeTempLayer();
         }
     };
     
@@ -60,4 +59,41 @@ tool.Line = function(app)
         else tool.draw.clearColourChooserHtml();
     };
 
-}; // Line
+    this.keydown = function(event){
+    	app.handleKeyDown(event);
+    };
+
+}; // Line tool class
+
+/**
+ * Draw line command.
+ * @param line The line to draw.
+ * @param app The application to draw the line on.
+ */
+DrawLineCommand = function(line, app)
+{
+	// app members can change 
+	var lineColor = app.getStyle().getLineColor();
+	var context = app.getTempLayer().getContext();
+	
+	this.draw = function()
+	{
+		// style
+		context.fillStyle = lineColor;
+		context.strokeStyle = lineColor;
+		// path
+        context.beginPath();
+        context.moveTo( line.getBegin().getX(), line.getBegin().getY());
+        context.lineTo( line.getEnd().getX(), line.getEnd().getY());
+        context.stroke();
+        context.closePath();
+		// length
+        var length = line.getWorldLength( 
+        	app.getImage().getSpacing()[0], 
+        	app.getImage().getSpacing()[1] );
+        context.font = app.getStyle().getFontStr();
+        context.fillText( Math.round(length) + "mm",
+        		line.getEnd().getX() + app.getStyle().getFontSize(),
+        		line.getEnd().getY() + app.getStyle().getFontSize());
+	}; 
+}; // Line command class
