@@ -10,25 +10,18 @@ function DwvApp()
 	// Image details.
     var image = null;
     
-    // Base canvas.
-    var imageCanvas = null;    
-
-    // Base context.
-    var imageContext = null;    
-
-    // Drawing canvas.
-    var drawCanvas = null;
-
-    // Drawing context.
-    var drawContext = null;   
+    // Image layer.
+    var imageLayer = null;
     
+    // Draw layer.
+    var drawLayer = null;
+
     // Tool box.
     var toolBox = new ToolBox(this);
     
     // Style.
     var style = new Style();
     
-
     // Get the image details.
     this.getImage = function() { return image; };
     
@@ -36,16 +29,22 @@ function DwvApp()
     this.getToolBox = function() { return toolBox; };
 
     // Get the image canvas.
-    this.getImageCanvas = function() { return imageCanvas; };
+    this.getImageLayer = function() { return imageLayer; };
+
+    // Get the image canvas.
+    this.getDrawLayer = function() { return drawLayer; };
+
+    // Get the image canvas.
+    this.getImageCanvas = function() { return imageLayer.getCanvas(); };
 
     // Get the image context.
-    this.getImageContext = function() { return imageContext; };
+    this.getImageContext = function() { return imageLayer.getContext(); };
 
     // Get the drawing canvas.
-    this.getDrawCanvas = function() { return drawCanvas; };
+    this.getDrawCanvas = function() { return drawLayer.getCanvas(); };
 
     // Get the drawing context.
-    this.getDrawContext = function() { return drawContext; };
+    this.getDrawContext = function() { return drawLayer.getContext(); };
 
     // Get the drawing context.
     this.getStyle = function() { return style; };
@@ -66,72 +65,13 @@ function DwvApp()
     
     /**
      * @private
-     */
-    function initCanvas()
-    {
-        // Find the canvas element.
-        imageCanvas = document.getElementById('imageLayer');
-        if (!imageCanvas)
-        {
-            alert('Error: I cannot find the canvas element!');
-            return;
-        }
-
-        if (!imageCanvas.getContext)
-        {
-            alert('Error: no canvas.getContext!');
-            return;
-        }
-
-        // Get the 2D canvas context.
-        imageContext = imageCanvas.getContext('2d');
-        if (!imageContext)
-        {
-            alert('Error: failed to getContext!');
-            return;
-        }
-
-        imageCanvas.width = image.getSize()[0];
-        imageCanvas.height = image.getSize()[1];
-
-        // Find the canvas element.
-        drawCanvas = document.getElementById('drawLayer');
-        if (!drawCanvas)
-        {
-            alert('Error: I cannot find the canvas element!');
-            return;
-        }
-
-        if (!drawCanvas.getContext)
-        {
-            alert('Error: no canvas.getContext!');
-            return;
-        }
-
-        // Get the 2D canvas context.
-        drawContext = drawCanvas.getContext('2d');
-        if (!drawContext)
-        {
-            alert('Error: failed to getContext!');
-            return;
-        }
-
-        drawCanvas.width = image.getSize()[0];
-        drawCanvas.height = image.getSize()[1];
-    }
-    
-    /**
-     * @private
      * This function draws the #imageDraw canvas on top of #imageView,
      * after which #imageDraw is cleared. This function is called each time when the
      * user completes a drawing operation.
      */
     this.updateContext = function() 
     {
-    	self.getImageContext().drawImage(self.getDrawCanvas(), 0, 0);
-    	self.getDrawContext().clearRect(0, 0, 
-    			self.getDrawCanvas().width, 
-    			self.getDrawCanvas().height);
+    	self.getImageLayer().merge(self.getDrawLayer());
     };
 
     /**
@@ -277,19 +217,23 @@ function DwvApp()
             dicomParser.pixelBuffer );
         image.setLookup( windowCenter, windowWidth, rescaleSlope, rescaleIntercept);
         
-        initCanvas();
+        imageLayer = new Layer("imageLayer");
+        imageLayer.init(image.getSize()[0], image.getSize()[1]);
         
-        imageContext.fillRect( 0, 0, image.getSize()[0], image.getSize()[1] );    
+        drawLayer = new Layer("drawLayer");
+        drawLayer.init(image.getSize()[0], image.getSize()[1]);
+        
+        imageLayer.getContext().fillRect( 0, 0, image.getSize()[0], image.getSize()[1] );    
         self.generateImage();        
         
         toolBox.init();
         
         // Attach the mousedown, mousemove and mouseup event listeners.
-        drawCanvas.addEventListener('mousedown', evenHandler, false);
-        drawCanvas.addEventListener('mousemove', evenHandler, false);
-        drawCanvas.addEventListener('mouseup', evenHandler, false);
-        drawCanvas.addEventListener('mousewheel', evenHandler, false);
-        drawCanvas.addEventListener('DOMMouseScroll', evenHandler, false);
+        drawLayer.getCanvas().addEventListener('mousedown', evenHandler, false);
+        drawLayer.getCanvas().addEventListener('mousemove', evenHandler, false);
+        drawLayer.getCanvas().addEventListener('mouseup', evenHandler, false);
+        drawLayer.getCanvas().addEventListener('mousewheel', evenHandler, false);
+        drawLayer.getCanvas().addEventListener('DOMMouseScroll', evenHandler, false);
         
         window.addEventListener('keydown', evenHandler, true);
     }
