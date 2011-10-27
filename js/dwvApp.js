@@ -16,6 +16,8 @@ function DwvApp()
     var drawLayer = null;
     // Temporary layer.
     var tempLayer = null;
+    // Information layer.
+    var infoLayer = null;
 
     // Tool box.
     var toolBox = new ToolBox(this);
@@ -38,6 +40,8 @@ function DwvApp()
     this.getDrawLayer = function() { return drawLayer; };
     // Get the temporary layer.
     this.getTempLayer = function() { return tempLayer; };
+    // Get the information layer.
+    this.getInfoLayer = function() { return infoLayer; };
 
     // Get the drawing context.
     this.getStyle = function() { return style; };
@@ -238,6 +242,9 @@ function DwvApp()
         // temp layer
         tempLayer = new Layer("tempLayer");
         tempLayer.init(image.getSize()[0], image.getSize()[1]);
+        // info layer
+        infoLayer = new Layer("infoLayer");
+        infoLayer.init(image.getSize()[0], image.getSize()[1]);
         
         self.generateImage();        
         

@@ -88,7 +88,7 @@ tool.WindowLevel.prototype.clearHtml = function()
 
 function showHUvalue(x,y)
 {
-	var context = app.getTempLayer().getContext();
+	var context = app.getInfoLayer().getContext();
     var style = app.getStyle();
 
     // style
@@ -109,8 +109,8 @@ function showHUvalue(x,y)
 
 function showWindowingValue(windowCenter,windowWidth)
 {
-	var canvas = app.getTempLayer().getCanvas();
-	var context = app.getTempLayer().getContext();
+	var canvas = app.getInfoLayer().getCanvas();
+	var context = app.getInfoLayer().getContext();
     var style = app.getStyle();
 	
 	// style

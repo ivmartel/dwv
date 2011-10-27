@@ -37,16 +37,9 @@ h1 { color: #fff; margin: 10px; padding: 10px; }
 #imageLayer { 
     border: 1px solid #000;
 }
-#drawLayer {
-    position: absolute; 
-    top: 1px; 
-    left: 1px;
-}
-#tempLayer {
-    position: absolute; 
-    top: 1px; 
-    left: 1px;
-}
+#drawLayer { position: absolute; top: 1px; left: 1px; }
+#tempLayer { position: absolute; top: 1px; left: 1px; }
+#infoLayer { position: absolute; top: 1px; left: 1px; }
 
 /* tag list */
 table.tagList { border-collapse:collapse; }
