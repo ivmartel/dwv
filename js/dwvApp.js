@@ -75,11 +75,11 @@ function DwvApp()
      */
     this.handleKeyDown = function(event)
     {
-    	if( event.keyCode == 85 ) // u
+    	if( event.keyCode == 90 && event.ctrlKey ) // crtl-z
 		{
     		self.getUndoStack().undo();
 		}
-    	else if( event.keyCode == 82 ) // r
+    	else if( event.keyCode == 89 && event.ctrlKey ) // crtl-y
 		{
     		self.getUndoStack().redo();
 		}
