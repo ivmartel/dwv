@@ -14,14 +14,14 @@ a { color: #ddf; }
     position: absolute;
     width: 200px;
     padding: 10px;
-    margin: 10px;
+    margin: 20px;
     border: 1px solid white;
 }
 
 #container { 
     overflow: auto; 
     position: relative; 
-    margin: 10px 10px 10px 250px;
+    margin: 10px 10px 10px 260px;
     padding: 0px; 
     height: 580px; 
     float: left; 
