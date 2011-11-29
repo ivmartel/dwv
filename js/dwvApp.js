@@ -149,7 +149,7 @@ function DwvApp()
                 parseAndLoadDicom(e.target.result);
                 var span = document.createElement('div');
                 span.innerHTML = ['<p><b>', e.target.result.length, '</b></p>'].join('');
-                document.getElementById('tagSearch').insertBefore(span, null);
+                document.getElementById('tagList').insertBefore(span, null);
             };
         }();
         myreader.readAsBinaryString(file);
