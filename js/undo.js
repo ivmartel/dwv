@@ -68,8 +68,8 @@ function insertOption(command)
 {
 	var elSel = document.getElementById('history_list');
 	var elOptNew = document.createElement('option');
-	elOptNew.text = command.getName();
-	elOptNew.value = "h";
+	elOptNew.text = "command";
+	elOptNew.value = "command";
 	var elOptOld = elSel.options[elSel.selectedIndex];  
 	try {
 	  elSel.add(elOptNew, elOptOld); // standards compliant; doesn't work in IE
