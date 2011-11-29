@@ -19,6 +19,8 @@ function UndoStack(app)
 		stack = stack.slice(0,curCmd);
 		// store command
 		stack[curCmd++] = cmd;
+		// add to display
+		insertOption(cmd);
 	};
 
 	/**
@@ -61,3 +63,38 @@ function UndoStack(app)
 	};
 
 } // UndoStack class
+
+function insertOption(command)
+{
+	var elSel = document.getElementById('history_list');
+	var elOptNew = document.createElement('option');
+	elOptNew.text = command.getName();
+	elOptNew.value = "h";
+	var elOptOld = elSel.options[elSel.selectedIndex];  
+	try {
+	  elSel.add(elOptNew, elOptOld); // standards compliant; doesn't work in IE
+	}
+	catch(ex) {
+	  elSel.add(elOptNew, elSel.selectedIndex); // IE only
+	}
+}
+
+function removeOption()
+{
+	var elSel = document.getElementById('history_list');
+	elSel.remove(elSel.length - 1);
+}
+
+UndoStack.prototype.appendHtml = function()
+{
+    var paragraph = document.createElement("p");  
+    paragraph.appendChild(document.createTextNode("History: "));
+    
+    var select = document.createElement("select");
+    select.id = "history_list";
+    select.name = "history_list";
+    select.multiple = "multiple";
+    paragraph.appendChild(select);
+
+    document.getElementById('history').appendChild(paragraph);
+};

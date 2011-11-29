@@ -75,6 +75,11 @@ DrawRectangleCommand = function(rectangle, app)
 	var lineColor = app.getStyle().getLineColor();
 	var context = app.getTempLayer().getContext();
 	
+    // Get the X position of the point.
+	var name = "";
+	this.setName = function(str) { name = str; };
+	this.getName = function() { return name; };
+
 	this.draw = function()
 	{
 		// style
