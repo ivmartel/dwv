@@ -39,7 +39,7 @@ tool.Circle = function(app)
 		// clear the temporary layer
         app.getTempLayer().clearContextRect();
         // draw
-        command.draw();
+        command.execute();
     };
 
     // This is called when you release the mouse button.
@@ -49,7 +49,7 @@ tool.Circle = function(app)
             // draw
         	self.mousemove(ev);
             // save command in undo stack
-        	app.getUndoStack().add(command.draw);
+        	app.getUndoStack().add(command);
             // set flag
         	self.started = false;
             // merge temporary layer
@@ -79,7 +79,13 @@ DrawCircleCommand = function(circle, app)
 	var lineColor = app.getStyle().getLineColor();
 	var context = app.getTempLayer().getContext();
 	
-	this.draw = function()
+    // command name
+	var name = "DrawCircleCommand";
+	this.setName = function(str) { name = str; };
+	this.getName = function() { return name; };
+
+	// main method
+	this.execute = function()
 	{
 		// style
 		context.fillStyle = lineColor;

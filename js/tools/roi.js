@@ -50,7 +50,7 @@ tool.Roi = function(app)
             context.stroke();
             // save command in undo stack
             var command = new DrawRoiCommand(roi, app);
-        	app.getUndoStack().add(command.draw);
+        	app.getUndoStack().add(command);
             // set flag
             self.started = false;
          	// merge temporary layer
@@ -81,7 +81,13 @@ DrawRoiCommand = function(roi, app)
 	var lineColor = app.getStyle().getLineColor();
 	var context = app.getTempLayer().getContext();
 	
-	this.draw = function()
+    // command name
+	var name = "DrawRoiCommand";
+	this.setName = function(str) { name = str; };
+	this.getName = function() { return name; };
+
+	// main method
+	this.execute = function()
 	{
 		// style
 		context.fillStyle = lineColor;

@@ -28,14 +28,14 @@ tool.Rect = function(app)
     	{
         	return;
     	}
-        // create line
-        var line = new Rectangle(beginPoint, endPoint);
+        // create rectangle
+        var rect = new Rectangle(beginPoint, endPoint);
         // create draw command
-        command = new DrawRectangleCommand(line, app);
+        command = new DrawRectangleCommand(rect, app);
         // clear the temporary layer
         app.getTempLayer().clearContextRect();
         // draw
-        command.draw();
+        command.execute();
     };
 
     // This is called when you release the mouse button.
@@ -45,7 +45,7 @@ tool.Rect = function(app)
             // draw
         	self.mousemove(ev);
             // save command in undo stack
-        	app.getUndoStack().add(command.draw);
+        	app.getUndoStack().add(command);
             // set flag
         	self.started = false;
             // merge temporary layer
@@ -75,12 +75,13 @@ DrawRectangleCommand = function(rectangle, app)
 	var lineColor = app.getStyle().getLineColor();
 	var context = app.getTempLayer().getContext();
 	
-    // Get the X position of the point.
-	var name = "";
+    // command name
+	var name = "DrawRectangleCommand";
 	this.setName = function(str) { name = str; };
 	this.getName = function() { return name; };
 
-	this.draw = function()
+	// main method
+	this.execute = function()
 	{
 		// style
 		context.fillStyle = lineColor;

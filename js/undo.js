@@ -20,7 +20,7 @@ function UndoStack(app)
 		// store command
 		stack[curCmd++] = cmd;
 		// add to display
-		insertOption(cmd);
+		addCommandToHistory(cmd);
 	};
 
 	/**
@@ -29,7 +29,7 @@ function UndoStack(app)
 	this.undo = function()
 	{ 
 		// not worth when drawing...
-		// stack[--curCmd]();
+		// stack[--curCmd].execute();
 		
 		// a bit inefficient...
 		if( curCmd > 0 )
@@ -42,10 +42,12 @@ function UndoStack(app)
 			curCmd--; 
 			for( var i = 0; i < curCmd; ++i)
 			{
-				stack[i](); 
+				stack[i].execute(); 
 			}
 			// merge the temporary layer
 			app.mergeTempLayer();
+			// remove last from history
+			removeOptionFromHistory();
 		}
 	}; 
 
@@ -56,33 +58,38 @@ function UndoStack(app)
 	{ 
 		if( curCmd < stack.length )
 		{
-			stack[curCmd++]();
+			var cmd = stack[curCmd++];
+			cmd.execute();
 			// merge the temporary layer
 			app.mergeTempLayer();
+			// add to display
+			addCommandToHistory(cmd);
 		}
 	};
 
 } // UndoStack class
 
-function insertOption(command)
+function addCommandToHistory(command)
 {
-	var elSel = document.getElementById('history_list');
-	var elOptNew = document.createElement('option');
-	elOptNew.text = "command";
-	elOptNew.value = "command";
-	var elOptOld = elSel.options[elSel.selectedIndex];  
-	try {
-	  elSel.add(elOptNew, elOptOld); // standards compliant; doesn't work in IE
+	var select = document.getElementById('history_list');
+	var newOption = document.createElement('option');
+	newOption.text = command.getName();
+	newOption.value = command.getName();
+	var oldOption = select.options[select.selectedIndex];  
+	try
+	{
+		select.add(newOption, oldOption); // standards compliant; doesn't work in IE
 	}
-	catch(ex) {
-	  elSel.add(elOptNew, elSel.selectedIndex); // IE only
+	catch(ex)
+	{
+		select.add(newOption, select.selectedIndex); // IE only
 	}
 }
 
-function removeOption()
+function removeOptionFromHistory()
 {
-	var elSel = document.getElementById('history_list');
-	elSel.remove(elSel.length - 1);
+	var select = document.getElementById('history_list');
+	select.remove(select.length - 1);
 }
 
 UndoStack.prototype.appendHtml = function()
