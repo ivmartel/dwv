@@ -19,8 +19,8 @@ function UndoStack(app)
 		stack = stack.slice(0,curCmd);
 		// store command
 		stack[curCmd++] = cmd;
-		// add to display
-		addCommandToHistory(cmd);
+		// add command to display history
+		addCommandToDisplayHistory(cmd);
 	};
 
 	/**
@@ -46,8 +46,8 @@ function UndoStack(app)
 			}
 			// merge the temporary layer
 			app.mergeTempLayer();
-			// remove last from history
-			removeOptionFromHistory();
+			// disable last in display history
+			enableInDisplayHistory(false);
 		}
 	}; 
 
@@ -62,34 +62,54 @@ function UndoStack(app)
 			cmd.execute();
 			// merge the temporary layer
 			app.mergeTempLayer();
-			// add to display
-			addCommandToHistory(cmd);
+			// enable next in display history
+			enableInDisplayHistory(true);
 		}
 	};
 
 } // UndoStack class
 
-function addCommandToHistory(command)
+function addCommandToDisplayHistory(command)
 {
 	var select = document.getElementById('history_list');
-	var newOption = document.createElement('option');
-	newOption.text = command.getName();
-	newOption.value = command.getName();
-	var oldOption = select.options[select.selectedIndex];  
-	try
+	// remove undone commands
+	var count = select.length - (select.selectedIndex+1);
+	if( count > 0 )
 	{
-		select.add(newOption, oldOption); // standards compliant; doesn't work in IE
+		for( var i = 0; i < count; ++i)
+		{
+			select.remove(select.length-1);
+		}
 	}
-	catch(ex)
-	{
-		select.add(newOption, select.selectedIndex); // IE only
-	}
+	// add new option
+	var option = document.createElement('option');
+	option.text = command.getName();
+	option.value = command.getName();
+	select.add(option);
+	// increment selected index
+	select.selectedIndex++;
 }
 
-function removeOptionFromHistory()
+function enableInDisplayHistory(enable)
 {
 	var select = document.getElementById('history_list');
-	select.remove(select.length - 1);
+	// enable or not (order is important)
+	if( enable ) 
+	{
+		// increment selected index
+		select.selectedIndex++;
+		// enable option
+		var option = select.options[select.selectedIndex];
+		option.disabled = false;
+	}
+	else 
+	{
+		// disable option
+		var option = select.options[select.selectedIndex];
+		option.disabled = true;
+		// decrement selected index
+		select.selectedIndex--;
+	}
 }
 
 UndoStack.prototype.appendHtml = function()
