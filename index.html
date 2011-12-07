@@ -4,10 +4,14 @@
 <title>DICOM Web Viewer</title>
 <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
 <link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/ui-darkness/jquery-ui-1.8.16.custom.css">
 </head>
 
 <body>
-     
+<!-- Third party -->
+<script type="text/javascript" src="js/jquery/jquery-1.6.2.min.js"></script>
+<script type="text/javascript" src="js/jquery/jquery-ui-1.8.16.custom.min.js"></script>
+<!-- Local -->
 <script type="text/javascript" src="js/reader/LocalFileReader.js"></script>
 <script type="text/javascript" src="js/dicom/DicomInputStreamReader.js"></script>
 <script type="text/javascript" src="js/dicom/DicomElement.js"></script>
@@ -30,33 +34,54 @@
 
 <script type="text/javascript"><!--
 
+    function toggle(dialogName)
+    {
+        if( $(dialogName).dialog('isOpen') )
+        {
+            $(dialogName).dialog('close');
+        }
+        else
+        {
+            $(dialogName).dialog('open');
+        }
+    }
+    
     // main application
     var app = new DwvApp();
+    
+    // jquery
+    $(document).ready(function(){
+        $("button").button();
+        $("#toolbox").dialog({ position: [10,120] });
+        $("#history").dialog({ position: [10,310] });
+        $("#openFile").dialog({ position: ['right',110] });
+        $("#tags").dialog({ position: ['right',300], autoOpen: false });
+    });
     
 --></script>
 
 <!-- Header -->
 <h1>DICOM Web Viewer (<a href="https://github.com/ivmartel/dwv">dwv</a>)</h1>
 
-<!-- Left -->
-<div id="left">
+<button onclick="toggle('#toolbox')">Toolbox</button>
+<button onclick="toggle('#history')">History</button>
+<button onclick="toggle('#openFile')">Open File</button>
+<button onclick="toggle('#tags')">Tags</button>
 
-<!-- toolbox -->
-<div id="toolbox"></div>
+<!-- Toolbox -->
+<div id="toolbox" title="Toolbox">
+<!-- tool chooser -->
 <script type="text/javascript">app.getToolBox().appendHtml();</script>
-
-<!-- displayed when drawing -->
+<!-- colour chooser: displayed when drawing -->
 <div id="colourChooser"></div>
-
-<!-- displayed when window/level -->
+<!-- w/l presets: displayed when window/level -->
 <div id="presetSelector"></div>
-
-<!-- history -->
-<div id="history"></div>
-<script type="text/javascript">app.getUndoStack().appendHtml();</script>
-
 </div>
-<!-- Left [end] -->
+
+<!-- History -->
+<div id="history" title="History">
+<script type="text/javascript">app.getUndoStack().appendHtml();</script>
+</div>
 
 <!-- Container -->
 <div id="container">
@@ -67,21 +92,19 @@
 </div>
 <!-- Container [end] -->
 
-<!-- Right -->
-<div id="right">
-
-<!-- input file -->
+<!-- Open file -->
+<div id="openFile" title="Open File">
 <p><form>
 Path: <input type="file" id="files" name="files[]" multiple />
 </form></p>
+</div>
 
 <script type="text/javascript">
     document.getElementById('files').addEventListener('change', app.loadDicom, false);
 </script>
 
 <!-- tags -->
-<div id="tags" style="display:none;">
-
+<div id="tags" title="Tags" style="display:none;">
 <table id="tagList" class="tagList">
 <tr>
 <th>Tag</th>
@@ -89,11 +112,7 @@ Path: <input type="file" id="files" name="files[]" multiple />
 <th>Value</th>
 </tr>
 </table>
-
 </div>
-
-</div>
-<!-- Right [end] -->
 
 </body>
 </html>
