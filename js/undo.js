@@ -115,7 +115,8 @@ function enableInDisplayHistory(enable)
 UndoStack.prototype.appendHtml = function()
 {
     var paragraph = document.createElement("p");  
-    paragraph.appendChild(document.createTextNode("History: "));
+    paragraph.appendChild(document.createTextNode("History:"));
+    paragraph.appendChild(document.createElement("br"));
     
     var select = document.createElement("select");
     select.id = "history_list";
