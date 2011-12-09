@@ -10,6 +10,10 @@ function DwvApp()
 	// Image details.
     var image = null;
     
+    var imageData = null;
+    // Get the image details.
+    this.getImageData = function() { return imageData; };
+    
     // Image layer.
     var imageLayer = null;
     // Draw layer.
@@ -276,11 +280,13 @@ function DwvApp()
      */
     this.generateImage = function()
     {        
-        var imageData = self.getImageLayer().getContext().getImageData( 
+        var data = self.getImageLayer().getContext().getImageData( 
         		0, 0, 
         		self.getImage().getSize()[0], 
         		self.getImage().getSize()[1]); 
-        self.getImage().generateImageData( imageData );         
-        self.getImageLayer().getContext().putImageData(imageData, 0,0);
+        
+        if( imageData == null ) imageData = data;
+        self.getImage().generateImageData( data );         
+        self.getImageLayer().getContext().putImageData(data, 0,0);
     };
 }
