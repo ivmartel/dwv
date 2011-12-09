@@ -13,7 +13,7 @@ a { color: #ddf; }
 #layerContainer { 
     overflow: auto; 
     position: relative; 
-    margin: 10px 10px 10px 260px;
+    margin: 20px 10px 10px 330px;
     padding: 0px; 
     height: 580px; 
     float: left; 

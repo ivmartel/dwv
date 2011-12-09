@@ -53,10 +53,10 @@
     $(document).ready(function(){
         // create buttons and dialogs
         $("button").button();
-        $("#toolbox").dialog({ position: [10,120] });
-        $("#history").dialog({ position: [10,310] });
-        $("#openFile").dialog({ position: ['right',110] });
-        $("#tags").dialog({ position: ['right',300], autoOpen: false });
+        $("#openFile").dialog({ "position": [10, 110] });
+        $("#toolbox").dialog({ position: [10, 280] });
+        $("#history").dialog({ position: [10, 450] });
+        $("#tags").dialog({ position: ['right', 110], autoOpen: false });
         
         // initialise the application
         app.init();
@@ -68,9 +68,9 @@
 <h1>DICOM Web Viewer (<a href="https://github.com/ivmartel/dwv">dwv</a>)</h1>
 
 <!-- Buttons -->
+<button onclick="toggle('#openFile')">Open File</button>
 <button onclick="toggle('#toolbox')">Toolbox</button>
 <button onclick="toggle('#history')">History</button>
-<button onclick="toggle('#openFile')">Open File</button>
 <button onclick="toggle('#tags')">Tags</button>
 
 <!-- Open file -->
