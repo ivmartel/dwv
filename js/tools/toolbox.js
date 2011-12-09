@@ -105,5 +105,5 @@ ToolBox.prototype.appendHtml = function()
         selector.appendChild(option);
     }
 
-    document.getElementById('toolbox').appendChild(paragraph);
+    document.getElementById('toolChooser').appendChild(paragraph);
 };

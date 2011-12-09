@@ -51,46 +51,27 @@
     
     // jquery
     $(document).ready(function(){
+        // create buttons and dialogs
         $("button").button();
         $("#toolbox").dialog({ position: [10,120] });
         $("#history").dialog({ position: [10,310] });
         $("#openFile").dialog({ position: ['right',110] });
         $("#tags").dialog({ position: ['right',300], autoOpen: false });
+        
+        // initialise the application
+        app.init();
     });
     
 --></script>
 
-<!-- Header -->
+<!-- Title -->
 <h1>DICOM Web Viewer (<a href="https://github.com/ivmartel/dwv">dwv</a>)</h1>
 
+<!-- Buttons -->
 <button onclick="toggle('#toolbox')">Toolbox</button>
 <button onclick="toggle('#history')">History</button>
 <button onclick="toggle('#openFile')">Open File</button>
 <button onclick="toggle('#tags')">Tags</button>
-
-<!-- Toolbox -->
-<div id="toolbox" title="Toolbox">
-<!-- tool chooser -->
-<script type="text/javascript">app.getToolBox().appendHtml();</script>
-<!-- colour chooser: displayed when drawing -->
-<div id="colourChooser"></div>
-<!-- w/l presets: displayed when window/level -->
-<div id="presetSelector"></div>
-</div>
-
-<!-- History -->
-<div id="history" title="History">
-<script type="text/javascript">app.getUndoStack().appendHtml();</script>
-</div>
-
-<!-- Container -->
-<div id="container">
-<canvas id="imageLayer" width="512" height="512"></canvas>
-<canvas id="drawLayer" width="512" height="512"></canvas>
-<canvas id="infoLayer" width="512" height="512"></canvas>
-<canvas id="tempLayer" width="512" height="512"></canvas>
-</div>
-<!-- Container [end] -->
 
 <!-- Open file -->
 <div id="openFile" title="Open File">
@@ -99,11 +80,20 @@ Path: <input type="file" id="files" name="files[]" multiple />
 </form></p>
 </div>
 
-<script type="text/javascript">
-    document.getElementById('files').addEventListener('change', app.loadDicom, false);
-</script>
+<!-- Toolbox -->
+<div id="toolbox" title="Toolbox">
+<!-- tool chooser -->
+<div id="toolChooser"></div>
+<!-- colour chooser: displayed when drawing -->
+<div id="colourChooser"></div>
+<!-- w/l presets: displayed when window/level -->
+<div id="presetSelector"></div>
+</div>
 
-<!-- tags -->
+<!-- History -->
+<div id="history" title="History"></div>
+
+<!-- Tags -->
 <div id="tags" title="Tags" style="display:none;">
 <table id="tagList" class="tagList">
 <tr>
@@ -112,6 +102,14 @@ Path: <input type="file" id="files" name="files[]" multiple />
 <th>Value</th>
 </tr>
 </table>
+</div>
+
+<!-- Layer Container -->
+<div id="layerContainer">
+<canvas id="imageLayer" width="512" height="512"></canvas>
+<canvas id="drawLayer" width="512" height="512"></canvas>
+<canvas id="infoLayer" width="512" height="512"></canvas>
+<canvas id="tempLayer" width="512" height="512"></canvas>
 </div>
 
 </body>

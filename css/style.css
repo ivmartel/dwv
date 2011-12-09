@@ -9,16 +9,8 @@ body {
 h1 { color: #fff; margin: 10px; padding: 10px; }
 a { color: #ddf; }
 
-/* layout */
-#left {
-    position: absolute;
-    width: 200px;
-    padding: 10px;
-    margin: 20px;
-    border: 1px solid white;
-}
-
-#container { 
+/* Layers */
+#layerContainer { 
     overflow: auto; 
     position: relative; 
     margin: 10px 10px 10px 260px;
@@ -27,24 +19,17 @@ a { color: #ddf; }
     float: left; 
 }
 
-#right { 
-    margin: 10px; 
-    padding: 10px; 
-    float: left; 
-    border: 1px solid white;
-}
-
 #imageLayer { border: 1px solid white; }
 #drawLayer { position: absolute; top: 1px; left: 1px; }
 #tempLayer { position: absolute; top: 1px; left: 1px; }
 #infoLayer { position: absolute; top: 1px; left: 1px; }
 
-/* tag list */
+/* Tag list */
 table.tagList { border-collapse:collapse; }
 table.tagList th { border: 1px solid black; }
 table.tagList td { border: 1px solid black; }
 
-/* colourChooser */
+/* Colour chooser */
 table.colourChooser td { width:20px; height:20px; border:#fff solid 2px; }
 table.colourChooser #black { background: black; }
 table.colourChooser #white { background: white; }
@@ -54,4 +39,3 @@ table.colourChooser #blue { background: blue; }
 table.colourChooser #yellow { background: yellow; }
 table.colourChooser #lime { background: lime; }
 table.colourChooser #fuchsia { background:fuchsia; }
-

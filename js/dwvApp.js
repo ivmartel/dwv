@@ -50,7 +50,19 @@ function DwvApp()
     this.getUndoStack = function() { return undoStack; };
 
     /**
-     * @private
+     * Initialise the HTML for the application.
+     */
+    this.init = function()
+    {
+    	// add the HTML for the tool box 
+    	toolBox.appendHtml();
+    	// add the HTML for the history 
+    	undoStack.appendHtml();
+    	// bind open files with method
+    	document.getElementById('files').addEventListener('change', this.loadDicom, false);
+    };
+    
+    /**
      * @param event
      */
     this.setLineColor = function(event)
@@ -64,7 +76,6 @@ function DwvApp()
     };
     
     /**
-     * @private
      * This function draws the #imageDraw canvas on top of #imageView,
      * after which #imageDraw is cleared. This function is called each time when the
      * user completes a drawing operation.
