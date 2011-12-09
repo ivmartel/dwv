@@ -3,10 +3,10 @@ body {
     color: white;
     font-family: Verdana, Arial, Helvetica, sans-serif ;
     font-size: 80%;
-    margin: 0px;
+    margin: 10px;
     padding: 0px;
 }
-h1 { color: #fff; margin: 10px; padding: 10px; }
+h1 { color: #fff; }
 a { color: #ddf; }
 
 /* Layers */
