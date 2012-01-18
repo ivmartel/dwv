@@ -17,7 +17,7 @@ tool.draw.appendColourChooserHtml = function(app)
     table.name = "colourChooser";
     table.className = "colourChooser";
     
-    var row = table.insertRow();
+    var row = table.insertRow(-1);
     row.id = "colours";
     row.onmouseover = tool.draw.onMouseOver;
     row.onmouseout = tool.draw.onMouseOut;
