@@ -111,27 +111,20 @@ function DwvApp()
      */
     function evenHandler(event)
     {
-    	// if mouse envent, chekc that it is in the canvas
+    	// if mouse event, check that it is in the canvas
     	if( event.type = MouseEvent )
 		{
-	    	if (event.layerX || event.layerX == 0)
-	        { 
-	            // Firefox
-	            event._x = event.layerX;
-	            event._y = event.layerY;
-	        }
-	        else if (event.offsetX || event.offsetX == 0)
-	        {
-	            // Opera
-	            event._x = event.offsetX;
-	            event._y = event.offsetY;
-	        }
-	
+	    	// set event._x and event._y to be used later
+    		// layerX is for firefox
+    		event._x = event.offsetX == undefined ? event.layerX : event.offsetX;
+    		event._y = event.offsetY == undefined ? event.layerY : event.offsetY;
+    		
 	        if(event._x < 0 
 	            || event._y < 0 
 	            || event._x >= image.getSize()[0] 
 	            || event._y >= image.getSize()[1] )
 	        {
+	        	// exit
 	        	return;
 	        }
         }
