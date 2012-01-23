@@ -58,6 +58,9 @@
         $("#history").dialog({ position: [10, 450] });
         $("#tags").dialog({ position: ['right', 110], autoOpen: false });
         
+        $("#layerContainer").dialog({ position: [340, 110], 
+            width: [550], height: [570] });
+        
         // initialise the application
         app.init();
     });
@@ -72,6 +75,7 @@
 <button onclick="toggle('#toolbox')">Toolbox</button>
 <button onclick="toggle('#history')">History</button>
 <button onclick="toggle('#tags')">Tags</button>
+<button onclick="toggle('#layerContainer')">Image</button>
 
 <!-- Open file -->
 <div id="openFile" title="Open File">
@@ -105,7 +109,7 @@ Path: <input type="file" id="files" name="files[]" multiple />
 </div>
 
 <!-- Layer Container -->
-<div id="layerContainer">
+<div id="layerContainer" title="Image">
 <canvas id="imageLayer" width="512" height="512"></canvas>
 <canvas id="drawLayer" width="512" height="512"></canvas>
 <canvas id="infoLayer" width="512" height="512"></canvas>
