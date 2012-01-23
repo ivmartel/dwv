@@ -1,6 +1,7 @@
 /**
- * 
- */
+* zoom.js
+* Simple implementation of an image zoom.
+*/
 var canvas = document.getElementById("canvas");
 var context = canvas.getContext("2d");
 var totalZoom = 1;
