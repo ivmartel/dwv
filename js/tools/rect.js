@@ -91,8 +91,8 @@ DrawRectangleCommand = function(rectangle, app)
         context.strokeRect( 
         		rectangle.getBegin().getX(), 
         		rectangle.getBegin().getY(),
-        		rectangle.getWidth(),
-        		rectangle.getHeight() );
+        		rectangle.getRealWidth(),
+        		rectangle.getRealHeight() );
 		// length
         var surf = rectangle.getWorldSurface( 
         	app.getImage().getSpacing()[0], 

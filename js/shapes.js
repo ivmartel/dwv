@@ -86,10 +86,14 @@ Rectangle = function(begin, end)
 	this.getBegin = function() { return begin; };
 	// Get the end point of the rectangle.
 	this.getEnd = function() { return end; };
+	// Get the real width of the rectangle.
+	this.getRealWidth = function() { return end.getX() - begin.getX(); };
+	// Get the real height of the rectangle.
+	this.getRealHeight = function() { return end.getY() - begin.getY(); };
 	// Get the width of the rectangle.
-	this.getWidth = function() { return Math.abs(end.getX() - begin.getX()); };
+	this.getWidth = function() { return Math.abs(this.getRealWidth()); };
 	// Get the height of the rectangle.
-	this.getHeight = function() { return Math.abs(end.getY() - begin.getY()); };
+	this.getHeight = function() { return Math.abs(this.getRealHeight()); };
 	// Get the surface of the rectangle.
 	this.getSurface = function() { return surface; };
     // Get the surface of the rectangle with a spacing.
