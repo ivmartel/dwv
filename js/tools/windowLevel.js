@@ -90,6 +90,7 @@ function showHUvalue(x,y)
 {
 	var context = app.getInfoLayer().getContext();
     var style = app.getStyle();
+    var border = 3;
 
     // style
     context.clearRect(0, 0, 150, 150);
@@ -99,12 +100,12 @@ function showHUvalue(x,y)
     context.textAlign = "left";
     
     // text
-    context.fillText("X = "+x, 0, 0);
-    context.fillText("Y = "+y, 0, style.getLineHeight());
+    context.fillText("X = "+x, border, border);
+    context.fillText("Y = "+y, border, border + style.getLineHeight());
     context.fillText(
     		"HU = "+app.getImage().getValue(x,y), 
-    		0, 
-    		2*style.getLineHeight());
+    		border, 
+    		border + 2*style.getLineHeight());
 }
 
 function showWindowingValue(windowCenter,windowWidth)
@@ -112,6 +113,7 @@ function showWindowingValue(windowCenter,windowWidth)
 	var canvas = app.getInfoLayer().getCanvas();
 	var context = app.getInfoLayer().getContext();
     var style = app.getStyle();
+    var border = 3;
 	
 	// style
     context.clearRect(canvas.width-150, 0, canvas.width, 150);
@@ -121,8 +123,8 @@ function showWindowingValue(windowCenter,windowWidth)
     context.textAlign = "right";
     
     // text
-    context.fillText("WindowCenter = "+windowCenter, canvas.width, 0);
-    context.fillText("WindowWidth = "+windowWidth, canvas.width, style.getLineHeight());
+    context.fillText("WindowCenter = "+windowCenter, canvas.width - border, border);
+    context.fillText("WindowWidth = "+windowWidth, canvas.width - border, border + style.getLineHeight());
 }
 
 function updateWindowingData(wc,ww)
