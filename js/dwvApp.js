@@ -72,7 +72,7 @@ function DwvApp()
     this.setLineColor = function(event)
     {
         // get the color
-    	var color = event.srcElement.id;
+    	var color = event.target.id;
     	// set style var
         self.getStyle().setLineColor(color);
         // reset borders
