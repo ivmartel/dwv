@@ -2,7 +2,7 @@
 * zoom.js
 * Simple implementation of an image zoom.
 */
-var canvas = document.getElementById("canvas");
+var canvas = document.getElementById("image");
 var context = canvas.getContext("2d");
 var totalZoom = 1;
 var originX0 = 0;
@@ -13,12 +13,20 @@ var mouseDownX = 0;
 var mouseDownY = 0;
 var isDragging = false;
 
+var originX1 = 0;
+var originY1 = 0;
+var width1 = 0;
+var height1 = 0;
+var zoom1 = 0;
+
 var img = new Image();
 img.onload = function() {
     originX = canvas.width/2 - img.width/2;
     originY = canvas.height/2 - img.height/2;
     originX0 = originX;
     originY0 = originY;
+    originX1 = originX;
+    originY1 = originY;
     drawImage();
     drawGrid();
 };
@@ -62,13 +70,50 @@ function drawGrid() {
 };
 
 function drawImage() {
-    // clear whole rect
-    context.clearRect(0, 0, 800, 600);
     // adapt to zoom
-    var width = img.width/totalZoom;
-    var height = img.height/totalZoom;
+    var newWidth = img.width/totalZoom;
+    var newHeight = img.height/totalZoom;
+    width1 = newWidth*zoom1;
+    height1 = newHeight*zoom1;
     // draw
-    context.drawImage(img, originX, originY, width, height);
+    if( totalZoom == 1 )
+    {
+        // clear whole rect
+        context.clearRect(0, 0, 800, 600);
+    	// draw
+        context.drawImage(img, originX, originY, newWidth, newHeight);
+    }
+    else
+    {
+        // get the image data before clearing
+        var imageData = context.getImageData(originX1, originY1, width1, height1);
+        // clear whole rect
+        context.clearRect(0, 0, 800, 600);
+    	
+        var tempCanvas = document.createElement("canvas");
+    	tempCanvas.width = width1;
+    	tempCanvas.height = height1;
+    	tempCanvas.getContext("2d").putImageData(imageData, 0, 0);
+
+    	//context.clearRect(0, 0, canvas.width, canvas.height);
+    	context.scale(zoom1,zoom1);
+    	context.drawImage(tempCanvas, originX, originY);
+    	context.restore();
+    	
+    	//tempCanvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
+    }
+    
+    // add info
+    var infoDiv = document.getElementById("info");
+    infoDiv.innerHTML = "";
+    var text = document.createTextNode(
+    		"origin 0: ("+Math.round(originX0)+","+Math.round(originY0)+")"
+    		+", origin: ("+Math.round(originX)+","+Math.round(originY)+")"
+    		+", image width: ("+Math.round(img.width)+","+Math.round(img.height)+")"
+    		+", image width: ("+Math.round(width1)+","+Math.round(height1)+")"
+    		+", image width: ("+Math.round(newWidth)+","+Math.round(newHeight)+")"
+    		+", zoom: "+totalZoom);
+    infoDiv.appendChild(text);
 };
 
 canvas.onmousedown = function(event) {
@@ -122,7 +167,7 @@ canvas.onmousewheel = function(event) {
     var mouseX = event.clientX - canvas.offsetLeft;
     var mouseY = event.clientY - canvas.offsetTop;
     // get mouse wheel
-    var wheel = event.wheelDelta/120;//n or -n
+    var wheel = event.wheelDelta/1200;//n or -n
     // calculate zoom
     var zoom = 1 + wheel/2;
     // store new zoom
@@ -145,6 +190,10 @@ function zoomImage0(mouseX, mouseY, zoom) {
     // The zoom is the ratio between the differences from the center
     // to the origins:
     // centerX - originXnew = (centerX - originXold) / zoom
+    originX1 = originX;
+    originY1 = originY;
+    zoom1 = zoom;
+    
     originX = centerX - ((centerX - originX) / zoom);
     originY = centerY - ((centerY - originY) / zoom);
     

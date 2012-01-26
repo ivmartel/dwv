@@ -280,6 +280,8 @@ function DwvApp()
         
         if( imageData == null ) imageData = data;
         self.getImage().generateImageData( data );         
-        self.getImageLayer().getContext().putImageData(data, 0,0);
+        //self.getImageLayer().getContext().putImageData(data, 0,0);
+        self.getImageLayer().setImageData(data);
+        self.getImageLayer().draw();
     };
 }

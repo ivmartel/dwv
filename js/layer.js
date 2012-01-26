@@ -16,6 +16,60 @@ function Layer(name)
 	// Get the layer context
 	this.getContext = function() { return context; };
 
+	var imageData = null;
+	
+	var originX = 0;
+	var originY = 0;
+	var zoomX = 1;
+	var zoomY = 1;
+	var zoomCenterX = 0;
+	var zoomCenterY = 0;
+	
+	this.setZoom = function(zx,zy,cx,cy)
+	{
+		zoomX = zx;
+		zoomY = zy;
+		zoomCenterX = zx;
+		zoomCenterY = zy;
+	};
+	
+	// translation is according to the last one
+	this.setTranslate = function(tx,ty)
+	{
+		originX += tx;
+		originY += ty;
+	};
+	
+	this.setImageData = function(data)
+	{
+		imageData = data;
+	};
+	
+	this.draw = function()
+	{
+		// re-generate data if windowing has changed or de-zoom
+		
+		// clear the context
+		this.clearContextRect();
+		// The zoom is the ratio between the differences from the center
+		// to the origins:
+		originX = zoomCenterX - ((zoomCenterX - originX) / zoomX);
+		originY = zoomCenterY - ((zoomCenterY - originY) / zoomY);
+		// apply zoom
+		var width = canvas.width/zoomX;
+		var height = canvas.height/zoomX;
+		console.log("zoomX:"+zoomX);
+		// put the data in the context
+		if( zoomX == 1 )
+			context.putImageData(imageData,originX,originY);
+		else
+			context.scale(zoomX,zoomY);
+			context.drawImage(canvas,originX,originY,width,height);
+        
+		// restore base settings
+        context.restore();
+	};
+	
 	/**
 	 * Initialise the layer: set the canvas and context
 	 * @input width The width of the canvas.

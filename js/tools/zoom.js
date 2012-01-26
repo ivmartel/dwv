@@ -6,16 +6,16 @@ tool.Zoom = function(app)
 {
     var self = this;
     this.started = false;
-    this.panX = 0;
-    this.panY = 0;
-    this.zoomf = 1;
+    this.zoomX = 1;
+    this.zoomY = 1;
 
     // This is called when you start holding down the mouse button.
     this.mousedown = function(ev){
         self.started = true;
-        self.x0 = ev._x - self.panX;
-        self.y0 = ev._y - self.panY;
-    };
+        // first position
+        self.x0 = ev._x;
+        self.y0 = ev._y;
+     };
 
     // This function is called every time you move the mouse.
     this.mousemove = function(ev){
@@ -24,39 +24,35 @@ tool.Zoom = function(app)
             return;
         }
 
-        var context = app.getImageLayer().getContext();
-        
-        // get the image data
-        var imageData = app.getImageData();
-       
-        // translate the base context
-        app.getImageLayer().clearContextRect();
-        var tx = self.zoomf * (ev._x - self.x0);
-        var ty = self.zoomf * (ev._y - self.y0);
-        
-        self.panX = tx;
-        self.panY = ty;
-		
-        // put the draw canvas in the base context
-        context.putImageData(imageData, tx, ty);
+        // calculate translation
+        var tx = self.zoomX * (ev._x - self.x0);
+        var ty = self.zoomY * (ev._y - self.y0);
+        // apply translation
+        app.getImageLayer().setTranslate(tx,ty);
+        app.getImageLayer().draw();
+    	// reset origin point
+        self.x0 = ev._x;
+        self.y0 = ev._y;
     };
 
     // This is called when you release the mouse button.
     this.mouseup = function(ev){
         if (self.started)
         {
-            self.mousemove(ev);
+            // store the last move
+        	self.mousemove(ev);
+        	// stop recording
             self.started = false;
         }
     };
     
     // This is called when you use the mouse wheel.
     this.DOMMouseScroll = function(ev){
-        zoom(ev.detail,  ev._x, ev._y);
+        zoom(ev.detail, ev._x, ev._y);
     };
 
     this.mousewheel = function(ev){
-        zoom(ev.wheelDelta/40, ev._x, ev._y);
+        zoom(ev.wheelDelta/1200, ev._x, ev._y);
     };
     
     this.enable = function(value){
@@ -69,6 +65,7 @@ tool.Zoom = function(app)
 
     function zoom(step, cx, cy)
     {
+        /*
         var context = app.getImageLayer().getContext();
         var tempContext = app.getTempLayer().getContext();
         var tempCanvas = app.getTempLayer().getCanvas();
@@ -103,6 +100,14 @@ tool.Zoom = function(app)
         
         // restore base settings
         context.restore();
+        */
+    	
+    	var zoom = 1 + step/2;
+    	console.log("step:"+step)
+    	console.log("zoom:"+zoom)
+        // apply zoom
+        app.getImageLayer().setZoom(zoom,zoom,cx,cy);
+        app.getImageLayer().draw();
     }
 
 }; // Zoom function
