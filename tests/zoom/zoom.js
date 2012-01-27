@@ -4,30 +4,44 @@
 */
 var canvas = document.getElementById("image");
 var context = canvas.getContext("2d");
-var totalZoom = 1;
-var originX0 = 0;
-var originY0 = 0;
-var originX = 0;
-var originY = 0;
 var mouseDownX = 0;
 var mouseDownY = 0;
 var isDragging = false;
 
-var originX1 = 0;
-var originY1 = 0;
-var width1 = 0;
-var height1 = 0;
-var zoom1 = 0;
+var originX0 = 0;
+var originY0 = 0;
+var width0 = 0;
+var height0 = 0;
+
+var newOriginX = 0;
+var newOriginY = 0;
+var newWidth = 0;
+var newHeight = 0;
+var newZoom = 1;
+
+var oldOriginX = 0;
+var oldOriginY = 0;
+var oldWidth = 0;
+var oldHeight = 0;
+var oldZoom = 1;
 
 var img = new Image();
 img.onload = function() {
-    originX = canvas.width/2 - img.width/2;
-    originY = canvas.height/2 - img.height/2;
-    originX0 = originX;
-    originY0 = originY;
-    originX1 = originX;
-    originY1 = originY;
-    drawImage();
+    originX0 = canvas.width/2 - img.width/2;
+    originY0 = canvas.height/2 - img.height/2;
+    newOriginX = originX0;
+    newOriginY = originY0;
+    oldOriginX = originX0;
+    oldOriginY = originY0;
+    
+    width0 = img.width;
+    height0 = img.height;
+    newWidth = width0;
+    newHeight = height0;
+    oldWidth = width0;
+    oldHeight = height0;
+        
+    firstDrawImage();
     drawGrid();
 };
 
@@ -69,50 +83,73 @@ function drawGrid() {
     }
 };
 
-function drawImage() {
-    // adapt to zoom
-    var newWidth = img.width/totalZoom;
-    var newHeight = img.height/totalZoom;
-    width1 = newWidth*zoom1;
-    height1 = newHeight*zoom1;
-    // draw
-    if( totalZoom == 1 )
-    {
-        // clear whole rect
-        context.clearRect(0, 0, 800, 600);
-    	// draw
-        context.drawImage(img, originX, originY, newWidth, newHeight);
-    }
-    else
-    {
-        // get the image data before clearing
-        var imageData = context.getImageData(originX1, originY1, width1, height1);
-        // clear whole rect
-        context.clearRect(0, 0, 800, 600);
-    	
-        var tempCanvas = document.createElement("canvas");
-    	tempCanvas.width = width1;
-    	tempCanvas.height = height1;
-    	tempCanvas.getContext("2d").putImageData(imageData, 0, 0);
+function firstDrawImage() {
+    // clear whole rect
+    context.clearRect(0, 0, 800, 600);
+	// draw
+    context.drawImage(img, originX0, originY0, width0, height0);
+};
 
-    	//context.clearRect(0, 0, canvas.width, canvas.height);
-    	context.scale(zoom1,zoom1);
-    	context.drawImage(tempCanvas, originX, originY);
-    	context.restore();
-    	
-    	//tempCanvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
-    }
+// use the image as input to the draw image
+function drawImage0() {
+    // store old
+    oldWidth = newWidth;
+    oldHeight = newHeight;
+    // calculate new
+    newWidth = oldWidth*newZoom;
+    newHeight = oldHeight*newZoom;
     
-    // add info
+    // clear whole rect
+    context.clearRect(0, 0, 800, 600);
+	// draw
+    context.drawImage(img, newOriginX, newOriginY, newWidth, newHeight);
+    
+    // info paragraph
+    appendInfo();
+};
+
+// use the canvas as the input to the draw image
+function drawImage1() {
+    // store old
+    oldWidth = newWidth;
+    oldHeight = newHeight;
+    // calculate new
+    newWidth = oldWidth*newZoom;
+    newHeight = oldHeight*newZoom;
+    
+    // get the image data before clearing
+    var imageData = context.getImageData(oldOriginX, oldOriginY, oldWidth, oldHeight);
+    // clear whole rect
+    context.clearRect(0, 0, 800, 600);
+	
+    // store the image data in a temporary canvas
+    var tempCanvas = document.createElement("canvas");
+	tempCanvas.width = oldWidth;
+	tempCanvas.height = oldHeight;
+	tempCanvas.getContext("2d").putImageData(imageData, 0, 0);
+
+	/*context.scale(newZoom,newZoom);
+	context.drawImage(tempCanvas, newOriginX, newOriginY);
+	context.restore();*/
+    
+	context.drawImage(tempCanvas, newOriginX, newOriginY, newWidth, newHeight);
+    
+    // info paragraph
+    appendInfo();
+};
+
+function appendInfo() {
+	// add info
     var infoDiv = document.getElementById("info");
     infoDiv.innerHTML = "";
     var text = document.createTextNode(
     		"origin 0: ("+Math.round(originX0)+","+Math.round(originY0)+")"
-    		+", origin: ("+Math.round(originX)+","+Math.round(originY)+")"
-    		+", image width: ("+Math.round(img.width)+","+Math.round(img.height)+")"
-    		+", image width: ("+Math.round(width1)+","+Math.round(height1)+")"
-    		+", image width: ("+Math.round(newWidth)+","+Math.round(newHeight)+")"
-    		+", zoom: "+totalZoom);
+    		+", old origin: ("+Math.round(oldOriginX)+","+Math.round(oldOriginY)+")"
+    		+", new origin: ("+Math.round(newOriginX)+","+Math.round(newOriginY)+")"
+    		+", old image size: ("+Math.round(oldWidth)+","+Math.round(oldHeight)+")"
+    		+", new image size: ("+Math.round(newWidth)+","+Math.round(newHeight)+")"
+    		+", old zoom: "+oldZoom
+			+", new zoom: "+newZoom);
     infoDiv.appendChild(text);
 };
 
@@ -143,7 +180,7 @@ canvas.onmousemove = function(event) {
     // translate it
     context.translate(tx, ty);
     // draw in translated context
-    drawImage();
+    drawImage0();
     // restore context
     context.restore();
 };
@@ -157,9 +194,12 @@ canvas.onmouseup = function(event) {
     // calculate translation
     var tx = mouseX - mouseDownX;
     var ty = mouseY - mouseDownY;
-    // store new origin
-    originX += tx;
-    originY += ty;
+    // store old
+    oldOriginX = newOriginX;
+    oldOriginY = newOriginY;
+    // calculate new
+    newOriginX += tx;
+    newOriginY += ty;
 };
  
 canvas.onmousewheel = function(event) {
@@ -167,19 +207,15 @@ canvas.onmousewheel = function(event) {
     var mouseX = event.clientX - canvas.offsetLeft;
     var mouseY = event.clientY - canvas.offsetTop;
     // get mouse wheel
-    var wheel = event.wheelDelta/1200;//n or -n
+    var wheel = event.wheelDelta/120;//n or -n
     // calculate zoom
     var zoom = 1 + wheel/2;
-    // store new zoom
-    totalZoom *= zoom;
 
     // method using context.drawImage
-    zoomImage0(mouseX, mouseY, zoom);
-    // method using context.scale
-    //zoomImage1(totalZoom);
+    zoomImage(mouseX, mouseY, zoom);
 };
 
-function zoomImage0(mouseX, mouseY, zoom) {
+function zoomImage(mouseX, mouseY, zoom) {
     // zoom centered on mouse: 
     var centerX = mouseX;
     var centerY = mouseY;
@@ -187,39 +223,23 @@ function zoomImage0(mouseX, mouseY, zoom) {
     //var centerX = originX + ( (img.width / 2) * (zoom/totalZoom) );
     //var centerY = originY + ( (img.height / 2) * (zoom/totalZoom) );
     
+    // store old
+    oldOriginX = newOriginX;
+    oldOriginY = newOriginY;
+    oldZoom = newZoom;
+
+    // calculate new
+    
     // The zoom is the ratio between the differences from the center
     // to the origins:
-    // centerX - originXnew = (centerX - originXold) / zoom
-    originX1 = originX;
-    originY1 = originY;
-    zoom1 = zoom;
+    // centerX - originXnew = (centerX - originXold) * zoom
+    newOriginX = centerX - ((centerX - oldOriginX) * zoom);
+    newOriginY = centerY - ((centerY - oldOriginY) * zoom);
+    newZoom = zoom;
     
-    originX = centerX - ((centerX - originX) / zoom);
-    originY = centerY - ((centerY - originY) / zoom);
-    
-    // draw
-    drawImage();
-}
-
-function zoomImage1(level) {
-    // shift origin
-    //originX = originX/zoom;
-    //originY = originY/zoom;
-   
-    // save context
-    context.save();
-    // translate to zoom center
-    context.translate(originX, originY);
-    // scale context
-    context.scale(totalZoom, totalZoom);
-    // draw in modified context
-    drawImage();
-    // translate back
-    context.translate(originX*totalZoom, originY*totalZoom);
-    // restore context
-    context.restore();
-
-    // restore origin
-    originX = originX*zoom;
-    originY = originY*zoom;
+    // draw image from the image object
+    //drawImage0();
+    // draw image from the canvas object
+    // problem when un-zooming...
+    drawImage1();
 }

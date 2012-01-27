@@ -25,8 +25,8 @@ tool.Zoom = function(app)
         }
 
         // calculate translation
-        var tx = self.zoomX * (ev._x - self.x0);
-        var ty = self.zoomY * (ev._y - self.y0);
+        var tx = (ev._x - self.x0);
+        var ty = (ev._y - self.y0);
         // apply translation
         app.getImageLayer().setTranslate(tx,ty);
         app.getImageLayer().draw();
@@ -65,46 +65,7 @@ tool.Zoom = function(app)
 
     function zoom(step, cx, cy)
     {
-        /*
-        var context = app.getImageLayer().getContext();
-        var tempContext = app.getTempLayer().getContext();
-        var tempCanvas = app.getTempLayer().getCanvas();
-
-        // get the image data
-        var imageData = context.getImageData( 
-        		0, 0, 
-    			app.getImage().getSize()[0], 
-    			app.getImage().getSize()[1]); 
-        //var imageData = app.getImageData();
-       
-        // copy it to the temporary context
-        app.getTempLayer().clearContextRect();
-        tempContext.putImageData(imageData, 0, 0);
-        
-        // save base settings
-        context.save();
-
-        // translate the base context
-        app.getImageLayer().clearContextRect();
-        
-        var localZoom = Math.pow(1.1, step);
-        self.zoomf *= localZoom;
-        context.translate(cx, cy);
-        context.scale( localZoom, localZoom );
-        
-        // put the draw canvas in the base context
-        context.drawImage(tempCanvas, 0, 0);
-
-        context.translate(-cx*localZoom, -cy*localZoom);
-        
-        
-        // restore base settings
-        context.restore();
-        */
-    	
     	var zoom = 1 + step/2;
-    	console.log("step:"+step)
-    	console.log("zoom:"+zoom)
         // apply zoom
         app.getImageLayer().setZoom(zoom,zoom,cx,cy);
         app.getImageLayer().draw();

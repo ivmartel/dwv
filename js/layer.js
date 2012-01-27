@@ -24,13 +24,15 @@ function Layer(name)
 	var zoomY = 1;
 	var zoomCenterX = 0;
 	var zoomCenterY = 0;
+	var width = 0;
+	var height = 0;
 	
 	this.setZoom = function(zx,zy,cx,cy)
 	{
 		zoomX = zx;
 		zoomY = zy;
-		zoomCenterX = zx;
-		zoomCenterY = zy;
+		zoomCenterX = cx;
+		zoomCenterY = cy;
 	};
 	
 	// translation is according to the last one
@@ -45,29 +47,47 @@ function Layer(name)
 		imageData = data;
 	};
 	
-	this.draw = function()
-	{
-		// re-generate data if windowing has changed or de-zoom
-		
-		// clear the context
-		this.clearContextRect();
-		// The zoom is the ratio between the differences from the center
-		// to the origins:
-		originX = zoomCenterX - ((zoomCenterX - originX) / zoomX);
-		originY = zoomCenterY - ((zoomCenterY - originY) / zoomY);
-		// apply zoom
-		var width = canvas.width/zoomX;
-		var height = canvas.height/zoomX;
-		console.log("zoomX:"+zoomX);
-		// put the data in the context
-		if( zoomX == 1 )
-			context.putImageData(imageData,originX,originY);
-		else
-			context.scale(zoomX,zoomY);
-			context.drawImage(canvas,originX,originY,width,height);
+    this.draw = function()
+    {
+        // get the image data before clearing
+        var imageData2 = context.getImageData(originX, originY, width, height);
+        
+        // re-generate data if windowing has changed or de-zoom
+        //...
+        
+        // clear the context
+        this.clearContextRect();
+        
+        // put the data in the context
+        if( zoomX == 1 )
+        {
+            context.putImageData(imageData,originX,originY);
+        }
+        else
+        {
+            // The zoom is the ratio between the differences from the center
+            // to the origins:
+            originX = zoomCenterX - ((zoomCenterX - originX) / zoomX);
+            originY = zoomCenterY - ((zoomCenterY - originY) / zoomY);
+            // apply zoom
+            var oldWidth = width;
+            var oldHeight = height;
+            width /= zoomX;
+            height /= zoomY;
+
+            // store the image data in a temporary canvas
+            var tempCanvas = document.createElement("canvas");
+            tempCanvas.width = oldWidth;
+            tempCanvas.height = oldHeight;
+            tempCanvas.getContext("2d").putImageData(imageData2, 0, 0);
+            
+            context.drawImage(tempCanvas,originX,originY,width,height);
+        }
         
 		// restore base settings
-        context.restore();
+        //context.restore();
+        zoomX = 1;
+        zoomY = 1;
 	};
 	
 	/**
@@ -75,7 +95,7 @@ function Layer(name)
 	 * @input width The width of the canvas.
 	 * @input height The height of the canvas.
 	 */
-	this.init = function(width, height)
+	this.init = function(inputWidth, inputHeight)
 	{
 	    // find the canvas element
 		canvas = document.getElementById(name);
@@ -98,8 +118,11 @@ function Layer(name)
 	        return;
 	    }
 	    // set sizes
-	    canvas.width = width;
-	    canvas.height = height;
+	    canvas.width = inputWidth;
+	    canvas.height = inputHeight;
+	    
+	    width = inputWidth;
+	    height = inputHeight;
 	};
 	
 	/**
