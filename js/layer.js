@@ -18,14 +18,19 @@ function Layer(name)
 
 	var imageData = null;
 	
-	var originX = 0;
-	var originY = 0;
 	var zoomX = 1;
 	var zoomY = 1;
 	var zoomCenterX = 0;
 	var zoomCenterY = 0;
-	var width = 0;
+	var transX = 0;
+	var transY = 0;
+
+    var originX = 0;
+    var originY = 0;
+    var width = 0;
 	var height = 0;
+	
+	var firstTime = true;
 	
 	this.setZoom = function(zx,zy,cx,cy)
 	{
@@ -38,8 +43,8 @@ function Layer(name)
 	// translation is according to the last one
 	this.setTranslate = function(tx,ty)
 	{
-		originX += tx;
-		originY += ty;
+		transX = tx;
+		transY = ty;
 	};
 	
 	this.setImageData = function(data)
@@ -58,36 +63,48 @@ function Layer(name)
         // clear the context
         this.clearContextRect();
         
+        // store width/height
+        var oldWidth = width;
+        var oldHeight = height;
+
         // put the data in the context
-        if( zoomX == 1 )
+        if( firstTime )
         {
             context.putImageData(imageData,originX,originY);
+            firstTime = false;
         }
         else
         {
-            // The zoom is the ratio between the differences from the center
-            // to the origins:
-            originX = zoomCenterX - ((zoomCenterX - originX) / zoomX);
-            originY = zoomCenterY - ((zoomCenterY - originY) / zoomY);
-            // apply zoom
-            var oldWidth = width;
-            var oldHeight = height;
-            width /= zoomX;
-            height /= zoomY;
-
+            if( transX != 1 || transY != 1)
+            {
+                originX += transX;
+                originY += transY;
+                // restore base settings
+                transX = 0;
+                transY = 0;
+            }
+            if( zoomX != 1 || zoomY != 1)
+            {
+                // The zoom is the ratio between the differences from the center
+                // to the origins:
+                originX = zoomCenterX - ((zoomCenterX - originX) / zoomX);
+                originY = zoomCenterY - ((zoomCenterY - originY) / zoomY);
+                // calculate new width/height
+                width /= zoomX;
+                height /= zoomY;
+                // restore base settings
+                zoomX = 1;
+                zoomY = 1;
+            }
+            
             // store the image data in a temporary canvas
             var tempCanvas = document.createElement("canvas");
             tempCanvas.width = oldWidth;
             tempCanvas.height = oldHeight;
             tempCanvas.getContext("2d").putImageData(imageData2, 0, 0);
-            
+            // draw the temporary canvas on the fixes context
             context.drawImage(tempCanvas,originX,originY,width,height);
         }
-        
-		// restore base settings
-        //context.restore();
-        zoomX = 1;
-        zoomY = 1;
 	};
 	
 	/**
