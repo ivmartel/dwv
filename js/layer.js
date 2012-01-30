@@ -66,16 +66,19 @@ function Layer(name)
         // store width/height
         var oldWidth = width;
         var oldHeight = height;
+        
+        var isTranslated = (transX != 0 || transY != 0);
+        var isZoomed = (zoomX != 1 || zoomY != 1);
 
         // put the data in the context
-        if( firstTime )
+        if( firstTime || (!isTranslated && !isZoomed))
         {
             context.putImageData(imageData,originX,originY);
             firstTime = false;
         }
         else
         {
-            if( transX != 1 || transY != 1)
+            if( isTranslated )
             {
                 originX += transX;
                 originY += transY;
@@ -83,7 +86,7 @@ function Layer(name)
                 transX = 0;
                 transY = 0;
             }
-            if( zoomX != 1 || zoomY != 1)
+            if( isZoomed )
             {
                 // The zoom is the ratio between the differences from the center
                 // to the origins:
