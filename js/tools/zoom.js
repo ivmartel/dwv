@@ -30,7 +30,8 @@ tool.Zoom = function(app)
         // apply translation
         app.getImageLayer().setTranslate(tx,ty);
         app.getImageLayer().draw();
-    	// reset origin point
+        
+        // reset origin point
         self.x0 = ev._x;
         self.y0 = ev._y;
     };
@@ -39,9 +40,7 @@ tool.Zoom = function(app)
     this.mouseup = function(ev){
         if (self.started)
         {
-            // store the last move
-        	self.mousemove(ev);
-        	// stop recording
+            // stop recording
             self.started = false;
         }
     };
@@ -51,21 +50,25 @@ tool.Zoom = function(app)
         zoom(ev.detail, ev._x, ev._y);
     };
 
+    // This is called when you use the mouse wheel on Firefox.
     this.mousewheel = function(ev){
         zoom(ev.wheelDelta/1200, ev._x, ev._y);
     };
     
+    // Enable method.
     this.enable = function(value){
         // nothing to do.
     };
 
+    // Keyboard shortcut.
     this.keydown = function(event){
-    	app.handleKeyDown(event);
+        app.handleKeyDown(event);
     };
 
+    // Really do the zoom
     function zoom(step, cx, cy)
     {
-    	var zoom = 1 + step/2;
+        var zoom = 1 + step/2;
         // apply zoom
         app.getImageLayer().setZoom(zoom,zoom,cx,cy);
         app.getImageLayer().draw();

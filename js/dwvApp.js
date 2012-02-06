@@ -4,10 +4,10 @@
 */
 function DwvApp()
 {
-	// Local object.
-	var self = this;
-	
-	// Image details.
+    // Local object.
+    var self = this;
+    
+    // Image details.
     var image = null;
     
     var imageData = null;
@@ -58,12 +58,12 @@ function DwvApp()
      */
     this.init = function()
     {
-    	// add the HTML for the tool box 
-    	toolBox.appendHtml();
-    	// add the HTML for the history 
-    	undoStack.appendHtml();
-    	// bind open files with method
-    	document.getElementById('files').addEventListener('change', this.loadDicom, false);
+        // add the HTML for the tool box 
+        toolBox.appendHtml();
+        // add the HTML for the history 
+        undoStack.appendHtml();
+        // bind open files with method
+        document.getElementById('files').addEventListener('change', this.loadDicom, false);
     };
     
     /**
@@ -72,8 +72,8 @@ function DwvApp()
     this.setLineColor = function(event)
     {
         // get the color
-    	var color = event.target.id;
-    	// set style var
+        var color = event.target.id;
+        // set style var
         self.getStyle().setLineColor(color);
         // reset borders
         tool.draw.setLineColor(color);
@@ -86,7 +86,7 @@ function DwvApp()
      */
     this.mergeTempLayer = function() 
     {
-    	self.getDrawLayer().merge(self.getTempLayer());
+        self.getDrawLayer().merge(self.getTempLayer());
     };
 
     /**
@@ -94,42 +94,42 @@ function DwvApp()
      */
     this.handleKeyDown = function(event)
     {
-    	if( event.keyCode == 90 && event.ctrlKey ) // crtl-z
-		{
-    		self.getUndoStack().undo();
-		}
-    	else if( event.keyCode == 89 && event.ctrlKey ) // crtl-y
-		{
-    		self.getUndoStack().redo();
-		}
+        if( event.keyCode == 90 && event.ctrlKey ) // crtl-z
+        {
+            self.getUndoStack().undo();
+        }
+        else if( event.keyCode == 89 && event.ctrlKey ) // crtl-y
+        {
+            self.getUndoStack().redo();
+        }
     };
     
     /**
      * @private
      * The general-purpose event handler. This function just determines the mouse 
-   	 * position relative to the canvas element.
+        * position relative to the canvas element.
      */
     function evenHandler(event)
     {
-    	// if mouse event, check that it is in the canvas
-    	if( event.type = MouseEvent )
-		{
-	    	// set event._x and event._y to be used later
-    		// layerX is for firefox
-    		event._x = event.offsetX == undefined ? event.layerX : event.offsetX;
-    		event._y = event.offsetY == undefined ? event.layerY : event.offsetY;
-    		
-	        if(event._x < 0 
-	            || event._y < 0 
-	            || event._x >= image.getSize()[0] 
-	            || event._y >= image.getSize()[1] )
-	        {
-	        	// exit
-	        	return;
-	        }
+        // if mouse event, check that it is in the canvas
+        if( event.type = MouseEvent )
+        {
+            // set event._x and event._y to be used later
+            // layerX is for firefox
+            event._x = event.offsetX == undefined ? event.layerX : event.offsetX;
+            event._y = event.offsetY == undefined ? event.layerY : event.offsetY;
+            
+            if(event._x < 0 
+                || event._y < 0 
+                || event._x >= image.getSize()[0] 
+                || event._y >= image.getSize()[1] )
+            {
+                // exit
+                return;
+            }
         }
             
-    	// Call the event handler of the tool.
+        // Call the event handler of the tool.
         var func = self.getToolBox().getSelectedTool()[event.type];
         if (func)
         {
@@ -272,16 +272,20 @@ function DwvApp()
      * @private
      */
     this.generateImage = function()
-    {        
-        var data = self.getImageLayer().getContext().getImageData( 
-        		0, 0, 
-        		self.getImage().getSize()[0], 
-        		self.getImage().getSize()[1]); 
-        
-        if( imageData == null ) imageData = data;
-        self.getImage().generateImageData( data );         
-        //self.getImageLayer().getContext().putImageData(data, 0,0);
-        self.getImageLayer().setImageData(data);
+    {         
+        // store first image data
+        if( imageData == null )
+        {
+            imageData = self.getImageLayer().getContext().getImageData( 
+                0, 0, 
+                self.getImage().getSize()[0], 
+                self.getImage().getSize()[1]);
+        }
+        // generate image data from DICOM
+        self.getImage().generateImageData(imageData);         
+        // set the image data of the layer
+        self.getImageLayer().setImageData(imageData);
+        // draw the image
         self.getImageLayer().draw();
     };
 }
