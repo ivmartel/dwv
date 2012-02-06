@@ -60,7 +60,6 @@ function Layer(name)
         // clear the context
         this.clearContextRect();
         
-        
         // put the data in the context
         if( firstTime )
         {
@@ -139,6 +138,8 @@ function Layer(name)
     {
         // copy content
         context.drawImage(layerToMerge.getCanvas(), 0, 0);
+        // copy the image data
+        imageData = layerToMerge.getContext().getImageData(0, 0, canvas.width, canvas.height);
         // empty merged layer
         layerToMerge.clearContextRect();
     };
