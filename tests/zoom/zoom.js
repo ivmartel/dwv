@@ -1,52 +1,40 @@
 /**
 * zoom.js
-* Simple implementation of an image zoom.
+* Simple implementation of an image zoom/pan.
 */
 var canvas = document.getElementById("image");
 var context = canvas.getContext("2d");
+
+// mouse event date
 var mouseDownX = 0;
 var mouseDownY = 0;
 var isDragging = false;
+// context image data
+var originX = 0;
+var originY = 0;
+var width = 0;
+var height = 0;
 
-var originX0 = 0;
-var originY0 = 0;
-var width0 = 0;
-var height0 = 0;
+// image data array
+var imageData = 0;
 
-var newOriginX = 0;
-var newOriginY = 0;
-var newWidth = 0;
-var newHeight = 0;
-var newZoom = 1;
-
-var oldOriginX = 0;
-var oldOriginY = 0;
-var oldWidth = 0;
-var oldHeight = 0;
-var oldZoom = 1;
-
+// image object
 var img = new Image();
 img.onload = function() {
-    originX0 = canvas.width/2 - img.width/2;
-    originY0 = canvas.height/2 - img.height/2;
-    newOriginX = originX0;
-    newOriginY = originY0;
-    oldOriginX = originX0;
-    oldOriginY = originY0;
-    
-    width0 = img.width;
-    height0 = img.height;
-    newWidth = width0;
-    newHeight = height0;
-    oldWidth = width0;
-    oldHeight = height0;
-        
+    // initial data
+    originX = canvas.width/2 - img.width/2;
+    originY = canvas.height/2 - img.height/2;
+    width = img.width;
+    height = img.height;
+
     firstDrawImage();
     drawGrid();
 };
-
 img.src = 'image.jpg';
 
+/**
+ * Draw the under layer grid.
+ */
 function drawGrid() {
     var gridCanvas = document.getElementById("grid");
     var gridContext = gridCanvas.getContext("2d");
@@ -83,87 +71,79 @@ function drawGrid() {
     }
 };
 
+/**
+ * First drawing of the image.
+ * Does it from the image object.
+ */
 function firstDrawImage() {
-    // clear whole rect
+    // clear whole context
     context.clearRect(0, 0, 800, 600);
-	// draw
-    context.drawImage(img, originX0, originY0, width0, height0);
-};
-
-// use the image as input to the draw image
-function drawImage0() {
-    // store old
-    oldWidth = newWidth;
-    oldHeight = newHeight;
-    // calculate new
-    newWidth = oldWidth*newZoom;
-    newHeight = oldHeight*newZoom;
-    
-    // clear whole rect
-    context.clearRect(0, 0, 800, 600);
-	// draw
-    context.drawImage(img, newOriginX, newOriginY, newWidth, newHeight);
-    
+    // draw
+    context.drawImage(img, originX, originY, width, height);
+    // store image data
+    imageData = context.getImageData(originX, originY, width, height);
     // info paragraph
     appendInfo();
 };
 
-// use the canvas as the input to the draw image
-function drawImage1() {
-    // store old
-    oldWidth = newWidth;
-    oldHeight = newHeight;
-    // calculate new
-    newWidth = oldWidth*newZoom;
-    newHeight = oldHeight*newZoom;
-    
-    // get the image data before clearing
-    var imageData = context.getImageData(oldOriginX, oldOriginY, oldWidth, oldHeight);
-    // clear whole rect
+/**
+ * Draw image.
+ * Use the canvas as the input to draw image.
+ * Context image data has been updated before in specific mouse event methods.
+ */ 
+function drawImage() {
+    // clear whole context
     context.clearRect(0, 0, 800, 600);
-	
-    // store the image data in a temporary canvas
+    
+    // store the original image data in a temporary canvas
+    // to be able to give it back to be drawn
+    // Question: no other way?
     var tempCanvas = document.createElement("canvas");
-	tempCanvas.width = oldWidth;
-	tempCanvas.height = oldHeight;
-	tempCanvas.getContext("2d").putImageData(imageData, 0, 0);
+    tempCanvas.width = img.width;
+    tempCanvas.height = img.height;
+    tempCanvas.getContext("2d").putImageData(imageData, 0, 0);
 
-	/*context.scale(newZoom,newZoom);
-	context.drawImage(tempCanvas, newOriginX, newOriginY);
-	context.restore();*/
-    
-	context.drawImage(tempCanvas, newOriginX, newOriginY, newWidth, newHeight);
+    // draw it in the resized context
+    context.drawImage(tempCanvas, originX, originY, width, height);
     
     // info paragraph
     appendInfo();
 };
 
+/**
+ * Append informational text.
+ */
 function appendInfo() {
-	// add info
+    // get div
     var infoDiv = document.getElementById("info");
+    // clear it
     infoDiv.innerHTML = "";
+    // new text
     var text = document.createTextNode(
-    		"origin 0: ("+Math.round(originX0)+","+Math.round(originY0)+")"
-    		+", old origin: ("+Math.round(oldOriginX)+","+Math.round(oldOriginY)+")"
-    		+", new origin: ("+Math.round(newOriginX)+","+Math.round(newOriginY)+")"
-    		+", old image size: ("+Math.round(oldWidth)+","+Math.round(oldHeight)+")"
-    		+", new image size: ("+Math.round(newWidth)+","+Math.round(newHeight)+")"
-    		+", old zoom: "+oldZoom
-			+", new zoom: "+newZoom);
+            "origin: ("+Math.round(originX)+","+Math.round(originY)+")"
+            +", image size: ("+Math.round(width)+","+Math.round(height)+")");
+    // append text to div
     infoDiv.appendChild(text);
 };
 
+/**
+ * Actions on mouse down.
+ * - store mouse position
+ * - set isDragging flag to true
+ */
 canvas.onmousedown = function(event) {
     // get mouse coordinates
-    var mouseX = event.clientX - canvas.offsetLeft;
-    var mouseY = event.clientY - canvas.offsetTop;
+    mouseDownX = event.clientX - canvas.offsetLeft;
+    mouseDownY = event.clientY - canvas.offsetTop;
     // start dragging
     isDragging = true;
-    // save initial mouse down
-    mouseDownX = mouseX;
-    mouseDownY = mouseY;
 };
- 
+
+/**
+ * Actions on mouse move.
+ * - calculate new origin
+ * - draw the image
+ */
 canvas.onmousemove = function(event) {
     // exit if not dragging
     if( !isDragging ) return;
@@ -174,72 +154,61 @@ canvas.onmousemove = function(event) {
     // calculate translation
     var tx = mouseX - mouseDownX;
     var ty = mouseY - mouseDownY;
+    // calculate new origin
+    originX += tx;
+    originY += ty;
     
-    // save context
-    context.save();
-    // translate it
-    context.translate(tx, ty);
-    // draw in translated context
-    drawImage0();
-    // restore context
-    context.restore();
+    // save mouse position for next move
+    mouseDownX = mouseX;
+    mouseDownY = mouseY;
+
+    // draw image
+    drawImage();
 };
 
+/**
+ * Actions on mouse up.
+ * - set isDragging flag to false
+ */
 canvas.onmouseup = function(event) {
     // end dragging
-    isDragging = false;
-    // get mouse coordinates
-    var mouseX = event.clientX - canvas.offsetLeft;
-    var mouseY = event.clientY - canvas.offsetTop;
-    // calculate translation
-    var tx = mouseX - mouseDownX;
-    var ty = mouseY - mouseDownY;
-    // store old
-    oldOriginX = newOriginX;
-    oldOriginY = newOriginY;
-    // calculate new
-    newOriginX += tx;
-    newOriginY += ty;
+    if( isDragging ) isDragging = false;
 };
  
+/**
+ * Act on mouse wheel.
+ * - zoom
+ * - draw image
+ */
 canvas.onmousewheel = function(event) {
     // get mouse coordinates
     var mouseX = event.clientX - canvas.offsetLeft;
     var mouseY = event.clientY - canvas.offsetTop;
     // get mouse wheel
-    var wheel = event.wheelDelta/120;//n or -n
+    var wheel = event.wheelDelta/120; //n or -n
     // calculate zoom
-    var zoom = 1 + wheel/2;
+    var zoom = 1 - wheel/2;
 
-    // method using context.drawImage
-    zoomImage(mouseX, mouseY, zoom);
-};
-
-function zoomImage(mouseX, mouseY, zoom) {
-    // zoom centered on mouse: 
+    // zoom centered on mouse
     var centerX = mouseX;
     var centerY = mouseY;
+
+    // calculate new origin
+    
     // zoom centered on center of image, even after been moved: 
     //var centerX = originX + ( (img.width / 2) * (zoom/totalZoom) );
     //var centerY = originY + ( (img.height / 2) * (zoom/totalZoom) );
-    
-    // store old
-    oldOriginX = newOriginX;
-    oldOriginY = newOriginY;
-    oldZoom = newZoom;
 
-    // calculate new
-    
     // The zoom is the ratio between the differences from the center
     // to the origins:
     // centerX - originXnew = (centerX - originXold) * zoom
-    newOriginX = centerX - ((centerX - oldOriginX) * zoom);
-    newOriginY = centerY - ((centerY - oldOriginY) * zoom);
-    newZoom = zoom;
+    originX = centerX - ((centerX - originX) * zoom);
+    originY = centerY - ((centerY - originY) * zoom);
     
-    // draw image from the image object
-    //drawImage0();
-    // draw image from the canvas object
-    // problem when un-zooming...
-    drawImage1();
-}
+    // calculate new size
+    width *= zoom;
+    height *= zoom;
+    
+    // draw image
+    drawImage();
+};
