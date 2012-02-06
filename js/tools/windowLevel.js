@@ -131,7 +131,7 @@ function updateWindowingData(wc,ww)
 {
 	app.getImage().getLookup().setWindowingdata(wc,ww);
     showWindowingValue(wc,ww);
-    app.generateImage();
+    app.generateAndDrawImage();
 }
 
 function changePreset(event)

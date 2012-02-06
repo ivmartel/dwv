@@ -67,6 +67,7 @@ function DwvApp()
     };
     
     /**
+     * Set the line color.
      * @param event
      */
     this.setLineColor = function(event)
@@ -90,7 +91,11 @@ function DwvApp()
     };
 
     /**
-     * Handle key event
+     * Handle key event.
+     * - crtl-z: undo
+     * - crtl-y: redo
+     * Default behavior. Usually used in tools. 
+     * @param event
      */
     this.handleKeyDown = function(event)
     {
@@ -107,9 +112,9 @@ function DwvApp()
     /**
      * @private
      * The general-purpose event handler. This function just determines the mouse 
-        * position relative to the canvas element.
+     * position relative to the canvas element.
      */
-    function evenHandler(event)
+    function eventHandler(event)
     {
         // if mouse event, check that it is in the canvas
         if( event.type = MouseEvent )
@@ -154,7 +159,14 @@ function DwvApp()
         var myreader = new FileReader();
         myreader.onload = function() {
             return function(e) {
-                parseAndLoadDicom(e.target.result);
+                // read the DICOM file
+            	parseAndLoadDicom(e.target.result);
+            	// prepare display
+            	postLoadInit();
+            	// Generate and draw the image data array
+                self.generateAndDrawImage();
+                 
+                // add the tag list data
                 var span = document.createElement('div');
                 span.innerHTML = ['<p><b>', e.target.result.length, '</b></p>'].join('');
                 document.getElementById('tagList').insertBefore(span, null);
@@ -234,44 +246,54 @@ function DwvApp()
                
         document.getElementById("tags").style.display='';
         
+        // create the DICOM image
         image = new DicomImage(
             [numberOfRows, numberOfColumns],
             [rowSpacing, columnSpacing],
             dicomParser.pixelBuffer );
         image.setLookup( windowCenter, windowWidth, rescaleSlope, rescaleIntercept);
-        
-        // image layer
+    }
+    
+    /**
+     * @private
+     * To be called once the image is loaded.
+     */
+    function postLoadInit()
+    {
+        var numberOfColumns = image.getSize()[0];
+        var numberOfRows = image.getSize()[1];
+    	
+    	// image layer
         imageLayer = new Layer("imageLayer");
-        imageLayer.init(image.getSize()[0], image.getSize()[1]);
+        imageLayer.init(numberOfColumns, numberOfRows);
         imageLayer.fillContext();
         // draw layer
         drawLayer = new Layer("drawLayer");
-        drawLayer.init(image.getSize()[0], image.getSize()[1]);
+        drawLayer.init(numberOfColumns, numberOfRows);
         // temp layer
         tempLayer = new Layer("tempLayer");
-        tempLayer.init(image.getSize()[0], image.getSize()[1]);
+        tempLayer.init(numberOfColumns, numberOfRows);
+        // Attach the mousedown, mousemove and mouseup event listeners.
+        tempLayer.getCanvas().addEventListener('mousedown', eventHandler, false);
+        tempLayer.getCanvas().addEventListener('mousemove', eventHandler, false);
+        tempLayer.getCanvas().addEventListener('mouseup', eventHandler, false);
+        tempLayer.getCanvas().addEventListener('mousewheel', eventHandler, false);
+        tempLayer.getCanvas().addEventListener('DOMMouseScroll', eventHandler, false);
         // info layer
         infoLayer = new Layer("infoLayer");
-        infoLayer.init(image.getSize()[0], image.getSize()[1]);
+        infoLayer.init(numberOfColumns, numberOfRows);
         
-        self.generateImage();        
-        
+        // Keydown listener
+        window.addEventListener('keydown', eventHandler, true);
+
+        // initialise the toolbox
         toolBox.init();
-        
-        // Attach the mousedown, mousemove and mouseup event listeners.
-        tempLayer.getCanvas().addEventListener('mousedown', evenHandler, false);
-        tempLayer.getCanvas().addEventListener('mousemove', evenHandler, false);
-        tempLayer.getCanvas().addEventListener('mouseup', evenHandler, false);
-        tempLayer.getCanvas().addEventListener('mousewheel', evenHandler, false);
-        tempLayer.getCanvas().addEventListener('DOMMouseScroll', evenHandler, false);
-        
-        window.addEventListener('keydown', evenHandler, true);
     }
     
     /**
      * @private
      */
-    this.generateImage = function()
+    this.generateAndDrawImage = function()
     {         
         // store first image data
         if( imageData == null )
