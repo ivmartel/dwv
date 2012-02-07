@@ -57,7 +57,10 @@ tool.WindowLevel = function(app)
 
 tool.WindowLevel.prototype.appendHtml = function()
 {
-    var paragraph = document.createElement("p");  
+    var div = document.createElement("div");
+    div.id = "presetSelector";
+	
+	var paragraph = document.createElement("p");  
     paragraph.appendChild(document.createTextNode("WL Preset: "));
     
     var selector = document.createElement("select");
@@ -77,13 +80,19 @@ tool.WindowLevel.prototype.appendHtml = function()
     }
 
     paragraph.appendChild(selector);
-    document.getElementById('presetSelector').appendChild(paragraph);
+    div.appendChild(paragraph);
+    document.getElementById('toolbox').appendChild(div);
 };
 
 tool.WindowLevel.prototype.clearHtml = function()
 {
+	// find the tool specific node
 	var node = document.getElementById('presetSelector');
+	// delete its content
 	while (node.hasChildNodes()) node.removeChild(node.firstChild);
+	// remove the tool specific node
+	var top = document.getElementById('toolbox');
+	top.removeChild(node);
 };
 
 function showHUvalue(x,y)

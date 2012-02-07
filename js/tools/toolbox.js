@@ -86,7 +86,10 @@ ToolBox.prototype.eventToolChange = function(event)
 
 ToolBox.prototype.appendHtml = function()
 {
-    var paragraph = document.createElement("p");  
+    var div = document.createElement("div");
+    div.id = "toolChooser";
+	
+	var paragraph = document.createElement("p");  
     paragraph.appendChild(document.createTextNode("Tool: "));
     
     var selector = document.createElement("select");
@@ -105,5 +108,6 @@ ToolBox.prototype.appendHtml = function()
         selector.appendChild(option);
     }
 
-    document.getElementById('toolChooser').appendChild(paragraph);
+    div.appendChild(paragraph);
+    document.getElementById('toolbox').appendChild(div);
 };

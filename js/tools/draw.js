@@ -10,7 +10,10 @@ tool.draw = tool.draw || {};
  */
 tool.draw.appendColourChooserHtml = function(app)
 {
-    var paragraph = document.createElement("p");  
+    var div = document.createElement("div");
+    div.id = "colourChooser";
+	
+	var paragraph = document.createElement("p");  
     paragraph.appendChild(document.createTextNode("Colour: "));
 
     var table = document.createElement("table");
@@ -33,19 +36,25 @@ tool.draw.appendColourChooserHtml = function(app)
     }
 
     paragraph.appendChild(table);
-    document.getElementById('colourChooser').appendChild(paragraph);
+    div.appendChild(paragraph);
+    document.getElementById('toolbox').appendChild(div);
     
     // select default
     tool.draw.setLineColor(app.getStyle().getLineColor());
 };
 
 /**
- * Remove all children from the 'colourChooser' node.
+ * Remove the tool specific node.
  */
 tool.draw.clearColourChooserHtml = function()
 {
-	node = document.getElementById('colourChooser');
+	// find the tool specific node
+	var node = document.getElementById('colourChooser');
+	// delete its content
 	while (node.hasChildNodes()) node.removeChild(node.firstChild);
+	// remove the tool specific node
+	var top = document.getElementById('toolbox');
+	top.removeChild(node);
 };
 
 /**
