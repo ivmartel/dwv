@@ -82,7 +82,7 @@ tool.WindowLevel.prototype.appendHtml = function()
 
 tool.WindowLevel.prototype.clearHtml = function()
 {
-	node = document.getElementById('presetSelector');
+	var node = document.getElementById('presetSelector');
 	while (node.hasChildNodes()) node.removeChild(node.firstChild);
 };
 
