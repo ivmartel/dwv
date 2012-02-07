@@ -58,8 +58,9 @@ tool.Zoom = function(app)
     };
     
     // Enable method.
-    this.enable = function(value){
-        // nothing to do.
+    this.enable = function(bool){
+    	if( bool ) this.appendHtml();
+    	else this.clearHtml();
     };
 
     // Keyboard shortcut.
@@ -79,3 +80,43 @@ tool.Zoom = function(app)
     }
 
 }; // Zoom function
+
+tool.Zoom.prototype.appendHtml = function()
+{
+    var div = document.createElement("div");
+    div.id = 'zoomResetDiv';
+	
+	var paragraph = document.createElement("p");  
+    paragraph.id = 'zoomReset';
+    paragraph.name = 'zoomReset';
+    
+    var button = document.createElement("button");
+    button.id = "zoomResetButton";
+    button.name = "zoomResetButton";
+    button.onclick = zoomReset;
+    var text = document.createTextNode('Reset');
+    button.appendChild(text);
+    
+	paragraph.appendChild(button);
+    div.appendChild(paragraph);
+	document.getElementById('toolbox').appendChild(div);
+};
+
+tool.Zoom.prototype.clearHtml = function()
+{
+	// find the tool specific node
+	var node = document.getElementById('zoomResetDiv');
+	// delete its content
+	while (node.hasChildNodes()) node.removeChild(node.firstChild);
+	// remove the tool specific node
+	var top = document.getElementById('toolbox');
+	top.removeChild(node);
+};
+
+function zoomReset(event)
+{
+    app.getImageLayer().resetLayout();
+    app.getImageLayer().draw();
+    app.getDrawLayer().resetLayout();
+    app.getDrawLayer().draw();
+}
