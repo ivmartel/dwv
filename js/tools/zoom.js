@@ -47,12 +47,12 @@ tool.Zoom = function(app)
         }
     };
     
-    // This is called when you use the mouse wheel.
+    // This is called when you use the mouse wheel on Firefox.
     this.DOMMouseScroll = function(ev){
-        zoom(ev.detail, ev._x, ev._y);
+        zoom(ev.detail/10, ev._x, ev._y);
     };
 
-    // This is called when you use the mouse wheel on Firefox.
+    // This is called when you use the mouse wheel.
     this.mousewheel = function(ev){
         zoom(ev.wheelDelta/1200, ev._x, ev._y);
     };
