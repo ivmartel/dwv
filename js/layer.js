@@ -24,13 +24,7 @@ function Layer(name)
     var originY = 0;
     var width = 0;
     var height = 0;
-    // original sizes
-    var width0 = 0;
-    var height0 = 0;
 
-    // drawing first time flag 
-    var firstTime = true;
-    
     this.setZoom = function(zx,zy,cx,cy)
     {
         // The zoom is the ratio between the differences from the center
@@ -50,32 +44,39 @@ function Layer(name)
         originY += ty;
     };
     
+    // set the image data array
     this.setImageData = function(data)
     {
         imageData = data;
     };
     
+    // reset layout
+    this.resetLayout = function()
+    {
+    	originX = 0;
+    	originY = 0;
+        width = canvas.width;
+        height = canvas.height;
+    };
+    
+    /**
+     * Draw the content (imageData) of the layer.
+     * The imageData variable needs to be set
+     */
     this.draw = function()
     {
-        // clear the context
+    	// clear the context
         this.clearContextRect();
         
-        // put the data in the context
-        if( firstTime )
-        {
-            context.putImageData(imageData,originX,originY);
-            firstTime = false;
-        }
-        else
-        {
-            // store the image data in a temporary canvas
-            var tempCanvas = document.createElement("canvas");
-            tempCanvas.width = width0;
-            tempCanvas.height = height0;
-            tempCanvas.getContext("2d").putImageData(imageData, 0, 0);
-            // draw the temporary canvas on the fixes context
-            context.drawImage(tempCanvas,originX,originY,width,height);
-        }
+        // Put the image data in the context
+        
+        // 1. store the image data in a temporary canvas
+        var tempCanvas = document.createElement("canvas");
+        tempCanvas.width = canvas.width;
+        tempCanvas.height = canvas.height;
+        tempCanvas.getContext("2d").putImageData(imageData, 0, 0);
+        // 2. draw the temporary canvas on the context
+        context.drawImage(tempCanvas,originX,originY,width,height);
     };
     
     /**
@@ -105,14 +106,15 @@ function Layer(name)
             alert("Error: failed to get the 2D context for '" + name + "'.");
             return;
         }
-        // set sizes
+        // canvas sizes
         canvas.width = inputWidth;
         canvas.height = inputHeight;
-        
+        // local sizes
         width = inputWidth;
         height = inputHeight;
-        width0 = inputWidth;
-        height0 = inputHeight;
+
+        // original image data array
+        imageData = context.getImageData(0, 0, canvas.width, canvas.height);
     };
     
     /**
@@ -138,8 +140,22 @@ function Layer(name)
     {
         // copy content
         context.drawImage(layerToMerge.getCanvas(), 0, 0);
-        // copy the image data
-        imageData = layerToMerge.getContext().getImageData(0, 0, canvas.width, canvas.height);
+        // store the image data
+        
+        // trans: NO
+        //imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+        // trans: NO
+        //imageData = context.getImageData(0, 0, width, height);
+        // trans: YES but shape cut 
+        // zoom: NO, translated and bad zoom (only first time)
+        //imageData = context.getImageData(originX, originY, canvas.width, canvas.height);
+        // trans: YES but shape cut 
+        // zoom: NO, translated and bad zoom (only first time)
+        imageData = context.getImageData(originX, originY, width, height);
+        
+        //console.log("canvas.width: "+canvas.width);
+        //console.log("width: "+width);
+        
         // empty merged layer
         layerToMerge.clearContextRect();
     };
