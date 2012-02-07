@@ -29,6 +29,8 @@ img.onload = function() {
 
     firstDrawImage();
     drawGrid();
+    
+    console.log("[Zoom Example] Image loaded!");
 };
 img.src = 'image.jpg';
 
