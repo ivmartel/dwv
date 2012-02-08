@@ -45,7 +45,7 @@ function UndoStack(app)
 				stack[i].execute(); 
 			}
 			// merge the temporary layer
-			app.mergeTempLayer();
+			app.getDrawLayer().merge(app.getTempLayer());
 			// disable last in display history
 			enableInDisplayHistory(false);
 		}
@@ -61,7 +61,7 @@ function UndoStack(app)
 			var cmd = stack[curCmd++];
 			cmd.execute();
 			// merge the temporary layer
-			app.mergeTempLayer();
+			app.getDrawLayer().merge(app.getTempLayer());
 			// enable next in display history
 			enableInDisplayHistory(true);
 		}

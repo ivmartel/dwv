@@ -81,16 +81,6 @@ function DwvApp()
     };
     
     /**
-     * This function draws the #imageDraw canvas on top of #imageView,
-     * after which #imageDraw is cleared. This function is called each time when the
-     * user completes a drawing operation.
-     */
-    this.mergeTempLayer = function() 
-    {
-        self.getDrawLayer().merge(self.getTempLayer());
-    };
-
-    /**
      * Handle key event.
      * - crtl-z: undo
      * - crtl-y: redo

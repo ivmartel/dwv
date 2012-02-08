@@ -54,8 +54,7 @@ tool.Roi = function(app)
             // set flag
             self.started = false;
          	// merge temporary layer
-            app.mergeTempLayer();
-            
+            app.getDrawLayer().merge(app.getTempLayer());
         }
     };
         
