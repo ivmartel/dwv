@@ -25,6 +25,7 @@ function Layer(name)
     var width = 0;
     var height = 0;
 
+    // set the zoom
     this.setZoom = function(zx,zy,cx,cy)
     {
         // The zoom is the ratio between the differences from the center
@@ -34,8 +35,19 @@ function Layer(name)
         // calculate new width/height
         width *= zx;
         height *= zy;
+        // draw 
+        this.draw();
     };
     
+    // zoom the layer
+    this.zoom = function(zx,zy,cx,cy)
+    {
+        // set zoom
+        this.setZoom(zx, zy, cx, cy);
+        // draw 
+        this.draw();
+    };
+
     // translation is according to the last one
     this.setTranslate = function(tx,ty)
     {
@@ -44,13 +56,24 @@ function Layer(name)
         originY += ty;
     };
     
+    // translation is according to the last one
+    this.translate = function(tx,ty)
+    {
+		// set the translate
+    	this.setTranslate(tx, ty);
+    	// draw
+    	this.draw();
+    };
+    
     // set the image data array
     this.setImageData = function(data)
     {
         imageData = data;
     };
     
-    // reset layout
+    /**
+     * Reset the layout
+     */ 
     this.resetLayout = function()
     {
     	originX = 0;
@@ -135,27 +158,16 @@ function Layer(name)
     
     /**
      * Merge two layers.
+     * @input layerToMerge The layer to merge. It will also be emptied.
      */
     this.merge = function(layerToMerge)
     {
         // copy content
         context.drawImage(layerToMerge.getCanvas(), 0, 0);
+        // reset layout
+        this.resetLayout();
         // store the image data
-        
-        // trans: NO
-        //imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-        // trans: NO
-        //imageData = context.getImageData(0, 0, width, height);
-        // trans: YES but shape cut 
-        // zoom: NO, translated and bad zoom (only first time)
-        //imageData = context.getImageData(originX, originY, canvas.width, canvas.height);
-        // trans: YES but shape cut 
-        // zoom: NO, translated and bad zoom (only first time)
-        imageData = context.getImageData(originX, originY, width, height);
-        
-        //console.log("canvas.width: "+canvas.width);
-        //console.log("width: "+width);
-        
+        imageData = context.getImageData(0, 0, canvas.width, canvas.height);
         // empty merged layer
         layerToMerge.clearContextRect();
     };
