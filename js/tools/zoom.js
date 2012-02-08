@@ -28,10 +28,8 @@ tool.Zoom = function(app)
         var tx = (ev._x - self.x0);
         var ty = (ev._y - self.y0);
         // apply translation
-        app.getImageLayer().setTranslate(tx,ty);
-        app.getImageLayer().draw();
-        app.getDrawLayer().setTranslate(tx,ty);
-        app.getDrawLayer().draw();
+        app.getImageLayer().translate(tx,ty);
+        app.getDrawLayer().translate(tx,ty);
         
         // reset origin point
         self.x0 = ev._x;
@@ -73,10 +71,8 @@ tool.Zoom = function(app)
     {
         var zoom = 1 + step/2;
         // apply zoom
-        app.getImageLayer().setZoom(zoom,zoom,cx,cy);
-        app.getImageLayer().draw();
-        app.getDrawLayer().setZoom(zoom,zoom,cx,cy);
-        app.getDrawLayer().draw();
+        app.getImageLayer().zoom(zoom,zoom,cx,cy);
+        app.getDrawLayer().zoom(zoom,zoom,cx,cy);
     }
 
 }; // Zoom function
