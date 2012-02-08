@@ -40,7 +40,6 @@ tool.WindowLevel = function(app)
         {
             self.mousemove(ev);
             self.started = false;
-            app.mergeTempLayer();
         }
     };
     
