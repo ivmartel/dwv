@@ -82,18 +82,18 @@ function DwvApp()
     
     /**
      * Handle key event.
-     * - crtl-z: undo
-     * - crtl-y: redo
+     * - CRTL-Z: undo
+     * - CRTL-Y: redo
      * Default behavior. Usually used in tools. 
      * @param event
      */
     this.handleKeyDown = function(event)
     {
-        if( event.keyCode === 90 && event.ctrlKey ) // crtl-z
+        if( event.keyCode === 90 && event.ctrlKey ) // CRTL-Z
         {
             self.getUndoStack().undo();
         }
-        else if( event.keyCode === 89 && event.ctrlKey ) // crtl-y
+        else if( event.keyCode === 89 && event.ctrlKey ) // CRTL-Y
         {
             self.getUndoStack().redo();
         }
