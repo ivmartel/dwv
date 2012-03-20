@@ -12,8 +12,8 @@ tool.draw.appendColourChooserHtml = function(app)
 {
     var div = document.createElement("div");
     div.id = "colourChooser";
-	
-	var paragraph = document.createElement("p");  
+    
+    var paragraph = document.createElement("p");  
     paragraph.appendChild(document.createTextNode("Colour: "));
 
     var table = document.createElement("table");
@@ -25,14 +25,14 @@ tool.draw.appendColourChooserHtml = function(app)
     row.onmouseover = tool.draw.onMouseOver;
     row.onmouseout = tool.draw.onMouseOut;
     
-    var colours = new Array("black", "white", "red", "green", "blue", "yellow", "lime", "fuchsia");
+    var colours = ["black", "white", "red", "green", "blue", "yellow", "lime", "fuchsia"];
     var cell;
     for ( var i = 0; i < colours.length; ++i )
     {
-    	cell = row.insertCell(i);
-    	cell.id = colours[i];
-    	cell.onclick = app.setLineColor;
-    	cell.appendChild(document.createTextNode(" "));
+        cell = row.insertCell(i);
+        cell.id = colours[i];
+        cell.onclick = app.setLineColor;
+        cell.appendChild(document.createTextNode(" "));
     }
 
     paragraph.appendChild(table);
@@ -48,13 +48,15 @@ tool.draw.appendColourChooserHtml = function(app)
  */
 tool.draw.clearColourChooserHtml = function()
 {
-	// find the tool specific node
-	var node = document.getElementById('colourChooser');
-	// delete its content
-	while (node.hasChildNodes()) node.removeChild(node.firstChild);
-	// remove the tool specific node
-	var top = document.getElementById('toolbox');
-	top.removeChild(node);
+    // find the tool specific node
+    var node = document.getElementById('colourChooser');
+    // delete its content
+    while (node.hasChildNodes()) { 
+        node.removeChild(node.firstChild);
+    }
+    // remove the tool specific node
+    var top = document.getElementById('toolbox');
+    top.removeChild(node);
 };
 
 /**

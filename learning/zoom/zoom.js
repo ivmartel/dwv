@@ -17,22 +17,7 @@ var height = 0;
 
 // image data array
 var imageData = 0;
-
-// image object
 var img = new Image();
-img.onload = function() {
-    // initial data
-    originX = canvas.width/2 - img.width/2;
-    originY = canvas.height/2 - img.height/2;
-    width = img.width;
-    height = img.height;
-
-    firstDrawImage();
-    drawGrid();
-    
-    console.log("[Zoom Example] Image loaded!");
-};
-img.src = 'image.jpg';
 
 /**
  * Draw the under layer grid.
@@ -54,8 +39,12 @@ function drawGrid() {
     // vertical
     for( var i = 0; i < nLinesX; ++i )
     {
-        if( i == Math.round(nLinesX / 2) ) gridContext.lineWidth = 1;
-        else gridContext.lineWidth = 0.1;
+        if( i === Math.round(nLinesX / 2) ) {
+            gridContext.lineWidth = 1;
+        }
+        else {
+            gridContext.lineWidth = 0.1;
+        }
         gridContext.beginPath();
         gridContext.moveTo( beginX + i*incrX, 0);
         gridContext.lineTo( beginX + i*incrX, gridCanvas.height);
@@ -64,14 +53,36 @@ function drawGrid() {
     // horizontal
     for( var j = 0; j < nLinesY; ++j )
     {
-        if( j == Math.round(nLinesY / 2) ) gridContext.lineWidth = 1;
-        else gridContext.lineWidth = 0.1;
+        if( j === Math.round(nLinesY / 2) )
+        {
+            gridContext.lineWidth = 1;
+        }
+        else
+        {
+            gridContext.lineWidth = 0.1;
+        }
         gridContext.beginPath();
         gridContext.moveTo( 0, beginY + j*incrY );
         gridContext.lineTo( gridCanvas.width, beginY + j*incrY );
         gridContext.stroke();
     }
-};
+}
+
+/**
+ * Append informational text.
+ */
+function appendInfo() {
+    // get div
+    var infoDiv = document.getElementById("info");
+    // clear it
+    infoDiv.innerHTML = "";
+    // new text
+    var text = document.createTextNode(
+            "origin: ("+Math.round(originX)+","+Math.round(originY)+")"
+            +", image size: ("+Math.round(width)+","+Math.round(height)+")");
+    // append text to div
+    infoDiv.appendChild(text);
+}
 
 /**
  * First drawing of the image.
@@ -86,7 +97,7 @@ function firstDrawImage() {
     imageData = context.getImageData(originX, originY, width, height);
     // info paragraph
     appendInfo();
-};
+}
 
 /**
  * Draw image.
@@ -110,23 +121,7 @@ function drawImage() {
     
     // info paragraph
     appendInfo();
-};
-
-/**
- * Append informational text.
- */
-function appendInfo() {
-    // get div
-    var infoDiv = document.getElementById("info");
-    // clear it
-    infoDiv.innerHTML = "";
-    // new text
-    var text = document.createTextNode(
-            "origin: ("+Math.round(originX)+","+Math.round(originY)+")"
-            +", image size: ("+Math.round(width)+","+Math.round(height)+")");
-    // append text to div
-    infoDiv.appendChild(text);
-};
+}
 
 /**
  * Actions on mouse down.
@@ -148,7 +143,9 @@ canvas.onmousedown = function(event) {
  */
 canvas.onmousemove = function(event) {
     // exit if not dragging
-    if( !isDragging ) return;
+    if( !isDragging ) {
+        return;
+    }
     
     // get mouse coordinates
     var mouseX = event.clientX - canvas.offsetLeft;
@@ -174,7 +171,9 @@ canvas.onmousemove = function(event) {
  */
 canvas.onmouseup = function(event) {
     // end dragging
-    if( isDragging ) isDragging = false;
+    if( isDragging ) {
+        isDragging = false;
+    }
 };
  
 /**
@@ -214,3 +213,19 @@ canvas.onmousewheel = function(event) {
     // draw image
     drawImage();
 };
+
+//image object
+img.onload = function() {
+    // initial data
+    originX = canvas.width/2 - img.width/2;
+    originY = canvas.height/2 - img.height/2;
+    width = img.width;
+    height = img.height;
+
+    firstDrawImage();
+    drawGrid();
+    
+    console.log("[Zoom Example] Image loaded!");
+};
+img.src = 'image.jpg';
+

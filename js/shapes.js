@@ -19,7 +19,7 @@ Point2D = function(x,y)
      * @param other The other Point2D to compare to.
      * @return True if both points are equal.
      */ 
-    this.equal = function(other) { return ( x == other.getX() && y == other.getY() ); };
+    this.equal = function(other) { return ( x === other.getX() && y === other.getY() ); };
 }; // Point2D class
 
 /**

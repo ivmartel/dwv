@@ -2,6 +2,18 @@
 * zoom.js
 * Zooming tool.
 */
+
+function zoomReset(event)
+{
+    app.getImageLayer().resetLayout();
+    app.getImageLayer().draw();
+    app.getDrawLayer().resetLayout();
+    app.getDrawLayer().draw();
+}
+
+/**
+ * Zoom class.
+ */
 tool.Zoom = function(app)
 {
     var self = this;
@@ -57,8 +69,12 @@ tool.Zoom = function(app)
     
     // Enable method.
     this.enable = function(bool){
-    	if( bool ) this.appendHtml();
-    	else this.clearHtml();
+        if( bool ) { 
+            this.appendHtml();
+        }
+        else { 
+            this.clearHtml();
+        }
     };
 
     // Keyboard shortcut.
@@ -69,10 +85,10 @@ tool.Zoom = function(app)
     // Really do the zoom
     function zoom(step, cx, cy)
     {
-        var zoom = 1 + step/2;
+        var zoomLevel = 1 + step/2;
         // apply zoom
-        app.getImageLayer().zoom(zoom,zoom,cx,cy);
-        app.getDrawLayer().zoom(zoom,zoom,cx,cy);
+        app.getImageLayer().zoom(zoomLevel,zoomLevel,cx,cy);
+        app.getDrawLayer().zoom(zoomLevel,zoomLevel,cx,cy);
     }
 
 }; // Zoom function
@@ -81,8 +97,8 @@ tool.Zoom.prototype.appendHtml = function()
 {
     var div = document.createElement("div");
     div.id = 'zoomResetDiv';
-	
-	var paragraph = document.createElement("p");  
+    
+    var paragraph = document.createElement("p");  
     paragraph.id = 'zoomReset';
     paragraph.name = 'zoomReset';
     
@@ -93,26 +109,20 @@ tool.Zoom.prototype.appendHtml = function()
     var text = document.createTextNode('Reset');
     button.appendChild(text);
     
-	paragraph.appendChild(button);
+    paragraph.appendChild(button);
     div.appendChild(paragraph);
-	document.getElementById('toolbox').appendChild(div);
+    document.getElementById('toolbox').appendChild(div);
 };
 
 tool.Zoom.prototype.clearHtml = function()
 {
-	// find the tool specific node
-	var node = document.getElementById('zoomResetDiv');
-	// delete its content
-	while (node.hasChildNodes()) node.removeChild(node.firstChild);
-	// remove the tool specific node
-	var top = document.getElementById('toolbox');
-	top.removeChild(node);
+    // find the tool specific node
+    var node = document.getElementById('zoomResetDiv');
+    // delete its content
+    while (node.hasChildNodes()) { 
+        node.removeChild(node.firstChild);
+    }
+    // remove the tool specific node
+    var top = document.getElementById('toolbox');
+    top.removeChild(node);
 };
-
-function zoomReset(event)
-{
-    app.getImageLayer().resetLayout();
-    app.getImageLayer().draw();
-    app.getDrawLayer().resetLayout();
-    app.getDrawLayer().draw();
-}

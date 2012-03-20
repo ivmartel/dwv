@@ -3,20 +3,8 @@
  *  Version 0.5
  *  Author: BabuHussain<babuhussain.a@raster.in>
  */
-function DicomParser(inputBuffer,reader)
-{
-    // members
-    this.inputBuffer=inputBuffer;
-    this.reader=reader;    
-    // methods
-    this.parseAll=parseAll;
-}
-var elementIndex=0;
 
-function getPixelBuffer()
-{
-    return this.pixelBuffer;
-}
+var elementIndex=0;
 
 function parseAll()
 {
@@ -38,13 +26,26 @@ function parseAll()
     this.readImage(this.moveToPixelDataTag(index));    
 }
 
+/**
+ * DicomParser class.
+ */
+function DicomParser(inputBuffer,reader)
+{
+    // members
+    this.inputBuffer=inputBuffer;
+    this.reader=reader;
+    this.dicomElement = [];
+    // methods
+    this.parseAll=parseAll;
+}
+
+function getPixelBuffer()
+{
+    return this.pixelBuffer;
+}
+
 DicomParser.prototype.setDicomElement=function(name,vr,vl,group,element,value,offset)
 {
-    if(this.dicomElement==null)
-    {
-        this.dicomElement = [];
-    }
-    
     this.dicomElement[elementIndex++]=new DicomElement(name,vr,vl,group,element,value,offset);
 };
 
@@ -54,15 +55,15 @@ DicomParser.prototype.readTag=function(index,firstContent,secondContent,thirdCon
     var i=index;
     for(; i<this.inputBuffer.length; i++) 
     {
-        if(this.reader.readNumber(1,i) == firstContent 
-            && this.reader.readNumber(1,i+1) == secondContent
-            && this.reader.readNumber(1,i+2) == thirdContent
-            && this.reader.readNumber(1,i+3) == fourthContent)
+        if(this.reader.readNumber(1,i) === firstContent 
+            && this.reader.readNumber(1,i+1) === secondContent
+            && this.reader.readNumber(1,i+2) === thirdContent
+            && this.reader.readNumber(1,i+3) === fourthContent)
         {
             i=i+4;
             vr = this.reader.readString(2,i);
             vl = this.reader.readNumber(2,i+2);
-            if( vr == "US")
+            if( vr === "US")
             {
                 value = [this.reader.readNumber(vl,i+4)];
             }
@@ -86,10 +87,10 @@ DicomParser.prototype.moveToPixelDataTag=function(index)
 {
     for(var i=index; i<this.inputBuffer.length; i++)
     {
-        if( this.reader.readNumber(1,i) == 224 
-            && this.reader.readNumber(1,i+1) == 127
-            && this.reader.readNumber(1,i+2) == 16
-            && this.reader.readNumber(1,i+3) == 0)
+        if( this.reader.readNumber(1,i) === 224 
+            && this.reader.readNumber(1,i+1) === 127
+            && this.reader.readNumber(1,i+2) === 16
+            && this.reader.readNumber(1,i+3) === 0)
         {            
             this.pixelDataOffset=i+4;
             break;

@@ -3,23 +3,6 @@
  *  Version 0.5
  *  Author: BabuHussain<babuhussain.a@raster.in>
  */
-function LookupTable()
-{
-    // methods
-    this.calculateHULookup=calculateHULookup;
-    this.calculateLookup=calculateLookup;
-    this.setWindowingdata=setWindowingdata;
-}
-
-LookupTable.prototype.setData = function(wc,ww,rs,ri)
-{    
-    this.windowCenter = wc;
-    this.windowWidth = ww;
-    this.defaultWindowCenter = wc;
-    this.defaultWindowWidth = ww;
-    this.rescaleSlope = rs;
-    this.rescaleIntercept = ri;    
-};
 
 function setWindowingdata(wc,ww)
 {
@@ -61,3 +44,25 @@ function calculateLookup()
         }
      }
 }
+
+/**
+ * LookupTable class.
+ * @returns {LookupTable}
+ */
+function LookupTable()
+{
+    // methods
+    this.calculateHULookup=calculateHULookup;
+    this.calculateLookup=calculateLookup;
+    this.setWindowingdata=setWindowingdata;
+}
+
+LookupTable.prototype.setData = function(wc,ww,rs,ri)
+{    
+    this.windowCenter = wc;
+    this.windowWidth = ww;
+    this.defaultWindowCenter = wc;
+    this.defaultWindowWidth = ww;
+    this.rescaleSlope = rs;
+    this.rescaleIntercept = ri;    
+};

@@ -74,22 +74,22 @@ ToolBox.prototype.enable = function(value)
 ToolBox.prototype.eventToolChange = function(event)
 {
     toolName = this.value;
-	if( app.getToolBox().hasTool(toolName) )
+    if( app.getToolBox().hasTool(toolName) )
     {
-    	app.getToolBox().setSelectedTool(toolName);
+        app.getToolBox().setSelectedTool(toolName);
     }
-	else
-	{
-		alert("Unknown tool: '" + toolName + "'");
-	}
+    else
+    {
+        alert("Unknown tool: '" + toolName + "'");
+    }
 };
 
 ToolBox.prototype.appendHtml = function()
 {
     var div = document.createElement("div");
     div.id = "toolChooser";
-	
-	var paragraph = document.createElement("p");  
+    
+    var paragraph = document.createElement("p");  
     paragraph.appendChild(document.createTextNode("Tool: "));
     
     var selector = document.createElement("select");
@@ -98,7 +98,7 @@ ToolBox.prototype.appendHtml = function()
     selector.disabled = 1;
     paragraph.appendChild(selector);
 
-    var options = new Array("windowLevel", "rect", "circle", "roi", "line", "zoom");
+    var options = ["windowLevel", "rect", "circle", "roi", "line", "zoom"];
     var option;
     for( var i = 0; i < options.length; ++i )
     {

@@ -29,9 +29,15 @@ function LocalFileReader(fileURL)
 	};
 	
 	this.movePointerTo = function(iTo){
-		if(iTo < 0) filePointer = 0;
-		else if(iTo > this.getFileSize()) throwException(_exception.EOFReached);
-		else filePointer = iTo;
+		if(iTo < 0) {
+		    filePointer = 0;
+		}
+		else if(iTo > this.getFileSize()) { 
+		    throwException(_exception.EOFReached);
+		}
+		else { 
+		    filePointer = iTo;
+		}
 
 		return filePointer;
 	};
@@ -91,10 +97,8 @@ function LocalFileReader(fileURL)
 		switch(errorCode){
 			case _exception.FileLoadFailed:
 				throw new Error('Error: Filed to load "'+fileURL+'"');
-				break;
 			case _exception.EOFReached:
 				throw new Error("Error: EOF reached");
-				break;
 		}
 	}
 
@@ -105,7 +109,9 @@ function LocalFileReader(fileURL)
 
 		fileSize = fileContents.length-1;
 
-		if(fileSize < 0) throwException(_exception.FileLoadFailed);
+		if(fileSize < 0) {
+		    throwException(_exception.FileLoadFailed);
+		}
 
 		this.readByteAt = function(i){
 			return fileContents[i];
@@ -122,8 +128,10 @@ function LocalFileReader(fileURL)
 		};
 	}
 	
-	if(/msie/i.test(navigator.userAgent) && !/opera/i.test(navigator.userAgent))
+	if(/msie/i.test(navigator.userAgent) && !/opera/i.test(navigator.userAgent)) {
 		LocalFileReaderImpl_IE.apply(this, [fileURL]);
-	else
+    }
+	else {
 		LocalFileReaderImpl.apply(this, [fileURL]);
+	}
 }

@@ -2,6 +2,55 @@
  * undo.js
  * Simple undo/redo stack. 
  */
+
+function addCommandToDisplayHistory(command)
+{
+    var select = document.getElementById('history_list');
+    // remove undone commands
+    var count = select.length - (select.selectedIndex+1);
+    if( count > 0 )
+    {
+        for( var i = 0; i < count; ++i)
+        {
+            select.remove(select.length-1);
+        }
+    }
+    // add new option
+    var option = document.createElement('option');
+    option.text = command.getName();
+    option.value = command.getName();
+    select.add(option);
+    // increment selected index
+    select.selectedIndex++;
+}
+
+function enableInDisplayHistory(enable)
+{
+    var select = document.getElementById('history_list');
+    // enable or not (order is important)
+    var option;
+    if( enable ) 
+    {
+        // increment selected index
+        select.selectedIndex++;
+        // enable option
+        option = select.options[select.selectedIndex];
+        option.disabled = false;
+    }
+    else 
+    {
+        // disable option
+        option = select.options[select.selectedIndex];
+        option.disabled = true;
+        // decrement selected index
+        select.selectedIndex--;
+    }
+}
+
+/**
+ * UndoStack class.
+ * @param app
+ */
 function UndoStack(app)
 { 
 	// Array of commands.
@@ -68,49 +117,6 @@ function UndoStack(app)
 	};
 
 } // UndoStack class
-
-function addCommandToDisplayHistory(command)
-{
-	var select = document.getElementById('history_list');
-	// remove undone commands
-	var count = select.length - (select.selectedIndex+1);
-	if( count > 0 )
-	{
-		for( var i = 0; i < count; ++i)
-		{
-			select.remove(select.length-1);
-		}
-	}
-	// add new option
-	var option = document.createElement('option');
-	option.text = command.getName();
-	option.value = command.getName();
-	select.add(option);
-	// increment selected index
-	select.selectedIndex++;
-}
-
-function enableInDisplayHistory(enable)
-{
-	var select = document.getElementById('history_list');
-	// enable or not (order is important)
-	if( enable ) 
-	{
-		// increment selected index
-		select.selectedIndex++;
-		// enable option
-		var option = select.options[select.selectedIndex];
-		option.disabled = false;
-	}
-	else 
-	{
-		// disable option
-		var option = select.options[select.selectedIndex];
-		option.disabled = true;
-		// decrement selected index
-		select.selectedIndex--;
-	}
-}
 
 UndoStack.prototype.appendHtml = function()
 {

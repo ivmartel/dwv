@@ -10,7 +10,7 @@ function Employee (name,dept) {
 function Manager () {
   this.reports = [];
 }
-Manager.prototype = new Employee;
+Manager.prototype = new Employee();
 
 // worker bee
 function WorkerBee (name,dept,projects) {
@@ -18,14 +18,14 @@ function WorkerBee (name,dept,projects) {
   this.base(name,dept);
   this.projects = projects|| [];
 }
-WorkerBee.prototype = new Employee;
+WorkerBee.prototype = new Employee();
 
 // sales person
 function SalesPerson () {
   this.dept = "sales";
   this.quota = 100;
 }
-SalesPerson.prototype = new WorkerBee;
+SalesPerson.prototype = new WorkerBee();
 
 // engineer
 function Engineer (name,projects,machine) {
@@ -33,4 +33,4 @@ function Engineer (name,projects,machine) {
   this.base(name,"engineering",projects);
   this.machine = machine || "";
 }
-Engineer.prototype = new WorkerBee;
+Engineer.prototype = new WorkerBee();

@@ -89,11 +89,11 @@ function DwvApp()
      */
     this.handleKeyDown = function(event)
     {
-        if( event.keyCode == 90 && event.ctrlKey ) // crtl-z
+        if( event.keyCode === 90 && event.ctrlKey ) // crtl-z
         {
             self.getUndoStack().undo();
         }
-        else if( event.keyCode == 89 && event.ctrlKey ) // crtl-y
+        else if( event.keyCode === 89 && event.ctrlKey ) // crtl-y
         {
             self.getUndoStack().redo();
         }
@@ -107,15 +107,15 @@ function DwvApp()
     function eventHandler(event)
     {
         // if mouse event, check that it is in the canvas
-        if( event.type == "mousemove"
-            || event.type == "mousedown"
-            || event.type == "mouseup"
-            || event.type == "mousewheel" )
+        if( event.type === "mousemove"
+            || event.type === "mousedown"
+            || event.type === "mouseup"
+            || event.type === "mousewheel" )
         {
             // set event._x and event._y to be used later
             // layerX is for firefox
-            event._x = event.offsetX == undefined ? event.layerX : event.offsetX;
-            event._y = event.offsetY == undefined ? event.layerY : event.offsetY;
+            event._x = event.offsetX === undefined ? event.layerX : event.offsetX;
+            event._y = event.offsetY === undefined ? event.layerY : event.offsetY;
             
             if(event._x < 0 
                 || event._y < 0 
@@ -150,7 +150,7 @@ function DwvApp()
     function loadDicomFile(file) 
     {
         var myreader = new FileReader();
-        myreader.onload = function() {
+        myreader.onload = ( function() {
             return function(e) {
                 // read the DICOM file
                 parseAndLoadDicom(e.target.result);
@@ -164,7 +164,8 @@ function DwvApp()
                 span.innerHTML = ['<p><b>', e.target.result.length, '</b></p>'].join('');
                 document.getElementById('tagList').insertBefore(span, null);
             };
-        }();
+        }()
+        );
         myreader.readAsBinaryString(file);
     }
     
@@ -197,32 +198,32 @@ function DwvApp()
         for(;elementindex<dicomParser.dicomElement.length;elementindex++)
         {
             var dicomElement=dicomParser.dicomElement[elementindex];            
-            if(dicomElement.name=="numberOfRows")
+            if(dicomElement.name === "numberOfRows")
             {
                 numberOfRows=dicomElement.value[0];
             }
-            else if(dicomElement.name=="numberOfColumns")
+            else if(dicomElement.name === "numberOfColumns")
             {
                 numberOfColumns=dicomElement.value[0];
             }
-            else if(dicomElement.name=="pixelSpacing")
+            else if(dicomElement.name === "pixelSpacing")
             {
                 rowSpacing=parseFloat(dicomElement.value[0]);    
                 columnSpacing=parseFloat(dicomElement.value[1]);    
             }
-            else if(dicomElement.name=="windowWidth")
+            else if(dicomElement.name === "windowWidth")
             {
                 windowWidth=dicomElement.value[0];
             }
-            else if(dicomElement.name=="windowCenter")
+            else if(dicomElement.name === "windowCenter")
             {
                 windowCenter=dicomElement.value[0];            
             }
-            else if(dicomElement.name=="rescaleSlope")
+            else if(dicomElement.name === "rescaleSlope")
             {
                 rescaleSlope=parseInt(dicomElement.value, 10);    
             }
-            else if(dicomElement.name=="rescaleIntercept")
+            else if(dicomElement.name === "rescaleIntercept")
             {
                 rescaleIntercept=parseInt(dicomElement.value, 10);
             }
@@ -289,7 +290,7 @@ function DwvApp()
     this.generateAndDrawImage = function()
     {         
         // store first image data
-        if( imageData == null )
+        if( imageData === null )
         {
             imageData = self.getImageLayer().getContext().getImageData( 
                 0, 0, 

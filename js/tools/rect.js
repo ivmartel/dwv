@@ -25,9 +25,9 @@ tool.Rect = function(app)
         var endPoint = new Point2D(ev._x, ev._y);
         // check for equality
         if( beginPoint.equal(endPoint) )
-    	{
-        	return;
-    	}
+        {
+            return;
+        }
         // create rectangle
         var rect = new Rectangle(beginPoint, endPoint);
         // create draw command
@@ -43,23 +43,27 @@ tool.Rect = function(app)
         if (self.started)
         {
             // draw
-        	self.mousemove(ev);
+            self.mousemove(ev);
             // save command in undo stack
-        	app.getUndoStack().add(command);
+            app.getUndoStack().add(command);
             // set flag
-        	self.started = false;
+            self.started = false;
             // merge temporary layer
-        	app.getDrawLayer().merge(app.getTempLayer());
+            app.getDrawLayer().merge(app.getTempLayer());
         }
     };
         
     this.enable = function(value){
-        if( value ) tool.draw.appendColourChooserHtml(app);
-        else tool.draw.clearColourChooserHtml();
+        if( value ) { 
+            tool.draw.appendColourChooserHtml(app);
+        }
+        else {
+            tool.draw.clearColourChooserHtml();
+        }
     };
 
     this.keydown = function(event){
-    	app.handleKeyDown(event);
+        app.handleKeyDown(event);
     };
 
 }; // Rect function
@@ -71,35 +75,35 @@ tool.Rect = function(app)
  */
 DrawRectangleCommand = function(rectangle, app)
 {
-	// app members can change 
-	var lineColor = app.getStyle().getLineColor();
-	var context = app.getTempLayer().getContext();
-	
+    // app members can change 
+    var lineColor = app.getStyle().getLineColor();
+    var context = app.getTempLayer().getContext();
+    
     // command name
-	var name = "DrawRectangleCommand";
-	this.setName = function(str) { name = str; };
-	this.getName = function() { return name; };
+    var name = "DrawRectangleCommand";
+    this.setName = function(str) { name = str; };
+    this.getName = function() { return name; };
 
-	// main method
-	this.execute = function()
-	{
-		// style
-		context.fillStyle = lineColor;
-		context.strokeStyle = lineColor;
-		// path
+    // main method
+    this.execute = function()
+    {
+        // style
+        context.fillStyle = lineColor;
+        context.strokeStyle = lineColor;
+        // path
         context.beginPath();
         context.strokeRect( 
-        		rectangle.getBegin().getX(), 
-        		rectangle.getBegin().getY(),
-        		rectangle.getRealWidth(),
-        		rectangle.getRealHeight() );
-		// length
+                rectangle.getBegin().getX(), 
+                rectangle.getBegin().getY(),
+                rectangle.getRealWidth(),
+                rectangle.getRealHeight() );
+        // length
         var surf = rectangle.getWorldSurface( 
-        	app.getImage().getSpacing()[0], 
-        	app.getImage().getSpacing()[1] );
+            app.getImage().getSpacing()[0], 
+            app.getImage().getSpacing()[1] );
         context.font = app.getStyle().getFontStr();
         context.fillText( Math.round(surf) + "mm2",
-        		rectangle.getEnd().getX() + app.getStyle().getFontSize(),
-        		rectangle.getEnd().getY() + app.getStyle().getFontSize());
-	}; 
+                rectangle.getEnd().getX() + app.getStyle().getFontSize(),
+                rectangle.getEnd().getY() + app.getStyle().getFontSize());
+    }; 
 }; // Rectangle command class
