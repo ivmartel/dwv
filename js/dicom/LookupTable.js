@@ -5,15 +5,6 @@
  */
 function LookupTable()
 {
-    // members
-    this.huLookup;
-    this.ylookup;
-    this.rescaleSlope;
-    this.rescaleIntercept;
-    this.windowCenter;
-    this.windowWidth;
-    this.defaultWindowCenter;
-    this.defaultWindowWidth;
     // methods
     this.calculateHULookup=calculateHULookup;
     this.calculateLookup=calculateLookup;
@@ -34,15 +25,15 @@ function setWindowingdata(wc,ww)
 {
     this.windowCenter = wc;
     this.windowWidth = ww;    
-};
+}
 
 function calculateHULookup()
 {
     this.huLookup = new Array(4096);         
-	for(var inputValue=0; inputValue<=4095; inputValue++)
-	{        
-	    this.huLookup[inputValue] = inputValue * this.rescaleSlope + this.rescaleIntercept;        
-	}        
+    for(var inputValue=0; inputValue<=4095; inputValue++)
+    {        
+        this.huLookup[inputValue] = inputValue * this.rescaleSlope + this.rescaleIntercept;        
+    }        
 }  
 
 function calculateLookup()
@@ -65,8 +56,8 @@ function calculateLookup()
         else
         {                
             var y = ( (this.huLookup[inputValue] - (this.windowCenter-0.5) ) / (this.windowWidth-1) + 0.5 )
-            	* (yMax-yMin) + yMin;                        
-            this.ylookup[inputValue]= parseInt(y);
+                * (yMax-yMin) + yMin;                        
+            this.ylookup[inputValue]= parseInt(y, 10);
         }
      }
 }

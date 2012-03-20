@@ -7,8 +7,8 @@
 */
 function DicomImage(size, spacing, buffer){
 
-	var self = this;
-	// size: [0]=row, [1]=column
+    var self = this;
+    // size: [0]=row, [1]=column
     this.size = size;
     // size: [0]=row, [1]=column
     this.spacing = spacing;
@@ -37,12 +37,12 @@ function DicomImage(size, spacing, buffer){
 
 DicomImage.prototype.getValue = function( i, j )
 {
-	return this.getValueAtOffset( ( j * this.size[0] ) + i );
+    return this.getValueAtOffset( ( j * this.size[0] ) + i );
 };
 
 DicomImage.prototype.getValueAtOffset = function( offset )
 {
-	return this.lookup.huLookup[ this.buffer[offset] ];
+    return this.lookup.huLookup[ this.buffer[offset] ];
 };
 
 DicomImage.prototype.setLookup = function( windowCenter, windowWidth, rescaleSlope, rescaleIntercept )
@@ -62,8 +62,8 @@ DicomImage.prototype.generateImageData = function( array )
     {
         for(var i=0; i < this.size[0]; ++i)
         {        
-        	colorOffset = (j * this.size[0] + i) * 4;                    
-            pxValue = parseInt( this.lookup.ylookup[ this.buffer[imageOffset] ] );    
+            colorOffset = (j * this.size[0] + i) * 4;                    
+            pxValue = parseInt( this.lookup.ylookup[ this.buffer[imageOffset] ], 10 );    
             imageOffset++;               
             array.data[colorOffset] = pxValue;
             array.data[colorOffset+1] = pxValue;

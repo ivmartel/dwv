@@ -52,17 +52,17 @@ function Layer(name)
     this.setTranslate = function(tx,ty)
     {
         // new origin
-    	originX += tx;
+        originX += tx;
         originY += ty;
     };
     
     // translation is according to the last one
     this.translate = function(tx,ty)
     {
-		// set the translate
-    	this.setTranslate(tx, ty);
-    	// draw
-    	this.draw();
+        // set the translate
+        this.setTranslate(tx, ty);
+        // draw
+        this.draw();
     };
     
     // set the image data array
@@ -76,8 +76,8 @@ function Layer(name)
      */ 
     this.resetLayout = function()
     {
-    	originX = 0;
-    	originY = 0;
+        originX = 0;
+        originY = 0;
         width = canvas.width;
         height = canvas.height;
     };
@@ -88,7 +88,7 @@ function Layer(name)
      */
     this.draw = function()
     {
-    	// clear the context
+        // clear the context
         this.clearContextRect();
         
         // Put the image data in the context

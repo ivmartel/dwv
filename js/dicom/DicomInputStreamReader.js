@@ -1,7 +1,7 @@
 function DicomInputStreamReader()
 {    
-    this.inputBuffer;
-    this.inputStreamReader;
+    //this.inputBuffer;
+    //this.inputStreamReader;
     this.readDicom=readDicom;
     this.getInputBuffer=getInputBuffer;
     this.getReader=getReader;

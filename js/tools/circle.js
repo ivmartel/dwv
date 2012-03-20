@@ -28,7 +28,7 @@ tool.Circle = function(app)
         // check zero radius
         if( radius == 0 )
         {
-        	return
+        	return;
         }
         // centre
         var centre = new Point2D(self.x0, self.y0);

@@ -8,11 +8,6 @@ function DicomParser(inputBuffer,reader)
     // members
     this.inputBuffer=inputBuffer;
     this.reader=reader;    
-    this.dicomElement;
-    this.pixelBuffer;
-    this.pixelDataOffset;
-    this.numberOfRows;
-    this.numberOfColumns;
     // methods
     this.parseAll=parseAll;
 }
@@ -47,7 +42,7 @@ DicomParser.prototype.setDicomElement=function(name,vr,vl,group,element,value,of
 {
     if(this.dicomElement==null)
     {
-        this.dicomElement=new Array();
+        this.dicomElement = [];
     }
     
     this.dicomElement[elementIndex++]=new DicomElement(name,vr,vl,group,element,value,offset);

@@ -108,10 +108,10 @@ function DwvApp()
     {
         // if mouse event, check that it is in the canvas
         if( event.type == "mousemove"
-        	|| event.type == "mousedown"
-        	|| event.type == "mouseup" )
+            || event.type == "mousedown"
+            || event.type == "mouseup" )
         {
-        	// set event._x and event._y to be used later
+            // set event._x and event._y to be used later
             // layerX is for firefox
             event._x = event.offsetX == undefined ? event.layerX : event.offsetX;
             event._y = event.offsetY == undefined ? event.layerY : event.offsetY;
@@ -152,10 +152,10 @@ function DwvApp()
         myreader.onload = function() {
             return function(e) {
                 // read the DICOM file
-            	parseAndLoadDicom(e.target.result);
-            	// prepare display
-            	postLoadInit();
-            	// Generate and draw the image data array
+                parseAndLoadDicom(e.target.result);
+                // prepare display
+                postLoadInit();
+                // Generate and draw the image data array
                 self.generateAndDrawImage();
                  
                 // add the tag list data
@@ -219,11 +219,11 @@ function DwvApp()
             }
             else if(dicomElement.name=="rescaleSlope")
             {
-                rescaleSlope=parseInt(dicomElement.value);    
+                rescaleSlope=parseInt(dicomElement.value, 10);    
             }
             else if(dicomElement.name=="rescaleIntercept")
             {
-                rescaleIntercept=parseInt(dicomElement.value);
+                rescaleIntercept=parseInt(dicomElement.value, 10);
             }
 
             var lastRow = table.rows.length;
@@ -254,8 +254,8 @@ function DwvApp()
     {
         var numberOfColumns = image.getSize()[0];
         var numberOfRows = image.getSize()[1];
-    	
-    	// image layer
+        
+        // image layer
         imageLayer = new Layer("imageLayer");
         imageLayer.init(numberOfColumns, numberOfRows);
         imageLayer.fillContext();

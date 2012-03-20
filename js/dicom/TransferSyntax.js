@@ -5,16 +5,6 @@
  */
 function TransferSyntax()
 {    
-    this._uid;
-
-    this._bigEndian;
-
-    this._explicitVR;
-
-    this._deflated;
-
-    this._encapsulated;
-
     this.ImplicitVRLittleEndian =new TransferSyntax("1.2.840.10008.1.2", false, false, false, false);
 
     this.ImplicitVRBigEndian = new TransferSyntax(null, false, true, false, false);
@@ -58,16 +48,21 @@ function TransferSyntax()
     }; 
     this.valueOf=function(uid)
     {
-        if (uid == null)
+        if (uid == null) {
             throw new Error("uid");
-        if (uid ==ImplicitVRLittleEndian._uid)
+        }
+        if (uid ==ImplicitVRLittleEndian._uid) {
             return ImplicitVRLittleEndian;
-        if (uid==ExplicitVRLittleEndian._uid)
+        }
+        if (uid==ExplicitVRLittleEndian._uid) {
             return ExplicitVRLittleEndian;
-        if (uid ==ExplicitVRBigEndian._uid)
+        }
+        if (uid ==ExplicitVRBigEndian._uid) {
             return ExplicitVRBigEndian;
-        if (uid ==DeflatedExplicitVRLittleEndian._uid)
+        }
+        if (uid ==DeflatedExplicitVRLittleEndian._uid) {
             return DeflatedExplicitVRLittleEndian;
+        }
         return new TransferSyntax(uid, true, false, false, true);
     };
 }
