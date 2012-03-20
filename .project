@@ -10,8 +10,14 @@
 			<arguments>
 			</arguments>
 		</buildCommand>
+		<buildCommand>
+			<name>com.googlecode.jslint4java.eclipse.jsLintBuilder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
 	</buildSpec>
 	<natures>
 		<nature>org.eclipse.wst.jsdt.core.jsNature</nature>
+		<nature>com.googlecode.jslint4java.eclipse.jsLintNature</nature>
 	</natures>
 </projectDescription>
