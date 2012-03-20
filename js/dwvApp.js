@@ -107,9 +107,11 @@ function DwvApp()
     function eventHandler(event)
     {
         // if mouse event, check that it is in the canvas
-        if( event.type = MouseEvent )
+        if( event.type == "mousemove"
+        	|| event.type == "mousedown"
+        	|| event.type == "mouseup" )
         {
-            // set event._x and event._y to be used later
+        	// set event._x and event._y to be used later
             // layerX is for firefox
             event._x = event.offsetX == undefined ? event.layerX : event.offsetX;
             event._y = event.offsetY == undefined ? event.layerY : event.offsetY;
