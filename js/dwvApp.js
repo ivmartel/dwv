@@ -109,7 +109,8 @@ function DwvApp()
         // if mouse event, check that it is in the canvas
         if( event.type == "mousemove"
             || event.type == "mousedown"
-            || event.type == "mouseup" )
+            || event.type == "mouseup"
+            || event.type == "mousewheel" )
         {
             // set event._x and event._y to be used later
             // layerX is for firefox
