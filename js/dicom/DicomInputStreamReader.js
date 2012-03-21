@@ -2,7 +2,7 @@ function readDicom(url)
 {
     //this.inputStreamReader=new BinFileReader(url);
     this.inputStreamReader=new LocalFileReader(url);                
-    this.inputBuffer = new Array(this.inputStreamReader.getFileSize); 
+    this.inputBuffer = new Array(this.inputStreamReader.getFileSize()); 
     this.inputBuffer=this.inputStreamReader.readBytes();    
 }
 
