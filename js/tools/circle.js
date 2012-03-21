@@ -104,8 +104,8 @@ DrawCircleCommand = function(circle, app)
         context.stroke();
         // surface
         var surf = circle.getWorldSurface( 
-            app.getImage().getSpacing()[0], 
-            app.getImage().getSpacing()[1] );
+            app.getImage().getSpacing().getColumnSpacing(), 
+            app.getImage().getSpacing().getRowSpacing() );
         context.font = app.getStyle().getFontStr();
         context.fillText( Math.round(surf) + "mm2",
                 circle.getCenter().getX() + app.getStyle().getFontSize(),

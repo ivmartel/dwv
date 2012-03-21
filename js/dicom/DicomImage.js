@@ -3,14 +3,71 @@
 */
 
 /**
-* DicomImage.
+* Image Size class. 
+* Supports 2D and 3D images.
+* @param numberOfColumns The number of columns (number).
+* @param numberOfRows The number of rows (number).
+* @param numberOfSlices The number of slices (number).
 */
-function DicomImage(size, spacing, buffer){
+function ImageSize( numberOfColumns, numberOfRows, numberOfSlices ) {
+    return {
+        getNumberOfColumns: function() {
+            return numberOfColumns;
+        },
+        getNumberOfRows: function() {
+            return numberOfRows;
+        },
+        getNumberOfSlices: function() {
+            return (numberOfSlices || 1);
+        },
+        getSliceSize: function() {
+            return numberOfColumns*numberOfRows;
+        },
+        checkCoordinates: function( i, j, k ) {
+            if( i < 0 || i >= this.getNumberOfColumns() ) {
+                throw new Error('Index (i) out of range.');
+            }
+            else if( j < 0 || j >= this.getNumberOfRows() ) {
+                throw new Error('Index (j) out of range.');
+            }
+            else if( k < 0 || k >= this.getNumberOfSlices() ) {
+                throw new Error('Index (k) out of range.');
+            }
+            return true;
+        }
+    };
+}
+
+/**
+* Image Spacing class. 
+* Supports 2D and 3D images.
+* @param columnSpacing The column spacing (number).
+* @param rowSpacing The row spacing (number).
+* @param sliceSpacing The slice spacing (number).
+*/
+function ImageSpacing( columnSpacing, rowSpacing, sliceSpacing ) {
+    return {
+        getColumnSpacing: function() {
+            return columnSpacing;
+        },
+        getRowSpacing: function() {
+            return rowSpacing;
+        },
+        getSliceSpacing: function() {
+            return (sliceSpacing || 1);
+        }
+    };
+}
+
+/**
+* DicomImage class.
+*/
+function DicomImage(size, spacing, buffer) {
 
     var self = this;
-    // size: [0]=row, [1]=column
+    // ImageSize
     this.size = size;
-    // size: [0]=row, [1]=column
+    // ImageSpacing
     this.spacing = spacing;
     // buffer
     this.buffer = buffer;
@@ -35,9 +92,13 @@ function DicomImage(size, spacing, buffer){
     };
 }
 
-DicomImage.prototype.getValue = function( i, j )
+DicomImage.prototype.getValue = function( i, j, k )
 {
-    return this.getValueAtOffset( ( j * this.size[0] ) + i );
+    var k1 = k || 0;
+    // check size
+    this.size.checkCoordinates( i, j, k1 );
+    // return
+    return this.getValueAtOffset( i + ( j * this.size.getNumberOfColumns() ) + ( k1 * this.size.getSliceSize()) );
 };
 
 DicomImage.prototype.getValueAtOffset = function( offset )
@@ -52,17 +113,20 @@ DicomImage.prototype.setLookup = function( windowCenter, windowWidth, rescaleSlo
     this.lookup.calculateHULookup();
 };
 
-DicomImage.prototype.generateImageData = function( array )
+DicomImage.prototype.generateImageData = function( array, sliceNumber )
 {        
     this.lookup.calculateLookup();
-    var imageOffset = 0;
+    var sliceOffset = (sliceNumber || 0) * this.size.getSliceSize();
+    var rowOffset = 0;
+    var imageOffset = sliceOffset;
     var colorOffset = 0;
     var pxValue = 0;
-    for(var j=0; j < this.size[1]; ++j)
+    for(var j=0; j < this.size.getNumberOfRows(); ++j)
     {
-        for(var i=0; i < this.size[0]; ++i)
+        rowOffset = j * this.size.getNumberOfColumns();
+        for(var i=0; i < this.size.getNumberOfColumns(); ++i)
         {        
-            colorOffset = (j * this.size[0] + i) * 4;                    
+            colorOffset = (i + rowOffset + sliceOffset) * 4;                    
             pxValue = parseInt( this.lookup.ylookup[ this.buffer[imageOffset] ], 10 );    
             imageOffset++;               
             array.data[colorOffset] = pxValue;

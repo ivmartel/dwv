@@ -99,8 +99,8 @@ DrawLineCommand = function(line, app)
         context.closePath();
         // length
         var length = line.getWorldLength( 
-            app.getImage().getSpacing()[0], 
-            app.getImage().getSpacing()[1] );
+            app.getImage().getSpacing().getColumnSpacing(), 
+            app.getImage().getSpacing().getRowSpacing() );
         context.font = app.getStyle().getFontStr();
         context.fillText( Math.round(length) + "mm",
                 line.getEnd().getX() + app.getStyle().getFontSize(),

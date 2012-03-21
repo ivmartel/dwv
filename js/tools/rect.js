@@ -99,8 +99,8 @@ DrawRectangleCommand = function(rectangle, app)
                 rectangle.getRealHeight() );
         // length
         var surf = rectangle.getWorldSurface( 
-            app.getImage().getSpacing()[0], 
-            app.getImage().getSpacing()[1] );
+            app.getImage().getSpacing().getColumnSpacing(), 
+            app.getImage().getSpacing().getRowSpacing() );
         context.font = app.getStyle().getFontStr();
         context.fillText( Math.round(surf) + "mm2",
                 rectangle.getEnd().getX() + app.getStyle().getFontSize(),

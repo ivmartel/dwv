@@ -119,8 +119,8 @@ function DwvApp()
             
             if(event._x < 0 
                 || event._y < 0 
-                || event._x >= image.getSize()[0] 
-                || event._y >= image.getSize()[1] )
+                || event._x >= image.getSize().getNumberOfColumns() 
+                || event._y >= image.getSize().getNumberOfRows() )
             {
                 // exit
                 return;
@@ -242,8 +242,8 @@ function DwvApp()
         
         // create the DICOM image
         image = new DicomImage(
-            [numberOfRows, numberOfColumns],
-            [rowSpacing, columnSpacing],
+            ImageSize(numberOfColumns, numberOfRows),
+            ImageSpacing(columnSpacing, rowSpacing),
             dicomParser.pixelBuffer );
         image.setLookup( windowCenter, windowWidth, rescaleSlope, rescaleIntercept);
     }
@@ -254,8 +254,8 @@ function DwvApp()
      */
     function postLoadInit()
     {
-        var numberOfColumns = image.getSize()[0];
-        var numberOfRows = image.getSize()[1];
+        var numberOfColumns = image.getSize().getNumberOfColumns();
+        var numberOfRows = image.getSize().getNumberOfRows();
         
         // image layer
         imageLayer = new Layer("imageLayer");
@@ -294,8 +294,8 @@ function DwvApp()
         {
             imageData = self.getImageLayer().getContext().getImageData( 
                 0, 0, 
-                self.getImage().getSize()[0], 
-                self.getImage().getSize()[1]);
+                self.getImage().getSize().getNumberOfColumns(), 
+                self.getImage().getSize().getNumberOfRows());
         }
         // generate image data from DICOM
         self.getImage().generateImageData(imageData);         
