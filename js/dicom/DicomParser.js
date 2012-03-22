@@ -4,25 +4,24 @@
  *  Author: BabuHussain<babuhussain.a@raster.in>
  */
 
-function DicomElement(name,vr,vl,group,element,value,offset) {
-    this.vr_type=vr;
+/**
+ * DicomElement class.
+ */
+function DicomElement(name, vr, vl, group, element, value, offset) {
+    // Tag name
+    this.name = name;
+    // Value Representation
+    this.vr = vr;
+    // Value Length
+    this.vl = vl;
+    // DICOM group
+    this.group = group;
+    // DICOM element
+    this.element = element;
     // Element Value
-    this.value=value;
-    // Element code
-    this.length=vl;
-    this.group=group;
-    this.element=element;
-    this.offset=offset;
-    this.name=name;
-}
-
-function parseAll()
-{
-    var index = 0;
-    // read tags
-    index = this.readTags();
-    // read pixel data
-    this.readImage(index);    
+    this.value = value;
+    // Position in the DICOM file
+    this.offset = offset;
 }
 
 /**
@@ -34,15 +33,13 @@ function DicomParser(inputBuffer,reader)
     this.inputBuffer = inputBuffer;
     this.reader = reader;
     this.dicomElement = [];
-    // methods
-    this.parseAll = parseAll;
     this.dict = new Dictionary();
 }
 
-function getPixelBuffer()
+DicomParser.prototype.getPixelBuffer=function()
 {
     return this.pixelBuffer;
-}
+};
 
 DicomParser.prototype.setDicomElement=function(name,vr,vl,group,element,value,offset)
 {
@@ -134,7 +131,7 @@ DicomParser.prototype.readDataElement=function(offset)
         'offset': elementOffset};    
 };
 
-DicomParser.prototype.readTags = function() //function( offset, firstContent, secondContent, thirdContent, fourthContent, tagName)
+DicomParser.prototype.readTags = function()
 {
     var offset = 0;
     var i;
@@ -218,3 +215,10 @@ DicomParser.prototype.readImage=function(index)
     }
 };
 
+DicomParser.prototype.parseAll=function()
+{
+    // read tags
+    var index = this.readTags();
+    // read pixel data
+    this.readImage(index);    
+};
