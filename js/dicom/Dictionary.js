@@ -1894,7 +1894,7 @@ function Dictionary() {
         this.newDictionary['0xFFFC'] = [];
         this.newDictionary['0xFFFC']['0xFFFC'] = ['OB', '1', 'DataSetTrailingPadding'];
 
-        // 0xFFFE]
+        // 0xFFFE
         this.newDictionary['0xFFFE'] = [];
         this.newDictionary['0xFFFE']['0xE000'] = ['NONE', '1', 'Item'];
         this.newDictionary['0xFFFE']['0xE00D'] = ['NONE', '1', 'ItemDelimitationItem'];
