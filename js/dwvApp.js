@@ -198,32 +198,32 @@ function DwvApp()
         for(;elementindex<dicomParser.dicomElement.length;elementindex++)
         {
             var dicomElement=dicomParser.dicomElement[elementindex];            
-            if(dicomElement.name === "numberOfRows")
+            if(dicomElement.name === "Rows")
             {
                 numberOfRows=dicomElement.value[0];
             }
-            else if(dicomElement.name === "numberOfColumns")
+            else if(dicomElement.name === "Columns")
             {
                 numberOfColumns=dicomElement.value[0];
             }
-            else if(dicomElement.name === "pixelSpacing")
+            else if(dicomElement.name === "PixelSpacing")
             {
                 rowSpacing=parseFloat(dicomElement.value[0]);    
                 columnSpacing=parseFloat(dicomElement.value[1]);    
             }
-            else if(dicomElement.name === "windowWidth")
+            else if(dicomElement.name === "WindowWidth")
             {
                 windowWidth=dicomElement.value[0];
             }
-            else if(dicomElement.name === "windowCenter")
+            else if(dicomElement.name === "WindowCenter")
             {
                 windowCenter=dicomElement.value[0];            
             }
-            else if(dicomElement.name === "rescaleSlope")
+            else if(dicomElement.name === "RescaleSlope")
             {
                 rescaleSlope=parseInt(dicomElement.value, 10);    
             }
-            else if(dicomElement.name === "rescaleIntercept")
+            else if(dicomElement.name === "RescaleIntercept")
             {
                 rescaleIntercept=parseInt(dicomElement.value, 10);
             }
