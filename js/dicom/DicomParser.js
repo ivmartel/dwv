@@ -4,7 +4,17 @@
  *  Author: BabuHussain<babuhussain.a@raster.in>
  */
 
-var elementIndex=0;
+function DicomElement(name,vr,vl,group,element,value,offset) {
+    this.vr_type=vr;
+    // Element Value
+    this.value=value;
+    // Element code
+    this.length=vl;
+    this.group=group;
+    this.element=element;
+    this.offset=offset;
+    this.name=name;
+}
 
 function parseAll()
 {
@@ -36,7 +46,7 @@ function getPixelBuffer()
 
 DicomParser.prototype.setDicomElement=function(name,vr,vl,group,element,value,offset)
 {
-    this.dicomElement[elementIndex++]=new DicomElement(name,vr,vl,group,element,value,offset);
+    this.dicomElement.push( new DicomElement(name,vr,vl,group,element,value,offset) );
 };
 
 DicomParser.prototype.readTag=function(offset)
@@ -195,22 +205,6 @@ DicomParser.prototype.readTags = function() //function( offset, firstContent, se
     }
     
     return i;
-};
-
-DicomParser.prototype.moveToPixelDataTag=function(index)
-{
-    for(var i=index; i<this.inputBuffer.length; i++)
-    {
-        if( this.reader.readNumber(1,i) === 224 
-            && this.reader.readNumber(1,i+1) === 127
-            && this.reader.readNumber(1,i+2) === 16
-            && this.reader.readNumber(1,i+3) === 0)
-        {            
-            this.pixelDataOffset=i+4;
-            break;
-        }    
-    } 
-    return this.pixelDataOffset;
 };
 
 DicomParser.prototype.readImage=function(index)
