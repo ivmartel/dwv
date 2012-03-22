@@ -127,6 +127,7 @@ DicomParser.prototype.readDataElement=function(offset)
 DicomParser.prototype.readTags = function() //function( offset, firstContent, secondContent, thirdContent, fourthContent, tagName)
 {
     var offset = 0;
+    var i;
     
     // dictionary
     this.dict.init();
@@ -148,7 +149,7 @@ DicomParser.prototype.readTags = function() //function( offset, firstContent, se
     // meta elements
     var metaStart = offset;
     var metaEnd = offset + metaLength;
-    for(var i=metaStart; i<metaEnd; i++) 
+    for( i=metaStart; i<metaEnd; i++ ) 
     {
         // get the data element
         dataElement = this.readDataElement(i);
@@ -164,13 +165,13 @@ DicomParser.prototype.readTags = function() //function( offset, firstContent, se
         this.setDicomElement( dataElement.tag.name,
             dataElement.vr, dataElement.vl,
             dataElement.tag.group, dataElement.tag.element,
-            dataElement.data, i-4);
+            dataElement.data, i);
         // increment index
         i += dataElement.offset-1;
     }
     
     // DICOM data elements
-    for(var i=metaEnd; i<this.inputBuffer.length; i++) 
+    for( i=metaEnd; i<this.inputBuffer.length; i++) 
     {
         // get the data element
         dataElement = this.readDataElement(i);
@@ -188,7 +189,7 @@ DicomParser.prototype.readTags = function() //function( offset, firstContent, se
         this.setDicomElement( dataElement.tag.name,
             dataElement.vr, dataElement.vl,
             dataElement.tag.group, dataElement.tag.element,
-            dataElement.data, i-4);
+            dataElement.data, i);
         // increment index
         i += dataElement.offset-1;
     }
