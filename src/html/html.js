@@ -1,5 +1,8 @@
+// html namespace
+var html = html || {};
+
 /**
-* HTML utilitaries.
+* HTML utilities functions.
 */
 
 /**
@@ -7,7 +10,7 @@
  * @param inputArray The input array, can be either a 1D array, 
  *                   2D array or an array of objects
  */
-arrayToTable = function(inputArray)
+html.arrayToTable = function(inputArray)
 {
     var table = document.createElement('table');
     var row = 0;
@@ -38,7 +41,7 @@ arrayToTable = function(inputArray)
                     var th = header.insertRow(-1);
                     for( var k=0; k<keys.length; ++k ) {
                         cell = th.insertCell(-1);
-                        cell.appendChild(document.createTextNode(capitaliseFirstLetter(keys[k])));
+                        cell.appendChild(document.createTextNode(utils.capitaliseFirstLetter(keys[k])));
                     }
                 }
                 // values

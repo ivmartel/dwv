@@ -179,7 +179,7 @@ function DwvApp()
         dicomParser.parseAll();     
         
         // tag list table      
-        var table = arrayToTable(dicomParser.dicomElement);
+        var table = html.arrayToTable(dicomParser.dicomElement);
         table.className = "tagList";
         document.getElementById('tags').appendChild(table);
         document.getElementById("tags").style.display='';
