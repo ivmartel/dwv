@@ -26,8 +26,8 @@ a { color: #ddf; }
 
 /* Tag list */
 table.tagList { border-collapse:collapse; }
-table.tagList th { border: 1px solid black; }
-table.tagList td { border: 1px solid black; }
+table.tagList thead td { font-weight: bold; }
+table.tagList td { border: 1px solid grey; padding: 2px; }
 
 /* Colour chooser */
 table.colourChooser td { width:20px; height:20px; border:#fff solid 2px; }
