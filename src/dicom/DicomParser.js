@@ -172,12 +172,11 @@ DicomParser.prototype.readTags = function()
             break;
         }
         // store the data element
-        var thename = dataElement.tag.name;
-        this.appendDicomElement( { thename: {
+        this.appendDicomElement( {
             'name': dataElement.tag.name,
             'group' : dataElement.tag.group, 
             'element': dataElement.tag.element,
-            'value': dataElement.data } } );
+            'value': dataElement.data } );
         // increment index
         i += dataElement.offset-1;
     }
