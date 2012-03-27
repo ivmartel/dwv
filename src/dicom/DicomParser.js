@@ -1,28 +1,6 @@
 /**
  *  DicomParser.js
- *  Version 0.5
- *  Author: BabuHussain<babuhussain.a@raster.in>
  */
-
-/**
- * DicomElement class.
- */
-function DicomElement(name, vr, vl, group, element, value, offset) {
-    // Tag name
-    this.name = name;
-    // Value Representation
-    this.vr = vr;
-    // Value Length
-    this.vl = vl;
-    // DICOM group
-    this.group = group;
-    // DICOM element
-    this.element = element;
-    // Element Value
-    this.value = value;
-    // Position in the DICOM file
-    this.offset = offset;
-}
 
 /**
  * DicomParser class.
@@ -41,9 +19,9 @@ DicomParser.prototype.getPixelBuffer=function()
     return this.pixelBuffer;
 };
 
-DicomParser.prototype.setDicomElement=function(name,vr,vl,group,element,value,offset)
+DicomParser.prototype.appendDicomElement=function( element )
 {
-    this.dicomElement.push( new DicomElement(name,vr,vl,group,element,value,offset) );
+    this.dicomElement.push( element );
 };
 
 DicomParser.prototype.readTag=function(offset)
@@ -169,10 +147,11 @@ DicomParser.prototype.readTags = function()
             }
         }            
         // store the data element
-        this.setDicomElement( dataElement.tag.name,
-            dataElement.vr, dataElement.vl,
-            dataElement.tag.group, dataElement.tag.element,
-            dataElement.data, i);
+        this.appendDicomElement( { 
+            'name': dataElement.tag.name,
+            'group': dataElement.tag.group, 
+            'element': dataElement.tag.element,
+            'value': dataElement.data } );
         // increment index
         i += dataElement.offset-1;
     }
@@ -193,10 +172,12 @@ DicomParser.prototype.readTags = function()
             break;
         }
         // store the data element
-        this.setDicomElement( dataElement.tag.name,
-            dataElement.vr, dataElement.vl,
-            dataElement.tag.group, dataElement.tag.element,
-            dataElement.data, i);
+        var thename = dataElement.tag.name;
+        this.appendDicomElement( { thename: {
+            'name': dataElement.tag.name,
+            'group' : dataElement.tag.group, 
+            'element': dataElement.tag.element,
+            'value': dataElement.data } } );
         // increment index
         i += dataElement.offset-1;
     }
