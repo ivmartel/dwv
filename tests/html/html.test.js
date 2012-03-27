@@ -17,7 +17,7 @@ $(document).ready(function(){
         // array of objects
         var array2 = [{a:0, b:1}, {a:2, b:3}];
         var table2 = arrayToTable(array2);
-        var table2_ref = "<table><thead><tr><td>a</td><td>b</td></tr></thead><tbody><tr><td>0</td><td>1</td></tr><tr><td>2</td><td>3</td></tr></tbody></table>";
+        var table2_ref = "<table><thead><tr><td>A</td><td>B</td></tr></thead><tbody><tr><td>0</td><td>1</td></tr><tr><td>2</td><td>3</td></tr></tbody></table>";
         equal(table2.outerHTML, table2_ref, "Array of objects");
     });
 

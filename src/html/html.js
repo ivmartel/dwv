@@ -38,7 +38,7 @@ arrayToTable = function(inputArray)
                     var th = header.insertRow(-1);
                     for( var k=0; k<keys.length; ++k ) {
                         cell = th.insertCell(-1);
-                        cell.appendChild(document.createTextNode(keys[k]));
+                        cell.appendChild(document.createTextNode(capitaliseFirstLetter(keys[k])));
                     }
                 }
                 // values
