@@ -15,25 +15,35 @@ arrayToTable = function(inputArray)
     var keys = 0;
     
     for(var i=0; i<inputArray.length; ++i) {
-        row = table.insertRow(i);
+        row = table.insertRow(-1);
         // 1D array
         if( typeof inputArray[i] === 'number' || typeof inputArray[i] === 'string') {
-            cell = row.insertCell(0);
+            cell = row.insertCell(-1);
             cell.appendChild(document.createTextNode(inputArray[i]));
         }
         else if( typeof inputArray[i] === 'object' ) {
             // 2D array
             if( inputArray[i] instanceof Array ) {
                 for( var j=0; j<inputArray[i].length; ++j) {
-                    cell = row.insertCell(j);
+                    cell = row.insertCell(-1);
                     cell.appendChild(document.createTextNode(inputArray[i][j]));
                 }
             }
             // array of objects
             else {
                 keys = Object.keys(inputArray[i]);
+                // header
+                if( i === 0 ) {
+                    var header = table.createTHead();
+                    var th = header.insertRow(-1);
+                    for( var k=0; k<keys.length; ++k ) {
+                        cell = th.insertCell(-1);
+                        cell.appendChild(document.createTextNode(keys[k]));
+                    }
+                }
+                // values
                 for( var o=0; o<keys.length; ++o ) {
-                    cell = row.insertCell(o);
+                    cell = row.insertCell(-1);
                     cell.appendChild(document.createTextNode(inputArray[i][keys[o]]));
                 }
             }
