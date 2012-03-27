@@ -54,10 +54,10 @@
     $(document).ready(function(){
         // create buttons and dialogs
         $("button").button();
-        $("#openFile").dialog({ "position": [10, 110] });
+        $("#openFile").dialog({ position: [10, 110] });
         $("#toolbox").dialog({ position: [10, 280] });
         $("#history").dialog({ position: [10, 450] });
-        $("#tags").dialog({ position: ['right', 110], autoOpen: false });
+        $("#tags").dialog({ position: ['right', 110], autoOpen: false, height: 400 });
         
         $("#layerContainer").dialog({ position: [340, 110], 
             width: [550], height: [570] });
@@ -92,15 +92,7 @@ Path: <input type="file" id="files" name="files[]" multiple />
 <div id="history" title="History"></div>
 
 <!-- Tags -->
-<div id="tags" title="Tags" style="display:none;">
-<table id="tagList" class="tagList">
-<tr>
-<th>Tag</th>
-<th>Name</th>
-<th>Value</th>
-</tr>
-</table>
-</div>
+<div id="tags" title="Tags" style="display:none;"></div>
 
 <!-- Layer Container -->
 <div id="layerContainer" title="Image">

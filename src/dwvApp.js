@@ -158,11 +158,6 @@ function DwvApp()
                 postLoadInit();
                 // Generate and draw the image data array
                 self.generateAndDrawImage();
-                 
-                // add the tag list data
-                var span = document.createElement('div');
-                span.innerHTML = ['<p><b>', e.target.result.length, '</b></p>'].join('');
-                document.getElementById('tagList').insertBefore(span, null);
             };
         }()
         );
@@ -175,6 +170,7 @@ function DwvApp()
      */
     function parseAndLoadDicom(file)
     {    
+        // parse the DICOM file
         var reader = new DicomInputStreamReader();    
         reader.readDicom(file);
         var dicomBuffer = reader.getInputBuffer();
@@ -183,8 +179,12 @@ function DwvApp()
         dicomParser.parseAll();     
         
         // tag list table      
-        var table = document.getElementById("tagList");
+        var table = arrayToTable(dicomParser.dicomElement);
+        table.className = "tagList";
+        document.getElementById('tags').appendChild(table);
+        document.getElementById("tags").style.display='';
         
+        // image details
         var numberOfRows = 0;
         var numberOfColumns = 0;
         var rowSpacing = 0;
@@ -227,19 +227,8 @@ function DwvApp()
             {
                 rescaleIntercept=parseInt(dicomElement.value, 10);
             }
-
-            var lastRow = table.rows.length;
-            var row = table.insertRow(lastRow);
-            var cell0 = row.insertCell(0);
-            cell0.appendChild(document.createTextNode(dicomElement.group+", "+dicomElement.element));
-            var cell1 = row.insertCell(1);
-            cell1.appendChild(document.createTextNode(dicomElement.name));
-            var cell2 = row.insertCell(2);
-            cell2.appendChild(document.createTextNode(dicomElement.value));
         } 
                
-        document.getElementById("tags").style.display='';
-        
         // create the DICOM image
         image = new DicomImage(
             ImageSize(numberOfColumns, numberOfRows),
