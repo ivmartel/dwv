@@ -9,6 +9,8 @@ body {
 h1 { color: #fff; }
 a { color: #ddf; }
 
+.highlighted { background: #f87217; }
+
 /* Layers */
 #layerContainer { 
     overflow: auto; 
@@ -27,7 +29,7 @@ a { color: #ddf; }
 /* Tag list */
 table.tagList { border-collapse:collapse; }
 table.tagList thead td { font-weight: bold; }
-table.tagList td { border: 1px solid grey; padding: 2px; }
+table.tagList td { border: 1px solid grey; padding: 2px; font-size: 80%; }
 
 /* Colour chooser */
 table.colourChooser td { width:20px; height:20px; border:#fff solid 2px; }
