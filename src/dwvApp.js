@@ -184,6 +184,16 @@ function DwvApp()
         document.getElementById('tags').appendChild(table);
         document.getElementById("tags").style.display='';
         
+        // table search form
+        var form = document.createElement('form');
+        form.setAttribute('class', 'filter');
+        var input = document.createElement('input');
+        input.onkeyup = function() {
+            html.filterTable(input, table);
+        };
+        form.appendChild(input);
+        document.getElementById('tags').insertBefore(form, table);
+
         // image details
         var numberOfRows = 0;
         var numberOfColumns = 0;
