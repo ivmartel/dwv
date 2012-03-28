@@ -143,7 +143,7 @@ DicomParser.prototype.readTags = function()
             var val = dataElement.data[0];
             var str = val.substring(0, val.length-1); // get rid of ending zero-with space (u200B)
             if( str !== "1.2.840.10008.1.2.1" ) {
-                throw new Error("Unsupported DICOM Transfer Syntax.");
+                throw new Error("Unsupported DICOM Transfer Syntax: '"+str+"'");
             }
         }            
         // store the data element
