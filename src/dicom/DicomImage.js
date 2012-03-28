@@ -121,6 +121,7 @@ DicomImage.prototype.generateImageData = function( array, sliceNumber )
     var imageOffset = sliceOffset;
     var colorOffset = 0;
     var pxValue = 0;
+    var lut = rainbow;
     for(var j=0; j < this.size.getNumberOfRows(); ++j)
     {
         rowOffset = j * this.size.getNumberOfColumns();
@@ -129,9 +130,9 @@ DicomImage.prototype.generateImageData = function( array, sliceNumber )
             colorOffset = (i + rowOffset + sliceOffset) * 4;                    
             pxValue = parseInt( this.lookup.ylookup[ this.buffer[imageOffset] ], 10 );    
             imageOffset++;               
-            array.data[colorOffset] = pxValue;
-            array.data[colorOffset+1] = pxValue;
-            array.data[colorOffset+2] = pxValue;
+            array.data[colorOffset] = lut.red[pxValue];
+            array.data[colorOffset+1] = lut.green[pxValue];
+            array.data[colorOffset+2] = lut.blue[pxValue];
         }
     }            
 };
