@@ -51,10 +51,16 @@ function updateWindowingData(wc,ww)
     app.generateAndDrawImage();
 }
 
-function applyPreset(preset)    
+function updateColourMap(colourMap)    
+{    
+    app.getImage().setColourMap(colourMap);
+    app.generateAndDrawImage();
+}
+
+function applyPreset(presetId)    
 {    
     var ww, wc;
-    switch (preset)
+    switch (presetId)
     {
         case 1: // default
             wc=app.getImage().getLookup().defaultWindowCenter;
@@ -94,10 +100,30 @@ function applyPreset(preset)
     }
 }
 
+function applyColourMap(colourMapId)    
+{    
+    switch (colourMapId)
+    {
+        case 1: // default
+            updateColourMap(lut.plain);
+            break;
+            
+        case 2: // rainbow
+            updateColourMap(lut.rainbow);
+            break;
+    }
+}
+
 function changePreset(event)
 {    
     applyPreset( parseInt(document.getElementById("presetsMenu").options[
         document.getElementById("presetsMenu").selectedIndex].value, 10) );
+}
+
+function changeColourMap(event)
+{    
+    applyColourMap( parseInt(document.getElementById("colourMapMenu").options[
+        document.getElementById("colourMapMenu").selectedIndex].value, 10) );
 }
 
 
@@ -165,27 +191,51 @@ tool.WindowLevel.prototype.appendHtml = function()
     var div = document.createElement("div");
     div.id = "presetSelector";
     
-    var paragraph = document.createElement("p");  
-    paragraph.appendChild(document.createTextNode("WL Preset: "));
-    
-    var selector = document.createElement("select");
-    selector.id = "presetsMenu";
-    selector.name = "presetsMenu";
-    selector.onchange = changePreset;
-    selector.selectedIndex = 1;
-
-    var options = ["Default", "Abdomen", "Lung", "Brain", "Bone", "Head"];
+    // paragraph for the window level preset selector
+    var wlParagraph = document.createElement("p");  
+    wlParagraph.appendChild(document.createTextNode("WL Preset: "));
+    // preset selector
+    var wlSelector = document.createElement("select");
+    wlSelector.id = "presetsMenu";
+    wlSelector.name = "presetsMenu";
+    wlSelector.onchange = changePreset;
+    wlSelector.selectedIndex = 1;
+    // selector options
+    var wlOptions = ["Default", "Abdomen", "Lung", "Brain", "Bone", "Head"];
     var option;
-    for ( var i = 0; i < options.length; ++i )
+    for ( var i = 0; i < wlOptions.length; ++i )
     {
         option = document.createElement("option");
         option.value = i+1;
-        option.appendChild(document.createTextNode(options[i]));
-        selector.appendChild(option);
+        option.appendChild(document.createTextNode(wlOptions[i]));
+        wlSelector.appendChild(option);
     }
+    // append to paragraph
+    wlParagraph.appendChild(wlSelector);
+    
+    // paragraph for colour map selector
+    var cmParagraph = document.createElement("p");  
+    cmParagraph.appendChild(document.createTextNode("Colour Map: "));
+    // preset selector
+    var cmSelector = document.createElement("select");
+    cmSelector.id = "colourMapMenu";
+    cmSelector.name = "colourMapMenu";
+    cmSelector.onchange = changeColourMap;
+    cmSelector.selectedIndex = 1;
+    // selector options
+    var cmOptions = ["Default", "Rainbow"];
+    for ( var o = 0; o < cmOptions.length; ++o )
+    {
+        option = document.createElement("option");
+        option.value = o+1;
+        option.appendChild(document.createTextNode(cmOptions[o]));
+        cmSelector.appendChild(option);
+    }
+    // append to paragraph
+    cmParagraph.appendChild(cmSelector);
 
-    paragraph.appendChild(selector);
-    div.appendChild(paragraph);
+    div.appendChild(wlParagraph);
+    div.appendChild(cmParagraph);
     document.getElementById('toolbox').appendChild(div);
 };
 

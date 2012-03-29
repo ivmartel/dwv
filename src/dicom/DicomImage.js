@@ -74,6 +74,7 @@ function DicomImage(size, spacing, buffer) {
     
     // lookup
     this.lookup = null;
+    this.lut = lut.plain;
 
     this.getSize = function() {
         return self.size;
@@ -86,7 +87,11 @@ function DicomImage(size, spacing, buffer) {
     this.getLookup = function() {
         return self.lookup;
     };
-    
+
+    this.getLut = function() {
+        return self.lut;
+    };
+
     this.getBuffer = function() {
         return self.buffer;
     };
@@ -106,6 +111,11 @@ DicomImage.prototype.getValueAtOffset = function( offset )
     return this.lookup.huLookup[ this.buffer[offset] ];
 };
 
+DicomImage.prototype.setColourMap = function( lut )
+{
+    this.lut = lut;
+};
+
 DicomImage.prototype.setLookup = function( windowCenter, windowWidth, rescaleSlope, rescaleIntercept )
 {
     this.lookup = new LookupTable();
@@ -121,7 +131,6 @@ DicomImage.prototype.generateImageData = function( array, sliceNumber )
     var imageOffset = sliceOffset;
     var colorOffset = 0;
     var pxValue = 0;
-    var lut = rainbow;
     for(var j=0; j < this.size.getNumberOfRows(); ++j)
     {
         rowOffset = j * this.size.getNumberOfColumns();
@@ -130,9 +139,9 @@ DicomImage.prototype.generateImageData = function( array, sliceNumber )
             colorOffset = (i + rowOffset + sliceOffset) * 4;                    
             pxValue = parseInt( this.lookup.ylookup[ this.buffer[imageOffset] ], 10 );    
             imageOffset++;               
-            array.data[colorOffset] = lut.red[pxValue];
-            array.data[colorOffset+1] = lut.green[pxValue];
-            array.data[colorOffset+2] = lut.blue[pxValue];
+            array.data[colorOffset] = this.lut.red[pxValue];
+            array.data[colorOffset+1] = this.lut.green[pxValue];
+            array.data[colorOffset+2] = this.lut.blue[pxValue];
         }
     }            
 };
