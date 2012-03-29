@@ -1,5 +1,5 @@
-// dicom namespace
-dwv.dicom = dwv.dicom || {};
+// image namespace
+dwv.image = dwv.image || {};
 
 /**
  *  LookupTable.js
@@ -7,13 +7,13 @@ dwv.dicom = dwv.dicom || {};
  *  Author: BabuHussain<babuhussain.a@raster.in>
  */
 
-dwv.dicom.setWindowingdata = function(wc,ww)
+dwv.image.setWindowingdata = function(wc,ww)
 {
     this.windowCenter = wc;
     this.windowWidth = ww;    
 };
 
-dwv.dicom.calculateHULookup = function()
+dwv.image.calculateHULookup = function()
 {
     this.huLookup = new Array(4096);         
     for(var inputValue=0; inputValue<=4095; inputValue++)
@@ -22,7 +22,7 @@ dwv.dicom.calculateHULookup = function()
     }        
 };
 
-dwv.dicom.calculateLookup = function()
+dwv.image.calculateLookup = function()
 {    
     xMin = this.windowCenter - 0.5 - (this.windowWidth-1) / 2;
     xMax = this.windowCenter - 0.5 + (this.windowWidth-1) / 2;    
@@ -52,15 +52,15 @@ dwv.dicom.calculateLookup = function()
  * LookupTable class.
  * @returns {LookupTable}
  */
-dwv.dicom.LookupTable = function()
+dwv.image.LookupTable = function()
 {
     // methods
-    this.calculateHULookup = dwv.dicom.calculateHULookup;
-    this.calculateLookup = dwv.dicom.calculateLookup;
-    this.setWindowingdata = dwv.dicom.setWindowingdata;
+    this.calculateHULookup = dwv.image.calculateHULookup;
+    this.calculateLookup = dwv.image.calculateLookup;
+    this.setWindowingdata = dwv.image.setWindowingdata;
 };
 
-dwv.dicom.LookupTable.prototype.setData = function(wc,ww,rs,ri)
+dwv.image.LookupTable.prototype.setData = function(wc,ww,rs,ri)
 {    
     this.windowCenter = wc;
     this.windowWidth = ww;

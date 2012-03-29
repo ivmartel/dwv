@@ -240,9 +240,9 @@ dwv.App = function()
         } 
                
         // create the DICOM image
-        image = new dwv.dicom.DicomImage(
-            dwv.dicom.ImageSize(numberOfColumns, numberOfRows),
-            dwv.dicom.ImageSpacing(columnSpacing, rowSpacing),
+        image = new dwv.image.Image(
+            dwv.image.ImageSize(numberOfColumns, numberOfRows),
+            dwv.image.ImageSpacing(columnSpacing, rowSpacing),
             dicomParser.pixelBuffer );
         image.setLookup( windowCenter, windowWidth, rescaleSlope, rescaleIntercept);
     }

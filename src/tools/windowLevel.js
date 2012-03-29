@@ -108,11 +108,11 @@ dwv.tool.applyColourMap = function(colourMapId)
     switch (colourMapId)
     {
         case 1: // default
-            dwv.tool.updateColourMap(dwv.dicom.lut.plain);
+            dwv.tool.updateColourMap(dwv.image.lut.plain);
             break;
             
         case 2: // rainbow
-            dwv.tool.updateColourMap(dwv.dicom.lut.rainbow);
+            dwv.tool.updateColourMap(dwv.image.lut.rainbow);
             break;
     }
 };

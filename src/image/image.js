@@ -1,8 +1,8 @@
-// dicom namespace
-dwv.dicom = dwv.dicom || {};
+// image namespace
+dwv.image = dwv.image || {};
 
 /**
-* DicomImage.js
+*image.js
 */
 
 /**
@@ -12,7 +12,7 @@ dwv.dicom = dwv.dicom || {};
 * @param numberOfRows The number of rows (number).
 * @param numberOfSlices The number of slices (number).
 */
-dwv.dicom.ImageSize = function( numberOfColumns, numberOfRows, numberOfSlices ) {
+dwv.image.ImageSize = function( numberOfColumns, numberOfRows, numberOfSlices ) {
     return {
         getNumberOfColumns: function() {
             return numberOfColumns;
@@ -48,7 +48,7 @@ dwv.dicom.ImageSize = function( numberOfColumns, numberOfRows, numberOfSlices ) 
 * @param rowSpacing The row spacing (number).
 * @param sliceSpacing The slice spacing (number).
 */
-dwv.dicom.ImageSpacing = function( columnSpacing, rowSpacing, sliceSpacing ) {
+dwv.image.ImageSpacing = function( columnSpacing, rowSpacing, sliceSpacing ) {
     return {
         getColumnSpacing: function() {
             return columnSpacing;
@@ -63,9 +63,9 @@ dwv.dicom.ImageSpacing = function( columnSpacing, rowSpacing, sliceSpacing ) {
 };
 
 /**
-* DicomImage class.
+* Image class.
 */
-dwv.dicom.DicomImage = function(size, spacing, buffer) {
+dwv.image.Image = function(size, spacing, buffer) {
 
     var self = this;
     // ImageSize
@@ -77,7 +77,7 @@ dwv.dicom.DicomImage = function(size, spacing, buffer) {
     
     // lookup
     this.lookup = null;
-    this.lut = dwv.dicom.lut.plain;
+    this.lut = dwv.image.lut.plain;
 
     this.getSize = function() {
         return self.size;
@@ -100,7 +100,7 @@ dwv.dicom.DicomImage = function(size, spacing, buffer) {
     };
 };
 
-dwv.dicom.DicomImage.prototype.getValue = function( i, j, k )
+dwv.image.Image.prototype.getValue = function( i, j, k )
 {
     var k1 = k || 0;
     // check size
@@ -109,24 +109,24 @@ dwv.dicom.DicomImage.prototype.getValue = function( i, j, k )
     return this.getValueAtOffset( i + ( j * this.size.getNumberOfColumns() ) + ( k1 * this.size.getSliceSize()) );
 };
 
-dwv.dicom.DicomImage.prototype.getValueAtOffset = function( offset )
+dwv.image.Image.prototype.getValueAtOffset = function( offset )
 {
     return this.lookup.huLookup[ this.buffer[offset] ];
 };
 
-dwv.dicom.DicomImage.prototype.setColourMap = function( lut )
+dwv.image.Image.prototype.setColourMap = function( lut )
 {
     this.lut = lut;
 };
 
-dwv.dicom.DicomImage.prototype.setLookup = function( windowCenter, windowWidth, rescaleSlope, rescaleIntercept )
+dwv.image.Image.prototype.setLookup = function( windowCenter, windowWidth, rescaleSlope, rescaleIntercept )
 {
-    this.lookup = new dwv.dicom.LookupTable();
+    this.lookup = new dwv.image.LookupTable();
     this.lookup.setData( windowCenter, windowWidth, rescaleSlope, rescaleIntercept );
     this.lookup.calculateHULookup();
 };
 
-dwv.dicom.DicomImage.prototype.generateImageData = function( array, sliceNumber )
+dwv.image.Image.prototype.generateImageData = function( array, sliceNumber )
 {        
     this.lookup.calculateLookup();
     var sliceOffset = (sliceNumber || 0) * this.size.getSliceSize();
