@@ -1,3 +1,6 @@
+// dicom namespace
+dwv.dicom = dwv.dicom || {};
+
 /**
 * DicomImage.js
 */
@@ -9,7 +12,7 @@
 * @param numberOfRows The number of rows (number).
 * @param numberOfSlices The number of slices (number).
 */
-function ImageSize( numberOfColumns, numberOfRows, numberOfSlices ) {
+dwv.dicom.ImageSize = function( numberOfColumns, numberOfRows, numberOfSlices ) {
     return {
         getNumberOfColumns: function() {
             return numberOfColumns;
@@ -36,7 +39,7 @@ function ImageSize( numberOfColumns, numberOfRows, numberOfSlices ) {
             return true;
         }
     };
-}
+};
 
 /**
 * Image Spacing class. 
@@ -45,7 +48,7 @@ function ImageSize( numberOfColumns, numberOfRows, numberOfSlices ) {
 * @param rowSpacing The row spacing (number).
 * @param sliceSpacing The slice spacing (number).
 */
-function ImageSpacing( columnSpacing, rowSpacing, sliceSpacing ) {
+dwv.dicom.ImageSpacing = function( columnSpacing, rowSpacing, sliceSpacing ) {
     return {
         getColumnSpacing: function() {
             return columnSpacing;
@@ -57,12 +60,12 @@ function ImageSpacing( columnSpacing, rowSpacing, sliceSpacing ) {
             return (sliceSpacing || 1);
         }
     };
-}
+};
 
 /**
 * DicomImage class.
 */
-function DicomImage(size, spacing, buffer) {
+dwv.dicom.DicomImage = function(size, spacing, buffer) {
 
     var self = this;
     // ImageSize
@@ -74,7 +77,7 @@ function DicomImage(size, spacing, buffer) {
     
     // lookup
     this.lookup = null;
-    this.lut = lut.plain;
+    this.lut = dwv.dicom.lut.plain;
 
     this.getSize = function() {
         return self.size;
@@ -95,9 +98,9 @@ function DicomImage(size, spacing, buffer) {
     this.getBuffer = function() {
         return self.buffer;
     };
-}
+};
 
-DicomImage.prototype.getValue = function( i, j, k )
+dwv.dicom.DicomImage.prototype.getValue = function( i, j, k )
 {
     var k1 = k || 0;
     // check size
@@ -106,24 +109,24 @@ DicomImage.prototype.getValue = function( i, j, k )
     return this.getValueAtOffset( i + ( j * this.size.getNumberOfColumns() ) + ( k1 * this.size.getSliceSize()) );
 };
 
-DicomImage.prototype.getValueAtOffset = function( offset )
+dwv.dicom.DicomImage.prototype.getValueAtOffset = function( offset )
 {
     return this.lookup.huLookup[ this.buffer[offset] ];
 };
 
-DicomImage.prototype.setColourMap = function( lut )
+dwv.dicom.DicomImage.prototype.setColourMap = function( lut )
 {
     this.lut = lut;
 };
 
-DicomImage.prototype.setLookup = function( windowCenter, windowWidth, rescaleSlope, rescaleIntercept )
+dwv.dicom.DicomImage.prototype.setLookup = function( windowCenter, windowWidth, rescaleSlope, rescaleIntercept )
 {
-    this.lookup = new LookupTable();
+    this.lookup = new dwv.dicom.LookupTable();
     this.lookup.setData( windowCenter, windowWidth, rescaleSlope, rescaleIntercept );
     this.lookup.calculateHULookup();
 };
 
-DicomImage.prototype.generateImageData = function( array, sliceNumber )
+dwv.dicom.DicomImage.prototype.generateImageData = function( array, sliceNumber )
 {        
     this.lookup.calculateLookup();
     var sliceOffset = (sliceNumber || 0) * this.size.getSliceSize();
@@ -145,4 +148,3 @@ DicomImage.prototype.generateImageData = function( array, sliceNumber )
         }
     }            
 };
-

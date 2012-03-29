@@ -1,20 +1,23 @@
+// tool namespace
+dwv.tool = dwv.tool || {};
+
 /**
 * zoom.js
 * Zooming tool.
 */
 
-function zoomReset(event)
+dwv.tool.zoomReset = function(event)
 {
     app.getImageLayer().resetLayout();
     app.getImageLayer().draw();
     app.getDrawLayer().resetLayout();
     app.getDrawLayer().draw();
-}
+};
 
 /**
  * Zoom class.
  */
-tool.Zoom = function(app)
+dwv.tool.Zoom = function(app)
 {
     var self = this;
     this.started = false;
@@ -93,7 +96,7 @@ tool.Zoom = function(app)
 
 }; // Zoom function
 
-tool.Zoom.prototype.appendHtml = function()
+dwv.tool.Zoom.prototype.appendHtml = function()
 {
     var div = document.createElement("div");
     div.id = 'zoomResetDiv';
@@ -105,7 +108,7 @@ tool.Zoom.prototype.appendHtml = function()
     var button = document.createElement("button");
     button.id = "zoomResetButton";
     button.name = "zoomResetButton";
-    button.onclick = zoomReset;
+    button.onclick = dwv.tool.zoomReset;
     var text = document.createTextNode('Reset');
     button.appendChild(text);
     
@@ -114,7 +117,7 @@ tool.Zoom.prototype.appendHtml = function()
     document.getElementById('toolbox').appendChild(div);
 };
 
-tool.Zoom.prototype.clearHtml = function()
+dwv.tool.Zoom.prototype.clearHtml = function()
 {
     // find the tool specific node
     var node = document.getElementById('zoomResetDiv');

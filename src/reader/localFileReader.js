@@ -1,3 +1,6 @@
+// reader namespace
+dwv.reader = dwv.reader || {};
+
 /**
  * LocalFileReader.js
  * You can find more about this function at
@@ -6,7 +9,7 @@
  * Copyright (c) 2008 Andy G.P. Na <nagoon97@naver.com>
  * The source code is freely distributable under the terms of an MIT-style license.
  */
-function LocalFileReader(fileURL)
+dwv.reader.LocalFileReader = function(fileURL)
 {
 	var _exception = {};
 	_exception.FileLoadFailed = 1;
@@ -134,4 +137,4 @@ function LocalFileReader(fileURL)
 	else {
 		LocalFileReaderImpl.apply(this, [fileURL]);
 	}
-}
+};

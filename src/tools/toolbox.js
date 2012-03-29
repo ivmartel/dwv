@@ -1,26 +1,26 @@
 // tool namespace
-var tool = tool || {};
+dwv.tool = dwv.tool || {};
 
 /**
 * toolbox.js
 * Tool box.
 */
-function ToolBox(app)
+dwv.tool.ToolBox = function(app)
 {
     this.tools = {};
     this.selectedTool = 0;
     this.defaultToolName = 'windowLevel';
-}
+};
 
-ToolBox.prototype.getTools = function() {
+dwv.tool.ToolBox.prototype.getTools = function() {
     return this.tools;
 };
 
-ToolBox.prototype.getSelectedTool = function() {
+dwv.tool.ToolBox.prototype.getSelectedTool = function() {
     return this.selectedTool;
 };
 
-ToolBox.prototype.setSelectedTool = function(toolName) {
+dwv.tool.ToolBox.prototype.setSelectedTool = function(toolName) {
     // disable old one
     if( this.selectedTool )
     {
@@ -31,26 +31,25 @@ ToolBox.prototype.setSelectedTool = function(toolName) {
     this.enable(true);
 };
 
-ToolBox.prototype.hasTool = function(toolName) {
+dwv.tool.ToolBox.prototype.hasTool = function(toolName) {
     return this.tools[toolName];
 };
 
-ToolBox.prototype.init = function()
+dwv.tool.ToolBox.prototype.init = function()
 {
     // tool list
-    this.tools.rect = tool.Rect;
-    this.tools.roi = tool.Roi;
-    this.tools.line = tool.Line;
-    this.tools.circle = tool.Circle;
-    this.tools.windowLevel = tool.WindowLevel;
-    this.tools.zoom = tool.Zoom;
+    this.tools.rectangle = dwv.tool.Rectangle;
+    this.tools.roi = dwv.tool.Roi;
+    this.tools.line = dwv.tool.Line;
+    this.tools.circle = dwv.tool.Circle;
+    this.tools.windowLevel = dwv.tool.WindowLevel;
+    this.tools.zoom = dwv.tool.Zoom;
 
     // Get the tool select input.
     var tool_select = document.getElementById('dtool');
     if (!tool_select)
     {
-        alert('Error: failed to get the dtool element!');
-        return;
+        throw new Error('Failed to get the dtool element!');
     }
     tool_select.addEventListener('change', this.eventToolChange, false);
     
@@ -62,7 +61,7 @@ ToolBox.prototype.init = function()
     }
 };
 
-ToolBox.prototype.enable = function(value)
+dwv.tool.ToolBox.prototype.enable = function(value)
 {
     // enable html select 
     document.getElementById('dtool').disabled = !value;
@@ -71,7 +70,7 @@ ToolBox.prototype.enable = function(value)
 };
 
 // The event handler for any changes made to the tool selector.
-ToolBox.prototype.eventToolChange = function(event)
+dwv.tool.ToolBox.prototype.eventToolChange = function(event)
 {
     toolName = this.value;
     if( app.getToolBox().hasTool(toolName) )
@@ -80,11 +79,11 @@ ToolBox.prototype.eventToolChange = function(event)
     }
     else
     {
-        alert("Unknown tool: '" + toolName + "'");
+        throw new Error("Unknown tool: '" + toolName + "'");
     }
 };
 
-ToolBox.prototype.appendHtml = function()
+dwv.tool.ToolBox.prototype.appendHtml = function()
 {
     var div = document.createElement("div");
     div.id = "toolChooser";
@@ -98,7 +97,7 @@ ToolBox.prototype.appendHtml = function()
     selector.disabled = 1;
     paragraph.appendChild(selector);
 
-    var options = ["windowLevel", "rect", "circle", "roi", "line", "zoom"];
+    var options = ["windowLevel", "rectangle", "circle", "roi", "line", "zoom"];
     var option;
     for( var i = 0; i < options.length; ++i )
     {

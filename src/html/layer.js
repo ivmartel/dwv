@@ -1,8 +1,11 @@
+// html namespace
+dwv.html = dwv.html || {};
+
 /**
 * Layer
 * Window layer.
 */
-function Layer(name)
+dwv.html.Layer = function(name)
 {
     // A HTMLCanvasElement.
     var canvas = null;
@@ -180,4 +183,4 @@ function Layer(name)
         context.fillStyle = color;
         context.strokeStyle = color;
     };
-} // Layer class
+}; // Layer class

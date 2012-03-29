@@ -1,9 +1,12 @@
+// tool namespace
+dwv.tool = dwv.tool || {};
+
 /**
 * windowLevel.js
 * WindowLevel tool.
 */
 
-function showHUvalue(x,y)
+dwv.tool.showHUvalue = function(x,y)
 {
     var context = app.getInfoLayer().getContext();
     var style = app.getStyle();
@@ -23,9 +26,9 @@ function showHUvalue(x,y)
             "HU = "+app.getImage().getValue(x,y), 
             border, 
             border + 2*style.getLineHeight());
-}
+};
 
-function showWindowingValue(windowCenter,windowWidth)
+dwv.tool.showWindowingValue = function(windowCenter,windowWidth)
 {
     var canvas = app.getInfoLayer().getCanvas();
     var context = app.getInfoLayer().getContext();
@@ -42,22 +45,22 @@ function showWindowingValue(windowCenter,windowWidth)
     // text
     context.fillText("WindowCenter = "+windowCenter, canvas.width - border, border);
     context.fillText("WindowWidth = "+windowWidth, canvas.width - border, border + style.getLineHeight());
-}
+};
 
-function updateWindowingData(wc,ww)
+dwv.tool.updateWindowingData = function(wc,ww)
 {
     app.getImage().getLookup().setWindowingdata(wc,ww);
-    showWindowingValue(wc,ww);
+    dwv.tool.showWindowingValue(wc,ww);
     app.generateAndDrawImage();
-}
+};
 
-function updateColourMap(colourMap)    
+dwv.tool.updateColourMap = function(colourMap)    
 {    
     app.getImage().setColourMap(colourMap);
     app.generateAndDrawImage();
-}
+};
 
-function applyPreset(presetId)    
+dwv.tool.applyPreset = function(presetId)    
 {    
     var ww, wc;
     switch (presetId)
@@ -65,72 +68,72 @@ function applyPreset(presetId)
         case 1: // default
             wc=app.getImage().getLookup().defaultWindowCenter;
             ww=app.getImage().getLookup().defaultWindowWidth;
-            updateWindowingData(wc,ww);
+            dwv.tool.updateWindowingData(wc,ww);
             break;
         
         case 2: // abdomen
             wc=350;
             ww=40;
-            updateWindowingData(wc,ww);
+            dwv.tool.updateWindowingData(wc,ww);
             break;
         
         case 3: // lung
             wc=-600;
             ww=1500;
-            updateWindowingData(wc,ww);
+            dwv.tool.updateWindowingData(wc,ww);
             break;
         
         case 4: // brain
             wc=40;
             ww=80;
-            updateWindowingData(wc,ww);
+            dwv.tool.updateWindowingData(wc,ww);
             break;
         
         case 5: // bone
             wc=480;
             ww=2500;
-            updateWindowingData(wc,ww);
+            dwv.tool.updateWindowingData(wc,ww);
             break;
         
         case 6: // head
             wc=90;
             ww=350;
-            updateWindowingData(wc,ww);
+            dwv.tool.updateWindowingData(wc,ww);
             break;
     }
-}
+};
 
-function applyColourMap(colourMapId)    
+dwv.tool.applyColourMap = function(colourMapId)    
 {    
     switch (colourMapId)
     {
         case 1: // default
-            updateColourMap(lut.plain);
+            dwv.tool.updateColourMap(dwv.dicom.lut.plain);
             break;
             
         case 2: // rainbow
-            updateColourMap(lut.rainbow);
+            dwv.tool.updateColourMap(dwv.dicom.lut.rainbow);
             break;
     }
-}
+};
 
-function changePreset(event)
+dwv.tool.changePreset = function(event)
 {    
-    applyPreset( parseInt(document.getElementById("presetsMenu").options[
+    dwv.tool.applyPreset( parseInt(document.getElementById("presetsMenu").options[
         document.getElementById("presetsMenu").selectedIndex].value, 10) );
-}
+};
 
-function changeColourMap(event)
+dwv.tool.changeColourMap = function(event)
 {    
-    applyColourMap( parseInt(document.getElementById("colourMapMenu").options[
+    dwv.tool.applyColourMap( parseInt(document.getElementById("colourMapMenu").options[
         document.getElementById("colourMapMenu").selectedIndex].value, 10) );
-}
+};
 
 
 /**
  * WindowLevel class.
  */
-tool.WindowLevel = function(app)
+dwv.tool.WindowLevel = function(app)
 {
     var self = this;
     this.started = false;
@@ -141,7 +144,7 @@ tool.WindowLevel = function(app)
         self.started = true;
         self.x0 = ev._x;
         self.y0 = ev._y;
-        showHUvalue(ev._x, ev._y);
+        dwv.tool.showHUvalue(ev._x, ev._y);
     };
 
     // This function is called every time you move the mouse.
@@ -156,7 +159,7 @@ tool.WindowLevel = function(app)
         var windowCenter = parseInt(app.getImage().getLookup().windowCenter, 10) + diffY;
         var windowWidth = parseInt(app.getImage().getLookup().windowWidth, 10) + diffX;                        
         
-        updateWindowingData(windowCenter,windowWidth);    
+        dwv.tool.updateWindowingData(windowCenter,windowWidth);    
         
         self.x0 = ev._x;             
         self.y0 = ev._y;
@@ -186,7 +189,7 @@ tool.WindowLevel = function(app)
 
 }; // WindowLevel function
 
-tool.WindowLevel.prototype.appendHtml = function()
+dwv.tool.WindowLevel.prototype.appendHtml = function()
 {
     var div = document.createElement("div");
     div.id = "presetSelector";
@@ -198,7 +201,7 @@ tool.WindowLevel.prototype.appendHtml = function()
     var wlSelector = document.createElement("select");
     wlSelector.id = "presetsMenu";
     wlSelector.name = "presetsMenu";
-    wlSelector.onchange = changePreset;
+    wlSelector.onchange = dwv.tool.changePreset;
     wlSelector.selectedIndex = 1;
     // selector options
     var wlOptions = ["Default", "Abdomen", "Lung", "Brain", "Bone", "Head"];
@@ -220,7 +223,7 @@ tool.WindowLevel.prototype.appendHtml = function()
     var cmSelector = document.createElement("select");
     cmSelector.id = "colourMapMenu";
     cmSelector.name = "colourMapMenu";
-    cmSelector.onchange = changeColourMap;
+    cmSelector.onchange = dwv.tool.changeColourMap;
     cmSelector.selectedIndex = 1;
     // selector options
     var cmOptions = ["Default", "Rainbow"];
@@ -239,7 +242,7 @@ tool.WindowLevel.prototype.appendHtml = function()
     document.getElementById('toolbox').appendChild(div);
 };
 
-tool.WindowLevel.prototype.clearHtml = function()
+dwv.tool.WindowLevel.prototype.clearHtml = function()
 {
     // find the tool specific node
     var node = document.getElementById('presetSelector');

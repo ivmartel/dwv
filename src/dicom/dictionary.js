@@ -1,9 +1,12 @@
+// dicom namespace
+dwv.dicom = dwv.dicom || {};
+
 /**
  *  Dictionary.js
  *  Version 0.5
  *  Author: BabuHussain<babuhussain.a@raster.in>
  */
-function Dictionary() {
+dwv.dicom.Dictionary = function() {
     this.newDictionary = [];
     this.init = function() {
         
@@ -1900,5 +1903,4 @@ function Dictionary() {
         this.newDictionary['0xFFFE']['0xE00D'] = ['NONE', '1', 'ItemDelimitationItem'];
         this.newDictionary['0xFFFE']['0xE0DD'] = ['NONE', '1', 'SequenceDelimitationItem'];
     };
-}
-
+};

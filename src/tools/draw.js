@@ -1,14 +1,17 @@
+// tool namespace
+dwv.tool = dwv.tool || {};
+// draw namespace
+dwv.tool.draw = dwv.tool.draw || {};
+
 /**
 * draw.js
 * Functions for drawing tools.
 */
-// draw namespace
-tool.draw = tool.draw || {};
 
 /**
  * Append the color chooser to the HTML document in the 'colourChooser' node.
  */
-tool.draw.appendColourChooserHtml = function(app)
+dwv.tool.draw.appendColourChooserHtml = function(app)
 {
     var div = document.createElement("div");
     div.id = "colourChooser";
@@ -22,8 +25,8 @@ tool.draw.appendColourChooserHtml = function(app)
     
     var row = table.insertRow(-1);
     row.id = "colours";
-    row.onmouseover = tool.draw.onMouseOver;
-    row.onmouseout = tool.draw.onMouseOut;
+    row.onmouseover = dwv.tool.draw.onMouseOver;
+    row.onmouseout = dwv.tool.draw.onMouseOut;
     
     var colours = ["black", "white", "red", "green", "blue", "yellow", "lime", "fuchsia"];
     var cell;
@@ -40,13 +43,13 @@ tool.draw.appendColourChooserHtml = function(app)
     document.getElementById('toolbox').appendChild(div);
     
     // select default
-    tool.draw.setLineColor(app.getStyle().getLineColor());
+    dwv.tool.draw.setLineColor(app.getStyle().getLineColor());
 };
 
 /**
  * Remove the tool specific node.
  */
-tool.draw.clearColourChooserHtml = function()
+dwv.tool.draw.clearColourChooserHtml = function()
 {
     // find the tool specific node
     var node = document.getElementById('colourChooser');
@@ -63,7 +66,7 @@ tool.draw.clearColourChooserHtml = function()
  * Set the line color of the color chooser
  * @param color The color to use.
  */
-tool.draw.setLineColor = function(color)
+dwv.tool.draw.setLineColor = function(color)
 {
     // reset borders
     var tr = document.getElementById("colours");
@@ -80,7 +83,7 @@ tool.draw.setLineColor = function(color)
 /**
  * Set the cursor when mouse over the color chooser.
  */
-tool.draw.onMouseOver = function(event)
+dwv.tool.draw.onMouseOver = function(event)
 {
     document.body.style.cursor="pointer";
 };
@@ -88,7 +91,7 @@ tool.draw.onMouseOver = function(event)
 /**
  * Set the cursor when mouse out the color chooser.
  */
-tool.draw.onMouseOut = function(event)
+dwv.tool.draw.onMouseOut = function(event)
 {
     document.body.style.cursor="auto";
 };

@@ -1,11 +1,14 @@
+// html namespace
+dwv.html = dwv.html || {};
+
 /**
 * style.js
 */
 
 /**
-* Style.
+* Style class.
 */
-function Style()
+dwv.html.Style = function()
 {
     // immutable
     this.fontSize = 12;
@@ -14,31 +17,28 @@ function Style()
     this.textColor = "#fff";
     // mutable
     this.lineColor = "yellow";
-}
+};
 
-Style.prototype.getFontSize = function() {
+dwv.html.Style.prototype.getFontSize = function() {
     return this.fontSize;
 };
 
-Style.prototype.getFontStr = function() {
+dwv.html.Style.prototype.getFontStr = function() {
     return this.fontStr;
 };
 
-Style.prototype.getLineHeight = function() {
+dwv.html.Style.prototype.getLineHeight = function() {
     return this.lineHeight;
 };
 
-Style.prototype.getTextColor = function() {
+dwv.html.Style.prototype.getTextColor = function() {
     return this.textColor;
 };
 
-Style.prototype.getLineColor = function() {
+dwv.html.Style.prototype.getLineColor = function() {
     return this.lineColor;
 };
 
-Style.prototype.setLineColor = function(color) {
+dwv.html.Style.prototype.setLineColor = function(color) {
     this.lineColor = color;
 };
-
-
-

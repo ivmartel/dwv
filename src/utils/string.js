@@ -1,5 +1,5 @@
 // utils namespace
-var utils = utils || {};
+dwv.utils = dwv.utils || {};
 
 /**
 * String utilities functions.
@@ -8,7 +8,7 @@ var utils = utils || {};
 /**
  * Capitalise the first letter of a string.
  */
-utils.capitaliseFirstLetter = function(string)
+dwv.utils.capitaliseFirstLetter = function(string)
 {
     return string.charAt(0).toUpperCase() + string.slice(1);
 };

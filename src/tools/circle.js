@@ -1,8 +1,11 @@
+// tool namespace
+dwv.tool = dwv.tool || {};
+
 /**
 * circle.js
 * Circle painting tool.
 */
-tool.Circle = function(app)
+dwv.tool.Circle = function(app)
 {
     var self = this;
     this.started = false;
@@ -31,11 +34,11 @@ tool.Circle = function(app)
             return;
         }
         // centre
-        var centre = new Point2D(self.x0, self.y0);
+        var centre = new dwv.math.Point2D(self.x0, self.y0);
         // create circle
-        var circle = new Circle(centre, radius);
+        var circle = new dwv.math.Circle(centre, radius);
         // create draw command
-        command = new DrawCircleCommand(circle, app);
+        command = new dwv.tool.DrawCircleCommand(circle, app);
         // clear the temporary layer
         app.getTempLayer().clearContextRect();
         // draw
@@ -59,10 +62,10 @@ tool.Circle = function(app)
 
     this.enable = function(value){
         if( value ) {
-            tool.draw.appendColourChooserHtml(app);
+            dwv.tool.draw.appendColourChooserHtml(app);
         }
         else { 
-            tool.draw.clearColourChooserHtml();
+            dwv.tool.draw.clearColourChooserHtml();
         }
     };
     
@@ -77,7 +80,7 @@ tool.Circle = function(app)
  * @param circle The circle to draw.
  * @param app The application to draw the circle on.
  */
-DrawCircleCommand = function(circle, app)
+dwv.tool.DrawCircleCommand = function(circle, app)
 {
     // app members can change 
     var lineColor = app.getStyle().getLineColor();

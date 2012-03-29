@@ -1,3 +1,6 @@
+// reader namespace
+dwv.reader = dwv.reader || {};
+
 /**
  * BinFileReader.js
  * You can find more about this function at
@@ -6,7 +9,7 @@
  * Copyright (c) 2008 Andy G.P. Na <nagoon97@naver.com>
  * The source code is freely distributable under the terms of an MIT-style license.
  */
-function BinFileReader(fileURL){
+dwv.reader.BinFileReader = function(fileURL){
     var _exception = {};
     _exception.FileLoadFailed = 1;
     _exception.EOFReached = 2;
@@ -139,7 +142,7 @@ function BinFileReader(fileURL){
     else {
         BinFileReaderImpl.apply(this, [fileURL]);
     }
-}
+};
 
 /*
 // to add in the index.html

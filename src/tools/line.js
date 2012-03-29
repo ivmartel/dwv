@@ -1,8 +1,11 @@
+// tool namespace
+dwv.tool = dwv.tool || {};
+
 /**
 * line.js
 * Line painting tool.
 */
-tool.Line = function(app)
+dwv.tool.Line = function(app)
 {
     var self = this;
     this.started = false;
@@ -22,17 +25,17 @@ tool.Line = function(app)
             return;
         }
         // points
-        var beginPoint = new Point2D(self.x0, self.y0);
-        var endPoint = new Point2D(ev._x, ev._y);
+        var beginPoint = new dwv.math.Point2D(self.x0, self.y0);
+        var endPoint = new dwv.math.Point2D(ev._x, ev._y);
         // check for equality
         if( beginPoint.equal(endPoint) )
         {
             return;
         }
         // create line
-        var line = new Line(beginPoint, endPoint);
+        var line = new dwv.math.Line(beginPoint, endPoint);
         // create draw command
-        command = new DrawLineCommand(line, app);
+        command = new dwv.tool.DrawLineCommand(line, app);
         // clear the temporary layer
         app.getTempLayer().clearContextRect();
         // draw
@@ -56,10 +59,10 @@ tool.Line = function(app)
     
     this.enable = function(value){
         if( value ) {
-            tool.draw.appendColourChooserHtml(app);
+            dwv.tool.draw.appendColourChooserHtml(app);
         }
         else {
-            tool.draw.clearColourChooserHtml();
+            dwv.tool.draw.clearColourChooserHtml();
         }
     };
 
@@ -74,7 +77,7 @@ tool.Line = function(app)
  * @param line The line to draw.
  * @param app The application to draw the line on.
  */
-DrawLineCommand = function(line, app)
+dwv.tool.DrawLineCommand = function(line, app)
 {
     // app members can change 
     var lineColor = app.getStyle().getLineColor();

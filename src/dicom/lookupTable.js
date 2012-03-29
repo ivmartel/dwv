@@ -1,25 +1,28 @@
+// dicom namespace
+dwv.dicom = dwv.dicom || {};
+
 /**
  *  LookupTable.js
  *  Version 0.5
  *  Author: BabuHussain<babuhussain.a@raster.in>
  */
 
-function setWindowingdata(wc,ww)
+dwv.dicom.setWindowingdata = function(wc,ww)
 {
     this.windowCenter = wc;
     this.windowWidth = ww;    
-}
+};
 
-function calculateHULookup()
+dwv.dicom.calculateHULookup = function()
 {
     this.huLookup = new Array(4096);         
     for(var inputValue=0; inputValue<=4095; inputValue++)
     {        
         this.huLookup[inputValue] = inputValue * this.rescaleSlope + this.rescaleIntercept;        
     }        
-}  
+};
 
-function calculateLookup()
+dwv.dicom.calculateLookup = function()
 {    
     xMin = this.windowCenter - 0.5 - (this.windowWidth-1) / 2;
     xMax = this.windowCenter - 0.5 + (this.windowWidth-1) / 2;    
@@ -43,21 +46,21 @@ function calculateLookup()
             this.ylookup[inputValue]= parseInt(y, 10);
         }
      }
-}
+};
 
 /**
  * LookupTable class.
  * @returns {LookupTable}
  */
-function LookupTable()
+dwv.dicom.LookupTable = function()
 {
     // methods
-    this.calculateHULookup=calculateHULookup;
-    this.calculateLookup=calculateLookup;
-    this.setWindowingdata=setWindowingdata;
-}
+    this.calculateHULookup = dwv.dicom.calculateHULookup;
+    this.calculateLookup = dwv.dicom.calculateLookup;
+    this.setWindowingdata = dwv.dicom.setWindowingdata;
+};
 
-LookupTable.prototype.setData = function(wc,ww,rs,ri)
+dwv.dicom.LookupTable.prototype.setData = function(wc,ww,rs,ri)
 {    
     this.windowCenter = wc;
     this.windowWidth = ww;

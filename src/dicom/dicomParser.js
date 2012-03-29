@@ -1,3 +1,6 @@
+// dicom namespace
+dwv.dicom = dwv.dicom || {};
+
 /**
  *  DicomParser.js
  */
@@ -5,26 +8,26 @@
 /**
  * DicomParser class.
  */
-function DicomParser(inputBuffer,reader)
+dwv.dicom.DicomParser = function(inputBuffer,reader)
 {
     // members
     this.inputBuffer = inputBuffer;
     this.reader = reader;
     this.dicomElement = [];
-    this.dict = new Dictionary();
-}
+    this.dict = new dwv.dicom.Dictionary();
+};
 
-DicomParser.prototype.getPixelBuffer=function()
+dwv.dicom.DicomParser.prototype.getPixelBuffer=function()
 {
     return this.pixelBuffer;
 };
 
-DicomParser.prototype.appendDicomElement=function( element )
+dwv.dicom.DicomParser.prototype.appendDicomElement=function( element )
 {
     this.dicomElement.push( element );
 };
 
-DicomParser.prototype.readTag=function(offset)
+dwv.dicom.DicomParser.prototype.readTag=function(offset)
 {
     // group
     var g0 = this.reader.readNumber( 1, offset );
@@ -50,7 +53,7 @@ DicomParser.prototype.readTag=function(offset)
     return { 'group': group, 'element': element, 'name': name };
 };
 
-DicomParser.prototype.readDataElement=function(offset)
+dwv.dicom.DicomParser.prototype.readDataElement=function(offset)
 {
     // only valid for LittleEndianExplicit (transferSyntax: 1.2.840.10008.1.2.1)
     
@@ -109,7 +112,7 @@ DicomParser.prototype.readDataElement=function(offset)
         'offset': elementOffset};    
 };
 
-DicomParser.prototype.readTags = function()
+dwv.dicom.DicomParser.prototype.readTags = function()
 {
     var offset = 0;
     var i;
@@ -184,7 +187,7 @@ DicomParser.prototype.readTags = function()
     return i;
 };
 
-DicomParser.prototype.readImage=function(index)
+dwv.dicom.DicomParser.prototype.readImage=function(index)
 {
     this.pixelBuffer = new Array(this.numberOfRows*this.numberOfColumns*2);
     var pixelIndex=0;
@@ -195,7 +198,7 @@ DicomParser.prototype.readImage=function(index)
     }
 };
 
-DicomParser.prototype.parseAll=function()
+dwv.dicom.DicomParser.prototype.parseAll=function()
 {
     // read tags
     var index = this.readTags();

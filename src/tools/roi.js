@@ -1,8 +1,11 @@
+// tool namespace
+dwv.tool = dwv.tool || {};
+
 /**
 * roi.js
 * Region of interest painting tool.
 */
-tool.Roi = function(app)
+dwv.tool.Roi = function(app)
 {
     var self = this;
     this.started = false;
@@ -19,8 +22,8 @@ tool.Roi = function(app)
         context.beginPath();
         context.moveTo(ev._x, ev._y);
         // store it as object
-        roi = new ROI();
-        roi.addPoint(new Point2D(ev._x, ev._y));
+        roi = new dwv.math.ROI();
+        roi.addPoint(new dwv.math.Point2D(ev._x, ev._y));
     };
 
     // This function is called every time you move the mouse.
@@ -35,7 +38,7 @@ tool.Roi = function(app)
         context.lineTo(ev._x, ev._y);
         context.stroke();
         // store roi point
-        roi.addPoint(new Point2D(ev._x, ev._y));
+        roi.addPoint(new dwv.math.Point2D(ev._x, ev._y));
     };
 
     // This is called when you release the mouse button.
@@ -49,7 +52,7 @@ tool.Roi = function(app)
             context.closePath();
             context.stroke();
             // save command in undo stack
-            var command = new DrawRoiCommand(roi, app);
+            var command = new dwv.tool.DrawRoiCommand(roi, app);
             app.getUndoStack().add(command);
             // set flag
             self.started = false;
@@ -60,10 +63,10 @@ tool.Roi = function(app)
         
     this.enable = function(value){
         if( value ) {
-            tool.draw.appendColourChooserHtml(app);
+            dwv.tool.draw.appendColourChooserHtml(app);
         }
         else {
-            tool.draw.clearColourChooserHtml();
+            dwv.tool.draw.clearColourChooserHtml();
         }
     };
 
@@ -78,7 +81,7 @@ tool.Roi = function(app)
  * @param roi The ROI to draw.
  * @param app The application to draw the line on.
  */
-DrawRoiCommand = function(roi, app)
+dwv.tool.DrawRoiCommand = function(roi, app)
 {
     // app members can change 
     var lineColor = app.getStyle().getLineColor();
@@ -110,4 +113,4 @@ DrawRoiCommand = function(roi, app)
         context.closePath();
         context.stroke();
     }; 
-}; // Rectangle command class
+}; // Roi command class

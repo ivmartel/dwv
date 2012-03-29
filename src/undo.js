@@ -3,7 +3,7 @@
  * Simple undo/redo stack. 
  */
 
-function addCommandToDisplayHistory(command)
+dwv.addCommandToDisplayHistory = function(command)
 {
     var select = document.getElementById('history_list');
     // remove undone commands
@@ -22,9 +22,9 @@ function addCommandToDisplayHistory(command)
     select.add(option);
     // increment selected index
     select.selectedIndex++;
-}
+};
 
-function enableInDisplayHistory(enable)
+dwv.enableInDisplayHistory = function(enable)
 {
     var select = document.getElementById('history_list');
     // enable or not (order is important)
@@ -45,13 +45,13 @@ function enableInDisplayHistory(enable)
         // decrement selected index
         select.selectedIndex--;
     }
-}
+};
 
 /**
  * UndoStack class.
  * @param app
  */
-function UndoStack(app)
+dwv.UndoStack = function(app)
 { 
 	// Array of commands.
 	var stack = [];
@@ -69,7 +69,7 @@ function UndoStack(app)
 		// store command
 		stack[curCmd++] = cmd;
 		// add command to display history
-		addCommandToDisplayHistory(cmd);
+		dwv.addCommandToDisplayHistory(cmd);
 	};
 
 	/**
@@ -96,7 +96,7 @@ function UndoStack(app)
 			// merge the temporary layer
 			app.getDrawLayer().merge(app.getTempLayer());
 			// disable last in display history
-			enableInDisplayHistory(false);
+			dwv.enableInDisplayHistory(false);
 		}
 	}; 
 
@@ -112,13 +112,13 @@ function UndoStack(app)
 			// merge the temporary layer
 			app.getDrawLayer().merge(app.getTempLayer());
 			// enable next in display history
-			enableInDisplayHistory(true);
+			dwv.enableInDisplayHistory(true);
 		}
 	};
 
-} // UndoStack class
+}; // UndoStack class
 
-UndoStack.prototype.appendHtml = function()
+dwv.UndoStack.prototype.appendHtml = function()
 {
     var paragraph = document.createElement("p");  
     paragraph.appendChild(document.createTextNode("History:"));

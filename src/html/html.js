@@ -1,5 +1,5 @@
 // html namespace
-var html = html || {};
+dwv.html = dwv.html || {};
 
 /**
 * HTML utilities functions.
@@ -10,7 +10,7 @@ var html = html || {};
  * @param inputArray The input array, can be either a 1D array, 
  *                   2D array or an array of objects
  */
-html.arrayToTable = function(inputArray)
+dwv.html.arrayToTable = function(inputArray)
 {
     var table = document.createElement('table');
     var row = 0;
@@ -41,7 +41,7 @@ html.arrayToTable = function(inputArray)
                     var th = header.insertRow(-1);
                     for( var k=0; k<keys.length; ++k ) {
                         cell = th.insertCell(-1);
-                        cell.appendChild(document.createTextNode(utils.capitaliseFirstLetter(keys[k])));
+                        cell.appendChild(document.createTextNode(dwv.utils.capitaliseFirstLetter(keys[k])));
                     }
                 }
                 // values
@@ -61,9 +61,9 @@ html.arrayToTable = function(inputArray)
  * @param term
  * @param table
  */
-html.filterTable = function(term, table) {
+dwv.html.filterTable = function(term, table) {
     // de-highlight
-    html.dehighlight(table);
+    dwv.html.dehighlight(table);
     // split search terms
     var terms = term.value.toLowerCase().split(" ");
 
@@ -78,7 +78,7 @@ html.filterTable = function(term, table) {
                 display = 'none';
             } else {
                 if (terms[i].length) {
-                    html.highlight(terms[i], table.rows[r]);
+                    dwv.html.highlight(terms[i], table.rows[r]);
                 }
             }
             table.rows[r].style.display = display;
@@ -92,7 +92,7 @@ html.filterTable = function(term, table) {
  * into its original preText term postText
  * @param container The container to de-highlight.
  */
-html.dehighlight = function(container) {
+dwv.html.dehighlight = function(container) {
     for (var i = 0; i < container.childNodes.length; i++) {
         var node = container.childNodes[i];
 
@@ -107,7 +107,7 @@ html.dehighlight = function(container) {
             return;
         } else if (node.nodeType !== 3) {
             // Keep going onto other elements
-            html.dehighlight(node);
+            dwv.html.dehighlight(node);
         }
     }
 };
@@ -119,7 +119,7 @@ html.dehighlight = function(container) {
  * @param term The term to highlight.
  * @param container The container where to highlight the term.
  */
-html.highlight = function(term, container) {
+dwv.html.highlight = function(term, container) {
     for (var i = 0; i < container.childNodes.length; i++) {
         var node = container.childNodes[i];
 
@@ -138,7 +138,7 @@ html.highlight = function(term, container) {
                     new_node.appendChild(document.createTextNode(
                                 data.substr(0, result)));
                     // term
-                    new_node.appendChild(html.createHighlightNode(
+                    new_node.appendChild(dwv.html.createHighlightNode(
                                 document.createTextNode(data.substr(
                                         result, term.length))));
                     // reduce search string
@@ -149,12 +149,12 @@ html.highlight = function(term, container) {
             }
         } else {
             // Keep going onto other elements
-            html.highlight(term, node);
+            dwv.html.highlight(term, node);
         }
     }
 };
 
-html.createHighlightNode = function(child) {
+dwv.html.createHighlightNode = function(child) {
     var node = document.createElement('span');
     node.setAttribute('class', 'highlighted');
     node.attributes['class'].value = 'highlighted';

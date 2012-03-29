@@ -1,3 +1,6 @@
+// math namespace
+dwv.math = dwv.math || {};
+
 /**
  * shapes.js
  * Definition of basic shapes.
@@ -8,7 +11,7 @@
  * @param x The X coordinate for the point.
  * @param y The Y coordinate for the point.
  */
-Point2D = function(x,y)
+dwv.math.Point2D = function(x,y)
 {
     // Get the X position of the point.
     this.getX = function() { return x; };
@@ -27,7 +30,7 @@ Point2D = function(x,y)
  * @param centre A Point2D representing the centre of the circle.
  * @param radius The radius of the circle.
  */
-Circle = function(centre, radius)
+dwv.math.Circle = function(centre, radius)
 {
     // Cache the surface
     var surface = Math.PI*radius*radius;
@@ -50,7 +53,7 @@ Circle = function(centre, radius)
  * @param begin A Point2D representing the beginning of the line.
  * @param end A Point2D representing the end of the line.
  */
-Line = function(begin, end)
+dwv.math.Line = function(begin, end)
 {
     // cache the length
     var length = Math.sqrt(
@@ -77,7 +80,7 @@ Line = function(begin, end)
  * @param begin A Point2D representing the beginning of the rectangle.
  * @param end A Point2D representing the end of the rectangle.
  */
-Rectangle = function(begin, end)
+dwv.math.Rectangle = function(begin, end)
 {
     // cache the length
     var surface = Math.abs(end.getX() - begin.getX()) * Math.abs(end.getY() - begin.getY() );
@@ -106,7 +109,7 @@ Rectangle = function(begin, end)
 /**
  * Region Of Interest shape.
  */
-ROI = function()
+dwv.math.ROI = function()
 {
     // list of points.
     var points = [];

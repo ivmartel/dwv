@@ -1,8 +1,11 @@
+// tool namespace
+dwv.tool = dwv.tool || {};
+
 /**
-* rect.js
+* rectangle.js
 * Rectangle painting tool.
 */
-tool.Rect = function(app)
+dwv.tool.Rectangle = function(app)
 {
     var self = this;
     this.started = false;
@@ -21,17 +24,17 @@ tool.Rect = function(app)
             return;
         }
         // points
-        var beginPoint = new Point2D(self.x0, self.y0);
-        var endPoint = new Point2D(ev._x, ev._y);
+        var beginPoint = new dwv.math.Point2D(self.x0, self.y0);
+        var endPoint = new dwv.math.Point2D(ev._x, ev._y);
         // check for equality
         if( beginPoint.equal(endPoint) )
         {
             return;
         }
         // create rectangle
-        var rect = new Rectangle(beginPoint, endPoint);
+        var rect = new dwv.math.Rectangle(beginPoint, endPoint);
         // create draw command
-        command = new DrawRectangleCommand(rect, app);
+        command = new dwv.tool.DrawRectangleCommand(rect, app);
         // clear the temporary layer
         app.getTempLayer().clearContextRect();
         // draw
@@ -55,10 +58,10 @@ tool.Rect = function(app)
         
     this.enable = function(value){
         if( value ) { 
-            tool.draw.appendColourChooserHtml(app);
+            dwv.tool.draw.appendColourChooserHtml(app);
         }
         else {
-            tool.draw.clearColourChooserHtml();
+            dwv.tool.draw.clearColourChooserHtml();
         }
     };
 
@@ -66,14 +69,14 @@ tool.Rect = function(app)
         app.handleKeyDown(event);
     };
 
-}; // Rect function
+}; // Rectangle function
 
 /**
  * Draw rectangle command.
  * @param rectangle The rectangle to draw.
  * @param app The application to draw the line on.
  */
-DrawRectangleCommand = function(rectangle, app)
+dwv.tool.DrawRectangleCommand = function(rectangle, app)
 {
     // app members can change 
     var lineColor = app.getStyle().getLineColor();

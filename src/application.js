@@ -1,8 +1,8 @@
 /**
-* dwvApp
+* App
 * Main application.
 */
-function DwvApp()
+dwv.App = function()
 {
     // Local object.
     var self = this;
@@ -24,13 +24,13 @@ function DwvApp()
     var infoLayer = null;
 
     // Tool box.
-    var toolBox = new ToolBox(this);
+    var toolBox = new dwv.tool.ToolBox(this);
     
     // Style.
-    var style = new Style();
+    var style = new dwv.html.Style();
     
     // UndoStack
-    var undoStack = new UndoStack(this);
+    var undoStack = new dwv.UndoStack(this);
     
     // Get the image details.
     this.getImage = function() { return image; };
@@ -77,7 +77,7 @@ function DwvApp()
         // set style var
         self.getStyle().setLineColor(color);
         // reset borders
-        tool.draw.setLineColor(color);
+        dwv.tool.draw.setLineColor(color);
     };
     
     /**
@@ -171,15 +171,15 @@ function DwvApp()
     function parseAndLoadDicom(file)
     {    
         // parse the DICOM file
-        var reader = new DicomInputStreamReader();    
+        var reader = new dwv.dicom.DicomInputStreamReader();    
         reader.readDicom(file);
         var dicomBuffer = reader.getInputBuffer();
         var dicomReader = reader.getReader();
-        var dicomParser = new DicomParser(dicomBuffer,dicomReader);
+        var dicomParser = new dwv.dicom.DicomParser(dicomBuffer,dicomReader);
         dicomParser.parseAll();     
         
         // tag list table      
-        var table = html.arrayToTable(dicomParser.dicomElement);
+        var table = dwv.html.arrayToTable(dicomParser.dicomElement);
         table.className = "tagList";
         document.getElementById('tags').appendChild(table);
         document.getElementById("tags").style.display='';
@@ -189,7 +189,7 @@ function DwvApp()
         form.setAttribute('class', 'filter');
         var input = document.createElement('input');
         input.onkeyup = function() {
-            html.filterTable(input, table);
+            dwv.html.filterTable(input, table);
         };
         form.appendChild(input);
         document.getElementById('tags').insertBefore(form, table);
@@ -240,9 +240,9 @@ function DwvApp()
         } 
                
         // create the DICOM image
-        image = new DicomImage(
-            ImageSize(numberOfColumns, numberOfRows),
-            ImageSpacing(columnSpacing, rowSpacing),
+        image = new dwv.dicom.DicomImage(
+            dwv.dicom.ImageSize(numberOfColumns, numberOfRows),
+            dwv.dicom.ImageSpacing(columnSpacing, rowSpacing),
             dicomParser.pixelBuffer );
         image.setLookup( windowCenter, windowWidth, rescaleSlope, rescaleIntercept);
     }
@@ -257,14 +257,14 @@ function DwvApp()
         var numberOfRows = image.getSize().getNumberOfRows();
         
         // image layer
-        imageLayer = new Layer("imageLayer");
+        imageLayer = new dwv.html.Layer("imageLayer");
         imageLayer.init(numberOfColumns, numberOfRows);
         imageLayer.fillContext();
         // draw layer
-        drawLayer = new Layer("drawLayer");
+        drawLayer = new dwv.html.Layer("drawLayer");
         drawLayer.init(numberOfColumns, numberOfRows);
         // temp layer
-        tempLayer = new Layer("tempLayer");
+        tempLayer = new dwv.html.Layer("tempLayer");
         tempLayer.init(numberOfColumns, numberOfRows);
         // Attach the mousedown, mousemove and mouseup event listeners.
         tempLayer.getCanvas().addEventListener('mousedown', eventHandler, false);
@@ -273,7 +273,7 @@ function DwvApp()
         tempLayer.getCanvas().addEventListener('mousewheel', eventHandler, false);
         tempLayer.getCanvas().addEventListener('DOMMouseScroll', eventHandler, false);
         // info layer
-        infoLayer = new Layer("infoLayer");
+        infoLayer = new dwv.html.Layer("infoLayer");
         infoLayer.init(numberOfColumns, numberOfRows);
         
         // Keydown listener
@@ -303,4 +303,4 @@ function DwvApp()
         // draw the image
         self.getImageLayer().draw();
     };
-}
+};
