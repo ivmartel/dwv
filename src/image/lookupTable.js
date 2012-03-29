@@ -2,18 +2,30 @@
 dwv.image = dwv.image || {};
 
 /**
- *  LookupTable.js
- *  Version 0.5
- *  Author: BabuHussain<babuhussain.a@raster.in>
- */
+*  lookupTable.js
+*/
 
-dwv.image.setWindowingdata = function(wc,ww)
+/**
+ * LookupTable class.
+ * @returns {LookupTable}
+ */
+dwv.image.LookupTable = function(wc,ww,rs,ri)
+{
+    this.windowCenter = wc;
+    this.windowWidth = ww;
+    this.defaultWindowCenter = wc;
+    this.defaultWindowWidth = ww;
+    this.rescaleSlope = rs;
+    this.rescaleIntercept = ri;    
+};
+
+dwv.image.LookupTable.prototype.setWindowingdata = function(wc,ww)
 {
     this.windowCenter = wc;
     this.windowWidth = ww;    
 };
 
-dwv.image.calculateHULookup = function()
+dwv.image.LookupTable.prototype.calculateHULookup = function()
 {
     this.huLookup = new Array(4096);         
     for(var inputValue=0; inputValue<=4095; inputValue++)
@@ -22,7 +34,7 @@ dwv.image.calculateHULookup = function()
     }        
 };
 
-dwv.image.calculateLookup = function()
+dwv.image.LookupTable.prototype.calculateLookup = function()
 {    
     xMin = this.windowCenter - 0.5 - (this.windowWidth-1) / 2;
     xMax = this.windowCenter - 0.5 + (this.windowWidth-1) / 2;    
@@ -46,26 +58,4 @@ dwv.image.calculateLookup = function()
             this.ylookup[inputValue]= parseInt(y, 10);
         }
      }
-};
-
-/**
- * LookupTable class.
- * @returns {LookupTable}
- */
-dwv.image.LookupTable = function()
-{
-    // methods
-    this.calculateHULookup = dwv.image.calculateHULookup;
-    this.calculateLookup = dwv.image.calculateLookup;
-    this.setWindowingdata = dwv.image.setWindowingdata;
-};
-
-dwv.image.LookupTable.prototype.setData = function(wc,ww,rs,ri)
-{    
-    this.windowCenter = wc;
-    this.windowWidth = ww;
-    this.defaultWindowCenter = wc;
-    this.defaultWindowWidth = ww;
-    this.rescaleSlope = rs;
-    this.rescaleIntercept = ri;    
 };
