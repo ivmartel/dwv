@@ -110,9 +110,17 @@ dwv.tool.applyColourMap = function(colourMapId)
         case 1: // default
             dwv.tool.updateColourMap(dwv.image.lut.plain);
             break;
-            
-        case 2: // rainbow
+        case 2: // inv plain
+            dwv.tool.updateColourMap(dwv.image.lut.invPlain);
+            break;
+        case 3: // rainbow
             dwv.tool.updateColourMap(dwv.image.lut.rainbow);
+            break;
+        case 4: // hot
+            dwv.tool.updateColourMap(dwv.image.lut.hot);
+            break;
+        case 5: // test
+            dwv.tool.updateColourMap(dwv.image.lut.test);
             break;
     }
 };
@@ -226,7 +234,7 @@ dwv.tool.WindowLevel.prototype.appendHtml = function()
     cmSelector.onchange = dwv.tool.changeColourMap;
     cmSelector.selectedIndex = 1;
     // selector options
-    var cmOptions = ["Default", "Rainbow"];
+    var cmOptions = ["Default", "InvPlain", "Rainbow", "Hot", "Test"];
     for ( var o = 0; o < cmOptions.length; ++o )
     {
         option = document.createElement("option");
