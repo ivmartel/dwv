@@ -104,7 +104,7 @@ dwv.image.Image.prototype.getValue = function( i, j, k )
 {
     var k1 = k || 0;
     // check size
-    this.size.checkCoordinates( i, j, k1 );
+    //this.size.checkCoordinates( i, j, k1 );
     // return
     return this.getValueAtOffset( i + ( j * this.size.getNumberOfColumns() ) + ( k1 * this.size.getSliceSize()) );
 };
@@ -148,4 +148,50 @@ dwv.image.Image.prototype.generateImageData = function( array, sliceNumber )
             array.data[colorOffset+2] = this.lut.blue[pxValue];
         }
     }            
+};
+
+dwv.image.Image.prototype.getMinMax = function()
+{
+    var min = this.getValue(0,0,0);
+    var max = min;
+    var value = 0;
+    for(var k=0; k < this.size.getNumberOfSlices(); ++k)
+    {
+        for(var j=0; j < this.size.getNumberOfRows(); ++j)
+        {
+            for(var i=0; i < this.size.getNumberOfColumns(); ++i)
+            {    
+                value = this.getValue(i,j,k);
+                if( value > max ) {
+                    max = value;
+                }
+                if( value < min ) {
+                    min = value;
+                }
+            }
+        }
+    }
+    return { "min": min, "max": max };
+};
+
+dwv.image.Image.prototype.getHistogram = function()
+{
+    var minMax = this.getMinMax();
+    console.log(minMax.max);
+    console.log(minMax.min);
+    var range = minMax.max - minMax.max;
+    var histo = [range];
+    var value = 0;
+    for(var k=0; k < this.size.getNumberOfSlices(); ++k)
+    {
+        for(var j=0; j < this.size.getNumberOfRows(); ++j)
+        {
+            for(var i=0; i < this.size.getNumberOfColumns(); ++i)
+            {    
+                value = this.getValue(i,j,k);
+                histo[value] += 1;
+            }
+        }
+    }
+    return histo;
 };

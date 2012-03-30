@@ -245,9 +245,21 @@ dwv.tool.WindowLevel.prototype.appendHtml = function()
     // append to paragraph
     cmParagraph.appendChild(cmSelector);
 
+    // append plot
+    var plotDiv = document.createElement("div");
+    plotDiv.id = "plot";
+    plotDiv.style.width = "250px";
+    plotDiv.style.height = "150px";
+    
     div.appendChild(wlParagraph);
     div.appendChild(cmParagraph);
+    div.appendChild(plotDiv);
     document.getElementById('toolbox').appendChild(div);
+
+    $.plot($("#plot"), [ {
+        data: app.getImage().getHistogram(),
+        lines: { show: true, steps: true }
+    } ]);
 };
 
 dwv.tool.WindowLevel.prototype.clearHtml = function()
