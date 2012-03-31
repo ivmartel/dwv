@@ -258,7 +258,7 @@ dwv.tool.WindowLevel.prototype.appendHtml = function()
 
     $.plot($("#plot"), [ {
         data: app.getImage().getHistogram(),
-        lines: { show: true, steps: true }
+        bars: { show: true }
     } ]);
 };
 

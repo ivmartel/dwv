@@ -152,23 +152,19 @@ dwv.image.Image.prototype.generateImageData = function( array, sliceNumber )
 
 dwv.image.Image.prototype.getMinMax = function()
 {
-    var min = this.getValue(0,0,0);
+    var min = this.buffer[0];
+    console.log("get val: "+min);
+
     var max = min;
     var value = 0;
-    for(var k=0; k < this.size.getNumberOfSlices(); ++k)
-    {
-        for(var j=0; j < this.size.getNumberOfRows(); ++j)
-        {
-            for(var i=0; i < this.size.getNumberOfColumns(); ++i)
-            {    
-                value = this.getValue(i,j,k);
-                if( value > max ) {
-                    max = value;
-                }
-                if( value < min ) {
-                    min = value;
-                }
-            }
+    for(var i=0; i < this.buffer.length; ++i)
+    {    
+        value = this.buffer[i];
+        if( value > max ) {
+            max = value;
+        }
+        if( value < min ) {
+            min = value;
         }
     }
     return { "min": min, "max": max };
@@ -176,22 +172,19 @@ dwv.image.Image.prototype.getMinMax = function()
 
 dwv.image.Image.prototype.getHistogram = function()
 {
-    var minMax = this.getMinMax();
-    console.log(minMax.max);
-    console.log(minMax.min);
-    var range = minMax.max - minMax.max;
-    var histo = [range];
+    var histo = [];
+    var histoPlot = [];
     var value = 0;
-    for(var k=0; k < this.size.getNumberOfSlices(); ++k)
-    {
-        for(var j=0; j < this.size.getNumberOfRows(); ++j)
-        {
-            for(var i=0; i < this.size.getNumberOfColumns(); ++i)
-            {    
-                value = this.getValue(i,j,k);
-                histo[value] += 1;
-            }
-        }
+    for(var i=0; i < this.buffer.length; ++i)
+    {    
+        value = this.buffer[i];
+        histo[value] = histo[value] || 0;
+        histo[value] += 1;
     }
-    return histo;
+    for(var j=0; j < 4096; ++j)
+    {    
+        value = histo[j] || 0;
+        histoPlot.push([j, value]);
+    }
+    return histoPlot;
 };
