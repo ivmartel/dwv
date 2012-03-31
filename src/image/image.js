@@ -74,6 +74,10 @@ dwv.image.Image = function(size, spacing, buffer) {
     this.spacing = spacing;
     // buffer
     this.buffer = buffer;
+    // data range
+    this.dataRange = undefined;
+    // histogram
+    this.histoPlot = undefined;
     
     // lookup
     this.lookup = null;
@@ -150,41 +154,44 @@ dwv.image.Image.prototype.generateImageData = function( array, sliceNumber )
     }            
 };
 
-dwv.image.Image.prototype.getMinMax = function()
+dwv.image.Image.prototype.getDataRange = function()
 {
-    var min = this.buffer[0];
-    console.log("get val: "+min);
-
-    var max = min;
-    var value = 0;
-    for(var i=0; i < this.buffer.length; ++i)
-    {    
-        value = this.buffer[i];
-        if( value > max ) {
-            max = value;
+    if( !this.dataRange ) {
+        var min = this.buffer[0];
+        var max = min;
+        var value = 0;
+        for(var i=0; i < this.buffer.length; ++i)
+        {    
+            value = this.buffer[i];
+            if( value > max ) {
+                max = value;
+            }
+            if( value < min ) {
+                min = value;
+            }
         }
-        if( value < min ) {
-            min = value;
-        }
+        this.dataRange = { "min": min, "max": max };
     }
-    return { "min": min, "max": max };
+    return this.dataRange;
 };
 
 dwv.image.Image.prototype.getHistogram = function()
 {
-    var histo = [];
-    var histoPlot = [];
-    var value = 0;
-    for(var i=0; i < this.buffer.length; ++i)
-    {    
-        value = this.buffer[i];
-        histo[value] = histo[value] || 0;
-        histo[value] += 1;
+    if( !this.histoPlot ) {
+        var histo = [];
+        this.histoPlot = [];
+        var value = 0;
+        for(var i=0; i < this.buffer.length; ++i)
+        {    
+            value = this.buffer[i];
+            histo[value] = histo[value] || 0;
+            histo[value] += 1;
+        }
+        for(var j=0; j < 4096; ++j)
+        {    
+            value = histo[j] || 0;
+            this.histoPlot.push([j, value]);
+        }
     }
-    for(var j=0; j < 4096; ++j)
-    {    
-        value = histo[j] || 0;
-        histoPlot.push([j, value]);
-    }
-    return histoPlot;
+    return this.histoPlot;
 };
