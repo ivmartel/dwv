@@ -135,23 +135,16 @@ dwv.image.Image.prototype.generateImageData = function( array, sliceNumber )
 {        
     this.lookup.calculateLookup();
     var sliceOffset = (sliceNumber || 0) * this.size.getSliceSize();
-    var rowOffset = 0;
-    var imageOffset = sliceOffset;
-    var colorOffset = 0;
+    var iMax = sliceOffset + this.size.getSliceSize();
     var pxValue = 0;
-    for(var j=0; j < this.size.getNumberOfRows(); ++j)
-    {
-        rowOffset = j * this.size.getNumberOfColumns();
-        for(var i=0; i < this.size.getNumberOfColumns(); ++i)
-        {        
-            colorOffset = (i + rowOffset + sliceOffset) * 4;                    
-            pxValue = parseInt( this.lookup.ylookup[ this.buffer[imageOffset] ], 10 );    
-            imageOffset++;               
-            array.data[colorOffset] = this.lut.red[pxValue];
-            array.data[colorOffset+1] = this.lut.green[pxValue];
-            array.data[colorOffset+2] = this.lut.blue[pxValue];
-        }
-    }            
+    for(var i=sliceOffset; i < iMax; ++i)
+    {        
+        pxValue = parseInt( this.lookup.ylookup[ this.buffer[i] ], 10 );    
+        array.data[4*i] = this.lut.red[pxValue];
+        array.data[4*i+1] = this.lut.green[pxValue];
+        array.data[4*i+2] = this.lut.blue[pxValue];
+        array.data[4*i+3] = 0xff;
+    }
 };
 
 dwv.image.Image.prototype.getDataRange = function()
