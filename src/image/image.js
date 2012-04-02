@@ -155,7 +155,7 @@ dwv.image.Image.prototype.getDataRange = function()
         var value = 0;
         for(var i=0; i < this.buffer.length; ++i)
         {    
-            value = this.buffer[i];
+            value = this.getValueAtOffset(i);
             if( value > max ) {
                 max = value;
             }
@@ -176,11 +176,12 @@ dwv.image.Image.prototype.getHistogram = function()
         var value = 0;
         for(var i=0; i < this.buffer.length; ++i)
         {    
-            value = this.buffer[i];
+            value = this.getValueAtOffset(i);
             histo[value] = histo[value] || 0;
             histo[value] += 1;
         }
-        for(var j=0; j < 4096; ++j)
+        // generate data for plotting
+        for(var j=this.getDataRange().min; j < this.getDataRange().max; ++j)
         {    
             value = histo[j] || 0;
             this.histoPlot.push([j, value]);
