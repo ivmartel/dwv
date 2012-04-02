@@ -51,6 +51,7 @@ dwv.tool.updateWindowingData = function(wc,ww)
 {
     app.getImage().getLookup().setWindowingdata(wc,ww);
     dwv.tool.showWindowingValue(wc,ww);
+    dwv.tool.WindowLevel.prototype.updatePlot(wc,ww);
     app.generateAndDrawImage();
 };
 
@@ -185,6 +186,9 @@ dwv.tool.WindowLevel = function(app)
     this.enable = function(bool){
         if( bool ) {
             this.appendHtml();
+            dwv.tool.updateWindowingData(
+                    app.getImage().getLookup().windowCenter,
+                    app.getImage().getLookup().windowWidth );
         }
         else {
             this.clearHtml();
@@ -255,11 +259,24 @@ dwv.tool.WindowLevel.prototype.appendHtml = function()
     div.appendChild(cmParagraph);
     div.appendChild(plotDiv);
     document.getElementById('toolbox').appendChild(div);
+};
 
-    $.plot($("#plot"), [ {
-        data: app.getImage().getHistogram(),
-        bars: { show: true }
-    } ]);
+dwv.tool.WindowLevel.prototype.updatePlot = function(wc,ww)
+{
+    var half = parseInt( parseInt(ww,10) / 2, 10 );
+    var center = parseInt(wc,10);
+    var min = center - half;
+    var max = center + half;
+    
+    var markings = [
+        { color: '#faa', lineWidth: 1, xaxis: { from: min, to: min } },
+        { color: '#aaf', lineWidth: 1, xaxis: { from: max, to: max } }
+    ];
+
+    $.plot($("#plot"), [ app.getImage().getHistogram() ], {
+        bars: { show: true },
+        grid: { markings: markings }
+    });
 };
 
 dwv.tool.WindowLevel.prototype.clearHtml = function()
