@@ -194,58 +194,8 @@ dwv.App = function()
         };
         tagSearchform.appendChild(input);
         document.getElementById('tags').insertBefore(tagSearchform, table);
-
-        // image details
-        var numberOfRows = 0;
-        var numberOfColumns = 0;
-        var rowSpacing = 0;
-        var columnSpacing = 0;
-        var windowWidth = 0;
-        var windowCenter = 0;
-        var rescaleIntercept = 0;
-        var rescaleSlope = 0;
         
-        var elementindex=0;
-        for(;elementindex<dicomParser.dicomElement.length;elementindex++)
-        {
-            var dicomElement=dicomParser.dicomElement[elementindex];            
-            if(dicomElement.name === "Rows")
-            {
-                numberOfRows=dicomElement.value[0];
-            }
-            else if(dicomElement.name === "Columns")
-            {
-                numberOfColumns=dicomElement.value[0];
-            }
-            else if(dicomElement.name === "PixelSpacing")
-            {
-                rowSpacing=parseFloat(dicomElement.value[0]);    
-                columnSpacing=parseFloat(dicomElement.value[1]);    
-            }
-            else if(dicomElement.name === "WindowWidth")
-            {
-                windowWidth=dicomElement.value[0];
-            }
-            else if(dicomElement.name === "WindowCenter")
-            {
-                windowCenter=dicomElement.value[0];            
-            }
-            else if(dicomElement.name === "RescaleSlope")
-            {
-                rescaleSlope=parseInt(dicomElement.value, 10);    
-            }
-            else if(dicomElement.name === "RescaleIntercept")
-            {
-                rescaleIntercept=parseInt(dicomElement.value, 10);
-            }
-        } 
-               
-        // create the DICOM image
-        image = new dwv.image.Image(
-            dwv.image.ImageSize(numberOfColumns, numberOfRows),
-            dwv.image.ImageSpacing(columnSpacing, rowSpacing),
-            dicomParser.pixelBuffer );
-        image.setLookup( windowCenter, windowWidth, rescaleSlope, rescaleIntercept);
+        image = dicomParser.getImage();
     }
     
     /**

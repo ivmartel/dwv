@@ -15,6 +15,15 @@ dwv.dicom.DicomParser = function(inputBuffer,reader)
     this.reader = reader;
     this.dicomElement = [];
     this.dict = new dwv.dicom.Dictionary();
+    // default image information
+    this.numberOfRows = 0;
+    this.numberOfColumns = 0;
+    this.rowSpacing = 1;
+    this.columnSpacing = 1;
+    this.windowWidth = 1;
+    this.windowCenter = 0;
+    this.rescaleSlope = 1;
+    this.rescaleIntercept = 0;
 };
 
 dwv.dicom.DicomParser.prototype.getPixelBuffer=function()
@@ -167,14 +176,10 @@ dwv.dicom.DicomParser.prototype.parseAll = function()
     {
         // get the data element
         dataElement = this.readDataElement(i);
-        // store some tags or break on pixel data
-        if( dataElement.tag.name === "Rows" ) {
-            this.numberOfRows = parseInt(dataElement.data, 10);
-        }
-        else if( dataElement.tag.name === "Columns" ) {
-            this.numberOfColumns = parseInt(dataElement.data, 10);
-        }
-        else if( dataElement.tag.name === "PixelData") {
+        // store image information
+        this.storeImageInformation( dataElement );
+        // store pixel data
+        if( dataElement.tag.name === "PixelData") {
             this.pixelBuffer = dataElement.data;
         }
         // store the data element
@@ -186,4 +191,51 @@ dwv.dicom.DicomParser.prototype.parseAll = function()
         // increment index
         i += dataElement.offset-1;
     }
+};
+
+dwv.dicom.DicomParser.prototype.storeImageInformation = function(element)
+{
+    if(element.tag.name === "Rows")
+    {
+        this.numberOfRows = element.data[0];
+    }
+    else if(element.tag.name === "Columns")
+    {
+        this.numberOfColumns = element.data[0];
+    }
+    else if(element.tag.name === "PixelSpacing")
+    {
+        this.rowSpacing = parseFloat(element.data[0]);    
+        this.columnSpacing = parseFloat(element.data[1]);    
+    }
+    else if(element.tag.name === "WindowWidth")
+    {
+        this.windowWidth = element.data[0];
+    }
+    else if(element.tag.name === "WindowCenter")
+    {
+        this.windowCenter = element.data[0];            
+    }
+    else if(element.tag.name === "RescaleSlope")
+    {
+        this.rescaleSlope = parseInt(element.data, 10);    
+    }
+    else if(element.tag.name === "RescaleIntercept")
+    {
+        this.rescaleIntercept = parseInt(element.data, 10);
+    }
+};
+
+dwv.dicom.DicomParser.prototype.getImage = function()
+{
+    // create the DICOM image
+    var image = new dwv.image.Image(
+        dwv.image.ImageSize(this.numberOfColumns, this.numberOfRows),
+        dwv.image.ImageSpacing(this.columnSpacing, this.rowSpacing),
+        this.pixelBuffer );
+    image.setLookup( 
+            this.windowCenter, this.windowWidth, 
+            this.rescaleSlope, this.rescaleIntercept);
+    
+    return image;
 };
