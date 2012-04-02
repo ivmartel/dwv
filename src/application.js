@@ -178,21 +178,22 @@ dwv.App = function()
         var dicomParser = new dwv.dicom.DicomParser(dicomBuffer,dicomReader);
         dicomParser.parseAll();     
         
-        // tag list table      
-        var table = dwv.html.arrayToTable(dicomParser.dicomElement);
+        // tag list table (without the pixel data)  
+        var table = dwv.html.arrayToTable(dicomParser.dicomElement.slice(
+                0, dicomParser.dicomElement.length-2));
         table.className = "tagList";
         document.getElementById('tags').appendChild(table);
         document.getElementById("tags").style.display='';
         
         // table search form
-        var form = document.createElement('form');
-        form.setAttribute('class', 'filter');
+        var tagSearchform = document.createElement('form');
+        tagSearchform.setAttribute('class', 'filter');
         var input = document.createElement('input');
         input.onkeyup = function() {
             dwv.html.filterTable(input, table);
         };
-        form.appendChild(input);
-        document.getElementById('tags').insertBefore(form, table);
+        tagSearchform.appendChild(input);
+        document.getElementById('tags').insertBefore(tagSearchform, table);
 
         // image details
         var numberOfRows = 0;
