@@ -40,14 +40,7 @@ dwv.dicom.DicomParser.prototype.readTag=function(offset)
     var element_str = (e2 + e3*256).toString(16);
     var element = "0x0000".substr(0, 6 - element_str.length) + element_str.toUpperCase();
     // name
-    var name;
-    var dictGroup = this.dict.newDictionary[group];
-    if( dictGroup && dictGroup[element]) {
-        name = dictGroup[element][2];
-    }
-    else {
-        name = "Undefined DICOM Tag";
-    }
+    var name = this.dict.newDictionary[group][element][2] || "Unknown DICOM Tag";
 
     // return as hex
     return { 'group': group, 'element': element, 'name': name };
@@ -96,6 +89,16 @@ dwv.dicom.DicomParser.prototype.readDataElement=function(offset)
     {
         data = [this.reader.readNumber( vl, offset+4+vlOffset)];
     }
+    else if( vr === "OW" ) // should be pixel data
+    {
+        data = [];
+        var begin = offset+4+vlOffset;
+        var end = begin + vl;
+        for(var i=begin; i<end; i+=2) 
+        {     
+            data.push(this.reader.readNumber(2,i));
+        }
+    }
     else
     {
         data = this.reader.readString( vl, offset+4+vlOffset);
@@ -112,7 +115,7 @@ dwv.dicom.DicomParser.prototype.readDataElement=function(offset)
         'offset': elementOffset};    
 };
 
-dwv.dicom.DicomParser.prototype.readTags = function()
+dwv.dicom.DicomParser.prototype.parseAll = function()
 {
     var offset = 0;
     var i;
@@ -172,7 +175,7 @@ dwv.dicom.DicomParser.prototype.readTags = function()
             this.numberOfColumns = parseInt(dataElement.data, 10);
         }
         else if( dataElement.tag.name === "PixelData") {
-            break;
+            this.pixelBuffer = dataElement.data;
         }
         // store the data element
         this.appendDicomElement( {
@@ -183,25 +186,4 @@ dwv.dicom.DicomParser.prototype.readTags = function()
         // increment index
         i += dataElement.offset-1;
     }
-    
-    return i;
-};
-
-dwv.dicom.DicomParser.prototype.readImage=function(index)
-{
-    this.pixelBuffer = new Array(this.numberOfRows*this.numberOfColumns*2);
-    var pixelIndex=0;
-    for(var i=index; i<this.inputBuffer.length; i+=2) 
-    {     
-        this.pixelBuffer[pixelIndex]=this.reader.readNumber(2,i);
-        pixelIndex++;
-    }
-};
-
-dwv.dicom.DicomParser.prototype.parseAll=function()
-{
-    // read tags
-    var index = this.readTags();
-    // read pixel data
-    this.readImage(index);    
 };
