@@ -171,11 +171,7 @@ dwv.App = function()
     function parseAndLoadDicom(file)
     {    
         // parse the DICOM file
-        var reader = new dwv.dicom.DicomInputStreamReader();    
-        reader.readDicom(file);
-        var dicomBuffer = reader.getInputBuffer();
-        var dicomReader = reader.getReader();
-        var dicomParser = new dwv.dicom.DicomParser(dicomBuffer,dicomReader);
+        var dicomParser = new dwv.dicom.DicomParser(file);
         dicomParser.parseAll();     
         
         // tag list table (without the pixel data)  

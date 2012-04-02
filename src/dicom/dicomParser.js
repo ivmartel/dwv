@@ -5,14 +5,45 @@ dwv.dicom = dwv.dicom || {};
  *  DicomParser.js
  */
 
+dwv.dicom.BigEndianReader = function()
+{
+    this.readNumber = function(buffer, startByte, nBytes) {
+        
+    };
+    this.readString = function(buffer, startChar, nChars) {
+        
+    };
+};
+
+dwv.dicom.LittleEndianReader = function(file)
+{
+    this.readByteAt = function(i) {
+        return file.charCodeAt(i) & 0xff;
+    };
+    this.readNumber = function(nBytes, startByte) {
+        var result = 0;
+        for(var i=startByte + nBytes; i>startByte; i--){
+            result = result * 256 + this.readByteAt(i-1);
+        }
+        return result;
+    };
+    this.readString = function(nChars, startChar) {
+        var result = "";
+        for(var i=startChar; i<startChar + nChars; i++){
+            result += String.fromCharCode(this.readNumber(1,i));
+        }
+        return result;
+    };
+};
+
 /**
  * DicomParser class.
  */
-dwv.dicom.DicomParser = function(inputBuffer,reader)
+dwv.dicom.DicomParser = function(file)
 {
     // members
-    this.inputBuffer = inputBuffer;
-    this.reader = reader;
+    this.inputBuffer = new Array(file.length);
+    this.reader = new dwv.dicom.LittleEndianReader(file);
     this.dicomElement = [];
     this.dict = new dwv.dicom.Dictionary();
     // default image information
