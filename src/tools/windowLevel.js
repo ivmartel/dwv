@@ -187,8 +187,8 @@ dwv.tool.WindowLevel = function(app)
         if( bool ) {
             this.appendHtml();
             dwv.tool.updateWindowingData(
-                    app.getImage().getLookup().windowCenter,
-                    app.getImage().getLookup().windowWidth );
+                    parseInt(app.getImage().getLookup().windowCenter, 10),
+                    parseInt(app.getImage().getLookup().windowWidth, 10) );
         }
         else {
             this.clearHtml();
