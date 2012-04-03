@@ -174,7 +174,7 @@ dwv.dicom.DicomParser.prototype.parseAll = function()
     // dictionary
     this.dict.init();
     var metaReader = new dwv.dicom.LittleEndianReader(this.file);
-    var dataReader;
+    var dataReader = new dwv.dicom.LittleEndianReader(this.file);
 
     // 128 -> 132: magic word
     offset = 128;
@@ -205,10 +205,6 @@ dwv.dicom.DicomParser.prototype.parseAll = function()
             if( val === "1.2.840.10008.1.2.2" ) {
                 console.log("Big endian!");
                 dataReader = new dwv.dicom.BigEndianReader(this.file);
-            }
-            else {
-                console.log("Little endian!");
-                dataReader = new dwv.dicom.LittleEndianReader(this.file);
             }
         }            
         // store the data element
