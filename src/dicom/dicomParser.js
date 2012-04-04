@@ -84,7 +84,12 @@ dwv.dicom.DicomParser.prototype.readTag=function(reader, offset)
     var element_str = (e2 + e3*256).toString(16);
     var element = "0x0000".substr(0, 6 - element_str.length) + element_str.toUpperCase();
     // name
-    var name = this.dict.newDictionary[group][element][2] || "Unknown DICOM Tag";
+    var name = "Unknown DICOM Tag";
+    if( this.dict.newDictionary[group] ) {
+        if( this.dict.newDictionary[group][element] ) {
+            name = this.dict.newDictionary[group][element][2];
+        }
+    }
 
     // return as hex
     return { 'group': group, 'element': element, 'name': name };
