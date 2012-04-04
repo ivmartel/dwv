@@ -54,18 +54,9 @@ dwv.dicom.DicomParser = function(file)
 {
     // members
     this.inputBuffer = new Array(file.length);
-    this.dicomElement = [];
+    this.dicomElements = {};
     this.dict = new dwv.dicom.Dictionary();
     this.file = file;
-    // default image information
-    this.numberOfRows = 0;
-    this.numberOfColumns = 0;
-    this.rowSpacing = 1;
-    this.columnSpacing = 1;
-    this.windowWidth = 1;
-    this.windowCenter = 0;
-    this.rescaleSlope = 1;
-    this.rescaleIntercept = 0;
 };
 
 dwv.dicom.DicomParser.prototype.getPixelBuffer=function()
@@ -75,7 +66,9 @@ dwv.dicom.DicomParser.prototype.getPixelBuffer=function()
 
 dwv.dicom.DicomParser.prototype.appendDicomElement=function( element )
 {
-    this.dicomElement.push( element );
+    this.dicomElements[element.name] = { 
+            "group": element.group, "element": element.element, 
+            "value": element.value };
 };
 
 dwv.dicom.DicomParser.prototype.readTag=function(reader, offset)
@@ -222,8 +215,6 @@ dwv.dicom.DicomParser.prototype.parseAll = function()
     {
         // get the data element
         dataElement = this.readDataElement(dataReader, i);
-        // store image information
-        this.storeImageInformation( dataElement );
         // store pixel data
         if( dataElement.tag.name === "PixelData") {
             this.pixelBuffer = dataElement.data;
@@ -239,49 +230,26 @@ dwv.dicom.DicomParser.prototype.parseAll = function()
     }
 };
 
-dwv.dicom.DicomParser.prototype.storeImageInformation = function(element)
-{
-    if(element.tag.name === "Rows")
-    {
-        this.numberOfRows = element.data[0];
-    }
-    else if(element.tag.name === "Columns")
-    {
-        this.numberOfColumns = element.data[0];
-    }
-    else if(element.tag.name === "PixelSpacing")
-    {
-        this.rowSpacing = parseFloat(element.data[0]);    
-        this.columnSpacing = parseFloat(element.data[1]);    
-    }
-    else if(element.tag.name === "WindowWidth")
-    {
-        this.windowWidth = element.data[0];
-    }
-    else if(element.tag.name === "WindowCenter")
-    {
-        this.windowCenter = element.data[0];            
-    }
-    else if(element.tag.name === "RescaleSlope")
-    {
-        this.rescaleSlope = parseInt(element.data, 10);    
-    }
-    else if(element.tag.name === "RescaleIntercept")
-    {
-        this.rescaleIntercept = parseInt(element.data, 10);
-    }
-};
-
 dwv.dicom.DicomParser.prototype.getImage = function()
 {
-    // create the DICOM image
-    var image = new dwv.image.Image(
-        dwv.image.ImageSize(this.numberOfColumns, this.numberOfRows),
-        dwv.image.ImageSpacing(this.columnSpacing, this.rowSpacing),
-        this.pixelBuffer );
+    // size
+    var size = new dwv.image.ImageSize(
+        this.dicomElements.Columns.value[0], 
+        this.dicomElements.Rows.value[0]);
+    // spacing
+    var rowSpacing = parseFloat(this.dicomElements.PixelSpacing.value[0]);
+    var columnSpacing = parseFloat(this.dicomElements.PixelSpacing.value[1]);
+    var spacing = new dwv.image.ImageSpacing(
+        columnSpacing, rowSpacing);
+    // image
+    var image = new dwv.image.Image( size, spacing, this.pixelBuffer );
+    // lookup
+    var rescaleSlope = parseFloat(this.dicomElements.RescaleSlope.value[0]) || 1;
+    var rescaleIntercept = parseFloat(this.dicomElements.RescaleIntercept.value[0]) || 0;
     image.setLookup( 
-            this.windowCenter, this.windowWidth, 
-            this.rescaleSlope, this.rescaleIntercept);
-    
+        this.dicomElements.WindowCenter.value[0], 
+        this.dicomElements.WindowWidth.value[0], 
+        rescaleSlope, rescaleIntercept );
+    // return
     return image;
 };
