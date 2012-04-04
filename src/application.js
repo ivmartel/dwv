@@ -174,9 +174,10 @@ dwv.App = function()
         var dicomParser = new dwv.dicom.DicomParser(file);
         dicomParser.parseAll();     
         
-        // tag list table (without the pixel data)  
-        var table = dwv.html.arrayToTable(dicomParser.dicomElement.slice(
-                0, dicomParser.dicomElement.length-2));
+        // tag list table (without the pixel data)
+        var data = dicomParser.dicomElements;
+        data.PixelData = "";
+        var table = dwv.html.toTable(data);
         table.className = "tagList";
         document.getElementById('tags').appendChild(table);
         document.getElementById("tags").style.display='';
