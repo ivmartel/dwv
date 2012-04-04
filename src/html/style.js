@@ -1,4 +1,6 @@
-// html namespace
+/**
+ * @namespace HTML related.
+ */
 dwv.html = dwv.html || {};
 
 /**

@@ -1,4 +1,6 @@
-// image namespace
+/**
+ * @namespace Image related.
+ */
 dwv.image = dwv.image || {};
 
 /**

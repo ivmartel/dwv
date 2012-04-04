@@ -1,4 +1,6 @@
-// utils namespace
+/**
+ * @namespace Utils classes and functions.
+ */
 dwv.utils = dwv.utils || {};
 
 /**

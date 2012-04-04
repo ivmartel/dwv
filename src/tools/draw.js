@@ -1,6 +1,10 @@
-// tool namespace
+/**
+ * @namespace Tool classes.
+ */
 dwv.tool = dwv.tool || {};
-// draw namespace
+/**
+ * @namespace Drawing Tool classes.
+ */
 dwv.tool.draw = dwv.tool.draw || {};
 
 /**

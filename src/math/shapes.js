@@ -1,4 +1,6 @@
-// math namespace
+/**
+ * @namespace Math related.
+ */
 dwv.math = dwv.math || {};
 
 /**

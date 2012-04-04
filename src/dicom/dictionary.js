@@ -1,4 +1,6 @@
-// dicom namespace
+/**
+ * @namespace DICOM related.
+ */
 dwv.dicom = dwv.dicom || {};
 
 /**

@@ -1,5 +1,5 @@
 /**
-* App
+* @class App
 * Main application.
 */
 dwv.App = function()

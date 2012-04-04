@@ -1,4 +1,6 @@
-// tool namespace
+/**
+ * @namespace Tool classes.
+ */
 dwv.tool = dwv.tool || {};
 
 /**

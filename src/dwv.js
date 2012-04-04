@@ -1,2 +1,4 @@
-// dwv (main) namespace
+/**
+ * @namespace Main DWV namespace.
+ */ 
 var dwv = dwv || {};

@@ -1,6 +1,10 @@
-// dicom namespace
+/**
+ * @namespace Image related.
+ */
 dwv.image = dwv.image || {};
-// lut namespace
+/**
+ * @namespace LUT related.
+ */
 dwv.image.lut = dwv.image.lut || {};
 
 /**
