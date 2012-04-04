@@ -7,52 +7,93 @@ dwv.html = dwv.html || {};
 
 /**
  * Get an HTML table corresponding to an input javascript array. 
- * @param inputArray The input array, can be either a 1D array, 
- *                   2D array or an array of objects
+ * @param input The input can be either a 1D array, 
+ *               2D array, an array of objects or an object.
  */
-dwv.html.arrayToTable = function(inputArray)
+dwv.html.appendCell = function(row, text)
 {
-    var table = document.createElement('table');
-    var row = 0;
-    var cell = 0;
-    var keys = 0;
-    
-    for(var i=0; i<inputArray.length; ++i) {
-        row = table.insertRow(-1);
-        // 1D array
-        if( typeof inputArray[i] === 'number' || typeof inputArray[i] === 'string') {
-            cell = row.insertCell(-1);
-            cell.appendChild(document.createTextNode(inputArray[i]));
+    var cell = row.insertCell(-1);
+    cell.appendChild(document.createTextNode(text));
+};
+
+dwv.html.appendRowForArray = function(table, input, level, maxLevel, rowHeader)
+{
+    var row = null;
+    // loop through
+    for(var i=0; i<input.length; ++i) {
+        // more to come
+        if( typeof input[i] === 'number'
+            || typeof input[i] === 'string'
+            || input[i] === null
+            || input[i] === undefined
+            || level >= maxLevel ) {
+            if( !row ) {
+                row = table.insertRow(-1);
+            }
+            dwv.html.appendCell(row, input[i]);
         }
-        else if( typeof inputArray[i] === 'object' ) {
-            // 2D array
-            if( inputArray[i] instanceof Array ) {
-                for( var j=0; j<inputArray[i].length; ++j) {
-                    cell = row.insertCell(-1);
-                    cell.appendChild(document.createTextNode(inputArray[i][j]));
-                }
-            }
-            // array of objects
-            else {
-                keys = Object.keys(inputArray[i]);
-                // header
-                if( i === 0 ) {
-                    var header = table.createTHead();
-                    var th = header.insertRow(-1);
-                    for( var k=0; k<keys.length; ++k ) {
-                        cell = th.insertCell(-1);
-                        cell.appendChild(document.createTextNode(dwv.utils.capitaliseFirstLetter(keys[k])));
-                    }
-                }
-                // values
-                for( var o=0; o<keys.length; ++o ) {
-                    cell = row.insertCell(-1);
-                    cell.appendChild(document.createTextNode(inputArray[i][keys[o]]));
-                }
-            }
+        // last level
+        else {
+            dwv.html.appendRow(table, input[i], level+i, maxLevel, rowHeader);
         }
     }
+};
 
+dwv.html.appendRowForObject = function(table, input, level, maxLevel, rowHeader)
+{
+    var keys = Object.keys(input);
+    var row = null;
+    for( var o=0; o<keys.length; ++o ) {
+        // more to come
+        if( typeof input[keys[o]] === 'number' 
+            || typeof input[keys[o]] === 'string'
+            || input[keys[o]] === null
+            || input[keys[o]] === undefined
+            || level >= maxLevel ) {
+            if( !row ) {
+                row = table.insertRow(-1);
+            }
+            if( o === 0 && rowHeader) {
+                dwv.html.appendCell(row, rowHeader);
+            }
+            dwv.html.appendCell(row, input[keys[o]]);
+        }
+        // last level
+        else {
+            dwv.html.appendRow(table, input[keys[o]], level+o, maxLevel, keys[o]);
+        }
+    }
+    // header row
+    // warn: need to create the header after the rest
+    // otherwise the data will inserted in the thead...
+    if( level === 2 ) {
+        var header = table.createTHead();
+        var th = header.insertRow(-1);
+        if( rowHeader ) {
+            dwv.html.appendCell(th, "");
+        }
+        for( var k=0; k<keys.length; ++k ) {
+            dwv.html.appendCell(th, dwv.utils.capitaliseFirstLetter(keys[k]));
+        }
+    }
+};
+
+dwv.html.appendRow = function(table, input, level, maxLevel, rowHeader)
+{
+    // array
+    if( input instanceof Array ) {
+        dwv.html.appendRowForArray(table, input, level+1, maxLevel, rowHeader);
+    }
+    // object
+    else if( typeof input === 'object') {
+        dwv.html.appendRowForObject(table, input, level+1, maxLevel, rowHeader);
+    }
+};
+
+dwv.html.toTable = function(input)
+{
+    var table = document.createElement('table');
+    dwv.html.appendRow(table, input, 0, 2);
     return table;
 };
 
