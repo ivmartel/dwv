@@ -3,6 +3,9 @@
  * Simple undo/redo stack. 
  */
 
+/**
+ * @function
+ */
 dwv.addCommandToDisplayHistory = function(command)
 {
     var select = document.getElementById('history_list');
@@ -24,6 +27,9 @@ dwv.addCommandToDisplayHistory = function(command)
     select.selectedIndex++;
 };
 
+/**
+ * @function
+ */
 dwv.enableInDisplayHistory = function(enable)
 {
     var select = document.getElementById('history_list');
@@ -48,7 +54,7 @@ dwv.enableInDisplayHistory = function(enable)
 };
 
 /**
- * UndoStack class.
+ * @class UndoStack class.
  * @param app
  */
 dwv.UndoStack = function(app)

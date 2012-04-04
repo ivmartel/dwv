@@ -4,10 +4,12 @@
 dwv.tool = dwv.tool || {};
 
 /**
-* zoom.js
-* Zooming tool.
+* @fileOverview Zooming tool.
 */
 
+/**
+ * @function
+ */
 dwv.tool.zoomReset = function(event)
 {
     app.getImageLayer().resetLayout();
@@ -17,7 +19,7 @@ dwv.tool.zoomReset = function(event)
 };
 
 /**
- * Zoom class.
+ * @class Zoom class.
  */
 dwv.tool.Zoom = function(app)
 {
@@ -96,7 +98,7 @@ dwv.tool.Zoom = function(app)
         app.getDrawLayer().zoom(zoomLevel,zoomLevel,cx,cy);
     }
 
-}; // Zoom function
+}; // Zoom class
 
 dwv.tool.Zoom.prototype.appendHtml = function()
 {

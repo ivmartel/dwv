@@ -4,10 +4,12 @@
 dwv.tool = dwv.tool || {};
 
 /**
-* windowLevel.js
-* WindowLevel tool.
+* @fileOverviez WindowLevel tool.
 */
 
+/**
+ * @function
+ */
 dwv.tool.showHUvalue = function(x,y)
 {
     var context = app.getInfoLayer().getContext();
@@ -30,6 +32,9 @@ dwv.tool.showHUvalue = function(x,y)
             border + 2*style.getLineHeight());
 };
 
+/**
+ * @function
+ */
 dwv.tool.showWindowingValue = function(windowCenter,windowWidth)
 {
     var canvas = app.getInfoLayer().getCanvas();
@@ -49,6 +54,9 @@ dwv.tool.showWindowingValue = function(windowCenter,windowWidth)
     context.fillText("WindowWidth = "+windowWidth, canvas.width - border, border + style.getLineHeight());
 };
 
+/**
+ * @function
+ */
 dwv.tool.updateWindowingData = function(wc,ww)
 {
     app.getImage().getLookup().setWindowingdata(wc,ww);
@@ -57,12 +65,18 @@ dwv.tool.updateWindowingData = function(wc,ww)
     app.generateAndDrawImage();
 };
 
+/**
+ * @function
+ */
 dwv.tool.updateColourMap = function(colourMap)    
 {    
     app.getImage().setColourMap(colourMap);
     app.generateAndDrawImage();
 };
 
+/**
+ * @function
+ */
 dwv.tool.applyPreset = function(presetId)    
 {    
     var ww, wc;
@@ -106,6 +120,9 @@ dwv.tool.applyPreset = function(presetId)
     }
 };
 
+/**
+ * @function
+ */
 dwv.tool.applyColourMap = function(colourMapId)    
 {    
     switch (colourMapId)
@@ -128,12 +145,18 @@ dwv.tool.applyColourMap = function(colourMapId)
     }
 };
 
+/**
+ * @function
+ */
 dwv.tool.changePreset = function(event)
 {    
     dwv.tool.applyPreset( parseInt(document.getElementById("presetsMenu").options[
         document.getElementById("presetsMenu").selectedIndex].value, 10) );
 };
 
+/**
+ * @function
+ */
 dwv.tool.changeColourMap = function(event)
 {    
     dwv.tool.applyColourMap( parseInt(document.getElementById("colourMapMenu").options[
@@ -142,7 +165,7 @@ dwv.tool.changeColourMap = function(event)
 
 
 /**
- * WindowLevel class.
+ * @class WindowLevel class.
  */
 dwv.tool.WindowLevel = function(app)
 {
@@ -201,7 +224,7 @@ dwv.tool.WindowLevel = function(app)
         app.handleKeyDown(event);
     };
 
-}; // WindowLevel function
+}; // WindowLevel class
 
 dwv.tool.WindowLevel.prototype.appendHtml = function()
 {

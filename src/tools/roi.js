@@ -4,8 +4,7 @@
 dwv.tool = dwv.tool || {};
 
 /**
-* roi.js
-* Region of interest painting tool.
+* @class Region of interest painting tool.
 */
 dwv.tool.Roi = function(app)
 {
@@ -76,10 +75,10 @@ dwv.tool.Roi = function(app)
         app.handleKeyDown(event);
     };
 
-}; // Roi function
+}; // Roi class
 
 /**
- * Draw ROI command.
+ * @class Draw ROI command.
  * @param roi The ROI to draw.
  * @param app The application to draw the line on.
  */
@@ -115,4 +114,4 @@ dwv.tool.DrawRoiCommand = function(roi, app)
         context.closePath();
         context.stroke();
     }; 
-}; // Roi command class
+}; // DrawRoiCommand class

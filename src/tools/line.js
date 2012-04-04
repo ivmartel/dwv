@@ -4,8 +4,7 @@
 dwv.tool = dwv.tool || {};
 
 /**
-* line.js
-* Line painting tool.
+* @class Line painting tool.
 */
 dwv.tool.Line = function(app)
 {
@@ -72,10 +71,10 @@ dwv.tool.Line = function(app)
         app.handleKeyDown(event);
     };
 
-}; // Line tool class
+}; // Line class
 
 /**
- * Draw line command.
+ * @class Draw line command.
  * @param line The line to draw.
  * @param app The application to draw the line on.
  */
@@ -111,4 +110,4 @@ dwv.tool.DrawLineCommand = function(line, app)
                 line.getEnd().getX() + app.getStyle().getFontSize(),
                 line.getEnd().getY() + app.getStyle().getFontSize());
     }; 
-}; // Line command class
+}; // DrawLineCommand class

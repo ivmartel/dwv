@@ -4,11 +4,7 @@
 dwv.html = dwv.html || {};
 
 /**
-* style.js
-*/
-
-/**
-* Style class.
+* @class Style class.
 */
 dwv.html.Style = function()
 {

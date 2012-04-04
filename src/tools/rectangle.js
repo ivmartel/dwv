@@ -4,8 +4,7 @@
 dwv.tool = dwv.tool || {};
 
 /**
-* rectangle.js
-* Rectangle painting tool.
+* @class Rectangle painting tool.
 */
 dwv.tool.Rectangle = function(app)
 {
@@ -71,10 +70,10 @@ dwv.tool.Rectangle = function(app)
         app.handleKeyDown(event);
     };
 
-}; // Rectangle function
+}; // Rectangle class 
 
 /**
- * Draw rectangle command.
+ * @class Draw rectangle command.
  * @param rectangle The rectangle to draw.
  * @param app The application to draw the line on.
  */
@@ -111,4 +110,4 @@ dwv.tool.DrawRectangleCommand = function(rectangle, app)
                 rectangle.getEnd().getX() + app.getStyle().getFontSize(),
                 rectangle.getEnd().getY() + app.getStyle().getFontSize());
     }; 
-}; // Rectangle command class
+}; // DrawRectangleCommand class

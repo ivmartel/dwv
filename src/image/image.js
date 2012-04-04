@@ -4,11 +4,7 @@
 dwv.image = dwv.image || {};
 
 /**
-*image.js
-*/
-
-/**
-* Image Size class. 
+* @class Image Size class. 
 * Supports 2D and 3D images.
 * @param numberOfColumns The number of columns (number).
 * @param numberOfRows The number of rows (number).
@@ -44,7 +40,7 @@ dwv.image.ImageSize = function( numberOfColumns, numberOfRows, numberOfSlices ) 
 };
 
 /**
-* Image Spacing class. 
+* @class Image Spacing class. 
 * Supports 2D and 3D images.
 * @param columnSpacing The column spacing (number).
 * @param rowSpacing The row spacing (number).
@@ -65,7 +61,7 @@ dwv.image.ImageSpacing = function( columnSpacing, rowSpacing, sliceSpacing ) {
 };
 
 /**
-* Image class.
+* @class Image class.
 */
 dwv.image.Image = function(size, spacing, buffer) {
 

@@ -7,6 +7,10 @@ dwv.dicom = dwv.dicom || {};
  *  DicomParser.js
  */
 
+/**
+ * @class Big Endian reader
+ * @param file
+ */
 dwv.dicom.BigEndianReader = function(file)
 {
     this.readByteAt = function(i) {
@@ -28,6 +32,10 @@ dwv.dicom.BigEndianReader = function(file)
     };
 };
 
+/**
+ * @class Litte Endian reader
+ * @param file
+ */
 dwv.dicom.LittleEndianReader = function(file)
 {
     this.readByteAt = function(i) {
@@ -50,7 +58,7 @@ dwv.dicom.LittleEndianReader = function(file)
 };
 
 /**
- * DicomParser class.
+ * @class DicomParser class.
  */
 dwv.dicom.DicomParser = function(file)
 {

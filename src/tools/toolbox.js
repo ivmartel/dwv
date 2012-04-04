@@ -4,8 +4,7 @@
 dwv.tool = dwv.tool || {};
 
 /**
-* toolbox.js
-* Tool box.
+* @class Tool box.
 */
 dwv.tool.ToolBox = function(app)
 {

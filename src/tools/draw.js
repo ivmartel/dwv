@@ -8,12 +8,11 @@ dwv.tool = dwv.tool || {};
 dwv.tool.draw = dwv.tool.draw || {};
 
 /**
-* draw.js
-* Functions for drawing tools.
+* @fileOverview Functions for drawing tools.
 */
 
 /**
- * Append the color chooser to the HTML document in the 'colourChooser' node.
+ * @function Append the color chooser to the HTML document in the 'colourChooser' node.
  */
 dwv.tool.draw.appendColourChooserHtml = function(app)
 {
@@ -51,7 +50,7 @@ dwv.tool.draw.appendColourChooserHtml = function(app)
 };
 
 /**
- * Remove the tool specific node.
+ * @function Remove the tool specific node.
  */
 dwv.tool.draw.clearColourChooserHtml = function()
 {
@@ -67,7 +66,7 @@ dwv.tool.draw.clearColourChooserHtml = function()
 };
 
 /**
- * Set the line color of the color chooser
+ * @function Set the line color of the color chooser
  * @param color The color to use.
  */
 dwv.tool.draw.setLineColor = function(color)
@@ -85,7 +84,7 @@ dwv.tool.draw.setLineColor = function(color)
 };
 
 /**
- * Set the cursor when mouse over the color chooser.
+ * @function Set the cursor when mouse over the color chooser.
  */
 dwv.tool.draw.onMouseOver = function(event)
 {
@@ -93,7 +92,7 @@ dwv.tool.draw.onMouseOver = function(event)
 };
 
 /**
- * Set the cursor when mouse out the color chooser.
+ * @function Set the cursor when mouse out the color chooser.
  */
 dwv.tool.draw.onMouseOut = function(event)
 {

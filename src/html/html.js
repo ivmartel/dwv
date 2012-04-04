@@ -4,11 +4,11 @@
 dwv.html = dwv.html || {};
 
 /**
-* HTML utilities functions.
+* @fileOverview HTML utilities functions.
 */
 
 /**
- * Get an HTML table corresponding to an input javascript array. 
+ * @function Get an HTML table corresponding to an input javascript array. 
  * @param input The input can be either a 1D array, 
  *               2D array, an array of objects or an object.
  */
@@ -18,6 +18,9 @@ dwv.html.appendCell = function(row, text)
     cell.appendChild(document.createTextNode(text));
 };
 
+/**
+ * @function
+ */
 dwv.html.appendRowForArray = function(table, input, level, maxLevel, rowHeader)
 {
     var row = null;
@@ -41,6 +44,9 @@ dwv.html.appendRowForArray = function(table, input, level, maxLevel, rowHeader)
     }
 };
 
+/**
+ * @function
+ */
 dwv.html.appendRowForObject = function(table, input, level, maxLevel, rowHeader)
 {
     var keys = Object.keys(input);
@@ -80,6 +86,9 @@ dwv.html.appendRowForObject = function(table, input, level, maxLevel, rowHeader)
     }
 };
 
+/**
+ * @function
+ */
 dwv.html.appendRow = function(table, input, level, maxLevel, rowHeader)
 {
     // array
@@ -92,6 +101,9 @@ dwv.html.appendRow = function(table, input, level, maxLevel, rowHeader)
     }
 };
 
+/**
+ * @function
+ */
 dwv.html.toTable = function(input)
 {
     var table = document.createElement('table');
@@ -100,7 +112,7 @@ dwv.html.toTable = function(input)
 };
 
 /**
- * 
+ * @function
  * @param term
  * @param table
  */
@@ -130,7 +142,7 @@ dwv.html.filterTable = function(term, table) {
 };
 
 /**
- * Transform back each
+ * @function Transform back each
  * <span>preText <span class="highlighted">term</span> postText</span>
  * into its original preText term postText
  * @param container The container to de-highlight.
@@ -156,7 +168,7 @@ dwv.html.dehighlight = function(container) {
 };
 
 /**
- * Create a
+ * @function Create a
  * <span>preText <span class="highlighted">term</span> postText</span>
  * around each search term
  * @param term The term to highlight.
@@ -197,6 +209,9 @@ dwv.html.highlight = function(term, container) {
     }
 };
 
+/**
+ * @function
+ */
 dwv.html.createHighlightNode = function(child) {
     var node = document.createElement('span');
     node.setAttribute('class', 'highlighted');

@@ -4,11 +4,7 @@
 dwv.image = dwv.image || {};
 
 /**
-*  lookupTable.js
-*/
-
-/**
- * LookupTable class.
+ * @class LookupTable class.
  * @returns {LookupTable}
  */
 dwv.image.LookupTable = function(wc,ww,rs,ri)

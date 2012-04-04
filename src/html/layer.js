@@ -4,8 +4,7 @@
 dwv.html = dwv.html || {};
 
 /**
-* Layer
-* Window layer.
+* @class Window layer.
 */
 dwv.html.Layer = function(name)
 {

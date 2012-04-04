@@ -9,7 +9,7 @@ dwv.math = dwv.math || {};
  */
 
 /**
- * 2D point.
+ * @class 2D point.
  * @param x The X coordinate for the point.
  * @param y The Y coordinate for the point.
  */
@@ -28,7 +28,7 @@ dwv.math.Point2D = function(x,y)
 }; // Point2D class
 
 /**
- * Circle shape.
+ * @class Circle shape.
  * @param centre A Point2D representing the centre of the circle.
  * @param radius The radius of the circle.
  */
@@ -51,7 +51,7 @@ dwv.math.Circle = function(centre, radius)
 }; // Circle class
 
 /**
- * Line shape.
+ * @class Line shape.
  * @param begin A Point2D representing the beginning of the line.
  * @param end A Point2D representing the end of the line.
  */
@@ -78,7 +78,7 @@ dwv.math.Line = function(begin, end)
 }; // Line class
 
 /**
- * Rectangle shape.
+ * @class Rectangle shape.
  * @param begin A Point2D representing the beginning of the rectangle.
  * @param end A Point2D representing the end of the rectangle.
  */
@@ -109,7 +109,7 @@ dwv.math.Rectangle = function(begin, end)
 }; // Rectangle class
 
 /**
- * Region Of Interest shape.
+ * @class Region Of Interest shape.
  */
 dwv.math.ROI = function()
 {

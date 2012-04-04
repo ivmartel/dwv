@@ -4,8 +4,7 @@
 dwv.tool = dwv.tool || {};
 
 /**
-* circle.js
-* Circle painting tool.
+* @class Circle painting tool.
 */
 dwv.tool.Circle = function(app)
 {
@@ -75,10 +74,10 @@ dwv.tool.Circle = function(app)
         app.handleKeyDown(event);
     };
 
-}; // Circle tool class
+}; // Circle class
 
 /**
- * Draw circle command.
+ * @class Draw circle command.
  * @param circle The circle to draw.
  * @param app The application to draw the circle on.
  */
@@ -116,4 +115,4 @@ dwv.tool.DrawCircleCommand = function(circle, app)
                 circle.getCenter().getX() + app.getStyle().getFontSize(),
                 circle.getCenter().getY() + app.getStyle().getFontSize());
     };
-}; // Circle command class
+}; // DrawCircleCommand class
