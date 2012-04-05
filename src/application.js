@@ -30,7 +30,7 @@ dwv.App = function()
     var style = new dwv.html.Style();
     
     // UndoStack
-    var undoStack = new dwv.UndoStack(this);
+    var undoStack = new dwv.tool.UndoStack(this);
     
     // Get the image details.
     this.getImage = function() { return image; };

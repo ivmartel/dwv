@@ -1,63 +1,17 @@
 /**
- * undo.js
- * Simple undo/redo stack. 
+ * @namespace Tool classes.
  */
+dwv.tool = dwv.tool || {};
 
 /**
- * @function
+ * @fileOverview Simple undo/redo stack. 
  */
-dwv.addCommandToDisplayHistory = function(command)
-{
-    var select = document.getElementById('history_list');
-    // remove undone commands
-    var count = select.length - (select.selectedIndex+1);
-    if( count > 0 )
-    {
-        for( var i = 0; i < count; ++i)
-        {
-            select.remove(select.length-1);
-        }
-    }
-    // add new option
-    var option = document.createElement('option');
-    option.text = command.getName();
-    option.value = command.getName();
-    select.add(option);
-    // increment selected index
-    select.selectedIndex++;
-};
-
-/**
- * @function
- */
-dwv.enableInDisplayHistory = function(enable)
-{
-    var select = document.getElementById('history_list');
-    // enable or not (order is important)
-    var option;
-    if( enable ) 
-    {
-        // increment selected index
-        select.selectedIndex++;
-        // enable option
-        option = select.options[select.selectedIndex];
-        option.disabled = false;
-    }
-    else 
-    {
-        // disable option
-        option = select.options[select.selectedIndex];
-        option.disabled = true;
-        // decrement selected index
-        select.selectedIndex--;
-    }
-};
 
 /**
  * @class UndoStack class.
  * @param app
  */
-dwv.UndoStack = function(app)
+dwv.tool.UndoStack = function(app)
 { 
 	// Array of commands.
 	var stack = [];
@@ -75,7 +29,7 @@ dwv.UndoStack = function(app)
 		// store command
 		stack[curCmd++] = cmd;
 		// add command to display history
-		dwv.addCommandToDisplayHistory(cmd);
+		this.addCommandToDisplayHistory(cmd);
 	};
 
 	/**
@@ -102,7 +56,7 @@ dwv.UndoStack = function(app)
 			// merge the temporary layer
 			app.getDrawLayer().merge(app.getTempLayer());
 			// disable last in display history
-			dwv.enableInDisplayHistory(false);
+			this.enableInDisplayHistory(false);
 		}
 	}; 
 
@@ -118,13 +72,13 @@ dwv.UndoStack = function(app)
 			// merge the temporary layer
 			app.getDrawLayer().merge(app.getTempLayer());
 			// enable next in display history
-			dwv.enableInDisplayHistory(true);
+			this.enableInDisplayHistory(true);
 		}
 	};
 
 }; // UndoStack class
 
-dwv.UndoStack.prototype.appendHtml = function()
+dwv.tool.UndoStack.prototype.appendHtml = function()
 {
     var paragraph = document.createElement("p");  
     paragraph.appendChild(document.createTextNode("History:"));
@@ -138,3 +92,49 @@ dwv.UndoStack.prototype.appendHtml = function()
 
     document.getElementById('history').appendChild(paragraph);
 };
+
+dwv.tool.UndoStack.prototype.addCommandToDisplayHistory = function(command)
+{
+    var select = document.getElementById('history_list');
+    // remove undone commands
+    var count = select.length - (select.selectedIndex+1);
+    if( count > 0 )
+    {
+        for( var i = 0; i < count; ++i)
+        {
+            select.remove(select.length-1);
+        }
+    }
+    // add new option
+    var option = document.createElement('option');
+    option.text = command.getName();
+    option.value = command.getName();
+    select.add(option);
+    // increment selected index
+    select.selectedIndex++;
+};
+
+dwv.tool.UndoStack.prototype.enableInDisplayHistory = function(enable)
+{
+    var select = document.getElementById('history_list');
+    // enable or not (order is important)
+    var option;
+    if( enable ) 
+    {
+        // increment selected index
+        select.selectedIndex++;
+        // enable option
+        option = select.options[select.selectedIndex];
+        option.disabled = false;
+    }
+    else 
+    {
+        // disable option
+        option = select.options[select.selectedIndex];
+        option.disabled = true;
+        // decrement selected index
+        select.selectedIndex--;
+    }
+};
+
+
