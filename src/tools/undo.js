@@ -4,10 +4,6 @@
 dwv.tool = dwv.tool || {};
 
 /**
- * @fileOverview Simple undo/redo stack. 
- */
-
-/**
  * @class UndoStack class.
  * @param app
  */

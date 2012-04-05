@@ -4,10 +4,6 @@
 dwv.utils = dwv.utils || {};
 
 /**
-* @fileOverview String utilities functions.
-*/
-
-/**
  * @function Capitalise the first letter of a string.
  */
 dwv.utils.capitaliseFirstLetter = function(string)

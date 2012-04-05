@@ -4,10 +4,6 @@
 dwv.html = dwv.html || {};
 
 /**
-* @fileOverview HTML utilities functions.
-*/
-
-/**
  * @function Get an HTML table corresponding to an input javascript array. 
  * @param input The input can be either a 1D array, 
  *               2D array, an array of objects or an object.

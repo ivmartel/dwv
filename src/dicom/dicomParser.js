@@ -4,10 +4,6 @@
 dwv.dicom = dwv.dicom || {};
 
 /**
- *  DicomParser.js
- */
-
-/**
  * @class Big Endian reader
  * @param file
  */

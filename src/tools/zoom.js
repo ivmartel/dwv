@@ -4,10 +4,6 @@
 dwv.tool = dwv.tool || {};
 
 /**
-* @fileOverview Zooming tool.
-*/
-
-/**
  * @function
  */
 dwv.tool.zoomReset = function(event)

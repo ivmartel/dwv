@@ -8,10 +8,6 @@ dwv.tool = dwv.tool || {};
 dwv.tool.draw = dwv.tool.draw || {};
 
 /**
-* @fileOverview Functions for drawing tools.
-*/
-
-/**
  * @function Append the color chooser to the HTML document in the 'colourChooser' node.
  */
 dwv.tool.draw.appendColourChooserHtml = function(app)
