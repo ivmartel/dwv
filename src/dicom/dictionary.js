@@ -4,9 +4,7 @@
 dwv.dicom = dwv.dicom || {};
 
 /**
- *  Dictionary.js
- *  Version 0.5
- *  Author: BabuHussain<babuhussain.a@raster.in>
+ * @class DICOM tag dictionary.
  */
 dwv.dicom.Dictionary = function() {
     this.newDictionary = [];
