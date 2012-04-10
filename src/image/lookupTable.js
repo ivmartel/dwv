@@ -7,12 +7,11 @@ dwv.image = dwv.image || {};
  * @class LookupTable class.
  * @returns {LookupTable}
  */
-dwv.image.LookupTable = function(wc,ww,rs,ri)
+dwv.image.LookupTable = function(windowPresets,rs,ri)
 {
-    this.windowCenter = wc;
-    this.windowWidth = ww;
-    this.defaultWindowCenter = wc;
-    this.defaultWindowWidth = ww;
+    this.windowCenter = windowPresets[0].center;
+    this.windowWidth = windowPresets[0].width;
+    this.windowPresets = windowPresets;
     this.rescaleSlope = rs;
     this.rescaleIntercept = ri;    
 };
@@ -34,10 +33,10 @@ dwv.image.LookupTable.prototype.calculateHULookup = function()
 
 dwv.image.LookupTable.prototype.calculateLookup = function()
 {    
-    xMin = this.windowCenter - 0.5 - (this.windowWidth-1) / 2;
-    xMax = this.windowCenter - 0.5 + (this.windowWidth-1) / 2;    
-    yMax = 255;
-    yMin = 0;
+    var xMin = this.windowCenter - 0.5 - (this.windowWidth-1) / 2;
+    var xMax = this.windowCenter - 0.5 + (this.windowWidth-1) / 2;    
+    var yMax = 255;
+    var yMin = 0;
     this.ylookup = new Array(4096);
     for(var inputValue=0; inputValue<=4095; inputValue++)
      {         

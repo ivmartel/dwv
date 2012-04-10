@@ -264,10 +264,15 @@ dwv.dicom.DicomParser.prototype.getImage = function()
     // lookup
     var rescaleSlope = parseFloat(this.dicomElements.RescaleSlope.value[0]) || 1;
     var rescaleIntercept = parseFloat(this.dicomElements.RescaleIntercept.value[0]) || 0;
-    image.setLookup( 
-        this.dicomElements.WindowCenter.value[0], 
-        this.dicomElements.WindowWidth.value[0], 
-        rescaleSlope, rescaleIntercept );
+    var windowPresets = [];
+    for( var i = 0; i < this.dicomElements.WindowCenterWidthExplanation.value.length; ++i) {
+        windowPresets.push({
+            "center": parseInt( this.dicomElements.WindowCenter.value[i], 10 ),
+            "width": parseInt( this.dicomElements.WindowWidth.value[i], 10 ), 
+            "name": this.dicomElements.WindowCenterWidthExplanation.value[i]
+        });
+    }
+    image.setLookup( windowPresets, rescaleSlope, rescaleIntercept );
     // return
     return image;
 };

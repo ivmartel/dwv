@@ -79,45 +79,21 @@ dwv.tool.updateColourMap = function(colourMap)
  */
 dwv.tool.applyPreset = function(presetId)    
 {    
-    var ww, wc;
-    switch (presetId)
-    {
-        case 1: // default
-            wc=app.getImage().getLookup().defaultWindowCenter;
-            ww=app.getImage().getLookup().defaultWindowWidth;
-            dwv.tool.updateWindowingData(wc,ww);
-            break;
-        
-        case 2: // abdomen
-            wc=350;
-            ww=40;
-            dwv.tool.updateWindowingData(wc,ww);
-            break;
-        
-        case 3: // lung
-            wc=-600;
-            ww=1500;
-            dwv.tool.updateWindowingData(wc,ww);
-            break;
-        
-        case 4: // brain
-            wc=40;
-            ww=80;
-            dwv.tool.updateWindowingData(wc,ww);
-            break;
-        
-        case 5: // bone
-            wc=480;
-            ww=2500;
-            dwv.tool.updateWindowingData(wc,ww);
-            break;
-        
-        case 6: // head
-            wc=90;
-            ww=350;
-            dwv.tool.updateWindowingData(wc,ww);
-            break;
+    var presets = [];
+    // from DICOM
+    for( var i = 0; i < app.getImage().getLookup().windowPresets.length; ++i ) {
+       presets.push(app.getImage().getLookup().windowPresets[i]);
     }
+    // default
+    presets.push({"center": 350, "width": 40}); // abdomen
+    presets.push({"center": -600, "width": 1500}); // lung
+    presets.push({"center": 40, "width": 80}); // brain
+    presets.push({"center": 480, "width": 2500}); // bone
+    presets.push({"center": 90, "width": 350}); // head
+    
+    dwv.tool.updateWindowingData(
+        presets[presetId-1].center, 
+        presets[presetId-1].width );
 };
 
 /**
@@ -241,7 +217,19 @@ dwv.tool.WindowLevel.prototype.appendHtml = function()
     wlSelector.onchange = dwv.tool.changePreset;
     wlSelector.selectedIndex = 1;
     // selector options
-    var wlOptions = ["Default", "Abdomen", "Lung", "Brain", "Bone", "Head"];
+    var wlOptions = [];
+    // from DICOM
+    for ( var p = 0; p < app.getImage().getLookup().windowPresets.length; ++p )
+    {
+        wlOptions.push( app.getImage().getLookup().windowPresets[p].name );
+    }
+    // default
+    var wlDefaultOptions = ["Abdomen", "Lung", "Brain", "Bone", "Head"];
+    for ( var d = 0; d < wlDefaultOptions.length; ++d )
+    {
+        wlOptions.push( wlDefaultOptions[d] );
+    }
+    // append options
     var option;
     for ( var i = 0; i < wlOptions.length; ++i )
     {
