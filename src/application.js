@@ -156,8 +156,6 @@ dwv.App = function()
                 parseAndLoadDicom(e.target.result);
                 // prepare display
                 postLoadInit();
-                // Generate and draw the image data array
-                self.generateAndDrawImage();
             };
         }()
         );
@@ -228,6 +226,7 @@ dwv.App = function()
         window.addEventListener('keydown', eventHandler, true);
 
         // initialise the toolbox
+        // note: the window/level tool is responsible for doing the first display.
         toolBox.init();
     }
     
