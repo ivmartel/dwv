@@ -1,0 +1,25 @@
+<html>
+<head>
+<title>DWV Colour Maps</title>
+<script type="text/javascript" src="../../src/dwv.js"></script>
+<script type="text/javascript" src="../../src/image/luts.js"></script>
+<script type="text/javascript" src="luts.js"></script>
+<style>body{font-family: Arial;}</style>
+</head>
+
+<body>
+
+<h1>The DWV colour maps</h1>
+
+<script type="text/javascript">
+window.onload = function() {
+    createImage("Plain", dwv.image.lut.plain);
+    createImage("InvPlain", dwv.image.lut.invPlain);
+    createImage("Rainbow", dwv.image.lut.rainbow);
+    createImage("Hot", dwv.image.lut.hot);
+    createImage("Test", dwv.image.lut.test);
+}
+</script>
+
+</body>
+</html>

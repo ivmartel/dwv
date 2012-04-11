@@ -1,20 +1,10 @@
-<html>
+/**
+ * luts.js: generate images from luts.
+ */
 
-<head>
-<title>DWV Colour Maps</title>
-<script type="text/javascript" src="../../src/dwv.js"></script>
-<script type="text/javascript" src="../../src/image/luts.js"></script>
-<style>body{font-family: Arial;}</style>
-</head>
-
-<body>
-
-<h1>The DWV colour maps</h1>
-
-<script type="text/javascript">
 function createImage(colourMapName, colourMap)
 {
-    // defaut size
+    // default size
     var height = 40;
     var width = 256;
     // create canvas
@@ -51,16 +41,3 @@ function createImage(colourMapName, colourMap)
     // add to the document
     document.body.appendChild(div);
 }
-
-window.onload = function() {
-    createImage("Plain", dwv.image.lut.plain);
-    createImage("InvPlain", dwv.image.lut.invPlain);
-    createImage("Rainbow", dwv.image.lut.rainbow);
-    createImage("Hot", dwv.image.lut.hot);
-    createImage("Test", dwv.image.lut.test);
-}
-</script>
-
-</body>
-
-</html>
