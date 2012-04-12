@@ -153,10 +153,15 @@ dwv.App = function()
         myreader.onload = ( function() {
             return function(e) {
                 // read the DICOM file
-                if( parseAndLoadDicom(e.target.result) ) {
-                    // prepare display
-                    postLoadInit();
+                try {
+                    parseAndLoadDicom(e.target.result);
                 }
+                catch(error) {
+                    alert("Exception: "+error.message);
+                    return;
+                }
+                // prepare display
+                postLoadInit();
             };
         }()
         );
@@ -171,13 +176,7 @@ dwv.App = function()
     {    
         // parse the DICOM file
         var dicomParser = new dwv.dicom.DicomParser(file);
-        try {
-            dicomParser.parseAll();
-        }
-        catch(error) {
-            alert("Exception: "+error.message);
-            return false;
-        }
+        dicomParser.parseAll();
         
         // tag list table (without the pixel data)
         var data = dicomParser.dicomElements;
@@ -198,8 +197,6 @@ dwv.App = function()
         document.getElementById('tags').insertBefore(tagSearchform, table);
         
         image = dicomParser.getImage();
-        
-        return true;
     }
     
     /**
