@@ -121,11 +121,9 @@ dwv.image.Image.prototype.setColourMap = function( lut )
     this.lut = lut;
 };
 
-dwv.image.Image.prototype.setLookup = function( windowCenter, windowWidth, rescaleSlope, rescaleIntercept )
+dwv.image.Image.prototype.setLookup = function( windowPresets, rescaleSlope, rescaleIntercept )
 {
-    this.lookup = new dwv.image.LookupTable(
-            windowCenter, windowWidth, 
-            rescaleSlope, rescaleIntercept);
+    this.lookup = new dwv.image.LookupTable( windowPresets, rescaleSlope, rescaleIntercept);
     this.lookup.calculateHULookup();
 };
 
