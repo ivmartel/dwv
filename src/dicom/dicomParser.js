@@ -254,19 +254,25 @@ dwv.dicom.DicomParser.prototype.parseAll = function()
         dataElement = this.readDataElement(metaReader, i, false);
         // check the transfer syntax
         if( dataElement.tag.name === "TransferSyntaxUID" ) {
-            var val = dataElement.data[0];
+            var syntax = dataElement.data[0];
             // get rid of ending zero-width space (u200B)
-            if( val[val.length-1] === String.fromCharCode("u200B") ) {
-                val = val.substring(0, val.length-1); 
+            if( syntax[syntax.length-1] === String.fromCharCode("u200B") ) {
+                syntax = syntax.substring(0, syntax.length-1); 
             }
-            console.log("transfer syntax: "+val);
-            if( val === "1.2.840.10008.1.2.2" ) {
-                console.log("Big endian.");
-                dataReader = new dwv.dicom.BigEndianReader(this.file);
-            }
-            else if( val === "1.2.840.10008.1.2" ) {
-                console.log("Implicit data.");
+            // implicit syntax
+            if( syntax === "1.2.840.10008.1.2" ) {
                 implicit = true;
+            }
+            // unsupported...
+            if( syntax === "1.2.840.10008.1.2.2" ) {
+                //dataReader = new dwv.dicom.BigEndianReader(this.file);
+                throw new Error("Unsupported DICOM transfer syntax (BigEndian): "+syntax+".");
+            }
+            else if( syntax.match(/1.2.840.10008.1.2.4/) ) {
+                throw new Error("Unsupported DICOM transfer syntax (JPEG): "+syntax+".");
+            }
+            else if( syntax.match(/1.2.840.10008.1.2.5/)) {
+                throw new Error("Unsupported DICOM transfer syntax (RLE): "+syntax+".");
             }
         }            
         // store the data element
