@@ -37,36 +37,36 @@
 
 <script type="text/javascript">
 
-    function toggle(dialogName)
+function toggle(dialogName)
+{
+    if( $(dialogName).dialog('isOpen') )
     {
-        if( $(dialogName).dialog('isOpen') )
-        {
-            $(dialogName).dialog('close');
-        }
-        else
-        {
-            $(dialogName).dialog('open');
-        }
+        $(dialogName).dialog('close');
     }
+    else
+    {
+        $(dialogName).dialog('open');
+    }
+}
+
+// main application
+var app = new dwv.App();
+
+// jquery
+$(document).ready(function(){
+    // create buttons and dialogs
+    $("button").button();
+    $("#openFile").dialog({ position: [10, 110] });
+    $("#toolbox").dialog({ position: [10, 280] });
+    $("#history").dialog({ position: [10, 450], autoOpen: false });
+    $("#tags").dialog({ position: ['right', 110], autoOpen: false, height: 400, width: 400 });
     
-    // main application
-    var app = new dwv.App();
+    $("#layerContainer").dialog({ position: [340, 110], 
+        width: [550], height: [570] });
     
-    // jquery
-    $(document).ready(function(){
-        // create buttons and dialogs
-        $("button").button();
-        $("#openFile").dialog({ position: [10, 110] });
-        $("#toolbox").dialog({ position: [10, 280] });
-        $("#history").dialog({ position: [10, 450], autoOpen: false });
-        $("#tags").dialog({ position: ['right', 110], autoOpen: false, height: 400, width: 400 });
-        
-        $("#layerContainer").dialog({ position: [340, 110], 
-            width: [550], height: [570] });
-        
-        // initialise the application
-        app.init();
-    });
+    // initialise the application
+    app.init();
+});
     
 </script>
 
