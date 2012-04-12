@@ -77,6 +77,8 @@ dwv.dicom.DicomParser.prototype.getPixelBuffer=function()
 /**
  * Append a DICOM element to the dicomElements member object.
  * Allows for easy retrieval of DICOM tag values from the tag name.
+ * If tags have same name (for the 'unknown' and private tags cases), a number is appended
+ * making the name unique.
  * @param element The element to add.
  */
 dwv.dicom.DicomParser.prototype.appendDicomElement=function( element )
@@ -97,7 +99,7 @@ dwv.dicom.DicomParser.prototype.appendDicomElement=function( element )
  * Read a DICOM tag.
  * @param reader The raw data reader.
  * @param offset The offset where to start to read.
- * @returns An object containing the tags 'group', 'element' and 'name' (unique).
+ * @returns An object containing the tags 'group', 'element' and 'name'.
  */
 dwv.dicom.DicomParser.prototype.readTag=function(reader, offset)
 {
