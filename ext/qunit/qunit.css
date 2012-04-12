@@ -1,13 +1,11 @@
 /**
- * QUnit v1.5.0pre - A JavaScript Unit Testing Framework
+ * QUnit v1.5.0 - A JavaScript Unit Testing Framework
  *
  * http://docs.jquery.com/QUnit
  *
  * Copyright (c) 2012 John Resig, Jörn Zaefferer
  * Dual licensed under the MIT (MIT-LICENSE.txt)
  * or GPL (GPL-LICENSE.txt) licenses.
- * Pulled Live from Git Tue Mar 27 08:25:01 UTC 2012
- * Last Commit: 6ec4cc264c450ec2079d45705481de0f60000647
  */
 
 /** Font Family and Sizes */
@@ -221,6 +219,9 @@
 	background-color: #D2E0E6;
 
 	border-bottom: 1px solid white;
+}
+#qunit-testresult .module-name {
+	font-weight: bold;
 }
 
 /** Fixture */

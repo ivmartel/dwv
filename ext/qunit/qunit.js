@@ -1,13 +1,11 @@
 /**
- * QUnit v1.5.0pre - A JavaScript Unit Testing Framework
+ * QUnit v1.5.0 - A JavaScript Unit Testing Framework
  *
  * http://docs.jquery.com/QUnit
  *
  * Copyright (c) 2012 John Resig, Jörn Zaefferer
  * Dual licensed under the MIT (MIT-LICENSE.txt)
  * or GPL (GPL-LICENSE.txt) licenses.
- * Pulled Live from Git Tue Mar 27 08:15:01 UTC 2012
- * Last Commit: 6ec4cc264c450ec2079d45705481de0f60000647
  */
 
 (function(window) {
@@ -102,6 +100,13 @@ Test.prototype = {
 	},
 	run: function() {
 		config.current = this;
+
+		var running = id("qunit-testresult");
+
+		if ( running ) {
+			running.innerHTML = "Running: <br/>" + this.name;
+		}
+
 		if ( this.async ) {
 			QUnit.stop();
 		}
