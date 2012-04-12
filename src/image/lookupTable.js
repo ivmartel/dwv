@@ -12,7 +12,7 @@ dwv.image.LookupTable = function(windowPresets,rs,ri)
     // default values if no presets
     this.windowCenter = 100;
     this.windowWidth = 1000;
-    if( windowPresets.lenght > 0 ) {
+    if( windowPresets.length > 0 ) {
         this.windowCenter = windowPresets[0].center;
         this.windowWidth = windowPresets[0].width;
     }
