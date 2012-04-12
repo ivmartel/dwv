@@ -186,14 +186,11 @@ dwv.dicom.DicomParser.prototype.readDataElement=function(reader, offset, implici
     
     // data
     var data;
-    if( tag.name === "dwv::unknown" && vl > 1000 ) {
-        data = "Not loaded.";
-    }
-    else if( vr === "US" || vr === "UL")
+    if( vr === "US" || vr === "UL")
     {
         data = [reader.readNumber( vl, offset+tagOffset+vrOffset+vlOffset)];
     }
-    else if( vr === "OW" ) // should be pixel data
+    else if( vr === "OX" || vr === "OW" )
     {
         data = [];
         var begin = offset+tagOffset+vrOffset+vlOffset;
