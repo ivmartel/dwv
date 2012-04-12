@@ -3,7 +3,7 @@
 ----------------------
 
 Web: https://github.com/kripken/j2k.js
-Version: copied on 11/04/2012, commit a4abb8e0538
+Version: copied on 13/12/2011, commit a4abb8e0538
 Download: https://raw.github.com/kripken/j2k.js/master/openjpeg.js
 License: BSD-like (see license.txt)
 
