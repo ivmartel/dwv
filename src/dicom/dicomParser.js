@@ -236,7 +236,7 @@ dwv.dicom.DicomParser.prototype.parseAll = function()
     var magicword = metaReader.readString(4, offset);
     if(magicword !== "DICM")
     {
-        throw new Error("No magic DICM word found.");
+        throw new Error("No magic DICM word found");
     }
     offset += 4;
     
@@ -266,13 +266,13 @@ dwv.dicom.DicomParser.prototype.parseAll = function()
             // unsupported...
             if( syntax === "1.2.840.10008.1.2.2" ) {
                 //dataReader = new dwv.dicom.BigEndianReader(this.file);
-                throw new Error("Unsupported DICOM transfer syntax (BigEndian): "+syntax+".");
+                throw new Error("Unsupported DICOM transfer syntax (BigEndian): "+syntax);
             }
             else if( syntax.match(/1.2.840.10008.1.2.4/) ) {
-                throw new Error("Unsupported DICOM transfer syntax (JPEG): "+syntax+".");
+                throw new Error("Unsupported DICOM transfer syntax (JPEG): "+syntax);
             }
             else if( syntax.match(/1.2.840.10008.1.2.5/)) {
-                throw new Error("Unsupported DICOM transfer syntax (RLE): "+syntax+".");
+                throw new Error("Unsupported DICOM transfer syntax (RLE): "+syntax);
             }
         }            
         // store the data element
@@ -312,10 +312,19 @@ dwv.dicom.DicomParser.prototype.parseAll = function()
 dwv.dicom.DicomParser.prototype.getImage = function()
 {
     // size
+    if( !this.dicomElements.Columns ) {
+        throw new Error("Missing DICOM image number of columns");
+    }
+    if( !this.dicomElements.Rows ) {
+        throw new Error("Missing DICOM image number of rows");
+    }
     var size = new dwv.image.ImageSize(
         this.dicomElements.Columns.value[0], 
         this.dicomElements.Rows.value[0]);
     // spacing
+    if( !this.dicomElements.PixelSpacing ) {
+        throw new Error("Missing DICOM image pixel spacing");
+    }
     var rowSpacing = parseFloat(this.dicomElements.PixelSpacing.value[0]);
     var columnSpacing = parseFloat(this.dicomElements.PixelSpacing.value[1]);
     var spacing = new dwv.image.ImageSpacing(
@@ -333,18 +342,20 @@ dwv.dicom.DicomParser.prototype.getImage = function()
     }
     var windowPresets = [];
     var name;
-    for( var i = 0; i < this.dicomElements.WindowCenter.value.length; ++i) {
-        if( this.dicomElements.WindowCenterWidthExplanation ) {
-            name = this.dicomElements.WindowCenterWidthExplanation.value[i];
+    if( this.dicomElements.WindowCenter &&  this.dicomElements.WindowWidth ) {
+        for( var i = 0; i < this.dicomElements.WindowCenter.value.length; ++i) {
+            if( this.dicomElements.WindowCenterWidthExplanation ) {
+                name = this.dicomElements.WindowCenterWidthExplanation.value[i];
+            }
+            else {
+                name = "Default"+i;
+            }
+            windowPresets.push({
+                "center": parseInt( this.dicomElements.WindowCenter.value[i], 10 ),
+                "width": parseInt( this.dicomElements.WindowWidth.value[i], 10 ), 
+                "name": name
+            });
         }
-        else {
-            name = "Default"+i;
-        }
-        windowPresets.push({
-            "center": parseInt( this.dicomElements.WindowCenter.value[i], 10 ),
-            "width": parseInt( this.dicomElements.WindowWidth.value[i], 10 ), 
-            "name": name
-        });
     }
     image.setLookup( windowPresets, rescaleSlope, rescaleIntercept );
     // return
