@@ -143,6 +143,21 @@ dwv.App = function()
         loadDicomFile(evt.target.files[0]);
     };
     
+    function onLoadDicom(e)
+    {
+        // read the DICOM file
+        try {
+            parseAndLoadDicom(e.target.result);
+        }
+        catch(error) {
+            alert(error.name+": "+error.message+".");
+            console.log(error.stack);
+            return;
+        }
+        // prepare display
+        postLoadInit();
+    }
+    
     /**
      * @private
      * @param file
@@ -150,21 +165,7 @@ dwv.App = function()
     function loadDicomFile(file) 
     {
         var myreader = new FileReader();
-        myreader.onload = ( function() {
-            return function(e) {
-                // read the DICOM file
-                try {
-                    parseAndLoadDicom(e.target.result);
-                }
-                catch(error) {
-                    alert("Exception: "+error.message);
-                    return;
-                }
-                // prepare display
-                postLoadInit();
-            };
-        }()
-        );
+        myreader.onload = onLoadDicom;
         myreader.readAsBinaryString(file);
     }
     
