@@ -9,8 +9,13 @@ dwv.image = dwv.image || {};
  */
 dwv.image.LookupTable = function(windowPresets,rs,ri)
 {
-    this.windowCenter = windowPresets[0].center;
-    this.windowWidth = windowPresets[0].width;
+    // default values if no presets
+    this.windowCenter = 100;
+    this.windowWidth = 1000;
+    if( windowPresets.lenght > 0 ) {
+        this.windowCenter = windowPresets[0].center;
+        this.windowWidth = windowPresets[0].width;
+    }
     this.windowPresets = windowPresets;
     this.rescaleSlope = rs;
     this.rescaleIntercept = ri;    
