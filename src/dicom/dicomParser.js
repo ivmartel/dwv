@@ -322,11 +322,19 @@ dwv.dicom.DicomParser.prototype.getImage = function()
         this.dicomElements.Columns.value[0], 
         this.dicomElements.Rows.value[0]);
     // spacing
-    if( !this.dicomElements.PixelSpacing ) {
+    var rowSpacing = 1;
+    var columnSpacing = 1;
+    if( this.dicomElements.PixelSpacing ) {
+        rowSpacing = parseFloat(this.dicomElements.PixelSpacing.value[0]);
+        columnSpacing = parseFloat(this.dicomElements.PixelSpacing.value[1]);
+    }
+    else if( this.dicomElements.ImagerPixelSpacing ) {
+        rowSpacing = parseFloat(this.dicomElements.ImagerPixelSpacing.value[0]);
+        columnSpacing = parseFloat(this.dicomElements.ImagerPixelSpacing.value[1]);
+    }
+    else {
         throw new Error("Missing DICOM image pixel spacing");
     }
-    var rowSpacing = parseFloat(this.dicomElements.PixelSpacing.value[0]);
-    var columnSpacing = parseFloat(this.dicomElements.PixelSpacing.value[1]);
     var spacing = new dwv.image.ImageSpacing(
         columnSpacing, rowSpacing);
     // image
