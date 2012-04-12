@@ -160,20 +160,22 @@ dwv.dicom.DicomParser.prototype.readDataElement=function(reader, offset, implici
                 }
             }
             vrOffset = 0;
+            vl = reader.readNumber( 4, offset+tagOffset+vrOffset );
+            vlOffset = 4;
         }
         else {
             vr = reader.readString( 2, offset+tagOffset );
             vrOffset = 2;
-        }
-        // long representations
-        if(vr === "OB" || vr === "OF" || vr === "SQ" || vr === "OW" || vr === "UN") {
-            vl = reader.readNumber( 4, offset+tagOffset+vrOffset+2 );
-            vlOffset = 6;
-        }
-        // short representation
-        else {
-            vl = reader.readNumber( 2, offset+tagOffset+vrOffset );
-            vlOffset = 2;
+            // long representations
+            if(vr === "OB" || vr === "OF" || vr === "SQ" || vr === "OW" || vr === "UN") {
+                vl = reader.readNumber( 4, offset+tagOffset+vrOffset+2 );
+                vlOffset = 6;
+            }
+            // short representation
+            else {
+                vl = reader.readNumber( 2, offset+tagOffset+vrOffset );
+                vlOffset = 2;
+            }
         }
     }
     
@@ -184,7 +186,10 @@ dwv.dicom.DicomParser.prototype.readDataElement=function(reader, offset, implici
     
     // data
     var data;
-    if( vr === "US" || vr === "UL")
+    if( tag.name === "dwv::unknown" && vl > 1000 ) {
+        data = "Not loaded.";
+    }
+    else if( vr === "US" || vr === "UL")
     {
         data = [reader.readNumber( vl, offset+tagOffset+vrOffset+vlOffset)];
     }
