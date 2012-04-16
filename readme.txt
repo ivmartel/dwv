@@ -1,8 +1,12 @@
 DWV
 -----
 
-A simple javascript/HTLM5 (only) DICOM web viewer. I'm a beginner at both javascript and HTML5 so any 
-coding/implementation comments are welcome.
+A simple javascript/HTLM5 (only) DICOM web viewer. 
+Not yet fully DICOM compliant, for now only supports:
+ * 512*512 2D images (or less)
+ * Little Endian transfer syntax
+
+All coding/implementation comments are welcome.
 
 For now works only with local files. 
 
