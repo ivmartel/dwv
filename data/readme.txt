@@ -1,7 +1,9 @@
 DWV test data
 --------------
-Most of the data is extracted from the Osirix DICOM database: http://pubimage.hcuge.ch:8080/
-
+Data sources:
+- Osirix: http://pubimage.hcuge.ch:8080/
+- Barre: (Sebastien) http://www.barre.nom.fr/medical/samples/
+- Gdcm: :pserver:xxx@cvs.creatis.insa-lyon.fr:2402/cvs/public
 
 * cta.dcm:
  origin: (Osirix) TOUTATIX/Cardiac 1CTA_CORONARY_ARTERIES_TESTBOLUS (Adult)/Heart w-o  1.5  B25f  55% /IM-0001-0100.dcm
@@ -11,8 +13,8 @@ Most of the data is extracted from the Osirix DICOM database: http://pubimage.hc
  origin: (Osirix) GOUDURIX/Specials 1_CORONARY_CTA_COMBI_SMH/70 % 1.0  B30f/IM-0001-0100.dcm
  details: 512*512, transfer syntax: 1.2.840.10008.1.2 (LittleEndianImplicit)
  
-* :
- origin: 
+* us:
+ origin: (Barre through Gdcm) US-RGB-8-epicard
  details: 512*512, transfer syntax: 1.2.840.10008.1.2.2 (BigEndianExplicit)
 
 * mr.dcm:
