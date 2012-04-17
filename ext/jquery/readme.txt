@@ -3,8 +3,8 @@
 ----------------------
 
 Web: http://jqueryui.com
-Version: 1.8.17
-Download: http://jqueryui.com/download/jquery-ui-1.8.17.custom.zip
+Version: 1.8.18
+Download: http://jqueryui.com/download/jquery-ui-1.8.18.custom.zip
 License: MIT (http://jquery.org/license)
 
 Note:
