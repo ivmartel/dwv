@@ -140,14 +140,18 @@ dwv.App = function()
      */
     this.loadDicom = function(evt) 
     {
-        loadDicomFile(evt.target.files[0]);
+        var reader = new FileReader();
+        reader.onload = onLoadedDicom;
+        reader.onprogress = updateProgress;
+        $("#progressbar").progressbar({ value: 0 });
+        reader.readAsBinaryString(evt.target.files[0]);
     };
     
-    function onLoadDicom(e)
+    function onLoadedDicom(evt)
     {
-        // read the DICOM file
+        // parse the DICOM file
         try {
-            parseAndLoadDicom(e.target.result);
+            parseDicom(evt.target.result);
         }
         catch(error) {
             alert(error.name+": "+error.message+".");
@@ -156,24 +160,26 @@ dwv.App = function()
         }
         // prepare display
         postLoadInit();
+        $("#progressbar").progressbar({ value: 100 });
     }
     
-    /**
-     * @private
-     * @param file
-     */
-    function loadDicomFile(file) 
+    function updateProgress(evt)
     {
-        var myreader = new FileReader();
-        myreader.onload = onLoadDicom;
-        myreader.readAsBinaryString(file);
+        // evt is an ProgressEvent.
+        if (evt.lengthComputable) {
+          var percentLoaded = Math.round((evt.loaded / evt.total) * 100);
+          // Increase the progress bar length.
+          if (percentLoaded < 100) {
+              $("#progressbar").progressbar({ value: percentLoaded });
+          }
+        }
     }
     
     /**
      * @private
      * @param file
      */
-    function parseAndLoadDicom(file)
+    function parseDicom(file)
     {    
         // parse the DICOM file
         var dicomParser = new dwv.dicom.DicomParser(file);
