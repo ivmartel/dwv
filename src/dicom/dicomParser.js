@@ -19,6 +19,20 @@ dwv.dicom.BigEndianReader = function(file)
         }
         return result;
     };
+    this.readCouple = function(a,b) {
+        return (b + a*256).toString(16);
+    };
+    this.readUint16Array = function(nBytes, startByte) {
+        return new Uint16Array(file.buffer, startByte, nBytes/2);
+    };
+    this.readUint16Array = function(nBytes, startByte) {
+        var data = [];
+        for(var i=startByte; i<startByte+nBytes; i+=2) 
+        {     
+            data.push(this.readNumber(1,i+1) + this.readNumber(1,i)*256);
+        }
+        return data;
+    };
     this.readString = function(nChars, startChar) {
         var result = "";
         for(var i=startChar; i<startChar + nChars; i++){
@@ -43,6 +57,17 @@ dwv.dicom.LittleEndianReader = function(file)
             result = result * 256 + this.readByteAt(i-1);
         }
         return result;
+    };
+    this.readCouple = function(a,b) {
+        return (a + b*256).toString(16);
+    };
+    this.readUint16Array = function(nBytes, startByte) {
+        var data = [];
+        for(var i=startByte; i<startByte+nBytes; i+=2) 
+        {     
+            data.push(this.readNumber(2,i));
+        }
+        return data;
     };
     this.readString = function(nChars, startChar) {
         var result = "";
@@ -106,12 +131,12 @@ dwv.dicom.DicomParser.prototype.readTag=function(reader, offset)
     // group
     var g0 = reader.readNumber( 1, offset );
     var g1 = reader.readNumber( 1, offset+1 );
-    var group_str = (g0 + g1*256).toString(16);
+    var group_str = reader.readCouple(g0, g1);
     var group = "0x0000".substr(0, 6 - group_str.length) + group_str.toUpperCase();
     // element
     var e2 = reader.readNumber( 1, offset+2 );
     var e3 = reader.readNumber( 1, offset+3 );
-    var element_str = (e2 + e3*256).toString(16);
+    var element_str = reader.readCouple(e2, e3);
     var element = "0x0000".substr(0, 6 - element_str.length) + element_str.toUpperCase();
     // name
     var name = "dwv::unknown";
@@ -192,12 +217,16 @@ dwv.dicom.DicomParser.prototype.readDataElement=function(reader, offset, implici
     }
     else if( vr === "OX" || vr === "OW" )
     {
+        data = reader.readUint16Array(vl, offset+tagOffset+vrOffset+vlOffset);
+    }
+    else if( vr === "OB" )
+    {
         data = [];
         var begin = offset+tagOffset+vrOffset+vlOffset;
         var end = begin + vl;
-        for(var i=begin; i<end; i+=2) 
+        for(var i=begin; i<end; ++i) 
         {     
-            data.push(reader.readNumber(2,i));
+            data.push(reader.readNumber(1,i));
         }
     }
     else
@@ -263,10 +292,9 @@ dwv.dicom.DicomParser.prototype.parseAll = function()
             if( syntax === "1.2.840.10008.1.2" ) {
                 implicit = true;
             }
-            // unsupported...
+            // special transfer syntax
             if( syntax === "1.2.840.10008.1.2.2" ) {
-                //dataReader = new dwv.dicom.BigEndianReader(this.file);
-                throw new Error("Unsupported DICOM transfer syntax (BigEndian): "+syntax);
+                dataReader = new dwv.dicom.BigEndianReader(this.file);
             }
             else if( syntax.match(/1.2.840.10008.1.2.4/) ) {
                 throw new Error("Unsupported DICOM transfer syntax (JPEG): "+syntax);
@@ -331,9 +359,6 @@ dwv.dicom.DicomParser.prototype.getImage = function()
     else if( this.dicomElements.ImagerPixelSpacing ) {
         rowSpacing = parseFloat(this.dicomElements.ImagerPixelSpacing.value[0]);
         columnSpacing = parseFloat(this.dicomElements.ImagerPixelSpacing.value[1]);
-    }
-    else {
-        throw new Error("Missing DICOM image pixel spacing");
     }
     var spacing = new dwv.image.ImageSpacing(
         columnSpacing, rowSpacing);
