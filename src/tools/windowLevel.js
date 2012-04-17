@@ -84,12 +84,19 @@ dwv.tool.applyPreset = function(presetId)
     for( var i = 0; i < app.getImage().getLookup().windowPresets.length; ++i ) {
        presets.push(app.getImage().getLookup().windowPresets[i]);
     }
-    // default
+    // defaults
     presets.push({"center": 350, "width": 40}); // abdomen
     presets.push({"center": -600, "width": 1500}); // lung
     presets.push({"center": 40, "width": 80}); // brain
     presets.push({"center": 480, "width": 2500}); // bone
     presets.push({"center": 90, "width": 350}); // head
+    // min/max preset
+    var range = app.getImage().getDataRange();
+    var min = range.min;
+    var max = range.max;
+    var width = max - min;
+    var center = min + width/2;
+    presets.push({"center": center, "width": width}); // min/max
     
     dwv.tool.updateWindowingData(
         presets[presetId-1].center, 
@@ -224,7 +231,7 @@ dwv.tool.WindowLevel.prototype.appendHtml = function()
         wlOptions.push( app.getImage().getLookup().windowPresets[p].name );
     }
     // default
-    var wlDefaultOptions = ["Abdomen", "Lung", "Brain", "Bone", "Head"];
+    var wlDefaultOptions = ["Abdomen", "Lung", "Brain", "Bone", "Head", "Min/Max"];
     for ( var d = 0; d < wlDefaultOptions.length; ++d )
     {
         wlOptions.push( wlDefaultOptions[d] );
