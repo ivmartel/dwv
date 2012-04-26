@@ -187,7 +187,7 @@ dwv.App = function()
         
         // tag list table (without the pixel data)
         var data = dicomParser.dicomElements;
-        data.PixelData = "";
+        data.PixelData.value = "...";
         var table = dwv.html.toTable(data);
         table.className = "tagList";
         document.getElementById('tags').appendChild(table);
