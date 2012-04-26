@@ -116,7 +116,10 @@ dwv.dicom.DicomParser.prototype.appendDicomElement=function( element )
     }
     // store it
     this.dicomElements[name] = { 
-            "group": element.group, "element": element.element, 
+            "group": element.group, 
+            "element": element.element,
+            "vr": element.vr,
+            "vl": element.vl,
             "value": element.value };
 };
 
@@ -219,7 +222,7 @@ dwv.dicom.DicomParser.prototype.readDataElement=function(reader, offset, implici
     {
         data = reader.readUint16Array(vl, offset+tagOffset+vrOffset+vlOffset);
     }
-    else if( vr === "OB" )
+    else if( vr === "OB" || vr === "N/A")
     {
         data = [];
         var begin = offset+tagOffset+vrOffset+vlOffset;
@@ -277,6 +280,7 @@ dwv.dicom.DicomParser.prototype.parseAll = function()
     // meta elements
     var metaStart = offset;
     var metaEnd = offset + metaLength;
+    var jpeg = false;
     for( i=metaStart; i<metaEnd; i++ ) 
     {
         // get the data element
@@ -295,6 +299,10 @@ dwv.dicom.DicomParser.prototype.parseAll = function()
             // special transfer syntax
             if( syntax === "1.2.840.10008.1.2.2" ) {
                 dataReader = new dwv.dicom.BigEndianReader(this.file);
+            }
+            else if( syntax.match(/1.2.840.10008.1.2.4.9/) ) {
+                jpeg = true;                
+                //throw new Error("Unsupported DICOM transfer syntax (JPEG 2000): "+syntax);
             }
             else if( syntax.match(/1.2.840.10008.1.2.4/) ) {
                 throw new Error("Unsupported DICOM transfer syntax (JPEG): "+syntax);
@@ -319,17 +327,33 @@ dwv.dicom.DicomParser.prototype.parseAll = function()
         // get the data element
         dataElement = this.readDataElement(dataReader, i, implicit);
         // store pixel data
-        if( dataElement.tag.name === "PixelData") {
+        if( dataElement.tag.name === "PixelData" ) {
             this.pixelBuffer = dataElement.data;
         }
         // store the data element
         this.appendDicomElement( {
             'name': dataElement.tag.name,
             'group' : dataElement.tag.group, 
+            'vr' : dataElement.vr, 
+            'vl' : dataElement.vl, 
             'element': dataElement.tag.element,
             'value': dataElement.data } );
         // increment index
         i += dataElement.offset-1;
+    }
+    
+    if( jpeg ) {
+        console.log("JPEG 2000");
+        var data = new Uint16Array(this.dicomElements.Item0.value);
+        var result = 0;
+        try {
+            result = openjpeg(data, "j2k");
+        }
+        catch(error) {
+            console.log(error);
+        }
+        this.pixelBuffer = result.data;
+        console.log(result);
     }
 };
 
