@@ -303,7 +303,7 @@ dwv.dicom.DicomParser.prototype.parseAll = function()
                 syntax = syntax.substring(0, syntax.length-1); 
             }
             
-            if( syntax.match(/1.2.840.10008.1.2.2/) ) {
+            if( syntax.match(/1.2.840.10008.1.2/) ) {
                 // implicit syntax
                 if( syntax === "1.2.840.10008.1.2" ) {
                     implicit = true;
