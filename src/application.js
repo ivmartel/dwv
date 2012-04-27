@@ -154,8 +154,15 @@ dwv.App = function()
             parseDicom(evt.target.result);
         }
         catch(error) {
-            alert(error.name+": "+error.message+".");
-            console.log(error.stack);
+            if( error.name && error.message) {
+                alert(error.name+": "+error.message+".");
+            }
+            else {
+                alert("Error: "+error);
+            }
+            if( error.stack ) {
+                console.log(error.stack);
+            }
             return;
         }
         // prepare display
