@@ -83,11 +83,16 @@ dwv.dicom.LittleEndianReader = function(file)
  */
 dwv.dicom.DicomParser = function(file)
 {
-    // members
-    this.inputBuffer = new Array(file.length);
+    // the list of DICOM elements
     this.dicomElements = {};
+    // the number of DICOM Items
+    this.numberOfItems = 0;
+    // the DICOM dictionary used to find tag names
     this.dict = new dwv.dicom.Dictionary();
+    // the file
     this.file = file;
+    // the pixel buffer
+    this.pixelBuffer = [];
 };
 
 /**
@@ -110,7 +115,11 @@ dwv.dicom.DicomParser.prototype.appendDicomElement=function( element )
 {
     // find a good tag name
     var name = element.name;
-    var count = 0;
+    // count the number of items
+    if( name === "Item" ) {
+        ++this.numberOfItems;
+    }
+    var count = 1;
     while( this.dicomElements[name] ) {
         name = element.name + (count++).toString();
     }
@@ -257,6 +266,8 @@ dwv.dicom.DicomParser.prototype.parseAll = function()
     var offset = 0;
     var i;
     var implicit = false;
+    var jpeg = false;
+    var jpeg2000 = false;
     // dictionary
     this.dict.init();
     // default readers
@@ -280,7 +291,6 @@ dwv.dicom.DicomParser.prototype.parseAll = function()
     // meta elements
     var metaStart = offset;
     var metaEnd = offset + metaLength;
-    var jpeg = false;
     for( i=metaStart; i<metaEnd; i++ ) 
     {
         // get the data element
@@ -292,23 +302,30 @@ dwv.dicom.DicomParser.prototype.parseAll = function()
             if( syntax[syntax.length-1] === String.fromCharCode("u200B") ) {
                 syntax = syntax.substring(0, syntax.length-1); 
             }
-            // implicit syntax
-            if( syntax === "1.2.840.10008.1.2" ) {
-                implicit = true;
-            }
-            // special transfer syntax
-            if( syntax === "1.2.840.10008.1.2.2" ) {
-                dataReader = new dwv.dicom.BigEndianReader(this.file);
-            }
-            else if( syntax.match(/1.2.840.10008.1.2.4.9/) ) {
-                jpeg = true;                
-                //throw new Error("Unsupported DICOM transfer syntax (JPEG 2000): "+syntax);
+            
+            if( syntax.match(/1.2.840.10008.1.2.2/) ) {
+                // implicit syntax
+                if( syntax === "1.2.840.10008.1.2" ) {
+                    implicit = true;
+                }
+                // special transfer syntax
+                else if( syntax === "1.2.840.10008.1.2.2" ) {
+                    dataReader = new dwv.dicom.BigEndianReader(this.file);
+                }
             }
             else if( syntax.match(/1.2.840.10008.1.2.4/) ) {
-                throw new Error("Unsupported DICOM transfer syntax (JPEG): "+syntax);
-            }
-            else if( syntax.match(/1.2.840.10008.1.2.5/)) {
-                throw new Error("Unsupported DICOM transfer syntax (RLE): "+syntax);
+                compressed = true;
+                if( syntax === "1.2.840.10008.1.2.4.9" ) {
+                    jpeg2000 = true;                
+                    throw new Error("Unsupported DICOM transfer syntax (JPEG 2000): "+syntax);
+                }
+                else if( syntax === "1.2.840.10008.1.2.4" ) {
+                    jpeg = true;
+                    throw new Error("Unsupported DICOM transfer syntax (JPEG): "+syntax);
+                }
+                else if( syntax === "1.2.840.10008.1.2.5" ) {
+                    throw new Error("Unsupported DICOM transfer syntax (RLE): "+syntax);
+                }
             }
         }            
         // store the data element
@@ -321,14 +338,36 @@ dwv.dicom.DicomParser.prototype.parseAll = function()
         i += dataElement.offset-1;
     }
     
+    var startedPixelItems = false;
+    
     // DICOM data elements
-    for( i=metaEnd; i<this.inputBuffer.length; i++) 
+    for( i=metaEnd; i<this.file.length; i++) 
     {
         // get the data element
         dataElement = this.readDataElement(dataReader, i, implicit);
-        // store pixel data
-        if( dataElement.tag.name === "PixelData" ) {
-            this.pixelBuffer = dataElement.data;
+        // store pixel data from multiple items
+        if( startedPixelItems ) {
+            if( dataElement.tag.name === "Item" ) {
+                if( dataElement.data.length !== 0 ) {
+                    this.pixelBuffer = this.pixelBuffer.concat( dataElement.data );
+                }
+            }
+            else if( dataElement.tag.name === "SequenceDelimitationItem" ) {
+                startedPixelItems = false;
+            }
+            else {
+                throw new Error("Unexpected tag in encapsulated pixel data: "+dataElement.tag.name);
+            }
+        }
+        // check the pixel data tag
+        if( dataElement.tag.name === "PixelData") {
+            if( dataElement.data.length !== 0 ) {
+                this.pixelBuffer = dataElement.data;
+            }
+            else {
+                startedPixelItems = true;
+                console.log(this.pixelBuffer[0]);
+            }
         }
         // store the data element
         this.appendDicomElement( {
@@ -342,9 +381,20 @@ dwv.dicom.DicomParser.prototype.parseAll = function()
         i += dataElement.offset-1;
     }
     
+    // uncompress data
     if( jpeg ) {
+        console.log("JPEG");
+        // using jpgjs from https://github.com/notmasteryet/jpgjs
+        // (or from https://github.com/mozilla/pdf.js?)
+        var j = new JpegImage();
+        j.parse(this.pixelBuffer);
+        var d = ctx.getImageData(0,0,j.width,j.height);
+        j.copyToImageData(d);
+        this.pixelBuffer = d.data;
+    }
+    else if( jpeg2000 ) {
         console.log("JPEG 2000");
-        var data = new Uint16Array(this.dicomElements.Item0.value);
+        var data = new Uint16Array(this.pixelBuffer);
         var result = 0;
         try {
             result = openjpeg(data, "j2k");
