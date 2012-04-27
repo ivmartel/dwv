@@ -158,7 +158,7 @@ dwv.App = function()
                 alert(error.name+": "+error.message+".");
             }
             else {
-                alert("Error: "+error);
+                alert("Error: "+error+".");
             }
             if( error.stack ) {
                 console.log(error.stack);
