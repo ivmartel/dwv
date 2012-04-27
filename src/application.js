@@ -195,20 +195,29 @@ dwv.App = function()
         // tag list table (without the pixel data)
         var data = dicomParser.dicomElements;
         data.PixelData.value = "...";
+        // HTML node
+        var node = document.getElementById("tags");
+        // remove possible previous
+        while (node.hasChildNodes()) { 
+            node.removeChild(node.firstChild);
+        }
+        // new table
         var table = dwv.html.toTable(data);
         table.className = "tagList";
-        document.getElementById('tags').appendChild(table);
-        document.getElementById("tags").style.display='';
+        // append new table
+        node.appendChild(table);
+        // display it
+        node.style.display='';
         
         // table search form
-        var tagSearchform = document.createElement('form');
-        tagSearchform.setAttribute('class', 'filter');
-        var input = document.createElement('input');
+        var tagSearchform = document.createElement("form");
+        tagSearchform.setAttribute("class", "filter");
+        var input = document.createElement("input");
         input.onkeyup = function() {
             dwv.html.filterTable(input, table);
         };
         tagSearchform.appendChild(input);
-        document.getElementById('tags').insertBefore(tagSearchform, table);
+        node.insertBefore(tagSearchform, table);
         
         image = dicomParser.getImage();
     }
