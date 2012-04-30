@@ -76,6 +76,15 @@ dwv.dicom.LittleEndianReader = function(file)
         }
         return result;
     };
+    // beta...
+    this.readRaw = function(nBytes, startByte) {
+        var data = [];
+        for(var i=startByte; i<startByte+nBytes; ++i) 
+        {     
+            data.push(file[i]);
+        }
+        return data;
+    };
 };
 
 /**
@@ -233,13 +242,14 @@ dwv.dicom.DicomParser.prototype.readDataElement=function(reader, offset, implici
     }
     else if( vr === "OB" || vr === "N/A")
     {
-        data = [];
         var begin = offset+tagOffset+vrOffset+vlOffset;
         var end = begin + vl;
+        data = [];
         for(var i=begin; i<end; ++i) 
         {     
             data.push(reader.readNumber(1,i));
         }
+        //data = reader.readRaw(vl, begin);
     }
     else
     {
@@ -408,6 +418,16 @@ dwv.dicom.DicomParser.prototype.parseAll = function()
         /*var data = new Uint16Array(this.pixelBuffer);
         var result = openjpeg(data, "j2k");
         this.pixelBuffer = result.data;*/
+        
+        // using jpx.js from https://github.com/mozilla/pdf.js
+        // -> ...
+        /*var j = new JpxImage();
+        j.parse(this.pixelBuffer);
+        console.log("width: "+j.width);
+        console.log("height: "+j.height);
+        console.log("tiles: "+j.tiles.length);
+        console.log("count: "+j.componentsCount);
+        this.pixelBuffer = j.tiles[0].items;*/
     }
 };
 
