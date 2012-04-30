@@ -303,8 +303,6 @@ dwv.dicom.DicomParser.prototype.parseAll = function()
                 syntax = syntax.substring(0, syntax.length-1); 
             }
             
-            // see table: http://docs.intersystems.com/ens20102/csp/docbook/DocBook.UI.Page.cls?KEY=EDICOM_transfer_syntax
-            
             // Implicit VR - Little Endian
             if( syntax === "1.2.840.10008.1.2" ) {
                 implicit = true;
@@ -328,7 +326,7 @@ dwv.dicom.DicomParser.prototype.parseAll = function()
             }
             // JPEG 2000
             else if( syntax.match(/1.2.840.10008.1.2.4.9/) ) {
-                jpeg = true;
+                jpeg2000 = true;
                 throw new Error("Unsupported DICOM transfer syntax (JPEG 2000): "+syntax);
             }
             // MPEG2 Image Compression
@@ -378,7 +376,6 @@ dwv.dicom.DicomParser.prototype.parseAll = function()
             }
             else {
                 startedPixelItems = true;
-                console.log(this.pixelBuffer[0]);
             }
         }
         // store the data element
@@ -397,25 +394,20 @@ dwv.dicom.DicomParser.prototype.parseAll = function()
     if( jpeg ) {
         console.log("JPEG");
         // using jpgjs from https://github.com/notmasteryet/jpgjs
-        // (or from https://github.com/mozilla/pdf.js?)
-        var j = new JpegImage();
+        // -> error with ffc3 and ffc1 jpeg jfif marker
+        /*var j = new JpegImage();
         j.parse(this.pixelBuffer);
         var d = 0;
         j.copyToImageData(d);
-        this.pixelBuffer = d.data;
+        this.pixelBuffer = d.data;*/
     }
     else if( jpeg2000 ) {
         console.log("JPEG 2000");
-        var data = new Uint16Array(this.pixelBuffer);
-        var result = 0;
-        try {
-            result = openjpeg(data, "j2k");
-        }
-        catch(error) {
-            console.log(error);
-        }
-        this.pixelBuffer = result.data;
-        console.log(result);
+        // using openjpeg.js from https://github.com/kripken/j2k.js
+        // -> 2 layers results????
+        /*var data = new Uint16Array(this.pixelBuffer);
+        var result = openjpeg(data, "j2k");
+        this.pixelBuffer = result.data;*/
     }
 };
 
