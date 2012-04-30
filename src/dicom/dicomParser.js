@@ -303,29 +303,41 @@ dwv.dicom.DicomParser.prototype.parseAll = function()
                 syntax = syntax.substring(0, syntax.length-1); 
             }
             
-            if( syntax.match(/1.2.840.10008.1.2/) ) {
-                // implicit syntax
-                if( syntax === "1.2.840.10008.1.2" ) {
-                    implicit = true;
-                }
-                // special transfer syntax
-                else if( syntax === "1.2.840.10008.1.2.2" ) {
-                    dataReader = new dwv.dicom.BigEndianReader(this.file);
-                }
+            // see table: http://docs.intersystems.com/ens20102/csp/docbook/DocBook.UI.Page.cls?KEY=EDICOM_transfer_syntax
+            
+            // Implicit VR - Little Endian
+            if( syntax === "1.2.840.10008.1.2" ) {
+                implicit = true;
             }
-            else if( syntax.match(/1.2.840.10008.1.2.4/) ) {
-                compressed = true;
-                if( syntax === "1.2.840.10008.1.2.4.9" ) {
-                    jpeg2000 = true;                
-                    throw new Error("Unsupported DICOM transfer syntax (JPEG 2000): "+syntax);
-                }
-                else if( syntax === "1.2.840.10008.1.2.4" ) {
-                    jpeg = true;
-                    throw new Error("Unsupported DICOM transfer syntax (JPEG): "+syntax);
-                }
-                else if( syntax === "1.2.840.10008.1.2.5" ) {
-                    throw new Error("Unsupported DICOM transfer syntax (RLE): "+syntax);
-                }
+            // Explicit VR - Little Endian (default): 1.2.840.10008.1.2.1 
+            // Deflated Explicit VR - Little Endian
+            else if( syntax === "1.2.840.10008.1.2.1.99" ) {
+                throw new Error("Unsupported DICOM transfer syntax (Deflated Explicit VR): "+syntax);
+            }
+            // Explicit VR - Big Endian
+            else if( syntax === "1.2.840.10008.1.2.2" ) {
+                dataReader = new dwv.dicom.BigEndianReader(this.file);
+            }
+            // JPEG
+            else if( syntax.match(/1.2.840.10008.1.2.4.5/) 
+                    || syntax.match(/1.2.840.10008.1.2.4.6/)
+                    || syntax.match(/1.2.840.10008.1.2.4.7/) 
+                    || syntax.match(/1.2.840.10008.1.2.4.8/) ) {
+                jpeg = true;
+                throw new Error("Unsupported DICOM transfer syntax (JPEG): "+syntax);
+            }
+            // JPEG 2000
+            else if( syntax.match(/1.2.840.10008.1.2.4.9/) ) {
+                jpeg = true;
+                throw new Error("Unsupported DICOM transfer syntax (JPEG 2000): "+syntax);
+            }
+            // MPEG2 Image Compression
+            else if( syntax === "1.2.840.10008.1.2.4.100" ) {
+                throw new Error("Unsupported DICOM transfer syntax (MPEG2): "+syntax);
+            }
+            // RLE (lossless)
+            else if( syntax === "1.2.840.10008.1.2.4.5" ) {
+                throw new Error("Unsupported DICOM transfer syntax (RLE): "+syntax);
             }
         }            
         // store the data element
@@ -388,7 +400,7 @@ dwv.dicom.DicomParser.prototype.parseAll = function()
         // (or from https://github.com/mozilla/pdf.js?)
         var j = new JpegImage();
         j.parse(this.pixelBuffer);
-        var d = ctx.getImageData(0,0,j.width,j.height);
+        var d = 0;
         j.copyToImageData(d);
         this.pixelBuffer = d.data;
     }
