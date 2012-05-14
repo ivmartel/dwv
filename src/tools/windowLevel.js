@@ -77,8 +77,11 @@ dwv.tool.updateColourMap = function(colourMap)
 /**
  * @function
  */
-dwv.tool.applyPreset = function(presetId)    
+dwv.tool.onchangePreset = function(event)
 {    
+    var presetId = parseInt(document.getElementById("presetsMenu").options[
+        document.getElementById("presetsMenu").selectedIndex].value, 10);
+    
     var presets = [];
     // from DICOM
     for( var i = 0; i < app.getImage().getLookup().windowPresets.length; ++i ) {
@@ -101,13 +104,17 @@ dwv.tool.applyPreset = function(presetId)
     dwv.tool.updateWindowingData(
         presets[presetId-1].center, 
         presets[presetId-1].width );
+
 };
 
 /**
  * @function
  */
-dwv.tool.applyColourMap = function(colourMapId)    
+dwv.tool.onchangeColourMap = function(event)
 {    
+    var colourMapId = parseInt(document.getElementById("colourMapMenu").options[
+        document.getElementById("colourMapMenu").selectedIndex].value, 10);
+
     switch (colourMapId)
     {
         case 1: // default
@@ -126,24 +133,7 @@ dwv.tool.applyColourMap = function(colourMapId)
             dwv.tool.updateColourMap(dwv.image.lut.test);
             break;
     }
-};
 
-/**
- * @function
- */
-dwv.tool.onchangePreset = function(event)
-{    
-    dwv.tool.applyPreset( parseInt(document.getElementById("presetsMenu").options[
-        document.getElementById("presetsMenu").selectedIndex].value, 10) );
-};
-
-/**
- * @function
- */
-dwv.tool.onchangeColourMap = function(event)
-{    
-    dwv.tool.applyColourMap( parseInt(document.getElementById("colourMapMenu").options[
-        document.getElementById("colourMapMenu").selectedIndex].value, 10) );
 };
 
 
