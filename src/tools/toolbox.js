@@ -45,6 +45,7 @@ dwv.tool.ToolBox.prototype.init = function()
     this.tools.circle = dwv.tool.Circle;
     this.tools.windowLevel = dwv.tool.WindowLevel;
     this.tools.zoom = dwv.tool.Zoom;
+    this.tools.filter = dwv.tool.Filter;
 
     // Get the tool select input.
     var tool_select = document.getElementById('dtool');
@@ -98,7 +99,7 @@ dwv.tool.ToolBox.prototype.appendHtml = function()
     selector.disabled = 1;
     paragraph.appendChild(selector);
 
-    var options = ["windowLevel", "rectangle", "circle", "roi", "line", "zoom"];
+    var options = ["windowLevel", "rectangle", "circle", "roi", "line", "zoom", "filter"];
     var option;
     for( var i = 0; i < options.length; ++i )
     {
