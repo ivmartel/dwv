@@ -131,7 +131,7 @@ dwv.tool.applyColourMap = function(colourMapId)
 /**
  * @function
  */
-dwv.tool.changePreset = function(event)
+dwv.tool.onchangePreset = function(event)
 {    
     dwv.tool.applyPreset( parseInt(document.getElementById("presetsMenu").options[
         document.getElementById("presetsMenu").selectedIndex].value, 10) );
@@ -140,7 +140,7 @@ dwv.tool.changePreset = function(event)
 /**
  * @function
  */
-dwv.tool.changeColourMap = function(event)
+dwv.tool.onchangeColourMap = function(event)
 {    
     dwv.tool.applyColourMap( parseInt(document.getElementById("colourMapMenu").options[
         document.getElementById("colourMapMenu").selectedIndex].value, 10) );
@@ -221,7 +221,7 @@ dwv.tool.WindowLevel.prototype.appendHtml = function()
     var wlSelector = document.createElement("select");
     wlSelector.id = "presetsMenu";
     wlSelector.name = "presetsMenu";
-    wlSelector.onchange = dwv.tool.changePreset;
+    wlSelector.onchange = dwv.tool.onchangePreset;
     wlSelector.selectedIndex = 1;
     // selector options
     var wlOptions = [];
@@ -255,7 +255,7 @@ dwv.tool.WindowLevel.prototype.appendHtml = function()
     var cmSelector = document.createElement("select");
     cmSelector.id = "colourMapMenu";
     cmSelector.name = "colourMapMenu";
-    cmSelector.onchange = dwv.tool.changeColourMap;
+    cmSelector.onchange = dwv.tool.onchangeColourMap;
     cmSelector.selectedIndex = 1;
     // selector options
     var cmOptions = ["Default", "InvPlain", "Rainbow", "Hot", "Test"];
