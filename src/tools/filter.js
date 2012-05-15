@@ -7,28 +7,41 @@ dwv.tool = dwv.tool || {};
  */
 dwv.tool.filter = dwv.tool.filter || {};
 
+dwv.tool.filter.threshold = function(min, max)
+{
+    app.getImage().restoreOrginalBuffer();
+    var data = app.getImage().getBuffer();
+    var value = 0;
+    for (var i=0; i<data.length; ++i) {
+        value = app.getImage().getValueAtOffset(i);
+        if( value < min || value > max) {
+            data[i] = 0;
+        }
+    }
+    app.generateAndDrawImage();
+};
+
 /**
 * @class Threshold Filter.
 */
-dwv.tool.filter.Threshold = function()
+dwv.tool.filter.ThresholdUI = function()
 {
-    this.run = function(data, threshold)
-    {
-        for (var i=0; i<data.length; ++i) {
-            if( data[i] < threshold.min || data[i] > threshold.max) {
-                data[i] = 0;
-            }
-        }
-    };
     
-    this.appendHtml = function() {
+    this.display = function() {
+        var div = document.createElement("div");
+        div.id = "slider-range";
+        document.getElementById('filterDiv').appendChild(div);
+
+        var min = app.getImage().getDataRange().min;
+        var max = app.getImage().getDataRange().max;
+        
         $( "#slider-range" ).slider({
             range: true,
-            min: 0,
-            max: 500,
-            values: [ 75, 300 ],
+            min: min,
+            max: max,
+            values: [ min, max ],
             slide: function( event, ui ) {
-                $( "#amount" ).val( "$" + ui.values[ 0 ] + " - $" + ui.values[ 1 ] );
+                dwv.tool.filter.threshold(ui.values[ 0 ], ui.values[ 1 ]);
             }
         });
     };
@@ -45,8 +58,8 @@ dwv.tool.onchangeFilter = function(event)
     switch (filterId)
     {
         case 1: // threshold
-            var f = new dwv.tool.filter.Threshold();
-            f.appendHtml();
+            var filterUI = new dwv.tool.filter.ThresholdUI();
+            filterUI.display();
             break;
         case 2: // sobel
             break;
@@ -56,7 +69,7 @@ dwv.tool.onchangeFilter = function(event)
 /**
 * @class Filter tool.
 */
-dwv.tool.Filter = function()
+dwv.tool.Filter = function(app)
 {
     this.enable = function(bool){
         if( bool ) {
@@ -75,7 +88,7 @@ dwv.tool.Filter = function()
 dwv.tool.Filter.prototype.appendHtml = function()
 {
     var div = document.createElement("div");
-    div.id = "filterSelector";
+    div.id = "filterDiv";
 
     // paragraph for the window level preset selector
     var filterParagraph = document.createElement("p");  
@@ -97,17 +110,21 @@ dwv.tool.Filter.prototype.appendHtml = function()
         option.appendChild(document.createTextNode(filterOptions[i]));
         filterSelector.appendChild(option);
     }
-    // append to paragraph
+    
+    // append all
     filterParagraph.appendChild(filterSelector);
-
     div.appendChild(filterParagraph);
     document.getElementById('toolbox').appendChild(div);
+
+    // enable default filter
+    var filterUI = new dwv.tool.filter.ThresholdUI();
+    filterUI.display();
 };
 
 dwv.tool.Filter.prototype.clearHtml = function()
 {
     // find the tool specific node
-    var node = document.getElementById('filterSelector');
+    var node = document.getElementById('filterDiv');
     // delete its content
     while (node.hasChildNodes()) {
         node.removeChild(node.firstChild);
