@@ -71,7 +71,8 @@ dwv.image.Image = function(size, spacing, buffer) {
     // ImageSpacing
     this.spacing = spacing;
     // buffer
-    this.buffer = buffer;
+    this.originalBuffer = buffer;
+    this.buffer = buffer.slice();
     // data range
     this.dataRange = undefined;
     // histogram
@@ -97,6 +98,10 @@ dwv.image.Image = function(size, spacing, buffer) {
         return self.lut;
     };
 
+    this.restoreOrginalBuffer = function() {
+        this.buffer = this.originalBuffer.slice();
+    };
+    
     this.getBuffer = function() {
         return self.buffer;
     };
