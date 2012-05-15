@@ -9,33 +9,115 @@ dwv.tool.filter = dwv.tool.filter || {};
 
 dwv.tool.filter.threshold = function(min, max)
 {
-    app.getImage().restoreOrginalBuffer();
-    var data = app.getImage().getBuffer();
+    var image = app.getImage().clone();
+    var data = image.getBuffer();
     var value = 0;
     for (var i=0; i<data.length; ++i) {
-        value = app.getImage().getValueAtOffset(i);
+        value = image.getValueAtOffset(i);
         if( value < min || value > max) {
             data[i] = 0;
         }
     }
+    
+    app.setImage(image);
     app.generateAndDrawImage();
 };
 
+dwv.tool.filter.convolute = function(weights)
+{
+    var originalImage = app.getImage();
+    var newImage = app.getImage().clone();
+    var newBuffer = newImage.getBuffer();
+    var value = 0;
+
+    var side = Math.round(Math.sqrt(weights.length));
+    var halfSide = Math.floor(side/2);
+    
+    var ncols = originalImage.getSize().getNumberOfColumns();
+    var nrows = originalImage.getSize().getNumberOfRows();
+    
+    // go through the destination image pixels
+    for (var y=0; y<nrows; y++) {
+        for (var x=0; x<ncols; x++) {
+            var dstOff = y*ncols + x;
+            // calculate the weighed sum of the source image pixels that
+            // fall under the convolution matrix
+            var newValue = 0;
+            for (var cy=0; cy<side; cy++) {
+                for (var cx=0; cx<side; cx++) {
+                    var scy = y + cy - halfSide;
+                    var scx = x + cx - halfSide;
+                    if (scy >= 0 && scy < nrows && scx >= 0 && scx < ncols) {
+                        var srcOff = scy*ncols + scx;
+                        var wt = weights[cy*side+cx];
+                        value = originalImage.getValueAtOffset(srcOff);
+                        newValue += value * wt;
+                    }
+                }
+            }
+            newBuffer[dstOff] = (newValue - originalImage.getLookup().rescaleIntercept) / originalImage.getLookup().rescaleSlope;
+        }
+    }
+    
+    return newImage;
+};
+
+dwv.tool.filter.sharpen = function()
+{
+    var newImage = dwv.tool.filter.convolute(
+        [  0, -1,  0,
+          -1,  5, -1,
+           0, -1,  0 ] );
+    
+    app.setImage(newImage);
+    app.generateAndDrawImage();
+};
+
+dwv.tool.filter.sobel = function()
+{
+    var gradX = dwv.tool.filter.convolute(
+        [ -1,  0,  1,
+          -2,  0,  2,
+          -1,  0,  1 ] );
+
+    var gradY = dwv.tool.filter.convolute(
+        [ -1, -2, -1,
+           0,  0,  0,
+           1,  2,  1 ] );
+    
+    gradX.transform( gradY, function(x,y){return Math.sqrt(x*x+y*y); } );
+    
+    app.setImage(gradX);
+    app.generateAndDrawImage();
+};
+
+dwv.tool.filter.clearFilterDiv = function()
+{
+    // find the tool specific node
+    var node = document.getElementById('subFilterDiv');
+    // delete its content
+    while (node.hasChildNodes()) {
+        node.removeChild(node.firstChild);
+    }
+    // remove the tool specific node
+    var top = document.getElementById('filterDiv');
+    top.removeChild(node);
+};
+
 /**
-* @class Threshold Filter.
+* @class Threshold Filter User Interface.
 */
 dwv.tool.filter.ThresholdUI = function()
 {
-    
     this.display = function() {
         var div = document.createElement("div");
-        div.id = "slider-range";
+        div.id = "subFilterDiv";
         document.getElementById('filterDiv').appendChild(div);
 
         var min = app.getImage().getDataRange().min;
         var max = app.getImage().getDataRange().max;
         
-        $( "#slider-range" ).slider({
+        $( "#subFilterDiv" ).slider({
             range: true,
             min: min,
             max: max,
@@ -44,7 +126,60 @@ dwv.tool.filter.ThresholdUI = function()
                 dwv.tool.filter.threshold(ui.values[ 0 ], ui.values[ 1 ]);
             }
         });
+
     };
+};
+
+/**
+* @class Sharpen Filter User Interface.
+*/
+dwv.tool.filter.SharpenUI = function()
+{
+    this.display = function() {
+        var div = document.createElement("div");
+        div.id = "subFilterDiv";
+        
+        var paragraph = document.createElement("p");  
+        paragraph.id = 'applyFilter';
+        paragraph.name = 'applyFilter';
+
+        var button = document.createElement("button");
+        button.id = "applyFilterButton";
+        button.name = "applyFilterButton";
+        button.onclick = dwv.tool.filter.sharpen;
+        var text = document.createTextNode('Apply');
+        button.appendChild(text);
+
+        paragraph.appendChild(button);
+        div.appendChild(paragraph);
+        document.getElementById('filterDiv').appendChild(div);
+    };    
+};
+
+/**
+* @class Sobel Filter User Interface.
+*/
+dwv.tool.filter.SobelUI = function()
+{
+    this.display = function() {
+        var div = document.createElement("div");
+        div.id = "subFilterDiv";
+        
+        var paragraph = document.createElement("p");  
+        paragraph.id = 'applyFilter';
+        paragraph.name = 'applyFilter';
+
+        var button = document.createElement("button");
+        button.id = "applyFilterButton";
+        button.name = "applyFilterButton";
+        button.onclick = dwv.tool.filter.sobel;
+        var text = document.createTextNode('Apply');
+        button.appendChild(text);
+
+        paragraph.appendChild(button);
+        div.appendChild(paragraph);
+        document.getElementById('filterDiv').appendChild(div);
+    };    
 };
 
 /**
@@ -55,15 +190,23 @@ dwv.tool.onchangeFilter = function(event)
     var filterId = parseInt(document.getElementById("filtersMenu").options[
         document.getElementById("filtersMenu").selectedIndex].value, 10);
 
+    var filterUI = 0;
+    dwv.tool.filter.clearFilterDiv();
+    
     switch (filterId)
     {
         case 1: // threshold
-            var filterUI = new dwv.tool.filter.ThresholdUI();
-            filterUI.display();
+            filterUI = new dwv.tool.filter.ThresholdUI();
             break;
-        case 2: // sobel
+        case 2: // sharpen
+            filterUI = new dwv.tool.filter.SharpenUI();
+            break;
+        case 3: // sobel
+            filterUI = new dwv.tool.filter.SobelUI();
             break;
     }
+    
+    filterUI.display();
 };
 
 /**
@@ -100,7 +243,7 @@ dwv.tool.Filter.prototype.appendHtml = function()
     filterSelector.onchange = dwv.tool.onchangeFilter;
     filterSelector.selectedIndex = 1;
     // selector options
-    var filterOptions = ["Threshold", "Sobel"];
+    var filterOptions = ["Threshold", "Sharpen", "Sobel"];
     // append options
     var option;
     for ( var i = 0; i < filterOptions.length; ++i )
