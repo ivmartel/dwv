@@ -488,7 +488,8 @@ dwv.dicom.DicomParser.prototype.getImage = function()
             });
         }
     }
-    image.setLookup( windowPresets, rescaleSlope, rescaleIntercept );
+    var lookup = new dwv.image.LookupTable( windowPresets, rescaleSlope, rescaleIntercept);
+    image.setLookup( lookup );
     // return
     return image;
 };
