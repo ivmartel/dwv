@@ -105,6 +105,7 @@ dwv.image.Image = function(size, spacing, buffer) {
     this.getBuffer = function() {
         return self.buffer;
     };
+    
 };
 
 dwv.image.Image.prototype.getValue = function( i, j, k )
@@ -130,6 +131,13 @@ dwv.image.Image.prototype.setLookup = function( lookup )
 {
     this.lookup = lookup;
     this.lookup.calculateHULookup();
+};
+
+dwv.image.Image.prototype.clone = function()
+{
+    var copy = new dwv.image.Image(this.size, this.spacing, this.originalBuffer);
+    copy.setLookup(this.lookup);
+    return copy;
 };
 
 dwv.image.Image.prototype.generateImageData = function( array, sliceNumber )
@@ -189,4 +197,12 @@ dwv.image.Image.prototype.getHistogram = function()
         }
     }
     return this.histoPlot;
+};
+
+dwv.image.Image.prototype.transform = function(rhs, operator)
+{
+    for(var i=0; i < this.buffer.length; ++i)
+    {   
+        this.buffer[i] = Math.floor( operator( this.getBuffer()[i], rhs.getBuffer()[i] ) );
+    }
 };
