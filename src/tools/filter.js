@@ -9,62 +9,20 @@ dwv.tool.filter = dwv.tool.filter || {};
 
 dwv.tool.filter.threshold = function(min, max)
 {
-    var image = app.getImage().clone();
-    var data = image.getBuffer();
-    var value = 0;
-    for (var i=0; i<data.length; ++i) {
-        value = image.getValueAtOffset(i);
-        if( value < min || value > max) {
-            data[i] = 0;
-        }
-    }
+    var imageMin = app.getImage().getLookup().rescaleIntercept;
+    var threshFunction = function(x){
+        if(x<min||x>max) { return imageMin; } 
+        else { return x; }
+    };
+    var newImage = app.getImage().transform( threshFunction );
     
-    app.setImage(image);
+    app.setImage(newImage);
     app.generateAndDrawImage();
-};
-
-dwv.tool.filter.convolute = function(weights)
-{
-    var originalImage = app.getImage();
-    var newImage = app.getImage().clone();
-    var newBuffer = newImage.getBuffer();
-    var value = 0;
-
-    var side = Math.round(Math.sqrt(weights.length));
-    var halfSide = Math.floor(side/2);
-    
-    var ncols = originalImage.getSize().getNumberOfColumns();
-    var nrows = originalImage.getSize().getNumberOfRows();
-    
-    // go through the destination image pixels
-    for (var y=0; y<nrows; y++) {
-        for (var x=0; x<ncols; x++) {
-            var dstOff = y*ncols + x;
-            // calculate the weighed sum of the source image pixels that
-            // fall under the convolution matrix
-            var newValue = 0;
-            for (var cy=0; cy<side; cy++) {
-                for (var cx=0; cx<side; cx++) {
-                    var scy = y + cy - halfSide;
-                    var scx = x + cx - halfSide;
-                    if (scy >= 0 && scy < nrows && scx >= 0 && scx < ncols) {
-                        var srcOff = scy*ncols + scx;
-                        var wt = weights[cy*side+cx];
-                        value = originalImage.getValueAtOffset(srcOff);
-                        newValue += value * wt;
-                    }
-                }
-            }
-            newBuffer[dstOff] = (newValue - originalImage.getLookup().rescaleIntercept) / originalImage.getLookup().rescaleSlope;
-        }
-    }
-    
-    return newImage;
 };
 
 dwv.tool.filter.sharpen = function()
 {
-    var newImage = dwv.tool.filter.convolute(
+    var newImage = app.getImage().convolute(
         [  0, -1,  0,
           -1,  5, -1,
            0, -1,  0 ] );
@@ -75,19 +33,19 @@ dwv.tool.filter.sharpen = function()
 
 dwv.tool.filter.sobel = function()
 {
-    var gradX = dwv.tool.filter.convolute(
-        [ -1,  0,  1,
-          -2,  0,  2,
-          -1,  0,  1 ] );
+    var gradX = app.getImage().convolute(
+        [ 1,  0,  -1,
+          2,  0,  -2,
+          1,  0,  -1 ] );
 
-    var gradY = dwv.tool.filter.convolute(
-        [ -1, -2, -1,
+    var gradY = app.getImage().convolute(
+        [  1,  2,  1,
            0,  0,  0,
-           1,  2,  1 ] );
+          -1, -2, -1 ] );
     
-    gradX.transform( gradY, function(x,y){return Math.sqrt(x*x+y*y); } );
+    var sobel = gradX.compose( gradY, function(x,y){return Math.sqrt(x*x+y*y);} );
     
-    app.setImage(gradX);
+    app.setImage(sobel);
     app.generateAndDrawImage();
 };
 
