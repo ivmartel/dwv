@@ -45,16 +45,18 @@ dwv.tool.Line = function(app)
 
     // This is called when you release the mouse button.
     this.mouseup = function(ev){
-        if (self.started)
+        if (self.started) 
         {
-            // draw
-            self.mousemove(ev);
-            // save command in undo stack
-            app.getUndoStack().add(command);
+            if( ev._x!==self.x0 && ev._y!==self.y0) {
+                // draw
+                self.mousemove(ev);
+                // save command in undo stack
+                app.getUndoStack().add(command);
+                // merge temporary layer
+                app.getDrawLayer().merge(app.getTempLayer());
+            }
             // set flag
             self.started = false;
-            // merge temporary layer
-            app.getDrawLayer().merge(app.getTempLayer());
         }
     };
     
