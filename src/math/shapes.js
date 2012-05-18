@@ -110,6 +110,7 @@ dwv.math.Rectangle = function(begin, end)
 
 /**
  * @class Region Of Interest shape.
+ * Note: should be a closed path.
  */
 dwv.math.ROI = function()
 {
@@ -129,4 +130,21 @@ dwv.math.ROI = function()
      * @param point The Point2D to add.
      */
     this.addPoint = function(point) { points.push(point); };
+}; // ROI class
+
+/**
+ * @class Path shape.
+ * @param points The list of Point2D that make the path.
+ * Note: first and last point do not need to be equal.
+ */
+dwv.math.Path = function(points)
+{
+    /**
+     * Get a point of the list.
+     * @param index The index of the point to get (beware, no size check).
+     * @return The Point2D at the given index.
+     */ 
+    this.getPoint = function(index) { return points[index]; };
+    // Get the length of the list
+    this.getLength = function() { return points.length; };
 }; // ROI class
