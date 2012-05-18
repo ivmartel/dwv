@@ -659,7 +659,7 @@ Scissors.prototype.doWork = function() {
 
 	var pointCount = 0;
 	var newPoints = new Array();
-	while ( !this.pq.isEmpty() && pointCount < this.pointsPerPost ) {
+	while ( !this.pq.isEmpty() ) {// && pointCount < this.pointsPerPost ) {
 		var p = this.pq.pop();
 		newPoints.push(p);
 		newPoints.push(this.parents[p.y][p.x]);
@@ -687,14 +687,14 @@ Scissors.prototype.doWork = function() {
 		pointCount++;
 	}
 
-	if ( this.pq.isEmpty() ) {
+	/*if ( this.pq.isEmpty() ) {
 		this.setWorking(false);
 		this.status(READY_STR);
 	}
 
 	if ( this.server && this.working ) {
 		this.server.postResults(newPoints);
-	}
+	}*/
 
 	return newPoints;
 };
