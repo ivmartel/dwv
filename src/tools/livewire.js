@@ -11,7 +11,6 @@ dwv.tool.Livewire = function(app)
     var self = this;
     this.started = false;
     var command = null;
-    var path = [];
     
     var parents = [];
     
@@ -28,7 +27,7 @@ dwv.tool.Livewire = function(app)
         self.y0 = ev._y;
         var p = new Point(ev._x, ev._y);
         
-        console.log("p: "+p);
+        //console.log("p: "+p);
         
         scissors.doTraining(p);
         
@@ -48,81 +47,69 @@ dwv.tool.Livewire = function(app)
             return;
         }
         
-        //if( ev._x !== self.x0 && ev._y !== self.y0 )
-        //{
-            var whileCount = 0;
+        //var whileCount = 0;
+        
+        var p = new Point(ev._x, ev._y);
+        //console.log("new p: "+p);
+        
+        scissors.setPoint(p);
+        
+        var results = 0;
+        var stop = false;
+        while( !parents[p.y][p.x] && !stop)
+        {
+            console.log("Getting ready...");
+            results = scissors.doWork();
             
-            var p = new Point(ev._x, ev._y);
-            console.log("new p: "+p);
-            
-            scissors.setPoint(p);
-            
-            var results = 0;
-            whileCount = 0;
-            var stop = false;
-            while( !parents[p.y][p.x] && !stop)
-            {
-                console.log("running: "+(whileCount++));
-                results = scissors.doWork();
-                
-                if( results.length === 0 ) { 
-                    stop = true;
-                    console.log("no more results");
-                }
-                
-                //console.log("parents: "+parents);
-                //console.log("results: "+results);
-                
+            if( results.length === 0 ) { 
+                stop = true;
+            }
+            else {
                 // fill parents
                 for( var i = 0; i < results.length-1; i+=2 ) {
                     var _p = results[i];
                     var _q = results[i+1];
                     parents[_p.y][_p.x] = _q;
                 }
-                console.log("got parent? "+parents[p.y][p.x]);
             }
-            
-            // get path
-            whileCount = 0;
-            //p = results[2];
-            while (p) {
-                console.log("build path: "+(whileCount++));
-                path.push(new dwv.math.Point2D(p.x, p.y));
-                if(!parents[p.y]) { 
-                    console.log("No parent y...");
-                }
-                else { 
-                    console.log("number parents y: "+parents[p.y].length); 
-                    //console.log("parents y: "+parents[p.y]); 
-                    if(!parents[p.y][p.x]) { 
-                        console.log("No parent x..."); 
-                    }
-                    else {
-                        console.log("Got parent!");
-                    }
-                }
-                console.log(parents[p.y][p.x]); 
-                p = parents[p.y][p.x];
+        }
+        console.log("Ready!");
+        
+        // get path
+        var path = [];
+        stop = false;
+        while (p && !stop) {
+            path.push(new dwv.math.Point2D(p.x, p.y));
+            if(!parents[p.y]) { 
+                stop = true;
             }
-            
-            /*// points
-            var beginPoint = new dwv.math.Point2D(self.x0, self.y0);
-            var endPoint = new dwv.math.Point2D(ev._x, ev._y);
-            // check for equality
-            if( beginPoint.equal(endPoint) )
-            {
-                return;
-            }*/
-            
-            // create livewire
-            var livewire = new dwv.math.Path(path);
-            // create draw command
-            command = new dwv.tool.DrawLivewireCommand(livewire, app);
-            // clear the temporary layer
-            app.getTempLayer().clearContextRect();
-            // draw
-            command.execute();
-        //}
+            else { 
+                if(!parents[p.y][p.x]) { 
+                    stop = true;
+                }
+                else {
+                    p = parents[p.y][p.x];
+                }
+            }
+        }
+        
+        /*// points
+        var beginPoint = new dwv.math.Point2D(self.x0, self.y0);
+        var endPoint = new dwv.math.Point2D(ev._x, ev._y);
+        // check for equality
+        if( beginPoint.equal(endPoint) )
+        {
+            return;
+        }*/
+        
+        // create livewire
+        var livewire = new dwv.math.Path(path);
+        // create draw command
+        command = new dwv.tool.DrawLivewireCommand(livewire, app);
+        // clear the temporary layer
+        app.getTempLayer().clearContextRect();
+        // draw
+        command.execute();
     };
 
     // This is called when you release the mouse button.
@@ -180,14 +167,14 @@ dwv.tool.DrawLivewireCommand = function(livewire, app)
         context.fillStyle = livewireColor;
         context.strokeStyle = livewireColor;
         // path
-        for( var i=0; i < livewire.getLength()-1; ++i ) {
-            var begin = livewire.getPoint(i);
-            var end = livewire.getPoint(i+1);
-            context.beginPath();
-            context.moveTo( begin.getX(), begin.getY());
-            context.lineTo( end.getX(), end.getY());
-            context.stroke();
-            context.closePath();
+        context.beginPath();
+        var p = livewire.getPoint(0);
+        context.moveTo( p.getX(), p.getY());
+        for( var i=1; i < livewire.getLength(); ++i ) {
+            p = livewire.getPoint(i);
+            context.lineTo( p.getX(), p.getY());
         }
+        context.stroke();
+        //context.closePath();
     }; 
 }; // DrawLivewireCommand class
