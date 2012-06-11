@@ -1,19 +1,3 @@
-//As of Firefox 3.6.4, object allocation is still very slow. (Except when it's not?)
-//Avoid allocating objects inside loops.
-
-//If setTimout starts running things in new threads, work cancellation will need
-//to be fixed so that it synchronizes correctly.
-
-/*if ( this.importScripts != undefined ) {
-	// We're running this script in a Web Worker, so set up environment
-	
-	importScripts("bucketQueue.js", "scissorsServer.js");
-
-	var scissorsServer = new ScissorsServer(new Scissors()); // Protocol object
-	onmessage = function(event) {
-		scissorsServer.postMessage(event);
-	};
-}*/
 
 var PROCESSING_STR = "Processing...";
 
@@ -35,21 +19,6 @@ Point.prototype.toString = function() {
 	return "(" + this.x + ", " + this.y + ")";
 };
 //// End Point class ////
-
-
-//function computeFixedCost(gradient, laplace) {
-// var fixedCost = new Array()
-
-// for (var y = 0; y < gradient.length; y++) {
-// fixedCost[y] = new Array()
-
-// for (var x = 0; x < gradient[y].length; x++) {
-// fixedCost[y][x] = 0.5 * (gradient[y][x] + laplace[y][x])
-// }
-// }
-
-// return fixedCost
-//}
 
 function computeGreyscale(data, width, height) {
 	// Returns 2D augmented array containing greyscale data
@@ -260,43 +229,6 @@ function gradDirection(gradX, gradY, px, py, qx, qy) {
 }
 gradDirection._2_3_PI = (2 / (3 * Math.PI)); // Precompute'd
 
-//Not currently used.
-function computeGradDirection(gradX, gradY) {
-	var gradDirMat = new Array();
-
-	for ( var dy = -1; dy <= 1; dy++ ) {
-		gradDirMat[dy+1] = new Array();
-
-		for ( var dx = -1; dx <= 1; dx++ ) {
-			if ( dx == 0 && dy == 0 ) {
-				// p == q
-				continue;
-			}
-
-			gradDirMat[dy+1][dx+1] = computeGradDirectionFor(gradX, gradY, dx, dy);
-		}
-	}
-
-	return gradDirMat;
-}
-
-//Not currently used.
-function computeGradDirectionFor(gradX, gradY, dx, dy) {
-	var gradDirMatFor = new Array();
-
-	var endY = Math.min(gradX.length, gradX.length + dy);
-	for ( var y = Math.max(0, -dy); y+dy < endY; y++ ) {
-		gradDirMatFor[y] = new Array();
-
-		var endX = Math.min(gradX[y].length, gradX[y].length + dx);
-		for ( var x = Math.max(0, -dx); x+dx < endX; x++ ) {
-			gradDirMatFor[y][x] = gradDirection(gradX, gradY, x, y, x+dx, y+dy);
-		}
-	}
-
-	return gradDirMatFor;
-}
-
 function computeSides(dist, gradX, gradY, greyscale) {
 	// Returns 2 2D arrays, containing inside and outside greyscale values.
 	// These greyscale values are the intensity just a little bit along the
@@ -314,11 +246,7 @@ function computeSides(dist, gradX, gradY, greyscale) {
 		sides.outside[y] = new Array();
 
 		for ( var x = 0; x < gradX[y].length; x++ ) {
-			//console.log(gradX.length + " " + gradY.length + " " + new Point(x,y) + " " + guv);
-
 			gradUnitVector(gradX, gradY, x, y, guv);
-
-			//console.log(guv + "= (" + guv.x + ", " + guv.y + ")");
 
 			//(x, y) rotated 90 = (y, -x)
 
@@ -358,7 +286,6 @@ function Scissors() {
 	this.gradient = null; // Gradient magnitudes.
 	this.gradX = null; // X-differences.
 	this.gradY = null; // Y-differences.
-	// this.gradDir = null; // Precomputed gradient directions.
 
 	this.parents = null; // Matrix mapping point => parent along shortest-path to root.
 
@@ -547,8 +474,6 @@ Scissors.prototype.addInStaticGrad = function(have, need) {
 };
 
 Scissors.prototype.gradDirection = function(px, py, qx, qy) {
-	// return this.gradDir[(qy-py) + 1][(qx-px) + 1][py][px];
-
 	return gradDirection(this.gradX, this.gradY, px, py, qx, qy);
 };
 
@@ -580,22 +505,6 @@ Scissors.prototype.dist = function(px, py, qx, qy) {
 
 Scissors.prototype.adj = function(p) {
 	var list = new Array();
-
-	// list[0] = new Point(p.x - 1, p.y - 1);
-	// list[1] = new Point(p.x    , p.y - 1);
-	// list[2] = new Point(p.x + 1, p.y - 1);
-
-	// list[3] = new Point(p.x - 1, p.y    );
-	// list[4] = new Point(p.x + 1, p.y    );
-
-	// list[5] = new Point(p.x - 1, p.y + 1);
-	// list[6] = new Point(p.x    , p.y + 1);
-	// list[7] = new Point(p.x + 1, p.y + 1);
-
-	// var sx = Math.max(p.x-1, 0, this.curPoint.x - this.searchSize);
-	// var sy = Math.max(p.y-1, 0, this.curPoint.y - this.searchSize);
-	// var ex = Math.min(p.x+1, this.greyscale[0].length-1, this.curPoint.x + this.searchSize);
-	// var ey = Math.min(p.y+1, this.greyscale.length-1, this.curPoint.y + this.searchSize);
 
 	var sx = Math.max(p.x-1, 0);
 	var sy = Math.max(p.y-1, 0);
@@ -659,7 +568,7 @@ Scissors.prototype.doWork = function() {
 
 	var pointCount = 0;
 	var newPoints = new Array();
-	while ( !this.pq.isEmpty() ) {// && pointCount < this.pointsPerPost ) {
+	while ( !this.pq.isEmpty() && pointCount < this.pointsPerPost ) {
 		var p = this.pq.pop();
 		newPoints.push(p);
 		newPoints.push(this.parents[p.y][p.x]);
@@ -687,15 +596,7 @@ Scissors.prototype.doWork = function() {
 		pointCount++;
 	}
 
-	/*if ( this.pq.isEmpty() ) {
-		this.setWorking(false);
-		this.status(READY_STR);
-	}
-
-	if ( this.server && this.working ) {
-		this.server.postResults(newPoints);
-	}*/
-
 	return newPoints;
 };
+
 //// End Scissors class ////
