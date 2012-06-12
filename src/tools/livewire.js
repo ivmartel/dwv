@@ -11,13 +11,22 @@ dwv.tool.Livewire = function(app)
     var self = this;
     this.started = false;
     var command = null;
+    // paths are stored in reverse order
+    var path = new dwv.math.Path();
+    var currentPath = new dwv.math.Path();
+    var parentPoints = [];
+    var tolerance = 5;
     
-    var parents = [];
-    // init parents
-    parents = [];
-    for( var i = 0; i < app.getImage().getSize().getNumberOfRows(); ++i ) {
-        parents[i] = [];
-    }
+    clearParentPoints = function() {
+        for( var i = 0; i < app.getImage().getSize().getNumberOfRows(); ++i ) {
+            parentPoints[i] = [];
+        }
+    };
+    
+    clearPaths = function() {
+        path = new dwv.math.Path();
+        currentPath = new dwv.math.Path();
+    };
     
     var scissors = new dwv.math.Scissors();
     scissors.setDimensions(
@@ -27,13 +36,42 @@ dwv.tool.Livewire = function(app)
     
     // This is called when you start holding down the mouse button.
     this.mousedown = function(ev){
-        self.started = true;
-        self.x0 = ev._x;
-        self.y0 = ev._y;
-        
-        var p = new dwv.math.FastPoint2D(ev._x, ev._y);
-        scissors.doTraining(p);
-        
+        // first time
+        if( !self.started ) {
+            self.started = true;
+            self.x0 = ev._x;
+            self.y0 = ev._y;
+            // do the training from the first point
+            clearPaths();
+            clearParentPoints();
+            var p = new dwv.math.FastPoint2D(ev._x, ev._y);
+            scissors.doTraining(p);
+            var p0 = new dwv.math.Point2D(ev._x, ev._y);
+            path.addPoint(p0);
+            path.addControlPoint(p0);
+        }
+        else {
+            // final point: one pixel tolerance
+            if( (Math.abs(ev._x - self.x0) < tolerance) && (Math.abs(ev._y - self.y0) < tolerance) ) {
+                console.log("Done.");
+                // draw
+                self.mousemove(ev);
+                // save command in undo stack
+                app.getUndoStack().add(command);
+                // merge temporary layer
+                app.getDrawLayer().merge(app.getTempLayer());
+                // set flag
+                self.started = false;
+            }
+            // anchor point
+            else {
+                path = currentPath;
+                clearParentPoints();
+                var pn = new dwv.math.FastPoint2D(ev._x, ev._y);
+                scissors.doTraining(pn);
+                path.addControlPoint(currentPath.getPoint(0));
+            }
+        }
     };
 
     // This function is called every time you move the mouse.
@@ -42,13 +80,13 @@ dwv.tool.Livewire = function(app)
         {
             return;
         }
-        
+        // set the point to find the path to
         var p = new dwv.math.FastPoint2D(ev._x, ev._y);
         scissors.setPoint(p);
-        
+        // do the work
         var results = 0;
         var stop = false;
-        while( !parents[p.y][p.x] && !stop)
+        while( !parentPoints[p.y][p.x] && !stop)
         {
             console.log("Getting ready...");
             results = scissors.doWork();
@@ -61,34 +99,33 @@ dwv.tool.Livewire = function(app)
                 for( var i = 0; i < results.length-1; i+=2 ) {
                     var _p = results[i];
                     var _q = results[i+1];
-                    parents[_p.y][_p.x] = _q;
+                    parentPoints[_p.y][_p.x] = _q;
                 }
             }
         }
         console.log("Ready!");
         
-        // get path
-        var path = [];
+        // get the path
+        currentPath = new dwv.math.Path();
         stop = false;
         while (p && !stop) {
-            path.push(new dwv.math.Point2D(p.x, p.y));
-            if(!parents[p.y]) { 
+            currentPath.addPoint(new dwv.math.Point2D(p.x, p.y));
+            if(!parentPoints[p.y]) { 
                 stop = true;
             }
             else { 
-                if(!parents[p.y][p.x]) { 
+                if(!parentPoints[p.y][p.x]) { 
                     stop = true;
                 }
                 else {
-                    p = parents[p.y][p.x];
+                    p = parentPoints[p.y][p.x];
                 }
             }
         }
+        currentPath.appenPath(path);
         
-        // create livewire
-        var livewire = new dwv.math.Path(path);
         // create draw command
-        command = new dwv.tool.DrawLivewireCommand(livewire, app);
+        command = new dwv.tool.DrawLivewireCommand(currentPath, app);
         // clear the temporary layer
         app.getTempLayer().clearContextRect();
         // draw
@@ -97,19 +134,7 @@ dwv.tool.Livewire = function(app)
 
     // This is called when you release the mouse button.
     this.mouseup = function(ev){
-        if (self.started)
-        {
-            if( ev._x!==self.x0 && ev._y!==self.y0) {
-                // draw
-                self.mousemove(ev);
-                // save command in undo stack
-                app.getUndoStack().add(command);
-                // merge temporary layer
-                app.getDrawLayer().merge(app.getTempLayer());
-            }
-            // set flag
-            self.started = false;
-        }
+        // nothing to do
     };
     
     this.enable = function(value){
@@ -156,6 +181,11 @@ dwv.tool.DrawLivewireCommand = function(livewire, app)
         for( var i=1; i < livewire.getLength(); ++i ) {
             p = livewire.getPoint(i);
             context.lineTo( p.getX(), p.getY());
+        }
+        console.log("cp size: "+livewire.controlPointIndexArray.length);
+        for( var j=0; j < livewire.controlPointIndexArray.length; ++j ) { 
+            p = livewire.getPoint(livewire.controlPointIndexArray[j]);
+            context.fillRect(p.getX(), p.getY(), 5, 5);
         }
         context.stroke();
         //context.closePath();
