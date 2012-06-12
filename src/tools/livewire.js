@@ -13,8 +13,13 @@ dwv.tool.Livewire = function(app)
     var command = null;
     
     var parents = [];
+    // init parents
+    parents = [];
+    for( var i = 0; i < app.getImage().getSize().getNumberOfRows(); ++i ) {
+        parents[i] = [];
+    }
     
-    var scissors = new Scissors();
+    var scissors = new dwv.math.Scissors();
     scissors.setDimensions(
         app.getImage().getSize().getNumberOfColumns(),
         app.getImage().getSize().getNumberOfRows() );
@@ -25,19 +30,10 @@ dwv.tool.Livewire = function(app)
         self.started = true;
         self.x0 = ev._x;
         self.y0 = ev._y;
-        var p = new Point(ev._x, ev._y);
         
-        //console.log("p: "+p);
-        
+        var p = new dwv.math.FastPoint2D(ev._x, ev._y);
         scissors.doTraining(p);
         
-        // init parents
-        parents = [];
-        for( var i = 0; i < app.getImage().getSize().getNumberOfRows(); ++i ) {
-            parents[i] = [];
-        }
-        
-
     };
 
     // This function is called every time you move the mouse.
@@ -47,11 +43,7 @@ dwv.tool.Livewire = function(app)
             return;
         }
         
-        //var whileCount = 0;
-        
-        var p = new Point(ev._x, ev._y);
-        //console.log("new p: "+p);
-        
+        var p = new dwv.math.FastPoint2D(ev._x, ev._y);
         scissors.setPoint(p);
         
         var results = 0;
@@ -92,15 +84,6 @@ dwv.tool.Livewire = function(app)
                 }
             }
         }
-        
-        /*// points
-        var beginPoint = new dwv.math.Point2D(self.x0, self.y0);
-        var endPoint = new dwv.math.Point2D(ev._x, ev._y);
-        // check for equality
-        if( beginPoint.equal(endPoint) )
-        {
-            return;
-        }*/
         
         // create livewire
         var livewire = new dwv.math.Path(path);

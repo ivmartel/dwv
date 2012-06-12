@@ -9,7 +9,7 @@ dwv.math = dwv.math || {};
  */
 
 /**
- * @class 2D point.
+ * @class 2D point. Immutable.
  * @param x The X coordinate for the point.
  * @param y The Y coordinate for the point.
  */
@@ -19,13 +19,58 @@ dwv.math.Point2D = function(x,y)
     this.getX = function() { return x; };
     // Get the Y position of the point.
     this.getY = function() { return y; };
-    /**
-     * Check for equality.
-     * @param other The other Point2D to compare to.
-     * @return True if both points are equal.
-     */ 
-    this.equal = function(other) { return ( x === other.getX() && y === other.getY() ); };
 }; // Point2D class
+
+/**
+ * Check for Point2D equality.
+ * @param other The other Point2D to compare to.
+ * @return True if both points are equal.
+ */ 
+dwv.math.Point2D.prototype.equals = function(other) {
+    if( !other ) { 
+        return false;
+    }
+    return ( this.getX() === other.getX() && this.getY() === other.getY() );
+};
+
+/**
+ * Get a string representation of the Point2D.
+ * @return The Point2D as string.
+ */ 
+dwv.math.Point2D.prototype.toString = function() {
+    return "(" + this.getX() + ", " + this.getY() + ")";
+};
+
+/**
+ * @class Fast 2D point since it's mutable!
+ * @param x The X coordinate for the point.
+ * @param y The Y coordinate for the point.
+ */
+dwv.math.FastPoint2D = function(x,y)
+{
+    this.x = x;
+    this.y = y;
+}; // FastPoint2D class
+
+/**
+ * Check for FastPoint2D equality.
+ * @param other The other FastPoint2D to compare to.
+ * @return True if both points are equal.
+ */ 
+dwv.math.FastPoint2D.prototype.equals = function(other) {
+    if( !other ) { 
+        return false;
+    }
+    return ( this.x === other.x && this.y === other.y );
+};
+
+/**
+ * Get a string representation of the FastPoint2D.
+ * @return The Point2D as string.
+ */ 
+dwv.math.FastPoint2D.prototype.toString = function() {
+    return "(" + this.x + ", " + this.y + ")";
+};
 
 /**
  * @class Circle shape.
