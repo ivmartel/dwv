@@ -29,7 +29,7 @@ dwv.tool.Line = function(app)
         var beginPoint = new dwv.math.Point2D(self.x0, self.y0);
         var endPoint = new dwv.math.Point2D(ev._x, ev._y);
         // check for equality
-        if( beginPoint.equal(endPoint) )
+        if( beginPoint.equals(endPoint) )
         {
             return;
         }
