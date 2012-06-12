@@ -237,7 +237,6 @@ dwv.math.computeSides = function(dist, gradX, gradY, greyscale) {
 
 		for ( var x = 0; x < gradX[y].length; x++ ) {
 		    dwv.math.gradUnitVector(gradX, gradY, x, y, guv);
-			//guv = gradUnitVector(gradX, gradY, x, y);
 
 			//(x, y) rotated 90 = (y, -x)
 
@@ -446,7 +445,7 @@ dwv.math.Scissors.prototype.calculateTraining = function(buffer, granularity, in
 	}
 
 	// Blur it, as suggested. Gets rid of static.
-	gaussianBlur(buffer, output);
+	dwv.math.gaussianBlur(buffer, output);
 };
 
 dwv.math.Scissors.prototype.addInStaticGrad = function(have, need) {
