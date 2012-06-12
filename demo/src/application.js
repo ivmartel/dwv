@@ -34,6 +34,7 @@ dwv.App = function()
     
     // Get the image details.
     this.getImage = function() { return image; };
+    this.setImage = function(img) { image = img; };    
     
     // Get the tool box.
     this.getToolBox = function() { return toolBox; };

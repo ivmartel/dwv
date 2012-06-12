@@ -29,7 +29,7 @@ dwv.tool.Line = function(app)
         var beginPoint = new dwv.math.Point2D(self.x0, self.y0);
         var endPoint = new dwv.math.Point2D(ev._x, ev._y);
         // check for equality
-        if( beginPoint.equal(endPoint) )
+        if( beginPoint.equals(endPoint) )
         {
             return;
         }
@@ -45,16 +45,18 @@ dwv.tool.Line = function(app)
 
     // This is called when you release the mouse button.
     this.mouseup = function(ev){
-        if (self.started)
+        if (self.started) 
         {
-            // draw
-            self.mousemove(ev);
-            // save command in undo stack
-            app.getUndoStack().add(command);
+            if( ev._x!==self.x0 && ev._y!==self.y0) {
+                // draw
+                self.mousemove(ev);
+                // save command in undo stack
+                app.getUndoStack().add(command);
+                // merge temporary layer
+                app.getDrawLayer().merge(app.getTempLayer());
+            }
             // set flag
             self.started = false;
-            // merge temporary layer
-            app.getDrawLayer().merge(app.getTempLayer());
         }
     };
     
