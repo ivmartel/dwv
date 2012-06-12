@@ -182,7 +182,6 @@ dwv.tool.DrawLivewireCommand = function(livewire, app)
             p = livewire.getPoint(i);
             context.lineTo( p.getX(), p.getY());
         }
-        console.log("cp size: "+livewire.controlPointIndexArray.length);
         for( var j=0; j < livewire.controlPointIndexArray.length; ++j ) { 
             p = livewire.getPoint(livewire.controlPointIndexArray[j]);
             context.fillRect(p.getX(), p.getY(), 5, 5);

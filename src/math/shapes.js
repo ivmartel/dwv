@@ -237,7 +237,6 @@ dwv.math.Path.prototype.addPoint = function(point) {
 dwv.math.Path.prototype.addControlPoint = function(point) {
     var index = this.pointArray.indexOf(point);
     if( index !== -1 ) {
-        console.log("addControlPoint: added at "+index);
         this.controlPointIndexArray.push(index);
     }
     else {
