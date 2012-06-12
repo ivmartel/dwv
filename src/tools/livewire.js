@@ -41,21 +41,23 @@ dwv.tool.Livewire = function(app)
             self.started = true;
             self.x0 = ev._x;
             self.y0 = ev._y;
-            // do the training from the first point
+            // clear vars
             clearPaths();
             clearParentPoints();
+            // do the training from the first point
             var p = new dwv.math.FastPoint2D(ev._x, ev._y);
             scissors.doTraining(p);
+            // add the initial point to the path
             var p0 = new dwv.math.Point2D(ev._x, ev._y);
             path.addPoint(p0);
             path.addControlPoint(p0);
         }
         else {
-            // final point: one pixel tolerance
+            // final point: at 'tolerance' of the initial point
             if( (Math.abs(ev._x - self.x0) < tolerance) && (Math.abs(ev._y - self.y0) < tolerance) ) {
-                console.log("Done.");
                 // draw
                 self.mousemove(ev);
+                console.log("Done.");
                 // save command in undo stack
                 app.getUndoStack().add(command);
                 // merge temporary layer
