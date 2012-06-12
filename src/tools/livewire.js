@@ -17,16 +17,16 @@ dwv.tool.Livewire = function(app)
     var parentPoints = [];
     var tolerance = 5;
     
-    clearParentPoints = function() {
+    function clearParentPoints() {
         for( var i = 0; i < app.getImage().getSize().getNumberOfRows(); ++i ) {
             parentPoints[i] = [];
         }
-    };
+    }
     
-    clearPaths = function() {
+    function clearPaths() {
         path = new dwv.math.Path();
         currentPath = new dwv.math.Path();
-    };
+    }
     
     var scissors = new dwv.math.Scissors();
     scissors.setDimensions(
@@ -186,7 +186,7 @@ dwv.tool.DrawLivewireCommand = function(livewire, app)
         }
         for( var j=0; j < livewire.controlPointIndexArray.length; ++j ) { 
             p = livewire.getPoint(livewire.controlPointIndexArray[j]);
-            context.fillRect(p.getX(), p.getY(), 5, 5);
+            context.fillRect(p.getX()-3, p.getY()-3, 5, 5);
         }
         context.stroke();
         //context.closePath();
