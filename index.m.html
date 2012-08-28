@@ -3,7 +3,7 @@
 <head>
 <title>DICOM Web Viewer</title>
 <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1" />
-<link rel="stylesheet" href="css/style.css" />
+<link rel="stylesheet" href="css/style.m.css" />
 <link rel="stylesheet" href="css/ui-darkness/jquery-ui-1.8.16.custom.css">
 <link rel="stylesheet" href="css/jquery.mobile-1.1.1.min.css" />
 <!-- Third party -->  
@@ -45,6 +45,7 @@
 
 <div data-role="header">
 <h1>DICOM Web Viewer</h1>
+<a href="../../" data-icon="info" data-iconpos="notext">Info</a>
 </div><!-- /header -->
 
 <div data-role="content">   
@@ -54,37 +55,31 @@
 <p><form>
 Path: <input type="file" id="files" name="files[]" multiple />
 </form></p>
-<div id="progressbar"></div>
+<div id="progressbar"  style="display:none;""></div>
 </div>
 
 <!-- Layer Container -->
+<div id="centerDiv">
 <div id="layerContainer" title="Image">
-<canvas id="imageLayer" width="512" height="512"></canvas>
-<canvas id="drawLayer" width="512" height="512"></canvas>
-<canvas id="infoLayer" width="512" height="512"></canvas>
-<canvas id="tempLayer" width="512" height="512"></canvas>
+<canvas id="imageLayer" style="display:none;"></canvas>
+<canvas id="drawLayer" style="display:none;"></canvas>
+<canvas id="infoLayer" style="display:none;"></canvas>
+<canvas id="tempLayer" style="display:none;"></canvas>
+</div>
+</div>
 </div>
 
 <!-- Toolbox -->
-<div id="toolbox" title="Toolbox">
+<div id="toolbox" title="Toolbox" style="display:none;">
 </div>
 
 <!-- History -->
-<div id="history" title="History"></div>
+<div id="history" title="History" style="display:none;"></div>
 
 <!-- Tags -->
 <div id="tags" title="Tags" style="display:none;"></div>
 
 </div><!-- /content -->
-
-<div data-role="footer">
-<div data-role="navbar">
-<ul>
-<li><a href="a.html" class="ui-btn-active">Image</a></li>
-<li><a href="b.html">Tags</a></li>
-</ul>
-</div><!-- /navbar -->
-</div><!-- /header -->
 
 </div><!-- /page -->
 
