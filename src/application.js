@@ -208,7 +208,7 @@ dwv.App = function()
         // append new table
         node.appendChild(table);
         // display it
-        node.style.display='';
+        //node.style.display='';
         
         // table search form
         var tagSearchform = document.createElement("form");
@@ -236,12 +236,15 @@ dwv.App = function()
         imageLayer = new dwv.html.Layer("imageLayer");
         imageLayer.init(numberOfColumns, numberOfRows);
         imageLayer.fillContext();
+        imageLayer.display(true);
         // draw layer
         drawLayer = new dwv.html.Layer("drawLayer");
         drawLayer.init(numberOfColumns, numberOfRows);
+        drawLayer.display(true);
         // temp layer
         tempLayer = new dwv.html.Layer("tempLayer");
         tempLayer.init(numberOfColumns, numberOfRows);
+        tempLayer.display(true);
         // Attach the mousedown, mousemove and mouseup event listeners.
         tempLayer.getCanvas().addEventListener('mousedown', eventHandler, false);
         tempLayer.getCanvas().addEventListener('mousemove', eventHandler, false);
@@ -251,6 +254,7 @@ dwv.App = function()
         // info layer
         infoLayer = new dwv.html.Layer("infoLayer");
         infoLayer.init(numberOfColumns, numberOfRows);
+        infoLayer.display(true);
         
         // Keydown listener
         window.addEventListener('keydown', eventHandler, true);

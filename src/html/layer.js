@@ -184,4 +184,25 @@ dwv.html.Layer = function(name)
         context.fillStyle = color;
         context.strokeStyle = color;
     };
+    
+    /**
+     * Display the layer.
+     */
+    this.display = function(val)
+    {
+        if( val === true )
+        {
+            canvas.style.display = '';
+        }
+        else
+        {
+            canvas.style.display = 'none';
+        }
+    };
+    
+    this.align = function(rhs)
+    {
+        var a = rhs.offsetLeft;
+        canvas.offsetLeft = rhs.offsetLeft;
+    };
 }; // Layer class
