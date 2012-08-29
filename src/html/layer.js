@@ -199,10 +199,4 @@ dwv.html.Layer = function(name)
             canvas.style.display = 'none';
         }
     };
-    
-    this.align = function(rhs)
-    {
-        var a = rhs.offsetLeft;
-        canvas.offsetLeft = rhs.offsetLeft;
-    };
 }; // Layer class
