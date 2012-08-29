@@ -227,7 +227,7 @@ dwv.App = function()
      * @private
      * To be called once the image is loaded.
      */
-    function postLoadInit()
+    function layoutLayers()
     {
         var numberOfColumns = image.getSize().getNumberOfColumns();
         var numberOfRows = image.getSize().getNumberOfRows();
@@ -245,17 +245,39 @@ dwv.App = function()
         tempLayer = new dwv.html.Layer("tempLayer");
         tempLayer.init(numberOfColumns, numberOfRows);
         tempLayer.display(true);
+        // info layer
+        infoLayer = new dwv.html.Layer("infoLayer");
+        infoLayer.init(numberOfColumns, numberOfRows);
+        infoLayer.display(true);
+    }
+    
+    /**
+     * @private
+     * To be called once the image is loaded.
+     */
+    this.alignLayers = function()
+    {
+        drawLayer.align(imageLayer);
+        tempLayer.align(imageLayer);
+        infoLayer.align(imageLayer);
+    };
+    
+    /**
+     * @private
+     * To be called once the image is loaded.
+     */
+    function postLoadInit()
+    {
+        layoutLayers();
+        self.alignLayers();
+        
         // Attach the mousedown, mousemove and mouseup event listeners.
         tempLayer.getCanvas().addEventListener('mousedown', eventHandler, false);
         tempLayer.getCanvas().addEventListener('mousemove', eventHandler, false);
         tempLayer.getCanvas().addEventListener('mouseup', eventHandler, false);
         tempLayer.getCanvas().addEventListener('mousewheel', eventHandler, false);
         tempLayer.getCanvas().addEventListener('DOMMouseScroll', eventHandler, false);
-        // info layer
-        infoLayer = new dwv.html.Layer("infoLayer");
-        infoLayer.init(numberOfColumns, numberOfRows);
-        infoLayer.display(true);
-        
+
         // Keydown listener
         window.addEventListener('keydown', eventHandler, true);
 

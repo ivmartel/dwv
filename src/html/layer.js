@@ -199,4 +199,13 @@ dwv.html.Layer = function(name)
             canvas.style.display = 'none';
         }
     };
+    
+    /**
+     * Align on another layer.
+     */
+    this.align = function(rhs)
+    {
+        canvas.style.top = rhs.getCanvas().offsetTop;
+        canvas.style.left = rhs.getCanvas().offsetLeft;
+    };
 }; // Layer class

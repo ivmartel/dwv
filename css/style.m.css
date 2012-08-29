@@ -15,18 +15,16 @@ a { color: #ddf; }
 #centerDiv { 
     margin: auto;
 	text-align:center;
-	border: 1px solid pink;
 }
 
 #layerContainer { 
 	overflow: auto; 
     position: relative; 
     width: auto;
-    background-color: #555;
-    border: 1px solid blue;
+    background-color: #222;
 }
 
-#imageLayer { border: 1px solid red; }
+#imageLayer { border: 1px solid #aaa; }
 #drawLayer { position: absolute; top: 0px; left: 0px; }
 #tempLayer { position: absolute; top: 0px; left: 0px; }
 #infoLayer { position: absolute; top: 0px; left: 0px; }
