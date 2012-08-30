@@ -196,8 +196,14 @@ dwv.html.Layer = function(name)
         }
         else
         {
-            canvas.style.display = 'none';
+            canvas.style.display = "none";
         }
+    };
+    
+    this.isVisible = function()
+    {
+      if( canvas.style.display === "none" ) return false;
+      else return true;
     };
     
     /**

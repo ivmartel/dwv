@@ -28,6 +28,7 @@ a { color: #ddf; }
 #drawLayer { position: absolute; top: 0px; left: 0px; }
 #tempLayer { position: absolute; top: 0px; left: 0px; }
 #infoLayer { position: absolute; top: 0px; left: 0px; }
+#plot { position: absolute; top: 0px; left: 0px; }
 
 /* Tag list */
 table.tagList { border-collapse:collapse; }

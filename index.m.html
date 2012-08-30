@@ -37,6 +37,17 @@
 <script type="text/javascript" src="src/tools/filter.js"></script>
 <script type="text/javascript" src="src/tools/undo.js"></script>
 <script type="text/javascript" src="src/utils/string.js"></script>
+
+<script type="text/javascript">
+function toggleInfo()
+{
+    if( app.getInfoLayer() )
+    {
+        app.getInfoLayer().display( !app.getInfoLayer().isVisible() );
+    }
+}
+</script>
+
 </head>
 
 <body>
@@ -45,18 +56,32 @@
 
 <div data-role="header">
 <h1>DICOM Web Viewer</h1>
-<a href="../../" data-icon="info" data-iconpos="notext">Info</a>
 </div><!-- /header -->
 
 <div data-role="content">   
 
+
+<div class="ui-grid-a">
+
+<div class="ui-block-a" style="border:1px solid blue">
 <!-- Open file -->
 <div id="openFile" title="Open File">
-<p><form>
+<form>
 Path: <input type="file" id="files" name="files[]" multiple />
-</form></p>
-<div id="progressbar"  style="display:none;""></div>
+</form>
+<div id="progressbar" style="display:none;""></div>
 </div>
+</div>
+
+<div class="ui-block-b" style="border:1px solid red">
+<div id="controls" data-role="controlgroup" style="text-align:right">
+<a href="#" data-role="button" 
+data-icon="info" data-iconpos="notext" data-inline="true"
+onclick="toggleInfo()">Info</a>
+</div>
+</div>
+
+</div><!-- /grid-a -->
 
 <!-- Layer Container -->
 <div id="centerDiv">
@@ -65,6 +90,7 @@ Path: <input type="file" id="files" name="files[]" multiple />
 <canvas id="drawLayer" style="display:none;"></canvas>
 <canvas id="infoLayer" style="display:none;"></canvas>
 <canvas id="tempLayer" style="display:none;"></canvas>
+<div id="plot" style="width:100px;height:70px"></div>
 </div>
 </div>
 </div>

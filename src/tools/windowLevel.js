@@ -285,7 +285,9 @@ dwv.tool.WindowLevel.prototype.updatePlot = function(wc,ww)
 
     $.plot($("#plot"), [ app.getImage().getHistogram() ], {
         bars: { show: true },
-        grid: { markings: markings }
+        grid: { markings: markings, backgroundColor: null },
+        xaxis: { show: false },
+        yaxis: { show: false }
     });
 };
 
