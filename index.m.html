@@ -63,22 +63,18 @@ function toggleInfo()
 
 <div class="ui-grid-a">
 
-<div class="ui-block-a" style="border:1px solid blue">
 <!-- Open file -->
-<div id="openFile" title="Open File">
+<div id="openFile" class="ui-block-a" title="Open File">
 <form>
 Path: <input type="file" id="files" name="files[]" multiple />
 </form>
 <div id="progressbar" style="display:none;""></div>
 </div>
-</div>
 
-<div class="ui-block-b" style="border:1px solid red">
-<div id="controls" data-role="controlgroup" style="text-align:right">
+<div id="controls" data-role="controlgroup" class="ui-block-b" style="text-align:right">
 <a href="#" data-role="button" 
 data-icon="info" data-iconpos="notext" data-inline="true"
 onclick="toggleInfo()">Info</a>
-</div>
 </div>
 
 </div><!-- /grid-a -->
