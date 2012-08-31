@@ -52,6 +52,52 @@ dwv.tool.showWindowingValue = function(windowCenter,windowWidth)
     // text
     context.fillText("WindowCenter = "+windowCenter, canvas.width - border, border);
     context.fillText("WindowWidth = "+windowWidth, canvas.width - border, border + style.getLineHeight());
+    
+    // append color map
+    // fill in the image data
+    var colourMap = dwv.image.lut.plain;
+    var imageData = context.getImageData(0,0,canvas.width, canvas.height);
+    var height = 10;
+    var width = 100;
+    var margin = 1;
+    var iEnd = canvas.width - margin;
+    var iStart = iEnd - width;
+    var jEnd = canvas.height - margin;
+    var jStart = jEnd - height;
+    
+    var c = 0;
+    var minInt = app.getImage().getDataRange().min;
+    var range = app.getImage().getDataRange().max - minInt;
+    var incrC = range / width;
+    var y = 0;
+    
+    var yMax = 255;
+    var yMin = 0;
+    var xMin = windowCenter - 0.5 - (windowWidth-1) / 2;
+    var xMax = windowCenter - 0.5 + (windowWidth-1) / 2;    
+    
+    for( var j=jStart; j<jEnd; ++j ) {
+        c = minInt;
+        for( var i=iStart; i<iEnd; ++i ) {
+            if( c <= xMin ) y = yMin;
+            else if( c > xMax ) y = yMax;
+            else {
+                y = ( (c - (windowCenter-0.5) ) / (windowWidth-1) + 0.5 )
+                    * (yMax-yMin) + yMin;
+                y = parseInt(y,10);
+            }
+            index = (i + j * imageData.width) * 4;
+            imageData.data[index] = colourMap.red[y];
+            imageData.data[index+1] = colourMap.green[y];
+            imageData.data[index+2] = colourMap.blue[y];
+            imageData.data[index+3] = 0xff;
+            c += incrC;
+        }
+    }
+    // put the image data in the context
+    context.putImageData(imageData, 0, 0);
+    
+
 };
 
 /**
@@ -265,6 +311,7 @@ dwv.tool.WindowLevel.prototype.appendHtml = function()
     plotDiv.style.width = "250px";
     plotDiv.style.height = "150px";
     
+    // put all together
     div.appendChild(wlParagraph);
     div.appendChild(cmParagraph);
     div.appendChild(plotDiv);
@@ -273,8 +320,8 @@ dwv.tool.WindowLevel.prototype.appendHtml = function()
 
 dwv.tool.WindowLevel.prototype.updatePlot = function(wc,ww)
 {
-    var half = parseInt( parseInt(ww,10) / 2, 10 );
-    var center = parseInt(wc,10);
+    var half = parseInt( (ww-1) / 2, 10 );
+    var center = parseInt( (wc-0.5), 10 );
     var min = center - half;
     var max = center + half;
     
