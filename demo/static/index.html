@@ -1,0 +1,114 @@
+<html>
+
+<head>
+<title>DICOM Web Viewer</title>
+<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/ui-darkness/jquery-ui-1.8.16.custom.css">
+</head>
+
+<body>
+<!-- Third party -->  
+<script type="text/javascript" src="ext/jquery/jquery-1.7.1.min.js"></script>
+<script type="text/javascript" src="ext/jquery/jquery-ui-1.8.18.custom.min.js"></script>
+<script type="text/javascript" src="ext/flot/jquery.flot.min.js"></script>
+<!-- Local -->
+<script type="text/javascript" src="src/dwv.js"></script>
+<script type="text/javascript" src="src/application.js"></script>
+<script type="text/javascript" src="src/dicom/dicomParser.js"></script>
+<script type="text/javascript" src="src/dicom/dictionary.js"></script>
+<script type="text/javascript" src="src/html/html.js"></script>
+<script type="text/javascript" src="src/html/style.js"></script>
+<script type="text/javascript" src="src/html/layer.js"></script>
+<script type="text/javascript" src="src/image/image.js"></script>
+<script type="text/javascript" src="src/image/lookupTable.js"></script>
+<script type="text/javascript" src="src/image/luts.js"></script>
+<script type="text/javascript" src="src/math/shapes.js"></script>
+<script type="text/javascript" src="src/math/bucketQueue.js"></script>
+<script type="text/javascript" src="src/math/scissors.js"></script>
+<script type="text/javascript" src="src/tools/toolbox.js"></script>
+<script type="text/javascript" src="src/tools/draw.js"></script>
+<script type="text/javascript" src="src/tools/rectangle.js"></script>
+<script type="text/javascript" src="src/tools/roi.js"></script>
+<script type="text/javascript" src="src/tools/line.js"></script>
+<script type="text/javascript" src="src/tools/livewire.js"></script>
+<script type="text/javascript" src="src/tools/circle.js"></script>
+<script type="text/javascript" src="src/tools/windowLevel.js"></script>
+<script type="text/javascript" src="src/tools/zoom.js"></script>
+<script type="text/javascript" src="src/tools/filter.js"></script>
+<script type="text/javascript" src="src/tools/undo.js"></script>
+<script type="text/javascript" src="src/utils/string.js"></script>
+
+<script type="text/javascript">
+
+function toggle(dialogName)
+{
+    if( $(dialogName).dialog('isOpen') )
+    {
+        $(dialogName).dialog('close');
+    }
+    else
+    {
+        $(dialogName).dialog('open');
+    }
+}
+
+// main application
+var app = new dwv.App();
+
+// jquery
+$(document).ready(function(){
+    // create buttons and dialogs
+    $("button").button();
+    $("#openFile").dialog({ position: [10, 110] });
+    $("#toolbox").dialog({ position: [10, 280] });
+    $("#history").dialog({ position: [10, 450], autoOpen: false });
+    $("#tags").dialog({ position: ['right', 110], autoOpen: false, height: 400, width: 400 });
+    
+    $("#layerContainer").dialog({ position: [340, 110], 
+        width: [550], height: [570] });
+    
+    // initialise the application
+    app.init();
+});
+    
+</script>
+
+<!-- Title -->
+<h1>DICOM Web Viewer (<a href="https://github.com/ivmartel/dwv">dwv</a>)</h1>
+
+<!-- Buttons -->
+<button onclick="toggle('#openFile')">Open File</button>
+<button onclick="toggle('#toolbox')">Toolbox</button>
+<button onclick="toggle('#history')">History</button>
+<button onclick="toggle('#tags')">Tags</button>
+<button onclick="toggle('#layerContainer')">Image</button>
+
+<!-- Open file -->
+<div id="openFile" title="Open File">
+<p><form>
+Path: <input type="file" id="files" name="files[]" multiple />
+</form></p>
+<div id="progressbar"></div>
+</div>
+
+<!-- Toolbox -->
+<div id="toolbox" title="Toolbox">
+</div>
+
+<!-- History -->
+<div id="history" title="History"></div>
+
+<!-- Tags -->
+<div id="tags" title="Tags" style="display:none;"></div>
+
+<!-- Layer Container -->
+<div id="layerContainer" title="Image">
+<canvas id="imageLayer" width="512" height="512"></canvas>
+<canvas id="drawLayer" width="512" height="512"></canvas>
+<canvas id="infoLayer" width="512" height="512"></canvas>
+<canvas id="tempLayer" width="512" height="512"></canvas>
+</div>
+
+</body>
+</html>

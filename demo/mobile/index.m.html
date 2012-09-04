@@ -1,0 +1,136 @@
+<html>
+
+<head>
+<title>DICOM Web Viewer</title>
+<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1" />
+<link rel="stylesheet" href="css/style.m.css" />
+<link rel="stylesheet" href="css/ui-darkness/jquery-ui-1.8.16.custom.css">
+<link rel="stylesheet" href="css/jquery.mobile-1.1.1.min.css" />
+<!-- Third party -->  
+<script type="text/javascript" src="ext/jquery/jquery-1.7.1.min.js"></script>
+<script type="text/javascript" src="ext/jquery/jquery-ui-1.8.18.custom.min.js"></script>
+<script type="text/javascript" src="ext/jquery/jquery.mobile-1.1.1.min.js"></script>
+<script type="text/javascript" src="ext/flot/jquery.flot.min.js"></script>
+<!-- Local -->
+<script type="text/javascript" src="src/dwv.js"></script>
+<script type="text/javascript" src="src/application.js"></script>
+<script type="text/javascript" src="src/dicom/dicomParser.js"></script>
+<script type="text/javascript" src="src/dicom/dictionary.js"></script>
+<script type="text/javascript" src="src/html/html.js"></script>
+<script type="text/javascript" src="src/html/style.js"></script>
+<script type="text/javascript" src="src/html/layer.js"></script>
+<script type="text/javascript" src="src/image/image.js"></script>
+<script type="text/javascript" src="src/image/lookupTable.js"></script>
+<script type="text/javascript" src="src/image/luts.js"></script>
+<script type="text/javascript" src="src/math/shapes.js"></script>
+<script type="text/javascript" src="src/math/bucketQueue.js"></script>
+<script type="text/javascript" src="src/math/scissors.js"></script>
+<script type="text/javascript" src="src/tools/toolbox.js"></script>
+<script type="text/javascript" src="src/tools/draw.js"></script>
+<script type="text/javascript" src="src/tools/rectangle.js"></script>
+<script type="text/javascript" src="src/tools/roi.js"></script>
+<script type="text/javascript" src="src/tools/line.js"></script>
+<script type="text/javascript" src="src/tools/livewire.js"></script>
+<script type="text/javascript" src="src/tools/circle.js"></script>
+<script type="text/javascript" src="src/tools/windowLevel.js"></script>
+<script type="text/javascript" src="src/tools/zoom.js"></script>
+<script type="text/javascript" src="src/tools/filter.js"></script>
+<script type="text/javascript" src="src/tools/undo.js"></script>
+<script type="text/javascript" src="src/utils/string.js"></script>
+
+<script type="text/javascript">
+function toggleInfo()
+{
+    if( app.getInfoLayer() )
+    {
+        app.getInfoLayer().display( !app.getInfoLayer().isVisible() );
+    }
+}
+</script>
+
+</head>
+
+<body>
+
+<div data-role="page" id="main">
+
+<div data-role="header">
+<h1>DICOM Web Viewer</h1>
+</div><!-- /header -->
+
+<div data-role="content">   
+
+
+<div class="ui-grid-a">
+
+<!-- Open file -->
+<div id="openFile" class="ui-block-a" title="Open File">
+<form>
+Path: <input type="file" id="files" name="files[]" multiple />
+</form>
+<div id="progressbar" style="display:none;""></div>
+</div>
+
+<div id="controls" data-role="controlgroup" class="ui-block-b" style="text-align:right">
+<a href="#" data-role="button" 
+data-icon="info" data-iconpos="notext" data-inline="true"
+onclick="toggleInfo()">Info</a>
+<a href="#tags_page" data-role="button"
+data-icon="grid" data-iconpos="notext" data-inline="true"
+data-transition="slide">Tags</a> 
+</div>
+
+</div><!-- /grid-a -->
+
+<!-- Layer Container -->
+<div id="centerDiv">
+<div id="layerContainer" title="Image">
+<canvas id="imageLayer" style="display:none;"></canvas>
+<canvas id="drawLayer" style="display:none;"></canvas>
+<canvas id="infoLayer" style="display:none;"></canvas>
+<canvas id="tempLayer" style="display:none;"></canvas>
+<div id="plot" style="width:100px;height:70px"></div>
+</div>
+</div>
+</div>
+
+<!-- Toolbox -->
+<div id="toolbox" title="Toolbox" style="display:none;">
+</div>
+
+<!-- History -->
+<div id="history" title="History" style="display:none;"></div>
+
+
+</div><!-- /content -->
+
+</div><!-- /page -->
+
+
+<div data-role="page" id="tags_page">
+
+<div data-role="header">
+<a href="#main" data-icon="back" 
+data-transition="slide" data-direction="reverse">Back</a>
+<h1>DICOM Tags</h1>
+</div><!-- /header -->
+
+<div data-role="content">   
+<!-- Tags -->
+<div id="tags" title="Tags"></div>
+</div><!-- /content -->
+
+</div><!-- /page -->
+
+
+<script type="text/javascript">
+// main application
+var app = new dwv.App();
+// initialise the application
+app.init();
+
+window.onresize = app.alignLayers;
+</script>
+
+</body>
+</html>
