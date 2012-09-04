@@ -52,7 +52,7 @@ function toggleInfo()
 
 <body>
 
-<div data-role="page">
+<div data-role="page" id="main">
 
 <div data-role="header">
 <h1>DICOM Web Viewer</h1>
@@ -75,6 +75,9 @@ Path: <input type="file" id="files" name="files[]" multiple />
 <a href="#" data-role="button" 
 data-icon="info" data-iconpos="notext" data-inline="true"
 onclick="toggleInfo()">Info</a>
+<a href="#tags_page" data-role="button"
+data-icon="grid" data-iconpos="notext" data-inline="true"
+data-transition="slide">Tags</a> 
 </div>
 
 </div><!-- /grid-a -->
@@ -98,12 +101,27 @@ onclick="toggleInfo()">Info</a>
 <!-- History -->
 <div id="history" title="History" style="display:none;"></div>
 
-<!-- Tags -->
-<div id="tags" title="Tags" style="display:none;"></div>
 
 </div><!-- /content -->
 
 </div><!-- /page -->
+
+
+<div data-role="page" id="tags_page">
+
+<div data-role="header">
+<a href="#main" data-icon="back" 
+data-transition="slide" data-direction="reverse">Back</a>
+<h1>DICOM Tags</h1>
+</div><!-- /header -->
+
+<div data-role="content">   
+<!-- Tags -->
+<div id="tags" title="Tags"></div>
+</div><!-- /content -->
+
+</div><!-- /page -->
+
 
 <script type="text/javascript">
 // main application
