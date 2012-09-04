@@ -227,6 +227,12 @@ dwv.tool.WindowLevel = function(app)
         }
     };
     
+    this.dblclick = function(ev){
+        dwv.tool.updateWindowingData(
+                parseInt(app.getImage().getValue(ev._x, ev._y), 10),
+                parseInt(app.getImage().getLookup().windowWidth, 10) );    
+    };
+    
     this.enable = function(bool){
         if( bool ) {
             this.appendHtml();

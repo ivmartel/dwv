@@ -111,7 +111,8 @@ dwv.App = function()
         if( event.type === "mousemove"
             || event.type === "mousedown"
             || event.type === "mouseup"
-            || event.type === "mousewheel" )
+            || event.type === "mousewheel"
+            || event.type === "dblclick")
         {
             // set event._x and event._y to be used later
             // layerX is for firefox
@@ -287,6 +288,7 @@ dwv.App = function()
         tempLayer.getCanvas().addEventListener('mouseup', eventHandler, false);
         tempLayer.getCanvas().addEventListener('mousewheel', eventHandler, false);
         tempLayer.getCanvas().addEventListener('DOMMouseScroll', eventHandler, false);
+        tempLayer.getCanvas().addEventListener('dblclick', eventHandler, false);
 
         // Keydown listener
         window.addEventListener('keydown', eventHandler, true);
