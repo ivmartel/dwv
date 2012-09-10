@@ -10,6 +10,10 @@ dwv.dicom = dwv.dicom || {};
 dwv.dicom.BigEndianReader = function(file)
 {
     this.readByteAt = function(i) {
+        // todo: check is slows down
+        if( i > file.length ) {
+            throw new Error("Exceeded the size of the file");
+        }
         return file.charCodeAt(i) & 0xff;
     };
     this.readNumber = function(nBytes, startByte) {
@@ -49,6 +53,10 @@ dwv.dicom.BigEndianReader = function(file)
 dwv.dicom.LittleEndianReader = function(file)
 {
     this.readByteAt = function(i) {
+        // todo: check is slows down
+        if( i > file.length ) {
+            throw new Error("Exceeded the size of the file");
+        }
         return file.charCodeAt(i) & 0xff;
     };
     this.readNumber = function(nBytes, startByte) {
