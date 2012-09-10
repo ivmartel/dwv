@@ -279,9 +279,16 @@ dwv.App = function()
      */
     function postLoadInit()
     {
+        // layout
         layoutLayers();
         self.alignLayers();
-        
+
+        // get the image data from the image layer
+        imageData = self.getImageLayer().getContext().getImageData( 
+            0, 0, 
+            self.getImage().getSize().getNumberOfColumns(), 
+            self.getImage().getSize().getNumberOfRows());
+
         // Attach the mousedown, mousemove and mouseup event listeners.
         tempLayer.getCanvas().addEventListener('mousedown', eventHandler, false);
         tempLayer.getCanvas().addEventListener('mousemove', eventHandler, false);
@@ -303,14 +310,6 @@ dwv.App = function()
      */
     this.generateAndDrawImage = function()
     {         
-        // store first image data
-        if( imageData === null )
-        {
-            imageData = self.getImageLayer().getContext().getImageData( 
-                0, 0, 
-                self.getImage().getSize().getNumberOfColumns(), 
-                self.getImage().getSize().getNumberOfRows());
-        }
         // generate image data from DICOM
         self.getImage().generateImageData(imageData);         
         // set the image data of the layer
