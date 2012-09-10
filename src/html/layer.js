@@ -140,7 +140,8 @@ dwv.html.Layer = function(name)
         width = inputWidth;
         height = inputHeight;
 
-        // original image data array
+        // original empty image data array
+        context.clearRect (0, 0, canvas.width, canvas.height);
         imageData = context.getImageData(0, 0, canvas.width, canvas.height);
     };
     
