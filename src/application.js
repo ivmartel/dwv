@@ -258,19 +258,21 @@ dwv.App = function()
      */
     this.alignLayers = function()
     {
-        drawLayer.align(imageLayer);
-        tempLayer.align(imageLayer);
-        infoLayer.align(imageLayer);
-        
-        // align plot
-        var plotDiv = document.getElementById("plot");
-        plotDiv.style.top = app.getImageLayer().getCanvas().offsetTop
-            + app.getImageLayer().getCanvas().height
-            - plotDiv.offsetHeight
-            - 15;
-        plotDiv.style.left = app.getImageLayer().getCanvas().offsetLeft
-            + app.getImageLayer().getCanvas().width
-            - plotDiv.offsetWidth;
+        if( imageLayer ) {
+            drawLayer.align(imageLayer);
+            tempLayer.align(imageLayer);
+            infoLayer.align(imageLayer);
+            
+            // align plot
+            var plotDiv = document.getElementById("plot");
+            plotDiv.style.top = app.getImageLayer().getCanvas().offsetTop
+                + app.getImageLayer().getCanvas().height
+                - plotDiv.offsetHeight
+                - 15;
+            plotDiv.style.left = app.getImageLayer().getCanvas().offsetLeft
+                + app.getImageLayer().getCanvas().width
+                - plotDiv.offsetWidth;
+        }
     };
     
     /**
