@@ -44,6 +44,10 @@ function toggleInfo()
     if( app.getInfoLayer() )
     {
         app.getInfoLayer().display( !app.getInfoLayer().isVisible() );
+        // histogram
+        var div = document.getElementById("plot");
+        if( div.style.display === "none" ) div.style.display = '';
+        else div.style.display = "none";
     }
 }
 </script>
