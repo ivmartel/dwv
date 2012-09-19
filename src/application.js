@@ -145,7 +145,7 @@ dwv.App = function()
         var reader = new FileReader();
         reader.onload = onLoadedDicom;
         reader.onprogress = updateProgress;
-        $("#progressbar").progressbar({ value: 0 });
+        //$("#progressbar").progressbar({ value: 0 });
         reader.readAsBinaryString(evt.target.files[0]);
     };
     
@@ -169,7 +169,7 @@ dwv.App = function()
         }
         // prepare display
         postLoadInit();
-        $("#progressbar").progressbar({ value: 100 });
+        //$("#progressbar").progressbar({ value: 100 });
     }
     
     function updateProgress(evt)
