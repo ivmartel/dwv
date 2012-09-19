@@ -4,11 +4,9 @@
 <title>DICOM Web Viewer</title>
 <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1" />
 <link rel="stylesheet" href="css/style.m.css" />
-<link rel="stylesheet" href="css/ui-darkness/jquery-ui-1.8.16.custom.css">
 <link rel="stylesheet" href="css/jquery.mobile-1.1.1.min.css" />
 <!-- Third party -->  
 <script type="text/javascript" src="ext/jquery/jquery-1.7.1.min.js"></script>
-<script type="text/javascript" src="ext/jquery/jquery-ui-1.8.18.custom.min.js"></script>
 <script type="text/javascript" src="ext/jquery/jquery.mobile-1.1.1.min.js"></script>
 <script type="text/javascript" src="ext/flot/jquery.flot.min.js"></script>
 <!-- Local -->
@@ -50,6 +48,57 @@ function toggleInfo()
         else div.style.display = "none";
     }
 }
+
+function showhome()
+{
+    // Show only desired NAV Bar
+    $('#home').show();
+    $('#filter').hide();
+    $('#draw').hide();
+    // Refresh the NAV Bars       
+    $('#page').trigger('create');
+}
+
+$(document).ready(function() {
+
+$('#toggleHomeFromFilter').bind('click', showhome);
+$('#toggleHomeFromDraw').bind('click', showhome);
+
+$('#toggleFilter').bind('click', function()
+{
+    // Show only desired NAV Bar
+    $('#home').hide();
+    $('#filter').show();
+    $('#draw').hide();
+    // Refresh the NAV Bars       
+    $('#page').trigger('create');
+});
+
+$('#toggleThreshold').bind('click', function()
+{
+    // Show only desired NAV Bar
+    $('#home').hide();
+    $('#threshold').show();
+    $('#filter').hide();
+    $('#draw').hide();
+    // Refresh the NAV Bars       
+    $('#page').trigger('create');
+    
+    var filterUI = new dwv.tool.filter.ThresholdUI();
+    filterUI.display();
+});
+
+$('#toggleDraw').bind('click', function()
+{
+    // Show only desired NAV Bar
+    $('#home').hide();
+    $('#filter').hide();
+    $('#draw').show();
+    // Refresh the NAV Bars       
+    $('#page').trigger('create');
+});
+
+});
 </script>
 
 </head>
@@ -64,24 +113,19 @@ function toggleInfo()
 
 <div data-role="content">   
 
-
 <div class="ui-grid-a">
-
 <!-- Open file -->
 <div id="openFile" class="ui-block-a" title="Open File">
 <form>
 Path: <input type="file" id="files" name="files[]" multiple />
 </form>
-<div id="progressbar" style="display:none;""></div>
 </div>
 
-<div id="controls" data-role="controlgroup" class="ui-block-b" style="text-align:right">
-<a href="#" data-role="button" 
-data-icon="info" data-iconpos="notext" data-inline="true"
-onclick="toggleInfo()">Info</a>
-<a href="#tags_page" data-role="button"
-data-icon="grid" data-iconpos="notext" data-inline="true"
-data-transition="slide">Tags</a> 
+<div class="ui-block-b" style="text-align:right">
+<select name="flip-1" id="flip-1" data-role="slider" data-mini="true" onchange="toggleInfo()">
+    <option value="on">On</option>
+    <option value="off">Off</option>
+</select>
 </div>
 
 </div><!-- /grid-a -->
@@ -96,7 +140,6 @@ data-transition="slide">Tags</a>
 <div id="plot" style="width:100px;height:70px"></div>
 </div>
 </div>
-</div>
 
 <!-- Toolbox -->
 <div id="toolbox" title="Toolbox" style="display:none;">
@@ -107,6 +150,35 @@ data-transition="slide">Tags</a>
 
 
 </div><!-- /content -->
+
+<div data-role="footer">        
+    <div data-role="navbar" id="home">
+        <ul>
+            <li><a href="#" id="toggleFilter">Filter</a></li>
+            <li><a href="#" id="toggleDraw">Draw</a></li>
+            <li><a href="#tags_page" data-transition="slide">Tags</a></li>
+        </ul>
+    </div><!-- /navbar: main -->
+    <div data-role="navbar" id="filter" style="display:none;">
+        <ul>
+            <li><a href="#" id="toggleHomeFromFilter">Home</a></li>
+            <li><a href="#" id="toggleThreshold">Threshold</a></li>
+            <li><a href="#">Sharpen</a></li>
+            <li><a href="#">Sobel</a></li>
+        </ul>
+    </div><!-- /navbar: filter -->
+    <div data-role="navbar" id="threshold" style="display:none;">
+    <div id="filterDiv"></div>
+    </div><!-- /navbar: threshold -->
+    <div data-role="navbar" id="draw" style="display:none;">
+        <ul>
+            <li><a href="#" id="toggleHomeFromDraw">Home</a></li>
+            <li><a href="#">Rectangle</a></li>
+            <li><a href="#">Circle</a></li>
+            <li><a href="#">Free Hand</a></li>
+        </ul>
+    </div><!-- /navbar: draw -->
+</div><!-- /footer -->
 
 </div><!-- /page -->
 
