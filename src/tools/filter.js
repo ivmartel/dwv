@@ -75,15 +75,41 @@ dwv.tool.filter.ThresholdUI = function()
         var min = app.getImage().getDataRange().min;
         var max = app.getImage().getDataRange().max;
         
-        $("#subFilterDiv").slider({
-            //range: true,
+        $( "#subFilterDiv" ).slider({
+            range: true,
             min: min,
             max: max,
-            value: min,
-            //values: [ min, max ],
-            //slide: function( event, ui ) {
-            //    dwv.tool.filter.threshold(ui.values[ 0 ], ui.values[ 1 ]);
-            //}
+            values: [ min, max ],
+            slide: function( event, ui ) {
+                dwv.tool.filter.threshold(ui.values[ 0 ], ui.values[ 1 ]);
+            }
+        });
+
+    };
+};
+
+/**
+* @class Threshold Filter User Interface.
+*/
+dwv.tool.filter.ThresholdUI2 = function()
+{
+    this.display = function() {
+        var div = document.createElement("div");
+        div.id = "subFilterDiv";
+        document.getElementById('filterDiv').appendChild(div);
+
+        var min = app.getImage().getDataRange().min;
+        var max = app.getImage().getDataRange().max;
+        
+         $("#subFilterDiv").slider({
+        //range: true,
+        min: min,
+        max: max,
+        value: min,
+        //values: [ min, max ],
+        //slide: function( event, ui ) {
+        //    dwv.tool.filter.threshold(ui.values[ 0 ], ui.values[ 1 ]);
+        //}
         });
         //$("#slider").val()
         $("#subFilterDiv").bind("change",
@@ -91,7 +117,6 @@ dwv.tool.filter.ThresholdUI = function()
                 dwv.tool.filter.threshold($("#subFilterDiv").val(), 1000);
             }
         );
-
     };
 };
 
