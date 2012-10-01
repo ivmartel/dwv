@@ -168,7 +168,13 @@ Path: <input type="file" id="files" name="files[]" multiple />
         </ul>
     </div><!-- /navbar: filter -->
     <div data-role="navbar" id="threshold" style="display:none;">
-    <div id="filterDiv"></div>
+        <ul>
+            <li><div id="filterDiv">
+            <input type="range" name="slider-mini" id="slider-mini" value="25" min="0" max="100" data-mini="true" />
+            </div></li>
+            <li><a href="#">Cancel</a></li>
+            <li><a href="#">Apply</a></li>
+        </ul>
     </div><!-- /navbar: threshold -->
     <div data-role="navbar" id="draw" style="display:none;">
         <ul>

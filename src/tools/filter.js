@@ -98,23 +98,16 @@ dwv.tool.filter.ThresholdUI2 = function()
         div.id = "subFilterDiv";
         document.getElementById('filterDiv').appendChild(div);
 
-        var min = app.getImage().getDataRange().min;
-        var max = app.getImage().getDataRange().max;
+        var mmin = app.getImage().getDataRange().min;
+        var mmax = app.getImage().getDataRange().max;
         
-         $("#subFilterDiv").slider({
-        //range: true,
-        min: min,
-        max: max,
-        value: min,
-        //values: [ min, max ],
-        //slide: function( event, ui ) {
-        //    dwv.tool.filter.threshold(ui.values[ 0 ], ui.values[ 1 ]);
-        //}
-        });
-        //$("#slider").val()
-        $("#subFilterDiv").bind("change",
+        $("#slider-mini").attr("min", mmin).slider("refresh");
+        $("#slider-mini").attr("max", mmax).slider("refresh");
+        $("#slider-mini").attr("value", mmin).slider("refresh");
+
+        $("#slider-mini").bind("change",
             function( event ) {
-                dwv.tool.filter.threshold($("#subFilterDiv").val(), 1000);
+                dwv.tool.filter.threshold($("#slider-mini").val(), mmax);
             }
         );
     };
