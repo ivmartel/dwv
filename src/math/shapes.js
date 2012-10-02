@@ -7,6 +7,35 @@ dwv.math = dwv.math || {};
  * shapes.js
  * Definition of basic shapes.
  */
+dwv.math.ShapeFactory = function() {};
+
+dwv.math.ShapeFactory.prototype.create = function(type, pointA, pointB)
+{
+    var object = null;
+    if( type === "line")
+    {
+        object = new dwv.math.Line(pointA, pointB);
+    }
+    else if( type === "rectangle")
+    {
+        object = new dwv.math.Rectangle(pointA, pointB);
+    }
+    else if( type === "circle")
+    {
+        // radius
+        var a = Math.abs(pointA.getX() - pointB.getX());
+        var b = Math.abs(pointA.getY() - pointB.getY());
+        var radius = Math.round( Math.sqrt( a * a + b * b ) );
+        // check zero radius
+        if( radius === 0 )
+        {
+            return;
+        }
+        // create circle
+        object = new dwv.math.Circle(pointA, radius);
+    }
+    return object;
+};
 
 /**
  * @class 2D point. Immutable.
