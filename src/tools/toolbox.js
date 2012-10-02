@@ -39,11 +39,9 @@ dwv.tool.ToolBox.prototype.hasTool = function(toolName) {
 dwv.tool.ToolBox.prototype.init = function()
 {
     // tool list
-    this.tools.rectangle = dwv.tool.Rectangle;
+    this.tools.draw = dwv.tool.Draw;
     this.tools.roi = dwv.tool.Roi;
-    this.tools.line = dwv.tool.Line;
     this.tools.livewire = dwv.tool.Livewire;
-    this.tools.circle = dwv.tool.Circle;
     this.tools.windowLevel = dwv.tool.WindowLevel;
     this.tools.zoom = dwv.tool.Zoom;
     this.tools.filter = dwv.tool.Filter;
@@ -100,7 +98,7 @@ dwv.tool.ToolBox.prototype.appendHtml = function()
     selector.disabled = 1;
     paragraph.appendChild(selector);
 
-    var options = ["windowLevel", "rectangle", "circle", "roi", "line", "livewire", "zoom", "filter"];
+    var options = ["windowLevel", "draw", "roi", "livewire", "zoom", "filter"];
     var option;
     for( var i = 0; i < options.length; ++i )
     {
