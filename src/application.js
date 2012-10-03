@@ -26,9 +26,6 @@ dwv.App = function()
     // Tool box.
     var toolBox = new dwv.tool.ToolBox(this);
     
-    // Style.
-    var style = new dwv.html.Style();
-    
     // UndoStack
     var undoStack = new dwv.tool.UndoStack(this);
     
@@ -48,9 +45,6 @@ dwv.App = function()
     // Get the information layer.
     this.getInfoLayer = function() { return infoLayer; };
 
-    // Get the drawing context.
-    this.getStyle = function() { return style; };
-
     // Get the image details.
     this.getUndoStack = function() { return undoStack; };
 
@@ -65,20 +59,6 @@ dwv.App = function()
         undoStack.appendHtml();
         // bind open files with method
         document.getElementById('files').addEventListener('change', this.loadDicom, false);
-    };
-    
-    /**
-     * Set the line color.
-     * @param event
-     */
-    this.setLineColor = function(event)
-    {
-        // get the color
-        var color = event.target.id;
-        // set style var
-        self.getStyle().setLineColor(color);
-        // reset borders
-        dwv.tool.draw.setLineColor(color);
     };
     
     /**

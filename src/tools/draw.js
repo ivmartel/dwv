@@ -182,7 +182,8 @@ dwv.tool.draw.appendColourChooserHtml = function(app)
     document.getElementById('toolbox').appendChild(div);
     
     // select default
-    dwv.tool.draw.setLineColor(app.getStyle().getLineColor());
+    var defaultStyle = new dwv.html.Style();
+    dwv.tool.draw.setLineColor(defaultStyle.getLineColor());
 };
 
 /**

@@ -10,6 +10,8 @@ dwv.tool.Livewire = function(app)
 {
     var self = this;
     this.started = false;
+    // draw style
+    var style = new dwv.html.Style();
     var command = null;
     // paths are stored in reverse order
     var path = new dwv.math.Path();
@@ -127,7 +129,7 @@ dwv.tool.Livewire = function(app)
         currentPath.appenPath(path);
         
         // create draw command
-        command = new dwv.tool.DrawLivewireCommand(currentPath, app);
+        command = new dwv.tool.DrawLivewireCommand(currentPath, app, style);
         // clear the temporary layer
         app.getTempLayer().clearContextRect();
         // draw
@@ -152,6 +154,17 @@ dwv.tool.Livewire = function(app)
         app.handleKeyDown(event);
     };
 
+    // Set the line color of the drawing
+    this.setLineColor = function(event)
+    {
+        // get the color
+        var color = event.target.id;
+        // set style var
+        style.setLineColor(color);
+        // reset borders
+        dwv.tool.draw.setLineColor(color);
+    };
+
 }; // Livewire class
 
 /**
@@ -159,10 +172,10 @@ dwv.tool.Livewire = function(app)
  * @param livewire The livewire to draw.
  * @param app The application to draw the livewire on.
  */
-dwv.tool.DrawLivewireCommand = function(livewire, app)
+dwv.tool.DrawLivewireCommand = function(livewire, app, style)
 {
     // app members can change 
-    var livewireColor = app.getStyle().getLineColor();
+    var livewireColor = style.getLineColor();
     var context = app.getTempLayer().getContext();
     
     // command name

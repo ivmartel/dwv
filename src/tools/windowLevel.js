@@ -13,7 +13,7 @@ dwv.tool = dwv.tool || {};
 dwv.tool.showHUvalue = function(x,y)
 {
     var context = app.getInfoLayer().getContext();
-    var style = app.getStyle();
+    var style = new dwv.html.Style();
     var border = 3;
 
     // style
@@ -39,7 +39,7 @@ dwv.tool.showWindowingValue = function(windowCenter,windowWidth)
 {
     var canvas = app.getInfoLayer().getCanvas();
     var context = app.getInfoLayer().getContext();
-    var style = app.getStyle();
+    var style = new dwv.html.Style();
     var border = 3;
     
     // style
