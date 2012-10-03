@@ -7,8 +7,19 @@ dwv.tool = dwv.tool || {};
  */
 dwv.tool.draw = dwv.tool.draw || {};
 
+/**
+ * @class Draw command factory.
+ */
 dwv.tool.draw.CommandFactory = function() {};
 
+/**
+ * Create a draw shape command according to a name and some arguments.
+ * @param shapeName The name of the shape.
+ * @param shape The shape to draw.
+ * @param app The application.
+ * @param style The style of the drawing.
+ * @returns The created command.
+ */
 dwv.tool.draw.CommandFactory.prototype.create = function(shapeName, shape, app, style)
 {
     var object = null;
@@ -28,6 +39,10 @@ dwv.tool.draw.CommandFactory.prototype.create = function(shapeName, shape, app, 
     {
         object = new dwv.tool.DrawRoiCommand(shape, app, style);
     }
+    else
+    {
+        throw new Error("Unknown shape name when creating draw command.");
+    }
     return object;
 };
 
@@ -37,28 +52,35 @@ dwv.tool.draw.CommandFactory.prototype.create = function(shapeName, shape, app, 
 dwv.tool.Draw = function(app)
 {
     var self = this;
-    this.started = false;
+    // start drawing flag
+    var started = false;
+    // draw command
     var command = null;
+    // draw style
     var style = new dwv.html.Style();
+    // shape name
     var shapeName = "line";
+    // list of points
     var points = [];
 
     // This is called when you start holding down the mouse button.
     this.mousedown = function(ev){
-        self.started = true;
+        started = true;
+        // clear array
         points = [];
+        // store point
         points.push(new dwv.math.Point2D(ev._x, ev._y));
     };
 
     // This function is called every time you move the mouse.
     this.mousemove = function(ev){
-        if (!self.started)
+        if (!started)
         {
             return;
         }
         // current point
         points.push(new dwv.math.Point2D(ev._x, ev._y));
-        // create circle
+        // create shape
         var shapeFactory = new dwv.math.ShapeFactory();
         var shape = shapeFactory.create(shapeName, points);
         // create draw command
@@ -72,10 +94,12 @@ dwv.tool.Draw = function(app)
 
     // This is called when you release the mouse button.
     this.mouseup = function(ev){
-        if (self.started)
+        if (started)
         {
-            if( ev._x!==points[0].getX() && ev._y!==points[0].getY()) {
-                // draw
+            if( ev._x !== points[0].getX() 
+                && ev._y !== points[0].getY() )
+            {
+                // draw last point
                 self.mousemove(ev);
                 // save command in undo stack
                 app.getUndoStack().add(command);
@@ -83,10 +107,11 @@ dwv.tool.Draw = function(app)
                 app.getDrawLayer().merge(app.getTempLayer());
             }
             // set flag
-            self.started = false;
+            started = false;
         }
     };
 
+    // Enable the draw tool
     this.enable = function(value){
         if( value ) {
             dwv.tool.draw.appendShapeChooserHtml(app);
@@ -98,10 +123,12 @@ dwv.tool.Draw = function(app)
         }
     };
     
+    // Handle key down event
     this.keydown = function(event){
         app.handleKeyDown(event);
     };
 
+    // Set the line color of the drawing
     this.setLineColor = function(event)
     {
         // get the color
@@ -112,12 +139,13 @@ dwv.tool.Draw = function(app)
         dwv.tool.draw.setLineColor(color);
     };
     
+    // Set the shape name of the drawing
     this.setShapeName = function(event)
     {
         shapeName = event.target.options[event.target.selectedIndex].text;
     };
     
-}; // Circle class
+}; // Draw class
 
 /**
  * @function Append the color chooser to the HTML document in the 'colourChooser' node.
@@ -158,7 +186,7 @@ dwv.tool.draw.appendColourChooserHtml = function(app)
 };
 
 /**
- * @function Remove the tool specific node.
+ * @function Remove the color chooser specific node.
  */
 dwv.tool.draw.clearColourChooserHtml = function()
 {
@@ -191,6 +219,9 @@ dwv.tool.draw.setLineColor = function(color)
     td.style.border = "#00f solid 2px";
 };
 
+/**
+ * @function Append the shape chooser to the HTML document in the 'shapeChooser' node.
+ */
 dwv.tool.draw.appendShapeChooserHtml = function(app)
 {
     var div = document.createElement("div");
@@ -219,6 +250,9 @@ dwv.tool.draw.appendShapeChooserHtml = function(app)
     document.getElementById('toolbox').appendChild(div);
 };
 
+/**
+ * @function Remove the shape chooser specific node.
+ */
 dwv.tool.draw.clearShapeChooserHtml = function()
 {
     // find the tool specific node

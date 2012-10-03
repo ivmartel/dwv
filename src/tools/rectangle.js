@@ -7,6 +7,7 @@ dwv.tool = dwv.tool || {};
  * @class Draw rectangle command.
  * @param rectangle The rectangle to draw.
  * @param app The application to draw the line on.
+ * @param style The drawing style.
  */
 dwv.tool.DrawRectangleCommand = function(rectangle, app, style)
 {

@@ -7,20 +7,30 @@ dwv.math = dwv.math || {};
  * shapes.js
  * Definition of basic shapes.
  */
+
+/**
+ * @class Shape factory.
+ */
 dwv.math.ShapeFactory = function() {};
 
-dwv.math.ShapeFactory.prototype.create = function(type, points)
+/**
+ * Create a shape according to a name and some arguments.
+ * @param shapeName The name of the shape.
+ * @param points The points of the shape.
+ * @returns The created shape.
+ */
+dwv.math.ShapeFactory.prototype.create = function(shapeName, points)
 {
     var object = null;
-    if( type === "line")
+    if( shapeName === "line")
     {
         object = new dwv.math.Line(points[0], points[points.length-1]);
     }
-    else if( type === "rectangle")
+    else if( shapeName === "rectangle")
     {
         object = new dwv.math.Rectangle(points[0], points[points.length-1]);
     }
-    else if( type === "circle")
+    else if( shapeName === "circle")
     {
         // radius
         var a = Math.abs(points[0].getX() - points[points.length-1].getX());
@@ -29,15 +39,20 @@ dwv.math.ShapeFactory.prototype.create = function(type, points)
         // check zero radius
         if( radius === 0 )
         {
+            // silent fail...
             return;
         }
         // create circle
         object = new dwv.math.Circle(points[0], radius);
     }
-    else if( type === "roi")
+    else if( shapeName === "roi")
     {
         object = new dwv.math.ROI();
         object.addPoints(points);
+    }
+    else
+    {
+        throw new Error("Unknown shape name when creating shape.");
     }
     return object;
 };

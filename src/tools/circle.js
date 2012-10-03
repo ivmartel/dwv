@@ -7,6 +7,7 @@ dwv.tool = dwv.tool || {};
  * @class Draw circle command.
  * @param circle The circle to draw.
  * @param app The application to draw the circle on.
+ * @param style The drawing style.
  */
 dwv.tool.DrawCircleCommand = function(circle, app, style)
 {

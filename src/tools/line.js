@@ -7,6 +7,7 @@ dwv.tool = dwv.tool || {};
  * @class Draw line command.
  * @param line The line to draw.
  * @param app The application to draw the line on.
+ * @param style The drawing style.
  */
 dwv.tool.DrawLineCommand = function(line, app, style)
 {

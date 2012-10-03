@@ -7,6 +7,7 @@ dwv.tool = dwv.tool || {};
  * @class Draw ROI command.
  * @param roi The ROI to draw.
  * @param app The application to draw the line on.
+ * @param style The drawing style.
  */
 dwv.tool.DrawRoiCommand = function(roi, app, style)
 {
