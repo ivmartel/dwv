@@ -24,6 +24,10 @@ dwv.tool.draw.CommandFactory.prototype.create = function(shapeName, shape, app, 
     {
         object = new dwv.tool.DrawRectangleCommand(shape, app, style);
     }
+    else if( shapeName === "roi")
+    {
+        object = new dwv.tool.DrawRoiCommand(shape, app, style);
+    }
     return object;
 };
 
@@ -37,12 +41,13 @@ dwv.tool.Draw = function(app)
     var command = null;
     var style = new dwv.html.Style();
     var shapeName = "line";
-    var p0 = null;
+    var points = [];
 
     // This is called when you start holding down the mouse button.
     this.mousedown = function(ev){
         self.started = true;
-        p0 = new dwv.math.Point2D(ev._x, ev._y);
+        points = [];
+        points.push(new dwv.math.Point2D(ev._x, ev._y));
     };
 
     // This function is called every time you move the mouse.
@@ -52,10 +57,10 @@ dwv.tool.Draw = function(app)
             return;
         }
         // current point
-        var p1 = new dwv.math.Point2D(ev._x, ev._y);
+        points.push(new dwv.math.Point2D(ev._x, ev._y));
         // create circle
         var shapeFactory = new dwv.math.ShapeFactory();
-        var shape = shapeFactory.create(shapeName, p0, p1);
+        var shape = shapeFactory.create(shapeName, points);
         // create draw command
         var commandFactory = new dwv.tool.draw.CommandFactory();
         command = commandFactory.create(shapeName, shape, app, style);
@@ -69,7 +74,7 @@ dwv.tool.Draw = function(app)
     this.mouseup = function(ev){
         if (self.started)
         {
-            if( ev._x!==p0.getX() && ev._y!==p0.getY()) {
+            if( ev._x!==points[0].getX() && ev._y!==points[0].getY()) {
                 // draw
                 self.mousemove(ev);
                 // save command in undo stack
@@ -200,7 +205,7 @@ dwv.tool.draw.appendShapeChooserHtml = function(app)
     selector.addEventListener('change', app.getToolBox().getSelectedTool().setShapeName, false);
     paragraph.appendChild(selector);
 
-    var options = ["line", "rectangle", "circle"]; // line is default
+    var options = ["line", "rectangle", "circle", "roi"]; // line is default
     var option;
     for( var i = 0; i < options.length; ++i )
     {

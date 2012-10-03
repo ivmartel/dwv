@@ -98,7 +98,7 @@ dwv.tool.ToolBox.prototype.appendHtml = function()
     selector.disabled = 1;
     paragraph.appendChild(selector);
 
-    var options = ["windowLevel", "draw", "roi", "livewire", "zoom", "filter"];
+    var options = ["windowLevel", "draw", "livewire", "zoom", "filter"];
     var option;
     for( var i = 0; i < options.length; ++i )
     {

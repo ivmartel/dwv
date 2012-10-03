@@ -9,22 +9,22 @@ dwv.math = dwv.math || {};
  */
 dwv.math.ShapeFactory = function() {};
 
-dwv.math.ShapeFactory.prototype.create = function(type, pointA, pointB)
+dwv.math.ShapeFactory.prototype.create = function(type, points)
 {
     var object = null;
     if( type === "line")
     {
-        object = new dwv.math.Line(pointA, pointB);
+        object = new dwv.math.Line(points[0], points[points.length-1]);
     }
     else if( type === "rectangle")
     {
-        object = new dwv.math.Rectangle(pointA, pointB);
+        object = new dwv.math.Rectangle(points[0], points[points.length-1]);
     }
     else if( type === "circle")
     {
         // radius
-        var a = Math.abs(pointA.getX() - pointB.getX());
-        var b = Math.abs(pointA.getY() - pointB.getY());
+        var a = Math.abs(points[0].getX() - points[points.length-1].getX());
+        var b = Math.abs(points[0].getY() - points[points.length-1].getY());
         var radius = Math.round( Math.sqrt( a * a + b * b ) );
         // check zero radius
         if( radius === 0 )
@@ -32,7 +32,12 @@ dwv.math.ShapeFactory.prototype.create = function(type, pointA, pointB)
             return;
         }
         // create circle
-        object = new dwv.math.Circle(pointA, radius);
+        object = new dwv.math.Circle(points[0], radius);
+    }
+    else if( type === "roi")
+    {
+        object = new dwv.math.ROI();
+        object.addPoints(points);
     }
     return object;
 };
@@ -204,6 +209,11 @@ dwv.math.ROI = function()
      * @param point The Point2D to add.
      */
     this.addPoint = function(point) { points.push(point); };
+    /**
+     * Add points to the ROI.
+     * @param rhs The array of POints2D to add.
+     */
+    this.addPoints = function(rhs) { points=points.concat(rhs);};
 }; // ROI class
 
 /**
