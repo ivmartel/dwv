@@ -234,7 +234,7 @@ dwv.tool.draw.appendShapeChooserHtml = function(app)
     var selector = document.createElement("select");
     selector.id = "dshape";
     selector.name = "dshape";
-    selector.addEventListener('change', app.getToolBox().getSelectedTool().setShapeName, false);
+    selector.onchange = app.getToolBox().getSelectedTool().setShapeName;
     paragraph.appendChild(selector);
 
     var options = ["line", "rectangle", "circle", "roi"]; // line is default

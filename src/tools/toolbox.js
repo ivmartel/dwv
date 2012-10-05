@@ -52,7 +52,6 @@ dwv.tool.ToolBox.prototype.init = function()
     {
         throw new Error('Failed to get the dtool element!');
     }
-    tool_select.addEventListener('change', this.eventToolChange, false);
     
     // Activate the default tool.
     if (this.tools[this.defaultToolName])
@@ -96,6 +95,7 @@ dwv.tool.ToolBox.prototype.appendHtml = function()
     selector.id = "dtool";
     selector.name = "dtool";
     selector.disabled = 1;
+    selector.onchange = this.eventToolChange;
     paragraph.appendChild(selector);
 
     var options = ["windowLevel", "draw", "livewire", "zoom", "filter"];
