@@ -46,18 +46,10 @@ dwv.tool.ToolBox.prototype.init = function()
     this.tools.zoom = dwv.tool.Zoom;
     this.tools.filter = dwv.tool.Filter;
 
-    // Get the tool select input.
-    var tool_select = document.getElementById('dtool');
-    if (!tool_select)
-    {
-        throw new Error('Failed to get the dtool element!');
-    }
-    
     // Activate the default tool.
     if (this.tools[this.defaultToolName])
     {
         this.setSelectedTool(this.defaultToolName);
-        tool_select.value = this.defaultToolName;
     }
 };
 
@@ -98,7 +90,7 @@ dwv.tool.ToolBox.prototype.appendHtml = function()
     selector.onchange = this.eventToolChange;
     paragraph.appendChild(selector);
 
-    var options = ["windowLevel", "draw", "livewire", "zoom", "filter"];
+    var options = [this.defaultToolName, "draw", "livewire", "zoom", "filter"];
     var option;
     for( var i = 0; i < options.length; ++i )
     {
