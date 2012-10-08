@@ -154,8 +154,9 @@ Path: <input type="file" id="files" name="files[]" multiple />
 <div data-role="footer">        
     <div data-role="navbar" id="home">
         <ul>
-            <li><a href="#" id="toggleFilter">Filter</a></li>
+            <li><a href="#" id="toggleFilter">Display</a></li>
             <li><a href="#" id="toggleDraw">Draw</a></li>
+            <li><a href="#" id="toggleFilter">Filter</a></li>
             <li><a href="#tags_page" data-transition="slide">Tags</a></li>
         </ul>
     </div><!-- /navbar: main -->
@@ -179,9 +180,20 @@ Path: <input type="file" id="files" name="files[]" multiple />
     <div data-role="navbar" id="draw" style="display:none;">
         <ul>
             <li><a href="#" id="toggleHomeFromDraw">Home</a></li>
-            <li><a href="#">Rectangle</a></li>
-            <li><a href="#">Circle</a></li>
-            <li><a href="#">Free Hand</a></li>
+            <li>
+            <select name="select-choice-0" id="select-choice-0" data-mini="true">
+            <option value="standard">Rectangle</option>
+            <option value="rush">Circle</option>
+            <option value="express">ROI</option>
+            <option value="overnight">Line</option>
+            </select>
+            </li>
+            <li>
+            <select name="select-choice-1" id="select-choice-1" data-mini="true">
+            <option value="standard">Blue</option>
+            <option value="rush">Red</option>
+            </select>
+            </li>
         </ul>
     </div><!-- /navbar: draw -->
 </div><!-- /footer -->
