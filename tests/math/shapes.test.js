@@ -59,4 +59,58 @@ test("Test Circle.", function() {
 	equal(c0.getWorldSurface(0.5,0.5), Math.PI, "getWorldSurface");
 });
 
+test("Test Line.", function() {
+    var p0 = new dwv.math.Point2D(0,0);
+    var p1 = new dwv.math.Point2D(0,-4);
+    var l0 = new dwv.math.Line(p0,p1);
+    // getBegin
+    equal(l0.getBegin(), p0, "getBegin");
+    // getEnd
+    equal(l0.getEnd(), p1, "getEnd");
+    // getLength
+    equal(l0.getLength(), 4, "getLength");
+    // getWorldLength
+    equal(l0.getWorldLength(0.5,0.5), 2, "getWorldLength");
+});
+
+test("Test Rectangle.", function() {
+    var p0 = new dwv.math.Point2D(0,0);
+    var p1 = new dwv.math.Point2D(-4,-4);
+    var r0 = new dwv.math.Rectangle(p0,p1);
+    // getBegin
+    equal(r0.getBegin(), p0, "getBegin");
+    // getEnd
+    equal(r0.getEnd(), p1, "getEnd");
+    // getRealWidth
+    equal(r0.getRealWidth(), -4, "getRealWidth");
+    // getRealHeight
+    equal(r0.getRealHeight(), -4, "getRealHeight");
+    // getWidth
+    equal(r0.getWidth(), 4, "getWidth");
+    // getHeight
+    equal(r0.getHeight(), 4, "getHeight");
+    // getSurface
+    equal(r0.getSurface(), 16, "getSurface");
+    // getWorldSurface
+    equal(r0.getWorldSurface(0.5,0.5), 4, "getWorldSurface");
+});
+
+test("Test ROI.", function() {
+    var r0 = new dwv.math.ROI();
+    // getLength
+    equal(r0.getLength(), 0, "getLength");
+    // add a point
+    var p0 = new dwv.math.Point2D(0,0);
+    r0.addPoint(p0);
+    // getLength
+    equal(r0.getLength(), 1, "getLength");
+    // add another point
+    var p1 = new dwv.math.Point2D(-4,-4);
+    r0.addPoint(p1);
+    // getPoint first
+    equal(r0.getPoint(0), p0, "getPoint first");
+    // getPoint second
+    equal(r0.getPoint(1), p1, "getPoint second");
+});
+
 });
