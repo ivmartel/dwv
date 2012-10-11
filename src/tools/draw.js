@@ -132,11 +132,9 @@ dwv.tool.Draw = function(app)
     this.setLineColor = function(event)
     {
         // get the color
-        var color = event.target.id;
+        var color = event.target.options[event.target.selectedIndex].text;
         // set style var
         style.setLineColor(color);
-        // reset borders
-        dwv.tool.draw.setLineColor(color);
     };
     
     // Set the shape name of the drawing
@@ -158,32 +156,24 @@ dwv.tool.draw.appendColourChooserHtml = function(app)
     var paragraph = document.createElement("p");  
     paragraph.appendChild(document.createTextNode("Colour: "));
 
-    var table = document.createElement("table");
-    table.name = "colourChooser";
-    table.className = "colourChooser";
-    
-    var row = table.insertRow(-1);
-    row.id = "colours";
-    row.onmouseover = dwv.tool.draw.onMouseOver;
-    row.onmouseout = dwv.tool.draw.onMouseOut;
-    
-    var colours = ["black", "white", "red", "green", "blue", "yellow", "lime", "fuchsia"];
-    var cell;
-    for ( var i = 0; i < colours.length; ++i )
+    var selector = document.createElement("select");
+    selector.id = "colourChooser";
+    selector.name = "colourChooser";
+    selector.onchange = app.getToolBox().getSelectedTool().setLineColor;
+    paragraph.appendChild(selector);
+
+    var options = ["yellow", "red", "white", "green", "blue", "lime", "fuchsia", "black"];
+    var option;
+    for( var i = 0; i < options.length; ++i )
     {
-        cell = row.insertCell(i);
-        cell.id = colours[i];
-        cell.onclick = app.getToolBox().getSelectedTool().setLineColor;
-        cell.appendChild(document.createTextNode(" "));
+        option = document.createElement("option");
+        option.id = options[i];
+        option.appendChild(document.createTextNode(options[i]));
+        selector.appendChild(option);
     }
 
-    paragraph.appendChild(table);
     div.appendChild(paragraph);
     document.getElementById('toolbox').appendChild(div);
-    
-    // select default
-    var defaultStyle = new dwv.html.Style();
-    dwv.tool.draw.setLineColor(defaultStyle.getLineColor());
 };
 
 /**
@@ -200,24 +190,6 @@ dwv.tool.draw.clearColourChooserHtml = function()
     // remove the tool specific node
     var top = document.getElementById('toolbox');
     top.removeChild(node);
-};
-
-/**
- * @function Set the line color of the color chooser
- * @param color The color to use.
- */
-dwv.tool.draw.setLineColor = function(color)
-{
-    // reset borders
-    var tr = document.getElementById("colours");
-    var tds = tr.getElementsByTagName("td");
-    for (var i = 0; i < tds.length; i++)
-    {
-        tds[i].style.border = "#fff solid 2px";
-    }
-    // set selected border
-    var td = document.getElementById(color);
-    td.style.border = "#00f solid 2px";
 };
 
 /**
@@ -242,7 +214,7 @@ dwv.tool.draw.appendShapeChooserHtml = function(app)
     for( var i = 0; i < options.length; ++i )
     {
         option = document.createElement("option");
-        option.value = options[i];
+        option.id = options[i];
         option.appendChild(document.createTextNode(options[i]));
         selector.appendChild(option);
     }
@@ -266,20 +238,3 @@ dwv.tool.draw.clearShapeChooserHtml = function()
     var top = document.getElementById('toolbox');
     top.removeChild(node);
 };
-
-/**
- * @function Set the cursor when mouse over the color chooser.
- */
-dwv.tool.draw.onMouseOver = function(event)
-{
-    document.body.style.cursor="pointer";
-};
-
-/**
- * @function Set the cursor when mouse out the color chooser.
- */
-dwv.tool.draw.onMouseOut = function(event)
-{
-    document.body.style.cursor="auto";
-};
-
