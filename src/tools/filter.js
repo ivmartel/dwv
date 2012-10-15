@@ -49,139 +49,25 @@ dwv.tool.filter.sobel = function()
     app.generateAndDrawImage();
 };
 
-dwv.tool.filter.clearFilterDiv = function()
-{
-    // find the tool specific node
-    var node = document.getElementById('subFilterDiv');
-    // delete its content
-    while (node.hasChildNodes()) {
-        node.removeChild(node.firstChild);
-    }
-    // remove the tool specific node
-    var top = document.getElementById('filterDiv');
-    top.removeChild(node);
-};
-
-/**
-* @class Threshold Filter User Interface.
-*/
-dwv.tool.filter.ThresholdUI = function()
-{
-    this.display = function() {
-        var div = document.createElement("div");
-        div.id = "subFilterDiv";
-        document.getElementById('filterDiv').appendChild(div);
-
-        var min = app.getImage().getDataRange().min;
-        var max = app.getImage().getDataRange().max;
-        
-        $( "#subFilterDiv" ).slider({
-            range: true,
-            min: min,
-            max: max,
-            values: [ min, max ],
-            slide: function( event, ui ) {
-                dwv.tool.filter.threshold(ui.values[ 0 ], ui.values[ 1 ]);
-            }
-        });
-
-    };
-};
-
-/**
-* @class Threshold Filter User Interface.
-*/
-dwv.tool.filter.ThresholdUI2 = function()
-{
-    this.display = function() {
-        var min = app.getImage().getDataRange().min;
-        var max = app.getImage().getDataRange().max;
-        
-        $("#threshold-slider").attr("min", min).slider("refresh");
-        $("#threshold-slider").attr("max", max).slider("refresh");
-        $("#threshold-slider").attr("value", min).slider("refresh");
-
-        $("#threshold-slider").bind("change",
-            function( event ) {
-                dwv.tool.filter.threshold($("#threshold-slider").val(), max);
-            }
-        );
-    };
-};
-
-/**
-* @class Sharpen Filter User Interface.
-*/
-dwv.tool.filter.SharpenUI = function()
-{
-    this.display = function() {
-        var div = document.createElement("div");
-        div.id = "subFilterDiv";
-        
-        var paragraph = document.createElement("p");  
-        paragraph.id = 'applyFilter';
-        paragraph.name = 'applyFilter';
-
-        var button = document.createElement("button");
-        button.id = "applyFilterButton";
-        button.name = "applyFilterButton";
-        button.onclick = dwv.tool.filter.sharpen;
-        var text = document.createTextNode('Apply');
-        button.appendChild(text);
-
-        paragraph.appendChild(button);
-        div.appendChild(paragraph);
-        document.getElementById('filterDiv').appendChild(div);
-    };    
-};
-
-/**
-* @class Sobel Filter User Interface.
-*/
-dwv.tool.filter.SobelUI = function()
-{
-    this.display = function() {
-        var div = document.createElement("div");
-        div.id = "subFilterDiv";
-        
-        var paragraph = document.createElement("p");  
-        paragraph.id = 'applyFilter';
-        paragraph.name = 'applyFilter';
-
-        var button = document.createElement("button");
-        button.id = "applyFilterButton";
-        button.name = "applyFilterButton";
-        button.onclick = dwv.tool.filter.sobel;
-        var text = document.createTextNode('Apply');
-        button.appendChild(text);
-
-        paragraph.appendChild(button);
-        div.appendChild(paragraph);
-        document.getElementById('filterDiv').appendChild(div);
-    };    
-};
 
 /**
  * @function
  */
-dwv.tool.onchangeFilter = function(event)
+dwv.tool.displayFilter = function(id)
 {    
-    var filterId = parseInt(document.getElementById("filtersMenu").options[
-        document.getElementById("filtersMenu").selectedIndex].value, 10);
-
     var filterUI = 0;
-    dwv.tool.filter.clearFilterDiv();
+    dwv.gui.clearSubFilterDiv();
     
-    switch (filterId)
+    switch (id)
     {
         case 1: // threshold
-            filterUI = new dwv.tool.filter.ThresholdUI();
+            filterUI = new dwv.gui.Threshold();
             break;
         case 2: // sharpen
-            filterUI = new dwv.tool.filter.SharpenUI();
+            filterUI = new dwv.gui.Sharpen();
             break;
         case 3: // sobel
-            filterUI = new dwv.tool.filter.SobelUI();
+            filterUI = new dwv.gui.Sobel();
             break;
     }
     
@@ -195,65 +81,16 @@ dwv.tool.Filter = function(app)
 {
     this.enable = function(bool){
         if( bool ) {
-            this.appendHtml();
+            dwv.gui.appendFilterHtml();
         }
         else {
-            this.clearHtml();
+            dwv.gui.clearFilterHtml();
         }
     };
 
     this.keydown = function(event){
         app.handleKeyDown(event);
     };
-};
-
-dwv.tool.Filter.prototype.appendHtml = function()
-{
-    var div = document.createElement("div");
-    div.id = "filterDiv";
-
-    // paragraph for the window level preset selector
-    var filterParagraph = document.createElement("p");  
-    filterParagraph.appendChild(document.createTextNode("Filter: "));
-    // filter selector
-    var filterSelector = document.createElement("select");
-    filterSelector.id = "filtersMenu";
-    filterSelector.name = "filtersMenu";
-    filterSelector.onchange = dwv.tool.onchangeFilter;
-    filterSelector.selectedIndex = 1;
-    // selector options
-    var filterOptions = ["Threshold", "Sharpen", "Sobel"];
-    // append options
-    var option;
-    for ( var i = 0; i < filterOptions.length; ++i )
-    {
-        option = document.createElement("option");
-        option.value = i+1;
-        option.appendChild(document.createTextNode(filterOptions[i]));
-        filterSelector.appendChild(option);
-    }
-    
-    // append all
-    filterParagraph.appendChild(filterSelector);
-    div.appendChild(filterParagraph);
-    document.getElementById('toolbox').appendChild(div);
-
-    // enable default filter
-    var filterUI = new dwv.tool.filter.ThresholdUI();
-    filterUI.display();
-};
-
-dwv.tool.Filter.prototype.clearHtml = function()
-{
-    // find the tool specific node
-    var node = document.getElementById('filterDiv');
-    // delete its content
-    while (node.hasChildNodes()) {
-        node.removeChild(node.firstChild);
-    }
-    // remove the tool specific node
-    var top = document.getElementById('toolbox');
-    top.removeChild(node);
 };
 
 /**

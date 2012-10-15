@@ -1,0 +1,437 @@
+/**
+ * @namespace GUI classes.
+ */
+dwv.gui = dwv.gui || {};
+
+dwv.gui.onChangeWindowLevelPreset = function()
+{
+    var id = parseInt(document.getElementById("presetsMenu").options[
+       document.getElementById("presetsMenu").selectedIndex].value, 10);
+    app.getToolBox().getSelectedTool().applyPreset(id);
+};
+
+dwv.gui.onChangeColorMap = function()
+{
+    var id = parseInt(document.getElementById("colourMapMenu").options[
+       document.getElementById("colourMapMenu").selectedIndex].value, 10);
+    app.getToolBox().getSelectedTool().applyColourMap(id);
+};
+
+dwv.gui.appendWindowLevelHtml = function()
+{
+    // preset selector
+    var wlSelector = document.createElement("select");
+    wlSelector.id = "presetsMenu";
+    wlSelector.name = "presetsMenu";
+    wlSelector.onchange = dwv.gui.onChangeWindowLevelPreset;
+    wlSelector.selectedIndex = 1;
+    // selector options
+    var wlOptions = [];
+    // from DICOM
+    for ( var p = 0; p < app.getImage().getLookup().windowPresets.length; ++p )
+    {
+        wlOptions.push( app.getImage().getLookup().windowPresets[p].name );
+    }
+    // default
+    var wlDefaultOptions = ["Abdomen", "Lung", "Brain", "Bone", "Head", "Min/Max"];
+    for ( var d = 0; d < wlDefaultOptions.length; ++d )
+    {
+        wlOptions.push( wlDefaultOptions[d] );
+    }
+    // append options
+    var option;
+    for ( var i = 0; i < wlOptions.length; ++i )
+    {
+        option = document.createElement("option");
+        option.value = i+1;
+        option.appendChild(document.createTextNode(wlOptions[i]));
+        wlSelector.appendChild(option);
+    }
+    
+    // preset selector
+    var cmSelector = document.createElement("select");
+    cmSelector.id = "colourMapMenu";
+    cmSelector.name = "colourMapMenu";
+    cmSelector.onchange = dwv.gui.onChangeColorMap;
+    cmSelector.selectedIndex = 1;
+    // selector options
+    var cmOptions = ["Default", "InvPlain", "Rainbow", "Hot", "Test"];
+    for ( var o = 0; o < cmOptions.length; ++o )
+    {
+        option = document.createElement("option");
+        option.value = o+1;
+        option.appendChild(document.createTextNode(cmOptions[o]));
+        cmSelector.appendChild(option);
+    }
+
+    // formatting...
+    var div = document.createElement("div");
+    div.id = "wl-options";
+    // list
+    var list_ul = document.createElement("ul");
+    // first item: window level
+    var list_li0 = document.createElement("li");
+    list_li0.appendChild(document.createTextNode("WL Preset: "));
+    list_li0.appendChild(wlSelector);
+    // append to list
+    list_ul.appendChild(list_li0);
+    // second item: colour map selector
+    var list_li1 = document.createElement("li");
+    list_li1.appendChild(document.createTextNode("Colour Map: "));
+    list_li1.appendChild(cmSelector);
+    // append to list
+    list_ul.appendChild(list_li1);
+    // append list to div
+    div.appendChild(list_ul);
+    
+    // add to document
+    document.getElementById("toolbox").appendChild(div);
+};
+
+dwv.gui.clearWindowLevelHtml = function()
+{
+    dwv.html.removeAllChildren("wl-options", "toolbox");
+};
+
+/**
+ * @function Append the color chooser to the HTML document in the 'colourChooser' node.
+ */
+dwv.gui.appendColourChooserHtml = function()
+{
+    var div = document.createElement("div");
+    div.id = "colourChooser";
+    
+    var paragraph = document.createElement("p");  
+    paragraph.appendChild(document.createTextNode("Colour: "));
+
+    var selector = document.createElement("select");
+    selector.id = "colourChooser";
+    selector.name = "colourChooser";
+    selector.onchange = app.getToolBox().getSelectedTool().setLineColor;
+    paragraph.appendChild(selector);
+
+    var options = ["yellow", "red", "white", "green", "blue", "lime", "fuchsia", "black"];
+    var option;
+    for( var i = 0; i < options.length; ++i )
+    {
+        option = document.createElement("option");
+        option.id = options[i];
+        option.appendChild(document.createTextNode(options[i]));
+        selector.appendChild(option);
+    }
+
+    div.appendChild(paragraph);
+    document.getElementById('toolbox').appendChild(div);
+};
+
+/**
+ * @function Remove the color chooser specific node.
+ */
+dwv.gui.clearColourChooserHtml = function()
+{
+    dwv.html.removeAllChildren("colourChooser", "toolbox");
+};
+
+/**
+ * @function Append the shape chooser to the HTML document in the 'shapeChooser' node.
+ */
+dwv.gui.appendShapeChooserHtml = function()
+{
+    var div = document.createElement("div");
+    div.id = "shapeChooser";
+    
+    var paragraph = document.createElement("p");  
+    paragraph.appendChild(document.createTextNode("Shape: "));
+    
+    var selector = document.createElement("select");
+    selector.id = "dshape";
+    selector.name = "dshape";
+    selector.onchange = app.getToolBox().getSelectedTool().setShapeName;
+    paragraph.appendChild(selector);
+
+    var options = ["line", "rectangle", "circle", "roi"]; // line is default
+    var option;
+    for( var i = 0; i < options.length; ++i )
+    {
+        option = document.createElement("option");
+        option.id = options[i];
+        option.appendChild(document.createTextNode(options[i]));
+        selector.appendChild(option);
+    }
+
+    div.appendChild(paragraph);
+    document.getElementById('toolbox').appendChild(div);
+};
+
+/**
+ * @function Remove the shape chooser specific node.
+ */
+dwv.gui.clearShapeChooserHtml = function()
+{
+    dwv.html.removeAllChildren("shapeChooser", "toolbox");
+};
+
+dwv.gui.onChangeFilter = function()
+{
+    var id = parseInt(document.getElementById("filtersMenu").options[
+       document.getElementById("filtersMenu").selectedIndex].value, 10);
+    dwv.tool.displayFilter(id);
+};
+
+dwv.gui.appendFilterHtml = function()
+{
+    var div = document.createElement("div");
+    div.id = "filterDiv";
+
+    // paragraph for the window level preset selector
+    var filterParagraph = document.createElement("p");  
+    filterParagraph.appendChild(document.createTextNode("Filter: "));
+    // filter selector
+    var filterSelector = document.createElement("select");
+    filterSelector.id = "filtersMenu";
+    filterSelector.name = "filtersMenu";
+    filterSelector.onchange = dwv.gui.onChangeFilter;
+    filterSelector.selectedIndex = 1;
+    // selector options
+    var filterOptions = ["Threshold", "Sharpen", "Sobel"];
+    // append options
+    var option;
+    for ( var i = 0; i < filterOptions.length; ++i )
+    {
+        option = document.createElement("option");
+        option.value = i+1;
+        option.appendChild(document.createTextNode(filterOptions[i]));
+        filterSelector.appendChild(option);
+    }
+    
+    // append all
+    filterParagraph.appendChild(filterSelector);
+    div.appendChild(filterParagraph);
+    document.getElementById('toolbox').appendChild(div);
+
+    // enable default filter
+    var filterUI = new dwv.gui.Threshold();
+    filterUI.display();
+};
+
+dwv.gui.clearFilterHtml = function()
+{
+    dwv.html.removeAllChildren("filterDiv", "toolbox");
+};
+
+dwv.gui.clearSubFilterDiv = function()
+{
+    dwv.html.removeAllChildren("subFilterDiv", "filterDiv");
+};
+
+/**
+* @class Threshold Filter User Interface.
+*/
+dwv.gui.Threshold = function()
+{
+    this.display = function() {
+        var div = document.createElement("div");
+        div.id = "subFilterDiv";
+        document.getElementById('filterDiv').appendChild(div);
+
+        var min = app.getImage().getDataRange().min;
+        var max = app.getImage().getDataRange().max;
+        
+        $( "#subFilterDiv" ).slider({
+            range: true,
+            min: min,
+            max: max,
+            values: [ min, max ],
+            slide: function( event, ui ) {
+                dwv.tool.filter.threshold(ui.values[ 0 ], ui.values[ 1 ]);
+            }
+        });
+
+    };
+};
+
+/**
+* @class Threshold Filter User Interface.
+*/
+dwv.gui.Threshold2 = function()
+{
+    this.display = function() {
+        var min = app.getImage().getDataRange().min;
+        var max = app.getImage().getDataRange().max;
+        
+        $("#threshold-slider").attr("min", min).slider("refresh");
+        $("#threshold-slider").attr("max", max).slider("refresh");
+        $("#threshold-slider").attr("value", min).slider("refresh");
+
+        $("#threshold-slider").bind("change",
+            function( event ) {
+                dwv.tool.filter.threshold($("#threshold-slider").val(), max);
+            }
+        );
+    };
+};
+
+/**
+* @class Sharpen Filter User Interface.
+*/
+dwv.gui.Sharpen = function()
+{
+    this.display = function() {
+        var div = document.createElement("div");
+        div.id = "subFilterDiv";
+        
+        var paragraph = document.createElement("p");  
+        paragraph.id = 'applyFilter';
+        paragraph.name = 'applyFilter';
+
+        var button = document.createElement("button");
+        button.id = "applyFilterButton";
+        button.name = "applyFilterButton";
+        button.onclick = dwv.tool.filter.sharpen;
+        var text = document.createTextNode('Apply');
+        button.appendChild(text);
+
+        paragraph.appendChild(button);
+        div.appendChild(paragraph);
+        document.getElementById('filterDiv').appendChild(div);
+    };    
+};
+
+/**
+* @class Sobel Filter User Interface.
+*/
+dwv.gui.Sobel = function()
+{
+    this.display = function() {
+        var div = document.createElement("div");
+        div.id = "subFilterDiv";
+        
+        var paragraph = document.createElement("p");  
+        paragraph.id = 'applyFilter';
+        paragraph.name = 'applyFilter';
+
+        var button = document.createElement("button");
+        button.id = "applyFilterButton";
+        button.name = "applyFilterButton";
+        button.onclick = dwv.tool.filter.sobel;
+        var text = document.createTextNode('Apply');
+        button.appendChild(text);
+
+        paragraph.appendChild(button);
+        div.appendChild(paragraph);
+        document.getElementById('filterDiv').appendChild(div);
+    };    
+};
+
+dwv.gui.appendZoomHtml = function()
+{
+    var div = document.createElement("div");
+    div.id = 'zoomResetDiv';
+    
+    var paragraph = document.createElement("p");  
+    paragraph.id = 'zoomReset';
+    paragraph.name = 'zoomReset';
+    
+    var button = document.createElement("button");
+    button.id = "zoomResetButton";
+    button.name = "zoomResetButton";
+    button.onclick = dwv.tool.zoomReset;
+    var text = document.createTextNode('Reset');
+    button.appendChild(text);
+    
+    paragraph.appendChild(button);
+    div.appendChild(paragraph);
+    document.getElementById('toolbox').appendChild(div);
+};
+
+dwv.gui.clearZoomHtml = function()
+{
+    dwv.html.removeAllChildren("zoomResetDiv", "toolbox");
+};
+
+dwv.gui.appendToolboxHtml = function()
+{
+    var div = document.createElement("div");
+    div.id = "toolChooser";
+    
+    var paragraph = document.createElement("p");  
+    paragraph.appendChild(document.createTextNode("Tool: "));
+    
+    var selector = document.createElement("select");
+    selector.id = "dtool";
+    selector.name = "dtool";
+    selector.onchange = app.getToolBox().eventToolChange;
+    paragraph.appendChild(selector);
+
+    var options = ["windowLevel", "draw", "livewire", "zoom", "filter"];
+    var option;
+    for( var i = 0; i < options.length; ++i )
+    {
+        option = document.createElement("option");
+        option.value = options[i];
+        option.appendChild(document.createTextNode(options[i]));
+        selector.appendChild(option);
+    }
+
+    div.appendChild(paragraph);
+    document.getElementById('toolbox').appendChild(div);
+};
+
+dwv.gui.appendUndoHtml = function()
+{
+    var paragraph = document.createElement("p");  
+    paragraph.appendChild(document.createTextNode("History:"));
+    paragraph.appendChild(document.createElement("br"));
+    
+    var select = document.createElement("select");
+    select.id = "history_list";
+    select.name = "history_list";
+    select.multiple = "multiple";
+    paragraph.appendChild(select);
+
+    document.getElementById('history').appendChild(paragraph);
+};
+
+dwv.gui.addCommandToUndoHtml = function(commandName)
+{
+    var select = document.getElementById('history_list');
+    // remove undone commands
+    var count = select.length - (select.selectedIndex+1);
+    if( count > 0 )
+    {
+        for( var i = 0; i < count; ++i)
+        {
+            select.remove(select.length-1);
+        }
+    }
+    // add new option
+    var option = document.createElement('option');
+    option.text = commandName;
+    option.value = commandName;
+    select.add(option);
+    // increment selected index
+    select.selectedIndex++;
+};
+
+dwv.gui.enableInUndoHtml = function(enable)
+{
+    var select = document.getElementById('history_list');
+    // enable or not (order is important)
+    var option;
+    if( enable ) 
+    {
+        // increment selected index
+        select.selectedIndex++;
+        // enable option
+        option = select.options[select.selectedIndex];
+        option.disabled = false;
+    }
+    else 
+    {
+        // disable option
+        option = select.options[select.selectedIndex];
+        option.disabled = true;
+        // decrement selected index
+        select.selectedIndex--;
+    }
+};

@@ -143,10 +143,10 @@ dwv.tool.Livewire = function(app)
     
     this.enable = function(value){
         if( value ) {
-            dwv.tool.draw.appendColourChooserHtml(app);
+            dwv.gui.appendColourChooserHtml();
         }
         else {
-            dwv.tool.draw.clearColourChooserHtml();
+            dwv.gui.clearColourChooserHtml();
         }
     };
 

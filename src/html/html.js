@@ -95,6 +95,9 @@ dwv.html.appendRow = function(table, input, level, maxLevel, rowHeader)
     else if( typeof input === 'object') {
         dwv.html.appendRowForObject(table, input, level+1, maxLevel, rowHeader);
     }
+    else {
+        throw new Error("Unsupported input dqtq type.");
+    }
 };
 
 /**
@@ -215,3 +218,19 @@ dwv.html.createHighlightNode = function(child) {
     node.appendChild(child);
     return node;
 };
+
+/**
+ * @function
+ */
+dwv.html.removeAllChildren = function(nodeId, parentId) {
+    // find the node
+    var node = document.getElementById(nodeId);
+    // remove its children
+    while (node.hasChildNodes()) {
+        node.removeChild(node.firstChild);
+    }
+    // remove it from its parent
+    var top = document.getElementById(parentId);
+    top.removeChild(node);
+};
+

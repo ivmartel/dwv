@@ -14,6 +14,7 @@
 <script type="text/javascript" src="src/application.js"></script>
 <script type="text/javascript" src="src/dicom/dicomParser.js"></script>
 <script type="text/javascript" src="src/dicom/dictionary.js"></script>
+<script type="text/javascript" src="src/html/gui.js"></script>
 <script type="text/javascript" src="src/html/html.js"></script>
 <script type="text/javascript" src="src/html/style.js"></script>
 <script type="text/javascript" src="src/html/layer.js"></script>
@@ -84,7 +85,7 @@ $('#toggleThreshold').bind('click', function()
     // Refresh the NAV Bars       
     $('#page').trigger('create');
     
-    var filterUI = new dwv.tool.filter.ThresholdUI2();
+    var filterUI = new dwv.gui.Threshold2();
     filterUI.display();
 });
 

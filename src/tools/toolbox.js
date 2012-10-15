@@ -55,8 +55,6 @@ dwv.tool.ToolBox.prototype.init = function()
 
 dwv.tool.ToolBox.prototype.enable = function(value)
 {
-    // enable html select 
-    document.getElementById('dtool').disabled = !value;
     // enable selected tool
     this.selectedTool.enable(value);
 };
@@ -73,33 +71,4 @@ dwv.tool.ToolBox.prototype.eventToolChange = function(event)
     {
         throw new Error("Unknown tool: '" + toolName + "'");
     }
-};
-
-dwv.tool.ToolBox.prototype.appendHtml = function()
-{
-    var div = document.createElement("div");
-    div.id = "toolChooser";
-    
-    var paragraph = document.createElement("p");  
-    paragraph.appendChild(document.createTextNode("Tool: "));
-    
-    var selector = document.createElement("select");
-    selector.id = "dtool";
-    selector.name = "dtool";
-    selector.disabled = 1;
-    selector.onchange = this.eventToolChange;
-    paragraph.appendChild(selector);
-
-    var options = [this.defaultToolName, "draw", "livewire", "zoom", "filter"];
-    var option;
-    for( var i = 0; i < options.length; ++i )
-    {
-        option = document.createElement("option");
-        option.value = options[i];
-        option.appendChild(document.createTextNode(options[i]));
-        selector.appendChild(option);
-    }
-
-    div.appendChild(paragraph);
-    document.getElementById('toolbox').appendChild(div);
 };

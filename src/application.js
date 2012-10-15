@@ -53,10 +53,6 @@ dwv.App = function()
      */
     this.init = function()
     {
-        // add the HTML for the tool box 
-        toolBox.appendHtml();
-        // add the HTML for the history 
-        undoStack.appendHtml();
         // bind open files with method
         document.getElementById('files').addEventListener('change', this.loadDicom, false);
     };
@@ -270,6 +266,11 @@ dwv.App = function()
             0, 0, 
             self.getImage().getSize().getNumberOfColumns(), 
             self.getImage().getSize().getNumberOfRows());
+
+        // add the HTML for the tool box 
+        dwv.gui.appendToolboxHtml();
+        // add the HTML for the history 
+        dwv.gui.appendUndoHtml();
 
         // Attach the mousedown, mousemove and mouseup event listeners.
         tempLayer.getCanvas().addEventListener('mousedown', eventHandler, false);

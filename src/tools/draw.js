@@ -114,12 +114,12 @@ dwv.tool.Draw = function(app)
     // Enable the draw tool
     this.enable = function(value){
         if( value ) {
-            dwv.tool.draw.appendShapeChooserHtml(app);
-            dwv.tool.draw.appendColourChooserHtml(app);
+            dwv.gui.appendShapeChooserHtml();
+            dwv.gui.appendColourChooserHtml();
         }
         else { 
-            dwv.tool.draw.clearColourChooserHtml();
-            dwv.tool.draw.clearShapeChooserHtml();
+            dwv.gui.clearColourChooserHtml();
+            dwv.gui.clearShapeChooserHtml();
         }
     };
     
@@ -144,97 +144,3 @@ dwv.tool.Draw = function(app)
     };
     
 }; // Draw class
-
-/**
- * @function Append the color chooser to the HTML document in the 'colourChooser' node.
- */
-dwv.tool.draw.appendColourChooserHtml = function(app)
-{
-    var div = document.createElement("div");
-    div.id = "colourChooser";
-    
-    var paragraph = document.createElement("p");  
-    paragraph.appendChild(document.createTextNode("Colour: "));
-
-    var selector = document.createElement("select");
-    selector.id = "colourChooser";
-    selector.name = "colourChooser";
-    selector.onchange = app.getToolBox().getSelectedTool().setLineColor;
-    paragraph.appendChild(selector);
-
-    var options = ["yellow", "red", "white", "green", "blue", "lime", "fuchsia", "black"];
-    var option;
-    for( var i = 0; i < options.length; ++i )
-    {
-        option = document.createElement("option");
-        option.id = options[i];
-        option.appendChild(document.createTextNode(options[i]));
-        selector.appendChild(option);
-    }
-
-    div.appendChild(paragraph);
-    document.getElementById('toolbox').appendChild(div);
-};
-
-/**
- * @function Remove the color chooser specific node.
- */
-dwv.tool.draw.clearColourChooserHtml = function()
-{
-    // find the tool specific node
-    var node = document.getElementById('colourChooser');
-    // delete its content
-    while (node.hasChildNodes()) { 
-        node.removeChild(node.firstChild);
-    }
-    // remove the tool specific node
-    var top = document.getElementById('toolbox');
-    top.removeChild(node);
-};
-
-/**
- * @function Append the shape chooser to the HTML document in the 'shapeChooser' node.
- */
-dwv.tool.draw.appendShapeChooserHtml = function(app)
-{
-    var div = document.createElement("div");
-    div.id = "shapeChooser";
-    
-    var paragraph = document.createElement("p");  
-    paragraph.appendChild(document.createTextNode("Shape: "));
-    
-    var selector = document.createElement("select");
-    selector.id = "dshape";
-    selector.name = "dshape";
-    selector.onchange = app.getToolBox().getSelectedTool().setShapeName;
-    paragraph.appendChild(selector);
-
-    var options = ["line", "rectangle", "circle", "roi"]; // line is default
-    var option;
-    for( var i = 0; i < options.length; ++i )
-    {
-        option = document.createElement("option");
-        option.id = options[i];
-        option.appendChild(document.createTextNode(options[i]));
-        selector.appendChild(option);
-    }
-
-    div.appendChild(paragraph);
-    document.getElementById('toolbox').appendChild(div);
-};
-
-/**
- * @function Remove the shape chooser specific node.
- */
-dwv.tool.draw.clearShapeChooserHtml = function()
-{
-    // find the tool specific node
-    var node = document.getElementById('shapeChooser');
-    // delete its content
-    while (node.hasChildNodes()) { 
-        node.removeChild(node.firstChild);
-    }
-    // remove the tool specific node
-    var top = document.getElementById('toolbox');
-    top.removeChild(node);
-};
