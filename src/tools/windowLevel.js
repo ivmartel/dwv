@@ -253,12 +253,6 @@ dwv.tool.WindowLevel = function(app)
 
 dwv.tool.WindowLevel.prototype.appendHtml = function()
 {
-    var div = document.createElement("div");
-    div.id = "presetSelector";
-    
-    // paragraph for the window level preset selector
-    var wlParagraph = document.createElement("p");  
-    wlParagraph.appendChild(document.createTextNode("WL Preset: "));
     // preset selector
     var wlSelector = document.createElement("select");
     wlSelector.id = "presetsMenu";
@@ -287,12 +281,7 @@ dwv.tool.WindowLevel.prototype.appendHtml = function()
         option.appendChild(document.createTextNode(wlOptions[i]));
         wlSelector.appendChild(option);
     }
-    // append to paragraph
-    wlParagraph.appendChild(wlSelector);
     
-    // paragraph for colour map selector
-    var cmParagraph = document.createElement("p");  
-    cmParagraph.appendChild(document.createTextNode("Colour Map: "));
     // preset selector
     var cmSelector = document.createElement("select");
     cmSelector.id = "colourMapMenu";
@@ -308,19 +297,28 @@ dwv.tool.WindowLevel.prototype.appendHtml = function()
         option.appendChild(document.createTextNode(cmOptions[o]));
         cmSelector.appendChild(option);
     }
-    // append to paragraph
-    cmParagraph.appendChild(cmSelector);
 
-    // append plot
-    var plotDiv = document.createElement("div");
-    plotDiv.id = "plot";
-    plotDiv.style.width = "250px";
-    plotDiv.style.height = "150px";
+    // formatting...
+    var div = document.createElement("div");
+    div.id = "wl-options";
+    // list
+    var list_ul = document.createElement("ul");
+    // first item: window level
+    var list_li0 = document.createElement("li");
+    list_li0.appendChild(document.createTextNode("WL Preset: "));
+    list_li0.appendChild(wlSelector);
+    // append to list
+    list_ul.appendChild(list_li0);
+    // second item: colour map selector
+    var list_li1 = document.createElement("li");
+    list_li1.appendChild(document.createTextNode("Colour Map: "));
+    list_li1.appendChild(cmSelector);
+    // append to list
+    list_ul.appendChild(list_li1);
+    // append list to div
+    div.appendChild(list_ul);
     
-    // put all together
-    div.appendChild(wlParagraph);
-    div.appendChild(cmParagraph);
-    div.appendChild(plotDiv);
+    // add to document
     document.getElementById('toolbox').appendChild(div);
 };
 
@@ -347,7 +345,7 @@ dwv.tool.WindowLevel.prototype.updatePlot = function(wc,ww)
 dwv.tool.WindowLevel.prototype.clearHtml = function()
 {
     // find the tool specific node
-    var node = document.getElementById('presetSelector');
+    var node = document.getElementById('wl-options');
     // delete its content
     while (node.hasChildNodes()) {
         node.removeChild(node.firstChild);
