@@ -179,23 +179,14 @@ dwv.App = function()
         while (node.hasChildNodes()) { 
             node.removeChild(node.firstChild);
         }
-        // new table
+        
+        // tags table
         var table = dwv.html.toTable(data);
         table.className = "tagList";
-        // append new table
+        // search form
+        node.appendChild(dwv.html.getHtmlSearchForm(table));
+        // tags table
         node.appendChild(table);
-        // display it
-        //node.style.display='';
-        
-        // table search form
-        var tagSearchform = document.createElement("form");
-        tagSearchform.setAttribute("class", "filter");
-        var input = document.createElement("input");
-        input.onkeyup = function() {
-            dwv.html.filterTable(input, table);
-        };
-        tagSearchform.appendChild(input);
-        node.insertBefore(tagSearchform, table);
         
         image = dicomParser.getImage();
     }

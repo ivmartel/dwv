@@ -112,6 +112,22 @@ dwv.html.toTable = function(input)
 
 /**
  * @function
+ */
+dwv.html.getHtmlSearchForm = function(htmlTableToSearch)
+{
+    var form = document.createElement("form");
+    form.setAttribute("class", "filter");
+    var input = document.createElement("input");
+    input.onkeyup = function() {
+        dwv.html.filterTable(input, htmlTableToSearch);
+    };
+    form.appendChild(input);
+    
+    return form;
+};
+
+/**
+ * @function
  * @param term
  * @param table
  */
