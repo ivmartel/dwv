@@ -25,11 +25,11 @@ dwv.tool.ToolBox.prototype.setSelectedTool = function(toolName) {
     // disable old one
     if( this.selectedTool )
     {
-        this.enable(false);
+        this.enableTool(false);
     }
     // enable new one
     this.selectedTool = new this.tools[toolName](app);
-    this.enable(true);
+    this.enableTool(true);
 };
 
 dwv.tool.ToolBox.prototype.hasTool = function(toolName) {
@@ -53,7 +53,7 @@ dwv.tool.ToolBox.prototype.init = function()
     }
 };
 
-dwv.tool.ToolBox.prototype.enable = function(value)
+dwv.tool.ToolBox.prototype.enableTool = function(value)
 {
     // enable selected tool
     this.selectedTool.enable(value);
