@@ -39,12 +39,14 @@ dwv.tool.ToolBox.prototype.hasTool = function(toolName) {
 dwv.tool.ToolBox.prototype.init = function()
 {
     // tool list
-    this.tools.draw = dwv.tool.Draw;
-    this.tools.roi = dwv.tool.Roi;
-    this.tools.livewire = dwv.tool.Livewire;
-    this.tools.windowLevel = dwv.tool.WindowLevel;
-    this.tools.zoom = dwv.tool.Zoom;
-    this.tools.filter = dwv.tool.Filter;
+    this.tools = {
+        windowLevel: dwv.tool.WindowLevel,
+        draw: dwv.tool.Draw,
+        roi: dwv.tool.Roi,
+        livewire: dwv.tool.Livewire,
+        zoom: dwv.tool.Zoom,
+        filter: dwv.tool.Filter
+    };
 
     // Activate the default tool.
     if (this.tools[this.defaultToolName])
