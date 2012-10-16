@@ -243,7 +243,7 @@ dwv.gui.Threshold = function()
             max: max,
             values: [ min, max ],
             slide: function( event, ui ) {
-                dwv.tool.filter.threshold(ui.values[ 0 ], ui.values[ 1 ]);
+                dwv.image.filter.threshold(ui.values[ 0 ], ui.values[ 1 ]);
             }
         });
 
@@ -265,7 +265,7 @@ dwv.gui.Threshold2 = function()
 
         $("#threshold-slider").bind("change",
             function( event ) {
-                dwv.tool.filter.threshold($("#threshold-slider").val(), max);
+                dwv.image.filter.threshold($("#threshold-slider").val(), max);
             }
         );
     };
@@ -287,7 +287,7 @@ dwv.gui.Sharpen = function()
         var button = document.createElement("button");
         button.id = "applyFilterButton";
         button.name = "applyFilterButton";
-        button.onclick = dwv.tool.filter.sharpen;
+        button.onclick = dwv.image.filter.sharpen;
         var text = document.createTextNode('Apply');
         button.appendChild(text);
 
@@ -313,7 +313,7 @@ dwv.gui.Sobel = function()
         var button = document.createElement("button");
         button.id = "applyFilterButton";
         button.name = "applyFilterButton";
-        button.onclick = dwv.tool.filter.sobel;
+        button.onclick = dwv.image.filter.sobel;
         var text = document.createTextNode('Apply');
         button.appendChild(text);
 
