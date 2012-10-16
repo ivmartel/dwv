@@ -190,16 +190,17 @@ dwv.gui.appendFilterHtml = function()
     var filterSelector = document.createElement("select");
     filterSelector.id = "filtersMenu";
     filterSelector.name = "filtersMenu";
-    filterSelector.onchange = dwv.gui.onChangeFilter;
+    //filterSelector.onchange = dwv.gui.onChangeFilter;
+    filterSelector.onchange = app.getToolBox().getSelectedTool().eventFilterChange;
     filterSelector.selectedIndex = 1;
     // selector options
-    var filterOptions = ["Threshold", "Sharpen", "Sobel"];
+    var filterOptions = ["threshold", "sharpen", "sobel"];
     // append options
     var option;
     for ( var i = 0; i < filterOptions.length; ++i )
     {
         option = document.createElement("option");
-        option.value = i+1;
+        option.value = filterOptions[i];
         option.appendChild(document.createTextNode(filterOptions[i]));
         filterSelector.appendChild(option);
     }
@@ -208,10 +209,6 @@ dwv.gui.appendFilterHtml = function()
     filterParagraph.appendChild(filterSelector);
     div.appendChild(filterParagraph);
     document.getElementById('toolbox').appendChild(div);
-
-    // enable default filter
-    var filterUI = new dwv.gui.Threshold();
-    filterUI.display();
 };
 
 dwv.gui.clearFilterHtml = function()
@@ -225,102 +222,100 @@ dwv.gui.clearSubFilterDiv = function()
 };
 
 /**
-* @class Threshold Filter User Interface.
+ * @namespace GUI classes.
+ */
+dwv.gui.filter = dwv.gui.filter || {};
+
+/**
+* @function Threshold Filter User Interface.
 */
-dwv.gui.Threshold = function()
+dwv.gui.filter.displayThreshold = function()
 {
-    this.display = function() {
-        var div = document.createElement("div");
-        div.id = "subFilterDiv";
-        document.getElementById('filterDiv').appendChild(div);
+    var div = document.createElement("div");
+    div.id = "subFilterDiv";
+    document.getElementById('filterDiv').appendChild(div);
 
-        var min = app.getImage().getDataRange().min;
-        var max = app.getImage().getDataRange().max;
-        
-        $( "#subFilterDiv" ).slider({
-            range: true,
-            min: min,
-            max: max,
-            values: [ min, max ],
-            slide: function( event, ui ) {
-                dwv.image.filter.threshold(ui.values[ 0 ], ui.values[ 1 ]);
-            }
-        });
-
-    };
+    var min = app.getImage().getDataRange().min;
+    var max = app.getImage().getDataRange().max;
+    
+    $( "#subFilterDiv" ).slider({
+        range: true,
+        min: min,
+        max: max,
+        values: [ min, max ],
+        slide: function( event, ui ) {
+            app.getToolBox().getSelectedTool().getSelectedFilter().run(
+                    {'min':ui.values[0], 'max':ui.values[1]});
+        }
+    });
 };
 
 /**
-* @class Threshold Filter User Interface.
+* @function Threshold Filter User Interface.
 */
-dwv.gui.Threshold2 = function()
+dwv.gui.filter.displayThreshold2 = function()
 {
-    this.display = function() {
-        var min = app.getImage().getDataRange().min;
-        var max = app.getImage().getDataRange().max;
-        
-        $("#threshold-slider").attr("min", min).slider("refresh");
-        $("#threshold-slider").attr("max", max).slider("refresh");
-        $("#threshold-slider").attr("value", min).slider("refresh");
+    var min = app.getImage().getDataRange().min;
+    var max = app.getImage().getDataRange().max;
+    
+    $("#threshold-slider").attr("min", min).slider("refresh");
+    $("#threshold-slider").attr("max", max).slider("refresh");
+    $("#threshold-slider").attr("value", min).slider("refresh");
 
-        $("#threshold-slider").bind("change",
-            function( event ) {
-                dwv.image.filter.threshold($("#threshold-slider").val(), max);
-            }
-        );
-    };
+    $("#threshold-slider").bind("change",
+        function( event ) {
+            app.getToolBox().getSelectedTool().getSelectedFilter().run(
+                    {'min':$("#threshold-slider").val(), 'max':max});
+        }
+    );
 };
 
 /**
-* @class Sharpen Filter User Interface.
+* @function Sharpen Filter User Interface.
 */
-dwv.gui.Sharpen = function()
+dwv.gui.filter.displaySharpen = function()
 {
-    this.display = function() {
-        var div = document.createElement("div");
-        div.id = "subFilterDiv";
-        
-        var paragraph = document.createElement("p");  
-        paragraph.id = 'applyFilter';
-        paragraph.name = 'applyFilter';
+    var div = document.createElement("div");
+    div.id = "subFilterDiv";
+    
+    var paragraph = document.createElement("p");  
+    paragraph.id = 'applyFilter';
+    paragraph.name = 'applyFilter';
 
-        var button = document.createElement("button");
-        button.id = "applyFilterButton";
-        button.name = "applyFilterButton";
-        button.onclick = dwv.image.filter.sharpen;
-        var text = document.createTextNode('Apply');
-        button.appendChild(text);
+    var button = document.createElement("button");
+    button.id = "applyFilterButton";
+    button.name = "applyFilterButton";
+    button.onclick = app.getToolBox().getSelectedTool().getSelectedFilter().run;
+    var text = document.createTextNode('Apply');
+    button.appendChild(text);
 
-        paragraph.appendChild(button);
-        div.appendChild(paragraph);
-        document.getElementById('filterDiv').appendChild(div);
-    };    
+    paragraph.appendChild(button);
+    div.appendChild(paragraph);
+    document.getElementById('filterDiv').appendChild(div);
 };
 
 /**
-* @class Sobel Filter User Interface.
+* @function Sobel Filter User Interface.
 */
-dwv.gui.Sobel = function()
+dwv.gui.filter.displaySobel = function()
 {
-    this.display = function() {
-        var div = document.createElement("div");
-        div.id = "subFilterDiv";
-        
-        var paragraph = document.createElement("p");  
-        paragraph.id = 'applyFilter';
-        paragraph.name = 'applyFilter';
+    var div = document.createElement("div");
+    div.id = "subFilterDiv";
+    
+    var paragraph = document.createElement("p");  
+    paragraph.id = 'applyFilter';
+    paragraph.name = 'applyFilter';
 
-        var button = document.createElement("button");
-        button.id = "applyFilterButton";
-        button.name = "applyFilterButton";
-        button.onclick = dwv.image.filter.sobel;
-        var text = document.createTextNode('Apply');
-        button.appendChild(text);
+    var button = document.createElement("button");
+    button.id = "applyFilterButton";
+    button.name = "applyFilterButton";
+    button.onclick = app.getToolBox().getSelectedTool().getSelectedFilter().run;
+    var text = document.createTextNode('Apply');
+    button.appendChild(text);
 
-        paragraph.appendChild(button);
-        div.appendChild(paragraph);
-        document.getElementById('filterDiv').appendChild(div);
-    };    
+    paragraph.appendChild(button);
+    div.appendChild(paragraph);
+    document.getElementById('filterDiv').appendChild(div);
 };
 
 dwv.gui.appendZoomHtml = function()

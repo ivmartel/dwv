@@ -13,10 +13,6 @@ dwv.tool.ToolBox = function(app)
     this.defaultToolName = 'windowLevel';
 };
 
-dwv.tool.ToolBox.prototype.getTools = function() {
-    return this.tools;
-};
-
 dwv.tool.ToolBox.prototype.getSelectedTool = function() {
     return this.selectedTool;
 };

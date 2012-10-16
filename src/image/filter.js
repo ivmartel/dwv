@@ -12,7 +12,23 @@ dwv.image.filter = dwv.image.filter || {};
  * @param min The new minimum.
  * @param max The new maximum.
  */
-dwv.image.filter.threshold = function(min, max)
+dwv.image.filter.Threshold = function()
+{
+    var min = 0;
+    var max = 0;
+};
+
+dwv.image.filter.Threshold.prototype.setMin = function(value)
+{
+    min = value;
+};
+
+dwv.image.filter.Threshold.prototype.setMax = function(value)
+{
+    max = value;
+};
+
+dwv.image.filter.Threshold.prototype.update = function()
 {
     var imageMin = app.getImage().getLookup().rescaleIntercept;
     var threshFunction = function(x){
@@ -28,7 +44,9 @@ dwv.image.filter.threshold = function(min, max)
 /**
  * @function Sharpen an image using a sharpen convolution matrix.
  */
-dwv.image.filter.sharpen = function()
+dwv.image.filter.Sharpen = function() {};
+
+dwv.image.filter.Sharpen.prototype.update = function()
 {
     var newImage = app.getImage().convolute(
         [  0, -1,  0,
@@ -42,7 +60,9 @@ dwv.image.filter.sharpen = function()
 /**
  * @function Apply a Sobel filter to an image.
  */
-dwv.image.filter.sobel = function()
+dwv.image.filter.Sobel = function() {};
+
+dwv.image.filter.Sobel.prototype.update = function()
 {
     var gradX = app.getImage().convolute(
         [ 1,  0,  -1,
