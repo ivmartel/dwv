@@ -3,18 +3,44 @@
  */
 dwv.gui = dwv.gui || {};
 
-dwv.gui.onChangeWindowLevelPreset = function()
+dwv.gui.onChangeWindowLevelPreset = function(event)
 {
     var id = parseInt(document.getElementById("presetsMenu").options[
        document.getElementById("presetsMenu").selectedIndex].value, 10);
     app.getToolBox().getSelectedTool().applyPreset(id);
 };
 
-dwv.gui.onChangeColorMap = function()
+dwv.gui.onChangeColorMap = function(event)
 {
     var id = parseInt(document.getElementById("colourMapMenu").options[
        document.getElementById("colourMapMenu").selectedIndex].value, 10);
     app.getToolBox().getSelectedTool().applyColourMap(id);
+};
+
+dwv.gui.onChangeTool = function(event)
+{
+    toolName = this.value;
+    if( app.getToolBox().hasTool(toolName) )
+    {
+        app.getToolBox().setSelectedTool(toolName);
+    }
+    else
+    {
+        throw new Error("Unknown tool: '" + toolName + "'");
+    }
+};
+
+dwv.gui.onChangeFilter = function(event)
+{
+    filterName = this.value;
+    if( app.getToolBox().getSelectedTool().hasFilter(filterName) )
+    {
+        app.getToolBox().getSelectedTool().setSelectedFilter(filterName);
+    }
+    else
+    {
+        throw new Error("Unknown filter: '" + filterName + "'");
+    }
 };
 
 dwv.gui.appendWindowLevelHtml = function()
@@ -183,7 +209,7 @@ dwv.gui.appendFilterHtml = function()
     var filterSelector = document.createElement("select");
     filterSelector.id = "filtersMenu";
     filterSelector.name = "filtersMenu";
-    filterSelector.onchange = app.getToolBox().getSelectedTool().eventFilterChange;
+    filterSelector.onchange = dwv.gui.onChangeFilter;
     filterSelector.selectedIndex = 1;
     // selector options
     var filterOptions = ["threshold", "sharpen", "sobel"];
@@ -347,7 +373,7 @@ dwv.gui.appendToolboxHtml = function()
     var selector = document.createElement("select");
     selector.id = "dtool";
     selector.name = "dtool";
-    selector.onchange = app.getToolBox().eventToolChange;
+    selector.onchange = dwv.gui.onChangeTool;
     paragraph.appendChild(selector);
 
     var options = ["windowLevel", "draw", "livewire", "zoom", "filter"];

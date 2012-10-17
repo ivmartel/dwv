@@ -74,20 +74,6 @@ dwv.tool.Filter.prototype.enableFilter= function(value)
     this.selectedFilter.enable(value);
 };
 
-// The event handler for any changes made to the filter selector.
-dwv.tool.Filter.prototype.eventFilterChange = function(event)
-{
-    filterName = this.value;
-    if( app.getToolBox().getSelectedTool().hasFilter(filterName) )
-    {
-        app.getToolBox().getSelectedTool().setSelectedFilter(filterName);
-    }
-    else
-    {
-        throw new Error("Unknown filter: '" + filterName + "'");
-    }
-};
-
 /**
 * @class Threshold filter tool.
 */

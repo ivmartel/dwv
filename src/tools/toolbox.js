@@ -56,17 +56,3 @@ dwv.tool.ToolBox.prototype.enableTool = function(value)
     // enable selected tool
     this.selectedTool.enable(value);
 };
-
-// The event handler for any changes made to the tool selector.
-dwv.tool.ToolBox.prototype.eventToolChange = function(event)
-{
-    toolName = this.value;
-    if( app.getToolBox().hasTool(toolName) )
-    {
-        app.getToolBox().setSelectedTool(toolName);
-    }
-    else
-    {
-        throw new Error("Unknown tool: '" + toolName + "'");
-    }
-};
