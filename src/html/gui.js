@@ -171,13 +171,6 @@ dwv.gui.clearShapeChooserHtml = function()
     dwv.html.removeAllChildren("shapeChooser", "toolbox");
 };
 
-dwv.gui.onChangeFilter = function()
-{
-    var id = parseInt(document.getElementById("filtersMenu").options[
-       document.getElementById("filtersMenu").selectedIndex].value, 10);
-    dwv.tool.displayFilter(id);
-};
-
 dwv.gui.appendFilterHtml = function()
 {
     var div = document.createElement("div");
@@ -190,7 +183,6 @@ dwv.gui.appendFilterHtml = function()
     var filterSelector = document.createElement("select");
     filterSelector.id = "filtersMenu";
     filterSelector.name = "filtersMenu";
-    //filterSelector.onchange = dwv.gui.onChangeFilter;
     filterSelector.onchange = app.getToolBox().getSelectedTool().eventFilterChange;
     filterSelector.selectedIndex = 1;
     // selector options

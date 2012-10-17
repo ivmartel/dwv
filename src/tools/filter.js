@@ -8,27 +8,6 @@ dwv.tool = dwv.tool || {};
 dwv.tool.filter = dwv.tool.filter || {};
 
 /**
- * @function
- */
-dwv.tool.displayFilter = function(id)
-{    
-    dwv.gui.clearSubFilterDiv();
-    
-    switch (id)
-    {
-        case 1: // threshold
-            dwv.gui.filter.displayThreshold();
-            break;
-        case 2: // sharpen
-            dwv.gui.filter.displaySharpen();
-            break;
-        case 3: // sobel
-            dwv.gui.filter.displaySobel();
-            break;
-    }
-};
-
-/**
 * @class Filter tool.
 */
 dwv.tool.Filter = function(app)
