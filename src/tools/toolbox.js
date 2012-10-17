@@ -17,15 +17,20 @@ dwv.tool.ToolBox.prototype.getSelectedTool = function() {
     return this.selectedTool;
 };
 
-dwv.tool.ToolBox.prototype.setSelectedTool = function(toolName) {
-    // disable old one
+dwv.tool.ToolBox.prototype.setSelectedTool = function(name) {
+    // check if we have it
+    if( !this.hasTool(name) )
+    {
+        throw new Error("Unknown tool: '" + name + "'");
+    }
+    // disable last selected
     if( this.selectedTool )
     {
-        this.enableTool(false);
+        this.selectedTool.enable(false);
     }
     // enable new one
-    this.selectedTool = new this.tools[toolName](app);
-    this.enableTool(true);
+    this.selectedTool = new this.tools[name](app);
+    this.selectedTool.enable(true);
 };
 
 dwv.tool.ToolBox.prototype.hasTool = function(toolName) {
@@ -49,10 +54,4 @@ dwv.tool.ToolBox.prototype.init = function()
     {
         this.setSelectedTool(this.defaultToolName);
     }
-};
-
-dwv.tool.ToolBox.prototype.enableTool = function(value)
-{
-    // enable selected tool
-    this.selectedTool.enable(value);
 };

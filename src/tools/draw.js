@@ -129,18 +129,16 @@ dwv.tool.Draw = function(app)
     };
 
     // Set the line color of the drawing
-    this.setLineColor = function(event)
+    this.setShapeColour = function(colour)
     {
-        // get the color
-        var color = event.target.options[event.target.selectedIndex].text;
         // set style var
-        style.setLineColor(color);
+        style.setLineColor(colour);
     };
     
     // Set the shape name of the drawing
-    this.setShapeName = function(event)
+    this.setShapeName = function(name)
     {
-        shapeName = event.target.options[event.target.selectedIndex].text;
+        shapeName = name;
     };
     
 }; // Draw class

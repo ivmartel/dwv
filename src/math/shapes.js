@@ -52,7 +52,7 @@ dwv.math.ShapeFactory.prototype.create = function(shapeName, points)
     }
     else
     {
-        throw new Error("Unknown shape name when creating shape.");
+        throw new Error("Unknown shape name when creating shape: '" + shapeName + "'");
     }
     return object;
 };

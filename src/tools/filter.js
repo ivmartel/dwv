@@ -38,14 +38,19 @@ dwv.tool.Filter.prototype.getSelectedFilter = function() {
 };
 
 dwv.tool.Filter.prototype.setSelectedFilter = function(name) {
-    // disable old one
+    // check if we have it
+    if( !this.hasFilter(name) )
+    {
+        throw new Error("Unknown filter: '" + name + "'");
+    }
+    // disable last selected
     if( this.selectedFilter )
     {
-        this.enableFilter(false);
+        this.selectedFilter.enable(false);
     }
     // enable new one
     this.selectedFilter = new this.filters[name](app);
-    this.enableFilter(true);
+    this.selectedFilter.enable(true);
 };
 
 dwv.tool.Filter.prototype.hasFilter = function(name) {
@@ -66,12 +71,6 @@ dwv.tool.Filter.prototype.init = function()
     {
         this.setSelectedFilter(this.defaultFilterName);
     }
-};
-
-dwv.tool.Filter.prototype.enableFilter= function(value)
-{
-    // enable selected filter
-    this.selectedFilter.enable(value);
 };
 
 /**

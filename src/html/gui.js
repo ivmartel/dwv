@@ -5,42 +5,32 @@ dwv.gui = dwv.gui || {};
 
 dwv.gui.onChangeWindowLevelPreset = function(event)
 {
-    var id = parseInt(document.getElementById("presetsMenu").options[
-       document.getElementById("presetsMenu").selectedIndex].value, 10);
-    app.getToolBox().getSelectedTool().applyPreset(id);
+    app.getToolBox().getSelectedTool().setPreset(this.value);
 };
 
-dwv.gui.onChangeColorMap = function(event)
+dwv.gui.onChangeColourMap = function(event)
 {
-    var id = parseInt(document.getElementById("colourMapMenu").options[
-       document.getElementById("colourMapMenu").selectedIndex].value, 10);
-    app.getToolBox().getSelectedTool().applyColourMap(id);
+    app.getToolBox().getSelectedTool().setColourMap(this.value);
 };
 
 dwv.gui.onChangeTool = function(event)
 {
-    toolName = this.value;
-    if( app.getToolBox().hasTool(toolName) )
-    {
-        app.getToolBox().setSelectedTool(toolName);
-    }
-    else
-    {
-        throw new Error("Unknown tool: '" + toolName + "'");
-    }
+    app.getToolBox().setSelectedTool(this.value);
 };
 
 dwv.gui.onChangeFilter = function(event)
 {
-    filterName = this.value;
-    if( app.getToolBox().getSelectedTool().hasFilter(filterName) )
-    {
-        app.getToolBox().getSelectedTool().setSelectedFilter(filterName);
-    }
-    else
-    {
-        throw new Error("Unknown filter: '" + filterName + "'");
-    }
+    app.getToolBox().getSelectedTool().setSelectedFilter(this.value);
+};
+
+dwv.gui.onChangeShape = function(event)
+{
+    app.getToolBox().getSelectedTool().setShapeName(this.value);
+};
+
+dwv.gui.onChangeShapeColour = function(event)
+{
+    app.getToolBox().getSelectedTool().setShapeColour(this.value);
 };
 
 dwv.gui.appendWindowLevelHtml = function()
@@ -69,7 +59,7 @@ dwv.gui.appendWindowLevelHtml = function()
     for ( var i = 0; i < wlOptions.length; ++i )
     {
         option = document.createElement("option");
-        option.value = i+1;
+        option.value = wlOptions[i].toLowerCase();
         option.appendChild(document.createTextNode(wlOptions[i]));
         wlSelector.appendChild(option);
     }
@@ -78,14 +68,14 @@ dwv.gui.appendWindowLevelHtml = function()
     var cmSelector = document.createElement("select");
     cmSelector.id = "colourMapMenu";
     cmSelector.name = "colourMapMenu";
-    cmSelector.onchange = dwv.gui.onChangeColorMap;
+    cmSelector.onchange = dwv.gui.onChangeColourMap;
     cmSelector.selectedIndex = 1;
     // selector options
-    var cmOptions = ["Default", "InvPlain", "Rainbow", "Hot", "Test"];
+    var cmOptions = ["Plain", "InvPlain", "Rainbow", "Hot", "Test"];
     for ( var o = 0; o < cmOptions.length; ++o )
     {
         option = document.createElement("option");
-        option.value = o+1;
+        option.value = cmOptions[o].toLowerCase();
         option.appendChild(document.createTextNode(cmOptions[o]));
         cmSelector.appendChild(option);
     }
@@ -133,15 +123,15 @@ dwv.gui.appendColourChooserHtml = function()
     var selector = document.createElement("select");
     selector.id = "colourChooser";
     selector.name = "colourChooser";
-    selector.onchange = app.getToolBox().getSelectedTool().setLineColor;
+    selector.onchange = dwv.gui.onChangeShapeColour;
     paragraph.appendChild(selector);
 
-    var options = ["yellow", "red", "white", "green", "blue", "lime", "fuchsia", "black"];
+    var options = ["Yellow", "Red", "White", "Green", "Blue", "Lime", "Fuchsia", "Black"];
     var option;
     for( var i = 0; i < options.length; ++i )
     {
         option = document.createElement("option");
-        option.id = options[i];
+        option.id = options[i].toLowerCase();
         option.appendChild(document.createTextNode(options[i]));
         selector.appendChild(option);
     }
@@ -172,15 +162,15 @@ dwv.gui.appendShapeChooserHtml = function()
     var selector = document.createElement("select");
     selector.id = "dshape";
     selector.name = "dshape";
-    selector.onchange = app.getToolBox().getSelectedTool().setShapeName;
+    selector.onchange = dwv.gui.onChangeShape;
     paragraph.appendChild(selector);
 
-    var options = ["line", "rectangle", "circle", "roi"]; // line is default
+    var options = ["Line", "Rectangle", "Circle", "Roi"]; // line is default
     var option;
     for( var i = 0; i < options.length; ++i )
     {
         option = document.createElement("option");
-        option.id = options[i];
+        option.value = options[i].toLowerCase();
         option.appendChild(document.createTextNode(options[i]));
         selector.appendChild(option);
     }

@@ -4,7 +4,7 @@
 dwv.tool = dwv.tool || {};
 
 /**
-* @fileOverviez WindowLevel tool.
+* @fileOverview WindowLevel tool.
 */
 
 /**
@@ -131,6 +131,22 @@ dwv.tool.WindowLevel = function(app)
     this.started = false;
     this.displayed = false;
 
+    this.colourMaps = {
+        "plain": dwv.image.lut.plain,
+        "invplain": dwv.image.lut.invPlain,
+        "rainbow": dwv.image.lut.rainbow,
+        "hot": dwv.image.lut.hot,
+        "test": dwv.image.lut.test
+    };
+    
+    this.presets = {
+        "abdomen": {"center": 350, "width": 40},
+        "lung": {"center": -600, "width": 1500},
+        "brain": {"center": 40, "width": 80},
+        "bone": {"center": 480, "width": 2500},
+        "head": {"center": 90, "width": 350}
+    };
+
     // This is called when you start holding down the mouse button.
     this.mousedown = function(ev){
         self.started = true;
@@ -174,6 +190,7 @@ dwv.tool.WindowLevel = function(app)
     
     this.enable = function(bool){
         if( bool ) {
+            this.updatePresets();
             dwv.gui.appendWindowLevelHtml();
             dwv.tool.updateWindowingData(
                     parseInt(app.getImage().getLookup().windowCenter, 10),
@@ -190,59 +207,50 @@ dwv.tool.WindowLevel = function(app)
 
 }; // WindowLevel class
 
-/**
- * @function
- */
-dwv.tool.WindowLevel.prototype.applyPreset = function(id)
+dwv.tool.WindowLevel.prototype.updatePresets = function()
 {    
-    var presets = [];
     // from DICOM
-    for( var i = 0; i < app.getImage().getLookup().windowPresets.length; ++i ) {
-       presets.push(app.getImage().getLookup().windowPresets[i]);
+    var dicomPresets = app.getImage().getLookup().windowPresets;
+    for( var i = 0; i < dicomPresets.length; ++i ) {
+        this.presets[dicomPresets[i].name.toLowerCase()] = dicomPresets[i];
     }
-    // defaults
-    presets.push({"center": 350, "width": 40}); // abdomen
-    presets.push({"center": -600, "width": 1500}); // lung
-    presets.push({"center": 40, "width": 80}); // brain
-    presets.push({"center": 480, "width": 2500}); // bone
-    presets.push({"center": 90, "width": 350}); // head
     // min/max preset
     var range = app.getImage().getDataRange();
     var min = range.min;
     var max = range.max;
     var width = max - min;
     var center = min + width/2;
-    presets.push({"center": center, "width": width}); // min/max
-    
-    dwv.tool.updateWindowingData(
-        presets[id-1].center, 
-        presets[id-1].width );
-
+    this.presets["min/max"] = {"center": center, "width": width};
 };
 
 /**
  * @function
  */
-dwv.tool.WindowLevel.prototype.applyColourMap = function(id)
+dwv.tool.WindowLevel.prototype.setPreset = function(name)
 {    
-    switch (id)
+    // check if we have it
+    if( !this.presets[name] )
     {
-        case 1: // default
-            dwv.tool.updateColourMap(dwv.image.lut.plain);
-            break;
-        case 2: // inv plain
-            dwv.tool.updateColourMap(dwv.image.lut.invPlain);
-            break;
-        case 3: // rainbow
-            dwv.tool.updateColourMap(dwv.image.lut.rainbow);
-            break;
-        case 4: // hot
-            dwv.tool.updateColourMap(dwv.image.lut.hot);
-            break;
-        case 5: // test
-            dwv.tool.updateColourMap(dwv.image.lut.test);
-            break;
+        throw new Error("Unknown window level preset: '" + name + "'");
     }
+    // enable it
+    dwv.tool.updateWindowingData(
+        this.presets[name].center, 
+        this.presets[name].width );
+};
+
+/**
+ * @function
+ */
+dwv.tool.WindowLevel.prototype.setColourMap = function(name)
+{    
+    // check if we have it
+    if( !this.colourMaps[name] )
+    {
+        throw new Error("Unknown colour map: '" + name + "'");
+    }
+    // enable it
+    dwv.tool.updateColourMap( this.colourMaps[name] );
 };
 
 dwv.tool.WindowLevel.prototype.updatePlot = function(wc,ww)
@@ -253,14 +261,14 @@ dwv.tool.WindowLevel.prototype.updatePlot = function(wc,ww)
     var max = center + half;
     
     var markings = [
-        { color: '#faa', lineWidth: 1, xaxis: { from: min, to: min } },
-        { color: '#aaf', lineWidth: 1, xaxis: { from: max, to: max } }
+        { "color": "#faa", "lineWidth": 1, "xaxis": { "from": min, "to": min } },
+        { "color": "#aaf", "lineWidth": 1, "xaxis": { "from": max, "to": max } }
     ];
 
     $.plot($("#plot"), [ app.getImage().getHistogram() ], {
-        bars: { show: true },
-        grid: { markings: markings, backgroundColor: null },
-        xaxis: { show: false },
-        yaxis: { show: false }
+        "bars": { "show": true },
+        "grid": { "markings": markings, "backgroundColor": null },
+        "xaxis": { "show": false },
+        "yaxis": { "show": false }
     });
 };
