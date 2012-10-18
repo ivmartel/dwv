@@ -43,3 +43,6 @@ dwv.tool.DrawRectangleCommand = function(rectangle, app, style)
                 rectangle.getEnd().getY() + style.getFontSize());
     }; 
 }; // DrawRectangleCommand class
+
+//Add the shape command to the list
+dwv.tool.shapes["rectangle"] = dwv.tool.DrawRectangleCommand;

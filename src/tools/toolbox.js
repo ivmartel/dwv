@@ -3,23 +3,16 @@
  */
 dwv.tool = dwv.tool || {};
 
-// tool list
-dwv.tool.tools = {
-    "windowlevel": dwv.tool.WindowLevel,
-    "draw": dwv.tool.Draw,
-    "roi": dwv.tool.Roi,
-    "livewire": dwv.tool.Livewire,
-    "zoom": dwv.tool.Zoom,
-    "filter": dwv.tool.Filter
-};
-
+// tool list: to be completed after each tool definition 
+dwv.tool.tools = {};
+    
 /**
 * @class Tool box.
 */
 dwv.tool.ToolBox = function(app)
 {
     this.selectedTool = 0;
-    this.defaultToolName = "windowlevel";
+    this.defaultToolName = 0;
 };
 
 dwv.tool.ToolBox.prototype.enable = function(bool)
@@ -56,5 +49,10 @@ dwv.tool.ToolBox.prototype.hasTool = function(name) {
 
 dwv.tool.ToolBox.prototype.init = function()
 {
+    // set the default to the first in the list
+    for( var key in dwv.tool.tools ){
+        this.defaultToolName = key;
+        break;
+    }
     this.setSelectedTool(this.defaultToolName);
 };

@@ -95,3 +95,6 @@ dwv.tool.Zoom = function(app)
     }
 
 }; // Zoom class
+
+//Add the tool to the list
+dwv.tool.tools["zoom"] = dwv.tool.Zoom;

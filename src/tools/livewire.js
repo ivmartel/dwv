@@ -167,6 +167,9 @@ dwv.tool.Livewire = function(app)
 
 }; // Livewire class
 
+//Add the tool to the list
+dwv.tool.tools["livewire"] = dwv.tool.Livewire;
+
 /**
  * @class Draw livewire command.
  * @param livewire The livewire to draw.

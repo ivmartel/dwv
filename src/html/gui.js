@@ -305,29 +305,18 @@ dwv.gui.clearZoomHtml = function()
 
 dwv.gui.appendToolboxHtml = function()
 {
-    var div = document.createElement("div");
-    div.id = "toolChooser";
-    
+    // select
+    var selector = dwv.html.createHtmlSelect("toolSelect",dwv.tool.tools);
+    selector.onchange = dwv.gui.onChangeTool;
+    // paragraph
     var paragraph = document.createElement("p");  
     paragraph.appendChild(document.createTextNode("Tool: "));
-    
-    var selector = document.createElement("select");
-    selector.id = "dtool";
-    selector.name = "dtool";
-    selector.onchange = dwv.gui.onChangeTool;
     paragraph.appendChild(selector);
-
-    var options = ["windowLevel", "draw", "livewire", "zoom", "filter"];
-    var option;
-    for( var i = 0; i < options.length; ++i )
-    {
-        option = document.createElement("option");
-        option.value = options[i];
-        option.appendChild(document.createTextNode(options[i]));
-        selector.appendChild(option);
-    }
-
+    // div
+    var div = document.createElement("div");
+    div.id = "toolChooser";
     div.appendChild(paragraph);
+    // append to document
     document.getElementById('toolbox').appendChild(div);
 };
 

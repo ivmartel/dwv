@@ -270,3 +270,6 @@ dwv.tool.WindowLevel.prototype.updatePlot = function(wc,ww)
         "yaxis": { "show": false }
     });
 };
+
+// Add the tool to the list
+dwv.tool.tools["windowlevel"] = dwv.tool.WindowLevel;

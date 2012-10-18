@@ -42,3 +42,6 @@ dwv.tool.DrawLineCommand = function(line, app, style)
                 line.getEnd().getY() + style.getFontSize());
     }; 
 }; // DrawLineCommand class
+
+//Add the shape command to the list
+dwv.tool.shapes["line"] = dwv.tool.DrawLineCommand;

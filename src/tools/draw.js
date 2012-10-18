@@ -8,13 +8,8 @@ dwv.tool.colors = [
     "Yellow", "Red", "White", "Green", "Blue", "Lime", "Fuchsia", "Black"
 ];
 
-//! List of supported shapes
-dwv.tool.shapes = {
-    "line": dwv.tool.DrawLineCommand,
-    "circle": dwv.tool.DrawCircleCommand,
-    "rectangle": dwv.tool.DrawRectangleCommand,
-    "roi": dwv.tool.DrawRoiCommand
-};
+//shape list: to be completed after each tool definition 
+dwv.tool.shapes = {};
 
 /**
 * @class Drawing tool.
@@ -27,9 +22,9 @@ dwv.tool.Draw = function(app)
     // draw command
     var command = null;
     // draw style
-    var style = new dwv.html.Style();
+    this.style = new dwv.html.Style();
     // shape name
-    var shapeName = "line";
+    this.shapeName = 0;
     // list of points
     var points = [];
 
@@ -52,9 +47,9 @@ dwv.tool.Draw = function(app)
         points.push(new dwv.math.Point2D(ev._x, ev._y));
         // create shape
         var shapeFactory = new dwv.math.ShapeFactory();
-        var shape = shapeFactory.create(shapeName, points);
+        var shape = shapeFactory.create(self.shapeName, points);
         // create draw command
-        command = new dwv.tool.shapes[shapeName](shape, app, style);
+        command = new dwv.tool.shapes[self.shapeName](shape, app, self.style);
         // clear the temporary layer
         app.getTempLayer().clearContextRect();
         // draw
@@ -83,6 +78,7 @@ dwv.tool.Draw = function(app)
     // Enable the draw tool
     this.enable = function(value){
         if( value ) {
+            this.init();
             dwv.gui.appendShapeChooserHtml();
             dwv.gui.appendColourChooserHtml();
         }
@@ -103,7 +99,7 @@ dwv.tool.Draw = function(app)
 dwv.tool.Draw.prototype.setShapeColour = function(colour)
 {
     // set style var
-    style.setLineColor(colour);
+    this.style.setLineColor(colour);
 };
 
 // Set the shape name of the drawing
@@ -114,9 +110,24 @@ dwv.tool.Draw.prototype.setShapeName = function(name)
     {
         throw new Error("Unknown shape: '" + name + "'");
     }
-    shapeName = name;
+    this.shapeName = name;
 };
 
 dwv.tool.Draw.prototype.hasShape = function(name) {
     return dwv.tool.shapes[name];
 };
+
+dwv.tool.Draw.prototype.init = function() {
+    // set the default to the first in the list
+    var shapeName = 0;
+    for( var key in dwv.tool.shapes ){
+        shapeName = key;
+        break;
+    }
+    this.setShapeName(shapeName);
+    // same for color
+    this.setShapeColour(dwv.tool.colors[0]);
+};
+
+// Add the tool to the list
+dwv.tool.tools["draw"] = dwv.tool.Draw;

@@ -42,3 +42,6 @@ dwv.tool.DrawRoiCommand = function(roi, app, style)
         context.stroke();
     }; 
 }; // DrawRoiCommand class
+
+//Add the shape command to the list
+dwv.tool.shapes["roi"] = dwv.tool.DrawRoiCommand;
