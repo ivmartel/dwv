@@ -5,13 +5,13 @@ dwv.tool = dwv.tool || {};
 
 /**
  * @class Draw line command.
- * @param line The line to draw.
+ * @param points The points from which to extract the line.
  * @param app The application to draw the line on.
  * @param style The drawing style.
  */
-dwv.tool.DrawLineCommand = function(line, app, style)
+dwv.tool.DrawLineCommand = function(points, app, style)
 {
-    // app members can change 
+    var line = new dwv.math.Line(points[0], points[points.length-1]);
     var lineColor = style.getLineColor();
     var context = app.getTempLayer().getContext();
     

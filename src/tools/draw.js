@@ -45,11 +45,8 @@ dwv.tool.Draw = function(app)
         }
         // current point
         points.push(new dwv.math.Point2D(ev._x, ev._y));
-        // create shape
-        var shapeFactory = new dwv.math.ShapeFactory();
-        var shape = shapeFactory.create(self.shapeName, points);
         // create draw command
-        command = new dwv.tool.shapes[self.shapeName](shape, app, self.style);
+        command = new dwv.tool.shapes[self.shapeName](points, app, self.style);
         // clear the temporary layer
         app.getTempLayer().clearContextRect();
         // draw

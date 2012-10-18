@@ -5,13 +5,24 @@ dwv.tool = dwv.tool || {};
 
 /**
  * @class Draw circle command.
- * @param circle The circle to draw.
+ * @param points The points from which to extract the circle.
  * @param app The application to draw the circle on.
  * @param style The drawing style.
  */
-dwv.tool.DrawCircleCommand = function(circle, app, style)
+dwv.tool.DrawCircleCommand = function(points, app, style)
 {
-    // app members can change 
+    // radius
+    var a = Math.abs(points[0].getX() - points[points.length-1].getX());
+    var b = Math.abs(points[0].getY() - points[points.length-1].getY());
+    var radius = Math.round( Math.sqrt( a * a + b * b ) );
+    // check zero radius
+    if( radius === 0 )
+    {
+        // silent fail...
+        return;
+    }
+    // create circle
+    var circle = new dwv.math.Circle(points[0], radius);
     var lineColor = style.getLineColor();
     var context = app.getTempLayer().getContext();
     
@@ -47,4 +58,3 @@ dwv.tool.DrawCircleCommand = function(circle, app, style)
 
 //Add the shape command to the list
 dwv.tool.shapes["circle"] = dwv.tool.DrawCircleCommand;
-

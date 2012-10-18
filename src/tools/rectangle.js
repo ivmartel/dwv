@@ -5,13 +5,13 @@ dwv.tool = dwv.tool || {};
 
 /**
  * @class Draw rectangle command.
- * @param rectangle The rectangle to draw.
+ * @param points The points from which to extract the circle.
  * @param app The application to draw the line on.
  * @param style The drawing style.
  */
-dwv.tool.DrawRectangleCommand = function(rectangle, app, style)
+dwv.tool.DrawRectangleCommand = function(points, app, style)
 {
-    // app members can change 
+    var rectangle = new dwv.math.Rectangle(points[0], points[points.length-1]);
     var lineColor = style.getLineColor();
     var context = app.getTempLayer().getContext();
     

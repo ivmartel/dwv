@@ -5,13 +5,15 @@ dwv.tool = dwv.tool || {};
 
 /**
  * @class Draw ROI command.
- * @param roi The ROI to draw.
+ * @param points The points from which to extract the line.
  * @param app The application to draw the line on.
  * @param style The drawing style.
  */
-dwv.tool.DrawRoiCommand = function(roi, app, style)
+dwv.tool.DrawRoiCommand = function(points, app, style)
 {
-    // app members can change 
+    var roi = new dwv.math.ROI();
+    roi.addPoints(points);
+
     var lineColor = style.getLineColor();
     var context = app.getTempLayer().getContext();
     

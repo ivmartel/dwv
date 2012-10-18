@@ -9,55 +9,6 @@ dwv.math = dwv.math || {};
  */
 
 /**
- * @class Shape factory.
- */
-dwv.math.ShapeFactory = function() {};
-
-/**
- * Create a shape according to a name and some arguments.
- * @param shapeName The name of the shape.
- * @param points The points of the shape.
- * @returns The created shape.
- */
-dwv.math.ShapeFactory.prototype.create = function(shapeName, points)
-{
-    var object = null;
-    if( shapeName === "line")
-    {
-        object = new dwv.math.Line(points[0], points[points.length-1]);
-    }
-    else if( shapeName === "rectangle")
-    {
-        object = new dwv.math.Rectangle(points[0], points[points.length-1]);
-    }
-    else if( shapeName === "circle")
-    {
-        // radius
-        var a = Math.abs(points[0].getX() - points[points.length-1].getX());
-        var b = Math.abs(points[0].getY() - points[points.length-1].getY());
-        var radius = Math.round( Math.sqrt( a * a + b * b ) );
-        // check zero radius
-        if( radius === 0 )
-        {
-            // silent fail...
-            return;
-        }
-        // create circle
-        object = new dwv.math.Circle(points[0], radius);
-    }
-    else if( shapeName === "roi")
-    {
-        object = new dwv.math.ROI();
-        object.addPoints(points);
-    }
-    else
-    {
-        throw new Error("Unknown shape name when creating shape: '" + shapeName + "'");
-    }
-    return object;
-};
-
-/**
  * @class 2D point. Immutable.
  * @param x The X coordinate for the point.
  * @param y The Y coordinate for the point.
