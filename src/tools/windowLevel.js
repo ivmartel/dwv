@@ -120,7 +120,13 @@ dwv.tool.updateColourMap = function(colourMap)
     app.generateAndDrawImage();
 };
 
-
+dwv.tool.colourMaps = {
+    "plain": dwv.image.lut.plain,
+    "invplain": dwv.image.lut.invPlain,
+    "rainbow": dwv.image.lut.rainbow,
+    "hot": dwv.image.lut.hot,
+    "test": dwv.image.lut.test
+};
 
 /**
  * @class WindowLevel class.
@@ -130,14 +136,6 @@ dwv.tool.WindowLevel = function(app)
     var self = this;
     this.started = false;
     this.displayed = false;
-
-    this.colourMaps = {
-        "plain": dwv.image.lut.plain,
-        "invplain": dwv.image.lut.invPlain,
-        "rainbow": dwv.image.lut.rainbow,
-        "hot": dwv.image.lut.hot,
-        "test": dwv.image.lut.test
-    };
     
     this.presets = {
         "abdomen": {"center": 350, "width": 40},
@@ -245,12 +243,12 @@ dwv.tool.WindowLevel.prototype.setPreset = function(name)
 dwv.tool.WindowLevel.prototype.setColourMap = function(name)
 {    
     // check if we have it
-    if( !this.colourMaps[name] )
+    if( !dwv.tool.colourMaps[name] )
     {
         throw new Error("Unknown colour map: '" + name + "'");
     }
     // enable it
-    dwv.tool.updateColourMap( this.colourMaps[name] );
+    dwv.tool.updateColourMap( dwv.tool.colourMaps[name] );
 };
 
 dwv.tool.WindowLevel.prototype.updatePlot = function(wc,ww)

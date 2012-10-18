@@ -258,8 +258,9 @@ dwv.App = function()
             self.getImage().getSize().getNumberOfColumns(), 
             self.getImage().getSize().getNumberOfRows());
 
-        // add the HTML for the tool box 
-        dwv.gui.appendToolboxHtml();
+        // initialise the toolbox
+        // note: the window/level tool is responsible for doing the first display.
+        toolBox.enable(true);
         // add the HTML for the history 
         dwv.gui.appendUndoHtml();
 
@@ -274,9 +275,6 @@ dwv.App = function()
         // Keydown listener
         window.addEventListener('keydown', eventHandler, true);
 
-        // initialise the toolbox
-        // note: the window/level tool is responsible for doing the first display.
-        toolBox.init();
     }
     
     /**

@@ -2,76 +2,11 @@
  * @namespace Tool classes.
  */
 dwv.tool = dwv.tool || {};
+
 /**
  * @namespace Filter classes.
  */
 dwv.tool.filter = dwv.tool.filter || {};
-
-/**
-* @class Filter tool.
-*/
-dwv.tool.Filter = function(app)
-{
-    this.filter = {};
-    this.selectedFilter = 0;
-    this.defaultFilterName = 'threshold';
-};
-
-dwv.tool.Filter.prototype.enable = function(bool)
-{
-    if( bool ) {
-        dwv.gui.appendFilterHtml();
-        this.init();
-    }
-    else {
-        dwv.gui.clearFilterHtml();
-    }
-};
-
-dwv.tool.Filter.prototype.keydown = function(event)
-{
-    app.handleKeyDown(event);
-};
-
-dwv.tool.Filter.prototype.getSelectedFilter = function() {
-    return this.selectedFilter;
-};
-
-dwv.tool.Filter.prototype.setSelectedFilter = function(name) {
-    // check if we have it
-    if( !this.hasFilter(name) )
-    {
-        throw new Error("Unknown filter: '" + name + "'");
-    }
-    // disable last selected
-    if( this.selectedFilter )
-    {
-        this.selectedFilter.enable(false);
-    }
-    // enable new one
-    this.selectedFilter = new this.filters[name](app);
-    this.selectedFilter.enable(true);
-};
-
-dwv.tool.Filter.prototype.hasFilter = function(name) {
-    return this.filters[name];
-};
-
-dwv.tool.Filter.prototype.init = function()
-{
-    // filter list
-    this.filters = {
-        'threshold': dwv.tool.filter.Threshold,
-        'sharpen': dwv.tool.filter.Sharpen,
-        'sobel': dwv.tool.filter.Sobel
-    };
-
-    // Activate the default filter
-    if (this.filters[this.defaultFilterName])
-    {
-        this.setSelectedFilter(this.defaultFilterName);
-    }
-};
 
 /**
 * @class Threshold filter tool.
@@ -145,6 +80,62 @@ dwv.tool.filter.Sobel.prototype.run = function(args)
     command.execute();
     // save command in undo stack
     app.getUndoStack().add(command);
+};
+
+// filter list
+dwv.tool.filters = {
+    "threshold": dwv.tool.filter.Threshold,
+    "sharpen": dwv.tool.filter.Sharpen,
+    "sobel": dwv.tool.filter.Sobel
+};
+
+/**
+* @class Filter tool.
+*/
+dwv.tool.Filter = function(app)
+{
+    this.selectedFilter = 0;
+    this.defaultFilterName = "threshold";
+};
+
+dwv.tool.Filter.prototype.enable = function(bool)
+{
+    if( bool ) {
+        dwv.gui.appendFilterHtml();
+        this.init();
+    }
+    else {
+        dwv.gui.clearFilterHtml();
+    }
+};
+
+dwv.tool.Filter.prototype.getSelectedFilter = function() {
+    return this.selectedFilter;
+};
+
+dwv.tool.Filter.prototype.setSelectedFilter = function(name) {
+    // check if we have it
+    if( !this.hasFilter(name) )
+    {
+        throw new Error("Unknown filter: '" + name + "'");
+    }
+    // disable last selected
+    if( this.selectedFilter )
+    {
+        this.selectedFilter.enable(false);
+    }
+    // enable new one
+    this.selectedFilter = new dwv.tool.filters[name](app);
+    this.selectedFilter.enable(true);
+};
+
+dwv.tool.Filter.prototype.hasFilter = function(name) {
+    return dwv.tool.filters[name];
+};
+
+dwv.tool.Filter.prototype.init = function()
+{
+    this.setSelectedFilter(this.defaultFilterName);
 };
 
 /**

@@ -96,7 +96,7 @@ dwv.html.appendRow = function(table, input, level, maxLevel, rowHeader)
         dwv.html.appendRowForObject(table, input, level+1, maxLevel, rowHeader);
     }
     else {
-        throw new Error("Unsupported input dqtq type.");
+        throw new Error("Unsupported input data type.");
     }
 };
 
@@ -236,7 +236,9 @@ dwv.html.createHighlightNode = function(child) {
 };
 
 /**
- * @function
+ * @function Remove all children of a node and then remove it from its parent.
+ * @param nodeId The id of the node to delete.
+ * @param parentId The id of the parent of the node to delete.
  */
 dwv.html.removeAllChildren = function(nodeId, parentId) {
     // find the node
@@ -250,3 +252,44 @@ dwv.html.removeAllChildren = function(nodeId, parentId) {
     top.removeChild(node);
 };
 
+/**
+ * @function Create a HTML select from an input array of options.
+ * The values of the options are the name of the option made lower case.
+ * It is left to the user to set the 'onchange' method of the select.
+ * @param name The name of the HTML select.
+ * @param array The array of options of the HTML select.
+ * @return The created HTML select.
+ */
+dwv.html.createHtmlSelect = function(name, list) {
+    // select
+    var select = document.createElement("select");
+    select.id = name;
+    select.name = name;
+    // options
+    var option;
+    if( list instanceof Array )
+    {
+        for ( var i in list )
+        {
+            option = document.createElement("option");
+            option.value = list[i].toLowerCase();
+            option.appendChild(document.createTextNode(dwv.utils.capitaliseFirstLetter(list[i])));
+            select.appendChild(option);
+        }
+    }
+    else if( typeof list === 'object')
+    {
+        for ( var name in list )
+        {
+            option = document.createElement("option");
+            option.value = name.toLowerCase();
+            option.appendChild(document.createTextNode(dwv.utils.capitaliseFirstLetter(name)));
+            select.appendChild(option);
+        }
+    }
+    else
+    {
+        throw new Error("Unsupported input list type.");
+    }
+    return select;
+};

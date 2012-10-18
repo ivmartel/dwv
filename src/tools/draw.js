@@ -2,48 +2,18 @@
  * @namespace Tool classes.
  */
 dwv.tool = dwv.tool || {};
-/**
- * @namespace Drawing Tool classes.
- */
-dwv.tool.draw = dwv.tool.draw || {};
 
-/**
- * @class Draw command factory.
- */
-dwv.tool.draw.CommandFactory = function() {};
+//! List of colors
+dwv.tool.colors = [
+    "Yellow", "Red", "White", "Green", "Blue", "Lime", "Fuchsia", "Black"
+];
 
-/**
- * Create a draw shape command according to a name and some arguments.
- * @param shapeName The name of the shape.
- * @param shape The shape to draw.
- * @param app The application.
- * @param style The style of the drawing.
- * @returns The created command.
- */
-dwv.tool.draw.CommandFactory.prototype.create = function(shapeName, shape, app, style)
-{
-    var object = null;
-    if( shapeName === "line")
-    {
-        object = new dwv.tool.DrawLineCommand(shape, app, style);
-    }
-    else if( shapeName === "circle")
-    {
-        object = new dwv.tool.DrawCircleCommand(shape, app, style);
-    }
-    else if( shapeName === "rectangle")
-    {
-        object = new dwv.tool.DrawRectangleCommand(shape, app, style);
-    }
-    else if( shapeName === "roi")
-    {
-        object = new dwv.tool.DrawRoiCommand(shape, app, style);
-    }
-    else
-    {
-        throw new Error("Unknown shape name when creating draw command.");
-    }
-    return object;
+//! List of supported shapes
+dwv.tool.shapes = {
+    "line": dwv.tool.DrawLineCommand,
+    "circle": dwv.tool.DrawCircleCommand,
+    "rectangle": dwv.tool.DrawRectangleCommand,
+    "roi": dwv.tool.DrawRoiCommand
 };
 
 /**
@@ -84,8 +54,7 @@ dwv.tool.Draw = function(app)
         var shapeFactory = new dwv.math.ShapeFactory();
         var shape = shapeFactory.create(shapeName, points);
         // create draw command
-        var commandFactory = new dwv.tool.draw.CommandFactory();
-        command = commandFactory.create(shapeName, shape, app, style);
+        command = new dwv.tool.shapes[shapeName](shape, app, style);
         // clear the temporary layer
         app.getTempLayer().clearContextRect();
         // draw
@@ -128,17 +97,26 @@ dwv.tool.Draw = function(app)
         app.handleKeyDown(event);
     };
 
-    // Set the line color of the drawing
-    this.setShapeColour = function(colour)
-    {
-        // set style var
-        style.setLineColor(colour);
-    };
-    
-    // Set the shape name of the drawing
-    this.setShapeName = function(name)
-    {
-        shapeName = name;
-    };
-    
 }; // Draw class
+
+// Set the line color of the drawing
+dwv.tool.Draw.prototype.setShapeColour = function(colour)
+{
+    // set style var
+    style.setLineColor(colour);
+};
+
+// Set the shape name of the drawing
+dwv.tool.Draw.prototype.setShapeName = function(name)
+{
+    // check if we have it
+    if( !this.hasShape(name) )
+    {
+        throw new Error("Unknown shape: '" + name + "'");
+    }
+    shapeName = name;
+};
+
+dwv.tool.Draw.prototype.hasShape = function(name) {
+    return dwv.tool.shapes[name];
+};

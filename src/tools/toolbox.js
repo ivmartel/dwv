@@ -3,14 +3,31 @@
  */
 dwv.tool = dwv.tool || {};
 
+// tool list
+dwv.tool.tools = {
+    "windowlevel": dwv.tool.WindowLevel,
+    "draw": dwv.tool.Draw,
+    "roi": dwv.tool.Roi,
+    "livewire": dwv.tool.Livewire,
+    "zoom": dwv.tool.Zoom,
+    "filter": dwv.tool.Filter
+};
+
 /**
 * @class Tool box.
 */
 dwv.tool.ToolBox = function(app)
 {
-    this.tools = {};
     this.selectedTool = 0;
-    this.defaultToolName = 'windowLevel';
+    this.defaultToolName = "windowlevel";
+};
+
+dwv.tool.ToolBox.prototype.enable = function(bool)
+{
+    if( bool ) {
+        dwv.gui.appendToolboxHtml();
+        this.init();
+    }
 };
 
 dwv.tool.ToolBox.prototype.getSelectedTool = function() {
@@ -29,29 +46,15 @@ dwv.tool.ToolBox.prototype.setSelectedTool = function(name) {
         this.selectedTool.enable(false);
     }
     // enable new one
-    this.selectedTool = new this.tools[name](app);
+    this.selectedTool = new dwv.tool.tools[name](app);
     this.selectedTool.enable(true);
 };
 
-dwv.tool.ToolBox.prototype.hasTool = function(toolName) {
-    return this.tools[toolName];
+dwv.tool.ToolBox.prototype.hasTool = function(name) {
+    return dwv.tool.tools[name];
 };
 
 dwv.tool.ToolBox.prototype.init = function()
 {
-    // tool list
-    this.tools = {
-        windowLevel: dwv.tool.WindowLevel,
-        draw: dwv.tool.Draw,
-        roi: dwv.tool.Roi,
-        livewire: dwv.tool.Livewire,
-        zoom: dwv.tool.Zoom,
-        filter: dwv.tool.Filter
-    };
-
-    // Activate the default tool.
-    if (this.tools[this.defaultToolName])
-    {
-        this.setSelectedTool(this.defaultToolName);
-    }
+    this.setSelectedTool(this.defaultToolName);
 };

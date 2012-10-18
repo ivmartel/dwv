@@ -64,21 +64,9 @@ dwv.gui.appendWindowLevelHtml = function()
         wlSelector.appendChild(option);
     }
     
-    // preset selector
-    var cmSelector = document.createElement("select");
-    cmSelector.id = "colourMapMenu";
-    cmSelector.name = "colourMapMenu";
+    // colour map selector
+    var cmSelector = dwv.html.createHtmlSelect("colourMapMenu",dwv.tool.colourMaps);
     cmSelector.onchange = dwv.gui.onChangeColourMap;
-    cmSelector.selectedIndex = 1;
-    // selector options
-    var cmOptions = ["Plain", "InvPlain", "Rainbow", "Hot", "Test"];
-    for ( var o = 0; o < cmOptions.length; ++o )
-    {
-        option = document.createElement("option");
-        option.value = cmOptions[o].toLowerCase();
-        option.appendChild(document.createTextNode(cmOptions[o]));
-        cmSelector.appendChild(option);
-    }
 
     // formatting...
     var div = document.createElement("div");
@@ -114,29 +102,18 @@ dwv.gui.clearWindowLevelHtml = function()
  */
 dwv.gui.appendColourChooserHtml = function()
 {
-    var div = document.createElement("div");
-    div.id = "colourChooser";
-    
+    // select
+    var selector = dwv.html.createHtmlSelect("colourSelect",dwv.tool.colors);
+    selector.onchange = dwv.gui.onChangeShapeColour;
+    // paragraph
     var paragraph = document.createElement("p");  
     paragraph.appendChild(document.createTextNode("Colour: "));
-
-    var selector = document.createElement("select");
-    selector.id = "colourChooser";
-    selector.name = "colourChooser";
-    selector.onchange = dwv.gui.onChangeShapeColour;
     paragraph.appendChild(selector);
-
-    var options = ["Yellow", "Red", "White", "Green", "Blue", "Lime", "Fuchsia", "Black"];
-    var option;
-    for( var i = 0; i < options.length; ++i )
-    {
-        option = document.createElement("option");
-        option.id = options[i].toLowerCase();
-        option.appendChild(document.createTextNode(options[i]));
-        selector.appendChild(option);
-    }
-
+    // div
+    var div = document.createElement("div");
+    div.id = "colourChooser";
     div.appendChild(paragraph);
+    // append to document
     document.getElementById('toolbox').appendChild(div);
 };
 
@@ -153,29 +130,18 @@ dwv.gui.clearColourChooserHtml = function()
  */
 dwv.gui.appendShapeChooserHtml = function()
 {
-    var div = document.createElement("div");
-    div.id = "shapeChooser";
-    
+    // select
+    var selector = dwv.html.createHtmlSelect("shapeSelect",dwv.tool.shapes);
+    selector.onchange = dwv.gui.onChangeShape;
+    // paragraph
     var paragraph = document.createElement("p");  
     paragraph.appendChild(document.createTextNode("Shape: "));
-    
-    var selector = document.createElement("select");
-    selector.id = "dshape";
-    selector.name = "dshape";
-    selector.onchange = dwv.gui.onChangeShape;
     paragraph.appendChild(selector);
-
-    var options = ["Line", "Rectangle", "Circle", "Roi"]; // line is default
-    var option;
-    for( var i = 0; i < options.length; ++i )
-    {
-        option = document.createElement("option");
-        option.value = options[i].toLowerCase();
-        option.appendChild(document.createTextNode(options[i]));
-        selector.appendChild(option);
-    }
-
+    // div
+    var div = document.createElement("div");
+    div.id = "shapeChooser";
     div.appendChild(paragraph);
+    // append to document
     document.getElementById('toolbox').appendChild(div);
 };
 
@@ -189,33 +155,18 @@ dwv.gui.clearShapeChooserHtml = function()
 
 dwv.gui.appendFilterHtml = function()
 {
+    // select
+    var selector = dwv.html.createHtmlSelect("filterSelect",dwv.tool.filters);
+    selector.onchange = dwv.gui.onChangeFilter;
+    // paragraph
+    var paragraph = document.createElement("p");  
+    paragraph.appendChild(document.createTextNode("Filter: "));
+    paragraph.appendChild(selector);
+    // div
     var div = document.createElement("div");
     div.id = "filterDiv";
-
-    // paragraph for the window level preset selector
-    var filterParagraph = document.createElement("p");  
-    filterParagraph.appendChild(document.createTextNode("Filter: "));
-    // filter selector
-    var filterSelector = document.createElement("select");
-    filterSelector.id = "filtersMenu";
-    filterSelector.name = "filtersMenu";
-    filterSelector.onchange = dwv.gui.onChangeFilter;
-    filterSelector.selectedIndex = 1;
-    // selector options
-    var filterOptions = ["threshold", "sharpen", "sobel"];
-    // append options
-    var option;
-    for ( var i = 0; i < filterOptions.length; ++i )
-    {
-        option = document.createElement("option");
-        option.value = filterOptions[i];
-        option.appendChild(document.createTextNode(filterOptions[i]));
-        filterSelector.appendChild(option);
-    }
-    
-    // append all
-    filterParagraph.appendChild(filterSelector);
-    div.appendChild(filterParagraph);
+    div.appendChild(paragraph);
+    // append to document
     document.getElementById('toolbox').appendChild(div);
 };
 
