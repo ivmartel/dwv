@@ -36,33 +36,9 @@ dwv.gui.onChangeShapeColour = function(event)
 dwv.gui.appendWindowLevelHtml = function()
 {
     // preset selector
-    var wlSelector = document.createElement("select");
-    wlSelector.id = "presetsMenu";
-    wlSelector.name = "presetsMenu";
+    // preset map selector
+    var wlSelector = dwv.html.createHtmlSelect("presetsMenu",dwv.tool.presets);
     wlSelector.onchange = dwv.gui.onChangeWindowLevelPreset;
-    wlSelector.selectedIndex = 1;
-    // selector options
-    var wlOptions = [];
-    // from DICOM
-    for ( var p = 0; p < app.getImage().getLookup().windowPresets.length; ++p )
-    {
-        wlOptions.push( app.getImage().getLookup().windowPresets[p].name );
-    }
-    // default
-    var wlDefaultOptions = ["Abdomen", "Lung", "Brain", "Bone", "Head", "Min/Max"];
-    for ( var d = 0; d < wlDefaultOptions.length; ++d )
-    {
-        wlOptions.push( wlDefaultOptions[d] );
-    }
-    // append options
-    var option;
-    for ( var i = 0; i < wlOptions.length; ++i )
-    {
-        option = document.createElement("option");
-        option.value = wlOptions[i].toLowerCase();
-        option.appendChild(document.createTextNode(wlOptions[i]));
-        wlSelector.appendChild(option);
-    }
     
     // colour map selector
     var cmSelector = dwv.html.createHtmlSelect("colourMapMenu",dwv.tool.colourMaps);

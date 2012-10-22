@@ -128,6 +128,14 @@ dwv.tool.colourMaps = {
     "test": dwv.image.lut.test
 };
 
+dwv.tool.presets = {
+        "abdomen": {"center": 350, "width": 40},
+        "lung": {"center": -600, "width": 1500},
+        "brain": {"center": 40, "width": 80},
+        "bone": {"center": 480, "width": 2500},
+        "head": {"center": 90, "width": 350}
+    };
+
 /**
  * @class WindowLevel class.
  */
@@ -137,13 +145,6 @@ dwv.tool.WindowLevel = function(app)
     this.started = false;
     this.displayed = false;
     
-    this.presets = {
-        "abdomen": {"center": 350, "width": 40},
-        "lung": {"center": -600, "width": 1500},
-        "brain": {"center": 40, "width": 80},
-        "bone": {"center": 480, "width": 2500},
-        "head": {"center": 90, "width": 350}
-    };
 
     // This is called when you start holding down the mouse button.
     this.mousedown = function(ev){
@@ -207,10 +208,14 @@ dwv.tool.WindowLevel = function(app)
 
 dwv.tool.WindowLevel.prototype.updatePresets = function()
 {    
-    // from DICOM
+    // copy the presets and reinitialize the external one
+	// (hoping to control the order of the presets)
+	var presets = dwv.tool.presets;
+    dwv.tool.presets = {};
+	// DICOM presets
     var dicomPresets = app.getImage().getLookup().windowPresets;
     for( var i = 0; i < dicomPresets.length; ++i ) {
-        this.presets[dicomPresets[i].name.toLowerCase()] = dicomPresets[i];
+        dwv.tool.presets[dicomPresets[i].name.toLowerCase()] = dicomPresets[i];
     }
     // min/max preset
     var range = app.getImage().getDataRange();
@@ -218,7 +223,11 @@ dwv.tool.WindowLevel.prototype.updatePresets = function()
     var max = range.max;
     var width = max - min;
     var center = min + width/2;
-    this.presets["min/max"] = {"center": center, "width": width};
+    dwv.tool.presets["min/max"] = {"center": center, "width": width};
+    // re-populate the external array
+    for( var key in presets ) {
+    	dwv.tool.presets[key] = presets[key];
+    }
 };
 
 /**
@@ -227,14 +236,14 @@ dwv.tool.WindowLevel.prototype.updatePresets = function()
 dwv.tool.WindowLevel.prototype.setPreset = function(name)
 {    
     // check if we have it
-    if( !this.presets[name] )
+    if( !dwv.tool.presets[name] )
     {
         throw new Error("Unknown window level preset: '" + name + "'");
     }
     // enable it
     dwv.tool.updateWindowingData(
-        this.presets[name].center, 
-        this.presets[name].width );
+    		dwv.tool.presets[name].center, 
+    		dwv.tool.presets[name].width );
 };
 
 /**
