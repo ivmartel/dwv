@@ -11,7 +11,7 @@ dwv.tool.Livewire = function(app)
     var self = this;
     this.started = false;
     // draw style
-    var style = new dwv.html.Style();
+    this.style = new dwv.html.Style();
     var command = null;
     // paths are stored in reverse order
     var path = new dwv.math.Path();
@@ -129,7 +129,7 @@ dwv.tool.Livewire = function(app)
         currentPath.appenPath(path);
         
         // create draw command
-        command = new dwv.tool.DrawLivewireCommand(currentPath, app, style);
+        command = new dwv.tool.DrawLivewireCommand(currentPath, app, self.style);
         // clear the temporary layer
         app.getTempLayer().clearContextRect();
         // draw
@@ -143,10 +143,11 @@ dwv.tool.Livewire = function(app)
     
     this.enable = function(value){
         if( value ) {
-            dwv.gui.appendColourChooserHtml();
+            this.init();
+            dwv.gui.appendLivewireHtml();
         }
         else {
-            dwv.gui.clearColourChooserHtml();
+            dwv.gui.clearLivewireHtml();
         }
     };
 
@@ -154,18 +155,20 @@ dwv.tool.Livewire = function(app)
         app.handleKeyDown(event);
     };
 
-    // Set the line color of the drawing
-    this.setLineColor = function(event)
-    {
-        // get the color
-        var color = event.target.id;
-        // set style var
-        style.setLineColor(color);
-        // reset borders
-        dwv.tool.draw.setLineColor(color);
-    };
-
 }; // Livewire class
+
+//Set the line color of the drawing
+dwv.tool.Livewire.prototype.setLineColour = function(colour)
+{
+    // set style var
+    this.style.setLineColor(colour);
+};
+
+dwv.tool.Livewire.prototype.init = function()
+{
+    // set the default to the first in the list
+    this.setLineColour(dwv.tool.colors[0]);
+};
 
 //Add the tool to the list
 dwv.tool.tools["livewire"] = dwv.tool.Livewire;

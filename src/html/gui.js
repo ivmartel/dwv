@@ -28,15 +28,14 @@ dwv.gui.onChangeShape = function(event)
     app.getToolBox().getSelectedTool().setShapeName(this.value);
 };
 
-dwv.gui.onChangeShapeColour = function(event)
+dwv.gui.onChangeLineColour = function(event)
 {
-    app.getToolBox().getSelectedTool().setShapeColour(this.value);
+    app.getToolBox().getSelectedTool().setLineColour(this.value);
 };
 
 dwv.gui.appendWindowLevelHtml = function()
 {
     // preset selector
-    // preset map selector
     var wlSelector = dwv.html.createHtmlSelect("presetsMenu",dwv.tool.presets);
     wlSelector.onchange = dwv.gui.onChangeWindowLevelPreset;
     
@@ -46,7 +45,7 @@ dwv.gui.appendWindowLevelHtml = function()
 
     // formatting...
     var div = document.createElement("div");
-    div.id = "wl-options";
+    div.id = "windowLevelTool";
     // list
     var list_ul = document.createElement("ul");
     // first item: window level
@@ -70,24 +69,62 @@ dwv.gui.appendWindowLevelHtml = function()
 
 dwv.gui.clearWindowLevelHtml = function()
 {
-    dwv.html.removeAllChildren("wl-options", "toolbox");
+    dwv.html.removeAllChildren("windowLevelTool", "toolbox");
+};
+
+dwv.gui.appendDrawHtml = function()
+{
+    // colour select
+    var colourSelector = dwv.html.createHtmlSelect("colourSelect",dwv.tool.colors);
+    colourSelector.onchange = dwv.gui.onChangeLineColour;
+    // shape select
+    var shapeSelector = dwv.html.createHtmlSelect("shapeSelect",dwv.tool.shapes);
+    shapeSelector.onchange = dwv.gui.onChangeShape;
+
+    // formatting...
+    var div = document.createElement("div");
+    div.id = "drawTool";
+    // list
+    var list_ul = document.createElement("ul");
+    // first item: window level
+    var list_li0 = document.createElement("li");
+    list_li0.appendChild(document.createTextNode("Shape: "));
+    list_li0.appendChild(shapeSelector);
+    // append to list
+    list_ul.appendChild(list_li0);
+    // second item: colour map selector
+    var list_li1 = document.createElement("li");
+    list_li1.appendChild(document.createTextNode("Colour: "));
+    list_li1.appendChild(colourSelector);
+    // append to list
+    list_ul.appendChild(list_li1);
+    // append list to div
+    div.appendChild(list_ul);
+    
+    // add to document
+    document.getElementById("toolbox").appendChild(div);
+};
+
+dwv.gui.clearDrawHtml = function()
+{
+    dwv.html.removeAllChildren("drawTool", "toolbox");
 };
 
 /**
  * @function Append the color chooser to the HTML document in the 'colourChooser' node.
  */
-dwv.gui.appendColourChooserHtml = function()
+dwv.gui.appendLivewireHtml = function()
 {
     // select
     var selector = dwv.html.createHtmlSelect("colourSelect",dwv.tool.colors);
-    selector.onchange = dwv.gui.onChangeShapeColour;
+    selector.onchange = dwv.gui.onChangeLineColour;
     // paragraph
     var paragraph = document.createElement("p");  
     paragraph.appendChild(document.createTextNode("Colour: "));
     paragraph.appendChild(selector);
     // div
     var div = document.createElement("div");
-    div.id = "colourChooser";
+    div.id = "livewireTool";
     div.appendChild(paragraph);
     // append to document
     document.getElementById('toolbox').appendChild(div);
@@ -96,37 +133,9 @@ dwv.gui.appendColourChooserHtml = function()
 /**
  * @function Remove the color chooser specific node.
  */
-dwv.gui.clearColourChooserHtml = function()
+dwv.gui.clearLivewireHtml = function()
 {
-    dwv.html.removeAllChildren("colourChooser", "toolbox");
-};
-
-/**
- * @function Append the shape chooser to the HTML document in the 'shapeChooser' node.
- */
-dwv.gui.appendShapeChooserHtml = function()
-{
-    // select
-    var selector = dwv.html.createHtmlSelect("shapeSelect",dwv.tool.shapes);
-    selector.onchange = dwv.gui.onChangeShape;
-    // paragraph
-    var paragraph = document.createElement("p");  
-    paragraph.appendChild(document.createTextNode("Shape: "));
-    paragraph.appendChild(selector);
-    // div
-    var div = document.createElement("div");
-    div.id = "shapeChooser";
-    div.appendChild(paragraph);
-    // append to document
-    document.getElementById('toolbox').appendChild(div);
-};
-
-/**
- * @function Remove the shape chooser specific node.
- */
-dwv.gui.clearShapeChooserHtml = function()
-{
-    dwv.html.removeAllChildren("shapeChooser", "toolbox");
+    dwv.html.removeAllChildren("livewireTool", "toolbox");
 };
 
 dwv.gui.appendFilterHtml = function()

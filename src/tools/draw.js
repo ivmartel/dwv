@@ -76,12 +76,10 @@ dwv.tool.Draw = function(app)
     this.enable = function(value){
         if( value ) {
             this.init();
-            dwv.gui.appendShapeChooserHtml();
-            dwv.gui.appendColourChooserHtml();
+            dwv.gui.appendDrawHtml();
         }
         else { 
-            dwv.gui.clearColourChooserHtml();
-            dwv.gui.clearShapeChooserHtml();
+            dwv.gui.clearDrawHtml();
         }
     };
     
@@ -93,7 +91,7 @@ dwv.tool.Draw = function(app)
 }; // Draw class
 
 // Set the line color of the drawing
-dwv.tool.Draw.prototype.setShapeColour = function(colour)
+dwv.tool.Draw.prototype.setLineColour = function(colour)
 {
     // set style var
     this.style.setLineColor(colour);
@@ -123,7 +121,7 @@ dwv.tool.Draw.prototype.init = function() {
     }
     this.setShapeName(shapeName);
     // same for color
-    this.setShapeColour(dwv.tool.colors[0]);
+    this.setLineColour(dwv.tool.colors[0]);
 };
 
 // Add the tool to the list
