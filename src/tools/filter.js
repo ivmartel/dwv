@@ -22,6 +22,10 @@ dwv.tool.Filter.prototype.enable = function(bool)
         this.init();
     }
     else {
+        if( this.selectedFilter )
+        {
+            this.selectedFilter.enable(false);
+        }
         dwv.gui.clearFilterHtml();
     }
 };
@@ -73,10 +77,10 @@ dwv.tool.filter.Threshold = function(app) {};
 dwv.tool.filter.Threshold.prototype.enable = function(value)
 {
     if( value ) {
-        dwv.gui.filter.displayThreshold();
+        dwv.gui.filter.appendThresholdHtml();
     }
     else { 
-        dwv.gui.clearSubFilterDiv();
+        dwv.gui.filter.clearThresholdHtml();
     }
 };
 
@@ -102,10 +106,10 @@ dwv.tool.filter.Sharpen = function(app) {};
 dwv.tool.filter.Sharpen.prototype.enable = function(value)
 {
     if( value ) {
-        dwv.gui.filter.displaySharpen();
+        dwv.gui.filter.appendSharpenHtml();
     }
     else { 
-        dwv.gui.clearSubFilterDiv();
+        dwv.gui.filter.clearSharpenHtml();
     }
 };
 
@@ -129,10 +133,10 @@ dwv.tool.filter.Sobel = function(app) {};
 dwv.tool.filter.Sobel.prototype.enable = function(value)
 {
     if( value ) {
-        dwv.gui.filter.displaySobel();
+        dwv.gui.filter.appendSobelHtml();
     }
     else { 
-        dwv.gui.clearSubFilterDiv();
+        dwv.gui.filter.clearSobelHtml();
     }
 };
 
