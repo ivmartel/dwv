@@ -240,7 +240,7 @@ dwv.html.createHighlightNode = function(child) {
  * @param nodeId The id of the node to delete.
  * @param parentId The id of the parent of the node to delete.
  */
-dwv.html.removeAllChildren = function(nodeId, parentId) {
+dwv.html.removeNode = function(nodeId) {
     // find the node
     var node = document.getElementById(nodeId);
     // remove its children
@@ -248,7 +248,7 @@ dwv.html.removeAllChildren = function(nodeId, parentId) {
         node.removeChild(node.firstChild);
     }
     // remove it from its parent
-    var top = document.getElementById(parentId);
+    var top = node.parentNode;
     top.removeChild(node);
 };
 
