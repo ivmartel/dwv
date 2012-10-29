@@ -14,7 +14,7 @@
 <script type="text/javascript" src="src/application.js"></script>
 <script type="text/javascript" src="src/dicom/dicomParser.js"></script>
 <script type="text/javascript" src="src/dicom/dictionary.js"></script>
-<script type="text/javascript" src="src/html/gui.js"></script>
+<script type="text/javascript" src="src/html/gui2.js"></script>
 <script type="text/javascript" src="src/html/html.js"></script>
 <script type="text/javascript" src="src/html/style.js"></script>
 <script type="text/javascript" src="src/html/layer.js"></script>
@@ -145,61 +145,15 @@ Path: <input type="file" id="files" name="files[]" multiple />
 </div>
 </div>
 
-<!-- Toolbox -->
-<div id="toolbox" title="Toolbox" style="display:none;">
-</div>
-
 <!-- History -->
 <div id="history" title="History" style="display:none;"></div>
 
-
 </div><!-- /content -->
 
-<div data-role="footer">        
-    <div data-role="navbar" id="home">
-        <ul>
-            <li><a href="#" id="toggleFilter">Display</a></li>
-            <li><a href="#" id="toggleDraw">Draw</a></li>
-            <li><a href="#" id="toggleFilter">Filter</a></li>
-            <li><a href="#tags_page" data-transition="slide">Tags</a></li>
-        </ul>
-    </div><!-- /navbar: main -->
-    <div data-role="navbar" id="filter" style="display:none;">
-        <ul>
-            <li><a href="#" id="toggleHomeFromFilter">Home</a></li>
-            <li><a href="#" id="toggleThreshold">Threshold</a></li>
-            <li><a href="#">Sharpen</a></li>
-            <li><a href="#">Sobel</a></li>
-        </ul>
-    </div><!-- /navbar: filter -->
-    <div data-role="navbar" id="threshold" style="display:none;">
-        <ul>
-            <li><div id="filterDiv">
-            <input type="range" name="threshold-slider" id="threshold-slider" value="25" min="0" max="100" data-mini="true" />
-            </div></li>
-            <li><a href="#">Apply</a></li>
-            <li><a href="#">Cancel</a></li>
-        </ul>
-    </div><!-- /navbar: threshold -->
-    <div data-role="navbar" id="draw" style="display:none;">
-        <ul>
-            <li><a href="#" id="toggleHomeFromDraw">Home</a></li>
-            <li>
-            <select name="select-choice-0" id="select-choice-0" data-mini="true">
-            <option value="standard">Rectangle</option>
-            <option value="rush">Circle</option>
-            <option value="express">ROI</option>
-            <option value="overnight">Line</option>
-            </select>
-            </li>
-            <li>
-            <select name="select-choice-1" id="select-choice-1" data-mini="true">
-            <option value="standard">Blue</option>
-            <option value="rush">Red</option>
-            </select>
-            </li>
-        </ul>
-    </div><!-- /navbar: draw -->
+<div data-role="footer" id="footer">        
+<div data-role="navbar" id="toolbox">
+<ul id="toolList"><li></li><li></li><li></li></ul>
+</div><!-- /navbar: main -->
 </div><!-- /footer -->
 
 </div><!-- /page -->
