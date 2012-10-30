@@ -52,57 +52,6 @@ function toggleInfo()
         else div.style.display = "none";
     }
 }
-
-function showhome()
-{
-    // Show only desired NAV Bar
-    $('#home').show();
-    $('#filter').hide();
-    $('#draw').hide();
-    // Refresh the NAV Bars       
-    $('#page').trigger('create');
-}
-
-$(document).ready(function() {
-
-$('#toggleHomeFromFilter').bind('click', showhome);
-$('#toggleHomeFromDraw').bind('click', showhome);
-
-$('#toggleFilter').bind('click', function()
-{
-    // Show only desired NAV Bar
-    $('#home').hide();
-    $('#filter').show();
-    $('#draw').hide();
-    // Refresh the NAV Bars       
-    $('#page').trigger('create');
-});
-
-$('#toggleThreshold').bind('click', function()
-{
-    // Show only desired NAV Bar
-    $('#home').hide();
-    $('#threshold').show();
-    $('#filter').hide();
-    $('#draw').hide();
-    // Refresh the NAV Bars       
-    $('#page').trigger('create');
-    
-    var filterUI = new dwv.gui.Threshold2();
-    filterUI.display();
-});
-
-$('#toggleDraw').bind('click', function()
-{
-    // Show only desired NAV Bar
-    $('#home').hide();
-    $('#filter').hide();
-    $('#draw').show();
-    // Refresh the NAV Bars       
-    $('#page').trigger('create');
-});
-
-});
 </script>
 
 </head>
@@ -118,18 +67,16 @@ $('#toggleDraw').bind('click', function()
 <div data-role="content">   
 
 <div class="ui-grid-a">
+
 <!-- Open file -->
-<div id="openFile" class="ui-block-a" title="Open File">
-<form>
-Path: <input type="file" id="files" name="files[]" multiple />
-</form>
+<div class="ui-block-a">
+<label for="files">Path: </label>
+<input type="file" id="files" name="files[]" multiple />
 </div>
 
 <div class="ui-block-b" style="text-align:right">
-<select name="flip-1" id="flip-1" data-role="slider" data-mini="true" onchange="toggleInfo()">
-    <option value="on">On</option>
-    <option value="off">Off</option>
-</select>
+<a href="#" data-role="button" data-mini="true" data-inline="true" onclick="toggleInfo()">Info</a>
+<a href="#tags_page" data-role="button" data-mini="true" data-inline="true">Tags</a>
 </div>
 
 </div><!-- /grid-a -->
