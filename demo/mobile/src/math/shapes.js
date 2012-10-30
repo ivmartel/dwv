@@ -105,7 +105,7 @@ dwv.math.Line = function(begin, end)
     // cache the length
     var length = Math.sqrt(
             Math.abs(end.getX() - begin.getX()) * Math.abs(end.getX() - begin.getX())
-            * Math.abs(end.getY() - begin.getY()) * Math.abs(end.getY() - begin.getY() ) );
+            + Math.abs(end.getY() - begin.getY()) * Math.abs(end.getY() - begin.getY() ) );
     
     // Get the begin point of the line.
     this.getBegin = function() { return begin; };
@@ -175,6 +175,11 @@ dwv.math.ROI = function()
      * @param point The Point2D to add.
      */
     this.addPoint = function(point) { points.push(point); };
+    /**
+     * Add points to the ROI.
+     * @param rhs The array of POints2D to add.
+     */
+    this.addPoints = function(rhs) { points=points.concat(rhs);};
 }; // ROI class
 
 /**

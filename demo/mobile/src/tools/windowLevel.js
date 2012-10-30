@@ -4,7 +4,7 @@
 dwv.tool = dwv.tool || {};
 
 /**
-* @fileOverviez WindowLevel tool.
+* @fileOverview WindowLevel tool.
 */
 
 /**
@@ -13,7 +13,7 @@ dwv.tool = dwv.tool || {};
 dwv.tool.showHUvalue = function(x,y)
 {
     var context = app.getInfoLayer().getContext();
-    var style = app.getStyle();
+    var style = new dwv.html.Style();
     var border = 3;
 
     // style
@@ -39,7 +39,7 @@ dwv.tool.showWindowingValue = function(windowCenter,windowWidth)
 {
     var canvas = app.getInfoLayer().getCanvas();
     var context = app.getInfoLayer().getContext();
-    var style = app.getStyle();
+    var style = new dwv.html.Style();
     var border = 3;
     
     // style
@@ -120,68 +120,21 @@ dwv.tool.updateColourMap = function(colourMap)
     app.generateAndDrawImage();
 };
 
-/**
- * @function
- */
-dwv.tool.onchangePreset = function(event)
-{    
-    var presetId = parseInt(document.getElementById("presetsMenu").options[
-        document.getElementById("presetsMenu").selectedIndex].value, 10);
-    
-    var presets = [];
-    // from DICOM
-    for( var i = 0; i < app.getImage().getLookup().windowPresets.length; ++i ) {
-       presets.push(app.getImage().getLookup().windowPresets[i]);
-    }
-    // defaults
-    presets.push({"center": 350, "width": 40}); // abdomen
-    presets.push({"center": -600, "width": 1500}); // lung
-    presets.push({"center": 40, "width": 80}); // brain
-    presets.push({"center": 480, "width": 2500}); // bone
-    presets.push({"center": 90, "width": 350}); // head
-    // min/max preset
-    var range = app.getImage().getDataRange();
-    var min = range.min;
-    var max = range.max;
-    var width = max - min;
-    var center = min + width/2;
-    presets.push({"center": center, "width": width}); // min/max
-    
-    dwv.tool.updateWindowingData(
-        presets[presetId-1].center, 
-        presets[presetId-1].width );
-
+dwv.tool.colourMaps = {
+    "plain": dwv.image.lut.plain,
+    "invplain": dwv.image.lut.invPlain,
+    "rainbow": dwv.image.lut.rainbow,
+    "hot": dwv.image.lut.hot,
+    "test": dwv.image.lut.test
 };
 
-/**
- * @function
- */
-dwv.tool.onchangeColourMap = function(event)
-{    
-    var colourMapId = parseInt(document.getElementById("colourMapMenu").options[
-        document.getElementById("colourMapMenu").selectedIndex].value, 10);
-
-    switch (colourMapId)
-    {
-        case 1: // default
-            dwv.tool.updateColourMap(dwv.image.lut.plain);
-            break;
-        case 2: // inv plain
-            dwv.tool.updateColourMap(dwv.image.lut.invPlain);
-            break;
-        case 3: // rainbow
-            dwv.tool.updateColourMap(dwv.image.lut.rainbow);
-            break;
-        case 4: // hot
-            dwv.tool.updateColourMap(dwv.image.lut.hot);
-            break;
-        case 5: // test
-            dwv.tool.updateColourMap(dwv.image.lut.test);
-            break;
-    }
-
-};
-
+dwv.tool.presets = {
+        "abdomen": {"center": 350, "width": 40},
+        "lung": {"center": -600, "width": 1500},
+        "brain": {"center": 40, "width": 80},
+        "bone": {"center": 480, "width": 2500},
+        "head": {"center": 90, "width": 350}
+    };
 
 /**
  * @class WindowLevel class.
@@ -191,6 +144,7 @@ dwv.tool.WindowLevel = function(app)
     var self = this;
     this.started = false;
     this.displayed = false;
+    
 
     // This is called when you start holding down the mouse button.
     this.mousedown = function(ev){
@@ -235,13 +189,14 @@ dwv.tool.WindowLevel = function(app)
     
     this.enable = function(bool){
         if( bool ) {
-            this.appendHtml();
+            this.updatePresets();
+            dwv.gui.appendWindowLevelHtml();
             dwv.tool.updateWindowingData(
                     parseInt(app.getImage().getLookup().windowCenter, 10),
                     parseInt(app.getImage().getLookup().windowWidth, 10) );
         }
         else {
-            this.clearHtml();
+            dwv.gui.clearWindowLevelHtml();
         }
     };
 
@@ -251,77 +206,58 @@ dwv.tool.WindowLevel = function(app)
 
 }; // WindowLevel class
 
-dwv.tool.WindowLevel.prototype.appendHtml = function()
-{
-    var div = document.createElement("div");
-    div.id = "presetSelector";
-    
-    // paragraph for the window level preset selector
-    var wlParagraph = document.createElement("p");  
-    wlParagraph.appendChild(document.createTextNode("WL Preset: "));
-    // preset selector
-    var wlSelector = document.createElement("select");
-    wlSelector.id = "presetsMenu";
-    wlSelector.name = "presetsMenu";
-    wlSelector.onchange = dwv.tool.onchangePreset;
-    wlSelector.selectedIndex = 1;
-    // selector options
-    var wlOptions = [];
-    // from DICOM
-    for ( var p = 0; p < app.getImage().getLookup().windowPresets.length; ++p )
-    {
-        wlOptions.push( app.getImage().getLookup().windowPresets[p].name );
+dwv.tool.WindowLevel.prototype.updatePresets = function()
+{    
+    // copy the presets and reinitialize the external one
+	// (hoping to control the order of the presets)
+	var presets = dwv.tool.presets;
+    dwv.tool.presets = {};
+	// DICOM presets
+    var dicomPresets = app.getImage().getLookup().windowPresets;
+    for( var i = 0; i < dicomPresets.length; ++i ) {
+        dwv.tool.presets[dicomPresets[i].name.toLowerCase()] = dicomPresets[i];
     }
-    // default
-    var wlDefaultOptions = ["Abdomen", "Lung", "Brain", "Bone", "Head", "Min/Max"];
-    for ( var d = 0; d < wlDefaultOptions.length; ++d )
-    {
-        wlOptions.push( wlDefaultOptions[d] );
+    // min/max preset
+    var range = app.getImage().getDataRange();
+    var min = range.min;
+    var max = range.max;
+    var width = max - min;
+    var center = min + width/2;
+    dwv.tool.presets["min/max"] = {"center": center, "width": width};
+    // re-populate the external array
+    for( var key in presets ) {
+    	dwv.tool.presets[key] = presets[key];
     }
-    // append options
-    var option;
-    for ( var i = 0; i < wlOptions.length; ++i )
-    {
-        option = document.createElement("option");
-        option.value = i+1;
-        option.appendChild(document.createTextNode(wlOptions[i]));
-        wlSelector.appendChild(option);
-    }
-    // append to paragraph
-    wlParagraph.appendChild(wlSelector);
-    
-    // paragraph for colour map selector
-    var cmParagraph = document.createElement("p");  
-    cmParagraph.appendChild(document.createTextNode("Colour Map: "));
-    // preset selector
-    var cmSelector = document.createElement("select");
-    cmSelector.id = "colourMapMenu";
-    cmSelector.name = "colourMapMenu";
-    cmSelector.onchange = dwv.tool.onchangeColourMap;
-    cmSelector.selectedIndex = 1;
-    // selector options
-    var cmOptions = ["Default", "InvPlain", "Rainbow", "Hot", "Test"];
-    for ( var o = 0; o < cmOptions.length; ++o )
-    {
-        option = document.createElement("option");
-        option.value = o+1;
-        option.appendChild(document.createTextNode(cmOptions[o]));
-        cmSelector.appendChild(option);
-    }
-    // append to paragraph
-    cmParagraph.appendChild(cmSelector);
+};
 
-    // append plot
-    var plotDiv = document.createElement("div");
-    plotDiv.id = "plot";
-    plotDiv.style.width = "250px";
-    plotDiv.style.height = "150px";
-    
-    // put all together
-    div.appendChild(wlParagraph);
-    div.appendChild(cmParagraph);
-    div.appendChild(plotDiv);
-    document.getElementById('toolbox').appendChild(div);
+/**
+ * @function
+ */
+dwv.tool.WindowLevel.prototype.setPreset = function(name)
+{    
+    // check if we have it
+    if( !dwv.tool.presets[name] )
+    {
+        throw new Error("Unknown window level preset: '" + name + "'");
+    }
+    // enable it
+    dwv.tool.updateWindowingData(
+    		dwv.tool.presets[name].center, 
+    		dwv.tool.presets[name].width );
+};
+
+/**
+ * @function
+ */
+dwv.tool.WindowLevel.prototype.setColourMap = function(name)
+{    
+    // check if we have it
+    if( !dwv.tool.colourMaps[name] )
+    {
+        throw new Error("Unknown colour map: '" + name + "'");
+    }
+    // enable it
+    dwv.tool.updateColourMap( dwv.tool.colourMaps[name] );
 };
 
 dwv.tool.WindowLevel.prototype.updatePlot = function(wc,ww)
@@ -332,27 +268,17 @@ dwv.tool.WindowLevel.prototype.updatePlot = function(wc,ww)
     var max = center + half;
     
     var markings = [
-        { color: '#faa', lineWidth: 1, xaxis: { from: min, to: min } },
-        { color: '#aaf', lineWidth: 1, xaxis: { from: max, to: max } }
+        { "color": "#faa", "lineWidth": 1, "xaxis": { "from": min, "to": min } },
+        { "color": "#aaf", "lineWidth": 1, "xaxis": { "from": max, "to": max } }
     ];
 
     $.plot($("#plot"), [ app.getImage().getHistogram() ], {
-        bars: { show: true },
-        grid: { markings: markings, backgroundColor: null },
-        xaxis: { show: false },
-        yaxis: { show: false }
+        "bars": { "show": true },
+        "grid": { "markings": markings, "backgroundColor": null },
+        "xaxis": { "show": false },
+        "yaxis": { "show": false }
     });
 };
 
-dwv.tool.WindowLevel.prototype.clearHtml = function()
-{
-    // find the tool specific node
-    var node = document.getElementById('presetSelector');
-    // delete its content
-    while (node.hasChildNodes()) {
-        node.removeChild(node.firstChild);
-    }
-    // remove the tool specific node
-    var top = document.getElementById('toolbox');
-    top.removeChild(node);
-};
+// Add the tool to the list
+dwv.tool.tools["windowlevel"] = dwv.tool.WindowLevel;

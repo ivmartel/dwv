@@ -4,86 +4,15 @@
 dwv.tool = dwv.tool || {};
 
 /**
-* @class Line painting tool.
-*/
-dwv.tool.Line = function(app)
-{
-    var self = this;
-    this.started = false;
-    var command = null;
-    
-    // This is called when you start holding down the mouse button.
-    this.mousedown = function(ev){
-        self.started = true;
-        self.x0 = ev._x;
-        self.y0 = ev._y;
-    };
-
-    // This function is called every time you move the mouse.
-    this.mousemove = function(ev){
-        if (!self.started)
-        {
-            return;
-        }
-        // points
-        var beginPoint = new dwv.math.Point2D(self.x0, self.y0);
-        var endPoint = new dwv.math.Point2D(ev._x, ev._y);
-        // check for equality
-        if( beginPoint.equals(endPoint) )
-        {
-            return;
-        }
-        // create line
-        var line = new dwv.math.Line(beginPoint, endPoint);
-        // create draw command
-        command = new dwv.tool.DrawLineCommand(line, app);
-        // clear the temporary layer
-        app.getTempLayer().clearContextRect();
-        // draw
-        command.execute();
-    };
-
-    // This is called when you release the mouse button.
-    this.mouseup = function(ev){
-        if (self.started) 
-        {
-            if( ev._x!==self.x0 && ev._y!==self.y0) {
-                // draw
-                self.mousemove(ev);
-                // save command in undo stack
-                app.getUndoStack().add(command);
-                // merge temporary layer
-                app.getDrawLayer().merge(app.getTempLayer());
-            }
-            // set flag
-            self.started = false;
-        }
-    };
-    
-    this.enable = function(value){
-        if( value ) {
-            dwv.tool.draw.appendColourChooserHtml(app);
-        }
-        else {
-            dwv.tool.draw.clearColourChooserHtml();
-        }
-    };
-
-    this.keydown = function(event){
-        app.handleKeyDown(event);
-    };
-
-}; // Line class
-
-/**
  * @class Draw line command.
- * @param line The line to draw.
+ * @param points The points from which to extract the line.
  * @param app The application to draw the line on.
+ * @param style The drawing style.
  */
-dwv.tool.DrawLineCommand = function(line, app)
+dwv.tool.DrawLineCommand = function(points, app, style)
 {
-    // app members can change 
-    var lineColor = app.getStyle().getLineColor();
+    var line = new dwv.math.Line(points[0], points[points.length-1]);
+    var lineColor = style.getLineColor();
     var context = app.getTempLayer().getContext();
     
     // command name
@@ -107,9 +36,12 @@ dwv.tool.DrawLineCommand = function(line, app)
         var length = line.getWorldLength( 
             app.getImage().getSpacing().getColumnSpacing(), 
             app.getImage().getSpacing().getRowSpacing() );
-        context.font = app.getStyle().getFontStr();
+        context.font = style.getFontStr();
         context.fillText( Math.round(length) + "mm",
-                line.getEnd().getX() + app.getStyle().getFontSize(),
-                line.getEnd().getY() + app.getStyle().getFontSize());
+                line.getEnd().getX() + style.getFontSize(),
+                line.getEnd().getY() + style.getFontSize());
     }; 
 }; // DrawLineCommand class
+
+//Add the shape command to the list
+dwv.tool.shapes["line"] = dwv.tool.DrawLineCommand;

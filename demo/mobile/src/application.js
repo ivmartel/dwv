@@ -26,9 +26,6 @@ dwv.App = function()
     // Tool box.
     var toolBox = new dwv.tool.ToolBox(this);
     
-    // Style.
-    var style = new dwv.html.Style();
-    
     // UndoStack
     var undoStack = new dwv.tool.UndoStack(this);
     
@@ -48,9 +45,6 @@ dwv.App = function()
     // Get the information layer.
     this.getInfoLayer = function() { return infoLayer; };
 
-    // Get the drawing context.
-    this.getStyle = function() { return style; };
-
     // Get the image details.
     this.getUndoStack = function() { return undoStack; };
 
@@ -59,26 +53,8 @@ dwv.App = function()
      */
     this.init = function()
     {
-        // add the HTML for the tool box 
-        toolBox.appendHtml();
-        // add the HTML for the history 
-        undoStack.appendHtml();
         // bind open files with method
         document.getElementById('files').addEventListener('change', this.loadDicom, false);
-    };
-    
-    /**
-     * Set the line color.
-     * @param event
-     */
-    this.setLineColor = function(event)
-    {
-        // get the color
-        var color = event.target.id;
-        // set style var
-        self.getStyle().setLineColor(color);
-        // reset borders
-        dwv.tool.draw.setLineColor(color);
     };
     
     /**
@@ -145,7 +121,7 @@ dwv.App = function()
         var reader = new FileReader();
         reader.onload = onLoadedDicom;
         reader.onprogress = updateProgress;
-        $("#progressbar").progressbar({ value: 0 });
+        //$("#progressbar").progressbar({ value: 0 });
         reader.readAsBinaryString(evt.target.files[0]);
     };
     
@@ -169,7 +145,7 @@ dwv.App = function()
         }
         // prepare display
         postLoadInit();
-        $("#progressbar").progressbar({ value: 100 });
+        //$("#progressbar").progressbar({ value: 100 });
     }
     
     function updateProgress(evt)
@@ -203,23 +179,14 @@ dwv.App = function()
         while (node.hasChildNodes()) { 
             node.removeChild(node.firstChild);
         }
-        // new table
+        
+        // tags table
         var table = dwv.html.toTable(data);
         table.className = "tagList";
-        // append new table
+        // search form
+        node.appendChild(dwv.html.getHtmlSearchForm(table));
+        // tags table
         node.appendChild(table);
-        // display it
-        //node.style.display='';
-        
-        // table search form
-        var tagSearchform = document.createElement("form");
-        tagSearchform.setAttribute("class", "filter");
-        var input = document.createElement("input");
-        input.onkeyup = function() {
-            dwv.html.filterTable(input, table);
-        };
-        tagSearchform.appendChild(input);
-        node.insertBefore(tagSearchform, table);
         
         image = dicomParser.getImage();
     }
@@ -258,19 +225,21 @@ dwv.App = function()
      */
     this.alignLayers = function()
     {
-        drawLayer.align(imageLayer);
-        tempLayer.align(imageLayer);
-        infoLayer.align(imageLayer);
-        
-        // align plot
-        var plotDiv = document.getElementById("plot");
-        plotDiv.style.top = app.getImageLayer().getCanvas().offsetTop
-            + app.getImageLayer().getCanvas().height
-            - plotDiv.offsetHeight
-            - 15;
-        plotDiv.style.left = app.getImageLayer().getCanvas().offsetLeft
-            + app.getImageLayer().getCanvas().width
-            - plotDiv.offsetWidth;
+        if( imageLayer ) {
+            drawLayer.align(imageLayer);
+            tempLayer.align(imageLayer);
+            infoLayer.align(imageLayer);
+            
+            // align plot
+            var plotDiv = document.getElementById("plot");
+            plotDiv.style.top = app.getImageLayer().getCanvas().offsetTop
+                + app.getImageLayer().getCanvas().height
+                - plotDiv.offsetHeight
+                - 15;
+            plotDiv.style.left = app.getImageLayer().getCanvas().offsetLeft
+                + app.getImageLayer().getCanvas().width
+                - plotDiv.offsetWidth;
+        }
     };
     
     /**
@@ -279,9 +248,22 @@ dwv.App = function()
      */
     function postLoadInit()
     {
+        // layout
         layoutLayers();
         self.alignLayers();
-        
+
+        // get the image data from the image layer
+        imageData = self.getImageLayer().getContext().getImageData( 
+            0, 0, 
+            self.getImage().getSize().getNumberOfColumns(), 
+            self.getImage().getSize().getNumberOfRows());
+
+        // initialise the toolbox
+        // note: the window/level tool is responsible for doing the first display.
+        toolBox.enable(true);
+        // add the HTML for the history 
+        dwv.gui.appendUndoHtml();
+
         // Attach the mousedown, mousemove and mouseup event listeners.
         tempLayer.getCanvas().addEventListener('mousedown', eventHandler, false);
         tempLayer.getCanvas().addEventListener('mousemove', eventHandler, false);
@@ -293,9 +275,6 @@ dwv.App = function()
         // Keydown listener
         window.addEventListener('keydown', eventHandler, true);
 
-        // initialise the toolbox
-        // note: the window/level tool is responsible for doing the first display.
-        toolBox.init();
     }
     
     /**
@@ -303,14 +282,6 @@ dwv.App = function()
      */
     this.generateAndDrawImage = function()
     {         
-        // store first image data
-        if( imageData === null )
-        {
-            imageData = self.getImageLayer().getContext().getImageData( 
-                0, 0, 
-                self.getImage().getSize().getNumberOfColumns(), 
-                self.getImage().getSize().getNumberOfRows());
-        }
         // generate image data from DICOM
         self.getImage().generateImageData(imageData);         
         // set the image data of the layer

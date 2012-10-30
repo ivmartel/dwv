@@ -73,10 +73,10 @@ dwv.tool.Zoom = function(app)
     // Enable method.
     this.enable = function(bool){
         if( bool ) { 
-            this.appendHtml();
+            dwv.gui.appendZoomHtml();
         }
         else { 
-            this.clearHtml();
+            dwv.gui.clearZoomHtml();
         }
     };
 
@@ -96,36 +96,5 @@ dwv.tool.Zoom = function(app)
 
 }; // Zoom class
 
-dwv.tool.Zoom.prototype.appendHtml = function()
-{
-    var div = document.createElement("div");
-    div.id = 'zoomResetDiv';
-    
-    var paragraph = document.createElement("p");  
-    paragraph.id = 'zoomReset';
-    paragraph.name = 'zoomReset';
-    
-    var button = document.createElement("button");
-    button.id = "zoomResetButton";
-    button.name = "zoomResetButton";
-    button.onclick = dwv.tool.zoomReset;
-    var text = document.createTextNode('Reset');
-    button.appendChild(text);
-    
-    paragraph.appendChild(button);
-    div.appendChild(paragraph);
-    document.getElementById('toolbox').appendChild(div);
-};
-
-dwv.tool.Zoom.prototype.clearHtml = function()
-{
-    // find the tool specific node
-    var node = document.getElementById('zoomResetDiv');
-    // delete its content
-    while (node.hasChildNodes()) { 
-        node.removeChild(node.firstChild);
-    }
-    // remove the tool specific node
-    var top = document.getElementById('toolbox');
-    top.removeChild(node);
-};
+//Add the tool to the list
+dwv.tool.tools["zoom"] = dwv.tool.Zoom;
