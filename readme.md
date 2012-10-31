@@ -1,7 +1,7 @@
 DWV
 ===
 
-A simple javascript/HTML5 (_only_) DICOM web viewer. 
+A simple javascript/HTML5 _only_ DICOM web viewer. 
 
 Not yet fully DICOM compliant, for now only supports:
  * 512*512 2D images (or less)
