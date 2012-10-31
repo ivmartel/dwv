@@ -1,5 +1,5 @@
 DWV
------
+===
 
 A simple javascript/HTML5 (only) DICOM web viewer. 
 Not yet fully DICOM compliant, for now only supports:
