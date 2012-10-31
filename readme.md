@@ -13,5 +13,5 @@ For now works only with local files.
  * Firefox: straight out of the box,
  * Google Chrome: launch it with the command line option: `--allow-file-access-from-files`. 
 
-Released under GNU GPL license (see [license.txt](license.txt)). 
+Released under GNU GPL license (see [license.txt](/ivmartel/dwv/blob/master/license.txt)). 
  
