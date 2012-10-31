@@ -35,19 +35,29 @@ dwv.gui.onChangeLineColour = function(event)
 
 dwv.gui.appendToolboxHtml = function()
 {
+    var node = document.getElementById('toolList');
+    while (node.hasChildNodes()) {
+        node.removeChild(node.firstChild);
+    }
+    
     // select
-    var selector = dwv.html.createHtmlSelect("toolSelect",dwv.tool.tools);
-    selector.onchange = dwv.gui.onChangeTool;
+    var toolSelector = dwv.html.createHtmlSelect("toolSelect",dwv.tool.tools);
+    toolSelector.onchange = dwv.gui.onChangeTool;
     // label
-    var label = document.createElement("label");
-    label.setAttribute("for", "toolSelect");
-    label.appendChild(document.createTextNode("Tool: "));
+    var toolLabel = document.createElement("label");
+    toolLabel.setAttribute("for", "toolSelect");
+    toolLabel.appendChild(document.createTextNode("Tool: "));
+    
     // list element
-    var li = document.createElement("li");
-    li.appendChild(label);
-    li.appendChild(selector);
+    var toolLi = document.createElement("li");
+    toolLi.id = "toolLi";
+    //toolLi.appendChild(toolLabel);
+    toolLi.appendChild(toolSelector);
+    toolLi.setAttribute("class","ui-block-a");
     // append to list
-    document.getElementById('toolList').appendChild(li);
+    document.getElementById('toolList').appendChild(toolLi);
+    
+    $("#toolList").trigger("create");
 };
 
 dwv.gui.appendWindowLevelHtml = function()
@@ -70,18 +80,22 @@ dwv.gui.appendWindowLevelHtml = function()
     // list element
     var wlLi = document.createElement("li");
     wlLi.id = "wlLi";
-    wlLi.appendChild(wlLabel);
+    //wlLi.appendChild(wlLabel);
     wlLi.appendChild(wlSelector);
+    wlLi.setAttribute("class","ui-block-b");
     // add to document
     document.getElementById("toolList").appendChild(wlLi);
 
     // list element
     var cmLi = document.createElement("li");
     cmLi.id = "cmLi";
-    cmLi.appendChild(cmLabel);
+   // cmLi.appendChild(cmLabel);
     cmLi.appendChild(cmSelector);
+    cmLi.setAttribute("class","ui-block-c");
     // add to document
     document.getElementById("toolList").appendChild(cmLi);
+
+    $("#toolList").trigger("create");
 };
 
 dwv.gui.clearWindowLevelHtml = function()
@@ -92,13 +106,6 @@ dwv.gui.clearWindowLevelHtml = function()
 
 dwv.gui.appendDrawHtml = function()
 {
-    // colour select
-    var colourSelector = dwv.html.createHtmlSelect("colourSelect",dwv.tool.colors);
-    colourSelector.onchange = dwv.gui.onChangeLineColour;
-    // colour label
-    var colourLabel = document.createElement("label");
-    colourLabel.setAttribute("for", "colourSelect");
-    colourLabel.appendChild(document.createTextNode("Colour: "));
     // shape select
     var shapeSelector = dwv.html.createHtmlSelect("shapeSelect",dwv.tool.shapes);
     shapeSelector.onchange = dwv.gui.onChangeShape;
@@ -106,22 +113,33 @@ dwv.gui.appendDrawHtml = function()
     var shapeLabel = document.createElement("label");
     shapeLabel.setAttribute("for", "shapeSelect");
     shapeLabel.appendChild(document.createTextNode("Shape: "));
-
-    // list element
-    var colourLi = document.createElement("li");
-    colourLi.id = "colourLi";
-    colourLi.appendChild(colourLabel);
-    colourLi.appendChild(colourSelector);
-    // add to document
-    document.getElementById("toolList").appendChild(colourLi);
+    // colour select
+    var colourSelector = dwv.html.createHtmlSelect("colourSelect",dwv.tool.colors);
+    colourSelector.onchange = dwv.gui.onChangeLineColour;
+    // colour label
+    var colourLabel = document.createElement("label");
+    colourLabel.setAttribute("for", "colourSelect");
+    colourLabel.appendChild(document.createTextNode("Colour: "));
 
     // list element
     var shapeLi = document.createElement("li");
     shapeLi.id = "shapeLi";
-    shapeLi.appendChild(shapeLabel);
+   // shapeLi.appendChild(shapeLabel);
     shapeLi.appendChild(shapeSelector);
+    shapeLi.setAttribute("class","ui-block-c");
     // add to document
     document.getElementById("toolList").appendChild(shapeLi);
+    
+    // list element
+    var colourLi = document.createElement("li");
+    colourLi.id = "colourLi";
+    //colourLi.appendChild(colourLabel);
+    colourLi.appendChild(colourSelector);
+    colourLi.setAttribute("class","ui-block-b");
+    // add to document
+    document.getElementById("toolList").appendChild(colourLi);
+
+    $("#toolList").trigger("create");
 };
 
 dwv.gui.clearDrawHtml = function()
@@ -146,10 +164,13 @@ dwv.gui.appendLivewireHtml = function()
     // list element
     var colourLi = document.createElement("li");
     colourLi.id = "colourLi";
-    colourLi.appendChild(colourLabel);
+    colourLi.setAttribute("class","ui-block-b");
+    //colourLi.appendChild(colourLabel);
     colourLi.appendChild(colourSelector);
     // add to document
     document.getElementById("toolList").appendChild(colourLi);
+
+    $("#toolList").trigger("create");
 };
 
 /**
@@ -173,10 +194,13 @@ dwv.gui.appendFilterHtml = function()
     // list element
     var filterLi = document.createElement("li");
     filterLi.id = "filterLi";
-    filterLi.appendChild(filterLabel);
+    filterLi.setAttribute("class","ui-block-b");
+    //filterLi.appendChild(filterLabel);
     filterLi.appendChild(filterSelector);
     // add to document
     document.getElementById("toolList").appendChild(filterLi);
+    
+    $("#toolList").trigger("create");
 };
 
 dwv.gui.clearFilterHtml = function()
@@ -194,48 +218,17 @@ dwv.gui.filter = dwv.gui.filter || {};
 */
 dwv.gui.filter.appendThresholdHtml = function()
 {
-    var li = document.createElement("li");
-    li.id = "thresholdLi";
-    document.getElementById("toolList").appendChild(li);
+    var thresholdLi = document.createElement("li");
+    thresholdLi.setAttribute("class","ui-block-c");
+    thresholdLi.id = "thresholdLi";
+    document.getElementById("toolList").appendChild(thresholdLi);
 
-    var min = app.getImage().getDataRange().min;
-    var max = app.getImage().getDataRange().max;
-    
-    $( "#thresholdLi" ).slider({
-        range: true,
-        min: min,
-        max: max,
-        values: [ min, max ],
-        slide: function( event, ui ) {
-            app.getToolBox().getSelectedTool().getSelectedFilter().run(
-                    {'min':ui.values[0], 'max':ui.values[1]});
-        }
-    });
+    dwv.gui.getSliderHtml();
 };
 
 dwv.gui.filter.clearThresholdHtml = function()
 {
     dwv.html.removeNode("thresholdLi");
-};
-
-/**
-* @function Threshold Filter User Interface.
-*/
-dwv.gui.filter.displayThreshold2 = function()
-{
-    var min = app.getImage().getDataRange().min;
-    var max = app.getImage().getDataRange().max;
-    
-    $("#threshold-slider").attr("min", min).slider("refresh");
-    $("#threshold-slider").attr("max", max).slider("refresh");
-    $("#threshold-slider").attr("value", min).slider("refresh");
-
-    $("#threshold-slider").bind("change",
-        function( event ) {
-            app.getToolBox().getSelectedTool().getSelectedFilter().run(
-                    {'min':$("#threshold-slider").val(), 'max':max});
-        }
-    );
 };
 
 /**
@@ -251,10 +244,13 @@ dwv.gui.filter.appendSharpenHtml = function()
     button.appendChild(document.createTextNode("Apply"));
     
     // list element
-    var li = document.createElement("li");
-    li.id = "sharpenLi";
-    li.appendChild(button);
-    document.getElementById("toolList").appendChild(li);
+    var sharpenLi = document.createElement("li");
+    sharpenLi.id = "sharpenLi";
+    sharpenLi.setAttribute("class","ui-block-c");
+    sharpenLi.appendChild(button);
+    document.getElementById("toolList").appendChild(sharpenLi);
+    
+    $("#toolList").trigger("create");
 };
 
 dwv.gui.filter.clearSharpenHtml = function()
@@ -275,10 +271,13 @@ dwv.gui.filter.appendSobelHtml = function()
     button.appendChild(document.createTextNode("Apply"));
 
     // list element
-    var li = document.createElement("li");
-    li.id = "sobelLi";
-    li.appendChild(button);
-    document.getElementById("toolList").appendChild(li);
+    var sobelLi = document.createElement("li");
+    sobelLi.id = "sobelLi";
+    sobelLi.setAttribute("class","ui-block-c");
+    sobelLi.appendChild(button);
+    document.getElementById("toolList").appendChild(sobelLi);
+    
+    $("#toolList").trigger("create");
 };
 
 dwv.gui.filter.clearSobelHtml = function()
@@ -288,13 +287,6 @@ dwv.gui.filter.clearSobelHtml = function()
 
 dwv.gui.appendZoomHtml = function()
 {
-    var div = document.createElement("div");
-    div.id = "zoomResetDiv";
-    
-    var paragraph = document.createElement("p");  
-    paragraph.id = "zoomReset";
-    paragraph.name = "zoomReset";
-    
     var button = document.createElement("button");
     button.id = "zoomResetButton";
     button.name = "zoomResetButton";
@@ -302,14 +294,19 @@ dwv.gui.appendZoomHtml = function()
     var text = document.createTextNode("Reset");
     button.appendChild(text);
     
-    paragraph.appendChild(button);
-    div.appendChild(paragraph);
-    document.getElementById('toolbox').appendChild(div);
+    // list element
+    var zoomLi = document.createElement("li");
+    zoomLi.id = "zoomLi";
+    zoomLi.setAttribute("class","ui-block-c");
+    zoomLi.appendChild(button);
+    document.getElementById("toolList").appendChild(zoomLi);
+    
+    $("#toolList").trigger("create");
 };
 
 dwv.gui.clearZoomHtml = function()
 {
-    dwv.html.removeNode("zoomResetDiv");
+    dwv.html.removeNode("zoomLi");
 };
 
 dwv.gui.appendUndoHtml = function()
