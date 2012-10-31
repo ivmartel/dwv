@@ -1,8 +1,7 @@
 body {
     background-color: #222;
     color: white;
-    font-family: Verdana, Arial, Helvetica, sans-serif ;
-    font-size: 80%;
+    font-family: Verdana, Arial, Helvetica, sans-serif;
     margin: 10px;
     padding: 0px;
 }
@@ -25,8 +24,5 @@ a { color: #ddf; }
 /* Tag list */
 table.tagList { border-collapse:collapse; }
 table.tagList thead td { font-weight: bold; }
-table.tagList td { border: 1px solid grey; padding: 2px; font-size: 80%; }
+table.tagList td { border: 1px solid grey; padding: 2px; }
 .highlighted { background: #f87217; }
-
-/* Toolbox */
-#toolbox li:first-child { list-style-type: none; padding-bottom: 10px; margin-left: -20px; }
