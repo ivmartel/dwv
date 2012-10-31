@@ -11,7 +11,7 @@ All coding/implementation comments are welcome.
 For now works only with local files. 
 
  * Firefox: straight out of the box,
- * Google Chrome: launch it with the command line option: --allow-file-access-from-files. 
+ * Google Chrome: launch it with the command line option: `--allow-file-access-from-files`. 
 
 Released under GNU GPL license (see license.txt). 
  
