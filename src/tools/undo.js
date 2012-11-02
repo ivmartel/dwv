@@ -12,7 +12,7 @@ dwv.tool.UndoStack = function(app)
 	// Array of commands.
 	var stack = [];
 	// Current command index.
-	var curCmd = 0;
+	var curCmdIndex = 0;
 
 	/**
 	 * Add a command to the stack.
@@ -20,10 +20,12 @@ dwv.tool.UndoStack = function(app)
 	 */
 	this.add = function(cmd)
 	{ 
-		// clear commands after curCmd
-		stack = stack.slice(0,curCmd);
+		// clear commands after current index
+		stack = stack.slice(0,curCmdIndex);
 		// store command
-		stack[curCmd++] = cmd;
+		stack[curCmdIndex] = cmd;
+        // increment index
+        ++curCmdIndex;
 		// add command to display history
 		dwv.gui.addCommandToUndoHtml(cmd.getName());
 	};
@@ -33,19 +35,17 @@ dwv.tool.UndoStack = function(app)
 	 */
 	this.undo = function()
 	{ 
-		// not worth when drawing...
-		// stack[--curCmd].execute();
-		
 		// a bit inefficient...
-		if( curCmd > 0 )
+		if( curCmdIndex > 0 )
 		{
-			// clear the draw layer
+			// decrement index
+		    --curCmdIndex; 
+		    // clear the draw layer
 			app.getDrawLayer().clearContextRect();
 			// clear the temporary layer 
 			app.getTempLayer().clearContextRect();
-			// redraw shapes
-			curCmd--; 
-			for( var i = 0; i < curCmd; ++i)
+			// redo from first command
+			for( var i = 0; i < curCmdIndex; ++i)
 			{
 				stack[i].execute(); 
 			}
@@ -61,10 +61,13 @@ dwv.tool.UndoStack = function(app)
 	 */
 	this.redo = function()
 	{ 
-		if( curCmd < stack.length )
+		if( curCmdIndex < stack.length )
 		{
-			var cmd = stack[curCmd++];
+		    // run command
+		    var cmd = stack[curCmdIndex];
 			cmd.execute();
+            // increment index
+            ++curCmdIndex;
 			// merge the temporary layer
 			app.getDrawLayer().merge(app.getTempLayer());
 			// enable next in display history
