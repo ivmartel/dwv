@@ -31,7 +31,7 @@ dwv.tool.UndoStack = function(app)
 	};
 
 	/**
-	 * Call the previous command. 
+	 * Undo the last command. 
 	 */
 	this.undo = function()
 	{ 
@@ -40,6 +40,7 @@ dwv.tool.UndoStack = function(app)
 		{
 			// decrement index
 		    --curCmdIndex; 
+		    // TODO: reset image
 		    // clear the draw layer
 			app.getDrawLayer().clearContextRect();
 			// clear the temporary layer 
@@ -57,7 +58,7 @@ dwv.tool.UndoStack = function(app)
 	}; 
 
 	/**
-	 * Call the next command.
+	 * Redo the last command.
 	 */
 	this.redo = function()
 	{ 
