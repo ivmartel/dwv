@@ -239,17 +239,22 @@ dwv.gui.filter.clearThresholdHtml = function()
 dwv.gui.filter.appendSharpenHtml = function()
 {
     // button
-    var button = document.createElement("button");
-    button.id = "applyFilterButton";
-    button.name = "applyFilterButton";
-    button.onclick = app.getToolBox().getSelectedTool().getSelectedFilter().run;
-    button.appendChild(document.createTextNode("Apply"));
-    
+    var buttonRun = document.createElement("button");
+    buttonRun.id = "runFilterButton";
+    buttonRun.onclick = app.getToolBox().getSelectedTool().getSelectedFilter().run;
+    buttonRun.appendChild(document.createTextNode("Apply"));
+
+    var buttonSave = document.createElement("button");
+    buttonSave.id = "saveFilterButton";
+    buttonSave.onclick = app.getToolBox().getSelectedTool().getSelectedFilter().save;
+    buttonSave.appendChild(document.createTextNode("Save"));
+
     // list element
     var sharpenLi = document.createElement("li");
     sharpenLi.id = "sharpenLi";
     sharpenLi.setAttribute("class","ui-block-c");
-    sharpenLi.appendChild(button);
+    sharpenLi.appendChild(buttonRun);
+    sharpenLi.appendChild(buttonSave);
     document.getElementById("toolList").appendChild(sharpenLi);
     
     $("#toolList").trigger("create");
@@ -266,17 +271,22 @@ dwv.gui.filter.clearSharpenHtml = function()
 dwv.gui.filter.appendSobelHtml = function()
 {
     // button
-    var button = document.createElement("button");
-    button.id = "applyFilterButton";
-    button.name = "applyFilterButton";
-    button.onclick = app.getToolBox().getSelectedTool().getSelectedFilter().run;
-    button.appendChild(document.createTextNode("Apply"));
+    var buttonRun = document.createElement("button");
+    buttonRun.id = "runFilterButton";
+    buttonRun.onclick = app.getToolBox().getSelectedTool().getSelectedFilter().run;
+    buttonRun.appendChild(document.createTextNode("Apply"));
+
+    var buttonSave = document.createElement("button");
+    buttonSave.id = "saveFilterButton";
+    buttonSave.onclick = app.getToolBox().getSelectedTool().getSelectedFilter().save;
+    buttonSave.appendChild(document.createTextNode("Save"));
 
     // list element
     var sobelLi = document.createElement("li");
     sobelLi.id = "sobelLi";
     sobelLi.setAttribute("class","ui-block-c");
-    sobelLi.appendChild(button);
+    sobelLi.appendChild(buttonRun);
+    sobelLi.appendChild(buttonSave);
     document.getElementById("toolList").appendChild(sobelLi);
     
     $("#toolList").trigger("create");
