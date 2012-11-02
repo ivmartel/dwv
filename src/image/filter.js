@@ -35,10 +35,7 @@ dwv.image.filter.Threshold.prototype.update = function()
         if(x<min||x>max) { return imageMin; } 
         else { return x; }
     };
-    var newImage = app.getImage().transform( threshFunction );
-    
-    app.setImage(newImage);
-    app.generateAndDrawImage();
+    return app.getImage().transform( threshFunction );
 };
 
 /**
@@ -48,13 +45,10 @@ dwv.image.filter.Sharpen = function() {};
 
 dwv.image.filter.Sharpen.prototype.update = function()
 {
-    var newImage = app.getImage().convolute(
+    return app.getImage().convolute(
         [  0, -1,  0,
           -1,  5, -1,
            0, -1,  0 ] );
-    
-    app.setImage(newImage);
-    app.generateAndDrawImage();
 };
 
 /**
@@ -74,8 +68,5 @@ dwv.image.filter.Sobel.prototype.update = function()
            0,  0,  0,
           -1, -2, -1 ] );
     
-    var sobel = gradX.compose( gradY, function(x,y){return Math.sqrt(x*x+y*y);} );
-    
-    app.setImage(sobel);
-    app.generateAndDrawImage();
+    return gradX.compose( gradY, function(x,y){return Math.sqrt(x*x+y*y);} );
 };
