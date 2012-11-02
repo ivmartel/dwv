@@ -224,6 +224,8 @@ dwv.gui.filter.appendThresholdHtml = function()
     document.getElementById("toolList").appendChild(thresholdLi);
 
     dwv.gui.getSliderHtml();
+
+    $("#toolList").trigger("create");
 };
 
 dwv.gui.filter.clearThresholdHtml = function()
