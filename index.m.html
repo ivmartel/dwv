@@ -57,8 +57,19 @@ function toggleInfo()
         else div.style.display = "none";
     }
 }
-</script>
 
+// main application
+var app = new dwv.App();
+
+// jquery
+$(document).ready(function(){
+	// initialise the application
+	app.init();
+	
+	window.onresize = app.alignLayers;
+});
+
+</script>
 </head>
 
 <body>
@@ -80,8 +91,14 @@ function toggleInfo()
 </div>
 
 <div class="ui-block-b" style="text-align:right">
-<a href="#" data-role="button" data-mini="true" data-inline="true" onclick="toggleInfo()">Info</a>
-<a href="#tags_page" data-role="button" data-mini="true" data-inline="true">Tags</a>
+<a href="#" data-role="button" data-mini="true" data-inline="true" 
+ data-icon="back" data-iconpos="notext" onclick="app.getUndoStack().undo()">Undo</a>
+<a href="#" data-role="button" data-mini="true" data-inline="true" 
+ data-icon="forward" data-iconpos="notext" onclick="app.getUndoStack().redo()">Redo</a>
+<a href="#" data-role="button" data-mini="true" data-inline="true" 
+ data-icon="info" data-iconpos="notext" onclick="toggleInfo()">Info</a>
+<a href="#tags_page" data-role="button" data-mini="true" data-inline="true"
+ data-icon="grid" data-iconpos="notext">Tags</a>
 </div>
 
 </div><!-- /grid-a -->
@@ -125,16 +142,6 @@ data-transition="slide" data-direction="reverse">Back</a>
 </div><!-- /content -->
 
 </div><!-- /page -->
-
-
-<script type="text/javascript">
-// main application
-var app = new dwv.App();
-// initialise the application
-app.init();
-
-window.onresize = app.alignLayers;
-</script>
 
 </body>
 </html>
