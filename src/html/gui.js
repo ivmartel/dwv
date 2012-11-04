@@ -222,7 +222,7 @@ dwv.gui.filter.appendThresholdHtml = function()
     thresholdLi.setAttribute("class","ui-block-c");
     thresholdLi.id = "thresholdLi";
     document.getElementById("toolList").appendChild(thresholdLi);
-
+    // gui specific slider...
     dwv.gui.getSliderHtml();
 
     $("#toolList").trigger("create");
@@ -244,17 +244,11 @@ dwv.gui.filter.appendSharpenHtml = function()
     buttonRun.onclick = app.getToolBox().getSelectedTool().getSelectedFilter().run;
     buttonRun.appendChild(document.createTextNode("Apply"));
 
-    var buttonSave = document.createElement("button");
-    buttonSave.id = "saveFilterButton";
-    buttonSave.onclick = app.getToolBox().getSelectedTool().getSelectedFilter().save;
-    buttonSave.appendChild(document.createTextNode("Save"));
-
     // list element
     var sharpenLi = document.createElement("li");
     sharpenLi.id = "sharpenLi";
     sharpenLi.setAttribute("class","ui-block-c");
     sharpenLi.appendChild(buttonRun);
-    sharpenLi.appendChild(buttonSave);
     document.getElementById("toolList").appendChild(sharpenLi);
     
     $("#toolList").trigger("create");
@@ -276,17 +270,11 @@ dwv.gui.filter.appendSobelHtml = function()
     buttonRun.onclick = app.getToolBox().getSelectedTool().getSelectedFilter().run;
     buttonRun.appendChild(document.createTextNode("Apply"));
 
-    var buttonSave = document.createElement("button");
-    buttonSave.id = "saveFilterButton";
-    buttonSave.onclick = app.getToolBox().getSelectedTool().getSelectedFilter().save;
-    buttonSave.appendChild(document.createTextNode("Save"));
-
     // list element
     var sobelLi = document.createElement("li");
     sobelLi.id = "sobelLi";
     sobelLi.setAttribute("class","ui-block-c");
     sobelLi.appendChild(buttonRun);
-    sobelLi.appendChild(buttonSave);
     document.getElementById("toolList").appendChild(sobelLi);
     
     $("#toolList").trigger("create");

@@ -93,16 +93,7 @@ dwv.tool.filter.Threshold.prototype.run = function(args)
     var filter = new dwv.image.filter.Threshold();
     filter.setMin(args.min);
     filter.setMax(args.max);
-    var command = new dwv.tool.RunFilterCommand(filter, app, false);
-    command.execute();
-};
-
-dwv.tool.filter.Threshold.prototype.save = function(args)
-{
-    var filter = new dwv.image.filter.Threshold();
-    filter.setMin(args.min);
-    filter.setMax(args.max);
-    var command = new dwv.tool.RunFilterCommand(filter, app, true);
+    var command = new dwv.tool.RunFilterCommand(filter, app);
     command.execute();
     // save command in undo stack
     app.getUndoStack().add(command);
@@ -129,14 +120,7 @@ dwv.tool.filter.Sharpen.prototype.enable = function(value)
 dwv.tool.filter.Sharpen.prototype.run = function(args)
 {
     var filter = new dwv.image.filter.Sharpen();
-    var command = new dwv.tool.RunFilterCommand(filter, app, false);
-    command.execute();
-};
-
-dwv.tool.filter.Sharpen.prototype.save = function(args)
-{
-    var filter = new dwv.image.filter.Sharpen();
-    var command = new dwv.tool.RunFilterCommand(filter, app, true);
+    var command = new dwv.tool.RunFilterCommand(filter, app);
     command.execute();
     // save command in undo stack
     app.getUndoStack().add(command);
@@ -163,14 +147,7 @@ dwv.tool.filter.Sobel.prototype.enable = function(value)
 dwv.tool.filter.Sobel.prototype.run = function(args)
 {
     var filter = new dwv.image.filter.Sobel();
-    var command = new dwv.tool.RunFilterCommand(filter, app, false);
-    command.execute();
-};
-
-dwv.tool.filter.Sobel.prototype.save = function(args)
-{
-    var filter = new dwv.image.filter.Sobel();
-    var command = new dwv.tool.RunFilterCommand(filter, app, true);
+    var command = new dwv.tool.RunFilterCommand(filter, app);
     command.execute();
     // save command in undo stack
     app.getUndoStack().add(command);
@@ -187,7 +164,7 @@ dwv.tool.tools["filter"] = dwv.tool.Filter;
  * @param filter The filter to run.
  * @param app The application to draw the line on.
  */
-dwv.tool.RunFilterCommand = function(filter, app, saveFlag)
+dwv.tool.RunFilterCommand = function(filter, app)
 {
     // command name
     var name = "RunFilterCommand";
@@ -197,30 +174,7 @@ dwv.tool.RunFilterCommand = function(filter, app, saveFlag)
     // main method
     this.execute = function()
     {
-        var newImage = filter.update();
-        
-        if( saveFlag )
-        {
-            console.log("saving...");
-            app.setImage(newImage);
-            app.generateAndDrawImage();
-            
-            app.getTempLayer().clearContextRect();
-            app.getImageLayer().display(true);
-        }
-        else
-        {
-            app.getImageLayer().display(false);
-            // set the image data of the layer
-            var data = app.getImageLayer().getContext().getImageData( 
-                    0, 0, 
-                    app.getImage().getSize().getNumberOfColumns(), 
-                    app.getImage().getSize().getNumberOfRows());; 
-            newImage.generateImageData(data);
-            app.getTempLayer().setImageData(data);
-            // draw the image
-            app.getTempLayer().draw();
-        }
-
+        app.setImage(filter.update());
+        app.generateAndDrawImage();
     }; 
 }; // RunFilterCommand class
