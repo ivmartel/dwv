@@ -4,48 +4,55 @@
 */
 dwv.App = function()
 {
-    // Local object.
+    // Local object
     var self = this;
-    
-    // Image details.
+    // Image
     var image = null;
-    
+    // Original image
+    var originalImage = null;
+    // Image data array
     var imageData = null;
-    // Get the image details.
-    this.getImageData = function() { return imageData; };
-    
-    // Image layer.
+     
+    // Image layer
     var imageLayer = null;
-    // Draw layer.
+    // Draw layer
     var drawLayer = null;
-    // Temporary layer.
+    // Temporary layer
     var tempLayer = null;
-    // Information layer.
+    // Information layer
     var infoLayer = null;
 
-    // Tool box.
+    // Tool box
     var toolBox = new dwv.tool.ToolBox(this);
-    
     // UndoStack
     var undoStack = new dwv.tool.UndoStack(this);
     
-    // Get the image details.
-    this.getImage = function() { return image; };
-    this.setImage = function(img) { image = img; };    
+    // Public Methods
+    // --------------
     
-    // Get the tool box.
+    // Get the image
+    this.getImage = function() { return image; };
+    
+    // Set the image
+    this.setImage = function(img) { image = img; };    
+    this.restoreOriginalImage = function() { image = originalImage; }; 
+    
+    // Get the image data array
+    this.getImageData = function() { return imageData; };
+
+    // Get the tool box
     this.getToolBox = function() { return toolBox; };
 
-    // Get the image layer.
+    // Get the image layer
     this.getImageLayer = function() { return imageLayer; };
-    // Get the draw layer.
+    // Get the draw layer
     this.getDrawLayer = function() { return drawLayer; };
-    // Get the temporary layer.
+    // Get the temporary layer
     this.getTempLayer = function() { return tempLayer; };
-    // Get the information layer.
+    // Get the information layer
     this.getInfoLayer = function() { return infoLayer; };
 
-    // Get the image details.
+    // Get the image details
     this.getUndoStack = function() { return undoStack; };
 
     /**
@@ -76,6 +83,34 @@ dwv.App = function()
         }
     };
     
+    /**
+     * @public
+     */
+    this.loadDicom = function(evt) 
+    {
+        var reader = new FileReader();
+        reader.onload = onLoadedDicom;
+        reader.onprogress = updateProgress;
+        //$("#progressbar").progressbar({ value: 0 });
+        reader.readAsBinaryString(evt.target.files[0]);
+    };
+    
+    /**
+     * Generate the image data and draw it.
+     */
+    this.generateAndDrawImage = function()
+    {         
+        // generate image data from DICOM
+        self.getImage().generateImageData(imageData);         
+        // set the image data of the layer
+        self.getImageLayer().setImageData(imageData);
+        // draw the image
+        self.getImageLayer().draw();
+    };
+    
+    // Private Methods
+    // ---------------
+
     /**
      * @private
      * The general-purpose event handler. This function just determines the mouse 
@@ -114,17 +149,9 @@ dwv.App = function()
     }
 
     /**
-     * @public
+     * @private
+     * @param file
      */
-    this.loadDicom = function(evt) 
-    {
-        var reader = new FileReader();
-        reader.onload = onLoadedDicom;
-        reader.onprogress = updateProgress;
-        //$("#progressbar").progressbar({ value: 0 });
-        reader.readAsBinaryString(evt.target.files[0]);
-    };
-    
     function onLoadedDicom(evt)
     {
         // parse the DICOM file
@@ -148,6 +175,10 @@ dwv.App = function()
         //$("#progressbar").progressbar({ value: 100 });
     }
     
+    /**
+     * @private
+     * @param file
+     */
     function updateProgress(evt)
     {
         // evt is an ProgressEvent.
@@ -188,7 +219,8 @@ dwv.App = function()
         // tags table
         node.appendChild(table);
         
-        image = dicomParser.getImage();
+        originalImage = dicomParser.getImage();
+        image = originalImage;
     }
     
     /**
@@ -223,7 +255,7 @@ dwv.App = function()
      * @private
      * To be called once the image is loaded.
      */
-    this.alignLayers = function()
+    function alignLayers()
     {
         if( imageLayer ) {
             drawLayer.align(imageLayer);
@@ -250,7 +282,7 @@ dwv.App = function()
     {
         // layout
         layoutLayers();
-        self.alignLayers();
+        alignLayers();
 
         // get the image data from the image layer
         imageData = self.getImageLayer().getContext().getImageData( 
@@ -274,19 +306,6 @@ dwv.App = function()
 
         // Keydown listener
         window.addEventListener('keydown', eventHandler, true);
-
     }
     
-    /**
-     * @private
-     */
-    this.generateAndDrawImage = function()
-    {         
-        // generate image data from DICOM
-        self.getImage().generateImageData(imageData);         
-        // set the image data of the layer
-        self.getImageLayer().setImageData(imageData);
-        // draw the image
-        self.getImageLayer().draw();
-    };
 };
