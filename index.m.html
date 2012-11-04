@@ -65,8 +65,8 @@ var app = new dwv.App();
 $(document).ready(function(){
 	// initialise the application
 	app.init();
-	
-	window.onresize = app.alignLayers;
+	// align layers when the window is resized
+    window.onresize = app.alignLayers;
 });
 
 </script>
