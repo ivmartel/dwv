@@ -167,7 +167,7 @@ dwv.tool.tools["filter"] = dwv.tool.Filter;
 dwv.tool.RunFilterCommand = function(filter, app)
 {
     // command name
-    var name = "RunFilterCommand";
+    var name = "RunFilter: " + filter.getName();
     this.setName = function(str) { name = str; };
     this.getName = function() { return name; };
 
