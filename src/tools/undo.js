@@ -40,18 +40,25 @@ dwv.tool.UndoStack = function(app)
 		{
 			// decrement index
 		    --curCmdIndex; 
-		    // TODO: reset image
-		    // clear the draw layer
+            // reset image
+            app.restoreOriginalImage();
+		    // clear layers
 			app.getDrawLayer().clearContextRect();
-			// clear the temporary layer 
 			app.getTempLayer().clearContextRect();
 			// redo from first command
 			for( var i = 0; i < curCmdIndex; ++i)
 			{
 				stack[i].execute(); 
 			}
-			// merge the temporary layer
-			app.getDrawLayer().merge(app.getTempLayer());
+			// display
+			if( curCmdIndex === 0 ) {
+			    // just draw the image
+			    app.generateAndDrawImage();
+			}
+			else {
+			    // merge the temporary layer
+			    app.getDrawLayer().merge(app.getTempLayer());
+			}
 			// disable last in display history
 			dwv.gui.enableInUndoHtml(false);
 		}
