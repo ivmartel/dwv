@@ -108,6 +108,29 @@ dwv.App = function()
         self.getImageLayer().draw();
     };
     
+    /**
+     * To be called once the image is loaded.
+     * Linked with the window.onresize method.
+     */
+    this.alignLayers = function()
+    {
+        if( imageLayer ) {
+            drawLayer.align(imageLayer);
+            tempLayer.align(imageLayer);
+            infoLayer.align(imageLayer);
+            
+            // align plot
+            var plotDiv = document.getElementById("plot");
+            plotDiv.style.top = app.getImageLayer().getCanvas().offsetTop
+                + app.getImageLayer().getCanvas().height
+                - plotDiv.offsetHeight
+                - 15;
+            plotDiv.style.left = app.getImageLayer().getCanvas().offsetLeft
+                + app.getImageLayer().getCanvas().width
+                - plotDiv.offsetWidth;
+        }
+    };
+    
     // Private Methods
     // ---------------
 
@@ -255,34 +278,11 @@ dwv.App = function()
      * @private
      * To be called once the image is loaded.
      */
-    function alignLayers()
-    {
-        if( imageLayer ) {
-            drawLayer.align(imageLayer);
-            tempLayer.align(imageLayer);
-            infoLayer.align(imageLayer);
-            
-            // align plot
-            var plotDiv = document.getElementById("plot");
-            plotDiv.style.top = app.getImageLayer().getCanvas().offsetTop
-                + app.getImageLayer().getCanvas().height
-                - plotDiv.offsetHeight
-                - 15;
-            plotDiv.style.left = app.getImageLayer().getCanvas().offsetLeft
-                + app.getImageLayer().getCanvas().width
-                - plotDiv.offsetWidth;
-        }
-    };
-    
-    /**
-     * @private
-     * To be called once the image is loaded.
-     */
     function postLoadInit()
     {
         // layout
         layoutLayers();
-        alignLayers();
+        self.alignLayers();
 
         // get the image data from the image layer
         imageData = self.getImageLayer().getContext().getImageData( 
