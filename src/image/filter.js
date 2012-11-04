@@ -18,6 +18,11 @@ dwv.image.filter.Threshold = function()
     var max = 0;
 };
 
+dwv.image.filter.Threshold.prototype.getName = function()
+{
+    return "Threshold";
+};
+
 dwv.image.filter.Threshold.prototype.setMin = function(value)
 {
     min = value;
@@ -43,6 +48,11 @@ dwv.image.filter.Threshold.prototype.update = function()
  */
 dwv.image.filter.Sharpen = function() {};
 
+dwv.image.filter.Sharpen.prototype.getName = function()
+{
+    return "Sharpen";
+};
+
 dwv.image.filter.Sharpen.prototype.update = function()
 {
     return app.getImage().convolute(
@@ -55,6 +65,11 @@ dwv.image.filter.Sharpen.prototype.update = function()
  * @function Apply a Sobel filter to an image.
  */
 dwv.image.filter.Sobel = function() {};
+
+dwv.image.filter.Sobel.prototype.getName = function()
+{
+    return "Sobel";
+};
 
 dwv.image.filter.Sobel.prototype.update = function()
 {
