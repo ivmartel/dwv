@@ -1,6 +1,5 @@
-----------------------
- Third Party: jquery
-----------------------
+Third Party: jquery
+===================
 
 Web: http://jquery.com
 Version: 1.8.2
