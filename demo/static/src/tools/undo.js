@@ -12,7 +12,7 @@ dwv.tool.UndoStack = function(app)
 	// Array of commands.
 	var stack = [];
 	// Current command index.
-	var curCmd = 0;
+	var curCmdIndex = 0;
 
 	/**
 	 * Add a command to the stack.
@@ -20,117 +20,67 @@ dwv.tool.UndoStack = function(app)
 	 */
 	this.add = function(cmd)
 	{ 
-		// clear commands after curCmd
-		stack = stack.slice(0,curCmd);
+		// clear commands after current index
+		stack = stack.slice(0,curCmdIndex);
 		// store command
-		stack[curCmd++] = cmd;
+		stack[curCmdIndex] = cmd;
+        // increment index
+        ++curCmdIndex;
 		// add command to display history
-		this.addCommandToDisplayHistory(cmd);
+		dwv.gui.addCommandToUndoHtml(cmd.getName());
 	};
 
 	/**
-	 * Call the previous command. 
+	 * Undo the last command. 
 	 */
 	this.undo = function()
 	{ 
-		// not worth when drawing...
-		// stack[--curCmd].execute();
-		
 		// a bit inefficient...
-		if( curCmd > 0 )
+		if( curCmdIndex > 0 )
 		{
-			// clear the draw layer
+			// decrement index
+		    --curCmdIndex; 
+            // reset image
+            app.restoreOriginalImage();
+		    // clear layers
 			app.getDrawLayer().clearContextRect();
-			// clear the temporary layer 
 			app.getTempLayer().clearContextRect();
-			// redraw shapes
-			curCmd--; 
-			for( var i = 0; i < curCmd; ++i)
+			// redo from first command
+			for( var i = 0; i < curCmdIndex; ++i)
 			{
 				stack[i].execute(); 
 			}
-			// merge the temporary layer
-			app.getDrawLayer().merge(app.getTempLayer());
+			// display
+			if( curCmdIndex === 0 ) {
+			    // just draw the image
+			    app.generateAndDrawImage();
+			}
+			else {
+			    // merge the temporary layer
+			    app.getDrawLayer().merge(app.getTempLayer());
+			}
 			// disable last in display history
-			this.enableInDisplayHistory(false);
+			dwv.gui.enableInUndoHtml(false);
 		}
 	}; 
 
 	/**
-	 * Call the next command.
+	 * Redo the last command.
 	 */
 	this.redo = function()
 	{ 
-		if( curCmd < stack.length )
+		if( curCmdIndex < stack.length )
 		{
-			var cmd = stack[curCmd++];
+		    // run command
+		    var cmd = stack[curCmdIndex];
 			cmd.execute();
+            // increment index
+            ++curCmdIndex;
 			// merge the temporary layer
 			app.getDrawLayer().merge(app.getTempLayer());
 			// enable next in display history
-			this.enableInDisplayHistory(true);
+			dwv.gui.enableInUndoHtml(true);
 		}
 	};
 
 }; // UndoStack class
-
-dwv.tool.UndoStack.prototype.appendHtml = function()
-{
-    var paragraph = document.createElement("p");  
-    paragraph.appendChild(document.createTextNode("History:"));
-    paragraph.appendChild(document.createElement("br"));
-    
-    var select = document.createElement("select");
-    select.id = "history_list";
-    select.name = "history_list";
-    select.multiple = "multiple";
-    paragraph.appendChild(select);
-
-    document.getElementById('history').appendChild(paragraph);
-};
-
-dwv.tool.UndoStack.prototype.addCommandToDisplayHistory = function(command)
-{
-    var select = document.getElementById('history_list');
-    // remove undone commands
-    var count = select.length - (select.selectedIndex+1);
-    if( count > 0 )
-    {
-        for( var i = 0; i < count; ++i)
-        {
-            select.remove(select.length-1);
-        }
-    }
-    // add new option
-    var option = document.createElement('option');
-    option.text = command.getName();
-    option.value = command.getName();
-    select.add(option);
-    // increment selected index
-    select.selectedIndex++;
-};
-
-dwv.tool.UndoStack.prototype.enableInDisplayHistory = function(enable)
-{
-    var select = document.getElementById('history_list');
-    // enable or not (order is important)
-    var option;
-    if( enable ) 
-    {
-        // increment selected index
-        select.selectedIndex++;
-        // enable option
-        option = select.options[select.selectedIndex];
-        option.disabled = false;
-    }
-    else 
-    {
-        // disable option
-        option = select.options[select.selectedIndex];
-        option.disabled = true;
-        // decrement selected index
-        select.selectedIndex--;
-    }
-};
-
-

@@ -64,6 +64,10 @@ dwv.tool.Filter.prototype.init = function()
     this.setSelectedFilter(this.defaultFilterName);
 };
 
+dwv.tool.Filter.prototype.keydown = function(event){
+    app.handleKeyDown(event);
+};
+
 /**
  * @namespace Filter classes.
  */
@@ -149,10 +153,10 @@ dwv.tool.filter.Sobel.prototype.run = function(args)
     app.getUndoStack().add(command);
 };
 
-// Add the tool to the list
+//Add the tool to the list
 dwv.tool.filters["sobel"] = dwv.tool.filter.Sobel;
 
-//Add the tool to the list
+//Add the filters to the tools
 dwv.tool.tools["filter"] = dwv.tool.Filter;
 
 /**
@@ -163,13 +167,14 @@ dwv.tool.tools["filter"] = dwv.tool.Filter;
 dwv.tool.RunFilterCommand = function(filter, app)
 {
     // command name
-    var name = "RunFilterCommand";
+    var name = "RunFilter: " + filter.getName();
     this.setName = function(str) { name = str; };
     this.getName = function() { return name; };
 
     // main method
     this.execute = function()
     {
-        filter.update();
+        app.setImage(filter.update());
+        app.generateAndDrawImage();
     }; 
 }; // RunFilterCommand class

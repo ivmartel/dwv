@@ -95,6 +95,9 @@ dwv.html.appendRow = function(table, input, level, maxLevel, rowHeader)
     else if( typeof input === 'object') {
         dwv.html.appendRowForObject(table, input, level+1, maxLevel, rowHeader);
     }
+    else {
+        throw new Error("Unsupported input data type.");
+    }
 };
 
 /**
@@ -105,6 +108,22 @@ dwv.html.toTable = function(input)
     var table = document.createElement('table');
     dwv.html.appendRow(table, input, 0, 2);
     return table;
+};
+
+/**
+ * @function
+ */
+dwv.html.getHtmlSearchForm = function(htmlTableToSearch)
+{
+    var form = document.createElement("form");
+    form.setAttribute("class", "filter");
+    var input = document.createElement("input");
+    input.onkeyup = function() {
+        dwv.html.filterTable(input, htmlTableToSearch);
+    };
+    form.appendChild(input);
+    
+    return form;
 };
 
 /**
@@ -214,4 +233,63 @@ dwv.html.createHighlightNode = function(child) {
     node.attributes['class'].value = 'highlighted';
     node.appendChild(child);
     return node;
+};
+
+/**
+ * @function Remove all children of a node and then remove it from its parent.
+ * @param nodeId The id of the node to delete.
+ * @param parentId The id of the parent of the node to delete.
+ */
+dwv.html.removeNode = function(nodeId) {
+    // find the node
+    var node = document.getElementById(nodeId);
+    // remove its children
+    while (node.hasChildNodes()) {
+        node.removeChild(node.firstChild);
+    }
+    // remove it from its parent
+    var top = node.parentNode;
+    top.removeChild(node);
+};
+
+/**
+ * @function Create a HTML select from an input array of options.
+ * The values of the options are the name of the option made lower case.
+ * It is left to the user to set the 'onchange' method of the select.
+ * @param name The name of the HTML select.
+ * @param array The array of options of the HTML select.
+ * @return The created HTML select.
+ */
+dwv.html.createHtmlSelect = function(name, list) {
+    // select
+    var select = document.createElement("select");
+    select.id = name;
+    select.name = name;
+    // options
+    var option;
+    if( list instanceof Array )
+    {
+        for ( var i in list )
+        {
+            option = document.createElement("option");
+            option.value = list[i].toLowerCase();
+            option.appendChild(document.createTextNode(dwv.utils.capitaliseFirstLetter(list[i])));
+            select.appendChild(option);
+        }
+    }
+    else if( typeof list === 'object')
+    {
+        for ( var name in list )
+        {
+            option = document.createElement("option");
+            option.value = name.toLowerCase();
+            option.appendChild(document.createTextNode(dwv.utils.capitaliseFirstLetter(name)));
+            select.appendChild(option);
+        }
+    }
+    else
+    {
+        throw new Error("Unsupported input list type.");
+    }
+    return select;
 };

@@ -1,43 +1,28 @@
 body {
     background-color: #222;
     color: white;
-    font-family: Verdana, Arial, Helvetica, sans-serif ;
-    font-size: 80%;
+    font-family: Verdana, Arial, Helvetica, sans-serif;
     margin: 10px;
     padding: 0px;
 }
 h1 { color: #fff; }
 a { color: #ddf; }
 
-.highlighted { background: #f87217; }
-
 /* Layers */
 #layerContainer { 
     overflow: auto; 
     position: relative; 
-    margin: 10px;
-    padding: 0px; 
-    height: 580px; 
-    float: left; 
+    width: auto;
+    background-color: #222;
 }
-
 #imageLayer { border: 1px solid white; }
 #drawLayer { position: absolute; top: 1px; left: 1px; }
 #tempLayer { position: absolute; top: 1px; left: 1px; }
 #infoLayer { position: absolute; top: 1px; left: 1px; }
+#plot { position: absolute; top: 0px; left: 0px; }
 
 /* Tag list */
 table.tagList { border-collapse:collapse; }
 table.tagList thead td { font-weight: bold; }
-table.tagList td { border: 1px solid grey; padding: 2px; font-size: 80%; }
-
-/* Colour chooser */
-table.colourChooser td { width:20px; height:20px; border:#fff solid 2px; }
-table.colourChooser #black { background: black; }
-table.colourChooser #white { background: white; }
-table.colourChooser #red { background: red; }
-table.colourChooser #green { background: green; }
-table.colourChooser #blue { background: blue; }
-table.colourChooser #yellow { background: yellow; }
-table.colourChooser #lime { background: lime; }
-table.colourChooser #fuchsia { background:fuchsia; }
+table.tagList td { border: 1px solid grey; padding: 2px; }
+.highlighted { background: #f87217; }

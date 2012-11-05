@@ -140,7 +140,8 @@ dwv.html.Layer = function(name)
         width = inputWidth;
         height = inputHeight;
 
-        // original image data array
+        // original empty image data array
+        context.clearRect (0, 0, canvas.width, canvas.height);
         imageData = context.getImageData(0, 0, canvas.width, canvas.height);
     };
     
@@ -183,5 +184,35 @@ dwv.html.Layer = function(name)
     {
         context.fillStyle = color;
         context.strokeStyle = color;
+    };
+    
+    /**
+     * Display the layer.
+     */
+    this.display = function(val)
+    {
+        if( val === true )
+        {
+            canvas.style.display = '';
+        }
+        else
+        {
+            canvas.style.display = "none";
+        }
+    };
+    
+    this.isVisible = function()
+    {
+      if( canvas.style.display === "none" ) return false;
+      else return true;
+    };
+    
+    /**
+     * Align on another layer.
+     */
+    this.align = function(rhs)
+    {
+        canvas.style.top = rhs.getCanvas().offsetTop;
+        canvas.style.left = rhs.getCanvas().offsetLeft;
     };
 }; // Layer class

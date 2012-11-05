@@ -14,7 +14,7 @@ dwv.html.Style = function()
     this.lineHeight = this.fontSize + this.fontSize/5;
     this.textColor = "#fff";
     // mutable
-    this.lineColor = "yellow";
+    this.lineColor = 0;
 };
 
 dwv.html.Style.prototype.getFontSize = function() {

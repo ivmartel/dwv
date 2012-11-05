@@ -2,95 +2,127 @@
  * @namespace Tool classes.
  */
 dwv.tool = dwv.tool || {};
-/**
- * @namespace Drawing Tool classes.
- */
-dwv.tool.draw = dwv.tool.draw || {};
+
+//! List of colors
+dwv.tool.colors = [
+    "Yellow", "Red", "White", "Green", "Blue", "Lime", "Fuchsia", "Black"
+];
+
+//shape list: to be completed after each tool definition 
+dwv.tool.shapes = {};
 
 /**
- * @function Append the color chooser to the HTML document in the 'colourChooser' node.
- */
-dwv.tool.draw.appendColourChooserHtml = function(app)
+* @class Drawing tool.
+*/
+dwv.tool.Draw = function(app)
 {
-    var div = document.createElement("div");
-    div.id = "colourChooser";
-    
-    var paragraph = document.createElement("p");  
-    paragraph.appendChild(document.createTextNode("Colour: "));
+    var self = this;
+    // start drawing flag
+    var started = false;
+    // draw command
+    var command = null;
+    // draw style
+    this.style = new dwv.html.Style();
+    // shape name
+    this.shapeName = 0;
+    // list of points
+    var points = [];
 
-    var table = document.createElement("table");
-    table.name = "colourChooser";
-    table.className = "colourChooser";
+    // This is called when you start holding down the mouse button.
+    this.mousedown = function(ev){
+        started = true;
+        // clear array
+        points = [];
+        // store point
+        points.push(new dwv.math.Point2D(ev._x, ev._y));
+    };
+
+    // This function is called every time you move the mouse.
+    this.mousemove = function(ev){
+        if (!started)
+        {
+            return;
+        }
+        // current point
+        points.push(new dwv.math.Point2D(ev._x, ev._y));
+        // create draw command
+        command = new dwv.tool.shapes[self.shapeName](points, app, self.style);
+        // clear the temporary layer
+        app.getTempLayer().clearContextRect();
+        // draw
+        command.execute();
+    };
+
+    // This is called when you release the mouse button.
+    this.mouseup = function(ev){
+        if (started)
+        {
+            if( ev._x !== points[0].getX() 
+                && ev._y !== points[0].getY() )
+            {
+                // draw last point
+                self.mousemove(ev);
+                // save command in undo stack
+                app.getUndoStack().add(command);
+                // merge temporary layer
+                app.getDrawLayer().merge(app.getTempLayer());
+            }
+            // set flag
+            started = false;
+        }
+    };
+
+    // Enable the draw tool
+    this.enable = function(value){
+        if( value ) {
+            this.init();
+            dwv.gui.appendDrawHtml();
+        }
+        else { 
+            dwv.gui.clearDrawHtml();
+        }
+    };
     
-    var row = table.insertRow(-1);
-    row.id = "colours";
-    row.onmouseover = dwv.tool.draw.onMouseOver;
-    row.onmouseout = dwv.tool.draw.onMouseOut;
-    
-    var colours = ["black", "white", "red", "green", "blue", "yellow", "lime", "fuchsia"];
-    var cell;
-    for ( var i = 0; i < colours.length; ++i )
+    // Handle key down event
+    this.keydown = function(event){
+        app.handleKeyDown(event);
+    };
+
+}; // Draw class
+
+// Set the line color of the drawing
+dwv.tool.Draw.prototype.setLineColour = function(colour)
+{
+    // set style var
+    this.style.setLineColor(colour);
+};
+
+// Set the shape name of the drawing
+dwv.tool.Draw.prototype.setShapeName = function(name)
+{
+    // check if we have it
+    if( !this.hasShape(name) )
     {
-        cell = row.insertCell(i);
-        cell.id = colours[i];
-        cell.onclick = app.setLineColor;
-        cell.appendChild(document.createTextNode(" "));
+        throw new Error("Unknown shape: '" + name + "'");
     }
-
-    paragraph.appendChild(table);
-    div.appendChild(paragraph);
-    document.getElementById('toolbox').appendChild(div);
-    
-    // select default
-    dwv.tool.draw.setLineColor(app.getStyle().getLineColor());
+    this.shapeName = name;
 };
 
-/**
- * @function Remove the tool specific node.
- */
-dwv.tool.draw.clearColourChooserHtml = function()
-{
-    // find the tool specific node
-    var node = document.getElementById('colourChooser');
-    // delete its content
-    while (node.hasChildNodes()) { 
-        node.removeChild(node.firstChild);
+dwv.tool.Draw.prototype.hasShape = function(name) {
+    return dwv.tool.shapes[name];
+};
+
+dwv.tool.Draw.prototype.init = function() {
+    // set the default to the first in the list
+    var shapeName = 0;
+    for( var key in dwv.tool.shapes ){
+        shapeName = key;
+        break;
     }
-    // remove the tool specific node
-    var top = document.getElementById('toolbox');
-    top.removeChild(node);
+    this.setShapeName(shapeName);
+    // same for color
+    this.setLineColour(dwv.tool.colors[0]);
 };
 
-/**
- * @function Set the line color of the color chooser
- * @param color The color to use.
- */
-dwv.tool.draw.setLineColor = function(color)
-{
-    // reset borders
-    var tr = document.getElementById("colours");
-    var tds = tr.getElementsByTagName("td");
-    for (var i = 0; i < tds.length; i++)
-    {
-        tds[i].style.border = "#fff solid 2px";
-    }
-    // set selected border
-    var td = document.getElementById(color);
-    td.style.border = "#00f solid 2px";
-};
-
-/**
- * @function Set the cursor when mouse over the color chooser.
- */
-dwv.tool.draw.onMouseOver = function(event)
-{
-    document.body.style.cursor="pointer";
-};
-
-/**
- * @function Set the cursor when mouse out the color chooser.
- */
-dwv.tool.draw.onMouseOut = function(event)
-{
-    document.body.style.cursor="auto";
-};
+// Add the tool to the list
+dwv.tool.tools["draw"] = dwv.tool.Draw;
