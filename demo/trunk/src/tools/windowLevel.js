@@ -153,7 +153,7 @@ dwv.tool.WindowLevel = function(app)
         self.y0 = ev._y;
         dwv.tool.showHUvalue(ev._x, ev._y);
     };
-
+    
     // This function is called every time you move the mouse.
     this.mousemove = function(ev){
         if (!self.started)
@@ -181,6 +181,18 @@ dwv.tool.WindowLevel = function(app)
         }
     };
     
+    this.touchstart = function(ev){
+        self.mousedown(ev);
+    };
+
+    this.touchmove = function(ev){
+        self.mousemove(ev);
+    };
+
+    this.touchend = function(ev){
+        self.mouseup(ev);
+    };
+
     this.dblclick = function(ev){
         dwv.tool.updateWindowingData(
                 parseInt(app.getImage().getValue(ev._x, ev._y), 10),

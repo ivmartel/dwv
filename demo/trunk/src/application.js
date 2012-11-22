@@ -164,6 +164,9 @@ dwv.App = function()
             || event.type === "mousedown"
             || event.type === "mouseup"
             || event.type === "mousewheel"
+            || event.type === "touchstart"
+            || event.type === "touchend"
+            || event.type === "touchmove"
             || event.type === "dblclick")
         {
             // set event._x and event._y to be used later
