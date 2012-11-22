@@ -61,7 +61,8 @@ dwv.App = function()
     this.init = function()
     {
         // bind open files with method
-        document.getElementById('files').addEventListener('change', this.loadDicom, false);
+        document.getElementById('dicomfiles').addEventListener('change', this.loadDicomFile, false);
+        document.getElementById('dicomurl').addEventListener('change', this.loadDicomURL, false);
     };
     
     /**
@@ -86,13 +87,30 @@ dwv.App = function()
     /**
      * @public
      */
-    this.loadDicom = function(evt) 
+    this.loadDicomFile = function(evt) 
     {
         var reader = new FileReader();
-        reader.onload = onLoadedDicom;
+        reader.onload = function(ev) {
+            onLoadedDicom(ev.target.result);
+          };
         reader.onprogress = updateProgress;
         //$("#progressbar").progressbar({ value: 0 });
         reader.readAsBinaryString(evt.target.files[0]);
+    };
+        
+    /**
+     * @public
+     */
+    this.loadDicomURL = function(evt) 
+    {
+        var request = new XMLHttpRequest();
+        // TODO Verify URL...
+        request.open('GET', evt.target.value, true);
+        request.overrideMimeType('text/plain; charset=x-user-defined');
+        request.onload = function(ev) {
+            onLoadedDicom(request.response);
+          };
+        request.send(null);
     };
     
     /**
@@ -175,11 +193,11 @@ dwv.App = function()
      * @private
      * @param file
      */
-    function onLoadedDicom(evt)
+    function onLoadedDicom(file)
     {
         // parse the DICOM file
         try {
-            parseDicom(evt.target.result);
+            parseDicom(file);
         }
         catch(error) {
             if( error.name && error.message) {

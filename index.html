@@ -69,7 +69,7 @@ var app = new dwv.App();
 $(document).ready(function(){
     // create buttons and dialogs
     $("button").button();
-    $("#openFile").dialog({ position: [10, 110] });
+    $("#openData").dialog({ position: [10, 110] });
     $("#toolbox").dialog({ position: [10, 280] });
     $("#history").dialog({ position: [10, 450], autoOpen: false });
     $("#tags").dialog({ position: ['right', 110], autoOpen: false, height: 400, width: 400 });
@@ -86,16 +86,17 @@ $(document).ready(function(){
 <h1>DICOM Web Viewer (<a href="https://github.com/ivmartel/dwv">dwv</a> v0.3b)</h1>
 
 <!-- Buttons -->
-<button onclick="toggle('#openFile')">Open File</button>
+<button onclick="toggle('#openData')">Open</button>
 <button onclick="toggle('#toolbox')">Toolbox</button>
 <button onclick="toggle('#history')">History</button>
 <button onclick="toggle('#tags')">Tags</button>
 <button onclick="toggle('#layerContainer')">Image</button>
 
 <!-- Open file -->
-<div id="openFile" title="Open File">
+<div id="openData" title="Open">
 <p><form>
-Path: <input type="file" id="files" name="files[]" multiple />
+Path: <input type="file" id="dicomfiles" multiple />
+URL: <input type="url" id="dicomurl" />
 </form></p>
 <div id="progressbar"></div>
 </div>
