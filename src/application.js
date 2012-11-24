@@ -183,6 +183,10 @@ dwv.App = function()
                 return;
             }
         }
+        else
+        {
+            console.log("[warn] Unsupported event: "+event.type);
+        }
             
         // Call the event handler of the tool.
         var func = self.getToolBox().getSelectedTool()[event.type];
