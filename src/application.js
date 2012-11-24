@@ -159,35 +159,45 @@ dwv.App = function()
      */
     function eventHandler(event)
     {
-        // if mouse event, check that it is in the canvas
+        // Store the event position in an extra member of the event
+        // event._x and event._y
         if( event.type === "mousemove"
             || event.type === "mousedown"
             || event.type === "mouseup"
             || event.type === "mousewheel"
-            || event.type === "touchstart"
-            || event.type === "touchend"
-            || event.type === "touchmove"
-            || event.type === "dblclick")
+            || event.type === "dblclick" )
         {
-            // set event._x and event._y to be used later
             // layerX is for firefox
             event._x = event.offsetX === undefined ? event.layerX : event.offsetX;
             event._y = event.offsetY === undefined ? event.layerY : event.offsetY;
-            
-            if(event._x < 0 
-                || event._y < 0 
-                || event._x >= image.getSize().getNumberOfColumns() 
-                || event._y >= image.getSize().getNumberOfRows() )
-            {
-                // exit
-                return;
+        }
+        else if( event.type === "touchstart"
+            || event.type === "touchend"
+            || event.type === "touchmove")
+        {
+            // If there's exactly one finger inside this element
+            if (event.targetTouches.length == 1) {
+              var touch = event.targetTouches[0];
+              // store
+              event._x = touch.pageX;
+              event._y = touch.pageY;
             }
         }
         else
         {
-            console.log("[warn] Unsupported event: "+event.type);
+            console.log("[dwv][debug] Unsupported event: "+event.type);
         }
             
+        // check that event is in canvas, if not exit
+        if(event._x < 0 
+                || event._y < 0 
+                || event._x >= image.getSize().getNumberOfColumns() 
+                || event._y >= image.getSize().getNumberOfRows() )
+        {
+            // exit
+            return;
+        }
+        
         // Call the event handler of the tool.
         var func = self.getToolBox().getSelectedTool()[event.type];
         if (func)
@@ -321,11 +331,14 @@ dwv.App = function()
         // add the HTML for the history 
         dwv.gui.appendUndoHtml();
 
-        // Attach the mousedown, mousemove and mouseup event listeners.
+        // Attach event listeners.
         tempLayer.getCanvas().addEventListener('mousedown', eventHandler, false);
         tempLayer.getCanvas().addEventListener('mousemove', eventHandler, false);
         tempLayer.getCanvas().addEventListener('mouseup', eventHandler, false);
         tempLayer.getCanvas().addEventListener('mousewheel', eventHandler, false);
+        tempLayer.getCanvas().addEventListener('touchstart', eventHandler, false);
+        tempLayer.getCanvas().addEventListener('touchmove', eventHandler, false);
+        tempLayer.getCanvas().addEventListener('touchend', eventHandler, false);
         tempLayer.getCanvas().addEventListener('DOMMouseScroll', eventHandler, false);
         tempLayer.getCanvas().addEventListener('dblclick', eventHandler, false);
 
