@@ -2,7 +2,7 @@
 * @class App
 * Main application.
 */
-dwv.App = function()
+dwv.App = function(mobile)
 {
     // Local object
     var self = this;
@@ -159,50 +159,49 @@ dwv.App = function()
      */
     function eventHandler(event)
     {
+        // flag not to get confused between touch and mouse
+        var handled = false;
         // Store the event position in an extra member of the event
         // event._x and event._y
-        if( event.type === "mousemove"
-            || event.type === "mousedown"
-            || event.type === "mouseup"
-            || event.type === "mousewheel"
-            || event.type === "dblclick" )
+        if( mobile )
         {
-            // layerX is for firefox
-            event._x = event.offsetX === undefined ? event.layerX : event.offsetX;
-            event._y = event.offsetY === undefined ? event.layerY : event.offsetY;
-        }
-        else if( event.type === "touchstart"
-            || event.type === "touchend"
-            || event.type === "touchmove")
-        {
-            // If there's exactly one finger inside this element
-            if (event.targetTouches.length == 1) {
-              var touch = event.targetTouches[0];
-              // store
-              event._x = touch.pageX;
-              event._y = touch.pageY;
+            if( event.type === "touchstart"
+                || event.type === "touchend"
+                || event.type === "touchmove")
+            {
+                // If there's exactly one finger inside this element
+                if (event.targetTouches.length == 1) {
+                  var touch = event.targetTouches[0];
+                  // store
+                  event._x = touch.pageX - parseInt(app.getImageLayer().getOffset().left, 10);
+                  event._y = touch.pageY - parseInt(app.getImageLayer().getOffset().top, 10);
+                }
+                handled = true;
             }
         }
         else
         {
-            console.log("[dwv][debug] Unsupported event: "+event.type);
+            if( event.type === "mousemove"
+                || event.type === "mousedown"
+                || event.type === "mouseup"
+                || event.type === "mousewheel"
+                || event.type === "dblclick" )
+            {
+                // layerX is for firefox
+                event._x = event.offsetX === undefined ? event.layerX : event.offsetX;
+                event._y = event.offsetY === undefined ? event.layerY : event.offsetY;
+                handled = true;
+            }
         }
             
-        // check that event is in canvas, if not exit
-        if(event._x < 0 
-                || event._y < 0 
-                || event._x >= image.getSize().getNumberOfColumns() 
-                || event._y >= image.getSize().getNumberOfRows() )
-        {
-            // exit
-            return;
-        }
-        
         // Call the event handler of the tool.
-        var func = self.getToolBox().getSelectedTool()[event.type];
-        if (func)
+        if( handled )
         {
-            func(event);
+            var func = self.getToolBox().getSelectedTool()[event.type];
+            if( func )
+            {
+                func(event);
+            }
         }
     }
 
