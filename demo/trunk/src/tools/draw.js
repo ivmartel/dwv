@@ -43,36 +43,46 @@ dwv.tool.Draw = function(app)
         {
             return;
         }
-        // current point
-        points.push(new dwv.math.Point2D(ev._x, ev._y));
-        // create draw command
-        command = new dwv.tool.shapes[self.shapeName](points, app, self.style);
-        // clear the temporary layer
-        app.getTempLayer().clearContextRect();
-        // draw
-        command.execute();
+        if( ev._x !== points[0].getX() 
+            && ev._y !== points[0].getY() )
+        {
+            // current point
+            points.push(new dwv.math.Point2D(ev._x, ev._y));
+            // create draw command
+            command = new dwv.tool.shapes[self.shapeName](points, app, self.style);
+            // clear the temporary layer
+            app.getTempLayer().clearContextRect();
+            // draw
+            command.execute();
+        }
     };
 
     // This is called when you release the mouse button.
     this.mouseup = function(ev){
         if (started)
         {
-            if( ev._x !== points[0].getX() 
-                && ev._y !== points[0].getY() )
-            {
-                // draw last point
-                self.mousemove(ev);
-                // save command in undo stack
-                app.getUndoStack().add(command);
-                // merge temporary layer
-                app.getDrawLayer().merge(app.getTempLayer());
-            }
+            // save command in undo stack
+            app.getUndoStack().add(command);
+            // merge temporary layer
+            app.getDrawLayer().merge(app.getTempLayer());
             // set flag
             started = false;
         }
     };
 
-    // Enable the draw tool
+    this.touchstart = function(ev){
+        self.mousedown(ev);
+    };
+
+    this.touchmove = function(ev){
+        self.mousemove(ev);
+    };
+
+    this.touchend = function(ev){
+        self.mouseup(ev);
+    };
+
+   // Enable the draw tool
     this.enable = function(value){
         if( value ) {
             this.init();
