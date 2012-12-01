@@ -176,7 +176,6 @@ dwv.tool.WindowLevel = function(app)
     this.mouseup = function(ev){
         if (self.started)
         {
-            self.mousemove(ev);
             self.started = false;
         }
     };
