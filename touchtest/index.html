@@ -1,0 +1,217 @@
+<!-- 
+Goal: benchmark multi-touch on many different devices.
+  - test which touch events are fired on what platforms
+  - test event firing resolution
+  - test which attributes touch events have
+-->
+<!doctype html>
+
+<head>
+  <title>Multi-touch Feature Test</title>
+  <meta name="viewport" content="width=device-width, user-scalable=no">
+  <style>
+    body {margin: 0; overflow: hidden; width: 100%; height: 100%;}
+    .touchable {position: absolute; z-index: 99;}
+    #obj1 {left: 0px; bottom: 0px; background: red;}
+    #obj2 {right: 0px; bottom: 0px; background: green;}
+  </style>
+</head>
+
+<body>
+  <ul id="instructions">
+  </ul>
+
+  <canvas id="obj1" class="touchable" width="200" height="200"></canvas>
+  <canvas id="obj2" class="touchable" width="200" height="200"></canvas>
+
+
+  <div id="report">
+    <li>
+    Test: single touch. Touch red and draw stuff. Expect touchstart, touchmoves and touchend
+    </li>
+    <li>
+    Test: single touch entering and leaving. Touch body, drag through red. Expect touchenter and touchleave to be fired on red
+    </li>
+    <li>
+    Test: multi touch events. Touch red, then touch green, then move green, then move red, then remove fingers. Expect a bunch of events!
+    </li>
+    <button id="summarize" onclick="javascript:summarize()">summarize</button>
+    <br/>
+  </div>
+
+  <object id="tuio" type="application/x-tuio" style="width: 0px; height: 0px;">
+    Touch input plugin failed to load!
+  </object>
+
+  <script src="magictouch.js"></script>
+  <script>
+    var OBJECTS = ['obj1', 'obj2'];
+    // Constants according to spec
+    var EVENTS = ['touchstart', 'touchend', 'touchmove', 'touchenter', 'touchleave', 'touchcancel'];
+    var EVENT_PROPERTIES = ['touches', 'targetTouches', 'changedTouches'];
+    var EVENTLIST_PROPERTIES = ['identifier', 'target', 'timestamp', 'screenX',
+      'screenY', 'clientX', 'clientY', 'pageX', 'pageY', 'radiusX', 'radiusY',
+      'rotationAngle', 'force', 'altKey', 'metaKey', 'ctrlKey', 'shiftKey'];
+
+    // Data to collect
+    // Touchmove firing resolution
+    var resolution = [];
+    // Attributes touch events have
+    // mA['eventName'] = ['prop1', 'prop2', ...]
+    var supportedEventProps = {};
+    var supportedTouchProps = {};
+
+    // Helper variables
+    var lastMoveTime = 0;
+
+    // Assign event listeners for all events to all objects
+    for (var i = 0; i < OBJECTS.length; i++) {
+      var obj = document.getElementById(OBJECTS[i]);
+
+      (function(o) {
+
+        for (var j = 0; j < EVENTS.length; j++) {
+          var eventName = EVENTS[j];
+
+          //console.log('bound ' + eventName);
+          (function(event, eventName) {
+
+            o.addEventListener(eventName, function(event) {
+              console.log(eventName + ' fired on ' + event.target.id);
+              analyzeEvent(event, eventName);
+            });
+
+          })(event, eventName);
+        }
+
+        // Also track resolution
+        o.addEventListener('touchmove', function(event) {
+          var now = new Date();
+          if (lastMoveTime) {
+            resolution.push(now - lastMoveTime);
+          }
+          lastMoveTime = now;
+        });
+
+        makeDrawable(o);
+        //makeDraggable(o);
+
+      })(obj);
+    }
+
+
+    function summarize() {
+      var r = document.getElementById('report');
+      r.innerHTML = '';
+      // Show summary of everything
+      // Get average touchmove resolution
+      var averageResolution = resolution.sum() / resolution.length;
+      report('<strong>average touchmove resolution</strong>: ' + averageResolution);
+      // Show which touch events fire
+      report('<strong>touch events:</strong> ' + supportedEventProps.keys());
+      // For each touch event, show which properties it has
+      for (var k in supportedEventProps) {
+        if (supportedEventProps.hasOwnProperty(k)) {
+          report('<strong>' + k + ' event properties:</strong> ' + supportedEventProps[k]);
+          report('<strong>touch properties:</strong> ' + supportedTouchProps[k]);
+        }
+      }
+    }
+
+    function report(message) {
+      var report = document.getElementById('report');
+      report.innerHTML += message + '<br/>';
+    }
+
+    function analyzeEvent(event, eventName) {
+      // Ensure eventName is in the missingProps
+      if (! supportedEventProps.hasOwnProperty(eventName)) {
+        supportedEventProps[eventName] = [];
+      }
+      if (! supportedTouchProps.hasOwnProperty(eventName)) {
+        supportedTouchProps[eventName] = [];
+      }
+      // Check if the event has properties
+      for (var i = 0; i < EVENT_PROPERTIES.length; i++) {
+        var prop = EVENT_PROPERTIES[i];
+        if (prop in event) {
+          supportedEventProps[eventName].pushUnique(prop);
+        }
+      }
+      if ('touches' in event && event.touches.length > 0) {
+        // Get a touch from the list and 
+        var touch = event.touches[0];
+        // Check if the properties are meaningful
+        for (var i = 0; i < EVENTLIST_PROPERTIES.length; i++) {
+          var prop = EVENTLIST_PROPERTIES[i];
+          if (prop in touch) {
+            supportedTouchProps[eventName].pushUnique(prop);
+          }
+        }
+      }
+    }
+
+    Array.prototype.sum = function() {
+      var out = 0;
+      for (var i = 0; i < this.length; i++) {
+        out += this[i];
+      }
+      return out;
+    }
+
+    Array.prototype.pushUnique = function(val) {
+      if (this.indexOf(val) === -1) {
+        this.push(val);
+      }
+    };
+
+    Object.prototype.keys = function() {
+      var out = [];
+      for (var k in this) {
+        if (this.hasOwnProperty(k)) {
+          out.push(k);
+        }
+      };
+      return out;
+    }
+    
+    function makeDrawable(obj) {
+      var ctx = obj.getContext('2d');
+      var isDrawing = false;
+      obj.addEventListener('touchstart', function(event) {
+        isDrawing = true;
+        var touch = event.targetTouches[0];
+        ctx.moveTo(touch.pageX - obj.offsetLeft, touch.pageY - obj.offsetTop);
+      });
+
+      obj.addEventListener('touchend', function(event) {
+        isDrawing = false;
+        ctx.stroke();
+      });
+
+      obj.addEventListener('touchmove', function(event) {
+        event.preventDefault();
+        if (!isDrawing) {
+          return;
+        }
+        var touch = event.targetTouches[0];
+        ctx.lineTo(touch.pageX - obj.offsetLeft, touch.pageY - obj.offsetTop);
+        ctx.stroke();
+      });
+    }
+
+    function makeDraggable(obj) {
+      var isMoving = false;
+      obj.addEventListener('touchstart', function(event) { isMoving = true; });
+      obj.addEventListener('touchend', function(event) { isMoving = false; });
+
+      obj.addEventListener('touchmove', function(event) {
+        var touch = event.targetTouches[0];
+        obj.style.left = touch.pageX + 'px';
+        obj.style.top = touch.pageY + 'px';
+      });
+    }
+
+  </script>
+
+</body>
