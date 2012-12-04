@@ -169,9 +169,10 @@ dwv.App = function(mobile)
                 || event.type === "touchend"
                 || event.type === "touchmove")
             {
+                event.preventDefault();
                 // If there's exactly one finger inside this element
-                if (event.targetTouches.length == 1) {
-                  var touch = event.targetTouches[0];
+                if (event.changedTouches.length == 1) {
+                  var touch = event.changedTouches[0];
                   // store
                   event._x = touch.pageX - parseInt(app.getImageLayer().getOffset().left, 10);
                   event._y = touch.pageY - parseInt(app.getImageLayer().getOffset().top, 10);
