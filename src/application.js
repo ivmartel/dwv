@@ -21,6 +21,9 @@ dwv.App = function(mobile)
     var tempLayer = null;
     // Information layer
     var infoLayer = null;
+    
+    // DICOM parser
+    var dicomParser = new dwv.dicom.DicomParser();
 
     // Tool box
     var toolBox = new dwv.tool.ToolBox(this);
@@ -89,13 +92,19 @@ dwv.App = function(mobile)
      */
     this.loadDicomFile = function(evt) 
     {
-        var reader = new FileReader();
-        reader.onload = function(ev) {
-            onLoadedDicom(ev.target.result);
-          };
-        reader.onprogress = updateProgress;
-        //$("#progressbar").progressbar({ value: 0 });
-        reader.readAsBinaryString(evt.target.files[0]);
+    	var files = evt.target.files;
+    	//for (var i = 0; i < files.length; ++i) {
+    		var reader = new FileReader();
+    		reader.onload = function(ev) {
+    			// parse DICOM
+    			parseDicom(ev.target.result);
+    			// prepare display
+    			postLoadInit();
+    		};
+    		reader.onprogress = updateProgress;
+    		//$("#progressbar").progressbar({ value: 0 });
+    		reader.readAsBinaryString(files[0]);
+    	//}
     };
         
     /**
@@ -108,7 +117,10 @@ dwv.App = function(mobile)
         request.open('GET', evt.target.value, true);
         request.overrideMimeType('text/plain; charset=x-user-defined');
         request.onload = function(ev) {
-            onLoadedDicom(request.response);
+            // parse DICOM
+        	parseDicom(request.response);
+            // prepare display
+            postLoadInit();
           };
         request.send(null);
     };
@@ -208,13 +220,13 @@ dwv.App = function(mobile)
 
     /**
      * @private
-     * @param file
+     * Parse an input string as a DICOM one.
+     * @param inString The input string
      */
-    function onLoadedDicom(file)
+    function parseDicom(inString)
     {
-        // parse the DICOM file
         try {
-            parseDicom(file);
+            dicomParser.parse(inString);
         }
         catch(error) {
             if( error.name && error.message) {
@@ -228,8 +240,6 @@ dwv.App = function(mobile)
             }
             return;
         }
-        // prepare display
-        postLoadInit();
         //$("#progressbar").progressbar({ value: 100 });
     }
     
@@ -247,38 +257,6 @@ dwv.App = function(mobile)
               $("#progressbar").progressbar({ value: percentLoaded });
           }
         }
-    }
-    
-    /**
-     * @private
-     * @param file
-     */
-    function parseDicom(file)
-    {    
-        // parse the DICOM file
-        var dicomParser = new dwv.dicom.DicomParser(file);
-        dicomParser.parseAll();
-        
-        // tag list table (without the pixel data)
-        var data = dicomParser.dicomElements;
-        data.PixelData.value = "...";
-        // HTML node
-        var node = document.getElementById("tags");
-        // remove possible previous
-        while (node.hasChildNodes()) { 
-            node.removeChild(node.firstChild);
-        }
-        
-        // tags table
-        var table = dwv.html.toTable(data);
-        table.className = "tagList";
-        // search form
-        node.appendChild(dwv.html.getHtmlSearchForm(table));
-        // tags table
-        node.appendChild(table);
-        
-        originalImage = dicomParser.getImage();
-        image = originalImage;
     }
     
     /**
@@ -311,10 +289,42 @@ dwv.App = function(mobile)
     
     /**
      * @private
-     * To be called once the image is loaded.
+     * Create the DICOM tags table.
+     * To be called once the DICOM has been parsed.
+     */
+    function createTagsTable()
+    {
+        // tag list table (without the pixel data)
+        var data = dicomParser.dicomElements;
+        data.PixelData.value = "...";
+        // HTML node
+        var node = document.getElementById("tags");
+        // remove possible previous
+        while (node.hasChildNodes()) { 
+            node.removeChild(node.firstChild);
+        }
+        // tags HTML table
+        var table = dwv.html.toTable(data);
+        table.className = "tagList";
+        // search form
+        node.appendChild(dwv.html.getHtmlSearchForm(table));
+        // tags table
+        node.appendChild(table);
+    }
+    
+    /**
+     * @private
+     * To be called once the DICOM has been parsed.
      */
     function postLoadInit()
     {
+    	// create the DICOM tags table
+    	createTagsTable();
+    	
+    	// store image
+        originalImage = dicomParser.getImage();
+        image = originalImage;
+
         // layout
         layoutLayers();
         self.alignLayers();
