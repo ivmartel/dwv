@@ -64,8 +64,8 @@ dwv.App = function(mobile)
     this.init = function()
     {
         // bind open files with method
-        document.getElementById('dicomfiles').addEventListener('change', this.loadDicomFile, false);
-        document.getElementById('dicomurl').addEventListener('change', this.loadDicomURL, false);
+        document.getElementById('dicomfiles').addEventListener('change', this.onChangeFiles, false);
+        document.getElementById('dicomurl').addEventListener('change', this.onChangeURL, false);
     };
     
     /**
@@ -90,9 +90,16 @@ dwv.App = function(mobile)
     /**
      * @public
      */
-    this.loadDicomFile = function(evt) 
+    this.onChangeFiles = function(evt)
     {
-    	var files = evt.target.files;
+        self.loadDicomFiles(evt.target.files);
+    };
+
+    /**
+     * @public
+     */
+    this.loadDicomFiles = function(files) 
+    {
     	//for (var i = 0; i < files.length; ++i) {
     		var reader = new FileReader();
     		reader.onload = function(ev) {
@@ -110,11 +117,19 @@ dwv.App = function(mobile)
     /**
      * @public
      */
-    this.loadDicomURL = function(evt) 
+    this.onChangeURL = function(evt)
+    {
+        self.loadDicomURL(evt.target.value);
+    };
+
+    /**
+     * @public
+     */
+    this.loadDicomURL = function(url) 
     {
         var request = new XMLHttpRequest();
         // TODO Verify URL...
-        request.open('GET', evt.target.value, true);
+        request.open('GET', url, true);
         request.overrideMimeType('text/plain; charset=x-user-defined');
         request.onload = function(ev) {
             // parse DICOM
