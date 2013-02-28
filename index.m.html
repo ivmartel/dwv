@@ -58,6 +58,15 @@ function toggleInfo()
     }
 }
 
+function getUriParam(name)
+{
+    var val = 0;
+    var regex = new RegExp("[\\?&]" + name + "=([^&#]*)")
+    var results = regex.exec(window.location.href);
+    if( results && results[1] ) val = results[1];
+    return val;
+}
+
 // main application
 var app = new dwv.App(true);
 
@@ -67,6 +76,9 @@ $(document).ready(function(){
 	app.init();
 	// align layers when the window is resized
     window.onresize = app.alignLayers;
+    // possible load from URL
+    var input = getUriParam("input"); 
+    if( input ) app.loadDicomURL(decodeURIComponent(input));
 });
 
 </script>
