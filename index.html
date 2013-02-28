@@ -88,7 +88,7 @@ $(document).ready(function(){
     
     // initialise the application
     app.init();
-    
+    // possible load from URL
     var input = getUriParam("input"); 
     if( input ) app.loadDicomURL(decodeURIComponent(input));
 });
