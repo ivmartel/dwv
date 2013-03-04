@@ -1,0 +1,28 @@
+body {
+    background-color: #222;
+    color: white;
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    margin: 10px;
+    padding: 0px;
+}
+h1 { color: #fff; }
+a { color: #ddf; }
+
+/* Layers */
+#layerContainer { 
+    overflow: auto; 
+    position: relative; 
+    width: auto;
+    background-color: #222;
+}
+#imageLayer { border: 1px solid white; }
+#drawLayer { position: absolute; top: 1px; left: 1px; }
+#tempLayer { position: absolute; top: 1px; left: 1px; }
+#infoLayer { position: absolute; top: 1px; left: 1px; }
+#plot { position: absolute; top: 0px; left: 0px; }
+
+/* Tag list */
+table.tagList { border-collapse:collapse; }
+table.tagList thead td { font-weight: bold; }
+table.tagList td { border: 1px solid grey; padding: 2px; }
+.highlighted { background: #f87217; }
