@@ -1,0 +1,202 @@
+<html>
+<head>
+<title>My (fake) PACS</title>
+<style>
+body {
+    background-color: #efefef;
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+}
+ul img {float:left; padding:0px 10px 10px 0px;}
+ul li {clear:both;}
+ul li h2 {font-size:90%;}
+ul a {text-decoration:none;}
+ul li p {font-size:80%;}
+</style>
+<!-- Can't make it work, problem of DOM loading
+(see http://jquerymobile.com/demos/1.3.0/docs/faq/dom-ready-not-working.html )...-->
+<!--<link rel="stylesheet" href="http://code.jquery.com/mobile/1.3.0/jquery.mobile-1.3.0.min.css" />
+<script type="text/javascript" src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="http://code.jquery.com/mobile/1.3.0/jquery.mobile-1.3.0.min.js"></script>-->
+<script type="text/javascript">
+function setDwv(obj)
+{
+    // update page links
+    elements = document.getElementsByClassName('dwvlink');
+    var tmp;
+    for (i = 0; i < elements.length; ++i) {
+        tmp = elements[i].href.split('?');
+        elements[i].href = getDwvBaseUrl(obj.value)+'?'+tmp[1];
+    }
+}
+function getDwvBaseUrl(flag)
+{
+    if( flag === "dwvmobile" ) return "../../index.m.html";
+    else if( flag === "dwvstatic" ) return "../../index.html";
+}
+function getDwvUrl(uri)
+{
+    var flag = "dwvmobile";
+    if( document.getElementById('select-dwv') ) {
+        var select = document.getElementById('select-dwv');
+        flag = select.options[select.selectedIndex].value;
+    }
+    return "<a href='"+getDwvBaseUrl(flag)+"?input="+encodeURIComponent(uri)+"' class=\"dwvlink\">";
+}
+</script>
+</head>
+<body>
+
+<div data-role="page">
+<div data-role="content">
+
+<h1>My (fake) PACS</h1>
+
+<p>These are a few data example that are displayed as they could
+be on a web interface to a PACS system. Click on the list item to launch DWV with the selected data.</p>
+
+<div data-role="fieldcontain">
+<label for="select-dwv">Choose which DWV to launch:</label>
+<select id="select-dwv" data-inline="true" data-mini="true" onClick="setDwv(this);">
+<option value="dwvmobile">DWV Mobile</option>
+<option value="dwvstatic">DWV Static</option>
+</select>
+</div>
+
+<ul data-role="listview" data-inset="true">
+
+<li>
+<script>
+var uri="http://x.babymri.org/?53320924&.dcm";
+document.write(getDwvUrl(uri));
+</script>
+<img src="images/babymri.png"/>
+<h2>Baby MRI</h2>
+<p>Brain MR, 256*256*1, LittleEndianExplicit [1.2.840.10008.1.2.1]</p>
+</a>
+</li>
+
+</ul>
+
+<br style="clear:both">
+
+<p>The folowing items link to data available online but not in a secured way due to 
+<a href="http://en.wikipedia.org/wiki/Same_origin_policy">same origin policy</a>. 
+To see them start Google Chrome with <code>--disable-web-security</code>
+(do not forget to <b>remove</b> that flag for normal browsing).</p>
+
+<!--<ul data-role="listview" data-inset="true" data-filter="true" data-filter-placeholder="Search...">-->
+<ul data-role="listview" data-inset="true">
+
+<li>
+<script><!-- The script starts the <a> and creates the link -->
+var uri="https://github.com/ivmartel/dwv/blob/master/data/cta.dcm?raw=true";
+document.write(getDwvUrl(uri));
+</script>
+<img src="images/toutatix.png">
+<h2>Toutatix</h2>
+<p>Chest CT(A), 512*512*1, LittleEndianExplicit [1.2.840.10008.1.2.1], 
+from the Osirix examples, hosted on my github.</p>
+</a>
+</li>
+
+<li>
+<script><!-- The script starts the <a> and creates the link -->
+var uri="https://github.com/ivmartel/dwv/blob/master/data/cta2.dcm?raw=true";
+document.write(getDwvUrl(uri));
+</script>
+<img src="images/goudurix.png">
+<h2>Goudurix</h2>
+<p>Chest CT(A), 512*512*1, LittleEndianExplicit [1.2.840.10008.1.2.1], 
+from the Osirix examples, hosted on my github.</p>
+</a>
+</li>
+
+<li>
+<script><!-- The script starts the <a> and creates the link -->
+var uri="https://github.com/ivmartel/dwv/blob/master/data/us.dcm?raw=true";
+document.write(getDwvUrl(uri));
+</script>
+<img src="images/us.png">
+<h2>US</h2>
+<p>US, 640*480*1, BigEndianExplicit [1.2.840.10008.1.2.2], 
+from the GDCM examples, hosted on my github.</p>
+</a>
+</li>
+
+<li>
+<script><!-- The script starts the <a> and creates the link -->
+var uri="https://github.com/ivmartel/dwv/blob/master/data/mr.dcm?raw=true";
+document.write(getDwvUrl(uri));
+</script>
+<img src="images/cerebrix.png">
+<h2>Cerebrix</h2>
+<p>Brain SC (Secondary Capture), 176*224*1, JPEG2000 [1.2.840.10008.1.2.4.91], 
+from the Osirix examples, hosted on my github, <b>NOT SUPPORTED YET...</b>.</p>
+</a>
+</li>
+
+<li>
+<script><!-- The script starts the <a> and creates the link -->
+var uri="http://dicom.vital-it.ch:8089/wado?requestType=WADO&contentType=application/dicom&studyUID=2.16.840.1.113669.632.20.1211.10000744858&seriesUID=1.3.6.1.4.1.19291.2.1.2.2413568109772100001&objectUID=1.3.6.1.4.1.19291.2.1.3.2413568110716100007";
+document.write(getDwvUrl(uri));
+</script>
+<img src="images/vitalitch0.png">
+<h2>JPEG 2000</h2>
+<p>via wado, 176*224*1, JPEG2000 [1.2.840.10008.1.2.4.91], 
+from the dicom.vital-it.ch examples, <b>NOT SUPPORTED YET...</b>.</p>
+</a>
+</li>
+
+<li>
+<script><!-- The script starts the <a> and creates the link -->
+var uri="http://dicom.vital-it.ch:8089/wado?requestType=WADO&contentType=application/dicom&studyUID=1.3.6.1.4.1.5962.1.2.0.1175775772.5729.0&seriesUID=1.3.6.1.4.1.5962.1.3.0.1.1175775772.5729.0&objectUID=1.3.6.1.4.1.5962.1.1.0.1.1.1175775772.5729.0";
+document.write(getDwvUrl(uri));
+</script>
+<img src="images/vitalitch1.png">
+<h2>Calibration</h2>
+<p>via wado, 512x512x1, LittleEndianExplicit [1.2.840.10008.1.2.1], MONOCHROME2, 8 bits,
+from the dicom.vital-it.ch examples, <b>Bad display</b>.</p>
+</a>
+</li>
+
+<li>
+<script><!-- The script starts the <a> and creates the link -->
+var uri="http://dicom.vital-it.ch:8089/wado?requestType=WADO&contentType=application/dicom&studyUID=1.3.6.1.4.1.19291.2.1.1.2675258517533100002&seriesUID=1.2.392.200036.9116.2.6.1.48.1215564802.1245749034.88493&objectUID=1.2.392.200036.9116.2.6.1.48.1215564802.1245749034.96207";
+document.write(getDwvUrl(uri));
+</script>
+<img src="images/vitalitch2.png">
+<h2>Anonymised</h2>
+<p>via wado, 512x512x1, LittleEndianExplicit [1.2.840.10008.1.2.1], MONOCHROME2, 16 bits,
+from the dicom.vital-it.ch examples.</p>
+</a>
+</li>
+
+<li>
+<script><!-- The script starts the <a> and creates the link -->
+var uri="http://dicom.vital-it.ch:8089/wado?requestType=WADO&contentType=application/dicom&studyUID=1.2.840.113564.3.1.2.20110912134402.100261&seriesUID=1.2.840.113564.1921680151.20110912125724093870&objectUID=1.2.840.113564.1921680151.20110912125724093880.2003000225000";
+document.write(getDwvUrl(uri));
+</script>
+<img src="images/vitalitch3.png">
+<h2>Anonymous</h2>
+<p>via wado, 2018x4915x1, LittleEndianExplicit [1.2.840.10008.1.2.1], MONOCHROME1, 16 bits,
+from the dicom.vital-it.ch examples, <b>carefull, big!</b>.</p>
+</a>
+</li>
+
+</ul>
+
+<br style="clear:both">
+
+<p>Data sources:</p>
+<ul>
+<li><a href="http://www.babymri.org/">Baby MRI</a></li>
+<li><a href="http://www.creatis.insa-lyon.fr/software/public/Gdcm/Main.html">GDCM (Creatis)</a></li>
+<li><a href="http://www.osirix-viewer.com/datasets/">Osirix datasets</a></li>
+<li><a href="http://dicom.vital-it.ch:8089/dcm4chee-web3/">dicom.vital-it.ch</a></li>
+</ul>
+
+</div><!-- /page -->
+</div><!-- /content -->
+
+</body>
+</html>
