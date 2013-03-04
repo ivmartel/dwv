@@ -8,13 +8,13 @@
 body { font-size: 80%; }
 #toolbox li:first-child { list-style-type: none; padding-bottom: 10px; margin-left: -20px; }
 </style>
-<link rel="stylesheet" href="ext/jquery/ui/1.9.0/themes/ui-darkness/jquery-ui.css">
+<link rel="stylesheet" href="ext/jquery/ui/1.10.1/themes/ui-darkness/jquery-ui.min.css">
 </head>
 
 <body>
 <!-- Third party -->  
-<script type="text/javascript" src="ext/jquery/jquery-1.8.2.min.js"></script>
-<script type="text/javascript" src="ext/jquery/ui/1.9.0/jquery-ui.min.js"></script>
+<script type="text/javascript" src="ext/jquery/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="ext/jquery/ui/1.10.1/jquery-ui.min.js"></script>
 <script type="text/javascript" src="ext/flot/jquery.flot.min.js"></script>
 <!-- Local -->
 <script type="text/javascript" src="src/dwv.js"></script>
@@ -62,6 +62,15 @@ function toggle(dialogName)
     }
 }
 
+function getUriParam(name)
+{
+    var val = 0;
+    var regex = new RegExp("[\\?&]" + name + "=([^&#]*)")
+    var results = regex.exec(window.location.href);
+    if( results && results[1] ) val = results[1];
+    return val;
+}
+
 // main application
 var app = new dwv.App();
 
@@ -69,7 +78,7 @@ var app = new dwv.App();
 $(document).ready(function(){
     // create buttons and dialogs
     $("button").button();
-    $("#openFile").dialog({ position: [10, 110] });
+    $("#openData").dialog({ position: [10, 110] });
     $("#toolbox").dialog({ position: [10, 280] });
     $("#history").dialog({ position: [10, 450], autoOpen: false });
     $("#tags").dialog({ position: ['right', 110], autoOpen: false, height: 400, width: 400 });
@@ -79,24 +88,27 @@ $(document).ready(function(){
     
     // initialise the application
     app.init();
+    // possible load from URL
+    var input = getUriParam("input"); 
+    if( input ) app.loadDicomURL(decodeURIComponent(input));
 });
-    
 </script>
 
 <!-- Title -->
-<h1>DICOM Web Viewer (<a href="https://github.com/ivmartel/dwv">dwv</a> v0.2)</h1>
+<h1>DICOM Web Viewer (<a href="https://github.com/ivmartel/dwv">dwv</a> v0.3b)</h1>
 
 <!-- Buttons -->
-<button onclick="toggle('#openFile')">Open File</button>
+<button onclick="toggle('#openData')">Open</button>
 <button onclick="toggle('#toolbox')">Toolbox</button>
 <button onclick="toggle('#history')">History</button>
 <button onclick="toggle('#tags')">Tags</button>
 <button onclick="toggle('#layerContainer')">Image</button>
 
 <!-- Open file -->
-<div id="openFile" title="Open File">
+<div id="openData" title="Open">
 <p><form>
-Path: <input type="file" id="files" name="files[]" multiple />
+Path: <input type="file" id="dicomfiles" multiple />
+URL: <input type="url" id="dicomurl" />
 </form></p>
 <div id="progressbar"></div>
 </div>

@@ -2,13 +2,53 @@
 <html>
 
   <head>
+    <title>Dwv</title>
     <meta charset='utf-8' />
     <meta http-equiv="X-UA-Compatible" content="chrome=1" />
     <meta name="description" content="Dwv : DICOM Web Viewer." />
 
     <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
 
-    <title>Dwv</title>
+    <style>
+    body {
+        background-color: #efefef;
+        font-family: Verdana, Arial, Helvetica, sans-serif;
+    }
+    .listview img {float:left; padding:0px 10px 10px 0px;}
+    .listview li {list-style-type:none; padding-top: 10px;}
+    ul li {clear:both;}
+    ul li h2 {font-size:90%;}
+    ul a {text-decoration:none;}
+    ul li p {font-size:80%;}
+    </style>
+
+    <script type="text/javascript">
+    function setDwv(obj)
+    {
+        // update page links
+        elements = document.getElementsByClassName('dwvlink');
+        var tmp;
+        for (i = 0; i < elements.length; ++i) {
+            tmp = elements[i].href.split('?');
+            elements[i].href = getDwvBaseUrl(obj.value)+'?'+tmp[1];
+        }
+    }
+    function getDwvBaseUrl(flag)
+    {
+        if( flag === "dwvmobile" ) return "demo/mobile/index.m.html";
+        else if( flag === "dwvstatic" ) return "demo/static/index.html";
+    }
+    function getDwvUrl(uri)
+    {
+        var flag = "dwvmobile";
+        if( document.getElementById('select-dwv') ) {
+            var select = document.getElementById('select-dwv');
+            flag = select.options[select.selectedIndex].value;
+        }
+        return "<a href='"+getDwvBaseUrl(flag)+"?input="+encodeURIComponent(uri)+"' class=\"dwvlink\">";
+    }
+    </script>
+
   </head>
 
   <body>
@@ -31,33 +71,110 @@
     <!-- MAIN CONTENT -->
     <div id="main_content_wrap" class="outer">
       <section id="main_content" class="inner">
-        <p>See the <a href="demo/static/index.html">static</a> and 
-        the <a href="demo/mobile/index.m.html">mobile</a> demos.</p> 
+      
+        <div data-role="page">
+        <div data-role="content">
 
-        <p><a href="http://ivmartel.github.com/dwv/images/dwv_static-v0.2.png"><img 
-        src="http://ivmartel.github.com/dwv/images/dwv_static-v0.2.png" width="390"/></a>
-        <a href="http://ivmartel.github.com/dwv/images/dwv_mobile-v0.2.png"><img 
-        src="http://ivmartel.github.com/dwv/images/dwv_mobile-v0.2.png" width="210"/></a>
-        </p>
-        
-        <p>A simple javascript/HTML5 (only) DICOM web viewer. 
-        Not yet fully DICOM compliant, for now only supports:</p>
+        <p>DWV is a simple javascript/HTML5 (only) DICOM Web Viewer.</p>
 
-        <ul>
-          <li>512*512 2D images (or less)</li>
-          <li>Little Endian transfer syntax</li>
+        <p>Here are a few data example that are displayed as they could
+        be on a web interface to a PACS system. Click on the list item to launch DWV with the selected data.</p>
+
+        <div data-role="fieldcontain">
+        <label for="select-dwv">Choose which DWV to launch:</label>
+        <select id="select-dwv" data-inline="true" data-mini="true" onClick="setDwv(this);">
+        <option value="dwvmobile">DWV Mobile</option>
+        <option value="dwvstatic">DWV Static</option>
+        </select>
+        </div>
+
+        <ul class="listview" data-role="listview" data-inset="true">
+
+        <li>
+        <script>
+        var uri="http://x.babymri.org/?53320924&.dcm";
+        document.write(getDwvUrl(uri));
+        </script>
+        <img src="images/babymri.png"/>
+        <h2>Baby MRI</h2>
+        <p>Brain MR, 256*256*1, LittleEndianExplicit [1.2.840.10008.1.2.1]</p>
+        </a>
+        </li>
+
         </ul>
-        
-        <p>All coding/implementation comments are welcome.</p>
 
-        <p>For now works only with local files. </p>
+        <br style="clear:both">
 
-        <ul>
-          <li>Firefox: straight out of the box,</li>
-          <li>Google Chrome: launch it with the command line option: --allow-file-access-from-files. </li>
+        <p>The folowing items link to data available online but not in a secured way due to 
+        the <a href="http://en.wikipedia.org/wiki/Same_origin_policy">same origin policy</a>. 
+        To see them start Google Chrome with <code>--disable-web-security</code>
+        (do not forget to <b>remove</b> that flag for normal browsing).</p>
+
+        <!--<ul data-role="listview" data-inset="true" data-filter="true" data-filter-placeholder="Search...">-->
+        <ul class="listview" data-role="listview" data-inset="true">
+
+        <li>
+        <script><!-- The script starts the <a> and creates the link -->
+        var uri="https://github.com/ivmartel/dwv/blob/master/data/cta.dcm?raw=true";
+        document.write(getDwvUrl(uri));
+        </script>
+        <img src="images/toutatix.png">
+        <h2>Toutatix</h2>
+        <p>Chest CT(A), 512*512*1, LittleEndianExplicit [1.2.840.10008.1.2.1], 
+        from the Osirix examples, hosted on my github.</p>
+        </a>
+        </li>
+
+        <li>
+        <script><!-- The script starts the <a> and creates the link -->
+        var uri="https://github.com/ivmartel/dwv/blob/master/data/cta2.dcm?raw=true";
+        document.write(getDwvUrl(uri));
+        </script>
+        <img src="images/goudurix.png">
+        <h2>Goudurix</h2>
+        <p>Chest CT(A), 512*512*1, LittleEndianExplicit [1.2.840.10008.1.2.1], 
+        from the Osirix examples, hosted on my github.</p>
+        </a>
+        </li>
+
+        <li>
+        <script><!-- The script starts the <a> and creates the link -->
+        var uri="https://github.com/ivmartel/dwv/blob/master/data/us.dcm?raw=true";
+        document.write(getDwvUrl(uri));
+        </script>
+        <img src="images/us.png">
+        <h2>US</h2>
+        <p>US, 640*480*1, BigEndianExplicit [1.2.840.10008.1.2.2], 
+        from the GDCM examples, hosted on my github.</p>
+        </a>
+        </li>
+
+        <li>
+        <script><!-- The script starts the <a> and creates the link -->
+        var uri="https://github.com/ivmartel/dwv/blob/master/data/mr.dcm?raw=true";
+        document.write(getDwvUrl(uri));
+        </script>
+        <img src="images/cerebrix.png">
+        <h2>Cerebrix</h2>
+        <p>Brain SC (Secondary Capture), 176*224*1, JPEG2000 [1.2.840.10008.1.2.4.91], 
+        from the Osirix examples, hosted on my github, <b>NOT SUPPORTED YET...</b>.</p>
+        </a>
+        </li>
+
         </ul>
-        
-        <p>Released under GNU GPL license (see <a href="https://github.com/ivmartel/dwv/blob/master/license.txt">license.txt</a>). </p>
+
+        <br style="clear:both">
+
+        <p>Data sources:</p>
+        <ul>
+        <li><a href="http://www.babymri.org/">Baby MRI</a></li>
+        <li><a href="http://www.creatis.insa-lyon.fr/software/public/Gdcm/Main.html">GDCM (Creatis)</a></li>
+        <li><a href="http://www.osirix-viewer.com/datasets/">Osirix datasets</a></li>
+        </ul>
+
+        </div><!-- /page -->
+        </div><!-- /content -->
+
       </section>
     </div>
 

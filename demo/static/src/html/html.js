@@ -243,6 +243,8 @@ dwv.html.createHighlightNode = function(child) {
 dwv.html.removeNode = function(nodeId) {
     // find the node
     var node = document.getElementById(nodeId);
+    // check node
+    if( !node ) return;
     // remove its children
     while (node.hasChildNodes()) {
         node.removeChild(node.firstChild);

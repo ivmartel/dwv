@@ -14,19 +14,33 @@ dwv.gui.getSliderHtml = function()
     var min = app.getImage().getDataRange().min;
     var max = app.getImage().getDataRange().max;
 
-    var input = document.createElement("input");
-    input.setAttribute("id", "threshold-input");
-    input.setAttribute("max", max);
-    input.setAttribute("min", min);
-    input.setAttribute("value", min);
-    input.setAttribute("type", "range");
-    input.setAttribute("data-mini", "true");
-    document.getElementById("thresholdLi").appendChild(input);
+    var inputMin = document.createElement("input");
+    inputMin.setAttribute("id", "threshold-min");
+    inputMin.setAttribute("max", max);
+    inputMin.setAttribute("min", min);
+    inputMin.setAttribute("value", min);
+    inputMin.setAttribute("type", "range");
 
-    $("#thresholdLi").bind("change",
+    var inputMax = document.createElement("input");
+    inputMax.setAttribute("id", "threshold-max");
+    inputMax.setAttribute("max", max);
+    inputMax.setAttribute("min", min);
+    inputMax.setAttribute("value", max);
+    inputMax.setAttribute("type", "range");
+    
+    var div = document.createElement("div");
+    div.setAttribute("id", "threshold-div");
+    div.setAttribute("data-role", "rangeslider");
+    div.appendChild(inputMin);
+    div.appendChild(inputMax);
+    div.setAttribute("data-mini", "true");
+    document.getElementById("thresholdLi").appendChild(div);
+
+    $("#threshold-div").bind("change",
         function( event ) {
             app.getToolBox().getSelectedTool().getSelectedFilter().run(
-                    {"min":$("#threshold-input").val(), "max":max});
+                { "min":$("#threshold-min").val(),
+                  "max":$("#threshold-max").val() } );
         }
     );
 };

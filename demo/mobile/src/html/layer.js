@@ -19,6 +19,8 @@ dwv.html.Layer = function(name)
     this.getCanvas = function() { return canvas; };
     // Get the layer context
     this.getContext = function() { return context; };
+    // Get the layer offset on page
+    this.getOffset = function() { return $('#'+name).offset(); };
 
     // Image data array
     var imageData = null;
@@ -28,7 +30,7 @@ dwv.html.Layer = function(name)
     var originY = 0;
     var width = 0;
     var height = 0;
-
+    
     // set the zoom
     this.setZoom = function(zx,zy,cx,cy)
     {
@@ -139,7 +141,6 @@ dwv.html.Layer = function(name)
         // local sizes
         width = inputWidth;
         height = inputHeight;
-
         // original empty image data array
         context.clearRect (0, 0, canvas.width, canvas.height);
         imageData = context.getImageData(0, 0, canvas.width, canvas.height);

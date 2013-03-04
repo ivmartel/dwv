@@ -5,16 +5,16 @@ dwv.dicom = dwv.dicom || {};
 
 /**
  * @class Big Endian reader
- * @param file
+ * @param inString The input string.
  */
-dwv.dicom.BigEndianReader = function(file)
+dwv.dicom.BigEndianReader = function(inString)
 {
     this.readByteAt = function(i) {
         // todo: check is slows down
-        if( i > file.length ) {
+        if( i > inString.length ) {
             throw new Error("Exceeded the size of the file");
         }
-        return file.charCodeAt(i) & 0xff;
+        return inString.charCodeAt(i) & 0xff;
     };
     this.readNumber = function(nBytes, startByte) {
         var result = 0;
@@ -27,7 +27,7 @@ dwv.dicom.BigEndianReader = function(file)
         return (b + a*256).toString(16);
     };
     this.readUint16Array = function(nBytes, startByte) {
-        return new Uint16Array(file.buffer, startByte, nBytes/2);
+        return new Uint16Array(inString.buffer, startByte, nBytes/2);
     };
     this.readUint16Array = function(nBytes, startByte) {
         var data = [];
@@ -48,16 +48,16 @@ dwv.dicom.BigEndianReader = function(file)
 
 /**
  * @class Litte Endian reader
- * @param file
+ * @param inString The input string.
  */
-dwv.dicom.LittleEndianReader = function(file)
+dwv.dicom.LittleEndianReader = function(inString)
 {
     this.readByteAt = function(i) {
         // todo: check is slows down
-        if( i > file.length ) {
-            throw new Error("Exceeded the size of the file");
+        if( i > inString.length ) {
+            throw new Error("Exceeded the size of the input string");
         }
-        return file.charCodeAt(i) & 0xff;
+        return inString.charCodeAt(i) & 0xff;
     };
     this.readNumber = function(nBytes, startByte) {
         var result = 0;
@@ -89,7 +89,7 @@ dwv.dicom.LittleEndianReader = function(file)
         var data = [];
         for(var i=startByte; i<startByte+nBytes; ++i) 
         {     
-            data.push(file[i]);
+            data.push(inString[i]);
         }
         return data;
     };
@@ -98,7 +98,7 @@ dwv.dicom.LittleEndianReader = function(file)
 /**
  * @class DicomParser class.
  */
-dwv.dicom.DicomParser = function(file)
+dwv.dicom.DicomParser = function()
 {
     // the list of DICOM elements
     this.dicomElements = {};
@@ -106,8 +106,6 @@ dwv.dicom.DicomParser = function(file)
     this.numberOfItems = 0;
     // the DICOM dictionary used to find tag names
     this.dict = new dwv.dicom.Dictionary();
-    // the file
-    this.file = file;
     // the pixel buffer
     this.pixelBuffer = [];
 };
@@ -278,8 +276,9 @@ dwv.dicom.DicomParser.prototype.readDataElement=function(reader, offset, implici
 /**
  * Parse the complete DICOM file (given as input to the class).
  * Fills in the member object 'dicomElements'.
+ * @param inString A binary string.
  */
-dwv.dicom.DicomParser.prototype.parseAll = function()
+dwv.dicom.DicomParser.prototype.parse = function(inString)
 {
     var offset = 0;
     var i;
@@ -289,8 +288,8 @@ dwv.dicom.DicomParser.prototype.parseAll = function()
     // dictionary
     this.dict.init();
     // default readers
-    var metaReader = new dwv.dicom.LittleEndianReader(this.file);
-    var dataReader = new dwv.dicom.LittleEndianReader(this.file);
+    var metaReader = new dwv.dicom.LittleEndianReader(inString);
+    var dataReader = new dwv.dicom.LittleEndianReader(inString);
 
     // 128 -> 132: magic word
     offset = 128;
@@ -332,7 +331,7 @@ dwv.dicom.DicomParser.prototype.parseAll = function()
             }
             // Explicit VR - Big Endian
             else if( syntax === "1.2.840.10008.1.2.2" ) {
-                dataReader = new dwv.dicom.BigEndianReader(this.file);
+                dataReader = new dwv.dicom.BigEndianReader(inString);
             }
             // JPEG
             else if( syntax.match(/1.2.840.10008.1.2.4.5/) 
@@ -369,7 +368,7 @@ dwv.dicom.DicomParser.prototype.parseAll = function()
     var startedPixelItems = false;
     
     // DICOM data elements
-    for( i=metaEnd; i<this.file.length; i++) 
+    for( i=metaEnd; i<inString.length; i++) 
     {
         // get the data element
         dataElement = this.readDataElement(dataReader, i, implicit);

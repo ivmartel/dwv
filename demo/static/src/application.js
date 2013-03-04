@@ -2,7 +2,7 @@
 * @class App
 * Main application.
 */
-dwv.App = function()
+dwv.App = function(mobile)
 {
     // Local object
     var self = this;
@@ -21,6 +21,9 @@ dwv.App = function()
     var tempLayer = null;
     // Information layer
     var infoLayer = null;
+    
+    // DICOM parser
+    var dicomParser = new dwv.dicom.DicomParser();
 
     // Tool box
     var toolBox = new dwv.tool.ToolBox(this);
@@ -61,7 +64,8 @@ dwv.App = function()
     this.init = function()
     {
         // bind open files with method
-        document.getElementById('files').addEventListener('change', this.loadDicom, false);
+        document.getElementById('dicomfiles').addEventListener('change', this.onChangeFiles, false);
+        document.getElementById('dicomurl').addEventListener('change', this.onChangeURL, false);
     };
     
     /**
@@ -86,13 +90,54 @@ dwv.App = function()
     /**
      * @public
      */
-    this.loadDicom = function(evt) 
+    this.onChangeFiles = function(evt)
     {
-        var reader = new FileReader();
-        reader.onload = onLoadedDicom;
-        reader.onprogress = updateProgress;
-        //$("#progressbar").progressbar({ value: 0 });
-        reader.readAsBinaryString(evt.target.files[0]);
+        self.loadDicomFiles(evt.target.files);
+    };
+
+    /**
+     * @public
+     */
+    this.loadDicomFiles = function(files) 
+    {
+    	//for (var i = 0; i < files.length; ++i) {
+    		var reader = new FileReader();
+    		reader.onload = function(ev) {
+    			// parse DICOM
+    			parseDicom(ev.target.result);
+    			// prepare display
+    			postLoadInit();
+    		};
+    		reader.onprogress = updateProgress;
+    		//$("#progressbar").progressbar({ value: 0 });
+    		reader.readAsBinaryString(files[0]);
+    	//}
+    };
+        
+    /**
+     * @public
+     */
+    this.onChangeURL = function(evt)
+    {
+        self.loadDicomURL(evt.target.value);
+    };
+
+    /**
+     * @public
+     */
+    this.loadDicomURL = function(url) 
+    {
+        var request = new XMLHttpRequest();
+        // TODO Verify URL...
+        request.open('GET', url, true);
+        request.overrideMimeType('text/plain; charset=x-user-defined');
+        request.onload = function(ev) {
+            // parse DICOM
+        	parseDicom(request.response);
+            // prepare display
+            postLoadInit();
+          };
+        request.send(null);
     };
     
     /**
@@ -141,45 +186,62 @@ dwv.App = function()
      */
     function eventHandler(event)
     {
-        // if mouse event, check that it is in the canvas
-        if( event.type === "mousemove"
-            || event.type === "mousedown"
-            || event.type === "mouseup"
-            || event.type === "mousewheel"
-            || event.type === "dblclick")
+        // flag not to get confused between touch and mouse
+        var handled = false;
+        // Store the event position in an extra member of the event
+        // event._x and event._y
+        if( mobile )
         {
-            // set event._x and event._y to be used later
-            // layerX is for firefox
-            event._x = event.offsetX === undefined ? event.layerX : event.offsetX;
-            event._y = event.offsetY === undefined ? event.layerY : event.offsetY;
-            
-            if(event._x < 0 
-                || event._y < 0 
-                || event._x >= image.getSize().getNumberOfColumns() 
-                || event._y >= image.getSize().getNumberOfRows() )
+            if( event.type === "touchstart"
+                || event.type === "touchend"
+                || event.type === "touchmove")
             {
-                // exit
-                return;
+                event.preventDefault();
+                // If there's exactly one finger inside this element
+                if (event.changedTouches.length == 1) {
+                  var touch = event.changedTouches[0];
+                  // store
+                  event._x = touch.pageX - parseInt(app.getImageLayer().getOffset().left, 10);
+                  event._y = touch.pageY - parseInt(app.getImageLayer().getOffset().top, 10);
+                }
+                handled = true;
+            }
+        }
+        else
+        {
+            if( event.type === "mousemove"
+                || event.type === "mousedown"
+                || event.type === "mouseup"
+                || event.type === "mousewheel"
+                || event.type === "dblclick" )
+            {
+                // layerX is for firefox
+                event._x = event.offsetX === undefined ? event.layerX : event.offsetX;
+                event._y = event.offsetY === undefined ? event.layerY : event.offsetY;
+                handled = true;
             }
         }
             
         // Call the event handler of the tool.
-        var func = self.getToolBox().getSelectedTool()[event.type];
-        if (func)
+        if( handled )
         {
-            func(event);
+            var func = self.getToolBox().getSelectedTool()[event.type];
+            if( func )
+            {
+                func(event);
+            }
         }
     }
 
     /**
      * @private
-     * @param file
+     * Parse an input string as a DICOM one.
+     * @param inString The input string
      */
-    function onLoadedDicom(evt)
+    function parseDicom(inString)
     {
-        // parse the DICOM file
         try {
-            parseDicom(evt.target.result);
+            dicomParser.parse(inString);
         }
         catch(error) {
             if( error.name && error.message) {
@@ -193,8 +255,6 @@ dwv.App = function()
             }
             return;
         }
-        // prepare display
-        postLoadInit();
         //$("#progressbar").progressbar({ value: 100 });
     }
     
@@ -212,38 +272,6 @@ dwv.App = function()
               $("#progressbar").progressbar({ value: percentLoaded });
           }
         }
-    }
-    
-    /**
-     * @private
-     * @param file
-     */
-    function parseDicom(file)
-    {    
-        // parse the DICOM file
-        var dicomParser = new dwv.dicom.DicomParser(file);
-        dicomParser.parseAll();
-        
-        // tag list table (without the pixel data)
-        var data = dicomParser.dicomElements;
-        data.PixelData.value = "...";
-        // HTML node
-        var node = document.getElementById("tags");
-        // remove possible previous
-        while (node.hasChildNodes()) { 
-            node.removeChild(node.firstChild);
-        }
-        
-        // tags table
-        var table = dwv.html.toTable(data);
-        table.className = "tagList";
-        // search form
-        node.appendChild(dwv.html.getHtmlSearchForm(table));
-        // tags table
-        node.appendChild(table);
-        
-        originalImage = dicomParser.getImage();
-        image = originalImage;
     }
     
     /**
@@ -276,10 +304,42 @@ dwv.App = function()
     
     /**
      * @private
-     * To be called once the image is loaded.
+     * Create the DICOM tags table.
+     * To be called once the DICOM has been parsed.
+     */
+    function createTagsTable()
+    {
+        // tag list table (without the pixel data)
+        var data = dicomParser.dicomElements;
+        data.PixelData.value = "...";
+        // HTML node
+        var node = document.getElementById("tags");
+        // remove possible previous
+        while (node.hasChildNodes()) { 
+            node.removeChild(node.firstChild);
+        }
+        // tags HTML table
+        var table = dwv.html.toTable(data);
+        table.className = "tagList";
+        // search form
+        node.appendChild(dwv.html.getHtmlSearchForm(table));
+        // tags table
+        node.appendChild(table);
+    }
+    
+    /**
+     * @private
+     * To be called once the DICOM has been parsed.
      */
     function postLoadInit()
     {
+    	// create the DICOM tags table
+    	createTagsTable();
+    	
+    	// store image
+        originalImage = dicomParser.getImage();
+        image = originalImage;
+
         // layout
         layoutLayers();
         self.alignLayers();
@@ -296,11 +356,14 @@ dwv.App = function()
         // add the HTML for the history 
         dwv.gui.appendUndoHtml();
 
-        // Attach the mousedown, mousemove and mouseup event listeners.
+        // Attach event listeners.
         tempLayer.getCanvas().addEventListener('mousedown', eventHandler, false);
         tempLayer.getCanvas().addEventListener('mousemove', eventHandler, false);
         tempLayer.getCanvas().addEventListener('mouseup', eventHandler, false);
         tempLayer.getCanvas().addEventListener('mousewheel', eventHandler, false);
+        tempLayer.getCanvas().addEventListener('touchstart', eventHandler, false);
+        tempLayer.getCanvas().addEventListener('touchmove', eventHandler, false);
+        tempLayer.getCanvas().addEventListener('touchend', eventHandler, false);
         tempLayer.getCanvas().addEventListener('DOMMouseScroll', eventHandler, false);
         tempLayer.getCanvas().addEventListener('dblclick', eventHandler, false);
 
