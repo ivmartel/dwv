@@ -16,6 +16,5 @@ For now works only with local files.
 
 Released under GNU GPL license (see [license.txt](/ivmartel/dwv/blob/master/license.txt)). 
 
-See the demos for [desktop](http://ivmartel.github.com/dwv/demo/static/index.html) and
-[mobile](http://ivmartel.github.com/dwv/demo/mobile/index.m.html).
+See the demos [here](http://ivmartel.github.com/dwv/).
  
