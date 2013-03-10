@@ -10,7 +10,7 @@ dwv.dicom = dwv.dicom || {};
 dwv.dicom.BigEndianReader = function(inString)
 {
     this.readByteAt = function(i) {
-        // todo: check is slows down
+        // TODO: check if slows down
         if( i > inString.length ) {
             throw new Error("Exceeded the size of the file");
         }
@@ -53,7 +53,7 @@ dwv.dicom.BigEndianReader = function(inString)
 dwv.dicom.LittleEndianReader = function(inString)
 {
     this.readByteAt = function(i) {
-        // todo: check is slows down
+        // TODO: check if slows down
         if( i > inString.length ) {
             throw new Error("Exceeded the size of the input string");
         }
@@ -489,8 +489,8 @@ dwv.dicom.DicomParser.prototype.getImage = function()
                 name = "Default"+i;
             }
             windowPresets.push({
-                "center": parseInt( this.dicomElements.WindowCenter.value[i], 10 ),
-                "width": parseInt( this.dicomElements.WindowWidth.value[i], 10 ), 
+                "center": parseFloat( this.dicomElements.WindowCenter.value[i], 10 ),
+                "width": parseFloat( this.dicomElements.WindowWidth.value[i], 10 ), 
                 "name": name
             });
         }
