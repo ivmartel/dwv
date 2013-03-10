@@ -47,7 +47,7 @@ dwv.dicom.BigEndianReader = function(inString)
 };
 
 /**
- * @class Litte Endian reader
+ * @class Little Endian reader
  * @param inString The input string.
  */
 dwv.dicom.LittleEndianReader = function(inString)
@@ -236,6 +236,7 @@ dwv.dicom.DicomParser.prototype.readDataElement=function(reader, offset, implici
         vl = 0;
     }
     
+    
     // data
     var data;
     if( vr === "US" || vr === "UL")
@@ -367,19 +368,29 @@ dwv.dicom.DicomParser.prototype.parse = function(inString)
     
     var startedPixelItems = false;
     
+    var tagName;
     // DICOM data elements
     for( i=metaEnd; i<inString.length; i++) 
     {
         // get the data element
-        dataElement = this.readDataElement(dataReader, i, implicit);
+        try
+        {
+            dataElement = this.readDataElement(dataReader, i, implicit);
+        }
+        catch(err)
+        {
+            console.warn("Problem reading at " + i + " / " + inString.length
+                    + ", after " + tagName + ".\n" + err);
+        }
+        tagName = dataElement.tag.name;
         // store pixel data from multiple items
         if( startedPixelItems ) {
-            if( dataElement.tag.name === "Item" ) {
+            if( tagName === "Item" ) {
                 if( dataElement.data.length !== 0 ) {
                     this.pixelBuffer = this.pixelBuffer.concat( dataElement.data );
                 }
             }
-            else if( dataElement.tag.name === "SequenceDelimitationItem" ) {
+            else if( tagName === "SequenceDelimitationItem" ) {
                 startedPixelItems = false;
             }
             else {
@@ -387,7 +398,7 @@ dwv.dicom.DicomParser.prototype.parse = function(inString)
             }
         }
         // check the pixel data tag
-        if( dataElement.tag.name === "PixelData") {
+        if( tagName === "PixelData") {
             if( dataElement.data.length !== 0 ) {
                 this.pixelBuffer = dataElement.data;
             }
@@ -397,7 +408,7 @@ dwv.dicom.DicomParser.prototype.parse = function(inString)
         }
         // store the data element
         this.appendDicomElement( {
-            'name': dataElement.tag.name,
+            'name': tagName,
             'group' : dataElement.tag.group, 
             'vr' : dataElement.vr, 
             'vl' : dataElement.vl, 
