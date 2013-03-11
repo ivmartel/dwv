@@ -14,6 +14,10 @@
 -- Then copy the 'css', 'src' and 'ext' folders of DWV in a 'dwv' folder
 -- in the web folder of your web server.
 
+-- Get ids
+
+local patientid = string.gsub(series2, ':.*$', '')
+local seriesuid = string.gsub(series2, '^.*:', '')
 
 -- Functions declaration
 
@@ -49,11 +53,10 @@ end
 
 -- Main
 
-local seriesuid = string.gsub(series, '^.*:', '')
 local studyuid = getstudyuid()
 local images = queryimages()
 
-local url = 'http://127.0.0.1' .. script_name
+local url = webscriptadress
 url = url .. '?requestType=WADO&contentType=application/dicom'
 url = url .. '&seriesUID=' .. seriesuid
 url = url .. '&studyUID=' .. studyuid
