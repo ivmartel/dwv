@@ -282,7 +282,6 @@ dwv.dicom.DicomParser.prototype.readDataElement=function(reader, offset, implici
 dwv.dicom.DicomParser.prototype.parse = function(inString)
 {
     var offset = 0;
-    var i;
     var implicit = false;
     var jpeg = false;
     var jpeg2000 = false;
@@ -308,8 +307,9 @@ dwv.dicom.DicomParser.prototype.parse = function(inString)
     
     // meta elements
     var metaStart = offset;
-    var metaEnd = offset + metaLength;
-    for( i=metaStart; i<metaEnd; i++ ) 
+    var metaEnd = metaStart + metaLength;
+    var i = metaStart;
+    while( i < metaEnd ) 
     {
         // get the data element
         dataElement = this.readDataElement(metaReader, i, false);
@@ -363,14 +363,14 @@ dwv.dicom.DicomParser.prototype.parse = function(inString)
             'element': dataElement.tag.element,
             'value': dataElement.data } );
         // increment index
-        i += dataElement.offset-1;
+        i += dataElement.offset;
     }
     
     var startedPixelItems = false;
     
     var tagName;
     // DICOM data elements
-    for( i=metaEnd; i<inString.length; i++) 
+    while( i < inString.length ) 
     {
         // get the data element
         try
@@ -415,7 +415,7 @@ dwv.dicom.DicomParser.prototype.parse = function(inString)
             'element': dataElement.tag.element,
             'value': dataElement.data } );
         // increment index
-        i += dataElement.offset-1;
+        i += dataElement.offset;
     }
     
     // uncompress data
