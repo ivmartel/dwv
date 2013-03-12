@@ -68,18 +68,16 @@ HTML('Content-type: text/html\n\n')
 --print([[<!DOCTYPE html>]])
 print([[<html>]])
 
-print([[<head>
-<title>DICOM Web Viewer</title>
+print([[<head>]])
+
+print([[<title>DICOM Web Viewer</title>
 <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
 <link rel="stylesheet" href="/dwv/css/style.css">
 <style>
 body { font-size: 80%; }
 #toolbox li:first-child { list-style-type: none; padding-bottom: 10px; margin-left: -20px; }
 </style>
-<link rel="stylesheet" href="/dwv/ext/jquery/ui/1.10.1/themes/ui-darkness/jquery-ui.min.css">
-</head>]])
-
-print([[<body>]])
+<link rel="stylesheet" href="/dwv/ext/jquery/ui/1.10.1/themes/ui-darkness/jquery-ui.min.css">]])
 
 print([[<!-- Third party -->  
 <script type="text/javascript" src="/dwv/ext/jquery/jquery-1.9.1.min.js"></script>
@@ -137,6 +135,21 @@ function getUriParam(name)
     var results = regex.exec(window.location.href);
     if( results && results[1] ) val = results[1];
     return val;
+}
+function load()
+{
+  app.loadDicomURL(']]..webscriptadress..[[?requestType=WADO&contentType=application/dicom'+
+    '&studyUID=]]..studyuid..[[' +
+    '&seriesUID=]]..seriesuid..[[' +
+    '&objectUID=' + document.forms[0].slice.value);
+}
+function nextslice()
+{ 
+  if (document.forms[0].slice.selectedIndex == document.forms[0].slice.length-1) 
+    document.forms[0].slice.selectedIndex = 0; 
+  else 
+    document.forms[0].slice.selectedIndex = document.forms[0].slice.selectedIndex + 1;
+  load();
 }]])
 
 print([[// main application
@@ -146,9 +159,10 @@ $(document).ready(function(){
     // create buttons and dialogs
     $("button").button();
     $("#openData").dialog({ position: [10, 110] });
-    $("#toolbox").dialog({ position: [10, 280] });
-    $("#history").dialog({ position: [10, 450], autoOpen: false });
-    $("#tags").dialog({ position: ['right', 110], autoOpen: false, height: 400, width: 400 });
+    $("#toolbox").dialog({ position: [10, 310] });
+    $("#history").dialog({ position: [10, 500], autoOpen: false });
+    $("#tags").dialog({ position: ['right', 110], autoOpen: false, 
+        height: 400, width: 400 });
     $("#layerContainer").dialog({ position: [340, 110], 
         width: [570], height: [590] });
     // initialise the application
@@ -158,22 +172,36 @@ $(document).ready(function(){
 });
 </script>]])
 
+print([[</head>]])
+
+print([[<body>]])
+
 print([[<!-- Title -->
 <h1>DICOM Web Viewer (<a href="https://github.com/ivmartel/dwv">dwv</a> v0.3b)</h1>
 
 <!-- Buttons -->
-<button onclick="toggle('#openData')">Open</button>
+<button onclick="toggle('#openData')">File</button>
 <button onclick="toggle('#toolbox')">Toolbox</button>
 <button onclick="toggle('#history')">History</button>
 <button onclick="toggle('#tags')">Tags</button>
 <button onclick="toggle('#layerContainer')">Image</button>]])
 
 print([[<!-- Open file -->
-<div id="openData" title="Open">
+<div id="openData" title="File">
 <p><form>
 Path: <input type="file" id="dicomfiles" multiple />
 URL: <input type="url" id="dicomurl" />
-</form></p>
+<br>Slice: <select name=slice onchange=load()>]])
+
+for i=1, #images do
+  print('  <option value='..images[i].SOPInstanceUID..'>'..i..'</option>')
+end
+
+print([[</select>
+  <input type=button value='>' onclick=nextslice() />
+</form>]])
+
+print([[</p>
 <div id="progressbar"></div>
 </div>]])
 
