@@ -9,9 +9,6 @@ body { font-size: 80%; }
 #toolbox li:first-child { list-style-type: none; padding-bottom: 10px; margin-left: -20px; }
 </style>
 <link rel="stylesheet" href="ext/jquery/ui/1.10.1/themes/ui-darkness/jquery-ui.min.css">
-</head>
-
-<body>
 <!-- Third party -->  
 <script type="text/javascript" src="ext/jquery/jquery-1.9.1.min.js"></script>
 <script type="text/javascript" src="ext/jquery/ui/1.10.1/jquery-ui.min.js"></script>
@@ -78,12 +75,14 @@ var app = new dwv.App();
 $(document).ready(function(){
     // create buttons and dialogs
     $("button").button();
-    $("#openData").dialog({ position: [10, 110] });
-    $("#toolbox").dialog({ position: [10, 280] });
-    $("#history").dialog({ position: [10, 450], autoOpen: false });
-    $("#tags").dialog({ position: ['right', 110], autoOpen: false, height: 400, width: 400 });
+    $("#openData").dialog({ position: {my: "left top", at: "left top", of: "#container"} });
+    $("#toolbox").dialog({ position: {my: "left top+170", at: "left top", of: "#container"} });
+    $("#history").dialog({ position: {my: "left top+350", at: "left top", of: "#container"},
+        autoOpen: false });
+    $("#tags").dialog({ position: {my: "right top", at: "right top", of: "#container"},
+        autoOpen: false, height: 400, width: 400 });
     
-    $("#layerContainer").dialog({ position: [340, 110], 
+    $("#layerContainer").dialog({ position: {my: "center top", at: "center top", of: "#container"},
         width: [570], height: [590] });
     
     // initialise the application
@@ -93,6 +92,9 @@ $(document).ready(function(){
     if( input ) app.loadDicomURL(decodeURIComponent(input));
 });
 </script>
+</head>
+
+<body>
 
 <!-- Title -->
 <h1>DICOM Web Viewer (<a href="https://github.com/ivmartel/dwv">dwv</a> v0.3b)</h1>
@@ -103,6 +105,10 @@ $(document).ready(function(){
 <button onclick="toggle('#history')">History</button>
 <button onclick="toggle('#tags')">Tags</button>
 <button onclick="toggle('#layerContainer')">Image</button>
+
+<div id="container" style="height: 85%; width: 100%; margin-top: 10px;">
+</div>
+
 
 <!-- Open file -->
 <div id="openData" title="Open">
