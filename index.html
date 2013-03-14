@@ -7,6 +7,7 @@
 <style>
 body { font-size: 80%; }
 #toolbox li:first-child { list-style-type: none; padding-bottom: 10px; margin-left: -20px; }
+#pageMain { height: 85%; width: 100%; margin-top: 10px; }
 </style>
 <link rel="stylesheet" href="ext/jquery/ui/1.10.1/themes/ui-darkness/jquery-ui.min.css">
 <!-- Third party -->  
@@ -75,15 +76,20 @@ var app = new dwv.App();
 $(document).ready(function(){
     // create buttons and dialogs
     $("button").button();
-    $("#openData").dialog({ position: {my: "left top", at: "left top", of: "#container"} });
-    $("#toolbox").dialog({ position: {my: "left top+170", at: "left top", of: "#container"} });
-    $("#history").dialog({ position: {my: "left top+350", at: "left top", of: "#container"},
+    $("#openData").dialog({ position: 
+        {my: "left top", at: "left top", of: "#pageMain"} });
+    $("#toolbox").dialog({ position: 
+        {my: "left top+170", at: "left top", of: "#pageMain"} });
+    $("#history").dialog({ position: 
+        {my: "left top+350", at: "left top", of: "#pageMain"},
         autoOpen: false });
-    $("#tags").dialog({ position: {my: "right top", at: "right top", of: "#container"},
-        autoOpen: false, height: 400, width: 400 });
+    $("#tags").dialog({ position: 
+        {my: "right top", at: "right top", of: "#pageMain"},
+        autoOpen: false, width: 500, height: 590 });
     
-    $("#layerContainer").dialog({ position: {my: "center top", at: "center top", of: "#container"},
-        width: [570], height: [590] });
+    $("#layerContainer").dialog({ position: 
+        {my: "center top", at: "center top", of: "#pageMain"},
+        width: 570, height: 590 });
     
     // initialise the application
     app.init();
@@ -96,26 +102,28 @@ $(document).ready(function(){
 
 <body>
 
+<div id="pageHeader">
+
 <!-- Title -->
 <h1>DICOM Web Viewer (<a href="https://github.com/ivmartel/dwv">dwv</a> v0.3b)</h1>
 
 <!-- Buttons -->
-<button onclick="toggle('#openData')">Open</button>
+<button onclick="toggle('#openData')">File</button>
 <button onclick="toggle('#toolbox')">Toolbox</button>
 <button onclick="toggle('#history')">History</button>
 <button onclick="toggle('#tags')">Tags</button>
 <button onclick="toggle('#layerContainer')">Image</button>
 
-<div id="container" style="height: 85%; width: 100%; margin-top: 10px;">
-</div>
+</div><!-- pageHeader -->
 
+<div id="pageMain">
 
 <!-- Open file -->
-<div id="openData" title="Open">
-<p><form>
+<div id="openData" title="File">
+<form><p>
 Path: <input type="file" id="dicomfiles" multiple />
 URL: <input type="url" id="dicomurl" />
-</form></p>
+</p></form>
 <div id="progressbar"></div>
 </div>
 
@@ -138,6 +146,8 @@ URL: <input type="url" id="dicomurl" />
 <canvas id="tempLayer" width="512" height="512"></canvas>
 <div id="plot" style="width:100px;height:70px"></div>
 </div>
+
+</div><!-- pageMain -->
 
 </body>
 </html>
