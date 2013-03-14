@@ -110,7 +110,7 @@ dwv.App = function(mobile)
     		};
     		reader.onprogress = updateProgress;
     		//$("#progressbar").progressbar({ value: 0 });
-    		reader.readAsBinaryString(files[0]);
+    		reader.readAsArrayBuffer(files[0]);
     	//}
     };
         
@@ -130,7 +130,7 @@ dwv.App = function(mobile)
         var request = new XMLHttpRequest();
         // TODO Verify URL...
         request.open('GET', url, true);
-        request.overrideMimeType('text/plain; charset=x-user-defined');
+        request.responseType = "arraybuffer"; 
         request.onload = function(ev) {
             // parse DICOM
         	parseDicom(request.response);
