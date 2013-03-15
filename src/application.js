@@ -102,6 +102,7 @@ dwv.App = function(mobile)
     {
     	//for (var i = 0; i < files.length; ++i) {
     		var reader = new FileReader();
+            reader.readAsArrayBuffer(files[0]);
     		reader.onload = function(ev) {
     			// parse DICOM
     			parseDicom(ev.target.result);
@@ -110,7 +111,6 @@ dwv.App = function(mobile)
     		};
     		reader.onprogress = updateProgress;
     		//$("#progressbar").progressbar({ value: 0 });
-    		reader.readAsArrayBuffer(files[0]);
     	//}
     };
         
