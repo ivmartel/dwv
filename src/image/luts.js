@@ -3,12 +3,111 @@
  */
 dwv.image = dwv.image || {};
 /**
- * @namespace LUT related.
+ * @namespace Look Up Table (LUT) related.
  */
 dwv.image.lut = dwv.image.lut || {};
 
 /**
-* Lookup table for image display. 
+ * @class Rescale Lookup Table class.
+ * @returns {Rescale}
+ */
+dwv.image.lut.Rescale = function(slope,intercept)
+{
+    // default values if no presets
+    if(typeof(slope)==='undefined') slope = 1;
+    if(typeof(intercept)==='undefined') intercept = 0;
+    // Get the slope.
+    this.getSlope = function() { return slope; };
+    // Get the intercept.
+    this.getIntercept = function() { return intercept; };
+    // the internal array
+    var rescaleLut = [];
+};
+
+dwv.image.lut.Rescale.prototype.initialise = function(size)
+{
+    if(typeof(size)==='undefined') size = 4096;
+    rescaleLut = new Array(size);         
+    for(var i=0; i<size; ++i)
+    {        
+        rescaleLut[i] = i * this.getSlope() + this.getIntercept();        
+    }
+};
+
+dwv.image.lut.Rescale.prototype.getLength = function()
+{
+    return rescaleLut.length;
+};
+
+dwv.image.lut.Rescale.prototype.getValue = function(offset)
+{
+    return rescaleLut[offset];
+};
+
+/**
+ * @class Window Lookup Table class.
+ * @returns {Window}
+ */
+dwv.image.lut.Window = function(center, width, rescaleLut)
+{
+    // default values if no presets
+    if(typeof(center)==='undefined') center = 100;
+    if(typeof(width)==='undefined') width = 200;
+    // Get the center.
+    this.getCenter = function() { return center; };
+    // Get the width.
+    this.getWidth = function() { return width; };
+    // Get the rescale LUT.
+    this.getRescaleLut = function() { return rescaleLut; };
+    // the internal array
+    var windowLut = [];
+};
+
+dwv.image.lut.Window.prototype.initialise = function(size)
+{    
+    if(typeof(size)==='undefined') size = this.getRescaleLut().getLength();
+    
+    var xMin = this.getCenter() - 0.5 - (this.getWidth()-1) / 2;
+    var xMax = this.getCenter() - 0.5 + (this.getWidth()-1) / 2;    
+    var yMax = 255;
+    var yMin = 0;
+    
+    windowLut = new Array(size);
+    var y = 0;
+    var value = 0;
+    for(var i=0; i<size; i++)
+    {         
+        value = this.getRescaleLut().getValue(i);
+        if(value <= xMin)
+        {                            
+            windowLut[i] = yMin;                        
+        }
+        else if (value > xMax)
+        {
+            windowLut[i] = yMax;         
+        }
+        else
+        {                
+            y = ( (value - (this.getCenter()-0.5) ) / (this.getWidth()-1) + 0.5 )
+                * (yMax-yMin) + yMin;                        
+            windowLut[i]= parseInt(y, 10);
+        }
+    }
+};
+
+dwv.image.lut.Window.prototype.getLength = function()
+{
+    return windowLut.length;
+};
+
+dwv.image.lut.Window.prototype.getValue = function(offset)
+{
+    return windowLut[offset];
+};
+
+
+/**
+* Lookup tables for image color display. 
 */
 
 dwv.image.lut.range_max = 256;

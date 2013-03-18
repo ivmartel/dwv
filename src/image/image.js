@@ -78,10 +78,14 @@ dwv.image.Image = function(size, spacing, buffer)
     // histogram
     this.histoPlot = undefined;
     
-    // lookup: from raw to HU display data (rescale + w/l)
-    this.lookup = null;
-    // lut: colour lookup table
-    this.lut = dwv.image.lut.plain;
+    // rescale lookup table
+    this.rescaleLut = new dwv.image.lut.Rescale();
+    // window lookup table
+    this.windowLut = null;
+    // window presets
+    this.windowPresets = null;
+    // color map
+    this.colorMap = dwv.image.lut.plain;
 
     // Get the size of the image.
     this.getSize = function() {
@@ -93,14 +97,24 @@ dwv.image.Image = function(size, spacing, buffer)
         return self.spacing;
     };
 
-    // Get the lookup table of the image.
-    this.getLookup = function() {
-        return self.lookup;
+    // Get the rescale LUT of the image.
+    this.getRescaleLut = function() {
+        return self.rescaleLut;
     };
 
-    // Get the colour lookup table of the image.
-    this.getLut = function() {
-        return self.lut;
+    // Get the window LUT of the image.
+    this.getWindowLut = function() {
+        return self.windowLut;
+    };
+
+    // Get the window presets of the image.
+    this.getWindowPresets = function() {
+        return self.windowPresets;
+    };
+
+    // Get the color map of the image.
+    this.getColorMap = function() {
+        return self.colorMap;
     };
 
     // Restore the original buffer data.
@@ -138,26 +152,69 @@ dwv.image.Image.prototype.getValue = function( i, j, k )
  */
 dwv.image.Image.prototype.getValueAtOffset = function( offset )
 {
-    return this.lookup.huLookup[ this.buffer[offset] ];
+    return this.rescaleLut.getValue( this.buffer[offset] );
 };
 
 /**
- * Set the colour lookup table.
- * @param lut The lookup table.
+ * Set the color map.
+ * @param map The color map.
  */
-dwv.image.Image.prototype.setColourMap = function( lut )
+dwv.image.Image.prototype.setColourMap = function( map )
 {
-    this.lut = lut;
+    this.colorMap = map;
 };
 
 /**
- * Set the main lookup table.
- * @param lut The lookup table.
+ * Set the rescale slope and intercept.
+ * @param slope The rescale slope.
+ * @param intercept The rescale intercept.
  */
-dwv.image.Image.prototype.setLookup = function( lookup )
+dwv.image.Image.prototype.setRescaleSlopeAndIntercept = function( slope, intercept )
 {
-    this.lookup = lookup;
-    this.lookup.calculateHULookup();
+    this.rescaleLut = new dwv.image.lut.Rescale(slope, intercept);
+    this.rescaleLut.initialise();
+};
+
+/**
+ * Set the rescale lookup table (already initialised).
+ * @param lut The rescale lookup table.
+ */
+dwv.image.Image.prototype.setRescaleLut = function( lut )
+{
+    this.rescaleLut = lut;
+};
+
+/**
+ * Set the image window/level.
+ * @param center The window center.
+ * @param width The window width.
+ * @warning Uses the latest set rescale LUT or the default linear one.
+ */
+dwv.image.Image.prototype.setWindowLevel= function( center, width )
+{
+    this.windowLut = new dwv.image.lut.Window(center, width, this.rescaleLut);
+    this.windowLut.initialise();
+};
+
+/**
+ * Set the image window presets and select the first one.
+ * @param presets The window presets.
+ * @warning Uses the latest set rescale LUT or the default linear one.
+ */
+dwv.image.Image.prototype.setWindowPresets= function( presets )
+{
+    this.windowPresets = presets;
+    this.windowLut = new dwv.image.lut.Window(presets[0].center, presets[0].width, this.rescaleLut);
+    this.windowLut.initialise();
+};
+
+/**
+ * Set the window lookup table (already initialised).
+ * @param lut The window lookup table.
+ */
+dwv.image.Image.prototype.setWindowLut = function( lut )
+{
+    this.windowLut = lut;
 };
 
 /**
@@ -167,7 +224,8 @@ dwv.image.Image.prototype.setLookup = function( lookup )
 dwv.image.Image.prototype.clone = function()
 {
     var copy = new dwv.image.Image(this.size, this.spacing, this.originalBuffer);
-    copy.setLookup(this.lookup);
+    copy.setRescaleLut(this.rescaleLut);
+    copy.setWindowLut(this.windowLut);
     return copy;
 };
 
@@ -178,16 +236,15 @@ dwv.image.Image.prototype.clone = function()
  */
 dwv.image.Image.prototype.generateImageData = function( array, sliceNumber )
 {        
-    this.lookup.calculateLookup();
     var sliceOffset = (sliceNumber || 0) * this.size.getSliceSize();
     var iMax = sliceOffset + this.size.getSliceSize();
     var pxValue = 0;
     for(var i=sliceOffset; i < iMax; ++i)
     {        
-        pxValue = parseInt( this.lookup.ylookup[ this.buffer[i] ], 10 );    
-        array.data[4*i] = this.lut.red[pxValue];
-        array.data[4*i+1] = this.lut.green[pxValue];
-        array.data[4*i+2] = this.lut.blue[pxValue];
+        pxValue = parseInt( this.windowLut.getValue( this.buffer[i] ), 10 );    
+        array.data[4*i] = this.colorMap.red[pxValue];
+        array.data[4*i+1] = this.colorMap.green[pxValue];
+        array.data[4*i+2] = this.colorMap.blue[pxValue];
         array.data[4*i+3] = 0xff;
     }
 };

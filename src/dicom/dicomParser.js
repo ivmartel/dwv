@@ -449,17 +449,18 @@ dwv.dicom.DicomParser.prototype.getImage = function()
     // image
     var image = new dwv.image.Image( size, spacing, this.pixelBuffer );
     // lookup
-    var rescaleSlope = 1;
+    var slope = 1;
     if( this.dicomElements.RescaleSlope ) {
-        rescaleSlope = parseFloat(this.dicomElements.RescaleSlope.value[0]);
+        slope = parseFloat(this.dicomElements.RescaleSlope.value[0]);
     }
-    var rescaleIntercept = 0;
+    var intercept = 0;
     if( this.dicomElements.RescaleIntercept ) {
-        rescaleIntercept = parseFloat(this.dicomElements.RescaleIntercept.value[0]);
+        intercept = parseFloat(this.dicomElements.RescaleIntercept.value[0]);
     }
-    var windowPresets = [];
-    var name;
-    if( this.dicomElements.WindowCenter &&  this.dicomElements.WindowWidth ) {
+    image.setRescaleSlopeAndIntercept(slope, intercept);
+    if( this.dicomElements.WindowCenter && this.dicomElements.WindowWidth ) {
+        var windowPresets = [];
+        var name;
         for( var i = 0; i < this.dicomElements.WindowCenter.value.length; ++i) {
             if( this.dicomElements.WindowCenterWidthExplanation ) {
                 name = this.dicomElements.WindowCenterWidthExplanation.value[i];
@@ -473,9 +474,8 @@ dwv.dicom.DicomParser.prototype.getImage = function()
                 "name": name
             });
         }
+        image.setWindowPresets( windowPresets );
     }
-    var lookup = new dwv.image.LookupTable( windowPresets, rescaleSlope, rescaleIntercept);
-    image.setLookup( lookup );
     // return
     return image;
 };

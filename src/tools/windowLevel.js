@@ -105,7 +105,7 @@ dwv.tool.showWindowingValue = function(windowCenter,windowWidth)
  */
 dwv.tool.updateWindowingData = function(wc,ww)
 {
-    app.getImage().getLookup().setWindowingdata(wc,ww);
+    app.getImage().setWindowLevel(wc,ww);
     dwv.tool.showWindowingValue(wc,ww);
     dwv.tool.WindowLevel.prototype.updatePlot(wc,ww);
     app.generateAndDrawImage();
@@ -163,8 +163,8 @@ dwv.tool.WindowLevel = function(app)
 
         var diffX = ev._x - self.x0;
         var diffY = self.y0 - ev._y;                                
-        var windowCenter = parseInt(app.getImage().getLookup().windowCenter, 10) + diffY;
-        var windowWidth = parseInt(app.getImage().getLookup().windowWidth, 10) + diffX;                        
+        var windowCenter = parseInt(app.getImage().getWindowLut().getCenter(), 10) + diffY;
+        var windowWidth = parseInt(app.getImage().getWindowLut().getWidth(), 10) + diffX;                        
         
         dwv.tool.updateWindowingData(windowCenter,windowWidth);    
         
@@ -195,7 +195,7 @@ dwv.tool.WindowLevel = function(app)
     this.dblclick = function(ev){
         dwv.tool.updateWindowingData(
                 parseInt(app.getImage().getValue(ev._x, ev._y), 10),
-                parseInt(app.getImage().getLookup().windowWidth, 10) );    
+                parseInt(app.getImage().getWindowLut().getWidth(), 10) );    
     };
     
     this.enable = function(bool){
@@ -203,8 +203,8 @@ dwv.tool.WindowLevel = function(app)
             this.updatePresets();
             dwv.gui.appendWindowLevelHtml();
             dwv.tool.updateWindowingData(
-                    parseInt(app.getImage().getLookup().windowCenter, 10),
-                    parseInt(app.getImage().getLookup().windowWidth, 10) );
+                    parseInt(app.getImage().getWindowLut().getCenter(), 10),
+                    parseInt(app.getImage().getWindowLut().getWidth(), 10) );
         }
         else {
             dwv.gui.clearWindowLevelHtml();
@@ -224,9 +224,12 @@ dwv.tool.WindowLevel.prototype.updatePresets = function()
 	var presets = dwv.tool.presets;
     dwv.tool.presets = {};
 	// DICOM presets
-    var dicomPresets = app.getImage().getLookup().windowPresets;
-    for( var i = 0; i < dicomPresets.length; ++i ) {
-        dwv.tool.presets[dicomPresets[i].name.toLowerCase()] = dicomPresets[i];
+    var dicomPresets = app.getImage().getWindowPresets();
+    if( dicomPresets )
+    {
+        for( var i = 0; i < dicomPresets.length; ++i ) {
+            dwv.tool.presets[dicomPresets[i].name.toLowerCase()] = dicomPresets[i];
+        }
     }
     // min/max preset
     var range = app.getImage().getDataRange();
