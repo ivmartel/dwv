@@ -186,6 +186,21 @@ dwv.image.Image.prototype.setRescaleLut = function( lut )
 
 /**
  * Set the image window/level.
+ * @warning Uses the latest set rescale LUT or the default linear one.
+ */
+dwv.image.Image.prototype.setWindowLevelMinMax= function()
+{
+    var range = this.getDataRange();
+    var min = range.min;
+    var max = range.max;
+    var width = max - min;
+    var center = min + width/2;
+    this.windowLut = new dwv.image.lut.Window(center, width, this.rescaleLut);
+    this.windowLut.initialise();
+};
+
+/**
+ * Set the image window/level.
  * @param center The window center.
  * @param width The window width.
  * @warning Uses the latest set rescale LUT or the default linear one.

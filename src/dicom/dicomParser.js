@@ -476,6 +476,10 @@ dwv.dicom.DicomParser.prototype.getImage = function()
         }
         image.setWindowPresets( windowPresets );
     }
+    else
+    {
+        image.setWindowLevelMinMax();
+    }
     // return
     return image;
 };
