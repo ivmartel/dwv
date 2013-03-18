@@ -312,7 +312,7 @@ dwv.App = function(mobile)
     function createTagsTable(dataInfo)
     {
         // tag list table (without the pixel data)
-        dataInfo.PixelData.value = "...";
+        if(dataInfo.PixelData) dataInfo.PixelData.value = "...";
         // HTML node
         var node = document.getElementById("tags");
         // remove possible previous
