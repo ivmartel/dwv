@@ -264,7 +264,7 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
     var magicword = metaReader.readString( offset, 4 );
     if(magicword !== "DICM")
     {
-        throw new Error("No magic DICM word found");
+        throw new Error("Not a valid DICOM file (no magic DICM word found)");
     }
     offset += 4;
     
