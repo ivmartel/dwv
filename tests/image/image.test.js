@@ -11,7 +11,7 @@ $(document).ready(function(){
         for(var i=0; i<size*size; ++i) buffer[i] = i;
         var image0 = new dwv.image.Image(imgSize, imgSpacing, buffer);
         // TODO: could be done by default
-        image0.getRescaleLut().initialise();
+        image0.setIdRescaleLut();
         // test its values
         equal( image0.getValue(0, 0, 0), 0, "Value at 0,0,0" );
         equal( image0.getValue(1, 0, 0), 1, "Value at 1,0,0" );

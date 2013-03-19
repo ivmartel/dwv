@@ -79,7 +79,7 @@ dwv.image.Image = function(size, spacing, buffer)
     this.histoPlot = undefined;
     
     // rescale lookup table
-    this.rescaleLut = new dwv.image.lut.Rescale();
+    this.rescaleLut = null;
     // window lookup table
     this.windowLut = null;
     // window presets
@@ -185,7 +185,16 @@ dwv.image.Image.prototype.setRescaleLut = function( lut )
 };
 
 /**
- * Set the image window/level.
+ * Set the rescale lookup table to an identity one.
+ */
+dwv.image.Image.prototype.setIdRescaleLut = function()
+{
+    this.rescaleLut = new dwv.image.lut.Rescale();
+    this.rescaleLut.initialise();
+};
+
+/**
+ * Set the image window/level to cover the full data range.
  * @warning Uses the latest set rescale LUT or the default linear one.
  */
 dwv.image.Image.prototype.setWindowLevelMinMax= function()
