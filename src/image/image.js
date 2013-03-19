@@ -371,8 +371,8 @@ dwv.image.Image.prototype.transform = function(operator)
     for(var i=0; i < newBuffer.length; ++i)
     {   
         // using the operator on the cloned buffer, i.e. the original data
-        newBuffer[i] = ( operator( newImage.getValueAtOffset(i) ) - this.lookup.rescaleIntercept )
-            / this.lookup.rescaleSlope;
+        newBuffer[i] = ( operator( newImage.getValueAtOffset(i) ) - this.rescaleLut.getIntercept() )
+            / this.rescaleLut.getSlope();
     }
     return newImage;
 };
