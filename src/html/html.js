@@ -101,7 +101,9 @@ dwv.html.appendRow = function(table, input, level, maxLevel, rowHeader)
 };
 
 /**
- * @function
+ * @function Converts the input to an HTML table.
+ * @input input Allowed types are: array, array of object, object.
+ * @warning Null is interpreted differently in browsers, firefox will not display it.
  */
 dwv.html.toTable = function(input)
 {
