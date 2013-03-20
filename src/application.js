@@ -112,6 +112,9 @@ dwv.App = function(mobile)
                 };
             };
             reader.onprogress = updateProgress;
+            reader.onerror = function(){
+                alert("An error occurred while reading the image file.");
+            };
             reader.readAsDataURL(files[0]);
         }
         else
@@ -124,6 +127,9 @@ dwv.App = function(mobile)
     			postLoadInit(data);
     		};
     		reader.onprogress = updateProgress;
+    		reader.onerror = function(){
+                alert("An error occurred while reading the DICOM file.");
+            };
     		reader.readAsArrayBuffer(files[0]);
         }
     };
@@ -146,13 +152,13 @@ dwv.App = function(mobile)
         request.open('GET', url, true);
         request.responseType = "arraybuffer"; 
         request.onload = function(ev) {
-            var data;
             // parse buffer
             try {
                 var view = new DataView(request.response);
                 var isJpeg = view.getUint32(0) === 0xffd8ffe0;
                 var isPng = view.getUint32(0) === 0x89504e47;
                 if( isJpeg || isPng ) {
+                    // image data
                     var image = new Image();
 
                     var bytes = new Uint8Array(request.response);
@@ -164,15 +170,17 @@ dwv.App = function(mobile)
                     image.src = "data:image/" + imgStr + ";base64," + window.btoa(binary);
                     
                     image.onload = function(e){
-                        // parse DICOM
+                        // parse image data
                         var data = dwv.image.getDataFromImage(image, 0);
                         // prepare display
                         postLoadInit(data);
                     };
-                    return;
                 }
                 else {
-                    data = dwv.image.getDataFromDicomBuffer(request.response);
+                    // parse DICOM
+                    var data = dwv.image.getDataFromDicomBuffer(request.response);
+                    // prepare display
+                    postLoadInit(data);
                 }
             }
             catch(error) {
@@ -187,12 +195,11 @@ dwv.App = function(mobile)
                 }
                 return;
             }
-            // prepare display
-            postLoadInit(data);
         };
         request.onerror = function(){
             alert("An error occurred while retrieving the file.");
         };
+        request.onprogress = updateProgress;
         request.send(null);
     };
     
