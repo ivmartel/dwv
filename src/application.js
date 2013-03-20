@@ -147,17 +147,28 @@ dwv.App = function(mobile)
         request.responseType = "arraybuffer"; 
         request.onload = function(ev) {
             var data;
-            // parse DICOM
+            // parse buffer
             try {
                 var view = new DataView(request.response);
-                if( view.getUint32(0) === 0xffd8ffe0 ) {
-                    // TODO ...
-                    console.log("got jpeg...");
-                    return;
-                }
-                else if( view.getUint32(0) === 0x89504e47 ) { 
-                    // TODO ...
-                    console.log("got png...");
+                var isJpeg = view.getUint32(0) === 0xffd8ffe0;
+                var isPng = view.getUint32(0) === 0x89504e47;
+                if( isJpeg || isPng ) {
+                    var image = new Image();
+
+                    var bytes = new Uint8Array(request.response);
+                    var binary = '';
+                    for (var i = 0; i < bytes.byteLength; ++i) {
+                        binary += String.fromCharCode(bytes[i]);
+                    }
+                    var imgStr = (isJpeg ? "jpeg" : "png");
+                    image.src = "data:image/" + imgStr + ";base64," + window.btoa(binary);
+                    
+                    image.onload = function(e){
+                        // parse DICOM
+                        var data = dwv.image.getDataFromImage(image, 0);
+                        // prepare display
+                        postLoadInit(data);
+                    };
                     return;
                 }
                 else {
