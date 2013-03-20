@@ -61,8 +61,8 @@ dwv.App = function(mobile)
     this.init = function()
     {
         // bind open files with method
-        document.getElementById('dicomfiles').addEventListener('change', this.onChangeFiles, false);
-        document.getElementById('dicomurl').addEventListener('change', this.onChangeURL, false);
+        document.getElementById('imagefiles').addEventListener('change', this.onChangeFiles, false);
+        document.getElementById('imageurl').addEventListener('change', this.onChangeURL, false);
     };
     
     /**
