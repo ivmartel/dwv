@@ -27,6 +27,7 @@ body { font-size: 80%; }
 <script type="text/javascript" src="src/image/filter.js"></script>
 <script type="text/javascript" src="src/image/image.js"></script>
 <script type="text/javascript" src="src/image/luts.js"></script>
+<script type="text/javascript" src="src/image/reader.js"></script>
 <script type="text/javascript" src="src/math/shapes.js"></script>
 <script type="text/javascript" src="src/math/bucketQueue.js"></script>
 <script type="text/javascript" src="src/math/scissors.js"></script>
@@ -94,7 +95,7 @@ $(document).ready(function(){
     app.init();
     // possible load from URL
     var input = getUriParam("input"); 
-    if( input ) app.loadDicomURL(decodeURIComponent(input));
+    if( input ) app.loadURL(decodeURIComponent(input));
 });
 </script>
 </head>
