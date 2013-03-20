@@ -111,7 +111,7 @@ dwv.App = function(mobile)
                     postLoadInit(data);
                 };
             };
-            reader.onprogress = updateProgress;
+            reader.onprogress = dwv.gui.updateProgress;
             reader.onerror = function(){
                 alert("An error occurred while reading the image file.");
             };
@@ -126,7 +126,7 @@ dwv.App = function(mobile)
     			// prepare display
     			postLoadInit(data);
     		};
-    		reader.onprogress = updateProgress;
+    		reader.onprogress = dwv.gui.updateProgress;
     		reader.onerror = function(){
                 alert("An error occurred while reading the DICOM file.");
             };
@@ -199,7 +199,7 @@ dwv.App = function(mobile)
         request.onerror = function(){
             alert("An error occurred while retrieving the file.");
         };
-        request.onprogress = updateProgress;
+        request.onprogress = dwv.gui.updateProgress;
         request.send(null);
     };
     
@@ -293,22 +293,6 @@ dwv.App = function(mobile)
             {
                 func(event);
             }
-        }
-    }
-    
-    /**
-     * @private
-     * @param file
-     */
-    function updateProgress(evt)
-    {
-        // evt is an ProgressEvent.
-        if (evt.lengthComputable) {
-          var percentLoaded = Math.round((evt.loaded / evt.total) * 100);
-          // Increase the progress bar length.
-          if (percentLoaded <= 100) {
-              $("#progressbar").progressbar({ value: percentLoaded });
-          }
         }
     }
     
