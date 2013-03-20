@@ -297,3 +297,14 @@ dwv.html.createHtmlSelect = function(name, list) {
     }
     return select;
 };
+
+dwv.html.getUriParam = function(name)
+{
+    var val = 0;
+    var regex = new RegExp("[\\?&]" + name + "=([^&#]*)");
+    var results = regex.exec(window.location.href);
+    if( results && results[1] ) val = results[1];
+    return val;
+};
+
+

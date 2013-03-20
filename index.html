@@ -60,15 +60,6 @@ function toggle(dialogName)
     }
 }
 
-function getUriParam(name)
-{
-    var val = 0;
-    var regex = new RegExp("[\\?&]" + name + "=([^&#]*)")
-    var results = regex.exec(window.location.href);
-    if( results && results[1] ) val = results[1];
-    return val;
-}
-
 // main application
 var app = new dwv.App();
 
@@ -94,7 +85,7 @@ $(document).ready(function(){
     // initialise the application
     app.init();
     // possible load from URL
-    var input = getUriParam("input"); 
+    var input = dwv.html.getUriParam("input"); 
     if( input ) app.loadURL(decodeURIComponent(input));
 });
 </script>
