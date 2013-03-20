@@ -98,7 +98,6 @@ dwv.App = function(mobile)
     this.loadFiles = function(files) 
     {
         //TODO: for (var i = 0; i < files.length; ++i) {
-        //TODO: $("#progressbar").progressbar({ value: 0 });
         if( files[0].type.match("image.*") )
         {
             var reader = new FileReader();
@@ -289,7 +288,7 @@ dwv.App = function(mobile)
         if (evt.lengthComputable) {
           var percentLoaded = Math.round((evt.loaded / evt.total) * 100);
           // Increase the progress bar length.
-          if (percentLoaded < 100) {
+          if (percentLoaded <= 100) {
               $("#progressbar").progressbar({ value: percentLoaded });
           }
         }
