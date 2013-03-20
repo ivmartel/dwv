@@ -128,14 +128,6 @@ function toggle(dialogName)
         $(dialogName).dialog('open');
     }
 }
-function getUriParam(name)
-{
-    var val = 0;
-    var regex = new RegExp("[\\?&]" + name + "=([^&#]*)")
-    var results = regex.exec(window.location.href);
-    if( results && results[1] ) val = results[1];
-    return val;
-}
 function load()
 {
   app.loadURL(']]..webscriptadress..[[?requestType=WADO&contentType=application/dicom'+
