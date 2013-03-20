@@ -96,8 +96,8 @@ print([[<!-- Local -->
 <script type="text/javascript" src="/dwv/src/html/layer.js"></script>
 <script type="text/javascript" src="/dwv/src/image/filter.js"></script>
 <script type="text/javascript" src="/dwv/src/image/image.js"></script>
-<script type="text/javascript" src="/dwv/src/image/lookupTable.js"></script>
 <script type="text/javascript" src="/dwv/src/image/luts.js"></script>
+<script type="text/javascript" src="/dwv/src/image/reader.js"></script>
 <script type="text/javascript" src="/dwv/src/math/shapes.js"></script>
 <script type="text/javascript" src="/dwv/src/math/bucketQueue.js"></script>
 <script type="text/javascript" src="/dwv/src/math/scissors.js"></script>
@@ -138,7 +138,7 @@ function getUriParam(name)
 }
 function load()
 {
-  app.loadDicomURL(']]..webscriptadress..[[?requestType=WADO&contentType=application/dicom'+
+  app.loadURL(']]..webscriptadress..[[?requestType=WADO&contentType=application/dicom'+
     '&studyUID=]]..studyuid..[[' +
     '&seriesUID=]]..seriesuid..[[' +
     '&objectUID=' + document.forms[0].slice.value);
@@ -158,17 +158,25 @@ var app = new dwv.App();
 $(document).ready(function(){
     // create buttons and dialogs
     $("button").button();
-    $("#openData").dialog({ position: [10, 110] });
-    $("#toolbox").dialog({ position: [10, 310] });
-    $("#history").dialog({ position: [10, 500], autoOpen: false });
-    $("#tags").dialog({ position: ['right', 110], autoOpen: false, 
-        height: 400, width: 400 });
-    $("#layerContainer").dialog({ position: [340, 110], 
-        width: [570], height: [590] });
+    $("#openData").dialog({ position: 
+        {my: "left top", at: "left top", of: "#pageMain"} });
+    $("#toolbox").dialog({ position: 
+        {my: "left top+200", at: "left top", of: "#pageMain"} });
+    $("#history").dialog({ position: 
+        {my: "left top+370", at: "left top", of: "#pageMain"},
+        autoOpen: false });
+    $("#tags").dialog({ position: 
+        {my: "right top", at: "right top", of: "#pageMain"},
+        autoOpen: false, width: 500, height: 590 });
+    
+    $("#layerContainer").dialog({ position: 
+        {my: "center top", at: "center top", of: "#pageMain"},
+        width: 570, height: 590 });
+
     // initialise the application
     app.init();
     // possible load from URL
-    app.loadDicomURL("]].. url ..[[");
+    app.loadURL("]].. url ..[[");
 });
 </script>]])
 
@@ -189,8 +197,8 @@ print([[<!-- Title -->
 print([[<!-- Open file -->
 <div id="openData" title="File">
 <p><form>
-Path: <input type="file" id="dicomfiles" multiple />
-URL: <input type="url" id="dicomurl" />
+Path: <input type="file" id="imagefiles" multiple />
+URL: <input type="url" id="imageurl" />
 <br>Slice: <select name=slice onchange=load()>]])
 
 for i=1, #images do

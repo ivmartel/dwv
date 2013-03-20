@@ -26,6 +26,7 @@
 <script type="text/javascript" src="src/image/filter.js"></script>
 <script type="text/javascript" src="src/image/image.js"></script>
 <script type="text/javascript" src="src/image/luts.js"></script>
+<script type="text/javascript" src="src/image/reader.js"></script>
 <script type="text/javascript" src="src/math/shapes.js"></script>
 <script type="text/javascript" src="src/math/bucketQueue.js"></script>
 <script type="text/javascript" src="src/math/scissors.js"></script>
@@ -77,7 +78,7 @@ $(document).ready(function(){
     window.onresize = app.alignLayers;
     // possible load from URL
     var input = getUriParam("input"); 
-    if( input ) app.loadDicomURL(decodeURIComponent(input));
+    if( input ) app.loadURL(decodeURIComponent(input));
 });
 
 </script>
@@ -99,12 +100,12 @@ $(document).ready(function(){
 <div class="ui-block-a">
 <form>
 <div data-role="fieldcontain">
-  <label for="dicomfiles">Path:</label>
-  <input id="dicomfiles" name="dicomfiles" type="file" multiple data-clear-btn="true" data-mini="true"/>
+  <label for="imagefiles">Path:</label>
+  <input id="imagefiles" type="file" multiple data-clear-btn="true" data-mini="true"/>
 </div>
 <div data-role="fieldcontain">
-  <label for="dicomurl">URL:</label>
-  <input id="dicomurl" type="url" data-clear-btn="true" data-mini="true"/>
+  <label for="imageurl">URL:</label>
+  <input id="imageurl" type="url" data-clear-btn="true" data-mini="true"/>
 </div>
 </form>
 </div>
