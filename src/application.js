@@ -89,26 +89,44 @@ dwv.App = function(mobile)
      */
     this.onChangeFiles = function(evt)
     {
-        self.loadDicomFiles(evt.target.files);
+        self.loadFiles(evt.target.files);
     };
 
     /**
      * @public
      */
-    this.loadDicomFiles = function(files) 
+    this.loadFiles = function(files) 
     {
-    	//for (var i = 0; i < files.length; ++i) {
-    		var reader = new FileReader();
-    		reader.onload = function(ev) {
+        //TODO: for (var i = 0; i < files.length; ++i) {
+        //TODO: $("#progressbar").progressbar({ value: 0 });
+        if( files[0].type.match("image.*") )
+        {
+            var reader = new FileReader();
+            reader.onload = function(event){
+                var image = new Image();
+                image.src = event.target.result;
+                image.onload = function(e){
+                    // parse DICOM
+                    var data = dwv.image.getDataFromImage(image, files[0]);
+                    // prepare display
+                    postLoadInit(data);
+                };
+            };
+            reader.onprogress = updateProgress;
+            reader.readAsDataURL(files[0]);
+        }
+        else
+        {
+            var reader = new FileReader();
+    		reader.onload = function(event){
     			// parse DICOM
-    			var data = parseDicom(ev.target.result);
+    			var data = dwv.image.getDataFromDicomBuffer(event.target.result);
     			// prepare display
     			postLoadInit(data);
     		};
     		reader.onprogress = updateProgress;
-    		//$("#progressbar").progressbar({ value: 0 });
     		reader.readAsArrayBuffer(files[0]);
-    	//}
+        }
     };
         
     /**
@@ -116,24 +134,55 @@ dwv.App = function(mobile)
      */
     this.onChangeURL = function(evt)
     {
-        self.loadDicomURL(evt.target.value);
+        self.loadURL(evt.target.value);
     };
 
     /**
      * @public
      */
-    this.loadDicomURL = function(url) 
+    this.loadURL = function(url) 
     {
         var request = new XMLHttpRequest();
         // TODO Verify URL...
         request.open('GET', url, true);
         request.responseType = "arraybuffer"; 
         request.onload = function(ev) {
+            var data;
             // parse DICOM
-        	var data = parseDicom(request.response);
+            try {
+                var view = new DataView(request.response);
+                if( view.getUint32(0) === 0xffd8ffe0 ) {
+                    // TODO ...
+                    console.log("got jpeg...");
+                    return;
+                }
+                else if( view.getUint32(0) === 0x89504e47 ) { 
+                    // TODO ...
+                    console.log("got png...");
+                    return;
+                }
+                else {
+                    data = dwv.image.getDataFromDicomBuffer(request.response);
+                }
+            }
+            catch(error) {
+                if( error.name && error.message) {
+                    alert(error.name+": "+error.message+".");
+                }
+                else {
+                    alert("Error: "+error+".");
+                }
+                if( error.stack ) {
+                    console.log(error.stack);
+                }
+                return;
+            }
             // prepare display
             postLoadInit(data);
-          };
+        };
+        request.onerror = function(){
+            alert("An error occurred while retrieving the file.");
+        };
         request.send(null);
     };
     
@@ -229,35 +278,6 @@ dwv.App = function(mobile)
             }
         }
     }
-
-    /**
-     * @private
-     * Parse an input string as a DICOM one.
-     * @param buffer The input data buffer.
-     */
-    function parseDicom(buffer)
-    {
-        // DICOM parser
-        var dicomParser = new dwv.dicom.DicomParser();
-
-        try {
-            dicomParser.parse(buffer);
-        }
-        catch(error) {
-            if( error.name && error.message) {
-                alert(error.name+": "+error.message+".");
-            }
-            else {
-                alert("Error: "+error+".");
-            }
-            if( error.stack ) {
-                console.log(error.stack);
-            }
-            return;
-        }
-        //$("#progressbar").progressbar({ value: 100 });
-        return {'image': dicomParser.getImage(), 'info': dicomParser.dicomElements};
-    }
     
     /**
      * @private
@@ -279,27 +299,24 @@ dwv.App = function(mobile)
      * @private
      * To be called once the image is loaded.
      */
-    function layoutLayers()
+    function createLayers(width,height)
     {
-        var numberOfColumns = image.getSize().getNumberOfColumns();
-        var numberOfRows = image.getSize().getNumberOfRows();
-        
         // image layer
         imageLayer = new dwv.html.Layer("imageLayer");
-        imageLayer.init(numberOfColumns, numberOfRows);
+        imageLayer.initialise(width, height);
         imageLayer.fillContext();
         imageLayer.display(true);
         // draw layer
         drawLayer = new dwv.html.Layer("drawLayer");
-        drawLayer.init(numberOfColumns, numberOfRows);
+        drawLayer.initialise(width, height);
         drawLayer.display(true);
         // temp layer
         tempLayer = new dwv.html.Layer("tempLayer");
-        tempLayer.init(numberOfColumns, numberOfRows);
+        tempLayer.initialise(width, height);
         tempLayer.display(true);
         // info layer
         infoLayer = new dwv.html.Layer("infoLayer");
-        infoLayer.init(numberOfColumns, numberOfRows);
+        infoLayer.initialise(width, height);
         infoLayer.display(true);
     }
     
@@ -342,7 +359,9 @@ dwv.App = function(mobile)
         image = originalImage;
 
         // layout
-        layoutLayers();
+        var width = image.getSize().getNumberOfColumns();
+        var height = image.getSize().getNumberOfRows();
+        createLayers(width, height);
         self.alignLayers();
 
         // get the image data from the image layer
