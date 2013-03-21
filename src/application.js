@@ -251,8 +251,9 @@ dwv.App = function(mobile)
     {
         // flag not to get confused between touch and mouse
         var handled = false;
-        // Store the event position in an extra member of the event
-        // event._x and event._y
+        // Store the event position relative to the image canvas
+        // in an extra member of the event:
+        // event._x and event._y.
         if( mobile )
         {
             if( event.type === "touchstart"
@@ -260,14 +261,23 @@ dwv.App = function(mobile)
                 || event.type === "touchmove")
             {
                 event.preventDefault();
-                // If there's exactly one finger inside this element
-                if (event.changedTouches.length == 1) {
+                // If there's one or two fingers inside this element
+                if (event.changedTouches.length === 1
+                        || event.changedTouches.length === 2) {
                   var touch = event.changedTouches[0];
                   // store
                   event._x = touch.pageX - parseInt(app.getImageLayer().getOffset().left, 10);
                   event._y = touch.pageY - parseInt(app.getImageLayer().getOffset().top, 10);
+                  // second finger
+                  if (event.changedTouches.length === 2) {
+                      touch = event.changedTouches[1];
+                      // store
+                      event._x1 = touch.pageX - parseInt(app.getImageLayer().getOffset().left, 10);
+                      event._y1 = touch.pageY - parseInt(app.getImageLayer().getOffset().top, 10);
+                  }
+                  // set handle event flag
+                  handled = true;
                 }
-                handled = true;
             }
         }
         else
@@ -281,6 +291,7 @@ dwv.App = function(mobile)
                 // layerX is for firefox
                 event._x = event.offsetX === undefined ? event.layerX : event.offsetX;
                 event._y = event.offsetY === undefined ? event.layerY : event.offsetY;
+                // set handle event flag
                 handled = true;
             }
         }
