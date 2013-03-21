@@ -239,6 +239,15 @@ dwv.App = function(mobile)
         }
     };
     
+    /**
+     * To be called once the image is loaded.
+     */
+    this.setLayersZoom = function(zoomX,zoomY,cx,cy)
+    {
+        if( imageLayer ) imageLayer.zoom(zoomX,zoomY,cx,cy);
+        if( drawLayer ) drawLayer.zoom(zoomX,zoomY,cx,cy);
+    };
+    
     // Private Methods
     // ---------------
 
@@ -371,16 +380,19 @@ dwv.App = function(mobile)
         image = originalImage;
 
         // layout
-        var width = image.getSize().getNumberOfColumns();
-        var height = image.getSize().getNumberOfRows();
+        var zoomX= 1;
+        var zoomY= 1;
+        var width = image.getSize().getNumberOfColumns() * zoomX;
+        var height = image.getSize().getNumberOfRows() * zoomY;
         createLayers(width, height);
         self.alignLayers();
+        self.setLayersZoom(zoomX, zoomY, 0, 0);
 
         // get the image data from the image layer
         imageData = self.getImageLayer().getContext().getImageData( 
             0, 0, 
-            self.getImage().getSize().getNumberOfColumns(), 
-            self.getImage().getSize().getNumberOfRows());
+            image.getSize().getNumberOfColumns(), 
+            image.getSize().getNumberOfRows());
 
         // initialise the toolbox
         // note: the window/level tool is responsible for doing the first display.

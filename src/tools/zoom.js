@@ -137,9 +137,8 @@ dwv.tool.Zoom = function(app)
     {
         var zoomLevel = 1 + step/2;
         // apply zoom
-        app.getImageLayer().zoom(zoomLevel,zoomLevel,cx,cy);
-        app.getDrawLayer().zoom(zoomLevel,zoomLevel,cx,cy);
-    }
+        app.setLayersZoom(zoomLevel,zoomLevel,cx,cy);
+     }
 
 }; // Zoom class
 
