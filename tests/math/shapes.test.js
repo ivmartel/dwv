@@ -61,16 +61,19 @@ test("Test Circle.", function() {
 
 test("Test Line.", function() {
     var p0 = new dwv.math.Point2D(0,0);
-    var p1 = new dwv.math.Point2D(0,-4);
+    var p1 = new dwv.math.Point2D(0,-5);
     var l0 = new dwv.math.Line(p0,p1);
     // getBegin
     equal(l0.getBegin(), p0, "getBegin");
     // getEnd
     equal(l0.getEnd(), p1, "getEnd");
     // getLength
-    equal(l0.getLength(), 4, "getLength");
+    equal(l0.getLength(), 5, "getLength");
     // getWorldLength
-    equal(l0.getWorldLength(0.5,0.5), 2, "getWorldLength");
+    equal(l0.getWorldLength(0.5,0.5), 2.5, "getWorldLength");
+    // getMidpoint
+    var pMid = new dwv.math.Point2D(0,-2); // rounded...
+    equal(l0.getMidpoint().equals(pMid), true, "getMidpoint");
 });
 
 test("Test Rectangle.", function() {
