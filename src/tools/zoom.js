@@ -32,8 +32,16 @@ dwv.tool.Zoom = function(app)
         self.y0 = ev._y;
      };
 
-    // This function is called every time you move the mouse.
-    this.mousemove = function(ev){
+     this.twotouchdown = function(ev){
+         self.started = true;
+         // first line
+         var point0 = new dwv.math.Point2D(ev._x, ev._y);
+         var point1 = new dwv.math.Point2D(ev._x1, ev._y1);
+         self.line0 = new dwv.math.Line(point0, point1);
+     };
+
+     // This function is called every time you move the mouse.
+     this.mousemove = function(ev){
         if (!self.started)
         {
             return;
@@ -51,6 +59,23 @@ dwv.tool.Zoom = function(app)
         self.y0 = ev._y;
     };
 
+    this.twotouchmove = function(ev){
+       if (!self.started)
+       {
+           return;
+       }
+       var point0 = new dwv.math.Point2D(ev._x, ev._y);
+       var point1 = new dwv.math.Point2D(ev._x1, ev._y1);
+       var newLine = new dwv.math.Line(point0, point1);
+       var lineDiff = Math.abs(self.line0.getLength() - newLine.getLength());
+       
+       var midPoint = self.line0.getMidpoint();
+       zoom(lineDiff, midPoint.getX(), midPoint.getY());
+       
+       // reset line
+       self.line0 = new dwv.math.Line(point0, point1);
+    };
+    
     // This is called when you release the mouse button.
     this.mouseup = function(ev){
         if (self.started)
@@ -60,6 +85,28 @@ dwv.tool.Zoom = function(app)
         }
     };
     
+    this.touchstart = function(ev){
+        if( event.changedTouches.length === 1 ){
+            self.mousedown(ev);
+        }
+        else if( event.changedTouches.length === 2 ){
+            self.twotouchdown(ev);
+        }
+    };
+
+    this.touchmove = function(ev){
+        if( event.changedTouches.length === 1 ){
+            self.mousemove(ev);
+        }
+        else if( event.changedTouches.length === 2 ){
+            self.twotouchmove(ev);
+        }
+    };
+
+    this.touchend = function(ev){
+        self.mouseup(ev);
+    };
+
     // This is called when you use the mouse wheel on Firefox.
     this.DOMMouseScroll = function(ev){
         zoom(ev.detail/10, ev._x, ev._y);
