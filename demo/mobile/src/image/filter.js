@@ -35,7 +35,7 @@ dwv.image.filter.Threshold.prototype.setMax = function(value)
 
 dwv.image.filter.Threshold.prototype.update = function()
 {
-    var imageMin = app.getImage().getLookup().rescaleIntercept;
+    var imageMin = app.getImage().getRescaleLut().getIntercept();
     var threshFunction = function(x){
         if(x<min||x>max) { return imageMin; } 
         else { return x; }

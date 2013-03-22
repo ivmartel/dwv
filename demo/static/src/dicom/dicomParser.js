@@ -4,94 +4,74 @@
 dwv.dicom = dwv.dicom || {};
 
 /**
- * @class Big Endian reader
- * @param inString The input string.
+ * @class Data reader
+ * @param buffer The input array buffer.
+ * @param isLittleEndian Flag to tell if the data is little or big endian.
  */
-dwv.dicom.BigEndianReader = function(inString)
+dwv.dicom.DataReader = function(buffer, isLittleEndian)
 {
-    this.readByteAt = function(i) {
-        // todo: check is slows down
-        if( i > inString.length ) {
-            throw new Error("Exceeded the size of the file");
-        }
-        return inString.charCodeAt(i) & 0xff;
+    var view = new DataView(buffer);
+    if(typeof(isLittleEndian)==='undefined') isLittleEndian = true;
+    
+    //! Read Uint8 (1 bytes) data.
+    this.readUint8 = function(byteOffset) {
+        return view.getUint8(byteOffset, isLittleEndian);
     };
-    this.readNumber = function(nBytes, startByte) {
-        var result = 0;
-        for(var i=startByte; i<startByte + nBytes; ++i){
-            result = result * 256 + this.readByteAt(i);
-        }
-        return result;
+    //! Read Uint16 (2 bytes) data.
+    this.readUint16 = function(byteOffset) {
+        return view.getUint16(byteOffset, isLittleEndian);
     };
-    this.readCouple = function(a,b) {
-        return (b + a*256).toString(16);
+    //! Read Uint32 (4 bytes) data.
+    this.readUint32 = function(byteOffset) {
+        return view.getUint32(byteOffset, isLittleEndian);
     };
-    this.readUint16Array = function(nBytes, startByte) {
-        return new Uint16Array(inString.buffer, startByte, nBytes/2);
+    //! Read Float32 (8 bytes) data.
+    this.readFloat32 = function(byteOffset) {
+        return view.getFloat32(byteOffset, isLittleEndian);
     };
-    this.readUint16Array = function(nBytes, startByte) {
+    //! Read Uint data of nBytes size.
+    this.readNumber = function(byteOffset, nBytes) {
+        if( nBytes === 1 )
+            return this.readUint8(byteOffset, isLittleEndian);
+        else if( nBytes === 2 )
+            return this.readUint16(byteOffset, isLittleEndian);
+        else if( nBytes === 4 )
+            return this.readUint32(byteOffset, isLittleEndian);
+        else if( nBytes === 8 )
+            return this.readFloat32(byteOffset, isLittleEndian);
+        else 
+            throw new Error("Unsupported number size.");
+    };
+    //! Read Uint8 array.
+    this.readUint8Array = function(byteOffset, size) {
         var data = [];
-        for(var i=startByte; i<startByte+nBytes; i+=2) 
-        {     
-            data.push(this.readNumber(1,i+1) + this.readNumber(1,i)*256);
+        for(var i=byteOffset; i<byteOffset + size; ++i) {     
+            data.push(this.readUint8(i));
         }
         return data;
     };
-    this.readString = function(nChars, startChar) {
+    //! Read Uint16 array.
+    this.readUint16Array = function(byteOffset, size) {
+        var data = [];
+        for(var i=byteOffset; i<byteOffset + size; i+=2) {     
+            data.push(this.readUint16(i));
+        }
+        return data;
+    };
+    //! Read data as an hexadecimal string.
+    this.readHex = function(byteOffset) {
+        // read and convert to hex string
+        var str = this.readUint16(byteOffset).toString(16);
+        // return padded
+        return "0x0000".substr(0, 6 - str.length) + str.toUpperCase();
+    };
+    //! Read data as a string.
+    this.readString = function(byteOffset, nChars) {
         var result = "";
-        for(var i=startChar; i<startChar + nChars; i++){
-            result += String.fromCharCode(this.readNumber(1,i));
+        for(var i=byteOffset; i<byteOffset + nChars; ++i){
+            result += String.fromCharCode( this.readUint8(i) );
         }
         return result;
-    };
-};
-
-/**
- * @class Litte Endian reader
- * @param inString The input string.
- */
-dwv.dicom.LittleEndianReader = function(inString)
-{
-    this.readByteAt = function(i) {
-        // todo: check is slows down
-        if( i > inString.length ) {
-            throw new Error("Exceeded the size of the input string");
-        }
-        return inString.charCodeAt(i) & 0xff;
-    };
-    this.readNumber = function(nBytes, startByte) {
-        var result = 0;
-        for(var i=startByte + nBytes; i>startByte; i--){
-            result = result * 256 + this.readByteAt(i-1);
-        }
-        return result;
-    };
-    this.readCouple = function(a,b) {
-        return (a + b*256).toString(16);
-    };
-    this.readUint16Array = function(nBytes, startByte) {
-        var data = [];
-        for(var i=startByte; i<startByte+nBytes; i+=2) 
-        {     
-            data.push(this.readNumber(2,i));
-        }
-        return data;
-    };
-    this.readString = function(nChars, startChar) {
-        var result = "";
-        for(var i=startChar; i<startChar + nChars; i++){
-            result += String.fromCharCode(this.readNumber(1,i));
-        }
-        return result;
-    };
-    // beta...
-    this.readRaw = function(nBytes, startByte) {
-        var data = [];
-        for(var i=startByte; i<startByte+nBytes; ++i) 
-        {     
-            data.push(inString[i]);
-        }
-        return data;
     };
 };
 
@@ -156,15 +136,9 @@ dwv.dicom.DicomParser.prototype.appendDicomElement=function( element )
 dwv.dicom.DicomParser.prototype.readTag=function(reader, offset)
 {
     // group
-    var g0 = reader.readNumber( 1, offset );
-    var g1 = reader.readNumber( 1, offset+1 );
-    var group_str = reader.readCouple(g0, g1);
-    var group = "0x0000".substr(0, 6 - group_str.length) + group_str.toUpperCase();
+    var group = reader.readHex(offset);
     // element
-    var e2 = reader.readNumber( 1, offset+2 );
-    var e3 = reader.readNumber( 1, offset+3 );
-    var element_str = reader.readCouple(e2, e3);
-    var element = "0x0000".substr(0, 6 - element_str.length) + element_str.toUpperCase();
+    var element = reader.readHex(offset+2);
     // name
     var name = "dwv::unknown";
     if( this.dict.newDictionary[group] ) {
@@ -172,7 +146,7 @@ dwv.dicom.DicomParser.prototype.readTag=function(reader, offset)
             name = this.dict.newDictionary[group][element][2];
         }
     }
-    // return as hex
+    // return
     return {'group': group, 'element': element, 'name': name};
 };
 
@@ -198,7 +172,7 @@ dwv.dicom.DicomParser.prototype.readDataElement=function(reader, offset, implici
     if( tag.group === "0xFFFE" ) {
         vr = "N/A";
         vrOffset = 0;
-        vl = reader.readNumber( 4, offset+tagOffset );
+        vl = reader.readUint32( offset+tagOffset );
         vlOffset = 4;
     }
     // non Item case
@@ -212,20 +186,20 @@ dwv.dicom.DicomParser.prototype.readDataElement=function(reader, offset, implici
                 }
             }
             vrOffset = 0;
-            vl = reader.readNumber( 4, offset+tagOffset+vrOffset );
+            vl = reader.readUint32( offset+tagOffset+vrOffset );
             vlOffset = 4;
         }
         else {
-            vr = reader.readString( 2, offset+tagOffset );
+            vr = reader.readString( offset+tagOffset, 2 );
             vrOffset = 2;
             // long representations
             if(vr === "OB" || vr === "OF" || vr === "SQ" || vr === "OW" || vr === "UN") {
-                vl = reader.readNumber( 4, offset+tagOffset+vrOffset+2 );
+                vl = reader.readUint32( offset+tagOffset+vrOffset+2 );
                 vlOffset = 6;
             }
             // short representation
             else {
-                vl = reader.readNumber( 2, offset+tagOffset+vrOffset );
+                vl = reader.readUint16( offset+tagOffset+vrOffset );
                 vlOffset = 2;
             }
         }
@@ -236,30 +210,25 @@ dwv.dicom.DicomParser.prototype.readDataElement=function(reader, offset, implici
         vl = 0;
     }
     
+    
     // data
     var data;
+    var dataOffset = offset+tagOffset+vrOffset+vlOffset;
     if( vr === "US" || vr === "UL")
     {
-        data = [reader.readNumber( vl, offset+tagOffset+vrOffset+vlOffset)];
+        data = [reader.readNumber( dataOffset, vl )];
     }
     else if( vr === "OX" || vr === "OW" )
     {
-        data = reader.readUint16Array(vl, offset+tagOffset+vrOffset+vlOffset);
+        data = reader.readUint16Array( dataOffset, vl );
     }
     else if( vr === "OB" || vr === "N/A")
     {
-        var begin = offset+tagOffset+vrOffset+vlOffset;
-        var end = begin + vl;
-        data = [];
-        for(var i=begin; i<end; ++i) 
-        {     
-            data.push(reader.readNumber(1,i));
-        }
-        //data = reader.readRaw(vl, begin);
+        data = reader.readUint8Array( dataOffset, vl );
     }
     else
     {
-        data = reader.readString( vl, offset+tagOffset+vrOffset+vlOffset);
+        data = reader.readString( dataOffset, vl);
         data = data.split("\\");                
     }    
 
@@ -276,27 +245,26 @@ dwv.dicom.DicomParser.prototype.readDataElement=function(reader, offset, implici
 /**
  * Parse the complete DICOM file (given as input to the class).
  * Fills in the member object 'dicomElements'.
- * @param inString A binary string.
+ * @param buffer The input array buffer.
  */
-dwv.dicom.DicomParser.prototype.parse = function(inString)
+dwv.dicom.DicomParser.prototype.parse = function(buffer)
 {
     var offset = 0;
-    var i;
     var implicit = false;
     var jpeg = false;
     var jpeg2000 = false;
     // dictionary
     this.dict.init();
     // default readers
-    var metaReader = new dwv.dicom.LittleEndianReader(inString);
-    var dataReader = new dwv.dicom.LittleEndianReader(inString);
+    var metaReader = new dwv.dicom.DataReader(buffer);
+    var dataReader = new dwv.dicom.DataReader(buffer);
 
     // 128 -> 132: magic word
     offset = 128;
-    var magicword = metaReader.readString(4, offset);
+    var magicword = metaReader.readString( offset, 4 );
     if(magicword !== "DICM")
     {
-        throw new Error("No magic DICM word found");
+        throw new Error("Not a valid DICOM file (no magic DICM word found)");
     }
     offset += 4;
     
@@ -307,8 +275,9 @@ dwv.dicom.DicomParser.prototype.parse = function(inString)
     
     // meta elements
     var metaStart = offset;
-    var metaEnd = offset + metaLength;
-    for( i=metaStart; i<metaEnd; i++ ) 
+    var metaEnd = metaStart + metaLength;
+    var i = metaStart;
+    while( i < metaEnd ) 
     {
         // get the data element
         dataElement = this.readDataElement(metaReader, i, false);
@@ -331,7 +300,7 @@ dwv.dicom.DicomParser.prototype.parse = function(inString)
             }
             // Explicit VR - Big Endian
             else if( syntax === "1.2.840.10008.1.2.2" ) {
-                dataReader = new dwv.dicom.BigEndianReader(inString);
+                dataReader = new dwv.dicom.DataReader(buffer,false);
             }
             // JPEG
             else if( syntax.match(/1.2.840.10008.1.2.4.5/) 
@@ -362,24 +331,34 @@ dwv.dicom.DicomParser.prototype.parse = function(inString)
             'element': dataElement.tag.element,
             'value': dataElement.data } );
         // increment index
-        i += dataElement.offset-1;
+        i += dataElement.offset;
     }
     
     var startedPixelItems = false;
     
+    var tagName;
     // DICOM data elements
-    for( i=metaEnd; i<inString.length; i++) 
+    while( i < buffer.byteLength ) 
     {
         // get the data element
-        dataElement = this.readDataElement(dataReader, i, implicit);
+        try
+        {
+            dataElement = this.readDataElement(dataReader, i, implicit);
+        }
+        catch(err)
+        {
+            console.warn("Problem reading at " + i + " / " + buffer.byteLength
+                    + ", after " + tagName + ".\n" + err);
+        }
+        tagName = dataElement.tag.name;
         // store pixel data from multiple items
         if( startedPixelItems ) {
-            if( dataElement.tag.name === "Item" ) {
+            if( tagName === "Item" ) {
                 if( dataElement.data.length !== 0 ) {
                     this.pixelBuffer = this.pixelBuffer.concat( dataElement.data );
                 }
             }
-            else if( dataElement.tag.name === "SequenceDelimitationItem" ) {
+            else if( tagName === "SequenceDelimitationItem" ) {
                 startedPixelItems = false;
             }
             else {
@@ -387,7 +366,7 @@ dwv.dicom.DicomParser.prototype.parse = function(inString)
             }
         }
         // check the pixel data tag
-        if( dataElement.tag.name === "PixelData") {
+        if( tagName === "PixelData") {
             if( dataElement.data.length !== 0 ) {
                 this.pixelBuffer = dataElement.data;
             }
@@ -397,14 +376,14 @@ dwv.dicom.DicomParser.prototype.parse = function(inString)
         }
         // store the data element
         this.appendDicomElement( {
-            'name': dataElement.tag.name,
+            'name': tagName,
             'group' : dataElement.tag.group, 
             'vr' : dataElement.vr, 
             'vl' : dataElement.vl, 
             'element': dataElement.tag.element,
             'value': dataElement.data } );
         // increment index
-        i += dataElement.offset-1;
+        i += dataElement.offset;
     }
     
     // uncompress data
@@ -470,17 +449,18 @@ dwv.dicom.DicomParser.prototype.getImage = function()
     // image
     var image = new dwv.image.Image( size, spacing, this.pixelBuffer );
     // lookup
-    var rescaleSlope = 1;
+    var slope = 1;
     if( this.dicomElements.RescaleSlope ) {
-        rescaleSlope = parseFloat(this.dicomElements.RescaleSlope.value[0]);
+        slope = parseFloat(this.dicomElements.RescaleSlope.value[0]);
     }
-    var rescaleIntercept = 0;
+    var intercept = 0;
     if( this.dicomElements.RescaleIntercept ) {
-        rescaleIntercept = parseFloat(this.dicomElements.RescaleIntercept.value[0]);
+        intercept = parseFloat(this.dicomElements.RescaleIntercept.value[0]);
     }
-    var windowPresets = [];
-    var name;
-    if( this.dicomElements.WindowCenter &&  this.dicomElements.WindowWidth ) {
+    image.setRescaleSlopeAndIntercept(slope, intercept);
+    if( this.dicomElements.WindowCenter && this.dicomElements.WindowWidth ) {
+        var windowPresets = [];
+        var name;
         for( var i = 0; i < this.dicomElements.WindowCenter.value.length; ++i) {
             if( this.dicomElements.WindowCenterWidthExplanation ) {
                 name = this.dicomElements.WindowCenterWidthExplanation.value[i];
@@ -489,14 +469,17 @@ dwv.dicom.DicomParser.prototype.getImage = function()
                 name = "Default"+i;
             }
             windowPresets.push({
-                "center": parseInt( this.dicomElements.WindowCenter.value[i], 10 ),
-                "width": parseInt( this.dicomElements.WindowWidth.value[i], 10 ), 
+                "center": parseFloat( this.dicomElements.WindowCenter.value[i], 10 ),
+                "width": parseFloat( this.dicomElements.WindowWidth.value[i], 10 ), 
                 "name": name
             });
         }
+        image.setWindowPresets( windowPresets );
     }
-    var lookup = new dwv.image.LookupTable( windowPresets, rescaleSlope, rescaleIntercept);
-    image.setLookup( lookup );
+    else
+    {
+        image.setWindowLevelMinMax();
+    }
     // return
     return image;
 };

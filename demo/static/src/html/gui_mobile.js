@@ -44,3 +44,23 @@ dwv.gui.getSliderHtml = function()
         }
     );
 };
+
+/**
+ * @function Update the progress bar.
+ * @param event A ProgressEvent.
+ */
+dwv.gui.updateProgress = function(event)
+{
+    // event is an ProgressEvent.
+    if( event.lengthComputable ) {
+        var percent = Math.round((event.loaded / event.total) * 100);
+        // Increase the progress bar length.
+        if( percent < 100 ) {
+            $.mobile.showPageLoadingMsg('a', percent+"%");
+        }
+        else if( percent === 100 ) {
+            $.mobile.hidePageLoadingMsg();
+        }
+    }
+};
+

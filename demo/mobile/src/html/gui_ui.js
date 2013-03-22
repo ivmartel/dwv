@@ -25,3 +25,18 @@ dwv.gui.getSliderHtml = function()
         }
     });
 };
+
+/**
+ * @function Update the progress bar.
+ * @param event A ProgressEvent.
+ */
+dwv.gui.updateProgress = function(event)
+{
+    if( event.lengthComputable ) {
+        var percent = Math.round((event.loaded / event.total) * 100);
+        // Increase the progress bar length.
+        if( percent <= 100 ) {
+            $("#progressbar").progressbar({ value: percent });
+        }
+    }
+};
