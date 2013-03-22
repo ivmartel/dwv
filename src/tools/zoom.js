@@ -109,11 +109,13 @@ dwv.tool.Zoom = function(app)
 
     // This is called when you use the mouse wheel on Firefox.
     this.DOMMouseScroll = function(ev){
-        zoom(ev.detail/10, ev._x, ev._y);
+        // ev.detail on firefox is 3
+        zoom(ev.detail/30, ev._x, ev._y);
     };
 
     // This is called when you use the mouse wheel.
     this.mousewheel = function(ev){
+        // ev.wheelDelta on chrome is 120
         zoom(ev.wheelDelta/1200, ev._x, ev._y);
     };
     
@@ -133,9 +135,10 @@ dwv.tool.Zoom = function(app)
     };
 
     // Really do the zoom
+    // A good step is of 0.1.
     function zoom(step, cx, cy)
     {
-        var zoomLevel = 1 + step/2;
+        var zoomLevel = 1 + step;
         // apply zoom
         app.setLayersZoom(zoomLevel,zoomLevel,cx,cy);
      }

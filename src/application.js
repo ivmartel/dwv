@@ -295,7 +295,8 @@ dwv.App = function(mobile)
                 || event.type === "mousedown"
                 || event.type === "mouseup"
                 || event.type === "mousewheel"
-                || event.type === "dblclick" )
+                || event.type === "dblclick" 
+                || event.type === "DOMMouseScroll" )
             {
                 // layerX is for firefox
                 event._x = event.offsetX === undefined ? event.layerX : event.offsetX;
