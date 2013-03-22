@@ -381,25 +381,19 @@ dwv.App = function(mobile)
         image = originalImage;
 
         // layout
-        var availableWidth = $(document).width() - 80;
-        var availableHeight = $(document).height() - 250;
-        var zoomX = availableWidth / image.getSize().getNumberOfColumns();
-        var zoomY = availableHeight / image.getSize().getNumberOfRows();
-        zoom = zoomX < zoomY ? zoomX : zoomY;
-        console.log("zoom: "+zoom);
-        var width = image.getSize().getNumberOfColumns() * zoom;
-        var height = image.getSize().getNumberOfRows() * zoom;
+        var zoomX= 1;
+        var zoomY= 1;
+        var width = image.getSize().getNumberOfColumns() * zoomX;
+        var height = image.getSize().getNumberOfRows() * zoomY;
         createLayers(width, height);
         self.alignLayers();
+        self.setLayersZoom(zoomX, zoomY, 0, 0);
 
         // get the image data from the image layer
         imageData = self.getImageLayer().getContext().getImageData( 
             0, 0, 
             image.getSize().getNumberOfColumns(), 
-            image.getSize().getNumberOfRows()  );
-
-        // needs to be called after getting the data
-        self.setLayersZoom(zoom, zoom, 0, 0);
+            image.getSize().getNumberOfRows());
 
         // initialise the toolbox
         // note: the window/level tool is responsible for doing the first display.
