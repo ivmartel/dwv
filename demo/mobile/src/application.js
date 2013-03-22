@@ -295,7 +295,8 @@ dwv.App = function(mobile)
                 || event.type === "mousedown"
                 || event.type === "mouseup"
                 || event.type === "mousewheel"
-                || event.type === "dblclick" )
+                || event.type === "dblclick" 
+                || event.type === "DOMMouseScroll" )
             {
                 // layerX is for firefox
                 event._x = event.offsetX === undefined ? event.layerX : event.offsetX;
@@ -380,19 +381,25 @@ dwv.App = function(mobile)
         image = originalImage;
 
         // layout
-        var zoomX= 1;
-        var zoomY= 1;
-        var width = image.getSize().getNumberOfColumns() * zoomX;
-        var height = image.getSize().getNumberOfRows() * zoomY;
+        var availableWidth = $(document).width() - 80;
+        var availableHeight = $(document).height() - 250;
+        var zoomX = availableWidth / image.getSize().getNumberOfColumns();
+        var zoomY = availableHeight / image.getSize().getNumberOfRows();
+        zoom = zoomX < zoomY ? zoomX : zoomY;
+        console.log("zoom: "+zoom);
+        var width = image.getSize().getNumberOfColumns() * zoom;
+        var height = image.getSize().getNumberOfRows() * zoom;
         createLayers(width, height);
         self.alignLayers();
-        self.setLayersZoom(zoomX, zoomY, 0, 0);
 
         // get the image data from the image layer
         imageData = self.getImageLayer().getContext().getImageData( 
             0, 0, 
             image.getSize().getNumberOfColumns(), 
-            image.getSize().getNumberOfRows());
+            image.getSize().getNumberOfRows()  );
+
+        // needs to be called after getting the data
+        self.setLayersZoom(zoom, zoom, 0, 0);
 
         // initialise the toolbox
         // note: the window/level tool is responsible for doing the first display.

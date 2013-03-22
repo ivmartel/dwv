@@ -170,6 +170,47 @@
         </a>
         </li>
 
+        <li>
+        <script><!-- The script starts the <a> and creates the link -->
+        var uri="http://dicom.vital-it.ch:8089/wado?requestType=WADO&contentType=application/dicom&studyUID=1.3.6.1.4.1.19291.2.1.1.2675258517533100002&seriesUID=1.2.392.200036.9116.2.6.1.48.1215564802.1245749034.88493&objectUID=1.2.392.200036.9116.2.6.1.48.1215564802.1245749034.96207";
+        document.write(getDwvUrl(uri));
+        </script>
+        <img src="images/vitalitch2.png">
+        <h2>Anonymised</h2>
+        <p>via wado, 512x512x1, LittleEndianExplicit [1.2.840.10008.1.2.1], MONOCHROME2, 16 bits,
+        from the dicom.vital-it.ch examples.</p>
+        </a>
+        </li>
+
+        </ul>
+
+        <br style="clear:both">
+
+        <p>Non DICOM Image formats:</p>
+        <ul class="listview" data-role="listview" data-inset="true">
+        
+        <li>
+        <script><!-- The script starts the <a> and creates the link -->
+        var uri="http://upload.wikimedia.org/wikipedia/commons/thumb/c/c6/PET-image.jpg/531px-PET-image.jpg";
+        document.write(getDwvUrl(uri));
+        </script>
+        <img src="images/brainpet-jpg.png">
+        <h2>JPEG</h2>
+        <p>Brain PET from wikipedia (http://en.wikipedia.org/wiki/File:PET-image.jpg), 531*600*1.</p>
+        </a>
+        </li>
+        
+        <li>
+        <script><!-- The script starts the <a> and creates the link -->
+        var uri="http://upload.wikimedia.org/wikipedia/commons/7/7f/Brain_MRI_112010_rgbca.png";
+        document.write(getDwvUrl(uri));
+        </script>
+        <img src="images/brainmri-png.png">
+        <h2>PNG</h2>
+        <p>Brain MRI from wikipedia (http://en.wikipedia.org/wiki/File:Brain_MRI_112010_rgbca.png), 389*504*1.</p>
+        </a>
+        </li>
+        
         </ul>
 
         <br style="clear:both">
@@ -179,6 +220,7 @@
         <li><a href="http://www.babymri.org/">Baby MRI</a></li>
         <li><a href="http://www.creatis.insa-lyon.fr/software/public/Gdcm/Main.html">GDCM (Creatis)</a></li>
         <li><a href="http://www.osirix-viewer.com/datasets/">Osirix datasets</a></li>
+        <li><a href="http://dicom.vital-it.ch:8089/dcm4chee-web3/">dicom.vital-it.ch</a></li>
         </ul>
 
         </div><!-- /page -->
