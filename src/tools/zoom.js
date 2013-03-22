@@ -38,6 +38,7 @@ dwv.tool.Zoom = function(app)
          var point0 = new dwv.math.Point2D(ev._x, ev._y);
          var point1 = new dwv.math.Point2D(ev._x1, ev._y1);
          self.line0 = new dwv.math.Line(point0, point1);
+         self.midPoint = self.line0.getMidpoint();         
      };
 
      // This function is called every time you move the mouse.
@@ -67,13 +68,10 @@ dwv.tool.Zoom = function(app)
        var point0 = new dwv.math.Point2D(ev._x, ev._y);
        var point1 = new dwv.math.Point2D(ev._x1, ev._y1);
        var newLine = new dwv.math.Line(point0, point1);
-       var lineDiff = Math.abs(self.line0.getLength() - newLine.getLength());
+       var lineDiff = ( self.line0.getLength() - newLine.getLength() ) / 100;
        
-       var midPoint = self.line0.getMidpoint();
-       zoom(lineDiff, midPoint.getX(), midPoint.getY());
-       
-       // reset line
-       self.line0 = new dwv.math.Line(point0, point1);
+       if( lineDiff !== 0 )
+           zoom(lineDiff, self.midPoint.getX(), self.midPoint.getY());
     };
     
     // This is called when you release the mouse button.
