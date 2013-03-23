@@ -8,4 +8,4 @@ see [Dicom-Support](https://github.com/ivmartel/dwv/wiki/Dicom-Support) on the w
 
 All coding/implementation comments are welcome.
 
-Released under GNU GPL license (see [license.txt](/ivmartel/dwv/blob/master/license.txt)). 
+Released under GNU GPL license (see [license.txt](license.txt)). 
