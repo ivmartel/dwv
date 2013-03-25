@@ -120,6 +120,13 @@ dwv.math.Line = function(begin, end)
         var ly = Math.abs(end.getY() - begin.getY()) * spacingY;
         return Math.sqrt( lx * lx + ly * ly );
     };
+    // Get the mid point of the line.
+    this.getMidpoint = function()
+    {
+        return new dwv.math.Point2D( 
+            parseInt( (begin.getX()+end.getX()) / 2, 10 ), 
+            parseInt( (begin.getY()+end.getY()) / 2, 10 ) );
+    };
 }; // Line class
 
 /**

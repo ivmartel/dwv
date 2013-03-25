@@ -113,7 +113,7 @@ dwv.html.Layer = function(name)
      * @input width The width of the canvas.
      * @input height The height of the canvas.
      */
-    this.init = function(inputWidth, inputHeight)
+    this.initialise = function(inputWidth, inputHeight)
     {
         // find the canvas element
         canvas = document.getElementById(name);

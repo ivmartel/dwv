@@ -21,7 +21,7 @@ dwv.App = function(mobile)
     var tempLayer = null;
     // Information layer
     var infoLayer = null;
-
+    
     // Tool box
     var toolBox = new dwv.tool.ToolBox(this);
     // UndoStack
@@ -61,8 +61,8 @@ dwv.App = function(mobile)
     this.init = function()
     {
         // bind open files with method
-        document.getElementById('dicomfiles').addEventListener('change', this.loadDicomFile, false);
-        document.getElementById('dicomurl').addEventListener('change', this.loadDicomURL, false);
+        document.getElementById('imagefiles').addEventListener('change', this.onChangeFiles, false);
+        document.getElementById('imageurl').addEventListener('change', this.onChangeURL, false);
     };
     
     /**
@@ -87,29 +87,119 @@ dwv.App = function(mobile)
     /**
      * @public
      */
-    this.loadDicomFile = function(evt) 
+    this.onChangeFiles = function(evt)
     {
-        var reader = new FileReader();
-        reader.onload = function(ev) {
-            onLoadedDicom(ev.target.result);
-          };
-        reader.onprogress = updateProgress;
-        //$("#progressbar").progressbar({ value: 0 });
-        reader.readAsBinaryString(evt.target.files[0]);
+        self.loadFiles(evt.target.files);
+    };
+
+    /**
+     * @public
+     */
+    this.loadFiles = function(files) 
+    {
+        //TODO: for (var i = 0; i < files.length; ++i) {
+        if( files[0].type.match("image.*") )
+        {
+            var reader = new FileReader();
+            reader.onload = function(event){
+                var image = new Image();
+                image.src = event.target.result;
+                image.onload = function(e){
+                    // parse DICOM
+                    var data = dwv.image.getDataFromImage(image, files[0]);
+                    // prepare display
+                    postLoadInit(data);
+                };
+            };
+            reader.onprogress = dwv.gui.updateProgress;
+            reader.onerror = function(){
+                alert("An error occurred while reading the image file.");
+            };
+            reader.readAsDataURL(files[0]);
+        }
+        else
+        {
+            var reader = new FileReader();
+    		reader.onload = function(event){
+    			// parse DICOM
+    			var data = dwv.image.getDataFromDicomBuffer(event.target.result);
+    			// prepare display
+    			postLoadInit(data);
+    		};
+    		reader.onprogress = dwv.gui.updateProgress;
+    		reader.onerror = function(){
+                alert("An error occurred while reading the DICOM file.");
+            };
+    		reader.readAsArrayBuffer(files[0]);
+        }
     };
         
     /**
      * @public
      */
-    this.loadDicomURL = function(evt) 
+    this.onChangeURL = function(evt)
+    {
+        self.loadURL(evt.target.value);
+    };
+
+    /**
+     * @public
+     */
+    this.loadURL = function(url) 
     {
         var request = new XMLHttpRequest();
         // TODO Verify URL...
-        request.open('GET', evt.target.value, true);
-        request.overrideMimeType('text/plain; charset=x-user-defined');
+        request.open('GET', url, true);
+        request.responseType = "arraybuffer"; 
         request.onload = function(ev) {
-            onLoadedDicom(request.response);
-          };
+            // parse buffer
+            try {
+                var view = new DataView(request.response);
+                var isJpeg = view.getUint32(0) === 0xffd8ffe0;
+                var isPng = view.getUint32(0) === 0x89504e47;
+                if( isJpeg || isPng ) {
+                    // image data
+                    var image = new Image();
+
+                    var bytes = new Uint8Array(request.response);
+                    var binary = '';
+                    for (var i = 0; i < bytes.byteLength; ++i) {
+                        binary += String.fromCharCode(bytes[i]);
+                    }
+                    var imgStr = (isJpeg ? "jpeg" : "png");
+                    image.src = "data:image/" + imgStr + ";base64," + window.btoa(binary);
+                    
+                    image.onload = function(e){
+                        // parse image data
+                        var data = dwv.image.getDataFromImage(image, 0);
+                        // prepare display
+                        postLoadInit(data);
+                    };
+                }
+                else {
+                    // parse DICOM
+                    var data = dwv.image.getDataFromDicomBuffer(request.response);
+                    // prepare display
+                    postLoadInit(data);
+                }
+            }
+            catch(error) {
+                if( error.name && error.message) {
+                    alert(error.name+": "+error.message+".");
+                }
+                else {
+                    alert("Error: "+error+".");
+                }
+                if( error.stack ) {
+                    console.log(error.stack);
+                }
+                return;
+            }
+        };
+        request.onerror = function(){
+            alert("An error occurred while retrieving the file.");
+        };
+        request.onprogress = dwv.gui.updateProgress;
         request.send(null);
     };
     
@@ -149,6 +239,15 @@ dwv.App = function(mobile)
         }
     };
     
+    /**
+     * To be called once the image is loaded.
+     */
+    this.setLayersZoom = function(zoomX,zoomY,cx,cy)
+    {
+        if( imageLayer ) imageLayer.zoom(zoomX,zoomY,cx,cy);
+        if( drawLayer ) drawLayer.zoom(zoomX,zoomY,cx,cy);
+    };
+    
     // Private Methods
     // ---------------
 
@@ -161,22 +260,36 @@ dwv.App = function(mobile)
     {
         // flag not to get confused between touch and mouse
         var handled = false;
-        // Store the event position in an extra member of the event
-        // event._x and event._y
+        // Store the event position relative to the image canvas
+        // in an extra member of the event:
+        // event._x and event._y.
         if( mobile )
         {
             if( event.type === "touchstart"
                 || event.type === "touchend"
                 || event.type === "touchmove")
             {
-                // If there's exactly one finger inside this element
-                if (event.targetTouches.length == 1) {
-                  var touch = event.targetTouches[0];
+                event.preventDefault();
+                console.log("Touches length: "+event.touches.length);
+                console.log("Changed touches length: "+event.changedTouches.length);
+                console.log("Target touches length: "+event.targetTouches.length);
+                // If there's one or two fingers inside this element
+                if (event.changedTouches.length === 1
+                        || event.changedTouches.length === 2) {
+                  var touch = event.changedTouches[0];
                   // store
                   event._x = touch.pageX - parseInt(app.getImageLayer().getOffset().left, 10);
                   event._y = touch.pageY - parseInt(app.getImageLayer().getOffset().top, 10);
+                  // second finger
+                  if (event.changedTouches.length === 2) {
+                      touch = event.changedTouches[1];
+                      // store
+                      event._x1 = touch.pageX - parseInt(app.getImageLayer().getOffset().left, 10);
+                      event._y1 = touch.pageY - parseInt(app.getImageLayer().getOffset().top, 10);
+                  }
+                  // set handle event flag
+                  handled = true;
                 }
-                handled = true;
             }
         }
         else
@@ -185,11 +298,13 @@ dwv.App = function(mobile)
                 || event.type === "mousedown"
                 || event.type === "mouseup"
                 || event.type === "mousewheel"
-                || event.type === "dblclick" )
+                || event.type === "dblclick" 
+                || event.type === "DOMMouseScroll" )
             {
                 // layerX is for firefox
                 event._x = event.offsetX === undefined ? event.layerX : event.offsetX;
                 event._y = event.offsetY === undefined ? event.layerY : event.offsetY;
+                // set handle event flag
                 handled = true;
             }
         }
@@ -204,125 +319,84 @@ dwv.App = function(mobile)
             }
         }
     }
-
+    
     /**
      * @private
-     * @param file
+     * To be called once the image is loaded.
      */
-    function onLoadedDicom(file)
+    function createLayers(width,height)
     {
-        // parse the DICOM file
-        try {
-            parseDicom(file);
-        }
-        catch(error) {
-            if( error.name && error.message) {
-                alert(error.name+": "+error.message+".");
-            }
-            else {
-                alert("Error: "+error+".");
-            }
-            if( error.stack ) {
-                console.log(error.stack);
-            }
-            return;
-        }
-        // prepare display
-        postLoadInit();
-        //$("#progressbar").progressbar({ value: 100 });
+        // image layer
+        imageLayer = new dwv.html.Layer("imageLayer");
+        imageLayer.initialise(width, height);
+        imageLayer.fillContext();
+        imageLayer.display(true);
+        // draw layer
+        drawLayer = new dwv.html.Layer("drawLayer");
+        drawLayer.initialise(width, height);
+        drawLayer.display(true);
+        // temp layer
+        tempLayer = new dwv.html.Layer("tempLayer");
+        tempLayer.initialise(width, height);
+        tempLayer.display(true);
+        // info layer
+        infoLayer = new dwv.html.Layer("infoLayer");
+        infoLayer.initialise(width, height);
+        infoLayer.display(true);
     }
     
     /**
      * @private
-     * @param file
+     * Create the DICOM tags table.
+     * @param dataInfo The data information.
+     * To be called once the DICOM has been parsed.
      */
-    function updateProgress(evt)
+    function createTagsTable(dataInfo)
     {
-        // evt is an ProgressEvent.
-        if (evt.lengthComputable) {
-          var percentLoaded = Math.round((evt.loaded / evt.total) * 100);
-          // Increase the progress bar length.
-          if (percentLoaded < 100) {
-              $("#progressbar").progressbar({ value: percentLoaded });
-          }
-        }
-    }
-    
-    /**
-     * @private
-     * @param file
-     */
-    function parseDicom(file)
-    {    
-        // parse the DICOM file
-        var dicomParser = new dwv.dicom.DicomParser(file);
-        dicomParser.parseAll();
-        
         // tag list table (without the pixel data)
-        var data = dicomParser.dicomElements;
-        data.PixelData.value = "...";
+        if(dataInfo.PixelData) dataInfo.PixelData.value = "...";
         // HTML node
         var node = document.getElementById("tags");
         // remove possible previous
         while (node.hasChildNodes()) { 
             node.removeChild(node.firstChild);
         }
-        
-        // tags table
-        var table = dwv.html.toTable(data);
+        // tags HTML table
+        var table = dwv.html.toTable(dataInfo);
         table.className = "tagList";
         // search form
         node.appendChild(dwv.html.getHtmlSearchForm(table));
         // tags table
         node.appendChild(table);
-        
-        originalImage = dicomParser.getImage();
+    }
+    
+    /**
+     * @private
+     * To be called once the DICOM has been parsed.
+     */
+    function postLoadInit(data)
+    {
+    	// create the DICOM tags table
+    	createTagsTable(data.info);
+    	
+    	// store image
+        originalImage = data.image;
         image = originalImage;
-    }
-    
-    /**
-     * @private
-     * To be called once the image is loaded.
-     */
-    function layoutLayers()
-    {
-        var numberOfColumns = image.getSize().getNumberOfColumns();
-        var numberOfRows = image.getSize().getNumberOfRows();
-        
-        // image layer
-        imageLayer = new dwv.html.Layer("imageLayer");
-        imageLayer.init(numberOfColumns, numberOfRows);
-        imageLayer.fillContext();
-        imageLayer.display(true);
-        // draw layer
-        drawLayer = new dwv.html.Layer("drawLayer");
-        drawLayer.init(numberOfColumns, numberOfRows);
-        drawLayer.display(true);
-        // temp layer
-        tempLayer = new dwv.html.Layer("tempLayer");
-        tempLayer.init(numberOfColumns, numberOfRows);
-        tempLayer.display(true);
-        // info layer
-        infoLayer = new dwv.html.Layer("infoLayer");
-        infoLayer.init(numberOfColumns, numberOfRows);
-        infoLayer.display(true);
-    }
-    
-    /**
-     * @private
-     * To be called once the image is loaded.
-     */
-    function postLoadInit()
-    {
+
         // layout
-        layoutLayers();
+        var zoomX= 1;
+        var zoomY= 1;
+        var width = image.getSize().getNumberOfColumns() * zoomX;
+        var height = image.getSize().getNumberOfRows() * zoomY;
+        createLayers(width, height);
         self.alignLayers();
+        self.setLayersZoom(zoomX, zoomY, 0, 0);
 
         // get the image data from the image layer
         imageData = self.getImageLayer().getContext().getImageData( 
             0, 0, 
-            self.getImage().getSize().getNumberOfColumns(), 
-            self.getImage().getSize().getNumberOfRows());
+            image.getSize().getNumberOfColumns(), 
+            image.getSize().getNumberOfRows());
 
         // initialise the toolbox
         // note: the window/level tool is responsible for doing the first display.

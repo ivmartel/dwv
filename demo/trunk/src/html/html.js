@@ -101,7 +101,9 @@ dwv.html.appendRow = function(table, input, level, maxLevel, rowHeader)
 };
 
 /**
- * @function
+ * @function Converts the input to an HTML table.
+ * @input input Allowed types are: array, array of object, object.
+ * @warning Null is interpreted differently in browsers, firefox will not display it.
  */
 dwv.html.toTable = function(input)
 {
@@ -243,6 +245,8 @@ dwv.html.createHighlightNode = function(child) {
 dwv.html.removeNode = function(nodeId) {
     // find the node
     var node = document.getElementById(nodeId);
+    // check node
+    if( !node ) return;
     // remove its children
     while (node.hasChildNodes()) {
         node.removeChild(node.firstChild);
@@ -293,3 +297,14 @@ dwv.html.createHtmlSelect = function(name, list) {
     }
     return select;
 };
+
+dwv.html.getUriParam = function(name)
+{
+    var val = 0;
+    var regex = new RegExp("[\\?&]" + name + "=([^&#]*)");
+    var results = regex.exec(window.location.href);
+    if( results && results[1] ) val = results[1];
+    return val;
+};
+
+
