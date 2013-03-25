@@ -84,19 +84,19 @@ dwv.tool.Zoom = function(app)
     };
     
     this.touchstart = function(ev){
-        if( event.changedTouches.length === 1 ){
+        if( event.targetTouches.length === 1 ){
             self.mousedown(ev);
         }
-        else if( event.changedTouches.length === 2 ){
+        else if( event.targetTouches.length === 2 ){
             self.twotouchdown(ev);
         }
     };
 
     this.touchmove = function(ev){
-        if( event.changedTouches.length === 1 ){
+        if( event.targetTouches.length === 1 ){
             self.mousemove(ev);
         }
-        else if( event.changedTouches.length === 2 ){
+        else if( event.targetTouches.length === 2 ){
             self.twotouchmove(ev);
         }
     };
