@@ -1,20 +1,11 @@
 DWV
 ===
 
-A simple javascript/HTML5 _only_ DICOM web viewer. 
+A simple javascript/HTML5 _only_ DICOM web viewer. See the [demos](http://ivmartel.github.com/dwv/).
 
-Not yet fully DICOM compliant, for now only supports:
- * 512*512 2D images (or less)
- * Little Endian transfer syntax
+Not yet fully DICOM compliant, 
+see [Dicom-Support](https://github.com/ivmartel/dwv/wiki/Dicom-Support) on the wiki of the project.
 
 All coding/implementation comments are welcome.
 
-For now works only with local files. 
-
- * Firefox: straight out of the box,
- * Google Chrome: launch it with the command line option: `--allow-file-access-from-files`. 
-
-Released under GNU GPL license (see [license.txt](/ivmartel/dwv/blob/master/license.txt)). 
-
-See the demos [here](http://ivmartel.github.com/dwv/).
- 
+Released under GNU GPL license (see [license.txt](license.txt)). 
