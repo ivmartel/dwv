@@ -68,7 +68,7 @@ dwv.tool.Zoom = function(app)
        var point0 = new dwv.math.Point2D(ev._x, ev._y);
        var point1 = new dwv.math.Point2D(ev._x1, ev._y1);
        var newLine = new dwv.math.Line(point0, point1);
-       var lineDiff = ( self.line0.getLength() - newLine.getLength() ) / 100;
+       var lineDiff = ( newLine.getLength() - self.line0.getLength() ) / 1000;
        
        if( lineDiff !== 0 )
            zoom(lineDiff, self.midPoint.getX(), self.midPoint.getY());
@@ -84,19 +84,19 @@ dwv.tool.Zoom = function(app)
     };
     
     this.touchstart = function(ev){
-        if( event.changedTouches.length === 1 ){
+        if( event.targetTouches.length === 1 ){
             self.mousedown(ev);
         }
-        else if( event.changedTouches.length === 2 ){
+        else if( event.targetTouches.length === 2 ){
             self.twotouchdown(ev);
         }
     };
 
     this.touchmove = function(ev){
-        if( event.changedTouches.length === 1 ){
+        if( event.targetTouches.length === 1 ){
             self.mousemove(ev);
         }
-        else if( event.changedTouches.length === 2 ){
+        else if( event.targetTouches.length === 2 ){
             self.twotouchmove(ev);
         }
     };
