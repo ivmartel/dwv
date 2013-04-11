@@ -9,7 +9,7 @@
 -- >> [webdefaults]
 -- >> ...
 -- >> viewer = dwv
--- This script relies on the 'kFactorFile', 'ACRNemaMap' and 'Dictionary' 
+-- This script relies on the 'kFactorFile', 'ACRNemaMap' and 'Dictionary'
 -- variables being set correctly.
 -- Then copy the 'css', 'src' and 'ext' folders of DWV in a 'dwv' folder
 -- in the web folder of your web server.
@@ -61,7 +61,7 @@ url = url .. '?requestType=WADO&contentType=application/dicom'
 url = url .. '&seriesUID=' .. seriesuid
 url = url .. '&studyUID=' .. studyuid
 url = url .. '&objectUID=' .. images[1].SOPInstanceUID
-  
+ 
 -- Generate html
 
 HTML('Content-type: text/html\n\n')
@@ -79,7 +79,7 @@ body { font-size: 80%; }
 </style>
 <link rel="stylesheet" href="/dwv/ext/jquery/ui/1.10.1/themes/ui-darkness/jquery-ui.min.css">]])
 
-print([[<!-- Third party -->  
+print([[<!-- Third party --> 
 <script type="text/javascript" src="/dwv/ext/jquery/jquery-1.9.1.min.js"></script>
 <script type="text/javascript" src="/dwv/ext/jquery/ui/1.10.1/jquery-ui.min.js"></script>
 <script type="text/javascript" src="/dwv/ext/flot/jquery.flot.min.js"></script>]])
@@ -136,13 +136,30 @@ function load()
     '&objectUID=' + document.forms[0].slice.value);
 }
 function nextslice()
-{ 
-  if (document.forms[0].slice.selectedIndex == document.forms[0].slice.length-1) 
-    document.forms[0].slice.selectedIndex = 0; 
-  else 
+{
+  if (document.forms[0].slice.selectedIndex == document.forms[0].slice.length-1)
+  {
+    document.forms[0].slice.selectedIndex = 0;
+  }
+  else
+  {
     document.forms[0].slice.selectedIndex = document.forms[0].slice.selectedIndex + 1;
+  }
   load();
-}]])
+}
+function previousslice()
+{
+  if (document.forms[0].slice.selectedIndex == 0)
+  {
+    document.forms[0].slice.selectedIndex = document.forms[0].slice.length-1;
+  }
+  else
+  {
+    document.forms[0].slice.selectedIndex = document.forms[0].slice.selectedIndex - 1;
+  }
+  load();
+}
+]])
 
 print([[// main application
 var app = new dwv.App();
@@ -150,18 +167,18 @@ var app = new dwv.App();
 $(document).ready(function(){
     // create buttons and dialogs
     $("button").button();
-    $("#openData").dialog({ position: 
+    $("#openData").dialog({ position:
         {my: "left top", at: "left top", of: "#pageMain"} });
-    $("#toolbox").dialog({ position: 
+    $("#toolbox").dialog({ position:
         {my: "left top+200", at: "left top", of: "#pageMain"} });
-    $("#history").dialog({ position: 
+    $("#history").dialog({ position:
         {my: "left top+370", at: "left top", of: "#pageMain"},
         autoOpen: false });
-    $("#tags").dialog({ position: 
+    $("#tags").dialog({ position:
         {my: "right top", at: "right top", of: "#pageMain"},
         autoOpen: false, width: 500, height: 590 });
-    
-    $("#layerContainer").dialog({ position: 
+   
+    $("#layerContainer").dialog({ position:
         {my: "center top", at: "center top", of: "#pageMain"},
         width: 570, height: 590 });
 
@@ -176,6 +193,8 @@ print([[</head>]])
 
 print([[<body>]])
 
+print([[<div id="pageHeader">]])
+
 print([[<!-- Title -->
 <h1>DICOM Web Viewer (<a href="https://github.com/ivmartel/dwv">dwv</a> v0.3b)</h1>
 
@@ -186,24 +205,30 @@ print([[<!-- Title -->
 <button onclick="toggle('#tags')">Tags</button>
 <button onclick="toggle('#layerContainer')">Image</button>]])
 
+print([[</div><!-- pageHeader -->]])
+
+print([[<div id="pageMain">]])
+
 print([[<!-- Open file -->
 <div id="openData" title="File">
-<p><form>
+<form><p>
 Path: <input type="file" id="imagefiles" multiple />
 URL: <input type="url" id="imageurl" />
-<br>Slice: <select name=slice onchange=load()>]])
+<br>Slice: 
+<input type=button value='<' onclick=previousslice() />
+<select name=slice onchange=load()>]])
 
 for i=1, #images do
   print('  <option value='..images[i].SOPInstanceUID..'>'..i..'</option>')
 end
 
 print([[</select>
-  <input type=button value='>' onclick=nextslice() />
-</form>]])
+<input type=button value='>' onclick=nextslice() />
+</p></form>]])
 
-print([[</p>
-<div id="progressbar"></div>
-</div>]])
+print([[<div id="progressbar"></div>]])
+
+print([[</div>]])
 
 print([[<!-- Toolbox -->
 <div id="toolbox" title="Toolbox">
@@ -224,6 +249,8 @@ print([[<!-- Layer Container -->
 <canvas id="tempLayer" width="512" height="512"></canvas>
 <div id="plot" style="width:100px;height:70px"></div>
 </div>]])
+
+print([[</div><!-- pageMain -->]])
 
 print([[</body>]])
 print([[</html>]])
