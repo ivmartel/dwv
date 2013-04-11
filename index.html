@@ -80,7 +80,9 @@ $(document).ready(function(){
     
     $("#layerContainer").dialog({ position: 
         {my: "center top", at: "center top", of: "#pageMain"},
-        width: 570, height: 590 });
+        width: 512, height: 512 });
+        
+    $("#layerContainer").resizable({aspectRatio: true});
     
     // initialise the application
     app.init();
@@ -131,10 +133,10 @@ URL: <input type="url" id="imageurl" />
 
 <!-- Layer Container -->
 <div id="layerContainer" title="Image">
-<canvas id="imageLayer" width="512" height="512"></canvas>
-<canvas id="drawLayer" width="512" height="512"></canvas>
-<canvas id="infoLayer" width="512" height="512"></canvas>
-<canvas id="tempLayer" width="512" height="512"></canvas>
+<canvas id="imageLayer">Only for HTML5 compatible browsers...</canvas>
+<canvas id="drawLayer">Only for HTML5 compatible browsers...</canvas>
+<canvas id="infoLayer">Only for HTML5 compatible browsers...</canvas>
+<canvas id="tempLayer">Only for HTML5 compatible browsers...</canvas>
 <div id="plot" style="width:100px;height:70px"></div>
 </div>
 
