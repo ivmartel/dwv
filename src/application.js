@@ -298,6 +298,7 @@ dwv.App = function(mobile)
             if( event.type === "mousemove"
                 || event.type === "mousedown"
                 || event.type === "mouseup"
+                || event.type === "mouseout"
                 || event.type === "mousewheel"
                 || event.type === "dblclick" 
                 || event.type === "DOMMouseScroll" )
@@ -409,6 +410,7 @@ dwv.App = function(mobile)
         tempLayer.getCanvas().addEventListener('mousedown', eventHandler, false);
         tempLayer.getCanvas().addEventListener('mousemove', eventHandler, false);
         tempLayer.getCanvas().addEventListener('mouseup', eventHandler, false);
+        tempLayer.getCanvas().addEventListener('mouseout', eventHandler, false);
         tempLayer.getCanvas().addEventListener('mousewheel', eventHandler, false);
         tempLayer.getCanvas().addEventListener('touchstart', eventHandler, false);
         tempLayer.getCanvas().addEventListener('touchmove', eventHandler, false);

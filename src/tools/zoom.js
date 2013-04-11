@@ -83,6 +83,10 @@ dwv.tool.Zoom = function(app)
         }
     };
     
+    this.mouseout = function(ev){
+        self.mouseup(ev);
+    };
+
     this.touchstart = function(ev){
         if( event.targetTouches.length === 1 ){
             self.mousedown(ev);

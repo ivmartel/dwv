@@ -180,6 +180,10 @@ dwv.tool.WindowLevel = function(app)
         }
     };
     
+    this.mouseout = function(ev){
+        self.mouseup(ev);
+    };
+
     this.touchstart = function(ev){
         self.mousedown(ev);
     };
