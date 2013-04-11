@@ -157,7 +157,8 @@ dwv.App = function(mobile)
                 var view = new DataView(request.response);
                 var isJpeg = view.getUint32(0) === 0xffd8ffe0;
                 var isPng = view.getUint32(0) === 0x89504e47;
-                if( isJpeg || isPng ) {
+                var isGif = view.getUint32(0) === 0x47494638;
+                if( isJpeg || isPng || isGif ) {
                     // image data
                     var image = new Image();
 
@@ -166,7 +167,10 @@ dwv.App = function(mobile)
                     for (var i = 0; i < bytes.byteLength; ++i) {
                         binary += String.fromCharCode(bytes[i]);
                     }
-                    var imgStr = (isJpeg ? "jpeg" : "png");
+                    var imgStr = "unknown";
+                    if (isJpeg) imgStr = "jpeg";
+                    else if (isPng) imgStr = "png";
+                    else if (isGif) imgStr = "gif";
                     image.src = "data:image/" + imgStr + ";base64," + window.btoa(binary);
                     
                     image.onload = function(e){
