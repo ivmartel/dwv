@@ -327,19 +327,19 @@ dwv.App = function(mobile)
         imageLayer = new dwv.html.Layer("imageLayer");
         imageLayer.initialise(width, height);
         imageLayer.fillContext();
-        imageLayer.display(true);
+        imageLayer.setStyleDisplay(true);
         // draw layer
         drawLayer = new dwv.html.Layer("drawLayer");
         drawLayer.initialise(width, height);
-        drawLayer.display(true);
+        drawLayer.setStyleDisplay(true);
         // temp layer
         tempLayer = new dwv.html.Layer("tempLayer");
         tempLayer.initialise(width, height);
-        tempLayer.display(true);
+        tempLayer.setStyleDisplay(true);
         // info layer
         infoLayer = new dwv.html.Layer("infoLayer");
         infoLayer.initialise(width, height);
-        infoLayer.display(true);
+        infoLayer.setStyleDisplay(true);
     }
     
     /**
