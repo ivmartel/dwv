@@ -78,12 +78,17 @@ $(document).ready(function(){
         {my: "right top", at: "right top", of: "#pageMain"},
         autoOpen: false, width: 500, height: 590 });
     
+    // image dialog
     $("#layerContainer").dialog({ position: 
-        {my: "center top", at: "center top", of: "#pageMain"},
-        width: 512, height: 512 });
-        
-    $("#layerContainer").resizable({aspectRatio: true});
-    
+        {my: "left+320 top", at: "left top", of: "#pageMain"}});
+    // default size
+    $("#layerContainer").dialog({ width: 512, height: 512 });
+    // hide scrollbars
+    $("#layerContainer").css("overflow", "hidden");
+    // keep aspect ratio
+    // TODO not working...    
+    //$("#layerContainer").resizable({ aspectRatio: true });
+
     // initialise the application
     app.init();
     // possible load from URL
@@ -137,7 +142,7 @@ URL: <input type="url" id="imageurl" />
 <canvas id="drawLayer">Only for HTML5 compatible browsers...</canvas>
 <canvas id="infoLayer">Only for HTML5 compatible browsers...</canvas>
 <canvas id="tempLayer">Only for HTML5 compatible browsers...</canvas>
-<div id="plot" style="width:100px;height:70px"></div>
+<div id="plot"></div>
 </div>
 
 </div><!-- pageMain -->

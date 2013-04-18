@@ -218,29 +218,6 @@ dwv.App = function(mobile)
     
     /**
      * To be called once the image is loaded.
-     * Linked with the window.onresize method.
-     */
-    this.alignLayers = function()
-    {
-        if( imageLayer ) {
-            drawLayer.align(imageLayer);
-            tempLayer.align(imageLayer);
-            infoLayer.align(imageLayer);
-            
-            // align plot
-            var plotDiv = document.getElementById("plot");
-            plotDiv.style.top = app.getImageLayer().getCanvas().offsetTop
-                + app.getImageLayer().getCanvas().height
-                - plotDiv.offsetHeight
-                - 15;
-            plotDiv.style.left = app.getImageLayer().getCanvas().offsetLeft
-                + app.getImageLayer().getCanvas().width
-                - plotDiv.offsetWidth;
-        }
-    };
-    
-    /**
-     * To be called once the image is loaded.
      */
     this.setLayersZoom = function(zoomX,zoomY,cx,cy)
     {
@@ -319,10 +296,24 @@ dwv.App = function(mobile)
     
     /**
      * @private
-     * To be called once the image is loaded.
+     * @param width The width of the layers.
+     * @param height The height of the layers.
      */
-    function createLayers(width,height)
+    function createLayers(width, height)
     {
+        // layer container
+        var mainWidth = $('#pageMain').width() - 320;
+        var mainHeight = $('#pageMain').height();
+        var ratio = Math.min( (mainWidth / width), (mainHeight / width) );
+        $("#layerContainer").dialog({ "width": ratio*width, "height": ratio*height });
+        
+        // mobile
+        //var mainWidth = $(window).width();
+        //var mainHeight = $(window).height();
+        //var ratio = Math.min( (mainWidth / width), (mainHeight / width) );
+        //$("#layerContainer").width(ratio*width);
+        //$("#layerContainer").height(ratio*height);
+        
         // image layer
         imageLayer = new dwv.html.Layer("imageLayer");
         imageLayer.initialise(width, height);
@@ -381,19 +372,13 @@ dwv.App = function(mobile)
         image = originalImage;
 
         // layout
-        var zoomX= 1;
-        var zoomY= 1;
-        var width = image.getSize().getNumberOfColumns() * zoomX;
-        var height = image.getSize().getNumberOfRows() * zoomY;
-        createLayers(width, height);
-        self.alignLayers();
-        self.setLayersZoom(zoomX, zoomY, 0, 0);
+        var numberOfColumns = image.getSize().getNumberOfColumns();
+        var numberOfRows = image.getSize().getNumberOfRows();
+        createLayers(numberOfColumns, numberOfRows);
 
         // get the image data from the image layer
-        imageData = self.getImageLayer().getContext().getImageData( 
-            0, 0, 
-            image.getSize().getNumberOfColumns(), 
-            image.getSize().getNumberOfRows());
+        imageData = self.getImageLayer().getContext().createImageData( 
+            numberOfColumns, numberOfRows);
 
         // initialise the toolbox
         // note: the window/level tool is responsible for doing the first display.

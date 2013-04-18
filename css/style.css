@@ -10,14 +10,15 @@ a { color: #ddf; }
 
 /* Layers */
 #layerContainer { overflow: auto; position: relative; }
-#imageLayer { border: 1px solid white; width: 100%; height: 100%; }
-#drawLayer { position: absolute; width: 100%; height: 100%; }
-#tempLayer { position: absolute; width: 100%; height: 100%; }
-#infoLayer { position: absolute; width: 100%; height: 100%; }
-#plot { position: absolute; }
+#imageLayer { position: absolute; width: 95%; height: 95%;
+  border: 1px solid white; }
+#drawLayer { position: absolute; width: 95%; height: 95%; }
+#tempLayer { position: absolute; width: 95%; height: 95%; }
+#infoLayer { position: absolute; width: 95%; height: 95%; }
+#plot { position: absolute; width: 19%; height: 10%;}
 
 /* Tag list */
-table.tagList { border-collapse:collapse; }
+table.tagList { border-collapse: collapse; }
 table.tagList thead td { font-weight: bold; }
 table.tagList td { border: 1px solid grey; padding: 2px; }
 .highlighted { background: #f87217; }

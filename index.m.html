@@ -65,8 +65,6 @@ var app = new dwv.App(true);
 $(document).ready(function(){
 	// initialise the application
 	app.init();
-	// align layers when the window is resized
-    window.onresize = app.alignLayers;
     // possible load from URL
     var input = dwv.html.getUriParam("input"); 
     if( input ) app.loadURL(decodeURIComponent(input));
@@ -79,11 +77,11 @@ $(document).ready(function(){
 
 <div data-role="page" id="main">
 
-<div data-role="header">
+<div id="pageHeader" data-role="header">
 <h1>DICOM Web Viewer (<a href="https://github.com/ivmartel/dwv">dwv</a> v0.3b)</h1>
 </div><!-- /header -->
 
-<div data-role="content">   
+<div id="pageMain" data-role="content">   
 
 <div class="ui-grid-a">
 
@@ -117,11 +115,11 @@ $(document).ready(function(){
 <!-- Layer Container -->
 <div id="centerDiv">
 <div id="layerContainer" title="Image">
-<canvas id="imageLayer" style="display:none;"></canvas>
-<canvas id="drawLayer" style="display:none;"></canvas>
-<canvas id="infoLayer" style="display:none;"></canvas>
-<canvas id="tempLayer" style="display:none;"></canvas>
-<div id="plot" style="width:100px;height:70px"></div>
+<canvas id="imageLayer">Only for HTML5 compatible browsers...</canvas>
+<canvas id="drawLayer">Only for HTML5 compatible browsers...</canvas>
+<canvas id="infoLayer">Only for HTML5 compatible browsers...</canvas>
+<canvas id="tempLayer">Only for HTML5 compatible browsers...</canvas>
+<div id="plot"></div>
 </div>
 </div>
 
