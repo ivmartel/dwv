@@ -6,7 +6,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
 <link rel="stylesheet" href="css/style.css" />
 <style>
-#centerDiv { margin: auto; text-align:center; }
+#layerContainer { margin: auto; text-align: center; }
+#imageLayer { left: 0px; }
+#drawLayer { left: 0px; }
+#tempLayer { left: 0px; }
+#infoLayer { left: 0px; }
+#plot { bottom: 45px; right: 30px; }
 </style>
 <link rel="stylesheet" href="ext/jquery/mobile/1.3.0/jquery.mobile-1.3.0.min.css" />
 <!-- Third party -->  
@@ -63,8 +68,10 @@ var app = new dwv.App(true);
 
 // jquery
 $(document).ready(function(){
-	// initialise the application
-	app.init();
+    // initialise the application
+    app.init();
+    // align layers when the window is resized
+    window.onresize = app.resize;
     // possible load from URL
     var input = dwv.html.getUriParam("input"); 
     if( input ) app.loadURL(decodeURIComponent(input));
@@ -113,14 +120,12 @@ $(document).ready(function(){
 </div><!-- /grid-a -->
 
 <!-- Layer Container -->
-<div id="centerDiv">
 <div id="layerContainer" title="Image">
 <canvas id="imageLayer">Only for HTML5 compatible browsers...</canvas>
 <canvas id="drawLayer">Only for HTML5 compatible browsers...</canvas>
 <canvas id="infoLayer">Only for HTML5 compatible browsers...</canvas>
 <canvas id="tempLayer">Only for HTML5 compatible browsers...</canvas>
 <div id="plot"></div>
-</div>
 </div>
 
 <!-- History -->
