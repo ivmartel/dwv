@@ -8,6 +8,7 @@
 body { font-size: 80%; }
 #toolbox li:first-child { list-style-type: none; padding-bottom: 10px; margin-left: -20px; }
 #pageMain { height: 85%; width: 100%; margin-top: 10px; }
+#plot { bottom: 40px; right: 20px; }
 </style>
 <link rel="stylesheet" href="ext/jquery/ui/1.10.1/themes/ui-darkness/jquery-ui.min.css">
 <!-- Third party -->  
@@ -82,13 +83,12 @@ $(document).ready(function(){
     $("#layerContainer").dialog({ position: 
         {my: "left+320 top", at: "left top", of: "#pageMain"}});
     // default size
-    $("#layerContainer").dialog({ width: 512, height: 512 });
+    $("#layerContainer").dialog({ width: 512, height: 512, resizable: false });
     // hide scrollbars
     $("#layerContainer").css("overflow", "hidden");
-    // keep aspect ratio
-    // TODO not working...    
-    //$("#layerContainer").resizable({ aspectRatio: true });
-
+    // keep aspect ratio (needs resizable: false in the dialog)
+    $("#layerContainer").resizable({ aspectRatio: true });
+    
     // initialise the application
     app.init();
     // possible load from URL
