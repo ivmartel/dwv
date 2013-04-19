@@ -12,6 +12,9 @@ dwv.App = function(mobile)
     var originalImage = null;
     // Image data array
     var imageData = null;
+    var dataWidth = 0;
+    var dataHeight = 0;
+    var displayZoom = 1;
      
     // Image layer
     var imageLayer = null;
@@ -219,6 +222,29 @@ dwv.App = function(mobile)
     /**
      * To be called once the image is loaded.
      */
+    this.resize = function()
+    {
+        // adapt size of the layer container
+        if( mobile ) {
+            var mainWidth = $(window).width();
+            var mainHeight = $(window).height() - 250;
+            displayZoom = Math.min( (mainWidth / dataWidth), (mainHeight / dataHeight) );
+            $("#layerContainer").width(displayZoom*dataWidth);
+            $("#layerContainer").height(displayZoom*dataHeight);
+        }
+        else {
+            var mainWidth = $('#pageMain').width() - 330;
+            var mainHeight = $('#pageMain').height();
+            displayZoom = Math.min( (mainWidth / dataWidth), (mainHeight / dataHeight) );
+            $("#layerContainer").dialog({ 
+                "width": displayZoom*dataWidth, 
+                "height": displayZoom*dataHeight });
+        }
+    };
+    
+    /**
+     * To be called once the image is loaded.
+     */
     this.setLayersZoom = function(zoomX,zoomY,cx,cy)
     {
         if( imageLayer ) imageLayer.zoom(zoomX,zoomY,cx,cy);
@@ -253,13 +279,17 @@ dwv.App = function(mobile)
                   var touch = event.targetTouches[0];
                   // store
                   event._x = touch.pageX - parseInt(app.getImageLayer().getOffset().left, 10);
+                  event._x = parseInt( (event._x / displayZoom), 10 );
                   event._y = touch.pageY - parseInt(app.getImageLayer().getOffset().top, 10);
+                  event._y = parseInt( (event._y / displayZoom), 10 );
                   // second finger
                   if (event.targetTouches.length === 2) {
                       touch = event.targetTouches[1];
                       // store
                       event._x1 = touch.pageX - parseInt(app.getImageLayer().getOffset().left, 10);
+                      event._x1 = parseInt( (event._x1 / displayZoom), 10 );
                       event._y1 = touch.pageY - parseInt(app.getImageLayer().getOffset().top, 10);
+                      event._y1 = parseInt( (event._y1 / displayZoom), 10 );
                   }
                   // set handle event flag
                   handled = true;
@@ -277,7 +307,9 @@ dwv.App = function(mobile)
             {
                 // layerX is for firefox
                 event._x = event.offsetX === undefined ? event.layerX : event.offsetX;
+                event._x = parseInt( (event._x / displayZoom), 10 );
                 event._y = event.offsetY === undefined ? event.layerY : event.offsetY;
+                event._y = parseInt( (event._y / displayZoom), 10 );
                 // set handle event flag
                 handled = true;
             }
@@ -296,40 +328,30 @@ dwv.App = function(mobile)
     
     /**
      * @private
-     * @param width The width of the layers.
-     * @param height The height of the layers.
+     * @param dataWidth The width of the input data.
+     * @param dataHeight The height of the input data.
      */
-    function createLayers(width, height)
+    function createLayers(dataWidth, dataHeight)
     {
-        // layer container
-        var mainWidth = $('#pageMain').width() - 320;
-        var mainHeight = $('#pageMain').height();
-        var ratio = Math.min( (mainWidth / width), (mainHeight / width) );
-        $("#layerContainer").dialog({ "width": ratio*width, "height": ratio*height });
-        
-        // mobile
-        //var mainWidth = $(window).width();
-        //var mainHeight = $(window).height();
-        //var ratio = Math.min( (mainWidth / width), (mainHeight / width) );
-        //$("#layerContainer").width(ratio*width);
-        //$("#layerContainer").height(ratio*height);
+        // resize app
+        self.resize();
         
         // image layer
         imageLayer = new dwv.html.Layer("imageLayer");
-        imageLayer.initialise(width, height);
+        imageLayer.initialise(dataWidth, dataHeight);
         imageLayer.fillContext();
         imageLayer.setStyleDisplay(true);
         // draw layer
         drawLayer = new dwv.html.Layer("drawLayer");
-        drawLayer.initialise(width, height);
+        drawLayer.initialise(dataWidth, dataHeight);
         drawLayer.setStyleDisplay(true);
         // temp layer
         tempLayer = new dwv.html.Layer("tempLayer");
-        tempLayer.initialise(width, height);
+        tempLayer.initialise(dataWidth, dataHeight);
         tempLayer.setStyleDisplay(true);
         // info layer
         infoLayer = new dwv.html.Layer("infoLayer");
-        infoLayer.initialise(width, height);
+        infoLayer.initialise(dataWidth, dataHeight);
         infoLayer.setStyleDisplay(true);
     }
     
@@ -364,21 +386,21 @@ dwv.App = function(mobile)
      */
     function postLoadInit(data)
     {
-    	// create the DICOM tags table
-    	createTagsTable(data.info);
-    	
-    	// store image
+        // create the DICOM tags table
+        createTagsTable(data.info);
+
+        // store image
         originalImage = data.image;
         image = originalImage;
 
         // layout
-        var numberOfColumns = image.getSize().getNumberOfColumns();
-        var numberOfRows = image.getSize().getNumberOfRows();
-        createLayers(numberOfColumns, numberOfRows);
+        dataWidth = image.getSize().getNumberOfColumns();
+        dataHeight = image.getSize().getNumberOfRows();
+        createLayers(dataWidth, dataHeight);
 
         // get the image data from the image layer
         imageData = self.getImageLayer().getContext().createImageData( 
-            numberOfColumns, numberOfRows);
+                dataWidth, dataHeight);
 
         // initialise the toolbox
         // note: the window/level tool is responsible for doing the first display.
