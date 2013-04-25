@@ -224,22 +224,20 @@ dwv.App = function(mobile)
      */
     this.resize = function()
     {
-        // adapt size of the layer container
+        // adapt the size of the layer container
+        var mainWidth = 0;
+        var mainHeight = 0;
         if( mobile ) {
-            var mainWidth = $(window).width();
-            var mainHeight = $(window).height() - 250;
-            displayZoom = Math.min( (mainWidth / dataWidth), (mainHeight / dataHeight) );
-            $("#layerContainer").width(displayZoom*dataWidth);
-            $("#layerContainer").height(displayZoom*dataHeight);
+            mainWidth = $(window).width();
+            mainHeight = $(window).height() - 250;
         }
         else {
-            var mainWidth = $('#pageMain').width() - 330;
-            var mainHeight = $('#pageMain').height();
-            displayZoom = Math.min( (mainWidth / dataWidth), (mainHeight / dataHeight) );
-            $("#layerContainer").dialog({ 
-                "width": displayZoom*dataWidth, 
-                "height": displayZoom*dataHeight });
+            mainWidth = $('#pageMain').width() - 350;
+            mainHeight = $('#pageMain').height() - 50;
         }
+        displayZoom = Math.min( (mainWidth / dataWidth), (mainHeight / dataHeight) );
+        $("#layerContainer").width(displayZoom*dataWidth);
+        $("#layerContainer").height(displayZoom*dataHeight);
     };
     
     /**

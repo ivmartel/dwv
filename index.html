@@ -80,17 +80,18 @@ $(document).ready(function(){
         autoOpen: false, width: 500, height: 590 });
     
     // image dialog
-    $("#layerContainer").dialog({ position: 
+    $("#layerDialog").dialog({ position: 
         {my: "left+320 top", at: "left top", of: "#pageMain"}});
     // default size
-    $("#layerContainer").dialog({ width: 512, height: 512, resizable: false });
-    // hide scrollbars
-    $("#layerContainer").css("overflow", "hidden");
-    // keep aspect ratio (needs resizable: false in the dialog)
-    $("#layerContainer").resizable({ aspectRatio: true });
+    $("#layerDialog").dialog({ width: "auto", resizable: false });
+    // Resizable but keep aspect ratio
+    // TODO it seems to add a border that bothers getting the cursor position...
+    //$("#layerContainer").resizable({ aspectRatio: true });
     
     // initialise the application
     app.init();
+    // align layers when the window is resized
+    window.onresize = app.resize;
     // possible load from URL
     var input = dwv.html.getUriParam("input"); 
     if( input ) app.loadURL(decodeURIComponent(input));
@@ -110,7 +111,7 @@ $(document).ready(function(){
 <button onclick="toggle('#toolbox')">Toolbox</button>
 <button onclick="toggle('#history')">History</button>
 <button onclick="toggle('#tags')">Tags</button>
-<button onclick="toggle('#layerContainer')">Image</button>
+<button onclick="toggle('#layerDialog')">Image</button>
 
 </div><!-- pageHeader -->
 
@@ -137,12 +138,14 @@ URL: <input type="url" id="imageurl" />
 <div id="tags" title="Tags" style="display:none;"></div>
 
 <!-- Layer Container -->
-<div id="layerContainer" title="Image">
+<div id="layerDialog" title="Image">
+<div id="layerContainer">
 <canvas id="imageLayer">Only for HTML5 compatible browsers...</canvas>
 <canvas id="drawLayer">Only for HTML5 compatible browsers...</canvas>
 <canvas id="infoLayer">Only for HTML5 compatible browsers...</canvas>
 <canvas id="tempLayer">Only for HTML5 compatible browsers...</canvas>
 <div id="plot"></div>
+</div>
 </div>
 
 </div><!-- pageMain -->
