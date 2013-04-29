@@ -328,6 +328,8 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
         this.appendDicomElement( { 
             'name': dataElement.tag.name,
             'group': dataElement.tag.group, 
+            'vr' : dataElement.vr, 
+            'vl' : dataElement.vl, 
             'element': dataElement.tag.element,
             'value': dataElement.data } );
         // increment index

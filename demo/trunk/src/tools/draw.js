@@ -69,6 +69,10 @@ dwv.tool.Draw = function(app)
             started = false;
         }
     };
+    
+    this.mouseout = function(ev){
+        self.mouseup(ev);
+    };
 
     this.touchstart = function(ev){
         self.mousedown(ev);
