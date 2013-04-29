@@ -17,12 +17,12 @@ Core
 UI
 --
 * Web: http://jqueryui.com
-* Version: [1.10.1](http://blog.jqueryui.com/2013/02/jquery-ui-1-10-1/)
-* Date: 15/02/2013
+* Version: [1.10.2](http://blog.jqueryui.com/2013/03/jquery-ui-1-10-2/)
+* Date: 14/03/2013
 * Download: [custom](http://jqueryui.com/download/) (default options with ui-darkness theme)
 * License: MIT (see http://jquery.org/license)
-* CDN (js): [jquery-ui.js](http://code.jquery.com/ui/1.10.1/jquery-ui.js)
-* CDN (css): [jquery-ui.css](http://code.jquery.com/ui/1.10.1/themes/ui-darkness/jquery-ui.css)
+* CDN (js): [jquery-ui.js](http://code.jquery.com/ui/1.10.2/jquery-ui.js)
+* CDN (css): [jquery-ui.css](http://code.jquery.com/ui/1.10.2/themes/ui-darkness/jquery-ui.css)
 * Description: jQuery UI provides abstractions for low-level interaction and animation,
   advanced effects and high-level, themeable widgets, built on top of the jQuery
   JavaScript Library, that you can use to build highly interactive web applications.
@@ -31,12 +31,12 @@ UI
 Mobile
 ------
 * Web: http://jquerymobile.com/
-* Version: [1.3.0](http://jquerymobile.com/blog/2013/02/20/jquery-mobile-1-3-0-released/)
-* Date: 20/02/2013
-* Download: [jquery.mobile-1.3.0.zip](http://code.jquery.com/mobile/1.3.0/jquery.mobile-1.3.0.zip)
+* Version: [1.3.1](http://jquerymobile.com/blog/2013/04/10/announcing-jquery-mobile-1-3-1/)
+* Date: 10/04/2013
+* Download: [jquery.mobile-1.3.1.zip](http://code.jquery.com/mobile/1.3.1/jquery.mobile-1.3.1.zip)
 * License: MIT (see http://jquery.org/license)
-* CDN (js): [jquery.mobile-1.3.0.min.js](http://code.jquery.com/mobile/1.3.0/jquery.mobile-1.3.0.min.js)
-* CDN (css): [jquery.mobile-1.3.0.min.css](http://code.jquery.com/mobile/1.3.0/jquery.mobile-1.3.0.min.css)
+* CDN (js): [jquery.mobile-1.3.1.min.js](http://code.jquery.com/mobile/1.3.1/jquery.mobile-1.3.1.min.js)
+* CDN (css): [jquery.mobile-1.3.1.min.css](http://code.jquery.com/mobile/1.3.1/jquery.mobile-1.3.1.min.css)
 * Description: A unified, HTML5-based user interface system for all popular mobile 
   device platforms, built on the rock-solid jQuery and jQuery UI foundation..
 * Purpose for dwv: DWV mobile user interface.
