@@ -76,12 +76,13 @@ print([[<title>DICOM Web Viewer</title>
 <style>
 body { font-size: 80%; }
 #toolbox li:first-child { list-style-type: none; padding-bottom: 10px; margin-left: -20px; }
+#pageMain { height: 85%; width: 100%; margin-top: 10px; }
 </style>
-<link rel="stylesheet" href="/dwv/ext/jquery/ui/1.10.1/themes/ui-darkness/jquery-ui.min.css">]])
+<link rel="stylesheet" href="ext/jquery/ui/1.10.2/themes/ui-darkness/jquery-ui-1.10.2.min.css">
 
 print([[<!-- Third party --> 
 <script type="text/javascript" src="/dwv/ext/jquery/jquery-1.9.1.min.js"></script>
-<script type="text/javascript" src="/dwv/ext/jquery/ui/1.10.1/jquery-ui.min.js"></script>
+<script type="text/javascript" src="ext/jquery/ui/1.10.2/jquery-ui-1.10.2.min.js"></script>
 <script type="text/javascript" src="/dwv/ext/flot/jquery.flot.min.js"></script>]])
 
 print([[<!-- Local -->
@@ -167,25 +168,33 @@ var app = new dwv.App();
 $(document).ready(function(){
     // create buttons and dialogs
     $("button").button();
-    $("#openData").dialog({ position:
+    $("#openData").dialog({ position: 
         {my: "left top", at: "left top", of: "#pageMain"} });
-    $("#toolbox").dialog({ position:
+    $("#toolbox").dialog({ position: 
         {my: "left top+200", at: "left top", of: "#pageMain"} });
-    $("#history").dialog({ position:
+    $("#history").dialog({ position: 
         {my: "left top+370", at: "left top", of: "#pageMain"},
         autoOpen: false });
-    $("#tags").dialog({ position:
+    $("#tags").dialog({ position: 
         {my: "right top", at: "right top", of: "#pageMain"},
         autoOpen: false, width: 500, height: 590 });
-   
-    $("#layerContainer").dialog({ position:
-        {my: "center top", at: "center top", of: "#pageMain"},
-        width: 570, height: 590 });
-
+    
+    // image dialog
+    $("#layerDialog").dialog({ position: 
+        {my: "left+320 top", at: "left top", of: "#pageMain"}});
+    // default size
+    $("#layerDialog").dialog({ width: "auto", resizable: false });
+    // Resizable but keep aspect ratio
+    // TODO it seems to add a border that bothers getting the cursor position...
+    //$("#layerContainer").resizable({ aspectRatio: true });
+    
     // initialise the application
     app.init();
+    // align layers when the window is resized
+    window.onresize = app.resize;
     // possible load from URL
-    app.loadURL("]].. url ..[[");
+    var input = dwv.html.getUriParam("input"); 
+    if( input ) app.loadURL(decodeURIComponent(input));
 });
 </script>]])
 
@@ -203,7 +212,7 @@ print([[<!-- Title -->
 <button onclick="toggle('#toolbox')">Toolbox</button>
 <button onclick="toggle('#history')">History</button>
 <button onclick="toggle('#tags')">Tags</button>
-<button onclick="toggle('#layerContainer')">Image</button>]])
+<button onclick="toggle('#layerDialog')">Image</button>
 
 print([[</div><!-- pageHeader -->]])
 
@@ -242,13 +251,19 @@ print([[<!-- Toolbox -->
 <div id="tags" title="Tags" style="display:none;"></div>]])
 
 print([[<!-- Layer Container -->
-<div id="layerContainer" title="Image">
-<canvas id="imageLayer" width="512" height="512"></canvas>
-<canvas id="drawLayer" width="512" height="512"></canvas>
-<canvas id="infoLayer" width="512" height="512"></canvas>
-<canvas id="tempLayer" width="512" height="512"></canvas>
-<div id="plot" style="width:100px;height:70px"></div>
-</div>]])
+<div id="layerDialog" title="Image">
+<div id="layerContainer">
+<canvas id="imageLayer">Only for HTML5 compatible browsers...</canvas>
+<canvas id="drawLayer">Only for HTML5 compatible browsers...</canvas>
+<canvas id="tempLayer">Only for HTML5 compatible browsers...</canvas>
+<div id="infoLayer">
+<div id="infotl"></div>
+<div id="infotr"></div>
+<div id="infobl"></div>
+<div id="infobr"><div id="plot"></div></div>
+</div><!-- /infoLayer -->
+</div><!-- /layerContainer -->
+</div><!-- /layerDialog -->]])
 
 print([[</div><!-- pageMain -->]])
 
