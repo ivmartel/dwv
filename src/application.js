@@ -12,6 +12,9 @@ dwv.App = function(mobile)
     var originalImage = null;
     // Image data array
     var imageData = null;
+    var dataWidth = 0;
+    var dataHeight = 0;
+    var displayZoom = 1;
      
     // Image layer
     var imageLayer = null;
@@ -19,8 +22,6 @@ dwv.App = function(mobile)
     var drawLayer = null;
     // Temporary layer
     var tempLayer = null;
-    // Information layer
-    var infoLayer = null;
     
     // Tool box
     var toolBox = new dwv.tool.ToolBox(this);
@@ -49,8 +50,6 @@ dwv.App = function(mobile)
     this.getDrawLayer = function() { return drawLayer; };
     // Get the temporary layer
     this.getTempLayer = function() { return tempLayer; };
-    // Get the information layer
-    this.getInfoLayer = function() { return infoLayer; };
 
     // Get the image details
     this.getUndoStack = function() { return undoStack; };
@@ -222,25 +221,23 @@ dwv.App = function(mobile)
     
     /**
      * To be called once the image is loaded.
-     * Linked with the window.onresize method.
      */
-    this.alignLayers = function()
+    this.resize = function()
     {
-        if( imageLayer ) {
-            drawLayer.align(imageLayer);
-            tempLayer.align(imageLayer);
-            infoLayer.align(imageLayer);
-            
-            // align plot
-            var plotDiv = document.getElementById("plot");
-            plotDiv.style.top = app.getImageLayer().getCanvas().offsetTop
-                + app.getImageLayer().getCanvas().height
-                - plotDiv.offsetHeight
-                - 15;
-            plotDiv.style.left = app.getImageLayer().getCanvas().offsetLeft
-                + app.getImageLayer().getCanvas().width
-                - plotDiv.offsetWidth;
+        // adapt the size of the layer container
+        var mainWidth = 0;
+        var mainHeight = 0;
+        if( mobile ) {
+            mainWidth = $(window).width();
+            mainHeight = $(window).height() - 250;
         }
+        else {
+            mainWidth = $('#pageMain').width() - 350;
+            mainHeight = $('#pageMain').height() - 50;
+        }
+        displayZoom = Math.min( (mainWidth / dataWidth), (mainHeight / dataHeight) );
+        $("#layerContainer").width(displayZoom*dataWidth);
+        $("#layerContainer").height(displayZoom*dataHeight);
     };
     
     /**
@@ -280,13 +277,17 @@ dwv.App = function(mobile)
                   var touch = event.targetTouches[0];
                   // store
                   event._x = touch.pageX - parseInt(app.getImageLayer().getOffset().left, 10);
+                  event._x = parseInt( (event._x / displayZoom), 10 );
                   event._y = touch.pageY - parseInt(app.getImageLayer().getOffset().top, 10);
+                  event._y = parseInt( (event._y / displayZoom), 10 );
                   // second finger
                   if (event.targetTouches.length === 2) {
                       touch = event.targetTouches[1];
                       // store
                       event._x1 = touch.pageX - parseInt(app.getImageLayer().getOffset().left, 10);
+                      event._x1 = parseInt( (event._x1 / displayZoom), 10 );
                       event._y1 = touch.pageY - parseInt(app.getImageLayer().getOffset().top, 10);
+                      event._y1 = parseInt( (event._y1 / displayZoom), 10 );
                   }
                   // set handle event flag
                   handled = true;
@@ -305,7 +306,9 @@ dwv.App = function(mobile)
             {
                 // layerX is for firefox
                 event._x = event.offsetX === undefined ? event.layerX : event.offsetX;
+                event._x = parseInt( (event._x / displayZoom), 10 );
                 event._y = event.offsetY === undefined ? event.layerY : event.offsetY;
+                event._y = parseInt( (event._y / displayZoom), 10 );
                 // set handle event flag
                 handled = true;
             }
@@ -324,27 +327,27 @@ dwv.App = function(mobile)
     
     /**
      * @private
-     * To be called once the image is loaded.
+     * @param dataWidth The width of the input data.
+     * @param dataHeight The height of the input data.
      */
-    function createLayers(width,height)
+    function createLayers(dataWidth, dataHeight)
     {
+        // resize app
+        self.resize();
+        
         // image layer
         imageLayer = new dwv.html.Layer("imageLayer");
-        imageLayer.initialise(width, height);
+        imageLayer.initialise(dataWidth, dataHeight);
         imageLayer.fillContext();
-        imageLayer.display(true);
+        imageLayer.setStyleDisplay(true);
         // draw layer
         drawLayer = new dwv.html.Layer("drawLayer");
-        drawLayer.initialise(width, height);
-        drawLayer.display(true);
+        drawLayer.initialise(dataWidth, dataHeight);
+        drawLayer.setStyleDisplay(true);
         // temp layer
         tempLayer = new dwv.html.Layer("tempLayer");
-        tempLayer.initialise(width, height);
-        tempLayer.display(true);
-        // info layer
-        infoLayer = new dwv.html.Layer("infoLayer");
-        infoLayer.initialise(width, height);
-        infoLayer.display(true);
+        tempLayer.initialise(dataWidth, dataHeight);
+        tempLayer.setStyleDisplay(true);
     }
     
     /**
@@ -378,27 +381,21 @@ dwv.App = function(mobile)
      */
     function postLoadInit(data)
     {
-    	// create the DICOM tags table
-    	createTagsTable(data.info);
-    	
-    	// store image
+        // create the DICOM tags table
+        createTagsTable(data.info);
+
+        // store image
         originalImage = data.image;
         image = originalImage;
 
         // layout
-        var zoomX= 1;
-        var zoomY= 1;
-        var width = image.getSize().getNumberOfColumns() * zoomX;
-        var height = image.getSize().getNumberOfRows() * zoomY;
-        createLayers(width, height);
-        self.alignLayers();
-        self.setLayersZoom(zoomX, zoomY, 0, 0);
+        dataWidth = image.getSize().getNumberOfColumns();
+        dataHeight = image.getSize().getNumberOfRows();
+        createLayers(dataWidth, dataHeight);
 
         // get the image data from the image layer
-        imageData = self.getImageLayer().getContext().getImageData( 
-            0, 0, 
-            image.getSize().getNumberOfColumns(), 
-            image.getSize().getNumberOfRows());
+        imageData = self.getImageLayer().getContext().createImageData( 
+                dataWidth, dataHeight);
 
         // initialise the toolbox
         // note: the window/level tool is responsible for doing the first display.
