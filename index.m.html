@@ -10,8 +10,7 @@
 #imageLayer { left: 0px; }
 #drawLayer { left: 0px; }
 #tempLayer { left: 0px; }
-#infoLayer { left: 0px; }
-#plot { bottom: 45px; right: 30px; }
+#infoLayer .ui-overlay-c{ text-shadow: 0 0 0 rgb(0,0,0); }
 </style>
 <link rel="stylesheet" href="ext/jquery/mobile/1.3.0/jquery.mobile-1.3.0.min.css" />
 <!-- Third party -->  
@@ -53,11 +52,9 @@
 <script type="text/javascript">
 function toggleInfo()
 {
-    if( app.getInfoLayer() )
+    if( document.getElementById("infoLayer") )
     {
-        app.getInfoLayer().display( !app.getInfoLayer().isVisible() );
-        // histogram
-        var div = document.getElementById("plot");
+        var div = document.getElementById("infoLayer");
         if( div.style.display === "none" ) div.style.display = '';
         else div.style.display = "none";
     }
@@ -123,10 +120,14 @@ $(document).ready(function(){
 <div id="layerContainer">
 <canvas id="imageLayer">Only for HTML5 compatible browsers...</canvas>
 <canvas id="drawLayer">Only for HTML5 compatible browsers...</canvas>
-<canvas id="infoLayer">Only for HTML5 compatible browsers...</canvas>
 <canvas id="tempLayer">Only for HTML5 compatible browsers...</canvas>
-<div id="plot"></div>
-</div>
+<div id="infoLayer">
+<div id="infotl"></div>
+<div id="infotr"></div>
+<div id="infobl"></div>
+<div id="infobr"><div id="plot"></div></div>
+</div><!-- /infoLayer -->
+</div><!-- /layerContainer -->
 
 <!-- History -->
 <div id="history" title="History" style="display:none;"></div>

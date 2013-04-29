@@ -8,7 +8,6 @@
 body { font-size: 80%; }
 #toolbox li:first-child { list-style-type: none; padding-bottom: 10px; margin-left: -20px; }
 #pageMain { height: 85%; width: 100%; margin-top: 10px; }
-#plot { bottom: 40px; right: 20px; }
 </style>
 <link rel="stylesheet" href="ext/jquery/ui/1.10.1/themes/ui-darkness/jquery-ui.min.css">
 <!-- Third party -->  
@@ -113,7 +112,7 @@ $(document).ready(function(){
 <button onclick="toggle('#tags')">Tags</button>
 <button onclick="toggle('#layerDialog')">Image</button>
 
-</div><!-- pageHeader -->
+</div><!-- /pageHeader -->
 
 <div id="pageMain">
 
@@ -142,13 +141,17 @@ URL: <input type="url" id="imageurl" />
 <div id="layerContainer">
 <canvas id="imageLayer">Only for HTML5 compatible browsers...</canvas>
 <canvas id="drawLayer">Only for HTML5 compatible browsers...</canvas>
-<canvas id="infoLayer">Only for HTML5 compatible browsers...</canvas>
 <canvas id="tempLayer">Only for HTML5 compatible browsers...</canvas>
-<div id="plot"></div>
-</div>
-</div>
+<div id="infoLayer">
+<div id="infotl"></div>
+<div id="infotr"></div>
+<div id="infobl"></div>
+<div id="infobr"><div id="plot"></div></div>
+</div><!-- /infoLayer -->
+</div><!-- /layerContainer -->
+</div><!-- /layerDialog -->
 
-</div><!-- pageMain -->
+</div><!-- /pageMain -->
 
 </body>
 </html>

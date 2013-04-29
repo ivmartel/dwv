@@ -22,8 +22,6 @@ dwv.App = function(mobile)
     var drawLayer = null;
     // Temporary layer
     var tempLayer = null;
-    // Information layer
-    var infoLayer = null;
     
     // Tool box
     var toolBox = new dwv.tool.ToolBox(this);
@@ -52,8 +50,6 @@ dwv.App = function(mobile)
     this.getDrawLayer = function() { return drawLayer; };
     // Get the temporary layer
     this.getTempLayer = function() { return tempLayer; };
-    // Get the information layer
-    this.getInfoLayer = function() { return infoLayer; };
 
     // Get the image details
     this.getUndoStack = function() { return undoStack; };
@@ -347,10 +343,6 @@ dwv.App = function(mobile)
         tempLayer = new dwv.html.Layer("tempLayer");
         tempLayer.initialise(dataWidth, dataHeight);
         tempLayer.setStyleDisplay(true);
-        // info layer
-        infoLayer = new dwv.html.Layer("infoLayer");
-        infoLayer.initialise(dataWidth, dataHeight);
-        infoLayer.setStyleDisplay(true);
     }
     
     /**
