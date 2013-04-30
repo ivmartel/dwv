@@ -450,6 +450,12 @@ dwv.dicom.DicomParser.prototype.getImage = function()
         columnSpacing, rowSpacing);
     // image
     var image = new dwv.image.Image( size, spacing, this.pixelBuffer );
+    // photometricInterpretation
+    var photometricInterpretation = 'MONOCHROME2';
+    if( this.dicomElements.PhotometricInterpretation ) {
+        photometricInterpretation = this.dicomElements.PhotometricInterpretation.value[0].trim();
+    }        
+    image.setPhotometricInterpretation(photometricInterpretation);
     // lookup
     var slope = 1;
     if( this.dicomElements.RescaleSlope ) {
