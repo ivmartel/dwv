@@ -4,14 +4,28 @@
 dwv.html = dwv.html || {};
 
 /**
- * @function Get an HTML table corresponding to an input javascript array. 
- * @param input The input can be either a 1D array, 
- *               2D array, an array of objects or an object.
+ * @function Append a cell to a given row.
+ * @param row The row to append the cell to.
+ * @param text The text of the cell.
  */
 dwv.html.appendCell = function(row, text)
 {
     var cell = row.insertCell(-1);
     cell.appendChild(document.createTextNode(text));
+};
+
+/**
+ * @function Append a header cell to a given row.
+ * @param row The row to append the header cell to.
+ * @param text The text of the header cell.
+ */
+dwv.html.appendHCell = function(row, text)
+{
+    var cell = document.createElement("th");
+    // TODO jquery-mobile specific...
+    if( text !== "Value" && text !== "Name" ) cell.setAttribute("data-priority", "1");
+    cell.appendChild(document.createTextNode(text));
+    row.appendChild(cell);
 };
 
 /**
@@ -74,10 +88,10 @@ dwv.html.appendRowForObject = function(table, input, level, maxLevel, rowHeader)
         var header = table.createTHead();
         var th = header.insertRow(-1);
         if( rowHeader ) {
-            dwv.html.appendCell(th, "");
+            dwv.html.appendHCell(th, "Name");
         }
         for( var k=0; k<keys.length; ++k ) {
-            dwv.html.appendCell(th, dwv.utils.capitaliseFirstLetter(keys[k]));
+            dwv.html.appendHCell(th, dwv.utils.capitaliseFirstLetter(keys[k]));
         }
     }
 };
@@ -307,4 +321,13 @@ dwv.html.getUriParam = function(name)
     return val;
 };
 
+dwv.html.toggleDisplay = function(id)
+{
+    if( document.getElementById(id) )
+    {
+        var div = document.getElementById(id);
+        if( div.style.display === "none" ) div.style.display = '';
+        else div.style.display = "none";
+    }
+};
 

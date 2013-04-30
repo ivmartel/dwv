@@ -25,4 +25,5 @@ a { color: #ddf; }
 table.tagList { border-collapse: collapse; }
 table.tagList thead td { font-weight: bold; }
 table.tagList td { border: 1px solid grey; padding: 2px; }
-.highlighted { background: #f87217; }
+#tags .highlighted { background: #f87217; }
+#tags form { width: 50%; }
