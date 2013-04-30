@@ -73,6 +73,8 @@ dwv.image.Image = function(size, spacing, buffer)
     // buffer
     this.originalBuffer = buffer;
     this.buffer = buffer.slice();
+    // PhotometricInterpretation
+    this.photometricInterpretation = null;
     // data range
     this.dataRange = undefined;
     // histogram
@@ -95,6 +97,11 @@ dwv.image.Image = function(size, spacing, buffer)
     // Get the spacing of the image.
     this.getSpacing = function() {
         return self.spacing;
+    };
+
+    // Get the photometricInterpretation of the image.
+    this.getPhotometricInterpretation = function() {
+        return self.photometricInterpretation;
     };
 
     // Get the rescale LUT of the image.
@@ -153,6 +160,15 @@ dwv.image.Image.prototype.getValue = function( i, j, k )
 dwv.image.Image.prototype.getValueAtOffset = function( offset )
 {
     return this.rescaleLut.getValue( this.buffer[offset] );
+};
+
+/**
+ * Set the value of PhotometricInterpretation
+ * @param photometricInterpretation The PhotometricInterpretation value.
+ */
+dwv.image.Image.prototype.setPhotometricInterpretation = function( photometricInterpretation )
+{
+    this.photometricInterpretation = photometricInterpretation;
 };
 
 /**
@@ -263,13 +279,35 @@ dwv.image.Image.prototype.generateImageData = function( array, sliceNumber )
     var sliceOffset = (sliceNumber || 0) * this.size.getSliceSize();
     var iMax = sliceOffset + this.size.getSliceSize();
     var pxValue = 0;
-    for(var i=sliceOffset; i < iMax; ++i)
-    {        
-        pxValue = parseInt( this.windowLut.getValue( this.buffer[i] ), 10 );    
-        array.data[4*i] = this.colorMap.red[pxValue];
-        array.data[4*i+1] = this.colorMap.green[pxValue];
-        array.data[4*i+2] = this.colorMap.blue[pxValue];
-        array.data[4*i+3] = 0xff;
+    var photometricInterpretation = this.getPhotometricInterpretation();
+    switch (photometricInterpretation) {
+        case "MONOCHROME1":
+            // ToDo
+            // Same as MONOCHROME2, but LUT must be changed in order to show inverse image
+        break;
+        
+        case "MONOCHROME2":
+            for(var i=sliceOffset; i < iMax; ++i)
+            {        
+                pxValue = parseInt( this.windowLut.getValue( this.buffer[i] ), 10 );    
+                array.data[4*i] = this.colorMap.red[pxValue];
+                array.data[4*i+1] = this.colorMap.green[pxValue];
+                array.data[4*i+2] = this.colorMap.blue[pxValue];
+                array.data[4*i+3] = 0xff;
+            }
+        break;
+        
+        case "RGB":
+            var posBuffer = 0;
+            for(var i=sliceOffset; i < iMax; ++i)
+            {        
+                array.data[4*i] = this.buffer[posBuffer++];
+                array.data[4*i+1] = this.buffer[posBuffer++];
+                array.data[4*i+2] = this.buffer[posBuffer++];
+                array.data[4*i+3] = 0xff;
+            }
+        break;
+    
     }
 };
 
