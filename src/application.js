@@ -229,11 +229,11 @@ dwv.App = function(mobile)
         var mainHeight = 0;
         if( mobile ) {
             mainWidth = $(window).width();
-            mainHeight = $(window).height() - 250;
+            mainHeight = $(window).height() - 125;
         }
         else {
-            mainWidth = $('#pageMain').width() - 350;
-            mainHeight = $('#pageMain').height() - 50;
+            mainWidth = $('#pageMain').width() - 360;
+            mainHeight = $('#pageMain').height() - 60;
         }
         displayZoom = Math.min( (mainWidth / dataWidth), (mainHeight / dataHeight) );
         $("#layerContainer").width(displayZoom*dataWidth);
@@ -368,7 +368,10 @@ dwv.App = function(mobile)
         }
         // tags HTML table
         var table = dwv.html.toTable(dataInfo);
-        table.className = "tagList";
+        table.id = "tagsTable";
+        table.className = "tagsList table-stripe";
+        table.setAttribute("data-role", "table");
+        table.setAttribute("data-mode", "columntoggle");
         // search form
         node.appendChild(dwv.html.getHtmlSearchForm(table));
         // tags table
