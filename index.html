@@ -6,8 +6,10 @@
 <link rel="stylesheet" href="css/style.css">
 <style>
 body { font-size: 80%; }
+#pageHeader h1 { display: inline-block; margin: 0; }
+#pageHeader #toolbar { display: inline-block; float: right; }
 #toolbox li:first-child { list-style-type: none; padding-bottom: 10px; margin-left: -20px; }
-#pageMain { height: 85%; width: 100%; margin-top: 10px; }
+#pageMain { height: 93%; width: 100%; margin-top: 10px; background-color: #333; }
 </style>
 <link rel="stylesheet" href="ext/jquery/ui/1.10.2/themes/ui-darkness/jquery-ui-1.10.2.min.css">
 <!-- Third party -->  
@@ -48,15 +50,15 @@ body { font-size: 80%; }
 
 <script type="text/javascript">
 
-function toggle(dialogName)
+function toggle(dialogId)
 {
-    if( $(dialogName).dialog('isOpen') )
+    if( $(dialogId).dialog('isOpen') )
     {
-        $(dialogName).dialog('close');
+        $(dialogId).dialog('close');
     }
     else
     {
-        $(dialogName).dialog('open');
+        $(dialogId).dialog('open');
     }
 }
 
@@ -65,8 +67,11 @@ var app = new dwv.App();
 
 // jquery
 $(document).ready(function(){
-    // create buttons and dialogs
+    // initialise buttons
     $("button").button();
+    $("#toggleInfoLayer").button({ icons: 
+        { primary: "ui-icon-comment" }, text: false });
+    // create dialogs
     $("#openData").dialog({ position: 
         {my: "left top", at: "left top", of: "#pageMain"} });
     $("#toolbox").dialog({ position: 
@@ -105,12 +110,15 @@ $(document).ready(function(){
 <!-- Title -->
 <h1>DICOM Web Viewer (<a href="https://github.com/ivmartel/dwv">dwv</a> v0.3b)</h1>
 
-<!-- Buttons -->
+<!-- Toolbar -->
+<div id="toolbar">
 <button onclick="toggle('#openData')">File</button>
 <button onclick="toggle('#toolbox')">Toolbox</button>
 <button onclick="toggle('#history')">History</button>
 <button onclick="toggle('#tags')">Tags</button>
 <button onclick="toggle('#layerDialog')">Image</button>
+<button onclick="dwv.html.toggleDisplay('infoLayer')" id="toggleInfoLayer">Info</button>
+ </div><!-- /toolbar -->
 
 </div><!-- /pageHeader -->
 
