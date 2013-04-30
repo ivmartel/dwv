@@ -44,6 +44,7 @@
     {
         if( flag === "dwvmobile" ) return "demo/mobile/index.m.html";
         else if( flag === "dwvstatic" ) return "demo/static/index.html";
+        else if( flag === "dwvtrunk" ) return "demo/trunk/index.html";
     }
     function getDwvUrl(uri)
     {
@@ -94,6 +95,7 @@
         <select id="select-dwv" data-inline="true" data-mini="true" onClick="setDwv(this);">
         <option value="dwvmobile">DWV Mobile</option>
         <option value="dwvstatic">DWV Static</option>
+        <option value="dwvtrunk">DWV Trunk</option>
         </select>
         </div>
 
