@@ -280,7 +280,7 @@ dwv.image.Image.prototype.generateImageData = function( array, sliceNumber )
     var iMax = sliceOffset + this.size.getSliceSize();
     var pxValue = 0;
     var photometricInterpretation = this.getPhotometricInterpretation();
-    switch (photometricInterpretation) {
+    switch (photometricInterpretation.toUpperCase()) {
         case "MONOCHROME1":
             // ToDo
             // Same as MONOCHROME2, but LUT must be changed in order to show inverse image
@@ -307,7 +307,9 @@ dwv.image.Image.prototype.generateImageData = function( array, sliceNumber )
                 array.data[4*i+3] = 0xff;
             }
         break;
-    
+        
+        default: 
+            throw new Error("Unsupported photometric interpretation: "+photometricInterpretation);
     }
 };
 
