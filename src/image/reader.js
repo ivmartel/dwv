@@ -22,7 +22,6 @@ dwv.image.getDataFromImage = function(image, file)
     var buffer = [];
     var r, g, b, value;
     var j = 0;
-    var startTime = new Date();
     var auxCoef = 255 / 16777216;
     for( var i = 0; i < imageData.data.length; i+=4 ) {
         r = imageData.data[i];
@@ -33,8 +32,6 @@ dwv.image.getDataFromImage = function(image, file)
         buffer[j] = value;
         ++j;
     }
-    var deltaTime = new Date() - startTime;
-    console.log('getDataFromImage: ' + deltaTime);
     // create dwv Image
     var imageSize = new dwv.image.ImageSize(image.width, image.height);
     // TODO: wrong info...
@@ -42,6 +39,8 @@ dwv.image.getDataFromImage = function(image, file)
     var dwvImage = new dwv.image.Image(imageSize, imageSpacing, buffer);
     dwvImage.setIdRescaleLut();
     dwvImage.setWindowLevelMinMax();
+    // TODO: use RGB...
+    dwvImage.setPhotometricInterpretation("MONOCHROME2");
     // properties
     var info = {};
     info["FileName"] = { "value": file.name };
