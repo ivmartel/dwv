@@ -447,12 +447,15 @@ dwv.dicom.DicomParser.prototype.getImage = function()
     // image
     var image = new dwv.image.Image( size, spacing, this.pixelBuffer );
     // photometricInterpretation
-    var photometricInterpretation = 'unhandled';
     if( this.dicomElements.PhotometricInterpretation ) {
-        photometricInterpretation = dwv.utils.cleanString(
-            this.dicomElements.PhotometricInterpretation.value[0]);
+        image.setPhotometricInterpretation( dwv.utils.cleanString(
+            this.dicomElements.PhotometricInterpretation.value[0]).toUpperCase() );
     }        
-    image.setPhotometricInterpretation(photometricInterpretation);
+    // planarConfiguration
+    if( this.dicomElements.PlanarConfiguration ) {
+        image.setPlanarConfiguration( 
+            this.dicomElements.PlanarConfiguration.value[0] );
+    }        
     // lookup
     var slope = 1;
     if( this.dicomElements.RescaleSlope ) {

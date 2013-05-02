@@ -73,8 +73,10 @@ dwv.image.Image = function(size, spacing, buffer)
     // buffer
     this.originalBuffer = buffer;
     this.buffer = buffer.slice();
-    // PhotometricInterpretation
+    // PhotometricInterpretation (MONOCHROME, RGB...)
     this.photometricInterpretation = null;
+    // PlanarConfiguration
+    this.planarConfiguration = null;
     // data range
     this.dataRange = undefined;
     // histogram
@@ -102,6 +104,11 @@ dwv.image.Image = function(size, spacing, buffer)
     // Get the photometricInterpretation of the image.
     this.getPhotometricInterpretation = function() {
         return self.photometricInterpretation;
+    };
+
+    // Get the planarConfiguration of the image.
+    this.getPlanarConfiguration = function() {
+        return self.planarConfiguration;
     };
 
     // Get the rescale LUT of the image.
@@ -163,12 +170,21 @@ dwv.image.Image.prototype.getValueAtOffset = function( offset )
 };
 
 /**
- * Set the value of PhotometricInterpretation
+ * Set the value of PhotometricInterpretation.
  * @param photometricInterpretation The PhotometricInterpretation value.
  */
 dwv.image.Image.prototype.setPhotometricInterpretation = function( photometricInterpretation )
 {
     this.photometricInterpretation = photometricInterpretation;
+};
+
+/**
+ * Set the value of PlanarConfiguration.
+ * @param planarConfiguration The PlanarConfiguration value.
+ */
+dwv.image.Image.prototype.setPlanarConfiguration = function( planarConfiguration )
+{
+    this.planarConfiguration = planarConfiguration;
 };
 
 /**
@@ -266,6 +282,8 @@ dwv.image.Image.prototype.clone = function()
     var copy = new dwv.image.Image(this.size, this.spacing, this.originalBuffer);
     copy.setRescaleLut(this.rescaleLut);
     copy.setWindowLut(this.windowLut);
+    copy.setPhotometricInterpretation(this.photometricInterpretation);
+    copy.setPlanarConfiguration(this.planarConfiguration);
     return copy;
 };
 
@@ -279,8 +297,7 @@ dwv.image.Image.prototype.generateImageData = function( array, sliceNumber )
     var sliceOffset = (sliceNumber || 0) * this.size.getSliceSize();
     var iMax = sliceOffset + this.size.getSliceSize();
     var pxValue = 0;
-    var photometricInterpretation = this.getPhotometricInterpretation();
-    switch (photometricInterpretation.toUpperCase()) {
+    switch (this.photometricInterpretation) {
         case "MONOCHROME1":
             // ToDo
             // Same as MONOCHROME2, but LUT must be changed in order to show inverse image
@@ -298,31 +315,30 @@ dwv.image.Image.prototype.generateImageData = function( array, sliceNumber )
         break;
         
         case "RGB":
-            // dummy code to force Planar Configuration = 1
-            // Please read and assign this value (0028, 0006) as any other Dicom Element
-            var planarConfiguration = 1;
-        
-            var posR, posG, posB, stepPos;
-            if (planarConfiguration == 1) { // RRRR...GGGG...BBBB...
-              posR = 0;
-              posG = iMax;
-              posB = 2 * iMax;
-              stepPos = 1;
+            // the planar configuration defines the memory layout
+            if( this.planarConfiguration !== 0 && this.planarConfiguration !== 1 ) {
+                throw new Error("Unsupported planar configuration: "+this.planarConfiguration);
             }
-            else { // RGBRGBRGBRGB...
-              posR = 0;
-              posG = 1;
-              posB = 2;
-              stepPos = 3;
+            // default: RGBRGBRGBRGB...
+            var posR = 0;
+            var posG = 1;
+            var posB = 2;
+            var stepPos = 3;
+            // RRRR...GGGG...BBBB...
+            if (this.planarConfiguration === 1) { 
+                posR = 0;
+                posG = iMax;
+                posB = 2 * iMax;
+                stepPos = 1;
             }
-
+            
             for(var i=sliceOffset; i < iMax; ++i)
             {        
                 array.data[4*i] = this.buffer[posR];
                 array.data[4*i+1] = this.buffer[posG];
                 array.data[4*i+2] = this.buffer[posB];
                 array.data[4*i+3] = 0xff;
-
+                
                 posR += stepPos;
                 posG += stepPos;
                 posB += stepPos;
