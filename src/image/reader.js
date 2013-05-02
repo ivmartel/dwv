@@ -18,19 +18,15 @@ dwv.image.getDataFromImage = function(image, file)
     ctx.drawImage(image, 0, 0, image.width, image.height);
     // get the image data
     var imageData = ctx.getImageData(0, 0, image.width, image.height);
-    // convert RGB data to pixel
+    // remove alpha
+    // TODO support passing the full image data
     var buffer = [];
-    var r, g, b, value;
     var j = 0;
-    var auxCoef = 255 / 16777216;
     for( var i = 0; i < imageData.data.length; i+=4 ) {
-        r = imageData.data[i];
-        g = imageData.data[i+1];
-        b = imageData.data[i+2];
-        value = 65536 * r + 256 * g + b;
-        value = Math.floor(value * auxCoef);
-        buffer[j] = value;
-        ++j;
+        buffer[j] = imageData.data[i];
+        buffer[j+1] = imageData.data[i+1];
+        buffer[j+2] = imageData.data[i+2];
+        j+=3;
     }
     // create dwv Image
     var imageSize = new dwv.image.ImageSize(image.width, image.height);
@@ -39,8 +35,8 @@ dwv.image.getDataFromImage = function(image, file)
     var dwvImage = new dwv.image.Image(imageSize, imageSpacing, buffer);
     dwvImage.setIdRescaleLut();
     dwvImage.setWindowLevelMinMax();
-    // TODO: use RGB...
-    dwvImage.setPhotometricInterpretation("MONOCHROME2");
+    dwvImage.setPhotometricInterpretation("RGB");
+    dwvImage.setPlanarConfiguration(0);
     // properties
     var info = {};
     info["FileName"] = { "value": file.name };
