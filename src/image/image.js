@@ -306,7 +306,7 @@ dwv.image.Image.prototype.generateImageData = function( array, sliceNumber )
         case "MONOCHROME2":
             for(var i=sliceOffset; i < iMax; ++i)
             {        
-                pxValue = parseInt( this.windowLut.getValue( this.buffer[i] ), 10 );    
+                pxValue = parseInt( this.windowLut.getValue( this.buffer[i] ), 10 );
                 array.data[4*i] = this.colorMap.red[pxValue];
                 array.data[4*i+1] = this.colorMap.green[pxValue];
                 array.data[4*i+2] = this.colorMap.blue[pxValue];
@@ -332,11 +332,18 @@ dwv.image.Image.prototype.generateImageData = function( array, sliceNumber )
                 stepPos = 1;
             }
             
+            var redValue = 0;
+            var greenValue = 0;
+            var blueValue = 0;
             for(var i=sliceOffset; i < iMax; ++i)
             {        
-                array.data[4*i] = this.buffer[posR];
-                array.data[4*i+1] = this.buffer[posG];
-                array.data[4*i+2] = this.buffer[posB];
+                redValue = parseInt( this.windowLut.getValue( this.buffer[posR] ), 10 );
+                greenValue = parseInt( this.windowLut.getValue( this.buffer[posG] ), 10 );
+                blueValue = parseInt( this.windowLut.getValue( this.buffer[posB] ), 10 );
+                
+                array.data[4*i] = redValue;
+                array.data[4*i+1] = greenValue;
+                array.data[4*i+2] = blueValue;
                 array.data[4*i+3] = 0xff;
                 
                 posR += stepPos;
