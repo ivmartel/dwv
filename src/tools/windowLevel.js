@@ -24,7 +24,7 @@ dwv.tool.showHUvalue = function(x,y)
     liy.appendChild(document.createTextNode("Y = "+y));
     ul.appendChild(liy);
     var lihu = document.createElement("li");
-    lihu.appendChild(document.createTextNode("HU = "+app.getImage().getValue(x,y)));
+    lihu.appendChild(document.createTextNode("v = "+app.getImage().getValue(x,y)));
     ul.appendChild(lihu);
     
     div.appendChild(ul);
