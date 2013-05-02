@@ -298,13 +298,34 @@ dwv.image.Image.prototype.generateImageData = function( array, sliceNumber )
         break;
         
         case "RGB":
-            var posBuffer = 0;
+            // dummy code to force Planar Configuration = 1
+            // Please read and assign this value (0028, 0006) as any other Dicom Element
+            var planarConfiguration = 1;
+        
+            var posR, posG, posB, stepPos;
+            if (planarConfiguration == 1) { // RRRR...GGGG...BBBB...
+              posR = 0;
+              posG = iMax;
+              posB = 2 * iMax;
+              stepPos = 1;
+            }
+            else { // RGBRGBRGBRGB...
+              posR = 0;
+              posG = 1;
+              posB = 2;
+              stepPos = 3;
+            }
+
             for(var i=sliceOffset; i < iMax; ++i)
             {        
-                array.data[4*i] = this.buffer[posBuffer++];
-                array.data[4*i+1] = this.buffer[posBuffer++];
-                array.data[4*i+2] = this.buffer[posBuffer++];
+                array.data[4*i] = this.buffer[posR];
+                array.data[4*i+1] = this.buffer[posG];
+                array.data[4*i+2] = this.buffer[posB];
                 array.data[4*i+3] = 0xff;
+
+                posR += stepPos;
+                posG += stepPos;
+                posB += stepPos;
             }
         break;
         
