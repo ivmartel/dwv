@@ -70,22 +70,37 @@ print([[<html>]])
 
 print([[<head>]])
 
-print([[<title>DICOM Web Viewer</title>
+print([[
+<title>DICOM Web Viewer</title>
 <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
 <link rel="stylesheet" href="/dwv/css/style.css">
 <style>
 body { font-size: 80%; }
+#pageHeader h1 { display: inline-block; margin: 0; }
+#pageHeader #toolbar { display: inline-block; float: right; }
 #toolbox li:first-child { list-style-type: none; padding-bottom: 10px; margin-left: -20px; }
-#pageMain { height: 85%; width: 100%; margin-top: 10px; }
+#pageMain { height: 93%; width: 100%; margin-top: 10px; background-color: #333; }
+#infotl { color: #333; text-shadow: 0 1px 0 #fff; }
+#infotr { color: #333; text-shadow: 0 1px 0 #fff; }
 </style>
-<link rel="stylesheet" href="ext/jquery/ui/1.10.2/themes/ui-darkness/jquery-ui-1.10.2.min.css">
+]])
 
-print([[<!-- Third party --> 
+-- path with extra /dwv
+print([[
+<link rel="stylesheet" href="/dwv/ext/jquery/ui/1.10.2/themes/ui-darkness/jquery-ui-1.10.2.min.css">
+]])
+
+-- path with extra /dwv
+print([[
+<!-- Third party --> 
 <script type="text/javascript" src="/dwv/ext/jquery/jquery-1.9.1.min.js"></script>
-<script type="text/javascript" src="ext/jquery/ui/1.10.2/jquery-ui-1.10.2.min.js"></script>
-<script type="text/javascript" src="/dwv/ext/flot/jquery.flot.min.js"></script>]])
+<script type="text/javascript" src="/dwv/ext/jquery/ui/1.10.2/jquery-ui-1.10.2.min.js"></script>
+<script type="text/javascript" src="/dwv/ext/flot/jquery.flot.min.js"></script>
+]])
 
-print([[<!-- Local -->
+-- path with extra /dwv
+print([[
+<!-- Local -->
 <script type="text/javascript" src="/dwv/src/dwv.js"></script>
 <script type="text/javascript" src="/dwv/src/application.js"></script>
 <script type="text/javascript" src="/dwv/src/dicom/dicomParser.js"></script>
@@ -102,9 +117,12 @@ print([[<!-- Local -->
 <script type="text/javascript" src="/dwv/src/math/shapes.js"></script>
 <script type="text/javascript" src="/dwv/src/math/bucketQueue.js"></script>
 <script type="text/javascript" src="/dwv/src/math/scissors.js"></script>
-<script type="text/javascript" src="/dwv/src/utils/string.js"></script>]])
+<script type="text/javascript" src="/dwv/src/utils/string.js"></script>
+]])
 
-print([[<!-- Tools: beware order is important... -->
+-- path with extra /dwv
+print([[
+<!-- Tools: beware order is important... -->
 <script type="text/javascript" src="/dwv/src/tools/toolbox.js"></script>
 <script type="text/javascript" src="/dwv/src/tools/windowLevel.js"></script>
 <script type="text/javascript" src="/dwv/src/tools/draw.js"></script>
@@ -115,9 +133,12 @@ print([[<!-- Tools: beware order is important... -->
 <script type="text/javascript" src="/dwv/src/tools/livewire.js"></script>
 <script type="text/javascript" src="/dwv/src/tools/zoom.js"></script>
 <script type="text/javascript" src="/dwv/src/tools/filter.js"></script>
-<script type="text/javascript" src="/dwv/src/tools/undo.js"></script>]])
+<script type="text/javascript" src="/dwv/src/tools/undo.js"></script>
+]])
 
-print([[<script type="text/javascript">
+print([[<script type="text/javascript">]])
+
+print([[
 function toggle(dialogName)
 {
     if( $(dialogName).dialog('isOpen') )
@@ -129,6 +150,10 @@ function toggle(dialogName)
         $(dialogName).dialog('open');
     }
 }
+]])
+
+-- custom method
+print([[
 function load()
 {
   app.loadURL(']]..webscriptadress..[[?requestType=WADO&contentType=application/dicom'+
@@ -136,6 +161,10 @@ function load()
     '&seriesUID=]]..seriesuid..[[' +
     '&objectUID=' + document.forms[0].slice.value);
 }
+]])
+
+-- custom method
+print([[
 function nextslice()
 {
   if (document.forms[0].slice.selectedIndex == document.forms[0].slice.length-1)
@@ -148,6 +177,10 @@ function nextslice()
   }
   load();
 }
+]])
+
+-- custom method
+print([[
 function previousslice()
 {
   if (document.forms[0].slice.selectedIndex == 0)
@@ -162,12 +195,19 @@ function previousslice()
 }
 ]])
 
-print([[// main application
+print([[
+// main application
 var app = new dwv.App();
+]])
+
+print([[
 // jquery
 $(document).ready(function(){
-    // create buttons and dialogs
+    // initialise buttons
     $("button").button();
+    $("#toggleInfoLayer").button({ icons: 
+        { primary: "ui-icon-comment" }, text: false });
+    // create dialogs
     $("#openData").dialog({ position: 
         {my: "left top", at: "left top", of: "#pageMain"} });
     $("#toolbox").dialog({ position: 
@@ -178,7 +218,9 @@ $(document).ready(function(){
     $("#tags").dialog({ position: 
         {my: "right top", at: "right top", of: "#pageMain"},
         autoOpen: false, width: 500, height: 590 });
-    
+]])
+   
+print([[
     // image dialog
     $("#layerDialog").dialog({ position: 
         {my: "left+320 top", at: "left top", of: "#pageMain"}});
@@ -192,54 +234,70 @@ $(document).ready(function(){
     app.init();
     // align layers when the window is resized
     window.onresize = app.resize;
-    // possible load from URL
-    var input = dwv.html.getUriParam("input"); 
-    if( input ) app.loadURL(decodeURIComponent(input));
+]])
+
+-- custom load
+print([[
+    // load wado URL
+    app.loadURL("]].. url ..[[");
 });
-</script>]])
+]])
 
+print([[</script>]])
 print([[</head>]])
-
 print([[<body>]])
 
 print([[<div id="pageHeader">]])
 
-print([[<!-- Title -->
-<h1>DICOM Web Viewer (<a href="https://github.com/ivmartel/dwv">dwv</a> v0.3b)</h1>
+print([[
+<!-- Title -->
+<h1>DICOM Web Viewer (<a href="https://github.com/ivmartel/dwv">dwv</a> v0.3)</h1>
 
-<!-- Buttons -->
+<!-- Toolbar -->
+<div id="toolbar">
 <button onclick="toggle('#openData')">File</button>
 <button onclick="toggle('#toolbox')">Toolbox</button>
 <button onclick="toggle('#history')">History</button>
 <button onclick="toggle('#tags')">Tags</button>
 <button onclick="toggle('#layerDialog')">Image</button>
+<button onclick="dwv.html.toggleDisplay('infoLayer')" id="toggleInfoLayer">Info</button>
+</div><!-- /toolbar -->
+]])
 
 print([[</div><!-- pageHeader -->]])
 
 print([[<div id="pageMain">]])
 
-print([[<!-- Open file -->
+print([[
+<!-- Open file -->
 <div id="openData" title="File">
 <form><p>
 Path: <input type="file" id="imagefiles" multiple />
 URL: <input type="url" id="imageurl" />
+]])
+
+-- custom slice chooser
+print([[
 <br>Slice: 
 <input type=button value='<' onclick=previousslice() />
-<select name=slice onchange=load()>]])
-
+<select name=slice onchange=load()>
+]])
 for i=1, #images do
   print('  <option value='..images[i].SOPInstanceUID..'>'..i..'</option>')
 end
-
-print([[</select>
+print([[
+</select>
 <input type=button value='>' onclick=nextslice() />
-</p></form>]])
+]])
+
+print([[</p></form>]])
 
 print([[<div id="progressbar"></div>]])
 
 print([[</div>]])
 
-print([[<!-- Toolbox -->
+print([[
+<!-- Toolbox -->
 <div id="toolbox" title="Toolbox">
 <ul id="toolList"></ul>
 </div>
@@ -248,9 +306,11 @@ print([[<!-- Toolbox -->
 <div id="history" title="History"></div>
 
 <!-- Tags -->
-<div id="tags" title="Tags" style="display:none;"></div>]])
+<div id="tags" title="Tags" style="display:none;"></div>
+]])
 
-print([[<!-- Layer Container -->
+print([[
+<!-- Layer Container -->
 <div id="layerDialog" title="Image">
 <div id="layerContainer">
 <canvas id="imageLayer">Only for HTML5 compatible browsers...</canvas>
@@ -263,7 +323,8 @@ print([[<!-- Layer Container -->
 <div id="infobr"><div id="plot"></div></div>
 </div><!-- /infoLayer -->
 </div><!-- /layerContainer -->
-</div><!-- /layerDialog -->]])
+</div><!-- /layerDialog -->
+]])
 
 print([[</div><!-- pageMain -->]])
 
