@@ -176,6 +176,7 @@ dwv.image.Image.prototype.getValueAtOffset = function( offset )
 dwv.image.Image.prototype.setPhotometricInterpretation = function( photometricInterpretation )
 {
     this.photometricInterpretation = photometricInterpretation;
+    if( photometricInterpretation === "MONOCHROME1") this.colorMap = dwv.image.lut.invPlain;
 };
 
 /**
@@ -299,10 +300,6 @@ dwv.image.Image.prototype.generateImageData = function( array, sliceNumber )
     var pxValue = 0;
     switch (this.photometricInterpretation) {
         case "MONOCHROME1":
-            // ToDo
-            // Same as MONOCHROME2, but LUT must be changed in order to show inverse image
-        break;
-        
         case "MONOCHROME2":
             for(var i=sliceOffset; i < iMax; ++i)
             {        
