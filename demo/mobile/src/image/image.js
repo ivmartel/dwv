@@ -73,6 +73,10 @@ dwv.image.Image = function(size, spacing, buffer)
     // buffer
     this.originalBuffer = buffer;
     this.buffer = buffer.slice();
+    // PhotometricInterpretation (MONOCHROME, RGB...)
+    this.photometricInterpretation = null;
+    // PlanarConfiguration
+    this.planarConfiguration = null;
     // data range
     this.dataRange = undefined;
     // histogram
@@ -95,6 +99,16 @@ dwv.image.Image = function(size, spacing, buffer)
     // Get the spacing of the image.
     this.getSpacing = function() {
         return self.spacing;
+    };
+
+    // Get the photometricInterpretation of the image.
+    this.getPhotometricInterpretation = function() {
+        return self.photometricInterpretation;
+    };
+
+    // Get the planarConfiguration of the image.
+    this.getPlanarConfiguration = function() {
+        return self.planarConfiguration;
     };
 
     // Get the rescale LUT of the image.
@@ -153,6 +167,25 @@ dwv.image.Image.prototype.getValue = function( i, j, k )
 dwv.image.Image.prototype.getValueAtOffset = function( offset )
 {
     return this.rescaleLut.getValue( this.buffer[offset] );
+};
+
+/**
+ * Set the value of PhotometricInterpretation.
+ * @param photometricInterpretation The PhotometricInterpretation value.
+ */
+dwv.image.Image.prototype.setPhotometricInterpretation = function( photometricInterpretation )
+{
+    this.photometricInterpretation = photometricInterpretation;
+    if( photometricInterpretation === "MONOCHROME1") this.colorMap = dwv.image.lut.invPlain;
+};
+
+/**
+ * Set the value of PlanarConfiguration.
+ * @param planarConfiguration The PlanarConfiguration value.
+ */
+dwv.image.Image.prototype.setPlanarConfiguration = function( planarConfiguration )
+{
+    this.planarConfiguration = planarConfiguration;
 };
 
 /**
@@ -250,6 +283,8 @@ dwv.image.Image.prototype.clone = function()
     var copy = new dwv.image.Image(this.size, this.spacing, this.originalBuffer);
     copy.setRescaleLut(this.rescaleLut);
     copy.setWindowLut(this.windowLut);
+    copy.setPhotometricInterpretation(this.photometricInterpretation);
+    copy.setPlanarConfiguration(this.planarConfiguration);
     return copy;
 };
 
@@ -263,13 +298,59 @@ dwv.image.Image.prototype.generateImageData = function( array, sliceNumber )
     var sliceOffset = (sliceNumber || 0) * this.size.getSliceSize();
     var iMax = sliceOffset + this.size.getSliceSize();
     var pxValue = 0;
-    for(var i=sliceOffset; i < iMax; ++i)
-    {        
-        pxValue = parseInt( this.windowLut.getValue( this.buffer[i] ), 10 );    
-        array.data[4*i] = this.colorMap.red[pxValue];
-        array.data[4*i+1] = this.colorMap.green[pxValue];
-        array.data[4*i+2] = this.colorMap.blue[pxValue];
-        array.data[4*i+3] = 0xff;
+    switch (this.photometricInterpretation) {
+        case "MONOCHROME1":
+        case "MONOCHROME2":
+            for(var i=sliceOffset; i < iMax; ++i)
+            {        
+                pxValue = parseInt( this.windowLut.getValue( this.buffer[i] ), 10 );
+                array.data[4*i] = this.colorMap.red[pxValue];
+                array.data[4*i+1] = this.colorMap.green[pxValue];
+                array.data[4*i+2] = this.colorMap.blue[pxValue];
+                array.data[4*i+3] = 0xff;
+            }
+        break;
+        
+        case "RGB":
+            // the planar configuration defines the memory layout
+            if( this.planarConfiguration !== 0 && this.planarConfiguration !== 1 ) {
+                throw new Error("Unsupported planar configuration: "+this.planarConfiguration);
+            }
+            // default: RGBRGBRGBRGB...
+            var posR = 0;
+            var posG = 1;
+            var posB = 2;
+            var stepPos = 3;
+            // RRRR...GGGG...BBBB...
+            if (this.planarConfiguration === 1) { 
+                posR = 0;
+                posG = iMax;
+                posB = 2 * iMax;
+                stepPos = 1;
+            }
+            
+            var redValue = 0;
+            var greenValue = 0;
+            var blueValue = 0;
+            for(var i=sliceOffset; i < iMax; ++i)
+            {        
+                redValue = parseInt( this.windowLut.getValue( this.buffer[posR] ), 10 );
+                greenValue = parseInt( this.windowLut.getValue( this.buffer[posG] ), 10 );
+                blueValue = parseInt( this.windowLut.getValue( this.buffer[posB] ), 10 );
+                
+                array.data[4*i] = redValue;
+                array.data[4*i+1] = greenValue;
+                array.data[4*i+2] = blueValue;
+                array.data[4*i+3] = 0xff;
+                
+                posR += stepPos;
+                posG += stepPos;
+                posB += stepPos;
+            }
+        break;
+        
+        default: 
+            throw new Error("Unsupported photometric interpretation: "+photometricInterpretation);
     }
 };
 

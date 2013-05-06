@@ -283,11 +283,7 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
         dataElement = this.readDataElement(metaReader, i, false);
         // check the transfer syntax
         if( dataElement.tag.name === "TransferSyntaxUID" ) {
-            var syntax = dataElement.data[0];
-            // get rid of ending zero-width space (u200B)
-            if( syntax[syntax.length-1] === String.fromCharCode("u200B") ) {
-                syntax = syntax.substring(0, syntax.length-1); 
-            }
+            var syntax = dwv.utils.cleanString(dataElement.data[0]);
             
             // Implicit VR - Little Endian
             if( syntax === "1.2.840.10008.1.2" ) {
@@ -450,6 +446,16 @@ dwv.dicom.DicomParser.prototype.getImage = function()
         columnSpacing, rowSpacing);
     // image
     var image = new dwv.image.Image( size, spacing, this.pixelBuffer );
+    // photometricInterpretation
+    if( this.dicomElements.PhotometricInterpretation ) {
+        image.setPhotometricInterpretation( dwv.utils.cleanString(
+            this.dicomElements.PhotometricInterpretation.value[0]).toUpperCase() );
+    }        
+    // planarConfiguration
+    if( this.dicomElements.PlanarConfiguration ) {
+        image.setPlanarConfiguration( 
+            this.dicomElements.PlanarConfiguration.value[0] );
+    }        
     // lookup
     var slope = 1;
     if( this.dicomElements.RescaleSlope ) {

@@ -2,9 +2,9 @@ Third Party: flot
 =================
 
 * Web: http://www.flotcharts.org/
-* Version: 0.7
-* Date: 03/2011
-* Download: [flot-0.7.zip](http://code.google.com/p/flot/downloads/detail?name=flot-0.7.zip)
+* Version: 0.8
+* Date: 10/04/2011
+* Download: [flot-0.8.zip](http://www.flotcharts.org/downloads/flot-0.8.0.zip)
 * License: [MIT](http://www.opensource.org/licenses/mit-license.php)
   (see [license.txt](/ivmartel/dwv/blob/master/ext/flot/license.txt)) 
 * Description: Flot is a pure Javascript plotting library for jQuery. 

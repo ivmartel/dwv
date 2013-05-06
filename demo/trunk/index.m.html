@@ -49,15 +49,6 @@
 <script type="text/javascript" src="src/tools/undo.js"></script>
 
 <script type="text/javascript">
-function toggleInfo()
-{
-    if( document.getElementById("infoLayer") )
-    {
-        var div = document.getElementById("infoLayer");
-        if( div.style.display === "none" ) div.style.display = '';
-        else div.style.display = "none";
-    }
-}
 
 // main application
 var app = new dwv.App(true);
@@ -78,42 +69,45 @@ $(document).ready(function(){
 
 <body>
 
+<!-- Main page -->
 <div data-role="page" id="main">
 
 <div id="pageHeader" data-role="header">
-<h1>DICOM Web Viewer (<a href="https://github.com/ivmartel/dwv">dwv</a> v0.3b)</h1>
+<h1>DICOM Web Viewer (<a href="https://github.com/ivmartel/dwv">dwv</a> v0.3)</h1>
 </div><!-- /header -->
 
-<div id="pageMain" data-role="content">   
+<div id="pageMain" data-role="content" style="padding:2px;">   
 
-<div class="ui-grid-a">
+<div id="toolbar"><p style="margin:0;">
 
-<!-- Open file -->
-<div class="ui-block-a">
-<form>
-<div data-role="fieldcontain">
-  <label for="imagefiles">Path:</label>
-  <input id="imagefiles" type="file" multiple data-clear-btn="true" data-mini="true"/>
-</div>
-<div data-role="fieldcontain">
-  <label for="imageurl">URL:</label>
-  <input id="imageurl" type="url" data-clear-btn="true" data-mini="true"/>
-</div>
-</form>
-</div>
+<a href="#popupOpen" data-role="button" data-mini="true" data-inline="true" 
+ data-icon="plus" data-iconpos="notext" 
+ data-rel="popup" data-position-to="window">Open</a>
 
-<div class="ui-block-b" style="text-align:right">
 <a href="#" data-role="button" data-mini="true" data-inline="true" 
  data-icon="back" data-iconpos="notext" onclick="app.getUndoStack().undo()">Undo</a>
 <a href="#" data-role="button" data-mini="true" data-inline="true" 
  data-icon="forward" data-iconpos="notext" onclick="app.getUndoStack().redo()">Redo</a>
 <a href="#" data-role="button" data-mini="true" data-inline="true" 
- data-icon="info" data-iconpos="notext" onclick="toggleInfo()">Info</a>
+ data-icon="info" data-iconpos="notext" onclick="dwv.html.toggleDisplay('infoLayer')">Info</a>
 <a href="#tags_page" data-role="button" data-mini="true" data-inline="true"
  data-icon="grid" data-iconpos="notext">Tags</a>
-</div>
 
-</div><!-- /grid-a -->
+</p></div><!-- /toolbar -->
+
+<!-- Open popup -->
+<div data-role="popup" id="popupOpen">
+<form>
+<div style="padding:10px 20px;">
+<h3>Open</h3>
+<label for="imagefiles">Path:</label>
+<input id="imagefiles" type="file" multiple data-clear-btn="true" data-mini="true"/>
+<label for="imageurl">URL:</label>
+<input id="imageurl" type="url" data-clear-btn="true" data-mini="true"/>
+</div>
+</form>
+</div>
+ 
 
 <!-- Layer Container -->
 <div id="layerContainer">
@@ -139,9 +133,10 @@ $(document).ready(function(){
 </div><!-- /navbar: main -->
 </div><!-- /footer -->
 
-</div><!-- /page -->
+</div><!-- /page main -->
 
 
+<!-- Tags page -->
 <div data-role="page" id="tags_page">
 
 <div data-role="header">
@@ -155,7 +150,7 @@ data-transition="slide" data-direction="reverse">Back</a>
 <div id="tags" title="Tags"></div>
 </div><!-- /content -->
 
-</div><!-- /page -->
+</div><!-- /page tags_page-->
 
 </body>
 </html>

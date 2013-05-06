@@ -12,24 +12,22 @@ dwv.tool = dwv.tool || {};
  */
 dwv.tool.showHUvalue = function(x,y)
 {
-    var context = app.getInfoLayer().getContext();
-    var style = new dwv.html.Style();
-    var border = 3;
-
-    // style
-    context.clearRect(0, 0, 150, 150);
-    context.fillStyle = style.getTextColor();
-    context.font = style.getFontStr();
-    context.textBaseline = "top";
-    context.textAlign = "left";
+    var div = document.getElementById("infotl");
+    dwv.html.removeNode("ulinfotl");
+    var ul = document.createElement("ul");
+    ul.id = "ulinfotl";
     
-    // text
-    context.fillText("X = "+x, border, border);
-    context.fillText("Y = "+y, border, border + style.getLineHeight());
-    context.fillText(
-            "HU = "+app.getImage().getValue(x,y), 
-            border, 
-            border + 2*style.getLineHeight());
+    var lix = document.createElement("li");
+    lix.appendChild(document.createTextNode("X = "+x));
+    ul.appendChild(lix);
+    var liy = document.createElement("li");
+    liy.appendChild(document.createTextNode("Y = "+y));
+    ul.appendChild(liy);
+    var lihu = document.createElement("li");
+    lihu.appendChild(document.createTextNode("v = "+app.getImage().getValue(x,y)));
+    ul.appendChild(lihu);
+    
+    div.appendChild(ul);
 };
 
 /**
@@ -37,38 +35,40 @@ dwv.tool.showHUvalue = function(x,y)
  */
 dwv.tool.showWindowingValue = function(windowCenter,windowWidth)
 {
-    var canvas = app.getInfoLayer().getCanvas();
-    var context = app.getInfoLayer().getContext();
-    var style = new dwv.html.Style();
-    var border = 3;
+    var div = document.getElementById("infotr");
+    dwv.html.removeNode("ulinfotr");
+    var ul = document.createElement("ul");
+    ul.id = "ulinfotr";
     
-    // style
-    context.clearRect(canvas.width-150, 0, canvas.width, 150);
-    context.fillStyle = style.getTextColor();
-    context.font = style.getFontStr();
-    context.textBaseline = "top";
-    context.textAlign = "right";
+    var liwc = document.createElement("li");
+    liwc.appendChild(document.createTextNode("WindowCenter = "+windowCenter));
+    ul.appendChild(liwc);
+    var liww = document.createElement("li");
+    liww.appendChild(document.createTextNode("WindowWidth = "+windowWidth));
+    ul.appendChild(liww);
     
-    // text
-    context.fillText("WindowCenter = "+windowCenter, canvas.width - border, border);
-    context.fillText("WindowWidth = "+windowWidth, canvas.width - border, border + style.getLineHeight());
+    div.appendChild(ul);
+};
+
+dwv.tool.showMiniColorMap = function(windowCenter,windowWidth)
+{    
+    // color map
+    var div = document.getElementById("infobr");
+    dwv.html.removeNode("canvasinfobr");
+    var canvas = document.createElement("canvas");
+    canvas.id = "canvasinfobr";
+    canvas.width = 98;
+    canvas.height = 10;
+    context = canvas.getContext('2d');
     
-    // append color map
     // fill in the image data
-    var colourMap = dwv.image.lut.plain;
+    var colourMap = app.getImage().getColorMap();
     var imageData = context.getImageData(0,0,canvas.width, canvas.height);
-    var height = 10;
-    var width = 100;
-    var margin = 1;
-    var iEnd = canvas.width - margin;
-    var iStart = iEnd - width;
-    var jEnd = canvas.height - margin;
-    var jStart = jEnd - height;
     
     var c = 0;
     var minInt = app.getImage().getDataRange().min;
     var range = app.getImage().getDataRange().max - minInt;
-    var incrC = range / width;
+    var incrC = range / canvas.width;
     var y = 0;
     
     var yMax = 255;
@@ -76,9 +76,9 @@ dwv.tool.showWindowingValue = function(windowCenter,windowWidth)
     var xMin = windowCenter - 0.5 - (windowWidth-1) / 2;
     var xMax = windowCenter - 0.5 + (windowWidth-1) / 2;    
     
-    for( var j=jStart; j<jEnd; ++j ) {
+    for( var j=0; j<canvas.height; ++j ) {
         c = minInt;
-        for( var i=iStart; i<iEnd; ++i ) {
+        for( var i=0; i<canvas.width; ++i ) {
             if( c <= xMin ) y = yMin;
             else if( c > xMax ) y = yMax;
             else {
@@ -86,7 +86,7 @@ dwv.tool.showWindowingValue = function(windowCenter,windowWidth)
                     * (yMax-yMin) + yMin;
                 y = parseInt(y,10);
             }
-            index = (i + j * imageData.width) * 4;
+            index = (i + j * canvas.width) * 4;
             imageData.data[index] = colourMap.red[y];
             imageData.data[index+1] = colourMap.green[y];
             imageData.data[index+2] = colourMap.blue[y];
@@ -97,7 +97,7 @@ dwv.tool.showWindowingValue = function(windowCenter,windowWidth)
     // put the image data in the context
     context.putImageData(imageData, 0, 0);
     
-
+    div.appendChild(canvas);
 };
 
 /**
@@ -107,6 +107,7 @@ dwv.tool.updateWindowingData = function(wc,ww)
 {
     app.getImage().setWindowLevel(wc,ww);
     dwv.tool.showWindowingValue(wc,ww);
+    dwv.tool.showMiniColorMap(wc,ww);
     dwv.tool.WindowLevel.prototype.updatePlot(wc,ww);
     app.generateAndDrawImage();
 };
@@ -180,6 +181,10 @@ dwv.tool.WindowLevel = function(app)
         }
     };
     
+    this.mouseout = function(ev){
+        self.mouseup(ev);
+    };
+
     this.touchstart = function(ev){
         self.mousedown(ev);
     };

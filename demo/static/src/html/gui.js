@@ -71,6 +71,9 @@ dwv.gui.appendWindowLevelHtml = function()
     wlLabel.appendChild(document.createTextNode("WL Preset: "));
     // colour map selector
     var cmSelector = dwv.html.createHtmlSelect("colourMapSelect",dwv.tool.colourMaps);
+    // special monochrome1 case
+    if( app.getImage().getPhotometricInterpretation() === "MONOCHROME1" )
+        cmSelector.options[1].defaultSelected = true;
     cmSelector.onchange = dwv.gui.onChangeColourMap;
     // colour map label
     var cmLabel = document.createElement("label");

@@ -190,7 +190,7 @@ dwv.html.Layer = function(name)
     /**
      * Display the layer.
      */
-    this.display = function(val)
+    this.setStyleDisplay = function(val)
     {
         if( val === true )
         {
