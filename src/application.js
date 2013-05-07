@@ -312,6 +312,7 @@ dwv.App = function(mobile)
                 // set handle event flag
                 handled = true;
             }
+            else if( event.type === "keydown" ) handled = true;
         }
             
         // Call the event handler of the tool.
