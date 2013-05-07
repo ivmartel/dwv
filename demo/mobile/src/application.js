@@ -267,7 +267,6 @@ dwv.App = function(mobile)
         if( mobile )
         {
             if( event.type === "touchstart"
-                || event.type === "touchend"
                 || event.type === "touchmove")
             {
                 event.preventDefault();
@@ -293,6 +292,7 @@ dwv.App = function(mobile)
                   handled = true;
                 }
             }
+            else if( event.type === "touchend" ) handled = true;
         }
         else
         {
@@ -312,6 +312,7 @@ dwv.App = function(mobile)
                 // set handle event flag
                 handled = true;
             }
+            else if( event.type === "keydown" ) handled = true;
         }
             
         // Call the event handler of the tool.
