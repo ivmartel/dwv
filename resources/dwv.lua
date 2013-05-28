@@ -251,7 +251,7 @@ print([[<div id="pageHeader">]])
 
 print([[
 <!-- Title -->
-<h1>DICOM Web Viewer (<a href="https://github.com/ivmartel/dwv">dwv</a> v0.3)</h1>
+<h1>DICOM Web Viewer (<a href="https://github.com/ivmartel/dwv">dwv</a> v0.4beta)</h1>
 
 <!-- Toolbar -->
 <div id="toolbar">
