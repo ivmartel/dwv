@@ -104,7 +104,7 @@ dwv.App = function(mobile)
                 var image = new Image();
                 image.src = event.target.result;
                 image.onload = function(e){
-                    // parse DICOM
+                    // parse image file
                     var data = dwv.image.getDataFromImage(image, files[0]);
                     // prepare display
                     postLoadInit(data);
@@ -120,7 +120,7 @@ dwv.App = function(mobile)
         {
             var reader = new FileReader();
     		reader.onload = function(event){
-    			// parse DICOM
+    			// parse DICOM file
     			var data = dwv.image.getDataFromDicomBuffer(event.target.result);
     			// prepare display
     			postLoadInit(data);
