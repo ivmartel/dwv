@@ -2,30 +2,32 @@
  * Tests for the 'dicom/dicomParser.js' file.
  */
 $(document).ready(function(){
-    test("Test DICOM parsing.", function() {
-        // timing
-        var startTime = new Date().getTime();
+    asyncTest("Test DICOM parsing.", 2, function() {
 
+        // Local file: forbidden...
         // parse the DICOM file
-        var myreader = new FileReader();
-        myreader.onload = ( function() {
-            return function(e) {
-                var reader = new dwv.dicom.DicomInputStreamReader();    
-                reader.readDicom(e.target.result);
-                var dicomBuffer = reader.getInputBuffer();
-                var dicomReader = reader.getReader();
-                var dicomParser = new dwv.dicom.DicomParser(dicomBuffer,dicomReader);
-                dicomParser.parseAll();
-            };
-        }()
-        );
-        /*var file = new File("cta.dcm");
-        myreader.readAsBinaryString(file);*/
+        /*var reader = new FileReader();
+        reader.onload = function(event) {
+            // parse DICOM file
+            var data = dwv.image.getDataFromDicomBuffer(event.target.result);
+        };
+        var file = new File("cta.dcm");
+        reader.readAsArrayBuffer(file);*/
         
-        // check timing
-        var endTime = new Date().getTime();
-        var time = endTime - startTime;
-        ok( time < 10000, "Parsing took too long.");
+        var request = new XMLHttpRequest();
+        var url = "http://x.babymri.org/?53320924&.dcm";
+        request.open('GET', url, true);
+        request.responseType = "arraybuffer"; 
+        request.onload = function(ev) {
+            // parse DICOM
+            var data = dwv.image.getDataFromDicomBuffer(request.response);
+            // check values
+            equal(data.info.Rows.value, 256, "Number of rows");
+            equal(data.info.Columns.value, 256, "Number of columns");
+            // start async test
+            start();
+        };
+        request.send(null);
     });
 
 });
