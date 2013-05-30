@@ -91,6 +91,9 @@ dwv.image.Image = function(size, spacing, buffer)
     // color map
     this.colorMap = dwv.image.lut.plain;
 
+    // image listeners
+    this.listeners = [];
+
     // Get the size of the image.
     this.getSize = function() {
         return self.size;
@@ -251,6 +254,7 @@ dwv.image.Image.prototype.setWindowLevel= function( center, width )
 {
     this.windowLut = new dwv.image.lut.Window(center, width, this.rescaleLut);
     this.windowLut.initialise();
+    this.fireEvent("wlchange");
 };
 
 /**
@@ -275,6 +279,15 @@ dwv.image.Image.prototype.setWindowLut = function( lut )
 };
 
 /**
+ * Set the listeners.
+ * @param listeners The list of listeners.
+ */
+dwv.image.Image.prototype.setListeners = function( list )
+{
+    this.listeners = list;
+};
+
+/**
  * Clone the image using all meta data and the original data buffer.
  * @returns A full copy of this {dwv.image.Image}.
  */
@@ -285,6 +298,7 @@ dwv.image.Image.prototype.clone = function()
     copy.setWindowLut(this.windowLut);
     copy.setPhotometricInterpretation(this.photometricInterpretation);
     copy.setPlanarConfiguration(this.planarConfiguration);
+    copy.setListeners(this.listeners);
     return copy;
 };
 
@@ -485,4 +499,50 @@ dwv.image.Image.prototype.compose = function(rhs, operator)
         newBuffer[i] = Math.floor( operator( this.buffer[i], rhs.getBuffer()[i] ) );
     }
     return newImage;
+};
+
+/**
+ * Add an event listener on the image.
+ * @param type The event type.
+ * @param listener The method associated with the provided event.
+ */
+dwv.image.Image.prototype.addEventListener = function(type, listener)
+{
+    if( !this.listeners[type] ) this.listeners[type] = [];
+    this.listeners[type].push(listener);
+};
+
+/**
+ * Remove an event listener on the image.
+ * @param type The event type.
+ * @param listener The method associated with the provided event.
+ */
+dwv.image.Image.prototype.removeEventListener = function(type, listener)
+{
+    if( !this.listeners[type] ) return;
+    for(var i=0; i < this.listeners[type].length; ++i)
+    {   
+        if( this.listeners[type][i] === listener )
+            delete this.listeners[type][i];
+    }
+};
+
+/**
+ * Fire an event: call all associated listeners.
+ * @param type The event type.
+ */
+dwv.image.Image.prototype.fireEvent = function(type)
+{
+    if( !this.listeners[type] ) return;
+    var event = { "type": type };
+    if( type === "wlchange" ) 
+    {
+        event.wc = this.getWindowLut().getCenter();
+        event.ww = this.getWindowLut().getWidth();
+    }
+    for(var i=0; i < this.listeners[type].length; ++i)
+    {   
+        this.listeners[type][i]( event );
+    }
+    
 };
