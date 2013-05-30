@@ -1,4 +1,100 @@
 /**
+ * @function
+ */
+dwv.showWindowingValue = function(event)
+{
+    var div = document.getElementById("infotr");
+    dwv.html.removeNode("ulinfotr");
+    var ul = document.createElement("ul");
+    ul.id = "ulinfotr";
+    
+    var liwc = document.createElement("li");
+    liwc.appendChild(document.createTextNode("WindowCenter = "+event.wc));
+    ul.appendChild(liwc);
+    var liww = document.createElement("li");
+    liww.appendChild(document.createTextNode("WindowWidth = "+event.ww));
+    ul.appendChild(liww);
+    
+    div.appendChild(ul);
+};
+
+dwv.showMiniColorMap = function(event)
+{    
+    var windowCenter = event.wc;
+    var windowWidth = event.ww;
+    
+    // color map
+    var div = document.getElementById("infobr");
+    dwv.html.removeNode("canvasinfobr");
+    var canvas = document.createElement("canvas");
+    canvas.id = "canvasinfobr";
+    canvas.width = 98;
+    canvas.height = 10;
+    context = canvas.getContext('2d');
+    
+    // fill in the image data
+    var colourMap = app.getImage().getColorMap();
+    var imageData = context.getImageData(0,0,canvas.width, canvas.height);
+    
+    var c = 0;
+    var minInt = app.getImage().getDataRange().min;
+    var range = app.getImage().getDataRange().max - minInt;
+    var incrC = range / canvas.width;
+    var y = 0;
+    
+    var yMax = 255;
+    var yMin = 0;
+    var xMin = windowCenter - 0.5 - (windowWidth-1) / 2;
+    var xMax = windowCenter - 0.5 + (windowWidth-1) / 2;    
+    
+    for( var j=0; j<canvas.height; ++j ) {
+        c = minInt;
+        for( var i=0; i<canvas.width; ++i ) {
+            if( c <= xMin ) y = yMin;
+            else if( c > xMax ) y = yMax;
+            else {
+                y = ( (c - (windowCenter-0.5) ) / (windowWidth-1) + 0.5 )
+                    * (yMax-yMin) + yMin;
+                y = parseInt(y,10);
+            }
+            index = (i + j * canvas.width) * 4;
+            imageData.data[index] = colourMap.red[y];
+            imageData.data[index+1] = colourMap.green[y];
+            imageData.data[index+2] = colourMap.blue[y];
+            imageData.data[index+3] = 0xff;
+            c += incrC;
+        }
+    }
+    // put the image data in the context
+    context.putImageData(imageData, 0, 0);
+    
+    div.appendChild(canvas);
+};
+
+dwv.updatePlot = function(event)
+{
+    var wc = event.wc;
+    var ww = event.ww;
+    
+    var half = parseInt( (ww-1) / 2, 10 );
+    var center = parseInt( (wc-0.5), 10 );
+    var min = center - half;
+    var max = center + half;
+    
+    var markings = [
+        { "color": "#faa", "lineWidth": 1, "xaxis": { "from": min, "to": min } },
+        { "color": "#aaf", "lineWidth": 1, "xaxis": { "from": max, "to": max } }
+    ];
+
+    $.plot($("#plot"), [ app.getImage().getHistogram() ], {
+        "bars": { "show": true },
+        "grid": { "markings": markings, "backgroundColor": null },
+        "xaxis": { "show": false },
+        "yaxis": { "show": false }
+    });
+};
+
+/**
 * @class App
 * Main application.
 */
@@ -391,7 +487,7 @@ dwv.App = function(mobile)
         // store image
         originalImage = data.image;
         image = originalImage;
-
+        
         // layout
         dataWidth = image.getSize().getNumberOfColumns();
         dataHeight = image.getSize().getNumberOfRows();
@@ -401,26 +497,31 @@ dwv.App = function(mobile)
         imageData = self.getImageLayer().getContext().createImageData( 
                 dataWidth, dataHeight);
 
+        // mouse listeners
+        tempLayer.getCanvas().addEventListener("mousedown", eventHandler, false);
+        tempLayer.getCanvas().addEventListener("mousemove", eventHandler, false);
+        tempLayer.getCanvas().addEventListener("mouseup", eventHandler, false);
+        tempLayer.getCanvas().addEventListener("mouseout", eventHandler, false);
+        tempLayer.getCanvas().addEventListener("mousewheel", eventHandler, false);
+        tempLayer.getCanvas().addEventListener("DOMMouseScroll", eventHandler, false);
+        tempLayer.getCanvas().addEventListener("dblclick", eventHandler, false);
+        // touch listeners
+        tempLayer.getCanvas().addEventListener("touchstart", eventHandler, false);
+        tempLayer.getCanvas().addEventListener("touchmove", eventHandler, false);
+        tempLayer.getCanvas().addEventListener("touchend", eventHandler, false);
+        // keydown listener
+        window.addEventListener("keydown", eventHandler, true);
+        // image listeners
+        image.addEventListener("wlchange", dwv.showWindowingValue);
+        image.addEventListener("wlchange", dwv.showMiniColorMap);
+        image.addEventListener("wlchange", dwv.updatePlot);
+        
         // initialise the toolbox
         // note: the window/level tool is responsible for doing the first display.
         toolBox.enable(true);
         // add the HTML for the history 
         dwv.gui.appendUndoHtml();
 
-        // Attach event listeners.
-        tempLayer.getCanvas().addEventListener('mousedown', eventHandler, false);
-        tempLayer.getCanvas().addEventListener('mousemove', eventHandler, false);
-        tempLayer.getCanvas().addEventListener('mouseup', eventHandler, false);
-        tempLayer.getCanvas().addEventListener('mouseout', eventHandler, false);
-        tempLayer.getCanvas().addEventListener('mousewheel', eventHandler, false);
-        tempLayer.getCanvas().addEventListener('touchstart', eventHandler, false);
-        tempLayer.getCanvas().addEventListener('touchmove', eventHandler, false);
-        tempLayer.getCanvas().addEventListener('touchend', eventHandler, false);
-        tempLayer.getCanvas().addEventListener('DOMMouseScroll', eventHandler, false);
-        tempLayer.getCanvas().addEventListener('dblclick', eventHandler, false);
-
-        // Keydown listener
-        window.addEventListener('keydown', eventHandler, true);
     }
     
 };

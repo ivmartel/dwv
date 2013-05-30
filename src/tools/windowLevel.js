@@ -33,82 +33,9 @@ dwv.tool.showHUvalue = function(x,y)
 /**
  * @function
  */
-dwv.tool.showWindowingValue = function(windowCenter,windowWidth)
-{
-    var div = document.getElementById("infotr");
-    dwv.html.removeNode("ulinfotr");
-    var ul = document.createElement("ul");
-    ul.id = "ulinfotr";
-    
-    var liwc = document.createElement("li");
-    liwc.appendChild(document.createTextNode("WindowCenter = "+windowCenter));
-    ul.appendChild(liwc);
-    var liww = document.createElement("li");
-    liww.appendChild(document.createTextNode("WindowWidth = "+windowWidth));
-    ul.appendChild(liww);
-    
-    div.appendChild(ul);
-};
-
-dwv.tool.showMiniColorMap = function(windowCenter,windowWidth)
-{    
-    // color map
-    var div = document.getElementById("infobr");
-    dwv.html.removeNode("canvasinfobr");
-    var canvas = document.createElement("canvas");
-    canvas.id = "canvasinfobr";
-    canvas.width = 98;
-    canvas.height = 10;
-    context = canvas.getContext('2d');
-    
-    // fill in the image data
-    var colourMap = app.getImage().getColorMap();
-    var imageData = context.getImageData(0,0,canvas.width, canvas.height);
-    
-    var c = 0;
-    var minInt = app.getImage().getDataRange().min;
-    var range = app.getImage().getDataRange().max - minInt;
-    var incrC = range / canvas.width;
-    var y = 0;
-    
-    var yMax = 255;
-    var yMin = 0;
-    var xMin = windowCenter - 0.5 - (windowWidth-1) / 2;
-    var xMax = windowCenter - 0.5 + (windowWidth-1) / 2;    
-    
-    for( var j=0; j<canvas.height; ++j ) {
-        c = minInt;
-        for( var i=0; i<canvas.width; ++i ) {
-            if( c <= xMin ) y = yMin;
-            else if( c > xMax ) y = yMax;
-            else {
-                y = ( (c - (windowCenter-0.5) ) / (windowWidth-1) + 0.5 )
-                    * (yMax-yMin) + yMin;
-                y = parseInt(y,10);
-            }
-            index = (i + j * canvas.width) * 4;
-            imageData.data[index] = colourMap.red[y];
-            imageData.data[index+1] = colourMap.green[y];
-            imageData.data[index+2] = colourMap.blue[y];
-            imageData.data[index+3] = 0xff;
-            c += incrC;
-        }
-    }
-    // put the image data in the context
-    context.putImageData(imageData, 0, 0);
-    
-    div.appendChild(canvas);
-};
-
-/**
- * @function
- */
 dwv.tool.updateWindowingData = function(wc,ww)
 {
     app.getImage().setWindowLevel(wc,ww);
-    dwv.tool.showWindowingValue(wc,ww);
-    dwv.tool.showMiniColorMap(wc,ww);
-    dwv.tool.WindowLevel.prototype.updatePlot(wc,ww);
     app.generateAndDrawImage();
 };
 
@@ -277,26 +204,6 @@ dwv.tool.WindowLevel.prototype.setColourMap = function(name)
     }
     // enable it
     dwv.tool.updateColourMap( dwv.tool.colourMaps[name] );
-};
-
-dwv.tool.WindowLevel.prototype.updatePlot = function(wc,ww)
-{
-    var half = parseInt( (ww-1) / 2, 10 );
-    var center = parseInt( (wc-0.5), 10 );
-    var min = center - half;
-    var max = center + half;
-    
-    var markings = [
-        { "color": "#faa", "lineWidth": 1, "xaxis": { "from": min, "to": min } },
-        { "color": "#aaf", "lineWidth": 1, "xaxis": { "from": max, "to": max } }
-    ];
-
-    $.plot($("#plot"), [ app.getImage().getHistogram() ], {
-        "bars": { "show": true },
-        "grid": { "markings": markings, "backgroundColor": null },
-        "xaxis": { "show": false },
-        "yaxis": { "show": false }
-    });
 };
 
 // Add the tool to the list
