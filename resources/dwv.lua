@@ -125,6 +125,7 @@ print([[
 <!-- Tools: beware order is important... -->
 <script type="text/javascript" src="/dwv/src/tools/toolbox.js"></script>
 <script type="text/javascript" src="/dwv/src/tools/windowLevel.js"></script>
+<script type="text/javascript" src="/dwv/src/tools/info.js"></script>
 <script type="text/javascript" src="/dwv/src/tools/draw.js"></script>
 <script type="text/javascript" src="/dwv/src/tools/line.js"></script>
 <script type="text/javascript" src="/dwv/src/tools/rectangle.js"></script>
