@@ -23,6 +23,9 @@ dwv.App = function(mobile)
     // Temporary layer
     var tempLayer = null;
     
+    // flag to know if the info layer is listening on the image.
+    var isInfoLayerListening = true;
+    
     // Tool box
     var toolBox = new dwv.tool.ToolBox(this);
     // UndoStack
@@ -247,6 +250,28 @@ dwv.App = function(mobile)
     {
         if( imageLayer ) imageLayer.zoom(zoomX,zoomY,cx,cy);
         if( drawLayer ) drawLayer.zoom(zoomX,zoomY,cx,cy);
+    };
+    
+    /**
+     * Toggle the display of the info layer.
+     */
+    this.toggleInfoLayerDisplay = function()
+    {
+        // toggle html
+        dwv.html.toggleDisplay('infoLayer');
+        // toggle listeners
+        if( isInfoLayerListening ) {
+            image.removeEventListener("wlchange", dwv.info.updateWindowingValue);
+            image.removeEventListener("wlchange", dwv.info.updateMiniColorMap);
+            image.removeEventListener("wlchange", dwv.info.updatePlotMarkings);
+            isInfoLayerListening = false;
+        }
+        else {
+            image.addEventListener("wlchange", dwv.info.updateWindowingValue);
+            image.addEventListener("wlchange", dwv.info.updateMiniColorMap);
+            image.addEventListener("wlchange", dwv.info.updatePlotMarkings);
+            isInfoLayerListening = true;
+        }
     };
     
     // Private Methods

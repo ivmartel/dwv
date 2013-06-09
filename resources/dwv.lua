@@ -261,7 +261,7 @@ print([[
 <button onclick="toggle('#history')">History</button>
 <button onclick="toggle('#tags')">Tags</button>
 <button onclick="toggle('#layerDialog')">Image</button>
-<button onclick="dwv.html.toggleDisplay('infoLayer')" id="toggleInfoLayer">Info</button>
+<button onclick="app.toggleInfoLayerDisplay()">Info</button>
 </div><!-- /toolbar -->
 ]])
 

@@ -92,7 +92,7 @@ dwv.image.Image = function(size, spacing, buffer)
     this.colorMap = dwv.image.lut.plain;
 
     // image listeners
-    this.listeners = [];
+    this.listeners = {};
 
     // Get the size of the image.
     this.getSize = function() {
@@ -254,7 +254,9 @@ dwv.image.Image.prototype.setWindowLevel= function( center, width )
 {
     this.windowLut = new dwv.image.lut.Window(center, width, this.rescaleLut);
     this.windowLut.initialise();
-    this.fireEvent("wlchange");
+    this.fireEvent({"type": "wlchange", 
+        "wc": this.getWindowLut().getCenter(),
+        "ww": this.getWindowLut().getWidth() });
 };
 
 /**
@@ -504,7 +506,7 @@ dwv.image.Image.prototype.compose = function(rhs, operator)
 /**
  * Add an event listener on the image.
  * @param type The event type.
- * @param listener The method associated with the provided event.
+ * @param listener The method associated with the provided event type.
  */
 dwv.image.Image.prototype.addEventListener = function(type, listener)
 {
@@ -515,7 +517,7 @@ dwv.image.Image.prototype.addEventListener = function(type, listener)
 /**
  * Remove an event listener on the image.
  * @param type The event type.
- * @param listener The method associated with the provided event.
+ * @param listener The method associated with the provided event type.
  */
 dwv.image.Image.prototype.removeEventListener = function(type, listener)
 {
@@ -523,26 +525,19 @@ dwv.image.Image.prototype.removeEventListener = function(type, listener)
     for(var i=0; i < this.listeners[type].length; ++i)
     {   
         if( this.listeners[type][i] === listener )
-            delete this.listeners[type][i];
+            this.listeners[type].splice(i,1);
     }
 };
 
 /**
  * Fire an event: call all associated listeners.
- * @param type The event type.
+ * @param event The event to fire.
  */
-dwv.image.Image.prototype.fireEvent = function(type)
+dwv.image.Image.prototype.fireEvent = function(event)
 {
-    if( !this.listeners[type] ) return;
-    var event = { "type": type };
-    if( type === "wlchange" ) 
-    {
-        event.wc = this.getWindowLut().getCenter();
-        event.ww = this.getWindowLut().getWidth();
-    }
-    for(var i=0; i < this.listeners[type].length; ++i)
+    if( !this.listeners[event.type] ) return;
+    for(var i=0; i < this.listeners[event.type].length; ++i)
     {   
-        this.listeners[type][i]( event );
+        this.listeners[event.type][i]( event );
     }
-    
 };
