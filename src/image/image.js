@@ -10,33 +10,32 @@ dwv.image = dwv.image || {};
 * @param numberOfRows The number of rows (number).
 * @param numberOfSlices The number of slices (number).
 */
-dwv.image.ImageSize = function( numberOfColumns, numberOfRows, numberOfSlices ) {
-    return {
-        getNumberOfColumns: function() {
-            return numberOfColumns;
-        },
-        getNumberOfRows: function() {
-            return numberOfRows;
-        },
-        getNumberOfSlices: function() {
-            return (numberOfSlices || 1);
-        },
-        getSliceSize: function() {
-            return numberOfColumns*numberOfRows;
-        },
-        checkCoordinates: function( i, j, k ) {
-            if( i < 0 || i >= this.getNumberOfColumns() ) {
-                throw new Error('Index (i) out of range.');
-            }
-            else if( j < 0 || j >= this.getNumberOfRows() ) {
-                throw new Error('Index (j) out of range.');
-            }
-            else if( k < 0 || k >= this.getNumberOfSlices() ) {
-                throw new Error('Index (k) out of range.');
-            }
-            return true;
-        }
-    };
+dwv.image.Size = function( numberOfColumns, numberOfRows, numberOfSlices )
+{
+    // Get the number of columns.
+    this.getNumberOfColumns = function() { return numberOfColumns; };
+    // Get the number of rows.
+    this.getNumberOfRows = function() { return numberOfRows; };
+    // Get the number of slices.
+    this.getNumberOfSlices = function() { return (numberOfSlices || 1.0); };
+};
+
+// Get the size of a slice.
+dwv.image.Size.prototype.getSliceSize = function() {
+    return this.getNumberOfColumns()*this.getNumberOfRows();
+};
+
+// Get the total size.
+dwv.image.Size.prototype.getTotalSize = function() {
+    return this.getSliceSize()*this.getNumberOfSlices();
+};
+
+// Check that coordinates are within bounds.
+dwv.image.Size.prototype.checkCoordinates = function( i, j, k ) {
+    if( i < 0 || i >= this.getNumberOfColumns() ) throw new Error('Index (i) out of range.');
+    else if( j < 0 || j >= this.getNumberOfRows() ) throw new Error('Index (j) out of range.');
+    else if( k < 0 || k >= this.getNumberOfSlices() ) throw new Error('Index (k) out of range.');
+    return true;
 };
 
 /**
@@ -46,104 +45,90 @@ dwv.image.ImageSize = function( numberOfColumns, numberOfRows, numberOfSlices ) 
 * @param rowSpacing The row spacing (number).
 * @param sliceSpacing The slice spacing (number).
 */
-dwv.image.ImageSpacing = function( columnSpacing, rowSpacing, sliceSpacing ) {
-    return {
-        getColumnSpacing: function() {
-            return columnSpacing;
-        },
-        getRowSpacing: function() {
-            return rowSpacing;
-        },
-        getSliceSpacing: function() {
-            return (sliceSpacing || 1);
-        }
-    };
+dwv.image.Spacing = function( columnSpacing, rowSpacing, sliceSpacing )
+{
+    // Get the column spacing.
+    this.getColumnSpacing = function() { return columnSpacing; };
+    // Get the row spacing.
+    this.getRowSpacing = function() { return rowSpacing; };
+    // Get the slice spacing.
+    this.getSliceSpacing = function() { return (sliceSpacing || 1.0); };
 };
 
 /**
 * @class Image class.
+* @param size The sizes of the image.
+* @param spacing The spacings of the image.
+* @param _buffer The image data.
+* Usable once created, optional are:
+* - rescale slope and intercept (default 1:0), 
+* - photometric interpretation (default MONOCHROME2),
+* - planar configuration (default RGBRGB...).
 */
 dwv.image.Image = function(size, spacing, buffer)
 {
-    var self = this;
-    // ImageSize
-    this.size = size;
-    // ImageSpacing
-    this.spacing = spacing;
-    // buffer
-    this.originalBuffer = buffer;
-    this.buffer = buffer.slice();
-    // PhotometricInterpretation (MONOCHROME, RGB...)
-    this.photometricInterpretation = null;
-    // PlanarConfiguration
-    this.planarConfiguration = null;
+    // Rescale slope.
+    var rescaleSlope = 1;
+    // Rescale intercept.
+    var rescaleIntercept = 0;
+    // Photometric interpretation (MONOCHROME, RGB...)
+    var photometricInterpretation = "MONOCHROME2";
+    // Planar configuration for RGB data (0:RGBRGBRGBRGB... or 1:RRR...GGG...BBB...)
+    var planarConfiguration = 0;
+    
     // data range
-    this.dataRange = undefined;
+    var dataRange = undefined;
     // histogram
-    this.histoPlot = undefined;
-    
-    // rescale lookup table
-    this.rescaleLut = null;
-    // window lookup table
-    this.windowLut = null;
-    // window presets
-    this.windowPresets = null;
-    // color map
-    this.colorMap = dwv.image.lut.plain;
-
-    // image listeners
-    this.listeners = {};
-
+    var histogram = undefined;
+     
     // Get the size of the image.
-    this.getSize = function() {
-        return self.size;
-    };
-
+    this.getSize = function() { return size; };
     // Get the spacing of the image.
-    this.getSpacing = function() {
-        return self.spacing;
-    };
-
-    // Get the photometricInterpretation of the image.
-    this.getPhotometricInterpretation = function() {
-        return self.photometricInterpretation;
-    };
-
-    // Get the planarConfiguration of the image.
-    this.getPlanarConfiguration = function() {
-        return self.planarConfiguration;
-    };
-
-    // Get the rescale LUT of the image.
-    this.getRescaleLut = function() {
-        return self.rescaleLut;
-    };
-
-    // Get the window LUT of the image.
-    this.getWindowLut = function() {
-        return self.windowLut;
-    };
-
-    // Get the window presets of the image.
-    this.getWindowPresets = function() {
-        return self.windowPresets;
-    };
-
-    // Get the color map of the image.
-    this.getColorMap = function() {
-        return self.colorMap;
-    };
-
-    // Restore the original buffer data.
-    this.restoreOrginalBuffer = function() {
-        this.buffer = this.originalBuffer.slice();
-    };
-    
+    this.getSpacing = function() { return spacing; };
     // Get the data buffer of the image.
-    this.getBuffer = function() {
-        return self.buffer;
-    };
+    this.getBuffer = function() { return buffer; };
     
+    // Get the rescale slope.
+    this.getRescaleSlope = function() { return rescaleSlope; };
+    // Set the rescale slope.
+    this.setRescaleSlope = function(val) { rescaleSlope = val; };
+    // Get the rescale intercept.
+    this.getRescaleIntercept = function() { return rescaleIntercept; };
+    // Set the rescale intercept.
+    this.setRescaleIntercept = function(val) { rescaleIntercept = val; };
+    // Get the photometricInterpretation of the image.
+    this.getPhotometricInterpretation = function() { return photometricInterpretation; };
+    // Set the photometricInterpretation of the image.
+    this.setPhotometricInterpretation = function(interp) { photometricInterpretation = interp; };
+    // Get the planarConfiguration of the image.
+    this.getPlanarConfiguration = function() { return planarConfiguration; };
+    // Set the planarConfiguration of the image.
+    this.setPlanarConfiguration = function(config) { planarConfiguration = config; };
+
+    // Get value at offset. Warning: No size check...
+    this.getValueAtOffset = function(offset) {
+    	return buffer[offset];
+    };
+    // Clone the image.
+    this.clone = function()
+    {
+        var copy = new dwv.image.Image(this.getSize(), this.getSpacing(), buffer);
+        copy.setRescaleSlope(this.getRescaleSlope());
+        copy.setRescaleIntercept(this.getRescaleIntercept());
+        copy.setPhotometricInterpretation(this.getPhotometricInterpretation());
+        copy.setPlanarConfiguration(this.getPlanarConfiguration());
+        return copy;
+    };
+    // Get the data range.
+    this.getDataRange = function() { 
+        if( !dataRange ) dataRange = this.calculateDataRange();
+        return dataRange;
+    };
+    // Get the histogram.
+    this.getHistogram = function() { 
+        if( !histogram ) histogram = this.calculateHistogram();
+        return histogram;
+    };
 };
 
 /**
@@ -152,6 +137,7 @@ dwv.image.Image = function(size, spacing, buffer)
  * @param j The Y index.
  * @param k The Z index.
  * @returns The value at the desired position.
+ * Warning: No size check...
  */
 dwv.image.Image.prototype.getValue = function( i, j, k )
 {
@@ -159,266 +145,75 @@ dwv.image.Image.prototype.getValue = function( i, j, k )
     // check size
     //this.size.checkCoordinates( i, j, k1 );
     // return
-    return this.getValueAtOffset( i + ( j * this.size.getNumberOfColumns() ) + ( k1 * this.size.getSliceSize()) );
+    return this.getValueAtOffset( i 
+            + ( j * this.getSize().getNumberOfColumns() ) 
+            + ( k1 * this.getSize().getSliceSize()) );
 };
 
 /**
  * Get the value of the image at a specific offset.
  * @param offset The offset in the buffer. 
  * @returns The value at the desired offset.
+ * Warning: No size check...
  */
-dwv.image.Image.prototype.getValueAtOffset = function( offset )
+dwv.image.Image.prototype.getRescaledValueAtOffset = function( offset )
 {
-    return this.rescaleLut.getValue( this.buffer[offset] );
+    return (this.getValueAtOffset(offset)*this.getRescaleSlope())+this.getRescaleIntercept();
 };
 
 /**
- * Set the value of PhotometricInterpretation.
- * @param photometricInterpretation The PhotometricInterpretation value.
+ * Get the value of the image at a specific coordinate.
+ * @param i The X index.
+ * @param j The Y index.
+ * @param k The Z index.
+ * @returns The value at the desired position.
+ * Warning: No size check...
  */
-dwv.image.Image.prototype.setPhotometricInterpretation = function( photometricInterpretation )
+dwv.image.Image.prototype.getRescaledValue = function( i, j, k )
 {
-    this.photometricInterpretation = photometricInterpretation;
-    if( photometricInterpretation === "MONOCHROME1") this.colorMap = dwv.image.lut.invPlain;
+    return (this.getValue(i,j,k)*this.getRescaleSlope())+this.getRescaleIntercept();
 };
 
 /**
- * Set the value of PlanarConfiguration.
- * @param planarConfiguration The PlanarConfiguration value.
- */
-dwv.image.Image.prototype.setPlanarConfiguration = function( planarConfiguration )
-{
-    this.planarConfiguration = planarConfiguration;
-};
-
-/**
- * Set the color map.
- * @param map The color map.
- */
-dwv.image.Image.prototype.setColourMap = function( map )
-{
-    this.colorMap = map;
-};
-
-/**
- * Set the rescale slope and intercept.
- * @param slope The rescale slope.
- * @param intercept The rescale intercept.
- */
-dwv.image.Image.prototype.setRescaleSlopeAndIntercept = function( slope, intercept )
-{
-    this.rescaleLut = new dwv.image.lut.Rescale(slope, intercept);
-    this.rescaleLut.initialise();
-};
-
-/**
- * Set the rescale lookup table (already initialised).
- * @param lut The rescale lookup table.
- */
-dwv.image.Image.prototype.setRescaleLut = function( lut )
-{
-    this.rescaleLut = lut;
-};
-
-/**
- * Set the rescale lookup table to an identity one.
- */
-dwv.image.Image.prototype.setIdRescaleLut = function()
-{
-    this.rescaleLut = new dwv.image.lut.Rescale();
-    this.rescaleLut.initialise();
-};
-
-/**
- * Set the image window/level to cover the full data range.
- * @warning Uses the latest set rescale LUT or the default linear one.
- */
-dwv.image.Image.prototype.setWindowLevelMinMax= function()
-{
-    var range = this.getDataRange();
-    var min = range.min;
-    var max = range.max;
-    var width = max - min;
-    var center = min + width/2;
-    this.windowLut = new dwv.image.lut.Window(center, width, this.rescaleLut);
-    this.windowLut.initialise();
-};
-
-/**
- * Set the image window/level.
- * @param center The window center.
- * @param width The window width.
- * @warning Uses the latest set rescale LUT or the default linear one.
- */
-dwv.image.Image.prototype.setWindowLevel= function( center, width )
-{
-    this.windowLut = new dwv.image.lut.Window(center, width, this.rescaleLut);
-    this.windowLut.initialise();
-    this.fireEvent({"type": "wlchange", 
-        "wc": this.getWindowLut().getCenter(),
-        "ww": this.getWindowLut().getWidth() });
-};
-
-/**
- * Set the image window presets and select the first one.
- * @param presets The window presets.
- * @warning Uses the latest set rescale LUT or the default linear one.
- */
-dwv.image.Image.prototype.setWindowPresets= function( presets )
-{
-    this.windowPresets = presets;
-    this.windowLut = new dwv.image.lut.Window(presets[0].center, presets[0].width, this.rescaleLut);
-    this.windowLut.initialise();
-};
-
-/**
- * Set the window lookup table (already initialised).
- * @param lut The window lookup table.
- */
-dwv.image.Image.prototype.setWindowLut = function( lut )
-{
-    this.windowLut = lut;
-};
-
-/**
- * Set the listeners.
- * @param listeners The list of listeners.
- */
-dwv.image.Image.prototype.setListeners = function( list )
-{
-    this.listeners = list;
-};
-
-/**
- * Clone the image using all meta data and the original data buffer.
- * @returns A full copy of this {dwv.image.Image}.
- */
-dwv.image.Image.prototype.clone = function()
-{
-    var copy = new dwv.image.Image(this.size, this.spacing, this.originalBuffer);
-    copy.setRescaleLut(this.rescaleLut);
-    copy.setWindowLut(this.windowLut);
-    copy.setPhotometricInterpretation(this.photometricInterpretation);
-    copy.setPlanarConfiguration(this.planarConfiguration);
-    copy.setListeners(this.listeners);
-    return copy;
-};
-
-/**
- * Generate display image data to be given to a canvas.
- * @param array The array to fill in.
- * @param sliceNumber The slice position.
- */
-dwv.image.Image.prototype.generateImageData = function( array, sliceNumber )
-{        
-    var sliceOffset = (sliceNumber || 0) * this.size.getSliceSize();
-    var iMax = sliceOffset + this.size.getSliceSize();
-    var pxValue = 0;
-    switch (this.photometricInterpretation) {
-        case "MONOCHROME1":
-        case "MONOCHROME2":
-            for(var i=sliceOffset; i < iMax; ++i)
-            {        
-                pxValue = parseInt( this.windowLut.getValue( this.buffer[i] ), 10 );
-                array.data[4*i] = this.colorMap.red[pxValue];
-                array.data[4*i+1] = this.colorMap.green[pxValue];
-                array.data[4*i+2] = this.colorMap.blue[pxValue];
-                array.data[4*i+3] = 0xff;
-            }
-        break;
-        
-        case "RGB":
-            // the planar configuration defines the memory layout
-            if( this.planarConfiguration !== 0 && this.planarConfiguration !== 1 ) {
-                throw new Error("Unsupported planar configuration: "+this.planarConfiguration);
-            }
-            // default: RGBRGBRGBRGB...
-            var posR = 0;
-            var posG = 1;
-            var posB = 2;
-            var stepPos = 3;
-            // RRRR...GGGG...BBBB...
-            if (this.planarConfiguration === 1) { 
-                posR = 0;
-                posG = iMax;
-                posB = 2 * iMax;
-                stepPos = 1;
-            }
-            
-            var redValue = 0;
-            var greenValue = 0;
-            var blueValue = 0;
-            for(var i=sliceOffset; i < iMax; ++i)
-            {        
-                redValue = parseInt( this.windowLut.getValue( this.buffer[posR] ), 10 );
-                greenValue = parseInt( this.windowLut.getValue( this.buffer[posG] ), 10 );
-                blueValue = parseInt( this.windowLut.getValue( this.buffer[posB] ), 10 );
-                
-                array.data[4*i] = redValue;
-                array.data[4*i+1] = greenValue;
-                array.data[4*i+2] = blueValue;
-                array.data[4*i+3] = 0xff;
-                
-                posR += stepPos;
-                posG += stepPos;
-                posB += stepPos;
-            }
-        break;
-        
-        default: 
-            throw new Error("Unsupported photometric interpretation: "+photometricInterpretation);
-    }
-};
-
-/**
- * Get the image data range (after rescale).
+ * Calculate the image data range (after rescale).
  * @returns The range {min, max}.
  */
-dwv.image.Image.prototype.getDataRange = function()
+dwv.image.Image.prototype.calculateDataRange = function()
 {
-    if( !this.dataRange ) {
-        var min = this.buffer[0];
-        var max = min;
-        var value = 0;
-        for(var i=0; i < this.buffer.length; ++i)
-        {    
-            value = this.getValueAtOffset(i);
-            if( value > max ) {
-                max = value;
-            }
-            if( value < min ) {
-                min = value;
-            }
-        }
-        this.dataRange = { "min": min, "max": max };
+    var min = this.getValueAtOffset(0);
+    var max = min;
+    var value = 0;
+    for(var i=0; i < this.getSize().getTotalSize(); ++i)
+    {    
+        value = this.getValueAtOffset(i);
+        if( value > max ) { max = value; }
+        if( value < min ) { min = value; }
     }
-    return this.dataRange;
+    return { "min": min, "max": max };
 };
 
 /**
- * Get the histogram of the image.
+ * Calculate the histogram of the image.
  * @returns An array representing the histogram.
  */
-dwv.image.Image.prototype.getHistogram = function()
+dwv.image.Image.prototype.calculateHistogram = function()
 {
-    if( !this.histoPlot ) {
-        var histo = [];
-        this.histoPlot = [];
-        var value = 0;
-        for(var i=0; i < this.buffer.length; ++i)
-        {    
-            value = this.getValueAtOffset(i);
-            histo[value] = histo[value] || 0;
-            histo[value] += 1;
-        }
-        // generate data for plotting
-        for(var j=this.getDataRange().min; j < this.getDataRange().max; ++j)
-        {    
-            value = histo[j] || 0;
-            this.histoPlot.push([j, value]);
-        }
+    var histo = [];
+    var histoPlot = [];
+    var value = 0;
+    for(var i=0; i < this.getSize().getTotalSize(); ++i)
+    {    
+        value = this.getValueAtOffset(i);
+        histo[value] = histo[value] || 0;
+        histo[value] += 1;
     }
-    return this.histoPlot;
+    // generate data for plotting
+    for(var j=this.getDataRange().min; j < this.getDataRange().max; ++j)
+    {    
+        value = histo[j] || 0;
+        histoPlot.push([j, value]);
+    }
+    return histoPlot;
 };
 
 /**
@@ -426,7 +221,7 @@ dwv.image.Image.prototype.getHistogram = function()
  * @param weights The weights of the 2D kernel.
  * @returns The convoluted image.
  * 
- * Note: Uses the raw buffer values and not the rescaled ones.
+ * Note: Uses the raw buffer values.
  */
 dwv.image.Image.prototype.convolute = function(weights)
 {
@@ -453,7 +248,7 @@ dwv.image.Image.prototype.convolute = function(weights)
                     if (scy >= 0 && scy < nrows && scx >= 0 && scx < ncols) {
                         var srcOff = scy*ncols + scx;
                         var wt = weights[cy*side+cx];
-                        newValue += this.buffer[srcOff] * wt;
+                        newValue += this.getValueAtOffset(srcOff) * wt;
                     }
                 }
             }
@@ -468,17 +263,15 @@ dwv.image.Image.prototype.convolute = function(weights)
  * @param operator The operator to use when transforming.
  * @returns The transformed image.
  * 
- * Note: Uses the rescaled buffer values and not the raw ones.
+ * Note: Uses the raw buffer values.
  */
 dwv.image.Image.prototype.transform = function(operator)
 {
     var newImage = this.clone();
     var newBuffer = newImage.getBuffer();
-    for(var i=0; i < newBuffer.length; ++i)
+    for(var i=0; i < this.getSize().getTotalSize(); ++i)
     {   
-        // using the operator on the cloned buffer, i.e. the original data
-        newBuffer[i] = ( operator( newImage.getValueAtOffset(i) ) - this.rescaleLut.getIntercept() )
-            / this.rescaleLut.getSlope();
+        newBuffer[i] = operator( newImage.getValueAtOffset(i) );
     }
     return newImage;
 };
@@ -489,55 +282,16 @@ dwv.image.Image.prototype.transform = function(operator)
  * @param operator The operator to use when composing.
  * @returns The composed image.
  * 
- * Note: Uses the raw buffer values and not the rescaled ones.
+ * Note: Uses the raw buffer values.
  */
 dwv.image.Image.prototype.compose = function(rhs, operator)
 {
     var newImage = this.clone();
     var newBuffer = newImage.getBuffer();
-    for(var i=0; i < newBuffer.length; ++i)
+    for(var i=0; i < this.getSize().getTotalSize(); ++i)
     {   
         // using the operator on the local buffer, i.e. the latest (not original) data
-        newBuffer[i] = Math.floor( operator( this.buffer[i], rhs.getBuffer()[i] ) );
+        newBuffer[i] = Math.floor( operator( this.getValueAtOffset(i), rhs.getValueAtOffset(i) ) );
     }
     return newImage;
-};
-
-/**
- * Add an event listener on the image.
- * @param type The event type.
- * @param listener The method associated with the provided event type.
- */
-dwv.image.Image.prototype.addEventListener = function(type, listener)
-{
-    if( !this.listeners[type] ) this.listeners[type] = [];
-    this.listeners[type].push(listener);
-};
-
-/**
- * Remove an event listener on the image.
- * @param type The event type.
- * @param listener The method associated with the provided event type.
- */
-dwv.image.Image.prototype.removeEventListener = function(type, listener)
-{
-    if( !this.listeners[type] ) return;
-    for(var i=0; i < this.listeners[type].length; ++i)
-    {   
-        if( this.listeners[type][i] === listener )
-            this.listeners[type].splice(i,1);
-    }
-};
-
-/**
- * Fire an event: call all associated listeners.
- * @param event The event to fire.
- */
-dwv.image.Image.prototype.fireEvent = function(event)
-{
-    if( !this.listeners[event.type] ) return;
-    for(var i=0; i < this.listeners[event.type].length; ++i)
-    {   
-        this.listeners[event.type][i]( event );
-    }
 };
