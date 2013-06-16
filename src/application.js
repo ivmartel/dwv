@@ -40,7 +40,12 @@ dwv.App = function(mobile)
     this.getView = function() { return view; };
     
     // Set the image
-    this.setImage = function(img) { image = img; };    
+    this.setImage = function(img) { 
+    	image = img;
+        var presets = view.getWindowPresets();
+    	view = new dwv.image.View(self.getImage());
+        view.setWindowPresets(presets);
+    	};    
     this.restoreOriginalImage = function() { image = originalImage; }; 
     
     // Get the image data array
@@ -216,7 +221,7 @@ dwv.App = function(mobile)
      */
     this.generateAndDrawImage = function()
     {         
-        // generate image data from DICOM
+    	// generate image data from DICOM
         self.getView().generateImageData(imageData);         
         // set the image data of the layer
         self.getImageLayer().setImageData(imageData);
