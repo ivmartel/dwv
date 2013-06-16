@@ -112,7 +112,7 @@ dwv.image.Image = function(size, spacing, buffer)
     // Clone the image.
     this.clone = function()
     {
-        var copy = new dwv.image.Image(this.getSize(), this.getSpacing(), buffer);
+        var copy = new dwv.image.Image(this.getSize(), this.getSpacing(), buffer.slice());
         copy.setRescaleSlope(this.getRescaleSlope());
         copy.setRescaleIntercept(this.getRescaleIntercept());
         copy.setPhotometricInterpretation(this.getPhotometricInterpretation());
