@@ -72,7 +72,7 @@ dwv.info.updateMiniColorMap = function(event)
     context = canvas.getContext('2d');
     
     // fill in the image data
-    var colourMap = app.getImage().getColorMap();
+    var colourMap = app.getView().getColorMap();
     var imageData = context.getImageData(0,0,canvas.width, canvas.height);
     
     var c = 0;

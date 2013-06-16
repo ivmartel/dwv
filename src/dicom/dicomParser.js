@@ -419,7 +419,7 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
  * Get an Image object from the read DICOM file.
  * @returns A new Image.
  */
-dwv.dicom.DicomParser.prototype.getImage = function()
+dwv.dicom.DicomParser.prototype.createImage = function()
 {
     // size
     if( !this.dicomElements.Columns ) {
@@ -428,9 +428,9 @@ dwv.dicom.DicomParser.prototype.getImage = function()
     if( !this.dicomElements.Rows ) {
         throw new Error("Missing DICOM image number of rows");
     }
-    var size = new dwv.image.ImageSize(
+    var size = new dwv.image.Size(
         this.dicomElements.Columns.value[0], 
-        this.dicomElements.Rows.value[0]);
+        this.dicomElements.Rows.value[0] );
     // spacing
     var rowSpacing = 1;
     var columnSpacing = 1;
@@ -442,8 +442,7 @@ dwv.dicom.DicomParser.prototype.getImage = function()
         rowSpacing = parseFloat(this.dicomElements.ImagerPixelSpacing.value[0]);
         columnSpacing = parseFloat(this.dicomElements.ImagerPixelSpacing.value[1]);
     }
-    var spacing = new dwv.image.ImageSpacing(
-        columnSpacing, rowSpacing);
+    var spacing = new dwv.image.Spacing( columnSpacing, rowSpacing);
     // image
     var image = new dwv.image.Image( size, spacing, this.pixelBuffer );
     // photometricInterpretation
@@ -456,16 +455,19 @@ dwv.dicom.DicomParser.prototype.getImage = function()
         image.setPlanarConfiguration( 
             this.dicomElements.PlanarConfiguration.value[0] );
     }        
-    // lookup
-    var slope = 1;
+    // rescale slope
     if( this.dicomElements.RescaleSlope ) {
-        slope = parseFloat(this.dicomElements.RescaleSlope.value[0]);
+        image.setRescaleSlope( parseFloat(this.dicomElements.RescaleSlope.value[0]) );
     }
-    var intercept = 0;
+    // rescale intercept
     if( this.dicomElements.RescaleIntercept ) {
-        intercept = parseFloat(this.dicomElements.RescaleIntercept.value[0]);
+        image.setRescaleIntercept( parseFloat(this.dicomElements.RescaleIntercept.value[0]) );
     }
-    image.setRescaleSlopeAndIntercept(slope, intercept);
+    // return
+    //return image;
+    
+    var view = new dwv.image.View(image);
+    // window center and width
     if( this.dicomElements.WindowCenter && this.dicomElements.WindowWidth ) {
         var windowPresets = [];
         var name;
@@ -482,12 +484,7 @@ dwv.dicom.DicomParser.prototype.getImage = function()
                 "name": name
             });
         }
-        image.setWindowPresets( windowPresets );
+        view.setWindowPresets( windowPresets );
     }
-    else
-    {
-        image.setWindowLevelMinMax();
-    }
-    // return
-    return image;
+    return view;
 };

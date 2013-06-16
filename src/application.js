@@ -8,6 +8,7 @@ dwv.App = function(mobile)
     var self = this;
     // Image
     var image = null;
+    var view = null;
     // Original image
     var originalImage = null;
     // Image data array
@@ -36,6 +37,7 @@ dwv.App = function(mobile)
     
     // Get the image
     this.getImage = function() { return image; };
+    this.getView = function() { return view; };
     
     // Set the image
     this.setImage = function(img) { image = img; };    
@@ -215,7 +217,7 @@ dwv.App = function(mobile)
     this.generateAndDrawImage = function()
     {         
         // generate image data from DICOM
-        self.getImage().generateImageData(imageData);         
+        self.getView().generateImageData(imageData);         
         // set the image data of the layer
         self.getImageLayer().setImageData(imageData);
         // draw the image
@@ -261,15 +263,15 @@ dwv.App = function(mobile)
         dwv.html.toggleDisplay('infoLayer');
         // toggle listeners
         if( isInfoLayerListening ) {
-            image.removeEventListener("wlchange", dwv.info.updateWindowingValue);
-            image.removeEventListener("wlchange", dwv.info.updateMiniColorMap);
-            image.removeEventListener("wlchange", dwv.info.updatePlotMarkings);
+            view.removeEventListener("wlchange", dwv.info.updateWindowingValue);
+            view.removeEventListener("wlchange", dwv.info.updateMiniColorMap);
+            view.removeEventListener("wlchange", dwv.info.updatePlotMarkings);
             isInfoLayerListening = false;
         }
         else {
-            image.addEventListener("wlchange", dwv.info.updateWindowingValue);
-            image.addEventListener("wlchange", dwv.info.updateMiniColorMap);
-            image.addEventListener("wlchange", dwv.info.updatePlotMarkings);
+            view.addEventListener("wlchange", dwv.info.updateWindowingValue);
+            view.addEventListener("wlchange", dwv.info.updateMiniColorMap);
+            view.addEventListener("wlchange", dwv.info.updatePlotMarkings);
             isInfoLayerListening = true;
         }
     };
@@ -413,8 +415,10 @@ dwv.App = function(mobile)
         // create the DICOM tags table
         createTagsTable(data.info);
 
+        view = data.view;
+        
         // store image
-        originalImage = data.image;
+        originalImage = view.getImage();
         image = originalImage;
         
         // layout
@@ -446,9 +450,9 @@ dwv.App = function(mobile)
         // keydown listener
         window.addEventListener("keydown", eventHandler, true);
         // image listeners
-        image.addEventListener("wlchange", dwv.info.updateWindowingValue);
-        image.addEventListener("wlchange", dwv.info.updateMiniColorMap);
-        image.addEventListener("wlchange", dwv.info.updatePlotMarkings);
+        view.addEventListener("wlchange", dwv.info.updateWindowingValue);
+        view.addEventListener("wlchange", dwv.info.updateMiniColorMap);
+        view.addEventListener("wlchange", dwv.info.updatePlotMarkings);
         
         // initialise the toolbox
         // note: the window/level tool is responsible for doing the first display.

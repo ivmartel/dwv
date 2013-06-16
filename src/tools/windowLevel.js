@@ -35,7 +35,7 @@ dwv.tool.showHUvalue = function(x,y)
  */
 dwv.tool.updateWindowingData = function(wc,ww)
 {
-    app.getImage().setWindowLevel(wc,ww);
+    app.getView().setWindowLevel(wc,ww);
     app.generateAndDrawImage();
 };
 
@@ -44,7 +44,7 @@ dwv.tool.updateWindowingData = function(wc,ww)
  */
 dwv.tool.updateColourMap = function(colourMap)    
 {    
-    app.getImage().setColourMap(colourMap);
+    app.getView().setColorMap(colourMap);
     app.generateAndDrawImage();
 };
 
@@ -91,8 +91,8 @@ dwv.tool.WindowLevel = function(app)
 
         var diffX = ev._x - self.x0;
         var diffY = self.y0 - ev._y;                                
-        var windowCenter = parseInt(app.getImage().getWindowLut().getCenter(), 10) + diffY;
-        var windowWidth = parseInt(app.getImage().getWindowLut().getWidth(), 10) + diffX;                        
+        var windowCenter = parseInt(app.getView().getWindowLut().getCenter(), 10) + diffY;
+        var windowWidth = parseInt(app.getView().getWindowLut().getWidth(), 10) + diffX;                        
         
         dwv.tool.updateWindowingData(windowCenter,windowWidth);    
         
@@ -127,7 +127,7 @@ dwv.tool.WindowLevel = function(app)
     this.dblclick = function(ev){
         dwv.tool.updateWindowingData(
                 parseInt(app.getImage().getValue(ev._x, ev._y), 10),
-                parseInt(app.getImage().getWindowLut().getWidth(), 10) );    
+                parseInt(app.getView().getWindowLut().getWidth(), 10) );    
     };
     
     this.enable = function(bool){
@@ -135,8 +135,8 @@ dwv.tool.WindowLevel = function(app)
             this.updatePresets();
             dwv.gui.appendWindowLevelHtml();
             dwv.tool.updateWindowingData(
-                    parseInt(app.getImage().getWindowLut().getCenter(), 10),
-                    parseInt(app.getImage().getWindowLut().getWidth(), 10) );
+                    parseInt(app.getView().getWindowLut().getCenter(), 10),
+                    parseInt(app.getView().getWindowLut().getWidth(), 10) );
         }
         else {
             dwv.gui.clearWindowLevelHtml();
@@ -156,7 +156,7 @@ dwv.tool.WindowLevel.prototype.updatePresets = function()
 	var presets = dwv.tool.presets;
     dwv.tool.presets = {};
 	// DICOM presets
-    var dicomPresets = app.getImage().getWindowPresets();
+    var dicomPresets = app.getView().getWindowPresets();
     if( dicomPresets )
     {
         for( var i = 0; i < dicomPresets.length; ++i ) {
