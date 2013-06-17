@@ -215,14 +215,17 @@ dwv.image.Image.prototype.calculateHistogram = function()
     var histo = [];
     var histoPlot = [];
     var value = 0;
-    for(var i=0; i < this.getSize().getTotalSize(); ++i)
+    var size = this.getSize().getTotalSize();
+    for(var i=0; i < size; ++i)
     {    
         value = this.getValueAtOffset(i);
         histo[value] = histo[value] || 0;
         histo[value] += 1;
     }
     // generate data for plotting
-    for(var j=this.getDataRange().min; j < this.getDataRange().max; ++j)
+    var min = this.getDataRange().min;
+    var max = this.getDataRange().max;
+    for(var j=min; j < max; ++j)
     {    
         value = histo[j] || 0;
         histoPlot.push([j, value]);
