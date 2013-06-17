@@ -486,5 +486,9 @@ dwv.dicom.DicomParser.prototype.createImage = function()
         }
         view.setWindowPresets( windowPresets );
     }
+    else
+    {
+        view.setWindowLevelMinMax();
+    }
     return view;
 };
