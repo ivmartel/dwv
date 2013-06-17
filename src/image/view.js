@@ -111,25 +111,28 @@ dwv.image.View.prototype.clone = function()
  */
 dwv.image.View.prototype.generateImageData = function( array, sliceNumber )
 {        
-    if( !this.getWindowLut() ) this.setWindowLevelMinMax();
-    var sliceSize = this.getImage().getSize().getSliceSize();
+    var image = this.getImage();
+    var sliceSize = image.getSize().getSliceSize();
     var sliceOffset = (sliceNumber || 0) * sliceSize;
     var iMax = sliceOffset + sliceSize;
     var pxValue = 0;
-    var photoInterpretation = this.getImage().getPhotometricInterpretation();
-    var planarConfig = this.getImage().getPlanarConfiguration();
+    var photoInterpretation = image.getPhotometricInterpretation();
+    var planarConfig = image.getPlanarConfiguration();
+    var windowLut = this.getWindowLut();
+    var colorMap = this.getColorMap();
+    var index = 0;
     switch (photoInterpretation) {
         case "MONOCHROME1":
         case "MONOCHROME2":
             for(var i=sliceOffset; i < iMax; ++i)
             {        
-                pxValue = parseInt( this.getWindowLut().getValue( 
-                        this.getImage().getValueAtOffset(i) ), 10 );
-                
-                array.data[4*i] = this.getColorMap().red[pxValue];
-                array.data[4*i+1] = this.getColorMap().green[pxValue];
-                array.data[4*i+2] = this.getColorMap().blue[pxValue];
-                array.data[4*i+3] = 0xff;
+                pxValue = parseInt( windowLut.getValue( 
+                		image.getValueAtOffset(i) ), 10 );
+                index = 4*i;
+                array.data[index] = colorMap.red[pxValue];
+                array.data[index+1] = colorMap.green[pxValue];
+                array.data[index+2] = colorMap.blue[pxValue];
+                array.data[index+3] = 0xff;
             }
         break;
         
