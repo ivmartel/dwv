@@ -24,6 +24,7 @@ dwv.image.View = function(image)
     
     // Get the associated image.
     this.getImage = function() { return image; };
+    this.setImage = function(inimage) { image = inimage; };
     
     // Get the rescale LUT of the image.
     this.getRescaleLut = function() { return rescaleLut; };
@@ -64,7 +65,7 @@ dwv.image.View = function(image)
  * @param width The window width.
  * @warning Uses the latest set rescale LUT or the default linear one.
  */
-dwv.image.View.prototype.setWindowLevel= function( center, width )
+dwv.image.View.prototype.setWindowLevel = function( center, width )
 {
     var lut = new dwv.image.lut.Window(center, width, this.getRescaleLut());
     lut.initialise();
@@ -78,7 +79,7 @@ dwv.image.View.prototype.setWindowLevel= function( center, width )
  * Set the image window/level to cover the full data range.
  * @warning Uses the latest set rescale LUT or the default linear one.
  */
-dwv.image.View.prototype.setWindowLevelMinMax= function()
+dwv.image.View.prototype.setWindowLevelMinMax = function()
 {
     // calculate center and width
     var range = this.getImage().getDataRange();

@@ -76,9 +76,12 @@ dwv.image.Image = function(size, spacing, buffer)
     // Planar configuration for RGB data (0:RGBRGBRGBRGB... or 1:RRR...GGG...BBB...)
     var planarConfiguration = 0;
     
-    // data range
+    // original buffer.
+    var originalBuffer = buffer.slice();
+    
+    // data range.
     var dataRange = undefined;
-    // histogram
+    // histogram.
     var histogram = undefined;
      
     // Get the size of the image.
@@ -112,7 +115,7 @@ dwv.image.Image = function(size, spacing, buffer)
     // Clone the image.
     this.clone = function()
     {
-        var copy = new dwv.image.Image(this.getSize(), this.getSpacing(), buffer.slice());
+        var copy = new dwv.image.Image(this.getSize(), this.getSpacing(), originalBuffer);
         copy.setRescaleSlope(this.getRescaleSlope());
         copy.setRescaleIntercept(this.getRescaleIntercept());
         copy.setPhotometricInterpretation(this.getPhotometricInterpretation());
@@ -175,7 +178,7 @@ dwv.image.Image.prototype.getRescaledValue = function( i, j, k )
 };
 
 /**
- * Calculate the image data range (after rescale).
+ * Calculate the raw image data range.
  * @returns The range {min, max}.
  */
 dwv.image.Image.prototype.calculateDataRange = function()
@@ -190,6 +193,17 @@ dwv.image.Image.prototype.calculateDataRange = function()
         if( value < min ) { min = value; }
     }
     return { "min": min, "max": max };
+};
+
+/**
+ * Calculate the image data range after rescale.
+ * @returns The range {min, max}.
+ */
+dwv.image.Image.prototype.getRescaledDataRange = function()
+{
+    var rawRange = this.getDataRange();
+    return { "min": rawRange.min*this.getRescaleSlope()+this.getRescaleIntercept(),
+        "max": rawRange.max*this.getRescaleSlope()+this.getRescaleIntercept()};
 };
 
 /**

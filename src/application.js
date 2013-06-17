@@ -42,9 +42,7 @@ dwv.App = function(mobile)
     // Set the image
     this.setImage = function(img) { 
     	image = img;
-        var presets = view.getWindowPresets();
-    	view = new dwv.image.View(self.getImage());
-        view.setWindowPresets(presets);
+        view.setImage(img);
     	};    
     this.restoreOriginalImage = function() { image = originalImage; }; 
     
