@@ -252,7 +252,7 @@ dwv.math.Path.prototype.addControlPoint = function(point) {
         this.controlPointIndexArray.push(index);
     }
     else {
-        throw Error("Error: addControlPoint called with not in list point.");
+        throw Error("Error: addControlPoint called with no point in list point.");
     }
 };
 
