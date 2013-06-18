@@ -269,12 +269,14 @@ dwv.App = function(mobile)
             view.removeEventListener("wlchange", dwv.info.updateWindowingValue);
             view.removeEventListener("wlchange", dwv.info.updateMiniColorMap);
             view.removeEventListener("wlchange", dwv.info.updatePlotMarkings);
+            view.removeEventListener("colorchange", dwv.info.updateMiniColorMap);
             isInfoLayerListening = false;
         }
         else {
             view.addEventListener("wlchange", dwv.info.updateWindowingValue);
             view.addEventListener("wlchange", dwv.info.updateMiniColorMap);
             view.addEventListener("wlchange", dwv.info.updatePlotMarkings);
+            view.addEventListener("colorchange", dwv.info.updateMiniColorMap);
             isInfoLayerListening = true;
         }
     };
@@ -456,6 +458,7 @@ dwv.App = function(mobile)
         view.addEventListener("wlchange", dwv.info.updateWindowingValue);
         view.addEventListener("wlchange", dwv.info.updateMiniColorMap);
         view.addEventListener("wlchange", dwv.info.updatePlotMarkings);
+        view.addEventListener("colorchange", dwv.info.updateMiniColorMap);
         
         // initialise the toolbox
         // note: the window/level tool is responsible for doing the first display.

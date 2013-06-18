@@ -49,6 +49,9 @@ dwv.image.View = function(image)
         // TODO Better handle this...
         if( this.getImage().getPhotometricInterpretation() === "MONOCHROME1") 
             colorMap = dwv.image.lut.invPlain;
+        this.fireEvent({"type": "colorchange", 
+            "wc": this.getWindowLut().getCenter(),
+            "ww": this.getWindowLut().getWidth() });
     };
     
     // view listeners
