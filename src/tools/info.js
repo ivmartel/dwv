@@ -76,8 +76,8 @@ dwv.info.updateMiniColorMap = function(event)
     var imageData = context.getImageData(0,0,canvas.width, canvas.height);
     
     var c = 0;
-    var minInt = app.getImage().getDataRange().min;
-    var range = app.getImage().getDataRange().max - minInt;
+    var minInt = app.getImage().getRescaledDataRange().min;
+    var range = app.getImage().getRescaledDataRange().max - minInt;
     var incrC = range / canvas.width;
     var y = 0;
     

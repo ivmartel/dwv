@@ -24,7 +24,7 @@ dwv.tool.showHUvalue = function(x,y)
     liy.appendChild(document.createTextNode("Y = "+y));
     ul.appendChild(liy);
     var lihu = document.createElement("li");
-    lihu.appendChild(document.createTextNode("v = "+app.getImage().getValue(x,y)));
+    lihu.appendChild(document.createTextNode("v = "+app.getImage().getRescaledValue(x,y)));
     ul.appendChild(lihu);
     
     div.appendChild(ul);
@@ -126,7 +126,7 @@ dwv.tool.WindowLevel = function(app)
 
     this.dblclick = function(ev){
         dwv.tool.updateWindowingData(
-                parseInt(app.getImage().getValue(ev._x, ev._y), 10),
+                parseInt(app.getImage().getRescaledValue(ev._x, ev._y), 10),
                 parseInt(app.getView().getWindowLut().getWidth(), 10) );    
     };
     
@@ -164,7 +164,7 @@ dwv.tool.WindowLevel.prototype.updatePresets = function()
         }
     }
     // min/max preset
-    var range = app.getImage().getDataRange();
+    var range = app.getImage().getRescaledDataRange();
     var min = range.min;
     var max = range.max;
     var width = max - min;

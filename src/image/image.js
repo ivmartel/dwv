@@ -218,13 +218,13 @@ dwv.image.Image.prototype.calculateHistogram = function()
     var size = this.getSize().getTotalSize();
     for(var i=0; i < size; ++i)
     {    
-        value = this.getValueAtOffset(i);
+        value = this.getRescaledValueAtOffset(i);
         histo[value] = histo[value] || 0;
         histo[value] += 1;
     }
     // generate data for plotting
-    var min = this.getDataRange().min;
-    var max = this.getDataRange().max;
+    var min = this.getRescaledDataRange().min;
+    var max = this.getRescaledDataRange().max;
     for(var j=min; j < max; ++j)
     {    
         value = histo[j] || 0;
