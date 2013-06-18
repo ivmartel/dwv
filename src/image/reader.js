@@ -29,13 +29,13 @@ dwv.image.getDataFromImage = function(image, file)
         j+=3;
     }
     // create dwv Image
-    var imageSize = new dwv.image.ImageSize(image.width, image.height);
+    var imageSize = new dwv.image.Size(image.width, image.height);
     // TODO: wrong info...
-    var imageSpacing = new dwv.image.ImageSpacing(1,1);
+    var imageSpacing = new dwv.image.Spacing(1,1);
     var dwvImage = new dwv.image.Image(imageSize, imageSpacing, buffer);
     dwvImage.setPhotometricInterpretation("RGB");
     // view
-    var view = new dwv.image.View(image);
+    var view = new dwv.image.View(dwvImage);
     view.setWindowLevelMinMax();
     // properties
     var info = {};
