@@ -10,3 +10,5 @@ see [Dicom-Support](https://github.com/ivmartel/dwv/wiki/Dicom-Support) on the w
 All coding/implementation comments are welcome.
 
 Released under GNU GPL license (see [license.txt](license.txt)). 
+
+[![Build Status](https://travis-ci.org/ivmartel/dwv.png)](https://travis-ci.org/ivmartel/dwv)
