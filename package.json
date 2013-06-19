@@ -1,0 +1,10 @@
+{
+  "name": "dwv",
+  "scripts": {
+    "test": "grunt travis --verbose"
+  },
+  "devDependencies": {
+    "grunt": "~0.4"
+  }
+}
+
