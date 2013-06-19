@@ -74,8 +74,8 @@ dwv.image.View.prototype.setWindowLevel = function( center, width )
     lut.initialise();
     this.setWindowLut( lut );
     this.fireEvent({"type": "wlchange", 
-        "wc": this.getWindowLut().getCenter(),
-        "ww": this.getWindowLut().getWidth() });
+        "wc": lut.getCenter(),
+        "ww": lut.getWidth() });
 };
 
 /**
@@ -162,12 +162,12 @@ dwv.image.View.prototype.generateImageData = function( array, sliceNumber )
             var blueValue = 0;
             for(var i=sliceOffset; i < iMax; ++i)
             {        
-                redValue = parseInt( this.getWindowLut().getValue( 
-                        this.getImage().getValueAtOffset(posR) ), 10 );
-                greenValue = parseInt( this.getWindowLut().getValue( 
-                        this.getImage().getValueAtOffset(posG) ), 10 );
-                blueValue = parseInt( this.getWindowLut().getValue( 
-                        this.getImage().getValueAtOffset(posB) ), 10 );
+                redValue = parseInt( windowLut.getValue( 
+                        image.getValueAtOffset(posR) ), 10 );
+                greenValue = parseInt( windowLut.getValue( 
+                        image.getValueAtOffset(posG) ), 10 );
+                blueValue = parseInt( windowLut.getValue( 
+                        image.getValueAtOffset(posB) ), 10 );
                 
                 array.data[4*i] = redValue;
                 array.data[4*i+1] = greenValue;
@@ -192,8 +192,9 @@ dwv.image.View.prototype.generateImageData = function( array, sliceNumber )
  */
 dwv.image.View.prototype.addEventListener = function(type, listener)
 {
-    if( !this.getListeners()[type] ) this.getListeners()[type] = [];
-    this.getListeners()[type].push(listener);
+    var listeners = this.getListeners();
+    if( !listeners[type] ) listeners[type] = [];
+    listeners[type].push(listener);
 };
 
 /**
@@ -203,11 +204,12 @@ dwv.image.View.prototype.addEventListener = function(type, listener)
  */
 dwv.image.View.prototype.removeEventListener = function(type, listener)
 {
-    if( !this.getListeners()[type] ) return;
-    for(var i=0; i < this.getListeners()[type].length; ++i)
+    var listeners = this.getListeners();
+    if( !listeners[type] ) return;
+    for(var i=0; i < listeners[type].length; ++i)
     {   
-        if( this.getListeners()[type][i] === listener )
-            this.getListeners()[type].splice(i,1);
+        if( listeners[type][i] === listener )
+            listeners[type].splice(i,1);
     }
 };
 
@@ -217,9 +219,11 @@ dwv.image.View.prototype.removeEventListener = function(type, listener)
  */
 dwv.image.View.prototype.fireEvent = function(event)
 {
-    if( !this.getListeners()[event.type] ) return;
-    for(var i=0; i < this.getListeners()[event.type].length; ++i)
+    var listeners = this.getListeners();
+    if( !listeners[event.type] ) return;
+    for(var i=0; i < listeners[event.type].length; ++i)
     {   
-        this.getListeners()[event.type][i](event);
+        listeners[event.type][i](event);
     }
 };
+
