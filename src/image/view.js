@@ -85,7 +85,7 @@ dwv.image.View.prototype.setWindowLevel = function( center, width )
 dwv.image.View.prototype.setWindowLevelMinMax = function()
 {
     // calculate center and width
-    var range = this.getImage().getDataRange();
+    var range = this.getImage().getRescaledDataRange();
     var min = range.min;
     var max = range.max;
     var width = max - min;
