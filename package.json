@@ -8,7 +8,8 @@
     "test": "grunt travis --verbose"
   },
   "devDependencies": {
-    "grunt": "~0.4"
+    "grunt": "~0.4",
+    "grunt-cli": "~0.1"
   }
 }
 
