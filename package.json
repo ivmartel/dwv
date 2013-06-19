@@ -5,7 +5,7 @@
     "url": "git://github.com/ivmartel/dwv.git"
   },
   "scripts": {
-    "test": "grunt travis --verbose"
+    "test": "grunt test --verbose"
   },
   "devDependencies": {
     "grunt": "~0.4",
