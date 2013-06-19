@@ -9,7 +9,8 @@
   },
   "devDependencies": {
     "grunt": "~0.4",
-    "grunt-cli": "~0.1"
+    "grunt-cli": "~0.1",
+    "grunt-contrib-qunit": "~0.2.2"
   }
 }
 
