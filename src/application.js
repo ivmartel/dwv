@@ -112,15 +112,20 @@ dwv.App = function(mobile)
                 var image = new Image();
                 image.src = event.target.result;
                 image.onload = function(e){
-                    // parse image file
-                    var data = dwv.image.getDataFromImage(image, files[0]);
-                    // prepare display
-                    postLoadInit(data);
+                    try {
+                        // parse image file
+                        var data = dwv.image.getDataFromImage(image, files[0]);
+                        // prepare display
+                        postLoadInit(data);
+        			} catch(error) {
+                        handleError(error);
+                        return;
+        			}
                 };
             };
             reader.onprogress = dwv.gui.updateProgress;
-            reader.onerror = function(){
-                alert("An error occurred while reading the image file.");
+            reader.onerror = function(event){
+                alert("An error occurred while reading the image file: "+event.getMessage());
             };
             reader.readAsDataURL(files[0]);
         }
@@ -128,14 +133,19 @@ dwv.App = function(mobile)
         {
             var reader = new FileReader();
     		reader.onload = function(event){
-    			// parse DICOM file
-    			var data = dwv.image.getDataFromDicomBuffer(event.target.result);
-    			// prepare display
-    			postLoadInit(data);
+    			try {
+        		    // parse DICOM file
+        			var data = dwv.image.getDataFromDicomBuffer(event.target.result);
+        			// prepare display
+        			postLoadInit(data);
+    			} catch(error) {
+                    handleError(error);
+                    return;
+    			}
     		};
     		reader.onprogress = dwv.gui.updateProgress;
-    		reader.onerror = function(){
-                alert("An error occurred while reading the DICOM file.");
+    		reader.onerror = function(event){
+                alert("An error occurred while reading the DICOM file: "+event.getMessage());
             };
     		reader.readAsArrayBuffer(files[0]);
         }
@@ -159,56 +169,51 @@ dwv.App = function(mobile)
         request.open('GET', url, true);
         request.responseType = "arraybuffer"; 
         request.onload = function(ev) {
-            // parse buffer
-            try {
-                var view = new DataView(request.response);
-                var isJpeg = view.getUint32(0) === 0xffd8ffe0;
-                var isPng = view.getUint32(0) === 0x89504e47;
-                var isGif = view.getUint32(0) === 0x47494638;
-                if( isJpeg || isPng || isGif ) {
-                    // image data
-                    var image = new Image();
+            var view = new DataView(request.response);
+            var isJpeg = view.getUint32(0) === 0xffd8ffe0;
+            var isPng = view.getUint32(0) === 0x89504e47;
+            var isGif = view.getUint32(0) === 0x47494638;
+            if( isJpeg || isPng || isGif ) {
+                // image data
+                var image = new Image();
 
-                    var bytes = new Uint8Array(request.response);
-                    var binary = '';
-                    for (var i = 0; i < bytes.byteLength; ++i) {
-                        binary += String.fromCharCode(bytes[i]);
-                    }
-                    var imgStr = "unknown";
-                    if (isJpeg) imgStr = "jpeg";
-                    else if (isPng) imgStr = "png";
-                    else if (isGif) imgStr = "gif";
-                    image.src = "data:image/" + imgStr + ";base64," + window.btoa(binary);
-                    
-                    image.onload = function(e){
-                        // parse image data
-                        var data = dwv.image.getDataFromImage(image, 0);
-                        // prepare display
-                        postLoadInit(data);
-                    };
+                var bytes = new Uint8Array(request.response);
+                var binary = '';
+                for (var i = 0; i < bytes.byteLength; ++i) {
+                    binary += String.fromCharCode(bytes[i]);
                 }
-                else {
-                    // parse DICOM
-                    var data = dwv.image.getDataFromDicomBuffer(request.response);
-                    // prepare display
-                    postLoadInit(data);
-                }
+                var imgStr = "unknown";
+                if (isJpeg) imgStr = "jpeg";
+                else if (isPng) imgStr = "png";
+                else if (isGif) imgStr = "gif";
+                image.src = "data:image/" + imgStr + ";base64," + window.btoa(binary);
+                
+                image.onload = function(e){
+        			try {
+	                    // parse image data
+	                    var data = dwv.image.getDataFromImage(image, 0);
+	                    // prepare display
+	                    postLoadInit(data);
+        			} catch(error) {
+                        handleError(error);
+                        return;
+        			}
+                };
             }
-            catch(error) {
-                if( error.name && error.message) {
-                    alert(error.name+": "+error.message+".");
-                }
-                else {
-                    alert("Error: "+error+".");
-                }
-                if( error.stack ) {
-                    console.log(error.stack);
-                }
-                return;
+            else {
+                try {
+	            	// parse DICOM
+	                var data = dwv.image.getDataFromDicomBuffer(request.response);
+	                // prepare display
+	                postLoadInit(data);
+    			} catch(error) {
+                    handleError(error);
+                    return;
+    			}
             }
         };
-        request.onerror = function(){
-            alert("An error occurred while retrieving the file.");
+        request.onerror = function(event){
+            alert("An error occurred while retrieving the file: (http) "+request.status);
         };
         request.onprogress = dwv.gui.updateProgress;
         request.send(null);
@@ -356,6 +361,16 @@ dwv.App = function(mobile)
                 func(event);
             }
         }
+    }
+    
+    /**
+     * @private
+     * */
+    function handleError(error)
+    {
+        if( error.name && error.message) alert(error.name+": "+error.message+".");
+        else alert("Error: "+error+".");
+        if( error.stack ) console.log(error.stack);
     }
     
     /**
