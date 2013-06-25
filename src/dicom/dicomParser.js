@@ -468,27 +468,26 @@ dwv.dicom.DicomParser.prototype.createImage = function()
     
     var view = new dwv.image.View(image);
     // window center and width
+    var windowPresets = [];
     if( this.dicomElements.WindowCenter && this.dicomElements.WindowWidth ) {
-        var windowPresets = [];
         var name;
         for( var i = 0; i < this.dicomElements.WindowCenter.value.length; ++i) {
-            if( this.dicomElements.WindowCenterWidthExplanation ) {
-                name = this.dicomElements.WindowCenterWidthExplanation.value[i];
+            var width = parseFloat( this.dicomElements.WindowWidth.value[i], 10 );
+        	if( width !== 0 ) {
+	        	if( this.dicomElements.WindowCenterWidthExplanation ) {
+	                name = this.dicomElements.WindowCenterWidthExplanation.value[i];
+	            }
+	            else name = "Default"+i;
+	            windowPresets.push({
+	                "center": parseFloat( this.dicomElements.WindowCenter.value[i], 10 ),
+	                "width": width, 
+	                "name": name
+	            });
             }
-            else {
-                name = "Default"+i;
-            }
-            windowPresets.push({
-                "center": parseFloat( this.dicomElements.WindowCenter.value[i], 10 ),
-                "width": parseFloat( this.dicomElements.WindowWidth.value[i], 10 ), 
-                "name": name
-            });
         }
-        view.setWindowPresets( windowPresets );
     }
-    else
-    {
-        view.setWindowLevelMinMax();
-    }
+    if( windowPresets.length !== 0 ) view.setWindowPresets( windowPresets );
+    else view.setWindowLevelMinMax();
+
     return view;
 };
