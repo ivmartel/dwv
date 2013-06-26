@@ -30,7 +30,7 @@ dwv.image.lut.Rescale.prototype.initialise = function(size)
     rescaleLut = new Array(size);         
     for(var i=0; i<size; ++i)
     {        
-        rescaleLut[i] = i * this.getSlope() + this.getIntercept();        
+        rescaleLut[i] = i * this.getSlope() + this.getIntercept();
     }
 };
 
@@ -48,7 +48,7 @@ dwv.image.lut.Rescale.prototype.getValue = function(offset)
  * @class Window Lookup Table class.
  * @returns {Window}
  */
-dwv.image.lut.Window = function(center, width, rescaleLut)
+dwv.image.lut.Window = function(center, width, rescaleLut, isSigned)
 {
     // default values if no presets
     if(typeof(center)==='undefined') center = 100;
@@ -59,6 +59,8 @@ dwv.image.lut.Window = function(center, width, rescaleLut)
     this.getWidth = function() { return width; };
     // Get the rescale LUT.
     this.getRescaleLut = function() { return rescaleLut; };
+    // Get the signed flag
+    this.isSigned = function() { return isSigned; };
     // the internal array
     var windowLut = [];
 };
@@ -67,8 +69,12 @@ dwv.image.lut.Window.prototype.initialise = function(size)
 {    
     if(typeof(size)==='undefined') size = this.getRescaleLut().getLength();
     
-    var xMin = this.getCenter() - 0.5 - (this.getWidth()-1) / 2;
-    var xMax = this.getCenter() - 0.5 + (this.getWidth()-1) / 2;    
+    var center = this.getCenter() - 0.5;
+    if( this.isSigned() ) center += size/2;
+    var width = this.getWidth() - 1;
+    
+    var xMin = center - width / 2;
+    var xMax = center + width / 2;    
     var yMax = 255;
     var yMin = 0;
     
@@ -88,8 +94,7 @@ dwv.image.lut.Window.prototype.initialise = function(size)
         }
         else
         {                
-            y = ( (value - (this.getCenter()-0.5) ) / (this.getWidth()-1) + 0.5 )
-                * (yMax-yMin) + yMin;                        
+            y = ( (value - center ) / width + 0.5 ) * (yMax-yMin) + yMin;                        
             windowLut[i]= parseInt(y, 10);
         }
     }
@@ -102,7 +107,9 @@ dwv.image.lut.Window.prototype.getLength = function()
 
 dwv.image.lut.Window.prototype.getValue = function(offset)
 {
-    return windowLut[offset];
+    var shift = 0;
+    if( this.isSigned() ) shift = windowLut.length/2;
+	return windowLut[offset+shift];
 };
 
 

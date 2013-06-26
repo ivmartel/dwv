@@ -443,6 +443,15 @@ dwv.dicom.DicomParser.prototype.createImage = function()
         columnSpacing = parseFloat(this.dicomElements.ImagerPixelSpacing.value[1]);
     }
     var spacing = new dwv.image.Spacing( columnSpacing, rowSpacing);
+    // unsigned to signed data if needed
+    if( this.dicomElements.PixelRepresentation 
+    		&& this.dicomElements.PixelRepresentation.value[0] == 1) {
+	    for( var i=0; i<this.pixelBuffer.length; ++i ) {
+	        if( this.pixelBuffer[i] >= Math.pow(2, 15) ) 
+	        	this.pixelBuffer[i] -= Math.pow(2, 16);
+	    }
+    }
+    
     // image
     var image = new dwv.image.Image( size, spacing, this.pixelBuffer );
     // photometricInterpretation
@@ -463,10 +472,13 @@ dwv.dicom.DicomParser.prototype.createImage = function()
     if( this.dicomElements.RescaleIntercept ) {
         image.setRescaleIntercept( parseFloat(this.dicomElements.RescaleIntercept.value[0]) );
     }
-    // return
-    //return image;
     
+    // view
     var view = new dwv.image.View(image);
+    // pixel representation
+    if( this.dicomElements.PixelRepresentation ) {
+    	view.setIsSigned( this.dicomElements.PixelRepresentation.value[0] );
+    }
     // window center and width
     var windowPresets = [];
     if( this.dicomElements.WindowCenter && this.dicomElements.WindowWidth ) {

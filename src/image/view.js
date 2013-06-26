@@ -21,6 +21,8 @@ dwv.image.View = function(image)
     var windowPresets = null;
     // color map
     var colorMap = dwv.image.lut.plain;
+    // is signed flag
+    var isSigned = 0;
     
     // Get the associated image.
     this.getImage = function() { return image; };
@@ -53,6 +55,10 @@ dwv.image.View = function(image)
             "wc": this.getWindowLut().getCenter(),
             "ww": this.getWindowLut().getWidth() });
     };
+    // Is the data signed data.
+    this.isSigned = function() { return isSigned; };
+    // Set the signed data flag.
+    this.setIsSigned = function(value) { isSigned = value; };
     
     // view listeners
     var listeners = {};
@@ -70,7 +76,7 @@ dwv.image.View = function(image)
  */
 dwv.image.View.prototype.setWindowLevel = function( center, width )
 {
-    var lut = new dwv.image.lut.Window(center, width, this.getRescaleLut());
+    var lut = new dwv.image.lut.Window(center, width, this.getRescaleLut(), this.isSigned());
     lut.initialise();
     this.setWindowLut( lut );
     this.fireEvent({"type": "wlchange", 
