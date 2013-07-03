@@ -19,17 +19,21 @@ dwv.image.Size = function( numberOfColumns, numberOfRows, numberOfSlices )
     // Get the number of slices.
     this.getNumberOfSlices = function() { return (numberOfSlices || 1.0); };
 };
-
 // Get the size of a slice.
 dwv.image.Size.prototype.getSliceSize = function() {
     return this.getNumberOfColumns()*this.getNumberOfRows();
 };
-
 // Get the total size.
 dwv.image.Size.prototype.getTotalSize = function() {
     return this.getSliceSize()*this.getNumberOfSlices();
 };
-
+// Check for equality.
+dwv.image.Size.prototype.equals = function(rhs) {
+	return rhs !== null
+    	&& this.getNumberOfColumns() === rhs.getNumberOfColumns()
+    	&& this.getNumberOfRows() === rhs.getNumberOfRows()
+    	&& this.getNumberOfSlices() === rhs.getNumberOfSlices();
+};
 // Check that coordinates are within bounds.
 dwv.image.Size.prototype.checkCoordinates = function( i, j, k ) {
     if( i < 0 || i >= this.getNumberOfColumns() ) throw new Error('Index (i) out of range.');
@@ -53,6 +57,13 @@ dwv.image.Spacing = function( columnSpacing, rowSpacing, sliceSpacing )
     this.getRowSpacing = function() { return rowSpacing; };
     // Get the slice spacing.
     this.getSliceSpacing = function() { return (sliceSpacing || 1.0); };
+};
+// Check for equality.
+dwv.image.Spacing.prototype.equals = function(rhs) {
+	return rhs !== null
+    	&& this.getColumnSpacing() === rhs.getColumnSpacing()
+    	&& this.getRowSpacing() === rhs.getRowSpacing()
+    	&& this.getSliceSpacing() === rhs.getSliceSpacing();
 };
 
 /**
@@ -88,7 +99,7 @@ dwv.image.Image = function(size, spacing, buffer)
     this.getSize = function() { return size; };
     // Get the spacing of the image.
     this.getSpacing = function() { return spacing; };
-    // Get the data buffer of the image.
+    // Get the data buffer of the image. TODO dangerous...
     this.getBuffer = function() { return buffer; };
     
     // Get the rescale slope.
@@ -121,6 +132,30 @@ dwv.image.Image = function(size, spacing, buffer)
         copy.setPhotometricInterpretation(this.getPhotometricInterpretation());
         copy.setPlanarConfiguration(this.getPlanarConfiguration());
         return copy;
+    };
+    // Append a slice to the image.
+    this.appendSlice = function(rhs)
+    {
+    	// check input
+    	if( rhs === null )
+    		throw new Error("Cannot append null slice.");
+    	if( size.getNumberOfColumns() !== rhs.getSize().getNumberOfColumns() )
+    		throw new Error("Cannot append slices with different number of columns.");
+    	if( size.getNumberOfRows() !== rhs.getSize().getNumberOfRows() )
+    		throw new Error("Cannot append slices with different number of rows.");
+    	if( photometricInterpretation !== rhs.getPhotometricInterpretation() )
+    		throw new Error("Cannot append slices with different photometric interpretation.");
+    	// add one slice to size
+    	size = new dwv.image.Size(size.getNumberOfColumns(),
+        		size.getNumberOfRows(),
+        		size.getNumberOfSlices() + 1 );
+        // add slice data
+    	var mul = 1;
+    	if( photometricInterpretation === "RGB" ) mul = 3;
+    	for(var i=0; i<mul*size.getSliceSize(); ++i) {     
+        	buffer.push(rhs.getValueAtOffset(i));
+        }
+    	originalBuffer = buffer.slice();
     };
     // Get the data range.
     this.getDataRange = function() { 
@@ -240,7 +275,7 @@ dwv.image.Image.prototype.calculateHistogram = function()
  * 
  * Note: Uses the raw buffer values.
  */
-dwv.image.Image.prototype.convolute = function(weights)
+dwv.image.Image.prototype.convolute2D = function(weights)
 {
     var newImage = this.clone();
     var newBuffer = newImage.getBuffer();
@@ -250,27 +285,38 @@ dwv.image.Image.prototype.convolute = function(weights)
     
     var ncols = this.getSize().getNumberOfColumns();
     var nrows = this.getSize().getNumberOfRows();
+    var nslices = this.getSize().getNumberOfSlices();
+    
+    // loop vars
+    var dstOff = 0;
+    var newValue = 0;
+    var sci = 0;
+    var scj = 0;
+    var srcOff = 0;
+    var wt = 0;
     
     // go through the destination image pixels
-    for (var y=0; y<nrows; y++) {
-        for (var x=0; x<ncols; x++) {
-            var dstOff = y*ncols + x;
-            // calculate the weighed sum of the source image pixels that
-            // fall under the convolution matrix
-            var newValue = 0;
-            for (var cy=0; cy<side; cy++) {
-                for (var cx=0; cx<side; cx++) {
-                    var scy = y + cy - halfSide;
-                    var scx = x + cx - halfSide;
-                    if (scy >= 0 && scy < nrows && scx >= 0 && scx < ncols) {
-                        var srcOff = scy*ncols + scx;
-                        var wt = weights[cy*side+cx];
-                        newValue += this.getValueAtOffset(srcOff) * wt;
-                    }
-                }
-            }
-            newBuffer[dstOff] = newValue;
-        }
+    for (var k=0; k<nslices; k++) {
+	    for (var j=0; j<nrows; j++) {
+	        for (var i=0; i<ncols; i++) {
+	            dstOff = k*ncols*nrows + j*ncols + i;
+	            // calculate the weighed sum of the source image pixels that
+	            // fall under the convolution matrix
+	            newValue = 0;
+	            for (var cj=0; cj<side; cj++) {
+	                for (var ci=0; ci<side; ci++) {
+	                    sci = i + ci - halfSide;
+	                    scj = j + cj - halfSide;
+	                    if (sci >= 0 && sci < ncols && scj >= 0 && scj < nrows ) {
+	                        srcOff = k*ncols*nrows + scj*ncols + sci;
+	                        wt = weights[cj*side+ci];
+	                        newValue += this.getValueAtOffset(srcOff) * wt;
+	                    }
+	                }
+	            }
+	            newBuffer[dstOff] = newValue;
+	        }
+	    }
     }
     return newImage;
 };
