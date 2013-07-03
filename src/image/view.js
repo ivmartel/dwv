@@ -121,9 +121,6 @@ dwv.image.View.prototype.clone = function()
 dwv.image.View.prototype.generateImageData = function( array, sliceNumber )
 {        
     var image = this.getImage();
-    var sliceSize = image.getSize().getSliceSize();
-    var sliceOffset = (sliceNumber || 0) * sliceSize;
-    var iMax = sliceOffset + sliceSize;
     var pxValue = 0;
     var photoInterpretation = image.getPhotometricInterpretation();
     var planarConfig = image.getPlanarConfiguration();
@@ -133,15 +130,18 @@ dwv.image.View.prototype.generateImageData = function( array, sliceNumber )
     switch (photoInterpretation) {
         case "MONOCHROME1":
         case "MONOCHROME2":
+            var sliceSize = image.getSize().getSliceSize();
+            var sliceOffset = (sliceNumber || 0) * sliceSize;
+            var iMax = sliceOffset + sliceSize;
             for(var i=sliceOffset; i < iMax; ++i)
             {        
                 pxValue = parseInt( windowLut.getValue( 
                 		image.getValueAtOffset(i) ), 10 );
-                index = 4*i;
                 array.data[index] = colorMap.red[pxValue];
                 array.data[index+1] = colorMap.green[pxValue];
                 array.data[index+2] = colorMap.blue[pxValue];
                 array.data[index+3] = 0xff;
+                index += 4;
             }
         break;
         
@@ -150,23 +150,25 @@ dwv.image.View.prototype.generateImageData = function( array, sliceNumber )
             if( planarConfig !== 0 && planarConfig !== 1 ) {
                 throw new Error("Unsupported planar configuration: "+planarConfig);
             }
+            var sliceSize = image.getSize().getSliceSize();
+            var sliceOffset = (sliceNumber || 0) * 3 * sliceSize;
             // default: RGBRGBRGBRGB...
-            var posR = 0;
-            var posG = 1;
-            var posB = 2;
+            var posR = sliceOffset;
+            var posG = sliceOffset + 1;
+            var posB = sliceOffset + 2;
             var stepPos = 3;
             // RRRR...GGGG...BBBB...
             if (planarConfig === 1) { 
-                posR = 0;
-                posG = iMax;
-                posB = 2 * iMax;
+                posR = sliceOffset;
+                posG = sliceOffset + sliceSize;
+                posB = sliceOffset + 2 * sliceSize;
                 stepPos = 1;
             }
             
             var redValue = 0;
             var greenValue = 0;
             var blueValue = 0;
-            for(var i=sliceOffset; i < iMax; ++i)
+            for(var i=0; i < image.getSize().getSliceSize(); ++i)
             {        
                 redValue = parseInt( windowLut.getValue( 
                         image.getValueAtOffset(posR) ), 10 );
@@ -175,10 +177,11 @@ dwv.image.View.prototype.generateImageData = function( array, sliceNumber )
                 blueValue = parseInt( windowLut.getValue( 
                         image.getValueAtOffset(posB) ), 10 );
                 
-                array.data[4*i] = redValue;
-                array.data[4*i+1] = greenValue;
-                array.data[4*i+2] = blueValue;
-                array.data[4*i+3] = 0xff;
+                array.data[index] = redValue;
+                array.data[index+1] = greenValue;
+                array.data[index+2] = blueValue;
+                array.data[index+3] = 0xff;
+                index += 4;
                 
                 posR += stepPos;
                 posG += stepPos;
