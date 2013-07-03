@@ -32,6 +32,8 @@ dwv.App = function(mobile)
     // UndoStack
     var undoStack = new dwv.tool.UndoStack(this);
     
+    var sliceNb = 0;
+    
     // Public Methods
     // --------------
     
@@ -81,13 +83,25 @@ dwv.App = function(mobile)
      */
     this.handleKeyDown = function(event)
     {
-        if( event.keyCode === 90 && event.ctrlKey ) // CRTL-Z
+        if( event.keyCode === 90 && event.ctrlKey ) // ctrl-z
         {
             self.getUndoStack().undo();
         }
-        else if( event.keyCode === 89 && event.ctrlKey ) // CRTL-Y
+        else if( event.keyCode === 89 && event.ctrlKey ) // ctrl-y
         {
             self.getUndoStack().redo();
+        }
+        else if( event.keyCode === 107 ) // +
+        {
+            ++sliceNb;
+            console.log( "sliceNb: "+sliceNb);
+            self.generateAndDrawImage();
+        }
+        else if( event.keyCode === 109 ) // -
+        {
+            if( sliceNb !== 0 ) --sliceNb;
+            console.log( "sliceNb: "+sliceNb);
+            self.generateAndDrawImage();
         }
     };
     
@@ -104,50 +118,55 @@ dwv.App = function(mobile)
      */
     this.loadFiles = function(files) 
     {
-        //TODO: for (var i = 0; i < files.length; ++i) {
-        if( files[0].type.match("image.*") )
-        {
-            var reader = new FileReader();
-            reader.onload = function(event){
-                var image = new Image();
-                image.src = event.target.result;
-                image.onload = function(e){
-                    try {
-                        // parse image file
-                        var data = dwv.image.getDataFromImage(image, files[0]);
-                        // prepare display
-                        postLoadInit(data);
-        			} catch(error) {
-                        handleError(error);
-                        return;
-        			}
-                };
-            };
-            reader.onprogress = dwv.gui.updateProgress;
-            reader.onerror = function(event){
-                alert("An error occurred while reading the image file: "+event.getMessage());
-            };
-            reader.readAsDataURL(files[0]);
-        }
-        else
-        {
-            var reader = new FileReader();
-    		reader.onload = function(event){
-    			try {
-        		    // parse DICOM file
-        			var data = dwv.image.getDataFromDicomBuffer(event.target.result);
-        			// prepare display
-        			postLoadInit(data);
-    			} catch(error) {
-                    handleError(error);
-                    return;
-    			}
-    		};
-    		reader.onprogress = dwv.gui.updateProgress;
-    		reader.onerror = function(event){
-                alert("An error occurred while reading the DICOM file: "+event.getMessage());
-            };
-    		reader.readAsArrayBuffer(files[0]);
+    	for (var i = 0; i < files.length; ++i)
+    	{
+            var file = files[i];
+	        if( file.type.match("image.*") )
+	        {
+	            var reader = new FileReader();
+	            reader.onload = function(event){
+	                var tmp_image = new Image();
+	                tmp_image.src = event.target.result;
+	                tmp_image.onload = function(e){
+	                    try {
+	                        // parse image file
+	                        var data = dwv.image.getDataFromImage(tmp_image, file);
+		        			if( image ) image.appendSlice( data.view.getImage() );
+	                        // prepare display
+	                        postLoadInit(data);
+	        			} catch(error) {
+	                        handleError(error);
+	                        return;
+	        			}
+	                };
+	            };
+	            reader.onprogress = dwv.gui.updateProgress;
+	            reader.onerror = function(event){
+	                alert("An error occurred while reading the image file: "+event.getMessage());
+	            };
+	            reader.readAsDataURL(file);
+	        }
+	        else
+	        {
+	            var reader = new FileReader();
+	    		reader.onload = function(event){
+	    			try {
+	        		    // parse DICOM file
+	        			var data = dwv.image.getDataFromDicomBuffer(event.target.result);
+	        			if( image ) image.appendSlice( data.view.getImage() );
+	        			// prepare display
+	    			    postLoadInit(data);
+	    			} catch(error) {
+	                    handleError(error);
+	                    return;
+	    			}
+	    		};
+	    		reader.onprogress = dwv.gui.updateProgress;
+	    		reader.onerror = function(event){
+	                alert("An error occurred while reading the DICOM file: "+event.getMessage());
+	            };
+	    		reader.readAsArrayBuffer(file);
+	        }
         }
     };
         
@@ -225,7 +244,7 @@ dwv.App = function(mobile)
     this.generateAndDrawImage = function()
     {         
     	// generate image data from DICOM
-        self.getView().generateImageData(imageData);         
+        self.getView().generateImageData(imageData, sliceNb);         
         // set the image data of the layer
         self.getImageLayer().setImageData(imageData);
         // draw the image
@@ -432,6 +451,11 @@ dwv.App = function(mobile)
      */
     function postLoadInit(data)
     {
+        if( view ) {
+            view.setImage(image);
+            return;
+        }
+        
         // create the DICOM tags table
         createTagsTable(data.info);
 
