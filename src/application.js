@@ -32,8 +32,6 @@ dwv.App = function(mobile)
     // UndoStack
     var undoStack = new dwv.tool.UndoStack(this);
     
-    var sliceNb = 0;
-    
     // Public Methods
     // --------------
     
