@@ -21,7 +21,6 @@ dwv.tool.updatePostionValue = function(i,j)
 dwv.tool.updateWindowingData = function(wc,ww)
 {
     app.getView().setWindowLevel(wc,ww);
-    app.generateAndDrawImage();
 };
 
 /**
@@ -30,7 +29,6 @@ dwv.tool.updateWindowingData = function(wc,ww)
 dwv.tool.updateColourMap = function(colourMap)    
 {    
     app.getView().setColorMap(colourMap);
-    app.generateAndDrawImage();
 };
 
 dwv.tool.colourMaps = {
@@ -57,7 +55,7 @@ dwv.tool.WindowLevel = function(app)
     var self = this;
     this.started = false;
     this.displayed = false;
-    
+    this.updatePresets();
 
     // This is called when you start holding down the mouse button.
     this.mousedown = function(ev){
@@ -117,11 +115,7 @@ dwv.tool.WindowLevel = function(app)
     
     this.enable = function(bool){
         if( bool ) {
-            this.updatePresets();
             dwv.gui.appendWindowLevelHtml();
-            dwv.tool.updateWindowingData(
-                    parseInt(app.getView().getWindowLut().getCenter(), 10),
-                    parseInt(app.getView().getWindowLut().getWidth(), 10) );
         }
         else {
             dwv.gui.clearWindowLevelHtml();
