@@ -23,10 +23,13 @@ dwv.image.View = function(image)
     var colorMap = dwv.image.lut.plain;
     // is signed flag
     var isSigned = 0;
+    // current position
+    var currentPosition = {"i":0,"j":0,"k":0};
     
     // Get the associated image.
     this.getImage = function() { return image; };
-    this.setImage = function(inimage) { image = inimage; };
+    // Set the associated image.
+    this.setImage = function(inImage) { image = inImage; };
     
     // Get the rescale LUT of the image.
     this.getRescaleLut = function() { return rescaleLut; };
@@ -59,6 +62,17 @@ dwv.image.View = function(image)
     this.isSigned = function() { return isSigned; };
     // Set the signed data flag.
     this.setIsSigned = function(value) { isSigned = value; };
+    // Get the current position.
+    this.getCurrentPosition = function() { return currentPosition; };
+    // Set the current position. Returns false is not in bounds.
+    this.setCurrentPosition = function(pos) { 
+    	if( !image.getSize().isInBounds(pos.i,pos.j,pos.k) ) return false;
+    	currentPosition = pos;
+        this.fireEvent({"type": "positionchange", 
+            "i": pos.i, "j": pos.j, "k": pos.k,
+            "value": image.getRescaledValue(pos.i,pos.j,pos.k)});
+        return true;
+	};
     
     // view listeners
     var listeners = {};
@@ -101,6 +115,30 @@ dwv.image.View.prototype.setWindowLevelMinMax = function()
 };
 
 /**
+ * Increment the current slice number.
+ * Returns false is not in bounds.
+ */
+dwv.image.View.prototype.incrementSliceNb = function()
+{
+	return this.setCurrentPosition({
+		"i": this.getCurrentPosition().i,
+		"j": this.getCurrentPosition().j,
+		"k": this.getCurrentPosition().k + 1 });
+};
+
+/**
+ * Decrement the current slice number.
+ * Returns false is not in bounds.
+ */
+dwv.image.View.prototype.decrementSliceNb = function()
+{
+	return this.setCurrentPosition({
+		"i": this.getCurrentPosition().i,
+		"j": this.getCurrentPosition().j,
+		"k": this.getCurrentPosition().k - 1 });
+};
+
+/**
  * Clone the image using all meta data and the original data buffer.
  * @returns A full copy of this {dwv.image.Image}.
  */
@@ -118,9 +156,10 @@ dwv.image.View.prototype.clone = function()
  * @param array The array to fill in.
  * @param sliceNumber The slice position.
  */
-dwv.image.View.prototype.generateImageData = function( array, sliceNumber )
+dwv.image.View.prototype.generateImageData = function( array )
 {        
-    var image = this.getImage();
+    var sliceNumber = this.getCurrentPosition().k;
+	var image = this.getImage();
     var pxValue = 0;
     var photoInterpretation = image.getPhotometricInterpretation();
     var planarConfig = image.getPlanarConfiguration();
