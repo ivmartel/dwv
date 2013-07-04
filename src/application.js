@@ -89,14 +89,6 @@ dwv.App = function(mobile)
         {
             self.getUndoStack().redo();
         }
-        else if( event.keyCode === 107 ) // +
-        {
-        	self.getView().incrementSliceNb();
-        }
-        else if( event.keyCode === 109 ) // -
-        {
-        	self.getView().decrementSliceNb();            	
-        }
     };
     
     /**
@@ -327,7 +319,6 @@ dwv.App = function(mobile)
      */
     function eventHandler(event)
     {
-        console.log(event.type);
     	// flag not to get confused between touch and mouse
         var handled = false;
         // Store the event position relative to the image canvas
