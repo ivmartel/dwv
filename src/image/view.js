@@ -64,13 +64,17 @@ dwv.image.View = function(image)
     this.setIsSigned = function(value) { isSigned = value; };
     // Get the current position.
     this.getCurrentPosition = function() { return currentPosition; };
-    // Set the current position. Returns false is not in bounds.
+    // Set the current position. Returns false if not in bounds.
     this.setCurrentPosition = function(pos) { 
     	if( !image.getSize().isInBounds(pos.i,pos.j,pos.k) ) return false;
     	currentPosition = pos;
         this.fireEvent({"type": "positionchange", 
             "i": pos.i, "j": pos.j, "k": pos.k,
             "value": image.getRescaledValue(pos.i,pos.j,pos.k)});
+        // slice change event (used to trigger redraw)
+        if( this.getCurrentPosition.k !== pos.k ) {
+        	this.fireEvent({"type": "slicechange"});
+        }
         return true;
 	};
     
@@ -116,7 +120,7 @@ dwv.image.View.prototype.setWindowLevelMinMax = function()
 
 /**
  * Increment the current slice number.
- * Returns false is not in bounds.
+ * Returns false if not in bounds.
  */
 dwv.image.View.prototype.incrementSliceNb = function()
 {
@@ -128,7 +132,7 @@ dwv.image.View.prototype.incrementSliceNb = function()
 
 /**
  * Decrement the current slice number.
- * Returns false is not in bounds.
+ * Returns false if not in bounds.
  */
 dwv.image.View.prototype.decrementSliceNb = function()
 {
