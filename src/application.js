@@ -93,15 +93,13 @@ dwv.App = function(mobile)
         }
         else if( event.keyCode === 107 ) // +
         {
-            ++sliceNb;
-            console.log( "sliceNb: "+sliceNb);
-            self.generateAndDrawImage();
+        	if( self.getView().incrementSliceNb() )
+        		self.generateAndDrawImage();
         }
         else if( event.keyCode === 109 ) // -
         {
-            if( sliceNb !== 0 ) --sliceNb;
-            console.log( "sliceNb: "+sliceNb);
-            self.generateAndDrawImage();
+        	if( self.getView().decrementSliceNb() )
+        		self.generateAndDrawImage();            	
         }
     };
     
@@ -244,7 +242,7 @@ dwv.App = function(mobile)
     this.generateAndDrawImage = function()
     {         
     	// generate image data from DICOM
-        self.getView().generateImageData(imageData, sliceNb);         
+        self.getView().generateImageData(imageData);         
         // set the image data of the layer
         self.getImageLayer().setImageData(imageData);
         // draw the image
@@ -290,17 +288,19 @@ dwv.App = function(mobile)
         dwv.html.toggleDisplay('infoLayer');
         // toggle listeners
         if( isInfoLayerListening ) {
-            view.removeEventListener("wlchange", dwv.info.updateWindowingValue);
+            view.removeEventListener("wlchange", dwv.info.updateWindowingDiv);
             view.removeEventListener("wlchange", dwv.info.updateMiniColorMap);
             view.removeEventListener("wlchange", dwv.info.updatePlotMarkings);
             view.removeEventListener("colorchange", dwv.info.updateMiniColorMap);
+            view.removeEventListener("positionchange", dwv.info.updatePositionDiv);
             isInfoLayerListening = false;
         }
         else {
-            view.addEventListener("wlchange", dwv.info.updateWindowingValue);
+            view.addEventListener("wlchange", dwv.info.updateWindowingDiv);
             view.addEventListener("wlchange", dwv.info.updateMiniColorMap);
             view.addEventListener("wlchange", dwv.info.updatePlotMarkings);
             view.addEventListener("colorchange", dwv.info.updateMiniColorMap);
+            view.addEventListener("positionchange", dwv.info.updatePositionDivs);
             isInfoLayerListening = true;
         }
     };
@@ -471,7 +471,8 @@ dwv.App = function(mobile)
         createLayers(dataWidth, dataHeight);
         
         // info layer
-        dwv.info.createWindowingValue();
+        dwv.info.createWindowingDiv();
+        dwv.info.createPositionDiv();
         dwv.info.createMiniColorMap();
         dwv.info.createPlot();
 
@@ -494,10 +495,11 @@ dwv.App = function(mobile)
         // keydown listener
         window.addEventListener("keydown", eventHandler, true);
         // image listeners
-        view.addEventListener("wlchange", dwv.info.updateWindowingValue);
+        view.addEventListener("wlchange", dwv.info.updateWindowingDiv);
         view.addEventListener("wlchange", dwv.info.updateMiniColorMap);
         view.addEventListener("wlchange", dwv.info.updatePlotMarkings);
         view.addEventListener("colorchange", dwv.info.updateMiniColorMap);
+        view.addEventListener("positionchange", dwv.info.updatePositionDiv);
         
         // initialise the toolbox
         // note: the window/level tool is responsible for doing the first display.
