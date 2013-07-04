@@ -35,10 +35,10 @@ dwv.image.Size.prototype.equals = function(rhs) {
     	&& this.getNumberOfSlices() === rhs.getNumberOfSlices();
 };
 // Check that coordinates are within bounds.
-dwv.image.Size.prototype.checkCoordinates = function( i, j, k ) {
-    if( i < 0 || i >= this.getNumberOfColumns() ) throw new Error('Index (i) out of range.');
-    else if( j < 0 || j >= this.getNumberOfRows() ) throw new Error('Index (j) out of range.');
-    else if( k < 0 || k >= this.getNumberOfSlices() ) throw new Error('Index (k) out of range.');
+dwv.image.Size.prototype.isInBounds = function( i, j, k ) {
+    if( i < 0 || i > this.getNumberOfColumns() - 1  
+		|| j < 0 || j > this.getNumberOfRows() - 1
+		|| k < 0 || k > this.getNumberOfSlices() - 1 ) return false;
     return true;
 };
 
@@ -179,13 +179,9 @@ dwv.image.Image = function(size, spacing, buffer)
  */
 dwv.image.Image.prototype.getValue = function( i, j, k )
 {
-    var k1 = k || 0;
-    // check size
-    //this.size.checkCoordinates( i, j, k1 );
-    // return
     return this.getValueAtOffset( i 
             + ( j * this.getSize().getNumberOfColumns() ) 
-            + ( k1 * this.getSize().getSliceSize()) );
+            + ( k * this.getSize().getSliceSize()) );
 };
 
 /**
