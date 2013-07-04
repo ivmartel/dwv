@@ -65,6 +65,11 @@ dwv.tool.WindowLevel = function(app)
         dwv.tool.updatePostionValue(ev._x, ev._y);
     };
     
+    this.twotouchdown = function(ev){
+        self.started = true;
+        self.x0 = ev._x;
+    };
+    
     // This function is called every time you move the mouse.
     this.mousemove = function(ev){
         if (!self.started)
@@ -83,6 +88,18 @@ dwv.tool.WindowLevel = function(app)
         self.y0 = ev._y;
     };
 
+    this.twotouchmove = function(ev){
+        if (!self.started)
+        {
+            return;
+        }
+        var diffX = ev._x - self.x0;
+        // do not trigger for small moves
+        if( Math.abs(diffX) < 10 ) return;
+    	if( diffX > 0 ) app.getView().incrementSliceNb();
+    	else app.getView().decrementSliceNb();
+    };
+    
     // This is called when you release the mouse button.
     this.mouseup = function(ev){
         if (self.started)
@@ -96,11 +113,21 @@ dwv.tool.WindowLevel = function(app)
     };
 
     this.touchstart = function(ev){
-        self.mousedown(ev);
+        if( event.targetTouches.length === 1 ){
+            self.mousedown(ev);
+        }
+        else if( event.targetTouches.length === 2 ){
+            self.twotouchdown(ev);
+        }
     };
 
     this.touchmove = function(ev){
-        self.mousemove(ev);
+        if( event.targetTouches.length === 1 ){
+            self.mousemove(ev);
+        }
+        else if( event.targetTouches.length === 2 ){
+            self.twotouchmove(ev);
+        }
     };
 
     this.touchend = function(ev){
@@ -111,6 +138,18 @@ dwv.tool.WindowLevel = function(app)
         dwv.tool.updateWindowingData(
                 parseInt(app.getImage().getRescaledValue(ev._x, ev._y), 10),
                 parseInt(app.getView().getWindowLut().getWidth(), 10) );    
+    };
+    
+    // This is called when you use the mouse wheel on Firefox.
+    this.DOMMouseScroll = function(ev){
+    	if( ev.detail > 0 ) app.getView().incrementSliceNb();
+    	else app.getView().decrementSliceNb();
+    };
+
+    // This is called when you use the mouse wheel.
+    this.mousewheel = function(ev){
+    	if( ev.wheelDelta > 0 ) app.getView().incrementSliceNb();
+    	else app.getView().decrementSliceNb();
     };
     
     this.enable = function(bool){
