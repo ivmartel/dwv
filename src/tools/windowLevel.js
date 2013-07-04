@@ -10,24 +10,9 @@ dwv.tool = dwv.tool || {};
 /**
  * @function
  */
-dwv.tool.showHUvalue = function(x,y)
+dwv.tool.updatePostionValue = function(i,j)
 {
-    var div = document.getElementById("infotl");
-    dwv.html.removeNode("ulinfotl");
-    var ul = document.createElement("ul");
-    ul.id = "ulinfotl";
-    
-    var lix = document.createElement("li");
-    lix.appendChild(document.createTextNode("X = "+x));
-    ul.appendChild(lix);
-    var liy = document.createElement("li");
-    liy.appendChild(document.createTextNode("Y = "+y));
-    ul.appendChild(liy);
-    var lihu = document.createElement("li");
-    lihu.appendChild(document.createTextNode("v = "+app.getImage().getRescaledValue(x,y)));
-    ul.appendChild(lihu);
-    
-    div.appendChild(ul);
+	app.getView().setCurrentPosition({"i": i, "j": j, "k": app.getView().getCurrentPosition().k});
 };
 
 /**
@@ -79,7 +64,7 @@ dwv.tool.WindowLevel = function(app)
         self.started = true;
         self.x0 = ev._x;
         self.y0 = ev._y;
-        dwv.tool.showHUvalue(ev._x, ev._y);
+        dwv.tool.updatePostionValue(ev._x, ev._y);
     };
     
     // This function is called every time you move the mouse.
