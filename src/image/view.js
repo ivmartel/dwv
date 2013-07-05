@@ -72,7 +72,7 @@ dwv.image.View = function(image)
             "i": pos.i, "j": pos.j, "k": pos.k,
             "value": image.getRescaledValue(pos.i,pos.j,pos.k)});
         // slice change event (used to trigger redraw)
-        if( this.getCurrentPosition.k !== pos.k ) {
+        if( this.getCurrentPosition().k !== pos.k ) {
         	this.fireEvent({"type": "slicechange"});
         }
         return true;
