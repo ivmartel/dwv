@@ -23,10 +23,13 @@ dwv.image.View = function(image)
     var colorMap = dwv.image.lut.plain;
     // is signed flag
     var isSigned = 0;
+    // current position
+    var currentPosition = {"i":0,"j":0,"k":0};
     
     // Get the associated image.
     this.getImage = function() { return image; };
-    this.setImage = function(inimage) { image = inimage; };
+    // Set the associated image.
+    this.setImage = function(inImage) { image = inImage; };
     
     // Get the rescale LUT of the image.
     this.getRescaleLut = function() { return rescaleLut; };
@@ -59,6 +62,21 @@ dwv.image.View = function(image)
     this.isSigned = function() { return isSigned; };
     // Set the signed data flag.
     this.setIsSigned = function(value) { isSigned = value; };
+    // Get the current position.
+    this.getCurrentPosition = function() { return currentPosition; };
+    // Set the current position. Returns false if not in bounds.
+    this.setCurrentPosition = function(pos) { 
+    	if( !image.getSize().isInBounds(pos.i,pos.j,pos.k) ) return false;
+    	currentPosition = pos;
+        this.fireEvent({"type": "positionchange", 
+            "i": pos.i, "j": pos.j, "k": pos.k,
+            "value": image.getRescaledValue(pos.i,pos.j,pos.k)});
+        // slice change event (used to trigger redraw)
+        if( this.getCurrentPosition().k !== pos.k ) {
+        	this.fireEvent({"type": "slicechange"});
+        }
+        return true;
+	};
     
     // view listeners
     var listeners = {};
@@ -101,6 +119,30 @@ dwv.image.View.prototype.setWindowLevelMinMax = function()
 };
 
 /**
+ * Increment the current slice number.
+ * Returns false if not in bounds.
+ */
+dwv.image.View.prototype.incrementSliceNb = function()
+{
+	return this.setCurrentPosition({
+		"i": this.getCurrentPosition().i,
+		"j": this.getCurrentPosition().j,
+		"k": this.getCurrentPosition().k + 1 });
+};
+
+/**
+ * Decrement the current slice number.
+ * Returns false if not in bounds.
+ */
+dwv.image.View.prototype.decrementSliceNb = function()
+{
+	return this.setCurrentPosition({
+		"i": this.getCurrentPosition().i,
+		"j": this.getCurrentPosition().j,
+		"k": this.getCurrentPosition().k - 1 });
+};
+
+/**
  * Clone the image using all meta data and the original data buffer.
  * @returns A full copy of this {dwv.image.Image}.
  */
@@ -118,12 +160,10 @@ dwv.image.View.prototype.clone = function()
  * @param array The array to fill in.
  * @param sliceNumber The slice position.
  */
-dwv.image.View.prototype.generateImageData = function( array, sliceNumber )
+dwv.image.View.prototype.generateImageData = function( array )
 {        
-    var image = this.getImage();
-    var sliceSize = image.getSize().getSliceSize();
-    var sliceOffset = (sliceNumber || 0) * sliceSize;
-    var iMax = sliceOffset + sliceSize;
+    var sliceNumber = this.getCurrentPosition().k;
+	var image = this.getImage();
     var pxValue = 0;
     var photoInterpretation = image.getPhotometricInterpretation();
     var planarConfig = image.getPlanarConfiguration();
@@ -133,15 +173,18 @@ dwv.image.View.prototype.generateImageData = function( array, sliceNumber )
     switch (photoInterpretation) {
         case "MONOCHROME1":
         case "MONOCHROME2":
+            var sliceSize = image.getSize().getSliceSize();
+            var sliceOffset = (sliceNumber || 0) * sliceSize;
+            var iMax = sliceOffset + sliceSize;
             for(var i=sliceOffset; i < iMax; ++i)
             {        
                 pxValue = parseInt( windowLut.getValue( 
                 		image.getValueAtOffset(i) ), 10 );
-                index = 4*i;
                 array.data[index] = colorMap.red[pxValue];
                 array.data[index+1] = colorMap.green[pxValue];
                 array.data[index+2] = colorMap.blue[pxValue];
                 array.data[index+3] = 0xff;
+                index += 4;
             }
         break;
         
@@ -150,23 +193,25 @@ dwv.image.View.prototype.generateImageData = function( array, sliceNumber )
             if( planarConfig !== 0 && planarConfig !== 1 ) {
                 throw new Error("Unsupported planar configuration: "+planarConfig);
             }
+            var sliceSize = image.getSize().getSliceSize();
+            var sliceOffset = (sliceNumber || 0) * 3 * sliceSize;
             // default: RGBRGBRGBRGB...
-            var posR = 0;
-            var posG = 1;
-            var posB = 2;
+            var posR = sliceOffset;
+            var posG = sliceOffset + 1;
+            var posB = sliceOffset + 2;
             var stepPos = 3;
             // RRRR...GGGG...BBBB...
             if (planarConfig === 1) { 
-                posR = 0;
-                posG = iMax;
-                posB = 2 * iMax;
+                posR = sliceOffset;
+                posG = sliceOffset + sliceSize;
+                posB = sliceOffset + 2 * sliceSize;
                 stepPos = 1;
             }
             
             var redValue = 0;
             var greenValue = 0;
             var blueValue = 0;
-            for(var i=sliceOffset; i < iMax; ++i)
+            for(var i=0; i < image.getSize().getSliceSize(); ++i)
             {        
                 redValue = parseInt( windowLut.getValue( 
                         image.getValueAtOffset(posR) ), 10 );
@@ -175,10 +220,11 @@ dwv.image.View.prototype.generateImageData = function( array, sliceNumber )
                 blueValue = parseInt( windowLut.getValue( 
                         image.getValueAtOffset(posB) ), 10 );
                 
-                array.data[4*i] = redValue;
-                array.data[4*i+1] = greenValue;
-                array.data[4*i+2] = blueValue;
-                array.data[4*i+3] = 0xff;
+                array.data[index] = redValue;
+                array.data[index+1] = greenValue;
+                array.data[index+2] = blueValue;
+                array.data[index+3] = 0xff;
+                index += 4;
                 
                 posR += stepPos;
                 posG += stepPos;

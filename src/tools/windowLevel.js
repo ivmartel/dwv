@@ -10,24 +10,9 @@ dwv.tool = dwv.tool || {};
 /**
  * @function
  */
-dwv.tool.showHUvalue = function(x,y)
+dwv.tool.updatePostionValue = function(i,j)
 {
-    var div = document.getElementById("infotl");
-    dwv.html.removeNode("ulinfotl");
-    var ul = document.createElement("ul");
-    ul.id = "ulinfotl";
-    
-    var lix = document.createElement("li");
-    lix.appendChild(document.createTextNode("X = "+x));
-    ul.appendChild(lix);
-    var liy = document.createElement("li");
-    liy.appendChild(document.createTextNode("Y = "+y));
-    ul.appendChild(liy);
-    var lihu = document.createElement("li");
-    lihu.appendChild(document.createTextNode("v = "+app.getImage().getRescaledValue(x,y)));
-    ul.appendChild(lihu);
-    
-    div.appendChild(ul);
+	app.getView().setCurrentPosition({"i": i, "j": j, "k": app.getView().getCurrentPosition().k});
 };
 
 /**
@@ -36,7 +21,6 @@ dwv.tool.showHUvalue = function(x,y)
 dwv.tool.updateWindowingData = function(wc,ww)
 {
     app.getView().setWindowLevel(wc,ww);
-    app.generateAndDrawImage();
 };
 
 /**
@@ -45,7 +29,6 @@ dwv.tool.updateWindowingData = function(wc,ww)
 dwv.tool.updateColourMap = function(colourMap)    
 {    
     app.getView().setColorMap(colourMap);
-    app.generateAndDrawImage();
 };
 
 dwv.tool.colourMaps = {
@@ -72,14 +55,19 @@ dwv.tool.WindowLevel = function(app)
     var self = this;
     this.started = false;
     this.displayed = false;
-    
+    this.updatePresets();
 
     // This is called when you start holding down the mouse button.
     this.mousedown = function(ev){
         self.started = true;
         self.x0 = ev._x;
         self.y0 = ev._y;
-        dwv.tool.showHUvalue(ev._x, ev._y);
+        dwv.tool.updatePostionValue(ev._x, ev._y);
+    };
+    
+    this.twotouchdown = function(ev){
+        self.started = true;
+        self.x0 = ev._x;
     };
     
     // This function is called every time you move the mouse.
@@ -100,6 +88,18 @@ dwv.tool.WindowLevel = function(app)
         self.y0 = ev._y;
     };
 
+    this.twotouchmove = function(ev){
+        if (!self.started)
+        {
+            return;
+        }
+        var diffX = ev._x - self.x0;
+        // do not trigger for small moves
+        if( Math.abs(diffX) < 10 ) return;
+    	if( diffX > 0 ) app.getView().incrementSliceNb();
+    	else app.getView().decrementSliceNb();
+    };
+    
     // This is called when you release the mouse button.
     this.mouseup = function(ev){
         if (self.started)
@@ -113,11 +113,21 @@ dwv.tool.WindowLevel = function(app)
     };
 
     this.touchstart = function(ev){
-        self.mousedown(ev);
+        if( event.targetTouches.length === 1 ){
+            self.mousedown(ev);
+        }
+        else if( event.targetTouches.length === 2 ){
+            self.twotouchdown(ev);
+        }
     };
 
     this.touchmove = function(ev){
-        self.mousemove(ev);
+        if( event.targetTouches.length === 1 ){
+            self.mousemove(ev);
+        }
+        else if( event.targetTouches.length === 2 ){
+            self.twotouchmove(ev);
+        }
     };
 
     this.touchend = function(ev){
@@ -130,13 +140,21 @@ dwv.tool.WindowLevel = function(app)
                 parseInt(app.getView().getWindowLut().getWidth(), 10) );    
     };
     
+    // This is called when you use the mouse wheel on Firefox.
+    this.DOMMouseScroll = function(ev){
+    	if( ev.detail > 0 ) app.getView().incrementSliceNb();
+    	else app.getView().decrementSliceNb();
+    };
+
+    // This is called when you use the mouse wheel.
+    this.mousewheel = function(ev){
+    	if( ev.wheelDelta > 0 ) app.getView().incrementSliceNb();
+    	else app.getView().decrementSliceNb();
+    };
+    
     this.enable = function(bool){
         if( bool ) {
-            this.updatePresets();
             dwv.gui.appendWindowLevelHtml();
-            dwv.tool.updateWindowingData(
-                    parseInt(app.getView().getWindowLut().getCenter(), 10),
-                    parseInt(app.getView().getWindowLut().getWidth(), 10) );
         }
         else {
             dwv.gui.clearWindowLevelHtml();
