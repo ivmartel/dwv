@@ -6,7 +6,7 @@ dwv.info = dwv.info || {};
 /**
  * @function Create the windowing info div.
  */
-dwv.info.createWindowingValue = function()
+dwv.info.createWindowingDiv = function()
 {
     var div = document.getElementById("infotr");
     dwv.html.removeNode("ulinfotr");
@@ -26,11 +26,11 @@ dwv.info.createWindowingValue = function()
 };
 
 /**
- * @function Update the windowing info div.
+ * @function Update the Top Right info div.
  * @param event The windowing change event containing the new values.
- * Warning: expects the windowing info div to exist (use after createWindowingValue).
+ * Warning: expects the windowing info div to exist (use after createWindowingDiv).
  */
-dwv.info.updateWindowingValue = function(event)
+dwv.info.updateWindowingDiv = function(event)
 {
     // window center list item
     var liwc = document.getElementById("liwcinfotr");
@@ -40,6 +40,45 @@ dwv.info.updateWindowingValue = function(event)
     var liww = document.getElementById("liwwinfotr");
     dwv.html.cleanNode(liww);
     liww.appendChild(document.createTextNode("WindowWidth = "+event.ww));
+};
+
+/**
+ * @function Create the position info div.
+ */
+dwv.info.createPositionDiv = function()
+{
+    var div = document.getElementById("infotl");
+    dwv.html.removeNode("ulinfotl");
+    // position list
+    var ul = document.createElement("ul");
+    ul.id = "ulinfotl";
+    // position
+    var lipos = document.createElement("li");
+    lipos.id = "liposinfotl";
+    ul.appendChild(lipos);
+    // value
+    var livalue = document.createElement("li");
+    livalue.id = "livalueinfotl";
+    ul.appendChild(livalue);
+    // add list to div
+    div.appendChild(ul);
+};
+
+/**
+ * @function Update the position info div.
+ * @param event The position change event containing the new values.
+ * Warning: expects the position info div to exist (use after createPositionDiv).
+ */
+dwv.info.updatePositionDiv = function(event)
+{
+    // window center list item
+    var lipos = document.getElementById("liposinfotl");
+    dwv.html.cleanNode(lipos);
+    lipos.appendChild(document.createTextNode("Pos = "+event.i+", "+event.j+", "+event.k));
+    // window width list item
+    var livalue = document.getElementById("livalueinfotl");
+    dwv.html.cleanNode(livalue);
+    livalue.appendChild(document.createTextNode("Value = "+event.value));
 };
 
 /**

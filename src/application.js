@@ -37,14 +37,13 @@ dwv.App = function(mobile)
     
     // Get the image
     this.getImage = function() { return image; };
+    // Get the view
     this.getView = function() { return view; };
     
     // Set the image
-    this.setImage = function(img) { 
-    	image = img;
-        view.setImage(img);
-    	};    
-    this.restoreOriginalImage = function() { image = originalImage; }; 
+    this.setImage = function(img) { image = img; view.setImage(img); };    
+    // Restore the original image
+    this.restoreOriginalImage = function() { image = originalImage; view.setImage(originalImage); }; 
     
     // Get the image data array
     this.getImageData = function() { return imageData; };
@@ -81,11 +80,11 @@ dwv.App = function(mobile)
      */
     this.handleKeyDown = function(event)
     {
-        if( event.keyCode === 90 && event.ctrlKey ) // CRTL-Z
+        if( event.keyCode === 90 && event.ctrlKey ) // ctrl-z
         {
             self.getUndoStack().undo();
         }
-        else if( event.keyCode === 89 && event.ctrlKey ) // CRTL-Y
+        else if( event.keyCode === 89 && event.ctrlKey ) // ctrl-y
         {
             self.getUndoStack().redo();
         }
@@ -104,50 +103,55 @@ dwv.App = function(mobile)
      */
     this.loadFiles = function(files) 
     {
-        //TODO: for (var i = 0; i < files.length; ++i) {
-        if( files[0].type.match("image.*") )
-        {
-            var reader = new FileReader();
-            reader.onload = function(event){
-                var image = new Image();
-                image.src = event.target.result;
-                image.onload = function(e){
-                    try {
-                        // parse image file
-                        var data = dwv.image.getDataFromImage(image, files[0]);
-                        // prepare display
-                        postLoadInit(data);
-        			} catch(error) {
-                        handleError(error);
-                        return;
-        			}
-                };
-            };
-            reader.onprogress = dwv.gui.updateProgress;
-            reader.onerror = function(event){
-                alert("An error occurred while reading the image file: "+event.getMessage());
-            };
-            reader.readAsDataURL(files[0]);
-        }
-        else
-        {
-            var reader = new FileReader();
-    		reader.onload = function(event){
-    			try {
-        		    // parse DICOM file
-        			var data = dwv.image.getDataFromDicomBuffer(event.target.result);
-        			// prepare display
-        			postLoadInit(data);
-    			} catch(error) {
-                    handleError(error);
-                    return;
-    			}
-    		};
-    		reader.onprogress = dwv.gui.updateProgress;
-    		reader.onerror = function(event){
-                alert("An error occurred while reading the DICOM file: "+event.getMessage());
-            };
-    		reader.readAsArrayBuffer(files[0]);
+    	for (var i = 0; i < files.length; ++i)
+    	{
+            var file = files[i];
+	        if( file.type.match("image.*") )
+	        {
+	            var reader = new FileReader();
+	            reader.onload = function(event){
+	                var tmp_image = new Image();
+	                tmp_image.src = event.target.result;
+	                tmp_image.onload = function(e){
+	                    try {
+	                        // parse image file
+	                        var data = dwv.image.getDataFromImage(tmp_image, file);
+		        			if( image ) image.appendSlice( data.view.getImage() );
+	                        // prepare display
+	                        postLoadInit(data);
+	        			} catch(error) {
+	                        handleError(error);
+	                        return;
+	        			}
+	                };
+	            };
+	            reader.onprogress = dwv.gui.updateProgress;
+	            reader.onerror = function(event){
+	                alert("An error occurred while reading the image file: "+event.getMessage());
+	            };
+	            reader.readAsDataURL(file);
+	        }
+	        else
+	        {
+	            var reader = new FileReader();
+	    		reader.onload = function(event){
+	    			try {
+	        		    // parse DICOM file
+	        			var data = dwv.image.getDataFromDicomBuffer(event.target.result);
+	        			if( image ) image.appendSlice( data.view.getImage() );
+	        			// prepare display
+	    			    postLoadInit(data);
+	    			} catch(error) {
+	                    handleError(error);
+	                    return;
+	    			}
+	    		};
+	    		reader.onprogress = dwv.gui.updateProgress;
+	    		reader.onerror = function(event){
+	                alert("An error occurred while reading the DICOM file: "+event.getMessage());
+	            };
+	    		reader.readAsArrayBuffer(file);
+	        }
         }
     };
         
@@ -271,17 +275,11 @@ dwv.App = function(mobile)
         dwv.html.toggleDisplay('infoLayer');
         // toggle listeners
         if( isInfoLayerListening ) {
-            view.removeEventListener("wlchange", dwv.info.updateWindowingValue);
-            view.removeEventListener("wlchange", dwv.info.updateMiniColorMap);
-            view.removeEventListener("wlchange", dwv.info.updatePlotMarkings);
-            view.removeEventListener("colorchange", dwv.info.updateMiniColorMap);
+        	removeImageInfoListeners();
             isInfoLayerListening = false;
         }
         else {
-            view.addEventListener("wlchange", dwv.info.updateWindowingValue);
-            view.addEventListener("wlchange", dwv.info.updateMiniColorMap);
-            view.addEventListener("wlchange", dwv.info.updatePlotMarkings);
-            view.addEventListener("colorchange", dwv.info.updateMiniColorMap);
+        	addImageInfoListeners();
             isInfoLayerListening = true;
         }
     };
@@ -290,13 +288,37 @@ dwv.App = function(mobile)
     // ---------------
 
     /**
+     * Add image listeners.
+     */
+    function addImageInfoListeners()
+    {
+        view.addEventListener("wlchange", dwv.info.updateWindowingDiv);
+        view.addEventListener("wlchange", dwv.info.updateMiniColorMap);
+        view.addEventListener("wlchange", dwv.info.updatePlotMarkings);
+        view.addEventListener("colorchange", dwv.info.updateMiniColorMap);
+        view.addEventListener("positionchange", dwv.info.updatePositionDiv);
+    }
+    
+    /**
+     * Remove image listeners.
+     */
+    function removeImageInfoListeners()
+    {
+        view.removeEventListener("wlchange", dwv.info.updateWindowingDiv);
+        view.removeEventListener("wlchange", dwv.info.updateMiniColorMap);
+        view.removeEventListener("wlchange", dwv.info.updatePlotMarkings);
+        view.removeEventListener("colorchange", dwv.info.updateMiniColorMap);
+        view.removeEventListener("positionchange", dwv.info.updatePositionDiv);
+    }
+    
+    /**
      * @private
      * The general-purpose event handler. This function just determines the mouse 
      * position relative to the canvas element.
      */
     function eventHandler(event)
     {
-        // flag not to get confused between touch and mouse
+    	// flag not to get confused between touch and mouse
         var handled = false;
         // Store the event position relative to the image canvas
         // in an extra member of the event:
@@ -432,11 +454,13 @@ dwv.App = function(mobile)
      */
     function postLoadInit(data)
     {
+        // only initialise the first time
+    	if( view ) return;
+        
+        // get the view from the loaded data
+    	view = data.view;
         // create the DICOM tags table
         createTagsTable(data.info);
-
-        view = data.view;
-        
         // store image
         originalImage = view.getImage();
         image = originalImage;
@@ -446,8 +470,9 @@ dwv.App = function(mobile)
         dataHeight = image.getSize().getNumberOfRows();
         createLayers(dataWidth, dataHeight);
         
-        // info layer
-        dwv.info.createWindowingValue();
+        // create the info layer
+        dwv.info.createWindowingDiv();
+        dwv.info.createPositionDiv();
         dwv.info.createMiniColorMap();
         dwv.info.createPlot();
 
@@ -470,17 +495,24 @@ dwv.App = function(mobile)
         // keydown listener
         window.addEventListener("keydown", eventHandler, true);
         // image listeners
-        view.addEventListener("wlchange", dwv.info.updateWindowingValue);
-        view.addEventListener("wlchange", dwv.info.updateMiniColorMap);
-        view.addEventListener("wlchange", dwv.info.updatePlotMarkings);
-        view.addEventListener("colorchange", dwv.info.updateMiniColorMap);
+        view.addEventListener("wlchange", app.generateAndDrawImage);
+        view.addEventListener("colorchange", app.generateAndDrawImage);
+        view.addEventListener("slicechange", app.generateAndDrawImage);
+        addImageInfoListeners();
         
         // initialise the toolbox
-        // note: the window/level tool is responsible for doing the first display.
         toolBox.enable(true);
         // add the HTML for the history 
         dwv.gui.appendUndoHtml();
-
+        
+        // the following has to be done after adding listeners
+        
+        // set window/level: triggers first data and div display
+        dwv.tool.updateWindowingData(
+                parseInt(app.getView().getWindowLut().getCenter(), 10),
+                parseInt(app.getView().getWindowLut().getWidth(), 10) );
+        // default position: triggers div display
+        dwv.tool.updatePostionValue(0,0);
     }
     
 };

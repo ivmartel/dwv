@@ -50,7 +50,7 @@ dwv.image.filter.Sharpen = function()
 
 dwv.image.filter.Sharpen.prototype.update = function()
 {
-    return app.getImage().convolute(
+    return app.getImage().convolute2D(
         [  0, -1,  0,
           -1,  5, -1,
            0, -1,  0 ] );
@@ -67,12 +67,12 @@ dwv.image.filter.Sobel = function()
 
 dwv.image.filter.Sobel.prototype.update = function()
 {
-    var gradX = app.getImage().convolute(
+    var gradX = app.getImage().convolute2D(
         [ 1,  0,  -1,
           2,  0,  -2,
           1,  0,  -1 ] );
 
-    var gradY = app.getImage().convolute(
+    var gradY = app.getImage().convolute2D(
         [  1,  2,  1,
            0,  0,  0,
           -1, -2, -1 ] );
