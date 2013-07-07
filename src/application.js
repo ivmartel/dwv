@@ -37,14 +37,13 @@ dwv.App = function(mobile)
     
     // Get the image
     this.getImage = function() { return image; };
+    // Get the view
     this.getView = function() { return view; };
     
     // Set the image
-    this.setImage = function(img) { 
-    	image = img;
-        view.setImage(img);
-    	};    
-    this.restoreOriginalImage = function() { image = originalImage; }; 
+    this.setImage = function(img) { image = img; view.setImage(img); };    
+    // Restore the original image
+    this.restoreOriginalImage = function() { image = originalImage; view.setImage(originalImage); }; 
     
     // Get the image data array
     this.getImageData = function() { return imageData; };
