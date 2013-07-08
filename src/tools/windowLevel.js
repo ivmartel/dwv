@@ -8,15 +8,15 @@ dwv.tool = dwv.tool || {};
 */
 
 /**
- * @function
+ * @function Update the views' current position.
  */
 dwv.tool.updatePostionValue = function(i,j)
 {
-	app.getView().setCurrentPosition({"i": i, "j": j, "k": app.getView().getCurrentPosition().k});
+    app.getView().setCurrentPosition({"i": i, "j": j, "k": app.getView().getCurrentPosition().k});
 };
 
 /**
- * @function
+ * @function Update the views' windowing data
  */
 dwv.tool.updateWindowingData = function(wc,ww)
 {
@@ -24,13 +24,14 @@ dwv.tool.updateWindowingData = function(wc,ww)
 };
 
 /**
- * @function
+ * @function Update the views' colour map.
  */
-dwv.tool.updateColourMap = function(colourMap)    
-{    
+dwv.tool.updateColourMap = function(colourMap)
+{
     app.getView().setColorMap(colourMap);
 };
 
+// Default colour maps.
 dwv.tool.colourMaps = {
     "plain": dwv.image.lut.plain,
     "invplain": dwv.image.lut.invPlain,
@@ -38,145 +39,157 @@ dwv.tool.colourMaps = {
     "hot": dwv.image.lut.hot,
     "test": dwv.image.lut.test
 };
-
+// Default window level presets.
 dwv.tool.presets = {
-        "abdomen": {"center": 350, "width": 40},
-        "lung": {"center": -600, "width": 1500},
-        "brain": {"center": 40, "width": 80},
-        "bone": {"center": 480, "width": 2500},
-        "head": {"center": 90, "width": 350}
-    };
+    "abdomen": {"center": 350, "width": 40},
+    "lung": {"center": -600, "width": 1500},
+    "brain": {"center": 40, "width": 80},
+    "bone": {"center": 480, "width": 2500},
+    "head": {"center": 90, "width": 350}
+};
 
 /**
- * @class WindowLevel class.
+ * @class WindowLevel tool: handle window/level related events.
  */
 dwv.tool.WindowLevel = function(app)
 {
+    // Closure to self: to be used by event handlers.
     var self = this;
+    // Interaction start flag.
     this.started = false;
-    this.displayed = false;
+    // Initialise presets.
     this.updatePresets();
-
-    // This is called when you start holding down the mouse button.
-    this.mousedown = function(ev){
+    
+    // Called on mouse down event.
+    this.mousedown = function(event){
+        // set start flag
         self.started = true;
-        self.x0 = ev._x;
-        self.y0 = ev._y;
-        dwv.tool.updatePostionValue(ev._x, ev._y);
+        // store initial position
+        self.x0 = event._x;
+        self.y0 = event._y;
+        // update GUI
+        dwv.tool.updatePostionValue(event._x, event._y);
     };
     
-    this.twotouchdown = function(ev){
+    // Called on touch start event with two fingers.
+    this.twotouchdown = function(event){
+        // set start flag
         self.started = true;
-        self.x0 = ev._x;
+        // store initial position
+        self.x0 = event._x;
     };
     
-    // This function is called every time you move the mouse.
-    this.mousemove = function(ev){
-        if (!self.started)
-        {
-            return;
-        }
-
-        var diffX = ev._x - self.x0;
-        var diffY = self.y0 - ev._y;                                
+    // Called on mouse move event.
+    this.mousemove = function(event){
+        // check start flag
+        if( !self.started ) return;
+        // difference to last position
+        var diffX = event._x - self.x0;
+        var diffY = self.y0 - event._y;
+        // calculate new window level
         var windowCenter = parseInt(app.getView().getWindowLut().getCenter(), 10) + diffY;
-        var windowWidth = parseInt(app.getView().getWindowLut().getWidth(), 10) + diffX;                        
-        
-        dwv.tool.updateWindowingData(windowCenter,windowWidth);    
-        
-        self.x0 = ev._x;             
-        self.y0 = ev._y;
+        var windowWidth = parseInt(app.getView().getWindowLut().getWidth(), 10) + diffX;
+        // update GUI
+        dwv.tool.updateWindowingData(windowCenter,windowWidth);
+        // store position
+        self.x0 = event._x;
+        self.y0 = event._y;
     };
-
-    this.twotouchmove = function(ev){
-        if (!self.started)
-        {
-            return;
-        }
-        var diffX = ev._x - self.x0;
+    
+    // Called on touch move event with two fingers.
+    this.twotouchmove = function(event){
+        // check start flag
+        if( !self.started ) return;
+        // difference  to last position
+        var diffX = event._x - self.x0;
         // do not trigger for small moves
         if( Math.abs(diffX) < 10 ) return;
-    	if( diffX > 0 ) app.getView().incrementSliceNb();
-    	else app.getView().decrementSliceNb();
+        // update GUI
+        if( diffX > 0 ) app.getView().incrementSliceNb();
+        else app.getView().decrementSliceNb();
     };
     
-    // This is called when you release the mouse button.
-    this.mouseup = function(ev){
-        if (self.started)
-        {
-            self.started = false;
-        }
+    // Called on mouse up event.
+    this.mouseup = function(event){
+        // set start flag
+        if( self.started ) self.started = false;
     };
     
-    this.mouseout = function(ev){
-        self.mouseup(ev);
+    // Called on mouse out event.
+    this.mouseout = function(event){
+        // treat as mouse up
+        self.mouseup(event);
     };
-
-    this.touchstart = function(ev){
-        if( event.targetTouches.length === 1 ){
-            self.mousedown(ev);
-        }
-        else if( event.targetTouches.length === 2 ){
-            self.twotouchdown(ev);
-        }
+    
+    // Called on touch start event.
+    this.touchstart = function(event){
+        // dispatch to one or two touch handler
+        if( event.targetTouches.length === 1 ) self.mousedown(event);
+        else if( event.targetTouches.length === 2 ) self.twotouchdown(event);
     };
-
-    this.touchmove = function(ev){
-        if( event.targetTouches.length === 1 ){
-            self.mousemove(ev);
-        }
-        else if( event.targetTouches.length === 2 ){
-            self.twotouchmove(ev);
-        }
+    
+    // Called on touch move event.
+    this.touchmove = function(event){
+        // dispatch to one or two touch handler
+        if( event.targetTouches.length === 1 ) self.mousemove(event);
+        else if( event.targetTouches.length === 2 ) self.twotouchmove(event);
     };
-
-    this.touchend = function(ev){
-        self.mouseup(ev);
+    
+    // Called on touch end event.
+    this.touchend = function(event){
+        // treat as mouse up
+        self.mouseup(event);
     };
-
-    this.dblclick = function(ev){
+    
+    // Called on double click event.
+    this.dblclick = function(event){
+        // update GUI
         dwv.tool.updateWindowingData(
-                parseInt(app.getImage().getRescaledValue(ev._x, ev._y, app.getView().getCurrentPosition().k), 10),
-                parseInt(app.getView().getWindowLut().getWidth(), 10) );    
+            parseInt(app.getImage().getRescaledValue(event._x, event._y, app.getView().getCurrentPosition().k), 10),
+            parseInt(app.getView().getWindowLut().getWidth(), 10) );    
     };
     
-    // This is called when you use the mouse wheel on Firefox.
-    this.DOMMouseScroll = function(ev){
-    	if( ev.detail > 0 ) app.getView().incrementSliceNb();
-    	else app.getView().decrementSliceNb();
-    };
-
-    // This is called when you use the mouse wheel.
-    this.mousewheel = function(ev){
-    	if( ev.wheelDelta > 0 ) app.getView().incrementSliceNb();
-    	else app.getView().decrementSliceNb();
+    // Called on mouse (wheel) scroll event on Firefox.
+    this.DOMMouseScroll = function(event){
+        // update GUI
+        if( event.detail > 0 ) app.getView().incrementSliceNb();
+        else app.getView().decrementSliceNb();
     };
     
-    this.enable = function(bool){
-        if( bool ) {
-            dwv.gui.appendWindowLevelHtml();
-        }
-        else {
-            dwv.gui.clearWindowLevelHtml();
-        }
+    // Called on mouse wheel event.
+    this.mousewheel = function(event){
+        // update GUI
+        if( event.wheelDelta > 0 ) app.getView().incrementSliceNb();
+        else app.getView().decrementSliceNb();
     };
-
+    
+    // Called on key down event.
     this.keydown = function(event){
+        // let the app handle it
         app.handleKeyDown(event);
     };
-
+    
+    // Enable the tool: prepare HTML for it.
+    this.enable = function(bool){
+        // update GUI
+        if( bool ) dwv.gui.appendWindowLevelHtml();
+        else dwv.gui.clearWindowLevelHtml();
+    };
+    
 }; // WindowLevel class
 
+/**
+ * @function Update the window/level presets.
+ */
 dwv.tool.WindowLevel.prototype.updatePresets = function()
 {    
     // copy the presets and reinitialize the external one
-	// (hoping to control the order of the presets)
-	var presets = dwv.tool.presets;
+    // (hoping to control the order of the presets)
+    var presets = dwv.tool.presets;
     dwv.tool.presets = {};
-	// DICOM presets
+    // DICOM presets
     var dicomPresets = app.getView().getWindowPresets();
-    if( dicomPresets )
-    {
+    if( dicomPresets ) {
         for( var i = 0; i < dicomPresets.length; ++i ) {
             dwv.tool.presets[dicomPresets[i].name.toLowerCase()] = dicomPresets[i];
         }
@@ -189,37 +202,31 @@ dwv.tool.WindowLevel.prototype.updatePresets = function()
     var center = min + width/2;
     dwv.tool.presets["min/max"] = {"center": center, "width": width};
     // re-populate the external array
-    for( var key in presets ) {
-    	dwv.tool.presets[key] = presets[key];
-    }
+    for( var key in presets ) dwv.tool.presets[key] = presets[key];
 };
 
 /**
- * @function
+ * @function Set the window/level presets.
  */
 dwv.tool.WindowLevel.prototype.setPreset = function(name)
-{    
+{
     // check if we have it
     if( !dwv.tool.presets[name] )
-    {
         throw new Error("Unknown window level preset: '" + name + "'");
-    }
     // enable it
-    dwv.tool.updateWindowingData(
-    		dwv.tool.presets[name].center, 
-    		dwv.tool.presets[name].width );
+    dwv.tool.updateWindowingData( 
+        dwv.tool.presets[name].center, 
+        dwv.tool.presets[name].width );
 };
 
 /**
- * @function
+ * @function Set the colour map.
  */
 dwv.tool.WindowLevel.prototype.setColourMap = function(name)
-{    
+{
     // check if we have it
     if( !dwv.tool.colourMaps[name] )
-    {
         throw new Error("Unknown colour map: '" + name + "'");
-    }
     // enable it
     dwv.tool.updateColourMap( dwv.tool.colourMaps[name] );
 };
