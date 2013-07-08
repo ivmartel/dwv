@@ -136,7 +136,7 @@ dwv.tool.WindowLevel = function(app)
 
     this.dblclick = function(ev){
         dwv.tool.updateWindowingData(
-                parseInt(app.getImage().getRescaledValue(ev._x, ev._y), 10),
+                parseInt(app.getImage().getRescaledValue(ev._x, ev._y, app.getView().getCurrentPosition().k), 10),
                 parseInt(app.getView().getWindowLut().getWidth(), 10) );    
     };
     
