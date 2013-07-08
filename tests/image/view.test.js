@@ -61,7 +61,7 @@ $(document).ready(function(){
         
         // Change the window level
         view0.setWindowLevel(4000, 200);
-
+        
         // start time
         var start1 = (new Date()).getMilliseconds();
         // call generate data
