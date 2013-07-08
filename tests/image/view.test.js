@@ -1,8 +1,8 @@
 /**
- * Tests for the 'image/image.js' file.
+ * Tests for the 'view/view.js' file.
  */
 $(document).ready(function(){
-    test("Test View.", function() {
+    test("Test listeners.", function() {
         // create an image
         var size0 = 4;
         var imgSize0 = new dwv.image.Size(size0, size0, 1);
@@ -32,4 +32,42 @@ $(document).ready(function(){
         view0.setWindowLevel(1,1);
     });
 
+    test("Test generate data.", function() {
+        // create an image
+        var size0 = 128;
+        var imgSize0 = new dwv.image.Size(size0, size0, 1);
+        var imgSpacing0 = new dwv.image.Spacing(1, 1, 1);
+        var buffer0 = [];
+        for(var i=0; i<size0*size0; ++i) buffer0[i] = i;
+        var image0 = new dwv.image.Image(imgSize0, imgSpacing0, buffer0);
+        // create a view
+        var view0 = new dwv.image.View(image0);
+        // create the image data
+        var imageData = {"width": size0, "height": size0, "data": new Uint8ClampedArray(size0*size0) };
+        
+        // default window level
+        view0.setWindowLevelMinMax();
+        
+        // start time
+        var start0 = window.performance.now();
+        // call generate data
+        view0.generateImageData(imageData);
+        // time taken 
+        var time0 = window.performance.now() - start0;
+        // check time taken
+        ok( time0 < 80, "First generateImageData: "+time0+"ms.");
+        
+        // Change the window level
+        view0.setWindowLevel(4000, 200);
+
+        // start time
+        var start1 = window.performance.now();
+        // call generate data
+        view0.generateImageData(imageData);
+        // time taken 
+        var time1 = window.performance.now() - start1;
+        // check time taken
+        ok( time1 < 80, "Second generateImageData: "+time1+"ms.");
+    });
+    
 });
