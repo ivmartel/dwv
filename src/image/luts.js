@@ -3,115 +3,90 @@
  */
 dwv.image = dwv.image || {};
 /**
- * @namespace Look Up Table (LUT) related.
+ * @namespace LookUp Table (LUT) related.
  */
 dwv.image.lut = dwv.image.lut || {};
 
 /**
- * @class Rescale Lookup Table class.
+ * @class Rescale LUT class.
  * @returns {Rescale}
  */
-dwv.image.lut.Rescale = function(slope,intercept)
+dwv.image.lut.Rescale = function(slope_,intercept_)
 {
-    // default values if no presets
-    if(typeof(slope)==='undefined') slope = 1;
-    if(typeof(intercept)==='undefined') intercept = 0;
-    // Get the slope.
-    this.getSlope = function() { return slope; };
-    // Get the intercept.
-    this.getIntercept = function() { return intercept; };
-    // the internal array
-    var rescaleLut = [];
-};
-
-dwv.image.lut.Rescale.prototype.initialise = function(size)
-{
-    if(typeof(size)==='undefined') size = 4096;
-    rescaleLut = new Array(size);         
-    for(var i=0; i<size; ++i)
-    {        
-        rescaleLut[i] = i * this.getSlope() + this.getIntercept();
-    }
-};
-
-dwv.image.lut.Rescale.prototype.getLength = function()
-{
-    return rescaleLut.length;
-};
-
-dwv.image.lut.Rescale.prototype.getValue = function(offset)
-{
-    return rescaleLut[offset];
+    // The internal array.
+    var rescaleLut_ = null;
+    // The rescale slope.
+    if(typeof(slope_) === 'undefined') slope_ = 1;
+    // The rescale intercept.
+    if(typeof(intercept_) === 'undefined') intercept_ = 0;
+    
+    // Get the rescale slope.
+    this.getSlope = function() { return slope_; };
+    // Get the rescale intercept.
+    this.getIntercept = function() { return intercept_; };
+    // Initialise the LUT.
+    this.initialise = function(size)
+    {
+        if(typeof(size) === 'undefined') size = 4096;
+        rescaleLut_ = new Float32Array(size);
+        for(var i=0; i<size; ++i)
+            rescaleLut_[i] = i * slope_ + intercept_;
+    };
+    // Get the length of the LUT array.
+    this.getLength = function() { return rescaleLut_.length; };
+    // Get the value of the LUT at the given offset.
+    this.getValue = function(offset) { return rescaleLut_[offset]; };
 };
 
 /**
- * @class Window Lookup Table class.
+ * @class Window LUT class.
  * @returns {Window}
  */
-dwv.image.lut.Window = function(center, width, rescaleLut, isSigned)
+dwv.image.lut.Window = function(rescaleLut_, isSigned_)
 {
-    // default values if no presets
-    if(typeof(center)==='undefined') center = 100;
-    if(typeof(width)==='undefined') width = 200;
+    // The internal array: Uint8ClampedArray clamps between 0 and 255.
+    var windowLut_ = new Uint8ClampedArray(rescaleLut_.getLength());
+    // The window center.
+    var center_ = null;
+    // The window width.
+    var width_ = null;
+    
     // Get the center.
-    this.getCenter = function() { return center; };
+    this.getCenter = function() { return center_; };
     // Get the width.
-    this.getWidth = function() { return width; };
-    // Get the rescale LUT.
-    this.getRescaleLut = function() { return rescaleLut; };
-    // Get the signed flag
-    this.isSigned = function() { return isSigned; };
-    // the internal array
-    var windowLut = [];
-};
-
-dwv.image.lut.Window.prototype.initialise = function(size)
-{    
-    if(typeof(size)==='undefined') size = this.getRescaleLut().getLength();
-    
-    var center = this.getCenter() - 0.5;
-    if( this.isSigned() ) center += size/2;
-    var width = this.getWidth() - 1;
-    
-    var xMin = center - width / 2;
-    var xMax = center + width / 2;    
-    var yMax = 255;
-    var yMin = 0;
-    
-    windowLut = new Array(size);
-    var y = 0;
-    var value = 0;
-    for(var i=0; i<size; i++)
-    {         
-        value = this.getRescaleLut().getValue(i);
-        if(value <= xMin)
-        {                            
-            windowLut[i] = yMin;                        
-        }
-        else if (value > xMax)
+    this.getWidth = function() { return width_; };
+    // Get the signed flag.
+    this.isSigned = function() { return isSigned_; };
+    // Set the window center and width.
+    this.setCenterAndWidth = function(center, width)
+    {
+        // store the window values
+        center_ = center;
+        width_ = width;
+        // pre calculate loop values
+        var size = windowLut_.length;
+        var center0 = isSigned_ ? center - 0.5 + size / 2 : center - 0.5;
+        var width0 = width - 1;
+        // Uint8ClampedArray clamps between 0 and 255
+        var dispval = 0;
+        for(var i=0; i<size; ++i)
         {
-            windowLut[i] = yMax;         
+            // from the DICOM specification (https://www.dabsoft.ch/dicom/3/C.11.2.1.2/)
+            // y = ((x - (c - 0.5)) / (w-1) + 0.5) * (ymax - ymin )+ ymin
+            dispval = ((rescaleLut_.getValue(i) - center0 ) / width0 + 0.5) * 255;
+            windowLut_[i]= parseInt(dispval, 10);
         }
-        else
-        {                
-            y = ( (value - center ) / width + 0.5 ) * (yMax-yMin) + yMin;                        
-            windowLut[i]= parseInt(y, 10);
-        }
-    }
-};
+    };
+    // Get the length of the LUT array.
+    this.getLength = function() { return windowLut_.length; };
+    // Get the value of the LUT at the given offset.
+    this.getValue = function(offset)
+    {
+        var shift = isSigned_ ? windowLut_.length / 2 : 0;
+        return windowLut_[offset+shift];
+    };
 
-dwv.image.lut.Window.prototype.getLength = function()
-{
-    return windowLut.length;
 };
-
-dwv.image.lut.Window.prototype.getValue = function(offset)
-{
-    var shift = 0;
-    if( this.isSigned() ) shift = windowLut.length/2;
-	return windowLut[offset+shift];
-};
-
 
 /**
 * Lookup tables for image color display. 
@@ -122,9 +97,8 @@ dwv.image.lut.range_max = 256;
 dwv.image.lut.buildLut = function(func)
 {
     var lut = [];
-    for( var i=0; i<dwv.image.lut.range_max; ++i ) {
+    for( var i=0; i<dwv.image.lut.range_max; ++i )
         lut.push(func(i));
-    }
     return lut;
 };
 
@@ -135,35 +109,31 @@ dwv.image.lut.max = function(i)
 
 dwv.image.lut.maxFirstThird = function(i)
 {
-    if( i < dwv.image.lut.range_max/3 ) {
+    if( i < dwv.image.lut.range_max/3 )
         return dwv.image.lut.range_max-1;
-    }
     return 0;
 };
 
 dwv.image.lut.maxSecondThird = function(i)
 {
     var third = dwv.image.lut.range_max/3;
-    if( i >= third && i < 2*third ) {
+    if( i >= third && i < 2*third )
         return dwv.image.lut.range_max-1;
-    }
     return 0;
 };
 
 dwv.image.lut.maxThirdThird = function(i)
 {
-    if( i >= 2*dwv.image.lut.range_max/3 ) {
+    if( i >= 2*dwv.image.lut.range_max/3 )
         return dwv.image.lut.range_max-1;
-    }
     return 0;
 };
 
 dwv.image.lut.toMaxFirstThird = function(i)
 {
     var val = i * 3;
-    if( val > dwv.image.lut.range_max-1 ) {
+    if( val > dwv.image.lut.range_max-1 )
         return dwv.image.lut.range_max-1;
-    }
     return val;
 };
 
@@ -173,9 +143,8 @@ dwv.image.lut.toMaxSecondThird = function(i)
     var val = 0;
     if( i >= third ) {
         val = (i-third) * 3;
-        if( val > dwv.image.lut.range_max-1 ) {
+        if( val > dwv.image.lut.range_max-1 )
             return dwv.image.lut.range_max-1;
-        }
     }
     return val;
 };
@@ -186,9 +155,8 @@ dwv.image.lut.toMaxThirdThird = function(i)
     var val = 0;
     if( i >= 2*third ) {
         val = (i-2*third) * 3;
-        if( val > dwv.image.lut.range_max-1 ) {
+        if( val > dwv.image.lut.range_max-1 )
             return dwv.image.lut.range_max-1;
-        }
     }
     return val;
 };
@@ -249,4 +217,3 @@ dwv.image.lut.test = {
    "green": dwv.image.lut.buildLut(dwv.image.lut.id),
    "blue":  dwv.image.lut.buildLut(dwv.image.lut.id)
 };*/
-

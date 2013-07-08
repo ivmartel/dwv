@@ -473,12 +473,13 @@ dwv.dicom.DicomParser.prototype.createImage = function()
         image.setRescaleIntercept( parseFloat(this.dicomElements.RescaleIntercept.value[0]) );
     }
     
-    // view
-    var view = new dwv.image.View(image);
     // pixel representation
+    var isSigned = 0;
     if( this.dicomElements.PixelRepresentation ) {
-    	view.setIsSigned( this.dicomElements.PixelRepresentation.value[0] );
+        isSigned = this.dicomElements.PixelRepresentation.value[0];
     }
+    // view
+    var view = new dwv.image.View(image, isSigned);
     // window center and width
     var windowPresets = [];
     if( this.dicomElements.WindowCenter && this.dicomElements.WindowWidth ) {

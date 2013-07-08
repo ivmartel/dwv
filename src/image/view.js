@@ -9,20 +9,18 @@ dwv.image = dwv.image || {};
 * Need to set the window lookup table once created
 * (either directly or with helper methods). 
 */
-dwv.image.View = function(image)
+dwv.image.View = function(image, isSigned)
 {
     // rescale lookup table
     var rescaleLut = new dwv.image.lut.Rescale(
         image.getRescaleSlope(), image.getRescaleIntercept() );
     rescaleLut.initialise();
     // window lookup table
-    var windowLut = null;
+    var windowLut = new dwv.image.lut.Window(rescaleLut, isSigned);
     // window presets
     var windowPresets = null;
     // color map
     var colorMap = dwv.image.lut.plain;
-    // is signed flag
-    var isSigned = 0;
     // current position
     var currentPosition = {"i":0,"j":0,"k":0};
     
@@ -60,8 +58,6 @@ dwv.image.View = function(image)
     };
     // Is the data signed data.
     this.isSigned = function() { return isSigned; };
-    // Set the signed data flag.
-    this.setIsSigned = function(value) { isSigned = value; };
     // Get the current position.
     this.getCurrentPosition = function() { return currentPosition; };
     // Set the current position. Returns false if not in bounds.
@@ -95,12 +91,8 @@ dwv.image.View = function(image)
  */
 dwv.image.View.prototype.setWindowLevel = function( center, width )
 {
-    var lut = new dwv.image.lut.Window(center, width, this.getRescaleLut(), this.isSigned());
-    lut.initialise();
-    this.setWindowLut( lut );
-    this.fireEvent({"type": "wlchange", 
-        "wc": lut.getCenter(),
-        "ww": lut.getWidth() });
+    this.getWindowLut().setCenterAndWidth(center, width);
+    this.fireEvent({"type": "wlchange", "wc": center, "ww": width });
 };
 
 /**
