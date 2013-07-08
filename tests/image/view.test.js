@@ -43,7 +43,7 @@ $(document).ready(function(){
         // create a view
         var view0 = new dwv.image.View(image0);
         // create the image data
-        var imageData = {"width": size0, "height": size0, "data": new Uint8ClampedArray(size0*size0) };
+        var imageData = {"width": size0, "height": size0, "data": new Uint8Array(size0*size0) };
         
         // default window level
         view0.setWindowLevelMinMax();
