@@ -2,6 +2,7 @@
  * Tests for the 'dicom/dicomParser.js' file.
  */
 $(document).ready(function(){
+    module("dicomParser");
     asyncTest("Test DICOM parsing.", 2, function() {
 
         // Local file: forbidden...

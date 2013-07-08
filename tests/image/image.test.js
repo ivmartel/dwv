@@ -2,6 +2,7 @@
  * Tests for the 'image/image.js' file.
  */
 $(document).ready(function(){
+    module("image");
     test("Test Image.", function() {
         // create a simple image
         var size0 = 4;

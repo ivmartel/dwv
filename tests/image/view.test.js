@@ -2,6 +2,7 @@
  * Tests for the 'view/view.js' file.
  */
 $(document).ready(function(){
+    module("view");
     test("Test listeners.", function() {
         // create an image
         var size0 = 4;

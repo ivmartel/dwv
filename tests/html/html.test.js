@@ -2,6 +2,7 @@
  * Tests for the 'html/html.js' file.
  */
 $(document).ready(function(){
+    module("html");
     test("Test array to html function.", function() {
         // 1D array
         var array0 = [0, 1, 2, 3];

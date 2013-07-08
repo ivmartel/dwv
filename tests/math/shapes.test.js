@@ -2,6 +2,7 @@
  * Tests for the 'math/shapes.js' file.
  */
 $(document).ready(function(){
+    module("shapes");
     test("Test Point2D.", function() {
     	var p0 = new dwv.math.Point2D(1,2);
         // getX
