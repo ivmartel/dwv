@@ -67,12 +67,13 @@ dwv.image.View = function(image)
     // Set the current position. Returns false if not in bounds.
     this.setCurrentPosition = function(pos) { 
     	if( !image.getSize().isInBounds(pos.i,pos.j,pos.k) ) return false;
+    	var oldPosition = currentPosition;
     	currentPosition = pos;
         this.fireEvent({"type": "positionchange", 
             "i": pos.i, "j": pos.j, "k": pos.k,
             "value": image.getRescaledValue(pos.i,pos.j,pos.k)});
         // slice change event (used to trigger redraw)
-        if( this.getCurrentPosition().k !== pos.k ) {
+        if( oldPosition.k !== currentPosition.k ) {
         	this.fireEvent({"type": "slicechange"});
         }
         return true;
