@@ -43,17 +43,19 @@ $(document).ready(function(){
         // create a view
         var view0 = new dwv.image.View(image0);
         // create the image data
+        // TODO Uint8ClampedArray not in phantom??
         var imageData = {"width": size0, "height": size0, "data": new Uint8Array(size0*size0) };
         
         // default window level
         view0.setWindowLevelMinMax();
         
         // start time
-        var start0 = window.performance.now();
+        // TODO window.performance.now() not in phantom??
+        var start0 = (new Date()).getMilliseconds(); 
         // call generate data
         view0.generateImageData(imageData);
         // time taken 
-        var time0 = window.performance.now() - start0;
+        var time0 = (new Date()).getMilliseconds() - start0;
         // check time taken
         ok( time0 < 80, "First generateImageData: "+time0+"ms.");
         
@@ -61,11 +63,11 @@ $(document).ready(function(){
         view0.setWindowLevel(4000, 200);
 
         // start time
-        var start1 = window.performance.now();
+        var start1 = (new Date()).getMilliseconds();
         // call generate data
         view0.generateImageData(imageData);
         // time taken 
-        var time1 = window.performance.now() - start1;
+        var time1 = (new Date()).getMilliseconds() - start1;
         // check time taken
         ok( time1 < 80, "Second generateImageData: "+time1+"ms.");
     });
