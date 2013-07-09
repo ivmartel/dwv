@@ -45,8 +45,13 @@ dwv.image.lut.Rescale = function(slope_,intercept_)
 dwv.image.lut.Window = function(rescaleLut_, isSigned_)
 {
     // The internal array: Uint8ClampedArray clamps between 0 and 255.
-    if( !window.Uint8ClampedArray ) throw new Error("Need Uint8ClampedArray...");
-    var windowLut_ = new Uint8ClampedArray(rescaleLut_.getLength());
+    // (not supported on travis yet... using basic array, be sure not to overflow!)
+    var windowLut_ = null;
+    if( !window.Uint8ClampedArray ) {
+        console.warn("No support for Uint8ClampedArray.");
+        new Uint8Array(rescaleLut_.getLength());
+    }
+    else windowLut_ = new Uint8ClampedArray(rescaleLut_.getLength());
     // The window center.
     var center_ = null;
     // The window width.
