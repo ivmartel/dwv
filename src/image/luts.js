@@ -45,7 +45,7 @@ dwv.image.lut.Rescale = function(slope_,intercept_)
 dwv.image.lut.Window = function(rescaleLut_, isSigned_)
 {
     // The internal array: Uint8ClampedArray clamps between 0 and 255.
-    if( !Uint8ClampedArray ) throw new Error("Need Uint8ClampedArray...");
+    if( !window.Uint8ClampedArray ) throw new Error("Need Uint8ClampedArray...");
     var windowLut_ = new Uint8ClampedArray(rescaleLut_.getLength());
     // The window center.
     var center_ = null;
