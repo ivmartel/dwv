@@ -49,7 +49,7 @@ dwv.image.lut.Window = function(rescaleLut_, isSigned_)
     var windowLut_ = null;
     if( !window.Uint8ClampedArray ) {
         console.warn("No support for Uint8ClampedArray.");
-        new Uint8Array(rescaleLut_.getLength());
+        windowLut_ = new Uint8Array(rescaleLut_.getLength());
     }
     else windowLut_ = new Uint8ClampedArray(rescaleLut_.getLength());
     // The window center.
