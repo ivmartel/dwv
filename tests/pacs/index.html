@@ -40,7 +40,6 @@ var dataDicomSop = [
     uri: "https://github.com/ivmartel/dwv/blob/master/data/cta2.dcm?raw=true", 
     img: "goudurix.png", 
     desc: "Chest CT(A), 512*512*1, LittleEndianExplicit [1.2.840.10008.1.2.1], from the Osirix examples, hosted on the dwv github.",
-    comment: "NOT SUPPORTED YET..."
     },
     {
     title: "US", 
@@ -155,6 +154,13 @@ function createAndPutHtml(data, id)
 	    ul.appendChild(li);
     }
 }
+
+// create html once ready
+window.onload = function() {
+    createAndPutHtml(dataDicom, "uldatadicom");
+    createAndPutHtml(dataDicomSop, "uldatadicomsop");
+    createAndPutHtml(dataImg, "uldataimg");
+}
 </script>
 </head>
 <body>
@@ -204,12 +210,6 @@ To see them start Google Chrome with <code>--disable-web-security</code>
 
 </div><!-- /page -->
 </div><!-- /content -->
-
-<script type="text/javascript">
-createAndPutHtml(dataDicom, "uldatadicom");
-createAndPutHtml(dataDicomSop, "uldatadicomsop");
-createAndPutHtml(dataImg, "uldataimg");
-</script>
 
 </body>
 </html>
