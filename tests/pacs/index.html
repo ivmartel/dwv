@@ -8,8 +8,8 @@ body {
     background-color: #efefef;
     font-family: Verdana, Arial, Helvetica, sans-serif;
 }
-ul {list-style-type: none;}
-ul img {float:left; padding:0px 10px 10px 0px;}
+.listview img {float:left; padding:0px 10px 10px 0px;}
+.listview li {list-style-type: none; padding-top: 10px;}
 ul li {clear:both;}
 ul li h2 {font-size:90%;}
 ul a {text-decoration:none;}
@@ -119,15 +119,6 @@ function getDwvUrl(uri)
         var select = document.getElementById('select-dwv');
         flag = select.options[select.selectedIndex].value;
     }
-    return "<a href='"+getDwvBaseUrl(flag)+"?input="+encodeURIComponent(uri)+"' class=\"dwvlink\">";
-}
-function getDwvUrl2(uri)
-{
-    var flag = "dwvmobile";
-    if( document.getElementById('select-dwv') ) {
-        var select = document.getElementById('select-dwv');
-        flag = select.options[select.selectedIndex].value;
-    }
     return getDwvBaseUrl(flag)+"?input="+encodeURIComponent(uri);
 }
 function createAndPutHtml(data, id)
@@ -151,7 +142,7 @@ function createAndPutHtml(data, id)
         
         // link
         var link = document.createElement("a");
-        link.href = getDwvUrl2(data[i].uri);
+        link.href = getDwvUrl(data[i].uri);
         link.className = "dwvlink";
         link.appendChild(image);
 	    
@@ -184,7 +175,7 @@ be on a web interface to a PACS system. Click on the list item to launch DWV wit
 </select>
 </div>
 
-<ul data-role="listview" data-inset="true" id="uldatadicom"></ul>
+<ul class="listview" data-role="listview" data-inset="true" id="uldatadicom"></ul>
 
 <br style="clear:both">
 
@@ -194,12 +185,12 @@ To see them start Google Chrome with <code>--disable-web-security</code>
 (do not forget to <b>remove</b> that flag for normal browsing).</p>
 
 <!--<ul data-role="listview" data-inset="true" data-filter="true" data-filter-placeholder="Search...">-->
-<ul data-role="listview" data-inset="true" id="uldatadicomsop"></ul>
+<ul class="listview" data-role="listview" data-inset="true" id="uldatadicomsop"></ul>
 
 <br style="clear:both">
 
 <p>Non DICOM Image formats:</p>
-<ul data-role="listview" data-inset="true" id="uldataimg"></ul>
+<ul class="listview" data-role="listview" data-inset="true" id="uldataimg"></ul>
 
 <br style="clear:both">
 
