@@ -156,6 +156,13 @@ function createAndPutHtml(data, id)
         ul.appendChild(li);
     }
 }
+
+// create html once ready
+window.onload = function() {
+    createAndPutHtml(dataDicom, "uldatadicom");
+    createAndPutHtml(dataDicomSop, "uldatadicomsop");
+    createAndPutHtml(dataImg, "uldataimg");
+}
 </script>
 </head>
 <body>
@@ -240,12 +247,6 @@ To see them start Google Chrome with <code>--disable-web-security</code>
 <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
 </footer>
 </div>
-
-<script type="text/javascript">
-createAndPutHtml(dataDicom, "uldatadicom");
-createAndPutHtml(dataDicomSop, "uldatadicomsop");
-createAndPutHtml(dataImg, "uldataimg");
-</script>
 
 </body>
 </html>
