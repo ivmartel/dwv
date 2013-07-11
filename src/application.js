@@ -250,11 +250,11 @@ dwv.App = function(mobile)
         }
         else {
             mainWidth = $('#pageMain').width() - 360;
-            mainHeight = $('#pageMain').height() - 60;
+            mainHeight = $('#pageMain').height() - 75;
         }
         displayZoom = Math.min( (mainWidth / dataWidth), (mainHeight / dataHeight) );
-        $("#layerContainer").width(displayZoom*dataWidth);
-        $("#layerContainer").height(displayZoom*dataHeight);
+        $("#layerContainer").width(parseInt(displayZoom*dataWidth, 10));
+        $("#layerContainer").height(parseInt(displayZoom*dataHeight, 10));
     };
     
     /**
