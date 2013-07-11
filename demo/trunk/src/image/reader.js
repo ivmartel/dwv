@@ -29,14 +29,14 @@ dwv.image.getDataFromImage = function(image, file)
         j+=3;
     }
     // create dwv Image
-    var imageSize = new dwv.image.ImageSize(image.width, image.height);
+    var imageSize = new dwv.image.Size(image.width, image.height);
     // TODO: wrong info...
-    var imageSpacing = new dwv.image.ImageSpacing(1,1);
+    var imageSpacing = new dwv.image.Spacing(1,1);
     var dwvImage = new dwv.image.Image(imageSize, imageSpacing, buffer);
-    dwvImage.setIdRescaleLut();
-    dwvImage.setWindowLevelMinMax();
     dwvImage.setPhotometricInterpretation("RGB");
-    dwvImage.setPlanarConfiguration(0);
+    // view
+    var view = new dwv.image.View(dwvImage);
+    view.setWindowLevelMinMax();
     // properties
     var info = {};
     info["FileName"] = { "value": file.name };
@@ -45,7 +45,7 @@ dwv.image.getDataFromImage = function(image, file)
     info["ImageWidth"] = { "value": image.width };
     info["ImageHeight"] = { "value": image.height };
     // return
-    return {"image": dwvImage, "info": info};
+    return {"view": view, "info": info};
 };
 
 /**
@@ -58,7 +58,8 @@ dwv.image.getDataFromDicomBuffer = function(buffer)
     var dicomParser = new dwv.dicom.DicomParser();
     // parse the buffer
     dicomParser.parse(buffer);
+    var view = dicomParser.createImage();
     // return
-    return {'image': dicomParser.getImage(), 'info': dicomParser.dicomElements};
+    return {"view": view, "info": dicomParser.dicomElements};
 };
 

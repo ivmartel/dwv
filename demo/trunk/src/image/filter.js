@@ -16,29 +16,25 @@ dwv.image.filter.Threshold = function()
 {
     var min = 0;
     var max = 0;
-};
-
-dwv.image.filter.Threshold.prototype.getName = function()
-{
-    return "Threshold";
-};
-
-dwv.image.filter.Threshold.prototype.setMin = function(value)
-{
-    min = value;
-};
-
-dwv.image.filter.Threshold.prototype.setMax = function(value)
-{
-    max = value;
+    // Get the minimum value.
+    this.getMin = function() { return min; };
+    // Set the minimum value.
+    this.setMin = function(val) { min = val; };
+    // Get the maximum value.
+    this.getMax = function() { return max; };
+    // Set the maximum value.
+    this.setMax = function(val) { max = val; };
+    // Get the name of the filter.
+    this.getName = function() { return "Threshold"; };
 };
 
 dwv.image.filter.Threshold.prototype.update = function()
 {
-    var imageMin = app.getImage().getRescaleLut().getIntercept();
-    var threshFunction = function(x){
-        if(x<min||x>max) { return imageMin; } 
-        else { return x; }
+    var imageMin = app.getImage().getDataRange().min;
+    var self = this;
+    var threshFunction = function(value){
+        if(value<self.getMin()||value>self.getMax()) return imageMin;
+        else return value;
     };
     return app.getImage().transform( threshFunction );
 };
@@ -46,16 +42,15 @@ dwv.image.filter.Threshold.prototype.update = function()
 /**
  * @function Sharpen an image using a sharpen convolution matrix.
  */
-dwv.image.filter.Sharpen = function() {};
-
-dwv.image.filter.Sharpen.prototype.getName = function()
+dwv.image.filter.Sharpen = function()
 {
-    return "Sharpen";
+    // Get the name of the filter.
+    this.getName = function() { return "Sharpen"; };
 };
 
 dwv.image.filter.Sharpen.prototype.update = function()
 {
-    return app.getImage().convolute(
+    return app.getImage().convolute2D(
         [  0, -1,  0,
           -1,  5, -1,
            0, -1,  0 ] );
@@ -64,21 +59,20 @@ dwv.image.filter.Sharpen.prototype.update = function()
 /**
  * @function Apply a Sobel filter to an image.
  */
-dwv.image.filter.Sobel = function() {};
-
-dwv.image.filter.Sobel.prototype.getName = function()
+dwv.image.filter.Sobel = function()
 {
-    return "Sobel";
+    // Get the name of the filter.
+    this.getName = function() { return "Sobel"; };
 };
 
 dwv.image.filter.Sobel.prototype.update = function()
 {
-    var gradX = app.getImage().convolute(
+    var gradX = app.getImage().convolute2D(
         [ 1,  0,  -1,
           2,  0,  -2,
           1,  0,  -1 ] );
 
-    var gradY = app.getImage().convolute(
+    var gradY = app.getImage().convolute2D(
         [  1,  2,  1,
            0,  0,  0,
           -1, -2, -1 ] );

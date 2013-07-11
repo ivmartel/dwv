@@ -1,8 +1,9 @@
+<!DOCTYPE html>
 <html>
 
 <head>
 <title>DICOM Web Viewer</title>
-<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1" />
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
 <link rel="stylesheet" href="css/style.css" />
 <style>
@@ -28,6 +29,7 @@
 <script type="text/javascript" src="src/html/layer.js"></script>
 <script type="text/javascript" src="src/image/filter.js"></script>
 <script type="text/javascript" src="src/image/image.js"></script>
+<script type="text/javascript" src="src/image/view.js"></script>
 <script type="text/javascript" src="src/image/luts.js"></script>
 <script type="text/javascript" src="src/image/reader.js"></script>
 <script type="text/javascript" src="src/math/shapes.js"></script>
@@ -38,6 +40,7 @@
 <!-- Tools: beware order is important... -->
 <script type="text/javascript" src="src/tools/toolbox.js"></script>
 <script type="text/javascript" src="src/tools/windowLevel.js"></script>
+<script type="text/javascript" src="src/tools/info.js"></script>
 <script type="text/javascript" src="src/tools/draw.js"></script>
 <script type="text/javascript" src="src/tools/line.js"></script>
 <script type="text/javascript" src="src/tools/rectangle.js"></script>
@@ -48,15 +51,6 @@
 <script type="text/javascript" src="src/tools/filter.js"></script>
 <script type="text/javascript" src="src/tools/undo.js"></script>
 
-<script>
-  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-  ga('create', 'UA-40868511-1', 'github.io');
-  ga('send', 'pageview');
-</script>
-A
 <script type="text/javascript">
 
 // main application
@@ -82,7 +76,7 @@ $(document).ready(function(){
 <div data-role="page" id="main">
 
 <div id="pageHeader" data-role="header">
-<h1>DICOM Web Viewer (<a href="https://github.com/ivmartel/dwv">dwv</a> v0.3)</h1>
+<h1>DICOM Web Viewer (<a href="https://github.com/ivmartel/dwv">dwv</a> v0.4beta)</h1>
 </div><!-- /header -->
 
 <div id="pageMain" data-role="content" style="padding:2px;">   
@@ -98,7 +92,7 @@ $(document).ready(function(){
 <a href="#" data-role="button" data-mini="true" data-inline="true" 
  data-icon="forward" data-iconpos="notext" onclick="app.getUndoStack().redo()">Redo</a>
 <a href="#" data-role="button" data-mini="true" data-inline="true" 
- data-icon="info" data-iconpos="notext" onclick="dwv.html.toggleDisplay('infoLayer')">Info</a>
+ data-icon="info" data-iconpos="notext" onclick="app.toggleInfoLayerDisplay()">Info</a>
 <a href="#tags_page" data-role="button" data-mini="true" data-inline="true"
  data-icon="grid" data-iconpos="notext">Tags</a>
 

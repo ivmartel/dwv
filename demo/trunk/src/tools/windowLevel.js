@@ -8,119 +8,30 @@ dwv.tool = dwv.tool || {};
 */
 
 /**
- * @function
+ * @function Update the views' current position.
  */
-dwv.tool.showHUvalue = function(x,y)
+dwv.tool.updatePostionValue = function(i,j)
 {
-    var div = document.getElementById("infotl");
-    dwv.html.removeNode("ulinfotl");
-    var ul = document.createElement("ul");
-    ul.id = "ulinfotl";
-    
-    var lix = document.createElement("li");
-    lix.appendChild(document.createTextNode("X = "+x));
-    ul.appendChild(lix);
-    var liy = document.createElement("li");
-    liy.appendChild(document.createTextNode("Y = "+y));
-    ul.appendChild(liy);
-    var lihu = document.createElement("li");
-    lihu.appendChild(document.createTextNode("v = "+app.getImage().getValue(x,y)));
-    ul.appendChild(lihu);
-    
-    div.appendChild(ul);
+    app.getView().setCurrentPosition({"i": i, "j": j, "k": app.getView().getCurrentPosition().k});
 };
 
 /**
- * @function
- */
-dwv.tool.showWindowingValue = function(windowCenter,windowWidth)
-{
-    var div = document.getElementById("infotr");
-    dwv.html.removeNode("ulinfotr");
-    var ul = document.createElement("ul");
-    ul.id = "ulinfotr";
-    
-    var liwc = document.createElement("li");
-    liwc.appendChild(document.createTextNode("WindowCenter = "+windowCenter));
-    ul.appendChild(liwc);
-    var liww = document.createElement("li");
-    liww.appendChild(document.createTextNode("WindowWidth = "+windowWidth));
-    ul.appendChild(liww);
-    
-    div.appendChild(ul);
-};
-
-dwv.tool.showMiniColorMap = function(windowCenter,windowWidth)
-{    
-    // color map
-    var div = document.getElementById("infobr");
-    dwv.html.removeNode("canvasinfobr");
-    var canvas = document.createElement("canvas");
-    canvas.id = "canvasinfobr";
-    canvas.width = 98;
-    canvas.height = 10;
-    context = canvas.getContext('2d');
-    
-    // fill in the image data
-    var colourMap = app.getImage().getColorMap();
-    var imageData = context.getImageData(0,0,canvas.width, canvas.height);
-    
-    var c = 0;
-    var minInt = app.getImage().getDataRange().min;
-    var range = app.getImage().getDataRange().max - minInt;
-    var incrC = range / canvas.width;
-    var y = 0;
-    
-    var yMax = 255;
-    var yMin = 0;
-    var xMin = windowCenter - 0.5 - (windowWidth-1) / 2;
-    var xMax = windowCenter - 0.5 + (windowWidth-1) / 2;    
-    
-    for( var j=0; j<canvas.height; ++j ) {
-        c = minInt;
-        for( var i=0; i<canvas.width; ++i ) {
-            if( c <= xMin ) y = yMin;
-            else if( c > xMax ) y = yMax;
-            else {
-                y = ( (c - (windowCenter-0.5) ) / (windowWidth-1) + 0.5 )
-                    * (yMax-yMin) + yMin;
-                y = parseInt(y,10);
-            }
-            index = (i + j * canvas.width) * 4;
-            imageData.data[index] = colourMap.red[y];
-            imageData.data[index+1] = colourMap.green[y];
-            imageData.data[index+2] = colourMap.blue[y];
-            imageData.data[index+3] = 0xff;
-            c += incrC;
-        }
-    }
-    // put the image data in the context
-    context.putImageData(imageData, 0, 0);
-    
-    div.appendChild(canvas);
-};
-
-/**
- * @function
+ * @function Update the views' windowing data
  */
 dwv.tool.updateWindowingData = function(wc,ww)
 {
-    app.getImage().setWindowLevel(wc,ww);
-    dwv.tool.showWindowingValue(wc,ww);
-    dwv.tool.showMiniColorMap(wc,ww);
-    dwv.tool.WindowLevel.prototype.updatePlot(wc,ww);
-    app.generateAndDrawImage();
+    app.getView().setWindowLevel(wc,ww);
 };
 
 /**
- * @function
+ * @function Update the views' colour map.
  */
-dwv.tool.updateColourMap = function(colourMap)    
-{    
-    app.getImage().setColourMap(colourMap);
-    app.generateAndDrawImage();
+dwv.tool.updateColourMap = function(colourMap)
+{
+    app.getView().setColorMap(colourMap);
 };
 
+// Default colour maps.
 dwv.tool.colourMaps = {
     "plain": dwv.image.lut.plain,
     "invplain": dwv.image.lut.invPlain,
@@ -128,175 +39,196 @@ dwv.tool.colourMaps = {
     "hot": dwv.image.lut.hot,
     "test": dwv.image.lut.test
 };
-
+// Default window level presets.
 dwv.tool.presets = {
-        "abdomen": {"center": 350, "width": 40},
-        "lung": {"center": -600, "width": 1500},
-        "brain": {"center": 40, "width": 80},
-        "bone": {"center": 480, "width": 2500},
-        "head": {"center": 90, "width": 350}
-    };
+    "abdomen": {"center": 350, "width": 40},
+    "lung": {"center": -600, "width": 1500},
+    "brain": {"center": 40, "width": 80},
+    "bone": {"center": 480, "width": 2500},
+    "head": {"center": 90, "width": 350}
+};
 
 /**
- * @class WindowLevel class.
+ * @class WindowLevel tool: handle window/level related events.
  */
 dwv.tool.WindowLevel = function(app)
 {
+    // Closure to self: to be used by event handlers.
     var self = this;
+    // Interaction start flag.
     this.started = false;
-    this.displayed = false;
+    // Initialise presets.
+    this.updatePresets();
     
-
-    // This is called when you start holding down the mouse button.
-    this.mousedown = function(ev){
+    // Called on mouse down event.
+    this.mousedown = function(event){
+        // set start flag
         self.started = true;
-        self.x0 = ev._x;
-        self.y0 = ev._y;
-        dwv.tool.showHUvalue(ev._x, ev._y);
+        // store initial position
+        self.x0 = event._x;
+        self.y0 = event._y;
+        // update GUI
+        dwv.tool.updatePostionValue(event._x, event._y);
     };
     
-    // This function is called every time you move the mouse.
-    this.mousemove = function(ev){
-        if (!self.started)
-        {
-            return;
-        }
-
-        var diffX = ev._x - self.x0;
-        var diffY = self.y0 - ev._y;                                
-        var windowCenter = parseInt(app.getImage().getWindowLut().getCenter(), 10) + diffY;
-        var windowWidth = parseInt(app.getImage().getWindowLut().getWidth(), 10) + diffX;                        
-        
-        dwv.tool.updateWindowingData(windowCenter,windowWidth);    
-        
-        self.x0 = ev._x;             
-        self.y0 = ev._y;
-    };
-
-    // This is called when you release the mouse button.
-    this.mouseup = function(ev){
-        if (self.started)
-        {
-            self.started = false;
-        }
+    // Called on touch start event with two fingers.
+    this.twotouchdown = function(event){
+        // set start flag
+        self.started = true;
+        // store initial position
+        self.x0 = event._x;
     };
     
-    this.mouseout = function(ev){
-        self.mouseup(ev);
+    // Called on mouse move event.
+    this.mousemove = function(event){
+        // check start flag
+        if( !self.started ) return;
+        // difference to last position
+        var diffX = event._x - self.x0;
+        var diffY = self.y0 - event._y;
+        // calculate new window level
+        var windowCenter = parseInt(app.getView().getWindowLut().getCenter(), 10) + diffY;
+        var windowWidth = parseInt(app.getView().getWindowLut().getWidth(), 10) + diffX;
+        // update GUI
+        dwv.tool.updateWindowingData(windowCenter,windowWidth);
+        // store position
+        self.x0 = event._x;
+        self.y0 = event._y;
     };
-
-    this.touchstart = function(ev){
-        self.mousedown(ev);
+    
+    // Called on touch move event with two fingers.
+    this.twotouchmove = function(event){
+        // check start flag
+        if( !self.started ) return;
+        // difference  to last position
+        var diffX = event._x - self.x0;
+        // do not trigger for small moves
+        if( Math.abs(diffX) < 10 ) return;
+        // update GUI
+        if( diffX > 0 ) app.getView().incrementSliceNb();
+        else app.getView().decrementSliceNb();
     };
-
-    this.touchmove = function(ev){
-        self.mousemove(ev);
+    
+    // Called on mouse up event.
+    this.mouseup = function(event){
+        // set start flag
+        if( self.started ) self.started = false;
     };
-
-    this.touchend = function(ev){
-        self.mouseup(ev);
+    
+    // Called on mouse out event.
+    this.mouseout = function(event){
+        // treat as mouse up
+        self.mouseup(event);
     };
-
-    this.dblclick = function(ev){
+    
+    // Called on touch start event.
+    this.touchstart = function(event){
+        // dispatch to one or two touch handler
+        if( event.targetTouches.length === 1 ) self.mousedown(event);
+        else if( event.targetTouches.length === 2 ) self.twotouchdown(event);
+    };
+    
+    // Called on touch move event.
+    this.touchmove = function(event){
+        // dispatch to one or two touch handler
+        if( event.targetTouches.length === 1 ) self.mousemove(event);
+        else if( event.targetTouches.length === 2 ) self.twotouchmove(event);
+    };
+    
+    // Called on touch end event.
+    this.touchend = function(event){
+        // treat as mouse up
+        self.mouseup(event);
+    };
+    
+    // Called on double click event.
+    this.dblclick = function(event){
+        // update GUI
         dwv.tool.updateWindowingData(
-                parseInt(app.getImage().getValue(ev._x, ev._y), 10),
-                parseInt(app.getImage().getWindowLut().getWidth(), 10) );    
+            parseInt(app.getImage().getRescaledValue(event._x, event._y, app.getView().getCurrentPosition().k), 10),
+            parseInt(app.getView().getWindowLut().getWidth(), 10) );    
     };
     
-    this.enable = function(bool){
-        if( bool ) {
-            this.updatePresets();
-            dwv.gui.appendWindowLevelHtml();
-            dwv.tool.updateWindowingData(
-                    parseInt(app.getImage().getWindowLut().getCenter(), 10),
-                    parseInt(app.getImage().getWindowLut().getWidth(), 10) );
-        }
-        else {
-            dwv.gui.clearWindowLevelHtml();
-        }
+    // Called on mouse (wheel) scroll event on Firefox.
+    this.DOMMouseScroll = function(event){
+        // update GUI
+        if( event.detail > 0 ) app.getView().incrementSliceNb();
+        else app.getView().decrementSliceNb();
     };
-
+    
+    // Called on mouse wheel event.
+    this.mousewheel = function(event){
+        // update GUI
+        if( event.wheelDelta > 0 ) app.getView().incrementSliceNb();
+        else app.getView().decrementSliceNb();
+    };
+    
+    // Called on key down event.
     this.keydown = function(event){
+        // let the app handle it
         app.handleKeyDown(event);
     };
-
+    
+    // Enable the tool: prepare HTML for it.
+    this.enable = function(bool){
+        // update GUI
+        if( bool ) dwv.gui.appendWindowLevelHtml();
+        else dwv.gui.clearWindowLevelHtml();
+    };
+    
 }; // WindowLevel class
 
+/**
+ * @function Update the window/level presets.
+ */
 dwv.tool.WindowLevel.prototype.updatePresets = function()
 {    
     // copy the presets and reinitialize the external one
-	// (hoping to control the order of the presets)
-	var presets = dwv.tool.presets;
+    // (hoping to control the order of the presets)
+    var presets = dwv.tool.presets;
     dwv.tool.presets = {};
-	// DICOM presets
-    var dicomPresets = app.getImage().getWindowPresets();
-    if( dicomPresets )
-    {
+    // DICOM presets
+    var dicomPresets = app.getView().getWindowPresets();
+    if( dicomPresets ) {
         for( var i = 0; i < dicomPresets.length; ++i ) {
             dwv.tool.presets[dicomPresets[i].name.toLowerCase()] = dicomPresets[i];
         }
     }
     // min/max preset
-    var range = app.getImage().getDataRange();
+    var range = app.getImage().getRescaledDataRange();
     var min = range.min;
     var max = range.max;
     var width = max - min;
     var center = min + width/2;
     dwv.tool.presets["min/max"] = {"center": center, "width": width};
     // re-populate the external array
-    for( var key in presets ) {
-    	dwv.tool.presets[key] = presets[key];
-    }
+    for( var key in presets ) dwv.tool.presets[key] = presets[key];
 };
 
 /**
- * @function
+ * @function Set the window/level presets.
  */
 dwv.tool.WindowLevel.prototype.setPreset = function(name)
-{    
+{
     // check if we have it
     if( !dwv.tool.presets[name] )
-    {
         throw new Error("Unknown window level preset: '" + name + "'");
-    }
     // enable it
-    dwv.tool.updateWindowingData(
-    		dwv.tool.presets[name].center, 
-    		dwv.tool.presets[name].width );
+    dwv.tool.updateWindowingData( 
+        dwv.tool.presets[name].center, 
+        dwv.tool.presets[name].width );
 };
 
 /**
- * @function
+ * @function Set the colour map.
  */
 dwv.tool.WindowLevel.prototype.setColourMap = function(name)
-{    
+{
     // check if we have it
     if( !dwv.tool.colourMaps[name] )
-    {
         throw new Error("Unknown colour map: '" + name + "'");
-    }
     // enable it
     dwv.tool.updateColourMap( dwv.tool.colourMaps[name] );
-};
-
-dwv.tool.WindowLevel.prototype.updatePlot = function(wc,ww)
-{
-    var half = parseInt( (ww-1) / 2, 10 );
-    var center = parseInt( (wc-0.5), 10 );
-    var min = center - half;
-    var max = center + half;
-    
-    var markings = [
-        { "color": "#faa", "lineWidth": 1, "xaxis": { "from": min, "to": min } },
-        { "color": "#aaf", "lineWidth": 1, "xaxis": { "from": max, "to": max } }
-    ];
-
-    $.plot($("#plot"), [ app.getImage().getHistogram() ], {
-        "bars": { "show": true },
-        "grid": { "markings": markings, "backgroundColor": null },
-        "xaxis": { "show": false },
-        "yaxis": { "show": false }
-    });
 };
 
 // Add the tool to the list

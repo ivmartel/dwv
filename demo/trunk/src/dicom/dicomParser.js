@@ -419,7 +419,7 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
  * Get an Image object from the read DICOM file.
  * @returns A new Image.
  */
-dwv.dicom.DicomParser.prototype.getImage = function()
+dwv.dicom.DicomParser.prototype.createImage = function()
 {
     // size
     if( !this.dicomElements.Columns ) {
@@ -428,9 +428,9 @@ dwv.dicom.DicomParser.prototype.getImage = function()
     if( !this.dicomElements.Rows ) {
         throw new Error("Missing DICOM image number of rows");
     }
-    var size = new dwv.image.ImageSize(
+    var size = new dwv.image.Size(
         this.dicomElements.Columns.value[0], 
-        this.dicomElements.Rows.value[0]);
+        this.dicomElements.Rows.value[0] );
     // spacing
     var rowSpacing = 1;
     var columnSpacing = 1;
@@ -442,8 +442,16 @@ dwv.dicom.DicomParser.prototype.getImage = function()
         rowSpacing = parseFloat(this.dicomElements.ImagerPixelSpacing.value[0]);
         columnSpacing = parseFloat(this.dicomElements.ImagerPixelSpacing.value[1]);
     }
-    var spacing = new dwv.image.ImageSpacing(
-        columnSpacing, rowSpacing);
+    var spacing = new dwv.image.Spacing( columnSpacing, rowSpacing);
+    // unsigned to signed data if needed
+    if( this.dicomElements.PixelRepresentation 
+    		&& this.dicomElements.PixelRepresentation.value[0] == 1) {
+	    for( var i=0; i<this.pixelBuffer.length; ++i ) {
+	        if( this.pixelBuffer[i] >= Math.pow(2, 15) ) 
+	        	this.pixelBuffer[i] -= Math.pow(2, 16);
+	    }
+    }
+    
     // image
     var image = new dwv.image.Image( size, spacing, this.pixelBuffer );
     // photometricInterpretation
@@ -456,38 +464,43 @@ dwv.dicom.DicomParser.prototype.getImage = function()
         image.setPlanarConfiguration( 
             this.dicomElements.PlanarConfiguration.value[0] );
     }        
-    // lookup
-    var slope = 1;
+    // rescale slope
     if( this.dicomElements.RescaleSlope ) {
-        slope = parseFloat(this.dicomElements.RescaleSlope.value[0]);
+        image.setRescaleSlope( parseFloat(this.dicomElements.RescaleSlope.value[0]) );
     }
-    var intercept = 0;
+    // rescale intercept
     if( this.dicomElements.RescaleIntercept ) {
-        intercept = parseFloat(this.dicomElements.RescaleIntercept.value[0]);
+        image.setRescaleIntercept( parseFloat(this.dicomElements.RescaleIntercept.value[0]) );
     }
-    image.setRescaleSlopeAndIntercept(slope, intercept);
+    
+    // pixel representation
+    var isSigned = 0;
+    if( this.dicomElements.PixelRepresentation ) {
+        isSigned = this.dicomElements.PixelRepresentation.value[0];
+    }
+    // view
+    var view = new dwv.image.View(image, isSigned);
+    // window center and width
+    var windowPresets = [];
     if( this.dicomElements.WindowCenter && this.dicomElements.WindowWidth ) {
-        var windowPresets = [];
         var name;
         for( var i = 0; i < this.dicomElements.WindowCenter.value.length; ++i) {
-            if( this.dicomElements.WindowCenterWidthExplanation ) {
-                name = this.dicomElements.WindowCenterWidthExplanation.value[i];
+            var width = parseFloat( this.dicomElements.WindowWidth.value[i], 10 );
+        	if( width !== 0 ) {
+	        	if( this.dicomElements.WindowCenterWidthExplanation ) {
+	                name = this.dicomElements.WindowCenterWidthExplanation.value[i];
+	            }
+	            else name = "Default"+i;
+	            windowPresets.push({
+	                "center": parseFloat( this.dicomElements.WindowCenter.value[i], 10 ),
+	                "width": width, 
+	                "name": name
+	            });
             }
-            else {
-                name = "Default"+i;
-            }
-            windowPresets.push({
-                "center": parseFloat( this.dicomElements.WindowCenter.value[i], 10 ),
-                "width": parseFloat( this.dicomElements.WindowWidth.value[i], 10 ), 
-                "name": name
-            });
         }
-        image.setWindowPresets( windowPresets );
     }
-    else
-    {
-        image.setWindowLevelMinMax();
-    }
-    // return
-    return image;
+    if( windowPresets.length !== 0 ) view.setWindowPresets( windowPresets );
+    else view.setWindowLevelMinMax();
+
+    return view;
 };

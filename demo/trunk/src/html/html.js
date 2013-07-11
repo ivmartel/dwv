@@ -252,6 +252,18 @@ dwv.html.createHighlightNode = function(child) {
 };
 
 /**
+ * @function Remove all children of a node.
+ * @param nodeId The id of the node to delete.
+ * @param parentId The id of the parent of the node to delete.
+ */
+dwv.html.cleanNode = function(node) {
+    // remove its children
+    while (node.hasChildNodes()) {
+        node.removeChild(node.firstChild);
+    }
+};
+
+/**
  * @function Remove all children of a node and then remove it from its parent.
  * @param nodeId The id of the node to delete.
  * @param parentId The id of the parent of the node to delete.
@@ -262,9 +274,7 @@ dwv.html.removeNode = function(nodeId) {
     // check node
     if( !node ) return;
     // remove its children
-    while (node.hasChildNodes()) {
-        node.removeChild(node.firstChild);
-    }
+    dwv.html.cleanNode(node);
     // remove it from its parent
     var top = node.parentNode;
     top.removeChild(node);
