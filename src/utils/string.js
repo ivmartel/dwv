@@ -24,3 +24,20 @@ dwv.utils.cleanString = function(string)
     return str;
 };
 
+/**
+ * root?key0=val0&key1=val1 ...
+ */
+dwv.utils.splitQueryString = function(inputStr)
+{
+    // take after the ?
+    var query = inputStr.substr(inputStr.indexOf('?')+1);
+    // split key/value pairs
+    var pairs = query.split('&');
+    var result = {};
+    for( var i = 0; i < pairs.length; ++i )
+    {
+        var pair = pairs[i].split('=');
+        result[pair[0]] = pair[1];
+    }
+    return result;
+};

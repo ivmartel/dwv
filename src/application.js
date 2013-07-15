@@ -110,12 +110,12 @@ dwv.App = function(mobile)
 	        {
 	            var reader = new FileReader();
 	            reader.onload = function(event){
-	                var tmp_image = new Image();
-	                tmp_image.src = event.target.result;
-	                tmp_image.onload = function(e){
+	                var localImage = new Image();
+	                localImage.src = event.target.result;
+	                localImage.onload = function(e){
 	                    try {
 	                        // parse image file
-	                        var data = dwv.image.getDataFromImage(tmp_image, file);
+	                        var data = dwv.image.getDataFromImage(localImage, file);
 		        			if( image ) image.appendSlice( data.view.getImage() );
 	                        // prepare display
 	                        postLoadInit(data);
@@ -166,61 +166,67 @@ dwv.App = function(mobile)
     /**
      * @public
      */
-    this.loadURL = function(url) 
+    this.loadURL = function(urls) 
     {
-        var request = new XMLHttpRequest();
-        // TODO Verify URL...
-        request.open('GET', url, true);
-        request.responseType = "arraybuffer"; 
-        request.onload = function(ev) {
-            var view = new DataView(request.response);
-            var isJpeg = view.getUint32(0) === 0xffd8ffe0;
-            var isPng = view.getUint32(0) === 0x89504e47;
-            var isGif = view.getUint32(0) === 0x47494638;
-            if( isJpeg || isPng || isGif ) {
-                // image data
-                var image = new Image();
-
-                var bytes = new Uint8Array(request.response);
-                var binary = '';
-                for (var i = 0; i < bytes.byteLength; ++i) {
-                    binary += String.fromCharCode(bytes[i]);
+        for (var i = 0; i < urls.length; ++i)
+        {
+            var url = urls[i];
+            var request = new XMLHttpRequest();
+            // TODO Verify URL...
+            request.open('GET', url, true);
+            request.responseType = "arraybuffer"; 
+            request.onload = function(ev) {
+                var view = new DataView(request.response);
+                var isJpeg = view.getUint32(0) === 0xffd8ffe0;
+                var isPng = view.getUint32(0) === 0x89504e47;
+                var isGif = view.getUint32(0) === 0x47494638;
+                if( isJpeg || isPng || isGif ) {
+                    // image data
+                    var localImage = new Image();
+    
+                    var bytes = new Uint8Array(request.response);
+                    var binary = '';
+                    for (var i = 0; i < bytes.byteLength; ++i) {
+                        binary += String.fromCharCode(bytes[i]);
+                    }
+                    var imgStr = "unknown";
+                    if (isJpeg) imgStr = "jpeg";
+                    else if (isPng) imgStr = "png";
+                    else if (isGif) imgStr = "gif";
+                    localImage.src = "data:image/" + imgStr + ";base64," + window.btoa(binary);
+                    
+                    localImage.onload = function(e){
+            			try {
+    	                    // parse image data
+    	                    var data = dwv.image.getDataFromImage(localImage, 0);
+    	                    if( image ) image.appendSlice( data.view.getImage() );
+    	                    // prepare display
+    	                    postLoadInit(data);
+            			} catch(error) {
+                            handleError(error);
+                            return;
+            			}
+                    };
                 }
-                var imgStr = "unknown";
-                if (isJpeg) imgStr = "jpeg";
-                else if (isPng) imgStr = "png";
-                else if (isGif) imgStr = "gif";
-                image.src = "data:image/" + imgStr + ";base64," + window.btoa(binary);
-                
-                image.onload = function(e){
-        			try {
-	                    // parse image data
-	                    var data = dwv.image.getDataFromImage(image, 0);
-	                    // prepare display
-	                    postLoadInit(data);
+                else {
+                    try {
+    	            	// parse DICOM
+    	                var data = dwv.image.getDataFromDicomBuffer(request.response);
+    	                if( image ) image.appendSlice( data.view.getImage() );
+    	                // prepare display
+    	                postLoadInit(data);
         			} catch(error) {
                         handleError(error);
                         return;
         			}
-                };
-            }
-            else {
-                try {
-	            	// parse DICOM
-	                var data = dwv.image.getDataFromDicomBuffer(request.response);
-	                // prepare display
-	                postLoadInit(data);
-    			} catch(error) {
-                    handleError(error);
-                    return;
-    			}
-            }
-        };
-        request.onerror = function(event){
-            alert("An error occurred while retrieving the file: (http) "+request.status);
-        };
-        request.onprogress = dwv.gui.updateProgress;
-        request.send(null);
+                }
+            };
+            request.onerror = function(event){
+                alert("An error occurred while retrieving the file: (http) "+request.status);
+            };
+            request.onprogress = dwv.gui.updateProgress;
+            request.send(null);
+        }
     };
     
     /**

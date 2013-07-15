@@ -322,12 +322,18 @@ dwv.html.createHtmlSelect = function(name, list) {
     return select;
 };
 
-dwv.html.getUriParam = function(name)
+dwv.html.getUriParam = function(paramName, uri)
 {
-    var val = 0;
-    var regex = new RegExp("[\\?&]" + name + "=([^&#]*)");
-    var results = regex.exec(window.location.href);
-    if( results && results[1] ) val = results[1];
+    var localUri = uri || window.location.href;
+    var val = [];
+    // split key/value pairs
+    var queryPairs = dwv.utils.splitQueryString(localUri);
+
+    if( !queryPairs.input ) 
+        throw new Error("No input parameter in query URI.");
+    var baseUrl = decodeURIComponent(queryPairs.input);
+    val.push(baseUrl);
+    
     return val;
 };
 

@@ -33,5 +33,37 @@ $(document).ready(function(){
         var table3_ref = "<table><thead><tr><th>Name</th><th data-priority=\"1\">A</th><th data-priority=\"1\">B</th></tr></thead><tbody><tr><td>first</td><td>0</td><td>1</td></tr><tr><td>second</td><td>hello</td><td>undefined</td></tr></tbody></table>";
         equal(table3.outerHTML, table3_ref, "Object");
     });
+    test("Test get URI param.", function() {
+        // test 00
+        var root00 = "http://test.com?input=";
+        var theo00 = ["result?key=val"];
+        var res00 = dwv.html.getUriParam("input", root00+encodeURIComponent(theo00));
+        equal(decodeURIComponent(res00), theo00, "http uri");
+        // test 01
+        var root01 = "file:///test.html?input=";
+        var theo01 = ["result"];
+        var res01 = dwv.html.getUriParam("input", root01+encodeURIComponent(theo01));
+        equal(decodeURIComponent(res01), theo01, "file uri");
+        // test 02
+        var root02 = "file:///test.html?input=";
+        var theo02 = ["result&a=0&a=1"];
+        var full02 = root02+encodeURIComponent(theo02)+"&dwvRepeatKey=a";
+        var res02 = dwv.html.getUriParam("input", full02);
+        equal(decodeURIComponent(res02), theo02, "multiple file uri");
+        
+        // real world URI
+        
+        // wado
+        var root10 = "http://ivmartel.github.io/dwv/demo/static/index.html?input=";
+        var theo10 = ["http://dicom.vital-it.ch:8089/wado?requestType=WADO&contentType=application/dicom&studyUID=1.2.840.113564.3.1.2.20110912134402.100261&seriesUID=1.2.840.113564.1921680151.20110912125724093870&objectUID=1.2.840.113564.1921680151.20110912125724093880.2003000225000"];
+        var res10 = dwv.html.getUriParam("input", root10+encodeURIComponent(theo10));
+        equal(decodeURIComponent(res10), theo10, "wado url");
+        // babymri
+        var root11 = "file:///E:/Bibliotheques/devel/dwv/dwv/index.html?input=";
+        var theo11 = ["http://x.babymri.org/?53320924&.dcm"];
+        var res11 = dwv.html.getUriParam("input", root11+encodeURIComponent(theo11));
+        equal(decodeURIComponent(res11), theo11, "babymri uri");
+        // github
+    });
 
 });
