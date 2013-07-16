@@ -322,17 +322,70 @@ dwv.html.createHtmlSelect = function(name, list) {
     return select;
 };
 
-dwv.html.getUriParam = function(paramName, uri)
+dwv.html.getUriParam = function(uri)
 {
-    var localUri = uri || window.location.href;
+    var inputUri = uri || window.location.href;
     var val = [];
     // split key/value pairs
-    var queryPairs = dwv.utils.splitQueryString(localUri);
-
-    if( !queryPairs.input ) 
+    var mainQueryPairs = dwv.utils.splitQueryString(inputUri);
+    // check pairs
+    if( mainQueryPairs === null ) return null;
+    // has to have an input key
+    if( !mainQueryPairs.input ) 
         throw new Error("No input parameter in query URI.");
-    var baseUrl = decodeURIComponent(queryPairs.input);
-    val.push(baseUrl);
+    // decode input URI
+    var queryUri = decodeURIComponent(mainQueryPairs.input);
+    // get key/value pairs from input URI
+    var inputQueryPairs = dwv.utils.splitQueryString(queryUri);
+    
+    if( !inputQueryPairs ) val.push(queryUri);
+    else
+    {
+        
+        var keys = Object.keys(inputQueryPairs);
+        // find repeat key
+        var repeatKey = null;
+        for( var i = 0; i < keys.length; ++i )
+        {
+            if( inputQueryPairs[keys[i]] instanceof Array )
+                repeatKey = keys[i];
+        }
+    
+        if( !repeatKey ) val.push(queryUri);
+        else
+        {
+            // build base uri
+            var baseUrl = inputQueryPairs.base + "?";
+            var gotOneArg = false;
+            for( var i = 0; i < keys.length; ++i )
+            {
+                if( keys[i] !== "base" && keys[i] !== repeatKey ) {
+                    if( gotOneArg ) baseUrl += "&";
+                    baseUrl += keys[i] + "=" + inputQueryPairs[keys[i]];
+                    gotOneArg = true;
+                }
+            }
+            
+            // check if we really have repetition
+            if( inputQueryPairs[repeatKey] instanceof Array )
+            {
+                for( var i = 0; i < inputQueryPairs[repeatKey].length; ++i )
+                {
+                    var url = baseUrl;
+                    if( gotOneArg ) url += "&";
+                    url += repeatKey + "=" + inputQueryPairs[repeatKey][i];
+                    val.push(url);
+                }
+            }
+            else 
+            {
+                var url = baseUrl;
+                if( gotOneArg ) url += "&";
+                url += repeatKey + "=" + inputQueryPairs[repeatKey];
+                val.push(url);
+            }
+        }
+    }
     
     return val;
 };
