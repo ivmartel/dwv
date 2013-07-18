@@ -322,12 +322,75 @@ dwv.html.createHtmlSelect = function(name, list) {
     return select;
 };
 
-dwv.html.getUriParam = function(name)
+dwv.html.getUriParam = function(uri)
 {
-    var val = 0;
-    var regex = new RegExp("[\\?&]" + name + "=([^&#]*)");
-    var results = regex.exec(window.location.href);
-    if( results && results[1] ) val = results[1];
+    var inputUri = uri || window.location.href;
+    var val = [];
+    // split key/value pairs
+    var mainQueryPairs = dwv.utils.splitQueryString(inputUri);
+    // check pairs
+    if( mainQueryPairs === null ) return null;
+    // has to have an input key
+    if( !mainQueryPairs.input ) 
+        throw new Error("No input parameter in query URI.");
+    // decode input URI
+    var queryUri = decodeURIComponent(mainQueryPairs.input);
+    // get key/value pairs from input URI
+    var inputQueryPairs = dwv.utils.splitQueryString(queryUri);
+    // repeat key replace mode (default to keep key)
+    var repeatKeyReplaceMode = "key";
+    if( mainQueryPairs.dwvReplaceMode ) repeatKeyReplaceMode = mainQueryPairs.dwvReplaceMode;
+    
+    if( !inputQueryPairs ) val.push(queryUri);
+    else
+    {
+        var keys = Object.keys(inputQueryPairs);
+        // find repeat key
+        var repeatKey = null;
+        for( var i = 0; i < keys.length; ++i )
+        {
+            if( inputQueryPairs[keys[i]] instanceof Array )
+                repeatKey = keys[i];
+        }
+    
+        if( !repeatKey ) val.push(queryUri);
+        else
+        {
+            // build base uri
+            var baseUrl = inputQueryPairs.base + "?";
+            var gotOneArg = false;
+            for( var i = 0; i < keys.length; ++i )
+            {
+                if( keys[i] !== "base" && keys[i] !== repeatKey ) {
+                    if( gotOneArg ) baseUrl += "&";
+                    baseUrl += keys[i] + "=" + inputQueryPairs[keys[i]];
+                    gotOneArg = true;
+                }
+            }
+            
+            // check if we really have repetition
+            if( inputQueryPairs[repeatKey] instanceof Array )
+            {
+                for( var i = 0; i < inputQueryPairs[repeatKey].length; ++i )
+                {
+                    var url = baseUrl;
+                    if( gotOneArg ) url += "&";
+                    if( repeatKeyReplaceMode === "key" ) url += repeatKey + "=";
+                    // other than key: do nothing
+                    url += inputQueryPairs[repeatKey][i];
+                    val.push(url);
+                }
+            }
+            else 
+            {
+                var url = baseUrl;
+                if( gotOneArg ) url += "&";
+                url += repeatKey + "=" + inputQueryPairs[repeatKey];
+                val.push(url);
+            }
+        }
+    }
+    
     return val;
 };
 
