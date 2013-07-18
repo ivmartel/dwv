@@ -43,6 +43,13 @@ var dataDicom = [
     uri: "http://x.babymri.org/?53320924&.dcm", 
     img: "babymri.png", 
     desc: "Brain MR, 256*256*1, LittleEndianExplicit [1.2.840.10008.1.2.1]"
+    },
+    {
+    title: "Multi-slice Baby MRI (only for trunk)", 
+    uri: "http://x.babymri.org/?key=53320924&key=53321068&key=53322843&key=53322987&key=53323131",
+    uriargs: "&dwvReplaceMode=void",
+    img: "babymri.png", 
+    desc: "Brain MR, 256*256*5, LittleEndianExplicit [1.2.840.10008.1.2.1]"
     }];
 var dataDicomSop = [
     {
@@ -136,6 +143,7 @@ function createAndPutHtml(data, id)
         // link
         var link = document.createElement("a");
         link.href = getDwvUrl(data[i].uri);
+        if( data[i].uriargs ) link.href += data[i].uriargs;
         link.className = "dwvlink";
         link.appendChild(image);
 
