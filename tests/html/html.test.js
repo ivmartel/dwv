@@ -82,7 +82,7 @@ $(document).ready(function(){
         equal(res10.toString(), theo10.toString(), "Wado url");
         
         // babymri
-        var root11 = "file:///E:/Bibliotheques/devel/dwv/dwv/index.html?input=";
+        var root11 = "http://ivmartel.github.io/dwv/demo/static/index.html?input=";
         var uri11 = "http://x.babymri.org/?53320924&.dcm";
         var full11 = root11 + encodeURIComponent(uri11);
         var res11 = dwv.html.getUriParam(full11);
@@ -90,7 +90,7 @@ $(document).ready(function(){
         equal(res11.toString(), theo11.toString(), "Babymri uri");
         
         // github
-        var root12 = "file:///E:/Bibliotheques/devel/dwv/dwv/index.html?input=";
+        var root12 = "http://ivmartel.github.io/dwv/demo/static/index.html?input=";
         var uri12 = "https://github.com/ivmartel/dwv/blob/master/data/cta0.dcm?raw=true";
         var full12 = root12 + encodeURIComponent(uri12);
         var res12 = dwv.html.getUriParam(full12);
@@ -131,7 +131,7 @@ $(document).ready(function(){
         var theo22 = ["result?b=3&c=4&a=0", "result?b=3&c=4&a=1", "result?b=3&c=4&a=2"];
         equal(res22.toString(), theo22.toString(), "Multiple File uri with plenty args");
 
-        // real world URI
+        // real world multiple URI
 
         // wado (called 'anonymised')
         var root30 = "http://ivmartel.github.io/dwv/demo/static/index.html?input=";
@@ -142,9 +142,15 @@ $(document).ready(function(){
                       "http://dicom.vital-it.ch:8089/wado?requestType=WADO&contentType=application/dicom&studyUID=1.3.6.1.4.1.19291.2.1.1.2675258517533100002&seriesUID=1.2.392.200036.9116.2.6.1.48.1215564802.1245749034.88493&objectUID=1.2.392.200036.9116.2.6.1.48.1215564802.1245749216.165708"];
         equal(res30.toString(), theo30.toString(), "Multiple Wado url");
         
-        // babymri
+        // babymri: test for replaceMode
+        var root31 = "http://ivmartel.github.io/dwv/demo/static/index.html?input=";
+        var uri31 = "http://x.babymri.org/?key=53320924&key=53320925&key=53320926";
+        var full31 = root31 + encodeURIComponent(uri31) + "&dwvReplaceMode=void";
+        var res31 = dwv.html.getUriParam(full31);
+        var theo31 = ["http://x.babymri.org/?53320924", "http://x.babymri.org/?53320925", "http://x.babymri.org/?53320926"];
+        equal(res31.toString(), theo31.toString(), "Multiple baby mri (replaceMode)");
         
-        // github
+        // github: not supproted
     });
 
 });

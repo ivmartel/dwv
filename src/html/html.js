@@ -337,11 +337,13 @@ dwv.html.getUriParam = function(uri)
     var queryUri = decodeURIComponent(mainQueryPairs.input);
     // get key/value pairs from input URI
     var inputQueryPairs = dwv.utils.splitQueryString(queryUri);
+    // repeat key replace mode (default to keep key)
+    var repeatKeyReplaceMode = "key";
+    if( mainQueryPairs.dwvReplaceMode ) repeatKeyReplaceMode = mainQueryPairs.dwvReplaceMode;
     
     if( !inputQueryPairs ) val.push(queryUri);
     else
     {
-        
         var keys = Object.keys(inputQueryPairs);
         // find repeat key
         var repeatKey = null;
@@ -373,7 +375,9 @@ dwv.html.getUriParam = function(uri)
                 {
                     var url = baseUrl;
                     if( gotOneArg ) url += "&";
-                    url += repeatKey + "=" + inputQueryPairs[repeatKey][i];
+                    if( repeatKeyReplaceMode === "key" ) url += repeatKey + "=";
+                    // other than key: do nothing
+                    url += inputQueryPairs[repeatKey][i];
                     val.push(url);
                 }
             }
