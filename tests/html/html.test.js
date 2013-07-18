@@ -99,7 +99,7 @@ $(document).ready(function(){
         
         // multiple URI
         
-        // simple test: one arg
+        // simple test: one argument
         var root20 = "file:///test.html?input=";
         var uri20 = "result?a=0";
         var full20 = root20 + encodeURIComponent(uri20);
@@ -107,7 +107,7 @@ $(document).ready(function(){
         var theo20 = ["result?a=0"];
         equal(res20.toString(), theo20.toString(), "Multiple File uri with one arg");
         
-        // simple test: two arg
+        // simple test: two arguments
         var root21 = "file:///test.html?input=";
         var uri21 = "result?a=0&a=1";
         var full21 = root21 + encodeURIComponent(uri21);
@@ -115,7 +115,7 @@ $(document).ready(function(){
         var theo21 = ["result?a=0", "result?a=1"];
         equal(res21.toString(), theo21.toString(), "Multiple File uri with two args");
 
-        // simple test: three arg
+        // simple test: three arguments
         var root22 = "file:///test.html?input=";
         var uri22 = "result?a=0&a=1&a=2";
         var full22 = root22 + encodeURIComponent(uri22);
@@ -123,7 +123,7 @@ $(document).ready(function(){
         var theo22 = ["result?a=0", "result?a=1", "result?a=2"];
         equal(res22.toString(), theo22.toString(), "Multiple File uri with three args");
         
-        // simple test: plenty arg
+        // simple test: plenty arguments
         var root22 = "file:///test.html?input=";
         var uri22 = "result?a=0&a=1&a=2&b=3&c=4";
         var full22 = root22 + encodeURIComponent(uri22);
@@ -150,7 +150,7 @@ $(document).ready(function(){
         var theo31 = ["http://x.babymri.org/?53320924", "http://x.babymri.org/?53320925", "http://x.babymri.org/?53320926"];
         equal(res31.toString(), theo31.toString(), "Multiple baby mri (replaceMode)");
         
-        // github: not supproted
+        // github: not supported
     });
 
 });
