@@ -88,7 +88,7 @@ dwv.image.Image = function(size, spacing, buffer)
     var planarConfiguration = 0;
     
     // original buffer.
-    var originalBuffer = buffer.slice();
+    var originalBuffer = new Int16Array(buffer);
     
     // data range.
     var dataRange = undefined;
@@ -146,16 +146,30 @@ dwv.image.Image = function(size, spacing, buffer)
     	if( photometricInterpretation !== rhs.getPhotometricInterpretation() )
     		throw new Error("Cannot append slices with different photometric interpretation.");
     	// add one slice to size
-    	size = new dwv.image.Size(size.getNumberOfColumns(),
+    	newSize = new dwv.image.Size(size.getNumberOfColumns(),
         		size.getNumberOfRows(),
         		size.getNumberOfSlices() + 1 );
         // add slice data
     	var mul = 1;
     	if( photometricInterpretation === "RGB" ) mul = 3;
-    	for(var i=0; i<mul*size.getSliceSize(); ++i) {     
-        	buffer.push(rhs.getValueAtOffset(i));
+    	// create the new buffer
+    	var newBuffer = new Int16Array(mul*newSize.getTotalSize());
+        // calculate limits
+    	var max = size.getNumberOfSlices()*mul*size.getSliceSize();
+    	var newMax = max + mul*size.getSliceSize();
+    	// first copy
+    	for(var i=0; i<max; ++i) {     
+    	    newBuffer[i] = buffer[i];
         }
-    	originalBuffer = buffer.slice();
+    	// second copy
+    	var index = 0;
+    	for(var i=max; i<newMax; ++i) {     
+    	    newBuffer[i] = rhs.getValueAtOffset(index++);
+        }
+    	// copy to class variables
+    	size = newSize;
+    	buffer = newBuffer;
+    	originalBuffer = new Int16Array(newBuffer);
     };
     // Get the data range.
     this.getDataRange = function() { 
