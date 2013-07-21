@@ -75,8 +75,11 @@ dwv.tool.WindowLevel = function(app)
     this.twotouchdown = function(event){
         // set start flag
         self.started = true;
-        // store initial position
+        // store initial positions
         self.x0 = event._x;
+        self.y0 = event._y;
+        self.x1 = event._x1;
+        self.y1 = event._y1;
     };
     
     // Called on mouse move event.
@@ -101,12 +104,14 @@ dwv.tool.WindowLevel = function(app)
         // check start flag
         if( !self.started ) return;
         // difference  to last position
-        var diffX = event._x - self.x0;
+        var diffY = event._y - self.y0;
         // do not trigger for small moves
-        if( Math.abs(diffX) < 10 ) return;
+        if( Math.abs(diffY) < 15 ) return;
         // update GUI
-        if( diffX > 0 ) app.getView().incrementSliceNb();
+        if( diffY > 0 ) app.getView().incrementSliceNb();
         else app.getView().decrementSliceNb();
+        // store position
+        self.y0 = event._y;
     };
     
     // Called on mouse up event.
