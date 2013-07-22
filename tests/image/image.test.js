@@ -45,11 +45,12 @@ $(document).ready(function(){
         // slice to append
         var sliceSize = new dwv.image.Size(size, size, 1);
         var sliceBuffer = new Int16Array(sliceSize.getTotalSize());
-        for(var i=0; i<size*size; ++i) sliceBuffer[i] = 1;
+        for(var i=0; i<size*size; ++i) sliceBuffer[i] = 2;
 
         // image buffer
         var buffer = new Int16Array(imgSize.getTotalSize());
         for(var i=0; i<size*size; ++i) buffer[i] = 0;
+        for(var i=size*size; i<2*size*size; ++i) buffer[i] = 1;
         
         // image 0
         var image0 = new dwv.image.Image(imgSize, imgSpacing, buffer, [[0,0,0],[0,0,1]]);
@@ -57,12 +58,12 @@ $(document).ready(function(){
         // append slice before
         image0.appendSlice(slice0);
         // test its values
-        equal( image0.getValue(0, 0, 0), 1, "Value at 0,0,0 (append before)" );
-        equal( image0.getValue(3, 3, 0), 1, "Value at 3,3,0 (append before)" );
+        equal( image0.getValue(0, 0, 0), 2, "Value at 0,0,0 (append before)" );
+        equal( image0.getValue(3, 3, 0), 2, "Value at 3,3,0 (append before)" );
         equal( image0.getValue(0, 0, 1), 0, "Value at 0,0,1 (append before)" );
         equal( image0.getValue(3, 3, 1), 0, "Value at 3,3,1 (append before)" );
-        equal( image0.getValue(0, 0, 2), 0, "Value at 0,0,2 (append before)" );
-        equal( image0.getValue(3, 3, 2), 0, "Value at 3,3,2 (append before)" );
+        equal( image0.getValue(0, 0, 2), 1, "Value at 0,0,2 (append before)" );
+        equal( image0.getValue(3, 3, 2), 1, "Value at 3,3,2 (append before)" );
 
         // image 1
         var image1 = new dwv.image.Image(imgSize, imgSpacing, buffer, [[0,0,0],[0,0,1]]);
@@ -72,10 +73,10 @@ $(document).ready(function(){
         // test its values
         equal( image1.getValue(0, 0, 0), 0, "Value at 0,0,0 (append after)" );
         equal( image1.getValue(3, 3, 0), 0, "Value at 3,3,0 (append after)" );
-        equal( image1.getValue(0, 0, 1), 0, "Value at 0,0,1 (append after)" );
-        equal( image1.getValue(3, 3, 1), 0, "Value at 3,3,1 (append after)" );
-        equal( image1.getValue(0, 0, 2), 1, "Value at 0,0,2 (append after)" );
-        equal( image1.getValue(3, 3, 2), 1, "Value at 3,3,2 (append after)" );
+        equal( image1.getValue(0, 0, 1), 1, "Value at 0,0,1 (append after)" );
+        equal( image1.getValue(3, 3, 1), 1, "Value at 3,3,1 (append after)" );
+        equal( image1.getValue(0, 0, 2), 2, "Value at 0,0,2 (append after)" );
+        equal( image1.getValue(3, 3, 2), 2, "Value at 3,3,2 (append after)" );
 
         // image 2
         var image2 = new dwv.image.Image(imgSize, imgSpacing, buffer, [[0,0,0],[0,0,1]]);
@@ -85,10 +86,10 @@ $(document).ready(function(){
         // test its values
         equal( image2.getValue(0, 0, 0), 0, "Value at 0,0,0 (append between)" );
         equal( image2.getValue(3, 3, 0), 0, "Value at 3,3,0 (append between)" );
-        equal( image2.getValue(0, 0, 1), 1, "Value at 0,0,1 (append between)" );
-        equal( image2.getValue(3, 3, 1), 1, "Value at 3,3,1 (append between)" );
-        equal( image2.getValue(0, 0, 2), 0, "Value at 0,0,2 (append between)" );
-        equal( image2.getValue(3, 3, 2), 0, "Value at 3,3,2 (append between)" );
+        equal( image2.getValue(0, 0, 1), 2, "Value at 0,0,1 (append between)" );
+        equal( image2.getValue(3, 3, 1), 2, "Value at 3,3,1 (append between)" );
+        equal( image2.getValue(0, 0, 2), 1, "Value at 0,0,2 (append between)" );
+        equal( image2.getValue(3, 3, 2), 1, "Value at 3,3,2 (append between)" );
 
     });
 
