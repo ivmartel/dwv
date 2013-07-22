@@ -53,7 +53,7 @@ dwv.dicom.DataReader = function(buffer, isLittleEndian)
     };
     //! Read Uint16 array.
     this.readUint16Array = function(byteOffset, size) {
-        var data = new Uint16Array(size);
+        var data = new Uint16Array(size/2);
         var index = 0;
         for(var i=byteOffset; i<byteOffset + size; i+=2) {     
             data[index++] = this.readUint16(i);
@@ -458,9 +458,15 @@ dwv.dicom.DicomParser.prototype.createImage = function()
         if( shift && buffer[i] >= Math.pow(2, 15) ) 
             buffer[i] -= Math.pow(2, 16);
     }
+    // slice position
+    var slicePosition = [0,0,0];
+    if( this.dicomElements.ImagePositionPatient )
+        slicePosition = [ parseFloat(this.dicomElements.ImagePositionPatient.value[0]),
+            parseFloat(this.dicomElements.ImagePositionPatient.value[1]),
+            parseFloat(this.dicomElements.ImagePositionPatient.value[2]) ];
     
     // image
-    var image = new dwv.image.Image( size, spacing, buffer );
+    var image = new dwv.image.Image( size, spacing, buffer, [slicePosition] );
     // photometricInterpretation
     if( this.dicomElements.PhotometricInterpretation ) {
         image.setPhotometricInterpretation( dwv.utils.cleanString(

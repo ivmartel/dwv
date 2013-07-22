@@ -76,7 +76,7 @@ dwv.image.Spacing.prototype.equals = function(rhs) {
 * - photometric interpretation (default MONOCHROME2),
 * - planar configuration (default RGBRGB...).
 */
-dwv.image.Image = function(size, spacing, buffer)
+dwv.image.Image = function(size, spacing, buffer, slicePositions)
 {
     // Rescale slope.
     var rescaleSlope = 1;
@@ -89,6 +89,9 @@ dwv.image.Image = function(size, spacing, buffer)
     
     // original buffer.
     var originalBuffer = new Int16Array(buffer);
+    
+    // check slice positions.
+    if( typeof(slicePositions) === 'undefined' ) slicePositions = [[0,0,0]];
     
     // data range.
     var dataRange = undefined;
@@ -118,6 +121,10 @@ dwv.image.Image = function(size, spacing, buffer)
     this.getPlanarConfiguration = function() { return planarConfiguration; };
     // Set the planarConfiguration of the image.
     this.setPlanarConfiguration = function(config) { planarConfiguration = config; };
+    // Get the slice positions.
+    this.getSlicePositions = function() { return slicePositions; };
+    // Set the slice positions.
+    this.setSlicePositions = function(pos) { slicePositions = pos; };
 
     // Get value at offset. Warning: No size check...
     this.getValueAtOffset = function(offset) {
@@ -139,33 +146,67 @@ dwv.image.Image = function(size, spacing, buffer)
     	// check input
     	if( rhs === null )
     		throw new Error("Cannot append null slice.");
+        if( rhs.getSize().getNumberOfSlices() !== 1 )
+            throw new Error("Cannot append more than one slice.");
     	if( size.getNumberOfColumns() !== rhs.getSize().getNumberOfColumns() )
-    		throw new Error("Cannot append slices with different number of columns.");
+    		throw new Error("Cannot append a slice with different number of columns.");
     	if( size.getNumberOfRows() !== rhs.getSize().getNumberOfRows() )
-    		throw new Error("Cannot append slices with different number of rows.");
+    		throw new Error("Cannot append a slice with different number of rows.");
     	if( photometricInterpretation !== rhs.getPhotometricInterpretation() )
-    		throw new Error("Cannot append slices with different photometric interpretation.");
-    	// add one slice to size
-    	newSize = new dwv.image.Size(size.getNumberOfColumns(),
-        		size.getNumberOfRows(),
-        		size.getNumberOfSlices() + 1 );
-        // add slice data
-    	var mul = 1;
-    	if( photometricInterpretation === "RGB" ) mul = 3;
-    	// create the new buffer
-    	var newBuffer = new Int16Array(mul*newSize.getTotalSize());
-        // calculate limits
-    	var max = size.getNumberOfSlices()*mul*size.getSliceSize();
-    	var newMax = max + mul*size.getSliceSize();
-    	// first copy
-    	for(var i=0; i<max; ++i) {     
-    	    newBuffer[i] = buffer[i];
-        }
-    	// second copy
-    	var index = 0;
-    	for(var i=max; i<newMax; ++i) {     
-    	    newBuffer[i] = rhs.getValueAtOffset(index++);
-        }
+    		throw new Error("Cannot append a slice with different photometric interpretation.");
+    	
+        // find index where to append slice
+    	var closestSliceIndex = 0;
+    	var slicePosition = rhs.getSlicePositions()[0];
+    	var minDiff = Math.abs( slicePositions[0][2] - slicePosition[2] );
+    	var diff = 0;
+    	for( var i = 0; i < slicePositions.length; ++i )
+    	{
+    	    diff = Math.abs( slicePositions[i][2] - slicePosition[2] );
+    	    if( diff < minDiff ) 
+	        {
+    	        minDiff = diff;
+    	        closestSliceIndex = i;
+	        }
+    	}
+    	diff = slicePositions[closestSliceIndex][2] - slicePosition[2];
+    	var newSliceNb = ( diff > 0 ) ? closestSliceIndex : closestSliceIndex + 1;
+    	
+        // new size
+        var newSize = new dwv.image.Size(size.getNumberOfColumns(),
+                size.getNumberOfRows(),
+                size.getNumberOfSlices() + 1 );
+        
+        // calculate slice size
+        var mul = 1;
+        if( photometricInterpretation === "RGB" ) mul = 3;
+        var sliceSize = mul * size.getSliceSize();
+        
+        // create the new buffer
+        var newBuffer = new Int16Array(sliceSize * newSize.getNumberOfSlices());
+        
+        // append slice at new position
+        if( newSliceNb === 0 )
+	    {
+            newBuffer.set(rhs.getBuffer());
+    	    newBuffer.set(buffer, sliceSize);
+	    }
+    	else if( newSliceNb === size.getNumberOfSlices() )
+	    {
+    	    newBuffer.set(buffer);
+            newBuffer.set(rhs.getBuffer(), size.getNumberOfSlices() * sliceSize);
+	    }
+    	else
+	    {
+    	    var offset = newSliceNb * sliceSize;
+    	    newBuffer.set(buffer.subarray(0, offset - 1));
+    	    newBuffer.set(rhs.getBuffer(), offset);
+    	    newBuffer.set(buffer.subarray(offset), offset + sliceSize);
+	    }
+    	
+    	// update slice positions
+        slicePositions.splice(newSliceNb,1,slicePosition);
+    	
     	// copy to class variables
     	size = newSize;
     	buffer = newBuffer;
