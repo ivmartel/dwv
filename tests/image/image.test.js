@@ -64,7 +64,13 @@ $(document).ready(function(){
         equal( image0.getValue(3, 3, 1), 0, "Value at 3,3,1 (append before)" );
         equal( image0.getValue(0, 0, 2), 1, "Value at 0,0,2 (append before)" );
         equal( image0.getValue(3, 3, 2), 1, "Value at 3,3,2 (append before)" );
-
+        // test its positions
+        var slicePositions0 = [];
+        slicePositions0[0] = [0,0,-1];
+        slicePositions0[1] = [0,0,0];
+        slicePositions0[2] = [0,0,1];
+        deepEqual( image0.getSlicePositions(), slicePositions0, "Slice positions (append before)" );
+        
         // image 1
         var image1 = new dwv.image.Image(imgSize, imgSpacing, buffer, [[0,0,0],[0,0,1]]);
         var slice1 = new dwv.image.Image(sliceSize, imgSpacing, sliceBuffer, [[0,0,2]]);
@@ -77,6 +83,12 @@ $(document).ready(function(){
         equal( image1.getValue(3, 3, 1), 1, "Value at 3,3,1 (append after)" );
         equal( image1.getValue(0, 0, 2), 2, "Value at 0,0,2 (append after)" );
         equal( image1.getValue(3, 3, 2), 2, "Value at 3,3,2 (append after)" );
+        // test its positions
+        var slicePositions1 = [];
+        slicePositions1[0] = [0,0,0];
+        slicePositions1[1] = [0,0,1];
+        slicePositions1[2] = [0,0,2];
+        deepEqual( image1.getSlicePositions(), slicePositions1, "Slice positions (append after)" );
 
         // image 2
         var image2 = new dwv.image.Image(imgSize, imgSpacing, buffer, [[0,0,0],[0,0,1]]);
@@ -90,6 +102,12 @@ $(document).ready(function(){
         equal( image2.getValue(3, 3, 1), 2, "Value at 3,3,1 (append between)" );
         equal( image2.getValue(0, 0, 2), 1, "Value at 0,0,2 (append between)" );
         equal( image2.getValue(3, 3, 2), 1, "Value at 3,3,2 (append between)" );
+        // test its positions
+        var slicePositions2 = [];
+        slicePositions2[0] = [0,0,0];
+        slicePositions2[1] = [0,0,0.4];
+        slicePositions2[2] = [0,0,1];
+        deepEqual( image2.getSlicePositions(), slicePositions2, "Slice positions (append between)" );
 
     });
 

@@ -104,6 +104,8 @@ dwv.image.Image = function(size, spacing, buffer, slicePositions)
     this.getSpacing = function() { return spacing; };
     // Get the data buffer of the image. TODO dangerous...
     this.getBuffer = function() { return buffer; };
+    // Get the slice positions.
+    this.getSlicePositions = function() { return slicePositions; };
     
     // Get the rescale slope.
     this.getRescaleSlope = function() { return rescaleSlope; };
@@ -121,10 +123,6 @@ dwv.image.Image = function(size, spacing, buffer, slicePositions)
     this.getPlanarConfiguration = function() { return planarConfiguration; };
     // Set the planarConfiguration of the image.
     this.setPlanarConfiguration = function(config) { planarConfiguration = config; };
-    // Get the slice positions.
-    this.getSlicePositions = function() { return slicePositions; };
-    // Set the slice positions.
-    this.setSlicePositions = function(pos) { slicePositions = pos; };
 
     // Get value at offset. Warning: No size check...
     this.getValueAtOffset = function(offset) {
@@ -133,7 +131,7 @@ dwv.image.Image = function(size, spacing, buffer, slicePositions)
     // Clone the image.
     this.clone = function()
     {
-        var copy = new dwv.image.Image(this.getSize(), this.getSpacing(), originalBuffer);
+        var copy = new dwv.image.Image(this.getSize(), this.getSpacing(), originalBuffer, slicePositions);
         copy.setRescaleSlope(this.getRescaleSlope());
         copy.setRescaleIntercept(this.getRescaleIntercept());
         copy.setPhotometricInterpretation(this.getPhotometricInterpretation());
@@ -205,7 +203,7 @@ dwv.image.Image = function(size, spacing, buffer, slicePositions)
 	    }
     	
     	// update slice positions
-        slicePositions.splice(newSliceNb,1,slicePosition);
+        slicePositions.splice(newSliceNb, 0, slicePosition);
     	
     	// copy to class variables
     	size = newSize;
