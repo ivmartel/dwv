@@ -108,9 +108,10 @@ function setDwv(obj)
 }
 function getDwvBaseUrl(flag)
 {
-    if( flag === "dwvmobile" ) return "demo/mobile/index.m.html";
-    else if( flag === "dwvstatic" ) return "demo/static/index.html";
-    else if( flag === "dwvtrunk" ) return "demo/trunk/index.m.html";
+    if( flag === "dwvstamob" ) return "demo/stable/index.m.html";
+    else if( flag === "dwvstasta" ) return "demo/stable/index.html";
+    else if( flag === "dwvtrumob" ) return "demo/trunk/index.m.html";
+    else if( flag === "dwvtrusta" ) return "demo/trunk/index.html";
 }
 function getDwvUrl(uri)
 {
@@ -201,9 +202,10 @@ to launch DWV with the selected data.</p>
 <div data-role="fieldcontain">
 <label for="select-dwv">Choose which DWV to launch:</label>
 <select id="select-dwv" data-inline="true" data-mini="true" onClick="setDwv(this);">
-<option value="dwvmobile">DWV Mobile</option>
-<option value="dwvstatic">DWV Static</option>
-<option value="dwvtrunk">DWV Trunk</option>
+<option value="dwvstamob">DWV Mobile</option>
+<option value="dwvstasta">DWV Static</option>
+<option value="dwvtrumob">DWV Trunk Mobile</option>
+<option value="dwvtrusta">DWV Trunk Static</option>
 </select>
 </div>
 
