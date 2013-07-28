@@ -8,7 +8,7 @@ dwv.image = dwv.image || {};
  * @param image The image.
  * @param file The corresponding file.
  */
-dwv.image.getDataFromImage = function(image, file)
+dwv.image.getDataFromImage = function(image)
 {
     // draw the image in the canvas in order to get its data
     var canvas = document.getElementById('imageLayer');
@@ -32,16 +32,20 @@ dwv.image.getDataFromImage = function(image, file)
     var imageSize = new dwv.image.Size(image.width, image.height);
     // TODO: wrong info...
     var imageSpacing = new dwv.image.Spacing(1,1);
-    var dwvImage = new dwv.image.Image(imageSize, imageSpacing, buffer);
+    var sliceIndex = image.index ? image.index : 0;
+    var dwvImage = new dwv.image.Image(imageSize, imageSpacing, buffer, [[0,0,sliceIndex]]);
     dwvImage.setPhotometricInterpretation("RGB");
     // view
     var view = new dwv.image.View(dwvImage);
     view.setWindowLevelMinMax();
     // properties
     var info = {};
-    info["FileName"] = { "value": file.name };
-    info["FileType"] = { "value": file.type };
-    info["FileLastModifiedDate"] = { "value": file.lastModifiedDate };
+    if( image.file )
+    {
+        info["FileName"] = { "value": image.file.name };
+        info["FileType"] = { "value": image.file.type };
+        info["FileLastModifiedDate"] = { "value": image.file.lastModifiedDate };
+    }
     info["ImageWidth"] = { "value": image.width };
     info["ImageHeight"] = { "value": image.height };
     // return

@@ -103,19 +103,25 @@ dwv.App = function(mobile)
      */
     this.loadFiles = function(files) 
     {
-    	for (var i = 0; i < files.length; ++i)
+        for (var i = 0; i < files.length; ++i)
     	{
             var file = files[i];
 	        if( file.type.match("image.*") )
 	        {
 	            var reader = new FileReader();
+	            // storing values to pass them on
+	            reader.file = file;
+	            reader.index = i;
 	            reader.onload = function(event){
 	                var localImage = new Image();
 	                localImage.src = event.target.result;
+	                // storing values to pass them on
+	                localImage.file = this.file;
+	                localImage.index = this.index;
 	                localImage.onload = function(e){
 	                    try {
 	                        // parse image file
-	                        var data = dwv.image.getDataFromImage(localImage, file);
+	                        var data = dwv.image.getDataFromImage(this);
 		        			if( image ) image.appendSlice( data.view.getImage() );
 	                        // prepare display
 	                        postLoadInit(data);
@@ -198,7 +204,7 @@ dwv.App = function(mobile)
                     localImage.onload = function(e){
             			try {
     	                    // parse image data
-    	                    var data = dwv.image.getDataFromImage(localImage, 0);
+    	                    var data = dwv.image.getDataFromImage(localImage);
     	                    if( image ) image.appendSlice( data.view.getImage() );
     	                    // prepare display
     	                    postLoadInit(data);

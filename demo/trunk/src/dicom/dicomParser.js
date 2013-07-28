@@ -44,17 +44,19 @@ dwv.dicom.DataReader = function(buffer, isLittleEndian)
     };
     //! Read Uint8 array.
     this.readUint8Array = function(byteOffset, size) {
-        var data = [];
+        var data = new Uint8Array(size);
+        var index = 0;
         for(var i=byteOffset; i<byteOffset + size; ++i) {     
-            data.push(this.readUint8(i));
+            data[index++] = this.readUint16(i);
         }
         return data;
     };
     //! Read Uint16 array.
     this.readUint16Array = function(byteOffset, size) {
-        var data = [];
+        var data = new Uint16Array(size/2);
+        var index = 0;
         for(var i=byteOffset; i<byteOffset + size; i+=2) {     
-            data.push(this.readUint16(i));
+            data[index++] = this.readUint16(i);
         }
         return data;
     };
@@ -443,17 +445,28 @@ dwv.dicom.DicomParser.prototype.createImage = function()
         columnSpacing = parseFloat(this.dicomElements.ImagerPixelSpacing.value[1]);
     }
     var spacing = new dwv.image.Spacing( columnSpacing, rowSpacing);
+    // buffer data
+    var buffer = new Int16Array(this.pixelBuffer.length);
     // unsigned to signed data if needed
+    var shift = false;
     if( this.dicomElements.PixelRepresentation 
     		&& this.dicomElements.PixelRepresentation.value[0] == 1) {
-	    for( var i=0; i<this.pixelBuffer.length; ++i ) {
-	        if( this.pixelBuffer[i] >= Math.pow(2, 15) ) 
-	        	this.pixelBuffer[i] -= Math.pow(2, 16);
-	    }
+        shift = true;
     }
+    for( var i=0; i<this.pixelBuffer.length; ++i ) {
+        buffer[i] = this.pixelBuffer[i];
+        if( shift && buffer[i] >= Math.pow(2, 15) ) 
+            buffer[i] -= Math.pow(2, 16);
+    }
+    // slice position
+    var slicePosition = [0,0,0];
+    if( this.dicomElements.ImagePositionPatient )
+        slicePosition = [ parseFloat(this.dicomElements.ImagePositionPatient.value[0]),
+            parseFloat(this.dicomElements.ImagePositionPatient.value[1]),
+            parseFloat(this.dicomElements.ImagePositionPatient.value[2]) ];
     
     // image
-    var image = new dwv.image.Image( size, spacing, this.pixelBuffer );
+    var image = new dwv.image.Image( size, spacing, buffer, [slicePosition] );
     // photometricInterpretation
     if( this.dicomElements.PhotometricInterpretation ) {
         image.setPhotometricInterpretation( dwv.utils.cleanString(
