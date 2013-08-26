@@ -89,15 +89,15 @@ var dataImg = [
     desc: "Acute Leukimia from wikipedia (http://en.wikipedia.org/wiki/File:Acute_leukemia-ALL.jpg), 347*395*1."
     }];
 
-function setDwv(obj)
+function setDwv(value)
 {
     // update page links
     var links = document.getElementsByClassName('dwvlink');
     var tmp;
-    var root = getDwvBaseUrl(obj.value);
+    var root = getDwvBaseUrl(value);
     for (var i = 0; i < links.length; ++i) {
         tmp = links[i].href.split('?');
-        links[i].setAttribute('href', root+'?'+tmp[1]);
+        links[i].href = root+'?'+tmp[1];
     }
 }
 function getDwvBaseUrl(flag)
@@ -192,7 +192,7 @@ to launch DWV with the selected data.</p>
 
 <div>
 <label for="select-dwv">Choose which DWV to launch:</label>
-<select id="select-dwv" onClick="setDwv(this);">
+<select id="select-dwv" onClick="setDwv(this.value);">
 <option value="dwvstamob">DWV Mobile</option>
 <option value="dwvstasta">DWV Static</option>
 <option value="dwvtrumob">DWV Trunk Mobile</option>
