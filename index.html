@@ -94,9 +94,10 @@ function setDwv(obj)
     // update page links
     var links = document.getElementsByClassName('dwvlink');
     var tmp;
+    var root = getDwvBaseUrl(obj.value);
     for (var i = 0; i < links.length; ++i) {
         tmp = links[i].href.split('?');
-        links[i].href = getDwvBaseUrl(obj.value)+'?'+tmp[1];
+        links[i].setAttribute('href', root+'?'+tmp[1];
     }
 }
 function getDwvBaseUrl(flag)
