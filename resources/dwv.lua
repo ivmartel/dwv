@@ -55,31 +55,34 @@ end
 
 local studyuid = getstudyuid()
 local images = queryimages()
+-- create the url lua array
+local urlRoot = webscriptadress
+urlRoot = urlRoot .. '?requestType=WADO&contentType=application/dicom'
+urlRoot = urlRoot .. '&seriesUID=' .. seriesuid
+urlRoot = urlRoot .. '&studyUID=' .. studyuid
+local urls = {}
+for i=1, #images do
+  urls[i] = urlRoot .. '&objectUID=' .. images[i].SOPInstanceUID
+end
 
-local url = webscriptadress
-url = url .. '?requestType=WADO&contentType=application/dicom'
-url = url .. '&seriesUID=' .. seriesuid
-url = url .. '&studyUID=' .. studyuid
-url = url .. '&objectUID=' .. images[1].SOPInstanceUID
- 
 -- Generate html
 
 HTML('Content-type: text/html\n\n')
---print([[<!DOCTYPE html>]])
+print([[<!DOCTYPE html>]])
 print([[<html>]])
 
 print([[<head>]])
 
 print([[
 <title>DICOM Web Viewer</title>
-<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+<meta charset="UTF-8">
 <link rel="stylesheet" href="/dwv/css/style.css">
 <style>
 body { font-size: 80%; }
 #pageHeader h1 { display: inline-block; margin: 0; }
 #pageHeader #toolbar { display: inline-block; float: right; }
 #toolbox li:first-child { list-style-type: none; padding-bottom: 10px; margin-left: -20px; }
-#pageMain { height: 93%; width: 100%; margin-top: 10px; background-color: #333; }
+#pageMain { position: absolute; height: 92%; width: 99%; bottom: 5px; left: 5px; background-color: #333; }
 #infotl { color: #333; text-shadow: 0 1px 0 #fff; }
 #infotr { color: #333; text-shadow: 0 1px 0 #fff; }
 </style>
@@ -110,8 +113,13 @@ print([[
 <script type="text/javascript" src="/dwv/src/html/html.js"></script>
 <script type="text/javascript" src="/dwv/src/html/style.js"></script>
 <script type="text/javascript" src="/dwv/src/html/layer.js"></script>
+]])
+
+-- path with extra /dwv
+print([[
 <script type="text/javascript" src="/dwv/src/image/filter.js"></script>
 <script type="text/javascript" src="/dwv/src/image/image.js"></script>
+<script type="text/javascript" src="/dwv/src/image/view.js"></script>
 <script type="text/javascript" src="/dwv/src/image/luts.js"></script>
 <script type="text/javascript" src="/dwv/src/image/reader.js"></script>
 <script type="text/javascript" src="/dwv/src/math/shapes.js"></script>
@@ -142,57 +150,8 @@ print([[<script type="text/javascript">]])
 print([[
 function toggle(dialogName)
 {
-    if( $(dialogName).dialog('isOpen') )
-    {
-        $(dialogName).dialog('close');
-    }
-    else
-    {
-        $(dialogName).dialog('open');
-    }
-}
-]])
-
--- custom method
-print([[
-function load()
-{
-  app.loadURL(']]..webscriptadress..[[?requestType=WADO&contentType=application/dicom'+
-    '&studyUID=]]..studyuid..[[' +
-    '&seriesUID=]]..seriesuid..[[' +
-    '&objectUID=' + document.forms[0].slice.value);
-}
-]])
-
--- custom method
-print([[
-function nextslice()
-{
-  if (document.forms[0].slice.selectedIndex == document.forms[0].slice.length-1)
-  {
-    document.forms[0].slice.selectedIndex = 0;
-  }
-  else
-  {
-    document.forms[0].slice.selectedIndex = document.forms[0].slice.selectedIndex + 1;
-  }
-  load();
-}
-]])
-
--- custom method
-print([[
-function previousslice()
-{
-  if (document.forms[0].slice.selectedIndex == 0)
-  {
-    document.forms[0].slice.selectedIndex = document.forms[0].slice.length-1;
-  }
-  else
-  {
-    document.forms[0].slice.selectedIndex = document.forms[0].slice.selectedIndex - 1;
-  }
-  load();
+    if( $(dialogName).dialog('isOpen') ) $(dialogName).dialog('close');
+    else $(dialogName).dialog('open');
 }
 ]])
 
@@ -235,12 +194,19 @@ print([[
     app.init();
     // align layers when the window is resized
     window.onresize = app.resize;
+    // possible load from URL
+    //var inputUrls = dwv.html.getUriParam(); 
 ]])
 
--- custom load
+-- create javascript url array
+print([[    var inputUrls = []])
+for i=1, #images do
+  print('      "'..urls[i]..'",')
+end
+print([[    ];]])
+-- load data
 print([[
-    // load wado URL
-    app.loadURL("]].. url ..[[");
+    if( inputUrls && inputUrls.length > 0 ) app.loadURL(inputUrls);
 });
 ]])
 
@@ -275,20 +241,6 @@ print([[
 <form><p>
 Path: <input type="file" id="imagefiles" multiple />
 URL: <input type="url" id="imageurl" />
-]])
-
--- custom slice chooser
-print([[
-<br>Slice: 
-<input type=button value='<' onclick=previousslice() />
-<select name=slice onchange=load()>
-]])
-for i=1, #images do
-  print('  <option value='..images[i].SOPInstanceUID..'>'..i..'</option>')
-end
-print([[
-</select>
-<input type=button value='>' onclick=nextslice() />
 ]])
 
 print([[</p></form>]])
