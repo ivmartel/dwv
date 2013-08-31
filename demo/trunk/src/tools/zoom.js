@@ -69,7 +69,7 @@ dwv.tool.Zoom = function(app)
        var point1 = new dwv.math.Point2D(ev._x1, ev._y1);
        var newLine = new dwv.math.Line(point0, point1);
        var lineDiff = newLine.getLength() / self.line0.getLength();
-       var ratio = lineDiff / 100;
+       var ratio = lineDiff / 10000;
        if( newLine.getLength() < self.line0.getLength() ) ratio *= -1;
        
        if( ratio !== 0 )
