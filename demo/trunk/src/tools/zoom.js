@@ -68,12 +68,8 @@ dwv.tool.Zoom = function(app)
        var point0 = new dwv.math.Point2D(ev._x, ev._y);
        var point1 = new dwv.math.Point2D(ev._x1, ev._y1);
        var newLine = new dwv.math.Line(point0, point1);
-       var lineDiff = newLine.getLength() / self.line0.getLength();
-       var ratio = lineDiff - 1;
-       //if( newLine.getLength() < self.line0.getLength() ) ratio *= -1;
-       
-       if( ratio !== 0 )
-           zoom(ratio, self.midPoint.getX(), self.midPoint.getY());
+       var lineDiff = ( newLine.getLength() - self.line0.getLength() ) / 1000;
+       zoom(lineDiff, self.midPoint.getX(), self.midPoint.getY());
     };
     
     // This is called when you release the mouse button.
