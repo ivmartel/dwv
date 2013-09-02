@@ -69,7 +69,7 @@ dwv.tool.Zoom = function(app)
        var lineRatio = newLine.getLength() / self.line0.getLength();
        
        //if( Math.abs(lineRatio) > 0.1 )
-       var zoom = (lineRatio - 1) / 10;
+       var zoom = lineRatio - 1;
        zoomLayers(zoom, self.midPoint.getX(), self.midPoint.getY());
     };
     
