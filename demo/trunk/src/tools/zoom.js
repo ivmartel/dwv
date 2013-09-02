@@ -21,8 +21,7 @@ dwv.tool.Zoom = function(app)
 {
     var self = this;
     this.started = false;
-    this.zoomX = 1;
-    this.zoomY = 1;
+    this.zoom = 1;
 
     // This is called when you start holding down the mouse button.
     this.mousedown = function(ev){
@@ -68,8 +67,10 @@ dwv.tool.Zoom = function(app)
        var point0 = new dwv.math.Point2D(ev._x, ev._y);
        var point1 = new dwv.math.Point2D(ev._x1, ev._y1);
        var newLine = new dwv.math.Line(point0, point1);
-       var lineDiff = ( newLine.getLength() - self.line0.getLength() ) / 1000;
-       zoom(lineDiff, self.midPoint.getX(), self.midPoint.getY());
+       var lineRatio = newLine.getLength() / self.line0.getLength();
+       
+       //if( Math.abs(lineRatio) > 0.1 )
+       zoom(lineRatio, self.midPoint.getX(), self.midPoint.getY());
     };
     
     // This is called when you release the mouse button.
@@ -110,13 +111,17 @@ dwv.tool.Zoom = function(app)
     // This is called when you use the mouse wheel on Firefox.
     this.DOMMouseScroll = function(ev){
         // ev.detail on firefox is 3
-        zoom(ev.detail/30, ev._x, ev._y);
+        var step = ev.detail/30;
+        self.zoom += step;
+        zoomLayers(step, ev._x, ev._y);
     };
 
     // This is called when you use the mouse wheel.
     this.mousewheel = function(ev){
         // ev.wheelDelta on chrome is 120
-        zoom(ev.wheelDelta/1200, ev._x, ev._y);
+        var step = ev.wheelDelta/1200;
+        self.zoom += step;
+        zoomLayers(step, ev._x, ev._y);
     };
     
     // Enable method.
@@ -136,11 +141,9 @@ dwv.tool.Zoom = function(app)
 
     // Really do the zoom
     // A good step is of 0.1.
-    function zoom(step, cx, cy)
+    function zoomLayers(step, cx, cy)
     {
-        var zoomLevel = 1 + step;
-        // apply zoom
-        app.setLayersZoom(zoomLevel,zoomLevel,cx,cy);
+        app.setLayersZoom(step,step,cx,cy);
      }
 
 }; // Zoom class

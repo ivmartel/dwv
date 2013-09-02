@@ -30,17 +30,25 @@ dwv.html.Layer = function(name)
     var originY = 0;
     var width = 0;
     var height = 0;
+    var oldZoomX = 1;
+    var oldZoomY = 1;
     
     // set the zoom
-    this.setZoom = function(zx,zy,cx,cy)
+    this.setZoom = function(stepX,stepY,centerX,centerY)
     {
+        var zoomX = oldZoomX + stepX;
+        var zoomY = oldZoomY + stepY;
         // The zoom is the ratio between the differences from the center
         // to the origins:
-        originX = cx - ((cx - originX) * zx);
-        originY = cy - ((cy - originY) * zy);
+        // centerX - originX = ( centerX - originX0 ) * zoomX
+        originX = centerX - (centerX - originX) * (zoomX / oldZoomX);
+        originY = centerY - (centerY - originY) * (zoomY / oldZoomY);
+        // save zoom
+        oldZoomX = zoomX;
+        oldZoomY = zoomY;
         // calculate new width/height
-        width *= zx;
-        height *= zy;
+        width = canvas.width * zoomX;
+        height = canvas.height * zoomY;
         // draw 
         this.draw();
     };
@@ -84,6 +92,8 @@ dwv.html.Layer = function(name)
     {
         originX = 0;
         originY = 0;
+        oldZoomX = 1;
+        oldZoomY = 1;
         width = canvas.width;
         height = canvas.height;
     };
