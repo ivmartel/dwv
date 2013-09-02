@@ -38,6 +38,9 @@ dwv.html.Layer = function(name)
     {
         var zoomX = oldZoomX + stepX;
         var zoomY = oldZoomY + stepY;
+        // check zoom value
+        if( zoomX <= 0.1 || zoomX >= 10 ||
+            zoomY <= 0.1 || zoomY >= 10 ) return;
         // The zoom is the ratio between the differences from the center
         // to the origins:
         // centerX - originX = ( centerX - originX0 ) * zoomX

@@ -21,7 +21,6 @@ dwv.tool.Zoom = function(app)
 {
     var self = this;
     this.started = false;
-    this.zoom = 1;
 
     // This is called when you start holding down the mouse button.
     this.mousedown = function(ev){
@@ -70,7 +69,7 @@ dwv.tool.Zoom = function(app)
        var lineRatio = newLine.getLength() / self.line0.getLength();
        
        //if( Math.abs(lineRatio) > 0.1 )
-       zoom(lineRatio, self.midPoint.getX(), self.midPoint.getY());
+       zoom(lineRatio-1, self.midPoint.getX(), self.midPoint.getY());
     };
     
     // This is called when you release the mouse button.
@@ -112,7 +111,6 @@ dwv.tool.Zoom = function(app)
     this.DOMMouseScroll = function(ev){
         // ev.detail on firefox is 3
         var step = ev.detail/30;
-        self.zoom += step;
         zoomLayers(step, ev._x, ev._y);
     };
 
@@ -120,7 +118,6 @@ dwv.tool.Zoom = function(app)
     this.mousewheel = function(ev){
         // ev.wheelDelta on chrome is 120
         var step = ev.wheelDelta/1200;
-        self.zoom += step;
         zoomLayers(step, ev._x, ev._y);
     };
     
@@ -144,7 +141,7 @@ dwv.tool.Zoom = function(app)
     function zoomLayers(step, cx, cy)
     {
         app.setLayersZoom(step,step,cx,cy);
-     }
+    }
 
 }; // Zoom class
 
