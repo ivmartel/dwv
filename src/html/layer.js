@@ -28,30 +28,25 @@ dwv.html.Layer = function(name)
     // Image information
     var originX = 0;
     var originY = 0;
-    var width = 0;
-    var height = 0;
-    var oldZoomX = 1;
-    var oldZoomY = 1;
+    var zoomX = 1;
+    var zoomY = 1;
     
     // set the zoom
     this.setZoom = function(stepX,stepY,centerX,centerY)
     {
-        var zoomX = oldZoomX + stepX;
-        var zoomY = oldZoomY + stepY;
+        var newZoomX = zoomX + stepX;
+        var newZoomY = zoomY + stepY;
         // check zoom value
-        if( zoomX <= 0.1 || zoomX >= 10 ||
-            zoomY <= 0.1 || zoomY >= 10 ) return;
+        if( newZoomX <= 0.1 || newZoomX >= 10 ||
+            newZoomY <= 0.1 || newZoomY >= 10 ) return;
         // The zoom is the ratio between the differences from the center
         // to the origins:
         // centerX - originX = ( centerX - originX0 ) * zoomX
-        originX = centerX - (centerX - originX) * (zoomX / oldZoomX);
-        originY = centerY - (centerY - originY) * (zoomY / oldZoomY);
+        originX = centerX - (centerX - originX) * (newZoomX / zoomX);
+        originY = centerY - (centerY - originY) * (newZoomY / zoomY);
         // save zoom
-        oldZoomX = zoomX;
-        oldZoomY = zoomY;
-        // calculate new width/height
-        width = canvas.width * zoomX;
-        height = canvas.height * zoomY;
+        zoomX = newZoomX;
+        zoomY = newZoomY;
         // draw 
         this.draw();
     };
@@ -68,6 +63,21 @@ dwv.html.Layer = function(name)
     // translation is according to the last one
     this.setTranslate = function(tx,ty)
     {
+        // check translate value
+        if( zoomX >= 1 ) { 
+            if( (originX + tx) < -1 * (canvas.width * zoomX) + canvas.width 
+                || (originX + tx) > 0 ) return;
+        } else {
+            if( (originX + tx) > -1 * (canvas.width * zoomX) + canvas.width 
+                || (originX + tx) < 0 ) return;
+        }
+        if( zoomY >= 1 ) { 
+            if( (originY + ty) < -1 * (canvas.height * zoomY) + canvas.height 
+                || (originY + ty) > 0 ) return;
+        } else {
+            if( (originY + ty) > -1 * (canvas.height * zoomY) + canvas.height 
+                || (originY + ty) < 0 ) return;
+        }
         // new origin
         originX += tx;
         originY += ty;
@@ -95,10 +105,8 @@ dwv.html.Layer = function(name)
     {
         originX = 0;
         originY = 0;
-        oldZoomX = 1;
-        oldZoomY = 1;
-        width = canvas.width;
-        height = canvas.height;
+        zoomX = 1;
+        zoomY = 1;
     };
     
     /**
@@ -118,7 +126,10 @@ dwv.html.Layer = function(name)
         tempCanvas.height = canvas.height;
         tempCanvas.getContext("2d").putImageData(imageData, 0, 0);
         // 2. draw the temporary canvas on the context
-        context.drawImage(tempCanvas,originX,originY,width,height);
+        context.drawImage(tempCanvas,
+            originX, originY,
+            canvas.width * zoomX, 
+            canvas.height * zoomY);
     };
     
     /**
@@ -151,9 +162,6 @@ dwv.html.Layer = function(name)
         // canvas sizes
         canvas.width = inputWidth;
         canvas.height = inputHeight;
-        // local sizes
-        width = inputWidth;
-        height = inputHeight;
         // original empty image data array
         context.clearRect (0, 0, canvas.width, canvas.height);
         imageData = context.getImageData(0, 0, canvas.width, canvas.height);
