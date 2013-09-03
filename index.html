@@ -57,16 +57,12 @@ body { font-size: 80%; }
 
 function toggle(dialogId)
 {
-    if( $(dialogId).dialog('isOpen') )
-    {
-        $(dialogId).dialog('close');
-    }
-    else
-    {
-        $(dialogId).dialog('open');
-    }
+    if( $(dialogId).dialog('isOpen') ) $(dialogId).dialog('close');
+    else $(dialogId).dialog('open');
 }
 
+// check browser support
+dwv.html.checkBrowser();
 // main application
 var app = new dwv.App();
 

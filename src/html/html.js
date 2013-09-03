@@ -404,3 +404,30 @@ dwv.html.toggleDisplay = function(id)
     }
 };
 
+/**
+ * Browser checks to see if it can run dwv...
+ * TODO Maybe use http://modernizr.com/.
+ */ 
+dwv.html.checkBrowser = function()
+{
+    var appnorun = "The application cannot be run.";
+    // Check for the File API support
+    if( !window.FileReader ) {
+        var message = "The File APIs are not supported in this browser. ";
+        alert(message+appnorun);
+        throw new Error(message);
+    }
+    // Check for XMLHttpRequest
+    if( !window.XMLHttpRequest || !("withCredentials" in new XMLHttpRequest) ) {
+      var message = "The XMLHttpRequest is not supported in this browser. ";
+      alert(message+appnorun);
+      throw new Error(message);
+    }
+    // Check typed array
+    if( !window.Uint8Array || !window.Uint16Array ) {
+        var message = "The Typed arrays are not supported in this browser. ";
+        alert(message+appnorun);
+        throw new Error(message);
+    }
+};
+
