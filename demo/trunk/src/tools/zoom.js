@@ -69,7 +69,8 @@ dwv.tool.Zoom = function(app)
        var lineRatio = newLine.getLength() / self.line0.getLength();
        
        var zoom = lineRatio - 1;
-       zoomLayers(zoom, self.midPoint.getX(), self.midPoint.getY());
+       if( Math.abs(zoom) % 0.1 <= 0.05 )
+           zoomLayers(zoom, self.midPoint.getX(), self.midPoint.getY());
     };
     
     // This is called when you release the mouse button.
