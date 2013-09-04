@@ -49,8 +49,8 @@ $(document).ready(function(){
 
         // image buffer
         var buffer = new Int16Array(imgSize.getTotalSize());
-        for(var i=0; i<size*size; ++i) buffer[i] = 0;
-        for(var i=size*size; i<2*size*size; ++i) buffer[i] = 1;
+        for(var j=0; j<size*size; ++j) buffer[j] = 0;
+        for(var k=size*size; k<2*size*size; ++k) buffer[k] = 1;
         
         // image 0
         var image0 = new dwv.image.Image(imgSize, imgSpacing, buffer, [[0,0,0],[0,0,1]]);

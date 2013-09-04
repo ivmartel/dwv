@@ -59,12 +59,12 @@ $(document).ready(function(){
         equal(res02.toString(), theo02.toString(), "File uri with args");
 
         // test 03
-        var root02 = "file:///test.html?";
-        var uri02 = "result?a=0";
-        var full02 = root02 + encodeURIComponent(uri02);
+        var root03 = "file:///test.html?";
+        var uri03 = "result?a=0";
+        var full03 = root03 + encodeURIComponent(uri03);
         var caughtError = false;
         try {
-            dwv.html.getUriParam(full02);
+            dwv.html.getUriParam(full03);
         }
         catch(error){ 
             caughtError = true;
@@ -124,12 +124,12 @@ $(document).ready(function(){
         equal(res22.toString(), theo22.toString(), "Multiple File uri with three args");
         
         // simple test: plenty arguments
-        var root22 = "file:///test.html?input=";
-        var uri22 = "result?a=0&a=1&a=2&b=3&c=4";
-        var full22 = root22 + encodeURIComponent(uri22);
-        var res22 = dwv.html.getUriParam(full22);
-        var theo22 = ["result?b=3&c=4&a=0", "result?b=3&c=4&a=1", "result?b=3&c=4&a=2"];
-        equal(res22.toString(), theo22.toString(), "Multiple File uri with plenty args");
+        var root23 = "file:///test.html?input=";
+        var uri23 = "result?a=0&a=1&a=2&b=3&c=4";
+        var full23 = root23 + encodeURIComponent(uri23);
+        var res23 = dwv.html.getUriParam(full23);
+        var theo23 = ["result?b=3&c=4&a=0", "result?b=3&c=4&a=1", "result?b=3&c=4&a=2"];
+        equal(res23.toString(), theo23.toString(), "Multiple File uri with plenty args");
 
         // real world multiple URI
 
