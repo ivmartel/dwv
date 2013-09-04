@@ -100,7 +100,7 @@ dwv.tool.filter.Threshold.prototype.run = function(args)
 };
 
 // Add the tool to the list
-dwv.tool.filters["threshold"] = dwv.tool.filter.Threshold;
+dwv.tool.filters.threshold = dwv.tool.filter.Threshold;
 
 /**
 * @class Sharpen filter tool.
@@ -127,7 +127,7 @@ dwv.tool.filter.Sharpen.prototype.run = function(args)
 };
 
 // Add the tool to the list
-dwv.tool.filters["sharpen"] = dwv.tool.filter.Sharpen;
+dwv.tool.filters.sharpen = dwv.tool.filter.Sharpen;
 
 /**
 * @class Sobel filter tool.
@@ -154,10 +154,10 @@ dwv.tool.filter.Sobel.prototype.run = function(args)
 };
 
 //Add the tool to the list
-dwv.tool.filters["sobel"] = dwv.tool.filter.Sobel;
+dwv.tool.filters.sobel = dwv.tool.filter.Sobel;
 
 //Add the filters to the tools
-dwv.tool.tools["filter"] = dwv.tool.Filter;
+dwv.tool.tools.filter = dwv.tool.Filter;
 
 /**
  * @class Run filter command.

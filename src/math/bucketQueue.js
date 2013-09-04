@@ -47,7 +47,7 @@ dwv.math.BucketQueue.prototype.pop = function() {
 	
 	// Find first empty bucket
 	while ( this.buckets[this.loc] === null ) {
-	    this.loc = (this.loc + 1) % this.bucketCount;
+        this.loc = (this.loc + 1) % this.bucketCount;
 	}
 	
 	// All items in bucket have same cost, return the first one

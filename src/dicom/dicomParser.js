@@ -301,10 +301,10 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
                 dataReader = new dwv.dicom.DataReader(buffer,false);
             }
             // JPEG
-            else if( syntax.match(/1.2.840.10008.1.2.4.5/) 
-                    || syntax.match(/1.2.840.10008.1.2.4.6/)
-                    || syntax.match(/1.2.840.10008.1.2.4.7/) 
-                    || syntax.match(/1.2.840.10008.1.2.4.8/) ) {
+            else if( syntax.match(/1.2.840.10008.1.2.4.5/) ||
+                    syntax.match(/1.2.840.10008.1.2.4.6/) ||
+                    syntax.match(/1.2.840.10008.1.2.4.7/) ||
+                    syntax.match(/1.2.840.10008.1.2.4.8/) ) {
                 jpeg = true;
                 throw new Error("Unsupported DICOM transfer syntax (JPEG): "+syntax);
             }
@@ -347,8 +347,8 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
         }
         catch(err)
         {
-            console.warn("Problem reading at " + i + " / " + buffer.byteLength
-                    + ", after " + tagName + ".\n" + err);
+            console.warn("Problem reading at " + i + " / " + buffer.byteLength +
+                ", after " + tagName + ".\n" + err);
         }
         tagName = dataElement.tag.name;
         // store pixel data from multiple items
@@ -449,8 +449,8 @@ dwv.dicom.DicomParser.prototype.createImage = function()
     var buffer = new Int16Array(this.pixelBuffer.length);
     // unsigned to signed data if needed
     var shift = false;
-    if( this.dicomElements.PixelRepresentation 
-    		&& this.dicomElements.PixelRepresentation.value[0] == 1) {
+    if( this.dicomElements.PixelRepresentation &&
+            this.dicomElements.PixelRepresentation.value[0] == 1) {
         shift = true;
     }
     for( var i=0; i<this.pixelBuffer.length; ++i ) {
@@ -497,18 +497,18 @@ dwv.dicom.DicomParser.prototype.createImage = function()
     var windowPresets = [];
     if( this.dicomElements.WindowCenter && this.dicomElements.WindowWidth ) {
         var name;
-        for( var i = 0; i < this.dicomElements.WindowCenter.value.length; ++i) {
-            var width = parseFloat( this.dicomElements.WindowWidth.value[i], 10 );
-        	if( width !== 0 ) {
-	        	if( this.dicomElements.WindowCenterWidthExplanation ) {
-	                name = this.dicomElements.WindowCenterWidthExplanation.value[i];
-	            }
-	            else name = "Default"+i;
-	            windowPresets.push({
-	                "center": parseFloat( this.dicomElements.WindowCenter.value[i], 10 ),
-	                "width": width, 
-	                "name": name
-	            });
+        for( var j = 0; j < this.dicomElements.WindowCenter.value.length; ++j) {
+            var width = parseFloat( this.dicomElements.WindowWidth.value[j], 10 );
+            if( width !== 0 ) {
+                if( this.dicomElements.WindowCenterWidthExplanation ) {
+                    name = this.dicomElements.WindowCenterWidthExplanation.value[j];
+                }
+                else name = "Default"+j;
+                windowPresets.push({
+                    "center": parseFloat( this.dicomElements.WindowCenter.value[j], 10 ),
+                    "width": width, 
+                    "name": name
+                });
             }
         }
     }

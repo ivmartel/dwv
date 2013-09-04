@@ -62,18 +62,18 @@ dwv.image.View = function(image, isSigned)
     this.getCurrentPosition = function() { return currentPosition; };
     // Set the current position. Returns false if not in bounds.
     this.setCurrentPosition = function(pos) { 
-    	if( !image.getSize().isInBounds(pos.i,pos.j,pos.k) ) return false;
-    	var oldPosition = currentPosition;
-    	currentPosition = pos;
+        if( !image.getSize().isInBounds(pos.i,pos.j,pos.k) ) return false;
+        var oldPosition = currentPosition;
+        currentPosition = pos;
         this.fireEvent({"type": "positionchange", 
             "i": pos.i, "j": pos.j, "k": pos.k,
             "value": image.getRescaledValue(pos.i,pos.j,pos.k)});
         // slice change event (used to trigger redraw)
         if( oldPosition.k !== currentPosition.k ) {
-        	this.fireEvent({"type": "slicechange"});
+            this.fireEvent({"type": "slicechange"});
         }
         return true;
-	};
+    };
     
     // view listeners
     var listeners = {};
@@ -117,10 +117,10 @@ dwv.image.View.prototype.setWindowLevelMinMax = function()
  */
 dwv.image.View.prototype.incrementSliceNb = function()
 {
-	return this.setCurrentPosition({
-		"i": this.getCurrentPosition().i,
-		"j": this.getCurrentPosition().j,
-		"k": this.getCurrentPosition().k + 1 });
+    return this.setCurrentPosition({
+        "i": this.getCurrentPosition().i,
+        "j": this.getCurrentPosition().j,
+        "k": this.getCurrentPosition().k + 1 });
 };
 
 /**
@@ -129,10 +129,10 @@ dwv.image.View.prototype.incrementSliceNb = function()
  */
 dwv.image.View.prototype.decrementSliceNb = function()
 {
-	return this.setCurrentPosition({
-		"i": this.getCurrentPosition().i,
-		"j": this.getCurrentPosition().j,
-		"k": this.getCurrentPosition().k - 1 });
+    return this.setCurrentPosition({
+        "i": this.getCurrentPosition().i,
+        "j": this.getCurrentPosition().j,
+        "k": this.getCurrentPosition().k - 1 });
 };
 
 /**
@@ -156,23 +156,25 @@ dwv.image.View.prototype.clone = function()
 dwv.image.View.prototype.generateImageData = function( array )
 {        
     var sliceNumber = this.getCurrentPosition().k;
-	var image = this.getImage();
+    var image = this.getImage();
     var pxValue = 0;
     var photoInterpretation = image.getPhotometricInterpretation();
     var planarConfig = image.getPlanarConfiguration();
     var windowLut = this.getWindowLut();
     var colorMap = this.getColorMap();
     var index = 0;
+    var sliceSize = 0;
+    var sliceOffset = 0;
     switch (photoInterpretation) {
         case "MONOCHROME1":
         case "MONOCHROME2":
-            var sliceSize = image.getSize().getSliceSize();
-            var sliceOffset = (sliceNumber || 0) * sliceSize;
+            sliceSize = image.getSize().getSliceSize();
+            sliceOffset = (sliceNumber || 0) * sliceSize;
             var iMax = sliceOffset + sliceSize;
             for(var i=sliceOffset; i < iMax; ++i)
             {        
                 pxValue = parseInt( windowLut.getValue( 
-                		image.getValueAtOffset(i) ), 10 );
+                        image.getValueAtOffset(i) ), 10 );
                 array.data[index] = colorMap.red[pxValue];
                 array.data[index+1] = colorMap.green[pxValue];
                 array.data[index+2] = colorMap.blue[pxValue];
@@ -186,8 +188,8 @@ dwv.image.View.prototype.generateImageData = function( array )
             if( planarConfig !== 0 && planarConfig !== 1 ) {
                 throw new Error("Unsupported planar configuration: "+planarConfig);
             }
-            var sliceSize = image.getSize().getSliceSize();
-            var sliceOffset = (sliceNumber || 0) * 3 * sliceSize;
+            sliceSize = image.getSize().getSliceSize();
+            sliceOffset = (sliceNumber || 0) * 3 * sliceSize;
             // default: RGBRGBRGBRGB...
             var posR = sliceOffset;
             var posG = sliceOffset + 1;
@@ -204,7 +206,7 @@ dwv.image.View.prototype.generateImageData = function( array )
             var redValue = 0;
             var greenValue = 0;
             var blueValue = 0;
-            for(var i=0; i < image.getSize().getSliceSize(); ++i)
+            for(var j=0; j < image.getSize().getSliceSize(); ++j)
             {        
                 redValue = parseInt( windowLut.getValue( 
                         image.getValueAtOffset(posR) ), 10 );

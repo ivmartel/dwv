@@ -37,11 +37,11 @@ dwv.html.appendRowForArray = function(table, input, level, maxLevel, rowHeader)
     // loop through
     for(var i=0; i<input.length; ++i) {
         // more to come
-        if( typeof input[i] === 'number'
-            || typeof input[i] === 'string'
-            || input[i] === null
-            || input[i] === undefined
-            || level >= maxLevel ) {
+        if( typeof input[i] === 'number' ||
+            typeof input[i] === 'string' ||
+            input[i] === null ||
+            input[i] === undefined ||
+            level >= maxLevel ) {
             if( !row ) {
                 row = table.insertRow(-1);
             }
@@ -63,11 +63,11 @@ dwv.html.appendRowForObject = function(table, input, level, maxLevel, rowHeader)
     var row = null;
     for( var o=0; o<keys.length; ++o ) {
         // more to come
-        if( typeof input[keys[o]] === 'number' 
-            || typeof input[keys[o]] === 'string'
-            || input[keys[o]] === null
-            || input[keys[o]] === undefined
-            || level >= maxLevel ) {
+        if( typeof input[keys[o]] === 'number' ||
+            typeof input[keys[o]] === 'string' ||
+            input[keys[o]] === null ||
+            input[keys[o]] === undefined ||
+            level >= maxLevel ) {
             if( !row ) {
                 row = table.insertRow(-1);
             }
@@ -182,9 +182,9 @@ dwv.html.dehighlight = function(container) {
     for (var i = 0; i < container.childNodes.length; i++) {
         var node = container.childNodes[i];
 
-        if (node.attributes 
-                && node.attributes['class']
-                && node.attributes['class'].value === 'highlighted') {
+        if (node.attributes &&
+                node.attributes['class'] &&
+                node.attributes['class'].value === 'highlighted') {
             node.parentNode.parentNode.replaceChild(
                     document.createTextNode(
                         node.parentNode.innerHTML.replace(/<[^>]+>/g, "")),
@@ -285,7 +285,7 @@ dwv.html.removeNode = function(nodeId) {
  * The values of the options are the name of the option made lower case.
  * It is left to the user to set the 'onchange' method of the select.
  * @param name The name of the HTML select.
- * @param array The array of options of the HTML select.
+ * @param list The list of options of the HTML select.
  * @return The created HTML select.
  */
 dwv.html.createHtmlSelect = function(name, list) {
@@ -307,11 +307,11 @@ dwv.html.createHtmlSelect = function(name, list) {
     }
     else if( typeof list === 'object')
     {
-        for ( var name in list )
+        for ( var item in list )
         {
             option = document.createElement("option");
-            option.value = name.toLowerCase();
-            option.appendChild(document.createTextNode(dwv.utils.capitaliseFirstLetter(name)));
+            option.value = item.toLowerCase();
+            option.appendChild(document.createTextNode(dwv.utils.capitaliseFirstLetter(item)));
             select.appendChild(option);
         }
     }
@@ -359,31 +359,32 @@ dwv.html.getUriParam = function(uri)
             // build base uri
             var baseUrl = inputQueryPairs.base + "?";
             var gotOneArg = false;
-            for( var i = 0; i < keys.length; ++i )
+            for( var j = 0; j < keys.length; ++j )
             {
-                if( keys[i] !== "base" && keys[i] !== repeatKey ) {
+                if( keys[j] !== "base" && keys[j] !== repeatKey ) {
                     if( gotOneArg ) baseUrl += "&";
-                    baseUrl += keys[i] + "=" + inputQueryPairs[keys[i]];
+                    baseUrl += keys[j] + "=" + inputQueryPairs[keys[j]];
                     gotOneArg = true;
                 }
             }
             
             // check if we really have repetition
+            var url;
             if( inputQueryPairs[repeatKey] instanceof Array )
             {
-                for( var i = 0; i < inputQueryPairs[repeatKey].length; ++i )
+                for( var k = 0; k < inputQueryPairs[repeatKey].length; ++k )
                 {
-                    var url = baseUrl;
+                    url = baseUrl;
                     if( gotOneArg ) url += "&";
                     if( repeatKeyReplaceMode === "key" ) url += repeatKey + "=";
                     // other than key: do nothing
-                    url += inputQueryPairs[repeatKey][i];
+                    url += inputQueryPairs[repeatKey][k];
                     val.push(url);
                 }
             }
             else 
             {
-                var url = baseUrl;
+                url = baseUrl;
                 if( gotOneArg ) url += "&";
                 url += repeatKey + "=" + inputQueryPairs[repeatKey];
                 val.push(url);
@@ -411,21 +412,22 @@ dwv.html.toggleDisplay = function(id)
 dwv.html.checkBrowser = function()
 {
     var appnorun = "The application cannot be run.";
+    var message = "";
     // Check for the File API support
     if( !window.FileReader ) {
-        var message = "The File APIs are not supported in this browser. ";
+        message = "The File APIs are not supported in this browser. ";
         alert(message+appnorun);
         throw new Error(message);
     }
     // Check for XMLHttpRequest
-    if( !window.XMLHttpRequest || !("withCredentials" in new XMLHttpRequest) ) {
-      var message = "The XMLHttpRequest is not supported in this browser. ";
-      alert(message+appnorun);
-      throw new Error(message);
+    if( !window.XMLHttpRequest || !("withCredentials" in new XMLHttpRequest()) ) {
+        message = "The XMLHttpRequest is not supported in this browser. ";
+        alert(message+appnorun);
+        throw new Error(message);
     }
     // Check typed array
     if( !window.Uint8Array || !window.Uint16Array ) {
-        var message = "The Typed arrays are not supported in this browser. ";
+        message = "The Typed arrays are not supported in this browser. ";
         alert(message+appnorun);
         throw new Error(message);
     }

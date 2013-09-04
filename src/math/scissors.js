@@ -236,7 +236,7 @@ dwv.math.computeSides = function(dist, gradX, gradY, greyscale) {
 		sides.outside[y] = [];
 
 		for ( var x = 0; x < gradX[y].length; x++ ) {
-		    dwv.math.gradUnitVector(gradX, gradY, x, y, guv);
+            dwv.math.gradUnitVector(gradX, gradY, x, y, guv);
 
 			//(x, y) rotated 90 = (y, -x)
 

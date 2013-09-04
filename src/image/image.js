@@ -29,16 +29,16 @@ dwv.image.Size.prototype.getTotalSize = function() {
 };
 // Check for equality.
 dwv.image.Size.prototype.equals = function(rhs) {
-	return rhs !== null
-    	&& this.getNumberOfColumns() === rhs.getNumberOfColumns()
-    	&& this.getNumberOfRows() === rhs.getNumberOfRows()
-    	&& this.getNumberOfSlices() === rhs.getNumberOfSlices();
+    return rhs !== null &&
+        this.getNumberOfColumns() === rhs.getNumberOfColumns() &&
+        this.getNumberOfRows() === rhs.getNumberOfRows() &&
+        this.getNumberOfSlices() === rhs.getNumberOfSlices();
 };
 // Check that coordinates are within bounds.
 dwv.image.Size.prototype.isInBounds = function( i, j, k ) {
-    if( i < 0 || i > this.getNumberOfColumns() - 1  
-		|| j < 0 || j > this.getNumberOfRows() - 1
-		|| k < 0 || k > this.getNumberOfSlices() - 1 ) return false;
+    if( i < 0 || i > this.getNumberOfColumns() - 1 ||
+        j < 0 || j > this.getNumberOfRows() - 1 ||
+        k < 0 || k > this.getNumberOfSlices() - 1 ) return false;
     return true;
 };
 
@@ -60,10 +60,10 @@ dwv.image.Spacing = function( columnSpacing, rowSpacing, sliceSpacing )
 };
 // Check for equality.
 dwv.image.Spacing.prototype.equals = function(rhs) {
-	return rhs !== null
-    	&& this.getColumnSpacing() === rhs.getColumnSpacing()
-    	&& this.getRowSpacing() === rhs.getRowSpacing()
-    	&& this.getSliceSpacing() === rhs.getSliceSpacing();
+    return rhs !== null &&
+        this.getColumnSpacing() === rhs.getColumnSpacing() &&
+        this.getRowSpacing() === rhs.getRowSpacing() &&
+        this.getSliceSpacing() === rhs.getSliceSpacing();
 };
 
 /**
@@ -94,9 +94,9 @@ dwv.image.Image = function(size, spacing, buffer, slicePositions)
     if( typeof(slicePositions) === 'undefined' ) slicePositions = [[0,0,0]];
     
     // data range.
-    var dataRange = undefined;
+    var dataRange = null;
     // histogram.
-    var histogram = undefined;
+    var histogram = null;
      
     // Get the size of the image.
     this.getSize = function() { return size; };
@@ -126,7 +126,7 @@ dwv.image.Image = function(size, spacing, buffer, slicePositions)
 
     // Get value at offset. Warning: No size check...
     this.getValueAtOffset = function(offset) {
-    	return buffer[offset];
+        return buffer[offset];
     };
     // Clone the image.
     this.clone = function()
@@ -141,35 +141,35 @@ dwv.image.Image = function(size, spacing, buffer, slicePositions)
     // Append a slice to the image.
     this.appendSlice = function(rhs)
     {
-    	// check input
-    	if( rhs === null )
-    		throw new Error("Cannot append null slice.");
+        // check input
+        if( rhs === null )
+            throw new Error("Cannot append null slice.");
         if( rhs.getSize().getNumberOfSlices() !== 1 )
             throw new Error("Cannot append more than one slice.");
-    	if( size.getNumberOfColumns() !== rhs.getSize().getNumberOfColumns() )
-    		throw new Error("Cannot append a slice with different number of columns.");
-    	if( size.getNumberOfRows() !== rhs.getSize().getNumberOfRows() )
-    		throw new Error("Cannot append a slice with different number of rows.");
-    	if( photometricInterpretation !== rhs.getPhotometricInterpretation() )
-    		throw new Error("Cannot append a slice with different photometric interpretation.");
-    	
+        if( size.getNumberOfColumns() !== rhs.getSize().getNumberOfColumns() )
+            throw new Error("Cannot append a slice with different number of columns.");
+        if( size.getNumberOfRows() !== rhs.getSize().getNumberOfRows() )
+            throw new Error("Cannot append a slice with different number of rows.");
+        if( photometricInterpretation !== rhs.getPhotometricInterpretation() )
+            throw new Error("Cannot append a slice with different photometric interpretation.");
+        
         // find index where to append slice
-    	var closestSliceIndex = 0;
-    	var slicePosition = rhs.getSlicePositions()[0];
-    	var minDiff = Math.abs( slicePositions[0][2] - slicePosition[2] );
-    	var diff = 0;
-    	for( var i = 0; i < slicePositions.length; ++i )
-    	{
-    	    diff = Math.abs( slicePositions[i][2] - slicePosition[2] );
-    	    if( diff < minDiff ) 
-	        {
-    	        minDiff = diff;
-    	        closestSliceIndex = i;
-	        }
-    	}
-    	diff = slicePositions[closestSliceIndex][2] - slicePosition[2];
-    	var newSliceNb = ( diff > 0 ) ? closestSliceIndex : closestSliceIndex + 1;
-    	
+        var closestSliceIndex = 0;
+        var slicePosition = rhs.getSlicePositions()[0];
+        var minDiff = Math.abs( slicePositions[0][2] - slicePosition[2] );
+        var diff = 0;
+        for( var i = 0; i < slicePositions.length; ++i )
+        {
+            diff = Math.abs( slicePositions[i][2] - slicePosition[2] );
+            if( diff < minDiff ) 
+            {
+                minDiff = diff;
+                closestSliceIndex = i;
+            }
+        }
+        diff = slicePositions[closestSliceIndex][2] - slicePosition[2];
+        var newSliceNb = ( diff > 0 ) ? closestSliceIndex : closestSliceIndex + 1;
+        
         // new size
         var newSize = new dwv.image.Size(size.getNumberOfColumns(),
                 size.getNumberOfRows(),
@@ -185,30 +185,30 @@ dwv.image.Image = function(size, spacing, buffer, slicePositions)
         
         // append slice at new position
         if( newSliceNb === 0 )
-	    {
+        {
             newBuffer.set(rhs.getBuffer());
-    	    newBuffer.set(buffer, sliceSize);
-	    }
-    	else if( newSliceNb === size.getNumberOfSlices() )
-	    {
-    	    newBuffer.set(buffer);
+            newBuffer.set(buffer, sliceSize);
+        }
+        else if( newSliceNb === size.getNumberOfSlices() )
+        {
+            newBuffer.set(buffer);
             newBuffer.set(rhs.getBuffer(), size.getNumberOfSlices() * sliceSize);
-	    }
-    	else
-	    {
-    	    var offset = newSliceNb * sliceSize;
-    	    newBuffer.set(buffer.subarray(0, offset - 1));
-    	    newBuffer.set(rhs.getBuffer(), offset);
-    	    newBuffer.set(buffer.subarray(offset), offset + sliceSize);
-	    }
-    	
-    	// update slice positions
+        }
+        else
+        {
+            var offset = newSliceNb * sliceSize;
+            newBuffer.set(buffer.subarray(0, offset - 1));
+            newBuffer.set(rhs.getBuffer(), offset);
+            newBuffer.set(buffer.subarray(offset), offset + sliceSize);
+        }
+        
+        // update slice positions
         slicePositions.splice(newSliceNb, 0, slicePosition);
-    	
-    	// copy to class variables
-    	size = newSize;
-    	buffer = newBuffer;
-    	originalBuffer = new Int16Array(newBuffer);
+        
+        // copy to class variables
+        size = newSize;
+        buffer = newBuffer;
+        originalBuffer = new Int16Array(newBuffer);
     };
     // Get the data range.
     this.getDataRange = function() { 
@@ -232,9 +232,9 @@ dwv.image.Image = function(size, spacing, buffer, slicePositions)
  */
 dwv.image.Image.prototype.getValue = function( i, j, k )
 {
-    return this.getValueAtOffset( i 
-            + ( j * this.getSize().getNumberOfColumns() ) 
-            + ( k * this.getSize().getSliceSize()) );
+    return this.getValueAtOffset( i +
+        ( j * this.getSize().getNumberOfColumns() ) +
+        ( k * this.getSize().getSliceSize()) );
 };
 
 /**
@@ -346,26 +346,26 @@ dwv.image.Image.prototype.convolute2D = function(weights)
     
     // go through the destination image pixels
     for (var k=0; k<nslices; k++) {
-	    for (var j=0; j<nrows; j++) {
-	        for (var i=0; i<ncols; i++) {
-	            dstOff = k*ncols*nrows + j*ncols + i;
-	            // calculate the weighed sum of the source image pixels that
-	            // fall under the convolution matrix
-	            newValue = 0;
-	            for (var cj=0; cj<side; cj++) {
-	                for (var ci=0; ci<side; ci++) {
-	                    sci = i + ci - halfSide;
-	                    scj = j + cj - halfSide;
-	                    if (sci >= 0 && sci < ncols && scj >= 0 && scj < nrows ) {
-	                        srcOff = k*ncols*nrows + scj*ncols + sci;
-	                        wt = weights[cj*side+ci];
-	                        newValue += this.getValueAtOffset(srcOff) * wt;
-	                    }
-	                }
-	            }
-	            newBuffer[dstOff] = newValue;
-	        }
-	    }
+        for (var j=0; j<nrows; j++) {
+            for (var i=0; i<ncols; i++) {
+                dstOff = k*ncols*nrows + j*ncols + i;
+                // calculate the weighed sum of the source image pixels that
+                // fall under the convolution matrix
+                newValue = 0;
+                for (var cj=0; cj<side; cj++) {
+                    for (var ci=0; ci<side; ci++) {
+                        sci = i + ci - halfSide;
+                        scj = j + cj - halfSide;
+                        if (sci >= 0 && sci < ncols && scj >= 0 && scj < nrows ) {
+                            srcOff = k*ncols*nrows + scj*ncols + sci;
+                            wt = weights[cj*side+ci];
+                            newValue += this.getValueAtOffset(srcOff) * wt;
+                        }
+                    }
+                }
+                newBuffer[dstOff] = newValue;
+            }
+        }
     }
     return newImage;
 };

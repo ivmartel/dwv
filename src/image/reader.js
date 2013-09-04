@@ -42,12 +42,12 @@ dwv.image.getDataFromImage = function(image)
     var info = {};
     if( image.file )
     {
-        info["FileName"] = { "value": image.file.name };
-        info["FileType"] = { "value": image.file.type };
-        info["FileLastModifiedDate"] = { "value": image.file.lastModifiedDate };
+        info.fileName = { "value": image.file.name };
+        info.fileType = { "value": image.file.type };
+        info.fileLastModifiedDate = { "value": image.file.lastModifiedDate };
     }
-    info["ImageWidth"] = { "value": image.width };
-    info["ImageHeight"] = { "value": image.height };
+    info.imageWidth = { "value": image.width };
+    info.imageHeight = { "value": image.height };
     // return
     return {"view": view, "info": info};
 };

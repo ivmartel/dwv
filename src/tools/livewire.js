@@ -171,7 +171,7 @@ dwv.tool.Livewire.prototype.init = function()
 };
 
 //Add the tool to the list
-dwv.tool.tools["livewire"] = dwv.tool.Livewire;
+dwv.tool.tools.livewire = dwv.tool.Livewire;
 
 /**
  * @class Draw livewire command.

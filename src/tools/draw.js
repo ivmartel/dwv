@@ -43,8 +43,8 @@ dwv.tool.Draw = function(app)
         {
             return;
         }
-        if( ev._x !== points[0].getX() 
-            && ev._y !== points[0].getY() )
+        if( ev._x !== points[0].getX() &&
+            ev._y !== points[0].getY() )
         {
             // current point
             points.push(new dwv.math.Point2D(ev._x, ev._y));
@@ -139,4 +139,4 @@ dwv.tool.Draw.prototype.init = function() {
 };
 
 // Add the tool to the list
-dwv.tool.tools["draw"] = dwv.tool.Draw;
+dwv.tool.tools.draw = dwv.tool.Draw;

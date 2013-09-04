@@ -103,61 +103,68 @@ dwv.App = function(mobile)
      */
     this.loadFiles = function(files) 
     {
+        var onLoadLocalImage = function(e){
+            try {
+                // parse image file
+                var data = dwv.image.getDataFromImage(this);
+                if( image ) image.appendSlice( data.view.getImage() );
+                // prepare display
+                postLoadInit(data);
+            } catch(error) {
+                handleError(error);
+                return;
+            }
+        };
+        
+        var onLoadImageReader = function(event){
+            var localImage = new Image();
+            localImage.src = event.target.result;
+            // storing values to pass them on
+            localImage.file = this.file;
+            localImage.index = this.index;
+            localImage.onload = onLoadLocalImage;
+        };
+        var onErrorImageReader = function(event){
+            alert("An error occurred while reading the image file: "+event.getMessage());
+        };
+        
+        var onLoadDicomReader = function(event){
+            try {
+                // parse DICOM file
+                var data = dwv.image.getDataFromDicomBuffer(event.target.result);
+                if( image ) image.appendSlice( data.view.getImage() );
+                // prepare display
+                postLoadInit(data);
+            } catch(error) {
+                handleError(error);
+                return;
+            }
+        };
+        var onErrorDicomReader = function(event){
+            alert("An error occurred while reading the DICOM file: "+event.getMessage());
+        };
+        
         for (var i = 0; i < files.length; ++i)
-    	{
+        {
             var file = files[i];
-	        if( file.type.match("image.*") )
-	        {
-	            var reader = new FileReader();
-	            // storing values to pass them on
-	            reader.file = file;
-	            reader.index = i;
-	            reader.onload = function(event){
-	                var localImage = new Image();
-	                localImage.src = event.target.result;
-	                // storing values to pass them on
-	                localImage.file = this.file;
-	                localImage.index = this.index;
-	                localImage.onload = function(e){
-	                    try {
-	                        // parse image file
-	                        var data = dwv.image.getDataFromImage(this);
-		        			if( image ) image.appendSlice( data.view.getImage() );
-	                        // prepare display
-	                        postLoadInit(data);
-	        			} catch(error) {
-	                        handleError(error);
-	                        return;
-	        			}
-	                };
-	            };
-	            reader.onprogress = dwv.gui.updateProgress;
-	            reader.onerror = function(event){
-	                alert("An error occurred while reading the image file: "+event.getMessage());
-	            };
-	            reader.readAsDataURL(file);
-	        }
-	        else
-	        {
-	            var reader = new FileReader();
-	    		reader.onload = function(event){
-	    			try {
-	        		    // parse DICOM file
-	        			var data = dwv.image.getDataFromDicomBuffer(event.target.result);
-	        			if( image ) image.appendSlice( data.view.getImage() );
-	        			// prepare display
-	    			    postLoadInit(data);
-	    			} catch(error) {
-	                    handleError(error);
-	                    return;
-	    			}
-	    		};
-	    		reader.onprogress = dwv.gui.updateProgress;
-	    		reader.onerror = function(event){
-	                alert("An error occurred while reading the DICOM file: "+event.getMessage());
-	            };
-	    		reader.readAsArrayBuffer(file);
-	        }
+            var reader = new FileReader();
+            if( file.type.match("image.*") )
+            {
+                // storing values to pass them on
+                reader.file = file;
+                reader.index = i;
+                reader.onload = onLoadImageReader;
+                reader.onprogress = dwv.gui.updateProgress;
+                reader.onerror = onErrorImageReader;
+                reader.readAsDataURL(file);
+            }
+            else
+            {
+                reader.onload = onLoadDicomReader;
+                reader.onprogress = dwv.gui.updateProgress;
+                reader.onerror = onErrorDicomReader;
+                reader.readAsArrayBuffer(file);
+            }
         }
     };
         
@@ -174,6 +181,58 @@ dwv.App = function(mobile)
      */
     this.loadURL = function(urls) 
     {
+        var onLoadLocalImage = function(e){
+            try {
+                // parse image data
+                var data = dwv.image.getDataFromImage(this);
+                if( image ) image.appendSlice( data.view.getImage() );
+                // prepare display
+                postLoadInit(data);
+            } catch(error) {
+                handleError(error);
+                return;
+            }
+        };
+        
+        var onLoadRequest = function(ev) {
+            var view = new DataView(this.response);
+            var isJpeg = view.getUint32(0) === 0xffd8ffe0;
+            var isPng = view.getUint32(0) === 0x89504e47;
+            var isGif = view.getUint32(0) === 0x47494638;
+            if( isJpeg || isPng || isGif ) {
+                // image data
+                var localImage = new Image();
+
+                var bytes = new Uint8Array(this.response);
+                var binary = '';
+                for (var i = 0; i < bytes.byteLength; ++i) {
+                    binary += String.fromCharCode(bytes[i]);
+                }
+                var imgStr = "unknown";
+                if (isJpeg) imgStr = "jpeg";
+                else if (isPng) imgStr = "png";
+                else if (isGif) imgStr = "gif";
+                localImage.src = "data:image/" + imgStr + ";base64," + window.btoa(binary);
+                
+                localImage.onload = onLoadLocalImage;
+            }
+            else {
+                try {
+                    // parse DICOM
+                    var data = dwv.image.getDataFromDicomBuffer(this.response);
+                    if( image ) image.appendSlice( data.view.getImage() );
+                    // prepare display
+                    postLoadInit(data);
+                } catch(error) {
+                    handleError(error);
+                    return;
+                }
+            }
+        };
+        var onErrorRequest = function(event){
+            alert("An error occurred while retrieving the file: (http) "+this.status);
+        };
+        
         for (var i = 0; i < urls.length; ++i)
         {
             var url = urls[i];
@@ -181,55 +240,8 @@ dwv.App = function(mobile)
             // TODO Verify URL...
             request.open('GET', url, true);
             request.responseType = "arraybuffer"; 
-            request.onload = function(ev) {
-                var view = new DataView(this.response);
-                var isJpeg = view.getUint32(0) === 0xffd8ffe0;
-                var isPng = view.getUint32(0) === 0x89504e47;
-                var isGif = view.getUint32(0) === 0x47494638;
-                if( isJpeg || isPng || isGif ) {
-                    // image data
-                    var localImage = new Image();
-    
-                    var bytes = new Uint8Array(this.response);
-                    var binary = '';
-                    for (var i = 0; i < bytes.byteLength; ++i) {
-                        binary += String.fromCharCode(bytes[i]);
-                    }
-                    var imgStr = "unknown";
-                    if (isJpeg) imgStr = "jpeg";
-                    else if (isPng) imgStr = "png";
-                    else if (isGif) imgStr = "gif";
-                    localImage.src = "data:image/" + imgStr + ";base64," + window.btoa(binary);
-                    
-                    localImage.onload = function(e){
-            			try {
-    	                    // parse image data
-    	                    var data = dwv.image.getDataFromImage(localImage);
-    	                    if( image ) image.appendSlice( data.view.getImage() );
-    	                    // prepare display
-    	                    postLoadInit(data);
-            			} catch(error) {
-                            handleError(error);
-                            return;
-            			}
-                    };
-                }
-                else {
-                    try {
-    	            	// parse DICOM
-    	                var data = dwv.image.getDataFromDicomBuffer(this.response);
-    	                if( image ) image.appendSlice( data.view.getImage() );
-    	                // prepare display
-    	                postLoadInit(data);
-        			} catch(error) {
-                        handleError(error);
-                        return;
-        			}
-                }
-            };
-            request.onerror = function(event){
-                alert("An error occurred while retrieving the file: (http) "+this.status);
-            };
+            request.onload = onLoadRequest;
+            request.onerror = onErrorRequest;
             request.onprogress = dwv.gui.updateProgress;
             request.send(null);
         }
@@ -240,7 +252,7 @@ dwv.App = function(mobile)
      */
     this.generateAndDrawImage = function()
     {         
-    	// generate image data from DICOM
+        // generate image data from DICOM
         self.getView().generateImageData(imageData);         
         // set the image data of the layer
         self.getImageLayer().setImageData(imageData);
@@ -287,11 +299,11 @@ dwv.App = function(mobile)
         dwv.html.toggleDisplay('infoLayer');
         // toggle listeners
         if( isInfoLayerListening ) {
-        	removeImageInfoListeners();
+            removeImageInfoListeners();
             isInfoLayerListening = false;
         }
         else {
-        	addImageInfoListeners();
+            addImageInfoListeners();
             isInfoLayerListening = true;
         }
     };
@@ -330,20 +342,21 @@ dwv.App = function(mobile)
      */
     function eventHandler(event)
     {
-    	// flag not to get confused between touch and mouse
+        // flag not to get confused between touch and mouse
         var handled = false;
         // Store the event position relative to the image canvas
         // in an extra member of the event:
         // event._x and event._y.
         if( mobile )
         {
-            if( event.type === "touchstart"
-                || event.type === "touchmove")
+            if( event.type === "touchstart" ||
+                event.type === "touchmove")
             {
                 event.preventDefault();
                 // If there's one or two fingers inside this element
-                if (event.targetTouches.length === 1
-                        || event.targetTouches.length === 2) {
+                if( event.targetTouches.length === 1 ||
+                    event.targetTouches.length === 2)
+                {
                   var touch = event.targetTouches[0];
                   // store
                   event._x = touch.pageX - parseInt(app.getImageLayer().getOffset().left, 10);
@@ -367,13 +380,13 @@ dwv.App = function(mobile)
         }
         else
         {
-            if( event.type === "mousemove"
-                || event.type === "mousedown"
-                || event.type === "mouseup"
-                || event.type === "mouseout"
-                || event.type === "mousewheel"
-                || event.type === "dblclick" 
-                || event.type === "DOMMouseScroll" )
+            if( event.type === "mousemove" ||
+                event.type === "mousedown" ||
+                event.type === "mouseup" ||
+                event.type === "mouseout" ||
+                event.type === "mousewheel" ||
+                event.type === "dblclick" ||
+                event.type === "DOMMouseScroll" )
             {
                 // layerX is for firefox
                 event._x = event.offsetX === undefined ? event.layerX : event.offsetX;
@@ -467,10 +480,10 @@ dwv.App = function(mobile)
     function postLoadInit(data)
     {
         // only initialise the first time
-    	if( view ) return;
+        if( view ) return;
         
         // get the view from the loaded data
-    	view = data.view;
+        view = data.view;
         // create the DICOM tags table
         createTagsTable(data.info);
         // store image

@@ -65,18 +65,18 @@ dwv.html.Layer = function(name)
     {
         // check translate value
         if( zoomX >= 1 ) { 
-            if( (originX + tx) < -1 * (canvas.width * zoomX) + canvas.width 
-                || (originX + tx) > 0 ) return;
+            if( (originX + tx) < -1 * (canvas.width * zoomX) + canvas.width ||
+                (originX + tx) > 0 ) return;
         } else {
-            if( (originX + tx) > -1 * (canvas.width * zoomX) + canvas.width 
-                || (originX + tx) < 0 ) return;
+            if( (originX + tx) > -1 * (canvas.width * zoomX) + canvas.width ||
+                (originX + tx) < 0 ) return;
         }
         if( zoomY >= 1 ) { 
-            if( (originY + ty) < -1 * (canvas.height * zoomY) + canvas.height 
-                || (originY + ty) > 0 ) return;
+            if( (originY + ty) < -1 * (canvas.height * zoomY) + canvas.height ||
+                (originY + ty) > 0 ) return;
         } else {
-            if( (originY + ty) > -1 * (canvas.height * zoomY) + canvas.height 
-                || (originY + ty) < 0 ) return;
+            if( (originY + ty) > -1 * (canvas.height * zoomY) + canvas.height ||
+                (originY + ty) < 0 ) return;
         }
         // new origin
         originX += tx;

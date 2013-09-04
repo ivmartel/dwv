@@ -57,4 +57,4 @@ dwv.tool.DrawCircleCommand = function(points, app, style)
 }; // DrawCircleCommand class
 
 //Add the shape command to the list
-dwv.tool.shapes["circle"] = dwv.tool.DrawCircleCommand;
+dwv.tool.shapes.circle = dwv.tool.DrawCircleCommand;

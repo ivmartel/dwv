@@ -104,8 +104,8 @@ dwv.math.Line = function(begin, end)
 {
     // cache the length
     var length = Math.sqrt(
-            Math.abs(end.getX() - begin.getX()) * Math.abs(end.getX() - begin.getX())
-            + Math.abs(end.getY() - begin.getY()) * Math.abs(end.getY() - begin.getY() ) );
+            Math.abs(end.getX() - begin.getX()) * Math.abs(end.getX() - begin.getX()) +
+            Math.abs(end.getY() - begin.getY()) * Math.abs(end.getY() - begin.getY() ) );
     
     // Get the begin point of the line.
     this.getBegin = function() { return begin; };

@@ -44,4 +44,4 @@ dwv.tool.DrawLineCommand = function(points, app, style)
 }; // DrawLineCommand class
 
 //Add the shape command to the list
-dwv.tool.shapes["line"] = dwv.tool.DrawLineCommand;
+dwv.tool.shapes.line = dwv.tool.DrawLineCommand;

@@ -131,8 +131,8 @@ dwv.info.updateMiniColorMap = function(event)
             if( c <= xMin ) y = yMin;
             else if( c > xMax ) y = yMax;
             else {
-                y = ( (c - (windowCenter-0.5) ) / (windowWidth-1) + 0.5 )
-                    * (yMax-yMin) + yMin;
+                y = ( (c - (windowCenter-0.5) ) / (windowWidth-1) + 0.5 ) *
+                    (yMax-yMin) + yMin;
                 y = parseInt(y,10);
             }
             index = (i + j * canvas.width) * 4;
