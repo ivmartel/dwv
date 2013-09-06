@@ -1,3 +1,6 @@
+#!/bin/bash
+#Script to push build results on the repository gh-pages branch.
+
 if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
   echo -e "Starting to update gh-pages\n"
   #go to home and setup git
