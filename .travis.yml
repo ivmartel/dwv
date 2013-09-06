@@ -6,5 +6,6 @@ env:
   global:
     - secure: VnChTCgd36QW4JdMWjMnQ1OQm5e61fY7Y23qEp7lfQuWxcfkW23hbzALmLXQxq8GZW+WeJREfq2DrwEZiilmRa2++bYczyaqI2mvsT8eBik9e/5avmBC6x49rRYU35+LwdE5Z2ZbU6DAwmcY8JtRbI2wMBC+el17P1ygxdACnXQ=
 
-after_success: ./resources/update-gh-pages.sh    
-    
+after_success: 
+  - chmod +x ./resources/update-gh-pages.sh
+  - ./resources/update-gh-pages.sh
