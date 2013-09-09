@@ -4,7 +4,7 @@ var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
 
 //filter list: to be completed after each tool definition 
-dwv.tool.filters = {};
+dwv.tool.filters = dwv.tool.filters || {};
 
 /**
 * @class Filter tool.
@@ -156,6 +156,8 @@ dwv.tool.filter.Sobel.prototype.run = function(args)
 //Add the tool to the list
 dwv.tool.filters.sobel = dwv.tool.filter.Sobel;
 
+//Tool list
+dwv.tool.tools = dwv.tool.tools || {};
 //Add the filters to the tools
 dwv.tool.tools.filter = dwv.tool.Filter;
 

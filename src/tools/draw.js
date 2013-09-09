@@ -9,7 +9,7 @@ dwv.tool.colors = [
 ];
 
 //shape list: to be completed after each tool definition 
-dwv.tool.shapes = {};
+dwv.tool.shapes = dwv.tool.shapes || {};
 
 /**
 * @class Drawing tool.
@@ -138,5 +138,7 @@ dwv.tool.Draw.prototype.init = function() {
     this.setLineColour(dwv.tool.colors[0]);
 };
 
-// Add the tool to the list
+//Tool list
+dwv.tool.tools = dwv.tool.tools || {};
+//Add the tool to the list
 dwv.tool.tools.draw = dwv.tool.Draw;

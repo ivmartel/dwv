@@ -44,5 +44,7 @@ dwv.tool.DrawRectangleCommand = function(points, app, style)
     }; 
 }; // DrawRectangleCommand class
 
+//Shape list
+dwv.tool.shapes = dwv.tool.shapes || {};
 //Add the shape command to the list
 dwv.tool.shapes.rectangle = dwv.tool.DrawRectangleCommand;

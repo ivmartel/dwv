@@ -4,7 +4,7 @@ var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
 
 // tool list: to be completed after each tool definition 
-dwv.tool.tools = {};
+dwv.tool.tools = dwv.tool.tools || {};
     
 /**
 * @class Tool box.

@@ -146,5 +146,7 @@ dwv.tool.Zoom = function(app)
 
 }; // Zoom class
 
+//Tool list
+dwv.tool.tools = dwv.tool.tools || {};
 //Add the tool to the list
 dwv.tool.tools.zoom = dwv.tool.Zoom;

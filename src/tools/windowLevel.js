@@ -236,5 +236,7 @@ dwv.tool.WindowLevel.prototype.setColourMap = function(name)
     dwv.tool.updateColourMap( dwv.tool.colourMaps[name] );
 };
 
-// Add the tool to the list
+//Tool list
+dwv.tool.tools = dwv.tool.tools || {};
+//Add the tool to the list
 dwv.tool.tools.windowlevel = dwv.tool.WindowLevel;

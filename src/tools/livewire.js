@@ -170,6 +170,8 @@ dwv.tool.Livewire.prototype.init = function()
     this.setLineColour(dwv.tool.colors[0]);
 };
 
+//Tool list
+dwv.tool.tools = dwv.tool.tools || {};
 //Add the tool to the list
 dwv.tool.tools.livewire = dwv.tool.Livewire;
 
