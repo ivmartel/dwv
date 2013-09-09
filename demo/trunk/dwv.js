@@ -6247,6 +6247,8 @@ dwv.tool.DrawCircleCommand = function(points, app, style)
     };
 }; // DrawCircleCommand class
 
+//Shape list
+dwv.tool.shapes = dwv.tool.shapes || {};
 //Add the shape command to the list
 dwv.tool.shapes.circle = dwv.tool.DrawCircleCommand;
 ;//! @namespace Main DWV namespace.
@@ -6260,7 +6262,7 @@ dwv.tool.colors = [
 ];
 
 //shape list: to be completed after each tool definition 
-dwv.tool.shapes = {};
+dwv.tool.shapes = dwv.tool.shapes || {};
 
 /**
 * @class Drawing tool.
@@ -6389,7 +6391,9 @@ dwv.tool.Draw.prototype.init = function() {
     this.setLineColour(dwv.tool.colors[0]);
 };
 
-// Add the tool to the list
+//Tool list
+dwv.tool.tools = dwv.tool.tools || {};
+//Add the tool to the list
 dwv.tool.tools.draw = dwv.tool.Draw;
 ;//! @namespace Main DWV namespace.
 var dwv = dwv || {};
@@ -6397,7 +6401,7 @@ var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
 
 //filter list: to be completed after each tool definition 
-dwv.tool.filters = {};
+dwv.tool.filters = dwv.tool.filters || {};
 
 /**
 * @class Filter tool.
@@ -6549,6 +6553,8 @@ dwv.tool.filter.Sobel.prototype.run = function(args)
 //Add the tool to the list
 dwv.tool.filters.sobel = dwv.tool.filter.Sobel;
 
+//Tool list
+dwv.tool.tools = dwv.tool.tools || {};
 //Add the filters to the tools
 dwv.tool.tools.filter = dwv.tool.Filter;
 
@@ -6805,6 +6811,8 @@ dwv.tool.DrawLineCommand = function(points, app, style)
     }; 
 }; // DrawLineCommand class
 
+//Shape list
+dwv.tool.shapes = dwv.tool.shapes || {};
 //Add the shape command to the list
 dwv.tool.shapes.line = dwv.tool.DrawLineCommand;
 ;//! @namespace Main DWV namespace.
@@ -6979,6 +6987,8 @@ dwv.tool.Livewire.prototype.init = function()
     this.setLineColour(dwv.tool.colors[0]);
 };
 
+//Tool list
+dwv.tool.tools = dwv.tool.tools || {};
 //Add the tool to the list
 dwv.tool.tools.livewire = dwv.tool.Livewire;
 
@@ -7066,6 +7076,8 @@ dwv.tool.DrawRectangleCommand = function(points, app, style)
     }; 
 }; // DrawRectangleCommand class
 
+//Shape list
+dwv.tool.shapes = dwv.tool.shapes || {};
 //Add the shape command to the list
 dwv.tool.shapes.rectangle = dwv.tool.DrawRectangleCommand;
 ;//! @namespace Main DWV namespace.
@@ -7115,6 +7127,8 @@ dwv.tool.DrawRoiCommand = function(points, app, style)
     }; 
 }; // DrawRoiCommand class
 
+//Shape list
+dwv.tool.shapes = dwv.tool.shapes || {};
 //Add the shape command to the list
 dwv.tool.shapes.roi = dwv.tool.DrawRoiCommand;
 ;//! @namespace Main DWV namespace.
@@ -7123,7 +7137,7 @@ var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
 
 // tool list: to be completed after each tool definition 
-dwv.tool.tools = {};
+dwv.tool.tools = dwv.tool.tools || {};
     
 /**
 * @class Tool box.
@@ -7499,7 +7513,9 @@ dwv.tool.WindowLevel.prototype.setColourMap = function(name)
     dwv.tool.updateColourMap( dwv.tool.colourMaps[name] );
 };
 
-// Add the tool to the list
+//Tool list
+dwv.tool.tools = dwv.tool.tools || {};
+//Add the tool to the list
 dwv.tool.tools.windowlevel = dwv.tool.WindowLevel;
 ;//! @namespace Main DWV namespace.
 var dwv = dwv || {};
@@ -7649,6 +7665,8 @@ dwv.tool.Zoom = function(app)
 
 }; // Zoom class
 
+//Tool list
+dwv.tool.tools = dwv.tool.tools || {};
 //Add the tool to the list
 dwv.tool.tools.zoom = dwv.tool.Zoom;
 ;//! @namespace Main DWV namespace.
