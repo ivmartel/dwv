@@ -1,6 +1,6 @@
-/**
- * @namespace HTML related.
- */
+//! @namespace Main DWV namespace.
+var dwv = dwv || {};
+//! @namespace Layer abstraction.
 dwv.html = dwv.html || {};
 
 /**

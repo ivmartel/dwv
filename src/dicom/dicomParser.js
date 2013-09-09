@@ -1,6 +1,6 @@
-/**
- * @namespace DICOM related.
- */
+//! @namespace Main DWV namespace.
+var dwv = dwv || {};
+//! @namespace DICOM related.
 dwv.dicom = dwv.dicom || {};
 
 /**

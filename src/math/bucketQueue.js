@@ -1,6 +1,6 @@
-/**
- * @namespace Math related.
- */
+//! @namespace Main DWV namespace.
+var dwv = dwv || {};
+//! @namespace Math related.
 dwv.math = dwv.math || {};
 
 /** 

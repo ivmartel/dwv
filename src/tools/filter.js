@@ -1,6 +1,6 @@
-/**
- * @namespace Tool classes.
- */
+//! @namespace Main DWV namespace.
+var dwv = dwv || {};
+//! @namespace Tool classes.
 dwv.tool = dwv.tool || {};
 
 //filter list: to be completed after each tool definition 

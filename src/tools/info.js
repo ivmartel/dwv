@@ -1,6 +1,6 @@
-/**
- * @namespace Info classes.
- */
+//! @namespace Main DWV namespace.
+var dwv = dwv || {};
+// @namespace Info classes.
 dwv.info = dwv.info || {};
 
 /**

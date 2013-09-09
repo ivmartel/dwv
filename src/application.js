@@ -1,3 +1,6 @@
+//! @namespace Main DWV namespace.
+var dwv = dwv || {};
+ 
 /**
 * @class App
 * Main application.

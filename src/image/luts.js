@@ -1,10 +1,8 @@
-/**
- * @namespace Image related.
- */
+//! @namespace Main DWV namespace.
+var dwv = dwv || {};
+//! @namespace Image related.
 dwv.image = dwv.image || {};
-/**
- * @namespace LookUp Table (LUT) related.
- */
+//! @namespace LookUp Table (LUT) related.
 dwv.image.lut = dwv.image.lut || {};
 
 /**

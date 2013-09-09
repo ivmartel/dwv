@@ -1,9 +1,6 @@
-/**
- * @namespace GUI classes.
- * 
- * Specific to jquery-ui.
- * 
- */
+//! @namespace Main DWV namespace.
+var dwv = dwv || {};
+//! @namespace GUI classes for jquery-ui.
 dwv.gui = dwv.gui || {};
 
 /**

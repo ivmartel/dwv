@@ -1,6 +1,6 @@
-/**
- * @namespace GUI classes.
- */
+//! @namespace Main DWV namespace.
+var dwv = dwv || {};
+//! @namespace GUI classes.
 dwv.gui = dwv.gui || {};
 
 dwv.gui.onChangeWindowLevelPreset = function(event)

@@ -1,11 +1,9 @@
-/**
- * @namespace Math related.
- */
+//! @namespace Main DWV namespace.
+var dwv = dwv || {};
+// @namespace Math related.
 dwv.math = dwv.math || {};
 
 // Pre-created to reduce allocation in inner loops
-var __dgpuv = new dwv.math.FastPoint2D(-1, -1); 
-var __gdquv = new dwv.math.FastPoint2D(-1, -1);
 var __twothirdpi = ( 2 / (3 * Math.PI) );
 
 /**
@@ -198,6 +196,8 @@ dwv.math.gradUnitVector = function(gradX, gradY, px, py, out) {
 };
 
 dwv.math.gradDirection = function(gradX, gradY, px, py, qx, qy) {
+    var __dgpuv = new dwv.math.FastPoint2D(-1, -1); 
+    var __gdquv = new dwv.math.FastPoint2D(-1, -1);
 	// Compute the gradiant direction, in radians, between to points
     dwv.math.gradUnitVector(gradX, gradY, px, py, __dgpuv);
     dwv.math.gradUnitVector(gradX, gradY, qx, qy, __gdquv);

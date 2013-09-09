@@ -1,9 +1,6 @@
-/**
- * @namespace GUI classes.
- * 
- * Specific to jquery-mobile.
- * 
- */
+//! @namespace Main DWV namespace.
+var dwv = dwv || {};
+//! @namespace GUI classes for jquery-mobile.
 dwv.gui = dwv.gui || {};
 
 /**

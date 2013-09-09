@@ -1,6 +1,6 @@
-/**
- * @namespace Utils classes and functions.
- */
+//! @namespace Main DWV namespace.
+var dwv = dwv || {};
+//! @namespace Utils classes and functions.
 dwv.utils = dwv.utils || {};
 
 /**

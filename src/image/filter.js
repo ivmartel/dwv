@@ -1,10 +1,8 @@
-/**
- * @namespace Image related.
- */
+//! @namespace Main DWV namespace.
+var dwv = dwv || {};
+//! @namespace Image related.
 dwv.image = dwv.image || {};
-/**
- * @namespace Filter classes.
- */
+//! @namespace Filter classes.
 dwv.image.filter = dwv.image.filter || {};
 
 /**
