@@ -5,7 +5,7 @@
 <title>DICOM Web Viewer</title>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
-<link rel="stylesheet" href="css/style.css" />
+<link rel="stylesheet" href="style.css" />
 <style>
 #layerContainer { margin: auto; text-align: center; }
 #imageLayer { left: 0px; }
@@ -18,41 +18,13 @@
 <script type="text/javascript" src="ext/jquery/mobile/1.3.1/jquery.mobile-1.3.1.min.js"></script>
 <script type="text/javascript" src="ext/flot/jquery.flot.min.js"></script>
 <!-- Local -->
-<script type="text/javascript" src="src/dwv.js"></script>
-<script type="text/javascript" src="src/application.js"></script>
-<script type="text/javascript" src="src/dicom/dicomParser.js"></script>
-<script type="text/javascript" src="src/dicom/dictionary.js"></script>
-<script type="text/javascript" src="src/html/gui.js"></script>
-<script type="text/javascript" src="src/html/gui_mobile.js"></script>
-<script type="text/javascript" src="src/html/html.js"></script>
-<script type="text/javascript" src="src/html/style.js"></script>
-<script type="text/javascript" src="src/html/layer.js"></script>
-<script type="text/javascript" src="src/image/filter.js"></script>
-<script type="text/javascript" src="src/image/image.js"></script>
-<script type="text/javascript" src="src/image/view.js"></script>
-<script type="text/javascript" src="src/image/luts.js"></script>
-<script type="text/javascript" src="src/image/reader.js"></script>
-<script type="text/javascript" src="src/math/shapes.js"></script>
-<script type="text/javascript" src="src/math/bucketQueue.js"></script>
-<script type="text/javascript" src="src/math/scissors.js"></script>
-<script type="text/javascript" src="src/utils/string.js"></script>
-
-<!-- Tools: beware order is important... -->
-<script type="text/javascript" src="src/tools/toolbox.js"></script>
-<script type="text/javascript" src="src/tools/windowLevel.js"></script>
-<script type="text/javascript" src="src/tools/info.js"></script>
-<script type="text/javascript" src="src/tools/draw.js"></script>
-<script type="text/javascript" src="src/tools/line.js"></script>
-<script type="text/javascript" src="src/tools/rectangle.js"></script>
-<script type="text/javascript" src="src/tools/roi.js"></script>
-<script type="text/javascript" src="src/tools/circle.js"></script>
-<script type="text/javascript" src="src/tools/livewire.js"></script>
-<script type="text/javascript" src="src/tools/zoom.js"></script>
-<script type="text/javascript" src="src/tools/filter.js"></script>
-<script type="text/javascript" src="src/tools/undo.js"></script>
+<script type="text/javascript" src="dwv.min.js"></script>
+<script type="text/javascript" src="gui_mobile.js"></script>
 
 <script type="text/javascript">
 
+//check browser support
+dwv.html.checkBrowser();
 // main application
 var app = new dwv.App(true);
 
