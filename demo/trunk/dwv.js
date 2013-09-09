@@ -1,3 +1,6 @@
+//! @namespace Main DWV namespace.
+var dwv = dwv || {};
+ 
 /**
 * @class App
 * Main application.
@@ -541,9 +544,9 @@ dwv.App = function(mobile)
     }
     
 };
-;/**
- * @namespace DICOM related.
- */
+;//! @namespace Main DWV namespace.
+var dwv = dwv || {};
+//! @namespace DICOM related.
 dwv.dicom = dwv.dicom || {};
 
 /**
@@ -1060,9 +1063,9 @@ dwv.dicom.DicomParser.prototype.createImage = function()
 
     return view;
 };
-;/**
- * @namespace DICOM related.
- */
+;//! @namespace Main DWV namespace.
+var dwv = dwv || {};
+//! @namespace DICOM related.
 dwv.dicom = dwv.dicom || {};
 
 /**
@@ -2966,13 +2969,9 @@ dwv.dicom.Dictionary = function() {
         this.newDictionary['0xFFFE']['0xE0DD'] = ['NONE', '1', 'SequenceDelimitationItem'];
     };
 };
-;/**
- * @namespace Main DWV namespace.
- */ 
+;//! @namespace Main DWV namespace.
 var dwv = dwv || {};
-;/**
- * @namespace GUI classes.
- */
+//! @namespace GUI classes.
 dwv.gui = dwv.gui || {};
 
 dwv.gui.onChangeWindowLevelPreset = function(event)
@@ -3342,12 +3341,9 @@ dwv.gui.enableInUndoHtml = function(enable)
         select.selectedIndex--;
     }
 };
-;/**
- * @namespace GUI classes.
- * 
- * Specific to jquery-mobile.
- * 
- */
+;//! @namespace Main DWV namespace.
+var dwv = dwv || {};
+//! @namespace GUI classes for jquery-mobile.
 dwv.gui = dwv.gui || {};
 
 /**
@@ -3408,12 +3404,9 @@ dwv.gui.updateProgress = function(event)
     }
 };
 
-;/**
- * @namespace GUI classes.
- * 
- * Specific to jquery-ui.
- * 
- */
+;//! @namespace Main DWV namespace.
+var dwv = dwv || {};
+//! @namespace GUI classes for jquery-ui.
 dwv.gui = dwv.gui || {};
 
 /**
@@ -3450,9 +3443,9 @@ dwv.gui.updateProgress = function(event)
         }
     }
 };
-;/**
- * @namespace HTML related.
- */
+;//! @namespace Main DWV namespace.
+var dwv = dwv || {};
+//! @namespace HTML related.
 dwv.html = dwv.html || {};
 
 /**
@@ -3885,9 +3878,9 @@ dwv.html.checkBrowser = function()
     }
 };
 
-;/**
- * @namespace HTML related.
- */
+;//! @namespace Main DWV namespace.
+var dwv = dwv || {};
+//! @namespace Layer abstraction.
 dwv.html = dwv.html || {};
 
 /**
@@ -4125,9 +4118,9 @@ dwv.html.Layer = function(name)
         canvas.style.left = rhs.getCanvas().offsetLeft;
     };
 }; // Layer class
-;/**
- * @namespace HTML related.
- */
+;//! @namespace Main DWV namespace.
+var dwv = dwv || {};
+//! @namespace Canvas style class.
 dwv.html = dwv.html || {};
 
 /**
@@ -4167,13 +4160,11 @@ dwv.html.Style.prototype.getLineColor = function() {
 dwv.html.Style.prototype.setLineColor = function(color) {
     this.lineColor = color;
 };
-;/**
- * @namespace Image related.
- */
+;//! @namespace Main DWV namespace.
+var dwv = dwv || {};
+//! @namespace Image related.
 dwv.image = dwv.image || {};
-/**
- * @namespace Filter classes.
- */
+//! @namespace Filter classes.
 dwv.image.filter = dwv.image.filter || {};
 
 /**
@@ -4248,9 +4239,9 @@ dwv.image.filter.Sobel.prototype.update = function()
     
     return gradX.compose( gradY, function(x,y){return Math.sqrt(x*x+y*y);} );
 };
-;/**
- * @namespace Image related.
- */
+;//! @namespace Main DWV namespace.
+var dwv = dwv || {};
+//! @namespace Image related.
 dwv.image = dwv.image || {};
 
 /**
@@ -4657,13 +4648,11 @@ dwv.image.Image.prototype.compose = function(rhs, operator)
     }
     return newImage;
 };
-;/**
- * @namespace Image related.
- */
+;//! @namespace Main DWV namespace.
+var dwv = dwv || {};
+//! @namespace Image related.
 dwv.image = dwv.image || {};
-/**
- * @namespace LookUp Table (LUT) related.
- */
+//! @namespace LookUp Table (LUT) related.
 dwv.image.lut = dwv.image.lut || {};
 
 /**
@@ -4882,9 +4871,9 @@ dwv.image.lut.test = {
    "green": dwv.image.lut.buildLut(dwv.image.lut.id),
    "blue":  dwv.image.lut.buildLut(dwv.image.lut.id)
 };*/
-;/**
- * @namespace Image related.
- */
+;//! @namespace Main DWV namespace.
+var dwv = dwv || {};
+//! @namespace Image related.
 dwv.image = dwv.image || {};
 
 /**
@@ -4951,9 +4940,9 @@ dwv.image.getDataFromDicomBuffer = function(buffer)
     return {"view": view, "info": dicomParser.dicomElements};
 };
 
-;/**
- * @namespace Image related.
- */
+;//! @namespace Main DWV namespace.
+var dwv = dwv || {};
+//! @namespace Image related.
 dwv.image = dwv.image || {};
 
 /**
@@ -5227,9 +5216,9 @@ dwv.image.View.prototype.fireEvent = function(event)
     }
 };
 
-;/**
- * @namespace Math related.
- */
+;//! @namespace Main DWV namespace.
+var dwv = dwv || {};
+//! @namespace Math related.
 dwv.math = dwv.math || {};
 
 /** 
@@ -5335,14 +5324,12 @@ dwv.math.BucketQueue.prototype.buildArray = function(newSize) {
 	
 	return buckets;
 };
-;/**
- * @namespace Math related.
- */
+;//! @namespace Main DWV namespace.
+var dwv = dwv || {};
+// @namespace Math related.
 dwv.math = dwv.math || {};
 
 // Pre-created to reduce allocation in inner loops
-var __dgpuv = new dwv.math.FastPoint2D(-1, -1); 
-var __gdquv = new dwv.math.FastPoint2D(-1, -1);
 var __twothirdpi = ( 2 / (3 * Math.PI) );
 
 /**
@@ -5535,6 +5522,8 @@ dwv.math.gradUnitVector = function(gradX, gradY, px, py, out) {
 };
 
 dwv.math.gradDirection = function(gradX, gradY, px, py, qx, qy) {
+    var __dgpuv = new dwv.math.FastPoint2D(-1, -1); 
+    var __gdquv = new dwv.math.FastPoint2D(-1, -1);
 	// Compute the gradiant direction, in radians, between to points
     dwv.math.gradUnitVector(gradX, gradY, px, py, __dgpuv);
     dwv.math.gradUnitVector(gradX, gradY, qx, qy, __gdquv);
@@ -5921,9 +5910,9 @@ dwv.math.Scissors.prototype.doWork = function() {
 
 	return newPoints;
 };
-;/**
- * @namespace Math related.
- */
+;//! @namespace Main DWV namespace.
+var dwv = dwv || {};
+//! @namespace Math related.
 dwv.math = dwv.math || {};
 
 /**
@@ -6200,9 +6189,9 @@ dwv.math.Path.prototype.appenPath = function(other) {
     }
     this.controlPointIndexArray = this.controlPointIndexArray.concat(indexArray);
 };
-;/**
- * @namespace Tool classes.
- */
+;//! @namespace Main DWV namespace.
+var dwv = dwv || {};
+//! @namespace Tool classes.
 dwv.tool = dwv.tool || {};
 
 /**
@@ -6260,9 +6249,9 @@ dwv.tool.DrawCircleCommand = function(points, app, style)
 
 //Add the shape command to the list
 dwv.tool.shapes.circle = dwv.tool.DrawCircleCommand;
-;/**
- * @namespace Tool classes.
- */
+;//! @namespace Main DWV namespace.
+var dwv = dwv || {};
+//! @namespace Tool classes.
 dwv.tool = dwv.tool || {};
 
 //! List of colors
@@ -6402,9 +6391,9 @@ dwv.tool.Draw.prototype.init = function() {
 
 // Add the tool to the list
 dwv.tool.tools.draw = dwv.tool.Draw;
-;/**
- * @namespace Tool classes.
- */
+;//! @namespace Main DWV namespace.
+var dwv = dwv || {};
+//! @namespace Tool classes.
 dwv.tool = dwv.tool || {};
 
 //filter list: to be completed after each tool definition 
@@ -6582,9 +6571,9 @@ dwv.tool.RunFilterCommand = function(filter, app)
         app.generateAndDrawImage();
     }; 
 }; // RunFilterCommand class
-;/**
- * @namespace Info classes.
- */
+;//! @namespace Main DWV namespace.
+var dwv = dwv || {};
+// @namespace Info classes.
 dwv.info = dwv.info || {};
 
 /**
@@ -6771,9 +6760,9 @@ dwv.info.updatePlotMarkings = function(event)
         "yaxis": { "show": false }
     });
 };
-;/**
- * @namespace Tool classes.
- */
+;//! @namespace Main DWV namespace.
+var dwv = dwv || {};
+//! @namespace Tool classes.
 dwv.tool = dwv.tool || {};
 
 /**
@@ -6818,9 +6807,9 @@ dwv.tool.DrawLineCommand = function(points, app, style)
 
 //Add the shape command to the list
 dwv.tool.shapes.line = dwv.tool.DrawLineCommand;
-;/**
- * @namespace Tool classes.
- */
+;//! @namespace Main DWV namespace.
+var dwv = dwv || {};
+//! @namespace Tool classes.
 dwv.tool = dwv.tool || {};
 
 /**
@@ -7031,9 +7020,9 @@ dwv.tool.DrawLivewireCommand = function(livewire, app, style)
         //context.closePath();
     }; 
 }; // DrawLivewireCommand class
-;/**
- * @namespace Tool classes.
- */
+;//! @namespace Main DWV namespace.
+var dwv = dwv || {};
+//! @namespace Tool classes.
 dwv.tool = dwv.tool || {};
 
 /**
@@ -7079,9 +7068,9 @@ dwv.tool.DrawRectangleCommand = function(points, app, style)
 
 //Add the shape command to the list
 dwv.tool.shapes.rectangle = dwv.tool.DrawRectangleCommand;
-;/**
- * @namespace Tool classes.
- */
+;//! @namespace Main DWV namespace.
+var dwv = dwv || {};
+//! @namespace Tool classes.
 dwv.tool = dwv.tool || {};
 
 /**
@@ -7128,9 +7117,9 @@ dwv.tool.DrawRoiCommand = function(points, app, style)
 
 //Add the shape command to the list
 dwv.tool.shapes.roi = dwv.tool.DrawRoiCommand;
-;/**
- * @namespace Tool classes.
- */
+;//! @namespace Main DWV namespace.
+var dwv = dwv || {};
+//! @namespace Tool classes.
 dwv.tool = dwv.tool || {};
 
 // tool list: to be completed after each tool definition 
@@ -7186,9 +7175,9 @@ dwv.tool.ToolBox.prototype.init = function()
     }
     this.setSelectedTool(this.defaultToolName);
 };
-;/**
- * @namespace Tool classes.
- */
+;//! @namespace Main DWV namespace.
+var dwv = dwv || {};
+//! @namespace Tool classes.
 dwv.tool = dwv.tool || {};
 
 /**
@@ -7272,9 +7261,9 @@ dwv.tool.UndoStack = function(app)
     };
 
 }; // UndoStack class
-;/**
- * @namespace Tool classes.
- */
+;//! @namespace Main DWV namespace.
+var dwv = dwv || {};
+//! @namespace Tool classes.
 dwv.tool = dwv.tool || {};
 
 /**
@@ -7512,9 +7501,9 @@ dwv.tool.WindowLevel.prototype.setColourMap = function(name)
 
 // Add the tool to the list
 dwv.tool.tools.windowlevel = dwv.tool.WindowLevel;
-;/**
- * @namespace Tool classes.
- */
+;//! @namespace Main DWV namespace.
+var dwv = dwv || {};
+//! @namespace Tool classes.
 dwv.tool = dwv.tool || {};
 
 /**
@@ -7662,9 +7651,9 @@ dwv.tool.Zoom = function(app)
 
 //Add the tool to the list
 dwv.tool.tools.zoom = dwv.tool.Zoom;
-;/**
- * @namespace Utils classes and functions.
- */
+;//! @namespace Main DWV namespace.
+var dwv = dwv || {};
+//! @namespace Utils classes and functions.
 dwv.utils = dwv.utils || {};
 
 /**
