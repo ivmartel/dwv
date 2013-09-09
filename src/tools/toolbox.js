@@ -18,6 +18,7 @@ dwv.tool.ToolBox = function(app)
 dwv.tool.ToolBox.prototype.enable = function(bool)
 {
     if( bool ) {
+        this.sortTools();
         dwv.gui.appendToolboxHtml();
         this.init();
     }
@@ -45,6 +46,18 @@ dwv.tool.ToolBox.prototype.setSelectedTool = function(name) {
 
 dwv.tool.ToolBox.prototype.hasTool = function(name) {
     return dwv.tool.tools[name];
+};
+
+dwv.tool.ToolBox.prototype.sortTools = function()
+{
+    // fiddle with order: make window level first if present
+    var tools = dwv.tool.tools;
+    dwv.tool.tools = {};
+    if( tools.windowlevel ) dwv.tool.tools.windowlevel = tools.windowlevel;
+    for( var key in tools ) {
+        if( key === "windowlevel" ) continue;
+        dwv.tool.tools[key] = tools[key];
+    }
 };
 
 dwv.tool.ToolBox.prototype.init = function()
