@@ -593,7 +593,7 @@ dwv.dicom.DataReader = function(buffer, isLittleEndian)
         var data = new Uint8Array(size);
         var index = 0;
         for(var i=byteOffset; i<byteOffset + size; ++i) {     
-            data[index++] = this.readUint16(i);
+            data[index++] = this.readUint8(i);
         }
         return data;
     };
