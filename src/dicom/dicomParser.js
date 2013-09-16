@@ -485,6 +485,12 @@ dwv.dicom.DicomParser.prototype.createImage = function()
     if( this.dicomElements.RescaleIntercept ) {
         image.setRescaleIntercept( parseFloat(this.dicomElements.RescaleIntercept.value[0]) );
     }
+    // meta information
+    var meta = {};
+    if( this.dicomElements.Modality ) {
+    	meta.Modality = this.dicomElements.Modality.value[0];
+    }
+    image.setMeta(meta);
     
     // pixel representation
     var isSigned = 0;

@@ -40,7 +40,9 @@ dwv.tool.colourMaps = {
     "test": dwv.image.lut.test
 };
 // Default window level presets.
-dwv.tool.presets = {
+dwv.tool.presets = {};
+dwv.tool.defaultpresets = {};
+dwv.tool.defaultpresets.CT = {
     "abdomen": {"center": 350, "width": 40},
     "lung": {"center": -600, "width": 1500},
     "brain": {"center": 40, "width": 80},
@@ -190,7 +192,6 @@ dwv.tool.WindowLevel.prototype.updatePresets = function()
 {    
     // copy the presets and reinitialize the external one
     // (hoping to control the order of the presets)
-    var presets = dwv.tool.presets;
     dwv.tool.presets = {};
     // DICOM presets
     var dicomPresets = app.getView().getWindowPresets();
@@ -207,7 +208,10 @@ dwv.tool.WindowLevel.prototype.updatePresets = function()
     var center = min + width/2;
     dwv.tool.presets["min/max"] = {"center": center, "width": width};
     // re-populate the external array
-    for( var key in presets ) dwv.tool.presets[key] = presets[key];
+    var modality = app.getImage().getMeta().Modality;
+    for( var key in dwv.tool.defaultpresets[modality] ) {
+    	dwv.tool.presets[key] = dwv.tool.defaultpresets[modality][key];
+    }
 };
 
 /**
