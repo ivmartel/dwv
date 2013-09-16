@@ -488,13 +488,13 @@ dwv.dicom.DicomParser.prototype.createImage = function()
     // meta information
     var meta = {};
     if( this.dicomElements.Modality ) {
-    	meta.Modality = this.dicomElements.Modality.value[0];
+        meta.Modality = this.dicomElements.Modality.value[0];
     }
     if( this.dicomElements.StudyInstanceUID ) {
-    	meta.StudyInstanceUID = this.dicomElements.StudyInstanceUID.value[0];
+        meta.StudyInstanceUID = this.dicomElements.StudyInstanceUID.value[0];
     }
     if( this.dicomElements.SeriesInstanceUID ) {
-    	meta.SeriesInstanceUID = this.dicomElements.SeriesInstanceUID.value[0];
+        meta.SeriesInstanceUID = this.dicomElements.SeriesInstanceUID.value[0];
     }
     image.setMeta(meta);
     

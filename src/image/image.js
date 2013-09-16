@@ -162,8 +162,8 @@ dwv.image.Image = function(size, spacing, buffer, slicePositions)
             throw new Error("Cannot append a slice with different photometric interpretation");
         // all meta should be equal
         for( var key in meta ) {
-        	if( meta[key] !== rhs.getMeta()[key] )
-        		throw new Error("Cannot append a slice with different "+key);
+            if( meta[key] !== rhs.getMeta()[key] )
+                throw new Error("Cannot append a slice with different "+key);
         }
         
         // find index where to append slice

@@ -210,7 +210,7 @@ dwv.tool.WindowLevel.prototype.updatePresets = function()
     // re-populate the external array
     var modality = app.getImage().getMeta().Modality;
     for( var key in dwv.tool.defaultpresets[modality] ) {
-    	dwv.tool.presets[key] = dwv.tool.defaultpresets[modality][key];
+        dwv.tool.presets[key] = dwv.tool.defaultpresets[modality][key];
     }
 };
 
