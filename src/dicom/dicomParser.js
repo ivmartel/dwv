@@ -490,6 +490,12 @@ dwv.dicom.DicomParser.prototype.createImage = function()
     if( this.dicomElements.Modality ) {
     	meta.Modality = this.dicomElements.Modality.value[0];
     }
+    if( this.dicomElements.StudyInstanceUID ) {
+    	meta.StudyInstanceUID = this.dicomElements.StudyInstanceUID.value[0];
+    }
+    if( this.dicomElements.SeriesInstanceUID ) {
+    	meta.SeriesInstanceUID = this.dicomElements.SeriesInstanceUID.value[0];
+    }
     image.setMeta(meta);
     
     // pixel representation
