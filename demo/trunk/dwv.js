@@ -1050,6 +1050,18 @@ dwv.dicom.DicomParser.prototype.createImage = function()
     if( this.dicomElements.RescaleIntercept ) {
         image.setRescaleIntercept( parseFloat(this.dicomElements.RescaleIntercept.value[0]) );
     }
+    // meta information
+    var meta = {};
+    if( this.dicomElements.Modality ) {
+        meta.Modality = this.dicomElements.Modality.value[0];
+    }
+    if( this.dicomElements.StudyInstanceUID ) {
+        meta.StudyInstanceUID = this.dicomElements.StudyInstanceUID.value[0];
+    }
+    if( this.dicomElements.SeriesInstanceUID ) {
+        meta.SeriesInstanceUID = this.dicomElements.SeriesInstanceUID.value[0];
+    }
+    image.setMeta(meta);
     
     // pixel representation
     var isSigned = 0;
@@ -4265,6 +4277,8 @@ dwv.image.Image = function(size, spacing, buffer, slicePositions)
     var photometricInterpretation = "MONOCHROME2";
     // Planar configuration for RGB data (0:RGBRGBRGBRGB... or 1:RRR...GGG...BBB...)
     var planarConfiguration = 0;
+    // Meta information
+    var meta = {};
     
     // original buffer.
     var originalBuffer = new Int16Array(buffer);
@@ -4303,6 +4317,11 @@ dwv.image.Image = function(size, spacing, buffer, slicePositions)
     // Set the planarConfiguration of the image.
     this.setPlanarConfiguration = function(config) { planarConfiguration = config; };
 
+    // Get the meta information of the image.
+    this.getMeta = function() { return meta; };
+    // Set the meta information of the image.
+    this.setMeta = function(rhs) { meta = rhs; };
+
     // Get value at offset. Warning: No size check...
     this.getValueAtOffset = function(offset) {
         return buffer[offset];
@@ -4315,6 +4334,7 @@ dwv.image.Image = function(size, spacing, buffer, slicePositions)
         copy.setRescaleIntercept(this.getRescaleIntercept());
         copy.setPhotometricInterpretation(this.getPhotometricInterpretation());
         copy.setPlanarConfiguration(this.getPlanarConfiguration());
+        copy.setMeta(this.getMeta());
         return copy;
     };
     // Append a slice to the image.
@@ -4322,15 +4342,20 @@ dwv.image.Image = function(size, spacing, buffer, slicePositions)
     {
         // check input
         if( rhs === null )
-            throw new Error("Cannot append null slice.");
+            throw new Error("Cannot append null slice");
         if( rhs.getSize().getNumberOfSlices() !== 1 )
-            throw new Error("Cannot append more than one slice.");
+            throw new Error("Cannot append more than one slice");
         if( size.getNumberOfColumns() !== rhs.getSize().getNumberOfColumns() )
-            throw new Error("Cannot append a slice with different number of columns.");
+            throw new Error("Cannot append a slice with different number of columns");
         if( size.getNumberOfRows() !== rhs.getSize().getNumberOfRows() )
-            throw new Error("Cannot append a slice with different number of rows.");
+            throw new Error("Cannot append a slice with different number of rows");
         if( photometricInterpretation !== rhs.getPhotometricInterpretation() )
-            throw new Error("Cannot append a slice with different photometric interpretation.");
+            throw new Error("Cannot append a slice with different photometric interpretation");
+        // all meta should be equal
+        for( var key in meta ) {
+            if( meta[key] !== rhs.getMeta()[key] )
+                throw new Error("Cannot append a slice with different "+key);
+        }
         
         // find index where to append slice
         var closestSliceIndex = 0;
@@ -7268,7 +7293,9 @@ dwv.tool.colourMaps = {
     "test": dwv.image.lut.test
 };
 // Default window level presets.
-dwv.tool.presets = {
+dwv.tool.presets = {};
+dwv.tool.defaultpresets = {};
+dwv.tool.defaultpresets.CT = {
     "abdomen": {"center": 350, "width": 40},
     "lung": {"center": -600, "width": 1500},
     "brain": {"center": 40, "width": 80},
@@ -7418,7 +7445,6 @@ dwv.tool.WindowLevel.prototype.updatePresets = function()
 {    
     // copy the presets and reinitialize the external one
     // (hoping to control the order of the presets)
-    var presets = dwv.tool.presets;
     dwv.tool.presets = {};
     // DICOM presets
     var dicomPresets = app.getView().getWindowPresets();
@@ -7435,7 +7461,10 @@ dwv.tool.WindowLevel.prototype.updatePresets = function()
     var center = min + width/2;
     dwv.tool.presets["min/max"] = {"center": center, "width": width};
     // re-populate the external array
-    for( var key in presets ) dwv.tool.presets[key] = presets[key];
+    var modality = app.getImage().getMeta().Modality;
+    for( var key in dwv.tool.defaultpresets[modality] ) {
+        dwv.tool.presets[key] = dwv.tool.defaultpresets[modality][key];
+    }
 };
 
 /**
