@@ -14,7 +14,7 @@ dwv.image.View = function(image, isSigned)
     // rescale lookup table
     var rescaleLut = new dwv.image.lut.Rescale(
         image.getRescaleSlope(), image.getRescaleIntercept() );
-    rescaleLut.initialise();
+    rescaleLut.initialise(image.getMeta().BitsStored);
     // window lookup table
     var windowLut = new dwv.image.lut.Window(rescaleLut, isSigned);
     // window presets
