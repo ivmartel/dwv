@@ -74,6 +74,13 @@ dwv.App = function(mobile)
         document.getElementById('imageurl').addEventListener('change', this.onChangeURL, false);
     };
     
+    this.reset = function()
+    {
+        image = null;
+        view = null;
+        undoStack = new dwv.tool.UndoStack(this);
+    };
+    
     /**
      * Handle key event.
      * - CRTL-Z: undo
@@ -106,7 +113,8 @@ dwv.App = function(mobile)
      */
     this.loadFiles = function(files) 
     {
-        var onLoadLocalImage = function(e){
+        // Image loader
+        var onLoadImage = function(event){
             try {
                 // parse image file
                 var data = dwv.image.getDataFromImage(this);
@@ -119,18 +127,21 @@ dwv.App = function(mobile)
             }
         };
         
+        // Image reader loader
         var onLoadImageReader = function(event){
-            var localImage = new Image();
-            localImage.src = event.target.result;
+            var theImage = new Image();
+            theImage.src = event.target.result;
             // storing values to pass them on
-            localImage.file = this.file;
-            localImage.index = this.index;
-            localImage.onload = onLoadLocalImage;
+            theImage.file = this.file;
+            theImage.index = this.index;
+            theImage.onload = onLoadImage;
         };
+        // Image reader error handler
         var onErrorImageReader = function(event){
             alert("An error occurred while reading the image file: "+event.getMessage());
         };
         
+        // DICOM reader loader
         var onLoadDicomReader = function(event){
             try {
                 // parse DICOM file
@@ -143,10 +154,13 @@ dwv.App = function(mobile)
                 return;
             }
         };
+        // DICOM reader error handler
         var onErrorDicomReader = function(event){
             alert("An error occurred while reading the DICOM file: "+event.getMessage());
         };
         
+        // main load loop
+        this.reset();
         for (var i = 0; i < files.length; ++i)
         {
             var file = files[i];
@@ -184,7 +198,8 @@ dwv.App = function(mobile)
      */
     this.loadURL = function(urls) 
     {
-        var onLoadLocalImage = function(e){
+        // Image loader
+        var onLoadImage = function(event){
             try {
                 // parse image data
                 var data = dwv.image.getDataFromImage(this);
@@ -197,14 +212,15 @@ dwv.App = function(mobile)
             }
         };
         
-        var onLoadRequest = function(ev) {
+        // Request handler
+        var onLoadRequest = function(event) {
             var view = new DataView(this.response);
             var isJpeg = view.getUint32(0) === 0xffd8ffe0;
             var isPng = view.getUint32(0) === 0x89504e47;
             var isGif = view.getUint32(0) === 0x47494638;
             if( isJpeg || isPng || isGif ) {
                 // image data
-                var localImage = new Image();
+                var theImage = new Image();
 
                 var bytes = new Uint8Array(this.response);
                 var binary = '';
@@ -215,9 +231,9 @@ dwv.App = function(mobile)
                 if (isJpeg) imgStr = "jpeg";
                 else if (isPng) imgStr = "png";
                 else if (isGif) imgStr = "gif";
-                localImage.src = "data:image/" + imgStr + ";base64," + window.btoa(binary);
+                theImage.src = "data:image/" + imgStr + ";base64," + window.btoa(binary);
                 
-                localImage.onload = onLoadLocalImage;
+                theImage.onload = onLoadImage;
             }
             else {
                 try {
@@ -232,10 +248,13 @@ dwv.App = function(mobile)
                 }
             }
         };
+        // Request error handler
         var onErrorRequest = function(event){
             alert("An error occurred while retrieving the file: (http) "+this.status);
         };
         
+        // main load loop
+        this.reset();
         for (var i = 0; i < urls.length; ++i)
         {
             var url = urls[i];

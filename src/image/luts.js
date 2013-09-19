@@ -23,9 +23,9 @@ dwv.image.lut.Rescale = function(slope_,intercept_)
     // Get the rescale intercept.
     this.getIntercept = function() { return intercept_; };
     // Initialise the LUT.
-    this.initialise = function(size)
+    this.initialise = function(bitsStored)
     {
-        if(typeof(size) === 'undefined') size = 4096;
+        var size = Math.pow(2, bitsStored);
         rescaleLut_ = new Float32Array(size);
         for(var i=0; i<size; ++i)
             rescaleLut_[i] = i * slope_ + intercept_;
