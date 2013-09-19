@@ -5876,9 +5876,9 @@ dwv.math.Scissors.prototype.doWork = function() {
 
 	return newPoints;
 };
-;//! @namespace Main DWV namespace.
+;//! @module Main DWV namespace.
 var dwv = dwv || {};
-//! @namespace Math related.
+//! @module Math related.
 dwv.math = dwv.math || {};
 
 /**
