@@ -58,7 +58,7 @@ test("Test generate data.", function() {
     // time taken 
     var time0 = (new Date()).getMilliseconds() - start0;
     // check time taken
-    ok( time0 < 80, "First generateImageData: "+time0+"ms.");
+    ok( time0 < 90, "First generateImageData: "+time0+"ms.");
     
     // Change the window level
     view0.setWindowLevel(4000, 200);
@@ -70,5 +70,5 @@ test("Test generate data.", function() {
     // time taken 
     var time1 = (new Date()).getMilliseconds() - start1;
     // check time taken
-    ok( time1 < 80, "Second generateImageData: "+time1+"ms.");
+    ok( time1 < 90, "Second generateImageData: "+time1+"ms.");
 });
