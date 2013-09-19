@@ -29,16 +29,16 @@ module.exports = function(grunt) {
         },
         yuidoc: {
             compile: {
-              name: '<%= pkg.name %>',
-              description: '<%= pkg.description %>',
-              version: '<%= pkg.version %>',
-              url: '<%= pkg.homepage %>',
-              options: {
-                paths: 'src/',
-                outdir: 'dist/docs/'
-              }
+                name: '<%= pkg.name %>',
+                description: '<%= pkg.description %>',
+                version: '<%= pkg.version %>',
+                url: '<%= pkg.homepage %>',
+                options: {
+                    paths: 'src/',
+                    outdir: 'dist/docs/'
+                }
             }
-          }
+        }
     });
 
     grunt.loadNpmTasks('grunt-contrib-jshint');
