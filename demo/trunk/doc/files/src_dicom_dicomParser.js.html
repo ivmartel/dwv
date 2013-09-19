@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>src/dicom/dicomParser.js - dwv</title>
+    <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
+    <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
+    <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
+    <link rel="shortcut icon" type="image/png" href="../assets/favicon.png">
+    <script src="http://yui.yahooapis.com/combo?3.9.1/build/yui/yui-min.js"></script>
+</head>
+<body class="yui3-skin-sam">
+
+<div id="doc">
+    <div id="hd" class="yui3-g header">
+        <div class="yui3-u-3-4">
+            
+                <h1><img src="../assets/css/logo.png" title="dwv"></h1>
+            
+        </div>
+        <div class="yui3-u-1-4 version">
+            <em>API Docs for: 0.4.0beta</em>
+        </div>
+    </div>
+    <div id="bd" class="yui3-g">
+
+        <div class="yui3-u-1-4">
+            <div id="docs-sidebar" class="sidebar apidocs">
+                <div id="api-list">
+    <h2 class="off-left">APIs</h2>
+    <div id="api-tabview" class="tabview">
+        <ul class="tabs">
+            <li><a href="#api-classes">Classes</a></li>
+            <li><a href="#api-modules">Modules</a></li>
+        </ul>
+
+        <div id="api-tabview-filter">
+            <input type="search" id="api-filter" placeholder="Type to filter APIs">
+        </div>
+
+        <div id="api-tabview-panel">
+            <ul id="api-classes" class="apis classes">
+            
+                <li><a href="../classes/Data reader.html">Data reader</a></li>
+            
+                <li><a href="../classes/DICOM tag dictionary..html">DICOM tag dictionary.</a></li>
+            
+                <li><a href="../classes/DicomParser class..html">DicomParser class.</a></li>
+            
+                <li><a href="../classes/Filter classes..App
+Main application..html">Filter classes..App
+Main application.</a></li>
+            
+                <li><a href="../classes/Filter classes..Draw line command..html">Filter classes..Draw line command.</a></li>
+            
+                <li><a href="../classes/Filter classes..Draw livewire command..html">Filter classes..Draw livewire command.</a></li>
+            
+                <li><a href="../classes/Filter classes..Draw rectangle command..html">Filter classes..Draw rectangle command.</a></li>
+            
+                <li><a href="../classes/Filter classes..Draw ROI command..html">Filter classes..Draw ROI command.</a></li>
+            
+                <li><a href="../classes/Filter classes..Filter tool..html">Filter classes..Filter tool.</a></li>
+            
+                <li><a href="../classes/Filter classes..Livewire painting tool..html">Filter classes..Livewire painting tool.</a></li>
+            
+                <li><a href="../classes/Filter classes..Run filter command..html">Filter classes..Run filter command.</a></li>
+            
+                <li><a href="../classes/Filter classes..Sharpen filter tool..html">Filter classes..Sharpen filter tool.</a></li>
+            
+                <li><a href="../classes/Filter classes..Sobel filter tool..html">Filter classes..Sobel filter tool.</a></li>
+            
+                <li><a href="../classes/Filter classes..Threshold filter tool..html">Filter classes..Threshold filter tool.</a></li>
+            
+                <li><a href="../classes/Filter classes..Tool box..html">Filter classes..Tool box.</a></li>
+            
+                <li><a href="../classes/Filter classes..UndoStack class..html">Filter classes..UndoStack class.</a></li>
+            
+                <li><a href="../classes/Filter classes..WindowLevel tool: handle window/level related events..html">Filter classes..WindowLevel tool: handle window/level related events.</a></li>
+            
+                <li><a href="../classes/Filter classes..Zoom class..html">Filter classes..Zoom class.</a></li>
+            
+                <li><a href="../classes/GUI classes..2D point. Immutable..html">GUI classes..2D point. Immutable.</a></li>
+            
+                <li><a href="../classes/GUI classes..Circle shape..html">GUI classes..Circle shape.</a></li>
+            
+                <li><a href="../classes/GUI classes..Circular Bucket Queue.
+
+Returns input&#x27;d points in sorted order. All operations run in roughly O(1)
+time (for input with small cost values), but it has a strict requirement:
+
+If the most recent point had a cost of c, any points added should have a cost
+c&#x27; in the range c &lt;= c&#x27; &lt;= c + (capacity - 1)..html">GUI classes..Circular Bucket Queue.
+
+Returns input&#x27;d points in sorted order. All operations run in roughly O(1)
+time (for input with small cost values), but it has a strict requirement:
+
+If the most recent point had a cost of c, any points added should have a cost
+c&#x27; in the range c &lt;= c&#x27; &lt;= c + (capacity - 1).</a></li>
+            
+                <li><a href="../classes/GUI classes..Draw circle command..html">GUI classes..Draw circle command.</a></li>
+            
+                <li><a href="../classes/GUI classes..Drawing tool..html">GUI classes..Drawing tool.</a></li>
+            
+                <li><a href="../classes/GUI classes..Fast 2D point since it&#x27;s mutable!.html">GUI classes..Fast 2D point since it&#x27;s mutable!</a></li>
+            
+                <li><a href="../classes/GUI classes..Image class..html">GUI classes..Image class.</a></li>
+            
+                <li><a href="../classes/GUI classes..Image Size class. 
+Supports 2D and 3D images..html">GUI classes..Image Size class. 
+Supports 2D and 3D images.</a></li>
+            
+                <li><a href="../classes/GUI classes..Image Spacing class. 
+Supports 2D and 3D images..html">GUI classes..Image Spacing class. 
+Supports 2D and 3D images.</a></li>
+            
+                <li><a href="../classes/GUI classes..Line shape..html">GUI classes..Line shape.</a></li>
+            
+                <li><a href="../classes/GUI classes..Path shape..html">GUI classes..Path shape.</a></li>
+            
+                <li><a href="../classes/GUI classes..Rectangle shape..html">GUI classes..Rectangle shape.</a></li>
+            
+                <li><a href="../classes/GUI classes..Region Of Interest shape.
+Note: should be a closed path..html">GUI classes..Region Of Interest shape.
+Note: should be a closed path.</a></li>
+            
+                <li><a href="../classes/GUI classes..Rescale LUT class..html">GUI classes..Rescale LUT class.</a></li>
+            
+                <li><a href="../classes/GUI classes..Scissors.
+
+Ref: Eric N. Mortensen, William A. Barrett, Interactive Segmentation with
+  Intelligent Scissors, Graphical Models and Image Processing, Volume 60,
+  Issue 5, September 1998, Pages 349-384, ISSN 1077-3169,
+  DOI: 10.1006/gmip.1998.0480.
+
+(http://www.sciencedirect.com/science/article/B6WG4-45JB8WN-9/2/6fe59d8089fd1892c2bfb82283065579)
+
+Highly inspired from http://code.google.com/p/livewire-javascript/.html">GUI classes..Scissors.
+
+Ref: Eric N. Mortensen, William A. Barrett, Interactive Segmentation with
+  Intelligent Scissors, Graphical Models and Image Processing, Volume 60,
+  Issue 5, September 1998, Pages 349-384, ISSN 1077-3169,
+  DOI: 10.1006/gmip.1998.0480.
+
+(http://www.sciencedirect.com/science/article/B6WG4-45JB8WN-9/2/6fe59d8089fd1892c2bfb82283065579)
+
+Highly inspired from http://code.google.com/p/livewire-javascript/</a></li>
+            
+                <li><a href="../classes/GUI classes..Style class..html">GUI classes..Style class.</a></li>
+            
+                <li><a href="../classes/GUI classes..View class..html">GUI classes..View class.</a></li>
+            
+                <li><a href="../classes/GUI classes..Window layer..html">GUI classes..Window layer.</a></li>
+            
+                <li><a href="../classes/GUI classes..Window LUT class..html">GUI classes..Window LUT class.</a></li>
+            
+            </ul>
+
+            <ul id="api-modules" class="apis modules">
+            
+            </ul>
+        </div>
+    </div>
+</div>
+
+            </div>
+        </div>
+        <div class="yui3-u-3-4">
+                <div id="api-options">
+        Show:
+        <label for="api-show-inherited">
+            <input type="checkbox" id="api-show-inherited" checked>
+            Inherited
+        </label>
+
+        <label for="api-show-protected">
+            <input type="checkbox" id="api-show-protected">
+            Protected
+        </label>
+
+        <label for="api-show-private">
+            <input type="checkbox" id="api-show-private">
+            Private
+        </label>
+        <label for="api-show-deprecated">
+            <input type="checkbox" id="api-show-deprecated">
+            Deprecated
+        </label>
+
+    </div>
+
+
+            <div class="apidocs">
+                <div id="docs-main">
+                    <div class="content">
+                        <h1 class="file-heading">File: src/dicom/dicomParser.js</h1>
+
+<div class="file">
+    <pre class="code prettyprint linenums">
+//! @namespace Main DWV namespace.
+var dwv = dwv || {};
+//! @namespace DICOM related.
+dwv.dicom = dwv.dicom || {};
+
+/**
+ * @class Data reader
+ * @param buffer The input array buffer.
+ * @param isLittleEndian Flag to tell if the data is little or big endian.
+ */
+dwv.dicom.DataReader = function(buffer, isLittleEndian)
+{
+    var view = new DataView(buffer);
+    if(typeof(isLittleEndian)===&#x27;undefined&#x27;) isLittleEndian = true;
+    
+    //! Read Uint8 (1 bytes) data.
+    this.readUint8 = function(byteOffset) {
+        return view.getUint8(byteOffset, isLittleEndian);
+    };
+    //! Read Uint16 (2 bytes) data.
+    this.readUint16 = function(byteOffset) {
+        return view.getUint16(byteOffset, isLittleEndian);
+    };
+    //! Read Uint32 (4 bytes) data.
+    this.readUint32 = function(byteOffset) {
+        return view.getUint32(byteOffset, isLittleEndian);
+    };
+    //! Read Float32 (8 bytes) data.
+    this.readFloat32 = function(byteOffset) {
+        return view.getFloat32(byteOffset, isLittleEndian);
+    };
+    //! Read Uint data of nBytes size.
+    this.readNumber = function(byteOffset, nBytes) {
+        if( nBytes === 1 )
+            return this.readUint8(byteOffset, isLittleEndian);
+        else if( nBytes === 2 )
+            return this.readUint16(byteOffset, isLittleEndian);
+        else if( nBytes === 4 )
+            return this.readUint32(byteOffset, isLittleEndian);
+        else if( nBytes === 8 )
+            return this.readFloat32(byteOffset, isLittleEndian);
+        else 
+            throw new Error(&quot;Unsupported number size.&quot;);
+    };
+    //! Read Uint8 array.
+    this.readUint8Array = function(byteOffset, size) {
+        var data = new Uint8Array(size);
+        var index = 0;
+        for(var i=byteOffset; i&lt;byteOffset + size; ++i) {     
+            data[index++] = this.readUint8(i);
+        }
+        return data;
+    };
+    //! Read Uint16 array.
+    this.readUint16Array = function(byteOffset, size) {
+        var data = new Uint16Array(size/2);
+        var index = 0;
+        for(var i=byteOffset; i&lt;byteOffset + size; i+=2) {     
+            data[index++] = this.readUint16(i);
+        }
+        return data;
+    };
+    //! Read data as an hexadecimal string.
+    this.readHex = function(byteOffset) {
+        // read and convert to hex string
+        var str = this.readUint16(byteOffset).toString(16);
+        // return padded
+        return &quot;0x0000&quot;.substr(0, 6 - str.length) + str.toUpperCase();
+    };
+    //! Read data as a string.
+    this.readString = function(byteOffset, nChars) {
+        var result = &quot;&quot;;
+        for(var i=byteOffset; i&lt;byteOffset + nChars; ++i){
+            result += String.fromCharCode( this.readUint8(i) );
+        }
+        return result;
+    };
+};
+
+/**
+ * @class DicomParser class.
+ */
+dwv.dicom.DicomParser = function()
+{
+    // the list of DICOM elements
+    this.dicomElements = {};
+    // the number of DICOM Items
+    this.numberOfItems = 0;
+    // the DICOM dictionary used to find tag names
+    this.dict = new dwv.dicom.Dictionary();
+    // the pixel buffer
+    this.pixelBuffer = [];
+};
+
+/**
+ * Get the DICOM data pixel buffer.
+ * @returns The pixel buffer (as an array).
+ */
+dwv.dicom.DicomParser.prototype.getPixelBuffer=function()
+{
+    return this.pixelBuffer;
+};
+
+/**
+ * Append a DICOM element to the dicomElements member object.
+ * Allows for easy retrieval of DICOM tag values from the tag name.
+ * If tags have same name (for the &#x27;unknown&#x27; and private tags cases), a number is appended
+ * making the name unique.
+ * @param element The element to add.
+ */
+dwv.dicom.DicomParser.prototype.appendDicomElement=function( element )
+{
+    // find a good tag name
+    var name = element.name;
+    // count the number of items
+    if( name === &quot;Item&quot; ) {
+        ++this.numberOfItems;
+    }
+    var count = 1;
+    while( this.dicomElements[name] ) {
+        name = element.name + (count++).toString();
+    }
+    // store it
+    this.dicomElements[name] = { 
+            &quot;group&quot;: element.group, 
+            &quot;element&quot;: element.element,
+            &quot;vr&quot;: element.vr,
+            &quot;vl&quot;: element.vl,
+            &quot;value&quot;: element.value };
+};
+
+/**
+ * Read a DICOM tag.
+ * @param reader The raw data reader.
+ * @param offset The offset where to start to read.
+ * @returns An object containing the tags &#x27;group&#x27;, &#x27;element&#x27; and &#x27;name&#x27;.
+ */
+dwv.dicom.DicomParser.prototype.readTag=function(reader, offset)
+{
+    // group
+    var group = reader.readHex(offset);
+    // element
+    var element = reader.readHex(offset+2);
+    // name
+    var name = &quot;dwv::unknown&quot;;
+    if( this.dict.newDictionary[group] ) {
+        if( this.dict.newDictionary[group][element] ) {
+            name = this.dict.newDictionary[group][element][2];
+        }
+    }
+    // return
+    return {&#x27;group&#x27;: group, &#x27;element&#x27;: element, &#x27;name&#x27;: name};
+};
+
+/**
+ * Read a DICOM data element.
+ * @param reader The raw data reader.
+ * @param offset The offset where to start to read.
+ * @param implicit Is the DICOM VR implicit?
+ * @returns An object containing the element &#x27;tag&#x27;, &#x27;vl&#x27;, &#x27;vr&#x27;, &#x27;data&#x27; and &#x27;offset&#x27;.
+ */
+dwv.dicom.DicomParser.prototype.readDataElement=function(reader, offset, implicit)
+{
+    // tag: group, element
+    var tag = this.readTag(reader, offset);
+    var tagOffset = 4;
+    
+    var vr; // Value Representation (VR)
+    var vl; // Value Length (VL)
+    var vrOffset = 0; // byte size of VR
+    var vlOffset = 0; // byte size of VL
+    
+    // (private) Item group case
+    if( tag.group === &quot;0xFFFE&quot; ) {
+        vr = &quot;N/A&quot;;
+        vrOffset = 0;
+        vl = reader.readUint32( offset+tagOffset );
+        vlOffset = 4;
+    }
+    // non Item case
+    else {
+        // implicit VR?
+        if(implicit) {
+            vr = &quot;UN&quot;;
+            if( this.dict.newDictionary[tag.group] ) {
+                if( this.dict.newDictionary[tag.group][tag.element] ) {
+                    vr = this.dict.newDictionary[tag.group][tag.element][0];
+                }
+            }
+            vrOffset = 0;
+            vl = reader.readUint32( offset+tagOffset+vrOffset );
+            vlOffset = 4;
+        }
+        else {
+            vr = reader.readString( offset+tagOffset, 2 );
+            vrOffset = 2;
+            // long representations
+            if(vr === &quot;OB&quot; || vr === &quot;OF&quot; || vr === &quot;SQ&quot; || vr === &quot;OW&quot; || vr === &quot;UN&quot;) {
+                vl = reader.readUint32( offset+tagOffset+vrOffset+2 );
+                vlOffset = 6;
+            }
+            // short representation
+            else {
+                vl = reader.readUint16( offset+tagOffset+vrOffset );
+                vlOffset = 2;
+            }
+        }
+    }
+    
+    // check the value of VL
+    if( vl === 0xffffffff ) {
+        vl = 0;
+    }
+    
+    
+    // data
+    var data;
+    var dataOffset = offset+tagOffset+vrOffset+vlOffset;
+    if( vr === &quot;US&quot; || vr === &quot;UL&quot;)
+    {
+        data = [reader.readNumber( dataOffset, vl )];
+    }
+    else if( vr === &quot;OX&quot; || vr === &quot;OW&quot; )
+    {
+        data = reader.readUint16Array( dataOffset, vl );
+    }
+    else if( vr === &quot;OB&quot; || vr === &quot;N/A&quot;)
+    {
+        data = reader.readUint8Array( dataOffset, vl );
+    }
+    else
+    {
+        data = reader.readString( dataOffset, vl);
+        data = data.split(&quot;\\&quot;);                
+    }    
+
+    // total element offset
+    var elementOffset = tagOffset + vrOffset + vlOffset + vl;
+    
+    // return
+    return { 
+        &#x27;tag&#x27;: tag, &#x27;vr&#x27;: vr, &#x27;vl&#x27;: vl, 
+        &#x27;data&#x27;: data,
+        &#x27;offset&#x27;: elementOffset};    
+};
+
+/**
+ * Parse the complete DICOM file (given as input to the class).
+ * Fills in the member object &#x27;dicomElements&#x27;.
+ * @param buffer The input array buffer.
+ */
+dwv.dicom.DicomParser.prototype.parse = function(buffer)
+{
+    var offset = 0;
+    var implicit = false;
+    var jpeg = false;
+    var jpeg2000 = false;
+    // dictionary
+    this.dict.init();
+    // default readers
+    var metaReader = new dwv.dicom.DataReader(buffer);
+    var dataReader = new dwv.dicom.DataReader(buffer);
+
+    // 128 -&gt; 132: magic word
+    offset = 128;
+    var magicword = metaReader.readString( offset, 4 );
+    if(magicword !== &quot;DICM&quot;)
+    {
+        throw new Error(&quot;Not a valid DICOM file (no magic DICM word found)&quot;);
+    }
+    offset += 4;
+    
+    // 0x0002, 0x0000: MetaElementGroupLength
+    var dataElement = this.readDataElement(metaReader, offset);
+    var metaLength = parseInt(dataElement.data, 10);
+    offset += dataElement.offset;
+    
+    // meta elements
+    var metaStart = offset;
+    var metaEnd = metaStart + metaLength;
+    var i = metaStart;
+    while( i &lt; metaEnd ) 
+    {
+        // get the data element
+        dataElement = this.readDataElement(metaReader, i, false);
+        // check the transfer syntax
+        if( dataElement.tag.name === &quot;TransferSyntaxUID&quot; ) {
+            var syntax = dwv.utils.cleanString(dataElement.data[0]);
+            
+            // Implicit VR - Little Endian
+            if( syntax === &quot;1.2.840.10008.1.2&quot; ) {
+                implicit = true;
+            }
+            // Explicit VR - Little Endian (default): 1.2.840.10008.1.2.1 
+            // Deflated Explicit VR - Little Endian
+            else if( syntax === &quot;1.2.840.10008.1.2.1.99&quot; ) {
+                throw new Error(&quot;Unsupported DICOM transfer syntax (Deflated Explicit VR): &quot;+syntax);
+            }
+            // Explicit VR - Big Endian
+            else if( syntax === &quot;1.2.840.10008.1.2.2&quot; ) {
+                dataReader = new dwv.dicom.DataReader(buffer,false);
+            }
+            // JPEG
+            else if( syntax.match(/1.2.840.10008.1.2.4.5/) ||
+                    syntax.match(/1.2.840.10008.1.2.4.6/) ||
+                    syntax.match(/1.2.840.10008.1.2.4.7/) ||
+                    syntax.match(/1.2.840.10008.1.2.4.8/) ) {
+                jpeg = true;
+                throw new Error(&quot;Unsupported DICOM transfer syntax (JPEG): &quot;+syntax);
+            }
+            // JPEG 2000
+            else if( syntax.match(/1.2.840.10008.1.2.4.9/) ) {
+                jpeg2000 = true;
+                throw new Error(&quot;Unsupported DICOM transfer syntax (JPEG 2000): &quot;+syntax);
+            }
+            // MPEG2 Image Compression
+            else if( syntax === &quot;1.2.840.10008.1.2.4.100&quot; ) {
+                throw new Error(&quot;Unsupported DICOM transfer syntax (MPEG2): &quot;+syntax);
+            }
+            // RLE (lossless)
+            else if( syntax === &quot;1.2.840.10008.1.2.4.5&quot; ) {
+                throw new Error(&quot;Unsupported DICOM transfer syntax (RLE): &quot;+syntax);
+            }
+        }            
+        // store the data element
+        this.appendDicomElement( { 
+            &#x27;name&#x27;: dataElement.tag.name,
+            &#x27;group&#x27;: dataElement.tag.group, 
+            &#x27;vr&#x27; : dataElement.vr, 
+            &#x27;vl&#x27; : dataElement.vl, 
+            &#x27;element&#x27;: dataElement.tag.element,
+            &#x27;value&#x27;: dataElement.data } );
+        // increment index
+        i += dataElement.offset;
+    }
+    
+    var startedPixelItems = false;
+    
+    var tagName;
+    // DICOM data elements
+    while( i &lt; buffer.byteLength ) 
+    {
+        // get the data element
+        try
+        {
+            dataElement = this.readDataElement(dataReader, i, implicit);
+        }
+        catch(err)
+        {
+            console.warn(&quot;Problem reading at &quot; + i + &quot; / &quot; + buffer.byteLength +
+                &quot;, after &quot; + tagName + &quot;.\n&quot; + err);
+        }
+        tagName = dataElement.tag.name;
+        // store pixel data from multiple items
+        if( startedPixelItems ) {
+            if( tagName === &quot;Item&quot; ) {
+                if( dataElement.data.length !== 0 ) {
+                    this.pixelBuffer = this.pixelBuffer.concat( dataElement.data );
+                }
+            }
+            else if( tagName === &quot;SequenceDelimitationItem&quot; ) {
+                startedPixelItems = false;
+            }
+            else {
+                throw new Error(&quot;Unexpected tag in encapsulated pixel data: &quot;+dataElement.tag.name);
+            }
+        }
+        // check the pixel data tag
+        if( tagName === &quot;PixelData&quot;) {
+            if( dataElement.data.length !== 0 ) {
+                this.pixelBuffer = dataElement.data;
+            }
+            else {
+                startedPixelItems = true;
+            }
+        }
+        // store the data element
+        this.appendDicomElement( {
+            &#x27;name&#x27;: tagName,
+            &#x27;group&#x27; : dataElement.tag.group, 
+            &#x27;vr&#x27; : dataElement.vr, 
+            &#x27;vl&#x27; : dataElement.vl, 
+            &#x27;element&#x27;: dataElement.tag.element,
+            &#x27;value&#x27;: dataElement.data } );
+        // increment index
+        i += dataElement.offset;
+    }
+    
+    // uncompress data
+    if( jpeg ) {
+        console.log(&quot;JPEG&quot;);
+        // using jpgjs from https://github.com/notmasteryet/jpgjs
+        // -&gt; error with ffc3 and ffc1 jpeg jfif marker
+        /*var j = new JpegImage();
+        j.parse(this.pixelBuffer);
+        var d = 0;
+        j.copyToImageData(d);
+        this.pixelBuffer = d.data;*/
+    }
+    else if( jpeg2000 ) {
+        console.log(&quot;JPEG 2000&quot;);
+        // using openjpeg.js from https://github.com/kripken/j2k.js
+        // -&gt; 2 layers results????
+        /*var data = new Uint16Array(this.pixelBuffer);
+        var result = openjpeg(data, &quot;j2k&quot;);
+        this.pixelBuffer = result.data;*/
+        
+        // using jpx.js from https://github.com/mozilla/pdf.js
+        // -&gt; ...
+        /*var j = new JpxImage();
+        j.parse(this.pixelBuffer);
+        console.log(&quot;width: &quot;+j.width);
+        console.log(&quot;height: &quot;+j.height);
+        console.log(&quot;tiles: &quot;+j.tiles.length);
+        console.log(&quot;count: &quot;+j.componentsCount);
+        this.pixelBuffer = j.tiles[0].items;*/
+    }
+};
+
+/**
+ * Get an Image object from the read DICOM file.
+ * @returns A new Image.
+ */
+dwv.dicom.DicomParser.prototype.createImage = function()
+{
+    // size
+    if( !this.dicomElements.Columns ) {
+        throw new Error(&quot;Missing DICOM image number of columns&quot;);
+    }
+    if( !this.dicomElements.Rows ) {
+        throw new Error(&quot;Missing DICOM image number of rows&quot;);
+    }
+    var size = new dwv.image.Size(
+        this.dicomElements.Columns.value[0], 
+        this.dicomElements.Rows.value[0] );
+    // spacing
+    var rowSpacing = 1;
+    var columnSpacing = 1;
+    if( this.dicomElements.PixelSpacing ) {
+        rowSpacing = parseFloat(this.dicomElements.PixelSpacing.value[0]);
+        columnSpacing = parseFloat(this.dicomElements.PixelSpacing.value[1]);
+    }
+    else if( this.dicomElements.ImagerPixelSpacing ) {
+        rowSpacing = parseFloat(this.dicomElements.ImagerPixelSpacing.value[0]);
+        columnSpacing = parseFloat(this.dicomElements.ImagerPixelSpacing.value[1]);
+    }
+    var spacing = new dwv.image.Spacing( columnSpacing, rowSpacing);
+    // buffer data
+    var buffer = new Int16Array(this.pixelBuffer.length);
+    // unsigned to signed data if needed
+    var shift = false;
+    if( this.dicomElements.PixelRepresentation &amp;&amp;
+            this.dicomElements.PixelRepresentation.value[0] == 1) {
+        shift = true;
+    }
+    for( var i=0; i&lt;this.pixelBuffer.length; ++i ) {
+        buffer[i] = this.pixelBuffer[i];
+        if( shift &amp;&amp; buffer[i] &gt;= Math.pow(2, 15) ) 
+            buffer[i] -= Math.pow(2, 16);
+    }
+    // slice position
+    var slicePosition = [0,0,0];
+    if( this.dicomElements.ImagePositionPatient )
+        slicePosition = [ parseFloat(this.dicomElements.ImagePositionPatient.value[0]),
+            parseFloat(this.dicomElements.ImagePositionPatient.value[1]),
+            parseFloat(this.dicomElements.ImagePositionPatient.value[2]) ];
+    
+    // image
+    var image = new dwv.image.Image( size, spacing, buffer, [slicePosition] );
+    // photometricInterpretation
+    if( this.dicomElements.PhotometricInterpretation ) {
+        image.setPhotometricInterpretation( dwv.utils.cleanString(
+            this.dicomElements.PhotometricInterpretation.value[0]).toUpperCase() );
+    }        
+    // planarConfiguration
+    if( this.dicomElements.PlanarConfiguration ) {
+        image.setPlanarConfiguration( 
+            this.dicomElements.PlanarConfiguration.value[0] );
+    }        
+    // rescale slope
+    if( this.dicomElements.RescaleSlope ) {
+        image.setRescaleSlope( parseFloat(this.dicomElements.RescaleSlope.value[0]) );
+    }
+    // rescale intercept
+    if( this.dicomElements.RescaleIntercept ) {
+        image.setRescaleIntercept( parseFloat(this.dicomElements.RescaleIntercept.value[0]) );
+    }
+    // meta information
+    var meta = {};
+    if( this.dicomElements.Modality ) {
+        meta.Modality = this.dicomElements.Modality.value[0];
+    }
+    if( this.dicomElements.StudyInstanceUID ) {
+        meta.StudyInstanceUID = this.dicomElements.StudyInstanceUID.value[0];
+    }
+    if( this.dicomElements.SeriesInstanceUID ) {
+        meta.SeriesInstanceUID = this.dicomElements.SeriesInstanceUID.value[0];
+    }
+    if( this.dicomElements.BitsStored ) {
+        meta.BitsStored = parseInt(this.dicomElements.BitsStored.value[0], 10);
+    }
+    image.setMeta(meta);
+    
+    // pixel representation
+    var isSigned = 0;
+    if( this.dicomElements.PixelRepresentation ) {
+        isSigned = this.dicomElements.PixelRepresentation.value[0];
+    }
+    // view
+    var view = new dwv.image.View(image, isSigned);
+    // window center and width
+    var windowPresets = [];
+    if( this.dicomElements.WindowCenter &amp;&amp; this.dicomElements.WindowWidth ) {
+        var name;
+        for( var j = 0; j &lt; this.dicomElements.WindowCenter.value.length; ++j) {
+            var width = parseFloat( this.dicomElements.WindowWidth.value[j], 10 );
+            if( width !== 0 ) {
+                if( this.dicomElements.WindowCenterWidthExplanation ) {
+                    name = this.dicomElements.WindowCenterWidthExplanation.value[j];
+                }
+                else name = &quot;Default&quot;+j;
+                windowPresets.push({
+                    &quot;center&quot;: parseFloat( this.dicomElements.WindowCenter.value[j], 10 ),
+                    &quot;width&quot;: width, 
+                    &quot;name&quot;: name
+                });
+            }
+        }
+    }
+    if( windowPresets.length !== 0 ) view.setWindowPresets( windowPresets );
+    else view.setWindowLevelMinMax();
+
+    return view;
+};
+
+    </pre>
+</div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="../assets/vendor/prettify/prettify-min.js"></script>
+<script>prettyPrint();</script>
+<script src="../assets/js/yui-prettify.js"></script>
+<script src="../assets/../api.js"></script>
+<script src="../assets/js/api-filter.js"></script>
+<script src="../assets/js/api-list.js"></script>
+<script src="../assets/js/api-search.js"></script>
+<script src="../assets/js/apidocs.js"></script>
+</body>
+</html>

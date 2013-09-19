@@ -1,0 +1,2870 @@
+{
+    "project": {
+        "name": "dwv",
+        "description": "Simple javascript/HTML5 (only) Dicom Web Viewer.",
+        "version": "0.4.0beta",
+        "url": "http://ivmartel.github.io/dwv/"
+    },
+    "files": {
+        "src/dicom/dicomParser.js": {
+            "name": "src/dicom/dicomParser.js",
+            "modules": {},
+            "classes": {
+                "Data reader": 1,
+                "DicomParser class.": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        },
+        "src/dicom/dictionary.js": {
+            "name": "src/dicom/dictionary.js",
+            "modules": {},
+            "classes": {
+                "DICOM tag dictionary.": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        },
+        "src/html/gui.js": {
+            "name": "src/html/gui.js",
+            "modules": {},
+            "classes": {},
+            "fors": {},
+            "namespaces": {
+                "GUI classes.": 1
+            }
+        },
+        "src/html/gui_mobile.js": {
+            "name": "src/html/gui_mobile.js",
+            "modules": {},
+            "classes": {},
+            "fors": {},
+            "namespaces": {}
+        },
+        "src/html/gui_ui.js": {
+            "name": "src/html/gui_ui.js",
+            "modules": {},
+            "classes": {},
+            "fors": {},
+            "namespaces": {}
+        },
+        "src/html/html.js": {
+            "name": "src/html/html.js",
+            "modules": {},
+            "classes": {},
+            "fors": {},
+            "namespaces": {}
+        },
+        "src/html/layer.js": {
+            "name": "src/html/layer.js",
+            "modules": {},
+            "classes": {
+                "GUI classes..Window layer.": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        },
+        "src/html/style.js": {
+            "name": "src/html/style.js",
+            "modules": {},
+            "classes": {
+                "GUI classes..Style class.": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        },
+        "src/image/filter.js": {
+            "name": "src/image/filter.js",
+            "modules": {},
+            "classes": {},
+            "fors": {},
+            "namespaces": {}
+        },
+        "src/image/image.js": {
+            "name": "src/image/image.js",
+            "modules": {},
+            "classes": {
+                "GUI classes..Image Size class. \nSupports 2D and 3D images.": 1,
+                "GUI classes..Image Spacing class. \nSupports 2D and 3D images.": 1,
+                "GUI classes..Image class.": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        },
+        "src/image/luts.js": {
+            "name": "src/image/luts.js",
+            "modules": {},
+            "classes": {
+                "GUI classes..Rescale LUT class.": 1,
+                "GUI classes..Window LUT class.": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        },
+        "src/image/reader.js": {
+            "name": "src/image/reader.js",
+            "modules": {},
+            "classes": {},
+            "fors": {},
+            "namespaces": {}
+        },
+        "src/image/view.js": {
+            "name": "src/image/view.js",
+            "modules": {},
+            "classes": {
+                "GUI classes..View class.": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        },
+        "src/math/bucketQueue.js": {
+            "name": "src/math/bucketQueue.js",
+            "modules": {},
+            "classes": {
+                "GUI classes..Circular Bucket Queue.\n\nReturns input'd points in sorted order. All operations run in roughly O(1)\ntime (for input with small cost values), but it has a strict requirement:\n\nIf the most recent point had a cost of c, any points added should have a cost\nc' in the range c <= c' <= c + (capacity - 1).": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        },
+        "src/math/scissors.js": {
+            "name": "src/math/scissors.js",
+            "modules": {},
+            "classes": {
+                "GUI classes..Scissors.\n\nRef: Eric N. Mortensen, William A. Barrett, Interactive Segmentation with\n  Intelligent Scissors, Graphical Models and Image Processing, Volume 60,\n  Issue 5, September 1998, Pages 349-384, ISSN 1077-3169,\n  DOI: 10.1006/gmip.1998.0480.\n\n(http://www.sciencedirect.com/science/article/B6WG4-45JB8WN-9/2/6fe59d8089fd1892c2bfb82283065579)\n\nHighly inspired from http://code.google.com/p/livewire-javascript/": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        },
+        "src/math/shapes.js": {
+            "name": "src/math/shapes.js",
+            "modules": {},
+            "classes": {
+                "GUI classes..2D point. Immutable.": 1,
+                "GUI classes..Fast 2D point since it's mutable!": 1,
+                "GUI classes..Circle shape.": 1,
+                "GUI classes..Line shape.": 1,
+                "GUI classes..Rectangle shape.": 1,
+                "GUI classes..Region Of Interest shape.\nNote: should be a closed path.": 1,
+                "GUI classes..Path shape.": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        },
+        "src/tools/circle.js": {
+            "name": "src/tools/circle.js",
+            "modules": {},
+            "classes": {
+                "GUI classes..Draw circle command.": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        },
+        "src/tools/draw.js": {
+            "name": "src/tools/draw.js",
+            "modules": {},
+            "classes": {
+                "GUI classes..Drawing tool.": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        },
+        "src/tools/filter.js": {
+            "name": "src/tools/filter.js",
+            "modules": {},
+            "classes": {
+                "Filter classes..Filter tool.": 1,
+                "Filter classes..Threshold filter tool.": 1,
+                "Filter classes..Sharpen filter tool.": 1,
+                "Filter classes..Sobel filter tool.": 1,
+                "Filter classes..Run filter command.": 1
+            },
+            "fors": {},
+            "namespaces": {
+                "Filter classes.": 1
+            }
+        },
+        "src/tools/info.js": {
+            "name": "src/tools/info.js",
+            "modules": {},
+            "classes": {},
+            "fors": {},
+            "namespaces": {}
+        },
+        "src/tools/line.js": {
+            "name": "src/tools/line.js",
+            "modules": {},
+            "classes": {
+                "Filter classes..Draw line command.": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        },
+        "src/tools/livewire.js": {
+            "name": "src/tools/livewire.js",
+            "modules": {},
+            "classes": {
+                "Filter classes..Livewire painting tool.": 1,
+                "Filter classes..Draw livewire command.": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        },
+        "src/tools/rectangle.js": {
+            "name": "src/tools/rectangle.js",
+            "modules": {},
+            "classes": {
+                "Filter classes..Draw rectangle command.": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        },
+        "src/tools/roi.js": {
+            "name": "src/tools/roi.js",
+            "modules": {},
+            "classes": {
+                "Filter classes..Draw ROI command.": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        },
+        "src/tools/toolbox.js": {
+            "name": "src/tools/toolbox.js",
+            "modules": {},
+            "classes": {
+                "Filter classes..Tool box.": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        },
+        "src/tools/undo.js": {
+            "name": "src/tools/undo.js",
+            "modules": {},
+            "classes": {
+                "Filter classes..UndoStack class.": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        },
+        "src/tools/windowLevel.js": {
+            "name": "src/tools/windowLevel.js",
+            "modules": {},
+            "classes": {
+                "Filter classes..WindowLevel tool: handle window/level related events.": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        },
+        "src/tools/zoom.js": {
+            "name": "src/tools/zoom.js",
+            "modules": {},
+            "classes": {
+                "Filter classes..Zoom class.": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        },
+        "src/utils/string.js": {
+            "name": "src/utils/string.js",
+            "modules": {},
+            "classes": {},
+            "fors": {},
+            "namespaces": {}
+        },
+        "src/application.js": {
+            "name": "src/application.js",
+            "modules": {},
+            "classes": {
+                "Filter classes..App\nMain application.": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        }
+    },
+    "modules": {},
+    "classes": {
+        "Data reader": {
+            "name": "Data reader",
+            "shortname": "Data reader",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "file": "src/dicom/dicomParser.js",
+            "line": 6,
+            "params": [
+                {
+                    "name": "buffer",
+                    "description": "The input array buffer."
+                },
+                {
+                    "name": "isLittleEndian",
+                    "description": "Flag to tell if the data is little or big endian."
+                }
+            ]
+        },
+        "DicomParser class.": {
+            "name": "DicomParser class.",
+            "shortname": "DicomParser class.",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "file": "src/dicom/dicomParser.js",
+            "line": 80
+        },
+        "DICOM tag dictionary.": {
+            "name": "DICOM tag dictionary.",
+            "shortname": "DICOM tag dictionary.",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "file": "src/dicom/dictionary.js",
+            "line": 6
+        },
+        "GUI classes..Window layer.": {
+            "name": "GUI classes..Window layer.",
+            "shortname": "Window layer.",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "namespace": "GUI classes.",
+            "file": "src/html/layer.js",
+            "line": 6
+        },
+        "GUI classes..Style class.": {
+            "name": "GUI classes..Style class.",
+            "shortname": "Style class.",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "namespace": "GUI classes.",
+            "file": "src/html/style.js",
+            "line": 6
+        },
+        "GUI classes..Image Size class. \nSupports 2D and 3D images.": {
+            "name": "GUI classes..Image Size class. \nSupports 2D and 3D images.",
+            "shortname": "Image Size class. \nSupports 2D and 3D images.",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "namespace": "GUI classes.",
+            "file": "src/image/image.js",
+            "line": 6,
+            "params": [
+                {
+                    "name": "numberOfColumns",
+                    "description": "The number of columns (number)."
+                },
+                {
+                    "name": "numberOfRows",
+                    "description": "The number of rows (number)."
+                },
+                {
+                    "name": "numberOfSlices",
+                    "description": "The number of slices (number)."
+                }
+            ]
+        },
+        "GUI classes..Image Spacing class. \nSupports 2D and 3D images.": {
+            "name": "GUI classes..Image Spacing class. \nSupports 2D and 3D images.",
+            "shortname": "Image Spacing class. \nSupports 2D and 3D images.",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "namespace": "GUI classes.",
+            "file": "src/image/image.js",
+            "line": 45,
+            "params": [
+                {
+                    "name": "columnSpacing",
+                    "description": "The column spacing (number)."
+                },
+                {
+                    "name": "rowSpacing",
+                    "description": "The row spacing (number)."
+                },
+                {
+                    "name": "sliceSpacing",
+                    "description": "The slice spacing (number)."
+                }
+            ]
+        },
+        "GUI classes..Image class.": {
+            "name": "GUI classes..Image class.",
+            "shortname": "Image class.",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "namespace": "GUI classes.",
+            "file": "src/image/image.js",
+            "line": 69,
+            "params": [
+                {
+                    "name": "size",
+                    "description": "The sizes of the image."
+                },
+                {
+                    "name": "spacing",
+                    "description": "The spacings of the image."
+                },
+                {
+                    "name": "_buffer",
+                    "description": "The image data.\nUsable once created, optional are:\n- rescale slope and intercept (default 1:0), \n- photometric interpretation (default MONOCHROME2),\n- planar configuration (default RGBRGB...)."
+                }
+            ]
+        },
+        "GUI classes..Rescale LUT class.": {
+            "name": "GUI classes..Rescale LUT class.",
+            "shortname": "Rescale LUT class.",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "namespace": "GUI classes.",
+            "file": "src/image/luts.js",
+            "line": 8,
+            "return": {
+                "description": "",
+                "type": "Rescale"
+            }
+        },
+        "GUI classes..Window LUT class.": {
+            "name": "GUI classes..Window LUT class.",
+            "shortname": "Window LUT class.",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "namespace": "GUI classes.",
+            "file": "src/image/luts.js",
+            "line": 39,
+            "return": {
+                "description": "",
+                "type": "Window"
+            }
+        },
+        "GUI classes..View class.": {
+            "name": "GUI classes..View class.",
+            "shortname": "View class.",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "namespace": "GUI classes.",
+            "file": "src/image/view.js",
+            "line": 6,
+            "params": [
+                {
+                    "name": "image",
+                    "description": "The associated image.\nNeed to set the window lookup table once created\n(either directly or with helper methods)."
+                }
+            ]
+        },
+        "GUI classes..Circular Bucket Queue.\n\nReturns input'd points in sorted order. All operations run in roughly O(1)\ntime (for input with small cost values), but it has a strict requirement:\n\nIf the most recent point had a cost of c, any points added should have a cost\nc' in the range c <= c' <= c + (capacity - 1).": {
+            "name": "GUI classes..Circular Bucket Queue.\n\nReturns input'd points in sorted order. All operations run in roughly O(1)\ntime (for input with small cost values), but it has a strict requirement:\n\nIf the most recent point had a cost of c, any points added should have a cost\nc' in the range c <= c' <= c + (capacity - 1).",
+            "shortname": "Circular Bucket Queue.\n\nReturns input'd points in sorted order. All operations run in roughly O(1)\ntime (for input with small cost values), but it has a strict requirement:\n\nIf the most recent point had a cost of c, any points added should have a cost\nc' in the range c <= c' <= c + (capacity - 1).",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "namespace": "GUI classes.",
+            "file": "src/math/bucketQueue.js",
+            "line": 6,
+            "input": "cost_functor"
+        },
+        "GUI classes..Scissors.\n\nRef: Eric N. Mortensen, William A. Barrett, Interactive Segmentation with\n  Intelligent Scissors, Graphical Models and Image Processing, Volume 60,\n  Issue 5, September 1998, Pages 349-384, ISSN 1077-3169,\n  DOI: 10.1006/gmip.1998.0480.\n\n(http://www.sciencedirect.com/science/article/B6WG4-45JB8WN-9/2/6fe59d8089fd1892c2bfb82283065579)\n\nHighly inspired from http://code.google.com/p/livewire-javascript/": {
+            "name": "GUI classes..Scissors.\n\nRef: Eric N. Mortensen, William A. Barrett, Interactive Segmentation with\n  Intelligent Scissors, Graphical Models and Image Processing, Volume 60,\n  Issue 5, September 1998, Pages 349-384, ISSN 1077-3169,\n  DOI: 10.1006/gmip.1998.0480.\n\n(http://www.sciencedirect.com/science/article/B6WG4-45JB8WN-9/2/6fe59d8089fd1892c2bfb82283065579)\n\nHighly inspired from http://code.google.com/p/livewire-javascript/",
+            "shortname": "Scissors.\n\nRef: Eric N. Mortensen, William A. Barrett, Interactive Segmentation with\n  Intelligent Scissors, Graphical Models and Image Processing, Volume 60,\n  Issue 5, September 1998, Pages 349-384, ISSN 1077-3169,\n  DOI: 10.1006/gmip.1998.0480.\n\n(http://www.sciencedirect.com/science/article/B6WG4-45JB8WN-9/2/6fe59d8089fd1892c2bfb82283065579)\n\nHighly inspired from http://code.google.com/p/livewire-javascript/",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "namespace": "GUI classes.",
+            "file": "src/math/scissors.js",
+            "line": 276
+        },
+        "GUI classes..2D point. Immutable.": {
+            "name": "GUI classes..2D point. Immutable.",
+            "shortname": "2D point. Immutable.",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "namespace": "GUI classes.",
+            "file": "src/math/shapes.js",
+            "line": 11,
+            "params": [
+                {
+                    "name": "x",
+                    "description": "The X coordinate for the point."
+                },
+                {
+                    "name": "y",
+                    "description": "The Y coordinate for the point."
+                }
+            ]
+        },
+        "GUI classes..Fast 2D point since it's mutable!": {
+            "name": "GUI classes..Fast 2D point since it's mutable!",
+            "shortname": "Fast 2D point since it's mutable!",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "namespace": "GUI classes.",
+            "file": "src/math/shapes.js",
+            "line": 44,
+            "params": [
+                {
+                    "name": "x",
+                    "description": "The X coordinate for the point."
+                },
+                {
+                    "name": "y",
+                    "description": "The Y coordinate for the point."
+                }
+            ]
+        },
+        "GUI classes..Circle shape.": {
+            "name": "GUI classes..Circle shape.",
+            "shortname": "Circle shape.",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "namespace": "GUI classes.",
+            "file": "src/math/shapes.js",
+            "line": 75,
+            "params": [
+                {
+                    "name": "centre",
+                    "description": "A Point2D representing the centre of the circle."
+                },
+                {
+                    "name": "radius",
+                    "description": "The radius of the circle."
+                }
+            ]
+        },
+        "GUI classes..Line shape.": {
+            "name": "GUI classes..Line shape.",
+            "shortname": "Line shape.",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "namespace": "GUI classes.",
+            "file": "src/math/shapes.js",
+            "line": 98,
+            "params": [
+                {
+                    "name": "begin",
+                    "description": "A Point2D representing the beginning of the line."
+                },
+                {
+                    "name": "end",
+                    "description": "A Point2D representing the end of the line."
+                }
+            ]
+        },
+        "GUI classes..Rectangle shape.": {
+            "name": "GUI classes..Rectangle shape.",
+            "shortname": "Rectangle shape.",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "namespace": "GUI classes.",
+            "file": "src/math/shapes.js",
+            "line": 132,
+            "params": [
+                {
+                    "name": "begin",
+                    "description": "A Point2D representing the beginning of the rectangle."
+                },
+                {
+                    "name": "end",
+                    "description": "A Point2D representing the end of the rectangle."
+                }
+            ]
+        },
+        "GUI classes..Region Of Interest shape.\nNote: should be a closed path.": {
+            "name": "GUI classes..Region Of Interest shape.\nNote: should be a closed path.",
+            "shortname": "Region Of Interest shape.\nNote: should be a closed path.",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "namespace": "GUI classes.",
+            "file": "src/math/shapes.js",
+            "line": 163
+        },
+        "GUI classes..Path shape.": {
+            "name": "GUI classes..Path shape.",
+            "shortname": "Path shape.",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "namespace": "GUI classes.",
+            "file": "src/math/shapes.js",
+            "line": 192,
+            "params": [
+                {
+                    "name": "points",
+                    "description": "The list of Point2D that make the path (optional)."
+                },
+                {
+                    "name": "points",
+                    "description": "The list of control point of path, as indexes (optional).\nNote: first and last point do not need to be equal."
+                }
+            ]
+        },
+        "GUI classes..Draw circle command.": {
+            "name": "GUI classes..Draw circle command.",
+            "shortname": "Draw circle command.",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "namespace": "GUI classes.",
+            "file": "src/tools/circle.js",
+            "line": 6,
+            "params": [
+                {
+                    "name": "points",
+                    "description": "The points from which to extract the circle."
+                },
+                {
+                    "name": "app",
+                    "description": "The application to draw the circle on."
+                },
+                {
+                    "name": "style",
+                    "description": "The drawing style."
+                }
+            ]
+        },
+        "GUI classes..Drawing tool.": {
+            "name": "GUI classes..Drawing tool.",
+            "shortname": "Drawing tool.",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "namespace": "GUI classes.",
+            "file": "src/tools/draw.js",
+            "line": 14
+        },
+        "Filter classes..Filter tool.": {
+            "name": "Filter classes..Filter tool.",
+            "shortname": "Filter tool.",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "namespace": "Filter classes.",
+            "file": "src/tools/filter.js",
+            "line": 9
+        },
+        "Filter classes..Threshold filter tool.": {
+            "name": "Filter classes..Threshold filter tool.",
+            "shortname": "Threshold filter tool.",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "namespace": "Filter classes.",
+            "file": "src/tools/filter.js",
+            "line": 76
+        },
+        "Filter classes..Sharpen filter tool.": {
+            "name": "Filter classes..Sharpen filter tool.",
+            "shortname": "Sharpen filter tool.",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "namespace": "Filter classes.",
+            "file": "src/tools/filter.js",
+            "line": 105
+        },
+        "Filter classes..Sobel filter tool.": {
+            "name": "Filter classes..Sobel filter tool.",
+            "shortname": "Sobel filter tool.",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "namespace": "Filter classes.",
+            "file": "src/tools/filter.js",
+            "line": 132
+        },
+        "Filter classes..Run filter command.": {
+            "name": "Filter classes..Run filter command.",
+            "shortname": "Run filter command.",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "namespace": "Filter classes.",
+            "file": "src/tools/filter.js",
+            "line": 164,
+            "params": [
+                {
+                    "name": "filter",
+                    "description": "The filter to run."
+                },
+                {
+                    "name": "app",
+                    "description": "The application to draw the line on."
+                }
+            ]
+        },
+        "Filter classes..Draw line command.": {
+            "name": "Filter classes..Draw line command.",
+            "shortname": "Draw line command.",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "namespace": "Filter classes.",
+            "file": "src/tools/line.js",
+            "line": 6,
+            "params": [
+                {
+                    "name": "points",
+                    "description": "The points from which to extract the line."
+                },
+                {
+                    "name": "app",
+                    "description": "The application to draw the line on."
+                },
+                {
+                    "name": "style",
+                    "description": "The drawing style."
+                }
+            ]
+        },
+        "Filter classes..Livewire painting tool.": {
+            "name": "Filter classes..Livewire painting tool.",
+            "shortname": "Livewire painting tool.",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "namespace": "Filter classes.",
+            "file": "src/tools/livewire.js",
+            "line": 6
+        },
+        "Filter classes..Draw livewire command.": {
+            "name": "Filter classes..Draw livewire command.",
+            "shortname": "Draw livewire command.",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "namespace": "Filter classes.",
+            "file": "src/tools/livewire.js",
+            "line": 178,
+            "params": [
+                {
+                    "name": "livewire",
+                    "description": "The livewire to draw."
+                },
+                {
+                    "name": "app",
+                    "description": "The application to draw the livewire on."
+                }
+            ]
+        },
+        "Filter classes..Draw rectangle command.": {
+            "name": "Filter classes..Draw rectangle command.",
+            "shortname": "Draw rectangle command.",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "namespace": "Filter classes.",
+            "file": "src/tools/rectangle.js",
+            "line": 6,
+            "params": [
+                {
+                    "name": "points",
+                    "description": "The points from which to extract the circle."
+                },
+                {
+                    "name": "app",
+                    "description": "The application to draw the line on."
+                },
+                {
+                    "name": "style",
+                    "description": "The drawing style."
+                }
+            ]
+        },
+        "Filter classes..Draw ROI command.": {
+            "name": "Filter classes..Draw ROI command.",
+            "shortname": "Draw ROI command.",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "namespace": "Filter classes.",
+            "file": "src/tools/roi.js",
+            "line": 6,
+            "params": [
+                {
+                    "name": "points",
+                    "description": "The points from which to extract the line."
+                },
+                {
+                    "name": "app",
+                    "description": "The application to draw the line on."
+                },
+                {
+                    "name": "style",
+                    "description": "The drawing style."
+                }
+            ]
+        },
+        "Filter classes..Tool box.": {
+            "name": "Filter classes..Tool box.",
+            "shortname": "Tool box.",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "namespace": "Filter classes.",
+            "file": "src/tools/toolbox.js",
+            "line": 9
+        },
+        "Filter classes..UndoStack class.": {
+            "name": "Filter classes..UndoStack class.",
+            "shortname": "UndoStack class.",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "namespace": "Filter classes.",
+            "file": "src/tools/undo.js",
+            "line": 6,
+            "params": [
+                {
+                    "name": "app",
+                    "description": ""
+                }
+            ]
+        },
+        "Filter classes..WindowLevel tool: handle window/level related events.": {
+            "name": "Filter classes..WindowLevel tool: handle window/level related events.",
+            "shortname": "WindowLevel tool: handle window/level related events.",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "namespace": "Filter classes.",
+            "file": "src/tools/windowLevel.js",
+            "line": 53
+        },
+        "Filter classes..Zoom class.": {
+            "name": "Filter classes..Zoom class.",
+            "shortname": "Zoom class.",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "namespace": "Filter classes.",
+            "file": "src/tools/zoom.js",
+            "line": 17
+        },
+        "Filter classes..App\nMain application.": {
+            "name": "Filter classes..App\nMain application.",
+            "shortname": "App\nMain application.",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "namespace": "Filter classes.",
+            "file": "src/application.js",
+            "line": 4
+        }
+    },
+    "classitems": [
+        {
+            "file": "src/dicom/dicomParser.js",
+            "line": 95,
+            "description": "Get the DICOM data pixel buffer.",
+            "return": {
+                "description": "The pixel buffer (as an array)."
+            },
+            "class": "DicomParser class."
+        },
+        {
+            "file": "src/dicom/dicomParser.js",
+            "line": 104,
+            "description": "Append a DICOM element to the dicomElements member object.\nAllows for easy retrieval of DICOM tag values from the tag name.\nIf tags have same name (for the 'unknown' and private tags cases), a number is appended\nmaking the name unique.",
+            "params": [
+                {
+                    "name": "element",
+                    "description": "The element to add."
+                }
+            ],
+            "class": "DicomParser class."
+        },
+        {
+            "file": "src/dicom/dicomParser.js",
+            "line": 132,
+            "description": "Read a DICOM tag.",
+            "params": [
+                {
+                    "name": "reader",
+                    "description": "The raw data reader."
+                },
+                {
+                    "name": "offset",
+                    "description": "The offset where to start to read."
+                }
+            ],
+            "return": {
+                "description": "An object containing the tags 'group', 'element' and 'name'."
+            },
+            "class": "DicomParser class."
+        },
+        {
+            "file": "src/dicom/dicomParser.js",
+            "line": 155,
+            "description": "Read a DICOM data element.",
+            "params": [
+                {
+                    "name": "reader",
+                    "description": "The raw data reader."
+                },
+                {
+                    "name": "offset",
+                    "description": "The offset where to start to read."
+                },
+                {
+                    "name": "implicit",
+                    "description": "Is the DICOM VR implicit?"
+                }
+            ],
+            "return": {
+                "description": "An object containing the element 'tag', 'vl', 'vr', 'data' and 'offset'."
+            },
+            "class": "DicomParser class."
+        },
+        {
+            "file": "src/dicom/dicomParser.js",
+            "line": 247,
+            "description": "Parse the complete DICOM file (given as input to the class).\nFills in the member object 'dicomElements'.",
+            "params": [
+                {
+                    "name": "buffer",
+                    "description": "The input array buffer."
+                }
+            ],
+            "class": "DicomParser class."
+        },
+        {
+            "file": "src/dicom/dicomParser.js",
+            "line": 420,
+            "description": "Get an Image object from the read DICOM file.",
+            "return": {
+                "description": "A new Image."
+            },
+            "class": "DicomParser class."
+        },
+        {
+            "file": "src/html/gui.js",
+            "line": 157,
+            "itemtype": "method",
+            "name": "Append the color chooser to the HTML document in the 'colourChooser' node.",
+            "class": "GUI classes..Window layer."
+        },
+        {
+            "file": "src/html/gui.js",
+            "line": 183,
+            "itemtype": "method",
+            "name": "Remove the color chooser specific node.",
+            "class": "GUI classes..Window layer."
+        },
+        {
+            "file": "src/html/gui.js",
+            "line": 219,
+            "class": "GUI classes..Window layer.",
+            "namespace": "GUI classes."
+        },
+        {
+            "file": "src/html/gui.js",
+            "line": 224,
+            "itemtype": "method",
+            "name": "Threshold Filter User Interface.",
+            "class": "GUI classes..Window layer.",
+            "namespace": "GUI classes."
+        },
+        {
+            "file": "src/html/gui.js",
+            "line": 247,
+            "itemtype": "method",
+            "name": "Sharpen Filter User Interface.",
+            "class": "GUI classes..Window layer.",
+            "namespace": "GUI classes."
+        },
+        {
+            "file": "src/html/gui.js",
+            "line": 275,
+            "itemtype": "method",
+            "name": "Sobel Filter User Interface.",
+            "class": "GUI classes..Window layer.",
+            "namespace": "GUI classes."
+        },
+        {
+            "file": "src/html/gui_mobile.js",
+            "line": 6,
+            "itemtype": "method",
+            "name": "Get a slider.",
+            "class": "GUI classes..Window layer.",
+            "namespace": "GUI classes."
+        },
+        {
+            "file": "src/html/gui_mobile.js",
+            "line": 45,
+            "itemtype": "method",
+            "name": "Update the progress bar.",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "A ProgressEvent."
+                }
+            ],
+            "class": "GUI classes..Window layer.",
+            "namespace": "GUI classes."
+        },
+        {
+            "file": "src/html/gui_ui.js",
+            "line": 6,
+            "itemtype": "method",
+            "name": "Get a slider.",
+            "class": "GUI classes..Window layer.",
+            "namespace": "GUI classes."
+        },
+        {
+            "file": "src/html/gui_ui.js",
+            "line": 26,
+            "itemtype": "method",
+            "name": "Update the progress bar.",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "A ProgressEvent."
+                }
+            ],
+            "class": "GUI classes..Window layer.",
+            "namespace": "GUI classes."
+        },
+        {
+            "file": "src/html/html.js",
+            "line": 6,
+            "itemtype": "method",
+            "name": "Append a cell to a given row.",
+            "params": [
+                {
+                    "name": "row",
+                    "description": "The row to append the cell to."
+                },
+                {
+                    "name": "text",
+                    "description": "The text of the cell."
+                }
+            ],
+            "class": "GUI classes..Window layer.",
+            "namespace": "GUI classes."
+        },
+        {
+            "file": "src/html/html.js",
+            "line": 17,
+            "itemtype": "method",
+            "name": "Append a header cell to a given row.",
+            "params": [
+                {
+                    "name": "row",
+                    "description": "The row to append the header cell to."
+                },
+                {
+                    "name": "text",
+                    "description": "The text of the header cell."
+                }
+            ],
+            "class": "GUI classes..Window layer.",
+            "namespace": "GUI classes."
+        },
+        {
+            "file": "src/html/html.js",
+            "line": 31,
+            "itemtype": "method",
+            "name": "",
+            "class": "GUI classes..Window layer.",
+            "namespace": "GUI classes."
+        },
+        {
+            "file": "src/html/html.js",
+            "line": 57,
+            "itemtype": "method",
+            "name": "",
+            "class": "GUI classes..Window layer.",
+            "namespace": "GUI classes."
+        },
+        {
+            "file": "src/html/html.js",
+            "line": 99,
+            "itemtype": "method",
+            "name": "",
+            "class": "GUI classes..Window layer.",
+            "namespace": "GUI classes."
+        },
+        {
+            "file": "src/html/html.js",
+            "line": 117,
+            "itemtype": "method",
+            "name": "Converts the input to an HTML table.",
+            "input": "input Allowed types are: array, array of object, object.",
+            "warning": "Null is interpreted differently in browsers, firefox will not display it.",
+            "class": "GUI classes..Window layer.",
+            "namespace": "GUI classes."
+        },
+        {
+            "file": "src/html/html.js",
+            "line": 129,
+            "itemtype": "method",
+            "name": "",
+            "class": "GUI classes..Window layer.",
+            "namespace": "GUI classes."
+        },
+        {
+            "file": "src/html/html.js",
+            "line": 145,
+            "itemtype": "method",
+            "name": "",
+            "params": [
+                {
+                    "name": "term",
+                    "description": ""
+                },
+                {
+                    "name": "table",
+                    "description": ""
+                }
+            ],
+            "class": "GUI classes..Window layer.",
+            "namespace": "GUI classes."
+        },
+        {
+            "file": "src/html/html.js",
+            "line": 175,
+            "itemtype": "method",
+            "name": "Transform back each\n<span>preText <span class=\"highlighted\">term</span> postText</span>\ninto its original preText term postText",
+            "params": [
+                {
+                    "name": "container",
+                    "description": "The container to de-highlight."
+                }
+            ],
+            "class": "GUI classes..Window layer.",
+            "namespace": "GUI classes."
+        },
+        {
+            "file": "src/html/html.js",
+            "line": 201,
+            "itemtype": "method",
+            "name": "Create a\n<span>preText <span class=\"highlighted\">term</span> postText</span>\naround each search term",
+            "params": [
+                {
+                    "name": "term",
+                    "description": "The term to highlight."
+                },
+                {
+                    "name": "container",
+                    "description": "The container where to highlight the term."
+                }
+            ],
+            "class": "GUI classes..Window layer.",
+            "namespace": "GUI classes."
+        },
+        {
+            "file": "src/html/html.js",
+            "line": 243,
+            "itemtype": "method",
+            "name": "",
+            "class": "GUI classes..Window layer.",
+            "namespace": "GUI classes."
+        },
+        {
+            "file": "src/html/html.js",
+            "line": 254,
+            "itemtype": "method",
+            "name": "Remove all children of a node.",
+            "params": [
+                {
+                    "name": "nodeId",
+                    "description": "The id of the node to delete."
+                },
+                {
+                    "name": "parentId",
+                    "description": "The id of the parent of the node to delete."
+                }
+            ],
+            "class": "GUI classes..Window layer.",
+            "namespace": "GUI classes."
+        },
+        {
+            "file": "src/html/html.js",
+            "line": 266,
+            "itemtype": "method",
+            "name": "Remove all children of a node and then remove it from its parent.",
+            "params": [
+                {
+                    "name": "nodeId",
+                    "description": "The id of the node to delete."
+                },
+                {
+                    "name": "parentId",
+                    "description": "The id of the parent of the node to delete."
+                }
+            ],
+            "class": "GUI classes..Window layer.",
+            "namespace": "GUI classes."
+        },
+        {
+            "file": "src/html/html.js",
+            "line": 283,
+            "itemtype": "method",
+            "name": "Create a HTML select from an input array of options.\nThe values of the options are the name of the option made lower case.\nIt is left to the user to set the 'onchange' method of the select.",
+            "params": [
+                {
+                    "name": "name",
+                    "description": "The name of the HTML select."
+                },
+                {
+                    "name": "list",
+                    "description": "The list of options of the HTML select."
+                }
+            ],
+            "return": {
+                "description": "The created HTML select."
+            },
+            "class": "GUI classes..Window layer.",
+            "namespace": "GUI classes."
+        },
+        {
+            "file": "src/html/html.js",
+            "line": 408,
+            "description": "Browser checks to see if it can run dwv...\nTODO Maybe use http://modernizr.com/.",
+            "class": "GUI classes..Window layer.",
+            "namespace": "GUI classes."
+        },
+        {
+            "file": "src/html/layer.js",
+            "line": 101,
+            "description": "Reset the layout",
+            "class": "GUI classes..Window layer.",
+            "namespace": "GUI classes."
+        },
+        {
+            "file": "src/html/layer.js",
+            "line": 112,
+            "description": "Draw the content (imageData) of the layer.\nThe imageData variable needs to be set",
+            "class": "GUI classes..Window layer.",
+            "namespace": "GUI classes."
+        },
+        {
+            "file": "src/html/layer.js",
+            "line": 135,
+            "description": "Initialise the layer: set the canvas and context",
+            "input": "height The height of the canvas.",
+            "class": "GUI classes..Window layer.",
+            "namespace": "GUI classes."
+        },
+        {
+            "file": "src/html/layer.js",
+            "line": 170,
+            "description": "Fill the full context with the current style.",
+            "class": "GUI classes..Window layer.",
+            "namespace": "GUI classes."
+        },
+        {
+            "file": "src/html/layer.js",
+            "line": 178,
+            "description": "Clear the full context.",
+            "class": "GUI classes..Window layer.",
+            "namespace": "GUI classes."
+        },
+        {
+            "file": "src/html/layer.js",
+            "line": 186,
+            "description": "Merge two layers.",
+            "input": "layerToMerge The layer to merge. It will also be emptied.",
+            "class": "GUI classes..Window layer.",
+            "namespace": "GUI classes."
+        },
+        {
+            "file": "src/html/layer.js",
+            "line": 202,
+            "description": "Set the fill and stroke style of the context.",
+            "class": "GUI classes..Window layer.",
+            "namespace": "GUI classes."
+        },
+        {
+            "file": "src/html/layer.js",
+            "line": 211,
+            "description": "Display the layer.",
+            "class": "GUI classes..Window layer.",
+            "namespace": "GUI classes."
+        },
+        {
+            "file": "src/html/layer.js",
+            "line": 232,
+            "description": "Align on another layer.",
+            "class": "GUI classes..Window layer.",
+            "namespace": "GUI classes."
+        },
+        {
+            "file": "src/image/filter.js",
+            "line": 8,
+            "itemtype": "method",
+            "name": "Threshold an image between an input minimum and maximum.",
+            "params": [
+                {
+                    "name": "min",
+                    "description": "The new minimum."
+                },
+                {
+                    "name": "max",
+                    "description": "The new maximum."
+                }
+            ],
+            "class": "GUI classes..Image Size class. \nSupports 2D and 3D images.",
+            "namespace": "GUI classes."
+        },
+        {
+            "file": "src/image/filter.js",
+            "line": 40,
+            "itemtype": "method",
+            "name": "Sharpen an image using a sharpen convolution matrix.",
+            "class": "GUI classes..Image Size class. \nSupports 2D and 3D images.",
+            "namespace": "GUI classes."
+        },
+        {
+            "file": "src/image/filter.js",
+            "line": 57,
+            "itemtype": "method",
+            "name": "Apply a Sobel filter to an image.",
+            "class": "GUI classes..Image Size class. \nSupports 2D and 3D images.",
+            "namespace": "GUI classes."
+        },
+        {
+            "file": "src/image/image.js",
+            "line": 238,
+            "description": "Get the value of the image at a specific coordinate.",
+            "params": [
+                {
+                    "name": "i",
+                    "description": "The X index."
+                },
+                {
+                    "name": "j",
+                    "description": "The Y index."
+                },
+                {
+                    "name": "k",
+                    "description": "The Z index."
+                }
+            ],
+            "return": {
+                "description": "The value at the desired position.\nWarning: No size check..."
+            },
+            "class": "GUI classes..Image class.",
+            "namespace": "GUI classes."
+        },
+        {
+            "file": "src/image/image.js",
+            "line": 253,
+            "description": "Get the value of the image at a specific offset.",
+            "params": [
+                {
+                    "name": "offset",
+                    "description": "The offset in the buffer."
+                }
+            ],
+            "return": {
+                "description": "The value at the desired offset.\nWarning: No size check..."
+            },
+            "class": "GUI classes..Image class.",
+            "namespace": "GUI classes."
+        },
+        {
+            "file": "src/image/image.js",
+            "line": 264,
+            "description": "Get the value of the image at a specific coordinate.",
+            "params": [
+                {
+                    "name": "i",
+                    "description": "The X index."
+                },
+                {
+                    "name": "j",
+                    "description": "The Y index."
+                },
+                {
+                    "name": "k",
+                    "description": "The Z index."
+                }
+            ],
+            "return": {
+                "description": "The value at the desired position.\nWarning: No size check..."
+            },
+            "class": "GUI classes..Image class.",
+            "namespace": "GUI classes."
+        },
+        {
+            "file": "src/image/image.js",
+            "line": 277,
+            "description": "Calculate the raw image data range.",
+            "return": {
+                "description": "The range .",
+                "type": "Min, max"
+            },
+            "class": "GUI classes..Image class.",
+            "namespace": "GUI classes."
+        },
+        {
+            "file": "src/image/image.js",
+            "line": 295,
+            "description": "Calculate the image data range after rescale.",
+            "return": {
+                "description": "The range .",
+                "type": "Min, max"
+            },
+            "class": "GUI classes..Image class.",
+            "namespace": "GUI classes."
+        },
+        {
+            "file": "src/image/image.js",
+            "line": 306,
+            "description": "Calculate the histogram of the image.",
+            "return": {
+                "description": "An array representing the histogram."
+            },
+            "class": "GUI classes..Image class.",
+            "namespace": "GUI classes."
+        },
+        {
+            "file": "src/image/image.js",
+            "line": 333,
+            "description": "Convolute the image with a given 2D kernel.",
+            "params": [
+                {
+                    "name": "weights",
+                    "description": "The weights of the 2D kernel."
+                }
+            ],
+            "return": {
+                "description": "The convoluted image.\n\nNote: Uses the raw buffer values."
+            },
+            "class": "GUI classes..Image class.",
+            "namespace": "GUI classes."
+        },
+        {
+            "file": "src/image/image.js",
+            "line": 386,
+            "description": "Transform an image using a specific operator.",
+            "params": [
+                {
+                    "name": "operator",
+                    "description": "The operator to use when transforming."
+                }
+            ],
+            "return": {
+                "description": "The transformed image.\n\nNote: Uses the raw buffer values."
+            },
+            "class": "GUI classes..Image class.",
+            "namespace": "GUI classes."
+        },
+        {
+            "file": "src/image/image.js",
+            "line": 404,
+            "description": "Compose this image with another one and using a specific operator.",
+            "params": [
+                {
+                    "name": "rhs",
+                    "description": "The image to compose with."
+                },
+                {
+                    "name": "operator",
+                    "description": "The operator to use when composing."
+                }
+            ],
+            "return": {
+                "description": "The composed image.\n\nNote: Uses the raw buffer values."
+            },
+            "class": "GUI classes..Image class.",
+            "namespace": "GUI classes."
+        },
+        {
+            "file": "src/image/luts.js",
+            "line": 95,
+            "description": "Lookup tables for image color display.",
+            "class": "GUI classes..Window LUT class.",
+            "namespace": "GUI classes."
+        },
+        {
+            "file": "src/image/reader.js",
+            "line": 6,
+            "description": "Get data from an input image using a canvas.",
+            "params": [
+                {
+                    "name": "image",
+                    "description": "The image."
+                },
+                {
+                    "name": "file",
+                    "description": "The corresponding file."
+                }
+            ],
+            "class": "GUI classes..View class.",
+            "namespace": "GUI classes."
+        },
+        {
+            "file": "src/image/reader.js",
+            "line": 55,
+            "description": "Get data from an input buffer using a DICOM parser.",
+            "params": [
+                {
+                    "name": "buffer",
+                    "description": "The input data buffer."
+                }
+            ],
+            "class": "GUI classes..View class.",
+            "namespace": "GUI classes."
+        },
+        {
+            "file": "src/image/view.js",
+            "line": 86,
+            "description": "Set the view window/level.",
+            "params": [
+                {
+                    "name": "center",
+                    "description": "The window center."
+                },
+                {
+                    "name": "width",
+                    "description": "The window width."
+                }
+            ],
+            "warning": "Uses the latest set rescale LUT or the default linear one.",
+            "class": "GUI classes..View class.",
+            "namespace": "GUI classes."
+        },
+        {
+            "file": "src/image/view.js",
+            "line": 98,
+            "description": "Set the image window/level to cover the full data range.",
+            "warning": "Uses the latest set rescale LUT or the default linear one.",
+            "class": "GUI classes..View class.",
+            "namespace": "GUI classes."
+        },
+        {
+            "file": "src/image/view.js",
+            "line": 114,
+            "description": "Increment the current slice number.\nReturns false if not in bounds.",
+            "class": "GUI classes..View class.",
+            "namespace": "GUI classes."
+        },
+        {
+            "file": "src/image/view.js",
+            "line": 126,
+            "description": "Decrement the current slice number.\nReturns false if not in bounds.",
+            "class": "GUI classes..View class.",
+            "namespace": "GUI classes."
+        },
+        {
+            "file": "src/image/view.js",
+            "line": 138,
+            "description": "Clone the image using all meta data and the original data buffer.",
+            "return": {
+                "description": "A full copy of this .",
+                "type": "dwv.image.Image"
+            },
+            "class": "GUI classes..View class.",
+            "namespace": "GUI classes."
+        },
+        {
+            "file": "src/image/view.js",
+            "line": 151,
+            "description": "Generate display image data to be given to a canvas.",
+            "params": [
+                {
+                    "name": "array",
+                    "description": "The array to fill in."
+                },
+                {
+                    "name": "sliceNumber",
+                    "description": "The slice position."
+                }
+            ],
+            "class": "GUI classes..View class.",
+            "namespace": "GUI classes."
+        },
+        {
+            "file": "src/image/view.js",
+            "line": 235,
+            "description": "Add an event listener on the view.",
+            "params": [
+                {
+                    "name": "type",
+                    "description": "The event type."
+                },
+                {
+                    "name": "listener",
+                    "description": "The method associated with the provided event type."
+                }
+            ],
+            "class": "GUI classes..View class.",
+            "namespace": "GUI classes."
+        },
+        {
+            "file": "src/image/view.js",
+            "line": 247,
+            "description": "Remove an event listener on the view.",
+            "params": [
+                {
+                    "name": "type",
+                    "description": "The event type."
+                },
+                {
+                    "name": "listener",
+                    "description": "The method associated with the provided event type."
+                }
+            ],
+            "class": "GUI classes..View class.",
+            "namespace": "GUI classes."
+        },
+        {
+            "file": "src/image/view.js",
+            "line": 263,
+            "description": "Fire an event: call all associated listeners.",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The event to fire."
+                }
+            ],
+            "class": "GUI classes..View class.",
+            "namespace": "GUI classes."
+        },
+        {
+            "file": "src/math/scissors.js",
+            "line": 9,
+            "class": "GUI classes..Scissors.\n\nRef: Eric N. Mortensen, William A. Barrett, Interactive Segmentation with\n  Intelligent Scissors, Graphical Models and Image Processing, Volume 60,\n  Issue 5, September 1998, Pages 349-384, ISSN 1077-3169,\n  DOI: 10.1006/gmip.1998.0480.\n\n(http://www.sciencedirect.com/science/article/B6WG4-45JB8WN-9/2/6fe59d8089fd1892c2bfb82283065579)\n\nHighly inspired from http://code.google.com/p/livewire-javascript/",
+            "namespace": "GUI classes."
+        },
+        {
+            "file": "src/math/scissors.js",
+            "line": 65,
+            "class": "GUI classes..Scissors.\n\nRef: Eric N. Mortensen, William A. Barrett, Interactive Segmentation with\n  Intelligent Scissors, Graphical Models and Image Processing, Volume 60,\n  Issue 5, September 1998, Pages 349-384, ISSN 1077-3169,\n  DOI: 10.1006/gmip.1998.0480.\n\n(http://www.sciencedirect.com/science/article/B6WG4-45JB8WN-9/2/6fe59d8089fd1892c2bfb82283065579)\n\nHighly inspired from http://code.google.com/p/livewire-javascript/",
+            "namespace": "GUI classes."
+        },
+        {
+            "file": "src/math/scissors.js",
+            "line": 105,
+            "class": "GUI classes..Scissors.\n\nRef: Eric N. Mortensen, William A. Barrett, Interactive Segmentation with\n  Intelligent Scissors, Graphical Models and Image Processing, Volume 60,\n  Issue 5, September 1998, Pages 349-384, ISSN 1077-3169,\n  DOI: 10.1006/gmip.1998.0480.\n\n(http://www.sciencedirect.com/science/article/B6WG4-45JB8WN-9/2/6fe59d8089fd1892c2bfb82283065579)\n\nHighly inspired from http://code.google.com/p/livewire-javascript/",
+            "namespace": "GUI classes."
+        },
+        {
+            "file": "src/math/shapes.js",
+            "line": 6,
+            "description": "shapes.js\nDefinition of basic shapes.",
+            "class": "GUI classes..2D point. Immutable.",
+            "namespace": "GUI classes."
+        },
+        {
+            "file": "src/math/shapes.js",
+            "line": 24,
+            "description": "Check for Point2D equality.",
+            "params": [
+                {
+                    "name": "other",
+                    "description": "The other Point2D to compare to."
+                }
+            ],
+            "return": {
+                "description": "True if both points are equal."
+            },
+            "class": "GUI classes..2D point. Immutable.",
+            "namespace": "GUI classes."
+        },
+        {
+            "file": "src/math/shapes.js",
+            "line": 36,
+            "description": "Get a string representation of the Point2D.",
+            "return": {
+                "description": "The Point2D as string."
+            },
+            "class": "GUI classes..2D point. Immutable.",
+            "namespace": "GUI classes."
+        },
+        {
+            "file": "src/math/shapes.js",
+            "line": 55,
+            "description": "Check for FastPoint2D equality.",
+            "params": [
+                {
+                    "name": "other",
+                    "description": "The other FastPoint2D to compare to."
+                }
+            ],
+            "return": {
+                "description": "True if both points are equal."
+            },
+            "class": "GUI classes..Fast 2D point since it's mutable!",
+            "namespace": "GUI classes."
+        },
+        {
+            "file": "src/math/shapes.js",
+            "line": 67,
+            "description": "Get a string representation of the FastPoint2D.",
+            "return": {
+                "description": "The Point2D as string."
+            },
+            "class": "GUI classes..Fast 2D point since it's mutable!",
+            "namespace": "GUI classes."
+        },
+        {
+            "file": "src/math/shapes.js",
+            "line": 172,
+            "description": "Get a point of the list.",
+            "params": [
+                {
+                    "name": "index",
+                    "description": "The index of the point to get (beware, no size check)."
+                }
+            ],
+            "return": {
+                "description": "The Point2D at the given index."
+            },
+            "class": "GUI classes..Region Of Interest shape.\nNote: should be a closed path.",
+            "namespace": "GUI classes."
+        },
+        {
+            "file": "src/math/shapes.js",
+            "line": 180,
+            "description": "Add a point to the ROI.",
+            "params": [
+                {
+                    "name": "point",
+                    "description": "The Point2D to add."
+                }
+            ],
+            "class": "GUI classes..Region Of Interest shape.\nNote: should be a closed path.",
+            "namespace": "GUI classes."
+        },
+        {
+            "file": "src/math/shapes.js",
+            "line": 185,
+            "description": "Add points to the ROI.",
+            "params": [
+                {
+                    "name": "rhs",
+                    "description": "The array of POints2D to add."
+                }
+            ],
+            "class": "GUI classes..Region Of Interest shape.\nNote: should be a closed path.",
+            "namespace": "GUI classes."
+        },
+        {
+            "file": "src/math/shapes.js",
+            "line": 206,
+            "description": "Get a point of the list.",
+            "params": [
+                {
+                    "name": "index",
+                    "description": "The index of the point to get (beware, no size check)."
+                }
+            ],
+            "return": {
+                "description": "The Point2D at the given index."
+            },
+            "class": "GUI classes..Path shape.",
+            "namespace": "GUI classes."
+        },
+        {
+            "file": "src/math/shapes.js",
+            "line": 215,
+            "description": "Is is a control point.",
+            "params": [
+                {
+                    "name": "point",
+                    "description": "The Point2D to check."
+                }
+            ],
+            "return": {
+                "description": "True if a control point."
+            },
+            "class": "GUI classes..Path shape.",
+            "namespace": "GUI classes."
+        },
+        {
+            "file": "src/math/shapes.js",
+            "line": 230,
+            "description": "Get the length of the path.",
+            "class": "GUI classes..Path shape.",
+            "namespace": "GUI classes."
+        },
+        {
+            "file": "src/math/shapes.js",
+            "line": 237,
+            "description": "Add a point to the path.",
+            "params": [
+                {
+                    "name": "point",
+                    "description": "The Point2D to add."
+                }
+            ],
+            "class": "GUI classes..Path shape.",
+            "namespace": "GUI classes."
+        },
+        {
+            "file": "src/math/shapes.js",
+            "line": 245,
+            "description": "Add a control point to the path.",
+            "params": [
+                {
+                    "name": "point",
+                    "description": "The Point2D to make a control point."
+                }
+            ],
+            "class": "GUI classes..Path shape.",
+            "namespace": "GUI classes."
+        },
+        {
+            "file": "src/math/shapes.js",
+            "line": 259,
+            "description": "Add points to the path.",
+            "params": [
+                {
+                    "name": "points",
+                    "description": "The list of Point2D to add."
+                }
+            ],
+            "class": "GUI classes..Path shape.",
+            "namespace": "GUI classes."
+        },
+        {
+            "file": "src/math/shapes.js",
+            "line": 267,
+            "description": "Append a Path to this one.",
+            "params": [
+                {
+                    "name": "other",
+                    "description": "The Path to append."
+                }
+            ],
+            "class": "GUI classes..Path shape.",
+            "namespace": "GUI classes."
+        },
+        {
+            "file": "src/tools/filter.js",
+            "line": 71,
+            "class": "Filter classes..Filter tool.",
+            "namespace": "Filter classes."
+        },
+        {
+            "file": "src/tools/info.js",
+            "line": 6,
+            "itemtype": "method",
+            "name": "Create the windowing info div.",
+            "class": "Filter classes..Draw line command.",
+            "namespace": "Filter classes."
+        },
+        {
+            "file": "src/tools/info.js",
+            "line": 28,
+            "itemtype": "method",
+            "name": "Update the Top Right info div.",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The windowing change event containing the new values.\nWarning: expects the windowing info div to exist (use after createWindowingDiv)."
+                }
+            ],
+            "class": "Filter classes..Draw line command.",
+            "namespace": "Filter classes."
+        },
+        {
+            "file": "src/tools/info.js",
+            "line": 45,
+            "itemtype": "method",
+            "name": "Create the position info div.",
+            "class": "Filter classes..Draw line command.",
+            "namespace": "Filter classes."
+        },
+        {
+            "file": "src/tools/info.js",
+            "line": 67,
+            "itemtype": "method",
+            "name": "Update the position info div.",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The position change event containing the new values.\nWarning: expects the position info div to exist (use after createPositionDiv)."
+                }
+            ],
+            "class": "Filter classes..Draw line command.",
+            "namespace": "Filter classes."
+        },
+        {
+            "file": "src/tools/info.js",
+            "line": 84,
+            "itemtype": "method",
+            "name": "Create the mini color map info div.",
+            "class": "Filter classes..Draw line command.",
+            "namespace": "Filter classes."
+        },
+        {
+            "file": "src/tools/info.js",
+            "line": 100,
+            "itemtype": "method",
+            "name": "Update the mini color map info div.",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The windowing change event containing the new values.\nWarning: expects the mini color map div to exist (use after createMiniColorMap)."
+                }
+            ],
+            "class": "Filter classes..Draw line command.",
+            "namespace": "Filter classes."
+        },
+        {
+            "file": "src/tools/info.js",
+            "line": 150,
+            "itemtype": "method",
+            "name": "Create the plot info.",
+            "class": "Filter classes..Draw line command.",
+            "namespace": "Filter classes."
+        },
+        {
+            "file": "src/tools/info.js",
+            "line": 163,
+            "itemtype": "method",
+            "name": "Update the plot markings.",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The windowing change event containing the new values.\nWarning: expects the plot to exist (use after createPlot)."
+                }
+            ],
+            "class": "Filter classes..Draw line command.",
+            "namespace": "Filter classes."
+        },
+        {
+            "file": "src/tools/undo.js",
+            "line": 17,
+            "description": "Add a command to the stack.",
+            "params": [
+                {
+                    "name": "cmd",
+                    "description": "The command to add."
+                }
+            ],
+            "class": "Filter classes..UndoStack class.",
+            "namespace": "Filter classes."
+        },
+        {
+            "file": "src/tools/undo.js",
+            "line": 33,
+            "description": "Undo the last command.",
+            "class": "Filter classes..UndoStack class.",
+            "namespace": "Filter classes."
+        },
+        {
+            "file": "src/tools/undo.js",
+            "line": 67,
+            "description": "Redo the last command.",
+            "class": "Filter classes..UndoStack class.",
+            "namespace": "Filter classes."
+        },
+        {
+            "file": "src/tools/windowLevel.js",
+            "line": 6,
+            "fileoverview": "WindowLevel tool.",
+            "class": "Filter classes..WindowLevel tool: handle window/level related events.",
+            "namespace": "Filter classes."
+        },
+        {
+            "file": "src/tools/windowLevel.js",
+            "line": 10,
+            "itemtype": "method",
+            "name": "Update the views' current position.",
+            "class": "Filter classes..WindowLevel tool: handle window/level related events.",
+            "namespace": "Filter classes."
+        },
+        {
+            "file": "src/tools/windowLevel.js",
+            "line": 18,
+            "itemtype": "method",
+            "name": "Update the views' windowing data",
+            "class": "Filter classes..WindowLevel tool: handle window/level related events.",
+            "namespace": "Filter classes."
+        },
+        {
+            "file": "src/tools/windowLevel.js",
+            "line": 26,
+            "itemtype": "method",
+            "name": "Update the views' colour map.",
+            "class": "Filter classes..WindowLevel tool: handle window/level related events.",
+            "namespace": "Filter classes."
+        },
+        {
+            "file": "src/tools/windowLevel.js",
+            "line": 188,
+            "itemtype": "method",
+            "name": "Update the window/level presets.",
+            "class": "Filter classes..WindowLevel tool: handle window/level related events.",
+            "namespace": "Filter classes."
+        },
+        {
+            "file": "src/tools/windowLevel.js",
+            "line": 217,
+            "itemtype": "method",
+            "name": "Set the window/level presets.",
+            "class": "Filter classes..WindowLevel tool: handle window/level related events.",
+            "namespace": "Filter classes."
+        },
+        {
+            "file": "src/tools/windowLevel.js",
+            "line": 231,
+            "itemtype": "method",
+            "name": "Set the colour map.",
+            "class": "Filter classes..WindowLevel tool: handle window/level related events.",
+            "namespace": "Filter classes."
+        },
+        {
+            "file": "src/tools/zoom.js",
+            "line": 6,
+            "itemtype": "method",
+            "name": "",
+            "class": "Filter classes..Zoom class.",
+            "namespace": "Filter classes."
+        },
+        {
+            "file": "src/utils/string.js",
+            "line": 6,
+            "itemtype": "method",
+            "name": "Capitalise the first letter of a string.",
+            "class": "Filter classes..App\nMain application.",
+            "namespace": "Filter classes."
+        },
+        {
+            "file": "src/utils/string.js",
+            "line": 14,
+            "itemtype": "method",
+            "name": "Clean string.",
+            "class": "Filter classes..App\nMain application.",
+            "namespace": "Filter classes."
+        },
+        {
+            "file": "src/utils/string.js",
+            "line": 27,
+            "description": "root?key0=val0&key1=val1 returns [{\"key\"=\"key0\", \"value\"=\"val0\"}, {\"key\"=\"key1\", \"value\"=\"val1\"}]\nReturns null if not a query string (no question mark).",
+            "class": "Filter classes..App\nMain application.",
+            "namespace": "Filter classes."
+        },
+        {
+            "file": "src/application.js",
+            "line": 67,
+            "description": "Initialise the HTML for the application.",
+            "class": "Filter classes..App\nMain application.",
+            "namespace": "Filter classes."
+        },
+        {
+            "file": "src/application.js",
+            "line": 84,
+            "description": "Handle key event.\n- CRTL-Z: undo\n- CRTL-Y: redo\nDefault behavior. Usually used in tools.",
+            "params": [
+                {
+                    "name": "event",
+                    "description": ""
+                }
+            ],
+            "class": "Filter classes..App\nMain application.",
+            "namespace": "Filter classes."
+        },
+        {
+            "file": "src/application.js",
+            "line": 103,
+            "access": "public",
+            "tagname": "",
+            "class": "Filter classes..App\nMain application.",
+            "namespace": "Filter classes."
+        },
+        {
+            "file": "src/application.js",
+            "line": 111,
+            "access": "public",
+            "tagname": "",
+            "class": "Filter classes..App\nMain application.",
+            "namespace": "Filter classes."
+        },
+        {
+            "file": "src/application.js",
+            "line": 188,
+            "access": "public",
+            "tagname": "",
+            "class": "Filter classes..App\nMain application.",
+            "namespace": "Filter classes."
+        },
+        {
+            "file": "src/application.js",
+            "line": 196,
+            "access": "public",
+            "tagname": "",
+            "class": "Filter classes..App\nMain application.",
+            "namespace": "Filter classes."
+        },
+        {
+            "file": "src/application.js",
+            "line": 272,
+            "description": "Generate the image data and draw it.",
+            "class": "Filter classes..App\nMain application.",
+            "namespace": "Filter classes."
+        },
+        {
+            "file": "src/application.js",
+            "line": 285,
+            "description": "To be called once the image is loaded.",
+            "class": "Filter classes..App\nMain application.",
+            "namespace": "Filter classes."
+        },
+        {
+            "file": "src/application.js",
+            "line": 306,
+            "description": "To be called once the image is loaded.",
+            "class": "Filter classes..App\nMain application.",
+            "namespace": "Filter classes."
+        },
+        {
+            "file": "src/application.js",
+            "line": 315,
+            "description": "Toggle the display of the info layer.",
+            "class": "Filter classes..App\nMain application.",
+            "namespace": "Filter classes."
+        },
+        {
+            "file": "src/application.js",
+            "line": 336,
+            "description": "Add image listeners.",
+            "class": "Filter classes..App\nMain application.",
+            "namespace": "Filter classes."
+        },
+        {
+            "file": "src/application.js",
+            "line": 348,
+            "description": "Remove image listeners.",
+            "class": "Filter classes..App\nMain application.",
+            "namespace": "Filter classes."
+        },
+        {
+            "file": "src/application.js",
+            "line": 360,
+            "access": "private",
+            "tagname": "The general-purpose event handler. This function just determines the mouse \nposition relative to the canvas element.",
+            "class": "Filter classes..App\nMain application.",
+            "namespace": "Filter classes."
+        },
+        {
+            "file": "src/application.js",
+            "line": 435,
+            "access": "private",
+            "tagname": "",
+            "class": "Filter classes..App\nMain application.",
+            "namespace": "Filter classes."
+        },
+        {
+            "file": "src/application.js",
+            "line": 445,
+            "access": "private",
+            "tagname": "",
+            "params": [
+                {
+                    "name": "dataWidth",
+                    "description": "The width of the input data."
+                },
+                {
+                    "name": "dataHeight",
+                    "description": "The height of the input data."
+                }
+            ],
+            "class": "Filter classes..App\nMain application.",
+            "namespace": "Filter classes."
+        },
+        {
+            "file": "src/application.js",
+            "line": 470,
+            "access": "private",
+            "tagname": "Create the DICOM tags table.",
+            "params": [
+                {
+                    "name": "dataInfo",
+                    "description": "The data information.\nTo be called once the DICOM has been parsed."
+                }
+            ],
+            "class": "Filter classes..App\nMain application.",
+            "namespace": "Filter classes."
+        },
+        {
+            "file": "src/application.js",
+            "line": 498,
+            "access": "private",
+            "tagname": "To be called once the DICOM has been parsed.",
+            "class": "Filter classes..App\nMain application.",
+            "namespace": "Filter classes."
+        }
+    ],
+    "warnings": [
+        {
+            "message": "replacing incorrect tag: returns with return",
+            "line": " src/dicom/dicomParser.js:95"
+        },
+        {
+            "message": "replacing incorrect tag: returns with return",
+            "line": " src/dicom/dicomParser.js:132"
+        },
+        {
+            "message": "replacing incorrect tag: returns with return",
+            "line": " src/dicom/dicomParser.js:155"
+        },
+        {
+            "message": "replacing incorrect tag: returns with return",
+            "line": " src/dicom/dicomParser.js:420"
+        },
+        {
+            "message": "replacing incorrect tag: function with method",
+            "line": " src/html/gui.js:157"
+        },
+        {
+            "message": "replacing incorrect tag: function with method",
+            "line": " src/html/gui.js:183"
+        },
+        {
+            "message": "replacing incorrect tag: function with method",
+            "line": " src/html/gui.js:224"
+        },
+        {
+            "message": "replacing incorrect tag: function with method",
+            "line": " src/html/gui.js:247"
+        },
+        {
+            "message": "replacing incorrect tag: function with method",
+            "line": " src/html/gui.js:275"
+        },
+        {
+            "message": "replacing incorrect tag: function with method",
+            "line": " src/html/gui_mobile.js:6"
+        },
+        {
+            "message": "replacing incorrect tag: function with method",
+            "line": " src/html/gui_mobile.js:45"
+        },
+        {
+            "message": "replacing incorrect tag: function with method",
+            "line": " src/html/gui_ui.js:6"
+        },
+        {
+            "message": "replacing incorrect tag: function with method",
+            "line": " src/html/gui_ui.js:26"
+        },
+        {
+            "message": "replacing incorrect tag: function with method",
+            "line": " src/html/html.js:6"
+        },
+        {
+            "message": "replacing incorrect tag: function with method",
+            "line": " src/html/html.js:17"
+        },
+        {
+            "message": "replacing incorrect tag: function with method",
+            "line": " src/html/html.js:31"
+        },
+        {
+            "message": "replacing incorrect tag: function with method",
+            "line": " src/html/html.js:57"
+        },
+        {
+            "message": "replacing incorrect tag: function with method",
+            "line": " src/html/html.js:99"
+        },
+        {
+            "message": "replacing incorrect tag: function with method",
+            "line": " src/html/html.js:117"
+        },
+        {
+            "message": "unknown tag: input",
+            "line": " src/html/html.js:117"
+        },
+        {
+            "message": "unknown tag: warning",
+            "line": " src/html/html.js:117"
+        },
+        {
+            "message": "replacing incorrect tag: function with method",
+            "line": " src/html/html.js:129"
+        },
+        {
+            "message": "replacing incorrect tag: function with method",
+            "line": " src/html/html.js:145"
+        },
+        {
+            "message": "replacing incorrect tag: function with method",
+            "line": " src/html/html.js:175"
+        },
+        {
+            "message": "replacing incorrect tag: function with method",
+            "line": " src/html/html.js:201"
+        },
+        {
+            "message": "replacing incorrect tag: function with method",
+            "line": " src/html/html.js:243"
+        },
+        {
+            "message": "replacing incorrect tag: function with method",
+            "line": " src/html/html.js:254"
+        },
+        {
+            "message": "replacing incorrect tag: function with method",
+            "line": " src/html/html.js:266"
+        },
+        {
+            "message": "replacing incorrect tag: function with method",
+            "line": " src/html/html.js:283"
+        },
+        {
+            "message": "unknown tag: input",
+            "line": " src/html/layer.js:135"
+        },
+        {
+            "message": "unknown tag: input",
+            "line": " src/html/layer.js:135"
+        },
+        {
+            "message": "unknown tag: input",
+            "line": " src/html/layer.js:186"
+        },
+        {
+            "message": "replacing incorrect tag: function with method",
+            "line": " src/image/filter.js:8"
+        },
+        {
+            "message": "replacing incorrect tag: function with method",
+            "line": " src/image/filter.js:40"
+        },
+        {
+            "message": "replacing incorrect tag: function with method",
+            "line": " src/image/filter.js:57"
+        },
+        {
+            "message": "replacing incorrect tag: returns with return",
+            "line": " src/image/image.js:238"
+        },
+        {
+            "message": "replacing incorrect tag: returns with return",
+            "line": " src/image/image.js:253"
+        },
+        {
+            "message": "replacing incorrect tag: returns with return",
+            "line": " src/image/image.js:264"
+        },
+        {
+            "message": "replacing incorrect tag: returns with return",
+            "line": " src/image/image.js:277"
+        },
+        {
+            "message": "replacing incorrect tag: returns with return",
+            "line": " src/image/image.js:295"
+        },
+        {
+            "message": "replacing incorrect tag: returns with return",
+            "line": " src/image/image.js:306"
+        },
+        {
+            "message": "replacing incorrect tag: returns with return",
+            "line": " src/image/image.js:333"
+        },
+        {
+            "message": "replacing incorrect tag: returns with return",
+            "line": " src/image/image.js:386"
+        },
+        {
+            "message": "replacing incorrect tag: returns with return",
+            "line": " src/image/image.js:404"
+        },
+        {
+            "message": "replacing incorrect tag: returns with return",
+            "line": " src/image/luts.js:8"
+        },
+        {
+            "message": "replacing incorrect tag: returns with return",
+            "line": " src/image/luts.js:39"
+        },
+        {
+            "message": "unknown tag: warning",
+            "line": " src/image/view.js:86"
+        },
+        {
+            "message": "unknown tag: warning",
+            "line": " src/image/view.js:98"
+        },
+        {
+            "message": "replacing incorrect tag: returns with return",
+            "line": " src/image/view.js:138"
+        },
+        {
+            "message": "unknown tag: input",
+            "line": " src/math/bucketQueue.js:6"
+        },
+        {
+            "message": "unknown tag: input",
+            "line": " src/math/bucketQueue.js:6"
+        },
+        {
+            "message": "replacing incorrect tag: function with method",
+            "line": " src/tools/info.js:6"
+        },
+        {
+            "message": "replacing incorrect tag: function with method",
+            "line": " src/tools/info.js:28"
+        },
+        {
+            "message": "replacing incorrect tag: function with method",
+            "line": " src/tools/info.js:45"
+        },
+        {
+            "message": "replacing incorrect tag: function with method",
+            "line": " src/tools/info.js:67"
+        },
+        {
+            "message": "replacing incorrect tag: function with method",
+            "line": " src/tools/info.js:84"
+        },
+        {
+            "message": "replacing incorrect tag: function with method",
+            "line": " src/tools/info.js:100"
+        },
+        {
+            "message": "replacing incorrect tag: function with method",
+            "line": " src/tools/info.js:150"
+        },
+        {
+            "message": "replacing incorrect tag: function with method",
+            "line": " src/tools/info.js:163"
+        },
+        {
+            "message": "unknown tag: fileoverview",
+            "line": " src/tools/windowLevel.js:6"
+        },
+        {
+            "message": "replacing incorrect tag: function with method",
+            "line": " src/tools/windowLevel.js:10"
+        },
+        {
+            "message": "replacing incorrect tag: function with method",
+            "line": " src/tools/windowLevel.js:18"
+        },
+        {
+            "message": "replacing incorrect tag: function with method",
+            "line": " src/tools/windowLevel.js:26"
+        },
+        {
+            "message": "replacing incorrect tag: function with method",
+            "line": " src/tools/windowLevel.js:188"
+        },
+        {
+            "message": "replacing incorrect tag: function with method",
+            "line": " src/tools/windowLevel.js:217"
+        },
+        {
+            "message": "replacing incorrect tag: function with method",
+            "line": " src/tools/windowLevel.js:231"
+        },
+        {
+            "message": "replacing incorrect tag: function with method",
+            "line": " src/tools/zoom.js:6"
+        },
+        {
+            "message": "replacing incorrect tag: function with method",
+            "line": " src/utils/string.js:6"
+        },
+        {
+            "message": "replacing incorrect tag: function with method",
+            "line": " src/utils/string.js:14"
+        },
+        {
+            "message": "Missing item type\nGet the DICOM data pixel buffer.",
+            "line": " src/dicom/dicomParser.js:95"
+        },
+        {
+            "message": "Missing item type\nAppend a DICOM element to the dicomElements member object.\nAllows for easy retrieval of DICOM tag values from the tag name.\nIf tags have same name (for the 'unknown' and private tags cases), a number is appended\nmaking the name unique.",
+            "line": " src/dicom/dicomParser.js:104"
+        },
+        {
+            "message": "Missing item type\nRead a DICOM tag.",
+            "line": " src/dicom/dicomParser.js:132"
+        },
+        {
+            "message": "Missing item type\nRead a DICOM data element.",
+            "line": " src/dicom/dicomParser.js:155"
+        },
+        {
+            "message": "Missing item type\nParse the complete DICOM file (given as input to the class).\nFills in the member object 'dicomElements'.",
+            "line": " src/dicom/dicomParser.js:247"
+        },
+        {
+            "message": "Missing item type\nGet an Image object from the read DICOM file.",
+            "line": " src/dicom/dicomParser.js:420"
+        },
+        {
+            "message": "Missing item type",
+            "line": " src/html/gui.js:219"
+        },
+        {
+            "message": "Missing item type\nBrowser checks to see if it can run dwv...\nTODO Maybe use http://modernizr.com/.",
+            "line": " src/html/html.js:408"
+        },
+        {
+            "message": "Missing item type\nReset the layout",
+            "line": " src/html/layer.js:101"
+        },
+        {
+            "message": "Missing item type\nDraw the content (imageData) of the layer.\nThe imageData variable needs to be set",
+            "line": " src/html/layer.js:112"
+        },
+        {
+            "message": "Missing item type\nInitialise the layer: set the canvas and context",
+            "line": " src/html/layer.js:135"
+        },
+        {
+            "message": "Missing item type\nFill the full context with the current style.",
+            "line": " src/html/layer.js:170"
+        },
+        {
+            "message": "Missing item type\nClear the full context.",
+            "line": " src/html/layer.js:178"
+        },
+        {
+            "message": "Missing item type\nMerge two layers.",
+            "line": " src/html/layer.js:186"
+        },
+        {
+            "message": "Missing item type\nSet the fill and stroke style of the context.",
+            "line": " src/html/layer.js:202"
+        },
+        {
+            "message": "Missing item type\nDisplay the layer.",
+            "line": " src/html/layer.js:211"
+        },
+        {
+            "message": "Missing item type\nAlign on another layer.",
+            "line": " src/html/layer.js:232"
+        },
+        {
+            "message": "Missing item type\nGet the value of the image at a specific coordinate.",
+            "line": " src/image/image.js:238"
+        },
+        {
+            "message": "Missing item type\nGet the value of the image at a specific offset.",
+            "line": " src/image/image.js:253"
+        },
+        {
+            "message": "Missing item type\nGet the value of the image at a specific coordinate.",
+            "line": " src/image/image.js:264"
+        },
+        {
+            "message": "Missing item type\nCalculate the raw image data range.",
+            "line": " src/image/image.js:277"
+        },
+        {
+            "message": "Missing item type\nCalculate the image data range after rescale.",
+            "line": " src/image/image.js:295"
+        },
+        {
+            "message": "Missing item type\nCalculate the histogram of the image.",
+            "line": " src/image/image.js:306"
+        },
+        {
+            "message": "Missing item type\nConvolute the image with a given 2D kernel.",
+            "line": " src/image/image.js:333"
+        },
+        {
+            "message": "Missing item type\nTransform an image using a specific operator.",
+            "line": " src/image/image.js:386"
+        },
+        {
+            "message": "Missing item type\nCompose this image with another one and using a specific operator.",
+            "line": " src/image/image.js:404"
+        },
+        {
+            "message": "Missing item type\nLookup tables for image color display.",
+            "line": " src/image/luts.js:95"
+        },
+        {
+            "message": "Missing item type\nGet data from an input image using a canvas.",
+            "line": " src/image/reader.js:6"
+        },
+        {
+            "message": "Missing item type\nGet data from an input buffer using a DICOM parser.",
+            "line": " src/image/reader.js:55"
+        },
+        {
+            "message": "Missing item type\nSet the view window/level.",
+            "line": " src/image/view.js:86"
+        },
+        {
+            "message": "Missing item type\nSet the image window/level to cover the full data range.",
+            "line": " src/image/view.js:98"
+        },
+        {
+            "message": "Missing item type\nIncrement the current slice number.\nReturns false if not in bounds.",
+            "line": " src/image/view.js:114"
+        },
+        {
+            "message": "Missing item type\nDecrement the current slice number.\nReturns false if not in bounds.",
+            "line": " src/image/view.js:126"
+        },
+        {
+            "message": "Missing item type\nClone the image using all meta data and the original data buffer.",
+            "line": " src/image/view.js:138"
+        },
+        {
+            "message": "Missing item type\nGenerate display image data to be given to a canvas.",
+            "line": " src/image/view.js:151"
+        },
+        {
+            "message": "Missing item type\nAdd an event listener on the view.",
+            "line": " src/image/view.js:235"
+        },
+        {
+            "message": "Missing item type\nRemove an event listener on the view.",
+            "line": " src/image/view.js:247"
+        },
+        {
+            "message": "Missing item type\nFire an event: call all associated listeners.",
+            "line": " src/image/view.js:263"
+        },
+        {
+            "message": "Missing item type",
+            "line": " src/math/scissors.js:9"
+        },
+        {
+            "message": "Missing item type",
+            "line": " src/math/scissors.js:65"
+        },
+        {
+            "message": "Missing item type",
+            "line": " src/math/scissors.js:105"
+        },
+        {
+            "message": "Missing item type\nshapes.js\nDefinition of basic shapes.",
+            "line": " src/math/shapes.js:6"
+        },
+        {
+            "message": "Missing item type\nCheck for Point2D equality.",
+            "line": " src/math/shapes.js:24"
+        },
+        {
+            "message": "Missing item type\nGet a string representation of the Point2D.",
+            "line": " src/math/shapes.js:36"
+        },
+        {
+            "message": "Missing item type\nCheck for FastPoint2D equality.",
+            "line": " src/math/shapes.js:55"
+        },
+        {
+            "message": "Missing item type\nGet a string representation of the FastPoint2D.",
+            "line": " src/math/shapes.js:67"
+        },
+        {
+            "message": "Missing item type\nGet a point of the list.",
+            "line": " src/math/shapes.js:172"
+        },
+        {
+            "message": "Missing item type\nAdd a point to the ROI.",
+            "line": " src/math/shapes.js:180"
+        },
+        {
+            "message": "Missing item type\nAdd points to the ROI.",
+            "line": " src/math/shapes.js:185"
+        },
+        {
+            "message": "Missing item type\nGet a point of the list.",
+            "line": " src/math/shapes.js:206"
+        },
+        {
+            "message": "Missing item type\nIs is a control point.",
+            "line": " src/math/shapes.js:215"
+        },
+        {
+            "message": "Missing item type\nGet the length of the path.",
+            "line": " src/math/shapes.js:230"
+        },
+        {
+            "message": "Missing item type\nAdd a point to the path.",
+            "line": " src/math/shapes.js:237"
+        },
+        {
+            "message": "Missing item type\nAdd a control point to the path.",
+            "line": " src/math/shapes.js:245"
+        },
+        {
+            "message": "Missing item type\nAdd points to the path.",
+            "line": " src/math/shapes.js:259"
+        },
+        {
+            "message": "Missing item type\nAppend a Path to this one.",
+            "line": " src/math/shapes.js:267"
+        },
+        {
+            "message": "Missing item type",
+            "line": " src/tools/filter.js:71"
+        },
+        {
+            "message": "Missing item type\nAdd a command to the stack.",
+            "line": " src/tools/undo.js:17"
+        },
+        {
+            "message": "Missing item type\nUndo the last command.",
+            "line": " src/tools/undo.js:33"
+        },
+        {
+            "message": "Missing item type\nRedo the last command.",
+            "line": " src/tools/undo.js:67"
+        },
+        {
+            "message": "Missing item type",
+            "line": " src/tools/windowLevel.js:6"
+        },
+        {
+            "message": "Missing item type\nroot?key0=val0&key1=val1 returns [{\"key\"=\"key0\", \"value\"=\"val0\"}, {\"key\"=\"key1\", \"value\"=\"val1\"}]\nReturns null if not a query string (no question mark).",
+            "line": " src/utils/string.js:27"
+        },
+        {
+            "message": "Missing item type\nInitialise the HTML for the application.",
+            "line": " src/application.js:67"
+        },
+        {
+            "message": "Missing item type\nHandle key event.\n- CRTL-Z: undo\n- CRTL-Y: redo\nDefault behavior. Usually used in tools.",
+            "line": " src/application.js:84"
+        },
+        {
+            "message": "Missing item type",
+            "line": " src/application.js:103"
+        },
+        {
+            "message": "Missing item type",
+            "line": " src/application.js:111"
+        },
+        {
+            "message": "Missing item type",
+            "line": " src/application.js:188"
+        },
+        {
+            "message": "Missing item type",
+            "line": " src/application.js:196"
+        },
+        {
+            "message": "Missing item type\nGenerate the image data and draw it.",
+            "line": " src/application.js:272"
+        },
+        {
+            "message": "Missing item type\nTo be called once the image is loaded.",
+            "line": " src/application.js:285"
+        },
+        {
+            "message": "Missing item type\nTo be called once the image is loaded.",
+            "line": " src/application.js:306"
+        },
+        {
+            "message": "Missing item type\nToggle the display of the info layer.",
+            "line": " src/application.js:315"
+        },
+        {
+            "message": "Missing item type\nAdd image listeners.",
+            "line": " src/application.js:336"
+        },
+        {
+            "message": "Missing item type\nRemove image listeners.",
+            "line": " src/application.js:348"
+        },
+        {
+            "message": "Missing item type",
+            "line": " src/application.js:360"
+        },
+        {
+            "message": "Missing item type",
+            "line": " src/application.js:435"
+        },
+        {
+            "message": "Missing item type",
+            "line": " src/application.js:445"
+        },
+        {
+            "message": "Missing item type",
+            "line": " src/application.js:470"
+        },
+        {
+            "message": "Missing item type",
+            "line": " src/application.js:498"
+        }
+    ]
+}
