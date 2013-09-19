@@ -1,6 +1,10 @@
-//! @module Main DWV namespace.
+/** Main DWV module.
+ * @module dwv
+ */
 var dwv = dwv || {};
-//! @module Math related.
+/** Math module.
+ * @module math
+ */
 dwv.math = dwv.math || {};
 
 /**
