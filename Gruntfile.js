@@ -35,7 +35,7 @@ module.exports = function(grunt) {
                 url: '<%= pkg.homepage %>',
                 options: {
                     paths: 'src/',
-                    outdir: 'dist/docs/'
+                    outdir: 'dist/doc/'
                 }
             }
         }
