@@ -137,15 +137,18 @@
         },
         "src/math/shapes.js": {
             "name": "src/math/shapes.js",
-            "modules": {},
+            "modules": {
+                "dwv": 1,
+                "math": 1
+            },
             "classes": {
-                "GUI classes..2D point. Immutable.": 1,
-                "GUI classes..Fast 2D point since it's mutable!": 1,
-                "GUI classes..Circle shape.": 1,
-                "GUI classes..Line shape.": 1,
-                "GUI classes..Rectangle shape.": 1,
-                "GUI classes..Region Of Interest shape.\nNote: should be a closed path.": 1,
-                "GUI classes..Path shape.": 1
+                "2D point. Immutable.": 1,
+                "Fast 2D point since it's mutable!": 1,
+                "Circle shape.": 1,
+                "Line shape.": 1,
+                "Rectangle shape.": 1,
+                "Region Of Interest shape.\nNote: should be a closed path.": 1,
+                "Path shape.": 1
             },
             "fors": {},
             "namespaces": {}
@@ -154,7 +157,7 @@
             "name": "src/tools/circle.js",
             "modules": {},
             "classes": {
-                "GUI classes..Draw circle command.": 1
+                "Draw circle command.": 1
             },
             "fors": {},
             "namespaces": {}
@@ -163,7 +166,7 @@
             "name": "src/tools/draw.js",
             "modules": {},
             "classes": {
-                "GUI classes..Drawing tool.": 1
+                "Drawing tool.": 1
             },
             "fors": {},
             "namespaces": {}
@@ -280,7 +283,69 @@
             "namespaces": {}
         }
     },
-    "modules": {},
+    "modules": {
+        "dwv": {
+            "name": "dwv",
+            "submodules": {},
+            "classes": {
+                "Data reader": 1,
+                "DicomParser class.": 1,
+                "DICOM tag dictionary.": 1,
+                "GUI classes..Window layer.": 1,
+                "GUI classes..Style class.": 1,
+                "GUI classes..Image Size class. \nSupports 2D and 3D images.": 1,
+                "GUI classes..Image Spacing class. \nSupports 2D and 3D images.": 1,
+                "GUI classes..Image class.": 1,
+                "GUI classes..Rescale LUT class.": 1,
+                "GUI classes..Window LUT class.": 1,
+                "GUI classes..View class.": 1,
+                "GUI classes..Circular Bucket Queue.\n\nReturns input'd points in sorted order. All operations run in roughly O(1)\ntime (for input with small cost values), but it has a strict requirement:\n\nIf the most recent point had a cost of c, any points added should have a cost\nc' in the range c <= c' <= c + (capacity - 1).": 1,
+                "GUI classes..Scissors.\n\nRef: Eric N. Mortensen, William A. Barrett, Interactive Segmentation with\n  Intelligent Scissors, Graphical Models and Image Processing, Volume 60,\n  Issue 5, September 1998, Pages 349-384, ISSN 1077-3169,\n  DOI: 10.1006/gmip.1998.0480.\n\n(http://www.sciencedirect.com/science/article/B6WG4-45JB8WN-9/2/6fe59d8089fd1892c2bfb82283065579)\n\nHighly inspired from http://code.google.com/p/livewire-javascript/": 1
+            },
+            "fors": {},
+            "namespaces": {},
+            "tag": "module",
+            "file": "src/math/scissors.js",
+            "line": 276
+        },
+        "math": {
+            "name": "math",
+            "submodules": {},
+            "classes": {
+                "2D point. Immutable.": 1,
+                "Fast 2D point since it's mutable!": 1,
+                "Circle shape.": 1,
+                "Line shape.": 1,
+                "Rectangle shape.": 1,
+                "Region Of Interest shape.\nNote: should be a closed path.": 1,
+                "Path shape.": 1,
+                "Draw circle command.": 1,
+                "Drawing tool.": 1,
+                "Filter classes..Filter tool.": 1,
+                "Filter classes..Threshold filter tool.": 1,
+                "Filter classes..Sharpen filter tool.": 1,
+                "Filter classes..Sobel filter tool.": 1,
+                "Filter classes..Run filter command.": 1,
+                "Filter classes..Draw line command.": 1,
+                "Filter classes..Livewire painting tool.": 1,
+                "Filter classes..Draw livewire command.": 1,
+                "Filter classes..Draw rectangle command.": 1,
+                "Filter classes..Draw ROI command.": 1,
+                "Filter classes..Tool box.": 1,
+                "Filter classes..UndoStack class.": 1,
+                "Filter classes..WindowLevel tool: handle window/level related events.": 1,
+                "Filter classes..Zoom class.": 1,
+                "Filter classes..App\nMain application.": 1
+            },
+            "fors": {},
+            "namespaces": {
+                "Filter classes.": 1
+            },
+            "tag": "module",
+            "file": "src/application.js",
+            "line": 4
+        }
+    },
     "classes": {
         "Data reader": {
             "name": "Data reader",
@@ -290,6 +355,7 @@
             "extensions": [],
             "plugin_for": [],
             "extension_for": [],
+            "module": "dwv",
             "file": "src/dicom/dicomParser.js",
             "line": 6,
             "params": [
@@ -311,6 +377,7 @@
             "extensions": [],
             "plugin_for": [],
             "extension_for": [],
+            "module": "dwv",
             "file": "src/dicom/dicomParser.js",
             "line": 80
         },
@@ -322,6 +389,7 @@
             "extensions": [],
             "plugin_for": [],
             "extension_for": [],
+            "module": "dwv",
             "file": "src/dicom/dictionary.js",
             "line": 6
         },
@@ -333,6 +401,7 @@
             "extensions": [],
             "plugin_for": [],
             "extension_for": [],
+            "module": "dwv",
             "namespace": "GUI classes.",
             "file": "src/html/layer.js",
             "line": 6
@@ -345,6 +414,7 @@
             "extensions": [],
             "plugin_for": [],
             "extension_for": [],
+            "module": "dwv",
             "namespace": "GUI classes.",
             "file": "src/html/style.js",
             "line": 6
@@ -357,6 +427,7 @@
             "extensions": [],
             "plugin_for": [],
             "extension_for": [],
+            "module": "dwv",
             "namespace": "GUI classes.",
             "file": "src/image/image.js",
             "line": 6,
@@ -383,6 +454,7 @@
             "extensions": [],
             "plugin_for": [],
             "extension_for": [],
+            "module": "dwv",
             "namespace": "GUI classes.",
             "file": "src/image/image.js",
             "line": 45,
@@ -409,6 +481,7 @@
             "extensions": [],
             "plugin_for": [],
             "extension_for": [],
+            "module": "dwv",
             "namespace": "GUI classes.",
             "file": "src/image/image.js",
             "line": 69,
@@ -435,6 +508,7 @@
             "extensions": [],
             "plugin_for": [],
             "extension_for": [],
+            "module": "dwv",
             "namespace": "GUI classes.",
             "file": "src/image/luts.js",
             "line": 8,
@@ -451,6 +525,7 @@
             "extensions": [],
             "plugin_for": [],
             "extension_for": [],
+            "module": "dwv",
             "namespace": "GUI classes.",
             "file": "src/image/luts.js",
             "line": 39,
@@ -467,6 +542,7 @@
             "extensions": [],
             "plugin_for": [],
             "extension_for": [],
+            "module": "dwv",
             "namespace": "GUI classes.",
             "file": "src/image/view.js",
             "line": 6,
@@ -485,6 +561,7 @@
             "extensions": [],
             "plugin_for": [],
             "extension_for": [],
+            "module": "dwv",
             "namespace": "GUI classes.",
             "file": "src/math/bucketQueue.js",
             "line": 6,
@@ -498,21 +575,23 @@
             "extensions": [],
             "plugin_for": [],
             "extension_for": [],
+            "module": "dwv",
             "namespace": "GUI classes.",
             "file": "src/math/scissors.js",
             "line": 276
         },
-        "GUI classes..2D point. Immutable.": {
-            "name": "GUI classes..2D point. Immutable.",
+        "2D point. Immutable.": {
+            "name": "2D point. Immutable.",
             "shortname": "2D point. Immutable.",
             "classitems": [],
             "plugins": [],
             "extensions": [],
             "plugin_for": [],
             "extension_for": [],
-            "namespace": "GUI classes.",
+            "module": "math",
+            "namespace": "",
             "file": "src/math/shapes.js",
-            "line": 11,
+            "line": 15,
             "params": [
                 {
                     "name": "x",
@@ -524,17 +603,18 @@
                 }
             ]
         },
-        "GUI classes..Fast 2D point since it's mutable!": {
-            "name": "GUI classes..Fast 2D point since it's mutable!",
+        "Fast 2D point since it's mutable!": {
+            "name": "Fast 2D point since it's mutable!",
             "shortname": "Fast 2D point since it's mutable!",
             "classitems": [],
             "plugins": [],
             "extensions": [],
             "plugin_for": [],
             "extension_for": [],
-            "namespace": "GUI classes.",
+            "module": "math",
+            "namespace": "",
             "file": "src/math/shapes.js",
-            "line": 44,
+            "line": 48,
             "params": [
                 {
                     "name": "x",
@@ -546,17 +626,18 @@
                 }
             ]
         },
-        "GUI classes..Circle shape.": {
-            "name": "GUI classes..Circle shape.",
+        "Circle shape.": {
+            "name": "Circle shape.",
             "shortname": "Circle shape.",
             "classitems": [],
             "plugins": [],
             "extensions": [],
             "plugin_for": [],
             "extension_for": [],
-            "namespace": "GUI classes.",
+            "module": "math",
+            "namespace": "",
             "file": "src/math/shapes.js",
-            "line": 75,
+            "line": 79,
             "params": [
                 {
                     "name": "centre",
@@ -568,17 +649,18 @@
                 }
             ]
         },
-        "GUI classes..Line shape.": {
-            "name": "GUI classes..Line shape.",
+        "Line shape.": {
+            "name": "Line shape.",
             "shortname": "Line shape.",
             "classitems": [],
             "plugins": [],
             "extensions": [],
             "plugin_for": [],
             "extension_for": [],
-            "namespace": "GUI classes.",
+            "module": "math",
+            "namespace": "",
             "file": "src/math/shapes.js",
-            "line": 98,
+            "line": 102,
             "params": [
                 {
                     "name": "begin",
@@ -590,17 +672,18 @@
                 }
             ]
         },
-        "GUI classes..Rectangle shape.": {
-            "name": "GUI classes..Rectangle shape.",
+        "Rectangle shape.": {
+            "name": "Rectangle shape.",
             "shortname": "Rectangle shape.",
             "classitems": [],
             "plugins": [],
             "extensions": [],
             "plugin_for": [],
             "extension_for": [],
-            "namespace": "GUI classes.",
+            "module": "math",
+            "namespace": "",
             "file": "src/math/shapes.js",
-            "line": 132,
+            "line": 136,
             "params": [
                 {
                     "name": "begin",
@@ -612,29 +695,31 @@
                 }
             ]
         },
-        "GUI classes..Region Of Interest shape.\nNote: should be a closed path.": {
-            "name": "GUI classes..Region Of Interest shape.\nNote: should be a closed path.",
+        "Region Of Interest shape.\nNote: should be a closed path.": {
+            "name": "Region Of Interest shape.\nNote: should be a closed path.",
             "shortname": "Region Of Interest shape.\nNote: should be a closed path.",
             "classitems": [],
             "plugins": [],
             "extensions": [],
             "plugin_for": [],
             "extension_for": [],
-            "namespace": "GUI classes.",
+            "module": "math",
+            "namespace": "",
             "file": "src/math/shapes.js",
-            "line": 163
+            "line": 167
         },
-        "GUI classes..Path shape.": {
-            "name": "GUI classes..Path shape.",
+        "Path shape.": {
+            "name": "Path shape.",
             "shortname": "Path shape.",
             "classitems": [],
             "plugins": [],
             "extensions": [],
             "plugin_for": [],
             "extension_for": [],
-            "namespace": "GUI classes.",
+            "module": "math",
+            "namespace": "",
             "file": "src/math/shapes.js",
-            "line": 192,
+            "line": 196,
             "params": [
                 {
                     "name": "points",
@@ -646,15 +731,16 @@
                 }
             ]
         },
-        "GUI classes..Draw circle command.": {
-            "name": "GUI classes..Draw circle command.",
+        "Draw circle command.": {
+            "name": "Draw circle command.",
             "shortname": "Draw circle command.",
             "classitems": [],
             "plugins": [],
             "extensions": [],
             "plugin_for": [],
             "extension_for": [],
-            "namespace": "GUI classes.",
+            "module": "math",
+            "namespace": "",
             "file": "src/tools/circle.js",
             "line": 6,
             "params": [
@@ -672,15 +758,16 @@
                 }
             ]
         },
-        "GUI classes..Drawing tool.": {
-            "name": "GUI classes..Drawing tool.",
+        "Drawing tool.": {
+            "name": "Drawing tool.",
             "shortname": "Drawing tool.",
             "classitems": [],
             "plugins": [],
             "extensions": [],
             "plugin_for": [],
             "extension_for": [],
-            "namespace": "GUI classes.",
+            "module": "math",
+            "namespace": "",
             "file": "src/tools/draw.js",
             "line": 14
         },
@@ -692,6 +779,7 @@
             "extensions": [],
             "plugin_for": [],
             "extension_for": [],
+            "module": "math",
             "namespace": "Filter classes.",
             "file": "src/tools/filter.js",
             "line": 9
@@ -704,6 +792,7 @@
             "extensions": [],
             "plugin_for": [],
             "extension_for": [],
+            "module": "math",
             "namespace": "Filter classes.",
             "file": "src/tools/filter.js",
             "line": 76
@@ -716,6 +805,7 @@
             "extensions": [],
             "plugin_for": [],
             "extension_for": [],
+            "module": "math",
             "namespace": "Filter classes.",
             "file": "src/tools/filter.js",
             "line": 105
@@ -728,6 +818,7 @@
             "extensions": [],
             "plugin_for": [],
             "extension_for": [],
+            "module": "math",
             "namespace": "Filter classes.",
             "file": "src/tools/filter.js",
             "line": 132
@@ -740,6 +831,7 @@
             "extensions": [],
             "plugin_for": [],
             "extension_for": [],
+            "module": "math",
             "namespace": "Filter classes.",
             "file": "src/tools/filter.js",
             "line": 164,
@@ -762,6 +854,7 @@
             "extensions": [],
             "plugin_for": [],
             "extension_for": [],
+            "module": "math",
             "namespace": "Filter classes.",
             "file": "src/tools/line.js",
             "line": 6,
@@ -788,6 +881,7 @@
             "extensions": [],
             "plugin_for": [],
             "extension_for": [],
+            "module": "math",
             "namespace": "Filter classes.",
             "file": "src/tools/livewire.js",
             "line": 6
@@ -800,6 +894,7 @@
             "extensions": [],
             "plugin_for": [],
             "extension_for": [],
+            "module": "math",
             "namespace": "Filter classes.",
             "file": "src/tools/livewire.js",
             "line": 178,
@@ -822,6 +917,7 @@
             "extensions": [],
             "plugin_for": [],
             "extension_for": [],
+            "module": "math",
             "namespace": "Filter classes.",
             "file": "src/tools/rectangle.js",
             "line": 6,
@@ -848,6 +944,7 @@
             "extensions": [],
             "plugin_for": [],
             "extension_for": [],
+            "module": "math",
             "namespace": "Filter classes.",
             "file": "src/tools/roi.js",
             "line": 6,
@@ -874,6 +971,7 @@
             "extensions": [],
             "plugin_for": [],
             "extension_for": [],
+            "module": "math",
             "namespace": "Filter classes.",
             "file": "src/tools/toolbox.js",
             "line": 9
@@ -886,6 +984,7 @@
             "extensions": [],
             "plugin_for": [],
             "extension_for": [],
+            "module": "math",
             "namespace": "Filter classes.",
             "file": "src/tools/undo.js",
             "line": 6,
@@ -904,6 +1003,7 @@
             "extensions": [],
             "plugin_for": [],
             "extension_for": [],
+            "module": "math",
             "namespace": "Filter classes.",
             "file": "src/tools/windowLevel.js",
             "line": 53
@@ -916,6 +1016,7 @@
             "extensions": [],
             "plugin_for": [],
             "extension_for": [],
+            "module": "math",
             "namespace": "Filter classes.",
             "file": "src/tools/zoom.js",
             "line": 17
@@ -928,6 +1029,7 @@
             "extensions": [],
             "plugin_for": [],
             "extension_for": [],
+            "module": "math",
             "namespace": "Filter classes.",
             "file": "src/application.js",
             "line": 4
@@ -1725,14 +1827,14 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 6,
+            "line": 10,
             "description": "shapes.js\nDefinition of basic shapes.",
-            "class": "GUI classes..2D point. Immutable.",
-            "namespace": "GUI classes."
+            "class": "2D point. Immutable.",
+            "module": "math"
         },
         {
             "file": "src/math/shapes.js",
-            "line": 24,
+            "line": 28,
             "description": "Check for Point2D equality.",
             "params": [
                 {
@@ -1743,22 +1845,22 @@
             "return": {
                 "description": "True if both points are equal."
             },
-            "class": "GUI classes..2D point. Immutable.",
-            "namespace": "GUI classes."
+            "class": "2D point. Immutable.",
+            "module": "math"
         },
         {
             "file": "src/math/shapes.js",
-            "line": 36,
+            "line": 40,
             "description": "Get a string representation of the Point2D.",
             "return": {
                 "description": "The Point2D as string."
             },
-            "class": "GUI classes..2D point. Immutable.",
-            "namespace": "GUI classes."
+            "class": "2D point. Immutable.",
+            "module": "math"
         },
         {
             "file": "src/math/shapes.js",
-            "line": 55,
+            "line": 59,
             "description": "Check for FastPoint2D equality.",
             "params": [
                 {
@@ -1769,22 +1871,22 @@
             "return": {
                 "description": "True if both points are equal."
             },
-            "class": "GUI classes..Fast 2D point since it's mutable!",
-            "namespace": "GUI classes."
+            "class": "Fast 2D point since it's mutable!",
+            "module": "math"
         },
         {
             "file": "src/math/shapes.js",
-            "line": 67,
+            "line": 71,
             "description": "Get a string representation of the FastPoint2D.",
             "return": {
                 "description": "The Point2D as string."
             },
-            "class": "GUI classes..Fast 2D point since it's mutable!",
-            "namespace": "GUI classes."
+            "class": "Fast 2D point since it's mutable!",
+            "module": "math"
         },
         {
             "file": "src/math/shapes.js",
-            "line": 172,
+            "line": 176,
             "description": "Get a point of the list.",
             "params": [
                 {
@@ -1795,12 +1897,12 @@
             "return": {
                 "description": "The Point2D at the given index."
             },
-            "class": "GUI classes..Region Of Interest shape.\nNote: should be a closed path.",
-            "namespace": "GUI classes."
+            "class": "Region Of Interest shape.\nNote: should be a closed path.",
+            "module": "math"
         },
         {
             "file": "src/math/shapes.js",
-            "line": 180,
+            "line": 184,
             "description": "Add a point to the ROI.",
             "params": [
                 {
@@ -1808,12 +1910,12 @@
                     "description": "The Point2D to add."
                 }
             ],
-            "class": "GUI classes..Region Of Interest shape.\nNote: should be a closed path.",
-            "namespace": "GUI classes."
+            "class": "Region Of Interest shape.\nNote: should be a closed path.",
+            "module": "math"
         },
         {
             "file": "src/math/shapes.js",
-            "line": 185,
+            "line": 189,
             "description": "Add points to the ROI.",
             "params": [
                 {
@@ -1821,12 +1923,12 @@
                     "description": "The array of POints2D to add."
                 }
             ],
-            "class": "GUI classes..Region Of Interest shape.\nNote: should be a closed path.",
-            "namespace": "GUI classes."
+            "class": "Region Of Interest shape.\nNote: should be a closed path.",
+            "module": "math"
         },
         {
             "file": "src/math/shapes.js",
-            "line": 206,
+            "line": 210,
             "description": "Get a point of the list.",
             "params": [
                 {
@@ -1837,12 +1939,12 @@
             "return": {
                 "description": "The Point2D at the given index."
             },
-            "class": "GUI classes..Path shape.",
-            "namespace": "GUI classes."
+            "class": "Path shape.",
+            "module": "math"
         },
         {
             "file": "src/math/shapes.js",
-            "line": 215,
+            "line": 219,
             "description": "Is is a control point.",
             "params": [
                 {
@@ -1853,19 +1955,19 @@
             "return": {
                 "description": "True if a control point."
             },
-            "class": "GUI classes..Path shape.",
-            "namespace": "GUI classes."
+            "class": "Path shape.",
+            "module": "math"
         },
         {
             "file": "src/math/shapes.js",
-            "line": 230,
+            "line": 234,
             "description": "Get the length of the path.",
-            "class": "GUI classes..Path shape.",
-            "namespace": "GUI classes."
+            "class": "Path shape.",
+            "module": "math"
         },
         {
             "file": "src/math/shapes.js",
-            "line": 237,
+            "line": 241,
             "description": "Add a point to the path.",
             "params": [
                 {
@@ -1873,12 +1975,12 @@
                     "description": "The Point2D to add."
                 }
             ],
-            "class": "GUI classes..Path shape.",
-            "namespace": "GUI classes."
+            "class": "Path shape.",
+            "module": "math"
         },
         {
             "file": "src/math/shapes.js",
-            "line": 245,
+            "line": 249,
             "description": "Add a control point to the path.",
             "params": [
                 {
@@ -1886,12 +1988,12 @@
                     "description": "The Point2D to make a control point."
                 }
             ],
-            "class": "GUI classes..Path shape.",
-            "namespace": "GUI classes."
+            "class": "Path shape.",
+            "module": "math"
         },
         {
             "file": "src/math/shapes.js",
-            "line": 259,
+            "line": 263,
             "description": "Add points to the path.",
             "params": [
                 {
@@ -1899,12 +2001,12 @@
                     "description": "The list of Point2D to add."
                 }
             ],
-            "class": "GUI classes..Path shape.",
-            "namespace": "GUI classes."
+            "class": "Path shape.",
+            "module": "math"
         },
         {
             "file": "src/math/shapes.js",
-            "line": 267,
+            "line": 271,
             "description": "Append a Path to this one.",
             "params": [
                 {
@@ -1912,13 +2014,14 @@
                     "description": "The Path to append."
                 }
             ],
-            "class": "GUI classes..Path shape.",
-            "namespace": "GUI classes."
+            "class": "Path shape.",
+            "module": "math"
         },
         {
             "file": "src/tools/filter.js",
             "line": 71,
             "class": "Filter classes..Filter tool.",
+            "module": "math",
             "namespace": "Filter classes."
         },
         {
@@ -1927,6 +2030,7 @@
             "itemtype": "method",
             "name": "Create the windowing info div.",
             "class": "Filter classes..Draw line command.",
+            "module": "math",
             "namespace": "Filter classes."
         },
         {
@@ -1941,6 +2045,7 @@
                 }
             ],
             "class": "Filter classes..Draw line command.",
+            "module": "math",
             "namespace": "Filter classes."
         },
         {
@@ -1949,6 +2054,7 @@
             "itemtype": "method",
             "name": "Create the position info div.",
             "class": "Filter classes..Draw line command.",
+            "module": "math",
             "namespace": "Filter classes."
         },
         {
@@ -1963,6 +2069,7 @@
                 }
             ],
             "class": "Filter classes..Draw line command.",
+            "module": "math",
             "namespace": "Filter classes."
         },
         {
@@ -1971,6 +2078,7 @@
             "itemtype": "method",
             "name": "Create the mini color map info div.",
             "class": "Filter classes..Draw line command.",
+            "module": "math",
             "namespace": "Filter classes."
         },
         {
@@ -1985,6 +2093,7 @@
                 }
             ],
             "class": "Filter classes..Draw line command.",
+            "module": "math",
             "namespace": "Filter classes."
         },
         {
@@ -1993,6 +2102,7 @@
             "itemtype": "method",
             "name": "Create the plot info.",
             "class": "Filter classes..Draw line command.",
+            "module": "math",
             "namespace": "Filter classes."
         },
         {
@@ -2007,6 +2117,7 @@
                 }
             ],
             "class": "Filter classes..Draw line command.",
+            "module": "math",
             "namespace": "Filter classes."
         },
         {
@@ -2020,6 +2131,7 @@
                 }
             ],
             "class": "Filter classes..UndoStack class.",
+            "module": "math",
             "namespace": "Filter classes."
         },
         {
@@ -2027,6 +2139,7 @@
             "line": 33,
             "description": "Undo the last command.",
             "class": "Filter classes..UndoStack class.",
+            "module": "math",
             "namespace": "Filter classes."
         },
         {
@@ -2034,6 +2147,7 @@
             "line": 67,
             "description": "Redo the last command.",
             "class": "Filter classes..UndoStack class.",
+            "module": "math",
             "namespace": "Filter classes."
         },
         {
@@ -2041,6 +2155,7 @@
             "line": 6,
             "fileoverview": "WindowLevel tool.",
             "class": "Filter classes..WindowLevel tool: handle window/level related events.",
+            "module": "math",
             "namespace": "Filter classes."
         },
         {
@@ -2049,6 +2164,7 @@
             "itemtype": "method",
             "name": "Update the views' current position.",
             "class": "Filter classes..WindowLevel tool: handle window/level related events.",
+            "module": "math",
             "namespace": "Filter classes."
         },
         {
@@ -2057,6 +2173,7 @@
             "itemtype": "method",
             "name": "Update the views' windowing data",
             "class": "Filter classes..WindowLevel tool: handle window/level related events.",
+            "module": "math",
             "namespace": "Filter classes."
         },
         {
@@ -2065,6 +2182,7 @@
             "itemtype": "method",
             "name": "Update the views' colour map.",
             "class": "Filter classes..WindowLevel tool: handle window/level related events.",
+            "module": "math",
             "namespace": "Filter classes."
         },
         {
@@ -2073,6 +2191,7 @@
             "itemtype": "method",
             "name": "Update the window/level presets.",
             "class": "Filter classes..WindowLevel tool: handle window/level related events.",
+            "module": "math",
             "namespace": "Filter classes."
         },
         {
@@ -2081,6 +2200,7 @@
             "itemtype": "method",
             "name": "Set the window/level presets.",
             "class": "Filter classes..WindowLevel tool: handle window/level related events.",
+            "module": "math",
             "namespace": "Filter classes."
         },
         {
@@ -2089,6 +2209,7 @@
             "itemtype": "method",
             "name": "Set the colour map.",
             "class": "Filter classes..WindowLevel tool: handle window/level related events.",
+            "module": "math",
             "namespace": "Filter classes."
         },
         {
@@ -2097,6 +2218,7 @@
             "itemtype": "method",
             "name": "",
             "class": "Filter classes..Zoom class.",
+            "module": "math",
             "namespace": "Filter classes."
         },
         {
@@ -2105,6 +2227,7 @@
             "itemtype": "method",
             "name": "Capitalise the first letter of a string.",
             "class": "Filter classes..App\nMain application.",
+            "module": "math",
             "namespace": "Filter classes."
         },
         {
@@ -2113,6 +2236,7 @@
             "itemtype": "method",
             "name": "Clean string.",
             "class": "Filter classes..App\nMain application.",
+            "module": "math",
             "namespace": "Filter classes."
         },
         {
@@ -2120,6 +2244,7 @@
             "line": 27,
             "description": "root?key0=val0&key1=val1 returns [{\"key\"=\"key0\", \"value\"=\"val0\"}, {\"key\"=\"key1\", \"value\"=\"val1\"}]\nReturns null if not a query string (no question mark).",
             "class": "Filter classes..App\nMain application.",
+            "module": "math",
             "namespace": "Filter classes."
         },
         {
@@ -2127,6 +2252,7 @@
             "line": 67,
             "description": "Initialise the HTML for the application.",
             "class": "Filter classes..App\nMain application.",
+            "module": "math",
             "namespace": "Filter classes."
         },
         {
@@ -2140,6 +2266,7 @@
                 }
             ],
             "class": "Filter classes..App\nMain application.",
+            "module": "math",
             "namespace": "Filter classes."
         },
         {
@@ -2148,6 +2275,7 @@
             "access": "public",
             "tagname": "",
             "class": "Filter classes..App\nMain application.",
+            "module": "math",
             "namespace": "Filter classes."
         },
         {
@@ -2156,6 +2284,7 @@
             "access": "public",
             "tagname": "",
             "class": "Filter classes..App\nMain application.",
+            "module": "math",
             "namespace": "Filter classes."
         },
         {
@@ -2164,6 +2293,7 @@
             "access": "public",
             "tagname": "",
             "class": "Filter classes..App\nMain application.",
+            "module": "math",
             "namespace": "Filter classes."
         },
         {
@@ -2172,6 +2302,7 @@
             "access": "public",
             "tagname": "",
             "class": "Filter classes..App\nMain application.",
+            "module": "math",
             "namespace": "Filter classes."
         },
         {
@@ -2179,6 +2310,7 @@
             "line": 272,
             "description": "Generate the image data and draw it.",
             "class": "Filter classes..App\nMain application.",
+            "module": "math",
             "namespace": "Filter classes."
         },
         {
@@ -2186,6 +2318,7 @@
             "line": 285,
             "description": "To be called once the image is loaded.",
             "class": "Filter classes..App\nMain application.",
+            "module": "math",
             "namespace": "Filter classes."
         },
         {
@@ -2193,6 +2326,7 @@
             "line": 306,
             "description": "To be called once the image is loaded.",
             "class": "Filter classes..App\nMain application.",
+            "module": "math",
             "namespace": "Filter classes."
         },
         {
@@ -2200,6 +2334,7 @@
             "line": 315,
             "description": "Toggle the display of the info layer.",
             "class": "Filter classes..App\nMain application.",
+            "module": "math",
             "namespace": "Filter classes."
         },
         {
@@ -2207,6 +2342,7 @@
             "line": 336,
             "description": "Add image listeners.",
             "class": "Filter classes..App\nMain application.",
+            "module": "math",
             "namespace": "Filter classes."
         },
         {
@@ -2214,6 +2350,7 @@
             "line": 348,
             "description": "Remove image listeners.",
             "class": "Filter classes..App\nMain application.",
+            "module": "math",
             "namespace": "Filter classes."
         },
         {
@@ -2222,6 +2359,7 @@
             "access": "private",
             "tagname": "The general-purpose event handler. This function just determines the mouse \nposition relative to the canvas element.",
             "class": "Filter classes..App\nMain application.",
+            "module": "math",
             "namespace": "Filter classes."
         },
         {
@@ -2230,6 +2368,7 @@
             "access": "private",
             "tagname": "",
             "class": "Filter classes..App\nMain application.",
+            "module": "math",
             "namespace": "Filter classes."
         },
         {
@@ -2248,6 +2387,7 @@
                 }
             ],
             "class": "Filter classes..App\nMain application.",
+            "module": "math",
             "namespace": "Filter classes."
         },
         {
@@ -2262,6 +2402,7 @@
                 }
             ],
             "class": "Filter classes..App\nMain application.",
+            "module": "math",
             "namespace": "Filter classes."
         },
         {
@@ -2270,6 +2411,7 @@
             "access": "private",
             "tagname": "To be called once the DICOM has been parsed.",
             "class": "Filter classes..App\nMain application.",
+            "module": "math",
             "namespace": "Filter classes."
         }
     ],
@@ -2716,63 +2858,63 @@
         },
         {
             "message": "Missing item type\nshapes.js\nDefinition of basic shapes.",
-            "line": " src/math/shapes.js:6"
+            "line": " src/math/shapes.js:10"
         },
         {
             "message": "Missing item type\nCheck for Point2D equality.",
-            "line": " src/math/shapes.js:24"
+            "line": " src/math/shapes.js:28"
         },
         {
             "message": "Missing item type\nGet a string representation of the Point2D.",
-            "line": " src/math/shapes.js:36"
+            "line": " src/math/shapes.js:40"
         },
         {
             "message": "Missing item type\nCheck for FastPoint2D equality.",
-            "line": " src/math/shapes.js:55"
+            "line": " src/math/shapes.js:59"
         },
         {
             "message": "Missing item type\nGet a string representation of the FastPoint2D.",
-            "line": " src/math/shapes.js:67"
+            "line": " src/math/shapes.js:71"
         },
         {
             "message": "Missing item type\nGet a point of the list.",
-            "line": " src/math/shapes.js:172"
+            "line": " src/math/shapes.js:176"
         },
         {
             "message": "Missing item type\nAdd a point to the ROI.",
-            "line": " src/math/shapes.js:180"
+            "line": " src/math/shapes.js:184"
         },
         {
             "message": "Missing item type\nAdd points to the ROI.",
-            "line": " src/math/shapes.js:185"
+            "line": " src/math/shapes.js:189"
         },
         {
             "message": "Missing item type\nGet a point of the list.",
-            "line": " src/math/shapes.js:206"
+            "line": " src/math/shapes.js:210"
         },
         {
             "message": "Missing item type\nIs is a control point.",
-            "line": " src/math/shapes.js:215"
+            "line": " src/math/shapes.js:219"
         },
         {
             "message": "Missing item type\nGet the length of the path.",
-            "line": " src/math/shapes.js:230"
+            "line": " src/math/shapes.js:234"
         },
         {
             "message": "Missing item type\nAdd a point to the path.",
-            "line": " src/math/shapes.js:237"
+            "line": " src/math/shapes.js:241"
         },
         {
             "message": "Missing item type\nAdd a control point to the path.",
-            "line": " src/math/shapes.js:245"
+            "line": " src/math/shapes.js:249"
         },
         {
             "message": "Missing item type\nAdd points to the path.",
-            "line": " src/math/shapes.js:259"
+            "line": " src/math/shapes.js:263"
         },
         {
             "message": "Missing item type\nAppend a Path to this one.",
-            "line": " src/math/shapes.js:267"
+            "line": " src/math/shapes.js:271"
         },
         {
             "message": "Missing item type",

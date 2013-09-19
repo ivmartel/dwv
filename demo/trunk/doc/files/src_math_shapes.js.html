@@ -41,11 +41,21 @@
         <div id="api-tabview-panel">
             <ul id="api-classes" class="apis classes">
             
+                <li><a href="../classes/2D point. Immutable..html">2D point. Immutable.</a></li>
+            
+                <li><a href="../classes/Circle shape..html">Circle shape.</a></li>
+            
                 <li><a href="../classes/Data reader.html">Data reader</a></li>
             
                 <li><a href="../classes/DICOM tag dictionary..html">DICOM tag dictionary.</a></li>
             
                 <li><a href="../classes/DicomParser class..html">DicomParser class.</a></li>
+            
+                <li><a href="../classes/Draw circle command..html">Draw circle command.</a></li>
+            
+                <li><a href="../classes/Drawing tool..html">Drawing tool.</a></li>
+            
+                <li><a href="../classes/Fast 2D point since it&#x27;s mutable!.html">Fast 2D point since it&#x27;s mutable!</a></li>
             
                 <li><a href="../classes/Filter classes..App
 Main application..html">Filter classes..App
@@ -79,10 +89,6 @@ Main application.</a></li>
             
                 <li><a href="../classes/Filter classes..Zoom class..html">Filter classes..Zoom class.</a></li>
             
-                <li><a href="../classes/GUI classes..2D point. Immutable..html">GUI classes..2D point. Immutable.</a></li>
-            
-                <li><a href="../classes/GUI classes..Circle shape..html">GUI classes..Circle shape.</a></li>
-            
                 <li><a href="../classes/GUI classes..Circular Bucket Queue.
 
 Returns input&#x27;d points in sorted order. All operations run in roughly O(1)
@@ -97,12 +103,6 @@ time (for input with small cost values), but it has a strict requirement:
 If the most recent point had a cost of c, any points added should have a cost
 c&#x27; in the range c &lt;= c&#x27; &lt;= c + (capacity - 1).</a></li>
             
-                <li><a href="../classes/GUI classes..Draw circle command..html">GUI classes..Draw circle command.</a></li>
-            
-                <li><a href="../classes/GUI classes..Drawing tool..html">GUI classes..Drawing tool.</a></li>
-            
-                <li><a href="../classes/GUI classes..Fast 2D point since it&#x27;s mutable!.html">GUI classes..Fast 2D point since it&#x27;s mutable!</a></li>
-            
                 <li><a href="../classes/GUI classes..Image class..html">GUI classes..Image class.</a></li>
             
                 <li><a href="../classes/GUI classes..Image Size class. 
@@ -112,16 +112,6 @@ Supports 2D and 3D images.</a></li>
                 <li><a href="../classes/GUI classes..Image Spacing class. 
 Supports 2D and 3D images..html">GUI classes..Image Spacing class. 
 Supports 2D and 3D images.</a></li>
-            
-                <li><a href="../classes/GUI classes..Line shape..html">GUI classes..Line shape.</a></li>
-            
-                <li><a href="../classes/GUI classes..Path shape..html">GUI classes..Path shape.</a></li>
-            
-                <li><a href="../classes/GUI classes..Rectangle shape..html">GUI classes..Rectangle shape.</a></li>
-            
-                <li><a href="../classes/GUI classes..Region Of Interest shape.
-Note: should be a closed path..html">GUI classes..Region Of Interest shape.
-Note: should be a closed path.</a></li>
             
                 <li><a href="../classes/GUI classes..Rescale LUT class..html">GUI classes..Rescale LUT class.</a></li>
             
@@ -153,9 +143,23 @@ Highly inspired from http://code.google.com/p/livewire-javascript/</a></li>
             
                 <li><a href="../classes/GUI classes..Window LUT class..html">GUI classes..Window LUT class.</a></li>
             
+                <li><a href="../classes/Line shape..html">Line shape.</a></li>
+            
+                <li><a href="../classes/Path shape..html">Path shape.</a></li>
+            
+                <li><a href="../classes/Rectangle shape..html">Rectangle shape.</a></li>
+            
+                <li><a href="../classes/Region Of Interest shape.
+Note: should be a closed path..html">Region Of Interest shape.
+Note: should be a closed path.</a></li>
+            
             </ul>
 
             <ul id="api-modules" class="apis modules">
+            
+                <li><a href="../modules/dwv.html">dwv</a></li>
+            
+                <li><a href="../modules/math.html">math</a></li>
             
             </ul>
         </div>
@@ -196,9 +200,13 @@ Highly inspired from http://code.google.com/p/livewire-javascript/</a></li>
 
 <div class="file">
     <pre class="code prettyprint linenums">
-//! @module Main DWV namespace.
+/** Main DWV module.
+ * @module dwv
+ */
 var dwv = dwv || {};
-//! @module Math related.
+/** Math module.
+ * @module math
+ */
 dwv.math = dwv.math || {};
 
 /**
