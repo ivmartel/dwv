@@ -90,14 +90,14 @@ body { font-size: 80%; }
 
 -- path with extra /dwv
 print([[
-<link rel="stylesheet" href="/dwv/ext/jquery/ui/1.10.2/themes/ui-darkness/jquery-ui-1.10.2.min.css">
+<link rel="stylesheet" href="/dwv/ext/jquery-ui/themes/ui-darkness/jquery-ui-1.10.2.min.css">
 ]])
 
 -- path with extra /dwv
 print([[
 <!-- Third party --> 
 <script type="text/javascript" src="/dwv/ext/jquery/jquery-1.9.1.min.js"></script>
-<script type="text/javascript" src="/dwv/ext/jquery/ui/1.10.2/jquery-ui-1.10.2.min.js"></script>
+<script type="text/javascript" src="/dwv/ext/jquery-ui/jquery-ui-1.10.2.min.js"></script>
 <script type="text/javascript" src="/dwv/ext/flot/jquery.flot.min.js"></script>
 ]])
 
