@@ -26,15 +26,28 @@ module.exports = function(grunt) {
                     'dist/<%= pkg.name %>.min.js': ['<%= concat.dist.dest %>']
                 }
             }
-        }
+        },
+        yuidoc: {
+            compile: {
+              name: '<%= pkg.name %>',
+              description: '<%= pkg.description %>',
+              version: '<%= pkg.version %>',
+              url: '<%= pkg.homepage %>',
+              options: {
+                paths: 'src/',
+                outdir: 'dist/docs/'
+              }
+            }
+          }
     });
 
     grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-contrib-qunit');
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-contrib-uglify');
+    grunt.loadNpmTasks('grunt-contrib-yuidoc');
     
     // Task to run tests
-    grunt.registerTask('test', ['jshint', 'qunit', 'concat', 'uglify']);
+    grunt.registerTask('test', ['jshint', 'qunit', 'concat', 'uglify', 'yuidoc']);
 };
 
