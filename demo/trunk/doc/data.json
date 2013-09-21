@@ -142,9 +142,9 @@
                 "math": 1
             },
             "classes": {
-                "2D point. Immutable.": 1,
-                "Fast 2D point since it's mutable!": 1,
-                "Circle shape.": 1,
+                "dwv.math.Point2D": 1,
+                "FastPoint2D": 1,
+                "dwv.math.Circle": 1,
                 "Line shape.": 1,
                 "Rectangle shape.": 1,
                 "Region Of Interest shape.\nNote: should be a closed path.": 1,
@@ -312,9 +312,9 @@
             "name": "math",
             "submodules": {},
             "classes": {
-                "2D point. Immutable.": 1,
-                "Fast 2D point since it's mutable!": 1,
-                "Circle shape.": 1,
+                "dwv.math.Point2D": 1,
+                "FastPoint2D": 1,
+                "dwv.math.Circle": 1,
                 "Line shape.": 1,
                 "Rectangle shape.": 1,
                 "Region Of Interest shape.\nNote: should be a closed path.": 1,
@@ -580,9 +580,9 @@
             "file": "src/math/scissors.js",
             "line": 276
         },
-        "2D point. Immutable.": {
-            "name": "2D point. Immutable.",
-            "shortname": "2D point. Immutable.",
+        "dwv.math.Point2D": {
+            "name": "dwv.math.Point2D",
+            "shortname": "dwv.math.Point2D",
             "classitems": [],
             "plugins": [],
             "extensions": [],
@@ -591,21 +591,23 @@
             "module": "math",
             "namespace": "",
             "file": "src/math/shapes.js",
-            "line": 15,
+            "line": 10,
             "params": [
                 {
                     "name": "x",
-                    "description": "The X coordinate for the point."
+                    "description": "The X coordinate for the point.",
+                    "type": "Number"
                 },
                 {
                     "name": "y",
-                    "description": "The Y coordinate for the point."
+                    "description": "The Y coordinate for the point.",
+                    "type": "Number"
                 }
             ]
         },
-        "Fast 2D point since it's mutable!": {
-            "name": "Fast 2D point since it's mutable!",
-            "shortname": "Fast 2D point since it's mutable!",
+        "FastPoint2D": {
+            "name": "FastPoint2D",
+            "shortname": "FastPoint2D",
             "classitems": [],
             "plugins": [],
             "extensions": [],
@@ -614,21 +616,23 @@
             "module": "math",
             "namespace": "",
             "file": "src/math/shapes.js",
-            "line": 48,
+            "line": 47,
             "params": [
                 {
                     "name": "x",
-                    "description": "The X coordinate for the point."
+                    "description": "The X coordinate for the point.",
+                    "type": "Number"
                 },
                 {
                     "name": "y",
-                    "description": "The Y coordinate for the point."
+                    "description": "The Y coordinate for the point.",
+                    "type": "Number"
                 }
             ]
         },
-        "Circle shape.": {
-            "name": "Circle shape.",
-            "shortname": "Circle shape.",
+        "dwv.math.Circle": {
+            "name": "dwv.math.Circle",
+            "shortname": "dwv.math.Circle",
             "classitems": [],
             "plugins": [],
             "extensions": [],
@@ -637,7 +641,7 @@
             "module": "math",
             "namespace": "",
             "file": "src/math/shapes.js",
-            "line": 79,
+            "line": 78,
             "params": [
                 {
                     "name": "centre",
@@ -660,7 +664,7 @@
             "module": "math",
             "namespace": "",
             "file": "src/math/shapes.js",
-            "line": 102,
+            "line": 101,
             "params": [
                 {
                     "name": "begin",
@@ -683,7 +687,7 @@
             "module": "math",
             "namespace": "",
             "file": "src/math/shapes.js",
-            "line": 136,
+            "line": 135,
             "params": [
                 {
                     "name": "begin",
@@ -706,7 +710,7 @@
             "module": "math",
             "namespace": "",
             "file": "src/math/shapes.js",
-            "line": 167
+            "line": 166
         },
         "Path shape.": {
             "name": "Path shape.",
@@ -719,7 +723,7 @@
             "module": "math",
             "namespace": "",
             "file": "src/math/shapes.js",
-            "line": 196,
+            "line": 195,
             "params": [
                 {
                     "name": "points",
@@ -1827,66 +1831,85 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 10,
-            "description": "shapes.js\nDefinition of basic shapes.",
-            "class": "2D point. Immutable.",
+            "line": 17,
+            "itemtype": "method",
+            "name": "getX",
+            "class": "dwv.math.Point2D",
             "module": "math"
         },
         {
             "file": "src/math/shapes.js",
-            "line": 28,
-            "description": "Check for Point2D equality.",
+            "line": 21,
+            "itemtype": "method",
+            "name": "getY",
+            "class": "dwv.math.Point2D",
+            "module": "math"
+        },
+        {
+            "file": "src/math/shapes.js",
+            "line": 27,
+            "itemtype": "method",
+            "name": "equals",
             "params": [
                 {
                     "name": "other",
-                    "description": "The other Point2D to compare to."
+                    "description": "The other Point2D to compare to.",
+                    "type": "Point2D"
                 }
             ],
             "return": {
-                "description": "True if both points are equal."
+                "description": "True if both points are equal.",
+                "type": "Boolean"
             },
-            "class": "2D point. Immutable.",
+            "class": "dwv.math.Point2D",
             "module": "math"
         },
         {
             "file": "src/math/shapes.js",
-            "line": 40,
-            "description": "Get a string representation of the Point2D.",
+            "line": 39,
+            "itemtype": "method",
+            "name": "toString",
             "return": {
-                "description": "The Point2D as string."
+                "description": "The Point2D as string.",
+                "type": "String"
             },
-            "class": "2D point. Immutable.",
+            "class": "dwv.math.Point2D",
             "module": "math"
         },
         {
             "file": "src/math/shapes.js",
-            "line": 59,
-            "description": "Check for FastPoint2D equality.",
+            "line": 58,
+            "itemtype": "method",
+            "name": "equals",
             "params": [
                 {
                     "name": "other",
-                    "description": "The other FastPoint2D to compare to."
+                    "description": "The other FastPoint2D to compare to.",
+                    "type": "FastPoint2D"
                 }
             ],
             "return": {
-                "description": "True if both points are equal."
+                "description": "True if both points are equal.",
+                "type": "Boolean"
             },
-            "class": "Fast 2D point since it's mutable!",
+            "class": "FastPoint2D",
             "module": "math"
         },
         {
             "file": "src/math/shapes.js",
-            "line": 71,
-            "description": "Get a string representation of the FastPoint2D.",
+            "line": 70,
+            "itemtype": "method",
+            "name": "toString",
             "return": {
-                "description": "The Point2D as string."
+                "description": "The Point2D as string.",
+                "type": "String"
             },
-            "class": "Fast 2D point since it's mutable!",
+            "class": "FastPoint2D",
             "module": "math"
         },
         {
             "file": "src/math/shapes.js",
-            "line": 176,
+            "line": 175,
             "description": "Get a point of the list.",
             "params": [
                 {
@@ -1902,7 +1925,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 184,
+            "line": 183,
             "description": "Add a point to the ROI.",
             "params": [
                 {
@@ -1915,7 +1938,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 189,
+            "line": 188,
             "description": "Add points to the ROI.",
             "params": [
                 {
@@ -1928,7 +1951,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 210,
+            "line": 209,
             "description": "Get a point of the list.",
             "params": [
                 {
@@ -1944,7 +1967,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 219,
+            "line": 218,
             "description": "Is is a control point.",
             "params": [
                 {
@@ -1960,14 +1983,14 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 234,
+            "line": 233,
             "description": "Get the length of the path.",
             "class": "Path shape.",
             "module": "math"
         },
         {
             "file": "src/math/shapes.js",
-            "line": 241,
+            "line": 240,
             "description": "Add a point to the path.",
             "params": [
                 {
@@ -1980,7 +2003,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 249,
+            "line": 248,
             "description": "Add a control point to the path.",
             "params": [
                 {
@@ -1993,7 +2016,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 263,
+            "line": 262,
             "description": "Add points to the path.",
             "params": [
                 {
@@ -2006,7 +2029,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 271,
+            "line": 270,
             "description": "Append a Path to this one.",
             "params": [
                 {
@@ -2857,64 +2880,44 @@
             "line": " src/math/scissors.js:105"
         },
         {
-            "message": "Missing item type\nshapes.js\nDefinition of basic shapes.",
-            "line": " src/math/shapes.js:10"
-        },
-        {
-            "message": "Missing item type\nCheck for Point2D equality.",
-            "line": " src/math/shapes.js:28"
-        },
-        {
-            "message": "Missing item type\nGet a string representation of the Point2D.",
-            "line": " src/math/shapes.js:40"
-        },
-        {
-            "message": "Missing item type\nCheck for FastPoint2D equality.",
-            "line": " src/math/shapes.js:59"
-        },
-        {
-            "message": "Missing item type\nGet a string representation of the FastPoint2D.",
-            "line": " src/math/shapes.js:71"
-        },
-        {
             "message": "Missing item type\nGet a point of the list.",
-            "line": " src/math/shapes.js:176"
+            "line": " src/math/shapes.js:175"
         },
         {
             "message": "Missing item type\nAdd a point to the ROI.",
-            "line": " src/math/shapes.js:184"
+            "line": " src/math/shapes.js:183"
         },
         {
             "message": "Missing item type\nAdd points to the ROI.",
-            "line": " src/math/shapes.js:189"
+            "line": " src/math/shapes.js:188"
         },
         {
             "message": "Missing item type\nGet a point of the list.",
-            "line": " src/math/shapes.js:210"
+            "line": " src/math/shapes.js:209"
         },
         {
             "message": "Missing item type\nIs is a control point.",
-            "line": " src/math/shapes.js:219"
+            "line": " src/math/shapes.js:218"
         },
         {
             "message": "Missing item type\nGet the length of the path.",
-            "line": " src/math/shapes.js:234"
+            "line": " src/math/shapes.js:233"
         },
         {
             "message": "Missing item type\nAdd a point to the path.",
-            "line": " src/math/shapes.js:241"
+            "line": " src/math/shapes.js:240"
         },
         {
             "message": "Missing item type\nAdd a control point to the path.",
-            "line": " src/math/shapes.js:249"
+            "line": " src/math/shapes.js:248"
         },
         {
             "message": "Missing item type\nAdd points to the path.",
-            "line": " src/math/shapes.js:263"
+            "line": " src/math/shapes.js:262"
         },
         {
             "message": "Missing item type\nAppend a Path to this one.",
-            "line": " src/math/shapes.js:271"
+            "line": " src/math/shapes.js:270"
         },
         {
             "message": "Missing item type",

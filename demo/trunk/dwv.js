@@ -5885,28 +5885,27 @@ var dwv = dwv || {};
  */
 dwv.math = dwv.math || {};
 
-/**
- * shapes.js
- * Definition of basic shapes.
- */
-
-/**
- * @class 2D point. Immutable.
- * @param x The X coordinate for the point.
- * @param y The Y coordinate for the point.
+/** 2D point. Immutable.
+ * @class dwv.math.Point2D
+ * @param {Number} x The X coordinate for the point.
+ * @param {Number} y The Y coordinate for the point.
  */
 dwv.math.Point2D = function(x,y)
 {
-    // Get the X position of the point.
+    /** Get the X position of the point.
+     * @method getX
+     * @return {Number} The X position of the point. */
     this.getX = function() { return x; };
-    // Get the Y position of the point.
+    /** Get the Y position of the point.
+     * @method getY
+     * @return {Number} The Y position of the point. */
     this.getY = function() { return y; };
 }; // Point2D class
 
-/**
- * Check for Point2D equality.
- * @param other The other Point2D to compare to.
- * @return True if both points are equal.
+/** Check for Point2D equality.
+ * @method equals
+ * @param {Point2D} other The other Point2D to compare to.
+ * @return {Boolean} True if both points are equal.
  */ 
 dwv.math.Point2D.prototype.equals = function(other) {
     if( !other ) { 
@@ -5915,18 +5914,18 @@ dwv.math.Point2D.prototype.equals = function(other) {
     return ( this.getX() === other.getX() && this.getY() === other.getY() );
 };
 
-/**
- * Get a string representation of the Point2D.
- * @return The Point2D as string.
+/** Get a string representation of the Point2D.
+ * @method toString
+ * @return {String} The Point2D as string.
  */ 
 dwv.math.Point2D.prototype.toString = function() {
     return "(" + this.getX() + ", " + this.getY() + ")";
 };
 
-/**
- * @class Fast 2D point since it's mutable!
- * @param x The X coordinate for the point.
- * @param y The Y coordinate for the point.
+/** Fast 2D point since it's mutable!
+ * @class FastPoint2D
+ * @param {Number} x The X coordinate for the point.
+ * @param {Number} y The Y coordinate for the point.
  */
 dwv.math.FastPoint2D = function(x,y)
 {
@@ -5934,10 +5933,10 @@ dwv.math.FastPoint2D = function(x,y)
     this.y = y;
 }; // FastPoint2D class
 
-/**
- * Check for FastPoint2D equality.
- * @param other The other FastPoint2D to compare to.
- * @return True if both points are equal.
+/** Check for FastPoint2D equality.
+ * @method equals
+ * @param {FastPoint2D} other The other FastPoint2D to compare to.
+ * @return {Boolean} True if both points are equal.
  */ 
 dwv.math.FastPoint2D.prototype.equals = function(other) {
     if( !other ) { 
@@ -5946,16 +5945,16 @@ dwv.math.FastPoint2D.prototype.equals = function(other) {
     return ( this.x === other.x && this.y === other.y );
 };
 
-/**
- * Get a string representation of the FastPoint2D.
- * @return The Point2D as string.
+/** Get a string representation of the FastPoint2D.
+ * @method toString
+ * @return {String} The Point2D as string.
  */ 
 dwv.math.FastPoint2D.prototype.toString = function() {
     return "(" + this.x + ", " + this.y + ")";
 };
 
-/**
- * @class Circle shape.
+/** Circle shape.
+ * @class dwv.math.Circle
  * @param centre A Point2D representing the centre of the circle.
  * @param radius The radius of the circle.
  */

@@ -1,14 +1,12 @@
 YUI.add("yuidoc-meta", function(Y) {
    Y.YUIDoc = { meta: {
     "classes": [
-        "2D point. Immutable.",
-        "Circle shape.",
         "DICOM tag dictionary.",
         "Data reader",
         "DicomParser class.",
         "Draw circle command.",
         "Drawing tool.",
-        "Fast 2D point since it's mutable!",
+        "FastPoint2D",
         "Filter classes..App\nMain application.",
         "Filter classes..Draw ROI command.",
         "Filter classes..Draw line command.",
@@ -37,7 +35,9 @@ YUI.add("yuidoc-meta", function(Y) {
         "Line shape.",
         "Path shape.",
         "Rectangle shape.",
-        "Region Of Interest shape.\nNote: should be a closed path."
+        "Region Of Interest shape.\nNote: should be a closed path.",
+        "dwv.math.Circle",
+        "dwv.math.Point2D"
     ],
     "modules": [
         "dwv",

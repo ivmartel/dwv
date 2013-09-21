@@ -41,10 +41,6 @@
         <div id="api-tabview-panel">
             <ul id="api-classes" class="apis classes">
             
-                <li><a href="../classes/2D point. Immutable..html">2D point. Immutable.</a></li>
-            
-                <li><a href="../classes/Circle shape..html">Circle shape.</a></li>
-            
                 <li><a href="../classes/Data reader.html">Data reader</a></li>
             
                 <li><a href="../classes/DICOM tag dictionary..html">DICOM tag dictionary.</a></li>
@@ -55,7 +51,11 @@
             
                 <li><a href="../classes/Drawing tool..html">Drawing tool.</a></li>
             
-                <li><a href="../classes/Fast 2D point since it&#x27;s mutable!.html">Fast 2D point since it&#x27;s mutable!</a></li>
+                <li><a href="../classes/dwv.math.Circle.html">dwv.math.Circle</a></li>
+            
+                <li><a href="../classes/dwv.math.Point2D.html">dwv.math.Point2D</a></li>
+            
+                <li><a href="../classes/FastPoint2D.html">FastPoint2D</a></li>
             
                 <li><a href="../classes/Filter classes..App
 Main application..html">Filter classes..App
@@ -209,28 +209,27 @@ var dwv = dwv || {};
  */
 dwv.math = dwv.math || {};
 
-/**
- * shapes.js
- * Definition of basic shapes.
- */
-
-/**
- * @class 2D point. Immutable.
- * @param x The X coordinate for the point.
- * @param y The Y coordinate for the point.
+/** 2D point. Immutable.
+ * @class dwv.math.Point2D
+ * @param {Number} x The X coordinate for the point.
+ * @param {Number} y The Y coordinate for the point.
  */
 dwv.math.Point2D = function(x,y)
 {
-    // Get the X position of the point.
+    /** Get the X position of the point.
+     * @method getX
+     * @return {Number} The X position of the point. */
     this.getX = function() { return x; };
-    // Get the Y position of the point.
+    /** Get the Y position of the point.
+     * @method getY
+     * @return {Number} The Y position of the point. */
     this.getY = function() { return y; };
 }; // Point2D class
 
-/**
- * Check for Point2D equality.
- * @param other The other Point2D to compare to.
- * @return True if both points are equal.
+/** Check for Point2D equality.
+ * @method equals
+ * @param {Point2D} other The other Point2D to compare to.
+ * @return {Boolean} True if both points are equal.
  */ 
 dwv.math.Point2D.prototype.equals = function(other) {
     if( !other ) { 
@@ -239,18 +238,18 @@ dwv.math.Point2D.prototype.equals = function(other) {
     return ( this.getX() === other.getX() &amp;&amp; this.getY() === other.getY() );
 };
 
-/**
- * Get a string representation of the Point2D.
- * @return The Point2D as string.
+/** Get a string representation of the Point2D.
+ * @method toString
+ * @return {String} The Point2D as string.
  */ 
 dwv.math.Point2D.prototype.toString = function() {
     return &quot;(&quot; + this.getX() + &quot;, &quot; + this.getY() + &quot;)&quot;;
 };
 
-/**
- * @class Fast 2D point since it&#x27;s mutable!
- * @param x The X coordinate for the point.
- * @param y The Y coordinate for the point.
+/** Fast 2D point since it&#x27;s mutable!
+ * @class FastPoint2D
+ * @param {Number} x The X coordinate for the point.
+ * @param {Number} y The Y coordinate for the point.
  */
 dwv.math.FastPoint2D = function(x,y)
 {
@@ -258,10 +257,10 @@ dwv.math.FastPoint2D = function(x,y)
     this.y = y;
 }; // FastPoint2D class
 
-/**
- * Check for FastPoint2D equality.
- * @param other The other FastPoint2D to compare to.
- * @return True if both points are equal.
+/** Check for FastPoint2D equality.
+ * @method equals
+ * @param {FastPoint2D} other The other FastPoint2D to compare to.
+ * @return {Boolean} True if both points are equal.
  */ 
 dwv.math.FastPoint2D.prototype.equals = function(other) {
     if( !other ) { 
@@ -270,16 +269,16 @@ dwv.math.FastPoint2D.prototype.equals = function(other) {
     return ( this.x === other.x &amp;&amp; this.y === other.y );
 };
 
-/**
- * Get a string representation of the FastPoint2D.
- * @return The Point2D as string.
+/** Get a string representation of the FastPoint2D.
+ * @method toString
+ * @return {String} The Point2D as string.
  */ 
 dwv.math.FastPoint2D.prototype.toString = function() {
     return &quot;(&quot; + this.x + &quot;, &quot; + this.y + &quot;)&quot;;
 };
 
-/**
- * @class Circle shape.
+/** Circle shape.
+ * @class dwv.math.Circle
  * @param centre A Point2D representing the centre of the circle.
  * @param radius The radius of the circle.
  */
