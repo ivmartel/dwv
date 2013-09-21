@@ -143,21 +143,23 @@
             },
             "classes": {
                 "dwv.math.Point2D": 1,
-                "FastPoint2D": 1,
+                "dwv.math.FastPoint2D": 1,
                 "dwv.math.Circle": 1,
-                "Line shape.": 1,
-                "Rectangle shape.": 1,
-                "Region Of Interest shape.\nNote: should be a closed path.": 1,
-                "Path shape.": 1
+                "dwv.math.Line shape.": 1,
+                "dwv.math.Rectangle shape.": 1,
+                "dwv.math.Region Of Interest shape.\nNote: should be a closed path.": 1,
+                "dwv.math.Path shape.": 1
             },
             "fors": {},
-            "namespaces": {}
+            "namespaces": {
+                "dwv.math": 1
+            }
         },
         "src/tools/circle.js": {
             "name": "src/tools/circle.js",
             "modules": {},
             "classes": {
-                "Draw circle command.": 1
+                "dwv.math.Draw circle command.": 1
             },
             "fors": {},
             "namespaces": {}
@@ -166,7 +168,7 @@
             "name": "src/tools/draw.js",
             "modules": {},
             "classes": {
-                "Drawing tool.": 1
+                "dwv.math.Drawing tool.": 1
             },
             "fors": {},
             "namespaces": {}
@@ -313,14 +315,14 @@
             "submodules": {},
             "classes": {
                 "dwv.math.Point2D": 1,
-                "FastPoint2D": 1,
+                "dwv.math.FastPoint2D": 1,
                 "dwv.math.Circle": 1,
-                "Line shape.": 1,
-                "Rectangle shape.": 1,
-                "Region Of Interest shape.\nNote: should be a closed path.": 1,
-                "Path shape.": 1,
-                "Draw circle command.": 1,
-                "Drawing tool.": 1,
+                "dwv.math.Line shape.": 1,
+                "dwv.math.Rectangle shape.": 1,
+                "dwv.math.Region Of Interest shape.\nNote: should be a closed path.": 1,
+                "dwv.math.Path shape.": 1,
+                "dwv.math.Draw circle command.": 1,
+                "dwv.math.Drawing tool.": 1,
                 "Filter classes..Filter tool.": 1,
                 "Filter classes..Threshold filter tool.": 1,
                 "Filter classes..Sharpen filter tool.": 1,
@@ -339,6 +341,7 @@
             },
             "fors": {},
             "namespaces": {
+                "dwv.math": 1,
                 "Filter classes.": 1
             },
             "tag": "module",
@@ -589,9 +592,10 @@
             "plugin_for": [],
             "extension_for": [],
             "module": "math",
-            "namespace": "",
+            "namespace": "dwv.math",
             "file": "src/math/shapes.js",
             "line": 10,
+            "is_constructor": 1,
             "params": [
                 {
                     "name": "x",
@@ -605,18 +609,19 @@
                 }
             ]
         },
-        "FastPoint2D": {
-            "name": "FastPoint2D",
-            "shortname": "FastPoint2D",
+        "dwv.math.FastPoint2D": {
+            "name": "dwv.math.FastPoint2D",
+            "shortname": "dwv.math.FastPoint2D",
             "classitems": [],
             "plugins": [],
             "extensions": [],
             "plugin_for": [],
             "extension_for": [],
             "module": "math",
-            "namespace": "",
+            "namespace": "dwv.math",
             "file": "src/math/shapes.js",
-            "line": 47,
+            "line": 49,
+            "is_constructor": 1,
             "params": [
                 {
                     "name": "x",
@@ -639,9 +644,10 @@
             "plugin_for": [],
             "extension_for": [],
             "module": "math",
-            "namespace": "",
+            "namespace": "dwv.math",
             "file": "src/math/shapes.js",
-            "line": 78,
+            "line": 82,
+            "is_constructor": 1,
             "params": [
                 {
                     "name": "centre",
@@ -653,8 +659,8 @@
                 }
             ]
         },
-        "Line shape.": {
-            "name": "Line shape.",
+        "dwv.math.Line shape.": {
+            "name": "dwv.math.Line shape.",
             "shortname": "Line shape.",
             "classitems": [],
             "plugins": [],
@@ -662,9 +668,9 @@
             "plugin_for": [],
             "extension_for": [],
             "module": "math",
-            "namespace": "",
+            "namespace": "dwv.math",
             "file": "src/math/shapes.js",
-            "line": 101,
+            "line": 107,
             "params": [
                 {
                     "name": "begin",
@@ -676,8 +682,8 @@
                 }
             ]
         },
-        "Rectangle shape.": {
-            "name": "Rectangle shape.",
+        "dwv.math.Rectangle shape.": {
+            "name": "dwv.math.Rectangle shape.",
             "shortname": "Rectangle shape.",
             "classitems": [],
             "plugins": [],
@@ -685,9 +691,9 @@
             "plugin_for": [],
             "extension_for": [],
             "module": "math",
-            "namespace": "",
+            "namespace": "dwv.math",
             "file": "src/math/shapes.js",
-            "line": 135,
+            "line": 141,
             "params": [
                 {
                     "name": "begin",
@@ -699,8 +705,8 @@
                 }
             ]
         },
-        "Region Of Interest shape.\nNote: should be a closed path.": {
-            "name": "Region Of Interest shape.\nNote: should be a closed path.",
+        "dwv.math.Region Of Interest shape.\nNote: should be a closed path.": {
+            "name": "dwv.math.Region Of Interest shape.\nNote: should be a closed path.",
             "shortname": "Region Of Interest shape.\nNote: should be a closed path.",
             "classitems": [],
             "plugins": [],
@@ -708,12 +714,12 @@
             "plugin_for": [],
             "extension_for": [],
             "module": "math",
-            "namespace": "",
+            "namespace": "dwv.math",
             "file": "src/math/shapes.js",
-            "line": 166
+            "line": 172
         },
-        "Path shape.": {
-            "name": "Path shape.",
+        "dwv.math.Path shape.": {
+            "name": "dwv.math.Path shape.",
             "shortname": "Path shape.",
             "classitems": [],
             "plugins": [],
@@ -721,9 +727,9 @@
             "plugin_for": [],
             "extension_for": [],
             "module": "math",
-            "namespace": "",
+            "namespace": "dwv.math",
             "file": "src/math/shapes.js",
-            "line": 195,
+            "line": 201,
             "params": [
                 {
                     "name": "points",
@@ -735,8 +741,8 @@
                 }
             ]
         },
-        "Draw circle command.": {
-            "name": "Draw circle command.",
+        "dwv.math.Draw circle command.": {
+            "name": "dwv.math.Draw circle command.",
             "shortname": "Draw circle command.",
             "classitems": [],
             "plugins": [],
@@ -744,7 +750,7 @@
             "plugin_for": [],
             "extension_for": [],
             "module": "math",
-            "namespace": "",
+            "namespace": "dwv.math",
             "file": "src/tools/circle.js",
             "line": 6,
             "params": [
@@ -762,8 +768,8 @@
                 }
             ]
         },
-        "Drawing tool.": {
-            "name": "Drawing tool.",
+        "dwv.math.Drawing tool.": {
+            "name": "dwv.math.Drawing tool.",
             "shortname": "Drawing tool.",
             "classitems": [],
             "plugins": [],
@@ -771,7 +777,7 @@
             "plugin_for": [],
             "extension_for": [],
             "module": "math",
-            "namespace": "",
+            "namespace": "dwv.math",
             "file": "src/tools/draw.js",
             "line": 14
         },
@@ -1831,23 +1837,25 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 17,
+            "line": 19,
             "itemtype": "method",
             "name": "getX",
             "class": "dwv.math.Point2D",
-            "module": "math"
+            "module": "math",
+            "namespace": "dwv.math"
         },
         {
             "file": "src/math/shapes.js",
-            "line": 21,
+            "line": 23,
             "itemtype": "method",
             "name": "getY",
             "class": "dwv.math.Point2D",
-            "module": "math"
+            "module": "math",
+            "namespace": "dwv.math"
         },
         {
             "file": "src/math/shapes.js",
-            "line": 27,
+            "line": 29,
             "itemtype": "method",
             "name": "equals",
             "params": [
@@ -1862,11 +1870,12 @@
                 "type": "Boolean"
             },
             "class": "dwv.math.Point2D",
-            "module": "math"
+            "module": "math",
+            "namespace": "dwv.math"
         },
         {
             "file": "src/math/shapes.js",
-            "line": 39,
+            "line": 41,
             "itemtype": "method",
             "name": "toString",
             "return": {
@@ -1874,11 +1883,12 @@
                 "type": "String"
             },
             "class": "dwv.math.Point2D",
-            "module": "math"
+            "module": "math",
+            "namespace": "dwv.math"
         },
         {
             "file": "src/math/shapes.js",
-            "line": 58,
+            "line": 62,
             "itemtype": "method",
             "name": "equals",
             "params": [
@@ -1892,24 +1902,26 @@
                 "description": "True if both points are equal.",
                 "type": "Boolean"
             },
-            "class": "FastPoint2D",
-            "module": "math"
+            "class": "dwv.math.FastPoint2D",
+            "module": "math",
+            "namespace": "dwv.math"
         },
         {
             "file": "src/math/shapes.js",
-            "line": 70,
+            "line": 74,
             "itemtype": "method",
             "name": "toString",
             "return": {
                 "description": "The Point2D as string.",
                 "type": "String"
             },
-            "class": "FastPoint2D",
-            "module": "math"
+            "class": "dwv.math.FastPoint2D",
+            "module": "math",
+            "namespace": "dwv.math"
         },
         {
             "file": "src/math/shapes.js",
-            "line": 175,
+            "line": 181,
             "description": "Get a point of the list.",
             "params": [
                 {
@@ -1920,12 +1932,13 @@
             "return": {
                 "description": "The Point2D at the given index."
             },
-            "class": "Region Of Interest shape.\nNote: should be a closed path.",
-            "module": "math"
+            "class": "dwv.math.Region Of Interest shape.\nNote: should be a closed path.",
+            "module": "math",
+            "namespace": "dwv.math"
         },
         {
             "file": "src/math/shapes.js",
-            "line": 183,
+            "line": 189,
             "description": "Add a point to the ROI.",
             "params": [
                 {
@@ -1933,12 +1946,13 @@
                     "description": "The Point2D to add."
                 }
             ],
-            "class": "Region Of Interest shape.\nNote: should be a closed path.",
-            "module": "math"
+            "class": "dwv.math.Region Of Interest shape.\nNote: should be a closed path.",
+            "module": "math",
+            "namespace": "dwv.math"
         },
         {
             "file": "src/math/shapes.js",
-            "line": 188,
+            "line": 194,
             "description": "Add points to the ROI.",
             "params": [
                 {
@@ -1946,12 +1960,13 @@
                     "description": "The array of POints2D to add."
                 }
             ],
-            "class": "Region Of Interest shape.\nNote: should be a closed path.",
-            "module": "math"
+            "class": "dwv.math.Region Of Interest shape.\nNote: should be a closed path.",
+            "module": "math",
+            "namespace": "dwv.math"
         },
         {
             "file": "src/math/shapes.js",
-            "line": 209,
+            "line": 215,
             "description": "Get a point of the list.",
             "params": [
                 {
@@ -1962,12 +1977,13 @@
             "return": {
                 "description": "The Point2D at the given index."
             },
-            "class": "Path shape.",
-            "module": "math"
+            "class": "dwv.math.Path shape.",
+            "module": "math",
+            "namespace": "dwv.math"
         },
         {
             "file": "src/math/shapes.js",
-            "line": 218,
+            "line": 224,
             "description": "Is is a control point.",
             "params": [
                 {
@@ -1978,19 +1994,21 @@
             "return": {
                 "description": "True if a control point."
             },
-            "class": "Path shape.",
-            "module": "math"
+            "class": "dwv.math.Path shape.",
+            "module": "math",
+            "namespace": "dwv.math"
         },
         {
             "file": "src/math/shapes.js",
-            "line": 233,
+            "line": 239,
             "description": "Get the length of the path.",
-            "class": "Path shape.",
-            "module": "math"
+            "class": "dwv.math.Path shape.",
+            "module": "math",
+            "namespace": "dwv.math"
         },
         {
             "file": "src/math/shapes.js",
-            "line": 240,
+            "line": 246,
             "description": "Add a point to the path.",
             "params": [
                 {
@@ -1998,12 +2016,13 @@
                     "description": "The Point2D to add."
                 }
             ],
-            "class": "Path shape.",
-            "module": "math"
+            "class": "dwv.math.Path shape.",
+            "module": "math",
+            "namespace": "dwv.math"
         },
         {
             "file": "src/math/shapes.js",
-            "line": 248,
+            "line": 254,
             "description": "Add a control point to the path.",
             "params": [
                 {
@@ -2011,12 +2030,13 @@
                     "description": "The Point2D to make a control point."
                 }
             ],
-            "class": "Path shape.",
-            "module": "math"
+            "class": "dwv.math.Path shape.",
+            "module": "math",
+            "namespace": "dwv.math"
         },
         {
             "file": "src/math/shapes.js",
-            "line": 262,
+            "line": 268,
             "description": "Add points to the path.",
             "params": [
                 {
@@ -2024,12 +2044,13 @@
                     "description": "The list of Point2D to add."
                 }
             ],
-            "class": "Path shape.",
-            "module": "math"
+            "class": "dwv.math.Path shape.",
+            "module": "math",
+            "namespace": "dwv.math"
         },
         {
             "file": "src/math/shapes.js",
-            "line": 270,
+            "line": 276,
             "description": "Append a Path to this one.",
             "params": [
                 {
@@ -2037,8 +2058,9 @@
                     "description": "The Path to append."
                 }
             ],
-            "class": "Path shape.",
-            "module": "math"
+            "class": "dwv.math.Path shape.",
+            "module": "math",
+            "namespace": "dwv.math"
         },
         {
             "file": "src/tools/filter.js",
@@ -2881,43 +2903,43 @@
         },
         {
             "message": "Missing item type\nGet a point of the list.",
-            "line": " src/math/shapes.js:175"
+            "line": " src/math/shapes.js:181"
         },
         {
             "message": "Missing item type\nAdd a point to the ROI.",
-            "line": " src/math/shapes.js:183"
+            "line": " src/math/shapes.js:189"
         },
         {
             "message": "Missing item type\nAdd points to the ROI.",
-            "line": " src/math/shapes.js:188"
+            "line": " src/math/shapes.js:194"
         },
         {
             "message": "Missing item type\nGet a point of the list.",
-            "line": " src/math/shapes.js:209"
+            "line": " src/math/shapes.js:215"
         },
         {
             "message": "Missing item type\nIs is a control point.",
-            "line": " src/math/shapes.js:218"
+            "line": " src/math/shapes.js:224"
         },
         {
             "message": "Missing item type\nGet the length of the path.",
-            "line": " src/math/shapes.js:233"
+            "line": " src/math/shapes.js:239"
         },
         {
             "message": "Missing item type\nAdd a point to the path.",
-            "line": " src/math/shapes.js:240"
+            "line": " src/math/shapes.js:246"
         },
         {
             "message": "Missing item type\nAdd a control point to the path.",
-            "line": " src/math/shapes.js:248"
+            "line": " src/math/shapes.js:254"
         },
         {
             "message": "Missing item type\nAdd points to the path.",
-            "line": " src/math/shapes.js:262"
+            "line": " src/math/shapes.js:268"
         },
         {
             "message": "Missing item type\nAppend a Path to this one.",
-            "line": " src/math/shapes.js:270"
+            "line": " src/math/shapes.js:276"
         },
         {
             "message": "Missing item type",

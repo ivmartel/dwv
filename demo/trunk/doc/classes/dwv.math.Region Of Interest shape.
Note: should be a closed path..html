@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>src/math/bucketQueue.js - dwv</title>
+    <title>dwv.math.Region Of Interest shape.
+Note: should be a closed path. - dwv</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
     <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
@@ -196,120 +197,67 @@ Highly inspired from http://code.google.com/p/livewire-javascript/</a></li>
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-                        <h1 class="file-heading">File: src/math/bucketQueue.js</h1>
+                        <h1>dwv.math.Region Of Interest shape.
+Note: should be a closed path. Class</h1>
+<div class="box meta">
+    
 
-<div class="file">
-    <pre class="code prettyprint linenums">
-//! @namespace Main DWV namespace.
-var dwv = dwv || {};
-//! @namespace Math related.
-dwv.math = dwv.math || {};
+    
 
-/** 
- * @class Circular Bucket Queue.
- *
- * Returns input&#x27;d points in sorted order. All operations run in roughly O(1)
- * time (for input with small cost values), but it has a strict requirement:
- *
- * If the most recent point had a cost of c, any points added should have a cost
- * c&#x27; in the range c &lt;= c&#x27; &lt;= c + (capacity - 1).
- * 
- * @input bits
- * @input cost_functor
- */
-dwv.math.BucketQueue = function(bits, cost_functor)
-{
-	this.bucketCount = 1 &lt;&lt; bits; // # of buckets = 2^bits
-	this.mask = this.bucketCount - 1; // 2^bits - 1 = index mask
-	this.size = 0;
-	
-	this.loc = 0; // Current index in bucket list
-	
-	// Cost defaults to item value
-	this.cost = (typeof(cost_functor) !== &#x27;undefined&#x27;) ? cost_functor : function(item) {
-		return item;
-	};
-	
-	this.buckets = this.buildArray(this.bucketCount);
-};
+    
+        <div class="foundat">
+            Defined in: <a href="../files/src_math_shapes.js.html#l172"><code>src&#x2F;math&#x2F;shapes.js:172</code></a>
+        </div>
+    
 
-dwv.math.BucketQueue.prototype.push = function(item) {
-	// Prepend item to the list in the appropriate bucket
-	var bucket = this.getBucket(item);
-	item.next = this.buckets[bucket];
-	this.buckets[bucket] = item;
-	
-	this.size++;
-};
+    
+        
+            Module: <a href="../modules/math.html">math</a>
+        
+    
 
-dwv.math.BucketQueue.prototype.pop = function() {
-	if ( this.size === 0 ) {
-		throw new Error(&quot;Cannot pop, bucketQueue is empty.&quot;);
-	}
-	
-	// Find first empty bucket
-	while ( this.buckets[this.loc] === null ) {
-        this.loc = (this.loc + 1) % this.bucketCount;
-	}
-	
-	// All items in bucket have same cost, return the first one
-	var ret = this.buckets[this.loc];
-	this.buckets[this.loc] = ret.next;
-	ret.next = null;
-	
-	this.size--;
-	return ret;
-};
+    
+</div>
 
-dwv.math.BucketQueue.prototype.remove = function(item) {
-	// Tries to remove item from queue. Returns true on success, false otherwise
-	if ( !item ) {
-		return false;
-	}
-	
-	// To find node, go to bucket and search through unsorted list.
-	var bucket = this.getBucket(item);
-	var node = this.buckets[bucket];
-	
-	while ( node !== null &amp;&amp; !item.equals(node.next) ) {
-		node = node.next;
-	}
-	
-	if ( node === null ) {
-		// Item not in list, ergo item not in queue
-		return false;
-	} 
-	else {
-		// Found item, do standard list node deletion
-		node.next = node.next.next;
-		
-		this.size--;
-		return true;
-	}
-};
 
-dwv.math.BucketQueue.prototype.isEmpty = function() {
-	return this.size === 0;
-};
 
-dwv.math.BucketQueue.prototype.getBucket = function(item) {
-	// Bucket index is the masked cost
-	return this.cost(item) &amp; this.mask;
-};
+<div class="box intro">
+    
+</div>
 
-dwv.math.BucketQueue.prototype.buildArray = function(newSize) {
-	// Create array and initialze pointers to null
-	var buckets = [];
-	buckets.length = newSize;
-	
-	for ( var i = 0; i &lt; buckets.length; i++ ) {
-		buckets[i] = null;
-	}
-	
-	return buckets;
-};
 
-    </pre>
+
+<div id="classdocs" class="tabview">
+    <ul class="api-class-tabs">
+        <li class="api-class-tab index"><a href="#index">Index</a></li>
+
+        
+        
+        
+        
+    </ul>
+
+    <div>
+        <div id="index" class="api-class-tabpanel index">
+            <h2 class="off-left">Item Index</h2>
+
+            
+
+            
+
+            
+
+            
+        </div>
+
+        
+
+        
+
+        
+
+        
+    </div>
 </div>
 
                     </div>

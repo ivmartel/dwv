@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>src/math/bucketQueue.js - dwv</title>
+    <title>dwv.math.FastPoint2D - dwv</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
     <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
@@ -196,120 +196,387 @@ Highly inspired from http://code.google.com/p/livewire-javascript/</a></li>
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-                        <h1 class="file-heading">File: src/math/bucketQueue.js</h1>
+                        <h1>dwv.math.FastPoint2D Class</h1>
+<div class="box meta">
+    
 
-<div class="file">
-    <pre class="code prettyprint linenums">
-//! @namespace Main DWV namespace.
-var dwv = dwv || {};
-//! @namespace Math related.
-dwv.math = dwv.math || {};
+    
 
-/** 
- * @class Circular Bucket Queue.
- *
- * Returns input&#x27;d points in sorted order. All operations run in roughly O(1)
- * time (for input with small cost values), but it has a strict requirement:
- *
- * If the most recent point had a cost of c, any points added should have a cost
- * c&#x27; in the range c &lt;= c&#x27; &lt;= c + (capacity - 1).
- * 
- * @input bits
- * @input cost_functor
- */
-dwv.math.BucketQueue = function(bits, cost_functor)
-{
-	this.bucketCount = 1 &lt;&lt; bits; // # of buckets = 2^bits
-	this.mask = this.bucketCount - 1; // 2^bits - 1 = index mask
-	this.size = 0;
-	
-	this.loc = 0; // Current index in bucket list
-	
-	// Cost defaults to item value
-	this.cost = (typeof(cost_functor) !== &#x27;undefined&#x27;) ? cost_functor : function(item) {
-		return item;
-	};
-	
-	this.buckets = this.buildArray(this.bucketCount);
-};
+    
+        <div class="foundat">
+            Defined in: <a href="../files/src_math_shapes.js.html#l49"><code>src&#x2F;math&#x2F;shapes.js:49</code></a>
+        </div>
+    
 
-dwv.math.BucketQueue.prototype.push = function(item) {
-	// Prepend item to the list in the appropriate bucket
-	var bucket = this.getBucket(item);
-	item.next = this.buckets[bucket];
-	this.buckets[bucket] = item;
-	
-	this.size++;
-};
+    
+        
+            Module: <a href="../modules/math.html">math</a>
+        
+    
 
-dwv.math.BucketQueue.prototype.pop = function() {
-	if ( this.size === 0 ) {
-		throw new Error(&quot;Cannot pop, bucketQueue is empty.&quot;);
-	}
-	
-	// Find first empty bucket
-	while ( this.buckets[this.loc] === null ) {
-        this.loc = (this.loc + 1) % this.bucketCount;
-	}
-	
-	// All items in bucket have same cost, return the first one
-	var ret = this.buckets[this.loc];
-	this.buckets[this.loc] = ret.next;
-	ret.next = null;
-	
-	this.size--;
-	return ret;
-};
+    
+</div>
 
-dwv.math.BucketQueue.prototype.remove = function(item) {
-	// Tries to remove item from queue. Returns true on success, false otherwise
-	if ( !item ) {
-		return false;
-	}
-	
-	// To find node, go to bucket and search through unsorted list.
-	var bucket = this.getBucket(item);
-	var node = this.buckets[bucket];
-	
-	while ( node !== null &amp;&amp; !item.equals(node.next) ) {
-		node = node.next;
-	}
-	
-	if ( node === null ) {
-		// Item not in list, ergo item not in queue
-		return false;
-	} 
-	else {
-		// Found item, do standard list node deletion
-		node.next = node.next.next;
-		
-		this.size--;
-		return true;
-	}
-};
 
-dwv.math.BucketQueue.prototype.isEmpty = function() {
-	return this.size === 0;
-};
 
-dwv.math.BucketQueue.prototype.getBucket = function(item) {
-	// Bucket index is the masked cost
-	return this.cost(item) &amp; this.mask;
-};
+<div class="box intro">
+    
+</div>
 
-dwv.math.BucketQueue.prototype.buildArray = function(newSize) {
-	// Create array and initialze pointers to null
-	var buckets = [];
-	buckets.length = newSize;
-	
-	for ( var i = 0; i &lt; buckets.length; i++ ) {
-		buckets[i] = null;
-	}
-	
-	return buckets;
-};
 
-    </pre>
+    <div class="constructor">
+        <h2>Constructor</h2>
+        <div id="method_dwv.math.FastPoint2D" class="method item">
+    <h3 class="name"><code>dwv.math.FastPoint2D</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>x</code>
+                    
+                </li>
+            
+                <li class="arg">
+                    
+                        <code>y</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_math_shapes.js.html#l49"><code>src&#x2F;math&#x2F;shapes.js:49</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">x</code>
+                        <span class="type">Number</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The X coordinate for the point.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+                <li class="param">
+                    
+                        <code class="param-name">y</code>
+                        <span class="type">Number</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The Y coordinate for the point.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+
+    
+</div>
+
+    </div>
+
+
+<div id="classdocs" class="tabview">
+    <ul class="api-class-tabs">
+        <li class="api-class-tab index"><a href="#index">Index</a></li>
+
+        
+            <li class="api-class-tab methods"><a href="#methods">Methods</a></li>
+        
+        
+        
+        
+    </ul>
+
+    <div>
+        <div id="index" class="api-class-tabpanel index">
+            <h2 class="off-left">Item Index</h2>
+
+            
+                <div class="index-section methods">
+                    <h3>Methods</h3>
+
+                    <ul class="index-list methods">
+                        
+                            <li class="index-item method">
+                                <a href="#method_equals">equals</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_toString">toString</a>
+
+                                
+                                
+                            </li>
+                        
+                    </ul>
+                </div>
+            
+
+            
+
+            
+
+            
+        </div>
+
+        
+            <div id="methods" class="api-class-tabpanel">
+                <h2 class="off-left">Methods</h2>
+
+                
+                    <div id="method_equals" class="method item">
+    <h3 class="name"><code>equals</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>other</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+        <span class="returns-inline">
+            <span class="type">Boolean</span>
+        </span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_math_shapes.js.html#l62"><code>src&#x2F;math&#x2F;shapes.js:62</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">other</code>
+                        <span class="type">FastPoint2D</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The other FastPoint2D to compare to.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                
+                    
+                        <span class="type">Boolean</span>:
+                    
+                    <p>True if both points are equal.</p>
+
+                
+            </div>
+        </div>
+    
+
+    
+</div>
+
+                
+                    <div id="method_toString" class="method item">
+    <h3 class="name"><code>toString</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+        <span class="returns-inline">
+            <span class="type">String</span>
+        </span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_math_shapes.js.html#l74"><code>src&#x2F;math&#x2F;shapes.js:74</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        
+    </div>
+
+    
+
+    
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                
+                    
+                        <span class="type">String</span>:
+                    
+                    <p>The Point2D as string.</p>
+
+                
+            </div>
+        </div>
+    
+
+    
+</div>
+
+                
+            </div>
+        
+
+        
+
+        
+
+        
+    </div>
 </div>
 
                     </div>

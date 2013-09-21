@@ -5886,7 +5886,9 @@ var dwv = dwv || {};
 dwv.math = dwv.math || {};
 
 /** 2D point. Immutable.
- * @class dwv.math.Point2D
+ * @class Point2D
+ * @namespace dwv.math
+ * @constructor
  * @param {Number} x The X coordinate for the point.
  * @param {Number} y The Y coordinate for the point.
  */
@@ -5924,6 +5926,8 @@ dwv.math.Point2D.prototype.toString = function() {
 
 /** Fast 2D point since it's mutable!
  * @class FastPoint2D
+ * @namespace dwv.math
+ * @constructor
  * @param {Number} x The X coordinate for the point.
  * @param {Number} y The Y coordinate for the point.
  */
@@ -5954,7 +5958,9 @@ dwv.math.FastPoint2D.prototype.toString = function() {
 };
 
 /** Circle shape.
- * @class dwv.math.Circle
+ * @class Circle
+ * @namespace dwv.math
+ * @constructor
  * @param centre A Point2D representing the centre of the circle.
  * @param radius The radius of the circle.
  */
