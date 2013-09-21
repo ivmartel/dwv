@@ -595,6 +595,7 @@
             "namespace": "dwv.math",
             "file": "src/math/shapes.js",
             "line": 10,
+            "description": "2D point. Immutable.",
             "is_constructor": 1,
             "params": [
                 {
@@ -620,7 +621,8 @@
             "module": "math",
             "namespace": "dwv.math",
             "file": "src/math/shapes.js",
-            "line": 49,
+            "line": 54,
+            "description": "Fast 2D point since it's mutable!",
             "is_constructor": 1,
             "params": [
                 {
@@ -646,7 +648,8 @@
             "module": "math",
             "namespace": "dwv.math",
             "file": "src/math/shapes.js",
-            "line": 82,
+            "line": 90,
+            "description": "Circle shape.",
             "is_constructor": 1,
             "params": [
                 {
@@ -670,7 +673,7 @@
             "module": "math",
             "namespace": "dwv.math",
             "file": "src/math/shapes.js",
-            "line": 107,
+            "line": 116,
             "params": [
                 {
                     "name": "begin",
@@ -693,7 +696,7 @@
             "module": "math",
             "namespace": "dwv.math",
             "file": "src/math/shapes.js",
-            "line": 141,
+            "line": 150,
             "params": [
                 {
                     "name": "begin",
@@ -716,7 +719,7 @@
             "module": "math",
             "namespace": "dwv.math",
             "file": "src/math/shapes.js",
-            "line": 172
+            "line": 181
         },
         "dwv.math.Path shape.": {
             "name": "dwv.math.Path shape.",
@@ -729,7 +732,7 @@
             "module": "math",
             "namespace": "dwv.math",
             "file": "src/math/shapes.js",
-            "line": 201,
+            "line": 210,
             "params": [
                 {
                     "name": "points",
@@ -1837,7 +1840,8 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 19,
+            "line": 20,
+            "description": "Get the X position of the point.",
             "itemtype": "method",
             "name": "getX",
             "class": "dwv.math.Point2D",
@@ -1846,7 +1850,8 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 23,
+            "line": 25,
+            "description": "Get the Y position of the point.",
             "itemtype": "method",
             "name": "getY",
             "class": "dwv.math.Point2D",
@@ -1855,7 +1860,8 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 29,
+            "line": 32,
+            "description": "Check for Point2D equality.",
             "itemtype": "method",
             "name": "equals",
             "params": [
@@ -1875,7 +1881,8 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 41,
+            "line": 45,
+            "description": "Get a string representation of the Point2D.",
             "itemtype": "method",
             "name": "toString",
             "return": {
@@ -1888,7 +1895,8 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 62,
+            "line": 68,
+            "description": "Check for FastPoint2D equality.",
             "itemtype": "method",
             "name": "equals",
             "params": [
@@ -1908,7 +1916,8 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 74,
+            "line": 81,
+            "description": "Get a string representation of the FastPoint2D.",
             "itemtype": "method",
             "name": "toString",
             "return": {
@@ -1921,7 +1930,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 181,
+            "line": 190,
             "description": "Get a point of the list.",
             "params": [
                 {
@@ -1938,7 +1947,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 189,
+            "line": 198,
             "description": "Add a point to the ROI.",
             "params": [
                 {
@@ -1952,7 +1961,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 194,
+            "line": 203,
             "description": "Add points to the ROI.",
             "params": [
                 {
@@ -1966,7 +1975,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 215,
+            "line": 224,
             "description": "Get a point of the list.",
             "params": [
                 {
@@ -1983,7 +1992,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 224,
+            "line": 233,
             "description": "Is is a control point.",
             "params": [
                 {
@@ -2000,7 +2009,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 239,
+            "line": 248,
             "description": "Get the length of the path.",
             "class": "dwv.math.Path shape.",
             "module": "math",
@@ -2008,7 +2017,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 246,
+            "line": 255,
             "description": "Add a point to the path.",
             "params": [
                 {
@@ -2022,7 +2031,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 254,
+            "line": 263,
             "description": "Add a control point to the path.",
             "params": [
                 {
@@ -2036,7 +2045,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 268,
+            "line": 277,
             "description": "Add points to the path.",
             "params": [
                 {
@@ -2050,7 +2059,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 276,
+            "line": 285,
             "description": "Append a Path to this one.",
             "params": [
                 {
@@ -2903,43 +2912,43 @@
         },
         {
             "message": "Missing item type\nGet a point of the list.",
-            "line": " src/math/shapes.js:181"
+            "line": " src/math/shapes.js:190"
         },
         {
             "message": "Missing item type\nAdd a point to the ROI.",
-            "line": " src/math/shapes.js:189"
+            "line": " src/math/shapes.js:198"
         },
         {
             "message": "Missing item type\nAdd points to the ROI.",
-            "line": " src/math/shapes.js:194"
+            "line": " src/math/shapes.js:203"
         },
         {
             "message": "Missing item type\nGet a point of the list.",
-            "line": " src/math/shapes.js:215"
-        },
-        {
-            "message": "Missing item type\nIs is a control point.",
             "line": " src/math/shapes.js:224"
         },
         {
+            "message": "Missing item type\nIs is a control point.",
+            "line": " src/math/shapes.js:233"
+        },
+        {
             "message": "Missing item type\nGet the length of the path.",
-            "line": " src/math/shapes.js:239"
+            "line": " src/math/shapes.js:248"
         },
         {
             "message": "Missing item type\nAdd a point to the path.",
-            "line": " src/math/shapes.js:246"
+            "line": " src/math/shapes.js:255"
         },
         {
             "message": "Missing item type\nAdd a control point to the path.",
-            "line": " src/math/shapes.js:254"
+            "line": " src/math/shapes.js:263"
         },
         {
             "message": "Missing item type\nAdd points to the path.",
-            "line": " src/math/shapes.js:268"
+            "line": " src/math/shapes.js:277"
         },
         {
             "message": "Missing item type\nAppend a Path to this one.",
-            "line": " src/math/shapes.js:276"
+            "line": " src/math/shapes.js:285"
         },
         {
             "message": "Missing item type",

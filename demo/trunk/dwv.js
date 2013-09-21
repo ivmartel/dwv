@@ -5885,7 +5885,8 @@ var dwv = dwv || {};
  */
 dwv.math = dwv.math || {};
 
-/** 2D point. Immutable.
+/** 
+ * 2D point. Immutable.
  * @class Point2D
  * @namespace dwv.math
  * @constructor
@@ -5894,17 +5895,20 @@ dwv.math = dwv.math || {};
  */
 dwv.math.Point2D = function(x,y)
 {
-    /** Get the X position of the point.
+    /** 
+     * Get the X position of the point.
      * @method getX
      * @return {Number} The X position of the point. */
     this.getX = function() { return x; };
-    /** Get the Y position of the point.
+    /** 
+     * Get the Y position of the point.
      * @method getY
      * @return {Number} The Y position of the point. */
     this.getY = function() { return y; };
 }; // Point2D class
 
-/** Check for Point2D equality.
+/** 
+ * Check for Point2D equality.
  * @method equals
  * @param {Point2D} other The other Point2D to compare to.
  * @return {Boolean} True if both points are equal.
@@ -5916,7 +5920,8 @@ dwv.math.Point2D.prototype.equals = function(other) {
     return ( this.getX() === other.getX() && this.getY() === other.getY() );
 };
 
-/** Get a string representation of the Point2D.
+/** 
+ * Get a string representation of the Point2D.
  * @method toString
  * @return {String} The Point2D as string.
  */ 
@@ -5924,7 +5929,8 @@ dwv.math.Point2D.prototype.toString = function() {
     return "(" + this.getX() + ", " + this.getY() + ")";
 };
 
-/** Fast 2D point since it's mutable!
+/** 
+ * Fast 2D point since it's mutable!
  * @class FastPoint2D
  * @namespace dwv.math
  * @constructor
@@ -5937,7 +5943,8 @@ dwv.math.FastPoint2D = function(x,y)
     this.y = y;
 }; // FastPoint2D class
 
-/** Check for FastPoint2D equality.
+/** 
+ * Check for FastPoint2D equality.
  * @method equals
  * @param {FastPoint2D} other The other FastPoint2D to compare to.
  * @return {Boolean} True if both points are equal.
@@ -5949,7 +5956,8 @@ dwv.math.FastPoint2D.prototype.equals = function(other) {
     return ( this.x === other.x && this.y === other.y );
 };
 
-/** Get a string representation of the FastPoint2D.
+/** 
+ * Get a string representation of the FastPoint2D.
  * @method toString
  * @return {String} The Point2D as string.
  */ 
@@ -5957,7 +5965,8 @@ dwv.math.FastPoint2D.prototype.toString = function() {
     return "(" + this.x + ", " + this.y + ")";
 };
 
-/** Circle shape.
+/** 
+ * Circle shape.
  * @class Circle
  * @namespace dwv.math
  * @constructor
