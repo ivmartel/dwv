@@ -3628,6 +3628,11 @@ dwv.gui.enableInUndoHtml = function(enable)
  * @module html
  */
 var dwv = dwv || {};
+/**
+ * Namespace for HTML related functions.
+ * @class html
+ * @namespace dwv
+ */
 dwv.html = dwv.html || {};
 
 /**
@@ -4807,7 +4812,7 @@ dwv.image.Spacing = function( columnSpacing, rowSpacing, sliceSpacing )
     this.getRowSpacing = function() { return rowSpacing; };
     /**
      * Get the slice spacing.
-     * @method slice
+     * @method getSliceSpacing
      * @return {Number} The slice spacing.
      */ 
     this.getSliceSpacing = function() { return (sliceSpacing || 1.0); };
