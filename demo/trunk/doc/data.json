@@ -520,7 +520,8 @@
             "namespace": "dwv",
             "file": "src/html/html.js",
             "line": 6,
-            "description": "Namespace for HTML related functions."
+            "description": "Namespace for HTML related functions.",
+            "static": 1
         },
         "dwv.html.Layer": {
             "name": "dwv.html.Layer",
@@ -2096,7 +2097,7 @@
         },
         {
             "file": "src/html/html.js",
-            "line": 13,
+            "line": 14,
             "description": "Append a cell to a given row.",
             "itemtype": "method",
             "name": "appendCell",
@@ -2119,7 +2120,7 @@
         },
         {
             "file": "src/html/html.js",
-            "line": 26,
+            "line": 27,
             "description": "Append a header cell to a given row.",
             "itemtype": "method",
             "name": "appendHCell",
@@ -2142,7 +2143,7 @@
         },
         {
             "file": "src/html/html.js",
-            "line": 42,
+            "line": 43,
             "description": "Append a row to an array.",
             "itemtype": "method",
             "name": "appendRowForArray",
@@ -2175,7 +2176,7 @@
         },
         {
             "file": "src/html/html.js",
-            "line": 75,
+            "line": 76,
             "description": "Append a row to an object.",
             "itemtype": "method",
             "name": "appendRowForObject",
@@ -2208,7 +2209,7 @@
         },
         {
             "file": "src/html/html.js",
-            "line": 124,
+            "line": 125,
             "description": "Append a row to an object or an array.",
             "itemtype": "method",
             "name": "appendRow",
@@ -2241,7 +2242,7 @@
         },
         {
             "file": "src/html/html.js",
-            "line": 149,
+            "line": 150,
             "description": "Converts the input to an HTML table.",
             "itemtype": "method",
             "name": "toTable",
@@ -2258,7 +2259,7 @@
         },
         {
             "file": "src/html/html.js",
-            "line": 164,
+            "line": 165,
             "description": "Get an HTML search form.",
             "itemtype": "method",
             "name": "getHtmlSearchForm",
@@ -2280,7 +2281,7 @@
         },
         {
             "file": "src/html/html.js",
-            "line": 184,
+            "line": 185,
             "description": "Filter a table with a given parameter: sets the display css of rows to\ntrue or false if it contains the term.",
             "itemtype": "method",
             "name": "filterTable",
@@ -2303,7 +2304,7 @@
         },
         {
             "file": "src/html/html.js",
-            "line": 217,
+            "line": 218,
             "description": "Transform back each\n'preText <span class=\"highlighted\">term</span> postText'\ninto its original 'preText term postText'.",
             "itemtype": "method",
             "name": "dehighlight",
@@ -2321,7 +2322,7 @@
         },
         {
             "file": "src/html/html.js",
-            "line": 245,
+            "line": 246,
             "description": "Create a\n'preText <span class=\"highlighted\">term</span> postText'\naround each search term.",
             "itemtype": "method",
             "name": "highlight",
@@ -2344,7 +2345,7 @@
         },
         {
             "file": "src/html/html.js",
-            "line": 289,
+            "line": 290,
             "description": "Highlight a HTML node.",
             "itemtype": "method",
             "name": "createHighlightNode",
@@ -2366,7 +2367,7 @@
         },
         {
             "file": "src/html/html.js",
-            "line": 304,
+            "line": 305,
             "description": "Remove all children of a HTML node.",
             "itemtype": "method",
             "name": "cleanNode",
@@ -2384,7 +2385,7 @@
         },
         {
             "file": "src/html/html.js",
-            "line": 317,
+            "line": 318,
             "description": "Remove a HTML node and all its children.",
             "itemtype": "method",
             "name": "removeNode",
@@ -2401,7 +2402,7 @@
         },
         {
             "file": "src/html/html.js",
-            "line": 334,
+            "line": 335,
             "description": "Create a HTML select from an input array of options.\nThe values of the options are the name of the option made lower case.\nIt is left to the user to set the 'onchange' method of the select.",
             "itemtype": "method",
             "name": "createHtmlSelect",
@@ -2428,7 +2429,7 @@
         },
         {
             "file": "src/html/html.js",
-            "line": 378,
+            "line": 379,
             "description": "Get a list of parameters from an input URI.",
             "itemtype": "method",
             "name": "getUriParam",
@@ -2450,7 +2451,7 @@
         },
         {
             "file": "src/html/html.js",
-            "line": 458,
+            "line": 459,
             "description": "Toggle the display of an element.",
             "itemtype": "method",
             "name": "toggleDisplay",
@@ -2468,7 +2469,7 @@
         },
         {
             "file": "src/html/html.js",
-            "line": 474,
+            "line": 475,
             "description": "Browser checks to see if it can run dwv. Throws an error if not.\nTODO Maybe use http://modernizr.com/.",
             "itemtype": "method",
             "name": "checkBrowser",
@@ -5705,11 +5706,11 @@
         },
         {
             "message": "unknown tag: input",
-            "line": " src/html/html.js:149"
+            "line": " src/html/html.js:150"
         },
         {
             "message": "unknown tag: warning",
-            "line": " src/html/html.js:149"
+            "line": " src/html/html.js:150"
         },
         {
             "message": "unknown tag: input",
