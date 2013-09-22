@@ -18,7 +18,7 @@ if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
   #copy new dist
   cp -Rf $HOME/dist/* demo/trunk
   #add, commit and push files
-  git add -f .
+  git add -Af .
   git commit -m "Travis build $TRAVIS_BUILD_NUMBER pushed to gh-pages"
   git push -fq origin gh-pages > /dev/null
   echo -e "Done updating.\n"
