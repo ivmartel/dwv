@@ -3,6 +3,12 @@
  * @module utils
  */
 var dwv = dwv || {};
+/**
+ * Namespace for utility functions.
+ * @class utils
+ * @namespace dwv
+ * @static
+ */
 dwv.utils = dwv.utils || {};
 
 /**

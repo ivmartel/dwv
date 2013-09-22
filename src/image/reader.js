@@ -3,6 +3,12 @@
  * @module image
  */
 var dwv = dwv || {};
+/**
+ * Namespace for image related functions.
+ * @class image
+ * @namespace dwv
+ * @static
+ */
 dwv.image = dwv.image || {};
 
 /**

@@ -3,6 +3,12 @@
  * @module gui
  */
 var dwv = dwv || {};
+/**
+ * Namespace for GUI functions.
+ * @class gui
+ * @namespace dwv
+ * @static
+ */
 dwv.gui = dwv.gui || {};
 
 /**
