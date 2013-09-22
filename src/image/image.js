@@ -109,7 +109,7 @@ dwv.image.Spacing = function( columnSpacing, rowSpacing, sliceSpacing )
     this.getRowSpacing = function() { return rowSpacing; };
     /**
      * Get the slice spacing.
-     * @method slice
+     * @method getSliceSpacing
      * @return {Number} The slice spacing.
      */ 
     this.getSliceSpacing = function() { return (sliceSpacing || 1.0); };
