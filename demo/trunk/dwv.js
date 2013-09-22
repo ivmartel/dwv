@@ -582,7 +582,7 @@ dwv.dicom.DataReader = function(buffer, isLittleEndian)
 {
     /**
      * The main data view.
-     * @property
+     * @property view
      * @private
      * @type DataView
      */
@@ -714,25 +714,25 @@ dwv.dicom.DicomParser = function()
 {
     /**
      * The list of DICOM elements.
-     * @property
+     * @property dicomElements
      * @type Array
      */
     this.dicomElements = {};
     /**
      * The number of DICOM Items.
-     * @property
+     * @property numberOfItems
      * @type Number
      */
     this.numberOfItems = 0;
     /**
      * The DICOM dictionary used to find tag names.
-     * @property
+     * @property dict
      * @type Dictionary
      */
     this.dict = new dwv.dicom.Dictionary();
     /**
      * The pixel buffer.
-     * @property
+     * @property pixelBuffer
      * @type Array
      */
     this.pixelBuffer = [];
@@ -1200,7 +1200,7 @@ dwv.dicom = dwv.dicom || {};
 dwv.dicom.Dictionary = function() {
     /**
      * Tag definition storage.
-     * @property
+     * @property newDictionary
      * @type Array
      */
     this.newDictionary = [];
@@ -6080,7 +6080,7 @@ dwv.math.Circle = function(centre, radius)
 {
     /**
      * Circle surface.
-     * @property
+     * @property surface
      * @private
      * @type Number
      */
@@ -6129,7 +6129,7 @@ dwv.math.Line = function(begin, end)
 {
     /**
      * Line length.
-     * @property
+     * @property length
      * @private
      * @type Number
      */
@@ -6193,7 +6193,7 @@ dwv.math.Rectangle = function(begin, end)
 {
     /**
      * Rectangle surface.
-     * @property
+     * @property surface
      * @private
      * @type Number
      */
@@ -6263,7 +6263,7 @@ dwv.math.ROI = function()
 {
     /**
      * List of points.
-     * @property
+     * @property points
      * @private
      * @type Array
      */
@@ -6310,13 +6310,13 @@ dwv.math.Path = function(inputPointArray, inputControlPointIndexArray)
 {
     /**
      * List of points.
-     * @property
+     * @property pointArray
      * @type Array
      */
     this.pointArray = inputPointArray ? inputPointArray.slice() : [];
     /**
      * List of control points.
-     * @property
+     * @property controlPointIndexArray
      * @type Array
      */
     this.controlPointIndexArray = inputControlPointIndexArray ?
