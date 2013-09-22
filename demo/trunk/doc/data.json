@@ -1477,7 +1477,7 @@
         },
         {
             "file": "src/dicom/dictionary.js",
-            "line": 22,
+            "line": 23,
             "description": "Fill in the dictionary array.",
             "itemtype": "method",
             "name": "init",
