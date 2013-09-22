@@ -99,7 +99,7 @@ dwv.math.Circle = function(centre, radius)
 {
     /**
      * Circle surface.
-     * @property
+     * @property surface
      * @private
      * @type Number
      */
@@ -148,7 +148,7 @@ dwv.math.Line = function(begin, end)
 {
     /**
      * Line length.
-     * @property
+     * @property length
      * @private
      * @type Number
      */
@@ -212,7 +212,7 @@ dwv.math.Rectangle = function(begin, end)
 {
     /**
      * Rectangle surface.
-     * @property
+     * @property surface
      * @private
      * @type Number
      */
@@ -282,7 +282,7 @@ dwv.math.ROI = function()
 {
     /**
      * List of points.
-     * @property
+     * @property points
      * @private
      * @type Array
      */
@@ -329,13 +329,13 @@ dwv.math.Path = function(inputPointArray, inputControlPointIndexArray)
 {
     /**
      * List of points.
-     * @property
+     * @property pointArray
      * @type Array
      */
     this.pointArray = inputPointArray ? inputPointArray.slice() : [];
     /**
      * List of control points.
-     * @property
+     * @property controlPointIndexArray
      * @type Array
      */
     this.controlPointIndexArray = inputControlPointIndexArray ?

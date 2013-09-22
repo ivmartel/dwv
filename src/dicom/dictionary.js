@@ -14,7 +14,7 @@ dwv.dicom = dwv.dicom || {};
 dwv.dicom.Dictionary = function() {
     /**
      * Tag definition storage.
-     * @property
+     * @property newDictionary
      * @type Array
      */
     this.newDictionary = [];
