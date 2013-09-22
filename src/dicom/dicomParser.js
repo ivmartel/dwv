@@ -1,35 +1,73 @@
-//! @namespace Main DWV namespace.
+/** 
+ * DICOM module.
+ * @module dicom
+ */
 var dwv = dwv || {};
-//! @namespace DICOM related.
 dwv.dicom = dwv.dicom || {};
 
 /**
- * @class Data reader
- * @param buffer The input array buffer.
- * @param isLittleEndian Flag to tell if the data is little or big endian.
+ * Data reader.
+ * @class DataReader
+ * @namespace dwv.dicom
+ * @constructor
+ * @param {Array} buffer The input array buffer.
+ * @param {Boolean} isLittleEndian Flag to tell if the data is little or big endian.
  */
 dwv.dicom.DataReader = function(buffer, isLittleEndian)
 {
+    /**
+     * The main data view.
+     * @property
+     * @private
+     * @type DataView
+     */
     var view = new DataView(buffer);
+    // Set endian flag if not defined.
     if(typeof(isLittleEndian)==='undefined') isLittleEndian = true;
     
-    //! Read Uint8 (1 bytes) data.
+    /**
+     * Read Uint8 (1 byte) data.
+     * @method readUint8
+     * @param {Number} byteOffset The offset to start reading from.
+     * @return {Number} The read data.
+     */
     this.readUint8 = function(byteOffset) {
         return view.getUint8(byteOffset, isLittleEndian);
     };
-    //! Read Uint16 (2 bytes) data.
+    /**
+     * Read Uint16 (2 bytes) data.
+     * @method readUint16
+     * @param {Number} byteOffset The offset to start reading from.
+     * @return {Number} The read data.
+     */
     this.readUint16 = function(byteOffset) {
         return view.getUint16(byteOffset, isLittleEndian);
     };
-    //! Read Uint32 (4 bytes) data.
+    /**
+     * Read Uint32 (4 bytes) data.
+     * @method readUint32
+     * @param {Number} byteOffset The offset to start reading from.
+     * @return {Number} The read data.
+     */
     this.readUint32 = function(byteOffset) {
         return view.getUint32(byteOffset, isLittleEndian);
     };
-    //! Read Float32 (8 bytes) data.
+    /**
+     * Read Float32 (8 bytes) data.
+     * @method readFloat32
+     * @param {Number} byteOffset The offset to start reading from.
+     * @return {Number} The read data.
+     */
     this.readFloat32 = function(byteOffset) {
         return view.getFloat32(byteOffset, isLittleEndian);
     };
-    //! Read Uint data of nBytes size.
+    /**
+     * Read Uint data of nBytes size.
+     * @method readNumber
+     * @param {Number} byteOffset The offset to start reading from.
+     * @param {Number} nBytes The number of bytes to read.
+     * @return {Number} The read data.
+     */
     this.readNumber = function(byteOffset, nBytes) {
         if( nBytes === 1 )
             return this.readUint8(byteOffset, isLittleEndian);
@@ -42,7 +80,13 @@ dwv.dicom.DataReader = function(buffer, isLittleEndian)
         else 
             throw new Error("Unsupported number size.");
     };
-    //! Read Uint8 array.
+    /**
+     * Read Uint8 array.
+     * @method readUint8Array
+     * @param {Number} byteOffset The offset to start reading from.
+     * @param {Number} size The size of the array.
+     * @return {Array} The read data.
+     */
     this.readUint8Array = function(byteOffset, size) {
         var data = new Uint8Array(size);
         var index = 0;
@@ -51,7 +95,13 @@ dwv.dicom.DataReader = function(buffer, isLittleEndian)
         }
         return data;
     };
-    //! Read Uint16 array.
+    /**
+     * Read Uint16 array.
+     * @method readUint16Array
+     * @param {Number} byteOffset The offset to start reading from.
+     * @param {Number} size The size of the array.
+     * @return {Array} The read data.
+     */
     this.readUint16Array = function(byteOffset, size) {
         var data = new Uint16Array(size/2);
         var index = 0;
@@ -60,13 +110,25 @@ dwv.dicom.DataReader = function(buffer, isLittleEndian)
         }
         return data;
     };
-    //! Read data as an hexadecimal string.
+    /**
+     * Read data as an hexadecimal string.
+     * @method readHex
+     * @param {Number} byteOffset The offset to start reading from.
+     * @return {Array} The read data.
+     */
     this.readHex = function(byteOffset) {
         // read and convert to hex string
         var str = this.readUint16(byteOffset).toString(16);
         // return padded
         return "0x0000".substr(0, 6 - str.length) + str.toUpperCase();
     };
+    /**
+     * Read data as a string.
+     * @method readString
+     * @param {Number} byteOffset The offset to start reading from.
+     * @param {Number} nChars The numner of characters to read.
+     * @return {String} The read data.
+     */
     //! Read data as a string.
     this.readString = function(byteOffset, nChars) {
         var result = "";
@@ -78,25 +140,45 @@ dwv.dicom.DataReader = function(buffer, isLittleEndian)
 };
 
 /**
- * @class DicomParser class.
+ * DicomParser class.
+ * @class DicomParser
+ * @namespace dwv.dicom
+ * @constructor
  */
 dwv.dicom.DicomParser = function()
 {
-    // the list of DICOM elements
+    /**
+     * The list of DICOM elements.
+     * @property
+     * @type Array
+     */
     this.dicomElements = {};
-    // the number of DICOM Items
+    /**
+     * The number of DICOM Items.
+     * @property
+     * @type Number
+     */
     this.numberOfItems = 0;
-    // the DICOM dictionary used to find tag names
+    /**
+     * The DICOM dictionary used to find tag names.
+     * @property
+     * @type Dictionary
+     */
     this.dict = new dwv.dicom.Dictionary();
-    // the pixel buffer
+    /**
+     * The pixel buffer.
+     * @property
+     * @type Array
+     */
     this.pixelBuffer = [];
 };
 
 /**
  * Get the DICOM data pixel buffer.
- * @returns The pixel buffer (as an array).
+ * @method getPixelBuffer
+ * @returns {Array} The pixel buffer.
  */
-dwv.dicom.DicomParser.prototype.getPixelBuffer=function()
+dwv.dicom.DicomParser.prototype.getPixelBuffer = function()
 {
     return this.pixelBuffer;
 };
@@ -106,9 +188,10 @@ dwv.dicom.DicomParser.prototype.getPixelBuffer=function()
  * Allows for easy retrieval of DICOM tag values from the tag name.
  * If tags have same name (for the 'unknown' and private tags cases), a number is appended
  * making the name unique.
- * @param element The element to add.
+ * @method appendDicomElement
+ * @param {Object} element The element to add.
  */
-dwv.dicom.DicomParser.prototype.appendDicomElement=function( element )
+dwv.dicom.DicomParser.prototype.appendDicomElement = function( element )
 {
     // find a good tag name
     var name = element.name;
@@ -131,11 +214,12 @@ dwv.dicom.DicomParser.prototype.appendDicomElement=function( element )
 
 /**
  * Read a DICOM tag.
+ * @method readTag
  * @param reader The raw data reader.
  * @param offset The offset where to start to read.
  * @returns An object containing the tags 'group', 'element' and 'name'.
  */
-dwv.dicom.DicomParser.prototype.readTag=function(reader, offset)
+dwv.dicom.DicomParser.prototype.readTag = function(reader, offset)
 {
     // group
     var group = reader.readHex(offset);
@@ -154,12 +238,13 @@ dwv.dicom.DicomParser.prototype.readTag=function(reader, offset)
 
 /**
  * Read a DICOM data element.
+ * @method readDataElement
  * @param reader The raw data reader.
  * @param offset The offset where to start to read.
  * @param implicit Is the DICOM VR implicit?
- * @returns An object containing the element 'tag', 'vl', 'vr', 'data' and 'offset'.
+ * @returns {Object} An object containing the element 'tag', 'vl', 'vr', 'data' and 'offset'.
  */
-dwv.dicom.DicomParser.prototype.readDataElement=function(reader, offset, implicit)
+dwv.dicom.DicomParser.prototype.readDataElement = function(reader, offset, implicit)
 {
     // tag: group, element
     var tag = this.readTag(reader, offset);
@@ -247,6 +332,7 @@ dwv.dicom.DicomParser.prototype.readDataElement=function(reader, offset, implici
 /**
  * Parse the complete DICOM file (given as input to the class).
  * Fills in the member object 'dicomElements'.
+ * @method parse
  * @param buffer The input array buffer.
  */
 dwv.dicom.DicomParser.prototype.parse = function(buffer)
@@ -419,7 +505,8 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
 
 /**
  * Get an Image object from the read DICOM file.
- * @returns A new Image.
+ * @method createImage
+ * @returns {View} A new Image.
  */
 dwv.dicom.DicomParser.prototype.createImage = function()
 {

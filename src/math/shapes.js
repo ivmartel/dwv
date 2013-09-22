@@ -1,10 +1,8 @@
-/** Main DWV module.
- * @module dwv
- */
-var dwv = dwv || {};
-/** Math module.
+/** 
+ * Math module.
  * @module math
  */
+var dwv = dwv || {};
 dwv.math = dwv.math || {};
 
 /** 
@@ -20,12 +18,14 @@ dwv.math.Point2D = function(x,y)
     /** 
      * Get the X position of the point.
      * @method getX
-     * @return {Number} The X position of the point. */
+     * @return {Number} The X position of the point.
+     */
     this.getX = function() { return x; };
     /** 
      * Get the Y position of the point.
      * @method getY
-     * @return {Number} The Y position of the point. */
+     * @return {Number} The Y position of the point. 
+     */
     this.getY = function() { return y; };
 }; // Point2D class
 
@@ -45,7 +45,7 @@ dwv.math.Point2D.prototype.equals = function(other) {
 /** 
  * Get a string representation of the Point2D.
  * @method toString
- * @return {String} The Point2D as string.
+ * @return {String} The Point2D as a string.
  */ 
 dwv.math.Point2D.prototype.toString = function() {
     return "(" + this.getX() + ", " + this.getY() + ")";
@@ -81,7 +81,7 @@ dwv.math.FastPoint2D.prototype.equals = function(other) {
 /** 
  * Get a string representation of the FastPoint2D.
  * @method toString
- * @return {String} The Point2D as string.
+ * @return {String} The Point2D as a string.
  */ 
 dwv.math.FastPoint2D.prototype.toString = function() {
     return "(" + this.x + ", " + this.y + ")";
@@ -92,21 +92,44 @@ dwv.math.FastPoint2D.prototype.toString = function() {
  * @class Circle
  * @namespace dwv.math
  * @constructor
- * @param centre A Point2D representing the centre of the circle.
- * @param radius The radius of the circle.
+ * @param {Object} centre A Point2D representing the centre of the circle.
+ * @param {Object} radius The radius of the circle.
  */
 dwv.math.Circle = function(centre, radius)
 {
-    // Cache the surface
+    /**
+     * Circle surface.
+     * @property
+     * @private
+     * @type Number
+     */
     var surface = Math.PI*radius*radius;
 
-    // Get the centre of the circle.
+    /**
+     * Get the centre (point) of the circle.
+     * @method getCenter
+     * @return {Object} The center (point) of the circle.
+     */
     this.getCenter = function() { return centre; };
-    // Get the radius of the circle.
+    /**
+     * Get the radius of the circle.
+     * @method getRadius
+     * @return {Number} The radius of the circle.
+     */
     this.getRadius = function() { return radius; };
-    // Get the surface of the circle.
+    /**
+     * Get the surface of the circle.
+     * @method getSurface
+     * @return {Number} The surface of the circle.
+     */
     this.getSurface = function() { return surface; };
-    // Get the surface of the circle with a spacing.
+    /**
+     * Get the surface of the circle with a spacing.
+     * @method getWorldSurface
+     * @param {Number} spacingX The X spacing.
+     * @param {Number} spacingY The Y spacing.
+     * @return {Number} The surface of the circle multiplied by the given spacing.
+     */
     this.getWorldSurface = function(spacingX, spacingY)
     {
         return surface * spacingX * spacingY;
@@ -114,31 +137,61 @@ dwv.math.Circle = function(centre, radius)
 }; // Circle class
 
 /**
- * @class Line shape.
- * @param begin A Point2D representing the beginning of the line.
- * @param end A Point2D representing the end of the line.
+ * Line shape.
+ * @class Line
+ * @namespace dwv.math
+ * @constructor
+ * @param {Object} begin A Point2D representing the beginning of the line.
+ * @param {Object} end A Point2D representing the end of the line.
  */
 dwv.math.Line = function(begin, end)
 {
-    // cache the length
+    /**
+     * Line length.
+     * @property
+     * @private
+     * @type Number
+     */
     var length = Math.sqrt(
-            Math.abs(end.getX() - begin.getX()) * Math.abs(end.getX() - begin.getX()) +
-            Math.abs(end.getY() - begin.getY()) * Math.abs(end.getY() - begin.getY() ) );
+        Math.abs(end.getX() - begin.getX()) * Math.abs(end.getX() - begin.getX()) +
+        Math.abs(end.getY() - begin.getY()) * Math.abs(end.getY() - begin.getY() ) );
     
-    // Get the begin point of the line.
+    /**
+     * Get the begin point of the line.
+     * @method getBegin
+     * @return {Object} The beginning point of the line.
+     */
     this.getBegin = function() { return begin; };
-    // Get the end point of the line.
+    /**
+     * Get the end point of the line.
+     * @method getEnd
+     * @return {Object} The ending point of the line.
+     */
     this.getEnd = function() { return end; };
-    // Get the length of the line.
+    /**
+     * Get the length of the line.
+     * @method getLength
+     * @return {Number} The length of the line.
+     */
     this.getLength = function() { return length; };
-    // Get the length of the line with a spacing.
+    /**
+     * Get the length of the line with spacing.
+     * @method getWorldLength
+     * @param {Number} spacingX The X spacing.
+     * @param {Number} spacingY The Y spacing.
+     * @return {Number} The length of the line with spacing.
+     */
     this.getWorldLength = function(spacingX, spacingY)
     {
         var lx = Math.abs(end.getX() - begin.getX()) * spacingX;
         var ly = Math.abs(end.getY() - begin.getY()) * spacingY;
         return Math.sqrt( lx * lx + ly * ly );
     };
-    // Get the mid point of the line.
+    /**
+     * Get the mid point of the line.
+     * @method getMidpoint
+     * @return {Object} The mid point of the line.
+     */
     this.getMidpoint = function()
     {
         return new dwv.math.Point2D( 
@@ -148,30 +201,70 @@ dwv.math.Line = function(begin, end)
 }; // Line class
 
 /**
- * @class Rectangle shape.
- * @param begin A Point2D representing the beginning of the rectangle.
- * @param end A Point2D representing the end of the rectangle.
+ * Rectangle shape.
+ * @class Rectangle
+ * @namespace dwv.math
+ * @constructor
+ * @param {Object} begin A Point2D representing the beginning of the rectangle.
+ * @param {Object} end A Point2D representing the end of the rectangle.
  */
 dwv.math.Rectangle = function(begin, end)
 {
-    // cache the length
+    /**
+     * Rectangle surface.
+     * @property
+     * @private
+     * @type Number
+     */
     var surface = Math.abs(end.getX() - begin.getX()) * Math.abs(end.getY() - begin.getY() );
 
-    // Get the begin point of the rectangle.
+    /**
+     * Get the begin point of the rectangle.
+     * @method getBegin
+     * @return {Object} The begin point of the rectangle
+     */
     this.getBegin = function() { return begin; };
-    // Get the end point of the rectangle.
+    /**
+     * Get the end point of the rectangle.
+     * @method getEnd
+     * @return {Object} The end point of the rectangle
+     */
     this.getEnd = function() { return end; };
-    // Get the real width of the rectangle.
+    /**
+     * Get the real width of the rectangle.
+     * @method getRealWidth
+     * @return {Number} The real width of the rectangle.
+     */
     this.getRealWidth = function() { return end.getX() - begin.getX(); };
-    // Get the real height of the rectangle.
+    /**
+     * Get the real height of the rectangle.
+     * @method getRealHeight
+     * @return {Number} The real height of the rectangle.
+     */
     this.getRealHeight = function() { return end.getY() - begin.getY(); };
-    // Get the width of the rectangle.
+    /**
+     * Get the width of the rectangle.
+     * @method getWidth
+     * @return {Number} The width of the rectangle.
+     */
     this.getWidth = function() { return Math.abs(this.getRealWidth()); };
-    // Get the height of the rectangle.
+    /**
+     * Get the height of the rectangle.
+     * @method getHeight
+     * @return {Number} The height of the rectangle.
+     */
     this.getHeight = function() { return Math.abs(this.getRealHeight()); };
-    // Get the surface of the rectangle.
+    /**
+     * Get the surface of the rectangle.
+     * @method getSurface
+     * @return {Number} The surface of the rectangle.
+     */
     this.getSurface = function() { return surface; };
-    // Get the surface of the rectangle with a spacing.
+    /**
+     * Get the surface of the rectangle with a spacing.
+     * @method getWorldSurface
+     * @return {Number} The surface of the rectangle with a spacing.
+     */
     this.getWorldSurface = function(spacingX, spacingY)
     {
         return surface * spacingX * spacingY;
@@ -179,61 +272,91 @@ dwv.math.Rectangle = function(begin, end)
 }; // Rectangle class
 
 /**
- * @class Region Of Interest shape.
+ * Region Of Interest shape.
+ * @class ROI
+ * @namespace dwv.math
+ * @constructor
  * Note: should be a closed path.
  */
 dwv.math.ROI = function()
 {
-    // list of points.
+    /**
+     * List of points.
+     * @property
+     * @private
+     * @type Array
+     */
     var points = [];
     
     /**
-     * Get a point of the list.
-     * @param index The index of the point to get (beware, no size check).
-     * @return The Point2D at the given index.
+     * Get a point of the list at a given index.
+     * @method getPoint
+     * @param {Number} index The index of the point to get (beware, no size check).
+     * @return {Object} The Point2D at the given index.
      */ 
     this.getPoint = function(index) { return points[index]; };
-    // Get the length of the list
+    /**
+     * Get the length of the point list.
+     * @method getLength
+     * @return {Number} The length of the point list.
+     */ 
     this.getLength = function() { return points.length; };
     /**
      * Add a point to the ROI.
-     * @param point The Point2D to add.
+     * @method addPoint
+     * @param {Object} point The Point2D to add.
      */
     this.addPoint = function(point) { points.push(point); };
     /**
      * Add points to the ROI.
-     * @param rhs The array of POints2D to add.
+     * @method addPoints
+     * @param {Array} rhs The array of POints2D to add.
      */
     this.addPoints = function(rhs) { points=points.concat(rhs);};
 }; // ROI class
 
 /**
- * @class Path shape.
- * @param points The list of Point2D that make the path (optional).
- * @param points The list of control point of path, as indexes (optional).
+ * Path shape.
+ * @class Path
+ * @namespace dwv.math
+ * @constructor
+ * @param {Array} inputPointArray The list of Point2D that make the path (optional).
+ * @param {Array} inputControlPointIndexArray The list of control point of path, 
+ *  as indexes (optional).
  * Note: first and last point do not need to be equal.
  */
 dwv.math.Path = function(inputPointArray, inputControlPointIndexArray)
 {
-    // list of points.
+    /**
+     * List of points.
+     * @property
+     * @type Array
+     */
     this.pointArray = inputPointArray ? inputPointArray.slice() : [];
-    // list of control points
-    this.controlPointIndexArray = inputControlPointIndexArray ? inputControlPointIndexArray.slice() : [];
+    /**
+     * List of control points.
+     * @property
+     * @type Array
+     */
+    this.controlPointIndexArray = inputControlPointIndexArray ?
+        inputControlPointIndexArray.slice() : [];
 }; // Path class
 
 /**
  * Get a point of the list.
- * @param index The index of the point to get (beware, no size check).
- * @return The Point2D at the given index.
+ * @method getPoint
+ * @param {Number} index The index of the point to get (beware, no size check).
+ * @return {Object} The Point2D at the given index.
  */ 
 dwv.math.Path.prototype.getPoint = function(index) {
     return this.pointArray[index];
 };
 
 /**
- * Is is a control point.
- * @param point The Point2D to check.
- * @return True if a control point.
+ * Is the given point a control point.
+ * @method isControlPoint
+ * @param {Object} point The Point2D to check.
+ * @return {Boolean} True if a control point.
  */ 
 dwv.math.Path.prototype.isControlPoint = function(point) {
     var index = this.pointArray.indexOf(point);
@@ -247,6 +370,8 @@ dwv.math.Path.prototype.isControlPoint = function(point) {
 
 /**
  * Get the length of the path.
+ * @method getLength
+ * @return {Number} The length of the path.
  */ 
 dwv.math.Path.prototype.getLength = function() { 
     return this.pointArray.length;
@@ -254,7 +379,8 @@ dwv.math.Path.prototype.getLength = function() {
 
 /**
  * Add a point to the path.
- * @param point The Point2D to add.
+ * @method addPoint
+ * @param {Object} point The Point2D to add.
  */
 dwv.math.Path.prototype.addPoint = function(point) {
     this.pointArray.push(point);
@@ -262,7 +388,8 @@ dwv.math.Path.prototype.addPoint = function(point) {
 
 /**
  * Add a control point to the path.
- * @param point The Point2D to make a control point.
+ * @method addControlPoint
+ * @param {Object} point The Point2D to make a control point.
  */
 dwv.math.Path.prototype.addControlPoint = function(point) {
     var index = this.pointArray.indexOf(point);
@@ -276,7 +403,8 @@ dwv.math.Path.prototype.addControlPoint = function(point) {
 
 /**
  * Add points to the path.
- * @param points The list of Point2D to add.
+ * @method addPoints
+ * @param {Array} points The list of Point2D to add.
  */
 dwv.math.Path.prototype.addPoints = function(newPointArray) { 
     this.pointArray = this.pointArray.concat(newPointArray);
@@ -284,7 +412,8 @@ dwv.math.Path.prototype.addPoints = function(newPointArray) {
 
 /**
  * Append a Path to this one.
- * @param other The Path to append.
+ * @method appenPath
+ * @param {Path} other The Path to append.
  */
 dwv.math.Path.prototype.appenPath = function(other) {
     var oldSize = this.pointArray.length;

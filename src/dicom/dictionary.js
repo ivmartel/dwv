@@ -1,13 +1,28 @@
-//! @namespace Main DWV namespace.
+/** 
+ * DICOM module.
+ * @module dicom
+ */
 var dwv = dwv || {};
-//! @namespace DICOM related.
 dwv.dicom = dwv.dicom || {};
 
 /**
- * @class DICOM tag dictionary.
+ * DICOM tag dictionary.
+ * @class Dictionary
+ * @namespace dwv.dicom
+ * @constructor
  */
 dwv.dicom.Dictionary = function() {
+    /**
+     * Tag definition storage.
+     * @property
+     * @type Array
+     */
     this.newDictionary = [];
+    
+    /**
+     * Fill in the dictionary array.
+     * @method init
+     */
     this.init = function() {
         
         // 0x0000
