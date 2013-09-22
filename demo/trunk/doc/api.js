@@ -1,7 +1,6 @@
 YUI.add("yuidoc-meta", function(Y) {
    Y.YUIDoc = { meta: {
     "classes": [
-        "App\nMain application.",
         "Filter classes..Draw ROI command.",
         "Filter classes..Draw line command.",
         "Filter classes..Draw livewire command.",
@@ -16,11 +15,15 @@ YUI.add("yuidoc-meta", function(Y) {
         "Filter classes..UndoStack class.",
         "Filter classes..WindowLevel tool: handle window/level related events.",
         "Filter classes..Zoom class.",
+        "dwv.App\nMain application.",
         "dwv.dicom.DataReader",
         "dwv.dicom.DicomParser",
         "dwv.dicom.Dictionary",
+        "dwv.gui",
+        "dwv.html",
         "dwv.html.Layer",
         "dwv.html.Style",
+        "dwv.image",
         "dwv.image.Image",
         "dwv.image.Size",
         "dwv.image.Spacing",
@@ -40,7 +43,8 @@ YUI.add("yuidoc-meta", function(Y) {
         "dwv.math.Point2D",
         "dwv.math.ROI",
         "dwv.math.Rectangle",
-        "dwv.math.Scissors"
+        "dwv.math.Scissors",
+        "dwv.utils"
     ],
     "modules": [
         "dicom",

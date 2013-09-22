@@ -3111,6 +3111,12 @@ dwv.dicom.Dictionary.prototype.init = function() {
  * @module gui
  */
 var dwv = dwv || {};
+/**
+ * Namespace for GUI functions.
+ * @class gui
+ * @namespace dwv
+ * @static
+ */
 dwv.gui = dwv.gui || {};
 
 /**
@@ -3628,6 +3634,12 @@ dwv.gui.enableInUndoHtml = function(enable)
  * @module html
  */
 var dwv = dwv || {};
+/**
+ * Namespace for HTML related functions.
+ * @class html
+ * @namespace dwv
+ * @static
+ */
 dwv.html = dwv.html || {};
 
 /**
@@ -5624,6 +5636,12 @@ dwv.image.lut.test = {
  * @module image
  */
 var dwv = dwv || {};
+/**
+ * Namespace for image related functions.
+ * @class image
+ * @namespace dwv
+ * @static
+ */
 dwv.image = dwv.image || {};
 
 /**
@@ -8716,6 +8734,12 @@ dwv.tool.tools.zoom = dwv.tool.Zoom;
  * @module utils
  */
 var dwv = dwv || {};
+/**
+ * Namespace for utility functions.
+ * @class utils
+ * @namespace dwv
+ * @static
+ */
 dwv.utils = dwv.utils || {};
 
 /**

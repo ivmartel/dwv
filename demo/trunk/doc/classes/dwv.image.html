@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>src/image/filter.js - dwv</title>
+    <title>dwv.image - dwv</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
     <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
@@ -182,156 +182,319 @@ Main application.</a></li>
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-                        <h1 class="file-heading">File: src/image/filter.js</h1>
-
-<div class="file">
-    <pre class="code prettyprint linenums">
-/** 
- * Image module.
- * @module image
- */
-var dwv = dwv || {};
-dwv.image = dwv.image || {};
-dwv.image.filter = dwv.image.filter || {};
-
-/**
- * Threshold an image between an input minimum and maximum.
- * @class Threshold
- * @namespace dwv.image.filter
- * @constructor
- */
-dwv.image.filter.Threshold = function()
-{
-    /**
-     * Threshold minimum.
-     * @property min
-     * @private
-     * @type Number
-     */
-    var min = 0;
-    /**
-     * Threshold maxnimum.
-     * @property max
-     * @private
-     * @type Number
-     */
-    var max = 0;
-
-    /**
-     * Get the threshold minimum.
-     * @method getMin
-     * @return {Number} The threshold minimum.
-     */
-    this.getMin = function() { return min; };
-    /**
-     * Set the threshold minimum.
-     * @method setMin
-     * @param {Number} val The threshold minimum.
-     */
-    this.setMin = function(val) { min = val; };
-    /**
-     * Get the threshold maximum.
-     * @method getMax
-     * @return {Number} The threshold maximum.
-     */
-    this.getMax = function() { return max; };
-    /**
-     * Set the threshold maximum.
-     * @method setMax
-     * @param {Number} val The threshold maximum.
-     */
-    this.setMax = function(val) { max = val; };
-    /**
-     * Get the name of the filter.
-     * @method getName
-     * @return {String} The name of the filter.
-     */
-    this.getName = function() { return &quot;Threshold&quot;; };
-};
-
-/**
- * Transform the main image using this filter.
- * @method update
- * @return {Object} The transformed image.
- */ 
-dwv.image.filter.Threshold.prototype.update = function()
-{
-    var imageMin = app.getImage().getDataRange().min;
-    var self = this;
-    var threshFunction = function(value){
-        if(value&lt;self.getMin()||value&gt;self.getMax()) return imageMin;
-        else return value;
-    };
-    return app.getImage().transform( threshFunction );
-};
-
-/**
- * Sharpen an image using a sharpen convolution matrix.
- * @class Sharpen
- * @namespace dwv.image.filter
- * @constructor
- */
-dwv.image.filter.Sharpen = function()
-{
-    /**
-     * Get the name of the filter.
-     * @method getName
-     * @return {String} The name of the filter.
-     */
-    this.getName = function() { return &quot;Sharpen&quot;; };
-};
-
-/**
- * Transform the main image using this filter.
- * @method update
- * @return {Object} The transformed image.
- */ 
-dwv.image.filter.Sharpen.prototype.update = function()
-{
-    return app.getImage().convolute2D(
-        [  0, -1,  0,
-          -1,  5, -1,
-           0, -1,  0 ] );
-};
-
-/**
- * Apply a Sobel filter to an image.
- * @class Sobel
- * @namespace dwv.image.filter
- * @constructor
- */
-dwv.image.filter.Sobel = function()
-{
-    /**
-     * Get the name of the filter.
-     * @method getName
-     * @return {String} The name of the filter.
-     */
-    this.getName = function() { return &quot;Sobel&quot;; };
-};
-
-/**
- * Transform the main image using this filter.
- * @method update
- * @return {Object} The transformed image.
- */ 
-dwv.image.filter.Sobel.prototype.update = function()
-{
-    var gradX = app.getImage().convolute2D(
-        [ 1,  0,  -1,
-          2,  0,  -2,
-          1,  0,  -1 ] );
-
-    var gradY = app.getImage().convolute2D(
-        [  1,  2,  1,
-           0,  0,  0,
-          -1, -2, -1 ] );
+                        <h1>dwv.image Class</h1>
+<div class="box meta">
     
-    return gradX.compose( gradY, function(x,y){return Math.sqrt(x*x+y*y);} );
-};
+
+    
+
+    
+        <div class="foundat">
+            Defined in: <a href="../files/src_image_reader.js.html#l6"><code>src&#x2F;image&#x2F;reader.js:6</code></a>
+        </div>
+    
+
+    
+        
+            Module: <a href="../modules/image.html">image</a>
+        
+    
+
+    
+</div>
 
 
-    </pre>
+
+<div class="box intro">
+    <p>Namespace for image related functions.</p>
+
+</div>
+
+
+
+<div id="classdocs" class="tabview">
+    <ul class="api-class-tabs">
+        <li class="api-class-tab index"><a href="#index">Index</a></li>
+
+        
+            <li class="api-class-tab methods"><a href="#methods">Methods</a></li>
+        
+        
+        
+        
+    </ul>
+
+    <div>
+        <div id="index" class="api-class-tabpanel index">
+            <h2 class="off-left">Item Index</h2>
+
+            
+                <div class="index-section methods">
+                    <h3>Methods</h3>
+
+                    <ul class="index-list methods">
+                        
+                            <li class="index-item method">
+                                <a href="#method_getDataFromDicomBuffer">getDataFromDicomBuffer</a>
+
+                                
+                                    <span class="flag static">static</span>
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_getDataFromImage">getDataFromImage</a>
+
+                                
+                                    <span class="flag static">static</span>
+                                
+                                
+                            </li>
+                        
+                    </ul>
+                </div>
+            
+
+            
+
+            
+
+            
+        </div>
+
+        
+            <div id="methods" class="api-class-tabpanel">
+                <h2 class="off-left">Methods</h2>
+
+                
+                    <div id="method_getDataFromDicomBuffer" class="method item">
+    <h3 class="name"><code>getDataFromDicomBuffer</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>buffer</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+        <span class="returns-inline">
+            <span class="type">Mixed</span>
+        </span>
+    
+
+    
+
+    
+
+    
+
+    
+        <span class="flag static">static</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_image_reader.js.html#l65"><code>src&#x2F;image&#x2F;reader.js:65</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Get data from an input buffer using a DICOM parser.</p>
+
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">buffer</code>
+                        <span class="type">Array</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The input data buffer.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                
+                    
+                        <span class="type">Mixed</span>:
+                    
+                    <p>The corresponding view and info.</p>
+
+                
+            </div>
+        </div>
+    
+
+    
+</div>
+
+                
+                    <div id="method_getDataFromImage" class="method item">
+    <h3 class="name"><code>getDataFromImage</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>image</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+        <span class="returns-inline">
+            <span class="type">Mixed</span>
+        </span>
+    
+
+    
+
+    
+
+    
+
+    
+        <span class="flag static">static</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_image_reader.js.html#l14"><code>src&#x2F;image&#x2F;reader.js:14</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Get data from an input image using a canvas.</p>
+
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">image</code>
+                        <span class="type">Image</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The image.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                
+                    
+                        <span class="type">Mixed</span>:
+                    
+                    <p>The corresponding view and info.</p>
+
+                
+            </div>
+        </div>
+    
+
+    
+</div>
+
+                
+            </div>
+        
+
+        
+
+        
+
+        
+    </div>
 </div>
 
                     </div>
