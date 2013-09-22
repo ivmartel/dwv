@@ -8,6 +8,7 @@ dwv.gui = dwv.gui || {};
 /**
  * Handle window/level change.
  * @method onChangeWindowLevelPreset
+ * @static
  * @param {Object} event The change event.
  */
 dwv.gui.onChangeWindowLevelPreset = function(event)
@@ -18,6 +19,7 @@ dwv.gui.onChangeWindowLevelPreset = function(event)
 /**
  * Handle colour map change.
  * @method onChangeColourMap
+ * @static
  * @param {Object} event The change event.
  */
 dwv.gui.onChangeColourMap = function(event)
@@ -28,6 +30,7 @@ dwv.gui.onChangeColourMap = function(event)
 /**
  * Handle tool change.
  * @method onChangeTool
+ * @static
  * @param {Object} event The change event.
  */
 dwv.gui.onChangeTool = function(event)
@@ -38,6 +41,7 @@ dwv.gui.onChangeTool = function(event)
 /**
  * Handle filter change.
  * @method onChangeFilter
+ * @static
  * @param {Object} event The change event.
  */
 dwv.gui.onChangeFilter = function(event)
@@ -48,6 +52,7 @@ dwv.gui.onChangeFilter = function(event)
 /**
  * Handle shape change.
  * @method onChangeShape
+ * @static
  * @param {Object} event The change event.
  */
 dwv.gui.onChangeShape = function(event)
@@ -58,6 +63,7 @@ dwv.gui.onChangeShape = function(event)
 /**
  * Handle line color change.
  * @method onChangeLineColour
+ * @static
  * @param {Object} event The change event.
  */
 dwv.gui.onChangeLineColour = function(event)
@@ -68,6 +74,7 @@ dwv.gui.onChangeLineColour = function(event)
 /**
  * Append the toolbox HTML to the page.
  * @method appendToolboxHtml
+ * @static
  */
 dwv.gui.appendToolboxHtml = function()
 {
@@ -98,6 +105,7 @@ dwv.gui.appendToolboxHtml = function()
 /**
  * Append the window/level HTML to the page.
  * @method appendWindowLevelHtml
+ * @static
  */
 dwv.gui.appendWindowLevelHtml = function()
 {
@@ -145,6 +153,7 @@ dwv.gui.appendWindowLevelHtml = function()
 /**
  * Clear the window/level HTML.
  * @method clearWindowLevelHtml
+ * @static
  */
 dwv.gui.clearWindowLevelHtml = function()
 {
@@ -155,6 +164,7 @@ dwv.gui.clearWindowLevelHtml = function()
 /**
  * Append the draw HTML to the page.
  * @method appendDrawHtml
+ * @static
  */
 dwv.gui.appendDrawHtml = function()
 {
@@ -199,6 +209,7 @@ dwv.gui.appendDrawHtml = function()
 /**
  * Clear the draw HTML.
  * @method clearDrawHtml
+ * @static
  */
 dwv.gui.clearDrawHtml = function()
 {
@@ -209,6 +220,7 @@ dwv.gui.clearDrawHtml = function()
 /**
  * Append the color chooser HTML to the page.
  * @method appendLivewireHtml
+ * @static
  */
 dwv.gui.appendLivewireHtml = function()
 {
@@ -236,6 +248,7 @@ dwv.gui.appendLivewireHtml = function()
 /**
  * Clear the color chooser HTML.
  * @method clearDrawHtml
+ * @static
  */
 dwv.gui.clearLivewireHtml = function()
 {
@@ -245,6 +258,7 @@ dwv.gui.clearLivewireHtml = function()
 /**
  * Append the filter HTML to the page.
  * @method appendLivewireHtml
+ * @static
  */
 dwv.gui.appendFilterHtml = function()
 {
@@ -272,6 +286,7 @@ dwv.gui.appendFilterHtml = function()
 /**
  * Clear the filter HTML.
  * @method clearDrawHtml
+ * @static
  */
 dwv.gui.clearFilterHtml = function()
 {
@@ -284,6 +299,7 @@ dwv.gui.filter = dwv.gui.filter || {};
 /**
  * Append the threshold filter HTML to the page.
  * @method appendThresholdHtml
+ * @static
  */
 dwv.gui.filter.appendThresholdHtml = function()
 {
@@ -303,6 +319,7 @@ dwv.gui.filter.appendThresholdHtml = function()
 /**
  * Clear the treshold filter HTML.
  * @method clearDrawHtml
+ * @static
  */
 dwv.gui.filter.clearThresholdHtml = function()
 {
@@ -312,6 +329,7 @@ dwv.gui.filter.clearThresholdHtml = function()
 /**
  * Append the sharpen filter HTML to the page.
  * @method appendSharpenHtml
+ * @static
  */
 dwv.gui.filter.appendSharpenHtml = function()
 {
@@ -336,6 +354,7 @@ dwv.gui.filter.appendSharpenHtml = function()
 /**
  * Clear the sharpen filter HTML.
  * @method clearSharpenHtml
+ * @static
  */
 dwv.gui.filter.clearSharpenHtml = function()
 {
@@ -345,6 +364,7 @@ dwv.gui.filter.clearSharpenHtml = function()
 /**
  * Append the sobel filter HTML to the page.
  * @method appendSharpenHtml
+ * @static
  */
 dwv.gui.filter.appendSobelHtml = function()
 {
@@ -369,6 +389,7 @@ dwv.gui.filter.appendSobelHtml = function()
 /**
  * Clear the sobel filter HTML.
  * @method clearSharpenHtml
+ * @static
  */
 dwv.gui.filter.clearSobelHtml = function()
 {
@@ -378,6 +399,7 @@ dwv.gui.filter.clearSobelHtml = function()
 /**
  * Append the zoom HTML to the page.
  * @method appendZoomHtml
+ * @static
  */
 dwv.gui.appendZoomHtml = function()
 {
@@ -404,6 +426,7 @@ dwv.gui.appendZoomHtml = function()
 /**
  * Clear the zoom filter HTML.
  * @method clearZoomHtml
+ * @static
  */
 dwv.gui.clearZoomHtml = function()
 {
@@ -413,6 +436,7 @@ dwv.gui.clearZoomHtml = function()
 /**
  * Append the undo HTML to the page.
  * @method appendUndoHtml
+ * @static
  */
 dwv.gui.appendUndoHtml = function()
 {
@@ -437,6 +461,7 @@ dwv.gui.appendUndoHtml = function()
 /**
  * Add a command to the undo HTML.
  * @method addCommandToUndoHtml
+ * @static
  * @param {String} commandName The name of the command to add.
  */
 dwv.gui.addCommandToUndoHtml = function(commandName)
@@ -463,6 +488,7 @@ dwv.gui.addCommandToUndoHtml = function(commandName)
 /**
  * Enable the last command of the undo HTML.
  * @method enableInUndoHtml
+ * @static
  * @param {Boolean} enable Flag to enable or disable the command.
  */
 dwv.gui.enableInUndoHtml = function(enable)
