@@ -1,9 +1,6 @@
 YUI.add("yuidoc-meta", function(Y) {
    Y.YUIDoc = { meta: {
     "classes": [
-        "DICOM tag dictionary.",
-        "Data reader",
-        "DicomParser class.",
         "Filter classes..App\nMain application.",
         "Filter classes..Draw ROI command.",
         "Filter classes..Draw line command.",
@@ -29,28 +26,33 @@ YUI.add("yuidoc-meta", function(Y) {
         "GUI classes..View class.",
         "GUI classes..Window LUT class.",
         "GUI classes..Window layer.",
+        "dwv.dicom.DataReader",
+        "dwv.dicom.DicomParser",
+        "dwv.dicom.Dictionary",
         "dwv.math.Circle",
         "dwv.math.Draw circle command.",
         "dwv.math.Drawing tool.",
         "dwv.math.FastPoint2D",
-        "dwv.math.Line shape.",
-        "dwv.math.Path shape.",
+        "dwv.math.Line",
+        "dwv.math.Path",
         "dwv.math.Point2D",
-        "dwv.math.Rectangle shape.",
-        "dwv.math.Region Of Interest shape.\nNote: should be a closed path."
+        "dwv.math.ROI",
+        "dwv.math.Rectangle"
     ],
     "modules": [
-        "dwv",
+        "dicom",
         "math"
     ],
     "allModules": [
         {
-            "displayName": "dwv",
-            "name": "dwv"
+            "displayName": "dicom",
+            "name": "dicom",
+            "description": "DICOM module."
         },
         {
             "displayName": "math",
-            "name": "math"
+            "name": "math",
+            "description": "Math module."
         }
     ]
 } };

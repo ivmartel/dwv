@@ -8,22 +8,28 @@
     "files": {
         "src/dicom/dicomParser.js": {
             "name": "src/dicom/dicomParser.js",
-            "modules": {},
+            "modules": {
+                "dicom": 1
+            },
             "classes": {
-                "Data reader": 1,
-                "DicomParser class.": 1
+                "dwv.dicom.DataReader": 1,
+                "dwv.dicom.DicomParser": 1
             },
             "fors": {},
-            "namespaces": {}
+            "namespaces": {
+                "dwv.dicom": 1
+            }
         },
         "src/dicom/dictionary.js": {
             "name": "src/dicom/dictionary.js",
             "modules": {},
             "classes": {
-                "DICOM tag dictionary.": 1
+                "dwv.dicom.Dictionary": 1
             },
             "fors": {},
-            "namespaces": {}
+            "namespaces": {
+                "dwv.dicom": 1
+            }
         },
         "src/html/gui.js": {
             "name": "src/html/gui.js",
@@ -138,17 +144,16 @@
         "src/math/shapes.js": {
             "name": "src/math/shapes.js",
             "modules": {
-                "dwv": 1,
                 "math": 1
             },
             "classes": {
                 "dwv.math.Point2D": 1,
                 "dwv.math.FastPoint2D": 1,
                 "dwv.math.Circle": 1,
-                "dwv.math.Line shape.": 1,
-                "dwv.math.Rectangle shape.": 1,
-                "dwv.math.Region Of Interest shape.\nNote: should be a closed path.": 1,
-                "dwv.math.Path shape.": 1
+                "dwv.math.Line": 1,
+                "dwv.math.Rectangle": 1,
+                "dwv.math.ROI": 1,
+                "dwv.math.Path": 1
             },
             "fors": {},
             "namespaces": {
@@ -286,13 +291,13 @@
         }
     },
     "modules": {
-        "dwv": {
-            "name": "dwv",
+        "dicom": {
+            "name": "dicom",
             "submodules": {},
             "classes": {
-                "Data reader": 1,
-                "DicomParser class.": 1,
-                "DICOM tag dictionary.": 1,
+                "dwv.dicom.DataReader": 1,
+                "dwv.dicom.DicomParser": 1,
+                "dwv.dicom.Dictionary": 1,
                 "GUI classes..Window layer.": 1,
                 "GUI classes..Style class.": 1,
                 "GUI classes..Image Size class. \nSupports 2D and 3D images.": 1,
@@ -305,10 +310,14 @@
                 "GUI classes..Scissors.\n\nRef: Eric N. Mortensen, William A. Barrett, Interactive Segmentation with\n  Intelligent Scissors, Graphical Models and Image Processing, Volume 60,\n  Issue 5, September 1998, Pages 349-384, ISSN 1077-3169,\n  DOI: 10.1006/gmip.1998.0480.\n\n(http://www.sciencedirect.com/science/article/B6WG4-45JB8WN-9/2/6fe59d8089fd1892c2bfb82283065579)\n\nHighly inspired from http://code.google.com/p/livewire-javascript/": 1
             },
             "fors": {},
-            "namespaces": {},
+            "namespaces": {
+                "dwv.dicom": 1,
+                "GUI classes.": 1
+            },
             "tag": "module",
             "file": "src/math/scissors.js",
-            "line": 276
+            "line": 276,
+            "description": "DICOM module."
         },
         "math": {
             "name": "math",
@@ -317,10 +326,10 @@
                 "dwv.math.Point2D": 1,
                 "dwv.math.FastPoint2D": 1,
                 "dwv.math.Circle": 1,
-                "dwv.math.Line shape.": 1,
-                "dwv.math.Rectangle shape.": 1,
-                "dwv.math.Region Of Interest shape.\nNote: should be a closed path.": 1,
-                "dwv.math.Path shape.": 1,
+                "dwv.math.Line": 1,
+                "dwv.math.Rectangle": 1,
+                "dwv.math.ROI": 1,
+                "dwv.math.Path": 1,
                 "dwv.math.Draw circle command.": 1,
                 "dwv.math.Drawing tool.": 1,
                 "Filter classes..Filter tool.": 1,
@@ -346,55 +355,67 @@
             },
             "tag": "module",
             "file": "src/application.js",
-            "line": 4
+            "line": 4,
+            "description": "Math module."
         }
     },
     "classes": {
-        "Data reader": {
-            "name": "Data reader",
-            "shortname": "Data reader",
+        "dwv.dicom.DataReader": {
+            "name": "dwv.dicom.DataReader",
+            "shortname": "dwv.dicom.DataReader",
             "classitems": [],
             "plugins": [],
             "extensions": [],
             "plugin_for": [],
             "extension_for": [],
-            "module": "dwv",
+            "module": "dicom",
+            "namespace": "dwv.dicom",
             "file": "src/dicom/dicomParser.js",
-            "line": 6,
+            "line": 8,
+            "description": "Data reader.",
+            "is_constructor": 1,
             "params": [
                 {
                     "name": "buffer",
-                    "description": "The input array buffer."
+                    "description": "The input array buffer.",
+                    "type": "Array"
                 },
                 {
                     "name": "isLittleEndian",
-                    "description": "Flag to tell if the data is little or big endian."
+                    "description": "Flag to tell if the data is little or big endian.",
+                    "type": "Boolean"
                 }
             ]
         },
-        "DicomParser class.": {
-            "name": "DicomParser class.",
-            "shortname": "DicomParser class.",
+        "dwv.dicom.DicomParser": {
+            "name": "dwv.dicom.DicomParser",
+            "shortname": "dwv.dicom.DicomParser",
             "classitems": [],
             "plugins": [],
             "extensions": [],
             "plugin_for": [],
             "extension_for": [],
-            "module": "dwv",
+            "module": "dicom",
+            "namespace": "dwv.dicom",
             "file": "src/dicom/dicomParser.js",
-            "line": 80
+            "line": 142,
+            "description": "DicomParser class.",
+            "is_constructor": 1
         },
-        "DICOM tag dictionary.": {
-            "name": "DICOM tag dictionary.",
-            "shortname": "DICOM tag dictionary.",
+        "dwv.dicom.Dictionary": {
+            "name": "dwv.dicom.Dictionary",
+            "shortname": "dwv.dicom.Dictionary",
             "classitems": [],
             "plugins": [],
             "extensions": [],
             "plugin_for": [],
             "extension_for": [],
-            "module": "dwv",
+            "module": "dicom",
+            "namespace": "dwv.dicom",
             "file": "src/dicom/dictionary.js",
-            "line": 6
+            "line": 8,
+            "description": "DICOM tag dictionary.",
+            "is_constructor": 1
         },
         "GUI classes..Window layer.": {
             "name": "GUI classes..Window layer.",
@@ -404,7 +425,7 @@
             "extensions": [],
             "plugin_for": [],
             "extension_for": [],
-            "module": "dwv",
+            "module": "dicom",
             "namespace": "GUI classes.",
             "file": "src/html/layer.js",
             "line": 6
@@ -417,7 +438,7 @@
             "extensions": [],
             "plugin_for": [],
             "extension_for": [],
-            "module": "dwv",
+            "module": "dicom",
             "namespace": "GUI classes.",
             "file": "src/html/style.js",
             "line": 6
@@ -430,7 +451,7 @@
             "extensions": [],
             "plugin_for": [],
             "extension_for": [],
-            "module": "dwv",
+            "module": "dicom",
             "namespace": "GUI classes.",
             "file": "src/image/image.js",
             "line": 6,
@@ -457,7 +478,7 @@
             "extensions": [],
             "plugin_for": [],
             "extension_for": [],
-            "module": "dwv",
+            "module": "dicom",
             "namespace": "GUI classes.",
             "file": "src/image/image.js",
             "line": 45,
@@ -484,7 +505,7 @@
             "extensions": [],
             "plugin_for": [],
             "extension_for": [],
-            "module": "dwv",
+            "module": "dicom",
             "namespace": "GUI classes.",
             "file": "src/image/image.js",
             "line": 69,
@@ -511,7 +532,7 @@
             "extensions": [],
             "plugin_for": [],
             "extension_for": [],
-            "module": "dwv",
+            "module": "dicom",
             "namespace": "GUI classes.",
             "file": "src/image/luts.js",
             "line": 8,
@@ -528,7 +549,7 @@
             "extensions": [],
             "plugin_for": [],
             "extension_for": [],
-            "module": "dwv",
+            "module": "dicom",
             "namespace": "GUI classes.",
             "file": "src/image/luts.js",
             "line": 39,
@@ -545,7 +566,7 @@
             "extensions": [],
             "plugin_for": [],
             "extension_for": [],
-            "module": "dwv",
+            "module": "dicom",
             "namespace": "GUI classes.",
             "file": "src/image/view.js",
             "line": 6,
@@ -564,7 +585,7 @@
             "extensions": [],
             "plugin_for": [],
             "extension_for": [],
-            "module": "dwv",
+            "module": "dicom",
             "namespace": "GUI classes.",
             "file": "src/math/bucketQueue.js",
             "line": 6,
@@ -578,7 +599,7 @@
             "extensions": [],
             "plugin_for": [],
             "extension_for": [],
-            "module": "dwv",
+            "module": "dicom",
             "namespace": "GUI classes.",
             "file": "src/math/scissors.js",
             "line": 276
@@ -594,7 +615,7 @@
             "module": "math",
             "namespace": "dwv.math",
             "file": "src/math/shapes.js",
-            "line": 10,
+            "line": 8,
             "description": "2D point. Immutable.",
             "is_constructor": 1,
             "params": [
@@ -654,17 +675,19 @@
             "params": [
                 {
                     "name": "centre",
-                    "description": "A Point2D representing the centre of the circle."
+                    "description": "A Point2D representing the centre of the circle.",
+                    "type": "Object"
                 },
                 {
                     "name": "radius",
-                    "description": "The radius of the circle."
+                    "description": "The radius of the circle.",
+                    "type": "Object"
                 }
             ]
         },
-        "dwv.math.Line shape.": {
-            "name": "dwv.math.Line shape.",
-            "shortname": "Line shape.",
+        "dwv.math.Line": {
+            "name": "dwv.math.Line",
+            "shortname": "dwv.math.Line",
             "classitems": [],
             "plugins": [],
             "extensions": [],
@@ -673,21 +696,25 @@
             "module": "math",
             "namespace": "dwv.math",
             "file": "src/math/shapes.js",
-            "line": 116,
+            "line": 139,
+            "description": "Line shape.",
+            "is_constructor": 1,
             "params": [
                 {
                     "name": "begin",
-                    "description": "A Point2D representing the beginning of the line."
+                    "description": "A Point2D representing the beginning of the line.",
+                    "type": "Object"
                 },
                 {
                     "name": "end",
-                    "description": "A Point2D representing the end of the line."
+                    "description": "A Point2D representing the end of the line.",
+                    "type": "Object"
                 }
             ]
         },
-        "dwv.math.Rectangle shape.": {
-            "name": "dwv.math.Rectangle shape.",
-            "shortname": "Rectangle shape.",
+        "dwv.math.Rectangle": {
+            "name": "dwv.math.Rectangle",
+            "shortname": "dwv.math.Rectangle",
             "classitems": [],
             "plugins": [],
             "extensions": [],
@@ -696,21 +723,25 @@
             "module": "math",
             "namespace": "dwv.math",
             "file": "src/math/shapes.js",
-            "line": 150,
+            "line": 203,
+            "description": "Rectangle shape.",
+            "is_constructor": 1,
             "params": [
                 {
                     "name": "begin",
-                    "description": "A Point2D representing the beginning of the rectangle."
+                    "description": "A Point2D representing the beginning of the rectangle.",
+                    "type": "Object"
                 },
                 {
                     "name": "end",
-                    "description": "A Point2D representing the end of the rectangle."
+                    "description": "A Point2D representing the end of the rectangle.",
+                    "type": "Object"
                 }
             ]
         },
-        "dwv.math.Region Of Interest shape.\nNote: should be a closed path.": {
-            "name": "dwv.math.Region Of Interest shape.\nNote: should be a closed path.",
-            "shortname": "Region Of Interest shape.\nNote: should be a closed path.",
+        "dwv.math.ROI": {
+            "name": "dwv.math.ROI",
+            "shortname": "dwv.math.ROI",
             "classitems": [],
             "plugins": [],
             "extensions": [],
@@ -719,11 +750,13 @@
             "module": "math",
             "namespace": "dwv.math",
             "file": "src/math/shapes.js",
-            "line": 181
+            "line": 274,
+            "description": "Region Of Interest shape.",
+            "is_constructor": 1
         },
-        "dwv.math.Path shape.": {
-            "name": "dwv.math.Path shape.",
-            "shortname": "Path shape.",
+        "dwv.math.Path": {
+            "name": "dwv.math.Path",
+            "shortname": "dwv.math.Path",
             "classitems": [],
             "plugins": [],
             "extensions": [],
@@ -732,15 +765,19 @@
             "module": "math",
             "namespace": "dwv.math",
             "file": "src/math/shapes.js",
-            "line": 210,
+            "line": 318,
+            "description": "Path shape.",
+            "is_constructor": 1,
             "params": [
                 {
-                    "name": "points",
-                    "description": "The list of Point2D that make the path (optional)."
+                    "name": "inputPointArray",
+                    "description": "The list of Point2D that make the path (optional).",
+                    "type": "Array"
                 },
                 {
-                    "name": "points",
-                    "description": "The list of control point of path, as indexes (optional).\nNote: first and last point do not need to be equal."
+                    "name": "inputControlPointIndexArray",
+                    "description": "The list of control point of path, \n as indexes (optional).\nNote: first and last point do not need to be equal.",
+                    "type": "Array"
                 }
             ]
         },
@@ -1051,29 +1088,307 @@
     "classitems": [
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 95,
-            "description": "Get the DICOM data pixel buffer.",
-            "return": {
-                "description": "The pixel buffer (as an array)."
-            },
-            "class": "DicomParser class."
+            "line": 18,
+            "description": "The main data view.",
+            "itemtype": "property",
+            "name": "",
+            "access": "private",
+            "tagname": "",
+            "type": "DataView",
+            "class": "dwv.dicom.DataReader",
+            "module": "dicom",
+            "namespace": "dwv.dicom"
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 104,
+            "line": 28,
+            "description": "Read Uint8 (1 byte) data.",
+            "itemtype": "method",
+            "name": "readUint8",
+            "params": [
+                {
+                    "name": "byteOffset",
+                    "description": "The offset to start reading from.",
+                    "type": "Number"
+                }
+            ],
+            "return": {
+                "description": "The read data.",
+                "type": "Number"
+            },
+            "class": "dwv.dicom.DataReader",
+            "module": "dicom",
+            "namespace": "dwv.dicom"
+        },
+        {
+            "file": "src/dicom/dicomParser.js",
+            "line": 37,
+            "description": "Read Uint16 (2 bytes) data.",
+            "itemtype": "method",
+            "name": "readUint16",
+            "params": [
+                {
+                    "name": "byteOffset",
+                    "description": "The offset to start reading from.",
+                    "type": "Number"
+                }
+            ],
+            "return": {
+                "description": "The read data.",
+                "type": "Number"
+            },
+            "class": "dwv.dicom.DataReader",
+            "module": "dicom",
+            "namespace": "dwv.dicom"
+        },
+        {
+            "file": "src/dicom/dicomParser.js",
+            "line": 46,
+            "description": "Read Uint32 (4 bytes) data.",
+            "itemtype": "method",
+            "name": "readUint32",
+            "params": [
+                {
+                    "name": "byteOffset",
+                    "description": "The offset to start reading from.",
+                    "type": "Number"
+                }
+            ],
+            "return": {
+                "description": "The read data.",
+                "type": "Number"
+            },
+            "class": "dwv.dicom.DataReader",
+            "module": "dicom",
+            "namespace": "dwv.dicom"
+        },
+        {
+            "file": "src/dicom/dicomParser.js",
+            "line": 55,
+            "description": "Read Float32 (8 bytes) data.",
+            "itemtype": "method",
+            "name": "readFloat32",
+            "params": [
+                {
+                    "name": "byteOffset",
+                    "description": "The offset to start reading from.",
+                    "type": "Number"
+                }
+            ],
+            "return": {
+                "description": "The read data.",
+                "type": "Number"
+            },
+            "class": "dwv.dicom.DataReader",
+            "module": "dicom",
+            "namespace": "dwv.dicom"
+        },
+        {
+            "file": "src/dicom/dicomParser.js",
+            "line": 64,
+            "description": "Read Uint data of nBytes size.",
+            "itemtype": "method",
+            "name": "readNumber",
+            "params": [
+                {
+                    "name": "byteOffset",
+                    "description": "The offset to start reading from.",
+                    "type": "Number"
+                },
+                {
+                    "name": "nBytes",
+                    "description": "The number of bytes to read.",
+                    "type": "Number"
+                }
+            ],
+            "return": {
+                "description": "The read data.",
+                "type": "Number"
+            },
+            "class": "dwv.dicom.DataReader",
+            "module": "dicom",
+            "namespace": "dwv.dicom"
+        },
+        {
+            "file": "src/dicom/dicomParser.js",
+            "line": 83,
+            "description": "Read Uint8 array.",
+            "itemtype": "method",
+            "name": "readUint8Array",
+            "params": [
+                {
+                    "name": "byteOffset",
+                    "description": "The offset to start reading from.",
+                    "type": "Number"
+                },
+                {
+                    "name": "size",
+                    "description": "The size of the array.",
+                    "type": "Number"
+                }
+            ],
+            "return": {
+                "description": "The read data.",
+                "type": "Array"
+            },
+            "class": "dwv.dicom.DataReader",
+            "module": "dicom",
+            "namespace": "dwv.dicom"
+        },
+        {
+            "file": "src/dicom/dicomParser.js",
+            "line": 98,
+            "description": "Read Uint16 array.",
+            "itemtype": "method",
+            "name": "readUint16Array",
+            "params": [
+                {
+                    "name": "byteOffset",
+                    "description": "The offset to start reading from.",
+                    "type": "Number"
+                },
+                {
+                    "name": "size",
+                    "description": "The size of the array.",
+                    "type": "Number"
+                }
+            ],
+            "return": {
+                "description": "The read data.",
+                "type": "Array"
+            },
+            "class": "dwv.dicom.DataReader",
+            "module": "dicom",
+            "namespace": "dwv.dicom"
+        },
+        {
+            "file": "src/dicom/dicomParser.js",
+            "line": 113,
+            "description": "Read data as an hexadecimal string.",
+            "itemtype": "method",
+            "name": "readHex",
+            "params": [
+                {
+                    "name": "byteOffset",
+                    "description": "The offset to start reading from.",
+                    "type": "Number"
+                }
+            ],
+            "return": {
+                "description": "The read data.",
+                "type": "Array"
+            },
+            "class": "dwv.dicom.DataReader",
+            "module": "dicom",
+            "namespace": "dwv.dicom"
+        },
+        {
+            "file": "src/dicom/dicomParser.js",
+            "line": 125,
+            "description": "Read data as a string.",
+            "itemtype": "method",
+            "name": "readString",
+            "params": [
+                {
+                    "name": "byteOffset",
+                    "description": "The offset to start reading from.",
+                    "type": "Number"
+                },
+                {
+                    "name": "nChars",
+                    "description": "The numner of characters to read.",
+                    "type": "Number"
+                }
+            ],
+            "return": {
+                "description": "The read data.",
+                "type": "String"
+            },
+            "class": "dwv.dicom.DataReader",
+            "module": "dicom",
+            "namespace": "dwv.dicom"
+        },
+        {
+            "file": "src/dicom/dicomParser.js",
+            "line": 150,
+            "description": "The list of DICOM elements.",
+            "itemtype": "property",
+            "name": "",
+            "type": "Array",
+            "class": "dwv.dicom.DicomParser",
+            "module": "dicom",
+            "namespace": "dwv.dicom"
+        },
+        {
+            "file": "src/dicom/dicomParser.js",
+            "line": 156,
+            "description": "The number of DICOM Items.",
+            "itemtype": "property",
+            "name": "",
+            "type": "Number",
+            "class": "dwv.dicom.DicomParser",
+            "module": "dicom",
+            "namespace": "dwv.dicom"
+        },
+        {
+            "file": "src/dicom/dicomParser.js",
+            "line": 162,
+            "description": "The DICOM dictionary used to find tag names.",
+            "itemtype": "property",
+            "name": "",
+            "type": "Dictionary",
+            "class": "dwv.dicom.DicomParser",
+            "module": "dicom",
+            "namespace": "dwv.dicom"
+        },
+        {
+            "file": "src/dicom/dicomParser.js",
+            "line": 168,
+            "description": "The pixel buffer.",
+            "itemtype": "property",
+            "name": "",
+            "type": "Array",
+            "class": "dwv.dicom.DicomParser",
+            "module": "dicom",
+            "namespace": "dwv.dicom"
+        },
+        {
+            "file": "src/dicom/dicomParser.js",
+            "line": 176,
+            "description": "Get the DICOM data pixel buffer.",
+            "itemtype": "method",
+            "name": "getPixelBuffer",
+            "return": {
+                "description": "The pixel buffer.",
+                "type": "Array"
+            },
+            "class": "dwv.dicom.DicomParser",
+            "module": "dicom",
+            "namespace": "dwv.dicom"
+        },
+        {
+            "file": "src/dicom/dicomParser.js",
+            "line": 186,
             "description": "Append a DICOM element to the dicomElements member object.\nAllows for easy retrieval of DICOM tag values from the tag name.\nIf tags have same name (for the 'unknown' and private tags cases), a number is appended\nmaking the name unique.",
+            "itemtype": "method",
+            "name": "appendDicomElement",
             "params": [
                 {
                     "name": "element",
-                    "description": "The element to add."
+                    "description": "The element to add.",
+                    "type": "Object"
                 }
             ],
-            "class": "DicomParser class."
+            "class": "dwv.dicom.DicomParser",
+            "module": "dicom",
+            "namespace": "dwv.dicom"
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 132,
+            "line": 215,
             "description": "Read a DICOM tag.",
+            "itemtype": "method",
+            "name": "readTag",
             "params": [
                 {
                     "name": "reader",
@@ -1087,12 +1402,16 @@
             "return": {
                 "description": "An object containing the tags 'group', 'element' and 'name'."
             },
-            "class": "DicomParser class."
+            "class": "dwv.dicom.DicomParser",
+            "module": "dicom",
+            "namespace": "dwv.dicom"
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 155,
+            "line": 239,
             "description": "Read a DICOM data element.",
+            "itemtype": "method",
+            "name": "readDataElement",
             "params": [
                 {
                     "name": "reader",
@@ -1108,49 +1427,87 @@
                 }
             ],
             "return": {
-                "description": "An object containing the element 'tag', 'vl', 'vr', 'data' and 'offset'."
+                "description": "An object containing the element 'tag', 'vl', 'vr', 'data' and 'offset'.",
+                "type": "Object"
             },
-            "class": "DicomParser class."
+            "class": "dwv.dicom.DicomParser",
+            "module": "dicom",
+            "namespace": "dwv.dicom"
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 247,
+            "line": 332,
             "description": "Parse the complete DICOM file (given as input to the class).\nFills in the member object 'dicomElements'.",
+            "itemtype": "method",
+            "name": "parse",
             "params": [
                 {
                     "name": "buffer",
                     "description": "The input array buffer."
                 }
             ],
-            "class": "DicomParser class."
+            "class": "dwv.dicom.DicomParser",
+            "module": "dicom",
+            "namespace": "dwv.dicom"
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 420,
+            "line": 506,
             "description": "Get an Image object from the read DICOM file.",
+            "itemtype": "method",
+            "name": "createImage",
             "return": {
-                "description": "A new Image."
+                "description": "A new Image.",
+                "type": "View"
             },
-            "class": "DicomParser class."
+            "class": "dwv.dicom.DicomParser",
+            "module": "dicom",
+            "namespace": "dwv.dicom"
+        },
+        {
+            "file": "src/dicom/dictionary.js",
+            "line": 15,
+            "description": "Tag definition storage.",
+            "itemtype": "property",
+            "name": "",
+            "type": "Array",
+            "class": "dwv.dicom.Dictionary",
+            "module": "dicom",
+            "namespace": "dwv.dicom"
+        },
+        {
+            "file": "src/dicom/dictionary.js",
+            "line": 22,
+            "description": "Fill in the dictionary array.",
+            "itemtype": "method",
+            "name": "init",
+            "class": "dwv.dicom.Dictionary",
+            "module": "dicom",
+            "namespace": "dwv.dicom"
         },
         {
             "file": "src/html/gui.js",
             "line": 157,
             "itemtype": "method",
             "name": "Append the color chooser to the HTML document in the 'colourChooser' node.",
-            "class": "GUI classes..Window layer."
+            "class": "GUI classes..Window layer.",
+            "module": "dicom",
+            "namespace": "dwv.dicom"
         },
         {
             "file": "src/html/gui.js",
             "line": 183,
             "itemtype": "method",
             "name": "Remove the color chooser specific node.",
-            "class": "GUI classes..Window layer."
+            "class": "GUI classes..Window layer.",
+            "module": "dicom",
+            "namespace": "dwv.dicom"
         },
         {
             "file": "src/html/gui.js",
             "line": 219,
             "class": "GUI classes..Window layer.",
+            "module": "dicom",
             "namespace": "GUI classes."
         },
         {
@@ -1159,6 +1516,7 @@
             "itemtype": "method",
             "name": "Threshold Filter User Interface.",
             "class": "GUI classes..Window layer.",
+            "module": "dicom",
             "namespace": "GUI classes."
         },
         {
@@ -1167,6 +1525,7 @@
             "itemtype": "method",
             "name": "Sharpen Filter User Interface.",
             "class": "GUI classes..Window layer.",
+            "module": "dicom",
             "namespace": "GUI classes."
         },
         {
@@ -1175,6 +1534,7 @@
             "itemtype": "method",
             "name": "Sobel Filter User Interface.",
             "class": "GUI classes..Window layer.",
+            "module": "dicom",
             "namespace": "GUI classes."
         },
         {
@@ -1183,6 +1543,7 @@
             "itemtype": "method",
             "name": "Get a slider.",
             "class": "GUI classes..Window layer.",
+            "module": "dicom",
             "namespace": "GUI classes."
         },
         {
@@ -1197,6 +1558,7 @@
                 }
             ],
             "class": "GUI classes..Window layer.",
+            "module": "dicom",
             "namespace": "GUI classes."
         },
         {
@@ -1205,6 +1567,7 @@
             "itemtype": "method",
             "name": "Get a slider.",
             "class": "GUI classes..Window layer.",
+            "module": "dicom",
             "namespace": "GUI classes."
         },
         {
@@ -1219,6 +1582,7 @@
                 }
             ],
             "class": "GUI classes..Window layer.",
+            "module": "dicom",
             "namespace": "GUI classes."
         },
         {
@@ -1237,6 +1601,7 @@
                 }
             ],
             "class": "GUI classes..Window layer.",
+            "module": "dicom",
             "namespace": "GUI classes."
         },
         {
@@ -1255,6 +1620,7 @@
                 }
             ],
             "class": "GUI classes..Window layer.",
+            "module": "dicom",
             "namespace": "GUI classes."
         },
         {
@@ -1263,6 +1629,7 @@
             "itemtype": "method",
             "name": "",
             "class": "GUI classes..Window layer.",
+            "module": "dicom",
             "namespace": "GUI classes."
         },
         {
@@ -1271,6 +1638,7 @@
             "itemtype": "method",
             "name": "",
             "class": "GUI classes..Window layer.",
+            "module": "dicom",
             "namespace": "GUI classes."
         },
         {
@@ -1279,6 +1647,7 @@
             "itemtype": "method",
             "name": "",
             "class": "GUI classes..Window layer.",
+            "module": "dicom",
             "namespace": "GUI classes."
         },
         {
@@ -1289,6 +1658,7 @@
             "input": "input Allowed types are: array, array of object, object.",
             "warning": "Null is interpreted differently in browsers, firefox will not display it.",
             "class": "GUI classes..Window layer.",
+            "module": "dicom",
             "namespace": "GUI classes."
         },
         {
@@ -1297,6 +1667,7 @@
             "itemtype": "method",
             "name": "",
             "class": "GUI classes..Window layer.",
+            "module": "dicom",
             "namespace": "GUI classes."
         },
         {
@@ -1315,6 +1686,7 @@
                 }
             ],
             "class": "GUI classes..Window layer.",
+            "module": "dicom",
             "namespace": "GUI classes."
         },
         {
@@ -1329,6 +1701,7 @@
                 }
             ],
             "class": "GUI classes..Window layer.",
+            "module": "dicom",
             "namespace": "GUI classes."
         },
         {
@@ -1347,6 +1720,7 @@
                 }
             ],
             "class": "GUI classes..Window layer.",
+            "module": "dicom",
             "namespace": "GUI classes."
         },
         {
@@ -1355,6 +1729,7 @@
             "itemtype": "method",
             "name": "",
             "class": "GUI classes..Window layer.",
+            "module": "dicom",
             "namespace": "GUI classes."
         },
         {
@@ -1373,6 +1748,7 @@
                 }
             ],
             "class": "GUI classes..Window layer.",
+            "module": "dicom",
             "namespace": "GUI classes."
         },
         {
@@ -1391,6 +1767,7 @@
                 }
             ],
             "class": "GUI classes..Window layer.",
+            "module": "dicom",
             "namespace": "GUI classes."
         },
         {
@@ -1412,6 +1789,7 @@
                 "description": "The created HTML select."
             },
             "class": "GUI classes..Window layer.",
+            "module": "dicom",
             "namespace": "GUI classes."
         },
         {
@@ -1419,6 +1797,7 @@
             "line": 408,
             "description": "Browser checks to see if it can run dwv...\nTODO Maybe use http://modernizr.com/.",
             "class": "GUI classes..Window layer.",
+            "module": "dicom",
             "namespace": "GUI classes."
         },
         {
@@ -1426,6 +1805,7 @@
             "line": 101,
             "description": "Reset the layout",
             "class": "GUI classes..Window layer.",
+            "module": "dicom",
             "namespace": "GUI classes."
         },
         {
@@ -1433,6 +1813,7 @@
             "line": 112,
             "description": "Draw the content (imageData) of the layer.\nThe imageData variable needs to be set",
             "class": "GUI classes..Window layer.",
+            "module": "dicom",
             "namespace": "GUI classes."
         },
         {
@@ -1441,6 +1822,7 @@
             "description": "Initialise the layer: set the canvas and context",
             "input": "height The height of the canvas.",
             "class": "GUI classes..Window layer.",
+            "module": "dicom",
             "namespace": "GUI classes."
         },
         {
@@ -1448,6 +1830,7 @@
             "line": 170,
             "description": "Fill the full context with the current style.",
             "class": "GUI classes..Window layer.",
+            "module": "dicom",
             "namespace": "GUI classes."
         },
         {
@@ -1455,6 +1838,7 @@
             "line": 178,
             "description": "Clear the full context.",
             "class": "GUI classes..Window layer.",
+            "module": "dicom",
             "namespace": "GUI classes."
         },
         {
@@ -1463,6 +1847,7 @@
             "description": "Merge two layers.",
             "input": "layerToMerge The layer to merge. It will also be emptied.",
             "class": "GUI classes..Window layer.",
+            "module": "dicom",
             "namespace": "GUI classes."
         },
         {
@@ -1470,6 +1855,7 @@
             "line": 202,
             "description": "Set the fill and stroke style of the context.",
             "class": "GUI classes..Window layer.",
+            "module": "dicom",
             "namespace": "GUI classes."
         },
         {
@@ -1477,6 +1863,7 @@
             "line": 211,
             "description": "Display the layer.",
             "class": "GUI classes..Window layer.",
+            "module": "dicom",
             "namespace": "GUI classes."
         },
         {
@@ -1484,6 +1871,7 @@
             "line": 232,
             "description": "Align on another layer.",
             "class": "GUI classes..Window layer.",
+            "module": "dicom",
             "namespace": "GUI classes."
         },
         {
@@ -1502,6 +1890,7 @@
                 }
             ],
             "class": "GUI classes..Image Size class. \nSupports 2D and 3D images.",
+            "module": "dicom",
             "namespace": "GUI classes."
         },
         {
@@ -1510,6 +1899,7 @@
             "itemtype": "method",
             "name": "Sharpen an image using a sharpen convolution matrix.",
             "class": "GUI classes..Image Size class. \nSupports 2D and 3D images.",
+            "module": "dicom",
             "namespace": "GUI classes."
         },
         {
@@ -1518,6 +1908,7 @@
             "itemtype": "method",
             "name": "Apply a Sobel filter to an image.",
             "class": "GUI classes..Image Size class. \nSupports 2D and 3D images.",
+            "module": "dicom",
             "namespace": "GUI classes."
         },
         {
@@ -1542,6 +1933,7 @@
                 "description": "The value at the desired position.\nWarning: No size check..."
             },
             "class": "GUI classes..Image class.",
+            "module": "dicom",
             "namespace": "GUI classes."
         },
         {
@@ -1558,6 +1950,7 @@
                 "description": "The value at the desired offset.\nWarning: No size check..."
             },
             "class": "GUI classes..Image class.",
+            "module": "dicom",
             "namespace": "GUI classes."
         },
         {
@@ -1582,6 +1975,7 @@
                 "description": "The value at the desired position.\nWarning: No size check..."
             },
             "class": "GUI classes..Image class.",
+            "module": "dicom",
             "namespace": "GUI classes."
         },
         {
@@ -1593,6 +1987,7 @@
                 "type": "Min, max"
             },
             "class": "GUI classes..Image class.",
+            "module": "dicom",
             "namespace": "GUI classes."
         },
         {
@@ -1604,6 +1999,7 @@
                 "type": "Min, max"
             },
             "class": "GUI classes..Image class.",
+            "module": "dicom",
             "namespace": "GUI classes."
         },
         {
@@ -1614,6 +2010,7 @@
                 "description": "An array representing the histogram."
             },
             "class": "GUI classes..Image class.",
+            "module": "dicom",
             "namespace": "GUI classes."
         },
         {
@@ -1630,6 +2027,7 @@
                 "description": "The convoluted image.\n\nNote: Uses the raw buffer values."
             },
             "class": "GUI classes..Image class.",
+            "module": "dicom",
             "namespace": "GUI classes."
         },
         {
@@ -1646,6 +2044,7 @@
                 "description": "The transformed image.\n\nNote: Uses the raw buffer values."
             },
             "class": "GUI classes..Image class.",
+            "module": "dicom",
             "namespace": "GUI classes."
         },
         {
@@ -1666,6 +2065,7 @@
                 "description": "The composed image.\n\nNote: Uses the raw buffer values."
             },
             "class": "GUI classes..Image class.",
+            "module": "dicom",
             "namespace": "GUI classes."
         },
         {
@@ -1673,6 +2073,7 @@
             "line": 95,
             "description": "Lookup tables for image color display.",
             "class": "GUI classes..Window LUT class.",
+            "module": "dicom",
             "namespace": "GUI classes."
         },
         {
@@ -1690,6 +2091,7 @@
                 }
             ],
             "class": "GUI classes..View class.",
+            "module": "dicom",
             "namespace": "GUI classes."
         },
         {
@@ -1703,6 +2105,7 @@
                 }
             ],
             "class": "GUI classes..View class.",
+            "module": "dicom",
             "namespace": "GUI classes."
         },
         {
@@ -1721,6 +2124,7 @@
             ],
             "warning": "Uses the latest set rescale LUT or the default linear one.",
             "class": "GUI classes..View class.",
+            "module": "dicom",
             "namespace": "GUI classes."
         },
         {
@@ -1729,6 +2133,7 @@
             "description": "Set the image window/level to cover the full data range.",
             "warning": "Uses the latest set rescale LUT or the default linear one.",
             "class": "GUI classes..View class.",
+            "module": "dicom",
             "namespace": "GUI classes."
         },
         {
@@ -1736,6 +2141,7 @@
             "line": 114,
             "description": "Increment the current slice number.\nReturns false if not in bounds.",
             "class": "GUI classes..View class.",
+            "module": "dicom",
             "namespace": "GUI classes."
         },
         {
@@ -1743,6 +2149,7 @@
             "line": 126,
             "description": "Decrement the current slice number.\nReturns false if not in bounds.",
             "class": "GUI classes..View class.",
+            "module": "dicom",
             "namespace": "GUI classes."
         },
         {
@@ -1754,6 +2161,7 @@
                 "type": "dwv.image.Image"
             },
             "class": "GUI classes..View class.",
+            "module": "dicom",
             "namespace": "GUI classes."
         },
         {
@@ -1771,6 +2179,7 @@
                 }
             ],
             "class": "GUI classes..View class.",
+            "module": "dicom",
             "namespace": "GUI classes."
         },
         {
@@ -1788,6 +2197,7 @@
                 }
             ],
             "class": "GUI classes..View class.",
+            "module": "dicom",
             "namespace": "GUI classes."
         },
         {
@@ -1805,6 +2215,7 @@
                 }
             ],
             "class": "GUI classes..View class.",
+            "module": "dicom",
             "namespace": "GUI classes."
         },
         {
@@ -1818,42 +2229,54 @@
                 }
             ],
             "class": "GUI classes..View class.",
+            "module": "dicom",
             "namespace": "GUI classes."
         },
         {
             "file": "src/math/scissors.js",
             "line": 9,
             "class": "GUI classes..Scissors.\n\nRef: Eric N. Mortensen, William A. Barrett, Interactive Segmentation with\n  Intelligent Scissors, Graphical Models and Image Processing, Volume 60,\n  Issue 5, September 1998, Pages 349-384, ISSN 1077-3169,\n  DOI: 10.1006/gmip.1998.0480.\n\n(http://www.sciencedirect.com/science/article/B6WG4-45JB8WN-9/2/6fe59d8089fd1892c2bfb82283065579)\n\nHighly inspired from http://code.google.com/p/livewire-javascript/",
+            "module": "dicom",
             "namespace": "GUI classes."
         },
         {
             "file": "src/math/scissors.js",
             "line": 65,
             "class": "GUI classes..Scissors.\n\nRef: Eric N. Mortensen, William A. Barrett, Interactive Segmentation with\n  Intelligent Scissors, Graphical Models and Image Processing, Volume 60,\n  Issue 5, September 1998, Pages 349-384, ISSN 1077-3169,\n  DOI: 10.1006/gmip.1998.0480.\n\n(http://www.sciencedirect.com/science/article/B6WG4-45JB8WN-9/2/6fe59d8089fd1892c2bfb82283065579)\n\nHighly inspired from http://code.google.com/p/livewire-javascript/",
+            "module": "dicom",
             "namespace": "GUI classes."
         },
         {
             "file": "src/math/scissors.js",
             "line": 105,
             "class": "GUI classes..Scissors.\n\nRef: Eric N. Mortensen, William A. Barrett, Interactive Segmentation with\n  Intelligent Scissors, Graphical Models and Image Processing, Volume 60,\n  Issue 5, September 1998, Pages 349-384, ISSN 1077-3169,\n  DOI: 10.1006/gmip.1998.0480.\n\n(http://www.sciencedirect.com/science/article/B6WG4-45JB8WN-9/2/6fe59d8089fd1892c2bfb82283065579)\n\nHighly inspired from http://code.google.com/p/livewire-javascript/",
+            "module": "dicom",
             "namespace": "GUI classes."
         },
         {
             "file": "src/math/shapes.js",
-            "line": 20,
+            "line": 18,
             "description": "Get the X position of the point.",
             "itemtype": "method",
             "name": "getX",
+            "return": {
+                "description": "The X position of the point.",
+                "type": "Number"
+            },
             "class": "dwv.math.Point2D",
             "module": "math",
             "namespace": "dwv.math"
         },
         {
             "file": "src/math/shapes.js",
-            "line": 25,
+            "line": 24,
             "description": "Get the Y position of the point.",
             "itemtype": "method",
             "name": "getY",
+            "return": {
+                "description": "The Y position of the point.",
+                "type": "Number"
+            },
             "class": "dwv.math.Point2D",
             "module": "math",
             "namespace": "dwv.math"
@@ -1886,7 +2309,7 @@
             "itemtype": "method",
             "name": "toString",
             "return": {
-                "description": "The Point2D as string.",
+                "description": "The Point2D as a string.",
                 "type": "String"
             },
             "class": "dwv.math.Point2D",
@@ -1921,7 +2344,7 @@
             "itemtype": "method",
             "name": "toString",
             "return": {
-                "description": "The Point2D as string.",
+                "description": "The Point2D as a string.",
                 "type": "String"
             },
             "class": "dwv.math.FastPoint2D",
@@ -1930,144 +2353,530 @@
         },
         {
             "file": "src/math/shapes.js",
+            "line": 100,
+            "description": "Circle surface.",
+            "itemtype": "property",
+            "name": "",
+            "access": "private",
+            "tagname": "",
+            "type": "Number",
+            "class": "dwv.math.Circle",
+            "module": "math",
+            "namespace": "dwv.math"
+        },
+        {
+            "file": "src/math/shapes.js",
+            "line": 108,
+            "description": "Get the centre (point) of the circle.",
+            "itemtype": "method",
+            "name": "getCenter",
+            "return": {
+                "description": "The center (point) of the circle.",
+                "type": "Object"
+            },
+            "class": "dwv.math.Circle",
+            "module": "math",
+            "namespace": "dwv.math"
+        },
+        {
+            "file": "src/math/shapes.js",
+            "line": 114,
+            "description": "Get the radius of the circle.",
+            "itemtype": "method",
+            "name": "getRadius",
+            "return": {
+                "description": "The radius of the circle.",
+                "type": "Number"
+            },
+            "class": "dwv.math.Circle",
+            "module": "math",
+            "namespace": "dwv.math"
+        },
+        {
+            "file": "src/math/shapes.js",
+            "line": 120,
+            "description": "Get the surface of the circle.",
+            "itemtype": "method",
+            "name": "getSurface",
+            "return": {
+                "description": "The surface of the circle.",
+                "type": "Number"
+            },
+            "class": "dwv.math.Circle",
+            "module": "math",
+            "namespace": "dwv.math"
+        },
+        {
+            "file": "src/math/shapes.js",
+            "line": 126,
+            "description": "Get the surface of the circle with a spacing.",
+            "itemtype": "method",
+            "name": "getWorldSurface",
+            "params": [
+                {
+                    "name": "spacingX",
+                    "description": "The X spacing.",
+                    "type": "Number"
+                },
+                {
+                    "name": "spacingY",
+                    "description": "The Y spacing.",
+                    "type": "Number"
+                }
+            ],
+            "return": {
+                "description": "The surface of the circle multiplied by the given spacing.",
+                "type": "Number"
+            },
+            "class": "dwv.math.Circle",
+            "module": "math",
+            "namespace": "dwv.math"
+        },
+        {
+            "file": "src/math/shapes.js",
+            "line": 149,
+            "description": "Line length.",
+            "itemtype": "property",
+            "name": "",
+            "access": "private",
+            "tagname": "",
+            "type": "Number",
+            "class": "dwv.math.Line",
+            "module": "math",
+            "namespace": "dwv.math"
+        },
+        {
+            "file": "src/math/shapes.js",
+            "line": 159,
+            "description": "Get the begin point of the line.",
+            "itemtype": "method",
+            "name": "getBegin",
+            "return": {
+                "description": "The beginning point of the line.",
+                "type": "Object"
+            },
+            "class": "dwv.math.Line",
+            "module": "math",
+            "namespace": "dwv.math"
+        },
+        {
+            "file": "src/math/shapes.js",
+            "line": 165,
+            "description": "Get the end point of the line.",
+            "itemtype": "method",
+            "name": "getEnd",
+            "return": {
+                "description": "The ending point of the line.",
+                "type": "Object"
+            },
+            "class": "dwv.math.Line",
+            "module": "math",
+            "namespace": "dwv.math"
+        },
+        {
+            "file": "src/math/shapes.js",
+            "line": 171,
+            "description": "Get the length of the line.",
+            "itemtype": "method",
+            "name": "getLength",
+            "return": {
+                "description": "The length of the line.",
+                "type": "Number"
+            },
+            "class": "dwv.math.Line",
+            "module": "math",
+            "namespace": "dwv.math"
+        },
+        {
+            "file": "src/math/shapes.js",
+            "line": 177,
+            "description": "Get the length of the line with spacing.",
+            "itemtype": "method",
+            "name": "getWorldLength",
+            "params": [
+                {
+                    "name": "spacingX",
+                    "description": "The X spacing.",
+                    "type": "Number"
+                },
+                {
+                    "name": "spacingY",
+                    "description": "The Y spacing.",
+                    "type": "Number"
+                }
+            ],
+            "return": {
+                "description": "The length of the line with spacing.",
+                "type": "Number"
+            },
+            "class": "dwv.math.Line",
+            "module": "math",
+            "namespace": "dwv.math"
+        },
+        {
+            "file": "src/math/shapes.js",
             "line": 190,
-            "description": "Get a point of the list.",
-            "params": [
-                {
-                    "name": "index",
-                    "description": "The index of the point to get (beware, no size check)."
-                }
-            ],
+            "description": "Get the mid point of the line.",
+            "itemtype": "method",
+            "name": "getMidpoint",
             "return": {
-                "description": "The Point2D at the given index."
+                "description": "The mid point of the line.",
+                "type": "Object"
             },
-            "class": "dwv.math.Region Of Interest shape.\nNote: should be a closed path.",
+            "class": "dwv.math.Line",
             "module": "math",
             "namespace": "dwv.math"
         },
         {
             "file": "src/math/shapes.js",
-            "line": 198,
-            "description": "Add a point to the ROI.",
-            "params": [
-                {
-                    "name": "point",
-                    "description": "The Point2D to add."
-                }
-            ],
-            "class": "dwv.math.Region Of Interest shape.\nNote: should be a closed path.",
+            "line": 213,
+            "description": "Rectangle surface.",
+            "itemtype": "property",
+            "name": "",
+            "access": "private",
+            "tagname": "",
+            "type": "Number",
+            "class": "dwv.math.Rectangle",
             "module": "math",
             "namespace": "dwv.math"
         },
         {
             "file": "src/math/shapes.js",
-            "line": 203,
-            "description": "Add points to the ROI.",
-            "params": [
-                {
-                    "name": "rhs",
-                    "description": "The array of POints2D to add."
-                }
-            ],
-            "class": "dwv.math.Region Of Interest shape.\nNote: should be a closed path.",
-            "module": "math",
-            "namespace": "dwv.math"
-        },
-        {
-            "file": "src/math/shapes.js",
-            "line": 224,
-            "description": "Get a point of the list.",
-            "params": [
-                {
-                    "name": "index",
-                    "description": "The index of the point to get (beware, no size check)."
-                }
-            ],
+            "line": 221,
+            "description": "Get the begin point of the rectangle.",
+            "itemtype": "method",
+            "name": "getBegin",
             "return": {
-                "description": "The Point2D at the given index."
+                "description": "The begin point of the rectangle",
+                "type": "Object"
             },
-            "class": "dwv.math.Path shape.",
+            "class": "dwv.math.Rectangle",
+            "module": "math",
+            "namespace": "dwv.math"
+        },
+        {
+            "file": "src/math/shapes.js",
+            "line": 227,
+            "description": "Get the end point of the rectangle.",
+            "itemtype": "method",
+            "name": "getEnd",
+            "return": {
+                "description": "The end point of the rectangle",
+                "type": "Object"
+            },
+            "class": "dwv.math.Rectangle",
             "module": "math",
             "namespace": "dwv.math"
         },
         {
             "file": "src/math/shapes.js",
             "line": 233,
-            "description": "Is is a control point.",
-            "params": [
-                {
-                    "name": "point",
-                    "description": "The Point2D to check."
-                }
-            ],
+            "description": "Get the real width of the rectangle.",
+            "itemtype": "method",
+            "name": "getRealWidth",
             "return": {
-                "description": "True if a control point."
+                "description": "The real width of the rectangle.",
+                "type": "Number"
             },
-            "class": "dwv.math.Path shape.",
+            "class": "dwv.math.Rectangle",
             "module": "math",
             "namespace": "dwv.math"
         },
         {
             "file": "src/math/shapes.js",
-            "line": 248,
-            "description": "Get the length of the path.",
-            "class": "dwv.math.Path shape.",
+            "line": 239,
+            "description": "Get the real height of the rectangle.",
+            "itemtype": "method",
+            "name": "getRealHeight",
+            "return": {
+                "description": "The real height of the rectangle.",
+                "type": "Number"
+            },
+            "class": "dwv.math.Rectangle",
             "module": "math",
             "namespace": "dwv.math"
         },
         {
             "file": "src/math/shapes.js",
-            "line": 255,
-            "description": "Add a point to the path.",
-            "params": [
-                {
-                    "name": "point",
-                    "description": "The Point2D to add."
-                }
-            ],
-            "class": "dwv.math.Path shape.",
+            "line": 245,
+            "description": "Get the width of the rectangle.",
+            "itemtype": "method",
+            "name": "getWidth",
+            "return": {
+                "description": "The width of the rectangle.",
+                "type": "Number"
+            },
+            "class": "dwv.math.Rectangle",
+            "module": "math",
+            "namespace": "dwv.math"
+        },
+        {
+            "file": "src/math/shapes.js",
+            "line": 251,
+            "description": "Get the height of the rectangle.",
+            "itemtype": "method",
+            "name": "getHeight",
+            "return": {
+                "description": "The height of the rectangle.",
+                "type": "Number"
+            },
+            "class": "dwv.math.Rectangle",
+            "module": "math",
+            "namespace": "dwv.math"
+        },
+        {
+            "file": "src/math/shapes.js",
+            "line": 257,
+            "description": "Get the surface of the rectangle.",
+            "itemtype": "method",
+            "name": "getSurface",
+            "return": {
+                "description": "The surface of the rectangle.",
+                "type": "Number"
+            },
+            "class": "dwv.math.Rectangle",
             "module": "math",
             "namespace": "dwv.math"
         },
         {
             "file": "src/math/shapes.js",
             "line": 263,
-            "description": "Add a control point to the path.",
+            "description": "Get the surface of the rectangle with a spacing.",
+            "itemtype": "method",
+            "name": "getWorldSurface",
+            "return": {
+                "description": "The surface of the rectangle with a spacing.",
+                "type": "Number"
+            },
+            "class": "dwv.math.Rectangle",
+            "module": "math",
+            "namespace": "dwv.math"
+        },
+        {
+            "file": "src/math/shapes.js",
+            "line": 283,
+            "description": "List of points.",
+            "itemtype": "property",
+            "name": "",
+            "access": "private",
+            "tagname": "",
+            "type": "Array",
+            "class": "dwv.math.ROI",
+            "module": "math",
+            "namespace": "dwv.math"
+        },
+        {
+            "file": "src/math/shapes.js",
+            "line": 291,
+            "description": "Get a point of the list at a given index.",
+            "itemtype": "method",
+            "name": "getPoint",
+            "params": [
+                {
+                    "name": "index",
+                    "description": "The index of the point to get (beware, no size check).",
+                    "type": "Number"
+                }
+            ],
+            "return": {
+                "description": "The Point2D at the given index.",
+                "type": "Object"
+            },
+            "class": "dwv.math.ROI",
+            "module": "math",
+            "namespace": "dwv.math"
+        },
+        {
+            "file": "src/math/shapes.js",
+            "line": 298,
+            "description": "Get the length of the point list.",
+            "itemtype": "method",
+            "name": "getLength",
+            "return": {
+                "description": "The length of the point list.",
+                "type": "Number"
+            },
+            "class": "dwv.math.ROI",
+            "module": "math",
+            "namespace": "dwv.math"
+        },
+        {
+            "file": "src/math/shapes.js",
+            "line": 304,
+            "description": "Add a point to the ROI.",
+            "itemtype": "method",
+            "name": "addPoint",
             "params": [
                 {
                     "name": "point",
-                    "description": "The Point2D to make a control point."
+                    "description": "The Point2D to add.",
+                    "type": "Object"
                 }
             ],
-            "class": "dwv.math.Path shape.",
+            "class": "dwv.math.ROI",
             "module": "math",
             "namespace": "dwv.math"
         },
         {
             "file": "src/math/shapes.js",
-            "line": 277,
+            "line": 310,
+            "description": "Add points to the ROI.",
+            "itemtype": "method",
+            "name": "addPoints",
+            "params": [
+                {
+                    "name": "rhs",
+                    "description": "The array of POints2D to add.",
+                    "type": "Array"
+                }
+            ],
+            "class": "dwv.math.ROI",
+            "module": "math",
+            "namespace": "dwv.math"
+        },
+        {
+            "file": "src/math/shapes.js",
+            "line": 330,
+            "description": "List of points.",
+            "itemtype": "property",
+            "name": "",
+            "type": "Array",
+            "class": "dwv.math.Path",
+            "module": "math",
+            "namespace": "dwv.math"
+        },
+        {
+            "file": "src/math/shapes.js",
+            "line": 336,
+            "description": "List of control points.",
+            "itemtype": "property",
+            "name": "",
+            "type": "Array",
+            "class": "dwv.math.Path",
+            "module": "math",
+            "namespace": "dwv.math"
+        },
+        {
+            "file": "src/math/shapes.js",
+            "line": 345,
+            "description": "Get a point of the list.",
+            "itemtype": "method",
+            "name": "getPoint",
+            "params": [
+                {
+                    "name": "index",
+                    "description": "The index of the point to get (beware, no size check).",
+                    "type": "Number"
+                }
+            ],
+            "return": {
+                "description": "The Point2D at the given index.",
+                "type": "Object"
+            },
+            "class": "dwv.math.Path",
+            "module": "math",
+            "namespace": "dwv.math"
+        },
+        {
+            "file": "src/math/shapes.js",
+            "line": 355,
+            "description": "Is the given point a control point.",
+            "itemtype": "method",
+            "name": "isControlPoint",
+            "params": [
+                {
+                    "name": "point",
+                    "description": "The Point2D to check.",
+                    "type": "Object"
+                }
+            ],
+            "return": {
+                "description": "True if a control point.",
+                "type": "Boolean"
+            },
+            "class": "dwv.math.Path",
+            "module": "math",
+            "namespace": "dwv.math"
+        },
+        {
+            "file": "src/math/shapes.js",
+            "line": 371,
+            "description": "Get the length of the path.",
+            "itemtype": "method",
+            "name": "getLength",
+            "return": {
+                "description": "The length of the path.",
+                "type": "Number"
+            },
+            "class": "dwv.math.Path",
+            "module": "math",
+            "namespace": "dwv.math"
+        },
+        {
+            "file": "src/math/shapes.js",
+            "line": 380,
+            "description": "Add a point to the path.",
+            "itemtype": "method",
+            "name": "addPoint",
+            "params": [
+                {
+                    "name": "point",
+                    "description": "The Point2D to add.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.math.Path",
+            "module": "math",
+            "namespace": "dwv.math"
+        },
+        {
+            "file": "src/math/shapes.js",
+            "line": 389,
+            "description": "Add a control point to the path.",
+            "itemtype": "method",
+            "name": "addControlPoint",
+            "params": [
+                {
+                    "name": "point",
+                    "description": "The Point2D to make a control point.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.math.Path",
+            "module": "math",
+            "namespace": "dwv.math"
+        },
+        {
+            "file": "src/math/shapes.js",
+            "line": 404,
             "description": "Add points to the path.",
+            "itemtype": "method",
+            "name": "addPoints",
             "params": [
                 {
                     "name": "points",
-                    "description": "The list of Point2D to add."
+                    "description": "The list of Point2D to add.",
+                    "type": "Array"
                 }
             ],
-            "class": "dwv.math.Path shape.",
+            "class": "dwv.math.Path",
             "module": "math",
             "namespace": "dwv.math"
         },
         {
             "file": "src/math/shapes.js",
-            "line": 285,
+            "line": 413,
             "description": "Append a Path to this one.",
+            "itemtype": "method",
+            "name": "appenPath",
             "params": [
                 {
                     "name": "other",
-                    "description": "The Path to append."
+                    "description": "The Path to append.",
+                    "type": "Path"
                 }
             ],
-            "class": "dwv.math.Path shape.",
+            "class": "dwv.math.Path",
             "module": "math",
             "namespace": "dwv.math"
         },
@@ -2472,19 +3281,19 @@
     "warnings": [
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/dicom/dicomParser.js:95"
+            "line": " src/dicom/dicomParser.js:176"
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/dicom/dicomParser.js:132"
+            "line": " src/dicom/dicomParser.js:215"
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/dicom/dicomParser.js:155"
+            "line": " src/dicom/dicomParser.js:239"
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/dicom/dicomParser.js:420"
+            "line": " src/dicom/dicomParser.js:506"
         },
         {
             "message": "replacing incorrect tag: function with method",
@@ -2747,30 +3556,6 @@
             "line": " src/utils/string.js:14"
         },
         {
-            "message": "Missing item type\nGet the DICOM data pixel buffer.",
-            "line": " src/dicom/dicomParser.js:95"
-        },
-        {
-            "message": "Missing item type\nAppend a DICOM element to the dicomElements member object.\nAllows for easy retrieval of DICOM tag values from the tag name.\nIf tags have same name (for the 'unknown' and private tags cases), a number is appended\nmaking the name unique.",
-            "line": " src/dicom/dicomParser.js:104"
-        },
-        {
-            "message": "Missing item type\nRead a DICOM tag.",
-            "line": " src/dicom/dicomParser.js:132"
-        },
-        {
-            "message": "Missing item type\nRead a DICOM data element.",
-            "line": " src/dicom/dicomParser.js:155"
-        },
-        {
-            "message": "Missing item type\nParse the complete DICOM file (given as input to the class).\nFills in the member object 'dicomElements'.",
-            "line": " src/dicom/dicomParser.js:247"
-        },
-        {
-            "message": "Missing item type\nGet an Image object from the read DICOM file.",
-            "line": " src/dicom/dicomParser.js:420"
-        },
-        {
             "message": "Missing item type",
             "line": " src/html/gui.js:219"
         },
@@ -2909,46 +3694,6 @@
         {
             "message": "Missing item type",
             "line": " src/math/scissors.js:105"
-        },
-        {
-            "message": "Missing item type\nGet a point of the list.",
-            "line": " src/math/shapes.js:190"
-        },
-        {
-            "message": "Missing item type\nAdd a point to the ROI.",
-            "line": " src/math/shapes.js:198"
-        },
-        {
-            "message": "Missing item type\nAdd points to the ROI.",
-            "line": " src/math/shapes.js:203"
-        },
-        {
-            "message": "Missing item type\nGet a point of the list.",
-            "line": " src/math/shapes.js:224"
-        },
-        {
-            "message": "Missing item type\nIs is a control point.",
-            "line": " src/math/shapes.js:233"
-        },
-        {
-            "message": "Missing item type\nGet the length of the path.",
-            "line": " src/math/shapes.js:248"
-        },
-        {
-            "message": "Missing item type\nAdd a point to the path.",
-            "line": " src/math/shapes.js:255"
-        },
-        {
-            "message": "Missing item type\nAdd a control point to the path.",
-            "line": " src/math/shapes.js:263"
-        },
-        {
-            "message": "Missing item type\nAdd points to the path.",
-            "line": " src/math/shapes.js:277"
-        },
-        {
-            "message": "Missing item type\nAppend a Path to this one.",
-            "line": " src/math/shapes.js:285"
         },
         {
             "message": "Missing item type",

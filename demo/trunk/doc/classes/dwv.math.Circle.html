@@ -41,11 +41,11 @@
         <div id="api-tabview-panel">
             <ul id="api-classes" class="apis classes">
             
-                <li><a href="../classes/Data reader.html">Data reader</a></li>
+                <li><a href="../classes/dwv.dicom.DataReader.html">dwv.dicom.DataReader</a></li>
             
-                <li><a href="../classes/DICOM tag dictionary..html">DICOM tag dictionary.</a></li>
+                <li><a href="../classes/dwv.dicom.DicomParser.html">dwv.dicom.DicomParser</a></li>
             
-                <li><a href="../classes/DicomParser class..html">DicomParser class.</a></li>
+                <li><a href="../classes/dwv.dicom.Dictionary.html">dwv.dicom.Dictionary</a></li>
             
                 <li><a href="../classes/dwv.math.Circle.html">dwv.math.Circle</a></li>
             
@@ -55,17 +55,15 @@
             
                 <li><a href="../classes/dwv.math.FastPoint2D.html">dwv.math.FastPoint2D</a></li>
             
-                <li><a href="../classes/dwv.math.Line shape..html">dwv.math.Line shape.</a></li>
+                <li><a href="../classes/dwv.math.Line.html">dwv.math.Line</a></li>
             
-                <li><a href="../classes/dwv.math.Path shape..html">dwv.math.Path shape.</a></li>
+                <li><a href="../classes/dwv.math.Path.html">dwv.math.Path</a></li>
             
                 <li><a href="../classes/dwv.math.Point2D.html">dwv.math.Point2D</a></li>
             
-                <li><a href="../classes/dwv.math.Rectangle shape..html">dwv.math.Rectangle shape.</a></li>
+                <li><a href="../classes/dwv.math.Rectangle.html">dwv.math.Rectangle</a></li>
             
-                <li><a href="../classes/dwv.math.Region Of Interest shape.
-Note: should be a closed path..html">dwv.math.Region Of Interest shape.
-Note: should be a closed path.</a></li>
+                <li><a href="../classes/dwv.math.ROI.html">dwv.math.ROI</a></li>
             
                 <li><a href="../classes/Filter classes..App
 Main application..html">Filter classes..App
@@ -157,7 +155,7 @@ Highly inspired from http://code.google.com/p/livewire-javascript/</a></li>
 
             <ul id="api-modules" class="apis modules">
             
-                <li><a href="../modules/dwv.html">dwv</a></li>
+                <li><a href="../modules/dicom.html">dicom</a></li>
             
                 <li><a href="../modules/math.html">math</a></li>
             
@@ -344,6 +342,10 @@ Highly inspired from http://code.google.com/p/livewire-javascript/</a></li>
         <li class="api-class-tab index"><a href="#index">Index</a></li>
 
         
+            <li class="api-class-tab methods"><a href="#methods">Methods</a></li>
+        
+        
+            <li class="api-class-tab properties"><a href="#properties">Properties</a></li>
         
         
         
@@ -354,7 +356,58 @@ Highly inspired from http://code.google.com/p/livewire-javascript/</a></li>
             <h2 class="off-left">Item Index</h2>
 
             
+                <div class="index-section methods">
+                    <h3>Methods</h3>
 
+                    <ul class="index-list methods">
+                        
+                            <li class="index-item method">
+                                <a href="#method_getCenter">getCenter</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_getRadius">getRadius</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_getSurface">getSurface</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_getWorldSurface">getWorldSurface</a>
+
+                                
+                                
+                            </li>
+                        
+                    </ul>
+                </div>
+            
+
+            
+                <div class="index-section properties">
+                    <h3>Properties</h3>
+
+                    <ul class="index-list properties">
+                        
+                            <li class="index-item property private">
+                                <a href="#property_"></a>
+
+                                
+                                
+                            </li>
+                        
+                    </ul>
+                </div>
             
 
             
@@ -363,7 +416,414 @@ Highly inspired from http://code.google.com/p/livewire-javascript/</a></li>
         </div>
 
         
+            <div id="methods" class="api-class-tabpanel">
+                <h2 class="off-left">Methods</h2>
 
+                
+                    <div id="method_getCenter" class="method item">
+    <h3 class="name"><code>getCenter</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+        <span class="returns-inline">
+            <span class="type">Object</span>
+        </span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_math_shapes.js.html#l108"><code>src&#x2F;math&#x2F;shapes.js:108</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Get the centre (point) of the circle.</p>
+
+    </div>
+
+    
+
+    
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                
+                    
+                        <span class="type">Object</span>:
+                    
+                    <p>The center (point) of the circle.</p>
+
+                
+            </div>
+        </div>
+    
+
+    
+</div>
+
+                
+                    <div id="method_getRadius" class="method item">
+    <h3 class="name"><code>getRadius</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+        <span class="returns-inline">
+            <span class="type">Number</span>
+        </span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_math_shapes.js.html#l114"><code>src&#x2F;math&#x2F;shapes.js:114</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Get the radius of the circle.</p>
+
+    </div>
+
+    
+
+    
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                
+                    
+                        <span class="type">Number</span>:
+                    
+                    <p>The radius of the circle.</p>
+
+                
+            </div>
+        </div>
+    
+
+    
+</div>
+
+                
+                    <div id="method_getSurface" class="method item">
+    <h3 class="name"><code>getSurface</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+        <span class="returns-inline">
+            <span class="type">Number</span>
+        </span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_math_shapes.js.html#l120"><code>src&#x2F;math&#x2F;shapes.js:120</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Get the surface of the circle.</p>
+
+    </div>
+
+    
+
+    
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                
+                    
+                        <span class="type">Number</span>:
+                    
+                    <p>The surface of the circle.</p>
+
+                
+            </div>
+        </div>
+    
+
+    
+</div>
+
+                
+                    <div id="method_getWorldSurface" class="method item">
+    <h3 class="name"><code>getWorldSurface</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>spacingX</code>
+                    
+                </li>
+            
+                <li class="arg">
+                    
+                        <code>spacingY</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+        <span class="returns-inline">
+            <span class="type">Number</span>
+        </span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_math_shapes.js.html#l126"><code>src&#x2F;math&#x2F;shapes.js:126</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Get the surface of the circle with a spacing.</p>
+
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">spacingX</code>
+                        <span class="type">Number</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The X spacing.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+                <li class="param">
+                    
+                        <code class="param-name">spacingY</code>
+                        <span class="type">Number</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The Y spacing.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                
+                    
+                        <span class="type">Number</span>:
+                    
+                    <p>The surface of the circle multiplied by the given spacing.</p>
+
+                
+            </div>
+        </div>
+    
+
+    
+</div>
+
+                
+            </div>
+        
+
+        
+            <div id="properties" class="api-class-tabpanel">
+                <h2 class="off-left">Properties</h2>
+
+                
+                    <div id="property_" class="property item private">
+    <h3 class="name"><code></code></h3>
+    <span class="type">Number</span>
+
+    
+
+    
+        <span class="flag private">private</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_math_shapes.js.html#l100"><code>src&#x2F;math&#x2F;shapes.js:100</code></a>
+        
+        </p>
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Circle surface.</p>
+
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+            </div>
         
 
         

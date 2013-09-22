@@ -563,38 +563,76 @@ dwv.App = function(mobile)
     }
     
 };
-;//! @namespace Main DWV namespace.
+;/** 
+ * DICOM module.
+ * @module dicom
+ */
 var dwv = dwv || {};
-//! @namespace DICOM related.
 dwv.dicom = dwv.dicom || {};
 
 /**
- * @class Data reader
- * @param buffer The input array buffer.
- * @param isLittleEndian Flag to tell if the data is little or big endian.
+ * Data reader.
+ * @class DataReader
+ * @namespace dwv.dicom
+ * @constructor
+ * @param {Array} buffer The input array buffer.
+ * @param {Boolean} isLittleEndian Flag to tell if the data is little or big endian.
  */
 dwv.dicom.DataReader = function(buffer, isLittleEndian)
 {
+    /**
+     * The main data view.
+     * @property
+     * @private
+     * @type DataView
+     */
     var view = new DataView(buffer);
+    // Set endian flag if not defined.
     if(typeof(isLittleEndian)==='undefined') isLittleEndian = true;
     
-    //! Read Uint8 (1 bytes) data.
+    /**
+     * Read Uint8 (1 byte) data.
+     * @method readUint8
+     * @param {Number} byteOffset The offset to start reading from.
+     * @return {Number} The read data.
+     */
     this.readUint8 = function(byteOffset) {
         return view.getUint8(byteOffset, isLittleEndian);
     };
-    //! Read Uint16 (2 bytes) data.
+    /**
+     * Read Uint16 (2 bytes) data.
+     * @method readUint16
+     * @param {Number} byteOffset The offset to start reading from.
+     * @return {Number} The read data.
+     */
     this.readUint16 = function(byteOffset) {
         return view.getUint16(byteOffset, isLittleEndian);
     };
-    //! Read Uint32 (4 bytes) data.
+    /**
+     * Read Uint32 (4 bytes) data.
+     * @method readUint32
+     * @param {Number} byteOffset The offset to start reading from.
+     * @return {Number} The read data.
+     */
     this.readUint32 = function(byteOffset) {
         return view.getUint32(byteOffset, isLittleEndian);
     };
-    //! Read Float32 (8 bytes) data.
+    /**
+     * Read Float32 (8 bytes) data.
+     * @method readFloat32
+     * @param {Number} byteOffset The offset to start reading from.
+     * @return {Number} The read data.
+     */
     this.readFloat32 = function(byteOffset) {
         return view.getFloat32(byteOffset, isLittleEndian);
     };
-    //! Read Uint data of nBytes size.
+    /**
+     * Read Uint data of nBytes size.
+     * @method readNumber
+     * @param {Number} byteOffset The offset to start reading from.
+     * @param {Number} nBytes The number of bytes to read.
+     * @return {Number} The read data.
+     */
     this.readNumber = function(byteOffset, nBytes) {
         if( nBytes === 1 )
             return this.readUint8(byteOffset, isLittleEndian);
@@ -607,7 +645,13 @@ dwv.dicom.DataReader = function(buffer, isLittleEndian)
         else 
             throw new Error("Unsupported number size.");
     };
-    //! Read Uint8 array.
+    /**
+     * Read Uint8 array.
+     * @method readUint8Array
+     * @param {Number} byteOffset The offset to start reading from.
+     * @param {Number} size The size of the array.
+     * @return {Array} The read data.
+     */
     this.readUint8Array = function(byteOffset, size) {
         var data = new Uint8Array(size);
         var index = 0;
@@ -616,7 +660,13 @@ dwv.dicom.DataReader = function(buffer, isLittleEndian)
         }
         return data;
     };
-    //! Read Uint16 array.
+    /**
+     * Read Uint16 array.
+     * @method readUint16Array
+     * @param {Number} byteOffset The offset to start reading from.
+     * @param {Number} size The size of the array.
+     * @return {Array} The read data.
+     */
     this.readUint16Array = function(byteOffset, size) {
         var data = new Uint16Array(size/2);
         var index = 0;
@@ -625,13 +675,25 @@ dwv.dicom.DataReader = function(buffer, isLittleEndian)
         }
         return data;
     };
-    //! Read data as an hexadecimal string.
+    /**
+     * Read data as an hexadecimal string.
+     * @method readHex
+     * @param {Number} byteOffset The offset to start reading from.
+     * @return {Array} The read data.
+     */
     this.readHex = function(byteOffset) {
         // read and convert to hex string
         var str = this.readUint16(byteOffset).toString(16);
         // return padded
         return "0x0000".substr(0, 6 - str.length) + str.toUpperCase();
     };
+    /**
+     * Read data as a string.
+     * @method readString
+     * @param {Number} byteOffset The offset to start reading from.
+     * @param {Number} nChars The numner of characters to read.
+     * @return {String} The read data.
+     */
     //! Read data as a string.
     this.readString = function(byteOffset, nChars) {
         var result = "";
@@ -643,25 +705,45 @@ dwv.dicom.DataReader = function(buffer, isLittleEndian)
 };
 
 /**
- * @class DicomParser class.
+ * DicomParser class.
+ * @class DicomParser
+ * @namespace dwv.dicom
+ * @constructor
  */
 dwv.dicom.DicomParser = function()
 {
-    // the list of DICOM elements
+    /**
+     * The list of DICOM elements.
+     * @property
+     * @type Array
+     */
     this.dicomElements = {};
-    // the number of DICOM Items
+    /**
+     * The number of DICOM Items.
+     * @property
+     * @type Number
+     */
     this.numberOfItems = 0;
-    // the DICOM dictionary used to find tag names
+    /**
+     * The DICOM dictionary used to find tag names.
+     * @property
+     * @type Dictionary
+     */
     this.dict = new dwv.dicom.Dictionary();
-    // the pixel buffer
+    /**
+     * The pixel buffer.
+     * @property
+     * @type Array
+     */
     this.pixelBuffer = [];
 };
 
 /**
  * Get the DICOM data pixel buffer.
- * @returns The pixel buffer (as an array).
+ * @method getPixelBuffer
+ * @returns {Array} The pixel buffer.
  */
-dwv.dicom.DicomParser.prototype.getPixelBuffer=function()
+dwv.dicom.DicomParser.prototype.getPixelBuffer = function()
 {
     return this.pixelBuffer;
 };
@@ -671,9 +753,10 @@ dwv.dicom.DicomParser.prototype.getPixelBuffer=function()
  * Allows for easy retrieval of DICOM tag values from the tag name.
  * If tags have same name (for the 'unknown' and private tags cases), a number is appended
  * making the name unique.
- * @param element The element to add.
+ * @method appendDicomElement
+ * @param {Object} element The element to add.
  */
-dwv.dicom.DicomParser.prototype.appendDicomElement=function( element )
+dwv.dicom.DicomParser.prototype.appendDicomElement = function( element )
 {
     // find a good tag name
     var name = element.name;
@@ -696,11 +779,12 @@ dwv.dicom.DicomParser.prototype.appendDicomElement=function( element )
 
 /**
  * Read a DICOM tag.
+ * @method readTag
  * @param reader The raw data reader.
  * @param offset The offset where to start to read.
  * @returns An object containing the tags 'group', 'element' and 'name'.
  */
-dwv.dicom.DicomParser.prototype.readTag=function(reader, offset)
+dwv.dicom.DicomParser.prototype.readTag = function(reader, offset)
 {
     // group
     var group = reader.readHex(offset);
@@ -719,12 +803,13 @@ dwv.dicom.DicomParser.prototype.readTag=function(reader, offset)
 
 /**
  * Read a DICOM data element.
+ * @method readDataElement
  * @param reader The raw data reader.
  * @param offset The offset where to start to read.
  * @param implicit Is the DICOM VR implicit?
- * @returns An object containing the element 'tag', 'vl', 'vr', 'data' and 'offset'.
+ * @returns {Object} An object containing the element 'tag', 'vl', 'vr', 'data' and 'offset'.
  */
-dwv.dicom.DicomParser.prototype.readDataElement=function(reader, offset, implicit)
+dwv.dicom.DicomParser.prototype.readDataElement = function(reader, offset, implicit)
 {
     // tag: group, element
     var tag = this.readTag(reader, offset);
@@ -812,6 +897,7 @@ dwv.dicom.DicomParser.prototype.readDataElement=function(reader, offset, implici
 /**
  * Parse the complete DICOM file (given as input to the class).
  * Fills in the member object 'dicomElements'.
+ * @method parse
  * @param buffer The input array buffer.
  */
 dwv.dicom.DicomParser.prototype.parse = function(buffer)
@@ -984,7 +1070,8 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
 
 /**
  * Get an Image object from the read DICOM file.
- * @returns A new Image.
+ * @method createImage
+ * @returns {View} A new Image.
  */
 dwv.dicom.DicomParser.prototype.createImage = function()
 {
@@ -1097,16 +1184,31 @@ dwv.dicom.DicomParser.prototype.createImage = function()
 
     return view;
 };
-;//! @namespace Main DWV namespace.
+;/** 
+ * DICOM module.
+ * @module dicom
+ */
 var dwv = dwv || {};
-//! @namespace DICOM related.
 dwv.dicom = dwv.dicom || {};
 
 /**
- * @class DICOM tag dictionary.
+ * DICOM tag dictionary.
+ * @class Dictionary
+ * @namespace dwv.dicom
+ * @constructor
  */
 dwv.dicom.Dictionary = function() {
+    /**
+     * Tag definition storage.
+     * @property
+     * @type Array
+     */
     this.newDictionary = [];
+    
+    /**
+     * Fill in the dictionary array.
+     * @method init
+     */
     this.init = function() {
         
         // 0x0000
@@ -5876,13 +5978,11 @@ dwv.math.Scissors.prototype.doWork = function() {
 
 	return newPoints;
 };
-;/** Main DWV module.
- * @module dwv
- */
-var dwv = dwv || {};
-/** Math module.
+;/** 
+ * Math module.
  * @module math
  */
+var dwv = dwv || {};
 dwv.math = dwv.math || {};
 
 /** 
@@ -5898,12 +5998,14 @@ dwv.math.Point2D = function(x,y)
     /** 
      * Get the X position of the point.
      * @method getX
-     * @return {Number} The X position of the point. */
+     * @return {Number} The X position of the point.
+     */
     this.getX = function() { return x; };
     /** 
      * Get the Y position of the point.
      * @method getY
-     * @return {Number} The Y position of the point. */
+     * @return {Number} The Y position of the point. 
+     */
     this.getY = function() { return y; };
 }; // Point2D class
 
@@ -5923,7 +6025,7 @@ dwv.math.Point2D.prototype.equals = function(other) {
 /** 
  * Get a string representation of the Point2D.
  * @method toString
- * @return {String} The Point2D as string.
+ * @return {String} The Point2D as a string.
  */ 
 dwv.math.Point2D.prototype.toString = function() {
     return "(" + this.getX() + ", " + this.getY() + ")";
@@ -5959,7 +6061,7 @@ dwv.math.FastPoint2D.prototype.equals = function(other) {
 /** 
  * Get a string representation of the FastPoint2D.
  * @method toString
- * @return {String} The Point2D as string.
+ * @return {String} The Point2D as a string.
  */ 
 dwv.math.FastPoint2D.prototype.toString = function() {
     return "(" + this.x + ", " + this.y + ")";
@@ -5970,21 +6072,44 @@ dwv.math.FastPoint2D.prototype.toString = function() {
  * @class Circle
  * @namespace dwv.math
  * @constructor
- * @param centre A Point2D representing the centre of the circle.
- * @param radius The radius of the circle.
+ * @param {Object} centre A Point2D representing the centre of the circle.
+ * @param {Object} radius The radius of the circle.
  */
 dwv.math.Circle = function(centre, radius)
 {
-    // Cache the surface
+    /**
+     * Circle surface.
+     * @property
+     * @private
+     * @type Number
+     */
     var surface = Math.PI*radius*radius;
 
-    // Get the centre of the circle.
+    /**
+     * Get the centre (point) of the circle.
+     * @method getCenter
+     * @return {Object} The center (point) of the circle.
+     */
     this.getCenter = function() { return centre; };
-    // Get the radius of the circle.
+    /**
+     * Get the radius of the circle.
+     * @method getRadius
+     * @return {Number} The radius of the circle.
+     */
     this.getRadius = function() { return radius; };
-    // Get the surface of the circle.
+    /**
+     * Get the surface of the circle.
+     * @method getSurface
+     * @return {Number} The surface of the circle.
+     */
     this.getSurface = function() { return surface; };
-    // Get the surface of the circle with a spacing.
+    /**
+     * Get the surface of the circle with a spacing.
+     * @method getWorldSurface
+     * @param {Number} spacingX The X spacing.
+     * @param {Number} spacingY The Y spacing.
+     * @return {Number} The surface of the circle multiplied by the given spacing.
+     */
     this.getWorldSurface = function(spacingX, spacingY)
     {
         return surface * spacingX * spacingY;
@@ -5992,31 +6117,61 @@ dwv.math.Circle = function(centre, radius)
 }; // Circle class
 
 /**
- * @class Line shape.
- * @param begin A Point2D representing the beginning of the line.
- * @param end A Point2D representing the end of the line.
+ * Line shape.
+ * @class Line
+ * @namespace dwv.math
+ * @constructor
+ * @param {Object} begin A Point2D representing the beginning of the line.
+ * @param {Object} end A Point2D representing the end of the line.
  */
 dwv.math.Line = function(begin, end)
 {
-    // cache the length
+    /**
+     * Line length.
+     * @property
+     * @private
+     * @type Number
+     */
     var length = Math.sqrt(
-            Math.abs(end.getX() - begin.getX()) * Math.abs(end.getX() - begin.getX()) +
-            Math.abs(end.getY() - begin.getY()) * Math.abs(end.getY() - begin.getY() ) );
+        Math.abs(end.getX() - begin.getX()) * Math.abs(end.getX() - begin.getX()) +
+        Math.abs(end.getY() - begin.getY()) * Math.abs(end.getY() - begin.getY() ) );
     
-    // Get the begin point of the line.
+    /**
+     * Get the begin point of the line.
+     * @method getBegin
+     * @return {Object} The beginning point of the line.
+     */
     this.getBegin = function() { return begin; };
-    // Get the end point of the line.
+    /**
+     * Get the end point of the line.
+     * @method getEnd
+     * @return {Object} The ending point of the line.
+     */
     this.getEnd = function() { return end; };
-    // Get the length of the line.
+    /**
+     * Get the length of the line.
+     * @method getLength
+     * @return {Number} The length of the line.
+     */
     this.getLength = function() { return length; };
-    // Get the length of the line with a spacing.
+    /**
+     * Get the length of the line with spacing.
+     * @method getWorldLength
+     * @param {Number} spacingX The X spacing.
+     * @param {Number} spacingY The Y spacing.
+     * @return {Number} The length of the line with spacing.
+     */
     this.getWorldLength = function(spacingX, spacingY)
     {
         var lx = Math.abs(end.getX() - begin.getX()) * spacingX;
         var ly = Math.abs(end.getY() - begin.getY()) * spacingY;
         return Math.sqrt( lx * lx + ly * ly );
     };
-    // Get the mid point of the line.
+    /**
+     * Get the mid point of the line.
+     * @method getMidpoint
+     * @return {Object} The mid point of the line.
+     */
     this.getMidpoint = function()
     {
         return new dwv.math.Point2D( 
@@ -6026,30 +6181,70 @@ dwv.math.Line = function(begin, end)
 }; // Line class
 
 /**
- * @class Rectangle shape.
- * @param begin A Point2D representing the beginning of the rectangle.
- * @param end A Point2D representing the end of the rectangle.
+ * Rectangle shape.
+ * @class Rectangle
+ * @namespace dwv.math
+ * @constructor
+ * @param {Object} begin A Point2D representing the beginning of the rectangle.
+ * @param {Object} end A Point2D representing the end of the rectangle.
  */
 dwv.math.Rectangle = function(begin, end)
 {
-    // cache the length
+    /**
+     * Rectangle surface.
+     * @property
+     * @private
+     * @type Number
+     */
     var surface = Math.abs(end.getX() - begin.getX()) * Math.abs(end.getY() - begin.getY() );
 
-    // Get the begin point of the rectangle.
+    /**
+     * Get the begin point of the rectangle.
+     * @method getBegin
+     * @return {Object} The begin point of the rectangle
+     */
     this.getBegin = function() { return begin; };
-    // Get the end point of the rectangle.
+    /**
+     * Get the end point of the rectangle.
+     * @method getEnd
+     * @return {Object} The end point of the rectangle
+     */
     this.getEnd = function() { return end; };
-    // Get the real width of the rectangle.
+    /**
+     * Get the real width of the rectangle.
+     * @method getRealWidth
+     * @return {Number} The real width of the rectangle.
+     */
     this.getRealWidth = function() { return end.getX() - begin.getX(); };
-    // Get the real height of the rectangle.
+    /**
+     * Get the real height of the rectangle.
+     * @method getRealHeight
+     * @return {Number} The real height of the rectangle.
+     */
     this.getRealHeight = function() { return end.getY() - begin.getY(); };
-    // Get the width of the rectangle.
+    /**
+     * Get the width of the rectangle.
+     * @method getWidth
+     * @return {Number} The width of the rectangle.
+     */
     this.getWidth = function() { return Math.abs(this.getRealWidth()); };
-    // Get the height of the rectangle.
+    /**
+     * Get the height of the rectangle.
+     * @method getHeight
+     * @return {Number} The height of the rectangle.
+     */
     this.getHeight = function() { return Math.abs(this.getRealHeight()); };
-    // Get the surface of the rectangle.
+    /**
+     * Get the surface of the rectangle.
+     * @method getSurface
+     * @return {Number} The surface of the rectangle.
+     */
     this.getSurface = function() { return surface; };
-    // Get the surface of the rectangle with a spacing.
+    /**
+     * Get the surface of the rectangle with a spacing.
+     * @method getWorldSurface
+     * @return {Number} The surface of the rectangle with a spacing.
+     */
     this.getWorldSurface = function(spacingX, spacingY)
     {
         return surface * spacingX * spacingY;
@@ -6057,61 +6252,91 @@ dwv.math.Rectangle = function(begin, end)
 }; // Rectangle class
 
 /**
- * @class Region Of Interest shape.
+ * Region Of Interest shape.
+ * @class ROI
+ * @namespace dwv.math
+ * @constructor
  * Note: should be a closed path.
  */
 dwv.math.ROI = function()
 {
-    // list of points.
+    /**
+     * List of points.
+     * @property
+     * @private
+     * @type Array
+     */
     var points = [];
     
     /**
-     * Get a point of the list.
-     * @param index The index of the point to get (beware, no size check).
-     * @return The Point2D at the given index.
+     * Get a point of the list at a given index.
+     * @method getPoint
+     * @param {Number} index The index of the point to get (beware, no size check).
+     * @return {Object} The Point2D at the given index.
      */ 
     this.getPoint = function(index) { return points[index]; };
-    // Get the length of the list
+    /**
+     * Get the length of the point list.
+     * @method getLength
+     * @return {Number} The length of the point list.
+     */ 
     this.getLength = function() { return points.length; };
     /**
      * Add a point to the ROI.
-     * @param point The Point2D to add.
+     * @method addPoint
+     * @param {Object} point The Point2D to add.
      */
     this.addPoint = function(point) { points.push(point); };
     /**
      * Add points to the ROI.
-     * @param rhs The array of POints2D to add.
+     * @method addPoints
+     * @param {Array} rhs The array of POints2D to add.
      */
     this.addPoints = function(rhs) { points=points.concat(rhs);};
 }; // ROI class
 
 /**
- * @class Path shape.
- * @param points The list of Point2D that make the path (optional).
- * @param points The list of control point of path, as indexes (optional).
+ * Path shape.
+ * @class Path
+ * @namespace dwv.math
+ * @constructor
+ * @param {Array} inputPointArray The list of Point2D that make the path (optional).
+ * @param {Array} inputControlPointIndexArray The list of control point of path, 
+ *  as indexes (optional).
  * Note: first and last point do not need to be equal.
  */
 dwv.math.Path = function(inputPointArray, inputControlPointIndexArray)
 {
-    // list of points.
+    /**
+     * List of points.
+     * @property
+     * @type Array
+     */
     this.pointArray = inputPointArray ? inputPointArray.slice() : [];
-    // list of control points
-    this.controlPointIndexArray = inputControlPointIndexArray ? inputControlPointIndexArray.slice() : [];
+    /**
+     * List of control points.
+     * @property
+     * @type Array
+     */
+    this.controlPointIndexArray = inputControlPointIndexArray ?
+        inputControlPointIndexArray.slice() : [];
 }; // Path class
 
 /**
  * Get a point of the list.
- * @param index The index of the point to get (beware, no size check).
- * @return The Point2D at the given index.
+ * @method getPoint
+ * @param {Number} index The index of the point to get (beware, no size check).
+ * @return {Object} The Point2D at the given index.
  */ 
 dwv.math.Path.prototype.getPoint = function(index) {
     return this.pointArray[index];
 };
 
 /**
- * Is is a control point.
- * @param point The Point2D to check.
- * @return True if a control point.
+ * Is the given point a control point.
+ * @method isControlPoint
+ * @param {Object} point The Point2D to check.
+ * @return {Boolean} True if a control point.
  */ 
 dwv.math.Path.prototype.isControlPoint = function(point) {
     var index = this.pointArray.indexOf(point);
@@ -6125,6 +6350,8 @@ dwv.math.Path.prototype.isControlPoint = function(point) {
 
 /**
  * Get the length of the path.
+ * @method getLength
+ * @return {Number} The length of the path.
  */ 
 dwv.math.Path.prototype.getLength = function() { 
     return this.pointArray.length;
@@ -6132,7 +6359,8 @@ dwv.math.Path.prototype.getLength = function() {
 
 /**
  * Add a point to the path.
- * @param point The Point2D to add.
+ * @method addPoint
+ * @param {Object} point The Point2D to add.
  */
 dwv.math.Path.prototype.addPoint = function(point) {
     this.pointArray.push(point);
@@ -6140,7 +6368,8 @@ dwv.math.Path.prototype.addPoint = function(point) {
 
 /**
  * Add a control point to the path.
- * @param point The Point2D to make a control point.
+ * @method addControlPoint
+ * @param {Object} point The Point2D to make a control point.
  */
 dwv.math.Path.prototype.addControlPoint = function(point) {
     var index = this.pointArray.indexOf(point);
@@ -6154,7 +6383,8 @@ dwv.math.Path.prototype.addControlPoint = function(point) {
 
 /**
  * Add points to the path.
- * @param points The list of Point2D to add.
+ * @method addPoints
+ * @param {Array} points The list of Point2D to add.
  */
 dwv.math.Path.prototype.addPoints = function(newPointArray) { 
     this.pointArray = this.pointArray.concat(newPointArray);
@@ -6162,7 +6392,8 @@ dwv.math.Path.prototype.addPoints = function(newPointArray) {
 
 /**
  * Append a Path to this one.
- * @param other The Path to append.
+ * @method appenPath
+ * @param {Path} other The Path to append.
  */
 dwv.math.Path.prototype.appenPath = function(other) {
     var oldSize = this.pointArray.length;

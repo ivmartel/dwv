@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>src/html/gui_mobile.js - dwv</title>
+    <title>dicom - dwv</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
     <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
@@ -194,75 +194,156 @@ Highly inspired from http://code.google.com/p/livewire-javascript/</a></li>
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-                        <h1 class="file-heading">File: src/html/gui_mobile.js</h1>
-
-<div class="file">
-    <pre class="code prettyprint linenums">
-//! @namespace Main DWV namespace.
-var dwv = dwv || {};
-//! @namespace GUI classes for jquery-mobile.
-dwv.gui = dwv.gui || {};
-
-/**
-* @function Get a slider.
-*/
-dwv.gui.getSliderHtml = function()
-{
-    var min = app.getImage().getDataRange().min;
-    var max = app.getImage().getDataRange().max;
-
-    var inputMin = document.createElement(&quot;input&quot;);
-    inputMin.setAttribute(&quot;id&quot;, &quot;threshold-min&quot;);
-    inputMin.setAttribute(&quot;max&quot;, max);
-    inputMin.setAttribute(&quot;min&quot;, min);
-    inputMin.setAttribute(&quot;value&quot;, min);
-    inputMin.setAttribute(&quot;type&quot;, &quot;range&quot;);
-
-    var inputMax = document.createElement(&quot;input&quot;);
-    inputMax.setAttribute(&quot;id&quot;, &quot;threshold-max&quot;);
-    inputMax.setAttribute(&quot;max&quot;, max);
-    inputMax.setAttribute(&quot;min&quot;, min);
-    inputMax.setAttribute(&quot;value&quot;, max);
-    inputMax.setAttribute(&quot;type&quot;, &quot;range&quot;);
+                        <h1>dicom Module</h1>
+<div class="box clearfix meta">
     
-    var div = document.createElement(&quot;div&quot;);
-    div.setAttribute(&quot;id&quot;, &quot;threshold-div&quot;);
-    div.setAttribute(&quot;data-role&quot;, &quot;rangeslider&quot;);
-    div.appendChild(inputMin);
-    div.appendChild(inputMax);
-    div.setAttribute(&quot;data-mini&quot;, &quot;true&quot;);
-    document.getElementById(&quot;thresholdLi&quot;).appendChild(div);
 
-    $(&quot;#threshold-div&quot;).bind(&quot;change&quot;,
-        function( event ) {
-            app.getToolBox().getSelectedTool().getSelectedFilter().run(
-                { &quot;min&quot;:$(&quot;#threshold-min&quot;).val(),
-                  &quot;max&quot;:$(&quot;#threshold-max&quot;).val() } );
-        }
-    );
-};
+    
 
-/**
- * @function Update the progress bar.
- * @param event A ProgressEvent.
- */
-dwv.gui.updateProgress = function(event)
-{
-    // event is an ProgressEvent.
-    if( event.lengthComputable ) {
-        var percent = Math.round((event.loaded / event.total) * 100);
-        // Increase the progress bar length.
-        if( percent &lt; 100 ) {
-            $.mobile.showPageLoadingMsg(&#x27;a&#x27;, percent+&quot;%&quot;);
-        }
-        else if( percent === 100 ) {
-            $.mobile.hidePageLoadingMsg();
-        }
-    }
-};
+    
+        <div class="foundat">
+            Defined in: <a href="../files/src_math_scissors.js.html#l276"><code>src&#x2F;math&#x2F;scissors.js:276</code></a>
+        </div>
+    
+
+    
+</div>
 
 
-    </pre>
+
+<div class="box intro">
+    <p>DICOM module.</p>
+
+</div>
+
+
+
+<div class="yui3-g">
+    <div class="yui3-u-1-2">
+        
+            <p>This module provides the following classes:</p>
+
+            <ul class="module-classes">
+            
+                <li class="module-class">
+                    <a href="../classes/dwv.dicom.DataReader.html">
+                        dwv.dicom.DataReader
+                    </a>
+                </li>
+            
+                <li class="module-class">
+                    <a href="../classes/dwv.dicom.DicomParser.html">
+                        dwv.dicom.DicomParser
+                    </a>
+                </li>
+            
+                <li class="module-class">
+                    <a href="../classes/dwv.dicom.Dictionary.html">
+                        dwv.dicom.Dictionary
+                    </a>
+                </li>
+            
+                <li class="module-class">
+                    <a href="../classes/GUI classes..Circular Bucket Queue.
+
+Returns input&#x27;d points in sorted order. All operations run in roughly O(1)
+time (for input with small cost values), but it has a strict requirement:
+
+If the most recent point had a cost of c, any points added should have a cost
+c&#x27; in the range c &lt;= c&#x27; &lt;= c + (capacity - 1)..html">
+                        GUI classes..Circular Bucket Queue.
+
+Returns input&#x27;d points in sorted order. All operations run in roughly O(1)
+time (for input with small cost values), but it has a strict requirement:
+
+If the most recent point had a cost of c, any points added should have a cost
+c&#x27; in the range c &lt;= c&#x27; &lt;= c + (capacity - 1).
+                    </a>
+                </li>
+            
+                <li class="module-class">
+                    <a href="../classes/GUI classes..Image class..html">
+                        GUI classes..Image class.
+                    </a>
+                </li>
+            
+                <li class="module-class">
+                    <a href="../classes/GUI classes..Image Size class. 
+Supports 2D and 3D images..html">
+                        GUI classes..Image Size class. 
+Supports 2D and 3D images.
+                    </a>
+                </li>
+            
+                <li class="module-class">
+                    <a href="../classes/GUI classes..Image Spacing class. 
+Supports 2D and 3D images..html">
+                        GUI classes..Image Spacing class. 
+Supports 2D and 3D images.
+                    </a>
+                </li>
+            
+                <li class="module-class">
+                    <a href="../classes/GUI classes..Rescale LUT class..html">
+                        GUI classes..Rescale LUT class.
+                    </a>
+                </li>
+            
+                <li class="module-class">
+                    <a href="../classes/GUI classes..Scissors.
+
+Ref: Eric N. Mortensen, William A. Barrett, Interactive Segmentation with
+  Intelligent Scissors, Graphical Models and Image Processing, Volume 60,
+  Issue 5, September 1998, Pages 349-384, ISSN 1077-3169,
+  DOI: 10.1006/gmip.1998.0480.
+
+(http://www.sciencedirect.com/science/article/B6WG4-45JB8WN-9/2/6fe59d8089fd1892c2bfb82283065579)
+
+Highly inspired from http://code.google.com/p/livewire-javascript/.html">
+                        GUI classes..Scissors.
+
+Ref: Eric N. Mortensen, William A. Barrett, Interactive Segmentation with
+  Intelligent Scissors, Graphical Models and Image Processing, Volume 60,
+  Issue 5, September 1998, Pages 349-384, ISSN 1077-3169,
+  DOI: 10.1006/gmip.1998.0480.
+
+(http://www.sciencedirect.com/science/article/B6WG4-45JB8WN-9/2/6fe59d8089fd1892c2bfb82283065579)
+
+Highly inspired from http://code.google.com/p/livewire-javascript/
+                    </a>
+                </li>
+            
+                <li class="module-class">
+                    <a href="../classes/GUI classes..Style class..html">
+                        GUI classes..Style class.
+                    </a>
+                </li>
+            
+                <li class="module-class">
+                    <a href="../classes/GUI classes..View class..html">
+                        GUI classes..View class.
+                    </a>
+                </li>
+            
+                <li class="module-class">
+                    <a href="../classes/GUI classes..Window layer..html">
+                        GUI classes..Window layer.
+                    </a>
+                </li>
+            
+                <li class="module-class">
+                    <a href="../classes/GUI classes..Window LUT class..html">
+                        GUI classes..Window LUT class.
+                    </a>
+                </li>
+            
+            </ul>
+        
+    </div>
+
+    <div class="yui3-u-1-2">
+        
+    </div>
 </div>
 
                     </div>

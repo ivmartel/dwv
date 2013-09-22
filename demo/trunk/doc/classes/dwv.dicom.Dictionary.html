@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>src/html/gui_mobile.js - dwv</title>
+    <title>dwv.dicom.Dictionary - dwv</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
     <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
@@ -194,75 +194,270 @@ Highly inspired from http://code.google.com/p/livewire-javascript/</a></li>
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-                        <h1 class="file-heading">File: src/html/gui_mobile.js</h1>
-
-<div class="file">
-    <pre class="code prettyprint linenums">
-//! @namespace Main DWV namespace.
-var dwv = dwv || {};
-//! @namespace GUI classes for jquery-mobile.
-dwv.gui = dwv.gui || {};
-
-/**
-* @function Get a slider.
-*/
-dwv.gui.getSliderHtml = function()
-{
-    var min = app.getImage().getDataRange().min;
-    var max = app.getImage().getDataRange().max;
-
-    var inputMin = document.createElement(&quot;input&quot;);
-    inputMin.setAttribute(&quot;id&quot;, &quot;threshold-min&quot;);
-    inputMin.setAttribute(&quot;max&quot;, max);
-    inputMin.setAttribute(&quot;min&quot;, min);
-    inputMin.setAttribute(&quot;value&quot;, min);
-    inputMin.setAttribute(&quot;type&quot;, &quot;range&quot;);
-
-    var inputMax = document.createElement(&quot;input&quot;);
-    inputMax.setAttribute(&quot;id&quot;, &quot;threshold-max&quot;);
-    inputMax.setAttribute(&quot;max&quot;, max);
-    inputMax.setAttribute(&quot;min&quot;, min);
-    inputMax.setAttribute(&quot;value&quot;, max);
-    inputMax.setAttribute(&quot;type&quot;, &quot;range&quot;);
+                        <h1>dwv.dicom.Dictionary Class</h1>
+<div class="box meta">
     
-    var div = document.createElement(&quot;div&quot;);
-    div.setAttribute(&quot;id&quot;, &quot;threshold-div&quot;);
-    div.setAttribute(&quot;data-role&quot;, &quot;rangeslider&quot;);
-    div.appendChild(inputMin);
-    div.appendChild(inputMax);
-    div.setAttribute(&quot;data-mini&quot;, &quot;true&quot;);
-    document.getElementById(&quot;thresholdLi&quot;).appendChild(div);
 
-    $(&quot;#threshold-div&quot;).bind(&quot;change&quot;,
-        function( event ) {
-            app.getToolBox().getSelectedTool().getSelectedFilter().run(
-                { &quot;min&quot;:$(&quot;#threshold-min&quot;).val(),
-                  &quot;max&quot;:$(&quot;#threshold-max&quot;).val() } );
-        }
-    );
-};
+    
 
-/**
- * @function Update the progress bar.
- * @param event A ProgressEvent.
- */
-dwv.gui.updateProgress = function(event)
-{
-    // event is an ProgressEvent.
-    if( event.lengthComputable ) {
-        var percent = Math.round((event.loaded / event.total) * 100);
-        // Increase the progress bar length.
-        if( percent &lt; 100 ) {
-            $.mobile.showPageLoadingMsg(&#x27;a&#x27;, percent+&quot;%&quot;);
-        }
-        else if( percent === 100 ) {
-            $.mobile.hidePageLoadingMsg();
-        }
-    }
-};
+    
+        <div class="foundat">
+            Defined in: <a href="../files/src_dicom_dictionary.js.html#l8"><code>src&#x2F;dicom&#x2F;dictionary.js:8</code></a>
+        </div>
+    
+
+    
+        
+            Module: <a href="../modules/dicom.html">dicom</a>
+        
+    
+
+    
+</div>
 
 
-    </pre>
+
+<div class="box intro">
+    <p>DICOM tag dictionary.</p>
+
+</div>
+
+
+    <div class="constructor">
+        <h2>Constructor</h2>
+        <div id="method_dwv.dicom.Dictionary" class="method item">
+    <h3 class="name"><code>dwv.dicom.Dictionary</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_dicom_dictionary.js.html#l8"><code>src&#x2F;dicom&#x2F;dictionary.js:8</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+    </div>
+
+
+<div id="classdocs" class="tabview">
+    <ul class="api-class-tabs">
+        <li class="api-class-tab index"><a href="#index">Index</a></li>
+
+        
+            <li class="api-class-tab methods"><a href="#methods">Methods</a></li>
+        
+        
+            <li class="api-class-tab properties"><a href="#properties">Properties</a></li>
+        
+        
+        
+    </ul>
+
+    <div>
+        <div id="index" class="api-class-tabpanel index">
+            <h2 class="off-left">Item Index</h2>
+
+            
+                <div class="index-section methods">
+                    <h3>Methods</h3>
+
+                    <ul class="index-list methods">
+                        
+                            <li class="index-item method">
+                                <a href="#method_init">init</a>
+
+                                
+                                
+                            </li>
+                        
+                    </ul>
+                </div>
+            
+
+            
+                <div class="index-section properties">
+                    <h3>Properties</h3>
+
+                    <ul class="index-list properties">
+                        
+                            <li class="index-item property">
+                                <a href="#property_"></a>
+
+                                
+                                
+                            </li>
+                        
+                    </ul>
+                </div>
+            
+
+            
+
+            
+        </div>
+
+        
+            <div id="methods" class="api-class-tabpanel">
+                <h2 class="off-left">Methods</h2>
+
+                
+                    <div id="method_init" class="method item">
+    <h3 class="name"><code>init</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_dicom_dictionary.js.html#l22"><code>src&#x2F;dicom&#x2F;dictionary.js:22</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Fill in the dictionary array.</p>
+
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+            </div>
+        
+
+        
+            <div id="properties" class="api-class-tabpanel">
+                <h2 class="off-left">Properties</h2>
+
+                
+                    <div id="property_" class="property item">
+    <h3 class="name"><code></code></h3>
+    <span class="type">Array</span>
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_dicom_dictionary.js.html#l15"><code>src&#x2F;dicom&#x2F;dictionary.js:15</code></a>
+        
+        </p>
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Tag definition storage.</p>
+
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+            </div>
+        
+
+        
+
+        
+    </div>
 </div>
 
                     </div>

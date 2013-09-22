@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Filter classes..Draw line command. - dwv</title>
+    <title>dwv.math.Line - dwv</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
     <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
@@ -194,7 +194,7 @@ Highly inspired from http://code.google.com/p/livewire-javascript/</a></li>
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-                        <h1>Filter classes..Draw line command. Class</h1>
+                        <h1>dwv.math.Line Class</h1>
 <div class="box meta">
     
 
@@ -202,7 +202,7 @@ Highly inspired from http://code.google.com/p/livewire-javascript/</a></li>
 
     
         <div class="foundat">
-            Defined in: <a href="../files/src_tools_line.js.html#l6"><code>src&#x2F;tools&#x2F;line.js:6</code></a>
+            Defined in: <a href="../files/src_math_shapes.js.html#l139"><code>src&#x2F;math&#x2F;shapes.js:139</code></a>
         </div>
     
 
@@ -218,9 +218,123 @@ Highly inspired from http://code.google.com/p/livewire-javascript/</a></li>
 
 
 <div class="box intro">
+    <p>Line shape.</p>
+
+</div>
+
+
+    <div class="constructor">
+        <h2>Constructor</h2>
+        <div id="method_dwv.math.Line" class="method item">
+    <h3 class="name"><code>dwv.math.Line</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>begin</code>
+                    
+                </li>
+            
+                <li class="arg">
+                    
+                        <code>end</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_math_shapes.js.html#l139"><code>src&#x2F;math&#x2F;shapes.js:139</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">begin</code>
+                        <span class="type">Object</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>A Point2D representing the beginning of the line.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+                <li class="param">
+                    
+                        <code class="param-name">end</code>
+                        <span class="type">Object</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>A Point2D representing the end of the line.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+
     
 </div>
 
+    </div>
 
 
 <div id="classdocs" class="tabview">
@@ -230,6 +344,8 @@ Highly inspired from http://code.google.com/p/livewire-javascript/</a></li>
         
             <li class="api-class-tab methods"><a href="#methods">Methods</a></li>
         
+        
+            <li class="api-class-tab properties"><a href="#properties">Properties</a></li>
         
         
         
@@ -246,56 +362,52 @@ Highly inspired from http://code.google.com/p/livewire-javascript/</a></li>
                     <ul class="index-list methods">
                         
                             <li class="index-item method">
-                                <a href="#method_Create the mini color map info div.">Create the mini color map info div.</a>
+                                <a href="#method_getBegin">getBegin</a>
 
                                 
                                 
                             </li>
                         
                             <li class="index-item method">
-                                <a href="#method_Create the plot info.">Create the plot info.</a>
+                                <a href="#method_getEnd">getEnd</a>
 
                                 
                                 
                             </li>
                         
                             <li class="index-item method">
-                                <a href="#method_Create the position info div.">Create the position info div.</a>
+                                <a href="#method_getLength">getLength</a>
 
                                 
                                 
                             </li>
                         
                             <li class="index-item method">
-                                <a href="#method_Create the windowing info div.">Create the windowing info div.</a>
+                                <a href="#method_getMidpoint">getMidpoint</a>
 
                                 
                                 
                             </li>
                         
                             <li class="index-item method">
-                                <a href="#method_Update the mini color map info div.">Update the mini color map info div.</a>
+                                <a href="#method_getWorldLength">getWorldLength</a>
 
                                 
                                 
                             </li>
                         
-                            <li class="index-item method">
-                                <a href="#method_Update the plot markings.">Update the plot markings.</a>
+                    </ul>
+                </div>
+            
 
-                                
-                                
-                            </li>
-                        
-                            <li class="index-item method">
-                                <a href="#method_Update the position info div.">Update the position info div.</a>
+            
+                <div class="index-section properties">
+                    <h3>Properties</h3>
 
-                                
-                                
-                            </li>
+                    <ul class="index-list properties">
                         
-                            <li class="index-item method">
-                                <a href="#method_Update the Top Right info div.">Update the Top Right info div.</a>
+                            <li class="index-item property private">
+                                <a href="#property_"></a>
 
                                 
                                 
@@ -308,8 +420,6 @@ Highly inspired from http://code.google.com/p/livewire-javascript/</a></li>
             
 
             
-
-            
         </div>
 
         
@@ -317,13 +427,17 @@ Highly inspired from http://code.google.com/p/livewire-javascript/</a></li>
                 <h2 class="off-left">Methods</h2>
 
                 
-                    <div id="method_Create the mini color map info div." class="method item">
-    <h3 class="name"><code>Create the mini color map info div.</code></h3>
+                    <div id="method_getBegin" class="method item">
+    <h3 class="name"><code>getBegin</code></h3>
 
     
         <span class="paren">()</span>
     
 
+    
+        <span class="returns-inline">
+            <span class="type">Object</span>
+        </span>
     
 
     
@@ -349,7 +463,7 @@ Highly inspired from http://code.google.com/p/livewire-javascript/</a></li>
             
         
         
-        <a href="../files/src_tools_info.js.html#l84"><code>src&#x2F;tools&#x2F;info.js:84</code></a>
+        <a href="../files/src_math_shapes.js.html#l159"><code>src&#x2F;math&#x2F;shapes.js:159</code></a>
         
         </p>
 
@@ -360,24 +474,43 @@ Highly inspired from http://code.google.com/p/livewire-javascript/</a></li>
     </div>
 
     <div class="description">
-        
+        <p>Get the begin point of the line.</p>
+
     </div>
 
     
 
+    
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                
+                    
+                        <span class="type">Object</span>:
+                    
+                    <p>The beginning point of the line.</p>
+
+                
+            </div>
+        </div>
     
 
     
 </div>
 
                 
-                    <div id="method_Create the plot info." class="method item">
-    <h3 class="name"><code>Create the plot info.</code></h3>
+                    <div id="method_getEnd" class="method item">
+    <h3 class="name"><code>getEnd</code></h3>
 
     
         <span class="paren">()</span>
     
 
+    
+        <span class="returns-inline">
+            <span class="type">Object</span>
+        </span>
     
 
     
@@ -403,7 +536,7 @@ Highly inspired from http://code.google.com/p/livewire-javascript/</a></li>
             
         
         
-        <a href="../files/src_tools_info.js.html#l150"><code>src&#x2F;tools&#x2F;info.js:150</code></a>
+        <a href="../files/src_math_shapes.js.html#l165"><code>src&#x2F;math&#x2F;shapes.js:165</code></a>
         
         </p>
 
@@ -414,24 +547,43 @@ Highly inspired from http://code.google.com/p/livewire-javascript/</a></li>
     </div>
 
     <div class="description">
-        
+        <p>Get the end point of the line.</p>
+
     </div>
 
     
 
+    
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                
+                    
+                        <span class="type">Object</span>:
+                    
+                    <p>The ending point of the line.</p>
+
+                
+            </div>
+        </div>
     
 
     
 </div>
 
                 
-                    <div id="method_Create the position info div." class="method item">
-    <h3 class="name"><code>Create the position info div.</code></h3>
+                    <div id="method_getLength" class="method item">
+    <h3 class="name"><code>getLength</code></h3>
 
     
         <span class="paren">()</span>
     
 
+    
+        <span class="returns-inline">
+            <span class="type">Number</span>
+        </span>
     
 
     
@@ -457,7 +609,7 @@ Highly inspired from http://code.google.com/p/livewire-javascript/</a></li>
             
         
         
-        <a href="../files/src_tools_info.js.html#l45"><code>src&#x2F;tools&#x2F;info.js:45</code></a>
+        <a href="../files/src_math_shapes.js.html#l171"><code>src&#x2F;math&#x2F;shapes.js:171</code></a>
         
         </p>
 
@@ -468,24 +620,43 @@ Highly inspired from http://code.google.com/p/livewire-javascript/</a></li>
     </div>
 
     <div class="description">
-        
+        <p>Get the length of the line.</p>
+
     </div>
 
     
 
+    
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                
+                    
+                        <span class="type">Number</span>:
+                    
+                    <p>The length of the line.</p>
+
+                
+            </div>
+        </div>
     
 
     
 </div>
 
                 
-                    <div id="method_Create the windowing info div." class="method item">
-    <h3 class="name"><code>Create the windowing info div.</code></h3>
+                    <div id="method_getMidpoint" class="method item">
+    <h3 class="name"><code>getMidpoint</code></h3>
 
     
         <span class="paren">()</span>
     
 
+    
+        <span class="returns-inline">
+            <span class="type">Object</span>
+        </span>
     
 
     
@@ -511,7 +682,7 @@ Highly inspired from http://code.google.com/p/livewire-javascript/</a></li>
             
         
         
-        <a href="../files/src_tools_info.js.html#l6"><code>src&#x2F;tools&#x2F;info.js:6</code></a>
+        <a href="../files/src_math_shapes.js.html#l190"><code>src&#x2F;math&#x2F;shapes.js:190</code></a>
         
         </p>
 
@@ -522,19 +693,34 @@ Highly inspired from http://code.google.com/p/livewire-javascript/</a></li>
     </div>
 
     <div class="description">
-        
+        <p>Get the mid point of the line.</p>
+
     </div>
 
     
 
+    
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                
+                    
+                        <span class="type">Object</span>:
+                    
+                    <p>The mid point of the line.</p>
+
+                
+            </div>
+        </div>
     
 
     
 </div>
 
                 
-                    <div id="method_Update the mini color map info div." class="method item">
-    <h3 class="name"><code>Update the mini color map info div.</code></h3>
+                    <div id="method_getWorldLength" class="method item">
+    <h3 class="name"><code>getWorldLength</code></h3>
 
     
         <div class="args">
@@ -542,7 +728,13 @@ Highly inspired from http://code.google.com/p/livewire-javascript/</a></li>
             
                 <li class="arg">
                     
-                        <code>event</code>
+                        <code>spacingX</code>
+                    
+                </li>
+            
+                <li class="arg">
+                    
+                        <code>spacingY</code>
                     
                 </li>
             
@@ -551,6 +743,10 @@ Highly inspired from http://code.google.com/p/livewire-javascript/</a></li>
     
 
     
+        <span class="returns-inline">
+            <span class="type">Number</span>
+        </span>
+    
 
     
 
@@ -575,7 +771,7 @@ Highly inspired from http://code.google.com/p/livewire-javascript/</a></li>
             
         
         
-        <a href="../files/src_tools_info.js.html#l100"><code>src&#x2F;tools&#x2F;info.js:100</code></a>
+        <a href="../files/src_math_shapes.js.html#l177"><code>src&#x2F;math&#x2F;shapes.js:177</code></a>
         
         </p>
 
@@ -586,7 +782,8 @@ Highly inspired from http://code.google.com/p/livewire-javascript/</a></li>
     </div>
 
     <div class="description">
-        
+        <p>Get the length of the line with spacing.</p>
+
     </div>
 
     
@@ -597,15 +794,30 @@ Highly inspired from http://code.google.com/p/livewire-javascript/</a></li>
             
                 <li class="param">
                     
-                        <code class="param-name">event</code>
-                        <span class="type">Object</span>
+                        <code class="param-name">spacingX</code>
+                        <span class="type">Number</span>
                     
 
                     
 
                     <div class="param-description">
-                        <p>The windowing change event containing the new values.
-Warning: expects the mini color map div to exist (use after createMiniColorMap).</p>
+                        <p>The X spacing.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+                <li class="param">
+                    
+                        <code class="param-name">spacingY</code>
+                        <span class="type">Number</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The Y spacing.</p>
 
                     </div>
 
@@ -617,272 +829,19 @@ Warning: expects the mini color map div to exist (use after createMiniColorMap).
     
 
     
+        <div class="returns">
+            <h4>Returns:</h4>
 
-    
-</div>
+            <div class="returns-description">
+                
+                    
+                        <span class="type">Number</span>:
+                    
+                    <p>The length of the line with spacing.</p>
 
                 
-                    <div id="method_Update the plot markings." class="method item">
-    <h3 class="name"><code>Update the plot markings.</code></h3>
-
-    
-        <div class="args">
-            <span class="paren">(</span><ul class="args-list inline commas">
-            
-                <li class="arg">
-                    
-                        <code>event</code>
-                    
-                </li>
-            
-            </ul><span class="paren">)</span>
+            </div>
         </div>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/src_tools_info.js.html#l163"><code>src&#x2F;tools&#x2F;info.js:163</code></a>
-        
-        </p>
-
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        
-    </div>
-
-    
-        <div class="params">
-            <h4>Parameters:</h4>
-
-            <ul class="params-list">
-            
-                <li class="param">
-                    
-                        <code class="param-name">event</code>
-                        <span class="type">Object</span>
-                    
-
-                    
-
-                    <div class="param-description">
-                        <p>The windowing change event containing the new values.
-Warning: expects the plot to exist (use after createPlot).</p>
-
-                    </div>
-
-                    
-                </li>
-            
-            </ul>
-        </div>
-    
-
-    
-
-    
-</div>
-
-                
-                    <div id="method_Update the position info div." class="method item">
-    <h3 class="name"><code>Update the position info div.</code></h3>
-
-    
-        <div class="args">
-            <span class="paren">(</span><ul class="args-list inline commas">
-            
-                <li class="arg">
-                    
-                        <code>event</code>
-                    
-                </li>
-            
-            </ul><span class="paren">)</span>
-        </div>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/src_tools_info.js.html#l67"><code>src&#x2F;tools&#x2F;info.js:67</code></a>
-        
-        </p>
-
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        
-    </div>
-
-    
-        <div class="params">
-            <h4>Parameters:</h4>
-
-            <ul class="params-list">
-            
-                <li class="param">
-                    
-                        <code class="param-name">event</code>
-                        <span class="type">Object</span>
-                    
-
-                    
-
-                    <div class="param-description">
-                        <p>The position change event containing the new values.
-Warning: expects the position info div to exist (use after createPositionDiv).</p>
-
-                    </div>
-
-                    
-                </li>
-            
-            </ul>
-        </div>
-    
-
-    
-
-    
-</div>
-
-                
-                    <div id="method_Update the Top Right info div." class="method item">
-    <h3 class="name"><code>Update the Top Right info div.</code></h3>
-
-    
-        <div class="args">
-            <span class="paren">(</span><ul class="args-list inline commas">
-            
-                <li class="arg">
-                    
-                        <code>event</code>
-                    
-                </li>
-            
-            </ul><span class="paren">)</span>
-        </div>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/src_tools_info.js.html#l28"><code>src&#x2F;tools&#x2F;info.js:28</code></a>
-        
-        </p>
-
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        
-    </div>
-
-    
-        <div class="params">
-            <h4>Parameters:</h4>
-
-            <ul class="params-list">
-            
-                <li class="param">
-                    
-                        <code class="param-name">event</code>
-                        <span class="type">Object</span>
-                    
-
-                    
-
-                    <div class="param-description">
-                        <p>The windowing change event containing the new values.
-Warning: expects the windowing info div to exist (use after createWindowingDiv).</p>
-
-                    </div>
-
-                    
-                </li>
-            
-            </ul>
-        </div>
-    
-
     
 
     
@@ -892,6 +851,59 @@ Warning: expects the windowing info div to exist (use after createWindowingDiv).
             </div>
         
 
+        
+            <div id="properties" class="api-class-tabpanel">
+                <h2 class="off-left">Properties</h2>
+
+                
+                    <div id="property_" class="property item private">
+    <h3 class="name"><code></code></h3>
+    <span class="type">Number</span>
+
+    
+
+    
+        <span class="flag private">private</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_math_shapes.js.html#l149"><code>src&#x2F;math&#x2F;shapes.js:149</code></a>
+        
+        </p>
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Line length.</p>
+
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+            </div>
         
 
         

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Filter classes..Draw line command. - dwv</title>
+    <title>dwv.dicom.DicomParser - dwv</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
     <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
@@ -194,7 +194,7 @@ Highly inspired from http://code.google.com/p/livewire-javascript/</a></li>
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-                        <h1>Filter classes..Draw line command. Class</h1>
+                        <h1>dwv.dicom.DicomParser Class</h1>
 <div class="box meta">
     
 
@@ -202,13 +202,13 @@ Highly inspired from http://code.google.com/p/livewire-javascript/</a></li>
 
     
         <div class="foundat">
-            Defined in: <a href="../files/src_tools_line.js.html#l6"><code>src&#x2F;tools&#x2F;line.js:6</code></a>
+            Defined in: <a href="../files/src_dicom_dicomParser.js.html#l142"><code>src&#x2F;dicom&#x2F;dicomParser.js:142</code></a>
         </div>
     
 
     
         
-            Module: <a href="../modules/math.html">math</a>
+            Module: <a href="../modules/dicom.html">dicom</a>
         
     
 
@@ -218,9 +218,67 @@ Highly inspired from http://code.google.com/p/livewire-javascript/</a></li>
 
 
 <div class="box intro">
+    <p>DicomParser class.</p>
+
+</div>
+
+
+    <div class="constructor">
+        <h2>Constructor</h2>
+        <div id="method_dwv.dicom.DicomParser" class="method item">
+    <h3 class="name"><code>dwv.dicom.DicomParser</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_dicom_dicomParser.js.html#l142"><code>src&#x2F;dicom&#x2F;dicomParser.js:142</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        
+    </div>
+
+    
+
+    
+
     
 </div>
 
+    </div>
 
 
 <div id="classdocs" class="tabview">
@@ -230,6 +288,8 @@ Highly inspired from http://code.google.com/p/livewire-javascript/</a></li>
         
             <li class="api-class-tab methods"><a href="#methods">Methods</a></li>
         
+        
+            <li class="api-class-tab properties"><a href="#properties">Properties</a></li>
         
         
         
@@ -246,56 +306,80 @@ Highly inspired from http://code.google.com/p/livewire-javascript/</a></li>
                     <ul class="index-list methods">
                         
                             <li class="index-item method">
-                                <a href="#method_Create the mini color map info div.">Create the mini color map info div.</a>
+                                <a href="#method_appendDicomElement">appendDicomElement</a>
 
                                 
                                 
                             </li>
                         
                             <li class="index-item method">
-                                <a href="#method_Create the plot info.">Create the plot info.</a>
+                                <a href="#method_createImage">createImage</a>
 
                                 
                                 
                             </li>
                         
                             <li class="index-item method">
-                                <a href="#method_Create the position info div.">Create the position info div.</a>
+                                <a href="#method_getPixelBuffer">getPixelBuffer</a>
 
                                 
                                 
                             </li>
                         
                             <li class="index-item method">
-                                <a href="#method_Create the windowing info div.">Create the windowing info div.</a>
+                                <a href="#method_parse">parse</a>
 
                                 
                                 
                             </li>
                         
                             <li class="index-item method">
-                                <a href="#method_Update the mini color map info div.">Update the mini color map info div.</a>
+                                <a href="#method_readDataElement">readDataElement</a>
 
                                 
                                 
                             </li>
                         
                             <li class="index-item method">
-                                <a href="#method_Update the plot markings.">Update the plot markings.</a>
+                                <a href="#method_readTag">readTag</a>
 
                                 
                                 
                             </li>
                         
-                            <li class="index-item method">
-                                <a href="#method_Update the position info div.">Update the position info div.</a>
+                    </ul>
+                </div>
+            
+
+            
+                <div class="index-section properties">
+                    <h3>Properties</h3>
+
+                    <ul class="index-list properties">
+                        
+                            <li class="index-item property">
+                                <a href="#property_"></a>
 
                                 
                                 
                             </li>
                         
-                            <li class="index-item method">
-                                <a href="#method_Update the Top Right info div.">Update the Top Right info div.</a>
+                            <li class="index-item property">
+                                <a href="#property_"></a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item property">
+                                <a href="#property_"></a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item property">
+                                <a href="#property_"></a>
 
                                 
                                 
@@ -308,8 +392,6 @@ Highly inspired from http://code.google.com/p/livewire-javascript/</a></li>
             
 
             
-
-            
         </div>
 
         
@@ -317,224 +399,8 @@ Highly inspired from http://code.google.com/p/livewire-javascript/</a></li>
                 <h2 class="off-left">Methods</h2>
 
                 
-                    <div id="method_Create the mini color map info div." class="method item">
-    <h3 class="name"><code>Create the mini color map info div.</code></h3>
-
-    
-        <span class="paren">()</span>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/src_tools_info.js.html#l84"><code>src&#x2F;tools&#x2F;info.js:84</code></a>
-        
-        </p>
-
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        
-    </div>
-
-    
-
-    
-
-    
-</div>
-
-                
-                    <div id="method_Create the plot info." class="method item">
-    <h3 class="name"><code>Create the plot info.</code></h3>
-
-    
-        <span class="paren">()</span>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/src_tools_info.js.html#l150"><code>src&#x2F;tools&#x2F;info.js:150</code></a>
-        
-        </p>
-
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        
-    </div>
-
-    
-
-    
-
-    
-</div>
-
-                
-                    <div id="method_Create the position info div." class="method item">
-    <h3 class="name"><code>Create the position info div.</code></h3>
-
-    
-        <span class="paren">()</span>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/src_tools_info.js.html#l45"><code>src&#x2F;tools&#x2F;info.js:45</code></a>
-        
-        </p>
-
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        
-    </div>
-
-    
-
-    
-
-    
-</div>
-
-                
-                    <div id="method_Create the windowing info div." class="method item">
-    <h3 class="name"><code>Create the windowing info div.</code></h3>
-
-    
-        <span class="paren">()</span>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/src_tools_info.js.html#l6"><code>src&#x2F;tools&#x2F;info.js:6</code></a>
-        
-        </p>
-
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        
-    </div>
-
-    
-
-    
-
-    
-</div>
-
-                
-                    <div id="method_Update the mini color map info div." class="method item">
-    <h3 class="name"><code>Update the mini color map info div.</code></h3>
+                    <div id="method_appendDicomElement" class="method item">
+    <h3 class="name"><code>appendDicomElement</code></h3>
 
     
         <div class="args">
@@ -542,7 +408,7 @@ Highly inspired from http://code.google.com/p/livewire-javascript/</a></li>
             
                 <li class="arg">
                     
-                        <code>event</code>
+                        <code>element</code>
                     
                 </li>
             
@@ -575,7 +441,7 @@ Highly inspired from http://code.google.com/p/livewire-javascript/</a></li>
             
         
         
-        <a href="../files/src_tools_info.js.html#l100"><code>src&#x2F;tools&#x2F;info.js:100</code></a>
+        <a href="../files/src_dicom_dicomParser.js.html#l186"><code>src&#x2F;dicom&#x2F;dicomParser.js:186</code></a>
         
         </p>
 
@@ -586,7 +452,11 @@ Highly inspired from http://code.google.com/p/livewire-javascript/</a></li>
     </div>
 
     <div class="description">
-        
+        <p>Append a DICOM element to the dicomElements member object.
+Allows for easy retrieval of DICOM tag values from the tag name.
+If tags have same name (for the &#39;unknown&#39; and private tags cases), a number is appended
+making the name unique.</p>
+
     </div>
 
     
@@ -597,15 +467,14 @@ Highly inspired from http://code.google.com/p/livewire-javascript/</a></li>
             
                 <li class="param">
                     
-                        <code class="param-name">event</code>
+                        <code class="param-name">element</code>
                         <span class="type">Object</span>
                     
 
                     
 
                     <div class="param-description">
-                        <p>The windowing change event containing the new values.
-Warning: expects the mini color map div to exist (use after createMiniColorMap).</p>
+                        <p>The element to add.</p>
 
                     </div>
 
@@ -622,8 +491,154 @@ Warning: expects the mini color map div to exist (use after createMiniColorMap).
 </div>
 
                 
-                    <div id="method_Update the plot markings." class="method item">
-    <h3 class="name"><code>Update the plot markings.</code></h3>
+                    <div id="method_createImage" class="method item">
+    <h3 class="name"><code>createImage</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+        <span class="returns-inline">
+            <span class="type">View</span>
+        </span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_dicom_dicomParser.js.html#l506"><code>src&#x2F;dicom&#x2F;dicomParser.js:506</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Get an Image object from the read DICOM file.</p>
+
+    </div>
+
+    
+
+    
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                
+                    
+                        <span class="type">View</span>:
+                    
+                    <p>A new Image.</p>
+
+                
+            </div>
+        </div>
+    
+
+    
+</div>
+
+                
+                    <div id="method_getPixelBuffer" class="method item">
+    <h3 class="name"><code>getPixelBuffer</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+        <span class="returns-inline">
+            <span class="type">Array</span>
+        </span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_dicom_dicomParser.js.html#l176"><code>src&#x2F;dicom&#x2F;dicomParser.js:176</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Get the DICOM data pixel buffer.</p>
+
+    </div>
+
+    
+
+    
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                
+                    
+                        <span class="type">Array</span>:
+                    
+                    <p>The pixel buffer.</p>
+
+                
+            </div>
+        </div>
+    
+
+    
+</div>
+
+                
+                    <div id="method_parse" class="method item">
+    <h3 class="name"><code>parse</code></h3>
 
     
         <div class="args">
@@ -631,7 +646,7 @@ Warning: expects the mini color map div to exist (use after createMiniColorMap).
             
                 <li class="arg">
                     
-                        <code>event</code>
+                        <code>buffer</code>
                     
                 </li>
             
@@ -664,7 +679,7 @@ Warning: expects the mini color map div to exist (use after createMiniColorMap).
             
         
         
-        <a href="../files/src_tools_info.js.html#l163"><code>src&#x2F;tools&#x2F;info.js:163</code></a>
+        <a href="../files/src_dicom_dicomParser.js.html#l332"><code>src&#x2F;dicom&#x2F;dicomParser.js:332</code></a>
         
         </p>
 
@@ -675,7 +690,9 @@ Warning: expects the mini color map div to exist (use after createMiniColorMap).
     </div>
 
     <div class="description">
-        
+        <p>Parse the complete DICOM file (given as input to the class).
+Fills in the member object &#39;dicomElements&#39;.</p>
+
     </div>
 
     
@@ -686,15 +703,14 @@ Warning: expects the mini color map div to exist (use after createMiniColorMap).
             
                 <li class="param">
                     
-                        <code class="param-name">event</code>
+                        <code class="param-name">buffer</code>
                         <span class="type">Object</span>
                     
 
                     
 
                     <div class="param-description">
-                        <p>The windowing change event containing the new values.
-Warning: expects the plot to exist (use after createPlot).</p>
+                        <p>The input array buffer.</p>
 
                     </div>
 
@@ -711,8 +727,8 @@ Warning: expects the plot to exist (use after createPlot).</p>
 </div>
 
                 
-                    <div id="method_Update the position info div." class="method item">
-    <h3 class="name"><code>Update the position info div.</code></h3>
+                    <div id="method_readDataElement" class="method item">
+    <h3 class="name"><code>readDataElement</code></h3>
 
     
         <div class="args">
@@ -720,7 +736,19 @@ Warning: expects the plot to exist (use after createPlot).</p>
             
                 <li class="arg">
                     
-                        <code>event</code>
+                        <code>reader</code>
+                    
+                </li>
+            
+                <li class="arg">
+                    
+                        <code>offset</code>
+                    
+                </li>
+            
+                <li class="arg">
+                    
+                        <code>implicit</code>
                     
                 </li>
             
@@ -728,6 +756,10 @@ Warning: expects the plot to exist (use after createPlot).</p>
         </div>
     
 
+    
+        <span class="returns-inline">
+            <span class="type">Object</span>
+        </span>
     
 
     
@@ -753,7 +785,7 @@ Warning: expects the plot to exist (use after createPlot).</p>
             
         
         
-        <a href="../files/src_tools_info.js.html#l67"><code>src&#x2F;tools&#x2F;info.js:67</code></a>
+        <a href="../files/src_dicom_dicomParser.js.html#l239"><code>src&#x2F;dicom&#x2F;dicomParser.js:239</code></a>
         
         </p>
 
@@ -764,7 +796,8 @@ Warning: expects the plot to exist (use after createPlot).</p>
     </div>
 
     <div class="description">
-        
+        <p>Read a DICOM data element.</p>
+
     </div>
 
     
@@ -775,15 +808,46 @@ Warning: expects the plot to exist (use after createPlot).</p>
             
                 <li class="param">
                     
-                        <code class="param-name">event</code>
+                        <code class="param-name">reader</code>
                         <span class="type">Object</span>
                     
 
                     
 
                     <div class="param-description">
-                        <p>The position change event containing the new values.
-Warning: expects the position info div to exist (use after createPositionDiv).</p>
+                        <p>The raw data reader.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+                <li class="param">
+                    
+                        <code class="param-name">offset</code>
+                        <span class="type">Object</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The offset where to start to read.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+                <li class="param">
+                    
+                        <code class="param-name">implicit</code>
+                        <span class="type">Object</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>Is the DICOM VR implicit?</p>
 
                     </div>
 
@@ -795,13 +859,27 @@ Warning: expects the position info div to exist (use after createPositionDiv).</
     
 
     
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                
+                    
+                        <span class="type">Object</span>:
+                    
+                    <p>An object containing the element &#39;tag&#39;, &#39;vl&#39;, &#39;vr&#39;, &#39;data&#39; and &#39;offset&#39;.</p>
+
+                
+            </div>
+        </div>
+    
 
     
 </div>
 
                 
-                    <div id="method_Update the Top Right info div." class="method item">
-    <h3 class="name"><code>Update the Top Right info div.</code></h3>
+                    <div id="method_readTag" class="method item">
+    <h3 class="name"><code>readTag</code></h3>
 
     
         <div class="args">
@@ -809,7 +887,13 @@ Warning: expects the position info div to exist (use after createPositionDiv).</
             
                 <li class="arg">
                     
-                        <code>event</code>
+                        <code>reader</code>
+                    
+                </li>
+            
+                <li class="arg">
+                    
+                        <code>offset</code>
                     
                 </li>
             
@@ -817,6 +901,10 @@ Warning: expects the position info div to exist (use after createPositionDiv).</
         </div>
     
 
+    
+        <span class="returns-inline">
+            <span class="type"></span>
+        </span>
     
 
     
@@ -842,7 +930,7 @@ Warning: expects the position info div to exist (use after createPositionDiv).</
             
         
         
-        <a href="../files/src_tools_info.js.html#l28"><code>src&#x2F;tools&#x2F;info.js:28</code></a>
+        <a href="../files/src_dicom_dicomParser.js.html#l215"><code>src&#x2F;dicom&#x2F;dicomParser.js:215</code></a>
         
         </p>
 
@@ -853,7 +941,8 @@ Warning: expects the position info div to exist (use after createPositionDiv).</
     </div>
 
     <div class="description">
-        
+        <p>Read a DICOM tag.</p>
+
     </div>
 
     
@@ -864,15 +953,30 @@ Warning: expects the position info div to exist (use after createPositionDiv).</
             
                 <li class="param">
                     
-                        <code class="param-name">event</code>
+                        <code class="param-name">reader</code>
                         <span class="type">Object</span>
                     
 
                     
 
                     <div class="param-description">
-                        <p>The windowing change event containing the new values.
-Warning: expects the windowing info div to exist (use after createWindowingDiv).</p>
+                        <p>The raw data reader.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+                <li class="param">
+                    
+                        <code class="param-name">offset</code>
+                        <span class="type">Object</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The offset where to start to read.</p>
 
                     </div>
 
@@ -883,6 +987,18 @@ Warning: expects the windowing info div to exist (use after createWindowingDiv).
         </div>
     
 
+    
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                
+                    
+                    <p>An object containing the tags &#39;group&#39;, &#39;element&#39; and &#39;name&#39;.</p>
+
+                
+            </div>
+        </div>
     
 
     
@@ -892,6 +1008,192 @@ Warning: expects the windowing info div to exist (use after createWindowingDiv).
             </div>
         
 
+        
+            <div id="properties" class="api-class-tabpanel">
+                <h2 class="off-left">Properties</h2>
+
+                
+                    <div id="property_" class="property item">
+    <h3 class="name"><code></code></h3>
+    <span class="type">Array</span>
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_dicom_dicomParser.js.html#l150"><code>src&#x2F;dicom&#x2F;dicomParser.js:150</code></a>
+        
+        </p>
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>The list of DICOM elements.</p>
+
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="property_" class="property item">
+    <h3 class="name"><code></code></h3>
+    <span class="type">Number</span>
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_dicom_dicomParser.js.html#l156"><code>src&#x2F;dicom&#x2F;dicomParser.js:156</code></a>
+        
+        </p>
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>The number of DICOM Items.</p>
+
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="property_" class="property item">
+    <h3 class="name"><code></code></h3>
+    <span class="type">Dictionary</span>
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_dicom_dicomParser.js.html#l162"><code>src&#x2F;dicom&#x2F;dicomParser.js:162</code></a>
+        
+        </p>
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>The DICOM dictionary used to find tag names.</p>
+
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="property_" class="property item">
+    <h3 class="name"><code></code></h3>
+    <span class="type">Array</span>
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_dicom_dicomParser.js.html#l168"><code>src&#x2F;dicom&#x2F;dicomParser.js:168</code></a>
+        
+        </p>
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>The pixel buffer.</p>
+
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+            </div>
         
 
         
