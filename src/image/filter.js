@@ -1,31 +1,71 @@
-//! @namespace Main DWV namespace.
+/** 
+ * Image module.
+ * @module image
+ */
 var dwv = dwv || {};
-//! @namespace Image related.
 dwv.image = dwv.image || {};
-//! @namespace Filter classes.
 dwv.image.filter = dwv.image.filter || {};
 
 /**
- * @function Threshold an image between an input minimum and maximum.
- * @param min The new minimum.
- * @param max The new maximum.
+ * Threshold an image between an input minimum and maximum.
+ * @class Threshold
+ * @namespace dwv.image.filter
+ * @constructor
  */
 dwv.image.filter.Threshold = function()
 {
+    /**
+     * Threshold minimum.
+     * @property min
+     * @private
+     * @type Number
+     */
     var min = 0;
+    /**
+     * Threshold maxnimum.
+     * @property max
+     * @private
+     * @type Number
+     */
     var max = 0;
-    // Get the minimum value.
+
+    /**
+     * Get the threshold minimum.
+     * @method getMin
+     * @return {Number} The threshold minimum.
+     */
     this.getMin = function() { return min; };
-    // Set the minimum value.
+    /**
+     * Set the threshold minimum.
+     * @method setMin
+     * @param {Number} val The threshold minimum.
+     */
     this.setMin = function(val) { min = val; };
-    // Get the maximum value.
+    /**
+     * Get the threshold maximum.
+     * @method getMax
+     * @return {Number} The threshold maximum.
+     */
     this.getMax = function() { return max; };
-    // Set the maximum value.
+    /**
+     * Set the threshold maximum.
+     * @method setMax
+     * @param {Number} val The threshold maximum.
+     */
     this.setMax = function(val) { max = val; };
-    // Get the name of the filter.
+    /**
+     * Get the name of the filter.
+     * @method getName
+     * @return {String} The name of the filter.
+     */
     this.getName = function() { return "Threshold"; };
 };
 
+/**
+ * Transform the main image using this filter.
+ * @method update
+ * @return {Object} The transformed image.
+ */ 
 dwv.image.filter.Threshold.prototype.update = function()
 {
     var imageMin = app.getImage().getDataRange().min;
@@ -38,14 +78,26 @@ dwv.image.filter.Threshold.prototype.update = function()
 };
 
 /**
- * @function Sharpen an image using a sharpen convolution matrix.
+ * Sharpen an image using a sharpen convolution matrix.
+ * @class Sharpen
+ * @namespace dwv.image.filter
+ * @constructor
  */
 dwv.image.filter.Sharpen = function()
 {
-    // Get the name of the filter.
+    /**
+     * Get the name of the filter.
+     * @method getName
+     * @return {String} The name of the filter.
+     */
     this.getName = function() { return "Sharpen"; };
 };
 
+/**
+ * Transform the main image using this filter.
+ * @method update
+ * @return {Object} The transformed image.
+ */ 
 dwv.image.filter.Sharpen.prototype.update = function()
 {
     return app.getImage().convolute2D(
@@ -55,14 +107,26 @@ dwv.image.filter.Sharpen.prototype.update = function()
 };
 
 /**
- * @function Apply a Sobel filter to an image.
+ * Apply a Sobel filter to an image.
+ * @class Sobel
+ * @namespace dwv.image.filter
+ * @constructor
  */
 dwv.image.filter.Sobel = function()
 {
-    // Get the name of the filter.
+    /**
+     * Get the name of the filter.
+     * @method getName
+     * @return {String} The name of the filter.
+     */
     this.getName = function() { return "Sobel"; };
 };
 
+/**
+ * Transform the main image using this filter.
+ * @method update
+ * @return {Object} The transformed image.
+ */ 
 dwv.image.filter.Sobel.prototype.update = function()
 {
     var gradX = app.getImage().convolute2D(
@@ -77,3 +141,4 @@ dwv.image.filter.Sobel.prototype.update = function()
     
     return gradX.compose( gradY, function(x,y){return Math.sqrt(x*x+y*y);} );
 };
+

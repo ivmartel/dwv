@@ -1,12 +1,16 @@
-//! @namespace Main DWV namespace.
+/** 
+ * Image module.
+ * @module image
+ */
 var dwv = dwv || {};
-//! @namespace Image related.
 dwv.image = dwv.image || {};
 
 /**
  * Get data from an input image using a canvas.
- * @param image The image.
- * @param file The corresponding file.
+ * @method getDataFromImage
+ * @static
+ * @param {Image} image The image.
+ * @return {Mixed} The corresponding view and info.
  */
 dwv.image.getDataFromImage = function(image)
 {
@@ -54,7 +58,10 @@ dwv.image.getDataFromImage = function(image)
 
 /**
  * Get data from an input buffer using a DICOM parser.
- * @param buffer The input data buffer.
+ * @method getDataFromDicomBuffer
+ * @static
+ * @param {Array} buffer The input data buffer.
+ * @return {Mixed} The corresponding view and info.
  */
 dwv.image.getDataFromDicomBuffer = function(buffer)
 {

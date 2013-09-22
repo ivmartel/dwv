@@ -1,40 +1,81 @@
-//! @namespace Main DWV namespace.
+/** 
+ * Image module.
+ * @module image
+ */
 var dwv = dwv || {};
-//! @namespace Image related.
 dwv.image = dwv.image || {};
 
 /**
-* @class Image Size class. 
-* Supports 2D and 3D images.
-* @param numberOfColumns The number of columns (number).
-* @param numberOfRows The number of rows (number).
-* @param numberOfSlices The number of slices (number).
+ * Image Size class.
+ * Supports 2D and 3D images.
+ * @class Size
+ * @namespace dwv.image
+ * @constructor
+ * @param {Number} numberOfColumns The number of columns.
+ * @param {Number} numberOfRows The number of rows.
+ * @param {Number} numberOfSlices The number of slices.
 */
 dwv.image.Size = function( numberOfColumns, numberOfRows, numberOfSlices )
 {
-    // Get the number of columns.
+    /**
+     * Get the number of columns.
+     * @method getNumberOfColumns
+     * @return {Number} The number of columns.
+     */ 
     this.getNumberOfColumns = function() { return numberOfColumns; };
-    // Get the number of rows.
+    /**
+     * Get the number of rows.
+     * @method getNumberOfRows
+     * @return {Number} The number of rows.
+     */ 
     this.getNumberOfRows = function() { return numberOfRows; };
-    // Get the number of slices.
+    /**
+     * Get the number of slices.
+     * @method getNumberOfSlices
+     * @return {Number} The number of slices.
+     */ 
     this.getNumberOfSlices = function() { return (numberOfSlices || 1.0); };
 };
-// Get the size of a slice.
+
+/**
+ * Get the size of a slice.
+ * @method getSliceSize
+ * @return {Number} The size of a slice.
+ */ 
 dwv.image.Size.prototype.getSliceSize = function() {
     return this.getNumberOfColumns()*this.getNumberOfRows();
 };
-// Get the total size.
+
+/**
+ * Get the total size.
+ * @method getTotalSize
+ * @return {Number} The total size.
+ */ 
 dwv.image.Size.prototype.getTotalSize = function() {
     return this.getSliceSize()*this.getNumberOfSlices();
 };
-// Check for equality.
+
+/**
+ * Check for equality.
+ * @method equals
+ * @param {Size} rhs The object to compare to.
+ * @return {Boolean} True if both objects are equal.
+ */ 
 dwv.image.Size.prototype.equals = function(rhs) {
     return rhs !== null &&
         this.getNumberOfColumns() === rhs.getNumberOfColumns() &&
         this.getNumberOfRows() === rhs.getNumberOfRows() &&
         this.getNumberOfSlices() === rhs.getNumberOfSlices();
 };
-// Check that coordinates are within bounds.
+
+/**
+ * Check that coordinates are within bounds.
+ * @method isInBounds
+ * @param {Number} i The column coordinate.
+ * @param {Number} j The row coordinate.
+ * @param {Number} k The slice coordinate.
+ * @return {Boolean} True if the given coordinates are within bounds.
+ */ 
 dwv.image.Size.prototype.isInBounds = function( i, j, k ) {
     if( i < 0 || i > this.getNumberOfColumns() - 1 ||
         j < 0 || j > this.getNumberOfRows() - 1 ||
@@ -43,22 +84,43 @@ dwv.image.Size.prototype.isInBounds = function( i, j, k ) {
 };
 
 /**
-* @class Image Spacing class. 
-* Supports 2D and 3D images.
-* @param columnSpacing The column spacing (number).
-* @param rowSpacing The row spacing (number).
-* @param sliceSpacing The slice spacing (number).
-*/
+ * Image Spacing class. 
+ * Supports 2D and 3D images.
+ * @class Spacing
+ * @namespace dwv.image
+ * @constructor
+ * @param {Number} columnSpacing The column spacing.
+ * @param {Number} rowSpacing The row spacing.
+ * @param {Number} sliceSpacing The slice spacing.
+ */
 dwv.image.Spacing = function( columnSpacing, rowSpacing, sliceSpacing )
 {
-    // Get the column spacing.
+    /**
+     * Get the column spacing.
+     * @method getColumnSpacing
+     * @return {Number} The column spacing.
+     */ 
     this.getColumnSpacing = function() { return columnSpacing; };
-    // Get the row spacing.
+    /**
+     * Get the row spacing.
+     * @method getRowSpacing
+     * @return {Number} The row spacing.
+     */ 
     this.getRowSpacing = function() { return rowSpacing; };
-    // Get the slice spacing.
+    /**
+     * Get the slice spacing.
+     * @method slice
+     * @return {Number} The slice spacing.
+     */ 
     this.getSliceSpacing = function() { return (sliceSpacing || 1.0); };
 };
-// Check for equality.
+
+/**
+ * Check for equality.
+ * @method equals
+ * @param {Spacing} rhs The object to compare to.
+ * @return {Boolean} True if both objects are equal.
+ */ 
 dwv.image.Spacing.prototype.equals = function(rhs) {
     return rhs !== null &&
         this.getColumnSpacing() === rhs.getColumnSpacing() &&
@@ -67,75 +129,185 @@ dwv.image.Spacing.prototype.equals = function(rhs) {
 };
 
 /**
-* @class Image class.
-* @param size The sizes of the image.
-* @param spacing The spacings of the image.
-* @param _buffer The image data.
-* Usable once created, optional are:
-* - rescale slope and intercept (default 1:0), 
-* - photometric interpretation (default MONOCHROME2),
-* - planar configuration (default RGBRGB...).
-*/
+ * Image class.
+ * Usable once created, optional are:
+ * - rescale slope and intercept (default 1:0), 
+ * - photometric interpretation (default MONOCHROME2),
+ * - planar configuration (default RGBRGB...).
+ * @class Image
+ * @namespace dwv.image
+ * @constructor
+ * @param {Size} size The size of the image.
+ * @param {Spacing} spacing The spacing of the image.
+ * @param {Array} buffer The image data.
+ * @param {Array} slicePositions The slice positions.
+ */
 dwv.image.Image = function(size, spacing, buffer, slicePositions)
 {
-    // Rescale slope.
+    /**
+     * Rescale slope.
+     * @property rescaleSlope
+     * @private
+     * @type Number
+     */
     var rescaleSlope = 1;
-    // Rescale intercept.
+    /**
+     * Rescale intercept.
+     * @property rescaleIntercept
+     * @private
+     * @type Number
+     */
     var rescaleIntercept = 0;
-    // Photometric interpretation (MONOCHROME, RGB...)
+    /**
+     * Photometric interpretation (MONOCHROME, RGB...).
+     * @property photometricInterpretation
+     * @private
+     * @type {String}
+     */
     var photometricInterpretation = "MONOCHROME2";
-    // Planar configuration for RGB data (0:RGBRGBRGBRGB... or 1:RRR...GGG...BBB...)
+    /**
+     * Planar configuration for RGB data (0:RGBRGBRGBRGB... or 1:RRR...GGG...BBB...).
+     * @property planarConfiguration
+     * @private
+     * @type {Number}
+     */
     var planarConfiguration = 0;
-    // Meta information
+    /**
+     * Meta information.
+     * @property meta
+     * @private
+     * @type {Object}
+     */
     var meta = {};
     
-    // original buffer.
+    /**
+     * Original buffer.
+     * @property originalBuffer
+     * @private
+     * @type {Array}
+     */
     var originalBuffer = new Int16Array(buffer);
     
     // check slice positions.
     if( typeof(slicePositions) === 'undefined' ) slicePositions = [[0,0,0]];
     
-    // data range.
+    /**
+     * Data range.
+     * @property dataRange
+     * @private
+     * @type {Object}
+     */
     var dataRange = null;
-    // histogram.
+    /**
+     * Histogram.
+     * @property histogram
+     * @private
+     * @type {Object}
+     */
     var histogram = null;
      
-    // Get the size of the image.
+    /**
+     * Get the size of the image.
+     * @method getSize
+     * @return {Size} The size of the image.
+     */ 
     this.getSize = function() { return size; };
-    // Get the spacing of the image.
+    /**
+     * Get the spacing of the image.
+     * @method getSpacing
+     * @return {Spacing} The spacing of the image.
+     */ 
     this.getSpacing = function() { return spacing; };
-    // Get the data buffer of the image. TODO dangerous...
+    /**
+     * Get the data buffer of the image. TODO dangerous...
+     * @method getBuffer
+     * @return {Array} The data buffer of the image.
+     */ 
     this.getBuffer = function() { return buffer; };
-    // Get the slice positions.
+    /**
+     * Get the slice positions.
+     * @method getSlicePositions
+     * @return {Array} The slice positions.
+     */ 
     this.getSlicePositions = function() { return slicePositions; };
     
-    // Get the rescale slope.
+    /**
+     * Get the rescale slope.
+     * @method getRescaleSlope
+     * @return {Number} The rescale slope.
+     */ 
     this.getRescaleSlope = function() { return rescaleSlope; };
-    // Set the rescale slope.
-    this.setRescaleSlope = function(val) { rescaleSlope = val; };
-    // Get the rescale intercept.
+    /**
+     * Set the rescale slope.
+     * @method setRescaleSlope
+     * @param {Number} rs The rescale slope.
+     */ 
+    this.setRescaleSlope = function(rs) { rescaleSlope = rs; };
+    /**
+     * Get the rescale intercept.
+     * @method getRescaleIntercept
+     * @return {Number} The rescale intercept.
+     */ 
     this.getRescaleIntercept = function() { return rescaleIntercept; };
-    // Set the rescale intercept.
-    this.setRescaleIntercept = function(val) { rescaleIntercept = val; };
-    // Get the photometricInterpretation of the image.
+    /**
+     * Set the rescale intercept.
+     * @method setRescaleIntercept
+     * @param {Number} ri The rescale intercept.
+     */ 
+    this.setRescaleIntercept = function(ri) { rescaleIntercept = ri; };
+    /**
+     * Get the photometricInterpretation of the image.
+     * @method getPhotometricInterpretation
+     * @return {String} The photometricInterpretation of the image.
+     */ 
     this.getPhotometricInterpretation = function() { return photometricInterpretation; };
-    // Set the photometricInterpretation of the image.
+    /**
+     * Set the photometricInterpretation of the image.
+     * @method setPhotometricInterpretation
+     * @pqrqm {String} interp The photometricInterpretation of the image.
+     */ 
     this.setPhotometricInterpretation = function(interp) { photometricInterpretation = interp; };
-    // Get the planarConfiguration of the image.
+    /**
+     * Get the planarConfiguration of the image.
+     * @method getPlanarConfiguration
+     * @return {Number} The planarConfiguration of the image.
+     */ 
     this.getPlanarConfiguration = function() { return planarConfiguration; };
-    // Set the planarConfiguration of the image.
+    /**
+     * Set the planarConfiguration of the image.
+     * @method setPlanarConfiguration
+     * @param {Number} config The planarConfiguration of the image.
+     */ 
     this.setPlanarConfiguration = function(config) { planarConfiguration = config; };
 
-    // Get the meta information of the image.
+    /**
+     * Get the meta information of the image.
+     * @method getMeta
+     * @return {Object} The meta information of the image.
+     */ 
     this.getMeta = function() { return meta; };
-    // Set the meta information of the image.
+    /**
+     * Set the meta information of the image.
+     * @method setMeta
+     * @param {Object} rhs The meta information of the image.
+     */ 
     this.setMeta = function(rhs) { meta = rhs; };
 
-    // Get value at offset. Warning: No size check...
+    /**
+     * Get value at offset. Warning: No size check...
+     * @method getValueAtOffset
+     * @param {Number} offset The desired offset.
+     * @return {Number} The value at offset.
+     */ 
     this.getValueAtOffset = function(offset) {
         return buffer[offset];
     };
-    // Clone the image.
+    
+    /**
+     * Clone the image.
+     * @method clone
+     * @return {Image} A clone of this image.
+     */ 
     this.clone = function()
     {
         var copy = new dwv.image.Image(this.getSize(), this.getSpacing(), originalBuffer, slicePositions);
@@ -146,7 +318,12 @@ dwv.image.Image = function(size, spacing, buffer, slicePositions)
         copy.setMeta(this.getMeta());
         return copy;
     };
-    // Append a slice to the image.
+    
+    /**
+     * Append a slice to the image.
+     * @method appendSlice
+     * @param {Image} The slice to append.
+     */ 
     this.appendSlice = function(rhs)
     {
         // check input
@@ -223,12 +400,22 @@ dwv.image.Image = function(size, spacing, buffer, slicePositions)
         buffer = newBuffer;
         originalBuffer = new Int16Array(newBuffer);
     };
-    // Get the data range.
+    
+    /**
+     * Get the data range.
+     * @method getDataRange
+     * @return {Object} The data range.
+     */ 
     this.getDataRange = function() { 
         if( !dataRange ) dataRange = this.calculateDataRange();
         return dataRange;
     };
-    // Get the histogram.
+
+    /**
+     * Get the histogram.
+     * @method getHistogram
+     * @return {Object} The histogram.
+     */ 
     this.getHistogram = function() { 
         if( !histogram ) histogram = this.calculateHistogram();
         return histogram;
@@ -237,10 +424,11 @@ dwv.image.Image = function(size, spacing, buffer, slicePositions)
 
 /**
  * Get the value of the image at a specific coordinate.
- * @param i The X index.
- * @param j The Y index.
- * @param k The Z index.
- * @returns The value at the desired position.
+ * @method getValue
+ * @param {Number} i The X index.
+ * @param {Number} j The Y index.
+ * @param {Number} k The Z index.
+ * @return {Number} The value at the desired position.
  * Warning: No size check...
  */
 dwv.image.Image.prototype.getValue = function( i, j, k )
@@ -251,9 +439,10 @@ dwv.image.Image.prototype.getValue = function( i, j, k )
 };
 
 /**
- * Get the value of the image at a specific offset.
- * @param offset The offset in the buffer. 
- * @returns The value at the desired offset.
+ * Get the rescaled value of the image at a specific offset.
+ * @method getRescaledValueAtOffset
+ * @param {Number} offset The offset in the buffer. 
+ * @return {Number} The rescaled value at the desired offset.
  * Warning: No size check...
  */
 dwv.image.Image.prototype.getRescaledValueAtOffset = function( offset )
@@ -262,11 +451,12 @@ dwv.image.Image.prototype.getRescaledValueAtOffset = function( offset )
 };
 
 /**
- * Get the value of the image at a specific coordinate.
- * @param i The X index.
- * @param j The Y index.
- * @param k The Z index.
- * @returns The value at the desired position.
+ * Get the rescaled value of the image at a specific coordinate.
+ * @method getRescaledValue
+ * @param {Number} i The X index.
+ * @param {Number} j The Y index.
+ * @param {Number} k The Z index.
+ * @return {Number} The rescaled value at the desired position.
  * Warning: No size check...
  */
 dwv.image.Image.prototype.getRescaledValue = function( i, j, k )
@@ -276,7 +466,8 @@ dwv.image.Image.prototype.getRescaledValue = function( i, j, k )
 
 /**
  * Calculate the raw image data range.
- * @returns The range {min, max}.
+ * @method calculateDataRange
+ * @return {Object} The range {min, max}.
  */
 dwv.image.Image.prototype.calculateDataRange = function()
 {
@@ -294,7 +485,8 @@ dwv.image.Image.prototype.calculateDataRange = function()
 
 /**
  * Calculate the image data range after rescale.
- * @returns The range {min, max}.
+ * @method getRescaledDataRange
+ * @return {Object} The rescaled data range {min, max}.
  */
 dwv.image.Image.prototype.getRescaledDataRange = function()
 {
@@ -305,7 +497,8 @@ dwv.image.Image.prototype.getRescaledDataRange = function()
 
 /**
  * Calculate the histogram of the image.
- * @returns An array representing the histogram.
+ * @method calculateHistogram
+ * @return {Array} An array representing the histogram.
  */
 dwv.image.Image.prototype.calculateHistogram = function()
 {
@@ -332,9 +525,9 @@ dwv.image.Image.prototype.calculateHistogram = function()
 
 /**
  * Convolute the image with a given 2D kernel.
- * @param weights The weights of the 2D kernel.
- * @returns The convoluted image.
- * 
+ * @method convolute2D
+ * @param {Array} weights The weights of the 2D kernel as a square matrix.
+ * @return {Image} The convoluted image.
  * Note: Uses the raw buffer values.
  */
 dwv.image.Image.prototype.convolute2D = function(weights)
@@ -385,9 +578,9 @@ dwv.image.Image.prototype.convolute2D = function(weights)
 
 /**
  * Transform an image using a specific operator.
- * @param operator The operator to use when transforming.
- * @returns The transformed image.
- * 
+ * @method transform
+ * @param {Function} operator The operator to use when transforming.
+ * @return {Image} The transformed image.
  * Note: Uses the raw buffer values.
  */
 dwv.image.Image.prototype.transform = function(operator)
@@ -403,10 +596,10 @@ dwv.image.Image.prototype.transform = function(operator)
 
 /**
  * Compose this image with another one and using a specific operator.
- * @param rhs The image to compose with.
- * @param operator The operator to use when composing.
- * @returns The composed image.
- * 
+ * @method compose
+ * @param {Image} rhs The image to compose with.
+ * @param {Function} operator The operator to use when composing.
+ * @return {Image} The composed image.
  * Note: Uses the raw buffer values.
  */
 dwv.image.Image.prototype.compose = function(rhs, operator)
@@ -420,3 +613,4 @@ dwv.image.Image.prototype.compose = function(rhs, operator)
     }
     return newImage;
 };
+

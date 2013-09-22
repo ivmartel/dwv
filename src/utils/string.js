@@ -1,10 +1,16 @@
-//! @namespace Main DWV namespace.
+/** 
+ * Utility module.
+ * @module utils
+ */
 var dwv = dwv || {};
-//! @namespace Utils classes and functions.
 dwv.utils = dwv.utils || {};
 
 /**
- * @function Capitalise the first letter of a string.
+ * Capitalise the first letter of a string.
+ * @method capitaliseFirstLetter
+ * @static
+ * @param {String} string The string to capitalise the first letter.
+ * @return {String} The new string.
  */
 dwv.utils.capitaliseFirstLetter = function(string)
 {
@@ -12,7 +18,11 @@ dwv.utils.capitaliseFirstLetter = function(string)
 };
 
 /**
- * @function Clean string.
+ * Clean string: trim and remove ending.
+ * @method cleanString
+ * @static
+ * @param {String} string The string to clean.
+ * @return {String} The cleaned string.
  */
 dwv.utils.cleanString = function(string)
 {
@@ -25,8 +35,13 @@ dwv.utils.cleanString = function(string)
 };
 
 /**
+ * Split string:
  * root?key0=val0&key1=val1 returns [{"key"="key0", "value"="val0"}, {"key"="key1", "value"="val1"}]
  * Returns null if not a query string (no question mark).
+ * @method splitQueryString
+ * @static
+ * @param {String} inputStr The string to split.
+ * @return {String} The splitted string.
  */
 dwv.utils.splitQueryString = function(inputStr)
 {
@@ -55,3 +70,4 @@ dwv.utils.splitQueryString = function(inputStr)
     }
     return result;
 };
+

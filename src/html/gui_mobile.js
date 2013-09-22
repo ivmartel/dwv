@@ -1,6 +1,6 @@
 /** 
  * GUI module.
- * @module dicom
+ * @module gui
  */
 var dwv = dwv || {};
 dwv.gui = dwv.gui || {};
@@ -8,6 +8,7 @@ dwv.gui = dwv.gui || {};
 /**
  * Append the slider HTML.
  * @method getSliderHtml
+ * @static
  */
 dwv.gui.getSliderHtml = function()
 {
@@ -48,6 +49,7 @@ dwv.gui.getSliderHtml = function()
 /**
  * Update the progress bar.
  * @method updateProgress
+ * @static
  * @param {Object} event A ProgressEvent.
  */
 dwv.gui.updateProgress = function(event)

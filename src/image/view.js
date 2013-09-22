@@ -1,52 +1,129 @@
-//! @namespace Main DWV namespace.
+/** 
+ * Image module.
+ * @module image
+ */
 var dwv = dwv || {};
-//! @namespace Image related.
 dwv.image = dwv.image || {};
 
 /**
-* @class View class.
-* @param image The associated image.
-* Need to set the window lookup table once created
-* (either directly or with helper methods). 
-*/
+ * View class.
+ * @class View
+ * @namespace dwv.image
+ * @constructor
+ * @param {Image} image The associated image.
+ * @param {Boolean} isSigned Is the data signed.
+ * Need to set the window lookup table once created
+ * (either directly or with helper methods). 
+ */
 dwv.image.View = function(image, isSigned)
 {
-    // rescale lookup table
+    /**
+     * Rescale lookup table.
+     * @property rescaleLut
+     * @private
+     * @type Rescale
+     */
     var rescaleLut = new dwv.image.lut.Rescale(
         image.getRescaleSlope(), image.getRescaleIntercept() );
+    // initialise it
     rescaleLut.initialise(image.getMeta().BitsStored);
-    // window lookup table
+    
+    /**
+     * Window lookup table.
+     * @property windowLut
+     * @private
+     * @type Window
+     */
     var windowLut = new dwv.image.lut.Window(rescaleLut, isSigned);
-    // window presets
+    
+    /**
+     * Window presets.
+     * @property windowPresets
+     * @private
+     * @type {Object}
+     */
     var windowPresets = null;
-    // color map
+    /**
+     * Color map
+     * @property colorMap
+     * @private
+     * @type {Object}
+     */
     var colorMap = dwv.image.lut.plain;
-    // current position
+    /**
+     * Current position
+     * @property currentPosition
+     * @private
+     * @type {Object}
+     */
     var currentPosition = {"i":0,"j":0,"k":0};
     
-    // Get the associated image.
+    /**
+     * Get the associated image.
+     * @method getImage
+     * @return {Image} The associated image.
+     */ 
     this.getImage = function() { return image; };
-    // Set the associated image.
+    /**
+     * Set the associated image.
+     * @method setImage
+     * @param {Image} inImage The associated image.
+     */ 
     this.setImage = function(inImage) { image = inImage; };
     
-    // Get the rescale LUT of the image.
+    /**
+     * Get the rescale LUT of the image.
+     * @method getRescaleLut
+     * @return {Rescale} The rescale LUT of the image.
+     */ 
     this.getRescaleLut = function() { return rescaleLut; };
-    // Set the rescale LUT of the image.
+    /**
+     * Set the rescale LUT of the image.
+     * @method setRescaleLut
+     * @param {Rescale} lut The rescale LUT of the image.
+     */ 
     this.setRescaleLut = function(lut) { rescaleLut = lut; };
-    // Get the window LUT of the image.
+
+    /**
+     * Get the window LUT of the image.
+     * @method getWindowLut
+     * @return {Window} The window LUT of the image.
+     */ 
     this.getWindowLut = function() { return windowLut; };
-    // Set the window LUT of the image.
+    /**
+     * Set the window LUT of the image.
+     * @method setWindowLut
+     * @param {Window} lut The window LUT of the image.
+     */ 
     this.setWindowLut = function(lut) { windowLut = lut; };
-    // Get the window presets.
+    
+    /**
+     * Get the window presets.
+     * @method getWindowPresets
+     * @return {Object} The window presets.
+     */ 
     this.getWindowPresets = function() { return windowPresets; };
-    // Set the window presets.
+    /**
+     * Set the window presets.
+     * @method setWindowPresets
+     * @param {Object} presets The window presets.
+     */ 
     this.setWindowPresets = function(presets) { 
         windowPresets = presets;
         this.setWindowLevel(presets[0].center, presets[0].width);
     };
-    // Get the color map of the image.
+    
+    /**
+     * Get the color map of the image.
+     * @method getColorMap
+     * @return {Object} The color map of the image.
+     */ 
     this.getColorMap = function() { return colorMap; };
-    // Set the color map of the image.
+    /**
+     * Set the color map of the image.
+     * @method setColorMap
+     * @param {Object} map The color map of the image.
+     */ 
     this.setColorMap = function(map) { 
         colorMap = map;
         // TODO Better handle this...
@@ -56,11 +133,25 @@ dwv.image.View = function(image, isSigned)
             "wc": this.getWindowLut().getCenter(),
             "ww": this.getWindowLut().getWidth() });
     };
-    // Is the data signed data.
+    
+    /**
+     * Is the data signed data.
+     * @method isSigned
+     * @return {Boolean} The signed data flag.
+     */ 
     this.isSigned = function() { return isSigned; };
-    // Get the current position.
+    
+    /**
+     * Get the current position.
+     * @method getCurrentPosition
+     * @return {Object} The current position.
+     */ 
     this.getCurrentPosition = function() { return currentPosition; };
-    // Set the current position. Returns false if not in bounds.
+    /**
+     * Set the current position. Returns false if not in bounds.
+     * @method setCurrentPosition
+     * @param {Object} pos The current position.
+     */ 
     this.setCurrentPosition = function(pos) { 
         if( !image.getSize().isInBounds(pos.i,pos.j,pos.k) ) return false;
         var oldPosition = currentPosition;
@@ -75,19 +166,33 @@ dwv.image.View = function(image, isSigned)
         return true;
     };
     
-    // view listeners
+    /**
+     * Vew listeners
+     * @property listeners
+     * @private
+     * @type Array
+     */
     var listeners = {};
-    // Get the view listeners.
+    /**
+     * Get the view listeners.
+     * @method getListeners
+     * @return {Array} The view listeners.
+     */ 
     this.getListeners = function() { return listeners; };
-    // Set the view listeners.
+    /**
+     * Set the view listeners.
+     * @method setListeners
+     * @param {Array} list The view listeners.
+     */ 
     this.setListeners = function(list) { listeners = list; };
 };
 
 /**
  * Set the view window/level.
- * @param center The window center.
- * @param width The window width.
- * @warning Uses the latest set rescale LUT or the default linear one.
+ * @method setWindowLevel
+ * @param {Number} center The window center.
+ * @param {Number} width The window width.
+ * Warning: uses the latest set rescale LUT or the default linear one.
  */
 dwv.image.View.prototype.setWindowLevel = function( center, width )
 {
@@ -97,7 +202,8 @@ dwv.image.View.prototype.setWindowLevel = function( center, width )
 
 /**
  * Set the image window/level to cover the full data range.
- * @warning Uses the latest set rescale LUT or the default linear one.
+ * @method setWindowLevelMinMax
+ * Warning: uses the latest set rescale LUT or the default linear one.
  */
 dwv.image.View.prototype.setWindowLevelMinMax = function()
 {
@@ -113,7 +219,8 @@ dwv.image.View.prototype.setWindowLevelMinMax = function()
 
 /**
  * Increment the current slice number.
- * Returns false if not in bounds.
+ * @method incrementSliceNb
+ * @return {Boolean} False if not in bounds.
  */
 dwv.image.View.prototype.incrementSliceNb = function()
 {
@@ -125,7 +232,8 @@ dwv.image.View.prototype.incrementSliceNb = function()
 
 /**
  * Decrement the current slice number.
- * Returns false if not in bounds.
+ * @method decrementSliceNb
+ * @return {Boolean} False if not in bounds.
  */
 dwv.image.View.prototype.decrementSliceNb = function()
 {
@@ -137,7 +245,8 @@ dwv.image.View.prototype.decrementSliceNb = function()
 
 /**
  * Clone the image using all meta data and the original data buffer.
- * @returns A full copy of this {dwv.image.Image}.
+ * @method clone
+ * @return {View} A full copy of this {dwv.image.Image}.
  */
 dwv.image.View.prototype.clone = function()
 {
@@ -150,8 +259,9 @@ dwv.image.View.prototype.clone = function()
 
 /**
  * Generate display image data to be given to a canvas.
- * @param array The array to fill in.
- * @param sliceNumber The slice position.
+ * @method generateImageData
+ * @param {Array} array The array to fill in.
+ * @param {Number} sliceNumber The slice position.
  */
 dwv.image.View.prototype.generateImageData = function( array )
 {        
@@ -234,8 +344,9 @@ dwv.image.View.prototype.generateImageData = function( array )
 
 /**
  * Add an event listener on the view.
- * @param type The event type.
- * @param listener The method associated with the provided event type.
+ * @method addEventListener
+ * @param {String} type The event type.
+ * @param {Object} listener The method associated with the provided event type.
  */
 dwv.image.View.prototype.addEventListener = function(type, listener)
 {
@@ -246,8 +357,9 @@ dwv.image.View.prototype.addEventListener = function(type, listener)
 
 /**
  * Remove an event listener on the view.
- * @param type The event type.
- * @param listener The method associated with the provided event type.
+ * @method removeEventListener
+ * @param {String} type The event type.
+ * @param {Object} listener The method associated with the provided event type.
  */
 dwv.image.View.prototype.removeEventListener = function(type, listener)
 {
@@ -262,7 +374,8 @@ dwv.image.View.prototype.removeEventListener = function(type, listener)
 
 /**
  * Fire an event: call all associated listeners.
- * @param event The event to fire.
+ * @method fireEvent
+ * @param {Object} event The event to fire.
  */
 dwv.image.View.prototype.fireEvent = function(event)
 {

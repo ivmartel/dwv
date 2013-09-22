@@ -1,6 +1,6 @@
 /** 
  * GUI module.
- * @module dicom
+ * @module gui
  */
 var dwv = dwv || {};
 dwv.gui = dwv.gui || {};
@@ -8,6 +8,7 @@ dwv.gui = dwv.gui || {};
 /**
  * Handle window/level change.
  * @method onChangeWindowLevelPreset
+ * @namespace dwv.gui
  * @static
  * @param {Object} event The change event.
  */

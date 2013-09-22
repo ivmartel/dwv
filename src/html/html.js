@@ -6,9 +6,11 @@ var dwv = dwv || {};
 dwv.html = dwv.html || {};
 
 /**
- * @method Append a cell to a given row.
- * @param row The row to append the cell to.
- * @param text The text of the cell.
+ * Append a cell to a given row.
+ * @method appendCell
+ * @static
+ * @param {Object} row The row to append the cell to.
+ * @param {String} text The text of the cell.
  */
 dwv.html.appendCell = function(row, text)
 {
@@ -17,9 +19,11 @@ dwv.html.appendCell = function(row, text)
 };
 
 /**
- * @function Append a header cell to a given row.
- * @param row The row to append the header cell to.
- * @param text The text of the header cell.
+ * Append a header cell to a given row.
+ * @method appendHCell
+ * @static
+ * @param {Object} row The row to append the header cell to.
+ * @param {String} text The text of the header cell.
  */
 dwv.html.appendHCell = function(row, text)
 {
@@ -31,7 +35,14 @@ dwv.html.appendHCell = function(row, text)
 };
 
 /**
- * @function
+ * Append a row to an array.
+ * @method appendRowForArray
+ * @static
+ * @param {} table
+ * @param {} input
+ * @param {} level
+ * @param {} maxLevel
+ * @param {} rowHeader
  */
 dwv.html.appendRowForArray = function(table, input, level, maxLevel, rowHeader)
 {
@@ -57,7 +68,14 @@ dwv.html.appendRowForArray = function(table, input, level, maxLevel, rowHeader)
 };
 
 /**
- * @function
+ * Append a row to an object.
+ * @method appendRowForObject
+ * @static
+ * @param {} table
+ * @param {} input
+ * @param {} level
+ * @param {} maxLevel
+ * @param {} rowHeader
  */
 dwv.html.appendRowForObject = function(table, input, level, maxLevel, rowHeader)
 {
@@ -99,7 +117,14 @@ dwv.html.appendRowForObject = function(table, input, level, maxLevel, rowHeader)
 };
 
 /**
- * @function
+ * Append a row to an object or an array.
+ * @method appendRow
+ * @static
+ * @param {} table
+ * @param {} input
+ * @param {} level
+ * @param {} maxLevel
+ * @param {} rowHeader
  */
 dwv.html.appendRow = function(table, input, level, maxLevel, rowHeader)
 {
@@ -117,8 +142,11 @@ dwv.html.appendRow = function(table, input, level, maxLevel, rowHeader)
 };
 
 /**
- * @function Converts the input to an HTML table.
- * @input input Allowed types are: array, array of object, object.
+ * Converts the input to an HTML table.
+ * @method toTable
+ * @static
+ * @input {Mixed} input Allowed types are: array, array of object, object.
+ * @return {Object} The created HTML table.
  * @warning Null is interpreted differently in browsers, firefox will not display it.
  */
 dwv.html.toTable = function(input)
@@ -129,7 +157,11 @@ dwv.html.toTable = function(input)
 };
 
 /**
- * @function
+ * Get an HTML search form.
+ * @method getHtmlSearchForm
+ * @static
+ * @param {Object} htmlTableToSearch The table to do the search on.
+ * @return {Object} The HTML search form.
  */
 dwv.html.getHtmlSearchForm = function(htmlTableToSearch)
 {
@@ -145,9 +177,12 @@ dwv.html.getHtmlSearchForm = function(htmlTableToSearch)
 };
 
 /**
- * @function
- * @param term
- * @param table
+ * Filter a table with a given parameter: sets the display css of rows to
+ * true or false if it contains the term.
+ * @method filterTable
+ * @static
+ * @param {String} term The term to filter the table with.
+ * @param {Object} table The table to filter.
  */
 dwv.html.filterTable = function(term, table) {
     // de-highlight
@@ -175,10 +210,12 @@ dwv.html.filterTable = function(term, table) {
 };
 
 /**
- * @function Transform back each
- * <span>preText <span class="highlighted">term</span> postText</span>
- * into its original preText term postText
- * @param container The container to de-highlight.
+ * Transform back each
+ * 'preText <span class="highlighted">term</span> postText'
+ * into its original 'preText term postText'.
+ * @method dehighlight
+ * @static
+ * @param {Object} container The container to de-highlight.
  */
 dwv.html.dehighlight = function(container) {
     for (var i = 0; i < container.childNodes.length; i++) {
@@ -201,11 +238,13 @@ dwv.html.dehighlight = function(container) {
 };
 
 /**
- * @function Create a
- * <span>preText <span class="highlighted">term</span> postText</span>
- * around each search term
- * @param term The term to highlight.
- * @param container The container where to highlight the term.
+ * Create a
+ * 'preText <span class="highlighted">term</span> postText'
+ * around each search term.
+ * @method highlight
+ * @static
+ * @param {String} term The term to highlight.
+ * @param {Object} container The container where to highlight the term.
  */
 dwv.html.highlight = function(term, container) {
     for (var i = 0; i < container.childNodes.length; i++) {
@@ -243,7 +282,11 @@ dwv.html.highlight = function(term, container) {
 };
 
 /**
- * @function
+ * Highlight a HTML node.
+ * @method createHighlightNode
+ * @static
+ * @param {Object} child The child to highlight.
+ * @return {Object} The created HTML node.
  */
 dwv.html.createHighlightNode = function(child) {
     var node = document.createElement('span');
@@ -254,9 +297,10 @@ dwv.html.createHighlightNode = function(child) {
 };
 
 /**
- * @function Remove all children of a node.
- * @param nodeId The id of the node to delete.
- * @param parentId The id of the parent of the node to delete.
+ * Remove all children of a HTML node.
+ * @method cleanNode
+ * @static
+ * @param {Object} node The node to remove kids.
  */
 dwv.html.cleanNode = function(node) {
     // remove its children
@@ -266,9 +310,9 @@ dwv.html.cleanNode = function(node) {
 };
 
 /**
- * @function Remove all children of a node and then remove it from its parent.
- * @param nodeId The id of the node to delete.
- * @param parentId The id of the parent of the node to delete.
+ * Remove a HTML node and all its children.
+ * @method removeNode
+ * @param {Number} nodeId The id of the node to delete.
  */
 dwv.html.removeNode = function(nodeId) {
     // find the node
@@ -283,12 +327,14 @@ dwv.html.removeNode = function(nodeId) {
 };
 
 /**
- * @function Create a HTML select from an input array of options.
+ * Create a HTML select from an input array of options.
  * The values of the options are the name of the option made lower case.
  * It is left to the user to set the 'onchange' method of the select.
- * @param name The name of the HTML select.
- * @param list The list of options of the HTML select.
- * @return The created HTML select.
+ * @method createHtmlSelect
+ * @static
+ * @param {String} name The name of the HTML select.
+ * @param {Mixed} list The list of options of the HTML select.
+ * @return {Object} The created HTML select.
  */
 dwv.html.createHtmlSelect = function(name, list) {
     // select
@@ -324,6 +370,13 @@ dwv.html.createHtmlSelect = function(name, list) {
     return select;
 };
 
+/**
+ * Get a list of parameters from an input URI.
+ * @method getUriParam
+ * @static
+ * @param {String } uri The URI to decode.
+ * @return {Array} The array of parameters.
+ */
 dwv.html.getUriParam = function(uri)
 {
     var inputUri = uri || window.location.href;
@@ -397,6 +450,12 @@ dwv.html.getUriParam = function(uri)
     return val;
 };
 
+/**
+ * Toggle the display of an element.
+ * @method toggleDisplay
+ * @static
+ * @param {Number} id The id of the element to toggle its display.
+ */
 dwv.html.toggleDisplay = function(id)
 {
     if( document.getElementById(id) )
@@ -408,8 +467,10 @@ dwv.html.toggleDisplay = function(id)
 };
 
 /**
- * Browser checks to see if it can run dwv...
+ * Browser checks to see if it can run dwv. Throws an error if not.
  * TODO Maybe use http://modernizr.com/.
+ * @method checkBrowser
+ * @static
  */ 
 dwv.html.checkBrowser = function()
 {
@@ -430,6 +491,11 @@ dwv.html.checkBrowser = function()
     // Check typed array
     if( !window.Uint8Array || !window.Uint16Array ) {
         message = "The Typed arrays are not supported in this browser. ";
+        alert(message+appnorun);
+        throw new Error(message);
+    }
+    if( !window.Uint8ClampedArray ) {
+        message = "The Uint8ClampedArray is not supported in this browser. ";
         alert(message+appnorun);
         throw new Error(message);
     }
