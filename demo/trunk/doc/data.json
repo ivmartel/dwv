@@ -1512,6 +1512,7 @@
             "description": "Handle window/level change.",
             "itemtype": "method",
             "name": "onChangeWindowLevelPreset",
+            "static": 1,
             "params": [
                 {
                     "name": "event",
@@ -1524,10 +1525,11 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 18,
+            "line": 19,
             "description": "Handle colour map change.",
             "itemtype": "method",
             "name": "onChangeColourMap",
+            "static": 1,
             "params": [
                 {
                     "name": "event",
@@ -1540,10 +1542,11 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 28,
+            "line": 30,
             "description": "Handle tool change.",
             "itemtype": "method",
             "name": "onChangeTool",
+            "static": 1,
             "params": [
                 {
                     "name": "event",
@@ -1556,10 +1559,11 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 38,
+            "line": 41,
             "description": "Handle filter change.",
             "itemtype": "method",
             "name": "onChangeFilter",
+            "static": 1,
             "params": [
                 {
                     "name": "event",
@@ -1572,10 +1576,11 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 48,
+            "line": 52,
             "description": "Handle shape change.",
             "itemtype": "method",
             "name": "onChangeShape",
+            "static": 1,
             "params": [
                 {
                     "name": "event",
@@ -1588,10 +1593,11 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 58,
+            "line": 63,
             "description": "Handle line color change.",
             "itemtype": "method",
             "name": "onChangeLineColour",
+            "static": 1,
             "params": [
                 {
                     "name": "event",
@@ -1604,172 +1610,191 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 68,
+            "line": 74,
             "description": "Append the toolbox HTML to the page.",
             "itemtype": "method",
             "name": "appendToolboxHtml",
+            "static": 1,
             "class": "dwv.html.Layer",
             "module": "dicom"
         },
         {
             "file": "src/html/gui.js",
-            "line": 98,
+            "line": 105,
             "description": "Append the window/level HTML to the page.",
             "itemtype": "method",
             "name": "appendWindowLevelHtml",
+            "static": 1,
             "class": "dwv.html.Layer",
             "module": "dicom"
         },
         {
             "file": "src/html/gui.js",
-            "line": 145,
+            "line": 153,
             "description": "Clear the window/level HTML.",
             "itemtype": "method",
             "name": "clearWindowLevelHtml",
+            "static": 1,
             "class": "dwv.html.Layer",
             "module": "dicom"
         },
         {
             "file": "src/html/gui.js",
-            "line": 155,
+            "line": 164,
             "description": "Append the draw HTML to the page.",
             "itemtype": "method",
             "name": "appendDrawHtml",
-            "class": "dwv.html.Layer",
-            "module": "dicom"
-        },
-        {
-            "file": "src/html/gui.js",
-            "line": 199,
-            "description": "Clear the draw HTML.",
-            "itemtype": "method",
-            "name": "clearDrawHtml",
+            "static": 1,
             "class": "dwv.html.Layer",
             "module": "dicom"
         },
         {
             "file": "src/html/gui.js",
             "line": 209,
+            "description": "Clear the draw HTML.",
+            "itemtype": "method",
+            "name": "clearDrawHtml",
+            "static": 1,
+            "class": "dwv.html.Layer",
+            "module": "dicom"
+        },
+        {
+            "file": "src/html/gui.js",
+            "line": 220,
             "description": "Append the color chooser HTML to the page.",
             "itemtype": "method",
             "name": "appendLivewireHtml",
+            "static": 1,
             "class": "dwv.html.Layer",
             "module": "dicom"
         },
         {
             "file": "src/html/gui.js",
-            "line": 236,
+            "line": 248,
             "description": "Clear the color chooser HTML.",
             "itemtype": "method",
             "name": "clearDrawHtml",
+            "static": 1,
             "class": "dwv.html.Layer",
             "module": "dicom"
         },
         {
             "file": "src/html/gui.js",
-            "line": 245,
+            "line": 258,
             "description": "Append the filter HTML to the page.",
             "itemtype": "method",
             "name": "appendLivewireHtml",
+            "static": 1,
             "class": "dwv.html.Layer",
             "module": "dicom"
         },
         {
             "file": "src/html/gui.js",
-            "line": 272,
+            "line": 286,
             "description": "Clear the filter HTML.",
             "itemtype": "method",
             "name": "clearDrawHtml",
+            "static": 1,
             "class": "dwv.html.Layer",
             "module": "dicom"
         },
         {
             "file": "src/html/gui.js",
-            "line": 284,
+            "line": 299,
             "description": "Append the threshold filter HTML to the page.",
             "itemtype": "method",
             "name": "appendThresholdHtml",
+            "static": 1,
             "class": "dwv.html.Layer",
             "module": "dicom"
         },
         {
             "file": "src/html/gui.js",
-            "line": 303,
+            "line": 319,
             "description": "Clear the treshold filter HTML.",
             "itemtype": "method",
             "name": "clearDrawHtml",
+            "static": 1,
             "class": "dwv.html.Layer",
             "module": "dicom"
         },
         {
             "file": "src/html/gui.js",
-            "line": 312,
+            "line": 329,
             "description": "Append the sharpen filter HTML to the page.",
             "itemtype": "method",
             "name": "appendSharpenHtml",
+            "static": 1,
             "class": "dwv.html.Layer",
             "module": "dicom"
         },
         {
             "file": "src/html/gui.js",
-            "line": 336,
+            "line": 354,
             "description": "Clear the sharpen filter HTML.",
             "itemtype": "method",
             "name": "clearSharpenHtml",
+            "static": 1,
             "class": "dwv.html.Layer",
             "module": "dicom"
         },
         {
             "file": "src/html/gui.js",
-            "line": 345,
+            "line": 364,
             "description": "Append the sobel filter HTML to the page.",
             "itemtype": "method",
             "name": "appendSharpenHtml",
+            "static": 1,
             "class": "dwv.html.Layer",
             "module": "dicom"
         },
         {
             "file": "src/html/gui.js",
-            "line": 369,
+            "line": 389,
             "description": "Clear the sobel filter HTML.",
             "itemtype": "method",
             "name": "clearSharpenHtml",
+            "static": 1,
             "class": "dwv.html.Layer",
             "module": "dicom"
         },
         {
             "file": "src/html/gui.js",
-            "line": 378,
+            "line": 399,
             "description": "Append the zoom HTML to the page.",
             "itemtype": "method",
             "name": "appendZoomHtml",
+            "static": 1,
             "class": "dwv.html.Layer",
             "module": "dicom"
         },
         {
             "file": "src/html/gui.js",
-            "line": 404,
+            "line": 426,
             "description": "Clear the zoom filter HTML.",
             "itemtype": "method",
             "name": "clearZoomHtml",
+            "static": 1,
             "class": "dwv.html.Layer",
             "module": "dicom"
         },
         {
             "file": "src/html/gui.js",
-            "line": 413,
+            "line": 436,
             "description": "Append the undo HTML to the page.",
             "itemtype": "method",
             "name": "appendUndoHtml",
+            "static": 1,
             "class": "dwv.html.Layer",
             "module": "dicom"
         },
         {
             "file": "src/html/gui.js",
-            "line": 437,
+            "line": 461,
             "description": "Add a command to the undo HTML.",
             "itemtype": "method",
             "name": "addCommandToUndoHtml",
+            "static": 1,
             "params": [
                 {
                     "name": "commandName",
@@ -1782,10 +1807,11 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 463,
+            "line": 488,
             "description": "Enable the last command of the undo HTML.",
             "itemtype": "method",
             "name": "enableInUndoHtml",
+            "static": 1,
             "params": [
                 {
                     "name": "enable",
