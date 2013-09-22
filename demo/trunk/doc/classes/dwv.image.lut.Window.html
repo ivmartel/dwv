@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>dwv.dicom.DicomParser - dwv</title>
+    <title>dwv.image.lut.Window - dwv</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
     <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
@@ -174,7 +174,7 @@ Main application.</a></li>
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-                        <h1>dwv.dicom.DicomParser Class</h1>
+                        <h1>dwv.image.lut.Window Class</h1>
 <div class="box meta">
     
 
@@ -182,13 +182,13 @@ Main application.</a></li>
 
     
         <div class="foundat">
-            Defined in: <a href="../files/src_dicom_dicomParser.js.html#l142"><code>src&#x2F;dicom&#x2F;dicomParser.js:142</code></a>
+            Defined in: <a href="../files/src_image_luts.js.html#l74"><code>src&#x2F;image&#x2F;luts.js:74</code></a>
         </div>
     
 
     
         
-            Module: <a href="../modules/dicom.html">dicom</a>
+            Module: <a href="../modules/image.html">image</a>
         
     
 
@@ -198,18 +198,34 @@ Main application.</a></li>
 
 
 <div class="box intro">
-    <p>DicomParser class.</p>
+    <p>Window LUT class.</p>
 
 </div>
 
 
     <div class="constructor">
         <h2>Constructor</h2>
-        <div id="method_dwv.dicom.DicomParser" class="method item">
-    <h3 class="name"><code>dwv.dicom.DicomParser</code></h3>
+        <div id="method_dwv.image.lut.Window" class="method item">
+    <h3 class="name"><code>dwv.image.lut.Window</code></h3>
 
     
-        <span class="paren">()</span>
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>rescaleLut_</code>
+                    
+                </li>
+            
+                <li class="arg">
+                    
+                        <code>isSigned_</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
     
 
     
@@ -237,7 +253,7 @@ Main application.</a></li>
             
         
         
-        <a href="../files/src_dicom_dicomParser.js.html#l142"><code>src&#x2F;dicom&#x2F;dicomParser.js:142</code></a>
+        <a href="../files/src_image_luts.js.html#l74"><code>src&#x2F;image&#x2F;luts.js:74</code></a>
         
         </p>
 
@@ -251,6 +267,46 @@ Main application.</a></li>
         
     </div>
 
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">rescaleLut_</code>
+                        <span class="type">Number</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The associated rescale LUT.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+                <li class="param">
+                    
+                        <code class="param-name">isSigned_</code>
+                        <span class="type">Number</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>Flag to know if the data is signed.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
     
 
     
@@ -286,42 +342,42 @@ Main application.</a></li>
                     <ul class="index-list methods">
                         
                             <li class="index-item method">
-                                <a href="#method_appendDicomElement">appendDicomElement</a>
+                                <a href="#method_getCenter">getCenter</a>
 
                                 
                                 
                             </li>
                         
                             <li class="index-item method">
-                                <a href="#method_createImage">createImage</a>
+                                <a href="#method_getLength">getLength</a>
 
                                 
                                 
                             </li>
                         
                             <li class="index-item method">
-                                <a href="#method_getPixelBuffer">getPixelBuffer</a>
+                                <a href="#method_getValue">getValue</a>
 
                                 
                                 
                             </li>
                         
                             <li class="index-item method">
-                                <a href="#method_parse">parse</a>
+                                <a href="#method_getWidth">getWidth</a>
 
                                 
                                 
                             </li>
                         
                             <li class="index-item method">
-                                <a href="#method_readDataElement">readDataElement</a>
+                                <a href="#method_isSigned">isSigned</a>
 
                                 
                                 
                             </li>
                         
                             <li class="index-item method">
-                                <a href="#method_readTag">readTag</a>
+                                <a href="#method_setCenterAndWidth">setCenterAndWidth</a>
 
                                 
                                 
@@ -337,29 +393,22 @@ Main application.</a></li>
 
                     <ul class="index-list properties">
                         
-                            <li class="index-item property">
-                                <a href="#property_dicomElements">dicomElements</a>
+                            <li class="index-item property private">
+                                <a href="#property_center_">center_</a>
 
                                 
                                 
                             </li>
                         
-                            <li class="index-item property">
-                                <a href="#property_dict">dict</a>
+                            <li class="index-item property private">
+                                <a href="#property_rescaleLut_">rescaleLut_</a>
 
                                 
                                 
                             </li>
                         
-                            <li class="index-item property">
-                                <a href="#property_numberOfItems">numberOfItems</a>
-
-                                
-                                
-                            </li>
-                        
-                            <li class="index-item property">
-                                <a href="#property_pixelBuffer">pixelBuffer</a>
+                            <li class="index-item property private">
+                                <a href="#property_width_">width_</a>
 
                                 
                                 
@@ -379,100 +428,8 @@ Main application.</a></li>
                 <h2 class="off-left">Methods</h2>
 
                 
-                    <div id="method_appendDicomElement" class="method item">
-    <h3 class="name"><code>appendDicomElement</code></h3>
-
-    
-        <div class="args">
-            <span class="paren">(</span><ul class="args-list inline commas">
-            
-                <li class="arg">
-                    
-                        <code>element</code>
-                    
-                </li>
-            
-            </ul><span class="paren">)</span>
-        </div>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/src_dicom_dicomParser.js.html#l186"><code>src&#x2F;dicom&#x2F;dicomParser.js:186</code></a>
-        
-        </p>
-
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        <p>Append a DICOM element to the dicomElements member object.
-Allows for easy retrieval of DICOM tag values from the tag name.
-If tags have same name (for the &#39;unknown&#39; and private tags cases), a number is appended
-making the name unique.</p>
-
-    </div>
-
-    
-        <div class="params">
-            <h4>Parameters:</h4>
-
-            <ul class="params-list">
-            
-                <li class="param">
-                    
-                        <code class="param-name">element</code>
-                        <span class="type">Object</span>
-                    
-
-                    
-
-                    <div class="param-description">
-                        <p>The element to add.</p>
-
-                    </div>
-
-                    
-                </li>
-            
-            </ul>
-        </div>
-    
-
-    
-
-    
-</div>
-
-                
-                    <div id="method_createImage" class="method item">
-    <h3 class="name"><code>createImage</code></h3>
+                    <div id="method_getCenter" class="method item">
+    <h3 class="name"><code>getCenter</code></h3>
 
     
         <span class="paren">()</span>
@@ -480,7 +437,7 @@ making the name unique.</p>
 
     
         <span class="returns-inline">
-            <span class="type">View</span>
+            <span class="type">Number</span>
         </span>
     
 
@@ -507,7 +464,7 @@ making the name unique.</p>
             
         
         
-        <a href="../files/src_dicom_dicomParser.js.html#l506"><code>src&#x2F;dicom&#x2F;dicomParser.js:506</code></a>
+        <a href="../files/src_image_luts.js.html#l115"><code>src&#x2F;image&#x2F;luts.js:115</code></a>
         
         </p>
 
@@ -518,7 +475,7 @@ making the name unique.</p>
     </div>
 
     <div class="description">
-        <p>Get an Image object from the read DICOM file.</p>
+        <p>Get the window center.</p>
 
     </div>
 
@@ -531,9 +488,9 @@ making the name unique.</p>
             <div class="returns-description">
                 
                     
-                        <span class="type">View</span>:
+                        <span class="type">Number</span>:
                     
-                    <p>A new Image.</p>
+                    <p>The window center.</p>
 
                 
             </div>
@@ -544,8 +501,8 @@ making the name unique.</p>
 </div>
 
                 
-                    <div id="method_getPixelBuffer" class="method item">
-    <h3 class="name"><code>getPixelBuffer</code></h3>
+                    <div id="method_getLength" class="method item">
+    <h3 class="name"><code>getLength</code></h3>
 
     
         <span class="paren">()</span>
@@ -553,7 +510,7 @@ making the name unique.</p>
 
     
         <span class="returns-inline">
-            <span class="type">Array</span>
+            <span class="type">Number</span>
         </span>
     
 
@@ -580,7 +537,7 @@ making the name unique.</p>
             
         
         
-        <a href="../files/src_dicom_dicomParser.js.html#l176"><code>src&#x2F;dicom&#x2F;dicomParser.js:176</code></a>
+        <a href="../files/src_image_luts.js.html#l160"><code>src&#x2F;image&#x2F;luts.js:160</code></a>
         
         </p>
 
@@ -591,7 +548,7 @@ making the name unique.</p>
     </div>
 
     <div class="description">
-        <p>Get the DICOM data pixel buffer.</p>
+        <p>Get the length of the LUT array.</p>
 
     </div>
 
@@ -604,9 +561,9 @@ making the name unique.</p>
             <div class="returns-description">
                 
                     
-                        <span class="type">Array</span>:
+                        <span class="type">Number</span>:
                     
-                    <p>The pixel buffer.</p>
+                    <p>The length of the LUT array.</p>
 
                 
             </div>
@@ -617,128 +574,16 @@ making the name unique.</p>
 </div>
 
                 
-                    <div id="method_parse" class="method item">
-    <h3 class="name"><code>parse</code></h3>
+                    <div id="method_getValue" class="method item">
+    <h3 class="name"><code>getValue</code></h3>
 
     
-        <div class="args">
-            <span class="paren">(</span><ul class="args-list inline commas">
-            
-                <li class="arg">
-                    
-                        <code>buffer</code>
-                    
-                </li>
-            
-            </ul><span class="paren">)</span>
-        </div>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/src_dicom_dicomParser.js.html#l332"><code>src&#x2F;dicom&#x2F;dicomParser.js:332</code></a>
-        
-        </p>
-
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        <p>Parse the complete DICOM file (given as input to the class).
-Fills in the member object &#39;dicomElements&#39;.</p>
-
-    </div>
-
-    
-        <div class="params">
-            <h4>Parameters:</h4>
-
-            <ul class="params-list">
-            
-                <li class="param">
-                    
-                        <code class="param-name">buffer</code>
-                        <span class="type">Object</span>
-                    
-
-                    
-
-                    <div class="param-description">
-                        <p>The input array buffer.</p>
-
-                    </div>
-
-                    
-                </li>
-            
-            </ul>
-        </div>
-    
-
-    
-
-    
-</div>
-
-                
-                    <div id="method_readDataElement" class="method item">
-    <h3 class="name"><code>readDataElement</code></h3>
-
-    
-        <div class="args">
-            <span class="paren">(</span><ul class="args-list inline commas">
-            
-                <li class="arg">
-                    
-                        <code>reader</code>
-                    
-                </li>
-            
-                <li class="arg">
-                    
-                        <code>offset</code>
-                    
-                </li>
-            
-                <li class="arg">
-                    
-                        <code>implicit</code>
-                    
-                </li>
-            
-            </ul><span class="paren">)</span>
-        </div>
+        <span class="paren">()</span>
     
 
     
         <span class="returns-inline">
-            <span class="type">Object</span>
+            <span class="type">Number</span>
         </span>
     
 
@@ -765,7 +610,7 @@ Fills in the member object &#39;dicomElements&#39;.</p>
             
         
         
-        <a href="../files/src_dicom_dicomParser.js.html#l239"><code>src&#x2F;dicom&#x2F;dicomParser.js:239</code></a>
+        <a href="../files/src_image_luts.js.html#l167"><code>src&#x2F;image&#x2F;luts.js:167</code></a>
         
         </p>
 
@@ -776,66 +621,10 @@ Fills in the member object &#39;dicomElements&#39;.</p>
     </div>
 
     <div class="description">
-        <p>Read a DICOM data element.</p>
+        <p>Get the value of the LUT at the given offset.</p>
 
     </div>
 
-    
-        <div class="params">
-            <h4>Parameters:</h4>
-
-            <ul class="params-list">
-            
-                <li class="param">
-                    
-                        <code class="param-name">reader</code>
-                        <span class="type">Object</span>
-                    
-
-                    
-
-                    <div class="param-description">
-                        <p>The raw data reader.</p>
-
-                    </div>
-
-                    
-                </li>
-            
-                <li class="param">
-                    
-                        <code class="param-name">offset</code>
-                        <span class="type">Object</span>
-                    
-
-                    
-
-                    <div class="param-description">
-                        <p>The offset where to start to read.</p>
-
-                    </div>
-
-                    
-                </li>
-            
-                <li class="param">
-                    
-                        <code class="param-name">implicit</code>
-                        <span class="type">Object</span>
-                    
-
-                    
-
-                    <div class="param-description">
-                        <p>Is the DICOM VR implicit?</p>
-
-                    </div>
-
-                    
-                </li>
-            
-            </ul>
-        </div>
     
 
     
@@ -845,9 +634,9 @@ Fills in the member object &#39;dicomElements&#39;.</p>
             <div class="returns-description">
                 
                     
-                        <span class="type">Object</span>:
+                        <span class="type">Number</span>:
                     
-                    <p>An object containing the element &#39;tag&#39;, &#39;vl&#39;, &#39;vr&#39;, &#39;data&#39; and &#39;offset&#39;.</p>
+                    <p>The value of the LUT at the given offset.</p>
 
                 
             </div>
@@ -858,32 +647,16 @@ Fills in the member object &#39;dicomElements&#39;.</p>
 </div>
 
                 
-                    <div id="method_readTag" class="method item">
-    <h3 class="name"><code>readTag</code></h3>
+                    <div id="method_getWidth" class="method item">
+    <h3 class="name"><code>getWidth</code></h3>
 
     
-        <div class="args">
-            <span class="paren">(</span><ul class="args-list inline commas">
-            
-                <li class="arg">
-                    
-                        <code>reader</code>
-                    
-                </li>
-            
-                <li class="arg">
-                    
-                        <code>offset</code>
-                    
-                </li>
-            
-            </ul><span class="paren">)</span>
-        </div>
+        <span class="paren">()</span>
     
 
     
         <span class="returns-inline">
-            <span class="type"></span>
+            <span class="type">Number</span>
         </span>
     
 
@@ -910,7 +683,7 @@ Fills in the member object &#39;dicomElements&#39;.</p>
             
         
         
-        <a href="../files/src_dicom_dicomParser.js.html#l215"><code>src&#x2F;dicom&#x2F;dicomParser.js:215</code></a>
+        <a href="../files/src_image_luts.js.html#l121"><code>src&#x2F;image&#x2F;luts.js:121</code></a>
         
         </p>
 
@@ -921,7 +694,165 @@ Fills in the member object &#39;dicomElements&#39;.</p>
     </div>
 
     <div class="description">
-        <p>Read a DICOM tag.</p>
+        <p>Get the window width.</p>
+
+    </div>
+
+    
+
+    
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                
+                    
+                        <span class="type">Number</span>:
+                    
+                    <p>The window width.</p>
+
+                
+            </div>
+        </div>
+    
+
+    
+</div>
+
+                
+                    <div id="method_isSigned" class="method item">
+    <h3 class="name"><code>isSigned</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+        <span class="returns-inline">
+            <span class="type">Boolean</span>
+        </span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_image_luts.js.html#l127"><code>src&#x2F;image&#x2F;luts.js:127</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Get the signed flag.</p>
+
+    </div>
+
+    
+
+    
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                
+                    
+                        <span class="type">Boolean</span>:
+                    
+                    <p>The signed flag.</p>
+
+                
+            </div>
+        </div>
+    
+
+    
+</div>
+
+                
+                    <div id="method_setCenterAndWidth" class="method item">
+    <h3 class="name"><code>setCenterAndWidth</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>center</code>
+                    
+                </li>
+            
+                <li class="arg">
+                    
+                        <code>width</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_image_luts.js.html#l134"><code>src&#x2F;image&#x2F;luts.js:134</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Set the window center and width.</p>
 
     </div>
 
@@ -933,14 +864,14 @@ Fills in the member object &#39;dicomElements&#39;.</p>
             
                 <li class="param">
                     
-                        <code class="param-name">reader</code>
-                        <span class="type">Object</span>
+                        <code class="param-name">center</code>
+                        <span class="type">Number</span>
                     
 
                     
 
                     <div class="param-description">
-                        <p>The raw data reader.</p>
+                        <p>The window center.</p>
 
                     </div>
 
@@ -949,14 +880,14 @@ Fills in the member object &#39;dicomElements&#39;.</p>
             
                 <li class="param">
                     
-                        <code class="param-name">offset</code>
-                        <span class="type">Object</span>
+                        <code class="param-name">width</code>
+                        <span class="type">Number</span>
                     
 
                     
 
                     <div class="param-description">
-                        <p>The offset where to start to read.</p>
+                        <p>The window width.</p>
 
                     </div>
 
@@ -967,18 +898,6 @@ Fills in the member object &#39;dicomElements&#39;.</p>
         </div>
     
 
-    
-        <div class="returns">
-            <h4>Returns:</h4>
-
-            <div class="returns-description">
-                
-                    
-                    <p>An object containing the tags &#39;group&#39;, &#39;element&#39; and &#39;name&#39;.</p>
-
-                
-            </div>
-        </div>
     
 
     
@@ -993,103 +912,15 @@ Fills in the member object &#39;dicomElements&#39;.</p>
                 <h2 class="off-left">Properties</h2>
 
                 
-                    <div id="property_dicomElements" class="property item">
-    <h3 class="name"><code>dicomElements</code></h3>
-    <span class="type">Array</span>
-
-    
-
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/src_dicom_dicomParser.js.html#l150"><code>src&#x2F;dicom&#x2F;dicomParser.js:150</code></a>
-        
-        </p>
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        <p>The list of DICOM elements.</p>
-
-    </div>
-
-    
-
-    
-
-    
-</div>
-
-                
-                    <div id="property_dict" class="property item">
-    <h3 class="name"><code>dict</code></h3>
-    <span class="type">Dictionary</span>
-
-    
-
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/src_dicom_dicomParser.js.html#l162"><code>src&#x2F;dicom&#x2F;dicomParser.js:162</code></a>
-        
-        </p>
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        <p>The DICOM dictionary used to find tag names.</p>
-
-    </div>
-
-    
-
-    
-
-    
-</div>
-
-                
-                    <div id="property_numberOfItems" class="property item">
-    <h3 class="name"><code>numberOfItems</code></h3>
+                    <div id="property_center_" class="property item private">
+    <h3 class="name"><code>center_</code></h3>
     <span class="type">Number</span>
 
     
 
     
+        <span class="flag private">private</span>
+    
 
     
 
@@ -1106,7 +937,7 @@ Fills in the member object &#39;dicomElements&#39;.</p>
             
         
         
-        <a href="../files/src_dicom_dicomParser.js.html#l156"><code>src&#x2F;dicom&#x2F;dicomParser.js:156</code></a>
+        <a href="../files/src_image_luts.js.html#l100"><code>src&#x2F;image&#x2F;luts.js:100</code></a>
         
         </p>
 
@@ -1116,7 +947,7 @@ Fills in the member object &#39;dicomElements&#39;.</p>
     </div>
 
     <div class="description">
-        <p>The number of DICOM Items.</p>
+        <p>The window center.</p>
 
     </div>
 
@@ -1128,12 +959,14 @@ Fills in the member object &#39;dicomElements&#39;.</p>
 </div>
 
                 
-                    <div id="property_pixelBuffer" class="property item">
-    <h3 class="name"><code>pixelBuffer</code></h3>
+                    <div id="property_rescaleLut_" class="property item private">
+    <h3 class="name"><code>rescaleLut_</code></h3>
     <span class="type">Array</span>
 
     
 
+    
+        <span class="flag private">private</span>
     
 
     
@@ -1151,7 +984,7 @@ Fills in the member object &#39;dicomElements&#39;.</p>
             
         
         
-        <a href="../files/src_dicom_dicomParser.js.html#l168"><code>src&#x2F;dicom&#x2F;dicomParser.js:168</code></a>
+        <a href="../files/src_image_luts.js.html#l84"><code>src&#x2F;image&#x2F;luts.js:84</code></a>
         
         </p>
 
@@ -1161,7 +994,55 @@ Fills in the member object &#39;dicomElements&#39;.</p>
     </div>
 
     <div class="description">
-        <p>The pixel buffer.</p>
+        <p>The internal array: Uint8ClampedArray clamps between 0 and 255.
+(not supported on travis yet... using basic array, be sure not to overflow!)</p>
+
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="property_width_" class="property item private">
+    <h3 class="name"><code>width_</code></h3>
+    <span class="type">Number</span>
+
+    
+
+    
+        <span class="flag private">private</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_image_luts.js.html#l107"><code>src&#x2F;image&#x2F;luts.js:107</code></a>
+        
+        </p>
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>The window width.</p>
 
     </div>
 

@@ -1,7 +1,7 @@
 YUI.add("yuidoc-meta", function(Y) {
    Y.YUIDoc = { meta: {
     "classes": [
-        "Filter classes..App\nMain application.",
+        "App\nMain application.",
         "Filter classes..Draw ROI command.",
         "Filter classes..Draw line command.",
         "Filter classes..Draw livewire command.",
@@ -19,14 +19,17 @@ YUI.add("yuidoc-meta", function(Y) {
         "dwv.dicom.DataReader",
         "dwv.dicom.DicomParser",
         "dwv.dicom.Dictionary",
-        "dwv.html.Image Size class. \nSupports 2D and 3D images.",
-        "dwv.html.Image Spacing class. \nSupports 2D and 3D images.",
-        "dwv.html.Image class.",
         "dwv.html.Layer",
-        "dwv.html.Rescale LUT class.",
         "dwv.html.Style",
-        "dwv.html.View class.",
-        "dwv.html.Window LUT class.",
+        "dwv.image.Image",
+        "dwv.image.Size",
+        "dwv.image.Spacing",
+        "dwv.image.View",
+        "dwv.image.filter.Sharpen",
+        "dwv.image.filter.Sobel",
+        "dwv.image.filter.Threshold",
+        "dwv.image.lut.Rescale",
+        "dwv.image.lut.Window",
         "dwv.math.BucketQueue",
         "dwv.math.Circle",
         "dwv.math.Draw circle command.",
@@ -41,14 +44,22 @@ YUI.add("yuidoc-meta", function(Y) {
     ],
     "modules": [
         "dicom",
+        "gui",
         "html",
-        "math"
+        "image",
+        "math",
+        "utils"
     ],
     "allModules": [
         {
             "displayName": "dicom",
             "name": "dicom",
-            "description": "HTML module."
+            "description": "DICOM module."
+        },
+        {
+            "displayName": "gui",
+            "name": "gui",
+            "description": "GUI module."
         },
         {
             "displayName": "html",
@@ -56,9 +67,19 @@ YUI.add("yuidoc-meta", function(Y) {
             "description": "HTML module."
         },
         {
+            "displayName": "image",
+            "name": "image",
+            "description": "Image module."
+        },
+        {
             "displayName": "math",
             "name": "math",
             "description": "Math module."
+        },
+        {
+            "displayName": "utils",
+            "name": "utils",
+            "description": "Utility module."
         }
     ]
 } };

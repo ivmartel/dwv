@@ -41,31 +41,37 @@
         <div id="api-tabview-panel">
             <ul id="api-classes" class="apis classes">
             
+                <li><a href="../classes/App
+Main application..html">App
+Main application.</a></li>
+            
                 <li><a href="../classes/dwv.dicom.DataReader.html">dwv.dicom.DataReader</a></li>
             
                 <li><a href="../classes/dwv.dicom.DicomParser.html">dwv.dicom.DicomParser</a></li>
             
                 <li><a href="../classes/dwv.dicom.Dictionary.html">dwv.dicom.Dictionary</a></li>
             
-                <li><a href="../classes/dwv.html.Image class..html">dwv.html.Image class.</a></li>
-            
-                <li><a href="../classes/dwv.html.Image Size class. 
-Supports 2D and 3D images..html">dwv.html.Image Size class. 
-Supports 2D and 3D images.</a></li>
-            
-                <li><a href="../classes/dwv.html.Image Spacing class. 
-Supports 2D and 3D images..html">dwv.html.Image Spacing class. 
-Supports 2D and 3D images.</a></li>
-            
                 <li><a href="../classes/dwv.html.Layer.html">dwv.html.Layer</a></li>
-            
-                <li><a href="../classes/dwv.html.Rescale LUT class..html">dwv.html.Rescale LUT class.</a></li>
             
                 <li><a href="../classes/dwv.html.Style.html">dwv.html.Style</a></li>
             
-                <li><a href="../classes/dwv.html.View class..html">dwv.html.View class.</a></li>
+                <li><a href="../classes/dwv.image.filter.Sharpen.html">dwv.image.filter.Sharpen</a></li>
             
-                <li><a href="../classes/dwv.html.Window LUT class..html">dwv.html.Window LUT class.</a></li>
+                <li><a href="../classes/dwv.image.filter.Sobel.html">dwv.image.filter.Sobel</a></li>
+            
+                <li><a href="../classes/dwv.image.filter.Threshold.html">dwv.image.filter.Threshold</a></li>
+            
+                <li><a href="../classes/dwv.image.Image.html">dwv.image.Image</a></li>
+            
+                <li><a href="../classes/dwv.image.lut.Rescale.html">dwv.image.lut.Rescale</a></li>
+            
+                <li><a href="../classes/dwv.image.lut.Window.html">dwv.image.lut.Window</a></li>
+            
+                <li><a href="../classes/dwv.image.Size.html">dwv.image.Size</a></li>
+            
+                <li><a href="../classes/dwv.image.Spacing.html">dwv.image.Spacing</a></li>
+            
+                <li><a href="../classes/dwv.image.View.html">dwv.image.View</a></li>
             
                 <li><a href="../classes/dwv.math.BucketQueue.html">dwv.math.BucketQueue</a></li>
             
@@ -88,10 +94,6 @@ Supports 2D and 3D images.</a></li>
                 <li><a href="../classes/dwv.math.ROI.html">dwv.math.ROI</a></li>
             
                 <li><a href="../classes/dwv.math.Scissors.html">dwv.math.Scissors</a></li>
-            
-                <li><a href="../classes/Filter classes..App
-Main application..html">Filter classes..App
-Main application.</a></li>
             
                 <li><a href="../classes/Filter classes..Draw line command..html">Filter classes..Draw line command.</a></li>
             
@@ -127,9 +129,15 @@ Main application.</a></li>
             
                 <li><a href="../modules/dicom.html">dicom</a></li>
             
+                <li><a href="../modules/gui.html">gui</a></li>
+            
                 <li><a href="../modules/html.html">html</a></li>
             
+                <li><a href="../modules/image.html">image</a></li>
+            
                 <li><a href="../modules/math.html">math</a></li>
+            
+                <li><a href="../modules/utils.html">utils</a></li>
             
             </ul>
         </div>
@@ -178,9 +186,11 @@ var dwv = dwv || {};
 dwv.html = dwv.html || {};
 
 /**
- * @method Append a cell to a given row.
- * @param row The row to append the cell to.
- * @param text The text of the cell.
+ * Append a cell to a given row.
+ * @method appendCell
+ * @static
+ * @param {Object} row The row to append the cell to.
+ * @param {String} text The text of the cell.
  */
 dwv.html.appendCell = function(row, text)
 {
@@ -189,9 +199,11 @@ dwv.html.appendCell = function(row, text)
 };
 
 /**
- * @function Append a header cell to a given row.
- * @param row The row to append the header cell to.
- * @param text The text of the header cell.
+ * Append a header cell to a given row.
+ * @method appendHCell
+ * @static
+ * @param {Object} row The row to append the header cell to.
+ * @param {String} text The text of the header cell.
  */
 dwv.html.appendHCell = function(row, text)
 {
@@ -203,7 +215,14 @@ dwv.html.appendHCell = function(row, text)
 };
 
 /**
- * @function
+ * Append a row to an array.
+ * @method appendRowForArray
+ * @static
+ * @param {} table
+ * @param {} input
+ * @param {} level
+ * @param {} maxLevel
+ * @param {} rowHeader
  */
 dwv.html.appendRowForArray = function(table, input, level, maxLevel, rowHeader)
 {
@@ -229,7 +248,14 @@ dwv.html.appendRowForArray = function(table, input, level, maxLevel, rowHeader)
 };
 
 /**
- * @function
+ * Append a row to an object.
+ * @method appendRowForObject
+ * @static
+ * @param {} table
+ * @param {} input
+ * @param {} level
+ * @param {} maxLevel
+ * @param {} rowHeader
  */
 dwv.html.appendRowForObject = function(table, input, level, maxLevel, rowHeader)
 {
@@ -271,7 +297,14 @@ dwv.html.appendRowForObject = function(table, input, level, maxLevel, rowHeader)
 };
 
 /**
- * @function
+ * Append a row to an object or an array.
+ * @method appendRow
+ * @static
+ * @param {} table
+ * @param {} input
+ * @param {} level
+ * @param {} maxLevel
+ * @param {} rowHeader
  */
 dwv.html.appendRow = function(table, input, level, maxLevel, rowHeader)
 {
@@ -289,8 +322,11 @@ dwv.html.appendRow = function(table, input, level, maxLevel, rowHeader)
 };
 
 /**
- * @function Converts the input to an HTML table.
- * @input input Allowed types are: array, array of object, object.
+ * Converts the input to an HTML table.
+ * @method toTable
+ * @static
+ * @input {Mixed} input Allowed types are: array, array of object, object.
+ * @return {Object} The created HTML table.
  * @warning Null is interpreted differently in browsers, firefox will not display it.
  */
 dwv.html.toTable = function(input)
@@ -301,7 +337,11 @@ dwv.html.toTable = function(input)
 };
 
 /**
- * @function
+ * Get an HTML search form.
+ * @method getHtmlSearchForm
+ * @static
+ * @param {Object} htmlTableToSearch The table to do the search on.
+ * @return {Object} The HTML search form.
  */
 dwv.html.getHtmlSearchForm = function(htmlTableToSearch)
 {
@@ -317,9 +357,12 @@ dwv.html.getHtmlSearchForm = function(htmlTableToSearch)
 };
 
 /**
- * @function
- * @param term
- * @param table
+ * Filter a table with a given parameter: sets the display css of rows to
+ * true or false if it contains the term.
+ * @method filterTable
+ * @static
+ * @param {String} term The term to filter the table with.
+ * @param {Object} table The table to filter.
  */
 dwv.html.filterTable = function(term, table) {
     // de-highlight
@@ -347,10 +390,12 @@ dwv.html.filterTable = function(term, table) {
 };
 
 /**
- * @function Transform back each
- * &lt;span&gt;preText &lt;span class=&quot;highlighted&quot;&gt;term&lt;/span&gt; postText&lt;/span&gt;
- * into its original preText term postText
- * @param container The container to de-highlight.
+ * Transform back each
+ * &#x27;preText &lt;span class=&quot;highlighted&quot;&gt;term&lt;/span&gt; postText&#x27;
+ * into its original &#x27;preText term postText&#x27;.
+ * @method dehighlight
+ * @static
+ * @param {Object} container The container to de-highlight.
  */
 dwv.html.dehighlight = function(container) {
     for (var i = 0; i &lt; container.childNodes.length; i++) {
@@ -373,11 +418,13 @@ dwv.html.dehighlight = function(container) {
 };
 
 /**
- * @function Create a
- * &lt;span&gt;preText &lt;span class=&quot;highlighted&quot;&gt;term&lt;/span&gt; postText&lt;/span&gt;
- * around each search term
- * @param term The term to highlight.
- * @param container The container where to highlight the term.
+ * Create a
+ * &#x27;preText &lt;span class=&quot;highlighted&quot;&gt;term&lt;/span&gt; postText&#x27;
+ * around each search term.
+ * @method highlight
+ * @static
+ * @param {String} term The term to highlight.
+ * @param {Object} container The container where to highlight the term.
  */
 dwv.html.highlight = function(term, container) {
     for (var i = 0; i &lt; container.childNodes.length; i++) {
@@ -415,7 +462,11 @@ dwv.html.highlight = function(term, container) {
 };
 
 /**
- * @function
+ * Highlight a HTML node.
+ * @method createHighlightNode
+ * @static
+ * @param {Object} child The child to highlight.
+ * @return {Object} The created HTML node.
  */
 dwv.html.createHighlightNode = function(child) {
     var node = document.createElement(&#x27;span&#x27;);
@@ -426,9 +477,10 @@ dwv.html.createHighlightNode = function(child) {
 };
 
 /**
- * @function Remove all children of a node.
- * @param nodeId The id of the node to delete.
- * @param parentId The id of the parent of the node to delete.
+ * Remove all children of a HTML node.
+ * @method cleanNode
+ * @static
+ * @param {Object} node The node to remove kids.
  */
 dwv.html.cleanNode = function(node) {
     // remove its children
@@ -438,9 +490,9 @@ dwv.html.cleanNode = function(node) {
 };
 
 /**
- * @function Remove all children of a node and then remove it from its parent.
- * @param nodeId The id of the node to delete.
- * @param parentId The id of the parent of the node to delete.
+ * Remove a HTML node and all its children.
+ * @method removeNode
+ * @param {Number} nodeId The id of the node to delete.
  */
 dwv.html.removeNode = function(nodeId) {
     // find the node
@@ -455,12 +507,14 @@ dwv.html.removeNode = function(nodeId) {
 };
 
 /**
- * @function Create a HTML select from an input array of options.
+ * Create a HTML select from an input array of options.
  * The values of the options are the name of the option made lower case.
  * It is left to the user to set the &#x27;onchange&#x27; method of the select.
- * @param name The name of the HTML select.
- * @param list The list of options of the HTML select.
- * @return The created HTML select.
+ * @method createHtmlSelect
+ * @static
+ * @param {String} name The name of the HTML select.
+ * @param {Mixed} list The list of options of the HTML select.
+ * @return {Object} The created HTML select.
  */
 dwv.html.createHtmlSelect = function(name, list) {
     // select
@@ -496,6 +550,13 @@ dwv.html.createHtmlSelect = function(name, list) {
     return select;
 };
 
+/**
+ * Get a list of parameters from an input URI.
+ * @method getUriParam
+ * @static
+ * @param {String } uri The URI to decode.
+ * @return {Array} The array of parameters.
+ */
 dwv.html.getUriParam = function(uri)
 {
     var inputUri = uri || window.location.href;
@@ -569,6 +630,12 @@ dwv.html.getUriParam = function(uri)
     return val;
 };
 
+/**
+ * Toggle the display of an element.
+ * @method toggleDisplay
+ * @static
+ * @param {Number} id The id of the element to toggle its display.
+ */
 dwv.html.toggleDisplay = function(id)
 {
     if( document.getElementById(id) )
@@ -580,8 +647,10 @@ dwv.html.toggleDisplay = function(id)
 };
 
 /**
- * Browser checks to see if it can run dwv...
+ * Browser checks to see if it can run dwv. Throws an error if not.
  * TODO Maybe use http://modernizr.com/.
+ * @method checkBrowser
+ * @static
  */ 
 dwv.html.checkBrowser = function()
 {
@@ -602,6 +671,11 @@ dwv.html.checkBrowser = function()
     // Check typed array
     if( !window.Uint8Array || !window.Uint16Array ) {
         message = &quot;The Typed arrays are not supported in this browser. &quot;;
+        alert(message+appnorun);
+        throw new Error(message);
+    }
+    if( !window.Uint8ClampedArray ) {
+        message = &quot;The Uint8ClampedArray is not supported in this browser. &quot;;
         alert(message+appnorun);
         throw new Error(message);
     }

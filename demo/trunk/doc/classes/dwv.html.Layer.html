@@ -41,31 +41,37 @@
         <div id="api-tabview-panel">
             <ul id="api-classes" class="apis classes">
             
+                <li><a href="../classes/App
+Main application..html">App
+Main application.</a></li>
+            
                 <li><a href="../classes/dwv.dicom.DataReader.html">dwv.dicom.DataReader</a></li>
             
                 <li><a href="../classes/dwv.dicom.DicomParser.html">dwv.dicom.DicomParser</a></li>
             
                 <li><a href="../classes/dwv.dicom.Dictionary.html">dwv.dicom.Dictionary</a></li>
             
-                <li><a href="../classes/dwv.html.Image class..html">dwv.html.Image class.</a></li>
-            
-                <li><a href="../classes/dwv.html.Image Size class. 
-Supports 2D and 3D images..html">dwv.html.Image Size class. 
-Supports 2D and 3D images.</a></li>
-            
-                <li><a href="../classes/dwv.html.Image Spacing class. 
-Supports 2D and 3D images..html">dwv.html.Image Spacing class. 
-Supports 2D and 3D images.</a></li>
-            
                 <li><a href="../classes/dwv.html.Layer.html">dwv.html.Layer</a></li>
-            
-                <li><a href="../classes/dwv.html.Rescale LUT class..html">dwv.html.Rescale LUT class.</a></li>
             
                 <li><a href="../classes/dwv.html.Style.html">dwv.html.Style</a></li>
             
-                <li><a href="../classes/dwv.html.View class..html">dwv.html.View class.</a></li>
+                <li><a href="../classes/dwv.image.filter.Sharpen.html">dwv.image.filter.Sharpen</a></li>
             
-                <li><a href="../classes/dwv.html.Window LUT class..html">dwv.html.Window LUT class.</a></li>
+                <li><a href="../classes/dwv.image.filter.Sobel.html">dwv.image.filter.Sobel</a></li>
+            
+                <li><a href="../classes/dwv.image.filter.Threshold.html">dwv.image.filter.Threshold</a></li>
+            
+                <li><a href="../classes/dwv.image.Image.html">dwv.image.Image</a></li>
+            
+                <li><a href="../classes/dwv.image.lut.Rescale.html">dwv.image.lut.Rescale</a></li>
+            
+                <li><a href="../classes/dwv.image.lut.Window.html">dwv.image.lut.Window</a></li>
+            
+                <li><a href="../classes/dwv.image.Size.html">dwv.image.Size</a></li>
+            
+                <li><a href="../classes/dwv.image.Spacing.html">dwv.image.Spacing</a></li>
+            
+                <li><a href="../classes/dwv.image.View.html">dwv.image.View</a></li>
             
                 <li><a href="../classes/dwv.math.BucketQueue.html">dwv.math.BucketQueue</a></li>
             
@@ -88,10 +94,6 @@ Supports 2D and 3D images.</a></li>
                 <li><a href="../classes/dwv.math.ROI.html">dwv.math.ROI</a></li>
             
                 <li><a href="../classes/dwv.math.Scissors.html">dwv.math.Scissors</a></li>
-            
-                <li><a href="../classes/Filter classes..App
-Main application..html">Filter classes..App
-Main application.</a></li>
             
                 <li><a href="../classes/Filter classes..Draw line command..html">Filter classes..Draw line command.</a></li>
             
@@ -127,9 +129,15 @@ Main application.</a></li>
             
                 <li><a href="../modules/dicom.html">dicom</a></li>
             
+                <li><a href="../modules/gui.html">gui</a></li>
+            
                 <li><a href="../modules/html.html">html</a></li>
             
+                <li><a href="../modules/image.html">image</a></li>
+            
                 <li><a href="../modules/math.html">math</a></li>
+            
+                <li><a href="../modules/utils.html">utils</a></li>
             
             </ul>
         </div>
@@ -180,7 +188,7 @@ Main application.</a></li>
 
     
         
-            Module: <a href="../modules/dicom.html">dicom</a>
+            Module: <a href="../modules/html.html">html</a>
         
     
 
@@ -295,6 +303,8 @@ Main application.</a></li>
             <li class="api-class-tab methods"><a href="#methods">Methods</a></li>
         
         
+            <li class="api-class-tab properties"><a href="#properties">Properties</a></li>
+        
         
         
     </ul>
@@ -319,15 +329,17 @@ Main application.</a></li>
                             </li>
                         
                             <li class="index-item method">
-                                <a href="#method_Append a cell to a given row.">Append a cell to a given row.</a>
+                                <a href="#method_align">align</a>
 
                                 
                                 
                             </li>
                         
                             <li class="index-item method">
-                                <a href="#method_Append a header cell to a given row.">Append a header cell to a given row.</a>
+                                <a href="#method_appendCell">appendCell</a>
 
+                                
+                                    <span class="flag static">static</span>
                                 
                                 
                             </li>
@@ -342,6 +354,15 @@ Main application.</a></li>
                             </li>
                         
                             <li class="index-item method">
+                                <a href="#method_appendHCell">appendHCell</a>
+
+                                
+                                    <span class="flag static">static</span>
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
                                 <a href="#method_appendLivewireHtml">appendLivewireHtml</a>
 
                                 
@@ -352,6 +373,33 @@ Main application.</a></li>
                         
                             <li class="index-item method">
                                 <a href="#method_appendLivewireHtml">appendLivewireHtml</a>
+
+                                
+                                    <span class="flag static">static</span>
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_appendRow">appendRow</a>
+
+                                
+                                    <span class="flag static">static</span>
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_appendRowForArray">appendRowForArray</a>
+
+                                
+                                    <span class="flag static">static</span>
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_appendRowForObject">appendRowForObject</a>
 
                                 
                                     <span class="flag static">static</span>
@@ -418,6 +466,31 @@ Main application.</a></li>
 
                                 
                                     <span class="flag static">static</span>
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_checkBrowser">checkBrowser</a>
+
+                                
+                                    <span class="flag static">static</span>
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_cleanNode">cleanNode</a>
+
+                                
+                                    <span class="flag static">static</span>
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_clearContextRect">clearContextRect</a>
+
                                 
                                 
                             </li>
@@ -495,71 +568,34 @@ Main application.</a></li>
                             </li>
                         
                             <li class="index-item method">
-                                <a href="#method_Converts the input to an HTML table.">Converts the input to an HTML table.</a>
+                                <a href="#method_createHighlightNode">createHighlightNode</a>
 
+                                
+                                    <span class="flag static">static</span>
                                 
                                 
                             </li>
                         
                             <li class="index-item method">
-                                <a href="#method_Create a
-&lt;span&gt;preText &lt;span class=&quot;highlighted&quot;&gt;term&lt;/span&gt; postText&lt;/span&gt;
-around each search term">Create a
-&lt;span&gt;preText &lt;span class=&quot;highlighted&quot;&gt;term&lt;/span&gt; postText&lt;/span&gt;
-around each search term</a>
+                                <a href="#method_createHtmlSelect">createHtmlSelect</a>
 
+                                
+                                    <span class="flag static">static</span>
                                 
                                 
                             </li>
                         
                             <li class="index-item method">
-                                <a href="#method_Create a HTML select from an input array of options.
-The values of the options are the name of the option made lower case.
-It is left to the user to set the &#x27;onchange&#x27; method of the select.">Create a HTML select from an input array of options.
-The values of the options are the name of the option made lower case.
-It is left to the user to set the &#x27;onchange&#x27; method of the select.</a>
+                                <a href="#method_dehighlight">dehighlight</a>
 
+                                
+                                    <span class="flag static">static</span>
                                 
                                 
                             </li>
                         
                             <li class="index-item method">
-                                <a href="#method_"></a>
-
-                                
-                                
-                            </li>
-                        
-                            <li class="index-item method">
-                                <a href="#method_"></a>
-
-                                
-                                
-                            </li>
-                        
-                            <li class="index-item method">
-                                <a href="#method_"></a>
-
-                                
-                                
-                            </li>
-                        
-                            <li class="index-item method">
-                                <a href="#method_"></a>
-
-                                
-                                
-                            </li>
-                        
-                            <li class="index-item method">
-                                <a href="#method_"></a>
-
-                                
-                                
-                            </li>
-                        
-                            <li class="index-item method">
-                                <a href="#method_"></a>
+                                <a href="#method_draw">draw</a>
 
                                 
                                 
@@ -575,7 +611,53 @@ It is left to the user to set the &#x27;onchange&#x27; method of the select.</a>
                             </li>
                         
                             <li class="index-item method">
-                                <a href="#method_getSliderHtml">getSliderHtml</a>
+                                <a href="#method_fillContext">fillContext</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_filterTable">filterTable</a>
+
+                                
+                                    <span class="flag static">static</span>
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_getCanvas">getCanvas</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_getContext">getContext</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_getHtmlSearchForm">getHtmlSearchForm</a>
+
+                                
+                                    <span class="flag static">static</span>
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_getName">getName</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_getOffset">getOffset</a>
 
                                 
                                 
@@ -583,6 +665,56 @@ It is left to the user to set the &#x27;onchange&#x27; method of the select.</a>
                         
                             <li class="index-item method">
                                 <a href="#method_getSliderHtml">getSliderHtml</a>
+
+                                
+                                    <span class="flag static">static</span>
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_getSliderHtml">getSliderHtml</a>
+
+                                
+                                    <span class="flag static">static</span>
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_getUriParam">getUriParam</a>
+
+                                
+                                    <span class="flag static">static</span>
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_highlight">highlight</a>
+
+                                
+                                    <span class="flag static">static</span>
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_initialise">initialise</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_isVisible">isVisible</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_merge">merge</a>
 
                                 
                                 
@@ -643,25 +775,74 @@ It is left to the user to set the &#x27;onchange&#x27; method of the select.</a>
                             </li>
                         
                             <li class="index-item method">
-                                <a href="#method_Remove all children of a node and then remove it from its parent.">Remove all children of a node and then remove it from its parent.</a>
+                                <a href="#method_removeNode">removeNode</a>
 
                                 
                                 
                             </li>
                         
                             <li class="index-item method">
-                                <a href="#method_Remove all children of a node.">Remove all children of a node.</a>
+                                <a href="#method_resetLayout">resetLayout</a>
 
                                 
                                 
                             </li>
                         
                             <li class="index-item method">
-                                <a href="#method_Transform back each
-&lt;span&gt;preText &lt;span class=&quot;highlighted&quot;&gt;term&lt;/span&gt; postText&lt;/span&gt;
-into its original preText term postText">Transform back each
-&lt;span&gt;preText &lt;span class=&quot;highlighted&quot;&gt;term&lt;/span&gt; postText&lt;/span&gt;
-into its original preText term postText</a>
+                                <a href="#method_setImageData">setImageData</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_setLineColor">setLineColor</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_setStyleDisplay">setStyleDisplay</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_setTranslate">setTranslate</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_setZoom">setZoom</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_toggleDisplay">toggleDisplay</a>
+
+                                
+                                    <span class="flag static">static</span>
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_toTable">toTable</a>
+
+                                
+                                    <span class="flag static">static</span>
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_translate">translate</a>
 
                                 
                                 
@@ -671,11 +852,22 @@ into its original preText term postText</a>
                                 <a href="#method_updateProgress">updateProgress</a>
 
                                 
+                                    <span class="flag static">static</span>
+                                
                                 
                             </li>
                         
                             <li class="index-item method">
                                 <a href="#method_updateProgress">updateProgress</a>
+
+                                
+                                    <span class="flag static">static</span>
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_zoom">zoom</a>
 
                                 
                                 
@@ -685,6 +877,63 @@ into its original preText term postText</a>
                 </div>
             
 
+            
+                <div class="index-section properties">
+                    <h3>Properties</h3>
+
+                    <ul class="index-list properties">
+                        
+                            <li class="index-item property private">
+                                <a href="#property_canvas">canvas</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item property private">
+                                <a href="#property_context">context</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item property private">
+                                <a href="#property_imageData">imageData</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item property private">
+                                <a href="#property_originX">originX</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item property private">
+                                <a href="#property_originY">originY</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item property private">
+                                <a href="#property_zoomX">zoomX</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item property private">
+                                <a href="#property_zoomY">zoomY</a>
+
+                                
+                                
+                            </li>
+                        
+                    </ul>
+                </div>
             
 
             
@@ -734,6 +983,8 @@ into its original preText term postText</a>
         
             
                 
+                    <p>Provided by the <a href="../modules/gui.html">gui</a> module.</p>
+                
                 <p>
                 
                 Defined in
@@ -741,7 +992,7 @@ into its original preText term postText</a>
             
         
         
-        <a href="../files/src_html_gui.js.html#l461"><code>src&#x2F;html&#x2F;gui.js:461</code></a>
+        <a href="../files/src_html_gui.js.html#l462"><code>src&#x2F;html&#x2F;gui.js:462</code></a>
         
         </p>
 
@@ -788,8 +1039,97 @@ into its original preText term postText</a>
 </div>
 
                 
-                    <div id="method_Append a cell to a given row." class="method item">
-    <h3 class="name"><code>Append a cell to a given row.</code></h3>
+                    <div id="method_align" class="method item">
+    <h3 class="name"><code>align</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>rhs</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_html_layer.js.html#l337"><code>src&#x2F;html&#x2F;layer.js:337</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Align on another layer.</p>
+
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">rhs</code>
+                        <span class="type">Layer</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The layer to align on.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_appendCell" class="method item">
+    <h3 class="name"><code>appendCell</code></h3>
 
     
         <div class="args">
@@ -820,6 +1160,8 @@ into its original preText term postText</a>
     
 
     
+        <span class="flag static">static</span>
+    
 
     
 
@@ -828,8 +1170,6 @@ into its original preText term postText</a>
     <div class="meta">
         
             
-                
-                    <p>Provided by the <a href="../modules/html.html">html</a> module.</p>
                 
                 <p>
                 
@@ -849,7 +1189,8 @@ into its original preText term postText</a>
     </div>
 
     <div class="description">
-        
+        <p>Append a cell to a given row.</p>
+
     </div>
 
     
@@ -877,125 +1218,13 @@ into its original preText term postText</a>
                 <li class="param">
                     
                         <code class="param-name">text</code>
-                        <span class="type">Object</span>
+                        <span class="type">String</span>
                     
 
                     
 
                     <div class="param-description">
                         <p>The text of the cell.</p>
-
-                    </div>
-
-                    
-                </li>
-            
-            </ul>
-        </div>
-    
-
-    
-
-    
-</div>
-
-                
-                    <div id="method_Append a header cell to a given row." class="method item">
-    <h3 class="name"><code>Append a header cell to a given row.</code></h3>
-
-    
-        <div class="args">
-            <span class="paren">(</span><ul class="args-list inline commas">
-            
-                <li class="arg">
-                    
-                        <code>row</code>
-                    
-                </li>
-            
-                <li class="arg">
-                    
-                        <code>text</code>
-                    
-                </li>
-            
-            </ul><span class="paren">)</span>
-        </div>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                    <p>Provided by the <a href="../modules/html.html">html</a> module.</p>
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/src_html_html.js.html#l19"><code>src&#x2F;html&#x2F;html.js:19</code></a>
-        
-        </p>
-
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        
-    </div>
-
-    
-        <div class="params">
-            <h4>Parameters:</h4>
-
-            <ul class="params-list">
-            
-                <li class="param">
-                    
-                        <code class="param-name">row</code>
-                        <span class="type">Object</span>
-                    
-
-                    
-
-                    <div class="param-description">
-                        <p>The row to append the header cell to.</p>
-
-                    </div>
-
-                    
-                </li>
-            
-                <li class="param">
-                    
-                        <code class="param-name">text</code>
-                        <span class="type">Object</span>
-                    
-
-                    
-
-                    <div class="param-description">
-                        <p>The text of the header cell.</p>
 
                     </div>
 
@@ -1039,6 +1268,8 @@ into its original preText term postText</a>
         
             
                 
+                    <p>Provided by the <a href="../modules/gui.html">gui</a> module.</p>
+                
                 <p>
                 
                 Defined in
@@ -1046,7 +1277,7 @@ into its original preText term postText</a>
             
         
         
-        <a href="../files/src_html_gui.js.html#l164"><code>src&#x2F;html&#x2F;gui.js:164</code></a>
+        <a href="../files/src_html_gui.js.html#l165"><code>src&#x2F;html&#x2F;gui.js:165</code></a>
         
         </p>
 
@@ -1069,11 +1300,27 @@ into its original preText term postText</a>
 </div>
 
                 
-                    <div id="method_appendLivewireHtml" class="method item">
-    <h3 class="name"><code>appendLivewireHtml</code></h3>
+                    <div id="method_appendHCell" class="method item">
+    <h3 class="name"><code>appendHCell</code></h3>
 
     
-        <span class="paren">()</span>
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>row</code>
+                    
+                </li>
+            
+                <li class="arg">
+                    
+                        <code>text</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
     
 
     
@@ -1103,7 +1350,7 @@ into its original preText term postText</a>
             
         
         
-        <a href="../files/src_html_gui.js.html#l220"><code>src&#x2F;html&#x2F;gui.js:220</code></a>
+        <a href="../files/src_html_html.js.html#l21"><code>src&#x2F;html&#x2F;html.js:21</code></a>
         
         </p>
 
@@ -1114,10 +1361,50 @@ into its original preText term postText</a>
     </div>
 
     <div class="description">
-        <p>Append the color chooser HTML to the page.</p>
+        <p>Append a header cell to a given row.</p>
 
     </div>
 
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">row</code>
+                        <span class="type">Object</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The row to append the header cell to.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+                <li class="param">
+                    
+                        <code class="param-name">text</code>
+                        <span class="type">String</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The text of the header cell.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
     
 
     
@@ -1153,6 +1440,8 @@ into its original preText term postText</a>
         
             
                 
+                    <p>Provided by the <a href="../modules/gui.html">gui</a> module.</p>
+                
                 <p>
                 
                 Defined in
@@ -1160,7 +1449,7 @@ into its original preText term postText</a>
             
         
         
-        <a href="../files/src_html_gui.js.html#l258"><code>src&#x2F;html&#x2F;gui.js:258</code></a>
+        <a href="../files/src_html_gui.js.html#l259"><code>src&#x2F;html&#x2F;gui.js:259</code></a>
         
         </p>
 
@@ -1183,11 +1472,104 @@ into its original preText term postText</a>
 </div>
 
                 
-                    <div id="method_appendSharpenHtml" class="method item">
-    <h3 class="name"><code>appendSharpenHtml</code></h3>
+                    <div id="method_appendLivewireHtml" class="method item">
+    <h3 class="name"><code>appendLivewireHtml</code></h3>
 
     
         <span class="paren">()</span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <span class="flag static">static</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                    <p>Provided by the <a href="../modules/gui.html">gui</a> module.</p>
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_html_gui.js.html#l221"><code>src&#x2F;html&#x2F;gui.js:221</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Append the color chooser HTML to the page.</p>
+
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_appendRow" class="method item">
+    <h3 class="name"><code>appendRow</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>table</code>
+                    
+                </li>
+            
+                <li class="arg">
+                    
+                        <code>input</code>
+                    
+                </li>
+            
+                <li class="arg">
+                    
+                        <code>level</code>
+                    
+                </li>
+            
+                <li class="arg">
+                    
+                        <code>maxLevel</code>
+                    
+                </li>
+            
+                <li class="arg">
+                    
+                        <code>rowHeader</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
     
 
     
@@ -1217,7 +1599,7 @@ into its original preText term postText</a>
             
         
         
-        <a href="../files/src_html_gui.js.html#l364"><code>src&#x2F;html&#x2F;gui.js:364</code></a>
+        <a href="../files/src_html_html.js.html#l119"><code>src&#x2F;html&#x2F;html.js:119</code></a>
         
         </p>
 
@@ -1228,7 +1610,497 @@ into its original preText term postText</a>
     </div>
 
     <div class="description">
-        <p>Append the sobel filter HTML to the page.</p>
+        <p>Append a row to an object or an array.</p>
+
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">table</code>
+                        <span class="type">Object</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                    
+                </li>
+            
+                <li class="param">
+                    
+                        <code class="param-name">input</code>
+                        <span class="type">Object</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                    
+                </li>
+            
+                <li class="param">
+                    
+                        <code class="param-name">level</code>
+                        <span class="type">Object</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                    
+                </li>
+            
+                <li class="param">
+                    
+                        <code class="param-name">maxLevel</code>
+                        <span class="type">Object</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                    
+                </li>
+            
+                <li class="param">
+                    
+                        <code class="param-name">rowHeader</code>
+                        <span class="type">Object</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_appendRowForArray" class="method item">
+    <h3 class="name"><code>appendRowForArray</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>table</code>
+                    
+                </li>
+            
+                <li class="arg">
+                    
+                        <code>input</code>
+                    
+                </li>
+            
+                <li class="arg">
+                    
+                        <code>level</code>
+                    
+                </li>
+            
+                <li class="arg">
+                    
+                        <code>maxLevel</code>
+                    
+                </li>
+            
+                <li class="arg">
+                    
+                        <code>rowHeader</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <span class="flag static">static</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_html_html.js.html#l37"><code>src&#x2F;html&#x2F;html.js:37</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Append a row to an array.</p>
+
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">table</code>
+                        <span class="type">Object</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                    
+                </li>
+            
+                <li class="param">
+                    
+                        <code class="param-name">input</code>
+                        <span class="type">Object</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                    
+                </li>
+            
+                <li class="param">
+                    
+                        <code class="param-name">level</code>
+                        <span class="type">Object</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                    
+                </li>
+            
+                <li class="param">
+                    
+                        <code class="param-name">maxLevel</code>
+                        <span class="type">Object</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                    
+                </li>
+            
+                <li class="param">
+                    
+                        <code class="param-name">rowHeader</code>
+                        <span class="type">Object</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_appendRowForObject" class="method item">
+    <h3 class="name"><code>appendRowForObject</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>table</code>
+                    
+                </li>
+            
+                <li class="arg">
+                    
+                        <code>input</code>
+                    
+                </li>
+            
+                <li class="arg">
+                    
+                        <code>level</code>
+                    
+                </li>
+            
+                <li class="arg">
+                    
+                        <code>maxLevel</code>
+                    
+                </li>
+            
+                <li class="arg">
+                    
+                        <code>rowHeader</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <span class="flag static">static</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_html_html.js.html#l70"><code>src&#x2F;html&#x2F;html.js:70</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Append a row to an object.</p>
+
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">table</code>
+                        <span class="type">Object</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                    
+                </li>
+            
+                <li class="param">
+                    
+                        <code class="param-name">input</code>
+                        <span class="type">Object</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                    
+                </li>
+            
+                <li class="param">
+                    
+                        <code class="param-name">level</code>
+                        <span class="type">Object</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                    
+                </li>
+            
+                <li class="param">
+                    
+                        <code class="param-name">maxLevel</code>
+                        <span class="type">Object</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                    
+                </li>
+            
+                <li class="param">
+                    
+                        <code class="param-name">rowHeader</code>
+                        <span class="type">Object</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_appendSharpenHtml" class="method item">
+    <h3 class="name"><code>appendSharpenHtml</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <span class="flag static">static</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                    <p>Provided by the <a href="../modules/gui.html">gui</a> module.</p>
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_html_gui.js.html#l330"><code>src&#x2F;html&#x2F;gui.js:330</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Append the sharpen filter HTML to the page.</p>
 
     </div>
 
@@ -1267,6 +2139,8 @@ into its original preText term postText</a>
         
             
                 
+                    <p>Provided by the <a href="../modules/gui.html">gui</a> module.</p>
+                
                 <p>
                 
                 Defined in
@@ -1274,7 +2148,7 @@ into its original preText term postText</a>
             
         
         
-        <a href="../files/src_html_gui.js.html#l329"><code>src&#x2F;html&#x2F;gui.js:329</code></a>
+        <a href="../files/src_html_gui.js.html#l365"><code>src&#x2F;html&#x2F;gui.js:365</code></a>
         
         </p>
 
@@ -1285,7 +2159,7 @@ into its original preText term postText</a>
     </div>
 
     <div class="description">
-        <p>Append the sharpen filter HTML to the page.</p>
+        <p>Append the sobel filter HTML to the page.</p>
 
     </div>
 
@@ -1324,6 +2198,8 @@ into its original preText term postText</a>
         
             
                 
+                    <p>Provided by the <a href="../modules/gui.html">gui</a> module.</p>
+                
                 <p>
                 
                 Defined in
@@ -1331,7 +2207,7 @@ into its original preText term postText</a>
             
         
         
-        <a href="../files/src_html_gui.js.html#l299"><code>src&#x2F;html&#x2F;gui.js:299</code></a>
+        <a href="../files/src_html_gui.js.html#l300"><code>src&#x2F;html&#x2F;gui.js:300</code></a>
         
         </p>
 
@@ -1381,6 +2257,8 @@ into its original preText term postText</a>
         
             
                 
+                    <p>Provided by the <a href="../modules/gui.html">gui</a> module.</p>
+                
                 <p>
                 
                 Defined in
@@ -1388,7 +2266,7 @@ into its original preText term postText</a>
             
         
         
-        <a href="../files/src_html_gui.js.html#l74"><code>src&#x2F;html&#x2F;gui.js:74</code></a>
+        <a href="../files/src_html_gui.js.html#l75"><code>src&#x2F;html&#x2F;gui.js:75</code></a>
         
         </p>
 
@@ -1438,6 +2316,8 @@ into its original preText term postText</a>
         
             
                 
+                    <p>Provided by the <a href="../modules/gui.html">gui</a> module.</p>
+                
                 <p>
                 
                 Defined in
@@ -1445,7 +2325,7 @@ into its original preText term postText</a>
             
         
         
-        <a href="../files/src_html_gui.js.html#l436"><code>src&#x2F;html&#x2F;gui.js:436</code></a>
+        <a href="../files/src_html_gui.js.html#l437"><code>src&#x2F;html&#x2F;gui.js:437</code></a>
         
         </p>
 
@@ -1495,6 +2375,8 @@ into its original preText term postText</a>
         
             
                 
+                    <p>Provided by the <a href="../modules/gui.html">gui</a> module.</p>
+                
                 <p>
                 
                 Defined in
@@ -1502,7 +2384,7 @@ into its original preText term postText</a>
             
         
         
-        <a href="../files/src_html_gui.js.html#l105"><code>src&#x2F;html&#x2F;gui.js:105</code></a>
+        <a href="../files/src_html_gui.js.html#l106"><code>src&#x2F;html&#x2F;gui.js:106</code></a>
         
         </p>
 
@@ -1552,6 +2434,8 @@ into its original preText term postText</a>
         
             
                 
+                    <p>Provided by the <a href="../modules/gui.html">gui</a> module.</p>
+                
                 <p>
                 
                 Defined in
@@ -1559,7 +2443,7 @@ into its original preText term postText</a>
             
         
         
-        <a href="../files/src_html_gui.js.html#l399"><code>src&#x2F;html&#x2F;gui.js:399</code></a>
+        <a href="../files/src_html_gui.js.html#l400"><code>src&#x2F;html&#x2F;gui.js:400</code></a>
         
         </p>
 
@@ -1571,6 +2455,210 @@ into its original preText term postText</a>
 
     <div class="description">
         <p>Append the zoom HTML to the page.</p>
+
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_checkBrowser" class="method item">
+    <h3 class="name"><code>checkBrowser</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <span class="flag static">static</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_html_html.js.html#l469"><code>src&#x2F;html&#x2F;html.js:469</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Browser checks to see if it can run dwv. Throws an error if not.
+TODO Maybe use <a href="http://modernizr.com/">http://modernizr.com/</a>.</p>
+
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_cleanNode" class="method item">
+    <h3 class="name"><code>cleanNode</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>node</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <span class="flag static">static</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_html_html.js.html#l299"><code>src&#x2F;html&#x2F;html.js:299</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Remove all children of a HTML node.</p>
+
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">node</code>
+                        <span class="type">Object</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The node to remove kids.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_clearContextRect" class="method item">
+    <h3 class="name"><code>clearContextRect</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_html_layer.js.html#l272"><code>src&#x2F;html&#x2F;layer.js:272</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Clear the full context.</p>
 
     </div>
 
@@ -1609,6 +2697,8 @@ into its original preText term postText</a>
         
             
                 
+                    <p>Provided by the <a href="../modules/gui.html">gui</a> module.</p>
+                
                 <p>
                 
                 Defined in
@@ -1616,7 +2706,7 @@ into its original preText term postText</a>
             
         
         
-        <a href="../files/src_html_gui.js.html#l248"><code>src&#x2F;html&#x2F;gui.js:248</code></a>
+        <a href="../files/src_html_gui.js.html#l249"><code>src&#x2F;html&#x2F;gui.js:249</code></a>
         
         </p>
 
@@ -1666,62 +2756,7 @@ into its original preText term postText</a>
         
             
                 
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/src_html_gui.js.html#l319"><code>src&#x2F;html&#x2F;gui.js:319</code></a>
-        
-        </p>
-
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        <p>Clear the treshold filter HTML.</p>
-
-    </div>
-
-    
-
-    
-
-    
-</div>
-
-                
-                    <div id="method_clearDrawHtml" class="method item">
-    <h3 class="name"><code>clearDrawHtml</code></h3>
-
-    
-        <span class="paren">()</span>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-        <span class="flag static">static</span>
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
+                    <p>Provided by the <a href="../modules/gui.html">gui</a> module.</p>
                 
                 <p>
                 
@@ -1730,7 +2765,7 @@ into its original preText term postText</a>
             
         
         
-        <a href="../files/src_html_gui.js.html#l209"><code>src&#x2F;html&#x2F;gui.js:209</code></a>
+        <a href="../files/src_html_gui.js.html#l210"><code>src&#x2F;html&#x2F;gui.js:210</code></a>
         
         </p>
 
@@ -1780,6 +2815,8 @@ into its original preText term postText</a>
         
             
                 
+                    <p>Provided by the <a href="../modules/gui.html">gui</a> module.</p>
+                
                 <p>
                 
                 Defined in
@@ -1787,7 +2824,66 @@ into its original preText term postText</a>
             
         
         
-        <a href="../files/src_html_gui.js.html#l286"><code>src&#x2F;html&#x2F;gui.js:286</code></a>
+        <a href="../files/src_html_gui.js.html#l320"><code>src&#x2F;html&#x2F;gui.js:320</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Clear the treshold filter HTML.</p>
+
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_clearDrawHtml" class="method item">
+    <h3 class="name"><code>clearDrawHtml</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <span class="flag static">static</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                    <p>Provided by the <a href="../modules/gui.html">gui</a> module.</p>
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_html_gui.js.html#l287"><code>src&#x2F;html&#x2F;gui.js:287</code></a>
         
         </p>
 
@@ -1837,6 +2933,8 @@ into its original preText term postText</a>
         
             
                 
+                    <p>Provided by the <a href="../modules/gui.html">gui</a> module.</p>
+                
                 <p>
                 
                 Defined in
@@ -1844,7 +2942,7 @@ into its original preText term postText</a>
             
         
         
-        <a href="../files/src_html_gui.js.html#l389"><code>src&#x2F;html&#x2F;gui.js:389</code></a>
+        <a href="../files/src_html_gui.js.html#l390"><code>src&#x2F;html&#x2F;gui.js:390</code></a>
         
         </p>
 
@@ -1894,6 +2992,8 @@ into its original preText term postText</a>
         
             
                 
+                    <p>Provided by the <a href="../modules/gui.html">gui</a> module.</p>
+                
                 <p>
                 
                 Defined in
@@ -1901,7 +3001,7 @@ into its original preText term postText</a>
             
         
         
-        <a href="../files/src_html_gui.js.html#l354"><code>src&#x2F;html&#x2F;gui.js:354</code></a>
+        <a href="../files/src_html_gui.js.html#l355"><code>src&#x2F;html&#x2F;gui.js:355</code></a>
         
         </p>
 
@@ -1951,6 +3051,8 @@ into its original preText term postText</a>
         
             
                 
+                    <p>Provided by the <a href="../modules/gui.html">gui</a> module.</p>
+                
                 <p>
                 
                 Defined in
@@ -1958,7 +3060,7 @@ into its original preText term postText</a>
             
         
         
-        <a href="../files/src_html_gui.js.html#l153"><code>src&#x2F;html&#x2F;gui.js:153</code></a>
+        <a href="../files/src_html_gui.js.html#l154"><code>src&#x2F;html&#x2F;gui.js:154</code></a>
         
         </p>
 
@@ -2008,6 +3110,8 @@ into its original preText term postText</a>
         
             
                 
+                    <p>Provided by the <a href="../modules/gui.html">gui</a> module.</p>
+                
                 <p>
                 
                 Defined in
@@ -2015,7 +3119,7 @@ into its original preText term postText</a>
             
         
         
-        <a href="../files/src_html_gui.js.html#l426"><code>src&#x2F;html&#x2F;gui.js:426</code></a>
+        <a href="../files/src_html_gui.js.html#l427"><code>src&#x2F;html&#x2F;gui.js:427</code></a>
         
         </p>
 
@@ -2038,68 +3142,8 @@ into its original preText term postText</a>
 </div>
 
                 
-                    <div id="method_Converts the input to an HTML table." class="method item">
-    <h3 class="name"><code>Converts the input to an HTML table.</code></h3>
-
-    
-        <span class="paren">()</span>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                    <p>Provided by the <a href="../modules/html.html">html</a> module.</p>
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/src_html_html.js.html#l119"><code>src&#x2F;html&#x2F;html.js:119</code></a>
-        
-        </p>
-
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        
-    </div>
-
-    
-
-    
-
-    
-</div>
-
-                
-                    <div id="method_Create a
-&lt;span&gt;preText &lt;span class=&quot;highlighted&quot;&gt;term&lt;/span&gt; postText&lt;/span&gt;
-around each search term" class="method item">
-    <h3 class="name"><code>Create a
-&lt;span&gt;preText &lt;span class=&quot;highlighted&quot;&gt;term&lt;/span&gt; postText&lt;/span&gt;
-around each search term</code></h3>
+                    <div id="method_createHighlightNode" class="method item">
+    <h3 class="name"><code>createHighlightNode</code></h3>
 
     
         <div class="args">
@@ -2107,13 +3151,7 @@ around each search term</code></h3>
             
                 <li class="arg">
                     
-                        <code>term</code>
-                    
-                </li>
-            
-                <li class="arg">
-                    
-                        <code>container</code>
+                        <code>child</code>
                     
                 </li>
             
@@ -2122,13 +3160,19 @@ around each search term</code></h3>
     
 
     
-
+        <span class="returns-inline">
+            <span class="type">Object</span>
+        </span>
     
 
     
 
     
 
+    
+
+    
+        <span class="flag static">static</span>
     
 
     
@@ -2139,8 +3183,6 @@ around each search term</code></h3>
         
             
                 
-                    <p>Provided by the <a href="../modules/html.html">html</a> module.</p>
-                
                 <p>
                 
                 Defined in
@@ -2148,7 +3190,7 @@ around each search term</code></h3>
             
         
         
-        <a href="../files/src_html_html.js.html#l203"><code>src&#x2F;html&#x2F;html.js:203</code></a>
+        <a href="../files/src_html_html.js.html#l284"><code>src&#x2F;html&#x2F;html.js:284</code></a>
         
         </p>
 
@@ -2159,7 +3201,8 @@ around each search term</code></h3>
     </div>
 
     <div class="description">
-        
+        <p>Highlight a HTML node.</p>
+
     </div>
 
     
@@ -2170,30 +3213,14 @@ around each search term</code></h3>
             
                 <li class="param">
                     
-                        <code class="param-name">term</code>
+                        <code class="param-name">child</code>
                         <span class="type">Object</span>
                     
 
                     
 
                     <div class="param-description">
-                        <p>The term to highlight.</p>
-
-                    </div>
-
-                    
-                </li>
-            
-                <li class="param">
-                    
-                        <code class="param-name">container</code>
-                        <span class="type">Object</span>
-                    
-
-                    
-
-                    <div class="param-description">
-                        <p>The container where to highlight the term.</p>
+                        <p>The child to highlight.</p>
 
                     </div>
 
@@ -2205,17 +3232,27 @@ around each search term</code></h3>
     
 
     
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                
+                    
+                        <span class="type">Object</span>:
+                    
+                    <p>The created HTML node.</p>
+
+                
+            </div>
+        </div>
+    
 
     
 </div>
 
                 
-                    <div id="method_Create a HTML select from an input array of options.
-The values of the options are the name of the option made lower case.
-It is left to the user to set the &#x27;onchange&#x27; method of the select." class="method item">
-    <h3 class="name"><code>Create a HTML select from an input array of options.
-The values of the options are the name of the option made lower case.
-It is left to the user to set the &#x27;onchange&#x27; method of the select.</code></h3>
+                    <div id="method_createHtmlSelect" class="method item">
+    <h3 class="name"><code>createHtmlSelect</code></h3>
 
     
         <div class="args">
@@ -2239,7 +3276,7 @@ It is left to the user to set the &#x27;onchange&#x27; method of the select.</co
 
     
         <span class="returns-inline">
-            <span class="type"></span>
+            <span class="type">Object</span>
         </span>
     
 
@@ -2250,6 +3287,8 @@ It is left to the user to set the &#x27;onchange&#x27; method of the select.</co
     
 
     
+        <span class="flag static">static</span>
+    
 
     
 
@@ -2259,8 +3298,6 @@ It is left to the user to set the &#x27;onchange&#x27; method of the select.</co
         
             
                 
-                    <p>Provided by the <a href="../modules/html.html">html</a> module.</p>
-                
                 <p>
                 
                 Defined in
@@ -2268,7 +3305,7 @@ It is left to the user to set the &#x27;onchange&#x27; method of the select.</co
             
         
         
-        <a href="../files/src_html_html.js.html#l285"><code>src&#x2F;html&#x2F;html.js:285</code></a>
+        <a href="../files/src_html_html.js.html#l329"><code>src&#x2F;html&#x2F;html.js:329</code></a>
         
         </p>
 
@@ -2279,7 +3316,10 @@ It is left to the user to set the &#x27;onchange&#x27; method of the select.</co
     </div>
 
     <div class="description">
-        
+        <p>Create a HTML select from an input array of options.
+The values of the options are the name of the option made lower case.
+It is left to the user to set the &#39;onchange&#39; method of the select.</p>
+
     </div>
 
     
@@ -2291,7 +3331,7 @@ It is left to the user to set the &#x27;onchange&#x27; method of the select.</co
                 <li class="param">
                     
                         <code class="param-name">name</code>
-                        <span class="type">Object</span>
+                        <span class="type">String</span>
                     
 
                     
@@ -2307,7 +3347,7 @@ It is left to the user to set the &#x27;onchange&#x27; method of the select.</co
                 <li class="param">
                     
                         <code class="param-name">list</code>
-                        <span class="type">Object</span>
+                        <span class="type">Mixed</span>
                     
 
                     
@@ -2331,6 +3371,8 @@ It is left to the user to set the &#x27;onchange&#x27; method of the select.</co
             <div class="returns-description">
                 
                     
+                        <span class="type">Object</span>:
+                    
                     <p>The created HTML select.</p>
 
                 
@@ -2342,8 +3384,8 @@ It is left to the user to set the &#x27;onchange&#x27; method of the select.</co
 </div>
 
                 
-                    <div id="method_" class="method item">
-    <h3 class="name"><code></code></h3>
+                    <div id="method_dehighlight" class="method item">
+    <h3 class="name"><code>dehighlight</code></h3>
 
     
         <div class="args">
@@ -2351,13 +3393,7 @@ It is left to the user to set the &#x27;onchange&#x27; method of the select.</co
             
                 <li class="arg">
                     
-                        <code>term</code>
-                    
-                </li>
-            
-                <li class="arg">
-                    
-                        <code>table</code>
+                        <code>container</code>
                     
                 </li>
             
@@ -2374,6 +3410,8 @@ It is left to the user to set the &#x27;onchange&#x27; method of the select.</co
     
 
     
+        <span class="flag static">static</span>
+    
 
     
 
@@ -2383,8 +3421,6 @@ It is left to the user to set the &#x27;onchange&#x27; method of the select.</co
         
             
                 
-                    <p>Provided by the <a href="../modules/html.html">html</a> module.</p>
-                
                 <p>
                 
                 Defined in
@@ -2392,7 +3428,7 @@ It is left to the user to set the &#x27;onchange&#x27; method of the select.</co
             
         
         
-        <a href="../files/src_html_html.js.html#l147"><code>src&#x2F;html&#x2F;html.js:147</code></a>
+        <a href="../files/src_html_html.js.html#l212"><code>src&#x2F;html&#x2F;html.js:212</code></a>
         
         </p>
 
@@ -2403,7 +3439,10 @@ It is left to the user to set the &#x27;onchange&#x27; method of the select.</co
     </div>
 
     <div class="description">
-        
+        <p>Transform back each
+&#39;preText <span class="highlighted">term</span> postText&#39;
+into its original &#39;preText term postText&#39;.</p>
+
     </div>
 
     
@@ -2414,29 +3453,15 @@ It is left to the user to set the &#x27;onchange&#x27; method of the select.</co
             
                 <li class="param">
                     
-                        <code class="param-name">term</code>
+                        <code class="param-name">container</code>
                         <span class="type">Object</span>
                     
 
                     
 
                     <div class="param-description">
-                         
-                    </div>
+                        <p>The container to de-highlight.</p>
 
-                    
-                </li>
-            
-                <li class="param">
-                    
-                        <code class="param-name">table</code>
-                        <span class="type">Object</span>
-                    
-
-                    
-
-                    <div class="param-description">
-                         
                     </div>
 
                     
@@ -2452,8 +3477,8 @@ It is left to the user to set the &#x27;onchange&#x27; method of the select.</co
 </div>
 
                 
-                    <div id="method_" class="method item">
-    <h3 class="name"><code></code></h3>
+                    <div id="method_draw" class="method item">
+    <h3 class="name"><code>draw</code></h3>
 
     
         <span class="paren">()</span>
@@ -2477,8 +3502,6 @@ It is left to the user to set the &#x27;onchange&#x27; method of the select.</co
         
             
                 
-                    <p>Provided by the <a href="../modules/html.html">html</a> module.</p>
-                
                 <p>
                 
                 Defined in
@@ -2486,7 +3509,7 @@ It is left to the user to set the &#x27;onchange&#x27; method of the select.</co
             
         
         
-        <a href="../files/src_html_html.js.html#l101"><code>src&#x2F;html&#x2F;html.js:101</code></a>
+        <a href="../files/src_html_layer.js.html#l203"><code>src&#x2F;html&#x2F;layer.js:203</code></a>
         
         </p>
 
@@ -2497,231 +3520,9 @@ It is left to the user to set the &#x27;onchange&#x27; method of the select.</co
     </div>
 
     <div class="description">
-        
-    </div>
+        <p>Draw the content (imageData) of the layer.
+The imageData variable needs to be set</p>
 
-    
-
-    
-
-    
-</div>
-
-                
-                    <div id="method_" class="method item">
-    <h3 class="name"><code></code></h3>
-
-    
-        <span class="paren">()</span>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                    <p>Provided by the <a href="../modules/html.html">html</a> module.</p>
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/src_html_html.js.html#l59"><code>src&#x2F;html&#x2F;html.js:59</code></a>
-        
-        </p>
-
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        
-    </div>
-
-    
-
-    
-
-    
-</div>
-
-                
-                    <div id="method_" class="method item">
-    <h3 class="name"><code></code></h3>
-
-    
-        <span class="paren">()</span>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                    <p>Provided by the <a href="../modules/html.html">html</a> module.</p>
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/src_html_html.js.html#l33"><code>src&#x2F;html&#x2F;html.js:33</code></a>
-        
-        </p>
-
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        
-    </div>
-
-    
-
-    
-
-    
-</div>
-
-                
-                    <div id="method_" class="method item">
-    <h3 class="name"><code></code></h3>
-
-    
-        <span class="paren">()</span>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                    <p>Provided by the <a href="../modules/html.html">html</a> module.</p>
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/src_html_html.js.html#l131"><code>src&#x2F;html&#x2F;html.js:131</code></a>
-        
-        </p>
-
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        
-    </div>
-
-    
-
-    
-
-    
-</div>
-
-                
-                    <div id="method_" class="method item">
-    <h3 class="name"><code></code></h3>
-
-    
-        <span class="paren">()</span>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                    <p>Provided by the <a href="../modules/html.html">html</a> module.</p>
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/src_html_html.js.html#l245"><code>src&#x2F;html&#x2F;html.js:245</code></a>
-        
-        </p>
-
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        
     </div>
 
     
@@ -2769,6 +3570,8 @@ It is left to the user to set the &#x27;onchange&#x27; method of the select.</co
         
             
                 
+                    <p>Provided by the <a href="../modules/gui.html">gui</a> module.</p>
+                
                 <p>
                 
                 Defined in
@@ -2776,7 +3579,7 @@ It is left to the user to set the &#x27;onchange&#x27; method of the select.</co
             
         
         
-        <a href="../files/src_html_gui.js.html#l488"><code>src&#x2F;html&#x2F;gui.js:488</code></a>
+        <a href="../files/src_html_gui.js.html#l489"><code>src&#x2F;html&#x2F;gui.js:489</code></a>
         
         </p>
 
@@ -2823,8 +3626,8 @@ It is left to the user to set the &#x27;onchange&#x27; method of the select.</co
 </div>
 
                 
-                    <div id="method_getSliderHtml" class="method item">
-    <h3 class="name"><code>getSliderHtml</code></h3>
+                    <div id="method_fillContext" class="method item">
+    <h3 class="name"><code>fillContext</code></h3>
 
     
         <span class="paren">()</span>
@@ -2847,6 +3650,580 @@ It is left to the user to set the &#x27;onchange&#x27; method of the select.</co
     <div class="meta">
         
             
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_html_layer.js.html#l263"><code>src&#x2F;html&#x2F;layer.js:263</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Fill the full context with the current style.</p>
+
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_filterTable" class="method item">
+    <h3 class="name"><code>filterTable</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>term</code>
+                    
+                </li>
+            
+                <li class="arg">
+                    
+                        <code>table</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <span class="flag static">static</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_html_html.js.html#l179"><code>src&#x2F;html&#x2F;html.js:179</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Filter a table with a given parameter: sets the display css of rows to
+true or false if it contains the term.</p>
+
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">term</code>
+                        <span class="type">String</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The term to filter the table with.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+                <li class="param">
+                    
+                        <code class="param-name">table</code>
+                        <span class="type">Object</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The table to filter.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_getCanvas" class="method item">
+    <h3 class="name"><code>getCanvas</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+        <span class="returns-inline">
+            <span class="type">Object</span>
+        </span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_html_layer.js.html#l38"><code>src&#x2F;html&#x2F;layer.js:38</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Get the layer canvas.</p>
+
+    </div>
+
+    
+
+    
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                
+                    
+                        <span class="type">Object</span>:
+                    
+                    <p>The layer canvas.</p>
+
+                
+            </div>
+        </div>
+    
+
+    
+</div>
+
+                
+                    <div id="method_getContext" class="method item">
+    <h3 class="name"><code>getContext</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+        <span class="returns-inline">
+            <span class="type">Object</span>
+        </span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_html_layer.js.html#l44"><code>src&#x2F;html&#x2F;layer.js:44</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Get the layer context.</p>
+
+    </div>
+
+    
+
+    
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                
+                    
+                        <span class="type">Object</span>:
+                    
+                    <p>The layer context.</p>
+
+                
+            </div>
+        </div>
+    
+
+    
+</div>
+
+                
+                    <div id="method_getHtmlSearchForm" class="method item">
+    <h3 class="name"><code>getHtmlSearchForm</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>htmlTableToSearch</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+        <span class="returns-inline">
+            <span class="type">Object</span>
+        </span>
+    
+
+    
+
+    
+
+    
+
+    
+        <span class="flag static">static</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_html_html.js.html#l159"><code>src&#x2F;html&#x2F;html.js:159</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Get an HTML search form.</p>
+
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">htmlTableToSearch</code>
+                        <span class="type">Object</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The table to do the search on.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                
+                    
+                        <span class="type">Object</span>:
+                    
+                    <p>The HTML search form.</p>
+
+                
+            </div>
+        </div>
+    
+
+    
+</div>
+
+                
+                    <div id="method_getName" class="method item">
+    <h3 class="name"><code>getName</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+        <span class="returns-inline">
+            <span class="type">String</span>
+        </span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_html_layer.js.html#l32"><code>src&#x2F;html&#x2F;layer.js:32</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Get the layer name.</p>
+
+    </div>
+
+    
+
+    
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                
+                    
+                        <span class="type">String</span>:
+                    
+                    <p>The layer name.</p>
+
+                
+            </div>
+        </div>
+    
+
+    
+</div>
+
+                
+                    <div id="method_getOffset" class="method item">
+    <h3 class="name"><code>getOffset</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+        <span class="returns-inline">
+            <span class="type">Number</span>
+        </span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_html_layer.js.html#l50"><code>src&#x2F;html&#x2F;layer.js:50</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Get the layer offset on page.</p>
+
+    </div>
+
+    
+
+    
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                
+                    
+                        <span class="type">Number</span>:
+                    
+                    <p>The layer offset on page.</p>
+
+                
+            </div>
+        </div>
+    
+
+    
+</div>
+
+                
+                    <div id="method_getSliderHtml" class="method item">
+    <h3 class="name"><code>getSliderHtml</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <span class="flag static">static</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                    <p>Provided by the <a href="../modules/gui.html">gui</a> module.</p>
                 
                 <p>
                 
@@ -2894,6 +4271,8 @@ It is left to the user to set the &#x27;onchange&#x27; method of the select.</co
     
 
     
+        <span class="flag static">static</span>
+    
 
     
 
@@ -2902,6 +4281,8 @@ It is left to the user to set the &#x27;onchange&#x27; method of the select.</co
     <div class="meta">
         
             
+                
+                    <p>Provided by the <a href="../modules/gui.html">gui</a> module.</p>
                 
                 <p>
                 
@@ -2922,6 +4303,413 @@ It is left to the user to set the &#x27;onchange&#x27; method of the select.</co
 
     <div class="description">
         <p>Append the slider HTML.</p>
+
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_getUriParam" class="method item">
+    <h3 class="name"><code>getUriParam</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>uri</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+        <span class="returns-inline">
+            <span class="type">Array</span>
+        </span>
+    
+
+    
+
+    
+
+    
+
+    
+        <span class="flag static">static</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_html_html.js.html#l373"><code>src&#x2F;html&#x2F;html.js:373</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Get a list of parameters from an input URI.</p>
+
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">uri</code>
+                        <span class="type">String</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The URI to decode.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                
+                    
+                        <span class="type">Array</span>:
+                    
+                    <p>The array of parameters.</p>
+
+                
+            </div>
+        </div>
+    
+
+    
+</div>
+
+                
+                    <div id="method_highlight" class="method item">
+    <h3 class="name"><code>highlight</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>term</code>
+                    
+                </li>
+            
+                <li class="arg">
+                    
+                        <code>container</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <span class="flag static">static</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_html_html.js.html#l240"><code>src&#x2F;html&#x2F;html.js:240</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Create a
+&#39;preText <span class="highlighted">term</span> postText&#39;
+around each search term.</p>
+
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">term</code>
+                        <span class="type">String</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The term to highlight.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+                <li class="param">
+                    
+                        <code class="param-name">container</code>
+                        <span class="type">Object</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The container where to highlight the term.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_initialise" class="method item">
+    <h3 class="name"><code>initialise</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_html_layer.js.html#l227"><code>src&#x2F;html&#x2F;layer.js:227</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Initialise the layer: set the canvas and context</p>
+
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_isVisible" class="method item">
+    <h3 class="name"><code>isVisible</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+        <span class="returns-inline">
+            <span class="type">Boolean</span>
+        </span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_html_layer.js.html#l326"><code>src&#x2F;html&#x2F;layer.js:326</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Check if the layer is visible.</p>
+
+    </div>
+
+    
+
+    
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                
+                    
+                        <span class="type">Boolean</span>:
+                    
+                    <p>True if the layer is visible.</p>
+
+                
+            </div>
+        </div>
+    
+
+    
+</div>
+
+                
+                    <div id="method_merge" class="method item">
+    <h3 class="name"><code>merge</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_html_layer.js.html#l281"><code>src&#x2F;html&#x2F;layer.js:281</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Merge two layers.</p>
 
     </div>
 
@@ -2970,6 +4758,8 @@ It is left to the user to set the &#x27;onchange&#x27; method of the select.</co
         
             
                 
+                    <p>Provided by the <a href="../modules/gui.html">gui</a> module.</p>
+                
                 <p>
                 
                 Defined in
@@ -2977,7 +4767,7 @@ It is left to the user to set the &#x27;onchange&#x27; method of the select.</co
             
         
         
-        <a href="../files/src_html_gui.js.html#l19"><code>src&#x2F;html&#x2F;gui.js:19</code></a>
+        <a href="../files/src_html_gui.js.html#l20"><code>src&#x2F;html&#x2F;gui.js:20</code></a>
         
         </p>
 
@@ -3061,6 +4851,8 @@ It is left to the user to set the &#x27;onchange&#x27; method of the select.</co
         
             
                 
+                    <p>Provided by the <a href="../modules/gui.html">gui</a> module.</p>
+                
                 <p>
                 
                 Defined in
@@ -3068,7 +4860,7 @@ It is left to the user to set the &#x27;onchange&#x27; method of the select.</co
             
         
         
-        <a href="../files/src_html_gui.js.html#l41"><code>src&#x2F;html&#x2F;gui.js:41</code></a>
+        <a href="../files/src_html_gui.js.html#l42"><code>src&#x2F;html&#x2F;gui.js:42</code></a>
         
         </p>
 
@@ -3152,6 +4944,8 @@ It is left to the user to set the &#x27;onchange&#x27; method of the select.</co
         
             
                 
+                    <p>Provided by the <a href="../modules/gui.html">gui</a> module.</p>
+                
                 <p>
                 
                 Defined in
@@ -3159,7 +4953,7 @@ It is left to the user to set the &#x27;onchange&#x27; method of the select.</co
             
         
         
-        <a href="../files/src_html_gui.js.html#l63"><code>src&#x2F;html&#x2F;gui.js:63</code></a>
+        <a href="../files/src_html_gui.js.html#l64"><code>src&#x2F;html&#x2F;gui.js:64</code></a>
         
         </p>
 
@@ -3243,6 +5037,8 @@ It is left to the user to set the &#x27;onchange&#x27; method of the select.</co
         
             
                 
+                    <p>Provided by the <a href="../modules/gui.html">gui</a> module.</p>
+                
                 <p>
                 
                 Defined in
@@ -3250,7 +5046,7 @@ It is left to the user to set the &#x27;onchange&#x27; method of the select.</co
             
         
         
-        <a href="../files/src_html_gui.js.html#l52"><code>src&#x2F;html&#x2F;gui.js:52</code></a>
+        <a href="../files/src_html_gui.js.html#l53"><code>src&#x2F;html&#x2F;gui.js:53</code></a>
         
         </p>
 
@@ -3334,6 +5130,8 @@ It is left to the user to set the &#x27;onchange&#x27; method of the select.</co
         
             
                 
+                    <p>Provided by the <a href="../modules/gui.html">gui</a> module.</p>
+                
                 <p>
                 
                 Defined in
@@ -3341,7 +5139,7 @@ It is left to the user to set the &#x27;onchange&#x27; method of the select.</co
             
         
         
-        <a href="../files/src_html_gui.js.html#l30"><code>src&#x2F;html&#x2F;gui.js:30</code></a>
+        <a href="../files/src_html_gui.js.html#l31"><code>src&#x2F;html&#x2F;gui.js:31</code></a>
         
         </p>
 
@@ -3425,6 +5223,8 @@ It is left to the user to set the &#x27;onchange&#x27; method of the select.</co
         
             
                 
+                    <p>Provided by the <a href="../modules/gui.html">gui</a> module.</p>
+                
                 <p>
                 
                 Defined in
@@ -3479,8 +5279,8 @@ It is left to the user to set the &#x27;onchange&#x27; method of the select.</co
 </div>
 
                 
-                    <div id="method_Remove all children of a node and then remove it from its parent." class="method item">
-    <h3 class="name"><code>Remove all children of a node and then remove it from its parent.</code></h3>
+                    <div id="method_removeNode" class="method item">
+    <h3 class="name"><code>removeNode</code></h3>
 
     
         <div class="args">
@@ -3489,12 +5289,6 @@ It is left to the user to set the &#x27;onchange&#x27; method of the select.</co
                 <li class="arg">
                     
                         <code>nodeId</code>
-                    
-                </li>
-            
-                <li class="arg">
-                    
-                        <code>parentId</code>
                     
                 </li>
             
@@ -3520,8 +5314,6 @@ It is left to the user to set the &#x27;onchange&#x27; method of the select.</co
         
             
                 
-                    <p>Provided by the <a href="../modules/html.html">html</a> module.</p>
-                
                 <p>
                 
                 Defined in
@@ -3529,7 +5321,7 @@ It is left to the user to set the &#x27;onchange&#x27; method of the select.</co
             
         
         
-        <a href="../files/src_html_html.js.html#l268"><code>src&#x2F;html&#x2F;html.js:268</code></a>
+        <a href="../files/src_html_html.js.html#l312"><code>src&#x2F;html&#x2F;html.js:312</code></a>
         
         </p>
 
@@ -3540,7 +5332,8 @@ It is left to the user to set the &#x27;onchange&#x27; method of the select.</co
     </div>
 
     <div class="description">
-        
+        <p>Remove a HTML node and all its children.</p>
+
     </div>
 
     
@@ -3552,29 +5345,13 @@ It is left to the user to set the &#x27;onchange&#x27; method of the select.</co
                 <li class="param">
                     
                         <code class="param-name">nodeId</code>
-                        <span class="type">Object</span>
+                        <span class="type">Number</span>
                     
 
                     
 
                     <div class="param-description">
                         <p>The id of the node to delete.</p>
-
-                    </div>
-
-                    
-                </li>
-            
-                <li class="param">
-                    
-                        <code class="param-name">parentId</code>
-                        <span class="type">Object</span>
-                    
-
-                    
-
-                    <div class="param-description">
-                        <p>The id of the parent of the node to delete.</p>
 
                     </div>
 
@@ -3591,8 +5368,63 @@ It is left to the user to set the &#x27;onchange&#x27; method of the select.</co
 </div>
 
                 
-                    <div id="method_Remove all children of a node." class="method item">
-    <h3 class="name"><code>Remove all children of a node.</code></h3>
+                    <div id="method_resetLayout" class="method item">
+    <h3 class="name"><code>resetLayout</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_html_layer.js.html#l191"><code>src&#x2F;html&#x2F;layer.js:191</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Reset the layout</p>
+
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_setImageData" class="method item">
+    <h3 class="name"><code>setImageData</code></h3>
 
     
         <div class="args">
@@ -3600,13 +5432,7 @@ It is left to the user to set the &#x27;onchange&#x27; method of the select.</co
             
                 <li class="arg">
                     
-                        <code>nodeId</code>
-                    
-                </li>
-            
-                <li class="arg">
-                    
-                        <code>parentId</code>
+                        <code>data</code>
                     
                 </li>
             
@@ -3632,8 +5458,6 @@ It is left to the user to set the &#x27;onchange&#x27; method of the select.</co
         
             
                 
-                    <p>Provided by the <a href="../modules/html.html">html</a> module.</p>
-                
                 <p>
                 
                 Defined in
@@ -3641,7 +5465,7 @@ It is left to the user to set the &#x27;onchange&#x27; method of the select.</co
             
         
         
-        <a href="../files/src_html_html.js.html#l256"><code>src&#x2F;html&#x2F;html.js:256</code></a>
+        <a href="../files/src_html_layer.js.html#l181"><code>src&#x2F;html&#x2F;layer.js:181</code></a>
         
         </p>
 
@@ -3652,7 +5476,8 @@ It is left to the user to set the &#x27;onchange&#x27; method of the select.</co
     </div>
 
     <div class="description">
-        
+        <p>Set the image data array.</p>
+
     </div>
 
     
@@ -3663,30 +5488,14 @@ It is left to the user to set the &#x27;onchange&#x27; method of the select.</co
             
                 <li class="param">
                     
-                        <code class="param-name">nodeId</code>
-                        <span class="type">Object</span>
+                        <code class="param-name">data</code>
+                        <span class="type">Array</span>
                     
 
                     
 
                     <div class="param-description">
-                        <p>The id of the node to delete.</p>
-
-                    </div>
-
-                    
-                </li>
-            
-                <li class="param">
-                    
-                        <code class="param-name">parentId</code>
-                        <span class="type">Object</span>
-                    
-
-                    
-
-                    <div class="param-description">
-                        <p>The id of the parent of the node to delete.</p>
+                        <p>The data array.</p>
 
                     </div>
 
@@ -3703,12 +5512,118 @@ It is left to the user to set the &#x27;onchange&#x27; method of the select.</co
 </div>
 
                 
-                    <div id="method_Transform back each
-&lt;span&gt;preText &lt;span class=&quot;highlighted&quot;&gt;term&lt;/span&gt; postText&lt;/span&gt;
-into its original preText term postText" class="method item">
-    <h3 class="name"><code>Transform back each
-&lt;span&gt;preText &lt;span class=&quot;highlighted&quot;&gt;term&lt;/span&gt; postText&lt;/span&gt;
-into its original preText term postText</code></h3>
+                    <div id="method_setLineColor" class="method item">
+    <h3 class="name"><code>setLineColor</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_html_layer.js.html#l298"><code>src&#x2F;html&#x2F;layer.js:298</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Set the line color for the layer.</p>
+
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_setStyleDisplay" class="method item">
+    <h3 class="name"><code>setStyleDisplay</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_html_layer.js.html#l309"><code>src&#x2F;html&#x2F;layer.js:309</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Display the layer.</p>
+
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_setTranslate" class="method item">
+    <h3 class="name"><code>setTranslate</code></h3>
 
     
         <div class="args">
@@ -3716,7 +5631,13 @@ into its original preText term postText</code></h3>
             
                 <li class="arg">
                     
-                        <code>container</code>
+                        <code>tx</code>
+                    
+                </li>
+            
+                <li class="arg">
+                    
+                        <code>ty</code>
                     
                 </li>
             
@@ -3742,8 +5663,6 @@ into its original preText term postText</code></h3>
         
             
                 
-                    <p>Provided by the <a href="../modules/html.html">html</a> module.</p>
-                
                 <p>
                 
                 Defined in
@@ -3751,7 +5670,7 @@ into its original preText term postText</code></h3>
             
         
         
-        <a href="../files/src_html_html.js.html#l177"><code>src&#x2F;html&#x2F;html.js:177</code></a>
+        <a href="../files/src_html_layer.js.html#l137"><code>src&#x2F;html&#x2F;layer.js:137</code></a>
         
         </p>
 
@@ -3762,7 +5681,9 @@ into its original preText term postText</code></h3>
     </div>
 
     <div class="description">
-        
+        <p>Set the layer translation.
+Translation is according to the last one.</p>
+
     </div>
 
     
@@ -3773,14 +5694,463 @@ into its original preText term postText</code></h3>
             
                 <li class="param">
                     
-                        <code class="param-name">container</code>
-                        <span class="type">Object</span>
+                        <code class="param-name">tx</code>
+                        <span class="type">Number</span>
                     
 
                     
 
                     <div class="param-description">
-                        <p>The container to de-highlight.</p>
+                        <p>The translation in the X direction.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+                <li class="param">
+                    
+                        <code class="param-name">ty</code>
+                        <span class="type">Number</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The translation in the Y direction.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_setZoom" class="method item">
+    <h3 class="name"><code>setZoom</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>stepX</code>
+                    
+                </li>
+            
+                <li class="arg">
+                    
+                        <code>stepY</code>
+                    
+                </li>
+            
+                <li class="arg">
+                    
+                        <code>centerX</code>
+                    
+                </li>
+            
+                <li class="arg">
+                    
+                        <code>centerY</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_html_layer.js.html#l94"><code>src&#x2F;html&#x2F;layer.js:94</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Set the layer zoom.</p>
+
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">stepX</code>
+                        <span class="type">Number</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The zoom step in the X direction.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+                <li class="param">
+                    
+                        <code class="param-name">stepY</code>
+                        <span class="type">Number</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The zoom step in the Y direction.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+                <li class="param">
+                    
+                        <code class="param-name">centerX</code>
+                        <span class="type">Number</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The zoom center in the X direction.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+                <li class="param">
+                    
+                        <code class="param-name">centerY</code>
+                        <span class="type">Number</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The zoom center in the Y direction.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_toggleDisplay" class="method item">
+    <h3 class="name"><code>toggleDisplay</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>id</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <span class="flag static">static</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_html_html.js.html#l453"><code>src&#x2F;html&#x2F;html.js:453</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Toggle the display of an element.</p>
+
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">id</code>
+                        <span class="type">Number</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The id of the element to toggle its display.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_toTable" class="method item">
+    <h3 class="name"><code>toTable</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+        <span class="returns-inline">
+            <span class="type">Object</span>
+        </span>
+    
+
+    
+
+    
+
+    
+
+    
+        <span class="flag static">static</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_html_html.js.html#l144"><code>src&#x2F;html&#x2F;html.js:144</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Converts the input to an HTML table.</p>
+
+    </div>
+
+    
+
+    
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                
+                    
+                        <span class="type">Object</span>:
+                    
+                    <p>The created HTML table.</p>
+
+                
+            </div>
+        </div>
+    
+
+    
+</div>
+
+                
+                    <div id="method_translate" class="method item">
+    <h3 class="name"><code>translate</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>tx</code>
+                    
+                </li>
+            
+                <li class="arg">
+                    
+                        <code>ty</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_html_layer.js.html#l166"><code>src&#x2F;html&#x2F;layer.js:166</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Set the layer translation and apply it.
+Translation is according to the last one.</p>
+
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">tx</code>
+                        <span class="type">Number</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The translation in the X direction.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+                <li class="param">
+                    
+                        <code class="param-name">ty</code>
+                        <span class="type">Number</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The translation in the Y direction.</p>
 
                     </div>
 
@@ -3823,6 +6193,8 @@ into its original preText term postText</code></h3>
     
 
     
+        <span class="flag static">static</span>
+    
 
     
 
@@ -3832,6 +6204,8 @@ into its original preText term postText</code></h3>
         
             
                 
+                    <p>Provided by the <a href="../modules/gui.html">gui</a> module.</p>
+                
                 <p>
                 
                 Defined in
@@ -3839,7 +6213,7 @@ into its original preText term postText</code></h3>
             
         
         
-        <a href="../files/src_html_gui_mobile.js.html#l48"><code>src&#x2F;html&#x2F;gui_mobile.js:48</code></a>
+        <a href="../files/src_html_gui_ui.js.html#l30"><code>src&#x2F;html&#x2F;gui_ui.js:30</code></a>
         
         </p>
 
@@ -3912,6 +6286,8 @@ into its original preText term postText</code></h3>
     
 
     
+        <span class="flag static">static</span>
+    
 
     
 
@@ -3921,6 +6297,8 @@ into its original preText term postText</code></h3>
         
             
                 
+                    <p>Provided by the <a href="../modules/gui.html">gui</a> module.</p>
+                
                 <p>
                 
                 Defined in
@@ -3928,7 +6306,7 @@ into its original preText term postText</code></h3>
             
         
         
-        <a href="../files/src_html_gui_ui.js.html#l29"><code>src&#x2F;html&#x2F;gui_ui.js:29</code></a>
+        <a href="../files/src_html_gui_mobile.js.html#l49"><code>src&#x2F;html&#x2F;gui_mobile.js:49</code></a>
         
         </p>
 
@@ -3959,6 +6337,161 @@ into its original preText term postText</code></h3>
 
                     <div class="param-description">
                         <p>A ProgressEvent.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_zoom" class="method item">
+    <h3 class="name"><code>zoom</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>stepX</code>
+                    
+                </li>
+            
+                <li class="arg">
+                    
+                        <code>stepY</code>
+                    
+                </li>
+            
+                <li class="arg">
+                    
+                        <code>centerX</code>
+                    
+                </li>
+            
+                <li class="arg">
+                    
+                        <code>centerY</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_html_layer.js.html#l121"><code>src&#x2F;html&#x2F;layer.js:121</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Set the layer zoom and apply it.</p>
+
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">stepX</code>
+                        <span class="type">Number</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The zoom step in the X direction.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+                <li class="param">
+                    
+                        <code class="param-name">stepY</code>
+                        <span class="type">Number</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The zoom step in the Y direction.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+                <li class="param">
+                    
+                        <code class="param-name">centerX</code>
+                        <span class="type">Number</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The zoom center in the X direction.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+                <li class="param">
+                    
+                        <code class="param-name">centerY</code>
+                        <span class="type">Number</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The zoom center in the Y direction.</p>
 
                     </div>
 
@@ -3978,6 +6511,341 @@ into its original preText term postText</code></h3>
             </div>
         
 
+        
+            <div id="properties" class="api-class-tabpanel">
+                <h2 class="off-left">Properties</h2>
+
+                
+                    <div id="property_canvas" class="property item private">
+    <h3 class="name"><code>canvas</code></h3>
+    <span class="type">Object</span>
+
+    
+
+    
+        <span class="flag private">private</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_html_layer.js.html#l17"><code>src&#x2F;html&#x2F;layer.js:17</code></a>
+        
+        </p>
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>The associated HTMLCanvasElement.</p>
+
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="property_context" class="property item private">
+    <h3 class="name"><code>context</code></h3>
+    <span class="type">Object</span>
+
+    
+
+    
+        <span class="flag private">private</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_html_layer.js.html#l24"><code>src&#x2F;html&#x2F;layer.js:24</code></a>
+        
+        </p>
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>The associated CanvasRenderingContext2D.</p>
+
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="property_imageData" class="property item private">
+    <h3 class="name"><code>imageData</code></h3>
+    <span class="type">Array</span>
+
+    
+
+    
+        <span class="flag private">private</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_html_layer.js.html#l57"><code>src&#x2F;html&#x2F;layer.js:57</code></a>
+        
+        </p>
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>The image data array.</p>
+
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="property_originX" class="property item private">
+    <h3 class="name"><code>originX</code></h3>
+    <span class="type">Number</span>
+
+    
+
+    
+        <span class="flag private">private</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_html_layer.js.html#l65"><code>src&#x2F;html&#x2F;layer.js:65</code></a>
+        
+        </p>
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>The image origin X position.</p>
+
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="property_originY" class="property item private">
+    <h3 class="name"><code>originY</code></h3>
+    <span class="type">Number</span>
+
+    
+
+    
+        <span class="flag private">private</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_html_layer.js.html#l72"><code>src&#x2F;html&#x2F;layer.js:72</code></a>
+        
+        </p>
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>The image origin Y position.</p>
+
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="property_zoomX" class="property item private">
+    <h3 class="name"><code>zoomX</code></h3>
+    <span class="type">Number</span>
+
+    
+
+    
+        <span class="flag private">private</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_html_layer.js.html#l79"><code>src&#x2F;html&#x2F;layer.js:79</code></a>
+        
+        </p>
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>The image zoom in the X direction.</p>
+
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="property_zoomY" class="property item private">
+    <h3 class="name"><code>zoomY</code></h3>
+    <span class="type">Number</span>
+
+    
+
+    
+        <span class="flag private">private</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_html_layer.js.html#l86"><code>src&#x2F;html&#x2F;layer.js:86</code></a>
+        
+        </p>
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>The image zoom in the Y direction.</p>
+
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+            </div>
         
 
         

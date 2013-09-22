@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>dwv.html.Image Size class. 
-Supports 2D and 3D images. - dwv</title>
+    <title>App
+Main application. - dwv</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
     <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
@@ -42,31 +42,37 @@ Supports 2D and 3D images. - dwv</title>
         <div id="api-tabview-panel">
             <ul id="api-classes" class="apis classes">
             
+                <li><a href="../classes/App
+Main application..html">App
+Main application.</a></li>
+            
                 <li><a href="../classes/dwv.dicom.DataReader.html">dwv.dicom.DataReader</a></li>
             
                 <li><a href="../classes/dwv.dicom.DicomParser.html">dwv.dicom.DicomParser</a></li>
             
                 <li><a href="../classes/dwv.dicom.Dictionary.html">dwv.dicom.Dictionary</a></li>
             
-                <li><a href="../classes/dwv.html.Image class..html">dwv.html.Image class.</a></li>
-            
-                <li><a href="../classes/dwv.html.Image Size class. 
-Supports 2D and 3D images..html">dwv.html.Image Size class. 
-Supports 2D and 3D images.</a></li>
-            
-                <li><a href="../classes/dwv.html.Image Spacing class. 
-Supports 2D and 3D images..html">dwv.html.Image Spacing class. 
-Supports 2D and 3D images.</a></li>
-            
                 <li><a href="../classes/dwv.html.Layer.html">dwv.html.Layer</a></li>
-            
-                <li><a href="../classes/dwv.html.Rescale LUT class..html">dwv.html.Rescale LUT class.</a></li>
             
                 <li><a href="../classes/dwv.html.Style.html">dwv.html.Style</a></li>
             
-                <li><a href="../classes/dwv.html.View class..html">dwv.html.View class.</a></li>
+                <li><a href="../classes/dwv.image.filter.Sharpen.html">dwv.image.filter.Sharpen</a></li>
             
-                <li><a href="../classes/dwv.html.Window LUT class..html">dwv.html.Window LUT class.</a></li>
+                <li><a href="../classes/dwv.image.filter.Sobel.html">dwv.image.filter.Sobel</a></li>
+            
+                <li><a href="../classes/dwv.image.filter.Threshold.html">dwv.image.filter.Threshold</a></li>
+            
+                <li><a href="../classes/dwv.image.Image.html">dwv.image.Image</a></li>
+            
+                <li><a href="../classes/dwv.image.lut.Rescale.html">dwv.image.lut.Rescale</a></li>
+            
+                <li><a href="../classes/dwv.image.lut.Window.html">dwv.image.lut.Window</a></li>
+            
+                <li><a href="../classes/dwv.image.Size.html">dwv.image.Size</a></li>
+            
+                <li><a href="../classes/dwv.image.Spacing.html">dwv.image.Spacing</a></li>
+            
+                <li><a href="../classes/dwv.image.View.html">dwv.image.View</a></li>
             
                 <li><a href="../classes/dwv.math.BucketQueue.html">dwv.math.BucketQueue</a></li>
             
@@ -89,10 +95,6 @@ Supports 2D and 3D images.</a></li>
                 <li><a href="../classes/dwv.math.ROI.html">dwv.math.ROI</a></li>
             
                 <li><a href="../classes/dwv.math.Scissors.html">dwv.math.Scissors</a></li>
-            
-                <li><a href="../classes/Filter classes..App
-Main application..html">Filter classes..App
-Main application.</a></li>
             
                 <li><a href="../classes/Filter classes..Draw line command..html">Filter classes..Draw line command.</a></li>
             
@@ -128,9 +130,15 @@ Main application.</a></li>
             
                 <li><a href="../modules/dicom.html">dicom</a></li>
             
+                <li><a href="../modules/gui.html">gui</a></li>
+            
                 <li><a href="../modules/html.html">html</a></li>
             
+                <li><a href="../modules/image.html">image</a></li>
+            
                 <li><a href="../modules/math.html">math</a></li>
+            
+                <li><a href="../modules/utils.html">utils</a></li>
             
             </ul>
         </div>
@@ -167,8 +175,8 @@ Main application.</a></li>
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-                        <h1>dwv.html.Image Size class. 
-Supports 2D and 3D images. Class</h1>
+                        <h1>App
+Main application. Class</h1>
 <div class="box meta">
     
 
@@ -176,13 +184,13 @@ Supports 2D and 3D images. Class</h1>
 
     
         <div class="foundat">
-            Defined in: <a href="../files/src_image_image.js.html#l6"><code>src&#x2F;image&#x2F;image.js:6</code></a>
+            Defined in: <a href="../files/src_application.js.html#l4"><code>src&#x2F;application.js:4</code></a>
         </div>
     
 
     
         
-            Module: <a href="../modules/dicom.html">dicom</a>
+            Module: <a href="../modules/utils.html">utils</a>
         
     
 
@@ -220,22 +228,28 @@ Supports 2D and 3D images. Class</h1>
                     <ul class="index-list methods">
                         
                             <li class="index-item method">
-                                <a href="#method_Apply a Sobel filter to an image.">Apply a Sobel filter to an image.</a>
+                                <a href="#method_capitaliseFirstLetter">capitaliseFirstLetter</a>
 
+                                
+                                    <span class="flag static">static</span>
                                 
                                 
                             </li>
                         
                             <li class="index-item method">
-                                <a href="#method_Sharpen an image using a sharpen convolution matrix.">Sharpen an image using a sharpen convolution matrix.</a>
+                                <a href="#method_cleanString">cleanString</a>
 
+                                
+                                    <span class="flag static">static</span>
                                 
                                 
                             </li>
                         
                             <li class="index-item method">
-                                <a href="#method_Threshold an image between an input minimum and maximum.">Threshold an image between an input minimum and maximum.</a>
+                                <a href="#method_splitQueryString">splitQueryString</a>
 
+                                
+                                    <span class="flag static">static</span>
                                 
                                 
                             </li>
@@ -256,116 +270,8 @@ Supports 2D and 3D images. Class</h1>
                 <h2 class="off-left">Methods</h2>
 
                 
-                    <div id="method_Apply a Sobel filter to an image." class="method item">
-    <h3 class="name"><code>Apply a Sobel filter to an image.</code></h3>
-
-    
-        <span class="paren">()</span>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/src_image_filter.js.html#l57"><code>src&#x2F;image&#x2F;filter.js:57</code></a>
-        
-        </p>
-
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        
-    </div>
-
-    
-
-    
-
-    
-</div>
-
-                
-                    <div id="method_Sharpen an image using a sharpen convolution matrix." class="method item">
-    <h3 class="name"><code>Sharpen an image using a sharpen convolution matrix.</code></h3>
-
-    
-        <span class="paren">()</span>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/src_image_filter.js.html#l40"><code>src&#x2F;image&#x2F;filter.js:40</code></a>
-        
-        </p>
-
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        
-    </div>
-
-    
-
-    
-
-    
-</div>
-
-                
-                    <div id="method_Threshold an image between an input minimum and maximum." class="method item">
-    <h3 class="name"><code>Threshold an image between an input minimum and maximum.</code></h3>
+                    <div id="method_capitaliseFirstLetter" class="method item">
+    <h3 class="name"><code>capitaliseFirstLetter</code></h3>
 
     
         <div class="args">
@@ -373,13 +279,7 @@ Supports 2D and 3D images. Class</h1>
             
                 <li class="arg">
                     
-                        <code>min</code>
-                    
-                </li>
-            
-                <li class="arg">
-                    
-                        <code>max</code>
+                        <code>string</code>
                     
                 </li>
             
@@ -388,13 +288,19 @@ Supports 2D and 3D images. Class</h1>
     
 
     
-
+        <span class="returns-inline">
+            <span class="type">String</span>
+        </span>
     
 
     
 
     
 
+    
+
+    
+        <span class="flag static">static</span>
     
 
     
@@ -412,7 +318,7 @@ Supports 2D and 3D images. Class</h1>
             
         
         
-        <a href="../files/src_image_filter.js.html#l8"><code>src&#x2F;image&#x2F;filter.js:8</code></a>
+        <a href="../files/src_utils_string.js.html#l8"><code>src&#x2F;utils&#x2F;string.js:8</code></a>
         
         </p>
 
@@ -423,7 +329,8 @@ Supports 2D and 3D images. Class</h1>
     </div>
 
     <div class="description">
-        
+        <p>Capitalise the first letter of a string.</p>
+
     </div>
 
     
@@ -434,30 +341,14 @@ Supports 2D and 3D images. Class</h1>
             
                 <li class="param">
                     
-                        <code class="param-name">min</code>
-                        <span class="type">Object</span>
+                        <code class="param-name">string</code>
+                        <span class="type">String</span>
                     
 
                     
 
                     <div class="param-description">
-                        <p>The new minimum.</p>
-
-                    </div>
-
-                    
-                </li>
-            
-                <li class="param">
-                    
-                        <code class="param-name">max</code>
-                        <span class="type">Object</span>
-                    
-
-                    
-
-                    <div class="param-description">
-                        <p>The new maximum.</p>
+                        <p>The string to capitalise the first letter.</p>
 
                     </div>
 
@@ -468,6 +359,240 @@ Supports 2D and 3D images. Class</h1>
         </div>
     
 
+    
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                
+                    
+                        <span class="type">String</span>:
+                    
+                    <p>The new string.</p>
+
+                
+            </div>
+        </div>
+    
+
+    
+</div>
+
+                
+                    <div id="method_cleanString" class="method item">
+    <h3 class="name"><code>cleanString</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>string</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+        <span class="returns-inline">
+            <span class="type">String</span>
+        </span>
+    
+
+    
+
+    
+
+    
+
+    
+        <span class="flag static">static</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_utils_string.js.html#l20"><code>src&#x2F;utils&#x2F;string.js:20</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Clean string: trim and remove ending.</p>
+
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">string</code>
+                        <span class="type">String</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The string to clean.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                
+                    
+                        <span class="type">String</span>:
+                    
+                    <p>The cleaned string.</p>
+
+                
+            </div>
+        </div>
+    
+
+    
+</div>
+
+                
+                    <div id="method_splitQueryString" class="method item">
+    <h3 class="name"><code>splitQueryString</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>inputStr</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+        <span class="returns-inline">
+            <span class="type">String</span>
+        </span>
+    
+
+    
+
+    
+
+    
+
+    
+        <span class="flag static">static</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_utils_string.js.html#l37"><code>src&#x2F;utils&#x2F;string.js:37</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Split string:
+root?key0=val0&amp;key1=val1 returns [{&quot;key&quot;=&quot;key0&quot;, &quot;value&quot;=&quot;val0&quot;}, {&quot;key&quot;=&quot;key1&quot;, &quot;value&quot;=&quot;val1&quot;}]
+Returns null if not a query string (no question mark).</p>
+
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">inputStr</code>
+                        <span class="type">String</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The string to split.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                
+                    
+                        <span class="type">String</span>:
+                    
+                    <p>The splitted string.</p>
+
+                
+            </div>
+        </div>
     
 
     

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>dwv.html.Window LUT class. - dwv</title>
+    <title>dwv.image.filter.Sobel - dwv</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
     <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
@@ -41,31 +41,37 @@
         <div id="api-tabview-panel">
             <ul id="api-classes" class="apis classes">
             
+                <li><a href="../classes/App
+Main application..html">App
+Main application.</a></li>
+            
                 <li><a href="../classes/dwv.dicom.DataReader.html">dwv.dicom.DataReader</a></li>
             
                 <li><a href="../classes/dwv.dicom.DicomParser.html">dwv.dicom.DicomParser</a></li>
             
                 <li><a href="../classes/dwv.dicom.Dictionary.html">dwv.dicom.Dictionary</a></li>
             
-                <li><a href="../classes/dwv.html.Image class..html">dwv.html.Image class.</a></li>
-            
-                <li><a href="../classes/dwv.html.Image Size class. 
-Supports 2D and 3D images..html">dwv.html.Image Size class. 
-Supports 2D and 3D images.</a></li>
-            
-                <li><a href="../classes/dwv.html.Image Spacing class. 
-Supports 2D and 3D images..html">dwv.html.Image Spacing class. 
-Supports 2D and 3D images.</a></li>
-            
                 <li><a href="../classes/dwv.html.Layer.html">dwv.html.Layer</a></li>
-            
-                <li><a href="../classes/dwv.html.Rescale LUT class..html">dwv.html.Rescale LUT class.</a></li>
             
                 <li><a href="../classes/dwv.html.Style.html">dwv.html.Style</a></li>
             
-                <li><a href="../classes/dwv.html.View class..html">dwv.html.View class.</a></li>
+                <li><a href="../classes/dwv.image.filter.Sharpen.html">dwv.image.filter.Sharpen</a></li>
             
-                <li><a href="../classes/dwv.html.Window LUT class..html">dwv.html.Window LUT class.</a></li>
+                <li><a href="../classes/dwv.image.filter.Sobel.html">dwv.image.filter.Sobel</a></li>
+            
+                <li><a href="../classes/dwv.image.filter.Threshold.html">dwv.image.filter.Threshold</a></li>
+            
+                <li><a href="../classes/dwv.image.Image.html">dwv.image.Image</a></li>
+            
+                <li><a href="../classes/dwv.image.lut.Rescale.html">dwv.image.lut.Rescale</a></li>
+            
+                <li><a href="../classes/dwv.image.lut.Window.html">dwv.image.lut.Window</a></li>
+            
+                <li><a href="../classes/dwv.image.Size.html">dwv.image.Size</a></li>
+            
+                <li><a href="../classes/dwv.image.Spacing.html">dwv.image.Spacing</a></li>
+            
+                <li><a href="../classes/dwv.image.View.html">dwv.image.View</a></li>
             
                 <li><a href="../classes/dwv.math.BucketQueue.html">dwv.math.BucketQueue</a></li>
             
@@ -88,10 +94,6 @@ Supports 2D and 3D images.</a></li>
                 <li><a href="../classes/dwv.math.ROI.html">dwv.math.ROI</a></li>
             
                 <li><a href="../classes/dwv.math.Scissors.html">dwv.math.Scissors</a></li>
-            
-                <li><a href="../classes/Filter classes..App
-Main application..html">Filter classes..App
-Main application.</a></li>
             
                 <li><a href="../classes/Filter classes..Draw line command..html">Filter classes..Draw line command.</a></li>
             
@@ -127,9 +129,15 @@ Main application.</a></li>
             
                 <li><a href="../modules/dicom.html">dicom</a></li>
             
+                <li><a href="../modules/gui.html">gui</a></li>
+            
                 <li><a href="../modules/html.html">html</a></li>
             
+                <li><a href="../modules/image.html">image</a></li>
+            
                 <li><a href="../modules/math.html">math</a></li>
+            
+                <li><a href="../modules/utils.html">utils</a></li>
             
             </ul>
         </div>
@@ -166,7 +174,7 @@ Main application.</a></li>
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-                        <h1>dwv.html.Window LUT class. Class</h1>
+                        <h1>dwv.image.filter.Sobel Class</h1>
 <div class="box meta">
     
 
@@ -174,13 +182,13 @@ Main application.</a></li>
 
     
         <div class="foundat">
-            Defined in: <a href="../files/src_image_luts.js.html#l39"><code>src&#x2F;image&#x2F;luts.js:39</code></a>
+            Defined in: <a href="../files/src_image_filter.js.html#l109"><code>src&#x2F;image&#x2F;filter.js:109</code></a>
         </div>
     
 
     
         
-            Module: <a href="../modules/dicom.html">dicom</a>
+            Module: <a href="../modules/image.html">image</a>
         
     
 
@@ -190,15 +198,75 @@ Main application.</a></li>
 
 
 <div class="box intro">
+    <p>Apply a Sobel filter to an image.</p>
+
+</div>
+
+
+    <div class="constructor">
+        <h2>Constructor</h2>
+        <div id="method_dwv.image.filter.Sobel" class="method item">
+    <h3 class="name"><code>dwv.image.filter.Sobel</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_image_filter.js.html#l109"><code>src&#x2F;image&#x2F;filter.js:109</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        
+    </div>
+
+    
+
+    
+
     
 </div>
 
+    </div>
 
 
 <div id="classdocs" class="tabview">
     <ul class="api-class-tabs">
         <li class="api-class-tab index"><a href="#index">Index</a></li>
 
+        
+            <li class="api-class-tab methods"><a href="#methods">Methods</a></li>
         
         
         
@@ -210,6 +278,28 @@ Main application.</a></li>
             <h2 class="off-left">Item Index</h2>
 
             
+                <div class="index-section methods">
+                    <h3>Methods</h3>
+
+                    <ul class="index-list methods">
+                        
+                            <li class="index-item method">
+                                <a href="#method_getName">getName</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_update">update</a>
+
+                                
+                                
+                            </li>
+                        
+                    </ul>
+                </div>
+            
 
             
 
@@ -218,6 +308,158 @@ Main application.</a></li>
             
         </div>
 
+        
+            <div id="methods" class="api-class-tabpanel">
+                <h2 class="off-left">Methods</h2>
+
+                
+                    <div id="method_getName" class="method item">
+    <h3 class="name"><code>getName</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+        <span class="returns-inline">
+            <span class="type">String</span>
+        </span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_image_filter.js.html#l117"><code>src&#x2F;image&#x2F;filter.js:117</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Get the name of the filter.</p>
+
+    </div>
+
+    
+
+    
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                
+                    
+                        <span class="type">String</span>:
+                    
+                    <p>The name of the filter.</p>
+
+                
+            </div>
+        </div>
+    
+
+    
+</div>
+
+                
+                    <div id="method_update" class="method item">
+    <h3 class="name"><code>update</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+        <span class="returns-inline">
+            <span class="type">Object</span>
+        </span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_image_filter.js.html#l125"><code>src&#x2F;image&#x2F;filter.js:125</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Transform the main image using this filter.</p>
+
+    </div>
+
+    
+
+    
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                
+                    
+                        <span class="type">Object</span>:
+                    
+                    <p>The transformed image.</p>
+
+                
+            </div>
+        </div>
+    
+
+    
+</div>
+
+                
+            </div>
         
 
         

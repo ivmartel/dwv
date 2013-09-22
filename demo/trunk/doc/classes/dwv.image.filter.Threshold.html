@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>dwv.dicom.Dictionary - dwv</title>
+    <title>dwv.image.filter.Threshold - dwv</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
     <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
@@ -174,7 +174,7 @@ Main application.</a></li>
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-                        <h1>dwv.dicom.Dictionary Class</h1>
+                        <h1>dwv.image.filter.Threshold Class</h1>
 <div class="box meta">
     
 
@@ -182,13 +182,13 @@ Main application.</a></li>
 
     
         <div class="foundat">
-            Defined in: <a href="../files/src_dicom_dictionary.js.html#l8"><code>src&#x2F;dicom&#x2F;dictionary.js:8</code></a>
+            Defined in: <a href="../files/src_image_filter.js.html#l9"><code>src&#x2F;image&#x2F;filter.js:9</code></a>
         </div>
     
 
     
         
-            Module: <a href="../modules/dicom.html">dicom</a>
+            Module: <a href="../modules/image.html">image</a>
         
     
 
@@ -198,15 +198,15 @@ Main application.</a></li>
 
 
 <div class="box intro">
-    <p>DICOM tag dictionary.</p>
+    <p>Threshold an image between an input minimum and maximum.</p>
 
 </div>
 
 
     <div class="constructor">
         <h2>Constructor</h2>
-        <div id="method_dwv.dicom.Dictionary" class="method item">
-    <h3 class="name"><code>dwv.dicom.Dictionary</code></h3>
+        <div id="method_dwv.image.filter.Threshold" class="method item">
+    <h3 class="name"><code>dwv.image.filter.Threshold</code></h3>
 
     
         <span class="paren">()</span>
@@ -237,7 +237,7 @@ Main application.</a></li>
             
         
         
-        <a href="../files/src_dicom_dictionary.js.html#l8"><code>src&#x2F;dicom&#x2F;dictionary.js:8</code></a>
+        <a href="../files/src_image_filter.js.html#l9"><code>src&#x2F;image&#x2F;filter.js:9</code></a>
         
         </p>
 
@@ -286,7 +286,42 @@ Main application.</a></li>
                     <ul class="index-list methods">
                         
                             <li class="index-item method">
-                                <a href="#method_init">init</a>
+                                <a href="#method_getMax">getMax</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_getMin">getMin</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_getName">getName</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_setMax">setMax</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_setMin">setMin</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_update">update</a>
 
                                 
                                 
@@ -302,8 +337,15 @@ Main application.</a></li>
 
                     <ul class="index-list properties">
                         
-                            <li class="index-item property">
-                                <a href="#property_newDictionary">newDictionary</a>
+                            <li class="index-item property private">
+                                <a href="#property_max">max</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item property private">
+                                <a href="#property_min">min</a>
 
                                 
                                 
@@ -323,11 +365,240 @@ Main application.</a></li>
                 <h2 class="off-left">Methods</h2>
 
                 
-                    <div id="method_init" class="method item">
-    <h3 class="name"><code>init</code></h3>
+                    <div id="method_getMax" class="method item">
+    <h3 class="name"><code>getMax</code></h3>
 
     
         <span class="paren">()</span>
+    
+
+    
+        <span class="returns-inline">
+            <span class="type">Number</span>
+        </span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_image_filter.js.html#l44"><code>src&#x2F;image&#x2F;filter.js:44</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Get the threshold maximum.</p>
+
+    </div>
+
+    
+
+    
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                
+                    
+                        <span class="type">Number</span>:
+                    
+                    <p>The threshold maximum.</p>
+
+                
+            </div>
+        </div>
+    
+
+    
+</div>
+
+                
+                    <div id="method_getMin" class="method item">
+    <h3 class="name"><code>getMin</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+        <span class="returns-inline">
+            <span class="type">Number</span>
+        </span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_image_filter.js.html#l32"><code>src&#x2F;image&#x2F;filter.js:32</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Get the threshold minimum.</p>
+
+    </div>
+
+    
+
+    
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                
+                    
+                        <span class="type">Number</span>:
+                    
+                    <p>The threshold minimum.</p>
+
+                
+            </div>
+        </div>
+    
+
+    
+</div>
+
+                
+                    <div id="method_getName" class="method item">
+    <h3 class="name"><code>getName</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+        <span class="returns-inline">
+            <span class="type">String</span>
+        </span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_image_filter.js.html#l56"><code>src&#x2F;image&#x2F;filter.js:56</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Get the name of the filter.</p>
+
+    </div>
+
+    
+
+    
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                
+                    
+                        <span class="type">String</span>:
+                    
+                    <p>The name of the filter.</p>
+
+                
+            </div>
+        </div>
+    
+
+    
+</div>
+
+                
+                    <div id="method_setMax" class="method item">
+    <h3 class="name"><code>setMax</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>val</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
     
 
     
@@ -355,7 +626,7 @@ Main application.</a></li>
             
         
         
-        <a href="../files/src_dicom_dictionary.js.html#l23"><code>src&#x2F;dicom&#x2F;dictionary.js:23</code></a>
+        <a href="../files/src_image_filter.js.html#l50"><code>src&#x2F;image&#x2F;filter.js:50</code></a>
         
         </p>
 
@@ -366,12 +637,198 @@ Main application.</a></li>
     </div>
 
     <div class="description">
-        <p>Fill in the dictionary array.</p>
+        <p>Set the threshold maximum.</p>
+
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">val</code>
+                        <span class="type">Number</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The threshold maximum.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_setMin" class="method item">
+    <h3 class="name"><code>setMin</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>val</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_image_filter.js.html#l38"><code>src&#x2F;image&#x2F;filter.js:38</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Set the threshold minimum.</p>
+
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">val</code>
+                        <span class="type">Number</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The threshold minimum.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_update" class="method item">
+    <h3 class="name"><code>update</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+        <span class="returns-inline">
+            <span class="type">Object</span>
+        </span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_image_filter.js.html#l64"><code>src&#x2F;image&#x2F;filter.js:64</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Transform the main image using this filter.</p>
 
     </div>
 
     
 
+    
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                
+                    
+                        <span class="type">Object</span>:
+                    
+                    <p>The transformed image.</p>
+
+                
+            </div>
+        </div>
     
 
     
@@ -386,12 +843,14 @@ Main application.</a></li>
                 <h2 class="off-left">Properties</h2>
 
                 
-                    <div id="property_newDictionary" class="property item">
-    <h3 class="name"><code>newDictionary</code></h3>
-    <span class="type">Array</span>
+                    <div id="property_max" class="property item private">
+    <h3 class="name"><code>max</code></h3>
+    <span class="type">Number</span>
 
     
 
+    
+        <span class="flag private">private</span>
     
 
     
@@ -409,7 +868,7 @@ Main application.</a></li>
             
         
         
-        <a href="../files/src_dicom_dictionary.js.html#l15"><code>src&#x2F;dicom&#x2F;dictionary.js:15</code></a>
+        <a href="../files/src_image_filter.js.html#l24"><code>src&#x2F;image&#x2F;filter.js:24</code></a>
         
         </p>
 
@@ -419,7 +878,54 @@ Main application.</a></li>
     </div>
 
     <div class="description">
-        <p>Tag definition storage.</p>
+        <p>Threshold maxnimum.</p>
+
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="property_min" class="property item private">
+    <h3 class="name"><code>min</code></h3>
+    <span class="type">Number</span>
+
+    
+
+    
+        <span class="flag private">private</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_image_filter.js.html#l17"><code>src&#x2F;image&#x2F;filter.js:17</code></a>
+        
+        </p>
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Threshold minimum.</p>
 
     </div>
 

@@ -3108,7 +3108,7 @@ dwv.dicom.Dictionary.prototype.init = function() {
 
 ;/** 
  * GUI module.
- * @module dicom
+ * @module gui
  */
 var dwv = dwv || {};
 dwv.gui = dwv.gui || {};
@@ -3116,6 +3116,7 @@ dwv.gui = dwv.gui || {};
 /**
  * Handle window/level change.
  * @method onChangeWindowLevelPreset
+ * @namespace dwv.gui
  * @static
  * @param {Object} event The change event.
  */
@@ -3630,9 +3631,11 @@ var dwv = dwv || {};
 dwv.html = dwv.html || {};
 
 /**
- * @method Append a cell to a given row.
- * @param row The row to append the cell to.
- * @param text The text of the cell.
+ * Append a cell to a given row.
+ * @method appendCell
+ * @static
+ * @param {Object} row The row to append the cell to.
+ * @param {String} text The text of the cell.
  */
 dwv.html.appendCell = function(row, text)
 {
@@ -3641,9 +3644,11 @@ dwv.html.appendCell = function(row, text)
 };
 
 /**
- * @function Append a header cell to a given row.
- * @param row The row to append the header cell to.
- * @param text The text of the header cell.
+ * Append a header cell to a given row.
+ * @method appendHCell
+ * @static
+ * @param {Object} row The row to append the header cell to.
+ * @param {String} text The text of the header cell.
  */
 dwv.html.appendHCell = function(row, text)
 {
@@ -3655,7 +3660,14 @@ dwv.html.appendHCell = function(row, text)
 };
 
 /**
- * @function
+ * Append a row to an array.
+ * @method appendRowForArray
+ * @static
+ * @param {} table
+ * @param {} input
+ * @param {} level
+ * @param {} maxLevel
+ * @param {} rowHeader
  */
 dwv.html.appendRowForArray = function(table, input, level, maxLevel, rowHeader)
 {
@@ -3681,7 +3693,14 @@ dwv.html.appendRowForArray = function(table, input, level, maxLevel, rowHeader)
 };
 
 /**
- * @function
+ * Append a row to an object.
+ * @method appendRowForObject
+ * @static
+ * @param {} table
+ * @param {} input
+ * @param {} level
+ * @param {} maxLevel
+ * @param {} rowHeader
  */
 dwv.html.appendRowForObject = function(table, input, level, maxLevel, rowHeader)
 {
@@ -3723,7 +3742,14 @@ dwv.html.appendRowForObject = function(table, input, level, maxLevel, rowHeader)
 };
 
 /**
- * @function
+ * Append a row to an object or an array.
+ * @method appendRow
+ * @static
+ * @param {} table
+ * @param {} input
+ * @param {} level
+ * @param {} maxLevel
+ * @param {} rowHeader
  */
 dwv.html.appendRow = function(table, input, level, maxLevel, rowHeader)
 {
@@ -3741,8 +3767,11 @@ dwv.html.appendRow = function(table, input, level, maxLevel, rowHeader)
 };
 
 /**
- * @function Converts the input to an HTML table.
- * @input input Allowed types are: array, array of object, object.
+ * Converts the input to an HTML table.
+ * @method toTable
+ * @static
+ * @input {Mixed} input Allowed types are: array, array of object, object.
+ * @return {Object} The created HTML table.
  * @warning Null is interpreted differently in browsers, firefox will not display it.
  */
 dwv.html.toTable = function(input)
@@ -3753,7 +3782,11 @@ dwv.html.toTable = function(input)
 };
 
 /**
- * @function
+ * Get an HTML search form.
+ * @method getHtmlSearchForm
+ * @static
+ * @param {Object} htmlTableToSearch The table to do the search on.
+ * @return {Object} The HTML search form.
  */
 dwv.html.getHtmlSearchForm = function(htmlTableToSearch)
 {
@@ -3769,9 +3802,12 @@ dwv.html.getHtmlSearchForm = function(htmlTableToSearch)
 };
 
 /**
- * @function
- * @param term
- * @param table
+ * Filter a table with a given parameter: sets the display css of rows to
+ * true or false if it contains the term.
+ * @method filterTable
+ * @static
+ * @param {String} term The term to filter the table with.
+ * @param {Object} table The table to filter.
  */
 dwv.html.filterTable = function(term, table) {
     // de-highlight
@@ -3799,10 +3835,12 @@ dwv.html.filterTable = function(term, table) {
 };
 
 /**
- * @function Transform back each
- * <span>preText <span class="highlighted">term</span> postText</span>
- * into its original preText term postText
- * @param container The container to de-highlight.
+ * Transform back each
+ * 'preText <span class="highlighted">term</span> postText'
+ * into its original 'preText term postText'.
+ * @method dehighlight
+ * @static
+ * @param {Object} container The container to de-highlight.
  */
 dwv.html.dehighlight = function(container) {
     for (var i = 0; i < container.childNodes.length; i++) {
@@ -3825,11 +3863,13 @@ dwv.html.dehighlight = function(container) {
 };
 
 /**
- * @function Create a
- * <span>preText <span class="highlighted">term</span> postText</span>
- * around each search term
- * @param term The term to highlight.
- * @param container The container where to highlight the term.
+ * Create a
+ * 'preText <span class="highlighted">term</span> postText'
+ * around each search term.
+ * @method highlight
+ * @static
+ * @param {String} term The term to highlight.
+ * @param {Object} container The container where to highlight the term.
  */
 dwv.html.highlight = function(term, container) {
     for (var i = 0; i < container.childNodes.length; i++) {
@@ -3867,7 +3907,11 @@ dwv.html.highlight = function(term, container) {
 };
 
 /**
- * @function
+ * Highlight a HTML node.
+ * @method createHighlightNode
+ * @static
+ * @param {Object} child The child to highlight.
+ * @return {Object} The created HTML node.
  */
 dwv.html.createHighlightNode = function(child) {
     var node = document.createElement('span');
@@ -3878,9 +3922,10 @@ dwv.html.createHighlightNode = function(child) {
 };
 
 /**
- * @function Remove all children of a node.
- * @param nodeId The id of the node to delete.
- * @param parentId The id of the parent of the node to delete.
+ * Remove all children of a HTML node.
+ * @method cleanNode
+ * @static
+ * @param {Object} node The node to remove kids.
  */
 dwv.html.cleanNode = function(node) {
     // remove its children
@@ -3890,9 +3935,9 @@ dwv.html.cleanNode = function(node) {
 };
 
 /**
- * @function Remove all children of a node and then remove it from its parent.
- * @param nodeId The id of the node to delete.
- * @param parentId The id of the parent of the node to delete.
+ * Remove a HTML node and all its children.
+ * @method removeNode
+ * @param {Number} nodeId The id of the node to delete.
  */
 dwv.html.removeNode = function(nodeId) {
     // find the node
@@ -3907,12 +3952,14 @@ dwv.html.removeNode = function(nodeId) {
 };
 
 /**
- * @function Create a HTML select from an input array of options.
+ * Create a HTML select from an input array of options.
  * The values of the options are the name of the option made lower case.
  * It is left to the user to set the 'onchange' method of the select.
- * @param name The name of the HTML select.
- * @param list The list of options of the HTML select.
- * @return The created HTML select.
+ * @method createHtmlSelect
+ * @static
+ * @param {String} name The name of the HTML select.
+ * @param {Mixed} list The list of options of the HTML select.
+ * @return {Object} The created HTML select.
  */
 dwv.html.createHtmlSelect = function(name, list) {
     // select
@@ -3948,6 +3995,13 @@ dwv.html.createHtmlSelect = function(name, list) {
     return select;
 };
 
+/**
+ * Get a list of parameters from an input URI.
+ * @method getUriParam
+ * @static
+ * @param {String } uri The URI to decode.
+ * @return {Array} The array of parameters.
+ */
 dwv.html.getUriParam = function(uri)
 {
     var inputUri = uri || window.location.href;
@@ -4021,6 +4075,12 @@ dwv.html.getUriParam = function(uri)
     return val;
 };
 
+/**
+ * Toggle the display of an element.
+ * @method toggleDisplay
+ * @static
+ * @param {Number} id The id of the element to toggle its display.
+ */
 dwv.html.toggleDisplay = function(id)
 {
     if( document.getElementById(id) )
@@ -4032,8 +4092,10 @@ dwv.html.toggleDisplay = function(id)
 };
 
 /**
- * Browser checks to see if it can run dwv...
+ * Browser checks to see if it can run dwv. Throws an error if not.
  * TODO Maybe use http://modernizr.com/.
+ * @method checkBrowser
+ * @static
  */ 
 dwv.html.checkBrowser = function()
 {
@@ -4057,11 +4119,16 @@ dwv.html.checkBrowser = function()
         alert(message+appnorun);
         throw new Error(message);
     }
+    if( !window.Uint8ClampedArray ) {
+        message = "The Uint8ClampedArray is not supported in this browser. ";
+        alert(message+appnorun);
+        throw new Error(message);
+    }
 };
 
 ;/** 
  * HTML module.
- * @module dicom
+ * @module html
  */
 var dwv = dwv || {};
 dwv.html = dwv.html || {};
@@ -4075,30 +4142,91 @@ dwv.html = dwv.html || {};
  */
 dwv.html.Layer = function(name)
 {
-    // A HTMLCanvasElement.
+    /**
+     * The associated HTMLCanvasElement.
+     * @property canvas
+     * @private
+     * @type Object
+     */
     var canvas = null;
-    // A CanvasRenderingContext2D.
+    /**
+     * The associated CanvasRenderingContext2D.
+     * @property context
+     * @private
+     * @type Object
+     */
     var context = null;
     
-    // Get the layer name.
+    /**
+     * Get the layer name.
+     * @method getName
+     * @return {String} The layer name.
+     */
     this.getName = function() { return name; };
-    // Get the layer canvas.
+    /**
+     * Get the layer canvas.
+     * @method getCanvas
+     * @return {Object} The layer canvas.
+     */
     this.getCanvas = function() { return canvas; };
-    // Get the layer context
+    /**
+     * Get the layer context.
+     * @method getContext
+     * @return {Object} The layer context.
+     */
     this.getContext = function() { return context; };
-    // Get the layer offset on page
+    /**
+     * Get the layer offset on page.
+     * @method getOffset
+     * @return {Number} The layer offset on page.
+     */
     this.getOffset = function() { return $('#'+name).offset(); };
 
-    // Image data array
+    /**
+     * The image data array.
+     * @property imageData
+     * @private
+     * @type Array
+     */
     var imageData = null;
     
-    // Image information
+    /**
+     * The image origin X position.
+     * @property originX
+     * @private
+     * @type Number
+     */
     var originX = 0;
+    /**
+     * The image origin Y position.
+     * @property originY
+     * @private
+     * @type Number
+     */
     var originY = 0;
+    /**
+     * The image zoom in the X direction.
+     * @property zoomX
+     * @private
+     * @type Number
+     */
     var zoomX = 1;
+    /**
+     * The image zoom in the Y direction.
+     * @property zoomY
+     * @private
+     * @type Number
+     */
     var zoomY = 1;
     
-    // set the zoom
+    /**
+     * Set the layer zoom.
+     * @method setZoom
+     * @param {Number} stepX The zoom step in the X direction.
+     * @param {Number} stepY The zoom step in the Y direction.
+     * @param {Number} centerX The zoom center in the X direction.
+     * @param {Number} centerY The zoom center in the Y direction.
+     */
     this.setZoom = function(stepX,stepY,centerX,centerY)
     {
         var newZoomX = zoomX + stepX;
@@ -4118,16 +4246,29 @@ dwv.html.Layer = function(name)
         this.draw();
     };
     
-    // zoom the layer
-    this.zoom = function(zx,zy,cx,cy)
+    /**
+     * Set the layer zoom and apply it.
+     * @method zoom
+     * @param {Number} stepX The zoom step in the X direction.
+     * @param {Number} stepY The zoom step in the Y direction.
+     * @param {Number} centerX The zoom center in the X direction.
+     * @param {Number} centerY The zoom center in the Y direction.
+     */
+    this.zoom = function(stepX,stepY,centerX,centreY)
     {
         // set zoom
-        this.setZoom(zx, zy, cx, cy);
+        this.setZoom(stepX,stepY,centerX,centreY);
         // draw 
         this.draw();
     };
 
-    // translation is according to the last one
+    /**
+     * Set the layer translation.
+     * Translation is according to the last one.
+     * @method setTranslate
+     * @param {Number} tx The translation in the X direction.
+     * @param {Number} ty The translation in the Y direction.
+     */
     this.setTranslate = function(tx,ty)
     {
         // check translate value
@@ -4150,7 +4291,13 @@ dwv.html.Layer = function(name)
         originY += ty;
     };
     
-    // translation is according to the last one
+    /**
+     * Set the layer translation and apply it.
+     * Translation is according to the last one.
+     * @method translate
+     * @param {Number} tx The translation in the X direction.
+     * @param {Number} ty The translation in the Y direction.
+     */
     this.translate = function(tx,ty)
     {
         // set the translate
@@ -4159,7 +4306,11 @@ dwv.html.Layer = function(name)
         this.draw();
     };
     
-    // set the image data array
+    /**
+     * Set the image data array.
+     * @method setImageData
+     * @param {Array} data The data array.
+     */
     this.setImageData = function(data)
     {
         imageData = data;
@@ -4167,6 +4318,7 @@ dwv.html.Layer = function(name)
     
     /**
      * Reset the layout
+     * @method resetLayout
      */ 
     this.resetLayout = function()
     {
@@ -4179,6 +4331,7 @@ dwv.html.Layer = function(name)
     /**
      * Draw the content (imageData) of the layer.
      * The imageData variable needs to be set
+     * @method draw
      */
     this.draw = function()
     {
@@ -4201,8 +4354,9 @@ dwv.html.Layer = function(name)
     
     /**
      * Initialise the layer: set the canvas and context
-     * @input width The width of the canvas.
-     * @input height The height of the canvas.
+     * @method initialise
+     * @input {Number} inputWidth The width of the canvas.
+     * @input {Number} inputHeight The height of the canvas.
      */
     this.initialise = function(inputWidth, inputHeight)
     {
@@ -4236,6 +4390,7 @@ dwv.html.Layer = function(name)
     
     /**
      * Fill the full context with the current style.
+     * @method fillContext
      */
     this.fillContext = function()
     {
@@ -4244,6 +4399,7 @@ dwv.html.Layer = function(name)
     
     /**
      * Clear the full context.
+     * @method clearContextRect
      */
     this.clearContextRect = function()
     {
@@ -4252,7 +4408,8 @@ dwv.html.Layer = function(name)
     
     /**
      * Merge two layers.
-     * @input layerToMerge The layer to merge. It will also be emptied.
+     * @method merge
+     * @input {Layer} layerToMerge The layer to merge. It will also be emptied.
      */
     this.merge = function(layerToMerge)
     {
@@ -4267,7 +4424,9 @@ dwv.html.Layer = function(name)
     };
     
     /**
-     * Set the fill and stroke style of the context.
+     * Set the line color for the layer.
+     * @method setLineColor
+     * @input {Layer} color The line color.
      */
     this.setLineColor = function(color)
     {
@@ -4277,6 +4436,8 @@ dwv.html.Layer = function(name)
     
     /**
      * Display the layer.
+     * @method setStyleDisplay
+     * @input {Boolean} val Whether to display the layer or not.
      */
     this.setStyleDisplay = function(val)
     {
@@ -4290,6 +4451,11 @@ dwv.html.Layer = function(name)
         }
     };
     
+    /**
+     * Check if the layer is visible.
+     * @method isVisible
+     * @return {Boolean} True if the layer is visible.
+     */
     this.isVisible = function()
     {
       if( canvas.style.display === "none" ) return false;
@@ -4298,6 +4464,8 @@ dwv.html.Layer = function(name)
     
     /**
      * Align on another layer.
+     * @method align
+     * @param {Layer} rhs The layer to align on.
      */
     this.align = function(rhs)
     {
@@ -4305,9 +4473,10 @@ dwv.html.Layer = function(name)
         canvas.style.left = rhs.getCanvas().offsetLeft;
     };
 }; // Layer class
+
 ;/** 
  * HTML module.
- * @module dicom
+ * @module html
  */
 var dwv = dwv || {};
 dwv.html = dwv.html || {};
@@ -4383,34 +4552,74 @@ dwv.html.Style.prototype.setLineColor = function(color) {
     this.lineColor = color;
 };
 
-;//! @namespace Main DWV namespace.
+;/** 
+ * Image module.
+ * @module image
+ */
 var dwv = dwv || {};
-//! @namespace Image related.
 dwv.image = dwv.image || {};
-//! @namespace Filter classes.
 dwv.image.filter = dwv.image.filter || {};
 
 /**
- * @function Threshold an image between an input minimum and maximum.
- * @param min The new minimum.
- * @param max The new maximum.
+ * Threshold an image between an input minimum and maximum.
+ * @class Threshold
+ * @namespace dwv.image.filter
+ * @constructor
  */
 dwv.image.filter.Threshold = function()
 {
+    /**
+     * Threshold minimum.
+     * @property min
+     * @private
+     * @type Number
+     */
     var min = 0;
+    /**
+     * Threshold maxnimum.
+     * @property max
+     * @private
+     * @type Number
+     */
     var max = 0;
-    // Get the minimum value.
+
+    /**
+     * Get the threshold minimum.
+     * @method getMin
+     * @return {Number} The threshold minimum.
+     */
     this.getMin = function() { return min; };
-    // Set the minimum value.
+    /**
+     * Set the threshold minimum.
+     * @method setMin
+     * @param {Number} val The threshold minimum.
+     */
     this.setMin = function(val) { min = val; };
-    // Get the maximum value.
+    /**
+     * Get the threshold maximum.
+     * @method getMax
+     * @return {Number} The threshold maximum.
+     */
     this.getMax = function() { return max; };
-    // Set the maximum value.
+    /**
+     * Set the threshold maximum.
+     * @method setMax
+     * @param {Number} val The threshold maximum.
+     */
     this.setMax = function(val) { max = val; };
-    // Get the name of the filter.
+    /**
+     * Get the name of the filter.
+     * @method getName
+     * @return {String} The name of the filter.
+     */
     this.getName = function() { return "Threshold"; };
 };
 
+/**
+ * Transform the main image using this filter.
+ * @method update
+ * @return {Object} The transformed image.
+ */ 
 dwv.image.filter.Threshold.prototype.update = function()
 {
     var imageMin = app.getImage().getDataRange().min;
@@ -4423,14 +4632,26 @@ dwv.image.filter.Threshold.prototype.update = function()
 };
 
 /**
- * @function Sharpen an image using a sharpen convolution matrix.
+ * Sharpen an image using a sharpen convolution matrix.
+ * @class Sharpen
+ * @namespace dwv.image.filter
+ * @constructor
  */
 dwv.image.filter.Sharpen = function()
 {
-    // Get the name of the filter.
+    /**
+     * Get the name of the filter.
+     * @method getName
+     * @return {String} The name of the filter.
+     */
     this.getName = function() { return "Sharpen"; };
 };
 
+/**
+ * Transform the main image using this filter.
+ * @method update
+ * @return {Object} The transformed image.
+ */ 
 dwv.image.filter.Sharpen.prototype.update = function()
 {
     return app.getImage().convolute2D(
@@ -4440,14 +4661,26 @@ dwv.image.filter.Sharpen.prototype.update = function()
 };
 
 /**
- * @function Apply a Sobel filter to an image.
+ * Apply a Sobel filter to an image.
+ * @class Sobel
+ * @namespace dwv.image.filter
+ * @constructor
  */
 dwv.image.filter.Sobel = function()
 {
-    // Get the name of the filter.
+    /**
+     * Get the name of the filter.
+     * @method getName
+     * @return {String} The name of the filter.
+     */
     this.getName = function() { return "Sobel"; };
 };
 
+/**
+ * Transform the main image using this filter.
+ * @method update
+ * @return {Object} The transformed image.
+ */ 
 dwv.image.filter.Sobel.prototype.update = function()
 {
     var gradX = app.getImage().convolute2D(
@@ -4462,43 +4695,85 @@ dwv.image.filter.Sobel.prototype.update = function()
     
     return gradX.compose( gradY, function(x,y){return Math.sqrt(x*x+y*y);} );
 };
-;//! @namespace Main DWV namespace.
+
+;/** 
+ * Image module.
+ * @module image
+ */
 var dwv = dwv || {};
-//! @namespace Image related.
 dwv.image = dwv.image || {};
 
 /**
-* @class Image Size class. 
-* Supports 2D and 3D images.
-* @param numberOfColumns The number of columns (number).
-* @param numberOfRows The number of rows (number).
-* @param numberOfSlices The number of slices (number).
+ * Image Size class.
+ * Supports 2D and 3D images.
+ * @class Size
+ * @namespace dwv.image
+ * @constructor
+ * @param {Number} numberOfColumns The number of columns.
+ * @param {Number} numberOfRows The number of rows.
+ * @param {Number} numberOfSlices The number of slices.
 */
 dwv.image.Size = function( numberOfColumns, numberOfRows, numberOfSlices )
 {
-    // Get the number of columns.
+    /**
+     * Get the number of columns.
+     * @method getNumberOfColumns
+     * @return {Number} The number of columns.
+     */ 
     this.getNumberOfColumns = function() { return numberOfColumns; };
-    // Get the number of rows.
+    /**
+     * Get the number of rows.
+     * @method getNumberOfRows
+     * @return {Number} The number of rows.
+     */ 
     this.getNumberOfRows = function() { return numberOfRows; };
-    // Get the number of slices.
+    /**
+     * Get the number of slices.
+     * @method getNumberOfSlices
+     * @return {Number} The number of slices.
+     */ 
     this.getNumberOfSlices = function() { return (numberOfSlices || 1.0); };
 };
-// Get the size of a slice.
+
+/**
+ * Get the size of a slice.
+ * @method getSliceSize
+ * @return {Number} The size of a slice.
+ */ 
 dwv.image.Size.prototype.getSliceSize = function() {
     return this.getNumberOfColumns()*this.getNumberOfRows();
 };
-// Get the total size.
+
+/**
+ * Get the total size.
+ * @method getTotalSize
+ * @return {Number} The total size.
+ */ 
 dwv.image.Size.prototype.getTotalSize = function() {
     return this.getSliceSize()*this.getNumberOfSlices();
 };
-// Check for equality.
+
+/**
+ * Check for equality.
+ * @method equals
+ * @param {Size} rhs The object to compare to.
+ * @return {Boolean} True if both objects are equal.
+ */ 
 dwv.image.Size.prototype.equals = function(rhs) {
     return rhs !== null &&
         this.getNumberOfColumns() === rhs.getNumberOfColumns() &&
         this.getNumberOfRows() === rhs.getNumberOfRows() &&
         this.getNumberOfSlices() === rhs.getNumberOfSlices();
 };
-// Check that coordinates are within bounds.
+
+/**
+ * Check that coordinates are within bounds.
+ * @method isInBounds
+ * @param {Number} i The column coordinate.
+ * @param {Number} j The row coordinate.
+ * @param {Number} k The slice coordinate.
+ * @return {Boolean} True if the given coordinates are within bounds.
+ */ 
 dwv.image.Size.prototype.isInBounds = function( i, j, k ) {
     if( i < 0 || i > this.getNumberOfColumns() - 1 ||
         j < 0 || j > this.getNumberOfRows() - 1 ||
@@ -4507,22 +4782,43 @@ dwv.image.Size.prototype.isInBounds = function( i, j, k ) {
 };
 
 /**
-* @class Image Spacing class. 
-* Supports 2D and 3D images.
-* @param columnSpacing The column spacing (number).
-* @param rowSpacing The row spacing (number).
-* @param sliceSpacing The slice spacing (number).
-*/
+ * Image Spacing class. 
+ * Supports 2D and 3D images.
+ * @class Spacing
+ * @namespace dwv.image
+ * @constructor
+ * @param {Number} columnSpacing The column spacing.
+ * @param {Number} rowSpacing The row spacing.
+ * @param {Number} sliceSpacing The slice spacing.
+ */
 dwv.image.Spacing = function( columnSpacing, rowSpacing, sliceSpacing )
 {
-    // Get the column spacing.
+    /**
+     * Get the column spacing.
+     * @method getColumnSpacing
+     * @return {Number} The column spacing.
+     */ 
     this.getColumnSpacing = function() { return columnSpacing; };
-    // Get the row spacing.
+    /**
+     * Get the row spacing.
+     * @method getRowSpacing
+     * @return {Number} The row spacing.
+     */ 
     this.getRowSpacing = function() { return rowSpacing; };
-    // Get the slice spacing.
+    /**
+     * Get the slice spacing.
+     * @method slice
+     * @return {Number} The slice spacing.
+     */ 
     this.getSliceSpacing = function() { return (sliceSpacing || 1.0); };
 };
-// Check for equality.
+
+/**
+ * Check for equality.
+ * @method equals
+ * @param {Spacing} rhs The object to compare to.
+ * @return {Boolean} True if both objects are equal.
+ */ 
 dwv.image.Spacing.prototype.equals = function(rhs) {
     return rhs !== null &&
         this.getColumnSpacing() === rhs.getColumnSpacing() &&
@@ -4531,75 +4827,185 @@ dwv.image.Spacing.prototype.equals = function(rhs) {
 };
 
 /**
-* @class Image class.
-* @param size The sizes of the image.
-* @param spacing The spacings of the image.
-* @param _buffer The image data.
-* Usable once created, optional are:
-* - rescale slope and intercept (default 1:0), 
-* - photometric interpretation (default MONOCHROME2),
-* - planar configuration (default RGBRGB...).
-*/
+ * Image class.
+ * Usable once created, optional are:
+ * - rescale slope and intercept (default 1:0), 
+ * - photometric interpretation (default MONOCHROME2),
+ * - planar configuration (default RGBRGB...).
+ * @class Image
+ * @namespace dwv.image
+ * @constructor
+ * @param {Size} size The size of the image.
+ * @param {Spacing} spacing The spacing of the image.
+ * @param {Array} buffer The image data.
+ * @param {Array} slicePositions The slice positions.
+ */
 dwv.image.Image = function(size, spacing, buffer, slicePositions)
 {
-    // Rescale slope.
+    /**
+     * Rescale slope.
+     * @property rescaleSlope
+     * @private
+     * @type Number
+     */
     var rescaleSlope = 1;
-    // Rescale intercept.
+    /**
+     * Rescale intercept.
+     * @property rescaleIntercept
+     * @private
+     * @type Number
+     */
     var rescaleIntercept = 0;
-    // Photometric interpretation (MONOCHROME, RGB...)
+    /**
+     * Photometric interpretation (MONOCHROME, RGB...).
+     * @property photometricInterpretation
+     * @private
+     * @type {String}
+     */
     var photometricInterpretation = "MONOCHROME2";
-    // Planar configuration for RGB data (0:RGBRGBRGBRGB... or 1:RRR...GGG...BBB...)
+    /**
+     * Planar configuration for RGB data (0:RGBRGBRGBRGB... or 1:RRR...GGG...BBB...).
+     * @property planarConfiguration
+     * @private
+     * @type {Number}
+     */
     var planarConfiguration = 0;
-    // Meta information
+    /**
+     * Meta information.
+     * @property meta
+     * @private
+     * @type {Object}
+     */
     var meta = {};
     
-    // original buffer.
+    /**
+     * Original buffer.
+     * @property originalBuffer
+     * @private
+     * @type {Array}
+     */
     var originalBuffer = new Int16Array(buffer);
     
     // check slice positions.
     if( typeof(slicePositions) === 'undefined' ) slicePositions = [[0,0,0]];
     
-    // data range.
+    /**
+     * Data range.
+     * @property dataRange
+     * @private
+     * @type {Object}
+     */
     var dataRange = null;
-    // histogram.
+    /**
+     * Histogram.
+     * @property histogram
+     * @private
+     * @type {Object}
+     */
     var histogram = null;
      
-    // Get the size of the image.
+    /**
+     * Get the size of the image.
+     * @method getSize
+     * @return {Size} The size of the image.
+     */ 
     this.getSize = function() { return size; };
-    // Get the spacing of the image.
+    /**
+     * Get the spacing of the image.
+     * @method getSpacing
+     * @return {Spacing} The spacing of the image.
+     */ 
     this.getSpacing = function() { return spacing; };
-    // Get the data buffer of the image. TODO dangerous...
+    /**
+     * Get the data buffer of the image. TODO dangerous...
+     * @method getBuffer
+     * @return {Array} The data buffer of the image.
+     */ 
     this.getBuffer = function() { return buffer; };
-    // Get the slice positions.
+    /**
+     * Get the slice positions.
+     * @method getSlicePositions
+     * @return {Array} The slice positions.
+     */ 
     this.getSlicePositions = function() { return slicePositions; };
     
-    // Get the rescale slope.
+    /**
+     * Get the rescale slope.
+     * @method getRescaleSlope
+     * @return {Number} The rescale slope.
+     */ 
     this.getRescaleSlope = function() { return rescaleSlope; };
-    // Set the rescale slope.
-    this.setRescaleSlope = function(val) { rescaleSlope = val; };
-    // Get the rescale intercept.
+    /**
+     * Set the rescale slope.
+     * @method setRescaleSlope
+     * @param {Number} rs The rescale slope.
+     */ 
+    this.setRescaleSlope = function(rs) { rescaleSlope = rs; };
+    /**
+     * Get the rescale intercept.
+     * @method getRescaleIntercept
+     * @return {Number} The rescale intercept.
+     */ 
     this.getRescaleIntercept = function() { return rescaleIntercept; };
-    // Set the rescale intercept.
-    this.setRescaleIntercept = function(val) { rescaleIntercept = val; };
-    // Get the photometricInterpretation of the image.
+    /**
+     * Set the rescale intercept.
+     * @method setRescaleIntercept
+     * @param {Number} ri The rescale intercept.
+     */ 
+    this.setRescaleIntercept = function(ri) { rescaleIntercept = ri; };
+    /**
+     * Get the photometricInterpretation of the image.
+     * @method getPhotometricInterpretation
+     * @return {String} The photometricInterpretation of the image.
+     */ 
     this.getPhotometricInterpretation = function() { return photometricInterpretation; };
-    // Set the photometricInterpretation of the image.
+    /**
+     * Set the photometricInterpretation of the image.
+     * @method setPhotometricInterpretation
+     * @pqrqm {String} interp The photometricInterpretation of the image.
+     */ 
     this.setPhotometricInterpretation = function(interp) { photometricInterpretation = interp; };
-    // Get the planarConfiguration of the image.
+    /**
+     * Get the planarConfiguration of the image.
+     * @method getPlanarConfiguration
+     * @return {Number} The planarConfiguration of the image.
+     */ 
     this.getPlanarConfiguration = function() { return planarConfiguration; };
-    // Set the planarConfiguration of the image.
+    /**
+     * Set the planarConfiguration of the image.
+     * @method setPlanarConfiguration
+     * @param {Number} config The planarConfiguration of the image.
+     */ 
     this.setPlanarConfiguration = function(config) { planarConfiguration = config; };
 
-    // Get the meta information of the image.
+    /**
+     * Get the meta information of the image.
+     * @method getMeta
+     * @return {Object} The meta information of the image.
+     */ 
     this.getMeta = function() { return meta; };
-    // Set the meta information of the image.
+    /**
+     * Set the meta information of the image.
+     * @method setMeta
+     * @param {Object} rhs The meta information of the image.
+     */ 
     this.setMeta = function(rhs) { meta = rhs; };
 
-    // Get value at offset. Warning: No size check...
+    /**
+     * Get value at offset. Warning: No size check...
+     * @method getValueAtOffset
+     * @param {Number} offset The desired offset.
+     * @return {Number} The value at offset.
+     */ 
     this.getValueAtOffset = function(offset) {
         return buffer[offset];
     };
-    // Clone the image.
+    
+    /**
+     * Clone the image.
+     * @method clone
+     * @return {Image} A clone of this image.
+     */ 
     this.clone = function()
     {
         var copy = new dwv.image.Image(this.getSize(), this.getSpacing(), originalBuffer, slicePositions);
@@ -4610,7 +5016,12 @@ dwv.image.Image = function(size, spacing, buffer, slicePositions)
         copy.setMeta(this.getMeta());
         return copy;
     };
-    // Append a slice to the image.
+    
+    /**
+     * Append a slice to the image.
+     * @method appendSlice
+     * @param {Image} The slice to append.
+     */ 
     this.appendSlice = function(rhs)
     {
         // check input
@@ -4687,12 +5098,22 @@ dwv.image.Image = function(size, spacing, buffer, slicePositions)
         buffer = newBuffer;
         originalBuffer = new Int16Array(newBuffer);
     };
-    // Get the data range.
+    
+    /**
+     * Get the data range.
+     * @method getDataRange
+     * @return {Object} The data range.
+     */ 
     this.getDataRange = function() { 
         if( !dataRange ) dataRange = this.calculateDataRange();
         return dataRange;
     };
-    // Get the histogram.
+
+    /**
+     * Get the histogram.
+     * @method getHistogram
+     * @return {Object} The histogram.
+     */ 
     this.getHistogram = function() { 
         if( !histogram ) histogram = this.calculateHistogram();
         return histogram;
@@ -4701,10 +5122,11 @@ dwv.image.Image = function(size, spacing, buffer, slicePositions)
 
 /**
  * Get the value of the image at a specific coordinate.
- * @param i The X index.
- * @param j The Y index.
- * @param k The Z index.
- * @returns The value at the desired position.
+ * @method getValue
+ * @param {Number} i The X index.
+ * @param {Number} j The Y index.
+ * @param {Number} k The Z index.
+ * @return {Number} The value at the desired position.
  * Warning: No size check...
  */
 dwv.image.Image.prototype.getValue = function( i, j, k )
@@ -4715,9 +5137,10 @@ dwv.image.Image.prototype.getValue = function( i, j, k )
 };
 
 /**
- * Get the value of the image at a specific offset.
- * @param offset The offset in the buffer. 
- * @returns The value at the desired offset.
+ * Get the rescaled value of the image at a specific offset.
+ * @method getRescaledValueAtOffset
+ * @param {Number} offset The offset in the buffer. 
+ * @return {Number} The rescaled value at the desired offset.
  * Warning: No size check...
  */
 dwv.image.Image.prototype.getRescaledValueAtOffset = function( offset )
@@ -4726,11 +5149,12 @@ dwv.image.Image.prototype.getRescaledValueAtOffset = function( offset )
 };
 
 /**
- * Get the value of the image at a specific coordinate.
- * @param i The X index.
- * @param j The Y index.
- * @param k The Z index.
- * @returns The value at the desired position.
+ * Get the rescaled value of the image at a specific coordinate.
+ * @method getRescaledValue
+ * @param {Number} i The X index.
+ * @param {Number} j The Y index.
+ * @param {Number} k The Z index.
+ * @return {Number} The rescaled value at the desired position.
  * Warning: No size check...
  */
 dwv.image.Image.prototype.getRescaledValue = function( i, j, k )
@@ -4740,7 +5164,8 @@ dwv.image.Image.prototype.getRescaledValue = function( i, j, k )
 
 /**
  * Calculate the raw image data range.
- * @returns The range {min, max}.
+ * @method calculateDataRange
+ * @return {Object} The range {min, max}.
  */
 dwv.image.Image.prototype.calculateDataRange = function()
 {
@@ -4758,7 +5183,8 @@ dwv.image.Image.prototype.calculateDataRange = function()
 
 /**
  * Calculate the image data range after rescale.
- * @returns The range {min, max}.
+ * @method getRescaledDataRange
+ * @return {Object} The rescaled data range {min, max}.
  */
 dwv.image.Image.prototype.getRescaledDataRange = function()
 {
@@ -4769,7 +5195,8 @@ dwv.image.Image.prototype.getRescaledDataRange = function()
 
 /**
  * Calculate the histogram of the image.
- * @returns An array representing the histogram.
+ * @method calculateHistogram
+ * @return {Array} An array representing the histogram.
  */
 dwv.image.Image.prototype.calculateHistogram = function()
 {
@@ -4796,9 +5223,9 @@ dwv.image.Image.prototype.calculateHistogram = function()
 
 /**
  * Convolute the image with a given 2D kernel.
- * @param weights The weights of the 2D kernel.
- * @returns The convoluted image.
- * 
+ * @method convolute2D
+ * @param {Array} weights The weights of the 2D kernel as a square matrix.
+ * @return {Image} The convoluted image.
  * Note: Uses the raw buffer values.
  */
 dwv.image.Image.prototype.convolute2D = function(weights)
@@ -4849,9 +5276,9 @@ dwv.image.Image.prototype.convolute2D = function(weights)
 
 /**
  * Transform an image using a specific operator.
- * @param operator The operator to use when transforming.
- * @returns The transformed image.
- * 
+ * @method transform
+ * @param {Function} operator The operator to use when transforming.
+ * @return {Image} The transformed image.
  * Note: Uses the raw buffer values.
  */
 dwv.image.Image.prototype.transform = function(operator)
@@ -4867,10 +5294,10 @@ dwv.image.Image.prototype.transform = function(operator)
 
 /**
  * Compose this image with another one and using a specific operator.
- * @param rhs The image to compose with.
- * @param operator The operator to use when composing.
- * @returns The composed image.
- * 
+ * @method compose
+ * @param {Image} rhs The image to compose with.
+ * @param {Function} operator The operator to use when composing.
+ * @return {Image} The composed image.
  * Note: Uses the raw buffer values.
  */
 dwv.image.Image.prototype.compose = function(rhs, operator)
@@ -4884,30 +5311,56 @@ dwv.image.Image.prototype.compose = function(rhs, operator)
     }
     return newImage;
 };
-;//! @namespace Main DWV namespace.
+
+;/** 
+ * Image module.
+ * @module image
+ */
 var dwv = dwv || {};
-//! @namespace Image related.
 dwv.image = dwv.image || {};
-//! @namespace LookUp Table (LUT) related.
 dwv.image.lut = dwv.image.lut || {};
 
 /**
- * @class Rescale LUT class.
- * @returns {Rescale}
+ * Rescale LUT class.
+ * @class Rescale
+ * @namespace dwv.image.lut
+ * @constructor
+ * @param {Number} slope_ The rescale slope.
+ * @param {Number} intercept_ The rescale intercept.
  */
 dwv.image.lut.Rescale = function(slope_,intercept_)
 {
-    // The internal array.
+    /**
+     * The internal array.
+     * @property rescaleLut_
+     * @private
+     * @type Array
+     */
     var rescaleLut_ = null;
-    // The rescale slope.
+    
+    // Check the rescale slope.
     if(typeof(slope_) === 'undefined') slope_ = 1;
-    // The rescale intercept.
+    // Check the rescale intercept.
     if(typeof(intercept_) === 'undefined') intercept_ = 0;
     
-    // Get the rescale slope.
+    /**
+     * Get the rescale slope.
+     * @method getSlope
+     * @return {Number} The rescale slope.
+     */ 
     this.getSlope = function() { return slope_; };
-    // Get the rescale intercept.
+    /**
+     * Get the rescale intercept.
+     * @method getIntercept
+     * @return {Number} The rescale intercept.
+     */ 
     this.getIntercept = function() { return intercept_; };
+    
+    /**
+     * Initialise the LUT.
+     * @method initialise
+     * @param {Number} bitsStored The number of bits used to store the data.
+     */ 
     // Initialise the LUT.
     this.initialise = function(bitsStored)
     {
@@ -4916,38 +5369,88 @@ dwv.image.lut.Rescale = function(slope_,intercept_)
         for(var i=0; i<size; ++i)
             rescaleLut_[i] = i * slope_ + intercept_;
     };
-    // Get the length of the LUT array.
+    
+    /**
+     * Get the length of the LUT array.
+     * @method getLength
+     * @return {Number} The length of the LUT array.
+     */ 
     this.getLength = function() { return rescaleLut_.length; };
-    // Get the value of the LUT at the given offset.
+    
+    /**
+     * Get the value of the LUT at the given offset.
+     * @method getValue
+     * @return {Number} The value of the LUT at the given offset.
+     */ 
     this.getValue = function(offset) { return rescaleLut_[offset]; };
 };
 
 /**
- * @class Window LUT class.
- * @returns {Window}
+ * Window LUT class.
+ * @class Window
+ * @namespace dwv.image.lut
+ * @constructor
+ * @param {Number} rescaleLut_ The associated rescale LUT.
+ * @param {Number} isSigned_ Flag to know if the data is signed.
  */
 dwv.image.lut.Window = function(rescaleLut_, isSigned_)
 {
-    // The internal array: Uint8ClampedArray clamps between 0 and 255.
-    // (not supported on travis yet... using basic array, be sure not to overflow!)
+    /**
+     * The internal array: Uint8ClampedArray clamps between 0 and 255.
+     * (not supported on travis yet... using basic array, be sure not to overflow!)
+     * @property rescaleLut_
+     * @private
+     * @type Array
+     */
     var windowLut_ = null;
+    
+    // check Uint8ClampedArray support
     if( !window.Uint8ClampedArray ) {
         console.warn("No support for Uint8ClampedArray.");
         windowLut_ = new Uint8Array(rescaleLut_.getLength());
     }
     else windowLut_ = new Uint8ClampedArray(rescaleLut_.getLength());
-    // The window center.
+    
+    /**
+     * The window center.
+     * @property center_
+     * @private
+     * @type Number
+     */
     var center_ = null;
-    // The window width.
+    /**
+     * The window width.
+     * @property width_
+     * @private
+     * @type Number
+     */
     var width_ = null;
     
-    // Get the center.
+    /**
+     * Get the window center.
+     * @method getCenter
+     * @return {Number} The window center.
+     */ 
     this.getCenter = function() { return center_; };
-    // Get the width.
+    /**
+     * Get the window width.
+     * @method getWidth
+     * @return {Number} The window width.
+     */ 
     this.getWidth = function() { return width_; };
-    // Get the signed flag.
+    /**
+     * Get the signed flag.
+     * @method isSigned
+     * @return {Boolean} The signed flag.
+     */ 
     this.isSigned = function() { return isSigned_; };
-    // Set the window center and width.
+    
+    /**
+     * Set the window center and width.
+     * @method setCenterAndWidth
+     * @param {Number} center The window center.
+     * @param {Number} width The window width.
+     */ 
     this.setCenterAndWidth = function(center, width)
     {
         // store the window values
@@ -4967,15 +5470,24 @@ dwv.image.lut.Window = function(rescaleLut_, isSigned_)
             windowLut_[i]= parseInt(dispval, 10);
         }
     };
-    // Get the length of the LUT array.
+    
+    /**
+     * Get the length of the LUT array.
+     * @method getLength
+     * @return {Number} The length of the LUT array.
+     */ 
     this.getLength = function() { return windowLut_.length; };
-    // Get the value of the LUT at the given offset.
+
+    /**
+     * Get the value of the LUT at the given offset.
+     * @method getValue
+     * @return {Number} The value of the LUT at the given offset.
+     */ 
     this.getValue = function(offset)
     {
         var shift = isSigned_ ? windowLut_.length / 2 : 0;
         return windowLut_[offset+shift];
     };
-
 };
 
 /**
@@ -5107,15 +5619,19 @@ dwv.image.lut.test = {
    "green": dwv.image.lut.buildLut(dwv.image.lut.id),
    "blue":  dwv.image.lut.buildLut(dwv.image.lut.id)
 };*/
-;//! @namespace Main DWV namespace.
+;/** 
+ * Image module.
+ * @module image
+ */
 var dwv = dwv || {};
-//! @namespace Image related.
 dwv.image = dwv.image || {};
 
 /**
  * Get data from an input image using a canvas.
- * @param image The image.
- * @param file The corresponding file.
+ * @method getDataFromImage
+ * @static
+ * @param {Image} image The image.
+ * @return {Mixed} The corresponding view and info.
  */
 dwv.image.getDataFromImage = function(image)
 {
@@ -5163,7 +5679,10 @@ dwv.image.getDataFromImage = function(image)
 
 /**
  * Get data from an input buffer using a DICOM parser.
- * @param buffer The input data buffer.
+ * @method getDataFromDicomBuffer
+ * @static
+ * @param {Array} buffer The input data buffer.
+ * @return {Mixed} The corresponding view and info.
  */
 dwv.image.getDataFromDicomBuffer = function(buffer)
 {
@@ -5176,55 +5695,132 @@ dwv.image.getDataFromDicomBuffer = function(buffer)
     return {"view": view, "info": dicomParser.dicomElements};
 };
 
-;//! @namespace Main DWV namespace.
+;/** 
+ * Image module.
+ * @module image
+ */
 var dwv = dwv || {};
-//! @namespace Image related.
 dwv.image = dwv.image || {};
 
 /**
-* @class View class.
-* @param image The associated image.
-* Need to set the window lookup table once created
-* (either directly or with helper methods). 
-*/
+ * View class.
+ * @class View
+ * @namespace dwv.image
+ * @constructor
+ * @param {Image} image The associated image.
+ * @param {Boolean} isSigned Is the data signed.
+ * Need to set the window lookup table once created
+ * (either directly or with helper methods). 
+ */
 dwv.image.View = function(image, isSigned)
 {
-    // rescale lookup table
+    /**
+     * Rescale lookup table.
+     * @property rescaleLut
+     * @private
+     * @type Rescale
+     */
     var rescaleLut = new dwv.image.lut.Rescale(
         image.getRescaleSlope(), image.getRescaleIntercept() );
+    // initialise it
     rescaleLut.initialise(image.getMeta().BitsStored);
-    // window lookup table
+    
+    /**
+     * Window lookup table.
+     * @property windowLut
+     * @private
+     * @type Window
+     */
     var windowLut = new dwv.image.lut.Window(rescaleLut, isSigned);
-    // window presets
+    
+    /**
+     * Window presets.
+     * @property windowPresets
+     * @private
+     * @type {Object}
+     */
     var windowPresets = null;
-    // color map
+    /**
+     * Color map
+     * @property colorMap
+     * @private
+     * @type {Object}
+     */
     var colorMap = dwv.image.lut.plain;
-    // current position
+    /**
+     * Current position
+     * @property currentPosition
+     * @private
+     * @type {Object}
+     */
     var currentPosition = {"i":0,"j":0,"k":0};
     
-    // Get the associated image.
+    /**
+     * Get the associated image.
+     * @method getImage
+     * @return {Image} The associated image.
+     */ 
     this.getImage = function() { return image; };
-    // Set the associated image.
+    /**
+     * Set the associated image.
+     * @method setImage
+     * @param {Image} inImage The associated image.
+     */ 
     this.setImage = function(inImage) { image = inImage; };
     
-    // Get the rescale LUT of the image.
+    /**
+     * Get the rescale LUT of the image.
+     * @method getRescaleLut
+     * @return {Rescale} The rescale LUT of the image.
+     */ 
     this.getRescaleLut = function() { return rescaleLut; };
-    // Set the rescale LUT of the image.
+    /**
+     * Set the rescale LUT of the image.
+     * @method setRescaleLut
+     * @param {Rescale} lut The rescale LUT of the image.
+     */ 
     this.setRescaleLut = function(lut) { rescaleLut = lut; };
-    // Get the window LUT of the image.
+
+    /**
+     * Get the window LUT of the image.
+     * @method getWindowLut
+     * @return {Window} The window LUT of the image.
+     */ 
     this.getWindowLut = function() { return windowLut; };
-    // Set the window LUT of the image.
+    /**
+     * Set the window LUT of the image.
+     * @method setWindowLut
+     * @param {Window} lut The window LUT of the image.
+     */ 
     this.setWindowLut = function(lut) { windowLut = lut; };
-    // Get the window presets.
+    
+    /**
+     * Get the window presets.
+     * @method getWindowPresets
+     * @return {Object} The window presets.
+     */ 
     this.getWindowPresets = function() { return windowPresets; };
-    // Set the window presets.
+    /**
+     * Set the window presets.
+     * @method setWindowPresets
+     * @param {Object} presets The window presets.
+     */ 
     this.setWindowPresets = function(presets) { 
         windowPresets = presets;
         this.setWindowLevel(presets[0].center, presets[0].width);
     };
-    // Get the color map of the image.
+    
+    /**
+     * Get the color map of the image.
+     * @method getColorMap
+     * @return {Object} The color map of the image.
+     */ 
     this.getColorMap = function() { return colorMap; };
-    // Set the color map of the image.
+    /**
+     * Set the color map of the image.
+     * @method setColorMap
+     * @param {Object} map The color map of the image.
+     */ 
     this.setColorMap = function(map) { 
         colorMap = map;
         // TODO Better handle this...
@@ -5234,11 +5830,25 @@ dwv.image.View = function(image, isSigned)
             "wc": this.getWindowLut().getCenter(),
             "ww": this.getWindowLut().getWidth() });
     };
-    // Is the data signed data.
+    
+    /**
+     * Is the data signed data.
+     * @method isSigned
+     * @return {Boolean} The signed data flag.
+     */ 
     this.isSigned = function() { return isSigned; };
-    // Get the current position.
+    
+    /**
+     * Get the current position.
+     * @method getCurrentPosition
+     * @return {Object} The current position.
+     */ 
     this.getCurrentPosition = function() { return currentPosition; };
-    // Set the current position. Returns false if not in bounds.
+    /**
+     * Set the current position. Returns false if not in bounds.
+     * @method setCurrentPosition
+     * @param {Object} pos The current position.
+     */ 
     this.setCurrentPosition = function(pos) { 
         if( !image.getSize().isInBounds(pos.i,pos.j,pos.k) ) return false;
         var oldPosition = currentPosition;
@@ -5253,19 +5863,33 @@ dwv.image.View = function(image, isSigned)
         return true;
     };
     
-    // view listeners
+    /**
+     * Vew listeners
+     * @property listeners
+     * @private
+     * @type Array
+     */
     var listeners = {};
-    // Get the view listeners.
+    /**
+     * Get the view listeners.
+     * @method getListeners
+     * @return {Array} The view listeners.
+     */ 
     this.getListeners = function() { return listeners; };
-    // Set the view listeners.
+    /**
+     * Set the view listeners.
+     * @method setListeners
+     * @param {Array} list The view listeners.
+     */ 
     this.setListeners = function(list) { listeners = list; };
 };
 
 /**
  * Set the view window/level.
- * @param center The window center.
- * @param width The window width.
- * @warning Uses the latest set rescale LUT or the default linear one.
+ * @method setWindowLevel
+ * @param {Number} center The window center.
+ * @param {Number} width The window width.
+ * Warning: uses the latest set rescale LUT or the default linear one.
  */
 dwv.image.View.prototype.setWindowLevel = function( center, width )
 {
@@ -5275,7 +5899,8 @@ dwv.image.View.prototype.setWindowLevel = function( center, width )
 
 /**
  * Set the image window/level to cover the full data range.
- * @warning Uses the latest set rescale LUT or the default linear one.
+ * @method setWindowLevelMinMax
+ * Warning: uses the latest set rescale LUT or the default linear one.
  */
 dwv.image.View.prototype.setWindowLevelMinMax = function()
 {
@@ -5291,7 +5916,8 @@ dwv.image.View.prototype.setWindowLevelMinMax = function()
 
 /**
  * Increment the current slice number.
- * Returns false if not in bounds.
+ * @method incrementSliceNb
+ * @return {Boolean} False if not in bounds.
  */
 dwv.image.View.prototype.incrementSliceNb = function()
 {
@@ -5303,7 +5929,8 @@ dwv.image.View.prototype.incrementSliceNb = function()
 
 /**
  * Decrement the current slice number.
- * Returns false if not in bounds.
+ * @method decrementSliceNb
+ * @return {Boolean} False if not in bounds.
  */
 dwv.image.View.prototype.decrementSliceNb = function()
 {
@@ -5315,7 +5942,8 @@ dwv.image.View.prototype.decrementSliceNb = function()
 
 /**
  * Clone the image using all meta data and the original data buffer.
- * @returns A full copy of this {dwv.image.Image}.
+ * @method clone
+ * @return {View} A full copy of this {dwv.image.Image}.
  */
 dwv.image.View.prototype.clone = function()
 {
@@ -5328,8 +5956,9 @@ dwv.image.View.prototype.clone = function()
 
 /**
  * Generate display image data to be given to a canvas.
- * @param array The array to fill in.
- * @param sliceNumber The slice position.
+ * @method generateImageData
+ * @param {Array} array The array to fill in.
+ * @param {Number} sliceNumber The slice position.
  */
 dwv.image.View.prototype.generateImageData = function( array )
 {        
@@ -5412,8 +6041,9 @@ dwv.image.View.prototype.generateImageData = function( array )
 
 /**
  * Add an event listener on the view.
- * @param type The event type.
- * @param listener The method associated with the provided event type.
+ * @method addEventListener
+ * @param {String} type The event type.
+ * @param {Object} listener The method associated with the provided event type.
  */
 dwv.image.View.prototype.addEventListener = function(type, listener)
 {
@@ -5424,8 +6054,9 @@ dwv.image.View.prototype.addEventListener = function(type, listener)
 
 /**
  * Remove an event listener on the view.
- * @param type The event type.
- * @param listener The method associated with the provided event type.
+ * @method removeEventListener
+ * @param {String} type The event type.
+ * @param {Object} listener The method associated with the provided event type.
  */
 dwv.image.View.prototype.removeEventListener = function(type, listener)
 {
@@ -5440,7 +6071,8 @@ dwv.image.View.prototype.removeEventListener = function(type, listener)
 
 /**
  * Fire an event: call all associated listeners.
- * @param event The event to fire.
+ * @method fireEvent
+ * @param {Object} event The event to fire.
  */
 dwv.image.View.prototype.fireEvent = function(event)
 {
@@ -8079,13 +8711,19 @@ dwv.tool.Zoom = function(app)
 dwv.tool.tools = dwv.tool.tools || {};
 //Add the tool to the list
 dwv.tool.tools.zoom = dwv.tool.Zoom;
-;//! @namespace Main DWV namespace.
+;/** 
+ * Utility module.
+ * @module utils
+ */
 var dwv = dwv || {};
-//! @namespace Utils classes and functions.
 dwv.utils = dwv.utils || {};
 
 /**
- * @function Capitalise the first letter of a string.
+ * Capitalise the first letter of a string.
+ * @method capitaliseFirstLetter
+ * @static
+ * @param {String} string The string to capitalise the first letter.
+ * @return {String} The new string.
  */
 dwv.utils.capitaliseFirstLetter = function(string)
 {
@@ -8093,7 +8731,11 @@ dwv.utils.capitaliseFirstLetter = function(string)
 };
 
 /**
- * @function Clean string.
+ * Clean string: trim and remove ending.
+ * @method cleanString
+ * @static
+ * @param {String} string The string to clean.
+ * @return {String} The cleaned string.
  */
 dwv.utils.cleanString = function(string)
 {
@@ -8106,8 +8748,13 @@ dwv.utils.cleanString = function(string)
 };
 
 /**
+ * Split string:
  * root?key0=val0&key1=val1 returns [{"key"="key0", "value"="val0"}, {"key"="key1", "value"="val1"}]
  * Returns null if not a query string (no question mark).
+ * @method splitQueryString
+ * @static
+ * @param {String} inputStr The string to split.
+ * @return {String} The splitted string.
  */
 dwv.utils.splitQueryString = function(inputStr)
 {
@@ -8136,3 +8783,4 @@ dwv.utils.splitQueryString = function(inputStr)
     }
     return result;
 };
+

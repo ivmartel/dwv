@@ -8,7 +8,9 @@
     "files": {
         "src/dicom/dicomParser.js": {
             "name": "src/dicom/dicomParser.js",
-            "modules": {},
+            "modules": {
+                "dicom": 1
+            },
             "classes": {
                 "dwv.dicom.DataReader": 1,
                 "dwv.dicom.DicomParser": 1
@@ -31,10 +33,14 @@
         },
         "src/html/gui.js": {
             "name": "src/html/gui.js",
-            "modules": {},
+            "modules": {
+                "gui": 1
+            },
             "classes": {},
             "fors": {},
-            "namespaces": {}
+            "namespaces": {
+                "dwv.gui": 1
+            }
         },
         "src/html/gui_mobile.js": {
             "name": "src/html/gui_mobile.js",
@@ -61,9 +67,7 @@
         },
         "src/html/layer.js": {
             "name": "src/html/layer.js",
-            "modules": {
-                "dicom": 1
-            },
+            "modules": {},
             "classes": {
                 "dwv.html.Layer": 1
             },
@@ -85,31 +89,43 @@
         },
         "src/image/filter.js": {
             "name": "src/image/filter.js",
-            "modules": {},
-            "classes": {},
+            "modules": {
+                "image": 1
+            },
+            "classes": {
+                "dwv.image.filter.Threshold": 1,
+                "dwv.image.filter.Sharpen": 1,
+                "dwv.image.filter.Sobel": 1
+            },
             "fors": {},
-            "namespaces": {}
+            "namespaces": {
+                "dwv.image.filter": 1
+            }
         },
         "src/image/image.js": {
             "name": "src/image/image.js",
             "modules": {},
             "classes": {
-                "dwv.html.Image Size class. \nSupports 2D and 3D images.": 1,
-                "dwv.html.Image Spacing class. \nSupports 2D and 3D images.": 1,
-                "dwv.html.Image class.": 1
+                "dwv.image.Size": 1,
+                "dwv.image.Spacing": 1,
+                "dwv.image.Image": 1
             },
             "fors": {},
-            "namespaces": {}
+            "namespaces": {
+                "dwv.image": 1
+            }
         },
         "src/image/luts.js": {
             "name": "src/image/luts.js",
             "modules": {},
             "classes": {
-                "dwv.html.Rescale LUT class.": 1,
-                "dwv.html.Window LUT class.": 1
+                "dwv.image.lut.Rescale": 1,
+                "dwv.image.lut.Window": 1
             },
             "fors": {},
-            "namespaces": {}
+            "namespaces": {
+                "dwv.image.lut": 1
+            }
         },
         "src/image/reader.js": {
             "name": "src/image/reader.js",
@@ -122,10 +138,12 @@
             "name": "src/image/view.js",
             "modules": {},
             "classes": {
-                "dwv.html.View class.": 1
+                "dwv.image.View": 1
             },
             "fors": {},
-            "namespaces": {}
+            "namespaces": {
+                "dwv.image": 1
+            }
         },
         "src/math/bucketQueue.js": {
             "name": "src/math/bucketQueue.js",
@@ -283,7 +301,9 @@
         },
         "src/utils/string.js": {
             "name": "src/utils/string.js",
-            "modules": {},
+            "modules": {
+                "utils": 1
+            },
             "classes": {},
             "fors": {},
             "namespaces": {}
@@ -292,7 +312,7 @@
             "name": "src/application.js",
             "modules": {},
             "classes": {
-                "Filter classes..App\nMain application.": 1
+                "App\nMain application.": 1
             },
             "fors": {},
             "namespaces": {}
@@ -305,36 +325,70 @@
             "classes": {
                 "dwv.dicom.DataReader": 1,
                 "dwv.dicom.DicomParser": 1,
-                "dwv.dicom.Dictionary": 1,
-                "dwv.html.Layer": 1,
-                "dwv.html.Style": 1,
-                "dwv.html.Image Size class. \nSupports 2D and 3D images.": 1,
-                "dwv.html.Image Spacing class. \nSupports 2D and 3D images.": 1,
-                "dwv.html.Image class.": 1,
-                "dwv.html.Rescale LUT class.": 1,
-                "dwv.html.Window LUT class.": 1,
-                "dwv.html.View class.": 1
+                "dwv.dicom.Dictionary": 1
             },
             "fors": {},
             "namespaces": {
-                "dwv.dicom": 1,
-                "dwv.html": 1
+                "dwv.dicom": 1
             },
             "tag": "module",
-            "file": "src/image/view.js",
-            "line": 6,
-            "description": "HTML module."
+            "file": "src/dicom/dictionary.js",
+            "line": 8,
+            "description": "DICOM module."
+        },
+        "gui": {
+            "name": "gui",
+            "submodules": {},
+            "classes": {},
+            "fors": {},
+            "namespaces": {
+                "dwv.gui": 1
+            },
+            "tag": "module",
+            "file": "src/html/gui.js",
+            "line": 1,
+            "description": "GUI module."
         },
         "html": {
             "name": "html",
             "submodules": {},
-            "classes": {},
+            "classes": {
+                "dwv.html.Layer": 1,
+                "dwv.html.Style": 1
+            },
             "fors": {},
-            "namespaces": {},
+            "namespaces": {
+                "dwv.html": 1
+            },
             "tag": "module",
-            "file": "src/html/html.js",
-            "line": 1,
+            "file": "src/html/style.js",
+            "line": 8,
             "description": "HTML module."
+        },
+        "image": {
+            "name": "image",
+            "submodules": {},
+            "classes": {
+                "dwv.image.filter.Threshold": 1,
+                "dwv.image.filter.Sharpen": 1,
+                "dwv.image.filter.Sobel": 1,
+                "dwv.image.Size": 1,
+                "dwv.image.Spacing": 1,
+                "dwv.image.Image": 1,
+                "dwv.image.lut.Rescale": 1,
+                "dwv.image.lut.Window": 1,
+                "dwv.image.View": 1
+            },
+            "fors": {},
+            "namespaces": {
+                "dwv.image.filter": 1,
+                "dwv.image": 1,
+                "dwv.image.lut": 1
+            },
+            "tag": "module",
+            "file": "src/image/view.js",
+            "line": 8,
+            "description": "Image module."
         },
         "math": {
             "name": "math",
@@ -364,8 +418,7 @@
                 "Filter classes..Tool box.": 1,
                 "Filter classes..UndoStack class.": 1,
                 "Filter classes..WindowLevel tool: handle window/level related events.": 1,
-                "Filter classes..Zoom class.": 1,
-                "Filter classes..App\nMain application.": 1
+                "Filter classes..Zoom class.": 1
             },
             "fors": {},
             "namespaces": {
@@ -373,9 +426,22 @@
                 "Filter classes.": 1
             },
             "tag": "module",
+            "file": "src/tools/zoom.js",
+            "line": 17,
+            "description": "Math module."
+        },
+        "utils": {
+            "name": "utils",
+            "submodules": {},
+            "classes": {
+                "App\nMain application.": 1
+            },
+            "fors": {},
+            "namespaces": {},
+            "tag": "module",
             "file": "src/application.js",
             "line": 4,
-            "description": "Math module."
+            "description": "Utility module."
         }
     },
     "classes": {
@@ -444,7 +510,7 @@
             "extensions": [],
             "plugin_for": [],
             "extension_for": [],
-            "module": "dicom",
+            "module": "html",
             "namespace": "dwv.html",
             "file": "src/html/layer.js",
             "line": 8,
@@ -466,144 +532,237 @@
             "extensions": [],
             "plugin_for": [],
             "extension_for": [],
-            "module": "dicom",
+            "module": "html",
             "namespace": "dwv.html",
             "file": "src/html/style.js",
             "line": 8,
             "description": "Style class.",
             "is_constructor": 1
         },
-        "dwv.html.Image Size class. \nSupports 2D and 3D images.": {
-            "name": "dwv.html.Image Size class. \nSupports 2D and 3D images.",
-            "shortname": "Image Size class. \nSupports 2D and 3D images.",
+        "dwv.image.filter.Threshold": {
+            "name": "dwv.image.filter.Threshold",
+            "shortname": "dwv.image.filter.Threshold",
             "classitems": [],
             "plugins": [],
             "extensions": [],
             "plugin_for": [],
             "extension_for": [],
-            "module": "dicom",
-            "namespace": "dwv.html",
+            "module": "image",
+            "namespace": "dwv.image.filter",
+            "file": "src/image/filter.js",
+            "line": 9,
+            "description": "Threshold an image between an input minimum and maximum.",
+            "is_constructor": 1
+        },
+        "dwv.image.filter.Sharpen": {
+            "name": "dwv.image.filter.Sharpen",
+            "shortname": "dwv.image.filter.Sharpen",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "image",
+            "namespace": "dwv.image.filter",
+            "file": "src/image/filter.js",
+            "line": 80,
+            "description": "Sharpen an image using a sharpen convolution matrix.",
+            "is_constructor": 1
+        },
+        "dwv.image.filter.Sobel": {
+            "name": "dwv.image.filter.Sobel",
+            "shortname": "dwv.image.filter.Sobel",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "image",
+            "namespace": "dwv.image.filter",
+            "file": "src/image/filter.js",
+            "line": 109,
+            "description": "Apply a Sobel filter to an image.",
+            "is_constructor": 1
+        },
+        "dwv.image.Size": {
+            "name": "dwv.image.Size",
+            "shortname": "dwv.image.Size",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "image",
+            "namespace": "dwv.image",
             "file": "src/image/image.js",
-            "line": 6,
+            "line": 8,
+            "description": "Image Size class.\nSupports 2D and 3D images.",
+            "is_constructor": 1,
             "params": [
                 {
                     "name": "numberOfColumns",
-                    "description": "The number of columns (number)."
+                    "description": "The number of columns.",
+                    "type": "Number"
                 },
                 {
                     "name": "numberOfRows",
-                    "description": "The number of rows (number)."
+                    "description": "The number of rows.",
+                    "type": "Number"
                 },
                 {
                     "name": "numberOfSlices",
-                    "description": "The number of slices (number)."
+                    "description": "The number of slices.",
+                    "type": "Number"
                 }
             ]
         },
-        "dwv.html.Image Spacing class. \nSupports 2D and 3D images.": {
-            "name": "dwv.html.Image Spacing class. \nSupports 2D and 3D images.",
-            "shortname": "Image Spacing class. \nSupports 2D and 3D images.",
+        "dwv.image.Spacing": {
+            "name": "dwv.image.Spacing",
+            "shortname": "dwv.image.Spacing",
             "classitems": [],
             "plugins": [],
             "extensions": [],
             "plugin_for": [],
             "extension_for": [],
-            "module": "dicom",
-            "namespace": "dwv.html",
+            "module": "image",
+            "namespace": "dwv.image",
             "file": "src/image/image.js",
-            "line": 45,
+            "line": 86,
+            "description": "Image Spacing class. \nSupports 2D and 3D images.",
+            "is_constructor": 1,
             "params": [
                 {
                     "name": "columnSpacing",
-                    "description": "The column spacing (number)."
+                    "description": "The column spacing.",
+                    "type": "Number"
                 },
                 {
                     "name": "rowSpacing",
-                    "description": "The row spacing (number)."
+                    "description": "The row spacing.",
+                    "type": "Number"
                 },
                 {
                     "name": "sliceSpacing",
-                    "description": "The slice spacing (number)."
+                    "description": "The slice spacing.",
+                    "type": "Number"
                 }
             ]
         },
-        "dwv.html.Image class.": {
-            "name": "dwv.html.Image class.",
-            "shortname": "Image class.",
+        "dwv.image.Image": {
+            "name": "dwv.image.Image",
+            "shortname": "dwv.image.Image",
             "classitems": [],
             "plugins": [],
             "extensions": [],
             "plugin_for": [],
             "extension_for": [],
-            "module": "dicom",
-            "namespace": "dwv.html",
+            "module": "image",
+            "namespace": "dwv.image",
             "file": "src/image/image.js",
-            "line": 69,
+            "line": 131,
+            "description": "Image class.\nUsable once created, optional are:\n- rescale slope and intercept (default 1:0), \n- photometric interpretation (default MONOCHROME2),\n- planar configuration (default RGBRGB...).",
+            "is_constructor": 1,
             "params": [
                 {
                     "name": "size",
-                    "description": "The sizes of the image."
+                    "description": "The size of the image.",
+                    "type": "Size"
                 },
                 {
                     "name": "spacing",
-                    "description": "The spacings of the image."
+                    "description": "The spacing of the image.",
+                    "type": "Spacing"
                 },
                 {
-                    "name": "_buffer",
-                    "description": "The image data.\nUsable once created, optional are:\n- rescale slope and intercept (default 1:0), \n- photometric interpretation (default MONOCHROME2),\n- planar configuration (default RGBRGB...)."
+                    "name": "buffer",
+                    "description": "The image data.",
+                    "type": "Array"
+                },
+                {
+                    "name": "slicePositions",
+                    "description": "The slice positions.",
+                    "type": "Array"
                 }
             ]
         },
-        "dwv.html.Rescale LUT class.": {
-            "name": "dwv.html.Rescale LUT class.",
-            "shortname": "Rescale LUT class.",
+        "dwv.image.lut.Rescale": {
+            "name": "dwv.image.lut.Rescale",
+            "shortname": "dwv.image.lut.Rescale",
             "classitems": [],
             "plugins": [],
             "extensions": [],
             "plugin_for": [],
             "extension_for": [],
-            "module": "dicom",
-            "namespace": "dwv.html",
+            "module": "image",
+            "namespace": "dwv.image.lut",
             "file": "src/image/luts.js",
-            "line": 8,
-            "return": {
-                "description": "",
-                "type": "Rescale"
-            }
+            "line": 9,
+            "description": "Rescale LUT class.",
+            "is_constructor": 1,
+            "params": [
+                {
+                    "name": "slope_",
+                    "description": "The rescale slope.",
+                    "type": "Number"
+                },
+                {
+                    "name": "intercept_",
+                    "description": "The rescale intercept.",
+                    "type": "Number"
+                }
+            ]
         },
-        "dwv.html.Window LUT class.": {
-            "name": "dwv.html.Window LUT class.",
-            "shortname": "Window LUT class.",
+        "dwv.image.lut.Window": {
+            "name": "dwv.image.lut.Window",
+            "shortname": "dwv.image.lut.Window",
             "classitems": [],
             "plugins": [],
             "extensions": [],
             "plugin_for": [],
             "extension_for": [],
-            "module": "dicom",
-            "namespace": "dwv.html",
+            "module": "image",
+            "namespace": "dwv.image.lut",
             "file": "src/image/luts.js",
-            "line": 39,
-            "return": {
-                "description": "",
-                "type": "Window"
-            }
+            "line": 74,
+            "description": "Window LUT class.",
+            "is_constructor": 1,
+            "params": [
+                {
+                    "name": "rescaleLut_",
+                    "description": "The associated rescale LUT.",
+                    "type": "Number"
+                },
+                {
+                    "name": "isSigned_",
+                    "description": "Flag to know if the data is signed.",
+                    "type": "Number"
+                }
+            ]
         },
-        "dwv.html.View class.": {
-            "name": "dwv.html.View class.",
-            "shortname": "View class.",
+        "dwv.image.View": {
+            "name": "dwv.image.View",
+            "shortname": "dwv.image.View",
             "classitems": [],
             "plugins": [],
             "extensions": [],
             "plugin_for": [],
             "extension_for": [],
-            "module": "dicom",
-            "namespace": "dwv.html",
+            "module": "image",
+            "namespace": "dwv.image",
             "file": "src/image/view.js",
-            "line": 6,
+            "line": 8,
+            "description": "View class.",
+            "is_constructor": 1,
             "params": [
                 {
                     "name": "image",
-                    "description": "The associated image.\nNeed to set the window lookup table once created\n(either directly or with helper methods)."
+                    "description": "The associated image.",
+                    "type": "Image"
+                },
+                {
+                    "name": "isSigned",
+                    "description": "Is the data signed.\nNeed to set the window lookup table once created\n(either directly or with helper methods).",
+                    "type": "Boolean"
                 }
             ]
         },
@@ -1105,16 +1264,16 @@
             "file": "src/tools/zoom.js",
             "line": 17
         },
-        "Filter classes..App\nMain application.": {
-            "name": "Filter classes..App\nMain application.",
+        "App\nMain application.": {
+            "name": "App\nMain application.",
             "shortname": "App\nMain application.",
             "classitems": [],
             "plugins": [],
             "extensions": [],
             "plugin_for": [],
             "extension_for": [],
-            "module": "math",
-            "namespace": "Filter classes.",
+            "module": "utils",
+            "namespace": "",
             "file": "src/application.js",
             "line": 4
         }
@@ -1534,11 +1693,12 @@
                 }
             ],
             "class": "dwv.html.Layer",
-            "module": "dicom"
+            "module": "gui",
+            "namespace": "dwv.gui"
         },
         {
             "file": "src/html/gui.js",
-            "line": 19,
+            "line": 20,
             "description": "Handle colour map change.",
             "itemtype": "method",
             "name": "onChangeColourMap",
@@ -1551,11 +1711,12 @@
                 }
             ],
             "class": "dwv.html.Layer",
-            "module": "dicom"
+            "module": "gui",
+            "namespace": "dwv.gui"
         },
         {
             "file": "src/html/gui.js",
-            "line": 30,
+            "line": 31,
             "description": "Handle tool change.",
             "itemtype": "method",
             "name": "onChangeTool",
@@ -1568,11 +1729,12 @@
                 }
             ],
             "class": "dwv.html.Layer",
-            "module": "dicom"
+            "module": "gui",
+            "namespace": "dwv.gui"
         },
         {
             "file": "src/html/gui.js",
-            "line": 41,
+            "line": 42,
             "description": "Handle filter change.",
             "itemtype": "method",
             "name": "onChangeFilter",
@@ -1585,11 +1747,12 @@
                 }
             ],
             "class": "dwv.html.Layer",
-            "module": "dicom"
+            "module": "gui",
+            "namespace": "dwv.gui"
         },
         {
             "file": "src/html/gui.js",
-            "line": 52,
+            "line": 53,
             "description": "Handle shape change.",
             "itemtype": "method",
             "name": "onChangeShape",
@@ -1602,11 +1765,12 @@
                 }
             ],
             "class": "dwv.html.Layer",
-            "module": "dicom"
+            "module": "gui",
+            "namespace": "dwv.gui"
         },
         {
             "file": "src/html/gui.js",
-            "line": 63,
+            "line": 64,
             "description": "Handle line color change.",
             "itemtype": "method",
             "name": "onChangeLineColour",
@@ -1619,191 +1783,210 @@
                 }
             ],
             "class": "dwv.html.Layer",
-            "module": "dicom"
+            "module": "gui",
+            "namespace": "dwv.gui"
         },
         {
             "file": "src/html/gui.js",
-            "line": 74,
+            "line": 75,
             "description": "Append the toolbox HTML to the page.",
             "itemtype": "method",
             "name": "appendToolboxHtml",
             "static": 1,
             "class": "dwv.html.Layer",
-            "module": "dicom"
+            "module": "gui",
+            "namespace": "dwv.gui"
         },
         {
             "file": "src/html/gui.js",
-            "line": 105,
+            "line": 106,
             "description": "Append the window/level HTML to the page.",
             "itemtype": "method",
             "name": "appendWindowLevelHtml",
             "static": 1,
             "class": "dwv.html.Layer",
-            "module": "dicom"
+            "module": "gui",
+            "namespace": "dwv.gui"
         },
         {
             "file": "src/html/gui.js",
-            "line": 153,
+            "line": 154,
             "description": "Clear the window/level HTML.",
             "itemtype": "method",
             "name": "clearWindowLevelHtml",
             "static": 1,
             "class": "dwv.html.Layer",
-            "module": "dicom"
+            "module": "gui",
+            "namespace": "dwv.gui"
         },
         {
             "file": "src/html/gui.js",
-            "line": 164,
+            "line": 165,
             "description": "Append the draw HTML to the page.",
             "itemtype": "method",
             "name": "appendDrawHtml",
             "static": 1,
             "class": "dwv.html.Layer",
-            "module": "dicom"
+            "module": "gui",
+            "namespace": "dwv.gui"
         },
         {
             "file": "src/html/gui.js",
-            "line": 209,
+            "line": 210,
             "description": "Clear the draw HTML.",
             "itemtype": "method",
             "name": "clearDrawHtml",
             "static": 1,
             "class": "dwv.html.Layer",
-            "module": "dicom"
+            "module": "gui",
+            "namespace": "dwv.gui"
         },
         {
             "file": "src/html/gui.js",
-            "line": 220,
+            "line": 221,
             "description": "Append the color chooser HTML to the page.",
             "itemtype": "method",
             "name": "appendLivewireHtml",
             "static": 1,
             "class": "dwv.html.Layer",
-            "module": "dicom"
+            "module": "gui",
+            "namespace": "dwv.gui"
         },
         {
             "file": "src/html/gui.js",
-            "line": 248,
+            "line": 249,
             "description": "Clear the color chooser HTML.",
             "itemtype": "method",
             "name": "clearDrawHtml",
             "static": 1,
             "class": "dwv.html.Layer",
-            "module": "dicom"
+            "module": "gui",
+            "namespace": "dwv.gui"
         },
         {
             "file": "src/html/gui.js",
-            "line": 258,
+            "line": 259,
             "description": "Append the filter HTML to the page.",
             "itemtype": "method",
             "name": "appendLivewireHtml",
             "static": 1,
             "class": "dwv.html.Layer",
-            "module": "dicom"
+            "module": "gui",
+            "namespace": "dwv.gui"
         },
         {
             "file": "src/html/gui.js",
-            "line": 286,
+            "line": 287,
             "description": "Clear the filter HTML.",
             "itemtype": "method",
             "name": "clearDrawHtml",
             "static": 1,
             "class": "dwv.html.Layer",
-            "module": "dicom"
+            "module": "gui",
+            "namespace": "dwv.gui"
         },
         {
             "file": "src/html/gui.js",
-            "line": 299,
+            "line": 300,
             "description": "Append the threshold filter HTML to the page.",
             "itemtype": "method",
             "name": "appendThresholdHtml",
             "static": 1,
             "class": "dwv.html.Layer",
-            "module": "dicom"
+            "module": "gui",
+            "namespace": "dwv.gui"
         },
         {
             "file": "src/html/gui.js",
-            "line": 319,
+            "line": 320,
             "description": "Clear the treshold filter HTML.",
             "itemtype": "method",
             "name": "clearDrawHtml",
             "static": 1,
             "class": "dwv.html.Layer",
-            "module": "dicom"
+            "module": "gui",
+            "namespace": "dwv.gui"
         },
         {
             "file": "src/html/gui.js",
-            "line": 329,
+            "line": 330,
             "description": "Append the sharpen filter HTML to the page.",
             "itemtype": "method",
             "name": "appendSharpenHtml",
             "static": 1,
             "class": "dwv.html.Layer",
-            "module": "dicom"
+            "module": "gui",
+            "namespace": "dwv.gui"
         },
         {
             "file": "src/html/gui.js",
-            "line": 354,
+            "line": 355,
             "description": "Clear the sharpen filter HTML.",
             "itemtype": "method",
             "name": "clearSharpenHtml",
             "static": 1,
             "class": "dwv.html.Layer",
-            "module": "dicom"
+            "module": "gui",
+            "namespace": "dwv.gui"
         },
         {
             "file": "src/html/gui.js",
-            "line": 364,
+            "line": 365,
             "description": "Append the sobel filter HTML to the page.",
             "itemtype": "method",
             "name": "appendSharpenHtml",
             "static": 1,
             "class": "dwv.html.Layer",
-            "module": "dicom"
+            "module": "gui",
+            "namespace": "dwv.gui"
         },
         {
             "file": "src/html/gui.js",
-            "line": 389,
+            "line": 390,
             "description": "Clear the sobel filter HTML.",
             "itemtype": "method",
             "name": "clearSharpenHtml",
             "static": 1,
             "class": "dwv.html.Layer",
-            "module": "dicom"
+            "module": "gui",
+            "namespace": "dwv.gui"
         },
         {
             "file": "src/html/gui.js",
-            "line": 399,
+            "line": 400,
             "description": "Append the zoom HTML to the page.",
             "itemtype": "method",
             "name": "appendZoomHtml",
             "static": 1,
             "class": "dwv.html.Layer",
-            "module": "dicom"
+            "module": "gui",
+            "namespace": "dwv.gui"
         },
         {
             "file": "src/html/gui.js",
-            "line": 426,
+            "line": 427,
             "description": "Clear the zoom filter HTML.",
             "itemtype": "method",
             "name": "clearZoomHtml",
             "static": 1,
             "class": "dwv.html.Layer",
-            "module": "dicom"
+            "module": "gui",
+            "namespace": "dwv.gui"
         },
         {
             "file": "src/html/gui.js",
-            "line": 436,
+            "line": 437,
             "description": "Append the undo HTML to the page.",
             "itemtype": "method",
             "name": "appendUndoHtml",
             "static": 1,
             "class": "dwv.html.Layer",
-            "module": "dicom"
+            "module": "gui",
+            "namespace": "dwv.gui"
         },
         {
             "file": "src/html/gui.js",
-            "line": 461,
+            "line": 462,
             "description": "Add a command to the undo HTML.",
             "itemtype": "method",
             "name": "addCommandToUndoHtml",
@@ -1816,11 +1999,12 @@
                 }
             ],
             "class": "dwv.html.Layer",
-            "module": "dicom"
+            "module": "gui",
+            "namespace": "dwv.gui"
         },
         {
             "file": "src/html/gui.js",
-            "line": 488,
+            "line": 489,
             "description": "Enable the last command of the undo HTML.",
             "itemtype": "method",
             "name": "enableInUndoHtml",
@@ -1833,7 +2017,8 @@
                 }
             ],
             "class": "dwv.html.Layer",
-            "module": "dicom"
+            "module": "gui",
+            "namespace": "dwv.gui"
         },
         {
             "file": "src/html/gui_mobile.js",
@@ -1841,15 +2026,17 @@
             "description": "Append the slider HTML.",
             "itemtype": "method",
             "name": "getSliderHtml",
+            "static": 1,
             "class": "dwv.html.Layer",
-            "module": "dicom"
+            "module": "gui"
         },
         {
             "file": "src/html/gui_mobile.js",
-            "line": 48,
+            "line": 49,
             "description": "Update the progress bar.",
             "itemtype": "method",
             "name": "updateProgress",
+            "static": 1,
             "params": [
                 {
                     "name": "event",
@@ -1858,7 +2045,7 @@
                 }
             ],
             "class": "dwv.html.Layer",
-            "module": "dicom"
+            "module": "gui"
         },
         {
             "file": "src/html/gui_ui.js",
@@ -1866,15 +2053,17 @@
             "description": "Append the slider HTML.",
             "itemtype": "method",
             "name": "getSliderHtml",
+            "static": 1,
             "class": "dwv.html.Layer",
-            "module": "dicom"
+            "module": "gui"
         },
         {
             "file": "src/html/gui_ui.js",
-            "line": 29,
+            "line": 30,
             "description": "Update the progress bar.",
             "itemtype": "method",
             "name": "updateProgress",
+            "static": 1,
             "params": [
                 {
                     "name": "event",
@@ -1883,21 +2072,25 @@
                 }
             ],
             "class": "dwv.html.Layer",
-            "module": "dicom"
+            "module": "gui"
         },
         {
             "file": "src/html/html.js",
             "line": 8,
+            "description": "Append a cell to a given row.",
             "itemtype": "method",
-            "name": "Append a cell to a given row.",
+            "name": "appendCell",
+            "static": 1,
             "params": [
                 {
                     "name": "row",
-                    "description": "The row to append the cell to."
+                    "description": "The row to append the cell to.",
+                    "type": "Object"
                 },
                 {
                     "name": "text",
-                    "description": "The text of the cell."
+                    "description": "The text of the cell.",
+                    "type": "String"
                 }
             ],
             "class": "dwv.html.Layer",
@@ -1905,17 +2098,21 @@
         },
         {
             "file": "src/html/html.js",
-            "line": 19,
+            "line": 21,
+            "description": "Append a header cell to a given row.",
             "itemtype": "method",
-            "name": "Append a header cell to a given row.",
+            "name": "appendHCell",
+            "static": 1,
             "params": [
                 {
                     "name": "row",
-                    "description": "The row to append the header cell to."
+                    "description": "The row to append the header cell to.",
+                    "type": "Object"
                 },
                 {
                     "name": "text",
-                    "description": "The text of the header cell."
+                    "description": "The text of the header cell.",
+                    "type": "String"
                 }
             ],
             "class": "dwv.html.Layer",
@@ -1923,240 +2120,711 @@
         },
         {
             "file": "src/html/html.js",
-            "line": 33,
+            "line": 37,
+            "description": "Append a row to an array.",
             "itemtype": "method",
-            "name": "",
+            "name": "appendRowForArray",
+            "static": 1,
+            "params": [
+                {
+                    "name": "table",
+                    "description": ""
+                },
+                {
+                    "name": "input",
+                    "description": ""
+                },
+                {
+                    "name": "level",
+                    "description": ""
+                },
+                {
+                    "name": "maxLevel",
+                    "description": ""
+                },
+                {
+                    "name": "rowHeader",
+                    "description": ""
+                }
+            ],
             "class": "dwv.html.Layer",
             "module": "html"
         },
         {
             "file": "src/html/html.js",
-            "line": 59,
+            "line": 70,
+            "description": "Append a row to an object.",
             "itemtype": "method",
-            "name": "",
-            "class": "dwv.html.Layer",
-            "module": "html"
-        },
-        {
-            "file": "src/html/html.js",
-            "line": 101,
-            "itemtype": "method",
-            "name": "",
+            "name": "appendRowForObject",
+            "static": 1,
+            "params": [
+                {
+                    "name": "table",
+                    "description": ""
+                },
+                {
+                    "name": "input",
+                    "description": ""
+                },
+                {
+                    "name": "level",
+                    "description": ""
+                },
+                {
+                    "name": "maxLevel",
+                    "description": ""
+                },
+                {
+                    "name": "rowHeader",
+                    "description": ""
+                }
+            ],
             "class": "dwv.html.Layer",
             "module": "html"
         },
         {
             "file": "src/html/html.js",
             "line": 119,
+            "description": "Append a row to an object or an array.",
             "itemtype": "method",
-            "name": "Converts the input to an HTML table.",
-            "input": "input Allowed types are: array, array of object, object.",
+            "name": "appendRow",
+            "static": 1,
+            "params": [
+                {
+                    "name": "table",
+                    "description": ""
+                },
+                {
+                    "name": "input",
+                    "description": ""
+                },
+                {
+                    "name": "level",
+                    "description": ""
+                },
+                {
+                    "name": "maxLevel",
+                    "description": ""
+                },
+                {
+                    "name": "rowHeader",
+                    "description": ""
+                }
+            ],
+            "class": "dwv.html.Layer",
+            "module": "html"
+        },
+        {
+            "file": "src/html/html.js",
+            "line": 144,
+            "description": "Converts the input to an HTML table.",
+            "itemtype": "method",
+            "name": "toTable",
+            "static": 1,
+            "input": "{Mixed} input Allowed types are: array, array of object, object.",
+            "return": {
+                "description": "The created HTML table.",
+                "type": "Object"
+            },
             "warning": "Null is interpreted differently in browsers, firefox will not display it.",
             "class": "dwv.html.Layer",
             "module": "html"
         },
         {
             "file": "src/html/html.js",
-            "line": 131,
+            "line": 159,
+            "description": "Get an HTML search form.",
             "itemtype": "method",
-            "name": "",
-            "class": "dwv.html.Layer",
-            "module": "html"
-        },
-        {
-            "file": "src/html/html.js",
-            "line": 147,
-            "itemtype": "method",
-            "name": "",
+            "name": "getHtmlSearchForm",
+            "static": 1,
             "params": [
                 {
-                    "name": "term",
-                    "description": ""
-                },
-                {
-                    "name": "table",
-                    "description": ""
-                }
-            ],
-            "class": "dwv.html.Layer",
-            "module": "html"
-        },
-        {
-            "file": "src/html/html.js",
-            "line": 177,
-            "itemtype": "method",
-            "name": "Transform back each\n<span>preText <span class=\"highlighted\">term</span> postText</span>\ninto its original preText term postText",
-            "params": [
-                {
-                    "name": "container",
-                    "description": "The container to de-highlight."
-                }
-            ],
-            "class": "dwv.html.Layer",
-            "module": "html"
-        },
-        {
-            "file": "src/html/html.js",
-            "line": 203,
-            "itemtype": "method",
-            "name": "Create a\n<span>preText <span class=\"highlighted\">term</span> postText</span>\naround each search term",
-            "params": [
-                {
-                    "name": "term",
-                    "description": "The term to highlight."
-                },
-                {
-                    "name": "container",
-                    "description": "The container where to highlight the term."
-                }
-            ],
-            "class": "dwv.html.Layer",
-            "module": "html"
-        },
-        {
-            "file": "src/html/html.js",
-            "line": 245,
-            "itemtype": "method",
-            "name": "",
-            "class": "dwv.html.Layer",
-            "module": "html"
-        },
-        {
-            "file": "src/html/html.js",
-            "line": 256,
-            "itemtype": "method",
-            "name": "Remove all children of a node.",
-            "params": [
-                {
-                    "name": "nodeId",
-                    "description": "The id of the node to delete."
-                },
-                {
-                    "name": "parentId",
-                    "description": "The id of the parent of the node to delete."
-                }
-            ],
-            "class": "dwv.html.Layer",
-            "module": "html"
-        },
-        {
-            "file": "src/html/html.js",
-            "line": 268,
-            "itemtype": "method",
-            "name": "Remove all children of a node and then remove it from its parent.",
-            "params": [
-                {
-                    "name": "nodeId",
-                    "description": "The id of the node to delete."
-                },
-                {
-                    "name": "parentId",
-                    "description": "The id of the parent of the node to delete."
-                }
-            ],
-            "class": "dwv.html.Layer",
-            "module": "html"
-        },
-        {
-            "file": "src/html/html.js",
-            "line": 285,
-            "itemtype": "method",
-            "name": "Create a HTML select from an input array of options.\nThe values of the options are the name of the option made lower case.\nIt is left to the user to set the 'onchange' method of the select.",
-            "params": [
-                {
-                    "name": "name",
-                    "description": "The name of the HTML select."
-                },
-                {
-                    "name": "list",
-                    "description": "The list of options of the HTML select."
+                    "name": "htmlTableToSearch",
+                    "description": "The table to do the search on.",
+                    "type": "Object"
                 }
             ],
             "return": {
-                "description": "The created HTML select."
+                "description": "The HTML search form.",
+                "type": "Object"
             },
             "class": "dwv.html.Layer",
             "module": "html"
         },
         {
             "file": "src/html/html.js",
-            "line": 410,
-            "description": "Browser checks to see if it can run dwv...\nTODO Maybe use http://modernizr.com/.",
+            "line": 179,
+            "description": "Filter a table with a given parameter: sets the display css of rows to\ntrue or false if it contains the term.",
+            "itemtype": "method",
+            "name": "filterTable",
+            "static": 1,
+            "params": [
+                {
+                    "name": "term",
+                    "description": "The term to filter the table with.",
+                    "type": "String"
+                },
+                {
+                    "name": "table",
+                    "description": "The table to filter.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.html.Layer",
+            "module": "html"
+        },
+        {
+            "file": "src/html/html.js",
+            "line": 212,
+            "description": "Transform back each\n'preText <span class=\"highlighted\">term</span> postText'\ninto its original 'preText term postText'.",
+            "itemtype": "method",
+            "name": "dehighlight",
+            "static": 1,
+            "params": [
+                {
+                    "name": "container",
+                    "description": "The container to de-highlight.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.html.Layer",
+            "module": "html"
+        },
+        {
+            "file": "src/html/html.js",
+            "line": 240,
+            "description": "Create a\n'preText <span class=\"highlighted\">term</span> postText'\naround each search term.",
+            "itemtype": "method",
+            "name": "highlight",
+            "static": 1,
+            "params": [
+                {
+                    "name": "term",
+                    "description": "The term to highlight.",
+                    "type": "String"
+                },
+                {
+                    "name": "container",
+                    "description": "The container where to highlight the term.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.html.Layer",
+            "module": "html"
+        },
+        {
+            "file": "src/html/html.js",
+            "line": 284,
+            "description": "Highlight a HTML node.",
+            "itemtype": "method",
+            "name": "createHighlightNode",
+            "static": 1,
+            "params": [
+                {
+                    "name": "child",
+                    "description": "The child to highlight.",
+                    "type": "Object"
+                }
+            ],
+            "return": {
+                "description": "The created HTML node.",
+                "type": "Object"
+            },
+            "class": "dwv.html.Layer",
+            "module": "html"
+        },
+        {
+            "file": "src/html/html.js",
+            "line": 299,
+            "description": "Remove all children of a HTML node.",
+            "itemtype": "method",
+            "name": "cleanNode",
+            "static": 1,
+            "params": [
+                {
+                    "name": "node",
+                    "description": "The node to remove kids.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.html.Layer",
+            "module": "html"
+        },
+        {
+            "file": "src/html/html.js",
+            "line": 312,
+            "description": "Remove a HTML node and all its children.",
+            "itemtype": "method",
+            "name": "removeNode",
+            "params": [
+                {
+                    "name": "nodeId",
+                    "description": "The id of the node to delete.",
+                    "type": "Number"
+                }
+            ],
+            "class": "dwv.html.Layer",
+            "module": "html"
+        },
+        {
+            "file": "src/html/html.js",
+            "line": 329,
+            "description": "Create a HTML select from an input array of options.\nThe values of the options are the name of the option made lower case.\nIt is left to the user to set the 'onchange' method of the select.",
+            "itemtype": "method",
+            "name": "createHtmlSelect",
+            "static": 1,
+            "params": [
+                {
+                    "name": "name",
+                    "description": "The name of the HTML select.",
+                    "type": "String"
+                },
+                {
+                    "name": "list",
+                    "description": "The list of options of the HTML select.",
+                    "type": "Mixed"
+                }
+            ],
+            "return": {
+                "description": "The created HTML select.",
+                "type": "Object"
+            },
+            "class": "dwv.html.Layer",
+            "module": "html"
+        },
+        {
+            "file": "src/html/html.js",
+            "line": 373,
+            "description": "Get a list of parameters from an input URI.",
+            "itemtype": "method",
+            "name": "getUriParam",
+            "static": 1,
+            "params": [
+                {
+                    "name": "uri",
+                    "description": "The URI to decode.",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "The array of parameters.",
+                "type": "Array"
+            },
+            "class": "dwv.html.Layer",
+            "module": "html"
+        },
+        {
+            "file": "src/html/html.js",
+            "line": 453,
+            "description": "Toggle the display of an element.",
+            "itemtype": "method",
+            "name": "toggleDisplay",
+            "static": 1,
+            "params": [
+                {
+                    "name": "id",
+                    "description": "The id of the element to toggle its display.",
+                    "type": "Number"
+                }
+            ],
+            "class": "dwv.html.Layer",
+            "module": "html"
+        },
+        {
+            "file": "src/html/html.js",
+            "line": 469,
+            "description": "Browser checks to see if it can run dwv. Throws an error if not.\nTODO Maybe use http://modernizr.com/.",
+            "itemtype": "method",
+            "name": "checkBrowser",
+            "static": 1,
             "class": "dwv.html.Layer",
             "module": "html"
         },
         {
             "file": "src/html/layer.js",
-            "line": 107,
+            "line": 17,
+            "description": "The associated HTMLCanvasElement.",
+            "itemtype": "property",
+            "name": "canvas",
+            "access": "private",
+            "tagname": "",
+            "type": "Object",
+            "class": "dwv.html.Layer",
+            "module": "html",
+            "namespace": "dwv.html"
+        },
+        {
+            "file": "src/html/layer.js",
+            "line": 24,
+            "description": "The associated CanvasRenderingContext2D.",
+            "itemtype": "property",
+            "name": "context",
+            "access": "private",
+            "tagname": "",
+            "type": "Object",
+            "class": "dwv.html.Layer",
+            "module": "html",
+            "namespace": "dwv.html"
+        },
+        {
+            "file": "src/html/layer.js",
+            "line": 32,
+            "description": "Get the layer name.",
+            "itemtype": "method",
+            "name": "getName",
+            "return": {
+                "description": "The layer name.",
+                "type": "String"
+            },
+            "class": "dwv.html.Layer",
+            "module": "html",
+            "namespace": "dwv.html"
+        },
+        {
+            "file": "src/html/layer.js",
+            "line": 38,
+            "description": "Get the layer canvas.",
+            "itemtype": "method",
+            "name": "getCanvas",
+            "return": {
+                "description": "The layer canvas.",
+                "type": "Object"
+            },
+            "class": "dwv.html.Layer",
+            "module": "html",
+            "namespace": "dwv.html"
+        },
+        {
+            "file": "src/html/layer.js",
+            "line": 44,
+            "description": "Get the layer context.",
+            "itemtype": "method",
+            "name": "getContext",
+            "return": {
+                "description": "The layer context.",
+                "type": "Object"
+            },
+            "class": "dwv.html.Layer",
+            "module": "html",
+            "namespace": "dwv.html"
+        },
+        {
+            "file": "src/html/layer.js",
+            "line": 50,
+            "description": "Get the layer offset on page.",
+            "itemtype": "method",
+            "name": "getOffset",
+            "return": {
+                "description": "The layer offset on page.",
+                "type": "Number"
+            },
+            "class": "dwv.html.Layer",
+            "module": "html",
+            "namespace": "dwv.html"
+        },
+        {
+            "file": "src/html/layer.js",
+            "line": 57,
+            "description": "The image data array.",
+            "itemtype": "property",
+            "name": "imageData",
+            "access": "private",
+            "tagname": "",
+            "type": "Array",
+            "class": "dwv.html.Layer",
+            "module": "html",
+            "namespace": "dwv.html"
+        },
+        {
+            "file": "src/html/layer.js",
+            "line": 65,
+            "description": "The image origin X position.",
+            "itemtype": "property",
+            "name": "originX",
+            "access": "private",
+            "tagname": "",
+            "type": "Number",
+            "class": "dwv.html.Layer",
+            "module": "html",
+            "namespace": "dwv.html"
+        },
+        {
+            "file": "src/html/layer.js",
+            "line": 72,
+            "description": "The image origin Y position.",
+            "itemtype": "property",
+            "name": "originY",
+            "access": "private",
+            "tagname": "",
+            "type": "Number",
+            "class": "dwv.html.Layer",
+            "module": "html",
+            "namespace": "dwv.html"
+        },
+        {
+            "file": "src/html/layer.js",
+            "line": 79,
+            "description": "The image zoom in the X direction.",
+            "itemtype": "property",
+            "name": "zoomX",
+            "access": "private",
+            "tagname": "",
+            "type": "Number",
+            "class": "dwv.html.Layer",
+            "module": "html",
+            "namespace": "dwv.html"
+        },
+        {
+            "file": "src/html/layer.js",
+            "line": 86,
+            "description": "The image zoom in the Y direction.",
+            "itemtype": "property",
+            "name": "zoomY",
+            "access": "private",
+            "tagname": "",
+            "type": "Number",
+            "class": "dwv.html.Layer",
+            "module": "html",
+            "namespace": "dwv.html"
+        },
+        {
+            "file": "src/html/layer.js",
+            "line": 94,
+            "description": "Set the layer zoom.",
+            "itemtype": "method",
+            "name": "setZoom",
+            "params": [
+                {
+                    "name": "stepX",
+                    "description": "The zoom step in the X direction.",
+                    "type": "Number"
+                },
+                {
+                    "name": "stepY",
+                    "description": "The zoom step in the Y direction.",
+                    "type": "Number"
+                },
+                {
+                    "name": "centerX",
+                    "description": "The zoom center in the X direction.",
+                    "type": "Number"
+                },
+                {
+                    "name": "centerY",
+                    "description": "The zoom center in the Y direction.",
+                    "type": "Number"
+                }
+            ],
+            "class": "dwv.html.Layer",
+            "module": "html",
+            "namespace": "dwv.html"
+        },
+        {
+            "file": "src/html/layer.js",
+            "line": 121,
+            "description": "Set the layer zoom and apply it.",
+            "itemtype": "method",
+            "name": "zoom",
+            "params": [
+                {
+                    "name": "stepX",
+                    "description": "The zoom step in the X direction.",
+                    "type": "Number"
+                },
+                {
+                    "name": "stepY",
+                    "description": "The zoom step in the Y direction.",
+                    "type": "Number"
+                },
+                {
+                    "name": "centerX",
+                    "description": "The zoom center in the X direction.",
+                    "type": "Number"
+                },
+                {
+                    "name": "centerY",
+                    "description": "The zoom center in the Y direction.",
+                    "type": "Number"
+                }
+            ],
+            "class": "dwv.html.Layer",
+            "module": "html",
+            "namespace": "dwv.html"
+        },
+        {
+            "file": "src/html/layer.js",
+            "line": 137,
+            "description": "Set the layer translation.\nTranslation is according to the last one.",
+            "itemtype": "method",
+            "name": "setTranslate",
+            "params": [
+                {
+                    "name": "tx",
+                    "description": "The translation in the X direction.",
+                    "type": "Number"
+                },
+                {
+                    "name": "ty",
+                    "description": "The translation in the Y direction.",
+                    "type": "Number"
+                }
+            ],
+            "class": "dwv.html.Layer",
+            "module": "html",
+            "namespace": "dwv.html"
+        },
+        {
+            "file": "src/html/layer.js",
+            "line": 166,
+            "description": "Set the layer translation and apply it.\nTranslation is according to the last one.",
+            "itemtype": "method",
+            "name": "translate",
+            "params": [
+                {
+                    "name": "tx",
+                    "description": "The translation in the X direction.",
+                    "type": "Number"
+                },
+                {
+                    "name": "ty",
+                    "description": "The translation in the Y direction.",
+                    "type": "Number"
+                }
+            ],
+            "class": "dwv.html.Layer",
+            "module": "html",
+            "namespace": "dwv.html"
+        },
+        {
+            "file": "src/html/layer.js",
+            "line": 181,
+            "description": "Set the image data array.",
+            "itemtype": "method",
+            "name": "setImageData",
+            "params": [
+                {
+                    "name": "data",
+                    "description": "The data array.",
+                    "type": "Array"
+                }
+            ],
+            "class": "dwv.html.Layer",
+            "module": "html",
+            "namespace": "dwv.html"
+        },
+        {
+            "file": "src/html/layer.js",
+            "line": 191,
             "description": "Reset the layout",
+            "itemtype": "method",
+            "name": "resetLayout",
             "class": "dwv.html.Layer",
-            "module": "dicom",
+            "module": "html",
             "namespace": "dwv.html"
         },
         {
             "file": "src/html/layer.js",
-            "line": 118,
+            "line": 203,
             "description": "Draw the content (imageData) of the layer.\nThe imageData variable needs to be set",
+            "itemtype": "method",
+            "name": "draw",
             "class": "dwv.html.Layer",
-            "module": "dicom",
+            "module": "html",
             "namespace": "dwv.html"
         },
         {
             "file": "src/html/layer.js",
-            "line": 141,
+            "line": 227,
             "description": "Initialise the layer: set the canvas and context",
-            "input": "height The height of the canvas.",
+            "itemtype": "method",
+            "name": "initialise",
+            "input": "{Number} inputHeight The height of the canvas.",
             "class": "dwv.html.Layer",
-            "module": "dicom",
+            "module": "html",
             "namespace": "dwv.html"
         },
         {
             "file": "src/html/layer.js",
-            "line": 176,
+            "line": 263,
             "description": "Fill the full context with the current style.",
+            "itemtype": "method",
+            "name": "fillContext",
             "class": "dwv.html.Layer",
-            "module": "dicom",
+            "module": "html",
             "namespace": "dwv.html"
         },
         {
             "file": "src/html/layer.js",
-            "line": 184,
+            "line": 272,
             "description": "Clear the full context.",
+            "itemtype": "method",
+            "name": "clearContextRect",
             "class": "dwv.html.Layer",
-            "module": "dicom",
+            "module": "html",
             "namespace": "dwv.html"
         },
         {
             "file": "src/html/layer.js",
-            "line": 192,
+            "line": 281,
             "description": "Merge two layers.",
-            "input": "layerToMerge The layer to merge. It will also be emptied.",
+            "itemtype": "method",
+            "name": "merge",
+            "input": "{Layer} layerToMerge The layer to merge. It will also be emptied.",
             "class": "dwv.html.Layer",
-            "module": "dicom",
+            "module": "html",
             "namespace": "dwv.html"
         },
         {
             "file": "src/html/layer.js",
-            "line": 208,
-            "description": "Set the fill and stroke style of the context.",
+            "line": 298,
+            "description": "Set the line color for the layer.",
+            "itemtype": "method",
+            "name": "setLineColor",
+            "input": "{Layer} color The line color.",
             "class": "dwv.html.Layer",
-            "module": "dicom",
+            "module": "html",
             "namespace": "dwv.html"
         },
         {
             "file": "src/html/layer.js",
-            "line": 217,
+            "line": 309,
             "description": "Display the layer.",
+            "itemtype": "method",
+            "name": "setStyleDisplay",
+            "input": "{Boolean} val Whether to display the layer or not.",
             "class": "dwv.html.Layer",
-            "module": "dicom",
+            "module": "html",
             "namespace": "dwv.html"
         },
         {
             "file": "src/html/layer.js",
-            "line": 238,
-            "description": "Align on another layer.",
+            "line": 326,
+            "description": "Check if the layer is visible.",
+            "itemtype": "method",
+            "name": "isVisible",
+            "return": {
+                "description": "True if the layer is visible.",
+                "type": "Boolean"
+            },
             "class": "dwv.html.Layer",
-            "module": "dicom",
+            "module": "html",
+            "namespace": "dwv.html"
+        },
+        {
+            "file": "src/html/layer.js",
+            "line": 337,
+            "description": "Align on another layer.",
+            "itemtype": "method",
+            "name": "align",
+            "params": [
+                {
+                    "name": "rhs",
+                    "description": "The layer to align on.",
+                    "type": "Layer"
+                }
+            ],
+            "class": "dwv.html.Layer",
+            "module": "html",
             "namespace": "dwv.html"
         },
         {
@@ -2170,7 +2838,7 @@
                 "type": "Number"
             },
             "class": "dwv.html.Style",
-            "module": "dicom",
+            "module": "html",
             "namespace": "dwv.html"
         },
         {
@@ -2184,7 +2852,7 @@
                 "type": "String"
             },
             "class": "dwv.html.Style",
-            "module": "dicom",
+            "module": "html",
             "namespace": "dwv.html"
         },
         {
@@ -2198,7 +2866,7 @@
                 "type": "Number"
             },
             "class": "dwv.html.Style",
-            "module": "dicom",
+            "module": "html",
             "namespace": "dwv.html"
         },
         {
@@ -2212,7 +2880,7 @@
                 "type": "String"
             },
             "class": "dwv.html.Style",
-            "module": "dicom",
+            "module": "html",
             "namespace": "dwv.html"
         },
         {
@@ -2226,7 +2894,7 @@
                 "type": "String"
             },
             "class": "dwv.html.Style",
-            "module": "dicom",
+            "module": "html",
             "namespace": "dwv.html"
         },
         {
@@ -2243,366 +2911,1680 @@
                 }
             ],
             "class": "dwv.html.Style",
-            "module": "dicom",
+            "module": "html",
             "namespace": "dwv.html"
         },
         {
             "file": "src/image/filter.js",
-            "line": 8,
+            "line": 17,
+            "description": "Threshold minimum.",
+            "itemtype": "property",
+            "name": "min",
+            "access": "private",
+            "tagname": "",
+            "type": "Number",
+            "class": "dwv.image.filter.Threshold",
+            "module": "image",
+            "namespace": "dwv.image.filter"
+        },
+        {
+            "file": "src/image/filter.js",
+            "line": 24,
+            "description": "Threshold maxnimum.",
+            "itemtype": "property",
+            "name": "max",
+            "access": "private",
+            "tagname": "",
+            "type": "Number",
+            "class": "dwv.image.filter.Threshold",
+            "module": "image",
+            "namespace": "dwv.image.filter"
+        },
+        {
+            "file": "src/image/filter.js",
+            "line": 32,
+            "description": "Get the threshold minimum.",
             "itemtype": "method",
-            "name": "Threshold an image between an input minimum and maximum.",
+            "name": "getMin",
+            "return": {
+                "description": "The threshold minimum.",
+                "type": "Number"
+            },
+            "class": "dwv.image.filter.Threshold",
+            "module": "image",
+            "namespace": "dwv.image.filter"
+        },
+        {
+            "file": "src/image/filter.js",
+            "line": 38,
+            "description": "Set the threshold minimum.",
+            "itemtype": "method",
+            "name": "setMin",
             "params": [
                 {
-                    "name": "min",
-                    "description": "The new minimum."
-                },
-                {
-                    "name": "max",
-                    "description": "The new maximum."
+                    "name": "val",
+                    "description": "The threshold minimum.",
+                    "type": "Number"
                 }
             ],
-            "class": "dwv.html.Image Size class. \nSupports 2D and 3D images.",
-            "module": "dicom",
-            "namespace": "dwv.html"
+            "class": "dwv.image.filter.Threshold",
+            "module": "image",
+            "namespace": "dwv.image.filter"
         },
         {
             "file": "src/image/filter.js",
-            "line": 40,
+            "line": 44,
+            "description": "Get the threshold maximum.",
             "itemtype": "method",
-            "name": "Sharpen an image using a sharpen convolution matrix.",
-            "class": "dwv.html.Image Size class. \nSupports 2D and 3D images.",
-            "module": "dicom",
-            "namespace": "dwv.html"
+            "name": "getMax",
+            "return": {
+                "description": "The threshold maximum.",
+                "type": "Number"
+            },
+            "class": "dwv.image.filter.Threshold",
+            "module": "image",
+            "namespace": "dwv.image.filter"
         },
         {
             "file": "src/image/filter.js",
-            "line": 57,
+            "line": 50,
+            "description": "Set the threshold maximum.",
             "itemtype": "method",
-            "name": "Apply a Sobel filter to an image.",
-            "class": "dwv.html.Image Size class. \nSupports 2D and 3D images.",
-            "module": "dicom",
-            "namespace": "dwv.html"
+            "name": "setMax",
+            "params": [
+                {
+                    "name": "val",
+                    "description": "The threshold maximum.",
+                    "type": "Number"
+                }
+            ],
+            "class": "dwv.image.filter.Threshold",
+            "module": "image",
+            "namespace": "dwv.image.filter"
+        },
+        {
+            "file": "src/image/filter.js",
+            "line": 56,
+            "description": "Get the name of the filter.",
+            "itemtype": "method",
+            "name": "getName",
+            "return": {
+                "description": "The name of the filter.",
+                "type": "String"
+            },
+            "class": "dwv.image.filter.Threshold",
+            "module": "image",
+            "namespace": "dwv.image.filter"
+        },
+        {
+            "file": "src/image/filter.js",
+            "line": 64,
+            "description": "Transform the main image using this filter.",
+            "itemtype": "method",
+            "name": "update",
+            "return": {
+                "description": "The transformed image.",
+                "type": "Object"
+            },
+            "class": "dwv.image.filter.Threshold",
+            "module": "image",
+            "namespace": "dwv.image.filter"
+        },
+        {
+            "file": "src/image/filter.js",
+            "line": 88,
+            "description": "Get the name of the filter.",
+            "itemtype": "method",
+            "name": "getName",
+            "return": {
+                "description": "The name of the filter.",
+                "type": "String"
+            },
+            "class": "dwv.image.filter.Sharpen",
+            "module": "image",
+            "namespace": "dwv.image.filter"
+        },
+        {
+            "file": "src/image/filter.js",
+            "line": 96,
+            "description": "Transform the main image using this filter.",
+            "itemtype": "method",
+            "name": "update",
+            "return": {
+                "description": "The transformed image.",
+                "type": "Object"
+            },
+            "class": "dwv.image.filter.Sharpen",
+            "module": "image",
+            "namespace": "dwv.image.filter"
+        },
+        {
+            "file": "src/image/filter.js",
+            "line": 117,
+            "description": "Get the name of the filter.",
+            "itemtype": "method",
+            "name": "getName",
+            "return": {
+                "description": "The name of the filter.",
+                "type": "String"
+            },
+            "class": "dwv.image.filter.Sobel",
+            "module": "image",
+            "namespace": "dwv.image.filter"
+        },
+        {
+            "file": "src/image/filter.js",
+            "line": 125,
+            "description": "Transform the main image using this filter.",
+            "itemtype": "method",
+            "name": "update",
+            "return": {
+                "description": "The transformed image.",
+                "type": "Object"
+            },
+            "class": "dwv.image.filter.Sobel",
+            "module": "image",
+            "namespace": "dwv.image.filter"
         },
         {
             "file": "src/image/image.js",
-            "line": 238,
-            "description": "Get the value of the image at a specific coordinate.",
+            "line": 20,
+            "description": "Get the number of columns.",
+            "itemtype": "method",
+            "name": "getNumberOfColumns",
+            "return": {
+                "description": "The number of columns.",
+                "type": "Number"
+            },
+            "class": "dwv.image.Size",
+            "module": "image",
+            "namespace": "dwv.image"
+        },
+        {
+            "file": "src/image/image.js",
+            "line": 26,
+            "description": "Get the number of rows.",
+            "itemtype": "method",
+            "name": "getNumberOfRows",
+            "return": {
+                "description": "The number of rows.",
+                "type": "Number"
+            },
+            "class": "dwv.image.Size",
+            "module": "image",
+            "namespace": "dwv.image"
+        },
+        {
+            "file": "src/image/image.js",
+            "line": 32,
+            "description": "Get the number of slices.",
+            "itemtype": "method",
+            "name": "getNumberOfSlices",
+            "return": {
+                "description": "The number of slices.",
+                "type": "Number"
+            },
+            "class": "dwv.image.Size",
+            "module": "image",
+            "namespace": "dwv.image"
+        },
+        {
+            "file": "src/image/image.js",
+            "line": 40,
+            "description": "Get the size of a slice.",
+            "itemtype": "method",
+            "name": "getSliceSize",
+            "return": {
+                "description": "The size of a slice.",
+                "type": "Number"
+            },
+            "class": "dwv.image.Size",
+            "module": "image",
+            "namespace": "dwv.image"
+        },
+        {
+            "file": "src/image/image.js",
+            "line": 49,
+            "description": "Get the total size.",
+            "itemtype": "method",
+            "name": "getTotalSize",
+            "return": {
+                "description": "The total size.",
+                "type": "Number"
+            },
+            "class": "dwv.image.Size",
+            "module": "image",
+            "namespace": "dwv.image"
+        },
+        {
+            "file": "src/image/image.js",
+            "line": 58,
+            "description": "Check for equality.",
+            "itemtype": "method",
+            "name": "equals",
+            "params": [
+                {
+                    "name": "rhs",
+                    "description": "The object to compare to.",
+                    "type": "Size"
+                }
+            ],
+            "return": {
+                "description": "True if both objects are equal.",
+                "type": "Boolean"
+            },
+            "class": "dwv.image.Size",
+            "module": "image",
+            "namespace": "dwv.image"
+        },
+        {
+            "file": "src/image/image.js",
+            "line": 71,
+            "description": "Check that coordinates are within bounds.",
+            "itemtype": "method",
+            "name": "isInBounds",
             "params": [
                 {
                     "name": "i",
-                    "description": "The X index."
+                    "description": "The column coordinate.",
+                    "type": "Number"
                 },
                 {
                     "name": "j",
-                    "description": "The Y index."
+                    "description": "The row coordinate.",
+                    "type": "Number"
                 },
                 {
                     "name": "k",
-                    "description": "The Z index."
+                    "description": "The slice coordinate.",
+                    "type": "Number"
                 }
             ],
             "return": {
-                "description": "The value at the desired position.\nWarning: No size check..."
+                "description": "True if the given coordinates are within bounds.",
+                "type": "Boolean"
             },
-            "class": "dwv.html.Image class.",
-            "module": "dicom",
-            "namespace": "dwv.html"
+            "class": "dwv.image.Size",
+            "module": "image",
+            "namespace": "dwv.image"
         },
         {
             "file": "src/image/image.js",
-            "line": 253,
-            "description": "Get the value of the image at a specific offset.",
+            "line": 98,
+            "description": "Get the column spacing.",
+            "itemtype": "method",
+            "name": "getColumnSpacing",
+            "return": {
+                "description": "The column spacing.",
+                "type": "Number"
+            },
+            "class": "dwv.image.Spacing",
+            "module": "image",
+            "namespace": "dwv.image"
+        },
+        {
+            "file": "src/image/image.js",
+            "line": 104,
+            "description": "Get the row spacing.",
+            "itemtype": "method",
+            "name": "getRowSpacing",
+            "return": {
+                "description": "The row spacing.",
+                "type": "Number"
+            },
+            "class": "dwv.image.Spacing",
+            "module": "image",
+            "namespace": "dwv.image"
+        },
+        {
+            "file": "src/image/image.js",
+            "line": 110,
+            "description": "Get the slice spacing.",
+            "itemtype": "method",
+            "name": "slice",
+            "return": {
+                "description": "The slice spacing.",
+                "type": "Number"
+            },
+            "class": "dwv.image.Spacing",
+            "module": "image",
+            "namespace": "dwv.image"
+        },
+        {
+            "file": "src/image/image.js",
+            "line": 118,
+            "description": "Check for equality.",
+            "itemtype": "method",
+            "name": "equals",
             "params": [
                 {
-                    "name": "offset",
-                    "description": "The offset in the buffer."
+                    "name": "rhs",
+                    "description": "The object to compare to.",
+                    "type": "Spacing"
                 }
             ],
             "return": {
-                "description": "The value at the desired offset.\nWarning: No size check..."
+                "description": "True if both objects are equal.",
+                "type": "Boolean"
             },
-            "class": "dwv.html.Image class.",
-            "module": "dicom",
-            "namespace": "dwv.html"
+            "class": "dwv.image.Spacing",
+            "module": "image",
+            "namespace": "dwv.image"
+        },
+        {
+            "file": "src/image/image.js",
+            "line": 147,
+            "description": "Rescale slope.",
+            "itemtype": "property",
+            "name": "rescaleSlope",
+            "access": "private",
+            "tagname": "",
+            "type": "Number",
+            "class": "dwv.image.Image",
+            "module": "image",
+            "namespace": "dwv.image"
+        },
+        {
+            "file": "src/image/image.js",
+            "line": 154,
+            "description": "Rescale intercept.",
+            "itemtype": "property",
+            "name": "rescaleIntercept",
+            "access": "private",
+            "tagname": "",
+            "type": "Number",
+            "class": "dwv.image.Image",
+            "module": "image",
+            "namespace": "dwv.image"
+        },
+        {
+            "file": "src/image/image.js",
+            "line": 161,
+            "description": "Photometric interpretation (MONOCHROME, RGB...).",
+            "itemtype": "property",
+            "name": "photometricInterpretation",
+            "access": "private",
+            "tagname": "",
+            "type": "{String}",
+            "class": "dwv.image.Image",
+            "module": "image",
+            "namespace": "dwv.image"
+        },
+        {
+            "file": "src/image/image.js",
+            "line": 168,
+            "description": "Planar configuration for RGB data (0:RGBRGBRGBRGB... or 1:RRR...GGG...BBB...).",
+            "itemtype": "property",
+            "name": "planarConfiguration",
+            "access": "private",
+            "tagname": "",
+            "type": "{Number}",
+            "class": "dwv.image.Image",
+            "module": "image",
+            "namespace": "dwv.image"
+        },
+        {
+            "file": "src/image/image.js",
+            "line": 175,
+            "description": "Meta information.",
+            "itemtype": "property",
+            "name": "meta",
+            "access": "private",
+            "tagname": "",
+            "type": "{Object}",
+            "class": "dwv.image.Image",
+            "module": "image",
+            "namespace": "dwv.image"
+        },
+        {
+            "file": "src/image/image.js",
+            "line": 183,
+            "description": "Original buffer.",
+            "itemtype": "property",
+            "name": "originalBuffer",
+            "access": "private",
+            "tagname": "",
+            "type": "{Array}",
+            "class": "dwv.image.Image",
+            "module": "image",
+            "namespace": "dwv.image"
+        },
+        {
+            "file": "src/image/image.js",
+            "line": 194,
+            "description": "Data range.",
+            "itemtype": "property",
+            "name": "dataRange",
+            "access": "private",
+            "tagname": "",
+            "type": "{Object}",
+            "class": "dwv.image.Image",
+            "module": "image",
+            "namespace": "dwv.image"
+        },
+        {
+            "file": "src/image/image.js",
+            "line": 201,
+            "description": "Histogram.",
+            "itemtype": "property",
+            "name": "histogram",
+            "access": "private",
+            "tagname": "",
+            "type": "{Object}",
+            "class": "dwv.image.Image",
+            "module": "image",
+            "namespace": "dwv.image"
+        },
+        {
+            "file": "src/image/image.js",
+            "line": 209,
+            "description": "Get the size of the image.",
+            "itemtype": "method",
+            "name": "getSize",
+            "return": {
+                "description": "The size of the image.",
+                "type": "Size"
+            },
+            "class": "dwv.image.Image",
+            "module": "image",
+            "namespace": "dwv.image"
+        },
+        {
+            "file": "src/image/image.js",
+            "line": 215,
+            "description": "Get the spacing of the image.",
+            "itemtype": "method",
+            "name": "getSpacing",
+            "return": {
+                "description": "The spacing of the image.",
+                "type": "Spacing"
+            },
+            "class": "dwv.image.Image",
+            "module": "image",
+            "namespace": "dwv.image"
+        },
+        {
+            "file": "src/image/image.js",
+            "line": 221,
+            "description": "Get the data buffer of the image. TODO dangerous...",
+            "itemtype": "method",
+            "name": "getBuffer",
+            "return": {
+                "description": "The data buffer of the image.",
+                "type": "Array"
+            },
+            "class": "dwv.image.Image",
+            "module": "image",
+            "namespace": "dwv.image"
+        },
+        {
+            "file": "src/image/image.js",
+            "line": 227,
+            "description": "Get the slice positions.",
+            "itemtype": "method",
+            "name": "getSlicePositions",
+            "return": {
+                "description": "The slice positions.",
+                "type": "Array"
+            },
+            "class": "dwv.image.Image",
+            "module": "image",
+            "namespace": "dwv.image"
+        },
+        {
+            "file": "src/image/image.js",
+            "line": 234,
+            "description": "Get the rescale slope.",
+            "itemtype": "method",
+            "name": "getRescaleSlope",
+            "return": {
+                "description": "The rescale slope.",
+                "type": "Number"
+            },
+            "class": "dwv.image.Image",
+            "module": "image",
+            "namespace": "dwv.image"
+        },
+        {
+            "file": "src/image/image.js",
+            "line": 240,
+            "description": "Set the rescale slope.",
+            "itemtype": "method",
+            "name": "setRescaleSlope",
+            "params": [
+                {
+                    "name": "rs",
+                    "description": "The rescale slope.",
+                    "type": "Number"
+                }
+            ],
+            "class": "dwv.image.Image",
+            "module": "image",
+            "namespace": "dwv.image"
+        },
+        {
+            "file": "src/image/image.js",
+            "line": 246,
+            "description": "Get the rescale intercept.",
+            "itemtype": "method",
+            "name": "getRescaleIntercept",
+            "return": {
+                "description": "The rescale intercept.",
+                "type": "Number"
+            },
+            "class": "dwv.image.Image",
+            "module": "image",
+            "namespace": "dwv.image"
+        },
+        {
+            "file": "src/image/image.js",
+            "line": 252,
+            "description": "Set the rescale intercept.",
+            "itemtype": "method",
+            "name": "setRescaleIntercept",
+            "params": [
+                {
+                    "name": "ri",
+                    "description": "The rescale intercept.",
+                    "type": "Number"
+                }
+            ],
+            "class": "dwv.image.Image",
+            "module": "image",
+            "namespace": "dwv.image"
+        },
+        {
+            "file": "src/image/image.js",
+            "line": 258,
+            "description": "Get the photometricInterpretation of the image.",
+            "itemtype": "method",
+            "name": "getPhotometricInterpretation",
+            "return": {
+                "description": "The photometricInterpretation of the image.",
+                "type": "String"
+            },
+            "class": "dwv.image.Image",
+            "module": "image",
+            "namespace": "dwv.image"
         },
         {
             "file": "src/image/image.js",
             "line": 264,
-            "description": "Get the value of the image at a specific coordinate.",
+            "description": "Set the photometricInterpretation of the image.",
+            "itemtype": "method",
+            "name": "setPhotometricInterpretation",
+            "pqrqm": "{String} interp The photometricInterpretation of the image.",
+            "class": "dwv.image.Image",
+            "module": "image",
+            "namespace": "dwv.image"
+        },
+        {
+            "file": "src/image/image.js",
+            "line": 270,
+            "description": "Get the planarConfiguration of the image.",
+            "itemtype": "method",
+            "name": "getPlanarConfiguration",
+            "return": {
+                "description": "The planarConfiguration of the image.",
+                "type": "Number"
+            },
+            "class": "dwv.image.Image",
+            "module": "image",
+            "namespace": "dwv.image"
+        },
+        {
+            "file": "src/image/image.js",
+            "line": 276,
+            "description": "Set the planarConfiguration of the image.",
+            "itemtype": "method",
+            "name": "setPlanarConfiguration",
             "params": [
                 {
-                    "name": "i",
-                    "description": "The X index."
-                },
+                    "name": "config",
+                    "description": "The planarConfiguration of the image.",
+                    "type": "Number"
+                }
+            ],
+            "class": "dwv.image.Image",
+            "module": "image",
+            "namespace": "dwv.image"
+        },
+        {
+            "file": "src/image/image.js",
+            "line": 283,
+            "description": "Get the meta information of the image.",
+            "itemtype": "method",
+            "name": "getMeta",
+            "return": {
+                "description": "The meta information of the image.",
+                "type": "Object"
+            },
+            "class": "dwv.image.Image",
+            "module": "image",
+            "namespace": "dwv.image"
+        },
+        {
+            "file": "src/image/image.js",
+            "line": 289,
+            "description": "Set the meta information of the image.",
+            "itemtype": "method",
+            "name": "setMeta",
+            "params": [
                 {
-                    "name": "j",
-                    "description": "The Y index."
-                },
+                    "name": "rhs",
+                    "description": "The meta information of the image.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.image.Image",
+            "module": "image",
+            "namespace": "dwv.image"
+        },
+        {
+            "file": "src/image/image.js",
+            "line": 296,
+            "description": "Get value at offset. Warning: No size check...",
+            "itemtype": "method",
+            "name": "getValueAtOffset",
+            "params": [
                 {
-                    "name": "k",
-                    "description": "The Z index."
+                    "name": "offset",
+                    "description": "The desired offset.",
+                    "type": "Number"
                 }
             ],
             "return": {
-                "description": "The value at the desired position.\nWarning: No size check..."
+                "description": "The value at offset.",
+                "type": "Number"
             },
-            "class": "dwv.html.Image class.",
-            "module": "dicom",
-            "namespace": "dwv.html"
-        },
-        {
-            "file": "src/image/image.js",
-            "line": 277,
-            "description": "Calculate the raw image data range.",
-            "return": {
-                "description": "The range .",
-                "type": "Min, max"
-            },
-            "class": "dwv.html.Image class.",
-            "module": "dicom",
-            "namespace": "dwv.html"
-        },
-        {
-            "file": "src/image/image.js",
-            "line": 295,
-            "description": "Calculate the image data range after rescale.",
-            "return": {
-                "description": "The range .",
-                "type": "Min, max"
-            },
-            "class": "dwv.html.Image class.",
-            "module": "dicom",
-            "namespace": "dwv.html"
+            "class": "dwv.image.Image",
+            "module": "image",
+            "namespace": "dwv.image"
         },
         {
             "file": "src/image/image.js",
             "line": 306,
-            "description": "Calculate the histogram of the image.",
+            "description": "Clone the image.",
+            "itemtype": "method",
+            "name": "clone",
             "return": {
-                "description": "An array representing the histogram."
+                "description": "A clone of this image.",
+                "type": "Image"
             },
-            "class": "dwv.html.Image class.",
-            "module": "dicom",
-            "namespace": "dwv.html"
+            "class": "dwv.image.Image",
+            "module": "image",
+            "namespace": "dwv.image"
         },
         {
             "file": "src/image/image.js",
-            "line": 333,
-            "description": "Convolute the image with a given 2D kernel.",
+            "line": 322,
+            "description": "Append a slice to the image.",
+            "itemtype": "method",
+            "name": "appendSlice",
             "params": [
                 {
-                    "name": "weights",
-                    "description": "The weights of the 2D kernel."
+                    "name": "The",
+                    "description": "slice to append.",
+                    "type": "Image"
                 }
             ],
-            "return": {
-                "description": "The convoluted image.\n\nNote: Uses the raw buffer values."
-            },
-            "class": "dwv.html.Image class.",
-            "module": "dicom",
-            "namespace": "dwv.html"
-        },
-        {
-            "file": "src/image/image.js",
-            "line": 386,
-            "description": "Transform an image using a specific operator.",
-            "params": [
-                {
-                    "name": "operator",
-                    "description": "The operator to use when transforming."
-                }
-            ],
-            "return": {
-                "description": "The transformed image.\n\nNote: Uses the raw buffer values."
-            },
-            "class": "dwv.html.Image class.",
-            "module": "dicom",
-            "namespace": "dwv.html"
+            "class": "dwv.image.Image",
+            "module": "image",
+            "namespace": "dwv.image"
         },
         {
             "file": "src/image/image.js",
             "line": 404,
+            "description": "Get the data range.",
+            "itemtype": "method",
+            "name": "getDataRange",
+            "return": {
+                "description": "The data range.",
+                "type": "Object"
+            },
+            "class": "dwv.image.Image",
+            "module": "image",
+            "namespace": "dwv.image"
+        },
+        {
+            "file": "src/image/image.js",
+            "line": 414,
+            "description": "Get the histogram.",
+            "itemtype": "method",
+            "name": "getHistogram",
+            "return": {
+                "description": "The histogram.",
+                "type": "Object"
+            },
+            "class": "dwv.image.Image",
+            "module": "image",
+            "namespace": "dwv.image"
+        },
+        {
+            "file": "src/image/image.js",
+            "line": 425,
+            "description": "Get the value of the image at a specific coordinate.",
+            "itemtype": "method",
+            "name": "getValue",
+            "params": [
+                {
+                    "name": "i",
+                    "description": "The X index.",
+                    "type": "Number"
+                },
+                {
+                    "name": "j",
+                    "description": "The Y index.",
+                    "type": "Number"
+                },
+                {
+                    "name": "k",
+                    "description": "The Z index.",
+                    "type": "Number"
+                }
+            ],
+            "return": {
+                "description": "The value at the desired position.\nWarning: No size check...",
+                "type": "Number"
+            },
+            "class": "dwv.image.Image",
+            "module": "image",
+            "namespace": "dwv.image"
+        },
+        {
+            "file": "src/image/image.js",
+            "line": 441,
+            "description": "Get the rescaled value of the image at a specific offset.",
+            "itemtype": "method",
+            "name": "getRescaledValueAtOffset",
+            "params": [
+                {
+                    "name": "offset",
+                    "description": "The offset in the buffer.",
+                    "type": "Number"
+                }
+            ],
+            "return": {
+                "description": "The rescaled value at the desired offset.\nWarning: No size check...",
+                "type": "Number"
+            },
+            "class": "dwv.image.Image",
+            "module": "image",
+            "namespace": "dwv.image"
+        },
+        {
+            "file": "src/image/image.js",
+            "line": 453,
+            "description": "Get the rescaled value of the image at a specific coordinate.",
+            "itemtype": "method",
+            "name": "getRescaledValue",
+            "params": [
+                {
+                    "name": "i",
+                    "description": "The X index.",
+                    "type": "Number"
+                },
+                {
+                    "name": "j",
+                    "description": "The Y index.",
+                    "type": "Number"
+                },
+                {
+                    "name": "k",
+                    "description": "The Z index.",
+                    "type": "Number"
+                }
+            ],
+            "return": {
+                "description": "The rescaled value at the desired position.\nWarning: No size check...",
+                "type": "Number"
+            },
+            "class": "dwv.image.Image",
+            "module": "image",
+            "namespace": "dwv.image"
+        },
+        {
+            "file": "src/image/image.js",
+            "line": 467,
+            "description": "Calculate the raw image data range.",
+            "itemtype": "method",
+            "name": "calculateDataRange",
+            "return": {
+                "description": "The range {min, max}.",
+                "type": "Object"
+            },
+            "class": "dwv.image.Image",
+            "module": "image",
+            "namespace": "dwv.image"
+        },
+        {
+            "file": "src/image/image.js",
+            "line": 486,
+            "description": "Calculate the image data range after rescale.",
+            "itemtype": "method",
+            "name": "getRescaledDataRange",
+            "return": {
+                "description": "The rescaled data range {min, max}.",
+                "type": "Object"
+            },
+            "class": "dwv.image.Image",
+            "module": "image",
+            "namespace": "dwv.image"
+        },
+        {
+            "file": "src/image/image.js",
+            "line": 498,
+            "description": "Calculate the histogram of the image.",
+            "itemtype": "method",
+            "name": "calculateHistogram",
+            "return": {
+                "description": "An array representing the histogram.",
+                "type": "Array"
+            },
+            "class": "dwv.image.Image",
+            "module": "image",
+            "namespace": "dwv.image"
+        },
+        {
+            "file": "src/image/image.js",
+            "line": 526,
+            "description": "Convolute the image with a given 2D kernel.",
+            "itemtype": "method",
+            "name": "convolute2D",
+            "params": [
+                {
+                    "name": "weights",
+                    "description": "The weights of the 2D kernel as a square matrix.",
+                    "type": "Array"
+                }
+            ],
+            "return": {
+                "description": "The convoluted image.\nNote: Uses the raw buffer values.",
+                "type": "Image"
+            },
+            "class": "dwv.image.Image",
+            "module": "image",
+            "namespace": "dwv.image"
+        },
+        {
+            "file": "src/image/image.js",
+            "line": 579,
+            "description": "Transform an image using a specific operator.",
+            "itemtype": "method",
+            "name": "transform",
+            "params": [
+                {
+                    "name": "operator",
+                    "description": "The operator to use when transforming.",
+                    "type": "Function"
+                }
+            ],
+            "return": {
+                "description": "The transformed image.\nNote: Uses the raw buffer values.",
+                "type": "Image"
+            },
+            "class": "dwv.image.Image",
+            "module": "image",
+            "namespace": "dwv.image"
+        },
+        {
+            "file": "src/image/image.js",
+            "line": 597,
             "description": "Compose this image with another one and using a specific operator.",
+            "itemtype": "method",
+            "name": "compose",
             "params": [
                 {
                     "name": "rhs",
-                    "description": "The image to compose with."
+                    "description": "The image to compose with.",
+                    "type": "Image"
                 },
                 {
                     "name": "operator",
-                    "description": "The operator to use when composing."
+                    "description": "The operator to use when composing.",
+                    "type": "Function"
                 }
             ],
             "return": {
-                "description": "The composed image.\n\nNote: Uses the raw buffer values."
+                "description": "The composed image.\nNote: Uses the raw buffer values.",
+                "type": "Image"
             },
-            "class": "dwv.html.Image class.",
-            "module": "dicom",
-            "namespace": "dwv.html"
+            "class": "dwv.image.Image",
+            "module": "image",
+            "namespace": "dwv.image"
         },
         {
             "file": "src/image/luts.js",
-            "line": 95,
-            "description": "Lookup tables for image color display.",
-            "class": "dwv.html.Window LUT class.",
-            "module": "dicom",
-            "namespace": "dwv.html"
+            "line": 19,
+            "description": "The internal array.",
+            "itemtype": "property",
+            "name": "rescaleLut_",
+            "access": "private",
+            "tagname": "",
+            "type": "Array",
+            "class": "dwv.image.lut.Rescale",
+            "module": "image",
+            "namespace": "dwv.image.lut"
         },
         {
-            "file": "src/image/reader.js",
-            "line": 6,
-            "description": "Get data from an input image using a canvas.",
+            "file": "src/image/luts.js",
+            "line": 32,
+            "description": "Get the rescale slope.",
+            "itemtype": "method",
+            "name": "getSlope",
+            "return": {
+                "description": "The rescale slope.",
+                "type": "Number"
+            },
+            "class": "dwv.image.lut.Rescale",
+            "module": "image",
+            "namespace": "dwv.image.lut"
+        },
+        {
+            "file": "src/image/luts.js",
+            "line": 38,
+            "description": "Get the rescale intercept.",
+            "itemtype": "method",
+            "name": "getIntercept",
+            "return": {
+                "description": "The rescale intercept.",
+                "type": "Number"
+            },
+            "class": "dwv.image.lut.Rescale",
+            "module": "image",
+            "namespace": "dwv.image.lut"
+        },
+        {
+            "file": "src/image/luts.js",
+            "line": 45,
+            "description": "Initialise the LUT.",
+            "itemtype": "method",
+            "name": "initialise",
             "params": [
                 {
-                    "name": "image",
-                    "description": "The image."
-                },
-                {
-                    "name": "file",
-                    "description": "The corresponding file."
+                    "name": "bitsStored",
+                    "description": "The number of bits used to store the data.",
+                    "type": "Number"
                 }
             ],
-            "class": "dwv.html.View class.",
-            "module": "dicom",
-            "namespace": "dwv.html"
+            "class": "dwv.image.lut.Rescale",
+            "module": "image",
+            "namespace": "dwv.image.lut"
         },
         {
-            "file": "src/image/reader.js",
-            "line": 55,
-            "description": "Get data from an input buffer using a DICOM parser.",
-            "params": [
-                {
-                    "name": "buffer",
-                    "description": "The input data buffer."
-                }
-            ],
-            "class": "dwv.html.View class.",
-            "module": "dicom",
-            "namespace": "dwv.html"
+            "file": "src/image/luts.js",
+            "line": 59,
+            "description": "Get the length of the LUT array.",
+            "itemtype": "method",
+            "name": "getLength",
+            "return": {
+                "description": "The length of the LUT array.",
+                "type": "Number"
+            },
+            "class": "dwv.image.lut.Rescale",
+            "module": "image",
+            "namespace": "dwv.image.lut"
         },
         {
-            "file": "src/image/view.js",
-            "line": 86,
-            "description": "Set the view window/level.",
+            "file": "src/image/luts.js",
+            "line": 66,
+            "description": "Get the value of the LUT at the given offset.",
+            "itemtype": "method",
+            "name": "getValue",
+            "return": {
+                "description": "The value of the LUT at the given offset.",
+                "type": "Number"
+            },
+            "class": "dwv.image.lut.Rescale",
+            "module": "image",
+            "namespace": "dwv.image.lut"
+        },
+        {
+            "file": "src/image/luts.js",
+            "line": 84,
+            "description": "The internal array: Uint8ClampedArray clamps between 0 and 255.\n(not supported on travis yet... using basic array, be sure not to overflow!)",
+            "itemtype": "property",
+            "name": "rescaleLut_",
+            "access": "private",
+            "tagname": "",
+            "type": "Array",
+            "class": "dwv.image.lut.Window",
+            "module": "image",
+            "namespace": "dwv.image.lut"
+        },
+        {
+            "file": "src/image/luts.js",
+            "line": 100,
+            "description": "The window center.",
+            "itemtype": "property",
+            "name": "center_",
+            "access": "private",
+            "tagname": "",
+            "type": "Number",
+            "class": "dwv.image.lut.Window",
+            "module": "image",
+            "namespace": "dwv.image.lut"
+        },
+        {
+            "file": "src/image/luts.js",
+            "line": 107,
+            "description": "The window width.",
+            "itemtype": "property",
+            "name": "width_",
+            "access": "private",
+            "tagname": "",
+            "type": "Number",
+            "class": "dwv.image.lut.Window",
+            "module": "image",
+            "namespace": "dwv.image.lut"
+        },
+        {
+            "file": "src/image/luts.js",
+            "line": 115,
+            "description": "Get the window center.",
+            "itemtype": "method",
+            "name": "getCenter",
+            "return": {
+                "description": "The window center.",
+                "type": "Number"
+            },
+            "class": "dwv.image.lut.Window",
+            "module": "image",
+            "namespace": "dwv.image.lut"
+        },
+        {
+            "file": "src/image/luts.js",
+            "line": 121,
+            "description": "Get the window width.",
+            "itemtype": "method",
+            "name": "getWidth",
+            "return": {
+                "description": "The window width.",
+                "type": "Number"
+            },
+            "class": "dwv.image.lut.Window",
+            "module": "image",
+            "namespace": "dwv.image.lut"
+        },
+        {
+            "file": "src/image/luts.js",
+            "line": 127,
+            "description": "Get the signed flag.",
+            "itemtype": "method",
+            "name": "isSigned",
+            "return": {
+                "description": "The signed flag.",
+                "type": "Boolean"
+            },
+            "class": "dwv.image.lut.Window",
+            "module": "image",
+            "namespace": "dwv.image.lut"
+        },
+        {
+            "file": "src/image/luts.js",
+            "line": 134,
+            "description": "Set the window center and width.",
+            "itemtype": "method",
+            "name": "setCenterAndWidth",
             "params": [
                 {
                     "name": "center",
-                    "description": "The window center."
+                    "description": "The window center.",
+                    "type": "Number"
                 },
                 {
                     "name": "width",
-                    "description": "The window width."
+                    "description": "The window width.",
+                    "type": "Number"
                 }
             ],
-            "warning": "Uses the latest set rescale LUT or the default linear one.",
-            "class": "dwv.html.View class.",
-            "module": "dicom",
-            "namespace": "dwv.html"
+            "class": "dwv.image.lut.Window",
+            "module": "image",
+            "namespace": "dwv.image.lut"
         },
         {
-            "file": "src/image/view.js",
-            "line": 98,
-            "description": "Set the image window/level to cover the full data range.",
-            "warning": "Uses the latest set rescale LUT or the default linear one.",
-            "class": "dwv.html.View class.",
-            "module": "dicom",
-            "namespace": "dwv.html"
-        },
-        {
-            "file": "src/image/view.js",
-            "line": 114,
-            "description": "Increment the current slice number.\nReturns false if not in bounds.",
-            "class": "dwv.html.View class.",
-            "module": "dicom",
-            "namespace": "dwv.html"
-        },
-        {
-            "file": "src/image/view.js",
-            "line": 126,
-            "description": "Decrement the current slice number.\nReturns false if not in bounds.",
-            "class": "dwv.html.View class.",
-            "module": "dicom",
-            "namespace": "dwv.html"
-        },
-        {
-            "file": "src/image/view.js",
-            "line": 138,
-            "description": "Clone the image using all meta data and the original data buffer.",
+            "file": "src/image/luts.js",
+            "line": 160,
+            "description": "Get the length of the LUT array.",
+            "itemtype": "method",
+            "name": "getLength",
             "return": {
-                "description": "A full copy of this .",
-                "type": "dwv.image.Image"
+                "description": "The length of the LUT array.",
+                "type": "Number"
             },
-            "class": "dwv.html.View class.",
-            "module": "dicom",
-            "namespace": "dwv.html"
+            "class": "dwv.image.lut.Window",
+            "module": "image",
+            "namespace": "dwv.image.lut"
+        },
+        {
+            "file": "src/image/luts.js",
+            "line": 167,
+            "description": "Get the value of the LUT at the given offset.",
+            "itemtype": "method",
+            "name": "getValue",
+            "return": {
+                "description": "The value of the LUT at the given offset.",
+                "type": "Number"
+            },
+            "class": "dwv.image.lut.Window",
+            "module": "image",
+            "namespace": "dwv.image.lut"
+        },
+        {
+            "file": "src/image/luts.js",
+            "line": 179,
+            "description": "Lookup tables for image color display.",
+            "class": "dwv.image.lut.Window",
+            "module": "image",
+            "namespace": "dwv.image.lut"
+        },
+        {
+            "file": "src/image/reader.js",
+            "line": 8,
+            "description": "Get data from an input image using a canvas.",
+            "itemtype": "method",
+            "name": "getDataFromImage",
+            "static": 1,
+            "params": [
+                {
+                    "name": "image",
+                    "description": "The image.",
+                    "type": "Image"
+                }
+            ],
+            "return": {
+                "description": "The corresponding view and info.",
+                "type": "Mixed"
+            },
+            "class": "dwv.image.View",
+            "module": "image"
+        },
+        {
+            "file": "src/image/reader.js",
+            "line": 59,
+            "description": "Get data from an input buffer using a DICOM parser.",
+            "itemtype": "method",
+            "name": "getDataFromDicomBuffer",
+            "static": 1,
+            "params": [
+                {
+                    "name": "buffer",
+                    "description": "The input data buffer.",
+                    "type": "Array"
+                }
+            ],
+            "return": {
+                "description": "The corresponding view and info.",
+                "type": "Mixed"
+            },
+            "class": "dwv.image.View",
+            "module": "image"
         },
         {
             "file": "src/image/view.js",
-            "line": 151,
+            "line": 20,
+            "description": "Rescale lookup table.",
+            "itemtype": "property",
+            "name": "rescaleLut",
+            "access": "private",
+            "tagname": "",
+            "type": "Rescale",
+            "class": "dwv.image.View",
+            "module": "image",
+            "namespace": "dwv.image"
+        },
+        {
+            "file": "src/image/view.js",
+            "line": 31,
+            "description": "Window lookup table.",
+            "itemtype": "property",
+            "name": "windowLut",
+            "access": "private",
+            "tagname": "",
+            "type": "Window",
+            "class": "dwv.image.View",
+            "module": "image",
+            "namespace": "dwv.image"
+        },
+        {
+            "file": "src/image/view.js",
+            "line": 39,
+            "description": "Window presets.",
+            "itemtype": "property",
+            "name": "windowPresets",
+            "access": "private",
+            "tagname": "",
+            "type": "{Object}",
+            "class": "dwv.image.View",
+            "module": "image",
+            "namespace": "dwv.image"
+        },
+        {
+            "file": "src/image/view.js",
+            "line": 46,
+            "description": "Color map",
+            "itemtype": "property",
+            "name": "colorMap",
+            "access": "private",
+            "tagname": "",
+            "type": "{Object}",
+            "class": "dwv.image.View",
+            "module": "image",
+            "namespace": "dwv.image"
+        },
+        {
+            "file": "src/image/view.js",
+            "line": 53,
+            "description": "Current position",
+            "itemtype": "property",
+            "name": "currentPosition",
+            "access": "private",
+            "tagname": "",
+            "type": "{Object}",
+            "class": "dwv.image.View",
+            "module": "image",
+            "namespace": "dwv.image"
+        },
+        {
+            "file": "src/image/view.js",
+            "line": 61,
+            "description": "Get the associated image.",
+            "itemtype": "method",
+            "name": "getImage",
+            "return": {
+                "description": "The associated image.",
+                "type": "Image"
+            },
+            "class": "dwv.image.View",
+            "module": "image",
+            "namespace": "dwv.image"
+        },
+        {
+            "file": "src/image/view.js",
+            "line": 67,
+            "description": "Set the associated image.",
+            "itemtype": "method",
+            "name": "setImage",
+            "params": [
+                {
+                    "name": "inImage",
+                    "description": "The associated image.",
+                    "type": "Image"
+                }
+            ],
+            "class": "dwv.image.View",
+            "module": "image",
+            "namespace": "dwv.image"
+        },
+        {
+            "file": "src/image/view.js",
+            "line": 74,
+            "description": "Get the rescale LUT of the image.",
+            "itemtype": "method",
+            "name": "getRescaleLut",
+            "return": {
+                "description": "The rescale LUT of the image.",
+                "type": "Rescale"
+            },
+            "class": "dwv.image.View",
+            "module": "image",
+            "namespace": "dwv.image"
+        },
+        {
+            "file": "src/image/view.js",
+            "line": 80,
+            "description": "Set the rescale LUT of the image.",
+            "itemtype": "method",
+            "name": "setRescaleLut",
+            "params": [
+                {
+                    "name": "lut",
+                    "description": "The rescale LUT of the image.",
+                    "type": "Rescale"
+                }
+            ],
+            "class": "dwv.image.View",
+            "module": "image",
+            "namespace": "dwv.image"
+        },
+        {
+            "file": "src/image/view.js",
+            "line": 87,
+            "description": "Get the window LUT of the image.",
+            "itemtype": "method",
+            "name": "getWindowLut",
+            "return": {
+                "description": "The window LUT of the image.",
+                "type": "Window"
+            },
+            "class": "dwv.image.View",
+            "module": "image",
+            "namespace": "dwv.image"
+        },
+        {
+            "file": "src/image/view.js",
+            "line": 93,
+            "description": "Set the window LUT of the image.",
+            "itemtype": "method",
+            "name": "setWindowLut",
+            "params": [
+                {
+                    "name": "lut",
+                    "description": "The window LUT of the image.",
+                    "type": "Window"
+                }
+            ],
+            "class": "dwv.image.View",
+            "module": "image",
+            "namespace": "dwv.image"
+        },
+        {
+            "file": "src/image/view.js",
+            "line": 100,
+            "description": "Get the window presets.",
+            "itemtype": "method",
+            "name": "getWindowPresets",
+            "return": {
+                "description": "The window presets.",
+                "type": "Object"
+            },
+            "class": "dwv.image.View",
+            "module": "image",
+            "namespace": "dwv.image"
+        },
+        {
+            "file": "src/image/view.js",
+            "line": 106,
+            "description": "Set the window presets.",
+            "itemtype": "method",
+            "name": "setWindowPresets",
+            "params": [
+                {
+                    "name": "presets",
+                    "description": "The window presets.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.image.View",
+            "module": "image",
+            "namespace": "dwv.image"
+        },
+        {
+            "file": "src/image/view.js",
+            "line": 116,
+            "description": "Get the color map of the image.",
+            "itemtype": "method",
+            "name": "getColorMap",
+            "return": {
+                "description": "The color map of the image.",
+                "type": "Object"
+            },
+            "class": "dwv.image.View",
+            "module": "image",
+            "namespace": "dwv.image"
+        },
+        {
+            "file": "src/image/view.js",
+            "line": 122,
+            "description": "Set the color map of the image.",
+            "itemtype": "method",
+            "name": "setColorMap",
+            "params": [
+                {
+                    "name": "map",
+                    "description": "The color map of the image.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.image.View",
+            "module": "image",
+            "namespace": "dwv.image"
+        },
+        {
+            "file": "src/image/view.js",
+            "line": 137,
+            "description": "Is the data signed data.",
+            "itemtype": "method",
+            "name": "isSigned",
+            "return": {
+                "description": "The signed data flag.",
+                "type": "Boolean"
+            },
+            "class": "dwv.image.View",
+            "module": "image",
+            "namespace": "dwv.image"
+        },
+        {
+            "file": "src/image/view.js",
+            "line": 144,
+            "description": "Get the current position.",
+            "itemtype": "method",
+            "name": "getCurrentPosition",
+            "return": {
+                "description": "The current position.",
+                "type": "Object"
+            },
+            "class": "dwv.image.View",
+            "module": "image",
+            "namespace": "dwv.image"
+        },
+        {
+            "file": "src/image/view.js",
+            "line": 150,
+            "description": "Set the current position. Returns false if not in bounds.",
+            "itemtype": "method",
+            "name": "setCurrentPosition",
+            "params": [
+                {
+                    "name": "pos",
+                    "description": "The current position.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.image.View",
+            "module": "image",
+            "namespace": "dwv.image"
+        },
+        {
+            "file": "src/image/view.js",
+            "line": 169,
+            "description": "Vew listeners",
+            "itemtype": "property",
+            "name": "listeners",
+            "access": "private",
+            "tagname": "",
+            "type": "Array",
+            "class": "dwv.image.View",
+            "module": "image",
+            "namespace": "dwv.image"
+        },
+        {
+            "file": "src/image/view.js",
+            "line": 176,
+            "description": "Get the view listeners.",
+            "itemtype": "method",
+            "name": "getListeners",
+            "return": {
+                "description": "The view listeners.",
+                "type": "Array"
+            },
+            "class": "dwv.image.View",
+            "module": "image",
+            "namespace": "dwv.image"
+        },
+        {
+            "file": "src/image/view.js",
+            "line": 182,
+            "description": "Set the view listeners.",
+            "itemtype": "method",
+            "name": "setListeners",
+            "params": [
+                {
+                    "name": "list",
+                    "description": "The view listeners.",
+                    "type": "Array"
+                }
+            ],
+            "class": "dwv.image.View",
+            "module": "image",
+            "namespace": "dwv.image"
+        },
+        {
+            "file": "src/image/view.js",
+            "line": 190,
+            "description": "Set the view window/level.",
+            "itemtype": "method",
+            "name": "setWindowLevel",
+            "params": [
+                {
+                    "name": "center",
+                    "description": "The window center.",
+                    "type": "Number"
+                },
+                {
+                    "name": "width",
+                    "description": "The window width.\nWarning: uses the latest set rescale LUT or the default linear one.",
+                    "type": "Number"
+                }
+            ],
+            "class": "dwv.image.View",
+            "module": "image",
+            "namespace": "dwv.image"
+        },
+        {
+            "file": "src/image/view.js",
+            "line": 203,
+            "description": "Set the image window/level to cover the full data range.",
+            "itemtype": "method",
+            "name": "setWindowLevelMinMax\nWarning: uses the latest set rescale LUT or the default linear one.",
+            "class": "dwv.image.View",
+            "module": "image",
+            "namespace": "dwv.image"
+        },
+        {
+            "file": "src/image/view.js",
+            "line": 220,
+            "description": "Increment the current slice number.",
+            "itemtype": "method",
+            "name": "incrementSliceNb",
+            "return": {
+                "description": "False if not in bounds.",
+                "type": "Boolean"
+            },
+            "class": "dwv.image.View",
+            "module": "image",
+            "namespace": "dwv.image"
+        },
+        {
+            "file": "src/image/view.js",
+            "line": 233,
+            "description": "Decrement the current slice number.",
+            "itemtype": "method",
+            "name": "decrementSliceNb",
+            "return": {
+                "description": "False if not in bounds.",
+                "type": "Boolean"
+            },
+            "class": "dwv.image.View",
+            "module": "image",
+            "namespace": "dwv.image"
+        },
+        {
+            "file": "src/image/view.js",
+            "line": 246,
+            "description": "Clone the image using all meta data and the original data buffer.",
+            "itemtype": "method",
+            "name": "clone",
+            "return": {
+                "description": "A full copy of this {dwv.image.Image}.",
+                "type": "View"
+            },
+            "class": "dwv.image.View",
+            "module": "image",
+            "namespace": "dwv.image"
+        },
+        {
+            "file": "src/image/view.js",
+            "line": 260,
             "description": "Generate display image data to be given to a canvas.",
+            "itemtype": "method",
+            "name": "generateImageData",
             "params": [
                 {
                     "name": "array",
-                    "description": "The array to fill in."
+                    "description": "The array to fill in.",
+                    "type": "Array"
                 },
                 {
                     "name": "sliceNumber",
-                    "description": "The slice position."
+                    "description": "The slice position.",
+                    "type": "Number"
                 }
             ],
-            "class": "dwv.html.View class.",
-            "module": "dicom",
-            "namespace": "dwv.html"
+            "class": "dwv.image.View",
+            "module": "image",
+            "namespace": "dwv.image"
         },
         {
             "file": "src/image/view.js",
-            "line": 235,
+            "line": 345,
             "description": "Add an event listener on the view.",
+            "itemtype": "method",
+            "name": "addEventListener",
             "params": [
                 {
                     "name": "type",
-                    "description": "The event type."
+                    "description": "The event type.",
+                    "type": "String"
                 },
                 {
                     "name": "listener",
-                    "description": "The method associated with the provided event type."
+                    "description": "The method associated with the provided event type.",
+                    "type": "Object"
                 }
             ],
-            "class": "dwv.html.View class.",
-            "module": "dicom",
-            "namespace": "dwv.html"
+            "class": "dwv.image.View",
+            "module": "image",
+            "namespace": "dwv.image"
         },
         {
             "file": "src/image/view.js",
-            "line": 247,
+            "line": 358,
             "description": "Remove an event listener on the view.",
+            "itemtype": "method",
+            "name": "removeEventListener",
             "params": [
                 {
                     "name": "type",
-                    "description": "The event type."
+                    "description": "The event type.",
+                    "type": "String"
                 },
                 {
                     "name": "listener",
-                    "description": "The method associated with the provided event type."
+                    "description": "The method associated with the provided event type.",
+                    "type": "Object"
                 }
             ],
-            "class": "dwv.html.View class.",
-            "module": "dicom",
-            "namespace": "dwv.html"
+            "class": "dwv.image.View",
+            "module": "image",
+            "namespace": "dwv.image"
         },
         {
             "file": "src/image/view.js",
-            "line": 263,
+            "line": 375,
             "description": "Fire an event: call all associated listeners.",
+            "itemtype": "method",
+            "name": "fireEvent",
             "params": [
                 {
                     "name": "event",
-                    "description": "The event to fire."
+                    "description": "The event to fire.",
+                    "type": "Object"
                 }
             ],
-            "class": "dwv.html.View class.",
-            "module": "dicom",
-            "namespace": "dwv.html"
+            "class": "dwv.image.View",
+            "module": "image",
+            "namespace": "dwv.image"
         },
         {
             "file": "src/math/scissors.js",
@@ -3455,37 +5437,73 @@
         },
         {
             "file": "src/utils/string.js",
-            "line": 6,
+            "line": 8,
+            "description": "Capitalise the first letter of a string.",
             "itemtype": "method",
-            "name": "Capitalise the first letter of a string.",
-            "class": "Filter classes..App\nMain application.",
-            "module": "math",
-            "namespace": "Filter classes."
+            "name": "capitaliseFirstLetter",
+            "static": 1,
+            "params": [
+                {
+                    "name": "string",
+                    "description": "The string to capitalise the first letter.",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "The new string.",
+                "type": "String"
+            },
+            "class": "App\nMain application.",
+            "module": "utils"
         },
         {
             "file": "src/utils/string.js",
-            "line": 14,
+            "line": 20,
+            "description": "Clean string: trim and remove ending.",
             "itemtype": "method",
-            "name": "Clean string.",
-            "class": "Filter classes..App\nMain application.",
-            "module": "math",
-            "namespace": "Filter classes."
+            "name": "cleanString",
+            "static": 1,
+            "params": [
+                {
+                    "name": "string",
+                    "description": "The string to clean.",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "The cleaned string.",
+                "type": "String"
+            },
+            "class": "App\nMain application.",
+            "module": "utils"
         },
         {
             "file": "src/utils/string.js",
-            "line": 27,
-            "description": "root?key0=val0&key1=val1 returns [{\"key\"=\"key0\", \"value\"=\"val0\"}, {\"key\"=\"key1\", \"value\"=\"val1\"}]\nReturns null if not a query string (no question mark).",
-            "class": "Filter classes..App\nMain application.",
-            "module": "math",
-            "namespace": "Filter classes."
+            "line": 37,
+            "description": "Split string:\nroot?key0=val0&key1=val1 returns [{\"key\"=\"key0\", \"value\"=\"val0\"}, {\"key\"=\"key1\", \"value\"=\"val1\"}]\nReturns null if not a query string (no question mark).",
+            "itemtype": "method",
+            "name": "splitQueryString",
+            "static": 1,
+            "params": [
+                {
+                    "name": "inputStr",
+                    "description": "The string to split.",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "The splitted string.",
+                "type": "String"
+            },
+            "class": "App\nMain application.",
+            "module": "utils"
         },
         {
             "file": "src/application.js",
             "line": 67,
             "description": "Initialise the HTML for the application.",
-            "class": "Filter classes..App\nMain application.",
-            "module": "math",
-            "namespace": "Filter classes."
+            "class": "App\nMain application.",
+            "module": "utils"
         },
         {
             "file": "src/application.js",
@@ -3497,111 +5515,98 @@
                     "description": ""
                 }
             ],
-            "class": "Filter classes..App\nMain application.",
-            "module": "math",
-            "namespace": "Filter classes."
+            "class": "App\nMain application.",
+            "module": "utils"
         },
         {
             "file": "src/application.js",
             "line": 103,
             "access": "public",
             "tagname": "",
-            "class": "Filter classes..App\nMain application.",
-            "module": "math",
-            "namespace": "Filter classes."
+            "class": "App\nMain application.",
+            "module": "utils"
         },
         {
             "file": "src/application.js",
             "line": 111,
             "access": "public",
             "tagname": "",
-            "class": "Filter classes..App\nMain application.",
-            "module": "math",
-            "namespace": "Filter classes."
+            "class": "App\nMain application.",
+            "module": "utils"
         },
         {
             "file": "src/application.js",
             "line": 188,
             "access": "public",
             "tagname": "",
-            "class": "Filter classes..App\nMain application.",
-            "module": "math",
-            "namespace": "Filter classes."
+            "class": "App\nMain application.",
+            "module": "utils"
         },
         {
             "file": "src/application.js",
             "line": 196,
             "access": "public",
             "tagname": "",
-            "class": "Filter classes..App\nMain application.",
-            "module": "math",
-            "namespace": "Filter classes."
+            "class": "App\nMain application.",
+            "module": "utils"
         },
         {
             "file": "src/application.js",
             "line": 272,
             "description": "Generate the image data and draw it.",
-            "class": "Filter classes..App\nMain application.",
-            "module": "math",
-            "namespace": "Filter classes."
+            "class": "App\nMain application.",
+            "module": "utils"
         },
         {
             "file": "src/application.js",
             "line": 285,
             "description": "To be called once the image is loaded.",
-            "class": "Filter classes..App\nMain application.",
-            "module": "math",
-            "namespace": "Filter classes."
+            "class": "App\nMain application.",
+            "module": "utils"
         },
         {
             "file": "src/application.js",
             "line": 306,
             "description": "To be called once the image is loaded.",
-            "class": "Filter classes..App\nMain application.",
-            "module": "math",
-            "namespace": "Filter classes."
+            "class": "App\nMain application.",
+            "module": "utils"
         },
         {
             "file": "src/application.js",
             "line": 315,
             "description": "Toggle the display of the info layer.",
-            "class": "Filter classes..App\nMain application.",
-            "module": "math",
-            "namespace": "Filter classes."
+            "class": "App\nMain application.",
+            "module": "utils"
         },
         {
             "file": "src/application.js",
             "line": 336,
             "description": "Add image listeners.",
-            "class": "Filter classes..App\nMain application.",
-            "module": "math",
-            "namespace": "Filter classes."
+            "class": "App\nMain application.",
+            "module": "utils"
         },
         {
             "file": "src/application.js",
             "line": 348,
             "description": "Remove image listeners.",
-            "class": "Filter classes..App\nMain application.",
-            "module": "math",
-            "namespace": "Filter classes."
+            "class": "App\nMain application.",
+            "module": "utils"
         },
         {
             "file": "src/application.js",
             "line": 360,
             "access": "private",
             "tagname": "The general-purpose event handler. This function just determines the mouse \nposition relative to the canvas element.",
-            "class": "Filter classes..App\nMain application.",
-            "module": "math",
-            "namespace": "Filter classes."
+            "class": "App\nMain application.",
+            "module": "utils"
         },
         {
             "file": "src/application.js",
             "line": 435,
             "access": "private",
             "tagname": "",
-            "class": "Filter classes..App\nMain application.",
-            "module": "math",
-            "namespace": "Filter classes."
+            "class": "App\nMain application.",
+            "module": "utils"
         },
         {
             "file": "src/application.js",
@@ -3618,9 +5623,8 @@
                     "description": "The height of the input data."
                 }
             ],
-            "class": "Filter classes..App\nMain application.",
-            "module": "math",
-            "namespace": "Filter classes."
+            "class": "App\nMain application.",
+            "module": "utils"
         },
         {
             "file": "src/application.js",
@@ -3633,18 +5637,16 @@
                     "description": "The data information.\nTo be called once the DICOM has been parsed."
                 }
             ],
-            "class": "Filter classes..App\nMain application.",
-            "module": "math",
-            "namespace": "Filter classes."
+            "class": "App\nMain application.",
+            "module": "utils"
         },
         {
             "file": "src/application.js",
             "line": 498,
             "access": "private",
             "tagname": "To be called once the DICOM has been parsed.",
-            "class": "Filter classes..App\nMain application.",
-            "module": "math",
-            "namespace": "Filter classes."
+            "class": "App\nMain application.",
+            "module": "utils"
         }
     ],
     "warnings": [
@@ -3665,144 +5667,36 @@
             "line": " src/dicom/dicomParser.js:506"
         },
         {
-            "message": "replacing incorrect tag: function with method",
-            "line": " src/html/html.js:19"
-        },
-        {
-            "message": "replacing incorrect tag: function with method",
-            "line": " src/html/html.js:33"
-        },
-        {
-            "message": "replacing incorrect tag: function with method",
-            "line": " src/html/html.js:59"
-        },
-        {
-            "message": "replacing incorrect tag: function with method",
-            "line": " src/html/html.js:101"
-        },
-        {
-            "message": "replacing incorrect tag: function with method",
-            "line": " src/html/html.js:119"
-        },
-        {
             "message": "unknown tag: input",
-            "line": " src/html/html.js:119"
+            "line": " src/html/html.js:144"
         },
         {
             "message": "unknown tag: warning",
-            "line": " src/html/html.js:119"
-        },
-        {
-            "message": "replacing incorrect tag: function with method",
-            "line": " src/html/html.js:131"
-        },
-        {
-            "message": "replacing incorrect tag: function with method",
-            "line": " src/html/html.js:147"
-        },
-        {
-            "message": "replacing incorrect tag: function with method",
-            "line": " src/html/html.js:177"
-        },
-        {
-            "message": "replacing incorrect tag: function with method",
-            "line": " src/html/html.js:203"
-        },
-        {
-            "message": "replacing incorrect tag: function with method",
-            "line": " src/html/html.js:245"
-        },
-        {
-            "message": "replacing incorrect tag: function with method",
-            "line": " src/html/html.js:256"
-        },
-        {
-            "message": "replacing incorrect tag: function with method",
-            "line": " src/html/html.js:268"
-        },
-        {
-            "message": "replacing incorrect tag: function with method",
-            "line": " src/html/html.js:285"
+            "line": " src/html/html.js:144"
         },
         {
             "message": "unknown tag: input",
-            "line": " src/html/layer.js:141"
+            "line": " src/html/layer.js:227"
         },
         {
             "message": "unknown tag: input",
-            "line": " src/html/layer.js:141"
+            "line": " src/html/layer.js:227"
         },
         {
             "message": "unknown tag: input",
-            "line": " src/html/layer.js:192"
+            "line": " src/html/layer.js:281"
         },
         {
-            "message": "replacing incorrect tag: function with method",
-            "line": " src/image/filter.js:8"
+            "message": "unknown tag: input",
+            "line": " src/html/layer.js:298"
         },
         {
-            "message": "replacing incorrect tag: function with method",
-            "line": " src/image/filter.js:40"
+            "message": "unknown tag: input",
+            "line": " src/html/layer.js:309"
         },
         {
-            "message": "replacing incorrect tag: function with method",
-            "line": " src/image/filter.js:57"
-        },
-        {
-            "message": "replacing incorrect tag: returns with return",
-            "line": " src/image/image.js:238"
-        },
-        {
-            "message": "replacing incorrect tag: returns with return",
-            "line": " src/image/image.js:253"
-        },
-        {
-            "message": "replacing incorrect tag: returns with return",
+            "message": "unknown tag: pqrqm",
             "line": " src/image/image.js:264"
-        },
-        {
-            "message": "replacing incorrect tag: returns with return",
-            "line": " src/image/image.js:277"
-        },
-        {
-            "message": "replacing incorrect tag: returns with return",
-            "line": " src/image/image.js:295"
-        },
-        {
-            "message": "replacing incorrect tag: returns with return",
-            "line": " src/image/image.js:306"
-        },
-        {
-            "message": "replacing incorrect tag: returns with return",
-            "line": " src/image/image.js:333"
-        },
-        {
-            "message": "replacing incorrect tag: returns with return",
-            "line": " src/image/image.js:386"
-        },
-        {
-            "message": "replacing incorrect tag: returns with return",
-            "line": " src/image/image.js:404"
-        },
-        {
-            "message": "replacing incorrect tag: returns with return",
-            "line": " src/image/luts.js:8"
-        },
-        {
-            "message": "replacing incorrect tag: returns with return",
-            "line": " src/image/luts.js:39"
-        },
-        {
-            "message": "unknown tag: warning",
-            "line": " src/image/view.js:86"
-        },
-        {
-            "message": "unknown tag: warning",
-            "line": " src/image/view.js:98"
-        },
-        {
-            "message": "replacing incorrect tag: returns with return",
-            "line": " src/image/view.js:138"
         },
         {
             "message": "unknown tag: input",
@@ -3877,136 +5771,8 @@
             "line": " src/tools/zoom.js:6"
         },
         {
-            "message": "replacing incorrect tag: function with method",
-            "line": " src/utils/string.js:6"
-        },
-        {
-            "message": "replacing incorrect tag: function with method",
-            "line": " src/utils/string.js:14"
-        },
-        {
-            "message": "Missing item type\nBrowser checks to see if it can run dwv...\nTODO Maybe use http://modernizr.com/.",
-            "line": " src/html/html.js:410"
-        },
-        {
-            "message": "Missing item type\nReset the layout",
-            "line": " src/html/layer.js:107"
-        },
-        {
-            "message": "Missing item type\nDraw the content (imageData) of the layer.\nThe imageData variable needs to be set",
-            "line": " src/html/layer.js:118"
-        },
-        {
-            "message": "Missing item type\nInitialise the layer: set the canvas and context",
-            "line": " src/html/layer.js:141"
-        },
-        {
-            "message": "Missing item type\nFill the full context with the current style.",
-            "line": " src/html/layer.js:176"
-        },
-        {
-            "message": "Missing item type\nClear the full context.",
-            "line": " src/html/layer.js:184"
-        },
-        {
-            "message": "Missing item type\nMerge two layers.",
-            "line": " src/html/layer.js:192"
-        },
-        {
-            "message": "Missing item type\nSet the fill and stroke style of the context.",
-            "line": " src/html/layer.js:208"
-        },
-        {
-            "message": "Missing item type\nDisplay the layer.",
-            "line": " src/html/layer.js:217"
-        },
-        {
-            "message": "Missing item type\nAlign on another layer.",
-            "line": " src/html/layer.js:238"
-        },
-        {
-            "message": "Missing item type\nGet the value of the image at a specific coordinate.",
-            "line": " src/image/image.js:238"
-        },
-        {
-            "message": "Missing item type\nGet the value of the image at a specific offset.",
-            "line": " src/image/image.js:253"
-        },
-        {
-            "message": "Missing item type\nGet the value of the image at a specific coordinate.",
-            "line": " src/image/image.js:264"
-        },
-        {
-            "message": "Missing item type\nCalculate the raw image data range.",
-            "line": " src/image/image.js:277"
-        },
-        {
-            "message": "Missing item type\nCalculate the image data range after rescale.",
-            "line": " src/image/image.js:295"
-        },
-        {
-            "message": "Missing item type\nCalculate the histogram of the image.",
-            "line": " src/image/image.js:306"
-        },
-        {
-            "message": "Missing item type\nConvolute the image with a given 2D kernel.",
-            "line": " src/image/image.js:333"
-        },
-        {
-            "message": "Missing item type\nTransform an image using a specific operator.",
-            "line": " src/image/image.js:386"
-        },
-        {
-            "message": "Missing item type\nCompose this image with another one and using a specific operator.",
-            "line": " src/image/image.js:404"
-        },
-        {
             "message": "Missing item type\nLookup tables for image color display.",
-            "line": " src/image/luts.js:95"
-        },
-        {
-            "message": "Missing item type\nGet data from an input image using a canvas.",
-            "line": " src/image/reader.js:6"
-        },
-        {
-            "message": "Missing item type\nGet data from an input buffer using a DICOM parser.",
-            "line": " src/image/reader.js:55"
-        },
-        {
-            "message": "Missing item type\nSet the view window/level.",
-            "line": " src/image/view.js:86"
-        },
-        {
-            "message": "Missing item type\nSet the image window/level to cover the full data range.",
-            "line": " src/image/view.js:98"
-        },
-        {
-            "message": "Missing item type\nIncrement the current slice number.\nReturns false if not in bounds.",
-            "line": " src/image/view.js:114"
-        },
-        {
-            "message": "Missing item type\nDecrement the current slice number.\nReturns false if not in bounds.",
-            "line": " src/image/view.js:126"
-        },
-        {
-            "message": "Missing item type\nClone the image using all meta data and the original data buffer.",
-            "line": " src/image/view.js:138"
-        },
-        {
-            "message": "Missing item type\nGenerate display image data to be given to a canvas.",
-            "line": " src/image/view.js:151"
-        },
-        {
-            "message": "Missing item type\nAdd an event listener on the view.",
-            "line": " src/image/view.js:235"
-        },
-        {
-            "message": "Missing item type\nRemove an event listener on the view.",
-            "line": " src/image/view.js:247"
-        },
-        {
-            "message": "Missing item type\nFire an event: call all associated listeners.",
-            "line": " src/image/view.js:263"
+            "line": " src/image/luts.js:179"
         },
         {
             "message": "Missing item type",
@@ -4039,10 +5805,6 @@
         {
             "message": "Missing item type",
             "line": " src/tools/windowLevel.js:6"
-        },
-        {
-            "message": "Missing item type\nroot?key0=val0&key1=val1 returns [{\"key\"=\"key0\", \"value\"=\"val0\"}, {\"key\"=\"key1\", \"value\"=\"val1\"}]\nReturns null if not a query string (no question mark).",
-            "line": " src/utils/string.js:27"
         },
         {
             "message": "Missing item type\nInitialise the HTML for the application.",
