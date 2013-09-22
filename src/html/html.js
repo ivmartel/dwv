@@ -7,6 +7,7 @@ var dwv = dwv || {};
  * Namespace for HTML related functions.
  * @class html
  * @namespace dwv
+ * @static
  */
 dwv.html = dwv.html || {};
 
