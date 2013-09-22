@@ -1,6 +1,8 @@
-//! @namespace Main DWV namespace.
+/** 
+ * Math module.
+ * @module math
+ */
 var dwv = dwv || {};
-// @namespace Math related.
 dwv.math = dwv.math || {};
 
 // Pre-created to reduce allocation in inner loops
@@ -274,7 +276,10 @@ dwv.math.gaussianBlur = function(buffer, out) {
 
 
 /**
- * @class Scissors.
+ * Scissors
+ * @class Scissors
+ * @namespace dwv.math
+ * @constructor
  * 
  * Ref: Eric N. Mortensen, William A. Barrett, Interactive Segmentation with
  *   Intelligent Scissors, Graphical Models and Image Processing, Volume 60,

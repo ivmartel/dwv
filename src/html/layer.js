@@ -1,11 +1,17 @@
-//! @namespace Main DWV namespace.
+/** 
+ * HTML module.
+ * @module dicom
+ */
 var dwv = dwv || {};
-//! @namespace Layer abstraction.
 dwv.html = dwv.html || {};
 
 /**
-* @class Window layer.
-*/
+ * Window layer.
+ * @class Layer
+ * @namespace dwv.html
+ * @constructor
+ * @param {String} name The name of the layer.
+ */
 dwv.html.Layer = function(name)
 {
     // A HTMLCanvasElement.

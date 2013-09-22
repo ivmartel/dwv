@@ -1,38 +1,74 @@
-//! @namespace Main DWV namespace.
+/** 
+ * GUI module.
+ * @module dicom
+ */
 var dwv = dwv || {};
-//! @namespace GUI classes.
 dwv.gui = dwv.gui || {};
 
+/**
+ * Handle window/level change.
+ * @method onChangeWindowLevelPreset
+ * @param {Object} event The change event.
+ */
 dwv.gui.onChangeWindowLevelPreset = function(event)
 {
     app.getToolBox().getSelectedTool().setPreset(this.value);
 };
 
+/**
+ * Handle colour map change.
+ * @method onChangeColourMap
+ * @param {Object} event The change event.
+ */
 dwv.gui.onChangeColourMap = function(event)
 {
     app.getToolBox().getSelectedTool().setColourMap(this.value);
 };
 
+/**
+ * Handle tool change.
+ * @method onChangeTool
+ * @param {Object} event The change event.
+ */
 dwv.gui.onChangeTool = function(event)
 {
     app.getToolBox().setSelectedTool(this.value);
 };
 
+/**
+ * Handle filter change.
+ * @method onChangeFilter
+ * @param {Object} event The change event.
+ */
 dwv.gui.onChangeFilter = function(event)
 {
     app.getToolBox().getSelectedTool().setSelectedFilter(this.value);
 };
 
+/**
+ * Handle shape change.
+ * @method onChangeShape
+ * @param {Object} event The change event.
+ */
 dwv.gui.onChangeShape = function(event)
 {
     app.getToolBox().getSelectedTool().setShapeName(this.value);
 };
 
+/**
+ * Handle line color change.
+ * @method onChangeLineColour
+ * @param {Object} event The change event.
+ */
 dwv.gui.onChangeLineColour = function(event)
 {
     app.getToolBox().getSelectedTool().setLineColour(this.value);
 };
 
+/**
+ * Append the toolbox HTML to the page.
+ * @method appendToolboxHtml
+ */
 dwv.gui.appendToolboxHtml = function()
 {
     // select
@@ -59,6 +95,10 @@ dwv.gui.appendToolboxHtml = function()
     $("#toolList").trigger("create");
 };
 
+/**
+ * Append the window/level HTML to the page.
+ * @method appendWindowLevelHtml
+ */
 dwv.gui.appendWindowLevelHtml = function()
 {
     // preset selector
@@ -102,12 +142,20 @@ dwv.gui.appendWindowLevelHtml = function()
     $("#toolList").trigger("create");
 };
 
+/**
+ * Clear the window/level HTML.
+ * @method clearWindowLevelHtml
+ */
 dwv.gui.clearWindowLevelHtml = function()
 {
     dwv.html.removeNode("wlLi");
     dwv.html.removeNode("cmLi");
 };
 
+/**
+ * Append the draw HTML to the page.
+ * @method appendDrawHtml
+ */
 dwv.gui.appendDrawHtml = function()
 {
     // shape select
@@ -148,6 +196,10 @@ dwv.gui.appendDrawHtml = function()
     $("#toolList").trigger("create");
 };
 
+/**
+ * Clear the draw HTML.
+ * @method clearDrawHtml
+ */
 dwv.gui.clearDrawHtml = function()
 {
     dwv.html.removeNode("colourLi");
@@ -155,7 +207,8 @@ dwv.gui.clearDrawHtml = function()
 };
 
 /**
- * @function Append the color chooser to the HTML document in the 'colourChooser' node.
+ * Append the color chooser HTML to the page.
+ * @method appendLivewireHtml
  */
 dwv.gui.appendLivewireHtml = function()
 {
@@ -181,13 +234,18 @@ dwv.gui.appendLivewireHtml = function()
 };
 
 /**
- * @function Remove the color chooser specific node.
+ * Clear the color chooser HTML.
+ * @method clearDrawHtml
  */
 dwv.gui.clearLivewireHtml = function()
 {
     dwv.html.removeNode("colourLi");
 };
 
+/**
+ * Append the filter HTML to the page.
+ * @method appendLivewireHtml
+ */
 dwv.gui.appendFilterHtml = function()
 {
     // select
@@ -211,19 +269,22 @@ dwv.gui.appendFilterHtml = function()
     $("#toolList").trigger("create");
 };
 
+/**
+ * Clear the filter HTML.
+ * @method clearDrawHtml
+ */
 dwv.gui.clearFilterHtml = function()
 {
     dwv.html.removeNode("filterLi");
 };
 
-/**
- * @namespace GUI classes.
- */
+// create namespace if not there
 dwv.gui.filter = dwv.gui.filter || {};
 
 /**
-* @function Threshold Filter User Interface.
-*/
+ * Append the threshold filter HTML to the page.
+ * @method appendThresholdHtml
+ */
 dwv.gui.filter.appendThresholdHtml = function()
 {
     // list element
@@ -239,14 +300,19 @@ dwv.gui.filter.appendThresholdHtml = function()
     $("#toolList").trigger("create");
 };
 
+/**
+ * Clear the treshold filter HTML.
+ * @method clearDrawHtml
+ */
 dwv.gui.filter.clearThresholdHtml = function()
 {
     dwv.html.removeNode("thresholdLi");
 };
 
 /**
-* @function Sharpen Filter User Interface.
-*/
+ * Append the sharpen filter HTML to the page.
+ * @method appendSharpenHtml
+ */
 dwv.gui.filter.appendSharpenHtml = function()
 {
     // button
@@ -267,14 +333,19 @@ dwv.gui.filter.appendSharpenHtml = function()
     $("#toolList").trigger("create");
 };
 
+/**
+ * Clear the sharpen filter HTML.
+ * @method clearSharpenHtml
+ */
 dwv.gui.filter.clearSharpenHtml = function()
 {
     dwv.html.removeNode("sharpenLi");
 };
 
 /**
-* @function Sobel Filter User Interface.
-*/
+ * Append the sobel filter HTML to the page.
+ * @method appendSharpenHtml
+ */
 dwv.gui.filter.appendSobelHtml = function()
 {
     // button
@@ -295,11 +366,19 @@ dwv.gui.filter.appendSobelHtml = function()
     $("#toolList").trigger("create");
 };
 
+/**
+ * Clear the sobel filter HTML.
+ * @method clearSharpenHtml
+ */
 dwv.gui.filter.clearSobelHtml = function()
 {
     dwv.html.removeNode("sobelLi");
 };
 
+/**
+ * Append the zoom HTML to the page.
+ * @method appendZoomHtml
+ */
 dwv.gui.appendZoomHtml = function()
 {
     // button
@@ -322,11 +401,19 @@ dwv.gui.appendZoomHtml = function()
     $("#toolList").trigger("create");
 };
 
+/**
+ * Clear the zoom filter HTML.
+ * @method clearZoomHtml
+ */
 dwv.gui.clearZoomHtml = function()
 {
     dwv.html.removeNode("zoomLi");
 };
 
+/**
+ * Append the undo HTML to the page.
+ * @method appendUndoHtml
+ */
 dwv.gui.appendUndoHtml = function()
 {
     var paragraph = document.createElement("p");  
@@ -347,6 +434,11 @@ dwv.gui.appendUndoHtml = function()
     node.appendChild(paragraph);
 };
 
+/**
+ * Add a command to the undo HTML.
+ * @method addCommandToUndoHtml
+ * @param {String} commandName The name of the command to add.
+ */
 dwv.gui.addCommandToUndoHtml = function(commandName)
 {
     var select = document.getElementById("history_list");
@@ -368,6 +460,11 @@ dwv.gui.addCommandToUndoHtml = function(commandName)
     select.selectedIndex++;
 };
 
+/**
+ * Enable the last command of the undo HTML.
+ * @method enableInUndoHtml
+ * @param {Boolean} enable Flag to enable or disable the command.
+ */
 dwv.gui.enableInUndoHtml = function(enable)
 {
     var select = document.getElementById("history_list");

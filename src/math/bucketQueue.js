@@ -1,10 +1,12 @@
-//! @namespace Main DWV namespace.
+/** 
+ * Math module.
+ * @module math
+ */
 var dwv = dwv || {};
-//! @namespace Math related.
 dwv.math = dwv.math || {};
 
 /** 
- * @class Circular Bucket Queue.
+ * Circular Bucket Queue.
  *
  * Returns input'd points in sorted order. All operations run in roughly O(1)
  * time (for input with small cost values), but it has a strict requirement:
@@ -12,6 +14,9 @@ dwv.math = dwv.math || {};
  * If the most recent point had a cost of c, any points added should have a cost
  * c' in the range c <= c' <= c + (capacity - 1).
  * 
+ * @class BucketQueue
+ * @namespace dwv.math
+ * @constructor
  * @input bits
  * @input cost_functor
  */

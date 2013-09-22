@@ -1,10 +1,12 @@
-//! @namespace Main DWV namespace.
+/** 
+ * HTML module.
+ * @module dicom
+ */
 var dwv = dwv || {};
-//! @namespace HTML related.
 dwv.html = dwv.html || {};
 
 /**
- * @function Append a cell to a given row.
+ * @method Append a cell to a given row.
  * @param row The row to append the cell to.
  * @param text The text of the cell.
  */

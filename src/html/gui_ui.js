@@ -1,11 +1,14 @@
-//! @namespace Main DWV namespace.
+/** 
+ * GUI module.
+ * @module dicom
+ */
 var dwv = dwv || {};
-//! @namespace GUI classes for jquery-ui.
 dwv.gui = dwv.gui || {};
 
 /**
-* @function Get a slider.
-*/
+ * Append the slider HTML.
+ * @method getSliderHtml
+ */
 dwv.gui.getSliderHtml = function()
 {
     var min = app.getImage().getDataRange().min;
@@ -24,8 +27,9 @@ dwv.gui.getSliderHtml = function()
 };
 
 /**
- * @function Update the progress bar.
- * @param event A ProgressEvent.
+ * Update the progress bar.
+ * @method updateProgress
+ * @param {Object} event A ProgressEvent.
  */
 dwv.gui.updateProgress = function(event)
 {
@@ -37,3 +41,4 @@ dwv.gui.updateProgress = function(event)
         }
     }
 };
+
