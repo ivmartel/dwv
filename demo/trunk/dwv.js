@@ -3106,41 +3106,77 @@ dwv.dicom.Dictionary.prototype.init = function() {
     this.newDictionary['0xFFFE']['0xE0DD'] = ['NONE', '1', 'SequenceDelimitationItem'];
 };
 
-;//! @namespace Main DWV namespace.
+;/** 
+ * GUI module.
+ * @module dicom
+ */
 var dwv = dwv || {};
-//! @namespace GUI classes.
 dwv.gui = dwv.gui || {};
 
+/**
+ * Handle window/level change.
+ * @method onChangeWindowLevelPreset
+ * @param {Object} event The change event.
+ */
 dwv.gui.onChangeWindowLevelPreset = function(event)
 {
     app.getToolBox().getSelectedTool().setPreset(this.value);
 };
 
+/**
+ * Handle colour map change.
+ * @method onChangeColourMap
+ * @param {Object} event The change event.
+ */
 dwv.gui.onChangeColourMap = function(event)
 {
     app.getToolBox().getSelectedTool().setColourMap(this.value);
 };
 
+/**
+ * Handle tool change.
+ * @method onChangeTool
+ * @param {Object} event The change event.
+ */
 dwv.gui.onChangeTool = function(event)
 {
     app.getToolBox().setSelectedTool(this.value);
 };
 
+/**
+ * Handle filter change.
+ * @method onChangeFilter
+ * @param {Object} event The change event.
+ */
 dwv.gui.onChangeFilter = function(event)
 {
     app.getToolBox().getSelectedTool().setSelectedFilter(this.value);
 };
 
+/**
+ * Handle shape change.
+ * @method onChangeShape
+ * @param {Object} event The change event.
+ */
 dwv.gui.onChangeShape = function(event)
 {
     app.getToolBox().getSelectedTool().setShapeName(this.value);
 };
 
+/**
+ * Handle line color change.
+ * @method onChangeLineColour
+ * @param {Object} event The change event.
+ */
 dwv.gui.onChangeLineColour = function(event)
 {
     app.getToolBox().getSelectedTool().setLineColour(this.value);
 };
 
+/**
+ * Append the toolbox HTML to the page.
+ * @method appendToolboxHtml
+ */
 dwv.gui.appendToolboxHtml = function()
 {
     // select
@@ -3167,6 +3203,10 @@ dwv.gui.appendToolboxHtml = function()
     $("#toolList").trigger("create");
 };
 
+/**
+ * Append the window/level HTML to the page.
+ * @method appendWindowLevelHtml
+ */
 dwv.gui.appendWindowLevelHtml = function()
 {
     // preset selector
@@ -3210,12 +3250,20 @@ dwv.gui.appendWindowLevelHtml = function()
     $("#toolList").trigger("create");
 };
 
+/**
+ * Clear the window/level HTML.
+ * @method clearWindowLevelHtml
+ */
 dwv.gui.clearWindowLevelHtml = function()
 {
     dwv.html.removeNode("wlLi");
     dwv.html.removeNode("cmLi");
 };
 
+/**
+ * Append the draw HTML to the page.
+ * @method appendDrawHtml
+ */
 dwv.gui.appendDrawHtml = function()
 {
     // shape select
@@ -3256,6 +3304,10 @@ dwv.gui.appendDrawHtml = function()
     $("#toolList").trigger("create");
 };
 
+/**
+ * Clear the draw HTML.
+ * @method clearDrawHtml
+ */
 dwv.gui.clearDrawHtml = function()
 {
     dwv.html.removeNode("colourLi");
@@ -3263,7 +3315,8 @@ dwv.gui.clearDrawHtml = function()
 };
 
 /**
- * @function Append the color chooser to the HTML document in the 'colourChooser' node.
+ * Append the color chooser HTML to the page.
+ * @method appendLivewireHtml
  */
 dwv.gui.appendLivewireHtml = function()
 {
@@ -3289,13 +3342,18 @@ dwv.gui.appendLivewireHtml = function()
 };
 
 /**
- * @function Remove the color chooser specific node.
+ * Clear the color chooser HTML.
+ * @method clearDrawHtml
  */
 dwv.gui.clearLivewireHtml = function()
 {
     dwv.html.removeNode("colourLi");
 };
 
+/**
+ * Append the filter HTML to the page.
+ * @method appendLivewireHtml
+ */
 dwv.gui.appendFilterHtml = function()
 {
     // select
@@ -3319,19 +3377,22 @@ dwv.gui.appendFilterHtml = function()
     $("#toolList").trigger("create");
 };
 
+/**
+ * Clear the filter HTML.
+ * @method clearDrawHtml
+ */
 dwv.gui.clearFilterHtml = function()
 {
     dwv.html.removeNode("filterLi");
 };
 
-/**
- * @namespace GUI classes.
- */
+// create namespace if not there
 dwv.gui.filter = dwv.gui.filter || {};
 
 /**
-* @function Threshold Filter User Interface.
-*/
+ * Append the threshold filter HTML to the page.
+ * @method appendThresholdHtml
+ */
 dwv.gui.filter.appendThresholdHtml = function()
 {
     // list element
@@ -3347,14 +3408,19 @@ dwv.gui.filter.appendThresholdHtml = function()
     $("#toolList").trigger("create");
 };
 
+/**
+ * Clear the treshold filter HTML.
+ * @method clearDrawHtml
+ */
 dwv.gui.filter.clearThresholdHtml = function()
 {
     dwv.html.removeNode("thresholdLi");
 };
 
 /**
-* @function Sharpen Filter User Interface.
-*/
+ * Append the sharpen filter HTML to the page.
+ * @method appendSharpenHtml
+ */
 dwv.gui.filter.appendSharpenHtml = function()
 {
     // button
@@ -3375,14 +3441,19 @@ dwv.gui.filter.appendSharpenHtml = function()
     $("#toolList").trigger("create");
 };
 
+/**
+ * Clear the sharpen filter HTML.
+ * @method clearSharpenHtml
+ */
 dwv.gui.filter.clearSharpenHtml = function()
 {
     dwv.html.removeNode("sharpenLi");
 };
 
 /**
-* @function Sobel Filter User Interface.
-*/
+ * Append the sobel filter HTML to the page.
+ * @method appendSharpenHtml
+ */
 dwv.gui.filter.appendSobelHtml = function()
 {
     // button
@@ -3403,11 +3474,19 @@ dwv.gui.filter.appendSobelHtml = function()
     $("#toolList").trigger("create");
 };
 
+/**
+ * Clear the sobel filter HTML.
+ * @method clearSharpenHtml
+ */
 dwv.gui.filter.clearSobelHtml = function()
 {
     dwv.html.removeNode("sobelLi");
 };
 
+/**
+ * Append the zoom HTML to the page.
+ * @method appendZoomHtml
+ */
 dwv.gui.appendZoomHtml = function()
 {
     // button
@@ -3430,11 +3509,19 @@ dwv.gui.appendZoomHtml = function()
     $("#toolList").trigger("create");
 };
 
+/**
+ * Clear the zoom filter HTML.
+ * @method clearZoomHtml
+ */
 dwv.gui.clearZoomHtml = function()
 {
     dwv.html.removeNode("zoomLi");
 };
 
+/**
+ * Append the undo HTML to the page.
+ * @method appendUndoHtml
+ */
 dwv.gui.appendUndoHtml = function()
 {
     var paragraph = document.createElement("p");  
@@ -3455,6 +3542,11 @@ dwv.gui.appendUndoHtml = function()
     node.appendChild(paragraph);
 };
 
+/**
+ * Add a command to the undo HTML.
+ * @method addCommandToUndoHtml
+ * @param {String} commandName The name of the command to add.
+ */
 dwv.gui.addCommandToUndoHtml = function(commandName)
 {
     var select = document.getElementById("history_list");
@@ -3476,6 +3568,11 @@ dwv.gui.addCommandToUndoHtml = function(commandName)
     select.selectedIndex++;
 };
 
+/**
+ * Enable the last command of the undo HTML.
+ * @method enableInUndoHtml
+ * @param {Boolean} enable Flag to enable or disable the command.
+ */
 dwv.gui.enableInUndoHtml = function(enable)
 {
     var select = document.getElementById("history_list");
@@ -3499,13 +3596,15 @@ dwv.gui.enableInUndoHtml = function(enable)
     }
 };
 
-;//! @namespace Main DWV namespace.
+;/** 
+ * HTML module.
+ * @module dicom
+ */
 var dwv = dwv || {};
-//! @namespace HTML related.
 dwv.html = dwv.html || {};
 
 /**
- * @function Append a cell to a given row.
+ * @method Append a cell to a given row.
  * @param row The row to append the cell to.
  * @param text The text of the cell.
  */
@@ -3934,14 +4033,20 @@ dwv.html.checkBrowser = function()
     }
 };
 
-;//! @namespace Main DWV namespace.
+;/** 
+ * HTML module.
+ * @module dicom
+ */
 var dwv = dwv || {};
-//! @namespace Layer abstraction.
 dwv.html = dwv.html || {};
 
 /**
-* @class Window layer.
-*/
+ * Window layer.
+ * @class Layer
+ * @namespace dwv.html
+ * @constructor
+ * @param {String} name The name of the layer.
+ */
 dwv.html.Layer = function(name)
 {
     // A HTMLCanvasElement.
@@ -4174,14 +4279,19 @@ dwv.html.Layer = function(name)
         canvas.style.left = rhs.getCanvas().offsetLeft;
     };
 }; // Layer class
-;//! @namespace Main DWV namespace.
+;/** 
+ * HTML module.
+ * @module dicom
+ */
 var dwv = dwv || {};
-//! @namespace Canvas style class.
 dwv.html = dwv.html || {};
 
 /**
-* @class Style class.
-*/
+ * Style class.
+ * @class Style
+ * @namespace dwv.html
+ * @constructor
+ */
 dwv.html.Style = function()
 {
     // immutable
@@ -4193,29 +4303,60 @@ dwv.html.Style = function()
     this.lineColor = 0;
 };
 
+/**
+ * Get the font size.
+ * @method getFontSize
+ * @return {Number} The font size.
+ */
 dwv.html.Style.prototype.getFontSize = function() {
     return this.fontSize;
 };
 
+/**
+ * Get the font definition string.
+ * @method getFontStr
+ * @return {String} The font definition string.
+ */
 dwv.html.Style.prototype.getFontStr = function() {
     return this.fontStr;
 };
 
+/**
+ * Get the line height.
+ * @method getLineHeight
+ * @return {Number} The line height.
+ */
 dwv.html.Style.prototype.getLineHeight = function() {
     return this.lineHeight;
 };
 
+/**
+ * Get the text color.
+ * @method getTextColor
+ * @return {String} The text color.
+ */
 dwv.html.Style.prototype.getTextColor = function() {
     return this.textColor;
 };
 
+/**
+ * Get the line color.
+ * @method getLineColor
+ * @return {String} The line color.
+ */
 dwv.html.Style.prototype.getLineColor = function() {
     return this.lineColor;
 };
 
+/**
+ * Set the line color.
+ * @method setLineColor
+ * @param {String} color The line color.
+ */
 dwv.html.Style.prototype.setLineColor = function(color) {
     this.lineColor = color;
 };
+
 ;//! @namespace Main DWV namespace.
 var dwv = dwv || {};
 //! @namespace Image related.
@@ -5285,13 +5426,15 @@ dwv.image.View.prototype.fireEvent = function(event)
     }
 };
 
-;//! @namespace Main DWV namespace.
+;/** 
+ * Math module.
+ * @module math
+ */
 var dwv = dwv || {};
-//! @namespace Math related.
 dwv.math = dwv.math || {};
 
 /** 
- * @class Circular Bucket Queue.
+ * Circular Bucket Queue.
  *
  * Returns input'd points in sorted order. All operations run in roughly O(1)
  * time (for input with small cost values), but it has a strict requirement:
@@ -5299,6 +5442,9 @@ dwv.math = dwv.math || {};
  * If the most recent point had a cost of c, any points added should have a cost
  * c' in the range c <= c' <= c + (capacity - 1).
  * 
+ * @class BucketQueue
+ * @namespace dwv.math
+ * @constructor
  * @input bits
  * @input cost_functor
  */
@@ -5393,9 +5539,11 @@ dwv.math.BucketQueue.prototype.buildArray = function(newSize) {
 	
 	return buckets;
 };
-;//! @namespace Main DWV namespace.
+;/** 
+ * Math module.
+ * @module math
+ */
 var dwv = dwv || {};
-// @namespace Math related.
 dwv.math = dwv.math || {};
 
 // Pre-created to reduce allocation in inner loops
@@ -5669,7 +5817,10 @@ dwv.math.gaussianBlur = function(buffer, out) {
 
 
 /**
- * @class Scissors.
+ * Scissors
+ * @class Scissors
+ * @namespace dwv.math
+ * @constructor
  * 
  * Ref: Eric N. Mortensen, William A. Barrett, Interactive Segmentation with
  *   Intelligent Scissors, Graphical Models and Image Processing, Volume 60,

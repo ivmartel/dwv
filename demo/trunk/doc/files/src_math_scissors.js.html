@@ -47,6 +47,28 @@
             
                 <li><a href="../classes/dwv.dicom.Dictionary.html">dwv.dicom.Dictionary</a></li>
             
+                <li><a href="../classes/dwv.html.Image class..html">dwv.html.Image class.</a></li>
+            
+                <li><a href="../classes/dwv.html.Image Size class. 
+Supports 2D and 3D images..html">dwv.html.Image Size class. 
+Supports 2D and 3D images.</a></li>
+            
+                <li><a href="../classes/dwv.html.Image Spacing class. 
+Supports 2D and 3D images..html">dwv.html.Image Spacing class. 
+Supports 2D and 3D images.</a></li>
+            
+                <li><a href="../classes/dwv.html.Layer.html">dwv.html.Layer</a></li>
+            
+                <li><a href="../classes/dwv.html.Rescale LUT class..html">dwv.html.Rescale LUT class.</a></li>
+            
+                <li><a href="../classes/dwv.html.Style.html">dwv.html.Style</a></li>
+            
+                <li><a href="../classes/dwv.html.View class..html">dwv.html.View class.</a></li>
+            
+                <li><a href="../classes/dwv.html.Window LUT class..html">dwv.html.Window LUT class.</a></li>
+            
+                <li><a href="../classes/dwv.math.BucketQueue.html">dwv.math.BucketQueue</a></li>
+            
                 <li><a href="../classes/dwv.math.Circle.html">dwv.math.Circle</a></li>
             
                 <li><a href="../classes/dwv.math.Draw circle command..html">dwv.math.Draw circle command.</a></li>
@@ -64,6 +86,8 @@
                 <li><a href="../classes/dwv.math.Rectangle.html">dwv.math.Rectangle</a></li>
             
                 <li><a href="../classes/dwv.math.ROI.html">dwv.math.ROI</a></li>
+            
+                <li><a href="../classes/dwv.math.Scissors.html">dwv.math.Scissors</a></li>
             
                 <li><a href="../classes/Filter classes..App
 Main application..html">Filter classes..App
@@ -96,60 +120,6 @@ Main application.</a></li>
                 <li><a href="../classes/Filter classes..WindowLevel tool: handle window/level related events..html">Filter classes..WindowLevel tool: handle window/level related events.</a></li>
             
                 <li><a href="../classes/Filter classes..Zoom class..html">Filter classes..Zoom class.</a></li>
-            
-                <li><a href="../classes/GUI classes..Circular Bucket Queue.
-
-Returns input&#x27;d points in sorted order. All operations run in roughly O(1)
-time (for input with small cost values), but it has a strict requirement:
-
-If the most recent point had a cost of c, any points added should have a cost
-c&#x27; in the range c &lt;= c&#x27; &lt;= c + (capacity - 1)..html">GUI classes..Circular Bucket Queue.
-
-Returns input&#x27;d points in sorted order. All operations run in roughly O(1)
-time (for input with small cost values), but it has a strict requirement:
-
-If the most recent point had a cost of c, any points added should have a cost
-c&#x27; in the range c &lt;= c&#x27; &lt;= c + (capacity - 1).</a></li>
-            
-                <li><a href="../classes/GUI classes..Image class..html">GUI classes..Image class.</a></li>
-            
-                <li><a href="../classes/GUI classes..Image Size class. 
-Supports 2D and 3D images..html">GUI classes..Image Size class. 
-Supports 2D and 3D images.</a></li>
-            
-                <li><a href="../classes/GUI classes..Image Spacing class. 
-Supports 2D and 3D images..html">GUI classes..Image Spacing class. 
-Supports 2D and 3D images.</a></li>
-            
-                <li><a href="../classes/GUI classes..Rescale LUT class..html">GUI classes..Rescale LUT class.</a></li>
-            
-                <li><a href="../classes/GUI classes..Scissors.
-
-Ref: Eric N. Mortensen, William A. Barrett, Interactive Segmentation with
-  Intelligent Scissors, Graphical Models and Image Processing, Volume 60,
-  Issue 5, September 1998, Pages 349-384, ISSN 1077-3169,
-  DOI: 10.1006/gmip.1998.0480.
-
-(http://www.sciencedirect.com/science/article/B6WG4-45JB8WN-9/2/6fe59d8089fd1892c2bfb82283065579)
-
-Highly inspired from http://code.google.com/p/livewire-javascript/.html">GUI classes..Scissors.
-
-Ref: Eric N. Mortensen, William A. Barrett, Interactive Segmentation with
-  Intelligent Scissors, Graphical Models and Image Processing, Volume 60,
-  Issue 5, September 1998, Pages 349-384, ISSN 1077-3169,
-  DOI: 10.1006/gmip.1998.0480.
-
-(http://www.sciencedirect.com/science/article/B6WG4-45JB8WN-9/2/6fe59d8089fd1892c2bfb82283065579)
-
-Highly inspired from http://code.google.com/p/livewire-javascript/</a></li>
-            
-                <li><a href="../classes/GUI classes..Style class..html">GUI classes..Style class.</a></li>
-            
-                <li><a href="../classes/GUI classes..View class..html">GUI classes..View class.</a></li>
-            
-                <li><a href="../classes/GUI classes..Window layer..html">GUI classes..Window layer.</a></li>
-            
-                <li><a href="../classes/GUI classes..Window LUT class..html">GUI classes..Window LUT class.</a></li>
             
             </ul>
 
@@ -198,9 +168,11 @@ Highly inspired from http://code.google.com/p/livewire-javascript/</a></li>
 
 <div class="file">
     <pre class="code prettyprint linenums">
-//! @namespace Main DWV namespace.
+/** 
+ * Math module.
+ * @module math
+ */
 var dwv = dwv || {};
-// @namespace Math related.
 dwv.math = dwv.math || {};
 
 // Pre-created to reduce allocation in inner loops
@@ -474,7 +446,10 @@ dwv.math.gaussianBlur = function(buffer, out) {
 
 
 /**
- * @class Scissors.
+ * Scissors
+ * @class Scissors
+ * @namespace dwv.math
+ * @constructor
  * 
  * Ref: Eric N. Mortensen, William A. Barrett, Interactive Segmentation with
  *   Intelligent Scissors, Graphical Models and Image Processing, Volume 60,

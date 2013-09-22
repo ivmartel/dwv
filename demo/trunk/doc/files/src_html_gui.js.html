@@ -47,6 +47,28 @@
             
                 <li><a href="../classes/dwv.dicom.Dictionary.html">dwv.dicom.Dictionary</a></li>
             
+                <li><a href="../classes/dwv.html.Image class..html">dwv.html.Image class.</a></li>
+            
+                <li><a href="../classes/dwv.html.Image Size class. 
+Supports 2D and 3D images..html">dwv.html.Image Size class. 
+Supports 2D and 3D images.</a></li>
+            
+                <li><a href="../classes/dwv.html.Image Spacing class. 
+Supports 2D and 3D images..html">dwv.html.Image Spacing class. 
+Supports 2D and 3D images.</a></li>
+            
+                <li><a href="../classes/dwv.html.Layer.html">dwv.html.Layer</a></li>
+            
+                <li><a href="../classes/dwv.html.Rescale LUT class..html">dwv.html.Rescale LUT class.</a></li>
+            
+                <li><a href="../classes/dwv.html.Style.html">dwv.html.Style</a></li>
+            
+                <li><a href="../classes/dwv.html.View class..html">dwv.html.View class.</a></li>
+            
+                <li><a href="../classes/dwv.html.Window LUT class..html">dwv.html.Window LUT class.</a></li>
+            
+                <li><a href="../classes/dwv.math.BucketQueue.html">dwv.math.BucketQueue</a></li>
+            
                 <li><a href="../classes/dwv.math.Circle.html">dwv.math.Circle</a></li>
             
                 <li><a href="../classes/dwv.math.Draw circle command..html">dwv.math.Draw circle command.</a></li>
@@ -64,6 +86,8 @@
                 <li><a href="../classes/dwv.math.Rectangle.html">dwv.math.Rectangle</a></li>
             
                 <li><a href="../classes/dwv.math.ROI.html">dwv.math.ROI</a></li>
+            
+                <li><a href="../classes/dwv.math.Scissors.html">dwv.math.Scissors</a></li>
             
                 <li><a href="../classes/Filter classes..App
 Main application..html">Filter classes..App
@@ -96,60 +120,6 @@ Main application.</a></li>
                 <li><a href="../classes/Filter classes..WindowLevel tool: handle window/level related events..html">Filter classes..WindowLevel tool: handle window/level related events.</a></li>
             
                 <li><a href="../classes/Filter classes..Zoom class..html">Filter classes..Zoom class.</a></li>
-            
-                <li><a href="../classes/GUI classes..Circular Bucket Queue.
-
-Returns input&#x27;d points in sorted order. All operations run in roughly O(1)
-time (for input with small cost values), but it has a strict requirement:
-
-If the most recent point had a cost of c, any points added should have a cost
-c&#x27; in the range c &lt;= c&#x27; &lt;= c + (capacity - 1)..html">GUI classes..Circular Bucket Queue.
-
-Returns input&#x27;d points in sorted order. All operations run in roughly O(1)
-time (for input with small cost values), but it has a strict requirement:
-
-If the most recent point had a cost of c, any points added should have a cost
-c&#x27; in the range c &lt;= c&#x27; &lt;= c + (capacity - 1).</a></li>
-            
-                <li><a href="../classes/GUI classes..Image class..html">GUI classes..Image class.</a></li>
-            
-                <li><a href="../classes/GUI classes..Image Size class. 
-Supports 2D and 3D images..html">GUI classes..Image Size class. 
-Supports 2D and 3D images.</a></li>
-            
-                <li><a href="../classes/GUI classes..Image Spacing class. 
-Supports 2D and 3D images..html">GUI classes..Image Spacing class. 
-Supports 2D and 3D images.</a></li>
-            
-                <li><a href="../classes/GUI classes..Rescale LUT class..html">GUI classes..Rescale LUT class.</a></li>
-            
-                <li><a href="../classes/GUI classes..Scissors.
-
-Ref: Eric N. Mortensen, William A. Barrett, Interactive Segmentation with
-  Intelligent Scissors, Graphical Models and Image Processing, Volume 60,
-  Issue 5, September 1998, Pages 349-384, ISSN 1077-3169,
-  DOI: 10.1006/gmip.1998.0480.
-
-(http://www.sciencedirect.com/science/article/B6WG4-45JB8WN-9/2/6fe59d8089fd1892c2bfb82283065579)
-
-Highly inspired from http://code.google.com/p/livewire-javascript/.html">GUI classes..Scissors.
-
-Ref: Eric N. Mortensen, William A. Barrett, Interactive Segmentation with
-  Intelligent Scissors, Graphical Models and Image Processing, Volume 60,
-  Issue 5, September 1998, Pages 349-384, ISSN 1077-3169,
-  DOI: 10.1006/gmip.1998.0480.
-
-(http://www.sciencedirect.com/science/article/B6WG4-45JB8WN-9/2/6fe59d8089fd1892c2bfb82283065579)
-
-Highly inspired from http://code.google.com/p/livewire-javascript/</a></li>
-            
-                <li><a href="../classes/GUI classes..Style class..html">GUI classes..Style class.</a></li>
-            
-                <li><a href="../classes/GUI classes..View class..html">GUI classes..View class.</a></li>
-            
-                <li><a href="../classes/GUI classes..Window layer..html">GUI classes..Window layer.</a></li>
-            
-                <li><a href="../classes/GUI classes..Window LUT class..html">GUI classes..Window LUT class.</a></li>
             
             </ul>
 
@@ -198,41 +168,77 @@ Highly inspired from http://code.google.com/p/livewire-javascript/</a></li>
 
 <div class="file">
     <pre class="code prettyprint linenums">
-//! @namespace Main DWV namespace.
+/** 
+ * GUI module.
+ * @module dicom
+ */
 var dwv = dwv || {};
-//! @namespace GUI classes.
 dwv.gui = dwv.gui || {};
 
+/**
+ * Handle window/level change.
+ * @method onChangeWindowLevelPreset
+ * @param {Object} event The change event.
+ */
 dwv.gui.onChangeWindowLevelPreset = function(event)
 {
     app.getToolBox().getSelectedTool().setPreset(this.value);
 };
 
+/**
+ * Handle colour map change.
+ * @method onChangeColourMap
+ * @param {Object} event The change event.
+ */
 dwv.gui.onChangeColourMap = function(event)
 {
     app.getToolBox().getSelectedTool().setColourMap(this.value);
 };
 
+/**
+ * Handle tool change.
+ * @method onChangeTool
+ * @param {Object} event The change event.
+ */
 dwv.gui.onChangeTool = function(event)
 {
     app.getToolBox().setSelectedTool(this.value);
 };
 
+/**
+ * Handle filter change.
+ * @method onChangeFilter
+ * @param {Object} event The change event.
+ */
 dwv.gui.onChangeFilter = function(event)
 {
     app.getToolBox().getSelectedTool().setSelectedFilter(this.value);
 };
 
+/**
+ * Handle shape change.
+ * @method onChangeShape
+ * @param {Object} event The change event.
+ */
 dwv.gui.onChangeShape = function(event)
 {
     app.getToolBox().getSelectedTool().setShapeName(this.value);
 };
 
+/**
+ * Handle line color change.
+ * @method onChangeLineColour
+ * @param {Object} event The change event.
+ */
 dwv.gui.onChangeLineColour = function(event)
 {
     app.getToolBox().getSelectedTool().setLineColour(this.value);
 };
 
+/**
+ * Append the toolbox HTML to the page.
+ * @method appendToolboxHtml
+ */
 dwv.gui.appendToolboxHtml = function()
 {
     // select
@@ -259,6 +265,10 @@ dwv.gui.appendToolboxHtml = function()
     $(&quot;#toolList&quot;).trigger(&quot;create&quot;);
 };
 
+/**
+ * Append the window/level HTML to the page.
+ * @method appendWindowLevelHtml
+ */
 dwv.gui.appendWindowLevelHtml = function()
 {
     // preset selector
@@ -302,12 +312,20 @@ dwv.gui.appendWindowLevelHtml = function()
     $(&quot;#toolList&quot;).trigger(&quot;create&quot;);
 };
 
+/**
+ * Clear the window/level HTML.
+ * @method clearWindowLevelHtml
+ */
 dwv.gui.clearWindowLevelHtml = function()
 {
     dwv.html.removeNode(&quot;wlLi&quot;);
     dwv.html.removeNode(&quot;cmLi&quot;);
 };
 
+/**
+ * Append the draw HTML to the page.
+ * @method appendDrawHtml
+ */
 dwv.gui.appendDrawHtml = function()
 {
     // shape select
@@ -348,6 +366,10 @@ dwv.gui.appendDrawHtml = function()
     $(&quot;#toolList&quot;).trigger(&quot;create&quot;);
 };
 
+/**
+ * Clear the draw HTML.
+ * @method clearDrawHtml
+ */
 dwv.gui.clearDrawHtml = function()
 {
     dwv.html.removeNode(&quot;colourLi&quot;);
@@ -355,7 +377,8 @@ dwv.gui.clearDrawHtml = function()
 };
 
 /**
- * @function Append the color chooser to the HTML document in the &#x27;colourChooser&#x27; node.
+ * Append the color chooser HTML to the page.
+ * @method appendLivewireHtml
  */
 dwv.gui.appendLivewireHtml = function()
 {
@@ -381,13 +404,18 @@ dwv.gui.appendLivewireHtml = function()
 };
 
 /**
- * @function Remove the color chooser specific node.
+ * Clear the color chooser HTML.
+ * @method clearDrawHtml
  */
 dwv.gui.clearLivewireHtml = function()
 {
     dwv.html.removeNode(&quot;colourLi&quot;);
 };
 
+/**
+ * Append the filter HTML to the page.
+ * @method appendLivewireHtml
+ */
 dwv.gui.appendFilterHtml = function()
 {
     // select
@@ -411,19 +439,22 @@ dwv.gui.appendFilterHtml = function()
     $(&quot;#toolList&quot;).trigger(&quot;create&quot;);
 };
 
+/**
+ * Clear the filter HTML.
+ * @method clearDrawHtml
+ */
 dwv.gui.clearFilterHtml = function()
 {
     dwv.html.removeNode(&quot;filterLi&quot;);
 };
 
-/**
- * @namespace GUI classes.
- */
+// create namespace if not there
 dwv.gui.filter = dwv.gui.filter || {};
 
 /**
-* @function Threshold Filter User Interface.
-*/
+ * Append the threshold filter HTML to the page.
+ * @method appendThresholdHtml
+ */
 dwv.gui.filter.appendThresholdHtml = function()
 {
     // list element
@@ -439,14 +470,19 @@ dwv.gui.filter.appendThresholdHtml = function()
     $(&quot;#toolList&quot;).trigger(&quot;create&quot;);
 };
 
+/**
+ * Clear the treshold filter HTML.
+ * @method clearDrawHtml
+ */
 dwv.gui.filter.clearThresholdHtml = function()
 {
     dwv.html.removeNode(&quot;thresholdLi&quot;);
 };
 
 /**
-* @function Sharpen Filter User Interface.
-*/
+ * Append the sharpen filter HTML to the page.
+ * @method appendSharpenHtml
+ */
 dwv.gui.filter.appendSharpenHtml = function()
 {
     // button
@@ -467,14 +503,19 @@ dwv.gui.filter.appendSharpenHtml = function()
     $(&quot;#toolList&quot;).trigger(&quot;create&quot;);
 };
 
+/**
+ * Clear the sharpen filter HTML.
+ * @method clearSharpenHtml
+ */
 dwv.gui.filter.clearSharpenHtml = function()
 {
     dwv.html.removeNode(&quot;sharpenLi&quot;);
 };
 
 /**
-* @function Sobel Filter User Interface.
-*/
+ * Append the sobel filter HTML to the page.
+ * @method appendSharpenHtml
+ */
 dwv.gui.filter.appendSobelHtml = function()
 {
     // button
@@ -495,11 +536,19 @@ dwv.gui.filter.appendSobelHtml = function()
     $(&quot;#toolList&quot;).trigger(&quot;create&quot;);
 };
 
+/**
+ * Clear the sobel filter HTML.
+ * @method clearSharpenHtml
+ */
 dwv.gui.filter.clearSobelHtml = function()
 {
     dwv.html.removeNode(&quot;sobelLi&quot;);
 };
 
+/**
+ * Append the zoom HTML to the page.
+ * @method appendZoomHtml
+ */
 dwv.gui.appendZoomHtml = function()
 {
     // button
@@ -522,11 +571,19 @@ dwv.gui.appendZoomHtml = function()
     $(&quot;#toolList&quot;).trigger(&quot;create&quot;);
 };
 
+/**
+ * Clear the zoom filter HTML.
+ * @method clearZoomHtml
+ */
 dwv.gui.clearZoomHtml = function()
 {
     dwv.html.removeNode(&quot;zoomLi&quot;);
 };
 
+/**
+ * Append the undo HTML to the page.
+ * @method appendUndoHtml
+ */
 dwv.gui.appendUndoHtml = function()
 {
     var paragraph = document.createElement(&quot;p&quot;);  
@@ -547,6 +604,11 @@ dwv.gui.appendUndoHtml = function()
     node.appendChild(paragraph);
 };
 
+/**
+ * Add a command to the undo HTML.
+ * @method addCommandToUndoHtml
+ * @param {String} commandName The name of the command to add.
+ */
 dwv.gui.addCommandToUndoHtml = function(commandName)
 {
     var select = document.getElementById(&quot;history_list&quot;);
@@ -568,6 +630,11 @@ dwv.gui.addCommandToUndoHtml = function(commandName)
     select.selectedIndex++;
 };
 
+/**
+ * Enable the last command of the undo HTML.
+ * @method enableInUndoHtml
+ * @param {Boolean} enable Flag to enable or disable the command.
+ */
 dwv.gui.enableInUndoHtml = function(enable)
 {
     var select = document.getElementById(&quot;history_list&quot;);

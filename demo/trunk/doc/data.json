@@ -36,9 +36,7 @@
             "modules": {},
             "classes": {},
             "fors": {},
-            "namespaces": {
-                "GUI classes.": 1
-            }
+            "namespaces": {}
         },
         "src/html/gui_mobile.js": {
             "name": "src/html/gui_mobile.js",
@@ -65,19 +63,23 @@
             "name": "src/html/layer.js",
             "modules": {},
             "classes": {
-                "GUI classes..Window layer.": 1
+                "dwv.html.Layer": 1
             },
             "fors": {},
-            "namespaces": {}
+            "namespaces": {
+                "dwv.html": 1
+            }
         },
         "src/html/style.js": {
             "name": "src/html/style.js",
             "modules": {},
             "classes": {
-                "GUI classes..Style class.": 1
+                "dwv.html.Style": 1
             },
             "fors": {},
-            "namespaces": {}
+            "namespaces": {
+                "dwv.html": 1
+            }
         },
         "src/image/filter.js": {
             "name": "src/image/filter.js",
@@ -90,9 +92,9 @@
             "name": "src/image/image.js",
             "modules": {},
             "classes": {
-                "GUI classes..Image Size class. \nSupports 2D and 3D images.": 1,
-                "GUI classes..Image Spacing class. \nSupports 2D and 3D images.": 1,
-                "GUI classes..Image class.": 1
+                "dwv.html.Image Size class. \nSupports 2D and 3D images.": 1,
+                "dwv.html.Image Spacing class. \nSupports 2D and 3D images.": 1,
+                "dwv.html.Image class.": 1
             },
             "fors": {},
             "namespaces": {}
@@ -101,8 +103,8 @@
             "name": "src/image/luts.js",
             "modules": {},
             "classes": {
-                "GUI classes..Rescale LUT class.": 1,
-                "GUI classes..Window LUT class.": 1
+                "dwv.html.Rescale LUT class.": 1,
+                "dwv.html.Window LUT class.": 1
             },
             "fors": {},
             "namespaces": {}
@@ -118,34 +120,38 @@
             "name": "src/image/view.js",
             "modules": {},
             "classes": {
-                "GUI classes..View class.": 1
+                "dwv.html.View class.": 1
             },
             "fors": {},
             "namespaces": {}
         },
         "src/math/bucketQueue.js": {
             "name": "src/math/bucketQueue.js",
-            "modules": {},
+            "modules": {
+                "math": 1
+            },
             "classes": {
-                "GUI classes..Circular Bucket Queue.\n\nReturns input'd points in sorted order. All operations run in roughly O(1)\ntime (for input with small cost values), but it has a strict requirement:\n\nIf the most recent point had a cost of c, any points added should have a cost\nc' in the range c <= c' <= c + (capacity - 1).": 1
+                "dwv.math.BucketQueue": 1
             },
             "fors": {},
-            "namespaces": {}
+            "namespaces": {
+                "dwv.math": 1
+            }
         },
         "src/math/scissors.js": {
             "name": "src/math/scissors.js",
             "modules": {},
             "classes": {
-                "GUI classes..Scissors.\n\nRef: Eric N. Mortensen, William A. Barrett, Interactive Segmentation with\n  Intelligent Scissors, Graphical Models and Image Processing, Volume 60,\n  Issue 5, September 1998, Pages 349-384, ISSN 1077-3169,\n  DOI: 10.1006/gmip.1998.0480.\n\n(http://www.sciencedirect.com/science/article/B6WG4-45JB8WN-9/2/6fe59d8089fd1892c2bfb82283065579)\n\nHighly inspired from http://code.google.com/p/livewire-javascript/": 1
+                "dwv.math.Scissors": 1
             },
             "fors": {},
-            "namespaces": {}
+            "namespaces": {
+                "dwv.math": 1
+            }
         },
         "src/math/shapes.js": {
             "name": "src/math/shapes.js",
-            "modules": {
-                "math": 1
-            },
+            "modules": {},
             "classes": {
                 "dwv.math.Point2D": 1,
                 "dwv.math.FastPoint2D": 1,
@@ -298,31 +304,31 @@
                 "dwv.dicom.DataReader": 1,
                 "dwv.dicom.DicomParser": 1,
                 "dwv.dicom.Dictionary": 1,
-                "GUI classes..Window layer.": 1,
-                "GUI classes..Style class.": 1,
-                "GUI classes..Image Size class. \nSupports 2D and 3D images.": 1,
-                "GUI classes..Image Spacing class. \nSupports 2D and 3D images.": 1,
-                "GUI classes..Image class.": 1,
-                "GUI classes..Rescale LUT class.": 1,
-                "GUI classes..Window LUT class.": 1,
-                "GUI classes..View class.": 1,
-                "GUI classes..Circular Bucket Queue.\n\nReturns input'd points in sorted order. All operations run in roughly O(1)\ntime (for input with small cost values), but it has a strict requirement:\n\nIf the most recent point had a cost of c, any points added should have a cost\nc' in the range c <= c' <= c + (capacity - 1).": 1,
-                "GUI classes..Scissors.\n\nRef: Eric N. Mortensen, William A. Barrett, Interactive Segmentation with\n  Intelligent Scissors, Graphical Models and Image Processing, Volume 60,\n  Issue 5, September 1998, Pages 349-384, ISSN 1077-3169,\n  DOI: 10.1006/gmip.1998.0480.\n\n(http://www.sciencedirect.com/science/article/B6WG4-45JB8WN-9/2/6fe59d8089fd1892c2bfb82283065579)\n\nHighly inspired from http://code.google.com/p/livewire-javascript/": 1
+                "dwv.html.Layer": 1,
+                "dwv.html.Style": 1,
+                "dwv.html.Image Size class. \nSupports 2D and 3D images.": 1,
+                "dwv.html.Image Spacing class. \nSupports 2D and 3D images.": 1,
+                "dwv.html.Image class.": 1,
+                "dwv.html.Rescale LUT class.": 1,
+                "dwv.html.Window LUT class.": 1,
+                "dwv.html.View class.": 1
             },
             "fors": {},
             "namespaces": {
                 "dwv.dicom": 1,
-                "GUI classes.": 1
+                "dwv.html": 1
             },
             "tag": "module",
-            "file": "src/math/scissors.js",
-            "line": 276,
+            "file": "src/image/view.js",
+            "line": 6,
             "description": "DICOM module."
         },
         "math": {
             "name": "math",
             "submodules": {},
             "classes": {
+                "dwv.math.BucketQueue": 1,
+                "dwv.math.Scissors": 1,
                 "dwv.math.Point2D": 1,
                 "dwv.math.FastPoint2D": 1,
                 "dwv.math.Circle": 1,
@@ -417,34 +423,45 @@
             "description": "DICOM tag dictionary.",
             "is_constructor": 1
         },
-        "GUI classes..Window layer.": {
-            "name": "GUI classes..Window layer.",
-            "shortname": "Window layer.",
+        "dwv.html.Layer": {
+            "name": "dwv.html.Layer",
+            "shortname": "dwv.html.Layer",
             "classitems": [],
             "plugins": [],
             "extensions": [],
             "plugin_for": [],
             "extension_for": [],
             "module": "dicom",
-            "namespace": "GUI classes.",
+            "namespace": "dwv.html",
             "file": "src/html/layer.js",
-            "line": 6
+            "line": 8,
+            "description": "Window layer.",
+            "is_constructor": 1,
+            "params": [
+                {
+                    "name": "name",
+                    "description": "The name of the layer.",
+                    "type": "String"
+                }
+            ]
         },
-        "GUI classes..Style class.": {
-            "name": "GUI classes..Style class.",
-            "shortname": "Style class.",
+        "dwv.html.Style": {
+            "name": "dwv.html.Style",
+            "shortname": "dwv.html.Style",
             "classitems": [],
             "plugins": [],
             "extensions": [],
             "plugin_for": [],
             "extension_for": [],
             "module": "dicom",
-            "namespace": "GUI classes.",
+            "namespace": "dwv.html",
             "file": "src/html/style.js",
-            "line": 6
+            "line": 8,
+            "description": "Style class.",
+            "is_constructor": 1
         },
-        "GUI classes..Image Size class. \nSupports 2D and 3D images.": {
-            "name": "GUI classes..Image Size class. \nSupports 2D and 3D images.",
+        "dwv.html.Image Size class. \nSupports 2D and 3D images.": {
+            "name": "dwv.html.Image Size class. \nSupports 2D and 3D images.",
             "shortname": "Image Size class. \nSupports 2D and 3D images.",
             "classitems": [],
             "plugins": [],
@@ -452,7 +469,7 @@
             "plugin_for": [],
             "extension_for": [],
             "module": "dicom",
-            "namespace": "GUI classes.",
+            "namespace": "dwv.html",
             "file": "src/image/image.js",
             "line": 6,
             "params": [
@@ -470,8 +487,8 @@
                 }
             ]
         },
-        "GUI classes..Image Spacing class. \nSupports 2D and 3D images.": {
-            "name": "GUI classes..Image Spacing class. \nSupports 2D and 3D images.",
+        "dwv.html.Image Spacing class. \nSupports 2D and 3D images.": {
+            "name": "dwv.html.Image Spacing class. \nSupports 2D and 3D images.",
             "shortname": "Image Spacing class. \nSupports 2D and 3D images.",
             "classitems": [],
             "plugins": [],
@@ -479,7 +496,7 @@
             "plugin_for": [],
             "extension_for": [],
             "module": "dicom",
-            "namespace": "GUI classes.",
+            "namespace": "dwv.html",
             "file": "src/image/image.js",
             "line": 45,
             "params": [
@@ -497,8 +514,8 @@
                 }
             ]
         },
-        "GUI classes..Image class.": {
-            "name": "GUI classes..Image class.",
+        "dwv.html.Image class.": {
+            "name": "dwv.html.Image class.",
             "shortname": "Image class.",
             "classitems": [],
             "plugins": [],
@@ -506,7 +523,7 @@
             "plugin_for": [],
             "extension_for": [],
             "module": "dicom",
-            "namespace": "GUI classes.",
+            "namespace": "dwv.html",
             "file": "src/image/image.js",
             "line": 69,
             "params": [
@@ -524,8 +541,8 @@
                 }
             ]
         },
-        "GUI classes..Rescale LUT class.": {
-            "name": "GUI classes..Rescale LUT class.",
+        "dwv.html.Rescale LUT class.": {
+            "name": "dwv.html.Rescale LUT class.",
             "shortname": "Rescale LUT class.",
             "classitems": [],
             "plugins": [],
@@ -533,7 +550,7 @@
             "plugin_for": [],
             "extension_for": [],
             "module": "dicom",
-            "namespace": "GUI classes.",
+            "namespace": "dwv.html",
             "file": "src/image/luts.js",
             "line": 8,
             "return": {
@@ -541,8 +558,8 @@
                 "type": "Rescale"
             }
         },
-        "GUI classes..Window LUT class.": {
-            "name": "GUI classes..Window LUT class.",
+        "dwv.html.Window LUT class.": {
+            "name": "dwv.html.Window LUT class.",
             "shortname": "Window LUT class.",
             "classitems": [],
             "plugins": [],
@@ -550,7 +567,7 @@
             "plugin_for": [],
             "extension_for": [],
             "module": "dicom",
-            "namespace": "GUI classes.",
+            "namespace": "dwv.html",
             "file": "src/image/luts.js",
             "line": 39,
             "return": {
@@ -558,8 +575,8 @@
                 "type": "Window"
             }
         },
-        "GUI classes..View class.": {
-            "name": "GUI classes..View class.",
+        "dwv.html.View class.": {
+            "name": "dwv.html.View class.",
             "shortname": "View class.",
             "classitems": [],
             "plugins": [],
@@ -567,7 +584,7 @@
             "plugin_for": [],
             "extension_for": [],
             "module": "dicom",
-            "namespace": "GUI classes.",
+            "namespace": "dwv.html",
             "file": "src/image/view.js",
             "line": 6,
             "params": [
@@ -577,32 +594,36 @@
                 }
             ]
         },
-        "GUI classes..Circular Bucket Queue.\n\nReturns input'd points in sorted order. All operations run in roughly O(1)\ntime (for input with small cost values), but it has a strict requirement:\n\nIf the most recent point had a cost of c, any points added should have a cost\nc' in the range c <= c' <= c + (capacity - 1).": {
-            "name": "GUI classes..Circular Bucket Queue.\n\nReturns input'd points in sorted order. All operations run in roughly O(1)\ntime (for input with small cost values), but it has a strict requirement:\n\nIf the most recent point had a cost of c, any points added should have a cost\nc' in the range c <= c' <= c + (capacity - 1).",
-            "shortname": "Circular Bucket Queue.\n\nReturns input'd points in sorted order. All operations run in roughly O(1)\ntime (for input with small cost values), but it has a strict requirement:\n\nIf the most recent point had a cost of c, any points added should have a cost\nc' in the range c <= c' <= c + (capacity - 1).",
+        "dwv.math.BucketQueue": {
+            "name": "dwv.math.BucketQueue",
+            "shortname": "dwv.math.BucketQueue",
             "classitems": [],
             "plugins": [],
             "extensions": [],
             "plugin_for": [],
             "extension_for": [],
-            "module": "dicom",
-            "namespace": "GUI classes.",
+            "module": "math",
+            "namespace": "dwv.math",
             "file": "src/math/bucketQueue.js",
-            "line": 6,
+            "line": 8,
+            "description": "Circular Bucket Queue.\n\nReturns input'd points in sorted order. All operations run in roughly O(1)\ntime (for input with small cost values), but it has a strict requirement:\n\nIf the most recent point had a cost of c, any points added should have a cost\nc' in the range c <= c' <= c + (capacity - 1).",
+            "is_constructor": 1,
             "input": "cost_functor"
         },
-        "GUI classes..Scissors.\n\nRef: Eric N. Mortensen, William A. Barrett, Interactive Segmentation with\n  Intelligent Scissors, Graphical Models and Image Processing, Volume 60,\n  Issue 5, September 1998, Pages 349-384, ISSN 1077-3169,\n  DOI: 10.1006/gmip.1998.0480.\n\n(http://www.sciencedirect.com/science/article/B6WG4-45JB8WN-9/2/6fe59d8089fd1892c2bfb82283065579)\n\nHighly inspired from http://code.google.com/p/livewire-javascript/": {
-            "name": "GUI classes..Scissors.\n\nRef: Eric N. Mortensen, William A. Barrett, Interactive Segmentation with\n  Intelligent Scissors, Graphical Models and Image Processing, Volume 60,\n  Issue 5, September 1998, Pages 349-384, ISSN 1077-3169,\n  DOI: 10.1006/gmip.1998.0480.\n\n(http://www.sciencedirect.com/science/article/B6WG4-45JB8WN-9/2/6fe59d8089fd1892c2bfb82283065579)\n\nHighly inspired from http://code.google.com/p/livewire-javascript/",
-            "shortname": "Scissors.\n\nRef: Eric N. Mortensen, William A. Barrett, Interactive Segmentation with\n  Intelligent Scissors, Graphical Models and Image Processing, Volume 60,\n  Issue 5, September 1998, Pages 349-384, ISSN 1077-3169,\n  DOI: 10.1006/gmip.1998.0480.\n\n(http://www.sciencedirect.com/science/article/B6WG4-45JB8WN-9/2/6fe59d8089fd1892c2bfb82283065579)\n\nHighly inspired from http://code.google.com/p/livewire-javascript/",
+        "dwv.math.Scissors": {
+            "name": "dwv.math.Scissors",
+            "shortname": "dwv.math.Scissors",
             "classitems": [],
             "plugins": [],
             "extensions": [],
             "plugin_for": [],
             "extension_for": [],
-            "module": "dicom",
-            "namespace": "GUI classes.",
+            "module": "math",
+            "namespace": "dwv.math",
             "file": "src/math/scissors.js",
-            "line": 276
+            "line": 278,
+            "description": "Scissors",
+            "is_constructor": 1
         },
         "dwv.math.Point2D": {
             "name": "dwv.math.Point2D",
@@ -1487,107 +1508,347 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 157,
+            "line": 8,
+            "description": "Handle window/level change.",
             "itemtype": "method",
-            "name": "Append the color chooser to the HTML document in the 'colourChooser' node.",
-            "class": "GUI classes..Window layer.",
-            "module": "dicom",
-            "namespace": "dwv.dicom"
-        },
-        {
-            "file": "src/html/gui.js",
-            "line": 183,
-            "itemtype": "method",
-            "name": "Remove the color chooser specific node.",
-            "class": "GUI classes..Window layer.",
-            "module": "dicom",
-            "namespace": "dwv.dicom"
-        },
-        {
-            "file": "src/html/gui.js",
-            "line": 219,
-            "class": "GUI classes..Window layer.",
-            "module": "dicom",
-            "namespace": "GUI classes."
-        },
-        {
-            "file": "src/html/gui.js",
-            "line": 224,
-            "itemtype": "method",
-            "name": "Threshold Filter User Interface.",
-            "class": "GUI classes..Window layer.",
-            "module": "dicom",
-            "namespace": "GUI classes."
-        },
-        {
-            "file": "src/html/gui.js",
-            "line": 247,
-            "itemtype": "method",
-            "name": "Sharpen Filter User Interface.",
-            "class": "GUI classes..Window layer.",
-            "module": "dicom",
-            "namespace": "GUI classes."
-        },
-        {
-            "file": "src/html/gui.js",
-            "line": 275,
-            "itemtype": "method",
-            "name": "Sobel Filter User Interface.",
-            "class": "GUI classes..Window layer.",
-            "module": "dicom",
-            "namespace": "GUI classes."
-        },
-        {
-            "file": "src/html/gui_mobile.js",
-            "line": 6,
-            "itemtype": "method",
-            "name": "Get a slider.",
-            "class": "GUI classes..Window layer.",
-            "module": "dicom",
-            "namespace": "GUI classes."
-        },
-        {
-            "file": "src/html/gui_mobile.js",
-            "line": 45,
-            "itemtype": "method",
-            "name": "Update the progress bar.",
+            "name": "onChangeWindowLevelPreset",
             "params": [
                 {
                     "name": "event",
-                    "description": "A ProgressEvent."
+                    "description": "The change event.",
+                    "type": "Object"
                 }
             ],
-            "class": "GUI classes..Window layer.",
-            "module": "dicom",
-            "namespace": "GUI classes."
+            "class": "dwv.html.Layer",
+            "module": "dicom"
         },
         {
-            "file": "src/html/gui_ui.js",
-            "line": 6,
+            "file": "src/html/gui.js",
+            "line": 18,
+            "description": "Handle colour map change.",
             "itemtype": "method",
-            "name": "Get a slider.",
-            "class": "GUI classes..Window layer.",
-            "module": "dicom",
-            "namespace": "GUI classes."
-        },
-        {
-            "file": "src/html/gui_ui.js",
-            "line": 26,
-            "itemtype": "method",
-            "name": "Update the progress bar.",
+            "name": "onChangeColourMap",
             "params": [
                 {
                     "name": "event",
-                    "description": "A ProgressEvent."
+                    "description": "The change event.",
+                    "type": "Object"
                 }
             ],
-            "class": "GUI classes..Window layer.",
-            "module": "dicom",
-            "namespace": "GUI classes."
+            "class": "dwv.html.Layer",
+            "module": "dicom"
+        },
+        {
+            "file": "src/html/gui.js",
+            "line": 28,
+            "description": "Handle tool change.",
+            "itemtype": "method",
+            "name": "onChangeTool",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The change event.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.html.Layer",
+            "module": "dicom"
+        },
+        {
+            "file": "src/html/gui.js",
+            "line": 38,
+            "description": "Handle filter change.",
+            "itemtype": "method",
+            "name": "onChangeFilter",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The change event.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.html.Layer",
+            "module": "dicom"
+        },
+        {
+            "file": "src/html/gui.js",
+            "line": 48,
+            "description": "Handle shape change.",
+            "itemtype": "method",
+            "name": "onChangeShape",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The change event.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.html.Layer",
+            "module": "dicom"
+        },
+        {
+            "file": "src/html/gui.js",
+            "line": 58,
+            "description": "Handle line color change.",
+            "itemtype": "method",
+            "name": "onChangeLineColour",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The change event.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.html.Layer",
+            "module": "dicom"
+        },
+        {
+            "file": "src/html/gui.js",
+            "line": 68,
+            "description": "Append the toolbox HTML to the page.",
+            "itemtype": "method",
+            "name": "appendToolboxHtml",
+            "class": "dwv.html.Layer",
+            "module": "dicom"
+        },
+        {
+            "file": "src/html/gui.js",
+            "line": 98,
+            "description": "Append the window/level HTML to the page.",
+            "itemtype": "method",
+            "name": "appendWindowLevelHtml",
+            "class": "dwv.html.Layer",
+            "module": "dicom"
+        },
+        {
+            "file": "src/html/gui.js",
+            "line": 145,
+            "description": "Clear the window/level HTML.",
+            "itemtype": "method",
+            "name": "clearWindowLevelHtml",
+            "class": "dwv.html.Layer",
+            "module": "dicom"
+        },
+        {
+            "file": "src/html/gui.js",
+            "line": 155,
+            "description": "Append the draw HTML to the page.",
+            "itemtype": "method",
+            "name": "appendDrawHtml",
+            "class": "dwv.html.Layer",
+            "module": "dicom"
+        },
+        {
+            "file": "src/html/gui.js",
+            "line": 199,
+            "description": "Clear the draw HTML.",
+            "itemtype": "method",
+            "name": "clearDrawHtml",
+            "class": "dwv.html.Layer",
+            "module": "dicom"
+        },
+        {
+            "file": "src/html/gui.js",
+            "line": 209,
+            "description": "Append the color chooser HTML to the page.",
+            "itemtype": "method",
+            "name": "appendLivewireHtml",
+            "class": "dwv.html.Layer",
+            "module": "dicom"
+        },
+        {
+            "file": "src/html/gui.js",
+            "line": 236,
+            "description": "Clear the color chooser HTML.",
+            "itemtype": "method",
+            "name": "clearDrawHtml",
+            "class": "dwv.html.Layer",
+            "module": "dicom"
+        },
+        {
+            "file": "src/html/gui.js",
+            "line": 245,
+            "description": "Append the filter HTML to the page.",
+            "itemtype": "method",
+            "name": "appendLivewireHtml",
+            "class": "dwv.html.Layer",
+            "module": "dicom"
+        },
+        {
+            "file": "src/html/gui.js",
+            "line": 272,
+            "description": "Clear the filter HTML.",
+            "itemtype": "method",
+            "name": "clearDrawHtml",
+            "class": "dwv.html.Layer",
+            "module": "dicom"
+        },
+        {
+            "file": "src/html/gui.js",
+            "line": 284,
+            "description": "Append the threshold filter HTML to the page.",
+            "itemtype": "method",
+            "name": "appendThresholdHtml",
+            "class": "dwv.html.Layer",
+            "module": "dicom"
+        },
+        {
+            "file": "src/html/gui.js",
+            "line": 303,
+            "description": "Clear the treshold filter HTML.",
+            "itemtype": "method",
+            "name": "clearDrawHtml",
+            "class": "dwv.html.Layer",
+            "module": "dicom"
+        },
+        {
+            "file": "src/html/gui.js",
+            "line": 312,
+            "description": "Append the sharpen filter HTML to the page.",
+            "itemtype": "method",
+            "name": "appendSharpenHtml",
+            "class": "dwv.html.Layer",
+            "module": "dicom"
+        },
+        {
+            "file": "src/html/gui.js",
+            "line": 336,
+            "description": "Clear the sharpen filter HTML.",
+            "itemtype": "method",
+            "name": "clearSharpenHtml",
+            "class": "dwv.html.Layer",
+            "module": "dicom"
+        },
+        {
+            "file": "src/html/gui.js",
+            "line": 345,
+            "description": "Append the sobel filter HTML to the page.",
+            "itemtype": "method",
+            "name": "appendSharpenHtml",
+            "class": "dwv.html.Layer",
+            "module": "dicom"
+        },
+        {
+            "file": "src/html/gui.js",
+            "line": 369,
+            "description": "Clear the sobel filter HTML.",
+            "itemtype": "method",
+            "name": "clearSharpenHtml",
+            "class": "dwv.html.Layer",
+            "module": "dicom"
+        },
+        {
+            "file": "src/html/gui.js",
+            "line": 378,
+            "description": "Append the zoom HTML to the page.",
+            "itemtype": "method",
+            "name": "appendZoomHtml",
+            "class": "dwv.html.Layer",
+            "module": "dicom"
+        },
+        {
+            "file": "src/html/gui.js",
+            "line": 404,
+            "description": "Clear the zoom filter HTML.",
+            "itemtype": "method",
+            "name": "clearZoomHtml",
+            "class": "dwv.html.Layer",
+            "module": "dicom"
+        },
+        {
+            "file": "src/html/gui.js",
+            "line": 413,
+            "description": "Append the undo HTML to the page.",
+            "itemtype": "method",
+            "name": "appendUndoHtml",
+            "class": "dwv.html.Layer",
+            "module": "dicom"
+        },
+        {
+            "file": "src/html/gui.js",
+            "line": 437,
+            "description": "Add a command to the undo HTML.",
+            "itemtype": "method",
+            "name": "addCommandToUndoHtml",
+            "params": [
+                {
+                    "name": "commandName",
+                    "description": "The name of the command to add.",
+                    "type": "String"
+                }
+            ],
+            "class": "dwv.html.Layer",
+            "module": "dicom"
+        },
+        {
+            "file": "src/html/gui.js",
+            "line": 463,
+            "description": "Enable the last command of the undo HTML.",
+            "itemtype": "method",
+            "name": "enableInUndoHtml",
+            "params": [
+                {
+                    "name": "enable",
+                    "description": "Flag to enable or disable the command.",
+                    "type": "Boolean"
+                }
+            ],
+            "class": "dwv.html.Layer",
+            "module": "dicom"
+        },
+        {
+            "file": "src/html/gui_mobile.js",
+            "line": 8,
+            "description": "Append the slider HTML.",
+            "itemtype": "method",
+            "name": "getSliderHtml",
+            "class": "dwv.html.Layer",
+            "module": "dicom"
+        },
+        {
+            "file": "src/html/gui_mobile.js",
+            "line": 48,
+            "description": "Update the progress bar.",
+            "itemtype": "method",
+            "name": "updateProgress",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "A ProgressEvent.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.html.Layer",
+            "module": "dicom"
+        },
+        {
+            "file": "src/html/gui_ui.js",
+            "line": 8,
+            "description": "Append the slider HTML.",
+            "itemtype": "method",
+            "name": "getSliderHtml",
+            "class": "dwv.html.Layer",
+            "module": "dicom"
+        },
+        {
+            "file": "src/html/gui_ui.js",
+            "line": 29,
+            "description": "Update the progress bar.",
+            "itemtype": "method",
+            "name": "updateProgress",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "A ProgressEvent.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.html.Layer",
+            "module": "dicom"
         },
         {
             "file": "src/html/html.js",
-            "line": 6,
+            "line": 8,
             "itemtype": "method",
             "name": "Append a cell to a given row.",
             "params": [
@@ -1600,13 +1861,12 @@
                     "description": "The text of the cell."
                 }
             ],
-            "class": "GUI classes..Window layer.",
-            "module": "dicom",
-            "namespace": "GUI classes."
+            "class": "dwv.html.Layer",
+            "module": "dicom"
         },
         {
             "file": "src/html/html.js",
-            "line": 17,
+            "line": 19,
             "itemtype": "method",
             "name": "Append a header cell to a given row.",
             "params": [
@@ -1619,60 +1879,54 @@
                     "description": "The text of the header cell."
                 }
             ],
-            "class": "GUI classes..Window layer.",
-            "module": "dicom",
-            "namespace": "GUI classes."
+            "class": "dwv.html.Layer",
+            "module": "dicom"
         },
         {
             "file": "src/html/html.js",
-            "line": 31,
+            "line": 33,
             "itemtype": "method",
             "name": "",
-            "class": "GUI classes..Window layer.",
-            "module": "dicom",
-            "namespace": "GUI classes."
+            "class": "dwv.html.Layer",
+            "module": "dicom"
         },
         {
             "file": "src/html/html.js",
-            "line": 57,
+            "line": 59,
             "itemtype": "method",
             "name": "",
-            "class": "GUI classes..Window layer.",
-            "module": "dicom",
-            "namespace": "GUI classes."
+            "class": "dwv.html.Layer",
+            "module": "dicom"
         },
         {
             "file": "src/html/html.js",
-            "line": 99,
+            "line": 101,
             "itemtype": "method",
             "name": "",
-            "class": "GUI classes..Window layer.",
-            "module": "dicom",
-            "namespace": "GUI classes."
+            "class": "dwv.html.Layer",
+            "module": "dicom"
         },
         {
             "file": "src/html/html.js",
-            "line": 117,
+            "line": 119,
             "itemtype": "method",
             "name": "Converts the input to an HTML table.",
             "input": "input Allowed types are: array, array of object, object.",
             "warning": "Null is interpreted differently in browsers, firefox will not display it.",
-            "class": "GUI classes..Window layer.",
-            "module": "dicom",
-            "namespace": "GUI classes."
+            "class": "dwv.html.Layer",
+            "module": "dicom"
         },
         {
             "file": "src/html/html.js",
-            "line": 129,
+            "line": 131,
             "itemtype": "method",
             "name": "",
-            "class": "GUI classes..Window layer.",
-            "module": "dicom",
-            "namespace": "GUI classes."
+            "class": "dwv.html.Layer",
+            "module": "dicom"
         },
         {
             "file": "src/html/html.js",
-            "line": 145,
+            "line": 147,
             "itemtype": "method",
             "name": "",
             "params": [
@@ -1685,13 +1939,12 @@
                     "description": ""
                 }
             ],
-            "class": "GUI classes..Window layer.",
-            "module": "dicom",
-            "namespace": "GUI classes."
+            "class": "dwv.html.Layer",
+            "module": "dicom"
         },
         {
             "file": "src/html/html.js",
-            "line": 175,
+            "line": 177,
             "itemtype": "method",
             "name": "Transform back each\n<span>preText <span class=\"highlighted\">term</span> postText</span>\ninto its original preText term postText",
             "params": [
@@ -1700,13 +1953,12 @@
                     "description": "The container to de-highlight."
                 }
             ],
-            "class": "GUI classes..Window layer.",
-            "module": "dicom",
-            "namespace": "GUI classes."
+            "class": "dwv.html.Layer",
+            "module": "dicom"
         },
         {
             "file": "src/html/html.js",
-            "line": 201,
+            "line": 203,
             "itemtype": "method",
             "name": "Create a\n<span>preText <span class=\"highlighted\">term</span> postText</span>\naround each search term",
             "params": [
@@ -1719,22 +1971,20 @@
                     "description": "The container where to highlight the term."
                 }
             ],
-            "class": "GUI classes..Window layer.",
-            "module": "dicom",
-            "namespace": "GUI classes."
+            "class": "dwv.html.Layer",
+            "module": "dicom"
         },
         {
             "file": "src/html/html.js",
-            "line": 243,
+            "line": 245,
             "itemtype": "method",
             "name": "",
-            "class": "GUI classes..Window layer.",
-            "module": "dicom",
-            "namespace": "GUI classes."
+            "class": "dwv.html.Layer",
+            "module": "dicom"
         },
         {
             "file": "src/html/html.js",
-            "line": 254,
+            "line": 256,
             "itemtype": "method",
             "name": "Remove all children of a node.",
             "params": [
@@ -1747,13 +1997,12 @@
                     "description": "The id of the parent of the node to delete."
                 }
             ],
-            "class": "GUI classes..Window layer.",
-            "module": "dicom",
-            "namespace": "GUI classes."
+            "class": "dwv.html.Layer",
+            "module": "dicom"
         },
         {
             "file": "src/html/html.js",
-            "line": 266,
+            "line": 268,
             "itemtype": "method",
             "name": "Remove all children of a node and then remove it from its parent.",
             "params": [
@@ -1766,13 +2015,12 @@
                     "description": "The id of the parent of the node to delete."
                 }
             ],
-            "class": "GUI classes..Window layer.",
-            "module": "dicom",
-            "namespace": "GUI classes."
+            "class": "dwv.html.Layer",
+            "module": "dicom"
         },
         {
             "file": "src/html/html.js",
-            "line": 283,
+            "line": 285,
             "itemtype": "method",
             "name": "Create a HTML select from an input array of options.\nThe values of the options are the name of the option made lower case.\nIt is left to the user to set the 'onchange' method of the select.",
             "params": [
@@ -1788,91 +2036,176 @@
             "return": {
                 "description": "The created HTML select."
             },
-            "class": "GUI classes..Window layer.",
-            "module": "dicom",
-            "namespace": "GUI classes."
+            "class": "dwv.html.Layer",
+            "module": "dicom"
         },
         {
             "file": "src/html/html.js",
-            "line": 408,
+            "line": 410,
             "description": "Browser checks to see if it can run dwv...\nTODO Maybe use http://modernizr.com/.",
-            "class": "GUI classes..Window layer.",
-            "module": "dicom",
-            "namespace": "GUI classes."
+            "class": "dwv.html.Layer",
+            "module": "dicom"
         },
         {
             "file": "src/html/layer.js",
-            "line": 101,
+            "line": 107,
             "description": "Reset the layout",
-            "class": "GUI classes..Window layer.",
+            "class": "dwv.html.Layer",
             "module": "dicom",
-            "namespace": "GUI classes."
+            "namespace": "dwv.html"
         },
         {
             "file": "src/html/layer.js",
-            "line": 112,
+            "line": 118,
             "description": "Draw the content (imageData) of the layer.\nThe imageData variable needs to be set",
-            "class": "GUI classes..Window layer.",
+            "class": "dwv.html.Layer",
             "module": "dicom",
-            "namespace": "GUI classes."
+            "namespace": "dwv.html"
         },
         {
             "file": "src/html/layer.js",
-            "line": 135,
+            "line": 141,
             "description": "Initialise the layer: set the canvas and context",
             "input": "height The height of the canvas.",
-            "class": "GUI classes..Window layer.",
+            "class": "dwv.html.Layer",
             "module": "dicom",
-            "namespace": "GUI classes."
+            "namespace": "dwv.html"
         },
         {
             "file": "src/html/layer.js",
-            "line": 170,
+            "line": 176,
             "description": "Fill the full context with the current style.",
-            "class": "GUI classes..Window layer.",
+            "class": "dwv.html.Layer",
             "module": "dicom",
-            "namespace": "GUI classes."
+            "namespace": "dwv.html"
         },
         {
             "file": "src/html/layer.js",
-            "line": 178,
+            "line": 184,
             "description": "Clear the full context.",
-            "class": "GUI classes..Window layer.",
+            "class": "dwv.html.Layer",
             "module": "dicom",
-            "namespace": "GUI classes."
+            "namespace": "dwv.html"
         },
         {
             "file": "src/html/layer.js",
-            "line": 186,
+            "line": 192,
             "description": "Merge two layers.",
             "input": "layerToMerge The layer to merge. It will also be emptied.",
-            "class": "GUI classes..Window layer.",
+            "class": "dwv.html.Layer",
             "module": "dicom",
-            "namespace": "GUI classes."
+            "namespace": "dwv.html"
         },
         {
             "file": "src/html/layer.js",
-            "line": 202,
+            "line": 208,
             "description": "Set the fill and stroke style of the context.",
-            "class": "GUI classes..Window layer.",
+            "class": "dwv.html.Layer",
             "module": "dicom",
-            "namespace": "GUI classes."
+            "namespace": "dwv.html"
         },
         {
             "file": "src/html/layer.js",
-            "line": 211,
+            "line": 217,
             "description": "Display the layer.",
-            "class": "GUI classes..Window layer.",
+            "class": "dwv.html.Layer",
             "module": "dicom",
-            "namespace": "GUI classes."
+            "namespace": "dwv.html"
         },
         {
             "file": "src/html/layer.js",
-            "line": 232,
+            "line": 238,
             "description": "Align on another layer.",
-            "class": "GUI classes..Window layer.",
+            "class": "dwv.html.Layer",
             "module": "dicom",
-            "namespace": "GUI classes."
+            "namespace": "dwv.html"
+        },
+        {
+            "file": "src/html/style.js",
+            "line": 25,
+            "description": "Get the font size.",
+            "itemtype": "method",
+            "name": "getFontSize",
+            "return": {
+                "description": "The font size.",
+                "type": "Number"
+            },
+            "class": "dwv.html.Style",
+            "module": "dicom",
+            "namespace": "dwv.html"
+        },
+        {
+            "file": "src/html/style.js",
+            "line": 34,
+            "description": "Get the font definition string.",
+            "itemtype": "method",
+            "name": "getFontStr",
+            "return": {
+                "description": "The font definition string.",
+                "type": "String"
+            },
+            "class": "dwv.html.Style",
+            "module": "dicom",
+            "namespace": "dwv.html"
+        },
+        {
+            "file": "src/html/style.js",
+            "line": 43,
+            "description": "Get the line height.",
+            "itemtype": "method",
+            "name": "getLineHeight",
+            "return": {
+                "description": "The line height.",
+                "type": "Number"
+            },
+            "class": "dwv.html.Style",
+            "module": "dicom",
+            "namespace": "dwv.html"
+        },
+        {
+            "file": "src/html/style.js",
+            "line": 52,
+            "description": "Get the text color.",
+            "itemtype": "method",
+            "name": "getTextColor",
+            "return": {
+                "description": "The text color.",
+                "type": "String"
+            },
+            "class": "dwv.html.Style",
+            "module": "dicom",
+            "namespace": "dwv.html"
+        },
+        {
+            "file": "src/html/style.js",
+            "line": 61,
+            "description": "Get the line color.",
+            "itemtype": "method",
+            "name": "getLineColor",
+            "return": {
+                "description": "The line color.",
+                "type": "String"
+            },
+            "class": "dwv.html.Style",
+            "module": "dicom",
+            "namespace": "dwv.html"
+        },
+        {
+            "file": "src/html/style.js",
+            "line": 70,
+            "description": "Set the line color.",
+            "itemtype": "method",
+            "name": "setLineColor",
+            "params": [
+                {
+                    "name": "color",
+                    "description": "The line color.",
+                    "type": "String"
+                }
+            ],
+            "class": "dwv.html.Style",
+            "module": "dicom",
+            "namespace": "dwv.html"
         },
         {
             "file": "src/image/filter.js",
@@ -1889,27 +2222,27 @@
                     "description": "The new maximum."
                 }
             ],
-            "class": "GUI classes..Image Size class. \nSupports 2D and 3D images.",
+            "class": "dwv.html.Image Size class. \nSupports 2D and 3D images.",
             "module": "dicom",
-            "namespace": "GUI classes."
+            "namespace": "dwv.html"
         },
         {
             "file": "src/image/filter.js",
             "line": 40,
             "itemtype": "method",
             "name": "Sharpen an image using a sharpen convolution matrix.",
-            "class": "GUI classes..Image Size class. \nSupports 2D and 3D images.",
+            "class": "dwv.html.Image Size class. \nSupports 2D and 3D images.",
             "module": "dicom",
-            "namespace": "GUI classes."
+            "namespace": "dwv.html"
         },
         {
             "file": "src/image/filter.js",
             "line": 57,
             "itemtype": "method",
             "name": "Apply a Sobel filter to an image.",
-            "class": "GUI classes..Image Size class. \nSupports 2D and 3D images.",
+            "class": "dwv.html.Image Size class. \nSupports 2D and 3D images.",
             "module": "dicom",
-            "namespace": "GUI classes."
+            "namespace": "dwv.html"
         },
         {
             "file": "src/image/image.js",
@@ -1932,9 +2265,9 @@
             "return": {
                 "description": "The value at the desired position.\nWarning: No size check..."
             },
-            "class": "GUI classes..Image class.",
+            "class": "dwv.html.Image class.",
             "module": "dicom",
-            "namespace": "GUI classes."
+            "namespace": "dwv.html"
         },
         {
             "file": "src/image/image.js",
@@ -1949,9 +2282,9 @@
             "return": {
                 "description": "The value at the desired offset.\nWarning: No size check..."
             },
-            "class": "GUI classes..Image class.",
+            "class": "dwv.html.Image class.",
             "module": "dicom",
-            "namespace": "GUI classes."
+            "namespace": "dwv.html"
         },
         {
             "file": "src/image/image.js",
@@ -1974,9 +2307,9 @@
             "return": {
                 "description": "The value at the desired position.\nWarning: No size check..."
             },
-            "class": "GUI classes..Image class.",
+            "class": "dwv.html.Image class.",
             "module": "dicom",
-            "namespace": "GUI classes."
+            "namespace": "dwv.html"
         },
         {
             "file": "src/image/image.js",
@@ -1986,9 +2319,9 @@
                 "description": "The range .",
                 "type": "Min, max"
             },
-            "class": "GUI classes..Image class.",
+            "class": "dwv.html.Image class.",
             "module": "dicom",
-            "namespace": "GUI classes."
+            "namespace": "dwv.html"
         },
         {
             "file": "src/image/image.js",
@@ -1998,9 +2331,9 @@
                 "description": "The range .",
                 "type": "Min, max"
             },
-            "class": "GUI classes..Image class.",
+            "class": "dwv.html.Image class.",
             "module": "dicom",
-            "namespace": "GUI classes."
+            "namespace": "dwv.html"
         },
         {
             "file": "src/image/image.js",
@@ -2009,9 +2342,9 @@
             "return": {
                 "description": "An array representing the histogram."
             },
-            "class": "GUI classes..Image class.",
+            "class": "dwv.html.Image class.",
             "module": "dicom",
-            "namespace": "GUI classes."
+            "namespace": "dwv.html"
         },
         {
             "file": "src/image/image.js",
@@ -2026,9 +2359,9 @@
             "return": {
                 "description": "The convoluted image.\n\nNote: Uses the raw buffer values."
             },
-            "class": "GUI classes..Image class.",
+            "class": "dwv.html.Image class.",
             "module": "dicom",
-            "namespace": "GUI classes."
+            "namespace": "dwv.html"
         },
         {
             "file": "src/image/image.js",
@@ -2043,9 +2376,9 @@
             "return": {
                 "description": "The transformed image.\n\nNote: Uses the raw buffer values."
             },
-            "class": "GUI classes..Image class.",
+            "class": "dwv.html.Image class.",
             "module": "dicom",
-            "namespace": "GUI classes."
+            "namespace": "dwv.html"
         },
         {
             "file": "src/image/image.js",
@@ -2064,17 +2397,17 @@
             "return": {
                 "description": "The composed image.\n\nNote: Uses the raw buffer values."
             },
-            "class": "GUI classes..Image class.",
+            "class": "dwv.html.Image class.",
             "module": "dicom",
-            "namespace": "GUI classes."
+            "namespace": "dwv.html"
         },
         {
             "file": "src/image/luts.js",
             "line": 95,
             "description": "Lookup tables for image color display.",
-            "class": "GUI classes..Window LUT class.",
+            "class": "dwv.html.Window LUT class.",
             "module": "dicom",
-            "namespace": "GUI classes."
+            "namespace": "dwv.html"
         },
         {
             "file": "src/image/reader.js",
@@ -2090,9 +2423,9 @@
                     "description": "The corresponding file."
                 }
             ],
-            "class": "GUI classes..View class.",
+            "class": "dwv.html.View class.",
             "module": "dicom",
-            "namespace": "GUI classes."
+            "namespace": "dwv.html"
         },
         {
             "file": "src/image/reader.js",
@@ -2104,9 +2437,9 @@
                     "description": "The input data buffer."
                 }
             ],
-            "class": "GUI classes..View class.",
+            "class": "dwv.html.View class.",
             "module": "dicom",
-            "namespace": "GUI classes."
+            "namespace": "dwv.html"
         },
         {
             "file": "src/image/view.js",
@@ -2123,34 +2456,34 @@
                 }
             ],
             "warning": "Uses the latest set rescale LUT or the default linear one.",
-            "class": "GUI classes..View class.",
+            "class": "dwv.html.View class.",
             "module": "dicom",
-            "namespace": "GUI classes."
+            "namespace": "dwv.html"
         },
         {
             "file": "src/image/view.js",
             "line": 98,
             "description": "Set the image window/level to cover the full data range.",
             "warning": "Uses the latest set rescale LUT or the default linear one.",
-            "class": "GUI classes..View class.",
+            "class": "dwv.html.View class.",
             "module": "dicom",
-            "namespace": "GUI classes."
+            "namespace": "dwv.html"
         },
         {
             "file": "src/image/view.js",
             "line": 114,
             "description": "Increment the current slice number.\nReturns false if not in bounds.",
-            "class": "GUI classes..View class.",
+            "class": "dwv.html.View class.",
             "module": "dicom",
-            "namespace": "GUI classes."
+            "namespace": "dwv.html"
         },
         {
             "file": "src/image/view.js",
             "line": 126,
             "description": "Decrement the current slice number.\nReturns false if not in bounds.",
-            "class": "GUI classes..View class.",
+            "class": "dwv.html.View class.",
             "module": "dicom",
-            "namespace": "GUI classes."
+            "namespace": "dwv.html"
         },
         {
             "file": "src/image/view.js",
@@ -2160,9 +2493,9 @@
                 "description": "A full copy of this .",
                 "type": "dwv.image.Image"
             },
-            "class": "GUI classes..View class.",
+            "class": "dwv.html.View class.",
             "module": "dicom",
-            "namespace": "GUI classes."
+            "namespace": "dwv.html"
         },
         {
             "file": "src/image/view.js",
@@ -2178,9 +2511,9 @@
                     "description": "The slice position."
                 }
             ],
-            "class": "GUI classes..View class.",
+            "class": "dwv.html.View class.",
             "module": "dicom",
-            "namespace": "GUI classes."
+            "namespace": "dwv.html"
         },
         {
             "file": "src/image/view.js",
@@ -2196,9 +2529,9 @@
                     "description": "The method associated with the provided event type."
                 }
             ],
-            "class": "GUI classes..View class.",
+            "class": "dwv.html.View class.",
             "module": "dicom",
-            "namespace": "GUI classes."
+            "namespace": "dwv.html"
         },
         {
             "file": "src/image/view.js",
@@ -2214,9 +2547,9 @@
                     "description": "The method associated with the provided event type."
                 }
             ],
-            "class": "GUI classes..View class.",
+            "class": "dwv.html.View class.",
             "module": "dicom",
-            "namespace": "GUI classes."
+            "namespace": "dwv.html"
         },
         {
             "file": "src/image/view.js",
@@ -2228,30 +2561,27 @@
                     "description": "The event to fire."
                 }
             ],
-            "class": "GUI classes..View class.",
+            "class": "dwv.html.View class.",
             "module": "dicom",
-            "namespace": "GUI classes."
+            "namespace": "dwv.html"
         },
         {
             "file": "src/math/scissors.js",
-            "line": 9,
-            "class": "GUI classes..Scissors.\n\nRef: Eric N. Mortensen, William A. Barrett, Interactive Segmentation with\n  Intelligent Scissors, Graphical Models and Image Processing, Volume 60,\n  Issue 5, September 1998, Pages 349-384, ISSN 1077-3169,\n  DOI: 10.1006/gmip.1998.0480.\n\n(http://www.sciencedirect.com/science/article/B6WG4-45JB8WN-9/2/6fe59d8089fd1892c2bfb82283065579)\n\nHighly inspired from http://code.google.com/p/livewire-javascript/",
-            "module": "dicom",
-            "namespace": "GUI classes."
+            "line": 11,
+            "class": "dwv.math.Scissors",
+            "module": "math"
         },
         {
             "file": "src/math/scissors.js",
-            "line": 65,
-            "class": "GUI classes..Scissors.\n\nRef: Eric N. Mortensen, William A. Barrett, Interactive Segmentation with\n  Intelligent Scissors, Graphical Models and Image Processing, Volume 60,\n  Issue 5, September 1998, Pages 349-384, ISSN 1077-3169,\n  DOI: 10.1006/gmip.1998.0480.\n\n(http://www.sciencedirect.com/science/article/B6WG4-45JB8WN-9/2/6fe59d8089fd1892c2bfb82283065579)\n\nHighly inspired from http://code.google.com/p/livewire-javascript/",
-            "module": "dicom",
-            "namespace": "GUI classes."
+            "line": 67,
+            "class": "dwv.math.Scissors",
+            "module": "math"
         },
         {
             "file": "src/math/scissors.js",
-            "line": 105,
-            "class": "GUI classes..Scissors.\n\nRef: Eric N. Mortensen, William A. Barrett, Interactive Segmentation with\n  Intelligent Scissors, Graphical Models and Image Processing, Volume 60,\n  Issue 5, September 1998, Pages 349-384, ISSN 1077-3169,\n  DOI: 10.1006/gmip.1998.0480.\n\n(http://www.sciencedirect.com/science/article/B6WG4-45JB8WN-9/2/6fe59d8089fd1892c2bfb82283065579)\n\nHighly inspired from http://code.google.com/p/livewire-javascript/",
-            "module": "dicom",
-            "namespace": "GUI classes."
+            "line": 107,
+            "class": "dwv.math.Scissors",
+            "module": "math"
         },
         {
             "file": "src/math/shapes.js",
@@ -3297,115 +3627,75 @@
         },
         {
             "message": "replacing incorrect tag: function with method",
-            "line": " src/html/gui.js:157"
+            "line": " src/html/html.js:19"
         },
         {
             "message": "replacing incorrect tag: function with method",
-            "line": " src/html/gui.js:183"
+            "line": " src/html/html.js:33"
         },
         {
             "message": "replacing incorrect tag: function with method",
-            "line": " src/html/gui.js:224"
+            "line": " src/html/html.js:59"
         },
         {
             "message": "replacing incorrect tag: function with method",
-            "line": " src/html/gui.js:247"
+            "line": " src/html/html.js:101"
         },
         {
             "message": "replacing incorrect tag: function with method",
-            "line": " src/html/gui.js:275"
-        },
-        {
-            "message": "replacing incorrect tag: function with method",
-            "line": " src/html/gui_mobile.js:6"
-        },
-        {
-            "message": "replacing incorrect tag: function with method",
-            "line": " src/html/gui_mobile.js:45"
-        },
-        {
-            "message": "replacing incorrect tag: function with method",
-            "line": " src/html/gui_ui.js:6"
-        },
-        {
-            "message": "replacing incorrect tag: function with method",
-            "line": " src/html/gui_ui.js:26"
-        },
-        {
-            "message": "replacing incorrect tag: function with method",
-            "line": " src/html/html.js:6"
-        },
-        {
-            "message": "replacing incorrect tag: function with method",
-            "line": " src/html/html.js:17"
-        },
-        {
-            "message": "replacing incorrect tag: function with method",
-            "line": " src/html/html.js:31"
-        },
-        {
-            "message": "replacing incorrect tag: function with method",
-            "line": " src/html/html.js:57"
-        },
-        {
-            "message": "replacing incorrect tag: function with method",
-            "line": " src/html/html.js:99"
-        },
-        {
-            "message": "replacing incorrect tag: function with method",
-            "line": " src/html/html.js:117"
+            "line": " src/html/html.js:119"
         },
         {
             "message": "unknown tag: input",
-            "line": " src/html/html.js:117"
+            "line": " src/html/html.js:119"
         },
         {
             "message": "unknown tag: warning",
-            "line": " src/html/html.js:117"
+            "line": " src/html/html.js:119"
         },
         {
             "message": "replacing incorrect tag: function with method",
-            "line": " src/html/html.js:129"
+            "line": " src/html/html.js:131"
         },
         {
             "message": "replacing incorrect tag: function with method",
-            "line": " src/html/html.js:145"
+            "line": " src/html/html.js:147"
         },
         {
             "message": "replacing incorrect tag: function with method",
-            "line": " src/html/html.js:175"
+            "line": " src/html/html.js:177"
         },
         {
             "message": "replacing incorrect tag: function with method",
-            "line": " src/html/html.js:201"
+            "line": " src/html/html.js:203"
         },
         {
             "message": "replacing incorrect tag: function with method",
-            "line": " src/html/html.js:243"
+            "line": " src/html/html.js:245"
         },
         {
             "message": "replacing incorrect tag: function with method",
-            "line": " src/html/html.js:254"
+            "line": " src/html/html.js:256"
         },
         {
             "message": "replacing incorrect tag: function with method",
-            "line": " src/html/html.js:266"
+            "line": " src/html/html.js:268"
         },
         {
             "message": "replacing incorrect tag: function with method",
-            "line": " src/html/html.js:283"
+            "line": " src/html/html.js:285"
         },
         {
             "message": "unknown tag: input",
-            "line": " src/html/layer.js:135"
+            "line": " src/html/layer.js:141"
         },
         {
             "message": "unknown tag: input",
-            "line": " src/html/layer.js:135"
+            "line": " src/html/layer.js:141"
         },
         {
             "message": "unknown tag: input",
-            "line": " src/html/layer.js:186"
+            "line": " src/html/layer.js:192"
         },
         {
             "message": "replacing incorrect tag: function with method",
@@ -3477,11 +3767,11 @@
         },
         {
             "message": "unknown tag: input",
-            "line": " src/math/bucketQueue.js:6"
+            "line": " src/math/bucketQueue.js:8"
         },
         {
             "message": "unknown tag: input",
-            "line": " src/math/bucketQueue.js:6"
+            "line": " src/math/bucketQueue.js:8"
         },
         {
             "message": "replacing incorrect tag: function with method",
@@ -3556,48 +3846,44 @@
             "line": " src/utils/string.js:14"
         },
         {
-            "message": "Missing item type",
-            "line": " src/html/gui.js:219"
-        },
-        {
             "message": "Missing item type\nBrowser checks to see if it can run dwv...\nTODO Maybe use http://modernizr.com/.",
-            "line": " src/html/html.js:408"
+            "line": " src/html/html.js:410"
         },
         {
             "message": "Missing item type\nReset the layout",
-            "line": " src/html/layer.js:101"
+            "line": " src/html/layer.js:107"
         },
         {
             "message": "Missing item type\nDraw the content (imageData) of the layer.\nThe imageData variable needs to be set",
-            "line": " src/html/layer.js:112"
+            "line": " src/html/layer.js:118"
         },
         {
             "message": "Missing item type\nInitialise the layer: set the canvas and context",
-            "line": " src/html/layer.js:135"
+            "line": " src/html/layer.js:141"
         },
         {
             "message": "Missing item type\nFill the full context with the current style.",
-            "line": " src/html/layer.js:170"
+            "line": " src/html/layer.js:176"
         },
         {
             "message": "Missing item type\nClear the full context.",
-            "line": " src/html/layer.js:178"
+            "line": " src/html/layer.js:184"
         },
         {
             "message": "Missing item type\nMerge two layers.",
-            "line": " src/html/layer.js:186"
+            "line": " src/html/layer.js:192"
         },
         {
             "message": "Missing item type\nSet the fill and stroke style of the context.",
-            "line": " src/html/layer.js:202"
+            "line": " src/html/layer.js:208"
         },
         {
             "message": "Missing item type\nDisplay the layer.",
-            "line": " src/html/layer.js:211"
+            "line": " src/html/layer.js:217"
         },
         {
             "message": "Missing item type\nAlign on another layer.",
-            "line": " src/html/layer.js:232"
+            "line": " src/html/layer.js:238"
         },
         {
             "message": "Missing item type\nGet the value of the image at a specific coordinate.",
@@ -3685,15 +3971,15 @@
         },
         {
             "message": "Missing item type",
-            "line": " src/math/scissors.js:9"
+            "line": " src/math/scissors.js:11"
         },
         {
             "message": "Missing item type",
-            "line": " src/math/scissors.js:65"
+            "line": " src/math/scissors.js:67"
         },
         {
             "message": "Missing item type",
-            "line": " src/math/scissors.js:105"
+            "line": " src/math/scissors.js:107"
         },
         {
             "message": "Missing item type",

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>src/tools/toolbox.js - dwv</title>
+    <title>dwv.html.Rescale LUT class. - dwv</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
     <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
@@ -164,83 +164,66 @@ Main application.</a></li>
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-                        <h1 class="file-heading">File: src/tools/toolbox.js</h1>
-
-<div class="file">
-    <pre class="code prettyprint linenums">
-//! @namespace Main DWV namespace.
-var dwv = dwv || {};
-//! @namespace Tool classes.
-dwv.tool = dwv.tool || {};
-
-// tool list: to be completed after each tool definition 
-dwv.tool.tools = dwv.tool.tools || {};
+                        <h1>dwv.html.Rescale LUT class. Class</h1>
+<div class="box meta">
     
-/**
-* @class Tool box.
-*/
-dwv.tool.ToolBox = function(app)
-{
-    this.selectedTool = 0;
-    this.defaultToolName = 0;
-};
 
-dwv.tool.ToolBox.prototype.enable = function(bool)
-{
-    if( bool ) {
-        this.sortTools();
-        dwv.gui.appendToolboxHtml();
-        this.init();
-    }
-};
+    
 
-dwv.tool.ToolBox.prototype.getSelectedTool = function() {
-    return this.selectedTool;
-};
+    
+        <div class="foundat">
+            Defined in: <a href="../files/src_image_luts.js.html#l8"><code>src&#x2F;image&#x2F;luts.js:8</code></a>
+        </div>
+    
 
-dwv.tool.ToolBox.prototype.setSelectedTool = function(name) {
-    // check if we have it
-    if( !this.hasTool(name) )
-    {
-        throw new Error(&quot;Unknown tool: &#x27;&quot; + name + &quot;&#x27;&quot;);
-    }
-    // disable last selected
-    if( this.selectedTool )
-    {
-        this.selectedTool.enable(false);
-    }
-    // enable new one
-    this.selectedTool = new dwv.tool.tools[name](app);
-    this.selectedTool.enable(true);
-};
+    
+        
+            Module: <a href="../modules/dicom.html">dicom</a>
+        
+    
 
-dwv.tool.ToolBox.prototype.hasTool = function(name) {
-    return dwv.tool.tools[name];
-};
+    
+</div>
 
-dwv.tool.ToolBox.prototype.sortTools = function()
-{
-    // fiddle with order: make window level first if present
-    var tools = dwv.tool.tools;
-    dwv.tool.tools = {};
-    if( tools.windowlevel ) dwv.tool.tools.windowlevel = tools.windowlevel;
-    for( var key in tools ) {
-        if( key === &quot;windowlevel&quot; ) continue;
-        dwv.tool.tools[key] = tools[key];
-    }
-};
 
-dwv.tool.ToolBox.prototype.init = function()
-{
-    // set the default to the first in the list
-    for( var key in dwv.tool.tools ){
-        this.defaultToolName = key;
-        break;
-    }
-    this.setSelectedTool(this.defaultToolName);
-};
 
-    </pre>
+<div class="box intro">
+    
+</div>
+
+
+
+<div id="classdocs" class="tabview">
+    <ul class="api-class-tabs">
+        <li class="api-class-tab index"><a href="#index">Index</a></li>
+
+        
+        
+        
+        
+    </ul>
+
+    <div>
+        <div id="index" class="api-class-tabpanel index">
+            <h2 class="off-left">Item Index</h2>
+
+            
+
+            
+
+            
+
+            
+        </div>
+
+        
+
+        
+
+        
+
+        
+    </div>
 </div>
 
                     </div>
