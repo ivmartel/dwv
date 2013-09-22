@@ -13,6 +13,9 @@ if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
   git clone --quiet --branch=gh-pages https://${GH_TOKEN}@github.com/ivmartel/dwv.git gh-pages > /dev/null
   #go into directory and copy data we're interested in to that directory
   cd gh-pages
+  #clean doc dir
+  rm -Rf demo/trunk/doc/*
+  #copy new dist
   cp -Rf $HOME/dist/* demo/trunk
   #add, commit and push files
   git add -f .
