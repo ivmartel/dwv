@@ -1,6 +1,6 @@
 /** 
  * HTML module.
- * @module dicom
+ * @module html
  */
 var dwv = dwv || {};
 dwv.html = dwv.html || {};
