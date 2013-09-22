@@ -19,7 +19,6 @@ YUI.add("yuidoc-meta", function(Y) {
         "dwv.dicom.DataReader",
         "dwv.dicom.DicomParser",
         "dwv.dicom.Dictionary",
-        "dwv.html",
         "dwv.html.Layer",
         "dwv.html.Style",
         "dwv.image.Image",

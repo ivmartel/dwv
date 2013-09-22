@@ -61,13 +61,9 @@
             "modules": {
                 "html": 1
             },
-            "classes": {
-                "dwv.html": 1
-            },
+            "classes": {},
             "fors": {},
-            "namespaces": {
-                "dwv": 1
-            }
+            "namespaces": {}
         },
         "src/html/layer.js": {
             "name": "src/html/layer.js",
@@ -357,13 +353,11 @@
             "name": "html",
             "submodules": {},
             "classes": {
-                "dwv.html": 1,
                 "dwv.html.Layer": 1,
                 "dwv.html.Style": 1
             },
             "fors": {},
             "namespaces": {
-                "dwv": 1,
                 "dwv.html": 1
             },
             "tag": "module",
@@ -507,21 +501,6 @@
             "line": 8,
             "description": "DICOM tag dictionary.",
             "is_constructor": 1
-        },
-        "dwv.html": {
-            "name": "dwv.html",
-            "shortname": "dwv.html",
-            "classitems": [],
-            "plugins": [],
-            "extensions": [],
-            "plugin_for": [],
-            "extension_for": [],
-            "module": "html",
-            "namespace": "dwv",
-            "file": "src/html/html.js",
-            "line": 6,
-            "description": "Namespace for HTML related functions.",
-            "static": 1
         },
         "dwv.html.Layer": {
             "name": "dwv.html.Layer",
@@ -1713,7 +1692,7 @@
                     "type": "Object"
                 }
             ],
-            "class": "dwv.html",
+            "class": "dwv.html.Layer",
             "module": "gui",
             "namespace": "dwv.gui"
         },
@@ -1731,7 +1710,7 @@
                     "type": "Object"
                 }
             ],
-            "class": "dwv.html",
+            "class": "dwv.html.Layer",
             "module": "gui",
             "namespace": "dwv.gui"
         },
@@ -1749,7 +1728,7 @@
                     "type": "Object"
                 }
             ],
-            "class": "dwv.html",
+            "class": "dwv.html.Layer",
             "module": "gui",
             "namespace": "dwv.gui"
         },
@@ -1767,7 +1746,7 @@
                     "type": "Object"
                 }
             ],
-            "class": "dwv.html",
+            "class": "dwv.html.Layer",
             "module": "gui",
             "namespace": "dwv.gui"
         },
@@ -1785,7 +1764,7 @@
                     "type": "Object"
                 }
             ],
-            "class": "dwv.html",
+            "class": "dwv.html.Layer",
             "module": "gui",
             "namespace": "dwv.gui"
         },
@@ -1803,7 +1782,7 @@
                     "type": "Object"
                 }
             ],
-            "class": "dwv.html",
+            "class": "dwv.html.Layer",
             "module": "gui",
             "namespace": "dwv.gui"
         },
@@ -1814,7 +1793,7 @@
             "itemtype": "method",
             "name": "appendToolboxHtml",
             "static": 1,
-            "class": "dwv.html",
+            "class": "dwv.html.Layer",
             "module": "gui",
             "namespace": "dwv.gui"
         },
@@ -1825,7 +1804,7 @@
             "itemtype": "method",
             "name": "appendWindowLevelHtml",
             "static": 1,
-            "class": "dwv.html",
+            "class": "dwv.html.Layer",
             "module": "gui",
             "namespace": "dwv.gui"
         },
@@ -1836,7 +1815,7 @@
             "itemtype": "method",
             "name": "clearWindowLevelHtml",
             "static": 1,
-            "class": "dwv.html",
+            "class": "dwv.html.Layer",
             "module": "gui",
             "namespace": "dwv.gui"
         },
@@ -1847,7 +1826,7 @@
             "itemtype": "method",
             "name": "appendDrawHtml",
             "static": 1,
-            "class": "dwv.html",
+            "class": "dwv.html.Layer",
             "module": "gui",
             "namespace": "dwv.gui"
         },
@@ -1858,7 +1837,7 @@
             "itemtype": "method",
             "name": "clearDrawHtml",
             "static": 1,
-            "class": "dwv.html",
+            "class": "dwv.html.Layer",
             "module": "gui",
             "namespace": "dwv.gui"
         },
@@ -1869,7 +1848,7 @@
             "itemtype": "method",
             "name": "appendLivewireHtml",
             "static": 1,
-            "class": "dwv.html",
+            "class": "dwv.html.Layer",
             "module": "gui",
             "namespace": "dwv.gui"
         },
@@ -1880,7 +1859,7 @@
             "itemtype": "method",
             "name": "clearDrawHtml",
             "static": 1,
-            "class": "dwv.html",
+            "class": "dwv.html.Layer",
             "module": "gui",
             "namespace": "dwv.gui"
         },
@@ -1891,7 +1870,7 @@
             "itemtype": "method",
             "name": "appendLivewireHtml",
             "static": 1,
-            "class": "dwv.html",
+            "class": "dwv.html.Layer",
             "module": "gui",
             "namespace": "dwv.gui"
         },
@@ -1902,7 +1881,7 @@
             "itemtype": "method",
             "name": "clearDrawHtml",
             "static": 1,
-            "class": "dwv.html",
+            "class": "dwv.html.Layer",
             "module": "gui",
             "namespace": "dwv.gui"
         },
@@ -1913,7 +1892,7 @@
             "itemtype": "method",
             "name": "appendThresholdHtml",
             "static": 1,
-            "class": "dwv.html",
+            "class": "dwv.html.Layer",
             "module": "gui",
             "namespace": "dwv.gui"
         },
@@ -1924,7 +1903,7 @@
             "itemtype": "method",
             "name": "clearDrawHtml",
             "static": 1,
-            "class": "dwv.html",
+            "class": "dwv.html.Layer",
             "module": "gui",
             "namespace": "dwv.gui"
         },
@@ -1935,7 +1914,7 @@
             "itemtype": "method",
             "name": "appendSharpenHtml",
             "static": 1,
-            "class": "dwv.html",
+            "class": "dwv.html.Layer",
             "module": "gui",
             "namespace": "dwv.gui"
         },
@@ -1946,7 +1925,7 @@
             "itemtype": "method",
             "name": "clearSharpenHtml",
             "static": 1,
-            "class": "dwv.html",
+            "class": "dwv.html.Layer",
             "module": "gui",
             "namespace": "dwv.gui"
         },
@@ -1957,7 +1936,7 @@
             "itemtype": "method",
             "name": "appendSharpenHtml",
             "static": 1,
-            "class": "dwv.html",
+            "class": "dwv.html.Layer",
             "module": "gui",
             "namespace": "dwv.gui"
         },
@@ -1968,7 +1947,7 @@
             "itemtype": "method",
             "name": "clearSharpenHtml",
             "static": 1,
-            "class": "dwv.html",
+            "class": "dwv.html.Layer",
             "module": "gui",
             "namespace": "dwv.gui"
         },
@@ -1979,7 +1958,7 @@
             "itemtype": "method",
             "name": "appendZoomHtml",
             "static": 1,
-            "class": "dwv.html",
+            "class": "dwv.html.Layer",
             "module": "gui",
             "namespace": "dwv.gui"
         },
@@ -1990,7 +1969,7 @@
             "itemtype": "method",
             "name": "clearZoomHtml",
             "static": 1,
-            "class": "dwv.html",
+            "class": "dwv.html.Layer",
             "module": "gui",
             "namespace": "dwv.gui"
         },
@@ -2001,7 +1980,7 @@
             "itemtype": "method",
             "name": "appendUndoHtml",
             "static": 1,
-            "class": "dwv.html",
+            "class": "dwv.html.Layer",
             "module": "gui",
             "namespace": "dwv.gui"
         },
@@ -2019,7 +1998,7 @@
                     "type": "String"
                 }
             ],
-            "class": "dwv.html",
+            "class": "dwv.html.Layer",
             "module": "gui",
             "namespace": "dwv.gui"
         },
@@ -2037,7 +2016,7 @@
                     "type": "Boolean"
                 }
             ],
-            "class": "dwv.html",
+            "class": "dwv.html.Layer",
             "module": "gui",
             "namespace": "dwv.gui"
         },
@@ -2048,7 +2027,7 @@
             "itemtype": "method",
             "name": "getSliderHtml",
             "static": 1,
-            "class": "dwv.html",
+            "class": "dwv.html.Layer",
             "module": "gui"
         },
         {
@@ -2065,7 +2044,7 @@
                     "type": "Object"
                 }
             ],
-            "class": "dwv.html",
+            "class": "dwv.html.Layer",
             "module": "gui"
         },
         {
@@ -2075,7 +2054,7 @@
             "itemtype": "method",
             "name": "getSliderHtml",
             "static": 1,
-            "class": "dwv.html",
+            "class": "dwv.html.Layer",
             "module": "gui"
         },
         {
@@ -2092,12 +2071,12 @@
                     "type": "Object"
                 }
             ],
-            "class": "dwv.html",
+            "class": "dwv.html.Layer",
             "module": "gui"
         },
         {
             "file": "src/html/html.js",
-            "line": 14,
+            "line": 8,
             "description": "Append a cell to a given row.",
             "itemtype": "method",
             "name": "appendCell",
@@ -2114,13 +2093,12 @@
                     "type": "String"
                 }
             ],
-            "class": "dwv.html",
-            "module": "html",
-            "namespace": "dwv"
+            "class": "dwv.html.Layer",
+            "module": "html"
         },
         {
             "file": "src/html/html.js",
-            "line": 27,
+            "line": 21,
             "description": "Append a header cell to a given row.",
             "itemtype": "method",
             "name": "appendHCell",
@@ -2137,13 +2115,12 @@
                     "type": "String"
                 }
             ],
-            "class": "dwv.html",
-            "module": "html",
-            "namespace": "dwv"
+            "class": "dwv.html.Layer",
+            "module": "html"
         },
         {
             "file": "src/html/html.js",
-            "line": 43,
+            "line": 37,
             "description": "Append a row to an array.",
             "itemtype": "method",
             "name": "appendRowForArray",
@@ -2170,13 +2147,12 @@
                     "description": ""
                 }
             ],
-            "class": "dwv.html",
-            "module": "html",
-            "namespace": "dwv"
+            "class": "dwv.html.Layer",
+            "module": "html"
         },
         {
             "file": "src/html/html.js",
-            "line": 76,
+            "line": 70,
             "description": "Append a row to an object.",
             "itemtype": "method",
             "name": "appendRowForObject",
@@ -2203,13 +2179,12 @@
                     "description": ""
                 }
             ],
-            "class": "dwv.html",
-            "module": "html",
-            "namespace": "dwv"
+            "class": "dwv.html.Layer",
+            "module": "html"
         },
         {
             "file": "src/html/html.js",
-            "line": 125,
+            "line": 119,
             "description": "Append a row to an object or an array.",
             "itemtype": "method",
             "name": "appendRow",
@@ -2236,13 +2211,12 @@
                     "description": ""
                 }
             ],
-            "class": "dwv.html",
-            "module": "html",
-            "namespace": "dwv"
+            "class": "dwv.html.Layer",
+            "module": "html"
         },
         {
             "file": "src/html/html.js",
-            "line": 150,
+            "line": 144,
             "description": "Converts the input to an HTML table.",
             "itemtype": "method",
             "name": "toTable",
@@ -2253,13 +2227,12 @@
                 "type": "Object"
             },
             "warning": "Null is interpreted differently in browsers, firefox will not display it.",
-            "class": "dwv.html",
-            "module": "html",
-            "namespace": "dwv"
+            "class": "dwv.html.Layer",
+            "module": "html"
         },
         {
             "file": "src/html/html.js",
-            "line": 165,
+            "line": 159,
             "description": "Get an HTML search form.",
             "itemtype": "method",
             "name": "getHtmlSearchForm",
@@ -2275,13 +2248,12 @@
                 "description": "The HTML search form.",
                 "type": "Object"
             },
-            "class": "dwv.html",
-            "module": "html",
-            "namespace": "dwv"
+            "class": "dwv.html.Layer",
+            "module": "html"
         },
         {
             "file": "src/html/html.js",
-            "line": 185,
+            "line": 179,
             "description": "Filter a table with a given parameter: sets the display css of rows to\ntrue or false if it contains the term.",
             "itemtype": "method",
             "name": "filterTable",
@@ -2298,13 +2270,12 @@
                     "type": "Object"
                 }
             ],
-            "class": "dwv.html",
-            "module": "html",
-            "namespace": "dwv"
+            "class": "dwv.html.Layer",
+            "module": "html"
         },
         {
             "file": "src/html/html.js",
-            "line": 218,
+            "line": 212,
             "description": "Transform back each\n'preText <span class=\"highlighted\">term</span> postText'\ninto its original 'preText term postText'.",
             "itemtype": "method",
             "name": "dehighlight",
@@ -2316,13 +2287,12 @@
                     "type": "Object"
                 }
             ],
-            "class": "dwv.html",
-            "module": "html",
-            "namespace": "dwv"
+            "class": "dwv.html.Layer",
+            "module": "html"
         },
         {
             "file": "src/html/html.js",
-            "line": 246,
+            "line": 240,
             "description": "Create a\n'preText <span class=\"highlighted\">term</span> postText'\naround each search term.",
             "itemtype": "method",
             "name": "highlight",
@@ -2339,13 +2309,12 @@
                     "type": "Object"
                 }
             ],
-            "class": "dwv.html",
-            "module": "html",
-            "namespace": "dwv"
+            "class": "dwv.html.Layer",
+            "module": "html"
         },
         {
             "file": "src/html/html.js",
-            "line": 290,
+            "line": 284,
             "description": "Highlight a HTML node.",
             "itemtype": "method",
             "name": "createHighlightNode",
@@ -2361,13 +2330,12 @@
                 "description": "The created HTML node.",
                 "type": "Object"
             },
-            "class": "dwv.html",
-            "module": "html",
-            "namespace": "dwv"
+            "class": "dwv.html.Layer",
+            "module": "html"
         },
         {
             "file": "src/html/html.js",
-            "line": 305,
+            "line": 299,
             "description": "Remove all children of a HTML node.",
             "itemtype": "method",
             "name": "cleanNode",
@@ -2379,13 +2347,12 @@
                     "type": "Object"
                 }
             ],
-            "class": "dwv.html",
-            "module": "html",
-            "namespace": "dwv"
+            "class": "dwv.html.Layer",
+            "module": "html"
         },
         {
             "file": "src/html/html.js",
-            "line": 318,
+            "line": 312,
             "description": "Remove a HTML node and all its children.",
             "itemtype": "method",
             "name": "removeNode",
@@ -2396,13 +2363,12 @@
                     "type": "Number"
                 }
             ],
-            "class": "dwv.html",
-            "module": "html",
-            "namespace": "dwv"
+            "class": "dwv.html.Layer",
+            "module": "html"
         },
         {
             "file": "src/html/html.js",
-            "line": 335,
+            "line": 329,
             "description": "Create a HTML select from an input array of options.\nThe values of the options are the name of the option made lower case.\nIt is left to the user to set the 'onchange' method of the select.",
             "itemtype": "method",
             "name": "createHtmlSelect",
@@ -2423,13 +2389,12 @@
                 "description": "The created HTML select.",
                 "type": "Object"
             },
-            "class": "dwv.html",
-            "module": "html",
-            "namespace": "dwv"
+            "class": "dwv.html.Layer",
+            "module": "html"
         },
         {
             "file": "src/html/html.js",
-            "line": 379,
+            "line": 373,
             "description": "Get a list of parameters from an input URI.",
             "itemtype": "method",
             "name": "getUriParam",
@@ -2445,13 +2410,12 @@
                 "description": "The array of parameters.",
                 "type": "Array"
             },
-            "class": "dwv.html",
-            "module": "html",
-            "namespace": "dwv"
+            "class": "dwv.html.Layer",
+            "module": "html"
         },
         {
             "file": "src/html/html.js",
-            "line": 459,
+            "line": 453,
             "description": "Toggle the display of an element.",
             "itemtype": "method",
             "name": "toggleDisplay",
@@ -2463,20 +2427,18 @@
                     "type": "Number"
                 }
             ],
-            "class": "dwv.html",
-            "module": "html",
-            "namespace": "dwv"
+            "class": "dwv.html.Layer",
+            "module": "html"
         },
         {
             "file": "src/html/html.js",
-            "line": 475,
+            "line": 469,
             "description": "Browser checks to see if it can run dwv. Throws an error if not.\nTODO Maybe use http://modernizr.com/.",
             "itemtype": "method",
             "name": "checkBrowser",
             "static": 1,
-            "class": "dwv.html",
-            "module": "html",
-            "namespace": "dwv"
+            "class": "dwv.html.Layer",
+            "module": "html"
         },
         {
             "file": "src/html/layer.js",
@@ -5706,11 +5668,11 @@
         },
         {
             "message": "unknown tag: input",
-            "line": " src/html/html.js:150"
+            "line": " src/html/html.js:144"
         },
         {
             "message": "unknown tag: warning",
-            "line": " src/html/html.js:150"
+            "line": " src/html/html.js:144"
         },
         {
             "message": "unknown tag: input",
