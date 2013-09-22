@@ -8,9 +8,7 @@
     "files": {
         "src/dicom/dicomParser.js": {
             "name": "src/dicom/dicomParser.js",
-            "modules": {
-                "dicom": 1
-            },
+            "modules": {},
             "classes": {
                 "dwv.dicom.DataReader": 1,
                 "dwv.dicom.DicomParser": 1
@@ -54,14 +52,18 @@
         },
         "src/html/html.js": {
             "name": "src/html/html.js",
-            "modules": {},
+            "modules": {
+                "html": 1
+            },
             "classes": {},
             "fors": {},
             "namespaces": {}
         },
         "src/html/layer.js": {
             "name": "src/html/layer.js",
-            "modules": {},
+            "modules": {
+                "dicom": 1
+            },
             "classes": {
                 "dwv.html.Layer": 1
             },
@@ -321,7 +323,18 @@
             "tag": "module",
             "file": "src/image/view.js",
             "line": 6,
-            "description": "DICOM module."
+            "description": "HTML module."
+        },
+        "html": {
+            "name": "html",
+            "submodules": {},
+            "classes": {},
+            "fors": {},
+            "namespaces": {},
+            "tag": "module",
+            "file": "src/html/html.js",
+            "line": 1,
+            "description": "HTML module."
         },
         "math": {
             "name": "math",
@@ -1888,7 +1901,7 @@
                 }
             ],
             "class": "dwv.html.Layer",
-            "module": "dicom"
+            "module": "html"
         },
         {
             "file": "src/html/html.js",
@@ -1906,7 +1919,7 @@
                 }
             ],
             "class": "dwv.html.Layer",
-            "module": "dicom"
+            "module": "html"
         },
         {
             "file": "src/html/html.js",
@@ -1914,7 +1927,7 @@
             "itemtype": "method",
             "name": "",
             "class": "dwv.html.Layer",
-            "module": "dicom"
+            "module": "html"
         },
         {
             "file": "src/html/html.js",
@@ -1922,7 +1935,7 @@
             "itemtype": "method",
             "name": "",
             "class": "dwv.html.Layer",
-            "module": "dicom"
+            "module": "html"
         },
         {
             "file": "src/html/html.js",
@@ -1930,7 +1943,7 @@
             "itemtype": "method",
             "name": "",
             "class": "dwv.html.Layer",
-            "module": "dicom"
+            "module": "html"
         },
         {
             "file": "src/html/html.js",
@@ -1940,7 +1953,7 @@
             "input": "input Allowed types are: array, array of object, object.",
             "warning": "Null is interpreted differently in browsers, firefox will not display it.",
             "class": "dwv.html.Layer",
-            "module": "dicom"
+            "module": "html"
         },
         {
             "file": "src/html/html.js",
@@ -1948,7 +1961,7 @@
             "itemtype": "method",
             "name": "",
             "class": "dwv.html.Layer",
-            "module": "dicom"
+            "module": "html"
         },
         {
             "file": "src/html/html.js",
@@ -1966,7 +1979,7 @@
                 }
             ],
             "class": "dwv.html.Layer",
-            "module": "dicom"
+            "module": "html"
         },
         {
             "file": "src/html/html.js",
@@ -1980,7 +1993,7 @@
                 }
             ],
             "class": "dwv.html.Layer",
-            "module": "dicom"
+            "module": "html"
         },
         {
             "file": "src/html/html.js",
@@ -1998,7 +2011,7 @@
                 }
             ],
             "class": "dwv.html.Layer",
-            "module": "dicom"
+            "module": "html"
         },
         {
             "file": "src/html/html.js",
@@ -2006,7 +2019,7 @@
             "itemtype": "method",
             "name": "",
             "class": "dwv.html.Layer",
-            "module": "dicom"
+            "module": "html"
         },
         {
             "file": "src/html/html.js",
@@ -2024,7 +2037,7 @@
                 }
             ],
             "class": "dwv.html.Layer",
-            "module": "dicom"
+            "module": "html"
         },
         {
             "file": "src/html/html.js",
@@ -2042,7 +2055,7 @@
                 }
             ],
             "class": "dwv.html.Layer",
-            "module": "dicom"
+            "module": "html"
         },
         {
             "file": "src/html/html.js",
@@ -2063,14 +2076,14 @@
                 "description": "The created HTML select."
             },
             "class": "dwv.html.Layer",
-            "module": "dicom"
+            "module": "html"
         },
         {
             "file": "src/html/html.js",
             "line": 410,
             "description": "Browser checks to see if it can run dwv...\nTODO Maybe use http://modernizr.com/.",
             "class": "dwv.html.Layer",
-            "module": "dicom"
+            "module": "html"
         },
         {
             "file": "src/html/layer.js",

@@ -3624,7 +3624,7 @@ dwv.gui.enableInUndoHtml = function(enable)
 
 ;/** 
  * HTML module.
- * @module dicom
+ * @module html
  */
 var dwv = dwv || {};
 dwv.html = dwv.html || {};

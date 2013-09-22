@@ -41,13 +41,19 @@ YUI.add("yuidoc-meta", function(Y) {
     ],
     "modules": [
         "dicom",
+        "html",
         "math"
     ],
     "allModules": [
         {
             "displayName": "dicom",
             "name": "dicom",
-            "description": "DICOM module."
+            "description": "HTML module."
+        },
+        {
+            "displayName": "html",
+            "name": "html",
+            "description": "HTML module."
         },
         {
             "displayName": "math",
