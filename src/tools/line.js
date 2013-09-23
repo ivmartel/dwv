@@ -1,26 +1,68 @@
-//! @namespace Main DWV namespace.
+/** 
+ * Tool module.
+ * @module tool
+ */
 var dwv = dwv || {};
-//! @namespace Tool classes.
 dwv.tool = dwv.tool || {};
 
 /**
- * @class Draw line command.
- * @param points The points from which to extract the line.
- * @param app The application to draw the line on.
- * @param style The drawing style.
+ * Draw line command.
+ * @class DrawLineCommand
+ * @namespace dwv.tool
+ * @constructor
+ * @param {Array} points The points from which to extract the line.
+ * @param {Object} app The application to draw the line on.
+ * @param {Style} style The drawing style.
  */
 dwv.tool.DrawLineCommand = function(points, app, style)
 {
+    /**
+     * Line object.
+     * @property line
+     * @private
+     * @type Line
+     */
     var line = new dwv.math.Line(points[0], points[points.length-1]);
+    
+    /**
+     * Line color.
+     * @property lineColor
+     * @private
+     * @type String
+     */
     var lineColor = style.getLineColor();
+    /**
+     * HTML context.
+     * @property context
+     * @private
+     * @type Object
+     */
     var context = app.getTempLayer().getContext();
     
-    // command name
+    /**
+     * Command name.
+     * @property name
+     * @private
+     * @type String
+     */
     var name = "DrawLineCommand";
-    this.setName = function(str) { name = str; };
+    /**
+     * Get the command name.
+     * @method getName
+     * @return {String} The command name.
+     */
     this.getName = function() { return name; };
+    /**
+     * Set the command name.
+     * @method setName
+     * @param {String} str The command name.
+     */
+    this.setName = function(str) { name = str; };
 
-    // main method
+    /**
+     * Execute the command.
+     * @method execute
+     */
     this.execute = function()
     {
         // style
@@ -38,12 +80,11 @@ dwv.tool.DrawLineCommand = function(points, app, style)
             app.getImage().getSpacing().getRowSpacing() );
         context.font = style.getFontStr();
         context.fillText( Math.round(length) + "mm",
-                line.getEnd().getX() + style.getFontSize(),
-                line.getEnd().getY() + style.getFontSize());
+            line.getEnd().getX() + style.getFontSize(),
+            line.getEnd().getY() + style.getFontSize());
     }; 
 }; // DrawLineCommand class
 
-//Shape list
+// Add the shape command to the command list
 dwv.tool.shapes = dwv.tool.shapes || {};
-//Add the shape command to the list
 dwv.tool.shapes.line = dwv.tool.DrawLineCommand;

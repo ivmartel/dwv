@@ -77,7 +77,7 @@ dwv.image.lut.Rescale = function(slope_,intercept_)
  * @namespace dwv.image.lut
  * @constructor
  * @param {Number} rescaleLut_ The associated rescale LUT.
- * @param {Number} isSigned_ Flag to know if the data is signed.
+ * @param {Boolean} isSigned_ Flag to know if the data is signed.
  */
 dwv.image.lut.Window = function(rescaleLut_, isSigned_)
 {

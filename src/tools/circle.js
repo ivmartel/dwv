@@ -1,17 +1,22 @@
-//! @namespace Main DWV namespace.
+/** 
+ * Tool module.
+ * @module tool
+ */
 var dwv = dwv || {};
-//! @namespace Tool classes.
 dwv.tool = dwv.tool || {};
 
 /**
- * @class Draw circle command.
- * @param points The points from which to extract the circle.
- * @param app The application to draw the circle on.
- * @param style The drawing style.
+ * Draw circle command.
+ * @class DrawCircleCommand
+ * @namespace dwv.tool
+ * @constructor
+ * @param {Array} points The points from which to extract the circle.
+ * @param {Object} app The application to draw the circle on.
+ * @param {Style} style The drawing style.
  */
 dwv.tool.DrawCircleCommand = function(points, app, style)
 {
-    // radius
+    // calculate radius
     var a = Math.abs(points[0].getX() - points[points.length-1].getX());
     var b = Math.abs(points[0].getY() - points[points.length-1].getY());
     var radius = Math.round( Math.sqrt( a * a + b * b ) );
@@ -21,17 +26,54 @@ dwv.tool.DrawCircleCommand = function(points, app, style)
         // silent fail...
         return;
     }
-    // create circle
+    
+    /**
+     * Circle object.
+     * @property circle
+     * @private
+     * @type Circle
+     */
     var circle = new dwv.math.Circle(points[0], radius);
+    
+    /**
+     * Line color.
+     * @property lineColor
+     * @private
+     * @type String
+     */
     var lineColor = style.getLineColor();
+    /**
+     * HTML context.
+     * @property context
+     * @private
+     * @type Object
+     */
     var context = app.getTempLayer().getContext();
     
-    // command name
+    /**
+     * Command name.
+     * @property name
+     * @private
+     * @type String
+     */
     var name = "DrawCircleCommand";
-    this.setName = function(str) { name = str; };
+    /**
+     * Get the command name.
+     * @method getName
+     * @return {String} The command name.
+     */
     this.getName = function() { return name; };
+    /**
+     * Set the command name.
+     * @method setName
+     * @param {String} str The command name.
+     */
+    this.setName = function(str) { name = str; };
 
-    // main method
+    /**
+     * Execute the command.
+     * @method execute
+     */
     this.execute = function()
     {
         // style
@@ -40,10 +82,10 @@ dwv.tool.DrawCircleCommand = function(points, app, style)
         // path
         context.beginPath();
         context.arc(
-                circle.getCenter().getX(), 
-                circle.getCenter().getY(), 
-                circle.getRadius(),
-                0, 2*Math.PI);
+            circle.getCenter().getX(), 
+            circle.getCenter().getY(), 
+            circle.getRadius(),
+            0, 2*Math.PI);
         context.stroke();
         // surface
         var surf = circle.getWorldSurface( 
@@ -51,12 +93,11 @@ dwv.tool.DrawCircleCommand = function(points, app, style)
             app.getImage().getSpacing().getRowSpacing() );
         context.font = style.getFontStr();
         context.fillText( Math.round(surf) + "mm2",
-                circle.getCenter().getX() + style.getFontSize(),
-                circle.getCenter().getY() + style.getFontSize());
+            circle.getCenter().getX() + style.getFontSize(),
+            circle.getCenter().getY() + style.getFontSize());
     };
 }; // DrawCircleCommand class
 
-//Shape list
+// Add the shape command to the command list
 dwv.tool.shapes = dwv.tool.shapes || {};
-//Add the shape command to the list
 dwv.tool.shapes.circle = dwv.tool.DrawCircleCommand;

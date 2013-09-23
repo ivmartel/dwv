@@ -93,7 +93,7 @@ dwv.math.FastPoint2D.prototype.toString = function() {
  * @namespace dwv.math
  * @constructor
  * @param {Object} centre A Point2D representing the centre of the circle.
- * @param {Object} radius The radius of the circle.
+ * @param {Number} radius The radius of the circle.
  */
 dwv.math.Circle = function(centre, radius)
 {

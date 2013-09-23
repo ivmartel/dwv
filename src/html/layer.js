@@ -298,7 +298,7 @@ dwv.html.Layer = function(name)
     /**
      * Set the line color for the layer.
      * @method setLineColor
-     * @input {Layer} color The line color.
+     * @input {String} color The line color.
      */
     this.setLineColor = function(color)
     {

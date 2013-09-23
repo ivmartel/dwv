@@ -1,10 +1,20 @@
-//! @namespace Main DWV namespace.
+/** 
+ * Tool module.
+ * @module tool
+ */
 var dwv = dwv || {};
-//! @namespace Tool classes.
+/**
+ * Namespace for tool functions.
+ * @class tool
+ * @namespace dwv
+ * @static
+ */
 dwv.tool = dwv.tool || {};
 
 /**
- * @function
+ * Reset the application zoom.
+ * @method zoomReset
+ * @static
  */
 dwv.tool.zoomReset = function(event)
 {
@@ -15,14 +25,33 @@ dwv.tool.zoomReset = function(event)
 };
 
 /**
- * @class Zoom class.
+ * Zoom class.
+ * @class Zoom
+ * @namespace dwv.tool
+ * @constructor
+ * @param {Object} app The associated application.
  */
 dwv.tool.Zoom = function(app)
 {
+    /**
+     * Closure to self: to be used by event handlers.
+     * @property self
+     * @private
+     * @type WindowLevel
+     */
     var self = this;
+    /**
+     * Interaction start flag.
+     * @property started
+     * @type Boolean
+     */
     this.started = false;
 
-    // This is called when you start holding down the mouse button.
+    /**
+     * Handle mouse down event.
+     * @method mousedown
+     * @param {Object} event The mouse down event.
+     */
     this.mousedown = function(ev){
         self.started = true;
         // first position
@@ -30,6 +59,11 @@ dwv.tool.Zoom = function(app)
         self.y0 = ev._y;
      };
 
+     /**
+      * Handle two touch down event.
+      * @method twotouchdown
+      * @param {Object} event The touch down event.
+      */
      this.twotouchdown = function(ev){
          self.started = true;
          // first line
@@ -39,7 +73,11 @@ dwv.tool.Zoom = function(app)
          self.midPoint = self.line0.getMidpoint();         
      };
 
-     // This function is called every time you move the mouse.
+     /**
+      * Handle mouse move event.
+      * @method mousemove
+      * @param {Object} event The mouse move event.
+      */
      this.mousemove = function(ev){
         if (!self.started)
         {
@@ -58,6 +96,11 @@ dwv.tool.Zoom = function(app)
         self.y0 = ev._y;
     };
 
+    /**
+     * Handle two touch move event.
+     * @method twotouchmove
+     * @param {Object} event The touch move event.
+     */
     this.twotouchmove = function(ev){
        if (!self.started)
        {
@@ -73,7 +116,11 @@ dwv.tool.Zoom = function(app)
            zoomLayers(zoom, self.midPoint.getX(), self.midPoint.getY());
     };
     
-    // This is called when you release the mouse button.
+    /**
+     * Handle mouse up event.
+     * @method mouseup
+     * @param {Object} event The mouse up event.
+     */
     this.mouseup = function(ev){
         if (self.started)
         {
@@ -82,10 +129,20 @@ dwv.tool.Zoom = function(app)
         }
     };
     
+    /**
+     * Handle mouse out event.
+     * @method mouseout
+     * @param {Object} event The mouse out event.
+     */
     this.mouseout = function(ev){
         self.mouseup(ev);
     };
 
+    /**
+     * Handle touch start event.
+     * @method touchstart
+     * @param {Object} event The touch start event.
+     */
     this.touchstart = function(ev){
         if( event.targetTouches.length === 1 ){
             self.mousedown(ev);
@@ -95,6 +152,11 @@ dwv.tool.Zoom = function(app)
         }
     };
 
+    /**
+     * Handle touch move event.
+     * @method touchmove
+     * @param {Object} event The touch move event.
+     */
     this.touchmove = function(ev){
         if( event.targetTouches.length === 1 ){
             self.mousemove(ev);
@@ -104,25 +166,51 @@ dwv.tool.Zoom = function(app)
         }
     };
 
+    /**
+     * Handle touch end event.
+     * @method touchend
+     * @param {Object} event The touch end event.
+     */
     this.touchend = function(ev){
         self.mouseup(ev);
     };
 
-    // This is called when you use the mouse wheel on Firefox.
+    /**
+     * Handle mouse scroll event (fired by Firefox).
+     * @method DOMMouseScroll
+     * @param {Object} event The mouse scroll event.
+     */
     this.DOMMouseScroll = function(ev){
         // ev.detail on firefox is 3
         var step = ev.detail/30;
         zoomLayers(step, ev._x, ev._y);
     };
 
-    // This is called when you use the mouse wheel.
+    /**
+     * Handle mouse wheel event.
+     * @method mousewheel
+     * @param {Object} event The mouse wheel event.
+     */
     this.mousewheel = function(ev){
         // ev.wheelDelta on chrome is 120
         var step = ev.wheelDelta/1200;
         zoomLayers(step, ev._x, ev._y);
     };
     
-    // Enable method.
+    /**
+     * Handle key down event.
+     * @method keydown
+     * @param {Object} event The key down event.
+     */
+    this.keydown = function(event){
+        app.handleKeyDown(event);
+    };
+
+    /**
+     * Enable the tool.
+     * @method enable
+     * @param {Boolean} bool The flag to enable or not.
+     */
     this.enable = function(bool){
         if( bool ) { 
             dwv.gui.appendZoomHtml();
@@ -132,13 +220,13 @@ dwv.tool.Zoom = function(app)
         }
     };
 
-    // Keyboard shortcut.
-    this.keydown = function(event){
-        app.handleKeyDown(event);
-    };
-
-    // Really do the zoom
-    // A good step is of 0.1.
+    /**
+     * Apply the zoom to the layers.
+     * @method zoomLayers
+     * @param {Number} step The zoom step increment. A good step is of 0.1.
+     * @param {Number} cx The zoom center X coordinate.
+     * @param {Number} cy The zoom center Y coordinate.
+     */ 
     function zoomLayers(step, cx, cy)
     {
         app.setLayersZoom(step,step,cx,cy);
@@ -146,7 +234,6 @@ dwv.tool.Zoom = function(app)
 
 }; // Zoom class
 
-//Tool list
+// Add the tool to the tool list
 dwv.tool.tools = dwv.tool.tools || {};
-//Add the tool to the list
 dwv.tool.tools.zoom = dwv.tool.Zoom;

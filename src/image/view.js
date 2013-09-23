@@ -40,21 +40,21 @@ dwv.image.View = function(image, isSigned)
      * Window presets.
      * @property windowPresets
      * @private
-     * @type {Object}
+     * @type Object
      */
     var windowPresets = null;
     /**
      * Color map
      * @property colorMap
      * @private
-     * @type {Object}
+     * @type Object
      */
     var colorMap = dwv.image.lut.plain;
     /**
      * Current position
      * @property currentPosition
      * @private
-     * @type {Object}
+     * @type Object
      */
     var currentPosition = {"i":0,"j":0,"k":0};
     

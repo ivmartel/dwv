@@ -162,21 +162,21 @@ dwv.image.Image = function(size, spacing, buffer, slicePositions)
      * Photometric interpretation (MONOCHROME, RGB...).
      * @property photometricInterpretation
      * @private
-     * @type {String}
+     * @type String
      */
     var photometricInterpretation = "MONOCHROME2";
     /**
      * Planar configuration for RGB data (0:RGBRGBRGBRGB... or 1:RRR...GGG...BBB...).
      * @property planarConfiguration
      * @private
-     * @type {Number}
+     * @type Number
      */
     var planarConfiguration = 0;
     /**
      * Meta information.
      * @property meta
      * @private
-     * @type {Object}
+     * @type Object
      */
     var meta = {};
     
@@ -184,7 +184,7 @@ dwv.image.Image = function(size, spacing, buffer, slicePositions)
      * Original buffer.
      * @property originalBuffer
      * @private
-     * @type {Array}
+     * @type Array
      */
     var originalBuffer = new Int16Array(buffer);
     
@@ -195,14 +195,14 @@ dwv.image.Image = function(size, spacing, buffer, slicePositions)
      * Data range.
      * @property dataRange
      * @private
-     * @type {Object}
+     * @type Object
      */
     var dataRange = null;
     /**
      * Histogram.
      * @property histogram
      * @private
-     * @type {Object}
+     * @type Array
      */
     var histogram = null;
      
@@ -414,7 +414,7 @@ dwv.image.Image = function(size, spacing, buffer, slicePositions)
     /**
      * Get the histogram.
      * @method getHistogram
-     * @return {Object} The histogram.
+     * @return {Array} The histogram.
      */ 
     this.getHistogram = function() { 
         if( !histogram ) histogram = this.calculateHistogram();

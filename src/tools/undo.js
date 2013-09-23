@@ -1,22 +1,38 @@
-//! @namespace Main DWV namespace.
+/** 
+ * Tool module.
+ * @module tool
+ */
 var dwv = dwv || {};
-//! @namespace Tool classes.
 dwv.tool = dwv.tool || {};
 
 /**
- * @class UndoStack class.
- * @param app
+ * UndoStack class.
+ * @class UndoStack
+ * @namespace dwv.tool
+ * @constructor
+ * @param {Object} app The associated application.
  */
 dwv.tool.UndoStack = function(app)
 { 
-    // Array of commands.
+    /**
+     * Array of commands.
+     * @property stack
+     * @private
+     * @type Array
+     */
     var stack = [];
-    // Current command index.
+    /**
+     * Current command index.
+     * @property curCmdIndex
+     * @private
+     * @type Number
+     */
     var curCmdIndex = 0;
 
     /**
      * Add a command to the stack.
-     * @param cmd The command to add.
+     * @method add
+     * @param {Object} cmd The command to add.
      */
     this.add = function(cmd)
     { 
@@ -32,6 +48,7 @@ dwv.tool.UndoStack = function(app)
 
     /**
      * Undo the last command. 
+     * @method undo
      */
     this.undo = function()
     { 
@@ -66,6 +83,7 @@ dwv.tool.UndoStack = function(app)
 
     /**
      * Redo the last command.
+     * @method redo
      */
     this.redo = function()
     { 

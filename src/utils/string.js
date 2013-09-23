@@ -47,7 +47,7 @@ dwv.utils.cleanString = function(string)
  * @method splitQueryString
  * @static
  * @param {String} inputStr The string to split.
- * @return {String} The splitted string.
+ * @return {Object} The split string.
  */
 dwv.utils.splitQueryString = function(inputStr)
 {

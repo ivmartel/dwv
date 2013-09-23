@@ -1,14 +1,22 @@
-//! @namespace Main DWV namespace.
+/** 
+ * Tool module.
+ * @module tool
+ */
 var dwv = dwv || {};
-//! @namespace Tool classes.
+/**
+ * Namespace for tool functions.
+ * @class tool
+ * @namespace dwv
+ * @static
+ */
 dwv.tool = dwv.tool || {};
 
 /**
-* @fileOverview WindowLevel tool.
-*/
-
-/**
- * @function Update the views' current position.
+ * Update the views' current position.
+ * @method updatePostionValue
+ * @static
+ * @param {Number} i The column index.
+ * @param {Number} j The row index.
  */
 dwv.tool.updatePostionValue = function(i,j)
 {
@@ -16,7 +24,11 @@ dwv.tool.updatePostionValue = function(i,j)
 };
 
 /**
- * @function Update the views' windowing data
+ * Update the views' windowing data.
+ * @method updateWindowingData
+ * @static
+ * @param {Number} wc The window center.
+ * @param {Number} ww The window width.
  */
 dwv.tool.updateWindowingData = function(wc,ww)
 {
@@ -24,7 +36,10 @@ dwv.tool.updateWindowingData = function(wc,ww)
 };
 
 /**
- * @function Update the views' colour map.
+ * Update the views' colour map.
+ * @method updateColourMap
+ * @static
+ * @param {Object} colourMap The colour map.
  */
 dwv.tool.updateColourMap = function(colourMap)
 {
@@ -51,18 +66,36 @@ dwv.tool.defaultpresets.CT = {
 };
 
 /**
- * @class WindowLevel tool: handle window/level related events.
+ * WindowLevel tool: handle window/level related events.
+ * @class WindowLevel
+ * @namespace dwv.tool
+ * @constructor
+ * @param {Object} app The associated application.
  */
 dwv.tool.WindowLevel = function(app)
 {
-    // Closure to self: to be used by event handlers.
+    /**
+     * Closure to self: to be used by event handlers.
+     * @property self
+     * @private
+     * @type WindowLevel
+     */
     var self = this;
-    // Interaction start flag.
+    /**
+     * Interaction start flag.
+     * @property started
+     * @type Boolean
+     */
     this.started = false;
+
     // Initialise presets.
     this.updatePresets();
     
-    // Called on mouse down event.
+    /**
+     * Handle mouse down event.
+     * @method mousedown
+     * @param {Object} event The mouse down event.
+     */
     this.mousedown = function(event){
         // set start flag
         self.started = true;
@@ -73,7 +106,11 @@ dwv.tool.WindowLevel = function(app)
         dwv.tool.updatePostionValue(event._x, event._y);
     };
     
-    // Called on touch start event with two fingers.
+    /**
+     * Handle two touch down event.
+     * @method twotouchdown
+     * @param {Object} event The touch down event.
+     */
     this.twotouchdown = function(event){
         // set start flag
         self.started = true;
@@ -84,7 +121,11 @@ dwv.tool.WindowLevel = function(app)
         self.y1 = event._y1;
     };
     
-    // Called on mouse move event.
+    /**
+     * Handle mouse move event.
+     * @method mousemove
+     * @param {Object} event The mouse move event.
+     */
     this.mousemove = function(event){
         // check start flag
         if( !self.started ) return;
@@ -101,7 +142,11 @@ dwv.tool.WindowLevel = function(app)
         self.y0 = event._y;
     };
     
-    // Called on touch move event with two fingers.
+    /**
+     * Handle two touch move event.
+     * @method twotouchmove
+     * @param {Object} event The touch move event.
+     */
     this.twotouchmove = function(event){
         // check start flag
         if( !self.started ) return;
@@ -116,39 +161,63 @@ dwv.tool.WindowLevel = function(app)
         self.y0 = event._y;
     };
     
-    // Called on mouse up event.
+    /**
+     * Handle mouse up event.
+     * @method mouseup
+     * @param {Object} event The mouse up event.
+     */
     this.mouseup = function(event){
         // set start flag
         if( self.started ) self.started = false;
     };
     
-    // Called on mouse out event.
+    /**
+     * Handle mouse out event.
+     * @method mouseout
+     * @param {Object} event The mouse out event.
+     */
     this.mouseout = function(event){
         // treat as mouse up
         self.mouseup(event);
     };
     
-    // Called on touch start event.
+    /**
+     * Handle touch start event.
+     * @method touchstart
+     * @param {Object} event The touch start event.
+     */
     this.touchstart = function(event){
         // dispatch to one or two touch handler
         if( event.targetTouches.length === 1 ) self.mousedown(event);
         else if( event.targetTouches.length === 2 ) self.twotouchdown(event);
     };
     
-    // Called on touch move event.
+    /**
+     * Handle touch move event.
+     * @method touchmove
+     * @param {Object} event The touch move event.
+     */
     this.touchmove = function(event){
         // dispatch to one or two touch handler
         if( event.targetTouches.length === 1 ) self.mousemove(event);
         else if( event.targetTouches.length === 2 ) self.twotouchmove(event);
     };
     
-    // Called on touch end event.
+    /**
+     * Handle touch end event.
+     * @method touchend
+     * @param {Object} event The touch end event.
+     */
     this.touchend = function(event){
         // treat as mouse up
         self.mouseup(event);
     };
     
-    // Called on double click event.
+    /**
+     * Handle double click event.
+     * @method dblclick
+     * @param {Object} event The double click event.
+     */
     this.dblclick = function(event){
         // update GUI
         dwv.tool.updateWindowingData(
@@ -156,27 +225,43 @@ dwv.tool.WindowLevel = function(app)
             parseInt(app.getView().getWindowLut().getWidth(), 10) );    
     };
     
-    // Called on mouse (wheel) scroll event on Firefox.
+    /**
+     * Handle mouse scroll event (fired by Firefox).
+     * @method DOMMouseScroll
+     * @param {Object} event The mouse scroll event.
+     */
     this.DOMMouseScroll = function(event){
         // update GUI
         if( event.detail > 0 ) app.getView().incrementSliceNb();
         else app.getView().decrementSliceNb();
     };
     
-    // Called on mouse wheel event.
+    /**
+     * Handle mouse wheel event.
+     * @method mousewheel
+     * @param {Object} event The mouse wheel event.
+     */
     this.mousewheel = function(event){
         // update GUI
         if( event.wheelDelta > 0 ) app.getView().incrementSliceNb();
         else app.getView().decrementSliceNb();
     };
     
-    // Called on key down event.
+    /**
+     * Handle key down event.
+     * @method keydown
+     * @param {Object} event The key down event.
+     */
     this.keydown = function(event){
         // let the app handle it
         app.handleKeyDown(event);
     };
     
-    // Enable the tool: prepare HTML for it.
+    /**
+     * Enable the tool.
+     * @method enable
+     * @param {Boolean} bool The flag to enable or not.
+     */
     this.enable = function(bool){
         // update GUI
         if( bool ) dwv.gui.appendWindowLevelHtml();
@@ -186,7 +271,8 @@ dwv.tool.WindowLevel = function(app)
 }; // WindowLevel class
 
 /**
- * @function Update the window/level presets.
+ * Update the window/level presets.
+ * @method updatePresets
  */
 dwv.tool.WindowLevel.prototype.updatePresets = function()
 {    
@@ -215,7 +301,9 @@ dwv.tool.WindowLevel.prototype.updatePresets = function()
 };
 
 /**
- * @function Set the window/level presets.
+ * Set the active window/level preset.
+ * @method setPreset
+ * @param {String} name The name of the preset to set.
  */
 dwv.tool.WindowLevel.prototype.setPreset = function(name)
 {
@@ -229,7 +317,9 @@ dwv.tool.WindowLevel.prototype.setPreset = function(name)
 };
 
 /**
- * @function Set the colour map.
+ * Set the active colour map.
+ * @function setColourMap
+ * @param {String} name The name of the colour map to set.
  */
 dwv.tool.WindowLevel.prototype.setColourMap = function(name)
 {
@@ -240,7 +330,6 @@ dwv.tool.WindowLevel.prototype.setColourMap = function(name)
     dwv.tool.updateColourMap( dwv.tool.colourMaps[name] );
 };
 
-//Tool list
+// Add the tool to the tool list
 dwv.tool.tools = dwv.tool.tools || {};
-//Add the tool to the list
 dwv.tool.tools.windowlevel = dwv.tool.WindowLevel;

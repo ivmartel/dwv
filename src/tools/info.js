@@ -1,10 +1,20 @@
-//! @namespace Main DWV namespace.
+/** 
+ * Info module.
+ * @module info
+ */
 var dwv = dwv || {};
-// @namespace Info classes.
+/**
+ * Namespace for info functions.
+ * @class info
+ * @namespace dwv
+ * @static
+ */
 dwv.info = dwv.info || {};
 
 /**
- * @function Create the windowing info div.
+ * Create the windowing info div.
+ * @method createWindowingDiv
+ * @static
  */
 dwv.info.createWindowingDiv = function()
 {
@@ -26,8 +36,10 @@ dwv.info.createWindowingDiv = function()
 };
 
 /**
- * @function Update the Top Right info div.
- * @param event The windowing change event containing the new values.
+ * Update the Top Right info div.
+ * @method updateWindowingDiv
+ * @static
+ * @param {Object} event The windowing change event containing the new values.
  * Warning: expects the windowing info div to exist (use after createWindowingDiv).
  */
 dwv.info.updateWindowingDiv = function(event)
@@ -43,7 +55,9 @@ dwv.info.updateWindowingDiv = function(event)
 };
 
 /**
- * @function Create the position info div.
+ * Create the position info div.
+ * @method createPositionDiv
+ * @static
  */
 dwv.info.createPositionDiv = function()
 {
@@ -65,8 +79,10 @@ dwv.info.createPositionDiv = function()
 };
 
 /**
- * @function Update the position info div.
- * @param event The position change event containing the new values.
+ * Update the position info div.
+ * @method updatePositionDiv
+ * @static
+ * @param {Object} event The position change event containing the new values.
  * Warning: expects the position info div to exist (use after createPositionDiv).
  */
 dwv.info.updatePositionDiv = function(event)
@@ -82,7 +98,9 @@ dwv.info.updatePositionDiv = function(event)
 };
 
 /**
- * @function Create the mini color map info div.
+ * Create the mini color map info div.
+ * @method createMiniColorMap
+ * @static
  */
 dwv.info.createMiniColorMap = function()
 {    
@@ -98,8 +116,10 @@ dwv.info.createMiniColorMap = function()
 };
 
 /**
- * @function Update the mini color map info div.
- * @param event The windowing change event containing the new values.
+ * Update the mini color map info div.
+ * @method updateMiniColorMap
+ * @static
+ * @param {Object} event The windowing change event containing the new values.
  * Warning: expects the mini color map div to exist (use after createMiniColorMap).
  */
 dwv.info.updateMiniColorMap = function(event)
@@ -148,7 +168,9 @@ dwv.info.updateMiniColorMap = function(event)
 };
 
 /**
- * @function Create the plot info.
+ * Create the plot info.
+ * @method createPlot
+ * @static
  */
 dwv.info.createPlot = function()
 {
@@ -161,8 +183,10 @@ dwv.info.createPlot = function()
 };
 
 /**
- * @function Update the plot markings.
- * @param event The windowing change event containing the new values.
+ * Update the plot markings.
+ * @method updatePlotMarkings
+ * @static
+ * @param {Object} event The windowing change event containing the new values.
  * Warning: expects the plot to exist (use after createPlot).
  */
 dwv.info.updatePlotMarkings = function(event)

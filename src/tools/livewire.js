@@ -1,42 +1,114 @@
-//! @namespace Main DWV namespace.
+/** 
+ * Tool module.
+ * @module tool
+ */
 var dwv = dwv || {};
-//! @namespace Tool classes.
 dwv.tool = dwv.tool || {};
 
 /**
-* @class Livewire painting tool.
-*/
+ * Livewire painting tool.
+ * @class Livewire
+ * @namespace dwv.tool
+ * @constructor
+ * @param {Object} app The associated application.
+ */
 dwv.tool.Livewire = function(app)
 {
+    /**
+     * Closure to self: to be used by event handlers.
+     * @property self
+     * @private
+     * @type WindowLevel
+     */
     var self = this;
+    /**
+     * Interaction start flag.
+     * @property started
+     * @type Boolean
+     */
     this.started = false;
-    // draw style
-    this.style = new dwv.html.Style();
+    
+    /**
+     * Draw command.
+     * @property command
+     * @private
+     * @type Object
+     */
     var command = null;
-    // paths are stored in reverse order
+    /**
+     * Drawing style.
+     * @property style
+     * @type Style
+     */
+    this.style = new dwv.html.Style();
+    
+    /**
+     * Path storage. Paths are stored in reverse order.
+     * @property path
+     * @private
+     * @type Path
+     */
     var path = new dwv.math.Path();
+    /**
+     * Current path storage. Paths are stored in reverse order.
+     * @property currentPath
+     * @private
+     * @type Path
+     */
     var currentPath = new dwv.math.Path();
+    /**
+     * List of parent points.
+     * @property parentPoints
+     * @private
+     * @type Array
+     */
     var parentPoints = [];
+    /**
+     * Tolerance.
+     * @property tolerance
+     * @private
+     * @type Number
+     */
     var tolerance = 5;
     
+    /**
+     * Clear the parent points list.
+     * @method clearParentPoints
+     * @private
+     */
     function clearParentPoints() {
         for( var i = 0; i < app.getImage().getSize().getNumberOfRows(); ++i ) {
             parentPoints[i] = [];
         }
     }
     
+    /**
+     * Clear the stored paths.
+     * @method clearPaths
+     * @private
+     */
     function clearPaths() {
         path = new dwv.math.Path();
         currentPath = new dwv.math.Path();
     }
     
+    /**
+     * Scissor representation.
+     * @property scissors
+     * @private
+     * @type Scissors
+     */
     var scissors = new dwv.math.Scissors();
     scissors.setDimensions(
         app.getImage().getSize().getNumberOfColumns(),
         app.getImage().getSize().getNumberOfRows() );
     scissors.setData(app.getImageData().data);
     
-    // This is called when you start holding down the mouse button.
+    /**
+     * Handle mouse down event.
+     * @method mousedown
+     * @param {Object} event The mouse down event.
+     */
     this.mousedown = function(ev){
         // first time
         if( !self.started ) {
@@ -78,7 +150,11 @@ dwv.tool.Livewire = function(app)
         }
     };
 
-    // This function is called every time you move the mouse.
+    /**
+     * Handle mouse move event.
+     * @method mousemove
+     * @param {Object} event The mouse move event.
+     */
     this.mousemove = function(ev){
         if (!self.started)
         {
@@ -136,11 +212,29 @@ dwv.tool.Livewire = function(app)
         command.execute();
     };
 
-    // This is called when you release the mouse button.
+    /**
+     * Handle mouse up event.
+     * @method mouseup
+     * @param {Object} event The mouse up event.
+     */
     this.mouseup = function(ev){
         // nothing to do
     };
     
+    /**
+     * Handle key down event.
+     * @method keydown
+     * @param {Object} event The key down event.
+     */
+    this.keydown = function(event){
+        app.handleKeyDown(event);
+    };
+
+    /**
+     * Enable the tool.
+     * @method enable
+     * @param {Boolean} bool The flag to enable or not.
+     */
     this.enable = function(value){
         if( value ) {
             this.init();
@@ -151,47 +245,83 @@ dwv.tool.Livewire = function(app)
         }
     };
 
-    this.keydown = function(event){
-        app.handleKeyDown(event);
-    };
 
 }; // Livewire class
 
-//Set the line color of the drawing
+/**
+ * Set the line color of the drawing.
+ * @method setLineColour
+ * @param {String} colour The colour to set.
+ */
 dwv.tool.Livewire.prototype.setLineColour = function(colour)
 {
     // set style var
     this.style.setLineColor(colour);
 };
 
+/**
+ * Initialise the tool.
+ * @method init
+ */
 dwv.tool.Livewire.prototype.init = function()
 {
     // set the default to the first in the list
     this.setLineColour(dwv.tool.colors[0]);
 };
 
-//Tool list
+// Add the tool to the tool list
 dwv.tool.tools = dwv.tool.tools || {};
-//Add the tool to the list
 dwv.tool.tools.livewire = dwv.tool.Livewire;
 
 /**
- * @class Draw livewire command.
- * @param livewire The livewire to draw.
- * @param app The application to draw the livewire on.
+ * Draw livewire command.
+ * @class DrawLivewireCommand
+ * @namespace dwv.tool
+ * @param {Object} livewire The livewire to draw.
+ * @param {Object} app The application to draw the livewire on.
+ * @param {Object} style The style of the livewire.
  */
 dwv.tool.DrawLivewireCommand = function(livewire, app, style)
 {
-    // app members can change 
+    /**
+     * The livewire color.
+     * @property livewireColor
+     * @private
+     * @type String
+     */
     var livewireColor = style.getLineColor();
+    /**
+     * The HTML context.
+     * @property context
+     * @private
+     * @type Object
+     */
     var context = app.getTempLayer().getContext();
     
-    // command name
+    /**
+     * Command name.
+     * @property name
+     * @private
+     * @type String
+     */
     var name = "DrawLivewireCommand";
-    this.setName = function(str) { name = str; };
+    /**
+     * Get the command name.
+     * @method getName
+     * @return {String} The command name.
+     */
     this.getName = function() { return name; };
+    /**
+     * Set the command name.
+     * @method setName
+     * @param {String} str The command name.
+     */
+    this.setName = function(str) { name = str; };
 
-    // main method
+    /**
+     * Execute the command.
+     * @method execute
+     */
     this.execute = function()
     {
         // style

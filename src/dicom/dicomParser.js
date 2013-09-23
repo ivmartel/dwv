@@ -129,7 +129,6 @@ dwv.dicom.DataReader = function(buffer, isLittleEndian)
      * @param {Number} nChars The numner of characters to read.
      * @return {String} The read data.
      */
-    //! Read data as a string.
     this.readString = function(byteOffset, nChars) {
         var result = "";
         for(var i=byteOffset; i<byteOffset + nChars; ++i){

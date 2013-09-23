@@ -1,20 +1,41 @@
-//! @namespace Main DWV namespace.
+/** 
+ * Tool module.
+ * @module tool
+ */
 var dwv = dwv || {};
-//! @namespace Tool classes.
 dwv.tool = dwv.tool || {};
 
-//filter list: to be completed after each tool definition 
+// Filter list: to be completed after each tool definition 
 dwv.tool.filters = dwv.tool.filters || {};
 
 /**
-* @class Filter tool.
-*/
+ * Filter tool.
+ * @class Filter
+ * @namespace dwv.tool
+ * @constructor
+ * @param {Object} app The associated application.
+ */
 dwv.tool.Filter = function(app)
 {
+    /**
+     * Selected filter.
+     * @property selectedFilter
+     * @type Object
+     */
     this.selectedFilter = 0;
+    /**
+     * Default filter name.
+     * @property defaultFilterName
+     * @type String
+     */
     this.defaultFilterName = 0;
 };
 
+/**
+ * Enable the filter.
+ * @method enable
+ * @param {Boolean} bool Flag to enable or not.
+ */
 dwv.tool.Filter.prototype.enable = function(bool)
 {
     if( bool ) {
@@ -30,10 +51,20 @@ dwv.tool.Filter.prototype.enable = function(bool)
     }
 };
 
+/**
+ * Get the selected filter.
+ * @method getSelectedFilter
+ * @return {Object} The selected filter.
+ */
 dwv.tool.Filter.prototype.getSelectedFilter = function() {
     return this.selectedFilter;
 };
 
+/**
+ * Set the selected filter.
+ * @method setSelectedFilter
+ * @return {String} The name of the filter to select.
+ */
 dwv.tool.Filter.prototype.setSelectedFilter = function(name) {
     // check if we have it
     if( !this.hasFilter(name) )
@@ -50,10 +81,20 @@ dwv.tool.Filter.prototype.setSelectedFilter = function(name) {
     this.selectedFilter.enable(true);
 };
 
+/**
+ * Check if a filter is in the filter list.
+ * @method hasFilter
+ * @param {String} name The name to check.
+ * @return {String} The filter list element for the given name.
+ */
 dwv.tool.Filter.prototype.hasFilter = function(name) {
     return dwv.tool.filters[name];
 };
 
+/**
+ * Initialise the filter.
+ * @method init
+ */
 dwv.tool.Filter.prototype.init = function()
 {
     // set the default to the first in the list
@@ -64,20 +105,32 @@ dwv.tool.Filter.prototype.init = function()
     this.setSelectedFilter(this.defaultFilterName);
 };
 
+/**
+ * Handle keydown event.
+ * @method keydown
+ * @param {Object} event The keydown event.
+ */
 dwv.tool.Filter.prototype.keydown = function(event){
     app.handleKeyDown(event);
 };
 
-/**
- * @namespace Filter classes.
- */
+// Filter namespace
 dwv.tool.filter = dwv.tool.filter || {};
 
 /**
-* @class Threshold filter tool.
-*/
+ * Threshold filter tool.
+ * @class Threshold
+ * @namespace dwv.tool.filter
+ * @constructor
+ * @param {Object} app The associated application.
+ */
 dwv.tool.filter.Threshold = function(app) {};
 
+/**
+ * Enable the filter.
+ * @method enable
+ * @param {Boolean} value Flag to enable or not.
+ */
 dwv.tool.filter.Threshold.prototype.enable = function(value)
 {
     if( value ) {
@@ -88,6 +141,11 @@ dwv.tool.filter.Threshold.prototype.enable = function(value)
     }
 };
 
+/**
+ * Run the filter.
+ * @method run
+ * @param {Mixed} args The filter arguments.
+ */
 dwv.tool.filter.Threshold.prototype.run = function(args)
 {
     var filter = new dwv.image.filter.Threshold();
@@ -99,14 +157,23 @@ dwv.tool.filter.Threshold.prototype.run = function(args)
     app.getUndoStack().add(command);
 };
 
-// Add the tool to the list
+// Add the filter to the filter list
 dwv.tool.filters.threshold = dwv.tool.filter.Threshold;
 
 /**
-* @class Sharpen filter tool.
-*/
+ * Sharpen filter tool.
+ * @class Sharpen
+ * @namespace dwv.tool.filter
+ * @constructor
+ * @param {Object} app The associated application.
+ */
 dwv.tool.filter.Sharpen = function(app) {};
 
+/**
+ * Enable the filter.
+ * @method enable
+ * @param {Boolean} value Flag to enable or not.
+ */
 dwv.tool.filter.Sharpen.prototype.enable = function(value)
 {
     if( value ) {
@@ -117,6 +184,11 @@ dwv.tool.filter.Sharpen.prototype.enable = function(value)
     }
 };
 
+/**
+ * Run the filter.
+ * @method run
+ * @param {Mixed} args The filter arguments.
+ */
 dwv.tool.filter.Sharpen.prototype.run = function(args)
 {
     var filter = new dwv.image.filter.Sharpen();
@@ -126,14 +198,23 @@ dwv.tool.filter.Sharpen.prototype.run = function(args)
     app.getUndoStack().add(command);
 };
 
-// Add the tool to the list
+// Add the filter to the filter list
 dwv.tool.filters.sharpen = dwv.tool.filter.Sharpen;
 
 /**
-* @class Sobel filter tool.
-*/
+ * Sobel filter tool.
+ * @class Sharpen
+ * @namespace dwv.tool.filter
+ * @constructor
+ * @param {Object} app The associated application.
+ */
 dwv.tool.filter.Sobel = function(app) {};
 
+/**
+ * Enable the filter.
+ * @method enable
+ * @param {Boolean} value Flag to enable or not.
+ */
 dwv.tool.filter.Sobel.prototype.enable = function(value)
 {
     if( value ) {
@@ -144,6 +225,11 @@ dwv.tool.filter.Sobel.prototype.enable = function(value)
     }
 };
 
+/**
+ * Run the filter.
+ * @method run
+ * @param {Mixed} args The filter arguments.
+ */
 dwv.tool.filter.Sobel.prototype.run = function(args)
 {
     var filter = new dwv.image.filter.Sobel();
@@ -153,27 +239,47 @@ dwv.tool.filter.Sobel.prototype.run = function(args)
     app.getUndoStack().add(command);
 };
 
-//Add the tool to the list
+// Add the filter to the filter list
 dwv.tool.filters.sobel = dwv.tool.filter.Sobel;
 
-//Tool list
+// Add the tool to the tool list
 dwv.tool.tools = dwv.tool.tools || {};
-//Add the filters to the tools
 dwv.tool.tools.filter = dwv.tool.Filter;
 
 /**
- * @class Run filter command.
- * @param filter The filter to run.
- * @param app The application to draw the line on.
+ * Run filter command.
+ * @class RunFilterCommand
+ * @namespace dwv.tool
+ * @constructor
+ * @param {Object} filter The filter to run.
+ * @param {Object} app The associated application.
  */
 dwv.tool.RunFilterCommand = function(filter, app)
 {
-    // command name
+    /**
+     * Command name.
+     * @property name
+     * @private
+     * @type String
+     */
     var name = "RunFilter: " + filter.getName();
-    this.setName = function(str) { name = str; };
+    /**
+     * Get the command name.
+     * @method getName
+     * @return {String} The command name.
+     */
     this.getName = function() { return name; };
+    /**
+     * Set the command name.
+     * @method setName
+     * @param {String} str The command name.
+     */
+    this.setName = function(str) { name = str; };
 
-    // main method
+    /**
+     * Execute the command.
+     * @method execute
+     */
     this.execute = function()
     {
         app.setImage(filter.update());

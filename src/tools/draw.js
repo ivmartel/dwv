@@ -1,34 +1,72 @@
-//! @namespace Main DWV namespace.
+/** 
+ * Tool module.
+ * @module tool
+ */
 var dwv = dwv || {};
-//! @namespace Tool classes.
 dwv.tool = dwv.tool || {};
 
-//! List of colors
+// List of colors
 dwv.tool.colors = [
     "Yellow", "Red", "White", "Green", "Blue", "Lime", "Fuchsia", "Black"
 ];
 
-//shape list: to be completed after each tool definition 
+// Shape list: to be completed after each tool definition 
 dwv.tool.shapes = dwv.tool.shapes || {};
 
 /**
-* @class Drawing tool.
-*/
+ * Drawing tool.
+ * @class Draw
+ * @namespace dwv.tool
+ * @constructor
+ * @param {Object} app The associated application.
+ */
 dwv.tool.Draw = function(app)
 {
+    /**
+     * Closure to self: to be used by event handlers.
+     * @property self
+     * @private
+     * @type WindowLevel
+     */
     var self = this;
-    // start drawing flag
+    /**
+     * Interaction start flag.
+     * @property started
+     * @type Boolean
+     */
     var started = false;
-    // draw command
+    
+    /**
+     * Draw command.
+     * @property command
+     * @private
+     * @type Object
+     */
     var command = null;
-    // draw style
+    /**
+     * Drawing style.
+     * @property style
+     * @type Style
+     */
     this.style = new dwv.html.Style();
-    // shape name
+    /**
+     * Shape name.
+     * @property shapeName
+     * @type String
+     */
     this.shapeName = 0;
-    // list of points
+    /**
+     * List of points
+     * @property points
+     * @type Array
+     */
     var points = [];
 
-    // This is called when you start holding down the mouse button.
+    /**
+     * Handle mouse down event.
+     * @method mousedown
+     * @param {Object} event The mouse down event.
+     */
     this.mousedown = function(ev){
         started = true;
         // clear array
@@ -37,7 +75,11 @@ dwv.tool.Draw = function(app)
         points.push(new dwv.math.Point2D(ev._x, ev._y));
     };
 
-    // This function is called every time you move the mouse.
+    /**
+     * Handle mouse move event.
+     * @method mousemove
+     * @param {Object} event The mouse move event.
+     */
     this.mousemove = function(ev){
         if (!started)
         {
@@ -57,7 +99,11 @@ dwv.tool.Draw = function(app)
         }
     };
 
-    // This is called when you release the mouse button.
+    /**
+     * Handle mouse up event.
+     * @method mouseup
+     * @param {Object} event The mouse up event.
+     */
     this.mouseup = function(ev){
         if (started)
         {
@@ -70,23 +116,56 @@ dwv.tool.Draw = function(app)
         }
     };
     
+    /**
+     * Handle mouse out event.
+     * @method mouseout
+     * @param {Object} event The mouse out event.
+     */
     this.mouseout = function(ev){
         self.mouseup(ev);
     };
 
+    /**
+     * Handle touch start event.
+     * @method touchstart
+     * @param {Object} event The touch start event.
+     */
     this.touchstart = function(ev){
         self.mousedown(ev);
     };
 
+    /**
+     * Handle touch move event.
+     * @method touchmove
+     * @param {Object} event The touch move event.
+     */
     this.touchmove = function(ev){
         self.mousemove(ev);
     };
 
+    /**
+     * Handle touch end event.
+     * @method touchend
+     * @param {Object} event The touch end event.
+     */
     this.touchend = function(ev){
         self.mouseup(ev);
     };
 
-   // Enable the draw tool
+    /**
+     * Handle key down event.
+     * @method keydown
+     * @param {Object} event The key down event.
+     */
+    this.keydown = function(event){
+        app.handleKeyDown(event);
+    };
+
+    /**
+     * Enable the tool.
+     * @method enable
+     * @param {Boolean} value The flag to enable or not.
+     */
     this.enable = function(value){
         if( value ) {
             this.init();
@@ -96,22 +175,25 @@ dwv.tool.Draw = function(app)
             dwv.gui.clearDrawHtml();
         }
     };
-    
-    // Handle key down event
-    this.keydown = function(event){
-        app.handleKeyDown(event);
-    };
 
 }; // Draw class
 
-// Set the line color of the drawing
+/**
+ * Set the line color of the drawing.
+ * @method setLineColour
+ * @param {String} colour The colour to set.
+ */
 dwv.tool.Draw.prototype.setLineColour = function(colour)
 {
     // set style var
     this.style.setLineColor(colour);
 };
 
-// Set the shape name of the drawing
+/**
+ * Set the shape name of the drawing.
+ * @method setShapeName
+ * @param {String} name The name of the shape.
+ */
 dwv.tool.Draw.prototype.setShapeName = function(name)
 {
     // check if we have it
@@ -122,10 +204,19 @@ dwv.tool.Draw.prototype.setShapeName = function(name)
     this.shapeName = name;
 };
 
+/**
+ * Check if the shape is in the shape list.
+ * @method hasShape
+ * @param {String} name The name of the shape.
+ */
 dwv.tool.Draw.prototype.hasShape = function(name) {
     return dwv.tool.shapes[name];
 };
 
+/**
+ * Initialise the tool.
+ * @method init
+ */
 dwv.tool.Draw.prototype.init = function() {
     // set the default to the first in the list
     var shapeName = 0;
@@ -138,7 +229,6 @@ dwv.tool.Draw.prototype.init = function() {
     this.setLineColour(dwv.tool.colors[0]);
 };
 
-//Tool list
+// Add the tool to the tool list
 dwv.tool.tools = dwv.tool.tools || {};
-//Add the tool to the list
 dwv.tool.tools.draw = dwv.tool.Draw;
