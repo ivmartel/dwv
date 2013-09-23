@@ -1,10 +1,11 @@
-//! @namespace Main DWV namespace.
+// Main DWV namespace.
 var dwv = dwv || {};
  
 /**
-* @class App
-* Main application.
-*/
+ * Application class.
+ * @class App
+ * Main application.
+ */
 dwv.App = function(mobile)
 {
     // Local object
@@ -35,37 +36,83 @@ dwv.App = function(mobile)
     // UndoStack
     var undoStack = new dwv.tool.UndoStack(this);
     
-    // Public Methods
-    // --------------
-    
-    // Get the image
+    /** 
+     * Get the image.
+     * @method getImage
+     * @return {Image} The associated image.
+     */
     this.getImage = function() { return image; };
-    // Get the view
+    /** 
+     * Get the view.
+     * @method getView
+     * @return {Image} The associated view.
+     */
     this.getView = function() { return view; };
     
-    // Set the image
-    this.setImage = function(img) { image = img; view.setImage(img); };    
-    // Restore the original image
-    this.restoreOriginalImage = function() { image = originalImage; view.setImage(originalImage); }; 
+    /** 
+     * Set the view.
+     * @method setImage
+     * @param {Image} img The associated image.
+     */
+    this.setImage = function(img)
+    { 
+        image = img; 
+        view.setImage(img);
+    };
     
-    // Get the image data array
+    /** 
+     * Restore the original image.
+     * @method Restore the original image
+     */
+    this.restoreOriginalImage = function() 
+    { 
+        image = originalImage; 
+        view.setImage(originalImage); 
+    }; 
+    
+    /** 
+     * Get the image data array.
+     * @method getImageData
+     * @return {Array} The image data array.
+     */
     this.getImageData = function() { return imageData; };
 
-    // Get the tool box
+    /** 
+     * Get the tool box.
+     * @method getToolBox
+     * @return {Object} The associated toolbox.
+     */
     this.getToolBox = function() { return toolBox; };
 
-    // Get the image layer
+    /** 
+     * Get the image layer.
+     * @method getImageLayer
+     * @return {Object} The image layer.
+     */
     this.getImageLayer = function() { return imageLayer; };
-    // Get the draw layer
+    /** 
+     * Get the draw layer.
+     * @method getDrawLayer
+     * @return {Object} The draw layer.
+     */
     this.getDrawLayer = function() { return drawLayer; };
-    // Get the temporary layer
+    /** 
+     * Get the temporary layer.
+     * @method getTempLayer
+     * @return {Object} The temporary layer.
+     */
     this.getTempLayer = function() { return tempLayer; };
 
-    // Get the image details
+    /** 
+     * Get the undo stack.
+     * @method getUndoStack
+     * @return {Object} The undo stack.
+     */
     this.getUndoStack = function() { return undoStack; };
 
     /**
      * Initialise the HTML for the application.
+     * @method init
      */
     this.init = function()
     {
@@ -74,6 +121,10 @@ dwv.App = function(mobile)
         document.getElementById('imageurl').addEventListener('change', this.onChangeURL, false);
     };
     
+    /**
+     * Reset the application.
+     * @method reset
+     */
     this.reset = function()
     {
         image = null;
@@ -82,11 +133,12 @@ dwv.App = function(mobile)
     };
     
     /**
-     * Handle key event.
+     * Handle key down event.
      * - CRTL-Z: undo
      * - CRTL-Y: redo
      * Default behavior. Usually used in tools. 
-     * @param event
+     * @method handleKeyDown
+     * @param {Object} event The key down event.
      */
     this.handleKeyDown = function(event)
     {
@@ -101,15 +153,19 @@ dwv.App = function(mobile)
     };
     
     /**
-     * @public
+     * Handle change files event.
+     * @method onChangeFiles
+     * @param {Object} event The event fired when changing the file field.
      */
-    this.onChangeFiles = function(evt)
+    this.onChangeFiles = function(event)
     {
-        self.loadFiles(evt.target.files);
+        self.loadFiles(event.target.files);
     };
 
     /**
-     * @public
+     * Load a list of files.
+     * @method loadFiles
+     * @param {Array} files The list of files to load.
      */
     this.loadFiles = function(files) 
     {
@@ -186,15 +242,19 @@ dwv.App = function(mobile)
     };
         
     /**
-     * @public
+     * Handle change url event.
+     * @method onChangeURL
+     * @param {Object} event The event fired when changing the url field.
      */
-    this.onChangeURL = function(evt)
+    this.onChangeURL = function(event)
     {
-        self.loadURL(evt.target.value);
+        self.loadURL(event.target.value);
     };
 
     /**
-     * @public
+     * Load a list of URLs.
+     * @method loadURL
+     * @param {Array} urls The list of urls to load.
      */
     this.loadURL = function(urls) 
     {
@@ -271,6 +331,7 @@ dwv.App = function(mobile)
     
     /**
      * Generate the image data and draw it.
+     * @method generateAndDrawImage
      */
     this.generateAndDrawImage = function()
     {         
@@ -283,7 +344,8 @@ dwv.App = function(mobile)
     };
     
     /**
-     * To be called once the image is loaded.
+     * Resize the display window. To be called once the image is loaded.
+     * @method resize
      */
     this.resize = function()
     {
@@ -304,7 +366,12 @@ dwv.App = function(mobile)
     };
     
     /**
-     * To be called once the image is loaded.
+     * Set the layers zoom. To be called once the image is loaded.
+     * @method setLayersZoom
+     * @param {Number} zoomX The zoom in the X direction.
+     * @param {Number} zoomY The zoom in the Y direction.
+     * @param {Number} cx The zoom center X coordinate.
+     * @param {Number} cy The zoom center Y coordinate.
      */
     this.setLayersZoom = function(zoomX,zoomY,cx,cy)
     {
@@ -314,6 +381,7 @@ dwv.App = function(mobile)
     
     /**
      * Toggle the display of the info layer.
+     * @method toggleInfoLayerDisplay
      */
     this.toggleInfoLayerDisplay = function()
     {
@@ -330,11 +398,12 @@ dwv.App = function(mobile)
         }
     };
     
-    // Private Methods
-    // ---------------
+    // Private Methods -------------------------------------------
 
     /**
      * Add image listeners.
+     * @method addImageInfoListeners
+     * @private
      */
     function addImageInfoListeners()
     {
@@ -347,6 +416,8 @@ dwv.App = function(mobile)
     
     /**
      * Remove image listeners.
+     * @method removeImageInfoListeners
+     * @private
      */
     function removeImageInfoListeners()
     {
@@ -358,9 +429,11 @@ dwv.App = function(mobile)
     }
     
     /**
+     * General-purpose event handler. This function just determines the mouse 
+     * position relative to the canvas element. It then passes it to the current tool.
+     * @method eventHandler
      * @private
-     * The general-purpose event handler. This function just determines the mouse 
-     * position relative to the canvas element.
+     * @param {Object} event The event to handle.
      */
     function eventHandler(event)
     {
@@ -433,8 +506,11 @@ dwv.App = function(mobile)
     }
     
     /**
+     * Handle an error: display it to the user.
+     * @method handleError
      * @private
-     * */
+     * @param {Object} error The error to handle.
+     */
     function handleError(error)
     {
         if( error.name && error.message) alert(error.name+": "+error.message+".");
@@ -443,9 +519,11 @@ dwv.App = function(mobile)
     }
     
     /**
+     * Create the application layers.
+     * @method createLayers
      * @private
-     * @param dataWidth The width of the input data.
-     * @param dataHeight The height of the input data.
+     * @param {Number} dataWidth The width of the input data.
+     * @param {Number} dataHeight The height of the input data.
      */
     function createLayers(dataWidth, dataHeight)
     {
@@ -468,10 +546,10 @@ dwv.App = function(mobile)
     }
     
     /**
+     * Create the DICOM tags table. To be called once the DICOM has been parsed.
+     * @method createTagsTable
      * @private
-     * Create the DICOM tags table.
-     * @param dataInfo The data information.
-     * To be called once the DICOM has been parsed.
+     * @param {Object} dataInfo The data information.
      */
     function createTagsTable(dataInfo)
     {
@@ -496,8 +574,10 @@ dwv.App = function(mobile)
     }
     
     /**
+     * Post load application initialisation. To be called once the DICOM has been parsed.
+     * @method postLoadInit
      * @private
-     * To be called once the DICOM has been parsed.
+     * @param {Object} data The data to display.
      */
     function postLoadInit(data)
     {

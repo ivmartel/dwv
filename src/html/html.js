@@ -318,6 +318,7 @@ dwv.html.cleanNode = function(node) {
 /**
  * Remove a HTML node and all its children.
  * @method removeNode
+ * @static
  * @param {Number} nodeId The id of the node to delete.
  */
 dwv.html.removeNode = function(nodeId) {
