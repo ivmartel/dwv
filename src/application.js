@@ -64,7 +64,7 @@ dwv.App = function(mobile)
     
     /** 
      * Restore the original image.
-     * @method Restore the original image
+     * @method restoreOriginalImage
      */
     this.restoreOriginalImage = function() 
     { 
