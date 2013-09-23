@@ -4466,7 +4466,7 @@
         },
         {
             "file": "src/image/reader.js",
-            "line": 65,
+            "line": 69,
             "description": "Get data from an input buffer using a DICOM parser.",
             "itemtype": "method",
             "name": "getDataFromDicomBuffer",
