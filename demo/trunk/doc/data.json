@@ -7909,7 +7909,7 @@
             "line": 65,
             "description": "Restore the original image.",
             "itemtype": "method",
-            "name": "Restore the original image",
+            "name": "restoreOriginalImage",
             "class": "dwv.App",
             "module": "utils",
             "namespace": "dwv"
