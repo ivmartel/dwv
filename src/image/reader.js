@@ -45,6 +45,10 @@ dwv.image.getDataFromImage = function(image)
     var sliceIndex = image.index ? image.index : 0;
     var dwvImage = new dwv.image.Image(imageSize, imageSpacing, buffer, [[0,0,sliceIndex]]);
     dwvImage.setPhotometricInterpretation("RGB");
+    // meta information
+    var meta = {};
+    meta.BitsStored = 8;
+    dwvImage.setMeta(meta);
     // view
     var view = new dwv.image.View(dwvImage);
     view.setWindowLevelMinMax();
