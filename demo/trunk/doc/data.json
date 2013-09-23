@@ -1545,7 +1545,8 @@
             "module": "utils",
             "namespace": "dwv",
             "file": "src/application.js",
-            "line": 4
+            "line": 4,
+            "description": "Application class."
         }
     },
     "classitems": [
@@ -2638,6 +2639,7 @@
             "description": "Remove a HTML node and all its children.",
             "itemtype": "method",
             "name": "removeNode",
+            "static": 1,
             "params": [
                 {
                     "name": "nodeId",
@@ -2651,7 +2653,7 @@
         },
         {
             "file": "src/html/html.js",
-            "line": 335,
+            "line": 336,
             "description": "Create a HTML select from an input array of options.\nThe values of the options are the name of the option made lower case.\nIt is left to the user to set the 'onchange' method of the select.",
             "itemtype": "method",
             "name": "createHtmlSelect",
@@ -2678,7 +2680,7 @@
         },
         {
             "file": "src/html/html.js",
-            "line": 379,
+            "line": 380,
             "description": "Get a list of parameters from an input URI.",
             "itemtype": "method",
             "name": "getUriParam",
@@ -2700,7 +2702,7 @@
         },
         {
             "file": "src/html/html.js",
-            "line": 459,
+            "line": 460,
             "description": "Toggle the display of an element.",
             "itemtype": "method",
             "name": "toggleDisplay",
@@ -2718,7 +2720,7 @@
         },
         {
             "file": "src/html/html.js",
-            "line": 475,
+            "line": 476,
             "description": "Browser checks to see if it can run dwv. Throws an error if not.\nTODO Maybe use http://modernizr.com/.",
             "itemtype": "method",
             "name": "checkBrowser",
@@ -7849,20 +7851,43 @@
         },
         {
             "file": "src/application.js",
-            "line": 67,
-            "description": "Initialise the HTML for the application.",
+            "line": 39,
+            "description": "Get the image.",
+            "itemtype": "method",
+            "name": "getImage",
+            "return": {
+                "description": "The associated image.",
+                "type": "Image"
+            },
             "class": "dwv.App\nMain application.",
             "module": "utils",
             "namespace": "dwv"
         },
         {
             "file": "src/application.js",
-            "line": 84,
-            "description": "Handle key event.\n- CRTL-Z: undo\n- CRTL-Y: redo\nDefault behavior. Usually used in tools.",
+            "line": 45,
+            "description": "Get the view.",
+            "itemtype": "method",
+            "name": "getView",
+            "return": {
+                "description": "The associated view.",
+                "type": "Image"
+            },
+            "class": "dwv.App\nMain application.",
+            "module": "utils",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/application.js",
+            "line": 52,
+            "description": "Set the view.",
+            "itemtype": "method",
+            "name": "setImage",
             "params": [
                 {
-                    "name": "event",
-                    "description": ""
+                    "name": "img",
+                    "description": "The associated image.",
+                    "type": "Image"
                 }
             ],
             "class": "dwv.App\nMain application.",
@@ -7871,100 +7896,271 @@
         },
         {
             "file": "src/application.js",
-            "line": 103,
-            "access": "public",
-            "tagname": "",
+            "line": 63,
+            "description": "Restore the original image.",
+            "itemtype": "method",
+            "name": "Restore the original image",
             "class": "dwv.App\nMain application.",
             "module": "utils",
             "namespace": "dwv"
         },
         {
             "file": "src/application.js",
-            "line": 111,
-            "access": "public",
-            "tagname": "",
+            "line": 73,
+            "description": "Get the image data array.",
+            "itemtype": "method",
+            "name": "getImageData",
+            "return": {
+                "description": "The image data array.",
+                "type": "Array"
+            },
             "class": "dwv.App\nMain application.",
             "module": "utils",
             "namespace": "dwv"
         },
         {
             "file": "src/application.js",
-            "line": 188,
-            "access": "public",
-            "tagname": "",
+            "line": 80,
+            "description": "Get the tool box.",
+            "itemtype": "method",
+            "name": "getToolBox",
+            "return": {
+                "description": "The associated toolbox.",
+                "type": "Object"
+            },
             "class": "dwv.App\nMain application.",
             "module": "utils",
             "namespace": "dwv"
         },
         {
             "file": "src/application.js",
-            "line": 196,
-            "access": "public",
-            "tagname": "",
+            "line": 87,
+            "description": "Get the image layer.",
+            "itemtype": "method",
+            "name": "getImageLayer",
+            "return": {
+                "description": "The image layer.",
+                "type": "Object"
+            },
             "class": "dwv.App\nMain application.",
             "module": "utils",
             "namespace": "dwv"
         },
         {
             "file": "src/application.js",
-            "line": 272,
+            "line": 93,
+            "description": "Get the draw layer.",
+            "itemtype": "method",
+            "name": "getDrawLayer",
+            "return": {
+                "description": "The draw layer.",
+                "type": "Object"
+            },
+            "class": "dwv.App\nMain application.",
+            "module": "utils",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/application.js",
+            "line": 99,
+            "description": "Get the temporary layer.",
+            "itemtype": "method",
+            "name": "getTempLayer",
+            "return": {
+                "description": "The temporary layer.",
+                "type": "Object"
+            },
+            "class": "dwv.App\nMain application.",
+            "module": "utils",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/application.js",
+            "line": 106,
+            "description": "Get the undo stack.",
+            "itemtype": "method",
+            "name": "getUndoStack",
+            "return": {
+                "description": "The undo stack.",
+                "type": "Object"
+            },
+            "class": "dwv.App\nMain application.",
+            "module": "utils",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/application.js",
+            "line": 113,
+            "description": "Initialise the HTML for the application.",
+            "itemtype": "method",
+            "name": "init",
+            "class": "dwv.App\nMain application.",
+            "module": "utils",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/application.js",
+            "line": 124,
+            "description": "Reset the application.",
+            "itemtype": "method",
+            "name": "reset",
+            "class": "dwv.App\nMain application.",
+            "module": "utils",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/application.js",
+            "line": 135,
+            "description": "Handle key down event.\n- CRTL-Z: undo\n- CRTL-Y: redo\nDefault behavior. Usually used in tools.",
+            "itemtype": "method",
+            "name": "handleKeyDown",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The key down event.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.App\nMain application.",
+            "module": "utils",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/application.js",
+            "line": 155,
+            "description": "Handle change files event.",
+            "itemtype": "method",
+            "name": "onChangeFiles",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The event fired when changing the file field.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.App\nMain application.",
+            "module": "utils",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/application.js",
+            "line": 165,
+            "description": "Load a list of files.",
+            "itemtype": "method",
+            "name": "loadFiles",
+            "params": [
+                {
+                    "name": "files",
+                    "description": "The list of files to load.",
+                    "type": "Array"
+                }
+            ],
+            "class": "dwv.App\nMain application.",
+            "module": "utils",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/application.js",
+            "line": 244,
+            "description": "Handle change url event.",
+            "itemtype": "method",
+            "name": "onChangeURL",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The event fired when changing the url field.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.App\nMain application.",
+            "module": "utils",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/application.js",
+            "line": 254,
+            "description": "Load a list of URLs.",
+            "itemtype": "method",
+            "name": "loadURL",
+            "params": [
+                {
+                    "name": "urls",
+                    "description": "The list of urls to load.",
+                    "type": "Array"
+                }
+            ],
+            "class": "dwv.App\nMain application.",
+            "module": "utils",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/application.js",
+            "line": 332,
             "description": "Generate the image data and draw it.",
+            "itemtype": "method",
+            "name": "generateAndDrawImage",
             "class": "dwv.App\nMain application.",
             "module": "utils",
             "namespace": "dwv"
         },
         {
             "file": "src/application.js",
-            "line": 285,
-            "description": "To be called once the image is loaded.",
+            "line": 346,
+            "description": "Resize the display window. To be called once the image is loaded.",
+            "itemtype": "method",
+            "name": "resize",
             "class": "dwv.App\nMain application.",
             "module": "utils",
             "namespace": "dwv"
         },
         {
             "file": "src/application.js",
-            "line": 306,
-            "description": "To be called once the image is loaded.",
+            "line": 368,
+            "description": "Set the layers zoom. To be called once the image is loaded.",
+            "itemtype": "method",
+            "name": "setLayersZoom",
+            "params": [
+                {
+                    "name": "zoomX",
+                    "description": "The zoom in the X direction.",
+                    "type": "Number"
+                },
+                {
+                    "name": "zoomY",
+                    "description": "The zoom in the Y direction.",
+                    "type": "Number"
+                },
+                {
+                    "name": "cx",
+                    "description": "The zoom center X coordinate.",
+                    "type": "Number"
+                },
+                {
+                    "name": "cy",
+                    "description": "The zoom center Y coordinate.",
+                    "type": "Number"
+                }
+            ],
             "class": "dwv.App\nMain application.",
             "module": "utils",
             "namespace": "dwv"
         },
         {
             "file": "src/application.js",
-            "line": 315,
+            "line": 382,
             "description": "Toggle the display of the info layer.",
+            "itemtype": "method",
+            "name": "toggleInfoLayerDisplay",
             "class": "dwv.App\nMain application.",
             "module": "utils",
             "namespace": "dwv"
         },
         {
             "file": "src/application.js",
-            "line": 336,
+            "line": 403,
             "description": "Add image listeners.",
-            "class": "dwv.App\nMain application.",
-            "module": "utils",
-            "namespace": "dwv"
-        },
-        {
-            "file": "src/application.js",
-            "line": 348,
-            "description": "Remove image listeners.",
-            "class": "dwv.App\nMain application.",
-            "module": "utils",
-            "namespace": "dwv"
-        },
-        {
-            "file": "src/application.js",
-            "line": 360,
-            "access": "private",
-            "tagname": "The general-purpose event handler. This function just determines the mouse \nposition relative to the canvas element.",
-            "class": "dwv.App\nMain application.",
-            "module": "utils",
-            "namespace": "dwv"
-        },
-        {
-            "file": "src/application.js",
-            "line": 435,
+            "itemtype": "method",
+            "name": "addImageInfoListeners",
             "access": "private",
             "tagname": "",
             "class": "dwv.App\nMain application.",
@@ -7973,17 +8169,72 @@
         },
         {
             "file": "src/application.js",
-            "line": 445,
+            "line": 417,
+            "description": "Remove image listeners.",
+            "itemtype": "method",
+            "name": "removeImageInfoListeners",
+            "access": "private",
+            "tagname": "",
+            "class": "dwv.App\nMain application.",
+            "module": "utils",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/application.js",
+            "line": 431,
+            "description": "General-purpose event handler. This function just determines the mouse \nposition relative to the canvas element. It then passes it to the current tool.",
+            "itemtype": "method",
+            "name": "eventHandler",
+            "access": "private",
+            "tagname": "",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The event to handle.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.App\nMain application.",
+            "module": "utils",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/application.js",
+            "line": 508,
+            "description": "Handle an error: display it to the user.",
+            "itemtype": "method",
+            "name": "handleError",
+            "access": "private",
+            "tagname": "",
+            "params": [
+                {
+                    "name": "error",
+                    "description": "The error to handle.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.App\nMain application.",
+            "module": "utils",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/application.js",
+            "line": 521,
+            "description": "Create the application layers.",
+            "itemtype": "method",
+            "name": "createLayers",
             "access": "private",
             "tagname": "",
             "params": [
                 {
                     "name": "dataWidth",
-                    "description": "The width of the input data."
+                    "description": "The width of the input data.",
+                    "type": "Number"
                 },
                 {
                     "name": "dataHeight",
-                    "description": "The height of the input data."
+                    "description": "The height of the input data.",
+                    "type": "Number"
                 }
             ],
             "class": "dwv.App\nMain application.",
@@ -7992,13 +8243,17 @@
         },
         {
             "file": "src/application.js",
-            "line": 470,
+            "line": 548,
+            "description": "Create the DICOM tags table. To be called once the DICOM has been parsed.",
+            "itemtype": "method",
+            "name": "createTagsTable",
             "access": "private",
-            "tagname": "Create the DICOM tags table.",
+            "tagname": "",
             "params": [
                 {
                     "name": "dataInfo",
-                    "description": "The data information.\nTo be called once the DICOM has been parsed."
+                    "description": "The data information.",
+                    "type": "Object"
                 }
             ],
             "class": "dwv.App\nMain application.",
@@ -8007,9 +8262,19 @@
         },
         {
             "file": "src/application.js",
-            "line": 498,
+            "line": 576,
+            "description": "Post load application initialisation. To be called once the DICOM has been parsed.",
+            "itemtype": "method",
+            "name": "postLoadInit",
             "access": "private",
-            "tagname": "To be called once the DICOM has been parsed.",
+            "tagname": "",
+            "params": [
+                {
+                    "name": "data",
+                    "description": "The data to display.",
+                    "type": "Object"
+                }
+            ],
             "class": "dwv.App\nMain application.",
             "module": "utils",
             "namespace": "dwv"
@@ -8091,74 +8356,6 @@
         {
             "message": "Missing item type",
             "line": " src/math/scissors.js:107"
-        },
-        {
-            "message": "Missing item type\nInitialise the HTML for the application.",
-            "line": " src/application.js:67"
-        },
-        {
-            "message": "Missing item type\nHandle key event.\n- CRTL-Z: undo\n- CRTL-Y: redo\nDefault behavior. Usually used in tools.",
-            "line": " src/application.js:84"
-        },
-        {
-            "message": "Missing item type",
-            "line": " src/application.js:103"
-        },
-        {
-            "message": "Missing item type",
-            "line": " src/application.js:111"
-        },
-        {
-            "message": "Missing item type",
-            "line": " src/application.js:188"
-        },
-        {
-            "message": "Missing item type",
-            "line": " src/application.js:196"
-        },
-        {
-            "message": "Missing item type\nGenerate the image data and draw it.",
-            "line": " src/application.js:272"
-        },
-        {
-            "message": "Missing item type\nTo be called once the image is loaded.",
-            "line": " src/application.js:285"
-        },
-        {
-            "message": "Missing item type\nTo be called once the image is loaded.",
-            "line": " src/application.js:306"
-        },
-        {
-            "message": "Missing item type\nToggle the display of the info layer.",
-            "line": " src/application.js:315"
-        },
-        {
-            "message": "Missing item type\nAdd image listeners.",
-            "line": " src/application.js:336"
-        },
-        {
-            "message": "Missing item type\nRemove image listeners.",
-            "line": " src/application.js:348"
-        },
-        {
-            "message": "Missing item type",
-            "line": " src/application.js:360"
-        },
-        {
-            "message": "Missing item type",
-            "line": " src/application.js:435"
-        },
-        {
-            "message": "Missing item type",
-            "line": " src/application.js:445"
-        },
-        {
-            "message": "Missing item type",
-            "line": " src/application.js:470"
-        },
-        {
-            "message": "Missing item type",
-            "line": " src/application.js:498"
         }
     ]
 }
