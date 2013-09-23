@@ -1,7 +1,7 @@
 YUI.add("yuidoc-meta", function(Y) {
    Y.YUIDoc = { meta: {
     "classes": [
-        "dwv.App\nMain application.",
+        "dwv.App",
         "dwv.dicom.DataReader",
         "dwv.dicom.DicomParser",
         "dwv.dicom.Dictionary",

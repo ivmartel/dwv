@@ -2,9 +2,11 @@
 var dwv = dwv || {};
  
 /**
- * Application class.
+ * Main application class.
  * @class App
- * Main application.
+ * @namespace dwv
+ * @constructor
+ * @param {Boolean} mobile Handle mobile or not.
  */
 dwv.App = function(mobile)
 {
