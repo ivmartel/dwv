@@ -79,13 +79,11 @@ Main application.</a></li>
             
                 <li><a href="../classes/dwv.image.View.html">dwv.image.View</a></li>
             
+                <li><a href="../classes/dwv.info.html">dwv.info</a></li>
+            
                 <li><a href="../classes/dwv.math.BucketQueue.html">dwv.math.BucketQueue</a></li>
             
                 <li><a href="../classes/dwv.math.Circle.html">dwv.math.Circle</a></li>
-            
-                <li><a href="../classes/dwv.math.Draw circle command..html">dwv.math.Draw circle command.</a></li>
-            
-                <li><a href="../classes/dwv.math.Drawing tool..html">dwv.math.Drawing tool.</a></li>
             
                 <li><a href="../classes/dwv.math.FastPoint2D.html">dwv.math.FastPoint2D</a></li>
             
@@ -101,35 +99,39 @@ Main application.</a></li>
             
                 <li><a href="../classes/dwv.math.Scissors.html">dwv.math.Scissors</a></li>
             
+                <li><a href="../classes/dwv.tool.html">dwv.tool</a></li>
+            
+                <li><a href="../classes/dwv.tool.Draw.html">dwv.tool.Draw</a></li>
+            
+                <li><a href="../classes/dwv.tool.DrawCircleCommand.html">dwv.tool.DrawCircleCommand</a></li>
+            
+                <li><a href="../classes/dwv.tool.DrawLineCommand.html">dwv.tool.DrawLineCommand</a></li>
+            
+                <li><a href="../classes/dwv.tool.DrawLivewireCommand.html">dwv.tool.DrawLivewireCommand</a></li>
+            
+                <li><a href="../classes/dwv.tool.DrawRectangleCommand.html">dwv.tool.DrawRectangleCommand</a></li>
+            
+                <li><a href="../classes/dwv.tool.DrawRoiCommand.html">dwv.tool.DrawRoiCommand</a></li>
+            
+                <li><a href="../classes/dwv.tool.Filter.html">dwv.tool.Filter</a></li>
+            
+                <li><a href="../classes/dwv.tool.filter.Sharpen.html">dwv.tool.filter.Sharpen</a></li>
+            
+                <li><a href="../classes/dwv.tool.filter.Threshold.html">dwv.tool.filter.Threshold</a></li>
+            
+                <li><a href="../classes/dwv.tool.Livewire.html">dwv.tool.Livewire</a></li>
+            
+                <li><a href="../classes/dwv.tool.RunFilterCommand.html">dwv.tool.RunFilterCommand</a></li>
+            
+                <li><a href="../classes/dwv.tool.ToolBox.html">dwv.tool.ToolBox</a></li>
+            
+                <li><a href="../classes/dwv.tool.UndoStack.html">dwv.tool.UndoStack</a></li>
+            
+                <li><a href="../classes/dwv.tool.WindowLevel.html">dwv.tool.WindowLevel</a></li>
+            
+                <li><a href="../classes/dwv.tool.Zoom.html">dwv.tool.Zoom</a></li>
+            
                 <li><a href="../classes/dwv.utils.html">dwv.utils</a></li>
-            
-                <li><a href="../classes/Filter classes..Draw line command..html">Filter classes..Draw line command.</a></li>
-            
-                <li><a href="../classes/Filter classes..Draw livewire command..html">Filter classes..Draw livewire command.</a></li>
-            
-                <li><a href="../classes/Filter classes..Draw rectangle command..html">Filter classes..Draw rectangle command.</a></li>
-            
-                <li><a href="../classes/Filter classes..Draw ROI command..html">Filter classes..Draw ROI command.</a></li>
-            
-                <li><a href="../classes/Filter classes..Filter tool..html">Filter classes..Filter tool.</a></li>
-            
-                <li><a href="../classes/Filter classes..Livewire painting tool..html">Filter classes..Livewire painting tool.</a></li>
-            
-                <li><a href="../classes/Filter classes..Run filter command..html">Filter classes..Run filter command.</a></li>
-            
-                <li><a href="../classes/Filter classes..Sharpen filter tool..html">Filter classes..Sharpen filter tool.</a></li>
-            
-                <li><a href="../classes/Filter classes..Sobel filter tool..html">Filter classes..Sobel filter tool.</a></li>
-            
-                <li><a href="../classes/Filter classes..Threshold filter tool..html">Filter classes..Threshold filter tool.</a></li>
-            
-                <li><a href="../classes/Filter classes..Tool box..html">Filter classes..Tool box.</a></li>
-            
-                <li><a href="../classes/Filter classes..UndoStack class..html">Filter classes..UndoStack class.</a></li>
-            
-                <li><a href="../classes/Filter classes..WindowLevel tool: handle window/level related events..html">Filter classes..WindowLevel tool: handle window/level related events.</a></li>
-            
-                <li><a href="../classes/Filter classes..Zoom class..html">Filter classes..Zoom class.</a></li>
             
             </ul>
 
@@ -143,7 +145,11 @@ Main application.</a></li>
             
                 <li><a href="../modules/image.html">image</a></li>
             
+                <li><a href="../modules/info.html">info</a></li>
+            
                 <li><a href="../modules/math.html">math</a></li>
+            
+                <li><a href="../modules/tool.html">tool</a></li>
             
                 <li><a href="../modules/utils.html">utils</a></li>
             
@@ -186,25 +192,41 @@ Main application.</a></li>
 
 <div class="file">
     <pre class="code prettyprint linenums">
-//! @namespace Main DWV namespace.
+/** 
+ * Tool module.
+ * @module tool
+ */
 var dwv = dwv || {};
-//! @namespace Tool classes.
 dwv.tool = dwv.tool || {};
 
 /**
- * @class UndoStack class.
- * @param app
+ * UndoStack class.
+ * @class UndoStack
+ * @namespace dwv.tool
+ * @constructor
+ * @param {Object} app The associated application.
  */
 dwv.tool.UndoStack = function(app)
 { 
-    // Array of commands.
+    /**
+     * Array of commands.
+     * @property stack
+     * @private
+     * @type Array
+     */
     var stack = [];
-    // Current command index.
+    /**
+     * Current command index.
+     * @property curCmdIndex
+     * @private
+     * @type Number
+     */
     var curCmdIndex = 0;
 
     /**
      * Add a command to the stack.
-     * @param cmd The command to add.
+     * @method add
+     * @param {Object} cmd The command to add.
      */
     this.add = function(cmd)
     { 
@@ -220,6 +242,7 @@ dwv.tool.UndoStack = function(app)
 
     /**
      * Undo the last command. 
+     * @method undo
      */
     this.undo = function()
     { 
@@ -254,6 +277,7 @@ dwv.tool.UndoStack = function(app)
 
     /**
      * Redo the last command.
+     * @method redo
      */
     this.redo = function()
     { 

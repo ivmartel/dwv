@@ -79,13 +79,11 @@ Main application.</a></li>
             
                 <li><a href="../classes/dwv.image.View.html">dwv.image.View</a></li>
             
+                <li><a href="../classes/dwv.info.html">dwv.info</a></li>
+            
                 <li><a href="../classes/dwv.math.BucketQueue.html">dwv.math.BucketQueue</a></li>
             
                 <li><a href="../classes/dwv.math.Circle.html">dwv.math.Circle</a></li>
-            
-                <li><a href="../classes/dwv.math.Draw circle command..html">dwv.math.Draw circle command.</a></li>
-            
-                <li><a href="../classes/dwv.math.Drawing tool..html">dwv.math.Drawing tool.</a></li>
             
                 <li><a href="../classes/dwv.math.FastPoint2D.html">dwv.math.FastPoint2D</a></li>
             
@@ -101,35 +99,39 @@ Main application.</a></li>
             
                 <li><a href="../classes/dwv.math.Scissors.html">dwv.math.Scissors</a></li>
             
+                <li><a href="../classes/dwv.tool.html">dwv.tool</a></li>
+            
+                <li><a href="../classes/dwv.tool.Draw.html">dwv.tool.Draw</a></li>
+            
+                <li><a href="../classes/dwv.tool.DrawCircleCommand.html">dwv.tool.DrawCircleCommand</a></li>
+            
+                <li><a href="../classes/dwv.tool.DrawLineCommand.html">dwv.tool.DrawLineCommand</a></li>
+            
+                <li><a href="../classes/dwv.tool.DrawLivewireCommand.html">dwv.tool.DrawLivewireCommand</a></li>
+            
+                <li><a href="../classes/dwv.tool.DrawRectangleCommand.html">dwv.tool.DrawRectangleCommand</a></li>
+            
+                <li><a href="../classes/dwv.tool.DrawRoiCommand.html">dwv.tool.DrawRoiCommand</a></li>
+            
+                <li><a href="../classes/dwv.tool.Filter.html">dwv.tool.Filter</a></li>
+            
+                <li><a href="../classes/dwv.tool.filter.Sharpen.html">dwv.tool.filter.Sharpen</a></li>
+            
+                <li><a href="../classes/dwv.tool.filter.Threshold.html">dwv.tool.filter.Threshold</a></li>
+            
+                <li><a href="../classes/dwv.tool.Livewire.html">dwv.tool.Livewire</a></li>
+            
+                <li><a href="../classes/dwv.tool.RunFilterCommand.html">dwv.tool.RunFilterCommand</a></li>
+            
+                <li><a href="../classes/dwv.tool.ToolBox.html">dwv.tool.ToolBox</a></li>
+            
+                <li><a href="../classes/dwv.tool.UndoStack.html">dwv.tool.UndoStack</a></li>
+            
+                <li><a href="../classes/dwv.tool.WindowLevel.html">dwv.tool.WindowLevel</a></li>
+            
+                <li><a href="../classes/dwv.tool.Zoom.html">dwv.tool.Zoom</a></li>
+            
                 <li><a href="../classes/dwv.utils.html">dwv.utils</a></li>
-            
-                <li><a href="../classes/Filter classes..Draw line command..html">Filter classes..Draw line command.</a></li>
-            
-                <li><a href="../classes/Filter classes..Draw livewire command..html">Filter classes..Draw livewire command.</a></li>
-            
-                <li><a href="../classes/Filter classes..Draw rectangle command..html">Filter classes..Draw rectangle command.</a></li>
-            
-                <li><a href="../classes/Filter classes..Draw ROI command..html">Filter classes..Draw ROI command.</a></li>
-            
-                <li><a href="../classes/Filter classes..Filter tool..html">Filter classes..Filter tool.</a></li>
-            
-                <li><a href="../classes/Filter classes..Livewire painting tool..html">Filter classes..Livewire painting tool.</a></li>
-            
-                <li><a href="../classes/Filter classes..Run filter command..html">Filter classes..Run filter command.</a></li>
-            
-                <li><a href="../classes/Filter classes..Sharpen filter tool..html">Filter classes..Sharpen filter tool.</a></li>
-            
-                <li><a href="../classes/Filter classes..Sobel filter tool..html">Filter classes..Sobel filter tool.</a></li>
-            
-                <li><a href="../classes/Filter classes..Threshold filter tool..html">Filter classes..Threshold filter tool.</a></li>
-            
-                <li><a href="../classes/Filter classes..Tool box..html">Filter classes..Tool box.</a></li>
-            
-                <li><a href="../classes/Filter classes..UndoStack class..html">Filter classes..UndoStack class.</a></li>
-            
-                <li><a href="../classes/Filter classes..WindowLevel tool: handle window/level related events..html">Filter classes..WindowLevel tool: handle window/level related events.</a></li>
-            
-                <li><a href="../classes/Filter classes..Zoom class..html">Filter classes..Zoom class.</a></li>
             
             </ul>
 
@@ -143,7 +145,11 @@ Main application.</a></li>
             
                 <li><a href="../modules/image.html">image</a></li>
             
+                <li><a href="../modules/info.html">info</a></li>
+            
                 <li><a href="../modules/math.html">math</a></li>
+            
+                <li><a href="../modules/tool.html">tool</a></li>
             
                 <li><a href="../modules/utils.html">utils</a></li>
             
@@ -186,23 +192,44 @@ Main application.</a></li>
 
 <div class="file">
     <pre class="code prettyprint linenums">
-//! @namespace Main DWV namespace.
+/** 
+ * Tool module.
+ * @module tool
+ */
 var dwv = dwv || {};
-//! @namespace Tool classes.
 dwv.tool = dwv.tool || {};
 
-//filter list: to be completed after each tool definition 
+// Filter list: to be completed after each tool definition 
 dwv.tool.filters = dwv.tool.filters || {};
 
 /**
-* @class Filter tool.
-*/
+ * Filter tool.
+ * @class Filter
+ * @namespace dwv.tool
+ * @constructor
+ * @param {Object} app The associated application.
+ */
 dwv.tool.Filter = function(app)
 {
+    /**
+     * Selected filter.
+     * @property selectedFilter
+     * @type Object
+     */
     this.selectedFilter = 0;
+    /**
+     * Default filter name.
+     * @property defaultFilterName
+     * @type String
+     */
     this.defaultFilterName = 0;
 };
 
+/**
+ * Enable the filter.
+ * @method enable
+ * @param {Boolean} bool Flag to enable or not.
+ */
 dwv.tool.Filter.prototype.enable = function(bool)
 {
     if( bool ) {
@@ -218,10 +245,20 @@ dwv.tool.Filter.prototype.enable = function(bool)
     }
 };
 
+/**
+ * Get the selected filter.
+ * @method getSelectedFilter
+ * @return {Object} The selected filter.
+ */
 dwv.tool.Filter.prototype.getSelectedFilter = function() {
     return this.selectedFilter;
 };
 
+/**
+ * Set the selected filter.
+ * @method setSelectedFilter
+ * @return {String} The name of the filter to select.
+ */
 dwv.tool.Filter.prototype.setSelectedFilter = function(name) {
     // check if we have it
     if( !this.hasFilter(name) )
@@ -238,10 +275,20 @@ dwv.tool.Filter.prototype.setSelectedFilter = function(name) {
     this.selectedFilter.enable(true);
 };
 
+/**
+ * Check if a filter is in the filter list.
+ * @method hasFilter
+ * @param {String} name The name to check.
+ * @return {String} The filter list element for the given name.
+ */
 dwv.tool.Filter.prototype.hasFilter = function(name) {
     return dwv.tool.filters[name];
 };
 
+/**
+ * Initialise the filter.
+ * @method init
+ */
 dwv.tool.Filter.prototype.init = function()
 {
     // set the default to the first in the list
@@ -252,20 +299,32 @@ dwv.tool.Filter.prototype.init = function()
     this.setSelectedFilter(this.defaultFilterName);
 };
 
+/**
+ * Handle keydown event.
+ * @method keydown
+ * @param {Object} event The keydown event.
+ */
 dwv.tool.Filter.prototype.keydown = function(event){
     app.handleKeyDown(event);
 };
 
-/**
- * @namespace Filter classes.
- */
+// Filter namespace
 dwv.tool.filter = dwv.tool.filter || {};
 
 /**
-* @class Threshold filter tool.
-*/
+ * Threshold filter tool.
+ * @class Threshold
+ * @namespace dwv.tool.filter
+ * @constructor
+ * @param {Object} app The associated application.
+ */
 dwv.tool.filter.Threshold = function(app) {};
 
+/**
+ * Enable the filter.
+ * @method enable
+ * @param {Boolean} value Flag to enable or not.
+ */
 dwv.tool.filter.Threshold.prototype.enable = function(value)
 {
     if( value ) {
@@ -276,6 +335,11 @@ dwv.tool.filter.Threshold.prototype.enable = function(value)
     }
 };
 
+/**
+ * Run the filter.
+ * @method run
+ * @param {Mixed} args The filter arguments.
+ */
 dwv.tool.filter.Threshold.prototype.run = function(args)
 {
     var filter = new dwv.image.filter.Threshold();
@@ -287,14 +351,23 @@ dwv.tool.filter.Threshold.prototype.run = function(args)
     app.getUndoStack().add(command);
 };
 
-// Add the tool to the list
+// Add the filter to the filter list
 dwv.tool.filters.threshold = dwv.tool.filter.Threshold;
 
 /**
-* @class Sharpen filter tool.
-*/
+ * Sharpen filter tool.
+ * @class Sharpen
+ * @namespace dwv.tool.filter
+ * @constructor
+ * @param {Object} app The associated application.
+ */
 dwv.tool.filter.Sharpen = function(app) {};
 
+/**
+ * Enable the filter.
+ * @method enable
+ * @param {Boolean} value Flag to enable or not.
+ */
 dwv.tool.filter.Sharpen.prototype.enable = function(value)
 {
     if( value ) {
@@ -305,6 +378,11 @@ dwv.tool.filter.Sharpen.prototype.enable = function(value)
     }
 };
 
+/**
+ * Run the filter.
+ * @method run
+ * @param {Mixed} args The filter arguments.
+ */
 dwv.tool.filter.Sharpen.prototype.run = function(args)
 {
     var filter = new dwv.image.filter.Sharpen();
@@ -314,14 +392,23 @@ dwv.tool.filter.Sharpen.prototype.run = function(args)
     app.getUndoStack().add(command);
 };
 
-// Add the tool to the list
+// Add the filter to the filter list
 dwv.tool.filters.sharpen = dwv.tool.filter.Sharpen;
 
 /**
-* @class Sobel filter tool.
-*/
+ * Sobel filter tool.
+ * @class Sharpen
+ * @namespace dwv.tool.filter
+ * @constructor
+ * @param {Object} app The associated application.
+ */
 dwv.tool.filter.Sobel = function(app) {};
 
+/**
+ * Enable the filter.
+ * @method enable
+ * @param {Boolean} value Flag to enable or not.
+ */
 dwv.tool.filter.Sobel.prototype.enable = function(value)
 {
     if( value ) {
@@ -332,6 +419,11 @@ dwv.tool.filter.Sobel.prototype.enable = function(value)
     }
 };
 
+/**
+ * Run the filter.
+ * @method run
+ * @param {Mixed} args The filter arguments.
+ */
 dwv.tool.filter.Sobel.prototype.run = function(args)
 {
     var filter = new dwv.image.filter.Sobel();
@@ -341,27 +433,47 @@ dwv.tool.filter.Sobel.prototype.run = function(args)
     app.getUndoStack().add(command);
 };
 
-//Add the tool to the list
+// Add the filter to the filter list
 dwv.tool.filters.sobel = dwv.tool.filter.Sobel;
 
-//Tool list
+// Add the tool to the tool list
 dwv.tool.tools = dwv.tool.tools || {};
-//Add the filters to the tools
 dwv.tool.tools.filter = dwv.tool.Filter;
 
 /**
- * @class Run filter command.
- * @param filter The filter to run.
- * @param app The application to draw the line on.
+ * Run filter command.
+ * @class RunFilterCommand
+ * @namespace dwv.tool
+ * @constructor
+ * @param {Object} filter The filter to run.
+ * @param {Object} app The associated application.
  */
 dwv.tool.RunFilterCommand = function(filter, app)
 {
-    // command name
+    /**
+     * Command name.
+     * @property name
+     * @private
+     * @type String
+     */
     var name = &quot;RunFilter: &quot; + filter.getName();
-    this.setName = function(str) { name = str; };
+    /**
+     * Get the command name.
+     * @method getName
+     * @return {String} The command name.
+     */
     this.getName = function() { return name; };
+    /**
+     * Set the command name.
+     * @method setName
+     * @param {String} str The command name.
+     */
+    this.setName = function(str) { name = str; };
 
-    // main method
+    /**
+     * Execute the command.
+     * @method execute
+     */
     this.execute = function()
     {
         app.setImage(filter.update());

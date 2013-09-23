@@ -79,13 +79,11 @@ Main application.</a></li>
             
                 <li><a href="../classes/dwv.image.View.html">dwv.image.View</a></li>
             
+                <li><a href="../classes/dwv.info.html">dwv.info</a></li>
+            
                 <li><a href="../classes/dwv.math.BucketQueue.html">dwv.math.BucketQueue</a></li>
             
                 <li><a href="../classes/dwv.math.Circle.html">dwv.math.Circle</a></li>
-            
-                <li><a href="../classes/dwv.math.Draw circle command..html">dwv.math.Draw circle command.</a></li>
-            
-                <li><a href="../classes/dwv.math.Drawing tool..html">dwv.math.Drawing tool.</a></li>
             
                 <li><a href="../classes/dwv.math.FastPoint2D.html">dwv.math.FastPoint2D</a></li>
             
@@ -101,35 +99,39 @@ Main application.</a></li>
             
                 <li><a href="../classes/dwv.math.Scissors.html">dwv.math.Scissors</a></li>
             
+                <li><a href="../classes/dwv.tool.html">dwv.tool</a></li>
+            
+                <li><a href="../classes/dwv.tool.Draw.html">dwv.tool.Draw</a></li>
+            
+                <li><a href="../classes/dwv.tool.DrawCircleCommand.html">dwv.tool.DrawCircleCommand</a></li>
+            
+                <li><a href="../classes/dwv.tool.DrawLineCommand.html">dwv.tool.DrawLineCommand</a></li>
+            
+                <li><a href="../classes/dwv.tool.DrawLivewireCommand.html">dwv.tool.DrawLivewireCommand</a></li>
+            
+                <li><a href="../classes/dwv.tool.DrawRectangleCommand.html">dwv.tool.DrawRectangleCommand</a></li>
+            
+                <li><a href="../classes/dwv.tool.DrawRoiCommand.html">dwv.tool.DrawRoiCommand</a></li>
+            
+                <li><a href="../classes/dwv.tool.Filter.html">dwv.tool.Filter</a></li>
+            
+                <li><a href="../classes/dwv.tool.filter.Sharpen.html">dwv.tool.filter.Sharpen</a></li>
+            
+                <li><a href="../classes/dwv.tool.filter.Threshold.html">dwv.tool.filter.Threshold</a></li>
+            
+                <li><a href="../classes/dwv.tool.Livewire.html">dwv.tool.Livewire</a></li>
+            
+                <li><a href="../classes/dwv.tool.RunFilterCommand.html">dwv.tool.RunFilterCommand</a></li>
+            
+                <li><a href="../classes/dwv.tool.ToolBox.html">dwv.tool.ToolBox</a></li>
+            
+                <li><a href="../classes/dwv.tool.UndoStack.html">dwv.tool.UndoStack</a></li>
+            
+                <li><a href="../classes/dwv.tool.WindowLevel.html">dwv.tool.WindowLevel</a></li>
+            
+                <li><a href="../classes/dwv.tool.Zoom.html">dwv.tool.Zoom</a></li>
+            
                 <li><a href="../classes/dwv.utils.html">dwv.utils</a></li>
-            
-                <li><a href="../classes/Filter classes..Draw line command..html">Filter classes..Draw line command.</a></li>
-            
-                <li><a href="../classes/Filter classes..Draw livewire command..html">Filter classes..Draw livewire command.</a></li>
-            
-                <li><a href="../classes/Filter classes..Draw rectangle command..html">Filter classes..Draw rectangle command.</a></li>
-            
-                <li><a href="../classes/Filter classes..Draw ROI command..html">Filter classes..Draw ROI command.</a></li>
-            
-                <li><a href="../classes/Filter classes..Filter tool..html">Filter classes..Filter tool.</a></li>
-            
-                <li><a href="../classes/Filter classes..Livewire painting tool..html">Filter classes..Livewire painting tool.</a></li>
-            
-                <li><a href="../classes/Filter classes..Run filter command..html">Filter classes..Run filter command.</a></li>
-            
-                <li><a href="../classes/Filter classes..Sharpen filter tool..html">Filter classes..Sharpen filter tool.</a></li>
-            
-                <li><a href="../classes/Filter classes..Sobel filter tool..html">Filter classes..Sobel filter tool.</a></li>
-            
-                <li><a href="../classes/Filter classes..Threshold filter tool..html">Filter classes..Threshold filter tool.</a></li>
-            
-                <li><a href="../classes/Filter classes..Tool box..html">Filter classes..Tool box.</a></li>
-            
-                <li><a href="../classes/Filter classes..UndoStack class..html">Filter classes..UndoStack class.</a></li>
-            
-                <li><a href="../classes/Filter classes..WindowLevel tool: handle window/level related events..html">Filter classes..WindowLevel tool: handle window/level related events.</a></li>
-            
-                <li><a href="../classes/Filter classes..Zoom class..html">Filter classes..Zoom class.</a></li>
             
             </ul>
 
@@ -143,7 +145,11 @@ Main application.</a></li>
             
                 <li><a href="../modules/image.html">image</a></li>
             
+                <li><a href="../modules/info.html">info</a></li>
+            
                 <li><a href="../modules/math.html">math</a></li>
+            
+                <li><a href="../modules/tool.html">tool</a></li>
             
                 <li><a href="../modules/utils.html">utils</a></li>
             
@@ -186,37 +192,75 @@ Main application.</a></li>
 
 <div class="file">
     <pre class="code prettyprint linenums">
-//! @namespace Main DWV namespace.
+/** 
+ * Tool module.
+ * @module tool
+ */
 var dwv = dwv || {};
-//! @namespace Tool classes.
 dwv.tool = dwv.tool || {};
 
-//! List of colors
+// List of colors
 dwv.tool.colors = [
     &quot;Yellow&quot;, &quot;Red&quot;, &quot;White&quot;, &quot;Green&quot;, &quot;Blue&quot;, &quot;Lime&quot;, &quot;Fuchsia&quot;, &quot;Black&quot;
 ];
 
-//shape list: to be completed after each tool definition 
+// Shape list: to be completed after each tool definition 
 dwv.tool.shapes = dwv.tool.shapes || {};
 
 /**
-* @class Drawing tool.
-*/
+ * Drawing tool.
+ * @class Draw
+ * @namespace dwv.tool
+ * @constructor
+ * @param {Object} app The associated application.
+ */
 dwv.tool.Draw = function(app)
 {
+    /**
+     * Closure to self: to be used by event handlers.
+     * @property self
+     * @private
+     * @type WindowLevel
+     */
     var self = this;
-    // start drawing flag
+    /**
+     * Interaction start flag.
+     * @property started
+     * @type Boolean
+     */
     var started = false;
-    // draw command
+    
+    /**
+     * Draw command.
+     * @property command
+     * @private
+     * @type Object
+     */
     var command = null;
-    // draw style
+    /**
+     * Drawing style.
+     * @property style
+     * @type Style
+     */
     this.style = new dwv.html.Style();
-    // shape name
+    /**
+     * Shape name.
+     * @property shapeName
+     * @type String
+     */
     this.shapeName = 0;
-    // list of points
+    /**
+     * List of points
+     * @property points
+     * @type Array
+     */
     var points = [];
 
-    // This is called when you start holding down the mouse button.
+    /**
+     * Handle mouse down event.
+     * @method mousedown
+     * @param {Object} event The mouse down event.
+     */
     this.mousedown = function(ev){
         started = true;
         // clear array
@@ -225,7 +269,11 @@ dwv.tool.Draw = function(app)
         points.push(new dwv.math.Point2D(ev._x, ev._y));
     };
 
-    // This function is called every time you move the mouse.
+    /**
+     * Handle mouse move event.
+     * @method mousemove
+     * @param {Object} event The mouse move event.
+     */
     this.mousemove = function(ev){
         if (!started)
         {
@@ -245,7 +293,11 @@ dwv.tool.Draw = function(app)
         }
     };
 
-    // This is called when you release the mouse button.
+    /**
+     * Handle mouse up event.
+     * @method mouseup
+     * @param {Object} event The mouse up event.
+     */
     this.mouseup = function(ev){
         if (started)
         {
@@ -258,23 +310,56 @@ dwv.tool.Draw = function(app)
         }
     };
     
+    /**
+     * Handle mouse out event.
+     * @method mouseout
+     * @param {Object} event The mouse out event.
+     */
     this.mouseout = function(ev){
         self.mouseup(ev);
     };
 
+    /**
+     * Handle touch start event.
+     * @method touchstart
+     * @param {Object} event The touch start event.
+     */
     this.touchstart = function(ev){
         self.mousedown(ev);
     };
 
+    /**
+     * Handle touch move event.
+     * @method touchmove
+     * @param {Object} event The touch move event.
+     */
     this.touchmove = function(ev){
         self.mousemove(ev);
     };
 
+    /**
+     * Handle touch end event.
+     * @method touchend
+     * @param {Object} event The touch end event.
+     */
     this.touchend = function(ev){
         self.mouseup(ev);
     };
 
-   // Enable the draw tool
+    /**
+     * Handle key down event.
+     * @method keydown
+     * @param {Object} event The key down event.
+     */
+    this.keydown = function(event){
+        app.handleKeyDown(event);
+    };
+
+    /**
+     * Enable the tool.
+     * @method enable
+     * @param {Boolean} value The flag to enable or not.
+     */
     this.enable = function(value){
         if( value ) {
             this.init();
@@ -284,22 +369,25 @@ dwv.tool.Draw = function(app)
             dwv.gui.clearDrawHtml();
         }
     };
-    
-    // Handle key down event
-    this.keydown = function(event){
-        app.handleKeyDown(event);
-    };
 
 }; // Draw class
 
-// Set the line color of the drawing
+/**
+ * Set the line color of the drawing.
+ * @method setLineColour
+ * @param {String} colour The colour to set.
+ */
 dwv.tool.Draw.prototype.setLineColour = function(colour)
 {
     // set style var
     this.style.setLineColor(colour);
 };
 
-// Set the shape name of the drawing
+/**
+ * Set the shape name of the drawing.
+ * @method setShapeName
+ * @param {String} name The name of the shape.
+ */
 dwv.tool.Draw.prototype.setShapeName = function(name)
 {
     // check if we have it
@@ -310,10 +398,19 @@ dwv.tool.Draw.prototype.setShapeName = function(name)
     this.shapeName = name;
 };
 
+/**
+ * Check if the shape is in the shape list.
+ * @method hasShape
+ * @param {String} name The name of the shape.
+ */
 dwv.tool.Draw.prototype.hasShape = function(name) {
     return dwv.tool.shapes[name];
 };
 
+/**
+ * Initialise the tool.
+ * @method init
+ */
 dwv.tool.Draw.prototype.init = function() {
     // set the default to the first in the list
     var shapeName = 0;
@@ -326,9 +423,8 @@ dwv.tool.Draw.prototype.init = function() {
     this.setLineColour(dwv.tool.colors[0]);
 };
 
-//Tool list
+// Add the tool to the tool list
 dwv.tool.tools = dwv.tool.tools || {};
-//Add the tool to the list
 dwv.tool.tools.draw = dwv.tool.Draw;
 
     </pre>

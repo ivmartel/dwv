@@ -1,20 +1,6 @@
 YUI.add("yuidoc-meta", function(Y) {
    Y.YUIDoc = { meta: {
     "classes": [
-        "Filter classes..Draw ROI command.",
-        "Filter classes..Draw line command.",
-        "Filter classes..Draw livewire command.",
-        "Filter classes..Draw rectangle command.",
-        "Filter classes..Filter tool.",
-        "Filter classes..Livewire painting tool.",
-        "Filter classes..Run filter command.",
-        "Filter classes..Sharpen filter tool.",
-        "Filter classes..Sobel filter tool.",
-        "Filter classes..Threshold filter tool.",
-        "Filter classes..Tool box.",
-        "Filter classes..UndoStack class.",
-        "Filter classes..WindowLevel tool: handle window/level related events.",
-        "Filter classes..Zoom class.",
         "dwv.App\nMain application.",
         "dwv.dicom.DataReader",
         "dwv.dicom.DicomParser",
@@ -33,10 +19,9 @@ YUI.add("yuidoc-meta", function(Y) {
         "dwv.image.filter.Threshold",
         "dwv.image.lut.Rescale",
         "dwv.image.lut.Window",
+        "dwv.info",
         "dwv.math.BucketQueue",
         "dwv.math.Circle",
-        "dwv.math.Draw circle command.",
-        "dwv.math.Drawing tool.",
         "dwv.math.FastPoint2D",
         "dwv.math.Line",
         "dwv.math.Path",
@@ -44,6 +29,22 @@ YUI.add("yuidoc-meta", function(Y) {
         "dwv.math.ROI",
         "dwv.math.Rectangle",
         "dwv.math.Scissors",
+        "dwv.tool",
+        "dwv.tool.Draw",
+        "dwv.tool.DrawCircleCommand",
+        "dwv.tool.DrawLineCommand",
+        "dwv.tool.DrawLivewireCommand",
+        "dwv.tool.DrawRectangleCommand",
+        "dwv.tool.DrawRoiCommand",
+        "dwv.tool.Filter",
+        "dwv.tool.Livewire",
+        "dwv.tool.RunFilterCommand",
+        "dwv.tool.ToolBox",
+        "dwv.tool.UndoStack",
+        "dwv.tool.WindowLevel",
+        "dwv.tool.Zoom",
+        "dwv.tool.filter.Sharpen",
+        "dwv.tool.filter.Threshold",
         "dwv.utils"
     ],
     "modules": [
@@ -51,7 +52,9 @@ YUI.add("yuidoc-meta", function(Y) {
         "gui",
         "html",
         "image",
+        "info",
         "math",
+        "tool",
         "utils"
     ],
     "allModules": [
@@ -76,9 +79,19 @@ YUI.add("yuidoc-meta", function(Y) {
             "description": "Image module."
         },
         {
+            "displayName": "info",
+            "name": "info",
+            "description": "Info module."
+        },
+        {
             "displayName": "math",
             "name": "math",
             "description": "Math module."
+        },
+        {
+            "displayName": "tool",
+            "name": "tool",
+            "description": "Tool module."
         },
         {
             "displayName": "utils",

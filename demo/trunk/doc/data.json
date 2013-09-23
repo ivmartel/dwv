@@ -201,114 +201,145 @@
             "name": "src/tools/circle.js",
             "modules": {},
             "classes": {
-                "dwv.math.Draw circle command.": 1
+                "dwv.tool.DrawCircleCommand": 1
             },
             "fors": {},
-            "namespaces": {}
+            "namespaces": {
+                "dwv.tool": 1
+            }
         },
         "src/tools/draw.js": {
             "name": "src/tools/draw.js",
             "modules": {},
             "classes": {
-                "dwv.math.Drawing tool.": 1
+                "dwv.tool.Draw": 1
             },
             "fors": {},
-            "namespaces": {}
+            "namespaces": {
+                "dwv.tool": 1
+            }
         },
         "src/tools/filter.js": {
             "name": "src/tools/filter.js",
             "modules": {},
             "classes": {
-                "Filter classes..Filter tool.": 1,
-                "Filter classes..Threshold filter tool.": 1,
-                "Filter classes..Sharpen filter tool.": 1,
-                "Filter classes..Sobel filter tool.": 1,
-                "Filter classes..Run filter command.": 1
+                "dwv.tool.Filter": 1,
+                "dwv.tool.filter.Threshold": 1,
+                "dwv.tool.filter.Sharpen": 1,
+                "dwv.tool.RunFilterCommand": 1
             },
             "fors": {},
             "namespaces": {
-                "Filter classes.": 1
+                "dwv.tool": 1,
+                "dwv.tool.filter": 1
             }
         },
         "src/tools/info.js": {
             "name": "src/tools/info.js",
-            "modules": {},
-            "classes": {},
+            "modules": {
+                "info": 1
+            },
+            "classes": {
+                "dwv.info": 1
+            },
             "fors": {},
-            "namespaces": {}
+            "namespaces": {
+                "dwv": 1
+            }
         },
         "src/tools/line.js": {
             "name": "src/tools/line.js",
-            "modules": {},
+            "modules": {
+                "tool": 1
+            },
             "classes": {
-                "Filter classes..Draw line command.": 1
+                "dwv.tool.DrawLineCommand": 1
             },
             "fors": {},
-            "namespaces": {}
+            "namespaces": {
+                "dwv.tool": 1
+            }
         },
         "src/tools/livewire.js": {
             "name": "src/tools/livewire.js",
             "modules": {},
             "classes": {
-                "Filter classes..Livewire painting tool.": 1,
-                "Filter classes..Draw livewire command.": 1
+                "dwv.tool.Livewire": 1,
+                "dwv.tool.DrawLivewireCommand": 1
             },
             "fors": {},
-            "namespaces": {}
+            "namespaces": {
+                "dwv.tool": 1
+            }
         },
         "src/tools/rectangle.js": {
             "name": "src/tools/rectangle.js",
             "modules": {},
             "classes": {
-                "Filter classes..Draw rectangle command.": 1
+                "dwv.tool.DrawRectangleCommand": 1
             },
             "fors": {},
-            "namespaces": {}
+            "namespaces": {
+                "dwv.tool": 1
+            }
         },
         "src/tools/roi.js": {
             "name": "src/tools/roi.js",
             "modules": {},
             "classes": {
-                "Filter classes..Draw ROI command.": 1
+                "dwv.tool.DrawRoiCommand": 1
             },
             "fors": {},
-            "namespaces": {}
+            "namespaces": {
+                "dwv.tool": 1
+            }
         },
         "src/tools/toolbox.js": {
             "name": "src/tools/toolbox.js",
             "modules": {},
             "classes": {
-                "Filter classes..Tool box.": 1
+                "dwv.tool.ToolBox": 1
             },
             "fors": {},
-            "namespaces": {}
+            "namespaces": {
+                "dwv.tool": 1
+            }
         },
         "src/tools/undo.js": {
             "name": "src/tools/undo.js",
             "modules": {},
             "classes": {
-                "Filter classes..UndoStack class.": 1
+                "dwv.tool.UndoStack": 1
             },
             "fors": {},
-            "namespaces": {}
+            "namespaces": {
+                "dwv.tool": 1
+            }
         },
         "src/tools/windowLevel.js": {
             "name": "src/tools/windowLevel.js",
             "modules": {},
             "classes": {
-                "Filter classes..WindowLevel tool: handle window/level related events.": 1
+                "dwv.tool.WindowLevel": 1
             },
             "fors": {},
-            "namespaces": {}
+            "namespaces": {
+                "dwv": 1,
+                "dwv.tool": 1
+            }
         },
         "src/tools/zoom.js": {
             "name": "src/tools/zoom.js",
             "modules": {},
             "classes": {
-                "Filter classes..Zoom class.": 1
+                "dwv.tool": 1,
+                "dwv.tool.Zoom": 1
             },
             "fors": {},
-            "namespaces": {}
+            "namespaces": {
+                "dwv": 1,
+                "dwv.tool": 1
+            }
         },
         "src/utils/string.js": {
             "name": "src/utils/string.js",
@@ -424,33 +455,63 @@
                 "dwv.math.Line": 1,
                 "dwv.math.Rectangle": 1,
                 "dwv.math.ROI": 1,
-                "dwv.math.Path": 1,
-                "dwv.math.Draw circle command.": 1,
-                "dwv.math.Drawing tool.": 1,
-                "Filter classes..Filter tool.": 1,
-                "Filter classes..Threshold filter tool.": 1,
-                "Filter classes..Sharpen filter tool.": 1,
-                "Filter classes..Sobel filter tool.": 1,
-                "Filter classes..Run filter command.": 1,
-                "Filter classes..Draw line command.": 1,
-                "Filter classes..Livewire painting tool.": 1,
-                "Filter classes..Draw livewire command.": 1,
-                "Filter classes..Draw rectangle command.": 1,
-                "Filter classes..Draw ROI command.": 1,
-                "Filter classes..Tool box.": 1,
-                "Filter classes..UndoStack class.": 1,
-                "Filter classes..WindowLevel tool: handle window/level related events.": 1,
-                "Filter classes..Zoom class.": 1
+                "dwv.math.Path": 1
             },
             "fors": {},
             "namespaces": {
-                "dwv.math": 1,
-                "Filter classes.": 1
+                "dwv.math": 1
+            },
+            "tag": "module",
+            "file": "src/math/shapes.js",
+            "line": 318,
+            "description": "Math module."
+        },
+        "tool": {
+            "name": "tool",
+            "submodules": {},
+            "classes": {
+                "dwv.tool.DrawCircleCommand": 1,
+                "dwv.tool.Draw": 1,
+                "dwv.tool.Filter": 1,
+                "dwv.tool.filter.Threshold": 1,
+                "dwv.tool.filter.Sharpen": 1,
+                "dwv.tool.RunFilterCommand": 1,
+                "dwv.tool.DrawLineCommand": 1,
+                "dwv.tool.Livewire": 1,
+                "dwv.tool.DrawLivewireCommand": 1,
+                "dwv.tool.DrawRectangleCommand": 1,
+                "dwv.tool.DrawRoiCommand": 1,
+                "dwv.tool.ToolBox": 1,
+                "dwv.tool.UndoStack": 1,
+                "dwv.tool": 1,
+                "dwv.tool.WindowLevel": 1,
+                "dwv.tool.Zoom": 1
+            },
+            "fors": {},
+            "namespaces": {
+                "dwv.tool": 1,
+                "dwv.tool.filter": 1,
+                "dwv": 1
             },
             "tag": "module",
             "file": "src/tools/zoom.js",
-            "line": 17,
-            "description": "Math module."
+            "line": 27,
+            "description": "Tool module."
+        },
+        "info": {
+            "name": "info",
+            "submodules": {},
+            "classes": {
+                "dwv.info": 1
+            },
+            "fors": {},
+            "namespaces": {
+                "dwv": 1
+            },
+            "tag": "module",
+            "file": "src/tools/info.js",
+            "line": 6,
+            "description": "Info module."
         },
         "utils": {
             "name": "utils",
@@ -508,7 +569,7 @@
             "module": "dicom",
             "namespace": "dwv.dicom",
             "file": "src/dicom/dicomParser.js",
-            "line": 142,
+            "line": 141,
             "description": "DicomParser class.",
             "is_constructor": 1
         },
@@ -790,7 +851,7 @@
                 {
                     "name": "isSigned_",
                     "description": "Flag to know if the data is signed.",
-                    "type": "Number"
+                    "type": "Boolean"
                 }
             ]
         },
@@ -944,7 +1005,7 @@
                 {
                     "name": "radius",
                     "description": "The radius of the circle.",
-                    "type": "Object"
+                    "type": "Number"
                 }
             ]
         },
@@ -1044,295 +1105,419 @@
                 }
             ]
         },
-        "dwv.math.Draw circle command.": {
-            "name": "dwv.math.Draw circle command.",
-            "shortname": "Draw circle command.",
+        "dwv.tool.DrawCircleCommand": {
+            "name": "dwv.tool.DrawCircleCommand",
+            "shortname": "dwv.tool.DrawCircleCommand",
             "classitems": [],
             "plugins": [],
             "extensions": [],
             "plugin_for": [],
             "extension_for": [],
-            "module": "math",
-            "namespace": "dwv.math",
+            "module": "tool",
+            "namespace": "dwv.tool",
             "file": "src/tools/circle.js",
-            "line": 6,
+            "line": 8,
+            "description": "Draw circle command.",
+            "is_constructor": 1,
             "params": [
                 {
                     "name": "points",
-                    "description": "The points from which to extract the circle."
+                    "description": "The points from which to extract the circle.",
+                    "type": "Array"
                 },
                 {
                     "name": "app",
-                    "description": "The application to draw the circle on."
+                    "description": "The application to draw the circle on.",
+                    "type": "Object"
                 },
                 {
                     "name": "style",
-                    "description": "The drawing style."
+                    "description": "The drawing style.",
+                    "type": "Style"
                 }
             ]
         },
-        "dwv.math.Drawing tool.": {
-            "name": "dwv.math.Drawing tool.",
-            "shortname": "Drawing tool.",
+        "dwv.tool.Draw": {
+            "name": "dwv.tool.Draw",
+            "shortname": "dwv.tool.Draw",
             "classitems": [],
             "plugins": [],
             "extensions": [],
             "plugin_for": [],
             "extension_for": [],
-            "module": "math",
-            "namespace": "dwv.math",
+            "module": "tool",
+            "namespace": "dwv.tool",
             "file": "src/tools/draw.js",
-            "line": 14
+            "line": 16,
+            "description": "Drawing tool.",
+            "is_constructor": 1,
+            "params": [
+                {
+                    "name": "app",
+                    "description": "The associated application.",
+                    "type": "Object"
+                }
+            ]
         },
-        "Filter classes..Filter tool.": {
-            "name": "Filter classes..Filter tool.",
-            "shortname": "Filter tool.",
+        "dwv.tool.Filter": {
+            "name": "dwv.tool.Filter",
+            "shortname": "dwv.tool.Filter",
             "classitems": [],
             "plugins": [],
             "extensions": [],
             "plugin_for": [],
             "extension_for": [],
-            "module": "math",
-            "namespace": "Filter classes.",
+            "module": "tool",
+            "namespace": "dwv.tool",
             "file": "src/tools/filter.js",
-            "line": 9
+            "line": 11,
+            "description": "Filter tool.",
+            "is_constructor": 1,
+            "params": [
+                {
+                    "name": "app",
+                    "description": "The associated application.",
+                    "type": "Object"
+                }
+            ]
         },
-        "Filter classes..Threshold filter tool.": {
-            "name": "Filter classes..Threshold filter tool.",
-            "shortname": "Threshold filter tool.",
+        "dwv.tool.filter.Threshold": {
+            "name": "dwv.tool.filter.Threshold",
+            "shortname": "dwv.tool.filter.Threshold",
             "classitems": [],
             "plugins": [],
             "extensions": [],
             "plugin_for": [],
             "extension_for": [],
-            "module": "math",
-            "namespace": "Filter classes.",
+            "module": "tool",
+            "namespace": "dwv.tool.filter",
             "file": "src/tools/filter.js",
-            "line": 76
+            "line": 120,
+            "description": "Threshold filter tool.",
+            "is_constructor": 1,
+            "params": [
+                {
+                    "name": "app",
+                    "description": "The associated application.",
+                    "type": "Object"
+                }
+            ]
         },
-        "Filter classes..Sharpen filter tool.": {
-            "name": "Filter classes..Sharpen filter tool.",
-            "shortname": "Sharpen filter tool.",
+        "dwv.tool.filter.Sharpen": {
+            "name": "dwv.tool.filter.Sharpen",
+            "shortname": "dwv.tool.filter.Sharpen",
             "classitems": [],
             "plugins": [],
             "extensions": [],
             "plugin_for": [],
             "extension_for": [],
-            "module": "math",
-            "namespace": "Filter classes.",
+            "module": "tool",
+            "namespace": "dwv.tool.filter",
             "file": "src/tools/filter.js",
-            "line": 105
+            "line": 204,
+            "description": "Sobel filter tool.",
+            "is_constructor": 1,
+            "params": [
+                {
+                    "name": "app",
+                    "description": "The associated application.",
+                    "type": "Object"
+                }
+            ]
         },
-        "Filter classes..Sobel filter tool.": {
-            "name": "Filter classes..Sobel filter tool.",
-            "shortname": "Sobel filter tool.",
+        "dwv.tool.RunFilterCommand": {
+            "name": "dwv.tool.RunFilterCommand",
+            "shortname": "dwv.tool.RunFilterCommand",
             "classitems": [],
             "plugins": [],
             "extensions": [],
             "plugin_for": [],
             "extension_for": [],
-            "module": "math",
-            "namespace": "Filter classes.",
+            "module": "tool",
+            "namespace": "dwv.tool",
             "file": "src/tools/filter.js",
-            "line": 132
-        },
-        "Filter classes..Run filter command.": {
-            "name": "Filter classes..Run filter command.",
-            "shortname": "Run filter command.",
-            "classitems": [],
-            "plugins": [],
-            "extensions": [],
-            "plugin_for": [],
-            "extension_for": [],
-            "module": "math",
-            "namespace": "Filter classes.",
-            "file": "src/tools/filter.js",
-            "line": 164,
+            "line": 249,
+            "description": "Run filter command.",
+            "is_constructor": 1,
             "params": [
                 {
                     "name": "filter",
-                    "description": "The filter to run."
+                    "description": "The filter to run.",
+                    "type": "Object"
                 },
                 {
                     "name": "app",
-                    "description": "The application to draw the line on."
+                    "description": "The associated application.",
+                    "type": "Object"
                 }
             ]
         },
-        "Filter classes..Draw line command.": {
-            "name": "Filter classes..Draw line command.",
-            "shortname": "Draw line command.",
+        "dwv.info": {
+            "name": "dwv.info",
+            "shortname": "dwv.info",
             "classitems": [],
             "plugins": [],
             "extensions": [],
             "plugin_for": [],
             "extension_for": [],
-            "module": "math",
-            "namespace": "Filter classes.",
-            "file": "src/tools/line.js",
+            "module": "info",
+            "namespace": "dwv",
+            "file": "src/tools/info.js",
             "line": 6,
+            "description": "Namespace for info functions.",
+            "static": 1
+        },
+        "dwv.tool.DrawLineCommand": {
+            "name": "dwv.tool.DrawLineCommand",
+            "shortname": "dwv.tool.DrawLineCommand",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "tool",
+            "namespace": "dwv.tool",
+            "file": "src/tools/line.js",
+            "line": 8,
+            "description": "Draw line command.",
+            "is_constructor": 1,
             "params": [
                 {
                     "name": "points",
-                    "description": "The points from which to extract the line."
+                    "description": "The points from which to extract the line.",
+                    "type": "Array"
                 },
                 {
                     "name": "app",
-                    "description": "The application to draw the line on."
+                    "description": "The application to draw the line on.",
+                    "type": "Object"
                 },
                 {
                     "name": "style",
-                    "description": "The drawing style."
+                    "description": "The drawing style.",
+                    "type": "Style"
                 }
             ]
         },
-        "Filter classes..Livewire painting tool.": {
-            "name": "Filter classes..Livewire painting tool.",
-            "shortname": "Livewire painting tool.",
+        "dwv.tool.Livewire": {
+            "name": "dwv.tool.Livewire",
+            "shortname": "dwv.tool.Livewire",
             "classitems": [],
             "plugins": [],
             "extensions": [],
             "plugin_for": [],
             "extension_for": [],
-            "module": "math",
-            "namespace": "Filter classes.",
+            "module": "tool",
+            "namespace": "dwv.tool",
             "file": "src/tools/livewire.js",
-            "line": 6
+            "line": 8,
+            "description": "Livewire painting tool.",
+            "is_constructor": 1,
+            "params": [
+                {
+                    "name": "app",
+                    "description": "The associated application.",
+                    "type": "Object"
+                }
+            ]
         },
-        "Filter classes..Draw livewire command.": {
-            "name": "Filter classes..Draw livewire command.",
-            "shortname": "Draw livewire command.",
+        "dwv.tool.DrawLivewireCommand": {
+            "name": "dwv.tool.DrawLivewireCommand",
+            "shortname": "dwv.tool.DrawLivewireCommand",
             "classitems": [],
             "plugins": [],
             "extensions": [],
             "plugin_for": [],
             "extension_for": [],
-            "module": "math",
-            "namespace": "Filter classes.",
+            "module": "tool",
+            "namespace": "dwv.tool",
             "file": "src/tools/livewire.js",
-            "line": 178,
+            "line": 276,
+            "description": "Draw livewire command.",
             "params": [
                 {
                     "name": "livewire",
-                    "description": "The livewire to draw."
+                    "description": "The livewire to draw.",
+                    "type": "Object"
                 },
                 {
                     "name": "app",
-                    "description": "The application to draw the livewire on."
+                    "description": "The application to draw the livewire on.",
+                    "type": "Object"
+                },
+                {
+                    "name": "style",
+                    "description": "The style of the livewire.",
+                    "type": "Object"
                 }
             ]
         },
-        "Filter classes..Draw rectangle command.": {
-            "name": "Filter classes..Draw rectangle command.",
-            "shortname": "Draw rectangle command.",
+        "dwv.tool.DrawRectangleCommand": {
+            "name": "dwv.tool.DrawRectangleCommand",
+            "shortname": "dwv.tool.DrawRectangleCommand",
             "classitems": [],
             "plugins": [],
             "extensions": [],
             "plugin_for": [],
             "extension_for": [],
-            "module": "math",
-            "namespace": "Filter classes.",
+            "module": "tool",
+            "namespace": "dwv.tool",
             "file": "src/tools/rectangle.js",
-            "line": 6,
+            "line": 8,
+            "description": "Draw rectangle command.",
+            "is_constructor": 1,
             "params": [
                 {
                     "name": "points",
-                    "description": "The points from which to extract the circle."
+                    "description": "The points from which to extract the circle.",
+                    "type": "Array"
                 },
                 {
                     "name": "app",
-                    "description": "The application to draw the line on."
+                    "description": "The application to draw the line on.",
+                    "type": "Object"
                 },
                 {
                     "name": "style",
-                    "description": "The drawing style."
+                    "description": "The drawing style.",
+                    "type": "Style"
                 }
             ]
         },
-        "Filter classes..Draw ROI command.": {
-            "name": "Filter classes..Draw ROI command.",
-            "shortname": "Draw ROI command.",
+        "dwv.tool.DrawRoiCommand": {
+            "name": "dwv.tool.DrawRoiCommand",
+            "shortname": "dwv.tool.DrawRoiCommand",
             "classitems": [],
             "plugins": [],
             "extensions": [],
             "plugin_for": [],
             "extension_for": [],
-            "module": "math",
-            "namespace": "Filter classes.",
+            "module": "tool",
+            "namespace": "dwv.tool",
             "file": "src/tools/roi.js",
-            "line": 6,
+            "line": 8,
+            "description": "Draw ROI command.",
+            "is_constructor": 1,
             "params": [
                 {
                     "name": "points",
-                    "description": "The points from which to extract the line."
+                    "description": "The points from which to extract the line.",
+                    "type": "Array"
                 },
                 {
                     "name": "app",
-                    "description": "The application to draw the line on."
+                    "description": "The application to draw the line on.",
+                    "type": "Object"
                 },
                 {
                     "name": "style",
-                    "description": "The drawing style."
+                    "description": "The drawing style.",
+                    "type": "Style"
                 }
             ]
         },
-        "Filter classes..Tool box.": {
-            "name": "Filter classes..Tool box.",
-            "shortname": "Tool box.",
+        "dwv.tool.ToolBox": {
+            "name": "dwv.tool.ToolBox",
+            "shortname": "dwv.tool.ToolBox",
             "classitems": [],
             "plugins": [],
             "extensions": [],
             "plugin_for": [],
             "extension_for": [],
-            "module": "math",
-            "namespace": "Filter classes.",
+            "module": "tool",
+            "namespace": "dwv.tool",
             "file": "src/tools/toolbox.js",
-            "line": 9
-        },
-        "Filter classes..UndoStack class.": {
-            "name": "Filter classes..UndoStack class.",
-            "shortname": "UndoStack class.",
-            "classitems": [],
-            "plugins": [],
-            "extensions": [],
-            "plugin_for": [],
-            "extension_for": [],
-            "module": "math",
-            "namespace": "Filter classes.",
-            "file": "src/tools/undo.js",
-            "line": 6,
+            "line": 11,
+            "description": "Tool box.",
+            "is_constructor": 1,
             "params": [
                 {
                     "name": "app",
-                    "description": ""
+                    "description": "The associated application.",
+                    "type": "Object"
                 }
             ]
         },
-        "Filter classes..WindowLevel tool: handle window/level related events.": {
-            "name": "Filter classes..WindowLevel tool: handle window/level related events.",
-            "shortname": "WindowLevel tool: handle window/level related events.",
+        "dwv.tool.UndoStack": {
+            "name": "dwv.tool.UndoStack",
+            "shortname": "dwv.tool.UndoStack",
             "classitems": [],
             "plugins": [],
             "extensions": [],
             "plugin_for": [],
             "extension_for": [],
-            "module": "math",
-            "namespace": "Filter classes.",
-            "file": "src/tools/windowLevel.js",
-            "line": 53
+            "module": "tool",
+            "namespace": "dwv.tool",
+            "file": "src/tools/undo.js",
+            "line": 8,
+            "description": "UndoStack class.",
+            "is_constructor": 1,
+            "params": [
+                {
+                    "name": "app",
+                    "description": "The associated application.",
+                    "type": "Object"
+                }
+            ]
         },
-        "Filter classes..Zoom class.": {
-            "name": "Filter classes..Zoom class.",
-            "shortname": "Zoom class.",
+        "dwv.tool": {
+            "name": "dwv.tool",
+            "shortname": "dwv.tool",
             "classitems": [],
             "plugins": [],
             "extensions": [],
             "plugin_for": [],
             "extension_for": [],
-            "module": "math",
-            "namespace": "Filter classes.",
+            "module": "tool",
+            "namespace": "dwv",
             "file": "src/tools/zoom.js",
-            "line": 17
+            "line": 6,
+            "description": "Namespace for tool functions.",
+            "static": 1
+        },
+        "dwv.tool.WindowLevel": {
+            "name": "dwv.tool.WindowLevel",
+            "shortname": "dwv.tool.WindowLevel",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "tool",
+            "namespace": "dwv.tool",
+            "file": "src/tools/windowLevel.js",
+            "line": 68,
+            "description": "WindowLevel tool: handle window/level related events.",
+            "is_constructor": 1,
+            "params": [
+                {
+                    "name": "app",
+                    "description": "The associated application.",
+                    "type": "Object"
+                }
+            ]
+        },
+        "dwv.tool.Zoom": {
+            "name": "dwv.tool.Zoom",
+            "shortname": "dwv.tool.Zoom",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "tool",
+            "namespace": "dwv.tool",
+            "file": "src/tools/zoom.js",
+            "line": 27,
+            "description": "Zoom class.",
+            "is_constructor": 1,
+            "params": [
+                {
+                    "name": "app",
+                    "description": "The associated application.",
+                    "type": "Object"
+                }
+            ]
         },
         "dwv.utils": {
             "name": "dwv.utils",
@@ -1588,7 +1773,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 150,
+            "line": 149,
             "description": "The list of DICOM elements.",
             "itemtype": "property",
             "name": "dicomElements",
@@ -1599,7 +1784,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 156,
+            "line": 155,
             "description": "The number of DICOM Items.",
             "itemtype": "property",
             "name": "numberOfItems",
@@ -1610,7 +1795,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 162,
+            "line": 161,
             "description": "The DICOM dictionary used to find tag names.",
             "itemtype": "property",
             "name": "dict",
@@ -1621,7 +1806,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 168,
+            "line": 167,
             "description": "The pixel buffer.",
             "itemtype": "property",
             "name": "pixelBuffer",
@@ -1632,7 +1817,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 176,
+            "line": 175,
             "description": "Get the DICOM data pixel buffer.",
             "itemtype": "method",
             "name": "getPixelBuffer",
@@ -1646,7 +1831,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 186,
+            "line": 185,
             "description": "Append a DICOM element to the dicomElements member object.\nAllows for easy retrieval of DICOM tag values from the tag name.\nIf tags have same name (for the 'unknown' and private tags cases), a number is appended\nmaking the name unique.",
             "itemtype": "method",
             "name": "appendDicomElement",
@@ -1663,7 +1848,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 215,
+            "line": 214,
             "description": "Read a DICOM tag.",
             "itemtype": "method",
             "name": "readTag",
@@ -1686,7 +1871,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 239,
+            "line": 238,
             "description": "Read a DICOM data element.",
             "itemtype": "method",
             "name": "readDataElement",
@@ -1714,7 +1899,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 332,
+            "line": 331,
             "description": "Parse the complete DICOM file (given as input to the class).\nFills in the member object 'dicomElements'.",
             "itemtype": "method",
             "name": "parse",
@@ -1730,7 +1915,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 506,
+            "line": 505,
             "description": "Get an Image object from the read DICOM file.",
             "itemtype": "method",
             "name": "createImage",
@@ -2882,7 +3067,7 @@
             "description": "Set the line color for the layer.",
             "itemtype": "method",
             "name": "setLineColor",
-            "input": "{Layer} color The line color.",
+            "input": "{String} color The line color.",
             "class": "dwv.html.Layer",
             "module": "html",
             "namespace": "dwv.html"
@@ -2931,7 +3116,72 @@
         },
         {
             "file": "src/html/style.js",
-            "line": 25,
+            "line": 16,
+            "description": "Font size.",
+            "itemtype": "property",
+            "name": "fontSize",
+            "access": "private",
+            "tagname": "",
+            "type": "Number",
+            "class": "dwv.html.Style",
+            "module": "html",
+            "namespace": "dwv.html"
+        },
+        {
+            "file": "src/html/style.js",
+            "line": 23,
+            "description": "Font definition string.",
+            "itemtype": "property",
+            "name": "fontStr",
+            "access": "private",
+            "tagname": "",
+            "type": "String",
+            "class": "dwv.html.Style",
+            "module": "html",
+            "namespace": "dwv.html"
+        },
+        {
+            "file": "src/html/style.js",
+            "line": 30,
+            "description": "Line height.",
+            "itemtype": "property",
+            "name": "lineHeight",
+            "access": "private",
+            "tagname": "",
+            "type": "Number",
+            "class": "dwv.html.Style",
+            "module": "html",
+            "namespace": "dwv.html"
+        },
+        {
+            "file": "src/html/style.js",
+            "line": 37,
+            "description": "Text color.",
+            "itemtype": "property",
+            "name": "textColor",
+            "access": "private",
+            "tagname": "",
+            "type": "String",
+            "class": "dwv.html.Style",
+            "module": "html",
+            "namespace": "dwv.html"
+        },
+        {
+            "file": "src/html/style.js",
+            "line": 44,
+            "description": "Line color.",
+            "itemtype": "property",
+            "name": "lineColor",
+            "access": "private",
+            "tagname": "",
+            "type": "String",
+            "class": "dwv.html.Style",
+            "module": "html",
+            "namespace": "dwv.html"
+        },
+        {
+            "file": "src/html/style.js",
+            "line": 52,
             "description": "Get the font size.",
             "itemtype": "method",
             "name": "getFontSize",
@@ -2945,7 +3195,7 @@
         },
         {
             "file": "src/html/style.js",
-            "line": 34,
+            "line": 59,
             "description": "Get the font definition string.",
             "itemtype": "method",
             "name": "getFontStr",
@@ -2959,7 +3209,7 @@
         },
         {
             "file": "src/html/style.js",
-            "line": 43,
+            "line": 66,
             "description": "Get the line height.",
             "itemtype": "method",
             "name": "getLineHeight",
@@ -2973,7 +3223,7 @@
         },
         {
             "file": "src/html/style.js",
-            "line": 52,
+            "line": 73,
             "description": "Get the text color.",
             "itemtype": "method",
             "name": "getTextColor",
@@ -2987,7 +3237,7 @@
         },
         {
             "file": "src/html/style.js",
-            "line": 61,
+            "line": 80,
             "description": "Get the line color.",
             "itemtype": "method",
             "name": "getLineColor",
@@ -3001,7 +3251,7 @@
         },
         {
             "file": "src/html/style.js",
-            "line": 70,
+            "line": 87,
             "description": "Set the line color.",
             "itemtype": "method",
             "name": "setLineColor",
@@ -3407,7 +3657,7 @@
             "name": "photometricInterpretation",
             "access": "private",
             "tagname": "",
-            "type": "{String}",
+            "type": "String",
             "class": "dwv.image.Image",
             "module": "image",
             "namespace": "dwv.image"
@@ -3420,7 +3670,7 @@
             "name": "planarConfiguration",
             "access": "private",
             "tagname": "",
-            "type": "{Number}",
+            "type": "Number",
             "class": "dwv.image.Image",
             "module": "image",
             "namespace": "dwv.image"
@@ -3433,7 +3683,7 @@
             "name": "meta",
             "access": "private",
             "tagname": "",
-            "type": "{Object}",
+            "type": "Object",
             "class": "dwv.image.Image",
             "module": "image",
             "namespace": "dwv.image"
@@ -3446,7 +3696,7 @@
             "name": "originalBuffer",
             "access": "private",
             "tagname": "",
-            "type": "{Array}",
+            "type": "Array",
             "class": "dwv.image.Image",
             "module": "image",
             "namespace": "dwv.image"
@@ -3459,7 +3709,7 @@
             "name": "dataRange",
             "access": "private",
             "tagname": "",
-            "type": "{Object}",
+            "type": "Object",
             "class": "dwv.image.Image",
             "module": "image",
             "namespace": "dwv.image"
@@ -3472,7 +3722,7 @@
             "name": "histogram",
             "access": "private",
             "tagname": "",
-            "type": "{Object}",
+            "type": "Array",
             "class": "dwv.image.Image",
             "module": "image",
             "namespace": "dwv.image"
@@ -3756,7 +4006,7 @@
             "name": "getHistogram",
             "return": {
                 "description": "The histogram.",
-                "type": "Object"
+                "type": "Array"
             },
             "class": "dwv.image.Image",
             "module": "image",
@@ -4258,7 +4508,7 @@
             "name": "windowPresets",
             "access": "private",
             "tagname": "",
-            "type": "{Object}",
+            "type": "Object",
             "class": "dwv.image.View",
             "module": "image",
             "namespace": "dwv.image"
@@ -4271,7 +4521,7 @@
             "name": "colorMap",
             "access": "private",
             "tagname": "",
-            "type": "{Object}",
+            "type": "Object",
             "class": "dwv.image.View",
             "module": "image",
             "namespace": "dwv.image"
@@ -4284,7 +4534,7 @@
             "name": "currentPosition",
             "access": "private",
             "tagname": "",
-            "type": "{Object}",
+            "type": "Object",
             "class": "dwv.image.View",
             "module": "image",
             "namespace": "dwv.image"
@@ -5336,208 +5586,2200 @@
             "namespace": "dwv.math"
         },
         {
-            "file": "src/tools/filter.js",
-            "line": 71,
-            "class": "Filter classes..Filter tool.",
-            "module": "math",
-            "namespace": "Filter classes."
+            "file": "src/tools/circle.js",
+            "line": 30,
+            "description": "Circle object.",
+            "itemtype": "property",
+            "name": "circle",
+            "access": "private",
+            "tagname": "",
+            "type": "Circle",
+            "class": "dwv.tool.DrawCircleCommand",
+            "module": "tool",
+            "namespace": "dwv.tool"
         },
         {
-            "file": "src/tools/info.js",
-            "line": 6,
-            "itemtype": "method",
-            "name": "Create the windowing info div.",
-            "class": "Filter classes..Draw line command.",
-            "module": "math",
-            "namespace": "Filter classes."
+            "file": "src/tools/circle.js",
+            "line": 38,
+            "description": "Line color.",
+            "itemtype": "property",
+            "name": "lineColor",
+            "access": "private",
+            "tagname": "",
+            "type": "String",
+            "class": "dwv.tool.DrawCircleCommand",
+            "module": "tool",
+            "namespace": "dwv.tool"
         },
         {
-            "file": "src/tools/info.js",
-            "line": 28,
-            "itemtype": "method",
-            "name": "Update the Top Right info div.",
-            "params": [
-                {
-                    "name": "event",
-                    "description": "The windowing change event containing the new values.\nWarning: expects the windowing info div to exist (use after createWindowingDiv)."
-                }
-            ],
-            "class": "Filter classes..Draw line command.",
-            "module": "math",
-            "namespace": "Filter classes."
-        },
-        {
-            "file": "src/tools/info.js",
+            "file": "src/tools/circle.js",
             "line": 45,
-            "itemtype": "method",
-            "name": "Create the position info div.",
-            "class": "Filter classes..Draw line command.",
-            "module": "math",
-            "namespace": "Filter classes."
+            "description": "HTML context.",
+            "itemtype": "property",
+            "name": "context",
+            "access": "private",
+            "tagname": "",
+            "type": "Object",
+            "class": "dwv.tool.DrawCircleCommand",
+            "module": "tool",
+            "namespace": "dwv.tool"
         },
         {
-            "file": "src/tools/info.js",
-            "line": 67,
+            "file": "src/tools/circle.js",
+            "line": 53,
+            "description": "Command name.",
+            "itemtype": "property",
+            "name": "name",
+            "access": "private",
+            "tagname": "",
+            "type": "String",
+            "class": "dwv.tool.DrawCircleCommand",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/circle.js",
+            "line": 60,
+            "description": "Get the command name.",
             "itemtype": "method",
-            "name": "Update the position info div.",
+            "name": "getName",
+            "return": {
+                "description": "The command name.",
+                "type": "String"
+            },
+            "class": "dwv.tool.DrawCircleCommand",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/circle.js",
+            "line": 66,
+            "description": "Set the command name.",
+            "itemtype": "method",
+            "name": "setName",
+            "params": [
+                {
+                    "name": "str",
+                    "description": "The command name.",
+                    "type": "String"
+                }
+            ],
+            "class": "dwv.tool.DrawCircleCommand",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/circle.js",
+            "line": 73,
+            "description": "Execute the command.",
+            "itemtype": "method",
+            "name": "execute",
+            "class": "dwv.tool.DrawCircleCommand",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/draw.js",
+            "line": 25,
+            "description": "Closure to self: to be used by event handlers.",
+            "itemtype": "property",
+            "name": "self",
+            "access": "private",
+            "tagname": "",
+            "type": "WindowLevel",
+            "class": "dwv.tool.Draw",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/draw.js",
+            "line": 32,
+            "description": "Interaction start flag.",
+            "itemtype": "property",
+            "name": "started",
+            "type": "Boolean",
+            "class": "dwv.tool.Draw",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/draw.js",
+            "line": 39,
+            "description": "Draw command.",
+            "itemtype": "property",
+            "name": "command",
+            "access": "private",
+            "tagname": "",
+            "type": "Object",
+            "class": "dwv.tool.Draw",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/draw.js",
+            "line": 46,
+            "description": "Drawing style.",
+            "itemtype": "property",
+            "name": "style",
+            "type": "Style",
+            "class": "dwv.tool.Draw",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/draw.js",
+            "line": 52,
+            "description": "Shape name.",
+            "itemtype": "property",
+            "name": "shapeName",
+            "type": "String",
+            "class": "dwv.tool.Draw",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/draw.js",
+            "line": 58,
+            "description": "List of points",
+            "itemtype": "property",
+            "name": "points",
+            "type": "Array",
+            "class": "dwv.tool.Draw",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/draw.js",
+            "line": 65,
+            "description": "Handle mouse down event.",
+            "itemtype": "method",
+            "name": "mousedown",
             "params": [
                 {
                     "name": "event",
-                    "description": "The position change event containing the new values.\nWarning: expects the position info div to exist (use after createPositionDiv)."
+                    "description": "The mouse down event.",
+                    "type": "Object"
                 }
             ],
-            "class": "Filter classes..Draw line command.",
-            "module": "math",
-            "namespace": "Filter classes."
+            "class": "dwv.tool.Draw",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/draw.js",
+            "line": 78,
+            "description": "Handle mouse move event.",
+            "itemtype": "method",
+            "name": "mousemove",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The mouse move event.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.tool.Draw",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/draw.js",
+            "line": 102,
+            "description": "Handle mouse up event.",
+            "itemtype": "method",
+            "name": "mouseup",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The mouse up event.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.tool.Draw",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/draw.js",
+            "line": 119,
+            "description": "Handle mouse out event.",
+            "itemtype": "method",
+            "name": "mouseout",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The mouse out event.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.tool.Draw",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/draw.js",
+            "line": 128,
+            "description": "Handle touch start event.",
+            "itemtype": "method",
+            "name": "touchstart",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The touch start event.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.tool.Draw",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/draw.js",
+            "line": 137,
+            "description": "Handle touch move event.",
+            "itemtype": "method",
+            "name": "touchmove",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The touch move event.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.tool.Draw",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/draw.js",
+            "line": 146,
+            "description": "Handle touch end event.",
+            "itemtype": "method",
+            "name": "touchend",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The touch end event.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.tool.Draw",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/draw.js",
+            "line": 155,
+            "description": "Handle key down event.",
+            "itemtype": "method",
+            "name": "keydown",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The key down event.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.tool.Draw",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/draw.js",
+            "line": 164,
+            "description": "Enable the tool.",
+            "itemtype": "method",
+            "name": "enable",
+            "params": [
+                {
+                    "name": "value",
+                    "description": "The flag to enable or not.",
+                    "type": "Boolean"
+                }
+            ],
+            "class": "dwv.tool.Draw",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/draw.js",
+            "line": 181,
+            "description": "Set the line color of the drawing.",
+            "itemtype": "method",
+            "name": "setLineColour",
+            "params": [
+                {
+                    "name": "colour",
+                    "description": "The colour to set.",
+                    "type": "String"
+                }
+            ],
+            "class": "dwv.tool.Draw",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/draw.js",
+            "line": 192,
+            "description": "Set the shape name of the drawing.",
+            "itemtype": "method",
+            "name": "setShapeName",
+            "params": [
+                {
+                    "name": "name",
+                    "description": "The name of the shape.",
+                    "type": "String"
+                }
+            ],
+            "class": "dwv.tool.Draw",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/draw.js",
+            "line": 207,
+            "description": "Check if the shape is in the shape list.",
+            "itemtype": "method",
+            "name": "hasShape",
+            "params": [
+                {
+                    "name": "name",
+                    "description": "The name of the shape.",
+                    "type": "String"
+                }
+            ],
+            "class": "dwv.tool.Draw",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/draw.js",
+            "line": 216,
+            "description": "Initialise the tool.",
+            "itemtype": "method",
+            "name": "init",
+            "class": "dwv.tool.Draw",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/filter.js",
+            "line": 20,
+            "description": "Selected filter.",
+            "itemtype": "property",
+            "name": "selectedFilter",
+            "type": "Object",
+            "class": "dwv.tool.Filter",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/filter.js",
+            "line": 26,
+            "description": "Default filter name.",
+            "itemtype": "property",
+            "name": "defaultFilterName",
+            "type": "String",
+            "class": "dwv.tool.Filter",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/filter.js",
+            "line": 34,
+            "description": "Enable the filter.",
+            "itemtype": "method",
+            "name": "enable",
+            "params": [
+                {
+                    "name": "bool",
+                    "description": "Flag to enable or not.",
+                    "type": "Boolean"
+                }
+            ],
+            "class": "dwv.tool.Filter",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/filter.js",
+            "line": 54,
+            "description": "Get the selected filter.",
+            "itemtype": "method",
+            "name": "getSelectedFilter",
+            "return": {
+                "description": "The selected filter.",
+                "type": "Object"
+            },
+            "class": "dwv.tool.Filter",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/filter.js",
+            "line": 63,
+            "description": "Set the selected filter.",
+            "itemtype": "method",
+            "name": "setSelectedFilter",
+            "return": {
+                "description": "The name of the filter to select.",
+                "type": "String"
+            },
+            "class": "dwv.tool.Filter",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/filter.js",
+            "line": 84,
+            "description": "Check if a filter is in the filter list.",
+            "itemtype": "method",
+            "name": "hasFilter",
+            "params": [
+                {
+                    "name": "name",
+                    "description": "The name to check.",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "The filter list element for the given name.",
+                "type": "String"
+            },
+            "class": "dwv.tool.Filter",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/filter.js",
+            "line": 94,
+            "description": "Initialise the filter.",
+            "itemtype": "method",
+            "name": "init",
+            "class": "dwv.tool.Filter",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/filter.js",
+            "line": 108,
+            "description": "Handle keydown event.",
+            "itemtype": "method",
+            "name": "keydown",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The keydown event.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.tool.Filter",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/filter.js",
+            "line": 129,
+            "description": "Enable the filter.",
+            "itemtype": "method",
+            "name": "enable",
+            "params": [
+                {
+                    "name": "value",
+                    "description": "Flag to enable or not.",
+                    "type": "Boolean"
+                }
+            ],
+            "class": "dwv.tool.filter.Threshold",
+            "module": "tool",
+            "namespace": "dwv.tool.filter"
+        },
+        {
+            "file": "src/tools/filter.js",
+            "line": 144,
+            "description": "Run the filter.",
+            "itemtype": "method",
+            "name": "run",
+            "params": [
+                {
+                    "name": "args",
+                    "description": "The filter arguments.",
+                    "type": "Mixed"
+                }
+            ],
+            "class": "dwv.tool.filter.Threshold",
+            "module": "tool",
+            "namespace": "dwv.tool.filter"
+        },
+        {
+            "file": "src/tools/filter.js",
+            "line": 172,
+            "description": "Enable the filter.",
+            "itemtype": "method",
+            "name": "enable",
+            "params": [
+                {
+                    "name": "value",
+                    "description": "Flag to enable or not.",
+                    "type": "Boolean"
+                }
+            ],
+            "class": "dwv.tool.filter.Sharpen",
+            "module": "tool",
+            "namespace": "dwv.tool.filter"
+        },
+        {
+            "file": "src/tools/filter.js",
+            "line": 187,
+            "description": "Run the filter.",
+            "itemtype": "method",
+            "name": "run",
+            "params": [
+                {
+                    "name": "args",
+                    "description": "The filter arguments.",
+                    "type": "Mixed"
+                }
+            ],
+            "class": "dwv.tool.filter.Sharpen",
+            "module": "tool",
+            "namespace": "dwv.tool.filter"
+        },
+        {
+            "file": "src/tools/filter.js",
+            "line": 213,
+            "description": "Enable the filter.",
+            "itemtype": "method",
+            "name": "enable",
+            "params": [
+                {
+                    "name": "value",
+                    "description": "Flag to enable or not.",
+                    "type": "Boolean"
+                }
+            ],
+            "class": "dwv.tool.filter.Sharpen",
+            "module": "tool",
+            "namespace": "dwv.tool.filter"
+        },
+        {
+            "file": "src/tools/filter.js",
+            "line": 228,
+            "description": "Run the filter.",
+            "itemtype": "method",
+            "name": "run",
+            "params": [
+                {
+                    "name": "args",
+                    "description": "The filter arguments.",
+                    "type": "Mixed"
+                }
+            ],
+            "class": "dwv.tool.filter.Sharpen",
+            "module": "tool",
+            "namespace": "dwv.tool.filter"
+        },
+        {
+            "file": "src/tools/filter.js",
+            "line": 259,
+            "description": "Command name.",
+            "itemtype": "property",
+            "name": "name",
+            "access": "private",
+            "tagname": "",
+            "type": "String",
+            "class": "dwv.tool.RunFilterCommand",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/filter.js",
+            "line": 266,
+            "description": "Get the command name.",
+            "itemtype": "method",
+            "name": "getName",
+            "return": {
+                "description": "The command name.",
+                "type": "String"
+            },
+            "class": "dwv.tool.RunFilterCommand",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/filter.js",
+            "line": 272,
+            "description": "Set the command name.",
+            "itemtype": "method",
+            "name": "setName",
+            "params": [
+                {
+                    "name": "str",
+                    "description": "The command name.",
+                    "type": "String"
+                }
+            ],
+            "class": "dwv.tool.RunFilterCommand",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/filter.js",
+            "line": 279,
+            "description": "Execute the command.",
+            "itemtype": "method",
+            "name": "execute",
+            "class": "dwv.tool.RunFilterCommand",
+            "module": "tool",
+            "namespace": "dwv.tool"
         },
         {
             "file": "src/tools/info.js",
-            "line": 84,
+            "line": 14,
+            "description": "Create the windowing info div.",
             "itemtype": "method",
-            "name": "Create the mini color map info div.",
-            "class": "Filter classes..Draw line command.",
-            "module": "math",
-            "namespace": "Filter classes."
+            "name": "createWindowingDiv",
+            "static": 1,
+            "class": "dwv.info",
+            "module": "info",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/tools/info.js",
+            "line": 38,
+            "description": "Update the Top Right info div.",
+            "itemtype": "method",
+            "name": "updateWindowingDiv",
+            "static": 1,
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The windowing change event containing the new values.\nWarning: expects the windowing info div to exist (use after createWindowingDiv).",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.info",
+            "module": "info",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/tools/info.js",
+            "line": 57,
+            "description": "Create the position info div.",
+            "itemtype": "method",
+            "name": "createPositionDiv",
+            "static": 1,
+            "class": "dwv.info",
+            "module": "info",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/tools/info.js",
+            "line": 81,
+            "description": "Update the position info div.",
+            "itemtype": "method",
+            "name": "updatePositionDiv",
+            "static": 1,
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The position change event containing the new values.\nWarning: expects the position info div to exist (use after createPositionDiv).",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.info",
+            "module": "info",
+            "namespace": "dwv"
         },
         {
             "file": "src/tools/info.js",
             "line": 100,
+            "description": "Create the mini color map info div.",
             "itemtype": "method",
-            "name": "Update the mini color map info div.",
-            "params": [
-                {
-                    "name": "event",
-                    "description": "The windowing change event containing the new values.\nWarning: expects the mini color map div to exist (use after createMiniColorMap)."
-                }
-            ],
-            "class": "Filter classes..Draw line command.",
-            "module": "math",
-            "namespace": "Filter classes."
+            "name": "createMiniColorMap",
+            "static": 1,
+            "class": "dwv.info",
+            "module": "info",
+            "namespace": "dwv"
         },
         {
             "file": "src/tools/info.js",
-            "line": 150,
+            "line": 118,
+            "description": "Update the mini color map info div.",
             "itemtype": "method",
-            "name": "Create the plot info.",
-            "class": "Filter classes..Draw line command.",
-            "module": "math",
-            "namespace": "Filter classes."
-        },
-        {
-            "file": "src/tools/info.js",
-            "line": 163,
-            "itemtype": "method",
-            "name": "Update the plot markings.",
+            "name": "updateMiniColorMap",
+            "static": 1,
             "params": [
                 {
                     "name": "event",
-                    "description": "The windowing change event containing the new values.\nWarning: expects the plot to exist (use after createPlot)."
+                    "description": "The windowing change event containing the new values.\nWarning: expects the mini color map div to exist (use after createMiniColorMap).",
+                    "type": "Object"
                 }
             ],
-            "class": "Filter classes..Draw line command.",
-            "module": "math",
-            "namespace": "Filter classes."
+            "class": "dwv.info",
+            "module": "info",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/tools/info.js",
+            "line": 170,
+            "description": "Create the plot info.",
+            "itemtype": "method",
+            "name": "createPlot",
+            "static": 1,
+            "class": "dwv.info",
+            "module": "info",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/tools/info.js",
+            "line": 185,
+            "description": "Update the plot markings.",
+            "itemtype": "method",
+            "name": "updatePlotMarkings",
+            "static": 1,
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The windowing change event containing the new values.\nWarning: expects the plot to exist (use after createPlot).",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.info",
+            "module": "info",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/tools/line.js",
+            "line": 19,
+            "description": "Line object.",
+            "itemtype": "property",
+            "name": "line",
+            "access": "private",
+            "tagname": "",
+            "type": "Line",
+            "class": "dwv.tool.DrawLineCommand",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/line.js",
+            "line": 27,
+            "description": "Line color.",
+            "itemtype": "property",
+            "name": "lineColor",
+            "access": "private",
+            "tagname": "",
+            "type": "String",
+            "class": "dwv.tool.DrawLineCommand",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/line.js",
+            "line": 34,
+            "description": "HTML context.",
+            "itemtype": "property",
+            "name": "context",
+            "access": "private",
+            "tagname": "",
+            "type": "Object",
+            "class": "dwv.tool.DrawLineCommand",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/line.js",
+            "line": 42,
+            "description": "Command name.",
+            "itemtype": "property",
+            "name": "name",
+            "access": "private",
+            "tagname": "",
+            "type": "String",
+            "class": "dwv.tool.DrawLineCommand",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/line.js",
+            "line": 49,
+            "description": "Get the command name.",
+            "itemtype": "method",
+            "name": "getName",
+            "return": {
+                "description": "The command name.",
+                "type": "String"
+            },
+            "class": "dwv.tool.DrawLineCommand",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/line.js",
+            "line": 55,
+            "description": "Set the command name.",
+            "itemtype": "method",
+            "name": "setName",
+            "params": [
+                {
+                    "name": "str",
+                    "description": "The command name.",
+                    "type": "String"
+                }
+            ],
+            "class": "dwv.tool.DrawLineCommand",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/line.js",
+            "line": 62,
+            "description": "Execute the command.",
+            "itemtype": "method",
+            "name": "execute",
+            "class": "dwv.tool.DrawLineCommand",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/livewire.js",
+            "line": 17,
+            "description": "Closure to self: to be used by event handlers.",
+            "itemtype": "property",
+            "name": "self",
+            "access": "private",
+            "tagname": "",
+            "type": "WindowLevel",
+            "class": "dwv.tool.Livewire",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/livewire.js",
+            "line": 24,
+            "description": "Interaction start flag.",
+            "itemtype": "property",
+            "name": "started",
+            "type": "Boolean",
+            "class": "dwv.tool.Livewire",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/livewire.js",
+            "line": 31,
+            "description": "Draw command.",
+            "itemtype": "property",
+            "name": "command",
+            "access": "private",
+            "tagname": "",
+            "type": "Object",
+            "class": "dwv.tool.Livewire",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/livewire.js",
+            "line": 38,
+            "description": "Drawing style.",
+            "itemtype": "property",
+            "name": "style",
+            "type": "Style",
+            "class": "dwv.tool.Livewire",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/livewire.js",
+            "line": 45,
+            "description": "Path storage. Paths are stored in reverse order.",
+            "itemtype": "property",
+            "name": "path",
+            "access": "private",
+            "tagname": "",
+            "type": "Path",
+            "class": "dwv.tool.Livewire",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/livewire.js",
+            "line": 52,
+            "description": "Current path storage. Paths are stored in reverse order.",
+            "itemtype": "property",
+            "name": "currentPath",
+            "access": "private",
+            "tagname": "",
+            "type": "Path",
+            "class": "dwv.tool.Livewire",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/livewire.js",
+            "line": 59,
+            "description": "List of parent points.",
+            "itemtype": "property",
+            "name": "parentPoints",
+            "access": "private",
+            "tagname": "",
+            "type": "Array",
+            "class": "dwv.tool.Livewire",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/livewire.js",
+            "line": 66,
+            "description": "Tolerance.",
+            "itemtype": "property",
+            "name": "tolerance",
+            "access": "private",
+            "tagname": "",
+            "type": "Number",
+            "class": "dwv.tool.Livewire",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/livewire.js",
+            "line": 74,
+            "description": "Clear the parent points list.",
+            "itemtype": "method",
+            "name": "clearParentPoints",
+            "access": "private",
+            "tagname": "",
+            "class": "dwv.tool.Livewire",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/livewire.js",
+            "line": 85,
+            "description": "Clear the stored paths.",
+            "itemtype": "method",
+            "name": "clearPaths",
+            "access": "private",
+            "tagname": "",
+            "class": "dwv.tool.Livewire",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/livewire.js",
+            "line": 95,
+            "description": "Scissor representation.",
+            "itemtype": "property",
+            "name": "scissors",
+            "access": "private",
+            "tagname": "",
+            "type": "Scissors",
+            "class": "dwv.tool.Livewire",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/livewire.js",
+            "line": 107,
+            "description": "Handle mouse down event.",
+            "itemtype": "method",
+            "name": "mousedown",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The mouse down event.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.tool.Livewire",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/livewire.js",
+            "line": 153,
+            "description": "Handle mouse move event.",
+            "itemtype": "method",
+            "name": "mousemove",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The mouse move event.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.tool.Livewire",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/livewire.js",
+            "line": 215,
+            "description": "Handle mouse up event.",
+            "itemtype": "method",
+            "name": "mouseup",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The mouse up event.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.tool.Livewire",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/livewire.js",
+            "line": 224,
+            "description": "Handle key down event.",
+            "itemtype": "method",
+            "name": "keydown",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The key down event.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.tool.Livewire",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/livewire.js",
+            "line": 233,
+            "description": "Enable the tool.",
+            "itemtype": "method",
+            "name": "enable",
+            "params": [
+                {
+                    "name": "bool",
+                    "description": "The flag to enable or not.",
+                    "type": "Boolean"
+                }
+            ],
+            "class": "dwv.tool.Livewire",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/livewire.js",
+            "line": 251,
+            "description": "Set the line color of the drawing.",
+            "itemtype": "method",
+            "name": "setLineColour",
+            "params": [
+                {
+                    "name": "colour",
+                    "description": "The colour to set.",
+                    "type": "String"
+                }
+            ],
+            "class": "dwv.tool.Livewire",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/livewire.js",
+            "line": 262,
+            "description": "Initialise the tool.",
+            "itemtype": "method",
+            "name": "init",
+            "class": "dwv.tool.Livewire",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/livewire.js",
+            "line": 286,
+            "description": "The livewire color.",
+            "itemtype": "property",
+            "name": "livewireColor",
+            "access": "private",
+            "tagname": "",
+            "type": "String",
+            "class": "dwv.tool.DrawLivewireCommand",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/livewire.js",
+            "line": 293,
+            "description": "The HTML context.",
+            "itemtype": "property",
+            "name": "context",
+            "access": "private",
+            "tagname": "",
+            "type": "Object",
+            "class": "dwv.tool.DrawLivewireCommand",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/livewire.js",
+            "line": 301,
+            "description": "Command name.",
+            "itemtype": "property",
+            "name": "name",
+            "access": "private",
+            "tagname": "",
+            "type": "String",
+            "class": "dwv.tool.DrawLivewireCommand",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/livewire.js",
+            "line": 308,
+            "description": "Get the command name.",
+            "itemtype": "method",
+            "name": "getName",
+            "return": {
+                "description": "The command name.",
+                "type": "String"
+            },
+            "class": "dwv.tool.DrawLivewireCommand",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/livewire.js",
+            "line": 314,
+            "description": "Set the command name.",
+            "itemtype": "method",
+            "name": "setName",
+            "params": [
+                {
+                    "name": "str",
+                    "description": "The command name.",
+                    "type": "String"
+                }
+            ],
+            "class": "dwv.tool.DrawLivewireCommand",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/livewire.js",
+            "line": 321,
+            "description": "Execute the command.",
+            "itemtype": "method",
+            "name": "execute",
+            "class": "dwv.tool.DrawLivewireCommand",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/rectangle.js",
+            "line": 19,
+            "description": "Rectangle object.",
+            "itemtype": "property",
+            "name": "rectangle",
+            "access": "private",
+            "tagname": "",
+            "type": "Rectangle",
+            "class": "dwv.tool.DrawRectangleCommand",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/rectangle.js",
+            "line": 27,
+            "description": "Line color.",
+            "itemtype": "property",
+            "name": "lineColor",
+            "access": "private",
+            "tagname": "",
+            "type": "String",
+            "class": "dwv.tool.DrawRectangleCommand",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/rectangle.js",
+            "line": 34,
+            "description": "HTML context.",
+            "itemtype": "property",
+            "name": "context",
+            "access": "private",
+            "tagname": "",
+            "type": "Object",
+            "class": "dwv.tool.DrawRectangleCommand",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/rectangle.js",
+            "line": 42,
+            "description": "Command name.",
+            "itemtype": "property",
+            "name": "name",
+            "access": "private",
+            "tagname": "",
+            "type": "String",
+            "class": "dwv.tool.DrawRectangleCommand",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/rectangle.js",
+            "line": 49,
+            "description": "Get the command name.",
+            "itemtype": "method",
+            "name": "getName",
+            "return": {
+                "description": "The command name.",
+                "type": "String"
+            },
+            "class": "dwv.tool.DrawRectangleCommand",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/rectangle.js",
+            "line": 55,
+            "description": "Set the command name.",
+            "itemtype": "method",
+            "name": "setName",
+            "params": [
+                {
+                    "name": "str",
+                    "description": "The command name.",
+                    "type": "String"
+                }
+            ],
+            "class": "dwv.tool.DrawRectangleCommand",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/rectangle.js",
+            "line": 62,
+            "description": "Execute the command.",
+            "itemtype": "method",
+            "name": "execute",
+            "class": "dwv.tool.DrawRectangleCommand",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/roi.js",
+            "line": 19,
+            "description": "ROI object.",
+            "itemtype": "property",
+            "name": "roi",
+            "access": "private",
+            "tagname": "",
+            "type": "ROI",
+            "class": "dwv.tool.DrawRoiCommand",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/roi.js",
+            "line": 30,
+            "description": "Line color.",
+            "itemtype": "property",
+            "name": "lineColor",
+            "access": "private",
+            "tagname": "",
+            "type": "String",
+            "class": "dwv.tool.DrawRoiCommand",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/roi.js",
+            "line": 37,
+            "description": "HTML context.",
+            "itemtype": "property",
+            "name": "context",
+            "access": "private",
+            "tagname": "",
+            "type": "Object",
+            "class": "dwv.tool.DrawRoiCommand",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/roi.js",
+            "line": 45,
+            "description": "Command name.",
+            "itemtype": "property",
+            "name": "name",
+            "access": "private",
+            "tagname": "",
+            "type": "String",
+            "class": "dwv.tool.DrawRoiCommand",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/roi.js",
+            "line": 52,
+            "description": "Get the command name.",
+            "itemtype": "method",
+            "name": "getName",
+            "return": {
+                "description": "The command name.",
+                "type": "String"
+            },
+            "class": "dwv.tool.DrawRoiCommand",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/roi.js",
+            "line": 58,
+            "description": "Set the command name.",
+            "itemtype": "method",
+            "name": "setName",
+            "params": [
+                {
+                    "name": "str",
+                    "description": "The command name.",
+                    "type": "String"
+                }
+            ],
+            "class": "dwv.tool.DrawRoiCommand",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/roi.js",
+            "line": 65,
+            "description": "Execute the command.",
+            "itemtype": "method",
+            "name": "execute",
+            "class": "dwv.tool.DrawRoiCommand",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/toolbox.js",
+            "line": 20,
+            "description": "Selected tool.",
+            "itemtype": "property",
+            "name": "selectedTool",
+            "type": "Object",
+            "class": "dwv.tool.ToolBox",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/toolbox.js",
+            "line": 26,
+            "description": "Default tool name.",
+            "itemtype": "property",
+            "name": "defaultToolName",
+            "type": "String",
+            "class": "dwv.tool.ToolBox",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/toolbox.js",
+            "line": 34,
+            "description": "Enable the toolbox.",
+            "itemtype": "method",
+            "name": "enable",
+            "params": [
+                {
+                    "name": "bool",
+                    "description": "Flag to enable or not.",
+                    "type": "Boolean"
+                }
+            ],
+            "class": "dwv.tool.ToolBox",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/toolbox.js",
+            "line": 48,
+            "description": "Get the selected tool.",
+            "itemtype": "method",
+            "name": "getSelectedTool",
+            "return": {
+                "description": "The selected tool.",
+                "type": "Object"
+            },
+            "class": "dwv.tool.ToolBox",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/toolbox.js",
+            "line": 57,
+            "description": "Set the selected tool.",
+            "itemtype": "method",
+            "name": "setSelectedTool",
+            "return": {
+                "description": "The name of the tool to select.",
+                "type": "String"
+            },
+            "class": "dwv.tool.ToolBox",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/toolbox.js",
+            "line": 78,
+            "description": "Check if a tool is in the tool list.",
+            "itemtype": "method",
+            "name": "hasTool",
+            "params": [
+                {
+                    "name": "name",
+                    "description": "The name to check.",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "The tool list element for the given name.",
+                "type": "String"
+            },
+            "class": "dwv.tool.ToolBox",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/toolbox.js",
+            "line": 88,
+            "description": "Sort the tool list.",
+            "itemtype": "method",
+            "name": "sortTools",
+            "class": "dwv.tool.ToolBox",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/toolbox.js",
+            "line": 104,
+            "description": "Initialise the tool box.",
+            "itemtype": "method",
+            "name": "init",
+            "class": "dwv.tool.ToolBox",
+            "module": "tool",
+            "namespace": "dwv.tool"
         },
         {
             "file": "src/tools/undo.js",
             "line": 17,
+            "description": "Array of commands.",
+            "itemtype": "property",
+            "name": "stack",
+            "access": "private",
+            "tagname": "",
+            "type": "Array",
+            "class": "dwv.tool.UndoStack",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/undo.js",
+            "line": 24,
+            "description": "Current command index.",
+            "itemtype": "property",
+            "name": "curCmdIndex",
+            "access": "private",
+            "tagname": "",
+            "type": "Number",
+            "class": "dwv.tool.UndoStack",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/undo.js",
+            "line": 32,
             "description": "Add a command to the stack.",
+            "itemtype": "method",
+            "name": "add",
             "params": [
                 {
                     "name": "cmd",
-                    "description": "The command to add."
+                    "description": "The command to add.",
+                    "type": "Object"
                 }
             ],
-            "class": "Filter classes..UndoStack class.",
-            "module": "math",
-            "namespace": "Filter classes."
+            "class": "dwv.tool.UndoStack",
+            "module": "tool",
+            "namespace": "dwv.tool"
         },
         {
             "file": "src/tools/undo.js",
-            "line": 33,
+            "line": 49,
             "description": "Undo the last command.",
-            "class": "Filter classes..UndoStack class.",
-            "module": "math",
-            "namespace": "Filter classes."
+            "itemtype": "method",
+            "name": "undo",
+            "class": "dwv.tool.UndoStack",
+            "module": "tool",
+            "namespace": "dwv.tool"
         },
         {
             "file": "src/tools/undo.js",
-            "line": 67,
+            "line": 84,
             "description": "Redo the last command.",
-            "class": "Filter classes..UndoStack class.",
-            "module": "math",
-            "namespace": "Filter classes."
-        },
-        {
-            "file": "src/tools/windowLevel.js",
-            "line": 6,
-            "fileoverview": "WindowLevel tool.",
-            "class": "Filter classes..WindowLevel tool: handle window/level related events.",
-            "module": "math",
-            "namespace": "Filter classes."
-        },
-        {
-            "file": "src/tools/windowLevel.js",
-            "line": 10,
             "itemtype": "method",
-            "name": "Update the views' current position.",
-            "class": "Filter classes..WindowLevel tool: handle window/level related events.",
-            "module": "math",
-            "namespace": "Filter classes."
+            "name": "redo",
+            "class": "dwv.tool.UndoStack",
+            "module": "tool",
+            "namespace": "dwv.tool"
         },
         {
             "file": "src/tools/windowLevel.js",
-            "line": 18,
+            "line": 14,
+            "description": "Update the views' current position.",
             "itemtype": "method",
-            "name": "Update the views' windowing data",
-            "class": "Filter classes..WindowLevel tool: handle window/level related events.",
-            "module": "math",
-            "namespace": "Filter classes."
+            "name": "updatePostionValue",
+            "static": 1,
+            "params": [
+                {
+                    "name": "i",
+                    "description": "The column index.",
+                    "type": "Number"
+                },
+                {
+                    "name": "j",
+                    "description": "The row index.",
+                    "type": "Number"
+                }
+            ],
+            "class": "dwv.tool",
+            "module": "tool",
+            "namespace": "dwv"
         },
         {
             "file": "src/tools/windowLevel.js",
             "line": 26,
+            "description": "Update the views' windowing data.",
             "itemtype": "method",
-            "name": "Update the views' colour map.",
-            "class": "Filter classes..WindowLevel tool: handle window/level related events.",
-            "module": "math",
-            "namespace": "Filter classes."
+            "name": "updateWindowingData",
+            "static": 1,
+            "params": [
+                {
+                    "name": "wc",
+                    "description": "The window center.",
+                    "type": "Number"
+                },
+                {
+                    "name": "ww",
+                    "description": "The window width.",
+                    "type": "Number"
+                }
+            ],
+            "class": "dwv.tool",
+            "module": "tool",
+            "namespace": "dwv"
         },
         {
             "file": "src/tools/windowLevel.js",
-            "line": 188,
+            "line": 38,
+            "description": "Update the views' colour map.",
             "itemtype": "method",
-            "name": "Update the window/level presets.",
-            "class": "Filter classes..WindowLevel tool: handle window/level related events.",
-            "module": "math",
-            "namespace": "Filter classes."
+            "name": "updateColourMap",
+            "static": 1,
+            "params": [
+                {
+                    "name": "colourMap",
+                    "description": "The colour map.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.tool",
+            "module": "tool",
+            "namespace": "dwv"
         },
         {
             "file": "src/tools/windowLevel.js",
-            "line": 217,
-            "itemtype": "method",
-            "name": "Set the window/level presets.",
-            "class": "Filter classes..WindowLevel tool: handle window/level related events.",
-            "module": "math",
-            "namespace": "Filter classes."
+            "line": 77,
+            "description": "Closure to self: to be used by event handlers.",
+            "itemtype": "property",
+            "name": "self",
+            "access": "private",
+            "tagname": "",
+            "type": "WindowLevel",
+            "class": "dwv.tool.WindowLevel",
+            "module": "tool",
+            "namespace": "dwv.tool"
         },
         {
             "file": "src/tools/windowLevel.js",
-            "line": 231,
+            "line": 84,
+            "description": "Interaction start flag.",
+            "itemtype": "property",
+            "name": "started",
+            "type": "Boolean",
+            "class": "dwv.tool.WindowLevel",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/windowLevel.js",
+            "line": 94,
+            "description": "Handle mouse down event.",
             "itemtype": "method",
-            "name": "Set the colour map.",
-            "class": "Filter classes..WindowLevel tool: handle window/level related events.",
-            "module": "math",
-            "namespace": "Filter classes."
+            "name": "mousedown",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The mouse down event.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.tool.WindowLevel",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/windowLevel.js",
+            "line": 109,
+            "description": "Handle two touch down event.",
+            "itemtype": "method",
+            "name": "twotouchdown",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The touch down event.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.tool.WindowLevel",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/windowLevel.js",
+            "line": 124,
+            "description": "Handle mouse move event.",
+            "itemtype": "method",
+            "name": "mousemove",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The mouse move event.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.tool.WindowLevel",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/windowLevel.js",
+            "line": 145,
+            "description": "Handle two touch move event.",
+            "itemtype": "method",
+            "name": "twotouchmove",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The touch move event.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.tool.WindowLevel",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/windowLevel.js",
+            "line": 164,
+            "description": "Handle mouse up event.",
+            "itemtype": "method",
+            "name": "mouseup",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The mouse up event.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.tool.WindowLevel",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/windowLevel.js",
+            "line": 174,
+            "description": "Handle mouse out event.",
+            "itemtype": "method",
+            "name": "mouseout",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The mouse out event.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.tool.WindowLevel",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/windowLevel.js",
+            "line": 184,
+            "description": "Handle touch start event.",
+            "itemtype": "method",
+            "name": "touchstart",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The touch start event.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.tool.WindowLevel",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/windowLevel.js",
+            "line": 195,
+            "description": "Handle touch move event.",
+            "itemtype": "method",
+            "name": "touchmove",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The touch move event.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.tool.WindowLevel",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/windowLevel.js",
+            "line": 206,
+            "description": "Handle touch end event.",
+            "itemtype": "method",
+            "name": "touchend",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The touch end event.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.tool.WindowLevel",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/windowLevel.js",
+            "line": 216,
+            "description": "Handle double click event.",
+            "itemtype": "method",
+            "name": "dblclick",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The double click event.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.tool.WindowLevel",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/windowLevel.js",
+            "line": 228,
+            "description": "Handle mouse scroll event (fired by Firefox).",
+            "itemtype": "method",
+            "name": "DOMMouseScroll",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The mouse scroll event.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.tool.WindowLevel",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/windowLevel.js",
+            "line": 239,
+            "description": "Handle mouse wheel event.",
+            "itemtype": "method",
+            "name": "mousewheel",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The mouse wheel event.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.tool.WindowLevel",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/windowLevel.js",
+            "line": 250,
+            "description": "Handle key down event.",
+            "itemtype": "method",
+            "name": "keydown",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The key down event.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.tool.WindowLevel",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/windowLevel.js",
+            "line": 260,
+            "description": "Enable the tool.",
+            "itemtype": "method",
+            "name": "enable",
+            "params": [
+                {
+                    "name": "bool",
+                    "description": "The flag to enable or not.",
+                    "type": "Boolean"
+                }
+            ],
+            "class": "dwv.tool.WindowLevel",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/windowLevel.js",
+            "line": 273,
+            "description": "Update the window/level presets.",
+            "itemtype": "method",
+            "name": "updatePresets",
+            "class": "dwv.tool.WindowLevel",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/windowLevel.js",
+            "line": 303,
+            "description": "Set the active window/level preset.",
+            "itemtype": "method",
+            "name": "setPreset",
+            "params": [
+                {
+                    "name": "name",
+                    "description": "The name of the preset to set.",
+                    "type": "String"
+                }
+            ],
+            "class": "dwv.tool.WindowLevel",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/windowLevel.js",
+            "line": 319,
+            "description": "Set the active colour map.",
+            "itemtype": "method",
+            "name": "setColourMap",
+            "params": [
+                {
+                    "name": "name",
+                    "description": "The name of the colour map to set.",
+                    "type": "String"
+                }
+            ],
+            "class": "dwv.tool.WindowLevel",
+            "module": "tool",
+            "namespace": "dwv.tool"
         },
         {
             "file": "src/tools/zoom.js",
-            "line": 6,
+            "line": 14,
+            "description": "Reset the application zoom.",
             "itemtype": "method",
-            "name": "",
-            "class": "Filter classes..Zoom class.",
-            "module": "math",
-            "namespace": "Filter classes."
+            "name": "zoomReset",
+            "static": 1,
+            "class": "dwv.tool",
+            "module": "tool",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/tools/zoom.js",
+            "line": 36,
+            "description": "Closure to self: to be used by event handlers.",
+            "itemtype": "property",
+            "name": "self",
+            "access": "private",
+            "tagname": "",
+            "type": "WindowLevel",
+            "class": "dwv.tool.Zoom",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/zoom.js",
+            "line": 43,
+            "description": "Interaction start flag.",
+            "itemtype": "property",
+            "name": "started",
+            "type": "Boolean",
+            "class": "dwv.tool.Zoom",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/zoom.js",
+            "line": 50,
+            "description": "Handle mouse down event.",
+            "itemtype": "method",
+            "name": "mousedown",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The mouse down event.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.tool.Zoom",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/zoom.js",
+            "line": 62,
+            "description": "Handle two touch down event.",
+            "itemtype": "method",
+            "name": "twotouchdown",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The touch down event.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.tool.Zoom",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/zoom.js",
+            "line": 76,
+            "description": "Handle mouse move event.",
+            "itemtype": "method",
+            "name": "mousemove",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The mouse move event.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.tool.Zoom",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/zoom.js",
+            "line": 99,
+            "description": "Handle two touch move event.",
+            "itemtype": "method",
+            "name": "twotouchmove",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The touch move event.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.tool.Zoom",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/zoom.js",
+            "line": 119,
+            "description": "Handle mouse up event.",
+            "itemtype": "method",
+            "name": "mouseup",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The mouse up event.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.tool.Zoom",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/zoom.js",
+            "line": 132,
+            "description": "Handle mouse out event.",
+            "itemtype": "method",
+            "name": "mouseout",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The mouse out event.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.tool.Zoom",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/zoom.js",
+            "line": 141,
+            "description": "Handle touch start event.",
+            "itemtype": "method",
+            "name": "touchstart",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The touch start event.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.tool.Zoom",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/zoom.js",
+            "line": 155,
+            "description": "Handle touch move event.",
+            "itemtype": "method",
+            "name": "touchmove",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The touch move event.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.tool.Zoom",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/zoom.js",
+            "line": 169,
+            "description": "Handle touch end event.",
+            "itemtype": "method",
+            "name": "touchend",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The touch end event.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.tool.Zoom",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/zoom.js",
+            "line": 178,
+            "description": "Handle mouse scroll event (fired by Firefox).",
+            "itemtype": "method",
+            "name": "DOMMouseScroll",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The mouse scroll event.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.tool.Zoom",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/zoom.js",
+            "line": 189,
+            "description": "Handle mouse wheel event.",
+            "itemtype": "method",
+            "name": "mousewheel",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The mouse wheel event.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.tool.Zoom",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/zoom.js",
+            "line": 200,
+            "description": "Handle key down event.",
+            "itemtype": "method",
+            "name": "keydown",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The key down event.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.tool.Zoom",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/zoom.js",
+            "line": 209,
+            "description": "Enable the tool.",
+            "itemtype": "method",
+            "name": "enable",
+            "params": [
+                {
+                    "name": "bool",
+                    "description": "The flag to enable or not.",
+                    "type": "Boolean"
+                }
+            ],
+            "class": "dwv.tool.Zoom",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/zoom.js",
+            "line": 223,
+            "description": "Apply the zoom to the layers.",
+            "itemtype": "method",
+            "name": "zoomLayers",
+            "params": [
+                {
+                    "name": "step",
+                    "description": "The zoom step increment. A good step is of 0.1.",
+                    "type": "Number"
+                },
+                {
+                    "name": "cx",
+                    "description": "The zoom center X coordinate.",
+                    "type": "Number"
+                },
+                {
+                    "name": "cy",
+                    "description": "The zoom center Y coordinate.",
+                    "type": "Number"
+                }
+            ],
+            "class": "dwv.tool.Zoom",
+            "module": "tool",
+            "namespace": "dwv.tool"
         },
         {
             "file": "src/utils/string.js",
@@ -5598,8 +7840,8 @@
                 }
             ],
             "return": {
-                "description": "The splitted string.",
-                "type": "String"
+                "description": "The split string.",
+                "type": "Object"
             },
             "class": "dwv.utils",
             "module": "utils",
@@ -5776,19 +8018,19 @@
     "warnings": [
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/dicom/dicomParser.js:176"
+            "line": " src/dicom/dicomParser.js:175"
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/dicom/dicomParser.js:215"
+            "line": " src/dicom/dicomParser.js:214"
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/dicom/dicomParser.js:239"
+            "line": " src/dicom/dicomParser.js:238"
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/dicom/dicomParser.js:506"
+            "line": " src/dicom/dicomParser.js:505"
         },
         {
             "message": "unknown tag: input",
@@ -5832,67 +8074,7 @@
         },
         {
             "message": "replacing incorrect tag: function with method",
-            "line": " src/tools/info.js:6"
-        },
-        {
-            "message": "replacing incorrect tag: function with method",
-            "line": " src/tools/info.js:28"
-        },
-        {
-            "message": "replacing incorrect tag: function with method",
-            "line": " src/tools/info.js:45"
-        },
-        {
-            "message": "replacing incorrect tag: function with method",
-            "line": " src/tools/info.js:67"
-        },
-        {
-            "message": "replacing incorrect tag: function with method",
-            "line": " src/tools/info.js:84"
-        },
-        {
-            "message": "replacing incorrect tag: function with method",
-            "line": " src/tools/info.js:100"
-        },
-        {
-            "message": "replacing incorrect tag: function with method",
-            "line": " src/tools/info.js:150"
-        },
-        {
-            "message": "replacing incorrect tag: function with method",
-            "line": " src/tools/info.js:163"
-        },
-        {
-            "message": "unknown tag: fileoverview",
-            "line": " src/tools/windowLevel.js:6"
-        },
-        {
-            "message": "replacing incorrect tag: function with method",
-            "line": " src/tools/windowLevel.js:10"
-        },
-        {
-            "message": "replacing incorrect tag: function with method",
-            "line": " src/tools/windowLevel.js:18"
-        },
-        {
-            "message": "replacing incorrect tag: function with method",
-            "line": " src/tools/windowLevel.js:26"
-        },
-        {
-            "message": "replacing incorrect tag: function with method",
-            "line": " src/tools/windowLevel.js:188"
-        },
-        {
-            "message": "replacing incorrect tag: function with method",
-            "line": " src/tools/windowLevel.js:217"
-        },
-        {
-            "message": "replacing incorrect tag: function with method",
-            "line": " src/tools/windowLevel.js:231"
-        },
-        {
-            "message": "replacing incorrect tag: function with method",
-            "line": " src/tools/zoom.js:6"
+            "line": " src/tools/windowLevel.js:319"
         },
         {
             "message": "Missing item type\nLookup tables for image color display.",
@@ -5909,26 +8091,6 @@
         {
             "message": "Missing item type",
             "line": " src/math/scissors.js:107"
-        },
-        {
-            "message": "Missing item type",
-            "line": " src/tools/filter.js:71"
-        },
-        {
-            "message": "Missing item type\nAdd a command to the stack.",
-            "line": " src/tools/undo.js:17"
-        },
-        {
-            "message": "Missing item type\nUndo the last command.",
-            "line": " src/tools/undo.js:33"
-        },
-        {
-            "message": "Missing item type\nRedo the last command.",
-            "line": " src/tools/undo.js:67"
-        },
-        {
-            "message": "Missing item type",
-            "line": " src/tools/windowLevel.js:6"
         },
         {
             "message": "Missing item type\nInitialise the HTML for the application.",

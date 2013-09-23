@@ -79,13 +79,11 @@ Main application.</a></li>
             
                 <li><a href="../classes/dwv.image.View.html">dwv.image.View</a></li>
             
+                <li><a href="../classes/dwv.info.html">dwv.info</a></li>
+            
                 <li><a href="../classes/dwv.math.BucketQueue.html">dwv.math.BucketQueue</a></li>
             
                 <li><a href="../classes/dwv.math.Circle.html">dwv.math.Circle</a></li>
-            
-                <li><a href="../classes/dwv.math.Draw circle command..html">dwv.math.Draw circle command.</a></li>
-            
-                <li><a href="../classes/dwv.math.Drawing tool..html">dwv.math.Drawing tool.</a></li>
             
                 <li><a href="../classes/dwv.math.FastPoint2D.html">dwv.math.FastPoint2D</a></li>
             
@@ -101,35 +99,39 @@ Main application.</a></li>
             
                 <li><a href="../classes/dwv.math.Scissors.html">dwv.math.Scissors</a></li>
             
+                <li><a href="../classes/dwv.tool.html">dwv.tool</a></li>
+            
+                <li><a href="../classes/dwv.tool.Draw.html">dwv.tool.Draw</a></li>
+            
+                <li><a href="../classes/dwv.tool.DrawCircleCommand.html">dwv.tool.DrawCircleCommand</a></li>
+            
+                <li><a href="../classes/dwv.tool.DrawLineCommand.html">dwv.tool.DrawLineCommand</a></li>
+            
+                <li><a href="../classes/dwv.tool.DrawLivewireCommand.html">dwv.tool.DrawLivewireCommand</a></li>
+            
+                <li><a href="../classes/dwv.tool.DrawRectangleCommand.html">dwv.tool.DrawRectangleCommand</a></li>
+            
+                <li><a href="../classes/dwv.tool.DrawRoiCommand.html">dwv.tool.DrawRoiCommand</a></li>
+            
+                <li><a href="../classes/dwv.tool.Filter.html">dwv.tool.Filter</a></li>
+            
+                <li><a href="../classes/dwv.tool.filter.Sharpen.html">dwv.tool.filter.Sharpen</a></li>
+            
+                <li><a href="../classes/dwv.tool.filter.Threshold.html">dwv.tool.filter.Threshold</a></li>
+            
+                <li><a href="../classes/dwv.tool.Livewire.html">dwv.tool.Livewire</a></li>
+            
+                <li><a href="../classes/dwv.tool.RunFilterCommand.html">dwv.tool.RunFilterCommand</a></li>
+            
+                <li><a href="../classes/dwv.tool.ToolBox.html">dwv.tool.ToolBox</a></li>
+            
+                <li><a href="../classes/dwv.tool.UndoStack.html">dwv.tool.UndoStack</a></li>
+            
+                <li><a href="../classes/dwv.tool.WindowLevel.html">dwv.tool.WindowLevel</a></li>
+            
+                <li><a href="../classes/dwv.tool.Zoom.html">dwv.tool.Zoom</a></li>
+            
                 <li><a href="../classes/dwv.utils.html">dwv.utils</a></li>
-            
-                <li><a href="../classes/Filter classes..Draw line command..html">Filter classes..Draw line command.</a></li>
-            
-                <li><a href="../classes/Filter classes..Draw livewire command..html">Filter classes..Draw livewire command.</a></li>
-            
-                <li><a href="../classes/Filter classes..Draw rectangle command..html">Filter classes..Draw rectangle command.</a></li>
-            
-                <li><a href="../classes/Filter classes..Draw ROI command..html">Filter classes..Draw ROI command.</a></li>
-            
-                <li><a href="../classes/Filter classes..Filter tool..html">Filter classes..Filter tool.</a></li>
-            
-                <li><a href="../classes/Filter classes..Livewire painting tool..html">Filter classes..Livewire painting tool.</a></li>
-            
-                <li><a href="../classes/Filter classes..Run filter command..html">Filter classes..Run filter command.</a></li>
-            
-                <li><a href="../classes/Filter classes..Sharpen filter tool..html">Filter classes..Sharpen filter tool.</a></li>
-            
-                <li><a href="../classes/Filter classes..Sobel filter tool..html">Filter classes..Sobel filter tool.</a></li>
-            
-                <li><a href="../classes/Filter classes..Threshold filter tool..html">Filter classes..Threshold filter tool.</a></li>
-            
-                <li><a href="../classes/Filter classes..Tool box..html">Filter classes..Tool box.</a></li>
-            
-                <li><a href="../classes/Filter classes..UndoStack class..html">Filter classes..UndoStack class.</a></li>
-            
-                <li><a href="../classes/Filter classes..WindowLevel tool: handle window/level related events..html">Filter classes..WindowLevel tool: handle window/level related events.</a></li>
-            
-                <li><a href="../classes/Filter classes..Zoom class..html">Filter classes..Zoom class.</a></li>
             
             </ul>
 
@@ -143,7 +145,11 @@ Main application.</a></li>
             
                 <li><a href="../modules/image.html">image</a></li>
             
+                <li><a href="../modules/info.html">info</a></li>
+            
                 <li><a href="../modules/math.html">math</a></li>
+            
+                <li><a href="../modules/tool.html">tool</a></li>
             
                 <li><a href="../modules/utils.html">utils</a></li>
             
@@ -186,13 +192,23 @@ Main application.</a></li>
 
 <div class="file">
     <pre class="code prettyprint linenums">
-//! @namespace Main DWV namespace.
+/** 
+ * Tool module.
+ * @module tool
+ */
 var dwv = dwv || {};
-//! @namespace Tool classes.
+/**
+ * Namespace for tool functions.
+ * @class tool
+ * @namespace dwv
+ * @static
+ */
 dwv.tool = dwv.tool || {};
 
 /**
- * @function
+ * Reset the application zoom.
+ * @method zoomReset
+ * @static
  */
 dwv.tool.zoomReset = function(event)
 {
@@ -203,14 +219,33 @@ dwv.tool.zoomReset = function(event)
 };
 
 /**
- * @class Zoom class.
+ * Zoom class.
+ * @class Zoom
+ * @namespace dwv.tool
+ * @constructor
+ * @param {Object} app The associated application.
  */
 dwv.tool.Zoom = function(app)
 {
+    /**
+     * Closure to self: to be used by event handlers.
+     * @property self
+     * @private
+     * @type WindowLevel
+     */
     var self = this;
+    /**
+     * Interaction start flag.
+     * @property started
+     * @type Boolean
+     */
     this.started = false;
 
-    // This is called when you start holding down the mouse button.
+    /**
+     * Handle mouse down event.
+     * @method mousedown
+     * @param {Object} event The mouse down event.
+     */
     this.mousedown = function(ev){
         self.started = true;
         // first position
@@ -218,6 +253,11 @@ dwv.tool.Zoom = function(app)
         self.y0 = ev._y;
      };
 
+     /**
+      * Handle two touch down event.
+      * @method twotouchdown
+      * @param {Object} event The touch down event.
+      */
      this.twotouchdown = function(ev){
          self.started = true;
          // first line
@@ -227,7 +267,11 @@ dwv.tool.Zoom = function(app)
          self.midPoint = self.line0.getMidpoint();         
      };
 
-     // This function is called every time you move the mouse.
+     /**
+      * Handle mouse move event.
+      * @method mousemove
+      * @param {Object} event The mouse move event.
+      */
      this.mousemove = function(ev){
         if (!self.started)
         {
@@ -246,6 +290,11 @@ dwv.tool.Zoom = function(app)
         self.y0 = ev._y;
     };
 
+    /**
+     * Handle two touch move event.
+     * @method twotouchmove
+     * @param {Object} event The touch move event.
+     */
     this.twotouchmove = function(ev){
        if (!self.started)
        {
@@ -261,7 +310,11 @@ dwv.tool.Zoom = function(app)
            zoomLayers(zoom, self.midPoint.getX(), self.midPoint.getY());
     };
     
-    // This is called when you release the mouse button.
+    /**
+     * Handle mouse up event.
+     * @method mouseup
+     * @param {Object} event The mouse up event.
+     */
     this.mouseup = function(ev){
         if (self.started)
         {
@@ -270,10 +323,20 @@ dwv.tool.Zoom = function(app)
         }
     };
     
+    /**
+     * Handle mouse out event.
+     * @method mouseout
+     * @param {Object} event The mouse out event.
+     */
     this.mouseout = function(ev){
         self.mouseup(ev);
     };
 
+    /**
+     * Handle touch start event.
+     * @method touchstart
+     * @param {Object} event The touch start event.
+     */
     this.touchstart = function(ev){
         if( event.targetTouches.length === 1 ){
             self.mousedown(ev);
@@ -283,6 +346,11 @@ dwv.tool.Zoom = function(app)
         }
     };
 
+    /**
+     * Handle touch move event.
+     * @method touchmove
+     * @param {Object} event The touch move event.
+     */
     this.touchmove = function(ev){
         if( event.targetTouches.length === 1 ){
             self.mousemove(ev);
@@ -292,25 +360,51 @@ dwv.tool.Zoom = function(app)
         }
     };
 
+    /**
+     * Handle touch end event.
+     * @method touchend
+     * @param {Object} event The touch end event.
+     */
     this.touchend = function(ev){
         self.mouseup(ev);
     };
 
-    // This is called when you use the mouse wheel on Firefox.
+    /**
+     * Handle mouse scroll event (fired by Firefox).
+     * @method DOMMouseScroll
+     * @param {Object} event The mouse scroll event.
+     */
     this.DOMMouseScroll = function(ev){
         // ev.detail on firefox is 3
         var step = ev.detail/30;
         zoomLayers(step, ev._x, ev._y);
     };
 
-    // This is called when you use the mouse wheel.
+    /**
+     * Handle mouse wheel event.
+     * @method mousewheel
+     * @param {Object} event The mouse wheel event.
+     */
     this.mousewheel = function(ev){
         // ev.wheelDelta on chrome is 120
         var step = ev.wheelDelta/1200;
         zoomLayers(step, ev._x, ev._y);
     };
     
-    // Enable method.
+    /**
+     * Handle key down event.
+     * @method keydown
+     * @param {Object} event The key down event.
+     */
+    this.keydown = function(event){
+        app.handleKeyDown(event);
+    };
+
+    /**
+     * Enable the tool.
+     * @method enable
+     * @param {Boolean} bool The flag to enable or not.
+     */
     this.enable = function(bool){
         if( bool ) { 
             dwv.gui.appendZoomHtml();
@@ -320,13 +414,13 @@ dwv.tool.Zoom = function(app)
         }
     };
 
-    // Keyboard shortcut.
-    this.keydown = function(event){
-        app.handleKeyDown(event);
-    };
-
-    // Really do the zoom
-    // A good step is of 0.1.
+    /**
+     * Apply the zoom to the layers.
+     * @method zoomLayers
+     * @param {Number} step The zoom step increment. A good step is of 0.1.
+     * @param {Number} cx The zoom center X coordinate.
+     * @param {Number} cy The zoom center Y coordinate.
+     */ 
     function zoomLayers(step, cx, cy)
     {
         app.setLayersZoom(step,step,cx,cy);
@@ -334,9 +428,8 @@ dwv.tool.Zoom = function(app)
 
 }; // Zoom class
 
-//Tool list
+// Add the tool to the tool list
 dwv.tool.tools = dwv.tool.tools || {};
-//Add the tool to the list
 dwv.tool.tools.zoom = dwv.tool.Zoom;
 
     </pre>

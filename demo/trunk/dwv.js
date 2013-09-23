@@ -694,7 +694,6 @@ dwv.dicom.DataReader = function(buffer, isLittleEndian)
      * @param {Number} nChars The numner of characters to read.
      * @return {String} The read data.
      */
-    //! Read data as a string.
     this.readString = function(byteOffset, nChars) {
         var result = "";
         for(var i=byteOffset; i<byteOffset + nChars; ++i){
@@ -4438,7 +4437,7 @@ dwv.html.Layer = function(name)
     /**
      * Set the line color for the layer.
      * @method setLineColor
-     * @input {Layer} color The line color.
+     * @input {String} color The line color.
      */
     this.setLineColor = function(color)
     {
@@ -4501,69 +4500,84 @@ dwv.html = dwv.html || {};
  */
 dwv.html.Style = function()
 {
-    // immutable
-    this.fontSize = 12;
-    this.fontStr = "normal "+this.fontSize+"px sans-serif";
-    this.lineHeight = this.fontSize + this.fontSize/5;
-    this.textColor = "#fff";
-    // mutable
-    this.lineColor = 0;
-};
+    /**
+     * Font size.
+     * @property fontSize
+     * @private
+     * @type Number
+     */
+    var fontSize = 12;
+    /**
+     * Font definition string.
+     * @property fontStr
+     * @private
+     * @type String
+     */
+    var fontStr = "normal "+this.fontSize+"px sans-serif";
+    /**
+     * Line height.
+     * @property lineHeight
+     * @private
+     * @type Number
+     */
+    var lineHeight = this.fontSize + this.fontSize/5;
+    /**
+     * Text color.
+     * @property textColor
+     * @private
+     * @type String
+     */
+    var textColor = "#fff";
+    /**
+     * Line color.
+     * @property lineColor
+     * @private
+     * @type String
+     */
+    var lineColor = 0;
+    
+    /**
+     * Get the font size.
+     * @method getFontSize
+     * @return {Number} The font size.
+     */
+    dwv.html.Style.prototype.getFontSize = function() { return fontSize; };
 
-/**
- * Get the font size.
- * @method getFontSize
- * @return {Number} The font size.
- */
-dwv.html.Style.prototype.getFontSize = function() {
-    return this.fontSize;
-};
+    /**
+     * Get the font definition string.
+     * @method getFontStr
+     * @return {String} The font definition string.
+     */
+    dwv.html.Style.prototype.getFontStr = function() { return fontStr; };
 
-/**
- * Get the font definition string.
- * @method getFontStr
- * @return {String} The font definition string.
- */
-dwv.html.Style.prototype.getFontStr = function() {
-    return this.fontStr;
-};
+    /**
+     * Get the line height.
+     * @method getLineHeight
+     * @return {Number} The line height.
+     */
+    dwv.html.Style.prototype.getLineHeight = function() { return lineHeight; };
 
-/**
- * Get the line height.
- * @method getLineHeight
- * @return {Number} The line height.
- */
-dwv.html.Style.prototype.getLineHeight = function() {
-    return this.lineHeight;
-};
+    /**
+     * Get the text color.
+     * @method getTextColor
+     * @return {String} The text color.
+     */
+    dwv.html.Style.prototype.getTextColor = function() { return textColor; };
 
-/**
- * Get the text color.
- * @method getTextColor
- * @return {String} The text color.
- */
-dwv.html.Style.prototype.getTextColor = function() {
-    return this.textColor;
-};
+    /**
+     * Get the line color.
+     * @method getLineColor
+     * @return {String} The line color.
+     */
+    dwv.html.Style.prototype.getLineColor = function() { return lineColor; };
 
-/**
- * Get the line color.
- * @method getLineColor
- * @return {String} The line color.
- */
-dwv.html.Style.prototype.getLineColor = function() {
-    return this.lineColor;
+    /**
+     * Set the line color.
+     * @method setLineColor
+     * @param {String} color The line color.
+     */
+    dwv.html.Style.prototype.setLineColor = function(color) { lineColor = color; };
 };
-
-/**
- * Set the line color.
- * @method setLineColor
- * @param {String} color The line color.
- */
-dwv.html.Style.prototype.setLineColor = function(color) {
-    this.lineColor = color;
-};
-
 ;/** 
  * Image module.
  * @module image
@@ -4872,21 +4886,21 @@ dwv.image.Image = function(size, spacing, buffer, slicePositions)
      * Photometric interpretation (MONOCHROME, RGB...).
      * @property photometricInterpretation
      * @private
-     * @type {String}
+     * @type String
      */
     var photometricInterpretation = "MONOCHROME2";
     /**
      * Planar configuration for RGB data (0:RGBRGBRGBRGB... or 1:RRR...GGG...BBB...).
      * @property planarConfiguration
      * @private
-     * @type {Number}
+     * @type Number
      */
     var planarConfiguration = 0;
     /**
      * Meta information.
      * @property meta
      * @private
-     * @type {Object}
+     * @type Object
      */
     var meta = {};
     
@@ -4894,7 +4908,7 @@ dwv.image.Image = function(size, spacing, buffer, slicePositions)
      * Original buffer.
      * @property originalBuffer
      * @private
-     * @type {Array}
+     * @type Array
      */
     var originalBuffer = new Int16Array(buffer);
     
@@ -4905,14 +4919,14 @@ dwv.image.Image = function(size, spacing, buffer, slicePositions)
      * Data range.
      * @property dataRange
      * @private
-     * @type {Object}
+     * @type Object
      */
     var dataRange = null;
     /**
      * Histogram.
      * @property histogram
      * @private
-     * @type {Object}
+     * @type Array
      */
     var histogram = null;
      
@@ -5124,7 +5138,7 @@ dwv.image.Image = function(size, spacing, buffer, slicePositions)
     /**
      * Get the histogram.
      * @method getHistogram
-     * @return {Object} The histogram.
+     * @return {Array} The histogram.
      */ 
     this.getHistogram = function() { 
         if( !histogram ) histogram = this.calculateHistogram();
@@ -5403,7 +5417,7 @@ dwv.image.lut.Rescale = function(slope_,intercept_)
  * @namespace dwv.image.lut
  * @constructor
  * @param {Number} rescaleLut_ The associated rescale LUT.
- * @param {Number} isSigned_ Flag to know if the data is signed.
+ * @param {Boolean} isSigned_ Flag to know if the data is signed.
  */
 dwv.image.lut.Window = function(rescaleLut_, isSigned_)
 {
@@ -5755,21 +5769,21 @@ dwv.image.View = function(image, isSigned)
      * Window presets.
      * @property windowPresets
      * @private
-     * @type {Object}
+     * @type Object
      */
     var windowPresets = null;
     /**
      * Color map
      * @property colorMap
      * @private
-     * @type {Object}
+     * @type Object
      */
     var colorMap = dwv.image.lut.plain;
     /**
      * Current position
      * @property currentPosition
      * @private
-     * @type {Object}
+     * @type Object
      */
     var currentPosition = {"i":0,"j":0,"k":0};
     
@@ -6901,7 +6915,7 @@ dwv.math.FastPoint2D.prototype.toString = function() {
  * @namespace dwv.math
  * @constructor
  * @param {Object} centre A Point2D representing the centre of the circle.
- * @param {Object} radius The radius of the circle.
+ * @param {Number} radius The radius of the circle.
  */
 dwv.math.Circle = function(centre, radius)
 {
@@ -7232,20 +7246,25 @@ dwv.math.Path.prototype.appenPath = function(other) {
     }
     this.controlPointIndexArray = this.controlPointIndexArray.concat(indexArray);
 };
-;//! @namespace Main DWV namespace.
+;/** 
+ * Tool module.
+ * @module tool
+ */
 var dwv = dwv || {};
-//! @namespace Tool classes.
 dwv.tool = dwv.tool || {};
 
 /**
- * @class Draw circle command.
- * @param points The points from which to extract the circle.
- * @param app The application to draw the circle on.
- * @param style The drawing style.
+ * Draw circle command.
+ * @class DrawCircleCommand
+ * @namespace dwv.tool
+ * @constructor
+ * @param {Array} points The points from which to extract the circle.
+ * @param {Object} app The application to draw the circle on.
+ * @param {Style} style The drawing style.
  */
 dwv.tool.DrawCircleCommand = function(points, app, style)
 {
-    // radius
+    // calculate radius
     var a = Math.abs(points[0].getX() - points[points.length-1].getX());
     var b = Math.abs(points[0].getY() - points[points.length-1].getY());
     var radius = Math.round( Math.sqrt( a * a + b * b ) );
@@ -7255,17 +7274,54 @@ dwv.tool.DrawCircleCommand = function(points, app, style)
         // silent fail...
         return;
     }
-    // create circle
+    
+    /**
+     * Circle object.
+     * @property circle
+     * @private
+     * @type Circle
+     */
     var circle = new dwv.math.Circle(points[0], radius);
+    
+    /**
+     * Line color.
+     * @property lineColor
+     * @private
+     * @type String
+     */
     var lineColor = style.getLineColor();
+    /**
+     * HTML context.
+     * @property context
+     * @private
+     * @type Object
+     */
     var context = app.getTempLayer().getContext();
     
-    // command name
+    /**
+     * Command name.
+     * @property name
+     * @private
+     * @type String
+     */
     var name = "DrawCircleCommand";
-    this.setName = function(str) { name = str; };
+    /**
+     * Get the command name.
+     * @method getName
+     * @return {String} The command name.
+     */
     this.getName = function() { return name; };
+    /**
+     * Set the command name.
+     * @method setName
+     * @param {String} str The command name.
+     */
+    this.setName = function(str) { name = str; };
 
-    // main method
+    /**
+     * Execute the command.
+     * @method execute
+     */
     this.execute = function()
     {
         // style
@@ -7274,10 +7330,10 @@ dwv.tool.DrawCircleCommand = function(points, app, style)
         // path
         context.beginPath();
         context.arc(
-                circle.getCenter().getX(), 
-                circle.getCenter().getY(), 
-                circle.getRadius(),
-                0, 2*Math.PI);
+            circle.getCenter().getX(), 
+            circle.getCenter().getY(), 
+            circle.getRadius(),
+            0, 2*Math.PI);
         context.stroke();
         // surface
         var surf = circle.getWorldSurface( 
@@ -7285,46 +7341,83 @@ dwv.tool.DrawCircleCommand = function(points, app, style)
             app.getImage().getSpacing().getRowSpacing() );
         context.font = style.getFontStr();
         context.fillText( Math.round(surf) + "mm2",
-                circle.getCenter().getX() + style.getFontSize(),
-                circle.getCenter().getY() + style.getFontSize());
+            circle.getCenter().getX() + style.getFontSize(),
+            circle.getCenter().getY() + style.getFontSize());
     };
 }; // DrawCircleCommand class
 
-//Shape list
+// Add the shape command to the command list
 dwv.tool.shapes = dwv.tool.shapes || {};
-//Add the shape command to the list
 dwv.tool.shapes.circle = dwv.tool.DrawCircleCommand;
-;//! @namespace Main DWV namespace.
+;/** 
+ * Tool module.
+ * @module tool
+ */
 var dwv = dwv || {};
-//! @namespace Tool classes.
 dwv.tool = dwv.tool || {};
 
-//! List of colors
+// List of colors
 dwv.tool.colors = [
     "Yellow", "Red", "White", "Green", "Blue", "Lime", "Fuchsia", "Black"
 ];
 
-//shape list: to be completed after each tool definition 
+// Shape list: to be completed after each tool definition 
 dwv.tool.shapes = dwv.tool.shapes || {};
 
 /**
-* @class Drawing tool.
-*/
+ * Drawing tool.
+ * @class Draw
+ * @namespace dwv.tool
+ * @constructor
+ * @param {Object} app The associated application.
+ */
 dwv.tool.Draw = function(app)
 {
+    /**
+     * Closure to self: to be used by event handlers.
+     * @property self
+     * @private
+     * @type WindowLevel
+     */
     var self = this;
-    // start drawing flag
+    /**
+     * Interaction start flag.
+     * @property started
+     * @type Boolean
+     */
     var started = false;
-    // draw command
+    
+    /**
+     * Draw command.
+     * @property command
+     * @private
+     * @type Object
+     */
     var command = null;
-    // draw style
+    /**
+     * Drawing style.
+     * @property style
+     * @type Style
+     */
     this.style = new dwv.html.Style();
-    // shape name
+    /**
+     * Shape name.
+     * @property shapeName
+     * @type String
+     */
     this.shapeName = 0;
-    // list of points
+    /**
+     * List of points
+     * @property points
+     * @type Array
+     */
     var points = [];
 
-    // This is called when you start holding down the mouse button.
+    /**
+     * Handle mouse down event.
+     * @method mousedown
+     * @param {Object} event The mouse down event.
+     */
     this.mousedown = function(ev){
         started = true;
         // clear array
@@ -7333,7 +7426,11 @@ dwv.tool.Draw = function(app)
         points.push(new dwv.math.Point2D(ev._x, ev._y));
     };
 
-    // This function is called every time you move the mouse.
+    /**
+     * Handle mouse move event.
+     * @method mousemove
+     * @param {Object} event The mouse move event.
+     */
     this.mousemove = function(ev){
         if (!started)
         {
@@ -7353,7 +7450,11 @@ dwv.tool.Draw = function(app)
         }
     };
 
-    // This is called when you release the mouse button.
+    /**
+     * Handle mouse up event.
+     * @method mouseup
+     * @param {Object} event The mouse up event.
+     */
     this.mouseup = function(ev){
         if (started)
         {
@@ -7366,23 +7467,56 @@ dwv.tool.Draw = function(app)
         }
     };
     
+    /**
+     * Handle mouse out event.
+     * @method mouseout
+     * @param {Object} event The mouse out event.
+     */
     this.mouseout = function(ev){
         self.mouseup(ev);
     };
 
+    /**
+     * Handle touch start event.
+     * @method touchstart
+     * @param {Object} event The touch start event.
+     */
     this.touchstart = function(ev){
         self.mousedown(ev);
     };
 
+    /**
+     * Handle touch move event.
+     * @method touchmove
+     * @param {Object} event The touch move event.
+     */
     this.touchmove = function(ev){
         self.mousemove(ev);
     };
 
+    /**
+     * Handle touch end event.
+     * @method touchend
+     * @param {Object} event The touch end event.
+     */
     this.touchend = function(ev){
         self.mouseup(ev);
     };
 
-   // Enable the draw tool
+    /**
+     * Handle key down event.
+     * @method keydown
+     * @param {Object} event The key down event.
+     */
+    this.keydown = function(event){
+        app.handleKeyDown(event);
+    };
+
+    /**
+     * Enable the tool.
+     * @method enable
+     * @param {Boolean} value The flag to enable or not.
+     */
     this.enable = function(value){
         if( value ) {
             this.init();
@@ -7392,22 +7526,25 @@ dwv.tool.Draw = function(app)
             dwv.gui.clearDrawHtml();
         }
     };
-    
-    // Handle key down event
-    this.keydown = function(event){
-        app.handleKeyDown(event);
-    };
 
 }; // Draw class
 
-// Set the line color of the drawing
+/**
+ * Set the line color of the drawing.
+ * @method setLineColour
+ * @param {String} colour The colour to set.
+ */
 dwv.tool.Draw.prototype.setLineColour = function(colour)
 {
     // set style var
     this.style.setLineColor(colour);
 };
 
-// Set the shape name of the drawing
+/**
+ * Set the shape name of the drawing.
+ * @method setShapeName
+ * @param {String} name The name of the shape.
+ */
 dwv.tool.Draw.prototype.setShapeName = function(name)
 {
     // check if we have it
@@ -7418,10 +7555,19 @@ dwv.tool.Draw.prototype.setShapeName = function(name)
     this.shapeName = name;
 };
 
+/**
+ * Check if the shape is in the shape list.
+ * @method hasShape
+ * @param {String} name The name of the shape.
+ */
 dwv.tool.Draw.prototype.hasShape = function(name) {
     return dwv.tool.shapes[name];
 };
 
+/**
+ * Initialise the tool.
+ * @method init
+ */
 dwv.tool.Draw.prototype.init = function() {
     // set the default to the first in the list
     var shapeName = 0;
@@ -7434,27 +7580,47 @@ dwv.tool.Draw.prototype.init = function() {
     this.setLineColour(dwv.tool.colors[0]);
 };
 
-//Tool list
+// Add the tool to the tool list
 dwv.tool.tools = dwv.tool.tools || {};
-//Add the tool to the list
 dwv.tool.tools.draw = dwv.tool.Draw;
-;//! @namespace Main DWV namespace.
+;/** 
+ * Tool module.
+ * @module tool
+ */
 var dwv = dwv || {};
-//! @namespace Tool classes.
 dwv.tool = dwv.tool || {};
 
-//filter list: to be completed after each tool definition 
+// Filter list: to be completed after each tool definition 
 dwv.tool.filters = dwv.tool.filters || {};
 
 /**
-* @class Filter tool.
-*/
+ * Filter tool.
+ * @class Filter
+ * @namespace dwv.tool
+ * @constructor
+ * @param {Object} app The associated application.
+ */
 dwv.tool.Filter = function(app)
 {
+    /**
+     * Selected filter.
+     * @property selectedFilter
+     * @type Object
+     */
     this.selectedFilter = 0;
+    /**
+     * Default filter name.
+     * @property defaultFilterName
+     * @type String
+     */
     this.defaultFilterName = 0;
 };
 
+/**
+ * Enable the filter.
+ * @method enable
+ * @param {Boolean} bool Flag to enable or not.
+ */
 dwv.tool.Filter.prototype.enable = function(bool)
 {
     if( bool ) {
@@ -7470,10 +7636,20 @@ dwv.tool.Filter.prototype.enable = function(bool)
     }
 };
 
+/**
+ * Get the selected filter.
+ * @method getSelectedFilter
+ * @return {Object} The selected filter.
+ */
 dwv.tool.Filter.prototype.getSelectedFilter = function() {
     return this.selectedFilter;
 };
 
+/**
+ * Set the selected filter.
+ * @method setSelectedFilter
+ * @return {String} The name of the filter to select.
+ */
 dwv.tool.Filter.prototype.setSelectedFilter = function(name) {
     // check if we have it
     if( !this.hasFilter(name) )
@@ -7490,10 +7666,20 @@ dwv.tool.Filter.prototype.setSelectedFilter = function(name) {
     this.selectedFilter.enable(true);
 };
 
+/**
+ * Check if a filter is in the filter list.
+ * @method hasFilter
+ * @param {String} name The name to check.
+ * @return {String} The filter list element for the given name.
+ */
 dwv.tool.Filter.prototype.hasFilter = function(name) {
     return dwv.tool.filters[name];
 };
 
+/**
+ * Initialise the filter.
+ * @method init
+ */
 dwv.tool.Filter.prototype.init = function()
 {
     // set the default to the first in the list
@@ -7504,20 +7690,32 @@ dwv.tool.Filter.prototype.init = function()
     this.setSelectedFilter(this.defaultFilterName);
 };
 
+/**
+ * Handle keydown event.
+ * @method keydown
+ * @param {Object} event The keydown event.
+ */
 dwv.tool.Filter.prototype.keydown = function(event){
     app.handleKeyDown(event);
 };
 
-/**
- * @namespace Filter classes.
- */
+// Filter namespace
 dwv.tool.filter = dwv.tool.filter || {};
 
 /**
-* @class Threshold filter tool.
-*/
+ * Threshold filter tool.
+ * @class Threshold
+ * @namespace dwv.tool.filter
+ * @constructor
+ * @param {Object} app The associated application.
+ */
 dwv.tool.filter.Threshold = function(app) {};
 
+/**
+ * Enable the filter.
+ * @method enable
+ * @param {Boolean} value Flag to enable or not.
+ */
 dwv.tool.filter.Threshold.prototype.enable = function(value)
 {
     if( value ) {
@@ -7528,6 +7726,11 @@ dwv.tool.filter.Threshold.prototype.enable = function(value)
     }
 };
 
+/**
+ * Run the filter.
+ * @method run
+ * @param {Mixed} args The filter arguments.
+ */
 dwv.tool.filter.Threshold.prototype.run = function(args)
 {
     var filter = new dwv.image.filter.Threshold();
@@ -7539,14 +7742,23 @@ dwv.tool.filter.Threshold.prototype.run = function(args)
     app.getUndoStack().add(command);
 };
 
-// Add the tool to the list
+// Add the filter to the filter list
 dwv.tool.filters.threshold = dwv.tool.filter.Threshold;
 
 /**
-* @class Sharpen filter tool.
-*/
+ * Sharpen filter tool.
+ * @class Sharpen
+ * @namespace dwv.tool.filter
+ * @constructor
+ * @param {Object} app The associated application.
+ */
 dwv.tool.filter.Sharpen = function(app) {};
 
+/**
+ * Enable the filter.
+ * @method enable
+ * @param {Boolean} value Flag to enable or not.
+ */
 dwv.tool.filter.Sharpen.prototype.enable = function(value)
 {
     if( value ) {
@@ -7557,6 +7769,11 @@ dwv.tool.filter.Sharpen.prototype.enable = function(value)
     }
 };
 
+/**
+ * Run the filter.
+ * @method run
+ * @param {Mixed} args The filter arguments.
+ */
 dwv.tool.filter.Sharpen.prototype.run = function(args)
 {
     var filter = new dwv.image.filter.Sharpen();
@@ -7566,14 +7783,23 @@ dwv.tool.filter.Sharpen.prototype.run = function(args)
     app.getUndoStack().add(command);
 };
 
-// Add the tool to the list
+// Add the filter to the filter list
 dwv.tool.filters.sharpen = dwv.tool.filter.Sharpen;
 
 /**
-* @class Sobel filter tool.
-*/
+ * Sobel filter tool.
+ * @class Sharpen
+ * @namespace dwv.tool.filter
+ * @constructor
+ * @param {Object} app The associated application.
+ */
 dwv.tool.filter.Sobel = function(app) {};
 
+/**
+ * Enable the filter.
+ * @method enable
+ * @param {Boolean} value Flag to enable or not.
+ */
 dwv.tool.filter.Sobel.prototype.enable = function(value)
 {
     if( value ) {
@@ -7584,6 +7810,11 @@ dwv.tool.filter.Sobel.prototype.enable = function(value)
     }
 };
 
+/**
+ * Run the filter.
+ * @method run
+ * @param {Mixed} args The filter arguments.
+ */
 dwv.tool.filter.Sobel.prototype.run = function(args)
 {
     var filter = new dwv.image.filter.Sobel();
@@ -7593,40 +7824,70 @@ dwv.tool.filter.Sobel.prototype.run = function(args)
     app.getUndoStack().add(command);
 };
 
-//Add the tool to the list
+// Add the filter to the filter list
 dwv.tool.filters.sobel = dwv.tool.filter.Sobel;
 
-//Tool list
+// Add the tool to the tool list
 dwv.tool.tools = dwv.tool.tools || {};
-//Add the filters to the tools
 dwv.tool.tools.filter = dwv.tool.Filter;
 
 /**
- * @class Run filter command.
- * @param filter The filter to run.
- * @param app The application to draw the line on.
+ * Run filter command.
+ * @class RunFilterCommand
+ * @namespace dwv.tool
+ * @constructor
+ * @param {Object} filter The filter to run.
+ * @param {Object} app The associated application.
  */
 dwv.tool.RunFilterCommand = function(filter, app)
 {
-    // command name
+    /**
+     * Command name.
+     * @property name
+     * @private
+     * @type String
+     */
     var name = "RunFilter: " + filter.getName();
-    this.setName = function(str) { name = str; };
+    /**
+     * Get the command name.
+     * @method getName
+     * @return {String} The command name.
+     */
     this.getName = function() { return name; };
+    /**
+     * Set the command name.
+     * @method setName
+     * @param {String} str The command name.
+     */
+    this.setName = function(str) { name = str; };
 
-    // main method
+    /**
+     * Execute the command.
+     * @method execute
+     */
     this.execute = function()
     {
         app.setImage(filter.update());
         app.generateAndDrawImage();
     }; 
 }; // RunFilterCommand class
-;//! @namespace Main DWV namespace.
+;/** 
+ * Info module.
+ * @module info
+ */
 var dwv = dwv || {};
-// @namespace Info classes.
+/**
+ * Namespace for info functions.
+ * @class info
+ * @namespace dwv
+ * @static
+ */
 dwv.info = dwv.info || {};
 
 /**
- * @function Create the windowing info div.
+ * Create the windowing info div.
+ * @method createWindowingDiv
+ * @static
  */
 dwv.info.createWindowingDiv = function()
 {
@@ -7648,8 +7909,10 @@ dwv.info.createWindowingDiv = function()
 };
 
 /**
- * @function Update the Top Right info div.
- * @param event The windowing change event containing the new values.
+ * Update the Top Right info div.
+ * @method updateWindowingDiv
+ * @static
+ * @param {Object} event The windowing change event containing the new values.
  * Warning: expects the windowing info div to exist (use after createWindowingDiv).
  */
 dwv.info.updateWindowingDiv = function(event)
@@ -7665,7 +7928,9 @@ dwv.info.updateWindowingDiv = function(event)
 };
 
 /**
- * @function Create the position info div.
+ * Create the position info div.
+ * @method createPositionDiv
+ * @static
  */
 dwv.info.createPositionDiv = function()
 {
@@ -7687,8 +7952,10 @@ dwv.info.createPositionDiv = function()
 };
 
 /**
- * @function Update the position info div.
- * @param event The position change event containing the new values.
+ * Update the position info div.
+ * @method updatePositionDiv
+ * @static
+ * @param {Object} event The position change event containing the new values.
  * Warning: expects the position info div to exist (use after createPositionDiv).
  */
 dwv.info.updatePositionDiv = function(event)
@@ -7704,7 +7971,9 @@ dwv.info.updatePositionDiv = function(event)
 };
 
 /**
- * @function Create the mini color map info div.
+ * Create the mini color map info div.
+ * @method createMiniColorMap
+ * @static
  */
 dwv.info.createMiniColorMap = function()
 {    
@@ -7720,8 +7989,10 @@ dwv.info.createMiniColorMap = function()
 };
 
 /**
- * @function Update the mini color map info div.
- * @param event The windowing change event containing the new values.
+ * Update the mini color map info div.
+ * @method updateMiniColorMap
+ * @static
+ * @param {Object} event The windowing change event containing the new values.
  * Warning: expects the mini color map div to exist (use after createMiniColorMap).
  */
 dwv.info.updateMiniColorMap = function(event)
@@ -7770,7 +8041,9 @@ dwv.info.updateMiniColorMap = function(event)
 };
 
 /**
- * @function Create the plot info.
+ * Create the plot info.
+ * @method createPlot
+ * @static
  */
 dwv.info.createPlot = function()
 {
@@ -7783,8 +8056,10 @@ dwv.info.createPlot = function()
 };
 
 /**
- * @function Update the plot markings.
- * @param event The windowing change event containing the new values.
+ * Update the plot markings.
+ * @method updatePlotMarkings
+ * @static
+ * @param {Object} event The windowing change event containing the new values.
  * Warning: expects the plot to exist (use after createPlot).
  */
 dwv.info.updatePlotMarkings = function(event)
@@ -7809,29 +8084,71 @@ dwv.info.updatePlotMarkings = function(event)
         "yaxis": { "show": false }
     });
 };
-;//! @namespace Main DWV namespace.
+;/** 
+ * Tool module.
+ * @module tool
+ */
 var dwv = dwv || {};
-//! @namespace Tool classes.
 dwv.tool = dwv.tool || {};
 
 /**
- * @class Draw line command.
- * @param points The points from which to extract the line.
- * @param app The application to draw the line on.
- * @param style The drawing style.
+ * Draw line command.
+ * @class DrawLineCommand
+ * @namespace dwv.tool
+ * @constructor
+ * @param {Array} points The points from which to extract the line.
+ * @param {Object} app The application to draw the line on.
+ * @param {Style} style The drawing style.
  */
 dwv.tool.DrawLineCommand = function(points, app, style)
 {
+    /**
+     * Line object.
+     * @property line
+     * @private
+     * @type Line
+     */
     var line = new dwv.math.Line(points[0], points[points.length-1]);
+    
+    /**
+     * Line color.
+     * @property lineColor
+     * @private
+     * @type String
+     */
     var lineColor = style.getLineColor();
+    /**
+     * HTML context.
+     * @property context
+     * @private
+     * @type Object
+     */
     var context = app.getTempLayer().getContext();
     
-    // command name
+    /**
+     * Command name.
+     * @property name
+     * @private
+     * @type String
+     */
     var name = "DrawLineCommand";
-    this.setName = function(str) { name = str; };
+    /**
+     * Get the command name.
+     * @method getName
+     * @return {String} The command name.
+     */
     this.getName = function() { return name; };
+    /**
+     * Set the command name.
+     * @method setName
+     * @param {String} str The command name.
+     */
+    this.setName = function(str) { name = str; };
 
-    // main method
+    /**
+     * Execute the command.
+     * @method execute
+     */
     this.execute = function()
     {
         // style
@@ -7849,54 +8166,125 @@ dwv.tool.DrawLineCommand = function(points, app, style)
             app.getImage().getSpacing().getRowSpacing() );
         context.font = style.getFontStr();
         context.fillText( Math.round(length) + "mm",
-                line.getEnd().getX() + style.getFontSize(),
-                line.getEnd().getY() + style.getFontSize());
+            line.getEnd().getX() + style.getFontSize(),
+            line.getEnd().getY() + style.getFontSize());
     }; 
 }; // DrawLineCommand class
 
-//Shape list
+// Add the shape command to the command list
 dwv.tool.shapes = dwv.tool.shapes || {};
-//Add the shape command to the list
 dwv.tool.shapes.line = dwv.tool.DrawLineCommand;
-;//! @namespace Main DWV namespace.
+;/** 
+ * Tool module.
+ * @module tool
+ */
 var dwv = dwv || {};
-//! @namespace Tool classes.
 dwv.tool = dwv.tool || {};
 
 /**
-* @class Livewire painting tool.
-*/
+ * Livewire painting tool.
+ * @class Livewire
+ * @namespace dwv.tool
+ * @constructor
+ * @param {Object} app The associated application.
+ */
 dwv.tool.Livewire = function(app)
 {
+    /**
+     * Closure to self: to be used by event handlers.
+     * @property self
+     * @private
+     * @type WindowLevel
+     */
     var self = this;
+    /**
+     * Interaction start flag.
+     * @property started
+     * @type Boolean
+     */
     this.started = false;
-    // draw style
-    this.style = new dwv.html.Style();
+    
+    /**
+     * Draw command.
+     * @property command
+     * @private
+     * @type Object
+     */
     var command = null;
-    // paths are stored in reverse order
+    /**
+     * Drawing style.
+     * @property style
+     * @type Style
+     */
+    this.style = new dwv.html.Style();
+    
+    /**
+     * Path storage. Paths are stored in reverse order.
+     * @property path
+     * @private
+     * @type Path
+     */
     var path = new dwv.math.Path();
+    /**
+     * Current path storage. Paths are stored in reverse order.
+     * @property currentPath
+     * @private
+     * @type Path
+     */
     var currentPath = new dwv.math.Path();
+    /**
+     * List of parent points.
+     * @property parentPoints
+     * @private
+     * @type Array
+     */
     var parentPoints = [];
+    /**
+     * Tolerance.
+     * @property tolerance
+     * @private
+     * @type Number
+     */
     var tolerance = 5;
     
+    /**
+     * Clear the parent points list.
+     * @method clearParentPoints
+     * @private
+     */
     function clearParentPoints() {
         for( var i = 0; i < app.getImage().getSize().getNumberOfRows(); ++i ) {
             parentPoints[i] = [];
         }
     }
     
+    /**
+     * Clear the stored paths.
+     * @method clearPaths
+     * @private
+     */
     function clearPaths() {
         path = new dwv.math.Path();
         currentPath = new dwv.math.Path();
     }
     
+    /**
+     * Scissor representation.
+     * @property scissors
+     * @private
+     * @type Scissors
+     */
     var scissors = new dwv.math.Scissors();
     scissors.setDimensions(
         app.getImage().getSize().getNumberOfColumns(),
         app.getImage().getSize().getNumberOfRows() );
     scissors.setData(app.getImageData().data);
     
-    // This is called when you start holding down the mouse button.
+    /**
+     * Handle mouse down event.
+     * @method mousedown
+     * @param {Object} event The mouse down event.
+     */
     this.mousedown = function(ev){
         // first time
         if( !self.started ) {
@@ -7938,7 +8326,11 @@ dwv.tool.Livewire = function(app)
         }
     };
 
-    // This function is called every time you move the mouse.
+    /**
+     * Handle mouse move event.
+     * @method mousemove
+     * @param {Object} event The mouse move event.
+     */
     this.mousemove = function(ev){
         if (!self.started)
         {
@@ -7996,11 +8388,29 @@ dwv.tool.Livewire = function(app)
         command.execute();
     };
 
-    // This is called when you release the mouse button.
+    /**
+     * Handle mouse up event.
+     * @method mouseup
+     * @param {Object} event The mouse up event.
+     */
     this.mouseup = function(ev){
         // nothing to do
     };
     
+    /**
+     * Handle key down event.
+     * @method keydown
+     * @param {Object} event The key down event.
+     */
+    this.keydown = function(event){
+        app.handleKeyDown(event);
+    };
+
+    /**
+     * Enable the tool.
+     * @method enable
+     * @param {Boolean} bool The flag to enable or not.
+     */
     this.enable = function(value){
         if( value ) {
             this.init();
@@ -8011,47 +8421,83 @@ dwv.tool.Livewire = function(app)
         }
     };
 
-    this.keydown = function(event){
-        app.handleKeyDown(event);
-    };
 
 }; // Livewire class
 
-//Set the line color of the drawing
+/**
+ * Set the line color of the drawing.
+ * @method setLineColour
+ * @param {String} colour The colour to set.
+ */
 dwv.tool.Livewire.prototype.setLineColour = function(colour)
 {
     // set style var
     this.style.setLineColor(colour);
 };
 
+/**
+ * Initialise the tool.
+ * @method init
+ */
 dwv.tool.Livewire.prototype.init = function()
 {
     // set the default to the first in the list
     this.setLineColour(dwv.tool.colors[0]);
 };
 
-//Tool list
+// Add the tool to the tool list
 dwv.tool.tools = dwv.tool.tools || {};
-//Add the tool to the list
 dwv.tool.tools.livewire = dwv.tool.Livewire;
 
 /**
- * @class Draw livewire command.
- * @param livewire The livewire to draw.
- * @param app The application to draw the livewire on.
+ * Draw livewire command.
+ * @class DrawLivewireCommand
+ * @namespace dwv.tool
+ * @param {Object} livewire The livewire to draw.
+ * @param {Object} app The application to draw the livewire on.
+ * @param {Object} style The style of the livewire.
  */
 dwv.tool.DrawLivewireCommand = function(livewire, app, style)
 {
-    // app members can change 
+    /**
+     * The livewire color.
+     * @property livewireColor
+     * @private
+     * @type String
+     */
     var livewireColor = style.getLineColor();
+    /**
+     * The HTML context.
+     * @property context
+     * @private
+     * @type Object
+     */
     var context = app.getTempLayer().getContext();
     
-    // command name
+    /**
+     * Command name.
+     * @property name
+     * @private
+     * @type String
+     */
     var name = "DrawLivewireCommand";
-    this.setName = function(str) { name = str; };
+    /**
+     * Get the command name.
+     * @method getName
+     * @return {String} The command name.
+     */
     this.getName = function() { return name; };
+    /**
+     * Set the command name.
+     * @method setName
+     * @param {String} str The command name.
+     */
+    this.setName = function(str) { name = str; };
 
-    // main method
+    /**
+     * Execute the command.
+     * @method execute
+     */
     this.execute = function()
     {
         // style
@@ -8073,29 +8519,71 @@ dwv.tool.DrawLivewireCommand = function(livewire, app, style)
         //context.closePath();
     }; 
 }; // DrawLivewireCommand class
-;//! @namespace Main DWV namespace.
+;/** 
+ * Tool module.
+ * @module tool
+ */
 var dwv = dwv || {};
-//! @namespace Tool classes.
 dwv.tool = dwv.tool || {};
 
 /**
- * @class Draw rectangle command.
- * @param points The points from which to extract the circle.
- * @param app The application to draw the line on.
- * @param style The drawing style.
+ * Draw rectangle command.
+ * @class DrawRectangleCommand
+ * @namespace dwv.tool
+ * @constructor
+ * @param {Array} points The points from which to extract the circle.
+ * @param {Object} app The application to draw the line on.
+ * @param {Style} style The drawing style.
  */
 dwv.tool.DrawRectangleCommand = function(points, app, style)
 {
+    /**
+     * Rectangle object.
+     * @property rectangle
+     * @private
+     * @type Rectangle
+     */
     var rectangle = new dwv.math.Rectangle(points[0], points[points.length-1]);
+    
+    /**
+     * Line color.
+     * @property lineColor
+     * @private
+     * @type String
+     */
     var lineColor = style.getLineColor();
+    /**
+     * HTML context.
+     * @property context
+     * @private
+     * @type Object
+     */
     var context = app.getTempLayer().getContext();
     
-    // command name
+    /**
+     * Command name.
+     * @property name
+     * @private
+     * @type String
+     */
     var name = "DrawRectangleCommand";
-    this.setName = function(str) { name = str; };
+    /**
+     * Get the command name.
+     * @method getName
+     * @return {String} The command name.
+     */
     this.getName = function() { return name; };
+    /**
+     * Set the command name.
+     * @method setName
+     * @param {String} str The command name.
+     */
+    this.setName = function(str) { name = str; };
 
-    // main method
+    /**
+     * Execute the command.
+     * @method execute
+     */
     this.execute = function()
     {
         // style
@@ -8104,50 +8592,92 @@ dwv.tool.DrawRectangleCommand = function(points, app, style)
         // path
         context.beginPath();
         context.strokeRect( 
-                rectangle.getBegin().getX(), 
-                rectangle.getBegin().getY(),
-                rectangle.getRealWidth(),
-                rectangle.getRealHeight() );
+            rectangle.getBegin().getX(), 
+            rectangle.getBegin().getY(),
+            rectangle.getRealWidth(),
+            rectangle.getRealHeight() );
         // length
         var surf = rectangle.getWorldSurface( 
             app.getImage().getSpacing().getColumnSpacing(), 
             app.getImage().getSpacing().getRowSpacing() );
         context.font = style.getFontStr();
         context.fillText( Math.round(surf) + "mm2",
-                rectangle.getEnd().getX() + style.getFontSize(),
-                rectangle.getEnd().getY() + style.getFontSize());
+            rectangle.getEnd().getX() + style.getFontSize(),
+            rectangle.getEnd().getY() + style.getFontSize());
     }; 
 }; // DrawRectangleCommand class
 
-//Shape list
+// Add the shape command to the command list
 dwv.tool.shapes = dwv.tool.shapes || {};
-//Add the shape command to the list
 dwv.tool.shapes.rectangle = dwv.tool.DrawRectangleCommand;
-;//! @namespace Main DWV namespace.
+;/** 
+ * Tool module.
+ * @module tool
+ */
 var dwv = dwv || {};
-//! @namespace Tool classes.
 dwv.tool = dwv.tool || {};
 
 /**
- * @class Draw ROI command.
- * @param points The points from which to extract the line.
- * @param app The application to draw the line on.
- * @param style The drawing style.
+ * Draw ROI command.
+ * @class DrawRoiCommand
+ * @namespace dwv.tool
+ * @constructor
+ * @param {Array} points The points from which to extract the line.
+ * @param {Object} app The application to draw the line on.
+ * @param {Style} style The drawing style.
  */
 dwv.tool.DrawRoiCommand = function(points, app, style)
 {
+    /**
+     * ROI object.
+     * @property roi
+     * @private
+     * @type ROI
+     */
     var roi = new dwv.math.ROI();
+    
+    // add input points to the ROI
     roi.addPoints(points);
 
+    /**
+     * Line color.
+     * @property lineColor
+     * @private
+     * @type String
+     */
     var lineColor = style.getLineColor();
+    /**
+     * HTML context.
+     * @property context
+     * @private
+     * @type Object
+     */
     var context = app.getTempLayer().getContext();
     
-    // command name
+    /**
+     * Command name.
+     * @property name
+     * @private
+     * @type String
+     */
     var name = "DrawRoiCommand";
-    this.setName = function(str) { name = str; };
+    /**
+     * Get the command name.
+     * @method getName
+     * @return {String} The command name.
+     */
     this.getName = function() { return name; };
+    /**
+     * Set the command name.
+     * @method setName
+     * @param {String} str The command name.
+     */
+    this.setName = function(str) { name = str; };
 
-    // main method
+    /**
+     * Execute the command.
+     * @method execute
+     */
     this.execute = function()
     {
         // style
@@ -8156,13 +8686,13 @@ dwv.tool.DrawRoiCommand = function(points, app, style)
         // path
         context.beginPath();
         context.moveTo(
-                roi.getPoint(0).getX(), 
-                roi.getPoint(0).getY());
+            roi.getPoint(0).getX(), 
+            roi.getPoint(0).getY());
         for( var i = 1; i < roi.getLength(); ++i )
         {
             context.lineTo(
-                    roi.getPoint(i).getX(), 
-                    roi.getPoint(i).getY());
+                roi.getPoint(i).getX(), 
+                roi.getPoint(i).getY());
             context.stroke();
         }
         context.closePath();
@@ -8170,27 +8700,47 @@ dwv.tool.DrawRoiCommand = function(points, app, style)
     }; 
 }; // DrawRoiCommand class
 
-//Shape list
+// Add the shape command to the command list
 dwv.tool.shapes = dwv.tool.shapes || {};
-//Add the shape command to the list
 dwv.tool.shapes.roi = dwv.tool.DrawRoiCommand;
-;//! @namespace Main DWV namespace.
+;/** 
+ * Tool module.
+ * @module tool
+ */
 var dwv = dwv || {};
-//! @namespace Tool classes.
 dwv.tool = dwv.tool || {};
 
-// tool list: to be completed after each tool definition 
+// Tool list: to be completed after each tool definition 
 dwv.tool.tools = dwv.tool.tools || {};
     
 /**
-* @class Tool box.
-*/
+ * Tool box.
+ * @class ToolBox
+ * @namespace dwv.tool
+ * @constructor
+ * @param {Object} app The associated application.
+ */
 dwv.tool.ToolBox = function(app)
 {
+    /**
+     * Selected tool.
+     * @property selectedTool
+     * @type Object
+     */
     this.selectedTool = 0;
+    /**
+     * Default tool name.
+     * @property defaultToolName
+     * @type String
+     */
     this.defaultToolName = 0;
 };
 
+/**
+ * Enable the toolbox.
+ * @method enable
+ * @param {Boolean} bool Flag to enable or not.
+ */
 dwv.tool.ToolBox.prototype.enable = function(bool)
 {
     if( bool ) {
@@ -8200,10 +8750,20 @@ dwv.tool.ToolBox.prototype.enable = function(bool)
     }
 };
 
+/**
+ * Get the selected tool.
+ * @method getSelectedTool
+ * @return {Object} The selected tool.
+ */
 dwv.tool.ToolBox.prototype.getSelectedTool = function() {
     return this.selectedTool;
 };
 
+/**
+ * Set the selected tool.
+ * @method setSelectedTool
+ * @return {String} The name of the tool to select.
+ */
 dwv.tool.ToolBox.prototype.setSelectedTool = function(name) {
     // check if we have it
     if( !this.hasTool(name) )
@@ -8220,10 +8780,20 @@ dwv.tool.ToolBox.prototype.setSelectedTool = function(name) {
     this.selectedTool.enable(true);
 };
 
+/**
+ * Check if a tool is in the tool list.
+ * @method hasTool
+ * @param {String} name The name to check.
+ * @return {String} The tool list element for the given name.
+ */
 dwv.tool.ToolBox.prototype.hasTool = function(name) {
     return dwv.tool.tools[name];
 };
 
+/**
+ * Sort the tool list.
+ * @method sortTools
+ */
 dwv.tool.ToolBox.prototype.sortTools = function()
 {
     // fiddle with order: make window level first if present
@@ -8236,6 +8806,10 @@ dwv.tool.ToolBox.prototype.sortTools = function()
     }
 };
 
+/**
+ * Initialise the tool box.
+ * @method init
+ */
 dwv.tool.ToolBox.prototype.init = function()
 {
     // set the default to the first in the list
@@ -8245,25 +8819,41 @@ dwv.tool.ToolBox.prototype.init = function()
     }
     this.setSelectedTool(this.defaultToolName);
 };
-;//! @namespace Main DWV namespace.
+;/** 
+ * Tool module.
+ * @module tool
+ */
 var dwv = dwv || {};
-//! @namespace Tool classes.
 dwv.tool = dwv.tool || {};
 
 /**
- * @class UndoStack class.
- * @param app
+ * UndoStack class.
+ * @class UndoStack
+ * @namespace dwv.tool
+ * @constructor
+ * @param {Object} app The associated application.
  */
 dwv.tool.UndoStack = function(app)
 { 
-    // Array of commands.
+    /**
+     * Array of commands.
+     * @property stack
+     * @private
+     * @type Array
+     */
     var stack = [];
-    // Current command index.
+    /**
+     * Current command index.
+     * @property curCmdIndex
+     * @private
+     * @type Number
+     */
     var curCmdIndex = 0;
 
     /**
      * Add a command to the stack.
-     * @param cmd The command to add.
+     * @method add
+     * @param {Object} cmd The command to add.
      */
     this.add = function(cmd)
     { 
@@ -8279,6 +8869,7 @@ dwv.tool.UndoStack = function(app)
 
     /**
      * Undo the last command. 
+     * @method undo
      */
     this.undo = function()
     { 
@@ -8313,6 +8904,7 @@ dwv.tool.UndoStack = function(app)
 
     /**
      * Redo the last command.
+     * @method redo
      */
     this.redo = function()
     { 
@@ -8331,17 +8923,25 @@ dwv.tool.UndoStack = function(app)
     };
 
 }; // UndoStack class
-;//! @namespace Main DWV namespace.
+;/** 
+ * Tool module.
+ * @module tool
+ */
 var dwv = dwv || {};
-//! @namespace Tool classes.
+/**
+ * Namespace for tool functions.
+ * @class tool
+ * @namespace dwv
+ * @static
+ */
 dwv.tool = dwv.tool || {};
 
 /**
-* @fileOverview WindowLevel tool.
-*/
-
-/**
- * @function Update the views' current position.
+ * Update the views' current position.
+ * @method updatePostionValue
+ * @static
+ * @param {Number} i The column index.
+ * @param {Number} j The row index.
  */
 dwv.tool.updatePostionValue = function(i,j)
 {
@@ -8349,7 +8949,11 @@ dwv.tool.updatePostionValue = function(i,j)
 };
 
 /**
- * @function Update the views' windowing data
+ * Update the views' windowing data.
+ * @method updateWindowingData
+ * @static
+ * @param {Number} wc The window center.
+ * @param {Number} ww The window width.
  */
 dwv.tool.updateWindowingData = function(wc,ww)
 {
@@ -8357,7 +8961,10 @@ dwv.tool.updateWindowingData = function(wc,ww)
 };
 
 /**
- * @function Update the views' colour map.
+ * Update the views' colour map.
+ * @method updateColourMap
+ * @static
+ * @param {Object} colourMap The colour map.
  */
 dwv.tool.updateColourMap = function(colourMap)
 {
@@ -8384,18 +8991,36 @@ dwv.tool.defaultpresets.CT = {
 };
 
 /**
- * @class WindowLevel tool: handle window/level related events.
+ * WindowLevel tool: handle window/level related events.
+ * @class WindowLevel
+ * @namespace dwv.tool
+ * @constructor
+ * @param {Object} app The associated application.
  */
 dwv.tool.WindowLevel = function(app)
 {
-    // Closure to self: to be used by event handlers.
+    /**
+     * Closure to self: to be used by event handlers.
+     * @property self
+     * @private
+     * @type WindowLevel
+     */
     var self = this;
-    // Interaction start flag.
+    /**
+     * Interaction start flag.
+     * @property started
+     * @type Boolean
+     */
     this.started = false;
+
     // Initialise presets.
     this.updatePresets();
     
-    // Called on mouse down event.
+    /**
+     * Handle mouse down event.
+     * @method mousedown
+     * @param {Object} event The mouse down event.
+     */
     this.mousedown = function(event){
         // set start flag
         self.started = true;
@@ -8406,7 +9031,11 @@ dwv.tool.WindowLevel = function(app)
         dwv.tool.updatePostionValue(event._x, event._y);
     };
     
-    // Called on touch start event with two fingers.
+    /**
+     * Handle two touch down event.
+     * @method twotouchdown
+     * @param {Object} event The touch down event.
+     */
     this.twotouchdown = function(event){
         // set start flag
         self.started = true;
@@ -8417,7 +9046,11 @@ dwv.tool.WindowLevel = function(app)
         self.y1 = event._y1;
     };
     
-    // Called on mouse move event.
+    /**
+     * Handle mouse move event.
+     * @method mousemove
+     * @param {Object} event The mouse move event.
+     */
     this.mousemove = function(event){
         // check start flag
         if( !self.started ) return;
@@ -8434,7 +9067,11 @@ dwv.tool.WindowLevel = function(app)
         self.y0 = event._y;
     };
     
-    // Called on touch move event with two fingers.
+    /**
+     * Handle two touch move event.
+     * @method twotouchmove
+     * @param {Object} event The touch move event.
+     */
     this.twotouchmove = function(event){
         // check start flag
         if( !self.started ) return;
@@ -8449,39 +9086,63 @@ dwv.tool.WindowLevel = function(app)
         self.y0 = event._y;
     };
     
-    // Called on mouse up event.
+    /**
+     * Handle mouse up event.
+     * @method mouseup
+     * @param {Object} event The mouse up event.
+     */
     this.mouseup = function(event){
         // set start flag
         if( self.started ) self.started = false;
     };
     
-    // Called on mouse out event.
+    /**
+     * Handle mouse out event.
+     * @method mouseout
+     * @param {Object} event The mouse out event.
+     */
     this.mouseout = function(event){
         // treat as mouse up
         self.mouseup(event);
     };
     
-    // Called on touch start event.
+    /**
+     * Handle touch start event.
+     * @method touchstart
+     * @param {Object} event The touch start event.
+     */
     this.touchstart = function(event){
         // dispatch to one or two touch handler
         if( event.targetTouches.length === 1 ) self.mousedown(event);
         else if( event.targetTouches.length === 2 ) self.twotouchdown(event);
     };
     
-    // Called on touch move event.
+    /**
+     * Handle touch move event.
+     * @method touchmove
+     * @param {Object} event The touch move event.
+     */
     this.touchmove = function(event){
         // dispatch to one or two touch handler
         if( event.targetTouches.length === 1 ) self.mousemove(event);
         else if( event.targetTouches.length === 2 ) self.twotouchmove(event);
     };
     
-    // Called on touch end event.
+    /**
+     * Handle touch end event.
+     * @method touchend
+     * @param {Object} event The touch end event.
+     */
     this.touchend = function(event){
         // treat as mouse up
         self.mouseup(event);
     };
     
-    // Called on double click event.
+    /**
+     * Handle double click event.
+     * @method dblclick
+     * @param {Object} event The double click event.
+     */
     this.dblclick = function(event){
         // update GUI
         dwv.tool.updateWindowingData(
@@ -8489,27 +9150,43 @@ dwv.tool.WindowLevel = function(app)
             parseInt(app.getView().getWindowLut().getWidth(), 10) );    
     };
     
-    // Called on mouse (wheel) scroll event on Firefox.
+    /**
+     * Handle mouse scroll event (fired by Firefox).
+     * @method DOMMouseScroll
+     * @param {Object} event The mouse scroll event.
+     */
     this.DOMMouseScroll = function(event){
         // update GUI
         if( event.detail > 0 ) app.getView().incrementSliceNb();
         else app.getView().decrementSliceNb();
     };
     
-    // Called on mouse wheel event.
+    /**
+     * Handle mouse wheel event.
+     * @method mousewheel
+     * @param {Object} event The mouse wheel event.
+     */
     this.mousewheel = function(event){
         // update GUI
         if( event.wheelDelta > 0 ) app.getView().incrementSliceNb();
         else app.getView().decrementSliceNb();
     };
     
-    // Called on key down event.
+    /**
+     * Handle key down event.
+     * @method keydown
+     * @param {Object} event The key down event.
+     */
     this.keydown = function(event){
         // let the app handle it
         app.handleKeyDown(event);
     };
     
-    // Enable the tool: prepare HTML for it.
+    /**
+     * Enable the tool.
+     * @method enable
+     * @param {Boolean} bool The flag to enable or not.
+     */
     this.enable = function(bool){
         // update GUI
         if( bool ) dwv.gui.appendWindowLevelHtml();
@@ -8519,7 +9196,8 @@ dwv.tool.WindowLevel = function(app)
 }; // WindowLevel class
 
 /**
- * @function Update the window/level presets.
+ * Update the window/level presets.
+ * @method updatePresets
  */
 dwv.tool.WindowLevel.prototype.updatePresets = function()
 {    
@@ -8548,7 +9226,9 @@ dwv.tool.WindowLevel.prototype.updatePresets = function()
 };
 
 /**
- * @function Set the window/level presets.
+ * Set the active window/level preset.
+ * @method setPreset
+ * @param {String} name The name of the preset to set.
  */
 dwv.tool.WindowLevel.prototype.setPreset = function(name)
 {
@@ -8562,7 +9242,9 @@ dwv.tool.WindowLevel.prototype.setPreset = function(name)
 };
 
 /**
- * @function Set the colour map.
+ * Set the active colour map.
+ * @function setColourMap
+ * @param {String} name The name of the colour map to set.
  */
 dwv.tool.WindowLevel.prototype.setColourMap = function(name)
 {
@@ -8573,17 +9255,26 @@ dwv.tool.WindowLevel.prototype.setColourMap = function(name)
     dwv.tool.updateColourMap( dwv.tool.colourMaps[name] );
 };
 
-//Tool list
+// Add the tool to the tool list
 dwv.tool.tools = dwv.tool.tools || {};
-//Add the tool to the list
 dwv.tool.tools.windowlevel = dwv.tool.WindowLevel;
-;//! @namespace Main DWV namespace.
+;/** 
+ * Tool module.
+ * @module tool
+ */
 var dwv = dwv || {};
-//! @namespace Tool classes.
+/**
+ * Namespace for tool functions.
+ * @class tool
+ * @namespace dwv
+ * @static
+ */
 dwv.tool = dwv.tool || {};
 
 /**
- * @function
+ * Reset the application zoom.
+ * @method zoomReset
+ * @static
  */
 dwv.tool.zoomReset = function(event)
 {
@@ -8594,14 +9285,33 @@ dwv.tool.zoomReset = function(event)
 };
 
 /**
- * @class Zoom class.
+ * Zoom class.
+ * @class Zoom
+ * @namespace dwv.tool
+ * @constructor
+ * @param {Object} app The associated application.
  */
 dwv.tool.Zoom = function(app)
 {
+    /**
+     * Closure to self: to be used by event handlers.
+     * @property self
+     * @private
+     * @type WindowLevel
+     */
     var self = this;
+    /**
+     * Interaction start flag.
+     * @property started
+     * @type Boolean
+     */
     this.started = false;
 
-    // This is called when you start holding down the mouse button.
+    /**
+     * Handle mouse down event.
+     * @method mousedown
+     * @param {Object} event The mouse down event.
+     */
     this.mousedown = function(ev){
         self.started = true;
         // first position
@@ -8609,6 +9319,11 @@ dwv.tool.Zoom = function(app)
         self.y0 = ev._y;
      };
 
+     /**
+      * Handle two touch down event.
+      * @method twotouchdown
+      * @param {Object} event The touch down event.
+      */
      this.twotouchdown = function(ev){
          self.started = true;
          // first line
@@ -8618,7 +9333,11 @@ dwv.tool.Zoom = function(app)
          self.midPoint = self.line0.getMidpoint();         
      };
 
-     // This function is called every time you move the mouse.
+     /**
+      * Handle mouse move event.
+      * @method mousemove
+      * @param {Object} event The mouse move event.
+      */
      this.mousemove = function(ev){
         if (!self.started)
         {
@@ -8637,6 +9356,11 @@ dwv.tool.Zoom = function(app)
         self.y0 = ev._y;
     };
 
+    /**
+     * Handle two touch move event.
+     * @method twotouchmove
+     * @param {Object} event The touch move event.
+     */
     this.twotouchmove = function(ev){
        if (!self.started)
        {
@@ -8652,7 +9376,11 @@ dwv.tool.Zoom = function(app)
            zoomLayers(zoom, self.midPoint.getX(), self.midPoint.getY());
     };
     
-    // This is called when you release the mouse button.
+    /**
+     * Handle mouse up event.
+     * @method mouseup
+     * @param {Object} event The mouse up event.
+     */
     this.mouseup = function(ev){
         if (self.started)
         {
@@ -8661,10 +9389,20 @@ dwv.tool.Zoom = function(app)
         }
     };
     
+    /**
+     * Handle mouse out event.
+     * @method mouseout
+     * @param {Object} event The mouse out event.
+     */
     this.mouseout = function(ev){
         self.mouseup(ev);
     };
 
+    /**
+     * Handle touch start event.
+     * @method touchstart
+     * @param {Object} event The touch start event.
+     */
     this.touchstart = function(ev){
         if( event.targetTouches.length === 1 ){
             self.mousedown(ev);
@@ -8674,6 +9412,11 @@ dwv.tool.Zoom = function(app)
         }
     };
 
+    /**
+     * Handle touch move event.
+     * @method touchmove
+     * @param {Object} event The touch move event.
+     */
     this.touchmove = function(ev){
         if( event.targetTouches.length === 1 ){
             self.mousemove(ev);
@@ -8683,25 +9426,51 @@ dwv.tool.Zoom = function(app)
         }
     };
 
+    /**
+     * Handle touch end event.
+     * @method touchend
+     * @param {Object} event The touch end event.
+     */
     this.touchend = function(ev){
         self.mouseup(ev);
     };
 
-    // This is called when you use the mouse wheel on Firefox.
+    /**
+     * Handle mouse scroll event (fired by Firefox).
+     * @method DOMMouseScroll
+     * @param {Object} event The mouse scroll event.
+     */
     this.DOMMouseScroll = function(ev){
         // ev.detail on firefox is 3
         var step = ev.detail/30;
         zoomLayers(step, ev._x, ev._y);
     };
 
-    // This is called when you use the mouse wheel.
+    /**
+     * Handle mouse wheel event.
+     * @method mousewheel
+     * @param {Object} event The mouse wheel event.
+     */
     this.mousewheel = function(ev){
         // ev.wheelDelta on chrome is 120
         var step = ev.wheelDelta/1200;
         zoomLayers(step, ev._x, ev._y);
     };
     
-    // Enable method.
+    /**
+     * Handle key down event.
+     * @method keydown
+     * @param {Object} event The key down event.
+     */
+    this.keydown = function(event){
+        app.handleKeyDown(event);
+    };
+
+    /**
+     * Enable the tool.
+     * @method enable
+     * @param {Boolean} bool The flag to enable or not.
+     */
     this.enable = function(bool){
         if( bool ) { 
             dwv.gui.appendZoomHtml();
@@ -8711,13 +9480,13 @@ dwv.tool.Zoom = function(app)
         }
     };
 
-    // Keyboard shortcut.
-    this.keydown = function(event){
-        app.handleKeyDown(event);
-    };
-
-    // Really do the zoom
-    // A good step is of 0.1.
+    /**
+     * Apply the zoom to the layers.
+     * @method zoomLayers
+     * @param {Number} step The zoom step increment. A good step is of 0.1.
+     * @param {Number} cx The zoom center X coordinate.
+     * @param {Number} cy The zoom center Y coordinate.
+     */ 
     function zoomLayers(step, cx, cy)
     {
         app.setLayersZoom(step,step,cx,cy);
@@ -8725,9 +9494,8 @@ dwv.tool.Zoom = function(app)
 
 }; // Zoom class
 
-//Tool list
+// Add the tool to the tool list
 dwv.tool.tools = dwv.tool.tools || {};
-//Add the tool to the list
 dwv.tool.tools.zoom = dwv.tool.Zoom;
 ;/** 
  * Utility module.
@@ -8778,7 +9546,7 @@ dwv.utils.cleanString = function(string)
  * @method splitQueryString
  * @static
  * @param {String} inputStr The string to split.
- * @return {String} The splitted string.
+ * @return {Object} The split string.
  */
 dwv.utils.splitQueryString = function(inputStr)
 {
