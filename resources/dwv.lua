@@ -76,7 +76,7 @@ print([[<head>]])
 print([[
 <title>DICOM Web Viewer</title>
 <meta charset="UTF-8">
-<link rel="stylesheet" href="/dwv/css/style.css">
+<link rel="stylesheet" href="/dwv/style.css">
 <style>
 body { font-size: 80%; }
 #pageHeader h1 { display: inline-block; margin: 0; }
@@ -104,46 +104,10 @@ print([[
 -- path with extra /dwv
 print([[
 <!-- Local -->
-<script type="text/javascript" src="/dwv/src/dwv.js"></script>
-<script type="text/javascript" src="/dwv/src/application.js"></script>
-<script type="text/javascript" src="/dwv/src/dicom/dicomParser.js"></script>
-<script type="text/javascript" src="/dwv/src/dicom/dictionary.js"></script>
-<script type="text/javascript" src="/dwv/src/html/gui.js"></script>
-<script type="text/javascript" src="/dwv/src/html/gui_ui.js"></script>
-<script type="text/javascript" src="/dwv/src/html/html.js"></script>
-<script type="text/javascript" src="/dwv/src/html/style.js"></script>
-<script type="text/javascript" src="/dwv/src/html/layer.js"></script>
+<script type="text/javascript" src="/dwv/dwv-0.4.0beta.min.js"></script>
+<script type="text/javascript" src="/dwv/gui_ui.js"></script>
 ]])
 
--- path with extra /dwv
-print([[
-<script type="text/javascript" src="/dwv/src/image/filter.js"></script>
-<script type="text/javascript" src="/dwv/src/image/image.js"></script>
-<script type="text/javascript" src="/dwv/src/image/view.js"></script>
-<script type="text/javascript" src="/dwv/src/image/luts.js"></script>
-<script type="text/javascript" src="/dwv/src/image/reader.js"></script>
-<script type="text/javascript" src="/dwv/src/math/shapes.js"></script>
-<script type="text/javascript" src="/dwv/src/math/bucketQueue.js"></script>
-<script type="text/javascript" src="/dwv/src/math/scissors.js"></script>
-<script type="text/javascript" src="/dwv/src/utils/string.js"></script>
-]])
-
--- path with extra /dwv
-print([[
-<!-- Tools: beware order is important... -->
-<script type="text/javascript" src="/dwv/src/tools/toolbox.js"></script>
-<script type="text/javascript" src="/dwv/src/tools/windowLevel.js"></script>
-<script type="text/javascript" src="/dwv/src/tools/info.js"></script>
-<script type="text/javascript" src="/dwv/src/tools/draw.js"></script>
-<script type="text/javascript" src="/dwv/src/tools/line.js"></script>
-<script type="text/javascript" src="/dwv/src/tools/rectangle.js"></script>
-<script type="text/javascript" src="/dwv/src/tools/roi.js"></script>
-<script type="text/javascript" src="/dwv/src/tools/circle.js"></script>
-<script type="text/javascript" src="/dwv/src/tools/livewire.js"></script>
-<script type="text/javascript" src="/dwv/src/tools/zoom.js"></script>
-<script type="text/javascript" src="/dwv/src/tools/filter.js"></script>
-<script type="text/javascript" src="/dwv/src/tools/undo.js"></script>
-]])
 
 print([[<script type="text/javascript">]])
 
@@ -156,6 +120,8 @@ function toggle(dialogName)
 ]])
 
 print([[
+// check browser support
+dwv.html.checkBrowser();
 // main application
 var app = new dwv.App();
 ]])
