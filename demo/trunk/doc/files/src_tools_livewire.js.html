@@ -414,6 +414,46 @@ dwv.tool.Livewire = function(app)
     };
     
     /**
+     * Handle mouse out event.
+     * @method mouseout
+     * @param {Object} event The mouse out event.
+     */
+    this.mouseout = function(event){
+        // treat as mouse up
+        self.mouseup(event);
+    };
+    
+    /**
+     * Handle touch start event.
+     * @method touchstart
+     * @param {Object} event The touch start event.
+     */
+    this.touchstart = function(event){
+        // treat as mouse down
+        self.mousedown(event);
+    };
+
+    /**
+     * Handle touch move event.
+     * @method touchmove
+     * @param {Object} event The touch move event.
+     */
+    this.touchmove = function(event){
+        // treat as mouse move
+        self.mousemove(event);
+    };
+
+    /**
+     * Handle touch end event.
+     * @method touchend
+     * @param {Object} event The touch end event.
+     */
+    this.touchend = function(event){
+        // treat as mouse up
+        self.mouseup(event);
+    };
+
+    /**
      * Handle key down event.
      * @method keydown
      * @param {Object} event The key down event.

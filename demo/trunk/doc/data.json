@@ -1334,7 +1334,7 @@
             "module": "tool",
             "namespace": "dwv.tool",
             "file": "src/tools/livewire.js",
-            "line": 276,
+            "line": 316,
             "description": "Draw livewire command.",
             "params": [
                 {
@@ -6645,6 +6645,74 @@
         {
             "file": "src/tools/livewire.js",
             "line": 224,
+            "description": "Handle mouse out event.",
+            "itemtype": "method",
+            "name": "mouseout",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The mouse out event.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.tool.Livewire",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/livewire.js",
+            "line": 234,
+            "description": "Handle touch start event.",
+            "itemtype": "method",
+            "name": "touchstart",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The touch start event.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.tool.Livewire",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/livewire.js",
+            "line": 244,
+            "description": "Handle touch move event.",
+            "itemtype": "method",
+            "name": "touchmove",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The touch move event.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.tool.Livewire",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/livewire.js",
+            "line": 254,
+            "description": "Handle touch end event.",
+            "itemtype": "method",
+            "name": "touchend",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The touch end event.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.tool.Livewire",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/livewire.js",
+            "line": 264,
             "description": "Handle key down event.",
             "itemtype": "method",
             "name": "keydown",
@@ -6661,7 +6729,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 233,
+            "line": 273,
             "description": "Enable the tool.",
             "itemtype": "method",
             "name": "enable",
@@ -6678,7 +6746,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 251,
+            "line": 291,
             "description": "Set the line color of the drawing.",
             "itemtype": "method",
             "name": "setLineColour",
@@ -6695,7 +6763,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 262,
+            "line": 302,
             "description": "Initialise the tool.",
             "itemtype": "method",
             "name": "init",
@@ -6705,7 +6773,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 286,
+            "line": 326,
             "description": "The livewire color.",
             "itemtype": "property",
             "name": "livewireColor",
@@ -6718,7 +6786,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 293,
+            "line": 333,
             "description": "The HTML context.",
             "itemtype": "property",
             "name": "context",
@@ -6731,7 +6799,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 301,
+            "line": 341,
             "description": "Command name.",
             "itemtype": "property",
             "name": "name",
@@ -6744,7 +6812,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 308,
+            "line": 348,
             "description": "Get the command name.",
             "itemtype": "method",
             "name": "getName",
@@ -6758,7 +6826,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 314,
+            "line": 354,
             "description": "Set the command name.",
             "itemtype": "method",
             "name": "setName",
@@ -6775,7 +6843,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 321,
+            "line": 361,
             "description": "Execute the command.",
             "itemtype": "method",
             "name": "execute",
