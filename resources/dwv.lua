@@ -11,7 +11,7 @@
 -- >> viewer = dwv
 -- This script relies on the 'kFactorFile', 'ACRNemaMap' and 'Dictionary'
 -- variables being set correctly.
--- Then copy the 'css', 'src' and 'ext' folders of DWV in a 'dwv' folder
+-- Then copy the DWV distribution files (without the html files) in a 'dwv' folder
 -- in the web folder of your web server.
 
 -- Get ids
