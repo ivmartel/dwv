@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>src/image/luts.js - dwv</title>
+    <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
+    <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
+    <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
+    <link rel="shortcut icon" type="image/png" href="../assets/favicon.png">
+    <script src="http://yui.yahooapis.com/combo?3.9.1/build/yui/yui-min.js"></script>
+</head>
+<body class="yui3-skin-sam">
+
+<div id="doc">
+    <div id="hd" class="yui3-g header">
+        <div class="yui3-u-3-4">
+            
+                <h1><img src="../assets/css/logo.png" title="dwv"></h1>
+            
+        </div>
+        <div class="yui3-u-1-4 version">
+            <em>API Docs for: 0.4.0</em>
+        </div>
+    </div>
+    <div id="bd" class="yui3-g">
+
+        <div class="yui3-u-1-4">
+            <div id="docs-sidebar" class="sidebar apidocs">
+                <div id="api-list">
+    <h2 class="off-left">APIs</h2>
+    <div id="api-tabview" class="tabview">
+        <ul class="tabs">
+            <li><a href="#api-classes">Classes</a></li>
+            <li><a href="#api-modules">Modules</a></li>
+        </ul>
+
+        <div id="api-tabview-filter">
+            <input type="search" id="api-filter" placeholder="Type to filter APIs">
+        </div>
+
+        <div id="api-tabview-panel">
+            <ul id="api-classes" class="apis classes">
+            
+                <li><a href="../classes/dwv.App.html">dwv.App</a></li>
+            
+                <li><a href="../classes/dwv.dicom.DataReader.html">dwv.dicom.DataReader</a></li>
+            
+                <li><a href="../classes/dwv.dicom.DicomParser.html">dwv.dicom.DicomParser</a></li>
+            
+                <li><a href="../classes/dwv.dicom.Dictionary.html">dwv.dicom.Dictionary</a></li>
+            
+                <li><a href="../classes/dwv.gui.html">dwv.gui</a></li>
+            
+                <li><a href="../classes/dwv.html.html">dwv.html</a></li>
+            
+                <li><a href="../classes/dwv.html.Layer.html">dwv.html.Layer</a></li>
+            
+                <li><a href="../classes/dwv.html.Style.html">dwv.html.Style</a></li>
+            
+                <li><a href="../classes/dwv.image.html">dwv.image</a></li>
+            
+                <li><a href="../classes/dwv.image.filter.Sharpen.html">dwv.image.filter.Sharpen</a></li>
+            
+                <li><a href="../classes/dwv.image.filter.Sobel.html">dwv.image.filter.Sobel</a></li>
+            
+                <li><a href="../classes/dwv.image.filter.Threshold.html">dwv.image.filter.Threshold</a></li>
+            
+                <li><a href="../classes/dwv.image.Image.html">dwv.image.Image</a></li>
+            
+                <li><a href="../classes/dwv.image.lut.Rescale.html">dwv.image.lut.Rescale</a></li>
+            
+                <li><a href="../classes/dwv.image.lut.Window.html">dwv.image.lut.Window</a></li>
+            
+                <li><a href="../classes/dwv.image.Size.html">dwv.image.Size</a></li>
+            
+                <li><a href="../classes/dwv.image.Spacing.html">dwv.image.Spacing</a></li>
+            
+                <li><a href="../classes/dwv.image.View.html">dwv.image.View</a></li>
+            
+                <li><a href="../classes/dwv.info.html">dwv.info</a></li>
+            
+                <li><a href="../classes/dwv.math.BucketQueue.html">dwv.math.BucketQueue</a></li>
+            
+                <li><a href="../classes/dwv.math.Circle.html">dwv.math.Circle</a></li>
+            
+                <li><a href="../classes/dwv.math.FastPoint2D.html">dwv.math.FastPoint2D</a></li>
+            
+                <li><a href="../classes/dwv.math.Line.html">dwv.math.Line</a></li>
+            
+                <li><a href="../classes/dwv.math.Path.html">dwv.math.Path</a></li>
+            
+                <li><a href="../classes/dwv.math.Point2D.html">dwv.math.Point2D</a></li>
+            
+                <li><a href="../classes/dwv.math.Rectangle.html">dwv.math.Rectangle</a></li>
+            
+                <li><a href="../classes/dwv.math.ROI.html">dwv.math.ROI</a></li>
+            
+                <li><a href="../classes/dwv.math.Scissors.html">dwv.math.Scissors</a></li>
+            
+                <li><a href="../classes/dwv.tool.html">dwv.tool</a></li>
+            
+                <li><a href="../classes/dwv.tool.Draw.html">dwv.tool.Draw</a></li>
+            
+                <li><a href="../classes/dwv.tool.DrawCircleCommand.html">dwv.tool.DrawCircleCommand</a></li>
+            
+                <li><a href="../classes/dwv.tool.DrawLineCommand.html">dwv.tool.DrawLineCommand</a></li>
+            
+                <li><a href="../classes/dwv.tool.DrawLivewireCommand.html">dwv.tool.DrawLivewireCommand</a></li>
+            
+                <li><a href="../classes/dwv.tool.DrawRectangleCommand.html">dwv.tool.DrawRectangleCommand</a></li>
+            
+                <li><a href="../classes/dwv.tool.DrawRoiCommand.html">dwv.tool.DrawRoiCommand</a></li>
+            
+                <li><a href="../classes/dwv.tool.Filter.html">dwv.tool.Filter</a></li>
+            
+                <li><a href="../classes/dwv.tool.filter.Sharpen.html">dwv.tool.filter.Sharpen</a></li>
+            
+                <li><a href="../classes/dwv.tool.filter.Threshold.html">dwv.tool.filter.Threshold</a></li>
+            
+                <li><a href="../classes/dwv.tool.Livewire.html">dwv.tool.Livewire</a></li>
+            
+                <li><a href="../classes/dwv.tool.RunFilterCommand.html">dwv.tool.RunFilterCommand</a></li>
+            
+                <li><a href="../classes/dwv.tool.ToolBox.html">dwv.tool.ToolBox</a></li>
+            
+                <li><a href="../classes/dwv.tool.UndoStack.html">dwv.tool.UndoStack</a></li>
+            
+                <li><a href="../classes/dwv.tool.WindowLevel.html">dwv.tool.WindowLevel</a></li>
+            
+                <li><a href="../classes/dwv.tool.Zoom.html">dwv.tool.Zoom</a></li>
+            
+                <li><a href="../classes/dwv.utils.html">dwv.utils</a></li>
+            
+            </ul>
+
+            <ul id="api-modules" class="apis modules">
+            
+                <li><a href="../modules/dicom.html">dicom</a></li>
+            
+                <li><a href="../modules/gui.html">gui</a></li>
+            
+                <li><a href="../modules/html.html">html</a></li>
+            
+                <li><a href="../modules/image.html">image</a></li>
+            
+                <li><a href="../modules/info.html">info</a></li>
+            
+                <li><a href="../modules/math.html">math</a></li>
+            
+                <li><a href="../modules/tool.html">tool</a></li>
+            
+                <li><a href="../modules/utils.html">utils</a></li>
+            
+            </ul>
+        </div>
+    </div>
+</div>
+
+            </div>
+        </div>
+        <div class="yui3-u-3-4">
+                <div id="api-options">
+        Show:
+        <label for="api-show-inherited">
+            <input type="checkbox" id="api-show-inherited" checked>
+            Inherited
+        </label>
+
+        <label for="api-show-protected">
+            <input type="checkbox" id="api-show-protected">
+            Protected
+        </label>
+
+        <label for="api-show-private">
+            <input type="checkbox" id="api-show-private">
+            Private
+        </label>
+        <label for="api-show-deprecated">
+            <input type="checkbox" id="api-show-deprecated">
+            Deprecated
+        </label>
+
+    </div>
+
+
+            <div class="apidocs">
+                <div id="docs-main">
+                    <div class="content">
+                        <h1 class="file-heading">File: src/image/luts.js</h1>
+
+<div class="file">
+    <pre class="code prettyprint linenums">
+/** 
+ * Image module.
+ * @module image
+ */
+var dwv = dwv || {};
+dwv.image = dwv.image || {};
+dwv.image.lut = dwv.image.lut || {};
+
+/**
+ * Rescale LUT class.
+ * @class Rescale
+ * @namespace dwv.image.lut
+ * @constructor
+ * @param {Number} slope_ The rescale slope.
+ * @param {Number} intercept_ The rescale intercept.
+ */
+dwv.image.lut.Rescale = function(slope_,intercept_)
+{
+    /**
+     * The internal array.
+     * @property rescaleLut_
+     * @private
+     * @type Array
+     */
+    var rescaleLut_ = null;
+    
+    // Check the rescale slope.
+    if(typeof(slope_) === &#x27;undefined&#x27;) slope_ = 1;
+    // Check the rescale intercept.
+    if(typeof(intercept_) === &#x27;undefined&#x27;) intercept_ = 0;
+    
+    /**
+     * Get the rescale slope.
+     * @method getSlope
+     * @return {Number} The rescale slope.
+     */ 
+    this.getSlope = function() { return slope_; };
+    /**
+     * Get the rescale intercept.
+     * @method getIntercept
+     * @return {Number} The rescale intercept.
+     */ 
+    this.getIntercept = function() { return intercept_; };
+    
+    /**
+     * Initialise the LUT.
+     * @method initialise
+     * @param {Number} bitsStored The number of bits used to store the data.
+     */ 
+    // Initialise the LUT.
+    this.initialise = function(bitsStored)
+    {
+        var size = Math.pow(2, bitsStored);
+        rescaleLut_ = new Float32Array(size);
+        for(var i=0; i&lt;size; ++i)
+            rescaleLut_[i] = i * slope_ + intercept_;
+    };
+    
+    /**
+     * Get the length of the LUT array.
+     * @method getLength
+     * @return {Number} The length of the LUT array.
+     */ 
+    this.getLength = function() { return rescaleLut_.length; };
+    
+    /**
+     * Get the value of the LUT at the given offset.
+     * @method getValue
+     * @return {Number} The value of the LUT at the given offset.
+     */ 
+    this.getValue = function(offset) { return rescaleLut_[offset]; };
+};
+
+/**
+ * Window LUT class.
+ * @class Window
+ * @namespace dwv.image.lut
+ * @constructor
+ * @param {Number} rescaleLut_ The associated rescale LUT.
+ * @param {Boolean} isSigned_ Flag to know if the data is signed.
+ */
+dwv.image.lut.Window = function(rescaleLut_, isSigned_)
+{
+    /**
+     * The internal array: Uint8ClampedArray clamps between 0 and 255.
+     * (not supported on travis yet... using basic array, be sure not to overflow!)
+     * @property rescaleLut_
+     * @private
+     * @type Array
+     */
+    var windowLut_ = null;
+    
+    // check Uint8ClampedArray support
+    if( !window.Uint8ClampedArray ) {
+        console.warn(&quot;No support for Uint8ClampedArray.&quot;);
+        windowLut_ = new Uint8Array(rescaleLut_.getLength());
+    }
+    else windowLut_ = new Uint8ClampedArray(rescaleLut_.getLength());
+    
+    /**
+     * The window center.
+     * @property center_
+     * @private
+     * @type Number
+     */
+    var center_ = null;
+    /**
+     * The window width.
+     * @property width_
+     * @private
+     * @type Number
+     */
+    var width_ = null;
+    
+    /**
+     * Get the window center.
+     * @method getCenter
+     * @return {Number} The window center.
+     */ 
+    this.getCenter = function() { return center_; };
+    /**
+     * Get the window width.
+     * @method getWidth
+     * @return {Number} The window width.
+     */ 
+    this.getWidth = function() { return width_; };
+    /**
+     * Get the signed flag.
+     * @method isSigned
+     * @return {Boolean} The signed flag.
+     */ 
+    this.isSigned = function() { return isSigned_; };
+    
+    /**
+     * Set the window center and width.
+     * @method setCenterAndWidth
+     * @param {Number} center The window center.
+     * @param {Number} width The window width.
+     */ 
+    this.setCenterAndWidth = function(center, width)
+    {
+        // store the window values
+        center_ = center;
+        width_ = width;
+        // pre calculate loop values
+        var size = windowLut_.length;
+        var center0 = isSigned_ ? center - 0.5 + size / 2 : center - 0.5;
+        var width0 = width - 1;
+        // Uint8ClampedArray clamps between 0 and 255
+        var dispval = 0;
+        for(var i=0; i&lt;size; ++i)
+        {
+            // from the DICOM specification (https://www.dabsoft.ch/dicom/3/C.11.2.1.2/)
+            // y = ((x - (c - 0.5)) / (w-1) + 0.5) * (ymax - ymin )+ ymin
+            dispval = ((rescaleLut_.getValue(i) - center0 ) / width0 + 0.5) * 255;
+            windowLut_[i]= parseInt(dispval, 10);
+        }
+    };
+    
+    /**
+     * Get the length of the LUT array.
+     * @method getLength
+     * @return {Number} The length of the LUT array.
+     */ 
+    this.getLength = function() { return windowLut_.length; };
+
+    /**
+     * Get the value of the LUT at the given offset.
+     * @method getValue
+     * @return {Number} The value of the LUT at the given offset.
+     */ 
+    this.getValue = function(offset)
+    {
+        var shift = isSigned_ ? windowLut_.length / 2 : 0;
+        return windowLut_[offset+shift];
+    };
+};
+
+/**
+* Lookup tables for image color display. 
+*/
+
+dwv.image.lut.range_max = 256;
+
+dwv.image.lut.buildLut = function(func)
+{
+    var lut = [];
+    for( var i=0; i&lt;dwv.image.lut.range_max; ++i )
+        lut.push(func(i));
+    return lut;
+};
+
+dwv.image.lut.max = function(i)
+{
+    return dwv.image.lut.range_max-1;
+};
+
+dwv.image.lut.maxFirstThird = function(i)
+{
+    if( i &lt; dwv.image.lut.range_max/3 )
+        return dwv.image.lut.range_max-1;
+    return 0;
+};
+
+dwv.image.lut.maxSecondThird = function(i)
+{
+    var third = dwv.image.lut.range_max/3;
+    if( i &gt;= third &amp;&amp; i &lt; 2*third )
+        return dwv.image.lut.range_max-1;
+    return 0;
+};
+
+dwv.image.lut.maxThirdThird = function(i)
+{
+    if( i &gt;= 2*dwv.image.lut.range_max/3 )
+        return dwv.image.lut.range_max-1;
+    return 0;
+};
+
+dwv.image.lut.toMaxFirstThird = function(i)
+{
+    var val = i * 3;
+    if( val &gt; dwv.image.lut.range_max-1 )
+        return dwv.image.lut.range_max-1;
+    return val;
+};
+
+dwv.image.lut.toMaxSecondThird = function(i)
+{
+    var third = dwv.image.lut.range_max/3;
+    var val = 0;
+    if( i &gt;= third ) {
+        val = (i-third) * 3;
+        if( val &gt; dwv.image.lut.range_max-1 )
+            return dwv.image.lut.range_max-1;
+    }
+    return val;
+};
+
+dwv.image.lut.toMaxThirdThird = function(i)
+{
+    var third = dwv.image.lut.range_max/3;
+    var val = 0;
+    if( i &gt;= 2*third ) {
+        val = (i-2*third) * 3;
+        if( val &gt; dwv.image.lut.range_max-1 )
+            return dwv.image.lut.range_max-1;
+    }
+    return val;
+};
+
+dwv.image.lut.zero = function(i)
+{
+    return 0;
+};
+
+dwv.image.lut.id = function(i)
+{
+    return i;
+};
+
+dwv.image.lut.invId = function(i)
+{
+    return (dwv.image.lut.range_max-1)-i;
+};
+
+// plain
+dwv.image.lut.plain = {
+   &quot;red&quot;:   dwv.image.lut.buildLut(dwv.image.lut.id),
+   &quot;green&quot;: dwv.image.lut.buildLut(dwv.image.lut.id),
+   &quot;blue&quot;:  dwv.image.lut.buildLut(dwv.image.lut.id)
+};
+
+// inverse plain
+dwv.image.lut.invPlain = {
+   &quot;red&quot;:   dwv.image.lut.buildLut(dwv.image.lut.invId),
+   &quot;green&quot;: dwv.image.lut.buildLut(dwv.image.lut.invId),
+   &quot;blue&quot;:  dwv.image.lut.buildLut(dwv.image.lut.invId)
+};
+
+//rainbow 
+dwv.image.lut.rainbow = {
+   &quot;blue&quot;:  [0, 4, 8, 12, 16, 20, 24, 28, 32, 36, 40, 44, 48, 52, 56, 60, 64, 68, 72, 76, 80, 84, 88, 92, 96, 100, 104, 108, 112, 116, 120, 124, 128, 132, 136, 140, 144, 148, 152, 156, 160, 164, 168, 172, 176, 180, 184, 188, 192, 196, 200, 204, 208, 212, 216, 220, 224, 228, 232, 236, 240, 244, 248, 252, 255, 247, 239, 231, 223, 215, 207, 199, 191, 183, 175, 167, 159, 151, 143, 135, 127, 119, 111, 103, 95, 87, 79, 71, 63, 55, 47, 39, 31, 23, 15, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+   &quot;green&quot;: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 16, 24, 32, 40, 48, 56, 64, 72, 80, 88, 96, 104, 112, 120, 128, 136, 144, 152, 160, 168, 176, 184, 192, 200, 208, 216, 224, 232, 240, 248, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 253, 251, 249, 247, 245, 243, 241, 239, 237, 235, 233, 231, 229, 227, 225, 223, 221, 219, 217, 215, 213, 211, 209, 207, 205, 203, 201, 199, 197, 195, 193, 192, 189, 186, 183, 180, 177, 174, 171, 168, 165, 162, 159, 156, 153, 150, 147, 144, 141, 138, 135, 132, 129, 126, 123, 120, 117, 114, 111, 108, 105, 102, 99, 96, 93, 90, 87, 84, 81, 78, 75, 72, 69, 66, 63, 60, 57, 54, 51, 48, 45, 42, 39, 36, 33, 30, 27, 24, 21, 18, 15, 12, 9, 6, 3],
+   &quot;red&quot;:   [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42, 44, 46, 48, 50, 52, 54, 56, 58, 60, 62, 64, 62, 60, 58, 56, 54, 52, 50, 48, 46, 44, 42, 40, 38, 36, 34, 32, 30, 28, 26, 24, 22, 20, 18, 16, 14, 12, 10, 8, 6, 4, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 8, 12, 16, 20, 24, 28, 32, 36, 40, 44, 48, 52, 56, 60, 64, 68, 72, 76, 80, 84, 88, 92, 96, 100, 104, 108, 112, 116, 120, 124, 128, 132, 136, 140, 144, 148, 152, 156, 160, 164, 168, 172, 176, 180, 184, 188, 192, 196, 200, 204, 208, 212, 216, 220, 224, 228, 232, 236, 240, 244, 248, 252, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255]
+};
+
+// hot
+dwv.image.lut.hot = {
+   &quot;red&quot;:   dwv.image.lut.buildLut(dwv.image.lut.toMaxFirstThird),
+   &quot;green&quot;: dwv.image.lut.buildLut(dwv.image.lut.toMaxSecondThird),
+   &quot;blue&quot;:  dwv.image.lut.buildLut(dwv.image.lut.toMaxThirdThird)
+};
+
+// test
+dwv.image.lut.test = {
+   &quot;red&quot;:   dwv.image.lut.buildLut(dwv.image.lut.id),
+   &quot;green&quot;: dwv.image.lut.buildLut(dwv.image.lut.zero),
+   &quot;blue&quot;:  dwv.image.lut.buildLut(dwv.image.lut.zero)
+};
+
+//red
+/*dwv.image.lut.red = {
+   &quot;red&quot;:   dwv.image.lut.buildLut(dwv.image.lut.max),
+   &quot;green&quot;: dwv.image.lut.buildLut(dwv.image.lut.id),
+   &quot;blue&quot;:  dwv.image.lut.buildLut(dwv.image.lut.id)
+};*/
+
+    </pre>
+</div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="../assets/vendor/prettify/prettify-min.js"></script>
+<script>prettyPrint();</script>
+<script src="../assets/js/yui-prettify.js"></script>
+<script src="../assets/../api.js"></script>
+<script src="../assets/js/api-filter.js"></script>
+<script src="../assets/js/api-list.js"></script>
+<script src="../assets/js/api-search.js"></script>
+<script src="../assets/js/apidocs.js"></script>
+</body>
+</html>

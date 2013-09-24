@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>src/image/view.js - dwv</title>
+    <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
+    <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
+    <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
+    <link rel="shortcut icon" type="image/png" href="../assets/favicon.png">
+    <script src="http://yui.yahooapis.com/combo?3.9.1/build/yui/yui-min.js"></script>
+</head>
+<body class="yui3-skin-sam">
+
+<div id="doc">
+    <div id="hd" class="yui3-g header">
+        <div class="yui3-u-3-4">
+            
+                <h1><img src="../assets/css/logo.png" title="dwv"></h1>
+            
+        </div>
+        <div class="yui3-u-1-4 version">
+            <em>API Docs for: 0.4.0</em>
+        </div>
+    </div>
+    <div id="bd" class="yui3-g">
+
+        <div class="yui3-u-1-4">
+            <div id="docs-sidebar" class="sidebar apidocs">
+                <div id="api-list">
+    <h2 class="off-left">APIs</h2>
+    <div id="api-tabview" class="tabview">
+        <ul class="tabs">
+            <li><a href="#api-classes">Classes</a></li>
+            <li><a href="#api-modules">Modules</a></li>
+        </ul>
+
+        <div id="api-tabview-filter">
+            <input type="search" id="api-filter" placeholder="Type to filter APIs">
+        </div>
+
+        <div id="api-tabview-panel">
+            <ul id="api-classes" class="apis classes">
+            
+                <li><a href="../classes/dwv.App.html">dwv.App</a></li>
+            
+                <li><a href="../classes/dwv.dicom.DataReader.html">dwv.dicom.DataReader</a></li>
+            
+                <li><a href="../classes/dwv.dicom.DicomParser.html">dwv.dicom.DicomParser</a></li>
+            
+                <li><a href="../classes/dwv.dicom.Dictionary.html">dwv.dicom.Dictionary</a></li>
+            
+                <li><a href="../classes/dwv.gui.html">dwv.gui</a></li>
+            
+                <li><a href="../classes/dwv.html.html">dwv.html</a></li>
+            
+                <li><a href="../classes/dwv.html.Layer.html">dwv.html.Layer</a></li>
+            
+                <li><a href="../classes/dwv.html.Style.html">dwv.html.Style</a></li>
+            
+                <li><a href="../classes/dwv.image.html">dwv.image</a></li>
+            
+                <li><a href="../classes/dwv.image.filter.Sharpen.html">dwv.image.filter.Sharpen</a></li>
+            
+                <li><a href="../classes/dwv.image.filter.Sobel.html">dwv.image.filter.Sobel</a></li>
+            
+                <li><a href="../classes/dwv.image.filter.Threshold.html">dwv.image.filter.Threshold</a></li>
+            
+                <li><a href="../classes/dwv.image.Image.html">dwv.image.Image</a></li>
+            
+                <li><a href="../classes/dwv.image.lut.Rescale.html">dwv.image.lut.Rescale</a></li>
+            
+                <li><a href="../classes/dwv.image.lut.Window.html">dwv.image.lut.Window</a></li>
+            
+                <li><a href="../classes/dwv.image.Size.html">dwv.image.Size</a></li>
+            
+                <li><a href="../classes/dwv.image.Spacing.html">dwv.image.Spacing</a></li>
+            
+                <li><a href="../classes/dwv.image.View.html">dwv.image.View</a></li>
+            
+                <li><a href="../classes/dwv.info.html">dwv.info</a></li>
+            
+                <li><a href="../classes/dwv.math.BucketQueue.html">dwv.math.BucketQueue</a></li>
+            
+                <li><a href="../classes/dwv.math.Circle.html">dwv.math.Circle</a></li>
+            
+                <li><a href="../classes/dwv.math.FastPoint2D.html">dwv.math.FastPoint2D</a></li>
+            
+                <li><a href="../classes/dwv.math.Line.html">dwv.math.Line</a></li>
+            
+                <li><a href="../classes/dwv.math.Path.html">dwv.math.Path</a></li>
+            
+                <li><a href="../classes/dwv.math.Point2D.html">dwv.math.Point2D</a></li>
+            
+                <li><a href="../classes/dwv.math.Rectangle.html">dwv.math.Rectangle</a></li>
+            
+                <li><a href="../classes/dwv.math.ROI.html">dwv.math.ROI</a></li>
+            
+                <li><a href="../classes/dwv.math.Scissors.html">dwv.math.Scissors</a></li>
+            
+                <li><a href="../classes/dwv.tool.html">dwv.tool</a></li>
+            
+                <li><a href="../classes/dwv.tool.Draw.html">dwv.tool.Draw</a></li>
+            
+                <li><a href="../classes/dwv.tool.DrawCircleCommand.html">dwv.tool.DrawCircleCommand</a></li>
+            
+                <li><a href="../classes/dwv.tool.DrawLineCommand.html">dwv.tool.DrawLineCommand</a></li>
+            
+                <li><a href="../classes/dwv.tool.DrawLivewireCommand.html">dwv.tool.DrawLivewireCommand</a></li>
+            
+                <li><a href="../classes/dwv.tool.DrawRectangleCommand.html">dwv.tool.DrawRectangleCommand</a></li>
+            
+                <li><a href="../classes/dwv.tool.DrawRoiCommand.html">dwv.tool.DrawRoiCommand</a></li>
+            
+                <li><a href="../classes/dwv.tool.Filter.html">dwv.tool.Filter</a></li>
+            
+                <li><a href="../classes/dwv.tool.filter.Sharpen.html">dwv.tool.filter.Sharpen</a></li>
+            
+                <li><a href="../classes/dwv.tool.filter.Threshold.html">dwv.tool.filter.Threshold</a></li>
+            
+                <li><a href="../classes/dwv.tool.Livewire.html">dwv.tool.Livewire</a></li>
+            
+                <li><a href="../classes/dwv.tool.RunFilterCommand.html">dwv.tool.RunFilterCommand</a></li>
+            
+                <li><a href="../classes/dwv.tool.ToolBox.html">dwv.tool.ToolBox</a></li>
+            
+                <li><a href="../classes/dwv.tool.UndoStack.html">dwv.tool.UndoStack</a></li>
+            
+                <li><a href="../classes/dwv.tool.WindowLevel.html">dwv.tool.WindowLevel</a></li>
+            
+                <li><a href="../classes/dwv.tool.Zoom.html">dwv.tool.Zoom</a></li>
+            
+                <li><a href="../classes/dwv.utils.html">dwv.utils</a></li>
+            
+            </ul>
+
+            <ul id="api-modules" class="apis modules">
+            
+                <li><a href="../modules/dicom.html">dicom</a></li>
+            
+                <li><a href="../modules/gui.html">gui</a></li>
+            
+                <li><a href="../modules/html.html">html</a></li>
+            
+                <li><a href="../modules/image.html">image</a></li>
+            
+                <li><a href="../modules/info.html">info</a></li>
+            
+                <li><a href="../modules/math.html">math</a></li>
+            
+                <li><a href="../modules/tool.html">tool</a></li>
+            
+                <li><a href="../modules/utils.html">utils</a></li>
+            
+            </ul>
+        </div>
+    </div>
+</div>
+
+            </div>
+        </div>
+        <div class="yui3-u-3-4">
+                <div id="api-options">
+        Show:
+        <label for="api-show-inherited">
+            <input type="checkbox" id="api-show-inherited" checked>
+            Inherited
+        </label>
+
+        <label for="api-show-protected">
+            <input type="checkbox" id="api-show-protected">
+            Protected
+        </label>
+
+        <label for="api-show-private">
+            <input type="checkbox" id="api-show-private">
+            Private
+        </label>
+        <label for="api-show-deprecated">
+            <input type="checkbox" id="api-show-deprecated">
+            Deprecated
+        </label>
+
+    </div>
+
+
+            <div class="apidocs">
+                <div id="docs-main">
+                    <div class="content">
+                        <h1 class="file-heading">File: src/image/view.js</h1>
+
+<div class="file">
+    <pre class="code prettyprint linenums">
+/** 
+ * Image module.
+ * @module image
+ */
+var dwv = dwv || {};
+dwv.image = dwv.image || {};
+
+/**
+ * View class.
+ * @class View
+ * @namespace dwv.image
+ * @constructor
+ * @param {Image} image The associated image.
+ * @param {Boolean} isSigned Is the data signed.
+ * Need to set the window lookup table once created
+ * (either directly or with helper methods). 
+ */
+dwv.image.View = function(image, isSigned)
+{
+    /**
+     * Rescale lookup table.
+     * @property rescaleLut
+     * @private
+     * @type Rescale
+     */
+    var rescaleLut = new dwv.image.lut.Rescale(
+        image.getRescaleSlope(), image.getRescaleIntercept() );
+    // initialise it
+    rescaleLut.initialise(image.getMeta().BitsStored);
+    
+    /**
+     * Window lookup table.
+     * @property windowLut
+     * @private
+     * @type Window
+     */
+    var windowLut = new dwv.image.lut.Window(rescaleLut, isSigned);
+    
+    /**
+     * Window presets.
+     * @property windowPresets
+     * @private
+     * @type Object
+     */
+    var windowPresets = null;
+    /**
+     * Color map
+     * @property colorMap
+     * @private
+     * @type Object
+     */
+    var colorMap = dwv.image.lut.plain;
+    /**
+     * Current position
+     * @property currentPosition
+     * @private
+     * @type Object
+     */
+    var currentPosition = {&quot;i&quot;:0,&quot;j&quot;:0,&quot;k&quot;:0};
+    
+    /**
+     * Get the associated image.
+     * @method getImage
+     * @return {Image} The associated image.
+     */ 
+    this.getImage = function() { return image; };
+    /**
+     * Set the associated image.
+     * @method setImage
+     * @param {Image} inImage The associated image.
+     */ 
+    this.setImage = function(inImage) { image = inImage; };
+    
+    /**
+     * Get the rescale LUT of the image.
+     * @method getRescaleLut
+     * @return {Rescale} The rescale LUT of the image.
+     */ 
+    this.getRescaleLut = function() { return rescaleLut; };
+    /**
+     * Set the rescale LUT of the image.
+     * @method setRescaleLut
+     * @param {Rescale} lut The rescale LUT of the image.
+     */ 
+    this.setRescaleLut = function(lut) { rescaleLut = lut; };
+
+    /**
+     * Get the window LUT of the image.
+     * @method getWindowLut
+     * @return {Window} The window LUT of the image.
+     */ 
+    this.getWindowLut = function() { return windowLut; };
+    /**
+     * Set the window LUT of the image.
+     * @method setWindowLut
+     * @param {Window} lut The window LUT of the image.
+     */ 
+    this.setWindowLut = function(lut) { windowLut = lut; };
+    
+    /**
+     * Get the window presets.
+     * @method getWindowPresets
+     * @return {Object} The window presets.
+     */ 
+    this.getWindowPresets = function() { return windowPresets; };
+    /**
+     * Set the window presets.
+     * @method setWindowPresets
+     * @param {Object} presets The window presets.
+     */ 
+    this.setWindowPresets = function(presets) { 
+        windowPresets = presets;
+        this.setWindowLevel(presets[0].center, presets[0].width);
+    };
+    
+    /**
+     * Get the color map of the image.
+     * @method getColorMap
+     * @return {Object} The color map of the image.
+     */ 
+    this.getColorMap = function() { return colorMap; };
+    /**
+     * Set the color map of the image.
+     * @method setColorMap
+     * @param {Object} map The color map of the image.
+     */ 
+    this.setColorMap = function(map) { 
+        colorMap = map;
+        // TODO Better handle this...
+        if( this.getImage().getPhotometricInterpretation() === &quot;MONOCHROME1&quot;) 
+            colorMap = dwv.image.lut.invPlain;
+        this.fireEvent({&quot;type&quot;: &quot;colorchange&quot;, 
+            &quot;wc&quot;: this.getWindowLut().getCenter(),
+            &quot;ww&quot;: this.getWindowLut().getWidth() });
+    };
+    
+    /**
+     * Is the data signed data.
+     * @method isSigned
+     * @return {Boolean} The signed data flag.
+     */ 
+    this.isSigned = function() { return isSigned; };
+    
+    /**
+     * Get the current position.
+     * @method getCurrentPosition
+     * @return {Object} The current position.
+     */ 
+    this.getCurrentPosition = function() { return currentPosition; };
+    /**
+     * Set the current position. Returns false if not in bounds.
+     * @method setCurrentPosition
+     * @param {Object} pos The current position.
+     */ 
+    this.setCurrentPosition = function(pos) { 
+        if( !image.getSize().isInBounds(pos.i,pos.j,pos.k) ) return false;
+        var oldPosition = currentPosition;
+        currentPosition = pos;
+        this.fireEvent({&quot;type&quot;: &quot;positionchange&quot;, 
+            &quot;i&quot;: pos.i, &quot;j&quot;: pos.j, &quot;k&quot;: pos.k,
+            &quot;value&quot;: image.getRescaledValue(pos.i,pos.j,pos.k)});
+        // slice change event (used to trigger redraw)
+        if( oldPosition.k !== currentPosition.k ) {
+            this.fireEvent({&quot;type&quot;: &quot;slicechange&quot;});
+        }
+        return true;
+    };
+    
+    /**
+     * Vew listeners
+     * @property listeners
+     * @private
+     * @type Array
+     */
+    var listeners = {};
+    /**
+     * Get the view listeners.
+     * @method getListeners
+     * @return {Array} The view listeners.
+     */ 
+    this.getListeners = function() { return listeners; };
+    /**
+     * Set the view listeners.
+     * @method setListeners
+     * @param {Array} list The view listeners.
+     */ 
+    this.setListeners = function(list) { listeners = list; };
+};
+
+/**
+ * Set the view window/level.
+ * @method setWindowLevel
+ * @param {Number} center The window center.
+ * @param {Number} width The window width.
+ * Warning: uses the latest set rescale LUT or the default linear one.
+ */
+dwv.image.View.prototype.setWindowLevel = function( center, width )
+{
+    this.getWindowLut().setCenterAndWidth(center, width);
+    this.fireEvent({&quot;type&quot;: &quot;wlchange&quot;, &quot;wc&quot;: center, &quot;ww&quot;: width });
+};
+
+/**
+ * Set the image window/level to cover the full data range.
+ * @method setWindowLevelMinMax
+ * Warning: uses the latest set rescale LUT or the default linear one.
+ */
+dwv.image.View.prototype.setWindowLevelMinMax = function()
+{
+    // calculate center and width
+    var range = this.getImage().getRescaledDataRange();
+    var min = range.min;
+    var max = range.max;
+    var width = max - min;
+    var center = min + width/2;
+    // set window level
+    this.setWindowLevel(center,width);
+};
+
+/**
+ * Increment the current slice number.
+ * @method incrementSliceNb
+ * @return {Boolean} False if not in bounds.
+ */
+dwv.image.View.prototype.incrementSliceNb = function()
+{
+    return this.setCurrentPosition({
+        &quot;i&quot;: this.getCurrentPosition().i,
+        &quot;j&quot;: this.getCurrentPosition().j,
+        &quot;k&quot;: this.getCurrentPosition().k + 1 });
+};
+
+/**
+ * Decrement the current slice number.
+ * @method decrementSliceNb
+ * @return {Boolean} False if not in bounds.
+ */
+dwv.image.View.prototype.decrementSliceNb = function()
+{
+    return this.setCurrentPosition({
+        &quot;i&quot;: this.getCurrentPosition().i,
+        &quot;j&quot;: this.getCurrentPosition().j,
+        &quot;k&quot;: this.getCurrentPosition().k - 1 });
+};
+
+/**
+ * Clone the image using all meta data and the original data buffer.
+ * @method clone
+ * @return {View} A full copy of this {dwv.image.Image}.
+ */
+dwv.image.View.prototype.clone = function()
+{
+    var copy = new dwv.image.View(this.getImage());
+    copy.setRescaleLut(this.getRescaleLut());
+    copy.setWindowLut(this.getWindowLut());
+    copy.setListeners(this.getListeners());
+    return copy;
+};
+
+/**
+ * Generate display image data to be given to a canvas.
+ * @method generateImageData
+ * @param {Array} array The array to fill in.
+ * @param {Number} sliceNumber The slice position.
+ */
+dwv.image.View.prototype.generateImageData = function( array )
+{        
+    var sliceNumber = this.getCurrentPosition().k;
+    var image = this.getImage();
+    var pxValue = 0;
+    var photoInterpretation = image.getPhotometricInterpretation();
+    var planarConfig = image.getPlanarConfiguration();
+    var windowLut = this.getWindowLut();
+    var colorMap = this.getColorMap();
+    var index = 0;
+    var sliceSize = 0;
+    var sliceOffset = 0;
+    switch (photoInterpretation) {
+        case &quot;MONOCHROME1&quot;:
+        case &quot;MONOCHROME2&quot;:
+            sliceSize = image.getSize().getSliceSize();
+            sliceOffset = (sliceNumber || 0) * sliceSize;
+            var iMax = sliceOffset + sliceSize;
+            for(var i=sliceOffset; i &lt; iMax; ++i)
+            {        
+                pxValue = parseInt( windowLut.getValue( 
+                        image.getValueAtOffset(i) ), 10 );
+                array.data[index] = colorMap.red[pxValue];
+                array.data[index+1] = colorMap.green[pxValue];
+                array.data[index+2] = colorMap.blue[pxValue];
+                array.data[index+3] = 0xff;
+                index += 4;
+            }
+        break;
+        
+        case &quot;RGB&quot;:
+            // the planar configuration defines the memory layout
+            if( planarConfig !== 0 &amp;&amp; planarConfig !== 1 ) {
+                throw new Error(&quot;Unsupported planar configuration: &quot;+planarConfig);
+            }
+            sliceSize = image.getSize().getSliceSize();
+            sliceOffset = (sliceNumber || 0) * 3 * sliceSize;
+            // default: RGBRGBRGBRGB...
+            var posR = sliceOffset;
+            var posG = sliceOffset + 1;
+            var posB = sliceOffset + 2;
+            var stepPos = 3;
+            // RRRR...GGGG...BBBB...
+            if (planarConfig === 1) { 
+                posR = sliceOffset;
+                posG = sliceOffset + sliceSize;
+                posB = sliceOffset + 2 * sliceSize;
+                stepPos = 1;
+            }
+            
+            var redValue = 0;
+            var greenValue = 0;
+            var blueValue = 0;
+            for(var j=0; j &lt; image.getSize().getSliceSize(); ++j)
+            {        
+                redValue = parseInt( windowLut.getValue( 
+                        image.getValueAtOffset(posR) ), 10 );
+                greenValue = parseInt( windowLut.getValue( 
+                        image.getValueAtOffset(posG) ), 10 );
+                blueValue = parseInt( windowLut.getValue( 
+                        image.getValueAtOffset(posB) ), 10 );
+                
+                array.data[index] = redValue;
+                array.data[index+1] = greenValue;
+                array.data[index+2] = blueValue;
+                array.data[index+3] = 0xff;
+                index += 4;
+                
+                posR += stepPos;
+                posG += stepPos;
+                posB += stepPos;
+            }
+        break;
+        
+        default: 
+            throw new Error(&quot;Unsupported photometric interpretation: &quot;+photoInterpretation);
+    }
+};
+
+/**
+ * Add an event listener on the view.
+ * @method addEventListener
+ * @param {String} type The event type.
+ * @param {Object} listener The method associated with the provided event type.
+ */
+dwv.image.View.prototype.addEventListener = function(type, listener)
+{
+    var listeners = this.getListeners();
+    if( !listeners[type] ) listeners[type] = [];
+    listeners[type].push(listener);
+};
+
+/**
+ * Remove an event listener on the view.
+ * @method removeEventListener
+ * @param {String} type The event type.
+ * @param {Object} listener The method associated with the provided event type.
+ */
+dwv.image.View.prototype.removeEventListener = function(type, listener)
+{
+    var listeners = this.getListeners();
+    if( !listeners[type] ) return;
+    for(var i=0; i &lt; listeners[type].length; ++i)
+    {   
+        if( listeners[type][i] === listener )
+            listeners[type].splice(i,1);
+    }
+};
+
+/**
+ * Fire an event: call all associated listeners.
+ * @method fireEvent
+ * @param {Object} event The event to fire.
+ */
+dwv.image.View.prototype.fireEvent = function(event)
+{
+    var listeners = this.getListeners();
+    if( !listeners[event.type] ) return;
+    for(var i=0; i &lt; listeners[event.type].length; ++i)
+    {   
+        listeners[event.type][i](event);
+    }
+};
+
+
+    </pre>
+</div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="../assets/vendor/prettify/prettify-min.js"></script>
+<script>prettyPrint();</script>
+<script src="../assets/js/yui-prettify.js"></script>
+<script src="../assets/../api.js"></script>
+<script src="../assets/js/api-filter.js"></script>
+<script src="../assets/js/api-list.js"></script>
+<script src="../assets/js/api-search.js"></script>
+<script src="../assets/js/apidocs.js"></script>
+</body>
+</html>

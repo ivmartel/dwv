@@ -1,0 +1,29 @@
+body {
+  background-color: #222; color: white;
+  font-family: Verdana, Arial, Helvetica, sans-serif;
+  margin: 10px; padding: 0; 
+}
+h1 { color: #fff; }
+a { color: #ddf; }
+
+/* Layers */
+#layerContainer { position: relative; padding: 0; }
+#imageLayer { position: absolute; width: 100%; height: 100%; }
+#drawLayer { position: absolute; width: 100%; height: 100%; }
+#tempLayer { position: absolute; width: 100%; height: 100%; }
+
+/* Info */
+#infotl { position: absolute; top: 0; left: 0; text-align: left; }
+#infotr { position: absolute; top: 0; right: 0; text-align: right; }
+#infobl { position: absolute; bottom: 0; left: 0; text-align: left; }
+#infobr { position: absolute; bottom: 0; right: 0; text-align: right; }
+#plot { position: absolute; width: 100px; height: 50px; bottom: 15px; }
+#infoLayer ul { margin: 0; padding: 2px; list-style-type: none; }
+#infoLayer canvas { margin: 0; padding: 2px; }
+
+/* Tag list */
+table.tagList { border-collapse: collapse; }
+table.tagList thead td { font-weight: bold; }
+table.tagList td { border: 1px solid grey; padding: 2px; }
+#tags .highlighted { background: #f87217; }
+#tags form { width: 50%; }

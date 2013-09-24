@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>src/application.js - dwv</title>
+    <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
+    <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
+    <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
+    <link rel="shortcut icon" type="image/png" href="../assets/favicon.png">
+    <script src="http://yui.yahooapis.com/combo?3.9.1/build/yui/yui-min.js"></script>
+</head>
+<body class="yui3-skin-sam">
+
+<div id="doc">
+    <div id="hd" class="yui3-g header">
+        <div class="yui3-u-3-4">
+            
+                <h1><img src="../assets/css/logo.png" title="dwv"></h1>
+            
+        </div>
+        <div class="yui3-u-1-4 version">
+            <em>API Docs for: 0.4.0</em>
+        </div>
+    </div>
+    <div id="bd" class="yui3-g">
+
+        <div class="yui3-u-1-4">
+            <div id="docs-sidebar" class="sidebar apidocs">
+                <div id="api-list">
+    <h2 class="off-left">APIs</h2>
+    <div id="api-tabview" class="tabview">
+        <ul class="tabs">
+            <li><a href="#api-classes">Classes</a></li>
+            <li><a href="#api-modules">Modules</a></li>
+        </ul>
+
+        <div id="api-tabview-filter">
+            <input type="search" id="api-filter" placeholder="Type to filter APIs">
+        </div>
+
+        <div id="api-tabview-panel">
+            <ul id="api-classes" class="apis classes">
+            
+                <li><a href="../classes/dwv.App.html">dwv.App</a></li>
+            
+                <li><a href="../classes/dwv.dicom.DataReader.html">dwv.dicom.DataReader</a></li>
+            
+                <li><a href="../classes/dwv.dicom.DicomParser.html">dwv.dicom.DicomParser</a></li>
+            
+                <li><a href="../classes/dwv.dicom.Dictionary.html">dwv.dicom.Dictionary</a></li>
+            
+                <li><a href="../classes/dwv.gui.html">dwv.gui</a></li>
+            
+                <li><a href="../classes/dwv.html.html">dwv.html</a></li>
+            
+                <li><a href="../classes/dwv.html.Layer.html">dwv.html.Layer</a></li>
+            
+                <li><a href="../classes/dwv.html.Style.html">dwv.html.Style</a></li>
+            
+                <li><a href="../classes/dwv.image.html">dwv.image</a></li>
+            
+                <li><a href="../classes/dwv.image.filter.Sharpen.html">dwv.image.filter.Sharpen</a></li>
+            
+                <li><a href="../classes/dwv.image.filter.Sobel.html">dwv.image.filter.Sobel</a></li>
+            
+                <li><a href="../classes/dwv.image.filter.Threshold.html">dwv.image.filter.Threshold</a></li>
+            
+                <li><a href="../classes/dwv.image.Image.html">dwv.image.Image</a></li>
+            
+                <li><a href="../classes/dwv.image.lut.Rescale.html">dwv.image.lut.Rescale</a></li>
+            
+                <li><a href="../classes/dwv.image.lut.Window.html">dwv.image.lut.Window</a></li>
+            
+                <li><a href="../classes/dwv.image.Size.html">dwv.image.Size</a></li>
+            
+                <li><a href="../classes/dwv.image.Spacing.html">dwv.image.Spacing</a></li>
+            
+                <li><a href="../classes/dwv.image.View.html">dwv.image.View</a></li>
+            
+                <li><a href="../classes/dwv.info.html">dwv.info</a></li>
+            
+                <li><a href="../classes/dwv.math.BucketQueue.html">dwv.math.BucketQueue</a></li>
+            
+                <li><a href="../classes/dwv.math.Circle.html">dwv.math.Circle</a></li>
+            
+                <li><a href="../classes/dwv.math.FastPoint2D.html">dwv.math.FastPoint2D</a></li>
+            
+                <li><a href="../classes/dwv.math.Line.html">dwv.math.Line</a></li>
+            
+                <li><a href="../classes/dwv.math.Path.html">dwv.math.Path</a></li>
+            
+                <li><a href="../classes/dwv.math.Point2D.html">dwv.math.Point2D</a></li>
+            
+                <li><a href="../classes/dwv.math.Rectangle.html">dwv.math.Rectangle</a></li>
+            
+                <li><a href="../classes/dwv.math.ROI.html">dwv.math.ROI</a></li>
+            
+                <li><a href="../classes/dwv.math.Scissors.html">dwv.math.Scissors</a></li>
+            
+                <li><a href="../classes/dwv.tool.html">dwv.tool</a></li>
+            
+                <li><a href="../classes/dwv.tool.Draw.html">dwv.tool.Draw</a></li>
+            
+                <li><a href="../classes/dwv.tool.DrawCircleCommand.html">dwv.tool.DrawCircleCommand</a></li>
+            
+                <li><a href="../classes/dwv.tool.DrawLineCommand.html">dwv.tool.DrawLineCommand</a></li>
+            
+                <li><a href="../classes/dwv.tool.DrawLivewireCommand.html">dwv.tool.DrawLivewireCommand</a></li>
+            
+                <li><a href="../classes/dwv.tool.DrawRectangleCommand.html">dwv.tool.DrawRectangleCommand</a></li>
+            
+                <li><a href="../classes/dwv.tool.DrawRoiCommand.html">dwv.tool.DrawRoiCommand</a></li>
+            
+                <li><a href="../classes/dwv.tool.Filter.html">dwv.tool.Filter</a></li>
+            
+                <li><a href="../classes/dwv.tool.filter.Sharpen.html">dwv.tool.filter.Sharpen</a></li>
+            
+                <li><a href="../classes/dwv.tool.filter.Threshold.html">dwv.tool.filter.Threshold</a></li>
+            
+                <li><a href="../classes/dwv.tool.Livewire.html">dwv.tool.Livewire</a></li>
+            
+                <li><a href="../classes/dwv.tool.RunFilterCommand.html">dwv.tool.RunFilterCommand</a></li>
+            
+                <li><a href="../classes/dwv.tool.ToolBox.html">dwv.tool.ToolBox</a></li>
+            
+                <li><a href="../classes/dwv.tool.UndoStack.html">dwv.tool.UndoStack</a></li>
+            
+                <li><a href="../classes/dwv.tool.WindowLevel.html">dwv.tool.WindowLevel</a></li>
+            
+                <li><a href="../classes/dwv.tool.Zoom.html">dwv.tool.Zoom</a></li>
+            
+                <li><a href="../classes/dwv.utils.html">dwv.utils</a></li>
+            
+            </ul>
+
+            <ul id="api-modules" class="apis modules">
+            
+                <li><a href="../modules/dicom.html">dicom</a></li>
+            
+                <li><a href="../modules/gui.html">gui</a></li>
+            
+                <li><a href="../modules/html.html">html</a></li>
+            
+                <li><a href="../modules/image.html">image</a></li>
+            
+                <li><a href="../modules/info.html">info</a></li>
+            
+                <li><a href="../modules/math.html">math</a></li>
+            
+                <li><a href="../modules/tool.html">tool</a></li>
+            
+                <li><a href="../modules/utils.html">utils</a></li>
+            
+            </ul>
+        </div>
+    </div>
+</div>
+
+            </div>
+        </div>
+        <div class="yui3-u-3-4">
+                <div id="api-options">
+        Show:
+        <label for="api-show-inherited">
+            <input type="checkbox" id="api-show-inherited" checked>
+            Inherited
+        </label>
+
+        <label for="api-show-protected">
+            <input type="checkbox" id="api-show-protected">
+            Protected
+        </label>
+
+        <label for="api-show-private">
+            <input type="checkbox" id="api-show-private">
+            Private
+        </label>
+        <label for="api-show-deprecated">
+            <input type="checkbox" id="api-show-deprecated">
+            Deprecated
+        </label>
+
+    </div>
+
+
+            <div class="apidocs">
+                <div id="docs-main">
+                    <div class="content">
+                        <h1 class="file-heading">File: src/application.js</h1>
+
+<div class="file">
+    <pre class="code prettyprint linenums">
+// Main DWV namespace.
+var dwv = dwv || {};
+ 
+/**
+ * Main application class.
+ * @class App
+ * @namespace dwv
+ * @constructor
+ * @param {Boolean} mobile Handle mobile or not.
+ */
+dwv.App = function(mobile)
+{
+    // Local object
+    var self = this;
+    // Image
+    var image = null;
+    var view = null;
+    // Original image
+    var originalImage = null;
+    // Image data array
+    var imageData = null;
+    var dataWidth = 0;
+    var dataHeight = 0;
+    var displayZoom = 1;
+     
+    // Image layer
+    var imageLayer = null;
+    // Draw layer
+    var drawLayer = null;
+    // Temporary layer
+    var tempLayer = null;
+    
+    // flag to know if the info layer is listening on the image.
+    var isInfoLayerListening = true;
+    
+    // Tool box
+    var toolBox = new dwv.tool.ToolBox(this);
+    // UndoStack
+    var undoStack = new dwv.tool.UndoStack(this);
+    
+    /** 
+     * Get the image.
+     * @method getImage
+     * @return {Image} The associated image.
+     */
+    this.getImage = function() { return image; };
+    /** 
+     * Get the view.
+     * @method getView
+     * @return {Image} The associated view.
+     */
+    this.getView = function() { return view; };
+    
+    /** 
+     * Set the view.
+     * @method setImage
+     * @param {Image} img The associated image.
+     */
+    this.setImage = function(img)
+    { 
+        image = img; 
+        view.setImage(img);
+    };
+    
+    /** 
+     * Restore the original image.
+     * @method restoreOriginalImage
+     */
+    this.restoreOriginalImage = function() 
+    { 
+        image = originalImage; 
+        view.setImage(originalImage); 
+    }; 
+    
+    /** 
+     * Get the image data array.
+     * @method getImageData
+     * @return {Array} The image data array.
+     */
+    this.getImageData = function() { return imageData; };
+
+    /** 
+     * Get the tool box.
+     * @method getToolBox
+     * @return {Object} The associated toolbox.
+     */
+    this.getToolBox = function() { return toolBox; };
+
+    /** 
+     * Get the image layer.
+     * @method getImageLayer
+     * @return {Object} The image layer.
+     */
+    this.getImageLayer = function() { return imageLayer; };
+    /** 
+     * Get the draw layer.
+     * @method getDrawLayer
+     * @return {Object} The draw layer.
+     */
+    this.getDrawLayer = function() { return drawLayer; };
+    /** 
+     * Get the temporary layer.
+     * @method getTempLayer
+     * @return {Object} The temporary layer.
+     */
+    this.getTempLayer = function() { return tempLayer; };
+
+    /** 
+     * Get the undo stack.
+     * @method getUndoStack
+     * @return {Object} The undo stack.
+     */
+    this.getUndoStack = function() { return undoStack; };
+
+    /**
+     * Initialise the HTML for the application.
+     * @method init
+     */
+    this.init = function()
+    {
+        // bind open files with method
+        document.getElementById(&#x27;imagefiles&#x27;).addEventListener(&#x27;change&#x27;, this.onChangeFiles, false);
+        document.getElementById(&#x27;imageurl&#x27;).addEventListener(&#x27;change&#x27;, this.onChangeURL, false);
+    };
+    
+    /**
+     * Reset the application.
+     * @method reset
+     */
+    this.reset = function()
+    {
+        image = null;
+        view = null;
+        undoStack = new dwv.tool.UndoStack(this);
+    };
+    
+    /**
+     * Handle key down event.
+     * - CRTL-Z: undo
+     * - CRTL-Y: redo
+     * Default behavior. Usually used in tools. 
+     * @method handleKeyDown
+     * @param {Object} event The key down event.
+     */
+    this.handleKeyDown = function(event)
+    {
+        if( event.keyCode === 90 &amp;&amp; event.ctrlKey ) // ctrl-z
+        {
+            self.getUndoStack().undo();
+        }
+        else if( event.keyCode === 89 &amp;&amp; event.ctrlKey ) // ctrl-y
+        {
+            self.getUndoStack().redo();
+        }
+    };
+    
+    /**
+     * Handle change files event.
+     * @method onChangeFiles
+     * @param {Object} event The event fired when changing the file field.
+     */
+    this.onChangeFiles = function(event)
+    {
+        self.loadFiles(event.target.files);
+    };
+
+    /**
+     * Load a list of files.
+     * @method loadFiles
+     * @param {Array} files The list of files to load.
+     */
+    this.loadFiles = function(files) 
+    {
+        // Image loader
+        var onLoadImage = function(event){
+            try {
+                // parse image file
+                var data = dwv.image.getDataFromImage(this);
+                if( image ) image.appendSlice( data.view.getImage() );
+                // prepare display
+                postLoadInit(data);
+            } catch(error) {
+                handleError(error);
+                return;
+            }
+        };
+        
+        // Image reader loader
+        var onLoadImageReader = function(event){
+            var theImage = new Image();
+            theImage.src = event.target.result;
+            // storing values to pass them on
+            theImage.file = this.file;
+            theImage.index = this.index;
+            theImage.onload = onLoadImage;
+        };
+        // Image reader error handler
+        var onErrorImageReader = function(event){
+            alert(&quot;An error occurred while reading the image file: &quot;+event.getMessage());
+        };
+        
+        // DICOM reader loader
+        var onLoadDicomReader = function(event){
+            try {
+                // parse DICOM file
+                var data = dwv.image.getDataFromDicomBuffer(event.target.result);
+                if( image ) image.appendSlice( data.view.getImage() );
+                // prepare display
+                postLoadInit(data);
+            } catch(error) {
+                handleError(error);
+                return;
+            }
+        };
+        // DICOM reader error handler
+        var onErrorDicomReader = function(event){
+            alert(&quot;An error occurred while reading the DICOM file: &quot;+event.getMessage());
+        };
+        
+        // main load loop
+        this.reset();
+        for (var i = 0; i &lt; files.length; ++i)
+        {
+            var file = files[i];
+            var reader = new FileReader();
+            if( file.type.match(&quot;image.*&quot;) )
+            {
+                // storing values to pass them on
+                reader.file = file;
+                reader.index = i;
+                reader.onload = onLoadImageReader;
+                reader.onprogress = dwv.gui.updateProgress;
+                reader.onerror = onErrorImageReader;
+                reader.readAsDataURL(file);
+            }
+            else
+            {
+                reader.onload = onLoadDicomReader;
+                reader.onprogress = dwv.gui.updateProgress;
+                reader.onerror = onErrorDicomReader;
+                reader.readAsArrayBuffer(file);
+            }
+        }
+    };
+        
+    /**
+     * Handle change url event.
+     * @method onChangeURL
+     * @param {Object} event The event fired when changing the url field.
+     */
+    this.onChangeURL = function(event)
+    {
+        self.loadURL(event.target.value);
+    };
+
+    /**
+     * Load a list of URLs.
+     * @method loadURL
+     * @param {Array} urls The list of urls to load.
+     */
+    this.loadURL = function(urls) 
+    {
+        // Image loader
+        var onLoadImage = function(event){
+            try {
+                // parse image data
+                var data = dwv.image.getDataFromImage(this);
+                if( image ) image.appendSlice( data.view.getImage() );
+                // prepare display
+                postLoadInit(data);
+            } catch(error) {
+                handleError(error);
+                return;
+            }
+        };
+        
+        // Request handler
+        var onLoadRequest = function(event) {
+            var view = new DataView(this.response);
+            var isJpeg = view.getUint32(0) === 0xffd8ffe0;
+            var isPng = view.getUint32(0) === 0x89504e47;
+            var isGif = view.getUint32(0) === 0x47494638;
+            if( isJpeg || isPng || isGif ) {
+                // image data
+                var theImage = new Image();
+
+                var bytes = new Uint8Array(this.response);
+                var binary = &#x27;&#x27;;
+                for (var i = 0; i &lt; bytes.byteLength; ++i) {
+                    binary += String.fromCharCode(bytes[i]);
+                }
+                var imgStr = &quot;unknown&quot;;
+                if (isJpeg) imgStr = &quot;jpeg&quot;;
+                else if (isPng) imgStr = &quot;png&quot;;
+                else if (isGif) imgStr = &quot;gif&quot;;
+                theImage.src = &quot;data:image/&quot; + imgStr + &quot;;base64,&quot; + window.btoa(binary);
+                
+                theImage.onload = onLoadImage;
+            }
+            else {
+                try {
+                    // parse DICOM
+                    var data = dwv.image.getDataFromDicomBuffer(this.response);
+                    if( image ) image.appendSlice( data.view.getImage() );
+                    // prepare display
+                    postLoadInit(data);
+                } catch(error) {
+                    handleError(error);
+                    return;
+                }
+            }
+        };
+        // Request error handler
+        var onErrorRequest = function(event){
+            alert(&quot;An error occurred while retrieving the file: (http) &quot;+this.status);
+        };
+        
+        // main load loop
+        this.reset();
+        for (var i = 0; i &lt; urls.length; ++i)
+        {
+            var url = urls[i];
+            var request = new XMLHttpRequest();
+            // TODO Verify URL...
+            request.open(&#x27;GET&#x27;, url, true);
+            request.responseType = &quot;arraybuffer&quot;; 
+            request.onload = onLoadRequest;
+            request.onerror = onErrorRequest;
+            request.onprogress = dwv.gui.updateProgress;
+            request.send(null);
+        }
+    };
+    
+    /**
+     * Generate the image data and draw it.
+     * @method generateAndDrawImage
+     */
+    this.generateAndDrawImage = function()
+    {         
+        // generate image data from DICOM
+        self.getView().generateImageData(imageData);         
+        // set the image data of the layer
+        self.getImageLayer().setImageData(imageData);
+        // draw the image
+        self.getImageLayer().draw();
+    };
+    
+    /**
+     * Resize the display window. To be called once the image is loaded.
+     * @method resize
+     */
+    this.resize = function()
+    {
+        // adapt the size of the layer container
+        var mainWidth = 0;
+        var mainHeight = 0;
+        if( mobile ) {
+            mainWidth = $(window).width();
+            mainHeight = $(window).height() - 125;
+        }
+        else {
+            mainWidth = $(&#x27;#pageMain&#x27;).width() - 360;
+            mainHeight = $(&#x27;#pageMain&#x27;).height() - 75;
+        }
+        displayZoom = Math.min( (mainWidth / dataWidth), (mainHeight / dataHeight) );
+        $(&quot;#layerContainer&quot;).width(parseInt(displayZoom*dataWidth, 10));
+        $(&quot;#layerContainer&quot;).height(parseInt(displayZoom*dataHeight, 10));
+    };
+    
+    /**
+     * Set the layers zoom. To be called once the image is loaded.
+     * @method setLayersZoom
+     * @param {Number} zoomX The zoom in the X direction.
+     * @param {Number} zoomY The zoom in the Y direction.
+     * @param {Number} cx The zoom center X coordinate.
+     * @param {Number} cy The zoom center Y coordinate.
+     */
+    this.setLayersZoom = function(zoomX,zoomY,cx,cy)
+    {
+        if( imageLayer ) imageLayer.zoom(zoomX,zoomY,cx,cy);
+        if( drawLayer ) drawLayer.zoom(zoomX,zoomY,cx,cy);
+    };
+    
+    /**
+     * Toggle the display of the info layer.
+     * @method toggleInfoLayerDisplay
+     */
+    this.toggleInfoLayerDisplay = function()
+    {
+        // toggle html
+        dwv.html.toggleDisplay(&#x27;infoLayer&#x27;);
+        // toggle listeners
+        if( isInfoLayerListening ) {
+            removeImageInfoListeners();
+            isInfoLayerListening = false;
+        }
+        else {
+            addImageInfoListeners();
+            isInfoLayerListening = true;
+        }
+    };
+    
+    // Private Methods -------------------------------------------
+
+    /**
+     * Add image listeners.
+     * @method addImageInfoListeners
+     * @private
+     */
+    function addImageInfoListeners()
+    {
+        view.addEventListener(&quot;wlchange&quot;, dwv.info.updateWindowingDiv);
+        view.addEventListener(&quot;wlchange&quot;, dwv.info.updateMiniColorMap);
+        view.addEventListener(&quot;wlchange&quot;, dwv.info.updatePlotMarkings);
+        view.addEventListener(&quot;colorchange&quot;, dwv.info.updateMiniColorMap);
+        view.addEventListener(&quot;positionchange&quot;, dwv.info.updatePositionDiv);
+    }
+    
+    /**
+     * Remove image listeners.
+     * @method removeImageInfoListeners
+     * @private
+     */
+    function removeImageInfoListeners()
+    {
+        view.removeEventListener(&quot;wlchange&quot;, dwv.info.updateWindowingDiv);
+        view.removeEventListener(&quot;wlchange&quot;, dwv.info.updateMiniColorMap);
+        view.removeEventListener(&quot;wlchange&quot;, dwv.info.updatePlotMarkings);
+        view.removeEventListener(&quot;colorchange&quot;, dwv.info.updateMiniColorMap);
+        view.removeEventListener(&quot;positionchange&quot;, dwv.info.updatePositionDiv);
+    }
+    
+    /**
+     * General-purpose event handler. This function just determines the mouse 
+     * position relative to the canvas element. It then passes it to the current tool.
+     * @method eventHandler
+     * @private
+     * @param {Object} event The event to handle.
+     */
+    function eventHandler(event)
+    {
+        // flag not to get confused between touch and mouse
+        var handled = false;
+        // Store the event position relative to the image canvas
+        // in an extra member of the event:
+        // event._x and event._y.
+        if( mobile )
+        {
+            if( event.type === &quot;touchstart&quot; ||
+                event.type === &quot;touchmove&quot;)
+            {
+                event.preventDefault();
+                // If there&#x27;s one or two fingers inside this element
+                if( event.targetTouches.length === 1 ||
+                    event.targetTouches.length === 2)
+                {
+                  var touch = event.targetTouches[0];
+                  // store
+                  event._x = touch.pageX - parseInt(app.getImageLayer().getOffset().left, 10);
+                  event._x = parseInt( (event._x / displayZoom), 10 );
+                  event._y = touch.pageY - parseInt(app.getImageLayer().getOffset().top, 10);
+                  event._y = parseInt( (event._y / displayZoom), 10 );
+                  // second finger
+                  if (event.targetTouches.length === 2) {
+                      touch = event.targetTouches[1];
+                      // store
+                      event._x1 = touch.pageX - parseInt(app.getImageLayer().getOffset().left, 10);
+                      event._x1 = parseInt( (event._x1 / displayZoom), 10 );
+                      event._y1 = touch.pageY - parseInt(app.getImageLayer().getOffset().top, 10);
+                      event._y1 = parseInt( (event._y1 / displayZoom), 10 );
+                  }
+                  // set handle event flag
+                  handled = true;
+                }
+            }
+            else if( event.type === &quot;touchend&quot; ) handled = true;
+        }
+        else
+        {
+            if( event.type === &quot;mousemove&quot; ||
+                event.type === &quot;mousedown&quot; ||
+                event.type === &quot;mouseup&quot; ||
+                event.type === &quot;mouseout&quot; ||
+                event.type === &quot;mousewheel&quot; ||
+                event.type === &quot;dblclick&quot; ||
+                event.type === &quot;DOMMouseScroll&quot; )
+            {
+                // layerX is for firefox
+                event._x = event.offsetX === undefined ? event.layerX : event.offsetX;
+                event._x = parseInt( (event._x / displayZoom), 10 );
+                event._y = event.offsetY === undefined ? event.layerY : event.offsetY;
+                event._y = parseInt( (event._y / displayZoom), 10 );
+                // set handle event flag
+                handled = true;
+            }
+            else if( event.type === &quot;keydown&quot; ) handled = true;
+        }
+            
+        // Call the event handler of the tool.
+        if( handled )
+        {
+            var func = self.getToolBox().getSelectedTool()[event.type];
+            if( func )
+            {
+                func(event);
+            }
+        }
+    }
+    
+    /**
+     * Handle an error: display it to the user.
+     * @method handleError
+     * @private
+     * @param {Object} error The error to handle.
+     */
+    function handleError(error)
+    {
+        if( error.name &amp;&amp; error.message) alert(error.name+&quot;: &quot;+error.message+&quot;.&quot;);
+        else alert(&quot;Error: &quot;+error+&quot;.&quot;);
+        if( error.stack ) console.log(error.stack);
+    }
+    
+    /**
+     * Create the application layers.
+     * @method createLayers
+     * @private
+     * @param {Number} dataWidth The width of the input data.
+     * @param {Number} dataHeight The height of the input data.
+     */
+    function createLayers(dataWidth, dataHeight)
+    {
+        // resize app
+        self.resize();
+        
+        // image layer
+        imageLayer = new dwv.html.Layer(&quot;imageLayer&quot;);
+        imageLayer.initialise(dataWidth, dataHeight);
+        imageLayer.fillContext();
+        imageLayer.setStyleDisplay(true);
+        // draw layer
+        drawLayer = new dwv.html.Layer(&quot;drawLayer&quot;);
+        drawLayer.initialise(dataWidth, dataHeight);
+        drawLayer.setStyleDisplay(true);
+        // temp layer
+        tempLayer = new dwv.html.Layer(&quot;tempLayer&quot;);
+        tempLayer.initialise(dataWidth, dataHeight);
+        tempLayer.setStyleDisplay(true);
+    }
+    
+    /**
+     * Create the DICOM tags table. To be called once the DICOM has been parsed.
+     * @method createTagsTable
+     * @private
+     * @param {Object} dataInfo The data information.
+     */
+    function createTagsTable(dataInfo)
+    {
+        // tag list table (without the pixel data)
+        if(dataInfo.PixelData) dataInfo.PixelData.value = &quot;...&quot;;
+        // HTML node
+        var node = document.getElementById(&quot;tags&quot;);
+        // remove possible previous
+        while (node.hasChildNodes()) { 
+            node.removeChild(node.firstChild);
+        }
+        // tags HTML table
+        var table = dwv.html.toTable(dataInfo);
+        table.id = &quot;tagsTable&quot;;
+        table.className = &quot;tagsList table-stripe&quot;;
+        table.setAttribute(&quot;data-role&quot;, &quot;table&quot;);
+        table.setAttribute(&quot;data-mode&quot;, &quot;columntoggle&quot;);
+        // search form
+        node.appendChild(dwv.html.getHtmlSearchForm(table));
+        // tags table
+        node.appendChild(table);
+    }
+    
+    /**
+     * Post load application initialisation. To be called once the DICOM has been parsed.
+     * @method postLoadInit
+     * @private
+     * @param {Object} data The data to display.
+     */
+    function postLoadInit(data)
+    {
+        // only initialise the first time
+        if( view ) return;
+        
+        // get the view from the loaded data
+        view = data.view;
+        // create the DICOM tags table
+        createTagsTable(data.info);
+        // store image
+        originalImage = view.getImage();
+        image = originalImage;
+        
+        // layout
+        dataWidth = image.getSize().getNumberOfColumns();
+        dataHeight = image.getSize().getNumberOfRows();
+        createLayers(dataWidth, dataHeight);
+        
+        // create the info layer
+        dwv.info.createWindowingDiv();
+        dwv.info.createPositionDiv();
+        dwv.info.createMiniColorMap();
+        dwv.info.createPlot();
+
+        // get the image data from the image layer
+        imageData = self.getImageLayer().getContext().createImageData( 
+                dataWidth, dataHeight);
+
+        // mouse listeners
+        tempLayer.getCanvas().addEventListener(&quot;mousedown&quot;, eventHandler, false);
+        tempLayer.getCanvas().addEventListener(&quot;mousemove&quot;, eventHandler, false);
+        tempLayer.getCanvas().addEventListener(&quot;mouseup&quot;, eventHandler, false);
+        tempLayer.getCanvas().addEventListener(&quot;mouseout&quot;, eventHandler, false);
+        tempLayer.getCanvas().addEventListener(&quot;mousewheel&quot;, eventHandler, false);
+        tempLayer.getCanvas().addEventListener(&quot;DOMMouseScroll&quot;, eventHandler, false);
+        tempLayer.getCanvas().addEventListener(&quot;dblclick&quot;, eventHandler, false);
+        // touch listeners
+        tempLayer.getCanvas().addEventListener(&quot;touchstart&quot;, eventHandler, false);
+        tempLayer.getCanvas().addEventListener(&quot;touchmove&quot;, eventHandler, false);
+        tempLayer.getCanvas().addEventListener(&quot;touchend&quot;, eventHandler, false);
+        // keydown listener
+        window.addEventListener(&quot;keydown&quot;, eventHandler, true);
+        // image listeners
+        view.addEventListener(&quot;wlchange&quot;, app.generateAndDrawImage);
+        view.addEventListener(&quot;colorchange&quot;, app.generateAndDrawImage);
+        view.addEventListener(&quot;slicechange&quot;, app.generateAndDrawImage);
+        addImageInfoListeners();
+        
+        // initialise the toolbox
+        toolBox.enable(true);
+        // add the HTML for the history 
+        dwv.gui.appendUndoHtml();
+        
+        // the following has to be done after adding listeners
+        
+        // set window/level: triggers first data and div display
+        dwv.tool.updateWindowingData(
+                parseInt(app.getView().getWindowLut().getCenter(), 10),
+                parseInt(app.getView().getWindowLut().getWidth(), 10) );
+        // default position: triggers div display
+        dwv.tool.updatePostionValue(0,0);
+    }
+    
+};
+
+    </pre>
+</div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="../assets/vendor/prettify/prettify-min.js"></script>
+<script>prettyPrint();</script>
+<script src="../assets/js/yui-prettify.js"></script>
+<script src="../assets/../api.js"></script>
+<script src="../assets/js/api-filter.js"></script>
+<script src="../assets/js/api-list.js"></script>
+<script src="../assets/js/api-search.js"></script>
+<script src="../assets/js/apidocs.js"></script>
+</body>
+</html>
