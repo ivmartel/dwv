@@ -2,7 +2,7 @@
     "project": {
         "name": "dwv",
         "description": "Simple javascript/HTML5 (only) Dicom Web Viewer.",
-        "version": "0.4.0beta",
+        "version": "0.4.0",
         "url": "http://ivmartel.github.io/dwv/"
     },
     "files": {
