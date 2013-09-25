@@ -19,7 +19,7 @@
             
         </div>
         <div class="yui3-u-1-4 version">
-            <em>API Docs for: 0.4.0</em>
+            <em>API Docs for: 0.4.1</em>
         </div>
     </div>
     <div id="bd" class="yui3-g">
@@ -665,38 +665,91 @@ dwv.html.toggleDisplay = function(id)
     }
 };
 
+// Browser namespace
+dwv.html.browser = dwv.html.browser || {};
+
+/**
+ * Browser check for the FileAPI.
+ * @method hasFileApi
+ * @static
+ */ 
+dwv.html.browser.hasFileApi = function()
+{
+    // regular test does not work on Safari 5
+    var isSafari5 = (navigator.appVersion.indexOf(&quot;Safari&quot;) != -1) &amp;&amp;
+        ( (navigator.appVersion.indexOf(&quot;5.0.&quot;) != -1) ||
+          (navigator.appVersion.indexOf(&quot;5.1.&quot;) != -1) );
+    if( isSafari5 ) 
+    {
+        console.warn(&quot;Assuming FileAPI support for Safari5...&quot;);
+        return true;
+    }
+    // regular test
+    return &quot;FileReader&quot; in window;
+};
+
+/**
+ * Browser check for the XMLHttpRequest.
+ * @method hasXmlHttpRequest
+ * @static
+ */ 
+dwv.html.browser.hasXmlHttpRequest = function()
+{
+    return &quot;XMLHttpRequest&quot; in window &amp;&amp; &quot;withCredentials&quot; in new XMLHttpRequest();
+};
+
+/**
+ * Browser check for typed array.
+ * @method hasTypedArray
+ * @static
+ */ 
+dwv.html.browser.hasTypedArray = function()
+{
+    return &quot;Uint8Array&quot; in window &amp;&amp; &quot;Uint16Array&quot; in window;
+};
+
+/**
+ * Browser check for clamped array.
+ * @method hasClampedArray
+ * @static
+ */ 
+dwv.html.browser.hasClampedArray = function()
+{
+    return &quot;Uint8ClampedArray&quot; in window;
+};
+
 /**
  * Browser checks to see if it can run dwv. Throws an error if not.
  * TODO Maybe use http://modernizr.com/.
- * @method checkBrowser
+ * @method check
  * @static
  */ 
-dwv.html.checkBrowser = function()
+dwv.html.browser.check = function()
 {
     var appnorun = &quot;The application cannot be run.&quot;;
     var message = &quot;&quot;;
     // Check for the File API support
-    if( !window.FileReader ) {
+    if( !dwv.html.browser.hasFileApi() ) {
         message = &quot;The File APIs are not supported in this browser. &quot;;
         alert(message+appnorun);
         throw new Error(message);
     }
     // Check for XMLHttpRequest
-    if( !window.XMLHttpRequest || !(&quot;withCredentials&quot; in new XMLHttpRequest()) ) {
+    if( !dwv.html.browser.hasXmlHttpRequest() ) {
         message = &quot;The XMLHttpRequest is not supported in this browser. &quot;;
         alert(message+appnorun);
         throw new Error(message);
     }
     // Check typed array
-    if( !window.Uint8Array || !window.Uint16Array ) {
+    if( !dwv.html.browser.hasTypedArray() ) {
         message = &quot;The Typed arrays are not supported in this browser. &quot;;
         alert(message+appnorun);
         throw new Error(message);
     }
-    if( !window.Uint8ClampedArray ) {
-        message = &quot;The Uint8ClampedArray is not supported in this browser. &quot;;
-        alert(message+appnorun);
-        throw new Error(message);
+    // check clamped array
+    if( !dwv.html.browser.hasClampedArray() ) {
+        // silent fail since IE does not support it...
+        console.warn(&quot;The Uint8ClampedArray is not supported in this browser. This may impair performance. &quot;);
     }
 };
 

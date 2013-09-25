@@ -2,7 +2,7 @@
     "project": {
         "name": "dwv",
         "description": "Simple javascript/HTML5 (only) Dicom Web Viewer.",
-        "version": "0.4.0",
+        "version": "0.4.1",
         "url": "http://ivmartel.github.io/dwv/"
     },
     "files": {
@@ -2730,10 +2730,54 @@
         },
         {
             "file": "src/html/html.js",
-            "line": 476,
+            "line": 479,
+            "description": "Browser check for the FileAPI.",
+            "itemtype": "method",
+            "name": "hasFileApi",
+            "static": 1,
+            "class": "dwv.html",
+            "module": "html",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/html/html.js",
+            "line": 499,
+            "description": "Browser check for the XMLHttpRequest.",
+            "itemtype": "method",
+            "name": "hasXmlHttpRequest",
+            "static": 1,
+            "class": "dwv.html",
+            "module": "html",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/html/html.js",
+            "line": 509,
+            "description": "Browser check for typed array.",
+            "itemtype": "method",
+            "name": "hasTypedArray",
+            "static": 1,
+            "class": "dwv.html",
+            "module": "html",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/html/html.js",
+            "line": 519,
+            "description": "Browser check for clamped array.",
+            "itemtype": "method",
+            "name": "hasClampedArray",
+            "static": 1,
+            "class": "dwv.html",
+            "module": "html",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/html/html.js",
+            "line": 529,
             "description": "Browser checks to see if it can run dwv. Throws an error if not.\nTODO Maybe use http://modernizr.com/.",
             "itemtype": "method",
-            "name": "checkBrowser",
+            "name": "check",
             "static": 1,
             "class": "dwv.html",
             "module": "html",
@@ -4408,7 +4452,7 @@
         },
         {
             "file": "src/image/luts.js",
-            "line": 160,
+            "line": 191,
             "description": "Get the length of the LUT array.",
             "itemtype": "method",
             "name": "getLength",
@@ -4422,7 +4466,7 @@
         },
         {
             "file": "src/image/luts.js",
-            "line": 167,
+            "line": 198,
             "description": "Get the value of the LUT at the given offset.",
             "itemtype": "method",
             "name": "getValue",
@@ -4436,7 +4480,7 @@
         },
         {
             "file": "src/image/luts.js",
-            "line": 179,
+            "line": 210,
             "description": "Lookup tables for image color display.",
             "class": "dwv.image.lut.Window",
             "module": "image",
@@ -8421,7 +8465,7 @@
         },
         {
             "message": "Missing item type\nLookup tables for image color display.",
-            "line": " src/image/luts.js:179"
+            "line": " src/image/luts.js:210"
         },
         {
             "message": "Missing item type",
