@@ -4185,38 +4185,91 @@ dwv.html.toggleDisplay = function(id)
     }
 };
 
+// Browser namespace
+dwv.html.browser = dwv.html.browser || {};
+
+/**
+ * Browser check for the FileAPI.
+ * @method hasFileApi
+ * @static
+ */ 
+dwv.html.browser.hasFileApi = function()
+{
+    // regular test does not work on Safari 5
+    var isSafari5 = (navigator.appVersion.indexOf("Safari") != -1) &&
+        ( (navigator.appVersion.indexOf("5.0.") != -1) ||
+          (navigator.appVersion.indexOf("5.1.") != -1) );
+    if( isSafari5 ) 
+    {
+        console.warn("Assuming FileAPI support for Safari5...");
+        return true;
+    }
+    // regular test
+    return "FileReader" in window;
+};
+
+/**
+ * Browser check for the XMLHttpRequest.
+ * @method hasXmlHttpRequest
+ * @static
+ */ 
+dwv.html.browser.hasXmlHttpRequest = function()
+{
+    return "XMLHttpRequest" in window && "withCredentials" in new XMLHttpRequest();
+};
+
+/**
+ * Browser check for typed array.
+ * @method hasTypedArray
+ * @static
+ */ 
+dwv.html.browser.hasTypedArray = function()
+{
+    return "Uint8Array" in window && "Uint16Array" in window;
+};
+
+/**
+ * Browser check for clamped array.
+ * @method hasClampedArray
+ * @static
+ */ 
+dwv.html.browser.hasClampedArray = function()
+{
+    return "Uint8ClampedArray" in window;
+};
+
 /**
  * Browser checks to see if it can run dwv. Throws an error if not.
  * TODO Maybe use http://modernizr.com/.
- * @method checkBrowser
+ * @method check
  * @static
  */ 
-dwv.html.checkBrowser = function()
+dwv.html.browser.check = function()
 {
     var appnorun = "The application cannot be run.";
     var message = "";
     // Check for the File API support
-    if( !window.FileReader ) {
+    if( !dwv.html.browser.hasFileApi() ) {
         message = "The File APIs are not supported in this browser. ";
         alert(message+appnorun);
         throw new Error(message);
     }
     // Check for XMLHttpRequest
-    if( !window.XMLHttpRequest || !("withCredentials" in new XMLHttpRequest()) ) {
+    if( !dwv.html.browser.hasXmlHttpRequest() ) {
         message = "The XMLHttpRequest is not supported in this browser. ";
         alert(message+appnorun);
         throw new Error(message);
     }
     // Check typed array
-    if( !window.Uint8Array || !window.Uint16Array ) {
+    if( !dwv.html.browser.hasTypedArray() ) {
         message = "The Typed arrays are not supported in this browser. ";
         alert(message+appnorun);
         throw new Error(message);
     }
-    if( !window.Uint8ClampedArray ) {
-        message = "The Uint8ClampedArray is not supported in this browser. ";
-        alert(message+appnorun);
-        throw new Error(message);
+    // check clamped array
+    if( !dwv.html.browser.hasClampedArray() ) {
+        // silent fail since IE does not support it...
+        console.warn("The Uint8ClampedArray is not supported in this browser. This may impair performance. ");
     }
 };
 
@@ -5514,8 +5567,8 @@ dwv.image.lut.Window = function(rescaleLut_, isSigned_)
     var windowLut_ = null;
     
     // check Uint8ClampedArray support
-    if( !window.Uint8ClampedArray ) {
-        console.warn("No support for Uint8ClampedArray.");
+    if( !dwv.html.browser.hasClampedArray() )
+    {
         windowLut_ = new Uint8Array(rescaleLut_.getLength());
     }
     else windowLut_ = new Uint8ClampedArray(rescaleLut_.getLength());
@@ -5569,14 +5622,45 @@ dwv.image.lut.Window = function(rescaleLut_, isSigned_)
         var size = windowLut_.length;
         var center0 = isSigned_ ? center - 0.5 + size / 2 : center - 0.5;
         var width0 = width - 1;
-        // Uint8ClampedArray clamps between 0 and 255
         var dispval = 0;
-        for(var i=0; i<size; ++i)
+        if( !dwv.html.browser.hasClampedArray() )
         {
-            // from the DICOM specification (https://www.dabsoft.ch/dicom/3/C.11.2.1.2/)
-            // y = ((x - (c - 0.5)) / (w-1) + 0.5) * (ymax - ymin )+ ymin
-            dispval = ((rescaleLut_.getValue(i) - center0 ) / width0 + 0.5) * 255;
-            windowLut_[i]= parseInt(dispval, 10);
+            var xMin = center - 0.5 - (width-1) / 2;
+            var xMax = center - 0.5 + (width-1) / 2;    
+            var yMax = 255;
+            var yMin = 0;
+            var value = 0;
+            for(var j=0; j<size; ++j)
+            {
+                // from the DICOM specification (https://www.dabsoft.ch/dicom/3/C.11.2.1.2/)
+                // y = ((x - (c - 0.5)) / (w-1) + 0.5) * (ymax - ymin )+ ymin
+                value = rescaleLut_.getValue(j);
+                if(value <= xMin)
+                {                            
+                    windowLut_[j] = yMin;                        
+                }
+                else if (value > xMax)
+                {
+                    windowLut_[j] = yMax;         
+                }
+                else
+                {                
+                    dispval = ((value - center0 ) / width0 + 0.5) * 255;
+                    windowLut_[j]= parseInt(dispval, 10);
+                }
+            }
+        }
+        else
+        {
+            // when using Uint8ClampedArray, values are clamped between 0 and 255
+            // no need to check
+            for(var i=0; i<size; ++i)
+            {
+                // from the DICOM specification (https://www.dabsoft.ch/dicom/3/C.11.2.1.2/)
+                // y = ((x - (c - 0.5)) / (w-1) + 0.5) * (ymax - ymin )+ ymin
+                dispval = ((rescaleLut_.getValue(i) - center0 ) / width0 + 0.5) * 255;
+                windowLut_[i]= parseInt(dispval, 10);
+            }
         }
     };
     
