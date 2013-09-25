@@ -121,7 +121,7 @@ function toggle(dialogName)
 
 print([[
 // check browser support
-dwv.html.checkBrowser();
+dwv.html.browser.check();
 // main application
 var app = new dwv.App();
 ]])
