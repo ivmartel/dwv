@@ -96,8 +96,8 @@ print([[
 -- path with extra /dwv
 print([[
 <!-- Third party --> 
-<script type="text/javascript" src="/dwv/ext/jquery/jquery-1.9.1.min.js"></script>
-<script type="text/javascript" src="/dwv/ext/jquery-ui/jquery-ui-1.10.2.min.js"></script>
+<script type="text/javascript" src="/dwv/ext/jquery/jquery-2.0.3.min.js"></script>
+<script type="text/javascript" src="/dwv/ext/jquery-ui/jquery-ui-1.10.3.min.js"></script>
 <script type="text/javascript" src="/dwv/ext/flot/jquery.flot.min.js"></script>
 ]])
 

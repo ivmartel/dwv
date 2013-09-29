@@ -59,10 +59,10 @@ dwv.gui.updateProgress = function(event)
         var percent = Math.round((event.loaded / event.total) * 100);
         // Increase the progress bar length.
         if( percent < 100 ) {
-            $.mobile.showPageLoadingMsg('a', percent+"%");
+            $.mobile.loading("show", {text: percent+"%", textVisible: true, theme: "b"} );
         }
         else if( percent === 100 ) {
-            $.mobile.hidePageLoadingMsg();
+            $.mobile.loading("hide");
         }
     }
 };
