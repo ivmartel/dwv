@@ -104,7 +104,7 @@ print([[
 -- path with extra /dwv
 print([[
 <!-- Local -->
-<script type="text/javascript" src="/dwv/dwv-0.4.1.min.js"></script>
+<script type="text/javascript" src="/dwv/dwv-0.5.0beta.min.js"></script>
 <script type="text/javascript" src="/dwv/gui_ui.js"></script>
 ]])
 
@@ -183,8 +183,8 @@ print([[<body>]])
 print([[<div id="pageHeader">]])
 
 print([[
-<!-- Title -->
-<h1>DICOM Web Viewer (<a href="https://github.com/ivmartel/dwv">dwv</a> v0.4.1)</h1>
+<!-- Title #dwvversion -->
+<h1>DICOM Web Viewer (<a href="https://github.com/ivmartel/dwv">dwv</a> v0.5.0beta)</h1>
 
 <!-- Toolbar -->
 <div id="toolbar">
