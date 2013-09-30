@@ -356,7 +356,7 @@ dwv.App = function(mobile)
         var mainHeight = 0;
         if( mobile ) {
             mainWidth = $(window).width();
-            mainHeight = $(window).height() - 125;
+            mainHeight = $(window).height() - 147;
         }
         else {
             mainWidth = $('#pageMain').width() - 360;

@@ -84,18 +84,16 @@ $(document).ready(function(){
 
 <div id="toolbar"><p style="margin:0;">
 
-<a href="#popupOpen" data-role="button" data-mini="true" data-inline="true" 
- data-icon="plus" data-iconpos="notext" 
+<a href="#popupOpen" class="ui-btn ui-btn-inline ui-btn-icon-notext ui-mini ui-icon-plus"
  data-rel="popup" data-position-to="window">Open</a>
 
-<a href="#" data-role="button" data-mini="true" data-inline="true" 
- data-icon="back" data-iconpos="notext" onclick="app.getUndoStack().undo()">Undo</a>
-<a href="#" data-role="button" data-mini="true" data-inline="true" 
- data-icon="forward" data-iconpos="notext" onclick="app.getUndoStack().redo()">Redo</a>
-<a href="#" data-role="button" data-mini="true" data-inline="true" 
- data-icon="info" data-iconpos="notext" onclick="app.toggleInfoLayerDisplay()">Info</a>
-<a href="#tags_page" data-role="button" data-mini="true" data-inline="true"
- data-icon="grid" data-iconpos="notext">Tags</a>
+<a href="#" class="ui-btn ui-btn-inline ui-btn-icon-notext ui-mini ui-icon-back"
+  onclick="app.getUndoStack().undo()">Undo</a>
+<a href="#" class="ui-btn ui-btn-inline ui-btn-icon-notext ui-mini ui-icon-forward"
+  onclick="app.getUndoStack().redo()">Redo</a>
+<a href="#" class="ui-btn ui-btn-inline ui-btn-icon-notext ui-mini ui-icon-info"
+  onclick="app.toggleInfoLayerDisplay()">Info</a>
+<a href="#tags_page" class="ui-btn ui-btn-inline ui-btn-icon-notext ui-mini ui-icon-grid">Tags</a>
 
 </p></div><!-- /toolbar -->
 
