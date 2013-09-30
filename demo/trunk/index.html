@@ -14,10 +14,10 @@ body { font-size: 80%; }
 #infotl { color: #333; text-shadow: 0 1px 0 #fff; }
 #infotr { color: #333; text-shadow: 0 1px 0 #fff; }
 </style>
-<link rel="stylesheet" href="ext/jquery-ui/themes/ui-darkness/jquery-ui-1.10.2.min.css">
+<link rel="stylesheet" href="ext/jquery-ui/themes/ui-darkness/jquery-ui-1.10.3.min.css">
 <!-- Third party -->  
-<script type="text/javascript" src="ext/jquery/jquery-1.9.1.min.js"></script>
-<script type="text/javascript" src="ext/jquery-ui/jquery-ui-1.10.2.min.js"></script>
+<script type="text/javascript" src="ext/jquery/jquery-2.0.3.min.js"></script>
+<script type="text/javascript" src="ext/jquery-ui/jquery-ui-1.10.3.min.js"></script>
 <script type="text/javascript" src="ext/flot/jquery.flot.min.js"></script>
 <!-- Local -->
 <script type="text/javascript" src="dwv-0.5.0beta.min.js"></script>
@@ -32,7 +32,7 @@ function toggle(dialogId)
 }
 
 // check browser support
-dwv.html.checkBrowser();
+dwv.html.browser.check();
 // main application
 var app = new dwv.App();
 
