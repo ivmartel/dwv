@@ -1,0 +1,11 @@
+{
+  "name": "DWV",
+  "description": "Dicom Web Viewer.",
+  "version": "0.5.0",
+  "app": {
+    "background": {
+      "scripts": ["resources/chrome-background.js"]
+    }
+  },
+  "icons": { "60": "resources/dwv-60.png" }
+}
