@@ -8122,7 +8122,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 126,
+            "line": 128,
             "description": "Reset the application.",
             "itemtype": "method",
             "name": "reset",
@@ -8132,7 +8132,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 137,
+            "line": 139,
             "description": "Handle key down event.\n- CRTL-Z: undo\n- CRTL-Y: redo\nDefault behavior. Usually used in tools.",
             "itemtype": "method",
             "name": "handleKeyDown",
@@ -8149,7 +8149,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 157,
+            "line": 159,
             "description": "Handle change files event.",
             "itemtype": "method",
             "name": "onChangeFiles",
@@ -8166,7 +8166,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 167,
+            "line": 169,
             "description": "Load a list of files.",
             "itemtype": "method",
             "name": "loadFiles",
@@ -8183,7 +8183,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 246,
+            "line": 248,
             "description": "Handle change url event.",
             "itemtype": "method",
             "name": "onChangeURL",
@@ -8200,7 +8200,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 256,
+            "line": 258,
             "description": "Load a list of URLs.",
             "itemtype": "method",
             "name": "loadURL",
@@ -8217,7 +8217,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 334,
+            "line": 336,
             "description": "Generate the image data and draw it.",
             "itemtype": "method",
             "name": "generateAndDrawImage",
@@ -8227,7 +8227,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 348,
+            "line": 350,
             "description": "Resize the display window. To be called once the image is loaded.",
             "itemtype": "method",
             "name": "resize",
@@ -8237,7 +8237,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 370,
+            "line": 372,
             "description": "Set the layers zoom. To be called once the image is loaded.",
             "itemtype": "method",
             "name": "setLayersZoom",
@@ -8269,7 +8269,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 384,
+            "line": 386,
             "description": "Toggle the display of the info layer.",
             "itemtype": "method",
             "name": "toggleInfoLayerDisplay",
@@ -8279,7 +8279,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 405,
+            "line": 407,
             "description": "Add image listeners.",
             "itemtype": "method",
             "name": "addImageInfoListeners",
@@ -8291,7 +8291,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 419,
+            "line": 421,
             "description": "Remove image listeners.",
             "itemtype": "method",
             "name": "removeImageInfoListeners",
@@ -8303,7 +8303,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 433,
+            "line": 435,
             "description": "General-purpose event handler. This function just determines the mouse \nposition relative to the canvas element. It then passes it to the current tool.",
             "itemtype": "method",
             "name": "eventHandler",
@@ -8322,7 +8322,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 510,
+            "line": 512,
             "description": "Handle an error: display it to the user.",
             "itemtype": "method",
             "name": "handleError",
@@ -8341,7 +8341,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 523,
+            "line": 525,
             "description": "Create the application layers.",
             "itemtype": "method",
             "name": "createLayers",
@@ -8365,7 +8365,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 550,
+            "line": 552,
             "description": "Create the DICOM tags table. To be called once the DICOM has been parsed.",
             "itemtype": "method",
             "name": "createTagsTable",
@@ -8384,7 +8384,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 578,
+            "line": 580,
             "description": "Post load application initialisation. To be called once the DICOM has been parsed.",
             "itemtype": "method",
             "name": "postLoadInit",
