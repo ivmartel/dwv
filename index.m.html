@@ -49,25 +49,8 @@ body { margin: 10px; padding: 0; }
 <script type="text/javascript" src="src/tools/zoom.js"></script>
 <script type="text/javascript" src="src/utils/string.js"></script>
 
-<script type="text/javascript">
-
-//check browser support
-dwv.html.browser.check();
-// main application
-var app = new dwv.App(true);
-
-// jquery
-$(document).ready(function(){
-    // initialise the application
-    app.init();
-    // align layers when the window is resized
-    window.onresize = app.resize;
-    // possible load from URL
-    var inputUrls = dwv.html.getUriParam(); 
-    if( inputUrls && inputUrls.length > 0 ) app.loadURL(inputUrls);
-});
-
-</script>
+<!--  Launch the app -->
+<script type="text/javascript" src="src/applauncher-m.js"></script>
 </head>
 
 <body>
@@ -88,18 +71,19 @@ $(document).ready(function(){
  data-rel="popup" data-position-to="window">Open</a>
 
 <a href="#" class="ui-btn ui-btn-inline ui-btn-icon-notext ui-mini ui-icon-back"
-  onclick="app.getUndoStack().undo()">Undo</a>
+  id="undo-btn">Undo</a>
 <a href="#" class="ui-btn ui-btn-inline ui-btn-icon-notext ui-mini ui-icon-forward"
-  onclick="app.getUndoStack().redo()">Redo</a>
+  id="redo-btn">Redo</a>
 <a href="#" class="ui-btn ui-btn-inline ui-btn-icon-notext ui-mini ui-icon-info"
-  onclick="app.toggleInfoLayerDisplay()">Info</a>
+  id="info-btn">Info</a>
 <a href="#tags_page" class="ui-btn ui-btn-inline ui-btn-icon-notext ui-mini ui-icon-grid">Tags</a>
 
 </p></div><!-- /toolbar -->
 
 <!-- Open popup -->
 <div data-role="popup" id="popupOpen">
-<form>
+<a href="#" data-rel="back" data-role="button" 
+  data-theme="a" data-icon="delete" data-iconpos="notext" class="ui-btn-right">Close</a> 
 <div style="padding:10px 20px;">
 <h3>Open</h3>
 <label for="imagefiles">Path:</label>
@@ -107,7 +91,6 @@ $(document).ready(function(){
 <label for="imageurl">URL:</label>
 <input id="imageurl" type="url" data-clear-btn="true" data-mini="true"/>
 </div>
-</form>
 </div>
  
 
