@@ -119,8 +119,10 @@ dwv.App = function(mobile)
     this.init = function()
     {
         // bind open files with method
-        document.getElementById('imagefiles').addEventListener('change', this.onChangeFiles, false);
-        document.getElementById('imageurl').addEventListener('change', this.onChangeURL, false);
+        var fileElement = document.getElementById('imagefiles');
+        if( fileElement ) fileElement.addEventListener('change', this.onChangeFiles, false);
+        var urlElement = document.getElementById('imageurl');
+        if( urlElement ) urlElement.addEventListener('change', this.onChangeURL, false);
     };
     
     /**
@@ -250,7 +252,7 @@ dwv.App = function(mobile)
      */
     this.onChangeURL = function(event)
     {
-        self.loadURL(event.target.value);
+        self.loadURL([event.target.value]);
     };
 
     /**
