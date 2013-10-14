@@ -3,5 +3,9 @@
   "description": "Dicom Web Viewer.",
   "version": "0.5.0beta",
   "launch_path": "/index.m.html",
-  "icons": { "60": "dwv-60.png" }
+  "icons": { 
+    "16": "/resources/dwv-16.png", 
+    "60": "/resources/dwv-60.png",
+    "128": "/resources/dwv-128.png"
+  }
 }
