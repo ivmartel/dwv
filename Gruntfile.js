@@ -13,7 +13,7 @@ module.exports = function(grunt) {
                 separator: ';'
             },
             dist: {
-                src: ['src/**/*.js','!src/html/gui_ui.js','!src/html/gui_mobile.js'],
+                src: ['src/**/*.js','!src/applauncher-s.js','!src/applauncher-m.js'],
                 dest: 'dist/<%= pkg.name %>.js'
             }
         },
