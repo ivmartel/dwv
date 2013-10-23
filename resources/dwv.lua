@@ -105,7 +105,6 @@ print([[
 print([[
 <!-- Local -->
 <script type="text/javascript" src="/dwv/dwv-0.5.0beta.min.js"></script>
-<script type="text/javascript" src="/dwv/gui_ui.js"></script>
 ]])
 
 
