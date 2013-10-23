@@ -20,27 +20,8 @@ body { margin: 10px; padding: 0; }
 <script type="text/javascript" src="ext/flot/jquery.flot.min.js"></script>
 <!-- Local -->
 <script type="text/javascript" src="dwv-0.5.0beta.min.js"></script>
-<script type="text/javascript" src="gui_mobile.js"></script>
-
-<script type="text/javascript">
-
-//check browser support
-dwv.html.browser.check();
-// main application
-var app = new dwv.App(true);
-
-// jquery
-$(document).ready(function(){
-    // initialise the application
-    app.init();
-    // align layers when the window is resized
-    window.onresize = app.resize;
-    // possible load from URL
-    var inputUrls = dwv.html.getUriParam(); 
-    if( inputUrls && inputUrls.length > 0 ) app.loadURL(inputUrls);
-});
-
-</script>
+<!--  Launch the app -->
+<script type="text/javascript" src="applauncher-m.js"></script>
 </head>
 
 <body>
