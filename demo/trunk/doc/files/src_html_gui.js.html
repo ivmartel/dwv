@@ -271,6 +271,97 @@ dwv.gui.onChangeLineColour = function(event)
 };
 
 /**
+ * Append the slider HTML.
+ * @method getSliderHtml
+ * @static
+ */
+dwv.gui.getSliderHtml = function()
+{
+    var min = app.getImage().getDataRange().min;
+    var max = app.getImage().getDataRange().max;
+
+    if( app.isMobile() )
+    {
+        // jquery-mobile range slider
+        var inputMin = document.createElement(&quot;input&quot;);
+        inputMin.setAttribute(&quot;id&quot;, &quot;threshold-min&quot;);
+        inputMin.setAttribute(&quot;max&quot;, max);
+        inputMin.setAttribute(&quot;min&quot;, min);
+        inputMin.setAttribute(&quot;value&quot;, min);
+        inputMin.setAttribute(&quot;type&quot;, &quot;range&quot;);
+
+        var inputMax = document.createElement(&quot;input&quot;);
+        inputMax.setAttribute(&quot;id&quot;, &quot;threshold-max&quot;);
+        inputMax.setAttribute(&quot;max&quot;, max);
+        inputMax.setAttribute(&quot;min&quot;, min);
+        inputMax.setAttribute(&quot;value&quot;, max);
+        inputMax.setAttribute(&quot;type&quot;, &quot;range&quot;);
+        
+        var div = document.createElement(&quot;div&quot;);
+        div.setAttribute(&quot;id&quot;, &quot;threshold-div&quot;);
+        div.setAttribute(&quot;data-role&quot;, &quot;rangeslider&quot;);
+        div.appendChild(inputMin);
+        div.appendChild(inputMax);
+        div.setAttribute(&quot;data-mini&quot;, &quot;true&quot;);
+        document.getElementById(&quot;thresholdLi&quot;).appendChild(div);
+
+        $(&quot;#threshold-div&quot;).bind(&quot;change&quot;,
+            function( event ) {
+                app.getToolBox().getSelectedTool().getSelectedFilter().run(
+                    { &quot;min&quot;:$(&quot;#threshold-min&quot;).val(),
+                      &quot;max&quot;:$(&quot;#threshold-max&quot;).val() } );
+            }
+        );
+    }
+    else
+    {
+        // jquery-ui slider
+        $( &quot;#thresholdLi&quot; ).slider({
+            range: true,
+            min: min,
+            max: max,
+            values: [ min, max ],
+            slide: function( event, ui ) {
+                app.getToolBox().getSelectedTool().getSelectedFilter().run(
+                        {&#x27;min&#x27;:ui.values[0], &#x27;max&#x27;:ui.values[1]});
+            }
+        });
+    }
+};
+
+/**
+ * Update the progress bar.
+ * @method updateProgress
+ * @static
+ * @param {Object} event A ProgressEvent.
+ */
+dwv.gui.updateProgress = function(event)
+{
+    // event is an ProgressEvent.
+    if( event.lengthComputable )
+    {
+        var percent = Math.round((event.loaded / event.total) * 100);
+        if( app.isMobile() )
+        {
+            // jquery-mobile loading
+            if( percent &lt; 100 ) {
+                $.mobile.loading(&quot;show&quot;, {text: percent+&quot;%&quot;, textVisible: true, theme: &quot;b&quot;} );
+            }
+            else if( percent === 100 ) {
+                $.mobile.loading(&quot;hide&quot;);
+            }
+        }
+        else
+        {
+            // jquery-ui progress bar
+            if( percent &lt;= 100 ) {
+                $(&quot;#progressbar&quot;).progressbar({ value: percent });
+            }
+        }
+    }
+};
+
+/**
  * Append the toolbox HTML to the page.
  * @method appendToolboxHtml
  * @static

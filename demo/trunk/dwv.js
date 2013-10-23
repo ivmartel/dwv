@@ -1,98 +1,4 @@
-//check browser support
-dwv.html.browser.check();
-// main application
-var app = new dwv.App(true);
-
-// jquery
-$(document).ready(function(){
-    // button listeners
-    var button = null;
-    // undo
-    button = document.getElementById("undo-btn");
-    if( button ) button.onclick = function() { app.getUndoStack().undo(); };
-    // undo
-    button = document.getElementById("redo-btn");
-    if( button ) button.onclick = function() { app.getUndoStack().redo(); };
-    // info
-    button = document.getElementById("info-btn");
-    if( button ) button.onclick = function() { app.toggleInfoLayerDisplay(); };
-
-    // initialise the application
-    app.init();
-    // align layers when the window is resized
-    window.onresize = app.resize;
-    // possible load from URL
-    var inputUrls = dwv.html.getUriParam(); 
-    if( inputUrls && inputUrls.length > 0 ) app.loadURL(inputUrls);
-});
-;function toggle(dialogId)
-{
-    if( $(dialogId).dialog('isOpen') ) $(dialogId).dialog('close');
-    else $(dialogId).dialog('open');
-}
-
-// check browser support
-dwv.html.browser.check();
-// main application
-var app = new dwv.App();
-
-// jquery
-$(document).ready(function(){
-    // initialise buttons
-    $("button").button();
-    $("#toggleInfoLayer").button({ icons: 
-        { primary: "ui-icon-comment" }, text: false });
-    // create dialogs
-    $("#openData").dialog({ position: 
-        {my: "left top", at: "left top", of: "#pageMain"} });
-    $("#toolbox").dialog({ position: 
-        {my: "left top+200", at: "left top", of: "#pageMain"} });
-    $("#history").dialog({ position: 
-        {my: "left top+370", at: "left top", of: "#pageMain"},
-        autoOpen: false });
-    $("#tags").dialog({ position: 
-        {my: "right top", at: "right top", of: "#pageMain"},
-        autoOpen: false, width: 500, height: 590 });
-    
-    // image dialog
-    $("#layerDialog").dialog({ position: 
-        {my: "left+320 top", at: "left top", of: "#pageMain"}});
-    // default size
-    $("#layerDialog").dialog({ width: "auto", resizable: false });
-    // Resizable but keep aspect ratio
-    // TODO it seems to add a border that bothers getting the cursor position...
-    //$("#layerContainer").resizable({ aspectRatio: true });
-    
-    // button listeners
-    var button = null;
-    // open
-    button = document.getElementById("open-btn");
-    if( button ) button.onclick = function() { toggle("#openData"); };
-    // toolbox
-    button = document.getElementById("toolbox-btn");
-    if( button ) button.onclick = function() { toggle("#toolbox"); };
-    // history
-    button = document.getElementById("history-btn");
-    if( button ) button.onclick = function() { toggle("#history"); };
-    // tags
-    button = document.getElementById("tags-btn");
-    if( button ) button.onclick = function() { toggle("#tags"); };
-    // layerDialog
-    button = document.getElementById("layerDialog-btn");
-    if( button ) button.onclick = function() { toggle("#layerDialog"); };
-    // info
-    button = document.getElementById("info-btn");
-    if( button ) button.onclick = function() { app.toggleInfoLayerDisplay(); };
-    
-    // initialise the application
-    app.init();
-    // align layers when the window is resized
-    window.onresize = app.resize;
-    // possible load from URL
-    var inputUrls = dwv.html.getUriParam(); 
-    if( inputUrls && inputUrls.length > 0 ) app.loadURL(inputUrls);
-});
-;// Main DWV namespace.
+// Main DWV namespace.
 var dwv = dwv || {};
  
 /**
@@ -205,6 +111,13 @@ dwv.App = function(mobile)
      * @return {Object} The undo stack.
      */
     this.getUndoStack = function() { return undoStack; };
+
+    /** 
+     * Get the mobile flag.
+     * @method isMobile
+     * @return {Boolean} The mobile flag.
+     */
+    this.isMobile = function() { return mobile; };
 
     /**
      * Initialise the HTML for the application.
@@ -3361,6 +3274,97 @@ dwv.gui.onChangeShape = function(event)
 dwv.gui.onChangeLineColour = function(event)
 {
     app.getToolBox().getSelectedTool().setLineColour(this.value);
+};
+
+/**
+ * Append the slider HTML.
+ * @method getSliderHtml
+ * @static
+ */
+dwv.gui.getSliderHtml = function()
+{
+    var min = app.getImage().getDataRange().min;
+    var max = app.getImage().getDataRange().max;
+
+    if( app.isMobile() )
+    {
+        // jquery-mobile range slider
+        var inputMin = document.createElement("input");
+        inputMin.setAttribute("id", "threshold-min");
+        inputMin.setAttribute("max", max);
+        inputMin.setAttribute("min", min);
+        inputMin.setAttribute("value", min);
+        inputMin.setAttribute("type", "range");
+
+        var inputMax = document.createElement("input");
+        inputMax.setAttribute("id", "threshold-max");
+        inputMax.setAttribute("max", max);
+        inputMax.setAttribute("min", min);
+        inputMax.setAttribute("value", max);
+        inputMax.setAttribute("type", "range");
+        
+        var div = document.createElement("div");
+        div.setAttribute("id", "threshold-div");
+        div.setAttribute("data-role", "rangeslider");
+        div.appendChild(inputMin);
+        div.appendChild(inputMax);
+        div.setAttribute("data-mini", "true");
+        document.getElementById("thresholdLi").appendChild(div);
+
+        $("#threshold-div").bind("change",
+            function( event ) {
+                app.getToolBox().getSelectedTool().getSelectedFilter().run(
+                    { "min":$("#threshold-min").val(),
+                      "max":$("#threshold-max").val() } );
+            }
+        );
+    }
+    else
+    {
+        // jquery-ui slider
+        $( "#thresholdLi" ).slider({
+            range: true,
+            min: min,
+            max: max,
+            values: [ min, max ],
+            slide: function( event, ui ) {
+                app.getToolBox().getSelectedTool().getSelectedFilter().run(
+                        {'min':ui.values[0], 'max':ui.values[1]});
+            }
+        });
+    }
+};
+
+/**
+ * Update the progress bar.
+ * @method updateProgress
+ * @static
+ * @param {Object} event A ProgressEvent.
+ */
+dwv.gui.updateProgress = function(event)
+{
+    // event is an ProgressEvent.
+    if( event.lengthComputable )
+    {
+        var percent = Math.round((event.loaded / event.total) * 100);
+        if( app.isMobile() )
+        {
+            // jquery-mobile loading
+            if( percent < 100 ) {
+                $.mobile.loading("show", {text: percent+"%", textVisible: true, theme: "b"} );
+            }
+            else if( percent === 100 ) {
+                $.mobile.loading("hide");
+            }
+        }
+        else
+        {
+            // jquery-ui progress bar
+            if( percent <= 100 ) {
+                $("#progressbar").progressbar({ value: percent });
+            }
+        }
+    }
 };
 
 /**
