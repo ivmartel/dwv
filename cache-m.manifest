@@ -1,0 +1,21 @@
+CACHE MANIFEST
+# v1 2013-10-23
+
+CACHE
+
+# html
+index.html
+# css: local
+style.css
+# js: local
+dwv-0.5.0beta.min.js
+applauncher-m.js
+
+# third party
+
+# css
+ext/jquery-mobile/jquery.mobile-1.4.0-beta.1.min.css
+# js
+ext/jquery/jquery-2.0.3.min.js
+ext/jquery-mobile/jquery.mobile-1.4.0-beta.1.min.js
+ext/flot/jquery.flot.min.js
