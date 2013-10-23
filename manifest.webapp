@@ -1,5 +1,5 @@
 {
-  "name": "DWV",
+  "name": "dwv",
   "description": "Dicom Web Viewer.",
   "version": "0.5.0beta",
   "launch_path": "/index.m.html",
