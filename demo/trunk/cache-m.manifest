@@ -1,7 +1,7 @@
 CACHE MANIFEST
 # v1 2013-10-23
 
-CACHE
+CACHE:
 
 # html
 index.html
@@ -15,7 +15,24 @@ applauncher-m.js
 
 # css
 ext/jquery-mobile/jquery.mobile-1.4.0-beta.1.min.css
+ext/jquery-mobile/images/ajax-loader.gif
+ext/jquery-mobile/images/icons-18-black.png
+ext/jquery-mobile/images/icons-18-white.png
+ext/jquery-mobile/images/icons-36-black.png
+ext/jquery-mobile/images/icons-36-white.png
+ext/jquery-mobile/images/icons-svg/plus-white.png
+ext/jquery-mobile/images/icons-svg/forward-white.png
+ext/jquery-mobile/images/icons-svg/back-white.png
+ext/jquery-mobile/images/icons-svg/info-white.png
+ext/jquery-mobile/images/icons-svg/grid-black.png
+ext/jquery-mobile/images/icons-png/plus-white.png
+ext/jquery-mobile/images/icons-png/forward-white.png
+ext/jquery-mobile/images/icons-png/back-white.png
+ext/jquery-mobile/images/icons-png/info-white.png
+ext/jquery-mobile/images/icons-png/grid-black.png
 # js
 ext/jquery/jquery-2.0.3.min.js
+ext/jquery/jquery-2.0.3.min.map
 ext/jquery-mobile/jquery.mobile-1.4.0-beta.1.min.js
+ext/jquery-mobile/jquery.mobile-1.4.0-beta.1.min.map
 ext/flot/jquery.flot.min.js
