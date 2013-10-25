@@ -20,11 +20,11 @@ ext/jquery-mobile/images/icons-18-black.png
 ext/jquery-mobile/images/icons-18-white.png
 ext/jquery-mobile/images/icons-36-black.png
 ext/jquery-mobile/images/icons-36-white.png
-ext/jquery-mobile/images/icons-svg/plus-white.png
-ext/jquery-mobile/images/icons-svg/forward-white.png
-ext/jquery-mobile/images/icons-svg/back-white.png
-ext/jquery-mobile/images/icons-svg/info-white.png
-ext/jquery-mobile/images/icons-svg/grid-black.png
+ext/jquery-mobile/images/icons-svg/plus-white.svg
+ext/jquery-mobile/images/icons-svg/forward-white.svg
+ext/jquery-mobile/images/icons-svg/back-white.svg
+ext/jquery-mobile/images/icons-svg/info-white.svg
+ext/jquery-mobile/images/icons-svg/grid-black.svg
 ext/jquery-mobile/images/icons-png/plus-white.png
 ext/jquery-mobile/images/icons-png/forward-white.png
 ext/jquery-mobile/images/icons-png/back-white.png
