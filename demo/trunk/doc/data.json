@@ -4759,7 +4759,7 @@
         {
             "file": "src/image/view.js",
             "line": 169,
-            "description": "Vew listeners",
+            "description": "View listeners",
             "itemtype": "property",
             "name": "listeners",
             "access": "private",
@@ -4793,7 +4793,7 @@
                 {
                     "name": "list",
                     "description": "The view listeners.",
-                    "type": "Array"
+                    "type": "Object"
                 }
             ],
             "class": "dwv.image.View",
