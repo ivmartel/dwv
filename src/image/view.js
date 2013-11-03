@@ -167,7 +167,7 @@ dwv.image.View = function(image, isSigned)
     };
     
     /**
-     * Vew listeners
+     * View listeners
      * @property listeners
      * @private
      * @type Array
@@ -182,7 +182,7 @@ dwv.image.View = function(image, isSigned)
     /**
      * Set the view listeners.
      * @method setListeners
-     * @param {Array} list The view listeners.
+     * @param {Object} list The view listeners.
      */ 
     this.setListeners = function(list) { listeners = list; };
 };
