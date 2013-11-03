@@ -421,7 +421,7 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
     
     var startedPixelItems = false;
     
-    var tagName;
+    var tagName = "";
     // DICOM data elements
     while( i < buffer.byteLength ) 
     {
