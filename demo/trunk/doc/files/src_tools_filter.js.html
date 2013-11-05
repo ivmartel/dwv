@@ -224,6 +224,19 @@ dwv.tool.Filter = function(app)
 };
 
 /**
+ * Help for this tool.
+ * @method getHelp
+ * @returns {Object} The help content.
+ */
+dwv.tool.Filter.getHelp = function()
+{
+    return {
+        &#x27;title&#x27;: &quot;Filter&quot;,
+        &#x27;brief&#x27;: &quot;This is the help of the Filter tool.&quot;
+    };
+};
+
+/**
  * Enable the filter.
  * @method enable
  * @param {Boolean} bool Flag to enable or not.

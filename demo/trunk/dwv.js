@@ -130,6 +130,8 @@ dwv.App = function(mobile)
         if( fileElement ) fileElement.addEventListener('change', this.onChangeFiles, false);
         var urlElement = document.getElementById('imageurl');
         if( urlElement ) urlElement.addEventListener('change', this.onChangeURL, false);
+        // build help
+        dwv.gui.appendHelpHtml(mobile);
     };
     
     /**
@@ -652,7 +654,6 @@ dwv.App = function(mobile)
         // default position: triggers div display
         dwv.tool.updatePostionValue(0,0);
     }
-    
 };
 ;/** 
  * DICOM module.
@@ -3810,6 +3811,38 @@ dwv.gui.enableInUndoHtml = function(enable)
     }
 };
 
+/**
+ * Build the help HTML.
+ * @method appendHelpHtml
+ * @param {Boolean} mobile Flag for mobile or not environement.
+ */
+dwv.gui.appendHelpHtml = function(mobile)
+{
+    if( mobile ) return;
+    
+    var node = document.getElementById("help");
+    for ( var t in dwv.tool.tools )
+    {
+        //console.log(t);
+        var tool = dwv.tool.tools[t];
+        
+        var title = document.createElement("h2");
+        title.appendChild(document.createTextNode(tool.getHelp().title));
+        node.appendChild(title);
+        var brief = document.createElement("p");
+        brief.appendChild(document.createTextNode(tool.getHelp().brief));
+        node.appendChild(brief);
+        if( tool.getHelp().drag )
+        {
+            var img = document.createElement("img");
+            img.src = "resources/drag.png";
+            node.appendChild(img);
+            var drag = document.createElement("p");
+            drag.appendChild(document.createTextNode(tool.getHelp().drag));
+            node.appendChild(drag);
+        }
+    }
+};
 ;/** 
  * HTML module.
  * @module html
@@ -7801,6 +7834,19 @@ dwv.tool.Draw = function(app)
 }; // Draw class
 
 /**
+ * Help for this tool.
+ * @method getHelp
+ * @returns {Object} The help content.
+ */
+dwv.tool.Draw.getHelp = function()
+{
+    return {
+        'title': "Draw",
+        'brief': "This is the help of the Draw tool."
+    };
+};
+
+/**
  * Set the line color of the drawing.
  * @method setLineColour
  * @param {String} colour The colour to set.
@@ -7885,6 +7931,19 @@ dwv.tool.Filter = function(app)
      * @type String
      */
     this.defaultFilterName = 0;
+};
+
+/**
+ * Help for this tool.
+ * @method getHelp
+ * @returns {Object} The help content.
+ */
+dwv.tool.Filter.getHelp = function()
+{
+    return {
+        'title': "Filter",
+        'brief': "This is the help of the Filter tool."
+    };
 };
 
 /**
@@ -8736,6 +8795,19 @@ dwv.tool.Livewire = function(app)
 }; // Livewire class
 
 /**
+ * Help for this tool.
+ * @method getHelp
+ * @returns {Object} The help content.
+ */
+dwv.tool.Livewire.getHelp = function()
+{
+    return {
+        'title': "Livewire",
+        'brief': "This is the help of the Livewire tool."
+    };
+};
+
+/**
  * Set the line color of the drawing.
  * @method setLineColour
  * @param {String} colour The colour to set.
@@ -9507,6 +9579,20 @@ dwv.tool.WindowLevel = function(app)
 }; // WindowLevel class
 
 /**
+ * Help for this tool.
+ * @method getHelp
+ * @returns {Object} The help content.
+ */
+dwv.tool.WindowLevel.getHelp = function()
+{
+    return {
+        'title': "WindowLevel",
+        'brief': "This is the help of the WindowLevel tool.",
+        'drag': "This action changes the window in the horizontal direction and the level in the vertical one."
+    };
+};
+
+/**
  * Update the window/level presets.
  * @method updatePresets
  */
@@ -9804,6 +9890,19 @@ dwv.tool.Zoom = function(app)
     }
 
 }; // Zoom class
+
+/**
+ * Help for this tool.
+ * @method getHelp
+ * @returns {Object} The help content.
+ */
+dwv.tool.Zoom.getHelp = function()
+{
+    return {
+        'title': "Zoom",
+        'brief': "This is the help of the Zoom tool."
+    };
+};
 
 // Add the tool to the tool list
 dwv.tool.tools = dwv.tool.tools || {};

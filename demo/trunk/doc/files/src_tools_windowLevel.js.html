@@ -463,6 +463,20 @@ dwv.tool.WindowLevel = function(app)
 }; // WindowLevel class
 
 /**
+ * Help for this tool.
+ * @method getHelp
+ * @returns {Object} The help content.
+ */
+dwv.tool.WindowLevel.getHelp = function()
+{
+    return {
+        &#x27;title&#x27;: &quot;WindowLevel&quot;,
+        &#x27;brief&#x27;: &quot;This is the help of the WindowLevel tool.&quot;,
+        &#x27;drag&#x27;: &quot;This action changes the window in the horizontal direction and the level in the vertical one.&quot;
+    };
+};
+
+/**
  * Update the window/level presets.
  * @method updatePresets
  */

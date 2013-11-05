@@ -804,6 +804,38 @@ dwv.gui.enableInUndoHtml = function(enable)
     }
 };
 
+/**
+ * Build the help HTML.
+ * @method appendHelpHtml
+ * @param {Boolean} mobile Flag for mobile or not environement.
+ */
+dwv.gui.appendHelpHtml = function(mobile)
+{
+    if( mobile ) return;
+    
+    var node = document.getElementById(&quot;help&quot;);
+    for ( var t in dwv.tool.tools )
+    {
+        //console.log(t);
+        var tool = dwv.tool.tools[t];
+        
+        var title = document.createElement(&quot;h2&quot;);
+        title.appendChild(document.createTextNode(tool.getHelp().title));
+        node.appendChild(title);
+        var brief = document.createElement(&quot;p&quot;);
+        brief.appendChild(document.createTextNode(tool.getHelp().brief));
+        node.appendChild(brief);
+        if( tool.getHelp().drag )
+        {
+            var img = document.createElement(&quot;img&quot;);
+            img.src = &quot;resources/drag.png&quot;;
+            node.appendChild(img);
+            var drag = document.createElement(&quot;p&quot;);
+            drag.appendChild(document.createTextNode(tool.getHelp().drag));
+            node.appendChild(drag);
+        }
+    }
+};
 
     </pre>
 </div>

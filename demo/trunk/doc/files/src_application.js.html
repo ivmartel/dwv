@@ -322,6 +322,8 @@ dwv.App = function(mobile)
         if( fileElement ) fileElement.addEventListener(&#x27;change&#x27;, this.onChangeFiles, false);
         var urlElement = document.getElementById(&#x27;imageurl&#x27;);
         if( urlElement ) urlElement.addEventListener(&#x27;change&#x27;, this.onChangeURL, false);
+        // build help
+        dwv.gui.appendHelpHtml(mobile);
     };
     
     /**
@@ -844,7 +846,6 @@ dwv.App = function(mobile)
         // default position: triggers div display
         dwv.tool.updatePostionValue(0,0);
     }
-    
 };
 
     </pre>
