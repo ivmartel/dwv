@@ -130,6 +130,8 @@ dwv.App = function(mobile)
         if( fileElement ) fileElement.addEventListener('change', this.onChangeFiles, false);
         var urlElement = document.getElementById('imageurl');
         if( urlElement ) urlElement.addEventListener('change', this.onChangeURL, false);
+        // build help
+        dwv.gui.appendHelpHtml(mobile);
     };
     
     /**
@@ -652,5 +654,4 @@ dwv.App = function(mobile)
         // default position: triggers div display
         dwv.tool.updatePostionValue(0,0);
     }
-    
 };

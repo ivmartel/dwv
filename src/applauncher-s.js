@@ -26,6 +26,9 @@ $(document).ready(function(){
     $("#tags").dialog({ position: 
         {my: "right top", at: "right top", of: "#pageMain"},
         autoOpen: false, width: 500, height: 590 });
+    $("#help").dialog({ position: 
+        {my: "right top", at: "right top", of: "#pageMain"},
+        autoOpen: false, width: 500, height: 590 });
     
     // image dialog
     $("#layerDialog").dialog({ position: 
@@ -56,6 +59,9 @@ $(document).ready(function(){
     // info
     button = document.getElementById("info-btn");
     if( button ) button.onclick = function() { app.toggleInfoLayerDisplay(); };
+    // help
+    button = document.getElementById("help-btn");
+    if( button ) button.onclick = function() { toggle("#help"); };
     
     // initialise the application
     app.init();

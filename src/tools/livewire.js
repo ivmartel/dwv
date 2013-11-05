@@ -289,6 +289,19 @@ dwv.tool.Livewire = function(app)
 }; // Livewire class
 
 /**
+ * Help for this tool.
+ * @method getHelp
+ * @returns {Object} The help content.
+ */
+dwv.tool.Livewire.getHelp = function()
+{
+    return {
+        'title': "Livewire",
+        'brief': "This is the help of the Livewire tool."
+    };
+};
+
+/**
  * Set the line color of the drawing.
  * @method setLineColour
  * @param {String} colour The colour to set.

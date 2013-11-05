@@ -179,6 +179,19 @@ dwv.tool.Draw = function(app)
 }; // Draw class
 
 /**
+ * Help for this tool.
+ * @method getHelp
+ * @returns {Object} The help content.
+ */
+dwv.tool.Draw.getHelp = function()
+{
+    return {
+        'title': "Draw",
+        'brief': "This is the help of the Draw tool."
+    };
+};
+
+/**
  * Set the line color of the drawing.
  * @method setLineColour
  * @param {String} colour The colour to set.

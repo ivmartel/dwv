@@ -234,6 +234,19 @@ dwv.tool.Zoom = function(app)
 
 }; // Zoom class
 
+/**
+ * Help for this tool.
+ * @method getHelp
+ * @returns {Object} The help content.
+ */
+dwv.tool.Zoom.getHelp = function()
+{
+    return {
+        'title': "Zoom",
+        'brief': "This is the help of the Zoom tool."
+    };
+};
+
 // Add the tool to the tool list
 dwv.tool.tools = dwv.tool.tools || {};
 dwv.tool.tools.zoom = dwv.tool.Zoom;
