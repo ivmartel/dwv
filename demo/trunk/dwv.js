@@ -3818,7 +3818,7 @@ dwv.gui.enableInUndoHtml = function(enable)
  */
 dwv.gui.appendHelpHtml = function(mobile)
 {
-    var prefix = "mouse";
+    var actionType = "mouse";
     if( mobile ) return;
     
     var toolHelpDiv = document.createElement("div");
@@ -3838,18 +3838,20 @@ dwv.gui.appendHelpHtml = function(mobile)
         brief.appendChild(document.createTextNode(tool.getHelp().brief));
         docDiv.appendChild(brief);
         // details
-        if( tool.getHelp().actions ) {
-            var keys = Object.keys(tool.getHelp().actions);
+        if( tool.getHelp()[actionType] ) {
+            var keys = Object.keys(tool.getHelp()[actionType]);
             for( var i=0; i<keys.length; ++i )
             {
-                var action = tool.getHelp().actions[keys[i]];
+                var action = tool.getHelp()[actionType][keys[i]];
                 
                 var img = document.createElement("img");
-                img.src = "resources/"+keys[i]+"-"+prefix+".png";
+                img.src = "resources/"+keys[i]+".png";
                 img.style.float = "left";
                 img.style.margin = "0px 15px 15px 0px";
+                
                 var br = document.createElement("br");
                 br.style.clear = "both";
+                
                 var para = document.createElement("p");
                 para.appendChild(img);
                 para.appendChild(document.createTextNode(action));
@@ -7870,7 +7872,13 @@ dwv.tool.Draw.getHelp = function()
 {
     return {
         'title': "Draw",
-        'brief': "This is the help of the Draw tool."
+        'brief': "Allows to draw shapes on the image.",
+        'mouse': {
+            'mouse_drag': "A single mouse drag draws the shape.",
+        },
+        'touch': {
+            'touch_drag': "A single touch drag draws the shape.",
+        }
     };
 };
 
@@ -9615,10 +9623,15 @@ dwv.tool.WindowLevel.getHelp = function()
 {
     return {
         'title': "WindowLevel",
-        'brief': "This is the help of the WindowLevel tool.",
-        'actions': {
-            'drag': "A single drag and move changes the window in the horizontal direction and the level in the vertical one.",
-            'double_click': "A double will"
+        'brief': "Changes the Window and Level of the image.",
+        'mouse': {
+            'mouse_drag': "A single mouse drag changes the window in the horizontal direction and the level in the vertical one.",
+            'double_click': "A double click will center the window and level on the clicked intensity.",
+            'mouse_wheel': "The mouse wheel is used to navigate through slices."
+        },
+        'touch': {
+            'touch_drag': "A single touch drag changes the window in the horizontal direction and the level in the vertical one.",
+            'twotouch_drag': "A double finger drag allows to navigate through slices."
         }
     };
 };

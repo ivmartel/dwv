@@ -811,7 +811,7 @@ dwv.gui.enableInUndoHtml = function(enable)
  */
 dwv.gui.appendHelpHtml = function(mobile)
 {
-    var prefix = &quot;mouse&quot;;
+    var actionType = &quot;mouse&quot;;
     if( mobile ) return;
     
     var toolHelpDiv = document.createElement(&quot;div&quot;);
@@ -831,18 +831,20 @@ dwv.gui.appendHelpHtml = function(mobile)
         brief.appendChild(document.createTextNode(tool.getHelp().brief));
         docDiv.appendChild(brief);
         // details
-        if( tool.getHelp().actions ) {
-            var keys = Object.keys(tool.getHelp().actions);
+        if( tool.getHelp()[actionType] ) {
+            var keys = Object.keys(tool.getHelp()[actionType]);
             for( var i=0; i&lt;keys.length; ++i )
             {
-                var action = tool.getHelp().actions[keys[i]];
+                var action = tool.getHelp()[actionType][keys[i]];
                 
                 var img = document.createElement(&quot;img&quot;);
-                img.src = &quot;resources/&quot;+keys[i]+&quot;-&quot;+prefix+&quot;.png&quot;;
+                img.src = &quot;resources/&quot;+keys[i]+&quot;.png&quot;;
                 img.style.float = &quot;left&quot;;
                 img.style.margin = &quot;0px 15px 15px 0px&quot;;
+                
                 var br = document.createElement(&quot;br&quot;);
                 br.style.clear = &quot;both&quot;;
+                
                 var para = document.createElement(&quot;p&quot;);
                 para.appendChild(img);
                 para.appendChild(document.createTextNode(action));
