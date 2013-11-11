@@ -187,7 +187,13 @@ dwv.tool.Draw.getHelp = function()
 {
     return {
         'title': "Draw",
-        'brief': "This is the help of the Draw tool."
+        'brief': "Allows to draw shapes on the image.",
+        'mouse': {
+            'mouse_drag': "A single mouse drag draws the shape.",
+        },
+        'touch': {
+            'touch_drag': "A single touch drag draws the shape.",
+        }
     };
 };
 

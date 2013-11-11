@@ -279,10 +279,15 @@ dwv.tool.WindowLevel.getHelp = function()
 {
     return {
         'title': "WindowLevel",
-        'brief': "This is the help of the WindowLevel tool.",
-        'actions': {
-            'drag': "A single drag and move changes the window in the horizontal direction and the level in the vertical one.",
-            'double_click': "A double will"
+        'brief': "Changes the Window and Level of the image.",
+        'mouse': {
+            'mouse_drag': "A single mouse drag changes the window in the horizontal direction and the level in the vertical one.",
+            'double_click': "A double click will center the window and level on the clicked intensity.",
+            'mouse_wheel': "The mouse wheel is used to navigate through slices."
+        },
+        'touch': {
+            'touch_drag': "A single touch drag changes the window in the horizontal direction and the level in the vertical one.",
+            'twotouch_drag': "A double finger drag allows to navigate through slices."
         }
     };
 };
