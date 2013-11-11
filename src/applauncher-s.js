@@ -38,7 +38,7 @@ $(document).ready(function(){
     // Resizable but keep aspect ratio
     // TODO it seems to add a border that bothers getting the cursor position...
     //$("#layerContainer").resizable({ aspectRatio: true });
-    
+        
     // button listeners
     var button = null;
     // open
@@ -70,4 +70,8 @@ $(document).ready(function(){
     // possible load from URL
     var inputUrls = dwv.html.getUriParam(); 
     if( inputUrls && inputUrls.length > 0 ) app.loadURL(inputUrls);
+    
+    // help
+    // TODO Seems accordion only works when at end...
+    $("#accordion").accordion({ collapsible: "true", active: "false", heightStyle: "content" });
 });

@@ -280,7 +280,10 @@ dwv.tool.WindowLevel.getHelp = function()
     return {
         'title': "WindowLevel",
         'brief': "This is the help of the WindowLevel tool.",
-        'drag': "This action changes the window in the horizontal direction and the level in the vertical one."
+        'actions': {
+            'drag': "A single drag and move changes the window in the horizontal direction and the level in the vertical one.",
+            'double_click': "A double will"
+        }
     };
 };
 
