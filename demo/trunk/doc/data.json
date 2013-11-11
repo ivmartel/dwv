@@ -7614,7 +7614,7 @@
         },
         {
             "file": "src/tools/windowLevel.js",
-            "line": 287,
+            "line": 290,
             "description": "Update the window/level presets.",
             "itemtype": "method",
             "name": "updatePresets",
@@ -7624,7 +7624,7 @@
         },
         {
             "file": "src/tools/windowLevel.js",
-            "line": 317,
+            "line": 320,
             "description": "Set the active window/level preset.",
             "itemtype": "method",
             "name": "setPreset",
@@ -7641,7 +7641,7 @@
         },
         {
             "file": "src/tools/windowLevel.js",
-            "line": 333,
+            "line": 336,
             "description": "Set the active colour map.",
             "itemtype": "method",
             "name": "setColourMap",
@@ -8539,7 +8539,7 @@
         },
         {
             "message": "replacing incorrect tag: function with method",
-            "line": " src/tools/windowLevel.js:333"
+            "line": " src/tools/windowLevel.js:336"
         },
         {
             "message": "replacing incorrect tag: returns with return",

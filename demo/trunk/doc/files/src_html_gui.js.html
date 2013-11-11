@@ -811,30 +811,58 @@ dwv.gui.enableInUndoHtml = function(enable)
  */
 dwv.gui.appendHelpHtml = function(mobile)
 {
+    var prefix = &quot;mouse&quot;;
     if( mobile ) return;
     
-    var node = document.getElementById(&quot;help&quot;);
+    var toolHelpDiv = document.createElement(&quot;div&quot;);
+    toolHelpDiv.id = &quot;accordion&quot;;
+    
     for ( var t in dwv.tool.tools )
     {
-        //console.log(t);
         var tool = dwv.tool.tools[t];
-        
-        var title = document.createElement(&quot;h2&quot;);
+        // title
+        var title = document.createElement(&quot;h3&quot;);
         title.appendChild(document.createTextNode(tool.getHelp().title));
-        node.appendChild(title);
+        toolHelpDiv.appendChild(title);
+        // doc div
+        var docDiv = document.createElement(&quot;div&quot;);
+        // brief
         var brief = document.createElement(&quot;p&quot;);
         brief.appendChild(document.createTextNode(tool.getHelp().brief));
-        node.appendChild(brief);
-        if( tool.getHelp().drag )
-        {
-            var img = document.createElement(&quot;img&quot;);
-            img.src = &quot;resources/drag.png&quot;;
-            node.appendChild(img);
-            var drag = document.createElement(&quot;p&quot;);
-            drag.appendChild(document.createTextNode(tool.getHelp().drag));
-            node.appendChild(drag);
+        docDiv.appendChild(brief);
+        // details
+        if( tool.getHelp().actions ) {
+            var keys = Object.keys(tool.getHelp().actions);
+            for( var i=0; i&lt;keys.length; ++i )
+            {
+                var action = tool.getHelp().actions[keys[i]];
+                
+                var img = document.createElement(&quot;img&quot;);
+                img.src = &quot;resources/&quot;+keys[i]+&quot;-&quot;+prefix+&quot;.png&quot;;
+                img.style.float = &quot;left&quot;;
+                img.style.margin = &quot;0px 15px 15px 0px&quot;;
+                var br = document.createElement(&quot;br&quot;);
+                br.style.clear = &quot;both&quot;;
+                var para = document.createElement(&quot;p&quot;);
+                para.appendChild(img);
+                para.appendChild(document.createTextNode(action));
+                para.appendChild(br);
+                docDiv.appendChild(para);
+            }
         }
+        toolHelpDiv.appendChild(docDiv);
     }
+    
+    var helpNode = document.getElementById(&quot;help&quot;);
+
+    var headPara = document.createElement(&quot;p&quot;);
+    headPara.appendChild(document.createTextNode(&quot;This is the main doc.&quot;));
+    helpNode.appendChild(headPara);
+    
+    var toolPara = document.createElement(&quot;p&quot;);
+    toolPara.appendChild(document.createTextNode(&quot;These are the tools:&quot;));
+    helpNode.appendChild(toolPara);
+    helpNode.appendChild(toolHelpDiv);
 };
 
     </pre>

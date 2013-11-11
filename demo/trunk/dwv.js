@@ -3818,30 +3818,58 @@ dwv.gui.enableInUndoHtml = function(enable)
  */
 dwv.gui.appendHelpHtml = function(mobile)
 {
+    var prefix = "mouse";
     if( mobile ) return;
     
-    var node = document.getElementById("help");
+    var toolHelpDiv = document.createElement("div");
+    toolHelpDiv.id = "accordion";
+    
     for ( var t in dwv.tool.tools )
     {
-        //console.log(t);
         var tool = dwv.tool.tools[t];
-        
-        var title = document.createElement("h2");
+        // title
+        var title = document.createElement("h3");
         title.appendChild(document.createTextNode(tool.getHelp().title));
-        node.appendChild(title);
+        toolHelpDiv.appendChild(title);
+        // doc div
+        var docDiv = document.createElement("div");
+        // brief
         var brief = document.createElement("p");
         brief.appendChild(document.createTextNode(tool.getHelp().brief));
-        node.appendChild(brief);
-        if( tool.getHelp().drag )
-        {
-            var img = document.createElement("img");
-            img.src = "resources/drag.png";
-            node.appendChild(img);
-            var drag = document.createElement("p");
-            drag.appendChild(document.createTextNode(tool.getHelp().drag));
-            node.appendChild(drag);
+        docDiv.appendChild(brief);
+        // details
+        if( tool.getHelp().actions ) {
+            var keys = Object.keys(tool.getHelp().actions);
+            for( var i=0; i<keys.length; ++i )
+            {
+                var action = tool.getHelp().actions[keys[i]];
+                
+                var img = document.createElement("img");
+                img.src = "resources/"+keys[i]+"-"+prefix+".png";
+                img.style.float = "left";
+                img.style.margin = "0px 15px 15px 0px";
+                var br = document.createElement("br");
+                br.style.clear = "both";
+                var para = document.createElement("p");
+                para.appendChild(img);
+                para.appendChild(document.createTextNode(action));
+                para.appendChild(br);
+                docDiv.appendChild(para);
+            }
         }
+        toolHelpDiv.appendChild(docDiv);
     }
+    
+    var helpNode = document.getElementById("help");
+
+    var headPara = document.createElement("p");
+    headPara.appendChild(document.createTextNode("This is the main doc."));
+    helpNode.appendChild(headPara);
+    
+    var toolPara = document.createElement("p");
+    toolPara.appendChild(document.createTextNode("These are the tools:"));
+    helpNode.appendChild(toolPara);
+    helpNode.appendChild(toolHelpDiv);
 };
 ;/** 
  * HTML module.
@@ -9588,7 +9616,10 @@ dwv.tool.WindowLevel.getHelp = function()
     return {
         'title': "WindowLevel",
         'brief': "This is the help of the WindowLevel tool.",
-        'drag': "This action changes the window in the horizontal direction and the level in the vertical one."
+        'actions': {
+            'drag': "A single drag and move changes the window in the horizontal direction and the level in the vertical one.",
+            'double_click': "A double will"
+        }
     };
 };
 
