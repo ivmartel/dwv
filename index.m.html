@@ -66,6 +66,8 @@ body { margin: 10px; padding: 0; }
 <!-- pageHeader #dwvversion -->
 <div id="pageHeader" data-role="header">
 <h1>DWV v0.5.0beta</h1>
+<a href="#help_page" data-icon="carat-r" class="ui-btn-right"
+  data-transition="slide">Help</a>
 </div><!-- /pageHeader -->
 
 <div id="pageMain" data-role="content" style="padding:2px;">   
@@ -131,7 +133,7 @@ body { margin: 10px; padding: 0; }
 
 <div data-role="header">
 <a href="#main" data-icon="back" 
-data-transition="slide" data-direction="reverse">Back</a>
+  data-transition="slide" data-direction="reverse">Back</a>
 <h1>DICOM Tags</h1>
 </div><!-- /header -->
 
@@ -141,6 +143,22 @@ data-transition="slide" data-direction="reverse">Back</a>
 </div><!-- /content -->
 
 </div><!-- /page tags_page-->
+
+<!-- Help page -->
+<div data-role="page" data-theme="b" id="help_page">
+
+<div data-role="header">
+<a href="#main" data-icon="back" 
+  data-transition="slide" data-direction="reverse">Back</a>
+<h1>DWV Help</h1>
+</div><!-- /header -->
+
+<div data-role="content">   
+<!-- Tags -->
+<div id="help" title="Help"></div>
+</div><!-- /content -->
+
+</div><!-- /page help_page-->
 
 </body>
 </html>
