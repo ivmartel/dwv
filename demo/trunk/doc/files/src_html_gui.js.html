@@ -812,10 +812,9 @@ dwv.gui.enableInUndoHtml = function(enable)
 dwv.gui.appendHelpHtml = function(mobile)
 {
     var actionType = &quot;mouse&quot;;
-    if( mobile ) return;
+    if( mobile ) actionType = &quot;touch&quot;;
     
     var toolHelpDiv = document.createElement(&quot;div&quot;);
-    toolHelpDiv.id = &quot;accordion&quot;;
     
     for ( var t in dwv.tool.tools )
     {
@@ -823,7 +822,6 @@ dwv.gui.appendHelpHtml = function(mobile)
         // title
         var title = document.createElement(&quot;h3&quot;);
         title.appendChild(document.createTextNode(tool.getHelp().title));
-        toolHelpDiv.appendChild(title);
         // doc div
         var docDiv = document.createElement(&quot;div&quot;);
         // brief
@@ -852,7 +850,22 @@ dwv.gui.appendHelpHtml = function(mobile)
                 docDiv.appendChild(para);
             }
         }
-        toolHelpDiv.appendChild(docDiv);
+        
+        // different div structure for mobile or static
+        if( mobile )
+        {
+            var toolDiv = document.createElement(&quot;div&quot;);
+            toolDiv.setAttribute(&quot;data-role&quot;, &quot;collapsible&quot;);
+            toolDiv.appendChild(title);
+            toolDiv.appendChild(docDiv);
+            toolHelpDiv.appendChild(toolDiv);
+        }
+        else
+        {
+            toolHelpDiv.id = &quot;accordion&quot;;
+            toolHelpDiv.appendChild(title);
+            toolHelpDiv.appendChild(docDiv);
+        }
     }
     
     var helpNode = document.getElementById(&quot;help&quot;);
