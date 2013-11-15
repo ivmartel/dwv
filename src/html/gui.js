@@ -35,6 +35,17 @@ dwv.gui.onChangeColourMap = function(event)
 };
 
 /**
+ * Handle loader change.
+ * @method onChangeLoader
+ * @static
+ * @param {Object} event The change event.
+ */
+dwv.gui.onChangeLoader = function(event)
+{
+    app.setSelectedLoader(this.value);
+};
+
+/**
  * Handle tool change.
  * @method onChangeTool
  * @static
@@ -167,6 +178,31 @@ dwv.gui.updateProgress = function(event)
             }
         }
     }
+};
+
+/**
+ * Append the loader HTML to the page.
+ * @method appendToolboxHtml
+ * @static
+ */
+dwv.gui.appendLoaderHtml = function()
+{
+    // select
+    var loaderSelector = dwv.html.createHtmlSelect("loaderSelect",dwv.io.loaders);
+    loaderSelector.onchange = dwv.gui.onChangeLoader;
+    // loader div
+    var loaderDiv = document.createElement("div");
+    loaderDiv.id = "loaderDiv";
+    loaderDiv.appendChild(loaderSelector);
+    
+    // node
+    var node = document.getElementById("loaders");
+    // clear it
+    while(node.hasChildNodes()) node.removeChild(node.firstChild);
+    // append
+    node.appendChild(loaderDiv);
+    // trigger create event (mobile)
+    $("#loaderDiv").trigger("create");
 };
 
 /**
