@@ -42,7 +42,36 @@ dwv.gui.onChangeColourMap = function(event)
  */
 dwv.gui.onChangeLoader = function(event)
 {
-    app.setSelectedLoader(this.value);
+    if( this.value === "file") {
+        dwv.gui.clearUrlLoadHtml();
+        dwv.gui.appendFileLoadHtml();
+    }
+    else if( this.value === "url") {
+        dwv.gui.clearFileLoadHtml();
+        dwv.gui.appendUrlLoadHtml();
+    }
+};
+
+/**
+ * Handle files change.
+ * @method onChangeFiles
+ * @static
+ * @param {Object} event The change event.
+ */
+dwv.gui.onChangeFiles = function(event)
+{
+    app.onChangeFiles(event);
+};
+
+/**
+ * Handle URL change.
+ * @method onChangeURL
+ * @static
+ * @param {Object} event The change event.
+ */
+dwv.gui.onChangeURL = function(event)
+{
+    app.onChangeURL(event);
 };
 
 /**
@@ -181,28 +210,104 @@ dwv.gui.updateProgress = function(event)
 };
 
 /**
- * Append the loader HTML to the page.
- * @method appendToolboxHtml
+ * Append the loadbox HTML to the page.
+ * @method appendLoadboxHtml
  * @static
  */
-dwv.gui.appendLoaderHtml = function()
+dwv.gui.appendLoadboxHtml = function()
 {
     // select
     var loaderSelector = dwv.html.createHtmlSelect("loaderSelect",dwv.io.loaders);
     loaderSelector.onchange = dwv.gui.onChangeLoader;
-    // loader div
-    var loaderDiv = document.createElement("div");
-    loaderDiv.id = "loaderDiv";
-    loaderDiv.appendChild(loaderSelector);
     
     // node
-    var node = document.getElementById("loaders");
+    var node = document.getElementById("loaderlist");
     // clear it
     while(node.hasChildNodes()) node.removeChild(node.firstChild);
     // append
-    node.appendChild(loaderDiv);
+    node.appendChild(loaderSelector);
     // trigger create event (mobile)
-    $("#loaderDiv").trigger("create");
+    $("#loaderlist").trigger("create");
+    
+    // default load
+    dwv.gui.appendFileLoadHtml();
+};
+
+/**
+ * Append the file load HTML to the page.
+ * @method appendFileLoadHtml
+ * @static
+ */
+dwv.gui.appendFileLoadHtml = function()
+{
+    // input
+    var fileLoadInput = document.createElement("input");
+    fileLoadInput.onchange = dwv.gui.onChangeFiles;
+    fileLoadInput.type = "file";
+    fileLoadInput.multiple = true;
+    fileLoadInput.id = "imagefiles";
+    fileLoadInput.setAttribute("data-clear-btn","true");
+    fileLoadInput.setAttribute("data-mini","true");
+
+    // associated div
+    var fileLoadDiv = document.createElement("div");
+    fileLoadDiv.id = "imagefilesdiv";
+    fileLoadDiv.appendChild(fileLoadInput);
+    
+    // node
+    var node = document.getElementById("loaderlist");
+    // append
+    node.appendChild(fileLoadDiv);
+    // trigger create event (mobile)
+    $("#loaderlist").trigger("create");
+};
+
+/**
+ * Clear the file load HTML.
+ * @method clearUrlLoadHtml
+ * @static
+ */
+dwv.gui.clearFileLoadHtml = function()
+{
+    dwv.html.removeNode("imagefilesdiv");
+};
+
+/**
+ * Append the url load HTML to the page.
+ * @method appendUrlLoadHtml
+ * @static
+ */
+dwv.gui.appendUrlLoadHtml = function()
+{
+    // input
+    var urlLoadInput = document.createElement("input");
+    urlLoadInput.onchange = dwv.gui.onChangeURL;
+    urlLoadInput.type = "url";
+    urlLoadInput.id = "imageurl";
+    urlLoadInput.setAttribute("data-clear-btn","true");
+    urlLoadInput.setAttribute("data-mini","true");
+
+    // associated div
+    var urlLoadDiv = document.createElement("div");
+    urlLoadDiv.id = "imageurldiv";
+    urlLoadDiv.appendChild(urlLoadInput);
+
+    // node
+    var node = document.getElementById("loaderlist");
+    // append
+    node.appendChild(urlLoadDiv);
+    // trigger create event (mobile)
+    $("#loaderlist").trigger("create");
+};
+
+/**
+ * Clear the url load HTML.
+ * @method clearUrlLoadHtml
+ * @static
+ */
+dwv.gui.clearUrlLoadHtml = function()
+{
+    dwv.html.removeNode("imageurldiv");
 };
 
 /**
