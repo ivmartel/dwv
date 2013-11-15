@@ -36,12 +36,13 @@ body { background-color: #222; color: white;
 
 <!-- Toolbar -->
 <div id="toolbar">
-<button onclick="toggle('#openData')">File</button>
-<button onclick="toggle('#toolbox')">Toolbox</button>
-<button onclick="toggle('#history')">History</button>
-<button onclick="toggle('#tags')">Tags</button>
-<button onclick="toggle('#layerDialog')">Image</button>
-<button onclick="app.toggleInfoLayerDisplay()">Info</button>
+<button id="open-btn">File</button>
+<button id="toolbox-btn">Toolbox</button>
+<button id="history-btn">History</button>
+<button id="tags-btn">Tags</button>
+<button id="layerDialog-btn">Image</button>
+<button id="info-btn">Info</button>
+<button id="help-btn">Help</button>
 </div><!-- /toolbar -->
 
 </div><!-- /pageHeader -->
@@ -50,10 +51,8 @@ body { background-color: #222; color: white;
 
 <!-- Open file -->
 <div id="openData" title="File">
-<form><p>
 Path: <input type="file" id="imagefiles" multiple />
 URL: <input type="url" id="imageurl" />
-</p></form>
 <div id="progressbar"></div>
 </div>
 
@@ -66,7 +65,10 @@ URL: <input type="url" id="imageurl" />
 <div id="history" title="History"></div>
 
 <!-- Tags -->
-<div id="tags" title="Tags" style="display:none;"></div>
+<div id="tags" title="Tags"></div>
+
+<!-- Help -->
+<div id="help" title="Help"></div>
 
 <!-- Layer Container -->
 <div id="layerDialog" title="Image">

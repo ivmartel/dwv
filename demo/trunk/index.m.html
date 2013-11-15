@@ -38,6 +38,8 @@ body { margin: 10px; padding: 0; }
 <!-- pageHeader #dwvversion -->
 <div id="pageHeader" data-role="header">
 <h1>DWV v0.5.0beta</h1>
+<a href="#help_page" data-icon="carat-r" class="ui-btn-right"
+  data-transition="slide">Help</a>
 </div><!-- /pageHeader -->
 
 <div id="pageMain" data-role="content" style="padding:2px;">   
@@ -48,18 +50,19 @@ body { margin: 10px; padding: 0; }
  data-rel="popup" data-position-to="window">Open</a>
 
 <a href="#" class="ui-btn ui-btn-inline ui-btn-icon-notext ui-mini ui-icon-back"
-  onclick="app.getUndoStack().undo()">Undo</a>
+  id="undo-btn">Undo</a>
 <a href="#" class="ui-btn ui-btn-inline ui-btn-icon-notext ui-mini ui-icon-forward"
-  onclick="app.getUndoStack().redo()">Redo</a>
+  id="redo-btn">Redo</a>
 <a href="#" class="ui-btn ui-btn-inline ui-btn-icon-notext ui-mini ui-icon-info"
-  onclick="app.toggleInfoLayerDisplay()">Info</a>
+  id="info-btn">Info</a>
 <a href="#tags_page" class="ui-btn ui-btn-inline ui-btn-icon-notext ui-mini ui-icon-grid">Tags</a>
 
 </p></div><!-- /toolbar -->
 
 <!-- Open popup -->
 <div data-role="popup" id="popupOpen">
-<form>
+<a href="#" data-rel="back" data-role="button" 
+  data-theme="a" data-icon="delete" data-iconpos="notext" class="ui-btn-right">Close</a> 
 <div style="padding:10px 20px;">
 <h3>Open</h3>
 <label for="imagefiles">Path:</label>
@@ -67,7 +70,6 @@ body { margin: 10px; padding: 0; }
 <label for="imageurl">URL:</label>
 <input id="imageurl" type="url" data-clear-btn="true" data-mini="true"/>
 </div>
-</form>
 </div>
  
 
@@ -103,7 +105,7 @@ body { margin: 10px; padding: 0; }
 
 <div data-role="header">
 <a href="#main" data-icon="back" 
-data-transition="slide" data-direction="reverse">Back</a>
+  data-transition="slide" data-direction="reverse">Back</a>
 <h1>DICOM Tags</h1>
 </div><!-- /header -->
 
@@ -113,6 +115,22 @@ data-transition="slide" data-direction="reverse">Back</a>
 </div><!-- /content -->
 
 </div><!-- /page tags_page-->
+
+<!-- Help page -->
+<div data-role="page" data-theme="b" id="help_page">
+
+<div data-role="header">
+<a href="#main" data-icon="back" 
+  data-transition="slide" data-direction="reverse">Back</a>
+<h1>DWV Help</h1>
+</div><!-- /header -->
+
+<div data-role="content">   
+<!-- Tags -->
+<div id="help" title="Help"></div>
+</div><!-- /content -->
+
+</div><!-- /page help_page-->
 
 </body>
 </html>
