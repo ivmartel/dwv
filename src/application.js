@@ -131,6 +131,7 @@ dwv.App = function(mobile)
         var urlElement = document.getElementById('imageurl');
         if( urlElement ) urlElement.addEventListener('change', this.onChangeURL, false);
         // build help
+        dwv.gui.appendLoaderHtml();
         dwv.gui.appendHelpHtml(mobile);
     };
     
@@ -182,78 +183,18 @@ dwv.App = function(mobile)
      */
     this.loadFiles = function(files) 
     {
-        // Image loader
-        var onLoadImage = function(event){
-            try {
-                // parse image file
-                var data = dwv.image.getDataFromImage(this);
-                if( image ) image.appendSlice( data.view.getImage() );
-                // prepare display
-                postLoadInit(data);
-            } catch(error) {
-                handleError(error);
-                return;
-            }
-        };
-        
-        // Image reader loader
-        var onLoadImageReader = function(event){
-            var theImage = new Image();
-            theImage.src = event.target.result;
-            // storing values to pass them on
-            theImage.file = this.file;
-            theImage.index = this.index;
-            theImage.onload = onLoadImage;
-        };
-        // Image reader error handler
-        var onErrorImageReader = function(event){
-            alert("An error occurred while reading the image file: "+event.getMessage());
-        };
-        
-        // DICOM reader loader
-        var onLoadDicomReader = function(event){
-            try {
-                // parse DICOM file
-                var data = dwv.image.getDataFromDicomBuffer(event.target.result);
-                if( image ) image.appendSlice( data.view.getImage() );
-                // prepare display
-                postLoadInit(data);
-            } catch(error) {
-                handleError(error);
-                return;
-            }
-        };
-        // DICOM reader error handler
-        var onErrorDicomReader = function(event){
-            alert("An error occurred while reading the DICOM file: "+event.getMessage());
-        };
-        
-        // main load loop
+        // clear variables
         this.reset();
-        for (var i = 0; i < files.length; ++i)
-        {
-            var file = files[i];
-            var reader = new FileReader();
-            if( file.type.match("image.*") )
-            {
-                // storing values to pass them on
-                reader.file = file;
-                reader.index = i;
-                reader.onload = onLoadImageReader;
-                reader.onprogress = dwv.gui.updateProgress;
-                reader.onerror = onErrorImageReader;
-                reader.readAsDataURL(file);
-            }
-            else
-            {
-                reader.onload = onLoadDicomReader;
-                reader.onprogress = dwv.gui.updateProgress;
-                reader.onerror = onErrorDicomReader;
-                reader.readAsArrayBuffer(file);
-            }
-        }
+        // create IO
+        var fileIO = new dwv.io.File();
+        fileIO.onload = function(data){
+            if( image ) image.appendSlice( data.view.getImage() );
+            postLoadInit(data);
+        };
+        // main load (asynchronous)
+        fileIO.load(files);
     };
-        
+    
     /**
      * Handle change url event.
      * @method onChangeURL
@@ -271,75 +212,16 @@ dwv.App = function(mobile)
      */
     this.loadURL = function(urls) 
     {
-        // Image loader
-        var onLoadImage = function(event){
-            try {
-                // parse image data
-                var data = dwv.image.getDataFromImage(this);
-                if( image ) image.appendSlice( data.view.getImage() );
-                // prepare display
-                postLoadInit(data);
-            } catch(error) {
-                handleError(error);
-                return;
-            }
-        };
-        
-        // Request handler
-        var onLoadRequest = function(event) {
-            var view = new DataView(this.response);
-            var isJpeg = view.getUint32(0) === 0xffd8ffe0;
-            var isPng = view.getUint32(0) === 0x89504e47;
-            var isGif = view.getUint32(0) === 0x47494638;
-            if( isJpeg || isPng || isGif ) {
-                // image data
-                var theImage = new Image();
-
-                var bytes = new Uint8Array(this.response);
-                var binary = '';
-                for (var i = 0; i < bytes.byteLength; ++i) {
-                    binary += String.fromCharCode(bytes[i]);
-                }
-                var imgStr = "unknown";
-                if (isJpeg) imgStr = "jpeg";
-                else if (isPng) imgStr = "png";
-                else if (isGif) imgStr = "gif";
-                theImage.src = "data:image/" + imgStr + ";base64," + window.btoa(binary);
-                
-                theImage.onload = onLoadImage;
-            }
-            else {
-                try {
-                    // parse DICOM
-                    var data = dwv.image.getDataFromDicomBuffer(this.response);
-                    if( image ) image.appendSlice( data.view.getImage() );
-                    // prepare display
-                    postLoadInit(data);
-                } catch(error) {
-                    handleError(error);
-                    return;
-                }
-            }
-        };
-        // Request error handler
-        var onErrorRequest = function(event){
-            alert("An error occurred while retrieving the file: (http) "+this.status);
-        };
-        
-        // main load loop
+        // clear variables
         this.reset();
-        for (var i = 0; i < urls.length; ++i)
-        {
-            var url = urls[i];
-            var request = new XMLHttpRequest();
-            // TODO Verify URL...
-            request.open('GET', url, true);
-            request.responseType = "arraybuffer"; 
-            request.onload = onLoadRequest;
-            request.onerror = onErrorRequest;
-            request.onprogress = dwv.gui.updateProgress;
-            request.send(null);
-        }
+        // create IO
+        var urlIO = new dwv.io.Url();
+        urlIO.onload = function(data){
+            if( image ) image.appendSlice( data.view.getImage() );
+            postLoadInit(data);
+        };
+        // main load (asynchronous)
+        urlIO.load(urls);
     };
     
     /**
