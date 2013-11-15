@@ -79,6 +79,10 @@
             
                 <li><a href="../classes/dwv.info.html">dwv.info</a></li>
             
+                <li><a href="../classes/dwv.io.File.html">dwv.io.File</a></li>
+            
+                <li><a href="../classes/dwv.io.Url.html">dwv.io.Url</a></li>
+            
                 <li><a href="../classes/dwv.math.BucketQueue.html">dwv.math.BucketQueue</a></li>
             
                 <li><a href="../classes/dwv.math.Circle.html">dwv.math.Circle</a></li>
@@ -144,6 +148,8 @@
                 <li><a href="../modules/image.html">image</a></li>
             
                 <li><a href="../modules/info.html">info</a></li>
+            
+                <li><a href="../modules/io.html">io</a></li>
             
                 <li><a href="../modules/math.html">math</a></li>
             
@@ -224,6 +230,17 @@ dwv.gui.onChangeWindowLevelPreset = function(event)
 dwv.gui.onChangeColourMap = function(event)
 {
     app.getToolBox().getSelectedTool().setColourMap(this.value);
+};
+
+/**
+ * Handle loader change.
+ * @method onChangeLoader
+ * @static
+ * @param {Object} event The change event.
+ */
+dwv.gui.onChangeLoader = function(event)
+{
+    app.setSelectedLoader(this.value);
 };
 
 /**
@@ -359,6 +376,31 @@ dwv.gui.updateProgress = function(event)
             }
         }
     }
+};
+
+/**
+ * Append the loader HTML to the page.
+ * @method appendToolboxHtml
+ * @static
+ */
+dwv.gui.appendLoaderHtml = function()
+{
+    // select
+    var loaderSelector = dwv.html.createHtmlSelect(&quot;loaderSelect&quot;,dwv.io.loaders);
+    loaderSelector.onchange = dwv.gui.onChangeLoader;
+    // loader div
+    var loaderDiv = document.createElement(&quot;div&quot;);
+    loaderDiv.id = &quot;loaderDiv&quot;;
+    loaderDiv.appendChild(loaderSelector);
+    
+    // node
+    var node = document.getElementById(&quot;loaders&quot;);
+    // clear it
+    while(node.hasChildNodes()) node.removeChild(node.firstChild);
+    // append
+    node.appendChild(loaderDiv);
+    // trigger create event (mobile)
+    $(&quot;#loaderDiv&quot;).trigger(&quot;create&quot;);
 };
 
 /**

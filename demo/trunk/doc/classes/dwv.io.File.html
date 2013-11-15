@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>dwv.image.lut.Rescale - dwv</title>
+    <title>dwv.io.File - dwv</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
     <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
@@ -192,7 +192,7 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-                        <h1>dwv.image.lut.Rescale Class</h1>
+                        <h1>dwv.io.File Class</h1>
 <div class="box meta">
     
 
@@ -200,13 +200,13 @@
 
     
         <div class="foundat">
-            Defined in: <a href="../files/src_image_luts.js.html#l9"><code>src&#x2F;image&#x2F;luts.js:9</code></a>
+            Defined in: <a href="../files/src_io_file.js.html#l30"><code>src&#x2F;io&#x2F;file.js:30</code></a>
         </div>
     
 
     
         
-            Module: <a href="../modules/image.html">image</a>
+            Module: <a href="../modules/io.html">io</a>
         
     
 
@@ -216,34 +216,18 @@
 
 
 <div class="box intro">
-    <p>Rescale LUT class.</p>
+    <p>File loader.</p>
 
 </div>
 
 
     <div class="constructor">
         <h2>Constructor</h2>
-        <div id="method_dwv.image.lut.Rescale" class="method item">
-    <h3 class="name"><code>dwv.image.lut.Rescale</code></h3>
+        <div id="method_dwv.io.File" class="method item">
+    <h3 class="name"><code>dwv.io.File</code></h3>
 
     
-        <div class="args">
-            <span class="paren">(</span><ul class="args-list inline commas">
-            
-                <li class="arg">
-                    
-                        <code>slope_</code>
-                    
-                </li>
-            
-                <li class="arg">
-                    
-                        <code>intercept_</code>
-                    
-                </li>
-            
-            </ul><span class="paren">)</span>
-        </div>
+        <span class="paren">()</span>
     
 
     
@@ -271,7 +255,7 @@
             
         
         
-        <a href="../files/src_image_luts.js.html#l9"><code>src&#x2F;image&#x2F;luts.js:9</code></a>
+        <a href="../files/src_io_file.js.html#l30"><code>src&#x2F;io&#x2F;file.js:30</code></a>
         
         </p>
 
@@ -285,46 +269,6 @@
         
     </div>
 
-    
-        <div class="params">
-            <h4>Parameters:</h4>
-
-            <ul class="params-list">
-            
-                <li class="param">
-                    
-                        <code class="param-name">slope_</code>
-                        <span class="type">Number</span>
-                    
-
-                    
-
-                    <div class="param-description">
-                        <p>The rescale slope.</p>
-
-                    </div>
-
-                    
-                </li>
-            
-                <li class="param">
-                    
-                        <code class="param-name">intercept_</code>
-                        <span class="type">Number</span>
-                    
-
-                    
-
-                    <div class="param-description">
-                        <p>The rescale intercept.</p>
-
-                    </div>
-
-                    
-                </li>
-            
-            </ul>
-        </div>
     
 
     
@@ -343,8 +287,6 @@
             <li class="api-class-tab methods"><a href="#methods">Methods</a></li>
         
         
-            <li class="api-class-tab properties"><a href="#properties">Properties</a></li>
-        
         
         
     </ul>
@@ -360,36 +302,26 @@
                     <ul class="index-list methods">
                         
                             <li class="index-item method">
-                                <a href="#method_getIntercept">getIntercept</a>
+                                <a href="#method_load">load</a>
 
                                 
                                 
                             </li>
                         
                             <li class="index-item method">
-                                <a href="#method_getLength">getLength</a>
+                                <a href="#method_onErrorImageReader">onErrorImageReader</a>
 
+                                
+                                    <span class="flag static">static</span>
                                 
                                 
                             </li>
                         
                             <li class="index-item method">
-                                <a href="#method_getSlope">getSlope</a>
+                                <a href="#method_onErrorImageReader">onErrorImageReader</a>
 
                                 
-                                
-                            </li>
-                        
-                            <li class="index-item method">
-                                <a href="#method_getValue">getValue</a>
-
-                                
-                                
-                            </li>
-                        
-                            <li class="index-item method">
-                                <a href="#method_initialise">initialise</a>
-
+                                    <span class="flag static">static</span>
                                 
                                 
                             </li>
@@ -398,21 +330,6 @@
                 </div>
             
 
-            
-                <div class="index-section properties">
-                    <h3>Properties</h3>
-
-                    <ul class="index-list properties">
-                        
-                            <li class="index-item property private">
-                                <a href="#property_rescaleLut_">rescaleLut_</a>
-
-                                
-                                
-                            </li>
-                        
-                    </ul>
-                </div>
             
 
             
@@ -425,300 +342,8 @@
                 <h2 class="off-left">Methods</h2>
 
                 
-                    <div id="method_getIntercept" class="method item">
-    <h3 class="name"><code>getIntercept</code></h3>
-
-    
-        <span class="paren">()</span>
-    
-
-    
-        <span class="returns-inline">
-            <span class="type">Number</span>
-        </span>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/src_image_luts.js.html#l38"><code>src&#x2F;image&#x2F;luts.js:38</code></a>
-        
-        </p>
-
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        <p>Get the rescale intercept.</p>
-
-    </div>
-
-    
-
-    
-        <div class="returns">
-            <h4>Returns:</h4>
-
-            <div class="returns-description">
-                
-                    
-                        <span class="type">Number</span>:
-                    
-                    <p>The rescale intercept.</p>
-
-                
-            </div>
-        </div>
-    
-
-    
-</div>
-
-                
-                    <div id="method_getLength" class="method item">
-    <h3 class="name"><code>getLength</code></h3>
-
-    
-        <span class="paren">()</span>
-    
-
-    
-        <span class="returns-inline">
-            <span class="type">Number</span>
-        </span>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/src_image_luts.js.html#l59"><code>src&#x2F;image&#x2F;luts.js:59</code></a>
-        
-        </p>
-
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        <p>Get the length of the LUT array.</p>
-
-    </div>
-
-    
-
-    
-        <div class="returns">
-            <h4>Returns:</h4>
-
-            <div class="returns-description">
-                
-                    
-                        <span class="type">Number</span>:
-                    
-                    <p>The length of the LUT array.</p>
-
-                
-            </div>
-        </div>
-    
-
-    
-</div>
-
-                
-                    <div id="method_getSlope" class="method item">
-    <h3 class="name"><code>getSlope</code></h3>
-
-    
-        <span class="paren">()</span>
-    
-
-    
-        <span class="returns-inline">
-            <span class="type">Number</span>
-        </span>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/src_image_luts.js.html#l32"><code>src&#x2F;image&#x2F;luts.js:32</code></a>
-        
-        </p>
-
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        <p>Get the rescale slope.</p>
-
-    </div>
-
-    
-
-    
-        <div class="returns">
-            <h4>Returns:</h4>
-
-            <div class="returns-description">
-                
-                    
-                        <span class="type">Number</span>:
-                    
-                    <p>The rescale slope.</p>
-
-                
-            </div>
-        </div>
-    
-
-    
-</div>
-
-                
-                    <div id="method_getValue" class="method item">
-    <h3 class="name"><code>getValue</code></h3>
-
-    
-        <span class="paren">()</span>
-    
-
-    
-        <span class="returns-inline">
-            <span class="type">Number</span>
-        </span>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/src_image_luts.js.html#l66"><code>src&#x2F;image&#x2F;luts.js:66</code></a>
-        
-        </p>
-
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        <p>Get the value of the LUT at the given offset.</p>
-
-    </div>
-
-    
-
-    
-        <div class="returns">
-            <h4>Returns:</h4>
-
-            <div class="returns-description">
-                
-                    
-                        <span class="type">Number</span>:
-                    
-                    <p>The value of the LUT at the given offset.</p>
-
-                
-            </div>
-        </div>
-    
-
-    
-</div>
-
-                
-                    <div id="method_initialise" class="method item">
-    <h3 class="name"><code>initialise</code></h3>
+                    <div id="method_load" class="method item">
+    <h3 class="name"><code>load</code></h3>
 
     
         <div class="args">
@@ -726,7 +351,7 @@
             
                 <li class="arg">
                     
-                        <code>bitsStored</code>
+                        <code>ioArray</code>
                     
                 </li>
             
@@ -759,7 +384,7 @@
             
         
         
-        <a href="../files/src_image_luts.js.html#l45"><code>src&#x2F;image&#x2F;luts.js:45</code></a>
+        <a href="../files/src_io_file.js.html#l41"><code>src&#x2F;io&#x2F;file.js:41</code></a>
         
         </p>
 
@@ -770,7 +395,7 @@
     </div>
 
     <div class="description">
-        <p>Initialise the LUT.</p>
+        <p>Load a list of files.</p>
 
     </div>
 
@@ -782,14 +407,196 @@
             
                 <li class="param">
                     
-                        <code class="param-name">bitsStored</code>
-                        <span class="type">Number</span>
+                        <code class="param-name">ioArray</code>
+                        <span class="type">Array</span>
                     
 
                     
 
                     <div class="param-description">
-                        <p>The number of bits used to store the data.</p>
+                        <p>The list of files to load.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_onErrorImageReader" class="method item">
+    <h3 class="name"><code>onErrorImageReader</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>event</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <span class="flag static">static</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_io_file.js.html#l8"><code>src&#x2F;io&#x2F;file.js:8</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Image reader error handler.</p>
+
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">event</code>
+                        <span class="type">Object</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>An error event.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_onErrorImageReader" class="method item">
+    <h3 class="name"><code>onErrorImageReader</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>event</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <span class="flag static">static</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_io_file.js.html#l19"><code>src&#x2F;io&#x2F;file.js:19</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>DICOM reader error handler.</p>
+
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">event</code>
+                        <span class="type">Object</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>An error event.</p>
 
                     </div>
 
@@ -809,59 +616,6 @@
             </div>
         
 
-        
-            <div id="properties" class="api-class-tabpanel">
-                <h2 class="off-left">Properties</h2>
-
-                
-                    <div id="property_rescaleLut_" class="property item private">
-    <h3 class="name"><code>rescaleLut_</code></h3>
-    <span class="type">Array</span>
-
-    
-
-    
-        <span class="flag private">private</span>
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/src_image_luts.js.html#l19"><code>src&#x2F;image&#x2F;luts.js:19</code></a>
-        
-        </p>
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        <p>The internal array.</p>
-
-    </div>
-
-    
-
-    
-
-    
-</div>
-
-                
-            </div>
         
 
         

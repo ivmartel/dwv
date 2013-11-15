@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>tool - dwv</title>
+    <title>src/io/file.js - dwv</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
     <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
@@ -192,140 +192,120 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-                        <h1>tool Module</h1>
-<div class="box clearfix meta">
-    
+                        <h1 class="file-heading">File: src/io/file.js</h1>
 
-    
+<div class="file">
+    <pre class="code prettyprint linenums">
+/** 
+ * I/O module.
+ * @module io
+ */
+var dwv = dwv || {};
+dwv.io = dwv.io || {};
 
-    
-        <div class="foundat">
-            Defined in: <a href="../files/src_tools_zoom.js.html#l27"><code>src&#x2F;tools&#x2F;zoom.js:27</code></a>
-        </div>
-    
+/**
+ * Image reader error handler.
+ * @method onErrorImageReader
+ * @static
+ * @param {Object} event An error event.
+ */
+dwv.io.onErrorImageReader = function(event)
+{
+    alert(&quot;An error occurred while reading the image file: &quot;+event.getMessage());
+};
 
-    
-</div>
+/**
+ * DICOM reader error handler.
+ * @method onErrorImageReader
+ * @static
+ * @param {Object} event An error event.
+ */
+dwv.io.onErrorDicomReader = function(event)
+{
+    alert(&quot;An error occurred while reading the DICOM file: &quot;+event.getMessage());
+};
+
+/**
+ * File loader.
+ * @class File
+ * @namespace dwv.io
+ * @constructor
+ */
+dwv.io.File = function()
+{
+    this.onload = null;
+};
+
+/**
+ * Load a list of files.
+ * @method load
+ * @param {Array} ioArray The list of files to load.
+ */
+dwv.io.File.prototype.load = function(ioArray) 
+{
+    // create closure to the onload method
+    var onload = this.onload;
+
+    // DICOM reader loader
+    var onLoadDicomReader = function(event)
+    {
+        // parse DICOM file
+        var tmpdata = dwv.image.getDataFromDicomBuffer(event.target.result);
+        // call listener
+        onload(tmpdata);
+    };
+
+    // Image loader
+    var onLoadImageFile = function(event)
+    {
+        // parse image file
+        var tmpdata = dwv.image.getDataFromImage(this);
+        // call listener
+        onload(tmpdata);
+    };
+
+    // Image reader loader
+    var onLoadImageReader = function(event)
+    {
+        var theImage = new Image();
+        theImage.src = event.target.result;
+        // storing values to pass them on
+        theImage.file = this.file;
+        theImage.index = this.index;
+        theImage.onload = onLoadImageFile;
+    };
+
+    // loop on I/O elements
+    for (var i = 0; i &lt; ioArray.length; ++i)
+    {
+        var file = ioArray[i];
+        var reader = new FileReader();
+        if( file.type.match(&quot;image.*&quot;) )
+        {
+            // storing values to pass them on
+            reader.file = file;
+            reader.index = i;
+            reader.onload = onLoadImageReader;
+            reader.onprogress = dwv.gui.updateProgress;
+            reader.onerror = dwv.io.onErrorImageReader;
+            reader.readAsDataURL(file);
+        }
+        else
+        {
+            reader.onload = onLoadDicomReader;
+            reader.onprogress = dwv.gui.updateProgress;
+            reader.onerror = dwv.io.onErrorDicomReader;
+            reader.readAsArrayBuffer(file);
+        }
+    }
+};
+
+//Add the loader to the loader list
+dwv.io.loaders = dwv.io.loaders || {};
+dwv.io.loaders.file = dwv.io.File;
 
 
-
-<div class="box intro">
-    <p>Tool module.</p>
-
-</div>
-
-
-
-<div class="yui3-g">
-    <div class="yui3-u-1-2">
-        
-            <p>This module provides the following classes:</p>
-
-            <ul class="module-classes">
-            
-                <li class="module-class">
-                    <a href="../classes/dwv.tool.html">
-                        dwv.tool
-                    </a>
-                </li>
-            
-                <li class="module-class">
-                    <a href="../classes/dwv.tool.Draw.html">
-                        dwv.tool.Draw
-                    </a>
-                </li>
-            
-                <li class="module-class">
-                    <a href="../classes/dwv.tool.DrawCircleCommand.html">
-                        dwv.tool.DrawCircleCommand
-                    </a>
-                </li>
-            
-                <li class="module-class">
-                    <a href="../classes/dwv.tool.DrawLineCommand.html">
-                        dwv.tool.DrawLineCommand
-                    </a>
-                </li>
-            
-                <li class="module-class">
-                    <a href="../classes/dwv.tool.DrawLivewireCommand.html">
-                        dwv.tool.DrawLivewireCommand
-                    </a>
-                </li>
-            
-                <li class="module-class">
-                    <a href="../classes/dwv.tool.DrawRectangleCommand.html">
-                        dwv.tool.DrawRectangleCommand
-                    </a>
-                </li>
-            
-                <li class="module-class">
-                    <a href="../classes/dwv.tool.DrawRoiCommand.html">
-                        dwv.tool.DrawRoiCommand
-                    </a>
-                </li>
-            
-                <li class="module-class">
-                    <a href="../classes/dwv.tool.Filter.html">
-                        dwv.tool.Filter
-                    </a>
-                </li>
-            
-                <li class="module-class">
-                    <a href="../classes/dwv.tool.filter.Sharpen.html">
-                        dwv.tool.filter.Sharpen
-                    </a>
-                </li>
-            
-                <li class="module-class">
-                    <a href="../classes/dwv.tool.filter.Threshold.html">
-                        dwv.tool.filter.Threshold
-                    </a>
-                </li>
-            
-                <li class="module-class">
-                    <a href="../classes/dwv.tool.Livewire.html">
-                        dwv.tool.Livewire
-                    </a>
-                </li>
-            
-                <li class="module-class">
-                    <a href="../classes/dwv.tool.RunFilterCommand.html">
-                        dwv.tool.RunFilterCommand
-                    </a>
-                </li>
-            
-                <li class="module-class">
-                    <a href="../classes/dwv.tool.ToolBox.html">
-                        dwv.tool.ToolBox
-                    </a>
-                </li>
-            
-                <li class="module-class">
-                    <a href="../classes/dwv.tool.UndoStack.html">
-                        dwv.tool.UndoStack
-                    </a>
-                </li>
-            
-                <li class="module-class">
-                    <a href="../classes/dwv.tool.WindowLevel.html">
-                        dwv.tool.WindowLevel
-                    </a>
-                </li>
-            
-                <li class="module-class">
-                    <a href="../classes/dwv.tool.Zoom.html">
-                        dwv.tool.Zoom
-                    </a>
-                </li>
-            
-            </ul>
-        
-    </div>
-
-    <div class="yui3-u-1-2">
-        
-    </div>
+    </pre>
 </div>
 
                     </div>
