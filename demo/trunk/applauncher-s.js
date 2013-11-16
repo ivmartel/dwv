@@ -26,6 +26,9 @@ $(document).ready(function(){
     $("#tags").dialog({ position: 
         {my: "right top", at: "right top", of: "#pageMain"},
         autoOpen: false, width: 500, height: 590 });
+    $("#help").dialog({ position: 
+        {my: "right top", at: "right top", of: "#pageMain"},
+        autoOpen: false, width: 500, height: 590 });
     
     // image dialog
     $("#layerDialog").dialog({ position: 
@@ -35,7 +38,7 @@ $(document).ready(function(){
     // Resizable but keep aspect ratio
     // TODO it seems to add a border that bothers getting the cursor position...
     //$("#layerContainer").resizable({ aspectRatio: true });
-    
+        
     // button listeners
     var button = null;
     // open
@@ -56,6 +59,9 @@ $(document).ready(function(){
     // info
     button = document.getElementById("info-btn");
     if( button ) button.onclick = function() { app.toggleInfoLayerDisplay(); };
+    // help
+    button = document.getElementById("help-btn");
+    if( button ) button.onclick = function() { toggle("#help"); };
     
     // initialise the application
     app.init();
@@ -64,4 +70,8 @@ $(document).ready(function(){
     // possible load from URL
     var inputUrls = dwv.html.getUriParam(); 
     if( inputUrls && inputUrls.length > 0 ) app.loadURL(inputUrls);
+    
+    // help
+    // TODO Seems accordion only works when at end...
+    $("#accordion").accordion({ collapsible: "true", active: "false", heightStyle: "content" });
 });
