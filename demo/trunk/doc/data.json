@@ -2071,7 +2071,43 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 48,
+            "line": 55,
+            "description": "Handle files change.",
+            "itemtype": "method",
+            "name": "onChangeFiles",
+            "static": 1,
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The change event.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.gui",
+            "module": "gui",
+            "namespace": "dwv.gui"
+        },
+        {
+            "file": "src/html/gui.js",
+            "line": 66,
+            "description": "Handle URL change.",
+            "itemtype": "method",
+            "name": "onChangeURL",
+            "static": 1,
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The change event.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.gui",
+            "module": "gui",
+            "namespace": "dwv.gui"
+        },
+        {
+            "file": "src/html/gui.js",
+            "line": 77,
             "description": "Handle tool change.",
             "itemtype": "method",
             "name": "onChangeTool",
@@ -2089,7 +2125,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 59,
+            "line": 88,
             "description": "Handle filter change.",
             "itemtype": "method",
             "name": "onChangeFilter",
@@ -2107,7 +2143,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 70,
+            "line": 99,
             "description": "Handle shape change.",
             "itemtype": "method",
             "name": "onChangeShape",
@@ -2125,7 +2161,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 81,
+            "line": 110,
             "description": "Handle line color change.",
             "itemtype": "method",
             "name": "onChangeLineColour",
@@ -2143,7 +2179,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 92,
+            "line": 121,
             "description": "Append the slider HTML.",
             "itemtype": "method",
             "name": "getSliderHtml",
@@ -2154,7 +2190,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 151,
+            "line": 180,
             "description": "Update the progress bar.",
             "itemtype": "method",
             "name": "updateProgress",
@@ -2172,10 +2208,10 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 183,
-            "description": "Append the loader HTML to the page.",
+            "line": 212,
+            "description": "Append the loadbox HTML to the page.",
             "itemtype": "method",
-            "name": "appendToolboxHtml",
+            "name": "appendLoadboxHtml",
             "static": 1,
             "class": "dwv.gui",
             "module": "gui",
@@ -2183,7 +2219,51 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 208,
+            "line": 236,
+            "description": "Append the file load HTML to the page.",
+            "itemtype": "method",
+            "name": "appendFileLoadHtml",
+            "static": 1,
+            "class": "dwv.gui",
+            "module": "gui",
+            "namespace": "dwv.gui"
+        },
+        {
+            "file": "src/html/gui.js",
+            "line": 265,
+            "description": "Clear the file load HTML.",
+            "itemtype": "method",
+            "name": "clearUrlLoadHtml",
+            "static": 1,
+            "class": "dwv.gui",
+            "module": "gui",
+            "namespace": "dwv.gui"
+        },
+        {
+            "file": "src/html/gui.js",
+            "line": 275,
+            "description": "Append the url load HTML to the page.",
+            "itemtype": "method",
+            "name": "appendUrlLoadHtml",
+            "static": 1,
+            "class": "dwv.gui",
+            "module": "gui",
+            "namespace": "dwv.gui"
+        },
+        {
+            "file": "src/html/gui.js",
+            "line": 303,
+            "description": "Clear the url load HTML.",
+            "itemtype": "method",
+            "name": "clearUrlLoadHtml",
+            "static": 1,
+            "class": "dwv.gui",
+            "module": "gui",
+            "namespace": "dwv.gui"
+        },
+        {
+            "file": "src/html/gui.js",
+            "line": 313,
             "description": "Append the toolbox HTML to the page.",
             "itemtype": "method",
             "name": "appendToolboxHtml",
@@ -2194,7 +2274,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 239,
+            "line": 344,
             "description": "Append the window/level HTML to the page.",
             "itemtype": "method",
             "name": "appendWindowLevelHtml",
@@ -2205,7 +2285,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 287,
+            "line": 392,
             "description": "Clear the window/level HTML.",
             "itemtype": "method",
             "name": "clearWindowLevelHtml",
@@ -2216,7 +2296,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 298,
+            "line": 403,
             "description": "Append the draw HTML to the page.",
             "itemtype": "method",
             "name": "appendDrawHtml",
@@ -2227,7 +2307,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 343,
+            "line": 448,
             "description": "Clear the draw HTML.",
             "itemtype": "method",
             "name": "clearDrawHtml",
@@ -2238,7 +2318,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 354,
+            "line": 459,
             "description": "Append the color chooser HTML to the page.",
             "itemtype": "method",
             "name": "appendLivewireHtml",
@@ -2249,7 +2329,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 382,
+            "line": 487,
             "description": "Clear the color chooser HTML.",
             "itemtype": "method",
             "name": "clearDrawHtml",
@@ -2260,7 +2340,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 392,
+            "line": 497,
             "description": "Append the filter HTML to the page.",
             "itemtype": "method",
             "name": "appendLivewireHtml",
@@ -2271,7 +2351,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 420,
+            "line": 525,
             "description": "Clear the filter HTML.",
             "itemtype": "method",
             "name": "clearDrawHtml",
@@ -2282,7 +2362,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 433,
+            "line": 538,
             "description": "Append the threshold filter HTML to the page.",
             "itemtype": "method",
             "name": "appendThresholdHtml",
@@ -2293,7 +2373,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 453,
+            "line": 558,
             "description": "Clear the treshold filter HTML.",
             "itemtype": "method",
             "name": "clearDrawHtml",
@@ -2304,7 +2384,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 463,
+            "line": 568,
             "description": "Append the sharpen filter HTML to the page.",
             "itemtype": "method",
             "name": "appendSharpenHtml",
@@ -2315,7 +2395,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 488,
+            "line": 593,
             "description": "Clear the sharpen filter HTML.",
             "itemtype": "method",
             "name": "clearSharpenHtml",
@@ -2326,7 +2406,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 498,
+            "line": 603,
             "description": "Append the sobel filter HTML to the page.",
             "itemtype": "method",
             "name": "appendSharpenHtml",
@@ -2337,7 +2417,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 523,
+            "line": 628,
             "description": "Clear the sobel filter HTML.",
             "itemtype": "method",
             "name": "clearSharpenHtml",
@@ -2348,7 +2428,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 533,
+            "line": 638,
             "description": "Append the zoom HTML to the page.",
             "itemtype": "method",
             "name": "appendZoomHtml",
@@ -2359,7 +2439,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 560,
+            "line": 665,
             "description": "Clear the zoom filter HTML.",
             "itemtype": "method",
             "name": "clearZoomHtml",
@@ -2370,7 +2450,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 570,
+            "line": 675,
             "description": "Append the undo HTML to the page.",
             "itemtype": "method",
             "name": "appendUndoHtml",
@@ -2381,7 +2461,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 595,
+            "line": 700,
             "description": "Add a command to the undo HTML.",
             "itemtype": "method",
             "name": "addCommandToUndoHtml",
@@ -2399,7 +2479,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 622,
+            "line": 727,
             "description": "Enable the last command of the undo HTML.",
             "itemtype": "method",
             "name": "enableInUndoHtml",
@@ -2417,7 +2497,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 651,
+            "line": 756,
             "description": "Build the help HTML.",
             "itemtype": "method",
             "name": "appendHelpHtml",
@@ -8368,7 +8448,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 138,
+            "line": 134,
             "description": "Reset the application.",
             "itemtype": "method",
             "name": "reset",
@@ -8378,7 +8458,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 149,
+            "line": 145,
             "description": "Handle key down event.\n- CRTL-Z: undo\n- CRTL-Y: redo\nDefault behavior. Usually used in tools.",
             "itemtype": "method",
             "name": "handleKeyDown",
@@ -8395,7 +8475,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 169,
+            "line": 165,
             "description": "Handle change files event.",
             "itemtype": "method",
             "name": "onChangeFiles",
@@ -8412,7 +8492,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 179,
+            "line": 175,
             "description": "Load a list of files.",
             "itemtype": "method",
             "name": "loadFiles",
@@ -8429,7 +8509,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 198,
+            "line": 194,
             "description": "Handle change url event.",
             "itemtype": "method",
             "name": "onChangeURL",
@@ -8446,7 +8526,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 208,
+            "line": 204,
             "description": "Load a list of URLs.",
             "itemtype": "method",
             "name": "loadURL",
@@ -8463,7 +8543,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 227,
+            "line": 223,
             "description": "Generate the image data and draw it.",
             "itemtype": "method",
             "name": "generateAndDrawImage",
@@ -8473,7 +8553,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 241,
+            "line": 237,
             "description": "Resize the display window. To be called once the image is loaded.",
             "itemtype": "method",
             "name": "resize",
@@ -8483,7 +8563,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 263,
+            "line": 259,
             "description": "Set the layers zoom. To be called once the image is loaded.",
             "itemtype": "method",
             "name": "setLayersZoom",
@@ -8515,7 +8595,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 277,
+            "line": 273,
             "description": "Toggle the display of the info layer.",
             "itemtype": "method",
             "name": "toggleInfoLayerDisplay",
@@ -8525,7 +8605,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 298,
+            "line": 294,
             "description": "Add image listeners.",
             "itemtype": "method",
             "name": "addImageInfoListeners",
@@ -8537,7 +8617,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 312,
+            "line": 308,
             "description": "Remove image listeners.",
             "itemtype": "method",
             "name": "removeImageInfoListeners",
@@ -8549,7 +8629,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 326,
+            "line": 322,
             "description": "General-purpose event handler. This function just determines the mouse \nposition relative to the canvas element. It then passes it to the current tool.",
             "itemtype": "method",
             "name": "eventHandler",
@@ -8568,7 +8648,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 403,
+            "line": 399,
             "description": "Handle an error: display it to the user.",
             "itemtype": "method",
             "name": "handleError",
@@ -8587,7 +8667,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 416,
+            "line": 412,
             "description": "Create the application layers.",
             "itemtype": "method",
             "name": "createLayers",
@@ -8611,7 +8691,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 443,
+            "line": 439,
             "description": "Create the DICOM tags table. To be called once the DICOM has been parsed.",
             "itemtype": "method",
             "name": "createTagsTable",
@@ -8630,7 +8710,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 471,
+            "line": 467,
             "description": "Post load application initialisation. To be called once the DICOM has been parsed.",
             "itemtype": "method",
             "name": "postLoadInit",

@@ -323,13 +323,9 @@ dwv.App = function(mobile)
      */
     this.init = function()
     {
-        // bind open files with method
-        var fileElement = document.getElementById(&#x27;imagefiles&#x27;);
-        if( fileElement ) fileElement.addEventListener(&#x27;change&#x27;, this.onChangeFiles, false);
-        var urlElement = document.getElementById(&#x27;imageurl&#x27;);
-        if( urlElement ) urlElement.addEventListener(&#x27;change&#x27;, this.onChangeURL, false);
-        // build help
-        dwv.gui.appendLoaderHtml();
+        // append loader HTML
+        dwv.gui.appendLoadboxHtml();
+        // append help HTML
         dwv.gui.appendHelpHtml(mobile);
     };
     

@@ -240,7 +240,36 @@ dwv.gui.onChangeColourMap = function(event)
  */
 dwv.gui.onChangeLoader = function(event)
 {
-    app.setSelectedLoader(this.value);
+    if( this.value === &quot;file&quot;) {
+        dwv.gui.clearUrlLoadHtml();
+        dwv.gui.appendFileLoadHtml();
+    }
+    else if( this.value === &quot;url&quot;) {
+        dwv.gui.clearFileLoadHtml();
+        dwv.gui.appendUrlLoadHtml();
+    }
+};
+
+/**
+ * Handle files change.
+ * @method onChangeFiles
+ * @static
+ * @param {Object} event The change event.
+ */
+dwv.gui.onChangeFiles = function(event)
+{
+    app.onChangeFiles(event);
+};
+
+/**
+ * Handle URL change.
+ * @method onChangeURL
+ * @static
+ * @param {Object} event The change event.
+ */
+dwv.gui.onChangeURL = function(event)
+{
+    app.onChangeURL(event);
 };
 
 /**
@@ -379,28 +408,104 @@ dwv.gui.updateProgress = function(event)
 };
 
 /**
- * Append the loader HTML to the page.
- * @method appendToolboxHtml
+ * Append the loadbox HTML to the page.
+ * @method appendLoadboxHtml
  * @static
  */
-dwv.gui.appendLoaderHtml = function()
+dwv.gui.appendLoadboxHtml = function()
 {
     // select
     var loaderSelector = dwv.html.createHtmlSelect(&quot;loaderSelect&quot;,dwv.io.loaders);
     loaderSelector.onchange = dwv.gui.onChangeLoader;
-    // loader div
-    var loaderDiv = document.createElement(&quot;div&quot;);
-    loaderDiv.id = &quot;loaderDiv&quot;;
-    loaderDiv.appendChild(loaderSelector);
     
     // node
-    var node = document.getElementById(&quot;loaders&quot;);
+    var node = document.getElementById(&quot;loaderlist&quot;);
     // clear it
     while(node.hasChildNodes()) node.removeChild(node.firstChild);
     // append
-    node.appendChild(loaderDiv);
+    node.appendChild(loaderSelector);
     // trigger create event (mobile)
-    $(&quot;#loaderDiv&quot;).trigger(&quot;create&quot;);
+    $(&quot;#loaderlist&quot;).trigger(&quot;create&quot;);
+    
+    // default load
+    dwv.gui.appendFileLoadHtml();
+};
+
+/**
+ * Append the file load HTML to the page.
+ * @method appendFileLoadHtml
+ * @static
+ */
+dwv.gui.appendFileLoadHtml = function()
+{
+    // input
+    var fileLoadInput = document.createElement(&quot;input&quot;);
+    fileLoadInput.onchange = dwv.gui.onChangeFiles;
+    fileLoadInput.type = &quot;file&quot;;
+    fileLoadInput.multiple = true;
+    fileLoadInput.id = &quot;imagefiles&quot;;
+    fileLoadInput.setAttribute(&quot;data-clear-btn&quot;,&quot;true&quot;);
+    fileLoadInput.setAttribute(&quot;data-mini&quot;,&quot;true&quot;);
+
+    // associated div
+    var fileLoadDiv = document.createElement(&quot;div&quot;);
+    fileLoadDiv.id = &quot;imagefilesdiv&quot;;
+    fileLoadDiv.appendChild(fileLoadInput);
+    
+    // node
+    var node = document.getElementById(&quot;loaderlist&quot;);
+    // append
+    node.appendChild(fileLoadDiv);
+    // trigger create event (mobile)
+    $(&quot;#loaderlist&quot;).trigger(&quot;create&quot;);
+};
+
+/**
+ * Clear the file load HTML.
+ * @method clearUrlLoadHtml
+ * @static
+ */
+dwv.gui.clearFileLoadHtml = function()
+{
+    dwv.html.removeNode(&quot;imagefilesdiv&quot;);
+};
+
+/**
+ * Append the url load HTML to the page.
+ * @method appendUrlLoadHtml
+ * @static
+ */
+dwv.gui.appendUrlLoadHtml = function()
+{
+    // input
+    var urlLoadInput = document.createElement(&quot;input&quot;);
+    urlLoadInput.onchange = dwv.gui.onChangeURL;
+    urlLoadInput.type = &quot;url&quot;;
+    urlLoadInput.id = &quot;imageurl&quot;;
+    urlLoadInput.setAttribute(&quot;data-clear-btn&quot;,&quot;true&quot;);
+    urlLoadInput.setAttribute(&quot;data-mini&quot;,&quot;true&quot;);
+
+    // associated div
+    var urlLoadDiv = document.createElement(&quot;div&quot;);
+    urlLoadDiv.id = &quot;imageurldiv&quot;;
+    urlLoadDiv.appendChild(urlLoadInput);
+
+    // node
+    var node = document.getElementById(&quot;loaderlist&quot;);
+    // append
+    node.appendChild(urlLoadDiv);
+    // trigger create event (mobile)
+    $(&quot;#loaderlist&quot;).trigger(&quot;create&quot;);
+};
+
+/**
+ * Clear the url load HTML.
+ * @method clearUrlLoadHtml
+ * @static
+ */
+dwv.gui.clearUrlLoadHtml = function()
+{
+    dwv.html.removeNode(&quot;imageurldiv&quot;);
 };
 
 /**
