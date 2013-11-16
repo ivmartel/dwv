@@ -10,6 +10,10 @@ style.css
 # js: local
 dwv-0.5.0beta.min.js
 applauncher-s.js
+# images
+resources/double_click.png
+resources/mouse_drag.png
+resources/mouse_wheel.png
 
 # third party
 
