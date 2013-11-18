@@ -1,8 +1,10 @@
 CACHE MANIFEST
-# v1 2013-11-18
+# v1 2013-11-16
 
 CACHE:
 
+# html
+index.html
 # css: local
 style.css
 # js: local
