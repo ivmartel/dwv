@@ -39,3 +39,6 @@ ext/jquery/jquery-2.0.3.min.js
 ext/jquery/jquery-2.0.3.min.map
 ext/jquery-ui/jquery-ui-1.10.3.min.js
 ext/flot/jquery.flot.min.js
+
+NETWORK:
+*
