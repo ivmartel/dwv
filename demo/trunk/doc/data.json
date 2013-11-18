@@ -468,7 +468,7 @@
             },
             "tag": "module",
             "file": "src/io/url.js",
-            "line": 19,
+            "line": 8,
             "description": "I/O module."
         },
         "math": {
@@ -936,7 +936,7 @@
             "module": "io",
             "namespace": "dwv.io",
             "file": "src/io/file.js",
-            "line": 30,
+            "line": 8,
             "description": "File loader.",
             "is_constructor": 1
         },
@@ -951,7 +951,7 @@
             "module": "io",
             "namespace": "dwv.io",
             "file": "src/io/url.js",
-            "line": 19,
+            "line": 8,
             "description": "Url loader.",
             "is_constructor": 1
         },
@@ -5155,41 +5155,7 @@
         },
         {
             "file": "src/io/file.js",
-            "line": 8,
-            "description": "Image reader error handler.",
-            "itemtype": "method",
-            "name": "onErrorImageReader",
-            "static": 1,
-            "params": [
-                {
-                    "name": "event",
-                    "description": "An error event.",
-                    "type": "Object"
-                }
-            ],
-            "class": "dwv.io.File",
-            "module": "io"
-        },
-        {
-            "file": "src/io/file.js",
-            "line": 19,
-            "description": "DICOM reader error handler.",
-            "itemtype": "method",
-            "name": "onErrorImageReader",
-            "static": 1,
-            "params": [
-                {
-                    "name": "event",
-                    "description": "An error event.",
-                    "type": "Object"
-                }
-            ],
-            "class": "dwv.io.File",
-            "module": "io"
-        },
-        {
-            "file": "src/io/file.js",
-            "line": 41,
+            "line": 20,
             "description": "Load a list of files.",
             "itemtype": "method",
             "name": "load",
@@ -5206,24 +5172,7 @@
         },
         {
             "file": "src/io/url.js",
-            "line": 8,
-            "description": "Request error handler.",
-            "itemtype": "method",
-            "name": "onErrorRequest",
-            "static": 1,
-            "params": [
-                {
-                    "name": "event",
-                    "description": "An error event.",
-                    "type": "Object"
-                }
-            ],
-            "class": "dwv.io.Url",
-            "module": "io"
-        },
-        {
-            "file": "src/io/url.js",
-            "line": 30,
+            "line": 20,
             "description": "Load a list of URLs.",
             "itemtype": "method",
             "name": "load",
@@ -8509,7 +8458,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 194,
+            "line": 195,
             "description": "Handle change url event.",
             "itemtype": "method",
             "name": "onChangeURL",
@@ -8526,7 +8475,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 204,
+            "line": 205,
             "description": "Load a list of URLs.",
             "itemtype": "method",
             "name": "loadURL",
@@ -8543,7 +8492,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 223,
+            "line": 225,
             "description": "Generate the image data and draw it.",
             "itemtype": "method",
             "name": "generateAndDrawImage",
@@ -8553,7 +8502,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 237,
+            "line": 239,
             "description": "Resize the display window. To be called once the image is loaded.",
             "itemtype": "method",
             "name": "resize",
@@ -8563,7 +8512,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 259,
+            "line": 261,
             "description": "Set the layers zoom. To be called once the image is loaded.",
             "itemtype": "method",
             "name": "setLayersZoom",
@@ -8595,7 +8544,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 273,
+            "line": 275,
             "description": "Toggle the display of the info layer.",
             "itemtype": "method",
             "name": "toggleInfoLayerDisplay",
@@ -8605,7 +8554,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 294,
+            "line": 296,
             "description": "Add image listeners.",
             "itemtype": "method",
             "name": "addImageInfoListeners",
@@ -8617,7 +8566,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 308,
+            "line": 310,
             "description": "Remove image listeners.",
             "itemtype": "method",
             "name": "removeImageInfoListeners",
@@ -8629,7 +8578,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 322,
+            "line": 324,
             "description": "General-purpose event handler. This function just determines the mouse \nposition relative to the canvas element. It then passes it to the current tool.",
             "itemtype": "method",
             "name": "eventHandler",
@@ -8648,7 +8597,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 399,
+            "line": 401,
             "description": "Handle an error: display it to the user.",
             "itemtype": "method",
             "name": "handleError",
@@ -8667,7 +8616,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 412,
+            "line": 414,
             "description": "Create the application layers.",
             "itemtype": "method",
             "name": "createLayers",
@@ -8691,7 +8640,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 439,
+            "line": 441,
             "description": "Create the DICOM tags table. To be called once the DICOM has been parsed.",
             "itemtype": "method",
             "name": "createTagsTable",
@@ -8710,7 +8659,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 467,
+            "line": 469,
             "description": "Post load application initialisation. To be called once the DICOM has been parsed.",
             "itemtype": "method",
             "name": "postLoadInit",
