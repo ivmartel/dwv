@@ -40,3 +40,6 @@ ext/jquery/jquery-2.0.3.min.map
 ext/jquery-mobile/jquery.mobile-1.4.0-beta.1.min.js
 ext/jquery-mobile/jquery.mobile-1.4.0-beta.1.min.map
 ext/flot/jquery.flot.min.js
+
+NETWORK:
+*
