@@ -187,6 +187,7 @@ dwv.App = function(mobile)
             if( image ) image.appendSlice( data.view.getImage() );
             postLoadInit(data);
         };
+        fileIO.onerror = function(error){ handleError(error); };
         // main load (asynchronous)
         fileIO.load(files);
     };
@@ -216,6 +217,7 @@ dwv.App = function(mobile)
             if( image ) image.appendSlice( data.view.getImage() );
             postLoadInit(data);
         };
+        urlIO.onerror = function(error){ handleError(error); };
         // main load (asynchronous)
         urlIO.load(urls);
     };

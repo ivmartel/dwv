@@ -6,28 +6,6 @@ var dwv = dwv || {};
 dwv.io = dwv.io || {};
 
 /**
- * Image reader error handler.
- * @method onErrorImageReader
- * @static
- * @param {Object} event An error event.
- */
-dwv.io.onErrorImageReader = function(event)
-{
-    alert("An error occurred while reading the image file: "+event.getMessage());
-};
-
-/**
- * DICOM reader error handler.
- * @method onErrorImageReader
- * @static
- * @param {Object} event An error event.
- */
-dwv.io.onErrorDicomReader = function(event)
-{
-    alert("An error occurred while reading the DICOM file: "+event.getMessage());
-};
-
-/**
  * File loader.
  * @class File
  * @namespace dwv.io
@@ -36,6 +14,7 @@ dwv.io.onErrorDicomReader = function(event)
 dwv.io.File = function()
 {
     this.onload = null;
+    this.onerror = null;
 };
 
 /**
@@ -47,23 +26,47 @@ dwv.io.File.prototype.load = function(ioArray)
 {
     // create closure to the onload method
     var onload = this.onload;
+    var onerror = this.onerror;
+
+    // Request error
+    var onErrorImageReader = function(event)
+    {
+        onerror( {'name': "RequestError", 
+            'message': "An error occurred while reading the image file: "+event.getMessage() } );
+    };
+
+
+    // Request error
+    var onErrorDicomReader = function(event)
+    {
+        onerror( {'name': "RequestError", 
+            'message': "An error occurred while reading the DICOM file: "+event.getMessage() } );
+    };
 
     // DICOM reader loader
     var onLoadDicomReader = function(event)
     {
         // parse DICOM file
-        var tmpdata = dwv.image.getDataFromDicomBuffer(event.target.result);
-        // call listener
-        onload(tmpdata);
+        try {
+            var tmpdata = dwv.image.getDataFromDicomBuffer(event.target.result);
+            // call listener
+            onload(tmpdata);
+        } catch(error) {
+            onerror(error);
+        }
     };
 
     // Image loader
     var onLoadImageFile = function(event)
     {
         // parse image file
-        var tmpdata = dwv.image.getDataFromImage(this);
-        // call listener
-        onload(tmpdata);
+        try {
+            var tmpdata = dwv.image.getDataFromImage(this);
+            // call listener
+            onload(tmpdata);
+        } catch(error) {
+            onerror(error);
+        }
     };
 
     // Image reader loader
@@ -89,14 +92,14 @@ dwv.io.File.prototype.load = function(ioArray)
             reader.index = i;
             reader.onload = onLoadImageReader;
             reader.onprogress = dwv.gui.updateProgress;
-            reader.onerror = dwv.io.onErrorImageReader;
+            reader.onerror = onErrorImageReader;
             reader.readAsDataURL(file);
         }
         else
         {
             reader.onload = onLoadDicomReader;
             reader.onprogress = dwv.gui.updateProgress;
-            reader.onerror = dwv.io.onErrorDicomReader;
+            reader.onerror = onErrorDicomReader;
             reader.readAsArrayBuffer(file);
         }
     }

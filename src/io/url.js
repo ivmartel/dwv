@@ -6,17 +6,6 @@ var dwv = dwv || {};
 dwv.io = dwv.io || {};
 
 /**
- * Request error handler.
- * @method onErrorRequest
- * @static
- * @param {Object} event An error event.
- */
-dwv.io.onErrorRequest = function(event)
-{
-    alert("An error occurred while retrieving the file: (http) "+this.status);
-};
-
-/**
  * Url loader.
  * @class Url
  * @namespace dwv.io
@@ -25,6 +14,7 @@ dwv.io.onErrorRequest = function(event)
 dwv.io.Url = function()
 {
     this.onload = null;
+    this.onerror = null;
 };
 
 /**
@@ -36,14 +26,26 @@ dwv.io.Url.prototype.load = function(ioArray)
 {
     // create closure to the class data
     var onload = this.onload;
+    var onerror = this.onerror;
     
+    // Request error
+    var onErrorRequest = function(event)
+    {
+        onerror( {'name': "RequestError", 
+            'message': "An error occurred while retrieving the file: (http) "+this.status } );
+    };
+
     // DICOM request loader
     var onLoadDicomRequest = function(response)
     {
         // parse DICOM file
-        var tmpdata = dwv.image.getDataFromDicomBuffer(response);
-        // call listener
-        onload(tmpdata);
+        try {
+            var tmpdata = dwv.image.getDataFromDicomBuffer(response);
+            // call listener
+            onload(tmpdata);
+        } catch(error) {
+            onerror(error);
+        }
     };
 
     // Image request loader
@@ -94,7 +96,7 @@ dwv.io.Url.prototype.load = function(ioArray)
         request.open('GET', url, true);
         request.responseType = "arraybuffer"; 
         request.onload = onLoadRequest;
-        request.onerror = dwv.io.onErrorRequest;
+        request.onerror = onErrorRequest;
         request.onprogress = dwv.gui.updateProgress;
         request.send(null);
     }
