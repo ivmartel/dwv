@@ -1826,7 +1826,7 @@
                 },
                 {
                     "name": "nChars",
-                    "description": "The numner of characters to read.",
+                    "description": "The number of characters to read.",
                     "type": "Number"
                 }
             ],
@@ -1982,7 +1982,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 505,
+            "line": 506,
             "description": "Get an Image object from the read DICOM file.",
             "itemtype": "method",
             "name": "createImage",
@@ -8692,7 +8692,7 @@
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/dicom/dicomParser.js:505"
+            "line": " src/dicom/dicomParser.js:506"
         },
         {
             "message": "unknown tag: input",
