@@ -126,7 +126,7 @@ dwv.dicom.DataReader = function(buffer, isLittleEndian)
      * Read data as a string.
      * @method readString
      * @param {Number} byteOffset The offset to start reading from.
-     * @param {Number} nChars The numner of characters to read.
+     * @param {Number} nChars The number of characters to read.
      * @return {String} The read data.
      */
     this.readString = function(byteOffset, nChars) {
@@ -396,7 +396,6 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
             // JPEG 2000
             else if( syntax.match(/1.2.840.10008.1.2.4.9/) ) {
                 jpeg2000 = true;
-                throw new Error("Unsupported DICOM transfer syntax (JPEG 2000): "+syntax);
             }
             // MPEG2 Image Compression
             else if( syntax === "1.2.840.10008.1.2.4.100" ) {
@@ -440,7 +439,14 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
         if( startedPixelItems ) {
             if( tagName === "Item" ) {
                 if( dataElement.data.length !== 0 ) {
-                    this.pixelBuffer = this.pixelBuffer.concat( dataElement.data );
+                    // concat does not work on typed arrays
+                    //this.pixelBuffer = this.pixelBuffer.concat( dataElement.data );
+                    // manual concat...
+                    var size = dataElement.data.length + this.pixelBuffer.length;
+                    var newBuffer = new Uint16Array(size);
+                    newBuffer.set( this.pixelBuffer, 0 );
+                    newBuffer.set( dataElement.data, this.pixelBuffer.lenght );
+                    this.pixelBuffer = newBuffer;
                 }
             }
             else if( tagName === "SequenceDelimitationItem" ) {
@@ -473,7 +479,7 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
     
     // uncompress data
     if( jpeg ) {
-        console.log("JPEG");
+        console.log("JPEG compressed DICOM data.");
         // using jpgjs from https://github.com/notmasteryet/jpgjs
         // -> error with ffc3 and ffc1 jpeg jfif marker
         /*var j = new JpegImage();
@@ -483,22 +489,17 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
         this.pixelBuffer = d.data;*/
     }
     else if( jpeg2000 ) {
-        console.log("JPEG 2000");
-        // using openjpeg.js from https://github.com/kripken/j2k.js
-        // -> 2 layers results????
-        /*var data = new Uint16Array(this.pixelBuffer);
-        var result = openjpeg(data, "j2k");
-        this.pixelBuffer = result.data;*/
-        
-        // using jpx.js from https://github.com/mozilla/pdf.js
-        // -> ...
-        /*var j = new JpxImage();
-        j.parse(this.pixelBuffer);
-        console.log("width: "+j.width);
-        console.log("height: "+j.height);
-        console.log("tiles: "+j.tiles.length);
-        console.log("count: "+j.componentsCount);
-        this.pixelBuffer = j.tiles[0].items;*/
+        console.log("JPEG 2000 compressed DICOM data.");
+        // decompress pixel buffer
+        var uint8Image = openjpeg(this.pixelBuffer, "j2k");
+        // convert to 16bit unsigned int
+        var sliceSize = uint8Image.width * uint8Image.height;
+        this.pixelBuffer = new Uint16Array( sliceSize );
+        var j = 0;
+        for( var p = 0; p < sliceSize; ++p ) {
+            this.pixelBuffer[p] = 256 * uint8Image.data[j] + uint8Image.data[j+1];
+            j += 2;
+        }
     }
 };
 
