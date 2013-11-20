@@ -52,9 +52,13 @@ dwv.io.Url.prototype.load = function(ioArray)
     var onLoadImageRequest = function(event)
     {
         // parse image data
-        var tmpdata = dwv.image.getDataFromImage(this);
-        // call listener
-        onload(tmpdata);
+        try {
+            var tmpdata = dwv.image.getDataFromImage(this);
+            // call listener
+            onload(tmpdata);
+        } catch(error) {
+            onerror(error);
+        }
     };
 
     // Request handler
