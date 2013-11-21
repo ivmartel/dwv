@@ -689,7 +689,12 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
     else if( jpeg2000 ) {
         console.log(&quot;JPEG 2000 compressed DICOM data.&quot;);
         // decompress pixel buffer
-        var uint8Image = openjpeg(this.pixelBuffer, &quot;j2k&quot;);
+        var uint8Image = null;
+        try {
+            uint8Image = openjpeg(this.pixelBuffer, &quot;j2k&quot;);
+        } catch(error) {
+            throw new Error(&quot;Cannot decode JPEG 2000 ([&quot; +error.name + &quot;] &quot; + error.message + &quot;)&quot;);
+        }
         // convert to 16bit unsigned int
         var sliceSize = uint8Image.width * uint8Image.height;
         this.pixelBuffer = new Uint16Array( sliceSize );

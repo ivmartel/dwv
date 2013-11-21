@@ -1982,7 +1982,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 506,
+            "line": 511,
             "description": "Get an Image object from the read DICOM file.",
             "itemtype": "method",
             "name": "createImage",
@@ -8692,7 +8692,7 @@
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/dicom/dicomParser.js:506"
+            "line": " src/dicom/dicomParser.js:511"
         },
         {
             "message": "unknown tag: input",

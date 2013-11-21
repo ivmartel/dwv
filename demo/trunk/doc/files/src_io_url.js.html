@@ -262,26 +262,30 @@ dwv.io.Url.prototype.load = function(ioArray)
     // Request handler
     var onLoadRequest = function(event)
     {
+        // find the image type
         var view = new DataView(this.response);
         var isJpeg = view.getUint32(0) === 0xffd8ffe0;
         var isPng = view.getUint32(0) === 0x89504e47;
         var isGif = view.getUint32(0) === 0x47494638;
-        if( isJpeg || isPng || isGif ) {
-            // image data
-            var theImage = new Image();
-
+        
+        // non DICOM
+        if( isJpeg || isPng || isGif )
+        {
+            // image data as string
             var bytes = new Uint8Array(this.response);
-            var binary = &#x27;&#x27;;
-            for (var i = 0; i &lt; bytes.byteLength; ++i) {
-                binary += String.fromCharCode(bytes[i]);
+            var imageDataStr = &#x27;&#x27;;
+            for( var i = 0; i &lt; bytes.byteLength; ++i ) {
+                imageDataStr += String.fromCharCode(bytes[i]);
             }
-            var imgStr = &quot;unknown&quot;;
-            if (isJpeg) imgStr = &quot;jpeg&quot;;
-            else if (isPng) imgStr = &quot;png&quot;;
-            else if (isGif) imgStr = &quot;gif&quot;;
-            theImage.src = &quot;data:image/&quot; + imgStr + &quot;;base64,&quot; + window.btoa(binary);
-            
-            theImage.onload = onLoadImageRequest;
+            // image type
+            var imageType = &quot;unknown&quot;;
+            if(isJpeg) imageType = &quot;jpeg&quot;;
+            else if(isPng) imageType = &quot;png&quot;;
+            else if(isGif) imageType = &quot;gif&quot;;
+            // temporary image object
+            var tmpImage = new Image();
+            tmpImage.src = &quot;data:image/&quot; + imageType + &quot;;base64,&quot; + window.btoa(imageDataStr);
+            tmpImage.onload = onLoadImageRequest;
         }
         else
         {
