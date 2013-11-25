@@ -276,6 +276,7 @@ dwv.dicom.DataReader = function(buffer, isLittleEndian)
         else if( nBytes === 8 )
             return this.readFloat32(byteOffset, isLittleEndian);
         else 
+            console.log(&quot;Non number: &#x27;&quot;+this.readString(byteOffset, nBytes)+&quot;&#x27;&quot;);
             throw new Error(&quot;Unsupported number size.&quot;);
     };
     /**
@@ -589,10 +590,12 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
                     syntax.match(/1.2.840.10008.1.2.4.7/) ||
                     syntax.match(/1.2.840.10008.1.2.4.8/) ) {
                 jpeg = true;
+                //console.log(&quot;JPEG compressed DICOM data: &quot; + syntax);
                 throw new Error(&quot;Unsupported DICOM transfer syntax (JPEG): &quot;+syntax);
             }
             // JPEG 2000
             else if( syntax.match(/1.2.840.10008.1.2.4.9/) ) {
+                console.log(&quot;JPEG 2000 compressed DICOM data: &quot; + syntax);
                 jpeg2000 = true;
             }
             // MPEG2 Image Compression
@@ -636,14 +639,18 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
         // store pixel data from multiple items
         if( startedPixelItems ) {
             if( tagName === &quot;Item&quot; ) {
-                if( dataElement.data.length !== 0 ) {
+                if( dataElement.data.length === 4 ) {
+                    console.log(&quot;Skipping Basic Offset Table.&quot;);
+                }
+                else if( dataElement.data.length !== 0 ) {
+                    console.log(&quot;Concatenating multiple pixel data items, length: &quot;+dataElement.data.length);
                     // concat does not work on typed arrays
                     //this.pixelBuffer = this.pixelBuffer.concat( dataElement.data );
                     // manual concat...
                     var size = dataElement.data.length + this.pixelBuffer.length;
                     var newBuffer = new Uint16Array(size);
                     newBuffer.set( this.pixelBuffer, 0 );
-                    newBuffer.set( dataElement.data, this.pixelBuffer.lenght );
+                    newBuffer.set( dataElement.data, this.pixelBuffer.length );
                     this.pixelBuffer = newBuffer;
                 }
             }
@@ -677,7 +684,6 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
     
     // uncompress data
     if( jpeg ) {
-        console.log(&quot;JPEG compressed DICOM data.&quot;);
         // using jpgjs from https://github.com/notmasteryet/jpgjs
         // -&gt; error with ffc3 and ffc1 jpeg jfif marker
         /*var j = new JpegImage();
@@ -687,7 +693,6 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
         this.pixelBuffer = d.data;*/
     }
     else if( jpeg2000 ) {
-        console.log(&quot;JPEG 2000 compressed DICOM data.&quot;);
         // decompress pixel buffer
         var uint8Image = null;
         try {
