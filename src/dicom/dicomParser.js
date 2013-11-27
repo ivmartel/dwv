@@ -140,6 +140,31 @@ dwv.dicom.DataReader = function(buffer, isLittleEndian)
 };
 
 /**
+ * Tell if a given syntax is a JPEG one.
+ * @method isJpeg
+ * @param {String} The transfer syntax to test.
+ * @returns {Boolean} True if a jpeg syntax.
+ */
+dwv.dicom.isJpegTransferSyntax = function(syntax)
+{
+    return syntax.match(/1.2.840.10008.1.2.4.5/) !== null ||
+        syntax.match(/1.2.840.10008.1.2.4.6/) !== null||
+        syntax.match(/1.2.840.10008.1.2.4.7/) !== null ||
+        syntax.match(/1.2.840.10008.1.2.4.8/) !== null;
+};
+
+/**
+ * Tell if a given syntax is a JPEG 2000 one.
+ * @method isJpeg
+ * @param {String} The transfer syntax to test.
+ * @returns {Boolean} True if a jpeg 2000 syntax.
+ */
+dwv.dicom.isJpeg2000TransferSyntax = function(syntax)
+{
+    return syntax.match(/1.2.840.10008.1.2.4.9/) !== null;
+};
+
+/**
  * DicomParser class.
  * @class DicomParser
  * @namespace dwv.dicom
@@ -387,16 +412,13 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
                 dataReader = new dwv.dicom.DataReader(buffer,false);
             }
             // JPEG
-            else if( syntax.match(/1.2.840.10008.1.2.4.5/) ||
-                    syntax.match(/1.2.840.10008.1.2.4.6/) ||
-                    syntax.match(/1.2.840.10008.1.2.4.7/) ||
-                    syntax.match(/1.2.840.10008.1.2.4.8/) ) {
+            else if( dwv.dicom.isJpegTransferSyntax(syntax) ) {
                 jpeg = true;
                 //console.log("JPEG compressed DICOM data: " + syntax);
                 throw new Error("Unsupported DICOM transfer syntax (JPEG): "+syntax);
             }
             // JPEG 2000
-            else if( syntax.match(/1.2.840.10008.1.2.4.9/) ) {
+            else if( dwv.dicom.isJpeg2000TransferSyntax(syntax) ) {
                 console.log("JPEG 2000 compressed DICOM data: " + syntax);
                 jpeg2000 = true;
             }
@@ -495,21 +517,14 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
         this.pixelBuffer = d.data;*/
     }
     else if( jpeg2000 ) {
-        // decompress pixel buffer
+        // decompress pixel buffer into Uint8 image
         var uint8Image = null;
         try {
             uint8Image = openjpeg(this.pixelBuffer, "j2k");
         } catch(error) {
             throw new Error("Cannot decode JPEG 2000 ([" +error.name + "] " + error.message + ")");
         }
-        // convert to 16bit unsigned int
-        var sliceSize = uint8Image.width * uint8Image.height;
-        this.pixelBuffer = new Uint16Array( sliceSize );
-        var j = 0;
-        for( var p = 0; p < sliceSize; ++p ) {
-            this.pixelBuffer[p] = 256 * uint8Image.data[j] + uint8Image.data[j+1];
-            j += 2;
-        }
+        this.pixelBuffer = uint8Image.data;
     }
 };
 
@@ -542,19 +557,42 @@ dwv.dicom.DicomParser.prototype.createImage = function()
         columnSpacing = parseFloat(this.dicomElements.ImagerPixelSpacing.value[1]);
     }
     var spacing = new dwv.image.Spacing( columnSpacing, rowSpacing);
+
+    // special jpeg 2000 case: openjpeg returns a Uint8 planar MONO or RGB image
+    var syntax = dwv.utils.cleanString(
+        this.dicomElements.TransferSyntaxUID.value[0] );
+    var jpeg2000 = dwv.dicom.isJpeg2000TransferSyntax( syntax );
+    
     // buffer data
-    var buffer = new Int16Array(this.pixelBuffer.length);
-    // unsigned to signed data if needed
-    var shift = false;
-    if( this.dicomElements.PixelRepresentation &&
-            this.dicomElements.PixelRepresentation.value[0] == 1) {
-        shift = true;
+    var buffer = null;
+    // convert to 16bit if needed
+    if( jpeg2000 && this.dicomElements.BitsAllocated.value[0] === 16 )
+    {
+        var sliceSize = size.getSliceSize();
+        buffer = new Int16Array( sliceSize );
+        var k = 0;
+        for( var p = 0; p < sliceSize; ++p ) {
+            buffer[p] = 256 * this.pixelBuffer[k] + this.pixelBuffer[k+1];
+            k += 2;
+        }
     }
-    for( var i=0; i<this.pixelBuffer.length; ++i ) {
-        buffer[i] = this.pixelBuffer[i];
-        if( shift && buffer[i] >= Math.pow(2, 15) ) 
-            buffer[i] -= Math.pow(2, 16);
+    else
+    {
+        buffer = new Int16Array(this.pixelBuffer.length);
+        // unsigned to signed data if needed
+        var shift = false;
+        if( this.dicomElements.PixelRepresentation &&
+                this.dicomElements.PixelRepresentation.value[0] == 1) {
+            shift = true;
+        }
+        // copy
+        for( var i=0; i<this.pixelBuffer.length; ++i ) {
+            buffer[i] = this.pixelBuffer[i];
+            if( shift && buffer[i] >= Math.pow(2, 15) ) 
+                buffer[i] -= Math.pow(2, 16);
+        }
     }
+    
     // slice position
     var slicePosition = [0,0,0];
     if( this.dicomElements.ImagePositionPatient )
@@ -566,13 +604,16 @@ dwv.dicom.DicomParser.prototype.createImage = function()
     var image = new dwv.image.Image( size, spacing, buffer, [slicePosition] );
     // photometricInterpretation
     if( this.dicomElements.PhotometricInterpretation ) {
-        image.setPhotometricInterpretation( dwv.utils.cleanString(
-            this.dicomElements.PhotometricInterpretation.value[0]).toUpperCase() );
+        var photo = dwv.utils.cleanString(
+            this.dicomElements.PhotometricInterpretation.value[0]).toUpperCase();
+        if( jpeg2000 && photo.match(/YBR/) ) photo = "RGB";
+        image.setPhotometricInterpretation( photo );
     }        
     // planarConfiguration
     if( this.dicomElements.PlanarConfiguration ) {
-        image.setPlanarConfiguration( 
-            this.dicomElements.PlanarConfiguration.value[0] );
+        var planar = this.dicomElements.PlanarConfiguration.value[0];
+        if( jpeg2000 ) planar = 1;
+        image.setPlanarConfiguration( planar );
     }        
     // rescale slope
     if( this.dicomElements.RescaleSlope ) {
