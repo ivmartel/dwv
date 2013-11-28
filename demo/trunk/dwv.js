@@ -678,7 +678,7 @@ dwv.dicom.DataReader = function(buffer, isLittleEndian)
 
 /**
  * Tell if a given syntax is a JPEG one.
- * @method isJpeg
+ * @method isJpegTransferSyntax
  * @param {String} The transfer syntax to test.
  * @returns {Boolean} True if a jpeg syntax.
  */
@@ -686,13 +686,23 @@ dwv.dicom.isJpegTransferSyntax = function(syntax)
 {
     return syntax.match(/1.2.840.10008.1.2.4.5/) !== null ||
         syntax.match(/1.2.840.10008.1.2.4.6/) !== null||
-        syntax.match(/1.2.840.10008.1.2.4.7/) !== null ||
-        syntax.match(/1.2.840.10008.1.2.4.8/) !== null;
+        syntax.match(/1.2.840.10008.1.2.4.7/) !== null;
+};
+
+/**
+ * Tell if a given syntax is a JPEG-LS one.
+ * @method isJpeglsTransferSyntax
+ * @param {String} The transfer syntax to test.
+ * @returns {Boolean} True if a jpeg-ls syntax.
+ */
+dwv.dicom.isJpeglsTransferSyntax = function(syntax)
+{
+    return syntax.match(/1.2.840.10008.1.2.4.8/) !== null;
 };
 
 /**
  * Tell if a given syntax is a JPEG 2000 one.
- * @method isJpeg
+ * @method isJpeg2000TransferSyntax
  * @param {String} The transfer syntax to test.
  * @returns {Boolean} True if a jpeg 2000 syntax.
  */
@@ -902,6 +912,7 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
     var offset = 0;
     var implicit = false;
     var jpeg = false;
+    var jpegls = false;
     var jpeg2000 = false;
     // dictionary
     this.dict.init();
@@ -953,6 +964,12 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
                 jpeg = true;
                 //console.log("JPEG compressed DICOM data: " + syntax);
                 throw new Error("Unsupported DICOM transfer syntax (JPEG): "+syntax);
+            }
+            // JPEG-LS
+            else if( dwv.dicom.isJpeglsTransferSyntax(syntax) ) {
+                jpegls = true;
+                //console.log("JPEG-LS compressed DICOM data: " + syntax);
+                throw new Error("Unsupported DICOM transfer syntax (JPEG-LS): "+syntax);
             }
             // JPEG 2000
             else if( dwv.dicom.isJpeg2000TransferSyntax(syntax) ) {

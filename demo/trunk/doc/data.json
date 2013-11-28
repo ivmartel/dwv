@@ -597,7 +597,7 @@
             "module": "dicom",
             "namespace": "dwv.dicom",
             "file": "src/dicom/dicomParser.js",
-            "line": 167,
+            "line": 177,
             "description": "DicomParser class.",
             "is_constructor": 1
         },
@@ -1843,7 +1843,7 @@
             "line": 142,
             "description": "Tell if a given syntax is a JPEG one.",
             "itemtype": "method",
-            "name": "isJpeg",
+            "name": "isJpegTransferSyntax",
             "params": [
                 {
                     "name": "The",
@@ -1861,10 +1861,31 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 156,
+            "line": 155,
+            "description": "Tell if a given syntax is a JPEG-LS one.",
+            "itemtype": "method",
+            "name": "isJpeglsTransferSyntax",
+            "params": [
+                {
+                    "name": "The",
+                    "description": "transfer syntax to test.",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "True if a jpeg-ls syntax.",
+                "type": "Boolean"
+            },
+            "class": "dwv.dicom.DataReader",
+            "module": "dicom",
+            "namespace": "dwv.dicom"
+        },
+        {
+            "file": "src/dicom/dicomParser.js",
+            "line": 166,
             "description": "Tell if a given syntax is a JPEG 2000 one.",
             "itemtype": "method",
-            "name": "isJpeg",
+            "name": "isJpeg2000TransferSyntax",
             "params": [
                 {
                     "name": "The",
@@ -1882,7 +1903,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 175,
+            "line": 185,
             "description": "The list of DICOM elements.",
             "itemtype": "property",
             "name": "dicomElements",
@@ -1893,7 +1914,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 181,
+            "line": 191,
             "description": "The number of DICOM Items.",
             "itemtype": "property",
             "name": "numberOfItems",
@@ -1904,7 +1925,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 187,
+            "line": 197,
             "description": "The DICOM dictionary used to find tag names.",
             "itemtype": "property",
             "name": "dict",
@@ -1915,7 +1936,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 193,
+            "line": 203,
             "description": "The pixel buffer.",
             "itemtype": "property",
             "name": "pixelBuffer",
@@ -1926,7 +1947,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 201,
+            "line": 211,
             "description": "Get the DICOM data pixel buffer.",
             "itemtype": "method",
             "name": "getPixelBuffer",
@@ -1940,7 +1961,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 211,
+            "line": 221,
             "description": "Append a DICOM element to the dicomElements member object.\nAllows for easy retrieval of DICOM tag values from the tag name.\nIf tags have same name (for the 'unknown' and private tags cases), a number is appended\nmaking the name unique.",
             "itemtype": "method",
             "name": "appendDicomElement",
@@ -1957,7 +1978,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 240,
+            "line": 250,
             "description": "Read a DICOM tag.",
             "itemtype": "method",
             "name": "readTag",
@@ -1980,7 +2001,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 264,
+            "line": 274,
             "description": "Read a DICOM data element.",
             "itemtype": "method",
             "name": "readDataElement",
@@ -2008,7 +2029,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 357,
+            "line": 367,
             "description": "Parse the complete DICOM file (given as input to the class).\nFills in the member object 'dicomElements'.",
             "itemtype": "method",
             "name": "parse",
@@ -2024,7 +2045,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 531,
+            "line": 548,
             "description": "Get an Image object from the read DICOM file.",
             "itemtype": "method",
             "name": "createImage",
@@ -8726,23 +8747,27 @@
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/dicom/dicomParser.js:156"
+            "line": " src/dicom/dicomParser.js:155"
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/dicom/dicomParser.js:201"
+            "line": " src/dicom/dicomParser.js:166"
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/dicom/dicomParser.js:240"
+            "line": " src/dicom/dicomParser.js:211"
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/dicom/dicomParser.js:264"
+            "line": " src/dicom/dicomParser.js:250"
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/dicom/dicomParser.js:531"
+            "line": " src/dicom/dicomParser.js:274"
+        },
+        {
+            "message": "replacing incorrect tag: returns with return",
+            "line": " src/dicom/dicomParser.js:548"
         },
         {
             "message": "unknown tag: input",
