@@ -297,7 +297,12 @@ dwv.tool.Livewire.getHelp = function()
 {
     return {
         'title': "Livewire",
-        'brief': "This is the help of the Livewire tool."
+        'brief': "The Livewire tool is a semi-automatic segmentation tool " +
+            "that proposes to the user paths that follow intensity edges." + 
+            "Click once to initialise and then move the mouse to see " + 
+            "the proposed paths. Click again to build your contour. " + 
+            "The process stops when you click on the first root point. " +
+            "BEWARE: the process can take time!"
     };
 };
 

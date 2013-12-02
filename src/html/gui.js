@@ -820,11 +820,17 @@ dwv.gui.appendHelpHtml = function(mobile)
     var helpNode = document.getElementById("help");
 
     var headPara = document.createElement("p");
-    headPara.appendChild(document.createTextNode("This is the main doc."));
+    headPara.appendChild(document.createTextNode("DWV can load DICOM data " +
+        "either from a local file or from an URL. All DICOM tags are available " +
+        "in a searchable table, press the 'tags' or grid button. " + 
+        "You can choose to display the image information overlay by pressing the " + 
+        "'info' or i button. "));
     helpNode.appendChild(headPara);
     
     var toolPara = document.createElement("p");
-    toolPara.appendChild(document.createTextNode("These are the tools:"));
+    toolPara.appendChild(document.createTextNode("Each tool defines the possible " + 
+        "user interactions. The default tool is the window/level one. " + 
+        "Here are the available tools:"));
     helpNode.appendChild(toolPara);
     helpNode.appendChild(toolHelpDiv);
 };

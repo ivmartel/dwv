@@ -243,7 +243,15 @@ dwv.tool.Zoom.getHelp = function()
 {
     return {
         'title': "Zoom",
-        'brief': "This is the help of the Zoom tool."
+        'brief': "The zoom tool allows to zoom and drag the image.",
+        'mouse': {
+            'mouse_drag': "A single mouse drag drags the image in the desired direction.",
+            'mouse_wheel': "The mouse wheel is used to zoom the image."
+        },
+        'touch': {
+            'touch_drag': "A single touch drag drags the image in the desired direction.",
+            'twotouch_pinch': "A pinch or spread allows to zoom the image."
+        }
     };
 };
 

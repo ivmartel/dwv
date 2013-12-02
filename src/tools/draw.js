@@ -187,12 +187,13 @@ dwv.tool.Draw.getHelp = function()
 {
     return {
         'title': "Draw",
-        'brief': "Allows to draw shapes on the image.",
+        'brief': "Allows to draw shapes on the image. " +
+            "Choose the shape and its color from the drop down menus. ",
         'mouse': {
-            'mouse_drag': "A single mouse drag draws the shape.",
+            'mouse_drag': "A single mouse drag draws the desired shape.",
         },
         'touch': {
-            'touch_drag': "A single touch drag draws the shape.",
+            'touch_drag': "A single touch drag draws the desired shape.",
         }
     };
 };
