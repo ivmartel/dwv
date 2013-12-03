@@ -1250,7 +1250,7 @@
             "module": "tool",
             "namespace": "dwv.tool.filter",
             "file": "src/tools/filter.js",
-            "line": 133,
+            "line": 136,
             "description": "Threshold filter tool.",
             "is_constructor": 1,
             "params": [
@@ -1272,7 +1272,7 @@
             "module": "tool",
             "namespace": "dwv.tool.filter",
             "file": "src/tools/filter.js",
-            "line": 217,
+            "line": 220,
             "description": "Sobel filter tool.",
             "is_constructor": 1,
             "params": [
@@ -1294,7 +1294,7 @@
             "module": "tool",
             "namespace": "dwv.tool",
             "file": "src/tools/filter.js",
-            "line": 262,
+            "line": 265,
             "description": "Run filter command.",
             "is_constructor": 1,
             "params": [
@@ -1390,7 +1390,7 @@
             "module": "tool",
             "namespace": "dwv.tool",
             "file": "src/tools/livewire.js",
-            "line": 329,
+            "line": 334,
             "description": "Draw livewire command.",
             "params": [
                 {
@@ -6227,7 +6227,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 200,
+            "line": 201,
             "description": "Set the line color of the drawing.",
             "itemtype": "method",
             "name": "setLineColour",
@@ -6244,7 +6244,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 211,
+            "line": 212,
             "description": "Set the shape name of the drawing.",
             "itemtype": "method",
             "name": "setShapeName",
@@ -6261,7 +6261,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 226,
+            "line": 227,
             "description": "Check if the shape is in the shape list.",
             "itemtype": "method",
             "name": "hasShape",
@@ -6278,7 +6278,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 235,
+            "line": 236,
             "description": "Initialise the tool.",
             "itemtype": "method",
             "name": "init",
@@ -6324,7 +6324,7 @@
         },
         {
             "file": "src/tools/filter.js",
-            "line": 47,
+            "line": 50,
             "description": "Enable the filter.",
             "itemtype": "method",
             "name": "enable",
@@ -6341,7 +6341,7 @@
         },
         {
             "file": "src/tools/filter.js",
-            "line": 67,
+            "line": 70,
             "description": "Get the selected filter.",
             "itemtype": "method",
             "name": "getSelectedFilter",
@@ -6355,7 +6355,7 @@
         },
         {
             "file": "src/tools/filter.js",
-            "line": 76,
+            "line": 79,
             "description": "Set the selected filter.",
             "itemtype": "method",
             "name": "setSelectedFilter",
@@ -6369,7 +6369,7 @@
         },
         {
             "file": "src/tools/filter.js",
-            "line": 97,
+            "line": 100,
             "description": "Check if a filter is in the filter list.",
             "itemtype": "method",
             "name": "hasFilter",
@@ -6390,7 +6390,7 @@
         },
         {
             "file": "src/tools/filter.js",
-            "line": 107,
+            "line": 110,
             "description": "Initialise the filter.",
             "itemtype": "method",
             "name": "init",
@@ -6400,7 +6400,7 @@
         },
         {
             "file": "src/tools/filter.js",
-            "line": 121,
+            "line": 124,
             "description": "Handle keydown event.",
             "itemtype": "method",
             "name": "keydown",
@@ -6417,7 +6417,7 @@
         },
         {
             "file": "src/tools/filter.js",
-            "line": 142,
+            "line": 145,
             "description": "Enable the filter.",
             "itemtype": "method",
             "name": "enable",
@@ -6434,7 +6434,7 @@
         },
         {
             "file": "src/tools/filter.js",
-            "line": 157,
+            "line": 160,
             "description": "Run the filter.",
             "itemtype": "method",
             "name": "run",
@@ -6451,7 +6451,7 @@
         },
         {
             "file": "src/tools/filter.js",
-            "line": 185,
+            "line": 188,
             "description": "Enable the filter.",
             "itemtype": "method",
             "name": "enable",
@@ -6468,7 +6468,7 @@
         },
         {
             "file": "src/tools/filter.js",
-            "line": 200,
+            "line": 203,
             "description": "Run the filter.",
             "itemtype": "method",
             "name": "run",
@@ -6485,7 +6485,7 @@
         },
         {
             "file": "src/tools/filter.js",
-            "line": 226,
+            "line": 229,
             "description": "Enable the filter.",
             "itemtype": "method",
             "name": "enable",
@@ -6502,7 +6502,7 @@
         },
         {
             "file": "src/tools/filter.js",
-            "line": 241,
+            "line": 244,
             "description": "Run the filter.",
             "itemtype": "method",
             "name": "run",
@@ -6519,7 +6519,7 @@
         },
         {
             "file": "src/tools/filter.js",
-            "line": 272,
+            "line": 275,
             "description": "Command name.",
             "itemtype": "property",
             "name": "name",
@@ -6532,7 +6532,7 @@
         },
         {
             "file": "src/tools/filter.js",
-            "line": 279,
+            "line": 282,
             "description": "Get the command name.",
             "itemtype": "method",
             "name": "getName",
@@ -6546,7 +6546,7 @@
         },
         {
             "file": "src/tools/filter.js",
-            "line": 285,
+            "line": 288,
             "description": "Set the command name.",
             "itemtype": "method",
             "name": "setName",
@@ -6563,7 +6563,7 @@
         },
         {
             "file": "src/tools/filter.js",
-            "line": 292,
+            "line": 295,
             "description": "Execute the command.",
             "itemtype": "method",
             "name": "execute",
@@ -7086,7 +7086,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 304,
+            "line": 309,
             "description": "Set the line color of the drawing.",
             "itemtype": "method",
             "name": "setLineColour",
@@ -7103,7 +7103,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 315,
+            "line": 320,
             "description": "Initialise the tool.",
             "itemtype": "method",
             "name": "init",
@@ -7113,7 +7113,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 339,
+            "line": 344,
             "description": "The livewire color.",
             "itemtype": "property",
             "name": "livewireColor",
@@ -7126,7 +7126,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 346,
+            "line": 351,
             "description": "The HTML context.",
             "itemtype": "property",
             "name": "context",
@@ -7139,7 +7139,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 354,
+            "line": 359,
             "description": "Command name.",
             "itemtype": "property",
             "name": "name",
@@ -7152,7 +7152,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 361,
+            "line": 366,
             "description": "Get the command name.",
             "itemtype": "method",
             "name": "getName",
@@ -7166,7 +7166,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 367,
+            "line": 372,
             "description": "Set the command name.",
             "itemtype": "method",
             "name": "setName",
@@ -7183,7 +7183,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 374,
+            "line": 379,
             "description": "Execute the command.",
             "itemtype": "method",
             "name": "execute",

@@ -441,7 +441,15 @@ dwv.tool.Zoom.getHelp = function()
 {
     return {
         &#x27;title&#x27;: &quot;Zoom&quot;,
-        &#x27;brief&#x27;: &quot;This is the help of the Zoom tool.&quot;
+        &#x27;brief&#x27;: &quot;The zoom tool allows to zoom and drag the image.&quot;,
+        &#x27;mouse&#x27;: {
+            &#x27;mouse_drag&#x27;: &quot;A single mouse drag drags the image in the desired direction.&quot;,
+            &#x27;mouse_wheel&#x27;: &quot;The mouse wheel is used to zoom the image.&quot;
+        },
+        &#x27;touch&#x27;: {
+            &#x27;touch_drag&#x27;: &quot;A single touch drag drags the image in the desired direction.&quot;,
+            &#x27;twotouch_pinch&#x27;: &quot;A pinch or spread allows to zoom the image.&quot;
+        }
     };
 };
 

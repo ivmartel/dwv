@@ -3968,11 +3968,17 @@ dwv.gui.appendHelpHtml = function(mobile)
     var helpNode = document.getElementById("help");
 
     var headPara = document.createElement("p");
-    headPara.appendChild(document.createTextNode("This is the main doc."));
+    headPara.appendChild(document.createTextNode("DWV can load DICOM data " +
+        "either from a local file or from an URL. All DICOM tags are available " +
+        "in a searchable table, press the 'tags' or grid button. " + 
+        "You can choose to display the image information overlay by pressing the " + 
+        "'info' or i button. "));
     helpNode.appendChild(headPara);
     
     var toolPara = document.createElement("p");
-    toolPara.appendChild(document.createTextNode("These are the tools:"));
+    toolPara.appendChild(document.createTextNode("Each tool defines the possible " + 
+        "user interactions. The default tool is the window/level one. " + 
+        "Here are the available tools:"));
     helpNode.appendChild(toolPara);
     helpNode.appendChild(toolHelpDiv);
 };
@@ -8201,12 +8207,13 @@ dwv.tool.Draw.getHelp = function()
 {
     return {
         'title': "Draw",
-        'brief': "Allows to draw shapes on the image.",
+        'brief': "Allows to draw shapes on the image. " +
+            "Choose the shape and its color from the drop down menus. ",
         'mouse': {
-            'mouse_drag': "A single mouse drag draws the shape.",
+            'mouse_drag': "A single mouse drag draws the desired shape.",
         },
         'touch': {
-            'touch_drag': "A single touch drag draws the shape.",
+            'touch_drag': "A single touch drag draws the desired shape.",
         }
     };
 };
@@ -8307,7 +8314,10 @@ dwv.tool.Filter.getHelp = function()
 {
     return {
         'title': "Filter",
-        'brief': "This is the help of the Filter tool."
+        'brief': "A few simple image filters are available: a Threshold filter to " +
+            "limit the image intensities between a chosen minimum and maximum, " +
+            "a Sharpen filter to convolute the image with a sharpen matrix, " +
+            "a Sobel filter to get the gradient of the image in both directions."
     };
 };
 
@@ -9168,7 +9178,12 @@ dwv.tool.Livewire.getHelp = function()
 {
     return {
         'title': "Livewire",
-        'brief': "This is the help of the Livewire tool."
+        'brief': "The Livewire tool is a semi-automatic segmentation tool " +
+            "that proposes to the user paths that follow intensity edges." + 
+            "Click once to initialise and then move the mouse to see " + 
+            "the proposed paths. Click again to build your contour. " + 
+            "The process stops when you click on the first root point. " +
+            "BEWARE: the process can take time!"
     };
 };
 
@@ -10273,7 +10288,15 @@ dwv.tool.Zoom.getHelp = function()
 {
     return {
         'title': "Zoom",
-        'brief': "This is the help of the Zoom tool."
+        'brief': "The zoom tool allows to zoom and drag the image.",
+        'mouse': {
+            'mouse_drag': "A single mouse drag drags the image in the desired direction.",
+            'mouse_wheel': "The mouse wheel is used to zoom the image."
+        },
+        'touch': {
+            'touch_drag': "A single touch drag drags the image in the desired direction.",
+            'twotouch_pinch': "A pinch or spread allows to zoom the image."
+        }
     };
 };
 
