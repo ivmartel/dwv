@@ -87,14 +87,17 @@ dwv.info.createPositionDiv = function()
  */
 dwv.info.updatePositionDiv = function(event)
 {
-    // window center list item
+    // position list item
     var lipos = document.getElementById("liposinfotl");
     dwv.html.cleanNode(lipos);
     lipos.appendChild(document.createTextNode("Pos = "+event.i+", "+event.j+", "+event.k));
-    // window width list item
-    var livalue = document.getElementById("livalueinfotl");
-    dwv.html.cleanNode(livalue);
-    livalue.appendChild(document.createTextNode("Value = "+event.value));
+    // value list item
+    if( event.value )
+    {
+        var livalue = document.getElementById("livalueinfotl");
+        dwv.html.cleanNode(livalue);
+        livalue.appendChild(document.createTextNode("Value = "+event.value));
+    }
 };
 
 /**

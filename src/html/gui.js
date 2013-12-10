@@ -381,10 +381,13 @@ dwv.gui.appendWindowLevelHtml = function()
 
     // node
     var node = document.getElementById("toolList");
-    // apend preset
-    node.appendChild(wlLi);
-    // apend color map
-    node.appendChild(cmLi);
+    if( app.getImage().getPhotometricInterpretation().match(/MONOCHROME/) !== null )
+    {
+        // apend preset
+        node.appendChild(wlLi);
+        // apend color map if monochrome image
+        node.appendChild(cmLi);
+    }
     // trigger create event (mobile)
     $("#toolList").trigger("create");
 };
