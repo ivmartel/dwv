@@ -2348,7 +2348,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 392,
+            "line": 395,
             "description": "Clear the window/level HTML.",
             "itemtype": "method",
             "name": "clearWindowLevelHtml",
@@ -2359,7 +2359,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 403,
+            "line": 406,
             "description": "Append the draw HTML to the page.",
             "itemtype": "method",
             "name": "appendDrawHtml",
@@ -2370,7 +2370,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 448,
+            "line": 451,
             "description": "Clear the draw HTML.",
             "itemtype": "method",
             "name": "clearDrawHtml",
@@ -2381,7 +2381,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 459,
+            "line": 462,
             "description": "Append the color chooser HTML to the page.",
             "itemtype": "method",
             "name": "appendLivewireHtml",
@@ -2392,7 +2392,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 487,
+            "line": 490,
             "description": "Clear the color chooser HTML.",
             "itemtype": "method",
             "name": "clearDrawHtml",
@@ -2403,7 +2403,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 497,
+            "line": 500,
             "description": "Append the filter HTML to the page.",
             "itemtype": "method",
             "name": "appendLivewireHtml",
@@ -2414,7 +2414,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 525,
+            "line": 528,
             "description": "Clear the filter HTML.",
             "itemtype": "method",
             "name": "clearDrawHtml",
@@ -2425,7 +2425,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 538,
+            "line": 541,
             "description": "Append the threshold filter HTML to the page.",
             "itemtype": "method",
             "name": "appendThresholdHtml",
@@ -2436,7 +2436,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 558,
+            "line": 561,
             "description": "Clear the treshold filter HTML.",
             "itemtype": "method",
             "name": "clearDrawHtml",
@@ -2447,7 +2447,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 568,
+            "line": 571,
             "description": "Append the sharpen filter HTML to the page.",
             "itemtype": "method",
             "name": "appendSharpenHtml",
@@ -2458,7 +2458,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 593,
+            "line": 596,
             "description": "Clear the sharpen filter HTML.",
             "itemtype": "method",
             "name": "clearSharpenHtml",
@@ -2469,7 +2469,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 603,
+            "line": 606,
             "description": "Append the sobel filter HTML to the page.",
             "itemtype": "method",
             "name": "appendSharpenHtml",
@@ -2480,7 +2480,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 628,
+            "line": 631,
             "description": "Clear the sobel filter HTML.",
             "itemtype": "method",
             "name": "clearSharpenHtml",
@@ -2491,7 +2491,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 638,
+            "line": 641,
             "description": "Append the zoom HTML to the page.",
             "itemtype": "method",
             "name": "appendZoomHtml",
@@ -2502,7 +2502,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 665,
+            "line": 668,
             "description": "Clear the zoom filter HTML.",
             "itemtype": "method",
             "name": "clearZoomHtml",
@@ -2513,7 +2513,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 675,
+            "line": 678,
             "description": "Append the undo HTML to the page.",
             "itemtype": "method",
             "name": "appendUndoHtml",
@@ -2524,7 +2524,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 700,
+            "line": 703,
             "description": "Add a command to the undo HTML.",
             "itemtype": "method",
             "name": "addCommandToUndoHtml",
@@ -2542,7 +2542,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 727,
+            "line": 730,
             "description": "Enable the last command of the undo HTML.",
             "itemtype": "method",
             "name": "enableInUndoHtml",
@@ -2560,7 +2560,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 756,
+            "line": 759,
             "description": "Build the help HTML.",
             "itemtype": "method",
             "name": "appendHelpHtml",
@@ -3954,6 +3954,19 @@
         {
             "file": "src/image/image.js",
             "line": 175,
+            "description": "Number of components.",
+            "itemtype": "property",
+            "name": "planarConfiguration",
+            "access": "private",
+            "tagname": "",
+            "type": "Number",
+            "class": "dwv.image.Image",
+            "module": "image",
+            "namespace": "dwv.image"
+        },
+        {
+            "file": "src/image/image.js",
+            "line": 182,
             "description": "Meta information.",
             "itemtype": "property",
             "name": "meta",
@@ -3966,7 +3979,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 183,
+            "line": 190,
             "description": "Original buffer.",
             "itemtype": "property",
             "name": "originalBuffer",
@@ -3979,7 +3992,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 194,
+            "line": 201,
             "description": "Data range.",
             "itemtype": "property",
             "name": "dataRange",
@@ -3992,7 +4005,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 201,
+            "line": 208,
             "description": "Histogram.",
             "itemtype": "property",
             "name": "histogram",
@@ -4005,7 +4018,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 209,
+            "line": 216,
             "description": "Get the size of the image.",
             "itemtype": "method",
             "name": "getSize",
@@ -4019,7 +4032,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 215,
+            "line": 222,
             "description": "Get the spacing of the image.",
             "itemtype": "method",
             "name": "getSpacing",
@@ -4033,7 +4046,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 221,
+            "line": 228,
             "description": "Get the data buffer of the image. TODO dangerous...",
             "itemtype": "method",
             "name": "getBuffer",
@@ -4047,7 +4060,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 227,
+            "line": 234,
             "description": "Get the slice positions.",
             "itemtype": "method",
             "name": "getSlicePositions",
@@ -4061,7 +4074,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 234,
+            "line": 241,
             "description": "Get the rescale slope.",
             "itemtype": "method",
             "name": "getRescaleSlope",
@@ -4075,7 +4088,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 240,
+            "line": 247,
             "description": "Set the rescale slope.",
             "itemtype": "method",
             "name": "setRescaleSlope",
@@ -4092,7 +4105,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 246,
+            "line": 253,
             "description": "Get the rescale intercept.",
             "itemtype": "method",
             "name": "getRescaleIntercept",
@@ -4106,7 +4119,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 252,
+            "line": 259,
             "description": "Set the rescale intercept.",
             "itemtype": "method",
             "name": "setRescaleIntercept",
@@ -4123,7 +4136,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 258,
+            "line": 265,
             "description": "Get the photometricInterpretation of the image.",
             "itemtype": "method",
             "name": "getPhotometricInterpretation",
@@ -4137,7 +4150,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 264,
+            "line": 271,
             "description": "Set the photometricInterpretation of the image.",
             "itemtype": "method",
             "name": "setPhotometricInterpretation",
@@ -4148,7 +4161,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 270,
+            "line": 277,
             "description": "Get the planarConfiguration of the image.",
             "itemtype": "method",
             "name": "getPlanarConfiguration",
@@ -4162,7 +4175,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 276,
+            "line": 283,
             "description": "Set the planarConfiguration of the image.",
             "itemtype": "method",
             "name": "setPlanarConfiguration",
@@ -4179,7 +4192,21 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 283,
+            "line": 289,
+            "description": "Get the numberOfComponents of the image.",
+            "itemtype": "method",
+            "name": "getNumberOfComponents",
+            "return": {
+                "description": "The numberOfComponents of the image.",
+                "type": "Number"
+            },
+            "class": "dwv.image.Image",
+            "module": "image",
+            "namespace": "dwv.image"
+        },
+        {
+            "file": "src/image/image.js",
+            "line": 296,
             "description": "Get the meta information of the image.",
             "itemtype": "method",
             "name": "getMeta",
@@ -4193,7 +4220,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 289,
+            "line": 302,
             "description": "Set the meta information of the image.",
             "itemtype": "method",
             "name": "setMeta",
@@ -4210,7 +4237,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 296,
+            "line": 309,
             "description": "Get value at offset. Warning: No size check...",
             "itemtype": "method",
             "name": "getValueAtOffset",
@@ -4231,7 +4258,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 306,
+            "line": 319,
             "description": "Clone the image.",
             "itemtype": "method",
             "name": "clone",
@@ -4245,7 +4272,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 322,
+            "line": 335,
             "description": "Append a slice to the image.",
             "itemtype": "method",
             "name": "appendSlice",
@@ -4262,7 +4289,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 404,
+            "line": 417,
             "description": "Get the data range.",
             "itemtype": "method",
             "name": "getDataRange",
@@ -4276,7 +4303,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 414,
+            "line": 427,
             "description": "Get the histogram.",
             "itemtype": "method",
             "name": "getHistogram",
@@ -4290,7 +4317,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 425,
+            "line": 438,
             "description": "Get the value of the image at a specific coordinate.",
             "itemtype": "method",
             "name": "getValue",
@@ -4321,7 +4348,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 441,
+            "line": 454,
             "description": "Get the rescaled value of the image at a specific offset.",
             "itemtype": "method",
             "name": "getRescaledValueAtOffset",
@@ -4342,7 +4369,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 453,
+            "line": 466,
             "description": "Get the rescaled value of the image at a specific coordinate.",
             "itemtype": "method",
             "name": "getRescaledValue",
@@ -4373,7 +4400,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 467,
+            "line": 480,
             "description": "Calculate the raw image data range.",
             "itemtype": "method",
             "name": "calculateDataRange",
@@ -4387,7 +4414,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 486,
+            "line": 499,
             "description": "Calculate the image data range after rescale.",
             "itemtype": "method",
             "name": "getRescaledDataRange",
@@ -4401,7 +4428,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 498,
+            "line": 511,
             "description": "Calculate the histogram of the image.",
             "itemtype": "method",
             "name": "calculateHistogram",
@@ -4415,14 +4442,14 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 526,
+            "line": 539,
             "description": "Convolute the image with a given 2D kernel.",
             "itemtype": "method",
             "name": "convolute2D",
             "params": [
                 {
                     "name": "weights",
-                    "description": "The weights of the 2D kernel as a square matrix.",
+                    "description": "The weights of the 2D kernel as a 3x3 matrix.",
                     "type": "Array"
                 }
             ],
@@ -4436,7 +4463,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 579,
+            "line": 666,
             "description": "Transform an image using a specific operator.",
             "itemtype": "method",
             "name": "transform",
@@ -4457,7 +4484,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 597,
+            "line": 684,
             "description": "Compose this image with another one and using a specific operator.",
             "itemtype": "method",
             "name": "compose",
@@ -6631,7 +6658,7 @@
         },
         {
             "file": "src/tools/info.js",
-            "line": 100,
+            "line": 103,
             "description": "Create the mini color map info div.",
             "itemtype": "method",
             "name": "createMiniColorMap",
@@ -6642,7 +6669,7 @@
         },
         {
             "file": "src/tools/info.js",
-            "line": 118,
+            "line": 121,
             "description": "Update the mini color map info div.",
             "itemtype": "method",
             "name": "updateMiniColorMap",
@@ -6660,7 +6687,7 @@
         },
         {
             "file": "src/tools/info.js",
-            "line": 170,
+            "line": 173,
             "description": "Create the plot info.",
             "itemtype": "method",
             "name": "createPlot",
@@ -6671,7 +6698,7 @@
         },
         {
             "file": "src/tools/info.js",
-            "line": 185,
+            "line": 188,
             "description": "Update the plot markings.",
             "itemtype": "method",
             "name": "updatePlotMarkings",
@@ -8799,7 +8826,7 @@
         },
         {
             "message": "unknown tag: pqrqm",
-            "line": " src/image/image.js:264"
+            "line": " src/image/image.js:271"
         },
         {
             "message": "unknown tag: input",
