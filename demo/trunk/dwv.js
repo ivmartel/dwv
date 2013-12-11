@@ -259,20 +259,6 @@ dwv.App = function(mobile)
     };
     
     /**
-     * Set the layers zoom. To be called once the image is loaded.
-     * @method setLayersZoom
-     * @param {Number} zoomX The zoom in the X direction.
-     * @param {Number} zoomY The zoom in the Y direction.
-     * @param {Number} cx The zoom center X coordinate.
-     * @param {Number} cy The zoom center Y coordinate.
-     */
-    this.setLayersZoom = function(zoomX,zoomY,cx,cy)
-    {
-        if( imageLayer ) imageLayer.zoom(zoomX,zoomY,cx,cy);
-        if( drawLayer ) drawLayer.zoom(zoomX,zoomY,cx,cy);
-    };
-    
-    /**
      * Toggle the display of the info layer.
      * @method toggleInfoLayerDisplay
      */
@@ -4664,8 +4650,6 @@ dwv.html.Layer = function(name)
         // save zoom
         zoomX = newZoomX;
         zoomY = newZoomY;
-        // draw 
-        this.draw();
     };
     
     /**
@@ -4835,14 +4819,34 @@ dwv.html.Layer = function(name)
      */
     this.merge = function(layerToMerge)
     {
-        // copy content
-        context.drawImage(layerToMerge.getCanvas(), 0, 0);
-        // reset layout
-        this.resetLayout();
-        // store the image data
-        imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-        // empty merged layer
+        // basic resampling of the merge data to put it at zoom 1:1
+        var mergeImageData = layerToMerge.getContext().getImageData(
+            0, 0, canvas.width, canvas.height);
+        var offMerge = 0;
+        var offMergeJ = 0;
+        var offThis = 0;
+        var offThisJ = 0;
+        for( var j=0; j < canvas.height; ++j ) {
+            offMergeJ = parseInt( (originY + j * zoomY), 10 ) * canvas.width;
+            offThisJ = j * canvas.width;
+            for( var i=0; i < canvas.width; ++i ) {
+                // 4 component data: RGB + alpha
+                offMerge = 4 * ( parseInt( (originX + i * zoomX), 10 ) + offMergeJ );
+                offThis = 4 * ( i + offThisJ );
+                // optimise for drawing: if one component is not zero take all
+                if( mergeImageData.data[offMerge] >= 128 ) {
+                    imageData.data[offThis] = mergeImageData.data[offMerge];
+                    imageData.data[offThis+1] = mergeImageData.data[offMerge+1];
+                    imageData.data[offThis+2] = mergeImageData.data[offMerge+2];
+                    imageData.data[offThis+3] = mergeImageData.data[offMerge+3];
+                }
+            }
+        }
+        // empty and reset merged layer
         layerToMerge.clearContextRect();
+        layerToMerge.resetLayout();
+        // draw the layer
+        this.draw();
     };
     
     /**
@@ -10235,8 +10239,7 @@ dwv.tool.Zoom = function(app)
         var tx = (ev._x - self.x0);
         var ty = (ev._y - self.y0);
         // apply translation
-        app.getImageLayer().translate(tx,ty);
-        app.getDrawLayer().translate(tx,ty);
+        translateLayers(tx, ty);
         
         // reset origin point
         self.x0 = ev._x;
@@ -10376,7 +10379,24 @@ dwv.tool.Zoom = function(app)
      */ 
     function zoomLayers(step, cx, cy)
     {
-        app.setLayersZoom(step,step,cx,cy);
+        if( app.getImageLayer() ) 
+            app.getImageLayer().zoom(step, step, cx, cy);
+        if( app.getDrawLayer() ) 
+            app.getDrawLayer().zoom(step, step, cx, cy);
+    }
+
+    /**
+     * Apply a translation to the layers.
+     * @method translateLayers
+     * @param {Number} tx The translation along X.
+     * @param {Number} ty The translation along Y.
+     */ 
+    function translateLayers(tx, ty)
+    {
+        if( app.getImageLayer() ) 
+            app.getImageLayer().translate(tx, ty);
+        if( app.getDrawLayer() ) 
+            app.getDrawLayer().translate(tx, ty);
     }
 
 }; // Zoom class

@@ -457,20 +457,6 @@ dwv.App = function(mobile)
     };
     
     /**
-     * Set the layers zoom. To be called once the image is loaded.
-     * @method setLayersZoom
-     * @param {Number} zoomX The zoom in the X direction.
-     * @param {Number} zoomY The zoom in the Y direction.
-     * @param {Number} cx The zoom center X coordinate.
-     * @param {Number} cy The zoom center Y coordinate.
-     */
-    this.setLayersZoom = function(zoomX,zoomY,cx,cy)
-    {
-        if( imageLayer ) imageLayer.zoom(zoomX,zoomY,cx,cy);
-        if( drawLayer ) drawLayer.zoom(zoomX,zoomY,cx,cy);
-    };
-    
-    /**
      * Toggle the display of the info layer.
      * @method toggleInfoLayerDisplay
      */

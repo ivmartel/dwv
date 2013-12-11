@@ -286,8 +286,7 @@ dwv.tool.Zoom = function(app)
         var tx = (ev._x - self.x0);
         var ty = (ev._y - self.y0);
         // apply translation
-        app.getImageLayer().translate(tx,ty);
-        app.getDrawLayer().translate(tx,ty);
+        translateLayers(tx, ty);
         
         // reset origin point
         self.x0 = ev._x;
@@ -427,7 +426,24 @@ dwv.tool.Zoom = function(app)
      */ 
     function zoomLayers(step, cx, cy)
     {
-        app.setLayersZoom(step,step,cx,cy);
+        if( app.getImageLayer() ) 
+            app.getImageLayer().zoom(step, step, cx, cy);
+        if( app.getDrawLayer() ) 
+            app.getDrawLayer().zoom(step, step, cx, cy);
+    }
+
+    /**
+     * Apply a translation to the layers.
+     * @method translateLayers
+     * @param {Number} tx The translation along X.
+     * @param {Number} ty The translation along Y.
+     */ 
+    function translateLayers(tx, ty)
+    {
+        if( app.getImageLayer() ) 
+            app.getImageLayer().translate(tx, ty);
+        if( app.getDrawLayer() ) 
+            app.getDrawLayer().translate(tx, ty);
     }
 
 }; // Zoom class

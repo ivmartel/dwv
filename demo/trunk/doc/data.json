@@ -3184,7 +3184,7 @@
         },
         {
             "file": "src/html/layer.js",
-            "line": 121,
+            "line": 119,
             "description": "Set the layer zoom and apply it.",
             "itemtype": "method",
             "name": "zoom",
@@ -3216,7 +3216,7 @@
         },
         {
             "file": "src/html/layer.js",
-            "line": 137,
+            "line": 135,
             "description": "Set the layer translation.\nTranslation is according to the last one.",
             "itemtype": "method",
             "name": "setTranslate",
@@ -3238,7 +3238,7 @@
         },
         {
             "file": "src/html/layer.js",
-            "line": 166,
+            "line": 164,
             "description": "Set the layer translation and apply it.\nTranslation is according to the last one.",
             "itemtype": "method",
             "name": "translate",
@@ -3260,7 +3260,7 @@
         },
         {
             "file": "src/html/layer.js",
-            "line": 181,
+            "line": 179,
             "description": "Set the image data array.",
             "itemtype": "method",
             "name": "setImageData",
@@ -3277,7 +3277,7 @@
         },
         {
             "file": "src/html/layer.js",
-            "line": 191,
+            "line": 189,
             "description": "Reset the layout",
             "itemtype": "method",
             "name": "resetLayout",
@@ -3287,7 +3287,7 @@
         },
         {
             "file": "src/html/layer.js",
-            "line": 203,
+            "line": 201,
             "description": "Draw the content (imageData) of the layer.\nThe imageData variable needs to be set",
             "itemtype": "method",
             "name": "draw",
@@ -3297,7 +3297,7 @@
         },
         {
             "file": "src/html/layer.js",
-            "line": 227,
+            "line": 225,
             "description": "Initialise the layer: set the canvas and context",
             "itemtype": "method",
             "name": "initialise",
@@ -3308,7 +3308,7 @@
         },
         {
             "file": "src/html/layer.js",
-            "line": 263,
+            "line": 261,
             "description": "Fill the full context with the current style.",
             "itemtype": "method",
             "name": "fillContext",
@@ -3318,7 +3318,7 @@
         },
         {
             "file": "src/html/layer.js",
-            "line": 272,
+            "line": 270,
             "description": "Clear the full context.",
             "itemtype": "method",
             "name": "clearContextRect",
@@ -3328,7 +3328,7 @@
         },
         {
             "file": "src/html/layer.js",
-            "line": 281,
+            "line": 279,
             "description": "Merge two layers.",
             "itemtype": "method",
             "name": "merge",
@@ -3339,7 +3339,7 @@
         },
         {
             "file": "src/html/layer.js",
-            "line": 298,
+            "line": 316,
             "description": "Set the line color for the layer.",
             "itemtype": "method",
             "name": "setLineColor",
@@ -3350,7 +3350,7 @@
         },
         {
             "file": "src/html/layer.js",
-            "line": 309,
+            "line": 327,
             "description": "Display the layer.",
             "itemtype": "method",
             "name": "setStyleDisplay",
@@ -3361,7 +3361,7 @@
         },
         {
             "file": "src/html/layer.js",
-            "line": 326,
+            "line": 344,
             "description": "Check if the layer is visible.",
             "itemtype": "method",
             "name": "isVisible",
@@ -3375,7 +3375,7 @@
         },
         {
             "file": "src/html/layer.js",
-            "line": 337,
+            "line": 355,
             "description": "Align on another layer.",
             "itemtype": "method",
             "name": "align",
@@ -8047,7 +8047,7 @@
         },
         {
             "file": "src/tools/zoom.js",
-            "line": 99,
+            "line": 98,
             "description": "Handle two touch move event.",
             "itemtype": "method",
             "name": "twotouchmove",
@@ -8064,7 +8064,7 @@
         },
         {
             "file": "src/tools/zoom.js",
-            "line": 119,
+            "line": 118,
             "description": "Handle mouse up event.",
             "itemtype": "method",
             "name": "mouseup",
@@ -8081,7 +8081,7 @@
         },
         {
             "file": "src/tools/zoom.js",
-            "line": 132,
+            "line": 131,
             "description": "Handle mouse out event.",
             "itemtype": "method",
             "name": "mouseout",
@@ -8098,7 +8098,7 @@
         },
         {
             "file": "src/tools/zoom.js",
-            "line": 141,
+            "line": 140,
             "description": "Handle touch start event.",
             "itemtype": "method",
             "name": "touchstart",
@@ -8115,7 +8115,7 @@
         },
         {
             "file": "src/tools/zoom.js",
-            "line": 155,
+            "line": 154,
             "description": "Handle touch move event.",
             "itemtype": "method",
             "name": "touchmove",
@@ -8132,7 +8132,7 @@
         },
         {
             "file": "src/tools/zoom.js",
-            "line": 169,
+            "line": 168,
             "description": "Handle touch end event.",
             "itemtype": "method",
             "name": "touchend",
@@ -8149,7 +8149,7 @@
         },
         {
             "file": "src/tools/zoom.js",
-            "line": 178,
+            "line": 177,
             "description": "Handle mouse scroll event (fired by Firefox).",
             "itemtype": "method",
             "name": "DOMMouseScroll",
@@ -8166,7 +8166,7 @@
         },
         {
             "file": "src/tools/zoom.js",
-            "line": 189,
+            "line": 188,
             "description": "Handle mouse wheel event.",
             "itemtype": "method",
             "name": "mousewheel",
@@ -8183,7 +8183,7 @@
         },
         {
             "file": "src/tools/zoom.js",
-            "line": 200,
+            "line": 199,
             "description": "Handle key down event.",
             "itemtype": "method",
             "name": "keydown",
@@ -8200,7 +8200,7 @@
         },
         {
             "file": "src/tools/zoom.js",
-            "line": 209,
+            "line": 208,
             "description": "Enable the tool.",
             "itemtype": "method",
             "name": "enable",
@@ -8217,7 +8217,7 @@
         },
         {
             "file": "src/tools/zoom.js",
-            "line": 223,
+            "line": 222,
             "description": "Apply the zoom to the layers.",
             "itemtype": "method",
             "name": "zoomLayers",
@@ -8245,6 +8245,28 @@
         {
             "file": "src/tools/zoom.js",
             "line": 237,
+            "description": "Apply a translation to the layers.",
+            "itemtype": "method",
+            "name": "translateLayers",
+            "params": [
+                {
+                    "name": "tx",
+                    "description": "The translation along X.",
+                    "type": "Number"
+                },
+                {
+                    "name": "ty",
+                    "description": "The translation along Y.",
+                    "type": "Number"
+                }
+            ],
+            "class": "dwv.tool.Zoom",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/zoom.js",
+            "line": 253,
             "description": "Help for this tool.",
             "itemtype": "method",
             "name": "getHelp",
@@ -8603,38 +8625,6 @@
         {
             "file": "src/application.js",
             "line": 261,
-            "description": "Set the layers zoom. To be called once the image is loaded.",
-            "itemtype": "method",
-            "name": "setLayersZoom",
-            "params": [
-                {
-                    "name": "zoomX",
-                    "description": "The zoom in the X direction.",
-                    "type": "Number"
-                },
-                {
-                    "name": "zoomY",
-                    "description": "The zoom in the Y direction.",
-                    "type": "Number"
-                },
-                {
-                    "name": "cx",
-                    "description": "The zoom center X coordinate.",
-                    "type": "Number"
-                },
-                {
-                    "name": "cy",
-                    "description": "The zoom center Y coordinate.",
-                    "type": "Number"
-                }
-            ],
-            "class": "dwv.App",
-            "module": "utils",
-            "namespace": "dwv"
-        },
-        {
-            "file": "src/application.js",
-            "line": 275,
             "description": "Toggle the display of the info layer.",
             "itemtype": "method",
             "name": "toggleInfoLayerDisplay",
@@ -8644,7 +8634,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 296,
+            "line": 282,
             "description": "Add image listeners.",
             "itemtype": "method",
             "name": "addImageInfoListeners",
@@ -8656,7 +8646,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 310,
+            "line": 296,
             "description": "Remove image listeners.",
             "itemtype": "method",
             "name": "removeImageInfoListeners",
@@ -8668,7 +8658,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 324,
+            "line": 310,
             "description": "General-purpose event handler. This function just determines the mouse \nposition relative to the canvas element. It then passes it to the current tool.",
             "itemtype": "method",
             "name": "eventHandler",
@@ -8687,7 +8677,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 401,
+            "line": 387,
             "description": "Handle an error: display it to the user.",
             "itemtype": "method",
             "name": "handleError",
@@ -8706,7 +8696,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 414,
+            "line": 400,
             "description": "Create the application layers.",
             "itemtype": "method",
             "name": "createLayers",
@@ -8730,7 +8720,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 441,
+            "line": 427,
             "description": "Create the DICOM tags table. To be called once the DICOM has been parsed.",
             "itemtype": "method",
             "name": "createTagsTable",
@@ -8749,7 +8739,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 469,
+            "line": 455,
             "description": "Post load application initialisation. To be called once the DICOM has been parsed.",
             "itemtype": "method",
             "name": "postLoadInit",
@@ -8806,23 +8796,23 @@
         },
         {
             "message": "unknown tag: input",
-            "line": " src/html/layer.js:227"
+            "line": " src/html/layer.js:225"
         },
         {
             "message": "unknown tag: input",
-            "line": " src/html/layer.js:227"
+            "line": " src/html/layer.js:225"
         },
         {
             "message": "unknown tag: input",
-            "line": " src/html/layer.js:281"
+            "line": " src/html/layer.js:279"
         },
         {
             "message": "unknown tag: input",
-            "line": " src/html/layer.js:298"
+            "line": " src/html/layer.js:316"
         },
         {
             "message": "unknown tag: input",
-            "line": " src/html/layer.js:309"
+            "line": " src/html/layer.js:327"
         },
         {
             "message": "unknown tag: pqrqm",
@@ -8858,7 +8848,7 @@
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/tools/zoom.js:237"
+            "line": " src/tools/zoom.js:253"
         },
         {
             "message": "Missing item type\nLookup tables for image color display.",
