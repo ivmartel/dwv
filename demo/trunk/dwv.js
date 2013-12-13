@@ -4723,7 +4723,7 @@ dwv.html.Layer = function(name)
     };
     
     /**
-     * Reset the layout
+     * Reset the layout.
      * @method resetLayout
      */ 
     this.resetLayout = function()
@@ -4742,7 +4742,7 @@ dwv.html.Layer = function(name)
     this.draw = function()
     {
         // clear the context
-        this.clearContextRect();
+        context.clearRect(0, 0, canvas.width, canvas.height);
         
         // Put the image data in the context
         
@@ -4804,14 +4804,16 @@ dwv.html.Layer = function(name)
     };
     
     /**
-     * Clear the full context.
-     * @method clearContextRect
+     * Clear the context and reset the image data.
+     * @method clear
      */
-    this.clearContextRect = function()
+    this.clear = function()
     {
         context.clearRect(0, 0, canvas.width, canvas.height);
+        imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+        this.resetLayout();
     };
-    
+
     /**
      * Merge two layers.
      * @method merge
@@ -4826,6 +4828,7 @@ dwv.html.Layer = function(name)
         var offMergeJ = 0;
         var offThis = 0;
         var offThisJ = 0;
+        var alpha = 0;
         for( var j=0; j < canvas.height; ++j ) {
             offMergeJ = parseInt( (originY + j * zoomY), 10 ) * canvas.width;
             offThisJ = j * canvas.width;
@@ -4833,18 +4836,18 @@ dwv.html.Layer = function(name)
                 // 4 component data: RGB + alpha
                 offMerge = 4 * ( parseInt( (originX + i * zoomX), 10 ) + offMergeJ );
                 offThis = 4 * ( i + offThisJ );
-                // optimise for drawing: if one component is not zero take all
-                if( mergeImageData.data[offMerge] >= 128 ) {
+                // merge non transparent 
+                alpha = mergeImageData.data[offMerge+3];
+                if( alpha !== 0 ) {
                     imageData.data[offThis] = mergeImageData.data[offMerge];
                     imageData.data[offThis+1] = mergeImageData.data[offMerge+1];
                     imageData.data[offThis+2] = mergeImageData.data[offMerge+2];
-                    imageData.data[offThis+3] = mergeImageData.data[offMerge+3];
+                    imageData.data[offThis+3] = alpha;
                 }
             }
         }
         // empty and reset merged layer
-        layerToMerge.clearContextRect();
-        layerToMerge.resetLayout();
+        layerToMerge.clear();
         // draw the layer
         this.draw();
     };
@@ -8216,7 +8219,7 @@ dwv.tool.Draw = function(app)
             // create draw command
             command = new dwv.tool.shapes[self.shapeName](points, app, self.style);
             // clear the temporary layer
-            app.getTempLayer().clearContextRect();
+            app.getTempLayer().clear();
             // draw
             command.execute();
         }
@@ -9194,7 +9197,7 @@ dwv.tool.Livewire = function(app)
         // create draw command
         command = new dwv.tool.DrawLivewireCommand(currentPath, app, self.style);
         // clear the temporary layer
-        app.getTempLayer().clearContextRect();
+        app.getTempLayer().clear();
         // draw
         command.execute();
     };
@@ -9750,8 +9753,8 @@ dwv.tool.UndoStack = function(app)
             // reset image
             app.restoreOriginalImage();
             // clear layers
-            app.getDrawLayer().clearContextRect();
-            app.getTempLayer().clearContextRect();
+            app.getDrawLayer().clear();
+            app.getTempLayer().clear();
             // redo from first command
             for( var i = 0; i < curCmdIndex; ++i)
             {

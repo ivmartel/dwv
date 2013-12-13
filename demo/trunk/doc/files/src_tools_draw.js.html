@@ -291,7 +291,7 @@ dwv.tool.Draw = function(app)
             // create draw command
             command = new dwv.tool.shapes[self.shapeName](points, app, self.style);
             // clear the temporary layer
-            app.getTempLayer().clearContextRect();
+            app.getTempLayer().clear();
             // draw
             command.execute();
         }

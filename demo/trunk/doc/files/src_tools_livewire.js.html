@@ -405,7 +405,7 @@ dwv.tool.Livewire = function(app)
         // create draw command
         command = new dwv.tool.DrawLivewireCommand(currentPath, app, self.style);
         // clear the temporary layer
-        app.getTempLayer().clearContextRect();
+        app.getTempLayer().clear();
         // draw
         command.execute();
     };

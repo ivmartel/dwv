@@ -3278,7 +3278,7 @@
         {
             "file": "src/html/layer.js",
             "line": 189,
-            "description": "Reset the layout",
+            "description": "Reset the layout.",
             "itemtype": "method",
             "name": "resetLayout",
             "class": "dwv.html.Layer",
@@ -3319,16 +3319,16 @@
         {
             "file": "src/html/layer.js",
             "line": 270,
-            "description": "Clear the full context.",
+            "description": "Clear the context and reset the image data.",
             "itemtype": "method",
-            "name": "clearContextRect",
+            "name": "clear",
             "class": "dwv.html.Layer",
             "module": "html",
             "namespace": "dwv.html"
         },
         {
             "file": "src/html/layer.js",
-            "line": 279,
+            "line": 281,
             "description": "Merge two layers.",
             "itemtype": "method",
             "name": "merge",
@@ -3339,7 +3339,7 @@
         },
         {
             "file": "src/html/layer.js",
-            "line": 316,
+            "line": 319,
             "description": "Set the line color for the layer.",
             "itemtype": "method",
             "name": "setLineColor",
@@ -3350,7 +3350,7 @@
         },
         {
             "file": "src/html/layer.js",
-            "line": 327,
+            "line": 330,
             "description": "Display the layer.",
             "itemtype": "method",
             "name": "setStyleDisplay",
@@ -3361,7 +3361,7 @@
         },
         {
             "file": "src/html/layer.js",
-            "line": 344,
+            "line": 347,
             "description": "Check if the layer is visible.",
             "itemtype": "method",
             "name": "isVisible",
@@ -3375,7 +3375,7 @@
         },
         {
             "file": "src/html/layer.js",
-            "line": 355,
+            "line": 358,
             "description": "Align on another layer.",
             "itemtype": "method",
             "name": "align",
@@ -8804,15 +8804,15 @@
         },
         {
             "message": "unknown tag: input",
-            "line": " src/html/layer.js:279"
+            "line": " src/html/layer.js:281"
         },
         {
             "message": "unknown tag: input",
-            "line": " src/html/layer.js:316"
+            "line": " src/html/layer.js:319"
         },
         {
             "message": "unknown tag: input",
-            "line": " src/html/layer.js:327"
+            "line": " src/html/layer.js:330"
         },
         {
             "message": "unknown tag: pqrqm",
