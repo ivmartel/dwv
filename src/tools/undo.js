@@ -60,8 +60,8 @@ dwv.tool.UndoStack = function(app)
             // reset image
             app.restoreOriginalImage();
             // clear layers
-            app.getDrawLayer().clearContextRect();
-            app.getTempLayer().clearContextRect();
+            app.getDrawLayer().clear();
+            app.getTempLayer().clear();
             // redo from first command
             for( var i = 0; i < curCmdIndex; ++i)
             {
