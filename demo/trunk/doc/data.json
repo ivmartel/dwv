@@ -8064,7 +8064,7 @@
         },
         {
             "file": "src/tools/zoom.js",
-            "line": 120,
+            "line": 121,
             "description": "Handle mouse up event.",
             "itemtype": "method",
             "name": "mouseup",
@@ -8081,7 +8081,7 @@
         },
         {
             "file": "src/tools/zoom.js",
-            "line": 133,
+            "line": 134,
             "description": "Handle mouse out event.",
             "itemtype": "method",
             "name": "mouseout",
@@ -8098,7 +8098,7 @@
         },
         {
             "file": "src/tools/zoom.js",
-            "line": 142,
+            "line": 143,
             "description": "Handle touch start event.",
             "itemtype": "method",
             "name": "touchstart",
@@ -8115,7 +8115,7 @@
         },
         {
             "file": "src/tools/zoom.js",
-            "line": 157,
+            "line": 158,
             "description": "Handle touch move event.",
             "itemtype": "method",
             "name": "touchmove",
@@ -8132,7 +8132,7 @@
         },
         {
             "file": "src/tools/zoom.js",
-            "line": 172,
+            "line": 173,
             "description": "Handle touch end event.",
             "itemtype": "method",
             "name": "touchend",
@@ -8149,7 +8149,7 @@
         },
         {
             "file": "src/tools/zoom.js",
-            "line": 181,
+            "line": 182,
             "description": "Handle mouse scroll event (fired by Firefox).",
             "itemtype": "method",
             "name": "DOMMouseScroll",
@@ -8166,7 +8166,7 @@
         },
         {
             "file": "src/tools/zoom.js",
-            "line": 192,
+            "line": 193,
             "description": "Handle mouse wheel event.",
             "itemtype": "method",
             "name": "mousewheel",
@@ -8183,7 +8183,7 @@
         },
         {
             "file": "src/tools/zoom.js",
-            "line": 203,
+            "line": 204,
             "description": "Handle key down event.",
             "itemtype": "method",
             "name": "keydown",
@@ -8200,7 +8200,7 @@
         },
         {
             "file": "src/tools/zoom.js",
-            "line": 212,
+            "line": 213,
             "description": "Enable the tool.",
             "itemtype": "method",
             "name": "enable",
@@ -8217,7 +8217,7 @@
         },
         {
             "file": "src/tools/zoom.js",
-            "line": 226,
+            "line": 227,
             "description": "Apply the zoom to the layers.",
             "itemtype": "method",
             "name": "zoomLayers",
@@ -8244,7 +8244,7 @@
         },
         {
             "file": "src/tools/zoom.js",
-            "line": 241,
+            "line": 242,
             "description": "Apply a translation to the layers.",
             "itemtype": "method",
             "name": "translateLayers",
@@ -8266,7 +8266,7 @@
         },
         {
             "file": "src/tools/zoom.js",
-            "line": 257,
+            "line": 258,
             "description": "Help for this tool.",
             "itemtype": "method",
             "name": "getHelp",
@@ -8848,7 +8848,7 @@
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/tools/zoom.js:257"
+            "line": " src/tools/zoom.js:258"
         },
         {
             "message": "Missing item type\nLookup tables for image color display.",
