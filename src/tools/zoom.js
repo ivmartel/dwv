@@ -109,9 +109,10 @@ dwv.tool.Zoom = function(app)
        var point1 = new dwv.math.Point2D(event._x1, event._y1);
        var newLine = new dwv.math.Line(point0, point1);
        var lineRatio = newLine.getLength() / self.line0.getLength();
+       alert("Just checking: "+lineRatio);
        
        var zoom = (lineRatio - 1) / 2;
-       alert("Just checking: "+lineRatio+", test:"+(Math.abs(zoom) % 0.1));
+       alert("test:"+(Math.abs(zoom) % 0.1));
        if( Math.abs(zoom) % 0.1 <= 0.05 )
            alert("passed check.");
            zoomLayers(zoom, self.midPoint.getX(), self.midPoint.getY());
