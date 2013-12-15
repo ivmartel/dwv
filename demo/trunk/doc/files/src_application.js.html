@@ -525,19 +525,19 @@ dwv.App = function(mobile)
                 event.type === &quot;touchmove&quot;)
             {
                 event.preventDefault();
+                var touches = event.targetTouches;
                 // If there&#x27;s one or two fingers inside this element
-                if( event.targetTouches.length === 1 ||
-                    event.targetTouches.length === 2)
+                if( touches.length === 1 || touches.length === 2)
                 {
-                  var touch = event.targetTouches[0];
+                  var touch = touches[0];
                   // store
                   event._x = touch.pageX - parseInt(app.getImageLayer().getOffset().left, 10);
                   event._x = parseInt( (event._x / displayZoom), 10 );
                   event._y = touch.pageY - parseInt(app.getImageLayer().getOffset().top, 10);
                   event._y = parseInt( (event._y / displayZoom), 10 );
                   // second finger
-                  if (event.targetTouches.length === 2) {
-                      touch = event.targetTouches[1];
+                  if (touches.length === 2) {
+                      touch = touches[1];
                       // store
                       event._x1 = touch.pageX - parseInt(app.getImageLayer().getOffset().left, 10);
                       event._x1 = parseInt( (event._x1 / displayZoom), 10 );

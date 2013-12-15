@@ -327,19 +327,19 @@ dwv.App = function(mobile)
                 event.type === "touchmove")
             {
                 event.preventDefault();
+                var touches = event.targetTouches;
                 // If there's one or two fingers inside this element
-                if( event.targetTouches.length === 1 ||
-                    event.targetTouches.length === 2)
+                if( touches.length === 1 || touches.length === 2)
                 {
-                  var touch = event.targetTouches[0];
+                  var touch = touches[0];
                   // store
                   event._x = touch.pageX - parseInt(app.getImageLayer().getOffset().left, 10);
                   event._x = parseInt( (event._x / displayZoom), 10 );
                   event._y = touch.pageY - parseInt(app.getImageLayer().getOffset().top, 10);
                   event._y = parseInt( (event._y / displayZoom), 10 );
                   // second finger
-                  if (event.targetTouches.length === 2) {
-                      touch = event.targetTouches[1];
+                  if (touches.length === 2) {
+                      touch = touches[1];
                       // store
                       event._x1 = touch.pageX - parseInt(app.getImageLayer().getOffset().left, 10);
                       event._x1 = parseInt( (event._x1 / displayZoom), 10 );
@@ -8193,12 +8193,12 @@ dwv.tool.Draw = function(app)
      * @method mousedown
      * @param {Object} event The mouse down event.
      */
-    this.mousedown = function(ev){
+    this.mousedown = function(event){
         started = true;
         // clear array
         points = [];
         // store point
-        points.push(new dwv.math.Point2D(ev._x, ev._y));
+        points.push(new dwv.math.Point2D(event._x, event._y));
     };
 
     /**
@@ -8206,16 +8206,16 @@ dwv.tool.Draw = function(app)
      * @method mousemove
      * @param {Object} event The mouse move event.
      */
-    this.mousemove = function(ev){
+    this.mousemove = function(event){
         if (!started)
         {
             return;
         }
-        if( ev._x !== points[0].getX() &&
-            ev._y !== points[0].getY() )
+        if( event._x !== points[0].getX() &&
+            event._y !== points[0].getY() )
         {
             // current point
-            points.push(new dwv.math.Point2D(ev._x, ev._y));
+            points.push(new dwv.math.Point2D(event._x, event._y));
             // create draw command
             command = new dwv.tool.shapes[self.shapeName](points, app, self.style);
             // clear the temporary layer
@@ -8230,7 +8230,7 @@ dwv.tool.Draw = function(app)
      * @method mouseup
      * @param {Object} event The mouse up event.
      */
-    this.mouseup = function(ev){
+    this.mouseup = function(event){
         if (started)
         {
             // save command in undo stack
@@ -8247,8 +8247,8 @@ dwv.tool.Draw = function(app)
      * @method mouseout
      * @param {Object} event The mouse out event.
      */
-    this.mouseout = function(ev){
-        self.mouseup(ev);
+    this.mouseout = function(event){
+        self.mouseup(event);
     };
 
     /**
@@ -8256,8 +8256,8 @@ dwv.tool.Draw = function(app)
      * @method touchstart
      * @param {Object} event The touch start event.
      */
-    this.touchstart = function(ev){
-        self.mousedown(ev);
+    this.touchstart = function(event){
+        self.mousedown(event);
     };
 
     /**
@@ -8265,8 +8265,8 @@ dwv.tool.Draw = function(app)
      * @method touchmove
      * @param {Object} event The touch move event.
      */
-    this.touchmove = function(ev){
-        self.mousemove(ev);
+    this.touchmove = function(event){
+        self.mousemove(event);
     };
 
     /**
@@ -8274,8 +8274,8 @@ dwv.tool.Draw = function(app)
      * @method touchend
      * @param {Object} event The touch end event.
      */
-    this.touchend = function(ev){
-        self.mouseup(ev);
+    this.touchend = function(event){
+        self.mouseup(event);
     };
 
     /**
@@ -9099,28 +9099,28 @@ dwv.tool.Livewire = function(app)
      * @method mousedown
      * @param {Object} event The mouse down event.
      */
-    this.mousedown = function(ev){
+    this.mousedown = function(event){
         // first time
         if( !self.started ) {
             self.started = true;
-            self.x0 = ev._x;
-            self.y0 = ev._y;
+            self.x0 = event._x;
+            self.y0 = event._y;
             // clear vars
             clearPaths();
             clearParentPoints();
             // do the training from the first point
-            var p = new dwv.math.FastPoint2D(ev._x, ev._y);
+            var p = new dwv.math.FastPoint2D(event._x, event._y);
             scissors.doTraining(p);
             // add the initial point to the path
-            var p0 = new dwv.math.Point2D(ev._x, ev._y);
+            var p0 = new dwv.math.Point2D(event._x, event._y);
             path.addPoint(p0);
             path.addControlPoint(p0);
         }
         else {
             // final point: at 'tolerance' of the initial point
-            if( (Math.abs(ev._x - self.x0) < tolerance) && (Math.abs(ev._y - self.y0) < tolerance) ) {
+            if( (Math.abs(event._x - self.x0) < tolerance) && (Math.abs(event._y - self.y0) < tolerance) ) {
                 // draw
-                self.mousemove(ev);
+                self.mousemove(event);
                 console.log("Done.");
                 // save command in undo stack
                 app.getUndoStack().add(command);
@@ -9133,7 +9133,7 @@ dwv.tool.Livewire = function(app)
             else {
                 path = currentPath;
                 clearParentPoints();
-                var pn = new dwv.math.FastPoint2D(ev._x, ev._y);
+                var pn = new dwv.math.FastPoint2D(event._x, event._y);
                 scissors.doTraining(pn);
                 path.addControlPoint(currentPath.getPoint(0));
             }
@@ -9145,13 +9145,13 @@ dwv.tool.Livewire = function(app)
      * @method mousemove
      * @param {Object} event The mouse move event.
      */
-    this.mousemove = function(ev){
+    this.mousemove = function(event){
         if (!self.started)
         {
             return;
         }
         // set the point to find the path to
-        var p = new dwv.math.FastPoint2D(ev._x, ev._y);
+        var p = new dwv.math.FastPoint2D(event._x, event._y);
         scissors.setPoint(p);
         // do the work
         var results = 0;
@@ -9207,7 +9207,7 @@ dwv.tool.Livewire = function(app)
      * @method mouseup
      * @param {Object} event The mouse up event.
      */
-    this.mouseup = function(ev){
+    this.mouseup = function(event){
         // nothing to do
     };
     
@@ -10206,11 +10206,11 @@ dwv.tool.Zoom = function(app)
      * @method mousedown
      * @param {Object} event The mouse down event.
      */
-    this.mousedown = function(ev){
+    this.mousedown = function(event){
         self.started = true;
         // first position
-        self.x0 = ev._x;
-        self.y0 = ev._y;
+        self.x0 = event._x;
+        self.y0 = event._y;
      };
 
      /**
@@ -10218,11 +10218,11 @@ dwv.tool.Zoom = function(app)
       * @method twotouchdown
       * @param {Object} event The touch down event.
       */
-     this.twotouchdown = function(ev){
+     this.twotouchdown = function(event){
          self.started = true;
          // first line
-         var point0 = new dwv.math.Point2D(ev._x, ev._y);
-         var point1 = new dwv.math.Point2D(ev._x1, ev._y1);
+         var point0 = new dwv.math.Point2D(event._x, event._y);
+         var point1 = new dwv.math.Point2D(event._x1, event._y1);
          self.line0 = new dwv.math.Line(point0, point1);
          self.midPoint = self.line0.getMidpoint();         
      };
@@ -10232,21 +10232,21 @@ dwv.tool.Zoom = function(app)
       * @method mousemove
       * @param {Object} event The mouse move event.
       */
-     this.mousemove = function(ev){
+     this.mousemove = function(event){
         if (!self.started)
         {
             return;
         }
 
         // calculate translation
-        var tx = (ev._x - self.x0);
-        var ty = (ev._y - self.y0);
+        var tx = (event._x - self.x0);
+        var ty = (event._y - self.y0);
         // apply translation
         translateLayers(tx, ty);
         
         // reset origin point
-        self.x0 = ev._x;
-        self.y0 = ev._y;
+        self.x0 = event._x;
+        self.y0 = event._y;
     };
 
     /**
@@ -10254,13 +10254,13 @@ dwv.tool.Zoom = function(app)
      * @method twotouchmove
      * @param {Object} event The touch move event.
      */
-    this.twotouchmove = function(ev){
+    this.twotouchmove = function(event){
        if (!self.started)
        {
            return;
        }
-       var point0 = new dwv.math.Point2D(ev._x, ev._y);
-       var point1 = new dwv.math.Point2D(ev._x1, ev._y1);
+       var point0 = new dwv.math.Point2D(event._x, event._y);
+       var point1 = new dwv.math.Point2D(event._x1, event._y1);
        var newLine = new dwv.math.Line(point0, point1);
        var lineRatio = newLine.getLength() / self.line0.getLength();
        
@@ -10274,7 +10274,7 @@ dwv.tool.Zoom = function(app)
      * @method mouseup
      * @param {Object} event The mouse up event.
      */
-    this.mouseup = function(ev){
+    this.mouseup = function(event){
         if (self.started)
         {
             // stop recording
@@ -10287,8 +10287,8 @@ dwv.tool.Zoom = function(app)
      * @method mouseout
      * @param {Object} event The mouse out event.
      */
-    this.mouseout = function(ev){
-        self.mouseup(ev);
+    this.mouseout = function(event){
+        self.mouseup(event);
     };
 
     /**
@@ -10296,12 +10296,13 @@ dwv.tool.Zoom = function(app)
      * @method touchstart
      * @param {Object} event The touch start event.
      */
-    this.touchstart = function(ev){
-        if( event.targetTouches.length === 1 ){
-            self.mousedown(ev);
+    this.touchstart = function(event){
+        var touches = event.targetTouches;
+        if( touches.length === 1 ){
+            self.mousedown(event);
         }
-        else if( event.targetTouches.length === 2 ){
-            self.twotouchdown(ev);
+        else if( touches.length === 2 ){
+            self.twotouchdown(event);
         }
     };
 
@@ -10310,12 +10311,13 @@ dwv.tool.Zoom = function(app)
      * @method touchmove
      * @param {Object} event The touch move event.
      */
-    this.touchmove = function(ev){
-        if( event.targetTouches.length === 1 ){
-            self.mousemove(ev);
+    this.touchmove = function(event){
+        var touches = event.targetTouches;
+        if( touches.length === 1 ){
+            self.mousemove(event);
         }
-        else if( event.targetTouches.length === 2 ){
-            self.twotouchmove(ev);
+        else if( touches.length === 2 ){
+            self.twotouchmove(event);
         }
     };
 
@@ -10324,8 +10326,8 @@ dwv.tool.Zoom = function(app)
      * @method touchend
      * @param {Object} event The touch end event.
      */
-    this.touchend = function(ev){
-        self.mouseup(ev);
+    this.touchend = function(event){
+        self.mouseup(event);
     };
 
     /**
@@ -10333,10 +10335,10 @@ dwv.tool.Zoom = function(app)
      * @method DOMMouseScroll
      * @param {Object} event The mouse scroll event.
      */
-    this.DOMMouseScroll = function(ev){
+    this.DOMMouseScroll = function(event){
         // ev.detail on firefox is 3
-        var step = ev.detail/30;
-        zoomLayers(step, ev._x, ev._y);
+        var step = event.detail/30;
+        zoomLayers(step, event._x, event._y);
     };
 
     /**
@@ -10344,10 +10346,10 @@ dwv.tool.Zoom = function(app)
      * @method mousewheel
      * @param {Object} event The mouse wheel event.
      */
-    this.mousewheel = function(ev){
+    this.mousewheel = function(event){
         // ev.wheelDelta on chrome is 120
-        var step = ev.wheelDelta/1200;
-        zoomLayers(step, ev._x, ev._y);
+        var step = event.wheelDelta/1200;
+        zoomLayers(step, event._x, event._y);
     };
     
     /**

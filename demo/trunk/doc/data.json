@@ -8115,7 +8115,7 @@
         },
         {
             "file": "src/tools/zoom.js",
-            "line": 154,
+            "line": 155,
             "description": "Handle touch move event.",
             "itemtype": "method",
             "name": "touchmove",
@@ -8132,7 +8132,7 @@
         },
         {
             "file": "src/tools/zoom.js",
-            "line": 168,
+            "line": 170,
             "description": "Handle touch end event.",
             "itemtype": "method",
             "name": "touchend",
@@ -8149,7 +8149,7 @@
         },
         {
             "file": "src/tools/zoom.js",
-            "line": 177,
+            "line": 179,
             "description": "Handle mouse scroll event (fired by Firefox).",
             "itemtype": "method",
             "name": "DOMMouseScroll",
@@ -8166,7 +8166,7 @@
         },
         {
             "file": "src/tools/zoom.js",
-            "line": 188,
+            "line": 190,
             "description": "Handle mouse wheel event.",
             "itemtype": "method",
             "name": "mousewheel",
@@ -8183,7 +8183,7 @@
         },
         {
             "file": "src/tools/zoom.js",
-            "line": 199,
+            "line": 201,
             "description": "Handle key down event.",
             "itemtype": "method",
             "name": "keydown",
@@ -8200,7 +8200,7 @@
         },
         {
             "file": "src/tools/zoom.js",
-            "line": 208,
+            "line": 210,
             "description": "Enable the tool.",
             "itemtype": "method",
             "name": "enable",
@@ -8217,7 +8217,7 @@
         },
         {
             "file": "src/tools/zoom.js",
-            "line": 222,
+            "line": 224,
             "description": "Apply the zoom to the layers.",
             "itemtype": "method",
             "name": "zoomLayers",
@@ -8244,7 +8244,7 @@
         },
         {
             "file": "src/tools/zoom.js",
-            "line": 237,
+            "line": 239,
             "description": "Apply a translation to the layers.",
             "itemtype": "method",
             "name": "translateLayers",
@@ -8266,7 +8266,7 @@
         },
         {
             "file": "src/tools/zoom.js",
-            "line": 253,
+            "line": 255,
             "description": "Help for this tool.",
             "itemtype": "method",
             "name": "getHelp",
@@ -8848,7 +8848,7 @@
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/tools/zoom.js:253"
+            "line": " src/tools/zoom.js:255"
         },
         {
             "message": "Missing item type\nLookup tables for image color display.",
