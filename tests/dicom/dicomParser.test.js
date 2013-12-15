@@ -18,7 +18,7 @@ asyncTest("Test DICOM parsing.", 2, function() {
     var url = "http://x.babymri.org/?53320924&.dcm";
     request.open('GET', url, true);
     request.responseType = "arraybuffer"; 
-    request.onload = function(ev) {
+    request.onload = function(event) {
         // parse DICOM
         var data = dwv.image.getDataFromDicomBuffer(request.response);
         // check values

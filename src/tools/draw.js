@@ -67,12 +67,12 @@ dwv.tool.Draw = function(app)
      * @method mousedown
      * @param {Object} event The mouse down event.
      */
-    this.mousedown = function(ev){
+    this.mousedown = function(event){
         started = true;
         // clear array
         points = [];
         // store point
-        points.push(new dwv.math.Point2D(ev._x, ev._y));
+        points.push(new dwv.math.Point2D(event._x, event._y));
     };
 
     /**
@@ -80,16 +80,16 @@ dwv.tool.Draw = function(app)
      * @method mousemove
      * @param {Object} event The mouse move event.
      */
-    this.mousemove = function(ev){
+    this.mousemove = function(event){
         if (!started)
         {
             return;
         }
-        if( ev._x !== points[0].getX() &&
-            ev._y !== points[0].getY() )
+        if( event._x !== points[0].getX() &&
+            event._y !== points[0].getY() )
         {
             // current point
-            points.push(new dwv.math.Point2D(ev._x, ev._y));
+            points.push(new dwv.math.Point2D(event._x, event._y));
             // create draw command
             command = new dwv.tool.shapes[self.shapeName](points, app, self.style);
             // clear the temporary layer
@@ -104,7 +104,7 @@ dwv.tool.Draw = function(app)
      * @method mouseup
      * @param {Object} event The mouse up event.
      */
-    this.mouseup = function(ev){
+    this.mouseup = function(event){
         if (started)
         {
             // save command in undo stack
@@ -121,8 +121,8 @@ dwv.tool.Draw = function(app)
      * @method mouseout
      * @param {Object} event The mouse out event.
      */
-    this.mouseout = function(ev){
-        self.mouseup(ev);
+    this.mouseout = function(event){
+        self.mouseup(event);
     };
 
     /**
@@ -130,8 +130,8 @@ dwv.tool.Draw = function(app)
      * @method touchstart
      * @param {Object} event The touch start event.
      */
-    this.touchstart = function(ev){
-        self.mousedown(ev);
+    this.touchstart = function(event){
+        self.mousedown(event);
     };
 
     /**
@@ -139,8 +139,8 @@ dwv.tool.Draw = function(app)
      * @method touchmove
      * @param {Object} event The touch move event.
      */
-    this.touchmove = function(ev){
-        self.mousemove(ev);
+    this.touchmove = function(event){
+        self.mousemove(event);
     };
 
     /**
@@ -148,8 +148,8 @@ dwv.tool.Draw = function(app)
      * @method touchend
      * @param {Object} event The touch end event.
      */
-    this.touchend = function(ev){
-        self.mouseup(ev);
+    this.touchend = function(event){
+        self.mouseup(event);
     };
 
     /**

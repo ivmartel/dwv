@@ -109,28 +109,28 @@ dwv.tool.Livewire = function(app)
      * @method mousedown
      * @param {Object} event The mouse down event.
      */
-    this.mousedown = function(ev){
+    this.mousedown = function(event){
         // first time
         if( !self.started ) {
             self.started = true;
-            self.x0 = ev._x;
-            self.y0 = ev._y;
+            self.x0 = event._x;
+            self.y0 = event._y;
             // clear vars
             clearPaths();
             clearParentPoints();
             // do the training from the first point
-            var p = new dwv.math.FastPoint2D(ev._x, ev._y);
+            var p = new dwv.math.FastPoint2D(event._x, event._y);
             scissors.doTraining(p);
             // add the initial point to the path
-            var p0 = new dwv.math.Point2D(ev._x, ev._y);
+            var p0 = new dwv.math.Point2D(event._x, event._y);
             path.addPoint(p0);
             path.addControlPoint(p0);
         }
         else {
             // final point: at 'tolerance' of the initial point
-            if( (Math.abs(ev._x - self.x0) < tolerance) && (Math.abs(ev._y - self.y0) < tolerance) ) {
+            if( (Math.abs(event._x - self.x0) < tolerance) && (Math.abs(event._y - self.y0) < tolerance) ) {
                 // draw
-                self.mousemove(ev);
+                self.mousemove(event);
                 console.log("Done.");
                 // save command in undo stack
                 app.getUndoStack().add(command);
@@ -143,7 +143,7 @@ dwv.tool.Livewire = function(app)
             else {
                 path = currentPath;
                 clearParentPoints();
-                var pn = new dwv.math.FastPoint2D(ev._x, ev._y);
+                var pn = new dwv.math.FastPoint2D(event._x, event._y);
                 scissors.doTraining(pn);
                 path.addControlPoint(currentPath.getPoint(0));
             }
@@ -155,13 +155,13 @@ dwv.tool.Livewire = function(app)
      * @method mousemove
      * @param {Object} event The mouse move event.
      */
-    this.mousemove = function(ev){
+    this.mousemove = function(event){
         if (!self.started)
         {
             return;
         }
         // set the point to find the path to
-        var p = new dwv.math.FastPoint2D(ev._x, ev._y);
+        var p = new dwv.math.FastPoint2D(event._x, event._y);
         scissors.setPoint(p);
         // do the work
         var results = 0;
@@ -217,7 +217,7 @@ dwv.tool.Livewire = function(app)
      * @method mouseup
      * @param {Object} event The mouse up event.
      */
-    this.mouseup = function(ev){
+    this.mouseup = function(event){
         // nothing to do
     };
     
