@@ -19,7 +19,7 @@
             
         </div>
         <div class="yui3-u-1-4 version">
-            <em>API Docs for: 0.4.1</em>
+            <em>API Docs for: 0.5.0</em>
         </div>
     </div>
     <div id="bd" class="yui3-g">
@@ -78,6 +78,10 @@
                 <li><a href="../classes/dwv.image.View.html">dwv.image.View</a></li>
             
                 <li><a href="../classes/dwv.info.html">dwv.info</a></li>
+            
+                <li><a href="../classes/dwv.io.File.html">dwv.io.File</a></li>
+            
+                <li><a href="../classes/dwv.io.Url.html">dwv.io.Url</a></li>
             
                 <li><a href="../classes/dwv.math.BucketQueue.html">dwv.math.BucketQueue</a></li>
             
@@ -144,6 +148,8 @@
                 <li><a href="../modules/image.html">image</a></li>
             
                 <li><a href="../modules/info.html">info</a></li>
+            
+                <li><a href="../modules/io.html">io</a></li>
             
                 <li><a href="../modules/math.html">math</a></li>
             
@@ -461,6 +467,28 @@ dwv.tool.WindowLevel = function(app)
     };
     
 }; // WindowLevel class
+
+/**
+ * Help for this tool.
+ * @method getHelp
+ * @returns {Object} The help content.
+ */
+dwv.tool.WindowLevel.getHelp = function()
+{
+    return {
+        &#x27;title&#x27;: &quot;WindowLevel&quot;,
+        &#x27;brief&#x27;: &quot;Changes the Window and Level of the image.&quot;,
+        &#x27;mouse&#x27;: {
+            &#x27;mouse_drag&#x27;: &quot;A single mouse drag changes the window in the horizontal direction and the level in the vertical one.&quot;,
+            &#x27;double_click&#x27;: &quot;A double click will center the window and level on the clicked intensity.&quot;,
+            &#x27;mouse_wheel&#x27;: &quot;The mouse wheel is used to navigate through slices.&quot;
+        },
+        &#x27;touch&#x27;: {
+            &#x27;touch_drag&#x27;: &quot;A single touch drag changes the window in the horizontal direction and the level in the vertical one.&quot;,
+            &#x27;twotouch_drag&#x27;: &quot;A double finger drag allows to navigate through slices.&quot;
+        }
+    };
+};
 
 /**
  * Update the window/level presets.

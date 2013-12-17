@@ -19,7 +19,7 @@
             
         </div>
         <div class="yui3-u-1-4 version">
-            <em>API Docs for: 0.4.1</em>
+            <em>API Docs for: 0.5.0</em>
         </div>
     </div>
     <div id="bd" class="yui3-g">
@@ -78,6 +78,10 @@
                 <li><a href="../classes/dwv.image.View.html">dwv.image.View</a></li>
             
                 <li><a href="../classes/dwv.info.html">dwv.info</a></li>
+            
+                <li><a href="../classes/dwv.io.File.html">dwv.io.File</a></li>
+            
+                <li><a href="../classes/dwv.io.Url.html">dwv.io.Url</a></li>
             
                 <li><a href="../classes/dwv.math.BucketQueue.html">dwv.math.BucketQueue</a></li>
             
@@ -144,6 +148,8 @@
                 <li><a href="../modules/image.html">image</a></li>
             
                 <li><a href="../modules/info.html">info</a></li>
+            
+                <li><a href="../modules/io.html">io</a></li>
             
                 <li><a href="../modules/math.html">math</a></li>
             
@@ -270,6 +276,7 @@ dwv.dicom.DataReader = function(buffer, isLittleEndian)
         else if( nBytes === 8 )
             return this.readFloat32(byteOffset, isLittleEndian);
         else 
+            console.log(&quot;Non number: &#x27;&quot;+this.readString(byteOffset, nBytes)+&quot;&#x27;&quot;);
             throw new Error(&quot;Unsupported number size.&quot;);
     };
     /**
@@ -318,7 +325,7 @@ dwv.dicom.DataReader = function(buffer, isLittleEndian)
      * Read data as a string.
      * @method readString
      * @param {Number} byteOffset The offset to start reading from.
-     * @param {Number} nChars The numner of characters to read.
+     * @param {Number} nChars The number of characters to read.
      * @return {String} The read data.
      */
     this.readString = function(byteOffset, nChars) {
@@ -328,6 +335,41 @@ dwv.dicom.DataReader = function(buffer, isLittleEndian)
         }
         return result;
     };
+};
+
+/**
+ * Tell if a given syntax is a JPEG one.
+ * @method isJpegTransferSyntax
+ * @param {String} The transfer syntax to test.
+ * @returns {Boolean} True if a jpeg syntax.
+ */
+dwv.dicom.isJpegTransferSyntax = function(syntax)
+{
+    return syntax.match(/1.2.840.10008.1.2.4.5/) !== null ||
+        syntax.match(/1.2.840.10008.1.2.4.6/) !== null||
+        syntax.match(/1.2.840.10008.1.2.4.7/) !== null;
+};
+
+/**
+ * Tell if a given syntax is a JPEG-LS one.
+ * @method isJpeglsTransferSyntax
+ * @param {String} The transfer syntax to test.
+ * @returns {Boolean} True if a jpeg-ls syntax.
+ */
+dwv.dicom.isJpeglsTransferSyntax = function(syntax)
+{
+    return syntax.match(/1.2.840.10008.1.2.4.8/) !== null;
+};
+
+/**
+ * Tell if a given syntax is a JPEG 2000 one.
+ * @method isJpeg2000TransferSyntax
+ * @param {String} The transfer syntax to test.
+ * @returns {Boolean} True if a jpeg 2000 syntax.
+ */
+dwv.dicom.isJpeg2000TransferSyntax = function(syntax)
+{
+    return syntax.match(/1.2.840.10008.1.2.4.9/) !== null;
 };
 
 /**
@@ -531,6 +573,7 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
     var offset = 0;
     var implicit = false;
     var jpeg = false;
+    var jpegls = false;
     var jpeg2000 = false;
     // dictionary
     this.dict.init();
@@ -578,17 +621,21 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
                 dataReader = new dwv.dicom.DataReader(buffer,false);
             }
             // JPEG
-            else if( syntax.match(/1.2.840.10008.1.2.4.5/) ||
-                    syntax.match(/1.2.840.10008.1.2.4.6/) ||
-                    syntax.match(/1.2.840.10008.1.2.4.7/) ||
-                    syntax.match(/1.2.840.10008.1.2.4.8/) ) {
+            else if( dwv.dicom.isJpegTransferSyntax(syntax) ) {
                 jpeg = true;
+                //console.log(&quot;JPEG compressed DICOM data: &quot; + syntax);
                 throw new Error(&quot;Unsupported DICOM transfer syntax (JPEG): &quot;+syntax);
             }
+            // JPEG-LS
+            else if( dwv.dicom.isJpeglsTransferSyntax(syntax) ) {
+                jpegls = true;
+                //console.log(&quot;JPEG-LS compressed DICOM data: &quot; + syntax);
+                throw new Error(&quot;Unsupported DICOM transfer syntax (JPEG-LS): &quot;+syntax);
+            }
             // JPEG 2000
-            else if( syntax.match(/1.2.840.10008.1.2.4.9/) ) {
+            else if( dwv.dicom.isJpeg2000TransferSyntax(syntax) ) {
+                console.log(&quot;JPEG 2000 compressed DICOM data: &quot; + syntax);
                 jpeg2000 = true;
-                throw new Error(&quot;Unsupported DICOM transfer syntax (JPEG 2000): &quot;+syntax);
             }
             // MPEG2 Image Compression
             else if( syntax === &quot;1.2.840.10008.1.2.4.100&quot; ) {
@@ -613,7 +660,7 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
     
     var startedPixelItems = false;
     
-    var tagName;
+    var tagName = &quot;&quot;;
     // DICOM data elements
     while( i &lt; buffer.byteLength ) 
     {
@@ -631,8 +678,19 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
         // store pixel data from multiple items
         if( startedPixelItems ) {
             if( tagName === &quot;Item&quot; ) {
-                if( dataElement.data.length !== 0 ) {
-                    this.pixelBuffer = this.pixelBuffer.concat( dataElement.data );
+                if( dataElement.data.length === 4 ) {
+                    console.log(&quot;Skipping Basic Offset Table.&quot;);
+                }
+                else if( dataElement.data.length !== 0 ) {
+                    console.log(&quot;Concatenating multiple pixel data items, length: &quot;+dataElement.data.length);
+                    // concat does not work on typed arrays
+                    //this.pixelBuffer = this.pixelBuffer.concat( dataElement.data );
+                    // manual concat...
+                    var size = dataElement.data.length + this.pixelBuffer.length;
+                    var newBuffer = new Uint16Array(size);
+                    newBuffer.set( this.pixelBuffer, 0 );
+                    newBuffer.set( dataElement.data, this.pixelBuffer.length );
+                    this.pixelBuffer = newBuffer;
                 }
             }
             else if( tagName === &quot;SequenceDelimitationItem&quot; ) {
@@ -665,7 +723,6 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
     
     // uncompress data
     if( jpeg ) {
-        console.log(&quot;JPEG&quot;);
         // using jpgjs from https://github.com/notmasteryet/jpgjs
         // -&gt; error with ffc3 and ffc1 jpeg jfif marker
         /*var j = new JpegImage();
@@ -675,22 +732,14 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
         this.pixelBuffer = d.data;*/
     }
     else if( jpeg2000 ) {
-        console.log(&quot;JPEG 2000&quot;);
-        // using openjpeg.js from https://github.com/kripken/j2k.js
-        // -&gt; 2 layers results????
-        /*var data = new Uint16Array(this.pixelBuffer);
-        var result = openjpeg(data, &quot;j2k&quot;);
-        this.pixelBuffer = result.data;*/
-        
-        // using jpx.js from https://github.com/mozilla/pdf.js
-        // -&gt; ...
-        /*var j = new JpxImage();
-        j.parse(this.pixelBuffer);
-        console.log(&quot;width: &quot;+j.width);
-        console.log(&quot;height: &quot;+j.height);
-        console.log(&quot;tiles: &quot;+j.tiles.length);
-        console.log(&quot;count: &quot;+j.componentsCount);
-        this.pixelBuffer = j.tiles[0].items;*/
+        // decompress pixel buffer into Uint8 image
+        var uint8Image = null;
+        try {
+            uint8Image = openjpeg(this.pixelBuffer, &quot;j2k&quot;);
+        } catch(error) {
+            throw new Error(&quot;Cannot decode JPEG 2000 ([&quot; +error.name + &quot;] &quot; + error.message + &quot;)&quot;);
+        }
+        this.pixelBuffer = uint8Image.data;
     }
 };
 
@@ -723,19 +772,42 @@ dwv.dicom.DicomParser.prototype.createImage = function()
         columnSpacing = parseFloat(this.dicomElements.ImagerPixelSpacing.value[1]);
     }
     var spacing = new dwv.image.Spacing( columnSpacing, rowSpacing);
+
+    // special jpeg 2000 case: openjpeg returns a Uint8 planar MONO or RGB image
+    var syntax = dwv.utils.cleanString(
+        this.dicomElements.TransferSyntaxUID.value[0] );
+    var jpeg2000 = dwv.dicom.isJpeg2000TransferSyntax( syntax );
+    
     // buffer data
-    var buffer = new Int16Array(this.pixelBuffer.length);
-    // unsigned to signed data if needed
-    var shift = false;
-    if( this.dicomElements.PixelRepresentation &amp;&amp;
-            this.dicomElements.PixelRepresentation.value[0] == 1) {
-        shift = true;
+    var buffer = null;
+    // convert to 16bit if needed
+    if( jpeg2000 &amp;&amp; this.dicomElements.BitsAllocated.value[0] === 16 )
+    {
+        var sliceSize = size.getSliceSize();
+        buffer = new Int16Array( sliceSize );
+        var k = 0;
+        for( var p = 0; p &lt; sliceSize; ++p ) {
+            buffer[p] = 256 * this.pixelBuffer[k] + this.pixelBuffer[k+1];
+            k += 2;
+        }
     }
-    for( var i=0; i&lt;this.pixelBuffer.length; ++i ) {
-        buffer[i] = this.pixelBuffer[i];
-        if( shift &amp;&amp; buffer[i] &gt;= Math.pow(2, 15) ) 
-            buffer[i] -= Math.pow(2, 16);
+    else
+    {
+        buffer = new Int16Array(this.pixelBuffer.length);
+        // unsigned to signed data if needed
+        var shift = false;
+        if( this.dicomElements.PixelRepresentation &amp;&amp;
+                this.dicomElements.PixelRepresentation.value[0] == 1) {
+            shift = true;
+        }
+        // copy
+        for( var i=0; i&lt;this.pixelBuffer.length; ++i ) {
+            buffer[i] = this.pixelBuffer[i];
+            if( shift &amp;&amp; buffer[i] &gt;= Math.pow(2, 15) ) 
+                buffer[i] -= Math.pow(2, 16);
+        }
     }
+    
     // slice position
     var slicePosition = [0,0,0];
     if( this.dicomElements.ImagePositionPatient )
@@ -747,13 +819,16 @@ dwv.dicom.DicomParser.prototype.createImage = function()
     var image = new dwv.image.Image( size, spacing, buffer, [slicePosition] );
     // photometricInterpretation
     if( this.dicomElements.PhotometricInterpretation ) {
-        image.setPhotometricInterpretation( dwv.utils.cleanString(
-            this.dicomElements.PhotometricInterpretation.value[0]).toUpperCase() );
+        var photo = dwv.utils.cleanString(
+            this.dicomElements.PhotometricInterpretation.value[0]).toUpperCase();
+        if( jpeg2000 &amp;&amp; photo.match(/YBR/) ) photo = &quot;RGB&quot;;
+        image.setPhotometricInterpretation( photo );
     }        
     // planarConfiguration
     if( this.dicomElements.PlanarConfiguration ) {
-        image.setPlanarConfiguration( 
-            this.dicomElements.PlanarConfiguration.value[0] );
+        var planar = this.dicomElements.PlanarConfiguration.value[0];
+        if( jpeg2000 ) planar = 1;
+        image.setPlanarConfiguration( planar );
     }        
     // rescale slope
     if( this.dicomElements.RescaleSlope ) {

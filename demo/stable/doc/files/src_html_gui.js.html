@@ -19,7 +19,7 @@
             
         </div>
         <div class="yui3-u-1-4 version">
-            <em>API Docs for: 0.4.1</em>
+            <em>API Docs for: 0.5.0</em>
         </div>
     </div>
     <div id="bd" class="yui3-g">
@@ -78,6 +78,10 @@
                 <li><a href="../classes/dwv.image.View.html">dwv.image.View</a></li>
             
                 <li><a href="../classes/dwv.info.html">dwv.info</a></li>
+            
+                <li><a href="../classes/dwv.io.File.html">dwv.io.File</a></li>
+            
+                <li><a href="../classes/dwv.io.Url.html">dwv.io.Url</a></li>
             
                 <li><a href="../classes/dwv.math.BucketQueue.html">dwv.math.BucketQueue</a></li>
             
@@ -144,6 +148,8 @@
                 <li><a href="../modules/image.html">image</a></li>
             
                 <li><a href="../modules/info.html">info</a></li>
+            
+                <li><a href="../modules/io.html">io</a></li>
             
                 <li><a href="../modules/math.html">math</a></li>
             
@@ -227,6 +233,46 @@ dwv.gui.onChangeColourMap = function(event)
 };
 
 /**
+ * Handle loader change.
+ * @method onChangeLoader
+ * @static
+ * @param {Object} event The change event.
+ */
+dwv.gui.onChangeLoader = function(event)
+{
+    if( this.value === &quot;file&quot;) {
+        dwv.gui.clearUrlLoadHtml();
+        dwv.gui.appendFileLoadHtml();
+    }
+    else if( this.value === &quot;url&quot;) {
+        dwv.gui.clearFileLoadHtml();
+        dwv.gui.appendUrlLoadHtml();
+    }
+};
+
+/**
+ * Handle files change.
+ * @method onChangeFiles
+ * @static
+ * @param {Object} event The change event.
+ */
+dwv.gui.onChangeFiles = function(event)
+{
+    app.onChangeFiles(event);
+};
+
+/**
+ * Handle URL change.
+ * @method onChangeURL
+ * @static
+ * @param {Object} event The change event.
+ */
+dwv.gui.onChangeURL = function(event)
+{
+    app.onChangeURL(event);
+};
+
+/**
  * Handle tool change.
  * @method onChangeTool
  * @static
@@ -268,6 +314,198 @@ dwv.gui.onChangeShape = function(event)
 dwv.gui.onChangeLineColour = function(event)
 {
     app.getToolBox().getSelectedTool().setLineColour(this.value);
+};
+
+/**
+ * Append the slider HTML.
+ * @method getSliderHtml
+ * @static
+ */
+dwv.gui.getSliderHtml = function()
+{
+    var min = app.getImage().getDataRange().min;
+    var max = app.getImage().getDataRange().max;
+
+    if( app.isMobile() )
+    {
+        // jquery-mobile range slider
+        var inputMin = document.createElement(&quot;input&quot;);
+        inputMin.setAttribute(&quot;id&quot;, &quot;threshold-min&quot;);
+        inputMin.setAttribute(&quot;max&quot;, max);
+        inputMin.setAttribute(&quot;min&quot;, min);
+        inputMin.setAttribute(&quot;value&quot;, min);
+        inputMin.setAttribute(&quot;type&quot;, &quot;range&quot;);
+
+        var inputMax = document.createElement(&quot;input&quot;);
+        inputMax.setAttribute(&quot;id&quot;, &quot;threshold-max&quot;);
+        inputMax.setAttribute(&quot;max&quot;, max);
+        inputMax.setAttribute(&quot;min&quot;, min);
+        inputMax.setAttribute(&quot;value&quot;, max);
+        inputMax.setAttribute(&quot;type&quot;, &quot;range&quot;);
+        
+        var div = document.createElement(&quot;div&quot;);
+        div.setAttribute(&quot;id&quot;, &quot;threshold-div&quot;);
+        div.setAttribute(&quot;data-role&quot;, &quot;rangeslider&quot;);
+        div.appendChild(inputMin);
+        div.appendChild(inputMax);
+        div.setAttribute(&quot;data-mini&quot;, &quot;true&quot;);
+        document.getElementById(&quot;thresholdLi&quot;).appendChild(div);
+
+        $(&quot;#threshold-div&quot;).bind(&quot;change&quot;,
+            function( event ) {
+                app.getToolBox().getSelectedTool().getSelectedFilter().run(
+                    { &quot;min&quot;:$(&quot;#threshold-min&quot;).val(),
+                      &quot;max&quot;:$(&quot;#threshold-max&quot;).val() } );
+            }
+        );
+    }
+    else
+    {
+        // jquery-ui slider
+        $( &quot;#thresholdLi&quot; ).slider({
+            range: true,
+            min: min,
+            max: max,
+            values: [ min, max ],
+            slide: function( event, ui ) {
+                app.getToolBox().getSelectedTool().getSelectedFilter().run(
+                        {&#x27;min&#x27;:ui.values[0], &#x27;max&#x27;:ui.values[1]});
+            }
+        });
+    }
+};
+
+/**
+ * Update the progress bar.
+ * @method updateProgress
+ * @static
+ * @param {Object} event A ProgressEvent.
+ */
+dwv.gui.updateProgress = function(event)
+{
+    // event is an ProgressEvent.
+    if( event.lengthComputable )
+    {
+        var percent = Math.round((event.loaded / event.total) * 100);
+        if( app.isMobile() )
+        {
+            // jquery-mobile loading
+            if( percent &lt; 100 ) {
+                $.mobile.loading(&quot;show&quot;, {text: percent+&quot;%&quot;, textVisible: true, theme: &quot;b&quot;} );
+            }
+            else if( percent === 100 ) {
+                $.mobile.loading(&quot;hide&quot;);
+            }
+        }
+        else
+        {
+            // jquery-ui progress bar
+            if( percent &lt;= 100 ) {
+                $(&quot;#progressbar&quot;).progressbar({ value: percent });
+            }
+        }
+    }
+};
+
+/**
+ * Append the loadbox HTML to the page.
+ * @method appendLoadboxHtml
+ * @static
+ */
+dwv.gui.appendLoadboxHtml = function()
+{
+    // select
+    var loaderSelector = dwv.html.createHtmlSelect(&quot;loaderSelect&quot;,dwv.io.loaders);
+    loaderSelector.onchange = dwv.gui.onChangeLoader;
+    
+    // node
+    var node = document.getElementById(&quot;loaderlist&quot;);
+    // clear it
+    while(node.hasChildNodes()) node.removeChild(node.firstChild);
+    // append
+    node.appendChild(loaderSelector);
+    // trigger create event (mobile)
+    $(&quot;#loaderlist&quot;).trigger(&quot;create&quot;);
+    
+    // default load
+    dwv.gui.appendFileLoadHtml();
+};
+
+/**
+ * Append the file load HTML to the page.
+ * @method appendFileLoadHtml
+ * @static
+ */
+dwv.gui.appendFileLoadHtml = function()
+{
+    // input
+    var fileLoadInput = document.createElement(&quot;input&quot;);
+    fileLoadInput.onchange = dwv.gui.onChangeFiles;
+    fileLoadInput.type = &quot;file&quot;;
+    fileLoadInput.multiple = true;
+    fileLoadInput.id = &quot;imagefiles&quot;;
+    fileLoadInput.setAttribute(&quot;data-clear-btn&quot;,&quot;true&quot;);
+    fileLoadInput.setAttribute(&quot;data-mini&quot;,&quot;true&quot;);
+
+    // associated div
+    var fileLoadDiv = document.createElement(&quot;div&quot;);
+    fileLoadDiv.id = &quot;imagefilesdiv&quot;;
+    fileLoadDiv.appendChild(fileLoadInput);
+    
+    // node
+    var node = document.getElementById(&quot;loaderlist&quot;);
+    // append
+    node.appendChild(fileLoadDiv);
+    // trigger create event (mobile)
+    $(&quot;#loaderlist&quot;).trigger(&quot;create&quot;);
+};
+
+/**
+ * Clear the file load HTML.
+ * @method clearUrlLoadHtml
+ * @static
+ */
+dwv.gui.clearFileLoadHtml = function()
+{
+    dwv.html.removeNode(&quot;imagefilesdiv&quot;);
+};
+
+/**
+ * Append the url load HTML to the page.
+ * @method appendUrlLoadHtml
+ * @static
+ */
+dwv.gui.appendUrlLoadHtml = function()
+{
+    // input
+    var urlLoadInput = document.createElement(&quot;input&quot;);
+    urlLoadInput.onchange = dwv.gui.onChangeURL;
+    urlLoadInput.type = &quot;url&quot;;
+    urlLoadInput.id = &quot;imageurl&quot;;
+    urlLoadInput.setAttribute(&quot;data-clear-btn&quot;,&quot;true&quot;);
+    urlLoadInput.setAttribute(&quot;data-mini&quot;,&quot;true&quot;);
+
+    // associated div
+    var urlLoadDiv = document.createElement(&quot;div&quot;);
+    urlLoadDiv.id = &quot;imageurldiv&quot;;
+    urlLoadDiv.appendChild(urlLoadInput);
+
+    // node
+    var node = document.getElementById(&quot;loaderlist&quot;);
+    // append
+    node.appendChild(urlLoadDiv);
+    // trigger create event (mobile)
+    $(&quot;#loaderlist&quot;).trigger(&quot;create&quot;);
+};
+
+/**
+ * Clear the url load HTML.
+ * @method clearUrlLoadHtml
+ * @static
+ */
+dwv.gui.clearUrlLoadHtml = function()
+{
+    dwv.html.removeNode(&quot;imageurldiv&quot;);
 };
 
 /**
@@ -341,10 +579,13 @@ dwv.gui.appendWindowLevelHtml = function()
 
     // node
     var node = document.getElementById(&quot;toolList&quot;);
-    // apend preset
-    node.appendChild(wlLi);
-    // apend color map
-    node.appendChild(cmLi);
+    if( app.getImage().getPhotometricInterpretation().match(/MONOCHROME/) !== null )
+    {
+        // apend preset
+        node.appendChild(wlLi);
+        // apend color map if monochrome image
+        node.appendChild(cmLi);
+    }
     // trigger create event (mobile)
     $(&quot;#toolList&quot;).trigger(&quot;create&quot;);
 };
@@ -713,6 +954,87 @@ dwv.gui.enableInUndoHtml = function(enable)
     }
 };
 
+/**
+ * Build the help HTML.
+ * @method appendHelpHtml
+ * @param {Boolean} mobile Flag for mobile or not environement.
+ */
+dwv.gui.appendHelpHtml = function(mobile)
+{
+    var actionType = &quot;mouse&quot;;
+    if( mobile ) actionType = &quot;touch&quot;;
+    
+    var toolHelpDiv = document.createElement(&quot;div&quot;);
+    
+    for ( var t in dwv.tool.tools )
+    {
+        var tool = dwv.tool.tools[t];
+        // title
+        var title = document.createElement(&quot;h3&quot;);
+        title.appendChild(document.createTextNode(tool.getHelp().title));
+        // doc div
+        var docDiv = document.createElement(&quot;div&quot;);
+        // brief
+        var brief = document.createElement(&quot;p&quot;);
+        brief.appendChild(document.createTextNode(tool.getHelp().brief));
+        docDiv.appendChild(brief);
+        // details
+        if( tool.getHelp()[actionType] ) {
+            var keys = Object.keys(tool.getHelp()[actionType]);
+            for( var i=0; i&lt;keys.length; ++i )
+            {
+                var action = tool.getHelp()[actionType][keys[i]];
+                
+                var img = document.createElement(&quot;img&quot;);
+                img.src = &quot;resources/&quot;+keys[i]+&quot;.png&quot;;
+                img.style.float = &quot;left&quot;;
+                img.style.margin = &quot;0px 15px 15px 0px&quot;;
+                
+                var br = document.createElement(&quot;br&quot;);
+                br.style.clear = &quot;both&quot;;
+                
+                var para = document.createElement(&quot;p&quot;);
+                para.appendChild(img);
+                para.appendChild(document.createTextNode(action));
+                para.appendChild(br);
+                docDiv.appendChild(para);
+            }
+        }
+        
+        // different div structure for mobile or static
+        if( mobile )
+        {
+            var toolDiv = document.createElement(&quot;div&quot;);
+            toolDiv.setAttribute(&quot;data-role&quot;, &quot;collapsible&quot;);
+            toolDiv.appendChild(title);
+            toolDiv.appendChild(docDiv);
+            toolHelpDiv.appendChild(toolDiv);
+        }
+        else
+        {
+            toolHelpDiv.id = &quot;accordion&quot;;
+            toolHelpDiv.appendChild(title);
+            toolHelpDiv.appendChild(docDiv);
+        }
+    }
+    
+    var helpNode = document.getElementById(&quot;help&quot;);
+
+    var headPara = document.createElement(&quot;p&quot;);
+    headPara.appendChild(document.createTextNode(&quot;DWV can load DICOM data &quot; +
+        &quot;either from a local file or from an URL. All DICOM tags are available &quot; +
+        &quot;in a searchable table, press the &#x27;tags&#x27; or grid button. &quot; + 
+        &quot;You can choose to display the image information overlay by pressing the &quot; + 
+        &quot;&#x27;info&#x27; or i button. &quot;));
+    helpNode.appendChild(headPara);
+    
+    var toolPara = document.createElement(&quot;p&quot;);
+    toolPara.appendChild(document.createTextNode(&quot;Each tool defines the possible &quot; + 
+        &quot;user interactions. The default tool is the window/level one. &quot; + 
+        &quot;Here are the available tools:&quot;));
+    helpNode.appendChild(toolPara);
+    helpNode.appendChild(toolHelpDiv);
+};
 
     </pre>
 </div>

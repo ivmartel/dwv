@@ -20,6 +20,8 @@ YUI.add("yuidoc-meta", function(Y) {
         "dwv.image.lut.Rescale",
         "dwv.image.lut.Window",
         "dwv.info",
+        "dwv.io.File",
+        "dwv.io.Url",
         "dwv.math.BucketQueue",
         "dwv.math.Circle",
         "dwv.math.FastPoint2D",
@@ -53,6 +55,7 @@ YUI.add("yuidoc-meta", function(Y) {
         "html",
         "image",
         "info",
+        "io",
         "math",
         "tool",
         "utils"
@@ -82,6 +85,11 @@ YUI.add("yuidoc-meta", function(Y) {
             "displayName": "info",
             "name": "info",
             "description": "Info module."
+        },
+        {
+            "displayName": "io",
+            "name": "io",
+            "description": "I/O module."
         },
         {
             "displayName": "math",

@@ -19,7 +19,7 @@
             
         </div>
         <div class="yui3-u-1-4 version">
-            <em>API Docs for: 0.4.1</em>
+            <em>API Docs for: 0.5.0</em>
         </div>
     </div>
     <div id="bd" class="yui3-g">
@@ -78,6 +78,10 @@
                 <li><a href="../classes/dwv.image.View.html">dwv.image.View</a></li>
             
                 <li><a href="../classes/dwv.info.html">dwv.info</a></li>
+            
+                <li><a href="../classes/dwv.io.File.html">dwv.io.File</a></li>
+            
+                <li><a href="../classes/dwv.io.Url.html">dwv.io.Url</a></li>
             
                 <li><a href="../classes/dwv.math.BucketQueue.html">dwv.math.BucketQueue</a></li>
             
@@ -144,6 +148,8 @@
                 <li><a href="../modules/image.html">image</a></li>
             
                 <li><a href="../modules/info.html">info</a></li>
+            
+                <li><a href="../modules/io.html">io</a></li>
             
                 <li><a href="../modules/math.html">math</a></li>
             
@@ -244,11 +250,11 @@ dwv.tool.Zoom = function(app)
      * @method mousedown
      * @param {Object} event The mouse down event.
      */
-    this.mousedown = function(ev){
+    this.mousedown = function(event){
         self.started = true;
         // first position
-        self.x0 = ev._x;
-        self.y0 = ev._y;
+        self.x0 = event._x;
+        self.y0 = event._y;
      };
 
      /**
@@ -256,11 +262,11 @@ dwv.tool.Zoom = function(app)
       * @method twotouchdown
       * @param {Object} event The touch down event.
       */
-     this.twotouchdown = function(ev){
+     this.twotouchdown = function(event){
          self.started = true;
          // first line
-         var point0 = new dwv.math.Point2D(ev._x, ev._y);
-         var point1 = new dwv.math.Point2D(ev._x1, ev._y1);
+         var point0 = new dwv.math.Point2D(event._x, event._y);
+         var point1 = new dwv.math.Point2D(event._x1, event._y1);
          self.line0 = new dwv.math.Line(point0, point1);
          self.midPoint = self.line0.getMidpoint();         
      };
@@ -270,22 +276,21 @@ dwv.tool.Zoom = function(app)
       * @method mousemove
       * @param {Object} event The mouse move event.
       */
-     this.mousemove = function(ev){
+     this.mousemove = function(event){
         if (!self.started)
         {
             return;
         }
 
         // calculate translation
-        var tx = (ev._x - self.x0);
-        var ty = (ev._y - self.y0);
+        var tx = (event._x - self.x0);
+        var ty = (event._y - self.y0);
         // apply translation
-        app.getImageLayer().translate(tx,ty);
-        app.getDrawLayer().translate(tx,ty);
+        translateLayers(tx, ty);
         
         // reset origin point
-        self.x0 = ev._x;
-        self.y0 = ev._y;
+        self.x0 = event._x;
+        self.y0 = event._y;
     };
 
     /**
@@ -293,13 +298,13 @@ dwv.tool.Zoom = function(app)
      * @method twotouchmove
      * @param {Object} event The touch move event.
      */
-    this.twotouchmove = function(ev){
+    this.twotouchmove = function(event){
        if (!self.started)
        {
            return;
        }
-       var point0 = new dwv.math.Point2D(ev._x, ev._y);
-       var point1 = new dwv.math.Point2D(ev._x1, ev._y1);
+       var point0 = new dwv.math.Point2D(event._x, event._y);
+       var point1 = new dwv.math.Point2D(event._x1, event._y1);
        var newLine = new dwv.math.Line(point0, point1);
        var lineRatio = newLine.getLength() / self.line0.getLength();
        
@@ -313,7 +318,7 @@ dwv.tool.Zoom = function(app)
      * @method mouseup
      * @param {Object} event The mouse up event.
      */
-    this.mouseup = function(ev){
+    this.mouseup = function(event){
         if (self.started)
         {
             // stop recording
@@ -326,8 +331,8 @@ dwv.tool.Zoom = function(app)
      * @method mouseout
      * @param {Object} event The mouse out event.
      */
-    this.mouseout = function(ev){
-        self.mouseup(ev);
+    this.mouseout = function(event){
+        self.mouseup(event);
     };
 
     /**
@@ -335,12 +340,13 @@ dwv.tool.Zoom = function(app)
      * @method touchstart
      * @param {Object} event The touch start event.
      */
-    this.touchstart = function(ev){
-        if( event.targetTouches.length === 1 ){
-            self.mousedown(ev);
+    this.touchstart = function(event){
+        var touches = event.targetTouches;
+        if( touches.length === 1 ){
+            self.mousedown(event);
         }
-        else if( event.targetTouches.length === 2 ){
-            self.twotouchdown(ev);
+        else if( touches.length === 2 ){
+            self.twotouchdown(event);
         }
     };
 
@@ -349,12 +355,13 @@ dwv.tool.Zoom = function(app)
      * @method touchmove
      * @param {Object} event The touch move event.
      */
-    this.touchmove = function(ev){
-        if( event.targetTouches.length === 1 ){
-            self.mousemove(ev);
+    this.touchmove = function(event){
+        var touches = event.targetTouches;
+        if( touches.length === 1 ){
+            self.mousemove(event);
         }
-        else if( event.targetTouches.length === 2 ){
-            self.twotouchmove(ev);
+        else if( touches.length === 2 ){
+            self.twotouchmove(event);
         }
     };
 
@@ -363,8 +370,8 @@ dwv.tool.Zoom = function(app)
      * @method touchend
      * @param {Object} event The touch end event.
      */
-    this.touchend = function(ev){
-        self.mouseup(ev);
+    this.touchend = function(event){
+        self.mouseup(event);
     };
 
     /**
@@ -372,10 +379,10 @@ dwv.tool.Zoom = function(app)
      * @method DOMMouseScroll
      * @param {Object} event The mouse scroll event.
      */
-    this.DOMMouseScroll = function(ev){
+    this.DOMMouseScroll = function(event){
         // ev.detail on firefox is 3
-        var step = ev.detail/30;
-        zoomLayers(step, ev._x, ev._y);
+        var step = event.detail/30;
+        zoomLayers(step, event._x, event._y);
     };
 
     /**
@@ -383,10 +390,10 @@ dwv.tool.Zoom = function(app)
      * @method mousewheel
      * @param {Object} event The mouse wheel event.
      */
-    this.mousewheel = function(ev){
+    this.mousewheel = function(event){
         // ev.wheelDelta on chrome is 120
-        var step = ev.wheelDelta/1200;
-        zoomLayers(step, ev._x, ev._y);
+        var step = event.wheelDelta/1200;
+        zoomLayers(step, event._x, event._y);
     };
     
     /**
@@ -421,10 +428,48 @@ dwv.tool.Zoom = function(app)
      */ 
     function zoomLayers(step, cx, cy)
     {
-        app.setLayersZoom(step,step,cx,cy);
+        if( app.getImageLayer() ) 
+            app.getImageLayer().zoom(step, step, cx, cy);
+        if( app.getDrawLayer() ) 
+            app.getDrawLayer().zoom(step, step, cx, cy);
+    }
+
+    /**
+     * Apply a translation to the layers.
+     * @method translateLayers
+     * @param {Number} tx The translation along X.
+     * @param {Number} ty The translation along Y.
+     */ 
+    function translateLayers(tx, ty)
+    {
+        if( app.getImageLayer() ) 
+            app.getImageLayer().translate(tx, ty);
+        if( app.getDrawLayer() ) 
+            app.getDrawLayer().translate(tx, ty);
     }
 
 }; // Zoom class
+
+/**
+ * Help for this tool.
+ * @method getHelp
+ * @returns {Object} The help content.
+ */
+dwv.tool.Zoom.getHelp = function()
+{
+    return {
+        &#x27;title&#x27;: &quot;Zoom&quot;,
+        &#x27;brief&#x27;: &quot;The zoom tool allows to zoom and drag the image.&quot;,
+        &#x27;mouse&#x27;: {
+            &#x27;mouse_drag&#x27;: &quot;A single mouse drag drags the image in the desired direction.&quot;,
+            &#x27;mouse_wheel&#x27;: &quot;The mouse wheel is used to zoom the image.&quot;
+        },
+        &#x27;touch&#x27;: {
+            &#x27;touch_drag&#x27;: &quot;A single touch drag drags the image in the desired direction.&quot;,
+            &#x27;twotouch_pinch&#x27;: &quot;A pinch or spread allows to zoom the image.&quot;
+        }
+    };
+};
 
 // Add the tool to the tool list
 dwv.tool.tools = dwv.tool.tools || {};

@@ -19,7 +19,7 @@
             
         </div>
         <div class="yui3-u-1-4 version">
-            <em>API Docs for: 0.4.1</em>
+            <em>API Docs for: 0.5.0</em>
         </div>
     </div>
     <div id="bd" class="yui3-g">
@@ -78,6 +78,10 @@
                 <li><a href="../classes/dwv.image.View.html">dwv.image.View</a></li>
             
                 <li><a href="../classes/dwv.info.html">dwv.info</a></li>
+            
+                <li><a href="../classes/dwv.io.File.html">dwv.io.File</a></li>
+            
+                <li><a href="../classes/dwv.io.Url.html">dwv.io.Url</a></li>
             
                 <li><a href="../classes/dwv.math.BucketQueue.html">dwv.math.BucketQueue</a></li>
             
@@ -144,6 +148,8 @@
                 <li><a href="../modules/image.html">image</a></li>
             
                 <li><a href="../modules/info.html">info</a></li>
+            
+                <li><a href="../modules/io.html">io</a></li>
             
                 <li><a href="../modules/math.html">math</a></li>
             
@@ -323,7 +329,7 @@ dwv.image.View = function(image, isSigned)
             colorMap = dwv.image.lut.invPlain;
         this.fireEvent({&quot;type&quot;: &quot;colorchange&quot;, 
             &quot;wc&quot;: this.getWindowLut().getCenter(),
-            &quot;ww&quot;: this.getWindowLut().getWidth() });
+           &quot;ww&quot;: this.getWindowLut().getWidth() });
     };
     
     /**
@@ -348,9 +354,18 @@ dwv.image.View = function(image, isSigned)
         if( !image.getSize().isInBounds(pos.i,pos.j,pos.k) ) return false;
         var oldPosition = currentPosition;
         currentPosition = pos;
-        this.fireEvent({&quot;type&quot;: &quot;positionchange&quot;, 
-            &quot;i&quot;: pos.i, &quot;j&quot;: pos.j, &quot;k&quot;: pos.k,
-            &quot;value&quot;: image.getRescaledValue(pos.i,pos.j,pos.k)});
+        // only display value for monochrome data
+        if( app.getImage().getPhotometricInterpretation().match(/MONOCHROME/) !== null )
+        {
+            this.fireEvent({&quot;type&quot;: &quot;positionchange&quot;, 
+                &quot;i&quot;: pos.i, &quot;j&quot;: pos.j, &quot;k&quot;: pos.k,
+                &quot;value&quot;: image.getRescaledValue(pos.i,pos.j,pos.k)});
+        }
+        else
+        {
+            this.fireEvent({&quot;type&quot;: &quot;positionchange&quot;, 
+                &quot;i&quot;: pos.i, &quot;j&quot;: pos.j, &quot;k&quot;: pos.k});
+        }
         // slice change event (used to trigger redraw)
         if( oldPosition.k !== currentPosition.k ) {
             this.fireEvent({&quot;type&quot;: &quot;slicechange&quot;});
@@ -359,7 +374,7 @@ dwv.image.View = function(image, isSigned)
     };
     
     /**
-     * Vew listeners
+     * View listeners
      * @property listeners
      * @private
      * @type Array
@@ -374,7 +389,7 @@ dwv.image.View = function(image, isSigned)
     /**
      * Set the view listeners.
      * @method setListeners
-     * @param {Array} list The view listeners.
+     * @param {Object} list The view listeners.
      */ 
     this.setListeners = function(list) { listeners = list; };
 };

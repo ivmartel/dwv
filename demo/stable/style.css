@@ -1,10 +1,4 @@
-body {
-  background-color: #222; color: white;
-  font-family: Verdana, Arial, Helvetica, sans-serif;
-  margin: 10px; padding: 0; 
-}
-h1 { color: #fff; }
-a { color: #ddf; }
+body { font-family: Verdana, Arial, Helvetica, sans-serif; }
 
 /* Layers */
 #layerContainer { position: relative; padding: 0; }

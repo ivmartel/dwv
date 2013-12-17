@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html manifest="cache.manifest">
 
 <head>
 <title>DICOM Web Viewer</title>
@@ -7,81 +7,73 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
 <link rel="stylesheet" href="style.css" />
 <style>
+body { margin: 10px; padding: 0; }
 #layerContainer { margin: auto; text-align: center; }
 #imageLayer { left: 0px; }
 #drawLayer { left: 0px; }
 #tempLayer { left: 0px; }
 </style>
-<link rel="stylesheet" href="ext/jquery-mobile/jquery.mobile-1.3.1.min.css" />
+<link rel="stylesheet" href="ext/jquery-mobile/jquery.mobile-1.4.0-rc.1.min.css" />
+<!-- mobile web app -->
+<meta name="mobile-web-app-capable" content="yes" />
+<link rel="shortcut icon" sizes="16x16" href="resources/dwv-16.png" />
+<link rel="shortcut icon" sizes="60x60" href="resources/dwv-60.png" />
+<link rel="shortcut icon" sizes="128x128" href="resources/dwv-128.png" />
+<!-- apple specific -->
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black" />
+<link rel="apple-touch-icon" sizes="16x16" href="resources/dwv-16.png" />
+<link rel="apple-touch-icon" sizes="60x60" href="resources/dwv-60.png" />
+<link rel="apple-touch-icon" sizes="128x128" href="resources/dwv-128.png" />
 <!-- Third party -->  
-<script type="text/javascript" src="ext/jquery/jquery-1.9.1.min.js"></script>
-<script type="text/javascript" src="ext/jquery-mobile/jquery.mobile-1.3.1.min.js"></script>
+<script type="text/javascript" src="ext/jquery/jquery-2.0.3.min.js"></script>
+<script type="text/javascript" src="ext/jquery-mobile/jquery.mobile-1.4.0-rc.1.min.js"></script>
 <script type="text/javascript" src="ext/flot/jquery.flot.min.js"></script>
+<script type="text/javascript" src="ext/openjpeg/openjpeg.js"></script>
 <!-- Local -->
-<script type="text/javascript" src="dwv-0.4.1.min.js"></script>
-<script type="text/javascript" src="gui_mobile.js"></script>
-
-<script type="text/javascript">
-
-//check browser support
-dwv.html.browser.check();
-// main application
-var app = new dwv.App(true);
-
-// jquery
-$(document).ready(function(){
-    // initialise the application
-    app.init();
-    // align layers when the window is resized
-    window.onresize = app.resize;
-    // possible load from URL
-    var inputUrls = dwv.html.getUriParam(); 
-    if( inputUrls && inputUrls.length > 0 ) app.loadURL(inputUrls);
-});
-
-</script>
+<script type="text/javascript" src="dwv-0.5.0.min.js"></script>
+<!--  Launch the app -->
+<script type="text/javascript" src="applauncher-m.js"></script>
 </head>
 
 <body>
 
 <!-- Main page -->
-<div data-role="page" id="main">
+<div data-role="page" data-theme="b" id="main">
 
+<!-- pageHeader #dwvversion -->
 <div id="pageHeader" data-role="header">
-<h1>DWV v0.4.1</h1>
-</div><!-- /header -->
+<h1>DWV v0.5.0</h1>
+<a href="#help_page" data-icon="carat-r" class="ui-btn-right"
+  data-transition="slide">Help</a>
+</div><!-- /pageHeader -->
 
 <div id="pageMain" data-role="content" style="padding:2px;">   
 
 <div id="toolbar"><p style="margin:0;">
 
-<a href="#popupOpen" data-role="button" data-mini="true" data-inline="true" 
- data-icon="plus" data-iconpos="notext" 
+<a href="#popupOpen" class="ui-btn ui-btn-inline ui-btn-icon-notext ui-mini ui-icon-plus"
  data-rel="popup" data-position-to="window">Open</a>
 
-<a href="#" data-role="button" data-mini="true" data-inline="true" 
- data-icon="back" data-iconpos="notext" onclick="app.getUndoStack().undo()">Undo</a>
-<a href="#" data-role="button" data-mini="true" data-inline="true" 
- data-icon="forward" data-iconpos="notext" onclick="app.getUndoStack().redo()">Redo</a>
-<a href="#" data-role="button" data-mini="true" data-inline="true" 
- data-icon="info" data-iconpos="notext" onclick="app.toggleInfoLayerDisplay()">Info</a>
-<a href="#tags_page" data-role="button" data-mini="true" data-inline="true"
- data-icon="grid" data-iconpos="notext">Tags</a>
+<a href="#" class="ui-btn ui-btn-inline ui-btn-icon-notext ui-mini ui-icon-back"
+  id="undo-btn">Undo</a>
+<a href="#" class="ui-btn ui-btn-inline ui-btn-icon-notext ui-mini ui-icon-forward"
+  id="redo-btn">Redo</a>
+<a href="#" class="ui-btn ui-btn-inline ui-btn-icon-notext ui-mini ui-icon-info"
+  id="info-btn">Info</a>
+<a href="#tags_page" class="ui-btn ui-btn-inline ui-btn-icon-notext ui-mini ui-icon-grid">Tags</a>
 
 </p></div><!-- /toolbar -->
 
 <!-- Open popup -->
 <div data-role="popup" id="popupOpen">
-<form>
+<a href="#" data-rel="back" data-role="button" 
+  data-theme="a" data-icon="delete" data-iconpos="notext" class="ui-btn-right">Close</a> 
 <div style="padding:10px 20px;">
 <h3>Open</h3>
-<label for="imagefiles">Path:</label>
-<input id="imagefiles" type="file" multiple data-clear-btn="true" data-mini="true"/>
-<label for="imageurl">URL:</label>
-<input id="imageurl" type="url" data-clear-btn="true" data-mini="true"/>
+<div id="loaderlist"></div>
 </div>
-</form>
-</div>
+</div><!-- /popup -->
  
 
 <!-- Layer Container -->
@@ -112,11 +104,11 @@ $(document).ready(function(){
 
 
 <!-- Tags page -->
-<div data-role="page" id="tags_page">
+<div data-role="page" data-theme="b" id="tags_page">
 
 <div data-role="header">
 <a href="#main" data-icon="back" 
-data-transition="slide" data-direction="reverse">Back</a>
+  data-transition="slide" data-direction="reverse">Back</a>
 <h1>DICOM Tags</h1>
 </div><!-- /header -->
 
@@ -126,6 +118,22 @@ data-transition="slide" data-direction="reverse">Back</a>
 </div><!-- /content -->
 
 </div><!-- /page tags_page-->
+
+<!-- Help page -->
+<div data-role="page" data-theme="b" id="help_page">
+
+<div data-role="header">
+<a href="#main" data-icon="back" 
+  data-transition="slide" data-direction="reverse">Back</a>
+<h1>DWV Help</h1>
+</div><!-- /header -->
+
+<div data-role="content">   
+<!-- Tags -->
+<div id="help" title="Help"></div>
+</div><!-- /content -->
+
+</div><!-- /page help_page-->
 
 </body>
 </html>

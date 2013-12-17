@@ -19,7 +19,7 @@
             
         </div>
         <div class="yui3-u-1-4 version">
-            <em>API Docs for: 0.4.1</em>
+            <em>API Docs for: 0.5.0</em>
         </div>
     </div>
     <div id="bd" class="yui3-g">
@@ -78,6 +78,10 @@
                 <li><a href="../classes/dwv.image.View.html">dwv.image.View</a></li>
             
                 <li><a href="../classes/dwv.info.html">dwv.info</a></li>
+            
+                <li><a href="../classes/dwv.io.File.html">dwv.io.File</a></li>
+            
+                <li><a href="../classes/dwv.io.Url.html">dwv.io.Url</a></li>
             
                 <li><a href="../classes/dwv.math.BucketQueue.html">dwv.math.BucketQueue</a></li>
             
@@ -144,6 +148,8 @@
                 <li><a href="../modules/image.html">image</a></li>
             
                 <li><a href="../modules/info.html">info</a></li>
+            
+                <li><a href="../modules/io.html">io</a></li>
             
                 <li><a href="../modules/math.html">math</a></li>
             
@@ -221,6 +227,22 @@ dwv.tool.Filter = function(app)
      * @type String
      */
     this.defaultFilterName = 0;
+};
+
+/**
+ * Help for this tool.
+ * @method getHelp
+ * @returns {Object} The help content.
+ */
+dwv.tool.Filter.getHelp = function()
+{
+    return {
+        &#x27;title&#x27;: &quot;Filter&quot;,
+        &#x27;brief&#x27;: &quot;A few simple image filters are available: a Threshold filter to &quot; +
+            &quot;limit the image intensities between a chosen minimum and maximum, &quot; +
+            &quot;a Sharpen filter to convolute the image with a sharpen matrix, &quot; +
+            &quot;a Sobel filter to get the gradient of the image in both directions.&quot;
+    };
 };
 
 /**
