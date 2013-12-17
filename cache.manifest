@@ -1,5 +1,5 @@
 CACHE MANIFEST
-# v1 2013-12-12
+# v1 2013-12-17
 
 CACHE:
 
@@ -8,7 +8,7 @@ index.html
 # css: local
 style.css
 # js: local
-dwv-0.5.0beta.min.js
+dwv-0.5.0.min.js
 applauncher-s.js
 # images
 resources/double_click.png

@@ -1,7 +1,7 @@
 {
   "name": "dwv",
   "description": "Dicom Web Viewer.",
-  "version": "0.5.0beta",
+  "version": "0.5.0",
   "launch_path": "/index.m.html",
   "icons": { 
     "16": "/resources/dwv-16.png", 
