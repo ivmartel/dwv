@@ -6,6 +6,7 @@
     "name": "ivmartel",
     "url": "https://github.com/ivmartel"
   },
+  "default_locale": "en",
   "launch_path": "/dwv/demo/stable/index.m.html",
   "appcache_path": "/dwv/demo/stable/cache-m.manifest",
   "icons": {
