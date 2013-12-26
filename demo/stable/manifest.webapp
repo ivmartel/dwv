@@ -2,13 +2,13 @@
   "name": "dwv",
   "description": "Dicom Web Viewer.",
   "version": "0.5.0",
-  "launch_path": "/index.m.html",
+  "launch_path": "/demo/stable/index.m.html",
   "icons": {
-    "16": "/resources/dwv-16.png",
-    "32": "/resources/dwv-32.png",
-    "60": "/resources/dwv-60.png",
-    "90": "/resources/dwv-90.png",
-    "128": "/resources/dwv-128.png"
+    "16": "/demo/stable/resources/dwv-16.png",
+    "32": "/demo/stable/resources/dwv-32.png",
+    "60": "/demo/stable/resources/dwv-60.png",
+    "90": "/demo/stable/resources/dwv-90.png",
+    "128": "/demo/stable/resources/dwv-128.png"
   },
   "developer": {
     "name": "ivmartel",
