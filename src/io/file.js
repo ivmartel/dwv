@@ -54,6 +54,9 @@ dwv.io.File.prototype.load = function(ioArray)
         } catch(error) {
             onerror(error);
         }
+        // force 100% progress (sometimes with firefox)
+        var endEvent = new ProgressEvent("progress", {lengthComputable: true, loaded: 1, total: 1});
+        dwv.gui.updateProgress(endEvent);
     };
 
     // Image loader
