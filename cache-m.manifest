@@ -18,7 +18,7 @@ resources/twotouch_drag.png
 # third party
 
 # css
-ext/jquery-mobile/jquery.mobile-1.4.0-rc.1.min.css
+ext/jquery-mobile/jquery.mobile-1.4.0.min.css
 ext/jquery-mobile/images/ajax-loader.gif
 ext/jquery-mobile/images/icons-svg/plus-white.svg
 ext/jquery-mobile/images/icons-svg/forward-white.svg
@@ -33,8 +33,8 @@ ext/jquery-mobile/images/icons-png/grid-black.png
 # js
 ext/jquery/jquery-2.0.3.min.js
 ext/jquery/jquery-2.0.3.min.map
-ext/jquery-mobile/jquery.mobile-1.4.0-rc.1.min.js
-ext/jquery-mobile/jquery.mobile-1.4.0-rc.1.min.map
+ext/jquery-mobile/jquery.mobile-1.4.0.min.js
+ext/jquery-mobile/jquery.mobile-1.4.0.min.map
 ext/flot/jquery.flot.min.js
 
 NETWORK:
