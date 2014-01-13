@@ -327,10 +327,6 @@ dwv.tool.Livewire.prototype.init = function()
     this.setLineColour(dwv.tool.colors[0]);
 };
 
-// Add the tool to the tool list
-dwv.tool.tools = dwv.tool.tools || {};
-dwv.tool.tools.livewire = dwv.tool.Livewire;
-
 /**
  * Draw livewire command.
  * @class DrawLivewireCommand

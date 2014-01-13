@@ -248,7 +248,3 @@ dwv.tool.Draw.prototype.init = function() {
     // same for color
     this.setLineColour(dwv.tool.colors[0]);
 };
-
-// Add the tool to the tool list
-dwv.tool.tools = dwv.tool.tools || {};
-dwv.tool.tools.draw = dwv.tool.Draw;

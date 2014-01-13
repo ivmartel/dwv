@@ -258,10 +258,6 @@ dwv.tool.filter.Sobel.prototype.run = function(args)
 // Add the filter to the filter list
 dwv.tool.filters.sobel = dwv.tool.filter.Sobel;
 
-// Add the tool to the tool list
-dwv.tool.tools = dwv.tool.tools || {};
-dwv.tool.tools.filter = dwv.tool.Filter;
-
 /**
  * Run filter command.
  * @class RunFilterCommand

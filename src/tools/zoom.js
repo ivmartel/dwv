@@ -272,7 +272,3 @@ dwv.tool.Zoom.getHelp = function()
         }
     };
 };
-
-// Add the tool to the tool list
-dwv.tool.tools = dwv.tool.tools || {};
-dwv.tool.tools.zoom = dwv.tool.Zoom;

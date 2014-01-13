@@ -5,11 +5,10 @@
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
 
-// Tool list: to be completed after each tool definition 
-dwv.tool.tools = dwv.tool.tools || {};
-    
 /**
  * Tool box.
+ * Relies on the static variable dwv.tool.tools. The available tools 
+ * of the gui will be those of this list.
  * @class ToolBox
  * @namespace dwv.tool
  * @constructor
