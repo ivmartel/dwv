@@ -6774,11 +6774,6 @@ dwv.io.File.prototype.load = function(ioArray)
         }
     }
 };
-
-//Add the loader to the loader list
-dwv.io.loaders = dwv.io.loaders || {};
-dwv.io.loaders.file = dwv.io.File;
-
 ;/** 
  * I/O module.
  * @module io
@@ -6890,10 +6885,6 @@ dwv.io.Url.prototype.load = function(ioArray)
         request.send(null);
     }
 };
-
-//Add the loader to the loader list
-dwv.io.loaders = dwv.io.loaders || {};
-dwv.io.loaders.url = dwv.io.Url;
 ;/** 
  * Math module.
  * @module math
