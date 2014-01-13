@@ -1294,7 +1294,7 @@
             "module": "tool",
             "namespace": "dwv.tool",
             "file": "src/tools/filter.js",
-            "line": 265,
+            "line": 261,
             "description": "Run filter command.",
             "is_constructor": 1,
             "params": [
@@ -1390,7 +1390,7 @@
             "module": "tool",
             "namespace": "dwv.tool",
             "file": "src/tools/livewire.js",
-            "line": 334,
+            "line": 330,
             "description": "Draw livewire command.",
             "params": [
                 {
@@ -1485,8 +1485,8 @@
             "module": "tool",
             "namespace": "dwv.tool",
             "file": "src/tools/toolbox.js",
-            "line": 11,
-            "description": "Tool box.",
+            "line": 8,
+            "description": "Tool box.\nRelies on the static variable dwv.tool.tools. The available tools \nof the gui will be those of this list.",
             "is_constructor": 1,
             "params": [
                 {
@@ -6546,7 +6546,7 @@
         },
         {
             "file": "src/tools/filter.js",
-            "line": 275,
+            "line": 271,
             "description": "Command name.",
             "itemtype": "property",
             "name": "name",
@@ -6559,7 +6559,7 @@
         },
         {
             "file": "src/tools/filter.js",
-            "line": 282,
+            "line": 278,
             "description": "Get the command name.",
             "itemtype": "method",
             "name": "getName",
@@ -6573,7 +6573,7 @@
         },
         {
             "file": "src/tools/filter.js",
-            "line": 288,
+            "line": 284,
             "description": "Set the command name.",
             "itemtype": "method",
             "name": "setName",
@@ -6590,7 +6590,7 @@
         },
         {
             "file": "src/tools/filter.js",
-            "line": 295,
+            "line": 291,
             "description": "Execute the command.",
             "itemtype": "method",
             "name": "execute",
@@ -7140,7 +7140,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 344,
+            "line": 340,
             "description": "The livewire color.",
             "itemtype": "property",
             "name": "livewireColor",
@@ -7153,7 +7153,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 351,
+            "line": 347,
             "description": "The HTML context.",
             "itemtype": "property",
             "name": "context",
@@ -7166,7 +7166,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 359,
+            "line": 355,
             "description": "Command name.",
             "itemtype": "property",
             "name": "name",
@@ -7179,7 +7179,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 366,
+            "line": 362,
             "description": "Get the command name.",
             "itemtype": "method",
             "name": "getName",
@@ -7193,7 +7193,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 372,
+            "line": 368,
             "description": "Set the command name.",
             "itemtype": "method",
             "name": "setName",
@@ -7210,7 +7210,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 379,
+            "line": 375,
             "description": "Execute the command.",
             "itemtype": "method",
             "name": "execute",
@@ -7406,7 +7406,7 @@
         },
         {
             "file": "src/tools/toolbox.js",
-            "line": 20,
+            "line": 19,
             "description": "Selected tool.",
             "itemtype": "property",
             "name": "selectedTool",
@@ -7417,7 +7417,7 @@
         },
         {
             "file": "src/tools/toolbox.js",
-            "line": 26,
+            "line": 25,
             "description": "Default tool name.",
             "itemtype": "property",
             "name": "defaultToolName",
@@ -7428,7 +7428,7 @@
         },
         {
             "file": "src/tools/toolbox.js",
-            "line": 34,
+            "line": 33,
             "description": "Enable the toolbox.",
             "itemtype": "method",
             "name": "enable",
@@ -7445,7 +7445,7 @@
         },
         {
             "file": "src/tools/toolbox.js",
-            "line": 48,
+            "line": 47,
             "description": "Get the selected tool.",
             "itemtype": "method",
             "name": "getSelectedTool",
@@ -7459,7 +7459,7 @@
         },
         {
             "file": "src/tools/toolbox.js",
-            "line": 57,
+            "line": 56,
             "description": "Set the selected tool.",
             "itemtype": "method",
             "name": "setSelectedTool",
@@ -7473,7 +7473,7 @@
         },
         {
             "file": "src/tools/toolbox.js",
-            "line": 78,
+            "line": 77,
             "description": "Check if a tool is in the tool list.",
             "itemtype": "method",
             "name": "hasTool",
@@ -7494,7 +7494,7 @@
         },
         {
             "file": "src/tools/toolbox.js",
-            "line": 88,
+            "line": 87,
             "description": "Sort the tool list.",
             "itemtype": "method",
             "name": "sortTools",
@@ -7504,7 +7504,7 @@
         },
         {
             "file": "src/tools/toolbox.js",
-            "line": 104,
+            "line": 103,
             "description": "Initialise the tool box.",
             "itemtype": "method",
             "name": "init",

@@ -8377,10 +8377,6 @@ dwv.tool.Draw.prototype.init = function() {
     // same for color
     this.setLineColour(dwv.tool.colors[0]);
 };
-
-// Add the tool to the tool list
-dwv.tool.tools = dwv.tool.tools || {};
-dwv.tool.tools.draw = dwv.tool.Draw;
 ;/** 
  * Tool module.
  * @module tool
@@ -8640,10 +8636,6 @@ dwv.tool.filter.Sobel.prototype.run = function(args)
 
 // Add the filter to the filter list
 dwv.tool.filters.sobel = dwv.tool.filter.Sobel;
-
-// Add the tool to the tool list
-dwv.tool.tools = dwv.tool.tools || {};
-dwv.tool.tools.filter = dwv.tool.Filter;
 
 /**
  * Run filter command.
@@ -9320,10 +9312,6 @@ dwv.tool.Livewire.prototype.init = function()
     this.setLineColour(dwv.tool.colors[0]);
 };
 
-// Add the tool to the tool list
-dwv.tool.tools = dwv.tool.tools || {};
-dwv.tool.tools.livewire = dwv.tool.Livewire;
-
 /**
  * Draw livewire command.
  * @class DrawLivewireCommand
@@ -9585,11 +9573,10 @@ dwv.tool.shapes.roi = dwv.tool.DrawRoiCommand;
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
 
-// Tool list: to be completed after each tool definition 
-dwv.tool.tools = dwv.tool.tools || {};
-    
 /**
  * Tool box.
+ * Relies on the static variable dwv.tool.tools. The available tools 
+ * of the gui will be those of this list.
  * @class ToolBox
  * @namespace dwv.tool
  * @constructor
@@ -10151,10 +10138,6 @@ dwv.tool.WindowLevel.prototype.setColourMap = function(name)
     // enable it
     dwv.tool.updateColourMap( dwv.tool.colourMaps[name] );
 };
-
-// Add the tool to the tool list
-dwv.tool.tools = dwv.tool.tools || {};
-dwv.tool.tools.windowlevel = dwv.tool.WindowLevel;
 ;/** 
  * Tool module.
  * @module tool
@@ -10429,10 +10412,6 @@ dwv.tool.Zoom.getHelp = function()
         }
     };
 };
-
-// Add the tool to the tool list
-dwv.tool.tools = dwv.tool.tools || {};
-dwv.tool.tools.zoom = dwv.tool.Zoom;
 ;/** 
  * Utility module.
  * @module utils
