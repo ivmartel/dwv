@@ -17,6 +17,19 @@ $(document).ready(function(){
     button = document.getElementById("info-btn");
     if( button ) button.onclick = function() { app.toggleInfoLayerDisplay(); };
 
+    // Add required loaders to the loader list
+    dwv.io.loaders = {};
+    dwv.io.loaders.file = dwv.io.File;
+    dwv.io.loaders.url = dwv.io.Url;
+
+    // Add required tools to the tool list
+    dwv.tool.tools = {};
+    dwv.tool.tools.windowlevel = dwv.tool.WindowLevel;
+    dwv.tool.tools.zoom = dwv.tool.Zoom;
+    dwv.tool.tools.draw = dwv.tool.Draw;
+    dwv.tool.tools.filter = dwv.tool.Filter;
+    dwv.tool.tools.livewire = dwv.tool.Livewire;
+
     // initialise the application
     app.init();
     // align layers when the window is resized
