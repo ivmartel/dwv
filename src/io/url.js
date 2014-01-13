@@ -109,7 +109,3 @@ dwv.io.Url.prototype.load = function(ioArray)
         request.send(null);
     }
 };
-
-//Add the loader to the loader list
-dwv.io.loaders = dwv.io.loaders || {};
-dwv.io.loaders.url = dwv.io.Url;

@@ -107,8 +107,3 @@ dwv.io.File.prototype.load = function(ioArray)
         }
     }
 };
-
-//Add the loader to the loader list
-dwv.io.loaders = dwv.io.loaders || {};
-dwv.io.loaders.file = dwv.io.File;
-

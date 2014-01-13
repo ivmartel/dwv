@@ -63,6 +63,11 @@ $(document).ready(function(){
     button = document.getElementById("help-btn");
     if( button ) button.onclick = function() { toggle("#help"); };
     
+    // Add required loaders to the loader list
+    dwv.io.loaders = {};
+    dwv.io.loaders.file = dwv.io.File;
+    dwv.io.loaders.url = dwv.io.Url;
+
     // Add required tools to the tool list
     dwv.tool.tools = {};
     dwv.tool.tools.windowlevel = dwv.tool.WindowLevel;
