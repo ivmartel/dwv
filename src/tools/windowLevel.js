@@ -88,9 +88,6 @@ dwv.tool.WindowLevel = function(app)
      */
     this.started = false;
 
-    // Initialise presets.
-    this.updatePresets();
-    
     /**
      * Handle mouse down event.
      * @method mousedown
@@ -262,12 +259,21 @@ dwv.tool.WindowLevel = function(app)
      * @method enable
      * @param {Boolean} bool The flag to enable or not.
      */
-    this.enable = function(bool){
-        // update GUI
-        if( bool ) dwv.gui.appendWindowLevelHtml();
-        else dwv.gui.clearWindowLevelHtml();
+    this.display = function(bool){
+        if( app.getImage().getPhotometricInterpretation().match(/MONOCHROME/) !== null )
+        {
+            dwv.gui.displayWindowLevelHtml(bool);
+        }
     };
     
+    /**
+     * Initialise the tool.
+     * @method init
+     */
+    this.init = function() {
+        this.updatePresets();
+        dwv.gui.updateWindowLevelHtml();
+    };
 }; // WindowLevel class
 
 /**
@@ -275,7 +281,7 @@ dwv.tool.WindowLevel = function(app)
  * @method getHelp
  * @returns {Object} The help content.
  */
-dwv.tool.WindowLevel.getHelp = function()
+dwv.tool.WindowLevel.prototype.getHelp = function()
 {
     return {
         'title': "WindowLevel",

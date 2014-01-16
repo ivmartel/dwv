@@ -212,13 +212,8 @@ dwv.tool.Zoom = function(app)
      * @method enable
      * @param {Boolean} bool The flag to enable or not.
      */
-    this.enable = function(bool){
-        if( bool ) { 
-            dwv.gui.appendZoomHtml();
-        }
-        else { 
-            dwv.gui.clearZoomHtml();
-        }
+    this.display = function(bool){
+        dwv.gui.displayZoomHtml(bool);
     };
 
     /**
@@ -257,7 +252,7 @@ dwv.tool.Zoom = function(app)
  * @method getHelp
  * @returns {Object} The help content.
  */
-dwv.tool.Zoom.getHelp = function()
+dwv.tool.Zoom.prototype.getHelp = function()
 {
     return {
         'title': "Zoom",
@@ -271,4 +266,12 @@ dwv.tool.Zoom.getHelp = function()
             'twotouch_pinch': "A pinch or spread allows to zoom the image."
         }
     };
+};
+
+/**
+ * Initialise the tool.
+ * @method init
+ */
+dwv.tool.Zoom.prototype.init = function() {
+    // nothing to do.
 };

@@ -70,12 +70,29 @@ $(document).ready(function(){
 
     // Add required tools to the tool list
     dwv.tool.tools = {};
-    dwv.tool.tools.windowlevel = dwv.tool.WindowLevel;
-    dwv.tool.tools.zoom = dwv.tool.Zoom;
-    dwv.tool.tools.draw = dwv.tool.Draw;
-    dwv.tool.tools.filter = dwv.tool.Filter;
-    dwv.tool.tools.livewire = dwv.tool.Livewire;
+    dwv.tool.tools.windowlevel = new dwv.tool.WindowLevel(app);
+    dwv.tool.tools.zoom = new dwv.tool.Zoom(app);
+    dwv.tool.tools.draw = new dwv.tool.Draw(app);
+    dwv.tool.tools.livewire = new dwv.tool.Livewire(app);
 
+    // Add the filter to the filter list
+    dwv.tool.tools.filter = new dwv.tool.Filter(app);
+    dwv.tool.filters = {};
+    dwv.tool.filters.threshold = new dwv.tool.filter.Threshold(app);
+    dwv.tool.filters.sharpen = new dwv.tool.filter.Sharpen(app);
+    dwv.tool.filters.sobel = new dwv.tool.filter.Sobel(app);
+
+    dwv.gui.appendToolboxHtml();
+    dwv.gui.appendWindowLevelHtml();
+    dwv.gui.appendZoomHtml();
+    dwv.gui.appendDrawHtml();
+    dwv.gui.appendLivewireHtml();
+
+    dwv.gui.appendFilterHtml();
+    dwv.gui.filter.appendThresholdHtml();
+    dwv.gui.filter.appendSharpenHtml();
+    dwv.gui.filter.appendSobelHtml();
+    
     // initialise the application
     app.init();
     // align layers when the window is resized

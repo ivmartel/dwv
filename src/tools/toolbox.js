@@ -35,13 +35,9 @@ dwv.tool.ToolBox = function(app)
  * @method enable
  * @param {Boolean} bool Flag to enable or not.
  */
-dwv.tool.ToolBox.prototype.enable = function(bool)
+dwv.tool.ToolBox.prototype.display = function(bool)
 {
-    if( bool ) {
-        this.sortTools();
-        dwv.gui.appendToolboxHtml();
-        this.init();
-    }
+    dwv.gui.displayToolboxHtml(bool);
 };
 
 /**
@@ -64,14 +60,15 @@ dwv.tool.ToolBox.prototype.setSelectedTool = function(name) {
     {
         throw new Error("Unknown tool: '" + name + "'");
     }
-    // disable last selected
+    // hide last selected
     if( this.selectedTool )
     {
-        this.selectedTool.enable(false);
+        this.selectedTool.display(false);
     }
     // enable new one
-    this.selectedTool = new dwv.tool.tools[name](app);
-    this.selectedTool.enable(true);
+    this.selectedTool = dwv.tool.tools[name];
+    // display it
+    this.selectedTool.display(true);
 };
 
 /**
@@ -106,10 +103,16 @@ dwv.tool.ToolBox.prototype.sortTools = function()
  */
 dwv.tool.ToolBox.prototype.init = function()
 {
+    // sort tools
+    this.sortTools();
     // set the default to the first in the list
     for( var key in dwv.tool.tools ){
         this.defaultToolName = key;
         break;
     }
     this.setSelectedTool(this.defaultToolName);
+    // init all tools
+    for( var key in dwv.tool.tools ) {
+        dwv.tool.tools[key].init();
+    }    
 };
