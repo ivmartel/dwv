@@ -507,7 +507,8 @@ dwv.App = function(mobile)
         addImageInfoListeners();
         
         // initialise the toolbox
-        toolBox.enable(true);
+        toolBox.init();
+        toolBox.display(true);
         // add the HTML for the history 
         dwv.gui.appendUndoHtml();
         
@@ -3230,6 +3231,11 @@ dwv.gui.onChangeFilter = function(event)
     app.getToolBox().getSelectedTool().setSelectedFilter(this.value);
 };
 
+dwv.gui.onRunFilter = function(event)
+{
+    app.getToolBox().getSelectedTool().getSelectedFilter().run();
+};
+
 /**
  * Handle shape change.
  * @method onChangeShape
@@ -3461,6 +3467,7 @@ dwv.gui.appendToolboxHtml = function()
     // list element
     var toolLi = document.createElement("li");
     toolLi.id = "toolLi";
+    toolLi.style.display = "none";
     //toolLi.appendChild(toolLabel);
     toolLi.appendChild(toolSelector);
     toolLi.setAttribute("class","ui-block-a");
@@ -3473,6 +3480,12 @@ dwv.gui.appendToolboxHtml = function()
     node.appendChild(toolLi);
     // trigger create event (mobile)
     $("#toolList").trigger("create");
+};
+
+dwv.gui.displayToolboxHtml = function(bool)
+{
+    var toolLi = document.getElementById("toolLi");
+    toolLi.style.display = bool ? "" : "none";
 };
 
 /**
@@ -3491,9 +3504,6 @@ dwv.gui.appendWindowLevelHtml = function()
     wlLabel.appendChild(document.createTextNode("WL Preset: "));
     // colour map selector
     var cmSelector = dwv.html.createHtmlSelect("colourMapSelect",dwv.tool.colourMaps);
-    // special monochrome1 case
-    if( app.getImage().getPhotometricInterpretation() === "MONOCHROME1" )
-        cmSelector.options[1].defaultSelected = true;
     cmSelector.onchange = dwv.gui.onChangeColourMap;
     // colour map label
     var cmLabel = document.createElement("label");
@@ -3503,25 +3513,24 @@ dwv.gui.appendWindowLevelHtml = function()
     // preset list element
     var wlLi = document.createElement("li");
     wlLi.id = "wlLi";
+    wlLi.style.display = "none";
     //wlLi.appendChild(wlLabel);
     wlLi.appendChild(wlSelector);
     wlLi.setAttribute("class","ui-block-b");
     // color map list element
     var cmLi = document.createElement("li");
     cmLi.id = "cmLi";
+    cmLi.style.display = "none";
     // cmLi.appendChild(cmLabel);
     cmLi.appendChild(cmSelector);
     cmLi.setAttribute("class","ui-block-c");
 
     // node
     var node = document.getElementById("toolList");
-    if( app.getImage().getPhotometricInterpretation().match(/MONOCHROME/) !== null )
-    {
-        // apend preset
-        node.appendChild(wlLi);
-        // apend color map if monochrome image
-        node.appendChild(cmLi);
-    }
+    // apend preset
+    node.appendChild(wlLi);
+    // apend color map if monochrome image
+    node.appendChild(cmLi);
     // trigger create event (mobile)
     $("#toolList").trigger("create");
 };
@@ -3531,10 +3540,40 @@ dwv.gui.appendWindowLevelHtml = function()
  * @method clearWindowLevelHtml
  * @static
  */
-dwv.gui.clearWindowLevelHtml = function()
+dwv.gui.displayWindowLevelHtml = function(bool)
 {
-    dwv.html.removeNode("wlLi");
-    dwv.html.removeNode("cmLi");
+    // presets
+    var wlLi = document.getElementById("wlLi");
+    wlLi.style.display = bool ? "" : "none";
+    // color map
+    var cmLi = document.getElementById("cmLi");
+    cmLi.style.display = bool ? "" : "none";
+};
+
+dwv.gui.updateWindowLevelHtml = function(bool)
+{
+    // update presets
+    dwv.html.removeNode("presetSelect");
+    // mobile
+    var nono = document.getElementById("presetSelect");
+    if( nono ) {
+        console.log("removing nono");
+        dwv.html.removeNode(nono.parentNode);
+    }
+    var wlSelector = dwv.html.createHtmlSelect("presetSelect",dwv.tool.presets);
+    wlSelector.onchange = dwv.gui.onChangeWindowLevelPreset;
+    var node = document.getElementById("wlLi");
+    node.appendChild(wlSelector);
+    
+    // special monochrome1 case
+    if( app.getImage().getPhotometricInterpretation() === "MONOCHROME1" )
+    {
+        var select = document.getElementById("colourMapSelect");
+        select.options[1].defaultSelected = true;
+    }
+    
+    // trigger create event (mobile)
+    $("#toolList").trigger("create");
 };
 
 /**
@@ -3562,12 +3601,14 @@ dwv.gui.appendDrawHtml = function()
     // list element
     var shapeLi = document.createElement("li");
     shapeLi.id = "shapeLi";
+    shapeLi.style.display = "none";
     // shapeLi.appendChild(shapeLabel);
     shapeLi.appendChild(shapeSelector);
     shapeLi.setAttribute("class","ui-block-c");
     // list element
     var colourLi = document.createElement("li");
     colourLi.id = "colourLi";
+    colourLi.style.display = "none";
     //colourLi.appendChild(colourLabel);
     colourLi.appendChild(colourSelector);
     colourLi.setAttribute("class","ui-block-b");
@@ -3587,10 +3628,14 @@ dwv.gui.appendDrawHtml = function()
  * @method clearDrawHtml
  * @static
  */
-dwv.gui.clearDrawHtml = function()
+dwv.gui.displayDrawHtml = function(bool)
 {
-    dwv.html.removeNode("colourLi");
-    dwv.html.removeNode("shapeLi");
+    // color
+    var colourLi = document.getElementById("colourLi");
+    colourLi.style.display = bool ? "" : "none";
+    // shape
+    var shapeLi = document.getElementById("shapeLi");
+    shapeLi.style.display = bool ? "" : "none";
 };
 
 /**
@@ -3610,7 +3655,8 @@ dwv.gui.appendLivewireHtml = function()
     
     // list element
     var colourLi = document.createElement("li");
-    colourLi.id = "colourLi";
+    colourLi.id = "lwColourLi";
+    colourLi.style.display = "none";
     colourLi.setAttribute("class","ui-block-b");
     //colourLi.appendChild(colourLabel);
     colourLi.appendChild(colourSelector);
@@ -3626,9 +3672,10 @@ dwv.gui.appendLivewireHtml = function()
  * @method clearDrawHtml
  * @static
  */
-dwv.gui.clearLivewireHtml = function()
+dwv.gui.displayLivewireHtml = function(bool)
 {
-    dwv.html.removeNode("colourLi");
+    var colourLi = document.getElementById("lwColourLi");
+    colourLi.style.display = bool ? "" : "none";
 };
 
 /**
@@ -3649,6 +3696,7 @@ dwv.gui.appendFilterHtml = function()
     // list element
     var filterLi = document.createElement("li");
     filterLi.id = "filterLi";
+    filterLi.style.display = "none";
     filterLi.setAttribute("class","ui-block-b");
     //filterLi.appendChild(filterLabel);
     filterLi.appendChild(filterSelector);
@@ -3664,9 +3712,10 @@ dwv.gui.appendFilterHtml = function()
  * @method clearDrawHtml
  * @static
  */
-dwv.gui.clearFilterHtml = function()
+dwv.gui.displayFilterHtml = function(bool)
 {
-    dwv.html.removeNode("filterLi");
+    var filterLi = document.getElementById("filterLi");
+    filterLi.style.display = bool ? "" : "none";
 };
 
 // create namespace if not there
@@ -3681,13 +3730,14 @@ dwv.gui.filter.appendThresholdHtml = function()
 {
     // list element
     var thresholdLi = document.createElement("li");
-    thresholdLi.setAttribute("class","ui-block-c");
     thresholdLi.id = "thresholdLi";
+    thresholdLi.setAttribute("class","ui-block-c");
+    thresholdLi.style.display = "none";
     
     // append to tool list
     document.getElementById("toolList").appendChild(thresholdLi);
     // gui specific slider...
-    dwv.gui.getSliderHtml();
+    //dwv.gui.getSliderHtml();
     // trigger create event (mobile)
     $("#toolList").trigger("create");
 };
@@ -3697,9 +3747,10 @@ dwv.gui.filter.appendThresholdHtml = function()
  * @method clearDrawHtml
  * @static
  */
-dwv.gui.filter.clearThresholdHtml = function()
+dwv.gui.filter.displayThresholdHtml = function(bool)
 {
-    dwv.html.removeNode("thresholdLi");
+    var thresholdLi = document.getElementById("thresholdLi");
+    thresholdLi.style.display = bool ? "" : "none";
 };
 
 /**
@@ -3712,12 +3763,13 @@ dwv.gui.filter.appendSharpenHtml = function()
     // button
     var buttonRun = document.createElement("button");
     buttonRun.id = "runFilterButton";
-    buttonRun.onclick = app.getToolBox().getSelectedTool().getSelectedFilter().run;
+    buttonRun.onclick = dwv.gui.onRunFilter;
     buttonRun.appendChild(document.createTextNode("Apply"));
 
     // list element
     var sharpenLi = document.createElement("li");
     sharpenLi.id = "sharpenLi";
+    sharpenLi.style.display = "none";
     sharpenLi.setAttribute("class","ui-block-c");
     sharpenLi.appendChild(buttonRun);
     
@@ -3732,9 +3784,10 @@ dwv.gui.filter.appendSharpenHtml = function()
  * @method clearSharpenHtml
  * @static
  */
-dwv.gui.filter.clearSharpenHtml = function()
+dwv.gui.filter.displaySharpenHtml = function(bool)
 {
-    dwv.html.removeNode("sharpenLi");
+    var sharpenLi = document.getElementById("sharpenLi");
+    sharpenLi.style.display = bool ? "" : "none";
 };
 
 /**
@@ -3747,12 +3800,13 @@ dwv.gui.filter.appendSobelHtml = function()
     // button
     var buttonRun = document.createElement("button");
     buttonRun.id = "runFilterButton";
-    buttonRun.onclick = app.getToolBox().getSelectedTool().getSelectedFilter().run;
+    buttonRun.onclick = dwv.gui.onRunFilter;
     buttonRun.appendChild(document.createTextNode("Apply"));
 
     // list element
     var sobelLi = document.createElement("li");
     sobelLi.id = "sobelLi";
+    sobelLi.style.display = "none";
     sobelLi.setAttribute("class","ui-block-c");
     sobelLi.appendChild(buttonRun);
     
@@ -3767,9 +3821,10 @@ dwv.gui.filter.appendSobelHtml = function()
  * @method clearSharpenHtml
  * @static
  */
-dwv.gui.filter.clearSobelHtml = function()
+dwv.gui.filter.displaySobelHtml = function(bool)
 {
-    dwv.html.removeNode("sobelLi");
+    var sobelLi = document.getElementById("sobelLi");
+    sobelLi.style.display = bool ? "" : "none";
 };
 
 /**
@@ -3790,6 +3845,7 @@ dwv.gui.appendZoomHtml = function()
     // list element
     var zoomLi = document.createElement("li");
     zoomLi.id = "zoomLi";
+    zoomLi.style.display = "none";
     zoomLi.setAttribute("class","ui-block-c");
     zoomLi.appendChild(button);
     
@@ -3804,9 +3860,10 @@ dwv.gui.appendZoomHtml = function()
  * @method clearZoomHtml
  * @static
  */
-dwv.gui.clearZoomHtml = function()
+dwv.gui.displayZoomHtml = function(bool)
 {
-    dwv.html.removeNode("zoomLi");
+    var zoomLi = document.getElementById("zoomLi");
+    zoomLi.style.display = bool ? "" : "none";
 };
 
 /**
@@ -8284,16 +8341,10 @@ dwv.tool.Draw = function(app)
     /**
      * Enable the tool.
      * @method enable
-     * @param {Boolean} value The flag to enable or not.
+     * @param {Boolean} bool The flag to enable or not.
      */
-    this.enable = function(value){
-        if( value ) {
-            this.init();
-            dwv.gui.appendDrawHtml();
-        }
-        else { 
-            dwv.gui.clearDrawHtml();
-        }
+    this.display = function(bool){
+        dwv.gui.displayDrawHtml(bool);
     };
 
 }; // Draw class
@@ -8303,7 +8354,7 @@ dwv.tool.Draw = function(app)
  * @method getHelp
  * @returns {Object} The help content.
  */
-dwv.tool.Draw.getHelp = function()
+dwv.tool.Draw.prototype.getHelp = function()
 {
     return {
         'title': "Draw",
@@ -8375,9 +8426,6 @@ dwv.tool.Draw.prototype.init = function() {
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
 
-// Filter list: to be completed after each tool definition 
-dwv.tool.filters = dwv.tool.filters || {};
-
 /**
  * Filter tool.
  * @class Filter
@@ -8399,6 +8447,8 @@ dwv.tool.Filter = function(app)
      * @type String
      */
     this.defaultFilterName = 0;
+    
+    this.displayed = false;
 };
 
 /**
@@ -8406,7 +8456,7 @@ dwv.tool.Filter = function(app)
  * @method getHelp
  * @returns {Object} The help content.
  */
-dwv.tool.Filter.getHelp = function()
+dwv.tool.Filter.prototype.getHelp = function()
 {
     return {
         'title': "Filter",
@@ -8422,19 +8472,12 @@ dwv.tool.Filter.getHelp = function()
  * @method enable
  * @param {Boolean} bool Flag to enable or not.
  */
-dwv.tool.Filter.prototype.enable = function(bool)
+dwv.tool.Filter.prototype.display = function(bool)
 {
-    if( bool ) {
-        dwv.gui.appendFilterHtml();
-        this.init();
-    }
-    else {
-        if( this.selectedFilter )
-        {
-            this.selectedFilter.enable(false);
-        }
-        dwv.gui.clearFilterHtml();
-    }
+    dwv.gui.displayFilterHtml(bool);
+    this.displayed = bool;
+    // display the selected filter
+    this.selectedFilter.display(bool);
 };
 
 /**
@@ -8457,14 +8500,18 @@ dwv.tool.Filter.prototype.setSelectedFilter = function(name) {
     {
         throw new Error("Unknown filter: '" + name + "'");
     }
-    // disable last selected
-    if( this.selectedFilter )
+    // hide last selected
+    if( this.displayed )
     {
-        this.selectedFilter.enable(false);
+        this.selectedFilter.display(false);
     }
     // enable new one
-    this.selectedFilter = new dwv.tool.filters[name](app);
-    this.selectedFilter.enable(true);
+    this.selectedFilter = dwv.tool.filters[name];
+    // display the selected filter
+    if( this.displayed )
+    {
+        this.selectedFilter.display(true);
+    }
 };
 
 /**
@@ -8515,16 +8562,11 @@ dwv.tool.filter.Threshold = function(app) {};
 /**
  * Enable the filter.
  * @method enable
- * @param {Boolean} value Flag to enable or not.
+ * @param {Boolean} bool Flag to enable or not.
  */
-dwv.tool.filter.Threshold.prototype.enable = function(value)
+dwv.tool.filter.Threshold.prototype.display = function(bool)
 {
-    if( value ) {
-        dwv.gui.filter.appendThresholdHtml();
-    }
-    else { 
-        dwv.gui.filter.clearThresholdHtml();
-    }
+    dwv.gui.filter.displayThresholdHtml(bool);
 };
 
 /**
@@ -8543,9 +8585,6 @@ dwv.tool.filter.Threshold.prototype.run = function(args)
     app.getUndoStack().add(command);
 };
 
-// Add the filter to the filter list
-dwv.tool.filters.threshold = dwv.tool.filter.Threshold;
-
 /**
  * Sharpen filter tool.
  * @class Sharpen
@@ -8558,16 +8597,11 @@ dwv.tool.filter.Sharpen = function(app) {};
 /**
  * Enable the filter.
  * @method enable
- * @param {Boolean} value Flag to enable or not.
+ * @param {Boolean} bool Flag to enable or not.
  */
-dwv.tool.filter.Sharpen.prototype.enable = function(value)
+dwv.tool.filter.Sharpen.prototype.display = function(bool)
 {
-    if( value ) {
-        dwv.gui.filter.appendSharpenHtml();
-    }
-    else { 
-        dwv.gui.filter.clearSharpenHtml();
-    }
+    dwv.gui.filter.displaySharpenHtml(bool);
 };
 
 /**
@@ -8584,9 +8618,6 @@ dwv.tool.filter.Sharpen.prototype.run = function(args)
     app.getUndoStack().add(command);
 };
 
-// Add the filter to the filter list
-dwv.tool.filters.sharpen = dwv.tool.filter.Sharpen;
-
 /**
  * Sobel filter tool.
  * @class Sharpen
@@ -8599,16 +8630,11 @@ dwv.tool.filter.Sobel = function(app) {};
 /**
  * Enable the filter.
  * @method enable
- * @param {Boolean} value Flag to enable or not.
+ * @param {Boolean} bool Flag to enable or not.
  */
-dwv.tool.filter.Sobel.prototype.enable = function(value)
+dwv.tool.filter.Sobel.prototype.display = function(bool)
 {
-    if( value ) {
-        dwv.gui.filter.appendSobelHtml();
-    }
-    else { 
-        dwv.gui.filter.clearSobelHtml();
-    }
+    dwv.gui.filter.displaySobelHtml(bool);
 };
 
 /**
@@ -8624,9 +8650,6 @@ dwv.tool.filter.Sobel.prototype.run = function(args)
     // save command in undo stack
     app.getUndoStack().add(command);
 };
-
-// Add the filter to the filter list
-dwv.tool.filters.sobel = dwv.tool.filter.Sobel;
 
 /**
  * Run filter command.
@@ -9075,10 +9098,6 @@ dwv.tool.Livewire = function(app)
      * @type Scissors
      */
     var scissors = new dwv.math.Scissors();
-    scissors.setDimensions(
-        app.getImage().getSize().getNumberOfColumns(),
-        app.getImage().getSize().getNumberOfRows() );
-    scissors.setData(app.getImageData().data);
     
     /**
      * Handle mouse down event.
@@ -9251,17 +9270,29 @@ dwv.tool.Livewire = function(app)
      * @method enable
      * @param {Boolean} bool The flag to enable or not.
      */
-    this.enable = function(value){
-        if( value ) {
-            this.init();
-            dwv.gui.appendLivewireHtml();
-        }
-        else {
-            dwv.gui.clearLivewireHtml();
-        }
+    this.display = function(bool){
+        dwv.gui.displayLivewireHtml(bool);
+        // TODO why twice?
+        this.init();
     };
 
-
+    /**
+     * Initialise the tool.
+     * @method init
+     */
+    this.init = function()
+    {
+        // set the default to the first in the list
+        this.setLineColour(dwv.tool.colors[0]);
+        
+        //scissors = new dwv.math.Scissors();
+        scissors.setDimensions(
+                app.getImage().getSize().getNumberOfColumns(),
+                app.getImage().getSize().getNumberOfRows() );
+        var data = app.getImageData().data;
+        scissors.setData(app.getImageData().data);
+    };
+    
 }; // Livewire class
 
 /**
@@ -9269,7 +9300,7 @@ dwv.tool.Livewire = function(app)
  * @method getHelp
  * @returns {Object} The help content.
  */
-dwv.tool.Livewire.getHelp = function()
+dwv.tool.Livewire.prototype.getHelp = function()
 {
     return {
         'title': "Livewire",
@@ -9291,16 +9322,6 @@ dwv.tool.Livewire.prototype.setLineColour = function(colour)
 {
     // set style var
     this.style.setLineColor(colour);
-};
-
-/**
- * Initialise the tool.
- * @method init
- */
-dwv.tool.Livewire.prototype.init = function()
-{
-    // set the default to the first in the list
-    this.setLineColour(dwv.tool.colors[0]);
 };
 
 /**
@@ -9594,13 +9615,9 @@ dwv.tool.ToolBox = function(app)
  * @method enable
  * @param {Boolean} bool Flag to enable or not.
  */
-dwv.tool.ToolBox.prototype.enable = function(bool)
+dwv.tool.ToolBox.prototype.display = function(bool)
 {
-    if( bool ) {
-        this.sortTools();
-        dwv.gui.appendToolboxHtml();
-        this.init();
-    }
+    dwv.gui.displayToolboxHtml(bool);
 };
 
 /**
@@ -9623,14 +9640,15 @@ dwv.tool.ToolBox.prototype.setSelectedTool = function(name) {
     {
         throw new Error("Unknown tool: '" + name + "'");
     }
-    // disable last selected
+    // hide last selected
     if( this.selectedTool )
     {
-        this.selectedTool.enable(false);
+        this.selectedTool.display(false);
     }
     // enable new one
-    this.selectedTool = new dwv.tool.tools[name](app);
-    this.selectedTool.enable(true);
+    this.selectedTool = dwv.tool.tools[name];
+    // display it
+    this.selectedTool.display(true);
 };
 
 /**
@@ -9665,12 +9683,18 @@ dwv.tool.ToolBox.prototype.sortTools = function()
  */
 dwv.tool.ToolBox.prototype.init = function()
 {
+    // sort tools
+    this.sortTools();
     // set the default to the first in the list
     for( var key in dwv.tool.tools ){
         this.defaultToolName = key;
         break;
     }
     this.setSelectedTool(this.defaultToolName);
+    // init all tools
+    for( key in dwv.tool.tools ) {
+        dwv.tool.tools[key].init();
+    }    
 };
 ;/** 
  * Tool module.
@@ -9866,9 +9890,6 @@ dwv.tool.WindowLevel = function(app)
      */
     this.started = false;
 
-    // Initialise presets.
-    this.updatePresets();
-    
     /**
      * Handle mouse down event.
      * @method mousedown
@@ -10040,12 +10061,21 @@ dwv.tool.WindowLevel = function(app)
      * @method enable
      * @param {Boolean} bool The flag to enable or not.
      */
-    this.enable = function(bool){
-        // update GUI
-        if( bool ) dwv.gui.appendWindowLevelHtml();
-        else dwv.gui.clearWindowLevelHtml();
+    this.display = function(bool){
+        if( app.getImage().getPhotometricInterpretation().match(/MONOCHROME/) !== null )
+        {
+            dwv.gui.displayWindowLevelHtml(bool);
+        }
     };
     
+    /**
+     * Initialise the tool.
+     * @method init
+     */
+    this.init = function() {
+        this.updatePresets();
+        dwv.gui.updateWindowLevelHtml();
+    };
 }; // WindowLevel class
 
 /**
@@ -10053,7 +10083,7 @@ dwv.tool.WindowLevel = function(app)
  * @method getHelp
  * @returns {Object} The help content.
  */
-dwv.tool.WindowLevel.getHelp = function()
+dwv.tool.WindowLevel.prototype.getHelp = function()
 {
     return {
         'title': "WindowLevel",
@@ -10343,13 +10373,8 @@ dwv.tool.Zoom = function(app)
      * @method enable
      * @param {Boolean} bool The flag to enable or not.
      */
-    this.enable = function(bool){
-        if( bool ) { 
-            dwv.gui.appendZoomHtml();
-        }
-        else { 
-            dwv.gui.clearZoomHtml();
-        }
+    this.display = function(bool){
+        dwv.gui.displayZoomHtml(bool);
     };
 
     /**
@@ -10388,7 +10413,7 @@ dwv.tool.Zoom = function(app)
  * @method getHelp
  * @returns {Object} The help content.
  */
-dwv.tool.Zoom.getHelp = function()
+dwv.tool.Zoom.prototype.getHelp = function()
 {
     return {
         'title': "Zoom",
@@ -10403,7 +10428,14 @@ dwv.tool.Zoom.getHelp = function()
         }
     };
 };
-;/** 
+
+/**
+ * Initialise the tool.
+ * @method init
+ */
+dwv.tool.Zoom.prototype.init = function() {
+    // nothing to do.
+};;/** 
  * Utility module.
  * @module utils
  */

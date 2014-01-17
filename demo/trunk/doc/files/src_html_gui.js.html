@@ -294,6 +294,11 @@ dwv.gui.onChangeFilter = function(event)
     app.getToolBox().getSelectedTool().setSelectedFilter(this.value);
 };
 
+dwv.gui.onRunFilter = function(event)
+{
+    app.getToolBox().getSelectedTool().getSelectedFilter().run();
+};
+
 /**
  * Handle shape change.
  * @method onChangeShape
@@ -525,6 +530,7 @@ dwv.gui.appendToolboxHtml = function()
     // list element
     var toolLi = document.createElement(&quot;li&quot;);
     toolLi.id = &quot;toolLi&quot;;
+    toolLi.style.display = &quot;none&quot;;
     //toolLi.appendChild(toolLabel);
     toolLi.appendChild(toolSelector);
     toolLi.setAttribute(&quot;class&quot;,&quot;ui-block-a&quot;);
@@ -537,6 +543,12 @@ dwv.gui.appendToolboxHtml = function()
     node.appendChild(toolLi);
     // trigger create event (mobile)
     $(&quot;#toolList&quot;).trigger(&quot;create&quot;);
+};
+
+dwv.gui.displayToolboxHtml = function(bool)
+{
+    var toolLi = document.getElementById(&quot;toolLi&quot;);
+    toolLi.style.display = bool ? &quot;&quot; : &quot;none&quot;;
 };
 
 /**
@@ -555,9 +567,6 @@ dwv.gui.appendWindowLevelHtml = function()
     wlLabel.appendChild(document.createTextNode(&quot;WL Preset: &quot;));
     // colour map selector
     var cmSelector = dwv.html.createHtmlSelect(&quot;colourMapSelect&quot;,dwv.tool.colourMaps);
-    // special monochrome1 case
-    if( app.getImage().getPhotometricInterpretation() === &quot;MONOCHROME1&quot; )
-        cmSelector.options[1].defaultSelected = true;
     cmSelector.onchange = dwv.gui.onChangeColourMap;
     // colour map label
     var cmLabel = document.createElement(&quot;label&quot;);
@@ -567,25 +576,24 @@ dwv.gui.appendWindowLevelHtml = function()
     // preset list element
     var wlLi = document.createElement(&quot;li&quot;);
     wlLi.id = &quot;wlLi&quot;;
+    wlLi.style.display = &quot;none&quot;;
     //wlLi.appendChild(wlLabel);
     wlLi.appendChild(wlSelector);
     wlLi.setAttribute(&quot;class&quot;,&quot;ui-block-b&quot;);
     // color map list element
     var cmLi = document.createElement(&quot;li&quot;);
     cmLi.id = &quot;cmLi&quot;;
+    cmLi.style.display = &quot;none&quot;;
     // cmLi.appendChild(cmLabel);
     cmLi.appendChild(cmSelector);
     cmLi.setAttribute(&quot;class&quot;,&quot;ui-block-c&quot;);
 
     // node
     var node = document.getElementById(&quot;toolList&quot;);
-    if( app.getImage().getPhotometricInterpretation().match(/MONOCHROME/) !== null )
-    {
-        // apend preset
-        node.appendChild(wlLi);
-        // apend color map if monochrome image
-        node.appendChild(cmLi);
-    }
+    // apend preset
+    node.appendChild(wlLi);
+    // apend color map if monochrome image
+    node.appendChild(cmLi);
     // trigger create event (mobile)
     $(&quot;#toolList&quot;).trigger(&quot;create&quot;);
 };
@@ -595,10 +603,40 @@ dwv.gui.appendWindowLevelHtml = function()
  * @method clearWindowLevelHtml
  * @static
  */
-dwv.gui.clearWindowLevelHtml = function()
+dwv.gui.displayWindowLevelHtml = function(bool)
 {
-    dwv.html.removeNode(&quot;wlLi&quot;);
-    dwv.html.removeNode(&quot;cmLi&quot;);
+    // presets
+    var wlLi = document.getElementById(&quot;wlLi&quot;);
+    wlLi.style.display = bool ? &quot;&quot; : &quot;none&quot;;
+    // color map
+    var cmLi = document.getElementById(&quot;cmLi&quot;);
+    cmLi.style.display = bool ? &quot;&quot; : &quot;none&quot;;
+};
+
+dwv.gui.updateWindowLevelHtml = function(bool)
+{
+    // update presets
+    dwv.html.removeNode(&quot;presetSelect&quot;);
+    // mobile
+    var nono = document.getElementById(&quot;presetSelect&quot;);
+    if( nono ) {
+        console.log(&quot;removing nono&quot;);
+        dwv.html.removeNode(nono.parentNode);
+    }
+    var wlSelector = dwv.html.createHtmlSelect(&quot;presetSelect&quot;,dwv.tool.presets);
+    wlSelector.onchange = dwv.gui.onChangeWindowLevelPreset;
+    var node = document.getElementById(&quot;wlLi&quot;);
+    node.appendChild(wlSelector);
+    
+    // special monochrome1 case
+    if( app.getImage().getPhotometricInterpretation() === &quot;MONOCHROME1&quot; )
+    {
+        var select = document.getElementById(&quot;colourMapSelect&quot;);
+        select.options[1].defaultSelected = true;
+    }
+    
+    // trigger create event (mobile)
+    $(&quot;#toolList&quot;).trigger(&quot;create&quot;);
 };
 
 /**
@@ -626,12 +664,14 @@ dwv.gui.appendDrawHtml = function()
     // list element
     var shapeLi = document.createElement(&quot;li&quot;);
     shapeLi.id = &quot;shapeLi&quot;;
+    shapeLi.style.display = &quot;none&quot;;
     // shapeLi.appendChild(shapeLabel);
     shapeLi.appendChild(shapeSelector);
     shapeLi.setAttribute(&quot;class&quot;,&quot;ui-block-c&quot;);
     // list element
     var colourLi = document.createElement(&quot;li&quot;);
     colourLi.id = &quot;colourLi&quot;;
+    colourLi.style.display = &quot;none&quot;;
     //colourLi.appendChild(colourLabel);
     colourLi.appendChild(colourSelector);
     colourLi.setAttribute(&quot;class&quot;,&quot;ui-block-b&quot;);
@@ -651,10 +691,14 @@ dwv.gui.appendDrawHtml = function()
  * @method clearDrawHtml
  * @static
  */
-dwv.gui.clearDrawHtml = function()
+dwv.gui.displayDrawHtml = function(bool)
 {
-    dwv.html.removeNode(&quot;colourLi&quot;);
-    dwv.html.removeNode(&quot;shapeLi&quot;);
+    // color
+    var colourLi = document.getElementById(&quot;colourLi&quot;);
+    colourLi.style.display = bool ? &quot;&quot; : &quot;none&quot;;
+    // shape
+    var shapeLi = document.getElementById(&quot;shapeLi&quot;);
+    shapeLi.style.display = bool ? &quot;&quot; : &quot;none&quot;;
 };
 
 /**
@@ -674,7 +718,8 @@ dwv.gui.appendLivewireHtml = function()
     
     // list element
     var colourLi = document.createElement(&quot;li&quot;);
-    colourLi.id = &quot;colourLi&quot;;
+    colourLi.id = &quot;lwColourLi&quot;;
+    colourLi.style.display = &quot;none&quot;;
     colourLi.setAttribute(&quot;class&quot;,&quot;ui-block-b&quot;);
     //colourLi.appendChild(colourLabel);
     colourLi.appendChild(colourSelector);
@@ -690,9 +735,10 @@ dwv.gui.appendLivewireHtml = function()
  * @method clearDrawHtml
  * @static
  */
-dwv.gui.clearLivewireHtml = function()
+dwv.gui.displayLivewireHtml = function(bool)
 {
-    dwv.html.removeNode(&quot;colourLi&quot;);
+    var colourLi = document.getElementById(&quot;lwColourLi&quot;);
+    colourLi.style.display = bool ? &quot;&quot; : &quot;none&quot;;
 };
 
 /**
@@ -713,6 +759,7 @@ dwv.gui.appendFilterHtml = function()
     // list element
     var filterLi = document.createElement(&quot;li&quot;);
     filterLi.id = &quot;filterLi&quot;;
+    filterLi.style.display = &quot;none&quot;;
     filterLi.setAttribute(&quot;class&quot;,&quot;ui-block-b&quot;);
     //filterLi.appendChild(filterLabel);
     filterLi.appendChild(filterSelector);
@@ -728,9 +775,10 @@ dwv.gui.appendFilterHtml = function()
  * @method clearDrawHtml
  * @static
  */
-dwv.gui.clearFilterHtml = function()
+dwv.gui.displayFilterHtml = function(bool)
 {
-    dwv.html.removeNode(&quot;filterLi&quot;);
+    var filterLi = document.getElementById(&quot;filterLi&quot;);
+    filterLi.style.display = bool ? &quot;&quot; : &quot;none&quot;;
 };
 
 // create namespace if not there
@@ -745,13 +793,14 @@ dwv.gui.filter.appendThresholdHtml = function()
 {
     // list element
     var thresholdLi = document.createElement(&quot;li&quot;);
-    thresholdLi.setAttribute(&quot;class&quot;,&quot;ui-block-c&quot;);
     thresholdLi.id = &quot;thresholdLi&quot;;
+    thresholdLi.setAttribute(&quot;class&quot;,&quot;ui-block-c&quot;);
+    thresholdLi.style.display = &quot;none&quot;;
     
     // append to tool list
     document.getElementById(&quot;toolList&quot;).appendChild(thresholdLi);
     // gui specific slider...
-    dwv.gui.getSliderHtml();
+    //dwv.gui.getSliderHtml();
     // trigger create event (mobile)
     $(&quot;#toolList&quot;).trigger(&quot;create&quot;);
 };
@@ -761,9 +810,10 @@ dwv.gui.filter.appendThresholdHtml = function()
  * @method clearDrawHtml
  * @static
  */
-dwv.gui.filter.clearThresholdHtml = function()
+dwv.gui.filter.displayThresholdHtml = function(bool)
 {
-    dwv.html.removeNode(&quot;thresholdLi&quot;);
+    var thresholdLi = document.getElementById(&quot;thresholdLi&quot;);
+    thresholdLi.style.display = bool ? &quot;&quot; : &quot;none&quot;;
 };
 
 /**
@@ -776,12 +826,13 @@ dwv.gui.filter.appendSharpenHtml = function()
     // button
     var buttonRun = document.createElement(&quot;button&quot;);
     buttonRun.id = &quot;runFilterButton&quot;;
-    buttonRun.onclick = app.getToolBox().getSelectedTool().getSelectedFilter().run;
+    buttonRun.onclick = dwv.gui.onRunFilter;
     buttonRun.appendChild(document.createTextNode(&quot;Apply&quot;));
 
     // list element
     var sharpenLi = document.createElement(&quot;li&quot;);
     sharpenLi.id = &quot;sharpenLi&quot;;
+    sharpenLi.style.display = &quot;none&quot;;
     sharpenLi.setAttribute(&quot;class&quot;,&quot;ui-block-c&quot;);
     sharpenLi.appendChild(buttonRun);
     
@@ -796,9 +847,10 @@ dwv.gui.filter.appendSharpenHtml = function()
  * @method clearSharpenHtml
  * @static
  */
-dwv.gui.filter.clearSharpenHtml = function()
+dwv.gui.filter.displaySharpenHtml = function(bool)
 {
-    dwv.html.removeNode(&quot;sharpenLi&quot;);
+    var sharpenLi = document.getElementById(&quot;sharpenLi&quot;);
+    sharpenLi.style.display = bool ? &quot;&quot; : &quot;none&quot;;
 };
 
 /**
@@ -811,12 +863,13 @@ dwv.gui.filter.appendSobelHtml = function()
     // button
     var buttonRun = document.createElement(&quot;button&quot;);
     buttonRun.id = &quot;runFilterButton&quot;;
-    buttonRun.onclick = app.getToolBox().getSelectedTool().getSelectedFilter().run;
+    buttonRun.onclick = dwv.gui.onRunFilter;
     buttonRun.appendChild(document.createTextNode(&quot;Apply&quot;));
 
     // list element
     var sobelLi = document.createElement(&quot;li&quot;);
     sobelLi.id = &quot;sobelLi&quot;;
+    sobelLi.style.display = &quot;none&quot;;
     sobelLi.setAttribute(&quot;class&quot;,&quot;ui-block-c&quot;);
     sobelLi.appendChild(buttonRun);
     
@@ -831,9 +884,10 @@ dwv.gui.filter.appendSobelHtml = function()
  * @method clearSharpenHtml
  * @static
  */
-dwv.gui.filter.clearSobelHtml = function()
+dwv.gui.filter.displaySobelHtml = function(bool)
 {
-    dwv.html.removeNode(&quot;sobelLi&quot;);
+    var sobelLi = document.getElementById(&quot;sobelLi&quot;);
+    sobelLi.style.display = bool ? &quot;&quot; : &quot;none&quot;;
 };
 
 /**
@@ -854,6 +908,7 @@ dwv.gui.appendZoomHtml = function()
     // list element
     var zoomLi = document.createElement(&quot;li&quot;);
     zoomLi.id = &quot;zoomLi&quot;;
+    zoomLi.style.display = &quot;none&quot;;
     zoomLi.setAttribute(&quot;class&quot;,&quot;ui-block-c&quot;);
     zoomLi.appendChild(button);
     
@@ -868,9 +923,10 @@ dwv.gui.appendZoomHtml = function()
  * @method clearZoomHtml
  * @static
  */
-dwv.gui.clearZoomHtml = function()
+dwv.gui.displayZoomHtml = function(bool)
 {
-    dwv.html.removeNode(&quot;zoomLi&quot;);
+    var zoomLi = document.getElementById(&quot;zoomLi&quot;);
+    zoomLi.style.display = bool ? &quot;&quot; : &quot;none&quot;;
 };
 
 /**
