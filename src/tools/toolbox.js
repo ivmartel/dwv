@@ -112,7 +112,7 @@ dwv.tool.ToolBox.prototype.init = function()
     }
     this.setSelectedTool(this.defaultToolName);
     // init all tools
-    for( var key in dwv.tool.tools ) {
+    for( key in dwv.tool.tools ) {
         dwv.tool.tools[key].init();
     }    
 };

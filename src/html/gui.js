@@ -433,8 +433,8 @@ dwv.gui.updateWindowLevelHtml = function(bool)
     // special monochrome1 case
     if( app.getImage().getPhotometricInterpretation() === "MONOCHROME1" )
     {
-        var node = document.getElementById("colourMapSelect");
-        node.options[1].defaultSelected = true;
+        var select = document.getElementById("colourMapSelect");
+        select.options[1].defaultSelected = true;
     }
     
     // trigger create event (mobile)
