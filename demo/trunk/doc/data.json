@@ -1250,7 +1250,7 @@
             "module": "tool",
             "namespace": "dwv.tool.filter",
             "file": "src/tools/filter.js",
-            "line": 132,
+            "line": 134,
             "description": "Threshold filter tool.",
             "is_constructor": 1,
             "params": [
@@ -1272,7 +1272,7 @@
             "module": "tool",
             "namespace": "dwv.tool.filter",
             "file": "src/tools/filter.js",
-            "line": 200,
+            "line": 202,
             "description": "Sobel filter tool.",
             "is_constructor": 1,
             "params": [
@@ -1294,7 +1294,7 @@
             "module": "tool",
             "namespace": "dwv.tool",
             "file": "src/tools/filter.js",
-            "line": 233,
+            "line": 235,
             "description": "Run filter command.",
             "is_constructor": 1,
             "params": [
@@ -1390,7 +1390,7 @@
             "module": "tool",
             "namespace": "dwv.tool",
             "file": "src/tools/livewire.js",
-            "line": 328,
+            "line": 329,
             "description": "Draw livewire command.",
             "params": [
                 {
@@ -2337,7 +2337,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 356,
+            "line": 362,
             "description": "Append the window/level HTML to the page.",
             "itemtype": "method",
             "name": "appendWindowLevelHtml",
@@ -2348,7 +2348,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 403,
+            "line": 409,
             "description": "Clear the window/level HTML.",
             "itemtype": "method",
             "name": "clearWindowLevelHtml",
@@ -2359,7 +2359,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 444,
+            "line": 452,
             "description": "Append the draw HTML to the page.",
             "itemtype": "method",
             "name": "appendDrawHtml",
@@ -2370,7 +2370,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 491,
+            "line": 499,
             "description": "Clear the draw HTML.",
             "itemtype": "method",
             "name": "clearDrawHtml",
@@ -2381,7 +2381,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 506,
+            "line": 524,
             "description": "Append the color chooser HTML to the page.",
             "itemtype": "method",
             "name": "appendLivewireHtml",
@@ -2392,7 +2392,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 535,
+            "line": 553,
             "description": "Clear the color chooser HTML.",
             "itemtype": "method",
             "name": "clearDrawHtml",
@@ -2403,7 +2403,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 546,
+            "line": 570,
             "description": "Append the filter HTML to the page.",
             "itemtype": "method",
             "name": "appendLivewireHtml",
@@ -2414,7 +2414,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 575,
+            "line": 599,
             "description": "Clear the filter HTML.",
             "itemtype": "method",
             "name": "clearDrawHtml",
@@ -2425,7 +2425,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 589,
+            "line": 619,
             "description": "Append the threshold filter HTML to the page.",
             "itemtype": "method",
             "name": "appendThresholdHtml",
@@ -2436,7 +2436,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 610,
+            "line": 640,
             "description": "Clear the treshold filter HTML.",
             "itemtype": "method",
             "name": "clearDrawHtml",
@@ -2447,7 +2447,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 621,
+            "line": 651,
             "description": "Append the sharpen filter HTML to the page.",
             "itemtype": "method",
             "name": "appendSharpenHtml",
@@ -2458,7 +2458,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 647,
+            "line": 677,
             "description": "Clear the sharpen filter HTML.",
             "itemtype": "method",
             "name": "clearSharpenHtml",
@@ -2469,7 +2469,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 658,
+            "line": 688,
             "description": "Append the sobel filter HTML to the page.",
             "itemtype": "method",
             "name": "appendSharpenHtml",
@@ -2480,7 +2480,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 684,
+            "line": 714,
             "description": "Clear the sobel filter HTML.",
             "itemtype": "method",
             "name": "clearSharpenHtml",
@@ -2491,7 +2491,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 695,
+            "line": 725,
             "description": "Append the zoom HTML to the page.",
             "itemtype": "method",
             "name": "appendZoomHtml",
@@ -2502,7 +2502,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 723,
+            "line": 753,
             "description": "Clear the zoom filter HTML.",
             "itemtype": "method",
             "name": "clearZoomHtml",
@@ -2513,7 +2513,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 734,
+            "line": 764,
             "description": "Append the undo HTML to the page.",
             "itemtype": "method",
             "name": "appendUndoHtml",
@@ -2524,7 +2524,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 759,
+            "line": 789,
             "description": "Add a command to the undo HTML.",
             "itemtype": "method",
             "name": "addCommandToUndoHtml",
@@ -2542,7 +2542,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 786,
+            "line": 816,
             "description": "Enable the last command of the undo HTML.",
             "itemtype": "method",
             "name": "enableInUndoHtml",
@@ -2560,7 +2560,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 815,
+            "line": 845,
             "description": "Build the help HTML.",
             "itemtype": "method",
             "name": "appendHelpHtml",
@@ -6427,7 +6427,7 @@
         },
         {
             "file": "src/tools/filter.js",
-            "line": 120,
+            "line": 122,
             "description": "Handle keydown event.",
             "itemtype": "method",
             "name": "keydown",
@@ -6444,7 +6444,7 @@
         },
         {
             "file": "src/tools/filter.js",
-            "line": 141,
+            "line": 143,
             "description": "Enable the filter.",
             "itemtype": "method",
             "name": "enable",
@@ -6461,7 +6461,7 @@
         },
         {
             "file": "src/tools/filter.js",
-            "line": 151,
+            "line": 153,
             "description": "Run the filter.",
             "itemtype": "method",
             "name": "run",
@@ -6478,7 +6478,7 @@
         },
         {
             "file": "src/tools/filter.js",
-            "line": 176,
+            "line": 178,
             "description": "Enable the filter.",
             "itemtype": "method",
             "name": "enable",
@@ -6495,7 +6495,7 @@
         },
         {
             "file": "src/tools/filter.js",
-            "line": 186,
+            "line": 188,
             "description": "Run the filter.",
             "itemtype": "method",
             "name": "run",
@@ -6512,7 +6512,7 @@
         },
         {
             "file": "src/tools/filter.js",
-            "line": 209,
+            "line": 211,
             "description": "Enable the filter.",
             "itemtype": "method",
             "name": "enable",
@@ -6529,7 +6529,7 @@
         },
         {
             "file": "src/tools/filter.js",
-            "line": 219,
+            "line": 221,
             "description": "Run the filter.",
             "itemtype": "method",
             "name": "run",
@@ -6546,7 +6546,7 @@
         },
         {
             "file": "src/tools/filter.js",
-            "line": 243,
+            "line": 245,
             "description": "Command name.",
             "itemtype": "property",
             "name": "name",
@@ -6559,7 +6559,7 @@
         },
         {
             "file": "src/tools/filter.js",
-            "line": 250,
+            "line": 252,
             "description": "Get the command name.",
             "itemtype": "method",
             "name": "getName",
@@ -6573,7 +6573,7 @@
         },
         {
             "file": "src/tools/filter.js",
-            "line": 256,
+            "line": 258,
             "description": "Set the command name.",
             "itemtype": "method",
             "name": "setName",
@@ -6590,7 +6590,7 @@
         },
         {
             "file": "src/tools/filter.js",
-            "line": 263,
+            "line": 265,
             "description": "Execute the command.",
             "itemtype": "method",
             "name": "execute",
@@ -7109,7 +7109,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 299,
+            "line": 300,
             "description": "Help for this tool.",
             "itemtype": "method",
             "name": "getHelp",
@@ -7123,7 +7123,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 317,
+            "line": 318,
             "description": "Set the line color of the drawing.",
             "itemtype": "method",
             "name": "setLineColour",
@@ -7140,7 +7140,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 338,
+            "line": 339,
             "description": "The livewire color.",
             "itemtype": "property",
             "name": "livewireColor",
@@ -7153,7 +7153,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 345,
+            "line": 346,
             "description": "The HTML context.",
             "itemtype": "property",
             "name": "context",
@@ -7166,7 +7166,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 353,
+            "line": 354,
             "description": "Command name.",
             "itemtype": "property",
             "name": "name",
@@ -7179,7 +7179,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 360,
+            "line": 361,
             "description": "Get the command name.",
             "itemtype": "method",
             "name": "getName",
@@ -7193,7 +7193,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 366,
+            "line": 367,
             "description": "Set the command name.",
             "itemtype": "method",
             "name": "setName",
@@ -7210,7 +7210,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 373,
+            "line": 374,
             "description": "Execute the command.",
             "itemtype": "method",
             "name": "execute",
@@ -8856,7 +8856,7 @@
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/tools/livewire.js:299"
+            "line": " src/tools/livewire.js:300"
         },
         {
             "message": "replacing incorrect tag: returns with return",

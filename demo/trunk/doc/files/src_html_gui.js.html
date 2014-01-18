@@ -551,6 +551,12 @@ dwv.gui.displayToolboxHtml = function(bool)
     toolLi.style.display = bool ? &quot;&quot; : &quot;none&quot;;
 };
 
+dwv.gui.initToolboxHtml = function()
+{
+    var toolSelector = document.getElementById(&quot;toolSelect&quot;);
+    toolSelector.options[0].defaultSelected = true;
+};
+
 /**
  * Append the window/level HTML to the page.
  * @method appendWindowLevelHtml
@@ -613,7 +619,7 @@ dwv.gui.displayWindowLevelHtml = function(bool)
     cmLi.style.display = bool ? &quot;&quot; : &quot;none&quot;;
 };
 
-dwv.gui.updateWindowLevelHtml = function(bool)
+dwv.gui.initWindowLevelHtml = function()
 {
     // update presets
     dwv.html.removeNode(&quot;presetSelect&quot;);
@@ -628,10 +634,12 @@ dwv.gui.updateWindowLevelHtml = function(bool)
     var node = document.getElementById(&quot;wlLi&quot;);
     node.appendChild(wlSelector);
     
+    // colour map selector
+    var select = document.getElementById(&quot;colourMapSelect&quot;);
+    select.options[0].defaultSelected = true;
     // special monochrome1 case
     if( app.getImage().getPhotometricInterpretation() === &quot;MONOCHROME1&quot; )
     {
-        var select = document.getElementById(&quot;colourMapSelect&quot;);
         select.options[1].defaultSelected = true;
     }
     
@@ -701,6 +709,16 @@ dwv.gui.displayDrawHtml = function(bool)
     shapeLi.style.display = bool ? &quot;&quot; : &quot;none&quot;;
 };
 
+dwv.gui.initDrawHtml = function()
+{
+    // shape selector
+    var shapeSelector = document.getElementById(&quot;shapeSelect&quot;);
+    shapeSelector.options[0].defaultSelected = true;
+    // color selector
+    var colourSelector = document.getElementById(&quot;colourSelect&quot;);
+    colourSelector.options[0].defaultSelected = true;
+};
+
 /**
  * Append the color chooser HTML to the page.
  * @method appendLivewireHtml
@@ -709,11 +727,11 @@ dwv.gui.displayDrawHtml = function(bool)
 dwv.gui.appendLivewireHtml = function()
 {
     // select
-    var colourSelector = dwv.html.createHtmlSelect(&quot;colourSelect&quot;,dwv.tool.colors);
+    var colourSelector = dwv.html.createHtmlSelect(&quot;lwColourSelect&quot;,dwv.tool.colors);
     colourSelector.onchange = dwv.gui.onChangeLineColour;
     // label
     var colourLabel = document.createElement(&quot;label&quot;);
-    colourLabel.setAttribute(&quot;for&quot;, &quot;colourSelect&quot;);
+    colourLabel.setAttribute(&quot;for&quot;, &quot;lwColourSelect&quot;);
     colourLabel.appendChild(document.createTextNode(&quot;Colour: &quot;));
     
     // list element
@@ -739,6 +757,12 @@ dwv.gui.displayLivewireHtml = function(bool)
 {
     var colourLi = document.getElementById(&quot;lwColourLi&quot;);
     colourLi.style.display = bool ? &quot;&quot; : &quot;none&quot;;
+};
+
+dwv.gui.initLivewireHtml = function()
+{
+    var colourSelector = document.getElementById(&quot;lwColourSelect&quot;);
+    colourSelector.options[0].defaultSelected = true;
 };
 
 /**
@@ -779,6 +803,12 @@ dwv.gui.displayFilterHtml = function(bool)
 {
     var filterLi = document.getElementById(&quot;filterLi&quot;);
     filterLi.style.display = bool ? &quot;&quot; : &quot;none&quot;;
+};
+
+dwv.gui.initFilterHtml = function()
+{
+    var filterSelector = document.getElementById(&quot;filterSelect&quot;);
+    filterSelector.options[0].defaultSelected = true;
 };
 
 // create namespace if not there
