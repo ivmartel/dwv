@@ -353,6 +353,12 @@ dwv.gui.displayToolboxHtml = function(bool)
     toolLi.style.display = bool ? "" : "none";
 };
 
+dwv.gui.initToolboxHtml = function()
+{
+    var toolSelector = document.getElementById("toolSelect");
+    toolSelector.options[0].defaultSelected = true;
+};
+
 /**
  * Append the window/level HTML to the page.
  * @method appendWindowLevelHtml
@@ -415,7 +421,7 @@ dwv.gui.displayWindowLevelHtml = function(bool)
     cmLi.style.display = bool ? "" : "none";
 };
 
-dwv.gui.updateWindowLevelHtml = function(bool)
+dwv.gui.initWindowLevelHtml = function()
 {
     // update presets
     dwv.html.removeNode("presetSelect");
@@ -430,10 +436,12 @@ dwv.gui.updateWindowLevelHtml = function(bool)
     var node = document.getElementById("wlLi");
     node.appendChild(wlSelector);
     
+    // colour map selector
+    var select = document.getElementById("colourMapSelect");
+    select.options[0].defaultSelected = true;
     // special monochrome1 case
     if( app.getImage().getPhotometricInterpretation() === "MONOCHROME1" )
     {
-        var select = document.getElementById("colourMapSelect");
         select.options[1].defaultSelected = true;
     }
     
@@ -503,6 +511,16 @@ dwv.gui.displayDrawHtml = function(bool)
     shapeLi.style.display = bool ? "" : "none";
 };
 
+dwv.gui.initDrawHtml = function()
+{
+    // shape selector
+    var shapeSelector = document.getElementById("shapeSelect");
+    shapeSelector.options[0].defaultSelected = true;
+    // color selector
+    var colourSelector = document.getElementById("colourSelect");
+    colourSelector.options[0].defaultSelected = true;
+};
+
 /**
  * Append the color chooser HTML to the page.
  * @method appendLivewireHtml
@@ -511,11 +529,11 @@ dwv.gui.displayDrawHtml = function(bool)
 dwv.gui.appendLivewireHtml = function()
 {
     // select
-    var colourSelector = dwv.html.createHtmlSelect("colourSelect",dwv.tool.colors);
+    var colourSelector = dwv.html.createHtmlSelect("lwColourSelect",dwv.tool.colors);
     colourSelector.onchange = dwv.gui.onChangeLineColour;
     // label
     var colourLabel = document.createElement("label");
-    colourLabel.setAttribute("for", "colourSelect");
+    colourLabel.setAttribute("for", "lwColourSelect");
     colourLabel.appendChild(document.createTextNode("Colour: "));
     
     // list element
@@ -541,6 +559,12 @@ dwv.gui.displayLivewireHtml = function(bool)
 {
     var colourLi = document.getElementById("lwColourLi");
     colourLi.style.display = bool ? "" : "none";
+};
+
+dwv.gui.initLivewireHtml = function()
+{
+    var colourSelector = document.getElementById("lwColourSelect");
+    colourSelector.options[0].defaultSelected = true;
 };
 
 /**
@@ -581,6 +605,12 @@ dwv.gui.displayFilterHtml = function(bool)
 {
     var filterLi = document.getElementById("filterLi");
     filterLi.style.display = bool ? "" : "none";
+};
+
+dwv.gui.initFilterHtml = function()
+{
+    var filterSelector = document.getElementById("filterSelect");
+    filterSelector.options[0].defaultSelected = true;
 };
 
 // create namespace if not there

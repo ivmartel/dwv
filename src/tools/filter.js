@@ -115,6 +115,8 @@ dwv.tool.Filter.prototype.init = function()
         break;
     }
     this.setSelectedFilter(this.defaultFilterName);
+    // init html
+    dwv.gui.initFilterHtml();
 };
 
 /**

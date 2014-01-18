@@ -115,4 +115,6 @@ dwv.tool.ToolBox.prototype.init = function()
     for( key in dwv.tool.tools ) {
         dwv.tool.tools[key].init();
     }    
+    // init html
+    dwv.gui.initToolboxHtml();
 };

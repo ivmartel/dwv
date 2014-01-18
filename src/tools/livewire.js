@@ -285,12 +285,13 @@ dwv.tool.Livewire = function(app)
     {
         // set the default to the first in the list
         this.setLineColour(dwv.tool.colors[0]);
+        // init html
+        dwv.gui.initLivewireHtml();
         
         //scissors = new dwv.math.Scissors();
         scissors.setDimensions(
                 app.getImage().getSize().getNumberOfColumns(),
                 app.getImage().getSize().getNumberOfRows() );
-        var data = app.getImageData().data;
         scissors.setData(app.getImageData().data);
     };
     

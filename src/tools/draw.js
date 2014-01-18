@@ -241,4 +241,6 @@ dwv.tool.Draw.prototype.init = function() {
     this.setShapeName(shapeName);
     // same for color
     this.setLineColour(dwv.tool.colors[0]);
+    // init html
+    dwv.gui.initDrawHtml();
 };

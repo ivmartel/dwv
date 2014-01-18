@@ -272,7 +272,7 @@ dwv.tool.WindowLevel = function(app)
      */
     this.init = function() {
         this.updatePresets();
-        dwv.gui.updateWindowLevelHtml();
+        dwv.gui.initWindowLevelHtml();
     };
 }; // WindowLevel class
 
