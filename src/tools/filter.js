@@ -115,6 +115,10 @@ dwv.tool.Filter.prototype.init = function()
         break;
     }
     this.setSelectedFilter(this.defaultFilterName);
+    // init all filters
+    for( key in dwv.tool.filters ) {
+        dwv.tool.filters[key].init();
+    }    
     // init html
     dwv.gui.initFilterHtml();
 };
@@ -148,6 +152,12 @@ dwv.tool.filter.Threshold = function(app) {};
 dwv.tool.filter.Threshold.prototype.display = function(bool)
 {
     dwv.gui.filter.displayThresholdHtml(bool);
+};
+
+dwv.tool.filter.Threshold.prototype.init = function()
+{
+    // init html
+    dwv.gui.filter.initThresholdHtml();
 };
 
 /**
@@ -185,6 +195,11 @@ dwv.tool.filter.Sharpen.prototype.display = function(bool)
     dwv.gui.filter.displaySharpenHtml(bool);
 };
 
+dwv.tool.filter.Sharpen.prototype.init = function()
+{
+    // nothing to do...
+};
+
 /**
  * Run the filter.
  * @method run
@@ -216,6 +231,11 @@ dwv.tool.filter.Sobel = function(app) {};
 dwv.tool.filter.Sobel.prototype.display = function(bool)
 {
     dwv.gui.filter.displaySobelHtml(bool);
+};
+
+dwv.tool.filter.Sobel.prototype.init = function()
+{
+    // nothing to do...
 };
 
 /**

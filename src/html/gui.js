@@ -631,8 +631,6 @@ dwv.gui.filter.appendThresholdHtml = function()
     
     // append to tool list
     document.getElementById("toolList").appendChild(thresholdLi);
-    // gui specific slider...
-    //dwv.gui.getSliderHtml();
     // trigger create event (mobile)
     $("#toolList").trigger("create");
 };
@@ -646,6 +644,12 @@ dwv.gui.filter.displayThresholdHtml = function(bool)
 {
     var thresholdLi = document.getElementById("thresholdLi");
     thresholdLi.style.display = bool ? "" : "none";
+};
+
+dwv.gui.filter.initThresholdHtml = function()
+{
+    // gui specific slider...
+    dwv.gui.getSliderHtml();
 };
 
 /**
