@@ -622,18 +622,21 @@ dwv.gui.displayWindowLevelHtml = function(bool)
 dwv.gui.initWindowLevelHtml = function()
 {
     // update presets
-    dwv.html.removeNode(&quot;presetSelect&quot;);
-    // mobile
-    var nono = document.getElementById(&quot;presetSelect&quot;);
-    if( nono ) {
-        console.log(&quot;removing nono&quot;);
-        dwv.html.removeNode(nono.parentNode);
-    }
+    dwv.html.removeNode(&quot;wlLi&quot;);
+    
     var wlSelector = dwv.html.createHtmlSelect(&quot;presetSelect&quot;,dwv.tool.presets);
     wlSelector.onchange = dwv.gui.onChangeWindowLevelPreset;
-    var node = document.getElementById(&quot;wlLi&quot;);
-    node.appendChild(wlSelector);
+    wlSelector.title = &quot;Select w/l preset.&quot;;
     
+    // preset list element
+    var wlLi = document.createElement(&quot;li&quot;);
+    wlLi.id = &quot;wlLi&quot;;
+    wlLi.appendChild(wlSelector);
+    // good order
+    wlLi.setAttribute(&quot;class&quot;,&quot;ui-block-b&quot;);
+    var cmLi = document.getElementById(&quot;cmLi&quot;);
+    cmLi.setAttribute(&quot;class&quot;,&quot;ui-block-c&quot;);
+
     // colour map selector
     var select = document.getElementById(&quot;colourMapSelect&quot;);
     select.options[0].defaultSelected = true;
@@ -643,6 +646,9 @@ dwv.gui.initWindowLevelHtml = function()
         select.options[1].defaultSelected = true;
     }
     
+    var node = document.getElementById(&quot;toolList&quot;);
+    // apend preset
+    node.appendChild(wlLi);
     // trigger create event (mobile)
     $(&quot;#toolList&quot;).trigger(&quot;create&quot;);
 };

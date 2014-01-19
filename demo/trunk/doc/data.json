@@ -2359,7 +2359,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 452,
+            "line": 458,
             "description": "Append the draw HTML to the page.",
             "itemtype": "method",
             "name": "appendDrawHtml",
@@ -2370,7 +2370,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 499,
+            "line": 505,
             "description": "Clear the draw HTML.",
             "itemtype": "method",
             "name": "clearDrawHtml",
@@ -2381,7 +2381,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 524,
+            "line": 530,
             "description": "Append the color chooser HTML to the page.",
             "itemtype": "method",
             "name": "appendLivewireHtml",
@@ -2392,7 +2392,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 553,
+            "line": 559,
             "description": "Clear the color chooser HTML.",
             "itemtype": "method",
             "name": "clearDrawHtml",
@@ -2403,7 +2403,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 570,
+            "line": 576,
             "description": "Append the filter HTML to the page.",
             "itemtype": "method",
             "name": "appendLivewireHtml",
@@ -2414,7 +2414,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 599,
+            "line": 605,
             "description": "Clear the filter HTML.",
             "itemtype": "method",
             "name": "clearDrawHtml",
@@ -2425,7 +2425,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 619,
+            "line": 625,
             "description": "Append the threshold filter HTML to the page.",
             "itemtype": "method",
             "name": "appendThresholdHtml",
@@ -2436,7 +2436,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 638,
+            "line": 644,
             "description": "Clear the treshold filter HTML.",
             "itemtype": "method",
             "name": "clearDrawHtml",
@@ -2447,7 +2447,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 655,
+            "line": 661,
             "description": "Append the sharpen filter HTML to the page.",
             "itemtype": "method",
             "name": "appendSharpenHtml",
@@ -2458,7 +2458,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 681,
+            "line": 687,
             "description": "Clear the sharpen filter HTML.",
             "itemtype": "method",
             "name": "clearSharpenHtml",
@@ -2469,7 +2469,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 692,
+            "line": 698,
             "description": "Append the sobel filter HTML to the page.",
             "itemtype": "method",
             "name": "appendSharpenHtml",
@@ -2480,7 +2480,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 718,
+            "line": 724,
             "description": "Clear the sobel filter HTML.",
             "itemtype": "method",
             "name": "clearSharpenHtml",
@@ -2491,7 +2491,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 729,
+            "line": 735,
             "description": "Append the zoom HTML to the page.",
             "itemtype": "method",
             "name": "appendZoomHtml",
@@ -2502,7 +2502,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 757,
+            "line": 763,
             "description": "Clear the zoom filter HTML.",
             "itemtype": "method",
             "name": "clearZoomHtml",
@@ -2513,7 +2513,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 768,
+            "line": 774,
             "description": "Append the undo HTML to the page.",
             "itemtype": "method",
             "name": "appendUndoHtml",
@@ -2524,7 +2524,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 793,
+            "line": 799,
             "description": "Add a command to the undo HTML.",
             "itemtype": "method",
             "name": "addCommandToUndoHtml",
@@ -2542,7 +2542,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 820,
+            "line": 826,
             "description": "Enable the last command of the undo HTML.",
             "itemtype": "method",
             "name": "enableInUndoHtml",
@@ -2560,7 +2560,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 849,
+            "line": 855,
             "description": "Build the help HTML.",
             "itemtype": "method",
             "name": "appendHelpHtml",
