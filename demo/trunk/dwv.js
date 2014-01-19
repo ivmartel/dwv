@@ -3766,8 +3766,6 @@ dwv.gui.filter.appendThresholdHtml = function()
     
     // append to tool list
     document.getElementById("toolList").appendChild(thresholdLi);
-    // gui specific slider...
-    //dwv.gui.getSliderHtml();
     // trigger create event (mobile)
     $("#toolList").trigger("create");
 };
@@ -3781,6 +3779,12 @@ dwv.gui.filter.displayThresholdHtml = function(bool)
 {
     var thresholdLi = document.getElementById("thresholdLi");
     thresholdLi.style.display = bool ? "" : "none";
+};
+
+dwv.gui.filter.initThresholdHtml = function()
+{
+    // gui specific slider...
+    dwv.gui.getSliderHtml();
 };
 
 /**
@@ -8568,6 +8572,10 @@ dwv.tool.Filter.prototype.init = function()
         break;
     }
     this.setSelectedFilter(this.defaultFilterName);
+    // init all filters
+    for( key in dwv.tool.filters ) {
+        dwv.tool.filters[key].init();
+    }    
     // init html
     dwv.gui.initFilterHtml();
 };
@@ -8601,6 +8609,12 @@ dwv.tool.filter.Threshold = function(app) {};
 dwv.tool.filter.Threshold.prototype.display = function(bool)
 {
     dwv.gui.filter.displayThresholdHtml(bool);
+};
+
+dwv.tool.filter.Threshold.prototype.init = function()
+{
+    // init html
+    dwv.gui.filter.initThresholdHtml();
 };
 
 /**
@@ -8638,6 +8652,11 @@ dwv.tool.filter.Sharpen.prototype.display = function(bool)
     dwv.gui.filter.displaySharpenHtml(bool);
 };
 
+dwv.tool.filter.Sharpen.prototype.init = function()
+{
+    // nothing to do...
+};
+
 /**
  * Run the filter.
  * @method run
@@ -8669,6 +8688,11 @@ dwv.tool.filter.Sobel = function(app) {};
 dwv.tool.filter.Sobel.prototype.display = function(bool)
 {
     dwv.gui.filter.displaySobelHtml(bool);
+};
+
+dwv.tool.filter.Sobel.prototype.init = function()
+{
+    // nothing to do...
 };
 
 /**
@@ -10103,6 +10127,7 @@ dwv.tool.WindowLevel = function(app)
         {
             dwv.gui.displayWindowLevelHtml(bool);
         }
+        else dwv.gui.displayWindowLevelHtml(false);
     };
     
     /**
