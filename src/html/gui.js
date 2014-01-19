@@ -424,18 +424,21 @@ dwv.gui.displayWindowLevelHtml = function(bool)
 dwv.gui.initWindowLevelHtml = function()
 {
     // update presets
-    dwv.html.removeNode("presetSelect");
-    // mobile
-    var nono = document.getElementById("presetSelect");
-    if( nono ) {
-        console.log("removing nono");
-        dwv.html.removeNode(nono.parentNode);
-    }
+    dwv.html.removeNode("wlLi");
+    
     var wlSelector = dwv.html.createHtmlSelect("presetSelect",dwv.tool.presets);
     wlSelector.onchange = dwv.gui.onChangeWindowLevelPreset;
-    var node = document.getElementById("wlLi");
-    node.appendChild(wlSelector);
+    wlSelector.title = "Select w/l preset.";
     
+    // preset list element
+    var wlLi = document.createElement("li");
+    wlLi.id = "wlLi";
+    wlLi.appendChild(wlSelector);
+    // good order
+    wlLi.setAttribute("class","ui-block-b");
+    var cmLi = document.getElementById("cmLi");
+    cmLi.setAttribute("class","ui-block-c");
+
     // colour map selector
     var select = document.getElementById("colourMapSelect");
     select.options[0].defaultSelected = true;
@@ -445,6 +448,9 @@ dwv.gui.initWindowLevelHtml = function()
         select.options[1].defaultSelected = true;
     }
     
+    var node = document.getElementById("toolList");
+    // apend preset
+    node.appendChild(wlLi);
     // trigger create event (mobile)
     $("#toolList").trigger("create");
 };
