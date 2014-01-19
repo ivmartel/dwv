@@ -264,6 +264,7 @@ dwv.tool.WindowLevel = function(app)
         {
             dwv.gui.displayWindowLevelHtml(bool);
         }
+        else dwv.gui.displayWindowLevelHtml(false);
     };
     
     /**
