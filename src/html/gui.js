@@ -101,6 +101,11 @@ dwv.gui.onRunFilter = function(event)
     app.getToolBox().getSelectedTool().getSelectedFilter().run();
 };
 
+dwv.gui.onChangeMinMax = function(range)
+{
+    app.getToolBox().getSelectedTool().getSelectedFilter().run(range);
+};
+
 /**
  * Handle shape change.
  * @method onChangeShape
@@ -158,13 +163,7 @@ dwv.gui.getSliderHtml = function()
         div.setAttribute("data-mini", "true");
         document.getElementById("thresholdLi").appendChild(div);
 
-        $("#threshold-div").bind("change",
-            function( event ) {
-                app.getToolBox().getSelectedTool().getSelectedFilter().run(
-                    { "min":$("#threshold-min").val(),
-                      "max":$("#threshold-max").val() } );
-            }
-        );
+        // binding is done in the initThreshold...
     }
     else
     {
@@ -175,7 +174,7 @@ dwv.gui.getSliderHtml = function()
             max: max,
             values: [ min, max ],
             slide: function( event, ui ) {
-                app.getToolBox().getSelectedTool().getSelectedFilter().run(
+                dwv.gui.onChangeMinMax(
                         {'min':ui.values[0], 'max':ui.values[1]});
             }
         });
@@ -650,12 +649,26 @@ dwv.gui.filter.displayThresholdHtml = function(bool)
 {
     var thresholdLi = document.getElementById("thresholdLi");
     thresholdLi.style.display = bool ? "" : "none";
+    // has to be bound when the filter is selected to access
+    // the threshold run method
+    if(bool)
+    {
+        $("#threshold-div").on("change",
+                function( event ) {
+                    dwv.gui.onChangeMinMax(
+                        { "min":$("#threshold-min").val(),
+                          "max":$("#threshold-max").val() } );
+                }
+            );
+    }
 };
 
 dwv.gui.filter.initThresholdHtml = function()
 {
     // gui specific slider...
     dwv.gui.getSliderHtml();
+    // trigger create event (mobile)
+    $("#toolList").trigger("create");
 };
 
 /**
