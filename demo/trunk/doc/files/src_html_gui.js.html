@@ -241,12 +241,12 @@ dwv.gui.onChangeColourMap = function(event)
 dwv.gui.onChangeLoader = function(event)
 {
     if( this.value === &quot;file&quot;) {
-        dwv.gui.clearUrlLoadHtml();
-        dwv.gui.appendFileLoadHtml();
+        dwv.gui.displayUrlLoadHtml(false);
+        dwv.gui.displayFileLoadHtml(true);
     }
     else if( this.value === &quot;url&quot;) {
-        dwv.gui.clearFileLoadHtml();
-        dwv.gui.appendUrlLoadHtml();
+        dwv.gui.displayFileLoadHtml(false);
+        dwv.gui.displayUrlLoadHtml(true);
     }
 };
 
@@ -483,7 +483,7 @@ dwv.gui.updateProgress = function(event)
  */
 dwv.gui.appendLoadboxHtml = function()
 {
-    // select
+    // loader select
     var loaderSelector = dwv.html.createHtmlSelect(&quot;loaderSelect&quot;,dwv.io.loaders);
     loaderSelector.onchange = dwv.gui.onChangeLoader;
     
@@ -495,9 +495,6 @@ dwv.gui.appendLoadboxHtml = function()
     node.appendChild(loaderSelector);
     // trigger create event (mobile)
     $(&quot;#loaderlist&quot;).trigger(&quot;create&quot;);
-    
-    // default load
-    dwv.gui.appendFileLoadHtml();
 };
 
 /**
@@ -519,6 +516,7 @@ dwv.gui.appendFileLoadHtml = function()
     // associated div
     var fileLoadDiv = document.createElement(&quot;div&quot;);
     fileLoadDiv.id = &quot;imagefilesdiv&quot;;
+    fileLoadDiv.style.display = &quot;none&quot;;
     fileLoadDiv.appendChild(fileLoadInput);
     
     // node
@@ -530,13 +528,16 @@ dwv.gui.appendFileLoadHtml = function()
 };
 
 /**
- * Clear the file load HTML.
+ * Display the file load HTML.
  * @method clearUrlLoadHtml
  * @static
+ * @param {Boolean} bool True to display, false to hide.
  */
-dwv.gui.clearFileLoadHtml = function()
+dwv.gui.displayFileLoadHtml = function(bool)
 {
-    dwv.html.removeNode(&quot;imagefilesdiv&quot;);
+    // file div element
+    var filediv = document.getElementById(&quot;imagefilesdiv&quot;);
+    filediv.style.display = bool ? &quot;&quot; : &quot;none&quot;;
 };
 
 /**
@@ -557,6 +558,7 @@ dwv.gui.appendUrlLoadHtml = function()
     // associated div
     var urlLoadDiv = document.createElement(&quot;div&quot;);
     urlLoadDiv.id = &quot;imageurldiv&quot;;
+    urlLoadDiv.style.display = &quot;none&quot;;
     urlLoadDiv.appendChild(urlLoadInput);
 
     // node
@@ -568,13 +570,16 @@ dwv.gui.appendUrlLoadHtml = function()
 };
 
 /**
- * Clear the url load HTML.
+ * Display the url load HTML.
  * @method clearUrlLoadHtml
  * @static
+ * @param {Boolean} bool True to display, false to hide.
  */
-dwv.gui.clearUrlLoadHtml = function()
+dwv.gui.displayUrlLoadHtml = function(bool)
 {
-    dwv.html.removeNode(&quot;imageurldiv&quot;);
+    // url div element
+    var urldiv = document.getElementById(&quot;imageurldiv&quot;);
+    urldiv.style.display = bool ? &quot;&quot; : &quot;none&quot;;
 };
 
 /**

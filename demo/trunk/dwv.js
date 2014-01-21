@@ -3178,12 +3178,12 @@ dwv.gui.onChangeColourMap = function(event)
 dwv.gui.onChangeLoader = function(event)
 {
     if( this.value === "file") {
-        dwv.gui.clearUrlLoadHtml();
-        dwv.gui.appendFileLoadHtml();
+        dwv.gui.displayUrlLoadHtml(false);
+        dwv.gui.displayFileLoadHtml(true);
     }
     else if( this.value === "url") {
-        dwv.gui.clearFileLoadHtml();
-        dwv.gui.appendUrlLoadHtml();
+        dwv.gui.displayFileLoadHtml(false);
+        dwv.gui.displayUrlLoadHtml(true);
     }
 };
 
@@ -3420,7 +3420,7 @@ dwv.gui.updateProgress = function(event)
  */
 dwv.gui.appendLoadboxHtml = function()
 {
-    // select
+    // loader select
     var loaderSelector = dwv.html.createHtmlSelect("loaderSelect",dwv.io.loaders);
     loaderSelector.onchange = dwv.gui.onChangeLoader;
     
@@ -3432,9 +3432,6 @@ dwv.gui.appendLoadboxHtml = function()
     node.appendChild(loaderSelector);
     // trigger create event (mobile)
     $("#loaderlist").trigger("create");
-    
-    // default load
-    dwv.gui.appendFileLoadHtml();
 };
 
 /**
@@ -3456,6 +3453,7 @@ dwv.gui.appendFileLoadHtml = function()
     // associated div
     var fileLoadDiv = document.createElement("div");
     fileLoadDiv.id = "imagefilesdiv";
+    fileLoadDiv.style.display = "none";
     fileLoadDiv.appendChild(fileLoadInput);
     
     // node
@@ -3467,13 +3465,16 @@ dwv.gui.appendFileLoadHtml = function()
 };
 
 /**
- * Clear the file load HTML.
+ * Display the file load HTML.
  * @method clearUrlLoadHtml
  * @static
+ * @param {Boolean} bool True to display, false to hide.
  */
-dwv.gui.clearFileLoadHtml = function()
+dwv.gui.displayFileLoadHtml = function(bool)
 {
-    dwv.html.removeNode("imagefilesdiv");
+    // file div element
+    var filediv = document.getElementById("imagefilesdiv");
+    filediv.style.display = bool ? "" : "none";
 };
 
 /**
@@ -3494,6 +3495,7 @@ dwv.gui.appendUrlLoadHtml = function()
     // associated div
     var urlLoadDiv = document.createElement("div");
     urlLoadDiv.id = "imageurldiv";
+    urlLoadDiv.style.display = "none";
     urlLoadDiv.appendChild(urlLoadInput);
 
     // node
@@ -3505,13 +3507,16 @@ dwv.gui.appendUrlLoadHtml = function()
 };
 
 /**
- * Clear the url load HTML.
+ * Display the url load HTML.
  * @method clearUrlLoadHtml
  * @static
+ * @param {Boolean} bool True to display, false to hide.
  */
-dwv.gui.clearUrlLoadHtml = function()
+dwv.gui.displayUrlLoadHtml = function(bool)
 {
-    dwv.html.removeNode("imageurldiv");
+    // url div element
+    var urldiv = document.getElementById("imageurldiv");
+    urldiv.style.display = bool ? "" : "none";
 };
 
 /**

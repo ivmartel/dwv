@@ -2347,7 +2347,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 305,
+            "line": 302,
             "description": "Append the file load HTML to the page.",
             "itemtype": "method",
             "name": "appendFileLoadHtml",
@@ -2358,18 +2358,25 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 334,
-            "description": "Clear the file load HTML.",
+            "line": 332,
+            "description": "Display the file load HTML.",
             "itemtype": "method",
             "name": "clearUrlLoadHtml",
             "static": 1,
+            "params": [
+                {
+                    "name": "bool",
+                    "description": "True to display, false to hide.",
+                    "type": "Boolean"
+                }
+            ],
             "class": "dwv.gui",
             "module": "gui",
             "namespace": "dwv.gui"
         },
         {
             "file": "src/html/gui.js",
-            "line": 344,
+            "line": 345,
             "description": "Append the url load HTML to the page.",
             "itemtype": "method",
             "name": "appendUrlLoadHtml",
@@ -2380,18 +2387,25 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 372,
-            "description": "Clear the url load HTML.",
+            "line": 374,
+            "description": "Display the url load HTML.",
             "itemtype": "method",
             "name": "clearUrlLoadHtml",
             "static": 1,
+            "params": [
+                {
+                    "name": "bool",
+                    "description": "True to display, false to hide.",
+                    "type": "Boolean"
+                }
+            ],
             "class": "dwv.gui",
             "module": "gui",
             "namespace": "dwv.gui"
         },
         {
             "file": "src/html/gui.js",
-            "line": 382,
+            "line": 387,
             "description": "Append the toolbox HTML to the page.",
             "itemtype": "method",
             "name": "appendToolboxHtml",
@@ -2402,7 +2416,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 410,
+            "line": 415,
             "description": "Display the toolbox HTML.",
             "itemtype": "method",
             "name": "displayToolboxHtml",
@@ -2420,7 +2434,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 423,
+            "line": 428,
             "description": "Initialise the toolbox HTML.",
             "itemtype": "method",
             "name": "initToolboxHtml",
@@ -2431,7 +2445,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 436,
+            "line": 441,
             "description": "Append the window/level HTML to the page.",
             "itemtype": "method",
             "name": "appendWindowLevelHtml",
@@ -2442,7 +2456,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 473,
+            "line": 478,
             "description": "Display the window/level HTML.",
             "itemtype": "method",
             "name": "displayWindowLevelHtml",
@@ -2460,7 +2474,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 489,
+            "line": 494,
             "description": "Initialise the window/level HTML.",
             "itemtype": "method",
             "name": "initWindowLevelHtml",
@@ -2471,7 +2485,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 518,
+            "line": 523,
             "description": "Append the draw HTML to the page.",
             "itemtype": "method",
             "name": "appendDrawHtml",
@@ -2482,7 +2496,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 555,
+            "line": 560,
             "description": "Display the draw HTML.",
             "itemtype": "method",
             "name": "displayDrawHtml",
@@ -2500,7 +2514,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 571,
+            "line": 576,
             "description": "Initialise the draw HTML.",
             "itemtype": "method",
             "name": "displayDrawHtml",
@@ -2511,7 +2525,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 588,
+            "line": 593,
             "description": "Append the color chooser HTML to the page.",
             "itemtype": "method",
             "name": "appendLivewireHtml",
@@ -2522,7 +2536,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 614,
+            "line": 619,
             "description": "Display the livewire HTML.",
             "itemtype": "method",
             "name": "displayLivewireHtml",
@@ -2540,7 +2554,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 627,
+            "line": 632,
             "description": "Initialise the livewire HTML.",
             "itemtype": "method",
             "name": "initLivewireHtml",
@@ -2551,7 +2565,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 639,
+            "line": 644,
             "description": "Append the filter HTML to the page.",
             "itemtype": "method",
             "name": "appendFilterHtml",
@@ -2562,7 +2576,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 665,
+            "line": 670,
             "description": "Display the filter HTML.",
             "itemtype": "method",
             "name": "displayFilterHtml",
@@ -2580,7 +2594,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 678,
+            "line": 683,
             "description": "Initialise the filter HTML.",
             "itemtype": "method",
             "name": "displayFilterHtml",
@@ -2591,7 +2605,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 694,
+            "line": 699,
             "description": "Append the threshold filter HTML to the page.",
             "itemtype": "method",
             "name": "appendThresholdHtml",
@@ -2602,7 +2616,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 717,
+            "line": 722,
             "description": "Clear the treshold filter HTML.",
             "itemtype": "method",
             "name": "displayThresholdHtml",
@@ -2620,7 +2634,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 730,
+            "line": 735,
             "description": "Initialise the treshold filter HTML.",
             "itemtype": "method",
             "name": "initThresholdHtml",
@@ -2631,7 +2645,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 741,
+            "line": 746,
             "description": "Append the sharpen filter HTML to the page.",
             "itemtype": "method",
             "name": "appendSharpenHtml",
@@ -2642,7 +2656,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 769,
+            "line": 774,
             "description": "Display the sharpen filter HTML.",
             "itemtype": "method",
             "name": "displaySharpenHtml",
@@ -2660,7 +2674,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 782,
+            "line": 787,
             "description": "Append the sobel filter HTML to the page.",
             "itemtype": "method",
             "name": "appendSobelHtml",
@@ -2671,7 +2685,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 810,
+            "line": 815,
             "description": "Display the sobel filter HTML.",
             "itemtype": "method",
             "name": "displaySobelHtml",
@@ -2689,7 +2703,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 823,
+            "line": 828,
             "description": "Append the zoom HTML to the page.",
             "itemtype": "method",
             "name": "appendZoomHtml",
@@ -2700,7 +2714,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 853,
+            "line": 858,
             "description": "Display the zoom HTML.",
             "itemtype": "method",
             "name": "displayZoomHtml",
@@ -2718,7 +2732,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 866,
+            "line": 871,
             "description": "Append the undo HTML to the page.",
             "itemtype": "method",
             "name": "appendUndoHtml",
@@ -2729,7 +2743,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 891,
+            "line": 896,
             "description": "Add a command to the undo HTML.",
             "itemtype": "method",
             "name": "addCommandToUndoHtml",
@@ -2747,7 +2761,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 918,
+            "line": 923,
             "description": "Enable the last command of the undo HTML.",
             "itemtype": "method",
             "name": "enableInUndoHtml",
@@ -2765,7 +2779,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 947,
+            "line": 952,
             "description": "Build the help HTML.",
             "itemtype": "method",
             "name": "appendHelpHtml",
