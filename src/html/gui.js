@@ -103,7 +103,10 @@ dwv.gui.onRunFilter = function(event)
 
 dwv.gui.onChangeMinMax = function(range)
 {
-    app.getToolBox().getSelectedTool().getSelectedFilter().run(range);
+    // seems like jquery is checking the method exists before it 
+    // is used...
+    if( app.getToolBox().getSelectedTool().getSelectedFilter )
+        app.getToolBox().getSelectedTool().getSelectedFilter().run(range);
 };
 
 /**
@@ -156,14 +159,22 @@ dwv.gui.getSliderHtml = function()
         inputMax.setAttribute("type", "range");
         
         var div = document.createElement("div");
+        div.id = "sliderDiv";
         div.setAttribute("id", "threshold-div");
         div.setAttribute("data-role", "rangeslider");
         div.appendChild(inputMin);
         div.appendChild(inputMax);
         div.setAttribute("data-mini", "true");
+        
         document.getElementById("thresholdLi").appendChild(div);
 
-        // binding is done in the initThreshold...
+        $("#threshold-div").on("change",
+                function( event ) {
+                    dwv.gui.onChangeMinMax(
+                        { "min":$("#threshold-min").val(),
+                          "max":$("#threshold-max").val() } );
+                }
+            );
     }
     else
     {
@@ -637,18 +648,6 @@ dwv.gui.filter.displayThresholdHtml = function(bool)
 {
     var thresholdLi = document.getElementById("thresholdLi");
     thresholdLi.style.display = bool ? "" : "none";
-    // has to be bound when the filter is selected to access
-    // the threshold run method
-    if(bool)
-    {
-        $("#threshold-div").on("change",
-                function( event ) {
-                    dwv.gui.onChangeMinMax(
-                        { "min":$("#threshold-min").val(),
-                          "max":$("#threshold-max").val() } );
-                }
-            );
-    }
 };
 
 dwv.gui.filter.initThresholdHtml = function()
