@@ -3231,19 +3231,37 @@ dwv.gui.onChangeFilter = function(event)
     app.getToolBox().getSelectedTool().setSelectedFilter(this.value);
 };
 
+/**
+ * Handle filter run.
+ * @method onRunFilter
+ * @static
+ * @param {Object} event The run event.
+ */
 dwv.gui.onRunFilter = function(event)
 {
     app.getToolBox().getSelectedTool().getSelectedFilter().run();
 };
 
+/**
+ * Handle min/max slider change.
+ * @method onChangeMinMax
+ * @static
+ * @param {Object} range The new range of the data.
+ */
 dwv.gui.onChangeMinMax = function(range)
 {
-    // seems like jquery is checking the method exists before it 
+    // seems like jquery is checking if the method exists before it 
     // is used...
     if( app.getToolBox().getSelectedTool().getSelectedFilter )
         app.getToolBox().getSelectedTool().getSelectedFilter().run(range);
 };
 
+/**
+ * Refresh a HTML select.
+ * @method refreshSelect
+ * @static
+ * @param {String} selectName The name of the HTML select to refresh.
+ */
 dwv.gui.refreshSelect = function(selectName)
 {
     // jquery-mobile
@@ -3274,7 +3292,7 @@ dwv.gui.onChangeLineColour = function(event)
 
 /**
  * Append the slider HTML.
- * @method getSliderHtml
+ * @method appendSliderHtml
  * @static
  */
 dwv.gui.appendSliderHtml = function()
@@ -3286,29 +3304,30 @@ dwv.gui.appendSliderHtml = function()
         var max = 1;
         
         // jquery-mobile range slider
+        // minimum input
         var inputMin = document.createElement("input");
         inputMin.id = "threshold-min";
         inputMin.type = "range";
         inputMin.max = max;
         inputMin.min = min;
         inputMin.value = min;
-
+        // maximum input
         var inputMax = document.createElement("input");
         inputMax.id = "threshold-max";
         inputMax.type = "range";
         inputMax.max = max;
         inputMax.min = min;
         inputMax.value = max;
-        
+        // slicer div
         var div = document.createElement("div");
-        div.setAttribute("id", "threshold-div");
+        div.id = "threshold-div";
         div.setAttribute("data-role", "rangeslider");
         div.appendChild(inputMin);
         div.appendChild(inputMax);
         div.setAttribute("data-mini", "true");
-        
+        // append to document
         document.getElementById("thresholdLi").appendChild(div);
-
+        // bind change
         $("#threshold-div").on("change",
                 function( event ) {
                     dwv.gui.onChangeMinMax(
@@ -3316,11 +3335,16 @@ dwv.gui.appendSliderHtml = function()
                           "max":$("#threshold-max").val() } );
                 }
             );
-        
+        // trigger creation
         $("#toolList").trigger("create");
     }
 };
 
+/**
+ * Initialise the slider HTML.
+ * @method initSliderHtml
+ * @static
+ */
 dwv.gui.initSliderHtml = function()
 {
     var min = app.getImage().getDataRange().min;
@@ -3328,16 +3352,17 @@ dwv.gui.initSliderHtml = function()
     
     if( app.isMobile() )
     {
+        // minimum input
         var inputMin = document.getElementById("threshold-min");
         inputMin.max = max;
         inputMin.min = min;
         inputMin.value = min;
-
+        // maximum input
         var inputMax = document.getElementById("threshold-max");
         inputMax.max = max;
         inputMax.min = min;
         inputMax.value = max;
-        
+        // trigger creation
         $("#toolList").trigger("create");
     }
     else
@@ -3496,18 +3521,14 @@ dwv.gui.clearUrlLoadHtml = function()
  */
 dwv.gui.appendToolboxHtml = function()
 {
-    // select
+    // tool select
     var toolSelector = dwv.html.createHtmlSelect("toolSelect",dwv.tool.tools);
     toolSelector.onchange = dwv.gui.onChangeTool;
-    // label
-    var toolLabel = document.createElement("label");
-    toolLabel.setAttribute("for", "toolSelect");
-    toolLabel.appendChild(document.createTextNode("Tool: "));
-    // list element
+    
+    // tool list element
     var toolLi = document.createElement("li");
     toolLi.id = "toolLi";
     toolLi.style.display = "none";
-    //toolLi.appendChild(toolLabel);
     toolLi.appendChild(toolSelector);
     toolLi.setAttribute("class","ui-block-a");
 
@@ -3521,15 +3542,27 @@ dwv.gui.appendToolboxHtml = function()
     $("#toolList").trigger("create");
 };
 
+/**
+ * Display the toolbox HTML.
+ * @method displayToolboxHtml
+ * @static
+ * @param {Boolean} bool True to display, false to hide.
+ */
 dwv.gui.displayToolboxHtml = function(bool)
 {
+    // tool list element
     var toolLi = document.getElementById("toolLi");
     toolLi.style.display = bool ? "" : "none";
 };
 
+/**
+ * Initialise the toolbox HTML.
+ * @method initToolboxHtml
+ * @static
+ */
 dwv.gui.initToolboxHtml = function()
 {
-    // reset selected option
+    // tool select: reset selected option
     var toolSelector = document.getElementById("toolSelect");
     toolSelector.selectedIndex = 0;
     dwv.gui.refreshSelect("#toolSelect");
@@ -3542,33 +3575,23 @@ dwv.gui.initToolboxHtml = function()
  */
 dwv.gui.appendWindowLevelHtml = function()
 {
-    // preset selector
+    // preset select
     var wlSelector = dwv.html.createHtmlSelect("presetSelect",dwv.tool.presets);
     wlSelector.onchange = dwv.gui.onChangeWindowLevelPreset;
-    // preset label
-    var wlLabel = document.createElement("label");
-    wlLabel.setAttribute("for", "presetSelect");
-    wlLabel.appendChild(document.createTextNode("WL Preset: "));
-    // colour map selector
+    // colour map select
     var cmSelector = dwv.html.createHtmlSelect("colourMapSelect",dwv.tool.colourMaps);
     cmSelector.onchange = dwv.gui.onChangeColourMap;
-    // colour map label
-    var cmLabel = document.createElement("label");
-    cmLabel.setAttribute("for", "colourMapSelect");
-    cmLabel.appendChild(document.createTextNode("Colour Map: "));
 
     // preset list element
     var wlLi = document.createElement("li");
     wlLi.id = "wlLi";
     wlLi.style.display = "none";
-    //wlLi.appendChild(wlLabel);
     wlLi.appendChild(wlSelector);
     wlLi.setAttribute("class","ui-block-b");
     // color map list element
     var cmLi = document.createElement("li");
     cmLi.id = "cmLi";
     cmLi.style.display = "none";
-    // cmLi.appendChild(cmLabel);
     cmLi.appendChild(cmSelector);
     cmLi.setAttribute("class","ui-block-c");
 
@@ -3583,23 +3606,29 @@ dwv.gui.appendWindowLevelHtml = function()
 };
 
 /**
- * Clear the window/level HTML.
- * @method clearWindowLevelHtml
+ * Display the window/level HTML.
+ * @method displayWindowLevelHtml
  * @static
+ * @param {Boolean} bool True to display, false to hide.
  */
 dwv.gui.displayWindowLevelHtml = function(bool)
 {
-    // presets
+    // presets list element
     var wlLi = document.getElementById("wlLi");
     wlLi.style.display = bool ? "" : "none";
-    // color map
+    // color map list element
     var cmLi = document.getElementById("cmLi");
     cmLi.style.display = bool ? "" : "none";
 };
 
+/**
+ * Initialise the window/level HTML.
+ * @method initWindowLevelHtml
+ * @static
+ */
 dwv.gui.initWindowLevelHtml = function()
 {
-    // create new preset selector
+    // create new preset select
     var wlSelector = dwv.html.createHtmlSelect("presetSelect",dwv.tool.presets);
     wlSelector.onchange = dwv.gui.onChangeWindowLevelPreset;
     wlSelector.title = "Select w/l preset.";
@@ -3610,7 +3639,7 @@ dwv.gui.initWindowLevelHtml = function()
     wlLi.appendChild(wlSelector);
     $("#toolList").trigger("create");
     
-    // colour map selector
+    // colour map select
     var cmSelector = document.getElementById("colourMapSelect");
     cmSelector.selectedIndex = 0;
     // special monochrome1 case
@@ -3631,30 +3660,20 @@ dwv.gui.appendDrawHtml = function()
     // shape select
     var shapeSelector = dwv.html.createHtmlSelect("shapeSelect",dwv.tool.shapes);
     shapeSelector.onchange = dwv.gui.onChangeShape;
-    // shape label
-    var shapeLabel = document.createElement("label");
-    shapeLabel.setAttribute("for", "shapeSelect");
-    shapeLabel.appendChild(document.createTextNode("Shape: "));
     // colour select
     var colourSelector = dwv.html.createHtmlSelect("colourSelect",dwv.tool.colors);
     colourSelector.onchange = dwv.gui.onChangeLineColour;
-    // colour label
-    var colourLabel = document.createElement("label");
-    colourLabel.setAttribute("for", "colourSelect");
-    colourLabel.appendChild(document.createTextNode("Colour: "));
 
-    // list element
+    // shape list element
     var shapeLi = document.createElement("li");
     shapeLi.id = "shapeLi";
     shapeLi.style.display = "none";
-    // shapeLi.appendChild(shapeLabel);
     shapeLi.appendChild(shapeSelector);
     shapeLi.setAttribute("class","ui-block-c");
-    // list element
+    // colour list element
     var colourLi = document.createElement("li");
     colourLi.id = "colourLi";
     colourLi.style.display = "none";
-    //colourLi.appendChild(colourLabel);
     colourLi.appendChild(colourSelector);
     colourLi.setAttribute("class","ui-block-b");
     
@@ -3669,27 +3688,33 @@ dwv.gui.appendDrawHtml = function()
 };
 
 /**
- * Clear the draw HTML.
- * @method clearDrawHtml
+ * Display the draw HTML.
+ * @method displayDrawHtml
  * @static
+ * @param {Boolean} bool True to display, false to hide.
  */
 dwv.gui.displayDrawHtml = function(bool)
 {
-    // color
+    // color list element
     var colourLi = document.getElementById("colourLi");
     colourLi.style.display = bool ? "" : "none";
-    // shape
+    // shape list element
     var shapeLi = document.getElementById("shapeLi");
     shapeLi.style.display = bool ? "" : "none";
 };
 
+/**
+ * Initialise the draw HTML.
+ * @method displayDrawHtml
+ * @static
+ * */
 dwv.gui.initDrawHtml = function()
 {
-    // shape selector: reset selected option
+    // shape select: reset selected option
     var shapeSelector = document.getElementById("shapeSelect");
     shapeSelector.selectedIndex = 0;
     dwv.gui.refreshSelect("#shapeSelect");
-    // color selector: reset selected option
+    // color select: reset selected option
     var colourSelector = document.getElementById("colourSelect");
     colourSelector.selectedIndex = 0;
     dwv.gui.refreshSelect("#colourSelect");
@@ -3702,39 +3727,43 @@ dwv.gui.initDrawHtml = function()
  */
 dwv.gui.appendLivewireHtml = function()
 {
-    // select
+    // colour select
     var colourSelector = dwv.html.createHtmlSelect("lwColourSelect",dwv.tool.colors);
     colourSelector.onchange = dwv.gui.onChangeLineColour;
-    // label
-    var colourLabel = document.createElement("label");
-    colourLabel.setAttribute("for", "lwColourSelect");
-    colourLabel.appendChild(document.createTextNode("Colour: "));
     
-    // list element
+    // colour list element
     var colourLi = document.createElement("li");
     colourLi.id = "lwColourLi";
     colourLi.style.display = "none";
     colourLi.setAttribute("class","ui-block-b");
-    //colourLi.appendChild(colourLabel);
     colourLi.appendChild(colourSelector);
     
-    // append to tool list
-    document.getElementById("toolList").appendChild(colourLi);
+    // node
+    var node = document.getElementById("toolList");
+    // apend colour
+    node.appendChild(colourLi);
     // trigger create event (mobile)
     $("#toolList").trigger("create");
 };
 
 /**
- * Clear the color chooser HTML.
- * @method clearDrawHtml
+ * Display the livewire HTML.
+ * @method displayLivewireHtml
  * @static
+ * @param {Boolean} bool True to display, false to hide.
  */
 dwv.gui.displayLivewireHtml = function(bool)
 {
+    // colour list
     var colourLi = document.getElementById("lwColourLi");
     colourLi.style.display = bool ? "" : "none";
 };
 
+/**
+ * Initialise the livewire HTML.
+ * @method initLivewireHtml
+ * @static
+ */
 dwv.gui.initLivewireHtml = function()
 {
     var colourSelector = document.getElementById("lwColourSelect");
@@ -3744,44 +3773,48 @@ dwv.gui.initLivewireHtml = function()
 
 /**
  * Append the filter HTML to the page.
- * @method appendLivewireHtml
+ * @method appendFilterHtml
  * @static
  */
 dwv.gui.appendFilterHtml = function()
 {
-    // select
+    // filter select
     var filterSelector = dwv.html.createHtmlSelect("filterSelect",dwv.tool.filters);
     filterSelector.onchange = dwv.gui.onChangeFilter;
-    // label
-    var filterLabel = document.createElement("label");
-    filterLabel.setAttribute("for", "filterSelect");
-    filterLabel.appendChild(document.createTextNode("Filter: "));
 
-    // list element
+    // filter list element
     var filterLi = document.createElement("li");
     filterLi.id = "filterLi";
     filterLi.style.display = "none";
     filterLi.setAttribute("class","ui-block-b");
-    //filterLi.appendChild(filterLabel);
     filterLi.appendChild(filterSelector);
     
-    // append to tool list
-    document.getElementById("toolList").appendChild(filterLi);
+    // node
+    var node = document.getElementById("toolList");
+    // apend filter
+    node.appendChild(filterLi);
     // trigger create event (mobile)
     $("#toolList").trigger("create");
 };
 
 /**
- * Clear the filter HTML.
- * @method clearDrawHtml
+ * Display the filter HTML.
+ * @method displayFilterHtml
  * @static
+ * @param {Boolean} bool True to display, false to hide.
  */
 dwv.gui.displayFilterHtml = function(bool)
 {
+    // filter lsit element
     var filterLi = document.getElementById("filterLi");
     filterLi.style.display = bool ? "" : "none";
 };
 
+/**
+ * Initialise the filter HTML.
+ * @method displayFilterHtml
+ * @static
+ */
 dwv.gui.initFilterHtml = function()
 {
     // filter select: reset selected options
@@ -3800,15 +3833,17 @@ dwv.gui.filter = dwv.gui.filter || {};
  */
 dwv.gui.filter.appendThresholdHtml = function()
 {
-    // list element
+    // threshold list element
     var thresholdLi = document.createElement("li");
     thresholdLi.id = "thresholdLi";
     thresholdLi.setAttribute("class","ui-block-c");
     thresholdLi.style.display = "none";
     
-    // append to tool list
-    document.getElementById("toolList").appendChild(thresholdLi);
-    // slider
+    // node
+    var node = document.getElementById("toolList");
+    // append threshold
+    node.appendChild(thresholdLi);
+    // threshold slider
     dwv.gui.appendSliderHtml();
     // trigger create event (mobile)
     $("#toolList").trigger("create");
@@ -3816,18 +3851,25 @@ dwv.gui.filter.appendThresholdHtml = function()
 
 /**
  * Clear the treshold filter HTML.
- * @method clearDrawHtml
+ * @method displayThresholdHtml
  * @static
+ * @param {Boolean} bool True to display, false to hide.
  */
 dwv.gui.filter.displayThresholdHtml = function(bool)
 {
+    // threshold list element
     var thresholdLi = document.getElementById("thresholdLi");
     thresholdLi.style.display = bool ? "" : "none";
 };
 
+/**
+ * Initialise the treshold filter HTML.
+ * @method initThresholdHtml
+ * @static
+ */
 dwv.gui.filter.initThresholdHtml = function()
 {
-    // slider
+    // threshold slider
     dwv.gui.initSliderHtml();
 };
 
@@ -3838,69 +3880,77 @@ dwv.gui.filter.initThresholdHtml = function()
  */
 dwv.gui.filter.appendSharpenHtml = function()
 {
-    // button
+    // sharpen button
     var buttonRun = document.createElement("button");
     buttonRun.id = "runFilterButton";
     buttonRun.onclick = dwv.gui.onRunFilter;
     buttonRun.appendChild(document.createTextNode("Apply"));
 
-    // list element
+    // sharpen list element
     var sharpenLi = document.createElement("li");
     sharpenLi.id = "sharpenLi";
     sharpenLi.style.display = "none";
     sharpenLi.setAttribute("class","ui-block-c");
     sharpenLi.appendChild(buttonRun);
     
-    // append to tool list
-    document.getElementById("toolList").appendChild(sharpenLi);
+    // node
+    var node = document.getElementById("toolList");
+    // append threshold
+    node.appendChild(sharpenLi);
     // trigger create event (mobile)
     $("#toolList").trigger("create");
 };
 
 /**
- * Clear the sharpen filter HTML.
- * @method clearSharpenHtml
+ * Display the sharpen filter HTML.
+ * @method displaySharpenHtml
  * @static
+ * @param {Boolean} bool True to display, false to hide.
  */
 dwv.gui.filter.displaySharpenHtml = function(bool)
 {
+    // sharpen list element
     var sharpenLi = document.getElementById("sharpenLi");
     sharpenLi.style.display = bool ? "" : "none";
 };
 
 /**
  * Append the sobel filter HTML to the page.
- * @method appendSharpenHtml
+ * @method appendSobelHtml
  * @static
  */
 dwv.gui.filter.appendSobelHtml = function()
 {
-    // button
+    // sobel button
     var buttonRun = document.createElement("button");
     buttonRun.id = "runFilterButton";
     buttonRun.onclick = dwv.gui.onRunFilter;
     buttonRun.appendChild(document.createTextNode("Apply"));
 
-    // list element
+    // sobel list element
     var sobelLi = document.createElement("li");
     sobelLi.id = "sobelLi";
     sobelLi.style.display = "none";
     sobelLi.setAttribute("class","ui-block-c");
     sobelLi.appendChild(buttonRun);
     
-    // append to tool list
-    document.getElementById("toolList").appendChild(sobelLi);
+    // node
+    var node = document.getElementById("toolList");
+    // append sobel
+    node.appendChild(sobelLi);
     // trigger create event (mobile)
     $("#toolList").trigger("create");
 };
 
 /**
- * Clear the sobel filter HTML.
- * @method clearSharpenHtml
+ * Display the sobel filter HTML.
+ * @method displaySobelHtml
  * @static
+ * @param {Boolean} bool True to display, false to hide.
  */
 dwv.gui.filter.displaySobelHtml = function(bool)
 {
+    // sobel list element
     var sobelLi = document.getElementById("sobelLi");
     sobelLi.style.display = bool ? "" : "none";
 };
@@ -3912,7 +3962,7 @@ dwv.gui.filter.displaySobelHtml = function(bool)
  */
 dwv.gui.appendZoomHtml = function()
 {
-    // button
+    // zoom button
     var button = document.createElement("button");
     button.id = "zoomResetButton";
     button.name = "zoomResetButton";
@@ -3920,26 +3970,30 @@ dwv.gui.appendZoomHtml = function()
     var text = document.createTextNode("Reset");
     button.appendChild(text);
     
-    // list element
+    // zoom list element
     var zoomLi = document.createElement("li");
     zoomLi.id = "zoomLi";
     zoomLi.style.display = "none";
     zoomLi.setAttribute("class","ui-block-c");
     zoomLi.appendChild(button);
     
-    // append to tool list
-    document.getElementById("toolList").appendChild(zoomLi);
+    // node
+    var node = document.getElementById("toolList");
+    // append zoom
+    node.appendChild(zoomLi);
     // trigger create event (mobile)
     $("#toolList").trigger("create");
 };
 
 /**
- * Clear the zoom filter HTML.
- * @method clearZoomHtml
+ * Display the zoom HTML.
+ * @method displayZoomHtml
  * @static
+ * @param {Boolean} bool True to display, false to hide.
  */
 dwv.gui.displayZoomHtml = function(bool)
 {
+    // zoom list element
     var zoomLi = document.getElementById("zoomLi");
     zoomLi.style.display = bool ? "" : "none";
 };

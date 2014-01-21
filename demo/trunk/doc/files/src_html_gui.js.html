@@ -294,19 +294,37 @@ dwv.gui.onChangeFilter = function(event)
     app.getToolBox().getSelectedTool().setSelectedFilter(this.value);
 };
 
+/**
+ * Handle filter run.
+ * @method onRunFilter
+ * @static
+ * @param {Object} event The run event.
+ */
 dwv.gui.onRunFilter = function(event)
 {
     app.getToolBox().getSelectedTool().getSelectedFilter().run();
 };
 
+/**
+ * Handle min/max slider change.
+ * @method onChangeMinMax
+ * @static
+ * @param {Object} range The new range of the data.
+ */
 dwv.gui.onChangeMinMax = function(range)
 {
-    // seems like jquery is checking the method exists before it 
+    // seems like jquery is checking if the method exists before it 
     // is used...
     if( app.getToolBox().getSelectedTool().getSelectedFilter )
         app.getToolBox().getSelectedTool().getSelectedFilter().run(range);
 };
 
+/**
+ * Refresh a HTML select.
+ * @method refreshSelect
+ * @static
+ * @param {String} selectName The name of the HTML select to refresh.
+ */
 dwv.gui.refreshSelect = function(selectName)
 {
     // jquery-mobile
@@ -337,7 +355,7 @@ dwv.gui.onChangeLineColour = function(event)
 
 /**
  * Append the slider HTML.
- * @method getSliderHtml
+ * @method appendSliderHtml
  * @static
  */
 dwv.gui.appendSliderHtml = function()
@@ -349,29 +367,30 @@ dwv.gui.appendSliderHtml = function()
         var max = 1;
         
         // jquery-mobile range slider
+        // minimum input
         var inputMin = document.createElement(&quot;input&quot;);
         inputMin.id = &quot;threshold-min&quot;;
         inputMin.type = &quot;range&quot;;
         inputMin.max = max;
         inputMin.min = min;
         inputMin.value = min;
-
+        // maximum input
         var inputMax = document.createElement(&quot;input&quot;);
         inputMax.id = &quot;threshold-max&quot;;
         inputMax.type = &quot;range&quot;;
         inputMax.max = max;
         inputMax.min = min;
         inputMax.value = max;
-        
+        // slicer div
         var div = document.createElement(&quot;div&quot;);
-        div.setAttribute(&quot;id&quot;, &quot;threshold-div&quot;);
+        div.id = &quot;threshold-div&quot;;
         div.setAttribute(&quot;data-role&quot;, &quot;rangeslider&quot;);
         div.appendChild(inputMin);
         div.appendChild(inputMax);
         div.setAttribute(&quot;data-mini&quot;, &quot;true&quot;);
-        
+        // append to document
         document.getElementById(&quot;thresholdLi&quot;).appendChild(div);
-
+        // bind change
         $(&quot;#threshold-div&quot;).on(&quot;change&quot;,
                 function( event ) {
                     dwv.gui.onChangeMinMax(
@@ -379,11 +398,16 @@ dwv.gui.appendSliderHtml = function()
                           &quot;max&quot;:$(&quot;#threshold-max&quot;).val() } );
                 }
             );
-        
+        // trigger creation
         $(&quot;#toolList&quot;).trigger(&quot;create&quot;);
     }
 };
 
+/**
+ * Initialise the slider HTML.
+ * @method initSliderHtml
+ * @static
+ */
 dwv.gui.initSliderHtml = function()
 {
     var min = app.getImage().getDataRange().min;
@@ -391,16 +415,17 @@ dwv.gui.initSliderHtml = function()
     
     if( app.isMobile() )
     {
+        // minimum input
         var inputMin = document.getElementById(&quot;threshold-min&quot;);
         inputMin.max = max;
         inputMin.min = min;
         inputMin.value = min;
-
+        // maximum input
         var inputMax = document.getElementById(&quot;threshold-max&quot;);
         inputMax.max = max;
         inputMax.min = min;
         inputMax.value = max;
-        
+        // trigger creation
         $(&quot;#toolList&quot;).trigger(&quot;create&quot;);
     }
     else
@@ -559,18 +584,14 @@ dwv.gui.clearUrlLoadHtml = function()
  */
 dwv.gui.appendToolboxHtml = function()
 {
-    // select
+    // tool select
     var toolSelector = dwv.html.createHtmlSelect(&quot;toolSelect&quot;,dwv.tool.tools);
     toolSelector.onchange = dwv.gui.onChangeTool;
-    // label
-    var toolLabel = document.createElement(&quot;label&quot;);
-    toolLabel.setAttribute(&quot;for&quot;, &quot;toolSelect&quot;);
-    toolLabel.appendChild(document.createTextNode(&quot;Tool: &quot;));
-    // list element
+    
+    // tool list element
     var toolLi = document.createElement(&quot;li&quot;);
     toolLi.id = &quot;toolLi&quot;;
     toolLi.style.display = &quot;none&quot;;
-    //toolLi.appendChild(toolLabel);
     toolLi.appendChild(toolSelector);
     toolLi.setAttribute(&quot;class&quot;,&quot;ui-block-a&quot;);
 
@@ -584,15 +605,27 @@ dwv.gui.appendToolboxHtml = function()
     $(&quot;#toolList&quot;).trigger(&quot;create&quot;);
 };
 
+/**
+ * Display the toolbox HTML.
+ * @method displayToolboxHtml
+ * @static
+ * @param {Boolean} bool True to display, false to hide.
+ */
 dwv.gui.displayToolboxHtml = function(bool)
 {
+    // tool list element
     var toolLi = document.getElementById(&quot;toolLi&quot;);
     toolLi.style.display = bool ? &quot;&quot; : &quot;none&quot;;
 };
 
+/**
+ * Initialise the toolbox HTML.
+ * @method initToolboxHtml
+ * @static
+ */
 dwv.gui.initToolboxHtml = function()
 {
-    // reset selected option
+    // tool select: reset selected option
     var toolSelector = document.getElementById(&quot;toolSelect&quot;);
     toolSelector.selectedIndex = 0;
     dwv.gui.refreshSelect(&quot;#toolSelect&quot;);
@@ -605,33 +638,23 @@ dwv.gui.initToolboxHtml = function()
  */
 dwv.gui.appendWindowLevelHtml = function()
 {
-    // preset selector
+    // preset select
     var wlSelector = dwv.html.createHtmlSelect(&quot;presetSelect&quot;,dwv.tool.presets);
     wlSelector.onchange = dwv.gui.onChangeWindowLevelPreset;
-    // preset label
-    var wlLabel = document.createElement(&quot;label&quot;);
-    wlLabel.setAttribute(&quot;for&quot;, &quot;presetSelect&quot;);
-    wlLabel.appendChild(document.createTextNode(&quot;WL Preset: &quot;));
-    // colour map selector
+    // colour map select
     var cmSelector = dwv.html.createHtmlSelect(&quot;colourMapSelect&quot;,dwv.tool.colourMaps);
     cmSelector.onchange = dwv.gui.onChangeColourMap;
-    // colour map label
-    var cmLabel = document.createElement(&quot;label&quot;);
-    cmLabel.setAttribute(&quot;for&quot;, &quot;colourMapSelect&quot;);
-    cmLabel.appendChild(document.createTextNode(&quot;Colour Map: &quot;));
 
     // preset list element
     var wlLi = document.createElement(&quot;li&quot;);
     wlLi.id = &quot;wlLi&quot;;
     wlLi.style.display = &quot;none&quot;;
-    //wlLi.appendChild(wlLabel);
     wlLi.appendChild(wlSelector);
     wlLi.setAttribute(&quot;class&quot;,&quot;ui-block-b&quot;);
     // color map list element
     var cmLi = document.createElement(&quot;li&quot;);
     cmLi.id = &quot;cmLi&quot;;
     cmLi.style.display = &quot;none&quot;;
-    // cmLi.appendChild(cmLabel);
     cmLi.appendChild(cmSelector);
     cmLi.setAttribute(&quot;class&quot;,&quot;ui-block-c&quot;);
 
@@ -646,23 +669,29 @@ dwv.gui.appendWindowLevelHtml = function()
 };
 
 /**
- * Clear the window/level HTML.
- * @method clearWindowLevelHtml
+ * Display the window/level HTML.
+ * @method displayWindowLevelHtml
  * @static
+ * @param {Boolean} bool True to display, false to hide.
  */
 dwv.gui.displayWindowLevelHtml = function(bool)
 {
-    // presets
+    // presets list element
     var wlLi = document.getElementById(&quot;wlLi&quot;);
     wlLi.style.display = bool ? &quot;&quot; : &quot;none&quot;;
-    // color map
+    // color map list element
     var cmLi = document.getElementById(&quot;cmLi&quot;);
     cmLi.style.display = bool ? &quot;&quot; : &quot;none&quot;;
 };
 
+/**
+ * Initialise the window/level HTML.
+ * @method initWindowLevelHtml
+ * @static
+ */
 dwv.gui.initWindowLevelHtml = function()
 {
-    // create new preset selector
+    // create new preset select
     var wlSelector = dwv.html.createHtmlSelect(&quot;presetSelect&quot;,dwv.tool.presets);
     wlSelector.onchange = dwv.gui.onChangeWindowLevelPreset;
     wlSelector.title = &quot;Select w/l preset.&quot;;
@@ -673,7 +702,7 @@ dwv.gui.initWindowLevelHtml = function()
     wlLi.appendChild(wlSelector);
     $(&quot;#toolList&quot;).trigger(&quot;create&quot;);
     
-    // colour map selector
+    // colour map select
     var cmSelector = document.getElementById(&quot;colourMapSelect&quot;);
     cmSelector.selectedIndex = 0;
     // special monochrome1 case
@@ -694,30 +723,20 @@ dwv.gui.appendDrawHtml = function()
     // shape select
     var shapeSelector = dwv.html.createHtmlSelect(&quot;shapeSelect&quot;,dwv.tool.shapes);
     shapeSelector.onchange = dwv.gui.onChangeShape;
-    // shape label
-    var shapeLabel = document.createElement(&quot;label&quot;);
-    shapeLabel.setAttribute(&quot;for&quot;, &quot;shapeSelect&quot;);
-    shapeLabel.appendChild(document.createTextNode(&quot;Shape: &quot;));
     // colour select
     var colourSelector = dwv.html.createHtmlSelect(&quot;colourSelect&quot;,dwv.tool.colors);
     colourSelector.onchange = dwv.gui.onChangeLineColour;
-    // colour label
-    var colourLabel = document.createElement(&quot;label&quot;);
-    colourLabel.setAttribute(&quot;for&quot;, &quot;colourSelect&quot;);
-    colourLabel.appendChild(document.createTextNode(&quot;Colour: &quot;));
 
-    // list element
+    // shape list element
     var shapeLi = document.createElement(&quot;li&quot;);
     shapeLi.id = &quot;shapeLi&quot;;
     shapeLi.style.display = &quot;none&quot;;
-    // shapeLi.appendChild(shapeLabel);
     shapeLi.appendChild(shapeSelector);
     shapeLi.setAttribute(&quot;class&quot;,&quot;ui-block-c&quot;);
-    // list element
+    // colour list element
     var colourLi = document.createElement(&quot;li&quot;);
     colourLi.id = &quot;colourLi&quot;;
     colourLi.style.display = &quot;none&quot;;
-    //colourLi.appendChild(colourLabel);
     colourLi.appendChild(colourSelector);
     colourLi.setAttribute(&quot;class&quot;,&quot;ui-block-b&quot;);
     
@@ -732,27 +751,33 @@ dwv.gui.appendDrawHtml = function()
 };
 
 /**
- * Clear the draw HTML.
- * @method clearDrawHtml
+ * Display the draw HTML.
+ * @method displayDrawHtml
  * @static
+ * @param {Boolean} bool True to display, false to hide.
  */
 dwv.gui.displayDrawHtml = function(bool)
 {
-    // color
+    // color list element
     var colourLi = document.getElementById(&quot;colourLi&quot;);
     colourLi.style.display = bool ? &quot;&quot; : &quot;none&quot;;
-    // shape
+    // shape list element
     var shapeLi = document.getElementById(&quot;shapeLi&quot;);
     shapeLi.style.display = bool ? &quot;&quot; : &quot;none&quot;;
 };
 
+/**
+ * Initialise the draw HTML.
+ * @method displayDrawHtml
+ * @static
+ * */
 dwv.gui.initDrawHtml = function()
 {
-    // shape selector: reset selected option
+    // shape select: reset selected option
     var shapeSelector = document.getElementById(&quot;shapeSelect&quot;);
     shapeSelector.selectedIndex = 0;
     dwv.gui.refreshSelect(&quot;#shapeSelect&quot;);
-    // color selector: reset selected option
+    // color select: reset selected option
     var colourSelector = document.getElementById(&quot;colourSelect&quot;);
     colourSelector.selectedIndex = 0;
     dwv.gui.refreshSelect(&quot;#colourSelect&quot;);
@@ -765,39 +790,43 @@ dwv.gui.initDrawHtml = function()
  */
 dwv.gui.appendLivewireHtml = function()
 {
-    // select
+    // colour select
     var colourSelector = dwv.html.createHtmlSelect(&quot;lwColourSelect&quot;,dwv.tool.colors);
     colourSelector.onchange = dwv.gui.onChangeLineColour;
-    // label
-    var colourLabel = document.createElement(&quot;label&quot;);
-    colourLabel.setAttribute(&quot;for&quot;, &quot;lwColourSelect&quot;);
-    colourLabel.appendChild(document.createTextNode(&quot;Colour: &quot;));
     
-    // list element
+    // colour list element
     var colourLi = document.createElement(&quot;li&quot;);
     colourLi.id = &quot;lwColourLi&quot;;
     colourLi.style.display = &quot;none&quot;;
     colourLi.setAttribute(&quot;class&quot;,&quot;ui-block-b&quot;);
-    //colourLi.appendChild(colourLabel);
     colourLi.appendChild(colourSelector);
     
-    // append to tool list
-    document.getElementById(&quot;toolList&quot;).appendChild(colourLi);
+    // node
+    var node = document.getElementById(&quot;toolList&quot;);
+    // apend colour
+    node.appendChild(colourLi);
     // trigger create event (mobile)
     $(&quot;#toolList&quot;).trigger(&quot;create&quot;);
 };
 
 /**
- * Clear the color chooser HTML.
- * @method clearDrawHtml
+ * Display the livewire HTML.
+ * @method displayLivewireHtml
  * @static
+ * @param {Boolean} bool True to display, false to hide.
  */
 dwv.gui.displayLivewireHtml = function(bool)
 {
+    // colour list
     var colourLi = document.getElementById(&quot;lwColourLi&quot;);
     colourLi.style.display = bool ? &quot;&quot; : &quot;none&quot;;
 };
 
+/**
+ * Initialise the livewire HTML.
+ * @method initLivewireHtml
+ * @static
+ */
 dwv.gui.initLivewireHtml = function()
 {
     var colourSelector = document.getElementById(&quot;lwColourSelect&quot;);
@@ -807,44 +836,48 @@ dwv.gui.initLivewireHtml = function()
 
 /**
  * Append the filter HTML to the page.
- * @method appendLivewireHtml
+ * @method appendFilterHtml
  * @static
  */
 dwv.gui.appendFilterHtml = function()
 {
-    // select
+    // filter select
     var filterSelector = dwv.html.createHtmlSelect(&quot;filterSelect&quot;,dwv.tool.filters);
     filterSelector.onchange = dwv.gui.onChangeFilter;
-    // label
-    var filterLabel = document.createElement(&quot;label&quot;);
-    filterLabel.setAttribute(&quot;for&quot;, &quot;filterSelect&quot;);
-    filterLabel.appendChild(document.createTextNode(&quot;Filter: &quot;));
 
-    // list element
+    // filter list element
     var filterLi = document.createElement(&quot;li&quot;);
     filterLi.id = &quot;filterLi&quot;;
     filterLi.style.display = &quot;none&quot;;
     filterLi.setAttribute(&quot;class&quot;,&quot;ui-block-b&quot;);
-    //filterLi.appendChild(filterLabel);
     filterLi.appendChild(filterSelector);
     
-    // append to tool list
-    document.getElementById(&quot;toolList&quot;).appendChild(filterLi);
+    // node
+    var node = document.getElementById(&quot;toolList&quot;);
+    // apend filter
+    node.appendChild(filterLi);
     // trigger create event (mobile)
     $(&quot;#toolList&quot;).trigger(&quot;create&quot;);
 };
 
 /**
- * Clear the filter HTML.
- * @method clearDrawHtml
+ * Display the filter HTML.
+ * @method displayFilterHtml
  * @static
+ * @param {Boolean} bool True to display, false to hide.
  */
 dwv.gui.displayFilterHtml = function(bool)
 {
+    // filter lsit element
     var filterLi = document.getElementById(&quot;filterLi&quot;);
     filterLi.style.display = bool ? &quot;&quot; : &quot;none&quot;;
 };
 
+/**
+ * Initialise the filter HTML.
+ * @method displayFilterHtml
+ * @static
+ */
 dwv.gui.initFilterHtml = function()
 {
     // filter select: reset selected options
@@ -863,15 +896,17 @@ dwv.gui.filter = dwv.gui.filter || {};
  */
 dwv.gui.filter.appendThresholdHtml = function()
 {
-    // list element
+    // threshold list element
     var thresholdLi = document.createElement(&quot;li&quot;);
     thresholdLi.id = &quot;thresholdLi&quot;;
     thresholdLi.setAttribute(&quot;class&quot;,&quot;ui-block-c&quot;);
     thresholdLi.style.display = &quot;none&quot;;
     
-    // append to tool list
-    document.getElementById(&quot;toolList&quot;).appendChild(thresholdLi);
-    // slider
+    // node
+    var node = document.getElementById(&quot;toolList&quot;);
+    // append threshold
+    node.appendChild(thresholdLi);
+    // threshold slider
     dwv.gui.appendSliderHtml();
     // trigger create event (mobile)
     $(&quot;#toolList&quot;).trigger(&quot;create&quot;);
@@ -879,18 +914,25 @@ dwv.gui.filter.appendThresholdHtml = function()
 
 /**
  * Clear the treshold filter HTML.
- * @method clearDrawHtml
+ * @method displayThresholdHtml
  * @static
+ * @param {Boolean} bool True to display, false to hide.
  */
 dwv.gui.filter.displayThresholdHtml = function(bool)
 {
+    // threshold list element
     var thresholdLi = document.getElementById(&quot;thresholdLi&quot;);
     thresholdLi.style.display = bool ? &quot;&quot; : &quot;none&quot;;
 };
 
+/**
+ * Initialise the treshold filter HTML.
+ * @method initThresholdHtml
+ * @static
+ */
 dwv.gui.filter.initThresholdHtml = function()
 {
-    // slider
+    // threshold slider
     dwv.gui.initSliderHtml();
 };
 
@@ -901,69 +943,77 @@ dwv.gui.filter.initThresholdHtml = function()
  */
 dwv.gui.filter.appendSharpenHtml = function()
 {
-    // button
+    // sharpen button
     var buttonRun = document.createElement(&quot;button&quot;);
     buttonRun.id = &quot;runFilterButton&quot;;
     buttonRun.onclick = dwv.gui.onRunFilter;
     buttonRun.appendChild(document.createTextNode(&quot;Apply&quot;));
 
-    // list element
+    // sharpen list element
     var sharpenLi = document.createElement(&quot;li&quot;);
     sharpenLi.id = &quot;sharpenLi&quot;;
     sharpenLi.style.display = &quot;none&quot;;
     sharpenLi.setAttribute(&quot;class&quot;,&quot;ui-block-c&quot;);
     sharpenLi.appendChild(buttonRun);
     
-    // append to tool list
-    document.getElementById(&quot;toolList&quot;).appendChild(sharpenLi);
+    // node
+    var node = document.getElementById(&quot;toolList&quot;);
+    // append threshold
+    node.appendChild(sharpenLi);
     // trigger create event (mobile)
     $(&quot;#toolList&quot;).trigger(&quot;create&quot;);
 };
 
 /**
- * Clear the sharpen filter HTML.
- * @method clearSharpenHtml
+ * Display the sharpen filter HTML.
+ * @method displaySharpenHtml
  * @static
+ * @param {Boolean} bool True to display, false to hide.
  */
 dwv.gui.filter.displaySharpenHtml = function(bool)
 {
+    // sharpen list element
     var sharpenLi = document.getElementById(&quot;sharpenLi&quot;);
     sharpenLi.style.display = bool ? &quot;&quot; : &quot;none&quot;;
 };
 
 /**
  * Append the sobel filter HTML to the page.
- * @method appendSharpenHtml
+ * @method appendSobelHtml
  * @static
  */
 dwv.gui.filter.appendSobelHtml = function()
 {
-    // button
+    // sobel button
     var buttonRun = document.createElement(&quot;button&quot;);
     buttonRun.id = &quot;runFilterButton&quot;;
     buttonRun.onclick = dwv.gui.onRunFilter;
     buttonRun.appendChild(document.createTextNode(&quot;Apply&quot;));
 
-    // list element
+    // sobel list element
     var sobelLi = document.createElement(&quot;li&quot;);
     sobelLi.id = &quot;sobelLi&quot;;
     sobelLi.style.display = &quot;none&quot;;
     sobelLi.setAttribute(&quot;class&quot;,&quot;ui-block-c&quot;);
     sobelLi.appendChild(buttonRun);
     
-    // append to tool list
-    document.getElementById(&quot;toolList&quot;).appendChild(sobelLi);
+    // node
+    var node = document.getElementById(&quot;toolList&quot;);
+    // append sobel
+    node.appendChild(sobelLi);
     // trigger create event (mobile)
     $(&quot;#toolList&quot;).trigger(&quot;create&quot;);
 };
 
 /**
- * Clear the sobel filter HTML.
- * @method clearSharpenHtml
+ * Display the sobel filter HTML.
+ * @method displaySobelHtml
  * @static
+ * @param {Boolean} bool True to display, false to hide.
  */
 dwv.gui.filter.displaySobelHtml = function(bool)
 {
+    // sobel list element
     var sobelLi = document.getElementById(&quot;sobelLi&quot;);
     sobelLi.style.display = bool ? &quot;&quot; : &quot;none&quot;;
 };
@@ -975,7 +1025,7 @@ dwv.gui.filter.displaySobelHtml = function(bool)
  */
 dwv.gui.appendZoomHtml = function()
 {
-    // button
+    // zoom button
     var button = document.createElement(&quot;button&quot;);
     button.id = &quot;zoomResetButton&quot;;
     button.name = &quot;zoomResetButton&quot;;
@@ -983,26 +1033,30 @@ dwv.gui.appendZoomHtml = function()
     var text = document.createTextNode(&quot;Reset&quot;);
     button.appendChild(text);
     
-    // list element
+    // zoom list element
     var zoomLi = document.createElement(&quot;li&quot;);
     zoomLi.id = &quot;zoomLi&quot;;
     zoomLi.style.display = &quot;none&quot;;
     zoomLi.setAttribute(&quot;class&quot;,&quot;ui-block-c&quot;);
     zoomLi.appendChild(button);
     
-    // append to tool list
-    document.getElementById(&quot;toolList&quot;).appendChild(zoomLi);
+    // node
+    var node = document.getElementById(&quot;toolList&quot;);
+    // append zoom
+    node.appendChild(zoomLi);
     // trigger create event (mobile)
     $(&quot;#toolList&quot;).trigger(&quot;create&quot;);
 };
 
 /**
- * Clear the zoom filter HTML.
- * @method clearZoomHtml
+ * Display the zoom HTML.
+ * @method displayZoomHtml
  * @static
+ * @param {Boolean} bool True to display, false to hide.
  */
 dwv.gui.displayZoomHtml = function(bool)
 {
+    // zoom list element
     var zoomLi = document.getElementById(&quot;zoomLi&quot;);
     zoomLi.style.display = bool ? &quot;&quot; : &quot;none&quot;;
 };
