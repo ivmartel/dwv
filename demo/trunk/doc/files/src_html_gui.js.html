@@ -299,6 +299,14 @@ dwv.gui.onRunFilter = function(event)
     app.getToolBox().getSelectedTool().getSelectedFilter().run();
 };
 
+dwv.gui.onChangeMinMax = function(range)
+{
+    // seems like jquery is checking the method exists before it 
+    // is used...
+    if( app.getToolBox().getSelectedTool().getSelectedFilter )
+        app.getToolBox().getSelectedTool().getSelectedFilter().run(range);
+};
+
 /**
  * Handle shape change.
  * @method onChangeShape
@@ -349,20 +357,22 @@ dwv.gui.getSliderHtml = function()
         inputMax.setAttribute(&quot;type&quot;, &quot;range&quot;);
         
         var div = document.createElement(&quot;div&quot;);
+        div.id = &quot;sliderDiv&quot;;
         div.setAttribute(&quot;id&quot;, &quot;threshold-div&quot;);
         div.setAttribute(&quot;data-role&quot;, &quot;rangeslider&quot;);
         div.appendChild(inputMin);
         div.appendChild(inputMax);
         div.setAttribute(&quot;data-mini&quot;, &quot;true&quot;);
+        
         document.getElementById(&quot;thresholdLi&quot;).appendChild(div);
 
-        $(&quot;#threshold-div&quot;).bind(&quot;change&quot;,
-            function( event ) {
-                app.getToolBox().getSelectedTool().getSelectedFilter().run(
-                    { &quot;min&quot;:$(&quot;#threshold-min&quot;).val(),
-                      &quot;max&quot;:$(&quot;#threshold-max&quot;).val() } );
-            }
-        );
+        $(&quot;#threshold-div&quot;).on(&quot;change&quot;,
+                function( event ) {
+                    dwv.gui.onChangeMinMax(
+                        { &quot;min&quot;:$(&quot;#threshold-min&quot;).val(),
+                          &quot;max&quot;:$(&quot;#threshold-max&quot;).val() } );
+                }
+            );
     }
     else
     {
@@ -373,7 +383,7 @@ dwv.gui.getSliderHtml = function()
             max: max,
             values: [ min, max ],
             slide: function( event, ui ) {
-                app.getToolBox().getSelectedTool().getSelectedFilter().run(
+                dwv.gui.onChangeMinMax(
                         {&#x27;min&#x27;:ui.values[0], &#x27;max&#x27;:ui.values[1]});
             }
         });
@@ -621,36 +631,24 @@ dwv.gui.displayWindowLevelHtml = function(bool)
 
 dwv.gui.initWindowLevelHtml = function()
 {
-    // update presets
-    dwv.html.removeNode(&quot;wlLi&quot;);
-    
+    // create new preset selector
     var wlSelector = dwv.html.createHtmlSelect(&quot;presetSelect&quot;,dwv.tool.presets);
     wlSelector.onchange = dwv.gui.onChangeWindowLevelPreset;
     wlSelector.title = &quot;Select w/l preset.&quot;;
     
-    // preset list element
-    var wlLi = document.createElement(&quot;li&quot;);
-    wlLi.id = &quot;wlLi&quot;;
+    // update html list
+    var wlLi = document.getElementById(&quot;wlLi&quot;);
+    dwv.html.cleanNode(wlLi);
     wlLi.appendChild(wlSelector);
-    // good order
-    wlLi.setAttribute(&quot;class&quot;,&quot;ui-block-b&quot;);
-    var cmLi = document.getElementById(&quot;cmLi&quot;);
-    cmLi.setAttribute(&quot;class&quot;,&quot;ui-block-c&quot;);
 
     // colour map selector
-    var select = document.getElementById(&quot;colourMapSelect&quot;);
-    select.options[0].defaultSelected = true;
+    var cmSelector = document.getElementById(&quot;colourMapSelect&quot;);
+    cmSelector.options[0].defaultSelected = true;
     // special monochrome1 case
     if( app.getImage().getPhotometricInterpretation() === &quot;MONOCHROME1&quot; )
     {
-        select.options[1].defaultSelected = true;
+        cmSelector.options[1].defaultSelected = true;
     }
-    
-    var node = document.getElementById(&quot;toolList&quot;);
-    // apend preset
-    node.appendChild(wlLi);
-    // trigger create event (mobile)
-    $(&quot;#toolList&quot;).trigger(&quot;create&quot;);
 };
 
 /**
@@ -854,6 +852,8 @@ dwv.gui.filter.initThresholdHtml = function()
 {
     // gui specific slider...
     dwv.gui.getSliderHtml();
+    // trigger create event (mobile)
+    $(&quot;#toolList&quot;).trigger(&quot;create&quot;);
 };
 
 /**

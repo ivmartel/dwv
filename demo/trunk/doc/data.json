@@ -2206,7 +2206,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 104,
+            "line": 112,
             "description": "Handle shape change.",
             "itemtype": "method",
             "name": "onChangeShape",
@@ -2224,7 +2224,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 115,
+            "line": 123,
             "description": "Handle line color change.",
             "itemtype": "method",
             "name": "onChangeLineColour",
@@ -2242,7 +2242,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 126,
+            "line": 134,
             "description": "Append the slider HTML.",
             "itemtype": "method",
             "name": "getSliderHtml",
@@ -2253,7 +2253,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 185,
+            "line": 195,
             "description": "Update the progress bar.",
             "itemtype": "method",
             "name": "updateProgress",
@@ -2271,7 +2271,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 217,
+            "line": 227,
             "description": "Append the loadbox HTML to the page.",
             "itemtype": "method",
             "name": "appendLoadboxHtml",
@@ -2282,7 +2282,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 241,
+            "line": 251,
             "description": "Append the file load HTML to the page.",
             "itemtype": "method",
             "name": "appendFileLoadHtml",
@@ -2293,7 +2293,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 270,
+            "line": 280,
             "description": "Clear the file load HTML.",
             "itemtype": "method",
             "name": "clearUrlLoadHtml",
@@ -2304,7 +2304,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 280,
+            "line": 290,
             "description": "Append the url load HTML to the page.",
             "itemtype": "method",
             "name": "appendUrlLoadHtml",
@@ -2315,7 +2315,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 308,
+            "line": 318,
             "description": "Clear the url load HTML.",
             "itemtype": "method",
             "name": "clearUrlLoadHtml",
@@ -2326,7 +2326,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 318,
+            "line": 328,
             "description": "Append the toolbox HTML to the page.",
             "itemtype": "method",
             "name": "appendToolboxHtml",
@@ -2337,7 +2337,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 362,
+            "line": 372,
             "description": "Append the window/level HTML to the page.",
             "itemtype": "method",
             "name": "appendWindowLevelHtml",
@@ -2348,7 +2348,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 409,
+            "line": 419,
             "description": "Clear the window/level HTML.",
             "itemtype": "method",
             "name": "clearWindowLevelHtml",
@@ -2359,7 +2359,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 458,
+            "line": 456,
             "description": "Append the draw HTML to the page.",
             "itemtype": "method",
             "name": "appendDrawHtml",
@@ -2370,7 +2370,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 505,
+            "line": 503,
             "description": "Clear the draw HTML.",
             "itemtype": "method",
             "name": "clearDrawHtml",
@@ -2381,7 +2381,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 530,
+            "line": 528,
             "description": "Append the color chooser HTML to the page.",
             "itemtype": "method",
             "name": "appendLivewireHtml",
@@ -2392,7 +2392,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 559,
+            "line": 557,
             "description": "Clear the color chooser HTML.",
             "itemtype": "method",
             "name": "clearDrawHtml",
@@ -2403,7 +2403,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 576,
+            "line": 574,
             "description": "Append the filter HTML to the page.",
             "itemtype": "method",
             "name": "appendLivewireHtml",
@@ -2414,7 +2414,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 605,
+            "line": 603,
             "description": "Clear the filter HTML.",
             "itemtype": "method",
             "name": "clearDrawHtml",
@@ -2425,7 +2425,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 625,
+            "line": 623,
             "description": "Append the threshold filter HTML to the page.",
             "itemtype": "method",
             "name": "appendThresholdHtml",
@@ -2436,7 +2436,7 @@
         },
         {
             "file": "src/html/gui.js",
-            "line": 644,
+            "line": 642,
             "description": "Clear the treshold filter HTML.",
             "itemtype": "method",
             "name": "clearDrawHtml",
