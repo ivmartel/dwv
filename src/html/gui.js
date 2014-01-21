@@ -109,6 +109,12 @@ dwv.gui.onChangeMinMax = function(range)
         app.getToolBox().getSelectedTool().getSelectedFilter().run(range);
 };
 
+dwv.gui.refreshSelect = function(selectName)
+{
+    // jquery-mobile
+    if( $(selectName).selectmenu ) $(selectName).selectmenu('refresh');
+};
+
 /**
  * Handle shape change.
  * @method onChangeShape
@@ -136,30 +142,30 @@ dwv.gui.onChangeLineColour = function(event)
  * @method getSliderHtml
  * @static
  */
-dwv.gui.getSliderHtml = function()
+dwv.gui.appendSliderHtml = function()
 {
-    var min = app.getImage().getDataRange().min;
-    var max = app.getImage().getDataRange().max;
-
     if( app.isMobile() )
     {
+        // default values
+        var min = 0;
+        var max = 1;
+        
         // jquery-mobile range slider
         var inputMin = document.createElement("input");
-        inputMin.setAttribute("id", "threshold-min");
-        inputMin.setAttribute("max", max);
-        inputMin.setAttribute("min", min);
-        inputMin.setAttribute("value", min);
-        inputMin.setAttribute("type", "range");
+        inputMin.id = "threshold-min";
+        inputMin.type = "range";
+        inputMin.max = max;
+        inputMin.min = min;
+        inputMin.value = min;
 
         var inputMax = document.createElement("input");
-        inputMax.setAttribute("id", "threshold-max");
-        inputMax.setAttribute("max", max);
-        inputMax.setAttribute("min", min);
-        inputMax.setAttribute("value", max);
-        inputMax.setAttribute("type", "range");
+        inputMax.id = "threshold-max";
+        inputMax.type = "range";
+        inputMax.max = max;
+        inputMax.min = min;
+        inputMax.value = max;
         
         var div = document.createElement("div");
-        div.id = "sliderDiv";
         div.setAttribute("id", "threshold-div");
         div.setAttribute("data-role", "rangeslider");
         div.appendChild(inputMin);
@@ -175,6 +181,29 @@ dwv.gui.getSliderHtml = function()
                           "max":$("#threshold-max").val() } );
                 }
             );
+        
+        $("#toolList").trigger("create");
+    }
+};
+
+dwv.gui.initSliderHtml = function()
+{
+    var min = app.getImage().getDataRange().min;
+    var max = app.getImage().getDataRange().max;
+    
+    if( app.isMobile() )
+    {
+        var inputMin = document.getElementById("threshold-min");
+        inputMin.max = max;
+        inputMin.min = min;
+        inputMin.value = min;
+
+        var inputMax = document.getElementById("threshold-max");
+        inputMax.max = max;
+        inputMax.min = min;
+        inputMax.value = max;
+        
+        $("#toolList").trigger("create");
     }
     else
     {
@@ -365,8 +394,10 @@ dwv.gui.displayToolboxHtml = function(bool)
 
 dwv.gui.initToolboxHtml = function()
 {
+    // reset selected option
     var toolSelector = document.getElementById("toolSelect");
-    toolSelector.options[0].defaultSelected = true;
+    toolSelector.selectedIndex = 0;
+    dwv.gui.refreshSelect("#toolSelect");
 };
 
 /**
@@ -442,15 +473,17 @@ dwv.gui.initWindowLevelHtml = function()
     var wlLi = document.getElementById("wlLi");
     dwv.html.cleanNode(wlLi);
     wlLi.appendChild(wlSelector);
-
+    $("#toolList").trigger("create");
+    
     // colour map selector
     var cmSelector = document.getElementById("colourMapSelect");
-    cmSelector.options[0].defaultSelected = true;
+    cmSelector.selectedIndex = 0;
     // special monochrome1 case
     if( app.getImage().getPhotometricInterpretation() === "MONOCHROME1" )
     {
-        cmSelector.options[1].defaultSelected = true;
+        cmSelector.selectedIndex = 1;
     }
+    dwv.gui.refreshSelect("#colourMapSelect");
 };
 
 /**
@@ -517,12 +550,14 @@ dwv.gui.displayDrawHtml = function(bool)
 
 dwv.gui.initDrawHtml = function()
 {
-    // shape selector
+    // shape selector: reset selected option
     var shapeSelector = document.getElementById("shapeSelect");
-    shapeSelector.options[0].defaultSelected = true;
-    // color selector
+    shapeSelector.selectedIndex = 0;
+    dwv.gui.refreshSelect("#shapeSelect");
+    // color selector: reset selected option
     var colourSelector = document.getElementById("colourSelect");
-    colourSelector.options[0].defaultSelected = true;
+    colourSelector.selectedIndex = 0;
+    dwv.gui.refreshSelect("#colourSelect");
 };
 
 /**
@@ -568,7 +603,8 @@ dwv.gui.displayLivewireHtml = function(bool)
 dwv.gui.initLivewireHtml = function()
 {
     var colourSelector = document.getElementById("lwColourSelect");
-    colourSelector.options[0].defaultSelected = true;
+    colourSelector.selectedIndex = 0;
+    dwv.gui.refreshSelect("#lwColourSelect");
 };
 
 /**
@@ -613,8 +649,10 @@ dwv.gui.displayFilterHtml = function(bool)
 
 dwv.gui.initFilterHtml = function()
 {
+    // filter select: reset selected options
     var filterSelector = document.getElementById("filterSelect");
-    filterSelector.options[0].defaultSelected = true;
+    filterSelector.selectedIndex = 0;
+    dwv.gui.refreshSelect("#filterSelect");
 };
 
 // create namespace if not there
@@ -635,6 +673,8 @@ dwv.gui.filter.appendThresholdHtml = function()
     
     // append to tool list
     document.getElementById("toolList").appendChild(thresholdLi);
+    // slider
+    dwv.gui.appendSliderHtml();
     // trigger create event (mobile)
     $("#toolList").trigger("create");
 };
@@ -652,10 +692,8 @@ dwv.gui.filter.displayThresholdHtml = function(bool)
 
 dwv.gui.filter.initThresholdHtml = function()
 {
-    // gui specific slider...
-    dwv.gui.getSliderHtml();
-    // trigger create event (mobile)
-    $("#toolList").trigger("create");
+    // slider
+    dwv.gui.initSliderHtml();
 };
 
 /**
