@@ -22,6 +22,13 @@ $(document).ready(function(){
     dwv.io.loaders.file = dwv.io.File;
     dwv.io.loaders.url = dwv.io.Url;
 
+    // append load container HTML
+    dwv.gui.appendLoadboxHtml();
+    // append loaders HTML
+    dwv.gui.appendFileLoadHtml();
+    dwv.gui.appendUrlLoadHtml();
+    dwv.gui.displayFileLoadHtml(true);
+
     // Add required tools to the tool list
     dwv.tool.tools = {};
     dwv.tool.tools.windowlevel = new dwv.tool.WindowLevel(app);
@@ -36,13 +43,17 @@ $(document).ready(function(){
     dwv.tool.filters.sharpen = new dwv.tool.filter.Sharpen(app);
     dwv.tool.filters.sobel = new dwv.tool.filter.Sobel(app);
 
+    // append tool container HTML
     dwv.gui.appendToolboxHtml();
+    // append tools HTML
     dwv.gui.appendWindowLevelHtml();
     dwv.gui.appendZoomHtml();
     dwv.gui.appendDrawHtml();
     dwv.gui.appendLivewireHtml();
-
+    
+    // append filter container HTML
     dwv.gui.appendFilterHtml();
+    // append filters HTML
     dwv.gui.filter.appendThresholdHtml();
     dwv.gui.filter.appendSharpenHtml();
     dwv.gui.filter.appendSobelHtml();
