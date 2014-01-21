@@ -307,6 +307,12 @@ dwv.gui.onChangeMinMax = function(range)
         app.getToolBox().getSelectedTool().getSelectedFilter().run(range);
 };
 
+dwv.gui.refreshSelect = function(selectName)
+{
+    // jquery-mobile
+    if( $(selectName).selectmenu ) $(selectName).selectmenu(&#x27;refresh&#x27;);
+};
+
 /**
  * Handle shape change.
  * @method onChangeShape
@@ -334,30 +340,30 @@ dwv.gui.onChangeLineColour = function(event)
  * @method getSliderHtml
  * @static
  */
-dwv.gui.getSliderHtml = function()
+dwv.gui.appendSliderHtml = function()
 {
-    var min = app.getImage().getDataRange().min;
-    var max = app.getImage().getDataRange().max;
-
     if( app.isMobile() )
     {
+        // default values
+        var min = 0;
+        var max = 1;
+        
         // jquery-mobile range slider
         var inputMin = document.createElement(&quot;input&quot;);
-        inputMin.setAttribute(&quot;id&quot;, &quot;threshold-min&quot;);
-        inputMin.setAttribute(&quot;max&quot;, max);
-        inputMin.setAttribute(&quot;min&quot;, min);
-        inputMin.setAttribute(&quot;value&quot;, min);
-        inputMin.setAttribute(&quot;type&quot;, &quot;range&quot;);
+        inputMin.id = &quot;threshold-min&quot;;
+        inputMin.type = &quot;range&quot;;
+        inputMin.max = max;
+        inputMin.min = min;
+        inputMin.value = min;
 
         var inputMax = document.createElement(&quot;input&quot;);
-        inputMax.setAttribute(&quot;id&quot;, &quot;threshold-max&quot;);
-        inputMax.setAttribute(&quot;max&quot;, max);
-        inputMax.setAttribute(&quot;min&quot;, min);
-        inputMax.setAttribute(&quot;value&quot;, max);
-        inputMax.setAttribute(&quot;type&quot;, &quot;range&quot;);
+        inputMax.id = &quot;threshold-max&quot;;
+        inputMax.type = &quot;range&quot;;
+        inputMax.max = max;
+        inputMax.min = min;
+        inputMax.value = max;
         
         var div = document.createElement(&quot;div&quot;);
-        div.id = &quot;sliderDiv&quot;;
         div.setAttribute(&quot;id&quot;, &quot;threshold-div&quot;);
         div.setAttribute(&quot;data-role&quot;, &quot;rangeslider&quot;);
         div.appendChild(inputMin);
@@ -373,6 +379,29 @@ dwv.gui.getSliderHtml = function()
                           &quot;max&quot;:$(&quot;#threshold-max&quot;).val() } );
                 }
             );
+        
+        $(&quot;#toolList&quot;).trigger(&quot;create&quot;);
+    }
+};
+
+dwv.gui.initSliderHtml = function()
+{
+    var min = app.getImage().getDataRange().min;
+    var max = app.getImage().getDataRange().max;
+    
+    if( app.isMobile() )
+    {
+        var inputMin = document.getElementById(&quot;threshold-min&quot;);
+        inputMin.max = max;
+        inputMin.min = min;
+        inputMin.value = min;
+
+        var inputMax = document.getElementById(&quot;threshold-max&quot;);
+        inputMax.max = max;
+        inputMax.min = min;
+        inputMax.value = max;
+        
+        $(&quot;#toolList&quot;).trigger(&quot;create&quot;);
     }
     else
     {
@@ -563,8 +592,10 @@ dwv.gui.displayToolboxHtml = function(bool)
 
 dwv.gui.initToolboxHtml = function()
 {
+    // reset selected option
     var toolSelector = document.getElementById(&quot;toolSelect&quot;);
-    toolSelector.options[0].defaultSelected = true;
+    toolSelector.selectedIndex = 0;
+    dwv.gui.refreshSelect(&quot;#toolSelect&quot;);
 };
 
 /**
@@ -640,15 +671,17 @@ dwv.gui.initWindowLevelHtml = function()
     var wlLi = document.getElementById(&quot;wlLi&quot;);
     dwv.html.cleanNode(wlLi);
     wlLi.appendChild(wlSelector);
-
+    $(&quot;#toolList&quot;).trigger(&quot;create&quot;);
+    
     // colour map selector
     var cmSelector = document.getElementById(&quot;colourMapSelect&quot;);
-    cmSelector.options[0].defaultSelected = true;
+    cmSelector.selectedIndex = 0;
     // special monochrome1 case
     if( app.getImage().getPhotometricInterpretation() === &quot;MONOCHROME1&quot; )
     {
-        cmSelector.options[1].defaultSelected = true;
+        cmSelector.selectedIndex = 1;
     }
+    dwv.gui.refreshSelect(&quot;#colourMapSelect&quot;);
 };
 
 /**
@@ -715,12 +748,14 @@ dwv.gui.displayDrawHtml = function(bool)
 
 dwv.gui.initDrawHtml = function()
 {
-    // shape selector
+    // shape selector: reset selected option
     var shapeSelector = document.getElementById(&quot;shapeSelect&quot;);
-    shapeSelector.options[0].defaultSelected = true;
-    // color selector
+    shapeSelector.selectedIndex = 0;
+    dwv.gui.refreshSelect(&quot;#shapeSelect&quot;);
+    // color selector: reset selected option
     var colourSelector = document.getElementById(&quot;colourSelect&quot;);
-    colourSelector.options[0].defaultSelected = true;
+    colourSelector.selectedIndex = 0;
+    dwv.gui.refreshSelect(&quot;#colourSelect&quot;);
 };
 
 /**
@@ -766,7 +801,8 @@ dwv.gui.displayLivewireHtml = function(bool)
 dwv.gui.initLivewireHtml = function()
 {
     var colourSelector = document.getElementById(&quot;lwColourSelect&quot;);
-    colourSelector.options[0].defaultSelected = true;
+    colourSelector.selectedIndex = 0;
+    dwv.gui.refreshSelect(&quot;#lwColourSelect&quot;);
 };
 
 /**
@@ -811,8 +847,10 @@ dwv.gui.displayFilterHtml = function(bool)
 
 dwv.gui.initFilterHtml = function()
 {
+    // filter select: reset selected options
     var filterSelector = document.getElementById(&quot;filterSelect&quot;);
-    filterSelector.options[0].defaultSelected = true;
+    filterSelector.selectedIndex = 0;
+    dwv.gui.refreshSelect(&quot;#filterSelect&quot;);
 };
 
 // create namespace if not there
@@ -833,6 +871,8 @@ dwv.gui.filter.appendThresholdHtml = function()
     
     // append to tool list
     document.getElementById(&quot;toolList&quot;).appendChild(thresholdLi);
+    // slider
+    dwv.gui.appendSliderHtml();
     // trigger create event (mobile)
     $(&quot;#toolList&quot;).trigger(&quot;create&quot;);
 };
@@ -850,10 +890,8 @@ dwv.gui.filter.displayThresholdHtml = function(bool)
 
 dwv.gui.filter.initThresholdHtml = function()
 {
-    // gui specific slider...
-    dwv.gui.getSliderHtml();
-    // trigger create event (mobile)
-    $(&quot;#toolList&quot;).trigger(&quot;create&quot;);
+    // slider
+    dwv.gui.initSliderHtml();
 };
 
 /**
