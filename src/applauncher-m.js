@@ -58,6 +58,9 @@ $(document).ready(function(){
     dwv.gui.filter.appendSharpenHtml();
     dwv.gui.filter.appendSobelHtml();
     
+    // append help HTML
+    dwv.gui.appendHelpHtml(true);
+
     // initialise the application
     app.init();
     // align layers when the window is resized
