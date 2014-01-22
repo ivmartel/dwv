@@ -5,9 +5,6 @@
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
 
-// Filter list: to be completed after each tool definition 
-dwv.tool.filters = dwv.tool.filters || {};
-
 /**
  * Filter tool.
  * @class Filter
@@ -29,6 +26,8 @@ dwv.tool.Filter = function(app)
      * @type String
      */
     this.defaultFilterName = 0;
+    
+    this.displayed = false;
 };
 
 /**
@@ -36,7 +35,7 @@ dwv.tool.Filter = function(app)
  * @method getHelp
  * @returns {Object} The help content.
  */
-dwv.tool.Filter.getHelp = function()
+dwv.tool.Filter.prototype.getHelp = function()
 {
     return {
         'title': "Filter",
@@ -52,19 +51,12 @@ dwv.tool.Filter.getHelp = function()
  * @method enable
  * @param {Boolean} bool Flag to enable or not.
  */
-dwv.tool.Filter.prototype.enable = function(bool)
+dwv.tool.Filter.prototype.display = function(bool)
 {
-    if( bool ) {
-        dwv.gui.appendFilterHtml();
-        this.init();
-    }
-    else {
-        if( this.selectedFilter )
-        {
-            this.selectedFilter.enable(false);
-        }
-        dwv.gui.clearFilterHtml();
-    }
+    dwv.gui.displayFilterHtml(bool);
+    this.displayed = bool;
+    // display the selected filter
+    this.selectedFilter.display(bool);
 };
 
 /**
@@ -87,14 +79,18 @@ dwv.tool.Filter.prototype.setSelectedFilter = function(name) {
     {
         throw new Error("Unknown filter: '" + name + "'");
     }
-    // disable last selected
-    if( this.selectedFilter )
+    // hide last selected
+    if( this.displayed )
     {
-        this.selectedFilter.enable(false);
+        this.selectedFilter.display(false);
     }
     // enable new one
-    this.selectedFilter = new dwv.tool.filters[name](app);
-    this.selectedFilter.enable(true);
+    this.selectedFilter = dwv.tool.filters[name];
+    // display the selected filter
+    if( this.displayed )
+    {
+        this.selectedFilter.display(true);
+    }
 };
 
 /**
@@ -119,6 +115,12 @@ dwv.tool.Filter.prototype.init = function()
         break;
     }
     this.setSelectedFilter(this.defaultFilterName);
+    // init all filters
+    for( key in dwv.tool.filters ) {
+        dwv.tool.filters[key].init();
+    }    
+    // init html
+    dwv.gui.initFilterHtml();
 };
 
 /**
@@ -145,16 +147,17 @@ dwv.tool.filter.Threshold = function(app) {};
 /**
  * Enable the filter.
  * @method enable
- * @param {Boolean} value Flag to enable or not.
+ * @param {Boolean} bool Flag to enable or not.
  */
-dwv.tool.filter.Threshold.prototype.enable = function(value)
+dwv.tool.filter.Threshold.prototype.display = function(bool)
 {
-    if( value ) {
-        dwv.gui.filter.appendThresholdHtml();
-    }
-    else { 
-        dwv.gui.filter.clearThresholdHtml();
-    }
+    dwv.gui.filter.displayThresholdHtml(bool);
+};
+
+dwv.tool.filter.Threshold.prototype.init = function()
+{
+    // init html
+    dwv.gui.filter.initThresholdHtml();
 };
 
 /**
@@ -173,9 +176,6 @@ dwv.tool.filter.Threshold.prototype.run = function(args)
     app.getUndoStack().add(command);
 };
 
-// Add the filter to the filter list
-dwv.tool.filters.threshold = dwv.tool.filter.Threshold;
-
 /**
  * Sharpen filter tool.
  * @class Sharpen
@@ -188,16 +188,16 @@ dwv.tool.filter.Sharpen = function(app) {};
 /**
  * Enable the filter.
  * @method enable
- * @param {Boolean} value Flag to enable or not.
+ * @param {Boolean} bool Flag to enable or not.
  */
-dwv.tool.filter.Sharpen.prototype.enable = function(value)
+dwv.tool.filter.Sharpen.prototype.display = function(bool)
 {
-    if( value ) {
-        dwv.gui.filter.appendSharpenHtml();
-    }
-    else { 
-        dwv.gui.filter.clearSharpenHtml();
-    }
+    dwv.gui.filter.displaySharpenHtml(bool);
+};
+
+dwv.tool.filter.Sharpen.prototype.init = function()
+{
+    // nothing to do...
 };
 
 /**
@@ -214,9 +214,6 @@ dwv.tool.filter.Sharpen.prototype.run = function(args)
     app.getUndoStack().add(command);
 };
 
-// Add the filter to the filter list
-dwv.tool.filters.sharpen = dwv.tool.filter.Sharpen;
-
 /**
  * Sobel filter tool.
  * @class Sharpen
@@ -229,16 +226,16 @@ dwv.tool.filter.Sobel = function(app) {};
 /**
  * Enable the filter.
  * @method enable
- * @param {Boolean} value Flag to enable or not.
+ * @param {Boolean} bool Flag to enable or not.
  */
-dwv.tool.filter.Sobel.prototype.enable = function(value)
+dwv.tool.filter.Sobel.prototype.display = function(bool)
 {
-    if( value ) {
-        dwv.gui.filter.appendSobelHtml();
-    }
-    else { 
-        dwv.gui.filter.clearSobelHtml();
-    }
+    dwv.gui.filter.displaySobelHtml(bool);
+};
+
+dwv.tool.filter.Sobel.prototype.init = function()
+{
+    // nothing to do...
 };
 
 /**
@@ -254,9 +251,6 @@ dwv.tool.filter.Sobel.prototype.run = function(args)
     // save command in undo stack
     app.getUndoStack().add(command);
 };
-
-// Add the filter to the filter list
-dwv.tool.filters.sobel = dwv.tool.filter.Sobel;
 
 /**
  * Run filter command.

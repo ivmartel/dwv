@@ -125,10 +125,6 @@ dwv.App = function(mobile)
      */
     this.init = function()
     {
-        // append loader HTML
-        dwv.gui.appendLoadboxHtml();
-        // append help HTML
-        dwv.gui.appendHelpHtml(mobile);
     };
     
     /**
@@ -507,7 +503,8 @@ dwv.App = function(mobile)
         addImageInfoListeners();
         
         // initialise the toolbox
-        toolBox.enable(true);
+        toolBox.init();
+        toolBox.display(true);
         // add the HTML for the history 
         dwv.gui.appendUndoHtml();
         

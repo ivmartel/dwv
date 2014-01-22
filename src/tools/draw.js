@@ -164,16 +164,10 @@ dwv.tool.Draw = function(app)
     /**
      * Enable the tool.
      * @method enable
-     * @param {Boolean} value The flag to enable or not.
+     * @param {Boolean} bool The flag to enable or not.
      */
-    this.enable = function(value){
-        if( value ) {
-            this.init();
-            dwv.gui.appendDrawHtml();
-        }
-        else { 
-            dwv.gui.clearDrawHtml();
-        }
+    this.display = function(bool){
+        dwv.gui.displayDrawHtml(bool);
     };
 
 }; // Draw class
@@ -183,7 +177,7 @@ dwv.tool.Draw = function(app)
  * @method getHelp
  * @returns {Object} The help content.
  */
-dwv.tool.Draw.getHelp = function()
+dwv.tool.Draw.prototype.getHelp = function()
 {
     return {
         'title': "Draw",
@@ -247,4 +241,6 @@ dwv.tool.Draw.prototype.init = function() {
     this.setShapeName(shapeName);
     // same for color
     this.setLineColour(dwv.tool.colors[0]);
+    // init html
+    dwv.gui.initDrawHtml();
 };

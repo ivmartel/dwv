@@ -99,10 +99,6 @@ dwv.tool.Livewire = function(app)
      * @type Scissors
      */
     var scissors = new dwv.math.Scissors();
-    scissors.setDimensions(
-        app.getImage().getSize().getNumberOfColumns(),
-        app.getImage().getSize().getNumberOfRows() );
-    scissors.setData(app.getImageData().data);
     
     /**
      * Handle mouse down event.
@@ -275,17 +271,30 @@ dwv.tool.Livewire = function(app)
      * @method enable
      * @param {Boolean} bool The flag to enable or not.
      */
-    this.enable = function(value){
-        if( value ) {
-            this.init();
-            dwv.gui.appendLivewireHtml();
-        }
-        else {
-            dwv.gui.clearLivewireHtml();
-        }
+    this.display = function(bool){
+        dwv.gui.displayLivewireHtml(bool);
+        // TODO why twice?
+        this.init();
     };
 
-
+    /**
+     * Initialise the tool.
+     * @method init
+     */
+    this.init = function()
+    {
+        // set the default to the first in the list
+        this.setLineColour(dwv.tool.colors[0]);
+        // init html
+        dwv.gui.initLivewireHtml();
+        
+        //scissors = new dwv.math.Scissors();
+        scissors.setDimensions(
+                app.getImage().getSize().getNumberOfColumns(),
+                app.getImage().getSize().getNumberOfRows() );
+        scissors.setData(app.getImageData().data);
+    };
+    
 }; // Livewire class
 
 /**
@@ -293,7 +302,7 @@ dwv.tool.Livewire = function(app)
  * @method getHelp
  * @returns {Object} The help content.
  */
-dwv.tool.Livewire.getHelp = function()
+dwv.tool.Livewire.prototype.getHelp = function()
 {
     return {
         'title': "Livewire",
@@ -315,16 +324,6 @@ dwv.tool.Livewire.prototype.setLineColour = function(colour)
 {
     // set style var
     this.style.setLineColor(colour);
-};
-
-/**
- * Initialise the tool.
- * @method init
- */
-dwv.tool.Livewire.prototype.init = function()
-{
-    // set the default to the first in the list
-    this.setLineColour(dwv.tool.colors[0]);
 };
 
 /**
