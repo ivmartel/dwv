@@ -125,10 +125,6 @@ dwv.App = function(mobile)
      */
     this.init = function()
     {
-        // append loader HTML
-        dwv.gui.appendLoadboxHtml();
-        // append help HTML
-        dwv.gui.appendHelpHtml(mobile);
     };
     
     /**
