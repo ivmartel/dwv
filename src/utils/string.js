@@ -41,8 +41,9 @@ dwv.utils.cleanString = function(string)
 };
 
 /**
- * Split string:
- * root?key0=val0&key1=val1 returns [{"key"="key0", "value"="val0"}, {"key"="key1", "value"="val1"}]
+ * Split query string:
+ *  'root?key0=val00&key0=val01&key1=val10' returns 
+ *  { base : root, query : [ key0 : [val00, val01], key1 : val1 ] }
  * Returns null if not a query string (no question mark).
  * @method splitQueryString
  * @static
@@ -57,17 +58,40 @@ dwv.utils.splitQueryString = function(inputStr)
     var result = {};
     // base
     result.base = inputStr.substr(0, inputStr.indexOf('?'));
-    // take after the ?
+    // take after the '?'
     var query = inputStr.substr(inputStr.indexOf('?')+1);
     // split key/value pairs
-    var pairs = query.split('&');
+    result.query = dwv.utils.splitKeyValueString(query);
+    // return
+    return result;
+};
+
+/**
+ * Split key/value string:
+ *  key0=val00&key0=val01&key1=val10 returns 
+*   { key0 : [val00, val01], key1 : val1 }
+ * @method splitKeyValueString
+ * @static
+ * @param {String} inputStr The string to split.
+ * @return {Object} The split string.
+ */
+dwv.utils.splitKeyValueString = function(inputStr)
+{
+    // result
+    var result = {};
+    // split key/value pairs
+    var pairs = inputStr.split('&');
     for( var i = 0; i < pairs.length; ++i )
     {
         var pair = pairs[i].split('=');
         // if the key does not exist, create it
-        if( !result[pair[0]] ) result[pair[0]] = pair[1];
+        if( !result[pair[0]] ) 
+        {
+            result[pair[0]] = pair[1];
+        }
         else
         {
+            // make it an array
             if( !( result[pair[0]] instanceof Array) ) {
                 result[pair[0]] = [result[pair[0]]];
             }
@@ -76,4 +100,3 @@ dwv.utils.splitQueryString = function(inputStr)
     }
     return result;
 };
-
