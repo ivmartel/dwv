@@ -6,8 +6,9 @@ Data sources:
 - Gdcm: :pserver:xxx@cvs.creatis.insa-lyon.fr:2402/cvs/public
 - Nema: ftp://medical.nema.org/MEDICAL/Dicom/DataSets/WG04/
 
-* cta.dcm:
+* cta-100.dcm and cta-101.dcm:
  origin: (Osirix) TOUTATIX/Cardiac 1CTA_CORONARY_ARTERIES_TESTBOLUS (Adult)/Heart w-o  1.5  B25f  55% /IM-0001-0100.dcm
+  (and IM-0001-0101.dcm)
  details: 512*512, transfer syntax: 1.2.840.10008.1.2.1 (LittleEndianExplicit)
 
 * cta2.dcm:
