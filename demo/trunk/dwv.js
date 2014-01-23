@@ -4541,7 +4541,9 @@ dwv.html.createHtmlSelect = function(name, list) {
 };
 
 /**
- * Get a list of parameters from an input URI.
+ * Get a list of parameters from an input URI that looks like:
+ *  [dwv root]?input=encodeURI([root]?key0=value0&key1=value1)
+ * 
  * @method getUriParam
  * @static
  * @param {String } uri The URI to decode.
@@ -4550,74 +4552,77 @@ dwv.html.createHtmlSelect = function(name, list) {
 dwv.html.getUriParam = function(uri)
 {
     var inputUri = uri || window.location.href;
-    var val = [];
+    var result = [];
     // split key/value pairs
     var mainQueryPairs = dwv.utils.splitQueryString(inputUri);
     // check pairs
     if( mainQueryPairs === null ) return null;
     // has to have an input key
-    if( !mainQueryPairs.input ) 
+    if( !mainQueryPairs.query || !mainQueryPairs.query.input ) 
         throw new Error("No input parameter in query URI.");
     // decode input URI
-    var queryUri = decodeURIComponent(mainQueryPairs.input);
+    var queryUri = decodeURIComponent(mainQueryPairs.query.input);
     // get key/value pairs from input URI
     var inputQueryPairs = dwv.utils.splitQueryString(queryUri);
     // repeat key replace mode (default to keep key)
     var repeatKeyReplaceMode = "key";
-    if( mainQueryPairs.dwvReplaceMode ) repeatKeyReplaceMode = mainQueryPairs.dwvReplaceMode;
+    if( mainQueryPairs.query.dwvReplaceMode ) repeatKeyReplaceMode = mainQueryPairs.query.dwvReplaceMode;
     
-    if( !inputQueryPairs ) val.push(queryUri);
+    if( !inputQueryPairs ) 
+    {
+        result.push(queryUri);
+    }
     else
     {
-        var keys = Object.keys(inputQueryPairs);
+        var keys = Object.keys(inputQueryPairs.query);
         // find repeat key
         var repeatKey = null;
         for( var i = 0; i < keys.length; ++i )
         {
-            if( inputQueryPairs[keys[i]] instanceof Array )
+            if( inputQueryPairs.query[keys[i]] instanceof Array )
+            {
                 repeatKey = keys[i];
+                break;
+            }
         }
     
-        if( !repeatKey ) val.push(queryUri);
+        if( !repeatKey ) 
+        {
+            result.push(queryUri);
+        }
         else
         {
+            var repeatList = inputQueryPairs.query[repeatKey];
             // build base uri
-            var baseUrl = inputQueryPairs.base + "?";
+            var baseUrl = inputQueryPairs.base;
+            // do not add '?' for what looks like file elements
+            // root/path/to/?key=0.jpg&key=1.jpg
+            if( !( baseUrl[baseUrl.length-1] === '/' && repeatList[0].indexOf('.') !== -1 ) ) 
+                baseUrl += "?";
             var gotOneArg = false;
             for( var j = 0; j < keys.length; ++j )
             {
-                if( keys[j] !== "base" && keys[j] !== repeatKey ) {
+                if( keys[j] !== repeatKey ) {
                     if( gotOneArg ) baseUrl += "&";
-                    baseUrl += keys[j] + "=" + inputQueryPairs[keys[j]];
+                    baseUrl += keys[j] + "=" + inputQueryPairs.query[keys[j]];
                     gotOneArg = true;
                 }
             }
-            
-            // check if we really have repetition
+            // append built urls to result
             var url;
-            if( inputQueryPairs[repeatKey] instanceof Array )
-            {
-                for( var k = 0; k < inputQueryPairs[repeatKey].length; ++k )
-                {
-                    url = baseUrl;
-                    if( gotOneArg ) url += "&";
-                    if( repeatKeyReplaceMode === "key" ) url += repeatKey + "=";
-                    // other than key: do nothing
-                    url += inputQueryPairs[repeatKey][k];
-                    val.push(url);
-                }
-            }
-            else 
+            for( var k = 0; k < repeatList.length; ++k )
             {
                 url = baseUrl;
                 if( gotOneArg ) url += "&";
-                url += repeatKey + "=" + inputQueryPairs[repeatKey];
-                val.push(url);
+                if( repeatKeyReplaceMode === "key" ) url += repeatKey + "=";
+                // other than 'key' mode: do nothing
+                url += repeatList[k];
+                result.push(url);
             }
         }
     }
     
-    return val;
+    return result;
 };
 
 /**
@@ -10639,8 +10644,9 @@ dwv.utils.cleanString = function(string)
 };
 
 /**
- * Split string:
- * root?key0=val0&key1=val1 returns [{"key"="key0", "value"="val0"}, {"key"="key1", "value"="val1"}]
+ * Split query string:
+ *  'root?key0=val00&key0=val01&key1=val10' returns 
+ *  { base : root, query : [ key0 : [val00, val01], key1 : val1 ] }
  * Returns null if not a query string (no question mark).
  * @method splitQueryString
  * @static
@@ -10655,17 +10661,40 @@ dwv.utils.splitQueryString = function(inputStr)
     var result = {};
     // base
     result.base = inputStr.substr(0, inputStr.indexOf('?'));
-    // take after the ?
+    // take after the '?'
     var query = inputStr.substr(inputStr.indexOf('?')+1);
     // split key/value pairs
-    var pairs = query.split('&');
+    result.query = dwv.utils.splitKeyValueString(query);
+    // return
+    return result;
+};
+
+/**
+ * Split key/value string:
+ *  key0=val00&key0=val01&key1=val10 returns 
+*   { key0 : [val00, val01], key1 : val1 }
+ * @method splitKeyValueString
+ * @static
+ * @param {String} inputStr The string to split.
+ * @return {Object} The split string.
+ */
+dwv.utils.splitKeyValueString = function(inputStr)
+{
+    // result
+    var result = {};
+    // split key/value pairs
+    var pairs = inputStr.split('&');
     for( var i = 0; i < pairs.length; ++i )
     {
         var pair = pairs[i].split('=');
         // if the key does not exist, create it
-        if( !result[pair[0]] ) result[pair[0]] = pair[1];
+        if( !result[pair[0]] ) 
+        {
+            result[pair[0]] = pair[1];
+        }
         else
         {
+            // make it an array
             if( !( result[pair[0]] instanceof Array) ) {
                 result[pair[0]] = [result[pair[0]]];
             }
@@ -10674,4 +10703,3 @@ dwv.utils.splitQueryString = function(inputStr)
     }
     return result;
 };
-

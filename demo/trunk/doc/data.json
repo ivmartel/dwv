@@ -3130,7 +3130,7 @@
         {
             "file": "src/html/html.js",
             "line": 380,
-            "description": "Get a list of parameters from an input URI.",
+            "description": "Get a list of parameters from an input URI that looks like:\n [dwv root]?input=encodeURI([root]?key0=value0&key1=value1)",
             "itemtype": "method",
             "name": "getUriParam",
             "static": 1,
@@ -3151,7 +3151,7 @@
         },
         {
             "file": "src/html/html.js",
-            "line": 460,
+            "line": 465,
             "description": "Toggle the display of an element.",
             "itemtype": "method",
             "name": "toggleDisplay",
@@ -3169,7 +3169,7 @@
         },
         {
             "file": "src/html/html.js",
-            "line": 479,
+            "line": 484,
             "description": "Browser check for the FileAPI.",
             "itemtype": "method",
             "name": "hasFileApi",
@@ -3180,7 +3180,7 @@
         },
         {
             "file": "src/html/html.js",
-            "line": 499,
+            "line": 504,
             "description": "Browser check for the XMLHttpRequest.",
             "itemtype": "method",
             "name": "hasXmlHttpRequest",
@@ -3191,7 +3191,7 @@
         },
         {
             "file": "src/html/html.js",
-            "line": 509,
+            "line": 514,
             "description": "Browser check for typed array.",
             "itemtype": "method",
             "name": "hasTypedArray",
@@ -3202,7 +3202,7 @@
         },
         {
             "file": "src/html/html.js",
-            "line": 519,
+            "line": 524,
             "description": "Browser check for clamped array.",
             "itemtype": "method",
             "name": "hasClampedArray",
@@ -3213,7 +3213,7 @@
         },
         {
             "file": "src/html/html.js",
-            "line": 529,
+            "line": 534,
             "description": "Browser checks to see if it can run dwv. Throws an error if not.\nTODO Maybe use http://modernizr.com/.",
             "itemtype": "method",
             "name": "check",
@@ -8564,9 +8564,31 @@
         {
             "file": "src/utils/string.js",
             "line": 43,
-            "description": "Split string:\nroot?key0=val0&key1=val1 returns [{\"key\"=\"key0\", \"value\"=\"val0\"}, {\"key\"=\"key1\", \"value\"=\"val1\"}]\nReturns null if not a query string (no question mark).",
+            "description": "Split query string:\n 'root?key0=val00&key0=val01&key1=val10' returns \n { base : root, query : [ key0 : [val00, val01], key1 : val1 ] }\nReturns null if not a query string (no question mark).",
             "itemtype": "method",
             "name": "splitQueryString",
+            "static": 1,
+            "params": [
+                {
+                    "name": "inputStr",
+                    "description": "The string to split.",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "The split string.",
+                "type": "Object"
+            },
+            "class": "dwv.utils",
+            "module": "utils",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/utils/string.js",
+            "line": 69,
+            "description": "Split key/value string:\n key0=val00&key0=val01&key1=val10 returns \n  { key0 : [val00, val01], key1 : val1 }",
+            "itemtype": "method",
+            "name": "splitKeyValueString",
             "static": 1,
             "params": [
                 {
