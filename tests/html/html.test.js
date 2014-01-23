@@ -152,4 +152,15 @@ test("Test get URI param.", function() {
     equal(res31.toString(), theo31.toString(), "Multiple baby mri (replaceMode)");
     
     // github: not supported
+    
+    // simple links (no query)
+    
+    // simple test: plenty arguments
+    var root40 = "file:///test.html?input=";
+    var uri40 = "web/path/to/file/?a=0.dcm&a=1.dcm&a=2.dcm";
+    var full40 = root40 + encodeURIComponent(uri40) + "&dwvReplaceMode=void";
+    var res40 = dwv.html.getUriParam(full40);
+    var theo40 = ["web/path/to/file/0.dcm", "web/path/to/file/1.dcm", "web/path/to/file/2.dcm"];
+    equal(res40.toString(), theo40.toString(), "Multiple file-like uri");
+
 });
