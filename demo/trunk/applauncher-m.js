@@ -22,13 +22,44 @@ $(document).ready(function(){
     dwv.io.loaders.file = dwv.io.File;
     dwv.io.loaders.url = dwv.io.Url;
 
+    // append load container HTML
+    dwv.gui.appendLoadboxHtml();
+    // append loaders HTML
+    dwv.gui.appendFileLoadHtml();
+    dwv.gui.appendUrlLoadHtml();
+    dwv.gui.displayFileLoadHtml(true);
+
     // Add required tools to the tool list
     dwv.tool.tools = {};
-    dwv.tool.tools.windowlevel = dwv.tool.WindowLevel;
-    dwv.tool.tools.zoom = dwv.tool.Zoom;
-    dwv.tool.tools.draw = dwv.tool.Draw;
-    dwv.tool.tools.filter = dwv.tool.Filter;
-    dwv.tool.tools.livewire = dwv.tool.Livewire;
+    dwv.tool.tools.windowlevel = new dwv.tool.WindowLevel(app);
+    dwv.tool.tools.zoom = new dwv.tool.Zoom(app);
+    dwv.tool.tools.draw = new dwv.tool.Draw(app);
+    dwv.tool.tools.livewire = new dwv.tool.Livewire(app);
+
+    // Add the filter to the filter list
+    dwv.tool.tools.filter = new dwv.tool.Filter(app);
+    dwv.tool.filters = {};
+    dwv.tool.filters.threshold = new dwv.tool.filter.Threshold(app);
+    dwv.tool.filters.sharpen = new dwv.tool.filter.Sharpen(app);
+    dwv.tool.filters.sobel = new dwv.tool.filter.Sobel(app);
+
+    // append tool container HTML
+    dwv.gui.appendToolboxHtml();
+    // append tools HTML
+    dwv.gui.appendWindowLevelHtml();
+    dwv.gui.appendZoomHtml();
+    dwv.gui.appendDrawHtml();
+    dwv.gui.appendLivewireHtml();
+    
+    // append filter container HTML
+    dwv.gui.appendFilterHtml();
+    // append filters HTML
+    dwv.gui.filter.appendThresholdHtml();
+    dwv.gui.filter.appendSharpenHtml();
+    dwv.gui.filter.appendSobelHtml();
+    
+    // append help HTML
+    dwv.gui.appendHelpHtml(true);
 
     // initialise the application
     app.init();
