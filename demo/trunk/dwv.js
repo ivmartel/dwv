@@ -4092,6 +4092,10 @@ dwv.gui.appendHelpHtml = function(mobile)
     
     var toolHelpDiv = document.createElement("div");
     
+    // current location
+    var loc = window.location.pathname;
+    var dir = loc.substring(0, loc.lastIndexOf('/'));
+
     for ( var t in dwv.tool.tools )
     {
         var tool = dwv.tool.tools[t];
@@ -4112,7 +4116,7 @@ dwv.gui.appendHelpHtml = function(mobile)
                 var action = tool.getHelp()[actionType][keys[i]];
                 
                 var img = document.createElement("img");
-                img.src = "./resources/"+keys[i]+".png";
+                img.src = dir + "/resources/"+keys[i]+".png";
                 img.style.float = "left";
                 img.style.margin = "0px 15px 15px 0px";
                 
