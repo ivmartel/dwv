@@ -4112,7 +4112,7 @@ dwv.gui.appendHelpHtml = function(mobile)
                 var action = tool.getHelp()[actionType][keys[i]];
                 
                 var img = document.createElement("img");
-                img.src = "resources/"+keys[i]+".png";
+                img.src = "./resources/"+keys[i]+".png";
                 img.style.float = "left";
                 img.style.margin = "0px 15px 15px 0px";
                 
