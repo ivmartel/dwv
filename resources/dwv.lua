@@ -78,8 +78,10 @@ print([[
 <meta charset="UTF-8">
 <link rel="stylesheet" href="/dwv/style.css">
 <style>
-body { font-size: 80%; }
-#pageHeader h1 { display: inline-block; margin: 0; }
+body { background-color: #222; color: white;
+  margin: 10px; padding: 0; font-size: 80%; }
+#pageHeader h1 { display: inline-block; margin: 0; color: #fff; }
+#pageHeader a { color: #ddf; }
 #pageHeader #toolbar { display: inline-block; float: right; }
 #toolbox li:first-child { list-style-type: none; padding-bottom: 10px; margin-left: -20px; }
 #pageMain { position: absolute; height: 92%; width: 99%; bottom: 5px; left: 5px; background-color: #333; }
@@ -99,6 +101,7 @@ print([[
 <script type="text/javascript" src="/dwv/ext/jquery/jquery-2.0.3.min.js"></script>
 <script type="text/javascript" src="/dwv/ext/jquery-ui/jquery-ui-1.10.3.min.js"></script>
 <script type="text/javascript" src="/dwv/ext/flot/jquery.flot.min.js"></script>
+<script type="text/javascript" src="/dwv/ext/openjpeg/openjpeg.js"></script>
 ]])
 
 -- path with extra /dwv
@@ -111,10 +114,10 @@ print([[
 print([[<script type="text/javascript">]])
 
 print([[
-function toggle(dialogName)
+function toggle(dialogId)
 {
-    if( $(dialogName).dialog('isOpen') ) $(dialogName).dialog('close');
-    else $(dialogName).dialog('open');
+    if( $(dialogId).dialog('isOpen') ) $(dialogId).dialog('close');
+    else $(dialogId).dialog('open');
 }
 ]])
 
@@ -143,6 +146,9 @@ $(document).ready(function(){
     $("#tags").dialog({ position: 
         {my: "right top", at: "right top", of: "#pageMain"},
         autoOpen: false, width: 500, height: 590 });
+    $("#help").dialog({ position: 
+        {my: "right top", at: "right top", of: "#pageMain"},
+        autoOpen: false, width: 500, height: 590 });
 ]])
    
 print([[
@@ -154,13 +160,97 @@ print([[
     // Resizable but keep aspect ratio
     // TODO it seems to add a border that bothers getting the cursor position...
     //$("#layerContainer").resizable({ aspectRatio: true });
+]])
+
+print([[
+    // button listeners
+    var button = null;
+    // open
+    button = document.getElementById("open-btn");
+    if( button ) button.onclick = function() { toggle("#openData"); };
+    // toolbox
+    button = document.getElementById("toolbox-btn");
+    if( button ) button.onclick = function() { toggle("#toolbox"); };
+    // history
+    button = document.getElementById("history-btn");
+    if( button ) button.onclick = function() { toggle("#history"); };
+    // tags
+    button = document.getElementById("tags-btn");
+    if( button ) button.onclick = function() { toggle("#tags"); };
+    // layerDialog
+    button = document.getElementById("layerDialog-btn");
+    if( button ) button.onclick = function() { toggle("#layerDialog"); };
+    // info
+    button = document.getElementById("info-btn");
+    if( button ) button.onclick = function() { app.toggleInfoLayerDisplay(); };
+    // help
+    button = document.getElementById("help-btn");
+    if( button ) button.onclick = function() { toggle("#help"); };
+]])
+   
+print([[
+    // Add required loaders to the loader list
+    dwv.io.loaders = {};
+    dwv.io.loaders.file = dwv.io.File;
+    dwv.io.loaders.url = dwv.io.Url;
+
+    // append load container HTML
+    dwv.gui.appendLoadboxHtml();
+    // append loaders HTML
+    dwv.gui.appendFileLoadHtml();
+    dwv.gui.appendUrlLoadHtml();
+    dwv.gui.displayFileLoadHtml(true);
+
+]])
+   
+print([[
+    // Add required tools to the tool list
+    dwv.tool.tools = {};
+    dwv.tool.tools.windowlevel = new dwv.tool.WindowLevel(app);
+    dwv.tool.tools.zoom = new dwv.tool.Zoom(app);
+    dwv.tool.tools.draw = new dwv.tool.Draw(app);
+    dwv.tool.tools.livewire = new dwv.tool.Livewire(app);
+
+    // Add the filter to the filter list
+    dwv.tool.tools.filter = new dwv.tool.Filter(app);
+    dwv.tool.filters = {};
+    dwv.tool.filters.threshold = new dwv.tool.filter.Threshold(app);
+    dwv.tool.filters.sharpen = new dwv.tool.filter.Sharpen(app);
+    dwv.tool.filters.sobel = new dwv.tool.filter.Sobel(app);
+
+]])
+   
+print([[
+	// append tool container HTML
+    dwv.gui.appendToolboxHtml();
+    // append tools HTML
+    dwv.gui.appendWindowLevelHtml();
+    dwv.gui.appendZoomHtml();
+    dwv.gui.appendDrawHtml();
+    dwv.gui.appendLivewireHtml();
     
+    // append filter container HTML
+    dwv.gui.appendFilterHtml();
+    // append filters HTML
+    dwv.gui.filter.appendThresholdHtml();
+    dwv.gui.filter.appendSharpenHtml();
+    dwv.gui.filter.appendSobelHtml();
+    
+    // append help HTML
+    dwv.gui.appendHelpHtml(false);
+]])
+
+print([[
     // initialise the application
     app.init();
     // align layers when the window is resized
     window.onresize = app.resize;
     // possible load from URL
     //var inputUrls = dwv.html.getUriParam(); 
+	
+	// help
+    // TODO Seems accordion only works when at end...
+    $("#accordion").accordion({ collapsible: "true", active: "false", heightStyle: "content" });
 ]])
 
 -- create javascript url array
@@ -183,16 +273,17 @@ print([[<div id="pageHeader">]])
 
 print([[
 <!-- Title #dwvversion -->
-<h1>DICOM Web Viewer (<a href="https://github.com/ivmartel/dwv">dwv</a> v0.6.0beta</h1>
+<h1>DICOM Web Viewer (<a href="https://github.com/ivmartel/dwv">dwv</a> v0.6.0beta)</h1>
 
 <!-- Toolbar -->
 <div id="toolbar">
-<button onclick="toggle('#openData')">File</button>
-<button onclick="toggle('#toolbox')">Toolbox</button>
-<button onclick="toggle('#history')">History</button>
-<button onclick="toggle('#tags')">Tags</button>
-<button onclick="toggle('#layerDialog')">Image</button>
-<button onclick="app.toggleInfoLayerDisplay()">Info</button>
+<button id="open-btn">File</button>
+<button id="toolbox-btn">Toolbox</button>
+<button id="history-btn">History</button>
+<button id="tags-btn">Tags</button>
+<button id="layerDialog-btn">Image</button>
+<button id="info-btn">Info</button>
+<button id="help-btn">Help</button>
 </div><!-- /toolbar -->
 ]])
 
@@ -203,16 +294,10 @@ print([[<div id="pageMain">]])
 print([[
 <!-- Open file -->
 <div id="openData" title="File">
-<form><p>
-Path: <input type="file" id="imagefiles" multiple />
-URL: <input type="url" id="imageurl" />
+<div id="loaderlist"></div>
+<div id="progressbar"></div>
+</div>
 ]])
-
-print([[</p></form>]])
-
-print([[<div id="progressbar"></div>]])
-
-print([[</div>]])
 
 print([[
 <!-- Toolbox -->
@@ -224,7 +309,10 @@ print([[
 <div id="history" title="History"></div>
 
 <!-- Tags -->
-<div id="tags" title="Tags" style="display:none;"></div>
+<div id="tags" title="Tags"></div>
+
+<!-- Help -->
+<div id="help" title="Help"></div>
 ]])
 
 print([[
