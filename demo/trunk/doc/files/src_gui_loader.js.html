@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>html - dwv</title>
+    <title>src/gui/loader.js - dwv</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
     <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
@@ -192,62 +192,162 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-                        <h1>html Module</h1>
-<div class="box clearfix meta">
+                        <h1 class="file-heading">File: src/gui/loader.js</h1>
+
+<div class="file">
+    <pre class="code prettyprint linenums">
+/** 
+ * GUI module.
+ * @module gui
+ */
+var dwv = dwv || {};
+/**
+ * Namespace for GUI functions.
+ * @class gui
+ * @namespace dwv
+ * @static
+ */
+dwv.gui = dwv.gui || {};
+
+/**
+ * Update the progress bar.
+ * @method updateProgress
+ * @static
+ * @param {Object} event A ProgressEvent.
+ */
+dwv.gui.updateProgress = function(event)
+{
+    // event is an ProgressEvent.
+    if( event.lengthComputable )
+    {
+        var percent = Math.round((event.loaded / event.total) * 100);
+        if( app.isMobile() )
+        {
+            // jquery-mobile loading
+            if( percent &lt; 100 ) {
+                $.mobile.loading(&quot;show&quot;, {text: percent+&quot;%&quot;, textVisible: true, theme: &quot;b&quot;} );
+            }
+            else if( percent === 100 ) {
+                $.mobile.loading(&quot;hide&quot;);
+            }
+        }
+        else
+        {
+            // jquery-ui progress bar
+            if( percent &lt;= 100 ) {
+                $(&quot;#progressbar&quot;).progressbar({ value: percent });
+            }
+        }
+    }
+};
+
+/**
+ * Append the loadbox HTML to the page.
+ * @method appendLoadboxHtml
+ * @static
+ */
+dwv.gui.appendLoadboxHtml = function()
+{
+    // loader select
+    var loaderSelector = dwv.html.createHtmlSelect(&quot;loaderSelect&quot;,dwv.io.loaders);
+    loaderSelector.onchange = dwv.gui.onChangeLoader;
     
+    // node
+    var node = document.getElementById(&quot;loaderlist&quot;);
+    // clear it
+    while(node.hasChildNodes()) node.removeChild(node.firstChild);
+    // append
+    node.appendChild(loaderSelector);
+    // trigger create event (mobile)
+    $(&quot;#loaderlist&quot;).trigger(&quot;create&quot;);
+};
 
+/**
+ * Append the file load HTML to the page.
+ * @method appendFileLoadHtml
+ * @static
+ */
+dwv.gui.appendFileLoadHtml = function()
+{
+    // input
+    var fileLoadInput = document.createElement(&quot;input&quot;);
+    fileLoadInput.onchange = dwv.gui.onChangeFiles;
+    fileLoadInput.type = &quot;file&quot;;
+    fileLoadInput.multiple = true;
+    fileLoadInput.id = &quot;imagefiles&quot;;
+    fileLoadInput.setAttribute(&quot;data-clear-btn&quot;,&quot;true&quot;);
+    fileLoadInput.setAttribute(&quot;data-mini&quot;,&quot;true&quot;);
+
+    // associated div
+    var fileLoadDiv = document.createElement(&quot;div&quot;);
+    fileLoadDiv.id = &quot;imagefilesdiv&quot;;
+    fileLoadDiv.style.display = &quot;none&quot;;
+    fileLoadDiv.appendChild(fileLoadInput);
     
+    // node
+    var node = document.getElementById(&quot;loaderlist&quot;);
+    // append
+    node.appendChild(fileLoadDiv);
+    // trigger create event (mobile)
+    $(&quot;#loaderlist&quot;).trigger(&quot;create&quot;);
+};
 
-    
-        <div class="foundat">
-            Defined in: <a href="../files/src_gui_style.js.html#l8"><code>src&#x2F;gui&#x2F;style.js:8</code></a>
-        </div>
-    
+/**
+ * Display the file load HTML.
+ * @method clearUrlLoadHtml
+ * @static
+ * @param {Boolean} bool True to display, false to hide.
+ */
+dwv.gui.displayFileLoadHtml = function(bool)
+{
+    // file div element
+    var filediv = document.getElementById(&quot;imagefilesdiv&quot;);
+    filediv.style.display = bool ? &quot;&quot; : &quot;none&quot;;
+};
 
-    
-</div>
+/**
+ * Append the url load HTML to the page.
+ * @method appendUrlLoadHtml
+ * @static
+ */
+dwv.gui.appendUrlLoadHtml = function()
+{
+    // input
+    var urlLoadInput = document.createElement(&quot;input&quot;);
+    urlLoadInput.onchange = dwv.gui.onChangeURL;
+    urlLoadInput.type = &quot;url&quot;;
+    urlLoadInput.id = &quot;imageurl&quot;;
+    urlLoadInput.setAttribute(&quot;data-clear-btn&quot;,&quot;true&quot;);
+    urlLoadInput.setAttribute(&quot;data-mini&quot;,&quot;true&quot;);
 
+    // associated div
+    var urlLoadDiv = document.createElement(&quot;div&quot;);
+    urlLoadDiv.id = &quot;imageurldiv&quot;;
+    urlLoadDiv.style.display = &quot;none&quot;;
+    urlLoadDiv.appendChild(urlLoadInput);
 
+    // node
+    var node = document.getElementById(&quot;loaderlist&quot;);
+    // append
+    node.appendChild(urlLoadDiv);
+    // trigger create event (mobile)
+    $(&quot;#loaderlist&quot;).trigger(&quot;create&quot;);
+};
 
-<div class="box intro">
-    <p>HTML module.</p>
+/**
+ * Display the url load HTML.
+ * @method clearUrlLoadHtml
+ * @static
+ * @param {Boolean} bool True to display, false to hide.
+ */
+dwv.gui.displayUrlLoadHtml = function(bool)
+{
+    // url div element
+    var urldiv = document.getElementById(&quot;imageurldiv&quot;);
+    urldiv.style.display = bool ? &quot;&quot; : &quot;none&quot;;
+};
 
-</div>
-
-
-
-<div class="yui3-g">
-    <div class="yui3-u-1-2">
-        
-            <p>This module provides the following classes:</p>
-
-            <ul class="module-classes">
-            
-                <li class="module-class">
-                    <a href="../classes/dwv.html.html">
-                        dwv.html
-                    </a>
-                </li>
-            
-                <li class="module-class">
-                    <a href="../classes/dwv.html.Layer.html">
-                        dwv.html.Layer
-                    </a>
-                </li>
-            
-                <li class="module-class">
-                    <a href="../classes/dwv.html.Style.html">
-                        dwv.html.Style
-                    </a>
-                </li>
-            
-            </ul>
-        
-    </div>
-
-    <div class="yui3-u-1-2">
-        
-    </div>
+    </pre>
 </div>
 
                     </div>

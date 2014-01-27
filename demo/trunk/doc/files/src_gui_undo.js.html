@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>src/html/style.js - dwv</title>
+    <title>src/gui/undo.js - dwv</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
     <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
@@ -192,102 +192,102 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-                        <h1 class="file-heading">File: src/html/style.js</h1>
+                        <h1 class="file-heading">File: src/gui/undo.js</h1>
 
 <div class="file">
     <pre class="code prettyprint linenums">
 /** 
- * HTML module.
- * @module html
+ * GUI module.
+ * @module gui
  */
 var dwv = dwv || {};
-dwv.html = dwv.html || {};
+/**
+ * Namespace for GUI functions.
+ * @class gui
+ * @namespace dwv
+ * @static
+ */
+dwv.gui = dwv.gui || {};
 
 /**
- * Style class.
- * @class Style
- * @namespace dwv.html
- * @constructor
+ * Append the undo HTML to the page.
+ * @method appendUndoHtml
+ * @static
  */
-dwv.html.Style = function()
+dwv.gui.appendUndoHtml = function()
 {
-    /**
-     * Font size.
-     * @property fontSize
-     * @private
-     * @type Number
-     */
-    var fontSize = 12;
-    /**
-     * Font definition string.
-     * @property fontStr
-     * @private
-     * @type String
-     */
-    var fontStr = &quot;normal &quot;+this.fontSize+&quot;px sans-serif&quot;;
-    /**
-     * Line height.
-     * @property lineHeight
-     * @private
-     * @type Number
-     */
-    var lineHeight = this.fontSize + this.fontSize/5;
-    /**
-     * Text color.
-     * @property textColor
-     * @private
-     * @type String
-     */
-    var textColor = &quot;#fff&quot;;
-    /**
-     * Line color.
-     * @property lineColor
-     * @private
-     * @type String
-     */
-    var lineColor = 0;
+    var paragraph = document.createElement(&quot;p&quot;);  
+    paragraph.appendChild(document.createTextNode(&quot;History:&quot;));
+    paragraph.appendChild(document.createElement(&quot;br&quot;));
     
-    /**
-     * Get the font size.
-     * @method getFontSize
-     * @return {Number} The font size.
-     */
-    dwv.html.Style.prototype.getFontSize = function() { return fontSize; };
+    var select = document.createElement(&quot;select&quot;);
+    select.id = &quot;history_list&quot;;
+    select.name = &quot;history_list&quot;;
+    select.multiple = &quot;multiple&quot;;
+    paragraph.appendChild(select);
 
-    /**
-     * Get the font definition string.
-     * @method getFontStr
-     * @return {String} The font definition string.
-     */
-    dwv.html.Style.prototype.getFontStr = function() { return fontStr; };
+    // node
+    var node = document.getElementById(&quot;history&quot;);
+    // clear it
+    while(node.hasChildNodes()) node.removeChild(node.firstChild);
+    // append
+    node.appendChild(paragraph);
+};
 
-    /**
-     * Get the line height.
-     * @method getLineHeight
-     * @return {Number} The line height.
-     */
-    dwv.html.Style.prototype.getLineHeight = function() { return lineHeight; };
+/**
+ * Add a command to the undo HTML.
+ * @method addCommandToUndoHtml
+ * @static
+ * @param {String} commandName The name of the command to add.
+ */
+dwv.gui.addCommandToUndoHtml = function(commandName)
+{
+    var select = document.getElementById(&quot;history_list&quot;);
+    // remove undone commands
+    var count = select.length - (select.selectedIndex+1);
+    if( count &gt; 0 )
+    {
+        for( var i = 0; i &lt; count; ++i)
+        {
+            select.remove(select.length-1);
+        }
+    }
+    // add new option
+    var option = document.createElement(&quot;option&quot;);
+    option.text = commandName;
+    option.value = commandName;
+    select.add(option);
+    // increment selected index
+    select.selectedIndex++;
+};
 
-    /**
-     * Get the text color.
-     * @method getTextColor
-     * @return {String} The text color.
-     */
-    dwv.html.Style.prototype.getTextColor = function() { return textColor; };
-
-    /**
-     * Get the line color.
-     * @method getLineColor
-     * @return {String} The line color.
-     */
-    dwv.html.Style.prototype.getLineColor = function() { return lineColor; };
-
-    /**
-     * Set the line color.
-     * @method setLineColor
-     * @param {String} color The line color.
-     */
-    dwv.html.Style.prototype.setLineColor = function(color) { lineColor = color; };
+/**
+ * Enable the last command of the undo HTML.
+ * @method enableInUndoHtml
+ * @static
+ * @param {Boolean} enable Flag to enable or disable the command.
+ */
+dwv.gui.enableInUndoHtml = function(enable)
+{
+    var select = document.getElementById(&quot;history_list&quot;);
+    // enable or not (order is important)
+    var option;
+    if( enable ) 
+    {
+        // increment selected index
+        select.selectedIndex++;
+        // enable option
+        option = select.options[select.selectedIndex];
+        option.disabled = false;
+    }
+    else 
+    {
+        // disable option
+        option = select.options[select.selectedIndex];
+        option.disabled = true;
+        // decrement selected index
+        select.selectedIndex--;
+    }
 };
 
     </pre>

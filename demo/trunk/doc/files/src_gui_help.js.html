@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>html - dwv</title>
+    <title>src/gui/help.js - dwv</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
     <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
@@ -192,62 +192,110 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-                        <h1>html Module</h1>
-<div class="box clearfix meta">
+                        <h1 class="file-heading">File: src/gui/help.js</h1>
+
+<div class="file">
+    <pre class="code prettyprint linenums">
+/** 
+ * GUI module.
+ * @module gui
+ */
+var dwv = dwv || {};
+/**
+ * Namespace for GUI functions.
+ * @class gui
+ * @namespace dwv
+ * @static
+ */
+dwv.gui = dwv.gui || {};
+
+/**
+ * Build the help HTML.
+ * @method appendHelpHtml
+ * @param {Boolean} mobile Flag for mobile or not environement.
+ */
+dwv.gui.appendHelpHtml = function(mobile)
+{
+    var actionType = &quot;mouse&quot;;
+    if( mobile ) actionType = &quot;touch&quot;;
     
-
+    var toolHelpDiv = document.createElement(&quot;div&quot;);
     
+    // current location
+    var loc = window.location.pathname;
+    var dir = loc.substring(0, loc.lastIndexOf(&#x27;/&#x27;));
 
-    
-        <div class="foundat">
-            Defined in: <a href="../files/src_gui_style.js.html#l8"><code>src&#x2F;gui&#x2F;style.js:8</code></a>
-        </div>
-    
-
-    
-</div>
-
-
-
-<div class="box intro">
-    <p>HTML module.</p>
-
-</div>
-
-
-
-<div class="yui3-g">
-    <div class="yui3-u-1-2">
+    for ( var t in dwv.tool.tools )
+    {
+        var tool = dwv.tool.tools[t];
+        // title
+        var title = document.createElement(&quot;h3&quot;);
+        title.appendChild(document.createTextNode(tool.getHelp().title));
+        // doc div
+        var docDiv = document.createElement(&quot;div&quot;);
+        // brief
+        var brief = document.createElement(&quot;p&quot;);
+        brief.appendChild(document.createTextNode(tool.getHelp().brief));
+        docDiv.appendChild(brief);
+        // details
+        if( tool.getHelp()[actionType] ) {
+            var keys = Object.keys(tool.getHelp()[actionType]);
+            for( var i=0; i&lt;keys.length; ++i )
+            {
+                var action = tool.getHelp()[actionType][keys[i]];
+                
+                var img = document.createElement(&quot;img&quot;);
+                img.src = dir + &quot;/resources/&quot;+keys[i]+&quot;.png&quot;;
+                img.style.float = &quot;left&quot;;
+                img.style.margin = &quot;0px 15px 15px 0px&quot;;
+                
+                var br = document.createElement(&quot;br&quot;);
+                br.style.clear = &quot;both&quot;;
+                
+                var para = document.createElement(&quot;p&quot;);
+                para.appendChild(img);
+                para.appendChild(document.createTextNode(action));
+                para.appendChild(br);
+                docDiv.appendChild(para);
+            }
+        }
         
-            <p>This module provides the following classes:</p>
+        // different div structure for mobile or static
+        if( mobile )
+        {
+            var toolDiv = document.createElement(&quot;div&quot;);
+            toolDiv.setAttribute(&quot;data-role&quot;, &quot;collapsible&quot;);
+            toolDiv.appendChild(title);
+            toolDiv.appendChild(docDiv);
+            toolHelpDiv.appendChild(toolDiv);
+        }
+        else
+        {
+            toolHelpDiv.id = &quot;accordion&quot;;
+            toolHelpDiv.appendChild(title);
+            toolHelpDiv.appendChild(docDiv);
+        }
+    }
+    
+    var helpNode = document.getElementById(&quot;help&quot;);
 
-            <ul class="module-classes">
-            
-                <li class="module-class">
-                    <a href="../classes/dwv.html.html">
-                        dwv.html
-                    </a>
-                </li>
-            
-                <li class="module-class">
-                    <a href="../classes/dwv.html.Layer.html">
-                        dwv.html.Layer
-                    </a>
-                </li>
-            
-                <li class="module-class">
-                    <a href="../classes/dwv.html.Style.html">
-                        dwv.html.Style
-                    </a>
-                </li>
-            
-            </ul>
-        
-    </div>
+    var headPara = document.createElement(&quot;p&quot;);
+    headPara.appendChild(document.createTextNode(&quot;DWV can load DICOM data &quot; +
+        &quot;either from a local file or from an URL. All DICOM tags are available &quot; +
+        &quot;in a searchable table, press the &#x27;tags&#x27; or grid button. &quot; + 
+        &quot;You can choose to display the image information overlay by pressing the &quot; + 
+        &quot;&#x27;info&#x27; or i button. &quot;));
+    helpNode.appendChild(headPara);
+    
+    var toolPara = document.createElement(&quot;p&quot;);
+    toolPara.appendChild(document.createTextNode(&quot;Each tool defines the possible &quot; + 
+        &quot;user interactions. The default tool is the window/level one. &quot; + 
+        &quot;Here are the available tools:&quot;));
+    helpNode.appendChild(toolPara);
+    helpNode.appendChild(toolHelpDiv);
+};
 
-    <div class="yui3-u-1-2">
-        
-    </div>
+    </pre>
 </div>
 
                     </div>

@@ -31,25 +31,37 @@
                 "dwv.dicom": 1
             }
         },
-        "src/html/gui.js": {
-            "name": "src/html/gui.js",
-            "modules": {
-                "gui": 1
-            },
-            "classes": {
-                "dwv.gui": 1
-            },
+        "src/gui/filter.js": {
+            "name": "src/gui/filter.js",
+            "modules": {},
+            "classes": {},
+            "fors": {},
+            "namespaces": {
+                "dwv": 1
+            }
+        },
+        "src/gui/handlers.js": {
+            "name": "src/gui/handlers.js",
+            "modules": {},
+            "classes": {},
             "fors": {},
             "namespaces": {
                 "dwv": 1,
                 "dwv.gui": 1
             }
         },
-        "src/html/html.js": {
-            "name": "src/html/html.js",
-            "modules": {
-                "html": 1
-            },
+        "src/gui/help.js": {
+            "name": "src/gui/help.js",
+            "modules": {},
+            "classes": {},
+            "fors": {},
+            "namespaces": {
+                "dwv": 1
+            }
+        },
+        "src/gui/html.js": {
+            "name": "src/gui/html.js",
+            "modules": {},
             "classes": {
                 "dwv.html": 1
             },
@@ -58,8 +70,8 @@
                 "dwv": 1
             }
         },
-        "src/html/layer.js": {
-            "name": "src/html/layer.js",
+        "src/gui/layer.js": {
+            "name": "src/gui/layer.js",
             "modules": {},
             "classes": {
                 "dwv.html.Layer": 1
@@ -69,15 +81,48 @@
                 "dwv.html": 1
             }
         },
-        "src/html/style.js": {
-            "name": "src/html/style.js",
+        "src/gui/loader.js": {
+            "name": "src/gui/loader.js",
             "modules": {},
+            "classes": {},
+            "fors": {},
+            "namespaces": {
+                "dwv": 1
+            }
+        },
+        "src/gui/style.js": {
+            "name": "src/gui/style.js",
+            "modules": {
+                "html": 1
+            },
             "classes": {
                 "dwv.html.Style": 1
             },
             "fors": {},
             "namespaces": {
                 "dwv.html": 1
+            }
+        },
+        "src/gui/tools.js": {
+            "name": "src/gui/tools.js",
+            "modules": {
+                "gui": 1
+            },
+            "classes": {},
+            "fors": {},
+            "namespaces": {
+                "dwv": 1
+            }
+        },
+        "src/gui/undo.js": {
+            "name": "src/gui/undo.js",
+            "modules": {},
+            "classes": {
+                "dwv.gui": 1
+            },
+            "fors": {},
+            "namespaces": {
+                "dwv": 1
             }
         },
         "src/image/filter.js": {
@@ -406,7 +451,7 @@
                 "dwv.gui": 1
             },
             "tag": "module",
-            "file": "src/html/gui.js",
+            "file": "src/gui/undo.js",
             "line": 6,
             "description": "GUI module."
         },
@@ -424,7 +469,7 @@
                 "dwv.html": 1
             },
             "tag": "module",
-            "file": "src/html/style.js",
+            "file": "src/gui/style.js",
             "line": 8,
             "description": "HTML module."
         },
@@ -625,8 +670,8 @@
             "plugin_for": [],
             "extension_for": [],
             "module": "gui",
-            "namespace": "dwv.gui",
-            "file": "src/html/gui.js",
+            "namespace": "dwv",
+            "file": "src/gui/undo.js",
             "line": 6,
             "description": "Namespace for GUI functions.",
             "static": 1
@@ -641,7 +686,7 @@
             "extension_for": [],
             "module": "html",
             "namespace": "dwv",
-            "file": "src/html/html.js",
+            "file": "src/gui/html.js",
             "line": 6,
             "description": "Namespace for HTML related functions.",
             "static": 1
@@ -656,7 +701,7 @@
             "extension_for": [],
             "module": "html",
             "namespace": "dwv.html",
-            "file": "src/html/layer.js",
+            "file": "src/gui/layer.js",
             "line": 8,
             "description": "Window layer.",
             "is_constructor": 1,
@@ -678,7 +723,7 @@
             "extension_for": [],
             "module": "html",
             "namespace": "dwv.html",
-            "file": "src/html/style.js",
+            "file": "src/gui/style.js",
             "line": 8,
             "description": "Style class.",
             "is_constructor": 1
@@ -2079,7 +2124,167 @@
             "namespace": "dwv.dicom"
         },
         {
-            "file": "src/html/gui.js",
+            "file": "src/gui/filter.js",
+            "line": 14,
+            "description": "Append the slider HTML.",
+            "itemtype": "method",
+            "name": "appendSliderHtml",
+            "static": 1,
+            "class": "dwv.gui",
+            "module": "gui",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/gui/filter.js",
+            "line": 64,
+            "description": "Initialise the slider HTML.",
+            "itemtype": "method",
+            "name": "initSliderHtml",
+            "static": 1,
+            "class": "dwv.gui",
+            "module": "gui",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/gui/filter.js",
+            "line": 105,
+            "description": "Append the filter HTML to the page.",
+            "itemtype": "method",
+            "name": "appendFilterHtml",
+            "static": 1,
+            "class": "dwv.gui",
+            "module": "gui",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/gui/filter.js",
+            "line": 131,
+            "description": "Display the filter HTML.",
+            "itemtype": "method",
+            "name": "displayFilterHtml",
+            "static": 1,
+            "params": [
+                {
+                    "name": "bool",
+                    "description": "True to display, false to hide.",
+                    "type": "Boolean"
+                }
+            ],
+            "class": "dwv.gui",
+            "module": "gui",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/gui/filter.js",
+            "line": 144,
+            "description": "Initialise the filter HTML.",
+            "itemtype": "method",
+            "name": "displayFilterHtml",
+            "static": 1,
+            "class": "dwv.gui",
+            "module": "gui",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/gui/filter.js",
+            "line": 160,
+            "description": "Append the threshold filter HTML to the page.",
+            "itemtype": "method",
+            "name": "appendThresholdHtml",
+            "static": 1,
+            "class": "dwv.gui",
+            "module": "gui",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/gui/filter.js",
+            "line": 183,
+            "description": "Clear the treshold filter HTML.",
+            "itemtype": "method",
+            "name": "displayThresholdHtml",
+            "static": 1,
+            "params": [
+                {
+                    "name": "bool",
+                    "description": "True to display, false to hide.",
+                    "type": "Boolean"
+                }
+            ],
+            "class": "dwv.gui",
+            "module": "gui",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/gui/filter.js",
+            "line": 196,
+            "description": "Initialise the treshold filter HTML.",
+            "itemtype": "method",
+            "name": "initThresholdHtml",
+            "static": 1,
+            "class": "dwv.gui",
+            "module": "gui",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/gui/filter.js",
+            "line": 207,
+            "description": "Append the sharpen filter HTML to the page.",
+            "itemtype": "method",
+            "name": "appendSharpenHtml",
+            "static": 1,
+            "class": "dwv.gui",
+            "module": "gui",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/gui/filter.js",
+            "line": 235,
+            "description": "Display the sharpen filter HTML.",
+            "itemtype": "method",
+            "name": "displaySharpenHtml",
+            "static": 1,
+            "params": [
+                {
+                    "name": "bool",
+                    "description": "True to display, false to hide.",
+                    "type": "Boolean"
+                }
+            ],
+            "class": "dwv.gui",
+            "module": "gui",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/gui/filter.js",
+            "line": 248,
+            "description": "Append the sobel filter HTML to the page.",
+            "itemtype": "method",
+            "name": "appendSobelHtml",
+            "static": 1,
+            "class": "dwv.gui",
+            "module": "gui",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/gui/filter.js",
+            "line": 276,
+            "description": "Display the sobel filter HTML.",
+            "itemtype": "method",
+            "name": "displaySobelHtml",
+            "static": 1,
+            "params": [
+                {
+                    "name": "bool",
+                    "description": "True to display, false to hide.",
+                    "type": "Boolean"
+                }
+            ],
+            "class": "dwv.gui",
+            "module": "gui",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/gui/handlers.js",
             "line": 14,
             "description": "Handle window/level change.",
             "itemtype": "method",
@@ -2097,7 +2302,7 @@
             "namespace": "dwv.gui"
         },
         {
-            "file": "src/html/gui.js",
+            "file": "src/gui/handlers.js",
             "line": 26,
             "description": "Handle colour map change.",
             "itemtype": "method",
@@ -2115,7 +2320,7 @@
             "namespace": "dwv.gui"
         },
         {
-            "file": "src/html/gui.js",
+            "file": "src/gui/handlers.js",
             "line": 37,
             "description": "Handle loader change.",
             "itemtype": "method",
@@ -2133,7 +2338,7 @@
             "namespace": "dwv.gui"
         },
         {
-            "file": "src/html/gui.js",
+            "file": "src/gui/handlers.js",
             "line": 55,
             "description": "Handle files change.",
             "itemtype": "method",
@@ -2151,7 +2356,7 @@
             "namespace": "dwv.gui"
         },
         {
-            "file": "src/html/gui.js",
+            "file": "src/gui/handlers.js",
             "line": 66,
             "description": "Handle URL change.",
             "itemtype": "method",
@@ -2169,7 +2374,7 @@
             "namespace": "dwv.gui"
         },
         {
-            "file": "src/html/gui.js",
+            "file": "src/gui/handlers.js",
             "line": 77,
             "description": "Handle tool change.",
             "itemtype": "method",
@@ -2187,7 +2392,7 @@
             "namespace": "dwv.gui"
         },
         {
-            "file": "src/html/gui.js",
+            "file": "src/gui/handlers.js",
             "line": 88,
             "description": "Handle filter change.",
             "itemtype": "method",
@@ -2205,7 +2410,7 @@
             "namespace": "dwv.gui"
         },
         {
-            "file": "src/html/gui.js",
+            "file": "src/gui/handlers.js",
             "line": 99,
             "description": "Handle filter run.",
             "itemtype": "method",
@@ -2223,7 +2428,7 @@
             "namespace": "dwv.gui"
         },
         {
-            "file": "src/html/gui.js",
+            "file": "src/gui/handlers.js",
             "line": 110,
             "description": "Handle min/max slider change.",
             "itemtype": "method",
@@ -2241,26 +2446,8 @@
             "namespace": "dwv.gui"
         },
         {
-            "file": "src/html/gui.js",
+            "file": "src/gui/handlers.js",
             "line": 124,
-            "description": "Refresh a HTML select.",
-            "itemtype": "method",
-            "name": "refreshSelect",
-            "static": 1,
-            "params": [
-                {
-                    "name": "selectName",
-                    "description": "The name of the HTML select to refresh.",
-                    "type": "String"
-                }
-            ],
-            "class": "dwv.gui",
-            "module": "gui",
-            "namespace": "dwv.gui"
-        },
-        {
-            "file": "src/html/gui.js",
-            "line": 136,
             "description": "Handle shape change.",
             "itemtype": "method",
             "name": "onChangeShape",
@@ -2277,8 +2464,8 @@
             "namespace": "dwv.gui"
         },
         {
-            "file": "src/html/gui.js",
-            "line": 147,
+            "file": "src/gui/handlers.js",
+            "line": 135,
             "description": "Handle line color change.",
             "itemtype": "method",
             "name": "onChangeLineColour",
@@ -2295,491 +2482,8 @@
             "namespace": "dwv.gui"
         },
         {
-            "file": "src/html/gui.js",
-            "line": 158,
-            "description": "Append the slider HTML.",
-            "itemtype": "method",
-            "name": "appendSliderHtml",
-            "static": 1,
-            "class": "dwv.gui",
-            "module": "gui",
-            "namespace": "dwv.gui"
-        },
-        {
-            "file": "src/html/gui.js",
-            "line": 208,
-            "description": "Initialise the slider HTML.",
-            "itemtype": "method",
-            "name": "initSliderHtml",
-            "static": 1,
-            "class": "dwv.gui",
-            "module": "gui",
-            "namespace": "dwv.gui"
-        },
-        {
-            "file": "src/html/gui.js",
-            "line": 249,
-            "description": "Update the progress bar.",
-            "itemtype": "method",
-            "name": "updateProgress",
-            "static": 1,
-            "params": [
-                {
-                    "name": "event",
-                    "description": "A ProgressEvent.",
-                    "type": "Object"
-                }
-            ],
-            "class": "dwv.gui",
-            "module": "gui",
-            "namespace": "dwv.gui"
-        },
-        {
-            "file": "src/html/gui.js",
-            "line": 281,
-            "description": "Append the loadbox HTML to the page.",
-            "itemtype": "method",
-            "name": "appendLoadboxHtml",
-            "static": 1,
-            "class": "dwv.gui",
-            "module": "gui",
-            "namespace": "dwv.gui"
-        },
-        {
-            "file": "src/html/gui.js",
-            "line": 302,
-            "description": "Append the file load HTML to the page.",
-            "itemtype": "method",
-            "name": "appendFileLoadHtml",
-            "static": 1,
-            "class": "dwv.gui",
-            "module": "gui",
-            "namespace": "dwv.gui"
-        },
-        {
-            "file": "src/html/gui.js",
-            "line": 332,
-            "description": "Display the file load HTML.",
-            "itemtype": "method",
-            "name": "clearUrlLoadHtml",
-            "static": 1,
-            "params": [
-                {
-                    "name": "bool",
-                    "description": "True to display, false to hide.",
-                    "type": "Boolean"
-                }
-            ],
-            "class": "dwv.gui",
-            "module": "gui",
-            "namespace": "dwv.gui"
-        },
-        {
-            "file": "src/html/gui.js",
-            "line": 345,
-            "description": "Append the url load HTML to the page.",
-            "itemtype": "method",
-            "name": "appendUrlLoadHtml",
-            "static": 1,
-            "class": "dwv.gui",
-            "module": "gui",
-            "namespace": "dwv.gui"
-        },
-        {
-            "file": "src/html/gui.js",
-            "line": 374,
-            "description": "Display the url load HTML.",
-            "itemtype": "method",
-            "name": "clearUrlLoadHtml",
-            "static": 1,
-            "params": [
-                {
-                    "name": "bool",
-                    "description": "True to display, false to hide.",
-                    "type": "Boolean"
-                }
-            ],
-            "class": "dwv.gui",
-            "module": "gui",
-            "namespace": "dwv.gui"
-        },
-        {
-            "file": "src/html/gui.js",
-            "line": 387,
-            "description": "Append the toolbox HTML to the page.",
-            "itemtype": "method",
-            "name": "appendToolboxHtml",
-            "static": 1,
-            "class": "dwv.gui",
-            "module": "gui",
-            "namespace": "dwv.gui"
-        },
-        {
-            "file": "src/html/gui.js",
-            "line": 415,
-            "description": "Display the toolbox HTML.",
-            "itemtype": "method",
-            "name": "displayToolboxHtml",
-            "static": 1,
-            "params": [
-                {
-                    "name": "bool",
-                    "description": "True to display, false to hide.",
-                    "type": "Boolean"
-                }
-            ],
-            "class": "dwv.gui",
-            "module": "gui",
-            "namespace": "dwv.gui"
-        },
-        {
-            "file": "src/html/gui.js",
-            "line": 428,
-            "description": "Initialise the toolbox HTML.",
-            "itemtype": "method",
-            "name": "initToolboxHtml",
-            "static": 1,
-            "class": "dwv.gui",
-            "module": "gui",
-            "namespace": "dwv.gui"
-        },
-        {
-            "file": "src/html/gui.js",
-            "line": 441,
-            "description": "Append the window/level HTML to the page.",
-            "itemtype": "method",
-            "name": "appendWindowLevelHtml",
-            "static": 1,
-            "class": "dwv.gui",
-            "module": "gui",
-            "namespace": "dwv.gui"
-        },
-        {
-            "file": "src/html/gui.js",
-            "line": 478,
-            "description": "Display the window/level HTML.",
-            "itemtype": "method",
-            "name": "displayWindowLevelHtml",
-            "static": 1,
-            "params": [
-                {
-                    "name": "bool",
-                    "description": "True to display, false to hide.",
-                    "type": "Boolean"
-                }
-            ],
-            "class": "dwv.gui",
-            "module": "gui",
-            "namespace": "dwv.gui"
-        },
-        {
-            "file": "src/html/gui.js",
-            "line": 494,
-            "description": "Initialise the window/level HTML.",
-            "itemtype": "method",
-            "name": "initWindowLevelHtml",
-            "static": 1,
-            "class": "dwv.gui",
-            "module": "gui",
-            "namespace": "dwv.gui"
-        },
-        {
-            "file": "src/html/gui.js",
-            "line": 523,
-            "description": "Append the draw HTML to the page.",
-            "itemtype": "method",
-            "name": "appendDrawHtml",
-            "static": 1,
-            "class": "dwv.gui",
-            "module": "gui",
-            "namespace": "dwv.gui"
-        },
-        {
-            "file": "src/html/gui.js",
-            "line": 560,
-            "description": "Display the draw HTML.",
-            "itemtype": "method",
-            "name": "displayDrawHtml",
-            "static": 1,
-            "params": [
-                {
-                    "name": "bool",
-                    "description": "True to display, false to hide.",
-                    "type": "Boolean"
-                }
-            ],
-            "class": "dwv.gui",
-            "module": "gui",
-            "namespace": "dwv.gui"
-        },
-        {
-            "file": "src/html/gui.js",
-            "line": 576,
-            "description": "Initialise the draw HTML.",
-            "itemtype": "method",
-            "name": "displayDrawHtml",
-            "static": 1,
-            "class": "dwv.gui",
-            "module": "gui",
-            "namespace": "dwv.gui"
-        },
-        {
-            "file": "src/html/gui.js",
-            "line": 593,
-            "description": "Append the color chooser HTML to the page.",
-            "itemtype": "method",
-            "name": "appendLivewireHtml",
-            "static": 1,
-            "class": "dwv.gui",
-            "module": "gui",
-            "namespace": "dwv.gui"
-        },
-        {
-            "file": "src/html/gui.js",
-            "line": 619,
-            "description": "Display the livewire HTML.",
-            "itemtype": "method",
-            "name": "displayLivewireHtml",
-            "static": 1,
-            "params": [
-                {
-                    "name": "bool",
-                    "description": "True to display, false to hide.",
-                    "type": "Boolean"
-                }
-            ],
-            "class": "dwv.gui",
-            "module": "gui",
-            "namespace": "dwv.gui"
-        },
-        {
-            "file": "src/html/gui.js",
-            "line": 632,
-            "description": "Initialise the livewire HTML.",
-            "itemtype": "method",
-            "name": "initLivewireHtml",
-            "static": 1,
-            "class": "dwv.gui",
-            "module": "gui",
-            "namespace": "dwv.gui"
-        },
-        {
-            "file": "src/html/gui.js",
-            "line": 644,
-            "description": "Append the filter HTML to the page.",
-            "itemtype": "method",
-            "name": "appendFilterHtml",
-            "static": 1,
-            "class": "dwv.gui",
-            "module": "gui",
-            "namespace": "dwv.gui"
-        },
-        {
-            "file": "src/html/gui.js",
-            "line": 670,
-            "description": "Display the filter HTML.",
-            "itemtype": "method",
-            "name": "displayFilterHtml",
-            "static": 1,
-            "params": [
-                {
-                    "name": "bool",
-                    "description": "True to display, false to hide.",
-                    "type": "Boolean"
-                }
-            ],
-            "class": "dwv.gui",
-            "module": "gui",
-            "namespace": "dwv.gui"
-        },
-        {
-            "file": "src/html/gui.js",
-            "line": 683,
-            "description": "Initialise the filter HTML.",
-            "itemtype": "method",
-            "name": "displayFilterHtml",
-            "static": 1,
-            "class": "dwv.gui",
-            "module": "gui",
-            "namespace": "dwv.gui"
-        },
-        {
-            "file": "src/html/gui.js",
-            "line": 699,
-            "description": "Append the threshold filter HTML to the page.",
-            "itemtype": "method",
-            "name": "appendThresholdHtml",
-            "static": 1,
-            "class": "dwv.gui",
-            "module": "gui",
-            "namespace": "dwv.gui"
-        },
-        {
-            "file": "src/html/gui.js",
-            "line": 722,
-            "description": "Clear the treshold filter HTML.",
-            "itemtype": "method",
-            "name": "displayThresholdHtml",
-            "static": 1,
-            "params": [
-                {
-                    "name": "bool",
-                    "description": "True to display, false to hide.",
-                    "type": "Boolean"
-                }
-            ],
-            "class": "dwv.gui",
-            "module": "gui",
-            "namespace": "dwv.gui"
-        },
-        {
-            "file": "src/html/gui.js",
-            "line": 735,
-            "description": "Initialise the treshold filter HTML.",
-            "itemtype": "method",
-            "name": "initThresholdHtml",
-            "static": 1,
-            "class": "dwv.gui",
-            "module": "gui",
-            "namespace": "dwv.gui"
-        },
-        {
-            "file": "src/html/gui.js",
-            "line": 746,
-            "description": "Append the sharpen filter HTML to the page.",
-            "itemtype": "method",
-            "name": "appendSharpenHtml",
-            "static": 1,
-            "class": "dwv.gui",
-            "module": "gui",
-            "namespace": "dwv.gui"
-        },
-        {
-            "file": "src/html/gui.js",
-            "line": 774,
-            "description": "Display the sharpen filter HTML.",
-            "itemtype": "method",
-            "name": "displaySharpenHtml",
-            "static": 1,
-            "params": [
-                {
-                    "name": "bool",
-                    "description": "True to display, false to hide.",
-                    "type": "Boolean"
-                }
-            ],
-            "class": "dwv.gui",
-            "module": "gui",
-            "namespace": "dwv.gui"
-        },
-        {
-            "file": "src/html/gui.js",
-            "line": 787,
-            "description": "Append the sobel filter HTML to the page.",
-            "itemtype": "method",
-            "name": "appendSobelHtml",
-            "static": 1,
-            "class": "dwv.gui",
-            "module": "gui",
-            "namespace": "dwv.gui"
-        },
-        {
-            "file": "src/html/gui.js",
-            "line": 815,
-            "description": "Display the sobel filter HTML.",
-            "itemtype": "method",
-            "name": "displaySobelHtml",
-            "static": 1,
-            "params": [
-                {
-                    "name": "bool",
-                    "description": "True to display, false to hide.",
-                    "type": "Boolean"
-                }
-            ],
-            "class": "dwv.gui",
-            "module": "gui",
-            "namespace": "dwv.gui"
-        },
-        {
-            "file": "src/html/gui.js",
-            "line": 828,
-            "description": "Append the zoom HTML to the page.",
-            "itemtype": "method",
-            "name": "appendZoomHtml",
-            "static": 1,
-            "class": "dwv.gui",
-            "module": "gui",
-            "namespace": "dwv.gui"
-        },
-        {
-            "file": "src/html/gui.js",
-            "line": 858,
-            "description": "Display the zoom HTML.",
-            "itemtype": "method",
-            "name": "displayZoomHtml",
-            "static": 1,
-            "params": [
-                {
-                    "name": "bool",
-                    "description": "True to display, false to hide.",
-                    "type": "Boolean"
-                }
-            ],
-            "class": "dwv.gui",
-            "module": "gui",
-            "namespace": "dwv.gui"
-        },
-        {
-            "file": "src/html/gui.js",
-            "line": 871,
-            "description": "Append the undo HTML to the page.",
-            "itemtype": "method",
-            "name": "appendUndoHtml",
-            "static": 1,
-            "class": "dwv.gui",
-            "module": "gui",
-            "namespace": "dwv.gui"
-        },
-        {
-            "file": "src/html/gui.js",
-            "line": 896,
-            "description": "Add a command to the undo HTML.",
-            "itemtype": "method",
-            "name": "addCommandToUndoHtml",
-            "static": 1,
-            "params": [
-                {
-                    "name": "commandName",
-                    "description": "The name of the command to add.",
-                    "type": "String"
-                }
-            ],
-            "class": "dwv.gui",
-            "module": "gui",
-            "namespace": "dwv.gui"
-        },
-        {
-            "file": "src/html/gui.js",
-            "line": 923,
-            "description": "Enable the last command of the undo HTML.",
-            "itemtype": "method",
-            "name": "enableInUndoHtml",
-            "static": 1,
-            "params": [
-                {
-                    "name": "enable",
-                    "description": "Flag to enable or disable the command.",
-                    "type": "Boolean"
-                }
-            ],
-            "class": "dwv.gui",
-            "module": "gui",
-            "namespace": "dwv.gui"
-        },
-        {
-            "file": "src/html/gui.js",
-            "line": 952,
+            "file": "src/gui/help.js",
+            "line": 14,
             "description": "Build the help HTML.",
             "itemtype": "method",
             "name": "appendHelpHtml",
@@ -2792,10 +2496,10 @@
             ],
             "class": "dwv.gui",
             "module": "gui",
-            "namespace": "dwv.gui"
+            "namespace": "dwv"
         },
         {
-            "file": "src/html/html.js",
+            "file": "src/gui/html.js",
             "line": 14,
             "description": "Append a cell to a given row.",
             "itemtype": "method",
@@ -2818,7 +2522,7 @@
             "namespace": "dwv"
         },
         {
-            "file": "src/html/html.js",
+            "file": "src/gui/html.js",
             "line": 27,
             "description": "Append a header cell to a given row.",
             "itemtype": "method",
@@ -2841,7 +2545,7 @@
             "namespace": "dwv"
         },
         {
-            "file": "src/html/html.js",
+            "file": "src/gui/html.js",
             "line": 43,
             "description": "Append a row to an array.",
             "itemtype": "method",
@@ -2874,7 +2578,7 @@
             "namespace": "dwv"
         },
         {
-            "file": "src/html/html.js",
+            "file": "src/gui/html.js",
             "line": 76,
             "description": "Append a row to an object.",
             "itemtype": "method",
@@ -2907,7 +2611,7 @@
             "namespace": "dwv"
         },
         {
-            "file": "src/html/html.js",
+            "file": "src/gui/html.js",
             "line": 125,
             "description": "Append a row to an object or an array.",
             "itemtype": "method",
@@ -2940,7 +2644,7 @@
             "namespace": "dwv"
         },
         {
-            "file": "src/html/html.js",
+            "file": "src/gui/html.js",
             "line": 150,
             "description": "Converts the input to an HTML table.",
             "itemtype": "method",
@@ -2957,7 +2661,7 @@
             "namespace": "dwv"
         },
         {
-            "file": "src/html/html.js",
+            "file": "src/gui/html.js",
             "line": 165,
             "description": "Get an HTML search form.",
             "itemtype": "method",
@@ -2979,7 +2683,7 @@
             "namespace": "dwv"
         },
         {
-            "file": "src/html/html.js",
+            "file": "src/gui/html.js",
             "line": 185,
             "description": "Filter a table with a given parameter: sets the display css of rows to\ntrue or false if it contains the term.",
             "itemtype": "method",
@@ -3002,7 +2706,7 @@
             "namespace": "dwv"
         },
         {
-            "file": "src/html/html.js",
+            "file": "src/gui/html.js",
             "line": 218,
             "description": "Transform back each\n'preText <span class=\"highlighted\">term</span> postText'\ninto its original 'preText term postText'.",
             "itemtype": "method",
@@ -3020,7 +2724,7 @@
             "namespace": "dwv"
         },
         {
-            "file": "src/html/html.js",
+            "file": "src/gui/html.js",
             "line": 246,
             "description": "Create a\n'preText <span class=\"highlighted\">term</span> postText'\naround each search term.",
             "itemtype": "method",
@@ -3043,7 +2747,7 @@
             "namespace": "dwv"
         },
         {
-            "file": "src/html/html.js",
+            "file": "src/gui/html.js",
             "line": 290,
             "description": "Highlight a HTML node.",
             "itemtype": "method",
@@ -3065,7 +2769,7 @@
             "namespace": "dwv"
         },
         {
-            "file": "src/html/html.js",
+            "file": "src/gui/html.js",
             "line": 305,
             "description": "Remove all children of a HTML node.",
             "itemtype": "method",
@@ -3083,7 +2787,7 @@
             "namespace": "dwv"
         },
         {
-            "file": "src/html/html.js",
+            "file": "src/gui/html.js",
             "line": 318,
             "description": "Remove a HTML node and all its children.",
             "itemtype": "method",
@@ -3101,7 +2805,7 @@
             "namespace": "dwv"
         },
         {
-            "file": "src/html/html.js",
+            "file": "src/gui/html.js",
             "line": 336,
             "description": "Create a HTML select from an input array of options.\nThe values of the options are the name of the option made lower case.\nIt is left to the user to set the 'onchange' method of the select.",
             "itemtype": "method",
@@ -3128,7 +2832,7 @@
             "namespace": "dwv"
         },
         {
-            "file": "src/html/html.js",
+            "file": "src/gui/html.js",
             "line": 380,
             "description": "Get a list of parameters from an input URI that looks like:\n [dwv root]?input=encodeURI([root]?key0=value0&key1=value1)",
             "itemtype": "method",
@@ -3150,7 +2854,7 @@
             "namespace": "dwv"
         },
         {
-            "file": "src/html/html.js",
+            "file": "src/gui/html.js",
             "line": 465,
             "description": "Toggle the display of an element.",
             "itemtype": "method",
@@ -3168,7 +2872,7 @@
             "namespace": "dwv"
         },
         {
-            "file": "src/html/html.js",
+            "file": "src/gui/html.js",
             "line": 484,
             "description": "Browser check for the FileAPI.",
             "itemtype": "method",
@@ -3179,7 +2883,7 @@
             "namespace": "dwv"
         },
         {
-            "file": "src/html/html.js",
+            "file": "src/gui/html.js",
             "line": 504,
             "description": "Browser check for the XMLHttpRequest.",
             "itemtype": "method",
@@ -3190,7 +2894,7 @@
             "namespace": "dwv"
         },
         {
-            "file": "src/html/html.js",
+            "file": "src/gui/html.js",
             "line": 514,
             "description": "Browser check for typed array.",
             "itemtype": "method",
@@ -3201,7 +2905,7 @@
             "namespace": "dwv"
         },
         {
-            "file": "src/html/html.js",
+            "file": "src/gui/html.js",
             "line": 524,
             "description": "Browser check for clamped array.",
             "itemtype": "method",
@@ -3212,7 +2916,7 @@
             "namespace": "dwv"
         },
         {
-            "file": "src/html/html.js",
+            "file": "src/gui/html.js",
             "line": 534,
             "description": "Browser checks to see if it can run dwv. Throws an error if not.\nTODO Maybe use http://modernizr.com/.",
             "itemtype": "method",
@@ -3223,7 +2927,7 @@
             "namespace": "dwv"
         },
         {
-            "file": "src/html/layer.js",
+            "file": "src/gui/layer.js",
             "line": 17,
             "description": "The associated HTMLCanvasElement.",
             "itemtype": "property",
@@ -3236,7 +2940,7 @@
             "namespace": "dwv.html"
         },
         {
-            "file": "src/html/layer.js",
+            "file": "src/gui/layer.js",
             "line": 24,
             "description": "The associated CanvasRenderingContext2D.",
             "itemtype": "property",
@@ -3249,7 +2953,7 @@
             "namespace": "dwv.html"
         },
         {
-            "file": "src/html/layer.js",
+            "file": "src/gui/layer.js",
             "line": 32,
             "description": "Get the layer name.",
             "itemtype": "method",
@@ -3263,7 +2967,7 @@
             "namespace": "dwv.html"
         },
         {
-            "file": "src/html/layer.js",
+            "file": "src/gui/layer.js",
             "line": 38,
             "description": "Get the layer canvas.",
             "itemtype": "method",
@@ -3277,7 +2981,7 @@
             "namespace": "dwv.html"
         },
         {
-            "file": "src/html/layer.js",
+            "file": "src/gui/layer.js",
             "line": 44,
             "description": "Get the layer context.",
             "itemtype": "method",
@@ -3291,7 +2995,7 @@
             "namespace": "dwv.html"
         },
         {
-            "file": "src/html/layer.js",
+            "file": "src/gui/layer.js",
             "line": 50,
             "description": "Get the layer offset on page.",
             "itemtype": "method",
@@ -3305,7 +3009,7 @@
             "namespace": "dwv.html"
         },
         {
-            "file": "src/html/layer.js",
+            "file": "src/gui/layer.js",
             "line": 57,
             "description": "The image data array.",
             "itemtype": "property",
@@ -3318,7 +3022,7 @@
             "namespace": "dwv.html"
         },
         {
-            "file": "src/html/layer.js",
+            "file": "src/gui/layer.js",
             "line": 65,
             "description": "The image origin X position.",
             "itemtype": "property",
@@ -3331,7 +3035,7 @@
             "namespace": "dwv.html"
         },
         {
-            "file": "src/html/layer.js",
+            "file": "src/gui/layer.js",
             "line": 72,
             "description": "The image origin Y position.",
             "itemtype": "property",
@@ -3344,7 +3048,7 @@
             "namespace": "dwv.html"
         },
         {
-            "file": "src/html/layer.js",
+            "file": "src/gui/layer.js",
             "line": 79,
             "description": "The image zoom in the X direction.",
             "itemtype": "property",
@@ -3357,7 +3061,7 @@
             "namespace": "dwv.html"
         },
         {
-            "file": "src/html/layer.js",
+            "file": "src/gui/layer.js",
             "line": 86,
             "description": "The image zoom in the Y direction.",
             "itemtype": "property",
@@ -3370,7 +3074,7 @@
             "namespace": "dwv.html"
         },
         {
-            "file": "src/html/layer.js",
+            "file": "src/gui/layer.js",
             "line": 94,
             "description": "Set the layer zoom.",
             "itemtype": "method",
@@ -3402,7 +3106,7 @@
             "namespace": "dwv.html"
         },
         {
-            "file": "src/html/layer.js",
+            "file": "src/gui/layer.js",
             "line": 119,
             "description": "Set the layer zoom and apply it.",
             "itemtype": "method",
@@ -3434,7 +3138,7 @@
             "namespace": "dwv.html"
         },
         {
-            "file": "src/html/layer.js",
+            "file": "src/gui/layer.js",
             "line": 135,
             "description": "Set the layer translation.\nTranslation is according to the last one.",
             "itemtype": "method",
@@ -3456,7 +3160,7 @@
             "namespace": "dwv.html"
         },
         {
-            "file": "src/html/layer.js",
+            "file": "src/gui/layer.js",
             "line": 164,
             "description": "Set the layer translation and apply it.\nTranslation is according to the last one.",
             "itemtype": "method",
@@ -3478,7 +3182,7 @@
             "namespace": "dwv.html"
         },
         {
-            "file": "src/html/layer.js",
+            "file": "src/gui/layer.js",
             "line": 179,
             "description": "Set the image data array.",
             "itemtype": "method",
@@ -3495,7 +3199,7 @@
             "namespace": "dwv.html"
         },
         {
-            "file": "src/html/layer.js",
+            "file": "src/gui/layer.js",
             "line": 189,
             "description": "Reset the layout.",
             "itemtype": "method",
@@ -3505,7 +3209,7 @@
             "namespace": "dwv.html"
         },
         {
-            "file": "src/html/layer.js",
+            "file": "src/gui/layer.js",
             "line": 201,
             "description": "Draw the content (imageData) of the layer.\nThe imageData variable needs to be set",
             "itemtype": "method",
@@ -3515,7 +3219,7 @@
             "namespace": "dwv.html"
         },
         {
-            "file": "src/html/layer.js",
+            "file": "src/gui/layer.js",
             "line": 225,
             "description": "Initialise the layer: set the canvas and context",
             "itemtype": "method",
@@ -3526,7 +3230,7 @@
             "namespace": "dwv.html"
         },
         {
-            "file": "src/html/layer.js",
+            "file": "src/gui/layer.js",
             "line": 261,
             "description": "Fill the full context with the current style.",
             "itemtype": "method",
@@ -3536,7 +3240,7 @@
             "namespace": "dwv.html"
         },
         {
-            "file": "src/html/layer.js",
+            "file": "src/gui/layer.js",
             "line": 270,
             "description": "Clear the context and reset the image data.",
             "itemtype": "method",
@@ -3546,7 +3250,7 @@
             "namespace": "dwv.html"
         },
         {
-            "file": "src/html/layer.js",
+            "file": "src/gui/layer.js",
             "line": 281,
             "description": "Merge two layers.",
             "itemtype": "method",
@@ -3557,7 +3261,7 @@
             "namespace": "dwv.html"
         },
         {
-            "file": "src/html/layer.js",
+            "file": "src/gui/layer.js",
             "line": 319,
             "description": "Set the line color for the layer.",
             "itemtype": "method",
@@ -3568,7 +3272,7 @@
             "namespace": "dwv.html"
         },
         {
-            "file": "src/html/layer.js",
+            "file": "src/gui/layer.js",
             "line": 330,
             "description": "Display the layer.",
             "itemtype": "method",
@@ -3579,7 +3283,7 @@
             "namespace": "dwv.html"
         },
         {
-            "file": "src/html/layer.js",
+            "file": "src/gui/layer.js",
             "line": 347,
             "description": "Check if the layer is visible.",
             "itemtype": "method",
@@ -3593,7 +3297,7 @@
             "namespace": "dwv.html"
         },
         {
-            "file": "src/html/layer.js",
+            "file": "src/gui/layer.js",
             "line": 358,
             "description": "Align on another layer.",
             "itemtype": "method",
@@ -3610,7 +3314,94 @@
             "namespace": "dwv.html"
         },
         {
-            "file": "src/html/style.js",
+            "file": "src/gui/loader.js",
+            "line": 14,
+            "description": "Update the progress bar.",
+            "itemtype": "method",
+            "name": "updateProgress",
+            "static": 1,
+            "params": [
+                {
+                    "name": "event",
+                    "description": "A ProgressEvent.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.gui",
+            "module": "gui",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/gui/loader.js",
+            "line": 46,
+            "description": "Append the loadbox HTML to the page.",
+            "itemtype": "method",
+            "name": "appendLoadboxHtml",
+            "static": 1,
+            "class": "dwv.gui",
+            "module": "gui",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/gui/loader.js",
+            "line": 67,
+            "description": "Append the file load HTML to the page.",
+            "itemtype": "method",
+            "name": "appendFileLoadHtml",
+            "static": 1,
+            "class": "dwv.gui",
+            "module": "gui",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/gui/loader.js",
+            "line": 97,
+            "description": "Display the file load HTML.",
+            "itemtype": "method",
+            "name": "clearUrlLoadHtml",
+            "static": 1,
+            "params": [
+                {
+                    "name": "bool",
+                    "description": "True to display, false to hide.",
+                    "type": "Boolean"
+                }
+            ],
+            "class": "dwv.gui",
+            "module": "gui",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/gui/loader.js",
+            "line": 110,
+            "description": "Append the url load HTML to the page.",
+            "itemtype": "method",
+            "name": "appendUrlLoadHtml",
+            "static": 1,
+            "class": "dwv.gui",
+            "module": "gui",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/gui/loader.js",
+            "line": 139,
+            "description": "Display the url load HTML.",
+            "itemtype": "method",
+            "name": "clearUrlLoadHtml",
+            "static": 1,
+            "params": [
+                {
+                    "name": "bool",
+                    "description": "True to display, false to hide.",
+                    "type": "Boolean"
+                }
+            ],
+            "class": "dwv.gui",
+            "module": "gui",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/gui/style.js",
             "line": 16,
             "description": "Font size.",
             "itemtype": "property",
@@ -3623,7 +3414,7 @@
             "namespace": "dwv.html"
         },
         {
-            "file": "src/html/style.js",
+            "file": "src/gui/style.js",
             "line": 23,
             "description": "Font definition string.",
             "itemtype": "property",
@@ -3636,7 +3427,7 @@
             "namespace": "dwv.html"
         },
         {
-            "file": "src/html/style.js",
+            "file": "src/gui/style.js",
             "line": 30,
             "description": "Line height.",
             "itemtype": "property",
@@ -3649,7 +3440,7 @@
             "namespace": "dwv.html"
         },
         {
-            "file": "src/html/style.js",
+            "file": "src/gui/style.js",
             "line": 37,
             "description": "Text color.",
             "itemtype": "property",
@@ -3662,7 +3453,7 @@
             "namespace": "dwv.html"
         },
         {
-            "file": "src/html/style.js",
+            "file": "src/gui/style.js",
             "line": 44,
             "description": "Line color.",
             "itemtype": "property",
@@ -3675,7 +3466,7 @@
             "namespace": "dwv.html"
         },
         {
-            "file": "src/html/style.js",
+            "file": "src/gui/style.js",
             "line": 52,
             "description": "Get the font size.",
             "itemtype": "method",
@@ -3689,7 +3480,7 @@
             "namespace": "dwv.html"
         },
         {
-            "file": "src/html/style.js",
+            "file": "src/gui/style.js",
             "line": 59,
             "description": "Get the font definition string.",
             "itemtype": "method",
@@ -3703,7 +3494,7 @@
             "namespace": "dwv.html"
         },
         {
-            "file": "src/html/style.js",
+            "file": "src/gui/style.js",
             "line": 66,
             "description": "Get the line height.",
             "itemtype": "method",
@@ -3717,7 +3508,7 @@
             "namespace": "dwv.html"
         },
         {
-            "file": "src/html/style.js",
+            "file": "src/gui/style.js",
             "line": 73,
             "description": "Get the text color.",
             "itemtype": "method",
@@ -3731,7 +3522,7 @@
             "namespace": "dwv.html"
         },
         {
-            "file": "src/html/style.js",
+            "file": "src/gui/style.js",
             "line": 80,
             "description": "Get the line color.",
             "itemtype": "method",
@@ -3745,7 +3536,7 @@
             "namespace": "dwv.html"
         },
         {
-            "file": "src/html/style.js",
+            "file": "src/gui/style.js",
             "line": 87,
             "description": "Set the line color.",
             "itemtype": "method",
@@ -3760,6 +3551,260 @@
             "class": "dwv.html.Style",
             "module": "html",
             "namespace": "dwv.html"
+        },
+        {
+            "file": "src/gui/tools.js",
+            "line": 14,
+            "description": "Refresh a HTML select.",
+            "itemtype": "method",
+            "name": "refreshSelect",
+            "static": 1,
+            "params": [
+                {
+                    "name": "selectName",
+                    "description": "The name of the HTML select to refresh.",
+                    "type": "String"
+                }
+            ],
+            "class": "dwv.gui",
+            "module": "gui",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/gui/tools.js",
+            "line": 26,
+            "description": "Append the toolbox HTML to the page.",
+            "itemtype": "method",
+            "name": "appendToolboxHtml",
+            "static": 1,
+            "class": "dwv.gui",
+            "module": "gui",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/gui/tools.js",
+            "line": 54,
+            "description": "Display the toolbox HTML.",
+            "itemtype": "method",
+            "name": "displayToolboxHtml",
+            "static": 1,
+            "params": [
+                {
+                    "name": "bool",
+                    "description": "True to display, false to hide.",
+                    "type": "Boolean"
+                }
+            ],
+            "class": "dwv.gui",
+            "module": "gui",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/gui/tools.js",
+            "line": 67,
+            "description": "Initialise the toolbox HTML.",
+            "itemtype": "method",
+            "name": "initToolboxHtml",
+            "static": 1,
+            "class": "dwv.gui",
+            "module": "gui",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/gui/tools.js",
+            "line": 80,
+            "description": "Append the window/level HTML to the page.",
+            "itemtype": "method",
+            "name": "appendWindowLevelHtml",
+            "static": 1,
+            "class": "dwv.gui",
+            "module": "gui",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/gui/tools.js",
+            "line": 117,
+            "description": "Display the window/level HTML.",
+            "itemtype": "method",
+            "name": "displayWindowLevelHtml",
+            "static": 1,
+            "params": [
+                {
+                    "name": "bool",
+                    "description": "True to display, false to hide.",
+                    "type": "Boolean"
+                }
+            ],
+            "class": "dwv.gui",
+            "module": "gui",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/gui/tools.js",
+            "line": 133,
+            "description": "Initialise the window/level HTML.",
+            "itemtype": "method",
+            "name": "initWindowLevelHtml",
+            "static": 1,
+            "class": "dwv.gui",
+            "module": "gui",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/gui/tools.js",
+            "line": 162,
+            "description": "Append the draw HTML to the page.",
+            "itemtype": "method",
+            "name": "appendDrawHtml",
+            "static": 1,
+            "class": "dwv.gui",
+            "module": "gui",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/gui/tools.js",
+            "line": 199,
+            "description": "Display the draw HTML.",
+            "itemtype": "method",
+            "name": "displayDrawHtml",
+            "static": 1,
+            "params": [
+                {
+                    "name": "bool",
+                    "description": "True to display, false to hide.",
+                    "type": "Boolean"
+                }
+            ],
+            "class": "dwv.gui",
+            "module": "gui",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/gui/tools.js",
+            "line": 215,
+            "description": "Initialise the draw HTML.",
+            "itemtype": "method",
+            "name": "displayDrawHtml",
+            "static": 1,
+            "class": "dwv.gui",
+            "module": "gui",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/gui/tools.js",
+            "line": 232,
+            "description": "Append the color chooser HTML to the page.",
+            "itemtype": "method",
+            "name": "appendLivewireHtml",
+            "static": 1,
+            "class": "dwv.gui",
+            "module": "gui",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/gui/tools.js",
+            "line": 258,
+            "description": "Display the livewire HTML.",
+            "itemtype": "method",
+            "name": "displayLivewireHtml",
+            "static": 1,
+            "params": [
+                {
+                    "name": "bool",
+                    "description": "True to display, false to hide.",
+                    "type": "Boolean"
+                }
+            ],
+            "class": "dwv.gui",
+            "module": "gui",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/gui/tools.js",
+            "line": 271,
+            "description": "Initialise the livewire HTML.",
+            "itemtype": "method",
+            "name": "initLivewireHtml",
+            "static": 1,
+            "class": "dwv.gui",
+            "module": "gui",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/gui/tools.js",
+            "line": 283,
+            "description": "Append the zoom HTML to the page.",
+            "itemtype": "method",
+            "name": "appendZoomHtml",
+            "static": 1,
+            "class": "dwv.gui",
+            "module": "gui",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/gui/tools.js",
+            "line": 313,
+            "description": "Display the zoom HTML.",
+            "itemtype": "method",
+            "name": "displayZoomHtml",
+            "static": 1,
+            "params": [
+                {
+                    "name": "bool",
+                    "description": "True to display, false to hide.",
+                    "type": "Boolean"
+                }
+            ],
+            "class": "dwv.gui",
+            "module": "gui",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/gui/undo.js",
+            "line": 14,
+            "description": "Append the undo HTML to the page.",
+            "itemtype": "method",
+            "name": "appendUndoHtml",
+            "static": 1,
+            "class": "dwv.gui",
+            "module": "gui",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/gui/undo.js",
+            "line": 39,
+            "description": "Add a command to the undo HTML.",
+            "itemtype": "method",
+            "name": "addCommandToUndoHtml",
+            "static": 1,
+            "params": [
+                {
+                    "name": "commandName",
+                    "description": "The name of the command to add.",
+                    "type": "String"
+                }
+            ],
+            "class": "dwv.gui",
+            "module": "gui",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/gui/undo.js",
+            "line": 66,
+            "description": "Enable the last command of the undo HTML.",
+            "itemtype": "method",
+            "name": "enableInUndoHtml",
+            "static": 1,
+            "params": [
+                {
+                    "name": "enable",
+                    "description": "Flag to enable or disable the command.",
+                    "type": "Boolean"
+                }
+            ],
+            "class": "dwv.gui",
+            "module": "gui",
+            "namespace": "dwv"
         },
         {
             "file": "src/image/filter.js",
@@ -9049,31 +9094,31 @@
         },
         {
             "message": "unknown tag: input",
-            "line": " src/html/html.js:150"
+            "line": " src/gui/html.js:150"
         },
         {
             "message": "unknown tag: warning",
-            "line": " src/html/html.js:150"
+            "line": " src/gui/html.js:150"
         },
         {
             "message": "unknown tag: input",
-            "line": " src/html/layer.js:225"
+            "line": " src/gui/layer.js:225"
         },
         {
             "message": "unknown tag: input",
-            "line": " src/html/layer.js:225"
+            "line": " src/gui/layer.js:225"
         },
         {
             "message": "unknown tag: input",
-            "line": " src/html/layer.js:281"
+            "line": " src/gui/layer.js:281"
         },
         {
             "message": "unknown tag: input",
-            "line": " src/html/layer.js:319"
+            "line": " src/gui/layer.js:319"
         },
         {
             "message": "unknown tag: input",
-            "line": " src/html/layer.js:330"
+            "line": " src/gui/layer.js:330"
         },
         {
             "message": "unknown tag: pqrqm",

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>html - dwv</title>
+    <title>src/gui/handlers.js - dwv</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
     <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
@@ -192,62 +192,157 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-                        <h1>html Module</h1>
-<div class="box clearfix meta">
-    
+                        <h1 class="file-heading">File: src/gui/handlers.js</h1>
 
-    
+<div class="file">
+    <pre class="code prettyprint linenums">
+/** 
+ * GUI module.
+ * @module gui
+ */
+var dwv = dwv || {};
+/**
+ * Namespace for GUI functions.
+ * @class gui
+ * @namespace dwv
+ * @static
+ */
+dwv.gui = dwv.gui || {};
 
-    
-        <div class="foundat">
-            Defined in: <a href="../files/src_gui_style.js.html#l8"><code>src&#x2F;gui&#x2F;style.js:8</code></a>
-        </div>
-    
+/**
+ * Handle window/level change.
+ * @method onChangeWindowLevelPreset
+ * @namespace dwv.gui
+ * @static
+ * @param {Object} event The change event.
+ */
+dwv.gui.onChangeWindowLevelPreset = function(event)
+{
+    app.getToolBox().getSelectedTool().setPreset(this.value);
+};
 
-    
-</div>
+/**
+ * Handle colour map change.
+ * @method onChangeColourMap
+ * @static
+ * @param {Object} event The change event.
+ */
+dwv.gui.onChangeColourMap = function(event)
+{
+    app.getToolBox().getSelectedTool().setColourMap(this.value);
+};
+
+/**
+ * Handle loader change.
+ * @method onChangeLoader
+ * @static
+ * @param {Object} event The change event.
+ */
+dwv.gui.onChangeLoader = function(event)
+{
+    if( this.value === &quot;file&quot;) {
+        dwv.gui.displayUrlLoadHtml(false);
+        dwv.gui.displayFileLoadHtml(true);
+    }
+    else if( this.value === &quot;url&quot;) {
+        dwv.gui.displayFileLoadHtml(false);
+        dwv.gui.displayUrlLoadHtml(true);
+    }
+};
+
+/**
+ * Handle files change.
+ * @method onChangeFiles
+ * @static
+ * @param {Object} event The change event.
+ */
+dwv.gui.onChangeFiles = function(event)
+{
+    app.onChangeFiles(event);
+};
+
+/**
+ * Handle URL change.
+ * @method onChangeURL
+ * @static
+ * @param {Object} event The change event.
+ */
+dwv.gui.onChangeURL = function(event)
+{
+    app.onChangeURL(event);
+};
+
+/**
+ * Handle tool change.
+ * @method onChangeTool
+ * @static
+ * @param {Object} event The change event.
+ */
+dwv.gui.onChangeTool = function(event)
+{
+    app.getToolBox().setSelectedTool(this.value);
+};
+
+/**
+ * Handle filter change.
+ * @method onChangeFilter
+ * @static
+ * @param {Object} event The change event.
+ */
+dwv.gui.onChangeFilter = function(event)
+{
+    app.getToolBox().getSelectedTool().setSelectedFilter(this.value);
+};
+
+/**
+ * Handle filter run.
+ * @method onRunFilter
+ * @static
+ * @param {Object} event The run event.
+ */
+dwv.gui.onRunFilter = function(event)
+{
+    app.getToolBox().getSelectedTool().getSelectedFilter().run();
+};
+
+/**
+ * Handle min/max slider change.
+ * @method onChangeMinMax
+ * @static
+ * @param {Object} range The new range of the data.
+ */
+dwv.gui.onChangeMinMax = function(range)
+{
+    // seems like jquery is checking if the method exists before it 
+    // is used...
+    if( app.getToolBox().getSelectedTool().getSelectedFilter )
+        app.getToolBox().getSelectedTool().getSelectedFilter().run(range);
+};
+
+/**
+ * Handle shape change.
+ * @method onChangeShape
+ * @static
+ * @param {Object} event The change event.
+ */
+dwv.gui.onChangeShape = function(event)
+{
+    app.getToolBox().getSelectedTool().setShapeName(this.value);
+};
+
+/**
+ * Handle line color change.
+ * @method onChangeLineColour
+ * @static
+ * @param {Object} event The change event.
+ */
+dwv.gui.onChangeLineColour = function(event)
+{
+    app.getToolBox().getSelectedTool().setLineColour(this.value);
+};
 
 
-
-<div class="box intro">
-    <p>HTML module.</p>
-
-</div>
-
-
-
-<div class="yui3-g">
-    <div class="yui3-u-1-2">
-        
-            <p>This module provides the following classes:</p>
-
-            <ul class="module-classes">
-            
-                <li class="module-class">
-                    <a href="../classes/dwv.html.html">
-                        dwv.html
-                    </a>
-                </li>
-            
-                <li class="module-class">
-                    <a href="../classes/dwv.html.Layer.html">
-                        dwv.html.Layer
-                    </a>
-                </li>
-            
-                <li class="module-class">
-                    <a href="../classes/dwv.html.Style.html">
-                        dwv.html.Style
-                    </a>
-                </li>
-            
-            </ul>
-        
-    </div>
-
-    <div class="yui3-u-1-2">
-        
-    </div>
+    </pre>
 </div>
 
                     </div>
