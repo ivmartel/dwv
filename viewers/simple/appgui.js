@@ -25,12 +25,7 @@ dwv.gui.displayUrlLoadHtml = function(bool){
 
 // Toolbox 
 dwv.gui.appendToolboxHtml = function(){
-    var tooldiv = document.createElement("div");
-    tooldiv.id = "toolLi";
-    
-    var node = document.getElementById("toolList");
-    node.appendChild(tooldiv);
-    $("#toolList").trigger("create");
+    //dwv.gui.base.appendToolboxHtml();
 };
 dwv.gui.displayToolboxHtml = function(bool){
     dwv.gui.base.displayToolboxHtml(bool);
@@ -46,13 +41,14 @@ dwv.gui.appendWindowLevelHtml = function(){
     wlbutton.value = "windowlevel";
     wlbutton.onclick = dwv.gui.onChangeTool;
     wlbutton.appendChild(document.createTextNode("W/L"));
-
-    var node = document.getElementById("toolList");
+    wlbutton.setAttribute("class","ui-btn ui-btn-inline");
+    
+    var node = document.getElementById("toolbar");
     node.appendChild(wlbutton);
-    $("#toolList").trigger("create");
+    $("#toolbar").trigger("create");
 };
 dwv.gui.displayWindowLevelHtml = function(bool){
-    dwv.gui.base.displayWindowLevelHtml(bool);
+    //dwv.gui.base.displayWindowLevelHtml(bool);
 };
 dwv.gui.initWindowLevelHtml = function(){
     //dwv.gui.base.initWindowLevelHtml();
@@ -65,17 +61,18 @@ dwv.gui.appendZoomHtml = function(){
     zoombutton.value = "zoom";
     zoombutton.onclick = dwv.gui.onChangeTool;
     zoombutton.appendChild(document.createTextNode("Zoom"));
-
-    var node = document.getElementById("toolList");
+    zoombutton.setAttribute("class","ui-btn ui-btn-inline");
+    
+    var node = document.getElementById("toolbar");
     node.appendChild(zoombutton);
-    $("#toolList").trigger("create");
+    $("#toolbar").trigger("create");
 };
 dwv.gui.displayZoomHtml = function(bool){
-    dwv.gui.base.displayZoomHtml(bool);
+    //dwv.gui.base.displayZoomHtml(bool);
 };
 
 // Undo/redo
 // TODO not needed but gives error...
 dwv.gui.appendUndoHtml = function(){
-    dwv.gui.base.appendUndoHtml();
+    //dwv.gui.base.appendUndoHtml();
 };

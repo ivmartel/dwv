@@ -77,22 +77,14 @@ body { margin: 10px; padding: 0; }
 <!-- Main page -->
 <div data-role="page" data-theme="b" id="main">
 
-<!-- pageHeader #dwvversion -->
-<div id="pageHeader" data-role="header">
-<h1>DWV v0.6.0beta</h1>
-</div><!-- /pageHeader -->
-
 <div id="pageMain" data-role="content" style="padding:2px;">   
 
-<div id="toolbar"><p style="margin:0;">
-
-<a href="#popupOpen" class="ui-btn ui-btn-inline ui-btn-icon-notext ui-mini ui-icon-plus"
- data-rel="popup" data-position-to="window">Open</a>
+<div id="toolbar">
 
 <a href="#" class="ui-btn ui-btn-inline ui-btn-icon-notext ui-mini ui-icon-info"
   id="info-btn">Info</a>
 
-</p></div><!-- /toolbar -->
+</div><!-- /toolbar -->
 
 <!-- Open popup -->
 <div data-role="popup" id="popupOpen">
@@ -118,16 +110,7 @@ body { margin: 10px; padding: 0; }
 </div><!-- /infoLayer -->
 </div><!-- /layerContainer -->
 
-<!-- History -->
-<div id="history" title="History" style="display:none;"></div>
-
 </div><!-- /content -->
-
-<div data-role="footer" id="footer">        
-<div data-role="navbar" id="toolbox">
-<ul id="toolList"><li></li><li></li><li></li></ul>
-</div><!-- /navbar: main -->
-</div><!-- /footer -->
 
 </div><!-- /page main -->
 
@@ -147,22 +130,6 @@ body { margin: 10px; padding: 0; }
 </div><!-- /content -->
 
 </div><!-- /page tags_page-->
-
-<!-- Help page -->
-<div data-role="page" data-theme="b" id="help_page">
-
-<div data-role="header">
-<a href="#main" data-icon="back" 
-  data-transition="slide" data-direction="reverse">Back</a>
-<h1>DWV Help</h1>
-</div><!-- /header -->
-
-<div data-role="content">   
-<!-- Tags -->
-<div id="help" title="Help"></div>
-</div><!-- /content -->
-
-</div><!-- /page help_page-->
 
 </body>
 </html>
