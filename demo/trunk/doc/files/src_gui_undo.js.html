@@ -208,13 +208,14 @@ var dwv = dwv || {};
  * @static
  */
 dwv.gui = dwv.gui || {};
+dwv.gui.base = dwv.gui.base || {};
 
 /**
  * Append the undo HTML to the page.
  * @method appendUndoHtml
  * @static
  */
-dwv.gui.appendUndoHtml = function()
+dwv.gui.base.appendUndoHtml = function()
 {
     var paragraph = document.createElement(&quot;p&quot;);  
     paragraph.appendChild(document.createTextNode(&quot;History:&quot;));

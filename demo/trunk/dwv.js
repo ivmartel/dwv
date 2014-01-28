@@ -3141,6 +3141,9 @@ var dwv = dwv || {};
  * @static
  */
 dwv.gui = dwv.gui || {};
+dwv.gui.base = dwv.gui.base || {};
+dwv.gui.filter = dwv.gui.filter || {};
+dwv.gui.filter.base = dwv.gui.filter.base || {};
 
 /**
  * Append the slider HTML.
@@ -3238,7 +3241,7 @@ dwv.gui.initSliderHtml = function()
  * @method appendFilterHtml
  * @static
  */
-dwv.gui.appendFilterHtml = function()
+dwv.gui.base.appendFilterHtml = function()
 {
     // filter select
     var filterSelector = dwv.html.createHtmlSelect("filterSelect",dwv.tool.filters);
@@ -3265,7 +3268,7 @@ dwv.gui.appendFilterHtml = function()
  * @static
  * @param {Boolean} bool True to display, false to hide.
  */
-dwv.gui.displayFilterHtml = function(bool)
+dwv.gui.base.displayFilterHtml = function(bool)
 {
     // filter lsit element
     var filterLi = document.getElementById("filterLi");
@@ -3277,7 +3280,7 @@ dwv.gui.displayFilterHtml = function(bool)
  * @method displayFilterHtml
  * @static
  */
-dwv.gui.initFilterHtml = function()
+dwv.gui.base.initFilterHtml = function()
 {
     // filter select: reset selected options
     var filterSelector = document.getElementById("filterSelect");
@@ -3293,7 +3296,7 @@ dwv.gui.filter = dwv.gui.filter || {};
  * @method appendThresholdHtml
  * @static
  */
-dwv.gui.filter.appendThresholdHtml = function()
+dwv.gui.filter.base.appendThresholdHtml = function()
 {
     // threshold list element
     var thresholdLi = document.createElement("li");
@@ -3317,7 +3320,7 @@ dwv.gui.filter.appendThresholdHtml = function()
  * @static
  * @param {Boolean} bool True to display, false to hide.
  */
-dwv.gui.filter.displayThresholdHtml = function(bool)
+dwv.gui.filter.base.displayThresholdHtml = function(bool)
 {
     // threshold list element
     var thresholdLi = document.getElementById("thresholdLi");
@@ -3329,7 +3332,7 @@ dwv.gui.filter.displayThresholdHtml = function(bool)
  * @method initThresholdHtml
  * @static
  */
-dwv.gui.filter.initThresholdHtml = function()
+dwv.gui.filter.base.initThresholdHtml = function()
 {
     // threshold slider
     dwv.gui.initSliderHtml();
@@ -3340,7 +3343,7 @@ dwv.gui.filter.initThresholdHtml = function()
  * @method appendSharpenHtml
  * @static
  */
-dwv.gui.filter.appendSharpenHtml = function()
+dwv.gui.filter.base.appendSharpenHtml = function()
 {
     // sharpen button
     var buttonRun = document.createElement("button");
@@ -3369,7 +3372,7 @@ dwv.gui.filter.appendSharpenHtml = function()
  * @static
  * @param {Boolean} bool True to display, false to hide.
  */
-dwv.gui.filter.displaySharpenHtml = function(bool)
+dwv.gui.filter.base.displaySharpenHtml = function(bool)
 {
     // sharpen list element
     var sharpenLi = document.getElementById("sharpenLi");
@@ -3381,7 +3384,7 @@ dwv.gui.filter.displaySharpenHtml = function(bool)
  * @method appendSobelHtml
  * @static
  */
-dwv.gui.filter.appendSobelHtml = function()
+dwv.gui.filter.base.appendSobelHtml = function()
 {
     // sobel button
     var buttonRun = document.createElement("button");
@@ -3410,7 +3413,7 @@ dwv.gui.filter.appendSobelHtml = function()
  * @static
  * @param {Boolean} bool True to display, false to hide.
  */
-dwv.gui.filter.displaySobelHtml = function(bool)
+dwv.gui.filter.base.displaySobelHtml = function(bool)
 {
     // sobel list element
     var sobelLi = document.getElementById("sobelLi");
@@ -3574,13 +3577,14 @@ var dwv = dwv || {};
  * @static
  */
 dwv.gui = dwv.gui || {};
+dwv.gui.base = dwv.gui.base || {};
 
 /**
  * Build the help HTML.
  * @method appendHelpHtml
  * @param {Boolean} mobile Flag for mobile or not environement.
  */
-dwv.gui.appendHelpHtml = function(mobile)
+dwv.gui.base.appendHelpHtml = function(mobile)
 {
     var actionType = "mouse";
     if( mobile ) actionType = "touch";
@@ -4124,6 +4128,12 @@ dwv.html.getUriParam = function(uri)
     return result;
 };
 
+dwv.html.displayElement = function(id,bool)
+{
+    var element = document.getElementById(id);
+    if( element ) element.style.display = bool ? "" : "none";
+};
+
 /**
  * Toggle the display of an element.
  * @method toggleDisplay
@@ -4609,6 +4619,7 @@ var dwv = dwv || {};
  * @static
  */
 dwv.gui = dwv.gui || {};
+dwv.gui.base = dwv.gui.base || {};
 
 /**
  * Update the progress bar.
@@ -4647,7 +4658,7 @@ dwv.gui.updateProgress = function(event)
  * @method appendLoadboxHtml
  * @static
  */
-dwv.gui.appendLoadboxHtml = function()
+dwv.gui.base.appendLoadboxHtml = function()
 {
     // loader select
     var loaderSelector = dwv.html.createHtmlSelect("loaderSelect",dwv.io.loaders);
@@ -4668,7 +4679,7 @@ dwv.gui.appendLoadboxHtml = function()
  * @method appendFileLoadHtml
  * @static
  */
-dwv.gui.appendFileLoadHtml = function()
+dwv.gui.base.appendFileLoadHtml = function()
 {
     // input
     var fileLoadInput = document.createElement("input");
@@ -4699,7 +4710,7 @@ dwv.gui.appendFileLoadHtml = function()
  * @static
  * @param {Boolean} bool True to display, false to hide.
  */
-dwv.gui.displayFileLoadHtml = function(bool)
+dwv.gui.base.displayFileLoadHtml = function(bool)
 {
     // file div element
     var filediv = document.getElementById("imagefilesdiv");
@@ -4711,7 +4722,7 @@ dwv.gui.displayFileLoadHtml = function(bool)
  * @method appendUrlLoadHtml
  * @static
  */
-dwv.gui.appendUrlLoadHtml = function()
+dwv.gui.base.appendUrlLoadHtml = function()
 {
     // input
     var urlLoadInput = document.createElement("input");
@@ -4741,7 +4752,7 @@ dwv.gui.appendUrlLoadHtml = function()
  * @static
  * @param {Boolean} bool True to display, false to hide.
  */
-dwv.gui.displayUrlLoadHtml = function(bool)
+dwv.gui.base.displayUrlLoadHtml = function(bool)
 {
     // url div element
     var urldiv = document.getElementById("imageurldiv");
@@ -4852,6 +4863,7 @@ var dwv = dwv || {};
  * @static
  */
 dwv.gui = dwv.gui || {};
+dwv.gui.base = dwv.gui.base || {};
 
 /**
  * Refresh a HTML select.
@@ -4870,7 +4882,7 @@ dwv.gui.refreshSelect = function(selectName)
  * @method appendToolboxHtml
  * @static
  */
-dwv.gui.appendToolboxHtml = function()
+dwv.gui.base.appendToolboxHtml = function()
 {
     // tool select
     var toolSelector = dwv.html.createHtmlSelect("toolSelect",dwv.tool.tools);
@@ -4899,11 +4911,10 @@ dwv.gui.appendToolboxHtml = function()
  * @static
  * @param {Boolean} bool True to display, false to hide.
  */
-dwv.gui.displayToolboxHtml = function(bool)
+dwv.gui.base.displayToolboxHtml = function(bool)
 {
     // tool list element
-    var toolLi = document.getElementById("toolLi");
-    toolLi.style.display = bool ? "" : "none";
+    dwv.html.displayElement("toolLi", bool);
 };
 
 /**
@@ -4911,7 +4922,7 @@ dwv.gui.displayToolboxHtml = function(bool)
  * @method initToolboxHtml
  * @static
  */
-dwv.gui.initToolboxHtml = function()
+dwv.gui.base.initToolboxHtml = function()
 {
     // tool select: reset selected option
     var toolSelector = document.getElementById("toolSelect");
@@ -4924,7 +4935,7 @@ dwv.gui.initToolboxHtml = function()
  * @method appendWindowLevelHtml
  * @static
  */
-dwv.gui.appendWindowLevelHtml = function()
+dwv.gui.base.appendWindowLevelHtml = function()
 {
     // preset select
     var wlSelector = dwv.html.createHtmlSelect("presetSelect",dwv.tool.presets);
@@ -4962,14 +4973,12 @@ dwv.gui.appendWindowLevelHtml = function()
  * @static
  * @param {Boolean} bool True to display, false to hide.
  */
-dwv.gui.displayWindowLevelHtml = function(bool)
+dwv.gui.base.displayWindowLevelHtml = function(bool)
 {
     // presets list element
-    var wlLi = document.getElementById("wlLi");
-    wlLi.style.display = bool ? "" : "none";
+    dwv.html.displayElement("wlLi", bool);
     // color map list element
-    var cmLi = document.getElementById("cmLi");
-    cmLi.style.display = bool ? "" : "none";
+    dwv.html.displayElement("cmLi", bool);
 };
 
 /**
@@ -4977,7 +4986,7 @@ dwv.gui.displayWindowLevelHtml = function(bool)
  * @method initWindowLevelHtml
  * @static
  */
-dwv.gui.initWindowLevelHtml = function()
+dwv.gui.base.initWindowLevelHtml = function()
 {
     // create new preset select
     var wlSelector = dwv.html.createHtmlSelect("presetSelect",dwv.tool.presets);
@@ -5006,7 +5015,7 @@ dwv.gui.initWindowLevelHtml = function()
  * @method appendDrawHtml
  * @static
  */
-dwv.gui.appendDrawHtml = function()
+dwv.gui.base.appendDrawHtml = function()
 {
     // shape select
     var shapeSelector = dwv.html.createHtmlSelect("shapeSelect",dwv.tool.shapes);
@@ -5044,14 +5053,12 @@ dwv.gui.appendDrawHtml = function()
  * @static
  * @param {Boolean} bool True to display, false to hide.
  */
-dwv.gui.displayDrawHtml = function(bool)
+dwv.gui.base.displayDrawHtml = function(bool)
 {
     // color list element
-    var colourLi = document.getElementById("colourLi");
-    colourLi.style.display = bool ? "" : "none";
+    dwv.html.displayElement("colourLi", bool);
     // shape list element
-    var shapeLi = document.getElementById("shapeLi");
-    shapeLi.style.display = bool ? "" : "none";
+    dwv.html.displayElement("shapeLi", bool);
 };
 
 /**
@@ -5059,7 +5066,7 @@ dwv.gui.displayDrawHtml = function(bool)
  * @method displayDrawHtml
  * @static
  * */
-dwv.gui.initDrawHtml = function()
+dwv.gui.base.initDrawHtml = function()
 {
     // shape select: reset selected option
     var shapeSelector = document.getElementById("shapeSelect");
@@ -5076,7 +5083,7 @@ dwv.gui.initDrawHtml = function()
  * @method appendLivewireHtml
  * @static
  */
-dwv.gui.appendLivewireHtml = function()
+dwv.gui.base.appendLivewireHtml = function()
 {
     // colour select
     var colourSelector = dwv.html.createHtmlSelect("lwColourSelect",dwv.tool.colors);
@@ -5103,11 +5110,10 @@ dwv.gui.appendLivewireHtml = function()
  * @static
  * @param {Boolean} bool True to display, false to hide.
  */
-dwv.gui.displayLivewireHtml = function(bool)
+dwv.gui.base.displayLivewireHtml = function(bool)
 {
     // colour list
-    var colourLi = document.getElementById("lwColourLi");
-    colourLi.style.display = bool ? "" : "none";
+    dwv.html.displayElement("lwColourLi", bool);
 };
 
 /**
@@ -5115,7 +5121,7 @@ dwv.gui.displayLivewireHtml = function(bool)
  * @method initLivewireHtml
  * @static
  */
-dwv.gui.initLivewireHtml = function()
+dwv.gui.base.initLivewireHtml = function()
 {
     var colourSelector = document.getElementById("lwColourSelect");
     colourSelector.selectedIndex = 0;
@@ -5127,7 +5133,7 @@ dwv.gui.initLivewireHtml = function()
  * @method appendZoomHtml
  * @static
  */
-dwv.gui.appendZoomHtml = function()
+dwv.gui.base.appendZoomHtml = function()
 {
     // zoom button
     var button = document.createElement("button");
@@ -5158,11 +5164,10 @@ dwv.gui.appendZoomHtml = function()
  * @static
  * @param {Boolean} bool True to display, false to hide.
  */
-dwv.gui.displayZoomHtml = function(bool)
+dwv.gui.base.displayZoomHtml = function(bool)
 {
     // zoom list element
-    var zoomLi = document.getElementById("zoomLi");
-    zoomLi.style.display = bool ? "" : "none";
+    dwv.html.displayElement("zoomLi", bool);
 };
 ;/** 
  * GUI module.
@@ -5176,13 +5181,14 @@ var dwv = dwv || {};
  * @static
  */
 dwv.gui = dwv.gui || {};
+dwv.gui.base = dwv.gui.base || {};
 
 /**
  * Append the undo HTML to the page.
  * @method appendUndoHtml
  * @static
  */
-dwv.gui.appendUndoHtml = function()
+dwv.gui.base.appendUndoHtml = function()
 {
     var paragraph = document.createElement("p");  
     paragraph.appendChild(document.createTextNode("History:"));

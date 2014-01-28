@@ -660,6 +660,12 @@ dwv.html.getUriParam = function(uri)
     return result;
 };
 
+dwv.html.displayElement = function(id,bool)
+{
+    var element = document.getElementById(id);
+    if( element ) element.style.display = bool ? &quot;&quot; : &quot;none&quot;;
+};
+
 /**
  * Toggle the display of an element.
  * @method toggleDisplay

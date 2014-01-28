@@ -208,6 +208,7 @@ var dwv = dwv || {};
  * @static
  */
 dwv.gui = dwv.gui || {};
+dwv.gui.base = dwv.gui.base || {};
 
 /**
  * Refresh a HTML select.
@@ -226,7 +227,7 @@ dwv.gui.refreshSelect = function(selectName)
  * @method appendToolboxHtml
  * @static
  */
-dwv.gui.appendToolboxHtml = function()
+dwv.gui.base.appendToolboxHtml = function()
 {
     // tool select
     var toolSelector = dwv.html.createHtmlSelect(&quot;toolSelect&quot;,dwv.tool.tools);
@@ -255,11 +256,10 @@ dwv.gui.appendToolboxHtml = function()
  * @static
  * @param {Boolean} bool True to display, false to hide.
  */
-dwv.gui.displayToolboxHtml = function(bool)
+dwv.gui.base.displayToolboxHtml = function(bool)
 {
     // tool list element
-    var toolLi = document.getElementById(&quot;toolLi&quot;);
-    toolLi.style.display = bool ? &quot;&quot; : &quot;none&quot;;
+    dwv.html.displayElement(&quot;toolLi&quot;, bool);
 };
 
 /**
@@ -267,7 +267,7 @@ dwv.gui.displayToolboxHtml = function(bool)
  * @method initToolboxHtml
  * @static
  */
-dwv.gui.initToolboxHtml = function()
+dwv.gui.base.initToolboxHtml = function()
 {
     // tool select: reset selected option
     var toolSelector = document.getElementById(&quot;toolSelect&quot;);
@@ -280,7 +280,7 @@ dwv.gui.initToolboxHtml = function()
  * @method appendWindowLevelHtml
  * @static
  */
-dwv.gui.appendWindowLevelHtml = function()
+dwv.gui.base.appendWindowLevelHtml = function()
 {
     // preset select
     var wlSelector = dwv.html.createHtmlSelect(&quot;presetSelect&quot;,dwv.tool.presets);
@@ -318,14 +318,12 @@ dwv.gui.appendWindowLevelHtml = function()
  * @static
  * @param {Boolean} bool True to display, false to hide.
  */
-dwv.gui.displayWindowLevelHtml = function(bool)
+dwv.gui.base.displayWindowLevelHtml = function(bool)
 {
     // presets list element
-    var wlLi = document.getElementById(&quot;wlLi&quot;);
-    wlLi.style.display = bool ? &quot;&quot; : &quot;none&quot;;
+    dwv.html.displayElement(&quot;wlLi&quot;, bool);
     // color map list element
-    var cmLi = document.getElementById(&quot;cmLi&quot;);
-    cmLi.style.display = bool ? &quot;&quot; : &quot;none&quot;;
+    dwv.html.displayElement(&quot;cmLi&quot;, bool);
 };
 
 /**
@@ -333,7 +331,7 @@ dwv.gui.displayWindowLevelHtml = function(bool)
  * @method initWindowLevelHtml
  * @static
  */
-dwv.gui.initWindowLevelHtml = function()
+dwv.gui.base.initWindowLevelHtml = function()
 {
     // create new preset select
     var wlSelector = dwv.html.createHtmlSelect(&quot;presetSelect&quot;,dwv.tool.presets);
@@ -362,7 +360,7 @@ dwv.gui.initWindowLevelHtml = function()
  * @method appendDrawHtml
  * @static
  */
-dwv.gui.appendDrawHtml = function()
+dwv.gui.base.appendDrawHtml = function()
 {
     // shape select
     var shapeSelector = dwv.html.createHtmlSelect(&quot;shapeSelect&quot;,dwv.tool.shapes);
@@ -400,14 +398,12 @@ dwv.gui.appendDrawHtml = function()
  * @static
  * @param {Boolean} bool True to display, false to hide.
  */
-dwv.gui.displayDrawHtml = function(bool)
+dwv.gui.base.displayDrawHtml = function(bool)
 {
     // color list element
-    var colourLi = document.getElementById(&quot;colourLi&quot;);
-    colourLi.style.display = bool ? &quot;&quot; : &quot;none&quot;;
+    dwv.html.displayElement(&quot;colourLi&quot;, bool);
     // shape list element
-    var shapeLi = document.getElementById(&quot;shapeLi&quot;);
-    shapeLi.style.display = bool ? &quot;&quot; : &quot;none&quot;;
+    dwv.html.displayElement(&quot;shapeLi&quot;, bool);
 };
 
 /**
@@ -415,7 +411,7 @@ dwv.gui.displayDrawHtml = function(bool)
  * @method displayDrawHtml
  * @static
  * */
-dwv.gui.initDrawHtml = function()
+dwv.gui.base.initDrawHtml = function()
 {
     // shape select: reset selected option
     var shapeSelector = document.getElementById(&quot;shapeSelect&quot;);
@@ -432,7 +428,7 @@ dwv.gui.initDrawHtml = function()
  * @method appendLivewireHtml
  * @static
  */
-dwv.gui.appendLivewireHtml = function()
+dwv.gui.base.appendLivewireHtml = function()
 {
     // colour select
     var colourSelector = dwv.html.createHtmlSelect(&quot;lwColourSelect&quot;,dwv.tool.colors);
@@ -459,11 +455,10 @@ dwv.gui.appendLivewireHtml = function()
  * @static
  * @param {Boolean} bool True to display, false to hide.
  */
-dwv.gui.displayLivewireHtml = function(bool)
+dwv.gui.base.displayLivewireHtml = function(bool)
 {
     // colour list
-    var colourLi = document.getElementById(&quot;lwColourLi&quot;);
-    colourLi.style.display = bool ? &quot;&quot; : &quot;none&quot;;
+    dwv.html.displayElement(&quot;lwColourLi&quot;, bool);
 };
 
 /**
@@ -471,7 +466,7 @@ dwv.gui.displayLivewireHtml = function(bool)
  * @method initLivewireHtml
  * @static
  */
-dwv.gui.initLivewireHtml = function()
+dwv.gui.base.initLivewireHtml = function()
 {
     var colourSelector = document.getElementById(&quot;lwColourSelect&quot;);
     colourSelector.selectedIndex = 0;
@@ -483,7 +478,7 @@ dwv.gui.initLivewireHtml = function()
  * @method appendZoomHtml
  * @static
  */
-dwv.gui.appendZoomHtml = function()
+dwv.gui.base.appendZoomHtml = function()
 {
     // zoom button
     var button = document.createElement(&quot;button&quot;);
@@ -514,11 +509,10 @@ dwv.gui.appendZoomHtml = function()
  * @static
  * @param {Boolean} bool True to display, false to hide.
  */
-dwv.gui.displayZoomHtml = function(bool)
+dwv.gui.base.displayZoomHtml = function(bool)
 {
     // zoom list element
-    var zoomLi = document.getElementById(&quot;zoomLi&quot;);
-    zoomLi.style.display = bool ? &quot;&quot; : &quot;none&quot;;
+    dwv.html.displayElement(&quot;zoomLi&quot;, bool);
 };
 
     </pre>

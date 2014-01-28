@@ -2125,7 +2125,7 @@
         },
         {
             "file": "src/gui/filter.js",
-            "line": 14,
+            "line": 17,
             "description": "Append the slider HTML.",
             "itemtype": "method",
             "name": "appendSliderHtml",
@@ -2136,7 +2136,7 @@
         },
         {
             "file": "src/gui/filter.js",
-            "line": 64,
+            "line": 67,
             "description": "Initialise the slider HTML.",
             "itemtype": "method",
             "name": "initSliderHtml",
@@ -2147,7 +2147,7 @@
         },
         {
             "file": "src/gui/filter.js",
-            "line": 105,
+            "line": 108,
             "description": "Append the filter HTML to the page.",
             "itemtype": "method",
             "name": "appendFilterHtml",
@@ -2158,7 +2158,7 @@
         },
         {
             "file": "src/gui/filter.js",
-            "line": 131,
+            "line": 134,
             "description": "Display the filter HTML.",
             "itemtype": "method",
             "name": "displayFilterHtml",
@@ -2176,7 +2176,7 @@
         },
         {
             "file": "src/gui/filter.js",
-            "line": 144,
+            "line": 147,
             "description": "Initialise the filter HTML.",
             "itemtype": "method",
             "name": "displayFilterHtml",
@@ -2187,7 +2187,7 @@
         },
         {
             "file": "src/gui/filter.js",
-            "line": 160,
+            "line": 163,
             "description": "Append the threshold filter HTML to the page.",
             "itemtype": "method",
             "name": "appendThresholdHtml",
@@ -2198,7 +2198,7 @@
         },
         {
             "file": "src/gui/filter.js",
-            "line": 183,
+            "line": 186,
             "description": "Clear the treshold filter HTML.",
             "itemtype": "method",
             "name": "displayThresholdHtml",
@@ -2216,7 +2216,7 @@
         },
         {
             "file": "src/gui/filter.js",
-            "line": 196,
+            "line": 199,
             "description": "Initialise the treshold filter HTML.",
             "itemtype": "method",
             "name": "initThresholdHtml",
@@ -2227,7 +2227,7 @@
         },
         {
             "file": "src/gui/filter.js",
-            "line": 207,
+            "line": 210,
             "description": "Append the sharpen filter HTML to the page.",
             "itemtype": "method",
             "name": "appendSharpenHtml",
@@ -2238,7 +2238,7 @@
         },
         {
             "file": "src/gui/filter.js",
-            "line": 235,
+            "line": 238,
             "description": "Display the sharpen filter HTML.",
             "itemtype": "method",
             "name": "displaySharpenHtml",
@@ -2256,7 +2256,7 @@
         },
         {
             "file": "src/gui/filter.js",
-            "line": 248,
+            "line": 251,
             "description": "Append the sobel filter HTML to the page.",
             "itemtype": "method",
             "name": "appendSobelHtml",
@@ -2267,7 +2267,7 @@
         },
         {
             "file": "src/gui/filter.js",
-            "line": 276,
+            "line": 279,
             "description": "Display the sobel filter HTML.",
             "itemtype": "method",
             "name": "displaySobelHtml",
@@ -2483,7 +2483,7 @@
         },
         {
             "file": "src/gui/help.js",
-            "line": 14,
+            "line": 15,
             "description": "Build the help HTML.",
             "itemtype": "method",
             "name": "appendHelpHtml",
@@ -2855,7 +2855,7 @@
         },
         {
             "file": "src/gui/html.js",
-            "line": 465,
+            "line": 471,
             "description": "Toggle the display of an element.",
             "itemtype": "method",
             "name": "toggleDisplay",
@@ -2873,7 +2873,7 @@
         },
         {
             "file": "src/gui/html.js",
-            "line": 484,
+            "line": 490,
             "description": "Browser check for the FileAPI.",
             "itemtype": "method",
             "name": "hasFileApi",
@@ -2884,7 +2884,7 @@
         },
         {
             "file": "src/gui/html.js",
-            "line": 504,
+            "line": 510,
             "description": "Browser check for the XMLHttpRequest.",
             "itemtype": "method",
             "name": "hasXmlHttpRequest",
@@ -2895,7 +2895,7 @@
         },
         {
             "file": "src/gui/html.js",
-            "line": 514,
+            "line": 520,
             "description": "Browser check for typed array.",
             "itemtype": "method",
             "name": "hasTypedArray",
@@ -2906,7 +2906,7 @@
         },
         {
             "file": "src/gui/html.js",
-            "line": 524,
+            "line": 530,
             "description": "Browser check for clamped array.",
             "itemtype": "method",
             "name": "hasClampedArray",
@@ -2917,7 +2917,7 @@
         },
         {
             "file": "src/gui/html.js",
-            "line": 534,
+            "line": 540,
             "description": "Browser checks to see if it can run dwv. Throws an error if not.\nTODO Maybe use http://modernizr.com/.",
             "itemtype": "method",
             "name": "check",
@@ -3315,7 +3315,7 @@
         },
         {
             "file": "src/gui/loader.js",
-            "line": 14,
+            "line": 15,
             "description": "Update the progress bar.",
             "itemtype": "method",
             "name": "updateProgress",
@@ -3333,7 +3333,7 @@
         },
         {
             "file": "src/gui/loader.js",
-            "line": 46,
+            "line": 47,
             "description": "Append the loadbox HTML to the page.",
             "itemtype": "method",
             "name": "appendLoadboxHtml",
@@ -3344,7 +3344,7 @@
         },
         {
             "file": "src/gui/loader.js",
-            "line": 67,
+            "line": 68,
             "description": "Append the file load HTML to the page.",
             "itemtype": "method",
             "name": "appendFileLoadHtml",
@@ -3355,7 +3355,7 @@
         },
         {
             "file": "src/gui/loader.js",
-            "line": 97,
+            "line": 98,
             "description": "Display the file load HTML.",
             "itemtype": "method",
             "name": "clearUrlLoadHtml",
@@ -3373,7 +3373,7 @@
         },
         {
             "file": "src/gui/loader.js",
-            "line": 110,
+            "line": 111,
             "description": "Append the url load HTML to the page.",
             "itemtype": "method",
             "name": "appendUrlLoadHtml",
@@ -3384,7 +3384,7 @@
         },
         {
             "file": "src/gui/loader.js",
-            "line": 139,
+            "line": 140,
             "description": "Display the url load HTML.",
             "itemtype": "method",
             "name": "clearUrlLoadHtml",
@@ -3554,7 +3554,7 @@
         },
         {
             "file": "src/gui/tools.js",
-            "line": 14,
+            "line": 15,
             "description": "Refresh a HTML select.",
             "itemtype": "method",
             "name": "refreshSelect",
@@ -3572,7 +3572,7 @@
         },
         {
             "file": "src/gui/tools.js",
-            "line": 26,
+            "line": 27,
             "description": "Append the toolbox HTML to the page.",
             "itemtype": "method",
             "name": "appendToolboxHtml",
@@ -3583,7 +3583,7 @@
         },
         {
             "file": "src/gui/tools.js",
-            "line": 54,
+            "line": 55,
             "description": "Display the toolbox HTML.",
             "itemtype": "method",
             "name": "displayToolboxHtml",
@@ -3641,7 +3641,7 @@
         },
         {
             "file": "src/gui/tools.js",
-            "line": 133,
+            "line": 131,
             "description": "Initialise the window/level HTML.",
             "itemtype": "method",
             "name": "initWindowLevelHtml",
@@ -3652,7 +3652,7 @@
         },
         {
             "file": "src/gui/tools.js",
-            "line": 162,
+            "line": 160,
             "description": "Append the draw HTML to the page.",
             "itemtype": "method",
             "name": "appendDrawHtml",
@@ -3663,7 +3663,7 @@
         },
         {
             "file": "src/gui/tools.js",
-            "line": 199,
+            "line": 197,
             "description": "Display the draw HTML.",
             "itemtype": "method",
             "name": "displayDrawHtml",
@@ -3681,7 +3681,7 @@
         },
         {
             "file": "src/gui/tools.js",
-            "line": 215,
+            "line": 211,
             "description": "Initialise the draw HTML.",
             "itemtype": "method",
             "name": "displayDrawHtml",
@@ -3692,7 +3692,7 @@
         },
         {
             "file": "src/gui/tools.js",
-            "line": 232,
+            "line": 228,
             "description": "Append the color chooser HTML to the page.",
             "itemtype": "method",
             "name": "appendLivewireHtml",
@@ -3703,7 +3703,7 @@
         },
         {
             "file": "src/gui/tools.js",
-            "line": 258,
+            "line": 254,
             "description": "Display the livewire HTML.",
             "itemtype": "method",
             "name": "displayLivewireHtml",
@@ -3721,7 +3721,7 @@
         },
         {
             "file": "src/gui/tools.js",
-            "line": 271,
+            "line": 266,
             "description": "Initialise the livewire HTML.",
             "itemtype": "method",
             "name": "initLivewireHtml",
@@ -3732,7 +3732,7 @@
         },
         {
             "file": "src/gui/tools.js",
-            "line": 283,
+            "line": 278,
             "description": "Append the zoom HTML to the page.",
             "itemtype": "method",
             "name": "appendZoomHtml",
@@ -3743,7 +3743,7 @@
         },
         {
             "file": "src/gui/tools.js",
-            "line": 313,
+            "line": 308,
             "description": "Display the zoom HTML.",
             "itemtype": "method",
             "name": "displayZoomHtml",
@@ -3761,7 +3761,7 @@
         },
         {
             "file": "src/gui/undo.js",
-            "line": 14,
+            "line": 15,
             "description": "Append the undo HTML to the page.",
             "itemtype": "method",
             "name": "appendUndoHtml",
@@ -3772,7 +3772,7 @@
         },
         {
             "file": "src/gui/undo.js",
-            "line": 39,
+            "line": 40,
             "description": "Add a command to the undo HTML.",
             "itemtype": "method",
             "name": "addCommandToUndoHtml",
@@ -3790,7 +3790,7 @@
         },
         {
             "file": "src/gui/undo.js",
-            "line": 66,
+            "line": 67,
             "description": "Enable the last command of the undo HTML.",
             "itemtype": "method",
             "name": "enableInUndoHtml",
