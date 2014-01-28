@@ -9,7 +9,7 @@ index.html
 style.css
 # js: local
 dwv-0.6.0beta.min.js
-applauncher-m.js
+applauncher.js
 # images
 resources/double_tap.png
 resources/touch_drag.png

@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<!-- <html manifest="cache-m.manifest"> -->
+<!-- <html manifest="cache.manifest"> -->
 <html>
 
 <head>
 <title>DICOM Web Viewer</title>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
-<link rel="stylesheet" href="style.css" />
+<link rel="stylesheet" href="../../css/style.css" />
 <style>
 body { margin: 10px; padding: 0; }
 #layerContainer { margin: auto; text-align: center; }
@@ -14,27 +14,28 @@ body { margin: 10px; padding: 0; }
 #drawLayer { left: 0px; }
 #tempLayer { left: 0px; }
 </style>
-<link rel="stylesheet" href="ext/jquery-mobile/jquery.mobile-1.4.0.min.css" />
+<link rel="stylesheet" href="../../ext/jquery-mobile/jquery.mobile-1.4.0.min.css" />
 <!-- mobile web app -->
 <meta name="mobile-web-app-capable" content="yes" />
-<link rel="shortcut icon" sizes="16x16" href="resources/dwv-16.png" />
-<link rel="shortcut icon" sizes="60x60" href="resources/dwv-60.png" />
-<link rel="shortcut icon" sizes="128x128" href="resources/dwv-128.png" />
+<link rel="shortcut icon" sizes="16x16" href="../../resources/dwv-16.png" />
+<link rel="shortcut icon" sizes="60x60" href="../../resources/dwv-60.png" />
+<link rel="shortcut icon" sizes="128x128" href="../../resources/dwv-128.png" />
 <!-- apple specific -->
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black" />
-<link rel="apple-touch-icon" sizes="16x16" href="resources/dwv-16.png" />
-<link rel="apple-touch-icon" sizes="60x60" href="resources/dwv-60.png" />
-<link rel="apple-touch-icon" sizes="128x128" href="resources/dwv-128.png" />
+<link rel="apple-touch-icon" sizes="16x16" href="../../resources/dwv-16.png" />
+<link rel="apple-touch-icon" sizes="60x60" href="../../resources/dwv-60.png" />
+<link rel="apple-touch-icon" sizes="128x128" href="../../resources/dwv-128.png" />
 <!-- Third party -->  
-<script type="text/javascript" src="ext/jquery/jquery-2.0.3.min.js"></script>
-<script type="text/javascript" src="ext/jquery-mobile/jquery.mobile-1.4.0.min.js"></script>
-<script type="text/javascript" src="ext/flot/jquery.flot.min.js"></script>
-<script type="text/javascript" src="ext/openjpeg/openjpeg.js"></script>
+<script type="text/javascript" src="../../ext/jquery/jquery-2.0.3.min.js"></script>
+<script type="text/javascript" src="../../ext/jquery-mobile/jquery.mobile-1.4.0.min.js"></script>
+<script type="text/javascript" src="../../ext/flot/jquery.flot.min.js"></script>
+<script type="text/javascript" src="../../ext/openjpeg/openjpeg.js"></script>
 <!-- Local -->
-<script type="text/javascript" src="dwv-0.6.0beta.min.js"></script>
-<!--  Launch the app -->
-<script type="text/javascript" src="applauncher-m.js"></script>
+<script type="text/javascript" src="../../dwv-0.6.0beta.min.js"></script>
+<!-- Launch the app -->
+<script type="text/javascript" src="appgui.js"></script>
+<script type="text/javascript" src="applauncher.js"></script>
 </head>
 
 <body>
