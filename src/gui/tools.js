@@ -10,6 +10,7 @@ var dwv = dwv || {};
  * @static
  */
 dwv.gui = dwv.gui || {};
+dwv.gui.base = dwv.gui.base || {};
 
 /**
  * Refresh a HTML select.
@@ -28,7 +29,7 @@ dwv.gui.refreshSelect = function(selectName)
  * @method appendToolboxHtml
  * @static
  */
-dwv.gui.appendToolboxHtml = function()
+dwv.gui.base.appendToolboxHtml = function()
 {
     // tool select
     var toolSelector = dwv.html.createHtmlSelect("toolSelect",dwv.tool.tools);
@@ -57,11 +58,10 @@ dwv.gui.appendToolboxHtml = function()
  * @static
  * @param {Boolean} bool True to display, false to hide.
  */
-dwv.gui.displayToolboxHtml = function(bool)
+dwv.gui.base.displayToolboxHtml = function(bool)
 {
     // tool list element
-    var toolLi = document.getElementById("toolLi");
-    toolLi.style.display = bool ? "" : "none";
+    dwv.html.displayElement("toolLi", bool);
 };
 
 /**
@@ -69,7 +69,7 @@ dwv.gui.displayToolboxHtml = function(bool)
  * @method initToolboxHtml
  * @static
  */
-dwv.gui.initToolboxHtml = function()
+dwv.gui.base.initToolboxHtml = function()
 {
     // tool select: reset selected option
     var toolSelector = document.getElementById("toolSelect");
@@ -82,7 +82,7 @@ dwv.gui.initToolboxHtml = function()
  * @method appendWindowLevelHtml
  * @static
  */
-dwv.gui.appendWindowLevelHtml = function()
+dwv.gui.base.appendWindowLevelHtml = function()
 {
     // preset select
     var wlSelector = dwv.html.createHtmlSelect("presetSelect",dwv.tool.presets);
@@ -120,14 +120,12 @@ dwv.gui.appendWindowLevelHtml = function()
  * @static
  * @param {Boolean} bool True to display, false to hide.
  */
-dwv.gui.displayWindowLevelHtml = function(bool)
+dwv.gui.base.displayWindowLevelHtml = function(bool)
 {
     // presets list element
-    var wlLi = document.getElementById("wlLi");
-    wlLi.style.display = bool ? "" : "none";
+    dwv.html.displayElement("wlLi", bool);
     // color map list element
-    var cmLi = document.getElementById("cmLi");
-    cmLi.style.display = bool ? "" : "none";
+    dwv.html.displayElement("cmLi", bool);
 };
 
 /**
@@ -135,7 +133,7 @@ dwv.gui.displayWindowLevelHtml = function(bool)
  * @method initWindowLevelHtml
  * @static
  */
-dwv.gui.initWindowLevelHtml = function()
+dwv.gui.base.initWindowLevelHtml = function()
 {
     // create new preset select
     var wlSelector = dwv.html.createHtmlSelect("presetSelect",dwv.tool.presets);
@@ -164,7 +162,7 @@ dwv.gui.initWindowLevelHtml = function()
  * @method appendDrawHtml
  * @static
  */
-dwv.gui.appendDrawHtml = function()
+dwv.gui.base.appendDrawHtml = function()
 {
     // shape select
     var shapeSelector = dwv.html.createHtmlSelect("shapeSelect",dwv.tool.shapes);
@@ -202,14 +200,12 @@ dwv.gui.appendDrawHtml = function()
  * @static
  * @param {Boolean} bool True to display, false to hide.
  */
-dwv.gui.displayDrawHtml = function(bool)
+dwv.gui.base.displayDrawHtml = function(bool)
 {
     // color list element
-    var colourLi = document.getElementById("colourLi");
-    colourLi.style.display = bool ? "" : "none";
+    dwv.html.displayElement("colourLi", bool);
     // shape list element
-    var shapeLi = document.getElementById("shapeLi");
-    shapeLi.style.display = bool ? "" : "none";
+    dwv.html.displayElement("shapeLi", bool);
 };
 
 /**
@@ -217,7 +213,7 @@ dwv.gui.displayDrawHtml = function(bool)
  * @method displayDrawHtml
  * @static
  * */
-dwv.gui.initDrawHtml = function()
+dwv.gui.base.initDrawHtml = function()
 {
     // shape select: reset selected option
     var shapeSelector = document.getElementById("shapeSelect");
@@ -234,7 +230,7 @@ dwv.gui.initDrawHtml = function()
  * @method appendLivewireHtml
  * @static
  */
-dwv.gui.appendLivewireHtml = function()
+dwv.gui.base.appendLivewireHtml = function()
 {
     // colour select
     var colourSelector = dwv.html.createHtmlSelect("lwColourSelect",dwv.tool.colors);
@@ -261,11 +257,10 @@ dwv.gui.appendLivewireHtml = function()
  * @static
  * @param {Boolean} bool True to display, false to hide.
  */
-dwv.gui.displayLivewireHtml = function(bool)
+dwv.gui.base.displayLivewireHtml = function(bool)
 {
     // colour list
-    var colourLi = document.getElementById("lwColourLi");
-    colourLi.style.display = bool ? "" : "none";
+    dwv.html.displayElement("lwColourLi", bool);
 };
 
 /**
@@ -273,7 +268,7 @@ dwv.gui.displayLivewireHtml = function(bool)
  * @method initLivewireHtml
  * @static
  */
-dwv.gui.initLivewireHtml = function()
+dwv.gui.base.initLivewireHtml = function()
 {
     var colourSelector = document.getElementById("lwColourSelect");
     colourSelector.selectedIndex = 0;
@@ -285,7 +280,7 @@ dwv.gui.initLivewireHtml = function()
  * @method appendZoomHtml
  * @static
  */
-dwv.gui.appendZoomHtml = function()
+dwv.gui.base.appendZoomHtml = function()
 {
     // zoom button
     var button = document.createElement("button");
@@ -316,9 +311,8 @@ dwv.gui.appendZoomHtml = function()
  * @static
  * @param {Boolean} bool True to display, false to hide.
  */
-dwv.gui.displayZoomHtml = function(bool)
+dwv.gui.base.displayZoomHtml = function(bool)
 {
     // zoom list element
-    var zoomLi = document.getElementById("zoomLi");
-    zoomLi.style.display = bool ? "" : "none";
+    dwv.html.displayElement("zoomLi", bool);
 };

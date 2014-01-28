@@ -10,6 +10,7 @@ var dwv = dwv || {};
  * @static
  */
 dwv.gui = dwv.gui || {};
+dwv.gui.base = dwv.gui.base || {};
 
 /**
  * Update the progress bar.
@@ -48,7 +49,7 @@ dwv.gui.updateProgress = function(event)
  * @method appendLoadboxHtml
  * @static
  */
-dwv.gui.appendLoadboxHtml = function()
+dwv.gui.base.appendLoadboxHtml = function()
 {
     // loader select
     var loaderSelector = dwv.html.createHtmlSelect("loaderSelect",dwv.io.loaders);
@@ -69,7 +70,7 @@ dwv.gui.appendLoadboxHtml = function()
  * @method appendFileLoadHtml
  * @static
  */
-dwv.gui.appendFileLoadHtml = function()
+dwv.gui.base.appendFileLoadHtml = function()
 {
     // input
     var fileLoadInput = document.createElement("input");
@@ -100,7 +101,7 @@ dwv.gui.appendFileLoadHtml = function()
  * @static
  * @param {Boolean} bool True to display, false to hide.
  */
-dwv.gui.displayFileLoadHtml = function(bool)
+dwv.gui.base.displayFileLoadHtml = function(bool)
 {
     // file div element
     var filediv = document.getElementById("imagefilesdiv");
@@ -112,7 +113,7 @@ dwv.gui.displayFileLoadHtml = function(bool)
  * @method appendUrlLoadHtml
  * @static
  */
-dwv.gui.appendUrlLoadHtml = function()
+dwv.gui.base.appendUrlLoadHtml = function()
 {
     // input
     var urlLoadInput = document.createElement("input");
@@ -142,7 +143,7 @@ dwv.gui.appendUrlLoadHtml = function()
  * @static
  * @param {Boolean} bool True to display, false to hide.
  */
-dwv.gui.displayUrlLoadHtml = function(bool)
+dwv.gui.base.displayUrlLoadHtml = function(bool)
 {
     // url div element
     var urldiv = document.getElementById("imageurldiv");

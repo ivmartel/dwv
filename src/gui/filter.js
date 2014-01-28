@@ -10,6 +10,9 @@ var dwv = dwv || {};
  * @static
  */
 dwv.gui = dwv.gui || {};
+dwv.gui.base = dwv.gui.base || {};
+dwv.gui.filter = dwv.gui.filter || {};
+dwv.gui.filter.base = dwv.gui.filter.base || {};
 
 /**
  * Append the slider HTML.
@@ -107,7 +110,7 @@ dwv.gui.initSliderHtml = function()
  * @method appendFilterHtml
  * @static
  */
-dwv.gui.appendFilterHtml = function()
+dwv.gui.base.appendFilterHtml = function()
 {
     // filter select
     var filterSelector = dwv.html.createHtmlSelect("filterSelect",dwv.tool.filters);
@@ -134,7 +137,7 @@ dwv.gui.appendFilterHtml = function()
  * @static
  * @param {Boolean} bool True to display, false to hide.
  */
-dwv.gui.displayFilterHtml = function(bool)
+dwv.gui.base.displayFilterHtml = function(bool)
 {
     // filter lsit element
     var filterLi = document.getElementById("filterLi");
@@ -146,7 +149,7 @@ dwv.gui.displayFilterHtml = function(bool)
  * @method displayFilterHtml
  * @static
  */
-dwv.gui.initFilterHtml = function()
+dwv.gui.base.initFilterHtml = function()
 {
     // filter select: reset selected options
     var filterSelector = document.getElementById("filterSelect");
@@ -162,7 +165,7 @@ dwv.gui.filter = dwv.gui.filter || {};
  * @method appendThresholdHtml
  * @static
  */
-dwv.gui.filter.appendThresholdHtml = function()
+dwv.gui.filter.base.appendThresholdHtml = function()
 {
     // threshold list element
     var thresholdLi = document.createElement("li");
@@ -186,7 +189,7 @@ dwv.gui.filter.appendThresholdHtml = function()
  * @static
  * @param {Boolean} bool True to display, false to hide.
  */
-dwv.gui.filter.displayThresholdHtml = function(bool)
+dwv.gui.filter.base.displayThresholdHtml = function(bool)
 {
     // threshold list element
     var thresholdLi = document.getElementById("thresholdLi");
@@ -198,7 +201,7 @@ dwv.gui.filter.displayThresholdHtml = function(bool)
  * @method initThresholdHtml
  * @static
  */
-dwv.gui.filter.initThresholdHtml = function()
+dwv.gui.filter.base.initThresholdHtml = function()
 {
     // threshold slider
     dwv.gui.initSliderHtml();
@@ -209,7 +212,7 @@ dwv.gui.filter.initThresholdHtml = function()
  * @method appendSharpenHtml
  * @static
  */
-dwv.gui.filter.appendSharpenHtml = function()
+dwv.gui.filter.base.appendSharpenHtml = function()
 {
     // sharpen button
     var buttonRun = document.createElement("button");
@@ -238,7 +241,7 @@ dwv.gui.filter.appendSharpenHtml = function()
  * @static
  * @param {Boolean} bool True to display, false to hide.
  */
-dwv.gui.filter.displaySharpenHtml = function(bool)
+dwv.gui.filter.base.displaySharpenHtml = function(bool)
 {
     // sharpen list element
     var sharpenLi = document.getElementById("sharpenLi");
@@ -250,7 +253,7 @@ dwv.gui.filter.displaySharpenHtml = function(bool)
  * @method appendSobelHtml
  * @static
  */
-dwv.gui.filter.appendSobelHtml = function()
+dwv.gui.filter.base.appendSobelHtml = function()
 {
     // sobel button
     var buttonRun = document.createElement("button");
@@ -279,7 +282,7 @@ dwv.gui.filter.appendSobelHtml = function()
  * @static
  * @param {Boolean} bool True to display, false to hide.
  */
-dwv.gui.filter.displaySobelHtml = function(bool)
+dwv.gui.filter.base.displaySobelHtml = function(bool)
 {
     // sobel list element
     var sobelLi = document.getElementById("sobelLi");

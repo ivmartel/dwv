@@ -10,13 +10,14 @@ var dwv = dwv || {};
  * @static
  */
 dwv.gui = dwv.gui || {};
+dwv.gui.base = dwv.gui.base || {};
 
 /**
  * Build the help HTML.
  * @method appendHelpHtml
  * @param {Boolean} mobile Flag for mobile or not environement.
  */
-dwv.gui.appendHelpHtml = function(mobile)
+dwv.gui.base.appendHelpHtml = function(mobile)
 {
     var actionType = "mouse";
     if( mobile ) actionType = "touch";

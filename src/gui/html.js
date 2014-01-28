@@ -462,6 +462,12 @@ dwv.html.getUriParam = function(uri)
     return result;
 };
 
+dwv.html.displayElement = function(id,bool)
+{
+    var element = document.getElementById(id);
+    if( element ) element.style.display = bool ? "" : "none";
+};
+
 /**
  * Toggle the display of an element.
  * @method toggleDisplay
