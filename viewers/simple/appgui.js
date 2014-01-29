@@ -2,27 +2,6 @@
  * Application GUI.
  */
 
-// Loaders
-dwv.gui.appendLoadboxHtml = function(){
-    dwv.gui.base.appendLoadboxHtml();
-};
-
-// File loader
-dwv.gui.appendFileLoadHtml = function(){
-    dwv.gui.base.appendFileLoadHtml();
-};
-dwv.gui.displayFileLoadHtml = function(bool){
-    dwv.gui.base.displayFileLoadHtml(bool);
-};
-
-// Url loader
-dwv.gui.appendUrlLoadHtml = function(){
-    dwv.gui.base.appendUrlLoadHtml();
-};
-dwv.gui.displayUrlLoadHtml = function(bool){
-    dwv.gui.base.displayUrlLoadHtml(bool);
-};
-
 // Toolbox 
 dwv.gui.appendToolboxHtml = function(){
     //dwv.gui.base.appendToolboxHtml();
