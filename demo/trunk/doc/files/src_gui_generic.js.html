@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>src/gui/filter.js - dwv</title>
+    <title>src/gui/generic.js - dwv</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
     <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
@@ -192,7 +192,7 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-                        <h1 class="file-heading">File: src/gui/filter.js</h1>
+                        <h1 class="file-heading">File: src/gui/generic.js</h1>
 
 <div class="file">
     <pre class="code prettyprint linenums">
@@ -209,192 +209,133 @@ var dwv = dwv || {};
  */
 dwv.gui = dwv.gui || {};
 dwv.gui.base = dwv.gui.base || {};
-dwv.gui.filter = dwv.gui.filter || {};
-dwv.gui.filter.base = dwv.gui.filter.base || {};
 
 /**
- * Append the filter HTML to the page.
- * @method appendFilterHtml
+ * Get the size of the image display window.
+ * @method getWindowSize
  * @static
  */
-dwv.gui.base.appendFilterHtml = function()
+dwv.gui.base.getWindowSize = function()
 {
-    // filter select
-    var filterSelector = dwv.html.createHtmlSelect(&quot;filterSelect&quot;,dwv.tool.filters);
-    filterSelector.onchange = dwv.gui.onChangeFilter;
+    return { &#x27;width&#x27;: ($(window).width()), &#x27;height&#x27;: ($(window).height() - 147) };
+};
 
-    // filter list element
-    var filterLi = document.createElement(&quot;li&quot;);
-    filterLi.id = &quot;filterLi&quot;;
-    filterLi.style.display = &quot;none&quot;;
-    filterLi.setAttribute(&quot;class&quot;,&quot;ui-block-b&quot;);
-    filterLi.appendChild(filterSelector);
+/**
+ * Update the progress bar.
+ * @method updateProgress
+ * @static
+ * @param {Object} event A ProgressEvent.
+ */
+dwv.gui.updateProgress = function(event)
+{
+    // event is an ProgressEvent.
+    if( event.lengthComputable )
+    {
+        var percent = Math.round((event.loaded / event.total) * 100);
+        dwv.gui.displayProgress(percent);
+    }
+};
+
+/**
+ * Display a progress value.
+ * @method displayProgress
+ * @static
+ * @param {Number} percent The progress percentage.
+ */
+dwv.gui.base.displayProgress = function(percent)
+{
+    // jquery-mobile specific
+    if( percent &lt; 100 ) {
+        $.mobile.loading(&quot;show&quot;, {text: percent+&quot;%&quot;, textVisible: true, theme: &quot;b&quot;} );
+    }
+    else if( percent === 100 ) {
+        $.mobile.loading(&quot;hide&quot;);
+    }
+};
+
+/**
+ * Refresh a HTML select.
+ * @method refreshSelect
+ * @static
+ * @param {String} selectName The name of the HTML select to refresh.
+ */
+dwv.gui.refreshSelect = function(selectName)
+{
+    // jquery-mobile
+    if( $(selectName).selectmenu ) $(selectName).selectmenu(&#x27;refresh&#x27;);
+};
+
+/**
+ * Append the slider HTML.
+ * @method appendSliderHtml
+ * @static
+ */
+dwv.gui.base.appendSliderHtml = function()
+{
+    // default values
+    var min = 0;
+    var max = 1;
     
-    // node
-    var node = document.getElementById(&quot;toolList&quot;);
-    // apend filter
-    node.appendChild(filterLi);
-    // trigger create event (mobile)
+    // jquery-mobile range slider
+    // minimum input
+    var inputMin = document.createElement(&quot;input&quot;);
+    inputMin.id = &quot;threshold-min&quot;;
+    inputMin.type = &quot;range&quot;;
+    inputMin.max = max;
+    inputMin.min = min;
+    inputMin.value = min;
+    // maximum input
+    var inputMax = document.createElement(&quot;input&quot;);
+    inputMax.id = &quot;threshold-max&quot;;
+    inputMax.type = &quot;range&quot;;
+    inputMax.max = max;
+    inputMax.min = min;
+    inputMax.value = max;
+    // slicer div
+    var div = document.createElement(&quot;div&quot;);
+    div.id = &quot;threshold-div&quot;;
+    div.setAttribute(&quot;data-role&quot;, &quot;rangeslider&quot;);
+    div.appendChild(inputMin);
+    div.appendChild(inputMax);
+    div.setAttribute(&quot;data-mini&quot;, &quot;true&quot;);
+    // append to document
+    document.getElementById(&quot;thresholdLi&quot;).appendChild(div);
+    // bind change
+    $(&quot;#threshold-div&quot;).on(&quot;change&quot;,
+            function( event ) {
+                dwv.gui.onChangeMinMax(
+                    { &quot;min&quot;:$(&quot;#threshold-min&quot;).val(),
+                      &quot;max&quot;:$(&quot;#threshold-max&quot;).val() } );
+            }
+        );
+    // trigger creation
     $(&quot;#toolList&quot;).trigger(&quot;create&quot;);
 };
 
 /**
- * Display the filter HTML.
- * @method displayFilterHtml
- * @static
- * @param {Boolean} bool True to display, false to hide.
- */
-dwv.gui.base.displayFilterHtml = function(bool)
-{
-    // filter lsit element
-    var filterLi = document.getElementById(&quot;filterLi&quot;);
-    filterLi.style.display = bool ? &quot;&quot; : &quot;none&quot;;
-};
-
-/**
- * Initialise the filter HTML.
- * @method displayFilterHtml
+ * Initialise the slider HTML.
+ * @method initSliderHtml
  * @static
  */
-dwv.gui.base.initFilterHtml = function()
+dwv.gui.base.initSliderHtml = function()
 {
-    // filter select: reset selected options
-    var filterSelector = document.getElementById(&quot;filterSelect&quot;);
-    filterSelector.selectedIndex = 0;
-    dwv.gui.refreshSelect(&quot;#filterSelect&quot;);
-};
-
-// create namespace if not there
-dwv.gui.filter = dwv.gui.filter || {};
-
-/**
- * Append the threshold filter HTML to the page.
- * @method appendThresholdHtml
- * @static
- */
-dwv.gui.filter.base.appendThresholdHtml = function()
-{
-    // threshold list element
-    var thresholdLi = document.createElement(&quot;li&quot;);
-    thresholdLi.id = &quot;thresholdLi&quot;;
-    thresholdLi.setAttribute(&quot;class&quot;,&quot;ui-block-c&quot;);
-    thresholdLi.style.display = &quot;none&quot;;
+    var min = app.getImage().getDataRange().min;
+    var max = app.getImage().getDataRange().max;
     
-    // node
-    var node = document.getElementById(&quot;toolList&quot;);
-    // append threshold
-    node.appendChild(thresholdLi);
-    // threshold slider
-    dwv.gui.appendSliderHtml();
-    // trigger create event (mobile)
+    // minimum input
+    var inputMin = document.getElementById(&quot;threshold-min&quot;);
+    inputMin.max = max;
+    inputMin.min = min;
+    inputMin.value = min;
+    // maximum input
+    var inputMax = document.getElementById(&quot;threshold-max&quot;);
+    inputMax.max = max;
+    inputMax.min = min;
+    inputMax.value = max;
+    // trigger creation
     $(&quot;#toolList&quot;).trigger(&quot;create&quot;);
 };
 
-/**
- * Clear the treshold filter HTML.
- * @method displayThresholdHtml
- * @static
- * @param {Boolean} bool True to display, false to hide.
- */
-dwv.gui.filter.base.displayThresholdHtml = function(bool)
-{
-    // threshold list element
-    var thresholdLi = document.getElementById(&quot;thresholdLi&quot;);
-    thresholdLi.style.display = bool ? &quot;&quot; : &quot;none&quot;;
-};
-
-/**
- * Initialise the treshold filter HTML.
- * @method initThresholdHtml
- * @static
- */
-dwv.gui.filter.base.initThresholdHtml = function()
-{
-    // threshold slider
-    dwv.gui.initSliderHtml();
-};
-
-/**
- * Append the sharpen filter HTML to the page.
- * @method appendSharpenHtml
- * @static
- */
-dwv.gui.filter.base.appendSharpenHtml = function()
-{
-    // sharpen button
-    var buttonRun = document.createElement(&quot;button&quot;);
-    buttonRun.id = &quot;runFilterButton&quot;;
-    buttonRun.onclick = dwv.gui.onRunFilter;
-    buttonRun.appendChild(document.createTextNode(&quot;Apply&quot;));
-
-    // sharpen list element
-    var sharpenLi = document.createElement(&quot;li&quot;);
-    sharpenLi.id = &quot;sharpenLi&quot;;
-    sharpenLi.style.display = &quot;none&quot;;
-    sharpenLi.setAttribute(&quot;class&quot;,&quot;ui-block-c&quot;);
-    sharpenLi.appendChild(buttonRun);
-    
-    // node
-    var node = document.getElementById(&quot;toolList&quot;);
-    // append threshold
-    node.appendChild(sharpenLi);
-    // trigger create event (mobile)
-    $(&quot;#toolList&quot;).trigger(&quot;create&quot;);
-};
-
-/**
- * Display the sharpen filter HTML.
- * @method displaySharpenHtml
- * @static
- * @param {Boolean} bool True to display, false to hide.
- */
-dwv.gui.filter.base.displaySharpenHtml = function(bool)
-{
-    // sharpen list element
-    var sharpenLi = document.getElementById(&quot;sharpenLi&quot;);
-    sharpenLi.style.display = bool ? &quot;&quot; : &quot;none&quot;;
-};
-
-/**
- * Append the sobel filter HTML to the page.
- * @method appendSobelHtml
- * @static
- */
-dwv.gui.filter.base.appendSobelHtml = function()
-{
-    // sobel button
-    var buttonRun = document.createElement(&quot;button&quot;);
-    buttonRun.id = &quot;runFilterButton&quot;;
-    buttonRun.onclick = dwv.gui.onRunFilter;
-    buttonRun.appendChild(document.createTextNode(&quot;Apply&quot;));
-
-    // sobel list element
-    var sobelLi = document.createElement(&quot;li&quot;);
-    sobelLi.id = &quot;sobelLi&quot;;
-    sobelLi.style.display = &quot;none&quot;;
-    sobelLi.setAttribute(&quot;class&quot;,&quot;ui-block-c&quot;);
-    sobelLi.appendChild(buttonRun);
-    
-    // node
-    var node = document.getElementById(&quot;toolList&quot;);
-    // append sobel
-    node.appendChild(sobelLi);
-    // trigger create event (mobile)
-    $(&quot;#toolList&quot;).trigger(&quot;create&quot;);
-};
-
-/**
- * Display the sobel filter HTML.
- * @method displaySobelHtml
- * @static
- * @param {Boolean} bool True to display, false to hide.
- */
-dwv.gui.filter.base.displaySobelHtml = function(bool)
-{
-    // sobel list element
-    var sobelLi = document.getElementById(&quot;sobelLi&quot;);
-    sobelLi.style.display = bool ? &quot;&quot; : &quot;none&quot;;
-};
 
 
     </pre>

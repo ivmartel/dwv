@@ -211,38 +211,6 @@ dwv.gui = dwv.gui || {};
 dwv.gui.base = dwv.gui.base || {};
 
 /**
- * Update the progress bar.
- * @method updateProgress
- * @static
- * @param {Object} event A ProgressEvent.
- */
-dwv.gui.updateProgress = function(event)
-{
-    // event is an ProgressEvent.
-    if( event.lengthComputable )
-    {
-        var percent = Math.round((event.loaded / event.total) * 100);
-        if( app.isMobile() )
-        {
-            // jquery-mobile loading
-            if( percent &lt; 100 ) {
-                $.mobile.loading(&quot;show&quot;, {text: percent+&quot;%&quot;, textVisible: true, theme: &quot;b&quot;} );
-            }
-            else if( percent === 100 ) {
-                $.mobile.loading(&quot;hide&quot;);
-            }
-        }
-        else
-        {
-            // jquery-ui progress bar
-            if( percent &lt;= 100 ) {
-                $(&quot;#progressbar&quot;).progressbar({ value: percent });
-            }
-        }
-    }
-};
-
-/**
  * Append the loadbox HTML to the page.
  * @method appendLoadboxHtml
  * @static
