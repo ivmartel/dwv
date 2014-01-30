@@ -24,23 +24,24 @@ dwv.gui.updateProgress = function(event)
     if( event.lengthComputable )
     {
         var percent = Math.round((event.loaded / event.total) * 100);
-        if( app.isMobile() )
-        {
-            // jquery-mobile loading
-            if( percent < 100 ) {
-                $.mobile.loading("show", {text: percent+"%", textVisible: true, theme: "b"} );
-            }
-            else if( percent === 100 ) {
-                $.mobile.loading("hide");
-            }
-        }
-        else
-        {
-            // jquery-ui progress bar
-            if( percent <= 100 ) {
-                $("#progressbar").progressbar({ value: percent });
-            }
-        }
+        dwv.gui.displayProgress(percent);
+    }
+};
+
+/**
+ * Display a progress value.
+ * @method displayProgress
+ * @static
+ * @param {Number} percent The progress percentage.
+ */
+dwv.gui.base.displayProgress = function(percent)
+{
+    // jquery-mobile loading
+    if( percent < 100 ) {
+        $.mobile.loading("show", {text: percent+"%", textVisible: true, theme: "b"} );
+    }
+    else if( percent === 100 ) {
+        $.mobile.loading("hide");
     }
 };
 

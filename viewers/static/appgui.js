@@ -2,6 +2,14 @@
  * Application GUI.
  */
 
+// Progress
+dwv.gui.displayProgress = function(percent){
+    // jquery-ui progress bar
+    if( percent <= 100 ) {
+        $("#progressbar").progressbar({ value: percent });
+    }
+};
+
 // Loaders
 dwv.gui.appendLoadboxHtml = function(){
     dwv.gui.base.appendLoadboxHtml();

@@ -2,6 +2,11 @@
  * Application GUI.
  */
 
+// Progress
+dwv.gui.displayProgress = function(percent){
+    dwv.gui.base.displayProgress(percent);
+};
+
 // Loaders
 dwv.gui.appendLoadboxHtml = function(){
     dwv.gui.base.appendLoadboxHtml();
