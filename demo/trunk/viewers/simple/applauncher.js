@@ -22,13 +22,6 @@ $(document).ready(function(){
     dwv.io.loaders.file = dwv.io.File;
     dwv.io.loaders.url = dwv.io.Url;
 
-    // append load container HTML
-    dwv.gui.appendLoadboxHtml();
-    // append loaders HTML
-    dwv.gui.appendFileLoadHtml();
-    dwv.gui.appendUrlLoadHtml();
-    dwv.gui.displayFileLoadHtml(true);
-
     // Add required tools to the tool list
     dwv.tool.tools = {};
     dwv.tool.tools.windowlevel = new dwv.tool.WindowLevel(app);

@@ -2,6 +2,38 @@
  * Application GUI.
  */
 
+// Window
+dwv.gui.getWindowSize = function(){
+    return { 'width': ($('#pageMain').width() - 360), 'height': ($('#pageMain').height() - 75) };
+};
+// Progress
+dwv.gui.displayProgress = function(percent){
+    // jquery-ui progress bar
+    if( percent <= 100 ) {
+        $("#progressbar").progressbar({ value: percent });
+    }
+};
+// Slider
+dwv.gui.appendSliderHtml = function(){
+    // nothing to do
+};
+dwv.gui.initSliderHtml = function(){
+    var min = app.getImage().getDataRange().min;
+    var max = app.getImage().getDataRange().max;
+    
+    // jquery-ui slider
+    $( "#thresholdLi" ).slider({
+        range: true,
+        min: min,
+        max: max,
+        values: [ min, max ],
+        slide: function( event, ui ) {
+            dwv.gui.onChangeMinMax(
+                    {'min':ui.values[0], 'max':ui.values[1]});
+        }
+    });
+};
+
 // Loaders
 dwv.gui.appendLoadboxHtml = function(){
     dwv.gui.base.appendLoadboxHtml();
