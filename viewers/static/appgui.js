@@ -10,6 +10,27 @@ dwv.gui.displayProgress = function(percent){
     }
 };
 
+// Slider
+dwv.gui.appendSliderHtml = function(){
+    // nothing to do
+};
+dwv.gui.initSliderHtml = function(){
+    var min = app.getImage().getDataRange().min;
+    var max = app.getImage().getDataRange().max;
+    
+    // jquery-ui slider
+    $( "#thresholdLi" ).slider({
+        range: true,
+        min: min,
+        max: max,
+        values: [ min, max ],
+        slide: function( event, ui ) {
+            dwv.gui.onChangeMinMax(
+                    {'min':ui.values[0], 'max':ui.values[1]});
+        }
+    });
+};
+
 // Loaders
 dwv.gui.appendLoadboxHtml = function(){
     dwv.gui.base.appendLoadboxHtml();

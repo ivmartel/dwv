@@ -7,6 +7,14 @@ dwv.gui.displayProgress = function(percent){
     dwv.gui.base.displayProgress(percent);
 };
 
+// Slider
+dwv.gui.appendSliderHtml = function(){
+    dwv.gui.base.appendSliderHtml();
+};
+dwv.gui.initSliderHtml = function(){
+    dwv.gui.base.initSliderHtml();
+};
+
 // Toolbox 
 dwv.gui.appendToolboxHtml = function(){
     //dwv.gui.base.appendToolboxHtml();

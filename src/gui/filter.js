@@ -19,49 +19,46 @@ dwv.gui.filter.base = dwv.gui.filter.base || {};
  * @method appendSliderHtml
  * @static
  */
-dwv.gui.appendSliderHtml = function()
+dwv.gui.base.appendSliderHtml = function()
 {
-    if( app.isMobile() )
-    {
-        // default values
-        var min = 0;
-        var max = 1;
-        
-        // jquery-mobile range slider
-        // minimum input
-        var inputMin = document.createElement("input");
-        inputMin.id = "threshold-min";
-        inputMin.type = "range";
-        inputMin.max = max;
-        inputMin.min = min;
-        inputMin.value = min;
-        // maximum input
-        var inputMax = document.createElement("input");
-        inputMax.id = "threshold-max";
-        inputMax.type = "range";
-        inputMax.max = max;
-        inputMax.min = min;
-        inputMax.value = max;
-        // slicer div
-        var div = document.createElement("div");
-        div.id = "threshold-div";
-        div.setAttribute("data-role", "rangeslider");
-        div.appendChild(inputMin);
-        div.appendChild(inputMax);
-        div.setAttribute("data-mini", "true");
-        // append to document
-        document.getElementById("thresholdLi").appendChild(div);
-        // bind change
-        $("#threshold-div").on("change",
-                function( event ) {
-                    dwv.gui.onChangeMinMax(
-                        { "min":$("#threshold-min").val(),
-                          "max":$("#threshold-max").val() } );
-                }
-            );
-        // trigger creation
-        $("#toolList").trigger("create");
-    }
+    // default values
+    var min = 0;
+    var max = 1;
+    
+    // jquery-mobile range slider
+    // minimum input
+    var inputMin = document.createElement("input");
+    inputMin.id = "threshold-min";
+    inputMin.type = "range";
+    inputMin.max = max;
+    inputMin.min = min;
+    inputMin.value = min;
+    // maximum input
+    var inputMax = document.createElement("input");
+    inputMax.id = "threshold-max";
+    inputMax.type = "range";
+    inputMax.max = max;
+    inputMax.min = min;
+    inputMax.value = max;
+    // slicer div
+    var div = document.createElement("div");
+    div.id = "threshold-div";
+    div.setAttribute("data-role", "rangeslider");
+    div.appendChild(inputMin);
+    div.appendChild(inputMax);
+    div.setAttribute("data-mini", "true");
+    // append to document
+    document.getElementById("thresholdLi").appendChild(div);
+    // bind change
+    $("#threshold-div").on("change",
+            function( event ) {
+                dwv.gui.onChangeMinMax(
+                    { "min":$("#threshold-min").val(),
+                      "max":$("#threshold-max").val() } );
+            }
+        );
+    // trigger creation
+    $("#toolList").trigger("create");
 };
 
 /**
@@ -69,40 +66,23 @@ dwv.gui.appendSliderHtml = function()
  * @method initSliderHtml
  * @static
  */
-dwv.gui.initSliderHtml = function()
+dwv.gui.base.initSliderHtml = function()
 {
     var min = app.getImage().getDataRange().min;
     var max = app.getImage().getDataRange().max;
     
-    if( app.isMobile() )
-    {
-        // minimum input
-        var inputMin = document.getElementById("threshold-min");
-        inputMin.max = max;
-        inputMin.min = min;
-        inputMin.value = min;
-        // maximum input
-        var inputMax = document.getElementById("threshold-max");
-        inputMax.max = max;
-        inputMax.min = min;
-        inputMax.value = max;
-        // trigger creation
-        $("#toolList").trigger("create");
-    }
-    else
-    {
-        // jquery-ui slider
-        $( "#thresholdLi" ).slider({
-            range: true,
-            min: min,
-            max: max,
-            values: [ min, max ],
-            slide: function( event, ui ) {
-                dwv.gui.onChangeMinMax(
-                        {'min':ui.values[0], 'max':ui.values[1]});
-            }
-        });
-    }
+    // minimum input
+    var inputMin = document.getElementById("threshold-min");
+    inputMin.max = max;
+    inputMin.min = min;
+    inputMin.value = min;
+    // maximum input
+    var inputMax = document.getElementById("threshold-max");
+    inputMax.max = max;
+    inputMax.min = min;
+    inputMax.value = max;
+    // trigger creation
+    $("#toolList").trigger("create");
 };
 
 /**
