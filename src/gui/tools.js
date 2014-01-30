@@ -13,18 +13,6 @@ dwv.gui = dwv.gui || {};
 dwv.gui.base = dwv.gui.base || {};
 
 /**
- * Refresh a HTML select.
- * @method refreshSelect
- * @static
- * @param {String} selectName The name of the HTML select to refresh.
- */
-dwv.gui.refreshSelect = function(selectName)
-{
-    // jquery-mobile
-    if( $(selectName).selectmenu ) $(selectName).selectmenu('refresh');
-};
-
-/**
  * Append the toolbox HTML to the page.
  * @method appendToolboxHtml
  * @static
