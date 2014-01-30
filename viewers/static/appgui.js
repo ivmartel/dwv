@@ -2,6 +2,10 @@
  * Application GUI.
  */
 
+// Window
+dwv.gui.getWindowSize = function(){
+    return { 'width': ($('#pageMain').width() - 360), 'height': ($('#pageMain').height() - 75) };
+};
 // Progress
 dwv.gui.displayProgress = function(percent){
     // jquery-ui progress bar
@@ -9,7 +13,6 @@ dwv.gui.displayProgress = function(percent){
         $("#progressbar").progressbar({ value: percent });
     }
 };
-
 // Slider
 dwv.gui.appendSliderHtml = function(){
     // nothing to do

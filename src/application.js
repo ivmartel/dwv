@@ -6,9 +6,8 @@ var dwv = dwv || {};
  * @class App
  * @namespace dwv
  * @constructor
- * @param {Boolean} mobile Handle mobile or not.
  */
-dwv.App = function(mobile)
+dwv.App = function()
 {
     // Local object
     var self = this;
@@ -112,20 +111,11 @@ dwv.App = function(mobile)
      */
     this.getUndoStack = function() { return undoStack; };
 
-    /** 
-     * Get the mobile flag.
-     * @method isMobile
-     * @return {Boolean} The mobile flag.
-     */
-    this.isMobile = function() { return mobile; };
-
     /**
      * Initialise the HTML for the application.
      * @method init
      */
-    this.init = function()
-    {
-    };
+    this.init = function(){};
     
     /**
      * Reset the application.
@@ -239,17 +229,8 @@ dwv.App = function(mobile)
     this.resize = function()
     {
         // adapt the size of the layer container
-        var mainWidth = 0;
-        var mainHeight = 0;
-        if( mobile ) {
-            mainWidth = $(window).width();
-            mainHeight = $(window).height() - 147;
-        }
-        else {
-            mainWidth = $('#pageMain').width() - 360;
-            mainHeight = $('#pageMain').height() - 75;
-        }
-        displayZoom = Math.min( (mainWidth / dataWidth), (mainHeight / dataHeight) );
+        var size = dwv.gui.getWindowSize();
+        displayZoom = Math.min( (size.width / dataWidth), (size.height / dataHeight) );
         $("#layerContainer").width(parseInt(displayZoom*dataWidth, 10));
         $("#layerContainer").height(parseInt(displayZoom*dataHeight, 10));
     };
@@ -317,56 +298,53 @@ dwv.App = function(mobile)
         // Store the event position relative to the image canvas
         // in an extra member of the event:
         // event._x and event._y.
-        if( mobile )
+        if( event.type === "touchstart" ||
+            event.type === "touchmove")
         {
-            if( event.type === "touchstart" ||
-                event.type === "touchmove")
+            event.preventDefault();
+            var touches = event.targetTouches;
+            // If there's one or two fingers inside this element
+            if( touches.length === 1 || touches.length === 2)
             {
-                event.preventDefault();
-                var touches = event.targetTouches;
-                // If there's one or two fingers inside this element
-                if( touches.length === 1 || touches.length === 2)
-                {
-                  var touch = touches[0];
+              var touch = touches[0];
+              // store
+              event._x = touch.pageX - parseInt(app.getImageLayer().getOffset().left, 10);
+              event._x = parseInt( (event._x / displayZoom), 10 );
+              event._y = touch.pageY - parseInt(app.getImageLayer().getOffset().top, 10);
+              event._y = parseInt( (event._y / displayZoom), 10 );
+              // second finger
+              if (touches.length === 2) {
+                  touch = touches[1];
                   // store
-                  event._x = touch.pageX - parseInt(app.getImageLayer().getOffset().left, 10);
-                  event._x = parseInt( (event._x / displayZoom), 10 );
-                  event._y = touch.pageY - parseInt(app.getImageLayer().getOffset().top, 10);
-                  event._y = parseInt( (event._y / displayZoom), 10 );
-                  // second finger
-                  if (touches.length === 2) {
-                      touch = touches[1];
-                      // store
-                      event._x1 = touch.pageX - parseInt(app.getImageLayer().getOffset().left, 10);
-                      event._x1 = parseInt( (event._x1 / displayZoom), 10 );
-                      event._y1 = touch.pageY - parseInt(app.getImageLayer().getOffset().top, 10);
-                      event._y1 = parseInt( (event._y1 / displayZoom), 10 );
-                  }
-                  // set handle event flag
-                  handled = true;
-                }
+                  event._x1 = touch.pageX - parseInt(app.getImageLayer().getOffset().left, 10);
+                  event._x1 = parseInt( (event._x1 / displayZoom), 10 );
+                  event._y1 = touch.pageY - parseInt(app.getImageLayer().getOffset().top, 10);
+                  event._y1 = parseInt( (event._y1 / displayZoom), 10 );
+              }
+              // set handle event flag
+              handled = true;
             }
-            else if( event.type === "touchend" ) handled = true;
         }
-        else
+        else if( event.type === "mousemove" ||
+            event.type === "mousedown" ||
+            event.type === "mouseup" ||
+            event.type === "mouseout" ||
+            event.type === "mousewheel" ||
+            event.type === "dblclick" ||
+            event.type === "DOMMouseScroll" )
         {
-            if( event.type === "mousemove" ||
-                event.type === "mousedown" ||
-                event.type === "mouseup" ||
-                event.type === "mouseout" ||
-                event.type === "mousewheel" ||
-                event.type === "dblclick" ||
-                event.type === "DOMMouseScroll" )
-            {
-                // layerX is for firefox
-                event._x = event.offsetX === undefined ? event.layerX : event.offsetX;
-                event._x = parseInt( (event._x / displayZoom), 10 );
-                event._y = event.offsetY === undefined ? event.layerY : event.offsetY;
-                event._y = parseInt( (event._y / displayZoom), 10 );
-                // set handle event flag
-                handled = true;
-            }
-            else if( event.type === "keydown" ) handled = true;
+            // layerX is for firefox
+            event._x = event.offsetX === undefined ? event.layerX : event.offsetX;
+            event._x = parseInt( (event._x / displayZoom), 10 );
+            event._y = event.offsetY === undefined ? event.layerY : event.offsetY;
+            event._y = parseInt( (event._y / displayZoom), 10 );
+            // set handle event flag
+            handled = true;
+        }
+        else if( event.type === "keydown" || 
+                event.type === "touchend")
+        {
+            handled = true;
         }
             
         // Call the event handler of the tool.

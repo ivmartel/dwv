@@ -2,11 +2,14 @@
  * Application GUI.
  */
 
+// Window
+dwv.gui.getWindowSize = function(){
+    return dwv.gui.base.getWindowSize();
+};
 // Progress
 dwv.gui.displayProgress = function(percent){
     dwv.gui.base.displayProgress(percent);
 };
-
 // Slider
 dwv.gui.appendSliderHtml = function(){
     dwv.gui.base.appendSliderHtml();
