@@ -10081,7 +10081,7 @@ dwv.tool.colourMaps = {
 dwv.tool.presets = {};
 dwv.tool.defaultpresets = {};
 dwv.tool.defaultpresets.CT = {
-    "abdomen": {"center": 350, "width": 40},
+    "abdomen": {"center": 40, "width": 350},
     "lung": {"center": -600, "width": 1500},
     "brain": {"center": 40, "width": 80},
     "bone": {"center": 480, "width": 2500},
