@@ -32,7 +32,8 @@ $(document).ready(function(){
     // Add required tools to the tool list
     dwv.tool.tools = {};
     dwv.tool.tools.windowlevel = new dwv.tool.WindowLevel(app);
-    dwv.tool.tools.zoom = new dwv.tool.Zoom(app);
+    dwv.tool.tools.navigate = new dwv.tool.Navigate(app);
+    dwv.tool.tools.scroll = new dwv.tool.Scroll(app);
     dwv.tool.tools.draw = new dwv.tool.Draw(app);
     dwv.tool.tools.livewire = new dwv.tool.Livewire(app);
 
@@ -47,7 +48,8 @@ $(document).ready(function(){
     dwv.gui.appendToolboxHtml();
     // append tools HTML
     dwv.gui.appendWindowLevelHtml();
-    dwv.gui.appendZoomHtml();
+    dwv.gui.appendNavigateHtml();
+    dwv.gui.appendScrollHtml();
     dwv.gui.appendDrawHtml();
     dwv.gui.appendLivewireHtml();
     

@@ -36,6 +36,22 @@ dwv.tool.updateWindowingData = function(wc,ww)
 };
 
 /**
+ * Set the active window/level preset.
+ * @method updateWindowingData
+ * @param {String} name The name of the preset to set.
+ */
+dwv.tool.updateWindowingDataFromName = function(name)
+{
+    // check if we have it
+    if( !dwv.tool.presets[name] )
+        throw new Error("Unknown window level preset: '" + name + "'");
+    // enable it
+    dwv.tool.updateWindowingData( 
+        dwv.tool.presets[name].center, 
+        dwv.tool.presets[name].width );
+};
+
+/**
  * Update the views' colour map.
  * @method updateColourMap
  * @static
@@ -44,6 +60,20 @@ dwv.tool.updateWindowingData = function(wc,ww)
 dwv.tool.updateColourMap = function(colourMap)
 {
     app.getView().setColorMap(colourMap);
+};
+
+/**
+ * Update the views' colour map.
+ * @function updateColourMap
+ * @param {String} name The name of the colour map to set.
+ */
+dwv.tool.updateColourMapFromName = function(name)
+{
+    // check if we have it
+    if( !dwv.tool.colourMaps[name] )
+        throw new Error("Unknown colour map: '" + name + "'");
+    // enable it
+    dwv.tool.updateColourMap( dwv.tool.colourMaps[name] );
 };
 
 // Default colour maps.
@@ -104,21 +134,6 @@ dwv.tool.WindowLevel = function(app)
     };
     
     /**
-     * Handle two touch down event.
-     * @method twotouchdown
-     * @param {Object} event The touch down event.
-     */
-    this.twotouchdown = function(event){
-        // set start flag
-        self.started = true;
-        // store initial positions
-        self.x0 = event._x;
-        self.y0 = event._y;
-        self.x1 = event._x1;
-        self.y1 = event._y1;
-    };
-    
-    /**
      * Handle mouse move event.
      * @method mousemove
      * @param {Object} event The mouse move event.
@@ -136,25 +151,6 @@ dwv.tool.WindowLevel = function(app)
         dwv.tool.updateWindowingData(windowCenter,windowWidth);
         // store position
         self.x0 = event._x;
-        self.y0 = event._y;
-    };
-    
-    /**
-     * Handle two touch move event.
-     * @method twotouchmove
-     * @param {Object} event The touch move event.
-     */
-    this.twotouchmove = function(event){
-        // check start flag
-        if( !self.started ) return;
-        // difference  to last position
-        var diffY = event._y - self.y0;
-        // do not trigger for small moves
-        if( Math.abs(diffY) < 15 ) return;
-        // update GUI
-        if( diffY > 0 ) app.getView().incrementSliceNb();
-        else app.getView().decrementSliceNb();
-        // store position
         self.y0 = event._y;
     };
     
@@ -184,9 +180,7 @@ dwv.tool.WindowLevel = function(app)
      * @param {Object} event The touch start event.
      */
     this.touchstart = function(event){
-        // dispatch to one or two touch handler
-        if( event.targetTouches.length === 1 ) self.mousedown(event);
-        else if( event.targetTouches.length === 2 ) self.twotouchdown(event);
+        self.mousedown(event);
     };
     
     /**
@@ -195,9 +189,7 @@ dwv.tool.WindowLevel = function(app)
      * @param {Object} event The touch move event.
      */
     this.touchmove = function(event){
-        // dispatch to one or two touch handler
-        if( event.targetTouches.length === 1 ) self.mousemove(event);
-        else if( event.targetTouches.length === 2 ) self.twotouchmove(event);
+        self.mousemove(event);
     };
     
     /**
@@ -206,7 +198,6 @@ dwv.tool.WindowLevel = function(app)
      * @param {Object} event The touch end event.
      */
     this.touchend = function(event){
-        // treat as mouse up
         self.mouseup(event);
     };
     
@@ -220,28 +211,6 @@ dwv.tool.WindowLevel = function(app)
         dwv.tool.updateWindowingData(
             parseInt(app.getImage().getRescaledValue(event._x, event._y, app.getView().getCurrentPosition().k), 10),
             parseInt(app.getView().getWindowLut().getWidth(), 10) );    
-    };
-    
-    /**
-     * Handle mouse scroll event (fired by Firefox).
-     * @method DOMMouseScroll
-     * @param {Object} event The mouse scroll event.
-     */
-    this.DOMMouseScroll = function(event){
-        // update GUI
-        if( event.detail > 0 ) app.getView().incrementSliceNb();
-        else app.getView().decrementSliceNb();
-    };
-    
-    /**
-     * Handle mouse wheel event.
-     * @method mousewheel
-     * @param {Object} event The mouse wheel event.
-     */
-    this.mousewheel = function(event){
-        // update GUI
-        if( event.wheelDelta > 0 ) app.getView().incrementSliceNb();
-        else app.getView().decrementSliceNb();
     };
     
     /**
@@ -290,11 +259,9 @@ dwv.tool.WindowLevel.prototype.getHelp = function()
         'mouse': {
             'mouse_drag': "A single mouse drag changes the window in the horizontal direction and the level in the vertical one.",
             'double_click': "A double click will center the window and level on the clicked intensity.",
-            'mouse_wheel': "The mouse wheel is used to navigate through slices."
         },
         'touch': {
             'touch_drag': "A single touch drag changes the window in the horizontal direction and the level in the vertical one.",
-            'twotouch_drag': "A double finger drag allows to navigate through slices."
         }
     };
 };
@@ -327,34 +294,4 @@ dwv.tool.WindowLevel.prototype.updatePresets = function()
     for( var key in dwv.tool.defaultpresets[modality] ) {
         dwv.tool.presets[key] = dwv.tool.defaultpresets[modality][key];
     }
-};
-
-/**
- * Set the active window/level preset.
- * @method setPreset
- * @param {String} name The name of the preset to set.
- */
-dwv.tool.WindowLevel.prototype.setPreset = function(name)
-{
-    // check if we have it
-    if( !dwv.tool.presets[name] )
-        throw new Error("Unknown window level preset: '" + name + "'");
-    // enable it
-    dwv.tool.updateWindowingData( 
-        dwv.tool.presets[name].center, 
-        dwv.tool.presets[name].width );
-};
-
-/**
- * Set the active colour map.
- * @function setColourMap
- * @param {String} name The name of the colour map to set.
- */
-dwv.tool.WindowLevel.prototype.setColourMap = function(name)
-{
-    // check if we have it
-    if( !dwv.tool.colourMaps[name] )
-        throw new Error("Unknown colour map: '" + name + "'");
-    // enable it
-    dwv.tool.updateColourMap( dwv.tool.colourMaps[name] );
 };

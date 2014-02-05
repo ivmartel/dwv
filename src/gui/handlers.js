@@ -20,7 +20,7 @@ dwv.gui = dwv.gui || {};
  */
 dwv.gui.onChangeWindowLevelPreset = function(event)
 {
-    app.getToolBox().getSelectedTool().setPreset(this.value);
+    dwv.tool.updateWindowingDataFromName(this.value);
 };
 
 /**
@@ -31,7 +31,7 @@ dwv.gui.onChangeWindowLevelPreset = function(event)
  */
 dwv.gui.onChangeColourMap = function(event)
 {
-    app.getToolBox().getSelectedTool().setColourMap(this.value);
+    dwv.tool.updateColourMapFromName(this.value);
 };
 
 /**

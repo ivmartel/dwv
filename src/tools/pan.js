@@ -16,7 +16,7 @@ dwv.tool = dwv.tool || {};
  * @method zoomReset
  * @static
  */
-dwv.tool.zoomReset = function(event)
+dwv.tool.panReset = function(event)
 {
     app.getImageLayer().resetLayout();
     app.getImageLayer().draw();
@@ -25,13 +25,13 @@ dwv.tool.zoomReset = function(event)
 };
 
 /**
- * Zoom class.
- * @class Zoom
+ * Pan class.
+ * @class Pan
  * @namespace dwv.tool
  * @constructor
  * @param {Object} app The associated application.
  */
-dwv.tool.Zoom = function(app)
+dwv.tool.Pan = function(app)
 {
     /**
      * Closure to self: to be used by event handlers.
@@ -55,8 +55,6 @@ dwv.tool.Zoom = function(app)
     this.mousedown = function(event){
         self.started = true;
         // first position
-        self.cx = event._x;
-        self.cy = event._y;
         self.x0 = event._x;
         self.y0 = event._y;
      };
@@ -67,13 +65,14 @@ dwv.tool.Zoom = function(app)
       * @param {Object} event The mouse move event.
       */
      this.mousemove = function(event){
-        // check start flag
-        if( !self.started ) return;
-        // calculate translation in Y
+        if (!self.started) return;
+
+        // calculate translation
+        var tx = (event._x - self.x0);
         var ty = (event._y - self.y0);
-        // zoom
-        var step = - ty / 100;
-        zoomLayers(step, self.cx, self.cy);
+        // apply translation
+        translateLayers(tx, ty);
+        
         // reset origin point
         self.x0 = event._x;
         self.y0 = event._y;
@@ -143,36 +142,35 @@ dwv.tool.Zoom = function(app)
      * @param {Boolean} bool The flag to enable or not.
      */
     this.display = function(bool){
-        dwv.gui.displayZoomHtml(bool);
+        dwv.gui.displayPanHtml(bool);
     };
 
     /**
-     * Apply the zoom to the layers.
-     * @method zoomLayers
-     * @param {Number} step The zoom step increment. A good step is of 0.1.
-     * @param {Number} cx The zoom center X coordinate.
-     * @param {Number} cy The zoom center Y coordinate.
+     * Apply a translation to the layers.
+     * @method translateLayers
+     * @param {Number} tx The translation along X.
+     * @param {Number} ty The translation along Y.
      */ 
-    function zoomLayers(step, cx, cy)
+    function translateLayers(tx, ty)
     {
         if( app.getImageLayer() ) 
-            app.getImageLayer().zoom(step, step, cx, cy);
+            app.getImageLayer().translate(tx, ty);
         if( app.getDrawLayer() ) 
-            app.getDrawLayer().zoom(step, step, cx, cy);
+            app.getDrawLayer().translate(tx, ty);
     }
 
-}; // Zoom class
+}; // Navigate class
 
 /**
  * Help for this tool.
  * @method getHelp
  * @returns {Object} The help content.
  */
-dwv.tool.Zoom.prototype.getHelp = function()
+dwv.tool.Pan.prototype.getHelp = function()
 {
     return {
-        'title': "Zoom",
-        'brief': "The zoom tool allows to zoom the image.",
+        'title': "Pan",
+        'brief': "The pan tool allows to drag the image.",
         'mouse': {
             'mouse_drag': "A single mouse drag drags the image in the desired direction.",
         },
@@ -186,6 +184,6 @@ dwv.tool.Zoom.prototype.getHelp = function()
  * Initialise the tool.
  * @method init
  */
-dwv.tool.Zoom.prototype.init = function() {
+dwv.tool.Pan.prototype.init = function() {
     // nothing to do.
 };

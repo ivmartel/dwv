@@ -12,26 +12,13 @@ var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
 
 /**
- * Reset the application zoom.
- * @method zoomReset
- * @static
- */
-dwv.tool.zoomReset = function(event)
-{
-    app.getImageLayer().resetLayout();
-    app.getImageLayer().draw();
-    app.getDrawLayer().resetLayout();
-    app.getDrawLayer().draw();
-};
-
-/**
- * Zoom class.
- * @class Zoom
+ * Scroll class.
+ * @class Scroll
  * @namespace dwv.tool
  * @constructor
  * @param {Object} app The associated application.
  */
-dwv.tool.Zoom = function(app)
+dwv.tool.Scroll = function(app)
 {
     /**
      * Closure to self: to be used by event handlers.
@@ -55,8 +42,6 @@ dwv.tool.Zoom = function(app)
     this.mousedown = function(event){
         self.started = true;
         // first position
-        self.cx = event._x;
-        self.cy = event._y;
         self.x0 = event._x;
         self.y0 = event._y;
      };
@@ -67,13 +52,15 @@ dwv.tool.Zoom = function(app)
       * @param {Object} event The mouse move event.
       */
      this.mousemove = function(event){
-        // check start flag
-        if( !self.started ) return;
-        // calculate translation in Y
-        var ty = (event._y - self.y0);
-        // zoom
-        var step = - ty / 100;
-        zoomLayers(step, self.cx, self.cy);
+        if (!self.started) return;
+
+        // difference to last position
+        var diffY = event._y - self.y0;
+        // do not trigger for small moves
+        if( Math.abs(diffY) < 15 ) return;
+        // update GUI
+        if( diffY > 0 ) app.getView().incrementSliceNb();
+        else app.getView().decrementSliceNb();
         // reset origin point
         self.x0 = event._x;
         self.y0 = event._y;
@@ -143,36 +130,21 @@ dwv.tool.Zoom = function(app)
      * @param {Boolean} bool The flag to enable or not.
      */
     this.display = function(bool){
-        dwv.gui.displayZoomHtml(bool);
+        dwv.gui.displayScrollHtml(bool);
     };
 
-    /**
-     * Apply the zoom to the layers.
-     * @method zoomLayers
-     * @param {Number} step The zoom step increment. A good step is of 0.1.
-     * @param {Number} cx The zoom center X coordinate.
-     * @param {Number} cy The zoom center Y coordinate.
-     */ 
-    function zoomLayers(step, cx, cy)
-    {
-        if( app.getImageLayer() ) 
-            app.getImageLayer().zoom(step, step, cx, cy);
-        if( app.getDrawLayer() ) 
-            app.getDrawLayer().zoom(step, step, cx, cy);
-    }
-
-}; // Zoom class
+}; // Scroll class
 
 /**
  * Help for this tool.
  * @method getHelp
  * @returns {Object} The help content.
  */
-dwv.tool.Zoom.prototype.getHelp = function()
+dwv.tool.Scroll.prototype.getHelp = function()
 {
     return {
-        'title': "Zoom",
-        'brief': "The zoom tool allows to zoom the image.",
+        'title': "Scroll",
+        'brief': "The navigate tool allows to scroll through slices.",
         'mouse': {
             'mouse_drag': "A single mouse drag drags the image in the desired direction.",
         },
@@ -186,6 +158,6 @@ dwv.tool.Zoom.prototype.getHelp = function()
  * Initialise the tool.
  * @method init
  */
-dwv.tool.Zoom.prototype.init = function() {
+dwv.tool.Scroll.prototype.init = function() {
     // nothing to do.
 };

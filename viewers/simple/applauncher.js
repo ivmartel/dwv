@@ -26,12 +26,17 @@ $(document).ready(function(){
     dwv.tool.tools = {};
     dwv.tool.tools.windowlevel = new dwv.tool.WindowLevel(app);
     dwv.tool.tools.zoom = new dwv.tool.Zoom(app);
+    dwv.tool.tools.pan = new dwv.tool.Pan(app);
+    dwv.tool.tools.scroll = new dwv.tool.Scroll(app);
 
     // append tool container HTML
     dwv.gui.appendToolboxHtml();
     // append tools HTML
     dwv.gui.appendWindowLevelHtml();
+    dwv.gui.appendScrollHtml();
     dwv.gui.appendZoomHtml();
+    dwv.gui.appendPanHtml();
+    dwv.gui.appendResetHtml();
     
     // initialise the application
     app.init();
