@@ -336,6 +336,30 @@
                 "dwv.tool": 1
             }
         },
+        "src/tools/navigate.js": {
+            "name": "src/tools/navigate.js",
+            "modules": {},
+            "classes": {
+                "dwv.tool.Navigate": 1
+            },
+            "fors": {},
+            "namespaces": {
+                "dwv": 1,
+                "dwv.tool": 1
+            }
+        },
+        "src/tools/pan.js": {
+            "name": "src/tools/pan.js",
+            "modules": {},
+            "classes": {
+                "dwv.tool.Pan": 1
+            },
+            "fors": {},
+            "namespaces": {
+                "dwv": 1,
+                "dwv.tool": 1
+            }
+        },
         "src/tools/rectangle.js": {
             "name": "src/tools/rectangle.js",
             "modules": {},
@@ -355,6 +379,18 @@
             },
             "fors": {},
             "namespaces": {
+                "dwv.tool": 1
+            }
+        },
+        "src/tools/scroll.js": {
+            "name": "src/tools/scroll.js",
+            "modules": {},
+            "classes": {
+                "dwv.tool.Scroll": 1
+            },
+            "fors": {},
+            "namespaces": {
+                "dwv": 1,
                 "dwv.tool": 1
             }
         },
@@ -561,11 +597,14 @@
                 "dwv.tool.DrawLineCommand": 1,
                 "dwv.tool.Livewire": 1,
                 "dwv.tool.DrawLivewireCommand": 1,
+                "dwv.tool": 1,
+                "dwv.tool.Navigate": 1,
+                "dwv.tool.Pan": 1,
                 "dwv.tool.DrawRectangleCommand": 1,
                 "dwv.tool.DrawRoiCommand": 1,
+                "dwv.tool.Scroll": 1,
                 "dwv.tool.ToolBox": 1,
                 "dwv.tool.UndoStack": 1,
-                "dwv.tool": 1,
                 "dwv.tool.WindowLevel": 1,
                 "dwv.tool.Zoom": 1
             },
@@ -1464,6 +1503,65 @@
                 }
             ]
         },
+        "dwv.tool": {
+            "name": "dwv.tool",
+            "shortname": "dwv.tool",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "tool",
+            "namespace": "dwv",
+            "file": "src/tools/zoom.js",
+            "line": 6,
+            "description": "Namespace for tool functions.",
+            "static": 1
+        },
+        "dwv.tool.Navigate": {
+            "name": "dwv.tool.Navigate",
+            "shortname": "dwv.tool.Navigate",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "tool",
+            "namespace": "dwv.tool",
+            "file": "src/tools/navigate.js",
+            "line": 27,
+            "description": "Navigate class.",
+            "is_constructor": 1,
+            "params": [
+                {
+                    "name": "app",
+                    "description": "The associated application.",
+                    "type": "Object"
+                }
+            ]
+        },
+        "dwv.tool.Pan": {
+            "name": "dwv.tool.Pan",
+            "shortname": "dwv.tool.Pan",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "tool",
+            "namespace": "dwv.tool",
+            "file": "src/tools/pan.js",
+            "line": 27,
+            "description": "Pan class.",
+            "is_constructor": 1,
+            "params": [
+                {
+                    "name": "app",
+                    "description": "The associated application.",
+                    "type": "Object"
+                }
+            ]
+        },
         "dwv.tool.DrawRectangleCommand": {
             "name": "dwv.tool.DrawRectangleCommand",
             "shortname": "dwv.tool.DrawRectangleCommand",
@@ -1528,6 +1626,28 @@
                 }
             ]
         },
+        "dwv.tool.Scroll": {
+            "name": "dwv.tool.Scroll",
+            "shortname": "dwv.tool.Scroll",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "tool",
+            "namespace": "dwv.tool",
+            "file": "src/tools/scroll.js",
+            "line": 14,
+            "description": "Scroll class.",
+            "is_constructor": 1,
+            "params": [
+                {
+                    "name": "app",
+                    "description": "The associated application.",
+                    "type": "Object"
+                }
+            ]
+        },
         "dwv.tool.ToolBox": {
             "name": "dwv.tool.ToolBox",
             "shortname": "dwv.tool.ToolBox",
@@ -1572,21 +1692,6 @@
                 }
             ]
         },
-        "dwv.tool": {
-            "name": "dwv.tool",
-            "shortname": "dwv.tool",
-            "classitems": [],
-            "plugins": [],
-            "extensions": [],
-            "plugin_for": [],
-            "extension_for": [],
-            "module": "tool",
-            "namespace": "dwv",
-            "file": "src/tools/zoom.js",
-            "line": 6,
-            "description": "Namespace for tool functions.",
-            "static": 1
-        },
         "dwv.tool.WindowLevel": {
             "name": "dwv.tool.WindowLevel",
             "shortname": "dwv.tool.WindowLevel",
@@ -1598,7 +1703,7 @@
             "module": "tool",
             "namespace": "dwv.tool",
             "file": "src/tools/windowLevel.js",
-            "line": 68,
+            "line": 98,
             "description": "WindowLevel tool: handle window/level related events.",
             "is_constructor": 1,
             "params": [
@@ -3764,7 +3869,36 @@
         {
             "file": "src/gui/tools.js",
             "line": 266,
-            "description": "Append the zoom HTML to the page.",
+            "description": "Append the Navigate HTML to the page.",
+            "itemtype": "method",
+            "name": "appendNavigateHtml",
+            "static": 1,
+            "class": "dwv.gui",
+            "module": "gui",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/gui/tools.js",
+            "line": 296,
+            "description": "Display the Navigate HTML.",
+            "itemtype": "method",
+            "name": "displayNavigateHtml",
+            "static": 1,
+            "params": [
+                {
+                    "name": "bool",
+                    "description": "True to display, false to hide.",
+                    "type": "Boolean"
+                }
+            ],
+            "class": "dwv.gui",
+            "module": "gui",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/gui/tools.js",
+            "line": 308,
+            "description": "Append the Zoom HTML to the page.",
             "itemtype": "method",
             "name": "appendZoomHtml",
             "static": 1,
@@ -3774,10 +3908,68 @@
         },
         {
             "file": "src/gui/tools.js",
-            "line": 296,
-            "description": "Display the zoom HTML.",
+            "line": 338,
+            "description": "Display the Zoom HTML.",
             "itemtype": "method",
             "name": "displayZoomHtml",
+            "static": 1,
+            "params": [
+                {
+                    "name": "bool",
+                    "description": "True to display, false to hide.",
+                    "type": "Boolean"
+                }
+            ],
+            "class": "dwv.gui",
+            "module": "gui",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/gui/tools.js",
+            "line": 350,
+            "description": "Append the Pan HTML to the page.",
+            "itemtype": "method",
+            "name": "appendPanHtml",
+            "static": 1,
+            "class": "dwv.gui",
+            "module": "gui",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/gui/tools.js",
+            "line": 380,
+            "description": "Display the pan HTML.",
+            "itemtype": "method",
+            "name": "displayPanHtml",
+            "static": 1,
+            "params": [
+                {
+                    "name": "bool",
+                    "description": "True to display, false to hide.",
+                    "type": "Boolean"
+                }
+            ],
+            "class": "dwv.gui",
+            "module": "gui",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/gui/tools.js",
+            "line": 392,
+            "description": "Append the Scroll HTML to the page.",
+            "itemtype": "method",
+            "name": "appendScrollHtml",
+            "static": 1,
+            "class": "dwv.gui",
+            "module": "gui",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/gui/tools.js",
+            "line": 413,
+            "description": "Display the Scroll HTML.",
+            "itemtype": "method",
+            "name": "displayScrollHtml",
             "static": 1,
             "params": [
                 {
@@ -7514,6 +7706,569 @@
             "namespace": "dwv.tool"
         },
         {
+            "file": "src/tools/navigate.js",
+            "line": 14,
+            "description": "Reset the application zoom.",
+            "itemtype": "method",
+            "name": "zoomReset",
+            "static": 1,
+            "class": "dwv.tool",
+            "module": "tool",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/tools/navigate.js",
+            "line": 36,
+            "description": "Closure to self: to be used by event handlers.",
+            "itemtype": "property",
+            "name": "self",
+            "access": "private",
+            "tagname": "",
+            "type": "WindowLevel",
+            "class": "dwv.tool.Navigate",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/navigate.js",
+            "line": 43,
+            "description": "Interaction start flag.",
+            "itemtype": "property",
+            "name": "started",
+            "type": "Boolean",
+            "class": "dwv.tool.Navigate",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/navigate.js",
+            "line": 50,
+            "description": "Handle mouse down event.",
+            "itemtype": "method",
+            "name": "mousedown",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The mouse down event.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.tool.Navigate",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/navigate.js",
+            "line": 62,
+            "description": "Handle two touch down event.",
+            "itemtype": "method",
+            "name": "twotouchdown",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The touch down event.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.tool.Navigate",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/navigate.js",
+            "line": 79,
+            "description": "Handle mouse move event.",
+            "itemtype": "method",
+            "name": "mousemove",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The mouse move event.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.tool.Navigate",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/navigate.js",
+            "line": 101,
+            "description": "Handle two touch move event.",
+            "itemtype": "method",
+            "name": "twotouchmove",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The touch move event.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.tool.Navigate",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/navigate.js",
+            "line": 136,
+            "description": "Handle mouse up event.",
+            "itemtype": "method",
+            "name": "mouseup",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The mouse up event.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.tool.Navigate",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/navigate.js",
+            "line": 149,
+            "description": "Handle mouse out event.",
+            "itemtype": "method",
+            "name": "mouseout",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The mouse out event.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.tool.Navigate",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/navigate.js",
+            "line": 158,
+            "description": "Handle touch start event.",
+            "itemtype": "method",
+            "name": "touchstart",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The touch start event.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.tool.Navigate",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/navigate.js",
+            "line": 173,
+            "description": "Handle touch move event.",
+            "itemtype": "method",
+            "name": "touchmove",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The touch move event.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.tool.Navigate",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/navigate.js",
+            "line": 188,
+            "description": "Handle touch end event.",
+            "itemtype": "method",
+            "name": "touchend",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The touch end event.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.tool.Navigate",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/navigate.js",
+            "line": 197,
+            "description": "Handle mouse scroll event (fired by Firefox).",
+            "itemtype": "method",
+            "name": "DOMMouseScroll",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The mouse scroll event.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.tool.Navigate",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/navigate.js",
+            "line": 212,
+            "description": "Handle mouse wheel event.",
+            "itemtype": "method",
+            "name": "mousewheel",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The mouse wheel event.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.tool.Navigate",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/navigate.js",
+            "line": 227,
+            "description": "Handle key down event.",
+            "itemtype": "method",
+            "name": "keydown",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The key down event.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.tool.Navigate",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/navigate.js",
+            "line": 236,
+            "description": "Enable the tool.",
+            "itemtype": "method",
+            "name": "enable",
+            "params": [
+                {
+                    "name": "bool",
+                    "description": "The flag to enable or not.",
+                    "type": "Boolean"
+                }
+            ],
+            "class": "dwv.tool.Navigate",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/navigate.js",
+            "line": 245,
+            "description": "Apply the zoom to the layers.",
+            "itemtype": "method",
+            "name": "zoomLayers",
+            "params": [
+                {
+                    "name": "step",
+                    "description": "The zoom step increment. A good step is of 0.1.",
+                    "type": "Number"
+                },
+                {
+                    "name": "cx",
+                    "description": "The zoom center X coordinate.",
+                    "type": "Number"
+                },
+                {
+                    "name": "cy",
+                    "description": "The zoom center Y coordinate.",
+                    "type": "Number"
+                }
+            ],
+            "class": "dwv.tool.Navigate",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/navigate.js",
+            "line": 260,
+            "description": "Apply a translation to the layers.",
+            "itemtype": "method",
+            "name": "translateLayers",
+            "params": [
+                {
+                    "name": "tx",
+                    "description": "The translation along X.",
+                    "type": "Number"
+                },
+                {
+                    "name": "ty",
+                    "description": "The translation along Y.",
+                    "type": "Number"
+                }
+            ],
+            "class": "dwv.tool.Navigate",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/navigate.js",
+            "line": 276,
+            "description": "Help for this tool.",
+            "itemtype": "method",
+            "name": "getHelp",
+            "return": {
+                "description": "The help content.",
+                "type": "Object"
+            },
+            "class": "dwv.tool.Navigate",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/navigate.js",
+            "line": 297,
+            "description": "Initialise the tool.",
+            "itemtype": "method",
+            "name": "init",
+            "class": "dwv.tool.Navigate",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/pan.js",
+            "line": 14,
+            "description": "Reset the application zoom.",
+            "itemtype": "method",
+            "name": "zoomReset",
+            "static": 1,
+            "class": "dwv.tool",
+            "module": "tool",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/tools/pan.js",
+            "line": 36,
+            "description": "Closure to self: to be used by event handlers.",
+            "itemtype": "property",
+            "name": "self",
+            "access": "private",
+            "tagname": "",
+            "type": "WindowLevel",
+            "class": "dwv.tool.Pan",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/pan.js",
+            "line": 43,
+            "description": "Interaction start flag.",
+            "itemtype": "property",
+            "name": "started",
+            "type": "Boolean",
+            "class": "dwv.tool.Pan",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/pan.js",
+            "line": 50,
+            "description": "Handle mouse down event.",
+            "itemtype": "method",
+            "name": "mousedown",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The mouse down event.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.tool.Pan",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/pan.js",
+            "line": 62,
+            "description": "Handle mouse move event.",
+            "itemtype": "method",
+            "name": "mousemove",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The mouse move event.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.tool.Pan",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/pan.js",
+            "line": 81,
+            "description": "Handle mouse up event.",
+            "itemtype": "method",
+            "name": "mouseup",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The mouse up event.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.tool.Pan",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/pan.js",
+            "line": 94,
+            "description": "Handle mouse out event.",
+            "itemtype": "method",
+            "name": "mouseout",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The mouse out event.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.tool.Pan",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/pan.js",
+            "line": 103,
+            "description": "Handle touch start event.",
+            "itemtype": "method",
+            "name": "touchstart",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The touch start event.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.tool.Pan",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/pan.js",
+            "line": 112,
+            "description": "Handle touch move event.",
+            "itemtype": "method",
+            "name": "touchmove",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The touch move event.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.tool.Pan",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/pan.js",
+            "line": 121,
+            "description": "Handle touch end event.",
+            "itemtype": "method",
+            "name": "touchend",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The touch end event.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.tool.Pan",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/pan.js",
+            "line": 130,
+            "description": "Handle key down event.",
+            "itemtype": "method",
+            "name": "keydown",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The key down event.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.tool.Pan",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/pan.js",
+            "line": 139,
+            "description": "Enable the tool.",
+            "itemtype": "method",
+            "name": "enable",
+            "params": [
+                {
+                    "name": "bool",
+                    "description": "The flag to enable or not.",
+                    "type": "Boolean"
+                }
+            ],
+            "class": "dwv.tool.Pan",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/pan.js",
+            "line": 148,
+            "description": "Apply a translation to the layers.",
+            "itemtype": "method",
+            "name": "translateLayers",
+            "params": [
+                {
+                    "name": "tx",
+                    "description": "The translation along X.",
+                    "type": "Number"
+                },
+                {
+                    "name": "ty",
+                    "description": "The translation along Y.",
+                    "type": "Number"
+                }
+            ],
+            "class": "dwv.tool.Pan",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/pan.js",
+            "line": 164,
+            "description": "Help for this tool.",
+            "itemtype": "method",
+            "name": "getHelp",
+            "return": {
+                "description": "The help content.",
+                "type": "Object"
+            },
+            "class": "dwv.tool.Pan",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/pan.js",
+            "line": 183,
+            "description": "Initialise the tool.",
+            "itemtype": "method",
+            "name": "init",
+            "class": "dwv.tool.Pan",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
             "file": "src/tools/rectangle.js",
             "line": 19,
             "description": "Rectangle object.",
@@ -7696,6 +8451,207 @@
             "itemtype": "method",
             "name": "execute",
             "class": "dwv.tool.DrawRoiCommand",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/scroll.js",
+            "line": 23,
+            "description": "Closure to self: to be used by event handlers.",
+            "itemtype": "property",
+            "name": "self",
+            "access": "private",
+            "tagname": "",
+            "type": "WindowLevel",
+            "class": "dwv.tool.Scroll",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/scroll.js",
+            "line": 30,
+            "description": "Interaction start flag.",
+            "itemtype": "property",
+            "name": "started",
+            "type": "Boolean",
+            "class": "dwv.tool.Scroll",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/scroll.js",
+            "line": 37,
+            "description": "Handle mouse down event.",
+            "itemtype": "method",
+            "name": "mousedown",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The mouse down event.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.tool.Scroll",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/scroll.js",
+            "line": 49,
+            "description": "Handle mouse move event.",
+            "itemtype": "method",
+            "name": "mousemove",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The mouse move event.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.tool.Scroll",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/scroll.js",
+            "line": 69,
+            "description": "Handle mouse up event.",
+            "itemtype": "method",
+            "name": "mouseup",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The mouse up event.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.tool.Scroll",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/scroll.js",
+            "line": 82,
+            "description": "Handle mouse out event.",
+            "itemtype": "method",
+            "name": "mouseout",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The mouse out event.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.tool.Scroll",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/scroll.js",
+            "line": 91,
+            "description": "Handle touch start event.",
+            "itemtype": "method",
+            "name": "touchstart",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The touch start event.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.tool.Scroll",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/scroll.js",
+            "line": 100,
+            "description": "Handle touch move event.",
+            "itemtype": "method",
+            "name": "touchmove",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The touch move event.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.tool.Scroll",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/scroll.js",
+            "line": 109,
+            "description": "Handle touch end event.",
+            "itemtype": "method",
+            "name": "touchend",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The touch end event.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.tool.Scroll",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/scroll.js",
+            "line": 118,
+            "description": "Handle key down event.",
+            "itemtype": "method",
+            "name": "keydown",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The key down event.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.tool.Scroll",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/scroll.js",
+            "line": 127,
+            "description": "Enable the tool.",
+            "itemtype": "method",
+            "name": "enable",
+            "params": [
+                {
+                    "name": "bool",
+                    "description": "The flag to enable or not.",
+                    "type": "Boolean"
+                }
+            ],
+            "class": "dwv.tool.Scroll",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/scroll.js",
+            "line": 138,
+            "description": "Help for this tool.",
+            "itemtype": "method",
+            "name": "getHelp",
+            "return": {
+                "description": "The help content.",
+                "type": "Object"
+            },
+            "class": "dwv.tool.Scroll",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/scroll.js",
+            "line": 157,
+            "description": "Initialise the tool.",
+            "itemtype": "method",
+            "name": "init",
+            "class": "dwv.tool.Scroll",
             "module": "tool",
             "namespace": "dwv.tool"
         },
@@ -7919,6 +8875,23 @@
         {
             "file": "src/tools/windowLevel.js",
             "line": 38,
+            "description": "Set the active window/level preset.",
+            "itemtype": "method",
+            "name": "updateWindowingData",
+            "params": [
+                {
+                    "name": "name",
+                    "description": "The name of the preset to set.",
+                    "type": "String"
+                }
+            ],
+            "class": "dwv.tool",
+            "module": "tool",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/tools/windowLevel.js",
+            "line": 54,
             "description": "Update the views' colour map.",
             "itemtype": "method",
             "name": "updateColourMap",
@@ -7936,7 +8909,24 @@
         },
         {
             "file": "src/tools/windowLevel.js",
-            "line": 77,
+            "line": 65,
+            "description": "Update the views' colour map.",
+            "itemtype": "method",
+            "name": "updateColourMap",
+            "params": [
+                {
+                    "name": "name",
+                    "description": "The name of the colour map to set.",
+                    "type": "String"
+                }
+            ],
+            "class": "dwv.tool",
+            "module": "tool",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/tools/windowLevel.js",
+            "line": 107,
             "description": "Closure to self: to be used by event handlers.",
             "itemtype": "property",
             "name": "self",
@@ -7949,7 +8939,7 @@
         },
         {
             "file": "src/tools/windowLevel.js",
-            "line": 84,
+            "line": 114,
             "description": "Interaction start flag.",
             "itemtype": "property",
             "name": "started",
@@ -7960,7 +8950,7 @@
         },
         {
             "file": "src/tools/windowLevel.js",
-            "line": 91,
+            "line": 121,
             "description": "Handle mouse down event.",
             "itemtype": "method",
             "name": "mousedown",
@@ -7977,24 +8967,7 @@
         },
         {
             "file": "src/tools/windowLevel.js",
-            "line": 106,
-            "description": "Handle two touch down event.",
-            "itemtype": "method",
-            "name": "twotouchdown",
-            "params": [
-                {
-                    "name": "event",
-                    "description": "The touch down event.",
-                    "type": "Object"
-                }
-            ],
-            "class": "dwv.tool.WindowLevel",
-            "module": "tool",
-            "namespace": "dwv.tool"
-        },
-        {
-            "file": "src/tools/windowLevel.js",
-            "line": 121,
+            "line": 136,
             "description": "Handle mouse move event.",
             "itemtype": "method",
             "name": "mousemove",
@@ -8011,24 +8984,7 @@
         },
         {
             "file": "src/tools/windowLevel.js",
-            "line": 142,
-            "description": "Handle two touch move event.",
-            "itemtype": "method",
-            "name": "twotouchmove",
-            "params": [
-                {
-                    "name": "event",
-                    "description": "The touch move event.",
-                    "type": "Object"
-                }
-            ],
-            "class": "dwv.tool.WindowLevel",
-            "module": "tool",
-            "namespace": "dwv.tool"
-        },
-        {
-            "file": "src/tools/windowLevel.js",
-            "line": 161,
+            "line": 157,
             "description": "Handle mouse up event.",
             "itemtype": "method",
             "name": "mouseup",
@@ -8045,7 +9001,7 @@
         },
         {
             "file": "src/tools/windowLevel.js",
-            "line": 171,
+            "line": 167,
             "description": "Handle mouse out event.",
             "itemtype": "method",
             "name": "mouseout",
@@ -8062,7 +9018,7 @@
         },
         {
             "file": "src/tools/windowLevel.js",
-            "line": 181,
+            "line": 177,
             "description": "Handle touch start event.",
             "itemtype": "method",
             "name": "touchstart",
@@ -8079,7 +9035,7 @@
         },
         {
             "file": "src/tools/windowLevel.js",
-            "line": 192,
+            "line": 186,
             "description": "Handle touch move event.",
             "itemtype": "method",
             "name": "touchmove",
@@ -8096,7 +9052,7 @@
         },
         {
             "file": "src/tools/windowLevel.js",
-            "line": 203,
+            "line": 195,
             "description": "Handle touch end event.",
             "itemtype": "method",
             "name": "touchend",
@@ -8113,7 +9069,7 @@
         },
         {
             "file": "src/tools/windowLevel.js",
-            "line": 213,
+            "line": 204,
             "description": "Handle double click event.",
             "itemtype": "method",
             "name": "dblclick",
@@ -8130,41 +9086,7 @@
         },
         {
             "file": "src/tools/windowLevel.js",
-            "line": 225,
-            "description": "Handle mouse scroll event (fired by Firefox).",
-            "itemtype": "method",
-            "name": "DOMMouseScroll",
-            "params": [
-                {
-                    "name": "event",
-                    "description": "The mouse scroll event.",
-                    "type": "Object"
-                }
-            ],
-            "class": "dwv.tool.WindowLevel",
-            "module": "tool",
-            "namespace": "dwv.tool"
-        },
-        {
-            "file": "src/tools/windowLevel.js",
-            "line": 236,
-            "description": "Handle mouse wheel event.",
-            "itemtype": "method",
-            "name": "mousewheel",
-            "params": [
-                {
-                    "name": "event",
-                    "description": "The mouse wheel event.",
-                    "type": "Object"
-                }
-            ],
-            "class": "dwv.tool.WindowLevel",
-            "module": "tool",
-            "namespace": "dwv.tool"
-        },
-        {
-            "file": "src/tools/windowLevel.js",
-            "line": 247,
+            "line": 216,
             "description": "Handle key down event.",
             "itemtype": "method",
             "name": "keydown",
@@ -8181,7 +9103,7 @@
         },
         {
             "file": "src/tools/windowLevel.js",
-            "line": 257,
+            "line": 226,
             "description": "Enable the tool.",
             "itemtype": "method",
             "name": "enable",
@@ -8198,7 +9120,7 @@
         },
         {
             "file": "src/tools/windowLevel.js",
-            "line": 270,
+            "line": 239,
             "description": "Initialise the tool.",
             "itemtype": "method",
             "name": "init",
@@ -8208,7 +9130,7 @@
         },
         {
             "file": "src/tools/windowLevel.js",
-            "line": 280,
+            "line": 249,
             "description": "Help for this tool.",
             "itemtype": "method",
             "name": "getHelp",
@@ -8222,44 +9144,10 @@
         },
         {
             "file": "src/tools/windowLevel.js",
-            "line": 302,
+            "line": 269,
             "description": "Update the window/level presets.",
             "itemtype": "method",
             "name": "updatePresets",
-            "class": "dwv.tool.WindowLevel",
-            "module": "tool",
-            "namespace": "dwv.tool"
-        },
-        {
-            "file": "src/tools/windowLevel.js",
-            "line": 332,
-            "description": "Set the active window/level preset.",
-            "itemtype": "method",
-            "name": "setPreset",
-            "params": [
-                {
-                    "name": "name",
-                    "description": "The name of the preset to set.",
-                    "type": "String"
-                }
-            ],
-            "class": "dwv.tool.WindowLevel",
-            "module": "tool",
-            "namespace": "dwv.tool"
-        },
-        {
-            "file": "src/tools/windowLevel.js",
-            "line": 348,
-            "description": "Set the active colour map.",
-            "itemtype": "method",
-            "name": "setColourMap",
-            "params": [
-                {
-                    "name": "name",
-                    "description": "The name of the colour map to set.",
-                    "type": "String"
-                }
-            ],
             "class": "dwv.tool.WindowLevel",
             "module": "tool",
             "namespace": "dwv.tool"
@@ -8318,24 +9206,7 @@
         },
         {
             "file": "src/tools/zoom.js",
-            "line": 62,
-            "description": "Handle two touch down event.",
-            "itemtype": "method",
-            "name": "twotouchdown",
-            "params": [
-                {
-                    "name": "event",
-                    "description": "The touch down event.",
-                    "type": "Object"
-                }
-            ],
-            "class": "dwv.tool.Zoom",
-            "module": "tool",
-            "namespace": "dwv.tool"
-        },
-        {
-            "file": "src/tools/zoom.js",
-            "line": 76,
+            "line": 64,
             "description": "Handle mouse move event.",
             "itemtype": "method",
             "name": "mousemove",
@@ -8352,24 +9223,7 @@
         },
         {
             "file": "src/tools/zoom.js",
-            "line": 98,
-            "description": "Handle two touch move event.",
-            "itemtype": "method",
-            "name": "twotouchmove",
-            "params": [
-                {
-                    "name": "event",
-                    "description": "The touch move event.",
-                    "type": "Object"
-                }
-            ],
-            "class": "dwv.tool.Zoom",
-            "module": "tool",
-            "namespace": "dwv.tool"
-        },
-        {
-            "file": "src/tools/zoom.js",
-            "line": 118,
+            "line": 82,
             "description": "Handle mouse up event.",
             "itemtype": "method",
             "name": "mouseup",
@@ -8386,7 +9240,7 @@
         },
         {
             "file": "src/tools/zoom.js",
-            "line": 131,
+            "line": 95,
             "description": "Handle mouse out event.",
             "itemtype": "method",
             "name": "mouseout",
@@ -8403,7 +9257,7 @@
         },
         {
             "file": "src/tools/zoom.js",
-            "line": 140,
+            "line": 104,
             "description": "Handle touch start event.",
             "itemtype": "method",
             "name": "touchstart",
@@ -8420,7 +9274,7 @@
         },
         {
             "file": "src/tools/zoom.js",
-            "line": 155,
+            "line": 113,
             "description": "Handle touch move event.",
             "itemtype": "method",
             "name": "touchmove",
@@ -8437,7 +9291,7 @@
         },
         {
             "file": "src/tools/zoom.js",
-            "line": 170,
+            "line": 122,
             "description": "Handle touch end event.",
             "itemtype": "method",
             "name": "touchend",
@@ -8454,41 +9308,7 @@
         },
         {
             "file": "src/tools/zoom.js",
-            "line": 179,
-            "description": "Handle mouse scroll event (fired by Firefox).",
-            "itemtype": "method",
-            "name": "DOMMouseScroll",
-            "params": [
-                {
-                    "name": "event",
-                    "description": "The mouse scroll event.",
-                    "type": "Object"
-                }
-            ],
-            "class": "dwv.tool.Zoom",
-            "module": "tool",
-            "namespace": "dwv.tool"
-        },
-        {
-            "file": "src/tools/zoom.js",
-            "line": 190,
-            "description": "Handle mouse wheel event.",
-            "itemtype": "method",
-            "name": "mousewheel",
-            "params": [
-                {
-                    "name": "event",
-                    "description": "The mouse wheel event.",
-                    "type": "Object"
-                }
-            ],
-            "class": "dwv.tool.Zoom",
-            "module": "tool",
-            "namespace": "dwv.tool"
-        },
-        {
-            "file": "src/tools/zoom.js",
-            "line": 201,
+            "line": 131,
             "description": "Handle key down event.",
             "itemtype": "method",
             "name": "keydown",
@@ -8505,7 +9325,7 @@
         },
         {
             "file": "src/tools/zoom.js",
-            "line": 210,
+            "line": 140,
             "description": "Enable the tool.",
             "itemtype": "method",
             "name": "enable",
@@ -8522,7 +9342,7 @@
         },
         {
             "file": "src/tools/zoom.js",
-            "line": 219,
+            "line": 149,
             "description": "Apply the zoom to the layers.",
             "itemtype": "method",
             "name": "zoomLayers",
@@ -8549,29 +9369,7 @@
         },
         {
             "file": "src/tools/zoom.js",
-            "line": 234,
-            "description": "Apply a translation to the layers.",
-            "itemtype": "method",
-            "name": "translateLayers",
-            "params": [
-                {
-                    "name": "tx",
-                    "description": "The translation along X.",
-                    "type": "Number"
-                },
-                {
-                    "name": "ty",
-                    "description": "The translation along Y.",
-                    "type": "Number"
-                }
-            ],
-            "class": "dwv.tool.Zoom",
-            "module": "tool",
-            "namespace": "dwv.tool"
-        },
-        {
-            "file": "src/tools/zoom.js",
-            "line": 250,
+            "line": 166,
             "description": "Help for this tool.",
             "itemtype": "method",
             "name": "getHelp",
@@ -8585,7 +9383,7 @@
         },
         {
             "file": "src/tools/zoom.js",
-            "line": 271,
+            "line": 185,
             "description": "Initialise the tool.",
             "itemtype": "method",
             "name": "init",
@@ -9163,15 +9961,27 @@
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/tools/windowLevel.js:280"
-        },
-        {
-            "message": "replacing incorrect tag: function with method",
-            "line": " src/tools/windowLevel.js:348"
+            "line": " src/tools/navigate.js:276"
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/tools/zoom.js:250"
+            "line": " src/tools/pan.js:164"
+        },
+        {
+            "message": "replacing incorrect tag: returns with return",
+            "line": " src/tools/scroll.js:138"
+        },
+        {
+            "message": "replacing incorrect tag: function with method",
+            "line": " src/tools/windowLevel.js:65"
+        },
+        {
+            "message": "replacing incorrect tag: returns with return",
+            "line": " src/tools/windowLevel.js:249"
+        },
+        {
+            "message": "replacing incorrect tag: returns with return",
+            "line": " src/tools/zoom.js:166"
         },
         {
             "message": "Missing item type\nLookup tables for image color display.",

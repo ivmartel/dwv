@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>dwv.image.filter.Threshold - dwv</title>
+    <title>dwv.tool.Scroll - dwv</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
     <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
@@ -198,7 +198,7 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-                        <h1>dwv.image.filter.Threshold Class</h1>
+                        <h1>dwv.tool.Scroll Class</h1>
 <div class="box meta">
     
 
@@ -206,13 +206,13 @@
 
     
         <div class="foundat">
-            Defined in: <a href="../files/src_image_filter.js.html#l9"><code>src&#x2F;image&#x2F;filter.js:9</code></a>
+            Defined in: <a href="../files/src_tools_scroll.js.html#l14"><code>src&#x2F;tools&#x2F;scroll.js:14</code></a>
         </div>
     
 
     
         
-            Module: <a href="../modules/image.html">image</a>
+            Module: <a href="../modules/tool.html">tool</a>
         
     
 
@@ -222,18 +222,28 @@
 
 
 <div class="box intro">
-    <p>Threshold an image between an input minimum and maximum.</p>
+    <p>Scroll class.</p>
 
 </div>
 
 
     <div class="constructor">
         <h2>Constructor</h2>
-        <div id="method_dwv.image.filter.Threshold" class="method item">
-    <h3 class="name"><code>dwv.image.filter.Threshold</code></h3>
+        <div id="method_dwv.tool.Scroll" class="method item">
+    <h3 class="name"><code>dwv.tool.Scroll</code></h3>
 
     
-        <span class="paren">()</span>
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>app</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
     
 
     
@@ -261,7 +271,7 @@
             
         
         
-        <a href="../files/src_image_filter.js.html#l9"><code>src&#x2F;image&#x2F;filter.js:9</code></a>
+        <a href="../files/src_tools_scroll.js.html#l14"><code>src&#x2F;tools&#x2F;scroll.js:14</code></a>
         
         </p>
 
@@ -275,6 +285,30 @@
         
     </div>
 
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">app</code>
+                        <span class="type">Object</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The associated application.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
     
 
     
@@ -310,42 +344,77 @@
                     <ul class="index-list methods">
                         
                             <li class="index-item method">
-                                <a href="#method_getMax">getMax</a>
+                                <a href="#method_enable">enable</a>
 
                                 
                                 
                             </li>
                         
                             <li class="index-item method">
-                                <a href="#method_getMin">getMin</a>
+                                <a href="#method_getHelp">getHelp</a>
 
                                 
                                 
                             </li>
                         
                             <li class="index-item method">
-                                <a href="#method_getName">getName</a>
+                                <a href="#method_init">init</a>
 
                                 
                                 
                             </li>
                         
                             <li class="index-item method">
-                                <a href="#method_setMax">setMax</a>
+                                <a href="#method_keydown">keydown</a>
 
                                 
                                 
                             </li>
                         
                             <li class="index-item method">
-                                <a href="#method_setMin">setMin</a>
+                                <a href="#method_mousedown">mousedown</a>
 
                                 
                                 
                             </li>
                         
                             <li class="index-item method">
-                                <a href="#method_update">update</a>
+                                <a href="#method_mousemove">mousemove</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_mouseout">mouseout</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_mouseup">mouseup</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_touchend">touchend</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_touchmove">touchmove</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_touchstart">touchstart</a>
 
                                 
                                 
@@ -362,14 +431,14 @@
                     <ul class="index-list properties">
                         
                             <li class="index-item property private">
-                                <a href="#property_max">max</a>
+                                <a href="#property_self">self</a>
 
                                 
                                 
                             </li>
                         
-                            <li class="index-item property private">
-                                <a href="#property_min">min</a>
+                            <li class="index-item property">
+                                <a href="#property_started">started</a>
 
                                 
                                 
@@ -389,227 +458,8 @@
                 <h2 class="off-left">Methods</h2>
 
                 
-                    <div id="method_getMax" class="method item">
-    <h3 class="name"><code>getMax</code></h3>
-
-    
-        <span class="paren">()</span>
-    
-
-    
-        <span class="returns-inline">
-            <span class="type">Number</span>
-        </span>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/src_image_filter.js.html#l44"><code>src&#x2F;image&#x2F;filter.js:44</code></a>
-        
-        </p>
-
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        <p>Get the threshold maximum.</p>
-
-    </div>
-
-    
-
-    
-        <div class="returns">
-            <h4>Returns:</h4>
-
-            <div class="returns-description">
-                
-                    
-                        <span class="type">Number</span>:
-                    
-                    <p>The threshold maximum.</p>
-
-                
-            </div>
-        </div>
-    
-
-    
-</div>
-
-                
-                    <div id="method_getMin" class="method item">
-    <h3 class="name"><code>getMin</code></h3>
-
-    
-        <span class="paren">()</span>
-    
-
-    
-        <span class="returns-inline">
-            <span class="type">Number</span>
-        </span>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/src_image_filter.js.html#l32"><code>src&#x2F;image&#x2F;filter.js:32</code></a>
-        
-        </p>
-
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        <p>Get the threshold minimum.</p>
-
-    </div>
-
-    
-
-    
-        <div class="returns">
-            <h4>Returns:</h4>
-
-            <div class="returns-description">
-                
-                    
-                        <span class="type">Number</span>:
-                    
-                    <p>The threshold minimum.</p>
-
-                
-            </div>
-        </div>
-    
-
-    
-</div>
-
-                
-                    <div id="method_getName" class="method item">
-    <h3 class="name"><code>getName</code></h3>
-
-    
-        <span class="paren">()</span>
-    
-
-    
-        <span class="returns-inline">
-            <span class="type">String</span>
-        </span>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/src_image_filter.js.html#l56"><code>src&#x2F;image&#x2F;filter.js:56</code></a>
-        
-        </p>
-
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        <p>Get the name of the filter.</p>
-
-    </div>
-
-    
-
-    
-        <div class="returns">
-            <h4>Returns:</h4>
-
-            <div class="returns-description">
-                
-                    
-                        <span class="type">String</span>:
-                    
-                    <p>The name of the filter.</p>
-
-                
-            </div>
-        </div>
-    
-
-    
-</div>
-
-                
-                    <div id="method_setMax" class="method item">
-    <h3 class="name"><code>setMax</code></h3>
+                    <div id="method_enable" class="method item">
+    <h3 class="name"><code>enable</code></h3>
 
     
         <div class="args">
@@ -617,7 +467,7 @@
             
                 <li class="arg">
                     
-                        <code>val</code>
+                        <code>bool</code>
                     
                 </li>
             
@@ -650,7 +500,7 @@
             
         
         
-        <a href="../files/src_image_filter.js.html#l50"><code>src&#x2F;image&#x2F;filter.js:50</code></a>
+        <a href="../files/src_tools_scroll.js.html#l127"><code>src&#x2F;tools&#x2F;scroll.js:127</code></a>
         
         </p>
 
@@ -661,7 +511,7 @@
     </div>
 
     <div class="description">
-        <p>Set the threshold maximum.</p>
+        <p>Enable the tool.</p>
 
     </div>
 
@@ -673,14 +523,14 @@
             
                 <li class="param">
                     
-                        <code class="param-name">val</code>
-                        <span class="type">Number</span>
+                        <code class="param-name">bool</code>
+                        <span class="type">Boolean</span>
                     
 
                     
 
                     <div class="param-description">
-                        <p>The threshold maximum.</p>
+                        <p>The flag to enable or not.</p>
 
                     </div>
 
@@ -697,97 +547,8 @@
 </div>
 
                 
-                    <div id="method_setMin" class="method item">
-    <h3 class="name"><code>setMin</code></h3>
-
-    
-        <div class="args">
-            <span class="paren">(</span><ul class="args-list inline commas">
-            
-                <li class="arg">
-                    
-                        <code>val</code>
-                    
-                </li>
-            
-            </ul><span class="paren">)</span>
-        </div>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/src_image_filter.js.html#l38"><code>src&#x2F;image&#x2F;filter.js:38</code></a>
-        
-        </p>
-
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        <p>Set the threshold minimum.</p>
-
-    </div>
-
-    
-        <div class="params">
-            <h4>Parameters:</h4>
-
-            <ul class="params-list">
-            
-                <li class="param">
-                    
-                        <code class="param-name">val</code>
-                        <span class="type">Number</span>
-                    
-
-                    
-
-                    <div class="param-description">
-                        <p>The threshold minimum.</p>
-
-                    </div>
-
-                    
-                </li>
-            
-            </ul>
-        </div>
-    
-
-    
-
-    
-</div>
-
-                
-                    <div id="method_update" class="method item">
-    <h3 class="name"><code>update</code></h3>
+                    <div id="method_getHelp" class="method item">
+    <h3 class="name"><code>getHelp</code></h3>
 
     
         <span class="paren">()</span>
@@ -822,7 +583,7 @@
             
         
         
-        <a href="../files/src_image_filter.js.html#l64"><code>src&#x2F;image&#x2F;filter.js:64</code></a>
+        <a href="../files/src_tools_scroll.js.html#l138"><code>src&#x2F;tools&#x2F;scroll.js:138</code></a>
         
         </p>
 
@@ -833,7 +594,7 @@
     </div>
 
     <div class="description">
-        <p>Transform the main image using this filter.</p>
+        <p>Help for this tool.</p>
 
     </div>
 
@@ -848,11 +609,778 @@
                     
                         <span class="type">Object</span>:
                     
-                    <p>The transformed image.</p>
+                    <p>The help content.</p>
 
                 
             </div>
         </div>
+    
+
+    
+</div>
+
+                
+                    <div id="method_init" class="method item">
+    <h3 class="name"><code>init</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_tools_scroll.js.html#l157"><code>src&#x2F;tools&#x2F;scroll.js:157</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Initialise the tool.</p>
+
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_keydown" class="method item">
+    <h3 class="name"><code>keydown</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>event</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_tools_scroll.js.html#l118"><code>src&#x2F;tools&#x2F;scroll.js:118</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Handle key down event.</p>
+
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">event</code>
+                        <span class="type">Object</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The key down event.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_mousedown" class="method item">
+    <h3 class="name"><code>mousedown</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>event</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_tools_scroll.js.html#l37"><code>src&#x2F;tools&#x2F;scroll.js:37</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Handle mouse down event.</p>
+
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">event</code>
+                        <span class="type">Object</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The mouse down event.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_mousemove" class="method item">
+    <h3 class="name"><code>mousemove</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>event</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_tools_scroll.js.html#l49"><code>src&#x2F;tools&#x2F;scroll.js:49</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Handle mouse move event.</p>
+
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">event</code>
+                        <span class="type">Object</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The mouse move event.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_mouseout" class="method item">
+    <h3 class="name"><code>mouseout</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>event</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_tools_scroll.js.html#l82"><code>src&#x2F;tools&#x2F;scroll.js:82</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Handle mouse out event.</p>
+
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">event</code>
+                        <span class="type">Object</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The mouse out event.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_mouseup" class="method item">
+    <h3 class="name"><code>mouseup</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>event</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_tools_scroll.js.html#l69"><code>src&#x2F;tools&#x2F;scroll.js:69</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Handle mouse up event.</p>
+
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">event</code>
+                        <span class="type">Object</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The mouse up event.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_touchend" class="method item">
+    <h3 class="name"><code>touchend</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>event</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_tools_scroll.js.html#l109"><code>src&#x2F;tools&#x2F;scroll.js:109</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Handle touch end event.</p>
+
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">event</code>
+                        <span class="type">Object</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The touch end event.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_touchmove" class="method item">
+    <h3 class="name"><code>touchmove</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>event</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_tools_scroll.js.html#l100"><code>src&#x2F;tools&#x2F;scroll.js:100</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Handle touch move event.</p>
+
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">event</code>
+                        <span class="type">Object</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The touch move event.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_touchstart" class="method item">
+    <h3 class="name"><code>touchstart</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>event</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_tools_scroll.js.html#l91"><code>src&#x2F;tools&#x2F;scroll.js:91</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Handle touch start event.</p>
+
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">event</code>
+                        <span class="type">Object</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The touch start event.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
     
 
     
@@ -867,9 +1395,9 @@
                 <h2 class="off-left">Properties</h2>
 
                 
-                    <div id="property_max" class="property item private">
-    <h3 class="name"><code>max</code></h3>
-    <span class="type">Number</span>
+                    <div id="property_self" class="property item private">
+    <h3 class="name"><code>self</code></h3>
+    <span class="type">WindowLevel</span>
 
     
 
@@ -892,7 +1420,7 @@
             
         
         
-        <a href="../files/src_image_filter.js.html#l24"><code>src&#x2F;image&#x2F;filter.js:24</code></a>
+        <a href="../files/src_tools_scroll.js.html#l23"><code>src&#x2F;tools&#x2F;scroll.js:23</code></a>
         
         </p>
 
@@ -902,7 +1430,7 @@
     </div>
 
     <div class="description">
-        <p>Threshold maxnimum.</p>
+        <p>Closure to self: to be used by event handlers.</p>
 
     </div>
 
@@ -914,14 +1442,12 @@
 </div>
 
                 
-                    <div id="property_min" class="property item private">
-    <h3 class="name"><code>min</code></h3>
-    <span class="type">Number</span>
+                    <div id="property_started" class="property item">
+    <h3 class="name"><code>started</code></h3>
+    <span class="type">Boolean</span>
 
     
 
-    
-        <span class="flag private">private</span>
     
 
     
@@ -939,7 +1465,7 @@
             
         
         
-        <a href="../files/src_image_filter.js.html#l17"><code>src&#x2F;image&#x2F;filter.js:17</code></a>
+        <a href="../files/src_tools_scroll.js.html#l30"><code>src&#x2F;tools&#x2F;scroll.js:30</code></a>
         
         </p>
 
@@ -949,7 +1475,7 @@
     </div>
 
     <div class="description">
-        <p>Threshold minimum.</p>
+        <p>Interaction start flag.</p>
 
     </div>
 

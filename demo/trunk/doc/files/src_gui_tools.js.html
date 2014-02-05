@@ -123,7 +123,13 @@
             
                 <li><a href="../classes/dwv.tool.Livewire.html">dwv.tool.Livewire</a></li>
             
+                <li><a href="../classes/dwv.tool.Navigate.html">dwv.tool.Navigate</a></li>
+            
+                <li><a href="../classes/dwv.tool.Pan.html">dwv.tool.Pan</a></li>
+            
                 <li><a href="../classes/dwv.tool.RunFilterCommand.html">dwv.tool.RunFilterCommand</a></li>
+            
+                <li><a href="../classes/dwv.tool.Scroll.html">dwv.tool.Scroll</a></li>
             
                 <li><a href="../classes/dwv.tool.ToolBox.html">dwv.tool.ToolBox</a></li>
             
@@ -462,13 +468,55 @@ dwv.gui.base.initLivewireHtml = function()
 };
 
 /**
- * Append the zoom HTML to the page.
+ * Append the Navigate HTML to the page.
+ * @method appendNavigateHtml
+ * @static
+ */
+dwv.gui.base.appendNavigateHtml = function()
+{
+    // reset button
+    var button = document.createElement(&quot;button&quot;);
+    button.id = &quot;navResetButton&quot;;
+    button.name = &quot;navResetButton&quot;;
+    button.onclick = dwv.tool.zoomReset;
+    var text = document.createTextNode(&quot;Reset&quot;);
+    button.appendChild(text);
+    
+    // list element
+    var liElement = document.createElement(&quot;li&quot;);
+    liElement.id = &quot;navLi&quot;;
+    liElement.style.display = &quot;none&quot;;
+    liElement.setAttribute(&quot;class&quot;,&quot;ui-block-c&quot;);
+    liElement.appendChild(button);
+    
+    // node
+    var node = document.getElementById(&quot;toolList&quot;);
+    // append element
+    node.appendChild(liElement);
+    // trigger create event (mobile)
+    $(&quot;#toolList&quot;).trigger(&quot;create&quot;);
+};
+
+/**
+ * Display the Navigate HTML.
+ * @method displayNavigateHtml
+ * @static
+ * @param {Boolean} bool True to display, false to hide.
+ */
+dwv.gui.base.displayNavigateHtml = function(bool)
+{
+    // display list element
+    dwv.html.displayElement(&quot;navLi&quot;, bool);
+};
+
+/**
+ * Append the Zoom HTML to the page.
  * @method appendZoomHtml
  * @static
  */
 dwv.gui.base.appendZoomHtml = function()
 {
-    // zoom button
+    // reset button
     var button = document.createElement(&quot;button&quot;);
     button.id = &quot;zoomResetButton&quot;;
     button.name = &quot;zoomResetButton&quot;;
@@ -476,31 +524,106 @@ dwv.gui.base.appendZoomHtml = function()
     var text = document.createTextNode(&quot;Reset&quot;);
     button.appendChild(text);
     
-    // zoom list element
-    var zoomLi = document.createElement(&quot;li&quot;);
-    zoomLi.id = &quot;zoomLi&quot;;
-    zoomLi.style.display = &quot;none&quot;;
-    zoomLi.setAttribute(&quot;class&quot;,&quot;ui-block-c&quot;);
-    zoomLi.appendChild(button);
+    // list element
+    var liElement = document.createElement(&quot;li&quot;);
+    liElement.id = &quot;zoomLi&quot;;
+    liElement.style.display = &quot;none&quot;;
+    liElement.setAttribute(&quot;class&quot;,&quot;ui-block-c&quot;);
+    liElement.appendChild(button);
     
     // node
     var node = document.getElementById(&quot;toolList&quot;);
-    // append zoom
-    node.appendChild(zoomLi);
+    // append element
+    node.appendChild(liElement);
     // trigger create event (mobile)
     $(&quot;#toolList&quot;).trigger(&quot;create&quot;);
 };
 
 /**
- * Display the zoom HTML.
+ * Display the Zoom HTML.
  * @method displayZoomHtml
  * @static
  * @param {Boolean} bool True to display, false to hide.
  */
 dwv.gui.base.displayZoomHtml = function(bool)
 {
-    // zoom list element
+    // display list element
     dwv.html.displayElement(&quot;zoomLi&quot;, bool);
+};
+
+/**
+ * Append the Pan HTML to the page.
+ * @method appendPanHtml
+ * @static
+ */
+dwv.gui.base.appendPanHtml = function()
+{
+    // reset button
+    var button = document.createElement(&quot;button&quot;);
+    button.id = &quot;panResetButton&quot;;
+    button.name = &quot;panResetButton&quot;;
+    button.onclick = dwv.tool.panReset;
+    var text = document.createTextNode(&quot;Reset&quot;);
+    button.appendChild(text);
+    
+    // list element
+    var liElement = document.createElement(&quot;li&quot;);
+    liElement.id = &quot;panLi&quot;;
+    liElement.style.display = &quot;none&quot;;
+    liElement.setAttribute(&quot;class&quot;,&quot;ui-block-c&quot;);
+    liElement.appendChild(button);
+    
+    // node
+    var node = document.getElementById(&quot;toolList&quot;);
+    // append element
+    node.appendChild(liElement);
+    // trigger create event (mobile)
+    $(&quot;#toolList&quot;).trigger(&quot;create&quot;);
+};
+
+/**
+ * Display the pan HTML.
+ * @method displayPanHtml
+ * @static
+ * @param {Boolean} bool True to display, false to hide.
+ */
+dwv.gui.base.displayPanHtml = function(bool)
+{
+    // display list element
+    dwv.html.displayElement(&quot;panLi&quot;, bool);
+};
+
+/**
+ * Append the Scroll HTML to the page.
+ * @method appendScrollHtml
+ * @static
+ */
+dwv.gui.base.appendScrollHtml = function()
+{
+    // list element
+    var liElement = document.createElement(&quot;li&quot;);
+    liElement.id = &quot;scrollLi&quot;;
+    liElement.style.display = &quot;none&quot;;
+    liElement.setAttribute(&quot;class&quot;,&quot;ui-block-c&quot;);
+    
+    // node
+    var node = document.getElementById(&quot;toolList&quot;);
+    // append element
+    node.appendChild(liElement);
+    // trigger create event (mobile)
+    $(&quot;#toolList&quot;).trigger(&quot;create&quot;);
+};
+
+/**
+ * Display the Scroll HTML.
+ * @method displayScrollHtml
+ * @static
+ * @param {Boolean} bool True to display, false to hide.
+ */
+dwv.gui.base.displayScrollHtml = function(bool)
+{
+    // display list element
+    dwv.html.displayElement(&quot;scrollLi&quot;, bool);
 };
 
     </pre>

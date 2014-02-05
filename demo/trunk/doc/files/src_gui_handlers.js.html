@@ -123,7 +123,13 @@
             
                 <li><a href="../classes/dwv.tool.Livewire.html">dwv.tool.Livewire</a></li>
             
+                <li><a href="../classes/dwv.tool.Navigate.html">dwv.tool.Navigate</a></li>
+            
+                <li><a href="../classes/dwv.tool.Pan.html">dwv.tool.Pan</a></li>
+            
                 <li><a href="../classes/dwv.tool.RunFilterCommand.html">dwv.tool.RunFilterCommand</a></li>
+            
+                <li><a href="../classes/dwv.tool.Scroll.html">dwv.tool.Scroll</a></li>
             
                 <li><a href="../classes/dwv.tool.ToolBox.html">dwv.tool.ToolBox</a></li>
             
@@ -218,7 +224,7 @@ dwv.gui = dwv.gui || {};
  */
 dwv.gui.onChangeWindowLevelPreset = function(event)
 {
-    app.getToolBox().getSelectedTool().setPreset(this.value);
+    dwv.tool.updateWindowingDataFromName(this.value);
 };
 
 /**
@@ -229,7 +235,7 @@ dwv.gui.onChangeWindowLevelPreset = function(event)
  */
 dwv.gui.onChangeColourMap = function(event)
 {
-    app.getToolBox().getSelectedTool().setColourMap(this.value);
+    dwv.tool.updateColourMapFromName(this.value);
 };
 
 /**
