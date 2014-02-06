@@ -38,9 +38,9 @@ dwv.gui.appendWindowLevelHtml = function(){
     button.appendChild(document.createTextNode("W/L"));
     button.setAttribute("class","ui-btn ui-btn-inline");
     
-    var node = document.getElementById("toolbar");
+    var node = document.getElementById("toolfieldset");
     node.appendChild(button);
-    $("#toolbar").trigger("create");
+    $("#toolfieldset").trigger("create");
 };
 dwv.gui.displayWindowLevelHtml = function(bool){
     //dwv.gui.base.displayWindowLevelHtml(bool);
@@ -52,18 +52,12 @@ dwv.gui.initWindowLevelHtml = function(){
     var select = dwv.html.createHtmlSelect("presetSelect",dwv.tool.presets);
     select.onchange = dwv.gui.onChangeWindowLevelPreset;
     select.title = "Select w/l preset.";
-    select.setAttribute("class","ui-select-inline");
+    //select.setAttribute("class","ui-select-inline");
     select.setAttribute("data-inline","true");
 
-    var fieldset = document.createElement("fieldset");
-    fieldset.id = "wlfieldset";
-    fieldset.setAttribute("data-role","controlgroup");
-    fieldset.setAttribute("data-type","horizontal");
-    fieldset.appendChild(select);
-    
-    var node = document.getElementById("toolbar");
-    node.appendChild(fieldset);
-    $("#toolbar").trigger("create");
+    var node = document.getElementById("toolfieldset");
+    node.appendChild(select);
+    $("#toolfieldset").trigger("create");
 };
 
 // Zoom
@@ -75,9 +69,9 @@ dwv.gui.appendZoomHtml = function(){
     button.appendChild(document.createTextNode("Zoom"));
     button.setAttribute("class","ui-btn ui-btn-inline");
     
-    var node = document.getElementById("toolbar");
+    var node = document.getElementById("toolfieldset");
     node.appendChild(button);
-    $("#toolbar").trigger("create");
+    $("#toolfieldset").trigger("create");
 };
 dwv.gui.displayZoomHtml = function(bool){
     //dwv.gui.base.displayZoomHtml(bool);
@@ -92,9 +86,9 @@ dwv.gui.appendPanHtml = function(){
     button.appendChild(document.createTextNode("Pan"));
     button.setAttribute("class","ui-btn ui-btn-inline");
     
-    var node = document.getElementById("toolbar");
+    var node = document.getElementById("toolfieldset");
     node.appendChild(button);
-    $("#toolbar").trigger("create");
+    $("#toolfieldset").trigger("create");
 };
 dwv.gui.displayPanHtml = function(bool){
     //dwv.gui.base.displayPanHtml(bool);
@@ -109,9 +103,9 @@ dwv.gui.appendResetHtml = function(){
     button.appendChild(document.createTextNode("Reset"));
     button.setAttribute("class","ui-btn ui-btn-inline");
     
-    var node = document.getElementById("toolbar");
+    var node = document.getElementById("toolfieldset");
     node.appendChild(button);
-    $("#toolbar").trigger("create");
+    $("#toolfieldset").trigger("create");
 };
 
 // Scroll
@@ -123,9 +117,9 @@ dwv.gui.appendScrollHtml = function(){
     button.appendChild(document.createTextNode("Scroll"));
     button.setAttribute("class","ui-btn ui-btn-inline");
     
-    var node = document.getElementById("toolbar");
+    var node = document.getElementById("toolfieldset");
     node.appendChild(button);
-    $("#toolbar").trigger("create");
+    $("#toolfieldset").trigger("create");
 };
 dwv.gui.displayScrollHtml = function(bool){
     //dwv.gui.base.displayScrollHtml(bool);
