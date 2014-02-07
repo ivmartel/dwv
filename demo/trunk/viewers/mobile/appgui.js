@@ -83,12 +83,20 @@ dwv.gui.initLivewireHtml = function(){
     dwv.gui.base.initLivewireHtml();
 };
 
-// Zoom
-dwv.gui.appendZoomHtml = function(){
-    dwv.gui.base.appendZoomHtml();
+// Navigate
+dwv.gui.appendNavigateHtml = function(){
+    dwv.gui.base.appendNavigateHtml();
 };
-dwv.gui.displayZoomHtml = function(bool){
-    dwv.gui.base.displayZoomHtml(bool);
+dwv.gui.displayNavigateHtml = function(bool){
+    dwv.gui.base.displayNavigateHtml(bool);
+};
+
+// Scroll
+dwv.gui.appendScrollHtml = function(){
+    dwv.gui.base.appendScrollHtml();
+};
+dwv.gui.displayScrollHtml = function(bool){
+    dwv.gui.base.displayScrollHtml(bool);
 };
 
 // Filter

@@ -31,39 +31,98 @@ dwv.gui.initToolboxHtml = function(){
 
 // Window/level
 dwv.gui.appendWindowLevelHtml = function(){
-    var wlbutton = document.createElement("button");
-    wlbutton.id = "wlLi";
-    wlbutton.value = "windowlevel";
-    wlbutton.onclick = dwv.gui.onChangeTool;
-    wlbutton.appendChild(document.createTextNode("W/L"));
-    wlbutton.setAttribute("class","ui-btn ui-btn-inline");
+    var button = document.createElement("button");
+    button.id = "wlLi";
+    button.value = "windowlevel";
+    button.onclick = dwv.gui.onChangeTool;
+    button.appendChild(document.createTextNode("W/L"));
+    button.setAttribute("class","ui-btn ui-btn-inline");
     
-    var node = document.getElementById("toolbar");
-    node.appendChild(wlbutton);
-    $("#toolbar").trigger("create");
+    var node = document.getElementById("toolfieldset");
+    node.appendChild(button);
+    $("#toolfieldset").trigger("create");
 };
 dwv.gui.displayWindowLevelHtml = function(bool){
     //dwv.gui.base.displayWindowLevelHtml(bool);
 };
 dwv.gui.initWindowLevelHtml = function(){
     //dwv.gui.base.initWindowLevelHtml();
+    
+    // create preset select
+    var select = dwv.html.createHtmlSelect("presetSelect",dwv.tool.presets);
+    select.onchange = dwv.gui.onChangeWindowLevelPreset;
+    select.title = "Select w/l preset.";
+    //select.setAttribute("class","ui-select-inline");
+    select.setAttribute("data-inline","true");
+
+    var node = document.getElementById("toolfieldset");
+    node.appendChild(select);
+    $("#toolfieldset").trigger("create");
 };
 
 // Zoom
 dwv.gui.appendZoomHtml = function(){
-    var zoombutton = document.createElement("button");
-    zoombutton.id = "zoomLi";
-    zoombutton.value = "zoom";
-    zoombutton.onclick = dwv.gui.onChangeTool;
-    zoombutton.appendChild(document.createTextNode("Zoom"));
-    zoombutton.setAttribute("class","ui-btn ui-btn-inline");
+    var button = document.createElement("button");
+    button.id = "zoomLi";
+    button.value = "zoom";
+    button.onclick = dwv.gui.onChangeTool;
+    button.appendChild(document.createTextNode("Zoom"));
+    button.setAttribute("class","ui-btn ui-btn-inline");
     
-    var node = document.getElementById("toolbar");
-    node.appendChild(zoombutton);
-    $("#toolbar").trigger("create");
+    var node = document.getElementById("toolfieldset");
+    node.appendChild(button);
+    $("#toolfieldset").trigger("create");
 };
 dwv.gui.displayZoomHtml = function(bool){
     //dwv.gui.base.displayZoomHtml(bool);
+};
+
+// Pan
+dwv.gui.appendPanHtml = function(){
+    var button = document.createElement("button");
+    button.id = "panLi";
+    button.value = "pan";
+    button.onclick = dwv.gui.onChangeTool;
+    button.appendChild(document.createTextNode("Pan"));
+    button.setAttribute("class","ui-btn ui-btn-inline");
+    
+    var node = document.getElementById("toolfieldset");
+    node.appendChild(button);
+    $("#toolfieldset").trigger("create");
+};
+dwv.gui.displayPanHtml = function(bool){
+    //dwv.gui.base.displayPanHtml(bool);
+};
+
+// Reset
+dwv.gui.appendResetHtml = function(){
+    var button = document.createElement("button");
+    button.id = "resetLi";
+    button.value = "reset";
+    button.onclick = dwv.tool.zoomReset;
+    button.appendChild(document.createTextNode("Reset"));
+    button.setAttribute("class","ui-btn ui-btn-inline");
+    
+    var node = document.getElementById("toolfieldset");
+    node.appendChild(button);
+    $("#toolfieldset").trigger("create");
+};
+
+// Scroll
+dwv.gui.appendScrollHtml = function(){
+    var button = document.createElement("button");
+    button.id = "scrollLi";
+    button.value = "scroll";
+    button.onclick = dwv.gui.onChangeTool;
+    button.appendChild(document.createTextNode("Scroll"));
+    button.setAttribute("class","ui-btn ui-btn-inline");
+    
+    var node = document.getElementById("toolfieldset");
+    node.appendChild(button);
+    $("#toolfieldset").trigger("create");
+};
+dwv.gui.displayScrollHtml = function(bool){
+    //dwv.gui.base.displayScrollHtml(bool);
 };
 
 // Undo/redo
