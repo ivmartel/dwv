@@ -217,6 +217,18 @@ dwv.gui = dwv.gui || {};
 dwv.gui.base = dwv.gui.base || {};
 
 /**
+ * Append the version HTML.
+ * @method appendVersionHtml
+ */
+dwv.gui.base.appendVersionHtml = function()
+{
+    var nodes = document.getElementsByClassName(&quot;dwv-version&quot;);
+    for( var i = 0; i &lt; nodes.length; ++i ){
+        nodes[i].appendChild(document.createTextNode(app.getVersion()));
+    }
+};
+
+/**
  * Build the help HTML.
  * @method appendHelpHtml
  * @param {Boolean} mobile Flag for mobile or not environement.

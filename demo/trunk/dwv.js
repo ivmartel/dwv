@@ -38,6 +38,13 @@ dwv.App = function()
     var undoStack = new dwv.tool.UndoStack(this);
     
     /** 
+     * Get the version of the application.
+     * @method getVersion
+     * @return {String} The version of the application.
+     */
+    this.getVersion = function() { return "v0.6.0beta"; };
+    
+    /** 
      * Get the image.
      * @method getImage
      * @return {Image} The associated image.
@@ -3606,6 +3613,18 @@ var dwv = dwv || {};
  */
 dwv.gui = dwv.gui || {};
 dwv.gui.base = dwv.gui.base || {};
+
+/**
+ * Append the version HTML.
+ * @method appendVersionHtml
+ */
+dwv.gui.base.appendVersionHtml = function()
+{
+    var nodes = document.getElementsByClassName("dwv-version");
+    for( var i = 0; i < nodes.length; ++i ){
+        nodes[i].appendChild(document.createTextNode(app.getVersion()));
+    }
+};
 
 /**
  * Build the help HTML.
