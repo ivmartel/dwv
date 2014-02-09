@@ -99,7 +99,7 @@ dwv.gui.appendResetHtml = function(){
     var button = document.createElement("button");
     button.id = "resetLi";
     button.value = "reset";
-    button.onclick = dwv.tool.zoomReset;
+    button.onclick = dwv.gui.onZoomReset;
     button.appendChild(document.createTextNode("Reset"));
     button.setAttribute("class","ui-btn ui-btn-inline");
     
