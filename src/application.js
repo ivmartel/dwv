@@ -38,6 +38,13 @@ dwv.App = function()
     var undoStack = new dwv.tool.UndoStack(this);
     
     /** 
+     * Get the version of the application.
+     * @method getVersion
+     * @return {String} The version of the application.
+     */
+    this.getVersion = function() { return "v0.6.0beta"; };
+    
+    /** 
      * Get the image.
      * @method getImage
      * @return {Image} The associated image.
