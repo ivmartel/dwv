@@ -216,19 +216,6 @@ var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
 
 /**
- * Reset the application zoom.
- * @method zoomReset
- * @static
- */
-dwv.tool.zoomReset = function(event)
-{
-    app.getImageLayer().resetLayout();
-    app.getImageLayer().draw();
-    app.getDrawLayer().resetLayout();
-    app.getDrawLayer().draw();
-};
-
-/**
  * Navigate class.
  * @class Navigate
  * @namespace dwv.tool

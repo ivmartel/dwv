@@ -478,7 +478,7 @@ dwv.gui.base.appendNavigateHtml = function()
     var button = document.createElement(&quot;button&quot;);
     button.id = &quot;navResetButton&quot;;
     button.name = &quot;navResetButton&quot;;
-    button.onclick = dwv.tool.zoomReset;
+    button.onclick = dwv.gui.onZoomReset;
     var text = document.createTextNode(&quot;Reset&quot;);
     button.appendChild(text);
     
@@ -520,7 +520,7 @@ dwv.gui.base.appendZoomHtml = function()
     var button = document.createElement(&quot;button&quot;);
     button.id = &quot;zoomResetButton&quot;;
     button.name = &quot;zoomResetButton&quot;;
-    button.onclick = dwv.tool.zoomReset;
+    button.onclick = dwv.gui.onZoomReset;
     var text = document.createTextNode(&quot;Reset&quot;);
     button.appendChild(text);
     

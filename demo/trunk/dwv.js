@@ -3600,6 +3600,21 @@ dwv.gui.onChangeLineColour = function(event)
     app.getToolBox().getSelectedTool().setLineColour(this.value);
 };
 
+/**
+ * Handle zoom reset.
+ * @method onZoomReset
+ * @static
+ * @param {Object} event The change event.
+ */
+dwv.gui.onZoomReset = function(event)
+{
+    app.getImageLayer().resetLayout();
+    app.getImageLayer().draw();
+    app.getDrawLayer().resetLayout();
+    app.getDrawLayer().draw();
+};
+
+
 ;/** 
  * GUI module.
  * @module gui
@@ -5142,7 +5157,7 @@ dwv.gui.base.appendNavigateHtml = function()
     var button = document.createElement("button");
     button.id = "navResetButton";
     button.name = "navResetButton";
-    button.onclick = dwv.tool.zoomReset;
+    button.onclick = dwv.gui.onZoomReset;
     var text = document.createTextNode("Reset");
     button.appendChild(text);
     
@@ -5184,7 +5199,7 @@ dwv.gui.base.appendZoomHtml = function()
     var button = document.createElement("button");
     button.id = "zoomResetButton";
     button.name = "zoomResetButton";
-    button.onclick = dwv.tool.zoomReset;
+    button.onclick = dwv.gui.onZoomReset;
     var text = document.createTextNode("Reset");
     button.appendChild(text);
     
@@ -9763,19 +9778,6 @@ var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
 
 /**
- * Reset the application zoom.
- * @method zoomReset
- * @static
- */
-dwv.tool.zoomReset = function(event)
-{
-    app.getImageLayer().resetLayout();
-    app.getImageLayer().draw();
-    app.getDrawLayer().resetLayout();
-    app.getDrawLayer().draw();
-};
-
-/**
  * Navigate class.
  * @class Navigate
  * @namespace dwv.tool
@@ -10063,19 +10065,6 @@ var dwv = dwv || {};
  * @static
  */
 dwv.tool = dwv.tool || {};
-
-/**
- * Reset the application zoom.
- * @method zoomReset
- * @static
- */
-dwv.tool.panReset = function(event)
-{
-    app.getImageLayer().resetLayout();
-    app.getImageLayer().draw();
-    app.getDrawLayer().resetLayout();
-    app.getDrawLayer().draw();
-};
 
 /**
  * Pan class.
@@ -11119,19 +11108,6 @@ var dwv = dwv || {};
  * @static
  */
 dwv.tool = dwv.tool || {};
-
-/**
- * Reset the application zoom.
- * @method zoomReset
- * @static
- */
-dwv.tool.zoomReset = function(event)
-{
-    app.getImageLayer().resetLayout();
-    app.getImageLayer().draw();
-    app.getDrawLayer().resetLayout();
-    app.getDrawLayer().draw();
-};
 
 /**
  * Zoom class.

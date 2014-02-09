@@ -347,6 +347,21 @@ dwv.gui.onChangeLineColour = function(event)
     app.getToolBox().getSelectedTool().setLineColour(this.value);
 };
 
+/**
+ * Handle zoom reset.
+ * @method onZoomReset
+ * @static
+ * @param {Object} event The change event.
+ */
+dwv.gui.onZoomReset = function(event)
+{
+    app.getImageLayer().resetLayout();
+    app.getImageLayer().draw();
+    app.getDrawLayer().resetLayout();
+    app.getDrawLayer().draw();
+};
+
+
 
     </pre>
 </div>
