@@ -30,7 +30,7 @@ dwv.App = function()
     var tempLayer = null;
     
     // flag to know if the info layer is listening on the image.
-    var isInfoLayerListening = true;
+    var isInfoLayerListening = false;
     
     // Tool box
     var toolBox = new dwv.tool.ToolBox(this);
@@ -253,11 +253,9 @@ dwv.App = function()
         // toggle listeners
         if( isInfoLayerListening ) {
             removeImageInfoListeners();
-            isInfoLayerListening = false;
         }
         else {
             addImageInfoListeners();
-            isInfoLayerListening = true;
         }
     };
     
@@ -275,6 +273,7 @@ dwv.App = function()
         view.addEventListener("wlchange", dwv.info.updatePlotMarkings);
         view.addEventListener("colorchange", dwv.info.updateMiniColorMap);
         view.addEventListener("positionchange", dwv.info.updatePositionDiv);
+        isInfoLayerListening = true;
     }
     
     /**
@@ -289,6 +288,7 @@ dwv.App = function()
         view.removeEventListener("wlchange", dwv.info.updatePlotMarkings);
         view.removeEventListener("colorchange", dwv.info.updateMiniColorMap);
         view.removeEventListener("positionchange", dwv.info.updatePositionDiv);
+        isInfoLayerListening = false;
     }
     
     /**
@@ -457,12 +457,6 @@ dwv.App = function()
         dataHeight = image.getSize().getNumberOfRows();
         createLayers(dataWidth, dataHeight);
         
-        // create the info layer
-        dwv.info.createWindowingDiv();
-        dwv.info.createPositionDiv();
-        dwv.info.createMiniColorMap();
-        dwv.info.createPlot();
-
         // get the image data from the image layer
         imageData = self.getImageLayer().getContext().createImageData( 
                 dataWidth, dataHeight);
@@ -485,7 +479,15 @@ dwv.App = function()
         view.addEventListener("wlchange", app.generateAndDrawImage);
         view.addEventListener("colorchange", app.generateAndDrawImage);
         view.addEventListener("slicechange", app.generateAndDrawImage);
-        addImageInfoListeners();
+        
+        // info layer
+        if(document.getElementById("infoLayer")){
+            dwv.info.createWindowingDiv();
+            dwv.info.createPositionDiv();
+            dwv.info.createMiniColorMap();
+            dwv.info.createPlot();
+            addImageInfoListeners();
+        }
         
         // initialise the toolbox
         toolBox.init();

@@ -13,9 +13,6 @@ $(document).ready(function(){
     // undo
     button = document.getElementById("redo-btn");
     if( button ) button.onclick = function() { app.getUndoStack().redo(); };
-    // info
-    button = document.getElementById("info-btn");
-    if( button ) button.onclick = function() { app.toggleInfoLayerDisplay(); };
 
     // Add required loaders to the loader list
     dwv.io.loaders = {};
