@@ -63,6 +63,7 @@ $(document).ready(function(){
     // append help HTML
     dwv.gui.appendHelpHtml(true);
     dwv.gui.base.appendVersionHtml();
+    dwv.gui.appendUndoHtml();
 
     // initialise the application
     app.init();

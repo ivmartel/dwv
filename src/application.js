@@ -492,8 +492,6 @@ dwv.App = function()
         // initialise the toolbox
         toolBox.init();
         toolBox.display(true);
-        // add the HTML for the history 
-        dwv.gui.appendUndoHtml();
         
         // the following has to be done after adding listeners
         
