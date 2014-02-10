@@ -30,7 +30,7 @@ dwv.App = function()
     var tempLayer = null;
     
     // flag to know if the info layer is listening on the image.
-    var isInfoLayerListening = true;
+    var isInfoLayerListening = false;
     
     // Tool box
     var toolBox = new dwv.tool.ToolBox(this);
@@ -253,14 +253,26 @@ dwv.App = function()
         // toggle listeners
         if( isInfoLayerListening ) {
             removeImageInfoListeners();
-            isInfoLayerListening = false;
         }
         else {
             addImageInfoListeners();
-            isInfoLayerListening = true;
         }
     };
     
+    /**
+     * Init the Window/Level display
+     */
+    this.initWLDisplay = function()
+    {
+        // set window/level
+        var keys = Object.keys(dwv.tool.presets);
+        dwv.tool.updateWindowingData(
+            dwv.tool.presets[keys[0]].center, 
+            dwv.tool.presets[keys[0]].width );
+        // default position
+        dwv.tool.updatePostionValue(0,0);
+    };
+
     // Private Methods -------------------------------------------
 
     /**
@@ -275,6 +287,7 @@ dwv.App = function()
         view.addEventListener("wlchange", dwv.info.updatePlotMarkings);
         view.addEventListener("colorchange", dwv.info.updateMiniColorMap);
         view.addEventListener("positionchange", dwv.info.updatePositionDiv);
+        isInfoLayerListening = true;
     }
     
     /**
@@ -289,6 +302,7 @@ dwv.App = function()
         view.removeEventListener("wlchange", dwv.info.updatePlotMarkings);
         view.removeEventListener("colorchange", dwv.info.updateMiniColorMap);
         view.removeEventListener("positionchange", dwv.info.updatePositionDiv);
+        isInfoLayerListening = false;
     }
     
     /**
@@ -457,12 +471,6 @@ dwv.App = function()
         dataHeight = image.getSize().getNumberOfRows();
         createLayers(dataWidth, dataHeight);
         
-        // create the info layer
-        dwv.info.createWindowingDiv();
-        dwv.info.createPositionDiv();
-        dwv.info.createMiniColorMap();
-        dwv.info.createPlot();
-
         // get the image data from the image layer
         imageData = self.getImageLayer().getContext().createImageData( 
                 dataWidth, dataHeight);
@@ -485,22 +493,22 @@ dwv.App = function()
         view.addEventListener("wlchange", app.generateAndDrawImage);
         view.addEventListener("colorchange", app.generateAndDrawImage);
         view.addEventListener("slicechange", app.generateAndDrawImage);
-        addImageInfoListeners();
+        
+        // info layer
+        if(document.getElementById("infoLayer")){
+            dwv.info.createWindowingDiv();
+            dwv.info.createPositionDiv();
+            dwv.info.createMiniColorMap();
+            dwv.info.createPlot();
+            addImageInfoListeners();
+        }
         
         // initialise the toolbox
         toolBox.init();
         toolBox.display(true);
-        // add the HTML for the history 
-        dwv.gui.appendUndoHtml();
         
-        // the following has to be done after adding listeners
-        
-        // set window/level: triggers first data and div display
-        dwv.tool.updateWindowingData(
-                parseInt(app.getView().getWindowLut().getCenter(), 10),
-                parseInt(app.getView().getWindowLut().getWidth(), 10) );
-        // default position: triggers div display
-        dwv.tool.updatePostionValue(0,0);
+        // init W/L display
+        self.initWLDisplay();        
     }
 };
 ;/** 
@@ -3614,7 +3622,21 @@ dwv.gui.onZoomReset = function(event)
     app.getDrawLayer().draw();
 };
 
-
+/**
+ * Handle display reset.
+ * @method onDisplayReset
+ * @static
+ * @param {Object} event The change event.
+ */
+dwv.gui.onDisplayReset = function(event)
+{
+    dwv.gui.onZoomReset(event);
+    app.initWLDisplay();
+    // update preset select
+    var select = document.getElementById("presetSelect");
+    select.selectedIndex = 0;
+    dwv.gui.refreshSelect("#presetSelect");
+};
 ;/** 
  * GUI module.
  * @module gui

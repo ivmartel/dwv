@@ -2672,6 +2672,24 @@
             "namespace": "dwv.gui"
         },
         {
+            "file": "src/gui/handlers.js",
+            "line": 160,
+            "description": "Handle display reset.",
+            "itemtype": "method",
+            "name": "onDisplayReset",
+            "static": 1,
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The change event.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.gui",
+            "module": "gui",
+            "namespace": "dwv.gui"
+        },
+        {
             "file": "src/gui/help.js",
             "line": 15,
             "description": "Append the version HTML.",
@@ -9764,7 +9782,15 @@
         },
         {
             "file": "src/application.js",
-            "line": 266,
+            "line": 262,
+            "description": "Init the Window/Level display",
+            "class": "dwv.App",
+            "module": "utils",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/application.js",
+            "line": 278,
             "description": "Add image listeners.",
             "itemtype": "method",
             "name": "addImageInfoListeners",
@@ -9776,7 +9802,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 280,
+            "line": 293,
             "description": "Remove image listeners.",
             "itemtype": "method",
             "name": "removeImageInfoListeners",
@@ -9788,7 +9814,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 294,
+            "line": 308,
             "description": "General-purpose event handler. This function just determines the mouse \nposition relative to the canvas element. It then passes it to the current tool.",
             "itemtype": "method",
             "name": "eventHandler",
@@ -9807,7 +9833,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 368,
+            "line": 382,
             "description": "Handle an error: display it to the user.",
             "itemtype": "method",
             "name": "handleError",
@@ -9826,7 +9852,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 381,
+            "line": 395,
             "description": "Create the application layers.",
             "itemtype": "method",
             "name": "createLayers",
@@ -9850,7 +9876,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 408,
+            "line": 422,
             "description": "Create the DICOM tags table. To be called once the DICOM has been parsed.",
             "itemtype": "method",
             "name": "createTagsTable",
@@ -9869,7 +9895,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 436,
+            "line": 450,
             "description": "Post load application initialisation. To be called once the DICOM has been parsed.",
             "itemtype": "method",
             "name": "postLoadInit",
@@ -10007,6 +10033,10 @@
         {
             "message": "Missing item type",
             "line": " src/math/scissors.js:107"
+        },
+        {
+            "message": "Missing item type\nInit the Window/Level display",
+            "line": " src/application.js:262"
         }
     ]
 }
