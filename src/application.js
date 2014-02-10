@@ -259,6 +259,20 @@ dwv.App = function()
         }
     };
     
+    /**
+     * Init the Window/Level display
+     */
+    this.initWLDisplay = function()
+    {
+        // set window/level
+        var keys = Object.keys(dwv.tool.presets);
+        dwv.tool.updateWindowingData(
+            dwv.tool.presets[keys[0]].center, 
+            dwv.tool.presets[keys[0]].width );
+        // default position
+        dwv.tool.updatePostionValue(0,0);
+    };
+
     // Private Methods -------------------------------------------
 
     /**
@@ -493,13 +507,7 @@ dwv.App = function()
         toolBox.init();
         toolBox.display(true);
         
-        // the following has to be done after adding listeners
-        
-        // set window/level: triggers first data and div display
-        dwv.tool.updateWindowingData(
-                parseInt(app.getView().getWindowLut().getCenter(), 10),
-                parseInt(app.getView().getWindowLut().getWidth(), 10) );
-        // default position: triggers div display
-        dwv.tool.updatePostionValue(0,0);
+        // init W/L display
+        self.initWLDisplay();        
     }
 };

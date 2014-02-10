@@ -157,4 +157,18 @@ dwv.gui.onZoomReset = function(event)
     app.getDrawLayer().draw();
 };
 
-
+/**
+ * Handle display reset.
+ * @method onDisplayReset
+ * @static
+ * @param {Object} event The change event.
+ */
+dwv.gui.onDisplayReset = function(event)
+{
+    dwv.gui.onZoomReset(event);
+    app.initWLDisplay();
+    // update preset select
+    var select = document.getElementById("presetSelect");
+    select.selectedIndex = 0;
+    dwv.gui.refreshSelect("#presetSelect");
+};
