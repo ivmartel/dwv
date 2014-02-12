@@ -31,15 +31,21 @@ dwv.gui.initToolboxHtml = function(){
 
 // Window/level
 dwv.gui.appendWindowLevelHtml = function(){
-    var button = document.createElement("button");
-    button.id = "wlLi";
-    button.value = "windowlevel";
-    button.onclick = dwv.gui.onChangeTool;
-    button.appendChild(document.createTextNode("W/L"));
-    button.setAttribute("class","ui-btn ui-btn-inline");
+    var input = document.createElement("input");
+    input.id = "wlLi";
+    input.name = "radio-choice";
+    input.checked = "checked";
+    input.type = "radio";
+    input.value = "windowlevel";
+    input.onclick = dwv.gui.onChangeTool;
     
-    var node = document.getElementById("toolfieldset");
-    node.appendChild(button);
+    var label = document.createElement("label");
+    label.setAttribute("for", "wlLi");
+    label.appendChild(document.createTextNode("W/L"));
+    
+    $("#toolfieldset").controlgroup("container")["append"](input);
+    $("#toolfieldset").controlgroup("container")["append"](label);
+    
     $("#toolfieldset").trigger("create");
 };
 dwv.gui.displayWindowLevelHtml = function(bool){
@@ -52,25 +58,30 @@ dwv.gui.initWindowLevelHtml = function(){
     var select = dwv.html.createHtmlSelect("presetSelect",dwv.tool.presets);
     select.onchange = dwv.gui.onChangeWindowLevelPreset;
     select.title = "Select w/l preset.";
-    //select.setAttribute("class","ui-select-inline");
     select.setAttribute("data-inline","true");
 
-    var node = document.getElementById("toolfieldset");
+    var node = document.getElementById("mainfieldset");
     node.appendChild(select);
-    $("#toolfieldset").trigger("create");
+    
+    $("#mainfieldset").trigger("create");
 };
 
 // Zoom
 dwv.gui.appendZoomHtml = function(){
-    var button = document.createElement("button");
-    button.id = "zoomLi";
-    button.value = "zoom";
-    button.onclick = dwv.gui.onChangeTool;
-    button.appendChild(document.createTextNode("Zoom"));
-    button.setAttribute("class","ui-btn ui-btn-inline");
+    var input = document.createElement("input");
+    input.id = "zoomLi";
+    input.name = "radio-choice";
+    input.type = "radio";
+    input.value = "zoom";
+    input.onclick = dwv.gui.onChangeTool;
     
-    var node = document.getElementById("toolfieldset");
-    node.appendChild(button);
+    var label = document.createElement("label");
+    label.setAttribute("for", "zoomLi");
+    label.appendChild(document.createTextNode("Zoom"));
+
+    $("#toolfieldset").controlgroup("container")["append"](input);
+    $("#toolfieldset").controlgroup("container")["append"](label);
+    
     $("#toolfieldset").trigger("create");
 };
 dwv.gui.displayZoomHtml = function(bool){
@@ -79,22 +90,49 @@ dwv.gui.displayZoomHtml = function(bool){
 
 // Pan
 dwv.gui.appendPanHtml = function(){
-    var button = document.createElement("button");
-    button.id = "panLi";
-    button.value = "pan";
-    button.onclick = dwv.gui.onChangeTool;
-    button.appendChild(document.createTextNode("Pan"));
-    button.setAttribute("class","ui-btn ui-btn-inline");
+    var input = document.createElement("input");
+    input.id = "panLi";
+    input.name = "radio-choice";
+    input.type = "radio";
+    input.value = "pan";
+    input.onclick = dwv.gui.onChangeTool;
     
-    var node = document.getElementById("toolfieldset");
-    node.appendChild(button);
+    var label = document.createElement("label");
+    label.setAttribute("for", "panLi");
+    label.appendChild(document.createTextNode("Pan"));
+
+    $("#toolfieldset").controlgroup("container")["append"](input);
+    $("#toolfieldset").controlgroup("container")["append"](label);
+    
     $("#toolfieldset").trigger("create");
 };
 dwv.gui.displayPanHtml = function(bool){
     //dwv.gui.base.displayPanHtml(bool);
 };
 
-// Reset
+// Scroll
+dwv.gui.appendScrollHtml = function(){
+    var input = document.createElement("input");
+    input.id = "scrollLi";
+    input.name = "radio-choice";
+    input.type = "radio";
+    input.value = "scroll";
+    input.onclick = dwv.gui.onChangeTool;
+    
+    var label = document.createElement("label");
+    label.setAttribute("for", "scrollLi");
+    label.appendChild(document.createTextNode("Scroll"));
+
+    $("#toolfieldset").controlgroup("container")["append"](input);
+    $("#toolfieldset").controlgroup("container")["append"](label);
+
+    $("#toolfieldset").trigger("create");
+};
+dwv.gui.displayScrollHtml = function(bool){
+    //dwv.gui.base.displayScrollHtml(bool);
+};
+
+//Reset
 dwv.gui.appendResetHtml = function(){
     var button = document.createElement("button");
     button.id = "resetLi";
@@ -103,26 +141,9 @@ dwv.gui.appendResetHtml = function(){
     button.appendChild(document.createTextNode("Reset"));
     button.setAttribute("class","ui-btn ui-btn-inline");
     
-    var node = document.getElementById("toolfieldset");
+    var node = document.getElementById("mainfieldset");
     node.appendChild(button);
-    $("#toolfieldset").trigger("create");
-};
-
-// Scroll
-dwv.gui.appendScrollHtml = function(){
-    var button = document.createElement("button");
-    button.id = "scrollLi";
-    button.value = "scroll";
-    button.onclick = dwv.gui.onChangeTool;
-    button.appendChild(document.createTextNode("Scroll"));
-    button.setAttribute("class","ui-btn ui-btn-inline");
-    
-    var node = document.getElementById("toolfieldset");
-    node.appendChild(button);
-    $("#toolfieldset").trigger("create");
-};
-dwv.gui.displayScrollHtml = function(bool){
-    //dwv.gui.base.displayScrollHtml(bool);
+    $("#mainfieldset").trigger("create");
 };
 
 // Undo/redo
