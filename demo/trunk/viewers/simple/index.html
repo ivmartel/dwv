@@ -41,10 +41,14 @@ body { margin: 10px; padding: 0; }
 <div id="pageMain" data-role="content" style="padding:2px;">   
 
 <div id="toolbar">
-<fieldset id="toolfieldset" data-role="controlgroup" data-type="horizontal">
-<a href="#" class="ui-btn ui-btn-inline ui-btn-icon-notext ui-mini ui-icon-info"
-  id="info-btn">Info</a>
+
+<fieldset id="mainfieldset" data-role="controlgroup" 
+  data-type="horizontal">
+<fieldset id="toolfieldset" data-role="controlgroup" 
+  data-type="horizontal" style="padding-right:10px;">
 </fieldset>
+</fieldset>
+
 </div><!-- /toolbar -->
 
 <!-- Open popup -->
@@ -63,12 +67,6 @@ body { margin: 10px; padding: 0; }
 <canvas id="imageLayer">Only for HTML5 compatible browsers...</canvas>
 <canvas id="drawLayer">Only for HTML5 compatible browsers...</canvas>
 <canvas id="tempLayer">Only for HTML5 compatible browsers...</canvas>
-<div id="infoLayer">
-<div id="infotl"></div>
-<div id="infotr"></div>
-<div id="infobl"></div>
-<div id="infobr"><div id="plot"></div></div>
-</div><!-- /infoLayer -->
 </div><!-- /layerContainer -->
 
 </div><!-- /content -->
