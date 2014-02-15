@@ -54,13 +54,24 @@ dwv.gui.displayWindowLevelHtml = function(bool){
 dwv.gui.initWindowLevelHtml = function(){
     //dwv.gui.base.initWindowLevelHtml();
     
+    // clear previous
+    $("#presetSelect").remove();
+    $("#presetLabel").remove();
+    
     // create preset select
+    dwv.tool.updatePresets(false);
     var select = dwv.html.createHtmlSelect("presetSelect",dwv.tool.presets);
     select.onchange = dwv.gui.onChangeWindowLevelPreset;
     select.title = "Select w/l preset.";
     select.setAttribute("data-inline","true");
 
+    // label as span (otherwise creates new line)
+    var span = document.createElement("span");
+    span.id = "presetLabel";
+    span.appendChild(document.createTextNode("Presets: "));
+    
     var node = document.getElementById("mainfieldset");
+    node.appendChild(span);
     node.appendChild(select);
     
     $("#mainfieldset").trigger("create");
