@@ -1703,7 +1703,7 @@
             "module": "tool",
             "namespace": "dwv.tool",
             "file": "src/tools/windowLevel.js",
-            "line": 98,
+            "line": 150,
             "description": "WindowLevel tool: handle window/level related events.",
             "is_constructor": 1,
             "params": [
@@ -2436,6 +2436,29 @@
         {
             "file": "src/gui/generic.js",
             "line": 70,
+            "description": "Set the selected item of a HTML select.",
+            "itemtype": "method",
+            "name": "refreshSelect",
+            "static": 1,
+            "params": [
+                {
+                    "name": "selectName",
+                    "description": "The name of the HTML select.",
+                    "type": "String"
+                },
+                {
+                    "name": "itemName",
+                    "description": "The name of the itme to mark as selected.",
+                    "type": "String"
+                }
+            ],
+            "class": "dwv.gui",
+            "module": "gui",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/gui/generic.js",
+            "line": 88,
             "description": "Append the slider HTML.",
             "itemtype": "method",
             "name": "appendSliderHtml",
@@ -2446,7 +2469,7 @@
         },
         {
             "file": "src/gui/generic.js",
-            "line": 117,
+            "line": 135,
             "description": "Initialise the slider HTML.",
             "itemtype": "method",
             "name": "initSliderHtml",
@@ -3834,7 +3857,7 @@
         },
         {
             "file": "src/gui/tools.js",
-            "line": 148,
+            "line": 150,
             "description": "Append the draw HTML to the page.",
             "itemtype": "method",
             "name": "appendDrawHtml",
@@ -3845,7 +3868,7 @@
         },
         {
             "file": "src/gui/tools.js",
-            "line": 185,
+            "line": 187,
             "description": "Display the draw HTML.",
             "itemtype": "method",
             "name": "displayDrawHtml",
@@ -3863,7 +3886,7 @@
         },
         {
             "file": "src/gui/tools.js",
-            "line": 199,
+            "line": 201,
             "description": "Initialise the draw HTML.",
             "itemtype": "method",
             "name": "displayDrawHtml",
@@ -3874,7 +3897,7 @@
         },
         {
             "file": "src/gui/tools.js",
-            "line": 216,
+            "line": 218,
             "description": "Append the color chooser HTML to the page.",
             "itemtype": "method",
             "name": "appendLivewireHtml",
@@ -3885,7 +3908,7 @@
         },
         {
             "file": "src/gui/tools.js",
-            "line": 242,
+            "line": 244,
             "description": "Display the livewire HTML.",
             "itemtype": "method",
             "name": "displayLivewireHtml",
@@ -3903,7 +3926,7 @@
         },
         {
             "file": "src/gui/tools.js",
-            "line": 254,
+            "line": 256,
             "description": "Initialise the livewire HTML.",
             "itemtype": "method",
             "name": "initLivewireHtml",
@@ -3914,7 +3937,7 @@
         },
         {
             "file": "src/gui/tools.js",
-            "line": 266,
+            "line": 268,
             "description": "Append the Navigate HTML to the page.",
             "itemtype": "method",
             "name": "appendNavigateHtml",
@@ -3925,7 +3948,7 @@
         },
         {
             "file": "src/gui/tools.js",
-            "line": 296,
+            "line": 298,
             "description": "Display the Navigate HTML.",
             "itemtype": "method",
             "name": "displayNavigateHtml",
@@ -3943,7 +3966,7 @@
         },
         {
             "file": "src/gui/tools.js",
-            "line": 308,
+            "line": 310,
             "description": "Append the Zoom HTML to the page.",
             "itemtype": "method",
             "name": "appendZoomHtml",
@@ -3954,7 +3977,7 @@
         },
         {
             "file": "src/gui/tools.js",
-            "line": 338,
+            "line": 340,
             "description": "Display the Zoom HTML.",
             "itemtype": "method",
             "name": "displayZoomHtml",
@@ -3972,7 +3995,7 @@
         },
         {
             "file": "src/gui/tools.js",
-            "line": 350,
+            "line": 352,
             "description": "Append the Pan HTML to the page.",
             "itemtype": "method",
             "name": "appendPanHtml",
@@ -3983,7 +4006,7 @@
         },
         {
             "file": "src/gui/tools.js",
-            "line": 380,
+            "line": 382,
             "description": "Display the pan HTML.",
             "itemtype": "method",
             "name": "displayPanHtml",
@@ -4001,7 +4024,7 @@
         },
         {
             "file": "src/gui/tools.js",
-            "line": 392,
+            "line": 394,
             "description": "Append the Scroll HTML to the page.",
             "itemtype": "method",
             "name": "appendScrollHtml",
@@ -4012,7 +4035,7 @@
         },
         {
             "file": "src/gui/tools.js",
-            "line": 413,
+            "line": 415,
             "description": "Display the Scroll HTML.",
             "itemtype": "method",
             "name": "displayScrollHtml",
@@ -8950,7 +8973,24 @@
         },
         {
             "file": "src/tools/windowLevel.js",
-            "line": 107,
+            "line": 100,
+            "description": "Update the window/level presets.",
+            "itemtype": "method",
+            "name": "updatePresets",
+            "params": [
+                {
+                    "name": "full",
+                    "description": "If true, shows all presets.",
+                    "type": "Boolean"
+                }
+            ],
+            "class": "dwv.tool",
+            "module": "tool",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/tools/windowLevel.js",
+            "line": 159,
             "description": "Closure to self: to be used by event handlers.",
             "itemtype": "property",
             "name": "self",
@@ -8963,7 +9003,7 @@
         },
         {
             "file": "src/tools/windowLevel.js",
-            "line": 114,
+            "line": 166,
             "description": "Interaction start flag.",
             "itemtype": "property",
             "name": "started",
@@ -8974,7 +9014,7 @@
         },
         {
             "file": "src/tools/windowLevel.js",
-            "line": 121,
+            "line": 173,
             "description": "Handle mouse down event.",
             "itemtype": "method",
             "name": "mousedown",
@@ -8991,7 +9031,7 @@
         },
         {
             "file": "src/tools/windowLevel.js",
-            "line": 136,
+            "line": 188,
             "description": "Handle mouse move event.",
             "itemtype": "method",
             "name": "mousemove",
@@ -9008,7 +9048,7 @@
         },
         {
             "file": "src/tools/windowLevel.js",
-            "line": 157,
+            "line": 209,
             "description": "Handle mouse up event.",
             "itemtype": "method",
             "name": "mouseup",
@@ -9025,7 +9065,7 @@
         },
         {
             "file": "src/tools/windowLevel.js",
-            "line": 167,
+            "line": 229,
             "description": "Handle mouse out event.",
             "itemtype": "method",
             "name": "mouseout",
@@ -9042,7 +9082,7 @@
         },
         {
             "file": "src/tools/windowLevel.js",
-            "line": 177,
+            "line": 239,
             "description": "Handle touch start event.",
             "itemtype": "method",
             "name": "touchstart",
@@ -9059,7 +9099,7 @@
         },
         {
             "file": "src/tools/windowLevel.js",
-            "line": 186,
+            "line": 248,
             "description": "Handle touch move event.",
             "itemtype": "method",
             "name": "touchmove",
@@ -9076,7 +9116,7 @@
         },
         {
             "file": "src/tools/windowLevel.js",
-            "line": 195,
+            "line": 257,
             "description": "Handle touch end event.",
             "itemtype": "method",
             "name": "touchend",
@@ -9093,7 +9133,7 @@
         },
         {
             "file": "src/tools/windowLevel.js",
-            "line": 204,
+            "line": 266,
             "description": "Handle double click event.",
             "itemtype": "method",
             "name": "dblclick",
@@ -9110,7 +9150,7 @@
         },
         {
             "file": "src/tools/windowLevel.js",
-            "line": 216,
+            "line": 278,
             "description": "Handle key down event.",
             "itemtype": "method",
             "name": "keydown",
@@ -9127,7 +9167,7 @@
         },
         {
             "file": "src/tools/windowLevel.js",
-            "line": 226,
+            "line": 288,
             "description": "Enable the tool.",
             "itemtype": "method",
             "name": "enable",
@@ -9144,7 +9184,7 @@
         },
         {
             "file": "src/tools/windowLevel.js",
-            "line": 239,
+            "line": 301,
             "description": "Initialise the tool.",
             "itemtype": "method",
             "name": "init",
@@ -9154,7 +9194,7 @@
         },
         {
             "file": "src/tools/windowLevel.js",
-            "line": 249,
+            "line": 311,
             "description": "Help for this tool.",
             "itemtype": "method",
             "name": "getHelp",
@@ -9162,16 +9202,6 @@
                 "description": "The help content.",
                 "type": "Object"
             },
-            "class": "dwv.tool.WindowLevel",
-            "module": "tool",
-            "namespace": "dwv.tool"
-        },
-        {
-            "file": "src/tools/windowLevel.js",
-            "line": 269,
-            "description": "Update the window/level presets.",
-            "itemtype": "method",
-            "name": "updatePresets",
             "class": "dwv.tool.WindowLevel",
             "module": "tool",
             "namespace": "dwv.tool"
@@ -10011,8 +10041,12 @@
             "line": " src/tools/windowLevel.js:65"
         },
         {
+            "message": "replacing incorrect tag: function with method",
+            "line": " src/tools/windowLevel.js:100"
+        },
+        {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/tools/windowLevel.js:249"
+            "line": " src/tools/windowLevel.js:311"
         },
         {
             "message": "replacing incorrect tag: returns with return",
