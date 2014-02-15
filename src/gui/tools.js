@@ -128,9 +128,11 @@ dwv.gui.base.initWindowLevelHtml = function()
     wlSelector.onchange = dwv.gui.onChangeWindowLevelPreset;
     wlSelector.title = "Select w/l preset.";
     
-    // update html list
+    // copy html list
     var wlLi = document.getElementById("wlLi");
+    // clear node
     dwv.html.cleanNode(wlLi);
+    // add children
     wlLi.appendChild(wlSelector);
     $("#toolList").trigger("create");
     

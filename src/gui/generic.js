@@ -68,6 +68,24 @@ dwv.gui.refreshSelect = function(selectName)
 };
 
 /**
+ * Set the selected item of a HTML select.
+ * @method refreshSelect
+ * @static
+ * @param {String} selectName The name of the HTML select.
+ * @param {String} itemName The name of the itme to mark as selected.
+ */
+dwv.gui.setSelected = function(selectName, itemName)
+{
+    var select = document.getElementById(selectName);
+    var index = 0;
+    for( index in select.options){ 
+        if( select.options[index].text === itemName ) break;
+    }
+    select.selectedIndex = index;
+    dwv.gui.refreshSelect("#" + selectName);
+};
+
+/**
  * Append the slider HTML.
  * @method appendSliderHtml
  * @static

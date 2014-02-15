@@ -88,11 +88,63 @@ dwv.tool.colourMaps = {
 dwv.tool.presets = {};
 dwv.tool.defaultpresets = {};
 dwv.tool.defaultpresets.CT = {
-    "abdomen": {"center": 40, "width": 350},
-    "lung": {"center": -600, "width": 1500},
+    "mediastinum": {"center": 40, "width": 400},
+    "lung": {"center": -500, "width": 1500},
+    "bone": {"center": 500, "width": 2000},
+};
+dwv.tool.defaultpresets.CTextra = {
     "brain": {"center": 40, "width": 80},
-    "bone": {"center": 480, "width": 2500},
     "head": {"center": 90, "width": 350}
+};
+
+/**
+ * Update the window/level presets.
+ * @function updatePresets
+ * @param {Boolean} full If true, shows all presets.
+ */
+dwv.tool.updatePresets = function(full)
+{    
+    // store the manual preset
+    var manual = dwv.tool.presets.manual;
+    // reinitialize the presets
+    dwv.tool.presets = {};
+    
+    // DICOM presets
+    var dicomPresets = app.getView().getWindowPresets();
+    if( dicomPresets ) {
+        if( full ) {
+            for( var i = 0; i < dicomPresets.length; ++i ) {
+                dwv.tool.presets[dicomPresets[i].name.toLowerCase()] = dicomPresets[i];
+            }
+        }
+        // just the first one
+        else {
+            dwv.tool.presets["default"] = dicomPresets[0];
+        }
+    }
+    
+    // min/max preset
+    if( full ) {
+        var range = app.getImage().getRescaledDataRange();
+        var width = range.max - range.min;
+        var center = range.min + width/2;
+        dwv.tool.presets["min/max"] = {"center": center, "width": width};
+    }
+    
+    // default presets
+    var modality = app.getImage().getMeta().Modality;
+    for( var key in dwv.tool.defaultpresets[modality] ) {
+        dwv.tool.presets[key] = dwv.tool.defaultpresets[modality][key];
+    }
+    if( full ) {
+        for( var key2 in dwv.tool.defaultpresets[modality+"extra"] ) {
+            dwv.tool.presets[key2] = dwv.tool.defaultpresets[modality+"extra"][key2];
+        }
+    }
+    // manual preset
+    if( manual ){
+        dwv.tool.presets.manual = manual;
+    }
 };
 
 /**
@@ -161,7 +213,17 @@ dwv.tool.WindowLevel = function(app)
      */
     this.mouseup = function(event){
         // set start flag
-        if( self.started ) self.started = false;
+        if( self.started ) {
+            self.started = false;
+            // store the manual preset
+            var windowCenter = parseInt(app.getView().getWindowLut().getCenter(), 10);
+            var windowWidth = parseInt(app.getView().getWindowLut().getWidth(), 10);
+            dwv.tool.presets.manual = {"center": windowCenter, "width": windowWidth};
+            // update gui
+            dwv.gui.initWindowLevelHtml();
+            // set selected
+            dwv.gui.setSelected("presetSelect", "Manual");
+        }
     };
     
     /**
@@ -241,7 +303,7 @@ dwv.tool.WindowLevel = function(app)
      * @method init
      */
     this.init = function() {
-        this.updatePresets();
+        dwv.tool.updatePresets(true);
         dwv.gui.initWindowLevelHtml();
     };
 }; // WindowLevel class
@@ -264,34 +326,4 @@ dwv.tool.WindowLevel.prototype.getHelp = function()
             'touch_drag': "A single touch drag changes the window in the horizontal direction and the level in the vertical one.",
         }
     };
-};
-
-/**
- * Update the window/level presets.
- * @method updatePresets
- */
-dwv.tool.WindowLevel.prototype.updatePresets = function()
-{    
-    // copy the presets and reinitialize the external one
-    // (hoping to control the order of the presets)
-    dwv.tool.presets = {};
-    // DICOM presets
-    var dicomPresets = app.getView().getWindowPresets();
-    if( dicomPresets ) {
-        for( var i = 0; i < dicomPresets.length; ++i ) {
-            dwv.tool.presets[dicomPresets[i].name.toLowerCase()] = dicomPresets[i];
-        }
-    }
-    // min/max preset
-    var range = app.getImage().getRescaledDataRange();
-    var min = range.min;
-    var max = range.max;
-    var width = max - min;
-    var center = min + width/2;
-    dwv.tool.presets["min/max"] = {"center": center, "width": width};
-    // re-populate the external array
-    var modality = app.getImage().getMeta().Modality;
-    for( var key in dwv.tool.defaultpresets[modality] ) {
-        dwv.tool.presets[key] = dwv.tool.defaultpresets[modality][key];
-    }
 };
