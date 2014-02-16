@@ -82,29 +82,11 @@ dwv.tool.ToolBox.prototype.hasTool = function(name) {
 };
 
 /**
- * Sort the tool list.
- * @method sortTools
- */
-dwv.tool.ToolBox.prototype.sortTools = function()
-{
-    // fiddle with order: make window level first if present
-    var tools = dwv.tool.tools;
-    dwv.tool.tools = {};
-    if( tools.windowlevel ) dwv.tool.tools.windowlevel = tools.windowlevel;
-    for( var key in tools ) {
-        if( key === "windowlevel" ) continue;
-        dwv.tool.tools[key] = tools[key];
-    }
-};
-
-/**
  * Initialise the tool box.
  * @method init
  */
 dwv.tool.ToolBox.prototype.init = function()
 {
-    // sort tools
-    this.sortTools();
     // set the default to the first in the list
     for( var key in dwv.tool.tools ){
         this.defaultToolName = key;
