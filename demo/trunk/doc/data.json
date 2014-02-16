@@ -8793,16 +8793,6 @@
         {
             "file": "src/tools/toolbox.js",
             "line": 84,
-            "description": "Sort the tool list.",
-            "itemtype": "method",
-            "name": "sortTools",
-            "class": "dwv.tool.ToolBox",
-            "module": "tool",
-            "namespace": "dwv.tool"
-        },
-        {
-            "file": "src/tools/toolbox.js",
-            "line": 100,
             "description": "Initialise the tool box.",
             "itemtype": "method",
             "name": "init",
