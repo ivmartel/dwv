@@ -1,3 +1,7 @@
+/** 
+ * Application launcher.
+ */
+
 function toggle(dialogId)
 {
     if( $(dialogId).dialog('isOpen') ) $(dialogId).dialog('close');
