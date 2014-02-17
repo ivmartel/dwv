@@ -172,3 +172,36 @@ dwv.gui.onDisplayReset = function(event)
     select.selectedIndex = 0;
     dwv.gui.refreshSelect("#presetSelect");
 };
+
+/**
+ * Handle undo.
+ * @method onUndo
+ * @static
+ * @param {Object} event The associated event.
+ */
+dwv.gui.onUndo = function(event)
+{
+    app.getUndoStack().undo();
+};
+
+/**
+ * Handle redo.
+ * @method onRedo
+ * @static
+ * @param {Object} event The associated event.
+ */
+dwv.gui.onRedo = function(event)
+{
+    app.getUndoStack().redo();
+};
+
+/**
+ * Handle toggle of info layer.
+ * @method onToggleInfoLayer
+ * @static
+ * @param {Object} event The associated event.
+ */
+dwv.gui.onToggleInfoLayer = function(event)
+{
+    app.toggleInfoLayerDisplay();
+};
