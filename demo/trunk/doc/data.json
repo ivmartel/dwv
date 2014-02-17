@@ -2713,6 +2713,60 @@
             "namespace": "dwv.gui"
         },
         {
+            "file": "src/gui/handlers.js",
+            "line": 176,
+            "description": "Handle undo.",
+            "itemtype": "method",
+            "name": "onUndo",
+            "static": 1,
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The associated event.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.gui",
+            "module": "gui",
+            "namespace": "dwv.gui"
+        },
+        {
+            "file": "src/gui/handlers.js",
+            "line": 187,
+            "description": "Handle redo.",
+            "itemtype": "method",
+            "name": "onRedo",
+            "static": 1,
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The associated event.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.gui",
+            "module": "gui",
+            "namespace": "dwv.gui"
+        },
+        {
+            "file": "src/gui/handlers.js",
+            "line": 198,
+            "description": "Handle toggle of info layer.",
+            "itemtype": "method",
+            "name": "onToggleInfoLayer",
+            "static": 1,
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The associated event.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.gui",
+            "module": "gui",
+            "namespace": "dwv.gui"
+        },
+        {
             "file": "src/gui/help.js",
             "line": 15,
             "description": "Append the version HTML.",
