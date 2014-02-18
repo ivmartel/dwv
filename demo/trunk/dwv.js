@@ -907,7 +907,6 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
     var offset = 0;
     var implicit = false;
     var jpeg = false;
-    var jpegls = false;
     var jpeg2000 = false;
     // dictionary
     this.dict.init();
@@ -962,7 +961,6 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
             }
             // JPEG-LS
             else if( dwv.dicom.isJpeglsTransferSyntax(syntax) ) {
-                jpegls = true;
                 //console.log("JPEG-LS compressed DICOM data: " + syntax);
                 throw new Error("Unsupported DICOM transfer syntax (JPEG-LS): "+syntax);
             }
@@ -1143,7 +1141,7 @@ dwv.dicom.DicomParser.prototype.createImage = function()
     }
     
     // slice position
-    var slicePosition = [0,0,0];
+    var slicePosition = new Array(0,0,0);
     if( this.dicomElements.ImagePositionPatient )
         slicePosition = [ parseFloat(this.dicomElements.ImagePositionPatient.value[0]),
             parseFloat(this.dicomElements.ImagePositionPatient.value[1]),
@@ -6960,7 +6958,7 @@ dwv.image.View = function(image, isSigned)
     /**
      * Get the view listeners.
      * @method getListeners
-     * @return {Array} The view listeners.
+     * @return {Object} The view listeners.
      */ 
     this.getListeners = function() { return listeners; };
     /**
@@ -7495,8 +7493,7 @@ dwv.math.BucketQueue.prototype.getBucket = function(item) {
 
 dwv.math.BucketQueue.prototype.buildArray = function(newSize) {
 	// Create array and initialze pointers to null
-	var buckets = [];
-	buckets.length = newSize;
+	var buckets = new Array(newSize);
 	
 	for ( var i = 0; i < buckets.length; i++ ) {
 		buckets[i] = null;

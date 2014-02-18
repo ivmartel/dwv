@@ -2240,7 +2240,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 548,
+            "line": 546,
             "description": "Get an Image object from the read DICOM file.",
             "itemtype": "method",
             "name": "createImage",
@@ -5716,7 +5716,7 @@
             "name": "getListeners",
             "return": {
                 "description": "The view listeners.",
-                "type": "Array"
+                "type": "Object"
             },
             "class": "dwv.image.View",
             "module": "image",
@@ -10057,7 +10057,7 @@
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/dicom/dicomParser.js:548"
+            "line": " src/dicom/dicomParser.js:546"
         },
         {
             "message": "unknown tag: input",
