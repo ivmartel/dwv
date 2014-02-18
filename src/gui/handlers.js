@@ -153,8 +153,10 @@ dwv.gui.onZoomReset = function(event)
 {
     app.getImageLayer().resetLayout();
     app.getImageLayer().draw();
-    app.getDrawLayer().resetLayout();
-    app.getDrawLayer().draw();
+    if( app.getDrawLayer() ) {
+        app.getDrawLayer().resetLayout();
+        app.getDrawLayer().draw();
+    }
 };
 
 /**
