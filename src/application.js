@@ -122,7 +122,20 @@ dwv.App = function()
      * Initialise the HTML for the application.
      * @method init
      */
-    this.init = function(){};
+    this.init = function(){
+        // align layers when the window is resized
+        window.onresize = app.resize;
+        // possible load from URL
+        if( typeof skipLoadUrl === "undefined" ) {
+            var inputUrls = dwv.html.getUriParam(); 
+            if( inputUrls && inputUrls.length > 0 ) {
+                app.loadURL(inputUrls);
+            }
+        }
+        else{
+            console.log("Not loading url from adress since skipLoadUrl is defined.");
+        }
+    };
     
     /**
      * Reset the application.
@@ -410,13 +423,17 @@ dwv.App = function()
         imageLayer.fillContext();
         imageLayer.setStyleDisplay(true);
         // draw layer
-        drawLayer = new dwv.html.Layer("drawLayer");
-        drawLayer.initialise(dataWidth, dataHeight);
-        drawLayer.setStyleDisplay(true);
+        if( document.getElementById("drawLayer") !== null) {
+            drawLayer = new dwv.html.Layer("drawLayer");
+            drawLayer.initialise(dataWidth, dataHeight);
+            drawLayer.setStyleDisplay(true);
+        }
         // temp layer
-        tempLayer = new dwv.html.Layer("tempLayer");
-        tempLayer.initialise(dataWidth, dataHeight);
-        tempLayer.setStyleDisplay(true);
+        if( document.getElementById("tempLayer") !== null) {
+            tempLayer = new dwv.html.Layer("tempLayer");
+            tempLayer.initialise(dataWidth, dataHeight);
+            tempLayer.setStyleDisplay(true);
+        }
     }
     
     /**
@@ -427,10 +444,11 @@ dwv.App = function()
      */
     function createTagsTable(dataInfo)
     {
-        // tag list table (without the pixel data)
-        if(dataInfo.PixelData) dataInfo.PixelData.value = "...";
         // HTML node
         var node = document.getElementById("tags");
+        if( node === null ) return;
+        // tag list table (without the pixel data)
+        if(dataInfo.PixelData) dataInfo.PixelData.value = "...";
         // remove possible previous
         while (node.hasChildNodes()) { 
             node.removeChild(node.firstChild);
@@ -475,18 +493,19 @@ dwv.App = function()
         imageData = self.getImageLayer().getContext().createImageData( 
                 dataWidth, dataHeight);
 
+        var topLayer = tempLayer === null ? imageLayer : tempLayer;
         // mouse listeners
-        tempLayer.getCanvas().addEventListener("mousedown", eventHandler, false);
-        tempLayer.getCanvas().addEventListener("mousemove", eventHandler, false);
-        tempLayer.getCanvas().addEventListener("mouseup", eventHandler, false);
-        tempLayer.getCanvas().addEventListener("mouseout", eventHandler, false);
-        tempLayer.getCanvas().addEventListener("mousewheel", eventHandler, false);
-        tempLayer.getCanvas().addEventListener("DOMMouseScroll", eventHandler, false);
-        tempLayer.getCanvas().addEventListener("dblclick", eventHandler, false);
+        topLayer.getCanvas().addEventListener("mousedown", eventHandler, false);
+        topLayer.getCanvas().addEventListener("mousemove", eventHandler, false);
+        topLayer.getCanvas().addEventListener("mouseup", eventHandler, false);
+        topLayer.getCanvas().addEventListener("mouseout", eventHandler, false);
+        topLayer.getCanvas().addEventListener("mousewheel", eventHandler, false);
+        topLayer.getCanvas().addEventListener("DOMMouseScroll", eventHandler, false);
+        topLayer.getCanvas().addEventListener("dblclick", eventHandler, false);
         // touch listeners
-        tempLayer.getCanvas().addEventListener("touchstart", eventHandler, false);
-        tempLayer.getCanvas().addEventListener("touchmove", eventHandler, false);
-        tempLayer.getCanvas().addEventListener("touchend", eventHandler, false);
+        topLayer.getCanvas().addEventListener("touchstart", eventHandler, false);
+        topLayer.getCanvas().addEventListener("touchmove", eventHandler, false);
+        topLayer.getCanvas().addEventListener("touchend", eventHandler, false);
         // keydown listener
         window.addEventListener("keydown", eventHandler, true);
         // image listeners

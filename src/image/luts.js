@@ -91,7 +91,7 @@ dwv.image.lut.Window = function(rescaleLut_, isSigned_)
     var windowLut_ = null;
     
     // check Uint8ClampedArray support
-    if( !dwv.html.browser.hasClampedArray() )
+    if( !dwv.browser.hasClampedArray() )
     {
         windowLut_ = new Uint8Array(rescaleLut_.getLength());
     }
@@ -147,7 +147,7 @@ dwv.image.lut.Window = function(rescaleLut_, isSigned_)
         var center0 = isSigned_ ? center - 0.5 + size / 2 : center - 0.5;
         var width0 = width - 1;
         var dispval = 0;
-        if( !dwv.html.browser.hasClampedArray() )
+        if( !dwv.browser.hasClampedArray() )
         {
             var xMin = center - 0.5 - (width-1) / 2;
             var xMax = center - 0.5 + (width-1) / 2;    
