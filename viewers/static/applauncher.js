@@ -3,11 +3,11 @@
  */
 
 // check browser support
-dwv.html.browser.check();
+dwv.browser.check();
 // main application
 var app = new dwv.App();
 
-// jquery
+// launch when page is loaded
 $(document).ready( function()
 {
     $("#toggleInfoLayer").button({ icons: 
@@ -81,16 +81,11 @@ $(document).ready( function()
     
     // append help HTML
     dwv.gui.appendHelpHtml(false);
-    dwv.gui.base.appendVersionHtml();
+    dwv.gui.appendVersionHtml();
     dwv.gui.appendUndoHtml();
 
     // initialise the application
     app.init();
-    // align layers when the window is resized
-    window.onresize = app.resize;
-    // possible load from URL
-    var inputUrls = dwv.html.getUriParam(); 
-    if( inputUrls && inputUrls.length > 0 ) app.loadURL(inputUrls);
     
     // help
     // TODO Seems accordion only works when at end...

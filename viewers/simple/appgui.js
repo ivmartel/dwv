@@ -173,9 +173,3 @@ dwv.gui.appendResetHtml = function(){
     node.appendChild(button);
     $("#mainfieldset").trigger("create");
 };
-
-// Undo/redo
-// TODO not needed but gives error...
-dwv.gui.appendUndoHtml = function(){
-    //dwv.gui.base.appendUndoHtml();
-};

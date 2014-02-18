@@ -207,3 +207,6 @@ dwv.gui.appendUndoHtml = function(){
 dwv.gui.appendHelpHtml = function(mobile){
     dwv.gui.base.appendHelpHtml(mobile);
 };
+dwv.gui.appendVersionHtml = function(){
+    dwv.gui.base.appendVersionHtml();
+};

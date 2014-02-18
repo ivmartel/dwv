@@ -3,11 +3,11 @@
  */
 
 // check browser support
-dwv.html.browser.check();
+dwv.browser.check();
 // main application
-var app = new dwv.App(true);
+var app = new dwv.App();
 
-// jquery
+// launch when page is loaded
 $(document).ready( function()
 {
     // Add required loaders to the loader list
@@ -32,9 +32,4 @@ $(document).ready( function()
     
     // initialise the application
     app.init();
-    // align layers when the window is resized
-    window.onresize = app.resize;
-    // possible load from URL
-    var inputUrls = dwv.html.getUriParam(); 
-    if( inputUrls && inputUrls.length > 0 ) app.loadURL(inputUrls);
 });
