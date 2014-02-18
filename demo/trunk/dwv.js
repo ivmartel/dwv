@@ -122,7 +122,20 @@ dwv.App = function()
      * Initialise the HTML for the application.
      * @method init
      */
-    this.init = function(){};
+    this.init = function(){
+        // align layers when the window is resized
+        window.onresize = app.resize;
+        // possible load from URL
+        if( typeof skipLoadUrl === "undefined" ) {
+            var inputUrls = dwv.html.getUriParam(); 
+            if( inputUrls && inputUrls.length > 0 ) {
+                app.loadURL(inputUrls);
+            }
+        }
+        else{
+            console.log("Not loading url from adress since skipLoadUrl is defined.");
+        }
+    };
     
     /**
      * Reset the application.
@@ -410,13 +423,17 @@ dwv.App = function()
         imageLayer.fillContext();
         imageLayer.setStyleDisplay(true);
         // draw layer
-        drawLayer = new dwv.html.Layer("drawLayer");
-        drawLayer.initialise(dataWidth, dataHeight);
-        drawLayer.setStyleDisplay(true);
+        if( document.getElementById("drawLayer") !== null) {
+            drawLayer = new dwv.html.Layer("drawLayer");
+            drawLayer.initialise(dataWidth, dataHeight);
+            drawLayer.setStyleDisplay(true);
+        }
         // temp layer
-        tempLayer = new dwv.html.Layer("tempLayer");
-        tempLayer.initialise(dataWidth, dataHeight);
-        tempLayer.setStyleDisplay(true);
+        if( document.getElementById("tempLayer") !== null) {
+            tempLayer = new dwv.html.Layer("tempLayer");
+            tempLayer.initialise(dataWidth, dataHeight);
+            tempLayer.setStyleDisplay(true);
+        }
     }
     
     /**
@@ -427,10 +444,11 @@ dwv.App = function()
      */
     function createTagsTable(dataInfo)
     {
-        // tag list table (without the pixel data)
-        if(dataInfo.PixelData) dataInfo.PixelData.value = "...";
         // HTML node
         var node = document.getElementById("tags");
+        if( node === null ) return;
+        // tag list table (without the pixel data)
+        if(dataInfo.PixelData) dataInfo.PixelData.value = "...";
         // remove possible previous
         while (node.hasChildNodes()) { 
             node.removeChild(node.firstChild);
@@ -475,18 +493,19 @@ dwv.App = function()
         imageData = self.getImageLayer().getContext().createImageData( 
                 dataWidth, dataHeight);
 
+        var topLayer = tempLayer === null ? imageLayer : tempLayer;
         // mouse listeners
-        tempLayer.getCanvas().addEventListener("mousedown", eventHandler, false);
-        tempLayer.getCanvas().addEventListener("mousemove", eventHandler, false);
-        tempLayer.getCanvas().addEventListener("mouseup", eventHandler, false);
-        tempLayer.getCanvas().addEventListener("mouseout", eventHandler, false);
-        tempLayer.getCanvas().addEventListener("mousewheel", eventHandler, false);
-        tempLayer.getCanvas().addEventListener("DOMMouseScroll", eventHandler, false);
-        tempLayer.getCanvas().addEventListener("dblclick", eventHandler, false);
+        topLayer.getCanvas().addEventListener("mousedown", eventHandler, false);
+        topLayer.getCanvas().addEventListener("mousemove", eventHandler, false);
+        topLayer.getCanvas().addEventListener("mouseup", eventHandler, false);
+        topLayer.getCanvas().addEventListener("mouseout", eventHandler, false);
+        topLayer.getCanvas().addEventListener("mousewheel", eventHandler, false);
+        topLayer.getCanvas().addEventListener("DOMMouseScroll", eventHandler, false);
+        topLayer.getCanvas().addEventListener("dblclick", eventHandler, false);
         // touch listeners
-        tempLayer.getCanvas().addEventListener("touchstart", eventHandler, false);
-        tempLayer.getCanvas().addEventListener("touchmove", eventHandler, false);
-        tempLayer.getCanvas().addEventListener("touchend", eventHandler, false);
+        topLayer.getCanvas().addEventListener("touchstart", eventHandler, false);
+        topLayer.getCanvas().addEventListener("touchmove", eventHandler, false);
+        topLayer.getCanvas().addEventListener("touchend", eventHandler, false);
         // keydown listener
         window.addEventListener("keydown", eventHandler, true);
         // image listeners
@@ -3123,6 +3142,103 @@ dwv.dicom.Dictionary.prototype.init = function() {
 };
 
 ;/** 
+ * Browser module.
+ * @module browser
+ */
+var dwv = dwv || {};
+/**
+ * Namespace for browser related functions.
+ * @class browser
+ * @namespace dwv
+ * @static
+ */
+dwv.browser = dwv.browser || {};
+
+/**
+ * Browser check for the FileAPI.
+ * @method hasFileApi
+ * @static
+ */ 
+dwv.browser.hasFileApi = function()
+{
+    // regular test does not work on Safari 5
+    var isSafari5 = (navigator.appVersion.indexOf("Safari") != -1) &&
+        ( (navigator.appVersion.indexOf("5.0.") != -1) ||
+          (navigator.appVersion.indexOf("5.1.") != -1) );
+    if( isSafari5 ) 
+    {
+        console.warn("Assuming FileAPI support for Safari5...");
+        return true;
+    }
+    // regular test
+    return "FileReader" in window;
+};
+
+/**
+ * Browser check for the XMLHttpRequest.
+ * @method hasXmlHttpRequest
+ * @static
+ */ 
+dwv.browser.hasXmlHttpRequest = function()
+{
+    return "XMLHttpRequest" in window && "withCredentials" in new XMLHttpRequest();
+};
+
+/**
+ * Browser check for typed array.
+ * @method hasTypedArray
+ * @static
+ */ 
+dwv.browser.hasTypedArray = function()
+{
+    return "Uint8Array" in window && "Uint16Array" in window;
+};
+
+/**
+ * Browser check for clamped array.
+ * @method hasClampedArray
+ * @static
+ */ 
+dwv.browser.hasClampedArray = function()
+{
+    return "Uint8ClampedArray" in window;
+};
+
+/**
+ * Browser checks to see if it can run dwv. Throws an error if not.
+ * TODO Maybe use http://modernizr.com/.
+ * @method check
+ * @static
+ */ 
+dwv.browser.check = function()
+{
+    var appnorun = "The application cannot be run.";
+    var message = "";
+    // Check for the File API support
+    if( !dwv.browser.hasFileApi() ) {
+        message = "The File APIs are not supported in this browser. ";
+        alert(message+appnorun);
+        throw new Error(message);
+    }
+    // Check for XMLHttpRequest
+    if( !dwv.browser.hasXmlHttpRequest() ) {
+        message = "The XMLHttpRequest is not supported in this browser. ";
+        alert(message+appnorun);
+        throw new Error(message);
+    }
+    // Check typed array
+    if( !dwv.browser.hasTypedArray() ) {
+        message = "The Typed arrays are not supported in this browser. ";
+        alert(message+appnorun);
+        throw new Error(message);
+    }
+    // check clamped array
+    if( !dwv.browser.hasClampedArray() ) {
+        // silent fail since IE does not support it...
+        console.warn("The Uint8ClampedArray is not supported in this browser. This may impair performance. ");
+    }
+};
+;/** 
  * GUI module.
  * @module gui
  */
@@ -3636,8 +3752,10 @@ dwv.gui.onZoomReset = function(event)
 {
     app.getImageLayer().resetLayout();
     app.getImageLayer().draw();
-    app.getDrawLayer().resetLayout();
-    app.getDrawLayer().draw();
+    if( app.getDrawLayer() ) {
+        app.getDrawLayer().resetLayout();
+        app.getDrawLayer().draw();
+    }
 };
 
 /**
@@ -4284,95 +4402,6 @@ dwv.html.toggleDisplay = function(id)
         else div.style.display = "none";
     }
 };
-
-// Browser namespace
-dwv.html.browser = dwv.html.browser || {};
-
-/**
- * Browser check for the FileAPI.
- * @method hasFileApi
- * @static
- */ 
-dwv.html.browser.hasFileApi = function()
-{
-    // regular test does not work on Safari 5
-    var isSafari5 = (navigator.appVersion.indexOf("Safari") != -1) &&
-        ( (navigator.appVersion.indexOf("5.0.") != -1) ||
-          (navigator.appVersion.indexOf("5.1.") != -1) );
-    if( isSafari5 ) 
-    {
-        console.warn("Assuming FileAPI support for Safari5...");
-        return true;
-    }
-    // regular test
-    return "FileReader" in window;
-};
-
-/**
- * Browser check for the XMLHttpRequest.
- * @method hasXmlHttpRequest
- * @static
- */ 
-dwv.html.browser.hasXmlHttpRequest = function()
-{
-    return "XMLHttpRequest" in window && "withCredentials" in new XMLHttpRequest();
-};
-
-/**
- * Browser check for typed array.
- * @method hasTypedArray
- * @static
- */ 
-dwv.html.browser.hasTypedArray = function()
-{
-    return "Uint8Array" in window && "Uint16Array" in window;
-};
-
-/**
- * Browser check for clamped array.
- * @method hasClampedArray
- * @static
- */ 
-dwv.html.browser.hasClampedArray = function()
-{
-    return "Uint8ClampedArray" in window;
-};
-
-/**
- * Browser checks to see if it can run dwv. Throws an error if not.
- * TODO Maybe use http://modernizr.com/.
- * @method check
- * @static
- */ 
-dwv.html.browser.check = function()
-{
-    var appnorun = "The application cannot be run.";
-    var message = "";
-    // Check for the File API support
-    if( !dwv.html.browser.hasFileApi() ) {
-        message = "The File APIs are not supported in this browser. ";
-        alert(message+appnorun);
-        throw new Error(message);
-    }
-    // Check for XMLHttpRequest
-    if( !dwv.html.browser.hasXmlHttpRequest() ) {
-        message = "The XMLHttpRequest is not supported in this browser. ";
-        alert(message+appnorun);
-        throw new Error(message);
-    }
-    // Check typed array
-    if( !dwv.html.browser.hasTypedArray() ) {
-        message = "The Typed arrays are not supported in this browser. ";
-        alert(message+appnorun);
-        throw new Error(message);
-    }
-    // check clamped array
-    if( !dwv.html.browser.hasClampedArray() ) {
-        // silent fail since IE does not support it...
-        console.warn("The Uint8ClampedArray is not supported in this browser. This may impair performance. ");
-    }
-};
-
 ;/** 
  * HTML module.
  * @module html
@@ -6413,7 +6442,7 @@ dwv.image.lut.Window = function(rescaleLut_, isSigned_)
     var windowLut_ = null;
     
     // check Uint8ClampedArray support
-    if( !dwv.html.browser.hasClampedArray() )
+    if( !dwv.browser.hasClampedArray() )
     {
         windowLut_ = new Uint8Array(rescaleLut_.getLength());
     }
@@ -6469,7 +6498,7 @@ dwv.image.lut.Window = function(rescaleLut_, isSigned_)
         var center0 = isSigned_ ? center - 0.5 + size / 2 : center - 0.5;
         var width0 = width - 1;
         var dispval = 0;
-        if( !dwv.html.browser.hasClampedArray() )
+        if( !dwv.browser.hasClampedArray() )
         {
             var xMin = center - 0.5 - (width-1) / 2;
             var xMax = center - 0.5 + (width-1) / 2;    

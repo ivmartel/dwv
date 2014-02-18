@@ -43,6 +43,8 @@
             
                 <li><a href="../classes/dwv.App.html">dwv.App</a></li>
             
+                <li><a href="../classes/dwv.browser.html">dwv.browser</a></li>
+            
                 <li><a href="../classes/dwv.dicom.DataReader.html">dwv.dicom.DataReader</a></li>
             
                 <li><a href="../classes/dwv.dicom.DicomParser.html">dwv.dicom.DicomParser</a></li>
@@ -144,6 +146,8 @@
             </ul>
 
             <ul id="api-modules" class="apis modules">
+            
+                <li><a href="../modules/browser.html">browser</a></li>
             
                 <li><a href="../modules/dicom.html">dicom</a></li>
             
@@ -357,8 +361,10 @@ dwv.gui.onZoomReset = function(event)
 {
     app.getImageLayer().resetLayout();
     app.getImageLayer().draw();
-    app.getDrawLayer().resetLayout();
-    app.getDrawLayer().draw();
+    if( app.getDrawLayer() ) {
+        app.getDrawLayer().resetLayout();
+        app.getDrawLayer().draw();
+    }
 };
 
 /**

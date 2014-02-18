@@ -31,6 +31,19 @@
                 "dwv.dicom": 1
             }
         },
+        "src/gui/browser.js": {
+            "name": "src/gui/browser.js",
+            "modules": {
+                "browser": 1
+            },
+            "classes": {
+                "dwv.browser": 1
+            },
+            "fors": {},
+            "namespaces": {
+                "dwv": 1
+            }
+        },
         "src/gui/filter.js": {
             "name": "src/gui/filter.js",
             "modules": {},
@@ -484,6 +497,21 @@
             "line": 8,
             "description": "DICOM module."
         },
+        "browser": {
+            "name": "browser",
+            "submodules": {},
+            "classes": {
+                "dwv.browser": 1
+            },
+            "fors": {},
+            "namespaces": {
+                "dwv": 1
+            },
+            "tag": "module",
+            "file": "src/gui/browser.js",
+            "line": 6,
+            "description": "Browser module."
+        },
         "gui": {
             "name": "gui",
             "submodules": {},
@@ -708,6 +736,21 @@
             "line": 8,
             "description": "DICOM tag dictionary.",
             "is_constructor": 1
+        },
+        "dwv.browser": {
+            "name": "dwv.browser",
+            "shortname": "dwv.browser",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "browser",
+            "namespace": "dwv",
+            "file": "src/gui/browser.js",
+            "line": 6,
+            "description": "Namespace for browser related functions.",
+            "static": 1
         },
         "dwv.gui": {
             "name": "dwv.gui",
@@ -2231,6 +2274,61 @@
             "namespace": "dwv.dicom"
         },
         {
+            "file": "src/gui/browser.js",
+            "line": 14,
+            "description": "Browser check for the FileAPI.",
+            "itemtype": "method",
+            "name": "hasFileApi",
+            "static": 1,
+            "class": "dwv.browser",
+            "module": "browser",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/gui/browser.js",
+            "line": 34,
+            "description": "Browser check for the XMLHttpRequest.",
+            "itemtype": "method",
+            "name": "hasXmlHttpRequest",
+            "static": 1,
+            "class": "dwv.browser",
+            "module": "browser",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/gui/browser.js",
+            "line": 44,
+            "description": "Browser check for typed array.",
+            "itemtype": "method",
+            "name": "hasTypedArray",
+            "static": 1,
+            "class": "dwv.browser",
+            "module": "browser",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/gui/browser.js",
+            "line": 54,
+            "description": "Browser check for clamped array.",
+            "itemtype": "method",
+            "name": "hasClampedArray",
+            "static": 1,
+            "class": "dwv.browser",
+            "module": "browser",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/gui/browser.js",
+            "line": 64,
+            "description": "Browser checks to see if it can run dwv. Throws an error if not.\nTODO Maybe use http://modernizr.com/.",
+            "itemtype": "method",
+            "name": "check",
+            "static": 1,
+            "class": "dwv.browser",
+            "module": "browser",
+            "namespace": "dwv"
+        },
+        {
             "file": "src/gui/filter.js",
             "line": 17,
             "description": "Append the filter HTML to the page.",
@@ -2696,7 +2794,7 @@
         },
         {
             "file": "src/gui/handlers.js",
-            "line": 160,
+            "line": 162,
             "description": "Handle display reset.",
             "itemtype": "method",
             "name": "onDisplayReset",
@@ -2714,7 +2812,7 @@
         },
         {
             "file": "src/gui/handlers.js",
-            "line": 176,
+            "line": 178,
             "description": "Handle undo.",
             "itemtype": "method",
             "name": "onUndo",
@@ -2732,7 +2830,7 @@
         },
         {
             "file": "src/gui/handlers.js",
-            "line": 187,
+            "line": 189,
             "description": "Handle redo.",
             "itemtype": "method",
             "name": "onRedo",
@@ -2750,7 +2848,7 @@
         },
         {
             "file": "src/gui/handlers.js",
-            "line": 198,
+            "line": 200,
             "description": "Handle toggle of info layer.",
             "itemtype": "method",
             "name": "onToggleInfoLayer",
@@ -3162,61 +3260,6 @@
                     "type": "Number"
                 }
             ],
-            "class": "dwv.html",
-            "module": "html",
-            "namespace": "dwv"
-        },
-        {
-            "file": "src/gui/html.js",
-            "line": 490,
-            "description": "Browser check for the FileAPI.",
-            "itemtype": "method",
-            "name": "hasFileApi",
-            "static": 1,
-            "class": "dwv.html",
-            "module": "html",
-            "namespace": "dwv"
-        },
-        {
-            "file": "src/gui/html.js",
-            "line": 510,
-            "description": "Browser check for the XMLHttpRequest.",
-            "itemtype": "method",
-            "name": "hasXmlHttpRequest",
-            "static": 1,
-            "class": "dwv.html",
-            "module": "html",
-            "namespace": "dwv"
-        },
-        {
-            "file": "src/gui/html.js",
-            "line": 520,
-            "description": "Browser check for typed array.",
-            "itemtype": "method",
-            "name": "hasTypedArray",
-            "static": 1,
-            "class": "dwv.html",
-            "module": "html",
-            "namespace": "dwv"
-        },
-        {
-            "file": "src/gui/html.js",
-            "line": 530,
-            "description": "Browser check for clamped array.",
-            "itemtype": "method",
-            "name": "hasClampedArray",
-            "static": 1,
-            "class": "dwv.html",
-            "module": "html",
-            "namespace": "dwv"
-        },
-        {
-            "file": "src/gui/html.js",
-            "line": 540,
-            "description": "Browser checks to see if it can run dwv. Throws an error if not.\nTODO Maybe use http://modernizr.com/.",
-            "itemtype": "method",
-            "name": "check",
-            "static": 1,
             "class": "dwv.html",
             "module": "html",
             "namespace": "dwv"
@@ -9731,7 +9774,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 127,
+            "line": 140,
             "description": "Reset the application.",
             "itemtype": "method",
             "name": "reset",
@@ -9741,7 +9784,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 138,
+            "line": 151,
             "description": "Handle key down event.\n- CRTL-Z: undo\n- CRTL-Y: redo\nDefault behavior. Usually used in tools.",
             "itemtype": "method",
             "name": "handleKeyDown",
@@ -9758,7 +9801,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 158,
+            "line": 171,
             "description": "Handle change files event.",
             "itemtype": "method",
             "name": "onChangeFiles",
@@ -9775,7 +9818,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 168,
+            "line": 181,
             "description": "Load a list of files.",
             "itemtype": "method",
             "name": "loadFiles",
@@ -9792,7 +9835,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 188,
+            "line": 201,
             "description": "Handle change url event.",
             "itemtype": "method",
             "name": "onChangeURL",
@@ -9809,7 +9852,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 198,
+            "line": 211,
             "description": "Load a list of URLs.",
             "itemtype": "method",
             "name": "loadURL",
@@ -9826,7 +9869,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 218,
+            "line": 231,
             "description": "Generate the image data and draw it.",
             "itemtype": "method",
             "name": "generateAndDrawImage",
@@ -9836,7 +9879,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 232,
+            "line": 245,
             "description": "Resize the display window. To be called once the image is loaded.",
             "itemtype": "method",
             "name": "resize",
@@ -9846,7 +9889,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 245,
+            "line": 258,
             "description": "Toggle the display of the info layer.",
             "itemtype": "method",
             "name": "toggleInfoLayerDisplay",
@@ -9856,7 +9899,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 262,
+            "line": 275,
             "description": "Init the Window/Level display",
             "class": "dwv.App",
             "module": "utils",
@@ -9864,7 +9907,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 278,
+            "line": 291,
             "description": "Add image listeners.",
             "itemtype": "method",
             "name": "addImageInfoListeners",
@@ -9876,7 +9919,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 293,
+            "line": 306,
             "description": "Remove image listeners.",
             "itemtype": "method",
             "name": "removeImageInfoListeners",
@@ -9888,7 +9931,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 308,
+            "line": 321,
             "description": "General-purpose event handler. This function just determines the mouse \nposition relative to the canvas element. It then passes it to the current tool.",
             "itemtype": "method",
             "name": "eventHandler",
@@ -9907,7 +9950,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 382,
+            "line": 395,
             "description": "Handle an error: display it to the user.",
             "itemtype": "method",
             "name": "handleError",
@@ -9926,7 +9969,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 395,
+            "line": 408,
             "description": "Create the application layers.",
             "itemtype": "method",
             "name": "createLayers",
@@ -9950,7 +9993,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 422,
+            "line": 439,
             "description": "Create the DICOM tags table. To be called once the DICOM has been parsed.",
             "itemtype": "method",
             "name": "createTagsTable",
@@ -9969,7 +10012,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 450,
+            "line": 468,
             "description": "Post load application initialisation. To be called once the DICOM has been parsed.",
             "itemtype": "method",
             "name": "postLoadInit",
@@ -10114,7 +10157,7 @@
         },
         {
             "message": "Missing item type\nInit the Window/Level display",
-            "line": " src/application.js:262"
+            "line": " src/application.js:275"
         }
     ]
 }

@@ -2,6 +2,7 @@ YUI.add("yuidoc-meta", function(Y) {
    Y.YUIDoc = { meta: {
     "classes": [
         "dwv.App",
+        "dwv.browser",
         "dwv.dicom.DataReader",
         "dwv.dicom.DicomParser",
         "dwv.dicom.Dictionary",
@@ -53,6 +54,7 @@ YUI.add("yuidoc-meta", function(Y) {
         "dwv.utils"
     ],
     "modules": [
+        "browser",
         "dicom",
         "gui",
         "html",
@@ -64,6 +66,11 @@ YUI.add("yuidoc-meta", function(Y) {
         "utils"
     ],
     "allModules": [
+        {
+            "displayName": "browser",
+            "name": "browser",
+            "description": "Browser module."
+        },
         {
             "displayName": "dicom",
             "name": "dicom",

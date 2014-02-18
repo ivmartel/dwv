@@ -43,6 +43,8 @@
             
                 <li><a href="../classes/dwv.App.html">dwv.App</a></li>
             
+                <li><a href="../classes/dwv.browser.html">dwv.browser</a></li>
+            
                 <li><a href="../classes/dwv.dicom.DataReader.html">dwv.dicom.DataReader</a></li>
             
                 <li><a href="../classes/dwv.dicom.DicomParser.html">dwv.dicom.DicomParser</a></li>
@@ -144,6 +146,8 @@
             </ul>
 
             <ul id="api-modules" class="apis modules">
+            
+                <li><a href="../modules/browser.html">browser</a></li>
             
                 <li><a href="../modules/dicom.html">dicom</a></li>
             
@@ -295,7 +299,7 @@ dwv.image.lut.Window = function(rescaleLut_, isSigned_)
     var windowLut_ = null;
     
     // check Uint8ClampedArray support
-    if( !dwv.html.browser.hasClampedArray() )
+    if( !dwv.browser.hasClampedArray() )
     {
         windowLut_ = new Uint8Array(rescaleLut_.getLength());
     }
@@ -351,7 +355,7 @@ dwv.image.lut.Window = function(rescaleLut_, isSigned_)
         var center0 = isSigned_ ? center - 0.5 + size / 2 : center - 0.5;
         var width0 = width - 1;
         var dispval = 0;
-        if( !dwv.html.browser.hasClampedArray() )
+        if( !dwv.browser.hasClampedArray() )
         {
             var xMin = center - 0.5 - (width-1) / 2;
             var xMax = center - 0.5 + (width-1) / 2;    

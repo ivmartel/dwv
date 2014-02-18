@@ -43,6 +43,8 @@
             
                 <li><a href="../classes/dwv.App.html">dwv.App</a></li>
             
+                <li><a href="../classes/dwv.browser.html">dwv.browser</a></li>
+            
                 <li><a href="../classes/dwv.dicom.DataReader.html">dwv.dicom.DataReader</a></li>
             
                 <li><a href="../classes/dwv.dicom.DicomParser.html">dwv.dicom.DicomParser</a></li>
@@ -144,6 +146,8 @@
             </ul>
 
             <ul id="api-modules" class="apis modules">
+            
+                <li><a href="../modules/browser.html">browser</a></li>
             
                 <li><a href="../modules/dicom.html">dicom</a></li>
             
@@ -326,7 +330,20 @@ dwv.App = function()
      * Initialise the HTML for the application.
      * @method init
      */
-    this.init = function(){};
+    this.init = function(){
+        // align layers when the window is resized
+        window.onresize = app.resize;
+        // possible load from URL
+        if( typeof skipLoadUrl === &quot;undefined&quot; ) {
+            var inputUrls = dwv.html.getUriParam(); 
+            if( inputUrls &amp;&amp; inputUrls.length &gt; 0 ) {
+                app.loadURL(inputUrls);
+            }
+        }
+        else{
+            console.log(&quot;Not loading url from adress since skipLoadUrl is defined.&quot;);
+        }
+    };
     
     /**
      * Reset the application.
@@ -614,13 +631,17 @@ dwv.App = function()
         imageLayer.fillContext();
         imageLayer.setStyleDisplay(true);
         // draw layer
-        drawLayer = new dwv.html.Layer(&quot;drawLayer&quot;);
-        drawLayer.initialise(dataWidth, dataHeight);
-        drawLayer.setStyleDisplay(true);
+        if( document.getElementById(&quot;drawLayer&quot;) !== null) {
+            drawLayer = new dwv.html.Layer(&quot;drawLayer&quot;);
+            drawLayer.initialise(dataWidth, dataHeight);
+            drawLayer.setStyleDisplay(true);
+        }
         // temp layer
-        tempLayer = new dwv.html.Layer(&quot;tempLayer&quot;);
-        tempLayer.initialise(dataWidth, dataHeight);
-        tempLayer.setStyleDisplay(true);
+        if( document.getElementById(&quot;tempLayer&quot;) !== null) {
+            tempLayer = new dwv.html.Layer(&quot;tempLayer&quot;);
+            tempLayer.initialise(dataWidth, dataHeight);
+            tempLayer.setStyleDisplay(true);
+        }
     }
     
     /**
@@ -631,10 +652,11 @@ dwv.App = function()
      */
     function createTagsTable(dataInfo)
     {
-        // tag list table (without the pixel data)
-        if(dataInfo.PixelData) dataInfo.PixelData.value = &quot;...&quot;;
         // HTML node
         var node = document.getElementById(&quot;tags&quot;);
+        if( node === null ) return;
+        // tag list table (without the pixel data)
+        if(dataInfo.PixelData) dataInfo.PixelData.value = &quot;...&quot;;
         // remove possible previous
         while (node.hasChildNodes()) { 
             node.removeChild(node.firstChild);
@@ -679,18 +701,19 @@ dwv.App = function()
         imageData = self.getImageLayer().getContext().createImageData( 
                 dataWidth, dataHeight);
 
+        var topLayer = tempLayer === null ? imageLayer : tempLayer;
         // mouse listeners
-        tempLayer.getCanvas().addEventListener(&quot;mousedown&quot;, eventHandler, false);
-        tempLayer.getCanvas().addEventListener(&quot;mousemove&quot;, eventHandler, false);
-        tempLayer.getCanvas().addEventListener(&quot;mouseup&quot;, eventHandler, false);
-        tempLayer.getCanvas().addEventListener(&quot;mouseout&quot;, eventHandler, false);
-        tempLayer.getCanvas().addEventListener(&quot;mousewheel&quot;, eventHandler, false);
-        tempLayer.getCanvas().addEventListener(&quot;DOMMouseScroll&quot;, eventHandler, false);
-        tempLayer.getCanvas().addEventListener(&quot;dblclick&quot;, eventHandler, false);
+        topLayer.getCanvas().addEventListener(&quot;mousedown&quot;, eventHandler, false);
+        topLayer.getCanvas().addEventListener(&quot;mousemove&quot;, eventHandler, false);
+        topLayer.getCanvas().addEventListener(&quot;mouseup&quot;, eventHandler, false);
+        topLayer.getCanvas().addEventListener(&quot;mouseout&quot;, eventHandler, false);
+        topLayer.getCanvas().addEventListener(&quot;mousewheel&quot;, eventHandler, false);
+        topLayer.getCanvas().addEventListener(&quot;DOMMouseScroll&quot;, eventHandler, false);
+        topLayer.getCanvas().addEventListener(&quot;dblclick&quot;, eventHandler, false);
         // touch listeners
-        tempLayer.getCanvas().addEventListener(&quot;touchstart&quot;, eventHandler, false);
-        tempLayer.getCanvas().addEventListener(&quot;touchmove&quot;, eventHandler, false);
-        tempLayer.getCanvas().addEventListener(&quot;touchend&quot;, eventHandler, false);
+        topLayer.getCanvas().addEventListener(&quot;touchstart&quot;, eventHandler, false);
+        topLayer.getCanvas().addEventListener(&quot;touchmove&quot;, eventHandler, false);
+        topLayer.getCanvas().addEventListener(&quot;touchend&quot;, eventHandler, false);
         // keydown listener
         window.addEventListener(&quot;keydown&quot;, eventHandler, true);
         // image listeners

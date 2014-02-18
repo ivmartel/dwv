@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>src/io/url.js - dwv</title>
+    <title>browser - dwv</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
     <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
@@ -202,123 +202,50 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-                        <h1 class="file-heading">File: src/io/url.js</h1>
-
-<div class="file">
-    <pre class="code prettyprint linenums">
-/** 
- * I/O module.
- * @module io
- */
-var dwv = dwv || {};
-dwv.io = dwv.io || {};
-
-/**
- * Url loader.
- * @class Url
- * @namespace dwv.io
- * @constructor
- */
-dwv.io.Url = function()
-{
-    this.onload = null;
-    this.onerror = null;
-};
-
-/**
- * Load a list of URLs.
- * @method load
- * @param {Array} ioArray The list of urls to load.
- */
-dwv.io.Url.prototype.load = function(ioArray) 
-{
-    // create closure to the class data
-    var onload = this.onload;
-    var onerror = this.onerror;
+                        <h1>browser Module</h1>
+<div class="box clearfix meta">
     
-    // Request error
-    var onErrorRequest = function(event)
-    {
-        onerror( {&#x27;name&#x27;: &quot;RequestError&quot;, 
-            &#x27;message&#x27;: &quot;An error occurred while retrieving the file: (http) &quot;+this.status } );
-    };
 
-    // DICOM request loader
-    var onLoadDicomRequest = function(response)
-    {
-        // parse DICOM file
-        try {
-            var tmpdata = dwv.image.getDataFromDicomBuffer(response);
-            // call listener
-            onload(tmpdata);
-        } catch(error) {
-            onerror(error);
-        }
-    };
+    
 
-    // Image request loader
-    var onLoadImageRequest = function(event)
-    {
-        // parse image data
-        try {
-            var tmpdata = dwv.image.getDataFromImage(this);
-            // call listener
-            onload(tmpdata);
-        } catch(error) {
-            onerror(error);
-        }
-    };
+    
+        <div class="foundat">
+            Defined in: <a href="../files/src_gui_browser.js.html#l6"><code>src&#x2F;gui&#x2F;browser.js:6</code></a>
+        </div>
+    
 
-    // Request handler
-    var onLoadRequest = function(event)
-    {
-        // find the image type
-        var view = new DataView(this.response);
-        var isJpeg = view.getUint32(0) === 0xffd8ffe0;
-        var isPng = view.getUint32(0) === 0x89504e47;
-        var isGif = view.getUint32(0) === 0x47494638;
+    
+</div>
+
+
+
+<div class="box intro">
+    <p>Browser module.</p>
+
+</div>
+
+
+
+<div class="yui3-g">
+    <div class="yui3-u-1-2">
         
-        // non DICOM
-        if( isJpeg || isPng || isGif )
-        {
-            // image data as string
-            var bytes = new Uint8Array(this.response);
-            var imageDataStr = &#x27;&#x27;;
-            for( var i = 0; i &lt; bytes.byteLength; ++i ) {
-                imageDataStr += String.fromCharCode(bytes[i]);
-            }
-            // image type
-            var imageType = &quot;unknown&quot;;
-            if(isJpeg) imageType = &quot;jpeg&quot;;
-            else if(isPng) imageType = &quot;png&quot;;
-            else if(isGif) imageType = &quot;gif&quot;;
-            // temporary image object
-            var tmpImage = new Image();
-            tmpImage.src = &quot;data:image/&quot; + imageType + &quot;;base64,&quot; + window.btoa(imageDataStr);
-            tmpImage.onload = onLoadImageRequest;
-        }
-        else
-        {
-            onLoadDicomRequest(this.response);
-        }
-    };
+            <p>This module provides the following classes:</p>
 
-    // loop on I/O elements
-    for (var i = 0; i &lt; ioArray.length; ++i)
-    {
-        var url = ioArray[i];
-        var request = new XMLHttpRequest();
-        // TODO Verify URL...
-        request.open(&#x27;GET&#x27;, url, true);
-        request.responseType = &quot;arraybuffer&quot;; 
-        request.onload = onLoadRequest;
-        request.onerror = onErrorRequest;
-        request.onprogress = dwv.gui.updateProgress;
-        request.send(null);
-    }
-};
+            <ul class="module-classes">
+            
+                <li class="module-class">
+                    <a href="../classes/dwv.browser.html">
+                        dwv.browser
+                    </a>
+                </li>
+            
+            </ul>
+        
+    </div>
 
-    </pre>
+    <div class="yui3-u-1-2">
+        
+    </div>
 </div>
 
                     </div>

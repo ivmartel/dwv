@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>src/io/url.js - dwv</title>
+    <title>src/gui/browser.js - dwv</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
     <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
@@ -202,119 +202,105 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-                        <h1 class="file-heading">File: src/io/url.js</h1>
+                        <h1 class="file-heading">File: src/gui/browser.js</h1>
 
 <div class="file">
     <pre class="code prettyprint linenums">
 /** 
- * I/O module.
- * @module io
+ * Browser module.
+ * @module browser
  */
 var dwv = dwv || {};
-dwv.io = dwv.io || {};
+/**
+ * Namespace for browser related functions.
+ * @class browser
+ * @namespace dwv
+ * @static
+ */
+dwv.browser = dwv.browser || {};
 
 /**
- * Url loader.
- * @class Url
- * @namespace dwv.io
- * @constructor
- */
-dwv.io.Url = function()
+ * Browser check for the FileAPI.
+ * @method hasFileApi
+ * @static
+ */ 
+dwv.browser.hasFileApi = function()
 {
-    this.onload = null;
-    this.onerror = null;
+    // regular test does not work on Safari 5
+    var isSafari5 = (navigator.appVersion.indexOf(&quot;Safari&quot;) != -1) &amp;&amp;
+        ( (navigator.appVersion.indexOf(&quot;5.0.&quot;) != -1) ||
+          (navigator.appVersion.indexOf(&quot;5.1.&quot;) != -1) );
+    if( isSafari5 ) 
+    {
+        console.warn(&quot;Assuming FileAPI support for Safari5...&quot;);
+        return true;
+    }
+    // regular test
+    return &quot;FileReader&quot; in window;
 };
 
 /**
- * Load a list of URLs.
- * @method load
- * @param {Array} ioArray The list of urls to load.
- */
-dwv.io.Url.prototype.load = function(ioArray) 
+ * Browser check for the XMLHttpRequest.
+ * @method hasXmlHttpRequest
+ * @static
+ */ 
+dwv.browser.hasXmlHttpRequest = function()
 {
-    // create closure to the class data
-    var onload = this.onload;
-    var onerror = this.onerror;
-    
-    // Request error
-    var onErrorRequest = function(event)
-    {
-        onerror( {&#x27;name&#x27;: &quot;RequestError&quot;, 
-            &#x27;message&#x27;: &quot;An error occurred while retrieving the file: (http) &quot;+this.status } );
-    };
+    return &quot;XMLHttpRequest&quot; in window &amp;&amp; &quot;withCredentials&quot; in new XMLHttpRequest();
+};
 
-    // DICOM request loader
-    var onLoadDicomRequest = function(response)
-    {
-        // parse DICOM file
-        try {
-            var tmpdata = dwv.image.getDataFromDicomBuffer(response);
-            // call listener
-            onload(tmpdata);
-        } catch(error) {
-            onerror(error);
-        }
-    };
+/**
+ * Browser check for typed array.
+ * @method hasTypedArray
+ * @static
+ */ 
+dwv.browser.hasTypedArray = function()
+{
+    return &quot;Uint8Array&quot; in window &amp;&amp; &quot;Uint16Array&quot; in window;
+};
 
-    // Image request loader
-    var onLoadImageRequest = function(event)
-    {
-        // parse image data
-        try {
-            var tmpdata = dwv.image.getDataFromImage(this);
-            // call listener
-            onload(tmpdata);
-        } catch(error) {
-            onerror(error);
-        }
-    };
+/**
+ * Browser check for clamped array.
+ * @method hasClampedArray
+ * @static
+ */ 
+dwv.browser.hasClampedArray = function()
+{
+    return &quot;Uint8ClampedArray&quot; in window;
+};
 
-    // Request handler
-    var onLoadRequest = function(event)
-    {
-        // find the image type
-        var view = new DataView(this.response);
-        var isJpeg = view.getUint32(0) === 0xffd8ffe0;
-        var isPng = view.getUint32(0) === 0x89504e47;
-        var isGif = view.getUint32(0) === 0x47494638;
-        
-        // non DICOM
-        if( isJpeg || isPng || isGif )
-        {
-            // image data as string
-            var bytes = new Uint8Array(this.response);
-            var imageDataStr = &#x27;&#x27;;
-            for( var i = 0; i &lt; bytes.byteLength; ++i ) {
-                imageDataStr += String.fromCharCode(bytes[i]);
-            }
-            // image type
-            var imageType = &quot;unknown&quot;;
-            if(isJpeg) imageType = &quot;jpeg&quot;;
-            else if(isPng) imageType = &quot;png&quot;;
-            else if(isGif) imageType = &quot;gif&quot;;
-            // temporary image object
-            var tmpImage = new Image();
-            tmpImage.src = &quot;data:image/&quot; + imageType + &quot;;base64,&quot; + window.btoa(imageDataStr);
-            tmpImage.onload = onLoadImageRequest;
-        }
-        else
-        {
-            onLoadDicomRequest(this.response);
-        }
-    };
-
-    // loop on I/O elements
-    for (var i = 0; i &lt; ioArray.length; ++i)
-    {
-        var url = ioArray[i];
-        var request = new XMLHttpRequest();
-        // TODO Verify URL...
-        request.open(&#x27;GET&#x27;, url, true);
-        request.responseType = &quot;arraybuffer&quot;; 
-        request.onload = onLoadRequest;
-        request.onerror = onErrorRequest;
-        request.onprogress = dwv.gui.updateProgress;
-        request.send(null);
+/**
+ * Browser checks to see if it can run dwv. Throws an error if not.
+ * TODO Maybe use http://modernizr.com/.
+ * @method check
+ * @static
+ */ 
+dwv.browser.check = function()
+{
+    var appnorun = &quot;The application cannot be run.&quot;;
+    var message = &quot;&quot;;
+    // Check for the File API support
+    if( !dwv.browser.hasFileApi() ) {
+        message = &quot;The File APIs are not supported in this browser. &quot;;
+        alert(message+appnorun);
+        throw new Error(message);
+    }
+    // Check for XMLHttpRequest
+    if( !dwv.browser.hasXmlHttpRequest() ) {
+        message = &quot;The XMLHttpRequest is not supported in this browser. &quot;;
+        alert(message+appnorun);
+        throw new Error(message);
+    }
+    // Check typed array
+    if( !dwv.browser.hasTypedArray() ) {
+        message = &quot;The Typed arrays are not supported in this browser. &quot;;
+        alert(message+appnorun);
+        throw new Error(message);
+    }
+    // check clamped array
+    if( !dwv.browser.hasClampedArray() ) {
+        // silent fail since IE does not support it...
+        console.warn(&quot;The Uint8ClampedArray is not supported in this browser. This may impair performance. &quot;);
     }
 };
 
