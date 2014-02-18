@@ -102,8 +102,7 @@ dwv.math.BucketQueue.prototype.getBucket = function(item) {
 
 dwv.math.BucketQueue.prototype.buildArray = function(newSize) {
 	// Create array and initialze pointers to null
-	var buckets = [];
-	buckets.length = newSize;
+	var buckets = new Array(newSize);
 	
 	for ( var i = 0; i < buckets.length; i++ ) {
 		buckets[i] = null;

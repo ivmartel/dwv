@@ -185,7 +185,7 @@ dwv.image.View = function(image, isSigned)
     /**
      * Get the view listeners.
      * @method getListeners
-     * @return {Array} The view listeners.
+     * @return {Object} The view listeners.
      */ 
     this.getListeners = function() { return listeners; };
     /**
