@@ -2,21 +2,14 @@
  * Application launcher.
  */
 
-function toggle(dialogId)
-{
-    if( $(dialogId).dialog('isOpen') ) $(dialogId).dialog('close');
-    else $(dialogId).dialog('open');
-}
-
 // check browser support
 dwv.html.browser.check();
 // main application
 var app = new dwv.App();
 
 // jquery
-$(document).ready(function(){
-    // initialise buttons
-    $("button").button();
+$(document).ready( function()
+{
     $("#toggleInfoLayer").button({ icons: 
         { primary: "ui-icon-comment" }, text: false });
     // create dialogs
@@ -43,30 +36,6 @@ $(document).ready(function(){
     // TODO it seems to add a border that bothers getting the cursor position...
     //$("#layerContainer").resizable({ aspectRatio: true });
         
-    // button listeners
-    var button = null;
-    // open
-    button = document.getElementById("open-btn");
-    if( button ) button.onclick = function() { toggle("#openData"); };
-    // toolbox
-    button = document.getElementById("toolbox-btn");
-    if( button ) button.onclick = function() { toggle("#toolbox"); };
-    // history
-    button = document.getElementById("history-btn");
-    if( button ) button.onclick = function() { toggle("#history"); };
-    // tags
-    button = document.getElementById("tags-btn");
-    if( button ) button.onclick = function() { toggle("#tags"); };
-    // layerDialog
-    button = document.getElementById("layerDialog-btn");
-    if( button ) button.onclick = function() { toggle("#layerDialog"); };
-    // info
-    button = document.getElementById("info-btn");
-    if( button ) button.onclick = function() { app.toggleInfoLayerDisplay(); };
-    // help
-    button = document.getElementById("help-btn");
-    if( button ) button.onclick = function() { toggle("#help"); };
-    
     // Add required loaders to the loader list
     dwv.io.loaders = {};
     dwv.io.loaders.file = dwv.io.File;
