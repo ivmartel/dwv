@@ -48,7 +48,7 @@ var dataDicomSop = [
     {
     title: "Toutatix  (only for trunk)", 
     uri: "https://github.com/ivmartel/dwv/raw/master/data/?file=cta-100.dcm&file=cta-101.dcm",
-	uriargs: "&dwvReplaceMode=void",
+    uriargs: "&dwvReplaceMode=void",
     img: "toutatix.png", 
     desc: "Chest CT(A), 512*512*1, LittleEndianExplicit [1.2.840.10008.1.2.1], from the Osirix examples, hosted on the dwv github."
     },
@@ -96,32 +96,38 @@ var dataImg = [
     desc: "Acute Leukimia from wikipedia (http://en.wikipedia.org/wiki/File:Acute_leukemia-ALL.jpg), 347*395*1."
     }];
 
-function setDwv(value)
+function updateLinks()
 {
     // update page links
     var links = document.getElementsByClassName('dwvlink');
     var tmp;
-    var root = getDwvBaseUrl(value);
+    var root = getDwvBaseUrl();
     for (var i = 0; i < links.length; ++i) {
         tmp = links[i].href.split('?');
         links[i].href = root+'?'+tmp[1];
     }
 }
-function getDwvBaseUrl(flag)
+function getDwvBaseUrl()
 {
-    if( flag === "dwvstamob" ) return "demo/stable/index.m.html";
-    else if( flag === "dwvstasta" ) return "demo/stable/index.html";
-    else if( flag === "dwvtrumob" ) return "demo/trunk/viewers/mobile/index.html";
-    else if( flag === "dwvtrusta" ) return "demo/trunk/viewers/static/index.html";
+    var useTrunkElement = document.getElementById('use-trunk');
+    var useTrunk = useTrunkElement.checked;
+    var select = document.getElementById('select-dwv');
+    var flag = select.options[select.selectedIndex].value;
+
+    var path = "";
+    if( !useTrunk ) {
+        if( flag === "dwv-mobile" ) path = "demo/stable/index.m.html";
+        else if( flag === "dwv-static" ) path = "demo/stable/index.html";
+    }
+    else {
+        if( flag === "dwv-mobile" ) path = "demo/trunk/viewers/mobile/index.html";
+        else if( flag === "dwv-static" ) path = "demo/trunk/viewers/static/index.html";
+    }
+    return path;
 }
 function getDwvUrl(uri)
 {
-    var flag = "dwvmobile";
-    if( document.getElementById('select-dwv') ) {
-        var select = document.getElementById('select-dwv');
-        flag = select.options[select.selectedIndex].value;
-    }
-    return getDwvBaseUrl(flag)+"?input="+encodeURIComponent(uri);
+    return getDwvBaseUrl() + "?input=" + encodeURIComponent(uri);
 }
 function createAndPutHtml(data, id)
 {
@@ -199,11 +205,9 @@ to launch DWV with the selected data.</p>
 
 <div>
 <label for="select-dwv">Choose which DWV to launch:</label>
-<select id="select-dwv" onChange="setDwv(this.value);">
-<option value="dwvstamob">DWV Mobile</option>
-<option value="dwvstasta">DWV Static</option>
-<option value="dwvtrumob">DWV Trunk Mobile</option>
-<option value="dwvtrusta">DWV Trunk Static</option>
+<select id="select-dwv" onChange="updateLinks();">
+<option value="dwv-mobile">DWV Mobile</option>
+<option value="dwv-static">DWV Static</option>
 </select>
 </div>
 
@@ -232,6 +236,11 @@ To see them start Google Chrome with <code>--disable-web-security</code>
 <li><a href="http://www.osirix-viewer.com/datasets/">Osirix datasets</a></li>
 <li><a href="http://dicom.vital-it.ch:8089/dcm4chee-web3/">dicom.vital-it.ch</a></li>
 </ul>
+
+<p>
+<input type="checkbox" id="use-trunk" onChange="updateLinks();">
+<label for="use-trunk">Use the trunk version (for debug purposes).<label>
+</p>
 
 </section>
 </div>
