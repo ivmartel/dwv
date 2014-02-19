@@ -21,7 +21,24 @@ dwv.gui.initSliderHtml = function(){
 // Toolbox 
 dwv.gui.appendToolboxHtml = function(){
     //dwv.gui.base.appendToolboxHtml();
+    var mainFieldset = document.createElement("fieldset");
+    mainFieldset.id = "mainfieldset";
+    mainFieldset.setAttribute("data-role", "controlgroup");
+    mainFieldset.setAttribute("data-type", "horizontal");
+    
+    var toolFieldset = document.createElement("fieldset");
+    toolFieldset.id = "toolfieldset";
+    toolFieldset.setAttribute("data-role", "controlgroup");
+    toolFieldset.setAttribute("data-type", "horizontal");
+    toolFieldset.setAttribute("style", "padding-right:10px;");
+
+    mainFieldset.appendChild(toolFieldset);
+    
+    var node = document.getElementById("toolbar");
+    node.appendChild(mainFieldset);
+     $("#toolbar").trigger("create");
 };
+
 dwv.gui.displayToolboxHtml = function(bool){
     dwv.gui.base.displayToolboxHtml(bool);
 };
@@ -155,10 +172,4 @@ dwv.gui.appendResetHtml = function(){
     var node = document.getElementById("mainfieldset");
     node.appendChild(button);
     $("#mainfieldset").trigger("create");
-};
-
-// Undo/redo
-// TODO not needed but gives error...
-dwv.gui.appendUndoHtml = function(){
-    //dwv.gui.base.appendUndoHtml();
 };

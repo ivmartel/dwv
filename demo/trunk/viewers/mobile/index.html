@@ -14,7 +14,7 @@ body { margin: 10px; padding: 0; }
 #drawLayer { left: 0px; }
 #tempLayer { left: 0px; }
 </style>
-<link rel="stylesheet" href="../../ext/jquery-mobile/jquery.mobile-1.4.0.min.css" />
+<link rel="stylesheet" href="../../ext/jquery-mobile/jquery.mobile-1.4.1.min.css" />
 <!-- mobile web app -->
 <meta name="mobile-web-app-capable" content="yes" />
 <link rel="shortcut icon" sizes="16x16" href="../../resources/dwv-16.png" />
@@ -27,8 +27,8 @@ body { margin: 10px; padding: 0; }
 <link rel="apple-touch-icon" sizes="60x60" href="../../resources/dwv-60.png" />
 <link rel="apple-touch-icon" sizes="128x128" href="../../resources/dwv-128.png" />
 <!-- Third party -->  
-<script type="text/javascript" src="../../ext/jquery/jquery-2.0.3.min.js"></script>
-<script type="text/javascript" src="../../ext/jquery-mobile/jquery.mobile-1.4.0.min.js"></script>
+<script type="text/javascript" src="../../ext/jquery/jquery-2.1.0.min.js"></script>
+<script type="text/javascript" src="../../ext/jquery-mobile/jquery.mobile-1.4.1.min.js"></script>
 <script type="text/javascript" src="../../ext/flot/jquery.flot.min.js"></script>
 <script type="text/javascript" src="../../ext/openjpeg/openjpeg.js"></script>
 <!-- Local -->
@@ -52,20 +52,8 @@ body { margin: 10px; padding: 0; }
 
 <div id="pageMain" data-role="content" style="padding:2px;">   
 
-<div id="toolbar"><p style="margin:0;">
-
-<a href="#popupOpen" class="ui-btn ui-btn-inline ui-btn-icon-notext ui-mini ui-icon-plus"
- data-rel="popup" data-position-to="window">Open</a>
-
-<a href="#" class="ui-btn ui-btn-inline ui-btn-icon-notext ui-mini ui-icon-back"
-  id="undo-btn">Undo</a>
-<a href="#" class="ui-btn ui-btn-inline ui-btn-icon-notext ui-mini ui-icon-forward"
-  id="redo-btn">Redo</a>
-<a href="#" class="ui-btn ui-btn-inline ui-btn-icon-notext ui-mini ui-icon-info"
-  id="info-btn">Info</a>
-<a href="#tags_page" class="ui-btn ui-btn-inline ui-btn-icon-notext ui-mini ui-icon-grid">Tags</a>
-
-</p></div><!-- /toolbar -->
+<!-- Toolbar -->
+<div id="toolbar"></div>
 
 <!-- Open popup -->
 <div data-role="popup" id="popupOpen">

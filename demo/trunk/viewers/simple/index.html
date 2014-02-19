@@ -6,24 +6,21 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
 <link rel="stylesheet" href="../../css/style.css" />
-<style>
-body { margin: 10px; padding: 0; }
-</style>
-<link rel="stylesheet" href="../../ext/jquery-mobile/jquery.mobile-1.4.0.min.css" />
+<link rel="stylesheet" href="../../ext/jquery-mobile/jquery.mobile-1.4.1.min.css" />
 <!-- mobile web app -->
 <meta name="mobile-web-app-capable" content="yes" />
-<link rel="shortcut icon" sizes="16x16" href="resources/dwv-16.png" />
-<link rel="shortcut icon" sizes="60x60" href="resources/dwv-60.png" />
-<link rel="shortcut icon" sizes="128x128" href="resources/dwv-128.png" />
+<link rel="shortcut icon" sizes="16x16" href="../../resources/dwv-16.png" />
+<link rel="shortcut icon" sizes="60x60" href="../../resources/dwv-60.png" />
+<link rel="shortcut icon" sizes="128x128" href="../../resources/dwv-128.png" />
 <!-- apple specific -->
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black" />
-<link rel="apple-touch-icon" sizes="16x16" href="resources/dwv-16.png" />
-<link rel="apple-touch-icon" sizes="60x60" href="resources/dwv-60.png" />
-<link rel="apple-touch-icon" sizes="128x128" href="resources/dwv-128.png" />
+<link rel="apple-touch-icon" sizes="16x16" href="../../resources/dwv-16.png" />
+<link rel="apple-touch-icon" sizes="60x60" href="../../resources/dwv-60.png" />
+<link rel="apple-touch-icon" sizes="128x128" href="../../resources/dwv-128.png" />
 <!-- Third party -->  
-<script type="text/javascript" src="../../ext/jquery/jquery-2.0.3.min.js"></script>
-<script type="text/javascript" src="../../ext/jquery-mobile/jquery.mobile-1.4.0.min.js"></script>
+<script type="text/javascript" src="../../ext/jquery/jquery-2.1.0.min.js"></script>
+<script type="text/javascript" src="../../ext/jquery-mobile/jquery.mobile-1.4.1.min.js"></script>
 <script type="text/javascript" src="../../ext/flot/jquery.flot.min.js"></script>
 <script type="text/javascript" src="../../ext/openjpeg/openjpeg.js"></script>
 <!-- Local -->
@@ -36,59 +33,22 @@ body { margin: 10px; padding: 0; }
 <body>
 
 <!-- Main page -->
-<div data-role="page" data-theme="b" id="main">
+<div data-role="page" data-theme="b">
 
-<div id="pageMain" data-role="content" style="padding:2px;">   
+<!-- Main content -->
+<div data-role="content">
 
-<div id="toolbar">
-
-<fieldset id="mainfieldset" data-role="controlgroup" 
-  data-type="horizontal">
-<fieldset id="toolfieldset" data-role="controlgroup" 
-  data-type="horizontal" style="padding-right:10px;">
-</fieldset>
-</fieldset>
-
-</div><!-- /toolbar -->
-
-<!-- Open popup -->
-<div data-role="popup" id="popupOpen">
-<a href="#" data-rel="back" data-role="button" 
-  data-icon="delete" data-iconpos="notext" class="ui-btn-right">Close</a> 
-<div style="padding:10px 20px;">
-<h3>Open</h3>
-<div id="loaderlist"></div>
-</div>
-</div><!-- /popup -->
- 
+<!-- Toolbar -->
+<div id="toolbar"></div>
 
 <!-- Layer Container -->
 <div id="layerContainer">
 <canvas id="imageLayer">Only for HTML5 compatible browsers...</canvas>
-<canvas id="drawLayer">Only for HTML5 compatible browsers...</canvas>
-<canvas id="tempLayer">Only for HTML5 compatible browsers...</canvas>
 </div><!-- /layerContainer -->
 
 </div><!-- /content -->
 
-</div><!-- /page main -->
-
-
-<!-- Tags page -->
-<div data-role="page" data-theme="b" id="tags_page">
-
-<div data-role="header">
-<a href="#main" data-icon="back" 
-  data-transition="slide" data-direction="reverse">Back</a>
-<h1>DICOM Tags</h1>
-</div><!-- /header -->
-
-<div data-role="content">   
-<!-- Tags -->
-<div id="tags" title="Tags"></div>
-</div><!-- /content -->
-
-</div><!-- /page tags_page-->
+</div><!-- /page -->
 
 </body>
 </html>

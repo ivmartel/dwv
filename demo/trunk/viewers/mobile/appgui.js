@@ -42,6 +42,39 @@ dwv.gui.displayUrlLoadHtml = function(bool){
 // Toolbox 
 dwv.gui.appendToolboxHtml = function(){
     dwv.gui.base.appendToolboxHtml();
+    
+    // toolbar
+    var buttonClass = "ui-btn ui-btn-inline ui-btn-icon-notext ui-mini"; 
+    
+    var open = document.createElement("a");
+    open.href = "#popupOpen";
+    open.setAttribute("class", buttonClass + " ui-icon-plus");
+    open.setAttribute("data-rel", "popup");
+    open.setAttribute("data-position-to", "window");
+
+    var undo = document.createElement("a");
+    undo.setAttribute("class", buttonClass + " ui-icon-back");
+    undo.onclick = dwv.gui.onUndo;
+
+    var redo = document.createElement("a");
+    redo.setAttribute("class", buttonClass + " ui-icon-forward");
+    redo.onclick = dwv.gui.onRedo;
+
+    var toggleInfo = document.createElement("a");
+    toggleInfo.setAttribute("class", buttonClass + " ui-icon-info");
+    toggleInfo.onclick = dwv.gui.onToggleInfoLayer;
+
+    var tags = document.createElement("a");
+    tags.href = "#tags_page";
+    tags.setAttribute("class", buttonClass + " ui-icon-grid");
+
+    var node = document.getElementById("toolbar");
+    node.appendChild(open);
+    node.appendChild(undo);
+    node.appendChild(redo);
+    node.appendChild(toggleInfo);
+    node.appendChild(tags);
+    $("#toolbar").trigger("create");
 };
 dwv.gui.displayToolboxHtml = function(bool){
     dwv.gui.base.displayToolboxHtml(bool);
@@ -145,4 +178,7 @@ dwv.gui.appendUndoHtml = function(){
 // Help
 dwv.gui.appendHelpHtml = function(mobile){
     dwv.gui.base.appendHelpHtml(mobile);
+};
+dwv.gui.appendVersionHtml = function(){
+    dwv.gui.base.appendVersionHtml();
 };

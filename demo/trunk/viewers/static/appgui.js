@@ -33,6 +33,12 @@ dwv.gui.initSliderHtml = function(){
         }
     });
 };
+function toggle(dialogId)
+{
+    if( $(dialogId).dialog('isOpen') ) $(dialogId).dialog('close');
+    else $(dialogId).dialog('open');
+}
+
 
 // Loaders
 dwv.gui.appendLoadboxHtml = function(){
@@ -58,6 +64,45 @@ dwv.gui.displayUrlLoadHtml = function(bool){
 // Toolbox 
 dwv.gui.appendToolboxHtml = function(){
     dwv.gui.base.appendToolboxHtml();
+    
+    // toolbar
+    var open = document.createElement("button");
+    open.appendChild(document.createTextNode("File"));
+    open.onclick = function() { toggle("#openData"); };
+    
+    var toolbox = document.createElement("button");
+    toolbox.appendChild(document.createTextNode("Toolbox"));
+    toolbox.onclick = function() { toggle("#toolbox"); };
+
+    var history = document.createElement("button");
+    history.appendChild(document.createTextNode("History"));
+    history.onclick = function() { toggle("#history"); };
+
+    var tags = document.createElement("button");
+    tags.appendChild(document.createTextNode("Tags"));
+    tags.onclick = function() { toggle("#tags"); };
+
+    var image = document.createElement("button");
+    image.appendChild(document.createTextNode("Image"));
+    image.onclick = function() { toggle("#layerDialog"); };
+
+    var info = document.createElement("button");
+    info.appendChild(document.createTextNode("Info"));
+    info.onclick = dwv.gui.onToggleInfoLayer;
+
+    var help = document.createElement("button");
+    help.appendChild(document.createTextNode("Help"));
+    help.onclick = function() { toggle("#help"); };
+
+    var node = document.getElementById("toolbar");
+    node.appendChild(open);
+    node.appendChild(toolbox);
+    node.appendChild(history);
+    node.appendChild(tags);
+    node.appendChild(image);
+    node.appendChild(info);
+    node.appendChild(help);
+    $("button").button();
 };
 dwv.gui.displayToolboxHtml = function(bool){
     dwv.gui.base.displayToolboxHtml(bool);
@@ -161,4 +206,7 @@ dwv.gui.appendUndoHtml = function(){
 // Help
 dwv.gui.appendHelpHtml = function(mobile){
     dwv.gui.base.appendHelpHtml(mobile);
+};
+dwv.gui.appendVersionHtml = function(){
+    dwv.gui.base.appendVersionHtml();
 };
