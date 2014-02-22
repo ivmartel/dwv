@@ -117,11 +117,11 @@ dwv.gui.initLivewireHtml = function(){
 };
 
 // Navigate
-dwv.gui.appendNavigateHtml = function(){
-    dwv.gui.base.appendNavigateHtml();
+dwv.gui.appendZoomAndPanHtml = function(){
+    dwv.gui.base.appendZoomAndPanHtml();
 };
-dwv.gui.displayNavigateHtml = function(bool){
-    dwv.gui.base.displayNavigateHtml(bool);
+dwv.gui.displayZoomAndPanHtml = function(bool){
+    dwv.gui.base.displayZoomAndPanHtml(bool);
 };
 
 // Scroll
