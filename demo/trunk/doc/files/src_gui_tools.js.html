@@ -125,10 +125,6 @@
             
                 <li><a href="../classes/dwv.tool.Livewire.html">dwv.tool.Livewire</a></li>
             
-                <li><a href="../classes/dwv.tool.Navigate.html">dwv.tool.Navigate</a></li>
-            
-                <li><a href="../classes/dwv.tool.Pan.html">dwv.tool.Pan</a></li>
-            
                 <li><a href="../classes/dwv.tool.RunFilterCommand.html">dwv.tool.RunFilterCommand</a></li>
             
                 <li><a href="../classes/dwv.tool.Scroll.html">dwv.tool.Scroll</a></li>
@@ -139,7 +135,7 @@
             
                 <li><a href="../classes/dwv.tool.WindowLevel.html">dwv.tool.WindowLevel</a></li>
             
-                <li><a href="../classes/dwv.tool.Zoom.html">dwv.tool.Zoom</a></li>
+                <li><a href="../classes/dwv.tool.ZoomAndPan.html">dwv.tool.ZoomAndPan</a></li>
             
                 <li><a href="../classes/dwv.utils.html">dwv.utils</a></li>
             
@@ -474,53 +470,11 @@ dwv.gui.base.initLivewireHtml = function()
 };
 
 /**
- * Append the Navigate HTML to the page.
- * @method appendNavigateHtml
+ * Append the ZoomAndPan HTML to the page.
+ * @method appendZoomAndPanHtml
  * @static
  */
-dwv.gui.base.appendNavigateHtml = function()
-{
-    // reset button
-    var button = document.createElement(&quot;button&quot;);
-    button.id = &quot;navResetButton&quot;;
-    button.name = &quot;navResetButton&quot;;
-    button.onclick = dwv.gui.onZoomReset;
-    var text = document.createTextNode(&quot;Reset&quot;);
-    button.appendChild(text);
-    
-    // list element
-    var liElement = document.createElement(&quot;li&quot;);
-    liElement.id = &quot;navLi&quot;;
-    liElement.style.display = &quot;none&quot;;
-    liElement.setAttribute(&quot;class&quot;,&quot;ui-block-c&quot;);
-    liElement.appendChild(button);
-    
-    // node
-    var node = document.getElementById(&quot;toolList&quot;);
-    // append element
-    node.appendChild(liElement);
-    // trigger create event (mobile)
-    $(&quot;#toolList&quot;).trigger(&quot;create&quot;);
-};
-
-/**
- * Display the Navigate HTML.
- * @method displayNavigateHtml
- * @static
- * @param {Boolean} bool True to display, false to hide.
- */
-dwv.gui.base.displayNavigateHtml = function(bool)
-{
-    // display list element
-    dwv.html.displayElement(&quot;navLi&quot;, bool);
-};
-
-/**
- * Append the Zoom HTML to the page.
- * @method appendZoomHtml
- * @static
- */
-dwv.gui.base.appendZoomHtml = function()
+dwv.gui.base.appendZoomAndPanHtml = function()
 {
     // reset button
     var button = document.createElement(&quot;button&quot;);
@@ -546,57 +500,15 @@ dwv.gui.base.appendZoomHtml = function()
 };
 
 /**
- * Display the Zoom HTML.
- * @method displayZoomHtml
+ * Display the ZoomAndPan HTML.
+ * @method displayZoomAndPanHtml
  * @static
  * @param {Boolean} bool True to display, false to hide.
  */
-dwv.gui.base.displayZoomHtml = function(bool)
+dwv.gui.base.displayZoomAndPanHtml = function(bool)
 {
     // display list element
     dwv.html.displayElement(&quot;zoomLi&quot;, bool);
-};
-
-/**
- * Append the Pan HTML to the page.
- * @method appendPanHtml
- * @static
- */
-dwv.gui.base.appendPanHtml = function()
-{
-    // reset button
-    var button = document.createElement(&quot;button&quot;);
-    button.id = &quot;panResetButton&quot;;
-    button.name = &quot;panResetButton&quot;;
-    button.onclick = dwv.tool.panReset;
-    var text = document.createTextNode(&quot;Reset&quot;);
-    button.appendChild(text);
-    
-    // list element
-    var liElement = document.createElement(&quot;li&quot;);
-    liElement.id = &quot;panLi&quot;;
-    liElement.style.display = &quot;none&quot;;
-    liElement.setAttribute(&quot;class&quot;,&quot;ui-block-c&quot;);
-    liElement.appendChild(button);
-    
-    // node
-    var node = document.getElementById(&quot;toolList&quot;);
-    // append element
-    node.appendChild(liElement);
-    // trigger create event (mobile)
-    $(&quot;#toolList&quot;).trigger(&quot;create&quot;);
-};
-
-/**
- * Display the pan HTML.
- * @method displayPanHtml
- * @static
- * @param {Boolean} bool True to display, false to hide.
- */
-dwv.gui.base.displayPanHtml = function(bool)
-{
-    // display list element
-    dwv.html.displayElement(&quot;panLi&quot;, bool);
 };
 
 /**

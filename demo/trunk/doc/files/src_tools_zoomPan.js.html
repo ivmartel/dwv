@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>src/tools/navigate.js - dwv</title>
+    <title>src/tools/zoomPan.js - dwv</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
     <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
@@ -125,10 +125,6 @@
             
                 <li><a href="../classes/dwv.tool.Livewire.html">dwv.tool.Livewire</a></li>
             
-                <li><a href="../classes/dwv.tool.Navigate.html">dwv.tool.Navigate</a></li>
-            
-                <li><a href="../classes/dwv.tool.Pan.html">dwv.tool.Pan</a></li>
-            
                 <li><a href="../classes/dwv.tool.RunFilterCommand.html">dwv.tool.RunFilterCommand</a></li>
             
                 <li><a href="../classes/dwv.tool.Scroll.html">dwv.tool.Scroll</a></li>
@@ -139,7 +135,7 @@
             
                 <li><a href="../classes/dwv.tool.WindowLevel.html">dwv.tool.WindowLevel</a></li>
             
-                <li><a href="../classes/dwv.tool.Zoom.html">dwv.tool.Zoom</a></li>
+                <li><a href="../classes/dwv.tool.ZoomAndPan.html">dwv.tool.ZoomAndPan</a></li>
             
                 <li><a href="../classes/dwv.utils.html">dwv.utils</a></li>
             
@@ -202,7 +198,7 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-                        <h1 class="file-heading">File: src/tools/navigate.js</h1>
+                        <h1 class="file-heading">File: src/tools/zoomPan.js</h1>
 
 <div class="file">
     <pre class="code prettyprint linenums">
@@ -220,13 +216,13 @@ var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
 
 /**
- * Navigate class.
- * @class Navigate
+ * ZoomAndPan class.
+ * @class ZoomAndPan
  * @namespace dwv.tool
  * @constructor
  * @param {Object} app The associated application.
  */
-dwv.tool.Navigate = function(app)
+dwv.tool.ZoomAndPan = function(app)
 {
     /**
      * Closure to self: to be used by event handlers.
@@ -434,7 +430,7 @@ dwv.tool.Navigate = function(app)
      * @param {Boolean} bool The flag to enable or not.
      */
     this.display = function(bool){
-        dwv.gui.displayNavigateHtml(bool);
+        dwv.gui.displayZoomAndPanHtml(bool);
     };
 
     /**
@@ -466,25 +462,25 @@ dwv.tool.Navigate = function(app)
             app.getDrawLayer().translate(tx, ty);
     }
 
-}; // Navigate class
+}; // ZoomAndPan class
 
 /**
  * Help for this tool.
  * @method getHelp
  * @returns {Object} The help content.
  */
-dwv.tool.Navigate.prototype.getHelp = function()
+dwv.tool.ZoomAndPan.prototype.getHelp = function()
 {
     return {
-        &#x27;title&#x27;: &quot;Navigate&quot;,
-        &#x27;brief&#x27;: &quot;The navigate tool allows to zoom and drag the image.&quot;,
+        &#x27;title&#x27;: &quot;Zoom/Pan&quot;,
+        &#x27;brief&#x27;: &quot;The Zoom/Pan tool allows to zoom and pan the image.&quot;,
         &#x27;mouse&#x27;: {
             &#x27;mouse_drag&#x27;: &quot;A single mouse drag drags the image in the desired direction.&quot;,
             &#x27;mouse_wheel&#x27;: &quot;The mouse wheel is used to zoom the image.&quot;
         },
         &#x27;touch&#x27;: {
             &#x27;touch_drag&#x27;: &quot;A single touch drag drags the image in the desired direction.&quot;,
-            &#x27;twotouch_pinch&#x27;: &quot;A pinch or spread allows to zoom the image.&quot;
+            &#x27;twotouch_pinch&#x27;: &quot;A pinch in or out allows to zoom the image.&quot;
         }
     };
 };
@@ -493,7 +489,7 @@ dwv.tool.Navigate.prototype.getHelp = function()
  * Initialise the tool.
  * @method init
  */
-dwv.tool.Navigate.prototype.init = function() {
+dwv.tool.ZoomAndPan.prototype.init = function() {
     // nothing to do.
 };
     </pre>
