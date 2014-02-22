@@ -12,13 +12,13 @@ var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
 
 /**
- * Navigate class.
- * @class Navigate
+ * ZoomAndPan class.
+ * @class ZoomAndPan
  * @namespace dwv.tool
  * @constructor
  * @param {Object} app The associated application.
  */
-dwv.tool.Navigate = function(app)
+dwv.tool.ZoomAndPan = function(app)
 {
     /**
      * Closure to self: to be used by event handlers.
@@ -226,7 +226,7 @@ dwv.tool.Navigate = function(app)
      * @param {Boolean} bool The flag to enable or not.
      */
     this.display = function(bool){
-        dwv.gui.displayNavigateHtml(bool);
+        dwv.gui.displayZoomAndPanHtml(bool);
     };
 
     /**
@@ -258,25 +258,25 @@ dwv.tool.Navigate = function(app)
             app.getDrawLayer().translate(tx, ty);
     }
 
-}; // Navigate class
+}; // ZoomAndPan class
 
 /**
  * Help for this tool.
  * @method getHelp
  * @returns {Object} The help content.
  */
-dwv.tool.Navigate.prototype.getHelp = function()
+dwv.tool.ZoomAndPan.prototype.getHelp = function()
 {
     return {
-        'title': "Navigate",
-        'brief': "The navigate tool allows to zoom and drag the image.",
+        'title': "Zoom/Pan",
+        'brief': "The Zoom/Pan tool allows to zoom and pan the image.",
         'mouse': {
             'mouse_drag': "A single mouse drag drags the image in the desired direction.",
             'mouse_wheel': "The mouse wheel is used to zoom the image."
         },
         'touch': {
             'touch_drag': "A single touch drag drags the image in the desired direction.",
-            'twotouch_pinch': "A pinch or spread allows to zoom the image."
+            'twotouch_pinch': "A pinch in or out allows to zoom the image."
         }
     };
 };
@@ -285,6 +285,6 @@ dwv.tool.Navigate.prototype.getHelp = function()
  * Initialise the tool.
  * @method init
  */
-dwv.tool.Navigate.prototype.init = function() {
+dwv.tool.ZoomAndPan.prototype.init = function() {
     // nothing to do.
 };

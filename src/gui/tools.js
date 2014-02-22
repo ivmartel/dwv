@@ -266,53 +266,11 @@ dwv.gui.base.initLivewireHtml = function()
 };
 
 /**
- * Append the Navigate HTML to the page.
- * @method appendNavigateHtml
+ * Append the ZoomAndPan HTML to the page.
+ * @method appendZoomAndPanHtml
  * @static
  */
-dwv.gui.base.appendNavigateHtml = function()
-{
-    // reset button
-    var button = document.createElement("button");
-    button.id = "navResetButton";
-    button.name = "navResetButton";
-    button.onclick = dwv.gui.onZoomReset;
-    var text = document.createTextNode("Reset");
-    button.appendChild(text);
-    
-    // list element
-    var liElement = document.createElement("li");
-    liElement.id = "navLi";
-    liElement.style.display = "none";
-    liElement.setAttribute("class","ui-block-c");
-    liElement.appendChild(button);
-    
-    // node
-    var node = document.getElementById("toolList");
-    // append element
-    node.appendChild(liElement);
-    // trigger create event (mobile)
-    $("#toolList").trigger("create");
-};
-
-/**
- * Display the Navigate HTML.
- * @method displayNavigateHtml
- * @static
- * @param {Boolean} bool True to display, false to hide.
- */
-dwv.gui.base.displayNavigateHtml = function(bool)
-{
-    // display list element
-    dwv.html.displayElement("navLi", bool);
-};
-
-/**
- * Append the Zoom HTML to the page.
- * @method appendZoomHtml
- * @static
- */
-dwv.gui.base.appendZoomHtml = function()
+dwv.gui.base.appendZoomAndPanHtml = function()
 {
     // reset button
     var button = document.createElement("button");
@@ -338,57 +296,15 @@ dwv.gui.base.appendZoomHtml = function()
 };
 
 /**
- * Display the Zoom HTML.
- * @method displayZoomHtml
+ * Display the ZoomAndPan HTML.
+ * @method displayZoomAndPanHtml
  * @static
  * @param {Boolean} bool True to display, false to hide.
  */
-dwv.gui.base.displayZoomHtml = function(bool)
+dwv.gui.base.displayZoomAndPanHtml = function(bool)
 {
     // display list element
     dwv.html.displayElement("zoomLi", bool);
-};
-
-/**
- * Append the Pan HTML to the page.
- * @method appendPanHtml
- * @static
- */
-dwv.gui.base.appendPanHtml = function()
-{
-    // reset button
-    var button = document.createElement("button");
-    button.id = "panResetButton";
-    button.name = "panResetButton";
-    button.onclick = dwv.tool.panReset;
-    var text = document.createTextNode("Reset");
-    button.appendChild(text);
-    
-    // list element
-    var liElement = document.createElement("li");
-    liElement.id = "panLi";
-    liElement.style.display = "none";
-    liElement.setAttribute("class","ui-block-c");
-    liElement.appendChild(button);
-    
-    // node
-    var node = document.getElementById("toolList");
-    // append element
-    node.appendChild(liElement);
-    // trigger create event (mobile)
-    $("#toolList").trigger("create");
-};
-
-/**
- * Display the pan HTML.
- * @method displayPanHtml
- * @static
- * @param {Boolean} bool True to display, false to hide.
- */
-dwv.gui.base.displayPanHtml = function(bool)
-{
-    // display list element
-    dwv.html.displayElement("panLi", bool);
 };
 
 /**
