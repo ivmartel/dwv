@@ -4272,7 +4272,7 @@ dwv.html.createHtmlSelect = function(name, list) {
         for ( var i in list )
         {
             option = document.createElement("option");
-            option.value = list[i].toLowerCase();
+            option.value = list[i];
             option.appendChild(document.createTextNode(dwv.utils.capitaliseFirstLetter(list[i])));
             select.appendChild(option);
         }
@@ -4282,7 +4282,7 @@ dwv.html.createHtmlSelect = function(name, list) {
         for ( var item in list )
         {
             option = document.createElement("option");
-            option.value = item.toLowerCase();
+            option.value = item;
             option.appendChild(document.createTextNode(dwv.utils.capitaliseFirstLetter(item)));
             select.appendChild(option);
         }
