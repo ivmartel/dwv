@@ -97,7 +97,3 @@ dwv.tool.DrawCircleCommand = function(points, app, style)
             circle.getCenter().getY() + style.getFontSize());
     };
 }; // DrawCircleCommand class
-
-// Add the shape command to the command list
-dwv.tool.shapes = dwv.tool.shapes || {};
-dwv.tool.shapes.circle = dwv.tool.DrawCircleCommand;

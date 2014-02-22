@@ -10,9 +10,6 @@ dwv.tool.colors = [
     "Yellow", "Red", "White", "Green", "Blue", "Lime", "Fuchsia", "Black"
 ];
 
-// Shape list: to be completed after each tool definition 
-dwv.tool.shapes = dwv.tool.shapes || {};
-
 /**
  * Drawing tool.
  * @class Draw

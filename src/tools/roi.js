@@ -87,7 +87,3 @@ dwv.tool.DrawRoiCommand = function(points, app, style)
         context.stroke();
     }; 
 }; // DrawRoiCommand class
-
-// Add the shape command to the command list
-dwv.tool.shapes = dwv.tool.shapes || {};
-dwv.tool.shapes.roi = dwv.tool.DrawRoiCommand;
