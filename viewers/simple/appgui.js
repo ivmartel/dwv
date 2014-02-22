@@ -59,8 +59,8 @@ dwv.gui.appendWindowLevelHtml = function(){
     label.setAttribute("for", "wlLi");
     label.appendChild(document.createTextNode("W/L"));
     
-    $("#toolfieldset").controlgroup("container")["append"](input);
-    $("#toolfieldset").controlgroup("container")["append"](label);
+    $("#toolfieldset").controlgroup("container").append(input);
+    $("#toolfieldset").controlgroup("container").append(label);
     
     $("#toolfieldset").trigger("create");
 };
@@ -106,8 +106,8 @@ dwv.gui.appendZoomAndPanHtml = function(){
     label.setAttribute("for", "zoomLi");
     label.appendChild(document.createTextNode("Zoom/Pan"));
 
-    $("#toolfieldset").controlgroup("container")["append"](input);
-    $("#toolfieldset").controlgroup("container")["append"](label);
+    $("#toolfieldset").controlgroup("container").append(input);
+    $("#toolfieldset").controlgroup("container").append(label);
     
     $("#toolfieldset").trigger("create");
 };
@@ -129,8 +129,8 @@ dwv.gui.appendScrollHtml = function(){
     label.setAttribute("for", "scrollLi");
     label.appendChild(document.createTextNode("Scroll"));
 
-    $("#toolfieldset").controlgroup("container")["append"](input);
-    $("#toolfieldset").controlgroup("container")["append"](label);
+    $("#toolfieldset").controlgroup("container").append(input);
+    $("#toolfieldset").controlgroup("container").append(label);
 
     $("#toolfieldset").trigger("create");
 };
