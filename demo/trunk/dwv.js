@@ -8533,10 +8533,6 @@ dwv.tool.DrawCircleCommand = function(points, app, style)
             circle.getCenter().getY() + style.getFontSize());
     };
 }; // DrawCircleCommand class
-
-// Add the shape command to the command list
-dwv.tool.shapes = dwv.tool.shapes || {};
-dwv.tool.shapes.circle = dwv.tool.DrawCircleCommand;
 ;/** 
  * Tool module.
  * @module tool
@@ -8548,9 +8544,6 @@ dwv.tool = dwv.tool || {};
 dwv.tool.colors = [
     "Yellow", "Red", "White", "Green", "Blue", "Lime", "Fuchsia", "Black"
 ];
-
-// Shape list: to be completed after each tool definition 
-dwv.tool.shapes = dwv.tool.shapes || {};
 
 /**
  * Drawing tool.
@@ -9379,10 +9372,6 @@ dwv.tool.DrawLineCommand = function(points, app, style)
             line.getEnd().getY() + style.getFontSize());
     }; 
 }; // DrawLineCommand class
-
-// Add the shape command to the command list
-dwv.tool.shapes = dwv.tool.shapes || {};
-dwv.tool.shapes.line = dwv.tool.DrawLineCommand;
 ;/** 
  * Tool module.
  * @module tool
@@ -9868,10 +9857,6 @@ dwv.tool.DrawRectangleCommand = function(points, app, style)
             rectangle.getEnd().getY() + style.getFontSize());
     }; 
 }; // DrawRectangleCommand class
-
-// Add the shape command to the command list
-dwv.tool.shapes = dwv.tool.shapes || {};
-dwv.tool.shapes.rectangle = dwv.tool.DrawRectangleCommand;
 ;/** 
  * Tool module.
  * @module tool
@@ -9961,10 +9946,6 @@ dwv.tool.DrawRoiCommand = function(points, app, style)
         context.stroke();
     }; 
 }; // DrawRoiCommand class
-
-// Add the shape command to the command list
-dwv.tool.shapes = dwv.tool.shapes || {};
-dwv.tool.shapes.roi = dwv.tool.DrawRoiCommand;
 ;/** 
  * Tool module.
  * @module tool
