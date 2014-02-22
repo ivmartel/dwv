@@ -22,16 +22,16 @@ $(document).ready( function()
     dwv.gui.appendUrlLoadHtml();
     dwv.gui.displayFileLoadHtml(true);
 
-    // Add required tools to the tool list
+    // Add tools to the tool list
     dwv.tool.tools = {};
-    dwv.tool.tools.windowlevel = new dwv.tool.WindowLevel(app);
-    dwv.tool.tools.zoompan = new dwv.tool.ZoomAndPan(app);
+    dwv.tool.tools["Window/Level"] = new dwv.tool.WindowLevel(app);
+    dwv.tool.tools["Zoom/Pan"] = new dwv.tool.ZoomAndPan(app);
     dwv.tool.tools.scroll = new dwv.tool.Scroll(app);
     dwv.tool.tools.draw = new dwv.tool.Draw(app);
     dwv.tool.tools.livewire = new dwv.tool.Livewire(app);
     dwv.tool.tools.filter = new dwv.tool.Filter(app);
 
-    // Add the filter to the filter list for the filter tool
+    // Add filters to the filter list for the filter tool
     dwv.tool.filters = {};
     dwv.tool.filters.threshold = new dwv.tool.filter.Threshold(app);
     dwv.tool.filters.sharpen = new dwv.tool.filter.Sharpen(app);

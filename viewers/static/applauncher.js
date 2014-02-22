@@ -50,8 +50,8 @@ $(document).ready( function()
 
     // Add tools to the tool list
     dwv.tool.tools = {};
-    dwv.tool.tools.windowlevel = new dwv.tool.WindowLevel(app);
-    dwv.tool.tools.zoompan = new dwv.tool.ZoomAndPan(app);
+    dwv.tool.tools["Window/Level"] = new dwv.tool.WindowLevel(app);
+    dwv.tool.tools["Zoom/Pan"] = new dwv.tool.ZoomAndPan(app);
     dwv.tool.tools.scroll = new dwv.tool.Scroll(app);
     dwv.tool.tools.draw = new dwv.tool.Draw(app);
     dwv.tool.tools.livewire = new dwv.tool.Livewire(app);
