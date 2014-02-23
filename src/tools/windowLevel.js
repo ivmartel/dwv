@@ -316,7 +316,7 @@ dwv.tool.WindowLevel = function(app)
 dwv.tool.WindowLevel.prototype.getHelp = function()
 {
     return {
-        'title': "WindowLevel",
+        'title': "Window/Level",
         'brief': "Changes the Window and Level of the image.",
         'mouse': {
             'mouse_drag': "A single mouse drag changes the window in the horizontal direction and the level in the vertical one.",

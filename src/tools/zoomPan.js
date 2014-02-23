@@ -271,12 +271,12 @@ dwv.tool.ZoomAndPan.prototype.getHelp = function()
         'title': "Zoom/Pan",
         'brief': "The Zoom/Pan tool allows to zoom and pan the image.",
         'mouse': {
-            'mouse_drag': "A single mouse drag drags the image in the desired direction.",
-            'mouse_wheel': "The mouse wheel is used to zoom the image."
+            'mouse_wheel': "The mouse wheel is used to zoom the image.",
+            'mouse_drag': "A single mouse drag drags the image in the desired direction."
         },
         'touch': {
-            'touch_drag': "A single touch drag drags the image in the desired direction.",
-            'twotouch_pinch': "A pinch in or out allows to zoom the image."
+            'twotouch_pinch': "A pinch in or out allows to zoom the image.",
+            'touch_drag': "A single touch drag drags the image in the desired direction."
         }
     };
 };

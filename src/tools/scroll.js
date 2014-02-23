@@ -144,12 +144,12 @@ dwv.tool.Scroll.prototype.getHelp = function()
 {
     return {
         'title': "Scroll",
-        'brief': "The navigate tool allows to scroll through slices.",
+        'brief': "The scroll tool allows to scroll through slices.",
         'mouse': {
-            'mouse_drag': "A single mouse drag drags the image in the desired direction.",
+            'mouse_drag': "A single vertical mouse drag changes the current slice.",
         },
         'touch': {
-            'touch_drag': "A single touch drag drags the image in the desired direction.",
+            'touch_drag': "A single vertical touch drag changes the current slice.",
         }
     };
 };
