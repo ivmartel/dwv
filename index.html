@@ -116,12 +116,14 @@ function getDwvBaseUrl()
 
     var path = "";
     if( !useTrunk ) {
-        if( flag === "dwv-mobile" ) path = "demo/stable/index.m.html";
-        else if( flag === "dwv-static" ) path = "demo/stable/index.html";
+        if( flag === "dwv-mobile" ) path = "demo/stable/viewers/mobile/index.html";
+        else if( flag === "dwv-static" ) path = "demo/stable/viewers/static/index.html";
+        else if( flag === "dwv-simple" ) path = "demo/stable/viewers/simple/index.html";
     }
     else {
         if( flag === "dwv-mobile" ) path = "demo/trunk/viewers/mobile/index.html";
         else if( flag === "dwv-static" ) path = "demo/trunk/viewers/static/index.html";
+        else if( flag === "dwv-simple" ) path = "demo/trunk/viewers/simple/index.html";
     }
     return path;
 }
@@ -208,6 +210,7 @@ to launch DWV with the selected data.</p>
 <select id="select-dwv" onChange="updateLinks();">
 <option value="dwv-mobile">DWV Mobile</option>
 <option value="dwv-static">DWV Static</option>
+<option value="dwv-simple">DWV Simple</option>
 </select>
 </div>
 
