@@ -107,7 +107,7 @@ print([[
 -- path with extra /dwv
 print([[
 <!-- Local -->
-<script type="text/javascript" src="/dwv/dwv-0.6.0beta.min.js"></script>
+<script type="text/javascript" src="/dwv/dwv-0.6.0.min.js"></script>
 <!--  Launch the app -->
 <script type="text/javascript" src="/dwv/viewers/static/appgui.js"></script>
 <script type="text/javascript" src="/dwv/viewers/static/applauncher.js"></script>
