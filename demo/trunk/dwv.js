@@ -42,7 +42,7 @@ dwv.App = function()
      * @method getVersion
      * @return {String} The version of the application.
      */
-    this.getVersion = function() { return "v0.6.0beta"; };
+    this.getVersion = function() { return "v0.6.0"; };
     
     /** 
      * Get the image.
@@ -10092,12 +10092,12 @@ dwv.tool.Scroll.prototype.getHelp = function()
 {
     return {
         'title': "Scroll",
-        'brief': "The navigate tool allows to scroll through slices.",
+        'brief': "The scroll tool allows to scroll through slices.",
         'mouse': {
-            'mouse_drag': "A single mouse drag drags the image in the desired direction.",
+            'mouse_drag': "A single vertical mouse drag changes the current slice.",
         },
         'touch': {
-            'touch_drag': "A single touch drag drags the image in the desired direction.",
+            'touch_drag': "A single vertical touch drag changes the current slice.",
         }
     };
 };
@@ -10633,7 +10633,7 @@ dwv.tool.WindowLevel = function(app)
 dwv.tool.WindowLevel.prototype.getHelp = function()
 {
     return {
-        'title': "WindowLevel",
+        'title': "Window/Level",
         'brief': "Changes the Window and Level of the image.",
         'mouse': {
             'mouse_drag': "A single mouse drag changes the window in the horizontal direction and the level in the vertical one.",
@@ -10917,12 +10917,12 @@ dwv.tool.ZoomAndPan.prototype.getHelp = function()
         'title': "Zoom/Pan",
         'brief': "The Zoom/Pan tool allows to zoom and pan the image.",
         'mouse': {
-            'mouse_drag': "A single mouse drag drags the image in the desired direction.",
-            'mouse_wheel': "The mouse wheel is used to zoom the image."
+            'mouse_wheel': "The mouse wheel is used to zoom the image.",
+            'mouse_drag': "A single mouse drag drags the image in the desired direction."
         },
         'touch': {
-            'touch_drag': "A single touch drag drags the image in the desired direction.",
-            'twotouch_pinch': "A pinch in or out allows to zoom the image."
+            'twotouch_pinch': "A pinch in or out allows to zoom the image.",
+            'touch_drag': "A single touch drag drags the image in the desired direction."
         }
     };
 };
