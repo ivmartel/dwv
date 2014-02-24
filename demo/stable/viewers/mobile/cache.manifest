@@ -6,36 +6,36 @@ CACHE:
 # html
 index.html
 # css
-../css/style.css
+/dwv/demo/stable/css/style.css
 # js
-../dwv-0.6.0.min.js
+/dwv/demo/stable/dwv-0.6.0.min.js
 applauncher.js
 appgui.js
 # images
-../resources/double_tap.png
-../resources/touch_drag.png
-../resources/twotouch_drag.png
+/dwv/demo/stable/resources/double_tap.png
+/dwv/demo/stable/resources/touch_drag.png
+/dwv/demo/stable/resources/twotouch_drag.png
 
 # third party
 
 # css
-../ext/jquery-mobile/jquery.mobile-1.4.1.min.css
-../ext/jquery-mobile/images/ajax-loader.gif
-../ext/jquery-mobile/images/icons-svg/plus-white.svg
-../ext/jquery-mobile/images/icons-svg/forward-white.svg
-../ext/jquery-mobile/images/icons-svg/back-white.svg
-../ext/jquery-mobile/images/icons-svg/info-white.svg
-../ext/jquery-mobile/images/icons-svg/grid-black.svg
-../ext/jquery-mobile/images/icons-png/plus-white.png
-../ext/jquery-mobile/images/icons-png/forward-white.png
-../ext/jquery-mobile/images/icons-png/back-white.png
-../ext/jquery-mobile/images/icons-png/info-white.png
-../ext/jquery-mobile/images/icons-png/grid-black.png
+/dwv/demo/stable/ext/jquery-mobile/jquery.mobile-1.4.1.min.css
+/dwv/demo/stable/ext/jquery-mobile/images/ajax-loader.gif
+/dwv/demo/stable/ext/jquery-mobile/images/icons-svg/plus-white.svg
+/dwv/demo/stable/ext/jquery-mobile/images/icons-svg/forward-white.svg
+/dwv/demo/stable/ext/jquery-mobile/images/icons-svg/back-white.svg
+/dwv/demo/stable/ext/jquery-mobile/images/icons-svg/info-white.svg
+/dwv/demo/stable/ext/jquery-mobile/images/icons-svg/grid-black.svg
+/dwv/demo/stable/ext/jquery-mobile/images/icons-png/plus-white.png
+/dwv/demo/stable/ext/jquery-mobile/images/icons-png/forward-white.png
+/dwv/demo/stable/ext/jquery-mobile/images/icons-png/back-white.png
+/dwv/demo/stable/ext/jquery-mobile/images/icons-png/info-white.png
+/dwv/demo/stable/ext/jquery-mobile/images/icons-png/grid-black.png
 # js
-../ext/jquery/jquery-2.1.0.min.js
-../ext/jquery-mobile/jquery.mobile-1.4.1.min.js
-../ext/jquery-mobile/jquery.mobile-1.4.1.min.map
-../ext/flot/jquery.flot.min.js
+/dwv/demo/stable/ext/jquery/jquery-2.1.0.min.js
+/dwv/demo/stable/ext/jquery-mobile/jquery.mobile-1.4.1.min.js
+/dwv/demo/stable/ext/jquery-mobile/jquery.mobile-1.4.1.min.map
+/dwv/demo/stable/ext/flot/jquery.flot.min.js
 
 NETWORK:
 *
