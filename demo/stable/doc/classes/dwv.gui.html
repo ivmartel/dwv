@@ -19,7 +19,7 @@
             
         </div>
         <div class="yui3-u-1-4 version">
-            <em>API Docs for: 0.5.1</em>
+            <em>API Docs for: 0.6.0</em>
         </div>
     </div>
     <div id="bd" class="yui3-g">
@@ -42,6 +42,8 @@
             <ul id="api-classes" class="apis classes">
             
                 <li><a href="../classes/dwv.App.html">dwv.App</a></li>
+            
+                <li><a href="../classes/dwv.browser.html">dwv.browser</a></li>
             
                 <li><a href="../classes/dwv.dicom.DataReader.html">dwv.dicom.DataReader</a></li>
             
@@ -125,19 +127,23 @@
             
                 <li><a href="../classes/dwv.tool.RunFilterCommand.html">dwv.tool.RunFilterCommand</a></li>
             
+                <li><a href="../classes/dwv.tool.Scroll.html">dwv.tool.Scroll</a></li>
+            
                 <li><a href="../classes/dwv.tool.ToolBox.html">dwv.tool.ToolBox</a></li>
             
                 <li><a href="../classes/dwv.tool.UndoStack.html">dwv.tool.UndoStack</a></li>
             
                 <li><a href="../classes/dwv.tool.WindowLevel.html">dwv.tool.WindowLevel</a></li>
             
-                <li><a href="../classes/dwv.tool.Zoom.html">dwv.tool.Zoom</a></li>
+                <li><a href="../classes/dwv.tool.ZoomAndPan.html">dwv.tool.ZoomAndPan</a></li>
             
                 <li><a href="../classes/dwv.utils.html">dwv.utils</a></li>
             
             </ul>
 
             <ul id="api-modules" class="apis modules">
+            
+                <li><a href="../modules/browser.html">browser</a></li>
             
                 <li><a href="../modules/dicom.html">dicom</a></li>
             
@@ -200,7 +206,7 @@
 
     
         <div class="foundat">
-            Defined in: <a href="../files/src_html_gui.js.html#l6"><code>src&#x2F;html&#x2F;gui.js:6</code></a>
+            Defined in: <a href="../files/src_gui_undo.js.html#l6"><code>src&#x2F;gui&#x2F;undo.js:6</code></a>
         </div>
     
 
@@ -272,17 +278,17 @@
                             </li>
                         
                             <li class="index-item method">
-                                <a href="#method_appendHelpHtml">appendHelpHtml</a>
+                                <a href="#method_appendFilterHtml">appendFilterHtml</a>
 
+                                
+                                    <span class="flag static">static</span>
                                 
                                 
                             </li>
                         
                             <li class="index-item method">
-                                <a href="#method_appendLivewireHtml">appendLivewireHtml</a>
+                                <a href="#method_appendHelpHtml">appendHelpHtml</a>
 
-                                
-                                    <span class="flag static">static</span>
                                 
                                 
                             </li>
@@ -306,7 +312,7 @@
                             </li>
                         
                             <li class="index-item method">
-                                <a href="#method_appendSharpenHtml">appendSharpenHtml</a>
+                                <a href="#method_appendScrollHtml">appendScrollHtml</a>
 
                                 
                                     <span class="flag static">static</span>
@@ -316,6 +322,24 @@
                         
                             <li class="index-item method">
                                 <a href="#method_appendSharpenHtml">appendSharpenHtml</a>
+
+                                
+                                    <span class="flag static">static</span>
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_appendSliderHtml">appendSliderHtml</a>
+
+                                
+                                    <span class="flag static">static</span>
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_appendSobelHtml">appendSobelHtml</a>
 
                                 
                                     <span class="flag static">static</span>
@@ -360,6 +384,13 @@
                             </li>
                         
                             <li class="index-item method">
+                                <a href="#method_appendVersionHtml">appendVersionHtml</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
                                 <a href="#method_appendWindowLevelHtml">appendWindowLevelHtml</a>
 
                                 
@@ -369,61 +400,7 @@
                             </li>
                         
                             <li class="index-item method">
-                                <a href="#method_appendZoomHtml">appendZoomHtml</a>
-
-                                
-                                    <span class="flag static">static</span>
-                                
-                                
-                            </li>
-                        
-                            <li class="index-item method">
-                                <a href="#method_clearDrawHtml">clearDrawHtml</a>
-
-                                
-                                    <span class="flag static">static</span>
-                                
-                                
-                            </li>
-                        
-                            <li class="index-item method">
-                                <a href="#method_clearDrawHtml">clearDrawHtml</a>
-
-                                
-                                    <span class="flag static">static</span>
-                                
-                                
-                            </li>
-                        
-                            <li class="index-item method">
-                                <a href="#method_clearDrawHtml">clearDrawHtml</a>
-
-                                
-                                    <span class="flag static">static</span>
-                                
-                                
-                            </li>
-                        
-                            <li class="index-item method">
-                                <a href="#method_clearDrawHtml">clearDrawHtml</a>
-
-                                
-                                    <span class="flag static">static</span>
-                                
-                                
-                            </li>
-                        
-                            <li class="index-item method">
-                                <a href="#method_clearSharpenHtml">clearSharpenHtml</a>
-
-                                
-                                    <span class="flag static">static</span>
-                                
-                                
-                            </li>
-                        
-                            <li class="index-item method">
-                                <a href="#method_clearSharpenHtml">clearSharpenHtml</a>
+                                <a href="#method_appendZoomAndPanHtml">appendZoomAndPanHtml</a>
 
                                 
                                     <span class="flag static">static</span>
@@ -450,7 +427,7 @@
                             </li>
                         
                             <li class="index-item method">
-                                <a href="#method_clearWindowLevelHtml">clearWindowLevelHtml</a>
+                                <a href="#method_displayDrawHtml">displayDrawHtml</a>
 
                                 
                                     <span class="flag static">static</span>
@@ -459,7 +436,106 @@
                             </li>
                         
                             <li class="index-item method">
-                                <a href="#method_clearZoomHtml">clearZoomHtml</a>
+                                <a href="#method_displayDrawHtml">displayDrawHtml</a>
+
+                                
+                                    <span class="flag static">static</span>
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_displayFilterHtml">displayFilterHtml</a>
+
+                                
+                                    <span class="flag static">static</span>
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_displayFilterHtml">displayFilterHtml</a>
+
+                                
+                                    <span class="flag static">static</span>
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_displayLivewireHtml">displayLivewireHtml</a>
+
+                                
+                                    <span class="flag static">static</span>
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_displayProgress">displayProgress</a>
+
+                                
+                                    <span class="flag static">static</span>
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_displayScrollHtml">displayScrollHtml</a>
+
+                                
+                                    <span class="flag static">static</span>
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_displaySharpenHtml">displaySharpenHtml</a>
+
+                                
+                                    <span class="flag static">static</span>
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_displaySobelHtml">displaySobelHtml</a>
+
+                                
+                                    <span class="flag static">static</span>
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_displayThresholdHtml">displayThresholdHtml</a>
+
+                                
+                                    <span class="flag static">static</span>
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_displayToolboxHtml">displayToolboxHtml</a>
+
+                                
+                                    <span class="flag static">static</span>
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_displayWindowLevelHtml">displayWindowLevelHtml</a>
+
+                                
+                                    <span class="flag static">static</span>
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_displayZoomAndPanHtml">displayZoomAndPanHtml</a>
 
                                 
                                     <span class="flag static">static</span>
@@ -477,7 +553,52 @@
                             </li>
                         
                             <li class="index-item method">
-                                <a href="#method_getSliderHtml">getSliderHtml</a>
+                                <a href="#method_getWindowSize">getWindowSize</a>
+
+                                
+                                    <span class="flag static">static</span>
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_initLivewireHtml">initLivewireHtml</a>
+
+                                
+                                    <span class="flag static">static</span>
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_initSliderHtml">initSliderHtml</a>
+
+                                
+                                    <span class="flag static">static</span>
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_initThresholdHtml">initThresholdHtml</a>
+
+                                
+                                    <span class="flag static">static</span>
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_initToolboxHtml">initToolboxHtml</a>
+
+                                
+                                    <span class="flag static">static</span>
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_initWindowLevelHtml">initWindowLevelHtml</a>
 
                                 
                                     <span class="flag static">static</span>
@@ -531,6 +652,15 @@
                             </li>
                         
                             <li class="index-item method">
+                                <a href="#method_onChangeMinMax">onChangeMinMax</a>
+
+                                
+                                    <span class="flag static">static</span>
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
                                 <a href="#method_onChangeShape">onChangeShape</a>
 
                                 
@@ -559,6 +689,78 @@
                         
                             <li class="index-item method">
                                 <a href="#method_onChangeWindowLevelPreset">onChangeWindowLevelPreset</a>
+
+                                
+                                    <span class="flag static">static</span>
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_onDisplayReset">onDisplayReset</a>
+
+                                
+                                    <span class="flag static">static</span>
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_onRedo">onRedo</a>
+
+                                
+                                    <span class="flag static">static</span>
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_onRunFilter">onRunFilter</a>
+
+                                
+                                    <span class="flag static">static</span>
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_onToggleInfoLayer">onToggleInfoLayer</a>
+
+                                
+                                    <span class="flag static">static</span>
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_onUndo">onUndo</a>
+
+                                
+                                    <span class="flag static">static</span>
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_onZoomReset">onZoomReset</a>
+
+                                
+                                    <span class="flag static">static</span>
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_refreshSelect">refreshSelect</a>
+
+                                
+                                    <span class="flag static">static</span>
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_refreshSelect">refreshSelect</a>
 
                                 
                                     <span class="flag static">static</span>
@@ -635,7 +837,7 @@
             
         
         
-        <a href="../files/src_html_gui.js.html#l703"><code>src&#x2F;html&#x2F;gui.js:703</code></a>
+        <a href="../files/src_gui_undo.js.html#l40"><code>src&#x2F;gui&#x2F;undo.js:40</code></a>
         
         </p>
 
@@ -716,7 +918,7 @@
             
         
         
-        <a href="../files/src_html_gui.js.html#l406"><code>src&#x2F;html&#x2F;gui.js:406</code></a>
+        <a href="../files/src_gui_tools.js.html#l150"><code>src&#x2F;gui&#x2F;tools.js:150</code></a>
         
         </p>
 
@@ -773,7 +975,7 @@
             
         
         
-        <a href="../files/src_html_gui.js.html#l236"><code>src&#x2F;html&#x2F;gui.js:236</code></a>
+        <a href="../files/src_gui_loader.js.html#l36"><code>src&#x2F;gui&#x2F;loader.js:36</code></a>
         
         </p>
 
@@ -785,6 +987,63 @@
 
     <div class="description">
         <p>Append the file load HTML to the page.</p>
+
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_appendFilterHtml" class="method item">
+    <h3 class="name"><code>appendFilterHtml</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <span class="flag static">static</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_gui_filter.js.html#l17"><code>src&#x2F;gui&#x2F;filter.js:17</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Append the filter HTML to the page.</p>
 
     </div>
 
@@ -838,7 +1097,7 @@
             
         
         
-        <a href="../files/src_html_gui.js.html#l759"><code>src&#x2F;html&#x2F;gui.js:759</code></a>
+        <a href="../files/src_gui_help.js.html#l27"><code>src&#x2F;gui&#x2F;help.js:27</code></a>
         
         </p>
 
@@ -919,64 +1178,7 @@
             
         
         
-        <a href="../files/src_html_gui.js.html#l500"><code>src&#x2F;html&#x2F;gui.js:500</code></a>
-        
-        </p>
-
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        <p>Append the filter HTML to the page.</p>
-
-    </div>
-
-    
-
-    
-
-    
-</div>
-
-                
-                    <div id="method_appendLivewireHtml" class="method item">
-    <h3 class="name"><code>appendLivewireHtml</code></h3>
-
-    
-        <span class="paren">()</span>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-        <span class="flag static">static</span>
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/src_html_gui.js.html#l462"><code>src&#x2F;html&#x2F;gui.js:462</code></a>
+        <a href="../files/src_gui_tools.js.html#l218"><code>src&#x2F;gui&#x2F;tools.js:218</code></a>
         
         </p>
 
@@ -1033,7 +1235,7 @@
             
         
         
-        <a href="../files/src_html_gui.js.html#l212"><code>src&#x2F;html&#x2F;gui.js:212</code></a>
+        <a href="../files/src_gui_loader.js.html#l15"><code>src&#x2F;gui&#x2F;loader.js:15</code></a>
         
         </p>
 
@@ -1056,8 +1258,8 @@
 </div>
 
                 
-                    <div id="method_appendSharpenHtml" class="method item">
-    <h3 class="name"><code>appendSharpenHtml</code></h3>
+                    <div id="method_appendScrollHtml" class="method item">
+    <h3 class="name"><code>appendScrollHtml</code></h3>
 
     
         <span class="paren">()</span>
@@ -1090,7 +1292,7 @@
             
         
         
-        <a href="../files/src_html_gui.js.html#l571"><code>src&#x2F;html&#x2F;gui.js:571</code></a>
+        <a href="../files/src_gui_tools.js.html#l310"><code>src&#x2F;gui&#x2F;tools.js:310</code></a>
         
         </p>
 
@@ -1101,7 +1303,7 @@
     </div>
 
     <div class="description">
-        <p>Append the sharpen filter HTML to the page.</p>
+        <p>Append the Scroll HTML to the page.</p>
 
     </div>
 
@@ -1147,7 +1349,121 @@
             
         
         
-        <a href="../files/src_html_gui.js.html#l606"><code>src&#x2F;html&#x2F;gui.js:606</code></a>
+        <a href="../files/src_gui_filter.js.html#l119"><code>src&#x2F;gui&#x2F;filter.js:119</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Append the sharpen filter HTML to the page.</p>
+
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_appendSliderHtml" class="method item">
+    <h3 class="name"><code>appendSliderHtml</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <span class="flag static">static</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_gui_generic.js.html#l88"><code>src&#x2F;gui&#x2F;generic.js:88</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Append the slider HTML.</p>
+
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_appendSobelHtml" class="method item">
+    <h3 class="name"><code>appendSobelHtml</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <span class="flag static">static</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_gui_filter.js.html#l160"><code>src&#x2F;gui&#x2F;filter.js:160</code></a>
         
         </p>
 
@@ -1204,7 +1520,7 @@
             
         
         
-        <a href="../files/src_html_gui.js.html#l541"><code>src&#x2F;html&#x2F;gui.js:541</code></a>
+        <a href="../files/src_gui_filter.js.html#l72"><code>src&#x2F;gui&#x2F;filter.js:72</code></a>
         
         </p>
 
@@ -1261,7 +1577,7 @@
             
         
         
-        <a href="../files/src_html_gui.js.html#l313"><code>src&#x2F;html&#x2F;gui.js:313</code></a>
+        <a href="../files/src_gui_tools.js.html#l15"><code>src&#x2F;gui&#x2F;tools.js:15</code></a>
         
         </p>
 
@@ -1318,7 +1634,7 @@
             
         
         
-        <a href="../files/src_html_gui.js.html#l678"><code>src&#x2F;html&#x2F;gui.js:678</code></a>
+        <a href="../files/src_gui_undo.js.html#l15"><code>src&#x2F;gui&#x2F;undo.js:15</code></a>
         
         </p>
 
@@ -1375,7 +1691,7 @@
             
         
         
-        <a href="../files/src_html_gui.js.html#l275"><code>src&#x2F;html&#x2F;gui.js:275</code></a>
+        <a href="../files/src_gui_loader.js.html#l79"><code>src&#x2F;gui&#x2F;loader.js:79</code></a>
         
         </p>
 
@@ -1387,6 +1703,61 @@
 
     <div class="description">
         <p>Append the url load HTML to the page.</p>
+
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_appendVersionHtml" class="method item">
+    <h3 class="name"><code>appendVersionHtml</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_gui_help.js.html#l15"><code>src&#x2F;gui&#x2F;help.js:15</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Append the version HTML.</p>
 
     </div>
 
@@ -1432,7 +1803,7 @@
             
         
         
-        <a href="../files/src_html_gui.js.html#l344"><code>src&#x2F;html&#x2F;gui.js:344</code></a>
+        <a href="../files/src_gui_tools.js.html#l68"><code>src&#x2F;gui&#x2F;tools.js:68</code></a>
         
         </p>
 
@@ -1455,8 +1826,8 @@
 </div>
 
                 
-                    <div id="method_appendZoomHtml" class="method item">
-    <h3 class="name"><code>appendZoomHtml</code></h3>
+                    <div id="method_appendZoomAndPanHtml" class="method item">
+    <h3 class="name"><code>appendZoomAndPanHtml</code></h3>
 
     
         <span class="paren">()</span>
@@ -1489,7 +1860,7 @@
             
         
         
-        <a href="../files/src_html_gui.js.html#l641"><code>src&#x2F;html&#x2F;gui.js:641</code></a>
+        <a href="../files/src_gui_tools.js.html#l268"><code>src&#x2F;gui&#x2F;tools.js:268</code></a>
         
         </p>
 
@@ -1500,7 +1871,7 @@
     </div>
 
     <div class="description">
-        <p>Append the zoom HTML to the page.</p>
+        <p>Append the ZoomAndPan HTML to the page.</p>
 
     </div>
 
@@ -1512,8 +1883,190 @@
 </div>
 
                 
-                    <div id="method_clearDrawHtml" class="method item">
-    <h3 class="name"><code>clearDrawHtml</code></h3>
+                    <div id="method_clearUrlLoadHtml" class="method item">
+    <h3 class="name"><code>clearUrlLoadHtml</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>bool</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <span class="flag static">static</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_gui_loader.js.html#l66"><code>src&#x2F;gui&#x2F;loader.js:66</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Display the file load HTML.</p>
+
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">bool</code>
+                        <span class="type">Boolean</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>True to display, false to hide.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_clearUrlLoadHtml" class="method item">
+    <h3 class="name"><code>clearUrlLoadHtml</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>bool</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <span class="flag static">static</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_gui_loader.js.html#l108"><code>src&#x2F;gui&#x2F;loader.js:108</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Display the url load HTML.</p>
+
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">bool</code>
+                        <span class="type">Boolean</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>True to display, false to hide.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_displayDrawHtml" class="method item">
+    <h3 class="name"><code>displayDrawHtml</code></h3>
 
     
         <span class="paren">()</span>
@@ -1546,7 +2099,7 @@
             
         
         
-        <a href="../files/src_html_gui.js.html#l528"><code>src&#x2F;html&#x2F;gui.js:528</code></a>
+        <a href="../files/src_gui_tools.js.html#l201"><code>src&#x2F;gui&#x2F;tools.js:201</code></a>
         
         </p>
 
@@ -1557,7 +2110,7 @@
     </div>
 
     <div class="description">
-        <p>Clear the filter HTML.</p>
+        <p>Initialise the draw HTML.</p>
 
     </div>
 
@@ -1569,8 +2122,99 @@
 </div>
 
                 
-                    <div id="method_clearDrawHtml" class="method item">
-    <h3 class="name"><code>clearDrawHtml</code></h3>
+                    <div id="method_displayDrawHtml" class="method item">
+    <h3 class="name"><code>displayDrawHtml</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>bool</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <span class="flag static">static</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_gui_tools.js.html#l187"><code>src&#x2F;gui&#x2F;tools.js:187</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Display the draw HTML.</p>
+
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">bool</code>
+                        <span class="type">Boolean</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>True to display, false to hide.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_displayFilterHtml" class="method item">
+    <h3 class="name"><code>displayFilterHtml</code></h3>
 
     
         <span class="paren">()</span>
@@ -1603,7 +2247,620 @@
             
         
         
-        <a href="../files/src_html_gui.js.html#l561"><code>src&#x2F;html&#x2F;gui.js:561</code></a>
+        <a href="../files/src_gui_filter.js.html#l56"><code>src&#x2F;gui&#x2F;filter.js:56</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Initialise the filter HTML.</p>
+
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_displayFilterHtml" class="method item">
+    <h3 class="name"><code>displayFilterHtml</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>bool</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <span class="flag static">static</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_gui_filter.js.html#l43"><code>src&#x2F;gui&#x2F;filter.js:43</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Display the filter HTML.</p>
+
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">bool</code>
+                        <span class="type">Boolean</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>True to display, false to hide.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_displayLivewireHtml" class="method item">
+    <h3 class="name"><code>displayLivewireHtml</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>bool</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <span class="flag static">static</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_gui_tools.js.html#l244"><code>src&#x2F;gui&#x2F;tools.js:244</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Display the livewire HTML.</p>
+
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">bool</code>
+                        <span class="type">Boolean</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>True to display, false to hide.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_displayProgress" class="method item">
+    <h3 class="name"><code>displayProgress</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>percent</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <span class="flag static">static</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_gui_generic.js.html#l41"><code>src&#x2F;gui&#x2F;generic.js:41</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Display a progress value.</p>
+
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">percent</code>
+                        <span class="type">Number</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The progress percentage.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_displayScrollHtml" class="method item">
+    <h3 class="name"><code>displayScrollHtml</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>bool</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <span class="flag static">static</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_gui_tools.js.html#l331"><code>src&#x2F;gui&#x2F;tools.js:331</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Display the Scroll HTML.</p>
+
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">bool</code>
+                        <span class="type">Boolean</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>True to display, false to hide.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_displaySharpenHtml" class="method item">
+    <h3 class="name"><code>displaySharpenHtml</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>bool</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <span class="flag static">static</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_gui_filter.js.html#l147"><code>src&#x2F;gui&#x2F;filter.js:147</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Display the sharpen filter HTML.</p>
+
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">bool</code>
+                        <span class="type">Boolean</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>True to display, false to hide.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_displaySobelHtml" class="method item">
+    <h3 class="name"><code>displaySobelHtml</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>bool</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <span class="flag static">static</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_gui_filter.js.html#l188"><code>src&#x2F;gui&#x2F;filter.js:188</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Display the sobel filter HTML.</p>
+
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">bool</code>
+                        <span class="type">Boolean</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>True to display, false to hide.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_displayThresholdHtml" class="method item">
+    <h3 class="name"><code>displayThresholdHtml</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>bool</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <span class="flag static">static</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_gui_filter.js.html#l95"><code>src&#x2F;gui&#x2F;filter.js:95</code></a>
         
         </p>
 
@@ -1619,6 +2876,30 @@
     </div>
 
     
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">bool</code>
+                        <span class="type">Boolean</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>True to display, false to hide.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
 
     
 
@@ -1626,11 +2907,21 @@
 </div>
 
                 
-                    <div id="method_clearDrawHtml" class="method item">
-    <h3 class="name"><code>clearDrawHtml</code></h3>
+                    <div id="method_displayToolboxHtml" class="method item">
+    <h3 class="name"><code>displayToolboxHtml</code></h3>
 
     
-        <span class="paren">()</span>
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>bool</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
     
 
     
@@ -1660,7 +2951,7 @@
             
         
         
-        <a href="../files/src_html_gui.js.html#l451"><code>src&#x2F;html&#x2F;gui.js:451</code></a>
+        <a href="../files/src_gui_tools.js.html#l43"><code>src&#x2F;gui&#x2F;tools.js:43</code></a>
         
         </p>
 
@@ -1671,10 +2962,34 @@
     </div>
 
     <div class="description">
-        <p>Clear the draw HTML.</p>
+        <p>Display the toolbox HTML.</p>
 
     </div>
 
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">bool</code>
+                        <span class="type">Boolean</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>True to display, false to hide.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
     
 
     
@@ -1683,11 +2998,21 @@
 </div>
 
                 
-                    <div id="method_clearDrawHtml" class="method item">
-    <h3 class="name"><code>clearDrawHtml</code></h3>
+                    <div id="method_displayWindowLevelHtml" class="method item">
+    <h3 class="name"><code>displayWindowLevelHtml</code></h3>
 
     
-        <span class="paren">()</span>
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>bool</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
     
 
     
@@ -1717,7 +3042,7 @@
             
         
         
-        <a href="../files/src_html_gui.js.html#l490"><code>src&#x2F;html&#x2F;gui.js:490</code></a>
+        <a href="../files/src_gui_tools.js.html#l105"><code>src&#x2F;gui&#x2F;tools.js:105</code></a>
         
         </p>
 
@@ -1728,10 +3053,34 @@
     </div>
 
     <div class="description">
-        <p>Clear the color chooser HTML.</p>
+        <p>Display the window/level HTML.</p>
 
     </div>
 
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">bool</code>
+                        <span class="type">Boolean</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>True to display, false to hide.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
     
 
     
@@ -1740,11 +3089,21 @@
 </div>
 
                 
-                    <div id="method_clearSharpenHtml" class="method item">
-    <h3 class="name"><code>clearSharpenHtml</code></h3>
+                    <div id="method_displayZoomAndPanHtml" class="method item">
+    <h3 class="name"><code>displayZoomAndPanHtml</code></h3>
 
     
-        <span class="paren">()</span>
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>bool</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
     
 
     
@@ -1774,7 +3133,7 @@
             
         
         
-        <a href="../files/src_html_gui.js.html#l596"><code>src&#x2F;html&#x2F;gui.js:596</code></a>
+        <a href="../files/src_gui_tools.js.html#l298"><code>src&#x2F;gui&#x2F;tools.js:298</code></a>
         
         </p>
 
@@ -1785,295 +3144,34 @@
     </div>
 
     <div class="description">
-        <p>Clear the sharpen filter HTML.</p>
+        <p>Display the ZoomAndPan HTML.</p>
 
     </div>
 
     
+        <div class="params">
+            <h4>Parameters:</h4>
 
-    
-
-    
-</div>
-
-                
-                    <div id="method_clearSharpenHtml" class="method item">
-    <h3 class="name"><code>clearSharpenHtml</code></h3>
-
-    
-        <span class="paren">()</span>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-        <span class="flag static">static</span>
-    
-
-    
-
-    
-
-    <div class="meta">
-        
+            <ul class="params-list">
             
-                
-                <p>
-                
-                Defined in
-                
+                <li class="param">
+                    
+                        <code class="param-name">bool</code>
+                        <span class="type">Boolean</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>True to display, false to hide.</p>
+
+                    </div>
+
+                    
+                </li>
             
-        
-        
-        <a href="../files/src_html_gui.js.html#l631"><code>src&#x2F;html&#x2F;gui.js:631</code></a>
-        
-        </p>
-
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        <p>Clear the sobel filter HTML.</p>
-
-    </div>
-
-    
-
-    
-
-    
-</div>
-
-                
-                    <div id="method_clearUrlLoadHtml" class="method item">
-    <h3 class="name"><code>clearUrlLoadHtml</code></h3>
-
-    
-        <span class="paren">()</span>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-        <span class="flag static">static</span>
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/src_html_gui.js.html#l265"><code>src&#x2F;html&#x2F;gui.js:265</code></a>
-        
-        </p>
-
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        <p>Clear the file load HTML.</p>
-
-    </div>
-
-    
-
-    
-
-    
-</div>
-
-                
-                    <div id="method_clearUrlLoadHtml" class="method item">
-    <h3 class="name"><code>clearUrlLoadHtml</code></h3>
-
-    
-        <span class="paren">()</span>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-        <span class="flag static">static</span>
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/src_html_gui.js.html#l303"><code>src&#x2F;html&#x2F;gui.js:303</code></a>
-        
-        </p>
-
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        <p>Clear the url load HTML.</p>
-
-    </div>
-
-    
-
-    
-
-    
-</div>
-
-                
-                    <div id="method_clearWindowLevelHtml" class="method item">
-    <h3 class="name"><code>clearWindowLevelHtml</code></h3>
-
-    
-        <span class="paren">()</span>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-        <span class="flag static">static</span>
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/src_html_gui.js.html#l395"><code>src&#x2F;html&#x2F;gui.js:395</code></a>
-        
-        </p>
-
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        <p>Clear the window/level HTML.</p>
-
-    </div>
-
-    
-
-    
-
-    
-</div>
-
-                
-                    <div id="method_clearZoomHtml" class="method item">
-    <h3 class="name"><code>clearZoomHtml</code></h3>
-
-    
-        <span class="paren">()</span>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-        <span class="flag static">static</span>
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/src_html_gui.js.html#l668"><code>src&#x2F;html&#x2F;gui.js:668</code></a>
-        
-        </p>
-
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        <p>Clear the zoom filter HTML.</p>
-
-    </div>
-
+            </ul>
+        </div>
     
 
     
@@ -2126,7 +3224,7 @@
             
         
         
-        <a href="../files/src_html_gui.js.html#l730"><code>src&#x2F;html&#x2F;gui.js:730</code></a>
+        <a href="../files/src_gui_undo.js.html#l67"><code>src&#x2F;gui&#x2F;undo.js:67</code></a>
         
         </p>
 
@@ -2173,8 +3271,8 @@
 </div>
 
                 
-                    <div id="method_getSliderHtml" class="method item">
-    <h3 class="name"><code>getSliderHtml</code></h3>
+                    <div id="method_getWindowSize" class="method item">
+    <h3 class="name"><code>getWindowSize</code></h3>
 
     
         <span class="paren">()</span>
@@ -2207,7 +3305,7 @@
             
         
         
-        <a href="../files/src_html_gui.js.html#l121"><code>src&#x2F;html&#x2F;gui.js:121</code></a>
+        <a href="../files/src_gui_generic.js.html#l15"><code>src&#x2F;gui&#x2F;generic.js:15</code></a>
         
         </p>
 
@@ -2218,7 +3316,292 @@
     </div>
 
     <div class="description">
-        <p>Append the slider HTML.</p>
+        <p>Get the size of the image display window.</p>
+
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_initLivewireHtml" class="method item">
+    <h3 class="name"><code>initLivewireHtml</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <span class="flag static">static</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_gui_tools.js.html#l256"><code>src&#x2F;gui&#x2F;tools.js:256</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Initialise the livewire HTML.</p>
+
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_initSliderHtml" class="method item">
+    <h3 class="name"><code>initSliderHtml</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <span class="flag static">static</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_gui_generic.js.html#l135"><code>src&#x2F;gui&#x2F;generic.js:135</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Initialise the slider HTML.</p>
+
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_initThresholdHtml" class="method item">
+    <h3 class="name"><code>initThresholdHtml</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <span class="flag static">static</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_gui_filter.js.html#l108"><code>src&#x2F;gui&#x2F;filter.js:108</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Initialise the treshold filter HTML.</p>
+
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_initToolboxHtml" class="method item">
+    <h3 class="name"><code>initToolboxHtml</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <span class="flag static">static</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_gui_tools.js.html#l55"><code>src&#x2F;gui&#x2F;tools.js:55</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Initialise the toolbox HTML.</p>
+
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_initWindowLevelHtml" class="method item">
+    <h3 class="name"><code>initWindowLevelHtml</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <span class="flag static">static</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_gui_tools.js.html#l119"><code>src&#x2F;gui&#x2F;tools.js:119</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Initialise the window/level HTML.</p>
 
     </div>
 
@@ -2274,7 +3657,7 @@
             
         
         
-        <a href="../files/src_html_gui.js.html#l26"><code>src&#x2F;html&#x2F;gui.js:26</code></a>
+        <a href="../files/src_gui_handlers.js.html#l26"><code>src&#x2F;gui&#x2F;handlers.js:26</code></a>
         
         </p>
 
@@ -2365,7 +3748,7 @@
             
         
         
-        <a href="../files/src_html_gui.js.html#l55"><code>src&#x2F;html&#x2F;gui.js:55</code></a>
+        <a href="../files/src_gui_handlers.js.html#l55"><code>src&#x2F;gui&#x2F;handlers.js:55</code></a>
         
         </p>
 
@@ -2456,7 +3839,7 @@
             
         
         
-        <a href="../files/src_html_gui.js.html#l88"><code>src&#x2F;html&#x2F;gui.js:88</code></a>
+        <a href="../files/src_gui_handlers.js.html#l88"><code>src&#x2F;gui&#x2F;handlers.js:88</code></a>
         
         </p>
 
@@ -2547,7 +3930,7 @@
             
         
         
-        <a href="../files/src_html_gui.js.html#l110"><code>src&#x2F;html&#x2F;gui.js:110</code></a>
+        <a href="../files/src_gui_handlers.js.html#l135"><code>src&#x2F;gui&#x2F;handlers.js:135</code></a>
         
         </p>
 
@@ -2638,7 +4021,7 @@
             
         
         
-        <a href="../files/src_html_gui.js.html#l37"><code>src&#x2F;html&#x2F;gui.js:37</code></a>
+        <a href="../files/src_gui_handlers.js.html#l37"><code>src&#x2F;gui&#x2F;handlers.js:37</code></a>
         
         </p>
 
@@ -2669,6 +4052,97 @@
 
                     <div class="param-description">
                         <p>The change event.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_onChangeMinMax" class="method item">
+    <h3 class="name"><code>onChangeMinMax</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>range</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <span class="flag static">static</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_gui_handlers.js.html#l110"><code>src&#x2F;gui&#x2F;handlers.js:110</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Handle min/max slider change.</p>
+
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">range</code>
+                        <span class="type">Object</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The new range of the data.</p>
 
                     </div>
 
@@ -2729,7 +4203,7 @@
             
         
         
-        <a href="../files/src_html_gui.js.html#l99"><code>src&#x2F;html&#x2F;gui.js:99</code></a>
+        <a href="../files/src_gui_handlers.js.html#l124"><code>src&#x2F;gui&#x2F;handlers.js:124</code></a>
         
         </p>
 
@@ -2820,7 +4294,7 @@
             
         
         
-        <a href="../files/src_html_gui.js.html#l77"><code>src&#x2F;html&#x2F;gui.js:77</code></a>
+        <a href="../files/src_gui_handlers.js.html#l77"><code>src&#x2F;gui&#x2F;handlers.js:77</code></a>
         
         </p>
 
@@ -2911,7 +4385,7 @@
             
         
         
-        <a href="../files/src_html_gui.js.html#l66"><code>src&#x2F;html&#x2F;gui.js:66</code></a>
+        <a href="../files/src_gui_handlers.js.html#l66"><code>src&#x2F;gui&#x2F;handlers.js:66</code></a>
         
         </p>
 
@@ -3002,7 +4476,7 @@
             
         
         
-        <a href="../files/src_html_gui.js.html#l14"><code>src&#x2F;html&#x2F;gui.js:14</code></a>
+        <a href="../files/src_gui_handlers.js.html#l14"><code>src&#x2F;gui&#x2F;handlers.js:14</code></a>
         
         </p>
 
@@ -3033,6 +4507,756 @@
 
                     <div class="param-description">
                         <p>The change event.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_onDisplayReset" class="method item">
+    <h3 class="name"><code>onDisplayReset</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>event</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <span class="flag static">static</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_gui_handlers.js.html#l162"><code>src&#x2F;gui&#x2F;handlers.js:162</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Handle display reset.</p>
+
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">event</code>
+                        <span class="type">Object</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The change event.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_onRedo" class="method item">
+    <h3 class="name"><code>onRedo</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>event</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <span class="flag static">static</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_gui_handlers.js.html#l189"><code>src&#x2F;gui&#x2F;handlers.js:189</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Handle redo.</p>
+
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">event</code>
+                        <span class="type">Object</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The associated event.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_onRunFilter" class="method item">
+    <h3 class="name"><code>onRunFilter</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>event</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <span class="flag static">static</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_gui_handlers.js.html#l99"><code>src&#x2F;gui&#x2F;handlers.js:99</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Handle filter run.</p>
+
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">event</code>
+                        <span class="type">Object</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The run event.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_onToggleInfoLayer" class="method item">
+    <h3 class="name"><code>onToggleInfoLayer</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>event</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <span class="flag static">static</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_gui_handlers.js.html#l200"><code>src&#x2F;gui&#x2F;handlers.js:200</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Handle toggle of info layer.</p>
+
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">event</code>
+                        <span class="type">Object</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The associated event.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_onUndo" class="method item">
+    <h3 class="name"><code>onUndo</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>event</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <span class="flag static">static</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_gui_handlers.js.html#l178"><code>src&#x2F;gui&#x2F;handlers.js:178</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Handle undo.</p>
+
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">event</code>
+                        <span class="type">Object</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The associated event.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_onZoomReset" class="method item">
+    <h3 class="name"><code>onZoomReset</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>event</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <span class="flag static">static</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_gui_handlers.js.html#l146"><code>src&#x2F;gui&#x2F;handlers.js:146</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Handle zoom reset.</p>
+
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">event</code>
+                        <span class="type">Object</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The change event.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_refreshSelect" class="method item">
+    <h3 class="name"><code>refreshSelect</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>selectName</code>
+                    
+                </li>
+            
+                <li class="arg">
+                    
+                        <code>itemName</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <span class="flag static">static</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_gui_generic.js.html#l70"><code>src&#x2F;gui&#x2F;generic.js:70</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Set the selected item of a HTML select.</p>
+
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">selectName</code>
+                        <span class="type">String</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The name of the HTML select.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+                <li class="param">
+                    
+                        <code class="param-name">itemName</code>
+                        <span class="type">String</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The name of the itme to mark as selected.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_refreshSelect" class="method item">
+    <h3 class="name"><code>refreshSelect</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>selectName</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <span class="flag static">static</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_gui_generic.js.html#l58"><code>src&#x2F;gui&#x2F;generic.js:58</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Refresh a HTML select.</p>
+
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">selectName</code>
+                        <span class="type">String</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The name of the HTML select to refresh.</p>
 
                     </div>
 
@@ -3093,7 +5317,7 @@
             
         
         
-        <a href="../files/src_html_gui.js.html#l180"><code>src&#x2F;html&#x2F;gui.js:180</code></a>
+        <a href="../files/src_gui_generic.js.html#l25"><code>src&#x2F;gui&#x2F;generic.js:25</code></a>
         
         </p>
 

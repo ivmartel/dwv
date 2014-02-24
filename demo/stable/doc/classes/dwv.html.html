@@ -19,7 +19,7 @@
             
         </div>
         <div class="yui3-u-1-4 version">
-            <em>API Docs for: 0.5.1</em>
+            <em>API Docs for: 0.6.0</em>
         </div>
     </div>
     <div id="bd" class="yui3-g">
@@ -42,6 +42,8 @@
             <ul id="api-classes" class="apis classes">
             
                 <li><a href="../classes/dwv.App.html">dwv.App</a></li>
+            
+                <li><a href="../classes/dwv.browser.html">dwv.browser</a></li>
             
                 <li><a href="../classes/dwv.dicom.DataReader.html">dwv.dicom.DataReader</a></li>
             
@@ -125,19 +127,23 @@
             
                 <li><a href="../classes/dwv.tool.RunFilterCommand.html">dwv.tool.RunFilterCommand</a></li>
             
+                <li><a href="../classes/dwv.tool.Scroll.html">dwv.tool.Scroll</a></li>
+            
                 <li><a href="../classes/dwv.tool.ToolBox.html">dwv.tool.ToolBox</a></li>
             
                 <li><a href="../classes/dwv.tool.UndoStack.html">dwv.tool.UndoStack</a></li>
             
                 <li><a href="../classes/dwv.tool.WindowLevel.html">dwv.tool.WindowLevel</a></li>
             
-                <li><a href="../classes/dwv.tool.Zoom.html">dwv.tool.Zoom</a></li>
+                <li><a href="../classes/dwv.tool.ZoomAndPan.html">dwv.tool.ZoomAndPan</a></li>
             
                 <li><a href="../classes/dwv.utils.html">dwv.utils</a></li>
             
             </ul>
 
             <ul id="api-modules" class="apis modules">
+            
+                <li><a href="../modules/browser.html">browser</a></li>
             
                 <li><a href="../modules/dicom.html">dicom</a></li>
             
@@ -200,7 +206,7 @@
 
     
         <div class="foundat">
-            Defined in: <a href="../files/src_html_html.js.html#l6"><code>src&#x2F;html&#x2F;html.js:6</code></a>
+            Defined in: <a href="../files/src_gui_html.js.html#l6"><code>src&#x2F;gui&#x2F;html.js:6</code></a>
         </div>
     
 
@@ -290,15 +296,6 @@
                             </li>
                         
                             <li class="index-item method">
-                                <a href="#method_check">check</a>
-
-                                
-                                    <span class="flag static">static</span>
-                                
-                                
-                            </li>
-                        
-                            <li class="index-item method">
                                 <a href="#method_cleanNode">cleanNode</a>
 
                                 
@@ -354,42 +351,6 @@
                         
                             <li class="index-item method">
                                 <a href="#method_getUriParam">getUriParam</a>
-
-                                
-                                    <span class="flag static">static</span>
-                                
-                                
-                            </li>
-                        
-                            <li class="index-item method">
-                                <a href="#method_hasClampedArray">hasClampedArray</a>
-
-                                
-                                    <span class="flag static">static</span>
-                                
-                                
-                            </li>
-                        
-                            <li class="index-item method">
-                                <a href="#method_hasFileApi">hasFileApi</a>
-
-                                
-                                    <span class="flag static">static</span>
-                                
-                                
-                            </li>
-                        
-                            <li class="index-item method">
-                                <a href="#method_hasTypedArray">hasTypedArray</a>
-
-                                
-                                    <span class="flag static">static</span>
-                                
-                                
-                            </li>
-                        
-                            <li class="index-item method">
-                                <a href="#method_hasXmlHttpRequest">hasXmlHttpRequest</a>
 
                                 
                                     <span class="flag static">static</span>
@@ -499,7 +460,7 @@
             
         
         
-        <a href="../files/src_html_html.js.html#l14"><code>src&#x2F;html&#x2F;html.js:14</code></a>
+        <a href="../files/src_gui_html.js.html#l14"><code>src&#x2F;gui&#x2F;html.js:14</code></a>
         
         </p>
 
@@ -612,7 +573,7 @@
             
         
         
-        <a href="../files/src_html_html.js.html#l27"><code>src&#x2F;html&#x2F;html.js:27</code></a>
+        <a href="../files/src_gui_html.js.html#l27"><code>src&#x2F;gui&#x2F;html.js:27</code></a>
         
         </p>
 
@@ -743,7 +704,7 @@
             
         
         
-        <a href="../files/src_html_html.js.html#l125"><code>src&#x2F;html&#x2F;html.js:125</code></a>
+        <a href="../files/src_gui_html.js.html#l125"><code>src&#x2F;gui&#x2F;html.js:125</code></a>
         
         </p>
 
@@ -917,7 +878,7 @@
             
         
         
-        <a href="../files/src_html_html.js.html#l43"><code>src&#x2F;html&#x2F;html.js:43</code></a>
+        <a href="../files/src_gui_html.js.html#l43"><code>src&#x2F;gui&#x2F;html.js:43</code></a>
         
         </p>
 
@@ -1091,7 +1052,7 @@
             
         
         
-        <a href="../files/src_html_html.js.html#l76"><code>src&#x2F;html&#x2F;html.js:76</code></a>
+        <a href="../files/src_gui_html.js.html#l76"><code>src&#x2F;gui&#x2F;html.js:76</code></a>
         
         </p>
 
@@ -1197,64 +1158,6 @@
 </div>
 
                 
-                    <div id="method_check" class="method item">
-    <h3 class="name"><code>check</code></h3>
-
-    
-        <span class="paren">()</span>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-        <span class="flag static">static</span>
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/src_html_html.js.html#l529"><code>src&#x2F;html&#x2F;html.js:529</code></a>
-        
-        </p>
-
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        <p>Browser checks to see if it can run dwv. Throws an error if not.
-TODO Maybe use <a href="http://modernizr.com/">http://modernizr.com/</a>.</p>
-
-    </div>
-
-    
-
-    
-
-    
-</div>
-
-                
                     <div id="method_cleanNode" class="method item">
     <h3 class="name"><code>cleanNode</code></h3>
 
@@ -1299,7 +1202,7 @@ TODO Maybe use <a href="http://modernizr.com/">http://modernizr.com/</a>.</p>
             
         
         
-        <a href="../files/src_html_html.js.html#l305"><code>src&#x2F;html&#x2F;html.js:305</code></a>
+        <a href="../files/src_gui_html.js.html#l305"><code>src&#x2F;gui&#x2F;html.js:305</code></a>
         
         </p>
 
@@ -1394,7 +1297,7 @@ TODO Maybe use <a href="http://modernizr.com/">http://modernizr.com/</a>.</p>
             
         
         
-        <a href="../files/src_html_html.js.html#l290"><code>src&#x2F;html&#x2F;html.js:290</code></a>
+        <a href="../files/src_gui_html.js.html#l290"><code>src&#x2F;gui&#x2F;html.js:290</code></a>
         
         </p>
 
@@ -1509,7 +1412,7 @@ TODO Maybe use <a href="http://modernizr.com/">http://modernizr.com/</a>.</p>
             
         
         
-        <a href="../files/src_html_html.js.html#l336"><code>src&#x2F;html&#x2F;html.js:336</code></a>
+        <a href="../files/src_gui_html.js.html#l336"><code>src&#x2F;gui&#x2F;html.js:336</code></a>
         
         </p>
 
@@ -1632,7 +1535,7 @@ It is left to the user to set the &#39;onchange&#39; method of the select.</p>
             
         
         
-        <a href="../files/src_html_html.js.html#l218"><code>src&#x2F;html&#x2F;html.js:218</code></a>
+        <a href="../files/src_gui_html.js.html#l218"><code>src&#x2F;gui&#x2F;html.js:218</code></a>
         
         </p>
 
@@ -1731,7 +1634,7 @@ into its original &#39;preText term postText&#39;.</p>
             
         
         
-        <a href="../files/src_html_html.js.html#l185"><code>src&#x2F;html&#x2F;html.js:185</code></a>
+        <a href="../files/src_gui_html.js.html#l185"><code>src&#x2F;gui&#x2F;html.js:185</code></a>
         
         </p>
 
@@ -1843,7 +1746,7 @@ true or false if it contains the term.</p>
             
         
         
-        <a href="../files/src_html_html.js.html#l165"><code>src&#x2F;html&#x2F;html.js:165</code></a>
+        <a href="../files/src_gui_html.js.html#l165"><code>src&#x2F;gui&#x2F;html.js:165</code></a>
         
         </p>
 
@@ -1952,7 +1855,7 @@ true or false if it contains the term.</p>
             
         
         
-        <a href="../files/src_html_html.js.html#l380"><code>src&#x2F;html&#x2F;html.js:380</code></a>
+        <a href="../files/src_gui_html.js.html#l380"><code>src&#x2F;gui&#x2F;html.js:380</code></a>
         
         </p>
 
@@ -1963,7 +1866,8 @@ true or false if it contains the term.</p>
     </div>
 
     <div class="description">
-        <p>Get a list of parameters from an input URI.</p>
+        <p>Get a list of parameters from an input URI that looks like:
+ [dwv root]?input=encodeURI([root]?key0=value0&amp;key1=value1)</p>
 
     </div>
 
@@ -2007,234 +1911,6 @@ true or false if it contains the term.</p>
                 
             </div>
         </div>
-    
-
-    
-</div>
-
-                
-                    <div id="method_hasClampedArray" class="method item">
-    <h3 class="name"><code>hasClampedArray</code></h3>
-
-    
-        <span class="paren">()</span>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-        <span class="flag static">static</span>
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/src_html_html.js.html#l519"><code>src&#x2F;html&#x2F;html.js:519</code></a>
-        
-        </p>
-
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        <p>Browser check for clamped array.</p>
-
-    </div>
-
-    
-
-    
-
-    
-</div>
-
-                
-                    <div id="method_hasFileApi" class="method item">
-    <h3 class="name"><code>hasFileApi</code></h3>
-
-    
-        <span class="paren">()</span>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-        <span class="flag static">static</span>
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/src_html_html.js.html#l479"><code>src&#x2F;html&#x2F;html.js:479</code></a>
-        
-        </p>
-
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        <p>Browser check for the FileAPI.</p>
-
-    </div>
-
-    
-
-    
-
-    
-</div>
-
-                
-                    <div id="method_hasTypedArray" class="method item">
-    <h3 class="name"><code>hasTypedArray</code></h3>
-
-    
-        <span class="paren">()</span>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-        <span class="flag static">static</span>
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/src_html_html.js.html#l509"><code>src&#x2F;html&#x2F;html.js:509</code></a>
-        
-        </p>
-
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        <p>Browser check for typed array.</p>
-
-    </div>
-
-    
-
-    
-
-    
-</div>
-
-                
-                    <div id="method_hasXmlHttpRequest" class="method item">
-    <h3 class="name"><code>hasXmlHttpRequest</code></h3>
-
-    
-        <span class="paren">()</span>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-        <span class="flag static">static</span>
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/src_html_html.js.html#l499"><code>src&#x2F;html&#x2F;html.js:499</code></a>
-        
-        </p>
-
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        <p>Browser check for the XMLHttpRequest.</p>
-
-    </div>
-
-    
-
     
 
     
@@ -2291,7 +1967,7 @@ true or false if it contains the term.</p>
             
         
         
-        <a href="../files/src_html_html.js.html#l246"><code>src&#x2F;html&#x2F;html.js:246</code></a>
+        <a href="../files/src_gui_html.js.html#l246"><code>src&#x2F;gui&#x2F;html.js:246</code></a>
         
         </p>
 
@@ -2400,7 +2076,7 @@ around each search term.</p>
             
         
         
-        <a href="../files/src_html_html.js.html#l318"><code>src&#x2F;html&#x2F;html.js:318</code></a>
+        <a href="../files/src_gui_html.js.html#l318"><code>src&#x2F;gui&#x2F;html.js:318</code></a>
         
         </p>
 
@@ -2491,7 +2167,7 @@ around each search term.</p>
             
         
         
-        <a href="../files/src_html_html.js.html#l460"><code>src&#x2F;html&#x2F;html.js:460</code></a>
+        <a href="../files/src_gui_html.js.html#l471"><code>src&#x2F;gui&#x2F;html.js:471</code></a>
         
         </p>
 
@@ -2576,7 +2252,7 @@ around each search term.</p>
             
         
         
-        <a href="../files/src_html_html.js.html#l150"><code>src&#x2F;html&#x2F;html.js:150</code></a>
+        <a href="../files/src_gui_html.js.html#l150"><code>src&#x2F;gui&#x2F;html.js:150</code></a>
         
         </p>
 

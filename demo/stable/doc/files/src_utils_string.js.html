@@ -19,7 +19,7 @@
             
         </div>
         <div class="yui3-u-1-4 version">
-            <em>API Docs for: 0.5.1</em>
+            <em>API Docs for: 0.6.0</em>
         </div>
     </div>
     <div id="bd" class="yui3-g">
@@ -42,6 +42,8 @@
             <ul id="api-classes" class="apis classes">
             
                 <li><a href="../classes/dwv.App.html">dwv.App</a></li>
+            
+                <li><a href="../classes/dwv.browser.html">dwv.browser</a></li>
             
                 <li><a href="../classes/dwv.dicom.DataReader.html">dwv.dicom.DataReader</a></li>
             
@@ -125,19 +127,23 @@
             
                 <li><a href="../classes/dwv.tool.RunFilterCommand.html">dwv.tool.RunFilterCommand</a></li>
             
+                <li><a href="../classes/dwv.tool.Scroll.html">dwv.tool.Scroll</a></li>
+            
                 <li><a href="../classes/dwv.tool.ToolBox.html">dwv.tool.ToolBox</a></li>
             
                 <li><a href="../classes/dwv.tool.UndoStack.html">dwv.tool.UndoStack</a></li>
             
                 <li><a href="../classes/dwv.tool.WindowLevel.html">dwv.tool.WindowLevel</a></li>
             
-                <li><a href="../classes/dwv.tool.Zoom.html">dwv.tool.Zoom</a></li>
+                <li><a href="../classes/dwv.tool.ZoomAndPan.html">dwv.tool.ZoomAndPan</a></li>
             
                 <li><a href="../classes/dwv.utils.html">dwv.utils</a></li>
             
             </ul>
 
             <ul id="api-modules" class="apis modules">
+            
+                <li><a href="../modules/browser.html">browser</a></li>
             
                 <li><a href="../modules/dicom.html">dicom</a></li>
             
@@ -239,8 +245,9 @@ dwv.utils.cleanString = function(string)
 };
 
 /**
- * Split string:
- * root?key0=val0&amp;key1=val1 returns [{&quot;key&quot;=&quot;key0&quot;, &quot;value&quot;=&quot;val0&quot;}, {&quot;key&quot;=&quot;key1&quot;, &quot;value&quot;=&quot;val1&quot;}]
+ * Split query string:
+ *  &#x27;root?key0=val00&amp;key0=val01&amp;key1=val10&#x27; returns 
+ *  { base : root, query : [ key0 : [val00, val01], key1 : val1 ] }
  * Returns null if not a query string (no question mark).
  * @method splitQueryString
  * @static
@@ -255,17 +262,40 @@ dwv.utils.splitQueryString = function(inputStr)
     var result = {};
     // base
     result.base = inputStr.substr(0, inputStr.indexOf(&#x27;?&#x27;));
-    // take after the ?
+    // take after the &#x27;?&#x27;
     var query = inputStr.substr(inputStr.indexOf(&#x27;?&#x27;)+1);
     // split key/value pairs
-    var pairs = query.split(&#x27;&amp;&#x27;);
+    result.query = dwv.utils.splitKeyValueString(query);
+    // return
+    return result;
+};
+
+/**
+ * Split key/value string:
+ *  key0=val00&amp;key0=val01&amp;key1=val10 returns 
+*   { key0 : [val00, val01], key1 : val1 }
+ * @method splitKeyValueString
+ * @static
+ * @param {String} inputStr The string to split.
+ * @return {Object} The split string.
+ */
+dwv.utils.splitKeyValueString = function(inputStr)
+{
+    // result
+    var result = {};
+    // split key/value pairs
+    var pairs = inputStr.split(&#x27;&amp;&#x27;);
     for( var i = 0; i &lt; pairs.length; ++i )
     {
         var pair = pairs[i].split(&#x27;=&#x27;);
         // if the key does not exist, create it
-        if( !result[pair[0]] ) result[pair[0]] = pair[1];
+        if( !result[pair[0]] ) 
+        {
+            result[pair[0]] = pair[1];
+        }
         else
         {
+            // make it an array
             if( !( result[pair[0]] instanceof Array) ) {
                 result[pair[0]] = [result[pair[0]]];
             }
@@ -274,7 +304,6 @@ dwv.utils.splitQueryString = function(inputStr)
     }
     return result;
 };
-
 
     </pre>
 </div>

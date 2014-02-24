@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>src/html/style.js - dwv</title>
+    <title>src/gui/handlers.js - dwv</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
     <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
@@ -19,7 +19,7 @@
             
         </div>
         <div class="yui3-u-1-4 version">
-            <em>API Docs for: 0.5.1</em>
+            <em>API Docs for: 0.6.0</em>
         </div>
     </div>
     <div id="bd" class="yui3-g">
@@ -42,6 +42,8 @@
             <ul id="api-classes" class="apis classes">
             
                 <li><a href="../classes/dwv.App.html">dwv.App</a></li>
+            
+                <li><a href="../classes/dwv.browser.html">dwv.browser</a></li>
             
                 <li><a href="../classes/dwv.dicom.DataReader.html">dwv.dicom.DataReader</a></li>
             
@@ -125,19 +127,23 @@
             
                 <li><a href="../classes/dwv.tool.RunFilterCommand.html">dwv.tool.RunFilterCommand</a></li>
             
+                <li><a href="../classes/dwv.tool.Scroll.html">dwv.tool.Scroll</a></li>
+            
                 <li><a href="../classes/dwv.tool.ToolBox.html">dwv.tool.ToolBox</a></li>
             
                 <li><a href="../classes/dwv.tool.UndoStack.html">dwv.tool.UndoStack</a></li>
             
                 <li><a href="../classes/dwv.tool.WindowLevel.html">dwv.tool.WindowLevel</a></li>
             
-                <li><a href="../classes/dwv.tool.Zoom.html">dwv.tool.Zoom</a></li>
+                <li><a href="../classes/dwv.tool.ZoomAndPan.html">dwv.tool.ZoomAndPan</a></li>
             
                 <li><a href="../classes/dwv.utils.html">dwv.utils</a></li>
             
             </ul>
 
             <ul id="api-modules" class="apis modules">
+            
+                <li><a href="../modules/browser.html">browser</a></li>
             
                 <li><a href="../modules/dicom.html">dicom</a></li>
             
@@ -192,102 +198,218 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-                        <h1 class="file-heading">File: src/html/style.js</h1>
+                        <h1 class="file-heading">File: src/gui/handlers.js</h1>
 
 <div class="file">
     <pre class="code prettyprint linenums">
 /** 
- * HTML module.
- * @module html
+ * GUI module.
+ * @module gui
  */
 var dwv = dwv || {};
-dwv.html = dwv.html || {};
+/**
+ * Namespace for GUI functions.
+ * @class gui
+ * @namespace dwv
+ * @static
+ */
+dwv.gui = dwv.gui || {};
 
 /**
- * Style class.
- * @class Style
- * @namespace dwv.html
- * @constructor
+ * Handle window/level change.
+ * @method onChangeWindowLevelPreset
+ * @namespace dwv.gui
+ * @static
+ * @param {Object} event The change event.
  */
-dwv.html.Style = function()
+dwv.gui.onChangeWindowLevelPreset = function(event)
 {
-    /**
-     * Font size.
-     * @property fontSize
-     * @private
-     * @type Number
-     */
-    var fontSize = 12;
-    /**
-     * Font definition string.
-     * @property fontStr
-     * @private
-     * @type String
-     */
-    var fontStr = &quot;normal &quot;+this.fontSize+&quot;px sans-serif&quot;;
-    /**
-     * Line height.
-     * @property lineHeight
-     * @private
-     * @type Number
-     */
-    var lineHeight = this.fontSize + this.fontSize/5;
-    /**
-     * Text color.
-     * @property textColor
-     * @private
-     * @type String
-     */
-    var textColor = &quot;#fff&quot;;
-    /**
-     * Line color.
-     * @property lineColor
-     * @private
-     * @type String
-     */
-    var lineColor = 0;
-    
-    /**
-     * Get the font size.
-     * @method getFontSize
-     * @return {Number} The font size.
-     */
-    dwv.html.Style.prototype.getFontSize = function() { return fontSize; };
+    dwv.tool.updateWindowingDataFromName(this.value);
+};
 
-    /**
-     * Get the font definition string.
-     * @method getFontStr
-     * @return {String} The font definition string.
-     */
-    dwv.html.Style.prototype.getFontStr = function() { return fontStr; };
+/**
+ * Handle colour map change.
+ * @method onChangeColourMap
+ * @static
+ * @param {Object} event The change event.
+ */
+dwv.gui.onChangeColourMap = function(event)
+{
+    dwv.tool.updateColourMapFromName(this.value);
+};
 
-    /**
-     * Get the line height.
-     * @method getLineHeight
-     * @return {Number} The line height.
-     */
-    dwv.html.Style.prototype.getLineHeight = function() { return lineHeight; };
+/**
+ * Handle loader change.
+ * @method onChangeLoader
+ * @static
+ * @param {Object} event The change event.
+ */
+dwv.gui.onChangeLoader = function(event)
+{
+    if( this.value === &quot;file&quot;) {
+        dwv.gui.displayUrlLoadHtml(false);
+        dwv.gui.displayFileLoadHtml(true);
+    }
+    else if( this.value === &quot;url&quot;) {
+        dwv.gui.displayFileLoadHtml(false);
+        dwv.gui.displayUrlLoadHtml(true);
+    }
+};
 
-    /**
-     * Get the text color.
-     * @method getTextColor
-     * @return {String} The text color.
-     */
-    dwv.html.Style.prototype.getTextColor = function() { return textColor; };
+/**
+ * Handle files change.
+ * @method onChangeFiles
+ * @static
+ * @param {Object} event The change event.
+ */
+dwv.gui.onChangeFiles = function(event)
+{
+    app.onChangeFiles(event);
+};
 
-    /**
-     * Get the line color.
-     * @method getLineColor
-     * @return {String} The line color.
-     */
-    dwv.html.Style.prototype.getLineColor = function() { return lineColor; };
+/**
+ * Handle URL change.
+ * @method onChangeURL
+ * @static
+ * @param {Object} event The change event.
+ */
+dwv.gui.onChangeURL = function(event)
+{
+    app.onChangeURL(event);
+};
 
-    /**
-     * Set the line color.
-     * @method setLineColor
-     * @param {String} color The line color.
-     */
-    dwv.html.Style.prototype.setLineColor = function(color) { lineColor = color; };
+/**
+ * Handle tool change.
+ * @method onChangeTool
+ * @static
+ * @param {Object} event The change event.
+ */
+dwv.gui.onChangeTool = function(event)
+{
+    app.getToolBox().setSelectedTool(this.value);
+};
+
+/**
+ * Handle filter change.
+ * @method onChangeFilter
+ * @static
+ * @param {Object} event The change event.
+ */
+dwv.gui.onChangeFilter = function(event)
+{
+    app.getToolBox().getSelectedTool().setSelectedFilter(this.value);
+};
+
+/**
+ * Handle filter run.
+ * @method onRunFilter
+ * @static
+ * @param {Object} event The run event.
+ */
+dwv.gui.onRunFilter = function(event)
+{
+    app.getToolBox().getSelectedTool().getSelectedFilter().run();
+};
+
+/**
+ * Handle min/max slider change.
+ * @method onChangeMinMax
+ * @static
+ * @param {Object} range The new range of the data.
+ */
+dwv.gui.onChangeMinMax = function(range)
+{
+    // seems like jquery is checking if the method exists before it 
+    // is used...
+    if( app.getToolBox().getSelectedTool().getSelectedFilter )
+        app.getToolBox().getSelectedTool().getSelectedFilter().run(range);
+};
+
+/**
+ * Handle shape change.
+ * @method onChangeShape
+ * @static
+ * @param {Object} event The change event.
+ */
+dwv.gui.onChangeShape = function(event)
+{
+    app.getToolBox().getSelectedTool().setShapeName(this.value);
+};
+
+/**
+ * Handle line color change.
+ * @method onChangeLineColour
+ * @static
+ * @param {Object} event The change event.
+ */
+dwv.gui.onChangeLineColour = function(event)
+{
+    app.getToolBox().getSelectedTool().setLineColour(this.value);
+};
+
+/**
+ * Handle zoom reset.
+ * @method onZoomReset
+ * @static
+ * @param {Object} event The change event.
+ */
+dwv.gui.onZoomReset = function(event)
+{
+    app.getImageLayer().resetLayout();
+    app.getImageLayer().draw();
+    if( app.getDrawLayer() ) {
+        app.getDrawLayer().resetLayout();
+        app.getDrawLayer().draw();
+    }
+};
+
+/**
+ * Handle display reset.
+ * @method onDisplayReset
+ * @static
+ * @param {Object} event The change event.
+ */
+dwv.gui.onDisplayReset = function(event)
+{
+    dwv.gui.onZoomReset(event);
+    app.initWLDisplay();
+    // update preset select
+    var select = document.getElementById(&quot;presetSelect&quot;);
+    select.selectedIndex = 0;
+    dwv.gui.refreshSelect(&quot;#presetSelect&quot;);
+};
+
+/**
+ * Handle undo.
+ * @method onUndo
+ * @static
+ * @param {Object} event The associated event.
+ */
+dwv.gui.onUndo = function(event)
+{
+    app.getUndoStack().undo();
+};
+
+/**
+ * Handle redo.
+ * @method onRedo
+ * @static
+ * @param {Object} event The associated event.
+ */
+dwv.gui.onRedo = function(event)
+{
+    app.getUndoStack().redo();
+};
+
+/**
+ * Handle toggle of info layer.
+ * @method onToggleInfoLayer
+ * @static
+ * @param {Object} event The associated event.
+ */
+dwv.gui.onToggleInfoLayer = function(event)
+{
+    app.toggleInfoLayerDisplay();
 };
 
     </pre>

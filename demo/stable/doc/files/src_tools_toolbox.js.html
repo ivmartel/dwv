@@ -19,7 +19,7 @@
             
         </div>
         <div class="yui3-u-1-4 version">
-            <em>API Docs for: 0.5.1</em>
+            <em>API Docs for: 0.6.0</em>
         </div>
     </div>
     <div id="bd" class="yui3-g">
@@ -42,6 +42,8 @@
             <ul id="api-classes" class="apis classes">
             
                 <li><a href="../classes/dwv.App.html">dwv.App</a></li>
+            
+                <li><a href="../classes/dwv.browser.html">dwv.browser</a></li>
             
                 <li><a href="../classes/dwv.dicom.DataReader.html">dwv.dicom.DataReader</a></li>
             
@@ -125,19 +127,23 @@
             
                 <li><a href="../classes/dwv.tool.RunFilterCommand.html">dwv.tool.RunFilterCommand</a></li>
             
+                <li><a href="../classes/dwv.tool.Scroll.html">dwv.tool.Scroll</a></li>
+            
                 <li><a href="../classes/dwv.tool.ToolBox.html">dwv.tool.ToolBox</a></li>
             
                 <li><a href="../classes/dwv.tool.UndoStack.html">dwv.tool.UndoStack</a></li>
             
                 <li><a href="../classes/dwv.tool.WindowLevel.html">dwv.tool.WindowLevel</a></li>
             
-                <li><a href="../classes/dwv.tool.Zoom.html">dwv.tool.Zoom</a></li>
+                <li><a href="../classes/dwv.tool.ZoomAndPan.html">dwv.tool.ZoomAndPan</a></li>
             
                 <li><a href="../classes/dwv.utils.html">dwv.utils</a></li>
             
             </ul>
 
             <ul id="api-modules" class="apis modules">
+            
+                <li><a href="../modules/browser.html">browser</a></li>
             
                 <li><a href="../modules/dicom.html">dicom</a></li>
             
@@ -203,11 +209,10 @@
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
 
-// Tool list: to be completed after each tool definition 
-dwv.tool.tools = dwv.tool.tools || {};
-    
 /**
  * Tool box.
+ * Relies on the static variable dwv.tool.tools. The available tools 
+ * of the gui will be those of this list.
  * @class ToolBox
  * @namespace dwv.tool
  * @constructor
@@ -234,13 +239,9 @@ dwv.tool.ToolBox = function(app)
  * @method enable
  * @param {Boolean} bool Flag to enable or not.
  */
-dwv.tool.ToolBox.prototype.enable = function(bool)
+dwv.tool.ToolBox.prototype.display = function(bool)
 {
-    if( bool ) {
-        this.sortTools();
-        dwv.gui.appendToolboxHtml();
-        this.init();
-    }
+    dwv.gui.displayToolboxHtml(bool);
 };
 
 /**
@@ -263,14 +264,15 @@ dwv.tool.ToolBox.prototype.setSelectedTool = function(name) {
     {
         throw new Error(&quot;Unknown tool: &#x27;&quot; + name + &quot;&#x27;&quot;);
     }
-    // disable last selected
+    // hide last selected
     if( this.selectedTool )
     {
-        this.selectedTool.enable(false);
+        this.selectedTool.display(false);
     }
     // enable new one
-    this.selectedTool = new dwv.tool.tools[name](app);
-    this.selectedTool.enable(true);
+    this.selectedTool = dwv.tool.tools[name];
+    // display it
+    this.selectedTool.display(true);
 };
 
 /**
@@ -281,22 +283,6 @@ dwv.tool.ToolBox.prototype.setSelectedTool = function(name) {
  */
 dwv.tool.ToolBox.prototype.hasTool = function(name) {
     return dwv.tool.tools[name];
-};
-
-/**
- * Sort the tool list.
- * @method sortTools
- */
-dwv.tool.ToolBox.prototype.sortTools = function()
-{
-    // fiddle with order: make window level first if present
-    var tools = dwv.tool.tools;
-    dwv.tool.tools = {};
-    if( tools.windowlevel ) dwv.tool.tools.windowlevel = tools.windowlevel;
-    for( var key in tools ) {
-        if( key === &quot;windowlevel&quot; ) continue;
-        dwv.tool.tools[key] = tools[key];
-    }
 };
 
 /**
@@ -311,6 +297,12 @@ dwv.tool.ToolBox.prototype.init = function()
         break;
     }
     this.setSelectedTool(this.defaultToolName);
+    // init all tools
+    for( key in dwv.tool.tools ) {
+        dwv.tool.tools[key].init();
+    }    
+    // init html
+    dwv.gui.initToolboxHtml();
 };
 
     </pre>

@@ -19,7 +19,7 @@
             
         </div>
         <div class="yui3-u-1-4 version">
-            <em>API Docs for: 0.5.1</em>
+            <em>API Docs for: 0.6.0</em>
         </div>
     </div>
     <div id="bd" class="yui3-g">
@@ -42,6 +42,8 @@
             <ul id="api-classes" class="apis classes">
             
                 <li><a href="../classes/dwv.App.html">dwv.App</a></li>
+            
+                <li><a href="../classes/dwv.browser.html">dwv.browser</a></li>
             
                 <li><a href="../classes/dwv.dicom.DataReader.html">dwv.dicom.DataReader</a></li>
             
@@ -125,19 +127,23 @@
             
                 <li><a href="../classes/dwv.tool.RunFilterCommand.html">dwv.tool.RunFilterCommand</a></li>
             
+                <li><a href="../classes/dwv.tool.Scroll.html">dwv.tool.Scroll</a></li>
+            
                 <li><a href="../classes/dwv.tool.ToolBox.html">dwv.tool.ToolBox</a></li>
             
                 <li><a href="../classes/dwv.tool.UndoStack.html">dwv.tool.UndoStack</a></li>
             
                 <li><a href="../classes/dwv.tool.WindowLevel.html">dwv.tool.WindowLevel</a></li>
             
-                <li><a href="../classes/dwv.tool.Zoom.html">dwv.tool.Zoom</a></li>
+                <li><a href="../classes/dwv.tool.ZoomAndPan.html">dwv.tool.ZoomAndPan</a></li>
             
                 <li><a href="../classes/dwv.utils.html">dwv.utils</a></li>
             
             </ul>
 
             <ul id="api-modules" class="apis modules">
+            
+                <li><a href="../modules/browser.html">browser</a></li>
             
                 <li><a href="../modules/dicom.html">dicom</a></li>
             
@@ -227,17 +233,7 @@
     <h3 class="name"><code>dwv.App</code></h3>
 
     
-        <div class="args">
-            <span class="paren">(</span><ul class="args-list inline commas">
-            
-                <li class="arg">
-                    
-                        <code>mobile</code>
-                    
-                </li>
-            
-            </ul><span class="paren">)</span>
-        </div>
+        <span class="paren">()</span>
     
 
     
@@ -279,30 +275,6 @@
         
     </div>
 
-    
-        <div class="params">
-            <h4>Parameters:</h4>
-
-            <ul class="params-list">
-            
-                <li class="param">
-                    
-                        <code class="param-name">mobile</code>
-                        <span class="type">Boolean</span>
-                    
-
-                    
-
-                    <div class="param-description">
-                        <p>Handle mobile or not.</p>
-
-                    </div>
-
-                    
-                </li>
-            
-            </ul>
-        </div>
     
 
     
@@ -420,6 +392,13 @@
                             </li>
                         
                             <li class="index-item method">
+                                <a href="#method_getVersion">getVersion</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
                                 <a href="#method_getView">getView</a>
 
                                 
@@ -442,13 +421,6 @@
                         
                             <li class="index-item method">
                                 <a href="#method_init">init</a>
-
-                                
-                                
-                            </li>
-                        
-                            <li class="index-item method">
-                                <a href="#method_isMobile">isMobile</a>
 
                                 
                                 
@@ -581,7 +553,7 @@
             
         
         
-        <a href="../files/src_application.js.html#l282"><code>src&#x2F;application.js:282</code></a>
+        <a href="../files/src_application.js.html#l291"><code>src&#x2F;application.js:291</code></a>
         
         </p>
 
@@ -654,7 +626,7 @@
             
         
         
-        <a href="../files/src_application.js.html#l400"><code>src&#x2F;application.js:400</code></a>
+        <a href="../files/src_application.js.html#l408"><code>src&#x2F;application.js:408</code></a>
         
         </p>
 
@@ -761,7 +733,7 @@
             
         
         
-        <a href="../files/src_application.js.html#l427"><code>src&#x2F;application.js:427</code></a>
+        <a href="../files/src_application.js.html#l439"><code>src&#x2F;application.js:439</code></a>
         
         </p>
 
@@ -852,7 +824,7 @@
             
         
         
-        <a href="../files/src_application.js.html#l310"><code>src&#x2F;application.js:310</code></a>
+        <a href="../files/src_application.js.html#l321"><code>src&#x2F;application.js:321</code></a>
         
         </p>
 
@@ -932,7 +904,7 @@ position relative to the canvas element. It then passes it to the current tool.<
             
         
         
-        <a href="../files/src_application.js.html#l225"><code>src&#x2F;application.js:225</code></a>
+        <a href="../files/src_application.js.html#l231"><code>src&#x2F;application.js:231</code></a>
         
         </p>
 
@@ -991,7 +963,7 @@ position relative to the canvas element. It then passes it to the current tool.<
             
         
         
-        <a href="../files/src_application.js.html#l95"><code>src&#x2F;application.js:95</code></a>
+        <a href="../files/src_application.js.html#l101"><code>src&#x2F;application.js:101</code></a>
         
         </p>
 
@@ -1064,7 +1036,7 @@ position relative to the canvas element. It then passes it to the current tool.<
             
         
         
-        <a href="../files/src_application.js.html#l41"><code>src&#x2F;application.js:41</code></a>
+        <a href="../files/src_application.js.html#l47"><code>src&#x2F;application.js:47</code></a>
         
         </p>
 
@@ -1137,7 +1109,7 @@ position relative to the canvas element. It then passes it to the current tool.<
             
         
         
-        <a href="../files/src_application.js.html#l75"><code>src&#x2F;application.js:75</code></a>
+        <a href="../files/src_application.js.html#l81"><code>src&#x2F;application.js:81</code></a>
         
         </p>
 
@@ -1210,7 +1182,7 @@ position relative to the canvas element. It then passes it to the current tool.<
             
         
         
-        <a href="../files/src_application.js.html#l89"><code>src&#x2F;application.js:89</code></a>
+        <a href="../files/src_application.js.html#l95"><code>src&#x2F;application.js:95</code></a>
         
         </p>
 
@@ -1283,7 +1255,7 @@ position relative to the canvas element. It then passes it to the current tool.<
             
         
         
-        <a href="../files/src_application.js.html#l101"><code>src&#x2F;application.js:101</code></a>
+        <a href="../files/src_application.js.html#l107"><code>src&#x2F;application.js:107</code></a>
         
         </p>
 
@@ -1356,7 +1328,7 @@ position relative to the canvas element. It then passes it to the current tool.<
             
         
         
-        <a href="../files/src_application.js.html#l82"><code>src&#x2F;application.js:82</code></a>
+        <a href="../files/src_application.js.html#l88"><code>src&#x2F;application.js:88</code></a>
         
         </p>
 
@@ -1429,7 +1401,7 @@ position relative to the canvas element. It then passes it to the current tool.<
             
         
         
-        <a href="../files/src_application.js.html#l108"><code>src&#x2F;application.js:108</code></a>
+        <a href="../files/src_application.js.html#l114"><code>src&#x2F;application.js:114</code></a>
         
         </p>
 
@@ -1456,6 +1428,79 @@ position relative to the canvas element. It then passes it to the current tool.<
                         <span class="type">Object</span>:
                     
                     <p>The undo stack.</p>
+
+                
+            </div>
+        </div>
+    
+
+    
+</div>
+
+                
+                    <div id="method_getVersion" class="method item">
+    <h3 class="name"><code>getVersion</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+        <span class="returns-inline">
+            <span class="type">String</span>
+        </span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_application.js.html#l40"><code>src&#x2F;application.js:40</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Get the version of the application.</p>
+
+    </div>
+
+    
+
+    
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                
+                    
+                        <span class="type">String</span>:
+                    
+                    <p>The version of the application.</p>
 
                 
             </div>
@@ -1502,7 +1547,7 @@ position relative to the canvas element. It then passes it to the current tool.<
             
         
         
-        <a href="../files/src_application.js.html#l47"><code>src&#x2F;application.js:47</code></a>
+        <a href="../files/src_application.js.html#l53"><code>src&#x2F;application.js:53</code></a>
         
         </p>
 
@@ -1583,7 +1628,7 @@ position relative to the canvas element. It then passes it to the current tool.<
             
         
         
-        <a href="../files/src_application.js.html#l387"><code>src&#x2F;application.js:387</code></a>
+        <a href="../files/src_application.js.html#l395"><code>src&#x2F;application.js:395</code></a>
         
         </p>
 
@@ -1672,7 +1717,7 @@ position relative to the canvas element. It then passes it to the current tool.<
             
         
         
-        <a href="../files/src_application.js.html#l145"><code>src&#x2F;application.js:145</code></a>
+        <a href="../files/src_application.js.html#l151"><code>src&#x2F;application.js:151</code></a>
         
         </p>
 
@@ -1756,7 +1801,7 @@ Default behavior. Usually used in tools.</li>
             
         
         
-        <a href="../files/src_application.js.html#l122"><code>src&#x2F;application.js:122</code></a>
+        <a href="../files/src_application.js.html#l121"><code>src&#x2F;application.js:121</code></a>
         
         </p>
 
@@ -1773,79 +1818,6 @@ Default behavior. Usually used in tools.</li>
 
     
 
-    
-
-    
-</div>
-
-                
-                    <div id="method_isMobile" class="method item">
-    <h3 class="name"><code>isMobile</code></h3>
-
-    
-        <span class="paren">()</span>
-    
-
-    
-        <span class="returns-inline">
-            <span class="type">Boolean</span>
-        </span>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/src_application.js.html#l115"><code>src&#x2F;application.js:115</code></a>
-        
-        </p>
-
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        <p>Get the mobile flag.</p>
-
-    </div>
-
-    
-
-    
-        <div class="returns">
-            <h4>Returns:</h4>
-
-            <div class="returns-description">
-                
-                    
-                        <span class="type">Boolean</span>:
-                    
-                    <p>The mobile flag.</p>
-
-                
-            </div>
-        </div>
     
 
     
@@ -1894,7 +1866,7 @@ Default behavior. Usually used in tools.</li>
             
         
         
-        <a href="../files/src_application.js.html#l175"><code>src&#x2F;application.js:175</code></a>
+        <a href="../files/src_application.js.html#l181"><code>src&#x2F;application.js:181</code></a>
         
         </p>
 
@@ -1983,7 +1955,7 @@ Default behavior. Usually used in tools.</li>
             
         
         
-        <a href="../files/src_application.js.html#l205"><code>src&#x2F;application.js:205</code></a>
+        <a href="../files/src_application.js.html#l211"><code>src&#x2F;application.js:211</code></a>
         
         </p>
 
@@ -2072,7 +2044,7 @@ Default behavior. Usually used in tools.</li>
             
         
         
-        <a href="../files/src_application.js.html#l165"><code>src&#x2F;application.js:165</code></a>
+        <a href="../files/src_application.js.html#l171"><code>src&#x2F;application.js:171</code></a>
         
         </p>
 
@@ -2161,7 +2133,7 @@ Default behavior. Usually used in tools.</li>
             
         
         
-        <a href="../files/src_application.js.html#l195"><code>src&#x2F;application.js:195</code></a>
+        <a href="../files/src_application.js.html#l201"><code>src&#x2F;application.js:201</code></a>
         
         </p>
 
@@ -2252,7 +2224,7 @@ Default behavior. Usually used in tools.</li>
             
         
         
-        <a href="../files/src_application.js.html#l455"><code>src&#x2F;application.js:455</code></a>
+        <a href="../files/src_application.js.html#l468"><code>src&#x2F;application.js:468</code></a>
         
         </p>
 
@@ -2333,7 +2305,7 @@ Default behavior. Usually used in tools.</li>
             
         
         
-        <a href="../files/src_application.js.html#l296"><code>src&#x2F;application.js:296</code></a>
+        <a href="../files/src_application.js.html#l306"><code>src&#x2F;application.js:306</code></a>
         
         </p>
 
@@ -2388,7 +2360,7 @@ Default behavior. Usually used in tools.</li>
             
         
         
-        <a href="../files/src_application.js.html#l134"><code>src&#x2F;application.js:134</code></a>
+        <a href="../files/src_application.js.html#l140"><code>src&#x2F;application.js:140</code></a>
         
         </p>
 
@@ -2443,7 +2415,7 @@ Default behavior. Usually used in tools.</li>
             
         
         
-        <a href="../files/src_application.js.html#l239"><code>src&#x2F;application.js:239</code></a>
+        <a href="../files/src_application.js.html#l245"><code>src&#x2F;application.js:245</code></a>
         
         </p>
 
@@ -2498,7 +2470,7 @@ Default behavior. Usually used in tools.</li>
             
         
         
-        <a href="../files/src_application.js.html#l65"><code>src&#x2F;application.js:65</code></a>
+        <a href="../files/src_application.js.html#l71"><code>src&#x2F;application.js:71</code></a>
         
         </p>
 
@@ -2563,7 +2535,7 @@ Default behavior. Usually used in tools.</li>
             
         
         
-        <a href="../files/src_application.js.html#l54"><code>src&#x2F;application.js:54</code></a>
+        <a href="../files/src_application.js.html#l60"><code>src&#x2F;application.js:60</code></a>
         
         </p>
 
@@ -2642,7 +2614,7 @@ Default behavior. Usually used in tools.</li>
             
         
         
-        <a href="../files/src_application.js.html#l261"><code>src&#x2F;application.js:261</code></a>
+        <a href="../files/src_application.js.html#l258"><code>src&#x2F;application.js:258</code></a>
         
         </p>
 

@@ -19,7 +19,7 @@
             
         </div>
         <div class="yui3-u-1-4 version">
-            <em>API Docs for: 0.5.1</em>
+            <em>API Docs for: 0.6.0</em>
         </div>
     </div>
     <div id="bd" class="yui3-g">
@@ -42,6 +42,8 @@
             <ul id="api-classes" class="apis classes">
             
                 <li><a href="../classes/dwv.App.html">dwv.App</a></li>
+            
+                <li><a href="../classes/dwv.browser.html">dwv.browser</a></li>
             
                 <li><a href="../classes/dwv.dicom.DataReader.html">dwv.dicom.DataReader</a></li>
             
@@ -125,19 +127,23 @@
             
                 <li><a href="../classes/dwv.tool.RunFilterCommand.html">dwv.tool.RunFilterCommand</a></li>
             
+                <li><a href="../classes/dwv.tool.Scroll.html">dwv.tool.Scroll</a></li>
+            
                 <li><a href="../classes/dwv.tool.ToolBox.html">dwv.tool.ToolBox</a></li>
             
                 <li><a href="../classes/dwv.tool.UndoStack.html">dwv.tool.UndoStack</a></li>
             
                 <li><a href="../classes/dwv.tool.WindowLevel.html">dwv.tool.WindowLevel</a></li>
             
-                <li><a href="../classes/dwv.tool.Zoom.html">dwv.tool.Zoom</a></li>
+                <li><a href="../classes/dwv.tool.ZoomAndPan.html">dwv.tool.ZoomAndPan</a></li>
             
                 <li><a href="../classes/dwv.utils.html">dwv.utils</a></li>
             
             </ul>
 
             <ul id="api-modules" class="apis modules">
+            
+                <li><a href="../modules/browser.html">browser</a></li>
             
                 <li><a href="../modules/dicom.html">dicom</a></li>
             
@@ -204,9 +210,8 @@ var dwv = dwv || {};
  * @class App
  * @namespace dwv
  * @constructor
- * @param {Boolean} mobile Handle mobile or not.
  */
-dwv.App = function(mobile)
+dwv.App = function()
 {
     // Local object
     var self = this;
@@ -229,12 +234,19 @@ dwv.App = function(mobile)
     var tempLayer = null;
     
     // flag to know if the info layer is listening on the image.
-    var isInfoLayerListening = true;
+    var isInfoLayerListening = false;
     
     // Tool box
     var toolBox = new dwv.tool.ToolBox(this);
     // UndoStack
     var undoStack = new dwv.tool.UndoStack(this);
+    
+    /** 
+     * Get the version of the application.
+     * @method getVersion
+     * @return {String} The version of the application.
+     */
+    this.getVersion = function() { return &quot;v0.6.0&quot;; };
     
     /** 
      * Get the image.
@@ -310,23 +322,23 @@ dwv.App = function(mobile)
      */
     this.getUndoStack = function() { return undoStack; };
 
-    /** 
-     * Get the mobile flag.
-     * @method isMobile
-     * @return {Boolean} The mobile flag.
-     */
-    this.isMobile = function() { return mobile; };
-
     /**
      * Initialise the HTML for the application.
      * @method init
      */
-    this.init = function()
-    {
-        // append loader HTML
-        dwv.gui.appendLoadboxHtml();
-        // append help HTML
-        dwv.gui.appendHelpHtml(mobile);
+    this.init = function(){
+        // align layers when the window is resized
+        window.onresize = app.resize;
+        // possible load from URL
+        if( typeof skipLoadUrl === &quot;undefined&quot; ) {
+            var inputUrls = dwv.html.getUriParam(); 
+            if( inputUrls &amp;&amp; inputUrls.length &gt; 0 ) {
+                app.loadURL(inputUrls);
+            }
+        }
+        else{
+            console.log(&quot;Not loading url from adress since skipLoadUrl is defined.&quot;);
+        }
     };
     
     /**
@@ -441,17 +453,8 @@ dwv.App = function(mobile)
     this.resize = function()
     {
         // adapt the size of the layer container
-        var mainWidth = 0;
-        var mainHeight = 0;
-        if( mobile ) {
-            mainWidth = $(window).width();
-            mainHeight = $(window).height() - 147;
-        }
-        else {
-            mainWidth = $(&#x27;#pageMain&#x27;).width() - 360;
-            mainHeight = $(&#x27;#pageMain&#x27;).height() - 75;
-        }
-        displayZoom = Math.min( (mainWidth / dataWidth), (mainHeight / dataHeight) );
+        var size = dwv.gui.getWindowSize();
+        displayZoom = Math.min( (size.width / dataWidth), (size.height / dataHeight) );
         $(&quot;#layerContainer&quot;).width(parseInt(displayZoom*dataWidth, 10));
         $(&quot;#layerContainer&quot;).height(parseInt(displayZoom*dataHeight, 10));
     };
@@ -467,14 +470,26 @@ dwv.App = function(mobile)
         // toggle listeners
         if( isInfoLayerListening ) {
             removeImageInfoListeners();
-            isInfoLayerListening = false;
         }
         else {
             addImageInfoListeners();
-            isInfoLayerListening = true;
         }
     };
     
+    /**
+     * Init the Window/Level display
+     */
+    this.initWLDisplay = function()
+    {
+        // set window/level
+        var keys = Object.keys(dwv.tool.presets);
+        dwv.tool.updateWindowingData(
+            dwv.tool.presets[keys[0]].center, 
+            dwv.tool.presets[keys[0]].width );
+        // default position
+        dwv.tool.updatePostionValue(0,0);
+    };
+
     // Private Methods -------------------------------------------
 
     /**
@@ -489,6 +504,7 @@ dwv.App = function(mobile)
         view.addEventListener(&quot;wlchange&quot;, dwv.info.updatePlotMarkings);
         view.addEventListener(&quot;colorchange&quot;, dwv.info.updateMiniColorMap);
         view.addEventListener(&quot;positionchange&quot;, dwv.info.updatePositionDiv);
+        isInfoLayerListening = true;
     }
     
     /**
@@ -503,6 +519,7 @@ dwv.App = function(mobile)
         view.removeEventListener(&quot;wlchange&quot;, dwv.info.updatePlotMarkings);
         view.removeEventListener(&quot;colorchange&quot;, dwv.info.updateMiniColorMap);
         view.removeEventListener(&quot;positionchange&quot;, dwv.info.updatePositionDiv);
+        isInfoLayerListening = false;
     }
     
     /**
@@ -519,56 +536,53 @@ dwv.App = function(mobile)
         // Store the event position relative to the image canvas
         // in an extra member of the event:
         // event._x and event._y.
-        if( mobile )
+        if( event.type === &quot;touchstart&quot; ||
+            event.type === &quot;touchmove&quot;)
         {
-            if( event.type === &quot;touchstart&quot; ||
-                event.type === &quot;touchmove&quot;)
+            event.preventDefault();
+            var touches = event.targetTouches;
+            // If there&#x27;s one or two fingers inside this element
+            if( touches.length === 1 || touches.length === 2)
             {
-                event.preventDefault();
-                var touches = event.targetTouches;
-                // If there&#x27;s one or two fingers inside this element
-                if( touches.length === 1 || touches.length === 2)
-                {
-                  var touch = touches[0];
+              var touch = touches[0];
+              // store
+              event._x = touch.pageX - parseInt(app.getImageLayer().getOffset().left, 10);
+              event._x = parseInt( (event._x / displayZoom), 10 );
+              event._y = touch.pageY - parseInt(app.getImageLayer().getOffset().top, 10);
+              event._y = parseInt( (event._y / displayZoom), 10 );
+              // second finger
+              if (touches.length === 2) {
+                  touch = touches[1];
                   // store
-                  event._x = touch.pageX - parseInt(app.getImageLayer().getOffset().left, 10);
-                  event._x = parseInt( (event._x / displayZoom), 10 );
-                  event._y = touch.pageY - parseInt(app.getImageLayer().getOffset().top, 10);
-                  event._y = parseInt( (event._y / displayZoom), 10 );
-                  // second finger
-                  if (touches.length === 2) {
-                      touch = touches[1];
-                      // store
-                      event._x1 = touch.pageX - parseInt(app.getImageLayer().getOffset().left, 10);
-                      event._x1 = parseInt( (event._x1 / displayZoom), 10 );
-                      event._y1 = touch.pageY - parseInt(app.getImageLayer().getOffset().top, 10);
-                      event._y1 = parseInt( (event._y1 / displayZoom), 10 );
-                  }
-                  // set handle event flag
-                  handled = true;
-                }
+                  event._x1 = touch.pageX - parseInt(app.getImageLayer().getOffset().left, 10);
+                  event._x1 = parseInt( (event._x1 / displayZoom), 10 );
+                  event._y1 = touch.pageY - parseInt(app.getImageLayer().getOffset().top, 10);
+                  event._y1 = parseInt( (event._y1 / displayZoom), 10 );
+              }
+              // set handle event flag
+              handled = true;
             }
-            else if( event.type === &quot;touchend&quot; ) handled = true;
         }
-        else
+        else if( event.type === &quot;mousemove&quot; ||
+            event.type === &quot;mousedown&quot; ||
+            event.type === &quot;mouseup&quot; ||
+            event.type === &quot;mouseout&quot; ||
+            event.type === &quot;mousewheel&quot; ||
+            event.type === &quot;dblclick&quot; ||
+            event.type === &quot;DOMMouseScroll&quot; )
         {
-            if( event.type === &quot;mousemove&quot; ||
-                event.type === &quot;mousedown&quot; ||
-                event.type === &quot;mouseup&quot; ||
-                event.type === &quot;mouseout&quot; ||
-                event.type === &quot;mousewheel&quot; ||
-                event.type === &quot;dblclick&quot; ||
-                event.type === &quot;DOMMouseScroll&quot; )
-            {
-                // layerX is for firefox
-                event._x = event.offsetX === undefined ? event.layerX : event.offsetX;
-                event._x = parseInt( (event._x / displayZoom), 10 );
-                event._y = event.offsetY === undefined ? event.layerY : event.offsetY;
-                event._y = parseInt( (event._y / displayZoom), 10 );
-                // set handle event flag
-                handled = true;
-            }
-            else if( event.type === &quot;keydown&quot; ) handled = true;
+            // layerX is for firefox
+            event._x = event.offsetX === undefined ? event.layerX : event.offsetX;
+            event._x = parseInt( (event._x / displayZoom), 10 );
+            event._y = event.offsetY === undefined ? event.layerY : event.offsetY;
+            event._y = parseInt( (event._y / displayZoom), 10 );
+            // set handle event flag
+            handled = true;
+        }
+        else if( event.type === &quot;keydown&quot; || 
+                event.type === &quot;touchend&quot;)
+        {
+            handled = true;
         }
             
         // Call the event handler of the tool.
@@ -613,13 +627,17 @@ dwv.App = function(mobile)
         imageLayer.fillContext();
         imageLayer.setStyleDisplay(true);
         // draw layer
-        drawLayer = new dwv.html.Layer(&quot;drawLayer&quot;);
-        drawLayer.initialise(dataWidth, dataHeight);
-        drawLayer.setStyleDisplay(true);
+        if( document.getElementById(&quot;drawLayer&quot;) !== null) {
+            drawLayer = new dwv.html.Layer(&quot;drawLayer&quot;);
+            drawLayer.initialise(dataWidth, dataHeight);
+            drawLayer.setStyleDisplay(true);
+        }
         // temp layer
-        tempLayer = new dwv.html.Layer(&quot;tempLayer&quot;);
-        tempLayer.initialise(dataWidth, dataHeight);
-        tempLayer.setStyleDisplay(true);
+        if( document.getElementById(&quot;tempLayer&quot;) !== null) {
+            tempLayer = new dwv.html.Layer(&quot;tempLayer&quot;);
+            tempLayer.initialise(dataWidth, dataHeight);
+            tempLayer.setStyleDisplay(true);
+        }
     }
     
     /**
@@ -630,10 +648,11 @@ dwv.App = function(mobile)
      */
     function createTagsTable(dataInfo)
     {
-        // tag list table (without the pixel data)
-        if(dataInfo.PixelData) dataInfo.PixelData.value = &quot;...&quot;;
         // HTML node
         var node = document.getElementById(&quot;tags&quot;);
+        if( node === null ) return;
+        // tag list table (without the pixel data)
+        if(dataInfo.PixelData) dataInfo.PixelData.value = &quot;...&quot;;
         // remove possible previous
         while (node.hasChildNodes()) { 
             node.removeChild(node.firstChild);
@@ -674,49 +693,45 @@ dwv.App = function(mobile)
         dataHeight = image.getSize().getNumberOfRows();
         createLayers(dataWidth, dataHeight);
         
-        // create the info layer
-        dwv.info.createWindowingDiv();
-        dwv.info.createPositionDiv();
-        dwv.info.createMiniColorMap();
-        dwv.info.createPlot();
-
         // get the image data from the image layer
         imageData = self.getImageLayer().getContext().createImageData( 
                 dataWidth, dataHeight);
 
+        var topLayer = tempLayer === null ? imageLayer : tempLayer;
         // mouse listeners
-        tempLayer.getCanvas().addEventListener(&quot;mousedown&quot;, eventHandler, false);
-        tempLayer.getCanvas().addEventListener(&quot;mousemove&quot;, eventHandler, false);
-        tempLayer.getCanvas().addEventListener(&quot;mouseup&quot;, eventHandler, false);
-        tempLayer.getCanvas().addEventListener(&quot;mouseout&quot;, eventHandler, false);
-        tempLayer.getCanvas().addEventListener(&quot;mousewheel&quot;, eventHandler, false);
-        tempLayer.getCanvas().addEventListener(&quot;DOMMouseScroll&quot;, eventHandler, false);
-        tempLayer.getCanvas().addEventListener(&quot;dblclick&quot;, eventHandler, false);
+        topLayer.getCanvas().addEventListener(&quot;mousedown&quot;, eventHandler, false);
+        topLayer.getCanvas().addEventListener(&quot;mousemove&quot;, eventHandler, false);
+        topLayer.getCanvas().addEventListener(&quot;mouseup&quot;, eventHandler, false);
+        topLayer.getCanvas().addEventListener(&quot;mouseout&quot;, eventHandler, false);
+        topLayer.getCanvas().addEventListener(&quot;mousewheel&quot;, eventHandler, false);
+        topLayer.getCanvas().addEventListener(&quot;DOMMouseScroll&quot;, eventHandler, false);
+        topLayer.getCanvas().addEventListener(&quot;dblclick&quot;, eventHandler, false);
         // touch listeners
-        tempLayer.getCanvas().addEventListener(&quot;touchstart&quot;, eventHandler, false);
-        tempLayer.getCanvas().addEventListener(&quot;touchmove&quot;, eventHandler, false);
-        tempLayer.getCanvas().addEventListener(&quot;touchend&quot;, eventHandler, false);
+        topLayer.getCanvas().addEventListener(&quot;touchstart&quot;, eventHandler, false);
+        topLayer.getCanvas().addEventListener(&quot;touchmove&quot;, eventHandler, false);
+        topLayer.getCanvas().addEventListener(&quot;touchend&quot;, eventHandler, false);
         // keydown listener
         window.addEventListener(&quot;keydown&quot;, eventHandler, true);
         // image listeners
         view.addEventListener(&quot;wlchange&quot;, app.generateAndDrawImage);
         view.addEventListener(&quot;colorchange&quot;, app.generateAndDrawImage);
         view.addEventListener(&quot;slicechange&quot;, app.generateAndDrawImage);
-        addImageInfoListeners();
+        
+        // info layer
+        if(document.getElementById(&quot;infoLayer&quot;)){
+            dwv.info.createWindowingDiv();
+            dwv.info.createPositionDiv();
+            dwv.info.createMiniColorMap();
+            dwv.info.createPlot();
+            addImageInfoListeners();
+        }
         
         // initialise the toolbox
-        toolBox.enable(true);
-        // add the HTML for the history 
-        dwv.gui.appendUndoHtml();
+        toolBox.init();
+        toolBox.display(true);
         
-        // the following has to be done after adding listeners
-        
-        // set window/level: triggers first data and div display
-        dwv.tool.updateWindowingData(
-                parseInt(app.getView().getWindowLut().getCenter(), 10),
-                parseInt(app.getView().getWindowLut().getWidth(), 10) );
-        // default position: triggers div display
-        dwv.tool.updatePostionValue(0,0);
+        // init W/L display
+        self.initWLDisplay();        
     }
 };
 

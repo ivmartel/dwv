@@ -19,7 +19,7 @@
             
         </div>
         <div class="yui3-u-1-4 version">
-            <em>API Docs for: 0.5.1</em>
+            <em>API Docs for: 0.6.0</em>
         </div>
     </div>
     <div id="bd" class="yui3-g">
@@ -42,6 +42,8 @@
             <ul id="api-classes" class="apis classes">
             
                 <li><a href="../classes/dwv.App.html">dwv.App</a></li>
+            
+                <li><a href="../classes/dwv.browser.html">dwv.browser</a></li>
             
                 <li><a href="../classes/dwv.dicom.DataReader.html">dwv.dicom.DataReader</a></li>
             
@@ -125,19 +127,23 @@
             
                 <li><a href="../classes/dwv.tool.RunFilterCommand.html">dwv.tool.RunFilterCommand</a></li>
             
+                <li><a href="../classes/dwv.tool.Scroll.html">dwv.tool.Scroll</a></li>
+            
                 <li><a href="../classes/dwv.tool.ToolBox.html">dwv.tool.ToolBox</a></li>
             
                 <li><a href="../classes/dwv.tool.UndoStack.html">dwv.tool.UndoStack</a></li>
             
                 <li><a href="../classes/dwv.tool.WindowLevel.html">dwv.tool.WindowLevel</a></li>
             
-                <li><a href="../classes/dwv.tool.Zoom.html">dwv.tool.Zoom</a></li>
+                <li><a href="../classes/dwv.tool.ZoomAndPan.html">dwv.tool.ZoomAndPan</a></li>
             
                 <li><a href="../classes/dwv.utils.html">dwv.utils</a></li>
             
             </ul>
 
             <ul id="api-modules" class="apis modules">
+            
+                <li><a href="../modules/browser.html">browser</a></li>
             
                 <li><a href="../modules/dicom.html">dicom</a></li>
             
@@ -297,10 +303,6 @@ dwv.tool.Livewire = function(app)
      * @type Scissors
      */
     var scissors = new dwv.math.Scissors();
-    scissors.setDimensions(
-        app.getImage().getSize().getNumberOfColumns(),
-        app.getImage().getSize().getNumberOfRows() );
-    scissors.setData(app.getImageData().data);
     
     /**
      * Handle mouse down event.
@@ -473,17 +475,30 @@ dwv.tool.Livewire = function(app)
      * @method enable
      * @param {Boolean} bool The flag to enable or not.
      */
-    this.enable = function(value){
-        if( value ) {
-            this.init();
-            dwv.gui.appendLivewireHtml();
-        }
-        else {
-            dwv.gui.clearLivewireHtml();
-        }
+    this.display = function(bool){
+        dwv.gui.displayLivewireHtml(bool);
+        // TODO why twice?
+        this.init();
     };
 
-
+    /**
+     * Initialise the tool.
+     * @method init
+     */
+    this.init = function()
+    {
+        // set the default to the first in the list
+        this.setLineColour(dwv.tool.colors[0]);
+        // init html
+        dwv.gui.initLivewireHtml();
+        
+        //scissors = new dwv.math.Scissors();
+        scissors.setDimensions(
+                app.getImage().getSize().getNumberOfColumns(),
+                app.getImage().getSize().getNumberOfRows() );
+        scissors.setData(app.getImageData().data);
+    };
+    
 }; // Livewire class
 
 /**
@@ -491,7 +506,7 @@ dwv.tool.Livewire = function(app)
  * @method getHelp
  * @returns {Object} The help content.
  */
-dwv.tool.Livewire.getHelp = function()
+dwv.tool.Livewire.prototype.getHelp = function()
 {
     return {
         &#x27;title&#x27;: &quot;Livewire&quot;,
@@ -514,20 +529,6 @@ dwv.tool.Livewire.prototype.setLineColour = function(colour)
     // set style var
     this.style.setLineColor(colour);
 };
-
-/**
- * Initialise the tool.
- * @method init
- */
-dwv.tool.Livewire.prototype.init = function()
-{
-    // set the default to the first in the list
-    this.setLineColour(dwv.tool.colors[0]);
-};
-
-// Add the tool to the tool list
-dwv.tool.tools = dwv.tool.tools || {};
-dwv.tool.tools.livewire = dwv.tool.Livewire;
 
 /**
  * Draw livewire command.

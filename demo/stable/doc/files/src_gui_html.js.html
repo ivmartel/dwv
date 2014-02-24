@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>src/html/html.js - dwv</title>
+    <title>src/gui/html.js - dwv</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
     <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
@@ -19,7 +19,7 @@
             
         </div>
         <div class="yui3-u-1-4 version">
-            <em>API Docs for: 0.5.1</em>
+            <em>API Docs for: 0.6.0</em>
         </div>
     </div>
     <div id="bd" class="yui3-g">
@@ -42,6 +42,8 @@
             <ul id="api-classes" class="apis classes">
             
                 <li><a href="../classes/dwv.App.html">dwv.App</a></li>
+            
+                <li><a href="../classes/dwv.browser.html">dwv.browser</a></li>
             
                 <li><a href="../classes/dwv.dicom.DataReader.html">dwv.dicom.DataReader</a></li>
             
@@ -125,19 +127,23 @@
             
                 <li><a href="../classes/dwv.tool.RunFilterCommand.html">dwv.tool.RunFilterCommand</a></li>
             
+                <li><a href="../classes/dwv.tool.Scroll.html">dwv.tool.Scroll</a></li>
+            
                 <li><a href="../classes/dwv.tool.ToolBox.html">dwv.tool.ToolBox</a></li>
             
                 <li><a href="../classes/dwv.tool.UndoStack.html">dwv.tool.UndoStack</a></li>
             
                 <li><a href="../classes/dwv.tool.WindowLevel.html">dwv.tool.WindowLevel</a></li>
             
-                <li><a href="../classes/dwv.tool.Zoom.html">dwv.tool.Zoom</a></li>
+                <li><a href="../classes/dwv.tool.ZoomAndPan.html">dwv.tool.ZoomAndPan</a></li>
             
                 <li><a href="../classes/dwv.utils.html">dwv.utils</a></li>
             
             </ul>
 
             <ul id="api-modules" class="apis modules">
+            
+                <li><a href="../modules/browser.html">browser</a></li>
             
                 <li><a href="../modules/dicom.html">dicom</a></li>
             
@@ -192,7 +198,7 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-                        <h1 class="file-heading">File: src/html/html.js</h1>
+                        <h1 class="file-heading">File: src/gui/html.js</h1>
 
 <div class="file">
     <pre class="code prettyprint linenums">
@@ -553,7 +559,7 @@ dwv.html.createHtmlSelect = function(name, list) {
         for ( var i in list )
         {
             option = document.createElement(&quot;option&quot;);
-            option.value = list[i].toLowerCase();
+            option.value = list[i];
             option.appendChild(document.createTextNode(dwv.utils.capitaliseFirstLetter(list[i])));
             select.appendChild(option);
         }
@@ -563,7 +569,7 @@ dwv.html.createHtmlSelect = function(name, list) {
         for ( var item in list )
         {
             option = document.createElement(&quot;option&quot;);
-            option.value = item.toLowerCase();
+            option.value = item;
             option.appendChild(document.createTextNode(dwv.utils.capitaliseFirstLetter(item)));
             select.appendChild(option);
         }
@@ -576,7 +582,9 @@ dwv.html.createHtmlSelect = function(name, list) {
 };
 
 /**
- * Get a list of parameters from an input URI.
+ * Get a list of parameters from an input URI that looks like:
+ *  [dwv root]?input=encodeURI([root]?key0=value0&amp;key1=value1)
+ * 
  * @method getUriParam
  * @static
  * @param {String } uri The URI to decode.
@@ -585,74 +593,83 @@ dwv.html.createHtmlSelect = function(name, list) {
 dwv.html.getUriParam = function(uri)
 {
     var inputUri = uri || window.location.href;
-    var val = [];
+    var result = [];
     // split key/value pairs
     var mainQueryPairs = dwv.utils.splitQueryString(inputUri);
     // check pairs
     if( mainQueryPairs === null ) return null;
     // has to have an input key
-    if( !mainQueryPairs.input ) 
+    if( !mainQueryPairs.query || !mainQueryPairs.query.input ) 
         throw new Error(&quot;No input parameter in query URI.&quot;);
     // decode input URI
-    var queryUri = decodeURIComponent(mainQueryPairs.input);
+    var queryUri = decodeURIComponent(mainQueryPairs.query.input);
     // get key/value pairs from input URI
     var inputQueryPairs = dwv.utils.splitQueryString(queryUri);
     // repeat key replace mode (default to keep key)
     var repeatKeyReplaceMode = &quot;key&quot;;
-    if( mainQueryPairs.dwvReplaceMode ) repeatKeyReplaceMode = mainQueryPairs.dwvReplaceMode;
+    if( mainQueryPairs.query.dwvReplaceMode ) repeatKeyReplaceMode = mainQueryPairs.query.dwvReplaceMode;
     
-    if( !inputQueryPairs ) val.push(queryUri);
+    if( !inputQueryPairs ) 
+    {
+        result.push(queryUri);
+    }
     else
     {
-        var keys = Object.keys(inputQueryPairs);
+        var keys = Object.keys(inputQueryPairs.query);
         // find repeat key
         var repeatKey = null;
         for( var i = 0; i &lt; keys.length; ++i )
         {
-            if( inputQueryPairs[keys[i]] instanceof Array )
+            if( inputQueryPairs.query[keys[i]] instanceof Array )
+            {
                 repeatKey = keys[i];
+                break;
+            }
         }
     
-        if( !repeatKey ) val.push(queryUri);
+        if( !repeatKey ) 
+        {
+            result.push(queryUri);
+        }
         else
         {
+            var repeatList = inputQueryPairs.query[repeatKey];
             // build base uri
-            var baseUrl = inputQueryPairs.base + &quot;?&quot;;
+            var baseUrl = inputQueryPairs.base;
+            // do not add &#x27;?&#x27; for what looks like file elements
+            // root/path/to/?key=0.jpg&amp;key=1.jpg
+            if( !( baseUrl[baseUrl.length-1] === &#x27;/&#x27; &amp;&amp; repeatList[0].indexOf(&#x27;.&#x27;) !== -1 ) ) 
+                baseUrl += &quot;?&quot;;
             var gotOneArg = false;
             for( var j = 0; j &lt; keys.length; ++j )
             {
-                if( keys[j] !== &quot;base&quot; &amp;&amp; keys[j] !== repeatKey ) {
+                if( keys[j] !== repeatKey ) {
                     if( gotOneArg ) baseUrl += &quot;&amp;&quot;;
-                    baseUrl += keys[j] + &quot;=&quot; + inputQueryPairs[keys[j]];
+                    baseUrl += keys[j] + &quot;=&quot; + inputQueryPairs.query[keys[j]];
                     gotOneArg = true;
                 }
             }
-            
-            // check if we really have repetition
+            // append built urls to result
             var url;
-            if( inputQueryPairs[repeatKey] instanceof Array )
-            {
-                for( var k = 0; k &lt; inputQueryPairs[repeatKey].length; ++k )
-                {
-                    url = baseUrl;
-                    if( gotOneArg ) url += &quot;&amp;&quot;;
-                    if( repeatKeyReplaceMode === &quot;key&quot; ) url += repeatKey + &quot;=&quot;;
-                    // other than key: do nothing
-                    url += inputQueryPairs[repeatKey][k];
-                    val.push(url);
-                }
-            }
-            else 
+            for( var k = 0; k &lt; repeatList.length; ++k )
             {
                 url = baseUrl;
                 if( gotOneArg ) url += &quot;&amp;&quot;;
-                url += repeatKey + &quot;=&quot; + inputQueryPairs[repeatKey];
-                val.push(url);
+                if( repeatKeyReplaceMode === &quot;key&quot; ) url += repeatKey + &quot;=&quot;;
+                // other than &#x27;key&#x27; mode: do nothing
+                url += repeatList[k];
+                result.push(url);
             }
         }
     }
     
-    return val;
+    return result;
+};
+
+dwv.html.displayElement = function(id,bool)
+{
+    var element = document.getElementById(id);
+    if( element ) element.style.display = bool ? &quot;&quot; : &quot;none&quot;;
 };
 
 /**
@@ -670,95 +687,6 @@ dwv.html.toggleDisplay = function(id)
         else div.style.display = &quot;none&quot;;
     }
 };
-
-// Browser namespace
-dwv.html.browser = dwv.html.browser || {};
-
-/**
- * Browser check for the FileAPI.
- * @method hasFileApi
- * @static
- */ 
-dwv.html.browser.hasFileApi = function()
-{
-    // regular test does not work on Safari 5
-    var isSafari5 = (navigator.appVersion.indexOf(&quot;Safari&quot;) != -1) &amp;&amp;
-        ( (navigator.appVersion.indexOf(&quot;5.0.&quot;) != -1) ||
-          (navigator.appVersion.indexOf(&quot;5.1.&quot;) != -1) );
-    if( isSafari5 ) 
-    {
-        console.warn(&quot;Assuming FileAPI support for Safari5...&quot;);
-        return true;
-    }
-    // regular test
-    return &quot;FileReader&quot; in window;
-};
-
-/**
- * Browser check for the XMLHttpRequest.
- * @method hasXmlHttpRequest
- * @static
- */ 
-dwv.html.browser.hasXmlHttpRequest = function()
-{
-    return &quot;XMLHttpRequest&quot; in window &amp;&amp; &quot;withCredentials&quot; in new XMLHttpRequest();
-};
-
-/**
- * Browser check for typed array.
- * @method hasTypedArray
- * @static
- */ 
-dwv.html.browser.hasTypedArray = function()
-{
-    return &quot;Uint8Array&quot; in window &amp;&amp; &quot;Uint16Array&quot; in window;
-};
-
-/**
- * Browser check for clamped array.
- * @method hasClampedArray
- * @static
- */ 
-dwv.html.browser.hasClampedArray = function()
-{
-    return &quot;Uint8ClampedArray&quot; in window;
-};
-
-/**
- * Browser checks to see if it can run dwv. Throws an error if not.
- * TODO Maybe use http://modernizr.com/.
- * @method check
- * @static
- */ 
-dwv.html.browser.check = function()
-{
-    var appnorun = &quot;The application cannot be run.&quot;;
-    var message = &quot;&quot;;
-    // Check for the File API support
-    if( !dwv.html.browser.hasFileApi() ) {
-        message = &quot;The File APIs are not supported in this browser. &quot;;
-        alert(message+appnorun);
-        throw new Error(message);
-    }
-    // Check for XMLHttpRequest
-    if( !dwv.html.browser.hasXmlHttpRequest() ) {
-        message = &quot;The XMLHttpRequest is not supported in this browser. &quot;;
-        alert(message+appnorun);
-        throw new Error(message);
-    }
-    // Check typed array
-    if( !dwv.html.browser.hasTypedArray() ) {
-        message = &quot;The Typed arrays are not supported in this browser. &quot;;
-        alert(message+appnorun);
-        throw new Error(message);
-    }
-    // check clamped array
-    if( !dwv.html.browser.hasClampedArray() ) {
-        // silent fail since IE does not support it...
-        console.warn(&quot;The Uint8ClampedArray is not supported in this browser. This may impair performance. &quot;);
-    }
-};
-
 
     </pre>
 </div>

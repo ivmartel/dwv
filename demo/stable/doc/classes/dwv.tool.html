@@ -19,7 +19,7 @@
             
         </div>
         <div class="yui3-u-1-4 version">
-            <em>API Docs for: 0.5.1</em>
+            <em>API Docs for: 0.6.0</em>
         </div>
     </div>
     <div id="bd" class="yui3-g">
@@ -42,6 +42,8 @@
             <ul id="api-classes" class="apis classes">
             
                 <li><a href="../classes/dwv.App.html">dwv.App</a></li>
+            
+                <li><a href="../classes/dwv.browser.html">dwv.browser</a></li>
             
                 <li><a href="../classes/dwv.dicom.DataReader.html">dwv.dicom.DataReader</a></li>
             
@@ -125,19 +127,23 @@
             
                 <li><a href="../classes/dwv.tool.RunFilterCommand.html">dwv.tool.RunFilterCommand</a></li>
             
+                <li><a href="../classes/dwv.tool.Scroll.html">dwv.tool.Scroll</a></li>
+            
                 <li><a href="../classes/dwv.tool.ToolBox.html">dwv.tool.ToolBox</a></li>
             
                 <li><a href="../classes/dwv.tool.UndoStack.html">dwv.tool.UndoStack</a></li>
             
                 <li><a href="../classes/dwv.tool.WindowLevel.html">dwv.tool.WindowLevel</a></li>
             
-                <li><a href="../classes/dwv.tool.Zoom.html">dwv.tool.Zoom</a></li>
+                <li><a href="../classes/dwv.tool.ZoomAndPan.html">dwv.tool.ZoomAndPan</a></li>
             
                 <li><a href="../classes/dwv.utils.html">dwv.utils</a></li>
             
             </ul>
 
             <ul id="api-modules" class="apis modules">
+            
+                <li><a href="../modules/browser.html">browser</a></li>
             
                 <li><a href="../modules/dicom.html">dicom</a></li>
             
@@ -200,7 +206,7 @@
 
     
         <div class="foundat">
-            Defined in: <a href="../files/src_tools_zoom.js.html#l6"><code>src&#x2F;tools&#x2F;zoom.js:6</code></a>
+            Defined in: <a href="../files/src_tools_zoomPan.js.html#l6"><code>src&#x2F;tools&#x2F;zoomPan.js:6</code></a>
         </div>
     
 
@@ -254,10 +260,24 @@
                             </li>
                         
                             <li class="index-item method">
+                                <a href="#method_updateColourMap">updateColourMap</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
                                 <a href="#method_updatePostionValue">updatePostionValue</a>
 
                                 
                                     <span class="flag static">static</span>
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_updatePresets">updatePresets</a>
+
                                 
                                 
                             </li>
@@ -272,10 +292,8 @@
                             </li>
                         
                             <li class="index-item method">
-                                <a href="#method_zoomReset">zoomReset</a>
+                                <a href="#method_updateWindowingData">updateWindowingData</a>
 
-                                
-                                    <span class="flag static">static</span>
                                 
                                 
                             </li>
@@ -340,7 +358,7 @@
             
         
         
-        <a href="../files/src_tools_windowLevel.js.html#l38"><code>src&#x2F;tools&#x2F;windowLevel.js:38</code></a>
+        <a href="../files/src_tools_windowLevel.js.html#l54"><code>src&#x2F;tools&#x2F;windowLevel.js:54</code></a>
         
         </p>
 
@@ -371,6 +389,95 @@
 
                     <div class="param-description">
                         <p>The colour map.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_updateColourMap" class="method item">
+    <h3 class="name"><code>updateColourMap</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>name</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_tools_windowLevel.js.html#l65"><code>src&#x2F;tools&#x2F;windowLevel.js:65</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Update the views&#39; colour map.</p>
+
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">name</code>
+                        <span class="type">String</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The name of the colour map to set.</p>
 
                     </div>
 
@@ -500,6 +607,95 @@
 </div>
 
                 
+                    <div id="method_updatePresets" class="method item">
+    <h3 class="name"><code>updatePresets</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>full</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_tools_windowLevel.js.html#l100"><code>src&#x2F;tools&#x2F;windowLevel.js:100</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Update the window/level presets.</p>
+
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">full</code>
+                        <span class="type">Boolean</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>If true, shows all presets.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+
+    
+</div>
+
+                
                     <div id="method_updateWindowingData" class="method item">
     <h3 class="name"><code>updateWindowingData</code></h3>
 
@@ -613,11 +809,21 @@
 </div>
 
                 
-                    <div id="method_zoomReset" class="method item">
-    <h3 class="name"><code>zoomReset</code></h3>
+                    <div id="method_updateWindowingData" class="method item">
+    <h3 class="name"><code>updateWindowingData</code></h3>
 
     
-        <span class="paren">()</span>
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>name</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
     
 
     
@@ -628,8 +834,6 @@
 
     
 
-    
-        <span class="flag static">static</span>
     
 
     
@@ -647,7 +851,7 @@
             
         
         
-        <a href="../files/src_tools_zoom.js.html#l14"><code>src&#x2F;tools&#x2F;zoom.js:14</code></a>
+        <a href="../files/src_tools_windowLevel.js.html#l38"><code>src&#x2F;tools&#x2F;windowLevel.js:38</code></a>
         
         </p>
 
@@ -658,10 +862,34 @@
     </div>
 
     <div class="description">
-        <p>Reset the application zoom.</p>
+        <p>Set the active window/level preset.</p>
 
     </div>
 
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">name</code>
+                        <span class="type">String</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The name of the preset to set.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
     
 
     

@@ -19,7 +19,7 @@
             
         </div>
         <div class="yui3-u-1-4 version">
-            <em>API Docs for: 0.5.1</em>
+            <em>API Docs for: 0.6.0</em>
         </div>
     </div>
     <div id="bd" class="yui3-g">
@@ -42,6 +42,8 @@
             <ul id="api-classes" class="apis classes">
             
                 <li><a href="../classes/dwv.App.html">dwv.App</a></li>
+            
+                <li><a href="../classes/dwv.browser.html">dwv.browser</a></li>
             
                 <li><a href="../classes/dwv.dicom.DataReader.html">dwv.dicom.DataReader</a></li>
             
@@ -125,19 +127,23 @@
             
                 <li><a href="../classes/dwv.tool.RunFilterCommand.html">dwv.tool.RunFilterCommand</a></li>
             
+                <li><a href="../classes/dwv.tool.Scroll.html">dwv.tool.Scroll</a></li>
+            
                 <li><a href="../classes/dwv.tool.ToolBox.html">dwv.tool.ToolBox</a></li>
             
                 <li><a href="../classes/dwv.tool.UndoStack.html">dwv.tool.UndoStack</a></li>
             
                 <li><a href="../classes/dwv.tool.WindowLevel.html">dwv.tool.WindowLevel</a></li>
             
-                <li><a href="../classes/dwv.tool.Zoom.html">dwv.tool.Zoom</a></li>
+                <li><a href="../classes/dwv.tool.ZoomAndPan.html">dwv.tool.ZoomAndPan</a></li>
             
                 <li><a href="../classes/dwv.utils.html">dwv.utils</a></li>
             
             </ul>
 
             <ul id="api-modules" class="apis modules">
+            
+                <li><a href="../modules/browser.html">browser</a></li>
             
                 <li><a href="../modules/dicom.html">dicom</a></li>
             
@@ -207,9 +213,6 @@ dwv.tool = dwv.tool || {};
 dwv.tool.colors = [
     &quot;Yellow&quot;, &quot;Red&quot;, &quot;White&quot;, &quot;Green&quot;, &quot;Blue&quot;, &quot;Lime&quot;, &quot;Fuchsia&quot;, &quot;Black&quot;
 ];
-
-// Shape list: to be completed after each tool definition 
-dwv.tool.shapes = dwv.tool.shapes || {};
 
 /**
  * Drawing tool.
@@ -362,16 +365,10 @@ dwv.tool.Draw = function(app)
     /**
      * Enable the tool.
      * @method enable
-     * @param {Boolean} value The flag to enable or not.
+     * @param {Boolean} bool The flag to enable or not.
      */
-    this.enable = function(value){
-        if( value ) {
-            this.init();
-            dwv.gui.appendDrawHtml();
-        }
-        else { 
-            dwv.gui.clearDrawHtml();
-        }
+    this.display = function(bool){
+        dwv.gui.displayDrawHtml(bool);
     };
 
 }; // Draw class
@@ -381,7 +378,7 @@ dwv.tool.Draw = function(app)
  * @method getHelp
  * @returns {Object} The help content.
  */
-dwv.tool.Draw.getHelp = function()
+dwv.tool.Draw.prototype.getHelp = function()
 {
     return {
         &#x27;title&#x27;: &quot;Draw&quot;,
@@ -445,11 +442,9 @@ dwv.tool.Draw.prototype.init = function() {
     this.setShapeName(shapeName);
     // same for color
     this.setLineColour(dwv.tool.colors[0]);
+    // init html
+    dwv.gui.initDrawHtml();
 };
-
-// Add the tool to the tool list
-dwv.tool.tools = dwv.tool.tools || {};
-dwv.tool.tools.draw = dwv.tool.Draw;
 
     </pre>
 </div>
