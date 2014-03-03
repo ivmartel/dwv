@@ -3601,7 +3601,7 @@ dwv.gui.base.appendSliderHtml = function()
     document.getElementById("thresholdLi").appendChild(div);
     // bind change
     $("#threshold-div").on("change",
-            function( event ) {
+            function(/*event*/) {
                 dwv.gui.onChangeMinMax(
                     { "min":$("#threshold-min").val(),
                       "max":$("#threshold-max").val() } );
@@ -3656,7 +3656,7 @@ dwv.gui = dwv.gui || {};
  * @static
  * @param {Object} event The change event.
  */
-dwv.gui.onChangeWindowLevelPreset = function(event)
+dwv.gui.onChangeWindowLevelPreset = function(/*event*/)
 {
     dwv.tool.updateWindowingDataFromName(this.value);
 };
@@ -3667,7 +3667,7 @@ dwv.gui.onChangeWindowLevelPreset = function(event)
  * @static
  * @param {Object} event The change event.
  */
-dwv.gui.onChangeColourMap = function(event)
+dwv.gui.onChangeColourMap = function(/*event*/)
 {
     dwv.tool.updateColourMapFromName(this.value);
 };
@@ -3678,7 +3678,7 @@ dwv.gui.onChangeColourMap = function(event)
  * @static
  * @param {Object} event The change event.
  */
-dwv.gui.onChangeLoader = function(event)
+dwv.gui.onChangeLoader = function(/*event*/)
 {
     if( this.value === "file") {
         dwv.gui.displayUrlLoadHtml(false);
@@ -3718,7 +3718,7 @@ dwv.gui.onChangeURL = function(event)
  * @static
  * @param {Object} event The change event.
  */
-dwv.gui.onChangeTool = function(event)
+dwv.gui.onChangeTool = function(/*event*/)
 {
     app.getToolBox().setSelectedTool(this.value);
 };
@@ -3729,7 +3729,7 @@ dwv.gui.onChangeTool = function(event)
  * @static
  * @param {Object} event The change event.
  */
-dwv.gui.onChangeFilter = function(event)
+dwv.gui.onChangeFilter = function(/*event*/)
 {
     app.getToolBox().getSelectedTool().setSelectedFilter(this.value);
 };
@@ -3740,7 +3740,7 @@ dwv.gui.onChangeFilter = function(event)
  * @static
  * @param {Object} event The run event.
  */
-dwv.gui.onRunFilter = function(event)
+dwv.gui.onRunFilter = function(/*event*/)
 {
     app.getToolBox().getSelectedTool().getSelectedFilter().run();
 };
@@ -3766,7 +3766,7 @@ dwv.gui.onChangeMinMax = function(range)
  * @static
  * @param {Object} event The change event.
  */
-dwv.gui.onChangeShape = function(event)
+dwv.gui.onChangeShape = function(/*event*/)
 {
     app.getToolBox().getSelectedTool().setShapeName(this.value);
 };
@@ -3777,7 +3777,7 @@ dwv.gui.onChangeShape = function(event)
  * @static
  * @param {Object} event The change event.
  */
-dwv.gui.onChangeLineColour = function(event)
+dwv.gui.onChangeLineColour = function(/*event*/)
 {
     app.getToolBox().getSelectedTool().setLineColour(this.value);
 };
@@ -3788,7 +3788,7 @@ dwv.gui.onChangeLineColour = function(event)
  * @static
  * @param {Object} event The change event.
  */
-dwv.gui.onZoomReset = function(event)
+dwv.gui.onZoomReset = function(/*event*/)
 {
     app.getImageLayer().resetLayout();
     app.getImageLayer().draw();
@@ -3820,7 +3820,7 @@ dwv.gui.onDisplayReset = function(event)
  * @static
  * @param {Object} event The associated event.
  */
-dwv.gui.onUndo = function(event)
+dwv.gui.onUndo = function(/*event*/)
 {
     app.getUndoStack().undo();
 };
@@ -3831,7 +3831,7 @@ dwv.gui.onUndo = function(event)
  * @static
  * @param {Object} event The associated event.
  */
-dwv.gui.onRedo = function(event)
+dwv.gui.onRedo = function(/*event*/)
 {
     app.getUndoStack().redo();
 };
@@ -3842,7 +3842,7 @@ dwv.gui.onRedo = function(event)
  * @static
  * @param {Object} event The associated event.
  */
-dwv.gui.onToggleInfoLayer = function(event)
+dwv.gui.onToggleInfoLayer = function(/*event*/)
 {
     app.toggleInfoLayerDisplay();
 };
@@ -6616,7 +6616,7 @@ dwv.image.lut.buildLut = function(func)
     return lut;
 };
 
-dwv.image.lut.max = function(i)
+dwv.image.lut.max = function(/*i*/)
 {
     return dwv.image.lut.range_max-1;
 };
@@ -6681,7 +6681,7 @@ dwv.image.lut.toMaxThirdThird = function(i)
     return val;
 };
 
-dwv.image.lut.zero = function(i)
+dwv.image.lut.zero = function(/*i*/)
 {
     return 0;
 };
@@ -7293,7 +7293,7 @@ dwv.io.File.prototype.load = function(ioArray)
     };
 
     // Image loader
-    var onLoadImageFile = function(event)
+    var onLoadImageFile = function(/*event*/)
     {
         // parse image file
         try {
@@ -7371,7 +7371,7 @@ dwv.io.Url.prototype.load = function(ioArray)
     var onerror = this.onerror;
     
     // Request error
-    var onErrorRequest = function(event)
+    var onErrorRequest = function(/*event*/)
     {
         onerror( {'name': "RequestError", 
             'message': "An error occurred while retrieving the file: (http) "+this.status } );
@@ -7391,7 +7391,7 @@ dwv.io.Url.prototype.load = function(ioArray)
     };
 
     // Image request loader
-    var onLoadImageRequest = function(event)
+    var onLoadImageRequest = function(/*event*/)
     {
         // parse image data
         try {
@@ -7404,7 +7404,7 @@ dwv.io.Url.prototype.load = function(ioArray)
     };
 
     // Request handler
-    var onLoadRequest = function(event)
+    var onLoadRequest = function(/*event*/)
     {
         // find the image type
         var view = new DataView(this.response);
@@ -8788,7 +8788,7 @@ dwv.tool.Draw = function(app)
      * @method mouseup
      * @param {Object} event The mouse up event.
      */
-    this.mouseup = function(event){
+    this.mouseup = function(/*event*/){
         if (started)
         {
             // save command in undo stack
@@ -8942,7 +8942,7 @@ dwv.tool = dwv.tool || {};
  * @constructor
  * @param {Object} app The associated application.
  */
-dwv.tool.Filter = function(app)
+dwv.tool.Filter = function(/*app*/)
 {
     /**
      * Selected filter.
@@ -9072,7 +9072,7 @@ dwv.tool.filter = dwv.tool.filter || {};
  * @constructor
  * @param {Object} app The associated application.
  */
-dwv.tool.filter.Threshold = function(app) {};
+dwv.tool.filter.Threshold = function(/*app*/) {};
 
 /**
  * Enable the filter.
@@ -9113,7 +9113,7 @@ dwv.tool.filter.Threshold.prototype.run = function(args)
  * @constructor
  * @param {Object} app The associated application.
  */
-dwv.tool.filter.Sharpen = function(app) {};
+dwv.tool.filter.Sharpen = function(/*app*/) {};
 
 /**
  * Enable the filter.
@@ -9135,7 +9135,7 @@ dwv.tool.filter.Sharpen.prototype.init = function()
  * @method run
  * @param {Mixed} args The filter arguments.
  */
-dwv.tool.filter.Sharpen.prototype.run = function(args)
+dwv.tool.filter.Sharpen.prototype.run = function(/*args*/)
 {
     var filter = new dwv.image.filter.Sharpen();
     var command = new dwv.tool.RunFilterCommand(filter, app);
@@ -9151,7 +9151,7 @@ dwv.tool.filter.Sharpen.prototype.run = function(args)
  * @constructor
  * @param {Object} app The associated application.
  */
-dwv.tool.filter.Sobel = function(app) {};
+dwv.tool.filter.Sobel = function(/*app*/) {};
 
 /**
  * Enable the filter.
@@ -9173,7 +9173,7 @@ dwv.tool.filter.Sobel.prototype.init = function()
  * @method run
  * @param {Mixed} args The filter arguments.
  */
-dwv.tool.filter.Sobel.prototype.run = function(args)
+dwv.tool.filter.Sobel.prototype.run = function(/*args*/)
 {
     var filter = new dwv.image.filter.Sobel();
     var command = new dwv.tool.RunFilterCommand(filter, app);
@@ -9743,7 +9743,7 @@ dwv.tool.Livewire = function(app)
      * @method mouseup
      * @param {Object} event The mouse up event.
      */
-    this.mouseup = function(event){
+    this.mouseup = function(/*event*/){
         // nothing to do
     };
     
@@ -10183,7 +10183,7 @@ dwv.tool.Scroll = function(app)
      * @method mouseup
      * @param {Object} event The mouse up event.
      */
-    this.mouseup = function(event){
+    this.mouseup = function(/*event*/){
         if (self.started)
         {
             // stop recording
@@ -10289,7 +10289,7 @@ dwv.tool = dwv.tool || {};
  * @constructor
  * @param {Object} app The associated application.
  */
-dwv.tool.ToolBox = function(app)
+dwv.tool.ToolBox = function(/*app*/)
 {
     /**
      * Selected tool.
@@ -10696,7 +10696,7 @@ dwv.tool.WindowLevel = function(app)
      * @method mouseup
      * @param {Object} event The mouse up event.
      */
-    this.mouseup = function(event){
+    this.mouseup = function(/*event*/){
         // set start flag
         if( self.started ) {
             self.started = false;
@@ -10947,7 +10947,7 @@ dwv.tool.ZoomAndPan = function(app)
      * @method mouseup
      * @param {Object} event The mouse up event.
      */
-    this.mouseup = function(event){
+    this.mouseup = function(/*event*/){
         if (self.started)
         {
             // stop recording
