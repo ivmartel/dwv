@@ -190,7 +190,9 @@ dwv.App = function()
         // create IO
         var fileIO = new dwv.io.File();
         fileIO.onload = function(data){
-            if( image ) image.appendSlice( data.view.getImage() );
+            if( image ) {
+                image.appendSlice( data.view.getImage() );
+            }
             postLoadInit(data);
         };
         fileIO.onerror = function(error){ handleError(error); };
@@ -220,7 +222,9 @@ dwv.App = function()
         // create IO
         var urlIO = new dwv.io.Url();
         urlIO.onload = function(data){
-            if( image ) image.appendSlice( data.view.getImage() );
+            if( image ) {
+                image.appendSlice( data.view.getImage() );
+            }
             postLoadInit(data);
         };
         urlIO.onerror = function(error){ handleError(error); };
@@ -400,9 +404,17 @@ dwv.App = function()
      */
     function handleError(error)
     {
-        if( error.name && error.message) alert(error.name+": "+error.message+".");
-        else alert("Error: "+error+".");
-        if( error.stack ) console.log(error.stack);
+        // alert window
+        if( error.name && error.message) {
+            alert(error.name+": "+error.message+".");
+        }
+        else {
+            alert("Error: "+error+".");
+        }
+        // log
+        if( error.stack ) {
+            console.log(error.stack);
+        }
     }
     
     /**
@@ -446,9 +458,13 @@ dwv.App = function()
     {
         // HTML node
         var node = document.getElementById("tags");
-        if( node === null ) return;
+        if( node === null ) {
+            return;
+        }
         // tag list table (without the pixel data)
-        if(dataInfo.PixelData) dataInfo.PixelData.value = "...";
+        if(dataInfo.PixelData) {
+            dataInfo.PixelData.value = "...";
+        }
         // remove possible previous
         while (node.hasChildNodes()) { 
             node.removeChild(node.firstChild);
@@ -474,7 +490,9 @@ dwv.App = function()
     function postLoadInit(data)
     {
         // only initialise the first time
-        if( view ) return;
+        if( view ) {
+            return;
+        }
         
         // get the view from the loaded data
         view = data.view;
@@ -555,7 +573,9 @@ dwv.dicom.DataReader = function(buffer, isLittleEndian)
      */
     var view = new DataView(buffer);
     // Set endian flag if not defined.
-    if(typeof(isLittleEndian)==='undefined') isLittleEndian = true;
+    if(typeof(isLittleEndian)==='undefined') {
+        isLittleEndian = true;
+    }
     
     /**
      * Read Uint8 (1 byte) data.
@@ -601,17 +621,22 @@ dwv.dicom.DataReader = function(buffer, isLittleEndian)
      * @return {Number} The read data.
      */
     this.readNumber = function(byteOffset, nBytes) {
-        if( nBytes === 1 )
+        if( nBytes === 1 ) {
             return this.readUint8(byteOffset, isLittleEndian);
-        else if( nBytes === 2 )
+        }
+        else if( nBytes === 2 ) {
             return this.readUint16(byteOffset, isLittleEndian);
-        else if( nBytes === 4 )
+        }
+        else if( nBytes === 4 ) {
             return this.readUint32(byteOffset, isLittleEndian);
-        else if( nBytes === 8 )
+        }
+        else if( nBytes === 8 ) {
             return this.readFloat32(byteOffset, isLittleEndian);
-        else 
+        }
+        else { 
             console.log("Non number: '"+this.readString(byteOffset, nBytes)+"'");
             throw new Error("Unsupported number size.");
+        }
     };
     /**
      * Read Uint8 array.
@@ -1135,17 +1160,19 @@ dwv.dicom.DicomParser.prototype.createImage = function()
         // copy
         for( var i=0; i<this.pixelBuffer.length; ++i ) {
             buffer[i] = this.pixelBuffer[i];
-            if( shift && buffer[i] >= Math.pow(2, 15) ) 
+            if( shift && buffer[i] >= Math.pow(2, 15) ) {
                 buffer[i] -= Math.pow(2, 16);
+            }
         }
     }
     
     // slice position
     var slicePosition = new Array(0,0,0);
-    if( this.dicomElements.ImagePositionPatient )
+    if( this.dicomElements.ImagePositionPatient ) {
         slicePosition = [ parseFloat(this.dicomElements.ImagePositionPatient.value[0]),
             parseFloat(this.dicomElements.ImagePositionPatient.value[1]),
             parseFloat(this.dicomElements.ImagePositionPatient.value[2]) ];
+    }
     
     // image
     var image = new dwv.image.Image( size, spacing, buffer, [slicePosition] );
@@ -1153,13 +1180,17 @@ dwv.dicom.DicomParser.prototype.createImage = function()
     if( this.dicomElements.PhotometricInterpretation ) {
         var photo = dwv.utils.cleanString(
             this.dicomElements.PhotometricInterpretation.value[0]).toUpperCase();
-        if( jpeg2000 && photo.match(/YBR/) ) photo = "RGB";
+        if( jpeg2000 && photo.match(/YBR/) ) {
+            photo = "RGB";
+        }
         image.setPhotometricInterpretation( photo );
     }        
     // planarConfiguration
     if( this.dicomElements.PlanarConfiguration ) {
         var planar = this.dicomElements.PlanarConfiguration.value[0];
-        if( jpeg2000 ) planar = 1;
+        if( jpeg2000 ) {
+            planar = 1;
+        }
         image.setPlanarConfiguration( planar );
     }        
     // rescale slope
@@ -1203,7 +1234,9 @@ dwv.dicom.DicomParser.prototype.createImage = function()
                 if( this.dicomElements.WindowCenterWidthExplanation ) {
                     name = this.dicomElements.WindowCenterWidthExplanation.value[j];
                 }
-                else name = "Default"+j;
+                else {
+                    name = "Default"+j;
+                }
                 windowPresets.push({
                     "center": parseFloat( this.dicomElements.WindowCenter.value[j], 10 ),
                     "width": width, 
@@ -1212,8 +1245,12 @@ dwv.dicom.DicomParser.prototype.createImage = function()
             }
         }
     }
-    if( windowPresets.length !== 0 ) view.setWindowPresets( windowPresets );
-    else view.setWindowLevelMinMax();
+    if( windowPresets.length !== 0 ) {
+        view.setWindowPresets( windowPresets );
+    }
+    else {
+        view.setWindowLevelMinMax();
+    }
 
     return view;
 };
@@ -3502,7 +3539,9 @@ dwv.gui.base.displayProgress = function(percent)
 dwv.gui.refreshSelect = function(selectName)
 {
     // jquery-mobile
-    if( $(selectName).selectmenu ) $(selectName).selectmenu('refresh');
+    if( $(selectName).selectmenu ) {
+        $(selectName).selectmenu('refresh');
+    }
 };
 
 /**
@@ -3517,7 +3556,9 @@ dwv.gui.setSelected = function(selectName, itemName)
     var select = document.getElementById(selectName);
     var index = 0;
     for( index in select.options){ 
-        if( select.options[index].text === itemName ) break;
+        if( select.options[index].text === itemName ) {
+            break;
+        }
     }
     select.selectedIndex = index;
     dwv.gui.refreshSelect("#" + selectName);
@@ -3714,8 +3755,9 @@ dwv.gui.onChangeMinMax = function(range)
 {
     // seems like jquery is checking if the method exists before it 
     // is used...
-    if( app.getToolBox().getSelectedTool().getSelectedFilter )
+    if( app.getToolBox().getSelectedTool().getSelectedFilter ) {
         app.getToolBox().getSelectedTool().getSelectedFilter().run(range);
+    }
 };
 
 /**
@@ -3838,7 +3880,9 @@ dwv.gui.base.appendVersionHtml = function()
 dwv.gui.base.appendHelpHtml = function(mobile)
 {
     var actionType = "mouse";
-    if( mobile ) actionType = "touch";
+    if( mobile ) {
+        actionType = "touch";
+    }
     
     var toolHelpDiv = document.createElement("div");
     
@@ -3952,7 +3996,9 @@ dwv.html.appendHCell = function(row, text)
 {
     var cell = document.createElement("th");
     // TODO jquery-mobile specific...
-    if( text !== "Value" && text !== "Name" ) cell.setAttribute("data-priority", "1");
+    if( text !== "Value" && text !== "Name" ) {
+        cell.setAttribute("data-priority", "1");
+    }
     cell.appendChild(document.createTextNode(text));
     row.appendChild(cell);
 };
@@ -4242,7 +4288,9 @@ dwv.html.removeNode = function(nodeId) {
     // find the node
     var node = document.getElementById(nodeId);
     // check node
-    if( !node ) return;
+    if( !node ) {
+        return;
+    }
     // remove its children
     dwv.html.cleanNode(node);
     // remove it from its parent
@@ -4310,17 +4358,22 @@ dwv.html.getUriParam = function(uri)
     // split key/value pairs
     var mainQueryPairs = dwv.utils.splitQueryString(inputUri);
     // check pairs
-    if( mainQueryPairs === null ) return null;
+    if( mainQueryPairs === null ) {
+        return null;
+    }
     // has to have an input key
-    if( !mainQueryPairs.query || !mainQueryPairs.query.input ) 
+    if( !mainQueryPairs.query || !mainQueryPairs.query.input ) { 
         throw new Error("No input parameter in query URI.");
+    }
     // decode input URI
     var queryUri = decodeURIComponent(mainQueryPairs.query.input);
     // get key/value pairs from input URI
     var inputQueryPairs = dwv.utils.splitQueryString(queryUri);
     // repeat key replace mode (default to keep key)
     var repeatKeyReplaceMode = "key";
-    if( mainQueryPairs.query.dwvReplaceMode ) repeatKeyReplaceMode = mainQueryPairs.query.dwvReplaceMode;
+    if( mainQueryPairs.query.dwvReplaceMode ) {
+        repeatKeyReplaceMode = mainQueryPairs.query.dwvReplaceMode;
+    }
     
     if( !inputQueryPairs ) 
     {
@@ -4351,13 +4404,16 @@ dwv.html.getUriParam = function(uri)
             var baseUrl = inputQueryPairs.base;
             // do not add '?' for what looks like file elements
             // root/path/to/?key=0.jpg&key=1.jpg
-            if( !( baseUrl[baseUrl.length-1] === '/' && repeatList[0].indexOf('.') !== -1 ) ) 
+            if( !( baseUrl[baseUrl.length-1] === '/' && repeatList[0].indexOf('.') !== -1 ) ) { 
                 baseUrl += "?";
+            }
             var gotOneArg = false;
             for( var j = 0; j < keys.length; ++j )
             {
                 if( keys[j] !== repeatKey ) {
-                    if( gotOneArg ) baseUrl += "&";
+                    if( gotOneArg ) {
+                        baseUrl += "&";
+                    }
                     baseUrl += keys[j] + "=" + inputQueryPairs.query[keys[j]];
                     gotOneArg = true;
                 }
@@ -4367,8 +4423,12 @@ dwv.html.getUriParam = function(uri)
             for( var k = 0; k < repeatList.length; ++k )
             {
                 url = baseUrl;
-                if( gotOneArg ) url += "&";
-                if( repeatKeyReplaceMode === "key" ) url += repeatKey + "=";
+                if( gotOneArg ) {
+                    url += "&";
+                }
+                if( repeatKeyReplaceMode === "key" ) {
+                    url += repeatKey + "=";
+                }
                 // other than 'key' mode: do nothing
                 url += repeatList[k];
                 result.push(url);
@@ -4382,7 +4442,9 @@ dwv.html.getUriParam = function(uri)
 dwv.html.displayElement = function(id,bool)
 {
     var element = document.getElementById(id);
-    if( element ) element.style.display = bool ? "" : "none";
+    if( element ) {
+        element.style.display = bool ? "" : "none";
+    }
 };
 
 /**
@@ -4396,8 +4458,12 @@ dwv.html.toggleDisplay = function(id)
     if( document.getElementById(id) )
     {
         var div = document.getElementById(id);
-        if( div.style.display === "none" ) div.style.display = '';
-        else div.style.display = "none";
+        if( div.style.display === "none" ) {
+            div.style.display = '';
+        }
+        else {
+            div.style.display = "none";
+        }
     }
 };
 ;/** 
@@ -4507,7 +4573,9 @@ dwv.html.Layer = function(name)
         var newZoomY = zoomY + stepY;
         // check zoom value
         if( newZoomX <= 0.1 || newZoomX >= 10 ||
-            newZoomY <= 0.1 || newZoomY >= 10 ) return;
+            newZoomY <= 0.1 || newZoomY >= 10 ) {
+            return;
+        }
         // The zoom is the ratio between the differences from the center
         // to the origins:
         // centerX - originX = ( centerX - originX0 ) * zoomX
@@ -4546,17 +4614,25 @@ dwv.html.Layer = function(name)
         // check translate value
         if( zoomX >= 1 ) { 
             if( (originX + tx) < -1 * (canvas.width * zoomX) + canvas.width ||
-                (originX + tx) > 0 ) return;
+                (originX + tx) > 0 ) {
+                return;
+            }
         } else {
             if( (originX + tx) > -1 * (canvas.width * zoomX) + canvas.width ||
-                (originX + tx) < 0 ) return;
+                (originX + tx) < 0 ) {
+                return;
+            }
         }
         if( zoomY >= 1 ) { 
             if( (originY + ty) < -1 * (canvas.height * zoomY) + canvas.height ||
-                (originY + ty) > 0 ) return;
+                (originY + ty) > 0 ) {
+                return;
+            }
         } else {
             if( (originY + ty) > -1 * (canvas.height * zoomY) + canvas.height ||
-                (originY + ty) < 0 ) return;
+                (originY + ty) < 0 ) {
+                return;
+            }
         }
         // new origin
         originX += tx;
@@ -4753,8 +4829,12 @@ dwv.html.Layer = function(name)
      */
     this.isVisible = function()
     {
-      if( canvas.style.display === "none" ) return false;
-      else return true;
+      if( canvas.style.display === "none" ) {
+          return false;
+      }
+      else {
+          return true;
+      }
     };
     
     /**
@@ -4797,7 +4877,9 @@ dwv.gui.base.appendLoadboxHtml = function()
     // node
     var node = document.getElementById("loaderlist");
     // clear it
-    while(node.hasChildNodes()) node.removeChild(node.firstChild);
+    while(node.hasChildNodes()) {
+        node.removeChild(node.firstChild);
+    }
     // append
     node.appendChild(loaderSelector);
     // trigger create event (mobile)
@@ -5016,7 +5098,9 @@ dwv.gui.base.appendToolboxHtml = function()
     // node
     var node = document.getElementById("toolList");
     // clear it
-    while(node.hasChildNodes()) node.removeChild(node.firstChild);
+    while(node.hasChildNodes()) {
+        node.removeChild(node.firstChild);
+    }
     // append
     node.appendChild(toolLi);
     // trigger create event (mobile)
@@ -5356,7 +5440,9 @@ dwv.gui.base.appendUndoHtml = function()
     // node
     var node = document.getElementById("history");
     // clear it
-    while(node.hasChildNodes()) node.removeChild(node.firstChild);
+    while(node.hasChildNodes()) {
+        node.removeChild(node.firstChild);
+    }
     // append
     node.appendChild(paragraph);
 };
@@ -5489,8 +5575,12 @@ dwv.image.filter.Threshold.prototype.update = function()
     var imageMin = app.getImage().getDataRange().min;
     var self = this;
     var threshFunction = function(value){
-        if(value<self.getMin()||value>self.getMax()) return imageMin;
-        else return value;
+        if(value<self.getMin()||value>self.getMax()) {
+            return imageMin;
+        }
+        else {
+            return value;
+        }
     };
     return app.getImage().transform( threshFunction );
 };
@@ -5641,7 +5731,9 @@ dwv.image.Size.prototype.equals = function(rhs) {
 dwv.image.Size.prototype.isInBounds = function( i, j, k ) {
     if( i < 0 || i > this.getNumberOfColumns() - 1 ||
         j < 0 || j > this.getNumberOfRows() - 1 ||
-        k < 0 || k > this.getNumberOfSlices() - 1 ) return false;
+        k < 0 || k > this.getNumberOfSlices() - 1 ) {
+        return false;
+    }
     return true;
 };
 
@@ -5758,7 +5850,9 @@ dwv.image.Image = function(size, spacing, buffer, slicePositions)
     var originalBuffer = new Int16Array(buffer);
     
     // check slice positions.
-    if( typeof(slicePositions) === 'undefined' ) slicePositions = [[0,0,0]];
+    if( typeof(slicePositions) === 'undefined' ) {
+        slicePositions = [[0,0,0]];
+    }
     
     /**
      * Data range.
@@ -5902,20 +5996,26 @@ dwv.image.Image = function(size, spacing, buffer, slicePositions)
     this.appendSlice = function(rhs)
     {
         // check input
-        if( rhs === null )
+        if( rhs === null ) {
             throw new Error("Cannot append null slice");
-        if( rhs.getSize().getNumberOfSlices() !== 1 )
+        }
+        if( rhs.getSize().getNumberOfSlices() !== 1 ) {
             throw new Error("Cannot append more than one slice");
-        if( size.getNumberOfColumns() !== rhs.getSize().getNumberOfColumns() )
+        }
+        if( size.getNumberOfColumns() !== rhs.getSize().getNumberOfColumns() ) {
             throw new Error("Cannot append a slice with different number of columns");
-        if( size.getNumberOfRows() !== rhs.getSize().getNumberOfRows() )
+        }
+        if( size.getNumberOfRows() !== rhs.getSize().getNumberOfRows() ) {
             throw new Error("Cannot append a slice with different number of rows");
-        if( photometricInterpretation !== rhs.getPhotometricInterpretation() )
+        }
+        if( photometricInterpretation !== rhs.getPhotometricInterpretation() ) {
             throw new Error("Cannot append a slice with different photometric interpretation");
+        }
         // all meta should be equal
         for( var key in meta ) {
-            if( meta[key] !== rhs.getMeta()[key] )
+            if( meta[key] !== rhs.getMeta()[key] ) {
                 throw new Error("Cannot append a slice with different "+key);
+            }
         }
         
         // find index where to append slice
@@ -5942,7 +6042,9 @@ dwv.image.Image = function(size, spacing, buffer, slicePositions)
         
         // calculate slice size
         var mul = 1;
-        if( photometricInterpretation === "RGB" ) mul = 3;
+        if( photometricInterpretation === "RGB" ) {
+            mul = 3;
+        }
         var sliceSize = mul * size.getSliceSize();
         
         // create the new buffer
@@ -5982,7 +6084,9 @@ dwv.image.Image = function(size, spacing, buffer, slicePositions)
      * @return {Object} The data range.
      */ 
     this.getDataRange = function() { 
-        if( !dataRange ) dataRange = this.calculateDataRange();
+        if( !dataRange ) {
+            dataRange = this.calculateDataRange();
+        }
         return dataRange;
     };
 
@@ -5992,7 +6096,9 @@ dwv.image.Image = function(size, spacing, buffer, slicePositions)
      * @return {Array} The histogram.
      */ 
     this.getHistogram = function() { 
-        if( !histogram ) histogram = this.calculateHistogram();
+        if( !histogram ) {
+            histogram = this.calculateHistogram();
+        }
         return histogram;
     };
 };
@@ -6107,8 +6213,9 @@ dwv.image.Image.prototype.calculateHistogram = function()
  */
 dwv.image.Image.prototype.convolute2D = function(weights)
 {
-    if(weights.length !== 9)
+    if(weights.length !== 9) {
         throw new Error("The convolution matrix does not have a length of 9; it has "+weights.length);
+    }
 
     var newImage = this.clone();
     var newBuffer = newImage.getBuffer();
@@ -6199,14 +6306,30 @@ dwv.image.Image.prototype.convolute2D = function(weights)
                 for (var i=0; i<ncols; i++) {
                     wOffFinal = wOff;
                     // special border cases
-                    if( i === 0 && j === 0 ) wOffFinal = wOff00;
-                    else if( i === 0 && j === nrows ) wOffFinal = wOff0n;
-                    else if( i === ncols && j === 0 ) wOffFinal = wOffn0;
-                    else if( i === ncols && j === nrows ) wOffFinal = wOffnn;
-                    else if( i === 0 && j !== nrows && j !== 0 ) wOffFinal = wOff0x;
-                    else if( i === ncols && j !== nrows && j !== 0 ) wOffFinal = wOffnx;
-                    else if( i !== 0 && i !== ncols && j === 0 ) wOffFinal = wOffx0;
-                    else if( i !== 0 && i !== ncols && j === nrows ) wOffFinal = wOffxn;
+                    if( i === 0 && j === 0 ) {
+                        wOffFinal = wOff00;
+                    }
+                    else if( i === 0 && j === nrows ) {
+                        wOffFinal = wOff0n;
+                    }
+                    else if( i === ncols && j === 0 ) {
+                        wOffFinal = wOffn0;
+                    }
+                    else if( i === ncols && j === nrows ) {
+                        wOffFinal = wOffnn;
+                    }
+                    else if( i === 0 && j !== nrows && j !== 0 ) {
+                        wOffFinal = wOff0x;
+                    }
+                    else if( i === ncols && j !== nrows && j !== 0 ) {
+                        wOffFinal = wOffnx;
+                    }
+                    else if( i !== 0 && i !== ncols && j === 0 ) {
+                        wOffFinal = wOffx0;
+                    }
+                    else if( i !== 0 && i !== ncols && j === nrows ) {
+                        wOffFinal = wOffxn;
+                    }
                         
                     // calculate the weighed sum of the source image pixels that
                     // fall under the convolution matrix
@@ -6290,9 +6413,13 @@ dwv.image.lut.Rescale = function(slope_,intercept_)
     var rescaleLut_ = null;
     
     // Check the rescale slope.
-    if(typeof(slope_) === 'undefined') slope_ = 1;
+    if(typeof(slope_) === 'undefined') {
+        slope_ = 1;
+    }
     // Check the rescale intercept.
-    if(typeof(intercept_) === 'undefined') intercept_ = 0;
+    if(typeof(intercept_) === 'undefined') {
+        intercept_ = 0;
+    }
     
     /**
      * Get the rescale slope.
@@ -6317,8 +6444,9 @@ dwv.image.lut.Rescale = function(slope_,intercept_)
     {
         var size = Math.pow(2, bitsStored);
         rescaleLut_ = new Float32Array(size);
-        for(var i=0; i<size; ++i)
+        for(var i=0; i<size; ++i) {
             rescaleLut_[i] = i * slope_ + intercept_;
+        }
     };
     
     /**
@@ -6356,11 +6484,12 @@ dwv.image.lut.Window = function(rescaleLut_, isSigned_)
     var windowLut_ = null;
     
     // check Uint8ClampedArray support
-    if( !dwv.browser.hasClampedArray() )
-    {
+    if( !dwv.browser.hasClampedArray() ) {
         windowLut_ = new Uint8Array(rescaleLut_.getLength());
     }
-    else windowLut_ = new Uint8ClampedArray(rescaleLut_.getLength());
+    else {
+        windowLut_ = new Uint8ClampedArray(rescaleLut_.getLength());
+    }
     
     /**
      * The window center.
@@ -6481,8 +6610,9 @@ dwv.image.lut.range_max = 256;
 dwv.image.lut.buildLut = function(func)
 {
     var lut = [];
-    for( var i=0; i<dwv.image.lut.range_max; ++i )
+    for( var i=0; i<dwv.image.lut.range_max; ++i ) {
         lut.push(func(i));
+    }
     return lut;
 };
 
@@ -6493,31 +6623,35 @@ dwv.image.lut.max = function(i)
 
 dwv.image.lut.maxFirstThird = function(i)
 {
-    if( i < dwv.image.lut.range_max/3 )
+    if( i < dwv.image.lut.range_max/3 ) {
         return dwv.image.lut.range_max-1;
+    }
     return 0;
 };
 
 dwv.image.lut.maxSecondThird = function(i)
 {
     var third = dwv.image.lut.range_max/3;
-    if( i >= third && i < 2*third )
+    if( i >= third && i < 2*third ) {
         return dwv.image.lut.range_max-1;
+    }
     return 0;
 };
 
 dwv.image.lut.maxThirdThird = function(i)
 {
-    if( i >= 2*dwv.image.lut.range_max/3 )
+    if( i >= 2*dwv.image.lut.range_max/3 ) {
         return dwv.image.lut.range_max-1;
+    }
     return 0;
 };
 
 dwv.image.lut.toMaxFirstThird = function(i)
 {
     var val = i * 3;
-    if( val > dwv.image.lut.range_max-1 )
+    if( val > dwv.image.lut.range_max-1 ) {
         return dwv.image.lut.range_max-1;
+    }
     return val;
 };
 
@@ -6527,8 +6661,9 @@ dwv.image.lut.toMaxSecondThird = function(i)
     var val = 0;
     if( i >= third ) {
         val = (i-third) * 3;
-        if( val > dwv.image.lut.range_max-1 )
+        if( val > dwv.image.lut.range_max-1 ) {
             return dwv.image.lut.range_max-1;
+        }
     }
     return val;
 };
@@ -6539,8 +6674,9 @@ dwv.image.lut.toMaxThirdThird = function(i)
     var val = 0;
     if( i >= 2*third ) {
         val = (i-2*third) * 3;
-        if( val > dwv.image.lut.range_max-1 )
+        if( val > dwv.image.lut.range_max-1 ) {
             return dwv.image.lut.range_max-1;
+        }
     }
     return val;
 };
@@ -6816,10 +6952,11 @@ dwv.image.View = function(image, isSigned)
     this.setColorMap = function(map) { 
         colorMap = map;
         // TODO Better handle this...
-        if( this.getImage().getPhotometricInterpretation() === "MONOCHROME1") 
+        if( this.getImage().getPhotometricInterpretation() === "MONOCHROME1") {
             colorMap = dwv.image.lut.invPlain;
+        }
         this.fireEvent({"type": "colorchange", 
-            "wc": this.getWindowLut().getCenter(),
+           "wc": this.getWindowLut().getCenter(),
            "ww": this.getWindowLut().getWidth() });
     };
     
@@ -6842,7 +6979,9 @@ dwv.image.View = function(image, isSigned)
      * @param {Object} pos The current position.
      */ 
     this.setCurrentPosition = function(pos) { 
-        if( !image.getSize().isInBounds(pos.i,pos.j,pos.k) ) return false;
+        if( !image.getSize().isInBounds(pos.i,pos.j,pos.k) ) {
+            return false;
+        }
         var oldPosition = currentPosition;
         currentPosition = pos;
         // only display value for monochrome data
@@ -6868,7 +7007,7 @@ dwv.image.View = function(image, isSigned)
      * View listeners
      * @property listeners
      * @private
-     * @type Array
+     * @type Object
      */
     var listeners = {};
     /**
@@ -7049,7 +7188,9 @@ dwv.image.View.prototype.generateImageData = function( array )
 dwv.image.View.prototype.addEventListener = function(type, listener)
 {
     var listeners = this.getListeners();
-    if( !listeners[type] ) listeners[type] = [];
+    if( !listeners[type] ) {
+        listeners[type] = [];
+    }
     listeners[type].push(listener);
 };
 
@@ -7062,11 +7203,14 @@ dwv.image.View.prototype.addEventListener = function(type, listener)
 dwv.image.View.prototype.removeEventListener = function(type, listener)
 {
     var listeners = this.getListeners();
-    if( !listeners[type] ) return;
+    if( !listeners[type] ) {
+        return;
+    }
     for(var i=0; i < listeners[type].length; ++i)
     {   
-        if( listeners[type][i] === listener )
+        if( listeners[type][i] === listener ) {
             listeners[type].splice(i,1);
+        }
     }
 };
 
@@ -7078,7 +7222,9 @@ dwv.image.View.prototype.removeEventListener = function(type, listener)
 dwv.image.View.prototype.fireEvent = function(event)
 {
     var listeners = this.getListeners();
-    if( !listeners[event.type] ) return;
+    if( !listeners[event.type] ) {
+        return;
+    }
     for(var i=0; i < listeners[event.type].length; ++i)
     {   
         listeners[event.type][i](event);
@@ -7277,9 +7423,15 @@ dwv.io.Url.prototype.load = function(ioArray)
             }
             // image type
             var imageType = "unknown";
-            if(isJpeg) imageType = "jpeg";
-            else if(isPng) imageType = "png";
-            else if(isGif) imageType = "gif";
+            if(isJpeg) {
+                imageType = "jpeg";
+            }
+            else if(isPng) {
+                imageType = "png";
+            }
+            else if(isGif) {
+                imageType = "gif";
+            }
             // temporary image object
             var tmpImage = new Image();
             tmpImage.src = "data:image/" + imageType + ";base64," + window.btoa(imageDataStr);
@@ -9223,8 +9375,12 @@ dwv.info.updateMiniColorMap = function(event)
     for( var j=0; j<canvas.height; ++j ) {
         c = minInt;
         for( var i=0; i<canvas.width; ++i ) {
-            if( c <= xMin ) y = yMin;
-            else if( c > xMax ) y = yMax;
+            if( c <= xMin ) {
+                y = yMin;
+            }
+            else if( c > xMax ) {
+                y = yMax;
+            }
             else {
                 y = ( (c - (windowCenter-0.5) ) / (windowWidth-1) + 0.5 ) *
                     (yMax-yMin) + yMin;
@@ -10000,15 +10156,23 @@ dwv.tool.Scroll = function(app)
       * @param {Object} event The mouse move event.
       */
      this.mousemove = function(event){
-        if (!self.started) return;
+        if (!self.started) {
+            return;
+        }
 
         // difference to last position
         var diffY = event._y - self.y0;
         // do not trigger for small moves
-        if( Math.abs(diffY) < 15 ) return;
+        if( Math.abs(diffY) < 15 ) {
+            return;
+        }
         // update GUI
-        if( diffY > 0 ) app.getView().incrementSliceNb();
-        else app.getView().decrementSliceNb();
+        if( diffY > 0 ) {
+            app.getView().incrementSliceNb();
+        }
+        else {
+            app.getView().decrementSliceNb();
+        }
         // reset origin point
         self.x0 = event._x;
         self.y0 = event._y;
@@ -10360,8 +10524,9 @@ dwv.tool.updateWindowingData = function(wc,ww)
 dwv.tool.updateWindowingDataFromName = function(name)
 {
     // check if we have it
-    if( !dwv.tool.presets[name] )
+    if( !dwv.tool.presets[name] ) {
         throw new Error("Unknown window level preset: '" + name + "'");
+    }
     // enable it
     dwv.tool.updateWindowingData( 
         dwv.tool.presets[name].center, 
@@ -10387,8 +10552,9 @@ dwv.tool.updateColourMap = function(colourMap)
 dwv.tool.updateColourMapFromName = function(name)
 {
     // check if we have it
-    if( !dwv.tool.colourMaps[name] )
+    if( !dwv.tool.colourMaps[name] ) {
         throw new Error("Unknown colour map: '" + name + "'");
+    }
     // enable it
     dwv.tool.updateColourMap( dwv.tool.colourMaps[name] );
 };
@@ -10509,7 +10675,9 @@ dwv.tool.WindowLevel = function(app)
      */
     this.mousemove = function(event){
         // check start flag
-        if( !self.started ) return;
+        if( !self.started ) {
+            return;
+        }
         // difference to last position
         var diffX = event._x - self.x0;
         var diffY = self.y0 - event._y;
@@ -10608,11 +10776,12 @@ dwv.tool.WindowLevel = function(app)
      * @param {Boolean} bool The flag to enable or not.
      */
     this.display = function(bool){
-        if( app.getImage().getPhotometricInterpretation().match(/MONOCHROME/) !== null )
-        {
+        if( app.getImage().getPhotometricInterpretation().match(/MONOCHROME/) !== null ) {
             dwv.gui.displayWindowLevelHtml(bool);
         }
-        else dwv.gui.displayWindowLevelHtml(false);
+        else {
+            dwv.gui.displayWindowLevelHtml(false);
+        }
     };
     
     /**
@@ -10752,17 +10921,24 @@ dwv.tool.ZoomAndPan = function(app)
            // difference  to last position
            var diffY = event._y - self.y0;
            // do not trigger for small moves
-           if( Math.abs(diffY) < 15 ) return;
+           if( Math.abs(diffY) < 15 ) {
+               return;
+           }
            // update GUI
-           if( diffY > 0 ) app.getView().incrementSliceNb();
-           else app.getView().decrementSliceNb();
+           if( diffY > 0 ) {
+               app.getView().incrementSliceNb();
+           }
+           else {
+               app.getView().decrementSliceNb();
+           }
        }
        else
        {
            // zoom mode
            var zoom = (lineRatio - 1) / 2;
-           if( Math.abs(zoom) % 0.1 <= 0.05 )
+           if( Math.abs(zoom) % 0.1 <= 0.05 ) {
                zoomLayers(zoom, self.midPoint.getX(), self.midPoint.getY());
+           }
        }
     };
     
@@ -10884,10 +11060,12 @@ dwv.tool.ZoomAndPan = function(app)
      */ 
     function zoomLayers(step, cx, cy)
     {
-        if( app.getImageLayer() ) 
+        if( app.getImageLayer() ) {
             app.getImageLayer().zoom(step, step, cx, cy);
-        if( app.getDrawLayer() ) 
+        }
+        if( app.getDrawLayer() ) { 
             app.getDrawLayer().zoom(step, step, cx, cy);
+        }
     }
 
     /**
@@ -10898,10 +11076,12 @@ dwv.tool.ZoomAndPan = function(app)
      */ 
     function translateLayers(tx, ty)
     {
-        if( app.getImageLayer() ) 
+        if( app.getImageLayer() ) {
             app.getImageLayer().translate(tx, ty);
-        if( app.getDrawLayer() ) 
+        }
+        if( app.getDrawLayer() ) { 
             app.getDrawLayer().translate(tx, ty);
+        }
     }
 
 }; // ZoomAndPan class
@@ -10988,7 +11168,9 @@ dwv.utils.cleanString = function(string)
 dwv.utils.splitQueryString = function(inputStr)
 {
     // check if query string
-    if( inputStr.indexOf('?') === -1 ) return null;
+    if( inputStr.indexOf('?') === -1 ) {
+        return null;
+    }
     // result
     var result = {};
     // base

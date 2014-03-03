@@ -309,7 +309,9 @@ dwv.html.Layer = function(name)
         var newZoomY = zoomY + stepY;
         // check zoom value
         if( newZoomX &lt;= 0.1 || newZoomX &gt;= 10 ||
-            newZoomY &lt;= 0.1 || newZoomY &gt;= 10 ) return;
+            newZoomY &lt;= 0.1 || newZoomY &gt;= 10 ) {
+            return;
+        }
         // The zoom is the ratio between the differences from the center
         // to the origins:
         // centerX - originX = ( centerX - originX0 ) * zoomX
@@ -348,17 +350,25 @@ dwv.html.Layer = function(name)
         // check translate value
         if( zoomX &gt;= 1 ) { 
             if( (originX + tx) &lt; -1 * (canvas.width * zoomX) + canvas.width ||
-                (originX + tx) &gt; 0 ) return;
+                (originX + tx) &gt; 0 ) {
+                return;
+            }
         } else {
             if( (originX + tx) &gt; -1 * (canvas.width * zoomX) + canvas.width ||
-                (originX + tx) &lt; 0 ) return;
+                (originX + tx) &lt; 0 ) {
+                return;
+            }
         }
         if( zoomY &gt;= 1 ) { 
             if( (originY + ty) &lt; -1 * (canvas.height * zoomY) + canvas.height ||
-                (originY + ty) &gt; 0 ) return;
+                (originY + ty) &gt; 0 ) {
+                return;
+            }
         } else {
             if( (originY + ty) &gt; -1 * (canvas.height * zoomY) + canvas.height ||
-                (originY + ty) &lt; 0 ) return;
+                (originY + ty) &lt; 0 ) {
+                return;
+            }
         }
         // new origin
         originX += tx;
@@ -555,8 +565,12 @@ dwv.html.Layer = function(name)
      */
     this.isVisible = function()
     {
-      if( canvas.style.display === &quot;none&quot; ) return false;
-      else return true;
+      if( canvas.style.display === &quot;none&quot; ) {
+          return false;
+      }
+      else {
+          return true;
+      }
     };
     
     /**

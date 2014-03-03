@@ -692,7 +692,7 @@
             "module": "dicom",
             "namespace": "dwv.dicom",
             "file": "src/dicom/dicomParser.js",
-            "line": 177,
+            "line": 184,
             "description": "DicomParser class.",
             "is_constructor": 1
         },
@@ -819,7 +819,7 @@
             "module": "image",
             "namespace": "dwv.image.filter",
             "file": "src/image/filter.js",
-            "line": 80,
+            "line": 84,
             "description": "Sharpen an image using a sharpen convolution matrix.",
             "is_constructor": 1
         },
@@ -834,7 +834,7 @@
             "module": "image",
             "namespace": "dwv.image.filter",
             "file": "src/image/filter.js",
-            "line": 109,
+            "line": 113,
             "description": "Apply a Sobel filter to an image.",
             "is_constructor": 1
         },
@@ -881,7 +881,7 @@
             "module": "image",
             "namespace": "dwv.image",
             "file": "src/image/image.js",
-            "line": 86,
+            "line": 88,
             "description": "Image Spacing class. \nSupports 2D and 3D images.",
             "is_constructor": 1,
             "params": [
@@ -913,7 +913,7 @@
             "module": "image",
             "namespace": "dwv.image",
             "file": "src/image/image.js",
-            "line": 131,
+            "line": 133,
             "description": "Image class.\nUsable once created, optional are:\n- rescale slope and intercept (default 1:0), \n- photometric interpretation (default MONOCHROME2),\n- planar configuration (default RGBRGB...).",
             "is_constructor": 1,
             "params": [
@@ -977,7 +977,7 @@
             "module": "image",
             "namespace": "dwv.image.lut",
             "file": "src/image/luts.js",
-            "line": 74,
+            "line": 79,
             "description": "Window LUT class.",
             "is_constructor": 1,
             "params": [
@@ -1676,7 +1676,7 @@
             "module": "tool",
             "namespace": "dwv.tool",
             "file": "src/tools/windowLevel.js",
-            "line": 150,
+            "line": 152,
             "description": "WindowLevel tool: handle window/level related events.",
             "is_constructor": 1,
             "params": [
@@ -1756,7 +1756,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 28,
+            "line": 30,
             "description": "Read Uint8 (1 byte) data.",
             "itemtype": "method",
             "name": "readUint8",
@@ -1777,7 +1777,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 37,
+            "line": 39,
             "description": "Read Uint16 (2 bytes) data.",
             "itemtype": "method",
             "name": "readUint16",
@@ -1798,7 +1798,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 46,
+            "line": 48,
             "description": "Read Uint32 (4 bytes) data.",
             "itemtype": "method",
             "name": "readUint32",
@@ -1819,7 +1819,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 55,
+            "line": 57,
             "description": "Read Float32 (8 bytes) data.",
             "itemtype": "method",
             "name": "readFloat32",
@@ -1840,7 +1840,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 64,
+            "line": 66,
             "description": "Read Uint data of nBytes size.",
             "itemtype": "method",
             "name": "readNumber",
@@ -1866,7 +1866,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 84,
+            "line": 91,
             "description": "Read Uint8 array.",
             "itemtype": "method",
             "name": "readUint8Array",
@@ -1892,7 +1892,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 99,
+            "line": 106,
             "description": "Read Uint16 array.",
             "itemtype": "method",
             "name": "readUint16Array",
@@ -1918,7 +1918,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 114,
+            "line": 121,
             "description": "Read data as an hexadecimal string.",
             "itemtype": "method",
             "name": "readHex",
@@ -1939,7 +1939,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 126,
+            "line": 133,
             "description": "Read data as a string.",
             "itemtype": "method",
             "name": "readString",
@@ -1965,7 +1965,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 142,
+            "line": 149,
             "description": "Tell if a given syntax is a JPEG one.",
             "itemtype": "method",
             "name": "isJpegTransferSyntax",
@@ -1986,7 +1986,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 155,
+            "line": 162,
             "description": "Tell if a given syntax is a JPEG-LS one.",
             "itemtype": "method",
             "name": "isJpeglsTransferSyntax",
@@ -2007,7 +2007,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 166,
+            "line": 173,
             "description": "Tell if a given syntax is a JPEG 2000 one.",
             "itemtype": "method",
             "name": "isJpeg2000TransferSyntax",
@@ -2028,7 +2028,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 185,
+            "line": 192,
             "description": "The list of DICOM elements.",
             "itemtype": "property",
             "name": "dicomElements",
@@ -2039,7 +2039,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 191,
+            "line": 198,
             "description": "The number of DICOM Items.",
             "itemtype": "property",
             "name": "numberOfItems",
@@ -2050,7 +2050,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 197,
+            "line": 204,
             "description": "The DICOM dictionary used to find tag names.",
             "itemtype": "property",
             "name": "dict",
@@ -2061,7 +2061,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 203,
+            "line": 210,
             "description": "The pixel buffer.",
             "itemtype": "property",
             "name": "pixelBuffer",
@@ -2072,7 +2072,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 211,
+            "line": 218,
             "description": "Get the DICOM data pixel buffer.",
             "itemtype": "method",
             "name": "getPixelBuffer",
@@ -2086,7 +2086,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 221,
+            "line": 228,
             "description": "Append a DICOM element to the dicomElements member object.\nAllows for easy retrieval of DICOM tag values from the tag name.\nIf tags have same name (for the 'unknown' and private tags cases), a number is appended\nmaking the name unique.",
             "itemtype": "method",
             "name": "appendDicomElement",
@@ -2103,7 +2103,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 250,
+            "line": 257,
             "description": "Read a DICOM tag.",
             "itemtype": "method",
             "name": "readTag",
@@ -2126,7 +2126,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 274,
+            "line": 281,
             "description": "Read a DICOM data element.",
             "itemtype": "method",
             "name": "readDataElement",
@@ -2154,7 +2154,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 367,
+            "line": 374,
             "description": "Parse the complete DICOM file (given as input to the class).\nFills in the member object 'dicomElements'.",
             "itemtype": "method",
             "name": "parse",
@@ -2170,7 +2170,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 546,
+            "line": 553,
             "description": "Get an Image object from the read DICOM file.",
             "itemtype": "method",
             "name": "createImage",
@@ -2463,7 +2463,7 @@
         },
         {
             "file": "src/gui/generic.js",
-            "line": 70,
+            "line": 72,
             "description": "Set the selected item of a HTML select.",
             "itemtype": "method",
             "name": "refreshSelect",
@@ -2486,7 +2486,7 @@
         },
         {
             "file": "src/gui/generic.js",
-            "line": 88,
+            "line": 92,
             "description": "Append the slider HTML.",
             "itemtype": "method",
             "name": "appendSliderHtml",
@@ -2497,7 +2497,7 @@
         },
         {
             "file": "src/gui/generic.js",
-            "line": 135,
+            "line": 139,
             "description": "Initialise the slider HTML.",
             "itemtype": "method",
             "name": "initSliderHtml",
@@ -2670,7 +2670,7 @@
         },
         {
             "file": "src/gui/handlers.js",
-            "line": 124,
+            "line": 125,
             "description": "Handle shape change.",
             "itemtype": "method",
             "name": "onChangeShape",
@@ -2688,7 +2688,7 @@
         },
         {
             "file": "src/gui/handlers.js",
-            "line": 135,
+            "line": 136,
             "description": "Handle line color change.",
             "itemtype": "method",
             "name": "onChangeLineColour",
@@ -2706,7 +2706,7 @@
         },
         {
             "file": "src/gui/handlers.js",
-            "line": 146,
+            "line": 147,
             "description": "Handle zoom reset.",
             "itemtype": "method",
             "name": "onZoomReset",
@@ -2724,7 +2724,7 @@
         },
         {
             "file": "src/gui/handlers.js",
-            "line": 162,
+            "line": 163,
             "description": "Handle display reset.",
             "itemtype": "method",
             "name": "onDisplayReset",
@@ -2742,7 +2742,7 @@
         },
         {
             "file": "src/gui/handlers.js",
-            "line": 178,
+            "line": 179,
             "description": "Handle undo.",
             "itemtype": "method",
             "name": "onUndo",
@@ -2760,7 +2760,7 @@
         },
         {
             "file": "src/gui/handlers.js",
-            "line": 189,
+            "line": 190,
             "description": "Handle redo.",
             "itemtype": "method",
             "name": "onRedo",
@@ -2778,7 +2778,7 @@
         },
         {
             "file": "src/gui/handlers.js",
-            "line": 200,
+            "line": 201,
             "description": "Handle toggle of info layer.",
             "itemtype": "method",
             "name": "onToggleInfoLayer",
@@ -2869,7 +2869,7 @@
         },
         {
             "file": "src/gui/html.js",
-            "line": 43,
+            "line": 45,
             "description": "Append a row to an array.",
             "itemtype": "method",
             "name": "appendRowForArray",
@@ -2902,7 +2902,7 @@
         },
         {
             "file": "src/gui/html.js",
-            "line": 76,
+            "line": 78,
             "description": "Append a row to an object.",
             "itemtype": "method",
             "name": "appendRowForObject",
@@ -2935,7 +2935,7 @@
         },
         {
             "file": "src/gui/html.js",
-            "line": 125,
+            "line": 127,
             "description": "Append a row to an object or an array.",
             "itemtype": "method",
             "name": "appendRow",
@@ -2968,7 +2968,7 @@
         },
         {
             "file": "src/gui/html.js",
-            "line": 150,
+            "line": 152,
             "description": "Converts the input to an HTML table.",
             "itemtype": "method",
             "name": "toTable",
@@ -2985,7 +2985,7 @@
         },
         {
             "file": "src/gui/html.js",
-            "line": 165,
+            "line": 167,
             "description": "Get an HTML search form.",
             "itemtype": "method",
             "name": "getHtmlSearchForm",
@@ -3007,7 +3007,7 @@
         },
         {
             "file": "src/gui/html.js",
-            "line": 185,
+            "line": 187,
             "description": "Filter a table with a given parameter: sets the display css of rows to\ntrue or false if it contains the term.",
             "itemtype": "method",
             "name": "filterTable",
@@ -3030,7 +3030,7 @@
         },
         {
             "file": "src/gui/html.js",
-            "line": 218,
+            "line": 220,
             "description": "Transform back each\n'preText <span class=\"highlighted\">term</span> postText'\ninto its original 'preText term postText'.",
             "itemtype": "method",
             "name": "dehighlight",
@@ -3048,7 +3048,7 @@
         },
         {
             "file": "src/gui/html.js",
-            "line": 246,
+            "line": 248,
             "description": "Create a\n'preText <span class=\"highlighted\">term</span> postText'\naround each search term.",
             "itemtype": "method",
             "name": "highlight",
@@ -3071,7 +3071,7 @@
         },
         {
             "file": "src/gui/html.js",
-            "line": 290,
+            "line": 292,
             "description": "Highlight a HTML node.",
             "itemtype": "method",
             "name": "createHighlightNode",
@@ -3093,7 +3093,7 @@
         },
         {
             "file": "src/gui/html.js",
-            "line": 305,
+            "line": 307,
             "description": "Remove all children of a HTML node.",
             "itemtype": "method",
             "name": "cleanNode",
@@ -3111,7 +3111,7 @@
         },
         {
             "file": "src/gui/html.js",
-            "line": 318,
+            "line": 320,
             "description": "Remove a HTML node and all its children.",
             "itemtype": "method",
             "name": "removeNode",
@@ -3129,7 +3129,7 @@
         },
         {
             "file": "src/gui/html.js",
-            "line": 336,
+            "line": 340,
             "description": "Create a HTML select from an input array of options.\nThe values of the options are the name of the option made lower case.\nIt is left to the user to set the 'onchange' method of the select.",
             "itemtype": "method",
             "name": "createHtmlSelect",
@@ -3156,7 +3156,7 @@
         },
         {
             "file": "src/gui/html.js",
-            "line": 380,
+            "line": 384,
             "description": "Get a list of parameters from an input URI that looks like:\n [dwv root]?input=encodeURI([root]?key0=value0&key1=value1)",
             "itemtype": "method",
             "name": "getUriParam",
@@ -3178,7 +3178,7 @@
         },
         {
             "file": "src/gui/html.js",
-            "line": 471,
+            "line": 489,
             "description": "Toggle the display of an element.",
             "itemtype": "method",
             "name": "toggleDisplay",
@@ -3375,7 +3375,7 @@
         },
         {
             "file": "src/gui/layer.js",
-            "line": 119,
+            "line": 121,
             "description": "Set the layer zoom and apply it.",
             "itemtype": "method",
             "name": "zoom",
@@ -3407,7 +3407,7 @@
         },
         {
             "file": "src/gui/layer.js",
-            "line": 135,
+            "line": 137,
             "description": "Set the layer translation.\nTranslation is according to the last one.",
             "itemtype": "method",
             "name": "setTranslate",
@@ -3429,7 +3429,7 @@
         },
         {
             "file": "src/gui/layer.js",
-            "line": 164,
+            "line": 174,
             "description": "Set the layer translation and apply it.\nTranslation is according to the last one.",
             "itemtype": "method",
             "name": "translate",
@@ -3451,7 +3451,7 @@
         },
         {
             "file": "src/gui/layer.js",
-            "line": 179,
+            "line": 189,
             "description": "Set the image data array.",
             "itemtype": "method",
             "name": "setImageData",
@@ -3468,7 +3468,7 @@
         },
         {
             "file": "src/gui/layer.js",
-            "line": 189,
+            "line": 199,
             "description": "Reset the layout.",
             "itemtype": "method",
             "name": "resetLayout",
@@ -3478,7 +3478,7 @@
         },
         {
             "file": "src/gui/layer.js",
-            "line": 201,
+            "line": 211,
             "description": "Draw the content (imageData) of the layer.\nThe imageData variable needs to be set",
             "itemtype": "method",
             "name": "draw",
@@ -3488,7 +3488,7 @@
         },
         {
             "file": "src/gui/layer.js",
-            "line": 225,
+            "line": 235,
             "description": "Initialise the layer: set the canvas and context",
             "itemtype": "method",
             "name": "initialise",
@@ -3499,7 +3499,7 @@
         },
         {
             "file": "src/gui/layer.js",
-            "line": 261,
+            "line": 271,
             "description": "Fill the full context with the current style.",
             "itemtype": "method",
             "name": "fillContext",
@@ -3509,7 +3509,7 @@
         },
         {
             "file": "src/gui/layer.js",
-            "line": 270,
+            "line": 280,
             "description": "Clear the context and reset the image data.",
             "itemtype": "method",
             "name": "clear",
@@ -3519,7 +3519,7 @@
         },
         {
             "file": "src/gui/layer.js",
-            "line": 281,
+            "line": 291,
             "description": "Merge two layers.",
             "itemtype": "method",
             "name": "merge",
@@ -3530,7 +3530,7 @@
         },
         {
             "file": "src/gui/layer.js",
-            "line": 319,
+            "line": 329,
             "description": "Set the line color for the layer.",
             "itemtype": "method",
             "name": "setLineColor",
@@ -3541,7 +3541,7 @@
         },
         {
             "file": "src/gui/layer.js",
-            "line": 330,
+            "line": 340,
             "description": "Display the layer.",
             "itemtype": "method",
             "name": "setStyleDisplay",
@@ -3552,7 +3552,7 @@
         },
         {
             "file": "src/gui/layer.js",
-            "line": 347,
+            "line": 357,
             "description": "Check if the layer is visible.",
             "itemtype": "method",
             "name": "isVisible",
@@ -3566,7 +3566,7 @@
         },
         {
             "file": "src/gui/layer.js",
-            "line": 358,
+            "line": 372,
             "description": "Align on another layer.",
             "itemtype": "method",
             "name": "align",
@@ -3594,7 +3594,7 @@
         },
         {
             "file": "src/gui/loader.js",
-            "line": 36,
+            "line": 38,
             "description": "Append the file load HTML to the page.",
             "itemtype": "method",
             "name": "appendFileLoadHtml",
@@ -3605,7 +3605,7 @@
         },
         {
             "file": "src/gui/loader.js",
-            "line": 66,
+            "line": 68,
             "description": "Display the file load HTML.",
             "itemtype": "method",
             "name": "clearUrlLoadHtml",
@@ -3623,7 +3623,7 @@
         },
         {
             "file": "src/gui/loader.js",
-            "line": 79,
+            "line": 81,
             "description": "Append the url load HTML to the page.",
             "itemtype": "method",
             "name": "appendUrlLoadHtml",
@@ -3634,7 +3634,7 @@
         },
         {
             "file": "src/gui/loader.js",
-            "line": 108,
+            "line": 110,
             "description": "Display the url load HTML.",
             "itemtype": "method",
             "name": "clearUrlLoadHtml",
@@ -3815,7 +3815,7 @@
         },
         {
             "file": "src/gui/tools.js",
-            "line": 43,
+            "line": 45,
             "description": "Display the toolbox HTML.",
             "itemtype": "method",
             "name": "displayToolboxHtml",
@@ -3833,7 +3833,7 @@
         },
         {
             "file": "src/gui/tools.js",
-            "line": 55,
+            "line": 57,
             "description": "Initialise the toolbox HTML.",
             "itemtype": "method",
             "name": "initToolboxHtml",
@@ -3844,7 +3844,7 @@
         },
         {
             "file": "src/gui/tools.js",
-            "line": 68,
+            "line": 70,
             "description": "Append the window/level HTML to the page.",
             "itemtype": "method",
             "name": "appendWindowLevelHtml",
@@ -3855,7 +3855,7 @@
         },
         {
             "file": "src/gui/tools.js",
-            "line": 105,
+            "line": 107,
             "description": "Display the window/level HTML.",
             "itemtype": "method",
             "name": "displayWindowLevelHtml",
@@ -3873,7 +3873,7 @@
         },
         {
             "file": "src/gui/tools.js",
-            "line": 119,
+            "line": 121,
             "description": "Initialise the window/level HTML.",
             "itemtype": "method",
             "name": "initWindowLevelHtml",
@@ -3884,7 +3884,7 @@
         },
         {
             "file": "src/gui/tools.js",
-            "line": 150,
+            "line": 152,
             "description": "Append the draw HTML to the page.",
             "itemtype": "method",
             "name": "appendDrawHtml",
@@ -3895,7 +3895,7 @@
         },
         {
             "file": "src/gui/tools.js",
-            "line": 187,
+            "line": 189,
             "description": "Display the draw HTML.",
             "itemtype": "method",
             "name": "displayDrawHtml",
@@ -3913,7 +3913,7 @@
         },
         {
             "file": "src/gui/tools.js",
-            "line": 201,
+            "line": 203,
             "description": "Initialise the draw HTML.",
             "itemtype": "method",
             "name": "displayDrawHtml",
@@ -3924,7 +3924,7 @@
         },
         {
             "file": "src/gui/tools.js",
-            "line": 218,
+            "line": 220,
             "description": "Append the color chooser HTML to the page.",
             "itemtype": "method",
             "name": "appendLivewireHtml",
@@ -3935,7 +3935,7 @@
         },
         {
             "file": "src/gui/tools.js",
-            "line": 244,
+            "line": 246,
             "description": "Display the livewire HTML.",
             "itemtype": "method",
             "name": "displayLivewireHtml",
@@ -3953,7 +3953,7 @@
         },
         {
             "file": "src/gui/tools.js",
-            "line": 256,
+            "line": 258,
             "description": "Initialise the livewire HTML.",
             "itemtype": "method",
             "name": "initLivewireHtml",
@@ -3964,7 +3964,7 @@
         },
         {
             "file": "src/gui/tools.js",
-            "line": 268,
+            "line": 270,
             "description": "Append the ZoomAndPan HTML to the page.",
             "itemtype": "method",
             "name": "appendZoomAndPanHtml",
@@ -3975,7 +3975,7 @@
         },
         {
             "file": "src/gui/tools.js",
-            "line": 298,
+            "line": 300,
             "description": "Display the ZoomAndPan HTML.",
             "itemtype": "method",
             "name": "displayZoomAndPanHtml",
@@ -3993,7 +3993,7 @@
         },
         {
             "file": "src/gui/tools.js",
-            "line": 310,
+            "line": 312,
             "description": "Append the Scroll HTML to the page.",
             "itemtype": "method",
             "name": "appendScrollHtml",
@@ -4004,7 +4004,7 @@
         },
         {
             "file": "src/gui/tools.js",
-            "line": 331,
+            "line": 333,
             "description": "Display the Scroll HTML.",
             "itemtype": "method",
             "name": "displayScrollHtml",
@@ -4033,7 +4033,7 @@
         },
         {
             "file": "src/gui/undo.js",
-            "line": 40,
+            "line": 42,
             "description": "Add a command to the undo HTML.",
             "itemtype": "method",
             "name": "addCommandToUndoHtml",
@@ -4051,7 +4051,7 @@
         },
         {
             "file": "src/gui/undo.js",
-            "line": 67,
+            "line": 69,
             "description": "Enable the last command of the undo HTML.",
             "itemtype": "method",
             "name": "enableInUndoHtml",
@@ -4185,7 +4185,7 @@
         },
         {
             "file": "src/image/filter.js",
-            "line": 88,
+            "line": 92,
             "description": "Get the name of the filter.",
             "itemtype": "method",
             "name": "getName",
@@ -4199,7 +4199,7 @@
         },
         {
             "file": "src/image/filter.js",
-            "line": 96,
+            "line": 100,
             "description": "Transform the main image using this filter.",
             "itemtype": "method",
             "name": "update",
@@ -4213,7 +4213,7 @@
         },
         {
             "file": "src/image/filter.js",
-            "line": 117,
+            "line": 121,
             "description": "Get the name of the filter.",
             "itemtype": "method",
             "name": "getName",
@@ -4227,7 +4227,7 @@
         },
         {
             "file": "src/image/filter.js",
-            "line": 125,
+            "line": 129,
             "description": "Transform the main image using this filter.",
             "itemtype": "method",
             "name": "update",
@@ -4363,7 +4363,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 98,
+            "line": 100,
             "description": "Get the column spacing.",
             "itemtype": "method",
             "name": "getColumnSpacing",
@@ -4377,7 +4377,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 104,
+            "line": 106,
             "description": "Get the row spacing.",
             "itemtype": "method",
             "name": "getRowSpacing",
@@ -4391,7 +4391,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 110,
+            "line": 112,
             "description": "Get the slice spacing.",
             "itemtype": "method",
             "name": "getSliceSpacing",
@@ -4405,7 +4405,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 118,
+            "line": 120,
             "description": "Check for equality.",
             "itemtype": "method",
             "name": "equals",
@@ -4426,7 +4426,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 147,
+            "line": 149,
             "description": "Rescale slope.",
             "itemtype": "property",
             "name": "rescaleSlope",
@@ -4439,7 +4439,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 154,
+            "line": 156,
             "description": "Rescale intercept.",
             "itemtype": "property",
             "name": "rescaleIntercept",
@@ -4452,7 +4452,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 161,
+            "line": 163,
             "description": "Photometric interpretation (MONOCHROME, RGB...).",
             "itemtype": "property",
             "name": "photometricInterpretation",
@@ -4465,7 +4465,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 168,
+            "line": 170,
             "description": "Planar configuration for RGB data (0:RGBRGBRGBRGB... or 1:RRR...GGG...BBB...).",
             "itemtype": "property",
             "name": "planarConfiguration",
@@ -4478,7 +4478,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 175,
+            "line": 177,
             "description": "Number of components.",
             "itemtype": "property",
             "name": "planarConfiguration",
@@ -4491,7 +4491,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 182,
+            "line": 184,
             "description": "Meta information.",
             "itemtype": "property",
             "name": "meta",
@@ -4504,7 +4504,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 190,
+            "line": 192,
             "description": "Original buffer.",
             "itemtype": "property",
             "name": "originalBuffer",
@@ -4517,7 +4517,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 201,
+            "line": 205,
             "description": "Data range.",
             "itemtype": "property",
             "name": "dataRange",
@@ -4530,7 +4530,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 208,
+            "line": 212,
             "description": "Histogram.",
             "itemtype": "property",
             "name": "histogram",
@@ -4543,7 +4543,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 216,
+            "line": 220,
             "description": "Get the size of the image.",
             "itemtype": "method",
             "name": "getSize",
@@ -4557,7 +4557,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 222,
+            "line": 226,
             "description": "Get the spacing of the image.",
             "itemtype": "method",
             "name": "getSpacing",
@@ -4571,7 +4571,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 228,
+            "line": 232,
             "description": "Get the data buffer of the image. TODO dangerous...",
             "itemtype": "method",
             "name": "getBuffer",
@@ -4585,7 +4585,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 234,
+            "line": 238,
             "description": "Get the slice positions.",
             "itemtype": "method",
             "name": "getSlicePositions",
@@ -4599,7 +4599,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 241,
+            "line": 245,
             "description": "Get the rescale slope.",
             "itemtype": "method",
             "name": "getRescaleSlope",
@@ -4613,7 +4613,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 247,
+            "line": 251,
             "description": "Set the rescale slope.",
             "itemtype": "method",
             "name": "setRescaleSlope",
@@ -4630,7 +4630,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 253,
+            "line": 257,
             "description": "Get the rescale intercept.",
             "itemtype": "method",
             "name": "getRescaleIntercept",
@@ -4644,7 +4644,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 259,
+            "line": 263,
             "description": "Set the rescale intercept.",
             "itemtype": "method",
             "name": "setRescaleIntercept",
@@ -4661,7 +4661,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 265,
+            "line": 269,
             "description": "Get the photometricInterpretation of the image.",
             "itemtype": "method",
             "name": "getPhotometricInterpretation",
@@ -4675,7 +4675,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 271,
+            "line": 275,
             "description": "Set the photometricInterpretation of the image.",
             "itemtype": "method",
             "name": "setPhotometricInterpretation",
@@ -4686,7 +4686,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 277,
+            "line": 281,
             "description": "Get the planarConfiguration of the image.",
             "itemtype": "method",
             "name": "getPlanarConfiguration",
@@ -4700,7 +4700,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 283,
+            "line": 287,
             "description": "Set the planarConfiguration of the image.",
             "itemtype": "method",
             "name": "setPlanarConfiguration",
@@ -4717,7 +4717,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 289,
+            "line": 293,
             "description": "Get the numberOfComponents of the image.",
             "itemtype": "method",
             "name": "getNumberOfComponents",
@@ -4731,7 +4731,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 296,
+            "line": 300,
             "description": "Get the meta information of the image.",
             "itemtype": "method",
             "name": "getMeta",
@@ -4745,7 +4745,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 302,
+            "line": 306,
             "description": "Set the meta information of the image.",
             "itemtype": "method",
             "name": "setMeta",
@@ -4762,7 +4762,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 309,
+            "line": 313,
             "description": "Get value at offset. Warning: No size check...",
             "itemtype": "method",
             "name": "getValueAtOffset",
@@ -4783,7 +4783,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 319,
+            "line": 323,
             "description": "Clone the image.",
             "itemtype": "method",
             "name": "clone",
@@ -4797,7 +4797,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 335,
+            "line": 339,
             "description": "Append a slice to the image.",
             "itemtype": "method",
             "name": "appendSlice",
@@ -4814,7 +4814,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 417,
+            "line": 429,
             "description": "Get the data range.",
             "itemtype": "method",
             "name": "getDataRange",
@@ -4828,7 +4828,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 427,
+            "line": 441,
             "description": "Get the histogram.",
             "itemtype": "method",
             "name": "getHistogram",
@@ -4842,7 +4842,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 438,
+            "line": 454,
             "description": "Get the value of the image at a specific coordinate.",
             "itemtype": "method",
             "name": "getValue",
@@ -4873,7 +4873,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 454,
+            "line": 470,
             "description": "Get the rescaled value of the image at a specific offset.",
             "itemtype": "method",
             "name": "getRescaledValueAtOffset",
@@ -4894,7 +4894,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 466,
+            "line": 482,
             "description": "Get the rescaled value of the image at a specific coordinate.",
             "itemtype": "method",
             "name": "getRescaledValue",
@@ -4925,7 +4925,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 480,
+            "line": 496,
             "description": "Calculate the raw image data range.",
             "itemtype": "method",
             "name": "calculateDataRange",
@@ -4939,7 +4939,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 499,
+            "line": 515,
             "description": "Calculate the image data range after rescale.",
             "itemtype": "method",
             "name": "getRescaledDataRange",
@@ -4953,7 +4953,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 511,
+            "line": 527,
             "description": "Calculate the histogram of the image.",
             "itemtype": "method",
             "name": "calculateHistogram",
@@ -4967,7 +4967,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 539,
+            "line": 555,
             "description": "Convolute the image with a given 2D kernel.",
             "itemtype": "method",
             "name": "convolute2D",
@@ -4988,7 +4988,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 666,
+            "line": 699,
             "description": "Transform an image using a specific operator.",
             "itemtype": "method",
             "name": "transform",
@@ -5009,7 +5009,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 684,
+            "line": 717,
             "description": "Compose this image with another one and using a specific operator.",
             "itemtype": "method",
             "name": "compose",
@@ -5048,7 +5048,7 @@
         },
         {
             "file": "src/image/luts.js",
-            "line": 32,
+            "line": 36,
             "description": "Get the rescale slope.",
             "itemtype": "method",
             "name": "getSlope",
@@ -5062,7 +5062,7 @@
         },
         {
             "file": "src/image/luts.js",
-            "line": 38,
+            "line": 42,
             "description": "Get the rescale intercept.",
             "itemtype": "method",
             "name": "getIntercept",
@@ -5076,7 +5076,7 @@
         },
         {
             "file": "src/image/luts.js",
-            "line": 45,
+            "line": 49,
             "description": "Initialise the LUT.",
             "itemtype": "method",
             "name": "initialise",
@@ -5093,7 +5093,7 @@
         },
         {
             "file": "src/image/luts.js",
-            "line": 59,
+            "line": 64,
             "description": "Get the length of the LUT array.",
             "itemtype": "method",
             "name": "getLength",
@@ -5107,7 +5107,7 @@
         },
         {
             "file": "src/image/luts.js",
-            "line": 66,
+            "line": 71,
             "description": "Get the value of the LUT at the given offset.",
             "itemtype": "method",
             "name": "getValue",
@@ -5121,7 +5121,7 @@
         },
         {
             "file": "src/image/luts.js",
-            "line": 84,
+            "line": 89,
             "description": "The internal array: Uint8ClampedArray clamps between 0 and 255.\n(not supported on travis yet... using basic array, be sure not to overflow!)",
             "itemtype": "property",
             "name": "rescaleLut_",
@@ -5134,7 +5134,7 @@
         },
         {
             "file": "src/image/luts.js",
-            "line": 100,
+            "line": 106,
             "description": "The window center.",
             "itemtype": "property",
             "name": "center_",
@@ -5147,7 +5147,7 @@
         },
         {
             "file": "src/image/luts.js",
-            "line": 107,
+            "line": 113,
             "description": "The window width.",
             "itemtype": "property",
             "name": "width_",
@@ -5160,7 +5160,7 @@
         },
         {
             "file": "src/image/luts.js",
-            "line": 115,
+            "line": 121,
             "description": "Get the window center.",
             "itemtype": "method",
             "name": "getCenter",
@@ -5174,7 +5174,7 @@
         },
         {
             "file": "src/image/luts.js",
-            "line": 121,
+            "line": 127,
             "description": "Get the window width.",
             "itemtype": "method",
             "name": "getWidth",
@@ -5188,7 +5188,7 @@
         },
         {
             "file": "src/image/luts.js",
-            "line": 127,
+            "line": 133,
             "description": "Get the signed flag.",
             "itemtype": "method",
             "name": "isSigned",
@@ -5202,7 +5202,7 @@
         },
         {
             "file": "src/image/luts.js",
-            "line": 134,
+            "line": 140,
             "description": "Set the window center and width.",
             "itemtype": "method",
             "name": "setCenterAndWidth",
@@ -5224,7 +5224,7 @@
         },
         {
             "file": "src/image/luts.js",
-            "line": 191,
+            "line": 197,
             "description": "Get the length of the LUT array.",
             "itemtype": "method",
             "name": "getLength",
@@ -5238,7 +5238,7 @@
         },
         {
             "file": "src/image/luts.js",
-            "line": 198,
+            "line": 204,
             "description": "Get the value of the LUT at the given offset.",
             "itemtype": "method",
             "name": "getValue",
@@ -5252,7 +5252,7 @@
         },
         {
             "file": "src/image/luts.js",
-            "line": 210,
+            "line": 216,
             "description": "Lookup tables for image color display.",
             "class": "dwv.image.lut.Window",
             "module": "image",
@@ -5524,7 +5524,7 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 137,
+            "line": 138,
             "description": "Is the data signed data.",
             "itemtype": "method",
             "name": "isSigned",
@@ -5538,7 +5538,7 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 144,
+            "line": 145,
             "description": "Get the current position.",
             "itemtype": "method",
             "name": "getCurrentPosition",
@@ -5552,7 +5552,7 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 150,
+            "line": 151,
             "description": "Set the current position. Returns false if not in bounds.",
             "itemtype": "method",
             "name": "setCurrentPosition",
@@ -5569,20 +5569,20 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 178,
+            "line": 181,
             "description": "View listeners",
             "itemtype": "property",
             "name": "listeners",
             "access": "private",
             "tagname": "",
-            "type": "Array",
+            "type": "Object",
             "class": "dwv.image.View",
             "module": "image",
             "namespace": "dwv.image"
         },
         {
             "file": "src/image/view.js",
-            "line": 185,
+            "line": 188,
             "description": "Get the view listeners.",
             "itemtype": "method",
             "name": "getListeners",
@@ -5596,7 +5596,7 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 191,
+            "line": 194,
             "description": "Set the view listeners.",
             "itemtype": "method",
             "name": "setListeners",
@@ -5613,7 +5613,7 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 199,
+            "line": 202,
             "description": "Set the view window/level.",
             "itemtype": "method",
             "name": "setWindowLevel",
@@ -5635,7 +5635,7 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 212,
+            "line": 215,
             "description": "Set the image window/level to cover the full data range.",
             "itemtype": "method",
             "name": "setWindowLevelMinMax\nWarning: uses the latest set rescale LUT or the default linear one.",
@@ -5645,7 +5645,7 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 229,
+            "line": 232,
             "description": "Increment the current slice number.",
             "itemtype": "method",
             "name": "incrementSliceNb",
@@ -5659,7 +5659,7 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 242,
+            "line": 245,
             "description": "Decrement the current slice number.",
             "itemtype": "method",
             "name": "decrementSliceNb",
@@ -5673,7 +5673,7 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 255,
+            "line": 258,
             "description": "Clone the image using all meta data and the original data buffer.",
             "itemtype": "method",
             "name": "clone",
@@ -5687,7 +5687,7 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 269,
+            "line": 272,
             "description": "Generate display image data to be given to a canvas.",
             "itemtype": "method",
             "name": "generateImageData",
@@ -5709,7 +5709,7 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 354,
+            "line": 357,
             "description": "Add an event listener on the view.",
             "itemtype": "method",
             "name": "addEventListener",
@@ -5731,7 +5731,7 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 367,
+            "line": 372,
             "description": "Remove an event listener on the view.",
             "itemtype": "method",
             "name": "removeEventListener",
@@ -5753,7 +5753,7 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 384,
+            "line": 392,
             "description": "Fire an event: call all associated listeners.",
             "itemtype": "method",
             "name": "fireEvent",
@@ -7212,7 +7212,7 @@
         },
         {
             "file": "src/tools/info.js",
-            "line": 173,
+            "line": 177,
             "description": "Create the plot info.",
             "itemtype": "method",
             "name": "createPlot",
@@ -7223,7 +7223,7 @@
         },
         {
             "file": "src/tools/info.js",
-            "line": 188,
+            "line": 192,
             "description": "Update the plot markings.",
             "itemtype": "method",
             "name": "updatePlotMarkings",
@@ -7989,7 +7989,7 @@
         },
         {
             "file": "src/tools/scroll.js",
-            "line": 69,
+            "line": 77,
             "description": "Handle mouse up event.",
             "itemtype": "method",
             "name": "mouseup",
@@ -8006,7 +8006,7 @@
         },
         {
             "file": "src/tools/scroll.js",
-            "line": 82,
+            "line": 90,
             "description": "Handle mouse out event.",
             "itemtype": "method",
             "name": "mouseout",
@@ -8023,7 +8023,7 @@
         },
         {
             "file": "src/tools/scroll.js",
-            "line": 91,
+            "line": 99,
             "description": "Handle touch start event.",
             "itemtype": "method",
             "name": "touchstart",
@@ -8040,7 +8040,7 @@
         },
         {
             "file": "src/tools/scroll.js",
-            "line": 100,
+            "line": 108,
             "description": "Handle touch move event.",
             "itemtype": "method",
             "name": "touchmove",
@@ -8057,7 +8057,7 @@
         },
         {
             "file": "src/tools/scroll.js",
-            "line": 109,
+            "line": 117,
             "description": "Handle touch end event.",
             "itemtype": "method",
             "name": "touchend",
@@ -8074,7 +8074,7 @@
         },
         {
             "file": "src/tools/scroll.js",
-            "line": 118,
+            "line": 126,
             "description": "Handle key down event.",
             "itemtype": "method",
             "name": "keydown",
@@ -8091,7 +8091,7 @@
         },
         {
             "file": "src/tools/scroll.js",
-            "line": 127,
+            "line": 135,
             "description": "Enable the tool.",
             "itemtype": "method",
             "name": "enable",
@@ -8108,7 +8108,7 @@
         },
         {
             "file": "src/tools/scroll.js",
-            "line": 138,
+            "line": 146,
             "description": "Help for this tool.",
             "itemtype": "method",
             "name": "getHelp",
@@ -8122,7 +8122,7 @@
         },
         {
             "file": "src/tools/scroll.js",
-            "line": 157,
+            "line": 165,
             "description": "Initialise the tool.",
             "itemtype": "method",
             "name": "init",
@@ -8356,7 +8356,7 @@
         },
         {
             "file": "src/tools/windowLevel.js",
-            "line": 54,
+            "line": 55,
             "description": "Update the views' colour map.",
             "itemtype": "method",
             "name": "updateColourMap",
@@ -8374,7 +8374,7 @@
         },
         {
             "file": "src/tools/windowLevel.js",
-            "line": 65,
+            "line": 66,
             "description": "Update the views' colour map.",
             "itemtype": "method",
             "name": "updateColourMap",
@@ -8391,7 +8391,7 @@
         },
         {
             "file": "src/tools/windowLevel.js",
-            "line": 100,
+            "line": 102,
             "description": "Update the window/level presets.",
             "itemtype": "method",
             "name": "updatePresets",
@@ -8408,7 +8408,7 @@
         },
         {
             "file": "src/tools/windowLevel.js",
-            "line": 159,
+            "line": 161,
             "description": "Closure to self: to be used by event handlers.",
             "itemtype": "property",
             "name": "self",
@@ -8421,7 +8421,7 @@
         },
         {
             "file": "src/tools/windowLevel.js",
-            "line": 166,
+            "line": 168,
             "description": "Interaction start flag.",
             "itemtype": "property",
             "name": "started",
@@ -8432,7 +8432,7 @@
         },
         {
             "file": "src/tools/windowLevel.js",
-            "line": 173,
+            "line": 175,
             "description": "Handle mouse down event.",
             "itemtype": "method",
             "name": "mousedown",
@@ -8449,7 +8449,7 @@
         },
         {
             "file": "src/tools/windowLevel.js",
-            "line": 188,
+            "line": 190,
             "description": "Handle mouse move event.",
             "itemtype": "method",
             "name": "mousemove",
@@ -8466,7 +8466,7 @@
         },
         {
             "file": "src/tools/windowLevel.js",
-            "line": 209,
+            "line": 213,
             "description": "Handle mouse up event.",
             "itemtype": "method",
             "name": "mouseup",
@@ -8483,7 +8483,7 @@
         },
         {
             "file": "src/tools/windowLevel.js",
-            "line": 229,
+            "line": 233,
             "description": "Handle mouse out event.",
             "itemtype": "method",
             "name": "mouseout",
@@ -8500,7 +8500,7 @@
         },
         {
             "file": "src/tools/windowLevel.js",
-            "line": 239,
+            "line": 243,
             "description": "Handle touch start event.",
             "itemtype": "method",
             "name": "touchstart",
@@ -8517,7 +8517,7 @@
         },
         {
             "file": "src/tools/windowLevel.js",
-            "line": 248,
+            "line": 252,
             "description": "Handle touch move event.",
             "itemtype": "method",
             "name": "touchmove",
@@ -8534,7 +8534,7 @@
         },
         {
             "file": "src/tools/windowLevel.js",
-            "line": 257,
+            "line": 261,
             "description": "Handle touch end event.",
             "itemtype": "method",
             "name": "touchend",
@@ -8551,7 +8551,7 @@
         },
         {
             "file": "src/tools/windowLevel.js",
-            "line": 266,
+            "line": 270,
             "description": "Handle double click event.",
             "itemtype": "method",
             "name": "dblclick",
@@ -8568,7 +8568,7 @@
         },
         {
             "file": "src/tools/windowLevel.js",
-            "line": 278,
+            "line": 282,
             "description": "Handle key down event.",
             "itemtype": "method",
             "name": "keydown",
@@ -8585,7 +8585,7 @@
         },
         {
             "file": "src/tools/windowLevel.js",
-            "line": 288,
+            "line": 292,
             "description": "Enable the tool.",
             "itemtype": "method",
             "name": "enable",
@@ -8602,7 +8602,7 @@
         },
         {
             "file": "src/tools/windowLevel.js",
-            "line": 301,
+            "line": 306,
             "description": "Initialise the tool.",
             "itemtype": "method",
             "name": "init",
@@ -8612,7 +8612,7 @@
         },
         {
             "file": "src/tools/windowLevel.js",
-            "line": 311,
+            "line": 316,
             "description": "Help for this tool.",
             "itemtype": "method",
             "name": "getHelp",
@@ -8718,7 +8718,7 @@
         },
         {
             "file": "src/tools/zoomPan.js",
-            "line": 123,
+            "line": 130,
             "description": "Handle mouse up event.",
             "itemtype": "method",
             "name": "mouseup",
@@ -8735,7 +8735,7 @@
         },
         {
             "file": "src/tools/zoomPan.js",
-            "line": 136,
+            "line": 143,
             "description": "Handle mouse out event.",
             "itemtype": "method",
             "name": "mouseout",
@@ -8752,7 +8752,7 @@
         },
         {
             "file": "src/tools/zoomPan.js",
-            "line": 145,
+            "line": 152,
             "description": "Handle touch start event.",
             "itemtype": "method",
             "name": "touchstart",
@@ -8769,7 +8769,7 @@
         },
         {
             "file": "src/tools/zoomPan.js",
-            "line": 160,
+            "line": 167,
             "description": "Handle touch move event.",
             "itemtype": "method",
             "name": "touchmove",
@@ -8786,7 +8786,7 @@
         },
         {
             "file": "src/tools/zoomPan.js",
-            "line": 175,
+            "line": 182,
             "description": "Handle touch end event.",
             "itemtype": "method",
             "name": "touchend",
@@ -8803,7 +8803,7 @@
         },
         {
             "file": "src/tools/zoomPan.js",
-            "line": 184,
+            "line": 191,
             "description": "Handle mouse scroll event (fired by Firefox).",
             "itemtype": "method",
             "name": "DOMMouseScroll",
@@ -8820,7 +8820,7 @@
         },
         {
             "file": "src/tools/zoomPan.js",
-            "line": 199,
+            "line": 206,
             "description": "Handle mouse wheel event.",
             "itemtype": "method",
             "name": "mousewheel",
@@ -8837,7 +8837,7 @@
         },
         {
             "file": "src/tools/zoomPan.js",
-            "line": 214,
+            "line": 221,
             "description": "Handle key down event.",
             "itemtype": "method",
             "name": "keydown",
@@ -8854,7 +8854,7 @@
         },
         {
             "file": "src/tools/zoomPan.js",
-            "line": 223,
+            "line": 230,
             "description": "Enable the tool.",
             "itemtype": "method",
             "name": "enable",
@@ -8871,7 +8871,7 @@
         },
         {
             "file": "src/tools/zoomPan.js",
-            "line": 232,
+            "line": 239,
             "description": "Apply the zoom to the layers.",
             "itemtype": "method",
             "name": "zoomLayers",
@@ -8898,7 +8898,7 @@
         },
         {
             "file": "src/tools/zoomPan.js",
-            "line": 247,
+            "line": 256,
             "description": "Apply a translation to the layers.",
             "itemtype": "method",
             "name": "translateLayers",
@@ -8920,7 +8920,7 @@
         },
         {
             "file": "src/tools/zoomPan.js",
-            "line": 263,
+            "line": 274,
             "description": "Help for this tool.",
             "itemtype": "method",
             "name": "getHelp",
@@ -8934,7 +8934,7 @@
         },
         {
             "file": "src/tools/zoomPan.js",
-            "line": 284,
+            "line": 295,
             "description": "Initialise the tool.",
             "itemtype": "method",
             "name": "init",
@@ -9010,7 +9010,7 @@
         },
         {
             "file": "src/utils/string.js",
-            "line": 69,
+            "line": 71,
             "description": "Split key/value string:\n key0=val00&key0=val01&key1=val10 returns \n  { key0 : [val00, val01], key1 : val1 }",
             "itemtype": "method",
             "name": "splitKeyValueString",
@@ -9256,7 +9256,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 201,
+            "line": 203,
             "description": "Handle change url event.",
             "itemtype": "method",
             "name": "onChangeURL",
@@ -9273,7 +9273,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 211,
+            "line": 213,
             "description": "Load a list of URLs.",
             "itemtype": "method",
             "name": "loadURL",
@@ -9290,7 +9290,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 231,
+            "line": 235,
             "description": "Generate the image data and draw it.",
             "itemtype": "method",
             "name": "generateAndDrawImage",
@@ -9300,7 +9300,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 245,
+            "line": 249,
             "description": "Resize the display window. To be called once the image is loaded.",
             "itemtype": "method",
             "name": "resize",
@@ -9310,7 +9310,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 258,
+            "line": 262,
             "description": "Toggle the display of the info layer.",
             "itemtype": "method",
             "name": "toggleInfoLayerDisplay",
@@ -9320,7 +9320,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 275,
+            "line": 279,
             "description": "Init the Window/Level display",
             "class": "dwv.App",
             "module": "utils",
@@ -9328,7 +9328,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 291,
+            "line": 295,
             "description": "Add image listeners.",
             "itemtype": "method",
             "name": "addImageInfoListeners",
@@ -9340,7 +9340,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 306,
+            "line": 310,
             "description": "Remove image listeners.",
             "itemtype": "method",
             "name": "removeImageInfoListeners",
@@ -9352,7 +9352,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 321,
+            "line": 325,
             "description": "General-purpose event handler. This function just determines the mouse \nposition relative to the canvas element. It then passes it to the current tool.",
             "itemtype": "method",
             "name": "eventHandler",
@@ -9371,7 +9371,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 395,
+            "line": 399,
             "description": "Handle an error: display it to the user.",
             "itemtype": "method",
             "name": "handleError",
@@ -9390,7 +9390,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 408,
+            "line": 420,
             "description": "Create the application layers.",
             "itemtype": "method",
             "name": "createLayers",
@@ -9414,7 +9414,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 439,
+            "line": 451,
             "description": "Create the DICOM tags table. To be called once the DICOM has been parsed.",
             "itemtype": "method",
             "name": "createTagsTable",
@@ -9433,7 +9433,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 468,
+            "line": 484,
             "description": "Post load application initialisation. To be called once the DICOM has been parsed.",
             "itemtype": "method",
             "name": "postLoadInit",
@@ -9454,63 +9454,63 @@
     "warnings": [
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/dicom/dicomParser.js:142"
+            "line": " src/dicom/dicomParser.js:149"
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/dicom/dicomParser.js:155"
+            "line": " src/dicom/dicomParser.js:162"
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/dicom/dicomParser.js:166"
+            "line": " src/dicom/dicomParser.js:173"
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/dicom/dicomParser.js:211"
+            "line": " src/dicom/dicomParser.js:218"
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/dicom/dicomParser.js:250"
+            "line": " src/dicom/dicomParser.js:257"
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/dicom/dicomParser.js:274"
+            "line": " src/dicom/dicomParser.js:281"
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/dicom/dicomParser.js:546"
+            "line": " src/dicom/dicomParser.js:553"
         },
         {
             "message": "unknown tag: input",
-            "line": " src/gui/html.js:150"
+            "line": " src/gui/html.js:152"
         },
         {
             "message": "unknown tag: warning",
-            "line": " src/gui/html.js:150"
+            "line": " src/gui/html.js:152"
         },
         {
             "message": "unknown tag: input",
-            "line": " src/gui/layer.js:225"
+            "line": " src/gui/layer.js:235"
         },
         {
             "message": "unknown tag: input",
-            "line": " src/gui/layer.js:225"
+            "line": " src/gui/layer.js:235"
         },
         {
             "message": "unknown tag: input",
-            "line": " src/gui/layer.js:281"
+            "line": " src/gui/layer.js:291"
         },
         {
             "message": "unknown tag: input",
-            "line": " src/gui/layer.js:319"
+            "line": " src/gui/layer.js:329"
         },
         {
             "message": "unknown tag: input",
-            "line": " src/gui/layer.js:330"
+            "line": " src/gui/layer.js:340"
         },
         {
             "message": "unknown tag: pqrqm",
-            "line": " src/image/image.js:271"
+            "line": " src/image/image.js:275"
         },
         {
             "message": "unknown tag: input",
@@ -9534,27 +9534,27 @@
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/tools/scroll.js:138"
+            "line": " src/tools/scroll.js:146"
         },
         {
             "message": "replacing incorrect tag: function with method",
-            "line": " src/tools/windowLevel.js:65"
+            "line": " src/tools/windowLevel.js:66"
         },
         {
             "message": "replacing incorrect tag: function with method",
-            "line": " src/tools/windowLevel.js:100"
+            "line": " src/tools/windowLevel.js:102"
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/tools/windowLevel.js:311"
+            "line": " src/tools/windowLevel.js:316"
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/tools/zoomPan.js:263"
+            "line": " src/tools/zoomPan.js:274"
         },
         {
             "message": "Missing item type\nLookup tables for image color display.",
-            "line": " src/image/luts.js:210"
+            "line": " src/image/luts.js:216"
         },
         {
             "message": "Missing item type",
@@ -9570,7 +9570,7 @@
         },
         {
             "message": "Missing item type\nInit the Window/Level display",
-            "line": " src/application.js:275"
+            "line": " src/application.js:279"
         }
     ]
 }

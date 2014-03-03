@@ -239,7 +239,9 @@ dwv.html.appendHCell = function(row, text)
 {
     var cell = document.createElement(&quot;th&quot;);
     // TODO jquery-mobile specific...
-    if( text !== &quot;Value&quot; &amp;&amp; text !== &quot;Name&quot; ) cell.setAttribute(&quot;data-priority&quot;, &quot;1&quot;);
+    if( text !== &quot;Value&quot; &amp;&amp; text !== &quot;Name&quot; ) {
+        cell.setAttribute(&quot;data-priority&quot;, &quot;1&quot;);
+    }
     cell.appendChild(document.createTextNode(text));
     row.appendChild(cell);
 };
@@ -529,7 +531,9 @@ dwv.html.removeNode = function(nodeId) {
     // find the node
     var node = document.getElementById(nodeId);
     // check node
-    if( !node ) return;
+    if( !node ) {
+        return;
+    }
     // remove its children
     dwv.html.cleanNode(node);
     // remove it from its parent
@@ -597,17 +601,22 @@ dwv.html.getUriParam = function(uri)
     // split key/value pairs
     var mainQueryPairs = dwv.utils.splitQueryString(inputUri);
     // check pairs
-    if( mainQueryPairs === null ) return null;
+    if( mainQueryPairs === null ) {
+        return null;
+    }
     // has to have an input key
-    if( !mainQueryPairs.query || !mainQueryPairs.query.input ) 
+    if( !mainQueryPairs.query || !mainQueryPairs.query.input ) { 
         throw new Error(&quot;No input parameter in query URI.&quot;);
+    }
     // decode input URI
     var queryUri = decodeURIComponent(mainQueryPairs.query.input);
     // get key/value pairs from input URI
     var inputQueryPairs = dwv.utils.splitQueryString(queryUri);
     // repeat key replace mode (default to keep key)
     var repeatKeyReplaceMode = &quot;key&quot;;
-    if( mainQueryPairs.query.dwvReplaceMode ) repeatKeyReplaceMode = mainQueryPairs.query.dwvReplaceMode;
+    if( mainQueryPairs.query.dwvReplaceMode ) {
+        repeatKeyReplaceMode = mainQueryPairs.query.dwvReplaceMode;
+    }
     
     if( !inputQueryPairs ) 
     {
@@ -638,13 +647,16 @@ dwv.html.getUriParam = function(uri)
             var baseUrl = inputQueryPairs.base;
             // do not add &#x27;?&#x27; for what looks like file elements
             // root/path/to/?key=0.jpg&amp;key=1.jpg
-            if( !( baseUrl[baseUrl.length-1] === &#x27;/&#x27; &amp;&amp; repeatList[0].indexOf(&#x27;.&#x27;) !== -1 ) ) 
+            if( !( baseUrl[baseUrl.length-1] === &#x27;/&#x27; &amp;&amp; repeatList[0].indexOf(&#x27;.&#x27;) !== -1 ) ) { 
                 baseUrl += &quot;?&quot;;
+            }
             var gotOneArg = false;
             for( var j = 0; j &lt; keys.length; ++j )
             {
                 if( keys[j] !== repeatKey ) {
-                    if( gotOneArg ) baseUrl += &quot;&amp;&quot;;
+                    if( gotOneArg ) {
+                        baseUrl += &quot;&amp;&quot;;
+                    }
                     baseUrl += keys[j] + &quot;=&quot; + inputQueryPairs.query[keys[j]];
                     gotOneArg = true;
                 }
@@ -654,8 +666,12 @@ dwv.html.getUriParam = function(uri)
             for( var k = 0; k &lt; repeatList.length; ++k )
             {
                 url = baseUrl;
-                if( gotOneArg ) url += &quot;&amp;&quot;;
-                if( repeatKeyReplaceMode === &quot;key&quot; ) url += repeatKey + &quot;=&quot;;
+                if( gotOneArg ) {
+                    url += &quot;&amp;&quot;;
+                }
+                if( repeatKeyReplaceMode === &quot;key&quot; ) {
+                    url += repeatKey + &quot;=&quot;;
+                }
                 // other than &#x27;key&#x27; mode: do nothing
                 url += repeatList[k];
                 result.push(url);
@@ -669,7 +685,9 @@ dwv.html.getUriParam = function(uri)
 dwv.html.displayElement = function(id,bool)
 {
     var element = document.getElementById(id);
-    if( element ) element.style.display = bool ? &quot;&quot; : &quot;none&quot;;
+    if( element ) {
+        element.style.display = bool ? &quot;&quot; : &quot;none&quot;;
+    }
 };
 
 /**
@@ -683,8 +701,12 @@ dwv.html.toggleDisplay = function(id)
     if( document.getElementById(id) )
     {
         var div = document.getElementById(id);
-        if( div.style.display === &quot;none&quot; ) div.style.display = &#x27;&#x27;;
-        else div.style.display = &quot;none&quot;;
+        if( div.style.display === &quot;none&quot; ) {
+            div.style.display = &#x27;&#x27;;
+        }
+        else {
+            div.style.display = &quot;none&quot;;
+        }
     }
 };
 

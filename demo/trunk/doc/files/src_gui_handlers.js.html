@@ -321,8 +321,9 @@ dwv.gui.onChangeMinMax = function(range)
 {
     // seems like jquery is checking if the method exists before it 
     // is used...
-    if( app.getToolBox().getSelectedTool().getSelectedFilter )
+    if( app.getToolBox().getSelectedTool().getSelectedFilter ) {
         app.getToolBox().getSelectedTool().getSelectedFilter().run(range);
+    }
 };
 
 /**
