@@ -248,31 +248,31 @@ dwv.tool.ZoomAndPan = function(app)
         // first position
         self.x0 = event._x;
         self.y0 = event._y;
-     };
+    };
 
-     /**
-      * Handle two touch down event.
-      * @method twotouchdown
-      * @param {Object} event The touch down event.
-      */
-     this.twotouchdown = function(event){
-         self.started = true;
-         // store first point
-         self.x0 = event._x;
-         self.y0 = event._y;
-         // first line
-         var point0 = new dwv.math.Point2D(event._x, event._y);
-         var point1 = new dwv.math.Point2D(event._x1, event._y1);
-         self.line0 = new dwv.math.Line(point0, point1);
-         self.midPoint = self.line0.getMidpoint();         
-     };
+    /**
+     * Handle two touch down event.
+     * @method twotouchdown
+     * @param {Object} event The touch down event.
+     */
+    this.twotouchdown = function(event){
+        self.started = true;
+        // store first point
+        self.x0 = event._x;
+        self.y0 = event._y;
+        // first line
+        var point0 = new dwv.math.Point2D(event._x, event._y);
+        var point1 = new dwv.math.Point2D(event._x1, event._y1);
+        self.line0 = new dwv.math.Line(point0, point1);
+        self.midPoint = self.line0.getMidpoint();         
+    };
 
-     /**
-      * Handle mouse move event.
-      * @method mousemove
-      * @param {Object} event The mouse move event.
-      */
-     this.mousemove = function(event){
+    /**
+     * Handle mouse move event.
+     * @method mousemove
+     * @param {Object} event The mouse move event.
+     */
+    this.mousemove = function(event){
         if (!self.started)
         {
             return;
@@ -295,40 +295,40 @@ dwv.tool.ZoomAndPan = function(app)
      * @param {Object} event The touch move event.
      */
     this.twotouchmove = function(event){
-       if (!self.started)
-       {
-           return;
-       }
-       var point0 = new dwv.math.Point2D(event._x, event._y);
-       var point1 = new dwv.math.Point2D(event._x1, event._y1);
-       var newLine = new dwv.math.Line(point0, point1);
-       var lineRatio = newLine.getLength() / self.line0.getLength();
-       
-       if( lineRatio === 1 )
-       {
-           // scroll mode
-           // difference  to last position
-           var diffY = event._y - self.y0;
-           // do not trigger for small moves
-           if( Math.abs(diffY) &lt; 15 ) {
-               return;
-           }
-           // update GUI
-           if( diffY &gt; 0 ) {
-               app.getView().incrementSliceNb();
-           }
-           else {
-               app.getView().decrementSliceNb();
-           }
-       }
-       else
-       {
-           // zoom mode
-           var zoom = (lineRatio - 1) / 2;
-           if( Math.abs(zoom) % 0.1 &lt;= 0.05 ) {
-               zoomLayers(zoom, self.midPoint.getX(), self.midPoint.getY());
-           }
-       }
+        if (!self.started)
+        {
+            return;
+        }
+        var point0 = new dwv.math.Point2D(event._x, event._y);
+        var point1 = new dwv.math.Point2D(event._x1, event._y1);
+        var newLine = new dwv.math.Line(point0, point1);
+        var lineRatio = newLine.getLength() / self.line0.getLength();
+        
+        if( lineRatio === 1 )
+        {
+            // scroll mode
+            // difference  to last position
+            var diffY = event._y - self.y0;
+            // do not trigger for small moves
+            if( Math.abs(diffY) &lt; 15 ) {
+                return;
+            }
+            // update GUI
+            if( diffY &gt; 0 ) {
+                app.getView().incrementSliceNb();
+            }
+            else {
+                app.getView().decrementSliceNb();
+            }
+        }
+        else
+        {
+            // zoom mode
+            var zoom = (lineRatio - 1) / 2;
+            if( Math.abs(zoom) % 0.1 &lt;= 0.05 ) {
+                zoomLayers(zoom, self.midPoint.getX(), self.midPoint.getY());
+            }
+        }
     };
     
     /**

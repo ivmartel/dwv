@@ -1092,7 +1092,7 @@
             "module": "math",
             "namespace": "dwv.math",
             "file": "src/math/scissors.js",
-            "line": 278,
+            "line": 280,
             "description": "Scissors",
             "is_constructor": 1
         },
@@ -2103,7 +2103,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 257,
+            "line": 258,
             "description": "Read a DICOM tag.",
             "itemtype": "method",
             "name": "readTag",
@@ -2126,7 +2126,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 281,
+            "line": 282,
             "description": "Read a DICOM data element.",
             "itemtype": "method",
             "name": "readDataElement",
@@ -2154,7 +2154,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 374,
+            "line": 378,
             "description": "Parse the complete DICOM file (given as input to the class).\nFills in the member object 'dicomElements'.",
             "itemtype": "method",
             "name": "parse",
@@ -2170,7 +2170,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 553,
+            "line": 559,
             "description": "Get an Image object from the read DICOM file.",
             "itemtype": "method",
             "name": "createImage",
@@ -4988,7 +4988,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 699,
+            "line": 705,
             "description": "Transform an image using a specific operator.",
             "itemtype": "method",
             "name": "transform",
@@ -5009,7 +5009,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 717,
+            "line": 723,
             "description": "Compose this image with another one and using a specific operator.",
             "itemtype": "method",
             "name": "compose",
@@ -5659,7 +5659,7 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 245,
+            "line": 246,
             "description": "Decrement the current slice number.",
             "itemtype": "method",
             "name": "decrementSliceNb",
@@ -5673,7 +5673,7 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 258,
+            "line": 260,
             "description": "Clone the image using all meta data and the original data buffer.",
             "itemtype": "method",
             "name": "clone",
@@ -5687,7 +5687,7 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 272,
+            "line": 274,
             "description": "Generate display image data to be given to a canvas.",
             "itemtype": "method",
             "name": "generateImageData",
@@ -5709,7 +5709,7 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 357,
+            "line": 360,
             "description": "Add an event listener on the view.",
             "itemtype": "method",
             "name": "addEventListener",
@@ -5731,7 +5731,7 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 372,
+            "line": 375,
             "description": "Remove an event listener on the view.",
             "itemtype": "method",
             "name": "removeEventListener",
@@ -5753,7 +5753,7 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 392,
+            "line": 395,
             "description": "Fire an event: call all associated listeners.",
             "itemtype": "method",
             "name": "fireEvent",
@@ -5810,13 +5810,13 @@
         },
         {
             "file": "src/math/scissors.js",
-            "line": 67,
+            "line": 68,
             "class": "dwv.math.Scissors",
             "module": "math"
         },
         {
             "file": "src/math/scissors.js",
-            "line": 107,
+            "line": 108,
             "class": "dwv.math.Scissors",
             "module": "math"
         },
@@ -9470,15 +9470,15 @@
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/dicom/dicomParser.js:257"
+            "line": " src/dicom/dicomParser.js:258"
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/dicom/dicomParser.js:281"
+            "line": " src/dicom/dicomParser.js:282"
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/dicom/dicomParser.js:553"
+            "line": " src/dicom/dicomParser.js:559"
         },
         {
             "message": "unknown tag: input",
@@ -9562,11 +9562,11 @@
         },
         {
             "message": "Missing item type",
-            "line": " src/math/scissors.js:67"
+            "line": " src/math/scissors.js:68"
         },
         {
             "message": "Missing item type",
-            "line": " src/math/scissors.js:107"
+            "line": " src/math/scissors.js:108"
         },
         {
             "message": "Missing item type\nInit the Window/Level display",

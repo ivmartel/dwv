@@ -548,23 +548,23 @@ dwv.App = function()
             // If there&#x27;s one or two fingers inside this element
             if( touches.length === 1 || touches.length === 2)
             {
-              var touch = touches[0];
-              // store
-              event._x = touch.pageX - parseInt(app.getImageLayer().getOffset().left, 10);
-              event._x = parseInt( (event._x / displayZoom), 10 );
-              event._y = touch.pageY - parseInt(app.getImageLayer().getOffset().top, 10);
-              event._y = parseInt( (event._y / displayZoom), 10 );
-              // second finger
-              if (touches.length === 2) {
-                  touch = touches[1];
-                  // store
-                  event._x1 = touch.pageX - parseInt(app.getImageLayer().getOffset().left, 10);
-                  event._x1 = parseInt( (event._x1 / displayZoom), 10 );
-                  event._y1 = touch.pageY - parseInt(app.getImageLayer().getOffset().top, 10);
-                  event._y1 = parseInt( (event._y1 / displayZoom), 10 );
-              }
-              // set handle event flag
-              handled = true;
+                var touch = touches[0];
+                // store
+                event._x = touch.pageX - parseInt(app.getImageLayer().getOffset().left, 10);
+                event._x = parseInt( (event._x / displayZoom), 10 );
+                event._y = touch.pageY - parseInt(app.getImageLayer().getOffset().top, 10);
+                event._y = parseInt( (event._y / displayZoom), 10 );
+                // second finger
+                if (touches.length === 2) {
+                    touch = touches[1];
+                    // store
+                    event._x1 = touch.pageX - parseInt(app.getImageLayer().getOffset().left, 10);
+                    event._x1 = parseInt( (event._x1 / displayZoom), 10 );
+                    event._y1 = touch.pageY - parseInt(app.getImageLayer().getOffset().top, 10);
+                    event._y1 = parseInt( (event._y1 / displayZoom), 10 );
+                }
+                // set handle event flag
+                handled = true;
             }
         }
         else if( event.type === &quot;mousemove&quot; ||

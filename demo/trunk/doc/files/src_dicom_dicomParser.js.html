@@ -451,11 +451,12 @@ dwv.dicom.DicomParser.prototype.appendDicomElement = function( element )
     }
     // store it
     this.dicomElements[name] = { 
-            &quot;group&quot;: element.group, 
-            &quot;element&quot;: element.element,
-            &quot;vr&quot;: element.vr,
-            &quot;vl&quot;: element.vl,
-            &quot;value&quot;: element.value };
+        &quot;group&quot;: element.group, 
+        &quot;element&quot;: element.element,
+        &quot;vr&quot;: element.vr,
+        &quot;vl&quot;: element.vl,
+        &quot;value&quot;: element.value 
+    };
 };
 
 /**
@@ -570,9 +571,12 @@ dwv.dicom.DicomParser.prototype.readDataElement = function(reader, offset, impli
     
     // return
     return { 
-        &#x27;tag&#x27;: tag, &#x27;vr&#x27;: vr, &#x27;vl&#x27;: vl, 
+        &#x27;tag&#x27;: tag, 
+        &#x27;vr&#x27;: vr, 
+        &#x27;vl&#x27;: vl, 
         &#x27;data&#x27;: data,
-        &#x27;offset&#x27;: elementOffset};    
+        &#x27;offset&#x27;: elementOffset
+    };    
 };
 
 /**
@@ -664,7 +668,8 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
             &#x27;vr&#x27; : dataElement.vr, 
             &#x27;vl&#x27; : dataElement.vl, 
             &#x27;element&#x27;: dataElement.tag.element,
-            &#x27;value&#x27;: dataElement.data } );
+            &#x27;value&#x27;: dataElement.data 
+        });
         // increment index
         i += dataElement.offset;
     }
@@ -727,7 +732,8 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
             &#x27;vr&#x27; : dataElement.vr, 
             &#x27;vl&#x27; : dataElement.vl, 
             &#x27;element&#x27;: dataElement.tag.element,
-            &#x27;value&#x27;: dataElement.data } );
+            &#x27;value&#x27;: dataElement.data 
+        });
         // increment index
         i += dataElement.offset;
     }

@@ -344,23 +344,23 @@ dwv.App = function()
             // If there's one or two fingers inside this element
             if( touches.length === 1 || touches.length === 2)
             {
-              var touch = touches[0];
-              // store
-              event._x = touch.pageX - parseInt(app.getImageLayer().getOffset().left, 10);
-              event._x = parseInt( (event._x / displayZoom), 10 );
-              event._y = touch.pageY - parseInt(app.getImageLayer().getOffset().top, 10);
-              event._y = parseInt( (event._y / displayZoom), 10 );
-              // second finger
-              if (touches.length === 2) {
-                  touch = touches[1];
-                  // store
-                  event._x1 = touch.pageX - parseInt(app.getImageLayer().getOffset().left, 10);
-                  event._x1 = parseInt( (event._x1 / displayZoom), 10 );
-                  event._y1 = touch.pageY - parseInt(app.getImageLayer().getOffset().top, 10);
-                  event._y1 = parseInt( (event._y1 / displayZoom), 10 );
-              }
-              // set handle event flag
-              handled = true;
+                var touch = touches[0];
+                // store
+                event._x = touch.pageX - parseInt(app.getImageLayer().getOffset().left, 10);
+                event._x = parseInt( (event._x / displayZoom), 10 );
+                event._y = touch.pageY - parseInt(app.getImageLayer().getOffset().top, 10);
+                event._y = parseInt( (event._y / displayZoom), 10 );
+                // second finger
+                if (touches.length === 2) {
+                    touch = touches[1];
+                    // store
+                    event._x1 = touch.pageX - parseInt(app.getImageLayer().getOffset().left, 10);
+                    event._x1 = parseInt( (event._x1 / displayZoom), 10 );
+                    event._y1 = touch.pageY - parseInt(app.getImageLayer().getOffset().top, 10);
+                    event._y1 = parseInt( (event._y1 / displayZoom), 10 );
+                }
+                // set handle event flag
+                handled = true;
             }
         }
         else if( event.type === "mousemove" ||
@@ -797,11 +797,12 @@ dwv.dicom.DicomParser.prototype.appendDicomElement = function( element )
     }
     // store it
     this.dicomElements[name] = { 
-            "group": element.group, 
-            "element": element.element,
-            "vr": element.vr,
-            "vl": element.vl,
-            "value": element.value };
+        "group": element.group, 
+        "element": element.element,
+        "vr": element.vr,
+        "vl": element.vl,
+        "value": element.value 
+    };
 };
 
 /**
@@ -916,9 +917,12 @@ dwv.dicom.DicomParser.prototype.readDataElement = function(reader, offset, impli
     
     // return
     return { 
-        'tag': tag, 'vr': vr, 'vl': vl, 
+        'tag': tag, 
+        'vr': vr, 
+        'vl': vl, 
         'data': data,
-        'offset': elementOffset};    
+        'offset': elementOffset
+    };    
 };
 
 /**
@@ -1010,7 +1014,8 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
             'vr' : dataElement.vr, 
             'vl' : dataElement.vl, 
             'element': dataElement.tag.element,
-            'value': dataElement.data } );
+            'value': dataElement.data 
+        });
         // increment index
         i += dataElement.offset;
     }
@@ -1073,7 +1078,8 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
             'vr' : dataElement.vr, 
             'vl' : dataElement.vl, 
             'element': dataElement.tag.element,
-            'value': dataElement.data } );
+            'value': dataElement.data 
+        });
         // increment index
         i += dataElement.offset;
     }
@@ -4829,12 +4835,12 @@ dwv.html.Layer = function(name)
      */
     this.isVisible = function()
     {
-      if( canvas.style.display === "none" ) {
-          return false;
-      }
-      else {
-          return true;
-      }
+        if( canvas.style.display === "none" ) {
+            return false;
+        }
+        else {
+            return true;
+        }
     };
     
     /**
@@ -6240,6 +6246,9 @@ dwv.image.Image.prototype.convolute2D = function(weights)
         }
     }
     
+    // allow special indent for matrices
+    /*jshint indent:false */
+
     // default weight offset matrix
     var wOff = [];
     wOff[0] = (-ncols-1) * factor; wOff[1] = (-ncols) * factor; wOff[2] = (-ncols+1) * factor;
@@ -6293,6 +6302,9 @@ dwv.image.Image.prototype.convolute2D = function(weights)
     wOffnn[3] = wOff[3]; wOffnn[4] = wOff[4]; wOffnn[5] = wOff[4];
     wOffnn[6] = wOff[3]; wOffnn[7] = wOff[4]; wOffnn[8] = wOff[4];
     
+    // restore indent for rest of method
+    /*jshint indent:4 */
+
     // loop vars
     var pixelOffset = 0;
     var newValue = 0;
@@ -6698,37 +6710,37 @@ dwv.image.lut.invId = function(i)
 
 // plain
 dwv.image.lut.plain = {
-   "red":   dwv.image.lut.buildLut(dwv.image.lut.id),
-   "green": dwv.image.lut.buildLut(dwv.image.lut.id),
-   "blue":  dwv.image.lut.buildLut(dwv.image.lut.id)
+    "red":   dwv.image.lut.buildLut(dwv.image.lut.id),
+    "green": dwv.image.lut.buildLut(dwv.image.lut.id),
+    "blue":  dwv.image.lut.buildLut(dwv.image.lut.id)
 };
 
 // inverse plain
 dwv.image.lut.invPlain = {
-   "red":   dwv.image.lut.buildLut(dwv.image.lut.invId),
-   "green": dwv.image.lut.buildLut(dwv.image.lut.invId),
-   "blue":  dwv.image.lut.buildLut(dwv.image.lut.invId)
+    "red":   dwv.image.lut.buildLut(dwv.image.lut.invId),
+    "green": dwv.image.lut.buildLut(dwv.image.lut.invId),
+    "blue":  dwv.image.lut.buildLut(dwv.image.lut.invId)
 };
 
 //rainbow 
 dwv.image.lut.rainbow = {
-   "blue":  [0, 4, 8, 12, 16, 20, 24, 28, 32, 36, 40, 44, 48, 52, 56, 60, 64, 68, 72, 76, 80, 84, 88, 92, 96, 100, 104, 108, 112, 116, 120, 124, 128, 132, 136, 140, 144, 148, 152, 156, 160, 164, 168, 172, 176, 180, 184, 188, 192, 196, 200, 204, 208, 212, 216, 220, 224, 228, 232, 236, 240, 244, 248, 252, 255, 247, 239, 231, 223, 215, 207, 199, 191, 183, 175, 167, 159, 151, 143, 135, 127, 119, 111, 103, 95, 87, 79, 71, 63, 55, 47, 39, 31, 23, 15, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-   "green": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 16, 24, 32, 40, 48, 56, 64, 72, 80, 88, 96, 104, 112, 120, 128, 136, 144, 152, 160, 168, 176, 184, 192, 200, 208, 216, 224, 232, 240, 248, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 253, 251, 249, 247, 245, 243, 241, 239, 237, 235, 233, 231, 229, 227, 225, 223, 221, 219, 217, 215, 213, 211, 209, 207, 205, 203, 201, 199, 197, 195, 193, 192, 189, 186, 183, 180, 177, 174, 171, 168, 165, 162, 159, 156, 153, 150, 147, 144, 141, 138, 135, 132, 129, 126, 123, 120, 117, 114, 111, 108, 105, 102, 99, 96, 93, 90, 87, 84, 81, 78, 75, 72, 69, 66, 63, 60, 57, 54, 51, 48, 45, 42, 39, 36, 33, 30, 27, 24, 21, 18, 15, 12, 9, 6, 3],
-   "red":   [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42, 44, 46, 48, 50, 52, 54, 56, 58, 60, 62, 64, 62, 60, 58, 56, 54, 52, 50, 48, 46, 44, 42, 40, 38, 36, 34, 32, 30, 28, 26, 24, 22, 20, 18, 16, 14, 12, 10, 8, 6, 4, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 8, 12, 16, 20, 24, 28, 32, 36, 40, 44, 48, 52, 56, 60, 64, 68, 72, 76, 80, 84, 88, 92, 96, 100, 104, 108, 112, 116, 120, 124, 128, 132, 136, 140, 144, 148, 152, 156, 160, 164, 168, 172, 176, 180, 184, 188, 192, 196, 200, 204, 208, 212, 216, 220, 224, 228, 232, 236, 240, 244, 248, 252, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255]
+    "blue":  [0, 4, 8, 12, 16, 20, 24, 28, 32, 36, 40, 44, 48, 52, 56, 60, 64, 68, 72, 76, 80, 84, 88, 92, 96, 100, 104, 108, 112, 116, 120, 124, 128, 132, 136, 140, 144, 148, 152, 156, 160, 164, 168, 172, 176, 180, 184, 188, 192, 196, 200, 204, 208, 212, 216, 220, 224, 228, 232, 236, 240, 244, 248, 252, 255, 247, 239, 231, 223, 215, 207, 199, 191, 183, 175, 167, 159, 151, 143, 135, 127, 119, 111, 103, 95, 87, 79, 71, 63, 55, 47, 39, 31, 23, 15, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    "green": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 16, 24, 32, 40, 48, 56, 64, 72, 80, 88, 96, 104, 112, 120, 128, 136, 144, 152, 160, 168, 176, 184, 192, 200, 208, 216, 224, 232, 240, 248, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 253, 251, 249, 247, 245, 243, 241, 239, 237, 235, 233, 231, 229, 227, 225, 223, 221, 219, 217, 215, 213, 211, 209, 207, 205, 203, 201, 199, 197, 195, 193, 192, 189, 186, 183, 180, 177, 174, 171, 168, 165, 162, 159, 156, 153, 150, 147, 144, 141, 138, 135, 132, 129, 126, 123, 120, 117, 114, 111, 108, 105, 102, 99, 96, 93, 90, 87, 84, 81, 78, 75, 72, 69, 66, 63, 60, 57, 54, 51, 48, 45, 42, 39, 36, 33, 30, 27, 24, 21, 18, 15, 12, 9, 6, 3],
+    "red":   [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42, 44, 46, 48, 50, 52, 54, 56, 58, 60, 62, 64, 62, 60, 58, 56, 54, 52, 50, 48, 46, 44, 42, 40, 38, 36, 34, 32, 30, 28, 26, 24, 22, 20, 18, 16, 14, 12, 10, 8, 6, 4, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 8, 12, 16, 20, 24, 28, 32, 36, 40, 44, 48, 52, 56, 60, 64, 68, 72, 76, 80, 84, 88, 92, 96, 100, 104, 108, 112, 116, 120, 124, 128, 132, 136, 140, 144, 148, 152, 156, 160, 164, 168, 172, 176, 180, 184, 188, 192, 196, 200, 204, 208, 212, 216, 220, 224, 228, 232, 236, 240, 244, 248, 252, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255]
 };
 
 // hot
 dwv.image.lut.hot = {
-   "red":   dwv.image.lut.buildLut(dwv.image.lut.toMaxFirstThird),
-   "green": dwv.image.lut.buildLut(dwv.image.lut.toMaxSecondThird),
-   "blue":  dwv.image.lut.buildLut(dwv.image.lut.toMaxThirdThird)
+    "red":   dwv.image.lut.buildLut(dwv.image.lut.toMaxFirstThird),
+    "green": dwv.image.lut.buildLut(dwv.image.lut.toMaxSecondThird),
+    "blue":  dwv.image.lut.buildLut(dwv.image.lut.toMaxThirdThird)
 };
 
 // test
 dwv.image.lut.test = {
-   "red":   dwv.image.lut.buildLut(dwv.image.lut.id),
-   "green": dwv.image.lut.buildLut(dwv.image.lut.zero),
-   "blue":  dwv.image.lut.buildLut(dwv.image.lut.zero)
+    "red":   dwv.image.lut.buildLut(dwv.image.lut.id),
+    "green": dwv.image.lut.buildLut(dwv.image.lut.zero),
+    "blue":  dwv.image.lut.buildLut(dwv.image.lut.zero)
 };
 
 //red
@@ -7064,7 +7076,8 @@ dwv.image.View.prototype.incrementSliceNb = function()
     return this.setCurrentPosition({
         "i": this.getCurrentPosition().i,
         "j": this.getCurrentPosition().j,
-        "k": this.getCurrentPosition().k + 1 });
+        "k": this.getCurrentPosition().k + 1 
+    });
 };
 
 /**
@@ -7077,7 +7090,8 @@ dwv.image.View.prototype.decrementSliceNb = function()
     return this.setCurrentPosition({
         "i": this.getCurrentPosition().i,
         "j": this.getCurrentPosition().j,
-        "k": this.getCurrentPosition().k - 1 });
+        "k": this.getCurrentPosition().k - 1 
+    });
 };
 
 /**
@@ -7112,70 +7126,71 @@ dwv.image.View.prototype.generateImageData = function( array )
     var index = 0;
     var sliceSize = 0;
     var sliceOffset = 0;
-    switch (photoInterpretation) {
-        case "MONOCHROME1":
-        case "MONOCHROME2":
-            sliceSize = image.getSize().getSliceSize();
-            sliceOffset = (sliceNumber || 0) * sliceSize;
-            var iMax = sliceOffset + sliceSize;
-            for(var i=sliceOffset; i < iMax; ++i)
-            {        
-                pxValue = parseInt( windowLut.getValue( 
-                        image.getValueAtOffset(i) ), 10 );
-                array.data[index] = colorMap.red[pxValue];
-                array.data[index+1] = colorMap.green[pxValue];
-                array.data[index+2] = colorMap.blue[pxValue];
-                array.data[index+3] = 0xff;
-                index += 4;
-            }
+    switch (photoInterpretation)
+    {
+    case "MONOCHROME1":
+    case "MONOCHROME2":
+        sliceSize = image.getSize().getSliceSize();
+        sliceOffset = (sliceNumber || 0) * sliceSize;
+        var iMax = sliceOffset + sliceSize;
+        for(var i=sliceOffset; i < iMax; ++i)
+        {        
+            pxValue = parseInt( windowLut.getValue( 
+                    image.getValueAtOffset(i) ), 10 );
+            array.data[index] = colorMap.red[pxValue];
+            array.data[index+1] = colorMap.green[pxValue];
+            array.data[index+2] = colorMap.blue[pxValue];
+            array.data[index+3] = 0xff;
+            index += 4;
+        }
         break;
+    
+    case "RGB":
+        // the planar configuration defines the memory layout
+        if( planarConfig !== 0 && planarConfig !== 1 ) {
+            throw new Error("Unsupported planar configuration: "+planarConfig);
+        }
+        sliceSize = image.getSize().getSliceSize();
+        sliceOffset = (sliceNumber || 0) * 3 * sliceSize;
+        // default: RGBRGBRGBRGB...
+        var posR = sliceOffset;
+        var posG = sliceOffset + 1;
+        var posB = sliceOffset + 2;
+        var stepPos = 3;
+        // RRRR...GGGG...BBBB...
+        if (planarConfig === 1) { 
+            posR = sliceOffset;
+            posG = sliceOffset + sliceSize;
+            posB = sliceOffset + 2 * sliceSize;
+            stepPos = 1;
+        }
         
-        case "RGB":
-            // the planar configuration defines the memory layout
-            if( planarConfig !== 0 && planarConfig !== 1 ) {
-                throw new Error("Unsupported planar configuration: "+planarConfig);
-            }
-            sliceSize = image.getSize().getSliceSize();
-            sliceOffset = (sliceNumber || 0) * 3 * sliceSize;
-            // default: RGBRGBRGBRGB...
-            var posR = sliceOffset;
-            var posG = sliceOffset + 1;
-            var posB = sliceOffset + 2;
-            var stepPos = 3;
-            // RRRR...GGGG...BBBB...
-            if (planarConfig === 1) { 
-                posR = sliceOffset;
-                posG = sliceOffset + sliceSize;
-                posB = sliceOffset + 2 * sliceSize;
-                stepPos = 1;
-            }
+        var redValue = 0;
+        var greenValue = 0;
+        var blueValue = 0;
+        for(var j=0; j < image.getSize().getSliceSize(); ++j)
+        {        
+            redValue = parseInt( windowLut.getValue( 
+                    image.getValueAtOffset(posR) ), 10 );
+            greenValue = parseInt( windowLut.getValue( 
+                    image.getValueAtOffset(posG) ), 10 );
+            blueValue = parseInt( windowLut.getValue( 
+                    image.getValueAtOffset(posB) ), 10 );
             
-            var redValue = 0;
-            var greenValue = 0;
-            var blueValue = 0;
-            for(var j=0; j < image.getSize().getSliceSize(); ++j)
-            {        
-                redValue = parseInt( windowLut.getValue( 
-                        image.getValueAtOffset(posR) ), 10 );
-                greenValue = parseInt( windowLut.getValue( 
-                        image.getValueAtOffset(posG) ), 10 );
-                blueValue = parseInt( windowLut.getValue( 
-                        image.getValueAtOffset(posB) ), 10 );
-                
-                array.data[index] = redValue;
-                array.data[index+1] = greenValue;
-                array.data[index+2] = blueValue;
-                array.data[index+3] = 0xff;
-                index += 4;
-                
-                posR += stepPos;
-                posG += stepPos;
-                posB += stepPos;
-            }
+            array.data[index] = redValue;
+            array.data[index+1] = greenValue;
+            array.data[index+2] = blueValue;
+            array.data[index+3] = 0xff;
+            index += 4;
+            
+            posR += stepPos;
+            posG += stepPos;
+            posB += stepPos;
+        }
         break;
-        
-        default: 
-            throw new Error("Unsupported photometric interpretation: "+photoInterpretation);
+    
+    default: 
+        throw new Error("Unsupported photometric interpretation: "+photoInterpretation);
     }
 };
 
@@ -7616,7 +7631,8 @@ dwv.math.computeGreyscale = function(data, width, height) {
 	};
 
 	greyscale.gradMagnitude = function(x,y) {
-		var dx = this.dx(x,y); var dy = this.dy(x,y);
+		var dx = this.dx(x,y); 
+		var dy = this.dy(x,y);
 		return Math.sqrt(dx*dx + dy*dy);
 	};
 
@@ -7780,7 +7796,8 @@ dwv.math.gradDirection = function(gradX, gradY, px, py, qx, qy) {
 
 	// Make sure dp is positive, to keep things consistant
 	if (dp < 0) {
-		dp = -dp; dq = -dq;
+		dp = -dp; 
+		dq = -dq;
 	}
 
 	if ( px !== qx && py !== qy ) {
@@ -10148,14 +10165,14 @@ dwv.tool.Scroll = function(app)
         // first position
         self.x0 = event._x;
         self.y0 = event._y;
-     };
+    };
 
-     /**
-      * Handle mouse move event.
-      * @method mousemove
-      * @param {Object} event The mouse move event.
-      */
-     this.mousemove = function(event){
+    /**
+     * Handle mouse move event.
+     * @method mousemove
+     * @param {Object} event The mouse move event.
+     */
+    this.mousemove = function(event){
         if (!self.started) {
             return;
         }
@@ -10859,31 +10876,31 @@ dwv.tool.ZoomAndPan = function(app)
         // first position
         self.x0 = event._x;
         self.y0 = event._y;
-     };
+    };
 
-     /**
-      * Handle two touch down event.
-      * @method twotouchdown
-      * @param {Object} event The touch down event.
-      */
-     this.twotouchdown = function(event){
-         self.started = true;
-         // store first point
-         self.x0 = event._x;
-         self.y0 = event._y;
-         // first line
-         var point0 = new dwv.math.Point2D(event._x, event._y);
-         var point1 = new dwv.math.Point2D(event._x1, event._y1);
-         self.line0 = new dwv.math.Line(point0, point1);
-         self.midPoint = self.line0.getMidpoint();         
-     };
+    /**
+     * Handle two touch down event.
+     * @method twotouchdown
+     * @param {Object} event The touch down event.
+     */
+    this.twotouchdown = function(event){
+        self.started = true;
+        // store first point
+        self.x0 = event._x;
+        self.y0 = event._y;
+        // first line
+        var point0 = new dwv.math.Point2D(event._x, event._y);
+        var point1 = new dwv.math.Point2D(event._x1, event._y1);
+        self.line0 = new dwv.math.Line(point0, point1);
+        self.midPoint = self.line0.getMidpoint();         
+    };
 
-     /**
-      * Handle mouse move event.
-      * @method mousemove
-      * @param {Object} event The mouse move event.
-      */
-     this.mousemove = function(event){
+    /**
+     * Handle mouse move event.
+     * @method mousemove
+     * @param {Object} event The mouse move event.
+     */
+    this.mousemove = function(event){
         if (!self.started)
         {
             return;
@@ -10906,40 +10923,40 @@ dwv.tool.ZoomAndPan = function(app)
      * @param {Object} event The touch move event.
      */
     this.twotouchmove = function(event){
-       if (!self.started)
-       {
-           return;
-       }
-       var point0 = new dwv.math.Point2D(event._x, event._y);
-       var point1 = new dwv.math.Point2D(event._x1, event._y1);
-       var newLine = new dwv.math.Line(point0, point1);
-       var lineRatio = newLine.getLength() / self.line0.getLength();
-       
-       if( lineRatio === 1 )
-       {
-           // scroll mode
-           // difference  to last position
-           var diffY = event._y - self.y0;
-           // do not trigger for small moves
-           if( Math.abs(diffY) < 15 ) {
-               return;
-           }
-           // update GUI
-           if( diffY > 0 ) {
-               app.getView().incrementSliceNb();
-           }
-           else {
-               app.getView().decrementSliceNb();
-           }
-       }
-       else
-       {
-           // zoom mode
-           var zoom = (lineRatio - 1) / 2;
-           if( Math.abs(zoom) % 0.1 <= 0.05 ) {
-               zoomLayers(zoom, self.midPoint.getX(), self.midPoint.getY());
-           }
-       }
+        if (!self.started)
+        {
+            return;
+        }
+        var point0 = new dwv.math.Point2D(event._x, event._y);
+        var point1 = new dwv.math.Point2D(event._x1, event._y1);
+        var newLine = new dwv.math.Line(point0, point1);
+        var lineRatio = newLine.getLength() / self.line0.getLength();
+        
+        if( lineRatio === 1 )
+        {
+            // scroll mode
+            // difference  to last position
+            var diffY = event._y - self.y0;
+            // do not trigger for small moves
+            if( Math.abs(diffY) < 15 ) {
+                return;
+            }
+            // update GUI
+            if( diffY > 0 ) {
+                app.getView().incrementSliceNb();
+            }
+            else {
+                app.getView().decrementSliceNb();
+            }
+        }
+        else
+        {
+            // zoom mode
+            var zoom = (lineRatio - 1) / 2;
+            if( Math.abs(zoom) % 0.1 <= 0.05 ) {
+                zoomLayers(zoom, self.midPoint.getX(), self.midPoint.getY());
+            }
+        }
     };
     
     /**
