@@ -48,6 +48,6 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-yuidoc');
     
     // Task to run tests
-    grunt.registerTask('test', ['jshint', 'qunit', 'concat', 'uglify', 'yuidoc']);
+    grunt.registerTask('publish', ['jshint', 'qunit', 'concat', 'uglify', 'yuidoc']);
 };
 

@@ -8,7 +8,7 @@
     "url": "git://github.com/ivmartel/dwv.git"
   },
   "scripts": {
-    "test": "grunt test --verbose"
+    "test": "grunt publish --verbose"
   },
   "devDependencies": {
     "grunt": "~0.4",
