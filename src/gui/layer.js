@@ -361,12 +361,12 @@ dwv.html.Layer = function(name)
      */
     this.isVisible = function()
     {
-      if( canvas.style.display === "none" ) {
-          return false;
-      }
-      else {
-          return true;
-      }
+        if( canvas.style.display === "none" ) {
+            return false;
+        }
+        else {
+            return true;
+        }
     };
     
     /**

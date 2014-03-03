@@ -588,6 +588,9 @@ dwv.image.Image.prototype.convolute2D = function(weights)
         }
     }
     
+    // allow special indent for matrices
+    /*jshint indent:false */
+
     // default weight offset matrix
     var wOff = [];
     wOff[0] = (-ncols-1) * factor; wOff[1] = (-ncols) * factor; wOff[2] = (-ncols+1) * factor;
@@ -641,6 +644,9 @@ dwv.image.Image.prototype.convolute2D = function(weights)
     wOffnn[3] = wOff[3]; wOffnn[4] = wOff[4]; wOffnn[5] = wOff[4];
     wOffnn[6] = wOff[3]; wOffnn[7] = wOff[4]; wOffnn[8] = wOff[4];
     
+    // restore indent for rest of method
+    /*jshint indent:4 */
+
     // loop vars
     var pixelOffset = 0;
     var newValue = 0;

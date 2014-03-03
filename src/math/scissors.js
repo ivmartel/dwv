@@ -45,7 +45,8 @@ dwv.math.computeGreyscale = function(data, width, height) {
 	};
 
 	greyscale.gradMagnitude = function(x,y) {
-		var dx = this.dx(x,y); var dy = this.dy(x,y);
+		var dx = this.dx(x,y); 
+		var dy = this.dy(x,y);
 		return Math.sqrt(dx*dx + dy*dy);
 	};
 
@@ -209,7 +210,8 @@ dwv.math.gradDirection = function(gradX, gradY, px, py, qx, qy) {
 
 	// Make sure dp is positive, to keep things consistant
 	if (dp < 0) {
-		dp = -dp; dq = -dq;
+		dp = -dp; 
+		dq = -dq;
 	}
 
 	if ( px !== qx && py !== qy ) {

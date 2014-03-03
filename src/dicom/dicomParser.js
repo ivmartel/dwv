@@ -247,11 +247,12 @@ dwv.dicom.DicomParser.prototype.appendDicomElement = function( element )
     }
     // store it
     this.dicomElements[name] = { 
-            "group": element.group, 
-            "element": element.element,
-            "vr": element.vr,
-            "vl": element.vl,
-            "value": element.value };
+        "group": element.group, 
+        "element": element.element,
+        "vr": element.vr,
+        "vl": element.vl,
+        "value": element.value 
+    };
 };
 
 /**
@@ -366,9 +367,12 @@ dwv.dicom.DicomParser.prototype.readDataElement = function(reader, offset, impli
     
     // return
     return { 
-        'tag': tag, 'vr': vr, 'vl': vl, 
+        'tag': tag, 
+        'vr': vr, 
+        'vl': vl, 
         'data': data,
-        'offset': elementOffset};    
+        'offset': elementOffset
+    };    
 };
 
 /**
@@ -460,7 +464,8 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
             'vr' : dataElement.vr, 
             'vl' : dataElement.vl, 
             'element': dataElement.tag.element,
-            'value': dataElement.data } );
+            'value': dataElement.data 
+        });
         // increment index
         i += dataElement.offset;
     }
@@ -523,7 +528,8 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
             'vr' : dataElement.vr, 
             'vl' : dataElement.vl, 
             'element': dataElement.tag.element,
-            'value': dataElement.data } );
+            'value': dataElement.data 
+        });
         // increment index
         i += dataElement.offset;
     }

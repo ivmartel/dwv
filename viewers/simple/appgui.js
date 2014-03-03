@@ -36,7 +36,7 @@ dwv.gui.appendToolboxHtml = function(){
     
     var node = document.getElementById("toolbar");
     node.appendChild(mainFieldset);
-     $("#toolbar").trigger("create");
+    $("#toolbar").trigger("create");
 };
 
 dwv.gui.displayToolboxHtml = function(bool){

@@ -239,7 +239,8 @@ dwv.image.View.prototype.incrementSliceNb = function()
     return this.setCurrentPosition({
         "i": this.getCurrentPosition().i,
         "j": this.getCurrentPosition().j,
-        "k": this.getCurrentPosition().k + 1 });
+        "k": this.getCurrentPosition().k + 1 
+    });
 };
 
 /**
@@ -252,7 +253,8 @@ dwv.image.View.prototype.decrementSliceNb = function()
     return this.setCurrentPosition({
         "i": this.getCurrentPosition().i,
         "j": this.getCurrentPosition().j,
-        "k": this.getCurrentPosition().k - 1 });
+        "k": this.getCurrentPosition().k - 1 
+    });
 };
 
 /**
@@ -287,70 +289,71 @@ dwv.image.View.prototype.generateImageData = function( array )
     var index = 0;
     var sliceSize = 0;
     var sliceOffset = 0;
-    switch (photoInterpretation) {
-        case "MONOCHROME1":
-        case "MONOCHROME2":
-            sliceSize = image.getSize().getSliceSize();
-            sliceOffset = (sliceNumber || 0) * sliceSize;
-            var iMax = sliceOffset + sliceSize;
-            for(var i=sliceOffset; i < iMax; ++i)
-            {        
-                pxValue = parseInt( windowLut.getValue( 
-                        image.getValueAtOffset(i) ), 10 );
-                array.data[index] = colorMap.red[pxValue];
-                array.data[index+1] = colorMap.green[pxValue];
-                array.data[index+2] = colorMap.blue[pxValue];
-                array.data[index+3] = 0xff;
-                index += 4;
-            }
+    switch (photoInterpretation)
+    {
+    case "MONOCHROME1":
+    case "MONOCHROME2":
+        sliceSize = image.getSize().getSliceSize();
+        sliceOffset = (sliceNumber || 0) * sliceSize;
+        var iMax = sliceOffset + sliceSize;
+        for(var i=sliceOffset; i < iMax; ++i)
+        {        
+            pxValue = parseInt( windowLut.getValue( 
+                    image.getValueAtOffset(i) ), 10 );
+            array.data[index] = colorMap.red[pxValue];
+            array.data[index+1] = colorMap.green[pxValue];
+            array.data[index+2] = colorMap.blue[pxValue];
+            array.data[index+3] = 0xff;
+            index += 4;
+        }
         break;
+    
+    case "RGB":
+        // the planar configuration defines the memory layout
+        if( planarConfig !== 0 && planarConfig !== 1 ) {
+            throw new Error("Unsupported planar configuration: "+planarConfig);
+        }
+        sliceSize = image.getSize().getSliceSize();
+        sliceOffset = (sliceNumber || 0) * 3 * sliceSize;
+        // default: RGBRGBRGBRGB...
+        var posR = sliceOffset;
+        var posG = sliceOffset + 1;
+        var posB = sliceOffset + 2;
+        var stepPos = 3;
+        // RRRR...GGGG...BBBB...
+        if (planarConfig === 1) { 
+            posR = sliceOffset;
+            posG = sliceOffset + sliceSize;
+            posB = sliceOffset + 2 * sliceSize;
+            stepPos = 1;
+        }
         
-        case "RGB":
-            // the planar configuration defines the memory layout
-            if( planarConfig !== 0 && planarConfig !== 1 ) {
-                throw new Error("Unsupported planar configuration: "+planarConfig);
-            }
-            sliceSize = image.getSize().getSliceSize();
-            sliceOffset = (sliceNumber || 0) * 3 * sliceSize;
-            // default: RGBRGBRGBRGB...
-            var posR = sliceOffset;
-            var posG = sliceOffset + 1;
-            var posB = sliceOffset + 2;
-            var stepPos = 3;
-            // RRRR...GGGG...BBBB...
-            if (planarConfig === 1) { 
-                posR = sliceOffset;
-                posG = sliceOffset + sliceSize;
-                posB = sliceOffset + 2 * sliceSize;
-                stepPos = 1;
-            }
+        var redValue = 0;
+        var greenValue = 0;
+        var blueValue = 0;
+        for(var j=0; j < image.getSize().getSliceSize(); ++j)
+        {        
+            redValue = parseInt( windowLut.getValue( 
+                    image.getValueAtOffset(posR) ), 10 );
+            greenValue = parseInt( windowLut.getValue( 
+                    image.getValueAtOffset(posG) ), 10 );
+            blueValue = parseInt( windowLut.getValue( 
+                    image.getValueAtOffset(posB) ), 10 );
             
-            var redValue = 0;
-            var greenValue = 0;
-            var blueValue = 0;
-            for(var j=0; j < image.getSize().getSliceSize(); ++j)
-            {        
-                redValue = parseInt( windowLut.getValue( 
-                        image.getValueAtOffset(posR) ), 10 );
-                greenValue = parseInt( windowLut.getValue( 
-                        image.getValueAtOffset(posG) ), 10 );
-                blueValue = parseInt( windowLut.getValue( 
-                        image.getValueAtOffset(posB) ), 10 );
-                
-                array.data[index] = redValue;
-                array.data[index+1] = greenValue;
-                array.data[index+2] = blueValue;
-                array.data[index+3] = 0xff;
-                index += 4;
-                
-                posR += stepPos;
-                posG += stepPos;
-                posB += stepPos;
-            }
+            array.data[index] = redValue;
+            array.data[index+1] = greenValue;
+            array.data[index+2] = blueValue;
+            array.data[index+3] = 0xff;
+            index += 4;
+            
+            posR += stepPos;
+            posG += stepPos;
+            posB += stepPos;
+        }
         break;
-        
-        default: 
-            throw new Error("Unsupported photometric interpretation: "+photoInterpretation);
+    
+    default: 
+        throw new Error("Unsupported photometric interpretation: "+photoInterpretation);
     }
 };
 

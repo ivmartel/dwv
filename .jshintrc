@@ -1,4 +1,5 @@
 {
   "curly": true,
-  "unused": true  
+  "unused": true,
+  "indent": 4
 }
