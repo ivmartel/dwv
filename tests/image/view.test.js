@@ -9,7 +9,9 @@ test("Test listeners.", function() {
     var imgSize0 = new dwv.image.Size(size0, size0, 1);
     var imgSpacing0 = new dwv.image.Spacing(1, 1, 1);
     var buffer0 = [];
-    for(var i=0; i<size0*size0; ++i) buffer0[i] = i;
+    for(var i=0; i<size0*size0; ++i) {
+        buffer0[i] = i;
+    }
     var image0 = new dwv.image.Image(imgSize0, imgSpacing0, buffer0);
     // create a view
     var view0 = new dwv.image.View(image0);
@@ -39,7 +41,9 @@ test("Test generate data.", function() {
     var imgSize0 = new dwv.image.Size(size0, size0, 1);
     var imgSpacing0 = new dwv.image.Spacing(1, 1, 1);
     var buffer0 = [];
-    for(var i=0; i<size0*size0; ++i) buffer0[i] = i;
+    for(var i=0; i<size0*size0; ++i) {
+        buffer0[i] = i;
+    }
     var image0 = new dwv.image.Image(imgSize0, imgSpacing0, buffer0);
     // create a view
     var view0 = new dwv.image.View(image0);

@@ -71,8 +71,12 @@ dwv.image.filter.Threshold.prototype.update = function()
     var imageMin = app.getImage().getDataRange().min;
     var self = this;
     var threshFunction = function(value){
-        if(value<self.getMin()||value>self.getMax()) return imageMin;
-        else return value;
+        if(value<self.getMin()||value>self.getMax()) {
+            return imageMin;
+        }
+        else {
+            return value;
+        }
     };
     return app.getImage().transform( threshFunction );
 };

@@ -53,7 +53,9 @@ dwv.utils.cleanString = function(string)
 dwv.utils.splitQueryString = function(inputStr)
 {
     // check if query string
-    if( inputStr.indexOf('?') === -1 ) return null;
+    if( inputStr.indexOf('?') === -1 ) {
+        return null;
+    }
     // result
     var result = {};
     // base

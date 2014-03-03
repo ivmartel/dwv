@@ -190,7 +190,9 @@ dwv.App = function()
         // create IO
         var fileIO = new dwv.io.File();
         fileIO.onload = function(data){
-            if( image ) image.appendSlice( data.view.getImage() );
+            if( image ) {
+                image.appendSlice( data.view.getImage() );
+            }
             postLoadInit(data);
         };
         fileIO.onerror = function(error){ handleError(error); };
@@ -220,7 +222,9 @@ dwv.App = function()
         // create IO
         var urlIO = new dwv.io.Url();
         urlIO.onload = function(data){
-            if( image ) image.appendSlice( data.view.getImage() );
+            if( image ) {
+                image.appendSlice( data.view.getImage() );
+            }
             postLoadInit(data);
         };
         urlIO.onerror = function(error){ handleError(error); };
@@ -400,9 +404,17 @@ dwv.App = function()
      */
     function handleError(error)
     {
-        if( error.name && error.message) alert(error.name+": "+error.message+".");
-        else alert("Error: "+error+".");
-        if( error.stack ) console.log(error.stack);
+        // alert window
+        if( error.name && error.message) {
+            alert(error.name+": "+error.message+".");
+        }
+        else {
+            alert("Error: "+error+".");
+        }
+        // log
+        if( error.stack ) {
+            console.log(error.stack);
+        }
     }
     
     /**
@@ -446,9 +458,13 @@ dwv.App = function()
     {
         // HTML node
         var node = document.getElementById("tags");
-        if( node === null ) return;
+        if( node === null ) {
+            return;
+        }
         // tag list table (without the pixel data)
-        if(dataInfo.PixelData) dataInfo.PixelData.value = "...";
+        if(dataInfo.PixelData) {
+            dataInfo.PixelData.value = "...";
+        }
         // remove possible previous
         while (node.hasChildNodes()) { 
             node.removeChild(node.firstChild);
@@ -474,7 +490,9 @@ dwv.App = function()
     function postLoadInit(data)
     {
         // only initialise the first time
-        if( view ) return;
+        if( view ) {
+            return;
+        }
         
         // get the view from the loaded data
         view = data.view;

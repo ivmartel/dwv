@@ -64,7 +64,9 @@ dwv.gui.base.displayProgress = function(percent)
 dwv.gui.refreshSelect = function(selectName)
 {
     // jquery-mobile
-    if( $(selectName).selectmenu ) $(selectName).selectmenu('refresh');
+    if( $(selectName).selectmenu ) {
+        $(selectName).selectmenu('refresh');
+    }
 };
 
 /**
@@ -79,7 +81,9 @@ dwv.gui.setSelected = function(selectName, itemName)
     var select = document.getElementById(selectName);
     var index = 0;
     for( index in select.options){ 
-        if( select.options[index].text === itemName ) break;
+        if( select.options[index].text === itemName ) {
+            break;
+        }
     }
     select.selectedIndex = index;
     dwv.gui.refreshSelect("#" + selectName);

@@ -127,10 +127,11 @@ dwv.image.View = function(image, isSigned)
     this.setColorMap = function(map) { 
         colorMap = map;
         // TODO Better handle this...
-        if( this.getImage().getPhotometricInterpretation() === "MONOCHROME1") 
+        if( this.getImage().getPhotometricInterpretation() === "MONOCHROME1") {
             colorMap = dwv.image.lut.invPlain;
+        }
         this.fireEvent({"type": "colorchange", 
-            "wc": this.getWindowLut().getCenter(),
+           "wc": this.getWindowLut().getCenter(),
            "ww": this.getWindowLut().getWidth() });
     };
     
@@ -153,7 +154,9 @@ dwv.image.View = function(image, isSigned)
      * @param {Object} pos The current position.
      */ 
     this.setCurrentPosition = function(pos) { 
-        if( !image.getSize().isInBounds(pos.i,pos.j,pos.k) ) return false;
+        if( !image.getSize().isInBounds(pos.i,pos.j,pos.k) ) {
+            return false;
+        }
         var oldPosition = currentPosition;
         currentPosition = pos;
         // only display value for monochrome data
@@ -179,7 +182,7 @@ dwv.image.View = function(image, isSigned)
      * View listeners
      * @property listeners
      * @private
-     * @type Array
+     * @type Object
      */
     var listeners = {};
     /**
@@ -360,7 +363,9 @@ dwv.image.View.prototype.generateImageData = function( array )
 dwv.image.View.prototype.addEventListener = function(type, listener)
 {
     var listeners = this.getListeners();
-    if( !listeners[type] ) listeners[type] = [];
+    if( !listeners[type] ) {
+        listeners[type] = [];
+    }
     listeners[type].push(listener);
 };
 
@@ -373,11 +378,14 @@ dwv.image.View.prototype.addEventListener = function(type, listener)
 dwv.image.View.prototype.removeEventListener = function(type, listener)
 {
     var listeners = this.getListeners();
-    if( !listeners[type] ) return;
+    if( !listeners[type] ) {
+        return;
+    }
     for(var i=0; i < listeners[type].length; ++i)
     {   
-        if( listeners[type][i] === listener )
+        if( listeners[type][i] === listener ) {
             listeners[type].splice(i,1);
+        }
     }
 };
 
@@ -389,7 +397,9 @@ dwv.image.View.prototype.removeEventListener = function(type, listener)
 dwv.image.View.prototype.fireEvent = function(event)
 {
     var listeners = this.getListeners();
-    if( !listeners[event.type] ) return;
+    if( !listeners[event.type] ) {
+        return;
+    }
     for(var i=0; i < listeners[event.type].length; ++i)
     {   
         listeners[event.type][i](event);

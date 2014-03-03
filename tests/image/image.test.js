@@ -9,7 +9,9 @@ test("Test Image getValue.", function() {
     var imgSize0 = new dwv.image.Size(size0, size0, 1);
     var imgSpacing0 = new dwv.image.Spacing(1, 1, 1);
     var buffer0 = [];
-    for(var i=0; i<size0*size0; ++i) buffer0[i] = i;
+    for(var i=0; i<size0*size0; ++i) {
+        buffer0[i] = i;
+    }
     var image0 = new dwv.image.Image(imgSize0, imgSpacing0, buffer0);
     // test its values
     equal( image0.getValue(0, 0, 0), 0, "Value at 0,0,0" );
@@ -45,12 +47,18 @@ test("Test Image append slice.", function() {
     // slice to append
     var sliceSize = new dwv.image.Size(size, size, 1);
     var sliceBuffer = new Int16Array(sliceSize.getTotalSize());
-    for(var i=0; i<size*size; ++i) sliceBuffer[i] = 2;
+    for(var i=0; i<size*size; ++i) {
+        sliceBuffer[i] = 2;
+    }
 
     // image buffer
     var buffer = new Int16Array(imgSize.getTotalSize());
-    for(var j=0; j<size*size; ++j) buffer[j] = 0;
-    for(var k=size*size; k<2*size*size; ++k) buffer[k] = 1;
+    for(var j=0; j<size*size; ++j) {
+        buffer[j] = 0;
+    }
+    for(var k=size*size; k<2*size*size; ++k) {
+        buffer[k] = 1;
+    }
     
     // image 0
     var image0 = new dwv.image.Image(imgSize, imgSpacing, buffer, [[0,0,0],[0,0,1]]);

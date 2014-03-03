@@ -106,17 +106,24 @@ dwv.tool.ZoomAndPan = function(app)
            // difference  to last position
            var diffY = event._y - self.y0;
            // do not trigger for small moves
-           if( Math.abs(diffY) < 15 ) return;
+           if( Math.abs(diffY) < 15 ) {
+               return;
+           }
            // update GUI
-           if( diffY > 0 ) app.getView().incrementSliceNb();
-           else app.getView().decrementSliceNb();
+           if( diffY > 0 ) {
+               app.getView().incrementSliceNb();
+           }
+           else {
+               app.getView().decrementSliceNb();
+           }
        }
        else
        {
            // zoom mode
            var zoom = (lineRatio - 1) / 2;
-           if( Math.abs(zoom) % 0.1 <= 0.05 )
+           if( Math.abs(zoom) % 0.1 <= 0.05 ) {
                zoomLayers(zoom, self.midPoint.getX(), self.midPoint.getY());
+           }
        }
     };
     
@@ -238,10 +245,12 @@ dwv.tool.ZoomAndPan = function(app)
      */ 
     function zoomLayers(step, cx, cy)
     {
-        if( app.getImageLayer() ) 
+        if( app.getImageLayer() ) {
             app.getImageLayer().zoom(step, step, cx, cy);
-        if( app.getDrawLayer() ) 
+        }
+        if( app.getDrawLayer() ) { 
             app.getDrawLayer().zoom(step, step, cx, cy);
+        }
     }
 
     /**
@@ -252,10 +261,12 @@ dwv.tool.ZoomAndPan = function(app)
      */ 
     function translateLayers(tx, ty)
     {
-        if( app.getImageLayer() ) 
+        if( app.getImageLayer() ) {
             app.getImageLayer().translate(tx, ty);
-        if( app.getDrawLayer() ) 
+        }
+        if( app.getDrawLayer() ) { 
             app.getDrawLayer().translate(tx, ty);
+        }
     }
 
 }; // ZoomAndPan class

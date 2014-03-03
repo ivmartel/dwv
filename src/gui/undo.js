@@ -32,7 +32,9 @@ dwv.gui.base.appendUndoHtml = function()
     // node
     var node = document.getElementById("history");
     // clear it
-    while(node.hasChildNodes()) node.removeChild(node.firstChild);
+    while(node.hasChildNodes()) {
+        node.removeChild(node.firstChild);
+    }
     // append
     node.appendChild(paragraph);
 };

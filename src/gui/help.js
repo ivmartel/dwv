@@ -32,7 +32,9 @@ dwv.gui.base.appendVersionHtml = function()
 dwv.gui.base.appendHelpHtml = function(mobile)
 {
     var actionType = "mouse";
-    if( mobile ) actionType = "touch";
+    if( mobile ) {
+        actionType = "touch";
+    }
     
     var toolHelpDiv = document.createElement("div");
     

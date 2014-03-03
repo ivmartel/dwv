@@ -23,7 +23,9 @@ dwv.dicom.DataReader = function(buffer, isLittleEndian)
      */
     var view = new DataView(buffer);
     // Set endian flag if not defined.
-    if(typeof(isLittleEndian)==='undefined') isLittleEndian = true;
+    if(typeof(isLittleEndian)==='undefined') {
+        isLittleEndian = true;
+    }
     
     /**
      * Read Uint8 (1 byte) data.
@@ -69,17 +71,22 @@ dwv.dicom.DataReader = function(buffer, isLittleEndian)
      * @return {Number} The read data.
      */
     this.readNumber = function(byteOffset, nBytes) {
-        if( nBytes === 1 )
+        if( nBytes === 1 ) {
             return this.readUint8(byteOffset, isLittleEndian);
-        else if( nBytes === 2 )
+        }
+        else if( nBytes === 2 ) {
             return this.readUint16(byteOffset, isLittleEndian);
-        else if( nBytes === 4 )
+        }
+        else if( nBytes === 4 ) {
             return this.readUint32(byteOffset, isLittleEndian);
-        else if( nBytes === 8 )
+        }
+        else if( nBytes === 8 ) {
             return this.readFloat32(byteOffset, isLittleEndian);
-        else 
+        }
+        else { 
             console.log("Non number: '"+this.readString(byteOffset, nBytes)+"'");
             throw new Error("Unsupported number size.");
+        }
     };
     /**
      * Read Uint8 array.
@@ -603,17 +610,19 @@ dwv.dicom.DicomParser.prototype.createImage = function()
         // copy
         for( var i=0; i<this.pixelBuffer.length; ++i ) {
             buffer[i] = this.pixelBuffer[i];
-            if( shift && buffer[i] >= Math.pow(2, 15) ) 
+            if( shift && buffer[i] >= Math.pow(2, 15) ) {
                 buffer[i] -= Math.pow(2, 16);
+            }
         }
     }
     
     // slice position
     var slicePosition = new Array(0,0,0);
-    if( this.dicomElements.ImagePositionPatient )
+    if( this.dicomElements.ImagePositionPatient ) {
         slicePosition = [ parseFloat(this.dicomElements.ImagePositionPatient.value[0]),
             parseFloat(this.dicomElements.ImagePositionPatient.value[1]),
             parseFloat(this.dicomElements.ImagePositionPatient.value[2]) ];
+    }
     
     // image
     var image = new dwv.image.Image( size, spacing, buffer, [slicePosition] );
@@ -621,13 +630,17 @@ dwv.dicom.DicomParser.prototype.createImage = function()
     if( this.dicomElements.PhotometricInterpretation ) {
         var photo = dwv.utils.cleanString(
             this.dicomElements.PhotometricInterpretation.value[0]).toUpperCase();
-        if( jpeg2000 && photo.match(/YBR/) ) photo = "RGB";
+        if( jpeg2000 && photo.match(/YBR/) ) {
+            photo = "RGB";
+        }
         image.setPhotometricInterpretation( photo );
     }        
     // planarConfiguration
     if( this.dicomElements.PlanarConfiguration ) {
         var planar = this.dicomElements.PlanarConfiguration.value[0];
-        if( jpeg2000 ) planar = 1;
+        if( jpeg2000 ) {
+            planar = 1;
+        }
         image.setPlanarConfiguration( planar );
     }        
     // rescale slope
@@ -671,7 +684,9 @@ dwv.dicom.DicomParser.prototype.createImage = function()
                 if( this.dicomElements.WindowCenterWidthExplanation ) {
                     name = this.dicomElements.WindowCenterWidthExplanation.value[j];
                 }
-                else name = "Default"+j;
+                else {
+                    name = "Default"+j;
+                }
                 windowPresets.push({
                     "center": parseFloat( this.dicomElements.WindowCenter.value[j], 10 ),
                     "width": width, 
@@ -680,8 +695,12 @@ dwv.dicom.DicomParser.prototype.createImage = function()
             }
         }
     }
-    if( windowPresets.length !== 0 ) view.setWindowPresets( windowPresets );
-    else view.setWindowLevelMinMax();
+    if( windowPresets.length !== 0 ) {
+        view.setWindowPresets( windowPresets );
+    }
+    else {
+        view.setWindowLevelMinMax();
+    }
 
     return view;
 };

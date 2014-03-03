@@ -81,9 +81,15 @@ dwv.io.Url.prototype.load = function(ioArray)
             }
             // image type
             var imageType = "unknown";
-            if(isJpeg) imageType = "jpeg";
-            else if(isPng) imageType = "png";
-            else if(isGif) imageType = "gif";
+            if(isJpeg) {
+                imageType = "jpeg";
+            }
+            else if(isPng) {
+                imageType = "png";
+            }
+            else if(isGif) {
+                imageType = "gif";
+            }
             // temporary image object
             var tmpImage = new Image();
             tmpImage.src = "data:image/" + imageType + ";base64," + window.btoa(imageDataStr);

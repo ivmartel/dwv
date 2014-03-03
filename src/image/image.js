@@ -79,7 +79,9 @@ dwv.image.Size.prototype.equals = function(rhs) {
 dwv.image.Size.prototype.isInBounds = function( i, j, k ) {
     if( i < 0 || i > this.getNumberOfColumns() - 1 ||
         j < 0 || j > this.getNumberOfRows() - 1 ||
-        k < 0 || k > this.getNumberOfSlices() - 1 ) return false;
+        k < 0 || k > this.getNumberOfSlices() - 1 ) {
+        return false;
+    }
     return true;
 };
 
@@ -196,7 +198,9 @@ dwv.image.Image = function(size, spacing, buffer, slicePositions)
     var originalBuffer = new Int16Array(buffer);
     
     // check slice positions.
-    if( typeof(slicePositions) === 'undefined' ) slicePositions = [[0,0,0]];
+    if( typeof(slicePositions) === 'undefined' ) {
+        slicePositions = [[0,0,0]];
+    }
     
     /**
      * Data range.
@@ -340,20 +344,26 @@ dwv.image.Image = function(size, spacing, buffer, slicePositions)
     this.appendSlice = function(rhs)
     {
         // check input
-        if( rhs === null )
+        if( rhs === null ) {
             throw new Error("Cannot append null slice");
-        if( rhs.getSize().getNumberOfSlices() !== 1 )
+        }
+        if( rhs.getSize().getNumberOfSlices() !== 1 ) {
             throw new Error("Cannot append more than one slice");
-        if( size.getNumberOfColumns() !== rhs.getSize().getNumberOfColumns() )
+        }
+        if( size.getNumberOfColumns() !== rhs.getSize().getNumberOfColumns() ) {
             throw new Error("Cannot append a slice with different number of columns");
-        if( size.getNumberOfRows() !== rhs.getSize().getNumberOfRows() )
+        }
+        if( size.getNumberOfRows() !== rhs.getSize().getNumberOfRows() ) {
             throw new Error("Cannot append a slice with different number of rows");
-        if( photometricInterpretation !== rhs.getPhotometricInterpretation() )
+        }
+        if( photometricInterpretation !== rhs.getPhotometricInterpretation() ) {
             throw new Error("Cannot append a slice with different photometric interpretation");
+        }
         // all meta should be equal
         for( var key in meta ) {
-            if( meta[key] !== rhs.getMeta()[key] )
+            if( meta[key] !== rhs.getMeta()[key] ) {
                 throw new Error("Cannot append a slice with different "+key);
+            }
         }
         
         // find index where to append slice
@@ -380,7 +390,9 @@ dwv.image.Image = function(size, spacing, buffer, slicePositions)
         
         // calculate slice size
         var mul = 1;
-        if( photometricInterpretation === "RGB" ) mul = 3;
+        if( photometricInterpretation === "RGB" ) {
+            mul = 3;
+        }
         var sliceSize = mul * size.getSliceSize();
         
         // create the new buffer
@@ -420,7 +432,9 @@ dwv.image.Image = function(size, spacing, buffer, slicePositions)
      * @return {Object} The data range.
      */ 
     this.getDataRange = function() { 
-        if( !dataRange ) dataRange = this.calculateDataRange();
+        if( !dataRange ) {
+            dataRange = this.calculateDataRange();
+        }
         return dataRange;
     };
 
@@ -430,7 +444,9 @@ dwv.image.Image = function(size, spacing, buffer, slicePositions)
      * @return {Array} The histogram.
      */ 
     this.getHistogram = function() { 
-        if( !histogram ) histogram = this.calculateHistogram();
+        if( !histogram ) {
+            histogram = this.calculateHistogram();
+        }
         return histogram;
     };
 };
@@ -545,8 +561,9 @@ dwv.image.Image.prototype.calculateHistogram = function()
  */
 dwv.image.Image.prototype.convolute2D = function(weights)
 {
-    if(weights.length !== 9)
+    if(weights.length !== 9) {
         throw new Error("The convolution matrix does not have a length of 9; it has "+weights.length);
+    }
 
     var newImage = this.clone();
     var newBuffer = newImage.getBuffer();
@@ -637,14 +654,30 @@ dwv.image.Image.prototype.convolute2D = function(weights)
                 for (var i=0; i<ncols; i++) {
                     wOffFinal = wOff;
                     // special border cases
-                    if( i === 0 && j === 0 ) wOffFinal = wOff00;
-                    else if( i === 0 && j === nrows ) wOffFinal = wOff0n;
-                    else if( i === ncols && j === 0 ) wOffFinal = wOffn0;
-                    else if( i === ncols && j === nrows ) wOffFinal = wOffnn;
-                    else if( i === 0 && j !== nrows && j !== 0 ) wOffFinal = wOff0x;
-                    else if( i === ncols && j !== nrows && j !== 0 ) wOffFinal = wOffnx;
-                    else if( i !== 0 && i !== ncols && j === 0 ) wOffFinal = wOffx0;
-                    else if( i !== 0 && i !== ncols && j === nrows ) wOffFinal = wOffxn;
+                    if( i === 0 && j === 0 ) {
+                        wOffFinal = wOff00;
+                    }
+                    else if( i === 0 && j === nrows ) {
+                        wOffFinal = wOff0n;
+                    }
+                    else if( i === ncols && j === 0 ) {
+                        wOffFinal = wOffn0;
+                    }
+                    else if( i === ncols && j === nrows ) {
+                        wOffFinal = wOffnn;
+                    }
+                    else if( i === 0 && j !== nrows && j !== 0 ) {
+                        wOffFinal = wOff0x;
+                    }
+                    else if( i === ncols && j !== nrows && j !== 0 ) {
+                        wOffFinal = wOffnx;
+                    }
+                    else if( i !== 0 && i !== ncols && j === 0 ) {
+                        wOffFinal = wOffx0;
+                    }
+                    else if( i !== 0 && i !== ncols && j === nrows ) {
+                        wOffFinal = wOffxn;
+                    }
                         
                     // calculate the weighed sum of the source image pixels that
                     // fall under the convolution matrix

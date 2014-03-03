@@ -43,8 +43,9 @@ dwv.tool.updateWindowingData = function(wc,ww)
 dwv.tool.updateWindowingDataFromName = function(name)
 {
     // check if we have it
-    if( !dwv.tool.presets[name] )
+    if( !dwv.tool.presets[name] ) {
         throw new Error("Unknown window level preset: '" + name + "'");
+    }
     // enable it
     dwv.tool.updateWindowingData( 
         dwv.tool.presets[name].center, 
@@ -70,8 +71,9 @@ dwv.tool.updateColourMap = function(colourMap)
 dwv.tool.updateColourMapFromName = function(name)
 {
     // check if we have it
-    if( !dwv.tool.colourMaps[name] )
+    if( !dwv.tool.colourMaps[name] ) {
         throw new Error("Unknown colour map: '" + name + "'");
+    }
     // enable it
     dwv.tool.updateColourMap( dwv.tool.colourMaps[name] );
 };
@@ -192,7 +194,9 @@ dwv.tool.WindowLevel = function(app)
      */
     this.mousemove = function(event){
         // check start flag
-        if( !self.started ) return;
+        if( !self.started ) {
+            return;
+        }
         // difference to last position
         var diffX = event._x - self.x0;
         var diffY = self.y0 - event._y;
@@ -291,11 +295,12 @@ dwv.tool.WindowLevel = function(app)
      * @param {Boolean} bool The flag to enable or not.
      */
     this.display = function(bool){
-        if( app.getImage().getPhotometricInterpretation().match(/MONOCHROME/) !== null )
-        {
+        if( app.getImage().getPhotometricInterpretation().match(/MONOCHROME/) !== null ) {
             dwv.gui.displayWindowLevelHtml(bool);
         }
-        else dwv.gui.displayWindowLevelHtml(false);
+        else {
+            dwv.gui.displayWindowLevelHtml(false);
+        }
     };
     
     /**

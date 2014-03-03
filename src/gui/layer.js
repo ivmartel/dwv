@@ -105,7 +105,9 @@ dwv.html.Layer = function(name)
         var newZoomY = zoomY + stepY;
         // check zoom value
         if( newZoomX <= 0.1 || newZoomX >= 10 ||
-            newZoomY <= 0.1 || newZoomY >= 10 ) return;
+            newZoomY <= 0.1 || newZoomY >= 10 ) {
+            return;
+        }
         // The zoom is the ratio between the differences from the center
         // to the origins:
         // centerX - originX = ( centerX - originX0 ) * zoomX
@@ -144,17 +146,25 @@ dwv.html.Layer = function(name)
         // check translate value
         if( zoomX >= 1 ) { 
             if( (originX + tx) < -1 * (canvas.width * zoomX) + canvas.width ||
-                (originX + tx) > 0 ) return;
+                (originX + tx) > 0 ) {
+                return;
+            }
         } else {
             if( (originX + tx) > -1 * (canvas.width * zoomX) + canvas.width ||
-                (originX + tx) < 0 ) return;
+                (originX + tx) < 0 ) {
+                return;
+            }
         }
         if( zoomY >= 1 ) { 
             if( (originY + ty) < -1 * (canvas.height * zoomY) + canvas.height ||
-                (originY + ty) > 0 ) return;
+                (originY + ty) > 0 ) {
+                return;
+            }
         } else {
             if( (originY + ty) > -1 * (canvas.height * zoomY) + canvas.height ||
-                (originY + ty) < 0 ) return;
+                (originY + ty) < 0 ) {
+                return;
+            }
         }
         // new origin
         originX += tx;
@@ -351,8 +361,12 @@ dwv.html.Layer = function(name)
      */
     this.isVisible = function()
     {
-      if( canvas.style.display === "none" ) return false;
-      else return true;
+      if( canvas.style.display === "none" ) {
+          return false;
+      }
+      else {
+          return true;
+      }
     };
     
     /**

@@ -26,7 +26,9 @@ dwv.gui.base.appendLoadboxHtml = function()
     // node
     var node = document.getElementById("loaderlist");
     // clear it
-    while(node.hasChildNodes()) node.removeChild(node.firstChild);
+    while(node.hasChildNodes()) {
+        node.removeChild(node.firstChild);
+    }
     // append
     node.appendChild(loaderSelector);
     // trigger create event (mobile)

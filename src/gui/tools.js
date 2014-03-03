@@ -33,7 +33,9 @@ dwv.gui.base.appendToolboxHtml = function()
     // node
     var node = document.getElementById("toolList");
     // clear it
-    while(node.hasChildNodes()) node.removeChild(node.firstChild);
+    while(node.hasChildNodes()) {
+        node.removeChild(node.firstChild);
+    }
     // append
     node.appendChild(toolLi);
     // trigger create event (mobile)

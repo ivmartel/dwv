@@ -35,7 +35,9 @@ dwv.html.appendHCell = function(row, text)
 {
     var cell = document.createElement("th");
     // TODO jquery-mobile specific...
-    if( text !== "Value" && text !== "Name" ) cell.setAttribute("data-priority", "1");
+    if( text !== "Value" && text !== "Name" ) {
+        cell.setAttribute("data-priority", "1");
+    }
     cell.appendChild(document.createTextNode(text));
     row.appendChild(cell);
 };
@@ -325,7 +327,9 @@ dwv.html.removeNode = function(nodeId) {
     // find the node
     var node = document.getElementById(nodeId);
     // check node
-    if( !node ) return;
+    if( !node ) {
+        return;
+    }
     // remove its children
     dwv.html.cleanNode(node);
     // remove it from its parent
@@ -393,17 +397,22 @@ dwv.html.getUriParam = function(uri)
     // split key/value pairs
     var mainQueryPairs = dwv.utils.splitQueryString(inputUri);
     // check pairs
-    if( mainQueryPairs === null ) return null;
+    if( mainQueryPairs === null ) {
+        return null;
+    }
     // has to have an input key
-    if( !mainQueryPairs.query || !mainQueryPairs.query.input ) 
+    if( !mainQueryPairs.query || !mainQueryPairs.query.input ) { 
         throw new Error("No input parameter in query URI.");
+    }
     // decode input URI
     var queryUri = decodeURIComponent(mainQueryPairs.query.input);
     // get key/value pairs from input URI
     var inputQueryPairs = dwv.utils.splitQueryString(queryUri);
     // repeat key replace mode (default to keep key)
     var repeatKeyReplaceMode = "key";
-    if( mainQueryPairs.query.dwvReplaceMode ) repeatKeyReplaceMode = mainQueryPairs.query.dwvReplaceMode;
+    if( mainQueryPairs.query.dwvReplaceMode ) {
+        repeatKeyReplaceMode = mainQueryPairs.query.dwvReplaceMode;
+    }
     
     if( !inputQueryPairs ) 
     {
@@ -434,13 +443,16 @@ dwv.html.getUriParam = function(uri)
             var baseUrl = inputQueryPairs.base;
             // do not add '?' for what looks like file elements
             // root/path/to/?key=0.jpg&key=1.jpg
-            if( !( baseUrl[baseUrl.length-1] === '/' && repeatList[0].indexOf('.') !== -1 ) ) 
+            if( !( baseUrl[baseUrl.length-1] === '/' && repeatList[0].indexOf('.') !== -1 ) ) { 
                 baseUrl += "?";
+            }
             var gotOneArg = false;
             for( var j = 0; j < keys.length; ++j )
             {
                 if( keys[j] !== repeatKey ) {
-                    if( gotOneArg ) baseUrl += "&";
+                    if( gotOneArg ) {
+                        baseUrl += "&";
+                    }
                     baseUrl += keys[j] + "=" + inputQueryPairs.query[keys[j]];
                     gotOneArg = true;
                 }
@@ -450,8 +462,12 @@ dwv.html.getUriParam = function(uri)
             for( var k = 0; k < repeatList.length; ++k )
             {
                 url = baseUrl;
-                if( gotOneArg ) url += "&";
-                if( repeatKeyReplaceMode === "key" ) url += repeatKey + "=";
+                if( gotOneArg ) {
+                    url += "&";
+                }
+                if( repeatKeyReplaceMode === "key" ) {
+                    url += repeatKey + "=";
+                }
                 // other than 'key' mode: do nothing
                 url += repeatList[k];
                 result.push(url);
@@ -465,7 +481,9 @@ dwv.html.getUriParam = function(uri)
 dwv.html.displayElement = function(id,bool)
 {
     var element = document.getElementById(id);
-    if( element ) element.style.display = bool ? "" : "none";
+    if( element ) {
+        element.style.display = bool ? "" : "none";
+    }
 };
 
 /**
@@ -479,7 +497,11 @@ dwv.html.toggleDisplay = function(id)
     if( document.getElementById(id) )
     {
         var div = document.getElementById(id);
-        if( div.style.display === "none" ) div.style.display = '';
-        else div.style.display = "none";
+        if( div.style.display === "none" ) {
+            div.style.display = '';
+        }
+        else {
+            div.style.display = "none";
+        }
     }
 };

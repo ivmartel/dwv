@@ -52,15 +52,23 @@ dwv.tool.Scroll = function(app)
       * @param {Object} event The mouse move event.
       */
      this.mousemove = function(event){
-        if (!self.started) return;
+        if (!self.started) {
+            return;
+        }
 
         // difference to last position
         var diffY = event._y - self.y0;
         // do not trigger for small moves
-        if( Math.abs(diffY) < 15 ) return;
+        if( Math.abs(diffY) < 15 ) {
+            return;
+        }
         // update GUI
-        if( diffY > 0 ) app.getView().incrementSliceNb();
-        else app.getView().decrementSliceNb();
+        if( diffY > 0 ) {
+            app.getView().incrementSliceNb();
+        }
+        else {
+            app.getView().decrementSliceNb();
+        }
         // reset origin point
         self.x0 = event._x;
         self.y0 = event._y;

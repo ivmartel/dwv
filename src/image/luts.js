@@ -25,9 +25,13 @@ dwv.image.lut.Rescale = function(slope_,intercept_)
     var rescaleLut_ = null;
     
     // Check the rescale slope.
-    if(typeof(slope_) === 'undefined') slope_ = 1;
+    if(typeof(slope_) === 'undefined') {
+        slope_ = 1;
+    }
     // Check the rescale intercept.
-    if(typeof(intercept_) === 'undefined') intercept_ = 0;
+    if(typeof(intercept_) === 'undefined') {
+        intercept_ = 0;
+    }
     
     /**
      * Get the rescale slope.
@@ -52,8 +56,9 @@ dwv.image.lut.Rescale = function(slope_,intercept_)
     {
         var size = Math.pow(2, bitsStored);
         rescaleLut_ = new Float32Array(size);
-        for(var i=0; i<size; ++i)
+        for(var i=0; i<size; ++i) {
             rescaleLut_[i] = i * slope_ + intercept_;
+        }
     };
     
     /**
@@ -91,11 +96,12 @@ dwv.image.lut.Window = function(rescaleLut_, isSigned_)
     var windowLut_ = null;
     
     // check Uint8ClampedArray support
-    if( !dwv.browser.hasClampedArray() )
-    {
+    if( !dwv.browser.hasClampedArray() ) {
         windowLut_ = new Uint8Array(rescaleLut_.getLength());
     }
-    else windowLut_ = new Uint8ClampedArray(rescaleLut_.getLength());
+    else {
+        windowLut_ = new Uint8ClampedArray(rescaleLut_.getLength());
+    }
     
     /**
      * The window center.
@@ -216,8 +222,9 @@ dwv.image.lut.range_max = 256;
 dwv.image.lut.buildLut = function(func)
 {
     var lut = [];
-    for( var i=0; i<dwv.image.lut.range_max; ++i )
+    for( var i=0; i<dwv.image.lut.range_max; ++i ) {
         lut.push(func(i));
+    }
     return lut;
 };
 
@@ -228,31 +235,35 @@ dwv.image.lut.max = function(i)
 
 dwv.image.lut.maxFirstThird = function(i)
 {
-    if( i < dwv.image.lut.range_max/3 )
+    if( i < dwv.image.lut.range_max/3 ) {
         return dwv.image.lut.range_max-1;
+    }
     return 0;
 };
 
 dwv.image.lut.maxSecondThird = function(i)
 {
     var third = dwv.image.lut.range_max/3;
-    if( i >= third && i < 2*third )
+    if( i >= third && i < 2*third ) {
         return dwv.image.lut.range_max-1;
+    }
     return 0;
 };
 
 dwv.image.lut.maxThirdThird = function(i)
 {
-    if( i >= 2*dwv.image.lut.range_max/3 )
+    if( i >= 2*dwv.image.lut.range_max/3 ) {
         return dwv.image.lut.range_max-1;
+    }
     return 0;
 };
 
 dwv.image.lut.toMaxFirstThird = function(i)
 {
     var val = i * 3;
-    if( val > dwv.image.lut.range_max-1 )
+    if( val > dwv.image.lut.range_max-1 ) {
         return dwv.image.lut.range_max-1;
+    }
     return val;
 };
 
@@ -262,8 +273,9 @@ dwv.image.lut.toMaxSecondThird = function(i)
     var val = 0;
     if( i >= third ) {
         val = (i-third) * 3;
-        if( val > dwv.image.lut.range_max-1 )
+        if( val > dwv.image.lut.range_max-1 ) {
             return dwv.image.lut.range_max-1;
+        }
     }
     return val;
 };
@@ -274,8 +286,9 @@ dwv.image.lut.toMaxThirdThird = function(i)
     var val = 0;
     if( i >= 2*third ) {
         val = (i-2*third) * 3;
-        if( val > dwv.image.lut.range_max-1 )
+        if( val > dwv.image.lut.range_max-1 ) {
             return dwv.image.lut.range_max-1;
+        }
     }
     return val;
 };
