@@ -132,7 +132,7 @@ dwv.tool.ZoomAndPan = function(app)
      * @method mouseup
      * @param {Object} event The mouse up event.
      */
-    this.mouseup = function(event){
+    this.mouseup = function(/*event*/){
         if (self.started)
         {
             // stop recording

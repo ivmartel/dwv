@@ -14,7 +14,7 @@ dwv.tool = dwv.tool || {};
  * @constructor
  * @param {Object} app The associated application.
  */
-dwv.tool.ToolBox = function(app)
+dwv.tool.ToolBox = function(/*app*/)
 {
     /**
      * Selected tool.

@@ -213,7 +213,7 @@ dwv.tool.Livewire = function(app)
      * @method mouseup
      * @param {Object} event The mouse up event.
      */
-    this.mouseup = function(event){
+    this.mouseup = function(/*event*/){
         // nothing to do
     };
     

@@ -228,7 +228,7 @@ dwv.image.lut.buildLut = function(func)
     return lut;
 };
 
-dwv.image.lut.max = function(i)
+dwv.image.lut.max = function(/*i*/)
 {
     return dwv.image.lut.range_max-1;
 };
@@ -293,7 +293,7 @@ dwv.image.lut.toMaxThirdThird = function(i)
     return val;
 };
 
-dwv.image.lut.zero = function(i)
+dwv.image.lut.zero = function(/*i*/)
 {
     return 0;
 };

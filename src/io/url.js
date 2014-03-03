@@ -29,7 +29,7 @@ dwv.io.Url.prototype.load = function(ioArray)
     var onerror = this.onerror;
     
     // Request error
-    var onErrorRequest = function(event)
+    var onErrorRequest = function(/*event*/)
     {
         onerror( {'name': "RequestError", 
             'message': "An error occurred while retrieving the file: (http) "+this.status } );
@@ -49,7 +49,7 @@ dwv.io.Url.prototype.load = function(ioArray)
     };
 
     // Image request loader
-    var onLoadImageRequest = function(event)
+    var onLoadImageRequest = function(/*event*/)
     {
         // parse image data
         try {
@@ -62,7 +62,7 @@ dwv.io.Url.prototype.load = function(ioArray)
     };
 
     // Request handler
-    var onLoadRequest = function(event)
+    var onLoadRequest = function(/*event*/)
     {
         // find the image type
         var view = new DataView(this.response);

@@ -64,7 +64,7 @@ dwv.gui.appendWindowLevelHtml = function(){
     
     $("#toolfieldset").trigger("create");
 };
-dwv.gui.displayWindowLevelHtml = function(bool){
+dwv.gui.displayWindowLevelHtml = function(/*bool*/){
     //dwv.gui.base.displayWindowLevelHtml(bool);
 };
 dwv.gui.initWindowLevelHtml = function(){
@@ -111,7 +111,7 @@ dwv.gui.appendZoomAndPanHtml = function(){
     
     $("#toolfieldset").trigger("create");
 };
-dwv.gui.displayZoomAndPanHtml = function(bool){
+dwv.gui.displayZoomAndPanHtml = function(/*bool*/){
     //dwv.gui.base.displayZoomHtml(bool);
 };
 
@@ -134,7 +134,7 @@ dwv.gui.appendScrollHtml = function(){
 
     $("#toolfieldset").trigger("create");
 };
-dwv.gui.displayScrollHtml = function(bool){
+dwv.gui.displayScrollHtml = function(/*bool*/){
     //dwv.gui.base.displayScrollHtml(bool);
 };
 

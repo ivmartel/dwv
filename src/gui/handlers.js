@@ -18,7 +18,7 @@ dwv.gui = dwv.gui || {};
  * @static
  * @param {Object} event The change event.
  */
-dwv.gui.onChangeWindowLevelPreset = function(event)
+dwv.gui.onChangeWindowLevelPreset = function(/*event*/)
 {
     dwv.tool.updateWindowingDataFromName(this.value);
 };
@@ -29,7 +29,7 @@ dwv.gui.onChangeWindowLevelPreset = function(event)
  * @static
  * @param {Object} event The change event.
  */
-dwv.gui.onChangeColourMap = function(event)
+dwv.gui.onChangeColourMap = function(/*event*/)
 {
     dwv.tool.updateColourMapFromName(this.value);
 };
@@ -40,7 +40,7 @@ dwv.gui.onChangeColourMap = function(event)
  * @static
  * @param {Object} event The change event.
  */
-dwv.gui.onChangeLoader = function(event)
+dwv.gui.onChangeLoader = function(/*event*/)
 {
     if( this.value === "file") {
         dwv.gui.displayUrlLoadHtml(false);
@@ -80,7 +80,7 @@ dwv.gui.onChangeURL = function(event)
  * @static
  * @param {Object} event The change event.
  */
-dwv.gui.onChangeTool = function(event)
+dwv.gui.onChangeTool = function(/*event*/)
 {
     app.getToolBox().setSelectedTool(this.value);
 };
@@ -91,7 +91,7 @@ dwv.gui.onChangeTool = function(event)
  * @static
  * @param {Object} event The change event.
  */
-dwv.gui.onChangeFilter = function(event)
+dwv.gui.onChangeFilter = function(/*event*/)
 {
     app.getToolBox().getSelectedTool().setSelectedFilter(this.value);
 };
@@ -102,7 +102,7 @@ dwv.gui.onChangeFilter = function(event)
  * @static
  * @param {Object} event The run event.
  */
-dwv.gui.onRunFilter = function(event)
+dwv.gui.onRunFilter = function(/*event*/)
 {
     app.getToolBox().getSelectedTool().getSelectedFilter().run();
 };
@@ -128,7 +128,7 @@ dwv.gui.onChangeMinMax = function(range)
  * @static
  * @param {Object} event The change event.
  */
-dwv.gui.onChangeShape = function(event)
+dwv.gui.onChangeShape = function(/*event*/)
 {
     app.getToolBox().getSelectedTool().setShapeName(this.value);
 };
@@ -139,7 +139,7 @@ dwv.gui.onChangeShape = function(event)
  * @static
  * @param {Object} event The change event.
  */
-dwv.gui.onChangeLineColour = function(event)
+dwv.gui.onChangeLineColour = function(/*event*/)
 {
     app.getToolBox().getSelectedTool().setLineColour(this.value);
 };
@@ -150,7 +150,7 @@ dwv.gui.onChangeLineColour = function(event)
  * @static
  * @param {Object} event The change event.
  */
-dwv.gui.onZoomReset = function(event)
+dwv.gui.onZoomReset = function(/*event*/)
 {
     app.getImageLayer().resetLayout();
     app.getImageLayer().draw();
@@ -182,7 +182,7 @@ dwv.gui.onDisplayReset = function(event)
  * @static
  * @param {Object} event The associated event.
  */
-dwv.gui.onUndo = function(event)
+dwv.gui.onUndo = function(/*event*/)
 {
     app.getUndoStack().undo();
 };
@@ -193,7 +193,7 @@ dwv.gui.onUndo = function(event)
  * @static
  * @param {Object} event The associated event.
  */
-dwv.gui.onRedo = function(event)
+dwv.gui.onRedo = function(/*event*/)
 {
     app.getUndoStack().redo();
 };
@@ -204,7 +204,7 @@ dwv.gui.onRedo = function(event)
  * @static
  * @param {Object} event The associated event.
  */
-dwv.gui.onToggleInfoLayer = function(event)
+dwv.gui.onToggleInfoLayer = function(/*event*/)
 {
     app.toggleInfoLayerDisplay();
 };

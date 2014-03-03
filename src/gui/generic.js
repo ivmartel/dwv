@@ -126,7 +126,7 @@ dwv.gui.base.appendSliderHtml = function()
     document.getElementById("thresholdLi").appendChild(div);
     // bind change
     $("#threshold-div").on("change",
-            function( event ) {
+            function(/*event*/) {
                 dwv.gui.onChangeMinMax(
                     { "min":$("#threshold-min").val(),
                       "max":$("#threshold-max").val() } );

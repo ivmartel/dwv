@@ -1,3 +1,4 @@
 {
-  "curly": true
+  "curly": true,
+  "unused": true  
 }

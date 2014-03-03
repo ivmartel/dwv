@@ -101,7 +101,7 @@ dwv.tool.Draw = function(app)
      * @method mouseup
      * @param {Object} event The mouse up event.
      */
-    this.mouseup = function(event){
+    this.mouseup = function(/*event*/){
         if (started)
         {
             // save command in undo stack

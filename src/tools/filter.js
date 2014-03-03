@@ -12,7 +12,7 @@ dwv.tool = dwv.tool || {};
  * @constructor
  * @param {Object} app The associated application.
  */
-dwv.tool.Filter = function(app)
+dwv.tool.Filter = function(/*app*/)
 {
     /**
      * Selected filter.
@@ -142,7 +142,7 @@ dwv.tool.filter = dwv.tool.filter || {};
  * @constructor
  * @param {Object} app The associated application.
  */
-dwv.tool.filter.Threshold = function(app) {};
+dwv.tool.filter.Threshold = function(/*app*/) {};
 
 /**
  * Enable the filter.
@@ -183,7 +183,7 @@ dwv.tool.filter.Threshold.prototype.run = function(args)
  * @constructor
  * @param {Object} app The associated application.
  */
-dwv.tool.filter.Sharpen = function(app) {};
+dwv.tool.filter.Sharpen = function(/*app*/) {};
 
 /**
  * Enable the filter.
@@ -205,7 +205,7 @@ dwv.tool.filter.Sharpen.prototype.init = function()
  * @method run
  * @param {Mixed} args The filter arguments.
  */
-dwv.tool.filter.Sharpen.prototype.run = function(args)
+dwv.tool.filter.Sharpen.prototype.run = function(/*args*/)
 {
     var filter = new dwv.image.filter.Sharpen();
     var command = new dwv.tool.RunFilterCommand(filter, app);
@@ -221,7 +221,7 @@ dwv.tool.filter.Sharpen.prototype.run = function(args)
  * @constructor
  * @param {Object} app The associated application.
  */
-dwv.tool.filter.Sobel = function(app) {};
+dwv.tool.filter.Sobel = function(/*app*/) {};
 
 /**
  * Enable the filter.
@@ -243,7 +243,7 @@ dwv.tool.filter.Sobel.prototype.init = function()
  * @method run
  * @param {Mixed} args The filter arguments.
  */
-dwv.tool.filter.Sobel.prototype.run = function(args)
+dwv.tool.filter.Sobel.prototype.run = function(/*args*/)
 {
     var filter = new dwv.image.filter.Sobel();
     var command = new dwv.tool.RunFilterCommand(filter, app);
