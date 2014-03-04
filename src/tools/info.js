@@ -131,7 +131,7 @@ dwv.info.updateMiniColorMap = function(event)
     var windowWidth = event.ww;
     
     var canvas = document.getElementById("canvasinfobr");
-    context = canvas.getContext('2d');
+    var context = canvas.getContext('2d');
     
     // fill in the image data
     var colourMap = app.getView().getColorMap();
@@ -148,6 +148,7 @@ dwv.info.updateMiniColorMap = function(event)
     var xMin = windowCenter - 0.5 - (windowWidth-1) / 2;
     var xMax = windowCenter - 0.5 + (windowWidth-1) / 2;    
     
+    var index;
     for( var j=0; j<canvas.height; ++j ) {
         c = minInt;
         for( var i=0; i<canvas.width; ++i ) {

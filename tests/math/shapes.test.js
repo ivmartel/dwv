@@ -1,6 +1,8 @@
 /**
  * Tests for the 'math/shapes.js' file.
  */
+// Do not warn if these variables were not defined before.
+/* global module, test, equal */
 module("shapes");
 
 test("Test Point2D.", function() {

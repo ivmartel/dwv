@@ -1,6 +1,8 @@
 /**
  * Tests for the 'view/view.js' file.
  */
+// Do not warn if these variables were not defined before.
+/* global module, test, equal, ok */
 module("view");
 
 test("Test listeners.", function() {

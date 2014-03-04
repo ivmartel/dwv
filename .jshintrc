@@ -1,5 +1,14 @@
 {
-  "curly": true,
-  "unused": true,
-  "indent": 4
+    "browser": true,
+    "devel": true,
+    "jquery": true,
+    "curly": true,
+    "unused": true,
+    "undef": false, // TODO
+    "globals": {
+        //"dwv": false,
+        //"app": false,
+        "openjpeg": false
+    },
+    "indent": 4
 }

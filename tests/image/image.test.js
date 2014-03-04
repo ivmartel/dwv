@@ -1,6 +1,8 @@
 /**
  * Tests for the 'image/image.js' file.
  */
+// Do not warn if these variables were not defined before.
+/* global module, test, equal, deepEqual */
 module("image");
 
 test("Test Image getValue.", function() {

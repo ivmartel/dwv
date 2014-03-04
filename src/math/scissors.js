@@ -74,7 +74,7 @@ dwv.math.computeGradient = function(greyscale) {
 	// function.
 	var gradient = [];
 
-	max = 0; // Maximum gradient found, for scaling purposes
+	var max = 0; // Maximum gradient found, for scaling purposes
 
 	var x = 0;
 	var y = 0;
@@ -271,7 +271,7 @@ dwv.math.gaussianBlur = function(buffer, out) {
         out[i] = 0.05*buffer[i-2] + 0.25*buffer[i-1] + 0.4*buffer[i] + 0.25*buffer[i+1] + 0.05*buffer[i+2];
     }
 
-    len = buffer.length;
+    var len = buffer.length;
     out[len-2] = 0.25*buffer[len-1] + 0.4*buffer[len-2] + 0.25*buffer[len-3] + 0.1*buffer[len-4];
     out[len-1] = 0.4*buffer[len-1] + 0.5*buffer[len-2] + 0.1*buffer[len-3];
 };

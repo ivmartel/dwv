@@ -1,6 +1,8 @@
 /**
  * Tests for the 'html/html.js' file.
  */
+// Do not warn if these variables were not defined before.
+/* global module, test, equal, ok */
 module("html");
 
 test("Test array to html function.", function() {
