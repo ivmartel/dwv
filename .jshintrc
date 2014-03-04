@@ -1,14 +1,15 @@
 {
-    "browser": true,
-    "devel": true,
-    "jquery": true,
-    "curly": true,
+    "browser": true, // allows to use document, XMLHttpRequest...
+    "devel": true, // allows to use alert, console...
+    "jquery": true, // allows to use $ and jquery
     "unused": true,
-    "undef": false, // TODO
+    "undef": true,
     "globals": {
-        //"dwv": false,
-        //"app": false,
-        "openjpeg": false
+        "dwv": true, // namespace
+        "app": true, // TODO restrict this
+        "openjpeg": false // allows to use openjpeg
     },
+    "curly": true,
+    "newcap": true,
     "indent": 4
 }

@@ -364,7 +364,7 @@ dwv.math.Path.prototype.isControlPoint = function(point) {
         return this.controlPointIndexArray.indexOf(index) !== -1;
     }
     else {
-        throw Error("Error: isControlPoint called with not in list point.");
+        throw new Error("Error: isControlPoint called with not in list point.");
     }
 };
 
@@ -397,7 +397,7 @@ dwv.math.Path.prototype.addControlPoint = function(point) {
         this.controlPointIndexArray.push(index);
     }
     else {
-        throw Error("Error: addControlPoint called with no point in list point.");
+        throw new Error("Error: addControlPoint called with no point in list point.");
     }
 };
 
