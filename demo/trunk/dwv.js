@@ -7303,7 +7303,7 @@ dwv.io.File.prototype.load = function(ioArray)
             onerror(error);
         }
         // force 100% progress (sometimes with firefox)
-        var endEvent = new ProgressEvent("progress", {lengthComputable: true, loaded: 1, total: 1});
+        var endEvent = {lengthComputable: true, loaded: 1, total: 1};
         dwv.gui.updateProgress(endEvent);
     };
 
@@ -7660,7 +7660,7 @@ dwv.math.computeGradient = function(greyscale) {
 	// function.
 	var gradient = [];
 
-	max = 0; // Maximum gradient found, for scaling purposes
+	var max = 0; // Maximum gradient found, for scaling purposes
 
 	var x = 0;
 	var y = 0;
@@ -7857,7 +7857,7 @@ dwv.math.gaussianBlur = function(buffer, out) {
         out[i] = 0.05*buffer[i-2] + 0.25*buffer[i-1] + 0.4*buffer[i] + 0.25*buffer[i+1] + 0.05*buffer[i+2];
     }
 
-    len = buffer.length;
+    var len = buffer.length;
     out[len-2] = 0.25*buffer[len-1] + 0.4*buffer[len-2] + 0.25*buffer[len-3] + 0.1*buffer[len-4];
     out[len-1] = 0.4*buffer[len-1] + 0.5*buffer[len-2] + 0.1*buffer[len-3];
 };
@@ -9372,7 +9372,7 @@ dwv.info.updateMiniColorMap = function(event)
     var windowWidth = event.ww;
     
     var canvas = document.getElementById("canvasinfobr");
-    context = canvas.getContext('2d');
+    var context = canvas.getContext('2d');
     
     // fill in the image data
     var colourMap = app.getView().getColorMap();
@@ -9389,6 +9389,7 @@ dwv.info.updateMiniColorMap = function(event)
     var xMin = windowCenter - 0.5 - (windowWidth-1) / 2;
     var xMax = windowCenter - 0.5 + (windowWidth-1) / 2;    
     
+    var index;
     for( var j=0; j<canvas.height; ++j ) {
         c = minInt;
         for( var i=0; i<canvas.width; ++i ) {

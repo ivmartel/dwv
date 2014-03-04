@@ -7212,7 +7212,7 @@
         },
         {
             "file": "src/tools/info.js",
-            "line": 177,
+            "line": 178,
             "description": "Create the plot info.",
             "itemtype": "method",
             "name": "createPlot",
@@ -7223,7 +7223,7 @@
         },
         {
             "file": "src/tools/info.js",
-            "line": 192,
+            "line": 193,
             "description": "Update the plot markings.",
             "itemtype": "method",
             "name": "updatePlotMarkings",
