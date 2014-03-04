@@ -49,8 +49,6 @@
             
                 <li><a href="../classes/dwv.dicom.DicomParser.html">dwv.dicom.DicomParser</a></li>
             
-                <li><a href="../classes/dwv.dicom.Dictionary.html">dwv.dicom.Dictionary</a></li>
-            
                 <li><a href="../classes/dwv.gui.html">dwv.gui</a></li>
             
                 <li><a href="../classes/dwv.html.html">dwv.html</a></li>
@@ -568,7 +566,7 @@ dwv.math.Path.prototype.isControlPoint = function(point) {
         return this.controlPointIndexArray.indexOf(index) !== -1;
     }
     else {
-        throw Error(&quot;Error: isControlPoint called with not in list point.&quot;);
+        throw new Error(&quot;Error: isControlPoint called with not in list point.&quot;);
     }
 };
 
@@ -601,7 +599,7 @@ dwv.math.Path.prototype.addControlPoint = function(point) {
         this.controlPointIndexArray.push(index);
     }
     else {
-        throw Error(&quot;Error: addControlPoint called with no point in list point.&quot;);
+        throw new Error(&quot;Error: addControlPoint called with no point in list point.&quot;);
     }
 };
 

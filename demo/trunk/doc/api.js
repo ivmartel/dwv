@@ -5,7 +5,6 @@ YUI.add("yuidoc-meta", function(Y) {
         "dwv.browser",
         "dwv.dicom.DataReader",
         "dwv.dicom.DicomParser",
-        "dwv.dicom.Dictionary",
         "dwv.gui",
         "dwv.html",
         "dwv.html.Layer",

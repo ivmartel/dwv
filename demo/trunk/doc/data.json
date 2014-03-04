@@ -23,9 +23,7 @@
         "src/dicom/dictionary.js": {
             "name": "src/dicom/dictionary.js",
             "modules": {},
-            "classes": {
-                "dwv.dicom.Dictionary": 1
-            },
+            "classes": {},
             "fors": {},
             "namespaces": {
                 "dwv.dicom": 1
@@ -461,16 +459,15 @@
             "submodules": {},
             "classes": {
                 "dwv.dicom.DataReader": 1,
-                "dwv.dicom.DicomParser": 1,
-                "dwv.dicom.Dictionary": 1
+                "dwv.dicom.DicomParser": 1
             },
             "fors": {},
             "namespaces": {
                 "dwv.dicom": 1
             },
             "tag": "module",
-            "file": "src/dicom/dictionary.js",
-            "line": 8,
+            "file": "src/dicom/dicomParser.js",
+            "line": 184,
             "description": "DICOM module."
         },
         "browser": {
@@ -694,21 +691,6 @@
             "file": "src/dicom/dicomParser.js",
             "line": 184,
             "description": "DicomParser class.",
-            "is_constructor": 1
-        },
-        "dwv.dicom.Dictionary": {
-            "name": "dwv.dicom.Dictionary",
-            "shortname": "dwv.dicom.Dictionary",
-            "classitems": [],
-            "plugins": [],
-            "extensions": [],
-            "plugin_for": [],
-            "extension_for": [],
-            "module": "dicom",
-            "namespace": "dwv.dicom",
-            "file": "src/dicom/dictionary.js",
-            "line": 8,
-            "description": "DICOM tag dictionary.",
             "is_constructor": 1
         },
         "dwv.browser": {
@@ -2051,17 +2033,6 @@
         {
             "file": "src/dicom/dicomParser.js",
             "line": 204,
-            "description": "The DICOM dictionary used to find tag names.",
-            "itemtype": "property",
-            "name": "dict",
-            "type": "Dictionary",
-            "class": "dwv.dicom.DicomParser",
-            "module": "dicom",
-            "namespace": "dwv.dicom"
-        },
-        {
-            "file": "src/dicom/dicomParser.js",
-            "line": 210,
             "description": "The pixel buffer.",
             "itemtype": "property",
             "name": "pixelBuffer",
@@ -2072,7 +2043,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 218,
+            "line": 212,
             "description": "Get the DICOM data pixel buffer.",
             "itemtype": "method",
             "name": "getPixelBuffer",
@@ -2086,7 +2057,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 228,
+            "line": 222,
             "description": "Append a DICOM element to the dicomElements member object.\nAllows for easy retrieval of DICOM tag values from the tag name.\nIf tags have same name (for the 'unknown' and private tags cases), a number is appended\nmaking the name unique.",
             "itemtype": "method",
             "name": "appendDicomElement",
@@ -2103,7 +2074,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 258,
+            "line": 252,
             "description": "Read a DICOM tag.",
             "itemtype": "method",
             "name": "readTag",
@@ -2126,7 +2097,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 282,
+            "line": 276,
             "description": "Read a DICOM data element.",
             "itemtype": "method",
             "name": "readDataElement",
@@ -2154,7 +2125,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 378,
+            "line": 372,
             "description": "Parse the complete DICOM file (given as input to the class).\nFills in the member object 'dicomElements'.",
             "itemtype": "method",
             "name": "parse",
@@ -2170,7 +2141,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 559,
+            "line": 551,
             "description": "Get an Image object from the read DICOM file.",
             "itemtype": "method",
             "name": "createImage",
@@ -2184,22 +2155,9 @@
         },
         {
             "file": "src/dicom/dictionary.js",
-            "line": 15,
-            "description": "Tag definition storage.",
-            "itemtype": "property",
-            "name": "newDictionary",
-            "type": "Array",
-            "class": "dwv.dicom.Dictionary",
-            "module": "dicom",
-            "namespace": "dwv.dicom"
-        },
-        {
-            "file": "src/dicom/dictionary.js",
-            "line": 23,
-            "description": "Fill in the dictionary array.",
-            "itemtype": "method",
-            "name": "init",
-            "class": "dwv.dicom.Dictionary",
+            "line": 8,
+            "description": "DICOM tag dictionary.",
+            "class": "dwv.browser",
             "module": "dicom",
             "namespace": "dwv.dicom"
         },
@@ -9466,19 +9424,19 @@
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/dicom/dicomParser.js:218"
+            "line": " src/dicom/dicomParser.js:212"
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/dicom/dicomParser.js:258"
+            "line": " src/dicom/dicomParser.js:252"
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/dicom/dicomParser.js:282"
+            "line": " src/dicom/dicomParser.js:276"
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/dicom/dicomParser.js:559"
+            "line": " src/dicom/dicomParser.js:551"
         },
         {
             "message": "unknown tag: input",
@@ -9551,6 +9509,10 @@
         {
             "message": "replacing incorrect tag: returns with return",
             "line": " src/tools/zoomPan.js:274"
+        },
+        {
+            "message": "Missing item type\nDICOM tag dictionary.",
+            "line": " src/dicom/dictionary.js:8"
         },
         {
             "message": "Missing item type\nLookup tables for image color display.",
