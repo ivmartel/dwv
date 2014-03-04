@@ -202,12 +202,6 @@ dwv.dicom.DicomParser = function()
      */
     this.numberOfItems = 0;
     /**
-     * The DICOM dictionary used to find tag names.
-     * @property dict
-     * @type Dictionary
-     */
-    this.dict = new dwv.dicom.Dictionary();
-    /**
      * The pixel buffer.
      * @property pixelBuffer
      * @type Array
@@ -270,9 +264,9 @@ dwv.dicom.DicomParser.prototype.readTag = function(reader, offset)
     var element = reader.readHex(offset+2);
     // name
     var name = "dwv::unknown";
-    if( this.dict.newDictionary[group] ) {
-        if( this.dict.newDictionary[group][element] ) {
-            name = this.dict.newDictionary[group][element][2];
+    if( dwv.dicom.dictionary[group] ) {
+        if( dwv.dicom.dictionary[group][element] ) {
+            name = dwv.dicom.dictionary[group][element][2];
         }
     }
     // return
@@ -310,9 +304,9 @@ dwv.dicom.DicomParser.prototype.readDataElement = function(reader, offset, impli
         // implicit VR?
         if(implicit) {
             vr = "UN";
-            if( this.dict.newDictionary[tag.group] ) {
-                if( this.dict.newDictionary[tag.group][tag.element] ) {
-                    vr = this.dict.newDictionary[tag.group][tag.element][0];
+            if( dwv.dicom.dictionary[tag.group] ) {
+                if( dwv.dicom.dictionary[tag.group][tag.element] ) {
+                    vr = dwv.dicom.dictionary[tag.group][tag.element][0];
                 }
             }
             vrOffset = 0;
@@ -387,8 +381,6 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
     var implicit = false;
     var jpeg = false;
     var jpeg2000 = false;
-    // dictionary
-    this.dict.init();
     // default readers
     var metaReader = new dwv.dicom.DataReader(buffer);
     var dataReader = new dwv.dicom.DataReader(buffer);

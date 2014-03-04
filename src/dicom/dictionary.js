@@ -7,1916 +7,1855 @@ dwv.dicom = dwv.dicom || {};
 
 /**
  * DICOM tag dictionary.
- * @class Dictionary
  * @namespace dwv.dicom
- * @constructor
  */
-dwv.dicom.Dictionary = function() {
-    /**
-     * Tag definition storage.
-     * @property newDictionary
-     * @type Array
-     */
-    this.newDictionary = [];
-};
-    
-/**
- * Fill in the dictionary array.
- * @method init
- */
-dwv.dicom.Dictionary.prototype.init = function() {
-    
-    // 0x0000
-    this.newDictionary['0x0000'] = [];
-    this.newDictionary['0x0000']['0x0000'] = ['UL', '1', 'GroupLength'];
-    this.newDictionary['0x0000']['0x0001'] = ['UL', '1', 'CommandLengthToEnd'];
-    this.newDictionary['0x0000']['0x0002'] = ['UI', '1', 'AffectedSOPClassUID'];
-    this.newDictionary['0x0000']['0x0003'] = ['UI', '1', 'RequestedSOPClassUID'];
-    this.newDictionary['0x0000']['0x0010'] = ['CS', '1', 'CommandRecognitionCode'];
-    this.newDictionary['0x0000']['0x0100'] = ['US', '1', 'CommandField'];
-    this.newDictionary['0x0000']['0x0110'] = ['US', '1', 'MessageID'];
-    this.newDictionary['0x0000']['0x0120'] = ['US', '1', 'MessageIDBeingRespondedTo'];
-    this.newDictionary['0x0000']['0x0200'] = ['AE', '1', 'Initiator']; 
-    this.newDictionary['0x0000']['0x0300'] = ['AE', '1', 'Receiver'];
-    this.newDictionary['0x0000']['0x0400'] = ['AE', '1', 'FindLocation'];
-    this.newDictionary['0x0000']['0x0600'] = ['AE', '1', 'MoveDestination'];
-    this.newDictionary['0x0000']['0x0700'] = ['US', '1', 'Priority'];
-    this.newDictionary['0x0000']['0x0800'] = ['US', '1', 'DataSetType'];
-    this.newDictionary['0x0000']['0x0850'] = ['US', '1', 'NumberOfMatches'];
-    this.newDictionary['0x0000']['0x0860'] = ['US', '1', 'ResponseSequenceNumber'];
-    this.newDictionary['0x0000']['0x0900'] = ['US', '1', 'Status'];
-    this.newDictionary['0x0000']['0x0901'] = ['AT', '1-n', 'OffendingElement'];
-    this.newDictionary['0x0000']['0x0902'] = ['LO', '1', 'ErrorComment'];
-    this.newDictionary['0x0000']['0x0903'] = ['US', '1', 'ErrorID'];
-    this.newDictionary['0x0000']['0x0904'] = ['OT', '1-n', 'ErrorInformation'];
-    this.newDictionary['0x0000']['0x1000'] = ['UI', '1', 'AffectedSOPInstanceUID'];
-    this.newDictionary['0x0000']['0x1001'] = ['UI', '1', 'RequestedSOPInstanceUID'];
-    this.newDictionary['0x0000']['0x1002'] = ['US', '1', 'EventTypeID'];
-    this.newDictionary['0x0000']['0x1003'] = ['OT', '1-n', 'EventInformation'];
-    this.newDictionary['0x0000']['0x1005'] = ['AT', '1-n', 'AttributeIdentifierList'];
-    this.newDictionary['0x0000']['0x1007'] = ['AT', '1-n', 'ModificationList'];
-    this.newDictionary['0x0000']['0x1008'] = ['US', '1', 'ActionTypeID'];
-    this.newDictionary['0x0000']['0x1009'] = ['OT', '1-n', 'ActionInformation'];
-    this.newDictionary['0x0000']['0x1013'] = ['UI', '1-n', 'SuccessfulSOPInstanceUIDList'];
-    this.newDictionary['0x0000']['0x1014'] = ['UI', '1-n', 'FailedSOPInstanceUIDList'];
-    this.newDictionary['0x0000']['0x1015'] = ['UI', '1-n', 'WarningSOPInstanceUIDList'];
-    this.newDictionary['0x0000']['0x1020'] = ['US', '1', 'NumberOfRemainingSuboperations'];
-    this.newDictionary['0x0000']['0x1021'] = ['US', '1', 'NumberOfCompletedSuboperations'];
-    this.newDictionary['0x0000']['0x1022'] = ['US', '1', 'NumberOfFailedSuboperations'];
-    this.newDictionary['0x0000']['0x1023'] = ['US', '1', 'NumberOfWarningSuboperations'];
-    this.newDictionary['0x0000']['0x1030'] = ['AE', '1', 'MoveOriginatorApplicationEntityTitle'];
-    this.newDictionary['0x0000']['0x1031'] = ['US', '1', 'MoveOriginatorMessageID'];
-    this.newDictionary['0x0000']['0x4000'] = ['AT', '1', 'DialogReceiver'];
-    this.newDictionary['0x0000']['0x4010'] = ['AT', '1', 'TerminalType'];
-    this.newDictionary['0x0000']['0x5010'] = ['SH', '1', 'MessageSetID'];
-    this.newDictionary['0x0000']['0x5020'] = ['SH', '1', 'EndMessageSet'];
-    this.newDictionary['0x0000']['0x5110'] = ['AT', '1', 'DisplayFormat'];
-    this.newDictionary['0x0000']['0x5120'] = ['AT', '1', 'PagePositionID'];
-    this.newDictionary['0x0000']['0x5130'] = ['CS', '1', 'TextFormatID'];
-    this.newDictionary['0x0000']['0x5140'] = ['CS', '1', 'NormalReverse'];
-    this.newDictionary['0x0000']['0x5150'] = ['CS', '1', 'AddGrayScale'];
-    this.newDictionary['0x0000']['0x5160'] = ['CS', '1', 'Borders'];
-    this.newDictionary['0x0000']['0x5170'] = ['IS', '1', 'Copies'];
-    this.newDictionary['0x0000']['0x5180'] = ['CS', '1', 'OldMagnificationType'];
-    this.newDictionary['0x0000']['0x5190'] = ['CS', '1', 'Erase'];
-    this.newDictionary['0x0000']['0x51A0'] = ['CS', '1', 'Print'];
-    this.newDictionary['0x0000']['0x51B0'] = ['US', '1-n', 'Overlays'];
-
-    // 0x0002
-    this.newDictionary['0x0002'] = [];
-    this.newDictionary['0x0002']['0x0000'] = ['UL', '1', 'MetaElementGroupLength'];
-    this.newDictionary['0x0002']['0x0001'] = ['OB', '1', 'FileMetaInformationVersion'];
-    this.newDictionary['0x0002']['0x0002'] = ['UI', '1', 'MediaStorageSOPClassUID'];
-    this.newDictionary['0x0002']['0x0003'] = ['UI', '1', 'MediaStorageSOPInstanceUID'];
-    this.newDictionary['0x0002']['0x0010'] = ['UI', '1', 'TransferSyntaxUID'];
-    this.newDictionary['0x0002']['0x0012'] = ['UI', '1', 'ImplementationClassUID'];
-    this.newDictionary['0x0002']['0x0013'] = ['SH', '1', 'ImplementationVersionName'];
-    this.newDictionary['0x0002']['0x0016'] = ['AE', '1', 'SourceApplicationEntityTitle'];
-    this.newDictionary['0x0002']['0x0100'] = ['UI', '1', 'PrivateInformationCreatorUID'];
-    this.newDictionary['0x0002']['0x0102'] = ['OB', '1', 'PrivateInformation'];
-
-    // 0x0004
-    this.newDictionary['0x0004'] = [];
-    this.newDictionary['0x0004']['0x0000'] = ['UL', '1', 'FileSetGroupLength'];
-    this.newDictionary['0x0004']['0x1130'] = ['CS', '1', 'FileSetID'];
-    this.newDictionary['0x0004']['0x1141'] = ['CS', '8', 'FileSetDescriptorFileID'];
-    this.newDictionary['0x0004']['0x1142'] = ['CS', '1', 'FileSetCharacterSet'];
-    this.newDictionary['0x0004']['0x1200'] = ['UL', '1', 'RootDirectoryFirstRecord'];
-    this.newDictionary['0x0004']['0x1202'] = ['UL', '1', 'RootDirectoryLastRecord'];
-    this.newDictionary['0x0004']['0x1212'] = ['US', '1', 'FileSetConsistencyFlag'];
-    this.newDictionary['0x0004']['0x1220'] = ['SQ', '1', 'DirectoryRecordSequence'];
-    this.newDictionary['0x0004']['0x1400'] = ['UL', '1', 'NextDirectoryRecordOffset'];
-    this.newDictionary['0x0004']['0x1410'] = ['US', '1', 'RecordInUseFlag'];
-    this.newDictionary['0x0004']['0x1420'] = ['UL', '1', 'LowerLevelDirectoryOffset'];
-    this.newDictionary['0x0004']['0x1430'] = ['CS', '1', 'DirectoryRecordType'];
-    this.newDictionary['0x0004']['0x1432'] = ['UI', '1', 'PrivateRecordUID'];
-    this.newDictionary['0x0004']['0x1500'] = ['CS', '8', 'ReferencedFileID'];
-    this.newDictionary['0x0004']['0x1504'] = ['UL', '1', 'DirectoryRecordOffset'];
-    this.newDictionary['0x0004']['0x1510'] = ['UI', '1', 'ReferencedSOPClassUIDInFile'];
-    this.newDictionary['0x0004']['0x1511'] = ['UI', '1', 'ReferencedSOPInstanceUIDInFile'];
-    this.newDictionary['0x0004']['0x1512'] = ['UI', '1', 'ReferencedTransferSyntaxUIDInFile'];
-    this.newDictionary['0x0004']['0x1600'] = ['UL', '1', 'NumberOfReferences'];
-
-    // 0x0008
-    this.newDictionary['0x0008'] = [];
-    this.newDictionary['0x0008']['0x0000'] = ['UL', '1', 'IdentifyingGroupLength'];
-    this.newDictionary['0x0008']['0x0001'] = ['UL', '1', 'LengthToEnd'];
-    this.newDictionary['0x0008']['0x0005'] = ['CS', '1', 'SpecificCharacterSet'];
-    this.newDictionary['0x0008']['0x0008'] = ['CS', '1-n', 'ImageType'];
-    this.newDictionary['0x0008']['0x000A'] = ['US', '1', 'SequenceItemNumber'];
-    this.newDictionary['0x0008']['0x0010'] = ['CS', '1', 'RecognitionCode'];
-    this.newDictionary['0x0008']['0x0012'] = ['DA', '1', 'InstanceCreationDate'];
-    this.newDictionary['0x0008']['0x0013'] = ['TM', '1', 'InstanceCreationTime'];
-    this.newDictionary['0x0008']['0x0014'] = ['UI', '1', 'InstanceCreatorUID'];
-    this.newDictionary['0x0008']['0x0016'] = ['UI', '1', 'SOPClassUID'];
-    this.newDictionary['0x0008']['0x0018'] = ['UI', '1', 'SOPInstanceUID'];
-    this.newDictionary['0x0008']['0x0020'] = ['DA', '1', 'StudyDate'];
-    this.newDictionary['0x0008']['0x0021'] = ['DA', '1', 'SeriesDate'];
-    this.newDictionary['0x0008']['0x0022'] = ['DA', '1', 'AcquisitionDate'];
-    this.newDictionary['0x0008']['0x0023'] = ['DA', '1', 'ImageDate'];
-    /* this.newDictionary['0x0008']['0x0023'] = ['DA','1','ContentDate']; */
-    this.newDictionary['0x0008']['0x0024'] = ['DA', '1', 'OverlayDate'];
-    this.newDictionary['0x0008']['0x0025'] = ['DA', '1', 'CurveDate'];
-    this.newDictionary['0x0008']['0x002A'] = ['DT', '1', 'AcquisitionDatetime'];
-    this.newDictionary['0x0008']['0x0030'] = ['TM', '1', 'StudyTime'];
-    this.newDictionary['0x0008']['0x0031'] = ['TM', '1', 'SeriesTime'];
-    this.newDictionary['0x0008']['0x0032'] = ['TM', '1', 'AcquisitionTime'];
-    this.newDictionary['0x0008']['0x0033'] = ['TM', '1', 'ImageTime'];
-    this.newDictionary['0x0008']['0x0034'] = ['TM', '1', 'OverlayTime'];
-    this.newDictionary['0x0008']['0x0035'] = ['TM', '1', 'CurveTime'];
-    this.newDictionary['0x0008']['0x0040'] = ['US', '1', 'OldDataSetType'];
-    this.newDictionary['0x0008']['0x0041'] = ['LT', '1', 'OldDataSetSubtype'];
-    this.newDictionary['0x0008']['0x0042'] = ['CS', '1', 'NuclearMedicineSeriesType'];
-    this.newDictionary['0x0008']['0x0050'] = ['SH', '1', 'AccessionNumber'];
-    this.newDictionary['0x0008']['0x0052'] = ['CS', '1', 'QueryRetrieveLevel'];
-    this.newDictionary['0x0008']['0x0054'] = ['AE', '1-n', 'RetrieveAETitle'];
-    this.newDictionary['0x0008']['0x0058'] = ['UI', '1-n', 'DataSetFailedSOPInstanceUIDList'];
-    this.newDictionary['0x0008']['0x0060'] = ['CS', '1', 'Modality'];
-    this.newDictionary['0x0008']['0x0061'] = ['CS', '1-n', 'ModalitiesInStudy'];
-    this.newDictionary['0x0008']['0x0064'] = ['CS', '1', 'ConversionType'];
-    this.newDictionary['0x0008']['0x0068'] = ['CS', '1', 'PresentationIntentType'];
-    this.newDictionary['0x0008']['0x0070'] = ['LO', '1', 'Manufacturer'];
-    this.newDictionary['0x0008']['0x0080'] = ['LO', '1', 'InstitutionName'];
-    this.newDictionary['0x0008']['0x0081'] = ['ST', '1', 'InstitutionAddress'];
-    this.newDictionary['0x0008']['0x0082'] = ['SQ', '1', 'InstitutionCodeSequence'];
-    this.newDictionary['0x0008']['0x0090'] = ['PN', '1', 'ReferringPhysicianName'];
-    this.newDictionary['0x0008']['0x0092'] = ['ST', '1', 'ReferringPhysicianAddress'];
-    this.newDictionary['0x0008']['0x0094'] = ['SH', '1-n', 'ReferringPhysicianTelephoneNumber'];
-    this.newDictionary['0x0008']['0x0100'] = ['SH', '1', 'CodeValue'];
-    this.newDictionary['0x0008']['0x0102'] = ['SH', '1', 'CodingSchemeDesignator'];
-    this.newDictionary['0x0008']['0x0103'] = ['SH', '1', 'CodingSchemeVersion'];
-    this.newDictionary['0x0008']['0x0104'] = ['LO', '1', 'CodeMeaning'];
-    this.newDictionary['0x0008']['0x0105'] = ['CS', '1', 'MappingResource'];
-    this.newDictionary['0x0008']['0x0106'] = ['DT', '1', 'ContextGroupVersion'];
-    this.newDictionary['0x0008']['0x0107'] = ['DT', '1', 'ContextGroupLocalVersion'];
-    this.newDictionary['0x0008']['0x010B'] = ['CS', '1', 'CodeSetExtensionFlag'];
-    this.newDictionary['0x0008']['0x010C'] = ['UI', '1', 'PrivateCodingSchemeCreatorUID'];
-    this.newDictionary['0x0008']['0x010D'] = ['UI', '1', 'CodeSetExtensionCreatorUID'];
-    this.newDictionary['0x0008']['0x010F'] = ['CS', '1', 'ContextIdentifier'];
-    this.newDictionary['0x0008']['0x0201'] = ['SH', '1', 'TimezoneOffsetFromUTC'];
-    this.newDictionary['0x0008']['0x1000'] = ['AE', '1', 'NetworkID'];
-    this.newDictionary['0x0008']['0x1010'] = ['SH', '1', 'StationName'];
-    this.newDictionary['0x0008']['0x1030'] = ['LO', '1', 'StudyDescription'];
-    this.newDictionary['0x0008']['0x1032'] = ['SQ', '1', 'ProcedureCodeSequence'];
-    this.newDictionary['0x0008']['0x103E'] = ['LO', '1', 'SeriesDescription'];
-    this.newDictionary['0x0008']['0x1040'] = ['LO', '1', 'InstitutionalDepartmentName'];
-    this.newDictionary['0x0008']['0x1048'] = ['PN', '1-n', 'PhysicianOfRecord'];
-    this.newDictionary['0x0008']['0x1050'] = ['PN', '1-n', 'PerformingPhysicianName'];
-    this.newDictionary['0x0008']['0x1060'] = ['PN', '1-n', 'PhysicianReadingStudy'];
-    this.newDictionary['0x0008']['0x1070'] = ['PN', '1-n', 'OperatorName'];
-    this.newDictionary['0x0008']['0x1080'] = ['LO', '1-n', 'AdmittingDiagnosisDescription'];
-    this.newDictionary['0x0008']['0x1084'] = ['SQ', '1', 'AdmittingDiagnosisCodeSequence'];
-    this.newDictionary['0x0008']['0x1090'] = ['LO', '1', 'ManufacturerModelName'];
-    this.newDictionary['0x0008']['0x1100'] = ['SQ', '1', 'ReferencedResultsSequence'];
-    this.newDictionary['0x0008']['0x1110'] = ['SQ', '1', 'ReferencedStudySequence'];
-    this.newDictionary['0x0008']['0x1111'] = ['SQ', '1', 'ReferencedStudyComponentSequence'];
-    this.newDictionary['0x0008']['0x1115'] = ['SQ', '1', 'ReferencedSeriesSequence'];
-    this.newDictionary['0x0008']['0x1120'] = ['SQ', '1', 'ReferencedPatientSequence'];
-    this.newDictionary['0x0008']['0x1125'] = ['SQ', '1', 'ReferencedVisitSequence'];
-    this.newDictionary['0x0008']['0x1130'] = ['SQ', '1', 'ReferencedOverlaySequence'];
-    this.newDictionary['0x0008']['0x1140'] = ['SQ', '1', 'ReferencedImageSequence'];
-    this.newDictionary['0x0008']['0x1145'] = ['SQ', '1', 'ReferencedCurveSequence'];
-    this.newDictionary['0x0008']['0x114A'] = ['SQ', '1', 'ReferencedInstanceSequence'];
-    this.newDictionary['0x0008']['0x114B'] = ['LO', '1', 'ReferenceDescription'];
-    this.newDictionary['0x0008']['0x1150'] = ['UI', '1', 'ReferencedSOPClassUID'];
-    this.newDictionary['0x0008']['0x1155'] = ['UI', '1', 'ReferencedSOPInstanceUID'];
-    this.newDictionary['0x0008']['0x115A'] = ['UI', '1-n', 'SOPClassesSupported'];
-    this.newDictionary['0x0008']['0x1160'] = ['IS', '1', 'ReferencedFrameNumber'];
-    this.newDictionary['0x0008']['0x1195'] = ['UI', '1', 'TransactionUID'];
-    this.newDictionary['0x0008']['0x1197'] = ['US', '1', 'FailureReason'];
-    this.newDictionary['0x0008']['0x1198'] = ['SQ', '1', 'FailedSOPSequence'];
-    this.newDictionary['0x0008']['0x1199'] = ['SQ', '1', 'ReferencedSOPSequence'];
-    this.newDictionary['0x0008']['0x2110'] = ['CS', '1', 'LossyImageCompression'];
-    this.newDictionary['0x0008']['0x2111'] = ['ST', '1', 'DerivationDescription'];
-    this.newDictionary['0x0008']['0x2112'] = ['SQ', '1', 'SourceImageSequence'];
-    this.newDictionary['0x0008']['0x2120'] = ['SH', '1', 'StageName'];
-    this.newDictionary['0x0008']['0x2122'] = ['IS', '1', 'StageNumber'];
-    this.newDictionary['0x0008']['0x2124'] = ['IS', '1', 'NumberOfStages'];
-    this.newDictionary['0x0008']['0x2128'] = ['IS', '1', 'ViewNumber'];
-    this.newDictionary['0x0008']['0x2129'] = ['IS', '1', 'NumberOfEventTimers'];
-    this.newDictionary['0x0008']['0x212A'] = ['IS', '1', 'NumberOfViewsInStage'];
-    this.newDictionary['0x0008']['0x2130'] = ['DS', '1-n', 'EventElapsedTime'];
-    this.newDictionary['0x0008']['0x2132'] = ['LO', '1-n', 'EventTimerName'];
-    this.newDictionary['0x0008']['0x2142'] = ['IS', '1', 'StartTrim'];
-    this.newDictionary['0x0008']['0x2143'] = ['IS', '1', 'StopTrim'];
-    this.newDictionary['0x0008']['0x2144'] = ['IS', '1', 'RecommendedDisplayFrameRate'];
-    this.newDictionary['0x0008']['0x2200'] = ['CS', '1', 'TransducerPosition'];
-    this.newDictionary['0x0008']['0x2204'] = ['CS', '1', 'TransducerOrientation'];
-    this.newDictionary['0x0008']['0x2208'] = ['CS', '1', 'AnatomicStructure'];
-    this.newDictionary['0x0008']['0x2218'] = ['SQ', '1', 'AnatomicRegionSequence'];
-    this.newDictionary['0x0008']['0x2220'] = ['SQ', '1', 'AnatomicRegionModifierSequence'];
-    this.newDictionary['0x0008']['0x2228'] = ['SQ', '1', 'PrimaryAnatomicStructureSequence'];
-    this.newDictionary['0x0008']['0x2229'] = ['SQ', '1', 'AnatomicStructureSpaceOrRegionSequence'];
-    this.newDictionary['0x0008']['0x2230'] = ['SQ', '1', 'PrimaryAnatomicStructureModifierSequence'];
-    this.newDictionary['0x0008']['0x2240'] = ['SQ', '1', 'TransducerPositionSequence'];
-    this.newDictionary['0x0008']['0x2242'] = ['SQ', '1', 'TransducerPositionModifierSequence'];
-    this.newDictionary['0x0008']['0x2244'] = ['SQ', '1', 'TransducerOrientationSequence'];
-    this.newDictionary['0x0008']['0x2246'] = ['SQ', '1', 'TransducerOrientationModifierSequence'];
-    this.newDictionary['0x0008']['0x4000'] = ['LT', '1-n', 'IdentifyingComments'];
-
-    // 0x0010
-    this.newDictionary['0x0010'] = [];
-    this.newDictionary['0x0010']['0x0000'] = ['UL', '1', 'PatientGroupLength'];
-    this.newDictionary['0x0010']['0x0010'] = ['PN', '1', 'PatientName'];
-    this.newDictionary['0x0010']['0x0020'] = ['LO', '1', 'PatientID'];
-    this.newDictionary['0x0010']['0x0021'] = ['LO', '1', 'IssuerOfPatientID'];
-    this.newDictionary['0x0010']['0x0030'] = ['DA', '1', 'PatientBirthDate'];
-    this.newDictionary['0x0010']['0x0032'] = ['TM', '1', 'PatientBirthTime'];
-    this.newDictionary['0x0010']['0x0040'] = ['CS', '1', 'PatientSex'];
-    this.newDictionary['0x0010']['0x0050'] = ['SQ', '1', 'PatientInsurancePlanCodeSequence'];
-    this.newDictionary['0x0010']['0x1000'] = ['LO', '1-n', 'OtherPatientID'];
-    this.newDictionary['0x0010']['0x1001'] = ['PN', '1-n', 'OtherPatientName'];
-    this.newDictionary['0x0010']['0x1005'] = ['PN', '1', 'PatientBirthName'];
-    this.newDictionary['0x0010']['0x1010'] = ['AS', '1', 'PatientAge'];
-    this.newDictionary['0x0010']['0x1020'] = ['DS', '1', 'PatientSize'];
-    this.newDictionary['0x0010']['0x1030'] = ['DS', '1', 'PatientWeight'];
-    this.newDictionary['0x0010']['0x1040'] = ['LO', '1', 'PatientAddress'];
-    this.newDictionary['0x0010']['0x1050'] = ['LT', '1-n', 'InsurancePlanIdentification'];
-    this.newDictionary['0x0010']['0x1060'] = ['PN', '1', 'PatientMotherBirthName'];
-    this.newDictionary['0x0010']['0x1080'] = ['LO', '1', 'MilitaryRank'];
-    this.newDictionary['0x0010']['0x1081'] = ['LO', '1', 'BranchOfService'];
-    this.newDictionary['0x0010']['0x1090'] = ['LO', '1', 'MedicalRecordLocator'];
-    this.newDictionary['0x0010']['0x2000'] = ['LO', '1-n', 'MedicalAlerts'];
-    this.newDictionary['0x0010']['0x2110'] = ['LO', '1-n', 'ContrastAllergies'];
-    this.newDictionary['0x0010']['0x2150'] = ['LO', '1', 'CountryOfResidence'];
-    this.newDictionary['0x0010']['0x2152'] = ['LO', '1', 'RegionOfResidence'];
-    this.newDictionary['0x0010']['0x2154'] = ['SH', '1-n', 'PatientTelephoneNumber'];
-    this.newDictionary['0x0010']['0x2160'] = ['SH', '1', 'EthnicGroup'];
-    this.newDictionary['0x0010']['0x2180'] = ['SH', '1', 'Occupation'];
-    this.newDictionary['0x0010']['0x21A0'] = ['CS', '1', 'SmokingStatus'];
-    this.newDictionary['0x0010']['0x21B0'] = ['LT', '1', 'AdditionalPatientHistory'];
-    this.newDictionary['0x0010']['0x21C0'] = ['US', '1', 'PregnancyStatus'];
-    this.newDictionary['0x0010']['0x21D0'] = ['DA', '1', 'LastMenstrualDate'];
-    this.newDictionary['0x0010']['0x21F0'] = ['LO', '1', 'PatientReligiousPreference'];
-    this.newDictionary['0x0010']['0x4000'] = ['LT', '1', 'PatientComments'];
-
-    // 0x0018
-    this.newDictionary['0x0018'] = [];
-    this.newDictionary['0x0018']['0x0000'] = ['UL', '1', 'AcquisitionGroupLength'];
-    this.newDictionary['0x0018']['0x0010'] = ['LO', '1', 'ContrastBolusAgent'];
-    this.newDictionary['0x0018']['0x0012'] = ['SQ', '1', 'ContrastBolusAgentSequence'];
-    this.newDictionary['0x0018']['0x0014'] = ['SQ', '1', 'ContrastBolusAdministrationRouteSequence'];
-    this.newDictionary['0x0018']['0x0015'] = ['CS', '1', 'BodyPartExamined'];
-    this.newDictionary['0x0018']['0x0020'] = ['CS', '1-n', 'ScanningSequence'];
-    this.newDictionary['0x0018']['0x0021'] = ['CS', '1-n', 'SequenceVariant'];
-    this.newDictionary['0x0018']['0x0022'] = ['CS', '1-n', 'ScanOptions'];
-    this.newDictionary['0x0018']['0x0023'] = ['CS', '1', 'MRAcquisitionType'];
-    this.newDictionary['0x0018']['0x0024'] = ['SH', '1', 'SequenceName'];
-    this.newDictionary['0x0018']['0x0025'] = ['CS', '1', 'AngioFlag'];
-    this.newDictionary['0x0018']['0x0026'] = ['SQ', '1', 'InterventionDrugInformationSequence'];
-    this.newDictionary['0x0018']['0x0027'] = ['TM', '1', 'InterventionDrugStopTime'];
-    this.newDictionary['0x0018']['0x0028'] = ['DS', '1', 'InterventionDrugDose'];
-    this.newDictionary['0x0018']['0x0029'] = ['SQ', '1', 'InterventionalDrugSequence'];
-    this.newDictionary['0x0018']['0x002A'] = ['SQ', '1', 'AdditionalDrugSequence'];
-    this.newDictionary['0x0018']['0x0030'] = ['LO', '1-n', 'Radionuclide'];
-    this.newDictionary['0x0018']['0x0031'] = ['LO', '1-n', 'Radiopharmaceutical'];
-    this.newDictionary['0x0018']['0x0032'] = ['DS', '1', 'EnergyWindowCenterline'];
-    this.newDictionary['0x0018']['0x0033'] = ['DS', '1-n', 'EnergyWindowTotalWidth'];
-    this.newDictionary['0x0018']['0x0034'] = ['LO', '1', 'InterventionalDrugName'];
-    this.newDictionary['0x0018']['0x0035'] = ['TM', '1', 'InterventionalDrugStartTime'];
-    this.newDictionary['0x0018']['0x0036'] = ['SQ', '1', 'InterventionalTherapySequence'];
-    this.newDictionary['0x0018']['0x0037'] = ['CS', '1', 'TherapyType'];
-    this.newDictionary['0x0018']['0x0038'] = ['CS', '1', 'InterventionalStatus'];
-    this.newDictionary['0x0018']['0x0039'] = ['CS', '1', 'TherapyDescription'];
-    this.newDictionary['0x0018']['0x0040'] = ['IS', '1', 'CineRate'];
-    this.newDictionary['0x0018']['0x0050'] = ['DS', '1', 'SliceThickness'];
-    this.newDictionary['0x0018']['0x0060'] = ['DS', '1', 'KVP'];
-    this.newDictionary['0x0018']['0x0070'] = ['IS', '1', 'CountsAccumulated'];
-    this.newDictionary['0x0018']['0x0071'] = ['CS', '1', 'AcquisitionTerminationCondition'];
-    this.newDictionary['0x0018']['0x0072'] = ['DS', '1', 'EffectiveSeriesDuration'];
-    this.newDictionary['0x0018']['0x0073'] = ['CS', '1', 'AcquisitionStartCondition'];
-    this.newDictionary['0x0018']['0x0074'] = ['IS', '1', 'AcquisitionStartConditionData'];
-    this.newDictionary['0x0018']['0x0075'] = ['IS', '1', 'AcquisitionTerminationConditionData'];
-    this.newDictionary['0x0018']['0x0080'] = ['DS', '1', 'RepetitionTime'];
-    this.newDictionary['0x0018']['0x0081'] = ['DS', '1', 'EchoTime'];
-    this.newDictionary['0x0018']['0x0082'] = ['DS', '1', 'InversionTime'];
-    this.newDictionary['0x0018']['0x0083'] = ['DS', '1', 'NumberOfAverages'];
-    this.newDictionary['0x0018']['0x0084'] = ['DS', '1', 'ImagingFrequency'];
-    this.newDictionary['0x0018']['0x0085'] = ['SH', '1', 'ImagedNucleus'];
-    this.newDictionary['0x0018']['0x0086'] = ['IS', '1-n', 'EchoNumber'];
-    this.newDictionary['0x0018']['0x0087'] = ['DS', '1', 'MagneticFieldStrength'];
-    this.newDictionary['0x0018']['0x0088'] = ['DS', '1', 'SpacingBetweenSlices'];
-    this.newDictionary['0x0018']['0x0089'] = ['IS', '1', 'NumberOfPhaseEncodingSteps'];
-    this.newDictionary['0x0018']['0x0090'] = ['DS', '1', 'DataCollectionDiameter'];
-    this.newDictionary['0x0018']['0x0091'] = ['IS', '1', 'EchoTrainLength'];
-    this.newDictionary['0x0018']['0x0093'] = ['DS', '1', 'PercentSampling'];
-    this.newDictionary['0x0018']['0x0094'] = ['DS', '1', 'PercentPhaseFieldOfView'];
-    this.newDictionary['0x0018']['0x0095'] = ['DS', '1', 'PixelBandwidth'];
-    this.newDictionary['0x0018']['0x1000'] = ['LO', '1', 'DeviceSerialNumber'];
-    this.newDictionary['0x0018']['0x1002'] = ['UI', '1', 'DeviceUID'];
-    this.newDictionary['0x0018']['0x1003'] = ['LO', '1', 'DeviceID'];
-    this.newDictionary['0x0018']['0x1004'] = ['LO', '1', 'PlateID'];
-    this.newDictionary['0x0018']['0x1005'] = ['LO', '1', 'GeneratorID'];
-    this.newDictionary['0x0018']['0x1006'] = ['LO', '1', 'GridID'];
-    this.newDictionary['0x0018']['0x1007'] = ['LO', '1', 'CassetteID'];
-    this.newDictionary['0x0018']['0x1008'] = ['LO', '1', 'GantryID'];
-    this.newDictionary['0x0018']['0x1010'] = ['LO', '1', 'SecondaryCaptureDeviceID'];
-    this.newDictionary['0x0018']['0x1011'] = ['LO', '1', 'HardcopyCreationDeviceID'];
-    this.newDictionary['0x0018']['0x1012'] = ['DA', '1', 'DateOfSecondaryCapture'];
-    this.newDictionary['0x0018']['0x1014'] = ['TM', '1', 'TimeOfSecondaryCapture'];
-    this.newDictionary['0x0018']['0x1016'] = ['LO', '1', 'SecondaryCaptureDeviceManufacturer'];
-    this.newDictionary['0x0018']['0x1017'] = ['LO', '1', 'HardcopyDeviceManufacturer'];
-    this.newDictionary['0x0018']['0x1018'] = ['LO', '1', 'SecondaryCaptureDeviceManufacturerModelName'];
-    this.newDictionary['0x0018']['0x1019'] = ['LO', '1-n', 'SecondaryCaptureDeviceSoftwareVersion'];
-    this.newDictionary['0x0018']['0x101A'] = ['LO', '1-n', 'HardcopyDeviceSoftwareVersion'];
-    this.newDictionary['0x0018']['0x101B'] = ['LO', '1', 'HardcopyDeviceManfuacturersModelName'];
-    this.newDictionary['0x0018']['0x1020'] = ['LO', '1-n', 'SoftwareVersion'];
-    this.newDictionary['0x0018']['0x1022'] = ['SH', '1', 'VideoImageFormatAcquired'];
-    this.newDictionary['0x0018']['0x1023'] = ['LO', '1', 'DigitalImageFormatAcquired'];
-    this.newDictionary['0x0018']['0x1030'] = ['LO', '1', 'ProtocolName'];
-    this.newDictionary['0x0018']['0x1040'] = ['LO', '1', 'ContrastBolusRoute'];
-    this.newDictionary['0x0018']['0x1041'] = ['DS', '1', 'ContrastBolusVolume'];
-    this.newDictionary['0x0018']['0x1042'] = ['TM', '1', 'ContrastBolusStartTime'];
-    this.newDictionary['0x0018']['0x1043'] = ['TM', '1', 'ContrastBolusStopTime'];
-    this.newDictionary['0x0018']['0x1044'] = ['DS', '1', 'ContrastBolusTotalDose'];
-    this.newDictionary['0x0018']['0x1045'] = ['IS', '1-n', 'SyringeCounts'];
-    this.newDictionary['0x0018']['0x1046'] = ['DS', '1-n', 'ContrastFlowRate'];
-    this.newDictionary['0x0018']['0x1047'] = ['DS', '1-n', 'ContrastFlowDuration'];
-    this.newDictionary['0x0018']['0x1048'] = ['CS', '1', 'ContrastBolusIngredient'];
-    this.newDictionary['0x0018']['0x1049'] = ['DS', '1', 'ContrastBolusIngredientConcentration'];
-    this.newDictionary['0x0018']['0x1050'] = ['DS', '1', 'SpatialResolution'];
-    this.newDictionary['0x0018']['0x1060'] = ['DS', '1', 'TriggerTime'];
-    this.newDictionary['0x0018']['0x1061'] = ['LO', '1', 'TriggerSourceOrType'];
-    this.newDictionary['0x0018']['0x1062'] = ['IS', '1', 'NominalInterval'];
-    this.newDictionary['0x0018']['0x1063'] = ['DS', '1', 'FrameTime'];
-    this.newDictionary['0x0018']['0x1064'] = ['LO', '1', 'FramingType'];
-    this.newDictionary['0x0018']['0x1065'] = ['DS', '1-n', 'FrameTimeVector'];
-    this.newDictionary['0x0018']['0x1066'] = ['DS', '1', 'FrameDelay'];
-    this.newDictionary['0x0018']['0x1067'] = ['DS', '1', 'ImageTriggerDelay'];
-    this.newDictionary['0x0018']['0x1068'] = ['DS', '1', 'MultiplexGroupTimeOffset'];
-    this.newDictionary['0x0018']['0x1069'] = ['DS', '1', 'TriggerTimeOffset'];
-    this.newDictionary['0x0018']['0x106A'] = ['CS', '1', 'SynchronizationTrigger'];
-    this.newDictionary['0x0018']['0x106C'] = ['US', '2', 'SynchronizationChannel'];
-    this.newDictionary['0x0018']['0x106E'] = ['UL', '1', 'TriggerSamplePosition'];
-    this.newDictionary['0x0018']['0x1070'] = ['LO', '1-n', 'RadionuclideRoute'];
-    this.newDictionary['0x0018']['0x1071'] = ['DS', '1-n', 'RadionuclideVolume'];
-    this.newDictionary['0x0018']['0x1072'] = ['TM', '1-n', 'RadionuclideStartTime'];
-    this.newDictionary['0x0018']['0x1073'] = ['TM', '1-n', 'RadionuclideStopTime'];
-    this.newDictionary['0x0018']['0x1074'] = ['DS', '1-n', 'RadionuclideTotalDose'];
-    this.newDictionary['0x0018']['0x1075'] = ['DS', '1', 'RadionuclideHalfLife'];
-    this.newDictionary['0x0018']['0x1076'] = ['DS', '1', 'RadionuclidePositronFraction'];
-    this.newDictionary['0x0018']['0x1077'] = ['DS', '1', 'RadiopharmaceuticalSpecificActivity'];
-    this.newDictionary['0x0018']['0x1080'] = ['CS', '1', 'BeatRejectionFlag'];
-    this.newDictionary['0x0018']['0x1081'] = ['IS', '1', 'LowRRValue'];
-    this.newDictionary['0x0018']['0x1082'] = ['IS', '1', 'HighRRValue'];
-    this.newDictionary['0x0018']['0x1083'] = ['IS', '1', 'IntervalsAcquired'];
-    this.newDictionary['0x0018']['0x1084'] = ['IS', '1', 'IntervalsRejected'];
-    this.newDictionary['0x0018']['0x1085'] = ['LO', '1', 'PVCRejection'];
-    this.newDictionary['0x0018']['0x1086'] = ['IS', '1', 'SkipBeats'];
-    this.newDictionary['0x0018']['0x1088'] = ['IS', '1', 'HeartRate'];
-    this.newDictionary['0x0018']['0x1090'] = ['IS', '1', 'CardiacNumberOfImages'];
-    this.newDictionary['0x0018']['0x1094'] = ['IS', '1', 'TriggerWindow'];
-    this.newDictionary['0x0018']['0x1100'] = ['DS', '1', 'ReconstructionDiameter'];
-    this.newDictionary['0x0018']['0x1110'] = ['DS', '1', 'DistanceSourceToDetector'];
-    this.newDictionary['0x0018']['0x1111'] = ['DS', '1', 'DistanceSourceToPatient'];
-    this.newDictionary['0x0018']['0x1114'] = ['DS', '1', 'EstimatedRadiographicMagnificationFactor'];
-    this.newDictionary['0x0018']['0x1120'] = ['DS', '1', 'GantryDetectorTilt'];
-    this.newDictionary['0x0018']['0x1121'] = ['DS', '1', 'GantryDetectorSlew'];
-    this.newDictionary['0x0018']['0x1130'] = ['DS', '1', 'TableHeight'];
-    this.newDictionary['0x0018']['0x1131'] = ['DS', '1', 'TableTraverse'];
-    this.newDictionary['0x0018']['0x1134'] = ['DS', '1', 'TableMotion'];
-    this.newDictionary['0x0018']['0x1135'] = ['DS', '1-n', 'TableVerticalIncrement'];
-    this.newDictionary['0x0018']['0x1136'] = ['DS', '1-n', 'TableLateralIncrement'];
-    this.newDictionary['0x0018']['0x1137'] = ['DS', '1-n', 'TableLongitudinalIncrement'];
-    this.newDictionary['0x0018']['0x1138'] = ['DS', '1', 'TableAngle'];
-    this.newDictionary['0x0018']['0x113A'] = ['CS', '1', 'TableType'];
-    this.newDictionary['0x0018']['0x1140'] = ['CS', '1', 'RotationDirection'];
-    this.newDictionary['0x0018']['0x1141'] = ['DS', '1', 'AngularPosition'];
-    this.newDictionary['0x0018']['0x1142'] = ['DS', '1-n', 'RadialPosition'];
-    this.newDictionary['0x0018']['0x1143'] = ['DS', '1', 'ScanArc'];
-    this.newDictionary['0x0018']['0x1144'] = ['DS', '1', 'AngularStep'];
-    this.newDictionary['0x0018']['0x1145'] = ['DS', '1', 'CenterOfRotationOffset'];
-    this.newDictionary['0x0018']['0x1146'] = ['DS', '1-n', 'RotationOffset'];
-    this.newDictionary['0x0018']['0x1147'] = ['CS', '1', 'FieldOfViewShape'];
-    this.newDictionary['0x0018']['0x1149'] = ['IS', '2', 'FieldOfViewDimension'];
-    this.newDictionary['0x0018']['0x1150'] = ['IS', '1', 'ExposureTime'];
-    this.newDictionary['0x0018']['0x1151'] = ['IS', '1', 'XrayTubeCurrent'];
-    this.newDictionary['0x0018']['0x1152'] = ['IS', '1', 'Exposure'];
-    this.newDictionary['0x0018']['0x1153'] = ['IS', '1', 'ExposureinuAs'];
-    this.newDictionary['0x0018']['0x1154'] = ['DS', '1', 'AveragePulseWidth'];
-    this.newDictionary['0x0018']['0x1155'] = ['CS', '1', 'RadiationSetting'];
-    this.newDictionary['0x0018']['0x1156'] = ['CS', '1', 'RectificationType'];
-    this.newDictionary['0x0018']['0x115A'] = ['CS', '1', 'RadiationMode'];
-    this.newDictionary['0x0018']['0x115E'] = ['DS', '1', 'ImageAreaDoseProduct'];
-    this.newDictionary['0x0018']['0x1160'] = ['SH', '1', 'FilterType'];
-    this.newDictionary['0x0018']['0x1161'] = ['LO', '1-n', 'TypeOfFilters'];
-    this.newDictionary['0x0018']['0x1162'] = ['DS', '1', 'IntensifierSize'];
-    this.newDictionary['0x0018']['0x1164'] = ['DS', '2', 'ImagerPixelSpacing'];
-    this.newDictionary['0x0018']['0x1166'] = ['CS', '1', 'Grid'];
-    this.newDictionary['0x0018']['0x1170'] = ['IS', '1', 'GeneratorPower'];
-    this.newDictionary['0x0018']['0x1180'] = ['SH', '1', 'CollimatorGridName'];
-    this.newDictionary['0x0018']['0x1181'] = ['CS', '1', 'CollimatorType'];
-    this.newDictionary['0x0018']['0x1182'] = ['IS', '1', 'FocalDistance'];
-    this.newDictionary['0x0018']['0x1183'] = ['DS', '1', 'XFocusCenter'];
-    this.newDictionary['0x0018']['0x1184'] = ['DS', '1', 'YFocusCenter'];
-    this.newDictionary['0x0018']['0x1190'] = ['DS', '1-n', 'FocalSpot'];
-    this.newDictionary['0x0018']['0x1191'] = ['CS', '1', 'AnodeTargetMaterial'];
-    this.newDictionary['0x0018']['0x11A0'] = ['DS', '1', 'BodyPartThickness'];
-    this.newDictionary['0x0018']['0x11A2'] = ['DS', '1', 'CompressionForce'];
-    this.newDictionary['0x0018']['0x1200'] = ['DA', '1-n', 'DateOfLastCalibration'];
-    this.newDictionary['0x0018']['0x1201'] = ['TM', '1-n', 'TimeOfLastCalibration'];
-    this.newDictionary['0x0018']['0x1210'] = ['SH', '1-n', 'ConvolutionKernel'];
-    this.newDictionary['0x0018']['0x1240'] = ['IS', '1-n', 'UpperLowerPixelValues'];
-    this.newDictionary['0x0018']['0x1242'] = ['IS', '1', 'ActualFrameDuration'];
-    this.newDictionary['0x0018']['0x1243'] = ['IS', '1', 'CountRate'];
-    this.newDictionary['0x0018']['0x1244'] = ['US', '1', 'PreferredPlaybackSequencing'];
-    this.newDictionary['0x0018']['0x1250'] = ['SH', '1', 'ReceivingCoil'];
-    this.newDictionary['0x0018']['0x1251'] = ['SH', '1', 'TransmittingCoil'];
-    this.newDictionary['0x0018']['0x1260'] = ['SH', '1', 'PlateType'];
-    this.newDictionary['0x0018']['0x1261'] = ['LO', '1', 'PhosphorType'];
-    this.newDictionary['0x0018']['0x1300'] = ['IS', '1', 'ScanVelocity'];
-    this.newDictionary['0x0018']['0x1301'] = ['CS', '1-n', 'WholeBodyTechnique'];
-    this.newDictionary['0x0018']['0x1302'] = ['IS', '1', 'ScanLength'];
-    this.newDictionary['0x0018']['0x1310'] = ['US', '4', 'AcquisitionMatrix'];
-    this.newDictionary['0x0018']['0x1312'] = ['CS', '1', 'PhaseEncodingDirection'];
-    this.newDictionary['0x0018']['0x1314'] = ['DS', '1', 'FlipAngle'];
-    this.newDictionary['0x0018']['0x1315'] = ['CS', '1', 'VariableFlipAngleFlag'];
-    this.newDictionary['0x0018']['0x1316'] = ['DS', '1', 'SAR'];
-    this.newDictionary['0x0018']['0x1318'] = ['DS', '1', 'dBdt'];
-    this.newDictionary['0x0018']['0x1400'] = ['LO', '1', 'AcquisitionDeviceProcessingDescription'];
-    this.newDictionary['0x0018']['0x1401'] = ['LO', '1', 'AcquisitionDeviceProcessingCode'];
-    this.newDictionary['0x0018']['0x1402'] = ['CS', '1', 'CassetteOrientation'];
-    this.newDictionary['0x0018']['0x1403'] = ['CS', '1', 'CassetteSize'];
-    this.newDictionary['0x0018']['0x1404'] = ['US', '1', 'ExposuresOnPlate'];
-    this.newDictionary['0x0018']['0x1405'] = ['IS', '1', 'RelativeXrayExposure'];
-    this.newDictionary['0x0018']['0x1450'] = ['DS', '1', 'ColumnAngulation'];
-    this.newDictionary['0x0018']['0x1460'] = ['DS', '1', 'TomoLayerHeight'];
-    this.newDictionary['0x0018']['0x1470'] = ['DS', '1', 'TomoAngle'];
-    this.newDictionary['0x0018']['0x1480'] = ['DS', '1', 'TomoTime'];
-    this.newDictionary['0x0018']['0x1490'] = ['CS', '1', 'TomoType'];
-    this.newDictionary['0x0018']['0x1491'] = ['CS', '1', 'TomoClass'];
-    this.newDictionary['0x0018']['0x1495'] = ['IS', '1', 'NumberofTomosynthesisSourceImages'];
-    this.newDictionary['0x0018']['0x1500'] = ['CS', '1', 'PositionerMotion'];
-    this.newDictionary['0x0018']['0x1508'] = ['CS', '1', 'PositionerType'];
-    this.newDictionary['0x0018']['0x1510'] = ['DS', '1', 'PositionerPrimaryAngle'];
-    this.newDictionary['0x0018']['0x1511'] = ['DS', '1', 'PositionerSecondaryAngle'];
-    this.newDictionary['0x0018']['0x1520'] = ['DS', '1-n', 'PositionerPrimaryAngleIncrement'];
-    this.newDictionary['0x0018']['0x1521'] = ['DS', '1-n', 'PositionerSecondaryAngleIncrement'];
-    this.newDictionary['0x0018']['0x1530'] = ['DS', '1', 'DetectorPrimaryAngle'];
-    this.newDictionary['0x0018']['0x1531'] = ['DS', '1', 'DetectorSecondaryAngle'];
-    this.newDictionary['0x0018']['0x1600'] = ['CS', '3', 'ShutterShape'];
-    this.newDictionary['0x0018']['0x1602'] = ['IS', '1', 'ShutterLeftVerticalEdge'];
-    this.newDictionary['0x0018']['0x1604'] = ['IS', '1', 'ShutterRightVerticalEdge'];
-    this.newDictionary['0x0018']['0x1606'] = ['IS', '1', 'ShutterUpperHorizontalEdge'];
-    this.newDictionary['0x0018']['0x1608'] = ['IS', '1', 'ShutterLowerHorizontalEdge'];
-    this.newDictionary['0x0018']['0x1610'] = ['IS', '1', 'CenterOfCircularShutter'];
-    this.newDictionary['0x0018']['0x1612'] = ['IS', '1', 'RadiusOfCircularShutter'];
-    this.newDictionary['0x0018']['0x1620'] = ['IS', '1-n', 'VerticesOfPolygonalShutter'];
-    this.newDictionary['0x0018']['0x1622'] = ['US', '1', 'ShutterPresentationValue'];
-    this.newDictionary['0x0018']['0x1623'] = ['US', '1', 'ShutterOverlayGroup'];
-    this.newDictionary['0x0018']['0x1700'] = ['CS', '3', 'CollimatorShape'];
-    this.newDictionary['0x0018']['0x1702'] = ['IS', '1', 'CollimatorLeftVerticalEdge'];
-    this.newDictionary['0x0018']['0x1704'] = ['IS', '1', 'CollimatorRightVerticalEdge'];
-    this.newDictionary['0x0018']['0x1706'] = ['IS', '1', 'CollimatorUpperHorizontalEdge'];
-    this.newDictionary['0x0018']['0x1708'] = ['IS', '1', 'CollimatorLowerHorizontalEdge'];
-    this.newDictionary['0x0018']['0x1710'] = ['IS', '1', 'CenterOfCircularCollimator'];
-    this.newDictionary['0x0018']['0x1712'] = ['IS', '1', 'RadiusOfCircularCollimator'];
-    this.newDictionary['0x0018']['0x1720'] = ['IS', '1-n', 'VerticesOfPolygonalCollimator'];
-    this.newDictionary['0x0018']['0x1800'] = ['CS', '1', 'AcquisitionTimeSynchronized'];
-    this.newDictionary['0x0018']['0x1801'] = ['SH', '1', 'TimeSource'];
-    this.newDictionary['0x0018']['0x1802'] = ['CS', '1', 'TimeDistributionProtocol'];
-    this.newDictionary['0x0018']['0x1810'] = ['DT', '1', 'AcquisitionTimestamp'];
-    this.newDictionary['0x0018']['0x4000'] = ['LT', '1-n', 'AcquisitionComments'];
-    this.newDictionary['0x0018']['0x5000'] = ['SH', '1-n', 'OutputPower'];
-    this.newDictionary['0x0018']['0x5010'] = ['LO', '3', 'TransducerData'];
-    this.newDictionary['0x0018']['0x5012'] = ['DS', '1', 'FocusDepth'];
-    this.newDictionary['0x0018']['0x5020'] = ['LO', '1', 'PreprocessingFunction'];
-    this.newDictionary['0x0018']['0x5021'] = ['LO', '1', 'PostprocessingFunction'];
-    this.newDictionary['0x0018']['0x5022'] = ['DS', '1', 'MechanicalIndex'];
-    this.newDictionary['0x0018']['0x5024'] = ['DS', '1', 'ThermalIndex'];
-    this.newDictionary['0x0018']['0x5026'] = ['DS', '1', 'CranialThermalIndex'];
-    this.newDictionary['0x0018']['0x5027'] = ['DS', '1', 'SoftTissueThermalIndex'];
-    this.newDictionary['0x0018']['0x5028'] = ['DS', '1', 'SoftTissueFocusThermalIndex'];
-    this.newDictionary['0x0018']['0x5029'] = ['DS', '1', 'SoftTissueSurfaceThermalIndex'];
-    this.newDictionary['0x0018']['0x5030'] = ['DS', '1', 'DynamicRange'];
-    this.newDictionary['0x0018']['0x5040'] = ['DS', '1', 'TotalGain'];
-    this.newDictionary['0x0018']['0x5050'] = ['IS', '1', 'DepthOfScanField'];
-    this.newDictionary['0x0018']['0x5100'] = ['CS', '1', 'PatientPosition'];
-    this.newDictionary['0x0018']['0x5101'] = ['CS', '1', 'ViewPosition'];
-    this.newDictionary['0x0018']['0x5104'] = ['SQ', '1', 'ProjectionEponymousNameCodeSequence'];
-    this.newDictionary['0x0018']['0x5210'] = ['DS', '6', 'ImageTransformationMatrix'];
-    this.newDictionary['0x0018']['0x5212'] = ['DS', '3', 'ImageTranslationVector'];
-    this.newDictionary['0x0018']['0x6000'] = ['DS', '1', 'Sensitivity'];
-    this.newDictionary['0x0018']['0x6011'] = ['SQ', '1', 'SequenceOfUltrasoundRegions'];
-    this.newDictionary['0x0018']['0x6012'] = ['US', '1', 'RegionSpatialFormat'];
-    this.newDictionary['0x0018']['0x6014'] = ['US', '1', 'RegionDataType'];
-    this.newDictionary['0x0018']['0x6016'] = ['UL', '1', 'RegionFlags'];
-    this.newDictionary['0x0018']['0x6018'] = ['UL', '1', 'RegionLocationMinX0'];
-    this.newDictionary['0x0018']['0x601A'] = ['UL', '1', 'RegionLocationMinY0'];
-    this.newDictionary['0x0018']['0x601C'] = ['UL', '1', 'RegionLocationMaxX1'];
-    this.newDictionary['0x0018']['0x601E'] = ['UL', '1', 'RegionLocationMaxY1'];
-    this.newDictionary['0x0018']['0x6020'] = ['SL', '1', 'ReferencePixelX0'];
-    this.newDictionary['0x0018']['0x6022'] = ['SL', '1', 'ReferencePixelY0'];
-    this.newDictionary['0x0018']['0x6024'] = ['US', '1', 'PhysicalUnitsXDirection'];
-    this.newDictionary['0x0018']['0x6026'] = ['US', '1', 'PhysicalUnitsYDirection'];
-    this.newDictionary['0x0018']['0x6028'] = ['FD', '1', 'ReferencePixelPhysicalValueX'];
-    this.newDictionary['0x0018']['0x602A'] = ['FD', '1', 'ReferencePixelPhysicalValueY'];
-    this.newDictionary['0x0018']['0x602C'] = ['FD', '1', 'PhysicalDeltaX'];
-    this.newDictionary['0x0018']['0x602E'] = ['FD', '1', 'PhysicalDeltaY'];
-    this.newDictionary['0x0018']['0x6030'] = ['UL', '1', 'TransducerFrequency'];
-    this.newDictionary['0x0018']['0x6031'] = ['CS', '1', 'TransducerType'];
-    this.newDictionary['0x0018']['0x6032'] = ['UL', '1', 'PulseRepetitionFrequency'];
-    this.newDictionary['0x0018']['0x6034'] = ['FD', '1', 'DopplerCorrectionAngle'];
-    this.newDictionary['0x0018']['0x6036'] = ['FD', '1', 'SteeringAngle'];
-    this.newDictionary['0x0018']['0x6038'] = ['UL', '1', 'DopplerSampleVolumeXPosition'];
-    this.newDictionary['0x0018']['0x603A'] = ['UL', '1', 'DopplerSampleVolumeYPosition'];
-    this.newDictionary['0x0018']['0x603C'] = ['UL', '1', 'TMLinePositionX0'];
-    this.newDictionary['0x0018']['0x603E'] = ['UL', '1', 'TMLinePositionY0'];
-    this.newDictionary['0x0018']['0x6040'] = ['UL', '1', 'TMLinePositionX1'];
-    this.newDictionary['0x0018']['0x6042'] = ['UL', '1', 'TMLinePositionY1'];
-    this.newDictionary['0x0018']['0x6044'] = ['US', '1', 'PixelComponentOrganization'];
-    this.newDictionary['0x0018']['0x6046'] = ['UL', '1', 'PixelComponentMask'];
-    this.newDictionary['0x0018']['0x6048'] = ['UL', '1', 'PixelComponentRangeStart'];
-    this.newDictionary['0x0018']['0x604A'] = ['UL', '1', 'PixelComponentRangeStop'];
-    this.newDictionary['0x0018']['0x604C'] = ['US', '1', 'PixelComponentPhysicalUnits'];
-    this.newDictionary['0x0018']['0x604E'] = ['US', '1', 'PixelComponentDataType'];
-    this.newDictionary['0x0018']['0x6050'] = ['UL', '1', 'NumberOfTableBreakPoints'];
-    this.newDictionary['0x0018']['0x6052'] = ['UL', '1-n', 'TableOfXBreakPoints'];
-    this.newDictionary['0x0018']['0x6054'] = ['FD', '1-n', 'TableOfYBreakPoints'];
-    this.newDictionary['0x0018']['0x6056'] = ['UL', '1', 'NumberOfTableEntries'];
-    this.newDictionary['0x0018']['0x6058'] = ['UL', '1-n', 'TableOfPixelValues'];
-    this.newDictionary['0x0018']['0x605A'] = ['FL', '1-n', 'TableOfParameterValues'];
-    this.newDictionary['0x0018']['0x7000'] = ['CS', '1', 'DetectorConditionsNominalFlag'];
-    this.newDictionary['0x0018']['0x7001'] = ['DS', '1', 'DetectorTemperature'];
-    this.newDictionary['0x0018']['0x7004'] = ['CS', '1', 'DetectorType'];
-    this.newDictionary['0x0018']['0x7005'] = ['CS', '1', 'DetectorConfiguration'];
-    this.newDictionary['0x0018']['0x7006'] = ['LT', '1', 'DetectorDescription'];
-    this.newDictionary['0x0018']['0x7008'] = ['LT', '1', 'DetectorMode'];
-    this.newDictionary['0x0018']['0x700A'] = ['SH', '1', 'DetectorID'];
-    this.newDictionary['0x0018']['0x700C'] = ['DA', '1', 'DateofLastDetectorCalibration'];
-    this.newDictionary['0x0018']['0x700E'] = ['TM', '1', 'TimeofLastDetectorCalibration'];
-    this.newDictionary['0x0018']['0x7010'] = ['IS', '1', 'ExposuresOnDetectorSinceLastCalibration'];
-    this.newDictionary['0x0018']['0x7011'] = ['IS', '1', 'ExposuresOnDetectorSinceManufactured'];
-    this.newDictionary['0x0018']['0x7012'] = ['DS', '1', 'DetectorTimeSinceLastExposure'];
-    this.newDictionary['0x0018']['0x7014'] = ['DS', '1', 'DetectorActiveTime'];
-    this.newDictionary['0x0018']['0x7016'] = ['DS', '1', 'DetectorActivationOffsetFromExposure'];
-    this.newDictionary['0x0018']['0x701A'] = ['DS', '2', 'DetectorBinning'];
-    this.newDictionary['0x0018']['0x7020'] = ['DS', '2', 'DetectorElementPhysicalSize'];
-    this.newDictionary['0x0018']['0x7022'] = ['DS', '2', 'DetectorElementSpacing'];
-    this.newDictionary['0x0018']['0x7024'] = ['CS', '1', 'DetectorActiveShape'];
-    this.newDictionary['0x0018']['0x7026'] = ['DS', '1-2', 'DetectorActiveDimensions'];
-    this.newDictionary['0x0018']['0x7028'] = ['DS', '2', 'DetectorActiveOrigin'];
-    this.newDictionary['0x0018']['0x7030'] = ['DS', '2', 'FieldofViewOrigin'];
-    this.newDictionary['0x0018']['0x7032'] = ['DS', '1', 'FieldofViewRotation'];
-    this.newDictionary['0x0018']['0x7034'] = ['CS', '1', 'FieldofViewHorizontalFlip'];
-    this.newDictionary['0x0018']['0x7040'] = ['LT', '1', 'GridAbsorbingMaterial'];
-    this.newDictionary['0x0018']['0x7041'] = ['LT', '1', 'GridSpacingMaterial'];
-    this.newDictionary['0x0018']['0x7042'] = ['DS', '1', 'GridThickness'];
-    this.newDictionary['0x0018']['0x7044'] = ['DS', '1', 'GridPitch'];
-    this.newDictionary['0x0018']['0x7046'] = ['IS', '2', 'GridAspectRatio'];
-    this.newDictionary['0x0018']['0x7048'] = ['DS', '1', 'GridPeriod'];
-    this.newDictionary['0x0018']['0x704C'] = ['DS', '1', 'GridFocalDistance'];
-    this.newDictionary['0x0018']['0x7050'] = ['LT', '1-n', 'FilterMaterial'];
-    this.newDictionary['0x0018']['0x7052'] = ['DS', '1-n', 'FilterThicknessMinimum'];
-    this.newDictionary['0x0018']['0x7054'] = ['DS', '1-n', 'FilterThicknessMaximum'];
-    this.newDictionary['0x0018']['0x7060'] = ['CS', '1', 'ExposureControlMode'];
-    this.newDictionary['0x0018']['0x7062'] = ['LT', '1', 'ExposureControlModeDescription'];
-    this.newDictionary['0x0018']['0x7064'] = ['CS', '1', 'ExposureStatus'];
-    this.newDictionary['0x0018']['0x7065'] = ['DS', '1', 'PhototimerSetting'];
-
-    // 0x0020
-    this.newDictionary['0x0020'] = [];
-    this.newDictionary['0x0020']['0x0000'] = ['UL', '1', 'ImageGroupLength'];
-    this.newDictionary['0x0020']['0x000D'] = ['UI', '1', 'StudyInstanceUID'];
-    this.newDictionary['0x0020']['0x000E'] = ['UI', '1', 'SeriesInstanceUID'];
-    this.newDictionary['0x0020']['0x0010'] = ['SH', '1', 'StudyID'];
-    this.newDictionary['0x0020']['0x0011'] = ['IS', '1', 'SeriesNumber'];
-    this.newDictionary['0x0020']['0x0012'] = ['IS', '1', 'AcquisitionNumber'];
-    this.newDictionary['0x0020']['0x0013'] = ['IS', '1', 'ImageNumber'];
-    this.newDictionary['0x0020']['0x0014'] = ['IS', '1', 'IsotopeNumber'];
-    this.newDictionary['0x0020']['0x0015'] = ['IS', '1', 'PhaseNumber'];
-    this.newDictionary['0x0020']['0x0016'] = ['IS', '1', 'IntervalNumber'];
-    this.newDictionary['0x0020']['0x0017'] = ['IS', '1', 'TimeSlotNumber'];
-    this.newDictionary['0x0020']['0x0018'] = ['IS', '1', 'AngleNumber'];
-    this.newDictionary['0x0020']['0x0019'] = ['IS', '1', 'ItemNumber'];
-    this.newDictionary['0x0020']['0x0020'] = ['CS', '2', 'PatientOrientation'];
-    this.newDictionary['0x0020']['0x0022'] = ['IS', '1', 'OverlayNumber'];
-    this.newDictionary['0x0020']['0x0024'] = ['IS', '1', 'CurveNumber'];
-    this.newDictionary['0x0020']['0x0026'] = ['IS', '1', 'LUTNumber'];
-    this.newDictionary['0x0020']['0x0030'] = ['DS', '3', 'ImagePosition'];
-    this.newDictionary['0x0020']['0x0032'] = ['DS', '3', 'ImagePositionPatient'];
-    this.newDictionary['0x0020']['0x0035'] = ['DS', '6', 'ImageOrientation'];
-    this.newDictionary['0x0020']['0x0037'] = ['DS', '6', 'ImageOrientationPatient'];
-    this.newDictionary['0x0020']['0x0050'] = ['DS', '1', 'Location'];
-    this.newDictionary['0x0020']['0x0052'] = ['UI', '1', 'FrameOfReferenceUID'];
-    this.newDictionary['0x0020']['0x0060'] = ['CS', '1', 'Laterality'];
-    this.newDictionary['0x0020']['0x0062'] = ['CS', '1', 'ImageLaterality'];
-    this.newDictionary['0x0020']['0x0070'] = ['LT', '1', 'ImageGeometryType'];
-    this.newDictionary['0x0020']['0x0080'] = ['CS', '1-n', 'MaskingImage'];
-    this.newDictionary['0x0020']['0x0100'] = ['IS', '1', 'TemporalPositionIdentifier'];
-    this.newDictionary['0x0020']['0x0105'] = ['IS', '1', 'NumberOfTemporalPositions'];
-    this.newDictionary['0x0020']['0x0110'] = ['DS', '1', 'TemporalResolution'];
-    this.newDictionary['0x0020']['0x0200'] = ['UI', '1', 'SynchronizationFrameofReferenceUID'];
-    this.newDictionary['0x0020']['0x1000'] = ['IS', '1', 'SeriesInStudy'];
-    this.newDictionary['0x0020']['0x1001'] = ['IS', '1', 'AcquisitionsInSeries'];
-    this.newDictionary['0x0020']['0x1002'] = ['IS', '1', 'ImagesInAcquisition'];
-    this.newDictionary['0x0020']['0x1003'] = ['IS', '1', 'ImagesInSeries'];
-    this.newDictionary['0x0020']['0x1004'] = ['IS', '1', 'AcquisitionsInStudy'];
-    this.newDictionary['0x0020']['0x1005'] = ['IS', '1', 'ImagesInStudy'];
-    this.newDictionary['0x0020']['0x1020'] = ['CS', '1-n', 'Reference'];
-    this.newDictionary['0x0020']['0x1040'] = ['LO', '1', 'PositionReferenceIndicator'];
-    this.newDictionary['0x0020']['0x1041'] = ['DS', '1', 'SliceLocation'];
-    this.newDictionary['0x0020']['0x1070'] = ['IS', '1-n', 'OtherStudyNumbers'];
-    this.newDictionary['0x0020']['0x1200'] = ['IS', '1', 'NumberOfPatientRelatedStudies'];
-    this.newDictionary['0x0020']['0x1202'] = ['IS', '1', 'NumberOfPatientRelatedSeries'];
-    this.newDictionary['0x0020']['0x1204'] = ['IS', '1', 'NumberOfPatientRelatedImages'];
-    this.newDictionary['0x0020']['0x1206'] = ['IS', '1', 'NumberOfStudyRelatedSeries'];
-    this.newDictionary['0x0020']['0x1208'] = ['IS', '1', 'NumberOfStudyRelatedImages'];
-    this.newDictionary['0x0020']['0x1209'] = ['IS', '1', 'NumberOfSeriesRelatedInstances'];
-    this.newDictionary['0x0020']['0x3100'] = ['CS', '1-n', 'SourceImageID'];
-    this.newDictionary['0x0020']['0x3401'] = ['CS', '1', 'ModifyingDeviceID'];
-    this.newDictionary['0x0020']['0x3402'] = ['CS', '1', 'ModifiedImageID'];
-    this.newDictionary['0x0020']['0x3403'] = ['DA', '1', 'ModifiedImageDate'];
-    this.newDictionary['0x0020']['0x3404'] = ['LO', '1', 'ModifyingDeviceManufacturer'];
-    this.newDictionary['0x0020']['0x3405'] = ['TM', '1', 'ModifiedImageTime'];
-    this.newDictionary['0x0020']['0x3406'] = ['LT', '1', 'ModifiedImageDescription'];
-    this.newDictionary['0x0020']['0x4000'] = ['LT', '1', 'ImageComments'];
-    this.newDictionary['0x0020']['0x5000'] = ['AT', '1-n', 'OriginalImageIdentification'];
-    this.newDictionary['0x0020']['0x5002'] = ['CS', '1-n', 'OriginalImageIdentificationNomenclature'];
-
-    // 0x0028
-    this.newDictionary['0x0028'] = [];
-    this.newDictionary['0x0028']['0x0000'] = ['UL', '1', 'ImagePresentationGroupLength'];
-    this.newDictionary['0x0028']['0x0002'] = ['US', '1', 'SamplesPerPixel'];
-    this.newDictionary['0x0028']['0x0004'] = ['CS', '1', 'PhotometricInterpretation'];
-    this.newDictionary['0x0028']['0x0005'] = ['US', '1', 'ImageDimensions'];
-    this.newDictionary['0x0028']['0x0006'] = ['US', '1', 'PlanarConfiguration'];
-    this.newDictionary['0x0028']['0x0008'] = ['IS', '1', 'NumberOfFrames'];
-    this.newDictionary['0x0028']['0x0009'] = ['AT', '1', 'FrameIncrementPointer'];
-    this.newDictionary['0x0028']['0x0010'] = ['US', '1', 'Rows'];
-    this.newDictionary['0x0028']['0x0011'] = ['US', '1', 'Columns'];
-    this.newDictionary['0x0028']['0x0012'] = ['US', '1', 'Planes'];
-    this.newDictionary['0x0028']['0x0014'] = ['US', '1', 'UltrasoundColorDataPresent'];
-    this.newDictionary['0x0028']['0x0030'] = ['DS', '2', 'PixelSpacing'];
-    this.newDictionary['0x0028']['0x0031'] = ['DS', '2', 'ZoomFactor'];
-    this.newDictionary['0x0028']['0x0032'] = ['DS', '2', 'ZoomCenter'];
-    this.newDictionary['0x0028']['0x0034'] = ['IS', '2', 'PixelAspectRatio'];
-    this.newDictionary['0x0028']['0x0040'] = ['CS', '1', 'ImageFormat'];
-    this.newDictionary['0x0028']['0x0050'] = ['LT', '1-n', 'ManipulatedImage'];
-    this.newDictionary['0x0028']['0x0051'] = ['CS', '1', 'CorrectedImage'];
-    this.newDictionary['0x0028']['0x005F'] = ['CS', '1', 'CompressionRecognitionCode'];
-    this.newDictionary['0x0028']['0x0060'] = ['CS', '1', 'CompressionCode'];
-    this.newDictionary['0x0028']['0x0061'] = ['SH', '1', 'CompressionOriginator'];
-    this.newDictionary['0x0028']['0x0062'] = ['SH', '1', 'CompressionLabel'];
-    this.newDictionary['0x0028']['0x0063'] = ['SH', '1', 'CompressionDescription'];
-    this.newDictionary['0x0028']['0x0065'] = ['CS', '1-n', 'CompressionSequence'];
-    this.newDictionary['0x0028']['0x0066'] = ['AT', '1-n', 'CompressionStepPointers'];
-    this.newDictionary['0x0028']['0x0068'] = ['US', '1', 'RepeatInterval'];
-    this.newDictionary['0x0028']['0x0069'] = ['US', '1', 'BitsGrouped'];
-    this.newDictionary['0x0028']['0x0070'] = ['US', '1-n', 'PerimeterTable'];
-    this.newDictionary['0x0028']['0x0071'] = ['XS', '1', 'PerimeterValue'];
-    this.newDictionary['0x0028']['0x0080'] = ['US', '1', 'PredictorRows'];
-    this.newDictionary['0x0028']['0x0081'] = ['US', '1', 'PredictorColumns'];
-    this.newDictionary['0x0028']['0x0082'] = ['US', '1-n', 'PredictorConstants'];
-    this.newDictionary['0x0028']['0x0090'] = ['CS', '1', 'BlockedPixels'];
-    this.newDictionary['0x0028']['0x0091'] = ['US', '1', 'BlockRows'];
-    this.newDictionary['0x0028']['0x0092'] = ['US', '1', 'BlockColumns'];
-    this.newDictionary['0x0028']['0x0093'] = ['US', '1', 'RowOverlap'];
-    this.newDictionary['0x0028']['0x0094'] = ['US', '1', 'ColumnOverlap'];
-    this.newDictionary['0x0028']['0x0100'] = ['US', '1', 'BitsAllocated'];
-    this.newDictionary['0x0028']['0x0101'] = ['US', '1', 'BitsStored'];
-    this.newDictionary['0x0028']['0x0102'] = ['US', '1', 'HighBit'];
-    this.newDictionary['0x0028']['0x0103'] = ['US', '1', 'PixelRepresentation'];
-    this.newDictionary['0x0028']['0x0104'] = ['XS', '1', 'SmallestValidPixelValue'];
-    this.newDictionary['0x0028']['0x0105'] = ['XS', '1', 'LargestValidPixelValue'];
-    this.newDictionary['0x0028']['0x0106'] = ['XS', '1', 'SmallestImagePixelValue'];
-    this.newDictionary['0x0028']['0x0107'] = ['XS', '1', 'LargestImagePixelValue'];
-    this.newDictionary['0x0028']['0x0108'] = ['XS', '1', 'SmallestPixelValueInSeries'];
-    this.newDictionary['0x0028']['0x0109'] = ['XS', '1', 'LargestPixelValueInSeries'];
-    this.newDictionary['0x0028']['0x0110'] = ['XS', '1', 'SmallestPixelValueInPlane'];
-    this.newDictionary['0x0028']['0x0111'] = ['XS', '1', 'LargestPixelValueInPlane'];
-    this.newDictionary['0x0028']['0x0120'] = ['XS', '1', 'PixelPaddingValue'];
-    this.newDictionary['0x0028']['0x0200'] = ['US', '1', 'ImageLocation'];
-    this.newDictionary['0x0028']['0x0300'] = ['CS', '1', 'QualityControlImage'];
-    this.newDictionary['0x0028']['0x0301'] = ['CS', '1', 'BurnedInAnnotation'];
-    this.newDictionary['0x0028']['0x0400'] = ['CS', '1', 'TransformLabel'];
-    this.newDictionary['0x0028']['0x0401'] = ['CS', '1', 'TransformVersionNumber'];
-    this.newDictionary['0x0028']['0x0402'] = ['US', '1', 'NumberOfTransformSteps'];
-    this.newDictionary['0x0028']['0x0403'] = ['CS', '1-n', 'SequenceOfCompressedData'];
-    this.newDictionary['0x0028']['0x0404'] = ['AT', '1-n', 'DetailsOfCoefficients'];
-    this.newDictionary['0x0028']['0x0410'] = ['US', '1', 'RowsForNthOrderCoefficients'];
-    this.newDictionary['0x0028']['0x0411'] = ['US', '1', 'ColumnsForNthOrderCoefficients'];
-    this.newDictionary['0x0028']['0x0412'] = ['CS', '1-n', 'CoefficientCoding'];
-    this.newDictionary['0x0028']['0x0413'] = ['AT', '1-n', 'CoefficientCodingPointers'];
-    this.newDictionary['0x0028']['0x0700'] = ['CS', '1', 'DCTLabel'];
-    this.newDictionary['0x0028']['0x0701'] = ['CS', '1-n', 'DataBlockDescription'];
-    this.newDictionary['0x0028']['0x0702'] = ['AT', '1-n', 'DataBlock'];
-    this.newDictionary['0x0028']['0x0710'] = ['US', '1', 'NormalizationFactorFormat'];
-    this.newDictionary['0x0028']['0x0720'] = ['US', '1', 'ZonalMapNumberFormat'];
-    this.newDictionary['0x0028']['0x0721'] = ['AT', '1-n', 'ZonalMapLocation'];
-    this.newDictionary['0x0028']['0x0722'] = ['US', '1', 'ZonalMapFormat'];
-    this.newDictionary['0x0028']['0x0730'] = ['US', '1', 'AdaptiveMapFormat'];
-    this.newDictionary['0x0028']['0x0740'] = ['US', '1', 'CodeNumberFormat'];
-    this.newDictionary['0x0028']['0x0800'] = ['CS', '1-n', 'CodeLabel'];
-    this.newDictionary['0x0028']['0x0802'] = ['US', '1', 'NumberOfTables'];
-    this.newDictionary['0x0028']['0x0803'] = ['AT', '1-n', 'CodeTableLocation'];
-    this.newDictionary['0x0028']['0x0804'] = ['US', '1', 'BitsForCodeWord'];
-    this.newDictionary['0x0028']['0x0808'] = ['AT', '1-n', 'ImageDataLocation'];
-    this.newDictionary['0x0028']['0x1040'] = ['CS', '1', 'PixelIntensityRelationship'];
-    this.newDictionary['0x0028']['0x1041'] = ['SS', '1', 'PixelIntensityRelationshipSign'];
-    this.newDictionary['0x0028']['0x1050'] = ['DS', '1-n', 'WindowCenter'];
-    this.newDictionary['0x0028']['0x1051'] = ['DS', '1-n', 'WindowWidth'];
-    this.newDictionary['0x0028']['0x1052'] = ['DS', '1', 'RescaleIntercept'];
-    this.newDictionary['0x0028']['0x1053'] = ['DS', '1', 'RescaleSlope'];
-    this.newDictionary['0x0028']['0x1054'] = ['LO', '1', 'RescaleType'];
-    this.newDictionary['0x0028']['0x1055'] = ['LO', '1-n', 'WindowCenterWidthExplanation'];
-    this.newDictionary['0x0028']['0x1080'] = ['CS', '1', 'GrayScale'];
-    this.newDictionary['0x0028']['0x1090'] = ['CS', '1', 'RecommendedViewingMode'];
-    this.newDictionary['0x0028']['0x1100'] = ['XS', '3', 'GrayLookupTableDescriptor'];
-    this.newDictionary['0x0028']['0x1101'] = ['XS', '3', 'RedPaletteColorLookupTableDescriptor'];
-    this.newDictionary['0x0028']['0x1102'] = ['XS', '3', 'GreenPaletteColorLookupTableDescriptor'];
-    this.newDictionary['0x0028']['0x1103'] = ['XS', '3', 'BluePaletteColorLookupTableDescriptor'];
-    this.newDictionary['0x0028']['0x1111'] = ['US', '4', 'LargeRedPaletteColorLookupTableDescriptor'];
-    this.newDictionary['0x0028']['0x1112'] = ['US', '4', 'LargeGreenPaletteColorLookupTabe'];
-    this.newDictionary['0x0028']['0x1113'] = ['US', '4', 'LargeBluePaletteColorLookupTabl'];
-    this.newDictionary['0x0028']['0x1199'] = ['UI', '1', 'PaletteColorLookupTableUID'];
-    this.newDictionary['0x0028']['0x1200'] = ['XS', '1-n', 'GrayLookupTableData'];
-    this.newDictionary['0x0028']['0x1201'] = ['XS', '1-n', 'RedPaletteColorLookupTableData'];
-    this.newDictionary['0x0028']['0x1202'] = ['XS', '1-n', 'GreenPaletteColorLookupTableData'];
-    this.newDictionary['0x0028']['0x1203'] = ['XS', '1-n', 'BluePaletteColorLookupTableData'];
-    this.newDictionary['0x0028']['0x1211'] = ['OW', '1', 'LargeRedPaletteColorLookupTableData'];
-    this.newDictionary['0x0028']['0x1212'] = ['OW', '1', 'LargeGreenPaletteColorLookupTableData'];
-    this.newDictionary['0x0028']['0x1213'] = ['OW', '1', 'LargeBluePaletteColorLookupTableData'];
-    this.newDictionary['0x0028']['0x1214'] = ['UI', '1', 'LargePaletteColorLookupTableUID'];
-    this.newDictionary['0x0028']['0x1221'] = ['OW', '1', 'SegmentedRedPaletteColorLookupTableData'];
-    this.newDictionary['0x0028']['0x1222'] = ['OW', '1', 'SegmentedGreenPaletteColorLookupTableData'];
-    this.newDictionary['0x0028']['0x1223'] = ['OW', '1', 'SegmentedBluePaletteColorLookupTableData'];
-    this.newDictionary['0x0028']['0x1300'] = ['CS', '1', 'ImplantPresent'];
-    this.newDictionary['0x0028']['0x2110'] = ['CS', '1', 'LossyImageCompression'];
-    this.newDictionary['0x0028']['0x2112'] = ['DS', '1-n', 'LossyImageCompressionRatio'];
-    this.newDictionary['0x0028']['0x3000'] = ['SQ', '1', 'ModalityLUTSequence'];
-    this.newDictionary['0x0028']['0x3002'] = ['XS', '3', 'LUTDescriptor'];
-    this.newDictionary['0x0028']['0x3003'] = ['LO', '1', 'LUTExplanation'];
-    this.newDictionary['0x0028']['0x3004'] = ['LO', '1', 'ModalityLUTType'];
-    this.newDictionary['0x0028']['0x3006'] = ['XS', '1-n', 'LUTData'];
-    this.newDictionary['0x0028']['0x3010'] = ['SQ', '1', 'VOILUTSequence'];
-    this.newDictionary['0x0028']['0x3110'] = ['SQ', '1', 'SoftcopyVOILUTSequence'];
-    this.newDictionary['0x0028']['0x4000'] = ['LT', '1-n', 'ImagePresentationComments'];
-    this.newDictionary['0x0028']['0x5000'] = ['SQ', '1', 'BiPlaneAcquisitionSequence'];
-    this.newDictionary['0x0028']['0x6010'] = ['US', '1', 'RepresentativeFrameNumber'];
-    this.newDictionary['0x0028']['0x6020'] = ['US', '1-n', 'FrameNumbersOfInterest'];
-    this.newDictionary['0x0028']['0x6022'] = ['LO', '1-n', 'FrameOfInterestDescription'];
-    this.newDictionary['0x0028']['0x6030'] = ['US', '1-n', 'MaskPointer'];
-    this.newDictionary['0x0028']['0x6040'] = ['US', '1-n', 'RWavePointer'];
-    this.newDictionary['0x0028']['0x6100'] = ['SQ', '1', 'MaskSubtractionSequence'];
-    this.newDictionary['0x0028']['0x6101'] = ['CS', '1', 'MaskOperation'];
-    this.newDictionary['0x0028']['0x6102'] = ['US', '1-n', 'ApplicableFrameRange'];
-    this.newDictionary['0x0028']['0x6110'] = ['US', '1-n', 'MaskFrameNumbers'];
-    this.newDictionary['0x0028']['0x6112'] = ['US', '1', 'ContrastFrameAveraging'];
-    this.newDictionary['0x0028']['0x6114'] = ['FL', '2', 'MaskSubPixelShift'];
-    this.newDictionary['0x0028']['0x6120'] = ['SS', '1', 'TIDOffset'];
-    this.newDictionary['0x0028']['0x6190'] = ['ST', '1', 'MaskOperationExplanation'];
-
-    // 0x0032
-    this.newDictionary['0x0032'] = [];
-    this.newDictionary['0x0032']['0x0000'] = ['UL', '1', 'StudyGroupLength'];
-    this.newDictionary['0x0032']['0x000A'] = ['CS', '1', 'StudyStatusID'];
-    this.newDictionary['0x0032']['0x000C'] = ['CS', '1', 'StudyPriorityID'];
-    this.newDictionary['0x0032']['0x0012'] = ['LO', '1', 'StudyIDIssuer'];
-    this.newDictionary['0x0032']['0x0032'] = ['DA', '1', 'StudyVerifiedDate'];
-    this.newDictionary['0x0032']['0x0033'] = ['TM', '1', 'StudyVerifiedTime'];
-    this.newDictionary['0x0032']['0x0034'] = ['DA', '1', 'StudyReadDate'];
-    this.newDictionary['0x0032']['0x0035'] = ['TM', '1', 'StudyReadTime'];
-    this.newDictionary['0x0032']['0x1000'] = ['DA', '1', 'ScheduledStudyStartDate'];
-    this.newDictionary['0x0032']['0x1001'] = ['TM', '1', 'ScheduledStudyStartTime'];
-    this.newDictionary['0x0032']['0x1010'] = ['DA', '1', 'ScheduledStudyStopDate'];
-    this.newDictionary['0x0032']['0x1011'] = ['TM', '1', 'ScheduledStudyStopTime'];
-    this.newDictionary['0x0032']['0x1020'] = ['LO', '1', 'ScheduledStudyLocation'];
-    this.newDictionary['0x0032']['0x1021'] = ['AE', '1-n', 'ScheduledStudyLocationAETitle'];
-    this.newDictionary['0x0032']['0x1030'] = ['LO', '1', 'ReasonForStudy'];
-    this.newDictionary['0x0032']['0x1032'] = ['PN', '1', 'RequestingPhysician'];
-    this.newDictionary['0x0032']['0x1033'] = ['LO', '1', 'RequestingService'];
-    this.newDictionary['0x0032']['0x1040'] = ['DA', '1', 'StudyArrivalDate'];
-    this.newDictionary['0x0032']['0x1041'] = ['TM', '1', 'StudyArrivalTime'];
-    this.newDictionary['0x0032']['0x1050'] = ['DA', '1', 'StudyCompletionDate'];
-    this.newDictionary['0x0032']['0x1051'] = ['TM', '1', 'StudyCompletionTime'];
-    this.newDictionary['0x0032']['0x1055'] = ['CS', '1', 'StudyComponentStatusID'];
-    this.newDictionary['0x0032']['0x1060'] = ['LO', '1', 'RequestedProcedureDescription'];
-    this.newDictionary['0x0032']['0x1064'] = ['SQ', '1', 'RequestedProcedureCodeSequence'];
-    this.newDictionary['0x0032']['0x1070'] = ['LO', '1', 'RequestedContrastAgent'];
-    this.newDictionary['0x0032']['0x4000'] = ['LT', '1', 'StudyComments'];
-
-    // 0x0038
-    this.newDictionary['0x0038'] = [];
-    this.newDictionary['0x0038']['0x0000'] = ['UL', '1', 'VisitGroupLength'];
-    this.newDictionary['0x0038']['0x0004'] = ['SQ', '1', 'ReferencedPatientAliasSequence'];
-    this.newDictionary['0x0038']['0x0008'] = ['CS', '1', 'VisitStatusID'];
-    this.newDictionary['0x0038']['0x0010'] = ['LO', '1', 'AdmissionID'];
-    this.newDictionary['0x0038']['0x0011'] = ['LO', '1', 'IssuerOfAdmissionID'];
-    this.newDictionary['0x0038']['0x0016'] = ['LO', '1', 'RouteOfAdmissions'];
-    this.newDictionary['0x0038']['0x001A'] = ['DA', '1', 'ScheduledAdmissionDate'];
-    this.newDictionary['0x0038']['0x001B'] = ['TM', '1', 'ScheduledAdmissionTime'];
-    this.newDictionary['0x0038']['0x001C'] = ['DA', '1', 'ScheduledDischargeDate'];
-    this.newDictionary['0x0038']['0x001D'] = ['TM', '1', 'ScheduledDischargeTime'];
-    this.newDictionary['0x0038']['0x001E'] = ['LO', '1', 'ScheduledPatientInstitutionResidence'];
-    this.newDictionary['0x0038']['0x0020'] = ['DA', '1', 'AdmittingDate'];
-    this.newDictionary['0x0038']['0x0021'] = ['TM', '1', 'AdmittingTime'];
-    this.newDictionary['0x0038']['0x0030'] = ['DA', '1', 'DischargeDate'];
-    this.newDictionary['0x0038']['0x0032'] = ['TM', '1', 'DischargeTime'];
-    this.newDictionary['0x0038']['0x0040'] = ['LO', '1', 'DischargeDiagnosisDescription'];
-    this.newDictionary['0x0038']['0x0044'] = ['SQ', '1', 'DischargeDiagnosisCodeSequence'];
-    this.newDictionary['0x0038']['0x0050'] = ['LO', '1', 'SpecialNeeds'];
-    this.newDictionary['0x0038']['0x0300'] = ['LO', '1', 'CurrentPatientLocation'];
-    this.newDictionary['0x0038']['0x0400'] = ['LO', '1', 'PatientInstitutionResidence'];
-    this.newDictionary['0x0038']['0x0500'] = ['LO', '1', 'PatientState'];
-    this.newDictionary['0x0038']['0x4000'] = ['LT', '1', 'VisitComments'];
-
-    // 0x003A
-    this.newDictionary['0x003A'] = [];
-    this.newDictionary['0x003A']['0x0004'] = ['CS', '1', 'WaveformOriginality'];
-    this.newDictionary['0x003A']['0x0005'] = ['US', '1', 'NumberofChannels'];
-    this.newDictionary['0x003A']['0x0010'] = ['UL', '1', 'NumberofSamples'];
-    this.newDictionary['0x003A']['0x001A'] = ['DS', '1', 'SamplingFrequency'];
-    this.newDictionary['0x003A']['0x0020'] = ['SH', '1', 'MultiplexGroupLabel'];
-    this.newDictionary['0x003A']['0x0200'] = ['SQ', '1', 'ChannelDefinitionSequence'];
-    this.newDictionary['0x003A']['0x0202'] = ['IS', '1', 'WVChannelNumber'];
-    this.newDictionary['0x003A']['0x0203'] = ['SH', '1', 'ChannelLabel'];
-    this.newDictionary['0x003A']['0x0205'] = ['CS', '1-n', 'ChannelStatus'];
-    this.newDictionary['0x003A']['0x0208'] = ['SQ', '1', 'ChannelSourceSequence'];
-    this.newDictionary['0x003A']['0x0209'] = ['SQ', '1', 'ChannelSourceModifiersSequence'];
-    this.newDictionary['0x003A']['0x020A'] = ['SQ', '1', 'SourceWaveformSequence'];
-    this.newDictionary['0x003A']['0x020C'] = ['LO', '1', 'ChannelDerivationDescription'];
-    this.newDictionary['0x003A']['0x0210'] = ['DS', '1', 'ChannelSensitivity'];
-    this.newDictionary['0x003A']['0x0211'] = ['SQ', '1', 'ChannelSensitivityUnits'];
-    this.newDictionary['0x003A']['0x0212'] = ['DS', '1', 'ChannelSensitivityCorrectionFactor'];
-    this.newDictionary['0x003A']['0x0213'] = ['DS', '1', 'ChannelBaseline'];
-    this.newDictionary['0x003A']['0x0214'] = ['DS', '1', 'ChannelTimeSkew'];
-    this.newDictionary['0x003A']['0x0215'] = ['DS', '1', 'ChannelSampleSkew'];
-    this.newDictionary['0x003A']['0x0218'] = ['DS', '1', 'ChannelOffset'];
-    this.newDictionary['0x003A']['0x021A'] = ['US', '1', 'WaveformBitsStored'];
-    this.newDictionary['0x003A']['0x0220'] = ['DS', '1', 'FilterLowFrequency'];
-    this.newDictionary['0x003A']['0x0221'] = ['DS', '1', 'FilterHighFrequency'];
-    this.newDictionary['0x003A']['0x0222'] = ['DS', '1', 'NotchFilterFrequency'];
-    this.newDictionary['0x003A']['0x0223'] = ['DS', '1', 'NotchFilterBandwidth'];
-
-    // 0x0040
-    this.newDictionary['0x0040'] = [];
-    this.newDictionary['0x0040']['0x0000'] = ['UL', '1', 'ModalityWorklistGroupLength'];
-    this.newDictionary['0x0040']['0x0001'] = ['AE', '1', 'ScheduledStationAETitle'];
-    this.newDictionary['0x0040']['0x0002'] = ['DA', '1', 'ScheduledProcedureStepStartDate'];
-    this.newDictionary['0x0040']['0x0003'] = ['TM', '1', 'ScheduledProcedureStepStartTime'];
-    this.newDictionary['0x0040']['0x0004'] = ['DA', '1', 'ScheduledProcedureStepEndDate'];
-    this.newDictionary['0x0040']['0x0005'] = ['TM', '1', 'ScheduledProcedureStepEndTime'];
-    this.newDictionary['0x0040']['0x0006'] = ['PN', '1', 'ScheduledPerformingPhysicianName'];
-    this.newDictionary['0x0040']['0x0007'] = ['LO', '1', 'ScheduledProcedureStepDescription'];
-    this.newDictionary['0x0040']['0x0008'] = ['SQ', '1', 'ScheduledProcedureStepCodeSequence'];
-    this.newDictionary['0x0040']['0x0009'] = ['SH', '1', 'ScheduledProcedureStepID'];
-    this.newDictionary['0x0040']['0x0010'] = ['SH', '1', 'ScheduledStationName'];
-    this.newDictionary['0x0040']['0x0011'] = ['SH', '1', 'ScheduledProcedureStepLocation'];
-    this.newDictionary['0x0040']['0x0012'] = ['LO', '1', 'ScheduledPreOrderOfMedication'];
-    this.newDictionary['0x0040']['0x0020'] = ['CS', '1', 'ScheduledProcedureStepStatus'];
-    this.newDictionary['0x0040']['0x0100'] = ['SQ', '1-n', 'ScheduledProcedureStepSequence'];
-    this.newDictionary['0x0040']['0x0220'] = ['SQ', '1', 'ReferencedStandaloneSOPInstanceSequence'];
-    this.newDictionary['0x0040']['0x0241'] = ['AE', '1', 'PerformedStationAETitle'];
-    this.newDictionary['0x0040']['0x0242'] = ['SH', '1', 'PerformedStationName'];
-    this.newDictionary['0x0040']['0x0243'] = ['SH', '1', 'PerformedLocation'];
-    this.newDictionary['0x0040']['0x0244'] = ['DA', '1', 'PerformedProcedureStepStartDate'];
-    this.newDictionary['0x0040']['0x0245'] = ['TM', '1', 'PerformedProcedureStepStartTime'];
-    this.newDictionary['0x0040']['0x0250'] = ['DA', '1', 'PerformedProcedureStepEndDate'];
-    this.newDictionary['0x0040']['0x0251'] = ['TM', '1', 'PerformedProcedureStepEndTime'];
-    this.newDictionary['0x0040']['0x0252'] = ['CS', '1', 'PerformedProcedureStepStatus'];
-    this.newDictionary['0x0040']['0x0253'] = ['CS', '1', 'PerformedProcedureStepID'];
-    this.newDictionary['0x0040']['0x0254'] = ['LO', '1', 'PerformedProcedureStepDescription'];
-    this.newDictionary['0x0040']['0x0255'] = ['LO', '1', 'PerformedProcedureTypeDescription'];
-    this.newDictionary['0x0040']['0x0260'] = ['SQ', '1', 'PerformedActionItemSequence'];
-    this.newDictionary['0x0040']['0x0270'] = ['SQ', '1', 'ScheduledStepAttributesSequence'];
-    this.newDictionary['0x0040']['0x0275'] = ['SQ', '1', 'RequestAttributesSequence'];
-    this.newDictionary['0x0040']['0x0280'] = ['ST', '1', 'CommentsOnThePerformedProcedureSteps'];
-    this.newDictionary['0x0040']['0x0293'] = ['SQ', '1', 'QuantitySequence'];
-    this.newDictionary['0x0040']['0x0294'] = ['DS', '1', 'Quantity'];
-    this.newDictionary['0x0040']['0x0295'] = ['SQ', '1', 'MeasuringUnitsSequence'];
-    this.newDictionary['0x0040']['0x0296'] = ['SQ', '1', 'BillingItemSequence'];
-    this.newDictionary['0x0040']['0x0300'] = ['US', '1', 'TotalTimeOfFluoroscopy'];
-    this.newDictionary['0x0040']['0x0301'] = ['US', '1', 'TotalNumberOfExposures'];
-    this.newDictionary['0x0040']['0x0302'] = ['US', '1', 'EntranceDose'];
-    this.newDictionary['0x0040']['0x0303'] = ['US', '1-2', 'ExposedArea'];
-    this.newDictionary['0x0040']['0x0306'] = ['DS', '1', 'DistanceSourceToEntrance'];
-    this.newDictionary['0x0040']['0x0307'] = ['DS', '1', 'DistanceSourceToSupport'];
-    this.newDictionary['0x0040']['0x0310'] = ['ST', '1', 'CommentsOnRadiationDose'];
-    this.newDictionary['0x0040']['0x0312'] = ['DS', '1', 'XRayOutput'];
-    this.newDictionary['0x0040']['0x0314'] = ['DS', '1', 'HalfValueLayer'];
-    this.newDictionary['0x0040']['0x0316'] = ['DS', '1', 'OrganDose'];
-    this.newDictionary['0x0040']['0x0318'] = ['CS', '1', 'OrganExposed'];
-    this.newDictionary['0x0040']['0x0320'] = ['SQ', '1', 'BillingProcedureStepSequence'];
-    this.newDictionary['0x0040']['0x0321'] = ['SQ', '1', 'FilmConsumptionSequence'];
-    this.newDictionary['0x0040']['0x0324'] = ['SQ', '1', 'BillingSuppliesAndDevicesSequence'];
-    this.newDictionary['0x0040']['0x0330'] = ['SQ', '1', 'ReferencedProcedureStepSequence'];
-    this.newDictionary['0x0040']['0x0340'] = ['SQ', '1', 'PerformedSeriesSequence'];
-    this.newDictionary['0x0040']['0x0400'] = ['LT', '1', 'CommentsOnScheduledProcedureStep'];
-    this.newDictionary['0x0040']['0x050A'] = ['LO', '1', 'SpecimenAccessionNumber'];
-    this.newDictionary['0x0040']['0x0550'] = ['SQ', '1', 'SpecimenSequence'];
-    this.newDictionary['0x0040']['0x0551'] = ['LO', '1', 'SpecimenIdentifier'];
-    this.newDictionary['0x0040']['0x0555'] = ['SQ', '1', 'AcquisitionContextSequence'];
-    this.newDictionary['0x0040']['0x0556'] = ['ST', '1', 'AcquisitionContextDescription'];
-    this.newDictionary['0x0040']['0x059A'] = ['SQ', '1', 'SpecimenTypeCodeSequence'];
-    this.newDictionary['0x0040']['0x06FA'] = ['LO', '1', 'SlideIdentifier'];
-    this.newDictionary['0x0040']['0x071A'] = ['SQ', '1', 'ImageCenterPointCoordinatesSequence'];
-    this.newDictionary['0x0040']['0x072A'] = ['DS', '1', 'XOffsetInSlideCoordinateSystem'];
-    this.newDictionary['0x0040']['0x073A'] = ['DS', '1', 'YOffsetInSlideCoordinateSystem'];
-    this.newDictionary['0x0040']['0x074A'] = ['DS', '1', 'ZOffsetInSlideCoordinateSystem'];
-    this.newDictionary['0x0040']['0x08D8'] = ['SQ', '1', 'PixelSpacingSequence'];
-    this.newDictionary['0x0040']['0x08DA'] = ['SQ', '1', 'CoordinateSystemAxisCodeSequence'];
-    this.newDictionary['0x0040']['0x08EA'] = ['SQ', '1', 'MeasurementUnitsCodeSequence'];
-    this.newDictionary['0x0040']['0x1001'] = ['SH', '1', 'RequestedProcedureID'];
-    this.newDictionary['0x0040']['0x1002'] = ['LO', '1', 'ReasonForRequestedProcedure'];
-    this.newDictionary['0x0040']['0x1003'] = ['SH', '1', 'RequestedProcedurePriority'];
-    this.newDictionary['0x0040']['0x1004'] = ['LO', '1', 'PatientTransportArrangements'];
-    this.newDictionary['0x0040']['0x1005'] = ['LO', '1', 'RequestedProcedureLocation'];
-    this.newDictionary['0x0040']['0x1006'] = ['SH', '1', 'PlacerOrderNumberOfProcedure'];
-    this.newDictionary['0x0040']['0x1007'] = ['SH', '1', 'FillerOrderNumberOfProcedure'];
-    this.newDictionary['0x0040']['0x1008'] = ['LO', '1', 'ConfidentialityCode'];
-    this.newDictionary['0x0040']['0x1009'] = ['SH', '1', 'ReportingPriority'];
-    this.newDictionary['0x0040']['0x1010'] = ['PN', '1-n', 'NamesOfIntendedRecipientsOfResults'];
-    this.newDictionary['0x0040']['0x1400'] = ['LT', '1', 'RequestedProcedureComments'];
-    this.newDictionary['0x0040']['0x2001'] = ['LO', '1', 'ReasonForTheImagingServiceRequest'];
-    this.newDictionary['0x0040']['0x2002'] = ['LO', '1', 'ImagingServiceRequestDescription'];
-    this.newDictionary['0x0040']['0x2004'] = ['DA', '1', 'IssueDateOfImagingServiceRequest'];
-    this.newDictionary['0x0040']['0x2005'] = ['TM', '1', 'IssueTimeOfImagingServiceRequest'];
-    this.newDictionary['0x0040']['0x2006'] = ['SH', '1', 'PlacerOrderNumberOfImagingServiceRequest'];
-    this.newDictionary['0x0040']['0x2007'] = ['SH', '0', 'FillerOrderNumberOfImagingServiceRequest'];
-    this.newDictionary['0x0040']['0x2008'] = ['PN', '1', 'OrderEnteredBy'];
-    this.newDictionary['0x0040']['0x2009'] = ['SH', '1', 'OrderEntererLocation'];
-    this.newDictionary['0x0040']['0x2010'] = ['SH', '1', 'OrderCallbackPhoneNumber'];
-    this.newDictionary['0x0040']['0x2016'] = ['LO', '1', 'PlacerOrderNumberImagingServiceRequest'];
-    this.newDictionary['0x0040']['0x2017'] = ['LO', '1', 'FillerOrderNumberImagingServiceRequest'];
-    this.newDictionary['0x0040']['0x2400'] = ['LT', '1', 'ImagingServiceRequestComments'];
-    this.newDictionary['0x0040']['0x3001'] = ['LT', '1', 'ConfidentialityConstraint'];
-    this.newDictionary['0x0040']['0xA010'] = ['CS', '1', 'RelationshipType'];
-    this.newDictionary['0x0040']['0xA027'] = ['LO', '1', 'VerifyingOrganization'];
-    this.newDictionary['0x0040']['0xA030'] = ['DT', '1', 'VerificationDateTime'];
-    this.newDictionary['0x0040']['0xA032'] = ['DT', '1', 'ObservationDateTime'];
-    this.newDictionary['0x0040']['0xA040'] = ['CS', '1', 'ValueType'];
-    this.newDictionary['0x0040']['0xA043'] = ['SQ', '1', 'ConceptNameCodeSequence'];
-    this.newDictionary['0x0040']['0xA050'] = ['CS', '1', 'ContinuityOfContent'];
-    this.newDictionary['0x0040']['0xA073'] = ['SQ', '1', 'VerifyingObserverSequence'];
-    this.newDictionary['0x0040']['0xA075'] = ['PN', '1', 'VerifyingObserverName'];
-    this.newDictionary['0x0040']['0xA088'] = ['SQ', '1', 'VerifyingObserverIdentificationCodeSeque'];
-    this.newDictionary['0x0040']['0xA0B0'] = ['US', '2-2n', 'ReferencedWaveformChannels'];
-    this.newDictionary['0x0040']['0xA120'] = ['DT', '1', 'DateTime'];
-    this.newDictionary['0x0040']['0xA121'] = ['DA', '1', 'Date'];
-    this.newDictionary['0x0040']['0xA122'] = ['TM', '1', 'Time'];
-    this.newDictionary['0x0040']['0xA123'] = ['PN', '1', 'PersonName'];
-    this.newDictionary['0x0040']['0xA124'] = ['UI', '1', 'UID'];
-    this.newDictionary['0x0040']['0xA130'] = ['CS', '1', 'TemporalRangeType'];
-    this.newDictionary['0x0040']['0xA132'] = ['UL', '1-n', 'ReferencedSamplePositionsU'];
-    this.newDictionary['0x0040']['0xA136'] = ['US', '1-n', 'ReferencedFrameNumbers'];
-    this.newDictionary['0x0040']['0xA138'] = ['DS', '1-n', 'ReferencedTimeOffsets'];
-    this.newDictionary['0x0040']['0xA13A'] = ['DT', '1-n', 'ReferencedDatetime'];
-    this.newDictionary['0x0040']['0xA160'] = ['UT', '1', 'TextValue'];
-    this.newDictionary['0x0040']['0xA168'] = ['SQ', '1', 'ConceptCodeSequence'];
-    this.newDictionary['0x0040']['0xA180'] = ['US', '1', 'AnnotationGroupNumber'];
-    this.newDictionary['0x0040']['0xA195'] = ['SQ', '1', 'ConceptNameCodeSequenceModifier'];
-    this.newDictionary['0x0040']['0xA300'] = ['SQ', '1', 'MeasuredValueSequence'];
-    this.newDictionary['0x0040']['0xA30A'] = ['DS', '1-n', 'NumericValue'];
-    this.newDictionary['0x0040']['0xA360'] = ['SQ', '1', 'PredecessorDocumentsSequence'];
-    this.newDictionary['0x0040']['0xA370'] = ['SQ', '1', 'ReferencedRequestSequence'];
-    this.newDictionary['0x0040']['0xA372'] = ['SQ', '1', 'PerformedProcedureCodeSequence'];
-    this.newDictionary['0x0040']['0xA375'] = ['SQ', '1', 'CurrentRequestedProcedureEvidenceSequenSequence'];
-    this.newDictionary['0x0040']['0xA385'] = ['SQ', '1', 'PertinentOtherEvidenceSequence'];
-    this.newDictionary['0x0040']['0xA491'] = ['CS', '1', 'CompletionFlag'];
-    this.newDictionary['0x0040']['0xA492'] = ['LO', '1', 'CompletionFlagDescription'];
-    this.newDictionary['0x0040']['0xA493'] = ['CS', '1', 'VerificationFlag'];
-    this.newDictionary['0x0040']['0xA504'] = ['SQ', '1', 'ContentTemplateSequence'];
-    this.newDictionary['0x0040']['0xA525'] = ['SQ', '1', 'IdenticalDocumentsSequence'];
-    this.newDictionary['0x0040']['0xA730'] = ['SQ', '1', 'ContentSequence'];
-    this.newDictionary['0x0040']['0xB020'] = ['SQ', '1', 'AnnotationSequence'];
-    this.newDictionary['0x0040']['0xDB00'] = ['CS', '1', 'TemplateIdentifier'];
-    this.newDictionary['0x0040']['0xDB06'] = ['DT', '1', 'TemplateVersion'];
-    this.newDictionary['0x0040']['0xDB07'] = ['DT', '1', 'TemplateLocalVersion'];
-    this.newDictionary['0x0040']['0xDB0B'] = ['CS', '1', 'TemplateExtensionFlag'];
-    this.newDictionary['0x0040']['0xDB0C'] = ['UI', '1', 'TemplateExtensionOrganizationUID'];
-    this.newDictionary['0x0040']['0xDB0D'] = ['UI', '1', 'TemplateExtensionCreatorUID'];
-    this.newDictionary['0x0040']['0xDB73'] = ['UL', '1-n', 'ReferencedContentItemIdentifier'];
-
-    // 0x0050
-    this.newDictionary['0x0050'] = [];
-    this.newDictionary['0x0050']['0x0000'] = ['UL', '1', 'XRayAngioDeviceGroupLength'];
-    this.newDictionary['0x0050']['0x0004'] = ['CS', '1', 'CalibrationObject'];
-    this.newDictionary['0x0050']['0x0010'] = ['SQ', '1', 'DeviceSequence'];
-    this.newDictionary['0x0050']['0x0012'] = ['CS', '1', 'DeviceType'];
-    this.newDictionary['0x0050']['0x0014'] = ['DS', '1', 'DeviceLength'];
-    this.newDictionary['0x0050']['0x0016'] = ['DS', '1', 'DeviceDiameter'];
-    this.newDictionary['0x0050']['0x0017'] = ['CS', '1', 'DeviceDiameterUnits'];
-    this.newDictionary['0x0050']['0x0018'] = ['DS', '1', 'DeviceVolume'];
-    this.newDictionary['0x0050']['0x0019'] = ['DS', '1', 'InterMarkerDistance'];
-    this.newDictionary['0x0050']['0x0020'] = ['LO', '1', 'DeviceDescription'];
-    this.newDictionary['0x0050']['0x0030'] = ['SQ', '1', 'CodedInterventionalDeviceSequence'];
-
-    // 0x0054
-    this.newDictionary['0x0054'] = [];
-    this.newDictionary['0x0054']['0x0000'] = ['UL', '1', 'NuclearMedicineGroupLength'];
-    this.newDictionary['0x0054']['0x0010'] = ['US', '1-n', 'EnergyWindowVector'];
-    this.newDictionary['0x0054']['0x0011'] = ['US', '1', 'NumberOfEnergyWindows'];
-    this.newDictionary['0x0054']['0x0012'] = ['SQ', '1', 'EnergyWindowInformationSequence'];
-    this.newDictionary['0x0054']['0x0013'] = ['SQ', '1', 'EnergyWindowRangeSequence'];
-    this.newDictionary['0x0054']['0x0014'] = ['DS', '1', 'EnergyWindowLowerLimit'];
-    this.newDictionary['0x0054']['0x0015'] = ['DS', '1', 'EnergyWindowUpperLimit'];
-    this.newDictionary['0x0054']['0x0016'] = ['SQ', '1', 'RadiopharmaceuticalInformationSequence'];
-    this.newDictionary['0x0054']['0x0017'] = ['IS', '1', 'ResidualSyringeCounts'];
-    this.newDictionary['0x0054']['0x0018'] = ['SH', '1', 'EnergyWindowName'];
-    this.newDictionary['0x0054']['0x0020'] = ['US', '1-n', 'DetectorVector'];
-    this.newDictionary['0x0054']['0x0021'] = ['US', '1', 'NumberOfDetectors'];
-    this.newDictionary['0x0054']['0x0022'] = ['SQ', '1', 'DetectorInformationSequence'];
-    this.newDictionary['0x0054']['0x0030'] = ['US', '1-n', 'PhaseVector'];
-    this.newDictionary['0x0054']['0x0031'] = ['US', '1', 'NumberOfPhases'];
-    this.newDictionary['0x0054']['0x0032'] = ['SQ', '1', 'PhaseInformationSequence'];
-    this.newDictionary['0x0054']['0x0033'] = ['US', '1', 'NumberOfFramesInPhase'];
-    this.newDictionary['0x0054']['0x0036'] = ['IS', '1', 'PhaseDelay'];
-    this.newDictionary['0x0054']['0x0038'] = ['IS', '1', 'PauseBetweenFrames'];
-    this.newDictionary['0x0054']['0x0050'] = ['US', '1-n', 'RotationVector'];
-    this.newDictionary['0x0054']['0x0051'] = ['US', '1', 'NumberOfRotations'];
-    this.newDictionary['0x0054']['0x0052'] = ['SQ', '1', 'RotationInformationSequence'];
-    this.newDictionary['0x0054']['0x0053'] = ['US', '1', 'NumberOfFramesInRotation'];
-    this.newDictionary['0x0054']['0x0060'] = ['US', '1-n', 'RRIntervalVector'];
-    this.newDictionary['0x0054']['0x0061'] = ['US', '1', 'NumberOfRRIntervals'];
-    this.newDictionary['0x0054']['0x0062'] = ['SQ', '1', 'GatedInformationSequence'];
-    this.newDictionary['0x0054']['0x0063'] = ['SQ', '1', 'DataInformationSequence'];
-    this.newDictionary['0x0054']['0x0070'] = ['US', '1-n', 'TimeSlotVector'];
-    this.newDictionary['0x0054']['0x0071'] = ['US', '1', 'NumberOfTimeSlots'];
-    this.newDictionary['0x0054']['0x0072'] = ['SQ', '1', 'TimeSlotInformationSequence'];
-    this.newDictionary['0x0054']['0x0073'] = ['DS', '1', 'TimeSlotTime'];
-    this.newDictionary['0x0054']['0x0080'] = ['US', '1-n', 'SliceVector'];
-    this.newDictionary['0x0054']['0x0081'] = ['US', '1', 'NumberOfSlices'];
-    this.newDictionary['0x0054']['0x0090'] = ['US', '1-n', 'AngularViewVector'];
-    this.newDictionary['0x0054']['0x0100'] = ['US', '1-n', 'TimeSliceVector'];
-    this.newDictionary['0x0054']['0x0101'] = ['US', '1', 'NumberOfTimeSlices'];
-    this.newDictionary['0x0054']['0x0200'] = ['DS', '1', 'StartAngle'];
-    this.newDictionary['0x0054']['0x0202'] = ['CS', '1', 'TypeOfDetectorMotion'];
-    this.newDictionary['0x0054']['0x0210'] = ['IS', '1-n', 'TriggerVector'];
-    this.newDictionary['0x0054']['0x0211'] = ['US', '1', 'NumberOfTriggersInPhase'];
-    this.newDictionary['0x0054']['0x0220'] = ['SQ', '1', 'ViewCodeSequence'];
-    this.newDictionary['0x0054']['0x0222'] = ['SQ', '1', 'ViewAngulationModifierCodeSequence'];
-    this.newDictionary['0x0054']['0x0300'] = ['SQ', '1', 'RadionuclideCodeSequence'];
-    this.newDictionary['0x0054']['0x0302'] = ['SQ', '1', 'AdministrationRouteCodeSequence'];
-    this.newDictionary['0x0054']['0x0304'] = ['SQ', '1', 'RadiopharmaceuticalCodeSequence'];
-    this.newDictionary['0x0054']['0x0306'] = ['SQ', '1', 'CalibrationDataSequence'];
-    this.newDictionary['0x0054']['0x0308'] = ['US', '1', 'EnergyWindowNumber'];
-    this.newDictionary['0x0054']['0x0400'] = ['SH', '1', 'ImageID'];
-    this.newDictionary['0x0054']['0x0410'] = ['SQ', '1', 'PatientOrientationCodeSequence'];
-    this.newDictionary['0x0054']['0x0412'] = ['SQ', '1', 'PatientOrientationModifierCodeSequence'];
-    this.newDictionary['0x0054']['0x0414'] = ['SQ', '1', 'PatientGantryRelationshipCodeSequence'];
-    this.newDictionary['0x0054']['0x1000'] = ['CS', '2', 'SeriesType'];
-    this.newDictionary['0x0054']['0x1001'] = ['CS', '1', 'Units'];
-    this.newDictionary['0x0054']['0x1002'] = ['CS', '1', 'CountsSource'];
-    this.newDictionary['0x0054']['0x1004'] = ['CS', '1', 'ReprojectionMethod'];
-    this.newDictionary['0x0054']['0x1100'] = ['CS', '1', 'RandomsCorrectionMethod'];
-    this.newDictionary['0x0054']['0x1101'] = ['LO', '1', 'AttenuationCorrectionMethod'];
-    this.newDictionary['0x0054']['0x1102'] = ['CS', '1', 'DecayCorrection'];
-    this.newDictionary['0x0054']['0x1103'] = ['LO', '1', 'ReconstructionMethod'];
-    this.newDictionary['0x0054']['0x1104'] = ['LO', '1', 'DetectorLinesOfResponseUsed'];
-    this.newDictionary['0x0054']['0x1105'] = ['LO', '1', 'ScatterCorrectionMethod'];
-    this.newDictionary['0x0054']['0x1200'] = ['DS', '1', 'AxialAcceptance'];
-    this.newDictionary['0x0054']['0x1201'] = ['IS', '2', 'AxialMash'];
-    this.newDictionary['0x0054']['0x1202'] = ['IS', '1', 'TransverseMash'];
-    this.newDictionary['0x0054']['0x1203'] = ['DS', '2', 'DetectorElementSize'];
-    this.newDictionary['0x0054']['0x1210'] = ['DS', '1', 'CoincidenceWindowWidth'];
-    this.newDictionary['0x0054']['0x1220'] = ['CS', '1-n', 'SecondaryCountsType'];
-    this.newDictionary['0x0054']['0x1300'] = ['DS', '1', 'FrameReferenceTime'];
-    this.newDictionary['0x0054']['0x1310'] = ['IS', '1', 'PrimaryPromptsCountsAccumulated'];
-    this.newDictionary['0x0054']['0x1311'] = ['IS', '1-n', 'SecondaryCountsAccumulated'];
-    this.newDictionary['0x0054']['0x1320'] = ['DS', '1', 'SliceSensitivityFactor'];
-    this.newDictionary['0x0054']['0x1321'] = ['DS', '1', 'DecayFactor'];
-    this.newDictionary['0x0054']['0x1322'] = ['DS', '1', 'DoseCalibrationFactor'];
-    this.newDictionary['0x0054']['0x1323'] = ['DS', '1', 'ScatterFractionFactor'];
-    this.newDictionary['0x0054']['0x1324'] = ['DS', '1', 'DeadTimeFactor'];
-    this.newDictionary['0x0054']['0x1330'] = ['US', '1', 'ImageIndex'];
-    this.newDictionary['0x0054']['0x1400'] = ['CS', '1-n', 'CountsIncluded'];
-    this.newDictionary['0x0054']['0x1401'] = ['CS', '1', 'DeadTimeCorrectionFlag'];
-
-    // 0x0060
-    this.newDictionary['0x0060'] = [];
-    this.newDictionary['0x0060']['0x0000'] = ['UL', '1', 'HistogramGroupLength'];
-    this.newDictionary['0x0060']['0x3000'] = ['SQ', '1', 'HistogramSequence'];
-    this.newDictionary['0x0060']['0x3002'] = ['US', '1', 'HistogramNumberofBins'];
-    this.newDictionary['0x0060']['0x3004'] = ['US/SS', '1', 'HistogramFirstBinValue'];
-    this.newDictionary['0x0060']['0x3006'] = ['US/SS', '1', 'HistogramLastBinValue'];
-    this.newDictionary['0x0060']['0x3008'] = ['US', '1', 'HistogramBinWidth'];
-    this.newDictionary['0x0060']['0x3010'] = ['LO', '1', 'HistogramExplanation'];
-    this.newDictionary['0x0060']['0x3020'] = ['UL', '1-n', 'HistogramData'];
-
-    // 0x0070
-    this.newDictionary['0x0070'] = [];
-    this.newDictionary['0x0070']['0x0001'] = ['SQ', '1', 'GraphicAnnotationSequence'];
-    this.newDictionary['0x0070']['0x0002'] = ['CS', '1', 'GraphicLayer'];
-    this.newDictionary['0x0070']['0x0003'] = ['CS', '1', 'BoundingBoxAnnotationUnits'];
-    this.newDictionary['0x0070']['0x0004'] = ['CS', '1', 'AnchorPointAnnotationUnits'];
-    this.newDictionary['0x0070']['0x0005'] = ['CS', '1', 'GraphicAnnotationUnits'];
-    this.newDictionary['0x0070']['0x0006'] = ['ST', '1', 'UnformattedTextValue'];
-    this.newDictionary['0x0070']['0x0008'] = ['SQ', '1', 'TextObjectSequence'];
-    this.newDictionary['0x0070']['0x0009'] = ['SQ', '1', 'GraphicObjectSequence'];
-    this.newDictionary['0x0070']['0x0010'] = ['FL', '2', 'BoundingBoxTopLeftHandCorner'];
-    this.newDictionary['0x0070']['0x0011'] = ['FL', '2', 'BoundingBoxBottomRightHandCorner'];
-    this.newDictionary['0x0070']['0x0012'] = ['CS', '1', 'BoundingBoxTextHorizontalJustification'];
-    this.newDictionary['0x0070']['0x0014'] = ['FL', '2', 'AnchorPoint'];
-    this.newDictionary['0x0070']['0x0015'] = ['CS', '1', 'AnchorPointVisibility'];
-    this.newDictionary['0x0070']['0x0020'] = ['US', '1', 'GraphicDimensions'];
-    this.newDictionary['0x0070']['0x0021'] = ['US', '1', 'NumberOfGraphicPoints'];
-    this.newDictionary['0x0070']['0x0022'] = ['FL', '2-n', 'GraphicData'];
-    this.newDictionary['0x0070']['0x0023'] = ['CS', '1', 'GraphicType'];
-    this.newDictionary['0x0070']['0x0024'] = ['CS', '1', 'GraphicFilled'];
-    this.newDictionary['0x0070']['0x0040'] = ['IS', '1', 'ImageRotationFrozenDraftRetired'];
-    this.newDictionary['0x0070']['0x0041'] = ['CS', '1', 'ImageHorizontalFlip'];
-    this.newDictionary['0x0070']['0x0042'] = ['US', '1', 'ImageRotation'];
-    this.newDictionary['0x0070']['0x0050'] = ['US', '2', 'DisplayedAreaTLHCFrozenDraftRetired'];
-    this.newDictionary['0x0070']['0x0051'] = ['US', '2', 'DisplayedAreaBRHCFrozenDraftRetired'];
-    this.newDictionary['0x0070']['0x0052'] = ['SL', '2', 'DisplayedAreaTopLeftHandCorner'];
-    this.newDictionary['0x0070']['0x0053'] = ['SL', '2', 'DisplayedAreaBottomRightHandCorner'];
-    this.newDictionary['0x0070']['0x005A'] = ['SQ', '1', 'DisplayedAreaSelectionSequence'];
-    this.newDictionary['0x0070']['0x0060'] = ['SQ', '1', 'GraphicLayerSequence'];
-    this.newDictionary['0x0070']['0x0062'] = ['IS', '1', 'GraphicLayerOrder'];
-    this.newDictionary['0x0070']['0x0066'] = ['US', '1', 'GraphicLayerRecommendedDisplayGrayscaleValue'];
-    this.newDictionary['0x0070']['0x0067'] = ['US', '3', 'GraphicLayerRecommendedDisplayRGBValue'];
-    this.newDictionary['0x0070']['0x0068'] = ['LO', '1', 'GraphicLayerDescription'];
-    this.newDictionary['0x0070']['0x0080'] = ['CS', '1', 'PresentationLabel'];
-    this.newDictionary['0x0070']['0x0081'] = ['LO', '1', 'PresentationDescription'];
-    this.newDictionary['0x0070']['0x0082'] = ['DA', '1', 'PresentationCreationDate'];
-    this.newDictionary['0x0070']['0x0083'] = ['TM', '1', 'PresentationCreationTime'];
-    this.newDictionary['0x0070']['0x0084'] = ['PN', '1', 'PresentationCreatorsName'];
-    this.newDictionary['0x0070']['0x0100'] = ['CS', '1', 'PresentationSizeMode'];
-    this.newDictionary['0x0070']['0x0101'] = ['DS', '2', 'PresentationPixelSpacing'];
-    this.newDictionary['0x0070']['0x0102'] = ['IS', '2', 'PresentationPixelAspectRatio'];
-    this.newDictionary['0x0070']['0x0103'] = ['FL', '1', 'PresentationPixelMagnificationRatio'];
-
-    // 0x0088
-    this.newDictionary['0x0088'] = [];
-    this.newDictionary['0x0088']['0x0000'] = ['UL', '1', 'StorageGroupLength'];
-    this.newDictionary['0x0088']['0x0130'] = ['SH', '1', 'StorageMediaFilesetID'];
-    this.newDictionary['0x0088']['0x0140'] = ['UI', '1', 'StorageMediaFilesetUID'];
-    this.newDictionary['0x0088']['0x0200'] = ['SQ', '1', 'IconImage'];
-    this.newDictionary['0x0088']['0x0904'] = ['LO', '1', 'TopicTitle'];
-    this.newDictionary['0x0088']['0x0906'] = ['ST', '1', 'TopicSubject'];
-    this.newDictionary['0x0088']['0x0910'] = ['LO', '1', 'TopicAuthor'];
-    this.newDictionary['0x0088']['0x0912'] = ['LO', '3', 'TopicKeyWords'];
-
-    // 0x1000
-    this.newDictionary['0x1000'] = [];
-    this.newDictionary['0x1000']['0x0000'] = ['UL', '1', 'CodeTableGroupLength'];
-    this.newDictionary['0x1000']['0x0010'] = ['US', '3', 'EscapeTriplet'];
-    this.newDictionary['0x1000']['0x0011'] = ['US', '3', 'RunLengthTriplet'];
-    this.newDictionary['0x1000']['0x0012'] = ['US', '1', 'HuffmanTableSize'];
-    this.newDictionary['0x1000']['0x0013'] = ['US', '3', 'HuffmanTableTriplet'];
-    this.newDictionary['0x1000']['0x0014'] = ['US', '1', 'ShiftTableSize'];
-    this.newDictionary['0x1000']['0x0015'] = ['US', '3', 'ShiftTableTriplet'];
-
-    // 0x1010
-    this.newDictionary['0x1010'] = [];
-    this.newDictionary['0x1010']['0x0000'] = ['UL', '1', 'ZonalMapGroupLength'];
-    this.newDictionary['0x1010']['0x0004'] = ['US', '1-n', 'ZonalMap'];
-
-    // 0x2000
-    this.newDictionary['0x2000'] = [];
-    this.newDictionary['0x2000']['0x0000'] = ['UL', '1', 'FilmSessionGroupLength'];
-    this.newDictionary['0x2000']['0x0010'] = ['IS', '1', 'NumberOfCopies'];
-    this.newDictionary['0x2000']['0x001E'] = ['SQ', '1', 'PrinterConfigurationSequence'];
-    this.newDictionary['0x2000']['0x0020'] = ['CS', '1', 'PrintPriority'];
-    this.newDictionary['0x2000']['0x0030'] = ['CS', '1', 'MediumType'];
-    this.newDictionary['0x2000']['0x0040'] = ['CS', '1', 'FilmDestination'];
-    this.newDictionary['0x2000']['0x0050'] = ['LO', '1', 'FilmSessionLabel'];
-    this.newDictionary['0x2000']['0x0060'] = ['IS', '1', 'MemoryAllocation'];
-    this.newDictionary['0x2000']['0x0061'] = ['IS', '1', 'MaximumMemoryAllocation'];
-    this.newDictionary['0x2000']['0x0062'] = ['CS', '1', 'ColorImagePrintingFlag'];
-    this.newDictionary['0x2000']['0x0063'] = ['CS', '1', 'CollationFlag'];
-    this.newDictionary['0x2000']['0x0065'] = ['CS', '1', 'AnnotationFlag'];
-    this.newDictionary['0x2000']['0x0067'] = ['CS', '1', 'ImageOverlayFlag'];
-    this.newDictionary['0x2000']['0x0069'] = ['CS', '1', 'PresentationLUTFlag'];
-    this.newDictionary['0x2000']['0x006A'] = ['CS', '1', 'ImageBoxPresentationLUTFlag'];
-    this.newDictionary['0x2000']['0x00A0'] = ['US', '1', 'MemoryBitDepth'];
-    this.newDictionary['0x2000']['0x00A1'] = ['US', '1', 'PrintingBitDepth'];
-    this.newDictionary['0x2000']['0x00A2'] = ['SQ', '1', 'MediaInstalledSequence'];
-    this.newDictionary['0x2000']['0x00A4'] = ['SQ', '1', 'OtherMediaAvailableSequence'];
-    this.newDictionary['0x2000']['0x00A8'] = ['SQ', '1', 'SupportedImageDisplayFormatsSequence'];
-    this.newDictionary['0x2000']['0x0500'] = ['SQ', '1', 'ReferencedFilmBoxSequence'];
-    this.newDictionary['0x2000']['0x0510'] = ['SQ', '1', 'ReferencedStoredPrintSequence'];
-
-    // 0x2010
-    this.newDictionary['0x2010'] = [];
-    this.newDictionary['0x2010']['0x0000'] = ['UL', '1', 'FilmBoxGroupLength'];
-    this.newDictionary['0x2010']['0x0010'] = ['ST', '1', 'ImageDisplayFormat'];
-    this.newDictionary['0x2010']['0x0030'] = ['CS', '1', 'AnnotationDisplayFormatID'];
-    this.newDictionary['0x2010']['0x0040'] = ['CS', '1', 'FilmOrientation'];
-    this.newDictionary['0x2010']['0x0050'] = ['CS', '1', 'FilmSizeID'];
-    this.newDictionary['0x2010']['0x0052'] = ['CS', '1', 'PrinterResolutionID'];
-    this.newDictionary['0x2010']['0x0054'] = ['CS', '1', 'DefaultPrinterResolutionID'];
-    this.newDictionary['0x2010']['0x0060'] = ['CS', '1', 'MagnificationType'];
-    this.newDictionary['0x2010']['0x0080'] = ['CS', '1', 'SmoothingType'];
-    this.newDictionary['0x2010']['0x00A6'] = ['CS', '1', 'DefaultMagnificationType'];
-    this.newDictionary['0x2010']['0x00A7'] = ['CS', '1-n', 'OtherMagnificationTypesAvailable'];
-    this.newDictionary['0x2010']['0x00A8'] = ['CS', '1', 'DefaultSmoothingType'];
-    this.newDictionary['0x2010']['0x00A9'] = ['CS', '1-n', 'OtherSmoothingTypesAvailable'];
-    this.newDictionary['0x2010']['0x0100'] = ['CS', '1', 'BorderDensity'];
-    this.newDictionary['0x2010']['0x0110'] = ['CS', '1', 'EmptyImageDensity'];
-    this.newDictionary['0x2010']['0x0120'] = ['US', '1', 'MinDensity'];
-    this.newDictionary['0x2010']['0x0130'] = ['US', '1', 'MaxDensity'];
-    this.newDictionary['0x2010']['0x0140'] = ['CS', '1', 'Trim'];
-    this.newDictionary['0x2010']['0x0150'] = ['ST', '1', 'ConfigurationInformation'];
-    this.newDictionary['0x2010']['0x0152'] = ['LT', '1', 'ConfigurationInformationDescription'];
-    this.newDictionary['0x2010']['0x0154'] = ['IS', '1', 'MaximumCollatedFilms'];
-    this.newDictionary['0x2010']['0x015E'] = ['US', '1', 'Illumination'];
-    this.newDictionary['0x2010']['0x0160'] = ['US', '1', 'ReflectedAmbientLight'];
-    this.newDictionary['0x2010']['0x0376'] = ['DS', '2', 'PrinterPixelSpacing'];
-    this.newDictionary['0x2010']['0x0500'] = ['SQ', '1', 'ReferencedFilmSessionSequence'];
-    this.newDictionary['0x2010']['0x0510'] = ['SQ', '1', 'ReferencedImageBoxSequence'];
-    this.newDictionary['0x2010']['0x0520'] = ['SQ', '1', 'ReferencedBasicAnnotationBoxSequence'];
-
-    // 0x2020
-    this.newDictionary['0x2020'] = [];
-    this.newDictionary['0x2020']['0x0000'] = ['UL', '1', 'ImageBoxGroupLength'];
-    this.newDictionary['0x2020']['0x0010'] = ['US', '1', 'ImageBoxPosition'];
-    this.newDictionary['0x2020']['0x0020'] = ['CS', '1', 'Polarity'];
-    this.newDictionary['0x2020']['0x0030'] = ['DS', '1', 'RequestedImageSize'];
-    this.newDictionary['0x2020']['0x0040'] = ['CS', '1', 'RequestedDecimateCropBehavior'];
-    this.newDictionary['0x2020']['0x0050'] = ['CS', '1', 'RequestedResolutionID'];
-    this.newDictionary['0x2020']['0x00A0'] = ['CS', '1', 'RequestedImageSizeFlag'];
-    this.newDictionary['0x2020']['0x00A2'] = ['CS', '1', 'DecimateCropResult'];
-    this.newDictionary['0x2020']['0x0110'] = ['SQ', '1', 'PreformattedGrayscaleImageSequence'];
-    this.newDictionary['0x2020']['0x0111'] = ['SQ', '1', 'PreformattedColorImageSequence'];
-    this.newDictionary['0x2020']['0x0130'] = ['SQ', '1', 'ReferencedImageOverlayBoxSequence'];
-    this.newDictionary['0x2020']['0x0140'] = ['SQ', '1', 'ReferencedVOILUTBoxSequence'];
-
-    // 0x2030
-    this.newDictionary['0x2030'] = [];
-    this.newDictionary['0x2030']['0x0000'] = ['UL', '1', 'AnnotationGroupLength'];
-    this.newDictionary['0x2030']['0x0010'] = ['US', '1', 'AnnotationPosition'];
-    this.newDictionary['0x2030']['0x0020'] = ['LO', '1', 'TextString'];
-
-    // 0x2040
-    this.newDictionary['0x2040'] = [];
-    this.newDictionary['0x2040']['0x0000'] = ['UL', '1', 'OverlayBoxGroupLength'];
-    this.newDictionary['0x2040']['0x0010'] = ['SQ', '1', 'ReferencedOverlayPlaneSequence'];
-    this.newDictionary['0x2040']['0x0011'] = ['US', '9', 'ReferencedOverlayPlaneGroups'];
-    this.newDictionary['0x2040']['0x0020'] = ['SQ', '1', 'OverlayPixelDataSequence'];
-    this.newDictionary['0x2040']['0x0060'] = ['CS', '1', 'OverlayMagnificationType'];
-    this.newDictionary['0x2040']['0x0070'] = ['CS', '1', 'OverlaySmoothingType'];
-    this.newDictionary['0x2040']['0x0072'] = ['CS', '1', 'OverlayOrImageMagnification'];
-    this.newDictionary['0x2040']['0x0074'] = ['US', '1', 'MagnifyToNumberOfColumns'];
-    this.newDictionary['0x2040']['0x0080'] = ['CS', '1', 'OverlayForegroundDensity'];
-    this.newDictionary['0x2040']['0x0082'] = ['CS', '1', 'OverlayBackgroundDensity'];
-    this.newDictionary['0x2040']['0x0090'] = ['CS', '1', 'OverlayMode'];
-    this.newDictionary['0x2040']['0x0100'] = ['CS', '1', 'ThresholdDensity'];
-    this.newDictionary['0x2040']['0x0500'] = ['SQ', '1', 'ReferencedOverlayImageBoxSequence'];
-
-    // 0x2050
-    this.newDictionary['0x2050'] = [];
-    this.newDictionary['0x2050']['0x0000'] = ['UL', '1', 'PresentationLUTGroupLength'];
-    this.newDictionary['0x2050']['0x0010'] = ['SQ', '1', 'PresentationLUTSequence'];
-    this.newDictionary['0x2050']['0x0020'] = ['CS', '1', 'PresentationLUTShape'];
-    this.newDictionary['0x2050']['0x0500'] = ['SQ', '1', 'ReferencedPresentationLUTSequence'];
-
-    // 0x2100
-    this.newDictionary['0x2100'] = [];
-    this.newDictionary['0x2100']['0x0000'] = ['UL', '1', 'PrintJobGroupLength'];
-    this.newDictionary['0x2100']['0x0010'] = ['SH', '1', 'PrintJobID'];
-    this.newDictionary['0x2100']['0x0020'] = ['CS', '1', 'ExecutionStatus'];
-    this.newDictionary['0x2100']['0x0030'] = ['CS', '1', 'ExecutionStatusInfo'];
-    this.newDictionary['0x2100']['0x0040'] = ['DA', '1', 'CreationDate'];
-    this.newDictionary['0x2100']['0x0050'] = ['TM', '1', 'CreationTime'];
-    this.newDictionary['0x2100']['0x0070'] = ['AE', '1', 'Originator'];
-    this.newDictionary['0x2100']['0x0140'] = ['AE', '1', 'DestinationAE'];
-    this.newDictionary['0x2100']['0x0160'] = ['SH', '1', 'OwnerID'];
-    this.newDictionary['0x2100']['0x0170'] = ['IS', '1', 'NumberOfFilms'];
-    this.newDictionary['0x2100']['0x0500'] = ['SQ', '1', 'ReferencedPrintJobSequence'];
-
-    // 0x2110
-    this.newDictionary['0x2110'] = [];
-    this.newDictionary['0x2110']['0x0000'] = ['UL', '1', 'PrinterGroupLength'];
-    this.newDictionary['0x2110']['0x0010'] = ['CS', '1', 'PrinterStatus'];
-    this.newDictionary['0x2110']['0x0020'] = ['CS', '1', 'PrinterStatusInfo'];
-    this.newDictionary['0x2110']['0x0030'] = ['LO', '1', 'PrinterName'];
-    this.newDictionary['0x2110']['0x0099'] = ['SH', '1', 'PrintQueueID'];
-
-    // 0x2120
-    this.newDictionary['0x2120'] = [];
-    this.newDictionary['0x2120']['0x0000'] = ['UL', '1', 'QueueGroupLength'];
-    this.newDictionary['0x2120']['0x0010'] = ['CS', '1', 'QueueStatus'];
-    this.newDictionary['0x2120']['0x0050'] = ['SQ', '1', 'PrintJobDescriptionSequence'];
-    this.newDictionary['0x2120']['0x0070'] = ['SQ', '1', 'QueueReferencedPrintJobSequence'];
-
-    // 0x2130
-    this.newDictionary['0x2130'] = [];
-    this.newDictionary['0x2130']['0x0000'] = ['UL', '1', 'PrintContentGroupLength'];
-    this.newDictionary['0x2130']['0x0010'] = ['SQ', '1', 'PrintManagementCapabilitiesSequence'];
-    this.newDictionary['0x2130']['0x0015'] = ['SQ', '1', 'PrinterCharacteristicsSequence'];
-    this.newDictionary['0x2130']['0x0030'] = ['SQ', '1', 'FilmBoxContentSequence'];
-    this.newDictionary['0x2130']['0x0040'] = ['SQ', '1', 'ImageBoxContentSequence'];
-    this.newDictionary['0x2130']['0x0050'] = ['SQ', '1', 'AnnotationContentSequence'];
-    this.newDictionary['0x2130']['0x0060'] = ['SQ', '1', 'ImageOverlayBoxContentSequence'];
-    this.newDictionary['0x2130']['0x0080'] = ['SQ', '1', 'PresentationLUTContentSequence'];
-    this.newDictionary['0x2130']['0x00A0'] = ['SQ', '1', 'ProposedStudySequence'];
-    this.newDictionary['0x2130']['0x00C0'] = ['SQ', '1', 'OriginalImageSequence'];
-
-    // 0x3002
-    this.newDictionary['0x3002'] = [];
-    this.newDictionary['0x3002']['0x0000'] = ['UL', '1', 'RTImageGroupLength'];
-    this.newDictionary['0x3002']['0x0002'] = ['SH', '1', 'RTImageLabel'];
-    this.newDictionary['0x3002']['0x0003'] = ['LO', '1', 'RTImageName'];
-    this.newDictionary['0x3002']['0x0004'] = ['ST', '1', 'RTImageDescription'];
-    this.newDictionary['0x3002']['0x000A'] = ['CS', '1', 'ReportedValuesOrigin'];
-    this.newDictionary['0x3002']['0x000C'] = ['CS', '1', 'RTImagePlane'];
-    this.newDictionary['0x3002']['0x000D'] = ['DS', '3', 'XRayImageReceptorTranslation'];
-    this.newDictionary['0x3002']['0x000E'] = ['DS', '1', 'XRayImageReceptorAngle'];
-    this.newDictionary['0x3002']['0x0010'] = ['DS', '6', 'RTImageOrientation'];
-    this.newDictionary['0x3002']['0x0011'] = ['DS', '2', 'ImagePlanePixelSpacing'];
-    this.newDictionary['0x3002']['0x0012'] = ['DS', '2', 'RTImagePosition'];
-    this.newDictionary['0x3002']['0x0020'] = ['SH', '1', 'RadiationMachineName'];
-    this.newDictionary['0x3002']['0x0022'] = ['DS', '1', 'RadiationMachineSAD'];
-    this.newDictionary['0x3002']['0x0024'] = ['DS', '1', 'RadiationMachineSSD'];
-    this.newDictionary['0x3002']['0x0026'] = ['DS', '1', 'RTImageSID'];
-    this.newDictionary['0x3002']['0x0028'] = ['DS', '1', 'SourceToReferenceObjectDistance'];
-    this.newDictionary['0x3002']['0x0029'] = ['IS', '1', 'FractionNumber'];
-    this.newDictionary['0x3002']['0x0030'] = ['SQ', '1', 'ExposureSequence'];
-    this.newDictionary['0x3002']['0x0032'] = ['DS', '1', 'MetersetExposure'];
-    this.newDictionary['0x3002']['0x0034'] = ['DS', '4', 'DiaphragmPosition'];
-
-    // x3004
-    this.newDictionary['0x3004'] = [];
-    this.newDictionary['0x3004']['0x0000'] = ['UL', '1', 'RTDoseGroupLength'];
-    this.newDictionary['0x3004']['0x0001'] = ['CS', '1', 'DVHType'];
-    this.newDictionary['0x3004']['0x0002'] = ['CS', '1', 'DoseUnits'];
-    this.newDictionary['0x3004']['0x0004'] = ['CS', '1', 'DoseType'];
-    this.newDictionary['0x3004']['0x0006'] = ['LO', '1', 'DoseComment'];
-    this.newDictionary['0x3004']['0x0008'] = ['DS', '3', 'NormalizationPoint'];
-    this.newDictionary['0x3004']['0x000A'] = ['CS', '1', 'DoseSummationType'];
-    this.newDictionary['0x3004']['0x000C'] = ['DS', '2-n', 'GridFrameOffsetVector'];
-    this.newDictionary['0x3004']['0x000E'] = ['DS', '1', 'DoseGridScaling'];
-    this.newDictionary['0x3004']['0x0010'] = ['SQ', '1', 'RTDoseROISequence'];
-    this.newDictionary['0x3004']['0x0012'] = ['DS', '1', 'DoseValue'];
-    this.newDictionary['0x3004']['0x0040'] = ['DS', '3', 'DVHNormalizationPoint'];
-    this.newDictionary['0x3004']['0x0042'] = ['DS', '1', 'DVHNormalizationDoseValue'];
-    this.newDictionary['0x3004']['0x0050'] = ['SQ', '1', 'DVHSequence'];
-    this.newDictionary['0x3004']['0x0052'] = ['DS', '1', 'DVHDoseScaling'];
-    this.newDictionary['0x3004']['0x0054'] = ['CS', '1', 'DVHVolumeUnits'];
-    this.newDictionary['0x3004']['0x0056'] = ['IS', '1', 'DVHNumberOfBins'];
-    this.newDictionary['0x3004']['0x0058'] = ['DS', '2-2n', 'DVHData'];
-    this.newDictionary['0x3004']['0x0060'] = ['SQ', '1', 'DVHReferencedROISequence'];
-    this.newDictionary['0x3004']['0x0062'] = ['CS', '1', 'DVHROIContributionType'];
-    this.newDictionary['0x3004']['0x0070'] = ['DS', '1', 'DVHMinimumDose'];
-    this.newDictionary['0x3004']['0x0072'] = ['DS', '1', 'DVHMaximumDose'];
-    this.newDictionary['0x3004']['0x0074'] = ['DS', '1', 'DVHMeanDose'];
-
-    // 0x3006
-    this.newDictionary['0x3006'] = [];
-    this.newDictionary['0x3006']['0x0000'] = ['UL', '1', 'RTStructureSetGroupLength'];
-    this.newDictionary['0x3006']['0x0002'] = ['SH', '1', 'StructureSetLabel'];
-    this.newDictionary['0x3006']['0x0004'] = ['LO', '1', 'StructureSetName'];
-    this.newDictionary['0x3006']['0x0006'] = ['ST', '1', 'StructureSetDescription'];
-    this.newDictionary['0x3006']['0x0008'] = ['DA', '1', 'StructureSetDate'];
-    this.newDictionary['0x3006']['0x0009'] = ['TM', '1', 'StructureSetTime'];
-    this.newDictionary['0x3006']['0x0010'] = ['SQ', '1', 'ReferencedFrameOfReferenceSequence'];
-    this.newDictionary['0x3006']['0x0012'] = ['SQ', '1', 'RTReferencedStudySequence'];
-    this.newDictionary['0x3006']['0x0014'] = ['SQ', '1', 'RTReferencedSeriesSequence'];
-    this.newDictionary['0x3006']['0x0016'] = ['SQ', '1', 'ContourImageSequence'];
-    this.newDictionary['0x3006']['0x0020'] = ['SQ', '1', 'StructureSetROISequence'];
-    this.newDictionary['0x3006']['0x0022'] = ['IS', '1', 'ROINumber'];
-    this.newDictionary['0x3006']['0x0024'] = ['UI', '1', 'ReferencedFrameOfReferenceUID'];
-    this.newDictionary['0x3006']['0x0026'] = ['LO', '1', 'ROIName'];
-    this.newDictionary['0x3006']['0x0028'] = ['ST', '1', 'ROIDescription'];
-    this.newDictionary['0x3006']['0x002A'] = ['IS', '3', 'ROIDisplayColor'];
-    this.newDictionary['0x3006']['0x002C'] = ['DS', '1', 'ROIVolume'];
-    this.newDictionary['0x3006']['0x0030'] = ['SQ', '1', 'RTRelatedROISequence'];
-    this.newDictionary['0x3006']['0x0033'] = ['CS', '1', 'RTROIRelationship'];
-    this.newDictionary['0x3006']['0x0036'] = ['CS', '1', 'ROIGenerationAlgorithm'];
-    this.newDictionary['0x3006']['0x0038'] = ['LO', '1', 'ROIGenerationDescription'];
-    this.newDictionary['0x3006']['0x0039'] = ['SQ', '1', 'ROIContourSequence'];
-    this.newDictionary['0x3006']['0x0040'] = ['SQ', '1', 'ContourSequence'];
-    this.newDictionary['0x3006']['0x0042'] = ['CS', '1', 'ContourGeometricType'];
-    this.newDictionary['0x3006']['0x0044'] = ['DS', '1', 'ContourSlabThickness'];
-    this.newDictionary['0x3006']['0x0045'] = ['DS', '3', 'ContourOffsetVector'];
-    this.newDictionary['0x3006']['0x0046'] = ['IS', '1', 'NumberOfContourPoints'];
-    this.newDictionary['0x3006']['0x0048'] = ['IS', '1', 'ContourNumber'];
-    this.newDictionary['0x3006']['0x0049'] = ['IS', '1-n', 'AttachedContours'];
-    this.newDictionary['0x3006']['0x0050'] = ['DS', '3-3n', 'ContourData'];
-    this.newDictionary['0x3006']['0x0080'] = ['SQ', '1', 'RTROIObservationsSequence'];
-    this.newDictionary['0x3006']['0x0082'] = ['IS', '1', 'ObservationNumber'];
-    this.newDictionary['0x3006']['0x0084'] = ['IS', '1', 'ReferencedROINumber'];
-    this.newDictionary['0x3006']['0x0085'] = ['SH', '1', 'ROIObservationLabel'];
-    this.newDictionary['0x3006']['0x0086'] = ['SQ', '1', 'RTROIIdentificationCodeSequence'];
-    this.newDictionary['0x3006']['0x0088'] = ['ST', '1', 'ROIObservationDescription'];
-    this.newDictionary['0x3006']['0x00A0'] = ['SQ', '1', 'RelatedRTROIObservationsSequence'];
-    this.newDictionary['0x3006']['0x00A4'] = ['CS', '1', 'RTROIInterpretedType'];
-    this.newDictionary['0x3006']['0x00A6'] = ['PN', '1', 'ROIInterpreter'];
-    this.newDictionary['0x3006']['0x00B0'] = ['SQ', '1', 'ROIPhysicalPropertiesSequence'];
-    this.newDictionary['0x3006']['0x00B2'] = ['CS', '1', 'ROIPhysicalProperty'];
-    this.newDictionary['0x3006']['0x00B4'] = ['DS', '1', 'ROIPhysicalPropertyValue'];
-    this.newDictionary['0x3006']['0x00C0'] = ['SQ', '1', 'FrameOfReferenceRelationshipSequence'];
-    this.newDictionary['0x3006']['0x00C2'] = ['UI', '1', 'RelatedFrameOfReferenceUID'];
-    this.newDictionary['0x3006']['0x00C4'] = ['CS', '1', 'FrameOfReferenceTransformationType'];
-    this.newDictionary['0x3006']['0x00C6'] = ['DS', '16', 'FrameOfReferenceTransformationMatrix'];
-    this.newDictionary['0x3006']['0x00C8'] = ['LO', '1', 'FrameOfReferenceTransformationComment'];
-
-    // 0x3008
-    this.newDictionary['0x3008'] = [];
-    this.newDictionary['0x3008']['0x0010'] = ['SQ', '1', 'MeasuredDoseReferenceSequence'];
-    this.newDictionary['0x3008']['0x0012'] = ['ST', '1', 'MeasuredDoseDescription'];
-    this.newDictionary['0x3008']['0x0014'] = ['CS', '1', 'MeasuredDoseType'];
-    this.newDictionary['0x3008']['0x0016'] = ['DS', '1', 'MeasuredDoseValue'];
-    this.newDictionary['0x3008']['0x0020'] = ['SQ', '1', 'TreatmentSessionBeamSequence'];
-    this.newDictionary['0x3008']['0x0022'] = ['IS', '1', 'CurrentFractionNumber'];
-    this.newDictionary['0x3008']['0x0024'] = ['DA', '1', 'TreatmentControlPointDate'];
-    this.newDictionary['0x3008']['0x0025'] = ['TM', '1', 'TreatmentControlPointTime'];
-    this.newDictionary['0x3008']['0x002A'] = ['CS', '1', 'TreatmentTerminationStatus'];
-    this.newDictionary['0x3008']['0x002B'] = ['SH', '1', 'TreatmentTerminationCode'];
-    this.newDictionary['0x3008']['0x002C'] = ['CS', '1', 'TreatmentVerificationStatus'];
-    this.newDictionary['0x3008']['0x0030'] = ['SQ', '1', 'ReferencedTreatmentRecordSequence'];
-    this.newDictionary['0x3008']['0x0032'] = ['DS', '1', 'SpecifiedPrimaryMeterset'];
-    this.newDictionary['0x3008']['0x0033'] = ['DS', '1', 'SpecifiedSecondaryMeterset'];
-    this.newDictionary['0x3008']['0x0036'] = ['DS', '1', 'DeliveredPrimaryMeterset'];
-    this.newDictionary['0x3008']['0x0037'] = ['DS', '1', 'DeliveredSecondaryMeterset'];
-    this.newDictionary['0x3008']['0x003A'] = ['DS', '1', 'SpecifiedTreatmentTime'];
-    this.newDictionary['0x3008']['0x003B'] = ['DS', '1', 'DeliveredTreatmentTime'];
-    this.newDictionary['0x3008']['0x0040'] = ['SQ', '1', 'ControlPointDeliverySequence'];
-    this.newDictionary['0x3008']['0x0042'] = ['DS', '1', 'SpecifiedMeterset'];
-    this.newDictionary['0x3008']['0x0044'] = ['DS', '1', 'DeliveredMeterset'];
-    this.newDictionary['0x3008']['0x0048'] = ['DS', '1', 'DoseRateDelivered'];
-    this.newDictionary['0x3008']['0x0050'] = ['SQ', '1', 'TreatmentSummaryCalculatedDoseReferenceSequence'];
-    this.newDictionary['0x3008']['0x0052'] = ['DS', '1', 'CumulativeDosetoDoseReference'];
-    this.newDictionary['0x3008']['0x0054'] = ['DA', '1', 'FirstTreatmentDate'];
-    this.newDictionary['0x3008']['0x0056'] = ['DA', '1', 'MostRecentTreatmentDate'];
-    this.newDictionary['0x3008']['0x005A'] = ['IS', '1', 'NumberofFractionsDelivered'];
-    this.newDictionary['0x3008']['0x0060'] = ['SQ', '1', 'OverrideSequence'];
-    this.newDictionary['0x3008']['0x0062'] = ['AT', '1', 'OverrideParameterPointer'];
-    this.newDictionary['0x3008']['0x0064'] = ['IS', '1', 'MeasuredDoseReferenceNumber'];
-    this.newDictionary['0x3008']['0x0066'] = ['ST', '1', 'OverrideReason'];
-    this.newDictionary['0x3008']['0x0070'] = ['SQ', '1', 'CalculatedDoseReferenceSequence'];
-    this.newDictionary['0x3008']['0x0072'] = ['IS', '1', 'CalculatedDoseReferenceNumber'];
-    this.newDictionary['0x3008']['0x0074'] = ['ST', '1', 'CalculatedDoseReferenceDescription'];
-    this.newDictionary['0x3008']['0x0076'] = ['DS', '1', 'CalculatedDoseReferenceDoseValue'];
-    this.newDictionary['0x3008']['0x0078'] = ['DS', '1', 'StartMeterset'];
-    this.newDictionary['0x3008']['0x007A'] = ['DS', '1', 'EndMeterset'];
-    this.newDictionary['0x3008']['0x0080'] = ['SQ', '1', 'ReferencedMeasuredDoseReferenceSequence'];
-    this.newDictionary['0x3008']['0x0082'] = ['IS', '1', 'ReferencedMeasuredDoseReferenceNumber'];
-    this.newDictionary['0x3008']['0x0090'] = ['SQ', '1', 'ReferencedCalculatedDoseReferenceSequence'];
-    this.newDictionary['0x3008']['0x0092'] = ['IS', '1', 'ReferencedCalculatedDoseReferenceNumber'];
-    this.newDictionary['0x3008']['0x00A0'] = ['SQ', '1', 'BeamLimitingDeviceLeafPairsSequence'];
-    this.newDictionary['0x3008']['0x00B0'] = ['SQ', '1', 'RecordedWedgeSequence'];
-    this.newDictionary['0x3008']['0x00C0'] = ['SQ', '1', 'RecordedCompensatorSequence'];
-    this.newDictionary['0x3008']['0x00D0'] = ['SQ', '1', 'RecordedBlockSequence'];
-    this.newDictionary['0x3008']['0x00E0'] = ['SQ', '1', 'TreatmentSummaryMeasuredDoseReferenceSequence'];
-    this.newDictionary['0x3008']['0x0100'] = ['SQ', '1', 'RecordedSourceSequence'];
-    this.newDictionary['0x3008']['0x0105'] = ['LO', '1', 'SourceSerialNumber'];
-    this.newDictionary['0x3008']['0x0110'] = ['SQ', '1', 'TreatmentSessionApplicationSetupSequence'];
-    this.newDictionary['0x3008']['0x0116'] = ['CS', '1', 'ApplicationSetupCheck'];
-    this.newDictionary['0x3008']['0x0120'] = ['SQ', '1', 'RecordedBrachyAccessoryDeviceSequence'];
-    this.newDictionary['0x3008']['0x0122'] = ['IS', '1', 'ReferencedBrachyAccessoryDeviceNumber'];
-    this.newDictionary['0x3008']['0x0130'] = ['SQ', '1', 'RecordedChannelSequence'];
-    this.newDictionary['0x3008']['0x0132'] = ['DS', '1', 'SpecifiedChannelTotalTime'];
-    this.newDictionary['0x3008']['0x0134'] = ['DS', '1', 'DeliveredChannelTotalTime'];
-    this.newDictionary['0x3008']['0x0136'] = ['IS', '1', 'SpecifiedNumberofPulses'];
-    this.newDictionary['0x3008']['0x0138'] = ['IS', '1', 'DeliveredNumberofPulses'];
-    this.newDictionary['0x3008']['0x013A'] = ['DS', '1', 'SpecifiedPulseRepetitionInterval'];
-    this.newDictionary['0x3008']['0x013C'] = ['DS', '1', 'DeliveredPulseRepetitionInterval'];
-    this.newDictionary['0x3008']['0x0140'] = ['SQ', '1', 'RecordedSourceApplicatorSequence'];
-    this.newDictionary['0x3008']['0x0142'] = ['IS', '1', 'ReferencedSourceApplicatorNumber'];
-    this.newDictionary['0x3008']['0x0150'] = ['SQ', '1', 'RecordedChannelShieldSequence'];
-    this.newDictionary['0x3008']['0x0152'] = ['IS', '1', 'ReferencedChannelShieldNumber'];
-    this.newDictionary['0x3008']['0x0160'] = ['SQ', '1', 'BrachyControlPointDeliveredSequence'];
-    this.newDictionary['0x3008']['0x0162'] = ['DA', '1', 'SafePositionExitDate'];
-    this.newDictionary['0x3008']['0x0164'] = ['TM', '1', 'SafePositionExitTime'];
-    this.newDictionary['0x3008']['0x0166'] = ['DA', '1', 'SafePositionReturnDate'];
-    this.newDictionary['0x3008']['0x0168'] = ['TM', '1', 'SafePositionReturnTime'];
-    this.newDictionary['0x3008']['0x0200'] = ['CS', '1', 'CurrentTreatmentStatus'];
-    this.newDictionary['0x3008']['0x0202'] = ['ST', '1', 'TreatmentStatusComment'];
-    this.newDictionary['0x3008']['0x0220'] = ['SQ', '1', 'FractionGroupSummarySequence'];
-    this.newDictionary['0x3008']['0x0223'] = ['IS', '1', 'ReferencedFractionNumber'];
-    this.newDictionary['0x3008']['0x0224'] = ['CS', '1', 'FractionGroupType'];
-    this.newDictionary['0x3008']['0x0230'] = ['CS', '1', 'BeamStopperPosition'];
-    this.newDictionary['0x3008']['0x0240'] = ['SQ', '1', 'FractionStatusSummarySequence'];
-    this.newDictionary['0x3008']['0x0250'] = ['DA', '1', 'TreatmentDate'];
-    this.newDictionary['0x3008']['0x0251'] = ['TM', '1', 'TreatmentTime'];
-
-    // 0x300A
-    this.newDictionary['0x300A'] = [];
-    this.newDictionary['0x300A']['0x0000'] = ['UL', '1', 'RTPlanGroupLength'];
-    this.newDictionary['0x300A']['0x0002'] = ['SH', '1', 'RTPlanLabel'];
-    this.newDictionary['0x300A']['0x0003'] = ['LO', '1', 'RTPlanName'];
-    this.newDictionary['0x300A']['0x0004'] = ['ST', '1', 'RTPlanDescription'];
-    this.newDictionary['0x300A']['0x0006'] = ['DA', '1', 'RTPlanDate'];
-    this.newDictionary['0x300A']['0x0007'] = ['TM', '1', 'RTPlanTime'];
-    this.newDictionary['0x300A']['0x0009'] = ['LO', '1-n', 'TreatmentProtocols'];
-    this.newDictionary['0x300A']['0x000A'] = ['CS', '1', 'TreatmentIntent'];
-    this.newDictionary['0x300A']['0x000B'] = ['LO', '1-n', 'TreatmentSites'];
-    this.newDictionary['0x300A']['0x000C'] = ['CS', '1', 'RTPlanGeometry'];
-    this.newDictionary['0x300A']['0x000E'] = ['ST', '1', 'PrescriptionDescription'];
-    this.newDictionary['0x300A']['0x0010'] = ['SQ', '1', 'DoseReferenceSequence'];
-    this.newDictionary['0x300A']['0x0012'] = ['IS', '1', 'DoseReferenceNumber'];
-    this.newDictionary['0x300A']['0x0014'] = ['CS', '1', 'DoseReferenceStructureType'];
-    this.newDictionary['0x300A']['0x0015'] = ['CS', '1', 'NominalBeamEnergyUnit'];
-    this.newDictionary['0x300A']['0x0016'] = ['LO', '1', 'DoseReferenceDescription'];
-    this.newDictionary['0x300A']['0x0018'] = ['DS', '3', 'DoseReferencePointCoordinates'];
-    this.newDictionary['0x300A']['0x001A'] = ['DS', '1', 'NominalPriorDose'];
-    this.newDictionary['0x300A']['0x0020'] = ['CS', '1', 'DoseReferenceType'];
-    this.newDictionary['0x300A']['0x0021'] = ['DS', '1', 'ConstraintWeight'];
-    this.newDictionary['0x300A']['0x0022'] = ['DS', '1', 'DeliveryWarningDose'];
-    this.newDictionary['0x300A']['0x0023'] = ['DS', '1', 'DeliveryMaximumDose'];
-    this.newDictionary['0x300A']['0x0025'] = ['DS', '1', 'TargetMinimumDose'];
-    this.newDictionary['0x300A']['0x0026'] = ['DS', '1', 'TargetPrescriptionDose'];
-    this.newDictionary['0x300A']['0x0027'] = ['DS', '1', 'TargetMaximumDose'];
-    this.newDictionary['0x300A']['0x0028'] = ['DS', '1', 'TargetUnderdoseVolumeFraction'];
-    this.newDictionary['0x300A']['0x002A'] = ['DS', '1', 'OrganAtRiskFullVolumeDose'];
-    this.newDictionary['0x300A']['0x002B'] = ['DS', '1', 'OrganAtRiskLimitDose'];
-    this.newDictionary['0x300A']['0x002C'] = ['DS', '1', 'OrganAtRiskMaximumDose'];
-    this.newDictionary['0x300A']['0x002D'] = ['DS', '1', 'OrganAtRiskOverdoseVolumeFraction'];
-    this.newDictionary['0x300A']['0x0040'] = ['SQ', '1', 'ToleranceTableSequence'];
-    this.newDictionary['0x300A']['0x0042'] = ['IS', '1', 'ToleranceTableNumber'];
-    this.newDictionary['0x300A']['0x0043'] = ['SH', '1', 'ToleranceTableLabel'];
-    this.newDictionary['0x300A']['0x0044'] = ['DS', '1', 'GantryAngleTolerance'];
-    this.newDictionary['0x300A']['0x0046'] = ['DS', '1', 'BeamLimitingDeviceAngleTolerance'];
-    this.newDictionary['0x300A']['0x0048'] = ['SQ', '1', 'BeamLimitingDeviceToleranceSequence'];
-    this.newDictionary['0x300A']['0x004A'] = ['DS', '1', 'BeamLimitingDevicePositionTolerance'];
-    this.newDictionary['0x300A']['0x004C'] = ['DS', '1', 'PatientSupportAngleTolerance'];
-    this.newDictionary['0x300A']['0x004E'] = ['DS', '1', 'TableTopEccentricAngleTolerance'];
-    this.newDictionary['0x300A']['0x0051'] = ['DS', '1', 'TableTopVerticalPositionTolerance'];
-    this.newDictionary['0x300A']['0x0052'] = ['DS', '1', 'TableTopLongitudinalPositionTolerance'];
-    this.newDictionary['0x300A']['0x0053'] = ['DS', '1', 'TableTopLateralPositionTolerance'];
-    this.newDictionary['0x300A']['0x0055'] = ['CS', '1', 'RTPlanRelationship'];
-    this.newDictionary['0x300A']['0x0070'] = ['SQ', '1', 'FractionGroupSequence'];
-    this.newDictionary['0x300A']['0x0071'] = ['IS', '1', 'FractionGroupNumber'];
-    this.newDictionary['0x300A']['0x0078'] = ['IS', '1', 'NumberOfFractionsPlanned'];
-    // this.newDictionary['0x300A']['0x0079'] = ['IS','1','NumberOfFractionsPerDay']; /// Changed
-    this.newDictionary['0x300A']['0x0079'] = ['IS', '1', 'NumberOfFractionsPatternDigistsPerDay'];
-    this.newDictionary['0x300A']['0x007A'] = ['IS', '1', 'RepeatFractionCycleLength'];
-    this.newDictionary['0x300A']['0x007B'] = ['LT', '1', 'FractionPattern'];
-    this.newDictionary['0x300A']['0x0080'] = ['IS', '1', 'NumberOfBeams'];
-    this.newDictionary['0x300A']['0x0082'] = ['DS', '3', 'BeamDoseSpecificationPoint'];
-    this.newDictionary['0x300A']['0x0084'] = ['DS', '1', 'BeamDose'];
-    this.newDictionary['0x300A']['0x0086'] = ['DS', '1', 'BeamMeterset'];
-    this.newDictionary['0x300A']['0x00A0'] = ['IS', '1', 'NumberOfBrachyApplicationSetups'];
-    this.newDictionary['0x300A']['0x00A2'] = ['DS', '3', 'BrachyApplicationSetupDoseSpecificationPoint'];
-    this.newDictionary['0x300A']['0x00A4'] = ['DS', '1', 'BrachyApplicationSetupDose'];
-    this.newDictionary['0x300A']['0x00B0'] = ['SQ', '1', 'BeamSequence'];
-    this.newDictionary['0x300A']['0x00B2'] = ['SH', '1', 'TreatmentMachineName'];
-    this.newDictionary['0x300A']['0x00B3'] = ['CS', '1', 'PrimaryDosimeterUnit'];
-    this.newDictionary['0x300A']['0x00B4'] = ['DS', '1', 'SourceAxisDistance'];
-    this.newDictionary['0x300A']['0x00B6'] = ['SQ', '1', 'BeamLimitingDeviceSequence'];
-    this.newDictionary['0x300A']['0x00B8'] = ['CS', '1', 'RTBeamLimitingDeviceType'];
-    this.newDictionary['0x300A']['0x00BA'] = ['DS', '1', 'SourceToBeamLimitingDeviceDistance'];
-    this.newDictionary['0x300A']['0x00BC'] = ['IS', '1', 'NumberOfLeafJawPairs'];
-    this.newDictionary['0x300A']['0x00BE'] = ['DS', '3-n', 'LeafPositionBoundaries'];
-    this.newDictionary['0x300A']['0x00C0'] = ['IS', '1', 'BeamNumber'];
-    this.newDictionary['0x300A']['0x00C2'] = ['LO', '1', 'BeamName'];
-    this.newDictionary['0x300A']['0x00C3'] = ['ST', '1', 'BeamDescription'];
-    this.newDictionary['0x300A']['0x00C4'] = ['CS', '1', 'BeamType'];
-    this.newDictionary['0x300A']['0x00C6'] = ['CS', '1', 'RadiationType'];
-    this.newDictionary['0x300A']['0x00C8'] = ['IS', '1', 'ReferenceImageNumber'];
-    this.newDictionary['0x300A']['0x00CA'] = ['SQ', '1', 'PlannedVerificationImageSequence'];
-    this.newDictionary['0x300A']['0x00CC'] = ['LO', '1-n', 'ImagingDeviceSpecificAcquisitionParameters'];
-    this.newDictionary['0x300A']['0x00CE'] = ['CS', '1', 'TreatmentDeliveryType'];
-    this.newDictionary['0x300A']['0x00D0'] = ['IS', '1', 'NumberOfWedges'];
-    this.newDictionary['0x300A']['0x00D1'] = ['SQ', '1', 'WedgeSequence'];
-    this.newDictionary['0x300A']['0x00D2'] = ['IS', '1', 'WedgeNumber'];
-    this.newDictionary['0x300A']['0x00D3'] = ['CS', '1', 'WedgeType'];
-    this.newDictionary['0x300A']['0x00D4'] = ['SH', '1', 'WedgeID'];
-    this.newDictionary['0x300A']['0x00D5'] = ['IS', '1', 'WedgeAngle'];
-    this.newDictionary['0x300A']['0x00D6'] = ['DS', '1', 'WedgeFactor'];
-    this.newDictionary['0x300A']['0x00D8'] = ['DS', '1', 'WedgeOrientation'];
-    this.newDictionary['0x300A']['0x00DA'] = ['DS', '1', 'SourceToWedgeTrayDistance'];
-    this.newDictionary['0x300A']['0x00E0'] = ['IS', '1', 'NumberOfCompensators'];
-    this.newDictionary['0x300A']['0x00E1'] = ['SH', '1', 'MaterialID'];
-    this.newDictionary['0x300A']['0x00E2'] = ['DS', '1', 'TotalCompensatorTrayFactor'];
-    this.newDictionary['0x300A']['0x00E3'] = ['SQ', '1', 'CompensatorSequence'];
-    this.newDictionary['0x300A']['0x00E4'] = ['IS', '1', 'CompensatorNumber'];
-    this.newDictionary['0x300A']['0x00E5'] = ['SH', '1', 'CompensatorID'];
-    this.newDictionary['0x300A']['0x00E6'] = ['DS', '1', 'SourceToCompensatorTrayDistance'];
-    this.newDictionary['0x300A']['0x00E7'] = ['IS', '1', 'CompensatorRows'];
-    this.newDictionary['0x300A']['0x00E8'] = ['IS', '1', 'CompensatorColumns'];
-    this.newDictionary['0x300A']['0x00E9'] = ['DS', '2', 'CompensatorPixelSpacing'];
-    this.newDictionary['0x300A']['0x00EA'] = ['DS', '2', 'CompensatorPosition'];
-    this.newDictionary['0x300A']['0x00EB'] = ['DS', '1-n', 'CompensatorTransmissionData'];
-    this.newDictionary['0x300A']['0x00EC'] = ['DS', '1-n', 'CompensatorThicknessData'];
-    this.newDictionary['0x300A']['0x00ED'] = ['IS', '1', 'NumberOfBoli'];
-    this.newDictionary['0x300A']['0x00EE'] = ['CS', '1', 'CompensatorType'];
-    this.newDictionary['0x300A']['0x00F0'] = ['IS', '1', 'NumberOfBlocks'];
-    this.newDictionary['0x300A']['0x00F2'] = ['DS', '1', 'TotalBlockTrayFactor'];
-    this.newDictionary['0x300A']['0x00F4'] = ['SQ', '1', 'BlockSequence'];
-    this.newDictionary['0x300A']['0x00F5'] = ['SH', '1', 'BlockTrayID'];
-    this.newDictionary['0x300A']['0x00F6'] = ['DS', '1', 'SourceToBlockTrayDistance'];
-    this.newDictionary['0x300A']['0x00F8'] = ['CS', '1', 'BlockType'];
-    this.newDictionary['0x300A']['0x00FA'] = ['CS', '1', 'BlockDivergence'];
-    this.newDictionary['0x300A']['0x00FC'] = ['IS', '1', 'BlockNumber'];
-    this.newDictionary['0x300A']['0x00FE'] = ['LO', '1', 'BlockName'];
-    this.newDictionary['0x300A']['0x0100'] = ['DS', '1', 'BlockThickness'];
-    this.newDictionary['0x300A']['0x0102'] = ['DS', '1', 'BlockTransmission'];
-    this.newDictionary['0x300A']['0x0104'] = ['IS', '1', 'BlockNumberOfPoints'];
-    this.newDictionary['0x300A']['0x0106'] = ['DS', '2-2n', 'BlockData'];
-    this.newDictionary['0x300A']['0x0107'] = ['SQ', '1', 'ApplicatorSequence'];
-    this.newDictionary['0x300A']['0x0108'] = ['SH', '1', 'ApplicatorID'];
-    this.newDictionary['0x300A']['0x0109'] = ['CS', '1', 'ApplicatorType'];
-    this.newDictionary['0x300A']['0x010A'] = ['LO', '1', 'ApplicatorDescription'];
-    this.newDictionary['0x300A']['0x010C'] = ['DS', '1', 'CumulativeDoseReferenceCoefficient'];
-    this.newDictionary['0x300A']['0x010E'] = ['DS', '1', 'FinalCumulativeMetersetWeight'];
-    this.newDictionary['0x300A']['0x0110'] = ['IS', '1', 'NumberOfControlPoints'];
-    this.newDictionary['0x300A']['0x0111'] = ['SQ', '1', 'ControlPointSequence'];
-    this.newDictionary['0x300A']['0x0112'] = ['IS', '1', 'ControlPointIndex'];
-    this.newDictionary['0x300A']['0x0114'] = ['DS', '1', 'NominalBeamEnergy'];
-    this.newDictionary['0x300A']['0x0115'] = ['DS', '1', 'DoseRateSet'];
-    this.newDictionary['0x300A']['0x0116'] = ['SQ', '1', 'WedgePositionSequence'];
-    this.newDictionary['0x300A']['0x0118'] = ['CS', '1', 'WedgePosition'];
-    this.newDictionary['0x300A']['0x011A'] = ['SQ', '1', 'BeamLimitingDevicePositionSequence'];
-    this.newDictionary['0x300A']['0x011C'] = ['DS', '2-2n', 'LeafJawPositions'];
-    this.newDictionary['0x300A']['0x011E'] = ['DS', '1', 'GantryAngle'];
-    this.newDictionary['0x300A']['0x011F'] = ['CS', '1', 'GantryRotationDirection'];
-    this.newDictionary['0x300A']['0x0120'] = ['DS', '1', 'BeamLimitingDeviceAngle'];
-    this.newDictionary['0x300A']['0x0121'] = ['CS', '1', 'BeamLimitingDeviceRotationDirection'];
-    this.newDictionary['0x300A']['0x0122'] = ['DS', '1', 'PatientSupportAngle'];
-    this.newDictionary['0x300A']['0x0123'] = ['CS', '1', 'PatientSupportRotationDirection'];
-    this.newDictionary['0x300A']['0x0124'] = ['DS', '1', 'TableTopEccentricAxisDistance'];
-    this.newDictionary['0x300A']['0x0125'] = ['DS', '1', 'TableTopEccentricAngle'];
-    this.newDictionary['0x300A']['0x0126'] = ['CS', '1', 'TableTopEccentricRotationDirection'];
-    this.newDictionary['0x300A']['0x0128'] = ['DS', '1', 'TableTopVerticalPosition'];
-    this.newDictionary['0x300A']['0x0129'] = ['DS', '1', 'TableTopLongitudinalPosition'];
-    this.newDictionary['0x300A']['0x012A'] = ['DS', '1', 'TableTopLateralPosition'];
-    this.newDictionary['0x300A']['0x012C'] = ['DS', '3', 'IsocenterPosition'];
-    this.newDictionary['0x300A']['0x012E'] = ['DS', '3', 'SurfaceEntryPoint'];
-    this.newDictionary['0x300A']['0x0130'] = ['DS', '1', 'SourceToSurfaceDistance'];
-    this.newDictionary['0x300A']['0x0134'] = ['DS', '1', 'CumulativeMetersetWeight'];
-    this.newDictionary['0x300A']['0x0140'] = ['FL', '1', 'TableTopPitchAngle'];
-    this.newDictionary['0x300A']['0x0142'] = ['CS', '1', 'TableTopPitchRotationDirection'];
-    this.newDictionary['0x300A']['0x0144'] = ['FL', '1', 'TableTopRollAngle'];
-    this.newDictionary['0x300A']['0x0146'] = ['CS', '1', 'TableTopRollRotationDirection'];
-    this.newDictionary['0x300A']['0x0148'] = ['FL', '1', 'HeadFixationAngle'];
-    this.newDictionary['0x300A']['0x014A'] = ['FL', '1', 'GantryPitchAngle'];
-    this.newDictionary['0x300A']['0x014C'] = ['CS', '1', 'GantryPitchRotationDirection'];
-    this.newDictionary['0x300A']['0x014E'] = ['FL', '1', 'GantryPitchAngleTolerance'];
-    this.newDictionary['0x300A']['0x0180'] = ['SQ', '1', 'PatientSetupSequence'];
-    this.newDictionary['0x300A']['0x0182'] = ['IS', '1', 'PatientSetupNumber'];
-    this.newDictionary['0x300A']['0x0184'] = ['LO', '1', 'PatientAdditionalPosition'];
-    this.newDictionary['0x300A']['0x0190'] = ['SQ', '1', 'FixationDeviceSequence'];
-    this.newDictionary['0x300A']['0x0192'] = ['CS', '1', 'FixationDeviceType'];
-    this.newDictionary['0x300A']['0x0194'] = ['SH', '1', 'FixationDeviceLabel'];
-    this.newDictionary['0x300A']['0x0196'] = ['ST', '1', 'FixationDeviceDescription'];
-    this.newDictionary['0x300A']['0x0198'] = ['SH', '1', 'FixationDevicePosition'];
-    this.newDictionary['0x300A']['0x01A0'] = ['SQ', '1', 'ShieldingDeviceSequence'];
-    this.newDictionary['0x300A']['0x01A2'] = ['CS', '1', 'ShieldingDeviceType'];
-    this.newDictionary['0x300A']['0x01A4'] = ['SH', '1', 'ShieldingDeviceLabel'];
-    this.newDictionary['0x300A']['0x01A6'] = ['ST', '1', 'ShieldingDeviceDescription'];
-    this.newDictionary['0x300A']['0x01A8'] = ['SH', '1', 'ShieldingDevicePosition'];
-    this.newDictionary['0x300A']['0x01B0'] = ['CS', '1', 'SetupTechnique'];
-    this.newDictionary['0x300A']['0x01B2'] = ['ST', '1', 'SetupTechniqueDescription'];
-    this.newDictionary['0x300A']['0x01B4'] = ['SQ', '1', 'SetupDeviceSequence'];
-    this.newDictionary['0x300A']['0x01B6'] = ['CS', '1', 'SetupDeviceType'];
-    this.newDictionary['0x300A']['0x01B8'] = ['SH', '1', 'SetupDeviceLabel'];
-    this.newDictionary['0x300A']['0x01BA'] = ['ST', '1', 'SetupDeviceDescription'];
-    this.newDictionary['0x300A']['0x01BC'] = ['DS', '1', 'SetupDeviceParameter'];
-    this.newDictionary['0x300A']['0x01D0'] = ['ST', '1', 'SetupReferenceDescription'];
-    this.newDictionary['0x300A']['0x01D2'] = ['DS', '1', 'TableTopVerticalSetupDisplacement'];
-    this.newDictionary['0x300A']['0x01D4'] = ['DS', '1', 'TableTopLongitudinalSetupDisplacement'];
-    this.newDictionary['0x300A']['0x01D6'] = ['DS', '1', 'TableTopLateralSetupDisplacement'];
-    this.newDictionary['0x300A']['0x0200'] = ['CS', '1', 'BrachyTreatmentTechnique'];
-    this.newDictionary['0x300A']['0x0202'] = ['CS', '1', 'BrachyTreatmentType'];
-    this.newDictionary['0x300A']['0x0206'] = ['SQ', '1', 'TreatmentMachineSequence'];
-    this.newDictionary['0x300A']['0x0210'] = ['SQ', '1', 'SourceSequence'];
-    this.newDictionary['0x300A']['0x0212'] = ['IS', '1', 'SourceNumber'];
-    this.newDictionary['0x300A']['0x0214'] = ['CS', '1', 'SourceType'];
-    this.newDictionary['0x300A']['0x0216'] = ['LO', '1', 'SourceManufacturer'];
-    this.newDictionary['0x300A']['0x0218'] = ['DS', '1', 'ActiveSourceDiameter'];
-    this.newDictionary['0x300A']['0x021A'] = ['DS', '1', 'ActiveSourceLength'];
-    this.newDictionary['0x300A']['0x0222'] = ['DS', '1', 'SourceEncapsulationNominalThickness'];
-    this.newDictionary['0x300A']['0x0224'] = ['DS', '1', 'SourceEncapsulationNominalTransmission'];
-    this.newDictionary['0x300A']['0x0226'] = ['LO', '1', 'SourceIsotopeName'];
-    this.newDictionary['0x300A']['0x0228'] = ['DS', '1', 'SourceIsotopeHalfLife'];
-    this.newDictionary['0x300A']['0x022A'] = ['DS', '1', 'ReferenceAirKermaRate'];
-    this.newDictionary['0x300A']['0x022C'] = ['DA', '1', 'AirKermaRateReferenceDate'];
-    this.newDictionary['0x300A']['0x022E'] = ['TM', '1', 'AirKermaRateReferenceTime'];
-    this.newDictionary['0x300A']['0x0230'] = ['SQ', '1', 'ApplicationSetupSequence'];
-    this.newDictionary['0x300A']['0x0232'] = ['CS', '1', 'ApplicationSetupType'];
-    this.newDictionary['0x300A']['0x0234'] = ['IS', '1', 'ApplicationSetupNumber'];
-    this.newDictionary['0x300A']['0x0236'] = ['LO', '1', 'ApplicationSetupName'];
-    this.newDictionary['0x300A']['0x0238'] = ['LO', '1', 'ApplicationSetupManufacturer'];
-    this.newDictionary['0x300A']['0x0240'] = ['IS', '1', 'TemplateNumber'];
-    this.newDictionary['0x300A']['0x0242'] = ['SH', '1', 'TemplateType'];
-    this.newDictionary['0x300A']['0x0244'] = ['LO', '1', 'TemplateName'];
-    this.newDictionary['0x300A']['0x0250'] = ['DS', '1', 'TotalReferenceAirKerma'];
-    this.newDictionary['0x300A']['0x0260'] = ['SQ', '1', 'BrachyAccessoryDeviceSequence'];
-    this.newDictionary['0x300A']['0x0262'] = ['IS', '1', 'BrachyAccessoryDeviceNumber'];
-    this.newDictionary['0x300A']['0x0263'] = ['SH', '1', 'BrachyAccessoryDeviceID'];
-    this.newDictionary['0x300A']['0x0264'] = ['CS', '1', 'BrachyAccessoryDeviceType'];
-    this.newDictionary['0x300A']['0x0266'] = ['LO', '1', 'BrachyAccessoryDeviceName'];
-    this.newDictionary['0x300A']['0x026A'] = ['DS', '1', 'BrachyAccessoryDeviceNominalThickness'];
-    this.newDictionary['0x300A']['0x026C'] = ['DS', '1', 'BrachyAccessoryDeviceNominalTransmission'];
-    this.newDictionary['0x300A']['0x0280'] = ['SQ', '1', 'ChannelSequence'];
-    this.newDictionary['0x300A']['0x0282'] = ['IS', '1', 'ChannelNumber'];
-    this.newDictionary['0x300A']['0x0284'] = ['DS', '1', 'ChannelLength'];
-    this.newDictionary['0x300A']['0x0286'] = ['DS', '1', 'ChannelTotalTime'];
-    this.newDictionary['0x300A']['0x0288'] = ['CS', '1', 'SourceMovementType'];
-    this.newDictionary['0x300A']['0x028A'] = ['IS', '1', 'NumberOfPulses'];
-    this.newDictionary['0x300A']['0x028C'] = ['DS', '1', 'PulseRepetitionInterval'];
-    this.newDictionary['0x300A']['0x0290'] = ['IS', '1', 'SourceApplicatorNumber'];
-    this.newDictionary['0x300A']['0x0291'] = ['SH', '1', 'SourceApplicatorID'];
-    this.newDictionary['0x300A']['0x0292'] = ['CS', '1', 'SourceApplicatorType'];
-    this.newDictionary['0x300A']['0x0294'] = ['LO', '1', 'SourceApplicatorName'];
-    this.newDictionary['0x300A']['0x0296'] = ['DS', '1', 'SourceApplicatorLength'];
-    this.newDictionary['0x300A']['0x0298'] = ['LO', '1', 'SourceApplicatorManufacturer'];
-    this.newDictionary['0x300A']['0x029C'] = ['DS', '1', 'SourceApplicatorWallNominalThickness'];
-    this.newDictionary['0x300A']['0x029E'] = ['DS', '1', 'SourceApplicatorWallNominalTransmission'];
-    this.newDictionary['0x300A']['0x02A0'] = ['DS', '1', 'SourceApplicatorStepSize'];
-    this.newDictionary['0x300A']['0x02A2'] = ['IS', '1', 'TransferTubeNumber'];
-    this.newDictionary['0x300A']['0x02A4'] = ['DS', '1', 'TransferTubeLength'];
-    this.newDictionary['0x300A']['0x02B0'] = ['SQ', '1', 'ChannelShieldSequence'];
-    this.newDictionary['0x300A']['0x02B2'] = ['IS', '1', 'ChannelShieldNumber'];
-    this.newDictionary['0x300A']['0x02B3'] = ['SH', '1', 'ChannelShieldID'];
-    this.newDictionary['0x300A']['0x02B4'] = ['LO', '1', 'ChannelShieldName'];
-    this.newDictionary['0x300A']['0x02B8'] = ['DS', '1', 'ChannelShieldNominalThickness'];
-    this.newDictionary['0x300A']['0x02BA'] = ['DS', '1', 'ChannelShieldNominalTransmission'];
-    this.newDictionary['0x300A']['0x02C8'] = ['DS', '1', 'FinalCumulativeTimeWeight'];
-    this.newDictionary['0x300A']['0x02D0'] = ['SQ', '1', 'BrachyControlPointSequence'];
-    this.newDictionary['0x300A']['0x02D2'] = ['DS', '1', 'ControlPointRelativePosition'];
-    this.newDictionary['0x300A']['0x02D4'] = ['DS', '3', 'ControlPointDPosition'];
-    this.newDictionary['0x300A']['0x02D6'] = ['DS', '1', 'CumulativeTimeWeight'];
-
-    // 0x300C
-    this.newDictionary['0x300C'] = [];
-    this.newDictionary['0x300C']['0x0000'] = ['UL', '1', 'RTRelationshipGroupLength'];
-    this.newDictionary['0x300C']['0x0002'] = ['SQ', '1', 'ReferencedRTPlanSequence'];
-    this.newDictionary['0x300C']['0x0004'] = ['SQ', '1', 'ReferencedBeamSequence'];
-    this.newDictionary['0x300C']['0x0006'] = ['IS', '1', 'ReferencedBeamNumber'];
-    this.newDictionary['0x300C']['0x0007'] = ['IS', '1', 'ReferencedReferenceImageNumber'];
-    this.newDictionary['0x300C']['0x0008'] = ['DS', '1', 'StartCumulativeMetersetWeight'];
-    this.newDictionary['0x300C']['0x0009'] = ['DS', '1', 'EndCumulativeMetersetWeight'];
-    this.newDictionary['0x300C']['0x000A'] = ['SQ', '1', 'ReferencedBrachyApplicationSetupSequence'];
-    this.newDictionary['0x300C']['0x000C'] = ['IS', '1', 'ReferencedBrachyApplicationSetupNumber'];
-    this.newDictionary['0x300C']['0x000E'] = ['IS', '1', 'ReferencedSourceNumber'];
-    this.newDictionary['0x300C']['0x0020'] = ['SQ', '1', 'ReferencedFractionGroupSequence'];
-    this.newDictionary['0x300C']['0x0022'] = ['IS', '1', 'ReferencedFractionGroupNumber'];
-    this.newDictionary['0x300C']['0x0040'] = ['SQ', '1', 'ReferencedVerificationImageSequence'];
-    this.newDictionary['0x300C']['0x0042'] = ['SQ', '1', 'ReferencedReferenceImageSequence'];
-    this.newDictionary['0x300C']['0x0050'] = ['SQ', '1', 'ReferencedDoseReferenceSequence'];
-    this.newDictionary['0x300C']['0x0051'] = ['IS', '1', 'ReferencedDoseReferenceNumber'];
-    this.newDictionary['0x300C']['0x0055'] = ['SQ', '1', 'BrachyReferencedDoseReferenceSequence'];
-    this.newDictionary['0x300C']['0x0060'] = ['SQ', '1', 'ReferencedStructureSetSequence'];
-    this.newDictionary['0x300C']['0x006A'] = ['IS', '1', 'ReferencedPatientSetupNumber'];
-    this.newDictionary['0x300C']['0x0080'] = ['SQ', '1', 'ReferencedDoseSequence'];
-    this.newDictionary['0x300C']['0x00A0'] = ['IS', '1', 'ReferencedToleranceTableNumber'];
-    this.newDictionary['0x300C']['0x00B0'] = ['SQ', '1', 'ReferencedBolusSequence'];
-    this.newDictionary['0x300C']['0x00C0'] = ['IS', '1', 'ReferencedWedgeNumber'];
-    this.newDictionary['0x300C']['0x00D0'] = ['IS', '1', 'ReferencedCompensatorNumber'];
-    this.newDictionary['0x300C']['0x00E0'] = ['IS', '1', 'ReferencedBlockNumber'];
-    this.newDictionary['0x300C']['0x00F0'] = ['IS', '1', 'ReferencedControlPointIndex'];
-
-    // 0x300E
-    this.newDictionary['0x300E'] = [];
-    this.newDictionary['0x300E']['0x0000'] = ['UL', '1', 'RTApprovalGroupLength'];
-    this.newDictionary['0x300E']['0x0002'] = ['CS', '1', 'ApprovalStatus'];
-    this.newDictionary['0x300E']['0x0004'] = ['DA', '1', 'ReviewDate'];
-    this.newDictionary['0x300E']['0x0005'] = ['TM', '1', 'ReviewTime'];
-    this.newDictionary['0x300E']['0x0008'] = ['PN', '1', 'ReviewerName'];
-
-    // 0x4000
-    this.newDictionary['0x4000'] = [];
-    this.newDictionary['0x4000']['0x0000'] = ['UL', '1', 'TextGroupLength'];
-    this.newDictionary['0x4000']['0x0010'] = ['LT', '1-n', 'TextArbitrary'];
-    this.newDictionary['0x4000']['0x4000'] = ['LT', '1-n', 'TextComments'];
-
-    // 0x4008
-    this.newDictionary['0x4008'] = [];
-    this.newDictionary['0x4008']['0x0000'] = ['UL', '1', 'ResultsGroupLength'];
-    this.newDictionary['0x4008']['0x0040'] = ['SH', '1', 'ResultsID'];
-    this.newDictionary['0x4008']['0x0042'] = ['LO', '1', 'ResultsIDIssuer'];
-    this.newDictionary['0x4008']['0x0050'] = ['SQ', '1', 'ReferencedInterpretationSequence'];
-    this.newDictionary['0x4008']['0x0100'] = ['DA', '1', 'InterpretationRecordedDate'];
-    this.newDictionary['0x4008']['0x0101'] = ['TM', '1', 'InterpretationRecordedTime'];
-    this.newDictionary['0x4008']['0x0102'] = ['PN', '1', 'InterpretationRecorder'];
-    this.newDictionary['0x4008']['0x0103'] = ['LO', '1', 'ReferenceToRecordedSound'];
-    this.newDictionary['0x4008']['0x0108'] = ['DA', '1', 'InterpretationTranscriptionDate'];
-    this.newDictionary['0x4008']['0x0109'] = ['TM', '1', 'InterpretationTranscriptionTime'];
-    this.newDictionary['0x4008']['0x010A'] = ['PN', '1', 'InterpretationTranscriber'];
-    this.newDictionary['0x4008']['0x010B'] = ['ST', '1', 'InterpretationText'];
-    this.newDictionary['0x4008']['0x010C'] = ['PN', '1', 'InterpretationAuthor'];
-    this.newDictionary['0x4008']['0x0111'] = ['SQ', '1', 'InterpretationApproverSequence'];
-    this.newDictionary['0x4008']['0x0112'] = ['DA', '1', 'InterpretationApprovalDate'];
-    this.newDictionary['0x4008']['0x0113'] = ['TM', '1', 'InterpretationApprovalTime'];
-    this.newDictionary['0x4008']['0x0114'] = ['PN', '1', 'PhysicianApprovingInterpretation'];
-    this.newDictionary['0x4008']['0x0115'] = ['LT', '1', 'InterpretationDiagnosisDescription'];
-    this.newDictionary['0x4008']['0x0117'] = ['SQ', '1', 'DiagnosisCodeSequence'];
-    this.newDictionary['0x4008']['0x0118'] = ['SQ', '1', 'ResultsDistributionListSequence'];
-    this.newDictionary['0x4008']['0x0119'] = ['PN', '1', 'DistributionName'];
-    this.newDictionary['0x4008']['0x011A'] = ['LO', '1', 'DistributionAddress'];
-    this.newDictionary['0x4008']['0x0200'] = ['SH', '1', 'InterpretationID'];
-    this.newDictionary['0x4008']['0x0202'] = ['LO', '1', 'InterpretationIDIssuer'];
-    this.newDictionary['0x4008']['0x0210'] = ['CS', '1', 'InterpretationTypeID'];
-    this.newDictionary['0x4008']['0x0212'] = ['CS', '1', 'InterpretationStatusID'];
-    this.newDictionary['0x4008']['0x0300'] = ['ST', '1', 'Impressions'];
-    this.newDictionary['0x4008']['0x4000'] = ['ST', '1', 'ResultsComments'];
-
-    // 0x5000
-    this.newDictionary['0x5000'] = [];
-    this.newDictionary['0x5000']['0x0000'] = ['UL', '1', 'CurveGroupLength'];
-    this.newDictionary['0x5000']['0x0005'] = ['US', '1', 'CurveDimensions'];
-    this.newDictionary['0x5000']['0x0010'] = ['US', '1', 'NumberOfPoints'];
-    this.newDictionary['0x5000']['0x0020'] = ['CS', '1', 'TypeOfData'];
-    this.newDictionary['0x5000']['0x0022'] = ['LO', '1', 'CurveDescription'];
-    this.newDictionary['0x5000']['0x0030'] = ['SH', '1-n', 'AxisUnits'];
-    this.newDictionary['0x5000']['0x0040'] = ['SH', '1-n', 'AxisLabels'];
-    this.newDictionary['0x5000']['0x0103'] = ['US', '1', 'DataValueRepresentation'];
-    this.newDictionary['0x5000']['0x0104'] = ['US', '1-n', 'MinimumCoordinateValue'];
-    this.newDictionary['0x5000']['0x0105'] = ['US', '1-n', 'MaximumCoordinateValue'];
-    this.newDictionary['0x5000']['0x0106'] = ['SH', '1-n', 'CurveRange'];
-    this.newDictionary['0x5000']['0x0110'] = ['US', '1', 'CurveDataDescriptor'];
-    this.newDictionary['0x5000']['0x0112'] = ['US', '1', 'CoordinateStartValue'];
-    this.newDictionary['0x5000']['0x0114'] = ['US', '1', 'CoordinateStepValue'];
-    this.newDictionary['0x5000']['0x2000'] = ['US', '1', 'AudioType'];
-    this.newDictionary['0x5000']['0x2002'] = ['US', '1', 'AudioSampleFormat'];
-    this.newDictionary['0x5000']['0x2004'] = ['US', '1', 'NumberOfChannels'];
-    this.newDictionary['0x5000']['0x2006'] = ['UL', '1', 'NumberOfSamples'];
-    this.newDictionary['0x5000']['0x2008'] = ['UL', '1', 'SampleRate'];
-    this.newDictionary['0x5000']['0x200A'] = ['UL', '1', 'TotalTime'];
-    this.newDictionary['0x5000']['0x200C'] = ['OX', '1', 'AudioSampleData'];
-    this.newDictionary['0x5000']['0x200E'] = ['LT', '1', 'AudioComments'];
-    this.newDictionary['0x5000']['0x3000'] = ['OX', '1', 'CurveData'];
-
-    // 0x5400
-    this.newDictionary['0x5400'] = [];
-    this.newDictionary['0x5400']['0x0100'] = ['SQ', '1', 'WaveformSequence'];
-    this.newDictionary['0x5400']['0x0110'] = ['OW/OB', '1', 'ChannelMinimumValue'];
-    this.newDictionary['0x5400']['0x0112'] = ['OW/OB', '1', 'ChannelMaximumValue'];
-    this.newDictionary['0x5400']['0x1004'] = ['US', '1', 'WaveformBitsAllocated'];
-    this.newDictionary['0x5400']['0x1006'] = ['CS', '1', 'WaveformSampleInterpretation'];
-    this.newDictionary['0x5400']['0x100A'] = ['OW/OB', '1', 'WaveformPaddingValue'];
-    this.newDictionary['0x5400']['0x1010'] = ['OW/OB', '1', 'WaveformData'];
-
-    // 0x6000
-    this.newDictionary['0x6000'] = [];
-    this.newDictionary['0x6000']['0x0000'] = ['UL', '1', 'OverlayGroupLength'];
-    this.newDictionary['0x6000']['0x0010'] = ['US', '1', 'OverlayRows'];
-    this.newDictionary['0x6000']['0x0011'] = ['US', '1', 'OverlayColumns'];
-    this.newDictionary['0x6000']['0x0012'] = ['US', '1', 'OverlayPlanes'];
-    this.newDictionary['0x6000']['0x0015'] = ['IS', '1', 'OverlayNumberOfFrames'];
-    this.newDictionary['0x6000']['0x0040'] = ['CS', '1', 'OverlayType'];
-    this.newDictionary['0x6000']['0x0050'] = ['SS', '2', 'OverlayOrigin'];
-    this.newDictionary['0x6000']['0x0051'] = ['US', '1', 'OverlayImageFrameOrigin'];
-    this.newDictionary['0x6000']['0x0052'] = ['US', '1', 'OverlayPlaneOrigin'];
-    this.newDictionary['0x6000']['0x0060'] = ['CS', '1', 'OverlayCompressionCode'];
-    this.newDictionary['0x6000']['0x0061'] = ['SH', '1', 'OverlayCompressionOriginator'];
-    this.newDictionary['0x6000']['0x0062'] = ['SH', '1', 'OverlayCompressionLabel'];
-    this.newDictionary['0x6000']['0x0063'] = ['SH', '1', 'OverlayCompressionDescription'];
-    this.newDictionary['0x6000']['0x0066'] = ['AT', '1-n', 'OverlayCompressionStepPointers'];
-    this.newDictionary['0x6000']['0x0068'] = ['US', '1', 'OverlayRepeatInterval'];
-    this.newDictionary['0x6000']['0x0069'] = ['US', '1', 'OverlayBitsGrouped'];
-    this.newDictionary['0x6000']['0x0100'] = ['US', '1', 'OverlayBitsAllocated'];
-    this.newDictionary['0x6000']['0x0102'] = ['US', '1', 'OverlayBitPosition'];
-    this.newDictionary['0x6000']['0x0110'] = ['CS', '1', 'OverlayFormat'];
-    this.newDictionary['0x6000']['0x0200'] = ['US', '1', 'OverlayLocation'];
-    this.newDictionary['0x6000']['0x0800'] = ['CS', '1-n', 'OverlayCodeLabel'];
-    this.newDictionary['0x6000']['0x0802'] = ['US', '1', 'OverlayNumberOfTables'];
-    this.newDictionary['0x6000']['0x0803'] = ['AT', '1-n', 'OverlayCodeTableLocation'];
-    this.newDictionary['0x6000']['0x0804'] = ['US', '1', 'OverlayBitsForCodeWord'];
-    this.newDictionary['0x6000']['0x1100'] = ['US', '1', 'OverlayDescriptorGray'];
-    this.newDictionary['0x6000']['0x1101'] = ['US', '1', 'OverlayDescriptorRed'];
-    this.newDictionary['0x6000']['0x1102'] = ['US', '1', 'OverlayDescriptorGreen'];
-    this.newDictionary['0x6000']['0x1103'] = ['US', '1', 'OverlayDescriptorBlue'];
-    this.newDictionary['0x6000']['0x1200'] = ['US', '1-n', 'OverlayGray'];
-    this.newDictionary['0x6000']['0x1201'] = ['US', '1-n', 'OverlayRed'];
-    this.newDictionary['0x6000']['0x1202'] = ['US', '1-n', 'OverlayGreen'];
-    this.newDictionary['0x6000']['0x1203'] = ['US', '1-n', 'OverlayBlue'];
-    this.newDictionary['0x6000']['0x1301'] = ['IS', '1', 'ROIArea'];
-    this.newDictionary['0x6000']['0x1302'] = ['DS', '1', 'ROIMean'];
-    this.newDictionary['0x6000']['0x1303'] = ['DS', '1', 'ROIStandardDeviation'];
-    this.newDictionary['0x6000']['0x3000'] = ['OW', '1', 'OverlayData'];
-    this.newDictionary['0x6000']['0x4000'] = ['LT', '1-n', 'OverlayComments'];
-
-    // 0x7F00
-    this.newDictionary['0x7F00'] = [];
-    this.newDictionary['0x7F00']['0x0000'] = ['UL', '1', 'VariablePixelDataGroupLength'];
-    this.newDictionary['0x7F00']['0x0010'] = ['OX', '1', 'VariablePixelData'];
-    this.newDictionary['0x7F00']['0x0011'] = ['AT', '1', 'VariableNextDataGroup'];
-    this.newDictionary['0x7F00']['0x0020'] = ['OW', '1-n', 'VariableCoefficientsSDVN'];
-    this.newDictionary['0x7F00']['0x0030'] = ['OW', '1-n', 'VariableCoefficientsSDHN'];
-    this.newDictionary['0x7F00']['0x0040'] = ['OW', '1-n', 'VariableCoefficientsSDDN'];
-
-    // 0x7FE0
-    this.newDictionary['0x7FE0'] = [];
-    this.newDictionary['0x7FE0']['0x0000'] = ['UL', '1', 'PixelDataGroupLength'];
-    this.newDictionary['0x7FE0']['0x0010'] = ['OX', '1', 'PixelData'];
-    this.newDictionary['0x7FE0']['0x0020'] = ['OW', '1-n', 'CoefficientsSDVN'];
-    this.newDictionary['0x7FE0']['0x0030'] = ['OW', '1-n', 'CoefficientsSDHN'];
-    this.newDictionary['0x7FE0']['0x0040'] = ['OW', '1-n', 'CoefficientsSDDN'];
-
-    // 0xFFFC
-    this.newDictionary['0xFFFC'] = [];
-    this.newDictionary['0xFFFC']['0xFFFC'] = ['OB', '1', 'DataSetTrailingPadding'];
-
-    // 0xFFFE
-    this.newDictionary['0xFFFE'] = [];
-    this.newDictionary['0xFFFE']['0xE000'] = ['NONE', '1', 'Item'];
-    this.newDictionary['0xFFFE']['0xE00D'] = ['NONE', '1', 'ItemDelimitationItem'];
-    this.newDictionary['0xFFFE']['0xE0DD'] = ['NONE', '1', 'SequenceDelimitationItem'];
-};
-
+dwv.dicom.dictionary = {
+    '0x0000': {
+        '0x0000': ['UL', '1', 'GroupLength'],
+        '0x0001': ['UL', '1', 'CommandLengthToEnd'],
+        '0x0002': ['UI', '1', 'AffectedSOPClassUID'],
+        '0x0003': ['UI', '1', 'RequestedSOPClassUID'],
+        '0x0010': ['CS', '1', 'CommandRecognitionCode'],
+        '0x0100': ['US', '1', 'CommandField'],
+        '0x0110': ['US', '1', 'MessageID'],
+        '0x0120': ['US', '1', 'MessageIDBeingRespondedTo'],
+        '0x0200': ['AE', '1', 'Initiator'], 
+        '0x0300': ['AE', '1', 'Receiver'],
+        '0x0400': ['AE', '1', 'FindLocation'],
+        '0x0600': ['AE', '1', 'MoveDestination'],
+        '0x0700': ['US', '1', 'Priority'],
+        '0x0800': ['US', '1', 'DataSetType'],
+        '0x0850': ['US', '1', 'NumberOfMatches'],
+        '0x0860': ['US', '1', 'ResponseSequenceNumber'],
+        '0x0900': ['US', '1', 'Status'],
+        '0x0901': ['AT', '1-n', 'OffendingElement'],
+        '0x0902': ['LO', '1', 'ErrorComment'],
+        '0x0903': ['US', '1', 'ErrorID'],
+        '0x0904': ['OT', '1-n', 'ErrorInformation'],
+        '0x1000': ['UI', '1', 'AffectedSOPInstanceUID'],
+        '0x1001': ['UI', '1', 'RequestedSOPInstanceUID'],
+        '0x1002': ['US', '1', 'EventTypeID'],
+        '0x1003': ['OT', '1-n', 'EventInformation'],
+        '0x1005': ['AT', '1-n', 'AttributeIdentifierList'],
+        '0x1007': ['AT', '1-n', 'ModificationList'],
+        '0x1008': ['US', '1', 'ActionTypeID'],
+        '0x1009': ['OT', '1-n', 'ActionInformation'],
+        '0x1013': ['UI', '1-n', 'SuccessfulSOPInstanceUIDList'],
+        '0x1014': ['UI', '1-n', 'FailedSOPInstanceUIDList'],
+        '0x1015': ['UI', '1-n', 'WarningSOPInstanceUIDList'],
+        '0x1020': ['US', '1', 'NumberOfRemainingSuboperations'],
+        '0x1021': ['US', '1', 'NumberOfCompletedSuboperations'],
+        '0x1022': ['US', '1', 'NumberOfFailedSuboperations'],
+        '0x1023': ['US', '1', 'NumberOfWarningSuboperations'],
+        '0x1030': ['AE', '1', 'MoveOriginatorApplicationEntityTitle'],
+        '0x1031': ['US', '1', 'MoveOriginatorMessageID'],
+        '0x4000': ['AT', '1', 'DialogReceiver'],
+        '0x4010': ['AT', '1', 'TerminalType'],
+        '0x5010': ['SH', '1', 'MessageSetID'],
+        '0x5020': ['SH', '1', 'EndMessageSet'],
+        '0x5110': ['AT', '1', 'DisplayFormat'],
+        '0x5120': ['AT', '1', 'PagePositionID'],
+        '0x5130': ['CS', '1', 'TextFormatID'],
+        '0x5140': ['CS', '1', 'NormalReverse'],
+        '0x5150': ['CS', '1', 'AddGrayScale'],
+        '0x5160': ['CS', '1', 'Borders'],
+        '0x5170': ['IS', '1', 'Copies'],
+        '0x5180': ['CS', '1', 'OldMagnificationType'],
+        '0x5190': ['CS', '1', 'Erase'],
+        '0x51A0': ['CS', '1', 'Print'],
+        '0x51B0': ['US', '1-n', 'Overlays'],
+    },
+    '0x0002': {
+        '0x0000': ['UL', '1', 'MetaElementGroupLength'],
+        '0x0001': ['OB', '1', 'FileMetaInformationVersion'],
+        '0x0002': ['UI', '1', 'MediaStorageSOPClassUID'],
+        '0x0003': ['UI', '1', 'MediaStorageSOPInstanceUID'],
+        '0x0010': ['UI', '1', 'TransferSyntaxUID'],
+        '0x0012': ['UI', '1', 'ImplementationClassUID'],
+        '0x0013': ['SH', '1', 'ImplementationVersionName'],
+        '0x0016': ['AE', '1', 'SourceApplicationEntityTitle'],
+        '0x0100': ['UI', '1', 'PrivateInformationCreatorUID'],
+        '0x0102': ['OB', '1', 'PrivateInformation'],
+    },
+    '0x0004': {
+        '0x0000': ['UL', '1', 'FileSetGroupLength'],
+        '0x1130': ['CS', '1', 'FileSetID'],
+        '0x1141': ['CS', '8', 'FileSetDescriptorFileID'],
+        '0x1142': ['CS', '1', 'FileSetCharacterSet'],
+        '0x1200': ['UL', '1', 'RootDirectoryFirstRecord'],
+        '0x1202': ['UL', '1', 'RootDirectoryLastRecord'],
+        '0x1212': ['US', '1', 'FileSetConsistencyFlag'],
+        '0x1220': ['SQ', '1', 'DirectoryRecordSequence'],
+        '0x1400': ['UL', '1', 'NextDirectoryRecordOffset'],
+        '0x1410': ['US', '1', 'RecordInUseFlag'],
+        '0x1420': ['UL', '1', 'LowerLevelDirectoryOffset'],
+        '0x1430': ['CS', '1', 'DirectoryRecordType'],
+        '0x1432': ['UI', '1', 'PrivateRecordUID'],
+        '0x1500': ['CS', '8', 'ReferencedFileID'],
+        '0x1504': ['UL', '1', 'DirectoryRecordOffset'],
+        '0x1510': ['UI', '1', 'ReferencedSOPClassUIDInFile'],
+        '0x1511': ['UI', '1', 'ReferencedSOPInstanceUIDInFile'],
+        '0x1512': ['UI', '1', 'ReferencedTransferSyntaxUIDInFile'],
+        '0x1600': ['UL', '1', 'NumberOfReferences'],
+    },
+    '0x0008': {
+        '0x0000': ['UL', '1', 'IdentifyingGroupLength'],
+        '0x0001': ['UL', '1', 'LengthToEnd'],
+        '0x0005': ['CS', '1', 'SpecificCharacterSet'],
+        '0x0008': ['CS', '1-n', 'ImageType'],
+        '0x000A': ['US', '1', 'SequenceItemNumber'],
+        '0x0010': ['CS', '1', 'RecognitionCode'],
+        '0x0012': ['DA', '1', 'InstanceCreationDate'],
+        '0x0013': ['TM', '1', 'InstanceCreationTime'],
+        '0x0014': ['UI', '1', 'InstanceCreatorUID'],
+        '0x0016': ['UI', '1', 'SOPClassUID'],
+        '0x0018': ['UI', '1', 'SOPInstanceUID'],
+        '0x0020': ['DA', '1', 'StudyDate'],
+        '0x0021': ['DA', '1', 'SeriesDate'],
+        '0x0022': ['DA', '1', 'AcquisitionDate'],
+        '0x0023': ['DA', '1', 'ImageDate'],
+        /* '0x0023': ['DA','1','ContentDate'], */
+        '0x0024': ['DA', '1', 'OverlayDate'],
+        '0x0025': ['DA', '1', 'CurveDate'],
+        '0x002A': ['DT', '1', 'AcquisitionDatetime'],
+        '0x0030': ['TM', '1', 'StudyTime'],
+        '0x0031': ['TM', '1', 'SeriesTime'],
+        '0x0032': ['TM', '1', 'AcquisitionTime'],
+        '0x0033': ['TM', '1', 'ImageTime'],
+        '0x0034': ['TM', '1', 'OverlayTime'],
+        '0x0035': ['TM', '1', 'CurveTime'],
+        '0x0040': ['US', '1', 'OldDataSetType'],
+        '0x0041': ['LT', '1', 'OldDataSetSubtype'],
+        '0x0042': ['CS', '1', 'NuclearMedicineSeriesType'],
+        '0x0050': ['SH', '1', 'AccessionNumber'],
+        '0x0052': ['CS', '1', 'QueryRetrieveLevel'],
+        '0x0054': ['AE', '1-n', 'RetrieveAETitle'],
+        '0x0058': ['UI', '1-n', 'DataSetFailedSOPInstanceUIDList'],
+        '0x0060': ['CS', '1', 'Modality'],
+        '0x0061': ['CS', '1-n', 'ModalitiesInStudy'],
+        '0x0064': ['CS', '1', 'ConversionType'],
+        '0x0068': ['CS', '1', 'PresentationIntentType'],
+        '0x0070': ['LO', '1', 'Manufacturer'],
+        '0x0080': ['LO', '1', 'InstitutionName'],
+        '0x0081': ['ST', '1', 'InstitutionAddress'],
+        '0x0082': ['SQ', '1', 'InstitutionCodeSequence'],
+        '0x0090': ['PN', '1', 'ReferringPhysicianName'],
+        '0x0092': ['ST', '1', 'ReferringPhysicianAddress'],
+        '0x0094': ['SH', '1-n', 'ReferringPhysicianTelephoneNumber'],
+        '0x0100': ['SH', '1', 'CodeValue'],
+        '0x0102': ['SH', '1', 'CodingSchemeDesignator'],
+        '0x0103': ['SH', '1', 'CodingSchemeVersion'],
+        '0x0104': ['LO', '1', 'CodeMeaning'],
+        '0x0105': ['CS', '1', 'MappingResource'],
+        '0x0106': ['DT', '1', 'ContextGroupVersion'],
+        '0x0107': ['DT', '1', 'ContextGroupLocalVersion'],
+        '0x010B': ['CS', '1', 'CodeSetExtensionFlag'],
+        '0x010C': ['UI', '1', 'PrivateCodingSchemeCreatorUID'],
+        '0x010D': ['UI', '1', 'CodeSetExtensionCreatorUID'],
+        '0x010F': ['CS', '1', 'ContextIdentifier'],
+        '0x0201': ['SH', '1', 'TimezoneOffsetFromUTC'],
+        '0x1000': ['AE', '1', 'NetworkID'],
+        '0x1010': ['SH', '1', 'StationName'],
+        '0x1030': ['LO', '1', 'StudyDescription'],
+        '0x1032': ['SQ', '1', 'ProcedureCodeSequence'],
+        '0x103E': ['LO', '1', 'SeriesDescription'],
+        '0x1040': ['LO', '1', 'InstitutionalDepartmentName'],
+        '0x1048': ['PN', '1-n', 'PhysicianOfRecord'],
+        '0x1050': ['PN', '1-n', 'PerformingPhysicianName'],
+        '0x1060': ['PN', '1-n', 'PhysicianReadingStudy'],
+        '0x1070': ['PN', '1-n', 'OperatorName'],
+        '0x1080': ['LO', '1-n', 'AdmittingDiagnosisDescription'],
+        '0x1084': ['SQ', '1', 'AdmittingDiagnosisCodeSequence'],
+        '0x1090': ['LO', '1', 'ManufacturerModelName'],
+        '0x1100': ['SQ', '1', 'ReferencedResultsSequence'],
+        '0x1110': ['SQ', '1', 'ReferencedStudySequence'],
+        '0x1111': ['SQ', '1', 'ReferencedStudyComponentSequence'],
+        '0x1115': ['SQ', '1', 'ReferencedSeriesSequence'],
+        '0x1120': ['SQ', '1', 'ReferencedPatientSequence'],
+        '0x1125': ['SQ', '1', 'ReferencedVisitSequence'],
+        '0x1130': ['SQ', '1', 'ReferencedOverlaySequence'],
+        '0x1140': ['SQ', '1', 'ReferencedImageSequence'],
+        '0x1145': ['SQ', '1', 'ReferencedCurveSequence'],
+        '0x114A': ['SQ', '1', 'ReferencedInstanceSequence'],
+        '0x114B': ['LO', '1', 'ReferenceDescription'],
+        '0x1150': ['UI', '1', 'ReferencedSOPClassUID'],
+        '0x1155': ['UI', '1', 'ReferencedSOPInstanceUID'],
+        '0x115A': ['UI', '1-n', 'SOPClassesSupported'],
+        '0x1160': ['IS', '1', 'ReferencedFrameNumber'],
+        '0x1195': ['UI', '1', 'TransactionUID'],
+        '0x1197': ['US', '1', 'FailureReason'],
+        '0x1198': ['SQ', '1', 'FailedSOPSequence'],
+        '0x1199': ['SQ', '1', 'ReferencedSOPSequence'],
+        '0x2110': ['CS', '1', 'LossyImageCompression'],
+        '0x2111': ['ST', '1', 'DerivationDescription'],
+        '0x2112': ['SQ', '1', 'SourceImageSequence'],
+        '0x2120': ['SH', '1', 'StageName'],
+        '0x2122': ['IS', '1', 'StageNumber'],
+        '0x2124': ['IS', '1', 'NumberOfStages'],
+        '0x2128': ['IS', '1', 'ViewNumber'],
+        '0x2129': ['IS', '1', 'NumberOfEventTimers'],
+        '0x212A': ['IS', '1', 'NumberOfViewsInStage'],
+        '0x2130': ['DS', '1-n', 'EventElapsedTime'],
+        '0x2132': ['LO', '1-n', 'EventTimerName'],
+        '0x2142': ['IS', '1', 'StartTrim'],
+        '0x2143': ['IS', '1', 'StopTrim'],
+        '0x2144': ['IS', '1', 'RecommendedDisplayFrameRate'],
+        '0x2200': ['CS', '1', 'TransducerPosition'],
+        '0x2204': ['CS', '1', 'TransducerOrientation'],
+        '0x2208': ['CS', '1', 'AnatomicStructure'],
+        '0x2218': ['SQ', '1', 'AnatomicRegionSequence'],
+        '0x2220': ['SQ', '1', 'AnatomicRegionModifierSequence'],
+        '0x2228': ['SQ', '1', 'PrimaryAnatomicStructureSequence'],
+        '0x2229': ['SQ', '1', 'AnatomicStructureSpaceOrRegionSequence'],
+        '0x2230': ['SQ', '1', 'PrimaryAnatomicStructureModifierSequence'],
+        '0x2240': ['SQ', '1', 'TransducerPositionSequence'],
+        '0x2242': ['SQ', '1', 'TransducerPositionModifierSequence'],
+        '0x2244': ['SQ', '1', 'TransducerOrientationSequence'],
+        '0x2246': ['SQ', '1', 'TransducerOrientationModifierSequence'],
+        '0x4000': ['LT', '1-n', 'IdentifyingComments'],
+    },
+    '0x0010': {
+        '0x0000': ['UL', '1', 'PatientGroupLength'],
+        '0x0010': ['PN', '1', 'PatientName'],
+        '0x0020': ['LO', '1', 'PatientID'],
+        '0x0021': ['LO', '1', 'IssuerOfPatientID'],
+        '0x0030': ['DA', '1', 'PatientBirthDate'],
+        '0x0032': ['TM', '1', 'PatientBirthTime'],
+        '0x0040': ['CS', '1', 'PatientSex'],
+        '0x0050': ['SQ', '1', 'PatientInsurancePlanCodeSequence'],
+        '0x1000': ['LO', '1-n', 'OtherPatientID'],
+        '0x1001': ['PN', '1-n', 'OtherPatientName'],
+        '0x1005': ['PN', '1', 'PatientBirthName'],
+        '0x1010': ['AS', '1', 'PatientAge'],
+        '0x1020': ['DS', '1', 'PatientSize'],
+        '0x1030': ['DS', '1', 'PatientWeight'],
+        '0x1040': ['LO', '1', 'PatientAddress'],
+        '0x1050': ['LT', '1-n', 'InsurancePlanIdentification'],
+        '0x1060': ['PN', '1', 'PatientMotherBirthName'],
+        '0x1080': ['LO', '1', 'MilitaryRank'],
+        '0x1081': ['LO', '1', 'BranchOfService'],
+        '0x1090': ['LO', '1', 'MedicalRecordLocator'],
+        '0x2000': ['LO', '1-n', 'MedicalAlerts'],
+        '0x2110': ['LO', '1-n', 'ContrastAllergies'],
+        '0x2150': ['LO', '1', 'CountryOfResidence'],
+        '0x2152': ['LO', '1', 'RegionOfResidence'],
+        '0x2154': ['SH', '1-n', 'PatientTelephoneNumber'],
+        '0x2160': ['SH', '1', 'EthnicGroup'],
+        '0x2180': ['SH', '1', 'Occupation'],
+        '0x21A0': ['CS', '1', 'SmokingStatus'],
+        '0x21B0': ['LT', '1', 'AdditionalPatientHistory'],
+        '0x21C0': ['US', '1', 'PregnancyStatus'],
+        '0x21D0': ['DA', '1', 'LastMenstrualDate'],
+        '0x21F0': ['LO', '1', 'PatientReligiousPreference'],
+        '0x4000': ['LT', '1', 'PatientComments'],
+    },
+    '0x0018': {
+        '0x0000': ['UL', '1', 'AcquisitionGroupLength'],
+        '0x0010': ['LO', '1', 'ContrastBolusAgent'],
+        '0x0012': ['SQ', '1', 'ContrastBolusAgentSequence'],
+        '0x0014': ['SQ', '1', 'ContrastBolusAdministrationRouteSequence'],
+        '0x0015': ['CS', '1', 'BodyPartExamined'],
+        '0x0020': ['CS', '1-n', 'ScanningSequence'],
+        '0x0021': ['CS', '1-n', 'SequenceVariant'],
+        '0x0022': ['CS', '1-n', 'ScanOptions'],
+        '0x0023': ['CS', '1', 'MRAcquisitionType'],
+        '0x0024': ['SH', '1', 'SequenceName'],
+        '0x0025': ['CS', '1', 'AngioFlag'],
+        '0x0026': ['SQ', '1', 'InterventionDrugInformationSequence'],
+        '0x0027': ['TM', '1', 'InterventionDrugStopTime'],
+        '0x0028': ['DS', '1', 'InterventionDrugDose'],
+        '0x0029': ['SQ', '1', 'InterventionalDrugSequence'],
+        '0x002A': ['SQ', '1', 'AdditionalDrugSequence'],
+        '0x0030': ['LO', '1-n', 'Radionuclide'],
+        '0x0031': ['LO', '1-n', 'Radiopharmaceutical'],
+        '0x0032': ['DS', '1', 'EnergyWindowCenterline'],
+        '0x0033': ['DS', '1-n', 'EnergyWindowTotalWidth'],
+        '0x0034': ['LO', '1', 'InterventionalDrugName'],
+        '0x0035': ['TM', '1', 'InterventionalDrugStartTime'],
+        '0x0036': ['SQ', '1', 'InterventionalTherapySequence'],
+        '0x0037': ['CS', '1', 'TherapyType'],
+        '0x0038': ['CS', '1', 'InterventionalStatus'],
+        '0x0039': ['CS', '1', 'TherapyDescription'],
+        '0x0040': ['IS', '1', 'CineRate'],
+        '0x0050': ['DS', '1', 'SliceThickness'],
+        '0x0060': ['DS', '1', 'KVP'],
+        '0x0070': ['IS', '1', 'CountsAccumulated'],
+        '0x0071': ['CS', '1', 'AcquisitionTerminationCondition'],
+        '0x0072': ['DS', '1', 'EffectiveSeriesDuration'],
+        '0x0073': ['CS', '1', 'AcquisitionStartCondition'],
+        '0x0074': ['IS', '1', 'AcquisitionStartConditionData'],
+        '0x0075': ['IS', '1', 'AcquisitionTerminationConditionData'],
+        '0x0080': ['DS', '1', 'RepetitionTime'],
+        '0x0081': ['DS', '1', 'EchoTime'],
+        '0x0082': ['DS', '1', 'InversionTime'],
+        '0x0083': ['DS', '1', 'NumberOfAverages'],
+        '0x0084': ['DS', '1', 'ImagingFrequency'],
+        '0x0085': ['SH', '1', 'ImagedNucleus'],
+        '0x0086': ['IS', '1-n', 'EchoNumber'],
+        '0x0087': ['DS', '1', 'MagneticFieldStrength'],
+        '0x0088': ['DS', '1', 'SpacingBetweenSlices'],
+        '0x0089': ['IS', '1', 'NumberOfPhaseEncodingSteps'],
+        '0x0090': ['DS', '1', 'DataCollectionDiameter'],
+        '0x0091': ['IS', '1', 'EchoTrainLength'],
+        '0x0093': ['DS', '1', 'PercentSampling'],
+        '0x0094': ['DS', '1', 'PercentPhaseFieldOfView'],
+        '0x0095': ['DS', '1', 'PixelBandwidth'],
+        '0x1000': ['LO', '1', 'DeviceSerialNumber'],
+        '0x1002': ['UI', '1', 'DeviceUID'],
+        '0x1003': ['LO', '1', 'DeviceID'],
+        '0x1004': ['LO', '1', 'PlateID'],
+        '0x1005': ['LO', '1', 'GeneratorID'],
+        '0x1006': ['LO', '1', 'GridID'],
+        '0x1007': ['LO', '1', 'CassetteID'],
+        '0x1008': ['LO', '1', 'GantryID'],
+        '0x1010': ['LO', '1', 'SecondaryCaptureDeviceID'],
+        '0x1011': ['LO', '1', 'HardcopyCreationDeviceID'],
+        '0x1012': ['DA', '1', 'DateOfSecondaryCapture'],
+        '0x1014': ['TM', '1', 'TimeOfSecondaryCapture'],
+        '0x1016': ['LO', '1', 'SecondaryCaptureDeviceManufacturer'],
+        '0x1017': ['LO', '1', 'HardcopyDeviceManufacturer'],
+        '0x1018': ['LO', '1', 'SecondaryCaptureDeviceManufacturerModelName'],
+        '0x1019': ['LO', '1-n', 'SecondaryCaptureDeviceSoftwareVersion'],
+        '0x101A': ['LO', '1-n', 'HardcopyDeviceSoftwareVersion'],
+        '0x101B': ['LO', '1', 'HardcopyDeviceManfuacturersModelName'],
+        '0x1020': ['LO', '1-n', 'SoftwareVersion'],
+        '0x1022': ['SH', '1', 'VideoImageFormatAcquired'],
+        '0x1023': ['LO', '1', 'DigitalImageFormatAcquired'],
+        '0x1030': ['LO', '1', 'ProtocolName'],
+        '0x1040': ['LO', '1', 'ContrastBolusRoute'],
+        '0x1041': ['DS', '1', 'ContrastBolusVolume'],
+        '0x1042': ['TM', '1', 'ContrastBolusStartTime'],
+        '0x1043': ['TM', '1', 'ContrastBolusStopTime'],
+        '0x1044': ['DS', '1', 'ContrastBolusTotalDose'],
+        '0x1045': ['IS', '1-n', 'SyringeCounts'],
+        '0x1046': ['DS', '1-n', 'ContrastFlowRate'],
+        '0x1047': ['DS', '1-n', 'ContrastFlowDuration'],
+        '0x1048': ['CS', '1', 'ContrastBolusIngredient'],
+        '0x1049': ['DS', '1', 'ContrastBolusIngredientConcentration'],
+        '0x1050': ['DS', '1', 'SpatialResolution'],
+        '0x1060': ['DS', '1', 'TriggerTime'],
+        '0x1061': ['LO', '1', 'TriggerSourceOrType'],
+        '0x1062': ['IS', '1', 'NominalInterval'],
+        '0x1063': ['DS', '1', 'FrameTime'],
+        '0x1064': ['LO', '1', 'FramingType'],
+        '0x1065': ['DS', '1-n', 'FrameTimeVector'],
+        '0x1066': ['DS', '1', 'FrameDelay'],
+        '0x1067': ['DS', '1', 'ImageTriggerDelay'],
+        '0x1068': ['DS', '1', 'MultiplexGroupTimeOffset'],
+        '0x1069': ['DS', '1', 'TriggerTimeOffset'],
+        '0x106A': ['CS', '1', 'SynchronizationTrigger'],
+        '0x106C': ['US', '2', 'SynchronizationChannel'],
+        '0x106E': ['UL', '1', 'TriggerSamplePosition'],
+        '0x1070': ['LO', '1-n', 'RadionuclideRoute'],
+        '0x1071': ['DS', '1-n', 'RadionuclideVolume'],
+        '0x1072': ['TM', '1-n', 'RadionuclideStartTime'],
+        '0x1073': ['TM', '1-n', 'RadionuclideStopTime'],
+        '0x1074': ['DS', '1-n', 'RadionuclideTotalDose'],
+        '0x1075': ['DS', '1', 'RadionuclideHalfLife'],
+        '0x1076': ['DS', '1', 'RadionuclidePositronFraction'],
+        '0x1077': ['DS', '1', 'RadiopharmaceuticalSpecificActivity'],
+        '0x1080': ['CS', '1', 'BeatRejectionFlag'],
+        '0x1081': ['IS', '1', 'LowRRValue'],
+        '0x1082': ['IS', '1', 'HighRRValue'],
+        '0x1083': ['IS', '1', 'IntervalsAcquired'],
+        '0x1084': ['IS', '1', 'IntervalsRejected'],
+        '0x1085': ['LO', '1', 'PVCRejection'],
+        '0x1086': ['IS', '1', 'SkipBeats'],
+        '0x1088': ['IS', '1', 'HeartRate'],
+        '0x1090': ['IS', '1', 'CardiacNumberOfImages'],
+        '0x1094': ['IS', '1', 'TriggerWindow'],
+        '0x1100': ['DS', '1', 'ReconstructionDiameter'],
+        '0x1110': ['DS', '1', 'DistanceSourceToDetector'],
+        '0x1111': ['DS', '1', 'DistanceSourceToPatient'],
+        '0x1114': ['DS', '1', 'EstimatedRadiographicMagnificationFactor'],
+        '0x1120': ['DS', '1', 'GantryDetectorTilt'],
+        '0x1121': ['DS', '1', 'GantryDetectorSlew'],
+        '0x1130': ['DS', '1', 'TableHeight'],
+        '0x1131': ['DS', '1', 'TableTraverse'],
+        '0x1134': ['DS', '1', 'TableMotion'],
+        '0x1135': ['DS', '1-n', 'TableVerticalIncrement'],
+        '0x1136': ['DS', '1-n', 'TableLateralIncrement'],
+        '0x1137': ['DS', '1-n', 'TableLongitudinalIncrement'],
+        '0x1138': ['DS', '1', 'TableAngle'],
+        '0x113A': ['CS', '1', 'TableType'],
+        '0x1140': ['CS', '1', 'RotationDirection'],
+        '0x1141': ['DS', '1', 'AngularPosition'],
+        '0x1142': ['DS', '1-n', 'RadialPosition'],
+        '0x1143': ['DS', '1', 'ScanArc'],
+        '0x1144': ['DS', '1', 'AngularStep'],
+        '0x1145': ['DS', '1', 'CenterOfRotationOffset'],
+        '0x1146': ['DS', '1-n', 'RotationOffset'],
+        '0x1147': ['CS', '1', 'FieldOfViewShape'],
+        '0x1149': ['IS', '2', 'FieldOfViewDimension'],
+        '0x1150': ['IS', '1', 'ExposureTime'],
+        '0x1151': ['IS', '1', 'XrayTubeCurrent'],
+        '0x1152': ['IS', '1', 'Exposure'],
+        '0x1153': ['IS', '1', 'ExposureinuAs'],
+        '0x1154': ['DS', '1', 'AveragePulseWidth'],
+        '0x1155': ['CS', '1', 'RadiationSetting'],
+        '0x1156': ['CS', '1', 'RectificationType'],
+        '0x115A': ['CS', '1', 'RadiationMode'],
+        '0x115E': ['DS', '1', 'ImageAreaDoseProduct'],
+        '0x1160': ['SH', '1', 'FilterType'],
+        '0x1161': ['LO', '1-n', 'TypeOfFilters'],
+        '0x1162': ['DS', '1', 'IntensifierSize'],
+        '0x1164': ['DS', '2', 'ImagerPixelSpacing'],
+        '0x1166': ['CS', '1', 'Grid'],
+        '0x1170': ['IS', '1', 'GeneratorPower'],
+        '0x1180': ['SH', '1', 'CollimatorGridName'],
+        '0x1181': ['CS', '1', 'CollimatorType'],
+        '0x1182': ['IS', '1', 'FocalDistance'],
+        '0x1183': ['DS', '1', 'XFocusCenter'],
+        '0x1184': ['DS', '1', 'YFocusCenter'],
+        '0x1190': ['DS', '1-n', 'FocalSpot'],
+        '0x1191': ['CS', '1', 'AnodeTargetMaterial'],
+        '0x11A0': ['DS', '1', 'BodyPartThickness'],
+        '0x11A2': ['DS', '1', 'CompressionForce'],
+        '0x1200': ['DA', '1-n', 'DateOfLastCalibration'],
+        '0x1201': ['TM', '1-n', 'TimeOfLastCalibration'],
+        '0x1210': ['SH', '1-n', 'ConvolutionKernel'],
+        '0x1240': ['IS', '1-n', 'UpperLowerPixelValues'],
+        '0x1242': ['IS', '1', 'ActualFrameDuration'],
+        '0x1243': ['IS', '1', 'CountRate'],
+        '0x1244': ['US', '1', 'PreferredPlaybackSequencing'],
+        '0x1250': ['SH', '1', 'ReceivingCoil'],
+        '0x1251': ['SH', '1', 'TransmittingCoil'],
+        '0x1260': ['SH', '1', 'PlateType'],
+        '0x1261': ['LO', '1', 'PhosphorType'],
+        '0x1300': ['IS', '1', 'ScanVelocity'],
+        '0x1301': ['CS', '1-n', 'WholeBodyTechnique'],
+        '0x1302': ['IS', '1', 'ScanLength'],
+        '0x1310': ['US', '4', 'AcquisitionMatrix'],
+        '0x1312': ['CS', '1', 'PhaseEncodingDirection'],
+        '0x1314': ['DS', '1', 'FlipAngle'],
+        '0x1315': ['CS', '1', 'VariableFlipAngleFlag'],
+        '0x1316': ['DS', '1', 'SAR'],
+        '0x1318': ['DS', '1', 'dBdt'],
+        '0x1400': ['LO', '1', 'AcquisitionDeviceProcessingDescription'],
+        '0x1401': ['LO', '1', 'AcquisitionDeviceProcessingCode'],
+        '0x1402': ['CS', '1', 'CassetteOrientation'],
+        '0x1403': ['CS', '1', 'CassetteSize'],
+        '0x1404': ['US', '1', 'ExposuresOnPlate'],
+        '0x1405': ['IS', '1', 'RelativeXrayExposure'],
+        '0x1450': ['DS', '1', 'ColumnAngulation'],
+        '0x1460': ['DS', '1', 'TomoLayerHeight'],
+        '0x1470': ['DS', '1', 'TomoAngle'],
+        '0x1480': ['DS', '1', 'TomoTime'],
+        '0x1490': ['CS', '1', 'TomoType'],
+        '0x1491': ['CS', '1', 'TomoClass'],
+        '0x1495': ['IS', '1', 'NumberofTomosynthesisSourceImages'],
+        '0x1500': ['CS', '1', 'PositionerMotion'],
+        '0x1508': ['CS', '1', 'PositionerType'],
+        '0x1510': ['DS', '1', 'PositionerPrimaryAngle'],
+        '0x1511': ['DS', '1', 'PositionerSecondaryAngle'],
+        '0x1520': ['DS', '1-n', 'PositionerPrimaryAngleIncrement'],
+        '0x1521': ['DS', '1-n', 'PositionerSecondaryAngleIncrement'],
+        '0x1530': ['DS', '1', 'DetectorPrimaryAngle'],
+        '0x1531': ['DS', '1', 'DetectorSecondaryAngle'],
+        '0x1600': ['CS', '3', 'ShutterShape'],
+        '0x1602': ['IS', '1', 'ShutterLeftVerticalEdge'],
+        '0x1604': ['IS', '1', 'ShutterRightVerticalEdge'],
+        '0x1606': ['IS', '1', 'ShutterUpperHorizontalEdge'],
+        '0x1608': ['IS', '1', 'ShutterLowerHorizontalEdge'],
+        '0x1610': ['IS', '1', 'CenterOfCircularShutter'],
+        '0x1612': ['IS', '1', 'RadiusOfCircularShutter'],
+        '0x1620': ['IS', '1-n', 'VerticesOfPolygonalShutter'],
+        '0x1622': ['US', '1', 'ShutterPresentationValue'],
+        '0x1623': ['US', '1', 'ShutterOverlayGroup'],
+        '0x1700': ['CS', '3', 'CollimatorShape'],
+        '0x1702': ['IS', '1', 'CollimatorLeftVerticalEdge'],
+        '0x1704': ['IS', '1', 'CollimatorRightVerticalEdge'],
+        '0x1706': ['IS', '1', 'CollimatorUpperHorizontalEdge'],
+        '0x1708': ['IS', '1', 'CollimatorLowerHorizontalEdge'],
+        '0x1710': ['IS', '1', 'CenterOfCircularCollimator'],
+        '0x1712': ['IS', '1', 'RadiusOfCircularCollimator'],
+        '0x1720': ['IS', '1-n', 'VerticesOfPolygonalCollimator'],
+        '0x1800': ['CS', '1', 'AcquisitionTimeSynchronized'],
+        '0x1801': ['SH', '1', 'TimeSource'],
+        '0x1802': ['CS', '1', 'TimeDistributionProtocol'],
+        '0x1810': ['DT', '1', 'AcquisitionTimestamp'],
+        '0x4000': ['LT', '1-n', 'AcquisitionComments'],
+        '0x5000': ['SH', '1-n', 'OutputPower'],
+        '0x5010': ['LO', '3', 'TransducerData'],
+        '0x5012': ['DS', '1', 'FocusDepth'],
+        '0x5020': ['LO', '1', 'PreprocessingFunction'],
+        '0x5021': ['LO', '1', 'PostprocessingFunction'],
+        '0x5022': ['DS', '1', 'MechanicalIndex'],
+        '0x5024': ['DS', '1', 'ThermalIndex'],
+        '0x5026': ['DS', '1', 'CranialThermalIndex'],
+        '0x5027': ['DS', '1', 'SoftTissueThermalIndex'],
+        '0x5028': ['DS', '1', 'SoftTissueFocusThermalIndex'],
+        '0x5029': ['DS', '1', 'SoftTissueSurfaceThermalIndex'],
+        '0x5030': ['DS', '1', 'DynamicRange'],
+        '0x5040': ['DS', '1', 'TotalGain'],
+        '0x5050': ['IS', '1', 'DepthOfScanField'],
+        '0x5100': ['CS', '1', 'PatientPosition'],
+        '0x5101': ['CS', '1', 'ViewPosition'],
+        '0x5104': ['SQ', '1', 'ProjectionEponymousNameCodeSequence'],
+        '0x5210': ['DS', '6', 'ImageTransformationMatrix'],
+        '0x5212': ['DS', '3', 'ImageTranslationVector'],
+        '0x6000': ['DS', '1', 'Sensitivity'],
+        '0x6011': ['SQ', '1', 'SequenceOfUltrasoundRegions'],
+        '0x6012': ['US', '1', 'RegionSpatialFormat'],
+        '0x6014': ['US', '1', 'RegionDataType'],
+        '0x6016': ['UL', '1', 'RegionFlags'],
+        '0x6018': ['UL', '1', 'RegionLocationMinX0'],
+        '0x601A': ['UL', '1', 'RegionLocationMinY0'],
+        '0x601C': ['UL', '1', 'RegionLocationMaxX1'],
+        '0x601E': ['UL', '1', 'RegionLocationMaxY1'],
+        '0x6020': ['SL', '1', 'ReferencePixelX0'],
+        '0x6022': ['SL', '1', 'ReferencePixelY0'],
+        '0x6024': ['US', '1', 'PhysicalUnitsXDirection'],
+        '0x6026': ['US', '1', 'PhysicalUnitsYDirection'],
+        '0x6028': ['FD', '1', 'ReferencePixelPhysicalValueX'],
+        '0x602A': ['FD', '1', 'ReferencePixelPhysicalValueY'],
+        '0x602C': ['FD', '1', 'PhysicalDeltaX'],
+        '0x602E': ['FD', '1', 'PhysicalDeltaY'],
+        '0x6030': ['UL', '1', 'TransducerFrequency'],
+        '0x6031': ['CS', '1', 'TransducerType'],
+        '0x6032': ['UL', '1', 'PulseRepetitionFrequency'],
+        '0x6034': ['FD', '1', 'DopplerCorrectionAngle'],
+        '0x6036': ['FD', '1', 'SteeringAngle'],
+        '0x6038': ['UL', '1', 'DopplerSampleVolumeXPosition'],
+        '0x603A': ['UL', '1', 'DopplerSampleVolumeYPosition'],
+        '0x603C': ['UL', '1', 'TMLinePositionX0'],
+        '0x603E': ['UL', '1', 'TMLinePositionY0'],
+        '0x6040': ['UL', '1', 'TMLinePositionX1'],
+        '0x6042': ['UL', '1', 'TMLinePositionY1'],
+        '0x6044': ['US', '1', 'PixelComponentOrganization'],
+        '0x6046': ['UL', '1', 'PixelComponentMask'],
+        '0x6048': ['UL', '1', 'PixelComponentRangeStart'],
+        '0x604A': ['UL', '1', 'PixelComponentRangeStop'],
+        '0x604C': ['US', '1', 'PixelComponentPhysicalUnits'],
+        '0x604E': ['US', '1', 'PixelComponentDataType'],
+        '0x6050': ['UL', '1', 'NumberOfTableBreakPoints'],
+        '0x6052': ['UL', '1-n', 'TableOfXBreakPoints'],
+        '0x6054': ['FD', '1-n', 'TableOfYBreakPoints'],
+        '0x6056': ['UL', '1', 'NumberOfTableEntries'],
+        '0x6058': ['UL', '1-n', 'TableOfPixelValues'],
+        '0x605A': ['FL', '1-n', 'TableOfParameterValues'],
+        '0x7000': ['CS', '1', 'DetectorConditionsNominalFlag'],
+        '0x7001': ['DS', '1', 'DetectorTemperature'],
+        '0x7004': ['CS', '1', 'DetectorType'],
+        '0x7005': ['CS', '1', 'DetectorConfiguration'],
+        '0x7006': ['LT', '1', 'DetectorDescription'],
+        '0x7008': ['LT', '1', 'DetectorMode'],
+        '0x700A': ['SH', '1', 'DetectorID'],
+        '0x700C': ['DA', '1', 'DateofLastDetectorCalibration'],
+        '0x700E': ['TM', '1', 'TimeofLastDetectorCalibration'],
+        '0x7010': ['IS', '1', 'ExposuresOnDetectorSinceLastCalibration'],
+        '0x7011': ['IS', '1', 'ExposuresOnDetectorSinceManufactured'],
+        '0x7012': ['DS', '1', 'DetectorTimeSinceLastExposure'],
+        '0x7014': ['DS', '1', 'DetectorActiveTime'],
+        '0x7016': ['DS', '1', 'DetectorActivationOffsetFromExposure'],
+        '0x701A': ['DS', '2', 'DetectorBinning'],
+        '0x7020': ['DS', '2', 'DetectorElementPhysicalSize'],
+        '0x7022': ['DS', '2', 'DetectorElementSpacing'],
+        '0x7024': ['CS', '1', 'DetectorActiveShape'],
+        '0x7026': ['DS', '1-2', 'DetectorActiveDimensions'],
+        '0x7028': ['DS', '2', 'DetectorActiveOrigin'],
+        '0x7030': ['DS', '2', 'FieldofViewOrigin'],
+        '0x7032': ['DS', '1', 'FieldofViewRotation'],
+        '0x7034': ['CS', '1', 'FieldofViewHorizontalFlip'],
+        '0x7040': ['LT', '1', 'GridAbsorbingMaterial'],
+        '0x7041': ['LT', '1', 'GridSpacingMaterial'],
+        '0x7042': ['DS', '1', 'GridThickness'],
+        '0x7044': ['DS', '1', 'GridPitch'],
+        '0x7046': ['IS', '2', 'GridAspectRatio'],
+        '0x7048': ['DS', '1', 'GridPeriod'],
+        '0x704C': ['DS', '1', 'GridFocalDistance'],
+        '0x7050': ['LT', '1-n', 'FilterMaterial'],
+        '0x7052': ['DS', '1-n', 'FilterThicknessMinimum'],
+        '0x7054': ['DS', '1-n', 'FilterThicknessMaximum'],
+        '0x7060': ['CS', '1', 'ExposureControlMode'],
+        '0x7062': ['LT', '1', 'ExposureControlModeDescription'],
+        '0x7064': ['CS', '1', 'ExposureStatus'],
+        '0x7065': ['DS', '1', 'PhototimerSetting'],
+    },
+    '0x0020': {
+        '0x0000': ['UL', '1', 'ImageGroupLength'],
+        '0x000D': ['UI', '1', 'StudyInstanceUID'],
+        '0x000E': ['UI', '1', 'SeriesInstanceUID'],
+        '0x0010': ['SH', '1', 'StudyID'],
+        '0x0011': ['IS', '1', 'SeriesNumber'],
+        '0x0012': ['IS', '1', 'AcquisitionNumber'],
+        '0x0013': ['IS', '1', 'ImageNumber'],
+        '0x0014': ['IS', '1', 'IsotopeNumber'],
+        '0x0015': ['IS', '1', 'PhaseNumber'],
+        '0x0016': ['IS', '1', 'IntervalNumber'],
+        '0x0017': ['IS', '1', 'TimeSlotNumber'],
+        '0x0018': ['IS', '1', 'AngleNumber'],
+        '0x0019': ['IS', '1', 'ItemNumber'],
+        '0x0020': ['CS', '2', 'PatientOrientation'],
+        '0x0022': ['IS', '1', 'OverlayNumber'],
+        '0x0024': ['IS', '1', 'CurveNumber'],
+        '0x0026': ['IS', '1', 'LUTNumber'],
+        '0x0030': ['DS', '3', 'ImagePosition'],
+        '0x0032': ['DS', '3', 'ImagePositionPatient'],
+        '0x0035': ['DS', '6', 'ImageOrientation'],
+        '0x0037': ['DS', '6', 'ImageOrientationPatient'],
+        '0x0050': ['DS', '1', 'Location'],
+        '0x0052': ['UI', '1', 'FrameOfReferenceUID'],
+        '0x0060': ['CS', '1', 'Laterality'],
+        '0x0062': ['CS', '1', 'ImageLaterality'],
+        '0x0070': ['LT', '1', 'ImageGeometryType'],
+        '0x0080': ['CS', '1-n', 'MaskingImage'],
+        '0x0100': ['IS', '1', 'TemporalPositionIdentifier'],
+        '0x0105': ['IS', '1', 'NumberOfTemporalPositions'],
+        '0x0110': ['DS', '1', 'TemporalResolution'],
+        '0x0200': ['UI', '1', 'SynchronizationFrameofReferenceUID'],
+        '0x1000': ['IS', '1', 'SeriesInStudy'],
+        '0x1001': ['IS', '1', 'AcquisitionsInSeries'],
+        '0x1002': ['IS', '1', 'ImagesInAcquisition'],
+        '0x1003': ['IS', '1', 'ImagesInSeries'],
+        '0x1004': ['IS', '1', 'AcquisitionsInStudy'],
+        '0x1005': ['IS', '1', 'ImagesInStudy'],
+        '0x1020': ['CS', '1-n', 'Reference'],
+        '0x1040': ['LO', '1', 'PositionReferenceIndicator'],
+        '0x1041': ['DS', '1', 'SliceLocation'],
+        '0x1070': ['IS', '1-n', 'OtherStudyNumbers'],
+        '0x1200': ['IS', '1', 'NumberOfPatientRelatedStudies'],
+        '0x1202': ['IS', '1', 'NumberOfPatientRelatedSeries'],
+        '0x1204': ['IS', '1', 'NumberOfPatientRelatedImages'],
+        '0x1206': ['IS', '1', 'NumberOfStudyRelatedSeries'],
+        '0x1208': ['IS', '1', 'NumberOfStudyRelatedImages'],
+        '0x1209': ['IS', '1', 'NumberOfSeriesRelatedInstances'],
+        '0x3100': ['CS', '1-n', 'SourceImageID'],
+        '0x3401': ['CS', '1', 'ModifyingDeviceID'],
+        '0x3402': ['CS', '1', 'ModifiedImageID'],
+        '0x3403': ['DA', '1', 'ModifiedImageDate'],
+        '0x3404': ['LO', '1', 'ModifyingDeviceManufacturer'],
+        '0x3405': ['TM', '1', 'ModifiedImageTime'],
+        '0x3406': ['LT', '1', 'ModifiedImageDescription'],
+        '0x4000': ['LT', '1', 'ImageComments'],
+        '0x5000': ['AT', '1-n', 'OriginalImageIdentification'],
+        '0x5002': ['CS', '1-n', 'OriginalImageIdentificationNomenclature'],
+    },
+    '0x0028': {
+        '0x0000': ['UL', '1', 'ImagePresentationGroupLength'],
+        '0x0002': ['US', '1', 'SamplesPerPixel'],
+        '0x0004': ['CS', '1', 'PhotometricInterpretation'],
+        '0x0005': ['US', '1', 'ImageDimensions'],
+        '0x0006': ['US', '1', 'PlanarConfiguration'],
+        '0x0008': ['IS', '1', 'NumberOfFrames'],
+        '0x0009': ['AT', '1', 'FrameIncrementPointer'],
+        '0x0010': ['US', '1', 'Rows'],
+        '0x0011': ['US', '1', 'Columns'],
+        '0x0012': ['US', '1', 'Planes'],
+        '0x0014': ['US', '1', 'UltrasoundColorDataPresent'],
+        '0x0030': ['DS', '2', 'PixelSpacing'],
+        '0x0031': ['DS', '2', 'ZoomFactor'],
+        '0x0032': ['DS', '2', 'ZoomCenter'],
+        '0x0034': ['IS', '2', 'PixelAspectRatio'],
+        '0x0040': ['CS', '1', 'ImageFormat'],
+        '0x0050': ['LT', '1-n', 'ManipulatedImage'],
+        '0x0051': ['CS', '1', 'CorrectedImage'],
+        '0x005F': ['CS', '1', 'CompressionRecognitionCode'],
+        '0x0060': ['CS', '1', 'CompressionCode'],
+        '0x0061': ['SH', '1', 'CompressionOriginator'],
+        '0x0062': ['SH', '1', 'CompressionLabel'],
+        '0x0063': ['SH', '1', 'CompressionDescription'],
+        '0x0065': ['CS', '1-n', 'CompressionSequence'],
+        '0x0066': ['AT', '1-n', 'CompressionStepPointers'],
+        '0x0068': ['US', '1', 'RepeatInterval'],
+        '0x0069': ['US', '1', 'BitsGrouped'],
+        '0x0070': ['US', '1-n', 'PerimeterTable'],
+        '0x0071': ['XS', '1', 'PerimeterValue'],
+        '0x0080': ['US', '1', 'PredictorRows'],
+        '0x0081': ['US', '1', 'PredictorColumns'],
+        '0x0082': ['US', '1-n', 'PredictorConstants'],
+        '0x0090': ['CS', '1', 'BlockedPixels'],
+        '0x0091': ['US', '1', 'BlockRows'],
+        '0x0092': ['US', '1', 'BlockColumns'],
+        '0x0093': ['US', '1', 'RowOverlap'],
+        '0x0094': ['US', '1', 'ColumnOverlap'],
+        '0x0100': ['US', '1', 'BitsAllocated'],
+        '0x0101': ['US', '1', 'BitsStored'],
+        '0x0102': ['US', '1', 'HighBit'],
+        '0x0103': ['US', '1', 'PixelRepresentation'],
+        '0x0104': ['XS', '1', 'SmallestValidPixelValue'],
+        '0x0105': ['XS', '1', 'LargestValidPixelValue'],
+        '0x0106': ['XS', '1', 'SmallestImagePixelValue'],
+        '0x0107': ['XS', '1', 'LargestImagePixelValue'],
+        '0x0108': ['XS', '1', 'SmallestPixelValueInSeries'],
+        '0x0109': ['XS', '1', 'LargestPixelValueInSeries'],
+        '0x0110': ['XS', '1', 'SmallestPixelValueInPlane'],
+        '0x0111': ['XS', '1', 'LargestPixelValueInPlane'],
+        '0x0120': ['XS', '1', 'PixelPaddingValue'],
+        '0x0200': ['US', '1', 'ImageLocation'],
+        '0x0300': ['CS', '1', 'QualityControlImage'],
+        '0x0301': ['CS', '1', 'BurnedInAnnotation'],
+        '0x0400': ['CS', '1', 'TransformLabel'],
+        '0x0401': ['CS', '1', 'TransformVersionNumber'],
+        '0x0402': ['US', '1', 'NumberOfTransformSteps'],
+        '0x0403': ['CS', '1-n', 'SequenceOfCompressedData'],
+        '0x0404': ['AT', '1-n', 'DetailsOfCoefficients'],
+        '0x0410': ['US', '1', 'RowsForNthOrderCoefficients'],
+        '0x0411': ['US', '1', 'ColumnsForNthOrderCoefficients'],
+        '0x0412': ['CS', '1-n', 'CoefficientCoding'],
+        '0x0413': ['AT', '1-n', 'CoefficientCodingPointers'],
+        '0x0700': ['CS', '1', 'DCTLabel'],
+        '0x0701': ['CS', '1-n', 'DataBlockDescription'],
+        '0x0702': ['AT', '1-n', 'DataBlock'],
+        '0x0710': ['US', '1', 'NormalizationFactorFormat'],
+        '0x0720': ['US', '1', 'ZonalMapNumberFormat'],
+        '0x0721': ['AT', '1-n', 'ZonalMapLocation'],
+        '0x0722': ['US', '1', 'ZonalMapFormat'],
+        '0x0730': ['US', '1', 'AdaptiveMapFormat'],
+        '0x0740': ['US', '1', 'CodeNumberFormat'],
+        '0x0800': ['CS', '1-n', 'CodeLabel'],
+        '0x0802': ['US', '1', 'NumberOfTables'],
+        '0x0803': ['AT', '1-n', 'CodeTableLocation'],
+        '0x0804': ['US', '1', 'BitsForCodeWord'],
+        '0x0808': ['AT', '1-n', 'ImageDataLocation'],
+        '0x1040': ['CS', '1', 'PixelIntensityRelationship'],
+        '0x1041': ['SS', '1', 'PixelIntensityRelationshipSign'],
+        '0x1050': ['DS', '1-n', 'WindowCenter'],
+        '0x1051': ['DS', '1-n', 'WindowWidth'],
+        '0x1052': ['DS', '1', 'RescaleIntercept'],
+        '0x1053': ['DS', '1', 'RescaleSlope'],
+        '0x1054': ['LO', '1', 'RescaleType'],
+        '0x1055': ['LO', '1-n', 'WindowCenterWidthExplanation'],
+        '0x1080': ['CS', '1', 'GrayScale'],
+        '0x1090': ['CS', '1', 'RecommendedViewingMode'],
+        '0x1100': ['XS', '3', 'GrayLookupTableDescriptor'],
+        '0x1101': ['XS', '3', 'RedPaletteColorLookupTableDescriptor'],
+        '0x1102': ['XS', '3', 'GreenPaletteColorLookupTableDescriptor'],
+        '0x1103': ['XS', '3', 'BluePaletteColorLookupTableDescriptor'],
+        '0x1111': ['US', '4', 'LargeRedPaletteColorLookupTableDescriptor'],
+        '0x1112': ['US', '4', 'LargeGreenPaletteColorLookupTabe'],
+        '0x1113': ['US', '4', 'LargeBluePaletteColorLookupTabl'],
+        '0x1199': ['UI', '1', 'PaletteColorLookupTableUID'],
+        '0x1200': ['XS', '1-n', 'GrayLookupTableData'],
+        '0x1201': ['XS', '1-n', 'RedPaletteColorLookupTableData'],
+        '0x1202': ['XS', '1-n', 'GreenPaletteColorLookupTableData'],
+        '0x1203': ['XS', '1-n', 'BluePaletteColorLookupTableData'],
+        '0x1211': ['OW', '1', 'LargeRedPaletteColorLookupTableData'],
+        '0x1212': ['OW', '1', 'LargeGreenPaletteColorLookupTableData'],
+        '0x1213': ['OW', '1', 'LargeBluePaletteColorLookupTableData'],
+        '0x1214': ['UI', '1', 'LargePaletteColorLookupTableUID'],
+        '0x1221': ['OW', '1', 'SegmentedRedPaletteColorLookupTableData'],
+        '0x1222': ['OW', '1', 'SegmentedGreenPaletteColorLookupTableData'],
+        '0x1223': ['OW', '1', 'SegmentedBluePaletteColorLookupTableData'],
+        '0x1300': ['CS', '1', 'ImplantPresent'],
+        '0x2110': ['CS', '1', 'LossyImageCompression'],
+        '0x2112': ['DS', '1-n', 'LossyImageCompressionRatio'],
+        '0x3000': ['SQ', '1', 'ModalityLUTSequence'],
+        '0x3002': ['XS', '3', 'LUTDescriptor'],
+        '0x3003': ['LO', '1', 'LUTExplanation'],
+        '0x3004': ['LO', '1', 'ModalityLUTType'],
+        '0x3006': ['XS', '1-n', 'LUTData'],
+        '0x3010': ['SQ', '1', 'VOILUTSequence'],
+        '0x3110': ['SQ', '1', 'SoftcopyVOILUTSequence'],
+        '0x4000': ['LT', '1-n', 'ImagePresentationComments'],
+        '0x5000': ['SQ', '1', 'BiPlaneAcquisitionSequence'],
+        '0x6010': ['US', '1', 'RepresentativeFrameNumber'],
+        '0x6020': ['US', '1-n', 'FrameNumbersOfInterest'],
+        '0x6022': ['LO', '1-n', 'FrameOfInterestDescription'],
+        '0x6030': ['US', '1-n', 'MaskPointer'],
+        '0x6040': ['US', '1-n', 'RWavePointer'],
+        '0x6100': ['SQ', '1', 'MaskSubtractionSequence'],
+        '0x6101': ['CS', '1', 'MaskOperation'],
+        '0x6102': ['US', '1-n', 'ApplicableFrameRange'],
+        '0x6110': ['US', '1-n', 'MaskFrameNumbers'],
+        '0x6112': ['US', '1', 'ContrastFrameAveraging'],
+        '0x6114': ['FL', '2', 'MaskSubPixelShift'],
+        '0x6120': ['SS', '1', 'TIDOffset'],
+        '0x6190': ['ST', '1', 'MaskOperationExplanation'],
+    },
+    '0x0032': {
+        '0x0000': ['UL', '1', 'StudyGroupLength'],
+        '0x000A': ['CS', '1', 'StudyStatusID'],
+        '0x000C': ['CS', '1', 'StudyPriorityID'],
+        '0x0012': ['LO', '1', 'StudyIDIssuer'],
+        '0x0032': ['DA', '1', 'StudyVerifiedDate'],
+        '0x0033': ['TM', '1', 'StudyVerifiedTime'],
+        '0x0034': ['DA', '1', 'StudyReadDate'],
+        '0x0035': ['TM', '1', 'StudyReadTime'],
+        '0x1000': ['DA', '1', 'ScheduledStudyStartDate'],
+        '0x1001': ['TM', '1', 'ScheduledStudyStartTime'],
+        '0x1010': ['DA', '1', 'ScheduledStudyStopDate'],
+        '0x1011': ['TM', '1', 'ScheduledStudyStopTime'],
+        '0x1020': ['LO', '1', 'ScheduledStudyLocation'],
+        '0x1021': ['AE', '1-n', 'ScheduledStudyLocationAETitle'],
+        '0x1030': ['LO', '1', 'ReasonForStudy'],
+        '0x1032': ['PN', '1', 'RequestingPhysician'],
+        '0x1033': ['LO', '1', 'RequestingService'],
+        '0x1040': ['DA', '1', 'StudyArrivalDate'],
+        '0x1041': ['TM', '1', 'StudyArrivalTime'],
+        '0x1050': ['DA', '1', 'StudyCompletionDate'],
+        '0x1051': ['TM', '1', 'StudyCompletionTime'],
+        '0x1055': ['CS', '1', 'StudyComponentStatusID'],
+        '0x1060': ['LO', '1', 'RequestedProcedureDescription'],
+        '0x1064': ['SQ', '1', 'RequestedProcedureCodeSequence'],
+        '0x1070': ['LO', '1', 'RequestedContrastAgent'],
+        '0x4000': ['LT', '1', 'StudyComments'],
+    },
+    '0x0038': {
+        '0x0000': ['UL', '1', 'VisitGroupLength'],
+        '0x0004': ['SQ', '1', 'ReferencedPatientAliasSequence'],
+        '0x0008': ['CS', '1', 'VisitStatusID'],
+        '0x0010': ['LO', '1', 'AdmissionID'],
+        '0x0011': ['LO', '1', 'IssuerOfAdmissionID'],
+        '0x0016': ['LO', '1', 'RouteOfAdmissions'],
+        '0x001A': ['DA', '1', 'ScheduledAdmissionDate'],
+        '0x001B': ['TM', '1', 'ScheduledAdmissionTime'],
+        '0x001C': ['DA', '1', 'ScheduledDischargeDate'],
+        '0x001D': ['TM', '1', 'ScheduledDischargeTime'],
+        '0x001E': ['LO', '1', 'ScheduledPatientInstitutionResidence'],
+        '0x0020': ['DA', '1', 'AdmittingDate'],
+        '0x0021': ['TM', '1', 'AdmittingTime'],
+        '0x0030': ['DA', '1', 'DischargeDate'],
+        '0x0032': ['TM', '1', 'DischargeTime'],
+        '0x0040': ['LO', '1', 'DischargeDiagnosisDescription'],
+        '0x0044': ['SQ', '1', 'DischargeDiagnosisCodeSequence'],
+        '0x0050': ['LO', '1', 'SpecialNeeds'],
+        '0x0300': ['LO', '1', 'CurrentPatientLocation'],
+        '0x0400': ['LO', '1', 'PatientInstitutionResidence'],
+        '0x0500': ['LO', '1', 'PatientState'],
+        '0x4000': ['LT', '1', 'VisitComments'],
+    },
+    '0x003A': {
+        '0x0004': ['CS', '1', 'WaveformOriginality'],
+        '0x0005': ['US', '1', 'NumberofChannels'],
+        '0x0010': ['UL', '1', 'NumberofSamples'],
+        '0x001A': ['DS', '1', 'SamplingFrequency'],
+        '0x0020': ['SH', '1', 'MultiplexGroupLabel'],
+        '0x0200': ['SQ', '1', 'ChannelDefinitionSequence'],
+        '0x0202': ['IS', '1', 'WVChannelNumber'],
+        '0x0203': ['SH', '1', 'ChannelLabel'],
+        '0x0205': ['CS', '1-n', 'ChannelStatus'],
+        '0x0208': ['SQ', '1', 'ChannelSourceSequence'],
+        '0x0209': ['SQ', '1', 'ChannelSourceModifiersSequence'],
+        '0x020A': ['SQ', '1', 'SourceWaveformSequence'],
+        '0x020C': ['LO', '1', 'ChannelDerivationDescription'],
+        '0x0210': ['DS', '1', 'ChannelSensitivity'],
+        '0x0211': ['SQ', '1', 'ChannelSensitivityUnits'],
+        '0x0212': ['DS', '1', 'ChannelSensitivityCorrectionFactor'],
+        '0x0213': ['DS', '1', 'ChannelBaseline'],
+        '0x0214': ['DS', '1', 'ChannelTimeSkew'],
+        '0x0215': ['DS', '1', 'ChannelSampleSkew'],
+        '0x0218': ['DS', '1', 'ChannelOffset'],
+        '0x021A': ['US', '1', 'WaveformBitsStored'],
+        '0x0220': ['DS', '1', 'FilterLowFrequency'],
+        '0x0221': ['DS', '1', 'FilterHighFrequency'],
+        '0x0222': ['DS', '1', 'NotchFilterFrequency'],
+        '0x0223': ['DS', '1', 'NotchFilterBandwidth'],
+    },
+    '0x0040': {
+        '0x0000': ['UL', '1', 'ModalityWorklistGroupLength'],
+        '0x0001': ['AE', '1', 'ScheduledStationAETitle'],
+        '0x0002': ['DA', '1', 'ScheduledProcedureStepStartDate'],
+        '0x0003': ['TM', '1', 'ScheduledProcedureStepStartTime'],
+        '0x0004': ['DA', '1', 'ScheduledProcedureStepEndDate'],
+        '0x0005': ['TM', '1', 'ScheduledProcedureStepEndTime'],
+        '0x0006': ['PN', '1', 'ScheduledPerformingPhysicianName'],
+        '0x0007': ['LO', '1', 'ScheduledProcedureStepDescription'],
+        '0x0008': ['SQ', '1', 'ScheduledProcedureStepCodeSequence'],
+        '0x0009': ['SH', '1', 'ScheduledProcedureStepID'],
+        '0x0010': ['SH', '1', 'ScheduledStationName'],
+        '0x0011': ['SH', '1', 'ScheduledProcedureStepLocation'],
+        '0x0012': ['LO', '1', 'ScheduledPreOrderOfMedication'],
+        '0x0020': ['CS', '1', 'ScheduledProcedureStepStatus'],
+        '0x0100': ['SQ', '1-n', 'ScheduledProcedureStepSequence'],
+        '0x0220': ['SQ', '1', 'ReferencedStandaloneSOPInstanceSequence'],
+        '0x0241': ['AE', '1', 'PerformedStationAETitle'],
+        '0x0242': ['SH', '1', 'PerformedStationName'],
+        '0x0243': ['SH', '1', 'PerformedLocation'],
+        '0x0244': ['DA', '1', 'PerformedProcedureStepStartDate'],
+        '0x0245': ['TM', '1', 'PerformedProcedureStepStartTime'],
+        '0x0250': ['DA', '1', 'PerformedProcedureStepEndDate'],
+        '0x0251': ['TM', '1', 'PerformedProcedureStepEndTime'],
+        '0x0252': ['CS', '1', 'PerformedProcedureStepStatus'],
+        '0x0253': ['CS', '1', 'PerformedProcedureStepID'],
+        '0x0254': ['LO', '1', 'PerformedProcedureStepDescription'],
+        '0x0255': ['LO', '1', 'PerformedProcedureTypeDescription'],
+        '0x0260': ['SQ', '1', 'PerformedActionItemSequence'],
+        '0x0270': ['SQ', '1', 'ScheduledStepAttributesSequence'],
+        '0x0275': ['SQ', '1', 'RequestAttributesSequence'],
+        '0x0280': ['ST', '1', 'CommentsOnThePerformedProcedureSteps'],
+        '0x0293': ['SQ', '1', 'QuantitySequence'],
+        '0x0294': ['DS', '1', 'Quantity'],
+        '0x0295': ['SQ', '1', 'MeasuringUnitsSequence'],
+        '0x0296': ['SQ', '1', 'BillingItemSequence'],
+        '0x0300': ['US', '1', 'TotalTimeOfFluoroscopy'],
+        '0x0301': ['US', '1', 'TotalNumberOfExposures'],
+        '0x0302': ['US', '1', 'EntranceDose'],
+        '0x0303': ['US', '1-2', 'ExposedArea'],
+        '0x0306': ['DS', '1', 'DistanceSourceToEntrance'],
+        '0x0307': ['DS', '1', 'DistanceSourceToSupport'],
+        '0x0310': ['ST', '1', 'CommentsOnRadiationDose'],
+        '0x0312': ['DS', '1', 'XRayOutput'],
+        '0x0314': ['DS', '1', 'HalfValueLayer'],
+        '0x0316': ['DS', '1', 'OrganDose'],
+        '0x0318': ['CS', '1', 'OrganExposed'],
+        '0x0320': ['SQ', '1', 'BillingProcedureStepSequence'],
+        '0x0321': ['SQ', '1', 'FilmConsumptionSequence'],
+        '0x0324': ['SQ', '1', 'BillingSuppliesAndDevicesSequence'],
+        '0x0330': ['SQ', '1', 'ReferencedProcedureStepSequence'],
+        '0x0340': ['SQ', '1', 'PerformedSeriesSequence'],
+        '0x0400': ['LT', '1', 'CommentsOnScheduledProcedureStep'],
+        '0x050A': ['LO', '1', 'SpecimenAccessionNumber'],
+        '0x0550': ['SQ', '1', 'SpecimenSequence'],
+        '0x0551': ['LO', '1', 'SpecimenIdentifier'],
+        '0x0555': ['SQ', '1', 'AcquisitionContextSequence'],
+        '0x0556': ['ST', '1', 'AcquisitionContextDescription'],
+        '0x059A': ['SQ', '1', 'SpecimenTypeCodeSequence'],
+        '0x06FA': ['LO', '1', 'SlideIdentifier'],
+        '0x071A': ['SQ', '1', 'ImageCenterPointCoordinatesSequence'],
+        '0x072A': ['DS', '1', 'XOffsetInSlideCoordinateSystem'],
+        '0x073A': ['DS', '1', 'YOffsetInSlideCoordinateSystem'],
+        '0x074A': ['DS', '1', 'ZOffsetInSlideCoordinateSystem'],
+        '0x08D8': ['SQ', '1', 'PixelSpacingSequence'],
+        '0x08DA': ['SQ', '1', 'CoordinateSystemAxisCodeSequence'],
+        '0x08EA': ['SQ', '1', 'MeasurementUnitsCodeSequence'],
+        '0x1001': ['SH', '1', 'RequestedProcedureID'],
+        '0x1002': ['LO', '1', 'ReasonForRequestedProcedure'],
+        '0x1003': ['SH', '1', 'RequestedProcedurePriority'],
+        '0x1004': ['LO', '1', 'PatientTransportArrangements'],
+        '0x1005': ['LO', '1', 'RequestedProcedureLocation'],
+        '0x1006': ['SH', '1', 'PlacerOrderNumberOfProcedure'],
+        '0x1007': ['SH', '1', 'FillerOrderNumberOfProcedure'],
+        '0x1008': ['LO', '1', 'ConfidentialityCode'],
+        '0x1009': ['SH', '1', 'ReportingPriority'],
+        '0x1010': ['PN', '1-n', 'NamesOfIntendedRecipientsOfResults'],
+        '0x1400': ['LT', '1', 'RequestedProcedureComments'],
+        '0x2001': ['LO', '1', 'ReasonForTheImagingServiceRequest'],
+        '0x2002': ['LO', '1', 'ImagingServiceRequestDescription'],
+        '0x2004': ['DA', '1', 'IssueDateOfImagingServiceRequest'],
+        '0x2005': ['TM', '1', 'IssueTimeOfImagingServiceRequest'],
+        '0x2006': ['SH', '1', 'PlacerOrderNumberOfImagingServiceRequest'],
+        '0x2007': ['SH', '0', 'FillerOrderNumberOfImagingServiceRequest'],
+        '0x2008': ['PN', '1', 'OrderEnteredBy'],
+        '0x2009': ['SH', '1', 'OrderEntererLocation'],
+        '0x2010': ['SH', '1', 'OrderCallbackPhoneNumber'],
+        '0x2016': ['LO', '1', 'PlacerOrderNumberImagingServiceRequest'],
+        '0x2017': ['LO', '1', 'FillerOrderNumberImagingServiceRequest'],
+        '0x2400': ['LT', '1', 'ImagingServiceRequestComments'],
+        '0x3001': ['LT', '1', 'ConfidentialityConstraint'],
+        '0xA010': ['CS', '1', 'RelationshipType'],
+        '0xA027': ['LO', '1', 'VerifyingOrganization'],
+        '0xA030': ['DT', '1', 'VerificationDateTime'],
+        '0xA032': ['DT', '1', 'ObservationDateTime'],
+        '0xA040': ['CS', '1', 'ValueType'],
+        '0xA043': ['SQ', '1', 'ConceptNameCodeSequence'],
+        '0xA050': ['CS', '1', 'ContinuityOfContent'],
+        '0xA073': ['SQ', '1', 'VerifyingObserverSequence'],
+        '0xA075': ['PN', '1', 'VerifyingObserverName'],
+        '0xA088': ['SQ', '1', 'VerifyingObserverIdentificationCodeSeque'],
+        '0xA0B0': ['US', '2-2n', 'ReferencedWaveformChannels'],
+        '0xA120': ['DT', '1', 'DateTime'],
+        '0xA121': ['DA', '1', 'Date'],
+        '0xA122': ['TM', '1', 'Time'],
+        '0xA123': ['PN', '1', 'PersonName'],
+        '0xA124': ['UI', '1', 'UID'],
+        '0xA130': ['CS', '1', 'TemporalRangeType'],
+        '0xA132': ['UL', '1-n', 'ReferencedSamplePositionsU'],
+        '0xA136': ['US', '1-n', 'ReferencedFrameNumbers'],
+        '0xA138': ['DS', '1-n', 'ReferencedTimeOffsets'],
+        '0xA13A': ['DT', '1-n', 'ReferencedDatetime'],
+        '0xA160': ['UT', '1', 'TextValue'],
+        '0xA168': ['SQ', '1', 'ConceptCodeSequence'],
+        '0xA180': ['US', '1', 'AnnotationGroupNumber'],
+        '0xA195': ['SQ', '1', 'ConceptNameCodeSequenceModifier'],
+        '0xA300': ['SQ', '1', 'MeasuredValueSequence'],
+        '0xA30A': ['DS', '1-n', 'NumericValue'],
+        '0xA360': ['SQ', '1', 'PredecessorDocumentsSequence'],
+        '0xA370': ['SQ', '1', 'ReferencedRequestSequence'],
+        '0xA372': ['SQ', '1', 'PerformedProcedureCodeSequence'],
+        '0xA375': ['SQ', '1', 'CurrentRequestedProcedureEvidenceSequenSequence'],
+        '0xA385': ['SQ', '1', 'PertinentOtherEvidenceSequence'],
+        '0xA491': ['CS', '1', 'CompletionFlag'],
+        '0xA492': ['LO', '1', 'CompletionFlagDescription'],
+        '0xA493': ['CS', '1', 'VerificationFlag'],
+        '0xA504': ['SQ', '1', 'ContentTemplateSequence'],
+        '0xA525': ['SQ', '1', 'IdenticalDocumentsSequence'],
+        '0xA730': ['SQ', '1', 'ContentSequence'],
+        '0xB020': ['SQ', '1', 'AnnotationSequence'],
+        '0xDB00': ['CS', '1', 'TemplateIdentifier'],
+        '0xDB06': ['DT', '1', 'TemplateVersion'],
+        '0xDB07': ['DT', '1', 'TemplateLocalVersion'],
+        '0xDB0B': ['CS', '1', 'TemplateExtensionFlag'],
+        '0xDB0C': ['UI', '1', 'TemplateExtensionOrganizationUID'],
+        '0xDB0D': ['UI', '1', 'TemplateExtensionCreatorUID'],
+        '0xDB73': ['UL', '1-n', 'ReferencedContentItemIdentifier'],
+    },
+    '0x0050': {
+        '0x0000': ['UL', '1', 'XRayAngioDeviceGroupLength'],
+        '0x0004': ['CS', '1', 'CalibrationObject'],
+        '0x0010': ['SQ', '1', 'DeviceSequence'],
+        '0x0012': ['CS', '1', 'DeviceType'],
+        '0x0014': ['DS', '1', 'DeviceLength'],
+        '0x0016': ['DS', '1', 'DeviceDiameter'],
+        '0x0017': ['CS', '1', 'DeviceDiameterUnits'],
+        '0x0018': ['DS', '1', 'DeviceVolume'],
+        '0x0019': ['DS', '1', 'InterMarkerDistance'],
+        '0x0020': ['LO', '1', 'DeviceDescription'],
+        '0x0030': ['SQ', '1', 'CodedInterventionalDeviceSequence'],
+    },
+    '0x0054': {
+        '0x0000': ['UL', '1', 'NuclearMedicineGroupLength'],
+        '0x0010': ['US', '1-n', 'EnergyWindowVector'],
+        '0x0011': ['US', '1', 'NumberOfEnergyWindows'],
+        '0x0012': ['SQ', '1', 'EnergyWindowInformationSequence'],
+        '0x0013': ['SQ', '1', 'EnergyWindowRangeSequence'],
+        '0x0014': ['DS', '1', 'EnergyWindowLowerLimit'],
+        '0x0015': ['DS', '1', 'EnergyWindowUpperLimit'],
+        '0x0016': ['SQ', '1', 'RadiopharmaceuticalInformationSequence'],
+        '0x0017': ['IS', '1', 'ResidualSyringeCounts'],
+        '0x0018': ['SH', '1', 'EnergyWindowName'],
+        '0x0020': ['US', '1-n', 'DetectorVector'],
+        '0x0021': ['US', '1', 'NumberOfDetectors'],
+        '0x0022': ['SQ', '1', 'DetectorInformationSequence'],
+        '0x0030': ['US', '1-n', 'PhaseVector'],
+        '0x0031': ['US', '1', 'NumberOfPhases'],
+        '0x0032': ['SQ', '1', 'PhaseInformationSequence'],
+        '0x0033': ['US', '1', 'NumberOfFramesInPhase'],
+        '0x0036': ['IS', '1', 'PhaseDelay'],
+        '0x0038': ['IS', '1', 'PauseBetweenFrames'],
+        '0x0050': ['US', '1-n', 'RotationVector'],
+        '0x0051': ['US', '1', 'NumberOfRotations'],
+        '0x0052': ['SQ', '1', 'RotationInformationSequence'],
+        '0x0053': ['US', '1', 'NumberOfFramesInRotation'],
+        '0x0060': ['US', '1-n', 'RRIntervalVector'],
+        '0x0061': ['US', '1', 'NumberOfRRIntervals'],
+        '0x0062': ['SQ', '1', 'GatedInformationSequence'],
+        '0x0063': ['SQ', '1', 'DataInformationSequence'],
+        '0x0070': ['US', '1-n', 'TimeSlotVector'],
+        '0x0071': ['US', '1', 'NumberOfTimeSlots'],
+        '0x0072': ['SQ', '1', 'TimeSlotInformationSequence'],
+        '0x0073': ['DS', '1', 'TimeSlotTime'],
+        '0x0080': ['US', '1-n', 'SliceVector'],
+        '0x0081': ['US', '1', 'NumberOfSlices'],
+        '0x0090': ['US', '1-n', 'AngularViewVector'],
+        '0x0100': ['US', '1-n', 'TimeSliceVector'],
+        '0x0101': ['US', '1', 'NumberOfTimeSlices'],
+        '0x0200': ['DS', '1', 'StartAngle'],
+        '0x0202': ['CS', '1', 'TypeOfDetectorMotion'],
+        '0x0210': ['IS', '1-n', 'TriggerVector'],
+        '0x0211': ['US', '1', 'NumberOfTriggersInPhase'],
+        '0x0220': ['SQ', '1', 'ViewCodeSequence'],
+        '0x0222': ['SQ', '1', 'ViewAngulationModifierCodeSequence'],
+        '0x0300': ['SQ', '1', 'RadionuclideCodeSequence'],
+        '0x0302': ['SQ', '1', 'AdministrationRouteCodeSequence'],
+        '0x0304': ['SQ', '1', 'RadiopharmaceuticalCodeSequence'],
+        '0x0306': ['SQ', '1', 'CalibrationDataSequence'],
+        '0x0308': ['US', '1', 'EnergyWindowNumber'],
+        '0x0400': ['SH', '1', 'ImageID'],
+        '0x0410': ['SQ', '1', 'PatientOrientationCodeSequence'],
+        '0x0412': ['SQ', '1', 'PatientOrientationModifierCodeSequence'],
+        '0x0414': ['SQ', '1', 'PatientGantryRelationshipCodeSequence'],
+        '0x1000': ['CS', '2', 'SeriesType'],
+        '0x1001': ['CS', '1', 'Units'],
+        '0x1002': ['CS', '1', 'CountsSource'],
+        '0x1004': ['CS', '1', 'ReprojectionMethod'],
+        '0x1100': ['CS', '1', 'RandomsCorrectionMethod'],
+        '0x1101': ['LO', '1', 'AttenuationCorrectionMethod'],
+        '0x1102': ['CS', '1', 'DecayCorrection'],
+        '0x1103': ['LO', '1', 'ReconstructionMethod'],
+        '0x1104': ['LO', '1', 'DetectorLinesOfResponseUsed'],
+        '0x1105': ['LO', '1', 'ScatterCorrectionMethod'],
+        '0x1200': ['DS', '1', 'AxialAcceptance'],
+        '0x1201': ['IS', '2', 'AxialMash'],
+        '0x1202': ['IS', '1', 'TransverseMash'],
+        '0x1203': ['DS', '2', 'DetectorElementSize'],
+        '0x1210': ['DS', '1', 'CoincidenceWindowWidth'],
+        '0x1220': ['CS', '1-n', 'SecondaryCountsType'],
+        '0x1300': ['DS', '1', 'FrameReferenceTime'],
+        '0x1310': ['IS', '1', 'PrimaryPromptsCountsAccumulated'],
+        '0x1311': ['IS', '1-n', 'SecondaryCountsAccumulated'],
+        '0x1320': ['DS', '1', 'SliceSensitivityFactor'],
+        '0x1321': ['DS', '1', 'DecayFactor'],
+        '0x1322': ['DS', '1', 'DoseCalibrationFactor'],
+        '0x1323': ['DS', '1', 'ScatterFractionFactor'],
+        '0x1324': ['DS', '1', 'DeadTimeFactor'],
+        '0x1330': ['US', '1', 'ImageIndex'],
+        '0x1400': ['CS', '1-n', 'CountsIncluded'],
+        '0x1401': ['CS', '1', 'DeadTimeCorrectionFlag'],
+    },
+    '0x0060': {
+        '0x0000': ['UL', '1', 'HistogramGroupLength'],
+        '0x3000': ['SQ', '1', 'HistogramSequence'],
+        '0x3002': ['US', '1', 'HistogramNumberofBins'],
+        '0x3004': ['US/SS', '1', 'HistogramFirstBinValue'],
+        '0x3006': ['US/SS', '1', 'HistogramLastBinValue'],
+        '0x3008': ['US', '1', 'HistogramBinWidth'],
+        '0x3010': ['LO', '1', 'HistogramExplanation'],
+        '0x3020': ['UL', '1-n', 'HistogramData'],
+    },
+    '0x0070': {
+        '0x0001': ['SQ', '1', 'GraphicAnnotationSequence'],
+        '0x0002': ['CS', '1', 'GraphicLayer'],
+        '0x0003': ['CS', '1', 'BoundingBoxAnnotationUnits'],
+        '0x0004': ['CS', '1', 'AnchorPointAnnotationUnits'],
+        '0x0005': ['CS', '1', 'GraphicAnnotationUnits'],
+        '0x0006': ['ST', '1', 'UnformattedTextValue'],
+        '0x0008': ['SQ', '1', 'TextObjectSequence'],
+        '0x0009': ['SQ', '1', 'GraphicObjectSequence'],
+        '0x0010': ['FL', '2', 'BoundingBoxTopLeftHandCorner'],
+        '0x0011': ['FL', '2', 'BoundingBoxBottomRightHandCorner'],
+        '0x0012': ['CS', '1', 'BoundingBoxTextHorizontalJustification'],
+        '0x0014': ['FL', '2', 'AnchorPoint'],
+        '0x0015': ['CS', '1', 'AnchorPointVisibility'],
+        '0x0020': ['US', '1', 'GraphicDimensions'],
+        '0x0021': ['US', '1', 'NumberOfGraphicPoints'],
+        '0x0022': ['FL', '2-n', 'GraphicData'],
+        '0x0023': ['CS', '1', 'GraphicType'],
+        '0x0024': ['CS', '1', 'GraphicFilled'],
+        '0x0040': ['IS', '1', 'ImageRotationFrozenDraftRetired'],
+        '0x0041': ['CS', '1', 'ImageHorizontalFlip'],
+        '0x0042': ['US', '1', 'ImageRotation'],
+        '0x0050': ['US', '2', 'DisplayedAreaTLHCFrozenDraftRetired'],
+        '0x0051': ['US', '2', 'DisplayedAreaBRHCFrozenDraftRetired'],
+        '0x0052': ['SL', '2', 'DisplayedAreaTopLeftHandCorner'],
+        '0x0053': ['SL', '2', 'DisplayedAreaBottomRightHandCorner'],
+        '0x005A': ['SQ', '1', 'DisplayedAreaSelectionSequence'],
+        '0x0060': ['SQ', '1', 'GraphicLayerSequence'],
+        '0x0062': ['IS', '1', 'GraphicLayerOrder'],
+        '0x0066': ['US', '1', 'GraphicLayerRecommendedDisplayGrayscaleValue'],
+        '0x0067': ['US', '3', 'GraphicLayerRecommendedDisplayRGBValue'],
+        '0x0068': ['LO', '1', 'GraphicLayerDescription'],
+        '0x0080': ['CS', '1', 'PresentationLabel'],
+        '0x0081': ['LO', '1', 'PresentationDescription'],
+        '0x0082': ['DA', '1', 'PresentationCreationDate'],
+        '0x0083': ['TM', '1', 'PresentationCreationTime'],
+        '0x0084': ['PN', '1', 'PresentationCreatorsName'],
+        '0x0100': ['CS', '1', 'PresentationSizeMode'],
+        '0x0101': ['DS', '2', 'PresentationPixelSpacing'],
+        '0x0102': ['IS', '2', 'PresentationPixelAspectRatio'],
+        '0x0103': ['FL', '1', 'PresentationPixelMagnificationRatio'],
+    },
+    '0x0088': {
+        '0x0000': ['UL', '1', 'StorageGroupLength'],
+        '0x0130': ['SH', '1', 'StorageMediaFilesetID'],
+        '0x0140': ['UI', '1', 'StorageMediaFilesetUID'],
+        '0x0200': ['SQ', '1', 'IconImage'],
+        '0x0904': ['LO', '1', 'TopicTitle'],
+        '0x0906': ['ST', '1', 'TopicSubject'],
+        '0x0910': ['LO', '1', 'TopicAuthor'],
+        '0x0912': ['LO', '3', 'TopicKeyWords'],
+    },
+    '0x1000': {
+        '0x0000': ['UL', '1', 'CodeTableGroupLength'],
+        '0x0010': ['US', '3', 'EscapeTriplet'],
+        '0x0011': ['US', '3', 'RunLengthTriplet'],
+        '0x0012': ['US', '1', 'HuffmanTableSize'],
+        '0x0013': ['US', '3', 'HuffmanTableTriplet'],
+        '0x0014': ['US', '1', 'ShiftTableSize'],
+        '0x0015': ['US', '3', 'ShiftTableTriplet'],
+    },
+    '0x1010': {
+        '0x0000': ['UL', '1', 'ZonalMapGroupLength'],
+        '0x0004': ['US', '1-n', 'ZonalMap'],
+    },
+    '0x2000': {
+        '0x0000': ['UL', '1', 'FilmSessionGroupLength'],
+        '0x0010': ['IS', '1', 'NumberOfCopies'],
+        '0x001E': ['SQ', '1', 'PrinterConfigurationSequence'],
+        '0x0020': ['CS', '1', 'PrintPriority'],
+        '0x0030': ['CS', '1', 'MediumType'],
+        '0x0040': ['CS', '1', 'FilmDestination'],
+        '0x0050': ['LO', '1', 'FilmSessionLabel'],
+        '0x0060': ['IS', '1', 'MemoryAllocation'],
+        '0x0061': ['IS', '1', 'MaximumMemoryAllocation'],
+        '0x0062': ['CS', '1', 'ColorImagePrintingFlag'],
+        '0x0063': ['CS', '1', 'CollationFlag'],
+        '0x0065': ['CS', '1', 'AnnotationFlag'],
+        '0x0067': ['CS', '1', 'ImageOverlayFlag'],
+        '0x0069': ['CS', '1', 'PresentationLUTFlag'],
+        '0x006A': ['CS', '1', 'ImageBoxPresentationLUTFlag'],
+        '0x00A0': ['US', '1', 'MemoryBitDepth'],
+        '0x00A1': ['US', '1', 'PrintingBitDepth'],
+        '0x00A2': ['SQ', '1', 'MediaInstalledSequence'],
+        '0x00A4': ['SQ', '1', 'OtherMediaAvailableSequence'],
+        '0x00A8': ['SQ', '1', 'SupportedImageDisplayFormatsSequence'],
+        '0x0500': ['SQ', '1', 'ReferencedFilmBoxSequence'],
+        '0x0510': ['SQ', '1', 'ReferencedStoredPrintSequence'],
+    },
+    '0x2010': {
+        '0x0000': ['UL', '1', 'FilmBoxGroupLength'],
+        '0x0010': ['ST', '1', 'ImageDisplayFormat'],
+        '0x0030': ['CS', '1', 'AnnotationDisplayFormatID'],
+        '0x0040': ['CS', '1', 'FilmOrientation'],
+        '0x0050': ['CS', '1', 'FilmSizeID'],
+        '0x0052': ['CS', '1', 'PrinterResolutionID'],
+        '0x0054': ['CS', '1', 'DefaultPrinterResolutionID'],
+        '0x0060': ['CS', '1', 'MagnificationType'],
+        '0x0080': ['CS', '1', 'SmoothingType'],
+        '0x00A6': ['CS', '1', 'DefaultMagnificationType'],
+        '0x00A7': ['CS', '1-n', 'OtherMagnificationTypesAvailable'],
+        '0x00A8': ['CS', '1', 'DefaultSmoothingType'],
+        '0x00A9': ['CS', '1-n', 'OtherSmoothingTypesAvailable'],
+        '0x0100': ['CS', '1', 'BorderDensity'],
+        '0x0110': ['CS', '1', 'EmptyImageDensity'],
+        '0x0120': ['US', '1', 'MinDensity'],
+        '0x0130': ['US', '1', 'MaxDensity'],
+        '0x0140': ['CS', '1', 'Trim'],
+        '0x0150': ['ST', '1', 'ConfigurationInformation'],
+        '0x0152': ['LT', '1', 'ConfigurationInformationDescription'],
+        '0x0154': ['IS', '1', 'MaximumCollatedFilms'],
+        '0x015E': ['US', '1', 'Illumination'],
+        '0x0160': ['US', '1', 'ReflectedAmbientLight'],
+        '0x0376': ['DS', '2', 'PrinterPixelSpacing'],
+        '0x0500': ['SQ', '1', 'ReferencedFilmSessionSequence'],
+        '0x0510': ['SQ', '1', 'ReferencedImageBoxSequence'],
+        '0x0520': ['SQ', '1', 'ReferencedBasicAnnotationBoxSequence'],
+    },
+    '0x2020': {
+        '0x0000': ['UL', '1', 'ImageBoxGroupLength'],
+        '0x0010': ['US', '1', 'ImageBoxPosition'],
+        '0x0020': ['CS', '1', 'Polarity'],
+        '0x0030': ['DS', '1', 'RequestedImageSize'],
+        '0x0040': ['CS', '1', 'RequestedDecimateCropBehavior'],
+        '0x0050': ['CS', '1', 'RequestedResolutionID'],
+        '0x00A0': ['CS', '1', 'RequestedImageSizeFlag'],
+        '0x00A2': ['CS', '1', 'DecimateCropResult'],
+        '0x0110': ['SQ', '1', 'PreformattedGrayscaleImageSequence'],
+        '0x0111': ['SQ', '1', 'PreformattedColorImageSequence'],
+        '0x0130': ['SQ', '1', 'ReferencedImageOverlayBoxSequence'],
+        '0x0140': ['SQ', '1', 'ReferencedVOILUTBoxSequence'],
+    },
+    '0x2030': {
+        '0x0000': ['UL', '1', 'AnnotationGroupLength'],
+        '0x0010': ['US', '1', 'AnnotationPosition'],
+        '0x0020': ['LO', '1', 'TextString'],
+    },
+    '0x2040': {
+        '0x0000': ['UL', '1', 'OverlayBoxGroupLength'],
+        '0x0010': ['SQ', '1', 'ReferencedOverlayPlaneSequence'],
+        '0x0011': ['US', '9', 'ReferencedOverlayPlaneGroups'],
+        '0x0020': ['SQ', '1', 'OverlayPixelDataSequence'],
+        '0x0060': ['CS', '1', 'OverlayMagnificationType'],
+        '0x0070': ['CS', '1', 'OverlaySmoothingType'],
+        '0x0072': ['CS', '1', 'OverlayOrImageMagnification'],
+        '0x0074': ['US', '1', 'MagnifyToNumberOfColumns'],
+        '0x0080': ['CS', '1', 'OverlayForegroundDensity'],
+        '0x0082': ['CS', '1', 'OverlayBackgroundDensity'],
+        '0x0090': ['CS', '1', 'OverlayMode'],
+        '0x0100': ['CS', '1', 'ThresholdDensity'],
+        '0x0500': ['SQ', '1', 'ReferencedOverlayImageBoxSequence'],
+    },
+    '0x2050': {
+        '0x0000': ['UL', '1', 'PresentationLUTGroupLength'],
+        '0x0010': ['SQ', '1', 'PresentationLUTSequence'],
+        '0x0020': ['CS', '1', 'PresentationLUTShape'],
+        '0x0500': ['SQ', '1', 'ReferencedPresentationLUTSequence'],
+    },
+    '0x2100': {
+        '0x0000': ['UL', '1', 'PrintJobGroupLength'],
+        '0x0010': ['SH', '1', 'PrintJobID'],
+        '0x0020': ['CS', '1', 'ExecutionStatus'],
+        '0x0030': ['CS', '1', 'ExecutionStatusInfo'],
+        '0x0040': ['DA', '1', 'CreationDate'],
+        '0x0050': ['TM', '1', 'CreationTime'],
+        '0x0070': ['AE', '1', 'Originator'],
+        '0x0140': ['AE', '1', 'DestinationAE'],
+        '0x0160': ['SH', '1', 'OwnerID'],
+        '0x0170': ['IS', '1', 'NumberOfFilms'],
+        '0x0500': ['SQ', '1', 'ReferencedPrintJobSequence'],
+    },
+    '0x2110': {
+        '0x0000': ['UL', '1', 'PrinterGroupLength'],
+        '0x0010': ['CS', '1', 'PrinterStatus'],
+        '0x0020': ['CS', '1', 'PrinterStatusInfo'],
+        '0x0030': ['LO', '1', 'PrinterName'],
+        '0x0099': ['SH', '1', 'PrintQueueID'],
+    },
+    '0x2120': {
+        '0x0000': ['UL', '1', 'QueueGroupLength'],
+        '0x0010': ['CS', '1', 'QueueStatus'],
+        '0x0050': ['SQ', '1', 'PrintJobDescriptionSequence'],
+        '0x0070': ['SQ', '1', 'QueueReferencedPrintJobSequence'],
+    },
+    '0x2130': {
+        '0x0000': ['UL', '1', 'PrintContentGroupLength'],
+        '0x0010': ['SQ', '1', 'PrintManagementCapabilitiesSequence'],
+        '0x0015': ['SQ', '1', 'PrinterCharacteristicsSequence'],
+        '0x0030': ['SQ', '1', 'FilmBoxContentSequence'],
+        '0x0040': ['SQ', '1', 'ImageBoxContentSequence'],
+        '0x0050': ['SQ', '1', 'AnnotationContentSequence'],
+        '0x0060': ['SQ', '1', 'ImageOverlayBoxContentSequence'],
+        '0x0080': ['SQ', '1', 'PresentationLUTContentSequence'],
+        '0x00A0': ['SQ', '1', 'ProposedStudySequence'],
+        '0x00C0': ['SQ', '1', 'OriginalImageSequence'],
+    },
+    '0x3002': {
+        '0x0000': ['UL', '1', 'RTImageGroupLength'],
+        '0x0002': ['SH', '1', 'RTImageLabel'],
+        '0x0003': ['LO', '1', 'RTImageName'],
+        '0x0004': ['ST', '1', 'RTImageDescription'],
+        '0x000A': ['CS', '1', 'ReportedValuesOrigin'],
+        '0x000C': ['CS', '1', 'RTImagePlane'],
+        '0x000D': ['DS', '3', 'XRayImageReceptorTranslation'],
+        '0x000E': ['DS', '1', 'XRayImageReceptorAngle'],
+        '0x0010': ['DS', '6', 'RTImageOrientation'],
+        '0x0011': ['DS', '2', 'ImagePlanePixelSpacing'],
+        '0x0012': ['DS', '2', 'RTImagePosition'],
+        '0x0020': ['SH', '1', 'RadiationMachineName'],
+        '0x0022': ['DS', '1', 'RadiationMachineSAD'],
+        '0x0024': ['DS', '1', 'RadiationMachineSSD'],
+        '0x0026': ['DS', '1', 'RTImageSID'],
+        '0x0028': ['DS', '1', 'SourceToReferenceObjectDistance'],
+        '0x0029': ['IS', '1', 'FractionNumber'],
+        '0x0030': ['SQ', '1', 'ExposureSequence'],
+        '0x0032': ['DS', '1', 'MetersetExposure'],
+        '0x0034': ['DS', '4', 'DiaphragmPosition'],
+    },
+    '0x3004': {
+        '0x0000': ['UL', '1', 'RTDoseGroupLength'],
+        '0x0001': ['CS', '1', 'DVHType'],
+        '0x0002': ['CS', '1', 'DoseUnits'],
+        '0x0004': ['CS', '1', 'DoseType'],
+        '0x0006': ['LO', '1', 'DoseComment'],
+        '0x0008': ['DS', '3', 'NormalizationPoint'],
+        '0x000A': ['CS', '1', 'DoseSummationType'],
+        '0x000C': ['DS', '2-n', 'GridFrameOffsetVector'],
+        '0x000E': ['DS', '1', 'DoseGridScaling'],
+        '0x0010': ['SQ', '1', 'RTDoseROISequence'],
+        '0x0012': ['DS', '1', 'DoseValue'],
+        '0x0040': ['DS', '3', 'DVHNormalizationPoint'],
+        '0x0042': ['DS', '1', 'DVHNormalizationDoseValue'],
+        '0x0050': ['SQ', '1', 'DVHSequence'],
+        '0x0052': ['DS', '1', 'DVHDoseScaling'],
+        '0x0054': ['CS', '1', 'DVHVolumeUnits'],
+        '0x0056': ['IS', '1', 'DVHNumberOfBins'],
+        '0x0058': ['DS', '2-2n', 'DVHData'],
+        '0x0060': ['SQ', '1', 'DVHReferencedROISequence'],
+        '0x0062': ['CS', '1', 'DVHROIContributionType'],
+        '0x0070': ['DS', '1', 'DVHMinimumDose'],
+        '0x0072': ['DS', '1', 'DVHMaximumDose'],
+        '0x0074': ['DS', '1', 'DVHMeanDose'],
+    },
+    '0x3006': {
+        '0x0000': ['UL', '1', 'RTStructureSetGroupLength'],
+        '0x0002': ['SH', '1', 'StructureSetLabel'],
+        '0x0004': ['LO', '1', 'StructureSetName'],
+        '0x0006': ['ST', '1', 'StructureSetDescription'],
+        '0x0008': ['DA', '1', 'StructureSetDate'],
+        '0x0009': ['TM', '1', 'StructureSetTime'],
+        '0x0010': ['SQ', '1', 'ReferencedFrameOfReferenceSequence'],
+        '0x0012': ['SQ', '1', 'RTReferencedStudySequence'],
+        '0x0014': ['SQ', '1', 'RTReferencedSeriesSequence'],
+        '0x0016': ['SQ', '1', 'ContourImageSequence'],
+        '0x0020': ['SQ', '1', 'StructureSetROISequence'],
+        '0x0022': ['IS', '1', 'ROINumber'],
+        '0x0024': ['UI', '1', 'ReferencedFrameOfReferenceUID'],
+        '0x0026': ['LO', '1', 'ROIName'],
+        '0x0028': ['ST', '1', 'ROIDescription'],
+        '0x002A': ['IS', '3', 'ROIDisplayColor'],
+        '0x002C': ['DS', '1', 'ROIVolume'],
+        '0x0030': ['SQ', '1', 'RTRelatedROISequence'],
+        '0x0033': ['CS', '1', 'RTROIRelationship'],
+        '0x0036': ['CS', '1', 'ROIGenerationAlgorithm'],
+        '0x0038': ['LO', '1', 'ROIGenerationDescription'],
+        '0x0039': ['SQ', '1', 'ROIContourSequence'],
+        '0x0040': ['SQ', '1', 'ContourSequence'],
+        '0x0042': ['CS', '1', 'ContourGeometricType'],
+        '0x0044': ['DS', '1', 'ContourSlabThickness'],
+        '0x0045': ['DS', '3', 'ContourOffsetVector'],
+        '0x0046': ['IS', '1', 'NumberOfContourPoints'],
+        '0x0048': ['IS', '1', 'ContourNumber'],
+        '0x0049': ['IS', '1-n', 'AttachedContours'],
+        '0x0050': ['DS', '3-3n', 'ContourData'],
+        '0x0080': ['SQ', '1', 'RTROIObservationsSequence'],
+        '0x0082': ['IS', '1', 'ObservationNumber'],
+        '0x0084': ['IS', '1', 'ReferencedROINumber'],
+        '0x0085': ['SH', '1', 'ROIObservationLabel'],
+        '0x0086': ['SQ', '1', 'RTROIIdentificationCodeSequence'],
+        '0x0088': ['ST', '1', 'ROIObservationDescription'],
+        '0x00A0': ['SQ', '1', 'RelatedRTROIObservationsSequence'],
+        '0x00A4': ['CS', '1', 'RTROIInterpretedType'],
+        '0x00A6': ['PN', '1', 'ROIInterpreter'],
+        '0x00B0': ['SQ', '1', 'ROIPhysicalPropertiesSequence'],
+        '0x00B2': ['CS', '1', 'ROIPhysicalProperty'],
+        '0x00B4': ['DS', '1', 'ROIPhysicalPropertyValue'],
+        '0x00C0': ['SQ', '1', 'FrameOfReferenceRelationshipSequence'],
+        '0x00C2': ['UI', '1', 'RelatedFrameOfReferenceUID'],
+        '0x00C4': ['CS', '1', 'FrameOfReferenceTransformationType'],
+        '0x00C6': ['DS', '16', 'FrameOfReferenceTransformationMatrix'],
+        '0x00C8': ['LO', '1', 'FrameOfReferenceTransformationComment'],
+    },
+    '0x3008': {
+        '0x0010': ['SQ', '1', 'MeasuredDoseReferenceSequence'],
+        '0x0012': ['ST', '1', 'MeasuredDoseDescription'],
+        '0x0014': ['CS', '1', 'MeasuredDoseType'],
+        '0x0016': ['DS', '1', 'MeasuredDoseValue'],
+        '0x0020': ['SQ', '1', 'TreatmentSessionBeamSequence'],
+        '0x0022': ['IS', '1', 'CurrentFractionNumber'],
+        '0x0024': ['DA', '1', 'TreatmentControlPointDate'],
+        '0x0025': ['TM', '1', 'TreatmentControlPointTime'],
+        '0x002A': ['CS', '1', 'TreatmentTerminationStatus'],
+        '0x002B': ['SH', '1', 'TreatmentTerminationCode'],
+        '0x002C': ['CS', '1', 'TreatmentVerificationStatus'],
+        '0x0030': ['SQ', '1', 'ReferencedTreatmentRecordSequence'],
+        '0x0032': ['DS', '1', 'SpecifiedPrimaryMeterset'],
+        '0x0033': ['DS', '1', 'SpecifiedSecondaryMeterset'],
+        '0x0036': ['DS', '1', 'DeliveredPrimaryMeterset'],
+        '0x0037': ['DS', '1', 'DeliveredSecondaryMeterset'],
+        '0x003A': ['DS', '1', 'SpecifiedTreatmentTime'],
+        '0x003B': ['DS', '1', 'DeliveredTreatmentTime'],
+        '0x0040': ['SQ', '1', 'ControlPointDeliverySequence'],
+        '0x0042': ['DS', '1', 'SpecifiedMeterset'],
+        '0x0044': ['DS', '1', 'DeliveredMeterset'],
+        '0x0048': ['DS', '1', 'DoseRateDelivered'],
+        '0x0050': ['SQ', '1', 'TreatmentSummaryCalculatedDoseReferenceSequence'],
+        '0x0052': ['DS', '1', 'CumulativeDosetoDoseReference'],
+        '0x0054': ['DA', '1', 'FirstTreatmentDate'],
+        '0x0056': ['DA', '1', 'MostRecentTreatmentDate'],
+        '0x005A': ['IS', '1', 'NumberofFractionsDelivered'],
+        '0x0060': ['SQ', '1', 'OverrideSequence'],
+        '0x0062': ['AT', '1', 'OverrideParameterPointer'],
+        '0x0064': ['IS', '1', 'MeasuredDoseReferenceNumber'],
+        '0x0066': ['ST', '1', 'OverrideReason'],
+        '0x0070': ['SQ', '1', 'CalculatedDoseReferenceSequence'],
+        '0x0072': ['IS', '1', 'CalculatedDoseReferenceNumber'],
+        '0x0074': ['ST', '1', 'CalculatedDoseReferenceDescription'],
+        '0x0076': ['DS', '1', 'CalculatedDoseReferenceDoseValue'],
+        '0x0078': ['DS', '1', 'StartMeterset'],
+        '0x007A': ['DS', '1', 'EndMeterset'],
+        '0x0080': ['SQ', '1', 'ReferencedMeasuredDoseReferenceSequence'],
+        '0x0082': ['IS', '1', 'ReferencedMeasuredDoseReferenceNumber'],
+        '0x0090': ['SQ', '1', 'ReferencedCalculatedDoseReferenceSequence'],
+        '0x0092': ['IS', '1', 'ReferencedCalculatedDoseReferenceNumber'],
+        '0x00A0': ['SQ', '1', 'BeamLimitingDeviceLeafPairsSequence'],
+        '0x00B0': ['SQ', '1', 'RecordedWedgeSequence'],
+        '0x00C0': ['SQ', '1', 'RecordedCompensatorSequence'],
+        '0x00D0': ['SQ', '1', 'RecordedBlockSequence'],
+        '0x00E0': ['SQ', '1', 'TreatmentSummaryMeasuredDoseReferenceSequence'],
+        '0x0100': ['SQ', '1', 'RecordedSourceSequence'],
+        '0x0105': ['LO', '1', 'SourceSerialNumber'],
+        '0x0110': ['SQ', '1', 'TreatmentSessionApplicationSetupSequence'],
+        '0x0116': ['CS', '1', 'ApplicationSetupCheck'],
+        '0x0120': ['SQ', '1', 'RecordedBrachyAccessoryDeviceSequence'],
+        '0x0122': ['IS', '1', 'ReferencedBrachyAccessoryDeviceNumber'],
+        '0x0130': ['SQ', '1', 'RecordedChannelSequence'],
+        '0x0132': ['DS', '1', 'SpecifiedChannelTotalTime'],
+        '0x0134': ['DS', '1', 'DeliveredChannelTotalTime'],
+        '0x0136': ['IS', '1', 'SpecifiedNumberofPulses'],
+        '0x0138': ['IS', '1', 'DeliveredNumberofPulses'],
+        '0x013A': ['DS', '1', 'SpecifiedPulseRepetitionInterval'],
+        '0x013C': ['DS', '1', 'DeliveredPulseRepetitionInterval'],
+        '0x0140': ['SQ', '1', 'RecordedSourceApplicatorSequence'],
+        '0x0142': ['IS', '1', 'ReferencedSourceApplicatorNumber'],
+        '0x0150': ['SQ', '1', 'RecordedChannelShieldSequence'],
+        '0x0152': ['IS', '1', 'ReferencedChannelShieldNumber'],
+        '0x0160': ['SQ', '1', 'BrachyControlPointDeliveredSequence'],
+        '0x0162': ['DA', '1', 'SafePositionExitDate'],
+        '0x0164': ['TM', '1', 'SafePositionExitTime'],
+        '0x0166': ['DA', '1', 'SafePositionReturnDate'],
+        '0x0168': ['TM', '1', 'SafePositionReturnTime'],
+        '0x0200': ['CS', '1', 'CurrentTreatmentStatus'],
+        '0x0202': ['ST', '1', 'TreatmentStatusComment'],
+        '0x0220': ['SQ', '1', 'FractionGroupSummarySequence'],
+        '0x0223': ['IS', '1', 'ReferencedFractionNumber'],
+        '0x0224': ['CS', '1', 'FractionGroupType'],
+        '0x0230': ['CS', '1', 'BeamStopperPosition'],
+        '0x0240': ['SQ', '1', 'FractionStatusSummarySequence'],
+        '0x0250': ['DA', '1', 'TreatmentDate'],
+        '0x0251': ['TM', '1', 'TreatmentTime'],
+    },
+    '0x300A': {
+        '0x0000': ['UL', '1', 'RTPlanGroupLength'],
+        '0x0002': ['SH', '1', 'RTPlanLabel'],
+        '0x0003': ['LO', '1', 'RTPlanName'],
+        '0x0004': ['ST', '1', 'RTPlanDescription'],
+        '0x0006': ['DA', '1', 'RTPlanDate'],
+        '0x0007': ['TM', '1', 'RTPlanTime'],
+        '0x0009': ['LO', '1-n', 'TreatmentProtocols'],
+        '0x000A': ['CS', '1', 'TreatmentIntent'],
+        '0x000B': ['LO', '1-n', 'TreatmentSites'],
+        '0x000C': ['CS', '1', 'RTPlanGeometry'],
+        '0x000E': ['ST', '1', 'PrescriptionDescription'],
+        '0x0010': ['SQ', '1', 'DoseReferenceSequence'],
+        '0x0012': ['IS', '1', 'DoseReferenceNumber'],
+        '0x0014': ['CS', '1', 'DoseReferenceStructureType'],
+        '0x0015': ['CS', '1', 'NominalBeamEnergyUnit'],
+        '0x0016': ['LO', '1', 'DoseReferenceDescription'],
+        '0x0018': ['DS', '3', 'DoseReferencePointCoordinates'],
+        '0x001A': ['DS', '1', 'NominalPriorDose'],
+        '0x0020': ['CS', '1', 'DoseReferenceType'],
+        '0x0021': ['DS', '1', 'ConstraintWeight'],
+        '0x0022': ['DS', '1', 'DeliveryWarningDose'],
+        '0x0023': ['DS', '1', 'DeliveryMaximumDose'],
+        '0x0025': ['DS', '1', 'TargetMinimumDose'],
+        '0x0026': ['DS', '1', 'TargetPrescriptionDose'],
+        '0x0027': ['DS', '1', 'TargetMaximumDose'],
+        '0x0028': ['DS', '1', 'TargetUnderdoseVolumeFraction'],
+        '0x002A': ['DS', '1', 'OrganAtRiskFullVolumeDose'],
+        '0x002B': ['DS', '1', 'OrganAtRiskLimitDose'],
+        '0x002C': ['DS', '1', 'OrganAtRiskMaximumDose'],
+        '0x002D': ['DS', '1', 'OrganAtRiskOverdoseVolumeFraction'],
+        '0x0040': ['SQ', '1', 'ToleranceTableSequence'],
+        '0x0042': ['IS', '1', 'ToleranceTableNumber'],
+        '0x0043': ['SH', '1', 'ToleranceTableLabel'],
+        '0x0044': ['DS', '1', 'GantryAngleTolerance'],
+        '0x0046': ['DS', '1', 'BeamLimitingDeviceAngleTolerance'],
+        '0x0048': ['SQ', '1', 'BeamLimitingDeviceToleranceSequence'],
+        '0x004A': ['DS', '1', 'BeamLimitingDevicePositionTolerance'],
+        '0x004C': ['DS', '1', 'PatientSupportAngleTolerance'],
+        '0x004E': ['DS', '1', 'TableTopEccentricAngleTolerance'],
+        '0x0051': ['DS', '1', 'TableTopVerticalPositionTolerance'],
+        '0x0052': ['DS', '1', 'TableTopLongitudinalPositionTolerance'],
+        '0x0053': ['DS', '1', 'TableTopLateralPositionTolerance'],
+        '0x0055': ['CS', '1', 'RTPlanRelationship'],
+        '0x0070': ['SQ', '1', 'FractionGroupSequence'],
+        '0x0071': ['IS', '1', 'FractionGroupNumber'],
+        '0x0078': ['IS', '1', 'NumberOfFractionsPlanned'],
+        // '0x0079': ['IS','1','NumberOfFractionsPerDay'], /// Changed
+        '0x0079': ['IS', '1', 'NumberOfFractionsPatternDigistsPerDay'],
+        '0x007A': ['IS', '1', 'RepeatFractionCycleLength'],
+        '0x007B': ['LT', '1', 'FractionPattern'],
+        '0x0080': ['IS', '1', 'NumberOfBeams'],
+        '0x0082': ['DS', '3', 'BeamDoseSpecificationPoint'],
+        '0x0084': ['DS', '1', 'BeamDose'],
+        '0x0086': ['DS', '1', 'BeamMeterset'],
+        '0x00A0': ['IS', '1', 'NumberOfBrachyApplicationSetups'],
+        '0x00A2': ['DS', '3', 'BrachyApplicationSetupDoseSpecificationPoint'],
+        '0x00A4': ['DS', '1', 'BrachyApplicationSetupDose'],
+        '0x00B0': ['SQ', '1', 'BeamSequence'],
+        '0x00B2': ['SH', '1', 'TreatmentMachineName'],
+        '0x00B3': ['CS', '1', 'PrimaryDosimeterUnit'],
+        '0x00B4': ['DS', '1', 'SourceAxisDistance'],
+        '0x00B6': ['SQ', '1', 'BeamLimitingDeviceSequence'],
+        '0x00B8': ['CS', '1', 'RTBeamLimitingDeviceType'],
+        '0x00BA': ['DS', '1', 'SourceToBeamLimitingDeviceDistance'],
+        '0x00BC': ['IS', '1', 'NumberOfLeafJawPairs'],
+        '0x00BE': ['DS', '3-n', 'LeafPositionBoundaries'],
+        '0x00C0': ['IS', '1', 'BeamNumber'],
+        '0x00C2': ['LO', '1', 'BeamName'],
+        '0x00C3': ['ST', '1', 'BeamDescription'],
+        '0x00C4': ['CS', '1', 'BeamType'],
+        '0x00C6': ['CS', '1', 'RadiationType'],
+        '0x00C8': ['IS', '1', 'ReferenceImageNumber'],
+        '0x00CA': ['SQ', '1', 'PlannedVerificationImageSequence'],
+        '0x00CC': ['LO', '1-n', 'ImagingDeviceSpecificAcquisitionParameters'],
+        '0x00CE': ['CS', '1', 'TreatmentDeliveryType'],
+        '0x00D0': ['IS', '1', 'NumberOfWedges'],
+        '0x00D1': ['SQ', '1', 'WedgeSequence'],
+        '0x00D2': ['IS', '1', 'WedgeNumber'],
+        '0x00D3': ['CS', '1', 'WedgeType'],
+        '0x00D4': ['SH', '1', 'WedgeID'],
+        '0x00D5': ['IS', '1', 'WedgeAngle'],
+        '0x00D6': ['DS', '1', 'WedgeFactor'],
+        '0x00D8': ['DS', '1', 'WedgeOrientation'],
+        '0x00DA': ['DS', '1', 'SourceToWedgeTrayDistance'],
+        '0x00E0': ['IS', '1', 'NumberOfCompensators'],
+        '0x00E1': ['SH', '1', 'MaterialID'],
+        '0x00E2': ['DS', '1', 'TotalCompensatorTrayFactor'],
+        '0x00E3': ['SQ', '1', 'CompensatorSequence'],
+        '0x00E4': ['IS', '1', 'CompensatorNumber'],
+        '0x00E5': ['SH', '1', 'CompensatorID'],
+        '0x00E6': ['DS', '1', 'SourceToCompensatorTrayDistance'],
+        '0x00E7': ['IS', '1', 'CompensatorRows'],
+        '0x00E8': ['IS', '1', 'CompensatorColumns'],
+        '0x00E9': ['DS', '2', 'CompensatorPixelSpacing'],
+        '0x00EA': ['DS', '2', 'CompensatorPosition'],
+        '0x00EB': ['DS', '1-n', 'CompensatorTransmissionData'],
+        '0x00EC': ['DS', '1-n', 'CompensatorThicknessData'],
+        '0x00ED': ['IS', '1', 'NumberOfBoli'],
+        '0x00EE': ['CS', '1', 'CompensatorType'],
+        '0x00F0': ['IS', '1', 'NumberOfBlocks'],
+        '0x00F2': ['DS', '1', 'TotalBlockTrayFactor'],
+        '0x00F4': ['SQ', '1', 'BlockSequence'],
+        '0x00F5': ['SH', '1', 'BlockTrayID'],
+        '0x00F6': ['DS', '1', 'SourceToBlockTrayDistance'],
+        '0x00F8': ['CS', '1', 'BlockType'],
+        '0x00FA': ['CS', '1', 'BlockDivergence'],
+        '0x00FC': ['IS', '1', 'BlockNumber'],
+        '0x00FE': ['LO', '1', 'BlockName'],
+        '0x0100': ['DS', '1', 'BlockThickness'],
+        '0x0102': ['DS', '1', 'BlockTransmission'],
+        '0x0104': ['IS', '1', 'BlockNumberOfPoints'],
+        '0x0106': ['DS', '2-2n', 'BlockData'],
+        '0x0107': ['SQ', '1', 'ApplicatorSequence'],
+        '0x0108': ['SH', '1', 'ApplicatorID'],
+        '0x0109': ['CS', '1', 'ApplicatorType'],
+        '0x010A': ['LO', '1', 'ApplicatorDescription'],
+        '0x010C': ['DS', '1', 'CumulativeDoseReferenceCoefficient'],
+        '0x010E': ['DS', '1', 'FinalCumulativeMetersetWeight'],
+        '0x0110': ['IS', '1', 'NumberOfControlPoints'],
+        '0x0111': ['SQ', '1', 'ControlPointSequence'],
+        '0x0112': ['IS', '1', 'ControlPointIndex'],
+        '0x0114': ['DS', '1', 'NominalBeamEnergy'],
+        '0x0115': ['DS', '1', 'DoseRateSet'],
+        '0x0116': ['SQ', '1', 'WedgePositionSequence'],
+        '0x0118': ['CS', '1', 'WedgePosition'],
+        '0x011A': ['SQ', '1', 'BeamLimitingDevicePositionSequence'],
+        '0x011C': ['DS', '2-2n', 'LeafJawPositions'],
+        '0x011E': ['DS', '1', 'GantryAngle'],
+        '0x011F': ['CS', '1', 'GantryRotationDirection'],
+        '0x0120': ['DS', '1', 'BeamLimitingDeviceAngle'],
+        '0x0121': ['CS', '1', 'BeamLimitingDeviceRotationDirection'],
+        '0x0122': ['DS', '1', 'PatientSupportAngle'],
+        '0x0123': ['CS', '1', 'PatientSupportRotationDirection'],
+        '0x0124': ['DS', '1', 'TableTopEccentricAxisDistance'],
+        '0x0125': ['DS', '1', 'TableTopEccentricAngle'],
+        '0x0126': ['CS', '1', 'TableTopEccentricRotationDirection'],
+        '0x0128': ['DS', '1', 'TableTopVerticalPosition'],
+        '0x0129': ['DS', '1', 'TableTopLongitudinalPosition'],
+        '0x012A': ['DS', '1', 'TableTopLateralPosition'],
+        '0x012C': ['DS', '3', 'IsocenterPosition'],
+        '0x012E': ['DS', '3', 'SurfaceEntryPoint'],
+        '0x0130': ['DS', '1', 'SourceToSurfaceDistance'],
+        '0x0134': ['DS', '1', 'CumulativeMetersetWeight'],
+        '0x0140': ['FL', '1', 'TableTopPitchAngle'],
+        '0x0142': ['CS', '1', 'TableTopPitchRotationDirection'],
+        '0x0144': ['FL', '1', 'TableTopRollAngle'],
+        '0x0146': ['CS', '1', 'TableTopRollRotationDirection'],
+        '0x0148': ['FL', '1', 'HeadFixationAngle'],
+        '0x014A': ['FL', '1', 'GantryPitchAngle'],
+        '0x014C': ['CS', '1', 'GantryPitchRotationDirection'],
+        '0x014E': ['FL', '1', 'GantryPitchAngleTolerance'],
+        '0x0180': ['SQ', '1', 'PatientSetupSequence'],
+        '0x0182': ['IS', '1', 'PatientSetupNumber'],
+        '0x0184': ['LO', '1', 'PatientAdditionalPosition'],
+        '0x0190': ['SQ', '1', 'FixationDeviceSequence'],
+        '0x0192': ['CS', '1', 'FixationDeviceType'],
+        '0x0194': ['SH', '1', 'FixationDeviceLabel'],
+        '0x0196': ['ST', '1', 'FixationDeviceDescription'],
+        '0x0198': ['SH', '1', 'FixationDevicePosition'],
+        '0x01A0': ['SQ', '1', 'ShieldingDeviceSequence'],
+        '0x01A2': ['CS', '1', 'ShieldingDeviceType'],
+        '0x01A4': ['SH', '1', 'ShieldingDeviceLabel'],
+        '0x01A6': ['ST', '1', 'ShieldingDeviceDescription'],
+        '0x01A8': ['SH', '1', 'ShieldingDevicePosition'],
+        '0x01B0': ['CS', '1', 'SetupTechnique'],
+        '0x01B2': ['ST', '1', 'SetupTechniqueDescription'],
+        '0x01B4': ['SQ', '1', 'SetupDeviceSequence'],
+        '0x01B6': ['CS', '1', 'SetupDeviceType'],
+        '0x01B8': ['SH', '1', 'SetupDeviceLabel'],
+        '0x01BA': ['ST', '1', 'SetupDeviceDescription'],
+        '0x01BC': ['DS', '1', 'SetupDeviceParameter'],
+        '0x01D0': ['ST', '1', 'SetupReferenceDescription'],
+        '0x01D2': ['DS', '1', 'TableTopVerticalSetupDisplacement'],
+        '0x01D4': ['DS', '1', 'TableTopLongitudinalSetupDisplacement'],
+        '0x01D6': ['DS', '1', 'TableTopLateralSetupDisplacement'],
+        '0x0200': ['CS', '1', 'BrachyTreatmentTechnique'],
+        '0x0202': ['CS', '1', 'BrachyTreatmentType'],
+        '0x0206': ['SQ', '1', 'TreatmentMachineSequence'],
+        '0x0210': ['SQ', '1', 'SourceSequence'],
+        '0x0212': ['IS', '1', 'SourceNumber'],
+        '0x0214': ['CS', '1', 'SourceType'],
+        '0x0216': ['LO', '1', 'SourceManufacturer'],
+        '0x0218': ['DS', '1', 'ActiveSourceDiameter'],
+        '0x021A': ['DS', '1', 'ActiveSourceLength'],
+        '0x0222': ['DS', '1', 'SourceEncapsulationNominalThickness'],
+        '0x0224': ['DS', '1', 'SourceEncapsulationNominalTransmission'],
+        '0x0226': ['LO', '1', 'SourceIsotopeName'],
+        '0x0228': ['DS', '1', 'SourceIsotopeHalfLife'],
+        '0x022A': ['DS', '1', 'ReferenceAirKermaRate'],
+        '0x022C': ['DA', '1', 'AirKermaRateReferenceDate'],
+        '0x022E': ['TM', '1', 'AirKermaRateReferenceTime'],
+        '0x0230': ['SQ', '1', 'ApplicationSetupSequence'],
+        '0x0232': ['CS', '1', 'ApplicationSetupType'],
+        '0x0234': ['IS', '1', 'ApplicationSetupNumber'],
+        '0x0236': ['LO', '1', 'ApplicationSetupName'],
+        '0x0238': ['LO', '1', 'ApplicationSetupManufacturer'],
+        '0x0240': ['IS', '1', 'TemplateNumber'],
+        '0x0242': ['SH', '1', 'TemplateType'],
+        '0x0244': ['LO', '1', 'TemplateName'],
+        '0x0250': ['DS', '1', 'TotalReferenceAirKerma'],
+        '0x0260': ['SQ', '1', 'BrachyAccessoryDeviceSequence'],
+        '0x0262': ['IS', '1', 'BrachyAccessoryDeviceNumber'],
+        '0x0263': ['SH', '1', 'BrachyAccessoryDeviceID'],
+        '0x0264': ['CS', '1', 'BrachyAccessoryDeviceType'],
+        '0x0266': ['LO', '1', 'BrachyAccessoryDeviceName'],
+        '0x026A': ['DS', '1', 'BrachyAccessoryDeviceNominalThickness'],
+        '0x026C': ['DS', '1', 'BrachyAccessoryDeviceNominalTransmission'],
+        '0x0280': ['SQ', '1', 'ChannelSequence'],
+        '0x0282': ['IS', '1', 'ChannelNumber'],
+        '0x0284': ['DS', '1', 'ChannelLength'],
+        '0x0286': ['DS', '1', 'ChannelTotalTime'],
+        '0x0288': ['CS', '1', 'SourceMovementType'],
+        '0x028A': ['IS', '1', 'NumberOfPulses'],
+        '0x028C': ['DS', '1', 'PulseRepetitionInterval'],
+        '0x0290': ['IS', '1', 'SourceApplicatorNumber'],
+        '0x0291': ['SH', '1', 'SourceApplicatorID'],
+        '0x0292': ['CS', '1', 'SourceApplicatorType'],
+        '0x0294': ['LO', '1', 'SourceApplicatorName'],
+        '0x0296': ['DS', '1', 'SourceApplicatorLength'],
+        '0x0298': ['LO', '1', 'SourceApplicatorManufacturer'],
+        '0x029C': ['DS', '1', 'SourceApplicatorWallNominalThickness'],
+        '0x029E': ['DS', '1', 'SourceApplicatorWallNominalTransmission'],
+        '0x02A0': ['DS', '1', 'SourceApplicatorStepSize'],
+        '0x02A2': ['IS', '1', 'TransferTubeNumber'],
+        '0x02A4': ['DS', '1', 'TransferTubeLength'],
+        '0x02B0': ['SQ', '1', 'ChannelShieldSequence'],
+        '0x02B2': ['IS', '1', 'ChannelShieldNumber'],
+        '0x02B3': ['SH', '1', 'ChannelShieldID'],
+        '0x02B4': ['LO', '1', 'ChannelShieldName'],
+        '0x02B8': ['DS', '1', 'ChannelShieldNominalThickness'],
+        '0x02BA': ['DS', '1', 'ChannelShieldNominalTransmission'],
+        '0x02C8': ['DS', '1', 'FinalCumulativeTimeWeight'],
+        '0x02D0': ['SQ', '1', 'BrachyControlPointSequence'],
+        '0x02D2': ['DS', '1', 'ControlPointRelativePosition'],
+        '0x02D4': ['DS', '3', 'ControlPointDPosition'],
+        '0x02D6': ['DS', '1', 'CumulativeTimeWeight'],
+    },
+    '0x300C': {
+        '0x0000': ['UL', '1', 'RTRelationshipGroupLength'],
+        '0x0002': ['SQ', '1', 'ReferencedRTPlanSequence'],
+        '0x0004': ['SQ', '1', 'ReferencedBeamSequence'],
+        '0x0006': ['IS', '1', 'ReferencedBeamNumber'],
+        '0x0007': ['IS', '1', 'ReferencedReferenceImageNumber'],
+        '0x0008': ['DS', '1', 'StartCumulativeMetersetWeight'],
+        '0x0009': ['DS', '1', 'EndCumulativeMetersetWeight'],
+        '0x000A': ['SQ', '1', 'ReferencedBrachyApplicationSetupSequence'],
+        '0x000C': ['IS', '1', 'ReferencedBrachyApplicationSetupNumber'],
+        '0x000E': ['IS', '1', 'ReferencedSourceNumber'],
+        '0x0020': ['SQ', '1', 'ReferencedFractionGroupSequence'],
+        '0x0022': ['IS', '1', 'ReferencedFractionGroupNumber'],
+        '0x0040': ['SQ', '1', 'ReferencedVerificationImageSequence'],
+        '0x0042': ['SQ', '1', 'ReferencedReferenceImageSequence'],
+        '0x0050': ['SQ', '1', 'ReferencedDoseReferenceSequence'],
+        '0x0051': ['IS', '1', 'ReferencedDoseReferenceNumber'],
+        '0x0055': ['SQ', '1', 'BrachyReferencedDoseReferenceSequence'],
+        '0x0060': ['SQ', '1', 'ReferencedStructureSetSequence'],
+        '0x006A': ['IS', '1', 'ReferencedPatientSetupNumber'],
+        '0x0080': ['SQ', '1', 'ReferencedDoseSequence'],
+        '0x00A0': ['IS', '1', 'ReferencedToleranceTableNumber'],
+        '0x00B0': ['SQ', '1', 'ReferencedBolusSequence'],
+        '0x00C0': ['IS', '1', 'ReferencedWedgeNumber'],
+        '0x00D0': ['IS', '1', 'ReferencedCompensatorNumber'],
+        '0x00E0': ['IS', '1', 'ReferencedBlockNumber'],
+        '0x00F0': ['IS', '1', 'ReferencedControlPointIndex'],
+    },
+    '0x300E': {
+        '0x0000': ['UL', '1', 'RTApprovalGroupLength'],
+        '0x0002': ['CS', '1', 'ApprovalStatus'],
+        '0x0004': ['DA', '1', 'ReviewDate'],
+        '0x0005': ['TM', '1', 'ReviewTime'],
+        '0x0008': ['PN', '1', 'ReviewerName'],
+    },
+    '0x4000': {
+        '0x0000': ['UL', '1', 'TextGroupLength'],
+        '0x0010': ['LT', '1-n', 'TextArbitrary'],
+        '0x4000': ['LT', '1-n', 'TextComments'],
+    },
+    '0x4008': {
+        '0x0000': ['UL', '1', 'ResultsGroupLength'],
+        '0x0040': ['SH', '1', 'ResultsID'],
+        '0x0042': ['LO', '1', 'ResultsIDIssuer'],
+        '0x0050': ['SQ', '1', 'ReferencedInterpretationSequence'],
+        '0x0100': ['DA', '1', 'InterpretationRecordedDate'],
+        '0x0101': ['TM', '1', 'InterpretationRecordedTime'],
+        '0x0102': ['PN', '1', 'InterpretationRecorder'],
+        '0x0103': ['LO', '1', 'ReferenceToRecordedSound'],
+        '0x0108': ['DA', '1', 'InterpretationTranscriptionDate'],
+        '0x0109': ['TM', '1', 'InterpretationTranscriptionTime'],
+        '0x010A': ['PN', '1', 'InterpretationTranscriber'],
+        '0x010B': ['ST', '1', 'InterpretationText'],
+        '0x010C': ['PN', '1', 'InterpretationAuthor'],
+        '0x0111': ['SQ', '1', 'InterpretationApproverSequence'],
+        '0x0112': ['DA', '1', 'InterpretationApprovalDate'],
+        '0x0113': ['TM', '1', 'InterpretationApprovalTime'],
+        '0x0114': ['PN', '1', 'PhysicianApprovingInterpretation'],
+        '0x0115': ['LT', '1', 'InterpretationDiagnosisDescription'],
+        '0x0117': ['SQ', '1', 'DiagnosisCodeSequence'],
+        '0x0118': ['SQ', '1', 'ResultsDistributionListSequence'],
+        '0x0119': ['PN', '1', 'DistributionName'],
+        '0x011A': ['LO', '1', 'DistributionAddress'],
+        '0x0200': ['SH', '1', 'InterpretationID'],
+        '0x0202': ['LO', '1', 'InterpretationIDIssuer'],
+        '0x0210': ['CS', '1', 'InterpretationTypeID'],
+        '0x0212': ['CS', '1', 'InterpretationStatusID'],
+        '0x0300': ['ST', '1', 'Impressions'],
+        '0x4000': ['ST', '1', 'ResultsComments'],
+    },
+    '0x5000': {
+        '0x0000': ['UL', '1', 'CurveGroupLength'],
+        '0x0005': ['US', '1', 'CurveDimensions'],
+        '0x0010': ['US', '1', 'NumberOfPoints'],
+        '0x0020': ['CS', '1', 'TypeOfData'],
+        '0x0022': ['LO', '1', 'CurveDescription'],
+        '0x0030': ['SH', '1-n', 'AxisUnits'],
+        '0x0040': ['SH', '1-n', 'AxisLabels'],
+        '0x0103': ['US', '1', 'DataValueRepresentation'],
+        '0x0104': ['US', '1-n', 'MinimumCoordinateValue'],
+        '0x0105': ['US', '1-n', 'MaximumCoordinateValue'],
+        '0x0106': ['SH', '1-n', 'CurveRange'],
+        '0x0110': ['US', '1', 'CurveDataDescriptor'],
+        '0x0112': ['US', '1', 'CoordinateStartValue'],
+        '0x0114': ['US', '1', 'CoordinateStepValue'],
+        '0x2000': ['US', '1', 'AudioType'],
+        '0x2002': ['US', '1', 'AudioSampleFormat'],
+        '0x2004': ['US', '1', 'NumberOfChannels'],
+        '0x2006': ['UL', '1', 'NumberOfSamples'],
+        '0x2008': ['UL', '1', 'SampleRate'],
+        '0x200A': ['UL', '1', 'TotalTime'],
+        '0x200C': ['OX', '1', 'AudioSampleData'],
+        '0x200E': ['LT', '1', 'AudioComments'],
+        '0x3000': ['OX', '1', 'CurveData'],
+    },
+    '0x5400': {
+        '0x0100': ['SQ', '1', 'WaveformSequence'],
+        '0x0110': ['OW/OB', '1', 'ChannelMinimumValue'],
+        '0x0112': ['OW/OB', '1', 'ChannelMaximumValue'],
+        '0x1004': ['US', '1', 'WaveformBitsAllocated'],
+        '0x1006': ['CS', '1', 'WaveformSampleInterpretation'],
+        '0x100A': ['OW/OB', '1', 'WaveformPaddingValue'],
+        '0x1010': ['OW/OB', '1', 'WaveformData'],
+    },
+    '0x6000': {
+        '0x0000': ['UL', '1', 'OverlayGroupLength'],
+        '0x0010': ['US', '1', 'OverlayRows'],
+        '0x0011': ['US', '1', 'OverlayColumns'],
+        '0x0012': ['US', '1', 'OverlayPlanes'],
+        '0x0015': ['IS', '1', 'OverlayNumberOfFrames'],
+        '0x0040': ['CS', '1', 'OverlayType'],
+        '0x0050': ['SS', '2', 'OverlayOrigin'],
+        '0x0051': ['US', '1', 'OverlayImageFrameOrigin'],
+        '0x0052': ['US', '1', 'OverlayPlaneOrigin'],
+        '0x0060': ['CS', '1', 'OverlayCompressionCode'],
+        '0x0061': ['SH', '1', 'OverlayCompressionOriginator'],
+        '0x0062': ['SH', '1', 'OverlayCompressionLabel'],
+        '0x0063': ['SH', '1', 'OverlayCompressionDescription'],
+        '0x0066': ['AT', '1-n', 'OverlayCompressionStepPointers'],
+        '0x0068': ['US', '1', 'OverlayRepeatInterval'],
+        '0x0069': ['US', '1', 'OverlayBitsGrouped'],
+        '0x0100': ['US', '1', 'OverlayBitsAllocated'],
+        '0x0102': ['US', '1', 'OverlayBitPosition'],
+        '0x0110': ['CS', '1', 'OverlayFormat'],
+        '0x0200': ['US', '1', 'OverlayLocation'],
+        '0x0800': ['CS', '1-n', 'OverlayCodeLabel'],
+        '0x0802': ['US', '1', 'OverlayNumberOfTables'],
+        '0x0803': ['AT', '1-n', 'OverlayCodeTableLocation'],
+        '0x0804': ['US', '1', 'OverlayBitsForCodeWord'],
+        '0x1100': ['US', '1', 'OverlayDescriptorGray'],
+        '0x1101': ['US', '1', 'OverlayDescriptorRed'],
+        '0x1102': ['US', '1', 'OverlayDescriptorGreen'],
+        '0x1103': ['US', '1', 'OverlayDescriptorBlue'],
+        '0x1200': ['US', '1-n', 'OverlayGray'],
+        '0x1201': ['US', '1-n', 'OverlayRed'],
+        '0x1202': ['US', '1-n', 'OverlayGreen'],
+        '0x1203': ['US', '1-n', 'OverlayBlue'],
+        '0x1301': ['IS', '1', 'ROIArea'],
+        '0x1302': ['DS', '1', 'ROIMean'],
+        '0x1303': ['DS', '1', 'ROIStandardDeviation'],
+        '0x3000': ['OW', '1', 'OverlayData'],
+        '0x4000': ['LT', '1-n', 'OverlayComments'],
+    },
+    '0x7F00': {
+        '0x0000': ['UL', '1', 'VariablePixelDataGroupLength'],
+        '0x0010': ['OX', '1', 'VariablePixelData'],
+        '0x0011': ['AT', '1', 'VariableNextDataGroup'],
+        '0x0020': ['OW', '1-n', 'VariableCoefficientsSDVN'],
+        '0x0030': ['OW', '1-n', 'VariableCoefficientsSDHN'],
+        '0x0040': ['OW', '1-n', 'VariableCoefficientsSDDN'],
+    },
+    '0x7FE0': {
+        '0x0000': ['UL', '1', 'PixelDataGroupLength'],
+        '0x0010': ['OX', '1', 'PixelData'],
+        '0x0020': ['OW', '1-n', 'CoefficientsSDVN'],
+        '0x0030': ['OW', '1-n', 'CoefficientsSDHN'],
+        '0x0040': ['OW', '1-n', 'CoefficientsSDDN'],
+    },
+    '0xFFFC': {
+        '0xFFFC': ['OB', '1', 'DataSetTrailingPadding'],
+    },
+    '0xFFFE': {
+        '0xE000': ['NONE', '1', 'Item'],
+        '0xE00D': ['NONE', '1', 'ItemDelimitationItem'],
+        '0xE0DD': ['NONE', '1', 'SequenceDelimitationItem'],
+    },
+}; // dwv.dicom.Dictionnary
