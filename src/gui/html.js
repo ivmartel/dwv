@@ -384,7 +384,9 @@ dwv.html.createHtmlSelect = function(name, list) {
 /**
  * Get a list of parameters from an input URI that looks like:
  *  [dwv root]?input=encodeURI([root]?key0=value0&key1=value1)
- * 
+ * or
+ *  [dwv root]?input=encodeURI([manifest link])&type=manifest
+ *  
  * @method getUriParam
  * @static
  * @param {String } uri The URI to decode.
@@ -393,7 +395,6 @@ dwv.html.createHtmlSelect = function(name, list) {
 dwv.html.getUriParam = function(uri)
 {
     var inputUri = uri || window.location.href;
-    var result = [];
     // split key/value pairs
     var mainQueryPairs = dwv.utils.splitQueryString(inputUri);
     // check pairs
@@ -401,17 +402,44 @@ dwv.html.getUriParam = function(uri)
         return null;
     }
     // has to have an input key
-    if( !mainQueryPairs.query || !mainQueryPairs.query.input ) { 
+    var query = mainQueryPairs.query;
+    if( !query || !query.input ) { 
         throw new Error("No input parameter in query URI.");
     }
+    
+    var result = [];
+    // if manifest
+    if( query.type && query.type === "manifest" ) {
+        result = dwv.html.decodeManifestUri( query.input, query.nslices );
+    }
+    // if key/value uri
+    else {
+        result = dwv.html.decodeKeyValueUri( query.input, query.dwvReplaceMode );
+    }
+   
+    return result;
+};
+
+/**
+ * Decode a Key/Value pair uri. If a key is repeated, the result 
+ * be an array of base + each key. 
+ * @method decodeKeyValueUri
+ * @static
+ * @param {String} uri The uri to decode.
+ * @param {String} replaceMode The key replace more.
+ */
+dwv.html.decodeKeyValueUri = function(uri, replaceMode)
+{
+    var result = [];
+
     // decode input URI
-    var queryUri = decodeURIComponent(mainQueryPairs.query.input);
+    var queryUri = decodeURIComponent(uri);
     // get key/value pairs from input URI
     var inputQueryPairs = dwv.utils.splitQueryString(queryUri);
     // repeat key replace mode (default to keep key)
     var repeatKeyReplaceMode = "key";
-    if( mainQueryPairs.query.dwvReplaceMode ) {
-        repeatKeyReplaceMode = mainQueryPairs.query.dwvReplaceMode;
+    if( replaceMode ) {
+        repeatKeyReplaceMode = replaceMode;
     }
     
     if( !inputQueryPairs ) 
@@ -474,10 +502,88 @@ dwv.html.getUriParam = function(uri)
             }
         }
     }
-    
+    // return
     return result;
 };
 
+/**
+ * Decode a manifest uri. 
+ * @method decodeManifestUri
+ * @static
+ * @param {String} uri The uri to decode.
+ * @param {number} nslices The number of slices to load.
+ */
+dwv.html.decodeManifestUri = function(uri, nslices)
+{
+    var result = [];
+    
+    // Request error
+    var onErrorRequest = function(/*event*/)
+    {
+        console.log( "RequestError while receiving manifest: "+this.status );
+    };
+
+    // Request handler
+    var onLoadRequest = function(/*event*/)
+    {
+        var doc = this.responseXML;
+        // wado url
+        var wadoElement = doc.getElementsByTagName("wado_query");
+        var wadoURL = wadoElement[0].getAttribute("wadoURL");
+        var rootURL = wadoURL + "?requestType=WADO&contentType=application/dicom&";
+        // patient list
+        var patientList = doc.getElementsByTagName("Patient");
+        if( patientList.length > 1 ) {
+            console.warn("More than one patient, loading first one.");
+        }
+        // study list
+        var studyList = patientList[0].getElementsByTagName("Study");
+        if( studyList.length > 1 ) {
+            console.warn("More than one study, loading first one.");
+        }
+        var studyUID = studyList[0].getAttribute("StudyInstanceUID");
+        // series list
+        var seriesList = studyList[0].getElementsByTagName("Series");
+        if( seriesList.length > 1 ) {
+            console.warn("More than one series, loading first one.");
+        }
+        var seriesUID = seriesList[0].getAttribute("SeriesInstanceUID");
+        // instance list
+        var instanceList = seriesList[0].getElementsByTagName("Instance");
+        // loop on instances and push links
+        var max = instanceList.length;
+        if( nslices < max ) {
+            max = nslices;
+        }
+        for( var i = 0; i < max; ++i ) {
+            var sopInstanceUID = instanceList[i].getAttribute("SOPInstanceUID");
+            var link = rootURL + 
+            "&studyUID=" + studyUID +
+            "&seriesUID=" + seriesUID +
+            "&objectUID=" + sopInstanceUID;
+            result.push( link );
+        }
+    };
+    
+    var request = new XMLHttpRequest();
+    request.open('GET', decodeURIComponent(uri), false);
+    request.responseType = "xml"; 
+    request.onload = onLoadRequest;
+    request.onerror = onErrorRequest;
+    //request.onprogress = dwv.gui.updateProgress;
+    request.send(null);
+
+    // return
+    return result;
+};
+
+/**
+ * Display or not an element.
+ * @method displayElement
+ * @static
+ * @param {Number} id The id of the element to toggle its display.
+ * @param {Boolean} bool True to display the element.
+ */
 dwv.html.displayElement = function(id,bool)
 {
     var element = document.getElementById(id);
