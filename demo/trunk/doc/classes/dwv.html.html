@@ -321,7 +321,34 @@
                             </li>
                         
                             <li class="index-item method">
+                                <a href="#method_decodeKeyValueUri">decodeKeyValueUri</a>
+
+                                
+                                    <span class="flag static">static</span>
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_decodeManifestUri">decodeManifestUri</a>
+
+                                
+                                    <span class="flag static">static</span>
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
                                 <a href="#method_dehighlight">dehighlight</a>
+
+                                
+                                    <span class="flag static">static</span>
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_displayElement">displayElement</a>
 
                                 
                                     <span class="flag static">static</span>
@@ -1489,6 +1516,233 @@ It is left to the user to set the &#39;onchange&#39; method of the select.</p>
 </div>
 
                 
+                    <div id="method_decodeKeyValueUri" class="method item">
+    <h3 class="name"><code>decodeKeyValueUri</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>uri</code>
+                    
+                </li>
+            
+                <li class="arg">
+                    
+                        <code>replaceMode</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <span class="flag static">static</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_gui_html.js.html#l423"><code>src&#x2F;gui&#x2F;html.js:423</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Decode a Key/Value pair uri. If a key is repeated, the result 
+be an array of base + each key.</p>
+
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">uri</code>
+                        <span class="type">String</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The uri to decode.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+                <li class="param">
+                    
+                        <code class="param-name">replaceMode</code>
+                        <span class="type">String</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The key replace more.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_decodeManifestUri" class="method item">
+    <h3 class="name"><code>decodeManifestUri</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>uri</code>
+                    
+                </li>
+            
+                <li class="arg">
+                    
+                        <code>nslices</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <span class="flag static">static</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_gui_html.js.html#l509"><code>src&#x2F;gui&#x2F;html.js:509</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Decode a manifest uri.</p>
+
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">uri</code>
+                        <span class="type">String</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The uri to decode.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+                <li class="param">
+                    
+                        <code class="param-name">nslices</code>
+                        <span class="type">Number</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The number of slices to load.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+
+    
+</div>
+
+                
                     <div id="method_dehighlight" class="method item">
     <h3 class="name"><code>dehighlight</code></h3>
 
@@ -1566,6 +1820,119 @@ into its original &#39;preText term postText&#39;.</p>
 
                     <div class="param-description">
                         <p>The container to de-highlight.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_displayElement" class="method item">
+    <h3 class="name"><code>displayElement</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>id</code>
+                    
+                </li>
+            
+                <li class="arg">
+                    
+                        <code>bool</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <span class="flag static">static</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_gui_html.js.html#l580"><code>src&#x2F;gui&#x2F;html.js:580</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Display or not an element.</p>
+
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">id</code>
+                        <span class="type">Number</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The id of the element to toggle its display.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+                <li class="param">
+                    
+                        <code class="param-name">bool</code>
+                        <span class="type">Boolean</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>True to display the element.</p>
 
                     </div>
 
@@ -1865,7 +2232,9 @@ true or false if it contains the term.</p>
 
     <div class="description">
         <p>Get a list of parameters from an input URI that looks like:
- [dwv root]?input=encodeURI([root]?key0=value0&amp;key1=value1)</p>
+ [dwv root]?input=encodeURI([root]?key0=value0&amp;key1=value1)
+or
+ [dwv root]?input=encodeURI([manifest link])&amp;type=manifest</p>
 
     </div>
 
@@ -2165,7 +2534,7 @@ around each search term.</p>
             
         
         
-        <a href="../files/src_gui_html.js.html#l489"><code>src&#x2F;gui&#x2F;html.js:489</code></a>
+        <a href="../files/src_gui_html.js.html#l595"><code>src&#x2F;gui&#x2F;html.js:595</code></a>
         
         </p>
 

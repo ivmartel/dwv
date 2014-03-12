@@ -3115,7 +3115,7 @@
         {
             "file": "src/gui/html.js",
             "line": 384,
-            "description": "Get a list of parameters from an input URI that looks like:\n [dwv root]?input=encodeURI([root]?key0=value0&key1=value1)",
+            "description": "Get a list of parameters from an input URI that looks like:\n [dwv root]?input=encodeURI([root]?key0=value0&key1=value1)\nor\n [dwv root]?input=encodeURI([manifest link])&type=manifest",
             "itemtype": "method",
             "name": "getUriParam",
             "static": 1,
@@ -3136,7 +3136,76 @@
         },
         {
             "file": "src/gui/html.js",
-            "line": 489,
+            "line": 423,
+            "description": "Decode a Key/Value pair uri. If a key is repeated, the result \nbe an array of base + each key.",
+            "itemtype": "method",
+            "name": "decodeKeyValueUri",
+            "static": 1,
+            "params": [
+                {
+                    "name": "uri",
+                    "description": "The uri to decode.",
+                    "type": "String"
+                },
+                {
+                    "name": "replaceMode",
+                    "description": "The key replace more.",
+                    "type": "String"
+                }
+            ],
+            "class": "dwv.html",
+            "module": "html",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/gui/html.js",
+            "line": 509,
+            "description": "Decode a manifest uri.",
+            "itemtype": "method",
+            "name": "decodeManifestUri",
+            "static": 1,
+            "params": [
+                {
+                    "name": "uri",
+                    "description": "The uri to decode.",
+                    "type": "String"
+                },
+                {
+                    "name": "nslices",
+                    "description": "The number of slices to load.",
+                    "type": "Number"
+                }
+            ],
+            "class": "dwv.html",
+            "module": "html",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/gui/html.js",
+            "line": 580,
+            "description": "Display or not an element.",
+            "itemtype": "method",
+            "name": "displayElement",
+            "static": 1,
+            "params": [
+                {
+                    "name": "id",
+                    "description": "The id of the element to toggle its display.",
+                    "type": "Number"
+                },
+                {
+                    "name": "bool",
+                    "description": "True to display the element.",
+                    "type": "Boolean"
+                }
+            ],
+            "class": "dwv.html",
+            "module": "html",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/gui/html.js",
+            "line": 595,
             "description": "Toggle the display of an element.",
             "itemtype": "method",
             "name": "toggleDisplay",
