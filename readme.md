@@ -5,7 +5,7 @@ A simple javascript/HTML5 _only_ DICOM web viewer. Try it [here](http://ivmartel
 More information on the [wiki](https://github.com/ivmartel/dwv/wiki).
 
 Not fully DICOM compliant, 
-see [Dicom-Support](https://github.com/ivmartel/dwv/wiki/Dicom-Support) for details.
+see [Dicom-Support](https://github.com/ivmartel/dwv/wiki/Dicom-Support) for details. Can be directyl integrated in PACS systems, see [Pacs-Support](https://github.com/ivmartel/dwv/wiki/Pacs-Support).
 
 All coding/implementation contributions and comments are welcome.
 
