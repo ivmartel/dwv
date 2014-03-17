@@ -430,7 +430,19 @@ dwv.image.View.prototype.setWindowLevelMinMax = function()
     // set window level
     this.setWindowLevel(center,width);
 };
-
+/**
+ * Go to first slice .
+ * @method goFirstSlice
+ * @return {Boolean} False if not in bounds.
+ */
+dwv.image.View.prototype.goFirstSlice = function()
+{
+    return this.setCurrentPosition({
+        &quot;i&quot;: this.getCurrentPosition().i,
+        &quot;j&quot;: this.getCurrentPosition().j,
+        &quot;k&quot;:  0 
+    });
+};
 /**
  * Increment the current slice number.
  * @method incrementSliceNb

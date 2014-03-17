@@ -5672,7 +5672,21 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 232,
+            "line": 231,
+            "description": "Go to first slice .",
+            "itemtype": "method",
+            "name": "goFirstSlice",
+            "return": {
+                "description": "False if not in bounds.",
+                "type": "Boolean"
+            },
+            "class": "dwv.image.View",
+            "module": "image",
+            "namespace": "dwv.image"
+        },
+        {
+            "file": "src/image/view.js",
+            "line": 244,
             "description": "Increment the current slice number.",
             "itemtype": "method",
             "name": "incrementSliceNb",
@@ -5686,7 +5700,7 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 246,
+            "line": 258,
             "description": "Decrement the current slice number.",
             "itemtype": "method",
             "name": "decrementSliceNb",
@@ -5700,7 +5714,7 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 260,
+            "line": 272,
             "description": "Clone the image using all meta data and the original data buffer.",
             "itemtype": "method",
             "name": "clone",
@@ -5714,7 +5728,7 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 274,
+            "line": 286,
             "description": "Generate display image data to be given to a canvas.",
             "itemtype": "method",
             "name": "generateImageData",
@@ -5736,7 +5750,7 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 360,
+            "line": 372,
             "description": "Add an event listener on the view.",
             "itemtype": "method",
             "name": "addEventListener",
@@ -5758,7 +5772,7 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 375,
+            "line": 387,
             "description": "Remove an event listener on the view.",
             "itemtype": "method",
             "name": "removeEventListener",
@@ -5780,7 +5794,7 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 395,
+            "line": 407,
             "description": "Fire an event: call all associated listeners.",
             "itemtype": "method",
             "name": "fireEvent",
