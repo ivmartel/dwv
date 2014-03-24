@@ -76,7 +76,7 @@ print([[<head>]])
 print([[
 <title>DICOM Web Viewer</title>
 <meta charset="UTF-8">
-<link rel="stylesheet" href="/dwv/style.css">
+<link rel="stylesheet" href="/dwv/css/style.css">
 <link rel="stylesheet" href="/dwv/ext/jquery-mobile/jquery.mobile-1.4.1.min.css">
 ]])
 

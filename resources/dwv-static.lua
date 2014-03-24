@@ -76,7 +76,7 @@ print([[<head>]])
 print([[
 <title>DICOM Web Viewer</title>
 <meta charset="UTF-8">
-<link rel="stylesheet" href="/dwv/style.css">
+<link rel="stylesheet" href="/dwv/css/style.css">
 <style>
 body { background-color: #222; color: white;
   margin: 10px; padding: 0; font-size: 80%; }
