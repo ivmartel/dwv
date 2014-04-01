@@ -1266,7 +1266,7 @@
             "module": "tool",
             "namespace": "dwv.tool",
             "file": "src/tools/circle.js",
-            "line": 8,
+            "line": 10,
             "description": "Draw circle command.",
             "is_constructor": 1,
             "params": [
@@ -6490,7 +6490,7 @@
         },
         {
             "file": "src/tools/circle.js",
-            "line": 30,
+            "line": 32,
             "description": "Circle object.",
             "itemtype": "property",
             "name": "circle",
@@ -6503,7 +6503,7 @@
         },
         {
             "file": "src/tools/circle.js",
-            "line": 38,
+            "line": 40,
             "description": "Line color.",
             "itemtype": "property",
             "name": "lineColor",
@@ -6516,7 +6516,7 @@
         },
         {
             "file": "src/tools/circle.js",
-            "line": 45,
+            "line": 47,
             "description": "HTML context.",
             "itemtype": "property",
             "name": "context",
@@ -6529,7 +6529,7 @@
         },
         {
             "file": "src/tools/circle.js",
-            "line": 53,
+            "line": 55,
             "description": "Command name.",
             "itemtype": "property",
             "name": "name",
@@ -6542,7 +6542,7 @@
         },
         {
             "file": "src/tools/circle.js",
-            "line": 60,
+            "line": 62,
             "description": "Get the command name.",
             "itemtype": "method",
             "name": "getName",
@@ -6556,7 +6556,7 @@
         },
         {
             "file": "src/tools/circle.js",
-            "line": 66,
+            "line": 68,
             "description": "Set the command name.",
             "itemtype": "method",
             "name": "setName",
@@ -6573,7 +6573,7 @@
         },
         {
             "file": "src/tools/circle.js",
-            "line": 73,
+            "line": 75,
             "description": "Execute the command.",
             "itemtype": "method",
             "name": "execute",

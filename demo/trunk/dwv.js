@@ -511,6 +511,11 @@ dwv.App = function()
         imageData = self.getImageLayer().getContext().createImageData( 
                 dataWidth, dataHeight);
 
+        var klayer = document.getElementById("kLayer");
+        klayer.addEventListener("mousedown", eventHandler, false);
+        klayer.addEventListener("mousemove", eventHandler, false);
+        klayer.addEventListener("mouseup", eventHandler, false);
+
         var topLayer = tempLayer === null ? imageLayer : tempLayer;
         // mouse listeners
         topLayer.getCanvas().addEventListener("mousedown", eventHandler, false);
@@ -8659,6 +8664,8 @@ dwv.math.Path.prototype.appenPath = function(other) {
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
 
+var Kinetic = Kinetic || {};
+
 /**
  * Draw circle command.
  * @class DrawCircleCommand
@@ -8702,7 +8709,7 @@ dwv.tool.DrawCircleCommand = function(points, app, style)
      * @private
      * @type Object
      */
-    var context = app.getTempLayer().getContext();
+    //var context = app.getTempLayer().getContext();
     
     /**
      * Command name.
@@ -8731,7 +8738,7 @@ dwv.tool.DrawCircleCommand = function(points, app, style)
     this.execute = function()
     {
         // style
-        context.fillStyle = lineColor;
+        /*context.fillStyle = lineColor;
         context.strokeStyle = lineColor;
         // path
         context.beginPath();
@@ -8748,7 +8755,29 @@ dwv.tool.DrawCircleCommand = function(points, app, style)
         context.font = style.getFontStr();
         context.fillText( Math.round(surf) + "mm2",
             circle.getCenter().getX() + style.getFontSize(),
-            circle.getCenter().getY() + style.getFontSize());
+            circle.getCenter().getY() + style.getFontSize());*/
+        
+        var canvas = app.getTempLayer().getCanvas();
+        var stage = new Kinetic.Stage({
+            container: 'kLayer', 
+            width: canvas.width, 
+            height: canvas.height
+        });
+        var layer = new Kinetic.Layer();
+
+        var kcircle = new Kinetic.Circle({
+            x: circle.getCenter().getX(),
+            y: circle.getCenter().getY(),
+            radius: circle.getRadius(),
+            stroke: lineColor,
+            strokeWidth: 2,
+            draggable: true
+        });
+
+        // add the shape to the layer
+        layer.add(kcircle);
+        // add the layer to the stage
+        stage.add(layer);
     };
 }; // DrawCircleCommand class
 ;/** 
