@@ -511,6 +511,11 @@ dwv.App = function()
         imageData = self.getImageLayer().getContext().createImageData( 
                 dataWidth, dataHeight);
 
+        var klayer = document.getElementById("kLayer");
+        klayer.addEventListener("mousedown", eventHandler, false);
+        klayer.addEventListener("mousemove", eventHandler, false);
+        klayer.addEventListener("mouseup", eventHandler, false);
+
         var topLayer = tempLayer === null ? imageLayer : tempLayer;
         // mouse listeners
         topLayer.getCanvas().addEventListener("mousedown", eventHandler, false);

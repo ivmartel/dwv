@@ -77,7 +77,7 @@ dwv.tool.DrawCircleCommand = function(points, app, style)
     this.execute = function()
     {
         // style
-        context.fillStyle = lineColor;
+        /*context.fillStyle = lineColor;
         context.strokeStyle = lineColor;
         // path
         context.beginPath();
@@ -94,6 +94,28 @@ dwv.tool.DrawCircleCommand = function(points, app, style)
         context.font = style.getFontStr();
         context.fillText( Math.round(surf) + "mm2",
             circle.getCenter().getX() + style.getFontSize(),
-            circle.getCenter().getY() + style.getFontSize());
+            circle.getCenter().getY() + style.getFontSize());*/
+        
+        var canvas = app.getTempLayer().getCanvas();
+        var stage = new Kinetic.Stage({
+            container: 'kLayer', 
+            width: canvas.width, 
+            height: canvas.height
+        });
+        var layer = new Kinetic.Layer();
+
+        var kcircle = new Kinetic.Circle({
+            x: circle.getCenter().getX(),
+            y: circle.getCenter().getY(),
+            radius: circle.getRadius(),
+            stroke: lineColor,
+            strokeWidth: 2,
+            draggable: true
+        });
+
+        // add the shape to the layer
+        layer.add(kcircle);
+        // add the layer to the stage
+        stage.add(layer);
     };
 }; // DrawCircleCommand class
