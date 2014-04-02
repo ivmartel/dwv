@@ -202,7 +202,9 @@
     <pre class="code prettyprint linenums">
 // Main DWV namespace.
 var dwv = dwv || {};
- 
+
+var Kinetic = Kinetic || {};
+
 /**
  * Main application class.
  * @class App
@@ -230,6 +232,9 @@ dwv.App = function()
     var drawLayer = null;
     // Temporary layer
     var tempLayer = null;
+    // Kinetic layer
+    var kineticLayer = null;
+    var kineticStage = null;
     
     // flag to know if the info layer is listening on the image.
     var isInfoLayerListening = false;
@@ -312,6 +317,20 @@ dwv.App = function()
      * @return {Object} The temporary layer.
      */
     this.getTempLayer = function() { return tempLayer; };
+    /** 
+     * Get the kinetic layer.
+     * @method getKineticLayer
+     * @return {Object} The temporary layer.
+     */
+    this.getKineticLayer = function() { return kineticLayer; };
+    this.getKineticStage = function() { return kineticStage; };
+    this.addToKineticLayer = function(shape) { 
+        //kineticLayer.removeChildren();
+        kineticLayer.add(shape); 
+        kineticLayer.draw();
+        //kineticStage.clear();
+        //kineticStage.add(kineticLayer);
+    };
 
     /** 
      * Get the undo stack.
@@ -337,6 +356,8 @@ dwv.App = function()
         else{
             console.log(&quot;Not loading url from adress since skipLoadUrl is defined.&quot;);
         }
+        
+        kineticStage = new Kinetic.Stage({container: &#x27;kineticDiv&#x27;});
     };
     
     /**
@@ -459,6 +480,13 @@ dwv.App = function()
         displayZoom = Math.min( (size.width / dataWidth), (size.height / dataHeight) );
         $(&quot;#layerContainer&quot;).width(parseInt(displayZoom*dataWidth, 10));
         $(&quot;#layerContainer&quot;).height(parseInt(displayZoom*dataHeight, 10));
+        
+        if( kineticStage ) {
+            kineticStage.setWidth(dataWidth);
+            kineticStage.setHeight(dataHeight);
+            console.log(&quot;displayZoom: &quot;+displayZoom);
+            kineticStage.scale( {x: 2, y: 2} );
+        }
     };
     
     /**
@@ -648,6 +676,12 @@ dwv.App = function()
             tempLayer.initialise(dataWidth, dataHeight);
             tempLayer.setStyleDisplay(true);
         }
+        // kinetic layer
+        if( document.getElementById(&quot;kineticDiv&quot;) !== null) {
+            kineticLayer = new Kinetic.Layer();
+            // add the layer to the stage
+            kineticStage.add(kineticLayer);
+        }
     }
     
     /**
@@ -713,10 +747,10 @@ dwv.App = function()
         imageData = self.getImageLayer().getContext().createImageData( 
                 dataWidth, dataHeight);
 
-        var klayer = document.getElementById(&quot;kLayer&quot;);
-        klayer.addEventListener(&quot;mousedown&quot;, eventHandler, false);
-        klayer.addEventListener(&quot;mousemove&quot;, eventHandler, false);
-        klayer.addEventListener(&quot;mouseup&quot;, eventHandler, false);
+        var kineticDiv = document.getElementById(&quot;kineticDiv&quot;);
+        kineticDiv.addEventListener(&quot;mousedown&quot;, eventHandler, false);
+        kineticDiv.addEventListener(&quot;mousemove&quot;, eventHandler, false);
+        kineticDiv.addEventListener(&quot;mouseup&quot;, eventHandler, false);
 
         var topLayer = tempLayer === null ? imageLayer : tempLayer;
         // mouse listeners
