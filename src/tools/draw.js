@@ -65,11 +65,29 @@ dwv.tool.Draw = function(app)
      * @param {Object} event The mouse down event.
      */
     this.mousedown = function(event){
-        started = true;
-        // clear array
-        points = [];
-        // store point
-        points.push(new dwv.math.Point2D(event._x, event._y));
+        var x = event._x;
+        var y = event._y;
+        var stage = app.getKineticStage();
+        var shape = stage.getIntersection( {x: x, y: y} );
+        if( shape ) {
+            if( shape.draggable() ) {
+                shape.draggable(false);
+                shape.fill('yellow');
+                app.getKineticLayer().draw();
+            }
+            else {
+                shape.draggable(true);
+                shape.fill('red');
+                app.getKineticLayer().draw();
+            }
+        }
+        else {
+            started = true;
+            // clear array
+            points = [];
+            // store point
+            points.push(new dwv.math.Point2D(event._x, event._y));
+        }
     };
 
     /**
@@ -88,7 +106,7 @@ dwv.tool.Draw = function(app)
             // current point
             points.push(new dwv.math.Point2D(event._x, event._y));
             // create draw command
-            command = new dwv.tool.shapes[self.shapeName](points, app, self.style);
+            command = new dwv.tool.shapes[self.shapeName](points, app, self.style, false);
             // clear the temporary layer
             app.getTempLayer().clear();
             // draw
@@ -105,9 +123,12 @@ dwv.tool.Draw = function(app)
         if (started)
         {
             // save command in undo stack
+            command = new dwv.tool.shapes[self.shapeName](points, app, self.style, true);
+            command.execute();
+            
             app.getUndoStack().add(command);
             // merge temporary layer
-            app.getDrawLayer().merge(app.getTempLayer());
+            //app.getDrawLayer().merge(app.getTempLayer());
             // set flag
             started = false;
         }

@@ -16,7 +16,7 @@ var Kinetic = Kinetic || {};
  * @param {Object} app The application to draw the circle on.
  * @param {Style} style The drawing style.
  */
-dwv.tool.DrawCircleCommand = function(points, app, style)
+dwv.tool.DrawCircleCommand = function(points, app, style, isFinal)
 {
     // calculate radius
     var a = Math.abs(points[0].getX() - points[points.length-1].getX());
@@ -98,26 +98,49 @@ dwv.tool.DrawCircleCommand = function(points, app, style)
             circle.getCenter().getX() + style.getFontSize(),
             circle.getCenter().getY() + style.getFontSize());*/
         
-        var canvas = app.getTempLayer().getCanvas();
-        var stage = new Kinetic.Stage({
-            container: 'kLayer', 
-            width: canvas.width, 
-            height: canvas.height
-        });
-        var layer = new Kinetic.Layer();
-
+        var name = isFinal ? "final" : "temp";
         var kcircle = new Kinetic.Circle({
             x: circle.getCenter().getX(),
             y: circle.getCenter().getY(),
             radius: circle.getRadius(),
             stroke: lineColor,
             strokeWidth: 2,
-            draggable: true
+            name: name
+        });
+        var kcircle2 = new Kinetic.Circle({
+            x: circle.getCenter().getX(),
+            y: circle.getCenter().getY(),
+            radius: circle.getRadius(),
+            stroke: lineColor,
+            strokeWidth: 2,
+            name: name,
+            fill: lineColor,
+            opacity: 0.2
         });
 
-        // add the shape to the layer
-        layer.add(kcircle);
-        // add the layer to the stage
-        stage.add(layer);
+        kcircle2.on('mouseover', function() {
+            this.opacity(0.5);
+            app.getKineticLayer().draw();
+            document.body.style.cursor = 'pointer';
+        });
+        kcircle2.on('mouseout', function() {
+            this.opacity(0.2);
+            app.getKineticLayer().draw();
+            document.body.style.cursor = 'default';
+        });
+        kcircle2.on('click', function() {
+            //app.getToolBox().getSelectedTool().
+            console.log('click...');
+        });
+
+          // add the shape to the layer
+        var klayer = app.getKineticLayer();
+        var shapes = klayer.find('.temp');
+        shapes.each( function(shape) {
+            shape.remove(); 
+        });
+        
+        app.addToKineticLayer(kcircle);
+        app.addToKineticLayer(kcircle2);
     };
 }; // DrawCircleCommand class
