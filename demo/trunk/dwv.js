@@ -122,13 +122,6 @@ dwv.App = function()
      */
     this.getKineticLayer = function() { return kineticLayer; };
     this.getKineticStage = function() { return kineticStage; };
-    this.addToKineticLayer = function(shape) { 
-        //kineticLayer.removeChildren();
-        kineticLayer.add(shape); 
-        kineticLayer.draw();
-        //kineticStage.clear();
-        //kineticStage.add(kineticLayer);
-    };
 
     /** 
      * Get the undo stack.
@@ -154,8 +147,6 @@ dwv.App = function()
         else{
             console.log("Not loading url from adress since skipLoadUrl is defined.");
         }
-        
-        kineticStage = new Kinetic.Stage({container: 'kineticDiv'});
     };
     
     /**
@@ -280,10 +271,10 @@ dwv.App = function()
         $("#layerContainer").height(parseInt(displayZoom*dataHeight, 10));
         
         if( kineticStage ) {
-            kineticStage.setWidth(dataWidth);
-            kineticStage.setHeight(dataHeight);
-            console.log("displayZoom: "+displayZoom);
-            kineticStage.scale( {x: 2, y: 2} );
+            kineticStage.setWidth(parseInt(displayZoom*dataWidth, 10));
+            kineticStage.setHeight(parseInt(displayZoom*dataHeight, 10));
+            kineticStage.scale( {x: displayZoom, y: displayZoom} );
+            kineticStage.draw();
         }
     };
     
@@ -454,9 +445,6 @@ dwv.App = function()
      */
     function createLayers(dataWidth, dataHeight)
     {
-        // resize app
-        self.resize();
-        
         // image layer
         imageLayer = new dwv.html.Layer("imageLayer");
         imageLayer.initialise(dataWidth, dataHeight);
@@ -476,10 +464,21 @@ dwv.App = function()
         }
         // kinetic layer
         if( document.getElementById("kineticDiv") !== null) {
+            // create stage
+            kineticStage = new Kinetic.Stage({
+                container: 'kineticDiv',
+                width: dataWidth,
+                height: dataHeight
+            });
+            // create layer
             kineticLayer = new Kinetic.Layer();
             // add the layer to the stage
             kineticStage.add(kineticLayer);
         }
+        
+        // resize app
+        self.resize();
+        
     }
     
     /**
@@ -546,23 +545,23 @@ dwv.App = function()
                 dataWidth, dataHeight);
 
         var kineticDiv = document.getElementById("kineticDiv");
-        kineticDiv.addEventListener("mousedown", eventHandler, false);
-        kineticDiv.addEventListener("mousemove", eventHandler, false);
-        kineticDiv.addEventListener("mouseup", eventHandler, false);
-
-        var topLayer = tempLayer === null ? imageLayer : tempLayer;
+        
+        var topLayer = tempLayer === null ? imageLayer.getCanvas() : tempLayer.getCanvas();
+        if ( kineticLayer ) {
+            topLayer = kineticDiv;
+        }
         // mouse listeners
-        topLayer.getCanvas().addEventListener("mousedown", eventHandler, false);
-        topLayer.getCanvas().addEventListener("mousemove", eventHandler, false);
-        topLayer.getCanvas().addEventListener("mouseup", eventHandler, false);
-        topLayer.getCanvas().addEventListener("mouseout", eventHandler, false);
-        topLayer.getCanvas().addEventListener("mousewheel", eventHandler, false);
-        topLayer.getCanvas().addEventListener("DOMMouseScroll", eventHandler, false);
-        topLayer.getCanvas().addEventListener("dblclick", eventHandler, false);
+        topLayer.addEventListener("mousedown", eventHandler, false);
+        topLayer.addEventListener("mousemove", eventHandler, false);
+        topLayer.addEventListener("mouseup", eventHandler, false);
+        topLayer.addEventListener("mouseout", eventHandler, false);
+        topLayer.addEventListener("mousewheel", eventHandler, false);
+        topLayer.addEventListener("DOMMouseScroll", eventHandler, false);
+        topLayer.addEventListener("dblclick", eventHandler, false);
         // touch listeners
-        topLayer.getCanvas().addEventListener("touchstart", eventHandler, false);
-        topLayer.getCanvas().addEventListener("touchmove", eventHandler, false);
-        topLayer.getCanvas().addEventListener("touchend", eventHandler, false);
+        topLayer.addEventListener("touchstart", eventHandler, false);
+        topLayer.addEventListener("touchmove", eventHandler, false);
+        topLayer.addEventListener("touchend", eventHandler, false);
         // keydown listener
         window.addEventListener("keydown", eventHandler, true);
         // image listeners
@@ -8826,15 +8825,16 @@ dwv.tool.DrawCircleCommand = function(points, app, style, isFinal)
             console.log('click...');
         });
 
-          // add the shape to the layer
+        // remove temporary shapes from the layer
         var klayer = app.getKineticLayer();
         var shapes = klayer.find('.temp');
         shapes.each( function(shape) {
             shape.remove(); 
         });
-        
-        app.addToKineticLayer(kcircle);
-        app.addToKineticLayer(kcircle2);
+        // add the new one
+        app.getKineticLayer().add(kcircle);
+        app.getKineticLayer().add(kcircle2);
+        app.getKineticLayer().draw();
     };
 }; // DrawCircleCommand class
 ;/** 
@@ -8939,8 +8939,8 @@ dwv.tool.Draw = function(app)
         {
             return;
         }
-        if( event._x !== points[0].getX() &&
-            event._y !== points[0].getY() )
+        if ( event._x !== points[0].getX() &&
+             event._y !== points[0].getY() )
         {
             // current point
             points.push(new dwv.math.Point2D(event._x, event._y));
@@ -8958,19 +8958,18 @@ dwv.tool.Draw = function(app)
      * @method mouseup
      * @param {Object} event The mouse up event.
      */
-    this.mouseup = function(/*event*/){
-        if (started)
+    this.mouseup = function (/*event*/){
+        if (started && points.length > 1 )
         {
-            // save command in undo stack
+            // create final command
             command = new dwv.tool.shapes[self.shapeName](points, app, self.style, true);
+            // execute it
             command.execute();
-            
+            // save it in undo stack
             app.getUndoStack().add(command);
-            // merge temporary layer
-            //app.getDrawLayer().merge(app.getTempLayer());
-            // set flag
-            started = false;
         }
+        // reset flag
+        started = false;
     };
     
     /**

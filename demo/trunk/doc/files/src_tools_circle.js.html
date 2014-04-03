@@ -335,15 +335,16 @@ dwv.tool.DrawCircleCommand = function(points, app, style, isFinal)
             console.log(&#x27;click...&#x27;);
         });
 
-          // add the shape to the layer
+        // remove temporary shapes from the layer
         var klayer = app.getKineticLayer();
         var shapes = klayer.find(&#x27;.temp&#x27;);
         shapes.each( function(shape) {
             shape.remove(); 
         });
-        
-        app.addToKineticLayer(kcircle);
-        app.addToKineticLayer(kcircle2);
+        // add the new one
+        app.getKineticLayer().add(kcircle);
+        app.getKineticLayer().add(kcircle2);
+        app.getKineticLayer().draw();
     };
 }; // DrawCircleCommand class
 

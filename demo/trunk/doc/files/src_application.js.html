@@ -324,13 +324,6 @@ dwv.App = function()
      */
     this.getKineticLayer = function() { return kineticLayer; };
     this.getKineticStage = function() { return kineticStage; };
-    this.addToKineticLayer = function(shape) { 
-        //kineticLayer.removeChildren();
-        kineticLayer.add(shape); 
-        kineticLayer.draw();
-        //kineticStage.clear();
-        //kineticStage.add(kineticLayer);
-    };
 
     /** 
      * Get the undo stack.
@@ -356,8 +349,6 @@ dwv.App = function()
         else{
             console.log(&quot;Not loading url from adress since skipLoadUrl is defined.&quot;);
         }
-        
-        kineticStage = new Kinetic.Stage({container: &#x27;kineticDiv&#x27;});
     };
     
     /**
@@ -482,10 +473,10 @@ dwv.App = function()
         $(&quot;#layerContainer&quot;).height(parseInt(displayZoom*dataHeight, 10));
         
         if( kineticStage ) {
-            kineticStage.setWidth(dataWidth);
-            kineticStage.setHeight(dataHeight);
-            console.log(&quot;displayZoom: &quot;+displayZoom);
-            kineticStage.scale( {x: 2, y: 2} );
+            kineticStage.setWidth(parseInt(displayZoom*dataWidth, 10));
+            kineticStage.setHeight(parseInt(displayZoom*dataHeight, 10));
+            kineticStage.scale( {x: displayZoom, y: displayZoom} );
+            kineticStage.draw();
         }
     };
     
@@ -656,9 +647,6 @@ dwv.App = function()
      */
     function createLayers(dataWidth, dataHeight)
     {
-        // resize app
-        self.resize();
-        
         // image layer
         imageLayer = new dwv.html.Layer(&quot;imageLayer&quot;);
         imageLayer.initialise(dataWidth, dataHeight);
@@ -678,10 +666,21 @@ dwv.App = function()
         }
         // kinetic layer
         if( document.getElementById(&quot;kineticDiv&quot;) !== null) {
+            // create stage
+            kineticStage = new Kinetic.Stage({
+                container: &#x27;kineticDiv&#x27;,
+                width: dataWidth,
+                height: dataHeight
+            });
+            // create layer
             kineticLayer = new Kinetic.Layer();
             // add the layer to the stage
             kineticStage.add(kineticLayer);
         }
+        
+        // resize app
+        self.resize();
+        
     }
     
     /**
@@ -748,23 +747,23 @@ dwv.App = function()
                 dataWidth, dataHeight);
 
         var kineticDiv = document.getElementById(&quot;kineticDiv&quot;);
-        kineticDiv.addEventListener(&quot;mousedown&quot;, eventHandler, false);
-        kineticDiv.addEventListener(&quot;mousemove&quot;, eventHandler, false);
-        kineticDiv.addEventListener(&quot;mouseup&quot;, eventHandler, false);
-
-        var topLayer = tempLayer === null ? imageLayer : tempLayer;
+        
+        var topLayer = tempLayer === null ? imageLayer.getCanvas() : tempLayer.getCanvas();
+        if ( kineticLayer ) {
+            topLayer = kineticDiv;
+        }
         // mouse listeners
-        topLayer.getCanvas().addEventListener(&quot;mousedown&quot;, eventHandler, false);
-        topLayer.getCanvas().addEventListener(&quot;mousemove&quot;, eventHandler, false);
-        topLayer.getCanvas().addEventListener(&quot;mouseup&quot;, eventHandler, false);
-        topLayer.getCanvas().addEventListener(&quot;mouseout&quot;, eventHandler, false);
-        topLayer.getCanvas().addEventListener(&quot;mousewheel&quot;, eventHandler, false);
-        topLayer.getCanvas().addEventListener(&quot;DOMMouseScroll&quot;, eventHandler, false);
-        topLayer.getCanvas().addEventListener(&quot;dblclick&quot;, eventHandler, false);
+        topLayer.addEventListener(&quot;mousedown&quot;, eventHandler, false);
+        topLayer.addEventListener(&quot;mousemove&quot;, eventHandler, false);
+        topLayer.addEventListener(&quot;mouseup&quot;, eventHandler, false);
+        topLayer.addEventListener(&quot;mouseout&quot;, eventHandler, false);
+        topLayer.addEventListener(&quot;mousewheel&quot;, eventHandler, false);
+        topLayer.addEventListener(&quot;DOMMouseScroll&quot;, eventHandler, false);
+        topLayer.addEventListener(&quot;dblclick&quot;, eventHandler, false);
         // touch listeners
-        topLayer.getCanvas().addEventListener(&quot;touchstart&quot;, eventHandler, false);
-        topLayer.getCanvas().addEventListener(&quot;touchmove&quot;, eventHandler, false);
-        topLayer.getCanvas().addEventListener(&quot;touchend&quot;, eventHandler, false);
+        topLayer.addEventListener(&quot;touchstart&quot;, eventHandler, false);
+        topLayer.addEventListener(&quot;touchmove&quot;, eventHandler, false);
+        topLayer.addEventListener(&quot;touchend&quot;, eventHandler, false);
         // keydown listener
         window.addEventListener(&quot;keydown&quot;, eventHandler, true);
         // image listeners

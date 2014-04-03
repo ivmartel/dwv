@@ -302,8 +302,8 @@ dwv.tool.Draw = function(app)
         {
             return;
         }
-        if( event._x !== points[0].getX() &amp;&amp;
-            event._y !== points[0].getY() )
+        if ( event._x !== points[0].getX() &amp;&amp;
+             event._y !== points[0].getY() )
         {
             // current point
             points.push(new dwv.math.Point2D(event._x, event._y));
@@ -321,19 +321,18 @@ dwv.tool.Draw = function(app)
      * @method mouseup
      * @param {Object} event The mouse up event.
      */
-    this.mouseup = function(/*event*/){
-        if (started)
+    this.mouseup = function (/*event*/){
+        if (started &amp;&amp; points.length &gt; 1 )
         {
-            // save command in undo stack
+            // create final command
             command = new dwv.tool.shapes[self.shapeName](points, app, self.style, true);
+            // execute it
             command.execute();
-            
+            // save it in undo stack
             app.getUndoStack().add(command);
-            // merge temporary layer
-            //app.getDrawLayer().merge(app.getTempLayer());
-            // set flag
-            started = false;
         }
+        // reset flag
+        started = false;
     };
     
     /**

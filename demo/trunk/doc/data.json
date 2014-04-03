@@ -6704,7 +6704,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 137,
+            "line": 136,
             "description": "Handle mouse out event.",
             "itemtype": "method",
             "name": "mouseout",
@@ -6721,7 +6721,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 146,
+            "line": 145,
             "description": "Handle touch start event.",
             "itemtype": "method",
             "name": "touchstart",
@@ -6738,7 +6738,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 155,
+            "line": 154,
             "description": "Handle touch move event.",
             "itemtype": "method",
             "name": "touchmove",
@@ -6755,7 +6755,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 164,
+            "line": 163,
             "description": "Handle touch end event.",
             "itemtype": "method",
             "name": "touchend",
@@ -6772,7 +6772,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 173,
+            "line": 172,
             "description": "Handle key down event.",
             "itemtype": "method",
             "name": "keydown",
@@ -6789,7 +6789,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 182,
+            "line": 181,
             "description": "Enable the tool.",
             "itemtype": "method",
             "name": "enable",
@@ -6806,7 +6806,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 193,
+            "line": 192,
             "description": "Help for this tool.",
             "itemtype": "method",
             "name": "getHelp",
@@ -6820,7 +6820,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 213,
+            "line": 212,
             "description": "Set the line color of the drawing.",
             "itemtype": "method",
             "name": "setLineColour",
@@ -6837,7 +6837,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 224,
+            "line": 223,
             "description": "Set the shape name of the drawing.",
             "itemtype": "method",
             "name": "setShapeName",
@@ -6854,7 +6854,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 239,
+            "line": 238,
             "description": "Check if the shape is in the shape list.",
             "itemtype": "method",
             "name": "hasShape",
@@ -6871,7 +6871,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 248,
+            "line": 247,
             "description": "Initialise the tool.",
             "itemtype": "method",
             "name": "init",
@@ -9226,7 +9226,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 133,
+            "line": 126,
             "description": "Get the undo stack.",
             "itemtype": "method",
             "name": "getUndoStack",
@@ -9240,7 +9240,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 140,
+            "line": 133,
             "description": "Initialise the HTML for the application.",
             "itemtype": "method",
             "name": "init",
@@ -9250,7 +9250,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 161,
+            "line": 152,
             "description": "Reset the application.",
             "itemtype": "method",
             "name": "reset",
@@ -9260,7 +9260,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 172,
+            "line": 163,
             "description": "Handle key down event.\n- CRTL-Z: undo\n- CRTL-Y: redo\nDefault behavior. Usually used in tools.",
             "itemtype": "method",
             "name": "handleKeyDown",
@@ -9277,7 +9277,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 192,
+            "line": 183,
             "description": "Handle change files event.",
             "itemtype": "method",
             "name": "onChangeFiles",
@@ -9294,7 +9294,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 202,
+            "line": 193,
             "description": "Load a list of files.",
             "itemtype": "method",
             "name": "loadFiles",
@@ -9311,7 +9311,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 224,
+            "line": 215,
             "description": "Handle change url event.",
             "itemtype": "method",
             "name": "onChangeURL",
@@ -9328,7 +9328,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 234,
+            "line": 225,
             "description": "Load a list of URLs.",
             "itemtype": "method",
             "name": "loadURL",
@@ -9345,7 +9345,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 256,
+            "line": 247,
             "description": "Generate the image data and draw it.",
             "itemtype": "method",
             "name": "generateAndDrawImage",
@@ -9355,7 +9355,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 270,
+            "line": 261,
             "description": "Resize the display window. To be called once the image is loaded.",
             "itemtype": "method",
             "name": "resize",
@@ -9365,7 +9365,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 290,
+            "line": 281,
             "description": "Toggle the display of the info layer.",
             "itemtype": "method",
             "name": "toggleInfoLayerDisplay",
@@ -9375,7 +9375,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 307,
+            "line": 298,
             "description": "Init the Window/Level display",
             "class": "dwv.App",
             "module": "utils",
@@ -9383,7 +9383,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 323,
+            "line": 314,
             "description": "Add image listeners.",
             "itemtype": "method",
             "name": "addImageInfoListeners",
@@ -9395,7 +9395,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 338,
+            "line": 329,
             "description": "Remove image listeners.",
             "itemtype": "method",
             "name": "removeImageInfoListeners",
@@ -9407,7 +9407,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 353,
+            "line": 344,
             "description": "General-purpose event handler. This function just determines the mouse \nposition relative to the canvas element. It then passes it to the current tool.",
             "itemtype": "method",
             "name": "eventHandler",
@@ -9426,7 +9426,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 427,
+            "line": 418,
             "description": "Handle an error: display it to the user.",
             "itemtype": "method",
             "name": "handleError",
@@ -9445,7 +9445,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 448,
+            "line": 439,
             "description": "Create the application layers.",
             "itemtype": "method",
             "name": "createLayers",
@@ -9469,7 +9469,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 485,
+            "line": 484,
             "description": "Create the DICOM tags table. To be called once the DICOM has been parsed.",
             "itemtype": "method",
             "name": "createTagsTable",
@@ -9488,7 +9488,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 518,
+            "line": 517,
             "description": "Post load application initialisation. To be called once the DICOM has been parsed.",
             "itemtype": "method",
             "name": "postLoadInit",
@@ -9577,7 +9577,7 @@
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/tools/draw.js:193"
+            "line": " src/tools/draw.js:192"
         },
         {
             "message": "replacing incorrect tag: returns with return",
@@ -9629,7 +9629,7 @@
         },
         {
             "message": "Missing item type\nInit the Window/Level display",
-            "line": " src/application.js:307"
+            "line": " src/application.js:298"
         }
     ]
 }
