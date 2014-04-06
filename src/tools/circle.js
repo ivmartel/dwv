@@ -128,10 +128,10 @@ dwv.tool.DrawCircleCommand = function(points, app, style, isFinal)
             app.getKineticLayer().draw();
             document.body.style.cursor = 'default';
         });
-        kcircle2.on('click', function() {
+        /*kcircle2.on('click', function() {
             //app.getToolBox().getSelectedTool().
-            console.log('click...');
-        });
+            console.log('click kcircle2...');
+        });*/
 
         // remove temporary shapes from the layer
         var klayer = app.getKineticLayer();
@@ -139,9 +139,14 @@ dwv.tool.DrawCircleCommand = function(points, app, style, isFinal)
         shapes.each( function(shape) {
             shape.remove(); 
         });
-        // add the new one
-        app.getKineticLayer().add(kcircle);
-        app.getKineticLayer().add(kcircle2);
+        
+        // create group
+        var group = new Kinetic.Group();
+        group.add(kcircle);
+        //group.add(kcircle2);
+        
+        // add the group to the layer
+        app.getKineticLayer().add(group);
         app.getKineticLayer().draw();
     };
 }; // DrawCircleCommand class

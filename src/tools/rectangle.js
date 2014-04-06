@@ -5,6 +5,8 @@
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
 
+var Kinetic = Kinetic || {};
+
 /**
  * Draw rectangle command.
  * @class DrawRectangleCommand
@@ -14,7 +16,7 @@ dwv.tool = dwv.tool || {};
  * @param {Object} app The application to draw the line on.
  * @param {Style} style The drawing style.
  */
-dwv.tool.DrawRectangleCommand = function(points, app, style)
+dwv.tool.DrawRectangleCommand = function(points, app, style, isFinal)
 {
     /**
      * Rectangle object.
@@ -37,7 +39,7 @@ dwv.tool.DrawRectangleCommand = function(points, app, style)
      * @private
      * @type Object
      */
-    var context = app.getTempLayer().getContext();
+    //var context = app.getTempLayer().getContext();
     
     /**
      * Command name.
@@ -66,7 +68,7 @@ dwv.tool.DrawRectangleCommand = function(points, app, style)
     this.execute = function()
     {
         // style
-        context.fillStyle = lineColor;
+        /*context.fillStyle = lineColor;
         context.strokeStyle = lineColor;
         // path
         context.beginPath();
@@ -82,6 +84,29 @@ dwv.tool.DrawRectangleCommand = function(points, app, style)
         context.font = style.getFontStr();
         context.fillText( Math.round(surf) + "mm2",
             rectangle.getEnd().getX() + style.getFontSize(),
-            rectangle.getEnd().getY() + style.getFontSize());
+            rectangle.getEnd().getY() + style.getFontSize());*/
+        
+        var name = isFinal ? "final" : "temp";
+        var krect = new Kinetic.Rect({
+            x: rectangle.getBegin().getX(),
+            y: rectangle.getBegin().getY(),
+            width: rectangle.getWidth(),
+            height: rectangle.getHeight(),
+            stroke: lineColor,
+            strokeWidth: 2,
+            name: name
+        });
+        // remove temporary shapes from the layer
+        var klayer = app.getKineticLayer();
+        var shapes = klayer.find('.temp');
+        shapes.each( function(shape) {
+            shape.remove(); 
+        });
+        // create group
+        var group = new Kinetic.Group();
+        group.add(krect);
+        // add the group to the layer
+        app.getKineticLayer().add(group);
+        app.getKineticLayer().draw();
     }; 
 }; // DrawRectangleCommand class
