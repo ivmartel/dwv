@@ -1298,7 +1298,7 @@
             "module": "tool",
             "namespace": "dwv.tool",
             "file": "src/tools/draw.js",
-            "line": 13,
+            "line": 229,
             "description": "Drawing tool.",
             "is_constructor": 1,
             "params": [
@@ -1513,7 +1513,7 @@
             "module": "tool",
             "namespace": "dwv.tool",
             "file": "src/tools/rectangle.js",
-            "line": 8,
+            "line": 10,
             "description": "Draw rectangle command.",
             "is_constructor": 1,
             "params": [
@@ -6583,7 +6583,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 22,
+            "line": 238,
             "description": "Closure to self: to be used by event handlers.",
             "itemtype": "property",
             "name": "self",
@@ -6596,7 +6596,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 29,
+            "line": 245,
             "description": "Interaction start flag.",
             "itemtype": "property",
             "name": "started",
@@ -6607,7 +6607,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 36,
+            "line": 252,
             "description": "Draw command.",
             "itemtype": "property",
             "name": "command",
@@ -6620,7 +6620,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 43,
+            "line": 259,
             "description": "Drawing style.",
             "itemtype": "property",
             "name": "style",
@@ -6631,7 +6631,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 49,
+            "line": 265,
             "description": "Shape name.",
             "itemtype": "property",
             "name": "shapeName",
@@ -6642,7 +6642,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 55,
+            "line": 271,
             "description": "List of points",
             "itemtype": "property",
             "name": "points",
@@ -6653,7 +6653,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 62,
+            "line": 280,
             "description": "Handle mouse down event.",
             "itemtype": "method",
             "name": "mousedown",
@@ -6670,7 +6670,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 93,
+            "line": 317,
             "description": "Handle mouse move event.",
             "itemtype": "method",
             "name": "mousemove",
@@ -6687,7 +6687,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 117,
+            "line": 341,
             "description": "Handle mouse up event.",
             "itemtype": "method",
             "name": "mouseup",
@@ -6704,7 +6704,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 136,
+            "line": 360,
             "description": "Handle mouse out event.",
             "itemtype": "method",
             "name": "mouseout",
@@ -6721,7 +6721,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 145,
+            "line": 369,
             "description": "Handle touch start event.",
             "itemtype": "method",
             "name": "touchstart",
@@ -6738,7 +6738,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 154,
+            "line": 378,
             "description": "Handle touch move event.",
             "itemtype": "method",
             "name": "touchmove",
@@ -6755,7 +6755,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 163,
+            "line": 387,
             "description": "Handle touch end event.",
             "itemtype": "method",
             "name": "touchend",
@@ -6772,7 +6772,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 172,
+            "line": 396,
             "description": "Handle key down event.",
             "itemtype": "method",
             "name": "keydown",
@@ -6789,7 +6789,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 181,
+            "line": 405,
             "description": "Enable the tool.",
             "itemtype": "method",
             "name": "enable",
@@ -6806,7 +6806,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 192,
+            "line": 416,
             "description": "Help for this tool.",
             "itemtype": "method",
             "name": "getHelp",
@@ -6820,7 +6820,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 212,
+            "line": 436,
             "description": "Set the line color of the drawing.",
             "itemtype": "method",
             "name": "setLineColour",
@@ -6837,7 +6837,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 223,
+            "line": 447,
             "description": "Set the shape name of the drawing.",
             "itemtype": "method",
             "name": "setShapeName",
@@ -6854,7 +6854,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 238,
+            "line": 462,
             "description": "Check if the shape is in the shape list.",
             "itemtype": "method",
             "name": "hasShape",
@@ -6871,7 +6871,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 247,
+            "line": 471,
             "description": "Initialise the tool.",
             "itemtype": "method",
             "name": "init",
@@ -7786,7 +7786,7 @@
         },
         {
             "file": "src/tools/rectangle.js",
-            "line": 19,
+            "line": 21,
             "description": "Rectangle object.",
             "itemtype": "property",
             "name": "rectangle",
@@ -7799,7 +7799,7 @@
         },
         {
             "file": "src/tools/rectangle.js",
-            "line": 27,
+            "line": 29,
             "description": "Line color.",
             "itemtype": "property",
             "name": "lineColor",
@@ -7812,7 +7812,7 @@
         },
         {
             "file": "src/tools/rectangle.js",
-            "line": 34,
+            "line": 36,
             "description": "HTML context.",
             "itemtype": "property",
             "name": "context",
@@ -7825,7 +7825,7 @@
         },
         {
             "file": "src/tools/rectangle.js",
-            "line": 42,
+            "line": 44,
             "description": "Command name.",
             "itemtype": "property",
             "name": "name",
@@ -7838,7 +7838,7 @@
         },
         {
             "file": "src/tools/rectangle.js",
-            "line": 49,
+            "line": 51,
             "description": "Get the command name.",
             "itemtype": "method",
             "name": "getName",
@@ -7852,7 +7852,7 @@
         },
         {
             "file": "src/tools/rectangle.js",
-            "line": 55,
+            "line": 57,
             "description": "Set the command name.",
             "itemtype": "method",
             "name": "setName",
@@ -7869,7 +7869,7 @@
         },
         {
             "file": "src/tools/rectangle.js",
-            "line": 62,
+            "line": 64,
             "description": "Execute the command.",
             "itemtype": "method",
             "name": "execute",
@@ -9577,7 +9577,7 @@
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/tools/draw.js:192"
+            "line": " src/tools/draw.js:416"
         },
         {
             "message": "replacing incorrect tag: returns with return",

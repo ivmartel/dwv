@@ -207,6 +207,222 @@
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
 
+var Kinetic = Kinetic || {};
+
+function updateLine(line, activeAnchor) {
+    var group = activeAnchor.getParent();
+    
+    var begin = group.find(&#x27;#begin&#x27;)[0];
+    var end = group.find(&#x27;#end&#x27;)[0];
+    
+    var anchorX = activeAnchor.x();
+    var anchorY = activeAnchor.y();
+    
+    // update anchor positions
+    switch (activeAnchor.id()) {
+    case &#x27;begin&#x27;:
+        begin.x( anchorX );
+        begin.y( anchorY );
+        break;
+    case &#x27;end&#x27;:
+        end.x( anchorX );
+        end.y( anchorY );
+        break;
+    }
+    
+    //line.setPosition(begin.getPosition());
+    line.points([begin.x(), begin.y(), end.x(), end.y()]);
+}
+
+function updateRect(rect, activeAnchor) {
+    var group = activeAnchor.getParent();
+
+    var topLeft = group.find(&#x27;#topLeft&#x27;)[0];
+    var topRight = group.find(&#x27;#topRight&#x27;)[0];
+    var bottomRight = group.find(&#x27;#bottomRight&#x27;)[0];
+    var bottomLeft = group.find(&#x27;#bottomLeft&#x27;)[0];
+
+    var anchorX = activeAnchor.x();
+    var anchorY = activeAnchor.y();
+
+    // update anchor positions
+    switch (activeAnchor.id()) {
+    case &#x27;topLeft&#x27;:
+        topRight.y(anchorY);
+        bottomLeft.x(anchorX);
+        break;
+    case &#x27;topRight&#x27;:
+        topLeft.y(anchorY);
+        bottomRight.x(anchorX);
+        break;
+    case &#x27;bottomRight&#x27;:
+        bottomLeft.y(anchorY);
+        topRight.x(anchorX); 
+        break;
+    case &#x27;bottomLeft&#x27;:
+        bottomRight.y(anchorY);
+        topLeft.x(anchorX); 
+        break;
+    }
+
+    rect.setPosition(topLeft.getPosition());
+
+    var width = Math.abs( topRight.x() - topLeft.x() );
+    var height = Math.abs( bottomLeft.y() - topLeft.y() );
+    if ( width &amp;&amp; height ) {
+        rect.setSize({width:width, height: height});
+    }
+}
+
+function updateCircle(circle, activeAnchor) {
+    var group = activeAnchor.getParent();
+
+    var topLeft = group.find(&#x27;#topLeft&#x27;)[0];
+    var topRight = group.find(&#x27;#topRight&#x27;)[0];
+    var bottomRight = group.find(&#x27;#bottomRight&#x27;)[0];
+    var bottomLeft = group.find(&#x27;#bottomLeft&#x27;)[0];
+
+    var anchorX = activeAnchor.x();
+    var anchorY = activeAnchor.y();
+
+    // update anchor positions
+    switch (activeAnchor.id()) {
+    case &#x27;topLeft&#x27;:
+        topRight.y(anchorY);
+        bottomLeft.x(anchorX);
+        break;
+    case &#x27;topRight&#x27;:
+        topLeft.y(anchorY);
+        bottomRight.x(anchorX);
+        break;
+    case &#x27;bottomRight&#x27;:
+        bottomLeft.y(anchorY);
+        topRight.x(anchorX); 
+        break;
+    case &#x27;bottomLeft&#x27;:
+        bottomRight.y(anchorY);
+        topLeft.x(anchorX); 
+        break;
+    }
+
+    var radius = Math.abs( topRight.x() - topLeft.x() ) / 2;
+    circle.radius( radius );
+    //circle.x( topLeft.x() + radius );
+    //circle.y( topLeft.y() + radius );
+}
+
+dwv.tool.ShapeEditor = function () {
+    var shape = null;
+    var isActive = false;
+    this.setShape = function ( inshape ) {
+        shape = inshape;
+        // clear previous controls
+        var anchors = shape.getLayer().find(&#x27;.anchor&#x27;);
+        anchors.each( function(anchor) {
+            anchor.remove();
+        });
+        // add new controls
+        createControls( shape );
+    };
+    this.isActive = function() {
+        return isActive;
+    };
+    this.enable = function () {
+        isActive = true;
+        var anchors = shape.getLayer().find(&#x27;.anchor&#x27;);
+        anchors.each( function(anchor) {
+            anchor.visible(true);
+        });
+        shape.getLayer().draw();
+    };
+    this.disable = function () {
+        isActive = false;
+        var anchors = shape.getLayer().find(&#x27;.anchor&#x27;);
+        anchors.each( function(anchor) {
+            anchor.visible(false);
+        });
+        shape.getLayer().draw();
+    };
+    function createControls( inshape ) {
+        // get shape group
+        var group = inshape.getParent();
+        // add spape specific anchors to the shape group
+        if ( inshape instanceof Kinetic.Line ) {
+            var points = inshape.points();
+            var lineBegin = points[0];
+            var lineEnd = points[1];
+            addAnchor(group, lineBegin.x, lineBegin.y, &#x27;begin&#x27;, updateLine);
+            addAnchor(group, lineEnd.x, lineEnd.y, &#x27;end&#x27;, updateLine);
+        }
+        else if( inshape  instanceof Kinetic.Rect ) {
+            var rectX = inshape.x();
+            var rectY = inshape.y();
+            var rectWidth = inshape.width();
+            var rectHeight = inshape.height();
+            addAnchor(group, rectX, rectY, &#x27;topLeft&#x27;, updateRect);
+            addAnchor(group, rectX+rectWidth, rectY, &#x27;topRight&#x27;, updateRect);
+            addAnchor(group, rectX+rectWidth, rectY+rectHeight, &#x27;bottomRight&#x27;, updateRect);
+            addAnchor(group, rectX, rectY+rectHeight, &#x27;bottomLeft&#x27;, updateRect);
+        }
+        else if( inshape  instanceof Kinetic.Circle ) {
+            var circleX = inshape.x();
+            var circleY = inshape.y();
+            var radius = inshape.radius();
+            addAnchor(group, circleX-radius, circleY-radius, &#x27;topLeft&#x27;, updateCircle);
+            addAnchor(group, circleX+radius, circleY-radius, &#x27;topRight&#x27;, updateCircle);
+            addAnchor(group, circleX+radius, circleY+radius, &#x27;bottomRight&#x27;, updateCircle);
+            addAnchor(group, circleX-radius, circleY+radius, &#x27;bottomLeft&#x27;, updateCircle);
+        }
+        // add group to layer
+        inshape.getLayer().add( group );
+        // draw layer
+        inshape.getLayer().draw();
+    }
+    function addAnchor(group, x, y, id, updateMethod) {
+        // anchor shape
+        var anchor = new Kinetic.Circle({
+            x: x,
+            y: y,
+            stroke: &#x27;#666&#x27;,
+            fill: &#x27;#ddd&#x27;,
+            strokeWidth: 2,
+            radius: 6,
+            name: &#x27;anchor&#x27;,
+            id: id,
+            dragOnTop: false,
+            draggable: true,
+            visible: false
+        });
+
+        anchor.on(&#x27;dragmove&#x27;, function() {
+            updateMethod(shape, this);
+            this.getLayer().draw();
+        });
+        anchor.on(&#x27;mousedown touchstart&#x27;, function() {
+            group.setDraggable(true);
+            this.moveToTop();
+        });
+        anchor.on(&#x27;dragend&#x27;, function() {
+            group.setDraggable(false);
+            this.getLayer().draw();
+        });
+        // add hover styling
+        anchor.on(&#x27;mouseover&#x27;, function() {
+            document.body.style.cursor = &#x27;pointer&#x27;;
+            this.setStrokeWidth(4);
+            this.getLayer().draw();
+            //console.log(id);
+        });
+        anchor.on(&#x27;mouseout&#x27;, function() {
+            document.body.style.cursor = &#x27;default&#x27;;
+            this.strokeWidth(2);
+            this.getLayer().draw();
+        });
+
+        group.add(anchor);
+    }
+};
+
 // List of colors
 dwv.tool.colors = [
     &quot;Yellow&quot;, &quot;Red&quot;, &quot;White&quot;, &quot;Green&quot;, &quot;Blue&quot;, &quot;Lime&quot;, &quot;Fuchsia&quot;, &quot;Black&quot;
@@ -260,6 +476,8 @@ dwv.tool.Draw = function(app)
      * @type Array
      */
     var points = [];
+    
+    var shapeEditor = new dwv.tool.ShapeEditor();
 
     /**
      * Handle mouse down event.
@@ -267,28 +485,34 @@ dwv.tool.Draw = function(app)
      * @param {Object} event The mouse down event.
      */
     this.mousedown = function(event){
-        var x = event._x;
-        var y = event._y;
+        
         var stage = app.getKineticStage();
-        var shape = stage.getIntersection( {x: x, y: y} );
-        if( shape ) {
-            if( shape.draggable() ) {
-                shape.draggable(false);
-                shape.fill(&#x27;yellow&#x27;);
-                app.getKineticLayer().draw();
+        var shape = stage.getIntersection({
+            x: event._x, 
+            y: event._y
+        });
+        
+        if ( shape ) {
+            console.log(&quot;got shape&quot;);
+            if ( shapeEditor.isActive() ) {
+                shapeEditor.disable();
             }
-            else {
-                shape.draggable(true);
-                shape.fill(&#x27;red&#x27;);
-                app.getKineticLayer().draw();
-            }
+            shapeEditor.setShape(shape);
+            shapeEditor.enable();
         }
         else {
-            started = true;
-            // clear array
-            points = [];
-            // store point
-            points.push(new dwv.math.Point2D(event._x, event._y));
+            console.log(&quot;no shape&quot;);
+            if ( shapeEditor.isActive() ) {
+                //return;
+                shapeEditor.disable();
+            }
+            else {
+                started = true;
+                // clear array
+                points = [];
+                // store point
+                points.push(new dwv.math.Point2D(event._x, event._y));
+            }
         }
     };
 
