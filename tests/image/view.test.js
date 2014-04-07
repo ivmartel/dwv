@@ -15,6 +15,7 @@ test("Test listeners.", function() {
         buffer0[i] = i;
     }
     var image0 = new dwv.image.Image(imgSize0, imgSpacing0, buffer0);
+    image0.setMeta( { BitsStored: 8 } );
     // create a view
     var view0 = new dwv.image.View(image0);
     
@@ -47,6 +48,7 @@ test("Test generate data.", function() {
         buffer0[i] = i;
     }
     var image0 = new dwv.image.Image(imgSize0, imgSpacing0, buffer0);
+    image0.setMeta( { BitsStored: 8 } );
     // create a view
     var view0 = new dwv.image.View(image0);
     // create the image data
