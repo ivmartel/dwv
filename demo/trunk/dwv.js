@@ -1,8 +1,6 @@
 // Main DWV namespace.
 var dwv = dwv || {};
-
-var Kinetic = Kinetic || {};
-
+ 
 /**
  * Main application class.
  * @class App
@@ -30,9 +28,6 @@ dwv.App = function()
     var drawLayer = null;
     // Temporary layer
     var tempLayer = null;
-    // Kinetic layer
-    var kineticLayer = null;
-    var kineticStage = null;
     
     // flag to know if the info layer is listening on the image.
     var isInfoLayerListening = false;
@@ -115,13 +110,6 @@ dwv.App = function()
      * @return {Object} The temporary layer.
      */
     this.getTempLayer = function() { return tempLayer; };
-    /** 
-     * Get the kinetic layer.
-     * @method getKineticLayer
-     * @return {Object} The temporary layer.
-     */
-    this.getKineticLayer = function() { return kineticLayer; };
-    this.getKineticStage = function() { return kineticStage; };
 
     /** 
      * Get the undo stack.
@@ -269,13 +257,6 @@ dwv.App = function()
         displayZoom = Math.min( (size.width / dataWidth), (size.height / dataHeight) );
         $("#layerContainer").width(parseInt(displayZoom*dataWidth, 10));
         $("#layerContainer").height(parseInt(displayZoom*dataHeight, 10));
-        
-        if( kineticStage ) {
-            kineticStage.setWidth(parseInt(displayZoom*dataWidth, 10));
-            kineticStage.setHeight(parseInt(displayZoom*dataHeight, 10));
-            kineticStage.scale( {x: displayZoom, y: displayZoom} );
-            kineticStage.draw();
-        }
     };
     
     /**
@@ -445,6 +426,9 @@ dwv.App = function()
      */
     function createLayers(dataWidth, dataHeight)
     {
+        // resize app
+        self.resize();
+        
         // image layer
         imageLayer = new dwv.html.Layer("imageLayer");
         imageLayer.initialise(dataWidth, dataHeight);
@@ -462,23 +446,6 @@ dwv.App = function()
             tempLayer.initialise(dataWidth, dataHeight);
             tempLayer.setStyleDisplay(true);
         }
-        // kinetic layer
-        if( document.getElementById("kineticDiv") !== null) {
-            // create stage
-            kineticStage = new Kinetic.Stage({
-                container: 'kineticDiv',
-                width: dataWidth,
-                height: dataHeight
-            });
-            // create layer
-            kineticLayer = new Kinetic.Layer();
-            // add the layer to the stage
-            kineticStage.add(kineticLayer);
-        }
-        
-        // resize app
-        self.resize();
-        
     }
     
     /**
@@ -544,24 +511,19 @@ dwv.App = function()
         imageData = self.getImageLayer().getContext().createImageData( 
                 dataWidth, dataHeight);
 
-        var kineticDiv = document.getElementById("kineticDiv");
-        
-        var topLayer = tempLayer === null ? imageLayer.getCanvas() : tempLayer.getCanvas();
-        if ( kineticLayer ) {
-            topLayer = kineticDiv;
-        }
+        var topLayer = tempLayer === null ? imageLayer : tempLayer;
         // mouse listeners
-        topLayer.addEventListener("mousedown", eventHandler, false);
-        topLayer.addEventListener("mousemove", eventHandler, false);
-        topLayer.addEventListener("mouseup", eventHandler, false);
-        topLayer.addEventListener("mouseout", eventHandler, false);
-        topLayer.addEventListener("mousewheel", eventHandler, false);
-        topLayer.addEventListener("DOMMouseScroll", eventHandler, false);
-        topLayer.addEventListener("dblclick", eventHandler, false);
+        topLayer.getCanvas().addEventListener("mousedown", eventHandler, false);
+        topLayer.getCanvas().addEventListener("mousemove", eventHandler, false);
+        topLayer.getCanvas().addEventListener("mouseup", eventHandler, false);
+        topLayer.getCanvas().addEventListener("mouseout", eventHandler, false);
+        topLayer.getCanvas().addEventListener("mousewheel", eventHandler, false);
+        topLayer.getCanvas().addEventListener("DOMMouseScroll", eventHandler, false);
+        topLayer.getCanvas().addEventListener("dblclick", eventHandler, false);
         // touch listeners
-        topLayer.addEventListener("touchstart", eventHandler, false);
-        topLayer.addEventListener("touchmove", eventHandler, false);
-        topLayer.addEventListener("touchend", eventHandler, false);
+        topLayer.getCanvas().addEventListener("touchstart", eventHandler, false);
+        topLayer.getCanvas().addEventListener("touchmove", eventHandler, false);
+        topLayer.getCanvas().addEventListener("touchend", eventHandler, false);
         // keydown listener
         window.addEventListener("keydown", eventHandler, true);
         // image listeners
@@ -6630,28 +6592,22 @@ dwv.image.lut.Window = function(rescaleLut_, isSigned_)
         var dispval = 0;
         if( !dwv.browser.hasClampedArray() )
         {
-            var xMin = center - 0.5 - (width-1) / 2;
-            var xMax = center - 0.5 + (width-1) / 2;    
             var yMax = 255;
             var yMin = 0;
-            var value = 0;
             for(var j=0; j<size; ++j)
             {
                 // from the DICOM specification (https://www.dabsoft.ch/dicom/3/C.11.2.1.2/)
                 // y = ((x - (c - 0.5)) / (w-1) + 0.5) * (ymax - ymin )+ ymin
-                value = rescaleLut_.getValue(j);
-                if(value <= xMin)
-                {                            
-                    windowLut_[j] = yMin;                        
+                dispval = ((rescaleLut_.getValue(j) - center0 ) / width0 + 0.5) * 255;
+                dispval = parseInt(dispval, 10);
+                if ( dispval <= yMin ) {
+                    windowLut_[j] = yMin;
                 }
-                else if (value > xMax)
-                {
-                    windowLut_[j] = yMax;         
+                else if ( dispval > yMax ) {
+                    windowLut_[j] = yMax;
                 }
-                else
-                {                
-                    dispval = ((value - center0 ) / width0 + 0.5) * 255;
-                    windowLut_[j]= parseInt(dispval, 10);
+                else {
+                    windowLut_[j] = dispval;
                 }
             }
         }
@@ -8697,8 +8653,6 @@ dwv.math.Path.prototype.appenPath = function(other) {
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
 
-var Kinetic = Kinetic || {};
-
 /**
  * Draw circle command.
  * @class DrawCircleCommand
@@ -8708,7 +8662,7 @@ var Kinetic = Kinetic || {};
  * @param {Object} app The application to draw the circle on.
  * @param {Style} style The drawing style.
  */
-dwv.tool.DrawCircleCommand = function(points, app, style, isFinal)
+dwv.tool.DrawCircleCommand = function(points, app, style)
 {
     // calculate radius
     var a = Math.abs(points[0].getX() - points[points.length-1].getX());
@@ -8742,7 +8696,7 @@ dwv.tool.DrawCircleCommand = function(points, app, style, isFinal)
      * @private
      * @type Object
      */
-    //var context = app.getTempLayer().getContext();
+    var context = app.getTempLayer().getContext();
     
     /**
      * Command name.
@@ -8771,7 +8725,7 @@ dwv.tool.DrawCircleCommand = function(points, app, style, isFinal)
     this.execute = function()
     {
         // style
-        /*context.fillStyle = lineColor;
+        context.fillStyle = lineColor;
         context.strokeStyle = lineColor;
         // path
         context.beginPath();
@@ -8788,58 +8742,7 @@ dwv.tool.DrawCircleCommand = function(points, app, style, isFinal)
         context.font = style.getFontStr();
         context.fillText( Math.round(surf) + "mm2",
             circle.getCenter().getX() + style.getFontSize(),
-            circle.getCenter().getY() + style.getFontSize());*/
-        
-        var name = isFinal ? "final" : "temp";
-        var kcircle = new Kinetic.Circle({
-            x: circle.getCenter().getX(),
-            y: circle.getCenter().getY(),
-            radius: circle.getRadius(),
-            stroke: lineColor,
-            strokeWidth: 2,
-            name: name
-        });
-        var kcircle2 = new Kinetic.Circle({
-            x: circle.getCenter().getX(),
-            y: circle.getCenter().getY(),
-            radius: circle.getRadius(),
-            stroke: lineColor,
-            strokeWidth: 2,
-            name: name,
-            fill: lineColor,
-            opacity: 0.2
-        });
-
-        kcircle2.on('mouseover', function() {
-            this.opacity(0.5);
-            app.getKineticLayer().draw();
-            document.body.style.cursor = 'pointer';
-        });
-        kcircle2.on('mouseout', function() {
-            this.opacity(0.2);
-            app.getKineticLayer().draw();
-            document.body.style.cursor = 'default';
-        });
-        /*kcircle2.on('click', function() {
-            //app.getToolBox().getSelectedTool().
-            console.log('click kcircle2...');
-        });*/
-
-        // remove temporary shapes from the layer
-        var klayer = app.getKineticLayer();
-        var shapes = klayer.find('.temp');
-        shapes.each( function(shape) {
-            shape.remove(); 
-        });
-        
-        // create group
-        var group = new Kinetic.Group();
-        group.add(kcircle);
-        //group.add(kcircle2);
-        
-        // add the group to the layer
-        app.getKineticLayer().add(group);
-        app.getKineticLayer().draw();
+            circle.getCenter().getY() + style.getFontSize());
     };
 }; // DrawCircleCommand class
 ;/** 
@@ -8848,222 +8751,6 @@ dwv.tool.DrawCircleCommand = function(points, app, style, isFinal)
  */
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
-
-var Kinetic = Kinetic || {};
-
-function updateLine(line, activeAnchor) {
-    var group = activeAnchor.getParent();
-    
-    var begin = group.find('#begin')[0];
-    var end = group.find('#end')[0];
-    
-    var anchorX = activeAnchor.x();
-    var anchorY = activeAnchor.y();
-    
-    // update anchor positions
-    switch (activeAnchor.id()) {
-    case 'begin':
-        begin.x( anchorX );
-        begin.y( anchorY );
-        break;
-    case 'end':
-        end.x( anchorX );
-        end.y( anchorY );
-        break;
-    }
-    
-    //line.setPosition(begin.getPosition());
-    line.points([begin.x(), begin.y(), end.x(), end.y()]);
-}
-
-function updateRect(rect, activeAnchor) {
-    var group = activeAnchor.getParent();
-
-    var topLeft = group.find('#topLeft')[0];
-    var topRight = group.find('#topRight')[0];
-    var bottomRight = group.find('#bottomRight')[0];
-    var bottomLeft = group.find('#bottomLeft')[0];
-
-    var anchorX = activeAnchor.x();
-    var anchorY = activeAnchor.y();
-
-    // update anchor positions
-    switch (activeAnchor.id()) {
-    case 'topLeft':
-        topRight.y(anchorY);
-        bottomLeft.x(anchorX);
-        break;
-    case 'topRight':
-        topLeft.y(anchorY);
-        bottomRight.x(anchorX);
-        break;
-    case 'bottomRight':
-        bottomLeft.y(anchorY);
-        topRight.x(anchorX); 
-        break;
-    case 'bottomLeft':
-        bottomRight.y(anchorY);
-        topLeft.x(anchorX); 
-        break;
-    }
-
-    rect.setPosition(topLeft.getPosition());
-
-    var width = Math.abs( topRight.x() - topLeft.x() );
-    var height = Math.abs( bottomLeft.y() - topLeft.y() );
-    if ( width && height ) {
-        rect.setSize({width:width, height: height});
-    }
-}
-
-function updateCircle(circle, activeAnchor) {
-    var group = activeAnchor.getParent();
-
-    var topLeft = group.find('#topLeft')[0];
-    var topRight = group.find('#topRight')[0];
-    var bottomRight = group.find('#bottomRight')[0];
-    var bottomLeft = group.find('#bottomLeft')[0];
-
-    var anchorX = activeAnchor.x();
-    var anchorY = activeAnchor.y();
-
-    // update anchor positions
-    switch (activeAnchor.id()) {
-    case 'topLeft':
-        topRight.y(anchorY);
-        bottomLeft.x(anchorX);
-        break;
-    case 'topRight':
-        topLeft.y(anchorY);
-        bottomRight.x(anchorX);
-        break;
-    case 'bottomRight':
-        bottomLeft.y(anchorY);
-        topRight.x(anchorX); 
-        break;
-    case 'bottomLeft':
-        bottomRight.y(anchorY);
-        topLeft.x(anchorX); 
-        break;
-    }
-
-    var radius = Math.abs( topRight.x() - topLeft.x() ) / 2;
-    circle.radius( radius );
-    //circle.x( topLeft.x() + radius );
-    //circle.y( topLeft.y() + radius );
-}
-
-dwv.tool.ShapeEditor = function () {
-    var shape = null;
-    var isActive = false;
-    this.setShape = function ( inshape ) {
-        shape = inshape;
-        // clear previous controls
-        var anchors = shape.getLayer().find('.anchor');
-        anchors.each( function(anchor) {
-            anchor.remove();
-        });
-        // add new controls
-        createControls( shape );
-    };
-    this.isActive = function() {
-        return isActive;
-    };
-    this.enable = function () {
-        isActive = true;
-        var anchors = shape.getLayer().find('.anchor');
-        anchors.each( function(anchor) {
-            anchor.visible(true);
-        });
-        shape.getLayer().draw();
-    };
-    this.disable = function () {
-        isActive = false;
-        var anchors = shape.getLayer().find('.anchor');
-        anchors.each( function(anchor) {
-            anchor.visible(false);
-        });
-        shape.getLayer().draw();
-    };
-    function createControls( inshape ) {
-        // get shape group
-        var group = inshape.getParent();
-        // add spape specific anchors to the shape group
-        if ( inshape instanceof Kinetic.Line ) {
-            var points = inshape.points();
-            var lineBegin = points[0];
-            var lineEnd = points[1];
-            addAnchor(group, lineBegin.x, lineBegin.y, 'begin', updateLine);
-            addAnchor(group, lineEnd.x, lineEnd.y, 'end', updateLine);
-        }
-        else if( inshape  instanceof Kinetic.Rect ) {
-            var rectX = inshape.x();
-            var rectY = inshape.y();
-            var rectWidth = inshape.width();
-            var rectHeight = inshape.height();
-            addAnchor(group, rectX, rectY, 'topLeft', updateRect);
-            addAnchor(group, rectX+rectWidth, rectY, 'topRight', updateRect);
-            addAnchor(group, rectX+rectWidth, rectY+rectHeight, 'bottomRight', updateRect);
-            addAnchor(group, rectX, rectY+rectHeight, 'bottomLeft', updateRect);
-        }
-        else if( inshape  instanceof Kinetic.Circle ) {
-            var circleX = inshape.x();
-            var circleY = inshape.y();
-            var radius = inshape.radius();
-            addAnchor(group, circleX-radius, circleY-radius, 'topLeft', updateCircle);
-            addAnchor(group, circleX+radius, circleY-radius, 'topRight', updateCircle);
-            addAnchor(group, circleX+radius, circleY+radius, 'bottomRight', updateCircle);
-            addAnchor(group, circleX-radius, circleY+radius, 'bottomLeft', updateCircle);
-        }
-        // add group to layer
-        inshape.getLayer().add( group );
-        // draw layer
-        inshape.getLayer().draw();
-    }
-    function addAnchor(group, x, y, id, updateMethod) {
-        // anchor shape
-        var anchor = new Kinetic.Circle({
-            x: x,
-            y: y,
-            stroke: '#666',
-            fill: '#ddd',
-            strokeWidth: 2,
-            radius: 6,
-            name: 'anchor',
-            id: id,
-            dragOnTop: false,
-            draggable: true,
-            visible: false
-        });
-
-        anchor.on('dragmove', function() {
-            updateMethod(shape, this);
-            this.getLayer().draw();
-        });
-        anchor.on('mousedown touchstart', function() {
-            group.setDraggable(true);
-            this.moveToTop();
-        });
-        anchor.on('dragend', function() {
-            group.setDraggable(false);
-            this.getLayer().draw();
-        });
-        // add hover styling
-        anchor.on('mouseover', function() {
-            document.body.style.cursor = 'pointer';
-            this.setStrokeWidth(4);
-            this.getLayer().draw();
-            //console.log(id);
-        });
-        anchor.on('mouseout', function() {
-            document.body.style.cursor = 'default';
-            this.strokeWidth(2);
-            this.getLayer().draw();
-        });
-
-        group.add(anchor);
-    }
-};
 
 // List of colors
 dwv.tool.colors = [
@@ -9118,8 +8805,6 @@ dwv.tool.Draw = function(app)
      * @type Array
      */
     var points = [];
-    
-    var shapeEditor = new dwv.tool.ShapeEditor();
 
     /**
      * Handle mouse down event.
@@ -9127,35 +8812,11 @@ dwv.tool.Draw = function(app)
      * @param {Object} event The mouse down event.
      */
     this.mousedown = function(event){
-        
-        var stage = app.getKineticStage();
-        var shape = stage.getIntersection({
-            x: event._x, 
-            y: event._y
-        });
-        
-        if ( shape ) {
-            console.log("got shape");
-            if ( shapeEditor.isActive() ) {
-                shapeEditor.disable();
-            }
-            shapeEditor.setShape(shape);
-            shapeEditor.enable();
-        }
-        else {
-            console.log("no shape");
-            if ( shapeEditor.isActive() ) {
-                //return;
-                shapeEditor.disable();
-            }
-            else {
-                started = true;
-                // clear array
-                points = [];
-                // store point
-                points.push(new dwv.math.Point2D(event._x, event._y));
-            }
-        }
+        started = true;
+        // clear array
+        points = [];
+        // store point
+        points.push(new dwv.math.Point2D(event._x, event._y));
     };
 
     /**
@@ -9168,13 +8829,13 @@ dwv.tool.Draw = function(app)
         {
             return;
         }
-        if ( event._x !== points[0].getX() &&
-             event._y !== points[0].getY() )
+        if( event._x !== points[0].getX() &&
+            event._y !== points[0].getY() )
         {
             // current point
             points.push(new dwv.math.Point2D(event._x, event._y));
             // create draw command
-            command = new dwv.tool.shapes[self.shapeName](points, app, self.style, false);
+            command = new dwv.tool.shapes[self.shapeName](points, app, self.style);
             // clear the temporary layer
             app.getTempLayer().clear();
             // draw
@@ -9187,18 +8848,16 @@ dwv.tool.Draw = function(app)
      * @method mouseup
      * @param {Object} event The mouse up event.
      */
-    this.mouseup = function (/*event*/){
-        if (started && points.length > 1 )
+    this.mouseup = function(/*event*/){
+        if (started)
         {
-            // create final command
-            command = new dwv.tool.shapes[self.shapeName](points, app, self.style, true);
-            // execute it
-            command.execute();
-            // save it in undo stack
+            // save command in undo stack
             app.getUndoStack().add(command);
+            // merge temporary layer
+            app.getDrawLayer().merge(app.getTempLayer());
+            // set flag
+            started = false;
         }
-        // reset flag
-        started = false;
     };
     
     /**
@@ -10335,8 +9994,6 @@ dwv.tool.DrawLivewireCommand = function(livewire, app, style)
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
 
-var Kinetic = Kinetic || {};
-
 /**
  * Draw rectangle command.
  * @class DrawRectangleCommand
@@ -10346,7 +10003,7 @@ var Kinetic = Kinetic || {};
  * @param {Object} app The application to draw the line on.
  * @param {Style} style The drawing style.
  */
-dwv.tool.DrawRectangleCommand = function(points, app, style, isFinal)
+dwv.tool.DrawRectangleCommand = function(points, app, style)
 {
     /**
      * Rectangle object.
@@ -10369,7 +10026,7 @@ dwv.tool.DrawRectangleCommand = function(points, app, style, isFinal)
      * @private
      * @type Object
      */
-    //var context = app.getTempLayer().getContext();
+    var context = app.getTempLayer().getContext();
     
     /**
      * Command name.
@@ -10398,7 +10055,7 @@ dwv.tool.DrawRectangleCommand = function(points, app, style, isFinal)
     this.execute = function()
     {
         // style
-        /*context.fillStyle = lineColor;
+        context.fillStyle = lineColor;
         context.strokeStyle = lineColor;
         // path
         context.beginPath();
@@ -10414,30 +10071,7 @@ dwv.tool.DrawRectangleCommand = function(points, app, style, isFinal)
         context.font = style.getFontStr();
         context.fillText( Math.round(surf) + "mm2",
             rectangle.getEnd().getX() + style.getFontSize(),
-            rectangle.getEnd().getY() + style.getFontSize());*/
-        
-        var name = isFinal ? "final" : "temp";
-        var krect = new Kinetic.Rect({
-            x: rectangle.getBegin().getX(),
-            y: rectangle.getBegin().getY(),
-            width: rectangle.getWidth(),
-            height: rectangle.getHeight(),
-            stroke: lineColor,
-            strokeWidth: 2,
-            name: name
-        });
-        // remove temporary shapes from the layer
-        var klayer = app.getKineticLayer();
-        var shapes = klayer.find('.temp');
-        shapes.each( function(shape) {
-            shape.remove(); 
-        });
-        // create group
-        var group = new Kinetic.Group();
-        group.add(krect);
-        // add the group to the layer
-        app.getKineticLayer().add(group);
-        app.getKineticLayer().draw();
+            rectangle.getEnd().getY() + style.getFontSize());
     }; 
 }; // DrawRectangleCommand class
 ;/** 
