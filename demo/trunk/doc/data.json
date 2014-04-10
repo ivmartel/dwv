@@ -646,7 +646,7 @@
             },
             "tag": "module",
             "file": "src/application.js",
-            "line": 4,
+            "line": 6,
             "description": "Utility module."
         }
     },
@@ -1266,7 +1266,7 @@
             "module": "tool",
             "namespace": "dwv.tool",
             "file": "src/tools/circle.js",
-            "line": 8,
+            "line": 10,
             "description": "Draw circle command.",
             "is_constructor": 1,
             "params": [
@@ -1298,7 +1298,7 @@
             "module": "tool",
             "namespace": "dwv.tool",
             "file": "src/tools/draw.js",
-            "line": 13,
+            "line": 232,
             "description": "Drawing tool.",
             "is_constructor": 1,
             "params": [
@@ -1513,7 +1513,7 @@
             "module": "tool",
             "namespace": "dwv.tool",
             "file": "src/tools/rectangle.js",
-            "line": 8,
+            "line": 10,
             "description": "Draw rectangle command.",
             "is_constructor": 1,
             "params": [
@@ -1717,7 +1717,7 @@
             "module": "utils",
             "namespace": "dwv",
             "file": "src/application.js",
-            "line": 4,
+            "line": 6,
             "description": "Main application class.",
             "is_constructor": 1
         }
@@ -5251,7 +5251,7 @@
         },
         {
             "file": "src/image/luts.js",
-            "line": 191,
+            "line": 197,
             "description": "Get the length of the LUT array.",
             "itemtype": "method",
             "name": "getLength",
@@ -5265,7 +5265,7 @@
         },
         {
             "file": "src/image/luts.js",
-            "line": 198,
+            "line": 204,
             "description": "Get the value of the LUT at the given offset.",
             "itemtype": "method",
             "name": "getValue",
@@ -5279,7 +5279,7 @@
         },
         {
             "file": "src/image/luts.js",
-            "line": 210,
+            "line": 216,
             "description": "Lookup tables for image color display.",
             "class": "dwv.image.lut.Window",
             "module": "image",
@@ -6490,7 +6490,7 @@
         },
         {
             "file": "src/tools/circle.js",
-            "line": 30,
+            "line": 32,
             "description": "Circle object.",
             "itemtype": "property",
             "name": "circle",
@@ -6503,7 +6503,7 @@
         },
         {
             "file": "src/tools/circle.js",
-            "line": 38,
+            "line": 40,
             "description": "Line color.",
             "itemtype": "property",
             "name": "lineColor",
@@ -6516,7 +6516,7 @@
         },
         {
             "file": "src/tools/circle.js",
-            "line": 45,
+            "line": 47,
             "description": "HTML context.",
             "itemtype": "property",
             "name": "context",
@@ -6529,7 +6529,7 @@
         },
         {
             "file": "src/tools/circle.js",
-            "line": 53,
+            "line": 55,
             "description": "Command name.",
             "itemtype": "property",
             "name": "name",
@@ -6542,7 +6542,7 @@
         },
         {
             "file": "src/tools/circle.js",
-            "line": 60,
+            "line": 62,
             "description": "Get the command name.",
             "itemtype": "method",
             "name": "getName",
@@ -6556,7 +6556,7 @@
         },
         {
             "file": "src/tools/circle.js",
-            "line": 66,
+            "line": 68,
             "description": "Set the command name.",
             "itemtype": "method",
             "name": "setName",
@@ -6573,7 +6573,7 @@
         },
         {
             "file": "src/tools/circle.js",
-            "line": 73,
+            "line": 75,
             "description": "Execute the command.",
             "itemtype": "method",
             "name": "execute",
@@ -6583,7 +6583,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 22,
+            "line": 241,
             "description": "Closure to self: to be used by event handlers.",
             "itemtype": "property",
             "name": "self",
@@ -6596,7 +6596,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 29,
+            "line": 248,
             "description": "Interaction start flag.",
             "itemtype": "property",
             "name": "started",
@@ -6607,7 +6607,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 36,
+            "line": 255,
             "description": "Draw command.",
             "itemtype": "property",
             "name": "command",
@@ -6620,7 +6620,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 43,
+            "line": 262,
             "description": "Drawing style.",
             "itemtype": "property",
             "name": "style",
@@ -6631,7 +6631,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 49,
+            "line": 268,
             "description": "Shape name.",
             "itemtype": "property",
             "name": "shapeName",
@@ -6642,7 +6642,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 55,
+            "line": 274,
             "description": "List of points",
             "itemtype": "property",
             "name": "points",
@@ -6653,7 +6653,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 62,
+            "line": 283,
             "description": "Handle mouse down event.",
             "itemtype": "method",
             "name": "mousedown",
@@ -6670,7 +6670,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 75,
+            "line": 324,
             "description": "Handle mouse move event.",
             "itemtype": "method",
             "name": "mousemove",
@@ -6687,7 +6687,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 99,
+            "line": 348,
             "description": "Handle mouse up event.",
             "itemtype": "method",
             "name": "mouseup",
@@ -6704,7 +6704,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 116,
+            "line": 367,
             "description": "Handle mouse out event.",
             "itemtype": "method",
             "name": "mouseout",
@@ -6721,7 +6721,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 125,
+            "line": 376,
             "description": "Handle touch start event.",
             "itemtype": "method",
             "name": "touchstart",
@@ -6738,7 +6738,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 134,
+            "line": 385,
             "description": "Handle touch move event.",
             "itemtype": "method",
             "name": "touchmove",
@@ -6755,7 +6755,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 143,
+            "line": 394,
             "description": "Handle touch end event.",
             "itemtype": "method",
             "name": "touchend",
@@ -6772,7 +6772,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 152,
+            "line": 403,
             "description": "Handle key down event.",
             "itemtype": "method",
             "name": "keydown",
@@ -6789,7 +6789,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 161,
+            "line": 412,
             "description": "Enable the tool.",
             "itemtype": "method",
             "name": "enable",
@@ -6806,7 +6806,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 172,
+            "line": 423,
             "description": "Help for this tool.",
             "itemtype": "method",
             "name": "getHelp",
@@ -6820,7 +6820,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 192,
+            "line": 443,
             "description": "Set the line color of the drawing.",
             "itemtype": "method",
             "name": "setLineColour",
@@ -6837,7 +6837,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 203,
+            "line": 454,
             "description": "Set the shape name of the drawing.",
             "itemtype": "method",
             "name": "setShapeName",
@@ -6854,7 +6854,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 218,
+            "line": 469,
             "description": "Check if the shape is in the shape list.",
             "itemtype": "method",
             "name": "hasShape",
@@ -6871,7 +6871,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 227,
+            "line": 478,
             "description": "Initialise the tool.",
             "itemtype": "method",
             "name": "init",
@@ -7786,7 +7786,7 @@
         },
         {
             "file": "src/tools/rectangle.js",
-            "line": 19,
+            "line": 21,
             "description": "Rectangle object.",
             "itemtype": "property",
             "name": "rectangle",
@@ -7799,7 +7799,7 @@
         },
         {
             "file": "src/tools/rectangle.js",
-            "line": 27,
+            "line": 29,
             "description": "Line color.",
             "itemtype": "property",
             "name": "lineColor",
@@ -7812,7 +7812,7 @@
         },
         {
             "file": "src/tools/rectangle.js",
-            "line": 34,
+            "line": 36,
             "description": "HTML context.",
             "itemtype": "property",
             "name": "context",
@@ -7825,7 +7825,7 @@
         },
         {
             "file": "src/tools/rectangle.js",
-            "line": 42,
+            "line": 44,
             "description": "Command name.",
             "itemtype": "property",
             "name": "name",
@@ -7838,7 +7838,7 @@
         },
         {
             "file": "src/tools/rectangle.js",
-            "line": 49,
+            "line": 51,
             "description": "Get the command name.",
             "itemtype": "method",
             "name": "getName",
@@ -7852,7 +7852,7 @@
         },
         {
             "file": "src/tools/rectangle.js",
-            "line": 55,
+            "line": 57,
             "description": "Set the command name.",
             "itemtype": "method",
             "name": "setName",
@@ -7869,7 +7869,7 @@
         },
         {
             "file": "src/tools/rectangle.js",
-            "line": 62,
+            "line": 64,
             "description": "Execute the command.",
             "itemtype": "method",
             "name": "execute",
@@ -9073,7 +9073,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 40,
+            "line": 45,
             "description": "Get the version of the application.",
             "itemtype": "method",
             "name": "getVersion",
@@ -9087,7 +9087,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 47,
+            "line": 52,
             "description": "Get the image.",
             "itemtype": "method",
             "name": "getImage",
@@ -9101,7 +9101,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 53,
+            "line": 58,
             "description": "Get the view.",
             "itemtype": "method",
             "name": "getView",
@@ -9115,7 +9115,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 60,
+            "line": 65,
             "description": "Set the view.",
             "itemtype": "method",
             "name": "setImage",
@@ -9132,7 +9132,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 71,
+            "line": 76,
             "description": "Restore the original image.",
             "itemtype": "method",
             "name": "restoreOriginalImage",
@@ -9142,7 +9142,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 81,
+            "line": 86,
             "description": "Get the image data array.",
             "itemtype": "method",
             "name": "getImageData",
@@ -9156,7 +9156,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 88,
+            "line": 93,
             "description": "Get the tool box.",
             "itemtype": "method",
             "name": "getToolBox",
@@ -9170,7 +9170,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 95,
+            "line": 100,
             "description": "Get the image layer.",
             "itemtype": "method",
             "name": "getImageLayer",
@@ -9184,7 +9184,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 101,
+            "line": 106,
             "description": "Get the draw layer.",
             "itemtype": "method",
             "name": "getDrawLayer",
@@ -9198,7 +9198,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 107,
+            "line": 112,
             "description": "Get the temporary layer.",
             "itemtype": "method",
             "name": "getTempLayer",
@@ -9212,7 +9212,21 @@
         },
         {
             "file": "src/application.js",
-            "line": 114,
+            "line": 118,
+            "description": "Get the kinetic layer.",
+            "itemtype": "method",
+            "name": "getKineticLayer",
+            "return": {
+                "description": "The temporary layer.",
+                "type": "Object"
+            },
+            "class": "dwv.App",
+            "module": "utils",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/application.js",
+            "line": 126,
             "description": "Get the undo stack.",
             "itemtype": "method",
             "name": "getUndoStack",
@@ -9226,7 +9240,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 121,
+            "line": 133,
             "description": "Initialise the HTML for the application.",
             "itemtype": "method",
             "name": "init",
@@ -9236,7 +9250,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 140,
+            "line": 152,
             "description": "Reset the application.",
             "itemtype": "method",
             "name": "reset",
@@ -9246,7 +9260,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 151,
+            "line": 163,
             "description": "Handle key down event.\n- CRTL-Z: undo\n- CRTL-Y: redo\nDefault behavior. Usually used in tools.",
             "itemtype": "method",
             "name": "handleKeyDown",
@@ -9263,7 +9277,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 171,
+            "line": 183,
             "description": "Handle change files event.",
             "itemtype": "method",
             "name": "onChangeFiles",
@@ -9280,7 +9294,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 181,
+            "line": 193,
             "description": "Load a list of files.",
             "itemtype": "method",
             "name": "loadFiles",
@@ -9297,7 +9311,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 203,
+            "line": 215,
             "description": "Handle change url event.",
             "itemtype": "method",
             "name": "onChangeURL",
@@ -9314,7 +9328,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 213,
+            "line": 225,
             "description": "Load a list of URLs.",
             "itemtype": "method",
             "name": "loadURL",
@@ -9331,7 +9345,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 235,
+            "line": 247,
             "description": "Generate the image data and draw it.",
             "itemtype": "method",
             "name": "generateAndDrawImage",
@@ -9341,7 +9355,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 249,
+            "line": 261,
             "description": "Resize the display window. To be called once the image is loaded.",
             "itemtype": "method",
             "name": "resize",
@@ -9351,7 +9365,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 262,
+            "line": 281,
             "description": "Toggle the display of the info layer.",
             "itemtype": "method",
             "name": "toggleInfoLayerDisplay",
@@ -9361,7 +9375,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 279,
+            "line": 298,
             "description": "Init the Window/Level display",
             "class": "dwv.App",
             "module": "utils",
@@ -9369,7 +9383,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 295,
+            "line": 314,
             "description": "Add image listeners.",
             "itemtype": "method",
             "name": "addImageInfoListeners",
@@ -9381,7 +9395,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 310,
+            "line": 329,
             "description": "Remove image listeners.",
             "itemtype": "method",
             "name": "removeImageInfoListeners",
@@ -9393,7 +9407,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 325,
+            "line": 344,
             "description": "General-purpose event handler. This function just determines the mouse \nposition relative to the canvas element. It then passes it to the current tool.",
             "itemtype": "method",
             "name": "eventHandler",
@@ -9412,7 +9426,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 399,
+            "line": 420,
             "description": "Handle an error: display it to the user.",
             "itemtype": "method",
             "name": "handleError",
@@ -9431,7 +9445,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 420,
+            "line": 441,
             "description": "Create the application layers.",
             "itemtype": "method",
             "name": "createLayers",
@@ -9455,7 +9469,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 451,
+            "line": 486,
             "description": "Create the DICOM tags table. To be called once the DICOM has been parsed.",
             "itemtype": "method",
             "name": "createTagsTable",
@@ -9474,7 +9488,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 484,
+            "line": 519,
             "description": "Post load application initialisation. To be called once the DICOM has been parsed.",
             "itemtype": "method",
             "name": "postLoadInit",
@@ -9563,7 +9577,7 @@
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/tools/draw.js:172"
+            "line": " src/tools/draw.js:423"
         },
         {
             "message": "replacing incorrect tag: returns with return",
@@ -9599,7 +9613,7 @@
         },
         {
             "message": "Missing item type\nLookup tables for image color display.",
-            "line": " src/image/luts.js:210"
+            "line": " src/image/luts.js:216"
         },
         {
             "message": "Missing item type",
@@ -9615,7 +9629,7 @@
         },
         {
             "message": "Missing item type\nInit the Window/Level display",
-            "line": " src/application.js:279"
+            "line": " src/application.js:298"
         }
     ]
 }

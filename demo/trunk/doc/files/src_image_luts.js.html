@@ -357,22 +357,28 @@ dwv.image.lut.Window = function(rescaleLut_, isSigned_)
         var dispval = 0;
         if( !dwv.browser.hasClampedArray() )
         {
+            var xMin = center - 0.5 - (width-1) / 2;
+            var xMax = center - 0.5 + (width-1) / 2;    
             var yMax = 255;
             var yMin = 0;
+            var value = 0;
             for(var j=0; j&lt;size; ++j)
             {
                 // from the DICOM specification (https://www.dabsoft.ch/dicom/3/C.11.2.1.2/)
                 // y = ((x - (c - 0.5)) / (w-1) + 0.5) * (ymax - ymin )+ ymin
-                dispval = ((rescaleLut_.getValue(j) - center0 ) / width0 + 0.5) * 255;
-                dispval = parseInt(dispval, 10);
-                if ( dispval &lt;= yMin ) {
-                    windowLut_[j] = yMin;
+                value = rescaleLut_.getValue(j);
+                if(value &lt;= xMin)
+                {                            
+                    windowLut_[j] = yMin;                        
                 }
-                else if ( dispval &gt; yMax ) {
-                    windowLut_[j] = yMax;
+                else if (value &gt; xMax)
+                {
+                    windowLut_[j] = yMax;         
                 }
-                else {
-                    windowLut_[j] = dispval;
+                else
+                {                
+                    dispval = ((value - center0 ) / width0 + 0.5) * 255;
+                    windowLut_[j]= parseInt(dispval, 10);
                 }
             }
         }
