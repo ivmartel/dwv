@@ -392,8 +392,10 @@ dwv.App = function()
         {
             // layerX is for firefox
             event._x = event.offsetX === undefined ? event.layerX : event.offsetX;
+            event._xs = event._x;
             event._x = parseInt( (event._x / displayZoom), 10 );
             event._y = event.offsetY === undefined ? event.layerY : event.offsetY;
+            event._ys = event._y;
             event._y = parseInt( (event._y / displayZoom), 10 );
             // set handle event flag
             handled = true;

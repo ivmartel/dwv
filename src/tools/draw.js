@@ -116,30 +116,36 @@ dwv.tool.ShapeEditor = function () {
         shape = inshape;
         // clear previous controls
         var anchors = shape.getLayer().find('.anchor');
-        anchors.each( function(anchor) {
+        anchors.each( function (anchor) {
             anchor.remove();
         });
         // add new controls
         createControls( shape );
     };
-    this.isActive = function() {
+    this.getShape = function () { 
+        return shape;
+    };
+    this.isActive = function () {
         return isActive;
     };
     this.enable = function () {
         isActive = true;
         var anchors = shape.getLayer().find('.anchor');
-        anchors.each( function(anchor) {
+        anchors.each( function (anchor) {
             anchor.visible(true);
         });
+        shape.getParent().draggable(true);
         shape.getLayer().draw();
     };
     this.disable = function () {
         isActive = false;
         var anchors = shape.getLayer().find('.anchor');
-        anchors.each( function(anchor) {
+        anchors.each( function (anchor) {
             anchor.visible(false);
         });
+        shape.getParent().draggable(false);
         shape.getLayer().draw();
+        shape = null;
     };
     function createControls( inshape ) {
         // get shape group
@@ -152,7 +158,7 @@ dwv.tool.ShapeEditor = function () {
             addAnchor(group, lineBegin.x, lineBegin.y, 'begin', updateLine);
             addAnchor(group, lineEnd.x, lineEnd.y, 'end', updateLine);
         }
-        else if( inshape  instanceof Kinetic.Rect ) {
+        else if ( inshape instanceof Kinetic.Rect ) {
             var rectX = inshape.x();
             var rectY = inshape.y();
             var rectWidth = inshape.width();
@@ -162,7 +168,7 @@ dwv.tool.ShapeEditor = function () {
             addAnchor(group, rectX+rectWidth, rectY+rectHeight, 'bottomRight', updateRect);
             addAnchor(group, rectX, rectY+rectHeight, 'bottomLeft', updateRect);
         }
-        else if( inshape  instanceof Kinetic.Circle ) {
+        else if ( inshape instanceof Kinetic.Circle ) {
             var circleX = inshape.x();
             var circleY = inshape.y();
             var radius = inshape.radius();
@@ -192,26 +198,23 @@ dwv.tool.ShapeEditor = function () {
             visible: false
         });
 
-        anchor.on('dragmove', function() {
+        anchor.on('dragmove', function () {
             updateMethod(shape, this);
             this.getLayer().draw();
         });
-        anchor.on('mousedown touchstart', function() {
-            group.setDraggable(true);
+        anchor.on('mousedown touchstart', function () {
             this.moveToTop();
         });
-        anchor.on('dragend', function() {
-            group.setDraggable(false);
+        anchor.on('dragend', function () {
             this.getLayer().draw();
         });
         // add hover styling
-        anchor.on('mouseover', function() {
+        anchor.on('mouseover', function () {
             document.body.style.cursor = 'pointer';
             this.setStrokeWidth(4);
             this.getLayer().draw();
-            //console.log(id);
         });
-        anchor.on('mouseout', function() {
+        anchor.on('mouseout', function () {
             document.body.style.cursor = 'default';
             this.strokeWidth(2);
             this.getLayer().draw();
@@ -233,7 +236,7 @@ dwv.tool.colors = [
  * @constructor
  * @param {Object} app The associated application.
  */
-dwv.tool.Draw = function(app)
+dwv.tool.Draw = function (app)
 {
     /**
      * Closure to self: to be used by event handlers.
@@ -283,34 +286,38 @@ dwv.tool.Draw = function(app)
      * @param {Object} event The mouse down event.
      */
     this.mousedown = function(event){
-        
         var stage = app.getKineticStage();
         var shape = stage.getIntersection({
-            x: event._x, 
-            y: event._y
+            x: event._xs, 
+            y: event._ys
         });
         
         if ( shape ) {
-            console.log("got shape");
-            if ( shapeEditor.isActive() ) {
-                shapeEditor.disable();
+            console.log("got shape: "+shape.name());
+            var group = shape.getParent();
+            var draw = group.find(".final")[0];
+            
+            if( draw ) {
+                console.log("got draw: "+draw.name());
+                if ( draw !== shapeEditor.getShape() ) {
+                    if ( shapeEditor.isActive() ) {
+                        shapeEditor.disable();
+                    }
+                    shapeEditor.setShape(draw);
+                    shapeEditor.enable();
+                }
             }
-            shapeEditor.setShape(shape);
-            shapeEditor.enable();
         }
         else {
             console.log("no shape");
             if ( shapeEditor.isActive() ) {
-                //return;
                 shapeEditor.disable();
             }
-            else {
-                started = true;
-                // clear array
-                points = [];
-                // store point
-                points.push(new dwv.math.Point2D(event._x, event._y));
-            }
+            started = true;
+            // clear array
+            points = [];
+            // store point
+            points.push(new dwv.math.Point2D(event._x, event._y));
         }
     };
 
