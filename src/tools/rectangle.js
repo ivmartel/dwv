@@ -96,17 +96,68 @@ dwv.tool.DrawRectangleCommand = function(points, app, style, isFinal)
             strokeWidth: 2,
             name: name
         });
+        // add hover styling
+        krect.on('mouseover', function () {
+            document.body.style.cursor = 'pointer';
+            this.getLayer().draw();
+        });
+        krect.on('mouseout', function () {
+            document.body.style.cursor = 'default';
+            this.getLayer().draw();
+        });
         // remove temporary shapes from the layer
         var klayer = app.getKineticLayer();
-        var shapes = klayer.find('.temp');
-        shapes.each( function(shape) {
-            shape.remove(); 
+        var kshapes = klayer.find('.temp');
+        kshapes.each( function (kshape) {
+            kshape.remove(); 
         });
         // create group
-        var group = new Kinetic.Group();
-        group.add(krect);
+        var kgroup = new Kinetic.Group();
+        kgroup.add(krect);
         // add the group to the layer
-        app.getKineticLayer().add(group);
+        app.getKineticLayer().add(kgroup);
         app.getKineticLayer().draw();
     }; 
 }; // DrawRectangleCommand class
+
+dwv.tool.UpdateRect = function (rect, anchor)
+{
+    var group = anchor.getParent();
+
+    var topLeft = group.find('#topLeft')[0];
+    var topRight = group.find('#topRight')[0];
+    var bottomRight = group.find('#bottomRight')[0];
+    var bottomLeft = group.find('#bottomLeft')[0];
+
+    var anchorX = anchor.x();
+    var anchorY = anchor.y();
+
+    // update anchor positions
+    switch (anchor.id()) {
+    case 'topLeft':
+        topRight.y(anchorY);
+        bottomLeft.x(anchorX);
+        break;
+    case 'topRight':
+        topLeft.y(anchorY);
+        bottomRight.x(anchorX);
+        break;
+    case 'bottomRight':
+        bottomLeft.y(anchorY);
+        topRight.x(anchorX); 
+        break;
+    case 'bottomLeft':
+        bottomRight.y(anchorY);
+        topLeft.x(anchorX); 
+        break;
+    }
+    
+    // update position
+    rect.setPosition(topLeft.getPosition());
+    // update size
+    var width = topRight.x() - topLeft.x();
+    var height = bottomLeft.y() - topLeft.y();
+    if ( width && height ) {
+        rect.setSize({width:width, height: height});
+    }
+};

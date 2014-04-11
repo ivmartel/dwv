@@ -99,54 +99,77 @@ dwv.tool.DrawCircleCommand = function(points, app, style, isFinal)
             circle.getCenter().getY() + style.getFontSize());*/
         
         var name = isFinal ? "final" : "temp";
-        var kcircle = new Kinetic.Circle({
+        var kcircle = new Kinetic.Ellipse({
             x: circle.getCenter().getX(),
             y: circle.getCenter().getY(),
-            radius: circle.getRadius(),
+            radius: { x: circle.getRadius(), y: circle.getRadius() },
             stroke: lineColor,
             strokeWidth: 2,
             name: name
         });
-        var kcircle2 = new Kinetic.Circle({
-            x: circle.getCenter().getX(),
-            y: circle.getCenter().getY(),
-            radius: circle.getRadius(),
-            stroke: lineColor,
-            strokeWidth: 2,
-            name: name,
-            fill: lineColor,
-            opacity: 0.2
-        });
-
-        kcircle2.on('mouseover', function() {
-            this.opacity(0.5);
-            app.getKineticLayer().draw();
+        // add hover styling
+        kcircle.on('mouseover', function () {
             document.body.style.cursor = 'pointer';
+            this.getLayer().draw();
         });
-        kcircle2.on('mouseout', function() {
-            this.opacity(0.2);
-            app.getKineticLayer().draw();
+        kcircle.on('mouseout', function () {
             document.body.style.cursor = 'default';
+            this.getLayer().draw();
         });
-        /*kcircle2.on('click', function() {
-            //app.getToolBox().getSelectedTool().
-            console.log('click kcircle2...');
-        });*/
-
         // remove temporary shapes from the layer
         var klayer = app.getKineticLayer();
-        var shapes = klayer.find('.temp');
-        shapes.each( function(shape) {
-            shape.remove(); 
+        var kshapes = klayer.find('.temp');
+        kshapes.each( function (kshape) {
+            kshape.remove(); 
         });
-        
         // create group
-        var group = new Kinetic.Group();
-        group.add(kcircle);
-        //group.add(kcircle2);
-        
-        // add the group to the layer
-        app.getKineticLayer().add(group);
+        var kgroup = new Kinetic.Group();
+        kgroup.add(kcircle);
+       // add the group to the layer
+        app.getKineticLayer().add(kgroup);
         app.getKineticLayer().draw();
     };
 }; // DrawCircleCommand class
+
+dwv.tool.UpdateCircle = function (circle, anchor) {
+    var group = anchor.getParent();
+
+    var topLeft = group.find('#topLeft')[0];
+    var topRight = group.find('#topRight')[0];
+    var bottomRight = group.find('#bottomRight')[0];
+    var bottomLeft = group.find('#bottomLeft')[0];
+
+    var anchorX = anchor.x();
+    var anchorY = anchor.y();
+
+    // update anchor positions
+    switch (anchor.id()) {
+    case 'topLeft':
+        topRight.y(anchorY);
+        bottomLeft.x(anchorX);
+        break;
+    case 'topRight':
+        topLeft.y(anchorY);
+        bottomRight.x(anchorX);
+        break;
+    case 'bottomRight':
+        bottomLeft.y(anchorY);
+        topRight.x(anchorX); 
+        break;
+    case 'bottomLeft':
+        bottomRight.y(anchorY);
+        topLeft.x(anchorX); 
+        break;
+    }
+
+    // update position
+    var radiusX = ( topRight.x() - topLeft.x() ) / 2;
+    var radiusY = ( bottomRight.y() - topRight.y() ) / 2;
+    var center = { x: topLeft.x() + radiusX, y: topRight.y() + radiusY };
+    circle.setPosition( center );
+    // update radius
+    var radiusAbs = { x: Math.abs(radiusX), y: Math.abs(radiusY) };
+    if ( radiusAbs ) {
+        circle.radius( radiusAbs );
+    }
+};

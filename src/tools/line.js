@@ -5,6 +5,8 @@
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
 
+var Kinetic = Kinetic || {};
+
 /**
  * Draw line command.
  * @class DrawLineCommand
@@ -14,7 +16,7 @@ dwv.tool = dwv.tool || {};
  * @param {Object} app The application to draw the line on.
  * @param {Style} style The drawing style.
  */
-dwv.tool.DrawLineCommand = function(points, app, style)
+dwv.tool.DrawLineCommand = function(points, app, style, isFinal)
 {
     /**
      * Line object.
@@ -37,7 +39,7 @@ dwv.tool.DrawLineCommand = function(points, app, style)
      * @private
      * @type Object
      */
-    var context = app.getTempLayer().getContext();
+    //var context = app.getTempLayer().getContext();
     
     /**
      * Command name.
@@ -66,7 +68,7 @@ dwv.tool.DrawLineCommand = function(points, app, style)
     this.execute = function()
     {
         // style
-        context.fillStyle = lineColor;
+        /*context.fillStyle = lineColor;
         context.strokeStyle = lineColor;
         // path
         context.beginPath();
@@ -81,6 +83,62 @@ dwv.tool.DrawLineCommand = function(points, app, style)
         context.font = style.getFontStr();
         context.fillText( Math.round(length) + "mm",
             line.getEnd().getX() + style.getFontSize(),
-            line.getEnd().getY() + style.getFontSize());
+            line.getEnd().getY() + style.getFontSize());*/
+        
+        var name = isFinal ? "final" : "temp";
+        var kline = new Kinetic.Line({
+            points: [line.getBegin().getX(), line.getBegin().getY(), 
+                     line.getEnd().getX(), line.getEnd().getY() ],
+            stroke: lineColor,
+            strokeWidth: 2,
+            name: name
+        });
+        // add hover styling
+        kline.on('mouseover', function () {
+            document.body.style.cursor = 'pointer';
+            this.getLayer().draw();
+        });
+        kline.on('mouseout', function () {
+            document.body.style.cursor = 'default';
+            this.getLayer().draw();
+        });
+        // remove temporary shapes from the layer
+        var klayer = app.getKineticLayer();
+        var kshapes = klayer.find('.temp');
+        kshapes.each( function (kshape) {
+            kshape.remove(); 
+        });
+        // create group
+        var kgroup = new Kinetic.Group();
+        kgroup.add(kline);
+       // add the group to the layer
+        app.getKineticLayer().add(kgroup);
+        app.getKineticLayer().draw();
+
     }; 
 }; // DrawLineCommand class
+
+dwv.tool.UpdateLine = function (line, anchor)
+{
+    var group = anchor.getParent();
+    
+    var begin = group.find('#begin')[0];
+    var end = group.find('#end')[0];
+    
+    var anchorX = anchor.x();
+    var anchorY = anchor.y();
+    
+    // update anchor positions
+    switch (anchor.id()) {
+    case 'begin':
+        begin.x( anchorX );
+        begin.y( anchorY );
+        break;
+    case 'end':
+        end.x( anchorX );
+        end.y( anchorY );
+        break;
+    }
+    
+    line.points([begin.x(), begin.y(), end.x(), end.y()]);
+};

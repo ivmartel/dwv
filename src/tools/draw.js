@@ -7,108 +7,6 @@ dwv.tool = dwv.tool || {};
 
 var Kinetic = Kinetic || {};
 
-function updateLine(line, activeAnchor) {
-    var group = activeAnchor.getParent();
-    
-    var begin = group.find('#begin')[0];
-    var end = group.find('#end')[0];
-    
-    var anchorX = activeAnchor.x();
-    var anchorY = activeAnchor.y();
-    
-    // update anchor positions
-    switch (activeAnchor.id()) {
-    case 'begin':
-        begin.x( anchorX );
-        begin.y( anchorY );
-        break;
-    case 'end':
-        end.x( anchorX );
-        end.y( anchorY );
-        break;
-    }
-    
-    //line.setPosition(begin.getPosition());
-    line.points([begin.x(), begin.y(), end.x(), end.y()]);
-}
-
-function updateRect(rect, activeAnchor) {
-    var group = activeAnchor.getParent();
-
-    var topLeft = group.find('#topLeft')[0];
-    var topRight = group.find('#topRight')[0];
-    var bottomRight = group.find('#bottomRight')[0];
-    var bottomLeft = group.find('#bottomLeft')[0];
-
-    var anchorX = activeAnchor.x();
-    var anchorY = activeAnchor.y();
-
-    // update anchor positions
-    switch (activeAnchor.id()) {
-    case 'topLeft':
-        topRight.y(anchorY);
-        bottomLeft.x(anchorX);
-        break;
-    case 'topRight':
-        topLeft.y(anchorY);
-        bottomRight.x(anchorX);
-        break;
-    case 'bottomRight':
-        bottomLeft.y(anchorY);
-        topRight.x(anchorX); 
-        break;
-    case 'bottomLeft':
-        bottomRight.y(anchorY);
-        topLeft.x(anchorX); 
-        break;
-    }
-
-    rect.setPosition(topLeft.getPosition());
-
-    var width = Math.abs( topRight.x() - topLeft.x() );
-    var height = Math.abs( bottomLeft.y() - topLeft.y() );
-    if ( width && height ) {
-        rect.setSize({width:width, height: height});
-    }
-}
-
-function updateCircle(circle, activeAnchor) {
-    var group = activeAnchor.getParent();
-
-    var topLeft = group.find('#topLeft')[0];
-    var topRight = group.find('#topRight')[0];
-    var bottomRight = group.find('#bottomRight')[0];
-    var bottomLeft = group.find('#bottomLeft')[0];
-
-    var anchorX = activeAnchor.x();
-    var anchorY = activeAnchor.y();
-
-    // update anchor positions
-    switch (activeAnchor.id()) {
-    case 'topLeft':
-        topRight.y(anchorY);
-        bottomLeft.x(anchorX);
-        break;
-    case 'topRight':
-        topLeft.y(anchorY);
-        bottomRight.x(anchorX);
-        break;
-    case 'bottomRight':
-        bottomLeft.y(anchorY);
-        topRight.x(anchorX); 
-        break;
-    case 'bottomLeft':
-        bottomRight.y(anchorY);
-        topLeft.x(anchorX); 
-        break;
-    }
-
-    var radius = Math.abs( topRight.x() - topLeft.x() ) / 2;
-    circle.radius( radius );
-    //circle.x( topLeft.x() + radius );
-    //circle.y( topLeft.y() + radius );
-}
-
 dwv.tool.ShapeEditor = function () {
     var shape = null;
     var isActive = false;
@@ -153,29 +51,27 @@ dwv.tool.ShapeEditor = function () {
         // add spape specific anchors to the shape group
         if ( inshape instanceof Kinetic.Line ) {
             var points = inshape.points();
-            var lineBegin = points[0];
-            var lineEnd = points[1];
-            addAnchor(group, lineBegin.x, lineBegin.y, 'begin', updateLine);
-            addAnchor(group, lineEnd.x, lineEnd.y, 'end', updateLine);
+            addAnchor(group, points[0], points[1], 'begin', dwv.tool.UpdateLine);
+            addAnchor(group, points[2], points[3], 'end', dwv.tool.UpdateLine);
         }
         else if ( inshape instanceof Kinetic.Rect ) {
             var rectX = inshape.x();
             var rectY = inshape.y();
             var rectWidth = inshape.width();
             var rectHeight = inshape.height();
-            addAnchor(group, rectX, rectY, 'topLeft', updateRect);
-            addAnchor(group, rectX+rectWidth, rectY, 'topRight', updateRect);
-            addAnchor(group, rectX+rectWidth, rectY+rectHeight, 'bottomRight', updateRect);
-            addAnchor(group, rectX, rectY+rectHeight, 'bottomLeft', updateRect);
+            addAnchor(group, rectX, rectY, 'topLeft', dwv.tool.UpdateRect);
+            addAnchor(group, rectX+rectWidth, rectY, 'topRight', dwv.tool.UpdateRect);
+            addAnchor(group, rectX+rectWidth, rectY+rectHeight, 'bottomRight', dwv.tool.UpdateRect);
+            addAnchor(group, rectX, rectY+rectHeight, 'bottomLeft', dwv.tool.UpdateRect);
         }
-        else if ( inshape instanceof Kinetic.Circle ) {
+        else if ( inshape instanceof Kinetic.Ellipse ) {
             var circleX = inshape.x();
             var circleY = inshape.y();
             var radius = inshape.radius();
-            addAnchor(group, circleX-radius, circleY-radius, 'topLeft', updateCircle);
-            addAnchor(group, circleX+radius, circleY-radius, 'topRight', updateCircle);
-            addAnchor(group, circleX+radius, circleY+radius, 'bottomRight', updateCircle);
-            addAnchor(group, circleX-radius, circleY+radius, 'bottomLeft', updateCircle);
+            addAnchor(group, circleX-radius.x, circleY-radius.y, 'topLeft', dwv.tool.UpdateCircle);
+            addAnchor(group, circleX+radius.x, circleY-radius.y, 'topRight', dwv.tool.UpdateCircle);
+            addAnchor(group, circleX+radius.x, circleY+radius.y, 'bottomRight', dwv.tool.UpdateCircle);
+            addAnchor(group, circleX-radius.x, circleY+radius.y, 'bottomLeft', dwv.tool.UpdateCircle);
         }
         // add group to layer
         inshape.getLayer().add( group );
@@ -187,8 +83,11 @@ dwv.tool.ShapeEditor = function () {
         var anchor = new Kinetic.Circle({
             x: x,
             y: y,
-            stroke: '#666',
-            fill: '#ddd',
+            stroke: '#999',
+            fillRed: 100,
+            fillBlue: 100,
+            fillGreen: 100,
+            fillAlpha: 0.7,
             strokeWidth: 2,
             radius: 6,
             name: 'anchor',
