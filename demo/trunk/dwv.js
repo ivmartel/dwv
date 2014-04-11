@@ -8793,57 +8793,80 @@ dwv.tool.DrawCircleCommand = function(points, app, style, isFinal)
             circle.getCenter().getY() + style.getFontSize());*/
         
         var name = isFinal ? "final" : "temp";
-        var kcircle = new Kinetic.Circle({
+        var kcircle = new Kinetic.Ellipse({
             x: circle.getCenter().getX(),
             y: circle.getCenter().getY(),
-            radius: circle.getRadius(),
+            radius: { x: circle.getRadius(), y: circle.getRadius() },
             stroke: lineColor,
             strokeWidth: 2,
             name: name
         });
-        var kcircle2 = new Kinetic.Circle({
-            x: circle.getCenter().getX(),
-            y: circle.getCenter().getY(),
-            radius: circle.getRadius(),
-            stroke: lineColor,
-            strokeWidth: 2,
-            name: name,
-            fill: lineColor,
-            opacity: 0.2
-        });
-
-        kcircle2.on('mouseover', function() {
-            this.opacity(0.5);
-            app.getKineticLayer().draw();
+        // add hover styling
+        kcircle.on('mouseover', function () {
             document.body.style.cursor = 'pointer';
+            this.getLayer().draw();
         });
-        kcircle2.on('mouseout', function() {
-            this.opacity(0.2);
-            app.getKineticLayer().draw();
+        kcircle.on('mouseout', function () {
             document.body.style.cursor = 'default';
+            this.getLayer().draw();
         });
-        /*kcircle2.on('click', function() {
-            //app.getToolBox().getSelectedTool().
-            console.log('click kcircle2...');
-        });*/
-
         // remove temporary shapes from the layer
         var klayer = app.getKineticLayer();
-        var shapes = klayer.find('.temp');
-        shapes.each( function(shape) {
-            shape.remove(); 
+        var kshapes = klayer.find('.temp');
+        kshapes.each( function (kshape) {
+            kshape.remove(); 
         });
-        
         // create group
-        var group = new Kinetic.Group();
-        group.add(kcircle);
-        //group.add(kcircle2);
-        
-        // add the group to the layer
-        app.getKineticLayer().add(group);
+        var kgroup = new Kinetic.Group();
+        kgroup.add(kcircle);
+       // add the group to the layer
+        app.getKineticLayer().add(kgroup);
         app.getKineticLayer().draw();
     };
 }; // DrawCircleCommand class
+
+dwv.tool.UpdateCircle = function (circle, anchor) {
+    var group = anchor.getParent();
+
+    var topLeft = group.find('#topLeft')[0];
+    var topRight = group.find('#topRight')[0];
+    var bottomRight = group.find('#bottomRight')[0];
+    var bottomLeft = group.find('#bottomLeft')[0];
+
+    var anchorX = anchor.x();
+    var anchorY = anchor.y();
+
+    // update anchor positions
+    switch (anchor.id()) {
+    case 'topLeft':
+        topRight.y(anchorY);
+        bottomLeft.x(anchorX);
+        break;
+    case 'topRight':
+        topLeft.y(anchorY);
+        bottomRight.x(anchorX);
+        break;
+    case 'bottomRight':
+        bottomLeft.y(anchorY);
+        topRight.x(anchorX); 
+        break;
+    case 'bottomLeft':
+        bottomRight.y(anchorY);
+        topLeft.x(anchorX); 
+        break;
+    }
+
+    // update position
+    var radiusX = ( topRight.x() - topLeft.x() ) / 2;
+    var radiusY = ( bottomRight.y() - topRight.y() ) / 2;
+    var center = { x: topLeft.x() + radiusX, y: topRight.y() + radiusY };
+    circle.setPosition( center );
+    // update radius
+    var radiusAbs = { x: Math.abs(radiusX), y: Math.abs(radiusY) };
+    if ( radiusAbs ) {
+        circle.radius( radiusAbs );
+    }
+};
 ;/** 
  * Tool module.
  * @module tool
@@ -8852,108 +8875,6 @@ var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
 
 var Kinetic = Kinetic || {};
-
-function updateLine(line, activeAnchor) {
-    var group = activeAnchor.getParent();
-    
-    var begin = group.find('#begin')[0];
-    var end = group.find('#end')[0];
-    
-    var anchorX = activeAnchor.x();
-    var anchorY = activeAnchor.y();
-    
-    // update anchor positions
-    switch (activeAnchor.id()) {
-    case 'begin':
-        begin.x( anchorX );
-        begin.y( anchorY );
-        break;
-    case 'end':
-        end.x( anchorX );
-        end.y( anchorY );
-        break;
-    }
-    
-    //line.setPosition(begin.getPosition());
-    line.points([begin.x(), begin.y(), end.x(), end.y()]);
-}
-
-function updateRect(rect, activeAnchor) {
-    var group = activeAnchor.getParent();
-
-    var topLeft = group.find('#topLeft')[0];
-    var topRight = group.find('#topRight')[0];
-    var bottomRight = group.find('#bottomRight')[0];
-    var bottomLeft = group.find('#bottomLeft')[0];
-
-    var anchorX = activeAnchor.x();
-    var anchorY = activeAnchor.y();
-
-    // update anchor positions
-    switch (activeAnchor.id()) {
-    case 'topLeft':
-        topRight.y(anchorY);
-        bottomLeft.x(anchorX);
-        break;
-    case 'topRight':
-        topLeft.y(anchorY);
-        bottomRight.x(anchorX);
-        break;
-    case 'bottomRight':
-        bottomLeft.y(anchorY);
-        topRight.x(anchorX); 
-        break;
-    case 'bottomLeft':
-        bottomRight.y(anchorY);
-        topLeft.x(anchorX); 
-        break;
-    }
-
-    rect.setPosition(topLeft.getPosition());
-
-    var width = Math.abs( topRight.x() - topLeft.x() );
-    var height = Math.abs( bottomLeft.y() - topLeft.y() );
-    if ( width && height ) {
-        rect.setSize({width:width, height: height});
-    }
-}
-
-function updateCircle(circle, activeAnchor) {
-    var group = activeAnchor.getParent();
-
-    var topLeft = group.find('#topLeft')[0];
-    var topRight = group.find('#topRight')[0];
-    var bottomRight = group.find('#bottomRight')[0];
-    var bottomLeft = group.find('#bottomLeft')[0];
-
-    var anchorX = activeAnchor.x();
-    var anchorY = activeAnchor.y();
-
-    // update anchor positions
-    switch (activeAnchor.id()) {
-    case 'topLeft':
-        topRight.y(anchorY);
-        bottomLeft.x(anchorX);
-        break;
-    case 'topRight':
-        topLeft.y(anchorY);
-        bottomRight.x(anchorX);
-        break;
-    case 'bottomRight':
-        bottomLeft.y(anchorY);
-        topRight.x(anchorX); 
-        break;
-    case 'bottomLeft':
-        bottomRight.y(anchorY);
-        topLeft.x(anchorX); 
-        break;
-    }
-
-    var radius = Math.abs( topRight.x() - topLeft.x() ) / 2;
-    circle.radius( radius );
-    //circle.x( topLeft.x() + radius );
-    //circle.y( topLeft.y() + radius );
-}
 
 dwv.tool.ShapeEditor = function () {
     var shape = null;
@@ -8999,29 +8920,27 @@ dwv.tool.ShapeEditor = function () {
         // add spape specific anchors to the shape group
         if ( inshape instanceof Kinetic.Line ) {
             var points = inshape.points();
-            var lineBegin = points[0];
-            var lineEnd = points[1];
-            addAnchor(group, lineBegin.x, lineBegin.y, 'begin', updateLine);
-            addAnchor(group, lineEnd.x, lineEnd.y, 'end', updateLine);
+            addAnchor(group, points[0], points[1], 'begin', dwv.tool.UpdateLine);
+            addAnchor(group, points[2], points[3], 'end', dwv.tool.UpdateLine);
         }
         else if ( inshape instanceof Kinetic.Rect ) {
             var rectX = inshape.x();
             var rectY = inshape.y();
             var rectWidth = inshape.width();
             var rectHeight = inshape.height();
-            addAnchor(group, rectX, rectY, 'topLeft', updateRect);
-            addAnchor(group, rectX+rectWidth, rectY, 'topRight', updateRect);
-            addAnchor(group, rectX+rectWidth, rectY+rectHeight, 'bottomRight', updateRect);
-            addAnchor(group, rectX, rectY+rectHeight, 'bottomLeft', updateRect);
+            addAnchor(group, rectX, rectY, 'topLeft', dwv.tool.UpdateRect);
+            addAnchor(group, rectX+rectWidth, rectY, 'topRight', dwv.tool.UpdateRect);
+            addAnchor(group, rectX+rectWidth, rectY+rectHeight, 'bottomRight', dwv.tool.UpdateRect);
+            addAnchor(group, rectX, rectY+rectHeight, 'bottomLeft', dwv.tool.UpdateRect);
         }
-        else if ( inshape instanceof Kinetic.Circle ) {
+        else if ( inshape instanceof Kinetic.Ellipse ) {
             var circleX = inshape.x();
             var circleY = inshape.y();
             var radius = inshape.radius();
-            addAnchor(group, circleX-radius, circleY-radius, 'topLeft', updateCircle);
-            addAnchor(group, circleX+radius, circleY-radius, 'topRight', updateCircle);
-            addAnchor(group, circleX+radius, circleY+radius, 'bottomRight', updateCircle);
-            addAnchor(group, circleX-radius, circleY+radius, 'bottomLeft', updateCircle);
+            addAnchor(group, circleX-radius.x, circleY-radius.y, 'topLeft', dwv.tool.UpdateCircle);
+            addAnchor(group, circleX+radius.x, circleY-radius.y, 'topRight', dwv.tool.UpdateCircle);
+            addAnchor(group, circleX+radius.x, circleY+radius.y, 'bottomRight', dwv.tool.UpdateCircle);
+            addAnchor(group, circleX-radius.x, circleY+radius.y, 'bottomLeft', dwv.tool.UpdateCircle);
         }
         // add group to layer
         inshape.getLayer().add( group );
@@ -9033,8 +8952,11 @@ dwv.tool.ShapeEditor = function () {
         var anchor = new Kinetic.Circle({
             x: x,
             y: y,
-            stroke: '#666',
-            fill: '#ddd',
+            stroke: '#999',
+            fillRed: 100,
+            fillBlue: 100,
+            fillGreen: 100,
+            fillAlpha: 0.7,
             strokeWidth: 2,
             radius: 6,
             name: 'anchor',
@@ -9860,6 +9782,8 @@ dwv.info.updatePlotMarkings = function(event)
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
 
+var Kinetic = Kinetic || {};
+
 /**
  * Draw line command.
  * @class DrawLineCommand
@@ -9869,7 +9793,7 @@ dwv.tool = dwv.tool || {};
  * @param {Object} app The application to draw the line on.
  * @param {Style} style The drawing style.
  */
-dwv.tool.DrawLineCommand = function(points, app, style)
+dwv.tool.DrawLineCommand = function(points, app, style, isFinal)
 {
     /**
      * Line object.
@@ -9892,7 +9816,7 @@ dwv.tool.DrawLineCommand = function(points, app, style)
      * @private
      * @type Object
      */
-    var context = app.getTempLayer().getContext();
+    //var context = app.getTempLayer().getContext();
     
     /**
      * Command name.
@@ -9921,7 +9845,7 @@ dwv.tool.DrawLineCommand = function(points, app, style)
     this.execute = function()
     {
         // style
-        context.fillStyle = lineColor;
+        /*context.fillStyle = lineColor;
         context.strokeStyle = lineColor;
         // path
         context.beginPath();
@@ -9936,9 +9860,65 @@ dwv.tool.DrawLineCommand = function(points, app, style)
         context.font = style.getFontStr();
         context.fillText( Math.round(length) + "mm",
             line.getEnd().getX() + style.getFontSize(),
-            line.getEnd().getY() + style.getFontSize());
+            line.getEnd().getY() + style.getFontSize());*/
+        
+        var name = isFinal ? "final" : "temp";
+        var kline = new Kinetic.Line({
+            points: [line.getBegin().getX(), line.getBegin().getY(), 
+                     line.getEnd().getX(), line.getEnd().getY() ],
+            stroke: lineColor,
+            strokeWidth: 2,
+            name: name
+        });
+        // add hover styling
+        kline.on('mouseover', function () {
+            document.body.style.cursor = 'pointer';
+            this.getLayer().draw();
+        });
+        kline.on('mouseout', function () {
+            document.body.style.cursor = 'default';
+            this.getLayer().draw();
+        });
+        // remove temporary shapes from the layer
+        var klayer = app.getKineticLayer();
+        var kshapes = klayer.find('.temp');
+        kshapes.each( function (kshape) {
+            kshape.remove(); 
+        });
+        // create group
+        var kgroup = new Kinetic.Group();
+        kgroup.add(kline);
+       // add the group to the layer
+        app.getKineticLayer().add(kgroup);
+        app.getKineticLayer().draw();
+
     }; 
 }; // DrawLineCommand class
+
+dwv.tool.UpdateLine = function (line, anchor)
+{
+    var group = anchor.getParent();
+    
+    var begin = group.find('#begin')[0];
+    var end = group.find('#end')[0];
+    
+    var anchorX = anchor.x();
+    var anchorY = anchor.y();
+    
+    // update anchor positions
+    switch (anchor.id()) {
+    case 'begin':
+        begin.x( anchorX );
+        begin.y( anchorY );
+        break;
+    case 'end':
+        end.x( anchorX );
+        end.y( anchorY );
+        break;
+    }
+    
+    line.points([begin.x(), begin.y(), end.x(), end.y()]);
+};
 ;/** 
  * Tool module.
  * @module tool
@@ -10435,21 +10415,71 @@ dwv.tool.DrawRectangleCommand = function(points, app, style, isFinal)
             strokeWidth: 2,
             name: name
         });
+        // add hover styling
+        krect.on('mouseover', function () {
+            document.body.style.cursor = 'pointer';
+            this.getLayer().draw();
+        });
+        krect.on('mouseout', function () {
+            document.body.style.cursor = 'default';
+            this.getLayer().draw();
+        });
         // remove temporary shapes from the layer
         var klayer = app.getKineticLayer();
-        var shapes = klayer.find('.temp');
-        shapes.each( function(shape) {
-            shape.remove(); 
+        var kshapes = klayer.find('.temp');
+        kshapes.each( function (kshape) {
+            kshape.remove(); 
         });
         // create group
-        var group = new Kinetic.Group();
-        group.add(krect);
+        var kgroup = new Kinetic.Group();
+        kgroup.add(krect);
         // add the group to the layer
-        app.getKineticLayer().add(group);
+        app.getKineticLayer().add(kgroup);
         app.getKineticLayer().draw();
     }; 
 }; // DrawRectangleCommand class
-;/** 
+
+dwv.tool.UpdateRect = function (rect, anchor)
+{
+    var group = anchor.getParent();
+
+    var topLeft = group.find('#topLeft')[0];
+    var topRight = group.find('#topRight')[0];
+    var bottomRight = group.find('#bottomRight')[0];
+    var bottomLeft = group.find('#bottomLeft')[0];
+
+    var anchorX = anchor.x();
+    var anchorY = anchor.y();
+
+    // update anchor positions
+    switch (anchor.id()) {
+    case 'topLeft':
+        topRight.y(anchorY);
+        bottomLeft.x(anchorX);
+        break;
+    case 'topRight':
+        topLeft.y(anchorY);
+        bottomRight.x(anchorX);
+        break;
+    case 'bottomRight':
+        bottomLeft.y(anchorY);
+        topRight.x(anchorX); 
+        break;
+    case 'bottomLeft':
+        bottomRight.y(anchorY);
+        topLeft.x(anchorX); 
+        break;
+    }
+    
+    // update position
+    rect.setPosition(topLeft.getPosition());
+    // update size
+    var width = topRight.x() - topLeft.x();
+    var height = bottomLeft.y() - topLeft.y();
+    if ( width && height ) {
+        rect.setSize({width:width, height: height});
+    }
+};;/** 
  * Tool module.
  * @module tool
  */

@@ -298,21 +298,71 @@ dwv.tool.DrawRectangleCommand = function(points, app, style, isFinal)
             strokeWidth: 2,
             name: name
         });
+        // add hover styling
+        krect.on(&#x27;mouseover&#x27;, function () {
+            document.body.style.cursor = &#x27;pointer&#x27;;
+            this.getLayer().draw();
+        });
+        krect.on(&#x27;mouseout&#x27;, function () {
+            document.body.style.cursor = &#x27;default&#x27;;
+            this.getLayer().draw();
+        });
         // remove temporary shapes from the layer
         var klayer = app.getKineticLayer();
-        var shapes = klayer.find(&#x27;.temp&#x27;);
-        shapes.each( function(shape) {
-            shape.remove(); 
+        var kshapes = klayer.find(&#x27;.temp&#x27;);
+        kshapes.each( function (kshape) {
+            kshape.remove(); 
         });
         // create group
-        var group = new Kinetic.Group();
-        group.add(krect);
+        var kgroup = new Kinetic.Group();
+        kgroup.add(krect);
         // add the group to the layer
-        app.getKineticLayer().add(group);
+        app.getKineticLayer().add(kgroup);
         app.getKineticLayer().draw();
     }; 
 }; // DrawRectangleCommand class
 
+dwv.tool.UpdateRect = function (rect, anchor)
+{
+    var group = anchor.getParent();
+
+    var topLeft = group.find(&#x27;#topLeft&#x27;)[0];
+    var topRight = group.find(&#x27;#topRight&#x27;)[0];
+    var bottomRight = group.find(&#x27;#bottomRight&#x27;)[0];
+    var bottomLeft = group.find(&#x27;#bottomLeft&#x27;)[0];
+
+    var anchorX = anchor.x();
+    var anchorY = anchor.y();
+
+    // update anchor positions
+    switch (anchor.id()) {
+    case &#x27;topLeft&#x27;:
+        topRight.y(anchorY);
+        bottomLeft.x(anchorX);
+        break;
+    case &#x27;topRight&#x27;:
+        topLeft.y(anchorY);
+        bottomRight.x(anchorX);
+        break;
+    case &#x27;bottomRight&#x27;:
+        bottomLeft.y(anchorY);
+        topRight.x(anchorX); 
+        break;
+    case &#x27;bottomLeft&#x27;:
+        bottomRight.y(anchorY);
+        topLeft.x(anchorX); 
+        break;
+    }
+    
+    // update position
+    rect.setPosition(topLeft.getPosition());
+    // update size
+    var width = topRight.x() - topLeft.x();
+    var height = bottomLeft.y() - topLeft.y();
+    if ( width &amp;&amp; height ) {
+        rect.setSize({width:width, height: height});
+    }
+};
     </pre>
 </div>
 
