@@ -262,6 +262,7 @@
                 "dwv.math.Point2D": 1,
                 "dwv.math.FastPoint2D": 1,
                 "dwv.math.Circle": 1,
+                "dwv.math.Ellipse": 1,
                 "dwv.math.Line": 1,
                 "dwv.math.Rectangle": 1,
                 "dwv.math.ROI": 1,
@@ -272,22 +273,22 @@
                 "dwv.math": 1
             }
         },
-        "src/tools/circle.js": {
-            "name": "src/tools/circle.js",
+        "src/tools/draw.js": {
+            "name": "src/tools/draw.js",
             "modules": {},
             "classes": {
-                "dwv.tool.DrawCircleCommand": 1
+                "dwv.tool.Draw": 1
             },
             "fors": {},
             "namespaces": {
                 "dwv.tool": 1
             }
         },
-        "src/tools/draw.js": {
-            "name": "src/tools/draw.js",
+        "src/tools/ellipse.js": {
+            "name": "src/tools/ellipse.js",
             "modules": {},
             "classes": {
-                "dwv.tool.Draw": 1
+                "dwv.tool.DrawEllipseCommand": 1
             },
             "fors": {},
             "namespaces": {
@@ -571,6 +572,7 @@
                 "dwv.math.Point2D": 1,
                 "dwv.math.FastPoint2D": 1,
                 "dwv.math.Circle": 1,
+                "dwv.math.Ellipse": 1,
                 "dwv.math.Line": 1,
                 "dwv.math.Rectangle": 1,
                 "dwv.math.ROI": 1,
@@ -582,15 +584,15 @@
             },
             "tag": "module",
             "file": "src/math/shapes.js",
-            "line": 318,
+            "line": 374,
             "description": "Math module."
         },
         "tool": {
             "name": "tool",
             "submodules": {},
             "classes": {
-                "dwv.tool.DrawCircleCommand": 1,
                 "dwv.tool.Draw": 1,
+                "dwv.tool.DrawEllipseCommand": 1,
                 "dwv.tool.Filter": 1,
                 "dwv.tool.filter.Threshold": 1,
                 "dwv.tool.filter.Sharpen": 1,
@@ -1159,6 +1161,38 @@
                 }
             ]
         },
+        "dwv.math.Ellipse": {
+            "name": "dwv.math.Ellipse",
+            "shortname": "dwv.math.Ellipse",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "math",
+            "namespace": "dwv.math",
+            "file": "src/math/shapes.js",
+            "line": 139,
+            "description": "Ellipse shape.",
+            "is_constructor": 1,
+            "params": [
+                {
+                    "name": "centre",
+                    "description": "A Point2D representing the centre of the ellipse.",
+                    "type": "Object"
+                },
+                {
+                    "name": "a",
+                    "description": "The radius of the ellipse on the horizontal axe.",
+                    "type": "Number"
+                },
+                {
+                    "name": "b",
+                    "description": "The radius of the ellipse on the vertical axe.",
+                    "type": "Number"
+                }
+            ]
+        },
         "dwv.math.Line": {
             "name": "dwv.math.Line",
             "shortname": "dwv.math.Line",
@@ -1170,7 +1204,7 @@
             "module": "math",
             "namespace": "dwv.math",
             "file": "src/math/shapes.js",
-            "line": 139,
+            "line": 195,
             "description": "Line shape.",
             "is_constructor": 1,
             "params": [
@@ -1197,7 +1231,7 @@
             "module": "math",
             "namespace": "dwv.math",
             "file": "src/math/shapes.js",
-            "line": 203,
+            "line": 259,
             "description": "Rectangle shape.",
             "is_constructor": 1,
             "params": [
@@ -1224,7 +1258,7 @@
             "module": "math",
             "namespace": "dwv.math",
             "file": "src/math/shapes.js",
-            "line": 274,
+            "line": 330,
             "description": "Region Of Interest shape.",
             "is_constructor": 1
         },
@@ -1239,7 +1273,7 @@
             "module": "math",
             "namespace": "dwv.math",
             "file": "src/math/shapes.js",
-            "line": 318,
+            "line": 374,
             "description": "Path shape.",
             "is_constructor": 1,
             "params": [
@@ -1252,38 +1286,6 @@
                     "name": "inputControlPointIndexArray",
                     "description": "The list of control point of path, \n as indexes (optional).\nNote: first and last point do not need to be equal.",
                     "type": "Array"
-                }
-            ]
-        },
-        "dwv.tool.DrawCircleCommand": {
-            "name": "dwv.tool.DrawCircleCommand",
-            "shortname": "dwv.tool.DrawCircleCommand",
-            "classitems": [],
-            "plugins": [],
-            "extensions": [],
-            "plugin_for": [],
-            "extension_for": [],
-            "module": "tool",
-            "namespace": "dwv.tool",
-            "file": "src/tools/circle.js",
-            "line": 10,
-            "description": "Draw circle command.",
-            "is_constructor": 1,
-            "params": [
-                {
-                    "name": "points",
-                    "description": "The points from which to extract the circle.",
-                    "type": "Array"
-                },
-                {
-                    "name": "app",
-                    "description": "The application to draw the circle on.",
-                    "type": "Object"
-                },
-                {
-                    "name": "style",
-                    "description": "The drawing style.",
-                    "type": "Style"
                 }
             ]
         },
@@ -1306,6 +1308,38 @@
                     "name": "app",
                     "description": "The associated application.",
                     "type": "Object"
+                }
+            ]
+        },
+        "dwv.tool.DrawEllipseCommand": {
+            "name": "dwv.tool.DrawEllipseCommand",
+            "shortname": "dwv.tool.DrawEllipseCommand",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "tool",
+            "namespace": "dwv.tool",
+            "file": "src/tools/ellipse.js",
+            "line": 10,
+            "description": "Draw ellpise command.",
+            "is_constructor": 1,
+            "params": [
+                {
+                    "name": "points",
+                    "description": "The points from which to extract the ellipse.",
+                    "type": "Array"
+                },
+                {
+                    "name": "app",
+                    "description": "The application to draw the ellipse on.",
+                    "type": "Object"
+                },
+                {
+                    "name": "style",
+                    "description": "The drawing style.",
+                    "type": "Style"
                 }
             ]
         },
@@ -1519,7 +1553,7 @@
             "params": [
                 {
                     "name": "points",
-                    "description": "The points from which to extract the circle.",
+                    "description": "The points from which to extract the rectangle.",
                     "type": "Array"
                 },
                 {
@@ -6042,7 +6076,102 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 149,
+            "line": 150,
+            "description": "Circle surface.",
+            "itemtype": "property",
+            "name": "surface",
+            "access": "private",
+            "tagname": "",
+            "type": "Number",
+            "class": "dwv.math.Ellipse",
+            "module": "math",
+            "namespace": "dwv.math"
+        },
+        {
+            "file": "src/math/shapes.js",
+            "line": 158,
+            "description": "Get the centre (point) of the ellipse.",
+            "itemtype": "method",
+            "name": "getCenter",
+            "return": {
+                "description": "The center (point) of the ellipse.",
+                "type": "Object"
+            },
+            "class": "dwv.math.Ellipse",
+            "module": "math",
+            "namespace": "dwv.math"
+        },
+        {
+            "file": "src/math/shapes.js",
+            "line": 164,
+            "description": "Get the radius of the ellipse on the horizontal axe.",
+            "itemtype": "method",
+            "name": "getA",
+            "return": {
+                "description": "The radius of the ellipse on the horizontal axe.",
+                "type": "Number"
+            },
+            "class": "dwv.math.Ellipse",
+            "module": "math",
+            "namespace": "dwv.math"
+        },
+        {
+            "file": "src/math/shapes.js",
+            "line": 170,
+            "description": "Get the radius of the ellipse on the vertical axe.",
+            "itemtype": "method",
+            "name": "getB",
+            "return": {
+                "description": "The radius of the ellipse on the vertical axe.",
+                "type": "Number"
+            },
+            "class": "dwv.math.Ellipse",
+            "module": "math",
+            "namespace": "dwv.math"
+        },
+        {
+            "file": "src/math/shapes.js",
+            "line": 176,
+            "description": "Get the surface of the ellipse.",
+            "itemtype": "method",
+            "name": "getSurface",
+            "return": {
+                "description": "The surface of the ellipse.",
+                "type": "Number"
+            },
+            "class": "dwv.math.Ellipse",
+            "module": "math",
+            "namespace": "dwv.math"
+        },
+        {
+            "file": "src/math/shapes.js",
+            "line": 182,
+            "description": "Get the surface of the ellipse with a spacing.",
+            "itemtype": "method",
+            "name": "getWorldSurface",
+            "params": [
+                {
+                    "name": "spacingX",
+                    "description": "The X spacing.",
+                    "type": "Number"
+                },
+                {
+                    "name": "spacingY",
+                    "description": "The Y spacing.",
+                    "type": "Number"
+                }
+            ],
+            "return": {
+                "description": "The surface of the ellipse multiplied by the given spacing.",
+                "type": "Number"
+            },
+            "class": "dwv.math.Ellipse",
+            "module": "math",
+            "namespace": "dwv.math"
+        },
+        {
+            "file": "src/math/shapes.js",
+            "line": 205,
             "description": "Line length.",
             "itemtype": "property",
             "name": "length",
@@ -6055,7 +6184,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 159,
+            "line": 215,
             "description": "Get the begin point of the line.",
             "itemtype": "method",
             "name": "getBegin",
@@ -6069,7 +6198,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 165,
+            "line": 221,
             "description": "Get the end point of the line.",
             "itemtype": "method",
             "name": "getEnd",
@@ -6083,7 +6212,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 171,
+            "line": 227,
             "description": "Get the length of the line.",
             "itemtype": "method",
             "name": "getLength",
@@ -6097,7 +6226,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 177,
+            "line": 233,
             "description": "Get the length of the line with spacing.",
             "itemtype": "method",
             "name": "getWorldLength",
@@ -6123,7 +6252,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 190,
+            "line": 246,
             "description": "Get the mid point of the line.",
             "itemtype": "method",
             "name": "getMidpoint",
@@ -6137,7 +6266,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 213,
+            "line": 269,
             "description": "Rectangle surface.",
             "itemtype": "property",
             "name": "surface",
@@ -6150,7 +6279,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 221,
+            "line": 277,
             "description": "Get the begin point of the rectangle.",
             "itemtype": "method",
             "name": "getBegin",
@@ -6164,7 +6293,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 227,
+            "line": 283,
             "description": "Get the end point of the rectangle.",
             "itemtype": "method",
             "name": "getEnd",
@@ -6178,7 +6307,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 233,
+            "line": 289,
             "description": "Get the real width of the rectangle.",
             "itemtype": "method",
             "name": "getRealWidth",
@@ -6192,7 +6321,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 239,
+            "line": 295,
             "description": "Get the real height of the rectangle.",
             "itemtype": "method",
             "name": "getRealHeight",
@@ -6206,7 +6335,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 245,
+            "line": 301,
             "description": "Get the width of the rectangle.",
             "itemtype": "method",
             "name": "getWidth",
@@ -6220,7 +6349,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 251,
+            "line": 307,
             "description": "Get the height of the rectangle.",
             "itemtype": "method",
             "name": "getHeight",
@@ -6234,7 +6363,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 257,
+            "line": 313,
             "description": "Get the surface of the rectangle.",
             "itemtype": "method",
             "name": "getSurface",
@@ -6248,7 +6377,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 263,
+            "line": 319,
             "description": "Get the surface of the rectangle with a spacing.",
             "itemtype": "method",
             "name": "getWorldSurface",
@@ -6262,7 +6391,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 283,
+            "line": 339,
             "description": "List of points.",
             "itemtype": "property",
             "name": "points",
@@ -6275,7 +6404,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 291,
+            "line": 347,
             "description": "Get a point of the list at a given index.",
             "itemtype": "method",
             "name": "getPoint",
@@ -6296,7 +6425,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 298,
+            "line": 354,
             "description": "Get the length of the point list.",
             "itemtype": "method",
             "name": "getLength",
@@ -6310,7 +6439,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 304,
+            "line": 360,
             "description": "Add a point to the ROI.",
             "itemtype": "method",
             "name": "addPoint",
@@ -6327,7 +6456,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 310,
+            "line": 366,
             "description": "Add points to the ROI.",
             "itemtype": "method",
             "name": "addPoints",
@@ -6344,7 +6473,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 330,
+            "line": 386,
             "description": "List of points.",
             "itemtype": "property",
             "name": "pointArray",
@@ -6355,7 +6484,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 336,
+            "line": 392,
             "description": "List of control points.",
             "itemtype": "property",
             "name": "controlPointIndexArray",
@@ -6366,7 +6495,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 345,
+            "line": 401,
             "description": "Get a point of the list.",
             "itemtype": "method",
             "name": "getPoint",
@@ -6387,7 +6516,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 355,
+            "line": 411,
             "description": "Is the given point a control point.",
             "itemtype": "method",
             "name": "isControlPoint",
@@ -6408,7 +6537,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 371,
+            "line": 427,
             "description": "Get the length of the path.",
             "itemtype": "method",
             "name": "getLength",
@@ -6422,7 +6551,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 380,
+            "line": 436,
             "description": "Add a point to the path.",
             "itemtype": "method",
             "name": "addPoint",
@@ -6439,7 +6568,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 389,
+            "line": 445,
             "description": "Add a control point to the path.",
             "itemtype": "method",
             "name": "addControlPoint",
@@ -6456,7 +6585,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 404,
+            "line": 460,
             "description": "Add points to the path.",
             "itemtype": "method",
             "name": "addPoints",
@@ -6473,7 +6602,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 413,
+            "line": 469,
             "description": "Append a Path to this one.",
             "itemtype": "method",
             "name": "appenPath",
@@ -6487,99 +6616,6 @@
             "class": "dwv.math.Path",
             "module": "math",
             "namespace": "dwv.math"
-        },
-        {
-            "file": "src/tools/circle.js",
-            "line": 32,
-            "description": "Circle object.",
-            "itemtype": "property",
-            "name": "circle",
-            "access": "private",
-            "tagname": "",
-            "type": "Circle",
-            "class": "dwv.tool.DrawCircleCommand",
-            "module": "tool",
-            "namespace": "dwv.tool"
-        },
-        {
-            "file": "src/tools/circle.js",
-            "line": 40,
-            "description": "Line color.",
-            "itemtype": "property",
-            "name": "lineColor",
-            "access": "private",
-            "tagname": "",
-            "type": "String",
-            "class": "dwv.tool.DrawCircleCommand",
-            "module": "tool",
-            "namespace": "dwv.tool"
-        },
-        {
-            "file": "src/tools/circle.js",
-            "line": 47,
-            "description": "HTML context.",
-            "itemtype": "property",
-            "name": "context",
-            "access": "private",
-            "tagname": "",
-            "type": "Object",
-            "class": "dwv.tool.DrawCircleCommand",
-            "module": "tool",
-            "namespace": "dwv.tool"
-        },
-        {
-            "file": "src/tools/circle.js",
-            "line": 55,
-            "description": "Command name.",
-            "itemtype": "property",
-            "name": "name",
-            "access": "private",
-            "tagname": "",
-            "type": "String",
-            "class": "dwv.tool.DrawCircleCommand",
-            "module": "tool",
-            "namespace": "dwv.tool"
-        },
-        {
-            "file": "src/tools/circle.js",
-            "line": 62,
-            "description": "Get the command name.",
-            "itemtype": "method",
-            "name": "getName",
-            "return": {
-                "description": "The command name.",
-                "type": "String"
-            },
-            "class": "dwv.tool.DrawCircleCommand",
-            "module": "tool",
-            "namespace": "dwv.tool"
-        },
-        {
-            "file": "src/tools/circle.js",
-            "line": 68,
-            "description": "Set the command name.",
-            "itemtype": "method",
-            "name": "setName",
-            "params": [
-                {
-                    "name": "str",
-                    "description": "The command name.",
-                    "type": "String"
-                }
-            ],
-            "class": "dwv.tool.DrawCircleCommand",
-            "module": "tool",
-            "namespace": "dwv.tool"
-        },
-        {
-            "file": "src/tools/circle.js",
-            "line": 75,
-            "description": "Execute the command.",
-            "itemtype": "method",
-            "name": "execute",
-            "class": "dwv.tool.DrawCircleCommand",
-            "module": "tool",
-            "namespace": "dwv.tool"
         },
         {
             "file": "src/tools/draw.js",
@@ -6876,6 +6912,99 @@
             "itemtype": "method",
             "name": "init",
             "class": "dwv.tool.Draw",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/ellipse.js",
+            "line": 31,
+            "description": "Ellipse object.",
+            "itemtype": "property",
+            "name": "ellipse",
+            "access": "private",
+            "tagname": "",
+            "type": "Ellipse",
+            "class": "dwv.tool.DrawEllipseCommand",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/ellipse.js",
+            "line": 39,
+            "description": "Line color.",
+            "itemtype": "property",
+            "name": "lineColor",
+            "access": "private",
+            "tagname": "",
+            "type": "String",
+            "class": "dwv.tool.DrawEllipseCommand",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/ellipse.js",
+            "line": 46,
+            "description": "HTML context.",
+            "itemtype": "property",
+            "name": "context",
+            "access": "private",
+            "tagname": "",
+            "type": "Object",
+            "class": "dwv.tool.DrawEllipseCommand",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/ellipse.js",
+            "line": 54,
+            "description": "Command name.",
+            "itemtype": "property",
+            "name": "name",
+            "access": "private",
+            "tagname": "",
+            "type": "String",
+            "class": "dwv.tool.DrawEllipseCommand",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/ellipse.js",
+            "line": 61,
+            "description": "Get the command name.",
+            "itemtype": "method",
+            "name": "getName",
+            "return": {
+                "description": "The command name.",
+                "type": "String"
+            },
+            "class": "dwv.tool.DrawEllipseCommand",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/ellipse.js",
+            "line": 67,
+            "description": "Set the command name.",
+            "itemtype": "method",
+            "name": "setName",
+            "params": [
+                {
+                    "name": "str",
+                    "description": "The command name.",
+                    "type": "String"
+                }
+            ],
+            "class": "dwv.tool.DrawEllipseCommand",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/ellipse.js",
+            "line": 74,
+            "description": "Execute the command.",
+            "itemtype": "method",
+            "name": "execute",
+            "class": "dwv.tool.DrawEllipseCommand",
             "module": "tool",
             "namespace": "dwv.tool"
         },

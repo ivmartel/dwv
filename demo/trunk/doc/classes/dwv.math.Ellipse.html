@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>dwv.math.Point2D - dwv</title>
+    <title>dwv.math.Ellipse - dwv</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
     <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
@@ -198,7 +198,7 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-                        <h1>dwv.math.Point2D Class</h1>
+                        <h1>dwv.math.Ellipse Class</h1>
 <div class="box meta">
     
 
@@ -206,7 +206,7 @@
 
     
         <div class="foundat">
-            Defined in: <a href="../files/src_math_shapes.js.html#l8"><code>src&#x2F;math&#x2F;shapes.js:8</code></a>
+            Defined in: <a href="../files/src_math_shapes.js.html#l139"><code>src&#x2F;math&#x2F;shapes.js:139</code></a>
         </div>
     
 
@@ -222,15 +222,15 @@
 
 
 <div class="box intro">
-    <p>2D point. Immutable.</p>
+    <p>Ellipse shape.</p>
 
 </div>
 
 
     <div class="constructor">
         <h2>Constructor</h2>
-        <div id="method_dwv.math.Point2D" class="method item">
-    <h3 class="name"><code>dwv.math.Point2D</code></h3>
+        <div id="method_dwv.math.Ellipse" class="method item">
+    <h3 class="name"><code>dwv.math.Ellipse</code></h3>
 
     
         <div class="args">
@@ -238,13 +238,19 @@
             
                 <li class="arg">
                     
-                        <code>x</code>
+                        <code>centre</code>
                     
                 </li>
             
                 <li class="arg">
                     
-                        <code>y</code>
+                        <code>a</code>
+                    
+                </li>
+            
+                <li class="arg">
+                    
+                        <code>b</code>
                     
                 </li>
             
@@ -277,7 +283,7 @@
             
         
         
-        <a href="../files/src_math_shapes.js.html#l8"><code>src&#x2F;math&#x2F;shapes.js:8</code></a>
+        <a href="../files/src_math_shapes.js.html#l139"><code>src&#x2F;math&#x2F;shapes.js:139</code></a>
         
         </p>
 
@@ -299,14 +305,14 @@
             
                 <li class="param">
                     
-                        <code class="param-name">x</code>
-                        <span class="type">Number</span>
+                        <code class="param-name">centre</code>
+                        <span class="type">Object</span>
                     
 
                     
 
                     <div class="param-description">
-                        <p>The X coordinate for the point.</p>
+                        <p>A Point2D representing the centre of the ellipse.</p>
 
                     </div>
 
@@ -315,14 +321,30 @@
             
                 <li class="param">
                     
-                        <code class="param-name">y</code>
+                        <code class="param-name">a</code>
                         <span class="type">Number</span>
                     
 
                     
 
                     <div class="param-description">
-                        <p>The Y coordinate for the point.</p>
+                        <p>The radius of the ellipse on the horizontal axe.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+                <li class="param">
+                    
+                        <code class="param-name">b</code>
+                        <span class="type">Number</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The radius of the ellipse on the vertical axe.</p>
 
                     </div>
 
@@ -349,6 +371,8 @@
             <li class="api-class-tab methods"><a href="#methods">Methods</a></li>
         
         
+            <li class="api-class-tab properties"><a href="#properties">Properties</a></li>
+        
         
         
     </ul>
@@ -364,28 +388,52 @@
                     <ul class="index-list methods">
                         
                             <li class="index-item method">
-                                <a href="#method_equals">equals</a>
+                                <a href="#method_getA">getA</a>
 
                                 
                                 
                             </li>
                         
                             <li class="index-item method">
-                                <a href="#method_getX">getX</a>
+                                <a href="#method_getB">getB</a>
 
                                 
                                 
                             </li>
                         
                             <li class="index-item method">
-                                <a href="#method_getY">getY</a>
+                                <a href="#method_getCenter">getCenter</a>
 
                                 
                                 
                             </li>
                         
                             <li class="index-item method">
-                                <a href="#method_toString">toString</a>
+                                <a href="#method_getSurface">getSurface</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_getWorldSurface">getWorldSurface</a>
+
+                                
+                                
+                            </li>
+                        
+                    </ul>
+                </div>
+            
+
+            
+                <div class="index-section properties">
+                    <h3>Properties</h3>
+
+                    <ul class="index-list properties">
+                        
+                            <li class="index-item property private">
+                                <a href="#property_surface">surface</a>
 
                                 
                                 
@@ -398,8 +446,6 @@
             
 
             
-
-            
         </div>
 
         
@@ -407,26 +453,16 @@
                 <h2 class="off-left">Methods</h2>
 
                 
-                    <div id="method_equals" class="method item">
-    <h3 class="name"><code>equals</code></h3>
+                    <div id="method_getA" class="method item">
+    <h3 class="name"><code>getA</code></h3>
 
     
-        <div class="args">
-            <span class="paren">(</span><ul class="args-list inline commas">
-            
-                <li class="arg">
-                    
-                        <code>other</code>
-                    
-                </li>
-            
-            </ul><span class="paren">)</span>
-        </div>
+        <span class="paren">()</span>
     
 
     
         <span class="returns-inline">
-            <span class="type">Boolean</span>
+            <span class="type">Number</span>
         </span>
     
 
@@ -453,7 +489,7 @@
             
         
         
-        <a href="../files/src_math_shapes.js.html#l32"><code>src&#x2F;math&#x2F;shapes.js:32</code></a>
+        <a href="../files/src_math_shapes.js.html#l164"><code>src&#x2F;math&#x2F;shapes.js:164</code></a>
         
         </p>
 
@@ -464,7 +500,315 @@
     </div>
 
     <div class="description">
-        <p>Check for Point2D equality.</p>
+        <p>Get the radius of the ellipse on the horizontal axe.</p>
+
+    </div>
+
+    
+
+    
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                
+                    
+                        <span class="type">Number</span>:
+                    
+                    <p>The radius of the ellipse on the horizontal axe.</p>
+
+                
+            </div>
+        </div>
+    
+
+    
+</div>
+
+                
+                    <div id="method_getB" class="method item">
+    <h3 class="name"><code>getB</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+        <span class="returns-inline">
+            <span class="type">Number</span>
+        </span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_math_shapes.js.html#l170"><code>src&#x2F;math&#x2F;shapes.js:170</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Get the radius of the ellipse on the vertical axe.</p>
+
+    </div>
+
+    
+
+    
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                
+                    
+                        <span class="type">Number</span>:
+                    
+                    <p>The radius of the ellipse on the vertical axe.</p>
+
+                
+            </div>
+        </div>
+    
+
+    
+</div>
+
+                
+                    <div id="method_getCenter" class="method item">
+    <h3 class="name"><code>getCenter</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+        <span class="returns-inline">
+            <span class="type">Object</span>
+        </span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_math_shapes.js.html#l158"><code>src&#x2F;math&#x2F;shapes.js:158</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Get the centre (point) of the ellipse.</p>
+
+    </div>
+
+    
+
+    
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                
+                    
+                        <span class="type">Object</span>:
+                    
+                    <p>The center (point) of the ellipse.</p>
+
+                
+            </div>
+        </div>
+    
+
+    
+</div>
+
+                
+                    <div id="method_getSurface" class="method item">
+    <h3 class="name"><code>getSurface</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+        <span class="returns-inline">
+            <span class="type">Number</span>
+        </span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_math_shapes.js.html#l176"><code>src&#x2F;math&#x2F;shapes.js:176</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Get the surface of the ellipse.</p>
+
+    </div>
+
+    
+
+    
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                
+                    
+                        <span class="type">Number</span>:
+                    
+                    <p>The surface of the ellipse.</p>
+
+                
+            </div>
+        </div>
+    
+
+    
+</div>
+
+                
+                    <div id="method_getWorldSurface" class="method item">
+    <h3 class="name"><code>getWorldSurface</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>spacingX</code>
+                    
+                </li>
+            
+                <li class="arg">
+                    
+                        <code>spacingY</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+        <span class="returns-inline">
+            <span class="type">Number</span>
+        </span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_math_shapes.js.html#l182"><code>src&#x2F;math&#x2F;shapes.js:182</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Get the surface of the ellipse with a spacing.</p>
 
     </div>
 
@@ -476,14 +820,30 @@
             
                 <li class="param">
                     
-                        <code class="param-name">other</code>
-                        <span class="type">Point2D</span>
+                        <code class="param-name">spacingX</code>
+                        <span class="type">Number</span>
                     
 
                     
 
                     <div class="param-description">
-                        <p>The other Point2D to compare to.</p>
+                        <p>The X spacing.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+                <li class="param">
+                    
+                        <code class="param-name">spacingY</code>
+                        <span class="type">Number</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The Y spacing.</p>
 
                     </div>
 
@@ -501,82 +861,9 @@
             <div class="returns-description">
                 
                     
-                        <span class="type">Boolean</span>:
-                    
-                    <p>True if both points are equal.</p>
-
-                
-            </div>
-        </div>
-    
-
-    
-</div>
-
-                
-                    <div id="method_getX" class="method item">
-    <h3 class="name"><code>getX</code></h3>
-
-    
-        <span class="paren">()</span>
-    
-
-    
-        <span class="returns-inline">
-            <span class="type">Number</span>
-        </span>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/src_math_shapes.js.html#l18"><code>src&#x2F;math&#x2F;shapes.js:18</code></a>
-        
-        </p>
-
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        <p>Get the X position of the point.</p>
-
-    </div>
-
-    
-
-    
-        <div class="returns">
-            <h4>Returns:</h4>
-
-            <div class="returns-description">
-                
-                    
                         <span class="type">Number</span>:
                     
-                    <p>The X position of the point.</p>
+                    <p>The surface of the ellipse multiplied by the given spacing.</p>
 
                 
             </div>
@@ -587,25 +874,22 @@
 </div>
 
                 
-                    <div id="method_getY" class="method item">
-    <h3 class="name"><code>getY</code></h3>
+            </div>
+        
 
-    
-        <span class="paren">()</span>
-    
+        
+            <div id="properties" class="api-class-tabpanel">
+                <h2 class="off-left">Properties</h2>
 
-    
-        <span class="returns-inline">
-            <span class="type">Number</span>
-        </span>
-    
-
-    
+                
+                    <div id="property_surface" class="property item private">
+    <h3 class="name"><code>surface</code></h3>
+    <span class="type">Number</span>
 
     
 
     
-
+        <span class="flag private">private</span>
     
 
     
@@ -623,10 +907,9 @@
             
         
         
-        <a href="../files/src_math_shapes.js.html#l24"><code>src&#x2F;math&#x2F;shapes.js:24</code></a>
+        <a href="../files/src_math_shapes.js.html#l150"><code>src&#x2F;math&#x2F;shapes.js:150</code></a>
         
         </p>
-
 
         
 
@@ -634,99 +917,12 @@
     </div>
 
     <div class="description">
-        <p>Get the Y position of the point.</p>
+        <p>Circle surface.</p>
 
     </div>
 
     
 
-    
-        <div class="returns">
-            <h4>Returns:</h4>
-
-            <div class="returns-description">
-                
-                    
-                        <span class="type">Number</span>:
-                    
-                    <p>The Y position of the point.</p>
-
-                
-            </div>
-        </div>
-    
-
-    
-</div>
-
-                
-                    <div id="method_toString" class="method item">
-    <h3 class="name"><code>toString</code></h3>
-
-    
-        <span class="paren">()</span>
-    
-
-    
-        <span class="returns-inline">
-            <span class="type">String</span>
-        </span>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/src_math_shapes.js.html#l45"><code>src&#x2F;math&#x2F;shapes.js:45</code></a>
-        
-        </p>
-
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        <p>Get a string representation of the Point2D.</p>
-
-    </div>
-
-    
-
-    
-        <div class="returns">
-            <h4>Returns:</h4>
-
-            <div class="returns-description">
-                
-                    
-                        <span class="type">String</span>:
-                    
-                    <p>The Point2D as a string.</p>
-
-                
-            </div>
-        </div>
     
 
     
@@ -734,8 +930,6 @@
 
                 
             </div>
-        
-
         
 
         

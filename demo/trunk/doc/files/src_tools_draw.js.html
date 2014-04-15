@@ -87,6 +87,8 @@
             
                 <li><a href="../classes/dwv.math.Circle.html">dwv.math.Circle</a></li>
             
+                <li><a href="../classes/dwv.math.Ellipse.html">dwv.math.Ellipse</a></li>
+            
                 <li><a href="../classes/dwv.math.FastPoint2D.html">dwv.math.FastPoint2D</a></li>
             
                 <li><a href="../classes/dwv.math.Line.html">dwv.math.Line</a></li>
@@ -105,7 +107,7 @@
             
                 <li><a href="../classes/dwv.tool.Draw.html">dwv.tool.Draw</a></li>
             
-                <li><a href="../classes/dwv.tool.DrawCircleCommand.html">dwv.tool.DrawCircleCommand</a></li>
+                <li><a href="../classes/dwv.tool.DrawEllipseCommand.html">dwv.tool.DrawEllipseCommand</a></li>
             
                 <li><a href="../classes/dwv.tool.DrawLineCommand.html">dwv.tool.DrawLineCommand</a></li>
             
@@ -267,13 +269,13 @@ dwv.tool.ShapeEditor = function () {
             addAnchor(group, rectX, rectY+rectHeight, &#x27;bottomLeft&#x27;, dwv.tool.UpdateRect);
         }
         else if ( inshape instanceof Kinetic.Ellipse ) {
-            var circleX = inshape.x();
-            var circleY = inshape.y();
+            var ellipseX = inshape.x();
+            var ellipseY = inshape.y();
             var radius = inshape.radius();
-            addAnchor(group, circleX-radius.x, circleY-radius.y, &#x27;topLeft&#x27;, dwv.tool.UpdateCircle);
-            addAnchor(group, circleX+radius.x, circleY-radius.y, &#x27;topRight&#x27;, dwv.tool.UpdateCircle);
-            addAnchor(group, circleX+radius.x, circleY+radius.y, &#x27;bottomRight&#x27;, dwv.tool.UpdateCircle);
-            addAnchor(group, circleX-radius.x, circleY+radius.y, &#x27;bottomLeft&#x27;, dwv.tool.UpdateCircle);
+            addAnchor(group, ellipseX-radius.x, ellipseY-radius.y, &#x27;topLeft&#x27;, dwv.tool.UpdateEllipse);
+            addAnchor(group, ellipseX+radius.x, ellipseY-radius.y, &#x27;topRight&#x27;, dwv.tool.UpdateEllipse);
+            addAnchor(group, ellipseX+radius.x, ellipseY+radius.y, &#x27;bottomRight&#x27;, dwv.tool.UpdateEllipse);
+            addAnchor(group, ellipseX-radius.x, ellipseY+radius.y, &#x27;bottomLeft&#x27;, dwv.tool.UpdateEllipse);
         }
         // add group to layer
         inshape.getLayer().add( group );
@@ -312,12 +314,12 @@ dwv.tool.ShapeEditor = function () {
         // add hover styling
         anchor.on(&#x27;mouseover&#x27;, function () {
             document.body.style.cursor = &#x27;pointer&#x27;;
-            this.setStrokeWidth(4);
+            this.stroke(&#x27;#ddd&#x27;);
             this.getLayer().draw();
         });
         anchor.on(&#x27;mouseout&#x27;, function () {
             document.body.style.cursor = &#x27;default&#x27;;
-            this.strokeWidth(2);
+            this.stroke(&#x27;#999&#x27;);
             this.getLayer().draw();
         });
 

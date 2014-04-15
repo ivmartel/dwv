@@ -8404,6 +8404,62 @@ dwv.math.Circle = function(centre, radius)
     };
 }; // Circle class
 
+/** 
+ * Ellipse shape.
+ * @class Ellipse
+ * @namespace dwv.math
+ * @constructor
+ * @param {Object} centre A Point2D representing the centre of the ellipse.
+ * @param {Number} a The radius of the ellipse on the horizontal axe.
+ * @param {Number} b The radius of the ellipse on the vertical axe.
+ */
+dwv.math.Ellipse = function(centre, a, b)
+{
+    /**
+     * Circle surface.
+     * @property surface
+     * @private
+     * @type Number
+     */
+    var surface = Math.PI*a*b;
+
+    /**
+     * Get the centre (point) of the ellipse.
+     * @method getCenter
+     * @return {Object} The center (point) of the ellipse.
+     */
+    this.getCenter = function() { return centre; };
+    /**
+     * Get the radius of the ellipse on the horizontal axe.
+     * @method getA
+     * @return {Number} The radius of the ellipse on the horizontal axe.
+     */
+    this.getA = function() { return a; };
+    /**
+     * Get the radius of the ellipse on the vertical axe.
+     * @method getB
+     * @return {Number} The radius of the ellipse on the vertical axe.
+     */
+    this.getB = function() { return b; };
+    /**
+     * Get the surface of the ellipse.
+     * @method getSurface
+     * @return {Number} The surface of the ellipse.
+     */
+    this.getSurface = function() { return surface; };
+    /**
+     * Get the surface of the ellipse with a spacing.
+     * @method getWorldSurface
+     * @param {Number} spacingX The X spacing.
+     * @param {Number} spacingY The Y spacing.
+     * @return {Number} The surface of the ellipse multiplied by the given spacing.
+     */
+    this.getWorldSurface = function(spacingX, spacingY)
+    {
+        return surface * spacingX * spacingY;
+    };
+}; // Circle class
+
 /**
  * Line shape.
  * @class Line
@@ -8701,181 +8757,6 @@ dwv.tool = dwv.tool || {};
 
 var Kinetic = Kinetic || {};
 
-/**
- * Draw circle command.
- * @class DrawCircleCommand
- * @namespace dwv.tool
- * @constructor
- * @param {Array} points The points from which to extract the circle.
- * @param {Object} app The application to draw the circle on.
- * @param {Style} style The drawing style.
- */
-dwv.tool.DrawCircleCommand = function(points, app, style, isFinal)
-{
-    // calculate radius
-    var a = Math.abs(points[0].getX() - points[points.length-1].getX());
-    var b = Math.abs(points[0].getY() - points[points.length-1].getY());
-    var radius = Math.round( Math.sqrt( a * a + b * b ) );
-    // check zero radius
-    if( radius === 0 )
-    {
-        // silent fail...
-        return;
-    }
-    
-    /**
-     * Circle object.
-     * @property circle
-     * @private
-     * @type Circle
-     */
-    var circle = new dwv.math.Circle(points[0], radius);
-    
-    /**
-     * Line color.
-     * @property lineColor
-     * @private
-     * @type String
-     */
-    var lineColor = style.getLineColor();
-    /**
-     * HTML context.
-     * @property context
-     * @private
-     * @type Object
-     */
-    //var context = app.getTempLayer().getContext();
-    
-    /**
-     * Command name.
-     * @property name
-     * @private
-     * @type String
-     */
-    var name = "DrawCircleCommand";
-    /**
-     * Get the command name.
-     * @method getName
-     * @return {String} The command name.
-     */
-    this.getName = function() { return name; };
-    /**
-     * Set the command name.
-     * @method setName
-     * @param {String} str The command name.
-     */
-    this.setName = function(str) { name = str; };
-
-    /**
-     * Execute the command.
-     * @method execute
-     */
-    this.execute = function()
-    {
-        // style
-        /*context.fillStyle = lineColor;
-        context.strokeStyle = lineColor;
-        // path
-        context.beginPath();
-        context.arc(
-            circle.getCenter().getX(), 
-            circle.getCenter().getY(), 
-            circle.getRadius(),
-            0, 2*Math.PI);
-        context.stroke();
-        // surface
-        var surf = circle.getWorldSurface( 
-            app.getImage().getSpacing().getColumnSpacing(), 
-            app.getImage().getSpacing().getRowSpacing() );
-        context.font = style.getFontStr();
-        context.fillText( Math.round(surf) + "mm2",
-            circle.getCenter().getX() + style.getFontSize(),
-            circle.getCenter().getY() + style.getFontSize());*/
-        
-        var name = isFinal ? "final" : "temp";
-        var kcircle = new Kinetic.Ellipse({
-            x: circle.getCenter().getX(),
-            y: circle.getCenter().getY(),
-            radius: { x: circle.getRadius(), y: circle.getRadius() },
-            stroke: lineColor,
-            strokeWidth: 2,
-            name: name
-        });
-        // add hover styling
-        kcircle.on('mouseover', function () {
-            document.body.style.cursor = 'pointer';
-            this.getLayer().draw();
-        });
-        kcircle.on('mouseout', function () {
-            document.body.style.cursor = 'default';
-            this.getLayer().draw();
-        });
-        // remove temporary shapes from the layer
-        var klayer = app.getKineticLayer();
-        var kshapes = klayer.find('.temp');
-        kshapes.each( function (kshape) {
-            kshape.remove(); 
-        });
-        // create group
-        var kgroup = new Kinetic.Group();
-        kgroup.add(kcircle);
-       // add the group to the layer
-        app.getKineticLayer().add(kgroup);
-        app.getKineticLayer().draw();
-    };
-}; // DrawCircleCommand class
-
-dwv.tool.UpdateCircle = function (circle, anchor) {
-    var group = anchor.getParent();
-
-    var topLeft = group.find('#topLeft')[0];
-    var topRight = group.find('#topRight')[0];
-    var bottomRight = group.find('#bottomRight')[0];
-    var bottomLeft = group.find('#bottomLeft')[0];
-
-    var anchorX = anchor.x();
-    var anchorY = anchor.y();
-
-    // update anchor positions
-    switch (anchor.id()) {
-    case 'topLeft':
-        topRight.y(anchorY);
-        bottomLeft.x(anchorX);
-        break;
-    case 'topRight':
-        topLeft.y(anchorY);
-        bottomRight.x(anchorX);
-        break;
-    case 'bottomRight':
-        bottomLeft.y(anchorY);
-        topRight.x(anchorX); 
-        break;
-    case 'bottomLeft':
-        bottomRight.y(anchorY);
-        topLeft.x(anchorX); 
-        break;
-    }
-
-    // update position
-    var radiusX = ( topRight.x() - topLeft.x() ) / 2;
-    var radiusY = ( bottomRight.y() - topRight.y() ) / 2;
-    var center = { x: topLeft.x() + radiusX, y: topRight.y() + radiusY };
-    circle.setPosition( center );
-    // update radius
-    var radiusAbs = { x: Math.abs(radiusX), y: Math.abs(radiusY) };
-    if ( radiusAbs ) {
-        circle.radius( radiusAbs );
-    }
-};
-;/** 
- * Tool module.
- * @module tool
- */
-var dwv = dwv || {};
-dwv.tool = dwv.tool || {};
-
-var Kinetic = Kinetic || {};
-
 dwv.tool.ShapeEditor = function () {
     var shape = null;
     var isActive = false;
@@ -8934,13 +8815,13 @@ dwv.tool.ShapeEditor = function () {
             addAnchor(group, rectX, rectY+rectHeight, 'bottomLeft', dwv.tool.UpdateRect);
         }
         else if ( inshape instanceof Kinetic.Ellipse ) {
-            var circleX = inshape.x();
-            var circleY = inshape.y();
+            var ellipseX = inshape.x();
+            var ellipseY = inshape.y();
             var radius = inshape.radius();
-            addAnchor(group, circleX-radius.x, circleY-radius.y, 'topLeft', dwv.tool.UpdateCircle);
-            addAnchor(group, circleX+radius.x, circleY-radius.y, 'topRight', dwv.tool.UpdateCircle);
-            addAnchor(group, circleX+radius.x, circleY+radius.y, 'bottomRight', dwv.tool.UpdateCircle);
-            addAnchor(group, circleX-radius.x, circleY+radius.y, 'bottomLeft', dwv.tool.UpdateCircle);
+            addAnchor(group, ellipseX-radius.x, ellipseY-radius.y, 'topLeft', dwv.tool.UpdateEllipse);
+            addAnchor(group, ellipseX+radius.x, ellipseY-radius.y, 'topRight', dwv.tool.UpdateEllipse);
+            addAnchor(group, ellipseX+radius.x, ellipseY+radius.y, 'bottomRight', dwv.tool.UpdateEllipse);
+            addAnchor(group, ellipseX-radius.x, ellipseY+radius.y, 'bottomLeft', dwv.tool.UpdateEllipse);
         }
         // add group to layer
         inshape.getLayer().add( group );
@@ -8979,12 +8860,12 @@ dwv.tool.ShapeEditor = function () {
         // add hover styling
         anchor.on('mouseover', function () {
             document.body.style.cursor = 'pointer';
-            this.setStrokeWidth(4);
+            this.stroke('#ddd');
             this.getLayer().draw();
         });
         anchor.on('mouseout', function () {
             document.body.style.cursor = 'default';
-            this.strokeWidth(2);
+            this.stroke('#999');
             this.getLayer().draw();
         });
 
@@ -9259,6 +9140,180 @@ dwv.tool.Draw.prototype.init = function() {
     this.setLineColour(dwv.tool.colors[0]);
     // init html
     dwv.gui.initDrawHtml();
+};
+;/** 
+ * Tool module.
+ * @module tool
+ */
+var dwv = dwv || {};
+dwv.tool = dwv.tool || {};
+
+var Kinetic = Kinetic || {};
+
+/**
+ * Draw ellpise command.
+ * @class DrawEllipseCommand
+ * @namespace dwv.tool
+ * @constructor
+ * @param {Array} points The points from which to extract the ellipse.
+ * @param {Object} app The application to draw the ellipse on.
+ * @param {Style} style The drawing style.
+ */
+dwv.tool.DrawEllipseCommand = function(points, app, style, isFinal)
+{
+    // calculate radius
+    var a = Math.abs(points[0].getX() - points[points.length-1].getX());
+    var b = Math.abs(points[0].getY() - points[points.length-1].getY());
+    // check zero radius
+    if ( a === 0 || b === 0 )
+    {
+        // silent fail...
+        return;
+    }
+    
+    /**
+     * Ellipse object.
+     * @property ellipse
+     * @private
+     * @type Ellipse
+     */
+    var ellipse = new dwv.math.Ellipse(points[0], a, b);
+    
+    /**
+     * Line color.
+     * @property lineColor
+     * @private
+     * @type String
+     */
+    var lineColor = style.getLineColor();
+    /**
+     * HTML context.
+     * @property context
+     * @private
+     * @type Object
+     */
+    //var context = app.getTempLayer().getContext();
+    
+    /**
+     * Command name.
+     * @property name
+     * @private
+     * @type String
+     */
+    var name = "DrawEllipseCommand";
+    /**
+     * Get the command name.
+     * @method getName
+     * @return {String} The command name.
+     */
+    this.getName = function() { return name; };
+    /**
+     * Set the command name.
+     * @method setName
+     * @param {String} str The command name.
+     */
+    this.setName = function(str) { name = str; };
+
+    /**
+     * Execute the command.
+     * @method execute
+     */
+    this.execute = function()
+    {
+        // style
+        /*context.fillStyle = lineColor;
+        context.strokeStyle = lineColor;
+        // path
+        context.beginPath();
+        context.arc(
+            ellipse.getCenter().getX(), 
+            ellipse.getCenter().getY(), 
+            ellipse.getRadius(),
+            0, 2*Math.PI);
+        context.stroke();
+        // surface
+        var surf = ellipse.getWorldSurface( 
+            app.getImage().getSpacing().getColumnSpacing(), 
+            app.getImage().getSpacing().getRowSpacing() );
+        context.font = style.getFontStr();
+        context.fillText( Math.round(surf) + "mm2",
+            ellipse.getCenter().getX() + style.getFontSize(),
+            ellipse.getCenter().getY() + style.getFontSize());*/
+        
+        var name = isFinal ? "final" : "temp";
+        var kellipse = new Kinetic.Ellipse({
+            x: ellipse.getCenter().getX(),
+            y: ellipse.getCenter().getY(),
+            radius: { x: ellipse.getA(), y: ellipse.getB() },
+            stroke: lineColor,
+            strokeWidth: 2,
+            name: name
+        });
+        // add hover styling
+        kellipse.on('mouseover', function () {
+            document.body.style.cursor = 'pointer';
+            this.getLayer().draw();
+        });
+        kellipse.on('mouseout', function () {
+            document.body.style.cursor = 'default';
+            this.getLayer().draw();
+        });
+        // remove temporary shapes from the layer
+        var klayer = app.getKineticLayer();
+        var kshapes = klayer.find('.temp');
+        kshapes.each( function (kshape) {
+            kshape.remove(); 
+        });
+        // create group
+        var kgroup = new Kinetic.Group();
+        kgroup.add(kellipse);
+       // add the group to the layer
+        app.getKineticLayer().add(kgroup);
+        app.getKineticLayer().draw();
+    };
+}; // DrawEllipseCommand class
+
+dwv.tool.UpdateEllipse = function (ellipse, anchor) {
+    var group = anchor.getParent();
+
+    var topLeft = group.find('#topLeft')[0];
+    var topRight = group.find('#topRight')[0];
+    var bottomRight = group.find('#bottomRight')[0];
+    var bottomLeft = group.find('#bottomLeft')[0];
+
+    var anchorX = anchor.x();
+    var anchorY = anchor.y();
+
+    // update anchor positions
+    switch (anchor.id()) {
+    case 'topLeft':
+        topRight.y(anchorY);
+        bottomLeft.x(anchorX);
+        break;
+    case 'topRight':
+        topLeft.y(anchorY);
+        bottomRight.x(anchorX);
+        break;
+    case 'bottomRight':
+        bottomLeft.y(anchorY);
+        topRight.x(anchorX); 
+        break;
+    case 'bottomLeft':
+        bottomRight.y(anchorY);
+        topLeft.x(anchorX); 
+        break;
+    }
+
+    // update position
+    var radiusX = ( topRight.x() - topLeft.x() ) / 2;
+    var radiusY = ( bottomRight.y() - topRight.y() ) / 2;
+    var center = { x: topLeft.x() + radiusX, y: topRight.y() + radiusY };
+    ellipse.setPosition( center );
+    // update radius
+    var radiusAbs = { x: Math.abs(radiusX), y: Math.abs(radiusY) };
+    if ( radiusAbs ) {
+        ellipse.radius( radiusAbs );
+    }
 };
 ;/** 
  * Tool module.
@@ -10331,7 +10386,7 @@ var Kinetic = Kinetic || {};
  * @class DrawRectangleCommand
  * @namespace dwv.tool
  * @constructor
- * @param {Array} points The points from which to extract the circle.
+ * @param {Array} points The points from which to extract the rectangle.
  * @param {Object} app The application to draw the line on.
  * @param {Style} style The drawing style.
  */
