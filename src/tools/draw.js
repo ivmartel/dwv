@@ -65,13 +65,13 @@ dwv.tool.ShapeEditor = function () {
             addAnchor(group, rectX, rectY+rectHeight, 'bottomLeft', dwv.tool.UpdateRect);
         }
         else if ( inshape instanceof Kinetic.Ellipse ) {
-            var circleX = inshape.x();
-            var circleY = inshape.y();
+            var ellipseX = inshape.x();
+            var ellipseY = inshape.y();
             var radius = inshape.radius();
-            addAnchor(group, circleX-radius.x, circleY-radius.y, 'topLeft', dwv.tool.UpdateCircle);
-            addAnchor(group, circleX+radius.x, circleY-radius.y, 'topRight', dwv.tool.UpdateCircle);
-            addAnchor(group, circleX+radius.x, circleY+radius.y, 'bottomRight', dwv.tool.UpdateCircle);
-            addAnchor(group, circleX-radius.x, circleY+radius.y, 'bottomLeft', dwv.tool.UpdateCircle);
+            addAnchor(group, ellipseX-radius.x, ellipseY-radius.y, 'topLeft', dwv.tool.UpdateEllipse);
+            addAnchor(group, ellipseX+radius.x, ellipseY-radius.y, 'topRight', dwv.tool.UpdateEllipse);
+            addAnchor(group, ellipseX+radius.x, ellipseY+radius.y, 'bottomRight', dwv.tool.UpdateEllipse);
+            addAnchor(group, ellipseX-radius.x, ellipseY+radius.y, 'bottomLeft', dwv.tool.UpdateEllipse);
         }
         // add group to layer
         inshape.getLayer().add( group );
@@ -110,12 +110,12 @@ dwv.tool.ShapeEditor = function () {
         // add hover styling
         anchor.on('mouseover', function () {
             document.body.style.cursor = 'pointer';
-            this.setStrokeWidth(4);
+            this.stroke('#ddd');
             this.getLayer().draw();
         });
         anchor.on('mouseout', function () {
             document.body.style.cursor = 'default';
-            this.strokeWidth(2);
+            this.stroke('#999');
             this.getLayer().draw();
         });
 

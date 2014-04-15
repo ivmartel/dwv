@@ -42,7 +42,7 @@ $(document).ready( function()
     dwv.tool.shapes.line = dwv.tool.DrawLineCommand;
     dwv.tool.shapes.rectangle = dwv.tool.DrawRectangleCommand;
     dwv.tool.shapes.roi = dwv.tool.DrawRoiCommand;
-    dwv.tool.shapes.circle = dwv.tool.DrawCircleCommand;
+    dwv.tool.shapes.ellipse = dwv.tool.DrawEllipseCommand;
 
     // append tool container HTML
     dwv.gui.appendToolboxHtml();

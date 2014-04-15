@@ -8,34 +8,33 @@ dwv.tool = dwv.tool || {};
 var Kinetic = Kinetic || {};
 
 /**
- * Draw circle command.
- * @class DrawCircleCommand
+ * Draw ellpise command.
+ * @class DrawEllipseCommand
  * @namespace dwv.tool
  * @constructor
- * @param {Array} points The points from which to extract the circle.
- * @param {Object} app The application to draw the circle on.
+ * @param {Array} points The points from which to extract the ellipse.
+ * @param {Object} app The application to draw the ellipse on.
  * @param {Style} style The drawing style.
  */
-dwv.tool.DrawCircleCommand = function(points, app, style, isFinal)
+dwv.tool.DrawEllipseCommand = function(points, app, style, isFinal)
 {
     // calculate radius
     var a = Math.abs(points[0].getX() - points[points.length-1].getX());
     var b = Math.abs(points[0].getY() - points[points.length-1].getY());
-    var radius = Math.round( Math.sqrt( a * a + b * b ) );
     // check zero radius
-    if( radius === 0 )
+    if ( a === 0 || b === 0 )
     {
         // silent fail...
         return;
     }
     
     /**
-     * Circle object.
-     * @property circle
+     * Ellipse object.
+     * @property ellipse
      * @private
-     * @type Circle
+     * @type Ellipse
      */
-    var circle = new dwv.math.Circle(points[0], radius);
+    var ellipse = new dwv.math.Ellipse(points[0], a, b);
     
     /**
      * Line color.
@@ -58,7 +57,7 @@ dwv.tool.DrawCircleCommand = function(points, app, style, isFinal)
      * @private
      * @type String
      */
-    var name = "DrawCircleCommand";
+    var name = "DrawEllipseCommand";
     /**
      * Get the command name.
      * @method getName
@@ -84,35 +83,35 @@ dwv.tool.DrawCircleCommand = function(points, app, style, isFinal)
         // path
         context.beginPath();
         context.arc(
-            circle.getCenter().getX(), 
-            circle.getCenter().getY(), 
-            circle.getRadius(),
+            ellipse.getCenter().getX(), 
+            ellipse.getCenter().getY(), 
+            ellipse.getRadius(),
             0, 2*Math.PI);
         context.stroke();
         // surface
-        var surf = circle.getWorldSurface( 
+        var surf = ellipse.getWorldSurface( 
             app.getImage().getSpacing().getColumnSpacing(), 
             app.getImage().getSpacing().getRowSpacing() );
         context.font = style.getFontStr();
         context.fillText( Math.round(surf) + "mm2",
-            circle.getCenter().getX() + style.getFontSize(),
-            circle.getCenter().getY() + style.getFontSize());*/
+            ellipse.getCenter().getX() + style.getFontSize(),
+            ellipse.getCenter().getY() + style.getFontSize());*/
         
         var name = isFinal ? "final" : "temp";
-        var kcircle = new Kinetic.Ellipse({
-            x: circle.getCenter().getX(),
-            y: circle.getCenter().getY(),
-            radius: { x: circle.getRadius(), y: circle.getRadius() },
+        var kellipse = new Kinetic.Ellipse({
+            x: ellipse.getCenter().getX(),
+            y: ellipse.getCenter().getY(),
+            radius: { x: ellipse.getA(), y: ellipse.getB() },
             stroke: lineColor,
             strokeWidth: 2,
             name: name
         });
         // add hover styling
-        kcircle.on('mouseover', function () {
+        kellipse.on('mouseover', function () {
             document.body.style.cursor = 'pointer';
             this.getLayer().draw();
         });
-        kcircle.on('mouseout', function () {
+        kellipse.on('mouseout', function () {
             document.body.style.cursor = 'default';
             this.getLayer().draw();
         });
@@ -124,14 +123,14 @@ dwv.tool.DrawCircleCommand = function(points, app, style, isFinal)
         });
         // create group
         var kgroup = new Kinetic.Group();
-        kgroup.add(kcircle);
+        kgroup.add(kellipse);
        // add the group to the layer
         app.getKineticLayer().add(kgroup);
         app.getKineticLayer().draw();
     };
-}; // DrawCircleCommand class
+}; // DrawEllipseCommand class
 
-dwv.tool.UpdateCircle = function (circle, anchor) {
+dwv.tool.UpdateEllipse = function (ellipse, anchor) {
     var group = anchor.getParent();
 
     var topLeft = group.find('#topLeft')[0];
@@ -166,10 +165,10 @@ dwv.tool.UpdateCircle = function (circle, anchor) {
     var radiusX = ( topRight.x() - topLeft.x() ) / 2;
     var radiusY = ( bottomRight.y() - topRight.y() ) / 2;
     var center = { x: topLeft.x() + radiusX, y: topRight.y() + radiusY };
-    circle.setPosition( center );
+    ellipse.setPosition( center );
     // update radius
     var radiusAbs = { x: Math.abs(radiusX), y: Math.abs(radiusY) };
     if ( radiusAbs ) {
-        circle.radius( radiusAbs );
+        ellipse.radius( radiusAbs );
     }
 };

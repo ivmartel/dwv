@@ -62,6 +62,21 @@ test("Test Circle.", function() {
     equal(c0.getWorldSurface(0.5,0.5), Math.PI, "getWorldSurface");
 });
 
+test("Test Ellipse.", function() {
+    var center = new dwv.math.Point2D(0,0);
+    var e0 = new dwv.math.Ellipse(center,2,4);
+    // getCenter
+    equal(e0.getCenter(), center, "getCenter");
+    // getA
+    equal(e0.getA(), 2, "getA");
+    // getB
+    equal(e0.getB(), 4, "getB");
+    // getSurface
+    equal(e0.getSurface(), Math.PI*2*4, "getSurface");
+    // equals: true
+    equal(e0.getWorldSurface(0.5,0.25), Math.PI, "getWorldSurface");
+});
+
 test("Test Line.", function() {
     var p0 = new dwv.math.Point2D(0,0);
     var p1 = new dwv.math.Point2D(0,-5);

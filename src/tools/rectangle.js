@@ -12,7 +12,7 @@ var Kinetic = Kinetic || {};
  * @class DrawRectangleCommand
  * @namespace dwv.tool
  * @constructor
- * @param {Array} points The points from which to extract the circle.
+ * @param {Array} points The points from which to extract the rectangle.
  * @param {Object} app The application to draw the line on.
  * @param {Style} style The drawing style.
  */
