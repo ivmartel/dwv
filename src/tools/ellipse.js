@@ -108,12 +108,16 @@ dwv.tool.DrawEllipseCommand = function(points, app, style, isFinal)
         });
         // add hover styling
         kellipse.on('mouseover', function () {
-            document.body.style.cursor = 'pointer';
-            this.getLayer().draw();
+            if ( this.getLayer() ) {
+                document.body.style.cursor = 'pointer';
+                this.getLayer().draw();
+            }
         });
         kellipse.on('mouseout', function () {
-            document.body.style.cursor = 'default';
-            this.getLayer().draw();
+            if ( this.getLayer() ) {
+                document.body.style.cursor = 'default';
+                this.getLayer().draw();
+            }
         });
         // remove temporary shapes from the layer
         var klayer = app.getKineticLayer();

@@ -266,6 +266,17 @@ dwv.math.Line = function(begin, end)
  */
 dwv.math.Rectangle = function(begin, end)
 {
+    if ( end.getX() < begin.getX() ) {
+        var tmpX = begin.getX();
+        begin = new dwv.math.Point2D( end.getX(), begin.getY() );
+        end = new dwv.math.Point2D( tmpX, end.getY() );
+    }
+    if ( end.getY() < begin.getY() ) {
+        var tmpY = begin.getY();
+        begin = new dwv.math.Point2D( begin.getX(), end.getY() );
+        end = new dwv.math.Point2D( end.getX(), tmpY );
+    }
+    
     /**
      * Rectangle surface.
      * @property surface
