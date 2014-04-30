@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>src/tools/ellipse.js - dwv</title>
+    <title>src/tools/circle.js - dwv</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
     <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
@@ -87,8 +87,6 @@
             
                 <li><a href="../classes/dwv.math.Circle.html">dwv.math.Circle</a></li>
             
-                <li><a href="../classes/dwv.math.Ellipse.html">dwv.math.Ellipse</a></li>
-            
                 <li><a href="../classes/dwv.math.FastPoint2D.html">dwv.math.FastPoint2D</a></li>
             
                 <li><a href="../classes/dwv.math.Line.html">dwv.math.Line</a></li>
@@ -107,7 +105,7 @@
             
                 <li><a href="../classes/dwv.tool.Draw.html">dwv.tool.Draw</a></li>
             
-                <li><a href="../classes/dwv.tool.DrawEllipseCommand.html">dwv.tool.DrawEllipseCommand</a></li>
+                <li><a href="../classes/dwv.tool.DrawCircleCommand.html">dwv.tool.DrawCircleCommand</a></li>
             
                 <li><a href="../classes/dwv.tool.DrawLineCommand.html">dwv.tool.DrawLineCommand</a></li>
             
@@ -198,7 +196,7 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-                        <h1 class="file-heading">File: src/tools/ellipse.js</h1>
+                        <h1 class="file-heading">File: src/tools/circle.js</h1>
 
 <div class="file">
     <pre class="code prettyprint linenums">
@@ -209,36 +207,35 @@
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
 
-var Kinetic = Kinetic || {};
-
 /**
- * Draw ellpise command.
- * @class DrawEllipseCommand
+ * Draw circle command.
+ * @class DrawCircleCommand
  * @namespace dwv.tool
  * @constructor
- * @param {Array} points The points from which to extract the ellipse.
- * @param {Object} app The application to draw the ellipse on.
+ * @param {Array} points The points from which to extract the circle.
+ * @param {Object} app The application to draw the circle on.
  * @param {Style} style The drawing style.
  */
-dwv.tool.DrawEllipseCommand = function(points, app, style, isFinal)
+dwv.tool.DrawCircleCommand = function(points, app, style)
 {
     // calculate radius
     var a = Math.abs(points[0].getX() - points[points.length-1].getX());
     var b = Math.abs(points[0].getY() - points[points.length-1].getY());
+    var radius = Math.round( Math.sqrt( a * a + b * b ) );
     // check zero radius
-    if ( a === 0 || b === 0 )
+    if( radius === 0 )
     {
         // silent fail...
         return;
     }
     
     /**
-     * Ellipse object.
-     * @property ellipse
+     * Circle object.
+     * @property circle
      * @private
-     * @type Ellipse
+     * @type Circle
      */
-    var ellipse = new dwv.math.Ellipse(points[0], a, b);
+    var circle = new dwv.math.Circle(points[0], radius);
     
     /**
      * Line color.
@@ -253,7 +250,7 @@ dwv.tool.DrawEllipseCommand = function(points, app, style, isFinal)
      * @private
      * @type Object
      */
-    //var context = app.getTempLayer().getContext();
+    var context = app.getTempLayer().getContext();
     
     /**
      * Command name.
@@ -261,7 +258,7 @@ dwv.tool.DrawEllipseCommand = function(points, app, style, isFinal)
      * @private
      * @type String
      */
-    var name = &quot;DrawEllipseCommand&quot;;
+    var name = &quot;DrawCircleCommand&quot;;
     /**
      * Get the command name.
      * @method getName
@@ -282,104 +279,26 @@ dwv.tool.DrawEllipseCommand = function(points, app, style, isFinal)
     this.execute = function()
     {
         // style
-        /*context.fillStyle = lineColor;
+        context.fillStyle = lineColor;
         context.strokeStyle = lineColor;
         // path
         context.beginPath();
         context.arc(
-            ellipse.getCenter().getX(), 
-            ellipse.getCenter().getY(), 
-            ellipse.getRadius(),
+            circle.getCenter().getX(), 
+            circle.getCenter().getY(), 
+            circle.getRadius(),
             0, 2*Math.PI);
         context.stroke();
         // surface
-        var surf = ellipse.getWorldSurface( 
+        var surf = circle.getWorldSurface( 
             app.getImage().getSpacing().getColumnSpacing(), 
             app.getImage().getSpacing().getRowSpacing() );
         context.font = style.getFontStr();
         context.fillText( Math.round(surf) + &quot;mm2&quot;,
-            ellipse.getCenter().getX() + style.getFontSize(),
-            ellipse.getCenter().getY() + style.getFontSize());*/
-        
-        var name = isFinal ? &quot;final&quot; : &quot;temp&quot;;
-        var kellipse = new Kinetic.Ellipse({
-            x: ellipse.getCenter().getX(),
-            y: ellipse.getCenter().getY(),
-            radius: { x: ellipse.getA(), y: ellipse.getB() },
-            stroke: lineColor,
-            strokeWidth: 2,
-            name: name
-        });
-        // add hover styling
-        kellipse.on(&#x27;mouseover&#x27;, function () {
-            if ( this.getLayer() ) {
-                document.body.style.cursor = &#x27;pointer&#x27;;
-                this.getLayer().draw();
-            }
-        });
-        kellipse.on(&#x27;mouseout&#x27;, function () {
-            if ( this.getLayer() ) {
-                document.body.style.cursor = &#x27;default&#x27;;
-                this.getLayer().draw();
-            }
-        });
-        // remove temporary shapes from the layer
-        var klayer = app.getKineticLayer();
-        var kshapes = klayer.find(&#x27;.temp&#x27;);
-        kshapes.each( function (kshape) {
-            kshape.remove(); 
-        });
-        // create group
-        var kgroup = new Kinetic.Group();
-        kgroup.add(kellipse);
-       // add the group to the layer
-        app.getKineticLayer().add(kgroup);
-        app.getKineticLayer().draw();
+            circle.getCenter().getX() + style.getFontSize(),
+            circle.getCenter().getY() + style.getFontSize());
     };
-}; // DrawEllipseCommand class
-
-dwv.tool.UpdateEllipse = function (ellipse, anchor) {
-    var group = anchor.getParent();
-
-    var topLeft = group.find(&#x27;#topLeft&#x27;)[0];
-    var topRight = group.find(&#x27;#topRight&#x27;)[0];
-    var bottomRight = group.find(&#x27;#bottomRight&#x27;)[0];
-    var bottomLeft = group.find(&#x27;#bottomLeft&#x27;)[0];
-
-    var anchorX = anchor.x();
-    var anchorY = anchor.y();
-
-    // update anchor positions
-    switch (anchor.id()) {
-    case &#x27;topLeft&#x27;:
-        topRight.y(anchorY);
-        bottomLeft.x(anchorX);
-        break;
-    case &#x27;topRight&#x27;:
-        topLeft.y(anchorY);
-        bottomRight.x(anchorX);
-        break;
-    case &#x27;bottomRight&#x27;:
-        bottomLeft.y(anchorY);
-        topRight.x(anchorX); 
-        break;
-    case &#x27;bottomLeft&#x27;:
-        bottomRight.y(anchorY);
-        topLeft.x(anchorX); 
-        break;
-    }
-
-    // update position
-    var radiusX = ( topRight.x() - topLeft.x() ) / 2;
-    var radiusY = ( bottomRight.y() - topRight.y() ) / 2;
-    var center = { x: topLeft.x() + radiusX, y: topRight.y() + radiusY };
-    ellipse.setPosition( center );
-    // update radius
-    var radiusAbs = { x: Math.abs(radiusX), y: Math.abs(radiusY) };
-    if ( radiusAbs ) {
-        ellipse.radius( radiusAbs );
-    }
-};
+}; // DrawCircleCommand class
 
     </pre>
 </div>

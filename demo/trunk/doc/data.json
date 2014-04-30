@@ -262,7 +262,6 @@
                 "dwv.math.Point2D": 1,
                 "dwv.math.FastPoint2D": 1,
                 "dwv.math.Circle": 1,
-                "dwv.math.Ellipse": 1,
                 "dwv.math.Line": 1,
                 "dwv.math.Rectangle": 1,
                 "dwv.math.ROI": 1,
@@ -273,22 +272,22 @@
                 "dwv.math": 1
             }
         },
-        "src/tools/draw.js": {
-            "name": "src/tools/draw.js",
+        "src/tools/circle.js": {
+            "name": "src/tools/circle.js",
             "modules": {},
             "classes": {
-                "dwv.tool.Draw": 1
+                "dwv.tool.DrawCircleCommand": 1
             },
             "fors": {},
             "namespaces": {
                 "dwv.tool": 1
             }
         },
-        "src/tools/ellipse.js": {
-            "name": "src/tools/ellipse.js",
+        "src/tools/draw.js": {
+            "name": "src/tools/draw.js",
             "modules": {},
             "classes": {
-                "dwv.tool.DrawEllipseCommand": 1
+                "dwv.tool.Draw": 1
             },
             "fors": {},
             "namespaces": {
@@ -572,7 +571,6 @@
                 "dwv.math.Point2D": 1,
                 "dwv.math.FastPoint2D": 1,
                 "dwv.math.Circle": 1,
-                "dwv.math.Ellipse": 1,
                 "dwv.math.Line": 1,
                 "dwv.math.Rectangle": 1,
                 "dwv.math.ROI": 1,
@@ -584,15 +582,15 @@
             },
             "tag": "module",
             "file": "src/math/shapes.js",
-            "line": 385,
+            "line": 318,
             "description": "Math module."
         },
         "tool": {
             "name": "tool",
             "submodules": {},
             "classes": {
+                "dwv.tool.DrawCircleCommand": 1,
                 "dwv.tool.Draw": 1,
-                "dwv.tool.DrawEllipseCommand": 1,
                 "dwv.tool.Filter": 1,
                 "dwv.tool.filter.Threshold": 1,
                 "dwv.tool.filter.Sharpen": 1,
@@ -648,7 +646,7 @@
             },
             "tag": "module",
             "file": "src/application.js",
-            "line": 6,
+            "line": 4,
             "description": "Utility module."
         }
     },
@@ -1161,38 +1159,6 @@
                 }
             ]
         },
-        "dwv.math.Ellipse": {
-            "name": "dwv.math.Ellipse",
-            "shortname": "dwv.math.Ellipse",
-            "classitems": [],
-            "plugins": [],
-            "extensions": [],
-            "plugin_for": [],
-            "extension_for": [],
-            "module": "math",
-            "namespace": "dwv.math",
-            "file": "src/math/shapes.js",
-            "line": 139,
-            "description": "Ellipse shape.",
-            "is_constructor": 1,
-            "params": [
-                {
-                    "name": "centre",
-                    "description": "A Point2D representing the centre of the ellipse.",
-                    "type": "Object"
-                },
-                {
-                    "name": "a",
-                    "description": "The radius of the ellipse on the horizontal axe.",
-                    "type": "Number"
-                },
-                {
-                    "name": "b",
-                    "description": "The radius of the ellipse on the vertical axe.",
-                    "type": "Number"
-                }
-            ]
-        },
         "dwv.math.Line": {
             "name": "dwv.math.Line",
             "shortname": "dwv.math.Line",
@@ -1204,7 +1170,7 @@
             "module": "math",
             "namespace": "dwv.math",
             "file": "src/math/shapes.js",
-            "line": 195,
+            "line": 139,
             "description": "Line shape.",
             "is_constructor": 1,
             "params": [
@@ -1231,7 +1197,7 @@
             "module": "math",
             "namespace": "dwv.math",
             "file": "src/math/shapes.js",
-            "line": 259,
+            "line": 203,
             "description": "Rectangle shape.",
             "is_constructor": 1,
             "params": [
@@ -1258,7 +1224,7 @@
             "module": "math",
             "namespace": "dwv.math",
             "file": "src/math/shapes.js",
-            "line": 341,
+            "line": 274,
             "description": "Region Of Interest shape.",
             "is_constructor": 1
         },
@@ -1273,7 +1239,7 @@
             "module": "math",
             "namespace": "dwv.math",
             "file": "src/math/shapes.js",
-            "line": 385,
+            "line": 318,
             "description": "Path shape.",
             "is_constructor": 1,
             "params": [
@@ -1289,6 +1255,38 @@
                 }
             ]
         },
+        "dwv.tool.DrawCircleCommand": {
+            "name": "dwv.tool.DrawCircleCommand",
+            "shortname": "dwv.tool.DrawCircleCommand",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "tool",
+            "namespace": "dwv.tool",
+            "file": "src/tools/circle.js",
+            "line": 8,
+            "description": "Draw circle command.",
+            "is_constructor": 1,
+            "params": [
+                {
+                    "name": "points",
+                    "description": "The points from which to extract the circle.",
+                    "type": "Array"
+                },
+                {
+                    "name": "app",
+                    "description": "The application to draw the circle on.",
+                    "type": "Object"
+                },
+                {
+                    "name": "style",
+                    "description": "The drawing style.",
+                    "type": "Style"
+                }
+            ]
+        },
         "dwv.tool.Draw": {
             "name": "dwv.tool.Draw",
             "shortname": "dwv.tool.Draw",
@@ -1300,7 +1298,7 @@
             "module": "tool",
             "namespace": "dwv.tool",
             "file": "src/tools/draw.js",
-            "line": 131,
+            "line": 13,
             "description": "Drawing tool.",
             "is_constructor": 1,
             "params": [
@@ -1308,38 +1306,6 @@
                     "name": "app",
                     "description": "The associated application.",
                     "type": "Object"
-                }
-            ]
-        },
-        "dwv.tool.DrawEllipseCommand": {
-            "name": "dwv.tool.DrawEllipseCommand",
-            "shortname": "dwv.tool.DrawEllipseCommand",
-            "classitems": [],
-            "plugins": [],
-            "extensions": [],
-            "plugin_for": [],
-            "extension_for": [],
-            "module": "tool",
-            "namespace": "dwv.tool",
-            "file": "src/tools/ellipse.js",
-            "line": 10,
-            "description": "Draw ellpise command.",
-            "is_constructor": 1,
-            "params": [
-                {
-                    "name": "points",
-                    "description": "The points from which to extract the ellipse.",
-                    "type": "Array"
-                },
-                {
-                    "name": "app",
-                    "description": "The application to draw the ellipse on.",
-                    "type": "Object"
-                },
-                {
-                    "name": "style",
-                    "description": "The drawing style.",
-                    "type": "Style"
                 }
             ]
         },
@@ -1462,7 +1428,7 @@
             "module": "tool",
             "namespace": "dwv.tool",
             "file": "src/tools/line.js",
-            "line": 10,
+            "line": 8,
             "description": "Draw line command.",
             "is_constructor": 1,
             "params": [
@@ -1547,13 +1513,13 @@
             "module": "tool",
             "namespace": "dwv.tool",
             "file": "src/tools/rectangle.js",
-            "line": 10,
+            "line": 8,
             "description": "Draw rectangle command.",
             "is_constructor": 1,
             "params": [
                 {
                     "name": "points",
-                    "description": "The points from which to extract the rectangle.",
+                    "description": "The points from which to extract the circle.",
                     "type": "Array"
                 },
                 {
@@ -1579,7 +1545,7 @@
             "module": "tool",
             "namespace": "dwv.tool",
             "file": "src/tools/roi.js",
-            "line": 10,
+            "line": 8,
             "description": "Draw ROI command.",
             "is_constructor": 1,
             "params": [
@@ -1751,7 +1717,7 @@
             "module": "utils",
             "namespace": "dwv",
             "file": "src/application.js",
-            "line": 6,
+            "line": 4,
             "description": "Main application class.",
             "is_constructor": 1
         }
@@ -5285,7 +5251,7 @@
         },
         {
             "file": "src/image/luts.js",
-            "line": 197,
+            "line": 191,
             "description": "Get the length of the LUT array.",
             "itemtype": "method",
             "name": "getLength",
@@ -5299,7 +5265,7 @@
         },
         {
             "file": "src/image/luts.js",
-            "line": 204,
+            "line": 198,
             "description": "Get the value of the LUT at the given offset.",
             "itemtype": "method",
             "name": "getValue",
@@ -5313,7 +5279,7 @@
         },
         {
             "file": "src/image/luts.js",
-            "line": 216,
+            "line": 210,
             "description": "Lookup tables for image color display.",
             "class": "dwv.image.lut.Window",
             "module": "image",
@@ -6076,102 +6042,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 150,
-            "description": "Circle surface.",
-            "itemtype": "property",
-            "name": "surface",
-            "access": "private",
-            "tagname": "",
-            "type": "Number",
-            "class": "dwv.math.Ellipse",
-            "module": "math",
-            "namespace": "dwv.math"
-        },
-        {
-            "file": "src/math/shapes.js",
-            "line": 158,
-            "description": "Get the centre (point) of the ellipse.",
-            "itemtype": "method",
-            "name": "getCenter",
-            "return": {
-                "description": "The center (point) of the ellipse.",
-                "type": "Object"
-            },
-            "class": "dwv.math.Ellipse",
-            "module": "math",
-            "namespace": "dwv.math"
-        },
-        {
-            "file": "src/math/shapes.js",
-            "line": 164,
-            "description": "Get the radius of the ellipse on the horizontal axe.",
-            "itemtype": "method",
-            "name": "getA",
-            "return": {
-                "description": "The radius of the ellipse on the horizontal axe.",
-                "type": "Number"
-            },
-            "class": "dwv.math.Ellipse",
-            "module": "math",
-            "namespace": "dwv.math"
-        },
-        {
-            "file": "src/math/shapes.js",
-            "line": 170,
-            "description": "Get the radius of the ellipse on the vertical axe.",
-            "itemtype": "method",
-            "name": "getB",
-            "return": {
-                "description": "The radius of the ellipse on the vertical axe.",
-                "type": "Number"
-            },
-            "class": "dwv.math.Ellipse",
-            "module": "math",
-            "namespace": "dwv.math"
-        },
-        {
-            "file": "src/math/shapes.js",
-            "line": 176,
-            "description": "Get the surface of the ellipse.",
-            "itemtype": "method",
-            "name": "getSurface",
-            "return": {
-                "description": "The surface of the ellipse.",
-                "type": "Number"
-            },
-            "class": "dwv.math.Ellipse",
-            "module": "math",
-            "namespace": "dwv.math"
-        },
-        {
-            "file": "src/math/shapes.js",
-            "line": 182,
-            "description": "Get the surface of the ellipse with a spacing.",
-            "itemtype": "method",
-            "name": "getWorldSurface",
-            "params": [
-                {
-                    "name": "spacingX",
-                    "description": "The X spacing.",
-                    "type": "Number"
-                },
-                {
-                    "name": "spacingY",
-                    "description": "The Y spacing.",
-                    "type": "Number"
-                }
-            ],
-            "return": {
-                "description": "The surface of the ellipse multiplied by the given spacing.",
-                "type": "Number"
-            },
-            "class": "dwv.math.Ellipse",
-            "module": "math",
-            "namespace": "dwv.math"
-        },
-        {
-            "file": "src/math/shapes.js",
-            "line": 205,
+            "line": 149,
             "description": "Line length.",
             "itemtype": "property",
             "name": "length",
@@ -6184,7 +6055,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 215,
+            "line": 159,
             "description": "Get the begin point of the line.",
             "itemtype": "method",
             "name": "getBegin",
@@ -6198,7 +6069,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 221,
+            "line": 165,
             "description": "Get the end point of the line.",
             "itemtype": "method",
             "name": "getEnd",
@@ -6212,7 +6083,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 227,
+            "line": 171,
             "description": "Get the length of the line.",
             "itemtype": "method",
             "name": "getLength",
@@ -6226,7 +6097,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 233,
+            "line": 177,
             "description": "Get the length of the line with spacing.",
             "itemtype": "method",
             "name": "getWorldLength",
@@ -6252,7 +6123,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 246,
+            "line": 190,
             "description": "Get the mid point of the line.",
             "itemtype": "method",
             "name": "getMidpoint",
@@ -6266,7 +6137,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 280,
+            "line": 213,
             "description": "Rectangle surface.",
             "itemtype": "property",
             "name": "surface",
@@ -6279,7 +6150,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 288,
+            "line": 221,
             "description": "Get the begin point of the rectangle.",
             "itemtype": "method",
             "name": "getBegin",
@@ -6293,7 +6164,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 294,
+            "line": 227,
             "description": "Get the end point of the rectangle.",
             "itemtype": "method",
             "name": "getEnd",
@@ -6307,7 +6178,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 300,
+            "line": 233,
             "description": "Get the real width of the rectangle.",
             "itemtype": "method",
             "name": "getRealWidth",
@@ -6321,7 +6192,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 306,
+            "line": 239,
             "description": "Get the real height of the rectangle.",
             "itemtype": "method",
             "name": "getRealHeight",
@@ -6335,7 +6206,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 312,
+            "line": 245,
             "description": "Get the width of the rectangle.",
             "itemtype": "method",
             "name": "getWidth",
@@ -6349,7 +6220,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 318,
+            "line": 251,
             "description": "Get the height of the rectangle.",
             "itemtype": "method",
             "name": "getHeight",
@@ -6363,7 +6234,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 324,
+            "line": 257,
             "description": "Get the surface of the rectangle.",
             "itemtype": "method",
             "name": "getSurface",
@@ -6377,7 +6248,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 330,
+            "line": 263,
             "description": "Get the surface of the rectangle with a spacing.",
             "itemtype": "method",
             "name": "getWorldSurface",
@@ -6391,7 +6262,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 350,
+            "line": 283,
             "description": "List of points.",
             "itemtype": "property",
             "name": "points",
@@ -6404,7 +6275,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 358,
+            "line": 291,
             "description": "Get a point of the list at a given index.",
             "itemtype": "method",
             "name": "getPoint",
@@ -6425,7 +6296,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 365,
+            "line": 298,
             "description": "Get the length of the point list.",
             "itemtype": "method",
             "name": "getLength",
@@ -6439,7 +6310,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 371,
+            "line": 304,
             "description": "Add a point to the ROI.",
             "itemtype": "method",
             "name": "addPoint",
@@ -6456,7 +6327,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 377,
+            "line": 310,
             "description": "Add points to the ROI.",
             "itemtype": "method",
             "name": "addPoints",
@@ -6473,7 +6344,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 397,
+            "line": 330,
             "description": "List of points.",
             "itemtype": "property",
             "name": "pointArray",
@@ -6484,7 +6355,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 403,
+            "line": 336,
             "description": "List of control points.",
             "itemtype": "property",
             "name": "controlPointIndexArray",
@@ -6495,7 +6366,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 412,
+            "line": 345,
             "description": "Get a point of the list.",
             "itemtype": "method",
             "name": "getPoint",
@@ -6516,7 +6387,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 422,
+            "line": 355,
             "description": "Is the given point a control point.",
             "itemtype": "method",
             "name": "isControlPoint",
@@ -6537,7 +6408,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 438,
+            "line": 371,
             "description": "Get the length of the path.",
             "itemtype": "method",
             "name": "getLength",
@@ -6551,7 +6422,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 447,
+            "line": 380,
             "description": "Add a point to the path.",
             "itemtype": "method",
             "name": "addPoint",
@@ -6568,7 +6439,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 456,
+            "line": 389,
             "description": "Add a control point to the path.",
             "itemtype": "method",
             "name": "addControlPoint",
@@ -6585,7 +6456,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 471,
+            "line": 404,
             "description": "Add points to the path.",
             "itemtype": "method",
             "name": "addPoints",
@@ -6602,7 +6473,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 480,
+            "line": 413,
             "description": "Append a Path to this one.",
             "itemtype": "method",
             "name": "appenPath",
@@ -6618,8 +6489,101 @@
             "namespace": "dwv.math"
         },
         {
+            "file": "src/tools/circle.js",
+            "line": 30,
+            "description": "Circle object.",
+            "itemtype": "property",
+            "name": "circle",
+            "access": "private",
+            "tagname": "",
+            "type": "Circle",
+            "class": "dwv.tool.DrawCircleCommand",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/circle.js",
+            "line": 38,
+            "description": "Line color.",
+            "itemtype": "property",
+            "name": "lineColor",
+            "access": "private",
+            "tagname": "",
+            "type": "String",
+            "class": "dwv.tool.DrawCircleCommand",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/circle.js",
+            "line": 45,
+            "description": "HTML context.",
+            "itemtype": "property",
+            "name": "context",
+            "access": "private",
+            "tagname": "",
+            "type": "Object",
+            "class": "dwv.tool.DrawCircleCommand",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/circle.js",
+            "line": 53,
+            "description": "Command name.",
+            "itemtype": "property",
+            "name": "name",
+            "access": "private",
+            "tagname": "",
+            "type": "String",
+            "class": "dwv.tool.DrawCircleCommand",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/circle.js",
+            "line": 60,
+            "description": "Get the command name.",
+            "itemtype": "method",
+            "name": "getName",
+            "return": {
+                "description": "The command name.",
+                "type": "String"
+            },
+            "class": "dwv.tool.DrawCircleCommand",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/circle.js",
+            "line": 66,
+            "description": "Set the command name.",
+            "itemtype": "method",
+            "name": "setName",
+            "params": [
+                {
+                    "name": "str",
+                    "description": "The command name.",
+                    "type": "String"
+                }
+            ],
+            "class": "dwv.tool.DrawCircleCommand",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/circle.js",
+            "line": 73,
+            "description": "Execute the command.",
+            "itemtype": "method",
+            "name": "execute",
+            "class": "dwv.tool.DrawCircleCommand",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
             "file": "src/tools/draw.js",
-            "line": 140,
+            "line": 22,
             "description": "Closure to self: to be used by event handlers.",
             "itemtype": "property",
             "name": "self",
@@ -6632,7 +6596,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 147,
+            "line": 29,
             "description": "Interaction start flag.",
             "itemtype": "property",
             "name": "started",
@@ -6643,7 +6607,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 154,
+            "line": 36,
             "description": "Draw command.",
             "itemtype": "property",
             "name": "command",
@@ -6656,7 +6620,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 161,
+            "line": 43,
             "description": "Drawing style.",
             "itemtype": "property",
             "name": "style",
@@ -6667,7 +6631,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 167,
+            "line": 49,
             "description": "Shape name.",
             "itemtype": "property",
             "name": "shapeName",
@@ -6678,7 +6642,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 173,
+            "line": 55,
             "description": "List of points",
             "itemtype": "property",
             "name": "points",
@@ -6689,7 +6653,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 182,
+            "line": 62,
             "description": "Handle mouse down event.",
             "itemtype": "method",
             "name": "mousedown",
@@ -6706,7 +6670,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 223,
+            "line": 75,
             "description": "Handle mouse move event.",
             "itemtype": "method",
             "name": "mousemove",
@@ -6723,7 +6687,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 247,
+            "line": 99,
             "description": "Handle mouse up event.",
             "itemtype": "method",
             "name": "mouseup",
@@ -6740,7 +6704,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 266,
+            "line": 116,
             "description": "Handle mouse out event.",
             "itemtype": "method",
             "name": "mouseout",
@@ -6757,7 +6721,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 275,
+            "line": 125,
             "description": "Handle touch start event.",
             "itemtype": "method",
             "name": "touchstart",
@@ -6774,7 +6738,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 284,
+            "line": 134,
             "description": "Handle touch move event.",
             "itemtype": "method",
             "name": "touchmove",
@@ -6791,7 +6755,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 293,
+            "line": 143,
             "description": "Handle touch end event.",
             "itemtype": "method",
             "name": "touchend",
@@ -6808,7 +6772,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 302,
+            "line": 152,
             "description": "Handle key down event.",
             "itemtype": "method",
             "name": "keydown",
@@ -6825,7 +6789,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 311,
+            "line": 161,
             "description": "Enable the tool.",
             "itemtype": "method",
             "name": "enable",
@@ -6842,7 +6806,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 322,
+            "line": 172,
             "description": "Help for this tool.",
             "itemtype": "method",
             "name": "getHelp",
@@ -6856,7 +6820,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 342,
+            "line": 192,
             "description": "Set the line color of the drawing.",
             "itemtype": "method",
             "name": "setLineColour",
@@ -6873,7 +6837,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 353,
+            "line": 203,
             "description": "Set the shape name of the drawing.",
             "itemtype": "method",
             "name": "setShapeName",
@@ -6890,7 +6854,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 368,
+            "line": 218,
             "description": "Check if the shape is in the shape list.",
             "itemtype": "method",
             "name": "hasShape",
@@ -6907,104 +6871,11 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 377,
+            "line": 227,
             "description": "Initialise the tool.",
             "itemtype": "method",
             "name": "init",
             "class": "dwv.tool.Draw",
-            "module": "tool",
-            "namespace": "dwv.tool"
-        },
-        {
-            "file": "src/tools/ellipse.js",
-            "line": 31,
-            "description": "Ellipse object.",
-            "itemtype": "property",
-            "name": "ellipse",
-            "access": "private",
-            "tagname": "",
-            "type": "Ellipse",
-            "class": "dwv.tool.DrawEllipseCommand",
-            "module": "tool",
-            "namespace": "dwv.tool"
-        },
-        {
-            "file": "src/tools/ellipse.js",
-            "line": 39,
-            "description": "Line color.",
-            "itemtype": "property",
-            "name": "lineColor",
-            "access": "private",
-            "tagname": "",
-            "type": "String",
-            "class": "dwv.tool.DrawEllipseCommand",
-            "module": "tool",
-            "namespace": "dwv.tool"
-        },
-        {
-            "file": "src/tools/ellipse.js",
-            "line": 46,
-            "description": "HTML context.",
-            "itemtype": "property",
-            "name": "context",
-            "access": "private",
-            "tagname": "",
-            "type": "Object",
-            "class": "dwv.tool.DrawEllipseCommand",
-            "module": "tool",
-            "namespace": "dwv.tool"
-        },
-        {
-            "file": "src/tools/ellipse.js",
-            "line": 54,
-            "description": "Command name.",
-            "itemtype": "property",
-            "name": "name",
-            "access": "private",
-            "tagname": "",
-            "type": "String",
-            "class": "dwv.tool.DrawEllipseCommand",
-            "module": "tool",
-            "namespace": "dwv.tool"
-        },
-        {
-            "file": "src/tools/ellipse.js",
-            "line": 61,
-            "description": "Get the command name.",
-            "itemtype": "method",
-            "name": "getName",
-            "return": {
-                "description": "The command name.",
-                "type": "String"
-            },
-            "class": "dwv.tool.DrawEllipseCommand",
-            "module": "tool",
-            "namespace": "dwv.tool"
-        },
-        {
-            "file": "src/tools/ellipse.js",
-            "line": 67,
-            "description": "Set the command name.",
-            "itemtype": "method",
-            "name": "setName",
-            "params": [
-                {
-                    "name": "str",
-                    "description": "The command name.",
-                    "type": "String"
-                }
-            ],
-            "class": "dwv.tool.DrawEllipseCommand",
-            "module": "tool",
-            "namespace": "dwv.tool"
-        },
-        {
-            "file": "src/tools/ellipse.js",
-            "line": 74,
-            "description": "Execute the command.",
-            "itemtype": "method",
-            "name": "execute",
-            "class": "dwv.tool.DrawEllipseCommand",
             "module": "tool",
             "namespace": "dwv.tool"
         },
@@ -7411,7 +7282,7 @@
         },
         {
             "file": "src/tools/line.js",
-            "line": 21,
+            "line": 19,
             "description": "Line object.",
             "itemtype": "property",
             "name": "line",
@@ -7424,7 +7295,7 @@
         },
         {
             "file": "src/tools/line.js",
-            "line": 29,
+            "line": 27,
             "description": "Line color.",
             "itemtype": "property",
             "name": "lineColor",
@@ -7437,7 +7308,7 @@
         },
         {
             "file": "src/tools/line.js",
-            "line": 36,
+            "line": 34,
             "description": "HTML context.",
             "itemtype": "property",
             "name": "context",
@@ -7450,7 +7321,7 @@
         },
         {
             "file": "src/tools/line.js",
-            "line": 44,
+            "line": 42,
             "description": "Command name.",
             "itemtype": "property",
             "name": "name",
@@ -7463,7 +7334,7 @@
         },
         {
             "file": "src/tools/line.js",
-            "line": 51,
+            "line": 49,
             "description": "Get the command name.",
             "itemtype": "method",
             "name": "getName",
@@ -7477,7 +7348,7 @@
         },
         {
             "file": "src/tools/line.js",
-            "line": 57,
+            "line": 55,
             "description": "Set the command name.",
             "itemtype": "method",
             "name": "setName",
@@ -7494,7 +7365,7 @@
         },
         {
             "file": "src/tools/line.js",
-            "line": 64,
+            "line": 62,
             "description": "Execute the command.",
             "itemtype": "method",
             "name": "execute",
@@ -7915,7 +7786,7 @@
         },
         {
             "file": "src/tools/rectangle.js",
-            "line": 21,
+            "line": 19,
             "description": "Rectangle object.",
             "itemtype": "property",
             "name": "rectangle",
@@ -7928,7 +7799,7 @@
         },
         {
             "file": "src/tools/rectangle.js",
-            "line": 29,
+            "line": 27,
             "description": "Line color.",
             "itemtype": "property",
             "name": "lineColor",
@@ -7941,7 +7812,7 @@
         },
         {
             "file": "src/tools/rectangle.js",
-            "line": 36,
+            "line": 34,
             "description": "HTML context.",
             "itemtype": "property",
             "name": "context",
@@ -7954,7 +7825,7 @@
         },
         {
             "file": "src/tools/rectangle.js",
-            "line": 44,
+            "line": 42,
             "description": "Command name.",
             "itemtype": "property",
             "name": "name",
@@ -7967,7 +7838,7 @@
         },
         {
             "file": "src/tools/rectangle.js",
-            "line": 51,
+            "line": 49,
             "description": "Get the command name.",
             "itemtype": "method",
             "name": "getName",
@@ -7981,7 +7852,7 @@
         },
         {
             "file": "src/tools/rectangle.js",
-            "line": 57,
+            "line": 55,
             "description": "Set the command name.",
             "itemtype": "method",
             "name": "setName",
@@ -7998,7 +7869,7 @@
         },
         {
             "file": "src/tools/rectangle.js",
-            "line": 64,
+            "line": 62,
             "description": "Execute the command.",
             "itemtype": "method",
             "name": "execute",
@@ -8008,7 +7879,7 @@
         },
         {
             "file": "src/tools/roi.js",
-            "line": 21,
+            "line": 19,
             "description": "ROI object.",
             "itemtype": "property",
             "name": "roi",
@@ -8021,7 +7892,7 @@
         },
         {
             "file": "src/tools/roi.js",
-            "line": 32,
+            "line": 30,
             "description": "Line color.",
             "itemtype": "property",
             "name": "lineColor",
@@ -8034,7 +7905,7 @@
         },
         {
             "file": "src/tools/roi.js",
-            "line": 39,
+            "line": 37,
             "description": "HTML context.",
             "itemtype": "property",
             "name": "context",
@@ -8047,7 +7918,7 @@
         },
         {
             "file": "src/tools/roi.js",
-            "line": 47,
+            "line": 45,
             "description": "Command name.",
             "itemtype": "property",
             "name": "name",
@@ -8060,7 +7931,7 @@
         },
         {
             "file": "src/tools/roi.js",
-            "line": 54,
+            "line": 52,
             "description": "Get the command name.",
             "itemtype": "method",
             "name": "getName",
@@ -8074,7 +7945,7 @@
         },
         {
             "file": "src/tools/roi.js",
-            "line": 60,
+            "line": 58,
             "description": "Set the command name.",
             "itemtype": "method",
             "name": "setName",
@@ -8091,7 +7962,7 @@
         },
         {
             "file": "src/tools/roi.js",
-            "line": 67,
+            "line": 65,
             "description": "Execute the command.",
             "itemtype": "method",
             "name": "execute",
@@ -9202,7 +9073,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 45,
+            "line": 40,
             "description": "Get the version of the application.",
             "itemtype": "method",
             "name": "getVersion",
@@ -9216,7 +9087,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 52,
+            "line": 47,
             "description": "Get the image.",
             "itemtype": "method",
             "name": "getImage",
@@ -9230,7 +9101,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 58,
+            "line": 53,
             "description": "Get the view.",
             "itemtype": "method",
             "name": "getView",
@@ -9244,7 +9115,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 65,
+            "line": 60,
             "description": "Set the view.",
             "itemtype": "method",
             "name": "setImage",
@@ -9261,7 +9132,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 76,
+            "line": 71,
             "description": "Restore the original image.",
             "itemtype": "method",
             "name": "restoreOriginalImage",
@@ -9271,7 +9142,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 86,
+            "line": 81,
             "description": "Get the image data array.",
             "itemtype": "method",
             "name": "getImageData",
@@ -9285,7 +9156,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 93,
+            "line": 88,
             "description": "Get the tool box.",
             "itemtype": "method",
             "name": "getToolBox",
@@ -9299,7 +9170,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 100,
+            "line": 95,
             "description": "Get the image layer.",
             "itemtype": "method",
             "name": "getImageLayer",
@@ -9313,7 +9184,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 106,
+            "line": 101,
             "description": "Get the draw layer.",
             "itemtype": "method",
             "name": "getDrawLayer",
@@ -9327,7 +9198,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 112,
+            "line": 107,
             "description": "Get the temporary layer.",
             "itemtype": "method",
             "name": "getTempLayer",
@@ -9341,21 +9212,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 118,
-            "description": "Get the kinetic layer.",
-            "itemtype": "method",
-            "name": "getKineticLayer",
-            "return": {
-                "description": "The temporary layer.",
-                "type": "Object"
-            },
-            "class": "dwv.App",
-            "module": "utils",
-            "namespace": "dwv"
-        },
-        {
-            "file": "src/application.js",
-            "line": 126,
+            "line": 114,
             "description": "Get the undo stack.",
             "itemtype": "method",
             "name": "getUndoStack",
@@ -9369,7 +9226,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 133,
+            "line": 121,
             "description": "Initialise the HTML for the application.",
             "itemtype": "method",
             "name": "init",
@@ -9379,7 +9236,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 152,
+            "line": 140,
             "description": "Reset the application.",
             "itemtype": "method",
             "name": "reset",
@@ -9389,7 +9246,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 163,
+            "line": 151,
             "description": "Handle key down event.\n- CRTL-Z: undo\n- CRTL-Y: redo\nDefault behavior. Usually used in tools.",
             "itemtype": "method",
             "name": "handleKeyDown",
@@ -9406,7 +9263,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 183,
+            "line": 171,
             "description": "Handle change files event.",
             "itemtype": "method",
             "name": "onChangeFiles",
@@ -9423,7 +9280,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 193,
+            "line": 181,
             "description": "Load a list of files.",
             "itemtype": "method",
             "name": "loadFiles",
@@ -9440,7 +9297,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 215,
+            "line": 203,
             "description": "Handle change url event.",
             "itemtype": "method",
             "name": "onChangeURL",
@@ -9457,7 +9314,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 225,
+            "line": 213,
             "description": "Load a list of URLs.",
             "itemtype": "method",
             "name": "loadURL",
@@ -9474,7 +9331,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 247,
+            "line": 235,
             "description": "Generate the image data and draw it.",
             "itemtype": "method",
             "name": "generateAndDrawImage",
@@ -9484,7 +9341,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 261,
+            "line": 249,
             "description": "Resize the display window. To be called once the image is loaded.",
             "itemtype": "method",
             "name": "resize",
@@ -9494,7 +9351,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 281,
+            "line": 262,
             "description": "Toggle the display of the info layer.",
             "itemtype": "method",
             "name": "toggleInfoLayerDisplay",
@@ -9504,7 +9361,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 298,
+            "line": 279,
             "description": "Init the Window/Level display",
             "class": "dwv.App",
             "module": "utils",
@@ -9512,7 +9369,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 314,
+            "line": 295,
             "description": "Add image listeners.",
             "itemtype": "method",
             "name": "addImageInfoListeners",
@@ -9524,7 +9381,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 329,
+            "line": 310,
             "description": "Remove image listeners.",
             "itemtype": "method",
             "name": "removeImageInfoListeners",
@@ -9536,7 +9393,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 344,
+            "line": 325,
             "description": "General-purpose event handler. This function just determines the mouse \nposition relative to the canvas element. It then passes it to the current tool.",
             "itemtype": "method",
             "name": "eventHandler",
@@ -9555,7 +9412,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 420,
+            "line": 399,
             "description": "Handle an error: display it to the user.",
             "itemtype": "method",
             "name": "handleError",
@@ -9574,7 +9431,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 441,
+            "line": 420,
             "description": "Create the application layers.",
             "itemtype": "method",
             "name": "createLayers",
@@ -9598,7 +9455,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 486,
+            "line": 451,
             "description": "Create the DICOM tags table. To be called once the DICOM has been parsed.",
             "itemtype": "method",
             "name": "createTagsTable",
@@ -9617,7 +9474,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 519,
+            "line": 484,
             "description": "Post load application initialisation. To be called once the DICOM has been parsed.",
             "itemtype": "method",
             "name": "postLoadInit",
@@ -9706,7 +9563,7 @@
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/tools/draw.js:322"
+            "line": " src/tools/draw.js:172"
         },
         {
             "message": "replacing incorrect tag: returns with return",
@@ -9742,7 +9599,7 @@
         },
         {
             "message": "Missing item type\nLookup tables for image color display.",
-            "line": " src/image/luts.js:216"
+            "line": " src/image/luts.js:210"
         },
         {
             "message": "Missing item type",
@@ -9758,7 +9615,7 @@
         },
         {
             "message": "Missing item type\nInit the Window/Level display",
-            "line": " src/application.js:298"
+            "line": " src/application.js:279"
         }
     ]
 }

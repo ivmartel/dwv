@@ -87,8 +87,6 @@
             
                 <li><a href="../classes/dwv.math.Circle.html">dwv.math.Circle</a></li>
             
-                <li><a href="../classes/dwv.math.Ellipse.html">dwv.math.Ellipse</a></li>
-            
                 <li><a href="../classes/dwv.math.FastPoint2D.html">dwv.math.FastPoint2D</a></li>
             
                 <li><a href="../classes/dwv.math.Line.html">dwv.math.Line</a></li>
@@ -107,7 +105,7 @@
             
                 <li><a href="../classes/dwv.tool.Draw.html">dwv.tool.Draw</a></li>
             
-                <li><a href="../classes/dwv.tool.DrawEllipseCommand.html">dwv.tool.DrawEllipseCommand</a></li>
+                <li><a href="../classes/dwv.tool.DrawCircleCommand.html">dwv.tool.DrawCircleCommand</a></li>
             
                 <li><a href="../classes/dwv.tool.DrawLineCommand.html">dwv.tool.DrawLineCommand</a></li>
             
@@ -209,124 +207,6 @@
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
 
-var Kinetic = Kinetic || {};
-
-dwv.tool.ShapeEditor = function () {
-    var shape = null;
-    var isActive = false;
-    this.setShape = function ( inshape ) {
-        shape = inshape;
-        // clear previous controls
-        var anchors = shape.getLayer().find(&#x27;.anchor&#x27;);
-        anchors.each( function (anchor) {
-            anchor.remove();
-        });
-        // add new controls
-        createControls( shape );
-    };
-    this.getShape = function () { 
-        return shape;
-    };
-    this.isActive = function () {
-        return isActive;
-    };
-    this.enable = function () {
-        isActive = true;
-        var anchors = shape.getLayer().find(&#x27;.anchor&#x27;);
-        anchors.each( function (anchor) {
-            anchor.visible(true);
-        });
-        shape.getParent().draggable(true);
-        shape.getLayer().draw();
-    };
-    this.disable = function () {
-        isActive = false;
-        var anchors = shape.getLayer().find(&#x27;.anchor&#x27;);
-        anchors.each( function (anchor) {
-            anchor.visible(false);
-        });
-        shape.getParent().draggable(false);
-        shape.getLayer().draw();
-        shape = null;
-    };
-    function createControls( inshape ) {
-        // get shape group
-        var group = inshape.getParent();
-        // add spape specific anchors to the shape group
-        if ( inshape instanceof Kinetic.Line ) {
-            var points = inshape.points();
-            addAnchor(group, points[0], points[1], &#x27;begin&#x27;, dwv.tool.UpdateLine);
-            addAnchor(group, points[2], points[3], &#x27;end&#x27;, dwv.tool.UpdateLine);
-        }
-        else if ( inshape instanceof Kinetic.Rect ) {
-            var rectX = inshape.x();
-            var rectY = inshape.y();
-            var rectWidth = inshape.width();
-            var rectHeight = inshape.height();
-            addAnchor(group, rectX, rectY, &#x27;topLeft&#x27;, dwv.tool.UpdateRect);
-            addAnchor(group, rectX+rectWidth, rectY, &#x27;topRight&#x27;, dwv.tool.UpdateRect);
-            addAnchor(group, rectX+rectWidth, rectY+rectHeight, &#x27;bottomRight&#x27;, dwv.tool.UpdateRect);
-            addAnchor(group, rectX, rectY+rectHeight, &#x27;bottomLeft&#x27;, dwv.tool.UpdateRect);
-        }
-        else if ( inshape instanceof Kinetic.Ellipse ) {
-            var ellipseX = inshape.x();
-            var ellipseY = inshape.y();
-            var radius = inshape.radius();
-            addAnchor(group, ellipseX-radius.x, ellipseY-radius.y, &#x27;topLeft&#x27;, dwv.tool.UpdateEllipse);
-            addAnchor(group, ellipseX+radius.x, ellipseY-radius.y, &#x27;topRight&#x27;, dwv.tool.UpdateEllipse);
-            addAnchor(group, ellipseX+radius.x, ellipseY+radius.y, &#x27;bottomRight&#x27;, dwv.tool.UpdateEllipse);
-            addAnchor(group, ellipseX-radius.x, ellipseY+radius.y, &#x27;bottomLeft&#x27;, dwv.tool.UpdateEllipse);
-        }
-        // add group to layer
-        inshape.getLayer().add( group );
-        // draw layer
-        inshape.getLayer().draw();
-    }
-    function addAnchor(group, x, y, id, updateMethod) {
-        // anchor shape
-        var anchor = new Kinetic.Circle({
-            x: x,
-            y: y,
-            stroke: &#x27;#999&#x27;,
-            fillRed: 100,
-            fillBlue: 100,
-            fillGreen: 100,
-            fillAlpha: 0.7,
-            strokeWidth: 2,
-            radius: 6,
-            name: &#x27;anchor&#x27;,
-            id: id,
-            dragOnTop: false,
-            draggable: true,
-            visible: false
-        });
-
-        anchor.on(&#x27;dragmove&#x27;, function () {
-            updateMethod(shape, this);
-            this.getLayer().draw();
-        });
-        anchor.on(&#x27;mousedown touchstart&#x27;, function () {
-            this.moveToTop();
-        });
-        anchor.on(&#x27;dragend&#x27;, function () {
-            this.getLayer().draw();
-        });
-        // add hover styling
-        anchor.on(&#x27;mouseover&#x27;, function () {
-            document.body.style.cursor = &#x27;pointer&#x27;;
-            this.stroke(&#x27;#ddd&#x27;);
-            this.getLayer().draw();
-        });
-        anchor.on(&#x27;mouseout&#x27;, function () {
-            document.body.style.cursor = &#x27;default&#x27;;
-            this.stroke(&#x27;#999&#x27;);
-            this.getLayer().draw();
-        });
-
-        group.add(anchor);
-    }
-};
-
 // List of colors
 dwv.tool.colors = [
     &quot;Yellow&quot;, &quot;Red&quot;, &quot;White&quot;, &quot;Green&quot;, &quot;Blue&quot;, &quot;Lime&quot;, &quot;Fuchsia&quot;, &quot;Black&quot;
@@ -339,7 +219,7 @@ dwv.tool.colors = [
  * @constructor
  * @param {Object} app The associated application.
  */
-dwv.tool.Draw = function (app)
+dwv.tool.Draw = function(app)
 {
     /**
      * Closure to self: to be used by event handlers.
@@ -380,8 +260,6 @@ dwv.tool.Draw = function (app)
      * @type Array
      */
     var points = [];
-    
-    var shapeEditor = new dwv.tool.ShapeEditor();
 
     /**
      * Handle mouse down event.
@@ -389,39 +267,11 @@ dwv.tool.Draw = function (app)
      * @param {Object} event The mouse down event.
      */
     this.mousedown = function(event){
-        var stage = app.getKineticStage();
-        var shape = stage.getIntersection({
-            x: event._xs, 
-            y: event._ys
-        });
-        
-        if ( shape ) {
-            console.log(&quot;got shape: &quot;+shape.name());
-            var group = shape.getParent();
-            var draw = group.find(&quot;.final&quot;)[0];
-            
-            if( draw ) {
-                console.log(&quot;got draw: &quot;+draw.name());
-                if ( draw !== shapeEditor.getShape() ) {
-                    if ( shapeEditor.isActive() ) {
-                        shapeEditor.disable();
-                    }
-                    shapeEditor.setShape(draw);
-                    shapeEditor.enable();
-                }
-            }
-        }
-        else {
-            console.log(&quot;no shape&quot;);
-            if ( shapeEditor.isActive() ) {
-                shapeEditor.disable();
-            }
-            started = true;
-            // clear array
-            points = [];
-            // store point
-            points.push(new dwv.math.Point2D(event._x, event._y));
-        }
+        started = true;
+        // clear array
+        points = [];
+        // store point
+        points.push(new dwv.math.Point2D(event._x, event._y));
     };
 
     /**
@@ -434,13 +284,13 @@ dwv.tool.Draw = function (app)
         {
             return;
         }
-        if ( event._x !== points[0].getX() &amp;&amp;
-             event._y !== points[0].getY() )
+        if( event._x !== points[0].getX() &amp;&amp;
+            event._y !== points[0].getY() )
         {
             // current point
             points.push(new dwv.math.Point2D(event._x, event._y));
             // create draw command
-            command = new dwv.tool.shapes[self.shapeName](points, app, self.style, false);
+            command = new dwv.tool.shapes[self.shapeName](points, app, self.style);
             // clear the temporary layer
             app.getTempLayer().clear();
             // draw
@@ -453,18 +303,16 @@ dwv.tool.Draw = function (app)
      * @method mouseup
      * @param {Object} event The mouse up event.
      */
-    this.mouseup = function (/*event*/){
-        if (started &amp;&amp; points.length &gt; 1 )
+    this.mouseup = function(/*event*/){
+        if (started)
         {
-            // create final command
-            command = new dwv.tool.shapes[self.shapeName](points, app, self.style, true);
-            // execute it
-            command.execute();
-            // save it in undo stack
+            // save command in undo stack
             app.getUndoStack().add(command);
+            // merge temporary layer
+            app.getDrawLayer().merge(app.getTempLayer());
+            // set flag
+            started = false;
         }
-        // reset flag
-        started = false;
     };
     
     /**
