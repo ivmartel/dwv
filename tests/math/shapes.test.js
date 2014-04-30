@@ -99,13 +99,13 @@ test("Test Rectangle.", function() {
     var p1 = new dwv.math.Point2D(-4,-4);
     var r0 = new dwv.math.Rectangle(p0,p1);
     // getBegin
-    equal(r0.getBegin(), p0, "getBegin");
+    equal(r0.getBegin().equals(p1), true, 'getBegin');
     // getEnd
-    equal(r0.getEnd(), p1, "getEnd");
+    equal(r0.getEnd().equals(p0), true, "getEnd");
     // getRealWidth
-    equal(r0.getRealWidth(), -4, "getRealWidth");
+    equal(r0.getRealWidth(), 4, "getRealWidth");
     // getRealHeight
-    equal(r0.getRealHeight(), -4, "getRealHeight");
+    equal(r0.getRealHeight(), 4, "getRealHeight");
     // getWidth
     equal(r0.getWidth(), 4, "getWidth");
     // getHeight

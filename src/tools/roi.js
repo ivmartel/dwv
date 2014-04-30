@@ -130,6 +130,6 @@ dwv.tool.DrawRoiCommand = function(points, app, style, isFinal)
     }; 
 }; // DrawRoiCommand class
 
-dwv.tool.UpdateRoi = function (roi, anchor)
-{
-};
+//dwv.tool.UpdateRoi = function (roi, anchor)
+//{
+//};
