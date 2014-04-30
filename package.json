@@ -10,6 +10,9 @@
   "scripts": {
     "test": "grunt publish --verbose"
   },
+  "dependencies": {
+    "jquery": "2.1.0"
+  },
   "devDependencies": {
     "grunt": "~0.4",
     "grunt-cli": "~0.1",
