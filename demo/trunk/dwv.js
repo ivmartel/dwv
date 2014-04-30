@@ -8534,6 +8534,17 @@ dwv.math.Line = function(begin, end)
  */
 dwv.math.Rectangle = function(begin, end)
 {
+    if ( end.getX() < begin.getX() ) {
+        var tmpX = begin.getX();
+        begin = new dwv.math.Point2D( end.getX(), begin.getY() );
+        end = new dwv.math.Point2D( tmpX, end.getY() );
+    }
+    if ( end.getY() < begin.getY() ) {
+        var tmpY = begin.getY();
+        begin = new dwv.math.Point2D( begin.getX(), end.getY() );
+        end = new dwv.math.Point2D( end.getX(), tmpY );
+    }
+    
     /**
      * Rectangle surface.
      * @property surface
@@ -9251,12 +9262,16 @@ dwv.tool.DrawEllipseCommand = function(points, app, style, isFinal)
         });
         // add hover styling
         kellipse.on('mouseover', function () {
-            document.body.style.cursor = 'pointer';
-            this.getLayer().draw();
+            if ( this.getLayer() ) {
+                document.body.style.cursor = 'pointer';
+                this.getLayer().draw();
+            }
         });
         kellipse.on('mouseout', function () {
-            document.body.style.cursor = 'default';
-            this.getLayer().draw();
+            if ( this.getLayer() ) {
+                document.body.style.cursor = 'default';
+                this.getLayer().draw();
+            }
         });
         // remove temporary shapes from the layer
         var klayer = app.getKineticLayer();
@@ -9927,12 +9942,16 @@ dwv.tool.DrawLineCommand = function(points, app, style, isFinal)
         });
         // add hover styling
         kline.on('mouseover', function () {
-            document.body.style.cursor = 'pointer';
-            this.getLayer().draw();
+            if ( this.getLayer() ) {
+                document.body.style.cursor = 'pointer';
+                this.getLayer().draw();
+            }
         });
         kline.on('mouseout', function () {
-            document.body.style.cursor = 'default';
-            this.getLayer().draw();
+            if ( this.getLayer() ) {
+                document.body.style.cursor = 'default';
+                this.getLayer().draw();
+            }
         });
         // remove temporary shapes from the layer
         var klayer = app.getKineticLayer();
@@ -10472,12 +10491,16 @@ dwv.tool.DrawRectangleCommand = function(points, app, style, isFinal)
         });
         // add hover styling
         krect.on('mouseover', function () {
-            document.body.style.cursor = 'pointer';
-            this.getLayer().draw();
+            if ( this.getLayer() ) {
+                document.body.style.cursor = 'pointer';
+                this.getLayer().draw();
+            }
         });
         krect.on('mouseout', function () {
-            document.body.style.cursor = 'default';
-            this.getLayer().draw();
+            if ( this.getLayer() ) {
+                document.body.style.cursor = 'default';
+                this.getLayer().draw();
+            }
         });
         // remove temporary shapes from the layer
         var klayer = app.getKineticLayer();
@@ -10640,12 +10663,16 @@ dwv.tool.DrawRoiCommand = function(points, app, style, isFinal)
         });
         // add hover styling
         kline.on('mouseover', function () {
-            document.body.style.cursor = 'pointer';
-            this.getLayer().draw();
+            if ( this.getLayer() ) {
+                document.body.style.cursor = 'pointer';
+                this.getLayer().draw();
+            }
         });
         kline.on('mouseout', function () {
-            document.body.style.cursor = 'default';
-            this.getLayer().draw();
+            if ( this.getLayer() ) {
+                document.body.style.cursor = 'default';
+                this.getLayer().draw();
+            }
         });
         // remove temporary shapes from the layer
         var klayer = app.getKineticLayer();
@@ -10661,6 +10688,10 @@ dwv.tool.DrawRoiCommand = function(points, app, style, isFinal)
         app.getKineticLayer().draw();
     }; 
 }; // DrawRoiCommand class
+
+//dwv.tool.UpdateRoi = function (roi, anchor)
+//{
+//};
 ;/** 
  * Tool module.
  * @module tool

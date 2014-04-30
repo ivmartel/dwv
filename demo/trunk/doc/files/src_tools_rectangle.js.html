@@ -302,12 +302,16 @@ dwv.tool.DrawRectangleCommand = function(points, app, style, isFinal)
         });
         // add hover styling
         krect.on(&#x27;mouseover&#x27;, function () {
-            document.body.style.cursor = &#x27;pointer&#x27;;
-            this.getLayer().draw();
+            if ( this.getLayer() ) {
+                document.body.style.cursor = &#x27;pointer&#x27;;
+                this.getLayer().draw();
+            }
         });
         krect.on(&#x27;mouseout&#x27;, function () {
-            document.body.style.cursor = &#x27;default&#x27;;
-            this.getLayer().draw();
+            if ( this.getLayer() ) {
+                document.body.style.cursor = &#x27;default&#x27;;
+                this.getLayer().draw();
+            }
         });
         // remove temporary shapes from the layer
         var klayer = app.getKineticLayer();

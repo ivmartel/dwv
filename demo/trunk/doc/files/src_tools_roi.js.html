@@ -308,12 +308,16 @@ dwv.tool.DrawRoiCommand = function(points, app, style, isFinal)
         });
         // add hover styling
         kline.on(&#x27;mouseover&#x27;, function () {
-            document.body.style.cursor = &#x27;pointer&#x27;;
-            this.getLayer().draw();
+            if ( this.getLayer() ) {
+                document.body.style.cursor = &#x27;pointer&#x27;;
+                this.getLayer().draw();
+            }
         });
         kline.on(&#x27;mouseout&#x27;, function () {
-            document.body.style.cursor = &#x27;default&#x27;;
-            this.getLayer().draw();
+            if ( this.getLayer() ) {
+                document.body.style.cursor = &#x27;default&#x27;;
+                this.getLayer().draw();
+            }
         });
         // remove temporary shapes from the layer
         var klayer = app.getKineticLayer();
@@ -329,6 +333,10 @@ dwv.tool.DrawRoiCommand = function(points, app, style, isFinal)
         app.getKineticLayer().draw();
     }; 
 }; // DrawRoiCommand class
+
+//dwv.tool.UpdateRoi = function (roi, anchor)
+//{
+//};
 
     </pre>
 </div>
