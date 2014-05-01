@@ -130,6 +130,19 @@ dwv.tool.DrawRoiCommand = function(points, app, style, isFinal)
     }; 
 }; // DrawRoiCommand class
 
-//dwv.tool.UpdateRoi = function (roi, anchor)
-//{
-//};
+dwv.tool.UpdateRoi = function (roi, anchor)
+{
+    // get the anchor position
+    var group = anchor.getParent();
+    var point = group.find('#'+anchor.id())[0];
+    var px = Math.floor(point.x());
+    var py = Math.floor(point.y());
+    
+    // update the roi points
+    // (the anchor id is the index of the point in the list)
+    var points = roi.points();
+    points[anchor.id()] = px;
+    points[anchor.id()+1] = py;
+    roi.points( points );
+
+};

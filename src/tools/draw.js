@@ -48,11 +48,19 @@ dwv.tool.ShapeEditor = function () {
     function createControls( inshape ) {
         // get shape group
         var group = inshape.getParent();
-        // add spape specific anchors to the shape group
+        // add shape specific anchors to the shape group
         if ( inshape instanceof Kinetic.Line ) {
             var points = inshape.points();
-            addAnchor(group, points[0], points[1], 'begin', dwv.tool.UpdateLine);
-            addAnchor(group, points[2], points[3], 'end', dwv.tool.UpdateLine);
+            if ( points.length === 4 ) {
+                addAnchor(group, points[0], points[1], 'begin', dwv.tool.UpdateLine);
+                addAnchor(group, points[2], points[3], 'end', dwv.tool.UpdateLine);
+            }
+            else {
+                addAnchor(group, points[0], points[1], 0, dwv.tool.UpdateRoi);
+                for ( var i = 0; i < points.length; i=i+2 ) {
+                    addAnchor(group, points[i], points[i+1], i, dwv.tool.UpdateRoi);
+                }
+            }
         }
         else if ( inshape instanceof Kinetic.Rect ) {
             var rectX = inshape.x();
@@ -192,12 +200,10 @@ dwv.tool.Draw = function (app)
         });
         
         if ( shape ) {
-            console.log("got shape: "+shape.name());
             var group = shape.getParent();
             var draw = group.find(".final")[0];
             
             if( draw ) {
-                console.log("got draw: "+draw.name());
                 if ( draw !== shapeEditor.getShape() ) {
                     if ( shapeEditor.isActive() ) {
                         shapeEditor.disable();
@@ -208,7 +214,6 @@ dwv.tool.Draw = function (app)
             }
         }
         else {
-            console.log("no shape");
             if ( shapeEditor.isActive() ) {
                 shapeEditor.disable();
             }
