@@ -87,6 +87,8 @@
             
                 <li><a href="../classes/dwv.math.Circle.html">dwv.math.Circle</a></li>
             
+                <li><a href="../classes/dwv.math.Ellipse.html">dwv.math.Ellipse</a></li>
+            
                 <li><a href="../classes/dwv.math.FastPoint2D.html">dwv.math.FastPoint2D</a></li>
             
                 <li><a href="../classes/dwv.math.Line.html">dwv.math.Line</a></li>
@@ -105,7 +107,7 @@
             
                 <li><a href="../classes/dwv.tool.Draw.html">dwv.tool.Draw</a></li>
             
-                <li><a href="../classes/dwv.tool.DrawCircleCommand.html">dwv.tool.DrawCircleCommand</a></li>
+                <li><a href="../classes/dwv.tool.DrawEllipseCommand.html">dwv.tool.DrawEllipseCommand</a></li>
             
                 <li><a href="../classes/dwv.tool.DrawLineCommand.html">dwv.tool.DrawLineCommand</a></li>
             
@@ -207,6 +209,8 @@
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
 
+var Kinetic = Kinetic || {};
+
 /**
  * Draw ROI command.
  * @class DrawRoiCommand
@@ -216,7 +220,7 @@ dwv.tool = dwv.tool || {};
  * @param {Object} app The application to draw the line on.
  * @param {Style} style The drawing style.
  */
-dwv.tool.DrawRoiCommand = function(points, app, style)
+dwv.tool.DrawRoiCommand = function(points, app, style, isFinal)
 {
     /**
      * ROI object.
@@ -242,7 +246,7 @@ dwv.tool.DrawRoiCommand = function(points, app, style)
      * @private
      * @type Object
      */
-    var context = app.getTempLayer().getContext();
+    //var context = app.getTempLayer().getContext();
     
     /**
      * Command name.
@@ -271,7 +275,7 @@ dwv.tool.DrawRoiCommand = function(points, app, style)
     this.execute = function()
     {
         // style
-        context.fillStyle = lineColor;
+        /*context.fillStyle = lineColor;
         context.strokeStyle = lineColor;
         // path
         context.beginPath();
@@ -286,9 +290,66 @@ dwv.tool.DrawRoiCommand = function(points, app, style)
             context.stroke();
         }
         context.closePath();
-        context.stroke();
+        context.stroke();*/
+        var arr = [];
+        for( var i = 1; i &lt; roi.getLength(); ++i )
+        {
+            arr = arr.concat( roi.getPoint(i).getX() );
+            arr = arr.concat( roi.getPoint(i).getY() );
+        }
+
+        var name = isFinal ? &quot;final&quot; : &quot;temp&quot;;
+        var kline = new Kinetic.Line({
+            points: arr,
+            stroke: lineColor,
+            strokeWidth: 2,
+            name: name,
+            closed: true
+        });
+        // add hover styling
+        kline.on(&#x27;mouseover&#x27;, function () {
+            if ( this.getLayer() ) {
+                document.body.style.cursor = &#x27;pointer&#x27;;
+                this.getLayer().draw();
+            }
+        });
+        kline.on(&#x27;mouseout&#x27;, function () {
+            if ( this.getLayer() ) {
+                document.body.style.cursor = &#x27;default&#x27;;
+                this.getLayer().draw();
+            }
+        });
+        // remove temporary shapes from the layer
+        var klayer = app.getKineticLayer();
+        var kshapes = klayer.find(&#x27;.temp&#x27;);
+        kshapes.each( function (kshape) {
+            kshape.remove(); 
+        });
+        // create group
+        var kgroup = new Kinetic.Group();
+        kgroup.add(kline);
+        // add the group to the layer
+        app.getKineticLayer().add(kgroup);
+        app.getKineticLayer().draw();
     }; 
 }; // DrawRoiCommand class
+
+dwv.tool.UpdateRoi = function (roi, anchor)
+{
+    // get the anchor position
+    var group = anchor.getParent();
+    var point = group.find(&#x27;#&#x27;+anchor.id())[0];
+    var px = Math.floor(point.x());
+    var py = Math.floor(point.y());
+    
+    // update the roi points
+    // (the anchor id is the index of the point in the list)
+    var points = roi.points();
+    points[anchor.id()] = px;
+    points[anchor.id()+1] = py;
+    roi.points( points );
+
+};
 
     </pre>
 </div>

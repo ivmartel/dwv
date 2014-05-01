@@ -87,6 +87,8 @@
             
                 <li><a href="../classes/dwv.math.Circle.html">dwv.math.Circle</a></li>
             
+                <li><a href="../classes/dwv.math.Ellipse.html">dwv.math.Ellipse</a></li>
+            
                 <li><a href="../classes/dwv.math.FastPoint2D.html">dwv.math.FastPoint2D</a></li>
             
                 <li><a href="../classes/dwv.math.Line.html">dwv.math.Line</a></li>
@@ -105,7 +107,7 @@
             
                 <li><a href="../classes/dwv.tool.Draw.html">dwv.tool.Draw</a></li>
             
-                <li><a href="../classes/dwv.tool.DrawCircleCommand.html">dwv.tool.DrawCircleCommand</a></li>
+                <li><a href="../classes/dwv.tool.DrawEllipseCommand.html">dwv.tool.DrawEllipseCommand</a></li>
             
                 <li><a href="../classes/dwv.tool.DrawLineCommand.html">dwv.tool.DrawLineCommand</a></li>
             
@@ -202,7 +204,9 @@
     <pre class="code prettyprint linenums">
 // Main DWV namespace.
 var dwv = dwv || {};
- 
+
+var Kinetic = Kinetic || {};
+
 /**
  * Main application class.
  * @class App
@@ -230,6 +234,9 @@ dwv.App = function()
     var drawLayer = null;
     // Temporary layer
     var tempLayer = null;
+    // Kinetic layer
+    var kineticLayer = null;
+    var kineticStage = null;
     
     // flag to know if the info layer is listening on the image.
     var isInfoLayerListening = false;
@@ -312,6 +319,13 @@ dwv.App = function()
      * @return {Object} The temporary layer.
      */
     this.getTempLayer = function() { return tempLayer; };
+    /** 
+     * Get the kinetic layer.
+     * @method getKineticLayer
+     * @return {Object} The temporary layer.
+     */
+    this.getKineticLayer = function() { return kineticLayer; };
+    this.getKineticStage = function() { return kineticStage; };
 
     /** 
      * Get the undo stack.
@@ -459,6 +473,13 @@ dwv.App = function()
         displayZoom = Math.min( (size.width / dataWidth), (size.height / dataHeight) );
         $(&quot;#layerContainer&quot;).width(parseInt(displayZoom*dataWidth, 10));
         $(&quot;#layerContainer&quot;).height(parseInt(displayZoom*dataHeight, 10));
+        
+        if( kineticStage ) {
+            kineticStage.setWidth(parseInt(displayZoom*dataWidth, 10));
+            kineticStage.setHeight(parseInt(displayZoom*dataHeight, 10));
+            kineticStage.scale( {x: displayZoom, y: displayZoom} );
+            kineticStage.draw();
+        }
     };
     
     /**
@@ -575,8 +596,10 @@ dwv.App = function()
         {
             // layerX is for firefox
             event._x = event.offsetX === undefined ? event.layerX : event.offsetX;
+            event._xs = event._x;
             event._x = parseInt( (event._x / displayZoom), 10 );
             event._y = event.offsetY === undefined ? event.layerY : event.offsetY;
+            event._ys = event._y;
             event._y = parseInt( (event._y / displayZoom), 10 );
             // set handle event flag
             handled = true;
@@ -628,9 +651,6 @@ dwv.App = function()
      */
     function createLayers(dataWidth, dataHeight)
     {
-        // resize app
-        self.resize();
-        
         // image layer
         imageLayer = new dwv.html.Layer(&quot;imageLayer&quot;);
         imageLayer.initialise(dataWidth, dataHeight);
@@ -648,6 +668,23 @@ dwv.App = function()
             tempLayer.initialise(dataWidth, dataHeight);
             tempLayer.setStyleDisplay(true);
         }
+        // kinetic layer
+        if( document.getElementById(&quot;kineticDiv&quot;) !== null) {
+            // create stage
+            kineticStage = new Kinetic.Stage({
+                container: &#x27;kineticDiv&#x27;,
+                width: dataWidth,
+                height: dataHeight
+            });
+            // create layer
+            kineticLayer = new Kinetic.Layer();
+            // add the layer to the stage
+            kineticStage.add(kineticLayer);
+        }
+        
+        // resize app
+        self.resize();
+        
     }
     
     /**
@@ -713,19 +750,24 @@ dwv.App = function()
         imageData = self.getImageLayer().getContext().createImageData( 
                 dataWidth, dataHeight);
 
-        var topLayer = tempLayer === null ? imageLayer : tempLayer;
+        var kineticDiv = document.getElementById(&quot;kineticDiv&quot;);
+        
+        var topLayer = tempLayer === null ? imageLayer.getCanvas() : tempLayer.getCanvas();
+        if ( kineticLayer ) {
+            topLayer = kineticDiv;
+        }
         // mouse listeners
-        topLayer.getCanvas().addEventListener(&quot;mousedown&quot;, eventHandler, false);
-        topLayer.getCanvas().addEventListener(&quot;mousemove&quot;, eventHandler, false);
-        topLayer.getCanvas().addEventListener(&quot;mouseup&quot;, eventHandler, false);
-        topLayer.getCanvas().addEventListener(&quot;mouseout&quot;, eventHandler, false);
-        topLayer.getCanvas().addEventListener(&quot;mousewheel&quot;, eventHandler, false);
-        topLayer.getCanvas().addEventListener(&quot;DOMMouseScroll&quot;, eventHandler, false);
-        topLayer.getCanvas().addEventListener(&quot;dblclick&quot;, eventHandler, false);
+        topLayer.addEventListener(&quot;mousedown&quot;, eventHandler, false);
+        topLayer.addEventListener(&quot;mousemove&quot;, eventHandler, false);
+        topLayer.addEventListener(&quot;mouseup&quot;, eventHandler, false);
+        topLayer.addEventListener(&quot;mouseout&quot;, eventHandler, false);
+        topLayer.addEventListener(&quot;mousewheel&quot;, eventHandler, false);
+        topLayer.addEventListener(&quot;DOMMouseScroll&quot;, eventHandler, false);
+        topLayer.addEventListener(&quot;dblclick&quot;, eventHandler, false);
         // touch listeners
-        topLayer.getCanvas().addEventListener(&quot;touchstart&quot;, eventHandler, false);
-        topLayer.getCanvas().addEventListener(&quot;touchmove&quot;, eventHandler, false);
-        topLayer.getCanvas().addEventListener(&quot;touchend&quot;, eventHandler, false);
+        topLayer.addEventListener(&quot;touchstart&quot;, eventHandler, false);
+        topLayer.addEventListener(&quot;touchmove&quot;, eventHandler, false);
+        topLayer.addEventListener(&quot;touchend&quot;, eventHandler, false);
         // keydown listener
         window.addEventListener(&quot;keydown&quot;, eventHandler, true);
         // image listeners
