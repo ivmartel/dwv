@@ -166,6 +166,7 @@ dwv.tool.Draw = function (app)
      * @type Object
      */
     var command = null;
+    var shape = null;
     /**
      * Drawing style.
      * @property style
@@ -184,6 +185,8 @@ dwv.tool.Draw = function (app)
      * @type Array
      */
     var points = [];
+    
+    var lastPoint = null;
     
     var shapeEditor = new dwv.tool.ShapeEditor();
 
@@ -221,7 +224,8 @@ dwv.tool.Draw = function (app)
             // clear array
             points = [];
             // store point
-            points.push(new dwv.math.Point2D(event._x, event._y));
+            lastPoint = new dwv.math.Point2D(event._x, event._y);
+            points.push(lastPoint);
         }
     };
 
@@ -235,13 +239,15 @@ dwv.tool.Draw = function (app)
         {
             return;
         }
-        if ( event._x !== points[0].getX() &&
-             event._y !== points[0].getY() )
+        if ( Math.abs( event._x - lastPoint.getX() ) > 0 ||
+                Math.abs( event._y - lastPoint.getY() ) > 0 )
         {
             // current point
-            points.push(new dwv.math.Point2D(event._x, event._y));
+            lastPoint = new dwv.math.Point2D(event._x, event._y);
+            points.push( lastPoint );
             // create draw command
-            command = new dwv.tool.shapes[self.shapeName](points, app, self.style, false);
+            shape = new dwv.tool.shapes[self.shapeName](points, app, self.style, false);
+            command = new dwv.tool.DrawEllipseCommand(shape, app);
             // clear the temporary layer
             app.getTempLayer().clear();
             // draw
@@ -258,7 +264,8 @@ dwv.tool.Draw = function (app)
         if (started && points.length > 1 )
         {
             // create final command
-            command = new dwv.tool.shapes[self.shapeName](points, app, self.style, true);
+            shape = new dwv.tool.shapes[self.shapeName](points, app, self.style, true);
+            command = new dwv.tool.DrawEllipseCommand(shape, app);
             // execute it
             command.execute();
             // save it in undo stack

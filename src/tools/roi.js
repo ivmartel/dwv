@@ -26,6 +26,24 @@ dwv.tool.DrawRoiCommand = function(points, app, style, isFinal)
      */
     var roi = new dwv.math.ROI();
     
+    if ( isFinal ) {
+        var size = points.length;
+        var clean = [];
+        if ( size > 0 ) {
+            clean.push( points[0] );
+            var last = points[0];
+            for ( var i = 1; i < size; ++i ) {
+                var line = new dwv.math.Line( last, points[i] );
+                if( line.getLength() > 2 ) {
+                    clean.push( points[i] );
+                    last = points[i];
+                }
+            }
+            points = clean;
+        }
+    }
+    
+    
     // add input points to the ROI
     roi.addPoints(points);
 
@@ -144,5 +162,4 @@ dwv.tool.UpdateRoi = function (roi, anchor)
     points[anchor.id()] = px;
     points[anchor.id()+1] = py;
     roi.points( points );
-
 };
