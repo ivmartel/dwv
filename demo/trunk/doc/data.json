@@ -1322,8 +1322,8 @@
             "module": "tool",
             "namespace": "dwv.tool",
             "file": "src/tools/ellipse.js",
-            "line": 10,
-            "description": "Draw ellpise command.",
+            "line": 41,
+            "description": "Draw ellipse command.",
             "is_constructor": 1,
             "params": [
                 {
@@ -6656,7 +6656,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 169,
+            "line": 170,
             "description": "Drawing style.",
             "itemtype": "property",
             "name": "style",
@@ -6667,7 +6667,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 175,
+            "line": 176,
             "description": "Shape name.",
             "itemtype": "property",
             "name": "shapeName",
@@ -6678,7 +6678,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 181,
+            "line": 182,
             "description": "List of points",
             "itemtype": "property",
             "name": "points",
@@ -6689,7 +6689,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 190,
+            "line": 193,
             "description": "Handle mouse down event.",
             "itemtype": "method",
             "name": "mousedown",
@@ -6706,7 +6706,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 228,
+            "line": 232,
             "description": "Handle mouse move event.",
             "itemtype": "method",
             "name": "mousemove",
@@ -6723,7 +6723,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 252,
+            "line": 258,
             "description": "Handle mouse up event.",
             "itemtype": "method",
             "name": "mouseup",
@@ -6740,7 +6740,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 271,
+            "line": 278,
             "description": "Handle mouse out event.",
             "itemtype": "method",
             "name": "mouseout",
@@ -6757,7 +6757,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 280,
+            "line": 287,
             "description": "Handle touch start event.",
             "itemtype": "method",
             "name": "touchstart",
@@ -6774,7 +6774,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 289,
+            "line": 296,
             "description": "Handle touch move event.",
             "itemtype": "method",
             "name": "touchmove",
@@ -6791,7 +6791,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 298,
+            "line": 305,
             "description": "Handle touch end event.",
             "itemtype": "method",
             "name": "touchend",
@@ -6808,7 +6808,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 307,
+            "line": 314,
             "description": "Handle key down event.",
             "itemtype": "method",
             "name": "keydown",
@@ -6825,7 +6825,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 316,
+            "line": 323,
             "description": "Enable the tool.",
             "itemtype": "method",
             "name": "enable",
@@ -6842,7 +6842,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 327,
+            "line": 334,
             "description": "Help for this tool.",
             "itemtype": "method",
             "name": "getHelp",
@@ -6856,7 +6856,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 347,
+            "line": 354,
             "description": "Set the line color of the drawing.",
             "itemtype": "method",
             "name": "setLineColour",
@@ -6873,7 +6873,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 358,
+            "line": 365,
             "description": "Set the shape name of the drawing.",
             "itemtype": "method",
             "name": "setShapeName",
@@ -6890,7 +6890,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 373,
+            "line": 380,
             "description": "Check if the shape is in the shape list.",
             "itemtype": "method",
             "name": "hasShape",
@@ -6907,7 +6907,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 382,
+            "line": 389,
             "description": "Initialise the tool.",
             "itemtype": "method",
             "name": "init",
@@ -6917,46 +6917,7 @@
         },
         {
             "file": "src/tools/ellipse.js",
-            "line": 31,
-            "description": "Ellipse object.",
-            "itemtype": "property",
-            "name": "ellipse",
-            "access": "private",
-            "tagname": "",
-            "type": "Ellipse",
-            "class": "dwv.tool.DrawEllipseCommand",
-            "module": "tool",
-            "namespace": "dwv.tool"
-        },
-        {
-            "file": "src/tools/ellipse.js",
-            "line": 39,
-            "description": "Line color.",
-            "itemtype": "property",
-            "name": "lineColor",
-            "access": "private",
-            "tagname": "",
-            "type": "String",
-            "class": "dwv.tool.DrawEllipseCommand",
-            "module": "tool",
-            "namespace": "dwv.tool"
-        },
-        {
-            "file": "src/tools/ellipse.js",
-            "line": 46,
-            "description": "HTML context.",
-            "itemtype": "property",
-            "name": "context",
-            "access": "private",
-            "tagname": "",
-            "type": "Object",
-            "class": "dwv.tool.DrawEllipseCommand",
-            "module": "tool",
-            "namespace": "dwv.tool"
-        },
-        {
-            "file": "src/tools/ellipse.js",
-            "line": 54,
+            "line": 53,
             "description": "Command name.",
             "itemtype": "property",
             "name": "name",
@@ -6969,7 +6930,7 @@
         },
         {
             "file": "src/tools/ellipse.js",
-            "line": 61,
+            "line": 60,
             "description": "Get the command name.",
             "itemtype": "method",
             "name": "getName",
@@ -6983,7 +6944,7 @@
         },
         {
             "file": "src/tools/ellipse.js",
-            "line": 67,
+            "line": 66,
             "description": "Set the command name.",
             "itemtype": "method",
             "name": "setName",
@@ -7000,7 +6961,7 @@
         },
         {
             "file": "src/tools/ellipse.js",
-            "line": 74,
+            "line": 73,
             "description": "Execute the command.",
             "itemtype": "method",
             "name": "execute",
@@ -8021,7 +7982,7 @@
         },
         {
             "file": "src/tools/roi.js",
-            "line": 32,
+            "line": 50,
             "description": "Line color.",
             "itemtype": "property",
             "name": "lineColor",
@@ -8034,7 +7995,7 @@
         },
         {
             "file": "src/tools/roi.js",
-            "line": 39,
+            "line": 57,
             "description": "HTML context.",
             "itemtype": "property",
             "name": "context",
@@ -8047,7 +8008,7 @@
         },
         {
             "file": "src/tools/roi.js",
-            "line": 47,
+            "line": 65,
             "description": "Command name.",
             "itemtype": "property",
             "name": "name",
@@ -8060,7 +8021,7 @@
         },
         {
             "file": "src/tools/roi.js",
-            "line": 54,
+            "line": 72,
             "description": "Get the command name.",
             "itemtype": "method",
             "name": "getName",
@@ -8074,7 +8035,7 @@
         },
         {
             "file": "src/tools/roi.js",
-            "line": 60,
+            "line": 78,
             "description": "Set the command name.",
             "itemtype": "method",
             "name": "setName",
@@ -8091,7 +8052,7 @@
         },
         {
             "file": "src/tools/roi.js",
-            "line": 67,
+            "line": 85,
             "description": "Execute the command.",
             "itemtype": "method",
             "name": "execute",
@@ -8453,7 +8414,7 @@
         },
         {
             "file": "src/tools/undo.js",
-            "line": 84,
+            "line": 88,
             "description": "Redo the last command.",
             "itemtype": "method",
             "name": "redo",
@@ -9706,7 +9667,7 @@
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/tools/draw.js:327"
+            "line": " src/tools/draw.js:334"
         },
         {
             "message": "replacing incorrect tag: returns with return",

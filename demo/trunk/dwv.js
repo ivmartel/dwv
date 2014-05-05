@@ -8927,6 +8927,7 @@ dwv.tool.Draw = function (app)
      * @type Object
      */
     var command = null;
+    var shape = null;
     /**
      * Drawing style.
      * @property style
@@ -8945,6 +8946,8 @@ dwv.tool.Draw = function (app)
      * @type Array
      */
     var points = [];
+    
+    var lastPoint = null;
     
     var shapeEditor = new dwv.tool.ShapeEditor();
 
@@ -8982,7 +8985,8 @@ dwv.tool.Draw = function (app)
             // clear array
             points = [];
             // store point
-            points.push(new dwv.math.Point2D(event._x, event._y));
+            lastPoint = new dwv.math.Point2D(event._x, event._y);
+            points.push(lastPoint);
         }
     };
 
@@ -8996,13 +9000,15 @@ dwv.tool.Draw = function (app)
         {
             return;
         }
-        if ( event._x !== points[0].getX() &&
-             event._y !== points[0].getY() )
+        if ( Math.abs( event._x - lastPoint.getX() ) > 0 ||
+                Math.abs( event._y - lastPoint.getY() ) > 0 )
         {
             // current point
-            points.push(new dwv.math.Point2D(event._x, event._y));
+            lastPoint = new dwv.math.Point2D(event._x, event._y);
+            points.push( lastPoint );
             // create draw command
-            command = new dwv.tool.shapes[self.shapeName](points, app, self.style, false);
+            shape = new dwv.tool.shapes[self.shapeName](points, app, self.style, false);
+            command = new dwv.tool.DrawEllipseCommand(shape, app);
             // clear the temporary layer
             app.getTempLayer().clear();
             // draw
@@ -9019,7 +9025,8 @@ dwv.tool.Draw = function (app)
         if (started && points.length > 1 )
         {
             // create final command
-            command = new dwv.tool.shapes[self.shapeName](points, app, self.style, true);
+            shape = new dwv.tool.shapes[self.shapeName](points, app, self.style, true);
+            command = new dwv.tool.DrawEllipseCommand(shape, app);
             // execute it
             command.execute();
             // save it in undo stack
@@ -9166,8 +9173,39 @@ dwv.tool = dwv.tool || {};
 
 var Kinetic = Kinetic || {};
 
+dwv.tool.EllipseCreator = function(points, app, style, isFinal)
+{
+    // calculate radius
+    var a = Math.abs(points[0].getX() - points[points.length-1].getX());
+    var b = Math.abs(points[0].getY() - points[points.length-1].getY());
+    var ellipse = new dwv.math.Ellipse(points[0], a, b);
+    var name = isFinal ? "final" : "temp";
+    var kellipse = new Kinetic.Ellipse({
+        x: ellipse.getCenter().getX(),
+        y: ellipse.getCenter().getY(),
+        radius: { x: ellipse.getA(), y: ellipse.getB() },
+        stroke: style.getLineColor(),
+        strokeWidth: 2,
+        name: name
+    });
+    // add hover styling
+    kellipse.on('mouseover', function () {
+        if ( this.getLayer() ) {
+            document.body.style.cursor = 'pointer';
+            this.getLayer().draw();
+        }
+    });
+    kellipse.on('mouseout', function () {
+        if ( this.getLayer() ) {
+            document.body.style.cursor = 'default';
+            this.getLayer().draw();
+        }
+    });
+    return kellipse;
+};
+
 /**
- * Draw ellpise command.
+ * Draw ellipse command.
  * @class DrawEllipseCommand
  * @namespace dwv.tool
  * @constructor
@@ -9175,41 +9213,9 @@ var Kinetic = Kinetic || {};
  * @param {Object} app The application to draw the ellipse on.
  * @param {Style} style The drawing style.
  */
-dwv.tool.DrawEllipseCommand = function(points, app, style, isFinal)
+//dwv.tool.DrawEllipseCommand = function(points, app, style, isFinal)
+dwv.tool.DrawEllipseCommand = function(shape, app)
 {
-    // calculate radius
-    var a = Math.abs(points[0].getX() - points[points.length-1].getX());
-    var b = Math.abs(points[0].getY() - points[points.length-1].getY());
-    // check zero radius
-    if ( a === 0 || b === 0 )
-    {
-        // silent fail...
-        return;
-    }
-    
-    /**
-     * Ellipse object.
-     * @property ellipse
-     * @private
-     * @type Ellipse
-     */
-    var ellipse = new dwv.math.Ellipse(points[0], a, b);
-    
-    /**
-     * Line color.
-     * @property lineColor
-     * @private
-     * @type String
-     */
-    var lineColor = style.getLineColor();
-    /**
-     * HTML context.
-     * @property context
-     * @private
-     * @type Object
-     */
-    //var context = app.getTempLayer().getContext();
-    
     /**
      * Command name.
      * @property name
@@ -9236,48 +9242,6 @@ dwv.tool.DrawEllipseCommand = function(points, app, style, isFinal)
      */
     this.execute = function()
     {
-        // style
-        /*context.fillStyle = lineColor;
-        context.strokeStyle = lineColor;
-        // path
-        context.beginPath();
-        context.arc(
-            ellipse.getCenter().getX(), 
-            ellipse.getCenter().getY(), 
-            ellipse.getRadius(),
-            0, 2*Math.PI);
-        context.stroke();
-        // surface
-        var surf = ellipse.getWorldSurface( 
-            app.getImage().getSpacing().getColumnSpacing(), 
-            app.getImage().getSpacing().getRowSpacing() );
-        context.font = style.getFontStr();
-        context.fillText( Math.round(surf) + "mm2",
-            ellipse.getCenter().getX() + style.getFontSize(),
-            ellipse.getCenter().getY() + style.getFontSize());*/
-        
-        var name = isFinal ? "final" : "temp";
-        var kellipse = new Kinetic.Ellipse({
-            x: ellipse.getCenter().getX(),
-            y: ellipse.getCenter().getY(),
-            radius: { x: ellipse.getA(), y: ellipse.getB() },
-            stroke: lineColor,
-            strokeWidth: 2,
-            name: name
-        });
-        // add hover styling
-        kellipse.on('mouseover', function () {
-            if ( this.getLayer() ) {
-                document.body.style.cursor = 'pointer';
-                this.getLayer().draw();
-            }
-        });
-        kellipse.on('mouseout', function () {
-            if ( this.getLayer() ) {
-                document.body.style.cursor = 'default';
-                this.getLayer().draw();
-            }
-        });
         // remove temporary shapes from the layer
         var klayer = app.getKineticLayer();
         var kshapes = klayer.find('.temp');
@@ -9286,11 +9250,16 @@ dwv.tool.DrawEllipseCommand = function(points, app, style, isFinal)
         });
         // create group
         var kgroup = new Kinetic.Group();
-        kgroup.add(kellipse);
+        kgroup.add(shape);
        // add the group to the layer
         app.getKineticLayer().add(kgroup);
         app.getKineticLayer().draw();
     };
+    this.undo = function () {
+        shape.remove();
+        app.getKineticLayer().draw();
+    };
+
 }; // DrawEllipseCommand class
 
 dwv.tool.UpdateEllipse = function (ellipse, anchor) {
@@ -10590,6 +10559,24 @@ dwv.tool.DrawRoiCommand = function(points, app, style, isFinal)
      */
     var roi = new dwv.math.ROI();
     
+    if ( isFinal ) {
+        var size = points.length;
+        var clean = [];
+        if ( size > 0 ) {
+            clean.push( points[0] );
+            var last = points[0];
+            for ( var i = 1; i < size; ++i ) {
+                var line = new dwv.math.Line( last, points[i] );
+                if( line.getLength() > 2 ) {
+                    clean.push( points[i] );
+                    last = points[i];
+                }
+            }
+            points = clean;
+        }
+    }
+    
+    
     // add input points to the ROI
     roi.addPoints(points);
 
@@ -10708,7 +10695,6 @@ dwv.tool.UpdateRoi = function (roi, anchor)
     points[anchor.id()] = px;
     points[anchor.id()+1] = py;
     roi.points( points );
-
 };
 ;/** 
  * Tool module.
@@ -11047,11 +11033,15 @@ dwv.tool.UndoStack = function(app)
             // clear layers
             app.getDrawLayer().clear();
             app.getTempLayer().clear();
+            //app.getKineticLayer().clear();
+            
+            stack[curCmdIndex].undo();
+            
             // redo from first command
-            for( var i = 0; i < curCmdIndex; ++i)
-            {
-                stack[i].execute(); 
-            }
+            //for( var i = 0; i < curCmdIndex; ++i)
+            //{
+            //    stack[i].execute(); 
+            //}
             // display
             if( curCmdIndex === 0 ) {
                 // just draw the image
