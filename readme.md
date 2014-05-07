@@ -11,4 +11,4 @@ All coding/implementation contributions and comments are welcome.
 
 Released under GNU GPL license (see [license.txt](license.txt)). 
 
-[![Build Status](https://travis-ci.org/ivmartel/dwv.png)](https://travis-ci.org/ivmartel/dwv) [![Code Climate](https://codeclimate.com/github/ivmartel/dwv.png)](https://codeclimate.com/github/ivmartel/dwv)
+[![Build Status](https://travis-ci.org/ivmartel/dwv.png)](https://travis-ci.org/ivmartel/dwv) [![Code Climate](https://codeclimate.com/github/ivmartel/dwv.png)](https://codeclimate.com/github/ivmartel/dwv) [![Dependency Status](https://david-dm.org/ivmartel/dwv.svg)](https://david-dm.org/ivmartel/dwv)
