@@ -366,8 +366,10 @@ dwv.App = function()
                 var touch = touches[0];
                 // store
                 event._x = touch.pageX - parseInt(app.getImageLayer().getOffset().left, 10);
+                event._xs = event._x;
                 event._x = parseInt( (event._x / displayZoom), 10 );
                 event._y = touch.pageY - parseInt(app.getImageLayer().getOffset().top, 10);
+                event._ys = event._y;
                 event._y = parseInt( (event._y / displayZoom), 10 );
                 // second finger
                 if (touches.length === 2) {

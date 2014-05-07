@@ -4,145 +4,71 @@
  */
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
-
 var Kinetic = Kinetic || {};
 
 /**
- * Draw line command.
- * @class DrawLineCommand
- * @namespace dwv.tool
- * @constructor
+ * Create a line shape to be displayed.
+ * @method LineCreator
+ * @static
  * @param {Array} points The points from which to extract the line.
- * @param {Object} app The application to draw the line on.
  * @param {Style} style The drawing style.
- */
-dwv.tool.DrawLineCommand = function(points, app, style, isFinal)
+ * @param {Boolean} isFinal Flag to know if final or temporary shape.
+ */ 
+dwv.tool.LineCreator = function (points, style, isFinal)
 {
-    /**
-     * Line object.
-     * @property line
-     * @private
-     * @type Line
-     */
+    // physical object
     var line = new dwv.math.Line(points[0], points[points.length-1]);
-    
-    /**
-     * Line color.
-     * @property lineColor
-     * @private
-     * @type String
-     */
-    var lineColor = style.getLineColor();
-    /**
-     * HTML context.
-     * @property context
-     * @private
-     * @type Object
-     */
-    //var context = app.getTempLayer().getContext();
-    
-    /**
-     * Command name.
-     * @property name
-     * @private
-     * @type String
-     */
-    var name = "DrawLineCommand";
-    /**
-     * Get the command name.
-     * @method getName
-     * @return {String} The command name.
-     */
-    this.getName = function() { return name; };
-    /**
-     * Set the command name.
-     * @method setName
-     * @param {String} str The command name.
-     */
-    this.setName = function(str) { name = str; };
+    // shape
+    var kline = new Kinetic.Line({
+        points: [line.getBegin().getX(), line.getBegin().getY(), 
+                 line.getEnd().getX(), line.getEnd().getY() ],
+        stroke: style.getLineColor(),
+        strokeWidth: 2,
+        name: ( isFinal ? "final" : "temp" )
+    });
+    // hover styling
+    kline.on('mouseover', function () {
+        if ( this.getLayer() ) {
+            document.body.style.cursor = 'pointer';
+            this.getLayer().draw();
+        }
+    });
+    // not hover styling
+    kline.on('mouseout', function () {
+        if ( this.getLayer() ) {
+            document.body.style.cursor = 'default';
+            this.getLayer().draw();
+        }
+    });
+    // return shape
+    return kline;
+};
 
-    /**
-     * Execute the command.
-     * @method execute
-     */
-    this.execute = function()
-    {
-        // style
-        /*context.fillStyle = lineColor;
-        context.strokeStyle = lineColor;
-        // path
-        context.beginPath();
-        context.moveTo( line.getBegin().getX(), line.getBegin().getY());
-        context.lineTo( line.getEnd().getX(), line.getEnd().getY());
-        context.stroke();
-        context.closePath();
-        // length
-        var length = line.getWorldLength( 
-            app.getImage().getSpacing().getColumnSpacing(), 
-            app.getImage().getSpacing().getRowSpacing() );
-        context.font = style.getFontStr();
-        context.fillText( Math.round(length) + "mm",
-            line.getEnd().getX() + style.getFontSize(),
-            line.getEnd().getY() + style.getFontSize());*/
-        
-        var name = isFinal ? "final" : "temp";
-        var kline = new Kinetic.Line({
-            points: [line.getBegin().getX(), line.getBegin().getY(), 
-                     line.getEnd().getX(), line.getEnd().getY() ],
-            stroke: lineColor,
-            strokeWidth: 2,
-            name: name
-        });
-        // add hover styling
-        kline.on('mouseover', function () {
-            if ( this.getLayer() ) {
-                document.body.style.cursor = 'pointer';
-                this.getLayer().draw();
-            }
-        });
-        kline.on('mouseout', function () {
-            if ( this.getLayer() ) {
-                document.body.style.cursor = 'default';
-                this.getLayer().draw();
-            }
-        });
-        // remove temporary shapes from the layer
-        var klayer = app.getKineticLayer();
-        var kshapes = klayer.find('.temp');
-        kshapes.each( function (kshape) {
-            kshape.remove(); 
-        });
-        // create group
-        var kgroup = new Kinetic.Group();
-        kgroup.add(kline);
-       // add the group to the layer
-        app.getKineticLayer().add(kgroup);
-        app.getKineticLayer().draw();
-
-    }; 
-}; // DrawLineCommand class
-
+/**
+ * Update a line shape.
+ * @method UpdateLine
+ * @static
+ * @param {Object} line The line shape to update.
+ * @param {Object} anchor The active anchor.
+ */ 
 dwv.tool.UpdateLine = function (line, anchor)
 {
+    // parent group
     var group = anchor.getParent();
-    
+    // find special points
     var begin = group.find('#begin')[0];
     var end = group.find('#end')[0];
-    
-    var anchorX = anchor.x();
-    var anchorY = anchor.y();
-    
-    // update anchor positions
-    switch (anchor.id()) {
+    // update special points
+    switch ( anchor.id() ) {
     case 'begin':
-        begin.x( anchorX );
-        begin.y( anchorY );
+        begin.x( anchor.x() );
+        begin.y( anchor.y() );
         break;
     case 'end':
-        end.x( anchorX );
-        end.y( anchorY );
+        end.x( anchor.x() );
+        end.y( anchor.y() );
         break;
     }
-    
+    // update shape
     line.points([begin.x(), begin.y(), end.x(), end.y()]);
 };
