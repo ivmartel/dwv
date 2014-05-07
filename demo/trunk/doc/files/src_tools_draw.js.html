@@ -107,15 +107,9 @@
             
                 <li><a href="../classes/dwv.tool.Draw.html">dwv.tool.Draw</a></li>
             
-                <li><a href="../classes/dwv.tool.DrawEllipseCommand.html">dwv.tool.DrawEllipseCommand</a></li>
-            
-                <li><a href="../classes/dwv.tool.DrawLineCommand.html">dwv.tool.DrawLineCommand</a></li>
-            
                 <li><a href="../classes/dwv.tool.DrawLivewireCommand.html">dwv.tool.DrawLivewireCommand</a></li>
             
-                <li><a href="../classes/dwv.tool.DrawRectangleCommand.html">dwv.tool.DrawRectangleCommand</a></li>
-            
-                <li><a href="../classes/dwv.tool.DrawRoiCommand.html">dwv.tool.DrawRoiCommand</a></li>
+                <li><a href="../classes/dwv.tool.DrawShapeCommand.html">dwv.tool.DrawShapeCommand</a></li>
             
                 <li><a href="../classes/dwv.tool.Filter.html">dwv.tool.Filter</a></li>
             
@@ -128,6 +122,8 @@
                 <li><a href="../classes/dwv.tool.RunFilterCommand.html">dwv.tool.RunFilterCommand</a></li>
             
                 <li><a href="../classes/dwv.tool.Scroll.html">dwv.tool.Scroll</a></li>
+            
+                <li><a href="../classes/dwv.tool.ShapeEditor.html">dwv.tool.ShapeEditor</a></li>
             
                 <li><a href="../classes/dwv.tool.ToolBox.html">dwv.tool.ToolBox</a></li>
             
@@ -208,132 +204,55 @@
  */
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
-
 var Kinetic = Kinetic || {};
 
-dwv.tool.ShapeEditor = function () {
-    var shape = null;
-    var isActive = false;
-    this.setShape = function ( inshape ) {
-        shape = inshape;
-        // clear previous controls
-        var anchors = shape.getLayer().find(&#x27;.anchor&#x27;);
-        anchors.each( function (anchor) {
-            anchor.remove();
-        });
-        // add new controls
-        createControls( shape );
-    };
-    this.getShape = function () { 
-        return shape;
-    };
-    this.isActive = function () {
-        return isActive;
-    };
-    this.enable = function () {
-        isActive = true;
-        var anchors = shape.getLayer().find(&#x27;.anchor&#x27;);
-        anchors.each( function (anchor) {
-            anchor.visible(true);
-        });
-        shape.getParent().draggable(true);
-        shape.getLayer().draw();
-    };
-    this.disable = function () {
-        isActive = false;
-        var anchors = shape.getLayer().find(&#x27;.anchor&#x27;);
-        anchors.each( function (anchor) {
-            anchor.visible(false);
-        });
-        shape.getParent().draggable(false);
-        shape.getLayer().draw();
-        shape = null;
-    };
-    function createControls( inshape ) {
-        // get shape group
-        var group = inshape.getParent();
-        // add shape specific anchors to the shape group
-        if ( inshape instanceof Kinetic.Line ) {
-            var points = inshape.points();
-            if ( points.length === 4 ) {
-                addAnchor(group, points[0], points[1], &#x27;begin&#x27;, dwv.tool.UpdateLine);
-                addAnchor(group, points[2], points[3], &#x27;end&#x27;, dwv.tool.UpdateLine);
-            }
-            else {
-                addAnchor(group, points[0], points[1], 0, dwv.tool.UpdateRoi);
-                for ( var i = 0; i &lt; points.length; i=i+2 ) {
-                    addAnchor(group, points[i], points[i+1], i, dwv.tool.UpdateRoi);
-                }
-            }
-        }
-        else if ( inshape instanceof Kinetic.Rect ) {
-            var rectX = inshape.x();
-            var rectY = inshape.y();
-            var rectWidth = inshape.width();
-            var rectHeight = inshape.height();
-            addAnchor(group, rectX, rectY, &#x27;topLeft&#x27;, dwv.tool.UpdateRect);
-            addAnchor(group, rectX+rectWidth, rectY, &#x27;topRight&#x27;, dwv.tool.UpdateRect);
-            addAnchor(group, rectX+rectWidth, rectY+rectHeight, &#x27;bottomRight&#x27;, dwv.tool.UpdateRect);
-            addAnchor(group, rectX, rectY+rectHeight, &#x27;bottomLeft&#x27;, dwv.tool.UpdateRect);
-        }
-        else if ( inshape instanceof Kinetic.Ellipse ) {
-            var ellipseX = inshape.x();
-            var ellipseY = inshape.y();
-            var radius = inshape.radius();
-            addAnchor(group, ellipseX-radius.x, ellipseY-radius.y, &#x27;topLeft&#x27;, dwv.tool.UpdateEllipse);
-            addAnchor(group, ellipseX+radius.x, ellipseY-radius.y, &#x27;topRight&#x27;, dwv.tool.UpdateEllipse);
-            addAnchor(group, ellipseX+radius.x, ellipseY+radius.y, &#x27;bottomRight&#x27;, dwv.tool.UpdateEllipse);
-            addAnchor(group, ellipseX-radius.x, ellipseY+radius.y, &#x27;bottomLeft&#x27;, dwv.tool.UpdateEllipse);
-        }
-        // add group to layer
-        inshape.getLayer().add( group );
-        // draw layer
-        inshape.getLayer().draw();
-    }
-    function addAnchor(group, x, y, id, updateMethod) {
-        // anchor shape
-        var anchor = new Kinetic.Circle({
-            x: x,
-            y: y,
-            stroke: &#x27;#999&#x27;,
-            fillRed: 100,
-            fillBlue: 100,
-            fillGreen: 100,
-            fillAlpha: 0.7,
-            strokeWidth: 2,
-            radius: 6,
-            name: &#x27;anchor&#x27;,
-            id: id,
-            dragOnTop: false,
-            draggable: true,
-            visible: false
-        });
+/**
+ * Draw shape command.
+ * @class DrawShapeCommand
+ * @namespace dwv.tool
+ * @constructor
+ */
+dwv.tool.DrawShapeCommand = function (shape, name, app)
+{
+    /**
+     * Command name.
+     * @property name
+     * @private
+     * @type String
+     */
+    var _name = &quot;Draw-&quot;+name;
+    /**
+     * Get the command name.
+     * @method getName
+     * @return {String} The command name.
+     */
+    this.getName = function() { return _name; };
 
-        anchor.on(&#x27;dragmove&#x27;, function () {
-            updateMethod(shape, this);
-            this.getLayer().draw();
+    /**
+     * Execute the command.
+     * @method execute
+     */
+    this.execute = function()
+    {
+        // remove temporary shapes from the layer
+        var klayer = app.getKineticLayer();
+        var kshapes = klayer.find(&#x27;.temp&#x27;);
+        kshapes.each( function (kshape) {
+            kshape.remove(); 
         });
-        anchor.on(&#x27;mousedown touchstart&#x27;, function () {
-            this.moveToTop();
-        });
-        anchor.on(&#x27;dragend&#x27;, function () {
-            this.getLayer().draw();
-        });
-        // add hover styling
-        anchor.on(&#x27;mouseover&#x27;, function () {
-            document.body.style.cursor = &#x27;pointer&#x27;;
-            this.stroke(&#x27;#ddd&#x27;);
-            this.getLayer().draw();
-        });
-        anchor.on(&#x27;mouseout&#x27;, function () {
-            document.body.style.cursor = &#x27;default&#x27;;
-            this.stroke(&#x27;#999&#x27;);
-            this.getLayer().draw();
-        });
+        // create group
+        var kgroup = new Kinetic.Group();
+        kgroup.add(shape);
+        // add the group to the layer
+        app.getKineticLayer().add(kgroup);
+        app.getKineticLayer().draw();
+    };
+    this.undo = function () {
+        shape.remove();
+        app.getKineticLayer().draw();
+    };
 
-        group.add(anchor);
-    }
-};
+}; // DrawShapeCommand class
 
 // List of colors
 dwv.tool.colors = [
@@ -450,8 +369,8 @@ dwv.tool.Draw = function (app)
             lastPoint = new dwv.math.Point2D(event._x, event._y);
             points.push( lastPoint );
             // create draw command
-            shape = new dwv.tool.shapes[self.shapeName](points, app, self.style, false);
-            command = new dwv.tool.DrawEllipseCommand(shape, app);
+            shape = new dwv.tool.shapes[self.shapeName](points, self.style, false);
+            command = new dwv.tool.DrawShapeCommand(shape, self.shapeName, app);
             // clear the temporary layer
             app.getTempLayer().clear();
             // draw
@@ -468,8 +387,8 @@ dwv.tool.Draw = function (app)
         if (started &amp;&amp; points.length &gt; 1 )
         {
             // create final command
-            shape = new dwv.tool.shapes[self.shapeName](points, app, self.style, true);
-            command = new dwv.tool.DrawEllipseCommand(shape, app);
+            shape = new dwv.tool.shapes[self.shapeName](points, self.style, true);
+            command = new dwv.tool.DrawShapeCommand(shape, self.shapeName, app);
             // execute it
             command.execute();
             // save it in undo stack

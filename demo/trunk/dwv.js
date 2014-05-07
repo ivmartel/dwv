@@ -366,8 +366,10 @@ dwv.App = function()
                 var touch = touches[0];
                 // store
                 event._x = touch.pageX - parseInt(app.getImageLayer().getOffset().left, 10);
+                event._xs = event._x;
                 event._x = parseInt( (event._x / displayZoom), 10 );
                 event._y = touch.pageY - parseInt(app.getImageLayer().getOffset().top, 10);
+                event._ys = event._y;
                 event._y = parseInt( (event._y / displayZoom), 10 );
                 // second finger
                 if (touches.length === 2) {
@@ -8765,132 +8767,55 @@ dwv.math.Path.prototype.appenPath = function(other) {
  */
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
-
 var Kinetic = Kinetic || {};
 
-dwv.tool.ShapeEditor = function () {
-    var shape = null;
-    var isActive = false;
-    this.setShape = function ( inshape ) {
-        shape = inshape;
-        // clear previous controls
-        var anchors = shape.getLayer().find('.anchor');
-        anchors.each( function (anchor) {
-            anchor.remove();
-        });
-        // add new controls
-        createControls( shape );
-    };
-    this.getShape = function () { 
-        return shape;
-    };
-    this.isActive = function () {
-        return isActive;
-    };
-    this.enable = function () {
-        isActive = true;
-        var anchors = shape.getLayer().find('.anchor');
-        anchors.each( function (anchor) {
-            anchor.visible(true);
-        });
-        shape.getParent().draggable(true);
-        shape.getLayer().draw();
-    };
-    this.disable = function () {
-        isActive = false;
-        var anchors = shape.getLayer().find('.anchor');
-        anchors.each( function (anchor) {
-            anchor.visible(false);
-        });
-        shape.getParent().draggable(false);
-        shape.getLayer().draw();
-        shape = null;
-    };
-    function createControls( inshape ) {
-        // get shape group
-        var group = inshape.getParent();
-        // add shape specific anchors to the shape group
-        if ( inshape instanceof Kinetic.Line ) {
-            var points = inshape.points();
-            if ( points.length === 4 ) {
-                addAnchor(group, points[0], points[1], 'begin', dwv.tool.UpdateLine);
-                addAnchor(group, points[2], points[3], 'end', dwv.tool.UpdateLine);
-            }
-            else {
-                addAnchor(group, points[0], points[1], 0, dwv.tool.UpdateRoi);
-                for ( var i = 0; i < points.length; i=i+2 ) {
-                    addAnchor(group, points[i], points[i+1], i, dwv.tool.UpdateRoi);
-                }
-            }
-        }
-        else if ( inshape instanceof Kinetic.Rect ) {
-            var rectX = inshape.x();
-            var rectY = inshape.y();
-            var rectWidth = inshape.width();
-            var rectHeight = inshape.height();
-            addAnchor(group, rectX, rectY, 'topLeft', dwv.tool.UpdateRect);
-            addAnchor(group, rectX+rectWidth, rectY, 'topRight', dwv.tool.UpdateRect);
-            addAnchor(group, rectX+rectWidth, rectY+rectHeight, 'bottomRight', dwv.tool.UpdateRect);
-            addAnchor(group, rectX, rectY+rectHeight, 'bottomLeft', dwv.tool.UpdateRect);
-        }
-        else if ( inshape instanceof Kinetic.Ellipse ) {
-            var ellipseX = inshape.x();
-            var ellipseY = inshape.y();
-            var radius = inshape.radius();
-            addAnchor(group, ellipseX-radius.x, ellipseY-radius.y, 'topLeft', dwv.tool.UpdateEllipse);
-            addAnchor(group, ellipseX+radius.x, ellipseY-radius.y, 'topRight', dwv.tool.UpdateEllipse);
-            addAnchor(group, ellipseX+radius.x, ellipseY+radius.y, 'bottomRight', dwv.tool.UpdateEllipse);
-            addAnchor(group, ellipseX-radius.x, ellipseY+radius.y, 'bottomLeft', dwv.tool.UpdateEllipse);
-        }
-        // add group to layer
-        inshape.getLayer().add( group );
-        // draw layer
-        inshape.getLayer().draw();
-    }
-    function addAnchor(group, x, y, id, updateMethod) {
-        // anchor shape
-        var anchor = new Kinetic.Circle({
-            x: x,
-            y: y,
-            stroke: '#999',
-            fillRed: 100,
-            fillBlue: 100,
-            fillGreen: 100,
-            fillAlpha: 0.7,
-            strokeWidth: 2,
-            radius: 6,
-            name: 'anchor',
-            id: id,
-            dragOnTop: false,
-            draggable: true,
-            visible: false
-        });
+/**
+ * Draw shape command.
+ * @class DrawShapeCommand
+ * @namespace dwv.tool
+ * @constructor
+ */
+dwv.tool.DrawShapeCommand = function (shape, name, app)
+{
+    /**
+     * Command name.
+     * @property name
+     * @private
+     * @type String
+     */
+    var _name = "Draw-"+name;
+    /**
+     * Get the command name.
+     * @method getName
+     * @return {String} The command name.
+     */
+    this.getName = function() { return _name; };
 
-        anchor.on('dragmove', function () {
-            updateMethod(shape, this);
-            this.getLayer().draw();
+    /**
+     * Execute the command.
+     * @method execute
+     */
+    this.execute = function()
+    {
+        // remove temporary shapes from the layer
+        var klayer = app.getKineticLayer();
+        var kshapes = klayer.find('.temp');
+        kshapes.each( function (kshape) {
+            kshape.remove(); 
         });
-        anchor.on('mousedown touchstart', function () {
-            this.moveToTop();
-        });
-        anchor.on('dragend', function () {
-            this.getLayer().draw();
-        });
-        // add hover styling
-        anchor.on('mouseover', function () {
-            document.body.style.cursor = 'pointer';
-            this.stroke('#ddd');
-            this.getLayer().draw();
-        });
-        anchor.on('mouseout', function () {
-            document.body.style.cursor = 'default';
-            this.stroke('#999');
-            this.getLayer().draw();
-        });
+        // create group
+        var kgroup = new Kinetic.Group();
+        kgroup.add(shape);
+        // add the group to the layer
+        app.getKineticLayer().add(kgroup);
+        app.getKineticLayer().draw();
+    };
+    this.undo = function () {
+        shape.remove();
+        app.getKineticLayer().draw();
+    };
 
-        group.add(anchor);
-    }
-};
+}; // DrawShapeCommand class
 
 // List of colors
 dwv.tool.colors = [
@@ -9007,8 +8932,8 @@ dwv.tool.Draw = function (app)
             lastPoint = new dwv.math.Point2D(event._x, event._y);
             points.push( lastPoint );
             // create draw command
-            shape = new dwv.tool.shapes[self.shapeName](points, app, self.style, false);
-            command = new dwv.tool.DrawEllipseCommand(shape, app);
+            shape = new dwv.tool.shapes[self.shapeName](points, self.style, false);
+            command = new dwv.tool.DrawShapeCommand(shape, self.shapeName, app);
             // clear the temporary layer
             app.getTempLayer().clear();
             // draw
@@ -9025,8 +8950,8 @@ dwv.tool.Draw = function (app)
         if (started && points.length > 1 )
         {
             // create final command
-            shape = new dwv.tool.shapes[self.shapeName](points, app, self.style, true);
-            command = new dwv.tool.DrawEllipseCommand(shape, app);
+            shape = new dwv.tool.shapes[self.shapeName](points, self.style, true);
+            command = new dwv.tool.DrawShapeCommand(shape, self.shapeName, app);
             // execute it
             command.execute();
             // save it in undo stack
@@ -9170,135 +9095,276 @@ dwv.tool.Draw.prototype.init = function() {
  */
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
-
 var Kinetic = Kinetic || {};
 
-dwv.tool.EllipseCreator = function(points, app, style, isFinal)
+/**
+ * Shape editor.
+ * @class ShapeEditor
+ * @namespace dwv.tool
+ * @constructor
+ */
+dwv.tool.ShapeEditor = function ()
+{
+    // 
+    var shape = null;
+    var isActive = false;
+    
+    /**
+     * Set the shape to edit.
+     * @method setShape
+     * param {Object} inshape The shape to edit.
+     */
+    this.setShape = function ( inshape ) {
+        shape = inshape;
+        // clear previous controls
+        var anchors = shape.getLayer().find('.anchor');
+        anchors.each( function (anchor) {
+            anchor.remove();
+        });
+        // add new controls
+        createControls( shape );
+    };
+    
+    /**
+     * Get the edited shape.
+     * @method getShape
+     * @return {Object} The edited shape.
+     */
+    this.getShape = function () { 
+        return shape;
+    };
+    
+    /**
+     * Get the active flag.
+     * @method isActive
+     * @return {Boolean} The active flag.
+     */
+    this.isActive = function () {
+        return isActive;
+    };
+
+    /**
+     * Enable the editor.
+     * @method enable
+     */
+    this.enable = function () {
+        isActive = true;
+        var anchors = shape.getLayer().find('.anchor');
+        anchors.each( function (anchor) {
+            anchor.visible(true);
+        });
+        shape.getParent().draggable(true);
+        shape.getLayer().draw();
+    };
+    
+    /**
+     * Disable the editor.
+     * @method disable
+     */
+    this.disable = function () {
+        isActive = false;
+        var anchors = shape.getLayer().find('.anchor');
+        anchors.each( function (anchor) {
+            anchor.visible(false);
+        });
+        shape.getParent().draggable(false);
+        shape.getLayer().draw();
+        shape = null;
+    };
+    
+    /**
+     * Create shape editor controls, i.e. the anchors.
+     * @method createControls
+     * @param {Object} inshape The shape to edit.
+     */
+    function createControls( inshape ) {
+        // get shape group
+        var group = inshape.getParent();
+        // add shape specific anchors to the shape group
+        if ( inshape instanceof Kinetic.Line ) {
+            var points = inshape.points();
+            if ( points.length === 4 ) {
+                addAnchor(group, points[0], points[1], 'begin', dwv.tool.UpdateLine);
+                addAnchor(group, points[2], points[3], 'end', dwv.tool.UpdateLine);
+            }
+            else {
+                addAnchor(group, points[0], points[1], 0, dwv.tool.UpdateRoi);
+                for ( var i = 0; i < points.length; i=i+2 ) {
+                    addAnchor(group, points[i], points[i+1], i, dwv.tool.UpdateRoi);
+                }
+            }
+        }
+        else if ( inshape instanceof Kinetic.Rect ) {
+            var rectX = inshape.x();
+            var rectY = inshape.y();
+            var rectWidth = inshape.width();
+            var rectHeight = inshape.height();
+            addAnchor(group, rectX, rectY, 'topLeft', dwv.tool.UpdateRect);
+            addAnchor(group, rectX+rectWidth, rectY, 'topRight', dwv.tool.UpdateRect);
+            addAnchor(group, rectX+rectWidth, rectY+rectHeight, 'bottomRight', dwv.tool.UpdateRect);
+            addAnchor(group, rectX, rectY+rectHeight, 'bottomLeft', dwv.tool.UpdateRect);
+        }
+        else if ( inshape instanceof Kinetic.Ellipse ) {
+            var ellipseX = inshape.x();
+            var ellipseY = inshape.y();
+            var radius = inshape.radius();
+            addAnchor(group, ellipseX-radius.x, ellipseY-radius.y, 'topLeft', dwv.tool.UpdateEllipse);
+            addAnchor(group, ellipseX+radius.x, ellipseY-radius.y, 'topRight', dwv.tool.UpdateEllipse);
+            addAnchor(group, ellipseX+radius.x, ellipseY+radius.y, 'bottomRight', dwv.tool.UpdateEllipse);
+            addAnchor(group, ellipseX-radius.x, ellipseY+radius.y, 'bottomLeft', dwv.tool.UpdateEllipse);
+        }
+        // add group to layer
+        inshape.getLayer().add( group );
+        // draw layer
+        inshape.getLayer().draw();
+    }
+    
+    /**
+     * Create shape editor controls, i.e. the anchors.
+     * @method addAnchor
+     * @param {Object} group The group associated with this anchor.
+     * @param {Number} x The X position of the anchor.
+     * @param {Number} y The Y position of the anchor.
+     * @param {Number} id The id of the anchor.
+     * @param {Object} updateMethod The method used to update the associated shape.
+     */
+    function addAnchor(group, x, y, id, updateMethod) {
+        // anchor shape
+        var anchor = new Kinetic.Circle({
+            x: x,
+            y: y,
+            stroke: '#999',
+            fillRed: 100,
+            fillBlue: 100,
+            fillGreen: 100,
+            fillAlpha: 0.7,
+            strokeWidth: 2,
+            radius: 6,
+            name: 'anchor',
+            id: id,
+            dragOnTop: false,
+            draggable: true,
+            visible: false
+        });
+        // dragmove listener
+        anchor.on('dragmove', function () {
+            updateMethod(shape, this);
+            this.getLayer().draw();
+        });
+        // mousedown listener
+        anchor.on('mousedown touchstart', function () {
+            this.moveToTop();
+        });
+        // dragend listener
+        anchor.on('dragend', function () {
+            this.getLayer().draw();
+        });
+        // hover styling
+        anchor.on('mouseover', function () {
+            document.body.style.cursor = 'pointer';
+            this.stroke('#ddd');
+            this.getLayer().draw();
+        });
+        // not hover styling
+        anchor.on('mouseout', function () {
+            document.body.style.cursor = 'default';
+            this.stroke('#999');
+            this.getLayer().draw();
+        });
+        // add the anchor to the group
+        group.add(anchor);
+    }
+};
+;/** 
+ * Tool module.
+ * @module tool
+ */
+var dwv = dwv || {};
+dwv.tool = dwv.tool || {};
+var Kinetic = Kinetic || {};
+
+/**
+ * Create an ellipse shape to be displayed.
+ * @method EllipseCreator
+ * @static
+ * @param {Array} points The points from which to extract the ellipse.
+ * @param {Style} style The drawing style.
+ * @param {Boolean} isFinal Flag to know if final or temporary shape.
+ */ 
+dwv.tool.EllipseCreator = function (points, style, isFinal)
 {
     // calculate radius
     var a = Math.abs(points[0].getX() - points[points.length-1].getX());
     var b = Math.abs(points[0].getY() - points[points.length-1].getY());
+    // physical object
     var ellipse = new dwv.math.Ellipse(points[0], a, b);
-    var name = isFinal ? "final" : "temp";
+    // shape
     var kellipse = new Kinetic.Ellipse({
         x: ellipse.getCenter().getX(),
         y: ellipse.getCenter().getY(),
         radius: { x: ellipse.getA(), y: ellipse.getB() },
         stroke: style.getLineColor(),
         strokeWidth: 2,
-        name: name
+        name: ( isFinal ? "final" : "temp" )
     });
-    // add hover styling
+    // hover styling
     kellipse.on('mouseover', function () {
         if ( this.getLayer() ) {
             document.body.style.cursor = 'pointer';
             this.getLayer().draw();
         }
     });
+    // not hover styling
     kellipse.on('mouseout', function () {
         if ( this.getLayer() ) {
             document.body.style.cursor = 'default';
             this.getLayer().draw();
         }
     });
+    // return shape
     return kellipse;
 };
 
 /**
- * Draw ellipse command.
- * @class DrawEllipseCommand
- * @namespace dwv.tool
- * @constructor
- * @param {Array} points The points from which to extract the ellipse.
- * @param {Object} app The application to draw the ellipse on.
- * @param {Style} style The drawing style.
- */
-//dwv.tool.DrawEllipseCommand = function(points, app, style, isFinal)
-dwv.tool.DrawEllipseCommand = function(shape, app)
+ * Update an ellipse shape.
+ * @method UpdateEllipse
+ * @static
+ * @param {Object} ellipse The ellipse shape to update.
+ * @param {Object} anchor The active anchor.
+ */ 
+dwv.tool.UpdateEllipse = function (ellipse, anchor)
 {
-    /**
-     * Command name.
-     * @property name
-     * @private
-     * @type String
-     */
-    var name = "DrawEllipseCommand";
-    /**
-     * Get the command name.
-     * @method getName
-     * @return {String} The command name.
-     */
-    this.getName = function() { return name; };
-    /**
-     * Set the command name.
-     * @method setName
-     * @param {String} str The command name.
-     */
-    this.setName = function(str) { name = str; };
-
-    /**
-     * Execute the command.
-     * @method execute
-     */
-    this.execute = function()
-    {
-        // remove temporary shapes from the layer
-        var klayer = app.getKineticLayer();
-        var kshapes = klayer.find('.temp');
-        kshapes.each( function (kshape) {
-            kshape.remove(); 
-        });
-        // create group
-        var kgroup = new Kinetic.Group();
-        kgroup.add(shape);
-       // add the group to the layer
-        app.getKineticLayer().add(kgroup);
-        app.getKineticLayer().draw();
-    };
-    this.undo = function () {
-        shape.remove();
-        app.getKineticLayer().draw();
-    };
-
-}; // DrawEllipseCommand class
-
-dwv.tool.UpdateEllipse = function (ellipse, anchor) {
+    // parent group
     var group = anchor.getParent();
-
+    // find special points
     var topLeft = group.find('#topLeft')[0];
     var topRight = group.find('#topRight')[0];
     var bottomRight = group.find('#bottomRight')[0];
     var bottomLeft = group.find('#bottomLeft')[0];
-
-    var anchorX = anchor.x();
-    var anchorY = anchor.y();
-
-    // update anchor positions
-    switch (anchor.id()) {
+    // update special points
+    switch ( anchor.id() ) {
     case 'topLeft':
-        topRight.y(anchorY);
-        bottomLeft.x(anchorX);
+        topRight.y( anchor.y() );
+        bottomLeft.x( anchor.x() );
         break;
     case 'topRight':
-        topLeft.y(anchorY);
-        bottomRight.x(anchorX);
+        topLeft.y( anchor.y() );
+        bottomRight.x( anchor.x() );
         break;
     case 'bottomRight':
-        bottomLeft.y(anchorY);
-        topRight.x(anchorX); 
+        bottomLeft.y( anchor.y() );
+        topRight.x( anchor.x() ); 
         break;
     case 'bottomLeft':
-        bottomRight.y(anchorY);
-        topLeft.x(anchorX); 
+        bottomRight.y( anchor.y() );
+        topLeft.x( anchor.x() ); 
         break;
     }
-
-    // update position
+    // update shape
     var radiusX = ( topRight.x() - topLeft.x() ) / 2;
     var radiusY = ( bottomRight.y() - topRight.y() ) / 2;
     var center = { x: topLeft.x() + radiusX, y: topRight.y() + radiusY };
     ellipse.setPosition( center );
-    // update radius
     var radiusAbs = { x: Math.abs(radiusX), y: Math.abs(radiusY) };
     if ( radiusAbs ) {
         ellipse.radius( radiusAbs );
@@ -9825,146 +9891,72 @@ dwv.info.updatePlotMarkings = function(event)
  */
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
-
 var Kinetic = Kinetic || {};
 
 /**
- * Draw line command.
- * @class DrawLineCommand
- * @namespace dwv.tool
- * @constructor
+ * Create a line shape to be displayed.
+ * @method LineCreator
+ * @static
  * @param {Array} points The points from which to extract the line.
- * @param {Object} app The application to draw the line on.
  * @param {Style} style The drawing style.
- */
-dwv.tool.DrawLineCommand = function(points, app, style, isFinal)
+ * @param {Boolean} isFinal Flag to know if final or temporary shape.
+ */ 
+dwv.tool.LineCreator = function (points, style, isFinal)
 {
-    /**
-     * Line object.
-     * @property line
-     * @private
-     * @type Line
-     */
+    // physical object
     var line = new dwv.math.Line(points[0], points[points.length-1]);
-    
-    /**
-     * Line color.
-     * @property lineColor
-     * @private
-     * @type String
-     */
-    var lineColor = style.getLineColor();
-    /**
-     * HTML context.
-     * @property context
-     * @private
-     * @type Object
-     */
-    //var context = app.getTempLayer().getContext();
-    
-    /**
-     * Command name.
-     * @property name
-     * @private
-     * @type String
-     */
-    var name = "DrawLineCommand";
-    /**
-     * Get the command name.
-     * @method getName
-     * @return {String} The command name.
-     */
-    this.getName = function() { return name; };
-    /**
-     * Set the command name.
-     * @method setName
-     * @param {String} str The command name.
-     */
-    this.setName = function(str) { name = str; };
+    // shape
+    var kline = new Kinetic.Line({
+        points: [line.getBegin().getX(), line.getBegin().getY(), 
+                 line.getEnd().getX(), line.getEnd().getY() ],
+        stroke: style.getLineColor(),
+        strokeWidth: 2,
+        name: ( isFinal ? "final" : "temp" )
+    });
+    // hover styling
+    kline.on('mouseover', function () {
+        if ( this.getLayer() ) {
+            document.body.style.cursor = 'pointer';
+            this.getLayer().draw();
+        }
+    });
+    // not hover styling
+    kline.on('mouseout', function () {
+        if ( this.getLayer() ) {
+            document.body.style.cursor = 'default';
+            this.getLayer().draw();
+        }
+    });
+    // return shape
+    return kline;
+};
 
-    /**
-     * Execute the command.
-     * @method execute
-     */
-    this.execute = function()
-    {
-        // style
-        /*context.fillStyle = lineColor;
-        context.strokeStyle = lineColor;
-        // path
-        context.beginPath();
-        context.moveTo( line.getBegin().getX(), line.getBegin().getY());
-        context.lineTo( line.getEnd().getX(), line.getEnd().getY());
-        context.stroke();
-        context.closePath();
-        // length
-        var length = line.getWorldLength( 
-            app.getImage().getSpacing().getColumnSpacing(), 
-            app.getImage().getSpacing().getRowSpacing() );
-        context.font = style.getFontStr();
-        context.fillText( Math.round(length) + "mm",
-            line.getEnd().getX() + style.getFontSize(),
-            line.getEnd().getY() + style.getFontSize());*/
-        
-        var name = isFinal ? "final" : "temp";
-        var kline = new Kinetic.Line({
-            points: [line.getBegin().getX(), line.getBegin().getY(), 
-                     line.getEnd().getX(), line.getEnd().getY() ],
-            stroke: lineColor,
-            strokeWidth: 2,
-            name: name
-        });
-        // add hover styling
-        kline.on('mouseover', function () {
-            if ( this.getLayer() ) {
-                document.body.style.cursor = 'pointer';
-                this.getLayer().draw();
-            }
-        });
-        kline.on('mouseout', function () {
-            if ( this.getLayer() ) {
-                document.body.style.cursor = 'default';
-                this.getLayer().draw();
-            }
-        });
-        // remove temporary shapes from the layer
-        var klayer = app.getKineticLayer();
-        var kshapes = klayer.find('.temp');
-        kshapes.each( function (kshape) {
-            kshape.remove(); 
-        });
-        // create group
-        var kgroup = new Kinetic.Group();
-        kgroup.add(kline);
-       // add the group to the layer
-        app.getKineticLayer().add(kgroup);
-        app.getKineticLayer().draw();
-
-    }; 
-}; // DrawLineCommand class
-
+/**
+ * Update a line shape.
+ * @method UpdateLine
+ * @static
+ * @param {Object} line The line shape to update.
+ * @param {Object} anchor The active anchor.
+ */ 
 dwv.tool.UpdateLine = function (line, anchor)
 {
+    // parent group
     var group = anchor.getParent();
-    
+    // find special points
     var begin = group.find('#begin')[0];
     var end = group.find('#end')[0];
-    
-    var anchorX = anchor.x();
-    var anchorY = anchor.y();
-    
-    // update anchor positions
-    switch (anchor.id()) {
+    // update special points
+    switch ( anchor.id() ) {
     case 'begin':
-        begin.x( anchorX );
-        begin.y( anchorY );
+        begin.x( anchor.x() );
+        begin.y( anchor.y() );
         break;
     case 'end':
-        end.x( anchorX );
-        end.y( anchorY );
+        end.x( anchor.x() );
+        end.y( anchor.y() );
         break;
     }
-    
+    // update shape
     line.points([begin.x(), begin.y(), end.x(), end.y()]);
 };
 ;/** 
@@ -10371,324 +10363,179 @@ dwv.tool.DrawLivewireCommand = function(livewire, app, style)
  */
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
-
 var Kinetic = Kinetic || {};
 
 /**
- * Draw rectangle command.
- * @class DrawRectangleCommand
- * @namespace dwv.tool
- * @constructor
+ * Create a rectangle shape to be displayed.
+ * @method RectangleCreator
+ * @static
  * @param {Array} points The points from which to extract the rectangle.
- * @param {Object} app The application to draw the line on.
  * @param {Style} style The drawing style.
- */
-dwv.tool.DrawRectangleCommand = function(points, app, style, isFinal)
+ * @param {Boolean} isFinal Flag to know if final or temporary shape.
+ */ 
+dwv.tool.RectangleCreator = function (points, style, isFinal)
 {
-    /**
-     * Rectangle object.
-     * @property rectangle
-     * @private
-     * @type Rectangle
-     */
+    // physical shape
     var rectangle = new dwv.math.Rectangle(points[0], points[points.length-1]);
-    
-    /**
-     * Line color.
-     * @property lineColor
-     * @private
-     * @type String
-     */
-    var lineColor = style.getLineColor();
-    /**
-     * HTML context.
-     * @property context
-     * @private
-     * @type Object
-     */
-    //var context = app.getTempLayer().getContext();
-    
-    /**
-     * Command name.
-     * @property name
-     * @private
-     * @type String
-     */
-    var name = "DrawRectangleCommand";
-    /**
-     * Get the command name.
-     * @method getName
-     * @return {String} The command name.
-     */
-    this.getName = function() { return name; };
-    /**
-     * Set the command name.
-     * @method setName
-     * @param {String} str The command name.
-     */
-    this.setName = function(str) { name = str; };
+    // shape
+    var krect = new Kinetic.Rect({
+        x: rectangle.getBegin().getX(),
+        y: rectangle.getBegin().getY(),
+        width: rectangle.getWidth(),
+        height: rectangle.getHeight(),
+        stroke: style.getLineColor(),
+        strokeWidth: 2,
+        name: ( isFinal ? "final" : "temp" )
+    });
+    // hover styling
+    krect.on('mouseover', function () {
+        if ( this.getLayer() ) {
+            document.body.style.cursor = 'pointer';
+            this.getLayer().draw();
+        }
+    });
+    // not hover styling
+    krect.on('mouseout', function () {
+        if ( this.getLayer() ) {
+            document.body.style.cursor = 'default';
+            this.getLayer().draw();
+        }
+    });
+    // return shape
+    return krect;
+};
 
-    /**
-     * Execute the command.
-     * @method execute
-     */
-    this.execute = function()
-    {
-        // style
-        /*context.fillStyle = lineColor;
-        context.strokeStyle = lineColor;
-        // path
-        context.beginPath();
-        context.strokeRect( 
-            rectangle.getBegin().getX(), 
-            rectangle.getBegin().getY(),
-            rectangle.getRealWidth(),
-            rectangle.getRealHeight() );
-        // length
-        var surf = rectangle.getWorldSurface( 
-            app.getImage().getSpacing().getColumnSpacing(), 
-            app.getImage().getSpacing().getRowSpacing() );
-        context.font = style.getFontStr();
-        context.fillText( Math.round(surf) + "mm2",
-            rectangle.getEnd().getX() + style.getFontSize(),
-            rectangle.getEnd().getY() + style.getFontSize());*/
-        
-        var name = isFinal ? "final" : "temp";
-        var krect = new Kinetic.Rect({
-            x: rectangle.getBegin().getX(),
-            y: rectangle.getBegin().getY(),
-            width: rectangle.getWidth(),
-            height: rectangle.getHeight(),
-            stroke: lineColor,
-            strokeWidth: 2,
-            name: name
-        });
-        // add hover styling
-        krect.on('mouseover', function () {
-            if ( this.getLayer() ) {
-                document.body.style.cursor = 'pointer';
-                this.getLayer().draw();
-            }
-        });
-        krect.on('mouseout', function () {
-            if ( this.getLayer() ) {
-                document.body.style.cursor = 'default';
-                this.getLayer().draw();
-            }
-        });
-        // remove temporary shapes from the layer
-        var klayer = app.getKineticLayer();
-        var kshapes = klayer.find('.temp');
-        kshapes.each( function (kshape) {
-            kshape.remove(); 
-        });
-        // create group
-        var kgroup = new Kinetic.Group();
-        kgroup.add(krect);
-        // add the group to the layer
-        app.getKineticLayer().add(kgroup);
-        app.getKineticLayer().draw();
-    }; 
-}; // DrawRectangleCommand class
-
+/**
+ * Update a rectangle shape.
+ * @method UpdateRect
+ * @static
+ * @param {Object} rect The rectangle shape to update.
+ * @param {Object} anchor The active anchor.
+ */ 
 dwv.tool.UpdateRect = function (rect, anchor)
 {
+    // parent group
     var group = anchor.getParent();
-
+    // find special points
     var topLeft = group.find('#topLeft')[0];
     var topRight = group.find('#topRight')[0];
     var bottomRight = group.find('#bottomRight')[0];
     var bottomLeft = group.find('#bottomLeft')[0];
-
-    var anchorX = anchor.x();
-    var anchorY = anchor.y();
-
-    // update anchor positions
-    switch (anchor.id()) {
+    // update special points
+    switch ( anchor.id() ) {
     case 'topLeft':
-        topRight.y(anchorY);
-        bottomLeft.x(anchorX);
+        topRight.y( anchor.y() );
+        bottomLeft.x( anchor.x() );
         break;
     case 'topRight':
-        topLeft.y(anchorY);
-        bottomRight.x(anchorX);
+        topLeft.y( anchor.y() );
+        bottomRight.x( anchor.x() );
         break;
     case 'bottomRight':
-        bottomLeft.y(anchorY);
-        topRight.x(anchorX); 
+        bottomLeft.y( anchor.y() );
+        topRight.x( anchor.x() ); 
         break;
     case 'bottomLeft':
-        bottomRight.y(anchorY);
-        topLeft.x(anchorX); 
+        bottomRight.y( anchor.y() );
+        topLeft.x( anchor.x() ); 
         break;
     }
-    
-    // update position
+    // update shape
     rect.setPosition(topLeft.getPosition());
-    // update size
     var width = topRight.x() - topLeft.x();
     var height = bottomLeft.y() - topLeft.y();
     if ( width && height ) {
         rect.setSize({width:width, height: height});
     }
-};;/** 
+};
+;/** 
  * Tool module.
  * @module tool
  */
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
-
 var Kinetic = Kinetic || {};
 
 /**
- * Draw ROI command.
- * @class DrawRoiCommand
- * @namespace dwv.tool
- * @constructor
+ * Create a roi shape to be displayed.
+ * @method RoiCreator
+ * @static
  * @param {Array} points The points from which to extract the line.
- * @param {Object} app The application to draw the line on.
  * @param {Style} style The drawing style.
- */
-dwv.tool.DrawRoiCommand = function(points, app, style, isFinal)
+ * @param {Boolean} isFinal Flag to know if final or temporary shape.
+ */ 
+dwv.tool.RoiCreator = function (points, style, isFinal)
 {
-    /**
-     * ROI object.
-     * @property roi
-     * @private
-     * @type ROI
-     */
+    // physical shape
     var roi = new dwv.math.ROI();
-    
+    // sample points so that they are not too close 
+    // to one another
     if ( isFinal ) {
         var size = points.length;
         var clean = [];
         if ( size > 0 ) {
             clean.push( points[0] );
             var last = points[0];
-            for ( var i = 1; i < size; ++i ) {
-                var line = new dwv.math.Line( last, points[i] );
+            for ( var j = 1; j < size; ++j ) {
+                var line = new dwv.math.Line( last, points[j] );
                 if( line.getLength() > 2 ) {
-                    clean.push( points[i] );
-                    last = points[i];
+                    clean.push( points[j] );
+                    last = points[j];
                 }
             }
             points = clean;
         }
     }
-    
-    
     // add input points to the ROI
     roi.addPoints(points);
-
-    /**
-     * Line color.
-     * @property lineColor
-     * @private
-     * @type String
-     */
-    var lineColor = style.getLineColor();
-    /**
-     * HTML context.
-     * @property context
-     * @private
-     * @type Object
-     */
-    //var context = app.getTempLayer().getContext();
-    
-    /**
-     * Command name.
-     * @property name
-     * @private
-     * @type String
-     */
-    var name = "DrawRoiCommand";
-    /**
-     * Get the command name.
-     * @method getName
-     * @return {String} The command name.
-     */
-    this.getName = function() { return name; };
-    /**
-     * Set the command name.
-     * @method setName
-     * @param {String} str The command name.
-     */
-    this.setName = function(str) { name = str; };
-
-    /**
-     * Execute the command.
-     * @method execute
-     */
-    this.execute = function()
+    // points stored the kineticjs way
+    var arr = [];
+    for( var i = 1; i < roi.getLength(); ++i )
     {
-        // style
-        /*context.fillStyle = lineColor;
-        context.strokeStyle = lineColor;
-        // path
-        context.beginPath();
-        context.moveTo(
-            roi.getPoint(0).getX(), 
-            roi.getPoint(0).getY());
-        for( var i = 1; i < roi.getLength(); ++i )
-        {
-            context.lineTo(
-                roi.getPoint(i).getX(), 
-                roi.getPoint(i).getY());
-            context.stroke();
+        arr = arr.concat( roi.getPoint(i).getX() );
+        arr = arr.concat( roi.getPoint(i).getY() );
+    }
+    // shape
+    var kline = new Kinetic.Line({
+        points: arr,
+        stroke: style.getLineColor(),
+        strokeWidth: 2,
+        name: ( isFinal ? "final" : "temp" ),
+        closed: true
+    });
+    // hover styling
+    kline.on('mouseover', function () {
+        if ( this.getLayer() ) {
+            document.body.style.cursor = 'pointer';
+            this.getLayer().draw();
         }
-        context.closePath();
-        context.stroke();*/
-        var arr = [];
-        for( var i = 1; i < roi.getLength(); ++i )
-        {
-            arr = arr.concat( roi.getPoint(i).getX() );
-            arr = arr.concat( roi.getPoint(i).getY() );
+    });
+    // not hover styling
+    kline.on('mouseout', function () {
+        if ( this.getLayer() ) {
+            document.body.style.cursor = 'default';
+            this.getLayer().draw();
         }
+    });
+    // return shape
+    return kline;
+}; 
 
-        var name = isFinal ? "final" : "temp";
-        var kline = new Kinetic.Line({
-            points: arr,
-            stroke: lineColor,
-            strokeWidth: 2,
-            name: name,
-            closed: true
-        });
-        // add hover styling
-        kline.on('mouseover', function () {
-            if ( this.getLayer() ) {
-                document.body.style.cursor = 'pointer';
-                this.getLayer().draw();
-            }
-        });
-        kline.on('mouseout', function () {
-            if ( this.getLayer() ) {
-                document.body.style.cursor = 'default';
-                this.getLayer().draw();
-            }
-        });
-        // remove temporary shapes from the layer
-        var klayer = app.getKineticLayer();
-        var kshapes = klayer.find('.temp');
-        kshapes.each( function (kshape) {
-            kshape.remove(); 
-        });
-        // create group
-        var kgroup = new Kinetic.Group();
-        kgroup.add(kline);
-        // add the group to the layer
-        app.getKineticLayer().add(kgroup);
-        app.getKineticLayer().draw();
-    }; 
-}; // DrawRoiCommand class
-
+/**
+ * Update a roi shape.
+ * @method UpdateRoi
+ * @static
+ * @param {Object} line The line shape to update.
+ * @param {Object} anchor The active anchor.
+ */ 
 dwv.tool.UpdateRoi = function (roi, anchor)
 {
-    // get the anchor position
+    // parent group
     var group = anchor.getParent();
+    // find special point
     var point = group.find('#'+anchor.id())[0];
     var px = Math.floor(point.x());
     var py = Math.floor(point.y());
-    
     // update the roi points
     // (the anchor id is the index of the point in the list)
     var points = roi.points();

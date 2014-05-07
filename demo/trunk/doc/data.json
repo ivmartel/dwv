@@ -277,7 +277,19 @@
             "name": "src/tools/draw.js",
             "modules": {},
             "classes": {
+                "dwv.tool.DrawShapeCommand": 1,
                 "dwv.tool.Draw": 1
+            },
+            "fors": {},
+            "namespaces": {
+                "dwv.tool": 1
+            }
+        },
+        "src/tools/editor.js": {
+            "name": "src/tools/editor.js",
+            "modules": {},
+            "classes": {
+                "dwv.tool.ShapeEditor": 1
             },
             "fors": {},
             "namespaces": {
@@ -287,13 +299,9 @@
         "src/tools/ellipse.js": {
             "name": "src/tools/ellipse.js",
             "modules": {},
-            "classes": {
-                "dwv.tool.DrawEllipseCommand": 1
-            },
+            "classes": {},
             "fors": {},
-            "namespaces": {
-                "dwv.tool": 1
-            }
+            "namespaces": {}
         },
         "src/tools/filter.js": {
             "name": "src/tools/filter.js",
@@ -328,13 +336,9 @@
             "modules": {
                 "tool": 1
             },
-            "classes": {
-                "dwv.tool.DrawLineCommand": 1
-            },
+            "classes": {},
             "fors": {},
-            "namespaces": {
-                "dwv.tool": 1
-            }
+            "namespaces": {}
         },
         "src/tools/livewire.js": {
             "name": "src/tools/livewire.js",
@@ -351,24 +355,16 @@
         "src/tools/rectangle.js": {
             "name": "src/tools/rectangle.js",
             "modules": {},
-            "classes": {
-                "dwv.tool.DrawRectangleCommand": 1
-            },
+            "classes": {},
             "fors": {},
-            "namespaces": {
-                "dwv.tool": 1
-            }
+            "namespaces": {}
         },
         "src/tools/roi.js": {
             "name": "src/tools/roi.js",
             "modules": {},
-            "classes": {
-                "dwv.tool.DrawRoiCommand": 1
-            },
+            "classes": {},
             "fors": {},
-            "namespaces": {
-                "dwv.tool": 1
-            }
+            "namespaces": {}
         },
         "src/tools/scroll.js": {
             "name": "src/tools/scroll.js",
@@ -591,17 +587,15 @@
             "name": "tool",
             "submodules": {},
             "classes": {
+                "dwv.tool.DrawShapeCommand": 1,
                 "dwv.tool.Draw": 1,
-                "dwv.tool.DrawEllipseCommand": 1,
+                "dwv.tool.ShapeEditor": 1,
                 "dwv.tool.Filter": 1,
                 "dwv.tool.filter.Threshold": 1,
                 "dwv.tool.filter.Sharpen": 1,
                 "dwv.tool.RunFilterCommand": 1,
-                "dwv.tool.DrawLineCommand": 1,
                 "dwv.tool.Livewire": 1,
                 "dwv.tool.DrawLivewireCommand": 1,
-                "dwv.tool.DrawRectangleCommand": 1,
-                "dwv.tool.DrawRoiCommand": 1,
                 "dwv.tool": 1,
                 "dwv.tool.Scroll": 1,
                 "dwv.tool.ToolBox": 1,
@@ -1289,6 +1283,21 @@
                 }
             ]
         },
+        "dwv.tool.DrawShapeCommand": {
+            "name": "dwv.tool.DrawShapeCommand",
+            "shortname": "dwv.tool.DrawShapeCommand",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "tool",
+            "namespace": "dwv.tool",
+            "file": "src/tools/draw.js",
+            "line": 9,
+            "description": "Draw shape command.",
+            "is_constructor": 1
+        },
         "dwv.tool.Draw": {
             "name": "dwv.tool.Draw",
             "shortname": "dwv.tool.Draw",
@@ -1300,7 +1309,7 @@
             "module": "tool",
             "namespace": "dwv.tool",
             "file": "src/tools/draw.js",
-            "line": 139,
+            "line": 62,
             "description": "Drawing tool.",
             "is_constructor": 1,
             "params": [
@@ -1311,9 +1320,9 @@
                 }
             ]
         },
-        "dwv.tool.DrawEllipseCommand": {
-            "name": "dwv.tool.DrawEllipseCommand",
-            "shortname": "dwv.tool.DrawEllipseCommand",
+        "dwv.tool.ShapeEditor": {
+            "name": "dwv.tool.ShapeEditor",
+            "shortname": "dwv.tool.ShapeEditor",
             "classitems": [],
             "plugins": [],
             "extensions": [],
@@ -1321,27 +1330,10 @@
             "extension_for": [],
             "module": "tool",
             "namespace": "dwv.tool",
-            "file": "src/tools/ellipse.js",
-            "line": 41,
-            "description": "Draw ellipse command.",
-            "is_constructor": 1,
-            "params": [
-                {
-                    "name": "points",
-                    "description": "The points from which to extract the ellipse.",
-                    "type": "Array"
-                },
-                {
-                    "name": "app",
-                    "description": "The application to draw the ellipse on.",
-                    "type": "Object"
-                },
-                {
-                    "name": "style",
-                    "description": "The drawing style.",
-                    "type": "Style"
-                }
-            ]
+            "file": "src/tools/editor.js",
+            "line": 9,
+            "description": "Shape editor.",
+            "is_constructor": 1
         },
         "dwv.tool.Filter": {
             "name": "dwv.tool.Filter",
@@ -1451,38 +1443,6 @@
             "description": "Namespace for info functions.",
             "static": 1
         },
-        "dwv.tool.DrawLineCommand": {
-            "name": "dwv.tool.DrawLineCommand",
-            "shortname": "dwv.tool.DrawLineCommand",
-            "classitems": [],
-            "plugins": [],
-            "extensions": [],
-            "plugin_for": [],
-            "extension_for": [],
-            "module": "tool",
-            "namespace": "dwv.tool",
-            "file": "src/tools/line.js",
-            "line": 10,
-            "description": "Draw line command.",
-            "is_constructor": 1,
-            "params": [
-                {
-                    "name": "points",
-                    "description": "The points from which to extract the line.",
-                    "type": "Array"
-                },
-                {
-                    "name": "app",
-                    "description": "The application to draw the line on.",
-                    "type": "Object"
-                },
-                {
-                    "name": "style",
-                    "description": "The drawing style.",
-                    "type": "Style"
-                }
-            ]
-        },
         "dwv.tool.Livewire": {
             "name": "dwv.tool.Livewire",
             "shortname": "dwv.tool.Livewire",
@@ -1533,70 +1493,6 @@
                     "name": "style",
                     "description": "The style of the livewire.",
                     "type": "Object"
-                }
-            ]
-        },
-        "dwv.tool.DrawRectangleCommand": {
-            "name": "dwv.tool.DrawRectangleCommand",
-            "shortname": "dwv.tool.DrawRectangleCommand",
-            "classitems": [],
-            "plugins": [],
-            "extensions": [],
-            "plugin_for": [],
-            "extension_for": [],
-            "module": "tool",
-            "namespace": "dwv.tool",
-            "file": "src/tools/rectangle.js",
-            "line": 10,
-            "description": "Draw rectangle command.",
-            "is_constructor": 1,
-            "params": [
-                {
-                    "name": "points",
-                    "description": "The points from which to extract the rectangle.",
-                    "type": "Array"
-                },
-                {
-                    "name": "app",
-                    "description": "The application to draw the line on.",
-                    "type": "Object"
-                },
-                {
-                    "name": "style",
-                    "description": "The drawing style.",
-                    "type": "Style"
-                }
-            ]
-        },
-        "dwv.tool.DrawRoiCommand": {
-            "name": "dwv.tool.DrawRoiCommand",
-            "shortname": "dwv.tool.DrawRoiCommand",
-            "classitems": [],
-            "plugins": [],
-            "extensions": [],
-            "plugin_for": [],
-            "extension_for": [],
-            "module": "tool",
-            "namespace": "dwv.tool",
-            "file": "src/tools/roi.js",
-            "line": 10,
-            "description": "Draw ROI command.",
-            "is_constructor": 1,
-            "params": [
-                {
-                    "name": "points",
-                    "description": "The points from which to extract the line.",
-                    "type": "Array"
-                },
-                {
-                    "name": "app",
-                    "description": "The application to draw the line on.",
-                    "type": "Object"
-                },
-                {
-                    "name": "style",
-                    "description": "The drawing style.",
-                    "type": "Style"
                 }
             ]
         },
@@ -6619,7 +6515,44 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 148,
+            "line": 17,
+            "description": "Command name.",
+            "itemtype": "property",
+            "name": "name",
+            "access": "private",
+            "tagname": "",
+            "type": "String",
+            "class": "dwv.tool.DrawShapeCommand",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/draw.js",
+            "line": 24,
+            "description": "Get the command name.",
+            "itemtype": "method",
+            "name": "getName",
+            "return": {
+                "description": "The command name.",
+                "type": "String"
+            },
+            "class": "dwv.tool.DrawShapeCommand",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/draw.js",
+            "line": 31,
+            "description": "Execute the command.",
+            "itemtype": "method",
+            "name": "execute",
+            "class": "dwv.tool.DrawShapeCommand",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/draw.js",
+            "line": 71,
             "description": "Closure to self: to be used by event handlers.",
             "itemtype": "property",
             "name": "self",
@@ -6632,7 +6565,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 155,
+            "line": 78,
             "description": "Interaction start flag.",
             "itemtype": "property",
             "name": "started",
@@ -6643,7 +6576,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 162,
+            "line": 85,
             "description": "Draw command.",
             "itemtype": "property",
             "name": "command",
@@ -6656,7 +6589,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 170,
+            "line": 93,
             "description": "Drawing style.",
             "itemtype": "property",
             "name": "style",
@@ -6667,7 +6600,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 176,
+            "line": 99,
             "description": "Shape name.",
             "itemtype": "property",
             "name": "shapeName",
@@ -6678,7 +6611,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 182,
+            "line": 105,
             "description": "List of points",
             "itemtype": "property",
             "name": "points",
@@ -6689,7 +6622,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 193,
+            "line": 116,
             "description": "Handle mouse down event.",
             "itemtype": "method",
             "name": "mousedown",
@@ -6706,7 +6639,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 232,
+            "line": 155,
             "description": "Handle mouse move event.",
             "itemtype": "method",
             "name": "mousemove",
@@ -6723,7 +6656,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 258,
+            "line": 181,
             "description": "Handle mouse up event.",
             "itemtype": "method",
             "name": "mouseup",
@@ -6740,7 +6673,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 278,
+            "line": 201,
             "description": "Handle mouse out event.",
             "itemtype": "method",
             "name": "mouseout",
@@ -6757,7 +6690,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 287,
+            "line": 210,
             "description": "Handle touch start event.",
             "itemtype": "method",
             "name": "touchstart",
@@ -6774,7 +6707,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 296,
+            "line": 219,
             "description": "Handle touch move event.",
             "itemtype": "method",
             "name": "touchmove",
@@ -6791,7 +6724,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 305,
+            "line": 228,
             "description": "Handle touch end event.",
             "itemtype": "method",
             "name": "touchend",
@@ -6808,7 +6741,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 314,
+            "line": 237,
             "description": "Handle key down event.",
             "itemtype": "method",
             "name": "keydown",
@@ -6825,7 +6758,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 323,
+            "line": 246,
             "description": "Enable the tool.",
             "itemtype": "method",
             "name": "enable",
@@ -6842,7 +6775,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 334,
+            "line": 257,
             "description": "Help for this tool.",
             "itemtype": "method",
             "name": "getHelp",
@@ -6856,7 +6789,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 354,
+            "line": 277,
             "description": "Set the line color of the drawing.",
             "itemtype": "method",
             "name": "setLineColour",
@@ -6873,7 +6806,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 365,
+            "line": 288,
             "description": "Set the shape name of the drawing.",
             "itemtype": "method",
             "name": "setShapeName",
@@ -6890,7 +6823,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 380,
+            "line": 303,
             "description": "Check if the shape is in the shape list.",
             "itemtype": "method",
             "name": "hasShape",
@@ -6907,7 +6840,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 389,
+            "line": 312,
             "description": "Initialise the tool.",
             "itemtype": "method",
             "name": "init",
@@ -6916,58 +6849,166 @@
             "namespace": "dwv.tool"
         },
         {
-            "file": "src/tools/ellipse.js",
-            "line": 53,
-            "description": "Command name.",
-            "itemtype": "property",
-            "name": "name",
-            "access": "private",
-            "tagname": "",
-            "type": "String",
-            "class": "dwv.tool.DrawEllipseCommand",
+            "file": "src/tools/editor.js",
+            "line": 21,
+            "description": "Set the shape to edit.",
+            "itemtype": "method",
+            "name": "setShape!~YUIDOC_LINE~!param  inshape The shape to edit.",
+            "type": "Object",
+            "class": "dwv.tool.ShapeEditor",
             "module": "tool",
             "namespace": "dwv.tool"
         },
         {
-            "file": "src/tools/ellipse.js",
-            "line": 60,
-            "description": "Get the command name.",
+            "file": "src/tools/editor.js",
+            "line": 37,
+            "description": "Get the edited shape.",
             "itemtype": "method",
-            "name": "getName",
+            "name": "getShape",
             "return": {
-                "description": "The command name.",
-                "type": "String"
+                "description": "The edited shape.",
+                "type": "Object"
             },
-            "class": "dwv.tool.DrawEllipseCommand",
+            "class": "dwv.tool.ShapeEditor",
             "module": "tool",
             "namespace": "dwv.tool"
         },
         {
-            "file": "src/tools/ellipse.js",
-            "line": 66,
-            "description": "Set the command name.",
+            "file": "src/tools/editor.js",
+            "line": 46,
+            "description": "Get the active flag.",
             "itemtype": "method",
-            "name": "setName",
+            "name": "isActive",
+            "return": {
+                "description": "The active flag.",
+                "type": "Boolean"
+            },
+            "class": "dwv.tool.ShapeEditor",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/editor.js",
+            "line": 55,
+            "description": "Enable the editor.",
+            "itemtype": "method",
+            "name": "enable",
+            "class": "dwv.tool.ShapeEditor",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/editor.js",
+            "line": 69,
+            "description": "Disable the editor.",
+            "itemtype": "method",
+            "name": "disable",
+            "class": "dwv.tool.ShapeEditor",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/editor.js",
+            "line": 84,
+            "description": "Create shape editor controls, i.e. the anchors.",
+            "itemtype": "method",
+            "name": "createControls",
             "params": [
                 {
-                    "name": "str",
-                    "description": "The command name.",
-                    "type": "String"
+                    "name": "inshape",
+                    "description": "The shape to edit.",
+                    "type": "Object"
                 }
             ],
-            "class": "dwv.tool.DrawEllipseCommand",
+            "class": "dwv.tool.ShapeEditor",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/editor.js",
+            "line": 131,
+            "description": "Create shape editor controls, i.e. the anchors.",
+            "itemtype": "method",
+            "name": "addAnchor",
+            "params": [
+                {
+                    "name": "group",
+                    "description": "The group associated with this anchor.",
+                    "type": "Object"
+                },
+                {
+                    "name": "x",
+                    "description": "The X position of the anchor.",
+                    "type": "Number"
+                },
+                {
+                    "name": "y",
+                    "description": "The Y position of the anchor.",
+                    "type": "Number"
+                },
+                {
+                    "name": "id",
+                    "description": "The id of the anchor.",
+                    "type": "Number"
+                },
+                {
+                    "name": "updateMethod",
+                    "description": "The method used to update the associated shape.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.tool.ShapeEditor",
             "module": "tool",
             "namespace": "dwv.tool"
         },
         {
             "file": "src/tools/ellipse.js",
-            "line": 73,
-            "description": "Execute the command.",
+            "line": 9,
+            "description": "Create an ellipse shape to be displayed.",
             "itemtype": "method",
-            "name": "execute",
-            "class": "dwv.tool.DrawEllipseCommand",
-            "module": "tool",
-            "namespace": "dwv.tool"
+            "name": "EllipseCreator",
+            "static": 1,
+            "params": [
+                {
+                    "name": "points",
+                    "description": "The points from which to extract the ellipse.",
+                    "type": "Array"
+                },
+                {
+                    "name": "style",
+                    "description": "The drawing style.",
+                    "type": "Style"
+                },
+                {
+                    "name": "isFinal",
+                    "description": "Flag to know if final or temporary shape.",
+                    "type": "Boolean"
+                }
+            ],
+            "class": "dwv.tool.Filter",
+            "module": "tool"
+        },
+        {
+            "file": "src/tools/ellipse.js",
+            "line": 51,
+            "description": "Update an ellipse shape.",
+            "itemtype": "method",
+            "name": "UpdateEllipse",
+            "static": 1,
+            "params": [
+                {
+                    "name": "ellipse",
+                    "description": "The ellipse shape to update.",
+                    "type": "Object"
+                },
+                {
+                    "name": "anchor",
+                    "description": "The active anchor.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.tool.Filter",
+            "module": "tool"
         },
         {
             "file": "src/tools/filter.js",
@@ -7372,96 +7413,52 @@
         },
         {
             "file": "src/tools/line.js",
-            "line": 21,
-            "description": "Line object.",
-            "itemtype": "property",
-            "name": "line",
-            "access": "private",
-            "tagname": "",
-            "type": "Line",
-            "class": "dwv.tool.DrawLineCommand",
-            "module": "tool",
-            "namespace": "dwv.tool"
-        },
-        {
-            "file": "src/tools/line.js",
-            "line": 29,
-            "description": "Line color.",
-            "itemtype": "property",
-            "name": "lineColor",
-            "access": "private",
-            "tagname": "",
-            "type": "String",
-            "class": "dwv.tool.DrawLineCommand",
-            "module": "tool",
-            "namespace": "dwv.tool"
-        },
-        {
-            "file": "src/tools/line.js",
-            "line": 36,
-            "description": "HTML context.",
-            "itemtype": "property",
-            "name": "context",
-            "access": "private",
-            "tagname": "",
-            "type": "Object",
-            "class": "dwv.tool.DrawLineCommand",
-            "module": "tool",
-            "namespace": "dwv.tool"
-        },
-        {
-            "file": "src/tools/line.js",
-            "line": 44,
-            "description": "Command name.",
-            "itemtype": "property",
-            "name": "name",
-            "access": "private",
-            "tagname": "",
-            "type": "String",
-            "class": "dwv.tool.DrawLineCommand",
-            "module": "tool",
-            "namespace": "dwv.tool"
-        },
-        {
-            "file": "src/tools/line.js",
-            "line": 51,
-            "description": "Get the command name.",
+            "line": 9,
+            "description": "Create a line shape to be displayed.",
             "itemtype": "method",
-            "name": "getName",
-            "return": {
-                "description": "The command name.",
-                "type": "String"
-            },
-            "class": "dwv.tool.DrawLineCommand",
-            "module": "tool",
-            "namespace": "dwv.tool"
-        },
-        {
-            "file": "src/tools/line.js",
-            "line": 57,
-            "description": "Set the command name.",
-            "itemtype": "method",
-            "name": "setName",
+            "name": "LineCreator",
+            "static": 1,
             "params": [
                 {
-                    "name": "str",
-                    "description": "The command name.",
-                    "type": "String"
+                    "name": "points",
+                    "description": "The points from which to extract the line.",
+                    "type": "Array"
+                },
+                {
+                    "name": "style",
+                    "description": "The drawing style.",
+                    "type": "Style"
+                },
+                {
+                    "name": "isFinal",
+                    "description": "Flag to know if final or temporary shape.",
+                    "type": "Boolean"
                 }
             ],
-            "class": "dwv.tool.DrawLineCommand",
-            "module": "tool",
-            "namespace": "dwv.tool"
+            "class": "dwv.tool.Livewire",
+            "module": "tool"
         },
         {
             "file": "src/tools/line.js",
-            "line": 64,
-            "description": "Execute the command.",
+            "line": 47,
+            "description": "Update a line shape.",
             "itemtype": "method",
-            "name": "execute",
-            "class": "dwv.tool.DrawLineCommand",
-            "module": "tool",
-            "namespace": "dwv.tool"
+            "name": "UpdateLine",
+            "static": 1,
+            "params": [
+                {
+                    "name": "line",
+                    "description": "The line shape to update.",
+                    "type": "Object"
+                },
+                {
+                    "name": "anchor",
+                    "description": "The active anchor.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.tool.Livewire",
+            "module": "tool"
         },
         {
             "file": "src/tools/livewire.js",
@@ -7876,189 +7873,101 @@
         },
         {
             "file": "src/tools/rectangle.js",
-            "line": 21,
-            "description": "Rectangle object.",
-            "itemtype": "property",
-            "name": "rectangle",
-            "access": "private",
-            "tagname": "",
-            "type": "Rectangle",
-            "class": "dwv.tool.DrawRectangleCommand",
-            "module": "tool",
-            "namespace": "dwv.tool"
-        },
-        {
-            "file": "src/tools/rectangle.js",
-            "line": 29,
-            "description": "Line color.",
-            "itemtype": "property",
-            "name": "lineColor",
-            "access": "private",
-            "tagname": "",
-            "type": "String",
-            "class": "dwv.tool.DrawRectangleCommand",
-            "module": "tool",
-            "namespace": "dwv.tool"
-        },
-        {
-            "file": "src/tools/rectangle.js",
-            "line": 36,
-            "description": "HTML context.",
-            "itemtype": "property",
-            "name": "context",
-            "access": "private",
-            "tagname": "",
-            "type": "Object",
-            "class": "dwv.tool.DrawRectangleCommand",
-            "module": "tool",
-            "namespace": "dwv.tool"
-        },
-        {
-            "file": "src/tools/rectangle.js",
-            "line": 44,
-            "description": "Command name.",
-            "itemtype": "property",
-            "name": "name",
-            "access": "private",
-            "tagname": "",
-            "type": "String",
-            "class": "dwv.tool.DrawRectangleCommand",
-            "module": "tool",
-            "namespace": "dwv.tool"
-        },
-        {
-            "file": "src/tools/rectangle.js",
-            "line": 51,
-            "description": "Get the command name.",
+            "line": 9,
+            "description": "Create a rectangle shape to be displayed.",
             "itemtype": "method",
-            "name": "getName",
-            "return": {
-                "description": "The command name.",
-                "type": "String"
-            },
-            "class": "dwv.tool.DrawRectangleCommand",
-            "module": "tool",
-            "namespace": "dwv.tool"
-        },
-        {
-            "file": "src/tools/rectangle.js",
-            "line": 57,
-            "description": "Set the command name.",
-            "itemtype": "method",
-            "name": "setName",
+            "name": "RectangleCreator",
+            "static": 1,
             "params": [
                 {
-                    "name": "str",
-                    "description": "The command name.",
-                    "type": "String"
+                    "name": "points",
+                    "description": "The points from which to extract the rectangle.",
+                    "type": "Array"
+                },
+                {
+                    "name": "style",
+                    "description": "The drawing style.",
+                    "type": "Style"
+                },
+                {
+                    "name": "isFinal",
+                    "description": "Flag to know if final or temporary shape.",
+                    "type": "Boolean"
                 }
             ],
-            "class": "dwv.tool.DrawRectangleCommand",
-            "module": "tool",
-            "namespace": "dwv.tool"
+            "class": "dwv.tool",
+            "module": "tool"
         },
         {
             "file": "src/tools/rectangle.js",
-            "line": 64,
-            "description": "Execute the command.",
+            "line": 49,
+            "description": "Update a rectangle shape.",
             "itemtype": "method",
-            "name": "execute",
-            "class": "dwv.tool.DrawRectangleCommand",
-            "module": "tool",
-            "namespace": "dwv.tool"
-        },
-        {
-            "file": "src/tools/roi.js",
-            "line": 21,
-            "description": "ROI object.",
-            "itemtype": "property",
-            "name": "roi",
-            "access": "private",
-            "tagname": "",
-            "type": "ROI",
-            "class": "dwv.tool.DrawRoiCommand",
-            "module": "tool",
-            "namespace": "dwv.tool"
-        },
-        {
-            "file": "src/tools/roi.js",
-            "line": 50,
-            "description": "Line color.",
-            "itemtype": "property",
-            "name": "lineColor",
-            "access": "private",
-            "tagname": "",
-            "type": "String",
-            "class": "dwv.tool.DrawRoiCommand",
-            "module": "tool",
-            "namespace": "dwv.tool"
-        },
-        {
-            "file": "src/tools/roi.js",
-            "line": 57,
-            "description": "HTML context.",
-            "itemtype": "property",
-            "name": "context",
-            "access": "private",
-            "tagname": "",
-            "type": "Object",
-            "class": "dwv.tool.DrawRoiCommand",
-            "module": "tool",
-            "namespace": "dwv.tool"
-        },
-        {
-            "file": "src/tools/roi.js",
-            "line": 65,
-            "description": "Command name.",
-            "itemtype": "property",
-            "name": "name",
-            "access": "private",
-            "tagname": "",
-            "type": "String",
-            "class": "dwv.tool.DrawRoiCommand",
-            "module": "tool",
-            "namespace": "dwv.tool"
-        },
-        {
-            "file": "src/tools/roi.js",
-            "line": 72,
-            "description": "Get the command name.",
-            "itemtype": "method",
-            "name": "getName",
-            "return": {
-                "description": "The command name.",
-                "type": "String"
-            },
-            "class": "dwv.tool.DrawRoiCommand",
-            "module": "tool",
-            "namespace": "dwv.tool"
-        },
-        {
-            "file": "src/tools/roi.js",
-            "line": 78,
-            "description": "Set the command name.",
-            "itemtype": "method",
-            "name": "setName",
+            "name": "UpdateRect",
+            "static": 1,
             "params": [
                 {
-                    "name": "str",
-                    "description": "The command name.",
-                    "type": "String"
+                    "name": "rect",
+                    "description": "The rectangle shape to update.",
+                    "type": "Object"
+                },
+                {
+                    "name": "anchor",
+                    "description": "The active anchor.",
+                    "type": "Object"
                 }
             ],
-            "class": "dwv.tool.DrawRoiCommand",
-            "module": "tool",
-            "namespace": "dwv.tool"
+            "class": "dwv.tool",
+            "module": "tool"
         },
         {
             "file": "src/tools/roi.js",
-            "line": 85,
-            "description": "Execute the command.",
+            "line": 9,
+            "description": "Create a roi shape to be displayed.",
             "itemtype": "method",
-            "name": "execute",
-            "class": "dwv.tool.DrawRoiCommand",
-            "module": "tool",
-            "namespace": "dwv.tool"
+            "name": "RoiCreator",
+            "static": 1,
+            "params": [
+                {
+                    "name": "points",
+                    "description": "The points from which to extract the line.",
+                    "type": "Array"
+                },
+                {
+                    "name": "style",
+                    "description": "The drawing style.",
+                    "type": "Style"
+                },
+                {
+                    "name": "isFinal",
+                    "description": "Flag to know if final or temporary shape.",
+                    "type": "Boolean"
+                }
+            ],
+            "class": "dwv.tool",
+            "module": "tool"
+        },
+        {
+            "file": "src/tools/roi.js",
+            "line": 74,
+            "description": "Update a roi shape.",
+            "itemtype": "method",
+            "name": "UpdateRoi",
+            "static": 1,
+            "params": [
+                {
+                    "name": "line",
+                    "description": "The line shape to update.",
+                    "type": "Object"
+                },
+                {
+                    "name": "anchor",
+                    "description": "The active anchor.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.tool",
+            "module": "tool"
         },
         {
             "file": "src/tools/scroll.js",
@@ -9516,7 +9425,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 420,
+            "line": 422,
             "description": "Handle an error: display it to the user.",
             "itemtype": "method",
             "name": "handleError",
@@ -9535,7 +9444,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 441,
+            "line": 443,
             "description": "Create the application layers.",
             "itemtype": "method",
             "name": "createLayers",
@@ -9559,7 +9468,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 486,
+            "line": 488,
             "description": "Create the DICOM tags table. To be called once the DICOM has been parsed.",
             "itemtype": "method",
             "name": "createTagsTable",
@@ -9578,7 +9487,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 519,
+            "line": 521,
             "description": "Post load application initialisation. To be called once the DICOM has been parsed.",
             "itemtype": "method",
             "name": "postLoadInit",
@@ -9667,7 +9576,7 @@
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/tools/draw.js:334"
+            "line": " src/tools/draw.js:257"
         },
         {
             "message": "replacing incorrect tag: returns with return",

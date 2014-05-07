@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>math - dwv</title>
+    <title>src/tools/editor.js - dwv</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
     <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
@@ -194,104 +194,198 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-                        <h1>math Module</h1>
-<div class="box clearfix meta">
+                        <h1 class="file-heading">File: src/tools/editor.js</h1>
+
+<div class="file">
+    <pre class="code prettyprint linenums">
+/** 
+ * Tool module.
+ * @module tool
+ */
+var dwv = dwv || {};
+dwv.tool = dwv.tool || {};
+var Kinetic = Kinetic || {};
+
+/**
+ * Shape editor.
+ * @class ShapeEditor
+ * @namespace dwv.tool
+ * @constructor
+ */
+dwv.tool.ShapeEditor = function ()
+{
+    // 
+    var shape = null;
+    var isActive = false;
     
-
+    /**
+     * Set the shape to edit.
+     * @method setShape
+     * param {Object} inshape The shape to edit.
+     */
+    this.setShape = function ( inshape ) {
+        shape = inshape;
+        // clear previous controls
+        var anchors = shape.getLayer().find(&#x27;.anchor&#x27;);
+        anchors.each( function (anchor) {
+            anchor.remove();
+        });
+        // add new controls
+        createControls( shape );
+    };
     
-
+    /**
+     * Get the edited shape.
+     * @method getShape
+     * @return {Object} The edited shape.
+     */
+    this.getShape = function () { 
+        return shape;
+    };
     
-        <div class="foundat">
-            Defined in: <a href="../files/src_math_shapes.js.html#l385"><code>src&#x2F;math&#x2F;shapes.js:385</code></a>
-        </div>
+    /**
+     * Get the active flag.
+     * @method isActive
+     * @return {Boolean} The active flag.
+     */
+    this.isActive = function () {
+        return isActive;
+    };
+
+    /**
+     * Enable the editor.
+     * @method enable
+     */
+    this.enable = function () {
+        isActive = true;
+        var anchors = shape.getLayer().find(&#x27;.anchor&#x27;);
+        anchors.each( function (anchor) {
+            anchor.visible(true);
+        });
+        shape.getParent().draggable(true);
+        shape.getLayer().draw();
+    };
     
-
+    /**
+     * Disable the editor.
+     * @method disable
+     */
+    this.disable = function () {
+        isActive = false;
+        var anchors = shape.getLayer().find(&#x27;.anchor&#x27;);
+        anchors.each( function (anchor) {
+            anchor.visible(false);
+        });
+        shape.getParent().draggable(false);
+        shape.getLayer().draw();
+        shape = null;
+    };
     
-</div>
+    /**
+     * Create shape editor controls, i.e. the anchors.
+     * @method createControls
+     * @param {Object} inshape The shape to edit.
+     */
+    function createControls( inshape ) {
+        // get shape group
+        var group = inshape.getParent();
+        // add shape specific anchors to the shape group
+        if ( inshape instanceof Kinetic.Line ) {
+            var points = inshape.points();
+            if ( points.length === 4 ) {
+                addAnchor(group, points[0], points[1], &#x27;begin&#x27;, dwv.tool.UpdateLine);
+                addAnchor(group, points[2], points[3], &#x27;end&#x27;, dwv.tool.UpdateLine);
+            }
+            else {
+                addAnchor(group, points[0], points[1], 0, dwv.tool.UpdateRoi);
+                for ( var i = 0; i &lt; points.length; i=i+2 ) {
+                    addAnchor(group, points[i], points[i+1], i, dwv.tool.UpdateRoi);
+                }
+            }
+        }
+        else if ( inshape instanceof Kinetic.Rect ) {
+            var rectX = inshape.x();
+            var rectY = inshape.y();
+            var rectWidth = inshape.width();
+            var rectHeight = inshape.height();
+            addAnchor(group, rectX, rectY, &#x27;topLeft&#x27;, dwv.tool.UpdateRect);
+            addAnchor(group, rectX+rectWidth, rectY, &#x27;topRight&#x27;, dwv.tool.UpdateRect);
+            addAnchor(group, rectX+rectWidth, rectY+rectHeight, &#x27;bottomRight&#x27;, dwv.tool.UpdateRect);
+            addAnchor(group, rectX, rectY+rectHeight, &#x27;bottomLeft&#x27;, dwv.tool.UpdateRect);
+        }
+        else if ( inshape instanceof Kinetic.Ellipse ) {
+            var ellipseX = inshape.x();
+            var ellipseY = inshape.y();
+            var radius = inshape.radius();
+            addAnchor(group, ellipseX-radius.x, ellipseY-radius.y, &#x27;topLeft&#x27;, dwv.tool.UpdateEllipse);
+            addAnchor(group, ellipseX+radius.x, ellipseY-radius.y, &#x27;topRight&#x27;, dwv.tool.UpdateEllipse);
+            addAnchor(group, ellipseX+radius.x, ellipseY+radius.y, &#x27;bottomRight&#x27;, dwv.tool.UpdateEllipse);
+            addAnchor(group, ellipseX-radius.x, ellipseY+radius.y, &#x27;bottomLeft&#x27;, dwv.tool.UpdateEllipse);
+        }
+        // add group to layer
+        inshape.getLayer().add( group );
+        // draw layer
+        inshape.getLayer().draw();
+    }
+    
+    /**
+     * Create shape editor controls, i.e. the anchors.
+     * @method addAnchor
+     * @param {Object} group The group associated with this anchor.
+     * @param {Number} x The X position of the anchor.
+     * @param {Number} y The Y position of the anchor.
+     * @param {Number} id The id of the anchor.
+     * @param {Object} updateMethod The method used to update the associated shape.
+     */
+    function addAnchor(group, x, y, id, updateMethod) {
+        // anchor shape
+        var anchor = new Kinetic.Circle({
+            x: x,
+            y: y,
+            stroke: &#x27;#999&#x27;,
+            fillRed: 100,
+            fillBlue: 100,
+            fillGreen: 100,
+            fillAlpha: 0.7,
+            strokeWidth: 2,
+            radius: 6,
+            name: &#x27;anchor&#x27;,
+            id: id,
+            dragOnTop: false,
+            draggable: true,
+            visible: false
+        });
+        // dragmove listener
+        anchor.on(&#x27;dragmove&#x27;, function () {
+            updateMethod(shape, this);
+            this.getLayer().draw();
+        });
+        // mousedown listener
+        anchor.on(&#x27;mousedown touchstart&#x27;, function () {
+            this.moveToTop();
+        });
+        // dragend listener
+        anchor.on(&#x27;dragend&#x27;, function () {
+            this.getLayer().draw();
+        });
+        // hover styling
+        anchor.on(&#x27;mouseover&#x27;, function () {
+            document.body.style.cursor = &#x27;pointer&#x27;;
+            this.stroke(&#x27;#ddd&#x27;);
+            this.getLayer().draw();
+        });
+        // not hover styling
+        anchor.on(&#x27;mouseout&#x27;, function () {
+            document.body.style.cursor = &#x27;default&#x27;;
+            this.stroke(&#x27;#999&#x27;);
+            this.getLayer().draw();
+        });
+        // add the anchor to the group
+        group.add(anchor);
+    }
+};
 
-
-
-<div class="box intro">
-    <p>Math module.</p>
-
-</div>
-
-
-
-<div class="yui3-g">
-    <div class="yui3-u-1-2">
-        
-            <p>This module provides the following classes:</p>
-
-            <ul class="module-classes">
-            
-                <li class="module-class">
-                    <a href="../classes/dwv.math.BucketQueue.html">
-                        dwv.math.BucketQueue
-                    </a>
-                </li>
-            
-                <li class="module-class">
-                    <a href="../classes/dwv.math.Circle.html">
-                        dwv.math.Circle
-                    </a>
-                </li>
-            
-                <li class="module-class">
-                    <a href="../classes/dwv.math.Ellipse.html">
-                        dwv.math.Ellipse
-                    </a>
-                </li>
-            
-                <li class="module-class">
-                    <a href="../classes/dwv.math.FastPoint2D.html">
-                        dwv.math.FastPoint2D
-                    </a>
-                </li>
-            
-                <li class="module-class">
-                    <a href="../classes/dwv.math.Line.html">
-                        dwv.math.Line
-                    </a>
-                </li>
-            
-                <li class="module-class">
-                    <a href="../classes/dwv.math.Path.html">
-                        dwv.math.Path
-                    </a>
-                </li>
-            
-                <li class="module-class">
-                    <a href="../classes/dwv.math.Point2D.html">
-                        dwv.math.Point2D
-                    </a>
-                </li>
-            
-                <li class="module-class">
-                    <a href="../classes/dwv.math.Rectangle.html">
-                        dwv.math.Rectangle
-                    </a>
-                </li>
-            
-                <li class="module-class">
-                    <a href="../classes/dwv.math.ROI.html">
-                        dwv.math.ROI
-                    </a>
-                </li>
-            
-                <li class="module-class">
-                    <a href="../classes/dwv.math.Scissors.html">
-                        dwv.math.Scissors
-                    </a>
-                </li>
-            
-            </ul>
-        
-    </div>
-
-    <div class="yui3-u-1-2">
-        
-    </div>
+    </pre>
 </div>
 
                     </div>
