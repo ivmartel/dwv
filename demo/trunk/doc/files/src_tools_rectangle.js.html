@@ -87,8 +87,6 @@
             
                 <li><a href="../classes/dwv.math.Circle.html">dwv.math.Circle</a></li>
             
-                <li><a href="../classes/dwv.math.Ellipse.html">dwv.math.Ellipse</a></li>
-            
                 <li><a href="../classes/dwv.math.FastPoint2D.html">dwv.math.FastPoint2D</a></li>
             
                 <li><a href="../classes/dwv.math.Line.html">dwv.math.Line</a></li>
@@ -107,9 +105,15 @@
             
                 <li><a href="../classes/dwv.tool.Draw.html">dwv.tool.Draw</a></li>
             
+                <li><a href="../classes/dwv.tool.DrawCircleCommand.html">dwv.tool.DrawCircleCommand</a></li>
+            
+                <li><a href="../classes/dwv.tool.DrawLineCommand.html">dwv.tool.DrawLineCommand</a></li>
+            
                 <li><a href="../classes/dwv.tool.DrawLivewireCommand.html">dwv.tool.DrawLivewireCommand</a></li>
             
-                <li><a href="../classes/dwv.tool.DrawShapeCommand.html">dwv.tool.DrawShapeCommand</a></li>
+                <li><a href="../classes/dwv.tool.DrawRectangleCommand.html">dwv.tool.DrawRectangleCommand</a></li>
+            
+                <li><a href="../classes/dwv.tool.DrawRoiCommand.html">dwv.tool.DrawRoiCommand</a></li>
             
                 <li><a href="../classes/dwv.tool.Filter.html">dwv.tool.Filter</a></li>
             
@@ -122,8 +126,6 @@
                 <li><a href="../classes/dwv.tool.RunFilterCommand.html">dwv.tool.RunFilterCommand</a></li>
             
                 <li><a href="../classes/dwv.tool.Scroll.html">dwv.tool.Scroll</a></li>
-            
-                <li><a href="../classes/dwv.tool.ShapeEditor.html">dwv.tool.ShapeEditor</a></li>
             
                 <li><a href="../classes/dwv.tool.ToolBox.html">dwv.tool.ToolBox</a></li>
             
@@ -204,91 +206,87 @@
  */
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
-var Kinetic = Kinetic || {};
 
 /**
- * Create a rectangle shape to be displayed.
- * @method RectangleCreator
- * @static
- * @param {Array} points The points from which to extract the rectangle.
+ * Draw rectangle command.
+ * @class DrawRectangleCommand
+ * @namespace dwv.tool
+ * @constructor
+ * @param {Array} points The points from which to extract the circle.
+ * @param {Object} app The application to draw the line on.
  * @param {Style} style The drawing style.
- * @param {Boolean} isFinal Flag to know if final or temporary shape.
- */ 
-dwv.tool.RectangleCreator = function (points, style, isFinal)
+ */
+dwv.tool.DrawRectangleCommand = function(points, app, style)
 {
-    // physical shape
+    /**
+     * Rectangle object.
+     * @property rectangle
+     * @private
+     * @type Rectangle
+     */
     var rectangle = new dwv.math.Rectangle(points[0], points[points.length-1]);
-    // shape
-    var krect = new Kinetic.Rect({
-        x: rectangle.getBegin().getX(),
-        y: rectangle.getBegin().getY(),
-        width: rectangle.getWidth(),
-        height: rectangle.getHeight(),
-        stroke: style.getLineColor(),
-        strokeWidth: 2,
-        name: ( isFinal ? &quot;final&quot; : &quot;temp&quot; )
-    });
-    // hover styling
-    krect.on(&#x27;mouseover&#x27;, function () {
-        if ( this.getLayer() ) {
-            document.body.style.cursor = &#x27;pointer&#x27;;
-            this.getLayer().draw();
-        }
-    });
-    // not hover styling
-    krect.on(&#x27;mouseout&#x27;, function () {
-        if ( this.getLayer() ) {
-            document.body.style.cursor = &#x27;default&#x27;;
-            this.getLayer().draw();
-        }
-    });
-    // return shape
-    return krect;
-};
+    
+    /**
+     * Line color.
+     * @property lineColor
+     * @private
+     * @type String
+     */
+    var lineColor = style.getLineColor();
+    /**
+     * HTML context.
+     * @property context
+     * @private
+     * @type Object
+     */
+    var context = app.getTempLayer().getContext();
+    
+    /**
+     * Command name.
+     * @property name
+     * @private
+     * @type String
+     */
+    var name = &quot;DrawRectangleCommand&quot;;
+    /**
+     * Get the command name.
+     * @method getName
+     * @return {String} The command name.
+     */
+    this.getName = function() { return name; };
+    /**
+     * Set the command name.
+     * @method setName
+     * @param {String} str The command name.
+     */
+    this.setName = function(str) { name = str; };
 
-/**
- * Update a rectangle shape.
- * @method UpdateRect
- * @static
- * @param {Object} rect The rectangle shape to update.
- * @param {Object} anchor The active anchor.
- */ 
-dwv.tool.UpdateRect = function (rect, anchor)
-{
-    // parent group
-    var group = anchor.getParent();
-    // find special points
-    var topLeft = group.find(&#x27;#topLeft&#x27;)[0];
-    var topRight = group.find(&#x27;#topRight&#x27;)[0];
-    var bottomRight = group.find(&#x27;#bottomRight&#x27;)[0];
-    var bottomLeft = group.find(&#x27;#bottomLeft&#x27;)[0];
-    // update special points
-    switch ( anchor.id() ) {
-    case &#x27;topLeft&#x27;:
-        topRight.y( anchor.y() );
-        bottomLeft.x( anchor.x() );
-        break;
-    case &#x27;topRight&#x27;:
-        topLeft.y( anchor.y() );
-        bottomRight.x( anchor.x() );
-        break;
-    case &#x27;bottomRight&#x27;:
-        bottomLeft.y( anchor.y() );
-        topRight.x( anchor.x() ); 
-        break;
-    case &#x27;bottomLeft&#x27;:
-        bottomRight.y( anchor.y() );
-        topLeft.x( anchor.x() ); 
-        break;
-    }
-    // update shape
-    rect.setPosition(topLeft.getPosition());
-    var width = topRight.x() - topLeft.x();
-    var height = bottomLeft.y() - topLeft.y();
-    if ( width &amp;&amp; height ) {
-        rect.setSize({width:width, height: height});
-    }
-};
+    /**
+     * Execute the command.
+     * @method execute
+     */
+    this.execute = function()
+    {
+        // style
+        context.fillStyle = lineColor;
+        context.strokeStyle = lineColor;
+        // path
+        context.beginPath();
+        context.strokeRect( 
+            rectangle.getBegin().getX(), 
+            rectangle.getBegin().getY(),
+            rectangle.getRealWidth(),
+            rectangle.getRealHeight() );
+        // length
+        var surf = rectangle.getWorldSurface( 
+            app.getImage().getSpacing().getColumnSpacing(), 
+            app.getImage().getSpacing().getRowSpacing() );
+        context.font = style.getFontStr();
+        context.fillText( Math.round(surf) + &quot;mm2&quot;,
+            rectangle.getEnd().getX() + style.getFontSize(),
+            rectangle.getEnd().getY() + style.getFontSize());
+    }; 
+}; // DrawRectangleCommand class
 
     </pre>
 </div>

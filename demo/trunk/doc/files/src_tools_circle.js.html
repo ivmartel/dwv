@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>src/tools/ellipse.js - dwv</title>
+    <title>src/tools/circle.js - dwv</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
     <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
@@ -87,8 +87,6 @@
             
                 <li><a href="../classes/dwv.math.Circle.html">dwv.math.Circle</a></li>
             
-                <li><a href="../classes/dwv.math.Ellipse.html">dwv.math.Ellipse</a></li>
-            
                 <li><a href="../classes/dwv.math.FastPoint2D.html">dwv.math.FastPoint2D</a></li>
             
                 <li><a href="../classes/dwv.math.Line.html">dwv.math.Line</a></li>
@@ -107,9 +105,15 @@
             
                 <li><a href="../classes/dwv.tool.Draw.html">dwv.tool.Draw</a></li>
             
+                <li><a href="../classes/dwv.tool.DrawCircleCommand.html">dwv.tool.DrawCircleCommand</a></li>
+            
+                <li><a href="../classes/dwv.tool.DrawLineCommand.html">dwv.tool.DrawLineCommand</a></li>
+            
                 <li><a href="../classes/dwv.tool.DrawLivewireCommand.html">dwv.tool.DrawLivewireCommand</a></li>
             
-                <li><a href="../classes/dwv.tool.DrawShapeCommand.html">dwv.tool.DrawShapeCommand</a></li>
+                <li><a href="../classes/dwv.tool.DrawRectangleCommand.html">dwv.tool.DrawRectangleCommand</a></li>
+            
+                <li><a href="../classes/dwv.tool.DrawRoiCommand.html">dwv.tool.DrawRoiCommand</a></li>
             
                 <li><a href="../classes/dwv.tool.Filter.html">dwv.tool.Filter</a></li>
             
@@ -122,8 +126,6 @@
                 <li><a href="../classes/dwv.tool.RunFilterCommand.html">dwv.tool.RunFilterCommand</a></li>
             
                 <li><a href="../classes/dwv.tool.Scroll.html">dwv.tool.Scroll</a></li>
-            
-                <li><a href="../classes/dwv.tool.ShapeEditor.html">dwv.tool.ShapeEditor</a></li>
             
                 <li><a href="../classes/dwv.tool.ToolBox.html">dwv.tool.ToolBox</a></li>
             
@@ -194,7 +196,7 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-                        <h1 class="file-heading">File: src/tools/ellipse.js</h1>
+                        <h1 class="file-heading">File: src/tools/circle.js</h1>
 
 <div class="file">
     <pre class="code prettyprint linenums">
@@ -204,95 +206,99 @@
  */
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
-var Kinetic = Kinetic || {};
 
 /**
- * Create an ellipse shape to be displayed.
- * @method EllipseCreator
- * @static
- * @param {Array} points The points from which to extract the ellipse.
+ * Draw circle command.
+ * @class DrawCircleCommand
+ * @namespace dwv.tool
+ * @constructor
+ * @param {Array} points The points from which to extract the circle.
+ * @param {Object} app The application to draw the circle on.
  * @param {Style} style The drawing style.
- * @param {Boolean} isFinal Flag to know if final or temporary shape.
- */ 
-dwv.tool.EllipseCreator = function (points, style, isFinal)
+ */
+dwv.tool.DrawCircleCommand = function(points, app, style)
 {
     // calculate radius
     var a = Math.abs(points[0].getX() - points[points.length-1].getX());
     var b = Math.abs(points[0].getY() - points[points.length-1].getY());
-    // physical object
-    var ellipse = new dwv.math.Ellipse(points[0], a, b);
-    // shape
-    var kellipse = new Kinetic.Ellipse({
-        x: ellipse.getCenter().getX(),
-        y: ellipse.getCenter().getY(),
-        radius: { x: ellipse.getA(), y: ellipse.getB() },
-        stroke: style.getLineColor(),
-        strokeWidth: 2,
-        name: ( isFinal ? &quot;final&quot; : &quot;temp&quot; )
-    });
-    // hover styling
-    kellipse.on(&#x27;mouseover&#x27;, function () {
-        if ( this.getLayer() ) {
-            document.body.style.cursor = &#x27;pointer&#x27;;
-            this.getLayer().draw();
-        }
-    });
-    // not hover styling
-    kellipse.on(&#x27;mouseout&#x27;, function () {
-        if ( this.getLayer() ) {
-            document.body.style.cursor = &#x27;default&#x27;;
-            this.getLayer().draw();
-        }
-    });
-    // return shape
-    return kellipse;
-};
+    var radius = Math.round( Math.sqrt( a * a + b * b ) );
+    // check zero radius
+    if( radius === 0 )
+    {
+        // silent fail...
+        return;
+    }
+    
+    /**
+     * Circle object.
+     * @property circle
+     * @private
+     * @type Circle
+     */
+    var circle = new dwv.math.Circle(points[0], radius);
+    
+    /**
+     * Line color.
+     * @property lineColor
+     * @private
+     * @type String
+     */
+    var lineColor = style.getLineColor();
+    /**
+     * HTML context.
+     * @property context
+     * @private
+     * @type Object
+     */
+    var context = app.getTempLayer().getContext();
+    
+    /**
+     * Command name.
+     * @property name
+     * @private
+     * @type String
+     */
+    var name = &quot;DrawCircleCommand&quot;;
+    /**
+     * Get the command name.
+     * @method getName
+     * @return {String} The command name.
+     */
+    this.getName = function() { return name; };
+    /**
+     * Set the command name.
+     * @method setName
+     * @param {String} str The command name.
+     */
+    this.setName = function(str) { name = str; };
 
-/**
- * Update an ellipse shape.
- * @method UpdateEllipse
- * @static
- * @param {Object} ellipse The ellipse shape to update.
- * @param {Object} anchor The active anchor.
- */ 
-dwv.tool.UpdateEllipse = function (ellipse, anchor)
-{
-    // parent group
-    var group = anchor.getParent();
-    // find special points
-    var topLeft = group.find(&#x27;#topLeft&#x27;)[0];
-    var topRight = group.find(&#x27;#topRight&#x27;)[0];
-    var bottomRight = group.find(&#x27;#bottomRight&#x27;)[0];
-    var bottomLeft = group.find(&#x27;#bottomLeft&#x27;)[0];
-    // update special points
-    switch ( anchor.id() ) {
-    case &#x27;topLeft&#x27;:
-        topRight.y( anchor.y() );
-        bottomLeft.x( anchor.x() );
-        break;
-    case &#x27;topRight&#x27;:
-        topLeft.y( anchor.y() );
-        bottomRight.x( anchor.x() );
-        break;
-    case &#x27;bottomRight&#x27;:
-        bottomLeft.y( anchor.y() );
-        topRight.x( anchor.x() ); 
-        break;
-    case &#x27;bottomLeft&#x27;:
-        bottomRight.y( anchor.y() );
-        topLeft.x( anchor.x() ); 
-        break;
-    }
-    // update shape
-    var radiusX = ( topRight.x() - topLeft.x() ) / 2;
-    var radiusY = ( bottomRight.y() - topRight.y() ) / 2;
-    var center = { x: topLeft.x() + radiusX, y: topRight.y() + radiusY };
-    ellipse.setPosition( center );
-    var radiusAbs = { x: Math.abs(radiusX), y: Math.abs(radiusY) };
-    if ( radiusAbs ) {
-        ellipse.radius( radiusAbs );
-    }
-};
+    /**
+     * Execute the command.
+     * @method execute
+     */
+    this.execute = function()
+    {
+        // style
+        context.fillStyle = lineColor;
+        context.strokeStyle = lineColor;
+        // path
+        context.beginPath();
+        context.arc(
+            circle.getCenter().getX(), 
+            circle.getCenter().getY(), 
+            circle.getRadius(),
+            0, 2*Math.PI);
+        context.stroke();
+        // surface
+        var surf = circle.getWorldSurface( 
+            app.getImage().getSpacing().getColumnSpacing(), 
+            app.getImage().getSpacing().getRowSpacing() );
+        context.font = style.getFontStr();
+        context.fillText( Math.round(surf) + &quot;mm2&quot;,
+            circle.getCenter().getX() + style.getFontSize(),
+            circle.getCenter().getY() + style.getFontSize());
+    };
+}; // DrawCircleCommand class
 
     </pre>
 </div>
