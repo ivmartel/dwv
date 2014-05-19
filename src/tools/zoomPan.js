@@ -211,7 +211,7 @@ dwv.tool.ZoomAndPan = function(app)
     this.mousewheel = function(event){
         // ev.wheelDelta on chrome is 120
         var step = event.wheelDelta/1200;
-        zoomLayers(step, event._x, event._y);
+        zoomLayers(step, event._x, event._y,event._xs, event._ys);
         
         // TODO slice scroll
         //if( event.wheelDelta > 0 ) app.getView().incrementSliceNb();
@@ -243,13 +243,28 @@ dwv.tool.ZoomAndPan = function(app)
      * @param {Number} cx The zoom center X coordinate.
      * @param {Number} cy The zoom center Y coordinate.
      */ 
-    function zoomLayers(step, cx, cy)
+    var koffset = {x:0,y:0};
+    function zoomLayers(step, cx, cy, cx2, cy2)
     {
         if( app.getImageLayer() ) {
             app.getImageLayer().zoom(step, step, cx, cy);
         }
         if( app.getDrawLayer() ) { 
             app.getDrawLayer().zoom(step, step, cx, cy);
+        }
+        if( app.getKineticStage() ) { 
+            
+            var stage = app.getKineticStage();
+            var oldZoom = stage.scale();
+            var newZoom = {x: (oldZoom.x + step), y: (oldZoom.y + step)};
+            
+            koffset.x = (cx2 / oldZoom.x) + stage.offset().x - (cx2 / newZoom.x);
+            koffset.y = (cy2 / oldZoom.y) + stage.offset().y - (cy2 / newZoom.y);
+            
+            stage.offset( koffset );
+            stage.scale( newZoom );
+
+            stage.draw();
         }
     }
 

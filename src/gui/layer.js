@@ -91,6 +91,12 @@ dwv.html.Layer = function(name)
      */
     var zoomY = 1;
     
+    this.getOrigin = function () {
+        return {x: originX, y: originY};
+    };
+    this.getZoom = function () {
+        return {x: zoomX, y: zoomY};
+    };
     /**
      * Set the layer zoom.
      * @method setZoom
@@ -112,6 +118,9 @@ dwv.html.Layer = function(name)
         // to the origins:
         // centerX - originX = ( centerX - originX0 ) * zoomX
         originX = centerX - (centerX - originX) * (newZoomX / zoomX);
+        
+        //originX = centerX / zoomX + originX - centerX / newZoomX;
+        
         originY = centerY - (centerY - originY) * (newZoomY / zoomY);
         // save zoom
         zoomX = newZoomX;
