@@ -87,6 +87,8 @@
             
                 <li><a href="../classes/dwv.math.Circle.html">dwv.math.Circle</a></li>
             
+                <li><a href="../classes/dwv.math.Ellipse.html">dwv.math.Ellipse</a></li>
+            
                 <li><a href="../classes/dwv.math.FastPoint2D.html">dwv.math.FastPoint2D</a></li>
             
                 <li><a href="../classes/dwv.math.Line.html">dwv.math.Line</a></li>
@@ -105,15 +107,9 @@
             
                 <li><a href="../classes/dwv.tool.Draw.html">dwv.tool.Draw</a></li>
             
-                <li><a href="../classes/dwv.tool.DrawCircleCommand.html">dwv.tool.DrawCircleCommand</a></li>
-            
-                <li><a href="../classes/dwv.tool.DrawLineCommand.html">dwv.tool.DrawLineCommand</a></li>
-            
                 <li><a href="../classes/dwv.tool.DrawLivewireCommand.html">dwv.tool.DrawLivewireCommand</a></li>
             
-                <li><a href="../classes/dwv.tool.DrawRectangleCommand.html">dwv.tool.DrawRectangleCommand</a></li>
-            
-                <li><a href="../classes/dwv.tool.DrawRoiCommand.html">dwv.tool.DrawRoiCommand</a></li>
+                <li><a href="../classes/dwv.tool.DrawShapeCommand.html">dwv.tool.DrawShapeCommand</a></li>
             
                 <li><a href="../classes/dwv.tool.Filter.html">dwv.tool.Filter</a></li>
             
@@ -126,6 +122,8 @@
                 <li><a href="../classes/dwv.tool.RunFilterCommand.html">dwv.tool.RunFilterCommand</a></li>
             
                 <li><a href="../classes/dwv.tool.Scroll.html">dwv.tool.Scroll</a></li>
+            
+                <li><a href="../classes/dwv.tool.ShapeEditor.html">dwv.tool.ShapeEditor</a></li>
             
                 <li><a href="../classes/dwv.tool.ToolBox.html">dwv.tool.ToolBox</a></li>
             
@@ -206,86 +204,74 @@
  */
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
+var Kinetic = Kinetic || {};
 
 /**
- * Draw line command.
- * @class DrawLineCommand
- * @namespace dwv.tool
- * @constructor
+ * Create a line shape to be displayed.
+ * @method LineCreator
+ * @static
  * @param {Array} points The points from which to extract the line.
- * @param {Object} app The application to draw the line on.
  * @param {Style} style The drawing style.
- */
-dwv.tool.DrawLineCommand = function(points, app, style)
+ * @param {Boolean} isFinal Flag to know if final or temporary shape.
+ */ 
+dwv.tool.LineCreator = function (points, style, isFinal)
 {
-    /**
-     * Line object.
-     * @property line
-     * @private
-     * @type Line
-     */
+    // physical object
     var line = new dwv.math.Line(points[0], points[points.length-1]);
-    
-    /**
-     * Line color.
-     * @property lineColor
-     * @private
-     * @type String
-     */
-    var lineColor = style.getLineColor();
-    /**
-     * HTML context.
-     * @property context
-     * @private
-     * @type Object
-     */
-    var context = app.getTempLayer().getContext();
-    
-    /**
-     * Command name.
-     * @property name
-     * @private
-     * @type String
-     */
-    var name = &quot;DrawLineCommand&quot;;
-    /**
-     * Get the command name.
-     * @method getName
-     * @return {String} The command name.
-     */
-    this.getName = function() { return name; };
-    /**
-     * Set the command name.
-     * @method setName
-     * @param {String} str The command name.
-     */
-    this.setName = function(str) { name = str; };
+    // shape
+    var kline = new Kinetic.Line({
+        points: [line.getBegin().getX(), line.getBegin().getY(), 
+                 line.getEnd().getX(), line.getEnd().getY() ],
+        stroke: style.getLineColor(),
+        strokeWidth: 2,
+        name: ( isFinal ? &quot;final&quot; : &quot;temp&quot; )
+    });
+    // hover styling
+    kline.on(&#x27;mouseover&#x27;, function () {
+        if ( this.getLayer() ) {
+            document.body.style.cursor = &#x27;pointer&#x27;;
+            this.getLayer().draw();
+        }
+    });
+    // not hover styling
+    kline.on(&#x27;mouseout&#x27;, function () {
+        if ( this.getLayer() ) {
+            document.body.style.cursor = &#x27;default&#x27;;
+            this.getLayer().draw();
+        }
+    });
+    // return shape
+    return kline;
+};
 
-    /**
-     * Execute the command.
-     * @method execute
-     */
-    this.execute = function()
-    {
-        // style
-        context.fillStyle = lineColor;
-        context.strokeStyle = lineColor;
-        // path
-        context.beginPath();
-        context.moveTo( line.getBegin().getX(), line.getBegin().getY());
-        context.lineTo( line.getEnd().getX(), line.getEnd().getY());
-        context.stroke();
-        context.closePath();
-        // length
-        var length = line.getWorldLength( 
-            app.getImage().getSpacing().getColumnSpacing(), 
-            app.getImage().getSpacing().getRowSpacing() );
-        context.font = style.getFontStr();
-        context.fillText( Math.round(length) + &quot;mm&quot;,
-            line.getEnd().getX() + style.getFontSize(),
-            line.getEnd().getY() + style.getFontSize());
-    }; 
-}; // DrawLineCommand class
+/**
+ * Update a line shape.
+ * @method UpdateLine
+ * @static
+ * @param {Object} line The line shape to update.
+ * @param {Object} anchor The active anchor.
+ */ 
+dwv.tool.UpdateLine = function (line, anchor)
+{
+    // parent group
+    var group = anchor.getParent();
+    // find special points
+    var begin = group.find(&#x27;#begin&#x27;)[0];
+    var end = group.find(&#x27;#end&#x27;)[0];
+    // update special points
+    switch ( anchor.id() ) {
+    case &#x27;begin&#x27;:
+        begin.x( anchor.x() );
+        begin.y( anchor.y() );
+        break;
+    case &#x27;end&#x27;:
+        end.x( anchor.x() );
+        end.y( anchor.y() );
+        break;
+    }
+    // update shape
+    line.points([begin.x(), begin.y(), end.x(), end.y()]);
+};
 
     </pre>
 </div>

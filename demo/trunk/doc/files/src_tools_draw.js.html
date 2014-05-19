@@ -87,6 +87,8 @@
             
                 <li><a href="../classes/dwv.math.Circle.html">dwv.math.Circle</a></li>
             
+                <li><a href="../classes/dwv.math.Ellipse.html">dwv.math.Ellipse</a></li>
+            
                 <li><a href="../classes/dwv.math.FastPoint2D.html">dwv.math.FastPoint2D</a></li>
             
                 <li><a href="../classes/dwv.math.Line.html">dwv.math.Line</a></li>
@@ -105,15 +107,9 @@
             
                 <li><a href="../classes/dwv.tool.Draw.html">dwv.tool.Draw</a></li>
             
-                <li><a href="../classes/dwv.tool.DrawCircleCommand.html">dwv.tool.DrawCircleCommand</a></li>
-            
-                <li><a href="../classes/dwv.tool.DrawLineCommand.html">dwv.tool.DrawLineCommand</a></li>
-            
                 <li><a href="../classes/dwv.tool.DrawLivewireCommand.html">dwv.tool.DrawLivewireCommand</a></li>
             
-                <li><a href="../classes/dwv.tool.DrawRectangleCommand.html">dwv.tool.DrawRectangleCommand</a></li>
-            
-                <li><a href="../classes/dwv.tool.DrawRoiCommand.html">dwv.tool.DrawRoiCommand</a></li>
+                <li><a href="../classes/dwv.tool.DrawShapeCommand.html">dwv.tool.DrawShapeCommand</a></li>
             
                 <li><a href="../classes/dwv.tool.Filter.html">dwv.tool.Filter</a></li>
             
@@ -126,6 +122,8 @@
                 <li><a href="../classes/dwv.tool.RunFilterCommand.html">dwv.tool.RunFilterCommand</a></li>
             
                 <li><a href="../classes/dwv.tool.Scroll.html">dwv.tool.Scroll</a></li>
+            
+                <li><a href="../classes/dwv.tool.ShapeEditor.html">dwv.tool.ShapeEditor</a></li>
             
                 <li><a href="../classes/dwv.tool.ToolBox.html">dwv.tool.ToolBox</a></li>
             
@@ -206,6 +204,55 @@
  */
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
+var Kinetic = Kinetic || {};
+
+/**
+ * Draw shape command.
+ * @class DrawShapeCommand
+ * @namespace dwv.tool
+ * @constructor
+ */
+dwv.tool.DrawShapeCommand = function (shape, name, app)
+{
+    /**
+     * Command name.
+     * @property name
+     * @private
+     * @type String
+     */
+    var _name = &quot;Draw-&quot;+name;
+    /**
+     * Get the command name.
+     * @method getName
+     * @return {String} The command name.
+     */
+    this.getName = function() { return _name; };
+
+    /**
+     * Execute the command.
+     * @method execute
+     */
+    this.execute = function()
+    {
+        // remove temporary shapes from the layer
+        var klayer = app.getKineticLayer();
+        var kshapes = klayer.find(&#x27;.temp&#x27;);
+        kshapes.each( function (kshape) {
+            kshape.remove(); 
+        });
+        // create group
+        var kgroup = new Kinetic.Group();
+        kgroup.add(shape);
+        // add the group to the layer
+        app.getKineticLayer().add(kgroup);
+        app.getKineticLayer().draw();
+    };
+    this.undo = function () {
+        shape.remove();
+        app.getKineticLayer().draw();
+    };
+
+}; // DrawShapeCommand class
 
 // List of colors
 dwv.tool.colors = [
@@ -219,7 +266,7 @@ dwv.tool.colors = [
  * @constructor
  * @param {Object} app The associated application.
  */
-dwv.tool.Draw = function(app)
+dwv.tool.Draw = function (app)
 {
     /**
      * Closure to self: to be used by event handlers.
@@ -242,6 +289,7 @@ dwv.tool.Draw = function(app)
      * @type Object
      */
     var command = null;
+    var shape = null;
     /**
      * Drawing style.
      * @property style
@@ -260,6 +308,10 @@ dwv.tool.Draw = function(app)
      * @type Array
      */
     var points = [];
+    
+    var lastPoint = null;
+    
+    var shapeEditor = new dwv.tool.ShapeEditor();
 
     /**
      * Handle mouse down event.
@@ -267,11 +319,37 @@ dwv.tool.Draw = function(app)
      * @param {Object} event The mouse down event.
      */
     this.mousedown = function(event){
-        started = true;
-        // clear array
-        points = [];
-        // store point
-        points.push(new dwv.math.Point2D(event._x, event._y));
+        var stage = app.getKineticStage();
+        var shape = stage.getIntersection({
+            x: event._xs, 
+            y: event._ys
+        });
+        
+        if ( shape ) {
+            var group = shape.getParent();
+            var draw = group.find(&quot;.final&quot;)[0];
+            
+            if( draw ) {
+                if ( draw !== shapeEditor.getShape() ) {
+                    if ( shapeEditor.isActive() ) {
+                        shapeEditor.disable();
+                    }
+                    shapeEditor.setShape(draw);
+                    shapeEditor.enable();
+                }
+            }
+        }
+        else {
+            if ( shapeEditor.isActive() ) {
+                shapeEditor.disable();
+            }
+            started = true;
+            // clear array
+            points = [];
+            // store point
+            lastPoint = new dwv.math.Point2D(event._x, event._y);
+            points.push(lastPoint);
+        }
     };
 
     /**
@@ -284,13 +362,15 @@ dwv.tool.Draw = function(app)
         {
             return;
         }
-        if( event._x !== points[0].getX() &amp;&amp;
-            event._y !== points[0].getY() )
+        if ( Math.abs( event._x - lastPoint.getX() ) &gt; 0 ||
+                Math.abs( event._y - lastPoint.getY() ) &gt; 0 )
         {
             // current point
-            points.push(new dwv.math.Point2D(event._x, event._y));
+            lastPoint = new dwv.math.Point2D(event._x, event._y);
+            points.push( lastPoint );
             // create draw command
-            command = new dwv.tool.shapes[self.shapeName](points, app, self.style);
+            shape = new dwv.tool.shapes[self.shapeName](points, self.style, false);
+            command = new dwv.tool.DrawShapeCommand(shape, self.shapeName, app);
             // clear the temporary layer
             app.getTempLayer().clear();
             // draw
@@ -303,16 +383,19 @@ dwv.tool.Draw = function(app)
      * @method mouseup
      * @param {Object} event The mouse up event.
      */
-    this.mouseup = function(/*event*/){
-        if (started)
+    this.mouseup = function (/*event*/){
+        if (started &amp;&amp; points.length &gt; 1 )
         {
-            // save command in undo stack
+            // create final command
+            shape = new dwv.tool.shapes[self.shapeName](points, self.style, true);
+            command = new dwv.tool.DrawShapeCommand(shape, self.shapeName, app);
+            // execute it
+            command.execute();
+            // save it in undo stack
             app.getUndoStack().add(command);
-            // merge temporary layer
-            app.getDrawLayer().merge(app.getTempLayer());
-            // set flag
-            started = false;
         }
+        // reset flag
+        started = false;
     };
     
     /**
