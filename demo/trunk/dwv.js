@@ -160,6 +160,11 @@ dwv.App = function()
         undoStack = new dwv.tool.UndoStack(this);
     };
     
+    this.resetLayout = function () {
+        app.getImageLayer().resetLayout(displayZoom);
+        app.getImageLayer().draw();
+    };
+    
     /**
      * Handle key down event.
      * - CRTL-Z: undo
@@ -267,12 +272,26 @@ dwv.App = function()
         // adapt the size of the layer container
         var size = dwv.gui.getWindowSize();
         displayZoom = Math.min( (size.width / dataWidth), (size.height / dataHeight) );
-        $("#layerContainer").width(parseInt(displayZoom*dataWidth, 10));
-        $("#layerContainer").height(parseInt(displayZoom*dataHeight, 10));
+        console.log("displayZoom: "+displayZoom);
         
+        var newWidth = parseInt(displayZoom*dataWidth, 10);
+        var newHeight = parseInt(displayZoom*dataHeight, 10);
+        
+        $("#layerContainer").width(newWidth);
+        $("#layerContainer").height(newHeight);
+
+        //$("#imageLayer").width(parseInt(displayZoom*dataWidth, 10));
+        //$("#imageLayer").height(parseInt(displayZoom*dataHeight, 10));
+
+        if( app.getImageLayer() ) {
+            app.getImageLayer().setDisplay(newWidth, newHeight);
+            app.getImageLayer().zoom(displayZoom, displayZoom, 0, 0);
+            app.getImageLayer().draw();
+        }
+
         if( kineticStage ) {
-            kineticStage.setWidth(parseInt(displayZoom*dataWidth, 10));
-            kineticStage.setHeight(parseInt(displayZoom*dataHeight, 10));
+            kineticStage.setWidth(newWidth);
+            kineticStage.setHeight(newHeight);
             kineticStage.scale( {x: displayZoom, y: displayZoom} );
             kineticStage.draw();
         }
@@ -3769,12 +3788,7 @@ dwv.gui.onChangeLineColour = function(/*event*/)
  */
 dwv.gui.onZoomReset = function(/*event*/)
 {
-    app.getImageLayer().resetLayout();
-    app.getImageLayer().draw();
-    if( app.getDrawLayer() ) {
-        app.getDrawLayer().resetLayout();
-        app.getDrawLayer().draw();
-    }
+    app.resetLayout();
 };
 
 /**
@@ -4614,6 +4628,9 @@ dwv.html.Layer = function(name)
      * @type Array
      */
     var imageData = null;
+    var dataWidth = 0;
+    var dataHeight = 0;
+    
     
     /**
      * The image origin X position.
@@ -4650,18 +4667,24 @@ dwv.html.Layer = function(name)
     this.getZoom = function () {
         return {x: zoomX, y: zoomY};
     };
+    var newDisplay = false;
+    this.setDisplay = function ( width, height ) {
+        var layer = document.getElementById( name );
+        layer.width = width;
+        layer.height = height;
+        newDisplay = true;
+    };
+    
     /**
      * Set the layer zoom.
      * @method setZoom
-     * @param {Number} stepX The zoom step in the X direction.
-     * @param {Number} stepY The zoom step in the Y direction.
+     * @param {Number} newZoomX The zoom in the X direction.
+     * @param {Number} newZoomY The zoom in the Y direction.
      * @param {Number} centerX The zoom center in the X direction.
      * @param {Number} centerY The zoom center in the Y direction.
      */
-    this.setZoom = function(stepX,stepY,centerX,centerY)
+    this.zoom = function(newZoomX,newZoomY,centerX,centerY)
     {
-        var newZoomX = zoomX + stepX;
-        var newZoomY = zoomY + stepY;
         // check zoom value
         if( newZoomX <= 0.1 || newZoomX >= 10 ||
             newZoomY <= 0.1 || newZoomY >= 10 ) {
@@ -4670,32 +4693,18 @@ dwv.html.Layer = function(name)
         // The zoom is the ratio between the differences from the center
         // to the origins:
         // centerX - originX = ( centerX - originX0 ) * zoomX
+        
         originX = centerX - (centerX - originX) * (newZoomX / zoomX);
-        
-        //originX = centerX / zoomX + originX - centerX / newZoomX;
-        
         originY = centerY - (centerY - originY) * (newZoomY / zoomY);
+        
+        //originX = (centerX / zoomX) + originX - (centerX / newZoomX);
+        //originY = (centerY / zoomY) + originY - (centerY / newZoomY);
+                
         // save zoom
         zoomX = newZoomX;
         zoomY = newZoomY;
     };
     
-    /**
-     * Set the layer zoom and apply it.
-     * @method zoom
-     * @param {Number} stepX The zoom step in the X direction.
-     * @param {Number} stepY The zoom step in the Y direction.
-     * @param {Number} centerX The zoom center in the X direction.
-     * @param {Number} centerY The zoom center in the Y direction.
-     */
-    this.zoom = function(stepX,stepY,centerX,centreY)
-    {
-        // set zoom
-        this.setZoom(stepX,stepY,centerX,centreY);
-        // draw 
-        this.draw();
-    };
-
     /**
      * Set the layer translation.
      * Translation is according to the last one.
@@ -4703,7 +4712,7 @@ dwv.html.Layer = function(name)
      * @param {Number} tx The translation in the X direction.
      * @param {Number} ty The translation in the Y direction.
      */
-    this.setTranslate = function(tx,ty)
+    this.translate = function(tx,ty)
     {
         // check translate value
         if( zoomX >= 1 ) { 
@@ -4734,21 +4743,6 @@ dwv.html.Layer = function(name)
     };
     
     /**
-     * Set the layer translation and apply it.
-     * Translation is according to the last one.
-     * @method translate
-     * @param {Number} tx The translation in the X direction.
-     * @param {Number} ty The translation in the Y direction.
-     */
-    this.translate = function(tx,ty)
-    {
-        // set the translate
-        this.setTranslate(tx, ty);
-        // draw
-        this.draw();
-    };
-    
-    /**
      * Set the image data array.
      * @method setImageData
      * @param {Array} data The data array.
@@ -4762,12 +4756,12 @@ dwv.html.Layer = function(name)
      * Reset the layout.
      * @method resetLayout
      */ 
-    this.resetLayout = function()
+    this.resetLayout = function(zoom)
     {
         originX = 0;
         originY = 0;
-        zoomX = 1;
-        zoomY = 1;
+        zoomX = zoom;
+        zoomY = zoom;
     };
     
     /**
@@ -4778,20 +4772,30 @@ dwv.html.Layer = function(name)
     this.draw = function()
     {
         // clear the context
-        context.clearRect(0, 0, canvas.width, canvas.height);
+        context.clearRect(0, 0, dataWidth, dataHeight);
         
-        // Put the image data in the context
+       // Put the image data in the context
         
         // 1. store the image data in a temporary canvas
         var tempCanvas = document.createElement("canvas");
-        tempCanvas.width = canvas.width;
-        tempCanvas.height = canvas.height;
+        tempCanvas.width = dataWidth;
+        tempCanvas.height = dataHeight;
         tempCanvas.getContext("2d").putImageData(imageData, 0, 0);
         // 2. draw the temporary canvas on the context
+        
+        var w = canvas.width;
+        var h = canvas.height;
+        
+        if ( newDisplay ) {
+            newDisplay = false;
+        }
+        else {
+            w *= zoomX;
+            h *= zoomY;
+        }
+        
         context.drawImage(tempCanvas,
-            originX, originY,
-            canvas.width * zoomX, 
-            canvas.height * zoomY);
+            originX, originY, w, h);
     };
     
     /**
@@ -4823,6 +4827,8 @@ dwv.html.Layer = function(name)
             return;
         }
         // canvas sizes
+        dataWidth = inputWidth;
+        dataHeight = inputHeight;
         canvas.width = inputWidth;
         canvas.height = inputHeight;
         // original empty image data array
@@ -8919,7 +8925,7 @@ dwv.tool.Draw = function (app)
             // clear array
             points = [];
             // store point
-            lastPoint = new dwv.math.Point2D(event._x, event._y);
+            lastPoint = new dwv.math.Point2D(event._xs, event._ys);
             points.push(lastPoint);
         }
     };
@@ -8934,11 +8940,11 @@ dwv.tool.Draw = function (app)
         {
             return;
         }
-        if ( Math.abs( event._x - lastPoint.getX() ) > 0 ||
-                Math.abs( event._y - lastPoint.getY() ) > 0 )
+        if ( Math.abs( event._xs - lastPoint.getX() ) > 0 ||
+                Math.abs( event._ys - lastPoint.getY() ) > 0 )
         {
             // current point
-            lastPoint = new dwv.math.Point2D(event._x, event._y);
+            lastPoint = new dwv.math.Point2D(event._xs, event._ys);
             points.push( lastPoint );
             // create draw command
             shape = new dwv.tool.shapes[self.shapeName](points, self.style, false);
@@ -11512,28 +11518,31 @@ dwv.tool.ZoomAndPan = function(app)
      * @param {Number} cx The zoom center X coordinate.
      * @param {Number} cy The zoom center Y coordinate.
      */ 
-    var koffset = {x:0,y:0};
     function zoomLayers(step, cx, cy, cx2, cy2)
     {
-        if( app.getImageLayer() ) {
+        /*if( app.getImageLayer() ) {
             app.getImageLayer().zoom(step, step, cx, cy);
         }
         if( app.getDrawLayer() ) { 
             app.getDrawLayer().zoom(step, step, cx, cy);
-        }
+        }*/
         if( app.getKineticStage() ) { 
             
             var stage = app.getKineticStage();
             var oldZoom = stage.scale();
             var newZoom = {x: (oldZoom.x + step), y: (oldZoom.y + step)};
             
-            koffset.x = (cx2 / oldZoom.x) + stage.offset().x - (cx2 / newZoom.x);
-            koffset.y = (cy2 / oldZoom.y) + stage.offset().y - (cy2 / newZoom.y);
+            var oldOffset = stage.offset();
+            var newOffsetX = (cx2 / oldZoom.x) + oldOffset.x - (cx2 / newZoom.x);
+            var newOffsetY = (cy2 / oldZoom.y) + oldOffset.y - (cy2 / newZoom.y);
+            var newOffset = { x: newOffsetX, y : newOffsetY };
             
-            stage.offset( koffset );
+            stage.offset( newOffset );
             stage.scale( newZoom );
-
             stage.draw();
+            
+            app.getImageLayer().zoom(newZoom.x, newZoom.y, cx2, cy2);
+            app.getImageLayer().draw();
         }
     }
 
@@ -11547,9 +11556,11 @@ dwv.tool.ZoomAndPan = function(app)
     {
         if( app.getImageLayer() ) {
             app.getImageLayer().translate(tx, ty);
+            app.getImageLayer().draw();
         }
         if( app.getDrawLayer() ) { 
             app.getDrawLayer().translate(tx, ty);
+            app.getDrawLayer().draw();
         }
     }
 
