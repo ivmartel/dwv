@@ -147,7 +147,7 @@ dwv.tool.Draw = function (app)
             // clear array
             points = [];
             // store point
-            lastPoint = new dwv.math.Point2D(event._x, event._y);
+            lastPoint = new dwv.math.Point2D(event._xs, event._ys);
             points.push(lastPoint);
         }
     };
@@ -162,11 +162,11 @@ dwv.tool.Draw = function (app)
         {
             return;
         }
-        if ( Math.abs( event._x - lastPoint.getX() ) > 0 ||
-                Math.abs( event._y - lastPoint.getY() ) > 0 )
+        if ( Math.abs( event._xs - lastPoint.getX() ) > 0 ||
+                Math.abs( event._ys - lastPoint.getY() ) > 0 )
         {
             // current point
-            lastPoint = new dwv.math.Point2D(event._x, event._y);
+            lastPoint = new dwv.math.Point2D(event._xs, event._ys);
             points.push( lastPoint );
             // create draw command
             shape = new dwv.tool.shapes[self.shapeName](points, self.style, false);

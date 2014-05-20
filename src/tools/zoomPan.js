@@ -243,28 +243,31 @@ dwv.tool.ZoomAndPan = function(app)
      * @param {Number} cx The zoom center X coordinate.
      * @param {Number} cy The zoom center Y coordinate.
      */ 
-    var koffset = {x:0,y:0};
     function zoomLayers(step, cx, cy, cx2, cy2)
     {
-        if( app.getImageLayer() ) {
+        /*if( app.getImageLayer() ) {
             app.getImageLayer().zoom(step, step, cx, cy);
         }
         if( app.getDrawLayer() ) { 
             app.getDrawLayer().zoom(step, step, cx, cy);
-        }
+        }*/
         if( app.getKineticStage() ) { 
             
             var stage = app.getKineticStage();
             var oldZoom = stage.scale();
             var newZoom = {x: (oldZoom.x + step), y: (oldZoom.y + step)};
             
-            koffset.x = (cx2 / oldZoom.x) + stage.offset().x - (cx2 / newZoom.x);
-            koffset.y = (cy2 / oldZoom.y) + stage.offset().y - (cy2 / newZoom.y);
+            var oldOffset = stage.offset();
+            var newOffsetX = (cx2 / oldZoom.x) + oldOffset.x - (cx2 / newZoom.x);
+            var newOffsetY = (cy2 / oldZoom.y) + oldOffset.y - (cy2 / newZoom.y);
+            var newOffset = { x: newOffsetX, y : newOffsetY };
             
-            stage.offset( koffset );
+            stage.offset( newOffset );
             stage.scale( newZoom );
-
             stage.draw();
+            
+            app.getImageLayer().zoom(newZoom.x, newZoom.y, cx2, cy2);
+            app.getImageLayer().draw();
         }
     }
 
@@ -278,9 +281,11 @@ dwv.tool.ZoomAndPan = function(app)
     {
         if( app.getImageLayer() ) {
             app.getImageLayer().translate(tx, ty);
+            app.getImageLayer().draw();
         }
         if( app.getDrawLayer() ) { 
             app.getDrawLayer().translate(tx, ty);
+            app.getDrawLayer().draw();
         }
     }
 

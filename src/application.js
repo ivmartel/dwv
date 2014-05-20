@@ -160,6 +160,11 @@ dwv.App = function()
         undoStack = new dwv.tool.UndoStack(this);
     };
     
+    this.resetLayout = function () {
+        app.getImageLayer().resetLayout(displayZoom);
+        app.getImageLayer().draw();
+    };
+    
     /**
      * Handle key down event.
      * - CRTL-Z: undo
@@ -267,12 +272,26 @@ dwv.App = function()
         // adapt the size of the layer container
         var size = dwv.gui.getWindowSize();
         displayZoom = Math.min( (size.width / dataWidth), (size.height / dataHeight) );
-        $("#layerContainer").width(parseInt(displayZoom*dataWidth, 10));
-        $("#layerContainer").height(parseInt(displayZoom*dataHeight, 10));
+        console.log("displayZoom: "+displayZoom);
         
+        var newWidth = parseInt(displayZoom*dataWidth, 10);
+        var newHeight = parseInt(displayZoom*dataHeight, 10);
+        
+        $("#layerContainer").width(newWidth);
+        $("#layerContainer").height(newHeight);
+
+        //$("#imageLayer").width(parseInt(displayZoom*dataWidth, 10));
+        //$("#imageLayer").height(parseInt(displayZoom*dataHeight, 10));
+
+        if( app.getImageLayer() ) {
+            app.getImageLayer().setDisplay(newWidth, newHeight);
+            app.getImageLayer().zoom(displayZoom, displayZoom, 0, 0);
+            app.getImageLayer().draw();
+        }
+
         if( kineticStage ) {
-            kineticStage.setWidth(parseInt(displayZoom*dataWidth, 10));
-            kineticStage.setHeight(parseInt(displayZoom*dataHeight, 10));
+            kineticStage.setWidth(newWidth);
+            kineticStage.setHeight(newHeight);
             kineticStage.scale( {x: displayZoom, y: displayZoom} );
             kineticStage.draw();
         }
