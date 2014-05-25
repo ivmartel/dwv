@@ -22,7 +22,7 @@ dwv.App = function()
     var imageData = null;
     var dataWidth = 0;
     var dataHeight = 0;
-    var displayZoom = 1;
+    var windowScale = 1;
      
     // Image layer
     var imageLayer = null;
@@ -161,8 +161,16 @@ dwv.App = function()
     };
     
     this.resetLayout = function () {
-        app.getImageLayer().resetLayout(displayZoom);
-        app.getImageLayer().draw();
+        if ( app.getImageLayer() ) {
+            app.getImageLayer().resetLayout(windowScale);
+            app.getImageLayer().draw();
+        }
+        if ( app.getKineticStage() ) {
+            var stage = app.getKineticStage();
+            stage.offset( {'x': 0, 'y': 0} );
+            stage.scale( {'x': windowScale, 'y': windowScale} );
+            stage.draw();
+        }
     };
     
     /**
@@ -269,30 +277,40 @@ dwv.App = function()
      */
     this.resize = function()
     {
-        // adapt the size of the layer container
+        // previous width
+        var oldWidth = parseInt(windowScale*dataWidth, 10);
+        // find new best fit
         var size = dwv.gui.getWindowSize();
-        displayZoom = Math.min( (size.width / dataWidth), (size.height / dataHeight) );
-        console.log("displayZoom: "+displayZoom);
-        
-        var newWidth = parseInt(displayZoom*dataWidth, 10);
-        var newHeight = parseInt(displayZoom*dataHeight, 10);
-        
+        windowScale = Math.min( (size.width / dataWidth), (size.height / dataHeight) );
+        // new sizes
+        var newWidth = parseInt(windowScale*dataWidth, 10);
+        var newHeight = parseInt(windowScale*dataHeight, 10);
+        // ratio previous/new to add to zoom
+        var mul = newWidth / oldWidth;
+
+        // resize container
         $("#layerContainer").width(newWidth);
-        $("#layerContainer").height(newHeight);
-
-        //$("#imageLayer").width(parseInt(displayZoom*dataWidth, 10));
-        //$("#imageLayer").height(parseInt(displayZoom*dataHeight, 10));
-
+        $("#layerContainer").height(newHeight + 1); // +1 to be sure...
+        // resize image layer
         if( app.getImageLayer() ) {
-            app.getImageLayer().setDisplay(newWidth, newHeight);
-            app.getImageLayer().zoom(displayZoom, displayZoom, 0, 0);
+            var iZoomX = app.getImageLayer().getZoom().x * mul;
+            var iZoomY = app.getImageLayer().getZoom().y * mul;
+            app.getImageLayer().setWidth(newWidth);
+            app.getImageLayer().setHeight(newHeight);
+            app.getImageLayer().zoom(iZoomX, iZoomY, 0, 0);
             app.getImageLayer().draw();
         }
-
+        // resize draw layer
         if( kineticStage ) {
+            // resize div
+            $("#kineticDiv").width(newWidth);
+            $("#kineticDiv").height(newHeight);
+            // resize stage
+            var kZoomX = kineticStage.scale().x * mul;
+            var kZoomY = kineticStage.scale().y * mul;
             kineticStage.setWidth(newWidth);
             kineticStage.setHeight(newHeight);
-            kineticStage.scale( {x: displayZoom, y: displayZoom} );
+            kineticStage.scale( {x: kZoomX, y: kZoomY} );
             kineticStage.draw();
         }
     };
@@ -383,21 +401,22 @@ dwv.App = function()
             if( touches.length === 1 || touches.length === 2)
             {
                 var touch = touches[0];
+                var zoom = self.getImageLayer().getZoom().x;
                 // store
                 event._x = touch.pageX - parseInt(app.getImageLayer().getOffset().left, 10);
                 event._xs = event._x;
-                event._x = parseInt( (event._x / displayZoom), 10 );
+                event._x = parseInt( (event._x / zoom), 10 );
                 event._y = touch.pageY - parseInt(app.getImageLayer().getOffset().top, 10);
                 event._ys = event._y;
-                event._y = parseInt( (event._y / displayZoom), 10 );
+                event._y = parseInt( (event._y / zoom), 10 );
                 // second finger
                 if (touches.length === 2) {
                     touch = touches[1];
                     // store
                     event._x1 = touch.pageX - parseInt(app.getImageLayer().getOffset().left, 10);
-                    event._x1 = parseInt( (event._x1 / displayZoom), 10 );
+                    event._x1 = parseInt( (event._x1 / zoom), 10 );
                     event._y1 = touch.pageY - parseInt(app.getImageLayer().getOffset().top, 10);
-                    event._y1 = parseInt( (event._y1 / displayZoom), 10 );
+                    event._y1 = parseInt( (event._y1 / zoom), 10 );
                 }
                 // set handle event flag
                 handled = true;
@@ -414,10 +433,13 @@ dwv.App = function()
             // layerX is for firefox
             event._x = event.offsetX === undefined ? event.layerX : event.offsetX;
             event._xs = event._x;
-            event._x = parseInt( (event._x / displayZoom), 10 );
+            //event._x = parseInt( (event._x / zoom), 10 );
             event._y = event.offsetY === undefined ? event.layerY : event.offsetY;
             event._ys = event._y;
-            event._y = parseInt( (event._y / displayZoom), 10 );
+            //event._y = parseInt( (event._y / zoom), 10 );
+            var p = self.getImageLayer().displayToIndex( {'x': event._x, 'y': event._y} );
+            event._x = parseInt( p.x, 10 );
+            event._y = parseInt( p.y, 10 );
             // set handle event flag
             handled = true;
         }

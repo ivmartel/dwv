@@ -22,6 +22,13 @@ dwv.html.Layer = function(name)
      */
     var canvas = null;
     /**
+     * A cache of the initial canvas.
+     * @property cacheCanvas
+     * @private
+     * @type Object
+     */
+    var cacheCanvas = null;
+    /**
      * The associated CanvasRenderingContext2D.
      * @property context
      * @private
@@ -61,51 +68,53 @@ dwv.html.Layer = function(name)
      * @type Array
      */
     var imageData = null;
-    var dataWidth = 0;
-    var dataHeight = 0;
-    
     
     /**
-     * The image origin X position.
-     * @property originX
+     * The layer origin.
+     * @property origin
      * @private
-     * @type Number
+     * @type {Object}
      */
-    var originX = 0;
+    var origin = {'x': 0, 'y': 0};
     /**
-     * The image origin Y position.
-     * @property originY
-     * @private
-     * @type Number
+     * Get the layer origin.
+     * @method getOrigin
+     * @returns {Object} The layer origin as {'x','y'}.
      */
-    var originY = 0;
-    /**
-     * The image zoom in the X direction.
-     * @property zoomX
-     * @private
-     * @type Number
-     */
-    var zoomX = 1;
-    /**
-     * The image zoom in the Y direction.
-     * @property zoomY
-     * @private
-     * @type Number
-     */
-    var zoomY = 1;
-    
     this.getOrigin = function () {
-        return {x: originX, y: originY};
+        return origin;
     };
+    /**
+     * The image zoom.
+     * @property zoom
+     * @private
+     * @type {Object}
+     */
+    var zoom = {'x': 1, 'y': 1};
+    /**
+     * Get the layer zoom.
+     * @method getZoom
+     * @returns {Object} The layer zoom as {'x','y'}.
+     */
     this.getZoom = function () {
-        return {x: zoomX, y: zoomY};
+        return zoom;
     };
-    var newDisplay = false;
-    this.setDisplay = function ( width, height ) {
-        var layer = document.getElementById( name );
-        layer.width = width;
-        layer.height = height;
-        newDisplay = true;
+    
+    /**
+     * Set the canvas width.
+     * @method setWidth
+     * @param {Number} width The new width.
+     */
+    this.setWidth = function ( width ) {
+        canvas.width = width;
+    };
+    /**
+     * Set the canvas height.
+     * @method setHeight
+     * @param {Number} height The new height.
+     */
+    this.setHeight = function ( height ) {
+        canvas.height = height;
     };
     
     /**
@@ -123,19 +132,21 @@ dwv.html.Layer = function(name)
             newZoomY <= 0.1 || newZoomY >= 10 ) {
             return;
         }
+        
         // The zoom is the ratio between the differences from the center
         // to the origins:
         // centerX - originX = ( centerX - originX0 ) * zoomX
-        
-        originX = centerX - (centerX - originX) * (newZoomX / zoomX);
-        originY = centerY - (centerY - originY) * (newZoomY / zoomY);
-        
+        // (center in ~world coordinate system)  
         //originX = (centerX / zoomX) + originX - (centerX / newZoomX);
         //originY = (centerY / zoomY) + originY - (centerY / newZoomY);
-                
+        
+        // center in image coordinate system        
+        origin.x = centerX - (centerX - origin.x) * (newZoomX / zoom.x);
+        origin.y = centerY - (centerY - origin.y) * (newZoomY / zoom.y);
+
         // save zoom
-        zoomX = newZoomX;
-        zoomY = newZoomY;
+        zoom.x = newZoomX;
+        zoom.y = newZoomY;
     };
     
     /**
@@ -148,31 +159,31 @@ dwv.html.Layer = function(name)
     this.translate = function(tx,ty)
     {
         // check translate value
-        if( zoomX >= 1 ) { 
-            if( (originX + tx) < -1 * (canvas.width * zoomX) + canvas.width ||
-                (originX + tx) > 0 ) {
+        if( zoom.x >= 1 ) { 
+            if( (origin.x + tx) < -1 * (canvas.width * zoom.x) + canvas.width ||
+                (origin.x + tx) > 0 ) {
                 return;
             }
         } else {
-            if( (originX + tx) > -1 * (canvas.width * zoomX) + canvas.width ||
-                (originX + tx) < 0 ) {
+            if( (origin.x + tx) > -1 * (canvas.width * zoom.x) + canvas.width ||
+                (origin.x + tx) < 0 ) {
                 return;
             }
         }
-        if( zoomY >= 1 ) { 
-            if( (originY + ty) < -1 * (canvas.height * zoomY) + canvas.height ||
-                (originY + ty) > 0 ) {
+        if( zoom.y >= 1 ) { 
+            if( (origin.y + ty) < -1 * (canvas.height * zoom.y) + canvas.height ||
+                (origin.y + ty) > 0 ) {
                 return;
             }
         } else {
-            if( (originY + ty) > -1 * (canvas.height * zoomY) + canvas.height ||
-                (originY + ty) < 0 ) {
+            if( (origin.y + ty) > -1 * (canvas.height * zoom.y) + canvas.height ||
+                (origin.y + ty) < 0 ) {
                 return;
             }
         }
         // new origin
-        originX += tx;
-        originY += ty;
+        origin.x += tx * zoom.x;
+        origin.y += ty * zoom.y;
     };
     
     /**
@@ -183,18 +194,29 @@ dwv.html.Layer = function(name)
     this.setImageData = function(data)
     {
         imageData = data;
+        // update the cached canvas
+        cacheCanvas.getContext("2d").putImageData(imageData, 0, 0);
     };
     
     /**
      * Reset the layout.
      * @method resetLayout
      */ 
-    this.resetLayout = function(zoom)
+    this.resetLayout = function(izoom)
     {
-        originX = 0;
-        originY = 0;
-        zoomX = zoom;
-        zoomY = zoom;
+        origin.x = 0;
+        origin.y = 0;
+        zoom.x = izoom;
+        zoom.y = izoom;
+    };
+    
+    /**
+     * Transform a display position to an index.
+     * @method displayToIndex
+     */ 
+    this.displayToIndex = function ( point2D ) {
+        return {'x': (point2D.x - origin.x) / zoom.x,
+            'y': (point2D.y - origin.y) / zoom.y };
     };
     
     /**
@@ -202,33 +224,25 @@ dwv.html.Layer = function(name)
      * The imageData variable needs to be set
      * @method draw
      */
-    this.draw = function()
+    this.draw = function ()
     {
-        // clear the context
-        context.clearRect(0, 0, dataWidth, dataHeight);
+        // clear the context: reset the transform first
+        // store the current transformation matrix
+        context.save();
+        // use the identity matrix while clearing the canvas
+        context.setTransform( 1, 0, 0, 1, 0, 0 );
+        context.clearRect( 0, 0, canvas.width, canvas.height );
+        // restore the transform
+        context.restore();
         
-       // Put the image data in the context
-        
-        // 1. store the image data in a temporary canvas
-        var tempCanvas = document.createElement("canvas");
-        tempCanvas.width = dataWidth;
-        tempCanvas.height = dataHeight;
-        tempCanvas.getContext("2d").putImageData(imageData, 0, 0);
-        // 2. draw the temporary canvas on the context
-        
-        var w = canvas.width;
-        var h = canvas.height;
-        
-        if ( newDisplay ) {
-            newDisplay = false;
-        }
-        else {
-            w *= zoomX;
-            h *= zoomY;
-        }
-        
-        context.drawImage(tempCanvas,
-            originX, originY, w, h);
+        // draw the cached canvas on the context
+        // transform takes as input a, b, c, d, e, f to create
+        // the transform matrix (column-major order):
+        // [ a c e ]
+        // [ b d f ]
+        // [ 0 0 1 ]
+        context.setTransform( zoom.x, 0, 0, zoom.y, origin.x, origin.y );
+        context.drawImage( cacheCanvas, 0, 0 );
     };
     
     /**
@@ -260,13 +274,15 @@ dwv.html.Layer = function(name)
             return;
         }
         // canvas sizes
-        dataWidth = inputWidth;
-        dataHeight = inputHeight;
         canvas.width = inputWidth;
         canvas.height = inputHeight;
         // original empty image data array
         context.clearRect (0, 0, canvas.width, canvas.height);
         imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+        // cached canvas
+        cacheCanvas = document.createElement("canvas");
+        cacheCanvas.width = inputWidth;
+        cacheCanvas.height = inputHeight;
     };
     
     /**
@@ -305,11 +321,11 @@ dwv.html.Layer = function(name)
         var offThisJ = 0;
         var alpha = 0;
         for( var j=0; j < canvas.height; ++j ) {
-            offMergeJ = parseInt( (originY + j * zoomY), 10 ) * canvas.width;
+            offMergeJ = parseInt( (origin.y + j * zoom.y), 10 ) * canvas.width;
             offThisJ = j * canvas.width;
             for( var i=0; i < canvas.width; ++i ) {
                 // 4 component data: RGB + alpha
-                offMerge = 4 * ( parseInt( (originX + i * zoomX), 10 ) + offMergeJ );
+                offMerge = 4 * ( parseInt( (origin.x + i * zoom.x), 10 ) + offMergeJ );
                 offThis = 4 * ( i + offThisJ );
                 // merge non transparent 
                 alpha = mergeImageData.data[offMerge+3];
