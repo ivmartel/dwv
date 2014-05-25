@@ -3167,6 +3167,19 @@
         {
             "file": "src/gui/layer.js",
             "line": 24,
+            "description": "A cache of the initial canvas.",
+            "itemtype": "property",
+            "name": "cacheCanvas",
+            "access": "private",
+            "tagname": "",
+            "type": "Object",
+            "class": "dwv.html.Layer",
+            "module": "html",
+            "namespace": "dwv.html"
+        },
+        {
+            "file": "src/gui/layer.js",
+            "line": 31,
             "description": "The associated CanvasRenderingContext2D.",
             "itemtype": "property",
             "name": "context",
@@ -3179,7 +3192,7 @@
         },
         {
             "file": "src/gui/layer.js",
-            "line": 32,
+            "line": 39,
             "description": "Get the layer name.",
             "itemtype": "method",
             "name": "getName",
@@ -3193,7 +3206,7 @@
         },
         {
             "file": "src/gui/layer.js",
-            "line": 38,
+            "line": 45,
             "description": "Get the layer canvas.",
             "itemtype": "method",
             "name": "getCanvas",
@@ -3207,7 +3220,7 @@
         },
         {
             "file": "src/gui/layer.js",
-            "line": 44,
+            "line": 51,
             "description": "Get the layer context.",
             "itemtype": "method",
             "name": "getContext",
@@ -3221,7 +3234,7 @@
         },
         {
             "file": "src/gui/layer.js",
-            "line": 50,
+            "line": 57,
             "description": "Get the layer offset on page.",
             "itemtype": "method",
             "name": "getOffset",
@@ -3235,7 +3248,7 @@
         },
         {
             "file": "src/gui/layer.js",
-            "line": 57,
+            "line": 64,
             "description": "The image data array.",
             "itemtype": "property",
             "name": "imageData",
@@ -3248,52 +3261,71 @@
         },
         {
             "file": "src/gui/layer.js",
-            "line": 68,
-            "description": "The image origin X position.",
+            "line": 72,
+            "description": "The layer origin.",
             "itemtype": "property",
-            "name": "originX",
+            "name": "origin",
             "access": "private",
             "tagname": "",
-            "type": "Number",
+            "type": "{Object}",
             "class": "dwv.html.Layer",
             "module": "html",
             "namespace": "dwv.html"
         },
         {
             "file": "src/gui/layer.js",
-            "line": 75,
-            "description": "The image origin Y position.",
-            "itemtype": "property",
-            "name": "originY",
-            "access": "private",
-            "tagname": "",
-            "type": "Number",
+            "line": 79,
+            "description": "Get the layer origin.",
+            "itemtype": "method",
+            "name": "getOrigin",
+            "return": {
+                "description": "The layer origin as {'x','y'}.",
+                "type": "Object"
+            },
             "class": "dwv.html.Layer",
             "module": "html",
             "namespace": "dwv.html"
         },
         {
             "file": "src/gui/layer.js",
-            "line": 82,
-            "description": "The image zoom in the X direction.",
+            "line": 87,
+            "description": "The image zoom.",
             "itemtype": "property",
-            "name": "zoomX",
+            "name": "zoom",
             "access": "private",
             "tagname": "",
-            "type": "Number",
+            "type": "{Object}",
             "class": "dwv.html.Layer",
             "module": "html",
             "namespace": "dwv.html"
         },
         {
             "file": "src/gui/layer.js",
-            "line": 89,
-            "description": "The image zoom in the Y direction.",
-            "itemtype": "property",
-            "name": "zoomY",
-            "access": "private",
-            "tagname": "",
-            "type": "Number",
+            "line": 94,
+            "description": "Get the layer zoom.",
+            "itemtype": "method",
+            "name": "getZoom",
+            "return": {
+                "description": "The layer zoom as {'x','y'}.",
+                "type": "Object"
+            },
+            "class": "dwv.html.Layer",
+            "module": "html",
+            "namespace": "dwv.html"
+        },
+        {
+            "file": "src/gui/layer.js",
+            "line": 103,
+            "description": "Set the canvas width.",
+            "itemtype": "method",
+            "name": "setWidth",
+            "params": [
+                {
+                    "name": "width",
+                    "description": "The new width.",
+                    "type": "Number"
+                }
+            ],
             "class": "dwv.html.Layer",
             "module": "html",
             "namespace": "dwv.html"
@@ -3301,6 +3333,23 @@
         {
             "file": "src/gui/layer.js",
             "line": 111,
+            "description": "Set the canvas height.",
+            "itemtype": "method",
+            "name": "setHeight",
+            "params": [
+                {
+                    "name": "height",
+                    "description": "The new height.",
+                    "type": "Number"
+                }
+            ],
+            "class": "dwv.html.Layer",
+            "module": "html",
+            "namespace": "dwv.html"
+        },
+        {
+            "file": "src/gui/layer.js",
+            "line": 120,
             "description": "Set the layer zoom.",
             "itemtype": "method",
             "name": "setZoom",
@@ -3332,7 +3381,7 @@
         },
         {
             "file": "src/gui/layer.js",
-            "line": 141,
+            "line": 152,
             "description": "Set the layer translation.\nTranslation is according to the last one.",
             "itemtype": "method",
             "name": "setTranslate",
@@ -3354,7 +3403,7 @@
         },
         {
             "file": "src/gui/layer.js",
-            "line": 178,
+            "line": 189,
             "description": "Set the image data array.",
             "itemtype": "method",
             "name": "setImageData",
@@ -3371,7 +3420,7 @@
         },
         {
             "file": "src/gui/layer.js",
-            "line": 188,
+            "line": 201,
             "description": "Reset the layout.",
             "itemtype": "method",
             "name": "resetLayout",
@@ -3381,7 +3430,17 @@
         },
         {
             "file": "src/gui/layer.js",
-            "line": 200,
+            "line": 213,
+            "description": "Transform a display position to an index.",
+            "itemtype": "method",
+            "name": "displayToIndex",
+            "class": "dwv.html.Layer",
+            "module": "html",
+            "namespace": "dwv.html"
+        },
+        {
+            "file": "src/gui/layer.js",
+            "line": 222,
             "description": "Draw the content (imageData) of the layer.\nThe imageData variable needs to be set",
             "itemtype": "method",
             "name": "draw",
@@ -3391,7 +3450,7 @@
         },
         {
             "file": "src/gui/layer.js",
-            "line": 234,
+            "line": 248,
             "description": "Initialise the layer: set the canvas and context",
             "itemtype": "method",
             "name": "initialise",
@@ -3402,7 +3461,7 @@
         },
         {
             "file": "src/gui/layer.js",
-            "line": 272,
+            "line": 288,
             "description": "Fill the full context with the current style.",
             "itemtype": "method",
             "name": "fillContext",
@@ -3412,7 +3471,7 @@
         },
         {
             "file": "src/gui/layer.js",
-            "line": 281,
+            "line": 297,
             "description": "Clear the context and reset the image data.",
             "itemtype": "method",
             "name": "clear",
@@ -3422,7 +3481,7 @@
         },
         {
             "file": "src/gui/layer.js",
-            "line": 292,
+            "line": 308,
             "description": "Merge two layers.",
             "itemtype": "method",
             "name": "merge",
@@ -3433,7 +3492,7 @@
         },
         {
             "file": "src/gui/layer.js",
-            "line": 330,
+            "line": 346,
             "description": "Set the line color for the layer.",
             "itemtype": "method",
             "name": "setLineColor",
@@ -3444,7 +3503,7 @@
         },
         {
             "file": "src/gui/layer.js",
-            "line": 341,
+            "line": 357,
             "description": "Display the layer.",
             "itemtype": "method",
             "name": "setStyleDisplay",
@@ -3455,7 +3514,7 @@
         },
         {
             "file": "src/gui/layer.js",
-            "line": 358,
+            "line": 374,
             "description": "Check if the layer is visible.",
             "itemtype": "method",
             "name": "isVisible",
@@ -3469,7 +3528,7 @@
         },
         {
             "file": "src/gui/layer.js",
-            "line": 373,
+            "line": 389,
             "description": "Align on another layer.",
             "itemtype": "method",
             "name": "align",
@@ -8884,7 +8943,7 @@
         },
         {
             "file": "src/tools/zoomPan.js",
-            "line": 274,
+            "line": 271,
             "description": "Apply a translation to the layers.",
             "itemtype": "method",
             "name": "translateLayers",
@@ -8906,7 +8965,7 @@
         },
         {
             "file": "src/tools/zoomPan.js",
-            "line": 294,
+            "line": 295,
             "description": "Help for this tool.",
             "itemtype": "method",
             "name": "getHelp",
@@ -8920,7 +8979,7 @@
         },
         {
             "file": "src/tools/zoomPan.js",
-            "line": 315,
+            "line": 316,
             "description": "Initialise the tool.",
             "itemtype": "method",
             "name": "init",
@@ -9205,7 +9264,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 168,
+            "line": 176,
             "description": "Handle key down event.\n- CRTL-Z: undo\n- CRTL-Y: redo\nDefault behavior. Usually used in tools.",
             "itemtype": "method",
             "name": "handleKeyDown",
@@ -9222,7 +9281,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 188,
+            "line": 196,
             "description": "Handle change files event.",
             "itemtype": "method",
             "name": "onChangeFiles",
@@ -9239,7 +9298,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 198,
+            "line": 206,
             "description": "Load a list of files.",
             "itemtype": "method",
             "name": "loadFiles",
@@ -9256,7 +9315,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 220,
+            "line": 228,
             "description": "Handle change url event.",
             "itemtype": "method",
             "name": "onChangeURL",
@@ -9273,7 +9332,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 230,
+            "line": 238,
             "description": "Load a list of URLs.",
             "itemtype": "method",
             "name": "loadURL",
@@ -9290,7 +9349,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 252,
+            "line": 260,
             "description": "Generate the image data and draw it.",
             "itemtype": "method",
             "name": "generateAndDrawImage",
@@ -9300,7 +9359,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 266,
+            "line": 274,
             "description": "Resize the display window. To be called once the image is loaded.",
             "itemtype": "method",
             "name": "resize",
@@ -9310,7 +9369,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 300,
+            "line": 318,
             "description": "Toggle the display of the info layer.",
             "itemtype": "method",
             "name": "toggleInfoLayerDisplay",
@@ -9320,7 +9379,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 317,
+            "line": 335,
             "description": "Init the Window/Level display",
             "class": "dwv.App",
             "module": "utils",
@@ -9328,7 +9387,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 333,
+            "line": 351,
             "description": "Add image listeners.",
             "itemtype": "method",
             "name": "addImageInfoListeners",
@@ -9340,7 +9399,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 348,
+            "line": 366,
             "description": "Remove image listeners.",
             "itemtype": "method",
             "name": "removeImageInfoListeners",
@@ -9352,7 +9411,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 363,
+            "line": 381,
             "description": "General-purpose event handler. This function just determines the mouse \nposition relative to the canvas element. It then passes it to the current tool.",
             "itemtype": "method",
             "name": "eventHandler",
@@ -9371,7 +9430,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 441,
+            "line": 463,
             "description": "Handle an error: display it to the user.",
             "itemtype": "method",
             "name": "handleError",
@@ -9390,7 +9449,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 462,
+            "line": 484,
             "description": "Create the application layers.",
             "itemtype": "method",
             "name": "createLayers",
@@ -9414,7 +9473,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 507,
+            "line": 529,
             "description": "Create the DICOM tags table. To be called once the DICOM has been parsed.",
             "itemtype": "method",
             "name": "createTagsTable",
@@ -9433,7 +9492,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 540,
+            "line": 562,
             "description": "Post load application initialisation. To be called once the DICOM has been parsed.",
             "itemtype": "method",
             "name": "postLoadInit",
@@ -9489,24 +9548,32 @@
             "line": " src/gui/html.js:152"
         },
         {
-            "message": "unknown tag: input",
-            "line": " src/gui/layer.js:234"
+            "message": "replacing incorrect tag: returns with return",
+            "line": " src/gui/layer.js:79"
+        },
+        {
+            "message": "replacing incorrect tag: returns with return",
+            "line": " src/gui/layer.js:94"
         },
         {
             "message": "unknown tag: input",
-            "line": " src/gui/layer.js:234"
+            "line": " src/gui/layer.js:248"
         },
         {
             "message": "unknown tag: input",
-            "line": " src/gui/layer.js:292"
+            "line": " src/gui/layer.js:248"
         },
         {
             "message": "unknown tag: input",
-            "line": " src/gui/layer.js:330"
+            "line": " src/gui/layer.js:308"
         },
         {
             "message": "unknown tag: input",
-            "line": " src/gui/layer.js:341"
+            "line": " src/gui/layer.js:346"
+        },
+        {
+            "message": "unknown tag: input",
+            "line": " src/gui/layer.js:357"
         },
         {
             "message": "unknown tag: pqrqm",
@@ -9550,7 +9617,7 @@
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/tools/zoomPan.js:294"
+            "line": " src/tools/zoomPan.js:295"
         },
         {
             "message": "Missing item type\nDICOM tag dictionary.",
@@ -9574,7 +9641,7 @@
         },
         {
             "message": "Missing item type\nInit the Window/Level display",
-            "line": " src/application.js:317"
+            "line": " src/application.js:335"
         }
     ]
 }
