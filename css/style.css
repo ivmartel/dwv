@@ -3,8 +3,6 @@ body { font-family: Verdana, Arial, Helvetica, sans-serif; }
 /* Layers */
 #layerContainer { position: relative; padding: 0; }
 #imageLayer { position: absolute; }
-#drawLayer { position: absolute; }
-#tempLayer { position: absolute; }
 #kineticDiv { position: absolute; }
 
 /* Info */
