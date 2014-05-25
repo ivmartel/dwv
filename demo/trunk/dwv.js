@@ -26,10 +26,6 @@ dwv.App = function()
      
     // Image layer
     var imageLayer = null;
-    // Draw layer
-    var drawLayer = null;
-    // Temporary layer
-    var tempLayer = null;
     // Kinetic layer
     var kineticLayer = null;
     var kineticStage = null;
@@ -103,18 +99,6 @@ dwv.App = function()
      * @return {Object} The image layer.
      */
     this.getImageLayer = function() { return imageLayer; };
-    /** 
-     * Get the draw layer.
-     * @method getDrawLayer
-     * @return {Object} The draw layer.
-     */
-    this.getDrawLayer = function() { return drawLayer; };
-    /** 
-     * Get the temporary layer.
-     * @method getTempLayer
-     * @return {Object} The temporary layer.
-     */
-    this.getTempLayer = function() { return tempLayer; };
     /** 
      * Get the kinetic layer.
      * @method getKineticLayer
@@ -495,18 +479,6 @@ dwv.App = function()
         imageLayer.initialise(dataWidth, dataHeight);
         imageLayer.fillContext();
         imageLayer.setStyleDisplay(true);
-        // draw layer
-        if( document.getElementById("drawLayer") !== null) {
-            drawLayer = new dwv.html.Layer("drawLayer");
-            drawLayer.initialise(dataWidth, dataHeight);
-            drawLayer.setStyleDisplay(true);
-        }
-        // temp layer
-        if( document.getElementById("tempLayer") !== null) {
-            tempLayer = new dwv.html.Layer("tempLayer");
-            tempLayer.initialise(dataWidth, dataHeight);
-            tempLayer.setStyleDisplay(true);
-        }
         // kinetic layer
         if( document.getElementById("kineticDiv") !== null) {
             // create stage
@@ -591,7 +563,7 @@ dwv.App = function()
 
         var kineticDiv = document.getElementById("kineticDiv");
         
-        var topLayer = tempLayer === null ? imageLayer.getCanvas() : tempLayer.getCanvas();
+        var topLayer = imageLayer.getCanvas();
         if ( kineticLayer ) {
             topLayer = kineticDiv;
         }
@@ -8987,8 +8959,6 @@ dwv.tool.Draw = function (app)
             // create draw command
             shape = new dwv.tool.shapes[self.shapeName](points, self.style, false);
             command = new dwv.tool.DrawShapeCommand(shape, self.shapeName, app);
-            // clear the temporary layer
-            app.getTempLayer().clear();
             // draw
             command.execute();
         }
@@ -10930,10 +10900,6 @@ dwv.tool.UndoStack = function(app)
             --curCmdIndex; 
             // reset image
             app.restoreOriginalImage();
-            // clear layers
-            app.getDrawLayer().clear();
-            app.getTempLayer().clear();
-            //app.getKineticLayer().clear();
             
             stack[curCmdIndex].undo();
             
@@ -10946,10 +10912,6 @@ dwv.tool.UndoStack = function(app)
             if( curCmdIndex === 0 ) {
                 // just draw the image
                 app.generateAndDrawImage();
-            }
-            else {
-                // merge the temporary layer
-                app.getDrawLayer().merge(app.getTempLayer());
             }
             // disable last in display history
             dwv.gui.enableInUndoHtml(false);
@@ -10969,8 +10931,6 @@ dwv.tool.UndoStack = function(app)
             cmd.execute();
             // increment index
             ++curCmdIndex;
-            // merge the temporary layer
-            app.getDrawLayer().merge(app.getTempLayer());
             // enable next in display history
             dwv.gui.enableInUndoHtml(true);
         }
