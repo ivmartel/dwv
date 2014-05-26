@@ -4688,12 +4688,6 @@ dwv.html.Layer = function(name)
      */
     this.zoom = function(newZoomX,newZoomY,centerX,centerY)
     {
-        // check zoom value
-        if( newZoomX <= 0.1 || newZoomX >= 10 ||
-            newZoomY <= 0.1 || newZoomY >= 10 ) {
-            return;
-        }
-        
         // The zoom is the ratio between the differences from the center
         // to the origins:
         // centerX - originX = ( centerX - originX0 ) * zoomX
@@ -4719,29 +4713,6 @@ dwv.html.Layer = function(name)
      */
     this.translate = function(tx,ty)
     {
-        // check translate value
-        if( zoom.x >= 1 ) { 
-            if( (origin.x + tx) < -1 * (canvas.width * zoom.x) + canvas.width ||
-                (origin.x + tx) > 0 ) {
-                return;
-            }
-        } else {
-            if( (origin.x + tx) > -1 * (canvas.width * zoom.x) + canvas.width ||
-                (origin.x + tx) < 0 ) {
-                return;
-            }
-        }
-        if( zoom.y >= 1 ) { 
-            if( (origin.y + ty) < -1 * (canvas.height * zoom.y) + canvas.height ||
-                (origin.y + ty) > 0 ) {
-                return;
-            }
-        } else {
-            if( (origin.y + ty) > -1 * (canvas.height * zoom.y) + canvas.height ||
-                (origin.y + ty) < 0 ) {
-                return;
-            }
-        }
         // new origin
         origin.x += tx * zoom.x;
         origin.y += ty * zoom.y;
@@ -8979,6 +8950,8 @@ dwv.tool.Draw = function (app)
             command.execute();
             // save it in undo stack
             app.getUndoStack().add(command);
+            // make shape group draggable
+            shape.getParent().draggable(true);
         }
         // reset flag
         started = false;
@@ -9036,6 +9009,44 @@ dwv.tool.Draw = function (app)
      */
     this.display = function(bool){
         dwv.gui.displayDrawHtml(bool);
+        var shapes = null;
+        if ( bool ) {
+            shapes = app.getKineticLayer().find('.final');
+            shapes.each( function (shape) {
+                // mouse over styling
+                shape.on('mouseover', function () {
+                    if ( this.getLayer() ) {
+                        document.body.style.cursor = 'pointer';
+                        this.getLayer().draw();
+                    }
+                });
+                // mouse out styling
+                shape.on('mouseout', function () {
+                    if ( this.getLayer() ) {
+                        document.body.style.cursor = 'default';
+                        this.getLayer().draw();
+                    }
+                });
+                // drag
+                shape.getParent().draggable(true);
+            });
+        }
+        else {
+            // disable if still active
+            if ( shapeEditor.isActive() ) {
+                shapeEditor.disable();
+            }
+            // remove mouse style
+            shapes = app.getKineticLayer().find('.final');
+            shapes.each( function (shape) {
+                // mouse over styling
+                shape.off('mouseover');
+                // mouse out styling
+                shape.off('mouseout');
+                // drag
+                shape.getParent().draggable(false);
+            });
+        }
     };
 
 }; // Draw class
@@ -9176,7 +9187,6 @@ dwv.tool.ShapeEditor = function ()
         anchors.each( function (anchor) {
             anchor.visible(true);
         });
-        shape.getParent().draggable(true);
         shape.getLayer().draw();
     };
     
@@ -9190,7 +9200,6 @@ dwv.tool.ShapeEditor = function ()
         anchors.each( function (anchor) {
             anchor.visible(false);
         });
-        shape.getParent().draggable(false);
         shape.getLayer().draw();
         shape = null;
     };
