@@ -62,7 +62,6 @@ dwv.tool.ShapeEditor = function ()
         anchors.each( function (anchor) {
             anchor.visible(true);
         });
-        shape.getParent().draggable(true);
         shape.getLayer().draw();
     };
     
@@ -76,7 +75,6 @@ dwv.tool.ShapeEditor = function ()
         anchors.each( function (anchor) {
             anchor.visible(false);
         });
-        shape.getParent().draggable(false);
         shape.getLayer().draw();
         shape = null;
     };

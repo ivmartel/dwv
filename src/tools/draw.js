@@ -191,6 +191,8 @@ dwv.tool.Draw = function (app)
             command.execute();
             // save it in undo stack
             app.getUndoStack().add(command);
+            // make shape group draggable
+            shape.getParent().draggable(true);
         }
         // reset flag
         started = false;
@@ -248,6 +250,44 @@ dwv.tool.Draw = function (app)
      */
     this.display = function(bool){
         dwv.gui.displayDrawHtml(bool);
+        var shapes = null;
+        if ( bool ) {
+            shapes = app.getKineticLayer().find('.final');
+            shapes.each( function (shape) {
+                // mouse over styling
+                shape.on('mouseover', function () {
+                    if ( this.getLayer() ) {
+                        document.body.style.cursor = 'pointer';
+                        this.getLayer().draw();
+                    }
+                });
+                // mouse out styling
+                shape.on('mouseout', function () {
+                    if ( this.getLayer() ) {
+                        document.body.style.cursor = 'default';
+                        this.getLayer().draw();
+                    }
+                });
+                // drag
+                shape.getParent().draggable(true);
+            });
+        }
+        else {
+            // disable if still active
+            if ( shapeEditor.isActive() ) {
+                shapeEditor.disable();
+            }
+            // remove mouse style
+            shapes = app.getKineticLayer().find('.final');
+            shapes.each( function (shape) {
+                // mouse over styling
+                shape.off('mouseover');
+                // mouse out styling
+                shape.off('mouseout');
+                // drag
+                shape.getParent().draggable(false);
+            });
+        }
     };
 
 }; // Draw class

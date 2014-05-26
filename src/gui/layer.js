@@ -127,12 +127,6 @@ dwv.html.Layer = function(name)
      */
     this.zoom = function(newZoomX,newZoomY,centerX,centerY)
     {
-        // check zoom value
-        if( newZoomX <= 0.1 || newZoomX >= 10 ||
-            newZoomY <= 0.1 || newZoomY >= 10 ) {
-            return;
-        }
-        
         // The zoom is the ratio between the differences from the center
         // to the origins:
         // centerX - originX = ( centerX - originX0 ) * zoomX
@@ -158,29 +152,6 @@ dwv.html.Layer = function(name)
      */
     this.translate = function(tx,ty)
     {
-        // check translate value
-        if( zoom.x >= 1 ) { 
-            if( (origin.x + tx) < -1 * (canvas.width * zoom.x) + canvas.width ||
-                (origin.x + tx) > 0 ) {
-                return;
-            }
-        } else {
-            if( (origin.x + tx) > -1 * (canvas.width * zoom.x) + canvas.width ||
-                (origin.x + tx) < 0 ) {
-                return;
-            }
-        }
-        if( zoom.y >= 1 ) { 
-            if( (origin.y + ty) < -1 * (canvas.height * zoom.y) + canvas.height ||
-                (origin.y + ty) > 0 ) {
-                return;
-            }
-        } else {
-            if( (origin.y + ty) > -1 * (canvas.height * zoom.y) + canvas.height ||
-                (origin.y + ty) < 0 ) {
-                return;
-            }
-        }
         // new origin
         origin.x += tx * zoom.x;
         origin.y += ty * zoom.y;
