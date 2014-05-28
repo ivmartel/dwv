@@ -48,7 +48,14 @@ dwv.tool.DrawShapeCommand = function (shape, name, app)
         app.getKineticLayer().draw();
     };
     this.undo = function () {
+        // remove anchors
+        var anchors = shape.getLayer().find('.anchor');
+        anchors.each( function (anchor) {
+            anchor.visible(false);
+        });
+        // remove shape
         shape.remove();
+        // draw
         app.getKineticLayer().draw();
     };
 
@@ -192,7 +199,7 @@ dwv.tool.Draw = function (app)
             // save it in undo stack
             app.getUndoStack().add(command);
             // make shape group draggable
-            shape.getParent().draggable(true);
+            setShapeOn(shape);
         }
         // reset flag
         started = false;
@@ -253,42 +260,104 @@ dwv.tool.Draw = function (app)
         var shapes = null;
         if ( bool ) {
             shapes = app.getKineticLayer().find('.final');
-            shapes.each( function (shape) {
-                // mouse over styling
-                shape.on('mouseover', function () {
-                    if ( this.getLayer() ) {
-                        document.body.style.cursor = 'pointer';
-                        this.getLayer().draw();
-                    }
-                });
-                // mouse out styling
-                shape.on('mouseout', function () {
-                    if ( this.getLayer() ) {
-                        document.body.style.cursor = 'default';
-                        this.getLayer().draw();
-                    }
-                });
-                // drag
-                shape.getParent().draggable(true);
-            });
+            shapes.each( function (shape){ setShapeOn( shape ); });
         }
         else {
             // disable if still active
             if ( shapeEditor.isActive() ) {
                 shapeEditor.disable();
             }
+            document.body.style.cursor = 'default';
+            app.getKineticLayer().draw();
             // remove mouse style
             shapes = app.getKineticLayer().find('.final');
-            shapes.each( function (shape) {
-                // mouse over styling
-                shape.off('mouseover');
-                // mouse out styling
-                shape.off('mouseout');
-                // drag
-                shape.getParent().draggable(false);
-            });
+            shapes.each( function (shape){ setShapeOff( shape ); });
         }
     };
+    
+    function setShapeOff( shape ) {
+        // mouse over styling
+        shape.off('mouseover');
+        // mouse out styling
+        shape.off('mouseout');
+        // drag
+        shape.getParent().draggable(false);
+    }
+
+    var trashText = new Kinetic.Text({
+        x: 256,
+        y: 10,
+        fontSize: 13,
+        fontFamily: 'Calibri',
+        fill: 'tomato',
+        text: 'TRASH'
+    });
+
+    function setShapeOn( shape ) {
+        // mouse over styling
+        shape.on('mouseover', function () {
+            if ( this.getLayer() ) {
+                document.body.style.cursor = 'pointer';
+                this.getLayer().draw();
+            }
+        });
+        // mouse out styling
+        shape.on('mouseout', function () {
+            if ( this.getLayer() ) {
+                document.body.style.cursor = 'default';
+                this.getLayer().draw();
+            }
+        });
+
+        var group = shape.getParent();
+            
+        // delete?
+        var stagee = app.getKineticStage();
+        trashText.x( 256 - stagee.offset().x );
+        trashText.y( stagee.offset().y + 20 );
+        //console.log( 'trash: '+trashText.x()+', '+trashText.y());
+        
+        group.on('dragstart', function () {
+            app.getKineticLayer().add( trashText );
+            app.getKineticLayer().draw();
+        });
+        group.on('dragmove', function (event) {
+            var stage = app.getKineticStage();
+            var ev = { 'x': (event.evt.offsetX - stage.offset().x) / stage.scale().x,
+                    'y': (event.evt.offsetY - stage.offset().y) / stage.scale().y};
+            //console.log( 'ev: '+ev.x+', '+ev.y);
+            if ( Math.abs( ev.x - trashText.x() ) < 20 &&
+                    Math.abs( ev.y - trashText.y() ) < 10   ) {
+                trashText.fontSize('15');
+                trashText.fill('red');
+                app.getKineticLayer().draw();
+            }
+            else {
+                trashText.fontSize('13');
+                trashText.fill('tomato');
+                app.getKineticLayer().draw();
+            }
+        });
+        group.on('dragend', function (event) {
+            var stage = app.getKineticStage();
+            var ev = { 'x': (event.evt.offsetX - stage.offset().x) / stage.scale().x,
+                    'y': (event.evt.offsetY - stage.offset().y) / stage.scale().y};
+            if ( Math.abs( ev.x - trashText.x() ) < 20 &&
+                    Math.abs( ev.y - trashText.y() ) < 10   ) {
+                if ( shapeEditor.isActive() ) {
+                    shapeEditor.disable();
+                }
+                document.body.style.cursor = 'default';
+                group.remove();
+                setShapeOff( shape );
+            }
+            trashText.remove();
+            app.getKineticLayer().draw();
+        });
+        // drag
+        group.draggable(true);
+    }
+
 
 }; // Draw class
 
