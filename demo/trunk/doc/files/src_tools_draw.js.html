@@ -248,7 +248,14 @@ dwv.tool.DrawShapeCommand = function (shape, name, app)
         app.getKineticLayer().draw();
     };
     this.undo = function () {
+        // remove anchors
+        var anchors = shape.getLayer().find(&#x27;.anchor&#x27;);
+        anchors.each( function (anchor) {
+            anchor.visible(false);
+        });
+        // remove shape
         shape.remove();
+        // draw
         app.getKineticLayer().draw();
     };
 
@@ -392,7 +399,7 @@ dwv.tool.Draw = function (app)
             // save it in undo stack
             app.getUndoStack().add(command);
             // make shape group draggable
-            shape.getParent().draggable(true);
+            setShapeOn(shape);
         }
         // reset flag
         started = false;
@@ -453,42 +460,104 @@ dwv.tool.Draw = function (app)
         var shapes = null;
         if ( bool ) {
             shapes = app.getKineticLayer().find(&#x27;.final&#x27;);
-            shapes.each( function (shape) {
-                // mouse over styling
-                shape.on(&#x27;mouseover&#x27;, function () {
-                    if ( this.getLayer() ) {
-                        document.body.style.cursor = &#x27;pointer&#x27;;
-                        this.getLayer().draw();
-                    }
-                });
-                // mouse out styling
-                shape.on(&#x27;mouseout&#x27;, function () {
-                    if ( this.getLayer() ) {
-                        document.body.style.cursor = &#x27;default&#x27;;
-                        this.getLayer().draw();
-                    }
-                });
-                // drag
-                shape.getParent().draggable(true);
-            });
+            shapes.each( function (shape){ setShapeOn( shape ); });
         }
         else {
             // disable if still active
             if ( shapeEditor.isActive() ) {
                 shapeEditor.disable();
             }
+            document.body.style.cursor = &#x27;default&#x27;;
+            app.getKineticLayer().draw();
             // remove mouse style
             shapes = app.getKineticLayer().find(&#x27;.final&#x27;);
-            shapes.each( function (shape) {
-                // mouse over styling
-                shape.off(&#x27;mouseover&#x27;);
-                // mouse out styling
-                shape.off(&#x27;mouseout&#x27;);
-                // drag
-                shape.getParent().draggable(false);
-            });
+            shapes.each( function (shape){ setShapeOff( shape ); });
         }
     };
+    
+    function setShapeOff( shape ) {
+        // mouse over styling
+        shape.off(&#x27;mouseover&#x27;);
+        // mouse out styling
+        shape.off(&#x27;mouseout&#x27;);
+        // drag
+        shape.getParent().draggable(false);
+    }
+
+    var trashText = new Kinetic.Text({
+        x: 256,
+        y: 10,
+        fontSize: 13,
+        fontFamily: &#x27;Calibri&#x27;,
+        fill: &#x27;tomato&#x27;,
+        text: &#x27;TRASH&#x27;
+    });
+
+    function setShapeOn( shape ) {
+        // mouse over styling
+        shape.on(&#x27;mouseover&#x27;, function () {
+            if ( this.getLayer() ) {
+                document.body.style.cursor = &#x27;pointer&#x27;;
+                this.getLayer().draw();
+            }
+        });
+        // mouse out styling
+        shape.on(&#x27;mouseout&#x27;, function () {
+            if ( this.getLayer() ) {
+                document.body.style.cursor = &#x27;default&#x27;;
+                this.getLayer().draw();
+            }
+        });
+
+        var group = shape.getParent();
+            
+        // delete?
+        var stagee = app.getKineticStage();
+        trashText.x( 256 - stagee.offset().x );
+        trashText.y( stagee.offset().y + 20 );
+        //console.log( &#x27;trash: &#x27;+trashText.x()+&#x27;, &#x27;+trashText.y());
+        
+        group.on(&#x27;dragstart&#x27;, function () {
+            app.getKineticLayer().add( trashText );
+            app.getKineticLayer().draw();
+        });
+        group.on(&#x27;dragmove&#x27;, function (event) {
+            var stage = app.getKineticStage();
+            var ev = { &#x27;x&#x27;: (event.evt.offsetX - stage.offset().x) / stage.scale().x,
+                    &#x27;y&#x27;: (event.evt.offsetY - stage.offset().y) / stage.scale().y};
+            //console.log( &#x27;ev: &#x27;+ev.x+&#x27;, &#x27;+ev.y);
+            if ( Math.abs( ev.x - trashText.x() ) &lt; 20 &amp;&amp;
+                    Math.abs( ev.y - trashText.y() ) &lt; 10   ) {
+                trashText.fontSize(&#x27;15&#x27;);
+                trashText.fill(&#x27;red&#x27;);
+                app.getKineticLayer().draw();
+            }
+            else {
+                trashText.fontSize(&#x27;13&#x27;);
+                trashText.fill(&#x27;tomato&#x27;);
+                app.getKineticLayer().draw();
+            }
+        });
+        group.on(&#x27;dragend&#x27;, function (event) {
+            var stage = app.getKineticStage();
+            var ev = { &#x27;x&#x27;: (event.evt.offsetX - stage.offset().x) / stage.scale().x,
+                    &#x27;y&#x27;: (event.evt.offsetY - stage.offset().y) / stage.scale().y};
+            if ( Math.abs( ev.x - trashText.x() ) &lt; 20 &amp;&amp;
+                    Math.abs( ev.y - trashText.y() ) &lt; 10   ) {
+                if ( shapeEditor.isActive() ) {
+                    shapeEditor.disable();
+                }
+                document.body.style.cursor = &#x27;default&#x27;;
+                group.remove();
+                setShapeOff( shape );
+            }
+            trashText.remove();
+            app.getKineticLayer().draw();
+        });
+        // drag
+        group.draggable(true);
+    }
+
 
 }; // Draw class
 

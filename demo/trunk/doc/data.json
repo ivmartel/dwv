@@ -1309,7 +1309,7 @@
             "module": "tool",
             "namespace": "dwv.tool",
             "file": "src/tools/draw.js",
-            "line": 62,
+            "line": 69,
             "description": "Drawing tool.",
             "is_constructor": 1,
             "params": [
@@ -6557,7 +6557,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 71,
+            "line": 78,
             "description": "Closure to self: to be used by event handlers.",
             "itemtype": "property",
             "name": "self",
@@ -6570,7 +6570,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 78,
+            "line": 85,
             "description": "Interaction start flag.",
             "itemtype": "property",
             "name": "started",
@@ -6581,7 +6581,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 85,
+            "line": 92,
             "description": "Draw command.",
             "itemtype": "property",
             "name": "command",
@@ -6594,7 +6594,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 93,
+            "line": 100,
             "description": "Drawing style.",
             "itemtype": "property",
             "name": "style",
@@ -6605,7 +6605,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 99,
+            "line": 106,
             "description": "Shape name.",
             "itemtype": "property",
             "name": "shapeName",
@@ -6616,7 +6616,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 105,
+            "line": 112,
             "description": "List of points",
             "itemtype": "property",
             "name": "points",
@@ -6627,7 +6627,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 116,
+            "line": 123,
             "description": "Handle mouse down event.",
             "itemtype": "method",
             "name": "mousedown",
@@ -6644,7 +6644,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 155,
+            "line": 162,
             "description": "Handle mouse move event.",
             "itemtype": "method",
             "name": "mousemove",
@@ -6661,7 +6661,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 179,
+            "line": 186,
             "description": "Handle mouse up event.",
             "itemtype": "method",
             "name": "mouseup",
@@ -6678,7 +6678,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 201,
+            "line": 208,
             "description": "Handle mouse out event.",
             "itemtype": "method",
             "name": "mouseout",
@@ -6695,7 +6695,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 210,
+            "line": 217,
             "description": "Handle touch start event.",
             "itemtype": "method",
             "name": "touchstart",
@@ -6712,7 +6712,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 219,
+            "line": 226,
             "description": "Handle touch move event.",
             "itemtype": "method",
             "name": "touchmove",
@@ -6729,7 +6729,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 228,
+            "line": 235,
             "description": "Handle touch end event.",
             "itemtype": "method",
             "name": "touchend",
@@ -6746,7 +6746,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 237,
+            "line": 244,
             "description": "Handle key down event.",
             "itemtype": "method",
             "name": "keydown",
@@ -6763,7 +6763,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 246,
+            "line": 253,
             "description": "Enable the tool.",
             "itemtype": "method",
             "name": "enable",
@@ -6780,7 +6780,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 295,
+            "line": 364,
             "description": "Help for this tool.",
             "itemtype": "method",
             "name": "getHelp",
@@ -6794,7 +6794,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 315,
+            "line": 384,
             "description": "Set the line color of the drawing.",
             "itemtype": "method",
             "name": "setLineColour",
@@ -6811,7 +6811,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 326,
+            "line": 395,
             "description": "Set the shape name of the drawing.",
             "itemtype": "method",
             "name": "setShapeName",
@@ -6828,7 +6828,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 341,
+            "line": 410,
             "description": "Check if the shape is in the shape list.",
             "itemtype": "method",
             "name": "hasShape",
@@ -6845,7 +6845,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 350,
+            "line": 419,
             "description": "Initialise the tool.",
             "itemtype": "method",
             "name": "init",
@@ -9561,7 +9561,7 @@
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/tools/draw.js:295"
+            "line": " src/tools/draw.js:364"
         },
         {
             "message": "replacing incorrect tag: returns with return",
