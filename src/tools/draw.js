@@ -61,6 +61,94 @@ dwv.tool.DrawShapeCommand = function (shape, name, app)
 
 }; // DrawShapeCommand class
 
+/**
+ * Move shape command.
+ * @class MoveShapeCommand
+ * @namespace dwv.tool
+ * @constructor
+ */
+dwv.tool.MoveShapeCommand = function (group, shape, name, translation, app)
+{
+    /**
+     * Command name.
+     * @property name
+     * @private
+     * @type String
+     */
+    var _name = "Move-"+name;
+    /**
+     * Get the command name.
+     * @method getName
+     * @return {String} The command name.
+     */
+    this.getName = function() { return _name; };
+
+    /**
+     * Execute the command.
+     * @method execute
+     */
+    this.execute = function()
+    {
+        group.x( group.x() + translation.x );
+        group.y( group.y() + translation.y );
+        // draw
+        app.getKineticLayer().draw();
+
+        //app.getToolBox().getSelectedTool().setShapeOn(shape);
+    };
+    this.undo = function () {
+        group.x( group.x() - translation.x );
+        group.y( group.y() - translation.y );
+        // draw
+        app.getKineticLayer().draw();
+    };
+
+}; // MoveShapeCommand class
+
+/**
+ * Delete shape command.
+ * @class DeleteShapeCommand
+ * @namespace dwv.tool
+ * @constructor
+ */
+dwv.tool.DeleteShapeCommand = function (group, shape, name, app, translation)
+{
+    /**
+     * Command name.
+     * @property name
+     * @private
+     * @type String
+     */
+    var _name = "Delete-"+name;
+    /**
+     * Get the command name.
+     * @method getName
+     * @return {String} The command name.
+     */
+    this.getName = function() { return _name; };
+
+    /**
+     * Execute the command.
+     * @method execute
+     */
+    this.execute = function()
+    {
+        group.remove();
+    };
+    this.undo = function () {
+        // possible translation before deletion
+        if ( typeof(translation) !== undefined ) {
+            group.x( group.x() - translation.x );
+            group.y( group.y() - translation.y );
+        }
+        
+        app.getKineticLayer().add(group);
+        // draw
+        app.getKineticLayer().draw();
+    };
+
+}; // DeleteShapeCommand class
+
 // List of colors
 dwv.tool.colors = [
     "Yellow", "Red", "White", "Green", "Blue", "Lime", "Fuchsia", "Black"
@@ -199,7 +287,7 @@ dwv.tool.Draw = function (app)
             // save it in undo stack
             app.getUndoStack().add(command);
             // make shape group draggable
-            setShapeOn(shape);
+            self.setShapeOn(shape);
         }
         // reset flag
         started = false;
@@ -260,7 +348,7 @@ dwv.tool.Draw = function (app)
         var shapes = null;
         if ( bool ) {
             shapes = app.getKineticLayer().find('.final');
-            shapes.each( function (shape){ setShapeOn( shape ); });
+            shapes.each( function (shape){ self.setShapeOn( shape ); });
         }
         else {
             // disable if still active
@@ -293,7 +381,7 @@ dwv.tool.Draw = function (app)
         text: 'TRASH'
     });
 
-    function setShapeOn( shape ) {
+    this.setShapeOn = function ( shape ) {
         // mouse over styling
         shape.on('mouseover', function () {
             if ( this.getLayer() ) {
@@ -312,17 +400,20 @@ dwv.tool.Draw = function (app)
         var group = shape.getParent();
             
         // delete?
-        var stagee = app.getKineticStage();
-        trashText.x( 256 - stagee.offset().x );
-        trashText.y( stagee.offset().y + 20 );
+        var stage = app.getKineticStage();
+        trashText.x( 256 - stage.offset().x );
+        trashText.y( stage.offset().y + 20 );
         //console.log( 'trash: '+trashText.x()+', '+trashText.y());
         
-        group.on('dragstart', function () {
+        var dragStartPos = null;
+        
+        group.on('dragstart', function (event) {
+            dragStartPos = { 'x': (event.evt.offsetX - stage.offset().x) / stage.scale().x,
+                    'y': (event.evt.offsetY - stage.offset().y) / stage.scale().y};
             app.getKineticLayer().add( trashText );
             app.getKineticLayer().draw();
         });
         group.on('dragmove', function (event) {
-            var stage = app.getKineticStage();
             var ev = { 'x': (event.evt.offsetX - stage.offset().x) / stage.scale().x,
                     'y': (event.evt.offsetY - stage.offset().y) / stage.scale().y};
             //console.log( 'ev: '+ev.x+', '+ev.y);
@@ -342,21 +433,33 @@ dwv.tool.Draw = function (app)
             var stage = app.getKineticStage();
             var ev = { 'x': (event.evt.offsetX - stage.offset().x) / stage.scale().x,
                     'y': (event.evt.offsetY - stage.offset().y) / stage.scale().y};
+            // delete case
             if ( Math.abs( ev.x - trashText.x() ) < 20 &&
                     Math.abs( ev.y - trashText.y() ) < 10   ) {
                 if ( shapeEditor.isActive() ) {
                     shapeEditor.disable();
                 }
                 document.body.style.cursor = 'default';
-                group.remove();
                 setShapeOff( shape );
+                var delTranslation = {'x': ev.x - dragStartPos.x, 
+                        'y': ev.y - dragStartPos.y};
+                var delcmd = new dwv.tool.DeleteShapeCommand(group, shape, "shape", app, delTranslation);
+                delcmd.execute();
+                app.getUndoStack().add(delcmd);
+            }
+            else {
+                // save drag move
+                var translation = {'x': ev.x - dragStartPos.x, 
+                        'y': ev.y - dragStartPos.y};
+                var mvcmd = new dwv.tool.MoveShapeCommand(group, shape, "shape", translation, app);
+                app.getUndoStack().add(mvcmd);
             }
             trashText.remove();
             app.getKineticLayer().draw();
         });
         // drag
         group.draggable(true);
-    }
+    };
 
 
 }; // Draw class
