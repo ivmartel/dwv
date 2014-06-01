@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>dwv.tool.filter.Threshold - dwv</title>
+    <title>dwv.tool.DeleteShapeCommand - dwv</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
     <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
@@ -198,7 +198,7 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-                        <h1>dwv.tool.filter.Threshold Class</h1>
+                        <h1>dwv.tool.DeleteShapeCommand Class</h1>
 <div class="box meta">
     
 
@@ -206,7 +206,7 @@
 
     
         <div class="foundat">
-            Defined in: <a href="../files/src_tools_filter.js.html#l138"><code>src&#x2F;tools&#x2F;filter.js:138</code></a>
+            Defined in: <a href="../files/src_tools_draw.js.html#l108"><code>src&#x2F;tools&#x2F;draw.js:108</code></a>
         </div>
     
 
@@ -222,28 +222,18 @@
 
 
 <div class="box intro">
-    <p>Threshold filter tool.</p>
+    <p>Delete shape command.</p>
 
 </div>
 
 
     <div class="constructor">
         <h2>Constructor</h2>
-        <div id="method_dwv.tool.filter.Threshold" class="method item">
-    <h3 class="name"><code>dwv.tool.filter.Threshold</code></h3>
+        <div id="method_dwv.tool.DeleteShapeCommand" class="method item">
+    <h3 class="name"><code>dwv.tool.DeleteShapeCommand</code></h3>
 
     
-        <div class="args">
-            <span class="paren">(</span><ul class="args-list inline commas">
-            
-                <li class="arg">
-                    
-                        <code>app</code>
-                    
-                </li>
-            
-            </ul><span class="paren">)</span>
-        </div>
+        <span class="paren">()</span>
     
 
     
@@ -271,7 +261,7 @@
             
         
         
-        <a href="../files/src_tools_filter.js.html#l138"><code>src&#x2F;tools&#x2F;filter.js:138</code></a>
+        <a href="../files/src_tools_draw.js.html#l108"><code>src&#x2F;tools&#x2F;draw.js:108</code></a>
         
         </p>
 
@@ -285,30 +275,6 @@
         
     </div>
 
-    
-        <div class="params">
-            <h4>Parameters:</h4>
-
-            <ul class="params-list">
-            
-                <li class="param">
-                    
-                        <code class="param-name">app</code>
-                        <span class="type">Object</span>
-                    
-
-                    
-
-                    <div class="param-description">
-                        <p>The associated application.</p>
-
-                    </div>
-
-                    
-                </li>
-            
-            </ul>
-        </div>
     
 
     
@@ -327,6 +293,8 @@
             <li class="api-class-tab methods"><a href="#methods">Methods</a></li>
         
         
+            <li class="api-class-tab properties"><a href="#properties">Properties</a></li>
+        
         
         
     </ul>
@@ -342,14 +310,31 @@
                     <ul class="index-list methods">
                         
                             <li class="index-item method">
-                                <a href="#method_enable">enable</a>
+                                <a href="#method_execute">execute</a>
 
                                 
                                 
                             </li>
                         
                             <li class="index-item method">
-                                <a href="#method_run">run</a>
+                                <a href="#method_getName">getName</a>
+
+                                
+                                
+                            </li>
+                        
+                    </ul>
+                </div>
+            
+
+            
+                <div class="index-section properties">
+                    <h3>Properties</h3>
+
+                    <ul class="index-list properties">
+                        
+                            <li class="index-item property private">
+                                <a href="#property_name">name</a>
 
                                 
                                 
@@ -362,8 +347,6 @@
             
 
             
-
-            
         </div>
 
         
@@ -371,21 +354,11 @@
                 <h2 class="off-left">Methods</h2>
 
                 
-                    <div id="method_enable" class="method item">
-    <h3 class="name"><code>enable</code></h3>
+                    <div id="method_execute" class="method item">
+    <h3 class="name"><code>execute</code></h3>
 
     
-        <div class="args">
-            <span class="paren">(</span><ul class="args-list inline commas">
-            
-                <li class="arg">
-                    
-                        <code>bool</code>
-                    
-                </li>
-            
-            </ul><span class="paren">)</span>
-        </div>
+        <span class="paren">()</span>
     
 
     
@@ -413,7 +386,7 @@
             
         
         
-        <a href="../files/src_tools_filter.js.html#l147"><code>src&#x2F;tools&#x2F;filter.js:147</code></a>
+        <a href="../files/src_tools_draw.js.html#l130"><code>src&#x2F;tools&#x2F;draw.js:130</code></a>
         
         </p>
 
@@ -424,34 +397,10 @@
     </div>
 
     <div class="description">
-        <p>Enable the filter.</p>
+        <p>Execute the command.</p>
 
     </div>
 
-    
-        <div class="params">
-            <h4>Parameters:</h4>
-
-            <ul class="params-list">
-            
-                <li class="param">
-                    
-                        <code class="param-name">bool</code>
-                        <span class="type">Boolean</span>
-                    
-
-                    
-
-                    <div class="param-description">
-                        <p>Flag to enable or not.</p>
-
-                    </div>
-
-                    
-                </li>
-            
-            </ul>
-        </div>
     
 
     
@@ -460,23 +409,17 @@
 </div>
 
                 
-                    <div id="method_run" class="method item">
-    <h3 class="name"><code>run</code></h3>
+                    <div id="method_getName" class="method item">
+    <h3 class="name"><code>getName</code></h3>
 
     
-        <div class="args">
-            <span class="paren">(</span><ul class="args-list inline commas">
-            
-                <li class="arg">
-                    
-                        <code>args</code>
-                    
-                </li>
-            
-            </ul><span class="paren">)</span>
-        </div>
+        <span class="paren">()</span>
     
 
+    
+        <span class="returns-inline">
+            <span class="type">String</span>
+        </span>
     
 
     
@@ -502,7 +445,7 @@
             
         
         
-        <a href="../files/src_tools_filter.js.html#l163"><code>src&#x2F;tools&#x2F;filter.js:163</code></a>
+        <a href="../files/src_tools_draw.js.html#l123"><code>src&#x2F;tools&#x2F;draw.js:123</code></a>
         
         </p>
 
@@ -513,36 +456,26 @@
     </div>
 
     <div class="description">
-        <p>Run the filter.</p>
+        <p>Get the command name.</p>
 
     </div>
 
     
-        <div class="params">
-            <h4>Parameters:</h4>
 
-            <ul class="params-list">
-            
-                <li class="param">
-                    
-                        <code class="param-name">args</code>
-                        <span class="type">Mixed</span>
-                    
-
-                    
-
-                    <div class="param-description">
-                        <p>The filter arguments.</p>
-
-                    </div>
-
-                    
-                </li>
-            
-            </ul>
-        </div>
     
+        <div class="returns">
+            <h4>Returns:</h4>
 
+            <div class="returns-description">
+                
+                    
+                        <span class="type">String</span>:
+                    
+                    <p>The command name.</p>
+
+                
+            </div>
+        </div>
     
 
     
@@ -552,6 +485,59 @@
             </div>
         
 
+        
+            <div id="properties" class="api-class-tabpanel">
+                <h2 class="off-left">Properties</h2>
+
+                
+                    <div id="property_name" class="property item private">
+    <h3 class="name"><code>name</code></h3>
+    <span class="type">String</span>
+
+    
+
+    
+        <span class="flag private">private</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_tools_draw.js.html#l116"><code>src&#x2F;tools&#x2F;draw.js:116</code></a>
+        
+        </p>
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Command name.</p>
+
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+            </div>
         
 
         
