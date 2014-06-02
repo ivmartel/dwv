@@ -9016,8 +9016,8 @@ dwv.tool.Draw = function (app)
         if ( kshape ) {
             var group = kshape.getParent();
             var draw = group.find(".shape")[0];
-            
-            if( draw ) {
+            // activate editor if click on other shape
+            if( draw && draw !== shapeEditor.getShape() ) { 
                 // disable previous edition
                 shapeEditor.disable();
                 // set new edited shape
@@ -9523,26 +9523,26 @@ dwv.tool.ShapeEditor = function ()
             draggable: true,
             visible: false
         });
-        // dragmove listener
+        // drag move listener
         anchor.on('dragmove', function () {
             updateMethod(shape, this);
             this.getLayer().draw();
         });
-        // mousedown listener
+        // mouse down listener
         anchor.on('mousedown touchstart', function () {
             this.moveToTop();
         });
-        // dragend listener
+        // drag end listener
         anchor.on('dragend', function () {
             this.getLayer().draw();
         });
-        // hover styling
+        // mouse over styling
         anchor.on('mouseover', function () {
             document.body.style.cursor = 'pointer';
             this.stroke('#ddd');
             this.getLayer().draw();
         });
-        // not hover styling
+        // mouse out styling
         anchor.on('mouseout', function () {
             document.body.style.cursor = 'default';
             this.stroke('#999');

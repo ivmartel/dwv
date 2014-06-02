@@ -359,26 +359,26 @@ dwv.tool.ShapeEditor = function ()
             draggable: true,
             visible: false
         });
-        // dragmove listener
+        // drag move listener
         anchor.on(&#x27;dragmove&#x27;, function () {
             updateMethod(shape, this);
             this.getLayer().draw();
         });
-        // mousedown listener
+        // mouse down listener
         anchor.on(&#x27;mousedown touchstart&#x27;, function () {
             this.moveToTop();
         });
-        // dragend listener
+        // drag end listener
         anchor.on(&#x27;dragend&#x27;, function () {
             this.getLayer().draw();
         });
-        // hover styling
+        // mouse over styling
         anchor.on(&#x27;mouseover&#x27;, function () {
             document.body.style.cursor = &#x27;pointer&#x27;;
             this.stroke(&#x27;#ddd&#x27;);
             this.getLayer().draw();
         });
-        // not hover styling
+        // mouse out styling
         anchor.on(&#x27;mouseout&#x27;, function () {
             document.body.style.cursor = &#x27;default&#x27;;
             this.stroke(&#x27;#999&#x27;);
