@@ -257,8 +257,8 @@ dwv.tool.Draw = function (app)
         if ( kshape ) {
             var group = kshape.getParent();
             var draw = group.find(".shape")[0];
-            
-            if( draw ) {
+            // activate editor if click on other shape
+            if( draw && draw !== shapeEditor.getShape() ) { 
                 // disable previous edition
                 shapeEditor.disable();
                 // set new edited shape
