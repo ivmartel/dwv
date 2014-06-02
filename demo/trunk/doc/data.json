@@ -1313,7 +1313,7 @@
             "module": "tool",
             "namespace": "dwv.tool",
             "file": "src/tools/draw.js",
-            "line": 64,
+            "line": 51,
             "description": "Move shape command.",
             "is_constructor": 1
         },
@@ -1328,7 +1328,7 @@
             "module": "tool",
             "namespace": "dwv.tool",
             "file": "src/tools/draw.js",
-            "line": 108,
+            "line": 95,
             "description": "Delete shape command.",
             "is_constructor": 1
         },
@@ -1343,7 +1343,7 @@
             "module": "tool",
             "namespace": "dwv.tool",
             "file": "src/tools/draw.js",
-            "line": 157,
+            "line": 142,
             "description": "Drawing tool.",
             "is_constructor": 1,
             "params": [
@@ -6591,7 +6591,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 72,
+            "line": 59,
             "description": "Command name.",
             "itemtype": "property",
             "name": "name",
@@ -6604,7 +6604,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 79,
+            "line": 66,
             "description": "Get the command name.",
             "itemtype": "method",
             "name": "getName",
@@ -6618,7 +6618,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 86,
+            "line": 73,
             "description": "Execute the command.",
             "itemtype": "method",
             "name": "execute",
@@ -6628,7 +6628,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 116,
+            "line": 103,
             "description": "Command name.",
             "itemtype": "property",
             "name": "name",
@@ -6641,7 +6641,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 123,
+            "line": 110,
             "description": "Get the command name.",
             "itemtype": "method",
             "name": "getName",
@@ -6655,7 +6655,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 130,
+            "line": 117,
             "description": "Execute the command.",
             "itemtype": "method",
             "name": "execute",
@@ -6665,7 +6665,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 166,
+            "line": 151,
             "description": "Closure to self: to be used by event handlers.",
             "itemtype": "property",
             "name": "self",
@@ -6678,10 +6678,12 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 173,
+            "line": 158,
             "description": "Interaction start flag.",
             "itemtype": "property",
             "name": "started",
+            "access": "private",
+            "tagname": "",
             "type": "Boolean",
             "class": "dwv.tool.Draw",
             "module": "tool",
@@ -6689,7 +6691,20 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 180,
+            "line": 165,
+            "description": "Interaction just started flag.",
+            "itemtype": "property",
+            "name": "justStarted",
+            "access": "private",
+            "tagname": "",
+            "type": "Boolean",
+            "class": "dwv.tool.Draw",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/draw.js",
+            "line": 173,
             "description": "Draw command.",
             "itemtype": "property",
             "name": "command",
@@ -6702,7 +6717,33 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 188,
+            "line": 180,
+            "description": "Current shape.",
+            "itemtype": "property",
+            "name": "shape",
+            "access": "private",
+            "tagname": "",
+            "type": "Object",
+            "class": "dwv.tool.Draw",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/draw.js",
+            "line": 187,
+            "description": "Current shape group.",
+            "itemtype": "property",
+            "name": "shapeGroup",
+            "access": "private",
+            "tagname": "",
+            "type": "Object",
+            "class": "dwv.tool.Draw",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/draw.js",
+            "line": 195,
             "description": "Drawing style.",
             "itemtype": "property",
             "name": "style",
@@ -6713,7 +6754,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 194,
+            "line": 201,
             "description": "Shape name.",
             "itemtype": "property",
             "name": "shapeName",
@@ -6724,10 +6765,12 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 200,
-            "description": "List of points",
+            "line": 208,
+            "description": "List of points.",
             "itemtype": "property",
             "name": "points",
+            "access": "private",
+            "tagname": "",
             "type": "Array",
             "class": "dwv.tool.Draw",
             "module": "tool",
@@ -6735,7 +6778,33 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 211,
+            "line": 216,
+            "description": "Last selected point.",
+            "itemtype": "property",
+            "name": "lastPoint",
+            "access": "private",
+            "tagname": "",
+            "type": "Object",
+            "class": "dwv.tool.Draw",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/draw.js",
+            "line": 224,
+            "description": "Shape editor.",
+            "itemtype": "property",
+            "name": "shapeEditor",
+            "access": "private",
+            "tagname": "",
+            "type": "Object",
+            "class": "dwv.tool.Draw",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/draw.js",
+            "line": 244,
             "description": "Handle mouse down event.",
             "itemtype": "method",
             "name": "mousedown",
@@ -6752,7 +6821,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 250,
+            "line": 284,
             "description": "Handle mouse move event.",
             "itemtype": "method",
             "name": "mousemove",
@@ -6769,7 +6838,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 274,
+            "line": 318,
             "description": "Handle mouse up event.",
             "itemtype": "method",
             "name": "mouseup",
@@ -6786,7 +6855,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 296,
+            "line": 350,
             "description": "Handle mouse out event.",
             "itemtype": "method",
             "name": "mouseout",
@@ -6803,7 +6872,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 305,
+            "line": 359,
             "description": "Handle touch start event.",
             "itemtype": "method",
             "name": "touchstart",
@@ -6820,7 +6889,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 314,
+            "line": 368,
             "description": "Handle touch move event.",
             "itemtype": "method",
             "name": "touchmove",
@@ -6837,7 +6906,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 323,
+            "line": 377,
             "description": "Handle touch end event.",
             "itemtype": "method",
             "name": "touchend",
@@ -6854,7 +6923,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 332,
+            "line": 386,
             "description": "Handle key down event.",
             "itemtype": "method",
             "name": "keydown",
@@ -6871,7 +6940,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 341,
+            "line": 395,
             "description": "Enable the tool.",
             "itemtype": "method",
             "name": "enable",
@@ -6888,7 +6957,41 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 467,
+            "line": 419,
+            "description": "Set shape off properties.",
+            "itemtype": "method",
+            "name": "setShapeOff",
+            "params": [
+                {
+                    "name": "shape",
+                    "description": "The shape to set off.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.tool.Draw",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/draw.js",
+            "line": 433,
+            "description": "Set shape on properties.",
+            "itemtype": "method",
+            "name": "setShapeOn",
+            "params": [
+                {
+                    "name": "shape",
+                    "description": "The shape to set on.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.tool.Draw",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/draw.js",
+            "line": 538,
             "description": "Help for this tool.",
             "itemtype": "method",
             "name": "getHelp",
@@ -6902,7 +7005,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 487,
+            "line": 558,
             "description": "Set the line color of the drawing.",
             "itemtype": "method",
             "name": "setLineColour",
@@ -6919,7 +7022,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 498,
+            "line": 569,
             "description": "Set the shape name of the drawing.",
             "itemtype": "method",
             "name": "setShapeName",
@@ -6936,7 +7039,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 513,
+            "line": 584,
             "description": "Check if the shape is in the shape list.",
             "itemtype": "method",
             "name": "hasShape",
@@ -6953,7 +7056,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 522,
+            "line": 593,
             "description": "Initialise the tool.",
             "itemtype": "method",
             "name": "init",
@@ -7022,7 +7125,7 @@
         },
         {
             "file": "src/tools/editor.js",
-            "line": 82,
+            "line": 84,
             "description": "Create shape editor controls, i.e. the anchors.",
             "itemtype": "method",
             "name": "createControls",
@@ -7039,7 +7142,7 @@
         },
         {
             "file": "src/tools/editor.js",
-            "line": 129,
+            "line": 131,
             "description": "Create shape editor controls, i.e. the anchors.",
             "itemtype": "method",
             "name": "addAnchor",
@@ -7091,11 +7194,6 @@
                     "name": "style",
                     "description": "The drawing style.",
                     "type": "Style"
-                },
-                {
-                    "name": "isFinal",
-                    "description": "Flag to know if final or temporary shape.",
-                    "type": "Boolean"
                 }
             ],
             "class": "dwv.tool.Filter",
@@ -7103,7 +7201,7 @@
         },
         {
             "file": "src/tools/ellipse.js",
-            "line": 51,
+            "line": 50,
             "description": "Update an ellipse shape.",
             "itemtype": "method",
             "name": "UpdateEllipse",
@@ -7541,11 +7639,6 @@
                     "name": "style",
                     "description": "The drawing style.",
                     "type": "Style"
-                },
-                {
-                    "name": "isFinal",
-                    "description": "Flag to know if final or temporary shape.",
-                    "type": "Boolean"
                 }
             ],
             "class": "dwv.tool.Livewire",
@@ -7553,7 +7646,7 @@
         },
         {
             "file": "src/tools/line.js",
-            "line": 47,
+            "line": 46,
             "description": "Update a line shape.",
             "itemtype": "method",
             "name": "UpdateLine",
@@ -8001,11 +8094,6 @@
                     "name": "style",
                     "description": "The drawing style.",
                     "type": "Style"
-                },
-                {
-                    "name": "isFinal",
-                    "description": "Flag to know if final or temporary shape.",
-                    "type": "Boolean"
                 }
             ],
             "class": "dwv.tool",
@@ -8013,7 +8101,7 @@
         },
         {
             "file": "src/tools/rectangle.js",
-            "line": 49,
+            "line": 48,
             "description": "Update a rectangle shape.",
             "itemtype": "method",
             "name": "UpdateRect",
@@ -8050,11 +8138,6 @@
                     "name": "style",
                     "description": "The drawing style.",
                     "type": "Style"
-                },
-                {
-                    "name": "isFinal",
-                    "description": "Flag to know if final or temporary shape.",
-                    "type": "Boolean"
                 }
             ],
             "class": "dwv.tool",
@@ -8062,7 +8145,7 @@
         },
         {
             "file": "src/tools/roi.js",
-            "line": 74,
+            "line": 73,
             "description": "Update a roi shape.",
             "itemtype": "method",
             "name": "UpdateRoi",
@@ -9669,7 +9752,7 @@
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/tools/draw.js:467"
+            "line": " src/tools/draw.js:538"
         },
         {
             "message": "replacing incorrect tag: returns with return",

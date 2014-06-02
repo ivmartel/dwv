@@ -275,11 +275,13 @@ dwv.tool.ShapeEditor = function ()
      */
     this.disable = function () {
         isActive = false;
-        var anchors = shape.getLayer().find(&#x27;.anchor&#x27;);
-        anchors.each( function (anchor) {
-            anchor.visible(false);
-        });
-        shape.getLayer().draw();
+        if ( shape &amp;&amp; shape.getLayer() ) {
+            var anchors = shape.getLayer().find(&#x27;.anchor&#x27;);
+            anchors.each( function (anchor) {
+                anchor.visible(false);
+            });
+            shape.getLayer().draw();
+        }
         shape = null;
     };
     
