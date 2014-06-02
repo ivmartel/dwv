@@ -12,15 +12,14 @@ var Kinetic = Kinetic || {};
  * @static
  * @param {Array} points The points from which to extract the line.
  * @param {Style} style The drawing style.
- * @param {Boolean} isFinal Flag to know if final or temporary shape.
  */ 
-dwv.tool.RoiCreator = function (points, style, isFinal)
+dwv.tool.RoiCreator = function (points, style)
 {
     // physical shape
     var roi = new dwv.math.ROI();
     // sample points so that they are not too close 
     // to one another
-    if ( isFinal ) {
+    /*if ( isFinal ) {
         var size = points.length;
         var clean = [];
         if ( size > 0 ) {
@@ -35,7 +34,7 @@ dwv.tool.RoiCreator = function (points, style, isFinal)
             }
             points = clean;
         }
-    }
+    }*/
     // add input points to the ROI
     roi.addPoints(points);
     // points stored the kineticjs way
@@ -50,7 +49,7 @@ dwv.tool.RoiCreator = function (points, style, isFinal)
         points: arr,
         stroke: style.getLineColor(),
         strokeWidth: 2,
-        name: ( isFinal ? "final" : "temp" ),
+        name: "shape",
         closed: true
     });
     // hover styling

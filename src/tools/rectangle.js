@@ -12,9 +12,8 @@ var Kinetic = Kinetic || {};
  * @static
  * @param {Array} points The points from which to extract the rectangle.
  * @param {Style} style The drawing style.
- * @param {Boolean} isFinal Flag to know if final or temporary shape.
  */ 
-dwv.tool.RectangleCreator = function (points, style, isFinal)
+dwv.tool.RectangleCreator = function (points, style)
 {
     // physical shape
     var rectangle = new dwv.math.Rectangle(points[0], points[points.length-1]);
@@ -26,7 +25,7 @@ dwv.tool.RectangleCreator = function (points, style, isFinal)
         height: rectangle.getHeight(),
         stroke: style.getLineColor(),
         strokeWidth: 2,
-        name: ( isFinal ? "final" : "temp" )
+        name: "shape"
     });
     // hover styling
     krect.on('mouseover', function () {

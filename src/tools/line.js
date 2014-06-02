@@ -12,9 +12,8 @@ var Kinetic = Kinetic || {};
  * @static
  * @param {Array} points The points from which to extract the line.
  * @param {Style} style The drawing style.
- * @param {Boolean} isFinal Flag to know if final or temporary shape.
  */ 
-dwv.tool.LineCreator = function (points, style, isFinal)
+dwv.tool.LineCreator = function (points, style)
 {
     // physical object
     var line = new dwv.math.Line(points[0], points[points.length-1]);
@@ -24,7 +23,7 @@ dwv.tool.LineCreator = function (points, style, isFinal)
                  line.getEnd().getX(), line.getEnd().getY() ],
         stroke: style.getLineColor(),
         strokeWidth: 2,
-        name: ( isFinal ? "final" : "temp" )
+        name: "shape"
     });
     // hover styling
     kline.on('mouseover', function () {

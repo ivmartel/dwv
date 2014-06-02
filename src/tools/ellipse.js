@@ -12,9 +12,8 @@ var Kinetic = Kinetic || {};
  * @static
  * @param {Array} points The points from which to extract the ellipse.
  * @param {Style} style The drawing style.
- * @param {Boolean} isFinal Flag to know if final or temporary shape.
  */ 
-dwv.tool.EllipseCreator = function (points, style, isFinal)
+dwv.tool.EllipseCreator = function (points, style)
 {
     // calculate radius
     var a = Math.abs(points[0].getX() - points[points.length-1].getX());
@@ -28,7 +27,7 @@ dwv.tool.EllipseCreator = function (points, style, isFinal)
         radius: { x: ellipse.getA(), y: ellipse.getB() },
         stroke: style.getLineColor(),
         strokeWidth: 2,
-        name: ( isFinal ? "final" : "temp" )
+        name: "shape"
     });
     // hover styling
     kellipse.on('mouseover', function () {
