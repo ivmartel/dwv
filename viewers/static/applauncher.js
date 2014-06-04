@@ -16,10 +16,9 @@ $(document).ready( function()
     $("#openData").dialog({ position: 
         {my: "left top", at: "left top", of: "#pageMain"} });
     $("#toolbox").dialog({ position: 
-        {my: "left top+200", at: "left top", of: "#pageMain"} });
+        {my: "left top+160", at: "left top", of: "#pageMain"} });
     $("#history").dialog({ position: 
-        {my: "left top+370", at: "left top", of: "#pageMain"},
-        autoOpen: false });
+        {my: "left top+350", at: "left top", of: "#pageMain"} });
     $("#tags").dialog({ position: 
         {my: "right top", at: "right top", of: "#pageMain"},
         autoOpen: false, width: 500, height: 590 });

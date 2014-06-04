@@ -39,7 +39,8 @@ dwv.tool.UndoStack = function(app)
         // clear commands after current index
         stack = stack.slice(0,curCmdIndex);
         // store command
-        stack[curCmdIndex] = cmd;
+        stack.push(cmd);
+        //stack[curCmdIndex] = cmd;
         // increment index
         ++curCmdIndex;
         // add command to display history
