@@ -293,6 +293,8 @@
             <li class="api-class-tab methods"><a href="#methods">Methods</a></li>
         
         
+            <li class="api-class-tab properties"><a href="#properties">Properties</a></li>
+        
         
         
     </ul>
@@ -315,7 +317,7 @@
                             </li>
                         
                             <li class="index-item method">
-                                <a href="#method_createControls">createControls</a>
+                                <a href="#method_addAnchors">addAnchors</a>
 
                                 
                                 
@@ -350,7 +352,28 @@
                             </li>
                         
                             <li class="index-item method">
-                                <a href="#method_setShape!~YUIDOC_LINE~!param  inshape The shape to edit.">setShape!~YUIDOC_LINE~!param  inshape The shape to edit.</a>
+                                <a href="#method_removeAnchors">removeAnchors</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_resetAnchors">resetAnchors</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_setAnchorsVisible">setAnchorsVisible</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_setShape">setShape</a>
 
                                 
                                 
@@ -360,6 +383,28 @@
                 </div>
             
 
+            
+                <div class="index-section properties">
+                    <h3>Properties</h3>
+
+                    <ul class="index-list properties">
+                        
+                            <li class="index-item property private">
+                                <a href="#property_isActive">isActive</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item property private">
+                                <a href="#property_shape">shape</a>
+
+                                
+                                
+                            </li>
+                        
+                    </ul>
+                </div>
             
 
             
@@ -438,7 +483,7 @@
             
         
         
-        <a href="../files/src_tools_editor.js.html#l131"><code>src&#x2F;tools&#x2F;editor.js:131</code></a>
+        <a href="../files/src_tools_editor.js.html#l176"><code>src&#x2F;tools&#x2F;editor.js:176</code></a>
         
         </p>
 
@@ -549,21 +594,11 @@
 </div>
 
                 
-                    <div id="method_createControls" class="method item">
-    <h3 class="name"><code>createControls</code></h3>
+                    <div id="method_addAnchors" class="method item">
+    <h3 class="name"><code>addAnchors</code></h3>
 
     
-        <div class="args">
-            <span class="paren">(</span><ul class="args-list inline commas">
-            
-                <li class="arg">
-                    
-                        <code>inshape</code>
-                    
-                </li>
-            
-            </ul><span class="paren">)</span>
-        </div>
+        <span class="paren">()</span>
     
 
     
@@ -591,7 +626,7 @@
             
         
         
-        <a href="../files/src_tools_editor.js.html#l84"><code>src&#x2F;tools&#x2F;editor.js:84</code></a>
+        <a href="../files/src_tools_editor.js.html#l128"><code>src&#x2F;tools&#x2F;editor.js:128</code></a>
         
         </p>
 
@@ -602,34 +637,10 @@
     </div>
 
     <div class="description">
-        <p>Create shape editor controls, i.e. the anchors.</p>
+        <p>Add the shape anchors.</p>
 
     </div>
 
-    
-        <div class="params">
-            <h4>Parameters:</h4>
-
-            <ul class="params-list">
-            
-                <li class="param">
-                    
-                        <code class="param-name">inshape</code>
-                        <span class="type">Object</span>
-                    
-
-                    
-
-                    <div class="param-description">
-                        <p>The shape to edit.</p>
-
-                    </div>
-
-                    
-                </li>
-            
-            </ul>
-        </div>
     
 
     
@@ -670,7 +681,7 @@
             
         
         
-        <a href="../files/src_tools_editor.js.html#l68"><code>src&#x2F;tools&#x2F;editor.js:68</code></a>
+        <a href="../files/src_tools_editor.js.html#l75"><code>src&#x2F;tools&#x2F;editor.js:75</code></a>
         
         </p>
 
@@ -681,7 +692,7 @@
     </div>
 
     <div class="description">
-        <p>Disable the editor.</p>
+        <p>Disable the editor. Redraws the layer.</p>
 
     </div>
 
@@ -725,7 +736,7 @@
             
         
         
-        <a href="../files/src_tools_editor.js.html#l55"><code>src&#x2F;tools&#x2F;editor.js:55</code></a>
+        <a href="../files/src_tools_editor.js.html#l63"><code>src&#x2F;tools&#x2F;editor.js:63</code></a>
         
         </p>
 
@@ -736,7 +747,7 @@
     </div>
 
     <div class="description">
-        <p>Enable the editor.</p>
+        <p>Enable the editor. Redraws the layer.</p>
 
     </div>
 
@@ -784,7 +795,7 @@
             
         
         
-        <a href="../files/src_tools_editor.js.html#l37"><code>src&#x2F;tools&#x2F;editor.js:37</code></a>
+        <a href="../files/src_tools_editor.js.html#l45"><code>src&#x2F;tools&#x2F;editor.js:45</code></a>
         
         </p>
 
@@ -857,7 +868,7 @@
             
         
         
-        <a href="../files/src_tools_editor.js.html#l46"><code>src&#x2F;tools&#x2F;editor.js:46</code></a>
+        <a href="../files/src_tools_editor.js.html#l54"><code>src&#x2F;tools&#x2F;editor.js:54</code></a>
         
         </p>
 
@@ -894,8 +905,8 @@
 </div>
 
                 
-                    <div id="method_setShape!~YUIDOC_LINE~!param  inshape The shape to edit." class="method item">
-    <h3 class="name"><code>setShape!~YUIDOC_LINE~!param  inshape The shape to edit.</code></h3>
+                    <div id="method_removeAnchors" class="method item">
+    <h3 class="name"><code>removeAnchors</code></h3>
 
     
         <span class="paren">()</span>
@@ -926,7 +937,216 @@
             
         
         
-        <a href="../files/src_tools_editor.js.html#l21"><code>src&#x2F;tools&#x2F;editor.js:21</code></a>
+        <a href="../files/src_tools_editor.js.html#l115"><code>src&#x2F;tools&#x2F;editor.js:115</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Remove anchors.</p>
+
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_resetAnchors" class="method item">
+    <h3 class="name"><code>resetAnchors</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_tools_editor.js.html#l88"><code>src&#x2F;tools&#x2F;editor.js:88</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Reset the anchors.</p>
+
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_setAnchorsVisible" class="method item">
+    <h3 class="name"><code>setAnchorsVisible</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>flag</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_tools_editor.js.html#l101"><code>src&#x2F;tools&#x2F;editor.js:101</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Set anchors visibility.</p>
+
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">flag</code>
+                        <span class="type">Boolean</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The visible flag.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_setShape" class="method item">
+    <h3 class="name"><code>setShape</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>inshape</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_tools_editor.js.html#l32"><code>src&#x2F;tools&#x2F;editor.js:32</code></a>
         
         </p>
 
@@ -942,6 +1162,30 @@
     </div>
 
     
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">inshape</code>
+                        <span class="type">Object</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The shape to edit.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
 
     
 
@@ -952,6 +1196,106 @@
             </div>
         
 
+        
+            <div id="properties" class="api-class-tabpanel">
+                <h2 class="off-left">Properties</h2>
+
+                
+                    <div id="property_isActive" class="property item private">
+    <h3 class="name"><code>isActive</code></h3>
+    <span class="type">Boolean</span>
+
+    
+
+    
+        <span class="flag private">private</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_tools_editor.js.html#l24"><code>src&#x2F;tools&#x2F;editor.js:24</code></a>
+        
+        </p>
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Active flag.</p>
+
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="property_shape" class="property item private">
+    <h3 class="name"><code>shape</code></h3>
+    <span class="type">Object</span>
+
+    
+
+    
+        <span class="flag private">private</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_tools_editor.js.html#l17"><code>src&#x2F;tools&#x2F;editor.js:17</code></a>
+        
+        </p>
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Edited shape.</p>
+
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+            </div>
         
 
         

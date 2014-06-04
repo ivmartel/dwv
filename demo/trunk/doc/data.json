@@ -1313,7 +1313,7 @@
             "module": "tool",
             "namespace": "dwv.tool",
             "file": "src/tools/draw.js",
-            "line": 51,
+            "line": 47,
             "description": "Move shape command.",
             "is_constructor": 1
         },
@@ -1328,7 +1328,7 @@
             "module": "tool",
             "namespace": "dwv.tool",
             "file": "src/tools/draw.js",
-            "line": 95,
+            "line": 88,
             "description": "Delete shape command.",
             "is_constructor": 1
         },
@@ -1343,7 +1343,7 @@
             "module": "tool",
             "namespace": "dwv.tool",
             "file": "src/tools/draw.js",
-            "line": 142,
+            "line": 131,
             "description": "Drawing tool.",
             "is_constructor": 1,
             "params": [
@@ -6555,19 +6555,6 @@
         {
             "file": "src/tools/draw.js",
             "line": 17,
-            "description": "Command name.",
-            "itemtype": "property",
-            "name": "name",
-            "access": "private",
-            "tagname": "",
-            "type": "String",
-            "class": "dwv.tool.DrawShapeCommand",
-            "module": "tool",
-            "namespace": "dwv.tool"
-        },
-        {
-            "file": "src/tools/draw.js",
-            "line": 24,
             "description": "Get the command name.",
             "itemtype": "method",
             "name": "getName",
@@ -6581,7 +6568,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 31,
+            "line": 23,
             "description": "Execute the command.",
             "itemtype": "method",
             "name": "execute",
@@ -6591,20 +6578,17 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 59,
-            "description": "Command name.",
-            "itemtype": "property",
-            "name": "name",
-            "access": "private",
-            "tagname": "",
-            "type": "String",
-            "class": "dwv.tool.MoveShapeCommand",
+            "line": 34,
+            "description": "Undo the command.",
+            "itemtype": "method",
+            "name": "undo",
+            "class": "dwv.tool.DrawShapeCommand",
             "module": "tool",
             "namespace": "dwv.tool"
         },
         {
             "file": "src/tools/draw.js",
-            "line": 66,
+            "line": 55,
             "description": "Get the command name.",
             "itemtype": "method",
             "name": "getName",
@@ -6618,7 +6602,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 73,
+            "line": 62,
             "description": "Execute the command.",
             "itemtype": "method",
             "name": "execute",
@@ -6628,20 +6612,17 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 103,
-            "description": "Command name.",
-            "itemtype": "property",
-            "name": "name",
-            "access": "private",
-            "tagname": "",
-            "type": "String",
-            "class": "dwv.tool.DeleteShapeCommand",
+            "line": 74,
+            "description": "Undo the command.",
+            "itemtype": "method",
+            "name": "undo",
+            "class": "dwv.tool.MoveShapeCommand",
             "module": "tool",
             "namespace": "dwv.tool"
         },
         {
             "file": "src/tools/draw.js",
-            "line": 110,
+            "line": 96,
             "description": "Get the command name.",
             "itemtype": "method",
             "name": "getName",
@@ -6655,7 +6636,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 117,
+            "line": 102,
             "description": "Execute the command.",
             "itemtype": "method",
             "name": "execute",
@@ -6665,7 +6646,17 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 151,
+            "line": 113,
+            "description": "Undo the command.",
+            "itemtype": "method",
+            "name": "undo",
+            "class": "dwv.tool.DeleteShapeCommand",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/draw.js",
+            "line": 140,
             "description": "Closure to self: to be used by event handlers.",
             "itemtype": "property",
             "name": "self",
@@ -6678,7 +6669,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 158,
+            "line": 147,
             "description": "Interaction start flag.",
             "itemtype": "property",
             "name": "started",
@@ -6691,7 +6682,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 165,
+            "line": 154,
             "description": "Interaction just started flag.",
             "itemtype": "property",
             "name": "justStarted",
@@ -6704,7 +6695,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 173,
+            "line": 162,
             "description": "Draw command.",
             "itemtype": "property",
             "name": "command",
@@ -6717,8 +6708,8 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 180,
-            "description": "Current shape.",
+            "line": 169,
+            "description": "Current active shape.",
             "itemtype": "property",
             "name": "shape",
             "access": "private",
@@ -6730,7 +6721,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 187,
+            "line": 177,
             "description": "Current shape group.",
             "itemtype": "property",
             "name": "shapeGroup",
@@ -6743,7 +6734,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 195,
+            "line": 185,
             "description": "Drawing style.",
             "itemtype": "property",
             "name": "style",
@@ -6754,7 +6745,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 201,
+            "line": 191,
             "description": "Shape name.",
             "itemtype": "property",
             "name": "shapeName",
@@ -6765,7 +6756,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 208,
+            "line": 198,
             "description": "List of points.",
             "itemtype": "property",
             "name": "points",
@@ -6778,7 +6769,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 216,
+            "line": 206,
             "description": "Last selected point.",
             "itemtype": "property",
             "name": "lastPoint",
@@ -6791,7 +6782,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 224,
+            "line": 214,
             "description": "Shape editor.",
             "itemtype": "property",
             "name": "shapeEditor",
@@ -6804,7 +6795,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 244,
+            "line": 234,
             "description": "Handle mouse down event.",
             "itemtype": "method",
             "name": "mousedown",
@@ -6821,7 +6812,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 284,
+            "line": 274,
             "description": "Handle mouse move event.",
             "itemtype": "method",
             "name": "mousemove",
@@ -6838,7 +6829,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 318,
+            "line": 308,
             "description": "Handle mouse up event.",
             "itemtype": "method",
             "name": "mouseup",
@@ -6855,7 +6846,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 350,
+            "line": 340,
             "description": "Handle mouse out event.",
             "itemtype": "method",
             "name": "mouseout",
@@ -6872,7 +6863,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 359,
+            "line": 349,
             "description": "Handle touch start event.",
             "itemtype": "method",
             "name": "touchstart",
@@ -6889,7 +6880,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 368,
+            "line": 358,
             "description": "Handle touch move event.",
             "itemtype": "method",
             "name": "touchmove",
@@ -6906,7 +6897,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 377,
+            "line": 367,
             "description": "Handle touch end event.",
             "itemtype": "method",
             "name": "touchend",
@@ -6923,7 +6914,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 386,
+            "line": 376,
             "description": "Handle key down event.",
             "itemtype": "method",
             "name": "keydown",
@@ -6940,13 +6931,13 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 395,
+            "line": 385,
             "description": "Enable the tool.",
             "itemtype": "method",
             "name": "enable",
             "params": [
                 {
-                    "name": "bool",
+                    "name": "flag",
                     "description": "The flag to enable or not.",
                     "type": "Boolean"
                 }
@@ -6957,7 +6948,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 419,
+            "line": 427,
             "description": "Set shape off properties.",
             "itemtype": "method",
             "name": "setShapeOff",
@@ -6974,7 +6965,15 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 433,
+            "line": 443,
+            "description": "Get the real position from an event.",
+            "class": "dwv.tool.Draw",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/draw.js",
+            "line": 452,
             "description": "Set shape on properties.",
             "itemtype": "method",
             "name": "setShapeOn",
@@ -6991,7 +6990,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 538,
+            "line": 562,
             "description": "Help for this tool.",
             "itemtype": "method",
             "name": "getHelp",
@@ -7005,7 +7004,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 558,
+            "line": 582,
             "description": "Set the line color of the drawing.",
             "itemtype": "method",
             "name": "setLineColour",
@@ -7022,7 +7021,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 569,
+            "line": 593,
             "description": "Set the shape name of the drawing.",
             "itemtype": "method",
             "name": "setShapeName",
@@ -7039,7 +7038,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 584,
+            "line": 608,
             "description": "Check if the shape is in the shape list.",
             "itemtype": "method",
             "name": "hasShape",
@@ -7056,7 +7055,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 593,
+            "line": 617,
             "description": "Initialise the tool.",
             "itemtype": "method",
             "name": "init",
@@ -7066,10 +7065,12 @@
         },
         {
             "file": "src/tools/editor.js",
-            "line": 21,
-            "description": "Set the shape to edit.",
-            "itemtype": "method",
-            "name": "setShape!~YUIDOC_LINE~!param  inshape The shape to edit.",
+            "line": 17,
+            "description": "Edited shape.",
+            "itemtype": "property",
+            "name": "shape",
+            "access": "private",
+            "tagname": "",
             "type": "Object",
             "class": "dwv.tool.ShapeEditor",
             "module": "tool",
@@ -7077,58 +7078,23 @@
         },
         {
             "file": "src/tools/editor.js",
-            "line": 37,
-            "description": "Get the edited shape.",
-            "itemtype": "method",
-            "name": "getShape",
-            "return": {
-                "description": "The edited shape.",
-                "type": "Object"
-            },
-            "class": "dwv.tool.ShapeEditor",
-            "module": "tool",
-            "namespace": "dwv.tool"
-        },
-        {
-            "file": "src/tools/editor.js",
-            "line": 46,
-            "description": "Get the active flag.",
-            "itemtype": "method",
+            "line": 24,
+            "description": "Active flag.",
+            "itemtype": "property",
             "name": "isActive",
-            "return": {
-                "description": "The active flag.",
-                "type": "Boolean"
-            },
+            "access": "private",
+            "tagname": "",
+            "type": "Boolean",
             "class": "dwv.tool.ShapeEditor",
             "module": "tool",
             "namespace": "dwv.tool"
         },
         {
             "file": "src/tools/editor.js",
-            "line": 55,
-            "description": "Enable the editor.",
+            "line": 32,
+            "description": "Set the shape to edit.",
             "itemtype": "method",
-            "name": "enable",
-            "class": "dwv.tool.ShapeEditor",
-            "module": "tool",
-            "namespace": "dwv.tool"
-        },
-        {
-            "file": "src/tools/editor.js",
-            "line": 68,
-            "description": "Disable the editor.",
-            "itemtype": "method",
-            "name": "disable",
-            "class": "dwv.tool.ShapeEditor",
-            "module": "tool",
-            "namespace": "dwv.tool"
-        },
-        {
-            "file": "src/tools/editor.js",
-            "line": 84,
-            "description": "Create shape editor controls, i.e. the anchors.",
-            "itemtype": "method",
-            "name": "createControls",
+            "name": "setShape",
             "params": [
                 {
                     "name": "inshape",
@@ -7142,7 +7108,102 @@
         },
         {
             "file": "src/tools/editor.js",
-            "line": 131,
+            "line": 45,
+            "description": "Get the edited shape.",
+            "itemtype": "method",
+            "name": "getShape",
+            "return": {
+                "description": "The edited shape.",
+                "type": "Object"
+            },
+            "class": "dwv.tool.ShapeEditor",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/editor.js",
+            "line": 54,
+            "description": "Get the active flag.",
+            "itemtype": "method",
+            "name": "isActive",
+            "return": {
+                "description": "The active flag.",
+                "type": "Boolean"
+            },
+            "class": "dwv.tool.ShapeEditor",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/editor.js",
+            "line": 63,
+            "description": "Enable the editor. Redraws the layer.",
+            "itemtype": "method",
+            "name": "enable",
+            "class": "dwv.tool.ShapeEditor",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/editor.js",
+            "line": 75,
+            "description": "Disable the editor. Redraws the layer.",
+            "itemtype": "method",
+            "name": "disable",
+            "class": "dwv.tool.ShapeEditor",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/editor.js",
+            "line": 88,
+            "description": "Reset the anchors.",
+            "itemtype": "method",
+            "name": "resetAnchors",
+            "class": "dwv.tool.ShapeEditor",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/editor.js",
+            "line": 101,
+            "description": "Set anchors visibility.",
+            "itemtype": "method",
+            "name": "setAnchorsVisible",
+            "params": [
+                {
+                    "name": "flag",
+                    "description": "The visible flag.",
+                    "type": "Boolean"
+                }
+            ],
+            "class": "dwv.tool.ShapeEditor",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/editor.js",
+            "line": 115,
+            "description": "Remove anchors.",
+            "itemtype": "method",
+            "name": "removeAnchors",
+            "class": "dwv.tool.ShapeEditor",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/editor.js",
+            "line": 128,
+            "description": "Add the shape anchors.",
+            "itemtype": "method",
+            "name": "addAnchors",
+            "class": "dwv.tool.ShapeEditor",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/editor.js",
+            "line": 176,
             "description": "Create shape editor controls, i.e. the anchors.",
             "itemtype": "method",
             "name": "addAnchor",
@@ -8509,7 +8570,7 @@
         },
         {
             "file": "src/tools/undo.js",
-            "line": 49,
+            "line": 50,
             "description": "Undo the last command.",
             "itemtype": "method",
             "name": "undo",
@@ -8519,7 +8580,7 @@
         },
         {
             "file": "src/tools/undo.js",
-            "line": 80,
+            "line": 81,
             "description": "Redo the last command.",
             "itemtype": "method",
             "name": "redo",
@@ -9752,7 +9813,7 @@
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/tools/draw.js:538"
+            "line": " src/tools/draw.js:562"
         },
         {
             "message": "replacing incorrect tag: returns with return",
@@ -9801,6 +9862,10 @@
         {
             "message": "Missing item type",
             "line": " src/math/scissors.js:108"
+        },
+        {
+            "message": "Missing item type\nGet the real position from an event.",
+            "line": " src/tools/draw.js:443"
         },
         {
             "message": "Missing item type\nInit the Window/Level display",
