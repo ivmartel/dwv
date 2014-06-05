@@ -36,10 +36,11 @@ dwv.tool.ShapeEditor = function ()
      */
     this.setShape = function ( inshape ) {
         shape = inshape;
-        // remove previous controls
-        removeAnchors();
-        // add anchors
-        addAnchors();
+        // reset anchors
+        if ( shape ) {
+            removeAnchors();
+            addAnchors();
+        }
     };
     
     /**
@@ -66,9 +67,11 @@ dwv.tool.ShapeEditor = function ()
      */
     this.enable = function () {
         isActive = true;
-        if ( shape && shape.getLayer() ) {
+        if ( shape ) {
             setAnchorsVisible( true );
-            shape.getLayer().draw();
+            if ( shape.getLayer() ) {
+                shape.getLayer().draw();
+            }
         }
     };
     
@@ -78,11 +81,12 @@ dwv.tool.ShapeEditor = function ()
      */
     this.disable = function () {
         isActive = false;
-        if ( shape && shape.getLayer() ) {
+        if ( shape ) {
             setAnchorsVisible( false );
-            shape.getLayer().draw();
+            if ( shape.getLayer() ) {
+                shape.getLayer().draw();
+            }
         }
-        shape = null;
     };
     
     /**
@@ -140,8 +144,12 @@ dwv.tool.ShapeEditor = function ()
         if ( shape instanceof Kinetic.Line ) {
             var points = shape.points();
             if ( points.length === 4 ) {
-                addAnchor(group, points[0], points[1], 'begin', dwv.tool.UpdateLine);
-                addAnchor(group, points[2], points[3], 'end', dwv.tool.UpdateLine);
+                var lineBeginX = points[0] + shape.x();
+                var lineBeginY = points[1] + shape.y();
+                var lineEndX = points[2] + shape.x();
+                var lineEndY = points[3] + shape.y();
+                addAnchor(group, lineBeginX, lineBeginY, 'begin', dwv.tool.UpdateLine);
+                addAnchor(group, lineEndX, lineEndY, 'end', dwv.tool.UpdateLine);
             }
             else {
                 addAnchor(group, points[0], points[1], 0, dwv.tool.UpdateRoi);

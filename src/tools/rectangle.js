@@ -81,10 +81,10 @@ dwv.tool.UpdateRect = function (rect, anchor)
         break;
     }
     // update shape
-    rect.setPosition(topLeft.getPosition());
+    rect.position(topLeft.position());
     var width = topRight.x() - topLeft.x();
     var height = bottomLeft.y() - topLeft.y();
     if ( width && height ) {
-        rect.setSize({width:width, height: height});
+        rect.size({'width': width, 'height': height});
     }
 };

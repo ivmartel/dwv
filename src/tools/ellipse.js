@@ -85,9 +85,9 @@ dwv.tool.UpdateEllipse = function (ellipse, anchor)
     // update shape
     var radiusX = ( topRight.x() - topLeft.x() ) / 2;
     var radiusY = ( bottomRight.y() - topRight.y() ) / 2;
-    var center = { x: topLeft.x() + radiusX, y: topRight.y() + radiusY };
-    ellipse.setPosition( center );
-    var radiusAbs = { x: Math.abs(radiusX), y: Math.abs(radiusY) };
+    var center = { 'x': topLeft.x() + radiusX, 'y': topRight.y() + radiusY };
+    ellipse.position( center );
+    var radiusAbs = { 'x': Math.abs(radiusX), 'y': Math.abs(radiusY) };
     if ( radiusAbs ) {
         ellipse.radius( radiusAbs );
     }
