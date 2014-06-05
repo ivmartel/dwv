@@ -273,7 +273,12 @@ dwv.tool.UpdateLine = function (line, anchor)
         break;
     }
     // update shape
-    line.points([begin.x(), begin.y(), end.x(), end.y()]);
+    // shape.position() and shape.size() won&#x27;t work...
+    var bx = begin.x() - line.x();
+    var by = begin.y() - line.y();
+    var ex = end.x() - line.x();
+    var ey = end.y() - line.y();
+    line.points( [bx,by,ex,ey] );
 };
 
     </pre>

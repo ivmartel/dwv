@@ -6812,7 +6812,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 274,
+            "line": 273,
             "description": "Handle mouse move event.",
             "itemtype": "method",
             "name": "mousemove",
@@ -6829,7 +6829,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 308,
+            "line": 307,
             "description": "Handle mouse up event.",
             "itemtype": "method",
             "name": "mouseup",
@@ -6948,7 +6948,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 427,
+            "line": 407,
             "description": "Set shape off properties.",
             "itemtype": "method",
             "name": "setShapeOff",
@@ -6965,7 +6965,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 443,
+            "line": 423,
             "description": "Get the real position from an event.",
             "class": "dwv.tool.Draw",
             "module": "tool",
@@ -6973,7 +6973,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 452,
+            "line": 432,
             "description": "Set shape on properties.",
             "itemtype": "method",
             "name": "setShapeOn",
@@ -6990,7 +6990,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 562,
+            "line": 545,
             "description": "Help for this tool.",
             "itemtype": "method",
             "name": "getHelp",
@@ -7004,7 +7004,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 582,
+            "line": 565,
             "description": "Set the line color of the drawing.",
             "itemtype": "method",
             "name": "setLineColour",
@@ -7021,7 +7021,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 593,
+            "line": 576,
             "description": "Set the shape name of the drawing.",
             "itemtype": "method",
             "name": "setShapeName",
@@ -7038,7 +7038,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 608,
+            "line": 591,
             "description": "Check if the shape is in the shape list.",
             "itemtype": "method",
             "name": "hasShape",
@@ -7055,7 +7055,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 617,
+            "line": 600,
             "description": "Initialise the tool.",
             "itemtype": "method",
             "name": "init",
@@ -7108,7 +7108,7 @@
         },
         {
             "file": "src/tools/editor.js",
-            "line": 45,
+            "line": 46,
             "description": "Get the edited shape.",
             "itemtype": "method",
             "name": "getShape",
@@ -7122,7 +7122,7 @@
         },
         {
             "file": "src/tools/editor.js",
-            "line": 54,
+            "line": 55,
             "description": "Get the active flag.",
             "itemtype": "method",
             "name": "isActive",
@@ -7136,7 +7136,7 @@
         },
         {
             "file": "src/tools/editor.js",
-            "line": 63,
+            "line": 64,
             "description": "Enable the editor. Redraws the layer.",
             "itemtype": "method",
             "name": "enable",
@@ -7146,7 +7146,7 @@
         },
         {
             "file": "src/tools/editor.js",
-            "line": 75,
+            "line": 78,
             "description": "Disable the editor. Redraws the layer.",
             "itemtype": "method",
             "name": "disable",
@@ -7156,7 +7156,7 @@
         },
         {
             "file": "src/tools/editor.js",
-            "line": 88,
+            "line": 92,
             "description": "Reset the anchors.",
             "itemtype": "method",
             "name": "resetAnchors",
@@ -7166,7 +7166,7 @@
         },
         {
             "file": "src/tools/editor.js",
-            "line": 101,
+            "line": 105,
             "description": "Set anchors visibility.",
             "itemtype": "method",
             "name": "setAnchorsVisible",
@@ -7183,7 +7183,7 @@
         },
         {
             "file": "src/tools/editor.js",
-            "line": 115,
+            "line": 119,
             "description": "Remove anchors.",
             "itemtype": "method",
             "name": "removeAnchors",
@@ -7193,7 +7193,7 @@
         },
         {
             "file": "src/tools/editor.js",
-            "line": 128,
+            "line": 132,
             "description": "Add the shape anchors.",
             "itemtype": "method",
             "name": "addAnchors",
@@ -7203,7 +7203,7 @@
         },
         {
             "file": "src/tools/editor.js",
-            "line": 176,
+            "line": 184,
             "description": "Create shape editor controls, i.e. the anchors.",
             "itemtype": "method",
             "name": "addAnchor",
@@ -9813,7 +9813,7 @@
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/tools/draw.js:562"
+            "line": " src/tools/draw.js:545"
         },
         {
             "message": "replacing incorrect tag: returns with return",
@@ -9865,7 +9865,7 @@
         },
         {
             "message": "Missing item type\nGet the real position from an event.",
-            "line": " src/tools/draw.js:443"
+            "line": " src/tools/draw.js:423"
         },
         {
             "message": "Missing item type\nInit the Window/Level display",

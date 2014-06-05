@@ -8932,7 +8932,7 @@ dwv.tool.Draw = function (app)
      * @type Object
      */
     var activeShape = null;
-    var deletedShapes = [];
+    var createdShapes = [];
     /**
      * Current shape group.
      * @property shapeGroup
@@ -9006,19 +9006,18 @@ dwv.tool.Draw = function (app)
         if ( kshape ) {
             var group = kshape.getParent();
             var selectedShape = group.find(".shape")[0];
-            // activate editor if click on other shape
-            if( selectedShape && selectedShape !== shapeEditor.getShape() ) { 
-                // disable previous edition
+            // reset editor if click on other shape
+            // (and avoid anchors mouse down)
+            if ( selectedShape && selectedShape !== shapeEditor.getShape() ) { 
                 shapeEditor.disable();
-                // set new edited shape
                 shapeEditor.setShape(selectedShape);
-                // enable new edition
                 shapeEditor.enable();
             }
         }
         else {
             // disable edition
             shapeEditor.disable();
+            shapeEditor.setShape(null);
             // start storing points
             started = true;
             shapeGroup = new Kinetic.Group();
@@ -9070,6 +9069,7 @@ dwv.tool.Draw = function (app)
      * @param {Object} event The mouse up event.
      */
     this.mouseup = function (/*event*/){
+        console.log("points.length: "+points.length);
         if (started && points.length > 1 )
         {
             // remove previous draw
@@ -9089,11 +9089,11 @@ dwv.tool.Draw = function (app)
             
             // set shape on
             self.setShapeOn(activeShape);
-            // reset flag
-            justStarted = true;
+            createdShapes.push(activeShape);
         }
         // reset flag
         started = false;
+        justStarted = true;
     };
     
     /**
@@ -9150,34 +9150,14 @@ dwv.tool.Draw = function (app)
         dwv.gui.displayDrawHtml( flag );
         // reset shape display properties
         shapeEditor.disable();
+        shapeEditor.setShape(null);
         document.body.style.cursor = 'default';
-        // check deleted shapes are still deleted
-        if ( deletedShapes.length !== 0 ) {
-            var tmp = deletedShapes;
-            deletedShapes = [];
-            tmp.forEach( function (shape){ 
-                if ( !shape.getLayer() ) {
-                    deletedShapes.push(shape);
-                }
-            });
-        }
         // set shape display properties
-        var shapes = null;
         if ( flag ) {
-            if ( activeShape && !activeShape.getLayer() ) {
-                self.setShapeOn( activeShape );
-            }
-            shapes = app.getKineticLayer().find('.shape');
-            shapes.each( function (shape){ self.setShapeOn( shape ); });
-            deletedShapes.forEach( function (shape){ self.setShapeOn( shape ); });
+            createdShapes.forEach( function (shape){ self.setShapeOn( shape ); });
         }
         else {
-            if ( activeShape && !activeShape.getLayer() ) {
-                setShapeOff( activeShape );
-            }
-            shapes = app.getKineticLayer().find('.shape');
-            shapes.each( function (shape){ setShapeOff( shape ); });
-            deletedShapes.forEach( function (shape){ setShapeOff( shape ); });
+            createdShapes.forEach( function (shape){ setShapeOff( shape ); });
         }
         // draw
         app.getKineticLayer().draw();
@@ -9293,7 +9273,8 @@ dwv.tool.Draw = function (app)
                 group.y( group.y() - delTranslation.y );
                 // disable editor
                 shapeEditor.disable();
-                deletedShapes.push(shape);
+                shapeEditor.setShape(null);
+                document.body.style.cursor = 'default';
                 // delete command
                 var delcmd = new dwv.tool.DeleteShapeCommand(this, cmdName, app);
                 delcmd.execute();
@@ -9303,8 +9284,10 @@ dwv.tool.Draw = function (app)
                 // save drag move
                 var translation = {'x': pos.x - dragStartPos.x, 
                         'y': pos.y - dragStartPos.y};
-                var mvcmd = new dwv.tool.MoveShapeCommand(this, cmdName, translation, app);
-                app.getUndoStack().add(mvcmd);
+                if ( translation.x !== 0 || translation.y !== 0 ) {
+                    var mvcmd = new dwv.tool.MoveShapeCommand(this, cmdName, translation, app);
+                    app.getUndoStack().add(mvcmd);
+                }
                 // reset anchors
                 shapeEditor.resetAnchors();
             }
@@ -9428,10 +9411,11 @@ dwv.tool.ShapeEditor = function ()
      */
     this.setShape = function ( inshape ) {
         shape = inshape;
-        // remove previous controls
-        removeAnchors();
-        // add anchors
-        addAnchors();
+        // reset anchors
+        if ( shape ) {
+            removeAnchors();
+            addAnchors();
+        }
     };
     
     /**
@@ -9458,9 +9442,11 @@ dwv.tool.ShapeEditor = function ()
      */
     this.enable = function () {
         isActive = true;
-        if ( shape && shape.getLayer() ) {
+        if ( shape ) {
             setAnchorsVisible( true );
-            shape.getLayer().draw();
+            if ( shape.getLayer() ) {
+                shape.getLayer().draw();
+            }
         }
     };
     
@@ -9470,11 +9456,12 @@ dwv.tool.ShapeEditor = function ()
      */
     this.disable = function () {
         isActive = false;
-        if ( shape && shape.getLayer() ) {
+        if ( shape ) {
             setAnchorsVisible( false );
-            shape.getLayer().draw();
+            if ( shape.getLayer() ) {
+                shape.getLayer().draw();
+            }
         }
-        shape = null;
     };
     
     /**
@@ -9532,8 +9519,12 @@ dwv.tool.ShapeEditor = function ()
         if ( shape instanceof Kinetic.Line ) {
             var points = shape.points();
             if ( points.length === 4 ) {
-                addAnchor(group, points[0], points[1], 'begin', dwv.tool.UpdateLine);
-                addAnchor(group, points[2], points[3], 'end', dwv.tool.UpdateLine);
+                var lineBeginX = points[0] + shape.x();
+                var lineBeginY = points[1] + shape.y();
+                var lineEndX = points[2] + shape.x();
+                var lineEndY = points[3] + shape.y();
+                addAnchor(group, lineBeginX, lineBeginY, 'begin', dwv.tool.UpdateLine);
+                addAnchor(group, lineEndX, lineEndY, 'end', dwv.tool.UpdateLine);
             }
             else {
                 addAnchor(group, points[0], points[1], 0, dwv.tool.UpdateRoi);
@@ -9704,9 +9695,9 @@ dwv.tool.UpdateEllipse = function (ellipse, anchor)
     // update shape
     var radiusX = ( topRight.x() - topLeft.x() ) / 2;
     var radiusY = ( bottomRight.y() - topRight.y() ) / 2;
-    var center = { x: topLeft.x() + radiusX, y: topRight.y() + radiusY };
-    ellipse.setPosition( center );
-    var radiusAbs = { x: Math.abs(radiusX), y: Math.abs(radiusY) };
+    var center = { 'x': topLeft.x() + radiusX, 'y': topRight.y() + radiusY };
+    ellipse.position( center );
+    var radiusAbs = { 'x': Math.abs(radiusX), 'y': Math.abs(radiusY) };
     if ( radiusAbs ) {
         ellipse.radius( radiusAbs );
     }
@@ -10297,7 +10288,12 @@ dwv.tool.UpdateLine = function (line, anchor)
         break;
     }
     // update shape
-    line.points([begin.x(), begin.y(), end.x(), end.y()]);
+    // shape.position() and shape.size() won't work...
+    var bx = begin.x() - line.x();
+    var by = begin.y() - line.y();
+    var ex = end.x() - line.x();
+    var ey = end.y() - line.y();
+    line.points( [bx,by,ex,ey] );
 };
 ;/** 
  * Tool module.
@@ -10780,11 +10776,11 @@ dwv.tool.UpdateRect = function (rect, anchor)
         break;
     }
     // update shape
-    rect.setPosition(topLeft.getPosition());
+    rect.position(topLeft.position());
     var width = topRight.x() - topLeft.x();
     var height = bottomLeft.y() - topLeft.y();
     if ( width && height ) {
-        rect.setSize({width:width, height: height});
+        rect.size({'width': width, 'height': height});
     }
 };
 ;/** 
