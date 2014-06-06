@@ -461,7 +461,7 @@ dwv.App = function()
         }
         // log
         if( error.stack ) {
-            console.log(error.stack);
+            console.error(error.stack);
         }
     }
     
