@@ -52,20 +52,6 @@ dwv.tool.RoiCreator = function (points, style)
         name: "shape",
         closed: true
     });
-    // hover styling
-    kline.on('mouseover', function () {
-        if ( this.getLayer() ) {
-            document.body.style.cursor = 'pointer';
-            this.getLayer().draw();
-        }
-    });
-    // not hover styling
-    kline.on('mouseout', function () {
-        if ( this.getLayer() ) {
-            document.body.style.cursor = 'default';
-            this.getLayer().draw();
-        }
-    });
     // return shape
     return kline;
 }; 
@@ -81,14 +67,14 @@ dwv.tool.UpdateRoi = function (roi, anchor)
 {
     // parent group
     var group = anchor.getParent();
-    // find special point
+    // update self
     var point = group.find('#'+anchor.id())[0];
-    var px = Math.floor(point.x());
-    var py = Math.floor(point.y());
+    point.x( anchor.x() );
+    point.y( anchor.y() );
     // update the roi points
     // (the anchor id is the index of the point in the list)
     var points = roi.points();
-    points[anchor.id()] = px;
-    points[anchor.id()+1] = py;
+    points[anchor.id()] = anchor.x();
+    points[anchor.id()+1] = anchor.y();
     roi.points( points );
 };

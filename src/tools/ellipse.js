@@ -29,20 +29,6 @@ dwv.tool.EllipseCreator = function (points, style)
         strokeWidth: 2,
         name: "shape"
     });
-    // hover styling
-    kellipse.on('mouseover', function () {
-        if ( this.getLayer() ) {
-            document.body.style.cursor = 'pointer';
-            this.getLayer().draw();
-        }
-    });
-    // not hover styling
-    kellipse.on('mouseout', function () {
-        if ( this.getLayer() ) {
-            document.body.style.cursor = 'default';
-            this.getLayer().draw();
-        }
-    });
     // return shape
     return kellipse;
 };
@@ -63,23 +49,34 @@ dwv.tool.UpdateEllipse = function (ellipse, anchor)
     var topRight = group.find('#topRight')[0];
     var bottomRight = group.find('#bottomRight')[0];
     var bottomLeft = group.find('#bottomLeft')[0];
-    // update special points
+    // update 'self' (undo case) and special points
     switch ( anchor.id() ) {
     case 'topLeft':
+        topLeft.x( anchor.x() );
+        topLeft.y( anchor.y() );
         topRight.y( anchor.y() );
         bottomLeft.x( anchor.x() );
         break;
     case 'topRight':
+        topRight.x( anchor.x() );
+        topRight.y( anchor.y() );
         topLeft.y( anchor.y() );
         bottomRight.x( anchor.x() );
         break;
     case 'bottomRight':
+        bottomRight.x( anchor.x() );
+        bottomRight.y( anchor.y() );
         bottomLeft.y( anchor.y() );
         topRight.x( anchor.x() ); 
         break;
     case 'bottomLeft':
+        bottomLeft.x( anchor.x() );
+        bottomLeft.y( anchor.y() );
         bottomRight.y( anchor.y() );
         topLeft.x( anchor.x() ); 
+        break;
+    default :
+        console.error('Unhandled anchor id: '+anchor.id());
         break;
     }
     // update shape

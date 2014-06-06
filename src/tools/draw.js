@@ -65,9 +65,11 @@ dwv.tool.MoveShapeCommand = function (shape, name, translation, app)
      */
     this.execute = function () {
         var group = shape.getParent();
-        // translate group
-        group.x( group.x() + translation.x );
-        group.y( group.y() + translation.y );
+        // translate all children of group
+        group.getChildren().each( function (shape) {
+            shape.x( shape.x() + translation.x );
+            shape.y( shape.y() + translation.y );
+        });
         // draw
         app.getKineticLayer().draw();
     };
@@ -77,13 +79,52 @@ dwv.tool.MoveShapeCommand = function (shape, name, translation, app)
      */
     this.undo = function () {
         var group = shape.getParent();
-        // invert translate group
-        group.x( group.x() - translation.x );
-        group.y( group.y() - translation.y );
+        // invert translate all children of group
+        group.getChildren().each( function (shape) {
+            shape.x( shape.x() - translation.x );
+            shape.y( shape.y() - translation.y );
+        });
         // draw
         app.getKineticLayer().draw();
     };
 }; // MoveShapeCommand class
+
+/**
+ * Change shape command.
+ * @class ChangeShapeCommand
+ * @namespace dwv.tool
+ * @constructor
+ */
+dwv.tool.ChangeShapeCommand = function (shape, name, func, startAnchor, endAnchor, app)
+{
+    /**
+     * Get the command name.
+     * @method getName
+     * @return {String} The command name.
+     */
+    this.getName = function () { return "Change-"+name; };
+
+    /**
+     * Execute the command.
+     * @method execute
+     */
+    this.execute = function () {
+        // change shape
+        func( shape, endAnchor );
+        // draw
+        app.getKineticLayer().draw();
+    };
+    /**
+     * Undo the command.
+     * @method undo
+     */
+    this.undo = function () {
+        // invert change shape
+        func( shape, startAnchor );
+        // draw
+        app.getKineticLayer().draw();
+    };
+}; // ChangeShapeCommand class
 
 /**
  * Delete shape command.
@@ -310,7 +351,6 @@ dwv.tool.Draw = function (app)
      * @param {Object} event The mouse up event.
      */
     this.mouseup = function (/*event*/){
-        console.log("points.length: "+points.length);
         if (started && points.length > 1 )
         {
             // remove previous draw
@@ -437,17 +477,11 @@ dwv.tool.Draw = function (app)
     this.setShapeOn = function ( shape ) {
         // mouse over styling
         shape.on('mouseover', function () {
-            if ( this.getLayer() ) {
-                document.body.style.cursor = 'pointer';
-                this.getLayer().draw();
-            }
+            document.body.style.cursor = 'pointer';
         });
         // mouse out styling
         shape.on('mouseout', function () {
-            if ( this.getLayer() ) {
-                document.body.style.cursor = 'default';
-                this.getLayer().draw();
-            }
+            document.body.style.cursor = 'default';
         });
 
         // make it draggable
@@ -479,6 +513,8 @@ dwv.tool.Draw = function (app)
             trash.y( stage.offset().y + ( 20 / scale.y ) );
             trash.scale( invscale );
             app.getKineticLayer().add( trash );
+            // deactivate anchors to avoid events on null shape
+            shapeEditor.setAnchorsActive(false);
             // draw
             app.getKineticLayer().draw();
         });
@@ -510,8 +546,10 @@ dwv.tool.Draw = function (app)
                 var delTranslation = {'x': pos.x - dragStartPos.x, 
                         'y': pos.y - dragStartPos.y};
                 var group = this.getParent();
-                group.x( group.x() - delTranslation.x );
-                group.y( group.y() - delTranslation.y );
+                group.getChildren().each( function (shape) {
+                    shape.x( shape.x() - delTranslation.x );
+                    shape.y( shape.y() - delTranslation.y );
+                });
                 // disable editor
                 shapeEditor.disable();
                 shapeEditor.setShape(null);
@@ -530,6 +568,7 @@ dwv.tool.Draw = function (app)
                     app.getUndoStack().add(mvcmd);
                 }
                 // reset anchors
+                shapeEditor.setAnchorsActive(true);
                 shapeEditor.resetAnchors();
             }
             // remove trash

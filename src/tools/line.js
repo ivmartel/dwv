@@ -25,20 +25,6 @@ dwv.tool.LineCreator = function (points, style)
         strokeWidth: 2,
         name: "shape"
     });
-    // hover styling
-    kline.on('mouseover', function () {
-        if ( this.getLayer() ) {
-            document.body.style.cursor = 'pointer';
-            this.getLayer().draw();
-        }
-    });
-    // not hover styling
-    kline.on('mouseout', function () {
-        if ( this.getLayer() ) {
-            document.body.style.cursor = 'default';
-            this.getLayer().draw();
-        }
-    });
     // return shape
     return kline;
 };
