@@ -105,6 +105,8 @@
             
                 <li><a href="../classes/dwv.tool.html">dwv.tool</a></li>
             
+                <li><a href="../classes/dwv.tool.ChangeShapeCommand.html">dwv.tool.ChangeShapeCommand</a></li>
+            
                 <li><a href="../classes/dwv.tool.DeleteShapeCommand.html">dwv.tool.DeleteShapeCommand</a></li>
             
                 <li><a href="../classes/dwv.tool.Draw.html">dwv.tool.Draw</a></li>
@@ -256,20 +258,6 @@ dwv.tool.RoiCreator = function (points, style)
         name: &quot;shape&quot;,
         closed: true
     });
-    // hover styling
-    kline.on(&#x27;mouseover&#x27;, function () {
-        if ( this.getLayer() ) {
-            document.body.style.cursor = &#x27;pointer&#x27;;
-            this.getLayer().draw();
-        }
-    });
-    // not hover styling
-    kline.on(&#x27;mouseout&#x27;, function () {
-        if ( this.getLayer() ) {
-            document.body.style.cursor = &#x27;default&#x27;;
-            this.getLayer().draw();
-        }
-    });
     // return shape
     return kline;
 }; 
@@ -285,15 +273,15 @@ dwv.tool.UpdateRoi = function (roi, anchor)
 {
     // parent group
     var group = anchor.getParent();
-    // find special point
+    // update self
     var point = group.find(&#x27;#&#x27;+anchor.id())[0];
-    var px = Math.floor(point.x());
-    var py = Math.floor(point.y());
+    point.x( anchor.x() );
+    point.y( anchor.y() );
     // update the roi points
     // (the anchor id is the index of the point in the list)
     var points = roi.points();
-    points[anchor.id()] = px;
-    points[anchor.id()+1] = py;
+    points[anchor.id()] = anchor.x();
+    points[anchor.id()+1] = anchor.y();
     roi.points( points );
 };
 

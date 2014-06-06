@@ -105,6 +105,8 @@
             
                 <li><a href="../classes/dwv.tool.html">dwv.tool</a></li>
             
+                <li><a href="../classes/dwv.tool.ChangeShapeCommand.html">dwv.tool.ChangeShapeCommand</a></li>
+            
                 <li><a href="../classes/dwv.tool.DeleteShapeCommand.html">dwv.tool.DeleteShapeCommand</a></li>
             
                 <li><a href="../classes/dwv.tool.Draw.html">dwv.tool.Draw</a></li>
@@ -232,6 +234,13 @@ dwv.tool.ShapeEditor = function ()
      * @type Boolean
      */
     var isActive = false;
+    /**
+     * Update function used by anchors to update the shape.
+     * @property updateFunction
+     * @private
+     * @type Object
+     */
+    var updateFunction = null;
     
     /**
      * Set the shape to edit.
@@ -307,30 +316,55 @@ dwv.tool.ShapeEditor = function ()
     };
     
     /**
+     * Apply a function on all anchors.
+     * @param {Object} func A f(shape) function.
+     */
+    function applyFuncToAnchors( func ) {
+        if ( shape &amp;&amp; shape.getParent() ) {
+            var anchors = shape.getParent().find(&#x27;.anchor&#x27;);
+            anchors.each( func );
+        }
+    }
+    
+    /**
      * Set anchors visibility.
      * @method setAnchorsVisible
      * @param {Boolean} flag The visible flag.
      */
     function setAnchorsVisible( flag ) {
-        if ( shape &amp;&amp; shape.getParent() ) {
-            var anchors = shape.getParent().find(&#x27;.anchor&#x27;);
-            anchors.each( function (anchor) {
-                anchor.visible( flag );
-            });
-        }
+        applyFuncToAnchors( function (anchor) {
+            anchor.visible( flag );
+        });
     }
+
+    /**
+     * Set anchors active.
+     * @method setAnchorsActive
+     * @param {Boolean} flag The active (on/off) flag.
+     */
+    this.setAnchorsActive = function ( flag ) {
+        var func = null;
+        if ( flag ) { 
+            func = function (anchor) {
+                setAnchorOn( anchor );
+            };
+        }
+        else {
+            func = function (anchor) {
+                setAnchorOff( anchor );
+            };
+        }
+        applyFuncToAnchors( func );
+    };
 
     /**
      * Remove anchors.
      * @method removeAnchors
      */
     function removeAnchors() {
-        if ( shape &amp;&amp; shape.getParent() ) {
-            var anchors = shape.getParent().find(&#x27;.anchor&#x27;);
-            anchors.each( function (anchor) {
-                anchor.remove();
-            });
-        }
+        applyFuncToAnchors( function (anchor) {
+            anchor.remove();
+        });
     }
     
     /**
@@ -338,48 +372,52 @@ dwv.tool.ShapeEditor = function ()
      * @method addAnchors
      */
     function addAnchors() {
-        // exit if no shape
-        if ( !shape ) {
+        // exit if no shape or no layer
+        if ( !shape || !shape.getLayer() ) {
             return;
         }
         // get shape group
         var group = shape.getParent();
         // add shape specific anchors to the shape group
         if ( shape instanceof Kinetic.Line ) {
+            updateFunction = dwv.tool.UpdateLine;
             var points = shape.points();
             if ( points.length === 4 ) {
                 var lineBeginX = points[0] + shape.x();
                 var lineBeginY = points[1] + shape.y();
                 var lineEndX = points[2] + shape.x();
                 var lineEndY = points[3] + shape.y();
-                addAnchor(group, lineBeginX, lineBeginY, &#x27;begin&#x27;, dwv.tool.UpdateLine);
-                addAnchor(group, lineEndX, lineEndY, &#x27;end&#x27;, dwv.tool.UpdateLine);
+                addAnchor(group, lineBeginX, lineBeginY, &#x27;begin&#x27;);
+                addAnchor(group, lineEndX, lineEndY, &#x27;end&#x27;);
             }
             else {
-                addAnchor(group, points[0], points[1], 0, dwv.tool.UpdateRoi);
+                updateFunction = dwv.tool.UpdateRoi;
+                addAnchor(group, points[0], points[1], 0);
                 for ( var i = 0; i &lt; points.length; i=i+2 ) {
-                    addAnchor(group, points[i], points[i+1], i, dwv.tool.UpdateRoi);
+                    addAnchor(group, points[i], points[i+1], i);
                 }
             }
         }
         else if ( shape instanceof Kinetic.Rect ) {
+            updateFunction = dwv.tool.UpdateRect;
             var rectX = shape.x();
             var rectY = shape.y();
             var rectWidth = shape.width();
             var rectHeight = shape.height();
-            addAnchor(group, rectX, rectY, &#x27;topLeft&#x27;, dwv.tool.UpdateRect);
-            addAnchor(group, rectX+rectWidth, rectY, &#x27;topRight&#x27;, dwv.tool.UpdateRect);
-            addAnchor(group, rectX+rectWidth, rectY+rectHeight, &#x27;bottomRight&#x27;, dwv.tool.UpdateRect);
-            addAnchor(group, rectX, rectY+rectHeight, &#x27;bottomLeft&#x27;, dwv.tool.UpdateRect);
+            addAnchor(group, rectX, rectY, &#x27;topLeft&#x27;);
+            addAnchor(group, rectX+rectWidth, rectY, &#x27;topRight&#x27;);
+            addAnchor(group, rectX+rectWidth, rectY+rectHeight, &#x27;bottomRight&#x27;);
+            addAnchor(group, rectX, rectY+rectHeight, &#x27;bottomLeft&#x27;);
         }
         else if ( shape instanceof Kinetic.Ellipse ) {
+            updateFunction = dwv.tool.UpdateEllipse;
             var ellipseX = shape.x();
             var ellipseY = shape.y();
             var radius = shape.radius();
-            addAnchor(group, ellipseX-radius.x, ellipseY-radius.y, &#x27;topLeft&#x27;, dwv.tool.UpdateEllipse);
-            addAnchor(group, ellipseX+radius.x, ellipseY-radius.y, &#x27;topRight&#x27;, dwv.tool.UpdateEllipse);
-            addAnchor(group, ellipseX+radius.x, ellipseY+radius.y, &#x27;bottomRight&#x27;, dwv.tool.UpdateEllipse);
-            addAnchor(group, ellipseX-radius.x, ellipseY+radius.y, &#x27;bottomLeft&#x27;, dwv.tool.UpdateEllipse);
+            addAnchor(group, ellipseX-radius.x, ellipseY-radius.y, &#x27;topLeft&#x27;);
+            addAnchor(group, ellipseX+radius.x, ellipseY-radius.y, &#x27;topRight&#x27;);
+            addAnchor(group, ellipseX+radius.x, ellipseY+radius.y, &#x27;bottomRight&#x27;);
+            addAnchor(group, ellipseX-radius.x, ellipseY+radius.y, &#x27;bottomLeft&#x27;);
         }
         // add group to layer
         shape.getLayer().add( group );
@@ -392,9 +430,8 @@ dwv.tool.ShapeEditor = function ()
      * @param {Number} x The X position of the anchor.
      * @param {Number} y The Y position of the anchor.
      * @param {Number} id The id of the anchor.
-     * @param {Object} updateMethod The method used to update the associated shape.
      */
-    function addAnchor(group, x, y, id, updateMethod) {
+    function addAnchor(group, x, y, id) {
         // anchor shape
         var anchor = new Kinetic.Circle({
             x: x,
@@ -412,10 +449,71 @@ dwv.tool.ShapeEditor = function ()
             draggable: true,
             visible: false
         });
+        // set anchor on
+        setAnchorOn( anchor );
+        // add the anchor to the group
+        group.add(anchor);
+    }
+    
+    /**
+     * Get a simple clone of the input anchor.
+     * @param {Object} anchor The anchor to clone.
+     */
+    function getClone( anchor ) {
+        // create closure to properties
+        var parent = anchor.getParent();
+        var id = anchor.id();
+        var x = anchor.x();
+        var y = anchor.y();
+        // create clone object
+        var clone = {};
+        clone.getParent = function () {
+            return parent;
+        };
+        clone.id = function () {
+            return id;
+        };
+        clone.x = function () {
+            return x;
+        };
+        clone.y = function () {
+            return y;
+        };
+        return clone;
+    }
+    
+    /**
+     * Set the anchor on listeners.
+     * @param {Object} anchor The anchor to set on.
+     */
+    function setAnchorOn( anchor ) {
+        var startAnchor = null;
+        // drag start listener
+        anchor.on(&#x27;dragstart&#x27;, function () {
+            startAnchor = getClone(this);
+        });
         // drag move listener
         anchor.on(&#x27;dragmove&#x27;, function () {
-            updateMethod(shape, this);
-            this.getLayer().draw();
+            if ( updateFunction ) {
+                updateFunction(shape, this);
+            }
+            if ( this.getLayer() ) {
+                this.getLayer().draw();
+            }
+            else {
+                console.warn(&quot;No layer to draw the anchor!&quot;);
+            }
+        });
+        // drag end listener
+        anchor.on(&#x27;dragend&#x27;, function () {
+            var endAnchor = getClone(this);
+            // store the change command
+            var chgcmd = new dwv.tool.ChangeShapeCommand(
+                    shape, &quot;shape&quot;, updateFunction, startAnchor, endAnchor, app);
+            chgcmd.execute();
+            app.getUndoStack().add(chgcmd);
+            // reset start anchor
+            startAnchor = endAnchor;
         });
         // mouse down listener
         anchor.on(&#x27;mousedown touchstart&#x27;, function () {
@@ -425,16 +523,37 @@ dwv.tool.ShapeEditor = function ()
         anchor.on(&#x27;mouseover&#x27;, function () {
             document.body.style.cursor = &#x27;pointer&#x27;;
             this.stroke(&#x27;#ddd&#x27;);
-            this.getLayer().draw();
+            if ( this.getLayer() ) {
+                this.getLayer().draw();
+            }
+            else {
+                console.warn(&quot;No layer to draw the anchor!&quot;);
+            }
         });
         // mouse out styling
         anchor.on(&#x27;mouseout&#x27;, function () {
             document.body.style.cursor = &#x27;default&#x27;;
             this.stroke(&#x27;#999&#x27;);
-            this.getLayer().draw();
+            if ( this.getLayer() ) {
+                this.getLayer().draw();
+            }
+            else {
+                console.warn(&quot;No layer to draw the anchor!&quot;);
+            }
         });
-        // add the anchor to the group
-        group.add(anchor);
+    }
+    
+    /**
+     * Set the anchor off listeners.
+     * @param {Object} anchor The anchor to set off.
+     */
+    function setAnchorOff( anchor ) {
+        anchor.off(&#x27;dragstart&#x27;);
+        anchor.off(&#x27;dragmove&#x27;);
+        anchor.off(&#x27;dragend&#x27;);
+        anchor.off(&#x27;mousedown touchstart&#x27;);
+        anchor.off(&#x27;mouseover&#x27;);
+        anchor.off(&#x27;mouseout&#x27;);
     }
 };
 

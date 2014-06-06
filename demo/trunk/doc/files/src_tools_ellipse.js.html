@@ -105,6 +105,8 @@
             
                 <li><a href="../classes/dwv.tool.html">dwv.tool</a></li>
             
+                <li><a href="../classes/dwv.tool.ChangeShapeCommand.html">dwv.tool.ChangeShapeCommand</a></li>
+            
                 <li><a href="../classes/dwv.tool.DeleteShapeCommand.html">dwv.tool.DeleteShapeCommand</a></li>
             
                 <li><a href="../classes/dwv.tool.Draw.html">dwv.tool.Draw</a></li>
@@ -233,20 +235,6 @@ dwv.tool.EllipseCreator = function (points, style)
         strokeWidth: 2,
         name: &quot;shape&quot;
     });
-    // hover styling
-    kellipse.on(&#x27;mouseover&#x27;, function () {
-        if ( this.getLayer() ) {
-            document.body.style.cursor = &#x27;pointer&#x27;;
-            this.getLayer().draw();
-        }
-    });
-    // not hover styling
-    kellipse.on(&#x27;mouseout&#x27;, function () {
-        if ( this.getLayer() ) {
-            document.body.style.cursor = &#x27;default&#x27;;
-            this.getLayer().draw();
-        }
-    });
     // return shape
     return kellipse;
 };
@@ -267,23 +255,34 @@ dwv.tool.UpdateEllipse = function (ellipse, anchor)
     var topRight = group.find(&#x27;#topRight&#x27;)[0];
     var bottomRight = group.find(&#x27;#bottomRight&#x27;)[0];
     var bottomLeft = group.find(&#x27;#bottomLeft&#x27;)[0];
-    // update special points
+    // update &#x27;self&#x27; (undo case) and special points
     switch ( anchor.id() ) {
     case &#x27;topLeft&#x27;:
+        topLeft.x( anchor.x() );
+        topLeft.y( anchor.y() );
         topRight.y( anchor.y() );
         bottomLeft.x( anchor.x() );
         break;
     case &#x27;topRight&#x27;:
+        topRight.x( anchor.x() );
+        topRight.y( anchor.y() );
         topLeft.y( anchor.y() );
         bottomRight.x( anchor.x() );
         break;
     case &#x27;bottomRight&#x27;:
+        bottomRight.x( anchor.x() );
+        bottomRight.y( anchor.y() );
         bottomLeft.y( anchor.y() );
         topRight.x( anchor.x() ); 
         break;
     case &#x27;bottomLeft&#x27;:
+        bottomLeft.x( anchor.x() );
+        bottomLeft.y( anchor.y() );
         bottomRight.y( anchor.y() );
         topLeft.x( anchor.x() ); 
+        break;
+    default :
+        console.error(&#x27;Unhandled anchor id: &#x27;+anchor.id());
         break;
     }
     // update shape

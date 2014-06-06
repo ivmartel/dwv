@@ -105,6 +105,8 @@
             
                 <li><a href="../classes/dwv.tool.html">dwv.tool</a></li>
             
+                <li><a href="../classes/dwv.tool.ChangeShapeCommand.html">dwv.tool.ChangeShapeCommand</a></li>
+            
                 <li><a href="../classes/dwv.tool.DeleteShapeCommand.html">dwv.tool.DeleteShapeCommand</a></li>
             
                 <li><a href="../classes/dwv.tool.Draw.html">dwv.tool.Draw</a></li>
@@ -228,20 +230,6 @@ dwv.tool.LineCreator = function (points, style)
         stroke: style.getLineColor(),
         strokeWidth: 2,
         name: &quot;shape&quot;
-    });
-    // hover styling
-    kline.on(&#x27;mouseover&#x27;, function () {
-        if ( this.getLayer() ) {
-            document.body.style.cursor = &#x27;pointer&#x27;;
-            this.getLayer().draw();
-        }
-    });
-    // not hover styling
-    kline.on(&#x27;mouseout&#x27;, function () {
-        if ( this.getLayer() ) {
-            document.body.style.cursor = &#x27;default&#x27;;
-            this.getLayer().draw();
-        }
     });
     // return shape
     return kline;

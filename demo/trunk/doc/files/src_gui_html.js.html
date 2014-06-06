@@ -105,6 +105,8 @@
             
                 <li><a href="../classes/dwv.tool.html">dwv.tool</a></li>
             
+                <li><a href="../classes/dwv.tool.ChangeShapeCommand.html">dwv.tool.ChangeShapeCommand</a></li>
+            
                 <li><a href="../classes/dwv.tool.DeleteShapeCommand.html">dwv.tool.DeleteShapeCommand</a></li>
             
                 <li><a href="../classes/dwv.tool.Draw.html">dwv.tool.Draw</a></li>
@@ -724,7 +726,7 @@ dwv.html.decodeManifestUri = function(uri, nslices)
     // Request error
     var onErrorRequest = function(/*event*/)
     {
-        console.log( &quot;RequestError while receiving manifest: &quot;+this.status );
+        console.warn( &quot;RequestError while receiving manifest: &quot;+this.status );
     };
 
     // Request handler

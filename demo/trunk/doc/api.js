@@ -33,6 +33,7 @@ YUI.add("yuidoc-meta", function(Y) {
         "dwv.math.Rectangle",
         "dwv.math.Scissors",
         "dwv.tool",
+        "dwv.tool.ChangeShapeCommand",
         "dwv.tool.DeleteShapeCommand",
         "dwv.tool.Draw",
         "dwv.tool.DrawLivewireCommand",
