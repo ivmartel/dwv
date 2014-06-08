@@ -9790,7 +9790,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 447,
+            "line": 452,
             "description": "Handle an error: display it to the user.",
             "itemtype": "method",
             "name": "handleError",
@@ -9809,7 +9809,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 468,
+            "line": 473,
             "description": "Create the application layers.",
             "itemtype": "method",
             "name": "createLayers",
@@ -9833,7 +9833,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 501,
+            "line": 506,
             "description": "Create the DICOM tags table. To be called once the DICOM has been parsed.",
             "itemtype": "method",
             "name": "createTagsTable",
@@ -9852,7 +9852,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 534,
+            "line": 539,
             "description": "Post load application initialisation. To be called once the DICOM has been parsed.",
             "itemtype": "method",
             "name": "postLoadInit",
