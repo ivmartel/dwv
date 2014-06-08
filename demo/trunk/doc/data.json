@@ -7299,7 +7299,7 @@
         },
         {
             "file": "src/tools/editor.js",
-            "line": 220,
+            "line": 224,
             "description": "Create shape editor controls, i.e. the anchors.",
             "itemtype": "method",
             "name": "addAnchor",
@@ -7331,7 +7331,7 @@
         },
         {
             "file": "src/tools/editor.js",
-            "line": 252,
+            "line": 256,
             "description": "Get a simple clone of the input anchor.",
             "params": [
                 {
@@ -7346,7 +7346,7 @@
         },
         {
             "file": "src/tools/editor.js",
-            "line": 279,
+            "line": 283,
             "description": "Set the anchor on listeners.",
             "params": [
                 {
@@ -7361,7 +7361,7 @@
         },
         {
             "file": "src/tools/editor.js",
-            "line": 340,
+            "line": 344,
             "description": "Set the anchor off listeners.",
             "params": [
                 {
@@ -10009,15 +10009,15 @@
         },
         {
             "message": "Missing item type\nGet a simple clone of the input anchor.",
-            "line": " src/tools/editor.js:252"
+            "line": " src/tools/editor.js:256"
         },
         {
             "message": "Missing item type\nSet the anchor on listeners.",
-            "line": " src/tools/editor.js:279"
+            "line": " src/tools/editor.js:283"
         },
         {
             "message": "Missing item type\nSet the anchor off listeners.",
-            "line": " src/tools/editor.js:340"
+            "line": " src/tools/editor.js:344"
         },
         {
             "message": "Missing item type\nInit the Window/Level display",

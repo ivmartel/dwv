@@ -277,11 +277,11 @@ dwv.tool.UpdateRoi = function (roi, anchor)
     var point = group.find(&#x27;#&#x27;+anchor.id())[0];
     point.x( anchor.x() );
     point.y( anchor.y() );
-    // update the roi points
+    // update the roi point and compensate for possible drag
     // (the anchor id is the index of the point in the list)
     var points = roi.points();
-    points[anchor.id()] = anchor.x();
-    points[anchor.id()+1] = anchor.y();
+    points[anchor.id()] = anchor.x() - roi.x();
+    points[anchor.id()+1] = anchor.y() - roi.y();
     roi.points( points );
 };
 

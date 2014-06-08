@@ -380,9 +380,10 @@ dwv.tool.ShapeEditor = function ()
         var group = shape.getParent();
         // add shape specific anchors to the shape group
         if ( shape instanceof Kinetic.Line ) {
-            updateFunction = dwv.tool.UpdateLine;
             var points = shape.points();
             if ( points.length === 4 ) {
+                updateFunction = dwv.tool.UpdateLine;
+                // add shape offset
                 var lineBeginX = points[0] + shape.x();
                 var lineBeginY = points[1] + shape.y();
                 var lineEndX = points[2] + shape.x();
@@ -392,9 +393,12 @@ dwv.tool.ShapeEditor = function ()
             }
             else {
                 updateFunction = dwv.tool.UpdateRoi;
-                addAnchor(group, points[0], points[1], 0);
+                var px = 0;
+                var py = 0;
                 for ( var i = 0; i &lt; points.length; i=i+2 ) {
-                    addAnchor(group, points[i], points[i+1], i);
+                    px = points[i] + shape.x();
+                    py = points[i+1] + shape.y();
+                    addAnchor(group, px, py, i);
                 }
             }
         }

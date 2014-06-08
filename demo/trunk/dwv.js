@@ -9588,9 +9588,10 @@ dwv.tool.ShapeEditor = function ()
         var group = shape.getParent();
         // add shape specific anchors to the shape group
         if ( shape instanceof Kinetic.Line ) {
-            updateFunction = dwv.tool.UpdateLine;
             var points = shape.points();
             if ( points.length === 4 ) {
+                updateFunction = dwv.tool.UpdateLine;
+                // add shape offset
                 var lineBeginX = points[0] + shape.x();
                 var lineBeginY = points[1] + shape.y();
                 var lineEndX = points[2] + shape.x();
@@ -9600,9 +9601,12 @@ dwv.tool.ShapeEditor = function ()
             }
             else {
                 updateFunction = dwv.tool.UpdateRoi;
-                addAnchor(group, points[0], points[1], 0);
+                var px = 0;
+                var py = 0;
                 for ( var i = 0; i < points.length; i=i+2 ) {
-                    addAnchor(group, points[i], points[i+1], i);
+                    px = points[i] + shape.x();
+                    py = points[i+1] + shape.y();
+                    addAnchor(group, px, py, i);
                 }
             }
         }
@@ -10426,8 +10430,8 @@ dwv.tool.UpdateLine = function (line, anchor)
         end.y( anchor.y() );
         break;
     }
-    // update shape
-    // shape.position() and shape.size() won't work...
+    // update shape and compensate for possible drag
+    // note: shape.position() and shape.size() won't work...
     var bx = begin.x() - line.x();
     var by = begin.y() - line.y();
     var ex = end.x() - line.x();
@@ -10992,11 +10996,11 @@ dwv.tool.UpdateRoi = function (roi, anchor)
     var point = group.find('#'+anchor.id())[0];
     point.x( anchor.x() );
     point.y( anchor.y() );
-    // update the roi points
+    // update the roi point and compensate for possible drag
     // (the anchor id is the index of the point in the list)
     var points = roi.points();
-    points[anchor.id()] = anchor.x();
-    points[anchor.id()+1] = anchor.y();
+    points[anchor.id()] = anchor.x() - roi.x();
+    points[anchor.id()+1] = anchor.y() - roi.y();
     roi.points( points );
 };
 ;/** 
