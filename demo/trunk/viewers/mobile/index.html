@@ -11,8 +11,6 @@
 body { margin: 10px; padding: 0; }
 #layerContainer { margin: auto; text-align: center; }
 #imageLayer { left: 0px; }
-#drawLayer { left: 0px; }
-#tempLayer { left: 0px; }
 </style>
 <link rel="stylesheet" href="../../ext/jquery-mobile/jquery.mobile-1.4.1.min.css" />
 <!-- mobile web app -->
@@ -31,6 +29,7 @@ body { margin: 10px; padding: 0; }
 <script type="text/javascript" src="../../ext/jquery-mobile/jquery.mobile-1.4.1.min.js"></script>
 <script type="text/javascript" src="../../ext/flot/jquery.flot.min.js"></script>
 <script type="text/javascript" src="../../ext/openjpeg/openjpeg.js"></script>
+<script type="text/javascript" src="../../ext/kinetic/kinetic-v5.1.0.min.js"></script>
 <!-- Local -->
 <script type="text/javascript" src="../../dwv-0.7.0beta.min.js"></script>
 <!-- Launch the app -->
@@ -69,14 +68,13 @@ body { margin: 10px; padding: 0; }
 <!-- Layer Container -->
 <div id="layerContainer">
 <canvas id="imageLayer">Only for HTML5 compatible browsers...</canvas>
-<canvas id="drawLayer">Only for HTML5 compatible browsers...</canvas>
-<canvas id="tempLayer">Only for HTML5 compatible browsers...</canvas>
 <div id="infoLayer">
 <div id="infotl"></div>
 <div id="infotr"></div>
 <div id="infobl"></div>
 <div id="infobr"><div id="plot"></div></div>
 </div><!-- /infoLayer -->
+<div id="kineticDiv"></div>
 </div><!-- /layerContainer -->
 
 <!-- History -->

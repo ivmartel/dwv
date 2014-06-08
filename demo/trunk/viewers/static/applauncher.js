@@ -16,10 +16,9 @@ $(document).ready( function()
     $("#openData").dialog({ position: 
         {my: "left top", at: "left top", of: "#pageMain"} });
     $("#toolbox").dialog({ position: 
-        {my: "left top+200", at: "left top", of: "#pageMain"} });
+        {my: "left top+160", at: "left top", of: "#pageMain"} });
     $("#history").dialog({ position: 
-        {my: "left top+370", at: "left top", of: "#pageMain"},
-        autoOpen: false });
+        {my: "left top+350", at: "left top", of: "#pageMain"} });
     $("#tags").dialog({ position: 
         {my: "right top", at: "right top", of: "#pageMain"},
         autoOpen: false, width: 500, height: 590 });
@@ -65,10 +64,10 @@ $(document).ready( function()
 
     // Add shapes to the shape list for the draw tool
     dwv.tool.shapes = {};
-    dwv.tool.shapes.line = dwv.tool.DrawLineCommand;
-    dwv.tool.shapes.rectangle = dwv.tool.DrawRectangleCommand;
-    dwv.tool.shapes.roi = dwv.tool.DrawRoiCommand;
-    dwv.tool.shapes.circle = dwv.tool.DrawCircleCommand;
+    dwv.tool.shapes.line = dwv.tool.LineCreator;
+    dwv.tool.shapes.rectangle = dwv.tool.RectangleCreator;
+    dwv.tool.shapes.roi = dwv.tool.RoiCreator;
+    dwv.tool.shapes.ellipse = dwv.tool.EllipseCreator;
 
     // append tool container HTML
     dwv.gui.appendToolboxHtml();
