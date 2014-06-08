@@ -54,8 +54,8 @@ dwv.tool.UpdateLine = function (line, anchor)
         end.y( anchor.y() );
         break;
     }
-    // update shape
-    // shape.position() and shape.size() won't work...
+    // update shape and compensate for possible drag
+    // note: shape.position() and shape.size() won't work...
     var bx = begin.x() - line.x();
     var by = begin.y() - line.y();
     var ex = end.x() - line.x();
