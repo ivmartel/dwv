@@ -706,6 +706,9 @@ dwv.tool.Draw = function (app)
             cmdName = &quot;ellipse&quot;;
         }
         
+        // shape color
+        var color = shape.stroke();
+        
         // drag start event handling
         shape.on(&#x27;dragstart&#x27;, function (event) {
             // save start position
@@ -731,10 +734,12 @@ dwv.tool.Draw = function (app)
             // highlight trash when on it
             if ( Math.abs( pos.x - trash.x() ) &lt; 10 &amp;&amp;
                     Math.abs( pos.y - trash.y() ) &lt; 10   ) {
-                trash.getChildren().each( function (shape){ shape.stroke(&#x27;orange&#x27;); });
+                trash.getChildren().each( function (tshape){ tshape.stroke(&#x27;orange&#x27;); });
+                shape.stroke(&#x27;red&#x27;);
             }
             else {
-                trash.getChildren().each( function (shape){ shape.stroke(&#x27;red&#x27;); });
+                trash.getChildren().each( function (tshape){ tshape.stroke(&#x27;red&#x27;); });
+                shape.stroke(color);
             }
             // reset anchors
             shapeEditor.resetAnchors();
