@@ -122,7 +122,7 @@ dwv.tool.ZoomAndPan = function(app)
             // zoom mode
             var zoom = (lineRatio - 1) / 2;
             if( Math.abs(zoom) % 0.1 <= 0.05 ) {
-                zoomLayers(zoom, self.midPoint.getX(), self.midPoint.getY());
+                zoomLayers(zoom, self.midPoint.getX(), self.midPoint.getY(),event._xs, event._ys);
             }
         }
     };
