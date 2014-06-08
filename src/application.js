@@ -385,22 +385,27 @@ dwv.App = function()
             if( touches.length === 1 || touches.length === 2)
             {
                 var touch = touches[0];
-                var zoom = self.getImageLayer().getZoom().x;
                 // store
                 event._x = touch.pageX - parseInt(app.getImageLayer().getOffset().left, 10);
                 event._xs = event._x;
-                event._x = parseInt( (event._x / zoom), 10 );
+                //event._x = parseInt( (event._x / zoom), 10 );
                 event._y = touch.pageY - parseInt(app.getImageLayer().getOffset().top, 10);
                 event._ys = event._y;
-                event._y = parseInt( (event._y / zoom), 10 );
+                //event._y = parseInt( (event._y / zoom), 10 );
+                var t = self.getImageLayer().displayToIndex( {'x': event._x, 'y': event._y} );
+                event._x = parseInt( t.x, 10 );
+                event._y = parseInt( t.y, 10 );
                 // second finger
                 if (touches.length === 2) {
                     touch = touches[1];
                     // store
                     event._x1 = touch.pageX - parseInt(app.getImageLayer().getOffset().left, 10);
-                    event._x1 = parseInt( (event._x1 / zoom), 10 );
+                    //event._x1 = parseInt( (event._x1 / zoom), 10 );
                     event._y1 = touch.pageY - parseInt(app.getImageLayer().getOffset().top, 10);
-                    event._y1 = parseInt( (event._y1 / zoom), 10 );
+                    //event._y1 = parseInt( (event._y1 / zoom), 10 );
+                    var t1 = self.getImageLayer().displayToIndex( {'x': event._x1, 'y': event._y1} );
+                    event._x1 = parseInt( t1.x, 10 );
+                    event._y1 = parseInt( t1.y, 10 );
                 }
                 // set handle event flag
                 handled = true;
