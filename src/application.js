@@ -419,14 +419,10 @@ dwv.App = function()
             event.type === "dblclick" ||
             event.type === "DOMMouseScroll" )
         {
-            // layerX is for firefox
-            event._x = event.offsetX === undefined ? event.layerX : event.offsetX;
-            event._xs = event._x;
-            //event._x = parseInt( (event._x / zoom), 10 );
-            event._y = event.offsetY === undefined ? event.layerY : event.offsetY;
-            event._ys = event._y;
-            //event._y = parseInt( (event._y / zoom), 10 );
-            var p = self.getImageLayer().displayToIndex( {'x': event._x, 'y': event._y} );
+            var offset = dwv.getOffset(event);
+            event._xs = offset.x;
+            event._ys = offset.y;
+            var p = self.getImageLayer().displayToIndex( offset );
             event._x = parseInt( p.x, 10 );
             event._y = parseInt( p.y, 10 );
             // set handle event flag

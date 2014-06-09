@@ -487,6 +487,7 @@ dwv.tool.Draw = function (app)
         // make it draggable
         shape.draggable(true);
         var dragStartPos = null;
+        var dragLastPos = null;
         
         // command name based on shape type
         var cmdName = "shape";
@@ -506,7 +507,7 @@ dwv.tool.Draw = function (app)
         // drag start event handling
         shape.on('dragstart', function (event) {
             // save start position
-            var offset = { 'x': event.evt.offsetX, 'y': event.evt.offsetY };
+            var offset = dwv.getOffset( event.evt );
             dragStartPos = getRealPosition( offset );
             // display trash
             var stage = app.getKineticStage();
@@ -523,8 +524,9 @@ dwv.tool.Draw = function (app)
         });
         // drag move event handling
         shape.on('dragmove', function (event) {
-            var offset = { 'x': event.evt.offsetX, 'y': event.evt.offsetY };
+            var offset = dwv.getOffset( event.evt );
             var pos = getRealPosition( offset );
+            dragLastPos = pos;
             // highlight trash when on it
             if ( Math.abs( pos.x - trash.x() ) < 10 &&
                     Math.abs( pos.y - trash.y() ) < 10   ) {
@@ -541,9 +543,8 @@ dwv.tool.Draw = function (app)
             app.getKineticLayer().draw();
         });
         // drag end event handling
-        shape.on('dragend', function (event) {
-            var offset = { 'x': event.evt.offsetX, 'y': event.evt.offsetY };
-            var pos = getRealPosition( offset );
+        shape.on('dragend', function (/*event*/) {
+            var pos = dragLastPos;
             // delete case
             if ( Math.abs( pos.x - trash.x() ) < 10 &&
                     Math.abs( pos.y - trash.y() ) < 10   ) {
@@ -555,6 +556,8 @@ dwv.tool.Draw = function (app)
                     shape.x( shape.x() - delTranslation.x );
                     shape.y( shape.y() - delTranslation.y );
                 });
+                // restore color
+                shape.stroke(color);
                 // disable editor
                 shapeEditor.disable();
                 shapeEditor.setShape(null);
