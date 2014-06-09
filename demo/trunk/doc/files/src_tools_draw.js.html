@@ -693,6 +693,7 @@ dwv.tool.Draw = function (app)
         // make it draggable
         shape.draggable(true);
         var dragStartPos = null;
+        var dragLastPos = null;
         
         // command name based on shape type
         var cmdName = &quot;shape&quot;;
@@ -712,7 +713,7 @@ dwv.tool.Draw = function (app)
         // drag start event handling
         shape.on(&#x27;dragstart&#x27;, function (event) {
             // save start position
-            var offset = { &#x27;x&#x27;: event.evt.offsetX, &#x27;y&#x27;: event.evt.offsetY };
+            var offset = dwv.getOffset( event.evt );
             dragStartPos = getRealPosition( offset );
             // display trash
             var stage = app.getKineticStage();
@@ -729,8 +730,9 @@ dwv.tool.Draw = function (app)
         });
         // drag move event handling
         shape.on(&#x27;dragmove&#x27;, function (event) {
-            var offset = { &#x27;x&#x27;: event.evt.offsetX, &#x27;y&#x27;: event.evt.offsetY };
+            var offset = dwv.getOffset( event.evt );
             var pos = getRealPosition( offset );
+            dragLastPos = pos;
             // highlight trash when on it
             if ( Math.abs( pos.x - trash.x() ) &lt; 10 &amp;&amp;
                     Math.abs( pos.y - trash.y() ) &lt; 10   ) {
@@ -747,9 +749,8 @@ dwv.tool.Draw = function (app)
             app.getKineticLayer().draw();
         });
         // drag end event handling
-        shape.on(&#x27;dragend&#x27;, function (event) {
-            var offset = { &#x27;x&#x27;: event.evt.offsetX, &#x27;y&#x27;: event.evt.offsetY };
-            var pos = getRealPosition( offset );
+        shape.on(&#x27;dragend&#x27;, function (/*event*/) {
+            var pos = dragLastPos;
             // delete case
             if ( Math.abs( pos.x - trash.x() ) &lt; 10 &amp;&amp;
                     Math.abs( pos.y - trash.y() ) &lt; 10   ) {
@@ -761,6 +762,8 @@ dwv.tool.Draw = function (app)
                     shape.x( shape.x() - delTranslation.x );
                     shape.y( shape.y() - delTranslation.y );
                 });
+                // restore color
+                shape.stroke(color);
                 // disable editor
                 shapeEditor.disable();
                 shapeEditor.setShape(null);

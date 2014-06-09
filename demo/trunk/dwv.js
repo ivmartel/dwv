@@ -419,14 +419,10 @@ dwv.App = function()
             event.type === "dblclick" ||
             event.type === "DOMMouseScroll" )
         {
-            // layerX is for firefox
-            event._x = event.offsetX === undefined ? event.layerX : event.offsetX;
-            event._xs = event._x;
-            //event._x = parseInt( (event._x / zoom), 10 );
-            event._y = event.offsetY === undefined ? event.layerY : event.offsetY;
-            event._ys = event._y;
-            //event._y = parseInt( (event._y / zoom), 10 );
-            var p = self.getImageLayer().displayToIndex( {'x': event._x, 'y': event._y} );
+            var offset = dwv.getOffset(event);
+            event._xs = offset.x;
+            event._ys = offset.y;
+            var p = self.getImageLayer().displayToIndex( offset );
             event._x = parseInt( p.x, 10 );
             event._y = parseInt( p.y, 10 );
             // set handle event flag
@@ -4935,6 +4931,27 @@ dwv.html.Layer = function(name)
     };
 }; // Layer class
 
+/**
+ * Get the offset of an input event.
+ * @param {Object} event The event to get the offset from.
+ * @method getOffset
+ * @static
+ */
+dwv.getOffset = function (event) {
+    var ex = 0;
+    var ey = 0;
+    if ( event.targetTouches && event.targetTouches.length !== 0 ) {
+        var touch0 = event.targetTouches[0];
+        ex = touch0.pageX - app.getImageLayer().getOffset().left;
+        ey = touch0.pageY - app.getImageLayer().getOffset().top;
+    }
+    else {
+        // layerX is used by Firefox
+        ex = event.offsetX === undefined ? event.layerX : event.offsetX;
+        ey = event.offsetY === undefined ? event.layerY : event.offsetY;
+    }
+    return { 'x': ex, 'y': ey };
+};
 ;/** 
  * GUI module.
  * @module gui
@@ -9251,6 +9268,7 @@ dwv.tool.Draw = function (app)
         // make it draggable
         shape.draggable(true);
         var dragStartPos = null;
+        var dragLastPos = null;
         
         // command name based on shape type
         var cmdName = "shape";
@@ -9270,7 +9288,7 @@ dwv.tool.Draw = function (app)
         // drag start event handling
         shape.on('dragstart', function (event) {
             // save start position
-            var offset = { 'x': event.evt.offsetX, 'y': event.evt.offsetY };
+            var offset = dwv.getOffset( event.evt );
             dragStartPos = getRealPosition( offset );
             // display trash
             var stage = app.getKineticStage();
@@ -9287,8 +9305,9 @@ dwv.tool.Draw = function (app)
         });
         // drag move event handling
         shape.on('dragmove', function (event) {
-            var offset = { 'x': event.evt.offsetX, 'y': event.evt.offsetY };
+            var offset = dwv.getOffset( event.evt );
             var pos = getRealPosition( offset );
+            dragLastPos = pos;
             // highlight trash when on it
             if ( Math.abs( pos.x - trash.x() ) < 10 &&
                     Math.abs( pos.y - trash.y() ) < 10   ) {
@@ -9305,9 +9324,8 @@ dwv.tool.Draw = function (app)
             app.getKineticLayer().draw();
         });
         // drag end event handling
-        shape.on('dragend', function (event) {
-            var offset = { 'x': event.evt.offsetX, 'y': event.evt.offsetY };
-            var pos = getRealPosition( offset );
+        shape.on('dragend', function (/*event*/) {
+            var pos = dragLastPos;
             // delete case
             if ( Math.abs( pos.x - trash.x() ) < 10 &&
                     Math.abs( pos.y - trash.y() ) < 10   ) {
@@ -9319,6 +9337,8 @@ dwv.tool.Draw = function (app)
                     shape.x( shape.x() - delTranslation.x );
                     shape.y( shape.y() - delTranslation.y );
                 });
+                // restore color
+                shape.stroke(color);
                 // disable editor
                 shapeEditor.disable();
                 shapeEditor.setShape(null);

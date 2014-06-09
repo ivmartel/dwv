@@ -3595,6 +3595,24 @@
             "namespace": "dwv.html"
         },
         {
+            "file": "src/gui/layer.js",
+            "line": 372,
+            "description": "Get the offset of an input event.",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The event to get the offset from.",
+                    "type": "Object"
+                }
+            ],
+            "itemtype": "method",
+            "name": "getOffset",
+            "static": 1,
+            "class": "dwv.html.Layer",
+            "module": "html",
+            "namespace": "dwv.html"
+        },
+        {
             "file": "src/gui/loader.js",
             "line": 15,
             "description": "Append the loadbox HTML to the page.",
@@ -7041,7 +7059,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 589,
+            "line": 592,
             "description": "Help for this tool.",
             "itemtype": "method",
             "name": "getHelp",
@@ -7055,7 +7073,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 609,
+            "line": 612,
             "description": "Set the line color of the drawing.",
             "itemtype": "method",
             "name": "setLineColour",
@@ -7072,7 +7090,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 620,
+            "line": 623,
             "description": "Set the shape name of the drawing.",
             "itemtype": "method",
             "name": "setShapeName",
@@ -7089,7 +7107,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 635,
+            "line": 638,
             "description": "Check if the shape is in the shape list.",
             "itemtype": "method",
             "name": "hasShape",
@@ -7106,7 +7124,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 644,
+            "line": 647,
             "description": "Initialise the tool.",
             "itemtype": "method",
             "name": "init",
@@ -9790,7 +9808,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 452,
+            "line": 448,
             "description": "Handle an error: display it to the user.",
             "itemtype": "method",
             "name": "handleError",
@@ -9809,7 +9827,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 473,
+            "line": 469,
             "description": "Create the application layers.",
             "itemtype": "method",
             "name": "createLayers",
@@ -9833,7 +9851,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 506,
+            "line": 502,
             "description": "Create the DICOM tags table. To be called once the DICOM has been parsed.",
             "itemtype": "method",
             "name": "createTagsTable",
@@ -9852,7 +9870,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 539,
+            "line": 535,
             "description": "Post load application initialisation. To be called once the DICOM has been parsed.",
             "itemtype": "method",
             "name": "postLoadInit",
@@ -9949,7 +9967,7 @@
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/tools/draw.js:589"
+            "line": " src/tools/draw.js:592"
         },
         {
             "message": "replacing incorrect tag: returns with return",
