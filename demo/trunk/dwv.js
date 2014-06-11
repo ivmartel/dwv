@@ -605,8 +605,6 @@ dwv.App = function()
     }
     
 };
-
-dwv.getA = function () { return 3; };
 ;/** 
  * DICOM module.
  * @module dicom
