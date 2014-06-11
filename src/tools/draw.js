@@ -209,11 +209,17 @@ dwv.tool.Draw = function (app)
     var command = null;
     /**
      * Current active shape.
-     * @property shape
+     * @property activeShape
      * @private
      * @type Object
      */
     var activeShape = null;
+    /**
+     * List of created shapes.
+     * @property createdShapes
+     * @private
+     * @type Array
+     */
     var createdShapes = [];
     /**
      * Current shape group.
@@ -260,15 +266,24 @@ dwv.tool.Draw = function (app)
      */
     var shapeEditor = new dwv.tool.ShapeEditor();
 
+    /**
+     * Trash draw: a cross.
+     * @property trash
+     * @private
+     * @type Object
+     */
+    var trash = new Kinetic.Group();
+
+    // first line of the cross
     var trashLine1 = new Kinetic.Line({
         points: [-10, -10, 10, 10 ],
         stroke: 'red',
     });
+    // second line of the cross
     var trashLine2 = new Kinetic.Line({
         points: [10, -10, -10, 10 ],
         stroke: 'red'
     });
-    var trash = new Kinetic.Group();
     trash.add(trashLine1);
     trash.add(trashLine2);
 
