@@ -27,9 +27,9 @@ dwv.tool.DrawShapeCommand = function (shape, name, app)
     this.execute = function () {
         var group = shape.getParent();
         // add the group to the layer
-        app.getKineticLayer().add(group);
+        app.getDrawLayer().add(group);
         // draw
-        app.getKineticLayer().draw();
+        app.getDrawLayer().draw();
     };
     /**
      * Undo the command.
@@ -40,7 +40,7 @@ dwv.tool.DrawShapeCommand = function (shape, name, app)
         // remove the group from the parent layer
         group.remove();
         // draw
-        app.getKineticLayer().draw();
+        app.getDrawLayer().draw();
     };
 }; // DrawShapeCommand class
 
@@ -71,7 +71,7 @@ dwv.tool.MoveShapeCommand = function (shape, name, translation, app)
             shape.y( shape.y() + translation.y );
         });
         // draw
-        app.getKineticLayer().draw();
+        app.getDrawLayer().draw();
     };
     /**
      * Undo the command.
@@ -85,7 +85,7 @@ dwv.tool.MoveShapeCommand = function (shape, name, translation, app)
             shape.y( shape.y() - translation.y );
         });
         // draw
-        app.getKineticLayer().draw();
+        app.getDrawLayer().draw();
     };
 }; // MoveShapeCommand class
 
@@ -112,7 +112,7 @@ dwv.tool.ChangeShapeCommand = function (shape, name, func, startAnchor, endAncho
         // change shape
         func( shape, endAnchor );
         // draw
-        app.getKineticLayer().draw();
+        app.getDrawLayer().draw();
     };
     /**
      * Undo the command.
@@ -122,7 +122,7 @@ dwv.tool.ChangeShapeCommand = function (shape, name, func, startAnchor, endAncho
         // invert change shape
         func( shape, startAnchor );
         // draw
-        app.getKineticLayer().draw();
+        app.getDrawLayer().draw();
     };
 }; // ChangeShapeCommand class
 
@@ -149,7 +149,7 @@ dwv.tool.DeleteShapeCommand = function (shape, name, app)
         // remove the group from the parent layer
         group.remove();
         // draw
-        app.getKineticLayer().draw();
+        app.getDrawLayer().draw();
     };
     /**
      * Undo the command.
@@ -158,9 +158,9 @@ dwv.tool.DeleteShapeCommand = function (shape, name, app)
     this.undo = function () {
         var group = shape.getParent();
         // add the group to the layer
-        app.getKineticLayer().add(group);
+        app.getDrawLayer().add(group);
         // draw
-        app.getKineticLayer().draw();
+        app.getDrawLayer().draw();
     };
 }; // DeleteShapeCommand class
 
@@ -279,7 +279,7 @@ dwv.tool.Draw = function (app)
      */
     this.mousedown = function(event){
         // determine if the click happened in an existing shape
-        var stage = app.getKineticStage();
+        var stage = app.getDrawStage();
         var kshape = stage.getIntersection({
             x: event._xs, 
             y: event._ys
@@ -441,7 +441,7 @@ dwv.tool.Draw = function (app)
             createdShapes.forEach( function (shape){ setShapeOff( shape ); });
         }
         // draw
-        app.getKineticLayer().draw();
+        app.getDrawLayer().draw();
     };
     
     /**
@@ -464,7 +464,7 @@ dwv.tool.Draw = function (app)
      * Get the real position from an event.
      */
     function getRealPosition( index ) {
-        var stage = app.getKineticStage();
+        var stage = app.getDrawStage();
         return { 'x': stage.offset().x + index.x / stage.scale().x,
             'y': stage.offset().y + index.y / stage.scale().y };
     }
@@ -507,24 +507,24 @@ dwv.tool.Draw = function (app)
         // drag start event handling
         shape.on('dragstart', function (event) {
             // save start position
-            var offset = dwv.getOffset( event.evt );
+            var offset = dwv.html.getEventOffset( event.evt )[0];
             dragStartPos = getRealPosition( offset );
             // display trash
-            var stage = app.getKineticStage();
+            var stage = app.getDrawStage();
             var scale = stage.scale();
             var invscale = {'x': 1/scale.x, 'y': 1/scale.y};
             trash.x( stage.offset().x + ( 256 / scale.x ) );
             trash.y( stage.offset().y + ( 20 / scale.y ) );
             trash.scale( invscale );
-            app.getKineticLayer().add( trash );
+            app.getDrawLayer().add( trash );
             // deactivate anchors to avoid events on null shape
             shapeEditor.setAnchorsActive(false);
             // draw
-            app.getKineticLayer().draw();
+            app.getDrawLayer().draw();
         });
         // drag move event handling
         shape.on('dragmove', function (event) {
-            var offset = dwv.getOffset( event.evt );
+            var offset = dwv.html.getEventOffset( event.evt )[0];
             var pos = getRealPosition( offset );
             dragLastPos = pos;
             // highlight trash when on it
@@ -540,7 +540,7 @@ dwv.tool.Draw = function (app)
             // reset anchors
             shapeEditor.resetAnchors();
             // draw
-            app.getKineticLayer().draw();
+            app.getDrawLayer().draw();
         });
         // drag end event handling
         shape.on('dragend', function (/*event*/) {
@@ -582,7 +582,7 @@ dwv.tool.Draw = function (app)
             // remove trash
             trash.remove();
             // draw
-            app.getKineticLayer().draw();
+            app.getDrawLayer().draw();
         });
     };
 

@@ -371,22 +371,29 @@ dwv.html.Layer = function(name)
 
 /**
  * Get the offset of an input event.
- * @param {Object} event The event to get the offset from.
- * @method getOffset
+ * @method getEventOffset
  * @static
+ * @param {Object} event The event to get the offset from.
+ * @return {Array} The array of offsets.
  */
-dwv.getOffset = function (event) {
+dwv.html.getEventOffset = function (event) {
+    var positions = [];
     var ex = 0;
     var ey = 0;
-    if ( event.targetTouches && event.targetTouches.length !== 0 ) {
-        var touch0 = event.targetTouches[0];
-        ex = touch0.pageX - app.getImageLayer().getOffset().left;
-        ey = touch0.pageY - app.getImageLayer().getOffset().top;
+    if ( event.targetTouches ) {
+        var touch = null;
+        for ( var i = 0 ; i < event.targetTouches.length; ++i ) {
+            touch = event.targetTouches[i];
+            ex = touch.pageX - app.getImageLayer().getOffset().left;
+            ey = touch.pageY - app.getImageLayer().getOffset().top;
+            positions.push({'x': ex, 'y': ey});
+        }
     }
     else {
         // layerX is used by Firefox
         ex = event.offsetX === undefined ? event.layerX : event.offsetX;
         ey = event.offsetY === undefined ? event.layerY : event.offsetY;
+        positions.push({'x': ex, 'y': ey});
     }
-    return { 'x': ex, 'y': ey };
+    return positions;
 };
