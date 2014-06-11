@@ -457,9 +457,9 @@ dwv.tool.ZoomAndPan = function(app)
             app.getImageLayer().zoom(newZoom.x, newZoom.y, cx2, cy2);
             app.getImageLayer().draw();
         }
-        if( app.getKineticStage() ) { 
+        if( app.getDrawStage() ) { 
             
-            var stage = app.getKineticStage();
+            var stage = app.getDrawStage();
             var oldKZoom = stage.scale();
             var newKZoom = {&#x27;x&#x27;: (oldKZoom.x + step), &#x27;y&#x27;: (oldKZoom.y + step)};
             
@@ -486,8 +486,8 @@ dwv.tool.ZoomAndPan = function(app)
             app.getImageLayer().translate(tx, ty);
             app.getImageLayer().draw();
         }
-        if( app.getKineticStage() ) { 
-            var stage = app.getKineticStage();
+        if( app.getDrawStage() ) { 
+            var stage = app.getDrawStage();
             var offset = stage.offset();
             offset.x -= tx;
             offset.y -= ty;

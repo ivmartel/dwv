@@ -15,20 +15,26 @@ dwv.App = function()
     var self = this;
     // Image
     var image = null;
+    // View
     var view = null;
     // Original image
     var originalImage = null;
     // Image data array
     var imageData = null;
+    // Image data width
     var dataWidth = 0;
+    // Image data height
     var dataHeight = 0;
+
+    // display window scale
     var windowScale = 1;
      
     // Image layer
     var imageLayer = null;
-    // Kinetic layer
-    var kineticLayer = null;
-    var kineticStage = null;
+    // Draw layer
+    var drawLayer = null;
+    // Draw stage
+    var drawStage = null;
     
     // flag to know if the info layer is listening on the image.
     var isInfoLayerListening = false;
@@ -100,12 +106,17 @@ dwv.App = function()
      */
     this.getImageLayer = function() { return imageLayer; };
     /** 
-     * Get the kinetic layer.
-     * @method getKineticLayer
-     * @return {Object} The temporary layer.
+     * Get the draw layer.
+     * @method getDrawLayer
+     * @return {Object} The draw layer.
      */
-    this.getKineticLayer = function() { return kineticLayer; };
-    this.getKineticStage = function() { return kineticStage; };
+    this.getDrawLayer = function() { return drawLayer; };
+    /** 
+     * Get the draw stage.
+     * @method getDrawStage
+     * @return {Object} The draw layer.
+     */
+    this.getDrawStage = function() { return drawStage; };
 
     /** 
      * Get the undo stack.
@@ -120,12 +131,12 @@ dwv.App = function()
      */
     this.init = function(){
         // align layers when the window is resized
-        window.onresize = app.resize;
+        window.onresize = this.resize;
         // possible load from URL
         if( typeof skipLoadUrl === "undefined" ) {
             var inputUrls = dwv.html.getUriParam(); 
             if( inputUrls && inputUrls.length > 0 ) {
-                app.loadURL(inputUrls);
+                this.loadURL(inputUrls);
             }
         }
         else{
@@ -144,16 +155,19 @@ dwv.App = function()
         undoStack = new dwv.tool.UndoStack(this);
     };
     
+    /**
+     * Reset the layout of the application.
+     * @method resetLayout
+     */
     this.resetLayout = function () {
-        if ( app.getImageLayer() ) {
-            app.getImageLayer().resetLayout(windowScale);
-            app.getImageLayer().draw();
+        if ( imageLayer ) {
+            imageLayer.resetLayout(windowScale);
+            imageLayer.draw();
         }
-        if ( app.getKineticStage() ) {
-            var stage = app.getKineticStage();
-            stage.offset( {'x': 0, 'y': 0} );
-            stage.scale( {'x': windowScale, 'y': windowScale} );
-            stage.draw();
+        if ( drawStage ) {
+            drawStage.offset( {'x': 0, 'y': 0} );
+            drawStage.scale( {'x': windowScale, 'y': windowScale} );
+            drawStage.draw();
         }
     };
     
@@ -169,11 +183,11 @@ dwv.App = function()
     {
         if( event.keyCode === 90 && event.ctrlKey ) // ctrl-z
         {
-            self.getUndoStack().undo();
+            undoStack.undo();
         }
         else if( event.keyCode === 89 && event.ctrlKey ) // ctrl-y
         {
-            self.getUndoStack().redo();
+            undoStack.redo();
         }
     };
     
@@ -184,7 +198,7 @@ dwv.App = function()
      */
     this.onChangeFiles = function(event)
     {
-        self.loadFiles(event.target.files);
+        this.loadFiles(event.target.files);
     };
 
     /**
@@ -216,7 +230,7 @@ dwv.App = function()
      */
     this.onChangeURL = function(event)
     {
-        self.loadURL([event.target.value]);
+        this.loadURL([event.target.value]);
     };
 
     /**
@@ -248,11 +262,11 @@ dwv.App = function()
     this.generateAndDrawImage = function()
     {         
         // generate image data from DICOM
-        self.getView().generateImageData(imageData);         
+        view.generateImageData(imageData);         
         // set the image data of the layer
-        self.getImageLayer().setImageData(imageData);
+        imageLayer.setImageData(imageData);
         // draw the image
-        self.getImageLayer().draw();
+        imageLayer.draw();
     };
     
     /**
@@ -276,26 +290,26 @@ dwv.App = function()
         $("#layerContainer").width(newWidth);
         $("#layerContainer").height(newHeight + 1); // +1 to be sure...
         // resize image layer
-        if( app.getImageLayer() ) {
-            var iZoomX = app.getImageLayer().getZoom().x * mul;
-            var iZoomY = app.getImageLayer().getZoom().y * mul;
-            app.getImageLayer().setWidth(newWidth);
-            app.getImageLayer().setHeight(newHeight);
-            app.getImageLayer().zoom(iZoomX, iZoomY, 0, 0);
-            app.getImageLayer().draw();
+        if( imageLayer ) {
+            var iZoomX = imageLayer.getZoom().x * mul;
+            var iZoomY = imageLayer.getZoom().y * mul;
+            imageLayer.setWidth(newWidth);
+            imageLayer.setHeight(newHeight);
+            imageLayer.zoom(iZoomX, iZoomY, 0, 0);
+            imageLayer.draw();
         }
-        // resize draw layer
-        if( kineticStage ) {
+        // resize draw stage
+        if( drawStage ) {
             // resize div
-            $("#kineticDiv").width(newWidth);
-            $("#kineticDiv").height(newHeight);
+            $("#drawDiv").width(newWidth);
+            $("#drawDiv").height(newHeight);
             // resize stage
-            var kZoomX = kineticStage.scale().x * mul;
-            var kZoomY = kineticStage.scale().y * mul;
-            kineticStage.setWidth(newWidth);
-            kineticStage.setHeight(newHeight);
-            kineticStage.scale( {x: kZoomX, y: kZoomY} );
-            kineticStage.draw();
+            var stageZomX = drawStage.scale().x * mul;
+            var stageZoomY = drawStage.scale().y * mul;
+            drawStage.setWidth(newWidth);
+            drawStage.setHeight(newHeight);
+            drawStage.scale( {x: stageZomX, y: stageZoomY} );
+            drawStage.draw();
         }
     };
     
@@ -376,40 +390,30 @@ dwv.App = function()
         // Store the event position relative to the image canvas
         // in an extra member of the event:
         // event._x and event._y.
+        var offsets = null;
+        var position = null;
         if( event.type === "touchstart" ||
             event.type === "touchmove")
         {
             event.preventDefault();
-            var touches = event.targetTouches;
-            // If there's one or two fingers inside this element
-            if( touches.length === 1 || touches.length === 2)
-            {
-                var touch = touches[0];
-                // store
-                event._x = touch.pageX - parseInt(app.getImageLayer().getOffset().left, 10);
-                event._xs = event._x;
-                //event._x = parseInt( (event._x / zoom), 10 );
-                event._y = touch.pageY - parseInt(app.getImageLayer().getOffset().top, 10);
-                event._ys = event._y;
-                //event._y = parseInt( (event._y / zoom), 10 );
-                var t = self.getImageLayer().displayToIndex( {'x': event._x, 'y': event._y} );
-                event._x = parseInt( t.x, 10 );
-                event._y = parseInt( t.y, 10 );
-                // second finger
-                if (touches.length === 2) {
-                    touch = touches[1];
-                    // store
-                    event._x1 = touch.pageX - parseInt(app.getImageLayer().getOffset().left, 10);
-                    //event._x1 = parseInt( (event._x1 / zoom), 10 );
-                    event._y1 = touch.pageY - parseInt(app.getImageLayer().getOffset().top, 10);
-                    //event._y1 = parseInt( (event._y1 / zoom), 10 );
-                    var t1 = self.getImageLayer().displayToIndex( {'x': event._x1, 'y': event._y1} );
-                    event._x1 = parseInt( t1.x, 10 );
-                    event._y1 = parseInt( t1.y, 10 );
-                }
-                // set handle event flag
-                handled = true;
+            // event offset(s)
+            offsets = dwv.html.getEventOffset(event);
+            // should have at least one offset
+            event._xs = offsets[0].x;
+            event._ys = offsets[0].y;
+            position = self.getImageLayer().displayToIndex( offsets[0] );
+            event._x = parseInt( position.x, 10 );
+            event._y = parseInt( position.y, 10 );
+            // possible second
+            if ( offsets.length === 2 ) {
+                event._x1s = offsets[1].x;
+                event._y1s = offsets[1].y;
+                position = self.getImageLayer().displayToIndex( offsets[1] );
+                event._x1 = parseInt( position.x, 10 );
+                event._y1 = parseInt( position.y, 10 );
             }
+            // set handle event flag
+            handled = true;
         }
         else if( event.type === "mousemove" ||
             event.type === "mousedown" ||
@@ -419,12 +423,12 @@ dwv.App = function()
             event.type === "dblclick" ||
             event.type === "DOMMouseScroll" )
         {
-            var offset = dwv.getOffset(event);
-            event._xs = offset.x;
-            event._ys = offset.y;
-            var p = self.getImageLayer().displayToIndex( offset );
-            event._x = parseInt( p.x, 10 );
-            event._y = parseInt( p.y, 10 );
+            offsets = dwv.html.getEventOffset(event);
+            event._xs = offsets[0].x;
+            event._ys = offsets[0].y;
+            position = self.getImageLayer().displayToIndex( offsets[0] );
+            event._x = parseInt( position.x, 10 );
+            event._y = parseInt( position.y, 10 );
             // set handle event flag
             handled = true;
         }
@@ -480,23 +484,21 @@ dwv.App = function()
         imageLayer.initialise(dataWidth, dataHeight);
         imageLayer.fillContext();
         imageLayer.setStyleDisplay(true);
-        // kinetic layer
-        if( document.getElementById("kineticDiv") !== null) {
+        // draw layer
+        if( document.getElementById("drawDiv") !== null) {
             // create stage
-            kineticStage = new Kinetic.Stage({
-                container: 'kineticDiv',
+            drawStage = new Kinetic.Stage({
+                container: 'drawDiv',
                 width: dataWidth,
                 height: dataHeight
             });
             // create layer
-            kineticLayer = new Kinetic.Layer();
+            drawLayer = new Kinetic.Layer();
             // add the layer to the stage
-            kineticStage.add(kineticLayer);
+            drawStage.add(drawLayer);
         }
-        
         // resize app
         self.resize();
-        
     }
     
     /**
@@ -559,14 +561,12 @@ dwv.App = function()
         createLayers(dataWidth, dataHeight);
         
         // get the image data from the image layer
-        imageData = self.getImageLayer().getContext().createImageData( 
+        imageData = imageLayer.getContext().createImageData( 
                 dataWidth, dataHeight);
 
-        var kineticDiv = document.getElementById("kineticDiv");
-        
         var topLayer = imageLayer.getCanvas();
-        if ( kineticLayer ) {
-            topLayer = kineticDiv;
+        if ( drawLayer ) {
+            topLayer = document.getElementById("drawDiv");
         }
         // mouse listeners
         topLayer.addEventListener("mousedown", eventHandler, false);
@@ -583,9 +583,9 @@ dwv.App = function()
         // keydown listener
         window.addEventListener("keydown", eventHandler, true);
         // image listeners
-        view.addEventListener("wlchange", app.generateAndDrawImage);
-        view.addEventListener("colorchange", app.generateAndDrawImage);
-        view.addEventListener("slicechange", app.generateAndDrawImage);
+        view.addEventListener("wlchange", self.generateAndDrawImage);
+        view.addEventListener("colorchange", self.generateAndDrawImage);
+        view.addEventListener("slicechange", self.generateAndDrawImage);
         
         // info layer
         if(document.getElementById("infoLayer")){
@@ -603,7 +603,10 @@ dwv.App = function()
         // init W/L display
         self.initWLDisplay();        
     }
+    
 };
+
+dwv.getA = function () { return 3; };
 ;/** 
  * DICOM module.
  * @module dicom
@@ -4933,24 +4936,31 @@ dwv.html.Layer = function(name)
 
 /**
  * Get the offset of an input event.
- * @param {Object} event The event to get the offset from.
- * @method getOffset
+ * @method getEventOffset
  * @static
+ * @param {Object} event The event to get the offset from.
+ * @return {Array} The array of offsets.
  */
-dwv.getOffset = function (event) {
+dwv.html.getEventOffset = function (event) {
+    var positions = [];
     var ex = 0;
     var ey = 0;
-    if ( event.targetTouches && event.targetTouches.length !== 0 ) {
-        var touch0 = event.targetTouches[0];
-        ex = touch0.pageX - app.getImageLayer().getOffset().left;
-        ey = touch0.pageY - app.getImageLayer().getOffset().top;
+    if ( event.targetTouches ) {
+        var touch = null;
+        for ( var i = 0 ; i < event.targetTouches.length; ++i ) {
+            touch = event.targetTouches[i];
+            ex = touch.pageX - app.getImageLayer().getOffset().left;
+            ey = touch.pageY - app.getImageLayer().getOffset().top;
+            positions.push({'x': ex, 'y': ey});
+        }
     }
     else {
         // layerX is used by Firefox
         ex = event.offsetX === undefined ? event.layerX : event.offsetX;
         ey = event.offsetY === undefined ? event.layerY : event.offsetY;
+        positions.push({'x': ex, 'y': ey});
     }
-    return { 'x': ex, 'y': ey };
+    return positions;
 };
 ;/** 
  * GUI module.
@@ -8808,9 +8818,9 @@ dwv.tool.DrawShapeCommand = function (shape, name, app)
     this.execute = function () {
         var group = shape.getParent();
         // add the group to the layer
-        app.getKineticLayer().add(group);
+        app.getDrawLayer().add(group);
         // draw
-        app.getKineticLayer().draw();
+        app.getDrawLayer().draw();
     };
     /**
      * Undo the command.
@@ -8821,7 +8831,7 @@ dwv.tool.DrawShapeCommand = function (shape, name, app)
         // remove the group from the parent layer
         group.remove();
         // draw
-        app.getKineticLayer().draw();
+        app.getDrawLayer().draw();
     };
 }; // DrawShapeCommand class
 
@@ -8852,7 +8862,7 @@ dwv.tool.MoveShapeCommand = function (shape, name, translation, app)
             shape.y( shape.y() + translation.y );
         });
         // draw
-        app.getKineticLayer().draw();
+        app.getDrawLayer().draw();
     };
     /**
      * Undo the command.
@@ -8866,7 +8876,7 @@ dwv.tool.MoveShapeCommand = function (shape, name, translation, app)
             shape.y( shape.y() - translation.y );
         });
         // draw
-        app.getKineticLayer().draw();
+        app.getDrawLayer().draw();
     };
 }; // MoveShapeCommand class
 
@@ -8893,7 +8903,7 @@ dwv.tool.ChangeShapeCommand = function (shape, name, func, startAnchor, endAncho
         // change shape
         func( shape, endAnchor );
         // draw
-        app.getKineticLayer().draw();
+        app.getDrawLayer().draw();
     };
     /**
      * Undo the command.
@@ -8903,7 +8913,7 @@ dwv.tool.ChangeShapeCommand = function (shape, name, func, startAnchor, endAncho
         // invert change shape
         func( shape, startAnchor );
         // draw
-        app.getKineticLayer().draw();
+        app.getDrawLayer().draw();
     };
 }; // ChangeShapeCommand class
 
@@ -8930,7 +8940,7 @@ dwv.tool.DeleteShapeCommand = function (shape, name, app)
         // remove the group from the parent layer
         group.remove();
         // draw
-        app.getKineticLayer().draw();
+        app.getDrawLayer().draw();
     };
     /**
      * Undo the command.
@@ -8939,9 +8949,9 @@ dwv.tool.DeleteShapeCommand = function (shape, name, app)
     this.undo = function () {
         var group = shape.getParent();
         // add the group to the layer
-        app.getKineticLayer().add(group);
+        app.getDrawLayer().add(group);
         // draw
-        app.getKineticLayer().draw();
+        app.getDrawLayer().draw();
     };
 }; // DeleteShapeCommand class
 
@@ -9060,7 +9070,7 @@ dwv.tool.Draw = function (app)
      */
     this.mousedown = function(event){
         // determine if the click happened in an existing shape
-        var stage = app.getKineticStage();
+        var stage = app.getDrawStage();
         var kshape = stage.getIntersection({
             x: event._xs, 
             y: event._ys
@@ -9222,7 +9232,7 @@ dwv.tool.Draw = function (app)
             createdShapes.forEach( function (shape){ setShapeOff( shape ); });
         }
         // draw
-        app.getKineticLayer().draw();
+        app.getDrawLayer().draw();
     };
     
     /**
@@ -9245,7 +9255,7 @@ dwv.tool.Draw = function (app)
      * Get the real position from an event.
      */
     function getRealPosition( index ) {
-        var stage = app.getKineticStage();
+        var stage = app.getDrawStage();
         return { 'x': stage.offset().x + index.x / stage.scale().x,
             'y': stage.offset().y + index.y / stage.scale().y };
     }
@@ -9288,24 +9298,24 @@ dwv.tool.Draw = function (app)
         // drag start event handling
         shape.on('dragstart', function (event) {
             // save start position
-            var offset = dwv.getOffset( event.evt );
+            var offset = dwv.html.getEventOffset( event.evt )[0];
             dragStartPos = getRealPosition( offset );
             // display trash
-            var stage = app.getKineticStage();
+            var stage = app.getDrawStage();
             var scale = stage.scale();
             var invscale = {'x': 1/scale.x, 'y': 1/scale.y};
             trash.x( stage.offset().x + ( 256 / scale.x ) );
             trash.y( stage.offset().y + ( 20 / scale.y ) );
             trash.scale( invscale );
-            app.getKineticLayer().add( trash );
+            app.getDrawLayer().add( trash );
             // deactivate anchors to avoid events on null shape
             shapeEditor.setAnchorsActive(false);
             // draw
-            app.getKineticLayer().draw();
+            app.getDrawLayer().draw();
         });
         // drag move event handling
         shape.on('dragmove', function (event) {
-            var offset = dwv.getOffset( event.evt );
+            var offset = dwv.html.getEventOffset( event.evt )[0];
             var pos = getRealPosition( offset );
             dragLastPos = pos;
             // highlight trash when on it
@@ -9321,7 +9331,7 @@ dwv.tool.Draw = function (app)
             // reset anchors
             shapeEditor.resetAnchors();
             // draw
-            app.getKineticLayer().draw();
+            app.getDrawLayer().draw();
         });
         // drag end event handling
         shape.on('dragend', function (/*event*/) {
@@ -9363,7 +9373,7 @@ dwv.tool.Draw = function (app)
             // remove trash
             trash.remove();
             // draw
-            app.getKineticLayer().draw();
+            app.getDrawLayer().draw();
         });
     };
 
@@ -11992,9 +12002,9 @@ dwv.tool.ZoomAndPan = function(app)
             app.getImageLayer().zoom(newZoom.x, newZoom.y, cx2, cy2);
             app.getImageLayer().draw();
         }
-        if( app.getKineticStage() ) { 
+        if( app.getDrawStage() ) { 
             
-            var stage = app.getKineticStage();
+            var stage = app.getDrawStage();
             var oldKZoom = stage.scale();
             var newKZoom = {'x': (oldKZoom.x + step), 'y': (oldKZoom.y + step)};
             
@@ -12021,8 +12031,8 @@ dwv.tool.ZoomAndPan = function(app)
             app.getImageLayer().translate(tx, ty);
             app.getImageLayer().draw();
         }
-        if( app.getKineticStage() ) { 
-            var stage = app.getKineticStage();
+        if( app.getDrawStage() ) { 
+            var stage = app.getDrawStage();
             var offset = stage.offset();
             offset.x -= tx;
             offset.y -= ty;
