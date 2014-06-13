@@ -7206,7 +7206,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 627,
+            "line": 629,
             "description": "Set the line color of the drawing.",
             "itemtype": "method",
             "name": "setLineColour",
@@ -7223,7 +7223,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 638,
+            "line": 640,
             "description": "Set the shape name of the drawing.",
             "itemtype": "method",
             "name": "setShapeName",
@@ -7240,7 +7240,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 653,
+            "line": 655,
             "description": "Check if the shape is in the shape list.",
             "itemtype": "method",
             "name": "hasShape",
@@ -7257,7 +7257,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 662,
+            "line": 664,
             "description": "Initialise the tool.",
             "itemtype": "method",
             "name": "init",
