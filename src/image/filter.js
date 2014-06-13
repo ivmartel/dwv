@@ -22,7 +22,7 @@ dwv.image.filter.Threshold = function()
      */
     var min = 0;
     /**
-     * Threshold maxnimum.
+     * Threshold maximum.
      * @property max
      * @private
      * @type Number
@@ -59,6 +59,26 @@ dwv.image.filter.Threshold = function()
      * @return {String} The name of the filter.
      */
     this.getName = function() { return "Threshold"; };
+    
+    /**
+     * Original image.
+     * @property originalImage
+     * @private
+     * @type Object
+     */
+    var originalImage = null;
+    /**
+     * Set the original image.
+     * @method setOriginalImage
+     * @param {Object} image The original image.
+     */
+    this.setOriginalImage = function (image) { originalImage = image; };
+    /**
+     * Get the original image.
+     * @method setOriginalImage
+     * @return {Object} image The original image.
+     */
+    this.getOriginalImage = function () { return originalImage; };
 };
 
 /**
@@ -68,8 +88,9 @@ dwv.image.filter.Threshold = function()
  */ 
 dwv.image.filter.Threshold.prototype.update = function()
 {
-    var imageMin = app.getImage().getDataRange().min;
     var self = this;
+    var imageMin = app.getImage().getDataRange().min;
+    self.setOriginalImage( app.getImage() );
     var threshFunction = function(value){
         if(value<self.getMin()||value>self.getMax()) {
             return imageMin;
@@ -95,6 +116,25 @@ dwv.image.filter.Sharpen = function()
      * @return {String} The name of the filter.
      */
     this.getName = function() { return "Sharpen"; };
+    /**
+     * Original image.
+     * @property originalImage
+     * @private
+     * @type Object
+     */
+    var originalImage = null;
+    /**
+     * Set the original image.
+     * @method setOriginalImage
+     * @param {Object} image The original image.
+     */
+    this.setOriginalImage = function (image) { originalImage = image; };
+    /**
+     * Get the original image.
+     * @method setOriginalImage
+     * @return {Object} image The original image.
+     */
+    this.getOriginalImage = function () { return originalImage; };
 };
 
 /**
@@ -104,6 +144,8 @@ dwv.image.filter.Sharpen = function()
  */ 
 dwv.image.filter.Sharpen.prototype.update = function()
 {
+    this.setOriginalImage( app.getImage() );
+    
     return app.getImage().convolute2D(
         [  0, -1,  0,
           -1,  5, -1,
@@ -124,6 +166,25 @@ dwv.image.filter.Sobel = function()
      * @return {String} The name of the filter.
      */
     this.getName = function() { return "Sobel"; };
+    /**
+     * Original image.
+     * @property originalImage
+     * @private
+     * @type Object
+     */
+    var originalImage = null;
+    /**
+     * Set the original image.
+     * @method setOriginalImage
+     * @param {Object} image The original image.
+     */
+    this.setOriginalImage = function (image) { originalImage = image; };
+    /**
+     * Get the original image.
+     * @method setOriginalImage
+     * @return {Object} image The original image.
+     */
+    this.getOriginalImage = function () { return originalImage; };
 };
 
 /**
@@ -133,6 +194,8 @@ dwv.image.filter.Sobel = function()
  */ 
 dwv.image.filter.Sobel.prototype.update = function()
 {
+    this.setOriginalImage( app.getImage() );
+    
     var gradX = app.getImage().convolute2D(
         [ 1,  0,  -1,
           2,  0,  -2,

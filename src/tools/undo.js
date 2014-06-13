@@ -10,9 +10,8 @@ dwv.tool = dwv.tool || {};
  * @class UndoStack
  * @namespace dwv.tool
  * @constructor
- * @param {Object} app The associated application.
  */
-dwv.tool.UndoStack = function(app)
+dwv.tool.UndoStack = function()
 { 
     /**
      * Array of commands.
@@ -56,23 +55,10 @@ dwv.tool.UndoStack = function(app)
         // a bit inefficient...
         if( curCmdIndex > 0 )
         {
-            // decrement index
+            // decrement command index
             --curCmdIndex; 
-            // reset image
-            app.restoreOriginalImage();
-            
+            // undo last command
             stack[curCmdIndex].undo();
-            
-            // redo from first command
-            //for( var i = 0; i < curCmdIndex; ++i)
-            //{
-            //    stack[i].execute(); 
-            //}
-            // display
-            if( curCmdIndex === 0 ) {
-                // just draw the image
-                app.generateAndDrawImage();
-            }
             // disable last in display history
             dwv.gui.enableInUndoHtml(false);
         }
@@ -86,10 +72,9 @@ dwv.tool.UndoStack = function(app)
     { 
         if( curCmdIndex < stack.length )
         {
-            // run command
-            var cmd = stack[curCmdIndex];
-            cmd.execute();
-            // increment index
+            // run last command
+            stack[curCmdIndex].execute();
+            // increment command index
             ++curCmdIndex;
             // enable next in display history
             dwv.gui.enableInUndoHtml(true);

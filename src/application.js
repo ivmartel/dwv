@@ -42,7 +42,7 @@ dwv.App = function()
     // Tool box
     var toolBox = new dwv.tool.ToolBox(this);
     // UndoStack
-    var undoStack = new dwv.tool.UndoStack(this);
+    var undoStack = new dwv.tool.UndoStack();
     
     /** 
      * Get the version of the application.
@@ -152,7 +152,8 @@ dwv.App = function()
     {
         image = null;
         view = null;
-        undoStack = new dwv.tool.UndoStack(this);
+        undoStack = new dwv.tool.UndoStack();
+        dwv.gui.cleaUndoHtml();
     };
     
     /**
@@ -498,6 +499,7 @@ dwv.App = function()
             drawStage.add(drawLayer);
         }
         // resize app
+        self.resetLayout();
         self.resize();
     }
     

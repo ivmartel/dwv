@@ -26,7 +26,11 @@ dwv.tool.Filter = function(/*app*/)
      * @type String
      */
     this.defaultFilterName = 0;
-    
+    /**
+     * Display Flag.
+     * @property displayed
+     * @type Boolean
+     */
     this.displayed = false;
 };
 
@@ -260,35 +264,30 @@ dwv.tool.filter.Sobel.prototype.run = function(/*args*/)
  * @param {Object} filter The filter to run.
  * @param {Object} app The associated application.
  */
-dwv.tool.RunFilterCommand = function(filter, app)
+dwv.tool.RunFilterCommand = function (filter, app)
 {
-    /**
-     * Command name.
-     * @property name
-     * @private
-     * @type String
-     */
-    var name = "RunFilter: " + filter.getName();
     /**
      * Get the command name.
      * @method getName
      * @return {String} The command name.
      */
-    this.getName = function() { return name; };
-    /**
-     * Set the command name.
-     * @method setName
-     * @param {String} str The command name.
-     */
-    this.setName = function(str) { name = str; };
+    this.getName = function () { return "Filter-" + filter.getName(); };
 
     /**
      * Execute the command.
      * @method execute
      */
-    this.execute = function()
+    this.execute = function ()
     {
         app.setImage(filter.update());
         app.generateAndDrawImage();
     }; 
+    /**
+     * Undo the command.
+     * @method undo
+     */
+    this.undo = function () {
+        app.setImage(filter.getOriginalImage());
+        app.generateAndDrawImage();
+    };
 }; // RunFilterCommand class
