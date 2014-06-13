@@ -11860,13 +11860,11 @@ dwv.tool.ZoomAndPan = function(app)
         {
             return;
         }
-
         // calculate translation
-        var tx = (event._xs - self.x0);
-        var ty = (event._ys - self.y0);
+        var tx = event._xs - self.x0;
+        var ty = event._ys - self.y0;
         // apply translation
         translateLayers(tx, ty);
-        
         // reset origin point
         self.x0 = event._xs;
         self.y0 = event._ys;
@@ -12064,14 +12062,19 @@ dwv.tool.ZoomAndPan = function(app)
     function translateLayers(tx, ty)
     {
         if( app.getImageLayer() ) {
-            app.getImageLayer().translate(tx, ty);
-            app.getImageLayer().draw();
+            var layer = app.getImageLayer();
+            var zoom = layer.getZoom();
+            var txx = tx / zoom.x;
+            var tyy = ty / zoom.y;
+            layer.translate(txx, tyy);
+            layer.draw();
         }
         if( app.getDrawStage() ) { 
             var stage = app.getDrawStage();
             var offset = stage.offset();
-            offset.x -= tx;
-            offset.y -= ty;
+            var kzoom = stage.scale();
+            offset.x -= tx / kzoom.x;
+            offset.y -= ty / kzoom.y;
             stage.offset( offset );
             stage.draw();
         }

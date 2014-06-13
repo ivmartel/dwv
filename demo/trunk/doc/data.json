@@ -9235,7 +9235,7 @@
         },
         {
             "file": "src/tools/zoomPan.js",
-            "line": 88,
+            "line": 86,
             "description": "Handle two touch move event.",
             "itemtype": "method",
             "name": "twotouchmove",
@@ -9252,7 +9252,7 @@
         },
         {
             "file": "src/tools/zoomPan.js",
-            "line": 130,
+            "line": 128,
             "description": "Handle mouse up event.",
             "itemtype": "method",
             "name": "mouseup",
@@ -9269,7 +9269,7 @@
         },
         {
             "file": "src/tools/zoomPan.js",
-            "line": 143,
+            "line": 141,
             "description": "Handle mouse out event.",
             "itemtype": "method",
             "name": "mouseout",
@@ -9286,7 +9286,7 @@
         },
         {
             "file": "src/tools/zoomPan.js",
-            "line": 152,
+            "line": 150,
             "description": "Handle touch start event.",
             "itemtype": "method",
             "name": "touchstart",
@@ -9303,7 +9303,7 @@
         },
         {
             "file": "src/tools/zoomPan.js",
-            "line": 167,
+            "line": 165,
             "description": "Handle touch move event.",
             "itemtype": "method",
             "name": "touchmove",
@@ -9320,7 +9320,7 @@
         },
         {
             "file": "src/tools/zoomPan.js",
-            "line": 182,
+            "line": 180,
             "description": "Handle touch end event.",
             "itemtype": "method",
             "name": "touchend",
@@ -9337,7 +9337,7 @@
         },
         {
             "file": "src/tools/zoomPan.js",
-            "line": 191,
+            "line": 189,
             "description": "Handle mouse scroll event (fired by Firefox).",
             "itemtype": "method",
             "name": "DOMMouseScroll",
@@ -9354,7 +9354,7 @@
         },
         {
             "file": "src/tools/zoomPan.js",
-            "line": 206,
+            "line": 204,
             "description": "Handle mouse wheel event.",
             "itemtype": "method",
             "name": "mousewheel",
@@ -9371,7 +9371,7 @@
         },
         {
             "file": "src/tools/zoomPan.js",
-            "line": 221,
+            "line": 219,
             "description": "Handle key down event.",
             "itemtype": "method",
             "name": "keydown",
@@ -9388,7 +9388,7 @@
         },
         {
             "file": "src/tools/zoomPan.js",
-            "line": 230,
+            "line": 228,
             "description": "Enable the tool.",
             "itemtype": "method",
             "name": "enable",
@@ -9405,7 +9405,7 @@
         },
         {
             "file": "src/tools/zoomPan.js",
-            "line": 239,
+            "line": 237,
             "description": "Apply the zoom to the layers.",
             "itemtype": "method",
             "name": "zoomLayers",
@@ -9432,7 +9432,7 @@
         },
         {
             "file": "src/tools/zoomPan.js",
-            "line": 271,
+            "line": 269,
             "description": "Apply a translation to the layers.",
             "itemtype": "method",
             "name": "translateLayers",
@@ -9454,7 +9454,7 @@
         },
         {
             "file": "src/tools/zoomPan.js",
-            "line": 295,
+            "line": 298,
             "description": "Help for this tool.",
             "itemtype": "method",
             "name": "getHelp",
@@ -9468,7 +9468,7 @@
         },
         {
             "file": "src/tools/zoomPan.js",
-            "line": 316,
+            "line": 319,
             "description": "Initialise the tool.",
             "itemtype": "method",
             "name": "init",
@@ -10102,7 +10102,7 @@
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/tools/zoomPan.js:295"
+            "line": " src/tools/zoomPan.js:298"
         },
         {
             "message": "Missing item type\nDICOM tag dictionary.",
