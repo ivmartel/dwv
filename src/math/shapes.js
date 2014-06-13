@@ -136,6 +136,62 @@ dwv.math.Circle = function(centre, radius)
     };
 }; // Circle class
 
+/** 
+ * Ellipse shape.
+ * @class Ellipse
+ * @namespace dwv.math
+ * @constructor
+ * @param {Object} centre A Point2D representing the centre of the ellipse.
+ * @param {Number} a The radius of the ellipse on the horizontal axe.
+ * @param {Number} b The radius of the ellipse on the vertical axe.
+ */
+dwv.math.Ellipse = function(centre, a, b)
+{
+    /**
+     * Circle surface.
+     * @property surface
+     * @private
+     * @type Number
+     */
+    var surface = Math.PI*a*b;
+
+    /**
+     * Get the centre (point) of the ellipse.
+     * @method getCenter
+     * @return {Object} The center (point) of the ellipse.
+     */
+    this.getCenter = function() { return centre; };
+    /**
+     * Get the radius of the ellipse on the horizontal axe.
+     * @method getA
+     * @return {Number} The radius of the ellipse on the horizontal axe.
+     */
+    this.getA = function() { return a; };
+    /**
+     * Get the radius of the ellipse on the vertical axe.
+     * @method getB
+     * @return {Number} The radius of the ellipse on the vertical axe.
+     */
+    this.getB = function() { return b; };
+    /**
+     * Get the surface of the ellipse.
+     * @method getSurface
+     * @return {Number} The surface of the ellipse.
+     */
+    this.getSurface = function() { return surface; };
+    /**
+     * Get the surface of the ellipse with a spacing.
+     * @method getWorldSurface
+     * @param {Number} spacingX The X spacing.
+     * @param {Number} spacingY The Y spacing.
+     * @return {Number} The surface of the ellipse multiplied by the given spacing.
+     */
+    this.getWorldSurface = function(spacingX, spacingY)
+    {
+        return surface * spacingX * spacingY;
+    };
+}; // Circle class
+
 /**
  * Line shape.
  * @class Line
@@ -210,6 +266,17 @@ dwv.math.Line = function(begin, end)
  */
 dwv.math.Rectangle = function(begin, end)
 {
+    if ( end.getX() < begin.getX() ) {
+        var tmpX = begin.getX();
+        begin = new dwv.math.Point2D( end.getX(), begin.getY() );
+        end = new dwv.math.Point2D( tmpX, end.getY() );
+    }
+    if ( end.getY() < begin.getY() ) {
+        var tmpY = begin.getY();
+        begin = new dwv.math.Point2D( begin.getX(), end.getY() );
+        end = new dwv.math.Point2D( end.getX(), tmpY );
+    }
+    
     /**
      * Rectangle surface.
      * @property surface

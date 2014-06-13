@@ -42,8 +42,8 @@ dwv.tool.ZoomAndPan = function(app)
     this.mousedown = function(event){
         self.started = true;
         // first position
-        self.x0 = event._x;
-        self.y0 = event._y;
+        self.x0 = event._xs;
+        self.y0 = event._ys;
     };
 
     /**
@@ -73,16 +73,14 @@ dwv.tool.ZoomAndPan = function(app)
         {
             return;
         }
-
         // calculate translation
-        var tx = (event._x - self.x0);
-        var ty = (event._y - self.y0);
+        var tx = event._xs - self.x0;
+        var ty = event._ys - self.y0;
         // apply translation
         translateLayers(tx, ty);
-        
         // reset origin point
-        self.x0 = event._x;
-        self.y0 = event._y;
+        self.x0 = event._xs;
+        self.y0 = event._ys;
     };
 
     /**
@@ -122,7 +120,7 @@ dwv.tool.ZoomAndPan = function(app)
             // zoom mode
             var zoom = (lineRatio - 1) / 2;
             if( Math.abs(zoom) % 0.1 <= 0.05 ) {
-                zoomLayers(zoom, self.midPoint.getX(), self.midPoint.getY());
+                zoomLayers(zoom, self.midPoint.getX(), self.midPoint.getY(),event._xs, event._ys);
             }
         }
     };
@@ -196,7 +194,7 @@ dwv.tool.ZoomAndPan = function(app)
     this.DOMMouseScroll = function(event){
         // ev.detail on firefox is 3
         var step = event.detail/30;
-        zoomLayers(step, event._x, event._y);
+        zoomLayers(step, event._x, event._y,event._xs, event._ys);
         
         // TODO slice scroll
         //if( event.detail > 0 ) app.getView().incrementSliceNb();
@@ -211,7 +209,7 @@ dwv.tool.ZoomAndPan = function(app)
     this.mousewheel = function(event){
         // ev.wheelDelta on chrome is 120
         var step = event.wheelDelta/1200;
-        zoomLayers(step, event._x, event._y);
+        zoomLayers(step, event._x, event._y,event._xs, event._ys);
         
         // TODO slice scroll
         //if( event.wheelDelta > 0 ) app.getView().incrementSliceNb();
@@ -243,13 +241,28 @@ dwv.tool.ZoomAndPan = function(app)
      * @param {Number} cx The zoom center X coordinate.
      * @param {Number} cy The zoom center Y coordinate.
      */ 
-    function zoomLayers(step, cx, cy)
+    function zoomLayers(step, cx, cy, cx2, cy2)
     {
         if( app.getImageLayer() ) {
-            app.getImageLayer().zoom(step, step, cx, cy);
+            var oldZoom = app.getImageLayer().getZoom();
+            var newZoom = {'x': (oldZoom.x + step), 'y': (oldZoom.y + step)};
+            app.getImageLayer().zoom(newZoom.x, newZoom.y, cx2, cy2);
+            app.getImageLayer().draw();
         }
-        if( app.getDrawLayer() ) { 
-            app.getDrawLayer().zoom(step, step, cx, cy);
+        if( app.getDrawStage() ) { 
+            
+            var stage = app.getDrawStage();
+            var oldKZoom = stage.scale();
+            var newKZoom = {'x': (oldKZoom.x + step), 'y': (oldKZoom.y + step)};
+            
+            var oldOffset = stage.offset();
+            var newOffsetX = (cx2 / oldKZoom.x) + oldOffset.x - (cx2 / newKZoom.x);
+            var newOffsetY = (cy2 / oldKZoom.y) + oldOffset.y - (cy2 / newKZoom.y);
+            var newOffset = { 'x': newOffsetX, 'y': newOffsetY };
+            
+            stage.offset( newOffset );
+            stage.scale( newKZoom );
+            stage.draw();
         }
     }
 
@@ -262,10 +275,21 @@ dwv.tool.ZoomAndPan = function(app)
     function translateLayers(tx, ty)
     {
         if( app.getImageLayer() ) {
-            app.getImageLayer().translate(tx, ty);
+            var layer = app.getImageLayer();
+            var zoom = layer.getZoom();
+            var txx = tx / zoom.x;
+            var tyy = ty / zoom.y;
+            layer.translate(txx, tyy);
+            layer.draw();
         }
-        if( app.getDrawLayer() ) { 
-            app.getDrawLayer().translate(tx, ty);
+        if( app.getDrawStage() ) { 
+            var stage = app.getDrawStage();
+            var offset = stage.offset();
+            var kzoom = stage.scale();
+            offset.x -= tx / kzoom.x;
+            offset.y -= ty / kzoom.y;
+            stage.offset( offset );
+            stage.draw();
         }
     }
 

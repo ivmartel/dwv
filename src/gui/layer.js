@@ -22,6 +22,13 @@ dwv.html.Layer = function(name)
      */
     var canvas = null;
     /**
+     * A cache of the initial canvas.
+     * @property cacheCanvas
+     * @private
+     * @type Object
+     */
+    var cacheCanvas = null;
+    /**
      * The associated CanvasRenderingContext2D.
      * @property context
      * @private
@@ -63,77 +70,79 @@ dwv.html.Layer = function(name)
     var imageData = null;
     
     /**
-     * The image origin X position.
-     * @property originX
+     * The layer origin.
+     * @property origin
      * @private
-     * @type Number
+     * @type {Object}
      */
-    var originX = 0;
+    var origin = {'x': 0, 'y': 0};
     /**
-     * The image origin Y position.
-     * @property originY
-     * @private
-     * @type Number
+     * Get the layer origin.
+     * @method getOrigin
+     * @returns {Object} The layer origin as {'x','y'}.
      */
-    var originY = 0;
+    this.getOrigin = function () {
+        return origin;
+    };
     /**
-     * The image zoom in the X direction.
-     * @property zoomX
+     * The image zoom.
+     * @property zoom
      * @private
-     * @type Number
+     * @type {Object}
      */
-    var zoomX = 1;
+    var zoom = {'x': 1, 'y': 1};
     /**
-     * The image zoom in the Y direction.
-     * @property zoomY
-     * @private
-     * @type Number
+     * Get the layer zoom.
+     * @method getZoom
+     * @returns {Object} The layer zoom as {'x','y'}.
      */
-    var zoomY = 1;
+    this.getZoom = function () {
+        return zoom;
+    };
+    
+    /**
+     * Set the canvas width.
+     * @method setWidth
+     * @param {Number} width The new width.
+     */
+    this.setWidth = function ( width ) {
+        canvas.width = width;
+    };
+    /**
+     * Set the canvas height.
+     * @method setHeight
+     * @param {Number} height The new height.
+     */
+    this.setHeight = function ( height ) {
+        canvas.height = height;
+    };
     
     /**
      * Set the layer zoom.
      * @method setZoom
-     * @param {Number} stepX The zoom step in the X direction.
-     * @param {Number} stepY The zoom step in the Y direction.
+     * @param {Number} newZoomX The zoom in the X direction.
+     * @param {Number} newZoomY The zoom in the Y direction.
      * @param {Number} centerX The zoom center in the X direction.
      * @param {Number} centerY The zoom center in the Y direction.
      */
-    this.setZoom = function(stepX,stepY,centerX,centerY)
+    this.zoom = function(newZoomX,newZoomY,centerX,centerY)
     {
-        var newZoomX = zoomX + stepX;
-        var newZoomY = zoomY + stepY;
-        // check zoom value
-        if( newZoomX <= 0.1 || newZoomX >= 10 ||
-            newZoomY <= 0.1 || newZoomY >= 10 ) {
-            return;
-        }
         // The zoom is the ratio between the differences from the center
         // to the origins:
         // centerX - originX = ( centerX - originX0 ) * zoomX
-        originX = centerX - (centerX - originX) * (newZoomX / zoomX);
-        originY = centerY - (centerY - originY) * (newZoomY / zoomY);
+        // (center in ~world coordinate system)  
+        //originX = (centerX / zoomX) + originX - (centerX / newZoomX);
+        //originY = (centerY / zoomY) + originY - (centerY / newZoomY);
+        
+        // center in image coordinate system        
+        origin.x = centerX - (centerX - origin.x) * (newZoomX / zoom.x);
+        origin.y = centerY - (centerY - origin.y) * (newZoomY / zoom.y);
+
         // save zoom
-        zoomX = newZoomX;
-        zoomY = newZoomY;
+        zoom.x = newZoomX;
+        zoom.y = newZoomY;
     };
     
-    /**
-     * Set the layer zoom and apply it.
-     * @method zoom
-     * @param {Number} stepX The zoom step in the X direction.
-     * @param {Number} stepY The zoom step in the Y direction.
-     * @param {Number} centerX The zoom center in the X direction.
-     * @param {Number} centerY The zoom center in the Y direction.
-     */
-    this.zoom = function(stepX,stepY,centerX,centreY)
-    {
-        // set zoom
-        this.setZoom(stepX,stepY,centerX,centreY);
-        // draw 
-        this.draw();
-    };
-
     /**
      * Set the layer translation.
      * Translation is according to the last one.
@@ -141,49 +150,11 @@ dwv.html.Layer = function(name)
      * @param {Number} tx The translation in the X direction.
      * @param {Number} ty The translation in the Y direction.
      */
-    this.setTranslate = function(tx,ty)
-    {
-        // check translate value
-        if( zoomX >= 1 ) { 
-            if( (originX + tx) < -1 * (canvas.width * zoomX) + canvas.width ||
-                (originX + tx) > 0 ) {
-                return;
-            }
-        } else {
-            if( (originX + tx) > -1 * (canvas.width * zoomX) + canvas.width ||
-                (originX + tx) < 0 ) {
-                return;
-            }
-        }
-        if( zoomY >= 1 ) { 
-            if( (originY + ty) < -1 * (canvas.height * zoomY) + canvas.height ||
-                (originY + ty) > 0 ) {
-                return;
-            }
-        } else {
-            if( (originY + ty) > -1 * (canvas.height * zoomY) + canvas.height ||
-                (originY + ty) < 0 ) {
-                return;
-            }
-        }
-        // new origin
-        originX += tx;
-        originY += ty;
-    };
-    
-    /**
-     * Set the layer translation and apply it.
-     * Translation is according to the last one.
-     * @method translate
-     * @param {Number} tx The translation in the X direction.
-     * @param {Number} ty The translation in the Y direction.
-     */
     this.translate = function(tx,ty)
     {
-        // set the translate
-        this.setTranslate(tx, ty);
-        // draw
-        this.draw();
+        // new origin
+        origin.x += tx * zoom.x;
+        origin.y += ty * zoom.y;
     };
     
     /**
@@ -194,18 +165,29 @@ dwv.html.Layer = function(name)
     this.setImageData = function(data)
     {
         imageData = data;
+        // update the cached canvas
+        cacheCanvas.getContext("2d").putImageData(imageData, 0, 0);
     };
     
     /**
      * Reset the layout.
      * @method resetLayout
      */ 
-    this.resetLayout = function()
+    this.resetLayout = function(izoom)
     {
-        originX = 0;
-        originY = 0;
-        zoomX = 1;
-        zoomY = 1;
+        origin.x = 0;
+        origin.y = 0;
+        zoom.x = izoom;
+        zoom.y = izoom;
+    };
+    
+    /**
+     * Transform a display position to an index.
+     * @method displayToIndex
+     */ 
+    this.displayToIndex = function ( point2D ) {
+        return {'x': (point2D.x - origin.x) / zoom.x,
+            'y': (point2D.y - origin.y) / zoom.y };
     };
     
     /**
@@ -213,23 +195,25 @@ dwv.html.Layer = function(name)
      * The imageData variable needs to be set
      * @method draw
      */
-    this.draw = function()
+    this.draw = function ()
     {
-        // clear the context
-        context.clearRect(0, 0, canvas.width, canvas.height);
+        // clear the context: reset the transform first
+        // store the current transformation matrix
+        context.save();
+        // use the identity matrix while clearing the canvas
+        context.setTransform( 1, 0, 0, 1, 0, 0 );
+        context.clearRect( 0, 0, canvas.width, canvas.height );
+        // restore the transform
+        context.restore();
         
-        // Put the image data in the context
-        
-        // 1. store the image data in a temporary canvas
-        var tempCanvas = document.createElement("canvas");
-        tempCanvas.width = canvas.width;
-        tempCanvas.height = canvas.height;
-        tempCanvas.getContext("2d").putImageData(imageData, 0, 0);
-        // 2. draw the temporary canvas on the context
-        context.drawImage(tempCanvas,
-            originX, originY,
-            canvas.width * zoomX, 
-            canvas.height * zoomY);
+        // draw the cached canvas on the context
+        // transform takes as input a, b, c, d, e, f to create
+        // the transform matrix (column-major order):
+        // [ a c e ]
+        // [ b d f ]
+        // [ 0 0 1 ]
+        context.setTransform( zoom.x, 0, 0, zoom.y, origin.x, origin.y );
+        context.drawImage( cacheCanvas, 0, 0 );
     };
     
     /**
@@ -266,6 +250,10 @@ dwv.html.Layer = function(name)
         // original empty image data array
         context.clearRect (0, 0, canvas.width, canvas.height);
         imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+        // cached canvas
+        cacheCanvas = document.createElement("canvas");
+        cacheCanvas.width = inputWidth;
+        cacheCanvas.height = inputHeight;
     };
     
     /**
@@ -304,11 +292,11 @@ dwv.html.Layer = function(name)
         var offThisJ = 0;
         var alpha = 0;
         for( var j=0; j < canvas.height; ++j ) {
-            offMergeJ = parseInt( (originY + j * zoomY), 10 ) * canvas.width;
+            offMergeJ = parseInt( (origin.y + j * zoom.y), 10 ) * canvas.width;
             offThisJ = j * canvas.width;
             for( var i=0; i < canvas.width; ++i ) {
                 // 4 component data: RGB + alpha
-                offMerge = 4 * ( parseInt( (originX + i * zoomX), 10 ) + offMergeJ );
+                offMerge = 4 * ( parseInt( (origin.x + i * zoom.x), 10 ) + offMergeJ );
                 offThis = 4 * ( i + offThisJ );
                 // merge non transparent 
                 alpha = mergeImageData.data[offMerge+3];
@@ -381,3 +369,31 @@ dwv.html.Layer = function(name)
     };
 }; // Layer class
 
+/**
+ * Get the offset of an input event.
+ * @method getEventOffset
+ * @static
+ * @param {Object} event The event to get the offset from.
+ * @return {Array} The array of offsets.
+ */
+dwv.html.getEventOffset = function (event) {
+    var positions = [];
+    var ex = 0;
+    var ey = 0;
+    if ( event.targetTouches ) {
+        var touch = null;
+        for ( var i = 0 ; i < event.targetTouches.length; ++i ) {
+            touch = event.targetTouches[i];
+            ex = touch.pageX - app.getImageLayer().getOffset().left;
+            ey = touch.pageY - app.getImageLayer().getOffset().top;
+            positions.push({'x': ex, 'y': ey});
+        }
+    }
+    else {
+        // layerX is used by Firefox
+        ex = event.offsetX === undefined ? event.layerX : event.offsetX;
+        ey = event.offsetY === undefined ? event.layerY : event.offsetY;
+        positions.push({'x': ex, 'y': ey});
+    }
+    return positions;
+};

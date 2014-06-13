@@ -4,6 +4,7 @@
  */
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
+var Kinetic = Kinetic || {};
 
 /**
  * Livewire painting tool.
@@ -27,6 +28,13 @@ dwv.tool.Livewire = function(app)
      * @type Boolean
      */
     this.started = false;
+    /**
+     * Interaction just started flag.
+     * @property justStarted
+     * @private
+     * @type Boolean
+     */
+    var justStarted = true;
     
     /**
      * Draw command.
@@ -35,6 +43,20 @@ dwv.tool.Livewire = function(app)
      * @type Object
      */
     var command = null;
+    /**
+     * Current active shape.
+     * @property activeShape
+     * @private
+     * @type Object
+     */
+    var activeShape = null;
+    /**
+     * Current shape group.
+     * @property shapeGroup
+     * @private
+     * @type Object
+     */
+    var shapeGroup = null;
     /**
      * Drawing style.
      * @property style
@@ -109,6 +131,7 @@ dwv.tool.Livewire = function(app)
         // first time
         if( !self.started ) {
             self.started = true;
+            shapeGroup = new Kinetic.Group();
             self.x0 = event._x;
             self.y0 = event._y;
             // clear vars
@@ -130,10 +153,9 @@ dwv.tool.Livewire = function(app)
                 console.log("Done.");
                 // save command in undo stack
                 app.getUndoStack().add(command);
-                // merge temporary layer
-                app.getDrawLayer().merge(app.getTempLayer());
                 // set flag
                 self.started = false;
+                justStarted = true;
             }
             // anchor point
             else {
@@ -200,10 +222,19 @@ dwv.tool.Livewire = function(app)
         }
         currentPath.appenPath(path);
         
-        // create draw command
-        command = new dwv.tool.DrawLivewireCommand(currentPath, app, self.style);
-        // clear the temporary layer
-        app.getTempLayer().clear();
+        // remove previous draw if not just started
+        if ( activeShape && !justStarted ) {
+            activeShape.destroy();
+        }
+        if ( justStarted ) {
+            justStarted = false;
+        }
+        // create shape
+        activeShape = new dwv.tool.RoiCreator(currentPath.pointArray, self.style);
+        // add shape to group
+        shapeGroup.add(activeShape);
+        // draw shape command
+        command = new dwv.tool.DrawShapeCommand(activeShape, "livewire", app);
         // draw
         command.execute();
     };
@@ -325,74 +356,3 @@ dwv.tool.Livewire.prototype.setLineColour = function(colour)
     // set style var
     this.style.setLineColor(colour);
 };
-
-/**
- * Draw livewire command.
- * @class DrawLivewireCommand
- * @namespace dwv.tool
- * @param {Object} livewire The livewire to draw.
- * @param {Object} app The application to draw the livewire on.
- * @param {Object} style The style of the livewire.
- */
-dwv.tool.DrawLivewireCommand = function(livewire, app, style)
-{
-    /**
-     * The livewire color.
-     * @property livewireColor
-     * @private
-     * @type String
-     */
-    var livewireColor = style.getLineColor();
-    /**
-     * The HTML context.
-     * @property context
-     * @private
-     * @type Object
-     */
-    var context = app.getTempLayer().getContext();
-    
-    /**
-     * Command name.
-     * @property name
-     * @private
-     * @type String
-     */
-    var name = "DrawLivewireCommand";
-    /**
-     * Get the command name.
-     * @method getName
-     * @return {String} The command name.
-     */
-    this.getName = function() { return name; };
-    /**
-     * Set the command name.
-     * @method setName
-     * @param {String} str The command name.
-     */
-    this.setName = function(str) { name = str; };
-
-    /**
-     * Execute the command.
-     * @method execute
-     */
-    this.execute = function()
-    {
-        // style
-        context.fillStyle = livewireColor;
-        context.strokeStyle = livewireColor;
-        // path
-        context.beginPath();
-        var p = livewire.getPoint(0);
-        context.moveTo( p.getX(), p.getY());
-        for( var i=1; i < livewire.getLength(); ++i ) {
-            p = livewire.getPoint(i);
-            context.lineTo( p.getX(), p.getY());
-        }
-        for( var j=0; j < livewire.controlPointIndexArray.length; ++j ) { 
-            p = livewire.getPoint(livewire.controlPointIndexArray[j]);
-            context.fillRect(p.getX()-3, p.getY()-3, 5, 5);
-        }
-        context.stroke();
-        //context.closePath();
-    }; 
-}; // DrawLivewireCommand class

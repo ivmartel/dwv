@@ -152,12 +152,7 @@ dwv.gui.onChangeLineColour = function(/*event*/)
  */
 dwv.gui.onZoomReset = function(/*event*/)
 {
-    app.getImageLayer().resetLayout();
-    app.getImageLayer().draw();
-    if( app.getDrawLayer() ) {
-        app.getDrawLayer().resetLayout();
-        app.getDrawLayer().draw();
-    }
+    app.resetLayout();
 };
 
 /**

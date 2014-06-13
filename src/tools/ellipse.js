@@ -7,38 +7,40 @@ dwv.tool = dwv.tool || {};
 var Kinetic = Kinetic || {};
 
 /**
- * Create a rectangle shape to be displayed.
- * @method RectangleCreator
+ * Create an ellipse shape to be displayed.
+ * @method EllipseCreator
  * @static
- * @param {Array} points The points from which to extract the rectangle.
+ * @param {Array} points The points from which to extract the ellipse.
  * @param {Style} style The drawing style.
  */ 
-dwv.tool.RectangleCreator = function (points, style)
+dwv.tool.EllipseCreator = function (points, style)
 {
-    // physical shape
-    var rectangle = new dwv.math.Rectangle(points[0], points[points.length-1]);
+    // calculate radius
+    var a = Math.abs(points[0].getX() - points[points.length-1].getX());
+    var b = Math.abs(points[0].getY() - points[points.length-1].getY());
+    // physical object
+    var ellipse = new dwv.math.Ellipse(points[0], a, b);
     // shape
-    var krect = new Kinetic.Rect({
-        x: rectangle.getBegin().getX(),
-        y: rectangle.getBegin().getY(),
-        width: rectangle.getWidth(),
-        height: rectangle.getHeight(),
+    var kellipse = new Kinetic.Ellipse({
+        x: ellipse.getCenter().getX(),
+        y: ellipse.getCenter().getY(),
+        radius: { x: ellipse.getA(), y: ellipse.getB() },
         stroke: style.getLineColor(),
         strokeWidth: 2,
         name: "shape"
     });
     // return shape
-    return krect;
+    return kellipse;
 };
 
 /**
- * Update a rectangle shape.
- * @method UpdateRect
+ * Update an ellipse shape.
+ * @method UpdateEllipse
  * @static
- * @param {Object} rect The rectangle shape to update.
+ * @param {Object} ellipse The ellipse shape to update.
  * @param {Object} anchor The active anchor.
  */ 
-dwv.tool.UpdateRect = function (rect, anchor)
+dwv.tool.UpdateEllipse = function (ellipse, anchor)
 {
     // parent group
     var group = anchor.getParent();
@@ -78,10 +80,12 @@ dwv.tool.UpdateRect = function (rect, anchor)
         break;
     }
     // update shape
-    rect.position(topLeft.position());
-    var width = topRight.x() - topLeft.x();
-    var height = bottomLeft.y() - topLeft.y();
-    if ( width && height ) {
-        rect.size({'width': width, 'height': height});
+    var radiusX = ( topRight.x() - topLeft.x() ) / 2;
+    var radiusY = ( bottomRight.y() - topRight.y() ) / 2;
+    var center = { 'x': topLeft.x() + radiusX, 'y': topRight.y() + radiusY };
+    ellipse.position( center );
+    var radiusAbs = { 'x': Math.abs(radiusX), 'y': Math.abs(radiusY) };
+    if ( radiusAbs ) {
+        ellipse.radius( radiusAbs );
     }
 };

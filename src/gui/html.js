@@ -520,7 +520,7 @@ dwv.html.decodeManifestUri = function(uri, nslices)
     // Request error
     var onErrorRequest = function(/*event*/)
     {
-        console.log( "RequestError while receiving manifest: "+this.status );
+        console.warn( "RequestError while receiving manifest: "+this.status );
     };
 
     // Request handler
