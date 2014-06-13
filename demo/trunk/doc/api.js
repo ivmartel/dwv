@@ -36,7 +36,6 @@ YUI.add("yuidoc-meta", function(Y) {
         "dwv.tool.ChangeShapeCommand",
         "dwv.tool.DeleteShapeCommand",
         "dwv.tool.Draw",
-        "dwv.tool.DrawLivewireCommand",
         "dwv.tool.DrawShapeCommand",
         "dwv.tool.Filter",
         "dwv.tool.Livewire",

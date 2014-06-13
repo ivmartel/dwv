@@ -111,8 +111,6 @@
             
                 <li><a href="../classes/dwv.tool.Draw.html">dwv.tool.Draw</a></li>
             
-                <li><a href="../classes/dwv.tool.DrawLivewireCommand.html">dwv.tool.DrawLivewireCommand</a></li>
-            
                 <li><a href="../classes/dwv.tool.DrawShapeCommand.html">dwv.tool.DrawShapeCommand</a></li>
             
                 <li><a href="../classes/dwv.tool.Filter.html">dwv.tool.Filter</a></li>
@@ -243,6 +241,20 @@ dwv.gui.base.appendUndoHtml = function()
     }
     // append
     node.appendChild(paragraph);
+};
+
+/**
+ * Clear the command list of the undo HTML.
+ * @method cleaUndoHtml
+ * @static
+ */
+dwv.gui.cleaUndoHtml = function ()
+{
+    var select = document.getElementById(&quot;history_list&quot;);
+    for( var i = select.length - 1; i &gt;= 0; --i)
+    {
+        select.remove(i);
+    }
 };
 
 /**

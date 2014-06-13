@@ -42,7 +42,7 @@ dwv.App = function()
     // Tool box
     var toolBox = new dwv.tool.ToolBox(this);
     // UndoStack
-    var undoStack = new dwv.tool.UndoStack(this);
+    var undoStack = new dwv.tool.UndoStack();
     
     /** 
      * Get the version of the application.
@@ -152,7 +152,8 @@ dwv.App = function()
     {
         image = null;
         view = null;
-        undoStack = new dwv.tool.UndoStack(this);
+        undoStack = new dwv.tool.UndoStack();
+        dwv.gui.cleaUndoHtml();
     };
     
     /**
@@ -498,6 +499,7 @@ dwv.App = function()
             drawStage.add(drawLayer);
         }
         // resize app
+        self.resetLayout();
         self.resize();
     }
     
@@ -5559,6 +5561,20 @@ dwv.gui.base.appendUndoHtml = function()
 };
 
 /**
+ * Clear the command list of the undo HTML.
+ * @method cleaUndoHtml
+ * @static
+ */
+dwv.gui.cleaUndoHtml = function ()
+{
+    var select = document.getElementById("history_list");
+    for( var i = select.length - 1; i >= 0; --i)
+    {
+        select.remove(i);
+    }
+};
+
+/**
  * Add a command to the undo HTML.
  * @method addCommandToUndoHtml
  * @static
@@ -5637,7 +5653,7 @@ dwv.image.filter.Threshold = function()
      */
     var min = 0;
     /**
-     * Threshold maxnimum.
+     * Threshold maximum.
      * @property max
      * @private
      * @type Number
@@ -5674,6 +5690,26 @@ dwv.image.filter.Threshold = function()
      * @return {String} The name of the filter.
      */
     this.getName = function() { return "Threshold"; };
+    
+    /**
+     * Original image.
+     * @property originalImage
+     * @private
+     * @type Object
+     */
+    var originalImage = null;
+    /**
+     * Set the original image.
+     * @method setOriginalImage
+     * @param {Object} image The original image.
+     */
+    this.setOriginalImage = function (image) { originalImage = image; };
+    /**
+     * Get the original image.
+     * @method setOriginalImage
+     * @return {Object} image The original image.
+     */
+    this.getOriginalImage = function () { return originalImage; };
 };
 
 /**
@@ -5683,8 +5719,9 @@ dwv.image.filter.Threshold = function()
  */ 
 dwv.image.filter.Threshold.prototype.update = function()
 {
-    var imageMin = app.getImage().getDataRange().min;
     var self = this;
+    var imageMin = app.getImage().getDataRange().min;
+    self.setOriginalImage( app.getImage() );
     var threshFunction = function(value){
         if(value<self.getMin()||value>self.getMax()) {
             return imageMin;
@@ -5710,6 +5747,25 @@ dwv.image.filter.Sharpen = function()
      * @return {String} The name of the filter.
      */
     this.getName = function() { return "Sharpen"; };
+    /**
+     * Original image.
+     * @property originalImage
+     * @private
+     * @type Object
+     */
+    var originalImage = null;
+    /**
+     * Set the original image.
+     * @method setOriginalImage
+     * @param {Object} image The original image.
+     */
+    this.setOriginalImage = function (image) { originalImage = image; };
+    /**
+     * Get the original image.
+     * @method setOriginalImage
+     * @return {Object} image The original image.
+     */
+    this.getOriginalImage = function () { return originalImage; };
 };
 
 /**
@@ -5719,6 +5775,8 @@ dwv.image.filter.Sharpen = function()
  */ 
 dwv.image.filter.Sharpen.prototype.update = function()
 {
+    this.setOriginalImage( app.getImage() );
+    
     return app.getImage().convolute2D(
         [  0, -1,  0,
           -1,  5, -1,
@@ -5739,6 +5797,25 @@ dwv.image.filter.Sobel = function()
      * @return {String} The name of the filter.
      */
     this.getName = function() { return "Sobel"; };
+    /**
+     * Original image.
+     * @property originalImage
+     * @private
+     * @type Object
+     */
+    var originalImage = null;
+    /**
+     * Set the original image.
+     * @method setOriginalImage
+     * @param {Object} image The original image.
+     */
+    this.setOriginalImage = function (image) { originalImage = image; };
+    /**
+     * Get the original image.
+     * @method setOriginalImage
+     * @return {Object} image The original image.
+     */
+    this.getOriginalImage = function () { return originalImage; };
 };
 
 /**
@@ -5748,6 +5825,8 @@ dwv.image.filter.Sobel = function()
  */ 
 dwv.image.filter.Sobel.prototype.update = function()
 {
+    this.setOriginalImage( app.getImage() );
+    
     var gradX = app.getImage().convolute2D(
         [ 1,  0,  -1,
           2,  0,  -2,
@@ -9940,7 +10019,11 @@ dwv.tool.Filter = function(/*app*/)
      * @type String
      */
     this.defaultFilterName = 0;
-    
+    /**
+     * Display Flag.
+     * @property displayed
+     * @type Boolean
+     */
     this.displayed = false;
 };
 
@@ -10174,37 +10257,32 @@ dwv.tool.filter.Sobel.prototype.run = function(/*args*/)
  * @param {Object} filter The filter to run.
  * @param {Object} app The associated application.
  */
-dwv.tool.RunFilterCommand = function(filter, app)
+dwv.tool.RunFilterCommand = function (filter, app)
 {
-    /**
-     * Command name.
-     * @property name
-     * @private
-     * @type String
-     */
-    var name = "RunFilter: " + filter.getName();
     /**
      * Get the command name.
      * @method getName
      * @return {String} The command name.
      */
-    this.getName = function() { return name; };
-    /**
-     * Set the command name.
-     * @method setName
-     * @param {String} str The command name.
-     */
-    this.setName = function(str) { name = str; };
+    this.getName = function () { return "Filter-" + filter.getName(); };
 
     /**
      * Execute the command.
      * @method execute
      */
-    this.execute = function()
+    this.execute = function ()
     {
         app.setImage(filter.update());
         app.generateAndDrawImage();
     }; 
+    /**
+     * Undo the command.
+     * @method undo
+     */
+    this.undo = function () {
+        app.setImage(filter.getOriginalImage());
+        app.generateAndDrawImage();
+    };
 }; // RunFilterCommand class
 ;/** 
  * Info module.
@@ -10497,6 +10575,7 @@ dwv.tool.UpdateLine = function (line, anchor)
  */
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
+var Kinetic = Kinetic || {};
 
 /**
  * Livewire painting tool.
@@ -10520,6 +10599,13 @@ dwv.tool.Livewire = function(app)
      * @type Boolean
      */
     this.started = false;
+    /**
+     * Interaction just started flag.
+     * @property justStarted
+     * @private
+     * @type Boolean
+     */
+    var justStarted = true;
     
     /**
      * Draw command.
@@ -10528,6 +10614,20 @@ dwv.tool.Livewire = function(app)
      * @type Object
      */
     var command = null;
+    /**
+     * Current active shape.
+     * @property activeShape
+     * @private
+     * @type Object
+     */
+    var activeShape = null;
+    /**
+     * Current shape group.
+     * @property shapeGroup
+     * @private
+     * @type Object
+     */
+    var shapeGroup = null;
     /**
      * Drawing style.
      * @property style
@@ -10602,6 +10702,7 @@ dwv.tool.Livewire = function(app)
         // first time
         if( !self.started ) {
             self.started = true;
+            shapeGroup = new Kinetic.Group();
             self.x0 = event._x;
             self.y0 = event._y;
             // clear vars
@@ -10623,10 +10724,9 @@ dwv.tool.Livewire = function(app)
                 console.log("Done.");
                 // save command in undo stack
                 app.getUndoStack().add(command);
-                // merge temporary layer
-                app.getDrawLayer().merge(app.getTempLayer());
                 // set flag
                 self.started = false;
+                justStarted = true;
             }
             // anchor point
             else {
@@ -10693,10 +10793,19 @@ dwv.tool.Livewire = function(app)
         }
         currentPath.appenPath(path);
         
-        // create draw command
-        command = new dwv.tool.DrawLivewireCommand(currentPath, app, self.style);
-        // clear the temporary layer
-        app.getTempLayer().clear();
+        // remove previous draw if not just started
+        if ( activeShape && !justStarted ) {
+            activeShape.destroy();
+        }
+        if ( justStarted ) {
+            justStarted = false;
+        }
+        // create shape
+        activeShape = new dwv.tool.RoiCreator(currentPath.pointArray, self.style);
+        // add shape to group
+        shapeGroup.add(activeShape);
+        // draw shape command
+        command = new dwv.tool.DrawShapeCommand(activeShape, "livewire", app);
         // draw
         command.execute();
     };
@@ -10818,77 +10927,6 @@ dwv.tool.Livewire.prototype.setLineColour = function(colour)
     // set style var
     this.style.setLineColor(colour);
 };
-
-/**
- * Draw livewire command.
- * @class DrawLivewireCommand
- * @namespace dwv.tool
- * @param {Object} livewire The livewire to draw.
- * @param {Object} app The application to draw the livewire on.
- * @param {Object} style The style of the livewire.
- */
-dwv.tool.DrawLivewireCommand = function(livewire, app, style)
-{
-    /**
-     * The livewire color.
-     * @property livewireColor
-     * @private
-     * @type String
-     */
-    var livewireColor = style.getLineColor();
-    /**
-     * The HTML context.
-     * @property context
-     * @private
-     * @type Object
-     */
-    var context = app.getTempLayer().getContext();
-    
-    /**
-     * Command name.
-     * @property name
-     * @private
-     * @type String
-     */
-    var name = "DrawLivewireCommand";
-    /**
-     * Get the command name.
-     * @method getName
-     * @return {String} The command name.
-     */
-    this.getName = function() { return name; };
-    /**
-     * Set the command name.
-     * @method setName
-     * @param {String} str The command name.
-     */
-    this.setName = function(str) { name = str; };
-
-    /**
-     * Execute the command.
-     * @method execute
-     */
-    this.execute = function()
-    {
-        // style
-        context.fillStyle = livewireColor;
-        context.strokeStyle = livewireColor;
-        // path
-        context.beginPath();
-        var p = livewire.getPoint(0);
-        context.moveTo( p.getX(), p.getY());
-        for( var i=1; i < livewire.getLength(); ++i ) {
-            p = livewire.getPoint(i);
-            context.lineTo( p.getX(), p.getY());
-        }
-        for( var j=0; j < livewire.controlPointIndexArray.length; ++j ) { 
-            p = livewire.getPoint(livewire.controlPointIndexArray[j]);
-            context.fillRect(p.getX()-3, p.getY()-3, 5, 5);
-        }
-        context.stroke();
-        //context.closePath();
-    }; 
-}; // DrawLivewireCommand class
 ;/** 
  * Tool module.
  * @module tool
@@ -11341,9 +11379,8 @@ dwv.tool = dwv.tool || {};
  * @class UndoStack
  * @namespace dwv.tool
  * @constructor
- * @param {Object} app The associated application.
  */
-dwv.tool.UndoStack = function(app)
+dwv.tool.UndoStack = function()
 { 
     /**
      * Array of commands.
@@ -11387,23 +11424,10 @@ dwv.tool.UndoStack = function(app)
         // a bit inefficient...
         if( curCmdIndex > 0 )
         {
-            // decrement index
+            // decrement command index
             --curCmdIndex; 
-            // reset image
-            app.restoreOriginalImage();
-            
+            // undo last command
             stack[curCmdIndex].undo();
-            
-            // redo from first command
-            //for( var i = 0; i < curCmdIndex; ++i)
-            //{
-            //    stack[i].execute(); 
-            //}
-            // display
-            if( curCmdIndex === 0 ) {
-                // just draw the image
-                app.generateAndDrawImage();
-            }
             // disable last in display history
             dwv.gui.enableInUndoHtml(false);
         }
@@ -11417,10 +11441,9 @@ dwv.tool.UndoStack = function(app)
     { 
         if( curCmdIndex < stack.length )
         {
-            // run command
-            var cmd = stack[curCmdIndex];
-            cmd.execute();
-            // increment index
+            // run last command
+            stack[curCmdIndex].execute();
+            // increment command index
             ++curCmdIndex;
             // enable next in display history
             dwv.gui.enableInUndoHtml(true);

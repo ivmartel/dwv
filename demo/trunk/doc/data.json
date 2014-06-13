@@ -347,8 +347,7 @@
             "name": "src/tools/livewire.js",
             "modules": {},
             "classes": {
-                "dwv.tool.Livewire": 1,
-                "dwv.tool.DrawLivewireCommand": 1
+                "dwv.tool.Livewire": 1
             },
             "fors": {},
             "namespaces": {
@@ -601,7 +600,6 @@
                 "dwv.tool.filter.Sharpen": 1,
                 "dwv.tool.RunFilterCommand": 1,
                 "dwv.tool.Livewire": 1,
-                "dwv.tool.DrawLivewireCommand": 1,
                 "dwv.tool": 1,
                 "dwv.tool.Scroll": 1,
                 "dwv.tool.ToolBox": 1,
@@ -803,7 +801,7 @@
             "module": "image",
             "namespace": "dwv.image.filter",
             "file": "src/image/filter.js",
-            "line": 84,
+            "line": 105,
             "description": "Sharpen an image using a sharpen convolution matrix.",
             "is_constructor": 1
         },
@@ -818,7 +816,7 @@
             "module": "image",
             "namespace": "dwv.image.filter",
             "file": "src/image/filter.js",
-            "line": 113,
+            "line": 155,
             "description": "Apply a Sobel filter to an image.",
             "is_constructor": 1
         },
@@ -1419,7 +1417,7 @@
             "module": "tool",
             "namespace": "dwv.tool.filter",
             "file": "src/tools/filter.js",
-            "line": 138,
+            "line": 142,
             "description": "Threshold filter tool.",
             "is_constructor": 1,
             "params": [
@@ -1441,7 +1439,7 @@
             "module": "tool",
             "namespace": "dwv.tool.filter",
             "file": "src/tools/filter.js",
-            "line": 217,
+            "line": 221,
             "description": "Sobel filter tool.",
             "is_constructor": 1,
             "params": [
@@ -1463,7 +1461,7 @@
             "module": "tool",
             "namespace": "dwv.tool",
             "file": "src/tools/filter.js",
-            "line": 255,
+            "line": 259,
             "description": "Run filter command.",
             "is_constructor": 1,
             "params": [
@@ -1505,44 +1503,13 @@
             "module": "tool",
             "namespace": "dwv.tool",
             "file": "src/tools/livewire.js",
-            "line": 8,
+            "line": 9,
             "description": "Livewire painting tool.",
             "is_constructor": 1,
             "params": [
                 {
                     "name": "app",
                     "description": "The associated application.",
-                    "type": "Object"
-                }
-            ]
-        },
-        "dwv.tool.DrawLivewireCommand": {
-            "name": "dwv.tool.DrawLivewireCommand",
-            "shortname": "dwv.tool.DrawLivewireCommand",
-            "classitems": [],
-            "plugins": [],
-            "extensions": [],
-            "plugin_for": [],
-            "extension_for": [],
-            "module": "tool",
-            "namespace": "dwv.tool",
-            "file": "src/tools/livewire.js",
-            "line": 329,
-            "description": "Draw livewire command.",
-            "params": [
-                {
-                    "name": "livewire",
-                    "description": "The livewire to draw.",
-                    "type": "Object"
-                },
-                {
-                    "name": "app",
-                    "description": "The application to draw the livewire on.",
-                    "type": "Object"
-                },
-                {
-                    "name": "style",
-                    "description": "The style of the livewire.",
                     "type": "Object"
                 }
             ]
@@ -1619,14 +1586,7 @@
             "file": "src/tools/undo.js",
             "line": 8,
             "description": "UndoStack class.",
-            "is_constructor": 1,
-            "params": [
-                {
-                    "name": "app",
-                    "description": "The associated application.",
-                    "type": "Object"
-                }
-            ]
+            "is_constructor": 1
         },
         "dwv.tool.WindowLevel": {
             "name": "dwv.tool.WindowLevel",
@@ -4069,6 +4029,17 @@
         {
             "file": "src/gui/undo.js",
             "line": 42,
+            "description": "Clear the command list of the undo HTML.",
+            "itemtype": "method",
+            "name": "cleaUndoHtml",
+            "static": 1,
+            "class": "dwv.gui",
+            "module": "gui",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/gui/undo.js",
+            "line": 56,
             "description": "Add a command to the undo HTML.",
             "itemtype": "method",
             "name": "addCommandToUndoHtml",
@@ -4086,7 +4057,7 @@
         },
         {
             "file": "src/gui/undo.js",
-            "line": 69,
+            "line": 83,
             "description": "Enable the last command of the undo HTML.",
             "itemtype": "method",
             "name": "enableInUndoHtml",
@@ -4118,7 +4089,7 @@
         {
             "file": "src/image/filter.js",
             "line": 24,
-            "description": "Threshold maxnimum.",
+            "description": "Threshold maximum.",
             "itemtype": "property",
             "name": "max",
             "access": "private",
@@ -4206,7 +4177,51 @@
         },
         {
             "file": "src/image/filter.js",
-            "line": 64,
+            "line": 63,
+            "description": "Original image.",
+            "itemtype": "property",
+            "name": "originalImage",
+            "access": "private",
+            "tagname": "",
+            "type": "Object",
+            "class": "dwv.image.filter.Threshold",
+            "module": "image",
+            "namespace": "dwv.image.filter"
+        },
+        {
+            "file": "src/image/filter.js",
+            "line": 70,
+            "description": "Set the original image.",
+            "itemtype": "method",
+            "name": "setOriginalImage",
+            "params": [
+                {
+                    "name": "image",
+                    "description": "The original image.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.image.filter.Threshold",
+            "module": "image",
+            "namespace": "dwv.image.filter"
+        },
+        {
+            "file": "src/image/filter.js",
+            "line": 76,
+            "description": "Get the original image.",
+            "itemtype": "method",
+            "name": "setOriginalImage",
+            "return": {
+                "description": "image The original image.",
+                "type": "Object"
+            },
+            "class": "dwv.image.filter.Threshold",
+            "module": "image",
+            "namespace": "dwv.image.filter"
+        },
+        {
+            "file": "src/image/filter.js",
+            "line": 84,
             "description": "Transform the main image using this filter.",
             "itemtype": "method",
             "name": "update",
@@ -4220,7 +4235,7 @@
         },
         {
             "file": "src/image/filter.js",
-            "line": 92,
+            "line": 113,
             "description": "Get the name of the filter.",
             "itemtype": "method",
             "name": "getName",
@@ -4234,7 +4249,51 @@
         },
         {
             "file": "src/image/filter.js",
-            "line": 100,
+            "line": 119,
+            "description": "Original image.",
+            "itemtype": "property",
+            "name": "originalImage",
+            "access": "private",
+            "tagname": "",
+            "type": "Object",
+            "class": "dwv.image.filter.Sharpen",
+            "module": "image",
+            "namespace": "dwv.image.filter"
+        },
+        {
+            "file": "src/image/filter.js",
+            "line": 126,
+            "description": "Set the original image.",
+            "itemtype": "method",
+            "name": "setOriginalImage",
+            "params": [
+                {
+                    "name": "image",
+                    "description": "The original image.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.image.filter.Sharpen",
+            "module": "image",
+            "namespace": "dwv.image.filter"
+        },
+        {
+            "file": "src/image/filter.js",
+            "line": 132,
+            "description": "Get the original image.",
+            "itemtype": "method",
+            "name": "setOriginalImage",
+            "return": {
+                "description": "image The original image.",
+                "type": "Object"
+            },
+            "class": "dwv.image.filter.Sharpen",
+            "module": "image",
+            "namespace": "dwv.image.filter"
+        },
+        {
+            "file": "src/image/filter.js",
+            "line": 140,
             "description": "Transform the main image using this filter.",
             "itemtype": "method",
             "name": "update",
@@ -4248,7 +4307,7 @@
         },
         {
             "file": "src/image/filter.js",
-            "line": 121,
+            "line": 163,
             "description": "Get the name of the filter.",
             "itemtype": "method",
             "name": "getName",
@@ -4262,7 +4321,51 @@
         },
         {
             "file": "src/image/filter.js",
-            "line": 129,
+            "line": 169,
+            "description": "Original image.",
+            "itemtype": "property",
+            "name": "originalImage",
+            "access": "private",
+            "tagname": "",
+            "type": "Object",
+            "class": "dwv.image.filter.Sobel",
+            "module": "image",
+            "namespace": "dwv.image.filter"
+        },
+        {
+            "file": "src/image/filter.js",
+            "line": 176,
+            "description": "Set the original image.",
+            "itemtype": "method",
+            "name": "setOriginalImage",
+            "params": [
+                {
+                    "name": "image",
+                    "description": "The original image.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.image.filter.Sobel",
+            "module": "image",
+            "namespace": "dwv.image.filter"
+        },
+        {
+            "file": "src/image/filter.js",
+            "line": 182,
+            "description": "Get the original image.",
+            "itemtype": "method",
+            "name": "setOriginalImage",
+            "return": {
+                "description": "image The original image.",
+                "type": "Object"
+            },
+            "class": "dwv.image.filter.Sobel",
+            "module": "image",
+            "namespace": "dwv.image.filter"
+        },
+        {
+            "file": "src/image/filter.js",
+            "line": 190,
             "description": "Transform the main image using this filter.",
             "itemtype": "method",
             "name": "update",
@@ -7490,7 +7593,18 @@
         },
         {
             "file": "src/tools/filter.js",
-            "line": 33,
+            "line": 29,
+            "description": "Display Flag.",
+            "itemtype": "property",
+            "name": "displayed",
+            "type": "Boolean",
+            "class": "dwv.tool.Filter",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/filter.js",
+            "line": 37,
             "description": "Help for this tool.",
             "itemtype": "method",
             "name": "getHelp",
@@ -7504,7 +7618,7 @@
         },
         {
             "file": "src/tools/filter.js",
-            "line": 49,
+            "line": 53,
             "description": "Enable the filter.",
             "itemtype": "method",
             "name": "enable",
@@ -7521,7 +7635,7 @@
         },
         {
             "file": "src/tools/filter.js",
-            "line": 62,
+            "line": 66,
             "description": "Get the selected filter.",
             "itemtype": "method",
             "name": "getSelectedFilter",
@@ -7535,7 +7649,7 @@
         },
         {
             "file": "src/tools/filter.js",
-            "line": 71,
+            "line": 75,
             "description": "Set the selected filter.",
             "itemtype": "method",
             "name": "setSelectedFilter",
@@ -7549,7 +7663,7 @@
         },
         {
             "file": "src/tools/filter.js",
-            "line": 96,
+            "line": 100,
             "description": "Check if a filter is in the filter list.",
             "itemtype": "method",
             "name": "hasFilter",
@@ -7570,7 +7684,7 @@
         },
         {
             "file": "src/tools/filter.js",
-            "line": 106,
+            "line": 110,
             "description": "Initialise the filter.",
             "itemtype": "method",
             "name": "init",
@@ -7580,7 +7694,7 @@
         },
         {
             "file": "src/tools/filter.js",
-            "line": 126,
+            "line": 130,
             "description": "Handle keydown event.",
             "itemtype": "method",
             "name": "keydown",
@@ -7597,7 +7711,7 @@
         },
         {
             "file": "src/tools/filter.js",
-            "line": 147,
+            "line": 151,
             "description": "Enable the filter.",
             "itemtype": "method",
             "name": "enable",
@@ -7614,7 +7728,7 @@
         },
         {
             "file": "src/tools/filter.js",
-            "line": 163,
+            "line": 167,
             "description": "Run the filter.",
             "itemtype": "method",
             "name": "run",
@@ -7631,7 +7745,7 @@
         },
         {
             "file": "src/tools/filter.js",
-            "line": 188,
+            "line": 192,
             "description": "Enable the filter.",
             "itemtype": "method",
             "name": "enable",
@@ -7648,7 +7762,7 @@
         },
         {
             "file": "src/tools/filter.js",
-            "line": 203,
+            "line": 207,
             "description": "Run the filter.",
             "itemtype": "method",
             "name": "run",
@@ -7665,7 +7779,7 @@
         },
         {
             "file": "src/tools/filter.js",
-            "line": 226,
+            "line": 230,
             "description": "Enable the filter.",
             "itemtype": "method",
             "name": "enable",
@@ -7682,7 +7796,7 @@
         },
         {
             "file": "src/tools/filter.js",
-            "line": 241,
+            "line": 245,
             "description": "Run the filter.",
             "itemtype": "method",
             "name": "run",
@@ -7699,20 +7813,7 @@
         },
         {
             "file": "src/tools/filter.js",
-            "line": 265,
-            "description": "Command name.",
-            "itemtype": "property",
-            "name": "name",
-            "access": "private",
-            "tagname": "",
-            "type": "String",
-            "class": "dwv.tool.RunFilterCommand",
-            "module": "tool",
-            "namespace": "dwv.tool"
-        },
-        {
-            "file": "src/tools/filter.js",
-            "line": 272,
+            "line": 269,
             "description": "Get the command name.",
             "itemtype": "method",
             "name": "getName",
@@ -7726,17 +7827,10 @@
         },
         {
             "file": "src/tools/filter.js",
-            "line": 278,
-            "description": "Set the command name.",
+            "line": 276,
+            "description": "Execute the command.",
             "itemtype": "method",
-            "name": "setName",
-            "params": [
-                {
-                    "name": "str",
-                    "description": "The command name.",
-                    "type": "String"
-                }
-            ],
+            "name": "execute",
             "class": "dwv.tool.RunFilterCommand",
             "module": "tool",
             "namespace": "dwv.tool"
@@ -7744,9 +7838,9 @@
         {
             "file": "src/tools/filter.js",
             "line": 285,
-            "description": "Execute the command.",
+            "description": "Undo the command.",
             "itemtype": "method",
-            "name": "execute",
+            "name": "undo",
             "class": "dwv.tool.RunFilterCommand",
             "module": "tool",
             "namespace": "dwv.tool"
@@ -7913,7 +8007,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 17,
+            "line": 18,
             "description": "Closure to self: to be used by event handlers.",
             "itemtype": "property",
             "name": "self",
@@ -7926,7 +8020,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 24,
+            "line": 25,
             "description": "Interaction start flag.",
             "itemtype": "property",
             "name": "started",
@@ -7938,6 +8032,19 @@
         {
             "file": "src/tools/livewire.js",
             "line": 31,
+            "description": "Interaction just started flag.",
+            "itemtype": "property",
+            "name": "justStarted",
+            "access": "private",
+            "tagname": "",
+            "type": "Boolean",
+            "class": "dwv.tool.Livewire",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/livewire.js",
+            "line": 39,
             "description": "Draw command.",
             "itemtype": "property",
             "name": "command",
@@ -7950,7 +8057,33 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 38,
+            "line": 46,
+            "description": "Current active shape.",
+            "itemtype": "property",
+            "name": "activeShape",
+            "access": "private",
+            "tagname": "",
+            "type": "Object",
+            "class": "dwv.tool.Livewire",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/livewire.js",
+            "line": 53,
+            "description": "Current shape group.",
+            "itemtype": "property",
+            "name": "shapeGroup",
+            "access": "private",
+            "tagname": "",
+            "type": "Object",
+            "class": "dwv.tool.Livewire",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/livewire.js",
+            "line": 60,
             "description": "Drawing style.",
             "itemtype": "property",
             "name": "style",
@@ -7961,7 +8094,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 45,
+            "line": 67,
             "description": "Path storage. Paths are stored in reverse order.",
             "itemtype": "property",
             "name": "path",
@@ -7974,7 +8107,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 52,
+            "line": 74,
             "description": "Current path storage. Paths are stored in reverse order.",
             "itemtype": "property",
             "name": "currentPath",
@@ -7987,7 +8120,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 59,
+            "line": 81,
             "description": "List of parent points.",
             "itemtype": "property",
             "name": "parentPoints",
@@ -8000,7 +8133,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 66,
+            "line": 88,
             "description": "Tolerance.",
             "itemtype": "property",
             "name": "tolerance",
@@ -8013,7 +8146,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 74,
+            "line": 96,
             "description": "Clear the parent points list.",
             "itemtype": "method",
             "name": "clearParentPoints",
@@ -8025,7 +8158,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 85,
+            "line": 107,
             "description": "Clear the stored paths.",
             "itemtype": "method",
             "name": "clearPaths",
@@ -8037,7 +8170,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 95,
+            "line": 117,
             "description": "Scissor representation.",
             "itemtype": "property",
             "name": "scissors",
@@ -8050,7 +8183,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 103,
+            "line": 125,
             "description": "Handle mouse down event.",
             "itemtype": "method",
             "name": "mousedown",
@@ -8067,7 +8200,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 149,
+            "line": 171,
             "description": "Handle mouse move event.",
             "itemtype": "method",
             "name": "mousemove",
@@ -8084,7 +8217,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 211,
+            "line": 242,
             "description": "Handle mouse up event.",
             "itemtype": "method",
             "name": "mouseup",
@@ -8101,7 +8234,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 220,
+            "line": 251,
             "description": "Handle mouse out event.",
             "itemtype": "method",
             "name": "mouseout",
@@ -8118,7 +8251,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 230,
+            "line": 261,
             "description": "Handle touch start event.",
             "itemtype": "method",
             "name": "touchstart",
@@ -8135,7 +8268,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 240,
+            "line": 271,
             "description": "Handle touch move event.",
             "itemtype": "method",
             "name": "touchmove",
@@ -8152,7 +8285,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 250,
+            "line": 281,
             "description": "Handle touch end event.",
             "itemtype": "method",
             "name": "touchend",
@@ -8169,7 +8302,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 260,
+            "line": 291,
             "description": "Handle key down event.",
             "itemtype": "method",
             "name": "keydown",
@@ -8186,7 +8319,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 269,
+            "line": 300,
             "description": "Enable the tool.",
             "itemtype": "method",
             "name": "enable",
@@ -8203,7 +8336,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 280,
+            "line": 311,
             "description": "Initialise the tool.",
             "itemtype": "method",
             "name": "init",
@@ -8213,7 +8346,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 300,
+            "line": 331,
             "description": "Help for this tool.",
             "itemtype": "method",
             "name": "getHelp",
@@ -8227,7 +8360,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 318,
+            "line": 349,
             "description": "Set the line color of the drawing.",
             "itemtype": "method",
             "name": "setLineColour",
@@ -8239,86 +8372,6 @@
                 }
             ],
             "class": "dwv.tool.Livewire",
-            "module": "tool",
-            "namespace": "dwv.tool"
-        },
-        {
-            "file": "src/tools/livewire.js",
-            "line": 339,
-            "description": "The livewire color.",
-            "itemtype": "property",
-            "name": "livewireColor",
-            "access": "private",
-            "tagname": "",
-            "type": "String",
-            "class": "dwv.tool.DrawLivewireCommand",
-            "module": "tool",
-            "namespace": "dwv.tool"
-        },
-        {
-            "file": "src/tools/livewire.js",
-            "line": 346,
-            "description": "The HTML context.",
-            "itemtype": "property",
-            "name": "context",
-            "access": "private",
-            "tagname": "",
-            "type": "Object",
-            "class": "dwv.tool.DrawLivewireCommand",
-            "module": "tool",
-            "namespace": "dwv.tool"
-        },
-        {
-            "file": "src/tools/livewire.js",
-            "line": 354,
-            "description": "Command name.",
-            "itemtype": "property",
-            "name": "name",
-            "access": "private",
-            "tagname": "",
-            "type": "String",
-            "class": "dwv.tool.DrawLivewireCommand",
-            "module": "tool",
-            "namespace": "dwv.tool"
-        },
-        {
-            "file": "src/tools/livewire.js",
-            "line": 361,
-            "description": "Get the command name.",
-            "itemtype": "method",
-            "name": "getName",
-            "return": {
-                "description": "The command name.",
-                "type": "String"
-            },
-            "class": "dwv.tool.DrawLivewireCommand",
-            "module": "tool",
-            "namespace": "dwv.tool"
-        },
-        {
-            "file": "src/tools/livewire.js",
-            "line": 367,
-            "description": "Set the command name.",
-            "itemtype": "method",
-            "name": "setName",
-            "params": [
-                {
-                    "name": "str",
-                    "description": "The command name.",
-                    "type": "String"
-                }
-            ],
-            "class": "dwv.tool.DrawLivewireCommand",
-            "module": "tool",
-            "namespace": "dwv.tool"
-        },
-        {
-            "file": "src/tools/livewire.js",
-            "line": 374,
-            "description": "Execute the command.",
-            "itemtype": "method",
-            "name": "execute",
-            "class": "dwv.tool.DrawLivewireCommand",
             "module": "tool",
             "namespace": "dwv.tool"
         },
@@ -8711,7 +8764,7 @@
         },
         {
             "file": "src/tools/undo.js",
-            "line": 17,
+            "line": 16,
             "description": "Array of commands.",
             "itemtype": "property",
             "name": "stack",
@@ -8724,7 +8777,7 @@
         },
         {
             "file": "src/tools/undo.js",
-            "line": 24,
+            "line": 23,
             "description": "Current command index.",
             "itemtype": "property",
             "name": "curCmdIndex",
@@ -8737,7 +8790,7 @@
         },
         {
             "file": "src/tools/undo.js",
-            "line": 32,
+            "line": 31,
             "description": "Add a command to the stack.",
             "itemtype": "method",
             "name": "add",
@@ -8754,7 +8807,7 @@
         },
         {
             "file": "src/tools/undo.js",
-            "line": 50,
+            "line": 49,
             "description": "Undo the last command.",
             "itemtype": "method",
             "name": "undo",
@@ -8764,7 +8817,7 @@
         },
         {
             "file": "src/tools/undo.js",
-            "line": 81,
+            "line": 67,
             "description": "Redo the last command.",
             "itemtype": "method",
             "name": "redo",
@@ -9686,7 +9739,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 158,
+            "line": 159,
             "description": "Reset the layout of the application.",
             "itemtype": "method",
             "name": "resetLayout",
@@ -9696,7 +9749,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 174,
+            "line": 175,
             "description": "Handle key down event.\n- CRTL-Z: undo\n- CRTL-Y: redo\nDefault behavior. Usually used in tools.",
             "itemtype": "method",
             "name": "handleKeyDown",
@@ -9713,7 +9766,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 194,
+            "line": 195,
             "description": "Handle change files event.",
             "itemtype": "method",
             "name": "onChangeFiles",
@@ -9730,7 +9783,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 204,
+            "line": 205,
             "description": "Load a list of files.",
             "itemtype": "method",
             "name": "loadFiles",
@@ -9747,7 +9800,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 226,
+            "line": 227,
             "description": "Handle change url event.",
             "itemtype": "method",
             "name": "onChangeURL",
@@ -9764,7 +9817,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 236,
+            "line": 237,
             "description": "Load a list of URLs.",
             "itemtype": "method",
             "name": "loadURL",
@@ -9781,7 +9834,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 258,
+            "line": 259,
             "description": "Generate the image data and draw it.",
             "itemtype": "method",
             "name": "generateAndDrawImage",
@@ -9791,7 +9844,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 272,
+            "line": 273,
             "description": "Resize the display window. To be called once the image is loaded.",
             "itemtype": "method",
             "name": "resize",
@@ -9801,7 +9854,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 316,
+            "line": 317,
             "description": "Toggle the display of the info layer.",
             "itemtype": "method",
             "name": "toggleInfoLayerDisplay",
@@ -9811,7 +9864,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 333,
+            "line": 334,
             "description": "Init the Window/Level display",
             "class": "dwv.App",
             "module": "utils",
@@ -9819,7 +9872,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 349,
+            "line": 350,
             "description": "Add image listeners.",
             "itemtype": "method",
             "name": "addImageInfoListeners",
@@ -9831,7 +9884,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 364,
+            "line": 365,
             "description": "Remove image listeners.",
             "itemtype": "method",
             "name": "removeImageInfoListeners",
@@ -9843,7 +9896,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 379,
+            "line": 380,
             "description": "General-purpose event handler. This function just determines the mouse \nposition relative to the canvas element. It then passes it to the current tool.",
             "itemtype": "method",
             "name": "eventHandler",
@@ -9862,7 +9915,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 452,
+            "line": 453,
             "description": "Handle an error: display it to the user.",
             "itemtype": "method",
             "name": "handleError",
@@ -9881,7 +9934,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 473,
+            "line": 474,
             "description": "Create the application layers.",
             "itemtype": "method",
             "name": "createLayers",
@@ -9905,7 +9958,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 504,
+            "line": 506,
             "description": "Create the DICOM tags table. To be called once the DICOM has been parsed.",
             "itemtype": "method",
             "name": "createTagsTable",
@@ -9924,7 +9977,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 537,
+            "line": 539,
             "description": "Post load application initialisation. To be called once the DICOM has been parsed.",
             "itemtype": "method",
             "name": "postLoadInit",
@@ -10025,11 +10078,11 @@
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/tools/filter.js:33"
+            "line": " src/tools/filter.js:37"
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/tools/livewire.js:300"
+            "line": " src/tools/livewire.js:331"
         },
         {
             "message": "replacing incorrect tag: returns with return",
@@ -10093,7 +10146,7 @@
         },
         {
             "message": "Missing item type\nInit the Window/Level display",
-            "line": " src/application.js:333"
+            "line": " src/application.js:334"
         }
     ]
 }
