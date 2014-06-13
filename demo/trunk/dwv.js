@@ -3193,9 +3193,10 @@ dwv.browser = dwv.browser || {};
 dwv.browser.hasFileApi = function()
 {
     // regular test does not work on Safari 5
-    var isSafari5 = (navigator.appVersion.indexOf("Safari") != -1) &&
-        ( (navigator.appVersion.indexOf("5.0.") != -1) ||
-          (navigator.appVersion.indexOf("5.1.") != -1) );
+    var isSafari5 = (navigator.appVersion.indexOf("Safari") !== -1) &&
+        (navigator.appVersion.indexOf("Chrome") === -1) &&
+        ( (navigator.appVersion.indexOf("5.0.") !== -1) ||
+          (navigator.appVersion.indexOf("5.1.") !== -1) );
     if( isSafari5 ) 
     {
         console.warn("Assuming FileAPI support for Safari5...");

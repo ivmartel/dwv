@@ -2115,7 +2115,7 @@
         },
         {
             "file": "src/gui/browser.js",
-            "line": 34,
+            "line": 35,
             "description": "Browser check for the XMLHttpRequest.",
             "itemtype": "method",
             "name": "hasXmlHttpRequest",
@@ -2126,7 +2126,7 @@
         },
         {
             "file": "src/gui/browser.js",
-            "line": 44,
+            "line": 45,
             "description": "Browser check for typed array.",
             "itemtype": "method",
             "name": "hasTypedArray",
@@ -2137,7 +2137,7 @@
         },
         {
             "file": "src/gui/browser.js",
-            "line": 54,
+            "line": 55,
             "description": "Browser check for clamped array.",
             "itemtype": "method",
             "name": "hasClampedArray",
@@ -2148,7 +2148,7 @@
         },
         {
             "file": "src/gui/browser.js",
-            "line": 64,
+            "line": 65,
             "description": "Browser checks to see if it can run dwv. Throws an error if not.\nTODO Maybe use http://modernizr.com/.",
             "itemtype": "method",
             "name": "check",
