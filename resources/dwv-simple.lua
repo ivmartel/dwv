@@ -77,14 +77,14 @@ print([[
 <title>DICOM Web Viewer</title>
 <meta charset="UTF-8">
 <link rel="stylesheet" href="/dwv/css/style.css">
-<link rel="stylesheet" href="/dwv/ext/jquery-mobile/jquery.mobile-1.4.1.min.css">
+<link rel="stylesheet" href="/dwv/ext/jquery-mobile/jquery.mobile-1.4.2.min.css">
 ]])
 
 -- path with extra /dwv
 print([[
 <!-- Third party --> 
-<script type="text/javascript" src="/dwv/ext/jquery/jquery-2.1.0.min.js"></script>
-<script type="text/javascript" src="/dwv/ext/jquery-mobile/jquery.mobile-1.4.1.min.js"></script>
+<script type="text/javascript" src="/dwv/ext/jquery/jquery-2.1.1.min.js"></script>
+<script type="text/javascript" src="/dwv/ext/jquery-mobile/jquery.mobile-1.4.2.min.js"></script>
 <script type="text/javascript" src="/dwv/ext/flot/jquery.flot.min.js"></script>
 <script type="text/javascript" src="/dwv/ext/openjpeg/openjpeg.js"></script>
 ]])

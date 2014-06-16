@@ -11,17 +11,18 @@
     "test": "grunt publish --verbose"
   },
   "dependencies": {
-    "jquery": "2.1.0",
-    "jquery-mobile": "1.4.1",
-    "jquery-ui": "1.10.4"
+    "jquery": "2.1.1",
+    "jquery-mobile": "1.4.2",
+    "jquery-ui": "1.10.4",
+    "kinetic": "5.1.0"
   },
   "devDependencies": {
     "grunt": "~0.4",
     "grunt-cli": "~0.1",
-    "grunt-contrib-qunit": "~0.4",
+    "grunt-contrib-qunit": "~0.5",
     "grunt-contrib-jshint": "~0.10",
     "grunt-contrib-concat": "~0.4",
-    "grunt-contrib-uglify": "~0.4",
+    "grunt-contrib-uglify": "~0.5",
     "grunt-contrib-yuidoc": "~0.5"
   }
 }

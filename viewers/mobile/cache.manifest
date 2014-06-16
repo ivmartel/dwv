@@ -19,7 +19,7 @@ appgui.js
 # third party
 
 # css
-/dwv/demo/stable/ext/jquery-mobile/jquery.mobile-1.4.1.min.css
+/dwv/demo/stable/ext/jquery-mobile/jquery.mobile-1.4.2.min.css
 /dwv/demo/stable/ext/jquery-mobile/images/ajax-loader.gif
 /dwv/demo/stable/ext/jquery-mobile/images/icons-svg/plus-white.svg
 /dwv/demo/stable/ext/jquery-mobile/images/icons-svg/forward-white.svg
@@ -32,9 +32,9 @@ appgui.js
 /dwv/demo/stable/ext/jquery-mobile/images/icons-png/info-white.png
 /dwv/demo/stable/ext/jquery-mobile/images/icons-png/grid-black.png
 # js
-/dwv/demo/stable/ext/jquery/jquery-2.1.0.min.js
-/dwv/demo/stable/ext/jquery-mobile/jquery.mobile-1.4.1.min.js
-/dwv/demo/stable/ext/jquery-mobile/jquery.mobile-1.4.1.min.map
+/dwv/demo/stable/ext/jquery/jquery-2.1.1.min.js
+/dwv/demo/stable/ext/jquery-mobile/jquery.mobile-1.4.2.min.js
+/dwv/demo/stable/ext/jquery-mobile/jquery.mobile-1.4.2.min.map
 /dwv/demo/stable/ext/flot/jquery.flot.min.js
 
 NETWORK:

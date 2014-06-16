@@ -36,7 +36,7 @@ appgui.js
 /dwv/demo/stable/ext/jquery-ui/themes/ui-darkness/images/ui-icons_cccccc_256x240.png
 /dwv/demo/stable/ext/jquery-ui/themes/ui-darkness/images/ui-icons_ffffff_256x240.png
 # js
-/dwv/demo/stable/ext/jquery/jquery-2.1.0.min.js
+/dwv/demo/stable/ext/jquery/jquery-2.1.1.min.js
 /dwv/demo/stable/ext/jquery-ui/jquery-ui-1.10.4.min.js
 /dwv/demo/stable/ext/flot/jquery.flot.min.js
 
