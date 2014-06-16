@@ -13,8 +13,7 @@
   "dependencies": {
     "jquery": "2.1.1",
     "jquery-mobile": "1.4.2",
-    "jquery-ui": "1.10.4",
-    "kinetic": "5.1.0"
+    "jquery-ui": "1.10.4"
   },
   "devDependencies": {
     "grunt": "~0.4",
