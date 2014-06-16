@@ -47,9 +47,11 @@ dwv.gui.base.appendUndoHtml = function()
 dwv.gui.cleaUndoHtml = function ()
 {
     var select = document.getElementById("history_list");
-    for( var i = select.length - 1; i >= 0; --i)
-    {
-        select.remove(i);
+    if ( select && select.length !== 0 ) {
+        for( var i = select.length - 1; i >= 0; --i)
+        {
+            select.remove(i);
+        }
     }
 };
 
