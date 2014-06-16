@@ -102,6 +102,7 @@ print([[
 <script type="text/javascript" src="/dwv/ext/jquery-ui/jquery-ui-1.10.4.min.js"></script>
 <script type="text/javascript" src="/dwv/ext/flot/jquery.flot.min.js"></script>
 <script type="text/javascript" src="/dwv/ext/openjpeg/openjpeg.js"></script>
+<script type="text/javascript" src="/dwv/ext/kinetic/kinetic-v5.1.0.min.js"></script>
 ]])
 
 -- path with extra /dwv
@@ -182,8 +183,7 @@ print([[
 <div id="layerDialog" title="Image">
 <div id="layerContainer">
 <canvas id="imageLayer">Only for HTML5 compatible browsers...</canvas>
-<canvas id="drawLayer">Only for HTML5 compatible browsers...</canvas>
-<canvas id="tempLayer">Only for HTML5 compatible browsers...</canvas>
+<div id="drawDiv"></div>
 <div id="infoLayer">
 <div id="infotl"></div>
 <div id="infotr"></div>
