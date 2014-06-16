@@ -12,7 +12,6 @@
   },
   "dependencies": {
     "jquery": "2.1.1",
-    "jquery-mobile": "1.4.2",
     "jquery-ui": "1.10.4"
   },
   "devDependencies": {
