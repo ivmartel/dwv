@@ -4039,7 +4039,7 @@
         },
         {
             "file": "src/gui/undo.js",
-            "line": 56,
+            "line": 58,
             "description": "Add a command to the undo HTML.",
             "itemtype": "method",
             "name": "addCommandToUndoHtml",
@@ -4057,7 +4057,7 @@
         },
         {
             "file": "src/gui/undo.js",
-            "line": 83,
+            "line": 85,
             "description": "Enable the last command of the undo HTML.",
             "itemtype": "method",
             "name": "enableInUndoHtml",
