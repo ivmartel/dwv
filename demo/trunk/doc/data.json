@@ -7512,7 +7512,7 @@
         },
         {
             "file": "src/tools/editor.js",
-            "line": 344,
+            "line": 357,
             "description": "Set the anchor off listeners.",
             "params": [
                 {
@@ -10142,7 +10142,7 @@
         },
         {
             "message": "Missing item type\nSet the anchor off listeners.",
-            "line": " src/tools/editor.js:344"
+            "line": " src/tools/editor.js:357"
         },
         {
             "message": "Missing item type\nInit the Window/Level display",

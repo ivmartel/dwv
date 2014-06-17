@@ -249,10 +249,18 @@ dwv.tool.UpdateEllipse = function (ellipse, anchor)
     // parent group
     var group = anchor.getParent();
     // find special points
-    var topLeft = group.find(&#x27;#topLeft&#x27;)[0];
-    var topRight = group.find(&#x27;#topRight&#x27;)[0];
-    var bottomRight = group.find(&#x27;#bottomRight&#x27;)[0];
-    var bottomLeft = group.find(&#x27;#bottomLeft&#x27;)[0];
+    var topLeft = group.getChildren(function(node){
+        return node.id() === &#x27;topLeft&#x27;;
+    })[0];
+    var topRight = group.getChildren(function(node){
+        return node.id() === &#x27;topRight&#x27;;
+    })[0];
+    var bottomRight = group.getChildren(function(node){
+        return node.id() === &#x27;bottomRight&#x27;;
+    })[0];
+    var bottomLeft = group.getChildren(function(node){
+        return node.id() === &#x27;bottomLeft&#x27;;
+    })[0];
     // update &#x27;self&#x27; (undo case) and special points
     switch ( anchor.id() ) {
     case &#x27;topLeft&#x27;:

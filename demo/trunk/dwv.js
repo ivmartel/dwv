@@ -9831,6 +9831,19 @@ dwv.tool.ShapeEditor = function ()
      */
     function setAnchorOn( anchor ) {
         var startAnchor = null;
+        
+        // command name based on shape type
+        var cmdName = "shape";
+        if ( shape instanceof Kinetic.Line ) {
+            cmdName = "line";
+        }
+        else if ( shape instanceof Kinetic.Rect ) {
+            cmdName = "rectangle";
+        }
+        else if ( shape instanceof Kinetic.Ellipse ) {
+            cmdName = "ellipse";
+        }
+
         // drag start listener
         anchor.on('dragstart', function () {
             startAnchor = getClone(this);
@@ -9852,7 +9865,7 @@ dwv.tool.ShapeEditor = function ()
             var endAnchor = getClone(this);
             // store the change command
             var chgcmd = new dwv.tool.ChangeShapeCommand(
-                    shape, "shape", updateFunction, startAnchor, endAnchor, app);
+                    shape, cmdName, updateFunction, startAnchor, endAnchor, app);
             chgcmd.execute();
             app.getUndoStack().add(chgcmd);
             // reset start anchor
@@ -9946,10 +9959,18 @@ dwv.tool.UpdateEllipse = function (ellipse, anchor)
     // parent group
     var group = anchor.getParent();
     // find special points
-    var topLeft = group.find('#topLeft')[0];
-    var topRight = group.find('#topRight')[0];
-    var bottomRight = group.find('#bottomRight')[0];
-    var bottomLeft = group.find('#bottomLeft')[0];
+    var topLeft = group.getChildren(function(node){
+        return node.id() === 'topLeft';
+    })[0];
+    var topRight = group.getChildren(function(node){
+        return node.id() === 'topRight';
+    })[0];
+    var bottomRight = group.getChildren(function(node){
+        return node.id() === 'bottomRight';
+    })[0];
+    var bottomLeft = group.getChildren(function(node){
+        return node.id() === 'bottomLeft';
+    })[0];
     // update 'self' (undo case) and special points
     switch ( anchor.id() ) {
     case 'topLeft':
@@ -10547,8 +10568,12 @@ dwv.tool.UpdateLine = function (line, anchor)
     // parent group
     var group = anchor.getParent();
     // find special points
-    var begin = group.find('#begin')[0];
-    var end = group.find('#end')[0];
+    var begin = group.getChildren(function(node){
+        return node.id() === 'begin';
+    })[0];
+    var end = group.getChildren(function(node){
+        return node.id() === 'end';
+    })[0];
     // update special points
     switch ( anchor.id() ) {
     case 'begin':
@@ -10971,10 +10996,18 @@ dwv.tool.UpdateRect = function (rect, anchor)
     // parent group
     var group = anchor.getParent();
     // find special points
-    var topLeft = group.find('#topLeft')[0];
-    var topRight = group.find('#topRight')[0];
-    var bottomRight = group.find('#bottomRight')[0];
-    var bottomLeft = group.find('#bottomLeft')[0];
+    var topLeft = group.getChildren(function(node){
+        return node.id() === 'topLeft';
+    })[0];
+    var topRight = group.getChildren(function(node){
+        return node.id() === 'topRight';
+    })[0];
+    var bottomRight = group.getChildren(function(node){
+        return node.id() === 'bottomRight';
+    })[0];
+    var bottomLeft = group.getChildren(function(node){
+        return node.id() === 'bottomLeft';
+    })[0];
     // update 'self' (undo case) and special points
     switch ( anchor.id() ) {
     case 'topLeft':
@@ -11083,7 +11116,9 @@ dwv.tool.UpdateRoi = function (roi, anchor)
     // parent group
     var group = anchor.getParent();
     // update self
-    var point = group.find('#'+anchor.id())[0];
+    var point = group.getChildren(function(node){
+        return node.id() === anchor.id();
+    })[0];
     point.x( anchor.x() );
     point.y( anchor.y() );
     // update the roi point and compensate for possible drag
