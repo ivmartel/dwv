@@ -43,10 +43,18 @@ dwv.tool.UpdateRect = function (rect, anchor)
     // parent group
     var group = anchor.getParent();
     // find special points
-    var topLeft = group.find('#topLeft')[0];
-    var topRight = group.find('#topRight')[0];
-    var bottomRight = group.find('#bottomRight')[0];
-    var bottomLeft = group.find('#bottomLeft')[0];
+    var topLeft = group.getChildren(function(node){
+        return node.id() === 'topLeft';
+    })[0];
+    var topRight = group.getChildren(function(node){
+        return node.id() === 'topRight';
+    })[0];
+    var bottomRight = group.getChildren(function(node){
+        return node.id() === 'bottomRight';
+    })[0];
+    var bottomLeft = group.getChildren(function(node){
+        return node.id() === 'bottomLeft';
+    })[0];
     // update 'self' (undo case) and special points
     switch ( anchor.id() ) {
     case 'topLeft':

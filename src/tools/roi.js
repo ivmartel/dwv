@@ -68,7 +68,9 @@ dwv.tool.UpdateRoi = function (roi, anchor)
     // parent group
     var group = anchor.getParent();
     // update self
-    var point = group.find('#'+anchor.id())[0];
+    var point = group.getChildren(function(node){
+        return node.id() === anchor.id();
+    })[0];
     point.x( anchor.x() );
     point.y( anchor.y() );
     // update the roi point and compensate for possible drag

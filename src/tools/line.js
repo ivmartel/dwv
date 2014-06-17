@@ -41,8 +41,12 @@ dwv.tool.UpdateLine = function (line, anchor)
     // parent group
     var group = anchor.getParent();
     // find special points
-    var begin = group.find('#begin')[0];
-    var end = group.find('#end')[0];
+    var begin = group.getChildren(function(node){
+        return node.id() === 'begin';
+    })[0];
+    var end = group.getChildren(function(node){
+        return node.id() === 'end';
+    })[0];
     // update special points
     switch ( anchor.id() ) {
     case 'begin':
