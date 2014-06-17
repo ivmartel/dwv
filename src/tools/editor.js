@@ -286,6 +286,19 @@ dwv.tool.ShapeEditor = function ()
      */
     function setAnchorOn( anchor ) {
         var startAnchor = null;
+        
+        // command name based on shape type
+        var cmdName = "shape";
+        if ( shape instanceof Kinetic.Line ) {
+            cmdName = "line";
+        }
+        else if ( shape instanceof Kinetic.Rect ) {
+            cmdName = "rectangle";
+        }
+        else if ( shape instanceof Kinetic.Ellipse ) {
+            cmdName = "ellipse";
+        }
+
         // drag start listener
         anchor.on('dragstart', function () {
             startAnchor = getClone(this);
@@ -307,7 +320,7 @@ dwv.tool.ShapeEditor = function ()
             var endAnchor = getClone(this);
             // store the change command
             var chgcmd = new dwv.tool.ChangeShapeCommand(
-                    shape, "shape", updateFunction, startAnchor, endAnchor, app);
+                    shape, cmdName, updateFunction, startAnchor, endAnchor, app);
             chgcmd.execute();
             app.getUndoStack().add(chgcmd);
             // reset start anchor
