@@ -397,12 +397,8 @@ dwv.tool.ZoomAndPan = function(app)
      */
     this.DOMMouseScroll = function(event){
         // ev.detail on firefox is 3
-        var step = event.detail/30;
-        zoomLayers(step, event._x, event._y,event._xs, event._ys);
-        
-        // TODO slice scroll
-        //if( event.detail &gt; 0 ) app.getView().incrementSliceNb();
-        //else app.getView().decrementSliceNb();
+        var step = - event.detail / 30;
+        zoomLayers(step, event._x, event._y, event._xs, event._ys);
     };
 
     /**
@@ -412,12 +408,8 @@ dwv.tool.ZoomAndPan = function(app)
      */
     this.mousewheel = function(event){
         // ev.wheelDelta on chrome is 120
-        var step = event.wheelDelta/1200;
-        zoomLayers(step, event._x, event._y,event._xs, event._ys);
-        
-        // TODO slice scroll
-        //if( event.wheelDelta &gt; 0 ) app.getView().incrementSliceNb();
-        //else app.getView().decrementSliceNb();
+        var step = event.wheelDelta / 1200;
+        zoomLayers(step, event._x, event._y, event._xs, event._ys);
     };
     
     /**

@@ -9354,7 +9354,7 @@
         },
         {
             "file": "src/tools/zoomPan.js",
-            "line": 204,
+            "line": 200,
             "description": "Handle mouse wheel event.",
             "itemtype": "method",
             "name": "mousewheel",
@@ -9371,7 +9371,7 @@
         },
         {
             "file": "src/tools/zoomPan.js",
-            "line": 219,
+            "line": 211,
             "description": "Handle key down event.",
             "itemtype": "method",
             "name": "keydown",
@@ -9388,7 +9388,7 @@
         },
         {
             "file": "src/tools/zoomPan.js",
-            "line": 228,
+            "line": 220,
             "description": "Enable the tool.",
             "itemtype": "method",
             "name": "enable",
@@ -9405,7 +9405,7 @@
         },
         {
             "file": "src/tools/zoomPan.js",
-            "line": 237,
+            "line": 229,
             "description": "Apply the zoom to the layers.",
             "itemtype": "method",
             "name": "zoomLayers",
@@ -9432,7 +9432,7 @@
         },
         {
             "file": "src/tools/zoomPan.js",
-            "line": 269,
+            "line": 261,
             "description": "Apply a translation to the layers.",
             "itemtype": "method",
             "name": "translateLayers",
@@ -9454,7 +9454,7 @@
         },
         {
             "file": "src/tools/zoomPan.js",
-            "line": 298,
+            "line": 290,
             "description": "Help for this tool.",
             "itemtype": "method",
             "name": "getHelp",
@@ -9468,7 +9468,7 @@
         },
         {
             "file": "src/tools/zoomPan.js",
-            "line": 319,
+            "line": 311,
             "description": "Initialise the tool.",
             "itemtype": "method",
             "name": "init",
@@ -10102,7 +10102,7 @@
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/tools/zoomPan.js:298"
+            "line": " src/tools/zoomPan.js:290"
         },
         {
             "message": "Missing item type\nDICOM tag dictionary.",
