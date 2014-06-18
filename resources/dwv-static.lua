@@ -102,7 +102,7 @@ print([[
 <script type="text/javascript" src="/dwv/ext/jquery-ui/jquery-ui-1.10.4.min.js"></script>
 <script type="text/javascript" src="/dwv/ext/flot/jquery.flot.min.js"></script>
 <script type="text/javascript" src="/dwv/ext/openjpeg/openjpeg.js"></script>
-<script type="text/javascript" src="/dwv/ext/kinetic/kinetic-v5.1.0.min.js"></script>
+<script type="text/javascript" src="../../ext/kinetic/kinetic-v5.1.1-06.10.min.js"></script>
 ]])
 
 -- path with extra /dwv
