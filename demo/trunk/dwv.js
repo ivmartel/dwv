@@ -9216,6 +9216,8 @@ dwv.tool.Draw = function (app)
             }
             // create shape
             activeShape = new dwv.tool.shapes[self.shapeName](points, self.style);
+            // do not listen during creation
+            activeShape.listening(false);
             // add shape to group
             shapeGroup.add(activeShape);
             // draw shape command

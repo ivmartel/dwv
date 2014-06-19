@@ -7031,7 +7031,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 363,
+            "line": 365,
             "description": "Handle mouse up event.",
             "itemtype": "method",
             "name": "mouseup",
@@ -7048,7 +7048,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 395,
+            "line": 397,
             "description": "Handle mouse out event.",
             "itemtype": "method",
             "name": "mouseout",
@@ -7065,7 +7065,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 404,
+            "line": 406,
             "description": "Handle touch start event.",
             "itemtype": "method",
             "name": "touchstart",
@@ -7082,7 +7082,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 413,
+            "line": 415,
             "description": "Handle touch move event.",
             "itemtype": "method",
             "name": "touchmove",
@@ -7099,7 +7099,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 422,
+            "line": 424,
             "description": "Handle touch end event.",
             "itemtype": "method",
             "name": "touchend",
@@ -7116,7 +7116,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 431,
+            "line": 433,
             "description": "Handle key down event.",
             "itemtype": "method",
             "name": "keydown",
@@ -7133,7 +7133,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 440,
+            "line": 442,
             "description": "Enable the tool.",
             "itemtype": "method",
             "name": "enable",
@@ -7150,7 +7150,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 462,
+            "line": 464,
             "description": "Set shape off properties.",
             "itemtype": "method",
             "name": "setShapeOff",
@@ -7167,7 +7167,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 478,
+            "line": 480,
             "description": "Get the real position from an event.",
             "class": "dwv.tool.Draw",
             "module": "tool",
@@ -7175,7 +7175,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 487,
+            "line": 489,
             "description": "Set shape on properties.",
             "itemtype": "method",
             "name": "setShapeOn",
@@ -7192,7 +7192,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 607,
+            "line": 609,
             "description": "Help for this tool.",
             "itemtype": "method",
             "name": "getHelp",
@@ -7206,7 +7206,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 629,
+            "line": 631,
             "description": "Set the line color of the drawing.",
             "itemtype": "method",
             "name": "setLineColour",
@@ -7223,7 +7223,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 640,
+            "line": 642,
             "description": "Set the shape name of the drawing.",
             "itemtype": "method",
             "name": "setShapeName",
@@ -7240,7 +7240,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 655,
+            "line": 657,
             "description": "Check if the shape is in the shape list.",
             "itemtype": "method",
             "name": "hasShape",
@@ -7257,7 +7257,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 664,
+            "line": 666,
             "description": "Initialise the tool.",
             "itemtype": "method",
             "name": "init",
@@ -10074,7 +10074,7 @@
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/tools/draw.js:607"
+            "line": " src/tools/draw.js:609"
         },
         {
             "message": "replacing incorrect tag: returns with return",
@@ -10126,7 +10126,7 @@
         },
         {
             "message": "Missing item type\nGet the real position from an event.",
-            "line": " src/tools/draw.js:478"
+            "line": " src/tools/draw.js:480"
         },
         {
             "message": "Missing item type\nApply a function on all anchors.",
