@@ -450,6 +450,9 @@ dwv.tool.Draw = function (app)
         shapeEditor.disable();
         shapeEditor.setShape(null);
         document.body.style.cursor = 'default';
+        // make layer listen or not to events
+        app.getDrawStage().listening( flag );
+        app.getDrawLayer().listening( flag );
         // set shape display properties
         if ( flag ) {
             createdShapes.forEach( function (shape){ self.setShapeOn( shape ); });

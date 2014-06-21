@@ -491,10 +491,13 @@ dwv.App = function()
             drawStage = new Kinetic.Stage({
                 container: 'drawDiv',
                 width: dataWidth,
-                height: dataHeight
+                height: dataHeight,
+                listening: false
             });
             // create layer
-            drawLayer = new Kinetic.Layer();
+            drawLayer = new Kinetic.Layer({
+                listening: false
+            });
             // add the layer to the stage
             drawStage.add(drawLayer);
         }
