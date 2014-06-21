@@ -491,10 +491,13 @@ dwv.App = function()
             drawStage = new Kinetic.Stage({
                 container: 'drawDiv',
                 width: dataWidth,
-                height: dataHeight
+                height: dataHeight,
+                listening: false
             });
             // create layer
-            drawLayer = new Kinetic.Layer();
+            drawLayer = new Kinetic.Layer({
+                listening: false
+            });
             // add the layer to the stage
             drawStage.add(drawLayer);
         }
@@ -9315,6 +9318,9 @@ dwv.tool.Draw = function (app)
         shapeEditor.disable();
         shapeEditor.setShape(null);
         document.body.style.cursor = 'default';
+        // make layer listen or not to events
+        app.getDrawStage().listening( flag );
+        app.getDrawLayer().listening( flag );
         // set shape display properties
         if ( flag ) {
             createdShapes.forEach( function (shape){ self.setShapeOn( shape ); });

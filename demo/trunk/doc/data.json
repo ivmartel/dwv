@@ -7150,7 +7150,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 464,
+            "line": 467,
             "description": "Set shape off properties.",
             "itemtype": "method",
             "name": "setShapeOff",
@@ -7167,7 +7167,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 480,
+            "line": 483,
             "description": "Get the real position from an event.",
             "class": "dwv.tool.Draw",
             "module": "tool",
@@ -7175,7 +7175,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 489,
+            "line": 492,
             "description": "Set shape on properties.",
             "itemtype": "method",
             "name": "setShapeOn",
@@ -7192,7 +7192,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 609,
+            "line": 612,
             "description": "Help for this tool.",
             "itemtype": "method",
             "name": "getHelp",
@@ -7206,7 +7206,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 631,
+            "line": 634,
             "description": "Set the line color of the drawing.",
             "itemtype": "method",
             "name": "setLineColour",
@@ -7223,7 +7223,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 642,
+            "line": 645,
             "description": "Set the shape name of the drawing.",
             "itemtype": "method",
             "name": "setShapeName",
@@ -7240,7 +7240,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 657,
+            "line": 660,
             "description": "Check if the shape is in the shape list.",
             "itemtype": "method",
             "name": "hasShape",
@@ -7257,7 +7257,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 666,
+            "line": 669,
             "description": "Initialise the tool.",
             "itemtype": "method",
             "name": "init",
@@ -9958,7 +9958,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 506,
+            "line": 509,
             "description": "Create the DICOM tags table. To be called once the DICOM has been parsed.",
             "itemtype": "method",
             "name": "createTagsTable",
@@ -9977,7 +9977,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 539,
+            "line": 542,
             "description": "Post load application initialisation. To be called once the DICOM has been parsed.",
             "itemtype": "method",
             "name": "postLoadInit",
@@ -10074,7 +10074,7 @@
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/tools/draw.js:609"
+            "line": " src/tools/draw.js:612"
         },
         {
             "message": "replacing incorrect tag: returns with return",
@@ -10126,7 +10126,7 @@
         },
         {
             "message": "Missing item type\nGet the real position from an event.",
-            "line": " src/tools/draw.js:480"
+            "line": " src/tools/draw.js:483"
         },
         {
             "message": "Missing item type\nApply a function on all anchors.",
