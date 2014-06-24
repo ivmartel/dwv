@@ -353,6 +353,7 @@ dwv.tool.Draw = function (app)
             activeShape = new dwv.tool.shapes[self.shapeName](points, self.style);
             // do not listen during creation
             activeShape.listening(false);
+            app.getDrawLayer().hitGraphEnabled(false);
             // add shape to group
             shapeGroup.add(activeShape);
             // draw shape command
@@ -376,6 +377,8 @@ dwv.tool.Draw = function (app)
             }
             // create final shape
             activeShape = new dwv.tool.shapes[self.shapeName](points, self.style);
+            // re-activate layer
+            app.getDrawLayer().hitGraphEnabled(true);
             // add shape to group
             shapeGroup.add(activeShape);
             // draw shape command
@@ -453,6 +456,7 @@ dwv.tool.Draw = function (app)
         // make layer listen or not to events
         app.getDrawStage().listening( flag );
         app.getDrawLayer().listening( flag );
+        app.getDrawLayer().hitGraphEnabled( flag );
         // set shape display properties
         if ( flag ) {
             createdShapes.forEach( function (shape){ self.setShapeOn( shape ); });
