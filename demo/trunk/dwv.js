@@ -501,19 +501,6 @@ dwv.App = function()
             });
             // add the layer to the stage
             drawStage.add(drawLayer);
-
-            // override the getIntersection method to deactivate it
-            // and make the interaction smoother on mobile
-            // from: https://github.com/lavrton/kineticjs-tips-and-tools/blob/master/README.md#mobile-tips
-            var oldFunc = drawStage.getIntersection;
-            drawLayer.on("dragmove touchmove", function () {
-                drawStage.getIntersection = function () {
-                    return drawLayer;
-                };
-            });
-            drawLayer.on("dragend touchend", function () {
-                drawStage.getIntersection = oldFunc;
-            });
         }
         // resize app
         self.resetLayout();
