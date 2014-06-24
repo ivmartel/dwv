@@ -700,7 +700,8 @@ dwv.App = function()
             });
             // create layer
             drawLayer = new Kinetic.Layer({
-                listening: false
+                listening: false,
+                hitGraphEnabled: false
             });
             // add the layer to the stage
             drawStage.add(drawLayer);
