@@ -68,29 +68,25 @@ end
 -- Generate html
 
 HTML('Content-type: text/html\n\n')
-print([[<!DOCTYPE html>]])
-print([[<html>]])
 
-print([[<head>]])
-
+-- paths with extra /dwv
 print([[
+<!DOCTYPE html>
+<html>
+
+<head>
 <title>DICOM Web Viewer</title>
 <meta charset="UTF-8">
-<link rel="stylesheet" href="/dwv/css/style.css">
-<link rel="stylesheet" href="/dwv/ext/jquery-mobile/jquery.mobile-1.4.2.min.css">
+<link type="text/css" rel="stylesheet" href="/dwv/css/style.css">
+<link type="text/css" rel="stylesheet" href="/dwv/ext/jquery-mobile/jquery.mobile-1.4.2.min.css">
 ]])
 
--- path with extra /dwv
 print([[
 <!-- Third party --> 
 <script type="text/javascript" src="/dwv/ext/jquery/jquery-2.1.1.min.js"></script>
 <script type="text/javascript" src="/dwv/ext/jquery-mobile/jquery.mobile-1.4.2.min.js"></script>
-<script type="text/javascript" src="/dwv/ext/flot/jquery.flot.min.js"></script>
 <script type="text/javascript" src="/dwv/ext/openjpeg/openjpeg.js"></script>
-]])
 
--- path with extra /dwv
-print([[
 <!-- Local -->
 <script type="text/javascript" src="/dwv/dwv-0.7.0beta.min.js"></script>
 <!--  Launch the app -->
@@ -98,15 +94,13 @@ print([[
 <script type="text/javascript" src="/dwv/viewers/simple/applauncher.js"></script>
 ]])
 
-print([[<script type="text/javascript">]])
-
 print([[
+<script type="text/javascript">
 // prevent default url load
 var skipLoadUrl = true;
 // launch when page is loaded
 $(document).ready(function(){
 ]])
-   
 -- create javascript url array
 print([[    var inputUrls = []])
 for i=1, #images do
@@ -117,13 +111,14 @@ print([[    ];]])
 print([[
     if( inputUrls && inputUrls.length > 0 ) app.loadURL(inputUrls);
 }); // end $(document).ready
+</script>
 ]])
 
-print([[</script>]])
-print([[</head>]])
-print([[<body>]])
-
 print([[
+</head>
+
+<body>
+
 <!-- Main page -->
 <div data-role="page" data-theme="b">
 
@@ -141,7 +136,7 @@ print([[
 </div><!-- /content -->
 
 </div><!-- /page -->
-]])
 
-print([[</body>]])
-print([[</html>]])
+</body>
+</html>
+]])

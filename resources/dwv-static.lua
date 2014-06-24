@@ -68,16 +68,18 @@ end
 -- Generate html
 
 HTML('Content-type: text/html\n\n')
-print([[<!DOCTYPE html>]])
-print([[<html>]])
 
-print([[<head>]])
-
+-- paths with extra /dwv
 print([[
+<!DOCTYPE html>
+
+<html>
+
+<head>
 <title>DICOM Web Viewer</title>
 <meta charset="UTF-8">
-<link rel="stylesheet" href="/dwv/css/style.css">
-<style>
+<link type="text/css" rel="stylesheet" href="/dwv/css/style.css">
+<style type="text/css" >
 body { background-color: #222; color: white;
   margin: 10px; padding: 0; font-size: 80%; }
 #pageHeader h1 { display: inline-block; margin: 0; color: #fff; }
@@ -88,25 +90,17 @@ body { background-color: #222; color: white;
 #infotl { color: #333; text-shadow: 0 1px 0 #fff; }
 #infotr { color: #333; text-shadow: 0 1px 0 #fff; }
 </style>
+<link type="text/css" rel="stylesheet" href="/dwv/ext/jquery-ui/themes/ui-darkness/jquery-ui-1.10.4.min.css">
 ]])
 
--- path with extra /dwv
-print([[
-<link rel="stylesheet" href="/dwv/ext/jquery-ui/themes/ui-darkness/jquery-ui-1.10.4.min.css">
-]])
-
--- path with extra /dwv
 print([[
 <!-- Third party --> 
 <script type="text/javascript" src="/dwv/ext/jquery/jquery-2.1.1.min.js"></script>
 <script type="text/javascript" src="/dwv/ext/jquery-ui/jquery-ui-1.10.4.min.js"></script>
 <script type="text/javascript" src="/dwv/ext/flot/jquery.flot.min.js"></script>
 <script type="text/javascript" src="/dwv/ext/openjpeg/openjpeg.js"></script>
-<script type="text/javascript" src="../../ext/kinetic/kinetic-v5.1.1-06.10.min.js"></script>
-]])
+<script type="text/javascript" src="/dwv/ext/kinetic/kinetic-v5.1.1-06.10.min.js"></script>
 
--- path with extra /dwv
-print([[
 <!-- Local -->
 <script type="text/javascript" src="/dwv/dwv-0.7.0beta.min.js"></script>
 <!--  Launch the app -->
@@ -114,15 +108,13 @@ print([[
 <script type="text/javascript" src="/dwv/viewers/static/applauncher.js"></script>
 ]])
 
-print([[<script type="text/javascript">]])
-
 print([[
+<script type="text/javascript">
 // prevent default url load
 var skipLoadUrl = true;
 // launch when page is loaded
 $(document).ready(function(){
 ]])
-   
 -- create javascript url array
 print([[    var inputUrls = []])
 for i=1, #images do
@@ -133,15 +125,17 @@ print([[    ];]])
 print([[
     if( inputUrls && inputUrls.length > 0 ) app.loadURL(inputUrls);
 }); // end $(document).ready
+</script>
 ]])
 
-print([[</script>]])
-print([[</head>]])
-print([[<body>]])
-
-print([[<div id="pageHeader">]])
-
 print([[
+</head>
+
+<body>
+
+<div id="pageHeader">
+
+<!-- Title -->
 <h1>DICOM Web Viewer 
 (<a href="https://github.com/ivmartel/dwv">dwv</a> 
 <span class="dwv-version"></span>)</h1>
@@ -150,19 +144,15 @@ print([[
 <div id="toolbar"></div>
 
 </div><!-- /pageHeader -->
-]])
 
-print([[<div id="pageMain">]])
+<div id="pageMain">
 
-print([[
 <!-- Open file -->
 <div id="openData" title="File">
 <div id="loaderlist"></div>
 <div id="progressbar"></div>
 </div>
-]])
 
-print([[
 <!-- Toolbox -->
 <div id="toolbox" title="Toolbox">
 <ul id="toolList"></ul>
@@ -176,9 +166,7 @@ print([[
 
 <!-- Help -->
 <div id="help" title="Help"></div>
-]])
 
-print([[
 <!-- Layer Container -->
 <div id="layerDialog" title="Image">
 <div id="layerContainer">
@@ -192,9 +180,9 @@ print([[
 </div><!-- /infoLayer -->
 </div><!-- /layerContainer -->
 </div><!-- /layerDialog -->
+
+</div><!-- /pageMain -->
+
+</body>
+</html>
 ]])
-
-print([[</div><!-- pageMain -->]])
-
-print([[</body>]])
-print([[</html>]])
