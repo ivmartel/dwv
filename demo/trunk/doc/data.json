@@ -9958,7 +9958,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 510,
+            "line": 523,
             "description": "Create the DICOM tags table. To be called once the DICOM has been parsed.",
             "itemtype": "method",
             "name": "createTagsTable",
@@ -9977,7 +9977,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 543,
+            "line": 556,
             "description": "Post load application initialisation. To be called once the DICOM has been parsed.",
             "itemtype": "method",
             "name": "postLoadInit",
