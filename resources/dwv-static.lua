@@ -103,7 +103,7 @@ print([[
 
 <!-- Local -->
 <script type="text/javascript" src="/dwv/dwv-0.7.0beta.min.js"></script>
-<!--  Launch the app -->
+<!-- Launch the app -->
 <script type="text/javascript" src="/dwv/viewers/static/appgui.js"></script>
 <script type="text/javascript" src="/dwv/viewers/static/applauncher.js"></script>
 ]])
