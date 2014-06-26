@@ -1,5 +1,5 @@
 CACHE MANIFEST
-# v1 2014-02-24
+# v2 2014-06-26
 
 CACHE:
 
@@ -39,6 +39,7 @@ appgui.js
 /dwv/demo/stable/ext/jquery/jquery-2.1.1.min.js
 /dwv/demo/stable/ext/jquery-ui/jquery-ui-1.10.4.min.js
 /dwv/demo/stable/ext/flot/jquery.flot.min.js
+/dwv/demo/stable/ext/kinetic/kinetic-v5.1.1-06.10.min.js
 
 NETWORK:
 *
