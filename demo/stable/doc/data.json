@@ -2,7 +2,7 @@
     "project": {
         "name": "dwv",
         "description": "Dicom Web Viewer.",
-        "version": "0.6.0",
+        "version": "0.7.0",
         "url": "http://ivmartel.github.io/dwv/"
     },
     "files": {
@@ -23,9 +23,7 @@
         "src/dicom/dictionary.js": {
             "name": "src/dicom/dictionary.js",
             "modules": {},
-            "classes": {
-                "dwv.dicom.Dictionary": 1
-            },
+            "classes": {},
             "fors": {},
             "namespaces": {
                 "dwv.dicom": 1
@@ -264,6 +262,7 @@
                 "dwv.math.Point2D": 1,
                 "dwv.math.FastPoint2D": 1,
                 "dwv.math.Circle": 1,
+                "dwv.math.Ellipse": 1,
                 "dwv.math.Line": 1,
                 "dwv.math.Rectangle": 1,
                 "dwv.math.ROI": 1,
@@ -274,27 +273,38 @@
                 "dwv.math": 1
             }
         },
-        "src/tools/circle.js": {
-            "name": "src/tools/circle.js",
-            "modules": {},
-            "classes": {
-                "dwv.tool.DrawCircleCommand": 1
-            },
-            "fors": {},
-            "namespaces": {
-                "dwv.tool": 1
-            }
-        },
         "src/tools/draw.js": {
             "name": "src/tools/draw.js",
             "modules": {},
             "classes": {
+                "dwv.tool.DrawShapeCommand": 1,
+                "dwv.tool.MoveShapeCommand": 1,
+                "dwv.tool.ChangeShapeCommand": 1,
+                "dwv.tool.DeleteShapeCommand": 1,
                 "dwv.tool.Draw": 1
             },
             "fors": {},
             "namespaces": {
                 "dwv.tool": 1
             }
+        },
+        "src/tools/editor.js": {
+            "name": "src/tools/editor.js",
+            "modules": {},
+            "classes": {
+                "dwv.tool.ShapeEditor": 1
+            },
+            "fors": {},
+            "namespaces": {
+                "dwv.tool": 1
+            }
+        },
+        "src/tools/ellipse.js": {
+            "name": "src/tools/ellipse.js",
+            "modules": {},
+            "classes": {},
+            "fors": {},
+            "namespaces": {}
         },
         "src/tools/filter.js": {
             "name": "src/tools/filter.js",
@@ -329,20 +339,15 @@
             "modules": {
                 "tool": 1
             },
-            "classes": {
-                "dwv.tool.DrawLineCommand": 1
-            },
+            "classes": {},
             "fors": {},
-            "namespaces": {
-                "dwv.tool": 1
-            }
+            "namespaces": {}
         },
         "src/tools/livewire.js": {
             "name": "src/tools/livewire.js",
             "modules": {},
             "classes": {
-                "dwv.tool.Livewire": 1,
-                "dwv.tool.DrawLivewireCommand": 1
+                "dwv.tool.Livewire": 1
             },
             "fors": {},
             "namespaces": {
@@ -352,24 +357,16 @@
         "src/tools/rectangle.js": {
             "name": "src/tools/rectangle.js",
             "modules": {},
-            "classes": {
-                "dwv.tool.DrawRectangleCommand": 1
-            },
+            "classes": {},
             "fors": {},
-            "namespaces": {
-                "dwv.tool": 1
-            }
+            "namespaces": {}
         },
         "src/tools/roi.js": {
             "name": "src/tools/roi.js",
             "modules": {},
-            "classes": {
-                "dwv.tool.DrawRoiCommand": 1
-            },
+            "classes": {},
             "fors": {},
-            "namespaces": {
-                "dwv.tool": 1
-            }
+            "namespaces": {}
         },
         "src/tools/scroll.js": {
             "name": "src/tools/scroll.js",
@@ -461,16 +458,15 @@
             "submodules": {},
             "classes": {
                 "dwv.dicom.DataReader": 1,
-                "dwv.dicom.DicomParser": 1,
-                "dwv.dicom.Dictionary": 1
+                "dwv.dicom.DicomParser": 1
             },
             "fors": {},
             "namespaces": {
                 "dwv.dicom": 1
             },
             "tag": "module",
-            "file": "src/dicom/dictionary.js",
-            "line": 8,
+            "file": "src/dicom/dicomParser.js",
+            "line": 184,
             "description": "DICOM module."
         },
         "browser": {
@@ -574,6 +570,7 @@
                 "dwv.math.Point2D": 1,
                 "dwv.math.FastPoint2D": 1,
                 "dwv.math.Circle": 1,
+                "dwv.math.Ellipse": 1,
                 "dwv.math.Line": 1,
                 "dwv.math.Rectangle": 1,
                 "dwv.math.ROI": 1,
@@ -585,24 +582,24 @@
             },
             "tag": "module",
             "file": "src/math/shapes.js",
-            "line": 318,
+            "line": 385,
             "description": "Math module."
         },
         "tool": {
             "name": "tool",
             "submodules": {},
             "classes": {
-                "dwv.tool.DrawCircleCommand": 1,
+                "dwv.tool.DrawShapeCommand": 1,
+                "dwv.tool.MoveShapeCommand": 1,
+                "dwv.tool.ChangeShapeCommand": 1,
+                "dwv.tool.DeleteShapeCommand": 1,
                 "dwv.tool.Draw": 1,
+                "dwv.tool.ShapeEditor": 1,
                 "dwv.tool.Filter": 1,
                 "dwv.tool.filter.Threshold": 1,
                 "dwv.tool.filter.Sharpen": 1,
                 "dwv.tool.RunFilterCommand": 1,
-                "dwv.tool.DrawLineCommand": 1,
                 "dwv.tool.Livewire": 1,
-                "dwv.tool.DrawLivewireCommand": 1,
-                "dwv.tool.DrawRectangleCommand": 1,
-                "dwv.tool.DrawRoiCommand": 1,
                 "dwv.tool": 1,
                 "dwv.tool.Scroll": 1,
                 "dwv.tool.ToolBox": 1,
@@ -649,7 +646,7 @@
             },
             "tag": "module",
             "file": "src/application.js",
-            "line": 4,
+            "line": 6,
             "description": "Utility module."
         }
     },
@@ -692,23 +689,8 @@
             "module": "dicom",
             "namespace": "dwv.dicom",
             "file": "src/dicom/dicomParser.js",
-            "line": 177,
+            "line": 184,
             "description": "DicomParser class.",
-            "is_constructor": 1
-        },
-        "dwv.dicom.Dictionary": {
-            "name": "dwv.dicom.Dictionary",
-            "shortname": "dwv.dicom.Dictionary",
-            "classitems": [],
-            "plugins": [],
-            "extensions": [],
-            "plugin_for": [],
-            "extension_for": [],
-            "module": "dicom",
-            "namespace": "dwv.dicom",
-            "file": "src/dicom/dictionary.js",
-            "line": 8,
-            "description": "DICOM tag dictionary.",
             "is_constructor": 1
         },
         "dwv.browser": {
@@ -819,7 +801,7 @@
             "module": "image",
             "namespace": "dwv.image.filter",
             "file": "src/image/filter.js",
-            "line": 80,
+            "line": 105,
             "description": "Sharpen an image using a sharpen convolution matrix.",
             "is_constructor": 1
         },
@@ -834,7 +816,7 @@
             "module": "image",
             "namespace": "dwv.image.filter",
             "file": "src/image/filter.js",
-            "line": 109,
+            "line": 155,
             "description": "Apply a Sobel filter to an image.",
             "is_constructor": 1
         },
@@ -881,7 +863,7 @@
             "module": "image",
             "namespace": "dwv.image",
             "file": "src/image/image.js",
-            "line": 86,
+            "line": 88,
             "description": "Image Spacing class. \nSupports 2D and 3D images.",
             "is_constructor": 1,
             "params": [
@@ -913,7 +895,7 @@
             "module": "image",
             "namespace": "dwv.image",
             "file": "src/image/image.js",
-            "line": 131,
+            "line": 133,
             "description": "Image class.\nUsable once created, optional are:\n- rescale slope and intercept (default 1:0), \n- photometric interpretation (default MONOCHROME2),\n- planar configuration (default RGBRGB...).",
             "is_constructor": 1,
             "params": [
@@ -977,7 +959,7 @@
             "module": "image",
             "namespace": "dwv.image.lut",
             "file": "src/image/luts.js",
-            "line": 74,
+            "line": 79,
             "description": "Window LUT class.",
             "is_constructor": 1,
             "params": [
@@ -1092,7 +1074,7 @@
             "module": "math",
             "namespace": "dwv.math",
             "file": "src/math/scissors.js",
-            "line": 278,
+            "line": 280,
             "description": "Scissors",
             "is_constructor": 1
         },
@@ -1177,6 +1159,38 @@
                 }
             ]
         },
+        "dwv.math.Ellipse": {
+            "name": "dwv.math.Ellipse",
+            "shortname": "dwv.math.Ellipse",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "math",
+            "namespace": "dwv.math",
+            "file": "src/math/shapes.js",
+            "line": 139,
+            "description": "Ellipse shape.",
+            "is_constructor": 1,
+            "params": [
+                {
+                    "name": "centre",
+                    "description": "A Point2D representing the centre of the ellipse.",
+                    "type": "Object"
+                },
+                {
+                    "name": "a",
+                    "description": "The radius of the ellipse on the horizontal axe.",
+                    "type": "Number"
+                },
+                {
+                    "name": "b",
+                    "description": "The radius of the ellipse on the vertical axe.",
+                    "type": "Number"
+                }
+            ]
+        },
         "dwv.math.Line": {
             "name": "dwv.math.Line",
             "shortname": "dwv.math.Line",
@@ -1188,7 +1202,7 @@
             "module": "math",
             "namespace": "dwv.math",
             "file": "src/math/shapes.js",
-            "line": 139,
+            "line": 195,
             "description": "Line shape.",
             "is_constructor": 1,
             "params": [
@@ -1215,7 +1229,7 @@
             "module": "math",
             "namespace": "dwv.math",
             "file": "src/math/shapes.js",
-            "line": 203,
+            "line": 259,
             "description": "Rectangle shape.",
             "is_constructor": 1,
             "params": [
@@ -1242,7 +1256,7 @@
             "module": "math",
             "namespace": "dwv.math",
             "file": "src/math/shapes.js",
-            "line": 274,
+            "line": 341,
             "description": "Region Of Interest shape.",
             "is_constructor": 1
         },
@@ -1257,7 +1271,7 @@
             "module": "math",
             "namespace": "dwv.math",
             "file": "src/math/shapes.js",
-            "line": 318,
+            "line": 385,
             "description": "Path shape.",
             "is_constructor": 1,
             "params": [
@@ -1273,9 +1287,9 @@
                 }
             ]
         },
-        "dwv.tool.DrawCircleCommand": {
-            "name": "dwv.tool.DrawCircleCommand",
-            "shortname": "dwv.tool.DrawCircleCommand",
+        "dwv.tool.DrawShapeCommand": {
+            "name": "dwv.tool.DrawShapeCommand",
+            "shortname": "dwv.tool.DrawShapeCommand",
             "classitems": [],
             "plugins": [],
             "extensions": [],
@@ -1283,27 +1297,55 @@
             "extension_for": [],
             "module": "tool",
             "namespace": "dwv.tool",
-            "file": "src/tools/circle.js",
-            "line": 8,
-            "description": "Draw circle command.",
-            "is_constructor": 1,
-            "params": [
-                {
-                    "name": "points",
-                    "description": "The points from which to extract the circle.",
-                    "type": "Array"
-                },
-                {
-                    "name": "app",
-                    "description": "The application to draw the circle on.",
-                    "type": "Object"
-                },
-                {
-                    "name": "style",
-                    "description": "The drawing style.",
-                    "type": "Style"
-                }
-            ]
+            "file": "src/tools/draw.js",
+            "line": 9,
+            "description": "Draw shape command.",
+            "is_constructor": 1
+        },
+        "dwv.tool.MoveShapeCommand": {
+            "name": "dwv.tool.MoveShapeCommand",
+            "shortname": "dwv.tool.MoveShapeCommand",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "tool",
+            "namespace": "dwv.tool",
+            "file": "src/tools/draw.js",
+            "line": 47,
+            "description": "Move shape command.",
+            "is_constructor": 1
+        },
+        "dwv.tool.ChangeShapeCommand": {
+            "name": "dwv.tool.ChangeShapeCommand",
+            "shortname": "dwv.tool.ChangeShapeCommand",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "tool",
+            "namespace": "dwv.tool",
+            "file": "src/tools/draw.js",
+            "line": 92,
+            "description": "Change shape command.",
+            "is_constructor": 1
+        },
+        "dwv.tool.DeleteShapeCommand": {
+            "name": "dwv.tool.DeleteShapeCommand",
+            "shortname": "dwv.tool.DeleteShapeCommand",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "tool",
+            "namespace": "dwv.tool",
+            "file": "src/tools/draw.js",
+            "line": 129,
+            "description": "Delete shape command.",
+            "is_constructor": 1
         },
         "dwv.tool.Draw": {
             "name": "dwv.tool.Draw",
@@ -1316,7 +1358,7 @@
             "module": "tool",
             "namespace": "dwv.tool",
             "file": "src/tools/draw.js",
-            "line": 13,
+            "line": 172,
             "description": "Drawing tool.",
             "is_constructor": 1,
             "params": [
@@ -1326,6 +1368,21 @@
                     "type": "Object"
                 }
             ]
+        },
+        "dwv.tool.ShapeEditor": {
+            "name": "dwv.tool.ShapeEditor",
+            "shortname": "dwv.tool.ShapeEditor",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "tool",
+            "namespace": "dwv.tool",
+            "file": "src/tools/editor.js",
+            "line": 9,
+            "description": "Shape editor.",
+            "is_constructor": 1
         },
         "dwv.tool.Filter": {
             "name": "dwv.tool.Filter",
@@ -1360,7 +1417,7 @@
             "module": "tool",
             "namespace": "dwv.tool.filter",
             "file": "src/tools/filter.js",
-            "line": 138,
+            "line": 142,
             "description": "Threshold filter tool.",
             "is_constructor": 1,
             "params": [
@@ -1382,7 +1439,7 @@
             "module": "tool",
             "namespace": "dwv.tool.filter",
             "file": "src/tools/filter.js",
-            "line": 217,
+            "line": 221,
             "description": "Sobel filter tool.",
             "is_constructor": 1,
             "params": [
@@ -1404,7 +1461,7 @@
             "module": "tool",
             "namespace": "dwv.tool",
             "file": "src/tools/filter.js",
-            "line": 255,
+            "line": 259,
             "description": "Run filter command.",
             "is_constructor": 1,
             "params": [
@@ -1435,38 +1492,6 @@
             "description": "Namespace for info functions.",
             "static": 1
         },
-        "dwv.tool.DrawLineCommand": {
-            "name": "dwv.tool.DrawLineCommand",
-            "shortname": "dwv.tool.DrawLineCommand",
-            "classitems": [],
-            "plugins": [],
-            "extensions": [],
-            "plugin_for": [],
-            "extension_for": [],
-            "module": "tool",
-            "namespace": "dwv.tool",
-            "file": "src/tools/line.js",
-            "line": 8,
-            "description": "Draw line command.",
-            "is_constructor": 1,
-            "params": [
-                {
-                    "name": "points",
-                    "description": "The points from which to extract the line.",
-                    "type": "Array"
-                },
-                {
-                    "name": "app",
-                    "description": "The application to draw the line on.",
-                    "type": "Object"
-                },
-                {
-                    "name": "style",
-                    "description": "The drawing style.",
-                    "type": "Style"
-                }
-            ]
-        },
         "dwv.tool.Livewire": {
             "name": "dwv.tool.Livewire",
             "shortname": "dwv.tool.Livewire",
@@ -1478,7 +1503,7 @@
             "module": "tool",
             "namespace": "dwv.tool",
             "file": "src/tools/livewire.js",
-            "line": 8,
+            "line": 9,
             "description": "Livewire painting tool.",
             "is_constructor": 1,
             "params": [
@@ -1486,101 +1511,6 @@
                     "name": "app",
                     "description": "The associated application.",
                     "type": "Object"
-                }
-            ]
-        },
-        "dwv.tool.DrawLivewireCommand": {
-            "name": "dwv.tool.DrawLivewireCommand",
-            "shortname": "dwv.tool.DrawLivewireCommand",
-            "classitems": [],
-            "plugins": [],
-            "extensions": [],
-            "plugin_for": [],
-            "extension_for": [],
-            "module": "tool",
-            "namespace": "dwv.tool",
-            "file": "src/tools/livewire.js",
-            "line": 329,
-            "description": "Draw livewire command.",
-            "params": [
-                {
-                    "name": "livewire",
-                    "description": "The livewire to draw.",
-                    "type": "Object"
-                },
-                {
-                    "name": "app",
-                    "description": "The application to draw the livewire on.",
-                    "type": "Object"
-                },
-                {
-                    "name": "style",
-                    "description": "The style of the livewire.",
-                    "type": "Object"
-                }
-            ]
-        },
-        "dwv.tool.DrawRectangleCommand": {
-            "name": "dwv.tool.DrawRectangleCommand",
-            "shortname": "dwv.tool.DrawRectangleCommand",
-            "classitems": [],
-            "plugins": [],
-            "extensions": [],
-            "plugin_for": [],
-            "extension_for": [],
-            "module": "tool",
-            "namespace": "dwv.tool",
-            "file": "src/tools/rectangle.js",
-            "line": 8,
-            "description": "Draw rectangle command.",
-            "is_constructor": 1,
-            "params": [
-                {
-                    "name": "points",
-                    "description": "The points from which to extract the circle.",
-                    "type": "Array"
-                },
-                {
-                    "name": "app",
-                    "description": "The application to draw the line on.",
-                    "type": "Object"
-                },
-                {
-                    "name": "style",
-                    "description": "The drawing style.",
-                    "type": "Style"
-                }
-            ]
-        },
-        "dwv.tool.DrawRoiCommand": {
-            "name": "dwv.tool.DrawRoiCommand",
-            "shortname": "dwv.tool.DrawRoiCommand",
-            "classitems": [],
-            "plugins": [],
-            "extensions": [],
-            "plugin_for": [],
-            "extension_for": [],
-            "module": "tool",
-            "namespace": "dwv.tool",
-            "file": "src/tools/roi.js",
-            "line": 8,
-            "description": "Draw ROI command.",
-            "is_constructor": 1,
-            "params": [
-                {
-                    "name": "points",
-                    "description": "The points from which to extract the line.",
-                    "type": "Array"
-                },
-                {
-                    "name": "app",
-                    "description": "The application to draw the line on.",
-                    "type": "Object"
-                },
-                {
-                    "name": "style",
-                    "description": "The drawing style.",
-                    "type": "Style"
                 }
             ]
         },
@@ -1656,14 +1586,7 @@
             "file": "src/tools/undo.js",
             "line": 8,
             "description": "UndoStack class.",
-            "is_constructor": 1,
-            "params": [
-                {
-                    "name": "app",
-                    "description": "The associated application.",
-                    "type": "Object"
-                }
-            ]
+            "is_constructor": 1
         },
         "dwv.tool.WindowLevel": {
             "name": "dwv.tool.WindowLevel",
@@ -1676,7 +1599,7 @@
             "module": "tool",
             "namespace": "dwv.tool",
             "file": "src/tools/windowLevel.js",
-            "line": 150,
+            "line": 152,
             "description": "WindowLevel tool: handle window/level related events.",
             "is_constructor": 1,
             "params": [
@@ -1735,7 +1658,7 @@
             "module": "utils",
             "namespace": "dwv",
             "file": "src/application.js",
-            "line": 4,
+            "line": 6,
             "description": "Main application class.",
             "is_constructor": 1
         }
@@ -1756,7 +1679,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 28,
+            "line": 30,
             "description": "Read Uint8 (1 byte) data.",
             "itemtype": "method",
             "name": "readUint8",
@@ -1777,7 +1700,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 37,
+            "line": 39,
             "description": "Read Uint16 (2 bytes) data.",
             "itemtype": "method",
             "name": "readUint16",
@@ -1798,7 +1721,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 46,
+            "line": 48,
             "description": "Read Uint32 (4 bytes) data.",
             "itemtype": "method",
             "name": "readUint32",
@@ -1819,7 +1742,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 55,
+            "line": 57,
             "description": "Read Float32 (8 bytes) data.",
             "itemtype": "method",
             "name": "readFloat32",
@@ -1840,7 +1763,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 64,
+            "line": 66,
             "description": "Read Uint data of nBytes size.",
             "itemtype": "method",
             "name": "readNumber",
@@ -1866,7 +1789,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 84,
+            "line": 91,
             "description": "Read Uint8 array.",
             "itemtype": "method",
             "name": "readUint8Array",
@@ -1892,7 +1815,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 99,
+            "line": 106,
             "description": "Read Uint16 array.",
             "itemtype": "method",
             "name": "readUint16Array",
@@ -1918,7 +1841,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 114,
+            "line": 121,
             "description": "Read data as an hexadecimal string.",
             "itemtype": "method",
             "name": "readHex",
@@ -1939,7 +1862,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 126,
+            "line": 133,
             "description": "Read data as a string.",
             "itemtype": "method",
             "name": "readString",
@@ -1965,7 +1888,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 142,
+            "line": 149,
             "description": "Tell if a given syntax is a JPEG one.",
             "itemtype": "method",
             "name": "isJpegTransferSyntax",
@@ -1986,7 +1909,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 155,
+            "line": 162,
             "description": "Tell if a given syntax is a JPEG-LS one.",
             "itemtype": "method",
             "name": "isJpeglsTransferSyntax",
@@ -2007,7 +1930,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 166,
+            "line": 173,
             "description": "Tell if a given syntax is a JPEG 2000 one.",
             "itemtype": "method",
             "name": "isJpeg2000TransferSyntax",
@@ -2028,7 +1951,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 185,
+            "line": 192,
             "description": "The list of DICOM elements.",
             "itemtype": "property",
             "name": "dicomElements",
@@ -2039,7 +1962,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 191,
+            "line": 198,
             "description": "The number of DICOM Items.",
             "itemtype": "property",
             "name": "numberOfItems",
@@ -2050,18 +1973,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 197,
-            "description": "The DICOM dictionary used to find tag names.",
-            "itemtype": "property",
-            "name": "dict",
-            "type": "Dictionary",
-            "class": "dwv.dicom.DicomParser",
-            "module": "dicom",
-            "namespace": "dwv.dicom"
-        },
-        {
-            "file": "src/dicom/dicomParser.js",
-            "line": 203,
+            "line": 204,
             "description": "The pixel buffer.",
             "itemtype": "property",
             "name": "pixelBuffer",
@@ -2072,7 +1984,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 211,
+            "line": 212,
             "description": "Get the DICOM data pixel buffer.",
             "itemtype": "method",
             "name": "getPixelBuffer",
@@ -2086,7 +1998,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 221,
+            "line": 222,
             "description": "Append a DICOM element to the dicomElements member object.\nAllows for easy retrieval of DICOM tag values from the tag name.\nIf tags have same name (for the 'unknown' and private tags cases), a number is appended\nmaking the name unique.",
             "itemtype": "method",
             "name": "appendDicomElement",
@@ -2103,7 +2015,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 250,
+            "line": 252,
             "description": "Read a DICOM tag.",
             "itemtype": "method",
             "name": "readTag",
@@ -2126,7 +2038,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 274,
+            "line": 276,
             "description": "Read a DICOM data element.",
             "itemtype": "method",
             "name": "readDataElement",
@@ -2154,7 +2066,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 367,
+            "line": 372,
             "description": "Parse the complete DICOM file (given as input to the class).\nFills in the member object 'dicomElements'.",
             "itemtype": "method",
             "name": "parse",
@@ -2170,7 +2082,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 546,
+            "line": 551,
             "description": "Get an Image object from the read DICOM file.",
             "itemtype": "method",
             "name": "createImage",
@@ -2184,22 +2096,9 @@
         },
         {
             "file": "src/dicom/dictionary.js",
-            "line": 15,
-            "description": "Tag definition storage.",
-            "itemtype": "property",
-            "name": "newDictionary",
-            "type": "Array",
-            "class": "dwv.dicom.Dictionary",
-            "module": "dicom",
-            "namespace": "dwv.dicom"
-        },
-        {
-            "file": "src/dicom/dictionary.js",
-            "line": 23,
-            "description": "Fill in the dictionary array.",
-            "itemtype": "method",
-            "name": "init",
-            "class": "dwv.dicom.Dictionary",
+            "line": 8,
+            "description": "DICOM tag dictionary.",
+            "class": "dwv.browser",
             "module": "dicom",
             "namespace": "dwv.dicom"
         },
@@ -2216,7 +2115,7 @@
         },
         {
             "file": "src/gui/browser.js",
-            "line": 34,
+            "line": 35,
             "description": "Browser check for the XMLHttpRequest.",
             "itemtype": "method",
             "name": "hasXmlHttpRequest",
@@ -2227,7 +2126,7 @@
         },
         {
             "file": "src/gui/browser.js",
-            "line": 44,
+            "line": 45,
             "description": "Browser check for typed array.",
             "itemtype": "method",
             "name": "hasTypedArray",
@@ -2238,7 +2137,7 @@
         },
         {
             "file": "src/gui/browser.js",
-            "line": 54,
+            "line": 55,
             "description": "Browser check for clamped array.",
             "itemtype": "method",
             "name": "hasClampedArray",
@@ -2249,7 +2148,7 @@
         },
         {
             "file": "src/gui/browser.js",
-            "line": 64,
+            "line": 65,
             "description": "Browser checks to see if it can run dwv. Throws an error if not.\nTODO Maybe use http://modernizr.com/.",
             "itemtype": "method",
             "name": "check",
@@ -2463,7 +2362,7 @@
         },
         {
             "file": "src/gui/generic.js",
-            "line": 70,
+            "line": 72,
             "description": "Set the selected item of a HTML select.",
             "itemtype": "method",
             "name": "refreshSelect",
@@ -2486,7 +2385,7 @@
         },
         {
             "file": "src/gui/generic.js",
-            "line": 88,
+            "line": 92,
             "description": "Append the slider HTML.",
             "itemtype": "method",
             "name": "appendSliderHtml",
@@ -2497,7 +2396,7 @@
         },
         {
             "file": "src/gui/generic.js",
-            "line": 135,
+            "line": 139,
             "description": "Initialise the slider HTML.",
             "itemtype": "method",
             "name": "initSliderHtml",
@@ -2670,7 +2569,7 @@
         },
         {
             "file": "src/gui/handlers.js",
-            "line": 124,
+            "line": 125,
             "description": "Handle shape change.",
             "itemtype": "method",
             "name": "onChangeShape",
@@ -2688,7 +2587,7 @@
         },
         {
             "file": "src/gui/handlers.js",
-            "line": 135,
+            "line": 136,
             "description": "Handle line color change.",
             "itemtype": "method",
             "name": "onChangeLineColour",
@@ -2706,7 +2605,7 @@
         },
         {
             "file": "src/gui/handlers.js",
-            "line": 146,
+            "line": 147,
             "description": "Handle zoom reset.",
             "itemtype": "method",
             "name": "onZoomReset",
@@ -2724,7 +2623,7 @@
         },
         {
             "file": "src/gui/handlers.js",
-            "line": 162,
+            "line": 158,
             "description": "Handle display reset.",
             "itemtype": "method",
             "name": "onDisplayReset",
@@ -2742,7 +2641,7 @@
         },
         {
             "file": "src/gui/handlers.js",
-            "line": 178,
+            "line": 174,
             "description": "Handle undo.",
             "itemtype": "method",
             "name": "onUndo",
@@ -2760,7 +2659,7 @@
         },
         {
             "file": "src/gui/handlers.js",
-            "line": 189,
+            "line": 185,
             "description": "Handle redo.",
             "itemtype": "method",
             "name": "onRedo",
@@ -2778,7 +2677,7 @@
         },
         {
             "file": "src/gui/handlers.js",
-            "line": 200,
+            "line": 196,
             "description": "Handle toggle of info layer.",
             "itemtype": "method",
             "name": "onToggleInfoLayer",
@@ -2869,7 +2768,7 @@
         },
         {
             "file": "src/gui/html.js",
-            "line": 43,
+            "line": 45,
             "description": "Append a row to an array.",
             "itemtype": "method",
             "name": "appendRowForArray",
@@ -2902,7 +2801,7 @@
         },
         {
             "file": "src/gui/html.js",
-            "line": 76,
+            "line": 78,
             "description": "Append a row to an object.",
             "itemtype": "method",
             "name": "appendRowForObject",
@@ -2935,7 +2834,7 @@
         },
         {
             "file": "src/gui/html.js",
-            "line": 125,
+            "line": 127,
             "description": "Append a row to an object or an array.",
             "itemtype": "method",
             "name": "appendRow",
@@ -2968,7 +2867,7 @@
         },
         {
             "file": "src/gui/html.js",
-            "line": 150,
+            "line": 152,
             "description": "Converts the input to an HTML table.",
             "itemtype": "method",
             "name": "toTable",
@@ -2985,7 +2884,7 @@
         },
         {
             "file": "src/gui/html.js",
-            "line": 165,
+            "line": 167,
             "description": "Get an HTML search form.",
             "itemtype": "method",
             "name": "getHtmlSearchForm",
@@ -3007,7 +2906,7 @@
         },
         {
             "file": "src/gui/html.js",
-            "line": 185,
+            "line": 187,
             "description": "Filter a table with a given parameter: sets the display css of rows to\ntrue or false if it contains the term.",
             "itemtype": "method",
             "name": "filterTable",
@@ -3030,7 +2929,7 @@
         },
         {
             "file": "src/gui/html.js",
-            "line": 218,
+            "line": 220,
             "description": "Transform back each\n'preText <span class=\"highlighted\">term</span> postText'\ninto its original 'preText term postText'.",
             "itemtype": "method",
             "name": "dehighlight",
@@ -3048,7 +2947,7 @@
         },
         {
             "file": "src/gui/html.js",
-            "line": 246,
+            "line": 248,
             "description": "Create a\n'preText <span class=\"highlighted\">term</span> postText'\naround each search term.",
             "itemtype": "method",
             "name": "highlight",
@@ -3071,7 +2970,7 @@
         },
         {
             "file": "src/gui/html.js",
-            "line": 290,
+            "line": 292,
             "description": "Highlight a HTML node.",
             "itemtype": "method",
             "name": "createHighlightNode",
@@ -3093,7 +2992,7 @@
         },
         {
             "file": "src/gui/html.js",
-            "line": 305,
+            "line": 307,
             "description": "Remove all children of a HTML node.",
             "itemtype": "method",
             "name": "cleanNode",
@@ -3111,7 +3010,7 @@
         },
         {
             "file": "src/gui/html.js",
-            "line": 318,
+            "line": 320,
             "description": "Remove a HTML node and all its children.",
             "itemtype": "method",
             "name": "removeNode",
@@ -3129,7 +3028,7 @@
         },
         {
             "file": "src/gui/html.js",
-            "line": 336,
+            "line": 340,
             "description": "Create a HTML select from an input array of options.\nThe values of the options are the name of the option made lower case.\nIt is left to the user to set the 'onchange' method of the select.",
             "itemtype": "method",
             "name": "createHtmlSelect",
@@ -3156,8 +3055,8 @@
         },
         {
             "file": "src/gui/html.js",
-            "line": 380,
-            "description": "Get a list of parameters from an input URI that looks like:\n [dwv root]?input=encodeURI([root]?key0=value0&key1=value1)",
+            "line": 384,
+            "description": "Get a list of parameters from an input URI that looks like:\n [dwv root]?input=encodeURI([root]?key0=value0&key1=value1)\nor\n [dwv root]?input=encodeURI([manifest link])&type=manifest",
             "itemtype": "method",
             "name": "getUriParam",
             "static": 1,
@@ -3178,7 +3077,76 @@
         },
         {
             "file": "src/gui/html.js",
-            "line": 471,
+            "line": 423,
+            "description": "Decode a Key/Value pair uri. If a key is repeated, the result \nbe an array of base + each key.",
+            "itemtype": "method",
+            "name": "decodeKeyValueUri",
+            "static": 1,
+            "params": [
+                {
+                    "name": "uri",
+                    "description": "The uri to decode.",
+                    "type": "String"
+                },
+                {
+                    "name": "replaceMode",
+                    "description": "The key replace more.",
+                    "type": "String"
+                }
+            ],
+            "class": "dwv.html",
+            "module": "html",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/gui/html.js",
+            "line": 509,
+            "description": "Decode a manifest uri.",
+            "itemtype": "method",
+            "name": "decodeManifestUri",
+            "static": 1,
+            "params": [
+                {
+                    "name": "uri",
+                    "description": "The uri to decode.",
+                    "type": "String"
+                },
+                {
+                    "name": "nslices",
+                    "description": "The number of slices to load.",
+                    "type": "Number"
+                }
+            ],
+            "class": "dwv.html",
+            "module": "html",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/gui/html.js",
+            "line": 580,
+            "description": "Display or not an element.",
+            "itemtype": "method",
+            "name": "displayElement",
+            "static": 1,
+            "params": [
+                {
+                    "name": "id",
+                    "description": "The id of the element to toggle its display.",
+                    "type": "Number"
+                },
+                {
+                    "name": "bool",
+                    "description": "True to display the element.",
+                    "type": "Boolean"
+                }
+            ],
+            "class": "dwv.html",
+            "module": "html",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/gui/html.js",
+            "line": 595,
             "description": "Toggle the display of an element.",
             "itemtype": "method",
             "name": "toggleDisplay",
@@ -3210,6 +3178,19 @@
         {
             "file": "src/gui/layer.js",
             "line": 24,
+            "description": "A cache of the initial canvas.",
+            "itemtype": "property",
+            "name": "cacheCanvas",
+            "access": "private",
+            "tagname": "",
+            "type": "Object",
+            "class": "dwv.html.Layer",
+            "module": "html",
+            "namespace": "dwv.html"
+        },
+        {
+            "file": "src/gui/layer.js",
+            "line": 31,
             "description": "The associated CanvasRenderingContext2D.",
             "itemtype": "property",
             "name": "context",
@@ -3222,7 +3203,7 @@
         },
         {
             "file": "src/gui/layer.js",
-            "line": 32,
+            "line": 39,
             "description": "Get the layer name.",
             "itemtype": "method",
             "name": "getName",
@@ -3236,7 +3217,7 @@
         },
         {
             "file": "src/gui/layer.js",
-            "line": 38,
+            "line": 45,
             "description": "Get the layer canvas.",
             "itemtype": "method",
             "name": "getCanvas",
@@ -3250,7 +3231,7 @@
         },
         {
             "file": "src/gui/layer.js",
-            "line": 44,
+            "line": 51,
             "description": "Get the layer context.",
             "itemtype": "method",
             "name": "getContext",
@@ -3264,7 +3245,7 @@
         },
         {
             "file": "src/gui/layer.js",
-            "line": 50,
+            "line": 57,
             "description": "Get the layer offset on page.",
             "itemtype": "method",
             "name": "getOffset",
@@ -3278,7 +3259,7 @@
         },
         {
             "file": "src/gui/layer.js",
-            "line": 57,
+            "line": 64,
             "description": "The image data array.",
             "itemtype": "property",
             "name": "imageData",
@@ -3291,26 +3272,13 @@
         },
         {
             "file": "src/gui/layer.js",
-            "line": 65,
-            "description": "The image origin X position.",
-            "itemtype": "property",
-            "name": "originX",
-            "access": "private",
-            "tagname": "",
-            "type": "Number",
-            "class": "dwv.html.Layer",
-            "module": "html",
-            "namespace": "dwv.html"
-        },
-        {
-            "file": "src/gui/layer.js",
             "line": 72,
-            "description": "The image origin Y position.",
+            "description": "The layer origin.",
             "itemtype": "property",
-            "name": "originY",
+            "name": "origin",
             "access": "private",
             "tagname": "",
-            "type": "Number",
+            "type": "{Object}",
             "class": "dwv.html.Layer",
             "module": "html",
             "namespace": "dwv.html"
@@ -3318,25 +3286,26 @@
         {
             "file": "src/gui/layer.js",
             "line": 79,
-            "description": "The image zoom in the X direction.",
-            "itemtype": "property",
-            "name": "zoomX",
-            "access": "private",
-            "tagname": "",
-            "type": "Number",
+            "description": "Get the layer origin.",
+            "itemtype": "method",
+            "name": "getOrigin",
+            "return": {
+                "description": "The layer origin as {'x','y'}.",
+                "type": "Object"
+            },
             "class": "dwv.html.Layer",
             "module": "html",
             "namespace": "dwv.html"
         },
         {
             "file": "src/gui/layer.js",
-            "line": 86,
-            "description": "The image zoom in the Y direction.",
+            "line": 87,
+            "description": "The image zoom.",
             "itemtype": "property",
-            "name": "zoomY",
+            "name": "zoom",
             "access": "private",
             "tagname": "",
-            "type": "Number",
+            "type": "{Object}",
             "class": "dwv.html.Layer",
             "module": "html",
             "namespace": "dwv.html"
@@ -3344,50 +3313,66 @@
         {
             "file": "src/gui/layer.js",
             "line": 94,
+            "description": "Get the layer zoom.",
+            "itemtype": "method",
+            "name": "getZoom",
+            "return": {
+                "description": "The layer zoom as {'x','y'}.",
+                "type": "Object"
+            },
+            "class": "dwv.html.Layer",
+            "module": "html",
+            "namespace": "dwv.html"
+        },
+        {
+            "file": "src/gui/layer.js",
+            "line": 103,
+            "description": "Set the canvas width.",
+            "itemtype": "method",
+            "name": "setWidth",
+            "params": [
+                {
+                    "name": "width",
+                    "description": "The new width.",
+                    "type": "Number"
+                }
+            ],
+            "class": "dwv.html.Layer",
+            "module": "html",
+            "namespace": "dwv.html"
+        },
+        {
+            "file": "src/gui/layer.js",
+            "line": 111,
+            "description": "Set the canvas height.",
+            "itemtype": "method",
+            "name": "setHeight",
+            "params": [
+                {
+                    "name": "height",
+                    "description": "The new height.",
+                    "type": "Number"
+                }
+            ],
+            "class": "dwv.html.Layer",
+            "module": "html",
+            "namespace": "dwv.html"
+        },
+        {
+            "file": "src/gui/layer.js",
+            "line": 120,
             "description": "Set the layer zoom.",
             "itemtype": "method",
             "name": "setZoom",
             "params": [
                 {
-                    "name": "stepX",
-                    "description": "The zoom step in the X direction.",
+                    "name": "newZoomX",
+                    "description": "The zoom in the X direction.",
                     "type": "Number"
                 },
                 {
-                    "name": "stepY",
-                    "description": "The zoom step in the Y direction.",
-                    "type": "Number"
-                },
-                {
-                    "name": "centerX",
-                    "description": "The zoom center in the X direction.",
-                    "type": "Number"
-                },
-                {
-                    "name": "centerY",
-                    "description": "The zoom center in the Y direction.",
-                    "type": "Number"
-                }
-            ],
-            "class": "dwv.html.Layer",
-            "module": "html",
-            "namespace": "dwv.html"
-        },
-        {
-            "file": "src/gui/layer.js",
-            "line": 119,
-            "description": "Set the layer zoom and apply it.",
-            "itemtype": "method",
-            "name": "zoom",
-            "params": [
-                {
-                    "name": "stepX",
-                    "description": "The zoom step in the X direction.",
-                    "type": "Number"
-                },
-                {
-                    "name": "stepY",
-                    "description": "The zoom step in the Y direction.",
+                    "name": "newZoomY",
+                    "description": "The zoom in the Y direction.",
                     "type": "Number"
                 },
                 {
@@ -3407,7 +3392,7 @@
         },
         {
             "file": "src/gui/layer.js",
-            "line": 135,
+            "line": 146,
             "description": "Set the layer translation.\nTranslation is according to the last one.",
             "itemtype": "method",
             "name": "setTranslate",
@@ -3429,29 +3414,7 @@
         },
         {
             "file": "src/gui/layer.js",
-            "line": 164,
-            "description": "Set the layer translation and apply it.\nTranslation is according to the last one.",
-            "itemtype": "method",
-            "name": "translate",
-            "params": [
-                {
-                    "name": "tx",
-                    "description": "The translation in the X direction.",
-                    "type": "Number"
-                },
-                {
-                    "name": "ty",
-                    "description": "The translation in the Y direction.",
-                    "type": "Number"
-                }
-            ],
-            "class": "dwv.html.Layer",
-            "module": "html",
-            "namespace": "dwv.html"
-        },
-        {
-            "file": "src/gui/layer.js",
-            "line": 179,
+            "line": 160,
             "description": "Set the image data array.",
             "itemtype": "method",
             "name": "setImageData",
@@ -3468,7 +3431,7 @@
         },
         {
             "file": "src/gui/layer.js",
-            "line": 189,
+            "line": 172,
             "description": "Reset the layout.",
             "itemtype": "method",
             "name": "resetLayout",
@@ -3478,7 +3441,17 @@
         },
         {
             "file": "src/gui/layer.js",
-            "line": 201,
+            "line": 184,
+            "description": "Transform a display position to an index.",
+            "itemtype": "method",
+            "name": "displayToIndex",
+            "class": "dwv.html.Layer",
+            "module": "html",
+            "namespace": "dwv.html"
+        },
+        {
+            "file": "src/gui/layer.js",
+            "line": 193,
             "description": "Draw the content (imageData) of the layer.\nThe imageData variable needs to be set",
             "itemtype": "method",
             "name": "draw",
@@ -3488,7 +3461,7 @@
         },
         {
             "file": "src/gui/layer.js",
-            "line": 225,
+            "line": 219,
             "description": "Initialise the layer: set the canvas and context",
             "itemtype": "method",
             "name": "initialise",
@@ -3499,7 +3472,7 @@
         },
         {
             "file": "src/gui/layer.js",
-            "line": 261,
+            "line": 259,
             "description": "Fill the full context with the current style.",
             "itemtype": "method",
             "name": "fillContext",
@@ -3509,7 +3482,7 @@
         },
         {
             "file": "src/gui/layer.js",
-            "line": 270,
+            "line": 268,
             "description": "Clear the context and reset the image data.",
             "itemtype": "method",
             "name": "clear",
@@ -3519,7 +3492,7 @@
         },
         {
             "file": "src/gui/layer.js",
-            "line": 281,
+            "line": 279,
             "description": "Merge two layers.",
             "itemtype": "method",
             "name": "merge",
@@ -3530,7 +3503,7 @@
         },
         {
             "file": "src/gui/layer.js",
-            "line": 319,
+            "line": 317,
             "description": "Set the line color for the layer.",
             "itemtype": "method",
             "name": "setLineColor",
@@ -3541,7 +3514,7 @@
         },
         {
             "file": "src/gui/layer.js",
-            "line": 330,
+            "line": 328,
             "description": "Display the layer.",
             "itemtype": "method",
             "name": "setStyleDisplay",
@@ -3552,7 +3525,7 @@
         },
         {
             "file": "src/gui/layer.js",
-            "line": 347,
+            "line": 345,
             "description": "Check if the layer is visible.",
             "itemtype": "method",
             "name": "isVisible",
@@ -3566,7 +3539,7 @@
         },
         {
             "file": "src/gui/layer.js",
-            "line": 358,
+            "line": 360,
             "description": "Align on another layer.",
             "itemtype": "method",
             "name": "align",
@@ -3577,6 +3550,28 @@
                     "type": "Layer"
                 }
             ],
+            "class": "dwv.html.Layer",
+            "module": "html",
+            "namespace": "dwv.html"
+        },
+        {
+            "file": "src/gui/layer.js",
+            "line": 372,
+            "description": "Get the offset of an input event.",
+            "itemtype": "method",
+            "name": "getEventOffset",
+            "static": 1,
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The event to get the offset from.",
+                    "type": "Object"
+                }
+            ],
+            "return": {
+                "description": "The array of offsets.",
+                "type": "Array"
+            },
             "class": "dwv.html.Layer",
             "module": "html",
             "namespace": "dwv.html"
@@ -3594,7 +3589,7 @@
         },
         {
             "file": "src/gui/loader.js",
-            "line": 36,
+            "line": 38,
             "description": "Append the file load HTML to the page.",
             "itemtype": "method",
             "name": "appendFileLoadHtml",
@@ -3605,7 +3600,7 @@
         },
         {
             "file": "src/gui/loader.js",
-            "line": 66,
+            "line": 68,
             "description": "Display the file load HTML.",
             "itemtype": "method",
             "name": "clearUrlLoadHtml",
@@ -3623,7 +3618,7 @@
         },
         {
             "file": "src/gui/loader.js",
-            "line": 79,
+            "line": 81,
             "description": "Append the url load HTML to the page.",
             "itemtype": "method",
             "name": "appendUrlLoadHtml",
@@ -3634,7 +3629,7 @@
         },
         {
             "file": "src/gui/loader.js",
-            "line": 108,
+            "line": 110,
             "description": "Display the url load HTML.",
             "itemtype": "method",
             "name": "clearUrlLoadHtml",
@@ -3815,7 +3810,7 @@
         },
         {
             "file": "src/gui/tools.js",
-            "line": 43,
+            "line": 45,
             "description": "Display the toolbox HTML.",
             "itemtype": "method",
             "name": "displayToolboxHtml",
@@ -3833,7 +3828,7 @@
         },
         {
             "file": "src/gui/tools.js",
-            "line": 55,
+            "line": 57,
             "description": "Initialise the toolbox HTML.",
             "itemtype": "method",
             "name": "initToolboxHtml",
@@ -3844,7 +3839,7 @@
         },
         {
             "file": "src/gui/tools.js",
-            "line": 68,
+            "line": 70,
             "description": "Append the window/level HTML to the page.",
             "itemtype": "method",
             "name": "appendWindowLevelHtml",
@@ -3855,7 +3850,7 @@
         },
         {
             "file": "src/gui/tools.js",
-            "line": 105,
+            "line": 107,
             "description": "Display the window/level HTML.",
             "itemtype": "method",
             "name": "displayWindowLevelHtml",
@@ -3873,7 +3868,7 @@
         },
         {
             "file": "src/gui/tools.js",
-            "line": 119,
+            "line": 121,
             "description": "Initialise the window/level HTML.",
             "itemtype": "method",
             "name": "initWindowLevelHtml",
@@ -3884,7 +3879,7 @@
         },
         {
             "file": "src/gui/tools.js",
-            "line": 150,
+            "line": 152,
             "description": "Append the draw HTML to the page.",
             "itemtype": "method",
             "name": "appendDrawHtml",
@@ -3895,7 +3890,7 @@
         },
         {
             "file": "src/gui/tools.js",
-            "line": 187,
+            "line": 189,
             "description": "Display the draw HTML.",
             "itemtype": "method",
             "name": "displayDrawHtml",
@@ -3913,7 +3908,7 @@
         },
         {
             "file": "src/gui/tools.js",
-            "line": 201,
+            "line": 203,
             "description": "Initialise the draw HTML.",
             "itemtype": "method",
             "name": "displayDrawHtml",
@@ -3924,7 +3919,7 @@
         },
         {
             "file": "src/gui/tools.js",
-            "line": 218,
+            "line": 220,
             "description": "Append the color chooser HTML to the page.",
             "itemtype": "method",
             "name": "appendLivewireHtml",
@@ -3935,7 +3930,7 @@
         },
         {
             "file": "src/gui/tools.js",
-            "line": 244,
+            "line": 246,
             "description": "Display the livewire HTML.",
             "itemtype": "method",
             "name": "displayLivewireHtml",
@@ -3953,7 +3948,7 @@
         },
         {
             "file": "src/gui/tools.js",
-            "line": 256,
+            "line": 258,
             "description": "Initialise the livewire HTML.",
             "itemtype": "method",
             "name": "initLivewireHtml",
@@ -3964,7 +3959,7 @@
         },
         {
             "file": "src/gui/tools.js",
-            "line": 268,
+            "line": 270,
             "description": "Append the ZoomAndPan HTML to the page.",
             "itemtype": "method",
             "name": "appendZoomAndPanHtml",
@@ -3975,7 +3970,7 @@
         },
         {
             "file": "src/gui/tools.js",
-            "line": 298,
+            "line": 300,
             "description": "Display the ZoomAndPan HTML.",
             "itemtype": "method",
             "name": "displayZoomAndPanHtml",
@@ -3993,7 +3988,7 @@
         },
         {
             "file": "src/gui/tools.js",
-            "line": 310,
+            "line": 312,
             "description": "Append the Scroll HTML to the page.",
             "itemtype": "method",
             "name": "appendScrollHtml",
@@ -4004,7 +3999,7 @@
         },
         {
             "file": "src/gui/tools.js",
-            "line": 331,
+            "line": 333,
             "description": "Display the Scroll HTML.",
             "itemtype": "method",
             "name": "displayScrollHtml",
@@ -4033,7 +4028,18 @@
         },
         {
             "file": "src/gui/undo.js",
-            "line": 40,
+            "line": 42,
+            "description": "Clear the command list of the undo HTML.",
+            "itemtype": "method",
+            "name": "cleaUndoHtml",
+            "static": 1,
+            "class": "dwv.gui",
+            "module": "gui",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/gui/undo.js",
+            "line": 58,
             "description": "Add a command to the undo HTML.",
             "itemtype": "method",
             "name": "addCommandToUndoHtml",
@@ -4051,7 +4057,7 @@
         },
         {
             "file": "src/gui/undo.js",
-            "line": 67,
+            "line": 85,
             "description": "Enable the last command of the undo HTML.",
             "itemtype": "method",
             "name": "enableInUndoHtml",
@@ -4083,7 +4089,7 @@
         {
             "file": "src/image/filter.js",
             "line": 24,
-            "description": "Threshold maxnimum.",
+            "description": "Threshold maximum.",
             "itemtype": "property",
             "name": "max",
             "access": "private",
@@ -4171,7 +4177,51 @@
         },
         {
             "file": "src/image/filter.js",
-            "line": 64,
+            "line": 63,
+            "description": "Original image.",
+            "itemtype": "property",
+            "name": "originalImage",
+            "access": "private",
+            "tagname": "",
+            "type": "Object",
+            "class": "dwv.image.filter.Threshold",
+            "module": "image",
+            "namespace": "dwv.image.filter"
+        },
+        {
+            "file": "src/image/filter.js",
+            "line": 70,
+            "description": "Set the original image.",
+            "itemtype": "method",
+            "name": "setOriginalImage",
+            "params": [
+                {
+                    "name": "image",
+                    "description": "The original image.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.image.filter.Threshold",
+            "module": "image",
+            "namespace": "dwv.image.filter"
+        },
+        {
+            "file": "src/image/filter.js",
+            "line": 76,
+            "description": "Get the original image.",
+            "itemtype": "method",
+            "name": "setOriginalImage",
+            "return": {
+                "description": "image The original image.",
+                "type": "Object"
+            },
+            "class": "dwv.image.filter.Threshold",
+            "module": "image",
+            "namespace": "dwv.image.filter"
+        },
+        {
+            "file": "src/image/filter.js",
+            "line": 84,
             "description": "Transform the main image using this filter.",
             "itemtype": "method",
             "name": "update",
@@ -4185,7 +4235,7 @@
         },
         {
             "file": "src/image/filter.js",
-            "line": 88,
+            "line": 113,
             "description": "Get the name of the filter.",
             "itemtype": "method",
             "name": "getName",
@@ -4199,7 +4249,51 @@
         },
         {
             "file": "src/image/filter.js",
-            "line": 96,
+            "line": 119,
+            "description": "Original image.",
+            "itemtype": "property",
+            "name": "originalImage",
+            "access": "private",
+            "tagname": "",
+            "type": "Object",
+            "class": "dwv.image.filter.Sharpen",
+            "module": "image",
+            "namespace": "dwv.image.filter"
+        },
+        {
+            "file": "src/image/filter.js",
+            "line": 126,
+            "description": "Set the original image.",
+            "itemtype": "method",
+            "name": "setOriginalImage",
+            "params": [
+                {
+                    "name": "image",
+                    "description": "The original image.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.image.filter.Sharpen",
+            "module": "image",
+            "namespace": "dwv.image.filter"
+        },
+        {
+            "file": "src/image/filter.js",
+            "line": 132,
+            "description": "Get the original image.",
+            "itemtype": "method",
+            "name": "setOriginalImage",
+            "return": {
+                "description": "image The original image.",
+                "type": "Object"
+            },
+            "class": "dwv.image.filter.Sharpen",
+            "module": "image",
+            "namespace": "dwv.image.filter"
+        },
+        {
+            "file": "src/image/filter.js",
+            "line": 140,
             "description": "Transform the main image using this filter.",
             "itemtype": "method",
             "name": "update",
@@ -4213,7 +4307,7 @@
         },
         {
             "file": "src/image/filter.js",
-            "line": 117,
+            "line": 163,
             "description": "Get the name of the filter.",
             "itemtype": "method",
             "name": "getName",
@@ -4227,7 +4321,51 @@
         },
         {
             "file": "src/image/filter.js",
-            "line": 125,
+            "line": 169,
+            "description": "Original image.",
+            "itemtype": "property",
+            "name": "originalImage",
+            "access": "private",
+            "tagname": "",
+            "type": "Object",
+            "class": "dwv.image.filter.Sobel",
+            "module": "image",
+            "namespace": "dwv.image.filter"
+        },
+        {
+            "file": "src/image/filter.js",
+            "line": 176,
+            "description": "Set the original image.",
+            "itemtype": "method",
+            "name": "setOriginalImage",
+            "params": [
+                {
+                    "name": "image",
+                    "description": "The original image.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.image.filter.Sobel",
+            "module": "image",
+            "namespace": "dwv.image.filter"
+        },
+        {
+            "file": "src/image/filter.js",
+            "line": 182,
+            "description": "Get the original image.",
+            "itemtype": "method",
+            "name": "setOriginalImage",
+            "return": {
+                "description": "image The original image.",
+                "type": "Object"
+            },
+            "class": "dwv.image.filter.Sobel",
+            "module": "image",
+            "namespace": "dwv.image.filter"
+        },
+        {
+            "file": "src/image/filter.js",
+            "line": 190,
             "description": "Transform the main image using this filter.",
             "itemtype": "method",
             "name": "update",
@@ -4363,7 +4501,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 98,
+            "line": 100,
             "description": "Get the column spacing.",
             "itemtype": "method",
             "name": "getColumnSpacing",
@@ -4377,7 +4515,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 104,
+            "line": 106,
             "description": "Get the row spacing.",
             "itemtype": "method",
             "name": "getRowSpacing",
@@ -4391,7 +4529,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 110,
+            "line": 112,
             "description": "Get the slice spacing.",
             "itemtype": "method",
             "name": "getSliceSpacing",
@@ -4405,7 +4543,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 118,
+            "line": 120,
             "description": "Check for equality.",
             "itemtype": "method",
             "name": "equals",
@@ -4426,7 +4564,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 147,
+            "line": 149,
             "description": "Rescale slope.",
             "itemtype": "property",
             "name": "rescaleSlope",
@@ -4439,7 +4577,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 154,
+            "line": 156,
             "description": "Rescale intercept.",
             "itemtype": "property",
             "name": "rescaleIntercept",
@@ -4452,7 +4590,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 161,
+            "line": 163,
             "description": "Photometric interpretation (MONOCHROME, RGB...).",
             "itemtype": "property",
             "name": "photometricInterpretation",
@@ -4465,7 +4603,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 168,
+            "line": 170,
             "description": "Planar configuration for RGB data (0:RGBRGBRGBRGB... or 1:RRR...GGG...BBB...).",
             "itemtype": "property",
             "name": "planarConfiguration",
@@ -4478,7 +4616,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 175,
+            "line": 177,
             "description": "Number of components.",
             "itemtype": "property",
             "name": "planarConfiguration",
@@ -4491,7 +4629,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 182,
+            "line": 184,
             "description": "Meta information.",
             "itemtype": "property",
             "name": "meta",
@@ -4504,7 +4642,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 190,
+            "line": 192,
             "description": "Original buffer.",
             "itemtype": "property",
             "name": "originalBuffer",
@@ -4517,7 +4655,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 201,
+            "line": 205,
             "description": "Data range.",
             "itemtype": "property",
             "name": "dataRange",
@@ -4530,7 +4668,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 208,
+            "line": 212,
             "description": "Histogram.",
             "itemtype": "property",
             "name": "histogram",
@@ -4543,7 +4681,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 216,
+            "line": 220,
             "description": "Get the size of the image.",
             "itemtype": "method",
             "name": "getSize",
@@ -4557,7 +4695,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 222,
+            "line": 226,
             "description": "Get the spacing of the image.",
             "itemtype": "method",
             "name": "getSpacing",
@@ -4571,7 +4709,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 228,
+            "line": 232,
             "description": "Get the data buffer of the image. TODO dangerous...",
             "itemtype": "method",
             "name": "getBuffer",
@@ -4585,7 +4723,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 234,
+            "line": 238,
             "description": "Get the slice positions.",
             "itemtype": "method",
             "name": "getSlicePositions",
@@ -4599,7 +4737,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 241,
+            "line": 245,
             "description": "Get the rescale slope.",
             "itemtype": "method",
             "name": "getRescaleSlope",
@@ -4613,7 +4751,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 247,
+            "line": 251,
             "description": "Set the rescale slope.",
             "itemtype": "method",
             "name": "setRescaleSlope",
@@ -4630,7 +4768,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 253,
+            "line": 257,
             "description": "Get the rescale intercept.",
             "itemtype": "method",
             "name": "getRescaleIntercept",
@@ -4644,7 +4782,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 259,
+            "line": 263,
             "description": "Set the rescale intercept.",
             "itemtype": "method",
             "name": "setRescaleIntercept",
@@ -4661,7 +4799,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 265,
+            "line": 269,
             "description": "Get the photometricInterpretation of the image.",
             "itemtype": "method",
             "name": "getPhotometricInterpretation",
@@ -4675,7 +4813,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 271,
+            "line": 275,
             "description": "Set the photometricInterpretation of the image.",
             "itemtype": "method",
             "name": "setPhotometricInterpretation",
@@ -4686,7 +4824,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 277,
+            "line": 281,
             "description": "Get the planarConfiguration of the image.",
             "itemtype": "method",
             "name": "getPlanarConfiguration",
@@ -4700,7 +4838,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 283,
+            "line": 287,
             "description": "Set the planarConfiguration of the image.",
             "itemtype": "method",
             "name": "setPlanarConfiguration",
@@ -4717,7 +4855,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 289,
+            "line": 293,
             "description": "Get the numberOfComponents of the image.",
             "itemtype": "method",
             "name": "getNumberOfComponents",
@@ -4731,7 +4869,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 296,
+            "line": 300,
             "description": "Get the meta information of the image.",
             "itemtype": "method",
             "name": "getMeta",
@@ -4745,7 +4883,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 302,
+            "line": 306,
             "description": "Set the meta information of the image.",
             "itemtype": "method",
             "name": "setMeta",
@@ -4762,7 +4900,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 309,
+            "line": 313,
             "description": "Get value at offset. Warning: No size check...",
             "itemtype": "method",
             "name": "getValueAtOffset",
@@ -4783,7 +4921,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 319,
+            "line": 323,
             "description": "Clone the image.",
             "itemtype": "method",
             "name": "clone",
@@ -4797,7 +4935,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 335,
+            "line": 339,
             "description": "Append a slice to the image.",
             "itemtype": "method",
             "name": "appendSlice",
@@ -4814,7 +4952,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 417,
+            "line": 429,
             "description": "Get the data range.",
             "itemtype": "method",
             "name": "getDataRange",
@@ -4828,7 +4966,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 427,
+            "line": 441,
             "description": "Get the histogram.",
             "itemtype": "method",
             "name": "getHistogram",
@@ -4842,7 +4980,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 438,
+            "line": 454,
             "description": "Get the value of the image at a specific coordinate.",
             "itemtype": "method",
             "name": "getValue",
@@ -4873,7 +5011,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 454,
+            "line": 470,
             "description": "Get the rescaled value of the image at a specific offset.",
             "itemtype": "method",
             "name": "getRescaledValueAtOffset",
@@ -4894,7 +5032,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 466,
+            "line": 482,
             "description": "Get the rescaled value of the image at a specific coordinate.",
             "itemtype": "method",
             "name": "getRescaledValue",
@@ -4925,7 +5063,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 480,
+            "line": 496,
             "description": "Calculate the raw image data range.",
             "itemtype": "method",
             "name": "calculateDataRange",
@@ -4939,7 +5077,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 499,
+            "line": 515,
             "description": "Calculate the image data range after rescale.",
             "itemtype": "method",
             "name": "getRescaledDataRange",
@@ -4953,7 +5091,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 511,
+            "line": 527,
             "description": "Calculate the histogram of the image.",
             "itemtype": "method",
             "name": "calculateHistogram",
@@ -4967,7 +5105,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 539,
+            "line": 555,
             "description": "Convolute the image with a given 2D kernel.",
             "itemtype": "method",
             "name": "convolute2D",
@@ -4988,7 +5126,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 666,
+            "line": 705,
             "description": "Transform an image using a specific operator.",
             "itemtype": "method",
             "name": "transform",
@@ -5009,7 +5147,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 684,
+            "line": 723,
             "description": "Compose this image with another one and using a specific operator.",
             "itemtype": "method",
             "name": "compose",
@@ -5048,7 +5186,7 @@
         },
         {
             "file": "src/image/luts.js",
-            "line": 32,
+            "line": 36,
             "description": "Get the rescale slope.",
             "itemtype": "method",
             "name": "getSlope",
@@ -5062,7 +5200,7 @@
         },
         {
             "file": "src/image/luts.js",
-            "line": 38,
+            "line": 42,
             "description": "Get the rescale intercept.",
             "itemtype": "method",
             "name": "getIntercept",
@@ -5076,7 +5214,7 @@
         },
         {
             "file": "src/image/luts.js",
-            "line": 45,
+            "line": 49,
             "description": "Initialise the LUT.",
             "itemtype": "method",
             "name": "initialise",
@@ -5093,7 +5231,7 @@
         },
         {
             "file": "src/image/luts.js",
-            "line": 59,
+            "line": 64,
             "description": "Get the length of the LUT array.",
             "itemtype": "method",
             "name": "getLength",
@@ -5107,7 +5245,7 @@
         },
         {
             "file": "src/image/luts.js",
-            "line": 66,
+            "line": 71,
             "description": "Get the value of the LUT at the given offset.",
             "itemtype": "method",
             "name": "getValue",
@@ -5121,7 +5259,7 @@
         },
         {
             "file": "src/image/luts.js",
-            "line": 84,
+            "line": 89,
             "description": "The internal array: Uint8ClampedArray clamps between 0 and 255.\n(not supported on travis yet... using basic array, be sure not to overflow!)",
             "itemtype": "property",
             "name": "rescaleLut_",
@@ -5134,7 +5272,7 @@
         },
         {
             "file": "src/image/luts.js",
-            "line": 100,
+            "line": 106,
             "description": "The window center.",
             "itemtype": "property",
             "name": "center_",
@@ -5147,7 +5285,7 @@
         },
         {
             "file": "src/image/luts.js",
-            "line": 107,
+            "line": 113,
             "description": "The window width.",
             "itemtype": "property",
             "name": "width_",
@@ -5160,7 +5298,7 @@
         },
         {
             "file": "src/image/luts.js",
-            "line": 115,
+            "line": 121,
             "description": "Get the window center.",
             "itemtype": "method",
             "name": "getCenter",
@@ -5174,7 +5312,7 @@
         },
         {
             "file": "src/image/luts.js",
-            "line": 121,
+            "line": 127,
             "description": "Get the window width.",
             "itemtype": "method",
             "name": "getWidth",
@@ -5188,7 +5326,7 @@
         },
         {
             "file": "src/image/luts.js",
-            "line": 127,
+            "line": 133,
             "description": "Get the signed flag.",
             "itemtype": "method",
             "name": "isSigned",
@@ -5202,7 +5340,7 @@
         },
         {
             "file": "src/image/luts.js",
-            "line": 134,
+            "line": 140,
             "description": "Set the window center and width.",
             "itemtype": "method",
             "name": "setCenterAndWidth",
@@ -5524,7 +5662,7 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 137,
+            "line": 138,
             "description": "Is the data signed data.",
             "itemtype": "method",
             "name": "isSigned",
@@ -5538,7 +5676,7 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 144,
+            "line": 145,
             "description": "Get the current position.",
             "itemtype": "method",
             "name": "getCurrentPosition",
@@ -5552,7 +5690,7 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 150,
+            "line": 151,
             "description": "Set the current position. Returns false if not in bounds.",
             "itemtype": "method",
             "name": "setCurrentPosition",
@@ -5569,20 +5707,20 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 178,
+            "line": 181,
             "description": "View listeners",
             "itemtype": "property",
             "name": "listeners",
             "access": "private",
             "tagname": "",
-            "type": "Array",
+            "type": "Object",
             "class": "dwv.image.View",
             "module": "image",
             "namespace": "dwv.image"
         },
         {
             "file": "src/image/view.js",
-            "line": 185,
+            "line": 188,
             "description": "Get the view listeners.",
             "itemtype": "method",
             "name": "getListeners",
@@ -5596,7 +5734,7 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 191,
+            "line": 194,
             "description": "Set the view listeners.",
             "itemtype": "method",
             "name": "setListeners",
@@ -5613,7 +5751,7 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 199,
+            "line": 202,
             "description": "Set the view window/level.",
             "itemtype": "method",
             "name": "setWindowLevel",
@@ -5635,7 +5773,7 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 212,
+            "line": 215,
             "description": "Set the image window/level to cover the full data range.",
             "itemtype": "method",
             "name": "setWindowLevelMinMax\nWarning: uses the latest set rescale LUT or the default linear one.",
@@ -5645,7 +5783,21 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 229,
+            "line": 231,
+            "description": "Go to first slice .",
+            "itemtype": "method",
+            "name": "goFirstSlice",
+            "return": {
+                "description": "False if not in bounds.",
+                "type": "Boolean"
+            },
+            "class": "dwv.image.View",
+            "module": "image",
+            "namespace": "dwv.image"
+        },
+        {
+            "file": "src/image/view.js",
+            "line": 244,
             "description": "Increment the current slice number.",
             "itemtype": "method",
             "name": "incrementSliceNb",
@@ -5659,7 +5811,7 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 242,
+            "line": 258,
             "description": "Decrement the current slice number.",
             "itemtype": "method",
             "name": "decrementSliceNb",
@@ -5673,7 +5825,7 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 255,
+            "line": 272,
             "description": "Clone the image using all meta data and the original data buffer.",
             "itemtype": "method",
             "name": "clone",
@@ -5687,7 +5839,7 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 269,
+            "line": 286,
             "description": "Generate display image data to be given to a canvas.",
             "itemtype": "method",
             "name": "generateImageData",
@@ -5709,7 +5861,7 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 354,
+            "line": 372,
             "description": "Add an event listener on the view.",
             "itemtype": "method",
             "name": "addEventListener",
@@ -5731,7 +5883,7 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 367,
+            "line": 387,
             "description": "Remove an event listener on the view.",
             "itemtype": "method",
             "name": "removeEventListener",
@@ -5753,7 +5905,7 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 384,
+            "line": 407,
             "description": "Fire an event: call all associated listeners.",
             "itemtype": "method",
             "name": "fireEvent",
@@ -5810,13 +5962,13 @@
         },
         {
             "file": "src/math/scissors.js",
-            "line": 67,
+            "line": 68,
             "class": "dwv.math.Scissors",
             "module": "math"
         },
         {
             "file": "src/math/scissors.js",
-            "line": 107,
+            "line": 108,
             "class": "dwv.math.Scissors",
             "module": "math"
         },
@@ -6001,7 +6153,102 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 149,
+            "line": 150,
+            "description": "Circle surface.",
+            "itemtype": "property",
+            "name": "surface",
+            "access": "private",
+            "tagname": "",
+            "type": "Number",
+            "class": "dwv.math.Ellipse",
+            "module": "math",
+            "namespace": "dwv.math"
+        },
+        {
+            "file": "src/math/shapes.js",
+            "line": 158,
+            "description": "Get the centre (point) of the ellipse.",
+            "itemtype": "method",
+            "name": "getCenter",
+            "return": {
+                "description": "The center (point) of the ellipse.",
+                "type": "Object"
+            },
+            "class": "dwv.math.Ellipse",
+            "module": "math",
+            "namespace": "dwv.math"
+        },
+        {
+            "file": "src/math/shapes.js",
+            "line": 164,
+            "description": "Get the radius of the ellipse on the horizontal axe.",
+            "itemtype": "method",
+            "name": "getA",
+            "return": {
+                "description": "The radius of the ellipse on the horizontal axe.",
+                "type": "Number"
+            },
+            "class": "dwv.math.Ellipse",
+            "module": "math",
+            "namespace": "dwv.math"
+        },
+        {
+            "file": "src/math/shapes.js",
+            "line": 170,
+            "description": "Get the radius of the ellipse on the vertical axe.",
+            "itemtype": "method",
+            "name": "getB",
+            "return": {
+                "description": "The radius of the ellipse on the vertical axe.",
+                "type": "Number"
+            },
+            "class": "dwv.math.Ellipse",
+            "module": "math",
+            "namespace": "dwv.math"
+        },
+        {
+            "file": "src/math/shapes.js",
+            "line": 176,
+            "description": "Get the surface of the ellipse.",
+            "itemtype": "method",
+            "name": "getSurface",
+            "return": {
+                "description": "The surface of the ellipse.",
+                "type": "Number"
+            },
+            "class": "dwv.math.Ellipse",
+            "module": "math",
+            "namespace": "dwv.math"
+        },
+        {
+            "file": "src/math/shapes.js",
+            "line": 182,
+            "description": "Get the surface of the ellipse with a spacing.",
+            "itemtype": "method",
+            "name": "getWorldSurface",
+            "params": [
+                {
+                    "name": "spacingX",
+                    "description": "The X spacing.",
+                    "type": "Number"
+                },
+                {
+                    "name": "spacingY",
+                    "description": "The Y spacing.",
+                    "type": "Number"
+                }
+            ],
+            "return": {
+                "description": "The surface of the ellipse multiplied by the given spacing.",
+                "type": "Number"
+            },
+            "class": "dwv.math.Ellipse",
+            "module": "math",
+            "namespace": "dwv.math"
+        },
+        {
+            "file": "src/math/shapes.js",
+            "line": 205,
             "description": "Line length.",
             "itemtype": "property",
             "name": "length",
@@ -6014,7 +6261,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 159,
+            "line": 215,
             "description": "Get the begin point of the line.",
             "itemtype": "method",
             "name": "getBegin",
@@ -6028,7 +6275,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 165,
+            "line": 221,
             "description": "Get the end point of the line.",
             "itemtype": "method",
             "name": "getEnd",
@@ -6042,7 +6289,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 171,
+            "line": 227,
             "description": "Get the length of the line.",
             "itemtype": "method",
             "name": "getLength",
@@ -6056,7 +6303,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 177,
+            "line": 233,
             "description": "Get the length of the line with spacing.",
             "itemtype": "method",
             "name": "getWorldLength",
@@ -6082,7 +6329,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 190,
+            "line": 246,
             "description": "Get the mid point of the line.",
             "itemtype": "method",
             "name": "getMidpoint",
@@ -6096,7 +6343,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 213,
+            "line": 280,
             "description": "Rectangle surface.",
             "itemtype": "property",
             "name": "surface",
@@ -6109,7 +6356,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 221,
+            "line": 288,
             "description": "Get the begin point of the rectangle.",
             "itemtype": "method",
             "name": "getBegin",
@@ -6123,7 +6370,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 227,
+            "line": 294,
             "description": "Get the end point of the rectangle.",
             "itemtype": "method",
             "name": "getEnd",
@@ -6137,7 +6384,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 233,
+            "line": 300,
             "description": "Get the real width of the rectangle.",
             "itemtype": "method",
             "name": "getRealWidth",
@@ -6151,7 +6398,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 239,
+            "line": 306,
             "description": "Get the real height of the rectangle.",
             "itemtype": "method",
             "name": "getRealHeight",
@@ -6165,7 +6412,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 245,
+            "line": 312,
             "description": "Get the width of the rectangle.",
             "itemtype": "method",
             "name": "getWidth",
@@ -6179,7 +6426,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 251,
+            "line": 318,
             "description": "Get the height of the rectangle.",
             "itemtype": "method",
             "name": "getHeight",
@@ -6193,7 +6440,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 257,
+            "line": 324,
             "description": "Get the surface of the rectangle.",
             "itemtype": "method",
             "name": "getSurface",
@@ -6207,7 +6454,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 263,
+            "line": 330,
             "description": "Get the surface of the rectangle with a spacing.",
             "itemtype": "method",
             "name": "getWorldSurface",
@@ -6221,7 +6468,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 283,
+            "line": 350,
             "description": "List of points.",
             "itemtype": "property",
             "name": "points",
@@ -6234,7 +6481,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 291,
+            "line": 358,
             "description": "Get a point of the list at a given index.",
             "itemtype": "method",
             "name": "getPoint",
@@ -6255,7 +6502,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 298,
+            "line": 365,
             "description": "Get the length of the point list.",
             "itemtype": "method",
             "name": "getLength",
@@ -6269,7 +6516,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 304,
+            "line": 371,
             "description": "Add a point to the ROI.",
             "itemtype": "method",
             "name": "addPoint",
@@ -6286,7 +6533,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 310,
+            "line": 377,
             "description": "Add points to the ROI.",
             "itemtype": "method",
             "name": "addPoints",
@@ -6303,7 +6550,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 330,
+            "line": 397,
             "description": "List of points.",
             "itemtype": "property",
             "name": "pointArray",
@@ -6314,7 +6561,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 336,
+            "line": 403,
             "description": "List of control points.",
             "itemtype": "property",
             "name": "controlPointIndexArray",
@@ -6325,7 +6572,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 345,
+            "line": 412,
             "description": "Get a point of the list.",
             "itemtype": "method",
             "name": "getPoint",
@@ -6346,7 +6593,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 355,
+            "line": 422,
             "description": "Is the given point a control point.",
             "itemtype": "method",
             "name": "isControlPoint",
@@ -6367,7 +6614,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 371,
+            "line": 438,
             "description": "Get the length of the path.",
             "itemtype": "method",
             "name": "getLength",
@@ -6381,7 +6628,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 380,
+            "line": 447,
             "description": "Add a point to the path.",
             "itemtype": "method",
             "name": "addPoint",
@@ -6398,7 +6645,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 389,
+            "line": 456,
             "description": "Add a control point to the path.",
             "itemtype": "method",
             "name": "addControlPoint",
@@ -6415,7 +6662,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 404,
+            "line": 471,
             "description": "Add points to the path.",
             "itemtype": "method",
             "name": "addPoints",
@@ -6432,7 +6679,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 413,
+            "line": 480,
             "description": "Append a Path to this one.",
             "itemtype": "method",
             "name": "appenPath",
@@ -6448,60 +6695,8 @@
             "namespace": "dwv.math"
         },
         {
-            "file": "src/tools/circle.js",
-            "line": 30,
-            "description": "Circle object.",
-            "itemtype": "property",
-            "name": "circle",
-            "access": "private",
-            "tagname": "",
-            "type": "Circle",
-            "class": "dwv.tool.DrawCircleCommand",
-            "module": "tool",
-            "namespace": "dwv.tool"
-        },
-        {
-            "file": "src/tools/circle.js",
-            "line": 38,
-            "description": "Line color.",
-            "itemtype": "property",
-            "name": "lineColor",
-            "access": "private",
-            "tagname": "",
-            "type": "String",
-            "class": "dwv.tool.DrawCircleCommand",
-            "module": "tool",
-            "namespace": "dwv.tool"
-        },
-        {
-            "file": "src/tools/circle.js",
-            "line": 45,
-            "description": "HTML context.",
-            "itemtype": "property",
-            "name": "context",
-            "access": "private",
-            "tagname": "",
-            "type": "Object",
-            "class": "dwv.tool.DrawCircleCommand",
-            "module": "tool",
-            "namespace": "dwv.tool"
-        },
-        {
-            "file": "src/tools/circle.js",
-            "line": 53,
-            "description": "Command name.",
-            "itemtype": "property",
-            "name": "name",
-            "access": "private",
-            "tagname": "",
-            "type": "String",
-            "class": "dwv.tool.DrawCircleCommand",
-            "module": "tool",
-            "namespace": "dwv.tool"
-        },
-        {
-            "file": "src/tools/circle.js",
-            "line": 60,
+            "file": "src/tools/draw.js",
+            "line": 17,
             "description": "Get the command name.",
             "itemtype": "method",
             "name": "getName",
@@ -6509,40 +6704,135 @@
                 "description": "The command name.",
                 "type": "String"
             },
-            "class": "dwv.tool.DrawCircleCommand",
-            "module": "tool",
-            "namespace": "dwv.tool"
-        },
-        {
-            "file": "src/tools/circle.js",
-            "line": 66,
-            "description": "Set the command name.",
-            "itemtype": "method",
-            "name": "setName",
-            "params": [
-                {
-                    "name": "str",
-                    "description": "The command name.",
-                    "type": "String"
-                }
-            ],
-            "class": "dwv.tool.DrawCircleCommand",
-            "module": "tool",
-            "namespace": "dwv.tool"
-        },
-        {
-            "file": "src/tools/circle.js",
-            "line": 73,
-            "description": "Execute the command.",
-            "itemtype": "method",
-            "name": "execute",
-            "class": "dwv.tool.DrawCircleCommand",
+            "class": "dwv.tool.DrawShapeCommand",
             "module": "tool",
             "namespace": "dwv.tool"
         },
         {
             "file": "src/tools/draw.js",
-            "line": 22,
+            "line": 23,
+            "description": "Execute the command.",
+            "itemtype": "method",
+            "name": "execute",
+            "class": "dwv.tool.DrawShapeCommand",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/draw.js",
+            "line": 34,
+            "description": "Undo the command.",
+            "itemtype": "method",
+            "name": "undo",
+            "class": "dwv.tool.DrawShapeCommand",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/draw.js",
+            "line": 55,
+            "description": "Get the command name.",
+            "itemtype": "method",
+            "name": "getName",
+            "return": {
+                "description": "The command name.",
+                "type": "String"
+            },
+            "class": "dwv.tool.MoveShapeCommand",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/draw.js",
+            "line": 62,
+            "description": "Execute the command.",
+            "itemtype": "method",
+            "name": "execute",
+            "class": "dwv.tool.MoveShapeCommand",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/draw.js",
+            "line": 76,
+            "description": "Undo the command.",
+            "itemtype": "method",
+            "name": "undo",
+            "class": "dwv.tool.MoveShapeCommand",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/draw.js",
+            "line": 100,
+            "description": "Get the command name.",
+            "itemtype": "method",
+            "name": "getName",
+            "return": {
+                "description": "The command name.",
+                "type": "String"
+            },
+            "class": "dwv.tool.ChangeShapeCommand",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/draw.js",
+            "line": 107,
+            "description": "Execute the command.",
+            "itemtype": "method",
+            "name": "execute",
+            "class": "dwv.tool.ChangeShapeCommand",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/draw.js",
+            "line": 117,
+            "description": "Undo the command.",
+            "itemtype": "method",
+            "name": "undo",
+            "class": "dwv.tool.ChangeShapeCommand",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/draw.js",
+            "line": 137,
+            "description": "Get the command name.",
+            "itemtype": "method",
+            "name": "getName",
+            "return": {
+                "description": "The command name.",
+                "type": "String"
+            },
+            "class": "dwv.tool.DeleteShapeCommand",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/draw.js",
+            "line": 143,
+            "description": "Execute the command.",
+            "itemtype": "method",
+            "name": "execute",
+            "class": "dwv.tool.DeleteShapeCommand",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/draw.js",
+            "line": 154,
+            "description": "Undo the command.",
+            "itemtype": "method",
+            "name": "undo",
+            "class": "dwv.tool.DeleteShapeCommand",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/draw.js",
+            "line": 181,
             "description": "Closure to self: to be used by event handlers.",
             "itemtype": "property",
             "name": "self",
@@ -6555,10 +6845,12 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 29,
+            "line": 188,
             "description": "Interaction start flag.",
             "itemtype": "property",
             "name": "started",
+            "access": "private",
+            "tagname": "",
             "type": "Boolean",
             "class": "dwv.tool.Draw",
             "module": "tool",
@@ -6566,7 +6858,20 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 36,
+            "line": 195,
+            "description": "Interaction just started flag.",
+            "itemtype": "property",
+            "name": "justStarted",
+            "access": "private",
+            "tagname": "",
+            "type": "Boolean",
+            "class": "dwv.tool.Draw",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/draw.js",
+            "line": 203,
             "description": "Draw command.",
             "itemtype": "property",
             "name": "command",
@@ -6579,7 +6884,46 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 43,
+            "line": 210,
+            "description": "Current active shape.",
+            "itemtype": "property",
+            "name": "activeShape",
+            "access": "private",
+            "tagname": "",
+            "type": "Object",
+            "class": "dwv.tool.Draw",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/draw.js",
+            "line": 217,
+            "description": "List of created shapes.",
+            "itemtype": "property",
+            "name": "createdShapes",
+            "access": "private",
+            "tagname": "",
+            "type": "Array",
+            "class": "dwv.tool.Draw",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/draw.js",
+            "line": 224,
+            "description": "Current shape group.",
+            "itemtype": "property",
+            "name": "shapeGroup",
+            "access": "private",
+            "tagname": "",
+            "type": "Object",
+            "class": "dwv.tool.Draw",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/draw.js",
+            "line": 232,
             "description": "Drawing style.",
             "itemtype": "property",
             "name": "style",
@@ -6590,7 +6934,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 49,
+            "line": 238,
             "description": "Shape name.",
             "itemtype": "property",
             "name": "shapeName",
@@ -6601,10 +6945,12 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 55,
-            "description": "List of points",
+            "line": 245,
+            "description": "List of points.",
             "itemtype": "property",
             "name": "points",
+            "access": "private",
+            "tagname": "",
             "type": "Array",
             "class": "dwv.tool.Draw",
             "module": "tool",
@@ -6612,7 +6958,46 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 62,
+            "line": 253,
+            "description": "Last selected point.",
+            "itemtype": "property",
+            "name": "lastPoint",
+            "access": "private",
+            "tagname": "",
+            "type": "Object",
+            "class": "dwv.tool.Draw",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/draw.js",
+            "line": 261,
+            "description": "Shape editor.",
+            "itemtype": "property",
+            "name": "shapeEditor",
+            "access": "private",
+            "tagname": "",
+            "type": "Object",
+            "class": "dwv.tool.Draw",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/draw.js",
+            "line": 269,
+            "description": "Trash draw: a cross.",
+            "itemtype": "property",
+            "name": "trash",
+            "access": "private",
+            "tagname": "",
+            "type": "Object",
+            "class": "dwv.tool.Draw",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/draw.js",
+            "line": 290,
             "description": "Handle mouse down event.",
             "itemtype": "method",
             "name": "mousedown",
@@ -6629,7 +7014,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 75,
+            "line": 329,
             "description": "Handle mouse move event.",
             "itemtype": "method",
             "name": "mousemove",
@@ -6646,7 +7031,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 99,
+            "line": 366,
             "description": "Handle mouse up event.",
             "itemtype": "method",
             "name": "mouseup",
@@ -6663,7 +7048,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 116,
+            "line": 400,
             "description": "Handle mouse out event.",
             "itemtype": "method",
             "name": "mouseout",
@@ -6680,7 +7065,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 125,
+            "line": 409,
             "description": "Handle touch start event.",
             "itemtype": "method",
             "name": "touchstart",
@@ -6697,7 +7082,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 134,
+            "line": 418,
             "description": "Handle touch move event.",
             "itemtype": "method",
             "name": "touchmove",
@@ -6714,7 +7099,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 143,
+            "line": 427,
             "description": "Handle touch end event.",
             "itemtype": "method",
             "name": "touchend",
@@ -6731,7 +7116,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 152,
+            "line": 436,
             "description": "Handle key down event.",
             "itemtype": "method",
             "name": "keydown",
@@ -6748,13 +7133,13 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 161,
+            "line": 445,
             "description": "Enable the tool.",
             "itemtype": "method",
             "name": "enable",
             "params": [
                 {
-                    "name": "bool",
+                    "name": "flag",
                     "description": "The flag to enable or not.",
                     "type": "Boolean"
                 }
@@ -6765,7 +7150,49 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 172,
+            "line": 471,
+            "description": "Set shape off properties.",
+            "itemtype": "method",
+            "name": "setShapeOff",
+            "params": [
+                {
+                    "name": "shape",
+                    "description": "The shape to set off.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.tool.Draw",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/draw.js",
+            "line": 487,
+            "description": "Get the real position from an event.",
+            "class": "dwv.tool.Draw",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/draw.js",
+            "line": 496,
+            "description": "Set shape on properties.",
+            "itemtype": "method",
+            "name": "setShapeOn",
+            "params": [
+                {
+                    "name": "shape",
+                    "description": "The shape to set on.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.tool.Draw",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/draw.js",
+            "line": 616,
             "description": "Help for this tool.",
             "itemtype": "method",
             "name": "getHelp",
@@ -6779,7 +7206,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 192,
+            "line": 638,
             "description": "Set the line color of the drawing.",
             "itemtype": "method",
             "name": "setLineColour",
@@ -6796,7 +7223,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 203,
+            "line": 649,
             "description": "Set the shape name of the drawing.",
             "itemtype": "method",
             "name": "setShapeName",
@@ -6813,7 +7240,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 218,
+            "line": 664,
             "description": "Check if the shape is in the shape list.",
             "itemtype": "method",
             "name": "hasShape",
@@ -6830,13 +7257,317 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 227,
+            "line": 673,
             "description": "Initialise the tool.",
             "itemtype": "method",
             "name": "init",
             "class": "dwv.tool.Draw",
             "module": "tool",
             "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/editor.js",
+            "line": 17,
+            "description": "Edited shape.",
+            "itemtype": "property",
+            "name": "shape",
+            "access": "private",
+            "tagname": "",
+            "type": "Object",
+            "class": "dwv.tool.ShapeEditor",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/editor.js",
+            "line": 24,
+            "description": "Active flag.",
+            "itemtype": "property",
+            "name": "isActive",
+            "access": "private",
+            "tagname": "",
+            "type": "Boolean",
+            "class": "dwv.tool.ShapeEditor",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/editor.js",
+            "line": 31,
+            "description": "Update function used by anchors to update the shape.",
+            "itemtype": "property",
+            "name": "updateFunction",
+            "access": "private",
+            "tagname": "",
+            "type": "Object",
+            "class": "dwv.tool.ShapeEditor",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/editor.js",
+            "line": 39,
+            "description": "Set the shape to edit.",
+            "itemtype": "method",
+            "name": "setShape",
+            "params": [
+                {
+                    "name": "inshape",
+                    "description": "The shape to edit.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.tool.ShapeEditor",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/editor.js",
+            "line": 53,
+            "description": "Get the edited shape.",
+            "itemtype": "method",
+            "name": "getShape",
+            "return": {
+                "description": "The edited shape.",
+                "type": "Object"
+            },
+            "class": "dwv.tool.ShapeEditor",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/editor.js",
+            "line": 62,
+            "description": "Get the active flag.",
+            "itemtype": "method",
+            "name": "isActive",
+            "return": {
+                "description": "The active flag.",
+                "type": "Boolean"
+            },
+            "class": "dwv.tool.ShapeEditor",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/editor.js",
+            "line": 71,
+            "description": "Enable the editor. Redraws the layer.",
+            "itemtype": "method",
+            "name": "enable",
+            "class": "dwv.tool.ShapeEditor",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/editor.js",
+            "line": 85,
+            "description": "Disable the editor. Redraws the layer.",
+            "itemtype": "method",
+            "name": "disable",
+            "class": "dwv.tool.ShapeEditor",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/editor.js",
+            "line": 99,
+            "description": "Reset the anchors.",
+            "itemtype": "method",
+            "name": "resetAnchors",
+            "class": "dwv.tool.ShapeEditor",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/editor.js",
+            "line": 112,
+            "description": "Apply a function on all anchors.",
+            "params": [
+                {
+                    "name": "func",
+                    "description": "A f(shape) function.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.tool.ShapeEditor",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/editor.js",
+            "line": 123,
+            "description": "Set anchors visibility.",
+            "itemtype": "method",
+            "name": "setAnchorsVisible",
+            "params": [
+                {
+                    "name": "flag",
+                    "description": "The visible flag.",
+                    "type": "Boolean"
+                }
+            ],
+            "class": "dwv.tool.ShapeEditor",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/editor.js",
+            "line": 134,
+            "description": "Set anchors active.",
+            "itemtype": "method",
+            "name": "setAnchorsActive",
+            "params": [
+                {
+                    "name": "flag",
+                    "description": "The active (on/off) flag.",
+                    "type": "Boolean"
+                }
+            ],
+            "class": "dwv.tool.ShapeEditor",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/editor.js",
+            "line": 154,
+            "description": "Remove anchors.",
+            "itemtype": "method",
+            "name": "removeAnchors",
+            "class": "dwv.tool.ShapeEditor",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/editor.js",
+            "line": 164,
+            "description": "Add the shape anchors.",
+            "itemtype": "method",
+            "name": "addAnchors",
+            "class": "dwv.tool.ShapeEditor",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/editor.js",
+            "line": 224,
+            "description": "Create shape editor controls, i.e. the anchors.",
+            "itemtype": "method",
+            "name": "addAnchor",
+            "params": [
+                {
+                    "name": "group",
+                    "description": "The group associated with this anchor.",
+                    "type": "Object"
+                },
+                {
+                    "name": "x",
+                    "description": "The X position of the anchor.",
+                    "type": "Number"
+                },
+                {
+                    "name": "y",
+                    "description": "The Y position of the anchor.",
+                    "type": "Number"
+                },
+                {
+                    "name": "id",
+                    "description": "The id of the anchor.",
+                    "type": "Number"
+                }
+            ],
+            "class": "dwv.tool.ShapeEditor",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/editor.js",
+            "line": 256,
+            "description": "Get a simple clone of the input anchor.",
+            "params": [
+                {
+                    "name": "anchor",
+                    "description": "The anchor to clone.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.tool.ShapeEditor",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/editor.js",
+            "line": 283,
+            "description": "Set the anchor on listeners.",
+            "params": [
+                {
+                    "name": "anchor",
+                    "description": "The anchor to set on.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.tool.ShapeEditor",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/editor.js",
+            "line": 357,
+            "description": "Set the anchor off listeners.",
+            "params": [
+                {
+                    "name": "anchor",
+                    "description": "The anchor to set off.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.tool.ShapeEditor",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/ellipse.js",
+            "line": 9,
+            "description": "Create an ellipse shape to be displayed.",
+            "itemtype": "method",
+            "name": "EllipseCreator",
+            "static": 1,
+            "params": [
+                {
+                    "name": "points",
+                    "description": "The points from which to extract the ellipse.",
+                    "type": "Array"
+                },
+                {
+                    "name": "style",
+                    "description": "The drawing style.",
+                    "type": "Style"
+                }
+            ],
+            "class": "dwv.tool.Filter",
+            "module": "tool"
+        },
+        {
+            "file": "src/tools/ellipse.js",
+            "line": 36,
+            "description": "Update an ellipse shape.",
+            "itemtype": "method",
+            "name": "UpdateEllipse",
+            "static": 1,
+            "params": [
+                {
+                    "name": "ellipse",
+                    "description": "The ellipse shape to update.",
+                    "type": "Object"
+                },
+                {
+                    "name": "anchor",
+                    "description": "The active anchor.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.tool.Filter",
+            "module": "tool"
         },
         {
             "file": "src/tools/filter.js",
@@ -6862,7 +7593,18 @@
         },
         {
             "file": "src/tools/filter.js",
-            "line": 33,
+            "line": 29,
+            "description": "Display Flag.",
+            "itemtype": "property",
+            "name": "displayed",
+            "type": "Boolean",
+            "class": "dwv.tool.Filter",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/filter.js",
+            "line": 37,
             "description": "Help for this tool.",
             "itemtype": "method",
             "name": "getHelp",
@@ -6876,7 +7618,7 @@
         },
         {
             "file": "src/tools/filter.js",
-            "line": 49,
+            "line": 53,
             "description": "Enable the filter.",
             "itemtype": "method",
             "name": "enable",
@@ -6893,7 +7635,7 @@
         },
         {
             "file": "src/tools/filter.js",
-            "line": 62,
+            "line": 66,
             "description": "Get the selected filter.",
             "itemtype": "method",
             "name": "getSelectedFilter",
@@ -6907,7 +7649,7 @@
         },
         {
             "file": "src/tools/filter.js",
-            "line": 71,
+            "line": 75,
             "description": "Set the selected filter.",
             "itemtype": "method",
             "name": "setSelectedFilter",
@@ -6921,7 +7663,7 @@
         },
         {
             "file": "src/tools/filter.js",
-            "line": 96,
+            "line": 100,
             "description": "Check if a filter is in the filter list.",
             "itemtype": "method",
             "name": "hasFilter",
@@ -6942,7 +7684,7 @@
         },
         {
             "file": "src/tools/filter.js",
-            "line": 106,
+            "line": 110,
             "description": "Initialise the filter.",
             "itemtype": "method",
             "name": "init",
@@ -6952,7 +7694,7 @@
         },
         {
             "file": "src/tools/filter.js",
-            "line": 126,
+            "line": 130,
             "description": "Handle keydown event.",
             "itemtype": "method",
             "name": "keydown",
@@ -6969,7 +7711,7 @@
         },
         {
             "file": "src/tools/filter.js",
-            "line": 147,
+            "line": 151,
             "description": "Enable the filter.",
             "itemtype": "method",
             "name": "enable",
@@ -6986,7 +7728,7 @@
         },
         {
             "file": "src/tools/filter.js",
-            "line": 163,
+            "line": 167,
             "description": "Run the filter.",
             "itemtype": "method",
             "name": "run",
@@ -7003,7 +7745,7 @@
         },
         {
             "file": "src/tools/filter.js",
-            "line": 188,
+            "line": 192,
             "description": "Enable the filter.",
             "itemtype": "method",
             "name": "enable",
@@ -7020,7 +7762,7 @@
         },
         {
             "file": "src/tools/filter.js",
-            "line": 203,
+            "line": 207,
             "description": "Run the filter.",
             "itemtype": "method",
             "name": "run",
@@ -7037,7 +7779,7 @@
         },
         {
             "file": "src/tools/filter.js",
-            "line": 226,
+            "line": 230,
             "description": "Enable the filter.",
             "itemtype": "method",
             "name": "enable",
@@ -7054,7 +7796,7 @@
         },
         {
             "file": "src/tools/filter.js",
-            "line": 241,
+            "line": 245,
             "description": "Run the filter.",
             "itemtype": "method",
             "name": "run",
@@ -7071,20 +7813,7 @@
         },
         {
             "file": "src/tools/filter.js",
-            "line": 265,
-            "description": "Command name.",
-            "itemtype": "property",
-            "name": "name",
-            "access": "private",
-            "tagname": "",
-            "type": "String",
-            "class": "dwv.tool.RunFilterCommand",
-            "module": "tool",
-            "namespace": "dwv.tool"
-        },
-        {
-            "file": "src/tools/filter.js",
-            "line": 272,
+            "line": 269,
             "description": "Get the command name.",
             "itemtype": "method",
             "name": "getName",
@@ -7098,17 +7827,10 @@
         },
         {
             "file": "src/tools/filter.js",
-            "line": 278,
-            "description": "Set the command name.",
+            "line": 276,
+            "description": "Execute the command.",
             "itemtype": "method",
-            "name": "setName",
-            "params": [
-                {
-                    "name": "str",
-                    "description": "The command name.",
-                    "type": "String"
-                }
-            ],
+            "name": "execute",
             "class": "dwv.tool.RunFilterCommand",
             "module": "tool",
             "namespace": "dwv.tool"
@@ -7116,9 +7838,9 @@
         {
             "file": "src/tools/filter.js",
             "line": 285,
-            "description": "Execute the command.",
+            "description": "Undo the command.",
             "itemtype": "method",
-            "name": "execute",
+            "name": "undo",
             "class": "dwv.tool.RunFilterCommand",
             "module": "tool",
             "namespace": "dwv.tool"
@@ -7212,7 +7934,7 @@
         },
         {
             "file": "src/tools/info.js",
-            "line": 173,
+            "line": 178,
             "description": "Create the plot info.",
             "itemtype": "method",
             "name": "createPlot",
@@ -7223,7 +7945,7 @@
         },
         {
             "file": "src/tools/info.js",
-            "line": 188,
+            "line": 193,
             "description": "Update the plot markings.",
             "itemtype": "method",
             "name": "updatePlotMarkings",
@@ -7241,100 +7963,51 @@
         },
         {
             "file": "src/tools/line.js",
-            "line": 19,
-            "description": "Line object.",
-            "itemtype": "property",
-            "name": "line",
-            "access": "private",
-            "tagname": "",
-            "type": "Line",
-            "class": "dwv.tool.DrawLineCommand",
-            "module": "tool",
-            "namespace": "dwv.tool"
-        },
-        {
-            "file": "src/tools/line.js",
-            "line": 27,
-            "description": "Line color.",
-            "itemtype": "property",
-            "name": "lineColor",
-            "access": "private",
-            "tagname": "",
-            "type": "String",
-            "class": "dwv.tool.DrawLineCommand",
-            "module": "tool",
-            "namespace": "dwv.tool"
-        },
-        {
-            "file": "src/tools/line.js",
-            "line": 34,
-            "description": "HTML context.",
-            "itemtype": "property",
-            "name": "context",
-            "access": "private",
-            "tagname": "",
-            "type": "Object",
-            "class": "dwv.tool.DrawLineCommand",
-            "module": "tool",
-            "namespace": "dwv.tool"
-        },
-        {
-            "file": "src/tools/line.js",
-            "line": 42,
-            "description": "Command name.",
-            "itemtype": "property",
-            "name": "name",
-            "access": "private",
-            "tagname": "",
-            "type": "String",
-            "class": "dwv.tool.DrawLineCommand",
-            "module": "tool",
-            "namespace": "dwv.tool"
-        },
-        {
-            "file": "src/tools/line.js",
-            "line": 49,
-            "description": "Get the command name.",
+            "line": 9,
+            "description": "Create a line shape to be displayed.",
             "itemtype": "method",
-            "name": "getName",
-            "return": {
-                "description": "The command name.",
-                "type": "String"
-            },
-            "class": "dwv.tool.DrawLineCommand",
-            "module": "tool",
-            "namespace": "dwv.tool"
-        },
-        {
-            "file": "src/tools/line.js",
-            "line": 55,
-            "description": "Set the command name.",
-            "itemtype": "method",
-            "name": "setName",
+            "name": "LineCreator",
+            "static": 1,
             "params": [
                 {
-                    "name": "str",
-                    "description": "The command name.",
-                    "type": "String"
+                    "name": "points",
+                    "description": "The points from which to extract the line.",
+                    "type": "Array"
+                },
+                {
+                    "name": "style",
+                    "description": "The drawing style.",
+                    "type": "Style"
                 }
             ],
-            "class": "dwv.tool.DrawLineCommand",
-            "module": "tool",
-            "namespace": "dwv.tool"
+            "class": "dwv.tool.Livewire",
+            "module": "tool"
         },
         {
             "file": "src/tools/line.js",
-            "line": 62,
-            "description": "Execute the command.",
+            "line": 32,
+            "description": "Update a line shape.",
             "itemtype": "method",
-            "name": "execute",
-            "class": "dwv.tool.DrawLineCommand",
-            "module": "tool",
-            "namespace": "dwv.tool"
+            "name": "UpdateLine",
+            "static": 1,
+            "params": [
+                {
+                    "name": "line",
+                    "description": "The line shape to update.",
+                    "type": "Object"
+                },
+                {
+                    "name": "anchor",
+                    "description": "The active anchor.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.tool.Livewire",
+            "module": "tool"
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 17,
+            "line": 18,
             "description": "Closure to self: to be used by event handlers.",
             "itemtype": "property",
             "name": "self",
@@ -7347,7 +8020,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 24,
+            "line": 25,
             "description": "Interaction start flag.",
             "itemtype": "property",
             "name": "started",
@@ -7359,6 +8032,19 @@
         {
             "file": "src/tools/livewire.js",
             "line": 31,
+            "description": "Interaction just started flag.",
+            "itemtype": "property",
+            "name": "justStarted",
+            "access": "private",
+            "tagname": "",
+            "type": "Boolean",
+            "class": "dwv.tool.Livewire",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/livewire.js",
+            "line": 39,
             "description": "Draw command.",
             "itemtype": "property",
             "name": "command",
@@ -7371,7 +8057,33 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 38,
+            "line": 46,
+            "description": "Current active shape.",
+            "itemtype": "property",
+            "name": "activeShape",
+            "access": "private",
+            "tagname": "",
+            "type": "Object",
+            "class": "dwv.tool.Livewire",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/livewire.js",
+            "line": 53,
+            "description": "Current shape group.",
+            "itemtype": "property",
+            "name": "shapeGroup",
+            "access": "private",
+            "tagname": "",
+            "type": "Object",
+            "class": "dwv.tool.Livewire",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/livewire.js",
+            "line": 60,
             "description": "Drawing style.",
             "itemtype": "property",
             "name": "style",
@@ -7382,7 +8094,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 45,
+            "line": 67,
             "description": "Path storage. Paths are stored in reverse order.",
             "itemtype": "property",
             "name": "path",
@@ -7395,7 +8107,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 52,
+            "line": 74,
             "description": "Current path storage. Paths are stored in reverse order.",
             "itemtype": "property",
             "name": "currentPath",
@@ -7408,7 +8120,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 59,
+            "line": 81,
             "description": "List of parent points.",
             "itemtype": "property",
             "name": "parentPoints",
@@ -7421,7 +8133,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 66,
+            "line": 88,
             "description": "Tolerance.",
             "itemtype": "property",
             "name": "tolerance",
@@ -7434,7 +8146,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 74,
+            "line": 96,
             "description": "Clear the parent points list.",
             "itemtype": "method",
             "name": "clearParentPoints",
@@ -7446,7 +8158,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 85,
+            "line": 107,
             "description": "Clear the stored paths.",
             "itemtype": "method",
             "name": "clearPaths",
@@ -7458,7 +8170,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 95,
+            "line": 117,
             "description": "Scissor representation.",
             "itemtype": "property",
             "name": "scissors",
@@ -7471,7 +8183,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 103,
+            "line": 125,
             "description": "Handle mouse down event.",
             "itemtype": "method",
             "name": "mousedown",
@@ -7488,7 +8200,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 149,
+            "line": 171,
             "description": "Handle mouse move event.",
             "itemtype": "method",
             "name": "mousemove",
@@ -7505,7 +8217,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 211,
+            "line": 242,
             "description": "Handle mouse up event.",
             "itemtype": "method",
             "name": "mouseup",
@@ -7522,7 +8234,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 220,
+            "line": 251,
             "description": "Handle mouse out event.",
             "itemtype": "method",
             "name": "mouseout",
@@ -7539,7 +8251,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 230,
+            "line": 261,
             "description": "Handle touch start event.",
             "itemtype": "method",
             "name": "touchstart",
@@ -7556,7 +8268,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 240,
+            "line": 271,
             "description": "Handle touch move event.",
             "itemtype": "method",
             "name": "touchmove",
@@ -7573,7 +8285,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 250,
+            "line": 281,
             "description": "Handle touch end event.",
             "itemtype": "method",
             "name": "touchend",
@@ -7590,7 +8302,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 260,
+            "line": 291,
             "description": "Handle key down event.",
             "itemtype": "method",
             "name": "keydown",
@@ -7607,7 +8319,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 269,
+            "line": 300,
             "description": "Enable the tool.",
             "itemtype": "method",
             "name": "enable",
@@ -7624,7 +8336,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 280,
+            "line": 311,
             "description": "Initialise the tool.",
             "itemtype": "method",
             "name": "init",
@@ -7634,7 +8346,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 300,
+            "line": 331,
             "description": "Help for this tool.",
             "itemtype": "method",
             "name": "getHelp",
@@ -7648,7 +8360,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 318,
+            "line": 349,
             "description": "Set the line color of the drawing.",
             "itemtype": "method",
             "name": "setLineColour",
@@ -7664,270 +8376,92 @@
             "namespace": "dwv.tool"
         },
         {
-            "file": "src/tools/livewire.js",
-            "line": 339,
-            "description": "The livewire color.",
-            "itemtype": "property",
-            "name": "livewireColor",
-            "access": "private",
-            "tagname": "",
-            "type": "String",
-            "class": "dwv.tool.DrawLivewireCommand",
-            "module": "tool",
-            "namespace": "dwv.tool"
-        },
-        {
-            "file": "src/tools/livewire.js",
-            "line": 346,
-            "description": "The HTML context.",
-            "itemtype": "property",
-            "name": "context",
-            "access": "private",
-            "tagname": "",
-            "type": "Object",
-            "class": "dwv.tool.DrawLivewireCommand",
-            "module": "tool",
-            "namespace": "dwv.tool"
-        },
-        {
-            "file": "src/tools/livewire.js",
-            "line": 354,
-            "description": "Command name.",
-            "itemtype": "property",
-            "name": "name",
-            "access": "private",
-            "tagname": "",
-            "type": "String",
-            "class": "dwv.tool.DrawLivewireCommand",
-            "module": "tool",
-            "namespace": "dwv.tool"
-        },
-        {
-            "file": "src/tools/livewire.js",
-            "line": 361,
-            "description": "Get the command name.",
+            "file": "src/tools/rectangle.js",
+            "line": 9,
+            "description": "Create a rectangle shape to be displayed.",
             "itemtype": "method",
-            "name": "getName",
-            "return": {
-                "description": "The command name.",
-                "type": "String"
-            },
-            "class": "dwv.tool.DrawLivewireCommand",
-            "module": "tool",
-            "namespace": "dwv.tool"
-        },
-        {
-            "file": "src/tools/livewire.js",
-            "line": 367,
-            "description": "Set the command name.",
-            "itemtype": "method",
-            "name": "setName",
+            "name": "RectangleCreator",
+            "static": 1,
             "params": [
                 {
-                    "name": "str",
-                    "description": "The command name.",
-                    "type": "String"
+                    "name": "points",
+                    "description": "The points from which to extract the rectangle.",
+                    "type": "Array"
+                },
+                {
+                    "name": "style",
+                    "description": "The drawing style.",
+                    "type": "Style"
                 }
             ],
-            "class": "dwv.tool.DrawLivewireCommand",
-            "module": "tool",
-            "namespace": "dwv.tool"
-        },
-        {
-            "file": "src/tools/livewire.js",
-            "line": 374,
-            "description": "Execute the command.",
-            "itemtype": "method",
-            "name": "execute",
-            "class": "dwv.tool.DrawLivewireCommand",
-            "module": "tool",
-            "namespace": "dwv.tool"
-        },
-        {
-            "file": "src/tools/rectangle.js",
-            "line": 19,
-            "description": "Rectangle object.",
-            "itemtype": "property",
-            "name": "rectangle",
-            "access": "private",
-            "tagname": "",
-            "type": "Rectangle",
-            "class": "dwv.tool.DrawRectangleCommand",
-            "module": "tool",
-            "namespace": "dwv.tool"
-        },
-        {
-            "file": "src/tools/rectangle.js",
-            "line": 27,
-            "description": "Line color.",
-            "itemtype": "property",
-            "name": "lineColor",
-            "access": "private",
-            "tagname": "",
-            "type": "String",
-            "class": "dwv.tool.DrawRectangleCommand",
-            "module": "tool",
-            "namespace": "dwv.tool"
+            "class": "dwv.tool",
+            "module": "tool"
         },
         {
             "file": "src/tools/rectangle.js",
             "line": 34,
-            "description": "HTML context.",
-            "itemtype": "property",
-            "name": "context",
-            "access": "private",
-            "tagname": "",
-            "type": "Object",
-            "class": "dwv.tool.DrawRectangleCommand",
-            "module": "tool",
-            "namespace": "dwv.tool"
-        },
-        {
-            "file": "src/tools/rectangle.js",
-            "line": 42,
-            "description": "Command name.",
-            "itemtype": "property",
-            "name": "name",
-            "access": "private",
-            "tagname": "",
-            "type": "String",
-            "class": "dwv.tool.DrawRectangleCommand",
-            "module": "tool",
-            "namespace": "dwv.tool"
-        },
-        {
-            "file": "src/tools/rectangle.js",
-            "line": 49,
-            "description": "Get the command name.",
+            "description": "Update a rectangle shape.",
             "itemtype": "method",
-            "name": "getName",
-            "return": {
-                "description": "The command name.",
-                "type": "String"
-            },
-            "class": "dwv.tool.DrawRectangleCommand",
-            "module": "tool",
-            "namespace": "dwv.tool"
-        },
-        {
-            "file": "src/tools/rectangle.js",
-            "line": 55,
-            "description": "Set the command name.",
-            "itemtype": "method",
-            "name": "setName",
+            "name": "UpdateRect",
+            "static": 1,
             "params": [
                 {
-                    "name": "str",
-                    "description": "The command name.",
-                    "type": "String"
+                    "name": "rect",
+                    "description": "The rectangle shape to update.",
+                    "type": "Object"
+                },
+                {
+                    "name": "anchor",
+                    "description": "The active anchor.",
+                    "type": "Object"
                 }
             ],
-            "class": "dwv.tool.DrawRectangleCommand",
-            "module": "tool",
-            "namespace": "dwv.tool"
+            "class": "dwv.tool",
+            "module": "tool"
         },
         {
-            "file": "src/tools/rectangle.js",
-            "line": 62,
-            "description": "Execute the command.",
+            "file": "src/tools/roi.js",
+            "line": 9,
+            "description": "Create a roi shape to be displayed.",
             "itemtype": "method",
-            "name": "execute",
-            "class": "dwv.tool.DrawRectangleCommand",
-            "module": "tool",
-            "namespace": "dwv.tool"
-        },
-        {
-            "file": "src/tools/roi.js",
-            "line": 19,
-            "description": "ROI object.",
-            "itemtype": "property",
-            "name": "roi",
-            "access": "private",
-            "tagname": "",
-            "type": "ROI",
-            "class": "dwv.tool.DrawRoiCommand",
-            "module": "tool",
-            "namespace": "dwv.tool"
-        },
-        {
-            "file": "src/tools/roi.js",
-            "line": 30,
-            "description": "Line color.",
-            "itemtype": "property",
-            "name": "lineColor",
-            "access": "private",
-            "tagname": "",
-            "type": "String",
-            "class": "dwv.tool.DrawRoiCommand",
-            "module": "tool",
-            "namespace": "dwv.tool"
-        },
-        {
-            "file": "src/tools/roi.js",
-            "line": 37,
-            "description": "HTML context.",
-            "itemtype": "property",
-            "name": "context",
-            "access": "private",
-            "tagname": "",
-            "type": "Object",
-            "class": "dwv.tool.DrawRoiCommand",
-            "module": "tool",
-            "namespace": "dwv.tool"
-        },
-        {
-            "file": "src/tools/roi.js",
-            "line": 45,
-            "description": "Command name.",
-            "itemtype": "property",
-            "name": "name",
-            "access": "private",
-            "tagname": "",
-            "type": "String",
-            "class": "dwv.tool.DrawRoiCommand",
-            "module": "tool",
-            "namespace": "dwv.tool"
-        },
-        {
-            "file": "src/tools/roi.js",
-            "line": 52,
-            "description": "Get the command name.",
-            "itemtype": "method",
-            "name": "getName",
-            "return": {
-                "description": "The command name.",
-                "type": "String"
-            },
-            "class": "dwv.tool.DrawRoiCommand",
-            "module": "tool",
-            "namespace": "dwv.tool"
-        },
-        {
-            "file": "src/tools/roi.js",
-            "line": 58,
-            "description": "Set the command name.",
-            "itemtype": "method",
-            "name": "setName",
+            "name": "RoiCreator",
+            "static": 1,
             "params": [
                 {
-                    "name": "str",
-                    "description": "The command name.",
-                    "type": "String"
+                    "name": "points",
+                    "description": "The points from which to extract the line.",
+                    "type": "Array"
+                },
+                {
+                    "name": "style",
+                    "description": "The drawing style.",
+                    "type": "Style"
                 }
             ],
-            "class": "dwv.tool.DrawRoiCommand",
-            "module": "tool",
-            "namespace": "dwv.tool"
+            "class": "dwv.tool",
+            "module": "tool"
         },
         {
             "file": "src/tools/roi.js",
-            "line": 65,
-            "description": "Execute the command.",
+            "line": 59,
+            "description": "Update a roi shape.",
             "itemtype": "method",
-            "name": "execute",
-            "class": "dwv.tool.DrawRoiCommand",
-            "module": "tool",
-            "namespace": "dwv.tool"
+            "name": "UpdateRoi",
+            "static": 1,
+            "params": [
+                {
+                    "name": "line",
+                    "description": "The line shape to update.",
+                    "type": "Object"
+                },
+                {
+                    "name": "anchor",
+                    "description": "The active anchor.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.tool",
+            "module": "tool"
         },
         {
             "file": "src/tools/scroll.js",
@@ -7989,7 +8523,7 @@
         },
         {
             "file": "src/tools/scroll.js",
-            "line": 69,
+            "line": 77,
             "description": "Handle mouse up event.",
             "itemtype": "method",
             "name": "mouseup",
@@ -8006,7 +8540,7 @@
         },
         {
             "file": "src/tools/scroll.js",
-            "line": 82,
+            "line": 90,
             "description": "Handle mouse out event.",
             "itemtype": "method",
             "name": "mouseout",
@@ -8023,7 +8557,7 @@
         },
         {
             "file": "src/tools/scroll.js",
-            "line": 91,
+            "line": 99,
             "description": "Handle touch start event.",
             "itemtype": "method",
             "name": "touchstart",
@@ -8040,7 +8574,7 @@
         },
         {
             "file": "src/tools/scroll.js",
-            "line": 100,
+            "line": 108,
             "description": "Handle touch move event.",
             "itemtype": "method",
             "name": "touchmove",
@@ -8057,7 +8591,7 @@
         },
         {
             "file": "src/tools/scroll.js",
-            "line": 109,
+            "line": 117,
             "description": "Handle touch end event.",
             "itemtype": "method",
             "name": "touchend",
@@ -8074,7 +8608,7 @@
         },
         {
             "file": "src/tools/scroll.js",
-            "line": 118,
+            "line": 126,
             "description": "Handle key down event.",
             "itemtype": "method",
             "name": "keydown",
@@ -8091,7 +8625,7 @@
         },
         {
             "file": "src/tools/scroll.js",
-            "line": 127,
+            "line": 135,
             "description": "Enable the tool.",
             "itemtype": "method",
             "name": "enable",
@@ -8108,7 +8642,7 @@
         },
         {
             "file": "src/tools/scroll.js",
-            "line": 138,
+            "line": 146,
             "description": "Help for this tool.",
             "itemtype": "method",
             "name": "getHelp",
@@ -8122,7 +8656,7 @@
         },
         {
             "file": "src/tools/scroll.js",
-            "line": 157,
+            "line": 165,
             "description": "Initialise the tool.",
             "itemtype": "method",
             "name": "init",
@@ -8230,7 +8764,7 @@
         },
         {
             "file": "src/tools/undo.js",
-            "line": 17,
+            "line": 16,
             "description": "Array of commands.",
             "itemtype": "property",
             "name": "stack",
@@ -8243,7 +8777,7 @@
         },
         {
             "file": "src/tools/undo.js",
-            "line": 24,
+            "line": 23,
             "description": "Current command index.",
             "itemtype": "property",
             "name": "curCmdIndex",
@@ -8256,7 +8790,7 @@
         },
         {
             "file": "src/tools/undo.js",
-            "line": 32,
+            "line": 31,
             "description": "Add a command to the stack.",
             "itemtype": "method",
             "name": "add",
@@ -8283,7 +8817,7 @@
         },
         {
             "file": "src/tools/undo.js",
-            "line": 84,
+            "line": 67,
             "description": "Redo the last command.",
             "itemtype": "method",
             "name": "redo",
@@ -8356,7 +8890,7 @@
         },
         {
             "file": "src/tools/windowLevel.js",
-            "line": 54,
+            "line": 55,
             "description": "Update the views' colour map.",
             "itemtype": "method",
             "name": "updateColourMap",
@@ -8374,7 +8908,7 @@
         },
         {
             "file": "src/tools/windowLevel.js",
-            "line": 65,
+            "line": 66,
             "description": "Update the views' colour map.",
             "itemtype": "method",
             "name": "updateColourMap",
@@ -8391,7 +8925,7 @@
         },
         {
             "file": "src/tools/windowLevel.js",
-            "line": 100,
+            "line": 102,
             "description": "Update the window/level presets.",
             "itemtype": "method",
             "name": "updatePresets",
@@ -8408,7 +8942,7 @@
         },
         {
             "file": "src/tools/windowLevel.js",
-            "line": 159,
+            "line": 161,
             "description": "Closure to self: to be used by event handlers.",
             "itemtype": "property",
             "name": "self",
@@ -8421,7 +8955,7 @@
         },
         {
             "file": "src/tools/windowLevel.js",
-            "line": 166,
+            "line": 168,
             "description": "Interaction start flag.",
             "itemtype": "property",
             "name": "started",
@@ -8432,7 +8966,7 @@
         },
         {
             "file": "src/tools/windowLevel.js",
-            "line": 173,
+            "line": 175,
             "description": "Handle mouse down event.",
             "itemtype": "method",
             "name": "mousedown",
@@ -8449,7 +8983,7 @@
         },
         {
             "file": "src/tools/windowLevel.js",
-            "line": 188,
+            "line": 190,
             "description": "Handle mouse move event.",
             "itemtype": "method",
             "name": "mousemove",
@@ -8466,7 +9000,7 @@
         },
         {
             "file": "src/tools/windowLevel.js",
-            "line": 209,
+            "line": 213,
             "description": "Handle mouse up event.",
             "itemtype": "method",
             "name": "mouseup",
@@ -8483,7 +9017,7 @@
         },
         {
             "file": "src/tools/windowLevel.js",
-            "line": 229,
+            "line": 233,
             "description": "Handle mouse out event.",
             "itemtype": "method",
             "name": "mouseout",
@@ -8500,7 +9034,7 @@
         },
         {
             "file": "src/tools/windowLevel.js",
-            "line": 239,
+            "line": 243,
             "description": "Handle touch start event.",
             "itemtype": "method",
             "name": "touchstart",
@@ -8517,7 +9051,7 @@
         },
         {
             "file": "src/tools/windowLevel.js",
-            "line": 248,
+            "line": 252,
             "description": "Handle touch move event.",
             "itemtype": "method",
             "name": "touchmove",
@@ -8534,7 +9068,7 @@
         },
         {
             "file": "src/tools/windowLevel.js",
-            "line": 257,
+            "line": 261,
             "description": "Handle touch end event.",
             "itemtype": "method",
             "name": "touchend",
@@ -8551,7 +9085,7 @@
         },
         {
             "file": "src/tools/windowLevel.js",
-            "line": 266,
+            "line": 270,
             "description": "Handle double click event.",
             "itemtype": "method",
             "name": "dblclick",
@@ -8568,7 +9102,7 @@
         },
         {
             "file": "src/tools/windowLevel.js",
-            "line": 278,
+            "line": 282,
             "description": "Handle key down event.",
             "itemtype": "method",
             "name": "keydown",
@@ -8585,7 +9119,7 @@
         },
         {
             "file": "src/tools/windowLevel.js",
-            "line": 288,
+            "line": 292,
             "description": "Enable the tool.",
             "itemtype": "method",
             "name": "enable",
@@ -8602,7 +9136,7 @@
         },
         {
             "file": "src/tools/windowLevel.js",
-            "line": 301,
+            "line": 306,
             "description": "Initialise the tool.",
             "itemtype": "method",
             "name": "init",
@@ -8612,7 +9146,7 @@
         },
         {
             "file": "src/tools/windowLevel.js",
-            "line": 311,
+            "line": 316,
             "description": "Help for this tool.",
             "itemtype": "method",
             "name": "getHelp",
@@ -8701,7 +9235,7 @@
         },
         {
             "file": "src/tools/zoomPan.js",
-            "line": 88,
+            "line": 86,
             "description": "Handle two touch move event.",
             "itemtype": "method",
             "name": "twotouchmove",
@@ -8718,7 +9252,7 @@
         },
         {
             "file": "src/tools/zoomPan.js",
-            "line": 123,
+            "line": 128,
             "description": "Handle mouse up event.",
             "itemtype": "method",
             "name": "mouseup",
@@ -8735,7 +9269,7 @@
         },
         {
             "file": "src/tools/zoomPan.js",
-            "line": 136,
+            "line": 141,
             "description": "Handle mouse out event.",
             "itemtype": "method",
             "name": "mouseout",
@@ -8752,7 +9286,7 @@
         },
         {
             "file": "src/tools/zoomPan.js",
-            "line": 145,
+            "line": 150,
             "description": "Handle touch start event.",
             "itemtype": "method",
             "name": "touchstart",
@@ -8769,7 +9303,7 @@
         },
         {
             "file": "src/tools/zoomPan.js",
-            "line": 160,
+            "line": 165,
             "description": "Handle touch move event.",
             "itemtype": "method",
             "name": "touchmove",
@@ -8786,7 +9320,7 @@
         },
         {
             "file": "src/tools/zoomPan.js",
-            "line": 175,
+            "line": 180,
             "description": "Handle touch end event.",
             "itemtype": "method",
             "name": "touchend",
@@ -8803,7 +9337,7 @@
         },
         {
             "file": "src/tools/zoomPan.js",
-            "line": 184,
+            "line": 189,
             "description": "Handle mouse scroll event (fired by Firefox).",
             "itemtype": "method",
             "name": "DOMMouseScroll",
@@ -8820,7 +9354,7 @@
         },
         {
             "file": "src/tools/zoomPan.js",
-            "line": 199,
+            "line": 200,
             "description": "Handle mouse wheel event.",
             "itemtype": "method",
             "name": "mousewheel",
@@ -8837,7 +9371,7 @@
         },
         {
             "file": "src/tools/zoomPan.js",
-            "line": 214,
+            "line": 211,
             "description": "Handle key down event.",
             "itemtype": "method",
             "name": "keydown",
@@ -8854,7 +9388,7 @@
         },
         {
             "file": "src/tools/zoomPan.js",
-            "line": 223,
+            "line": 220,
             "description": "Enable the tool.",
             "itemtype": "method",
             "name": "enable",
@@ -8871,7 +9405,7 @@
         },
         {
             "file": "src/tools/zoomPan.js",
-            "line": 232,
+            "line": 229,
             "description": "Apply the zoom to the layers.",
             "itemtype": "method",
             "name": "zoomLayers",
@@ -8898,7 +9432,7 @@
         },
         {
             "file": "src/tools/zoomPan.js",
-            "line": 247,
+            "line": 261,
             "description": "Apply a translation to the layers.",
             "itemtype": "method",
             "name": "translateLayers",
@@ -8920,7 +9454,7 @@
         },
         {
             "file": "src/tools/zoomPan.js",
-            "line": 263,
+            "line": 290,
             "description": "Help for this tool.",
             "itemtype": "method",
             "name": "getHelp",
@@ -8934,7 +9468,7 @@
         },
         {
             "file": "src/tools/zoomPan.js",
-            "line": 284,
+            "line": 311,
             "description": "Initialise the tool.",
             "itemtype": "method",
             "name": "init",
@@ -9010,7 +9544,7 @@
         },
         {
             "file": "src/utils/string.js",
-            "line": 69,
+            "line": 71,
             "description": "Split key/value string:\n key0=val00&key0=val01&key1=val10 returns \n  { key0 : [val00, val01], key1 : val1 }",
             "itemtype": "method",
             "name": "splitKeyValueString",
@@ -9032,7 +9566,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 40,
+            "line": 47,
             "description": "Get the version of the application.",
             "itemtype": "method",
             "name": "getVersion",
@@ -9046,7 +9580,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 47,
+            "line": 54,
             "description": "Get the image.",
             "itemtype": "method",
             "name": "getImage",
@@ -9060,7 +9594,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 53,
+            "line": 60,
             "description": "Get the view.",
             "itemtype": "method",
             "name": "getView",
@@ -9074,7 +9608,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 60,
+            "line": 67,
             "description": "Set the view.",
             "itemtype": "method",
             "name": "setImage",
@@ -9091,7 +9625,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 71,
+            "line": 78,
             "description": "Restore the original image.",
             "itemtype": "method",
             "name": "restoreOriginalImage",
@@ -9101,7 +9635,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 81,
+            "line": 88,
             "description": "Get the image data array.",
             "itemtype": "method",
             "name": "getImageData",
@@ -9115,7 +9649,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 88,
+            "line": 95,
             "description": "Get the tool box.",
             "itemtype": "method",
             "name": "getToolBox",
@@ -9129,7 +9663,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 95,
+            "line": 102,
             "description": "Get the image layer.",
             "itemtype": "method",
             "name": "getImageLayer",
@@ -9143,7 +9677,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 101,
+            "line": 108,
             "description": "Get the draw layer.",
             "itemtype": "method",
             "name": "getDrawLayer",
@@ -9157,12 +9691,12 @@
         },
         {
             "file": "src/application.js",
-            "line": 107,
-            "description": "Get the temporary layer.",
+            "line": 114,
+            "description": "Get the draw stage.",
             "itemtype": "method",
-            "name": "getTempLayer",
+            "name": "getDrawStage",
             "return": {
-                "description": "The temporary layer.",
+                "description": "The draw layer.",
                 "type": "Object"
             },
             "class": "dwv.App",
@@ -9171,7 +9705,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 114,
+            "line": 121,
             "description": "Get the undo stack.",
             "itemtype": "method",
             "name": "getUndoStack",
@@ -9185,7 +9719,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 121,
+            "line": 128,
             "description": "Initialise the HTML for the application.",
             "itemtype": "method",
             "name": "init",
@@ -9195,7 +9729,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 140,
+            "line": 147,
             "description": "Reset the application.",
             "itemtype": "method",
             "name": "reset",
@@ -9205,7 +9739,17 @@
         },
         {
             "file": "src/application.js",
-            "line": 151,
+            "line": 159,
+            "description": "Reset the layout of the application.",
+            "itemtype": "method",
+            "name": "resetLayout",
+            "class": "dwv.App",
+            "module": "utils",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/application.js",
+            "line": 175,
             "description": "Handle key down event.\n- CRTL-Z: undo\n- CRTL-Y: redo\nDefault behavior. Usually used in tools.",
             "itemtype": "method",
             "name": "handleKeyDown",
@@ -9222,7 +9766,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 171,
+            "line": 195,
             "description": "Handle change files event.",
             "itemtype": "method",
             "name": "onChangeFiles",
@@ -9239,7 +9783,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 181,
+            "line": 205,
             "description": "Load a list of files.",
             "itemtype": "method",
             "name": "loadFiles",
@@ -9256,7 +9800,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 201,
+            "line": 227,
             "description": "Handle change url event.",
             "itemtype": "method",
             "name": "onChangeURL",
@@ -9273,7 +9817,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 211,
+            "line": 237,
             "description": "Load a list of URLs.",
             "itemtype": "method",
             "name": "loadURL",
@@ -9290,7 +9834,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 231,
+            "line": 259,
             "description": "Generate the image data and draw it.",
             "itemtype": "method",
             "name": "generateAndDrawImage",
@@ -9300,7 +9844,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 245,
+            "line": 273,
             "description": "Resize the display window. To be called once the image is loaded.",
             "itemtype": "method",
             "name": "resize",
@@ -9310,7 +9854,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 258,
+            "line": 317,
             "description": "Toggle the display of the info layer.",
             "itemtype": "method",
             "name": "toggleInfoLayerDisplay",
@@ -9320,7 +9864,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 275,
+            "line": 334,
             "description": "Init the Window/Level display",
             "class": "dwv.App",
             "module": "utils",
@@ -9328,7 +9872,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 291,
+            "line": 350,
             "description": "Add image listeners.",
             "itemtype": "method",
             "name": "addImageInfoListeners",
@@ -9340,7 +9884,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 306,
+            "line": 365,
             "description": "Remove image listeners.",
             "itemtype": "method",
             "name": "removeImageInfoListeners",
@@ -9352,7 +9896,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 321,
+            "line": 380,
             "description": "General-purpose event handler. This function just determines the mouse \nposition relative to the canvas element. It then passes it to the current tool.",
             "itemtype": "method",
             "name": "eventHandler",
@@ -9371,7 +9915,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 395,
+            "line": 453,
             "description": "Handle an error: display it to the user.",
             "itemtype": "method",
             "name": "handleError",
@@ -9390,7 +9934,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 408,
+            "line": 474,
             "description": "Create the application layers.",
             "itemtype": "method",
             "name": "createLayers",
@@ -9414,7 +9958,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 439,
+            "line": 510,
             "description": "Create the DICOM tags table. To be called once the DICOM has been parsed.",
             "itemtype": "method",
             "name": "createTagsTable",
@@ -9433,7 +9977,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 468,
+            "line": 543,
             "description": "Post load application initialisation. To be called once the DICOM has been parsed.",
             "itemtype": "method",
             "name": "postLoadInit",
@@ -9454,63 +9998,71 @@
     "warnings": [
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/dicom/dicomParser.js:142"
+            "line": " src/dicom/dicomParser.js:149"
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/dicom/dicomParser.js:155"
+            "line": " src/dicom/dicomParser.js:162"
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/dicom/dicomParser.js:166"
+            "line": " src/dicom/dicomParser.js:173"
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/dicom/dicomParser.js:211"
+            "line": " src/dicom/dicomParser.js:212"
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/dicom/dicomParser.js:250"
+            "line": " src/dicom/dicomParser.js:252"
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/dicom/dicomParser.js:274"
+            "line": " src/dicom/dicomParser.js:276"
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/dicom/dicomParser.js:546"
+            "line": " src/dicom/dicomParser.js:551"
         },
         {
             "message": "unknown tag: input",
-            "line": " src/gui/html.js:150"
+            "line": " src/gui/html.js:152"
         },
         {
             "message": "unknown tag: warning",
-            "line": " src/gui/html.js:150"
+            "line": " src/gui/html.js:152"
+        },
+        {
+            "message": "replacing incorrect tag: returns with return",
+            "line": " src/gui/layer.js:79"
+        },
+        {
+            "message": "replacing incorrect tag: returns with return",
+            "line": " src/gui/layer.js:94"
         },
         {
             "message": "unknown tag: input",
-            "line": " src/gui/layer.js:225"
+            "line": " src/gui/layer.js:219"
         },
         {
             "message": "unknown tag: input",
-            "line": " src/gui/layer.js:225"
+            "line": " src/gui/layer.js:219"
         },
         {
             "message": "unknown tag: input",
-            "line": " src/gui/layer.js:281"
+            "line": " src/gui/layer.js:279"
         },
         {
             "message": "unknown tag: input",
-            "line": " src/gui/layer.js:319"
+            "line": " src/gui/layer.js:317"
         },
         {
             "message": "unknown tag: input",
-            "line": " src/gui/layer.js:330"
+            "line": " src/gui/layer.js:328"
         },
         {
             "message": "unknown tag: pqrqm",
-            "line": " src/image/image.js:271"
+            "line": " src/image/image.js:275"
         },
         {
             "message": "unknown tag: input",
@@ -9522,35 +10074,39 @@
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/tools/draw.js:172"
+            "line": " src/tools/draw.js:616"
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/tools/filter.js:33"
+            "line": " src/tools/filter.js:37"
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/tools/livewire.js:300"
+            "line": " src/tools/livewire.js:331"
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/tools/scroll.js:138"
+            "line": " src/tools/scroll.js:146"
         },
         {
             "message": "replacing incorrect tag: function with method",
-            "line": " src/tools/windowLevel.js:65"
+            "line": " src/tools/windowLevel.js:66"
         },
         {
             "message": "replacing incorrect tag: function with method",
-            "line": " src/tools/windowLevel.js:100"
+            "line": " src/tools/windowLevel.js:102"
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/tools/windowLevel.js:311"
+            "line": " src/tools/windowLevel.js:316"
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/tools/zoomPan.js:263"
+            "line": " src/tools/zoomPan.js:290"
+        },
+        {
+            "message": "Missing item type\nDICOM tag dictionary.",
+            "line": " src/dicom/dictionary.js:8"
         },
         {
             "message": "Missing item type\nLookup tables for image color display.",
@@ -9562,15 +10118,35 @@
         },
         {
             "message": "Missing item type",
-            "line": " src/math/scissors.js:67"
+            "line": " src/math/scissors.js:68"
         },
         {
             "message": "Missing item type",
-            "line": " src/math/scissors.js:107"
+            "line": " src/math/scissors.js:108"
+        },
+        {
+            "message": "Missing item type\nGet the real position from an event.",
+            "line": " src/tools/draw.js:487"
+        },
+        {
+            "message": "Missing item type\nApply a function on all anchors.",
+            "line": " src/tools/editor.js:112"
+        },
+        {
+            "message": "Missing item type\nGet a simple clone of the input anchor.",
+            "line": " src/tools/editor.js:256"
+        },
+        {
+            "message": "Missing item type\nSet the anchor on listeners.",
+            "line": " src/tools/editor.js:283"
+        },
+        {
+            "message": "Missing item type\nSet the anchor off listeners.",
+            "line": " src/tools/editor.js:357"
         },
         {
             "message": "Missing item type\nInit the Window/Level display",
-            "line": " src/application.js:275"
+            "line": " src/application.js:334"
         }
     ]
 }

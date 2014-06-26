@@ -19,7 +19,7 @@
             
         </div>
         <div class="yui3-u-1-4 version">
-            <em>API Docs for: 0.6.0</em>
+            <em>API Docs for: 0.7.0</em>
         </div>
     </div>
     <div id="bd" class="yui3-g">
@@ -48,8 +48,6 @@
                 <li><a href="../classes/dwv.dicom.DataReader.html">dwv.dicom.DataReader</a></li>
             
                 <li><a href="../classes/dwv.dicom.DicomParser.html">dwv.dicom.DicomParser</a></li>
-            
-                <li><a href="../classes/dwv.dicom.Dictionary.html">dwv.dicom.Dictionary</a></li>
             
                 <li><a href="../classes/dwv.gui.html">dwv.gui</a></li>
             
@@ -89,6 +87,8 @@
             
                 <li><a href="../classes/dwv.math.Circle.html">dwv.math.Circle</a></li>
             
+                <li><a href="../classes/dwv.math.Ellipse.html">dwv.math.Ellipse</a></li>
+            
                 <li><a href="../classes/dwv.math.FastPoint2D.html">dwv.math.FastPoint2D</a></li>
             
                 <li><a href="../classes/dwv.math.Line.html">dwv.math.Line</a></li>
@@ -105,17 +105,13 @@
             
                 <li><a href="../classes/dwv.tool.html">dwv.tool</a></li>
             
+                <li><a href="../classes/dwv.tool.ChangeShapeCommand.html">dwv.tool.ChangeShapeCommand</a></li>
+            
+                <li><a href="../classes/dwv.tool.DeleteShapeCommand.html">dwv.tool.DeleteShapeCommand</a></li>
+            
                 <li><a href="../classes/dwv.tool.Draw.html">dwv.tool.Draw</a></li>
             
-                <li><a href="../classes/dwv.tool.DrawCircleCommand.html">dwv.tool.DrawCircleCommand</a></li>
-            
-                <li><a href="../classes/dwv.tool.DrawLineCommand.html">dwv.tool.DrawLineCommand</a></li>
-            
-                <li><a href="../classes/dwv.tool.DrawLivewireCommand.html">dwv.tool.DrawLivewireCommand</a></li>
-            
-                <li><a href="../classes/dwv.tool.DrawRectangleCommand.html">dwv.tool.DrawRectangleCommand</a></li>
-            
-                <li><a href="../classes/dwv.tool.DrawRoiCommand.html">dwv.tool.DrawRoiCommand</a></li>
+                <li><a href="../classes/dwv.tool.DrawShapeCommand.html">dwv.tool.DrawShapeCommand</a></li>
             
                 <li><a href="../classes/dwv.tool.Filter.html">dwv.tool.Filter</a></li>
             
@@ -125,9 +121,13 @@
             
                 <li><a href="../classes/dwv.tool.Livewire.html">dwv.tool.Livewire</a></li>
             
+                <li><a href="../classes/dwv.tool.MoveShapeCommand.html">dwv.tool.MoveShapeCommand</a></li>
+            
                 <li><a href="../classes/dwv.tool.RunFilterCommand.html">dwv.tool.RunFilterCommand</a></li>
             
                 <li><a href="../classes/dwv.tool.Scroll.html">dwv.tool.Scroll</a></li>
+            
+                <li><a href="../classes/dwv.tool.ShapeEditor.html">dwv.tool.ShapeEditor</a></li>
             
                 <li><a href="../classes/dwv.tool.ToolBox.html">dwv.tool.ToolBox</a></li>
             
@@ -452,6 +452,13 @@ Need to set the window lookup table once created
                             </li>
                         
                             <li class="index-item method">
+                                <a href="#method_goFirstSlice">goFirstSlice</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
                                 <a href="#method_incrementSliceNb">incrementSliceNb</a>
 
                                 
@@ -651,7 +658,7 @@ Warning: uses the latest set rescale LUT or the default linear one.</a>
             
         
         
-        <a href="../files/src_image_view.js.html#l354"><code>src&#x2F;image&#x2F;view.js:354</code></a>
+        <a href="../files/src_image_view.js.html#l372"><code>src&#x2F;image&#x2F;view.js:372</code></a>
         
         </p>
 
@@ -750,7 +757,7 @@ Warning: uses the latest set rescale LUT or the default linear one.</a>
             
         
         
-        <a href="../files/src_image_view.js.html#l255"><code>src&#x2F;image&#x2F;view.js:255</code></a>
+        <a href="../files/src_image_view.js.html#l272"><code>src&#x2F;image&#x2F;view.js:272</code></a>
         
         </p>
 
@@ -823,7 +830,7 @@ Warning: uses the latest set rescale LUT or the default linear one.</a>
             
         
         
-        <a href="../files/src_image_view.js.html#l242"><code>src&#x2F;image&#x2F;view.js:242</code></a>
+        <a href="../files/src_image_view.js.html#l258"><code>src&#x2F;image&#x2F;view.js:258</code></a>
         
         </p>
 
@@ -902,7 +909,7 @@ Warning: uses the latest set rescale LUT or the default linear one.</a>
             
         
         
-        <a href="../files/src_image_view.js.html#l384"><code>src&#x2F;image&#x2F;view.js:384</code></a>
+        <a href="../files/src_image_view.js.html#l407"><code>src&#x2F;image&#x2F;view.js:407</code></a>
         
         </p>
 
@@ -997,7 +1004,7 @@ Warning: uses the latest set rescale LUT or the default linear one.</a>
             
         
         
-        <a href="../files/src_image_view.js.html#l269"><code>src&#x2F;image&#x2F;view.js:269</code></a>
+        <a href="../files/src_image_view.js.html#l286"><code>src&#x2F;image&#x2F;view.js:286</code></a>
         
         </p>
 
@@ -1169,7 +1176,7 @@ Warning: uses the latest set rescale LUT or the default linear one.</a>
             
         
         
-        <a href="../files/src_image_view.js.html#l144"><code>src&#x2F;image&#x2F;view.js:144</code></a>
+        <a href="../files/src_image_view.js.html#l145"><code>src&#x2F;image&#x2F;view.js:145</code></a>
         
         </p>
 
@@ -1315,7 +1322,7 @@ Warning: uses the latest set rescale LUT or the default linear one.</a>
             
         
         
-        <a href="../files/src_image_view.js.html#l185"><code>src&#x2F;image&#x2F;view.js:185</code></a>
+        <a href="../files/src_image_view.js.html#l188"><code>src&#x2F;image&#x2F;view.js:188</code></a>
         
         </p>
 
@@ -1571,6 +1578,79 @@ Warning: uses the latest set rescale LUT or the default linear one.</a>
 </div>
 
                 
+                    <div id="method_goFirstSlice" class="method item">
+    <h3 class="name"><code>goFirstSlice</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+        <span class="returns-inline">
+            <span class="type">Boolean</span>
+        </span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_image_view.js.html#l231"><code>src&#x2F;image&#x2F;view.js:231</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Go to first slice .</p>
+
+    </div>
+
+    
+
+    
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                
+                    
+                        <span class="type">Boolean</span>:
+                    
+                    <p>False if not in bounds.</p>
+
+                
+            </div>
+        </div>
+    
+
+    
+</div>
+
+                
                     <div id="method_incrementSliceNb" class="method item">
     <h3 class="name"><code>incrementSliceNb</code></h3>
 
@@ -1607,7 +1687,7 @@ Warning: uses the latest set rescale LUT or the default linear one.</a>
             
         
         
-        <a href="../files/src_image_view.js.html#l229"><code>src&#x2F;image&#x2F;view.js:229</code></a>
+        <a href="../files/src_image_view.js.html#l244"><code>src&#x2F;image&#x2F;view.js:244</code></a>
         
         </p>
 
@@ -1680,7 +1760,7 @@ Warning: uses the latest set rescale LUT or the default linear one.</a>
             
         
         
-        <a href="../files/src_image_view.js.html#l137"><code>src&#x2F;image&#x2F;view.js:137</code></a>
+        <a href="../files/src_image_view.js.html#l138"><code>src&#x2F;image&#x2F;view.js:138</code></a>
         
         </p>
 
@@ -1765,7 +1845,7 @@ Warning: uses the latest set rescale LUT or the default linear one.</a>
             
         
         
-        <a href="../files/src_image_view.js.html#l367"><code>src&#x2F;image&#x2F;view.js:367</code></a>
+        <a href="../files/src_image_view.js.html#l387"><code>src&#x2F;image&#x2F;view.js:387</code></a>
         
         </p>
 
@@ -1959,7 +2039,7 @@ Warning: uses the latest set rescale LUT or the default linear one.</a>
             
         
         
-        <a href="../files/src_image_view.js.html#l150"><code>src&#x2F;image&#x2F;view.js:150</code></a>
+        <a href="../files/src_image_view.js.html#l151"><code>src&#x2F;image&#x2F;view.js:151</code></a>
         
         </p>
 
@@ -2137,7 +2217,7 @@ Warning: uses the latest set rescale LUT or the default linear one.</a>
             
         
         
-        <a href="../files/src_image_view.js.html#l191"><code>src&#x2F;image&#x2F;view.js:191</code></a>
+        <a href="../files/src_image_view.js.html#l194"><code>src&#x2F;image&#x2F;view.js:194</code></a>
         
         </p>
 
@@ -2321,7 +2401,7 @@ Warning: uses the latest set rescale LUT or the default linear one.</a>
             
         
         
-        <a href="../files/src_image_view.js.html#l199"><code>src&#x2F;image&#x2F;view.js:199</code></a>
+        <a href="../files/src_image_view.js.html#l202"><code>src&#x2F;image&#x2F;view.js:202</code></a>
         
         </p>
 
@@ -2419,7 +2499,7 @@ Warning: uses the latest set rescale LUT or the default linear one.</code></h3>
             
         
         
-        <a href="../files/src_image_view.js.html#l212"><code>src&#x2F;image&#x2F;view.js:212</code></a>
+        <a href="../files/src_image_view.js.html#l215"><code>src&#x2F;image&#x2F;view.js:215</code></a>
         
         </p>
 
@@ -2724,7 +2804,7 @@ Warning: uses the latest set rescale LUT or the default linear one.</code></h3>
                 
                     <div id="property_listeners" class="property item private">
     <h3 class="name"><code>listeners</code></h3>
-    <span class="type">Array</span>
+    <span class="type">Object</span>
 
     
 
@@ -2747,7 +2827,7 @@ Warning: uses the latest set rescale LUT or the default linear one.</code></h3>
             
         
         
-        <a href="../files/src_image_view.js.html#l178"><code>src&#x2F;image&#x2F;view.js:178</code></a>
+        <a href="../files/src_image_view.js.html#l181"><code>src&#x2F;image&#x2F;view.js:181</code></a>
         
         </p>
 

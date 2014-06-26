@@ -19,7 +19,7 @@
             
         </div>
         <div class="yui3-u-1-4 version">
-            <em>API Docs for: 0.6.0</em>
+            <em>API Docs for: 0.7.0</em>
         </div>
     </div>
     <div id="bd" class="yui3-g">
@@ -48,8 +48,6 @@
                 <li><a href="../classes/dwv.dicom.DataReader.html">dwv.dicom.DataReader</a></li>
             
                 <li><a href="../classes/dwv.dicom.DicomParser.html">dwv.dicom.DicomParser</a></li>
-            
-                <li><a href="../classes/dwv.dicom.Dictionary.html">dwv.dicom.Dictionary</a></li>
             
                 <li><a href="../classes/dwv.gui.html">dwv.gui</a></li>
             
@@ -89,6 +87,8 @@
             
                 <li><a href="../classes/dwv.math.Circle.html">dwv.math.Circle</a></li>
             
+                <li><a href="../classes/dwv.math.Ellipse.html">dwv.math.Ellipse</a></li>
+            
                 <li><a href="../classes/dwv.math.FastPoint2D.html">dwv.math.FastPoint2D</a></li>
             
                 <li><a href="../classes/dwv.math.Line.html">dwv.math.Line</a></li>
@@ -105,17 +105,13 @@
             
                 <li><a href="../classes/dwv.tool.html">dwv.tool</a></li>
             
+                <li><a href="../classes/dwv.tool.ChangeShapeCommand.html">dwv.tool.ChangeShapeCommand</a></li>
+            
+                <li><a href="../classes/dwv.tool.DeleteShapeCommand.html">dwv.tool.DeleteShapeCommand</a></li>
+            
                 <li><a href="../classes/dwv.tool.Draw.html">dwv.tool.Draw</a></li>
             
-                <li><a href="../classes/dwv.tool.DrawCircleCommand.html">dwv.tool.DrawCircleCommand</a></li>
-            
-                <li><a href="../classes/dwv.tool.DrawLineCommand.html">dwv.tool.DrawLineCommand</a></li>
-            
-                <li><a href="../classes/dwv.tool.DrawLivewireCommand.html">dwv.tool.DrawLivewireCommand</a></li>
-            
-                <li><a href="../classes/dwv.tool.DrawRectangleCommand.html">dwv.tool.DrawRectangleCommand</a></li>
-            
-                <li><a href="../classes/dwv.tool.DrawRoiCommand.html">dwv.tool.DrawRoiCommand</a></li>
+                <li><a href="../classes/dwv.tool.DrawShapeCommand.html">dwv.tool.DrawShapeCommand</a></li>
             
                 <li><a href="../classes/dwv.tool.Filter.html">dwv.tool.Filter</a></li>
             
@@ -125,9 +121,13 @@
             
                 <li><a href="../classes/dwv.tool.Livewire.html">dwv.tool.Livewire</a></li>
             
+                <li><a href="../classes/dwv.tool.MoveShapeCommand.html">dwv.tool.MoveShapeCommand</a></li>
+            
                 <li><a href="../classes/dwv.tool.RunFilterCommand.html">dwv.tool.RunFilterCommand</a></li>
             
                 <li><a href="../classes/dwv.tool.Scroll.html">dwv.tool.Scroll</a></li>
+            
+                <li><a href="../classes/dwv.tool.ShapeEditor.html">dwv.tool.ShapeEditor</a></li>
             
                 <li><a href="../classes/dwv.tool.ToolBox.html">dwv.tool.ToolBox</a></li>
             
@@ -283,7 +283,9 @@ dwv.image.Size.prototype.equals = function(rhs) {
 dwv.image.Size.prototype.isInBounds = function( i, j, k ) {
     if( i &lt; 0 || i &gt; this.getNumberOfColumns() - 1 ||
         j &lt; 0 || j &gt; this.getNumberOfRows() - 1 ||
-        k &lt; 0 || k &gt; this.getNumberOfSlices() - 1 ) return false;
+        k &lt; 0 || k &gt; this.getNumberOfSlices() - 1 ) {
+        return false;
+    }
     return true;
 };
 
@@ -400,7 +402,9 @@ dwv.image.Image = function(size, spacing, buffer, slicePositions)
     var originalBuffer = new Int16Array(buffer);
     
     // check slice positions.
-    if( typeof(slicePositions) === &#x27;undefined&#x27; ) slicePositions = [[0,0,0]];
+    if( typeof(slicePositions) === &#x27;undefined&#x27; ) {
+        slicePositions = [[0,0,0]];
+    }
     
     /**
      * Data range.
@@ -544,20 +548,26 @@ dwv.image.Image = function(size, spacing, buffer, slicePositions)
     this.appendSlice = function(rhs)
     {
         // check input
-        if( rhs === null )
+        if( rhs === null ) {
             throw new Error(&quot;Cannot append null slice&quot;);
-        if( rhs.getSize().getNumberOfSlices() !== 1 )
+        }
+        if( rhs.getSize().getNumberOfSlices() !== 1 ) {
             throw new Error(&quot;Cannot append more than one slice&quot;);
-        if( size.getNumberOfColumns() !== rhs.getSize().getNumberOfColumns() )
+        }
+        if( size.getNumberOfColumns() !== rhs.getSize().getNumberOfColumns() ) {
             throw new Error(&quot;Cannot append a slice with different number of columns&quot;);
-        if( size.getNumberOfRows() !== rhs.getSize().getNumberOfRows() )
+        }
+        if( size.getNumberOfRows() !== rhs.getSize().getNumberOfRows() ) {
             throw new Error(&quot;Cannot append a slice with different number of rows&quot;);
-        if( photometricInterpretation !== rhs.getPhotometricInterpretation() )
+        }
+        if( photometricInterpretation !== rhs.getPhotometricInterpretation() ) {
             throw new Error(&quot;Cannot append a slice with different photometric interpretation&quot;);
+        }
         // all meta should be equal
         for( var key in meta ) {
-            if( meta[key] !== rhs.getMeta()[key] )
+            if( meta[key] !== rhs.getMeta()[key] ) {
                 throw new Error(&quot;Cannot append a slice with different &quot;+key);
+            }
         }
         
         // find index where to append slice
@@ -584,7 +594,9 @@ dwv.image.Image = function(size, spacing, buffer, slicePositions)
         
         // calculate slice size
         var mul = 1;
-        if( photometricInterpretation === &quot;RGB&quot; ) mul = 3;
+        if( photometricInterpretation === &quot;RGB&quot; ) {
+            mul = 3;
+        }
         var sliceSize = mul * size.getSliceSize();
         
         // create the new buffer
@@ -624,7 +636,9 @@ dwv.image.Image = function(size, spacing, buffer, slicePositions)
      * @return {Object} The data range.
      */ 
     this.getDataRange = function() { 
-        if( !dataRange ) dataRange = this.calculateDataRange();
+        if( !dataRange ) {
+            dataRange = this.calculateDataRange();
+        }
         return dataRange;
     };
 
@@ -634,7 +648,9 @@ dwv.image.Image = function(size, spacing, buffer, slicePositions)
      * @return {Array} The histogram.
      */ 
     this.getHistogram = function() { 
-        if( !histogram ) histogram = this.calculateHistogram();
+        if( !histogram ) {
+            histogram = this.calculateHistogram();
+        }
         return histogram;
     };
 };
@@ -749,8 +765,9 @@ dwv.image.Image.prototype.calculateHistogram = function()
  */
 dwv.image.Image.prototype.convolute2D = function(weights)
 {
-    if(weights.length !== 9)
+    if(weights.length !== 9) {
         throw new Error(&quot;The convolution matrix does not have a length of 9; it has &quot;+weights.length);
+    }
 
     var newImage = this.clone();
     var newBuffer = newImage.getBuffer();
@@ -775,6 +792,9 @@ dwv.image.Image.prototype.convolute2D = function(weights)
         }
     }
     
+    // allow special indent for matrices
+    /*jshint indent:false */
+
     // default weight offset matrix
     var wOff = [];
     wOff[0] = (-ncols-1) * factor; wOff[1] = (-ncols) * factor; wOff[2] = (-ncols+1) * factor;
@@ -828,6 +848,9 @@ dwv.image.Image.prototype.convolute2D = function(weights)
     wOffnn[3] = wOff[3]; wOffnn[4] = wOff[4]; wOffnn[5] = wOff[4];
     wOffnn[6] = wOff[3]; wOffnn[7] = wOff[4]; wOffnn[8] = wOff[4];
     
+    // restore indent for rest of method
+    /*jshint indent:4 */
+
     // loop vars
     var pixelOffset = 0;
     var newValue = 0;
@@ -841,14 +864,30 @@ dwv.image.Image.prototype.convolute2D = function(weights)
                 for (var i=0; i&lt;ncols; i++) {
                     wOffFinal = wOff;
                     // special border cases
-                    if( i === 0 &amp;&amp; j === 0 ) wOffFinal = wOff00;
-                    else if( i === 0 &amp;&amp; j === nrows ) wOffFinal = wOff0n;
-                    else if( i === ncols &amp;&amp; j === 0 ) wOffFinal = wOffn0;
-                    else if( i === ncols &amp;&amp; j === nrows ) wOffFinal = wOffnn;
-                    else if( i === 0 &amp;&amp; j !== nrows &amp;&amp; j !== 0 ) wOffFinal = wOff0x;
-                    else if( i === ncols &amp;&amp; j !== nrows &amp;&amp; j !== 0 ) wOffFinal = wOffnx;
-                    else if( i !== 0 &amp;&amp; i !== ncols &amp;&amp; j === 0 ) wOffFinal = wOffx0;
-                    else if( i !== 0 &amp;&amp; i !== ncols &amp;&amp; j === nrows ) wOffFinal = wOffxn;
+                    if( i === 0 &amp;&amp; j === 0 ) {
+                        wOffFinal = wOff00;
+                    }
+                    else if( i === 0 &amp;&amp; j === nrows ) {
+                        wOffFinal = wOff0n;
+                    }
+                    else if( i === ncols &amp;&amp; j === 0 ) {
+                        wOffFinal = wOffn0;
+                    }
+                    else if( i === ncols &amp;&amp; j === nrows ) {
+                        wOffFinal = wOffnn;
+                    }
+                    else if( i === 0 &amp;&amp; j !== nrows &amp;&amp; j !== 0 ) {
+                        wOffFinal = wOff0x;
+                    }
+                    else if( i === ncols &amp;&amp; j !== nrows &amp;&amp; j !== 0 ) {
+                        wOffFinal = wOffnx;
+                    }
+                    else if( i !== 0 &amp;&amp; i !== ncols &amp;&amp; j === 0 ) {
+                        wOffFinal = wOffx0;
+                    }
+                    else if( i !== 0 &amp;&amp; i !== ncols &amp;&amp; j === nrows ) {
+                        wOffFinal = wOffxn;
+                    }
                         
                     // calculate the weighed sum of the source image pixels that
                     // fall under the convolution matrix

@@ -19,7 +19,7 @@
             
         </div>
         <div class="yui3-u-1-4 version">
-            <em>API Docs for: 0.6.0</em>
+            <em>API Docs for: 0.7.0</em>
         </div>
     </div>
     <div id="bd" class="yui3-g">
@@ -48,8 +48,6 @@
                 <li><a href="../classes/dwv.dicom.DataReader.html">dwv.dicom.DataReader</a></li>
             
                 <li><a href="../classes/dwv.dicom.DicomParser.html">dwv.dicom.DicomParser</a></li>
-            
-                <li><a href="../classes/dwv.dicom.Dictionary.html">dwv.dicom.Dictionary</a></li>
             
                 <li><a href="../classes/dwv.gui.html">dwv.gui</a></li>
             
@@ -89,6 +87,8 @@
             
                 <li><a href="../classes/dwv.math.Circle.html">dwv.math.Circle</a></li>
             
+                <li><a href="../classes/dwv.math.Ellipse.html">dwv.math.Ellipse</a></li>
+            
                 <li><a href="../classes/dwv.math.FastPoint2D.html">dwv.math.FastPoint2D</a></li>
             
                 <li><a href="../classes/dwv.math.Line.html">dwv.math.Line</a></li>
@@ -105,17 +105,13 @@
             
                 <li><a href="../classes/dwv.tool.html">dwv.tool</a></li>
             
+                <li><a href="../classes/dwv.tool.ChangeShapeCommand.html">dwv.tool.ChangeShapeCommand</a></li>
+            
+                <li><a href="../classes/dwv.tool.DeleteShapeCommand.html">dwv.tool.DeleteShapeCommand</a></li>
+            
                 <li><a href="../classes/dwv.tool.Draw.html">dwv.tool.Draw</a></li>
             
-                <li><a href="../classes/dwv.tool.DrawCircleCommand.html">dwv.tool.DrawCircleCommand</a></li>
-            
-                <li><a href="../classes/dwv.tool.DrawLineCommand.html">dwv.tool.DrawLineCommand</a></li>
-            
-                <li><a href="../classes/dwv.tool.DrawLivewireCommand.html">dwv.tool.DrawLivewireCommand</a></li>
-            
-                <li><a href="../classes/dwv.tool.DrawRectangleCommand.html">dwv.tool.DrawRectangleCommand</a></li>
-            
-                <li><a href="../classes/dwv.tool.DrawRoiCommand.html">dwv.tool.DrawRoiCommand</a></li>
+                <li><a href="../classes/dwv.tool.DrawShapeCommand.html">dwv.tool.DrawShapeCommand</a></li>
             
                 <li><a href="../classes/dwv.tool.Filter.html">dwv.tool.Filter</a></li>
             
@@ -125,9 +121,13 @@
             
                 <li><a href="../classes/dwv.tool.Livewire.html">dwv.tool.Livewire</a></li>
             
+                <li><a href="../classes/dwv.tool.MoveShapeCommand.html">dwv.tool.MoveShapeCommand</a></li>
+            
                 <li><a href="../classes/dwv.tool.RunFilterCommand.html">dwv.tool.RunFilterCommand</a></li>
             
                 <li><a href="../classes/dwv.tool.Scroll.html">dwv.tool.Scroll</a></li>
+            
+                <li><a href="../classes/dwv.tool.ShapeEditor.html">dwv.tool.ShapeEditor</a></li>
             
                 <li><a href="../classes/dwv.tool.ToolBox.html">dwv.tool.ToolBox</a></li>
             
@@ -358,6 +358,13 @@
                             </li>
                         
                             <li class="index-item method">
+                                <a href="#method_displayToIndex">displayToIndex</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
                                 <a href="#method_draw">draw</a>
 
                                 
@@ -386,6 +393,15 @@
                             </li>
                         
                             <li class="index-item method">
+                                <a href="#method_getEventOffset">getEventOffset</a>
+
+                                
+                                    <span class="flag static">static</span>
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
                                 <a href="#method_getName">getName</a>
 
                                 
@@ -394,6 +410,20 @@
                         
                             <li class="index-item method">
                                 <a href="#method_getOffset">getOffset</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_getOrigin">getOrigin</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_getZoom">getZoom</a>
 
                                 
                                 
@@ -428,6 +458,13 @@
                             </li>
                         
                             <li class="index-item method">
+                                <a href="#method_setHeight">setHeight</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
                                 <a href="#method_setImageData">setImageData</a>
 
                                 
@@ -456,21 +493,14 @@
                             </li>
                         
                             <li class="index-item method">
+                                <a href="#method_setWidth">setWidth</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
                                 <a href="#method_setZoom">setZoom</a>
-
-                                
-                                
-                            </li>
-                        
-                            <li class="index-item method">
-                                <a href="#method_translate">translate</a>
-
-                                
-                                
-                            </li>
-                        
-                            <li class="index-item method">
-                                <a href="#method_zoom">zoom</a>
 
                                 
                                 
@@ -485,6 +515,13 @@
                     <h3>Properties</h3>
 
                     <ul class="index-list properties">
+                        
+                            <li class="index-item property private">
+                                <a href="#property_cacheCanvas">cacheCanvas</a>
+
+                                
+                                
+                            </li>
                         
                             <li class="index-item property private">
                                 <a href="#property_canvas">canvas</a>
@@ -508,28 +545,14 @@
                             </li>
                         
                             <li class="index-item property private">
-                                <a href="#property_originX">originX</a>
+                                <a href="#property_origin">origin</a>
 
                                 
                                 
                             </li>
                         
                             <li class="index-item property private">
-                                <a href="#property_originY">originY</a>
-
-                                
-                                
-                            </li>
-                        
-                            <li class="index-item property private">
-                                <a href="#property_zoomX">zoomX</a>
-
-                                
-                                
-                            </li>
-                        
-                            <li class="index-item property private">
-                                <a href="#property_zoomY">zoomY</a>
+                                <a href="#property_zoom">zoom</a>
 
                                 
                                 
@@ -591,7 +614,7 @@
             
         
         
-        <a href="../files/src_gui_layer.js.html#l358"><code>src&#x2F;gui&#x2F;layer.js:358</code></a>
+        <a href="../files/src_gui_layer.js.html#l360"><code>src&#x2F;gui&#x2F;layer.js:360</code></a>
         
         </p>
 
@@ -670,7 +693,7 @@
             
         
         
-        <a href="../files/src_gui_layer.js.html#l270"><code>src&#x2F;gui&#x2F;layer.js:270</code></a>
+        <a href="../files/src_gui_layer.js.html#l268"><code>src&#x2F;gui&#x2F;layer.js:268</code></a>
         
         </p>
 
@@ -682,6 +705,61 @@
 
     <div class="description">
         <p>Clear the context and reset the image data.</p>
+
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_displayToIndex" class="method item">
+    <h3 class="name"><code>displayToIndex</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_gui_layer.js.html#l184"><code>src&#x2F;gui&#x2F;layer.js:184</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Transform a display position to an index.</p>
 
     </div>
 
@@ -725,7 +803,7 @@
             
         
         
-        <a href="../files/src_gui_layer.js.html#l201"><code>src&#x2F;gui&#x2F;layer.js:201</code></a>
+        <a href="../files/src_gui_layer.js.html#l193"><code>src&#x2F;gui&#x2F;layer.js:193</code></a>
         
         </p>
 
@@ -781,7 +859,7 @@ The imageData variable needs to be set</p>
             
         
         
-        <a href="../files/src_gui_layer.js.html#l261"><code>src&#x2F;gui&#x2F;layer.js:261</code></a>
+        <a href="../files/src_gui_layer.js.html#l259"><code>src&#x2F;gui&#x2F;layer.js:259</code></a>
         
         </p>
 
@@ -840,7 +918,7 @@ The imageData variable needs to be set</p>
             
         
         
-        <a href="../files/src_gui_layer.js.html#l38"><code>src&#x2F;gui&#x2F;layer.js:38</code></a>
+        <a href="../files/src_gui_layer.js.html#l45"><code>src&#x2F;gui&#x2F;layer.js:45</code></a>
         
         </p>
 
@@ -913,7 +991,7 @@ The imageData variable needs to be set</p>
             
         
         
-        <a href="../files/src_gui_layer.js.html#l44"><code>src&#x2F;gui&#x2F;layer.js:44</code></a>
+        <a href="../files/src_gui_layer.js.html#l51"><code>src&#x2F;gui&#x2F;layer.js:51</code></a>
         
         </p>
 
@@ -940,6 +1018,115 @@ The imageData variable needs to be set</p>
                         <span class="type">Object</span>:
                     
                     <p>The layer context.</p>
+
+                
+            </div>
+        </div>
+    
+
+    
+</div>
+
+                
+                    <div id="method_getEventOffset" class="method item">
+    <h3 class="name"><code>getEventOffset</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>event</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+        <span class="returns-inline">
+            <span class="type">Array</span>
+        </span>
+    
+
+    
+
+    
+
+    
+
+    
+        <span class="flag static">static</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_gui_layer.js.html#l372"><code>src&#x2F;gui&#x2F;layer.js:372</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Get the offset of an input event.</p>
+
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">event</code>
+                        <span class="type">Object</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The event to get the offset from.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                
+                    
+                        <span class="type">Array</span>:
+                    
+                    <p>The array of offsets.</p>
 
                 
             </div>
@@ -986,7 +1173,7 @@ The imageData variable needs to be set</p>
             
         
         
-        <a href="../files/src_gui_layer.js.html#l32"><code>src&#x2F;gui&#x2F;layer.js:32</code></a>
+        <a href="../files/src_gui_layer.js.html#l39"><code>src&#x2F;gui&#x2F;layer.js:39</code></a>
         
         </p>
 
@@ -1059,7 +1246,7 @@ The imageData variable needs to be set</p>
             
         
         
-        <a href="../files/src_gui_layer.js.html#l50"><code>src&#x2F;gui&#x2F;layer.js:50</code></a>
+        <a href="../files/src_gui_layer.js.html#l57"><code>src&#x2F;gui&#x2F;layer.js:57</code></a>
         
         </p>
 
@@ -1086,6 +1273,152 @@ The imageData variable needs to be set</p>
                         <span class="type">Number</span>:
                     
                     <p>The layer offset on page.</p>
+
+                
+            </div>
+        </div>
+    
+
+    
+</div>
+
+                
+                    <div id="method_getOrigin" class="method item">
+    <h3 class="name"><code>getOrigin</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+        <span class="returns-inline">
+            <span class="type">Object</span>
+        </span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_gui_layer.js.html#l79"><code>src&#x2F;gui&#x2F;layer.js:79</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Get the layer origin.</p>
+
+    </div>
+
+    
+
+    
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                
+                    
+                        <span class="type">Object</span>:
+                    
+                    <p>The layer origin as {&#39;x&#39;,&#39;y&#39;}.</p>
+
+                
+            </div>
+        </div>
+    
+
+    
+</div>
+
+                
+                    <div id="method_getZoom" class="method item">
+    <h3 class="name"><code>getZoom</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+        <span class="returns-inline">
+            <span class="type">Object</span>
+        </span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_gui_layer.js.html#l94"><code>src&#x2F;gui&#x2F;layer.js:94</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Get the layer zoom.</p>
+
+    </div>
+
+    
+
+    
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                
+                    
+                        <span class="type">Object</span>:
+                    
+                    <p>The layer zoom as {&#39;x&#39;,&#39;y&#39;}.</p>
 
                 
             </div>
@@ -1128,7 +1461,7 @@ The imageData variable needs to be set</p>
             
         
         
-        <a href="../files/src_gui_layer.js.html#l225"><code>src&#x2F;gui&#x2F;layer.js:225</code></a>
+        <a href="../files/src_gui_layer.js.html#l219"><code>src&#x2F;gui&#x2F;layer.js:219</code></a>
         
         </p>
 
@@ -1187,7 +1520,7 @@ The imageData variable needs to be set</p>
             
         
         
-        <a href="../files/src_gui_layer.js.html#l347"><code>src&#x2F;gui&#x2F;layer.js:347</code></a>
+        <a href="../files/src_gui_layer.js.html#l345"><code>src&#x2F;gui&#x2F;layer.js:345</code></a>
         
         </p>
 
@@ -1256,7 +1589,7 @@ The imageData variable needs to be set</p>
             
         
         
-        <a href="../files/src_gui_layer.js.html#l281"><code>src&#x2F;gui&#x2F;layer.js:281</code></a>
+        <a href="../files/src_gui_layer.js.html#l279"><code>src&#x2F;gui&#x2F;layer.js:279</code></a>
         
         </p>
 
@@ -1311,7 +1644,7 @@ The imageData variable needs to be set</p>
             
         
         
-        <a href="../files/src_gui_layer.js.html#l189"><code>src&#x2F;gui&#x2F;layer.js:189</code></a>
+        <a href="../files/src_gui_layer.js.html#l172"><code>src&#x2F;gui&#x2F;layer.js:172</code></a>
         
         </p>
 
@@ -1326,6 +1659,95 @@ The imageData variable needs to be set</p>
 
     </div>
 
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_setHeight" class="method item">
+    <h3 class="name"><code>setHeight</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>height</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_gui_layer.js.html#l111"><code>src&#x2F;gui&#x2F;layer.js:111</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Set the canvas height.</p>
+
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">height</code>
+                        <span class="type">Number</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The new height.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
     
 
     
@@ -1376,7 +1798,7 @@ The imageData variable needs to be set</p>
             
         
         
-        <a href="../files/src_gui_layer.js.html#l179"><code>src&#x2F;gui&#x2F;layer.js:179</code></a>
+        <a href="../files/src_gui_layer.js.html#l160"><code>src&#x2F;gui&#x2F;layer.js:160</code></a>
         
         </p>
 
@@ -1455,7 +1877,7 @@ The imageData variable needs to be set</p>
             
         
         
-        <a href="../files/src_gui_layer.js.html#l319"><code>src&#x2F;gui&#x2F;layer.js:319</code></a>
+        <a href="../files/src_gui_layer.js.html#l317"><code>src&#x2F;gui&#x2F;layer.js:317</code></a>
         
         </p>
 
@@ -1510,7 +1932,7 @@ The imageData variable needs to be set</p>
             
         
         
-        <a href="../files/src_gui_layer.js.html#l330"><code>src&#x2F;gui&#x2F;layer.js:330</code></a>
+        <a href="../files/src_gui_layer.js.html#l328"><code>src&#x2F;gui&#x2F;layer.js:328</code></a>
         
         </p>
 
@@ -1581,7 +2003,7 @@ The imageData variable needs to be set</p>
             
         
         
-        <a href="../files/src_gui_layer.js.html#l135"><code>src&#x2F;gui&#x2F;layer.js:135</code></a>
+        <a href="../files/src_gui_layer.js.html#l146"><code>src&#x2F;gui&#x2F;layer.js:146</code></a>
         
         </p>
 
@@ -1645,6 +2067,95 @@ Translation is according to the last one.</p>
 </div>
 
                 
+                    <div id="method_setWidth" class="method item">
+    <h3 class="name"><code>setWidth</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>width</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_gui_layer.js.html#l103"><code>src&#x2F;gui&#x2F;layer.js:103</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Set the canvas width.</p>
+
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">width</code>
+                        <span class="type">Number</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The new width.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+
+    
+</div>
+
+                
                     <div id="method_setZoom" class="method item">
     <h3 class="name"><code>setZoom</code></h3>
 
@@ -1654,13 +2165,13 @@ Translation is according to the last one.</p>
             
                 <li class="arg">
                     
-                        <code>stepX</code>
+                        <code>newZoomX</code>
                     
                 </li>
             
                 <li class="arg">
                     
-                        <code>stepY</code>
+                        <code>newZoomY</code>
                     
                 </li>
             
@@ -1705,7 +2216,7 @@ Translation is according to the last one.</p>
             
         
         
-        <a href="../files/src_gui_layer.js.html#l94"><code>src&#x2F;gui&#x2F;layer.js:94</code></a>
+        <a href="../files/src_gui_layer.js.html#l120"><code>src&#x2F;gui&#x2F;layer.js:120</code></a>
         
         </p>
 
@@ -1728,14 +2239,14 @@ Translation is according to the last one.</p>
             
                 <li class="param">
                     
-                        <code class="param-name">stepX</code>
+                        <code class="param-name">newZoomX</code>
                         <span class="type">Number</span>
                     
 
                     
 
                     <div class="param-description">
-                        <p>The zoom step in the X direction.</p>
+                        <p>The zoom in the X direction.</p>
 
                     </div>
 
@@ -1744,281 +2255,14 @@ Translation is according to the last one.</p>
             
                 <li class="param">
                     
-                        <code class="param-name">stepY</code>
+                        <code class="param-name">newZoomY</code>
                         <span class="type">Number</span>
                     
 
                     
 
                     <div class="param-description">
-                        <p>The zoom step in the Y direction.</p>
-
-                    </div>
-
-                    
-                </li>
-            
-                <li class="param">
-                    
-                        <code class="param-name">centerX</code>
-                        <span class="type">Number</span>
-                    
-
-                    
-
-                    <div class="param-description">
-                        <p>The zoom center in the X direction.</p>
-
-                    </div>
-
-                    
-                </li>
-            
-                <li class="param">
-                    
-                        <code class="param-name">centerY</code>
-                        <span class="type">Number</span>
-                    
-
-                    
-
-                    <div class="param-description">
-                        <p>The zoom center in the Y direction.</p>
-
-                    </div>
-
-                    
-                </li>
-            
-            </ul>
-        </div>
-    
-
-    
-
-    
-</div>
-
-                
-                    <div id="method_translate" class="method item">
-    <h3 class="name"><code>translate</code></h3>
-
-    
-        <div class="args">
-            <span class="paren">(</span><ul class="args-list inline commas">
-            
-                <li class="arg">
-                    
-                        <code>tx</code>
-                    
-                </li>
-            
-                <li class="arg">
-                    
-                        <code>ty</code>
-                    
-                </li>
-            
-            </ul><span class="paren">)</span>
-        </div>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/src_gui_layer.js.html#l164"><code>src&#x2F;gui&#x2F;layer.js:164</code></a>
-        
-        </p>
-
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        <p>Set the layer translation and apply it.
-Translation is according to the last one.</p>
-
-    </div>
-
-    
-        <div class="params">
-            <h4>Parameters:</h4>
-
-            <ul class="params-list">
-            
-                <li class="param">
-                    
-                        <code class="param-name">tx</code>
-                        <span class="type">Number</span>
-                    
-
-                    
-
-                    <div class="param-description">
-                        <p>The translation in the X direction.</p>
-
-                    </div>
-
-                    
-                </li>
-            
-                <li class="param">
-                    
-                        <code class="param-name">ty</code>
-                        <span class="type">Number</span>
-                    
-
-                    
-
-                    <div class="param-description">
-                        <p>The translation in the Y direction.</p>
-
-                    </div>
-
-                    
-                </li>
-            
-            </ul>
-        </div>
-    
-
-    
-
-    
-</div>
-
-                
-                    <div id="method_zoom" class="method item">
-    <h3 class="name"><code>zoom</code></h3>
-
-    
-        <div class="args">
-            <span class="paren">(</span><ul class="args-list inline commas">
-            
-                <li class="arg">
-                    
-                        <code>stepX</code>
-                    
-                </li>
-            
-                <li class="arg">
-                    
-                        <code>stepY</code>
-                    
-                </li>
-            
-                <li class="arg">
-                    
-                        <code>centerX</code>
-                    
-                </li>
-            
-                <li class="arg">
-                    
-                        <code>centerY</code>
-                    
-                </li>
-            
-            </ul><span class="paren">)</span>
-        </div>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/src_gui_layer.js.html#l119"><code>src&#x2F;gui&#x2F;layer.js:119</code></a>
-        
-        </p>
-
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        <p>Set the layer zoom and apply it.</p>
-
-    </div>
-
-    
-        <div class="params">
-            <h4>Parameters:</h4>
-
-            <ul class="params-list">
-            
-                <li class="param">
-                    
-                        <code class="param-name">stepX</code>
-                        <span class="type">Number</span>
-                    
-
-                    
-
-                    <div class="param-description">
-                        <p>The zoom step in the X direction.</p>
-
-                    </div>
-
-                    
-                </li>
-            
-                <li class="param">
-                    
-                        <code class="param-name">stepY</code>
-                        <span class="type">Number</span>
-                    
-
-                    
-
-                    <div class="param-description">
-                        <p>The zoom step in the Y direction.</p>
+                        <p>The zoom in the Y direction.</p>
 
                     </div>
 
@@ -2073,6 +2317,53 @@ Translation is according to the last one.</p>
         
             <div id="properties" class="api-class-tabpanel">
                 <h2 class="off-left">Properties</h2>
+
+                
+                    <div id="property_cacheCanvas" class="property item private">
+    <h3 class="name"><code>cacheCanvas</code></h3>
+    <span class="type">Object</span>
+
+    
+
+    
+        <span class="flag private">private</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_gui_layer.js.html#l24"><code>src&#x2F;gui&#x2F;layer.js:24</code></a>
+        
+        </p>
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>A cache of the initial canvas.</p>
+
+    </div>
+
+    
+
+    
+
+    
+</div>
 
                 
                     <div id="property_canvas" class="property item private">
@@ -2147,7 +2438,7 @@ Translation is according to the last one.</p>
             
         
         
-        <a href="../files/src_gui_layer.js.html#l24"><code>src&#x2F;gui&#x2F;layer.js:24</code></a>
+        <a href="../files/src_gui_layer.js.html#l31"><code>src&#x2F;gui&#x2F;layer.js:31</code></a>
         
         </p>
 
@@ -2194,7 +2485,7 @@ Translation is according to the last one.</p>
             
         
         
-        <a href="../files/src_gui_layer.js.html#l57"><code>src&#x2F;gui&#x2F;layer.js:57</code></a>
+        <a href="../files/src_gui_layer.js.html#l64"><code>src&#x2F;gui&#x2F;layer.js:64</code></a>
         
         </p>
 
@@ -2216,56 +2507,9 @@ Translation is according to the last one.</p>
 </div>
 
                 
-                    <div id="property_originX" class="property item private">
-    <h3 class="name"><code>originX</code></h3>
-    <span class="type">Number</span>
-
-    
-
-    
-        <span class="flag private">private</span>
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/src_gui_layer.js.html#l65"><code>src&#x2F;gui&#x2F;layer.js:65</code></a>
-        
-        </p>
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        <p>The image origin X position.</p>
-
-    </div>
-
-    
-
-    
-
-    
-</div>
-
-                
-                    <div id="property_originY" class="property item private">
-    <h3 class="name"><code>originY</code></h3>
-    <span class="type">Number</span>
+                    <div id="property_origin" class="property item private">
+    <h3 class="name"><code>origin</code></h3>
+    <span class="type">Object</span>
 
     
 
@@ -2298,7 +2542,7 @@ Translation is according to the last one.</p>
     </div>
 
     <div class="description">
-        <p>The image origin Y position.</p>
+        <p>The layer origin.</p>
 
     </div>
 
@@ -2310,9 +2554,9 @@ Translation is according to the last one.</p>
 </div>
 
                 
-                    <div id="property_zoomX" class="property item private">
-    <h3 class="name"><code>zoomX</code></h3>
-    <span class="type">Number</span>
+                    <div id="property_zoom" class="property item private">
+    <h3 class="name"><code>zoom</code></h3>
+    <span class="type">Object</span>
 
     
 
@@ -2335,7 +2579,7 @@ Translation is according to the last one.</p>
             
         
         
-        <a href="../files/src_gui_layer.js.html#l79"><code>src&#x2F;gui&#x2F;layer.js:79</code></a>
+        <a href="../files/src_gui_layer.js.html#l87"><code>src&#x2F;gui&#x2F;layer.js:87</code></a>
         
         </p>
 
@@ -2345,54 +2589,7 @@ Translation is according to the last one.</p>
     </div>
 
     <div class="description">
-        <p>The image zoom in the X direction.</p>
-
-    </div>
-
-    
-
-    
-
-    
-</div>
-
-                
-                    <div id="property_zoomY" class="property item private">
-    <h3 class="name"><code>zoomY</code></h3>
-    <span class="type">Number</span>
-
-    
-
-    
-        <span class="flag private">private</span>
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/src_gui_layer.js.html#l86"><code>src&#x2F;gui&#x2F;layer.js:86</code></a>
-        
-        </p>
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        <p>The image zoom in the Y direction.</p>
+        <p>The image zoom.</p>
 
     </div>
 

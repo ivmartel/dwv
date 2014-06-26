@@ -19,7 +19,7 @@
             
         </div>
         <div class="yui3-u-1-4 version">
-            <em>API Docs for: 0.6.0</em>
+            <em>API Docs for: 0.7.0</em>
         </div>
     </div>
     <div id="bd" class="yui3-g">
@@ -48,8 +48,6 @@
                 <li><a href="../classes/dwv.dicom.DataReader.html">dwv.dicom.DataReader</a></li>
             
                 <li><a href="../classes/dwv.dicom.DicomParser.html">dwv.dicom.DicomParser</a></li>
-            
-                <li><a href="../classes/dwv.dicom.Dictionary.html">dwv.dicom.Dictionary</a></li>
             
                 <li><a href="../classes/dwv.gui.html">dwv.gui</a></li>
             
@@ -89,6 +87,8 @@
             
                 <li><a href="../classes/dwv.math.Circle.html">dwv.math.Circle</a></li>
             
+                <li><a href="../classes/dwv.math.Ellipse.html">dwv.math.Ellipse</a></li>
+            
                 <li><a href="../classes/dwv.math.FastPoint2D.html">dwv.math.FastPoint2D</a></li>
             
                 <li><a href="../classes/dwv.math.Line.html">dwv.math.Line</a></li>
@@ -105,17 +105,13 @@
             
                 <li><a href="../classes/dwv.tool.html">dwv.tool</a></li>
             
+                <li><a href="../classes/dwv.tool.ChangeShapeCommand.html">dwv.tool.ChangeShapeCommand</a></li>
+            
+                <li><a href="../classes/dwv.tool.DeleteShapeCommand.html">dwv.tool.DeleteShapeCommand</a></li>
+            
                 <li><a href="../classes/dwv.tool.Draw.html">dwv.tool.Draw</a></li>
             
-                <li><a href="../classes/dwv.tool.DrawCircleCommand.html">dwv.tool.DrawCircleCommand</a></li>
-            
-                <li><a href="../classes/dwv.tool.DrawLineCommand.html">dwv.tool.DrawLineCommand</a></li>
-            
-                <li><a href="../classes/dwv.tool.DrawLivewireCommand.html">dwv.tool.DrawLivewireCommand</a></li>
-            
-                <li><a href="../classes/dwv.tool.DrawRectangleCommand.html">dwv.tool.DrawRectangleCommand</a></li>
-            
-                <li><a href="../classes/dwv.tool.DrawRoiCommand.html">dwv.tool.DrawRoiCommand</a></li>
+                <li><a href="../classes/dwv.tool.DrawShapeCommand.html">dwv.tool.DrawShapeCommand</a></li>
             
                 <li><a href="../classes/dwv.tool.Filter.html">dwv.tool.Filter</a></li>
             
@@ -125,9 +121,13 @@
             
                 <li><a href="../classes/dwv.tool.Livewire.html">dwv.tool.Livewire</a></li>
             
+                <li><a href="../classes/dwv.tool.MoveShapeCommand.html">dwv.tool.MoveShapeCommand</a></li>
+            
                 <li><a href="../classes/dwv.tool.RunFilterCommand.html">dwv.tool.RunFilterCommand</a></li>
             
                 <li><a href="../classes/dwv.tool.Scroll.html">dwv.tool.Scroll</a></li>
+            
+                <li><a href="../classes/dwv.tool.ShapeEditor.html">dwv.tool.ShapeEditor</a></li>
             
                 <li><a href="../classes/dwv.tool.ToolBox.html">dwv.tool.ToolBox</a></li>
             
@@ -206,7 +206,7 @@
 
     
         <div class="foundat">
-            Defined in: <a href="../files/src_tools_livewire.js.html#l8"><code>src&#x2F;tools&#x2F;livewire.js:8</code></a>
+            Defined in: <a href="../files/src_tools_livewire.js.html#l9"><code>src&#x2F;tools&#x2F;livewire.js:9</code></a>
         </div>
     
 
@@ -271,7 +271,7 @@
             
         
         
-        <a href="../files/src_tools_livewire.js.html#l8"><code>src&#x2F;tools&#x2F;livewire.js:8</code></a>
+        <a href="../files/src_tools_livewire.js.html#l9"><code>src&#x2F;tools&#x2F;livewire.js:9</code></a>
         
         </p>
 
@@ -386,6 +386,15 @@
                             </li>
                         
                             <li class="index-item method">
+                                <a href="#method_LineCreator">LineCreator</a>
+
+                                
+                                    <span class="flag static">static</span>
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
                                 <a href="#method_mousedown">mousedown</a>
 
                                 
@@ -441,6 +450,15 @@
                                 
                             </li>
                         
+                            <li class="index-item method">
+                                <a href="#method_UpdateLine">UpdateLine</a>
+
+                                
+                                    <span class="flag static">static</span>
+                                
+                                
+                            </li>
+                        
                     </ul>
                 </div>
             
@@ -452,6 +470,13 @@
                     <ul class="index-list properties">
                         
                             <li class="index-item property private">
+                                <a href="#property_activeShape">activeShape</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item property private">
                                 <a href="#property_command">command</a>
 
                                 
@@ -460,6 +485,13 @@
                         
                             <li class="index-item property private">
                                 <a href="#property_currentPath">currentPath</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item property private">
+                                <a href="#property_justStarted">justStarted</a>
 
                                 
                                 
@@ -488,6 +520,13 @@
                         
                             <li class="index-item property private">
                                 <a href="#property_self">self</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item property private">
+                                <a href="#property_shapeGroup">shapeGroup</a>
 
                                 
                                 
@@ -562,7 +601,7 @@
             
         
         
-        <a href="../files/src_tools_livewire.js.html#l74"><code>src&#x2F;tools&#x2F;livewire.js:74</code></a>
+        <a href="../files/src_tools_livewire.js.html#l96"><code>src&#x2F;tools&#x2F;livewire.js:96</code></a>
         
         </p>
 
@@ -619,7 +658,7 @@
             
         
         
-        <a href="../files/src_tools_livewire.js.html#l85"><code>src&#x2F;tools&#x2F;livewire.js:85</code></a>
+        <a href="../files/src_tools_livewire.js.html#l107"><code>src&#x2F;tools&#x2F;livewire.js:107</code></a>
         
         </p>
 
@@ -684,7 +723,7 @@
             
         
         
-        <a href="../files/src_tools_livewire.js.html#l269"><code>src&#x2F;tools&#x2F;livewire.js:269</code></a>
+        <a href="../files/src_tools_livewire.js.html#l300"><code>src&#x2F;tools&#x2F;livewire.js:300</code></a>
         
         </p>
 
@@ -767,7 +806,7 @@
             
         
         
-        <a href="../files/src_tools_livewire.js.html#l300"><code>src&#x2F;tools&#x2F;livewire.js:300</code></a>
+        <a href="../files/src_tools_livewire.js.html#l331"><code>src&#x2F;tools&#x2F;livewire.js:331</code></a>
         
         </p>
 
@@ -836,7 +875,7 @@
             
         
         
-        <a href="../files/src_tools_livewire.js.html#l280"><code>src&#x2F;tools&#x2F;livewire.js:280</code></a>
+        <a href="../files/src_tools_livewire.js.html#l311"><code>src&#x2F;tools&#x2F;livewire.js:311</code></a>
         
         </p>
 
@@ -901,7 +940,7 @@
             
         
         
-        <a href="../files/src_tools_livewire.js.html#l260"><code>src&#x2F;tools&#x2F;livewire.js:260</code></a>
+        <a href="../files/src_tools_livewire.js.html#l291"><code>src&#x2F;tools&#x2F;livewire.js:291</code></a>
         
         </p>
 
@@ -932,6 +971,119 @@
 
                     <div class="param-description">
                         <p>The key down event.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_LineCreator" class="method item">
+    <h3 class="name"><code>LineCreator</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>points</code>
+                    
+                </li>
+            
+                <li class="arg">
+                    
+                        <code>style</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <span class="flag static">static</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_tools_line.js.html#l9"><code>src&#x2F;tools&#x2F;line.js:9</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Create a line shape to be displayed.</p>
+
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">points</code>
+                        <span class="type">Array</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The points from which to extract the line.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+                <li class="param">
+                    
+                        <code class="param-name">style</code>
+                        <span class="type">Style</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The drawing style.</p>
 
                     </div>
 
@@ -990,7 +1142,7 @@
             
         
         
-        <a href="../files/src_tools_livewire.js.html#l103"><code>src&#x2F;tools&#x2F;livewire.js:103</code></a>
+        <a href="../files/src_tools_livewire.js.html#l125"><code>src&#x2F;tools&#x2F;livewire.js:125</code></a>
         
         </p>
 
@@ -1079,7 +1231,7 @@
             
         
         
-        <a href="../files/src_tools_livewire.js.html#l149"><code>src&#x2F;tools&#x2F;livewire.js:149</code></a>
+        <a href="../files/src_tools_livewire.js.html#l171"><code>src&#x2F;tools&#x2F;livewire.js:171</code></a>
         
         </p>
 
@@ -1168,7 +1320,7 @@
             
         
         
-        <a href="../files/src_tools_livewire.js.html#l220"><code>src&#x2F;tools&#x2F;livewire.js:220</code></a>
+        <a href="../files/src_tools_livewire.js.html#l251"><code>src&#x2F;tools&#x2F;livewire.js:251</code></a>
         
         </p>
 
@@ -1257,7 +1409,7 @@
             
         
         
-        <a href="../files/src_tools_livewire.js.html#l211"><code>src&#x2F;tools&#x2F;livewire.js:211</code></a>
+        <a href="../files/src_tools_livewire.js.html#l242"><code>src&#x2F;tools&#x2F;livewire.js:242</code></a>
         
         </p>
 
@@ -1346,7 +1498,7 @@
             
         
         
-        <a href="../files/src_tools_livewire.js.html#l318"><code>src&#x2F;tools&#x2F;livewire.js:318</code></a>
+        <a href="../files/src_tools_livewire.js.html#l349"><code>src&#x2F;tools&#x2F;livewire.js:349</code></a>
         
         </p>
 
@@ -1435,7 +1587,7 @@
             
         
         
-        <a href="../files/src_tools_livewire.js.html#l250"><code>src&#x2F;tools&#x2F;livewire.js:250</code></a>
+        <a href="../files/src_tools_livewire.js.html#l281"><code>src&#x2F;tools&#x2F;livewire.js:281</code></a>
         
         </p>
 
@@ -1524,7 +1676,7 @@
             
         
         
-        <a href="../files/src_tools_livewire.js.html#l240"><code>src&#x2F;tools&#x2F;livewire.js:240</code></a>
+        <a href="../files/src_tools_livewire.js.html#l271"><code>src&#x2F;tools&#x2F;livewire.js:271</code></a>
         
         </p>
 
@@ -1613,7 +1765,7 @@
             
         
         
-        <a href="../files/src_tools_livewire.js.html#l230"><code>src&#x2F;tools&#x2F;livewire.js:230</code></a>
+        <a href="../files/src_tools_livewire.js.html#l261"><code>src&#x2F;tools&#x2F;livewire.js:261</code></a>
         
         </p>
 
@@ -1660,12 +1812,172 @@
 </div>
 
                 
+                    <div id="method_UpdateLine" class="method item">
+    <h3 class="name"><code>UpdateLine</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>line</code>
+                    
+                </li>
+            
+                <li class="arg">
+                    
+                        <code>anchor</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <span class="flag static">static</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_tools_line.js.html#l32"><code>src&#x2F;tools&#x2F;line.js:32</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Update a line shape.</p>
+
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">line</code>
+                        <span class="type">Object</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The line shape to update.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+                <li class="param">
+                    
+                        <code class="param-name">anchor</code>
+                        <span class="type">Object</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The active anchor.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+
+    
+</div>
+
+                
             </div>
         
 
         
             <div id="properties" class="api-class-tabpanel">
                 <h2 class="off-left">Properties</h2>
+
+                
+                    <div id="property_activeShape" class="property item private">
+    <h3 class="name"><code>activeShape</code></h3>
+    <span class="type">Object</span>
+
+    
+
+    
+        <span class="flag private">private</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_tools_livewire.js.html#l46"><code>src&#x2F;tools&#x2F;livewire.js:46</code></a>
+        
+        </p>
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Current active shape.</p>
+
+    </div>
+
+    
+
+    
+
+    
+</div>
 
                 
                     <div id="property_command" class="property item private">
@@ -1693,7 +2005,7 @@
             
         
         
-        <a href="../files/src_tools_livewire.js.html#l31"><code>src&#x2F;tools&#x2F;livewire.js:31</code></a>
+        <a href="../files/src_tools_livewire.js.html#l39"><code>src&#x2F;tools&#x2F;livewire.js:39</code></a>
         
         </p>
 
@@ -1740,7 +2052,7 @@
             
         
         
-        <a href="../files/src_tools_livewire.js.html#l52"><code>src&#x2F;tools&#x2F;livewire.js:52</code></a>
+        <a href="../files/src_tools_livewire.js.html#l74"><code>src&#x2F;tools&#x2F;livewire.js:74</code></a>
         
         </p>
 
@@ -1751,6 +2063,53 @@
 
     <div class="description">
         <p>Current path storage. Paths are stored in reverse order.</p>
+
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="property_justStarted" class="property item private">
+    <h3 class="name"><code>justStarted</code></h3>
+    <span class="type">Boolean</span>
+
+    
+
+    
+        <span class="flag private">private</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_tools_livewire.js.html#l31"><code>src&#x2F;tools&#x2F;livewire.js:31</code></a>
+        
+        </p>
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Interaction just started flag.</p>
 
     </div>
 
@@ -1787,7 +2146,7 @@
             
         
         
-        <a href="../files/src_tools_livewire.js.html#l59"><code>src&#x2F;tools&#x2F;livewire.js:59</code></a>
+        <a href="../files/src_tools_livewire.js.html#l81"><code>src&#x2F;tools&#x2F;livewire.js:81</code></a>
         
         </p>
 
@@ -1834,7 +2193,7 @@
             
         
         
-        <a href="../files/src_tools_livewire.js.html#l45"><code>src&#x2F;tools&#x2F;livewire.js:45</code></a>
+        <a href="../files/src_tools_livewire.js.html#l67"><code>src&#x2F;tools&#x2F;livewire.js:67</code></a>
         
         </p>
 
@@ -1881,7 +2240,7 @@
             
         
         
-        <a href="../files/src_tools_livewire.js.html#l95"><code>src&#x2F;tools&#x2F;livewire.js:95</code></a>
+        <a href="../files/src_tools_livewire.js.html#l117"><code>src&#x2F;tools&#x2F;livewire.js:117</code></a>
         
         </p>
 
@@ -1928,7 +2287,7 @@
             
         
         
-        <a href="../files/src_tools_livewire.js.html#l17"><code>src&#x2F;tools&#x2F;livewire.js:17</code></a>
+        <a href="../files/src_tools_livewire.js.html#l18"><code>src&#x2F;tools&#x2F;livewire.js:18</code></a>
         
         </p>
 
@@ -1939,6 +2298,53 @@
 
     <div class="description">
         <p>Closure to self: to be used by event handlers.</p>
+
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="property_shapeGroup" class="property item private">
+    <h3 class="name"><code>shapeGroup</code></h3>
+    <span class="type">Object</span>
+
+    
+
+    
+        <span class="flag private">private</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_tools_livewire.js.html#l53"><code>src&#x2F;tools&#x2F;livewire.js:53</code></a>
+        
+        </p>
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Current shape group.</p>
 
     </div>
 
@@ -1973,7 +2379,7 @@
             
         
         
-        <a href="../files/src_tools_livewire.js.html#l24"><code>src&#x2F;tools&#x2F;livewire.js:24</code></a>
+        <a href="../files/src_tools_livewire.js.html#l25"><code>src&#x2F;tools&#x2F;livewire.js:25</code></a>
         
         </p>
 
@@ -2018,7 +2424,7 @@
             
         
         
-        <a href="../files/src_tools_livewire.js.html#l38"><code>src&#x2F;tools&#x2F;livewire.js:38</code></a>
+        <a href="../files/src_tools_livewire.js.html#l60"><code>src&#x2F;tools&#x2F;livewire.js:60</code></a>
         
         </p>
 
@@ -2065,7 +2471,7 @@
             
         
         
-        <a href="../files/src_tools_livewire.js.html#l66"><code>src&#x2F;tools&#x2F;livewire.js:66</code></a>
+        <a href="../files/src_tools_livewire.js.html#l88"><code>src&#x2F;tools&#x2F;livewire.js:88</code></a>
         
         </p>
 

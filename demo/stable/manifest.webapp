@@ -1,19 +1,19 @@
 {
   "name": "dwv",
   "description": "Dicom Web Viewer.",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "developer": {
     "name": "ivmartel",
     "url": "https://github.com/ivmartel"
   },
   "default_locale": "en",
-  "launch_path": "/dwv/demo/stable/viewers/mobile/index.html",
-  "appcache_path": "/dwv/demo/stable/viewers/mobile/cache.manifest",
+  "launch_path": "/viewers/mobile/index.html",
+  "appcache_path": "/viewers/mobile/cache.manifest",
   "icons": { 
-    "16": "/dwv/demo/stable/resources/dwv-16.png", 
-    "32": "/dwv/demo/stable/resources/dwv-32.png",
-    "60": "/dwv/demo/stable/resources/dwv-60.png",
-    "90": "/dwv/demo/stable/resources/dwv-90.png",
-    "128": "/dwv/demo/stable/resources/dwv-128.png"
+    "16": "/resources/dwv-16.png", 
+    "32": "/resources/dwv-32.png",
+    "60": "/resources/dwv-60.png",
+    "90": "/resources/dwv-90.png",
+    "128": "/resources/dwv-128.png"
   }
 }

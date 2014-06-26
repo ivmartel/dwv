@@ -19,7 +19,7 @@
             
         </div>
         <div class="yui3-u-1-4 version">
-            <em>API Docs for: 0.6.0</em>
+            <em>API Docs for: 0.7.0</em>
         </div>
     </div>
     <div id="bd" class="yui3-g">
@@ -48,8 +48,6 @@
                 <li><a href="../classes/dwv.dicom.DataReader.html">dwv.dicom.DataReader</a></li>
             
                 <li><a href="../classes/dwv.dicom.DicomParser.html">dwv.dicom.DicomParser</a></li>
-            
-                <li><a href="../classes/dwv.dicom.Dictionary.html">dwv.dicom.Dictionary</a></li>
             
                 <li><a href="../classes/dwv.gui.html">dwv.gui</a></li>
             
@@ -89,6 +87,8 @@
             
                 <li><a href="../classes/dwv.math.Circle.html">dwv.math.Circle</a></li>
             
+                <li><a href="../classes/dwv.math.Ellipse.html">dwv.math.Ellipse</a></li>
+            
                 <li><a href="../classes/dwv.math.FastPoint2D.html">dwv.math.FastPoint2D</a></li>
             
                 <li><a href="../classes/dwv.math.Line.html">dwv.math.Line</a></li>
@@ -105,17 +105,13 @@
             
                 <li><a href="../classes/dwv.tool.html">dwv.tool</a></li>
             
+                <li><a href="../classes/dwv.tool.ChangeShapeCommand.html">dwv.tool.ChangeShapeCommand</a></li>
+            
+                <li><a href="../classes/dwv.tool.DeleteShapeCommand.html">dwv.tool.DeleteShapeCommand</a></li>
+            
                 <li><a href="../classes/dwv.tool.Draw.html">dwv.tool.Draw</a></li>
             
-                <li><a href="../classes/dwv.tool.DrawCircleCommand.html">dwv.tool.DrawCircleCommand</a></li>
-            
-                <li><a href="../classes/dwv.tool.DrawLineCommand.html">dwv.tool.DrawLineCommand</a></li>
-            
-                <li><a href="../classes/dwv.tool.DrawLivewireCommand.html">dwv.tool.DrawLivewireCommand</a></li>
-            
-                <li><a href="../classes/dwv.tool.DrawRectangleCommand.html">dwv.tool.DrawRectangleCommand</a></li>
-            
-                <li><a href="../classes/dwv.tool.DrawRoiCommand.html">dwv.tool.DrawRoiCommand</a></li>
+                <li><a href="../classes/dwv.tool.DrawShapeCommand.html">dwv.tool.DrawShapeCommand</a></li>
             
                 <li><a href="../classes/dwv.tool.Filter.html">dwv.tool.Filter</a></li>
             
@@ -125,9 +121,13 @@
             
                 <li><a href="../classes/dwv.tool.Livewire.html">dwv.tool.Livewire</a></li>
             
+                <li><a href="../classes/dwv.tool.MoveShapeCommand.html">dwv.tool.MoveShapeCommand</a></li>
+            
                 <li><a href="../classes/dwv.tool.RunFilterCommand.html">dwv.tool.RunFilterCommand</a></li>
             
                 <li><a href="../classes/dwv.tool.Scroll.html">dwv.tool.Scroll</a></li>
+            
+                <li><a href="../classes/dwv.tool.ShapeEditor.html">dwv.tool.ShapeEditor</a></li>
             
                 <li><a href="../classes/dwv.tool.ToolBox.html">dwv.tool.ToolBox</a></li>
             
@@ -233,7 +233,7 @@ dwv.io.Url.prototype.load = function(ioArray)
     var onerror = this.onerror;
     
     // Request error
-    var onErrorRequest = function(event)
+    var onErrorRequest = function(/*event*/)
     {
         onerror( {&#x27;name&#x27;: &quot;RequestError&quot;, 
             &#x27;message&#x27;: &quot;An error occurred while retrieving the file: (http) &quot;+this.status } );
@@ -253,7 +253,7 @@ dwv.io.Url.prototype.load = function(ioArray)
     };
 
     // Image request loader
-    var onLoadImageRequest = function(event)
+    var onLoadImageRequest = function(/*event*/)
     {
         // parse image data
         try {
@@ -266,7 +266,7 @@ dwv.io.Url.prototype.load = function(ioArray)
     };
 
     // Request handler
-    var onLoadRequest = function(event)
+    var onLoadRequest = function(/*event*/)
     {
         // find the image type
         var view = new DataView(this.response);
@@ -285,9 +285,15 @@ dwv.io.Url.prototype.load = function(ioArray)
             }
             // image type
             var imageType = &quot;unknown&quot;;
-            if(isJpeg) imageType = &quot;jpeg&quot;;
-            else if(isPng) imageType = &quot;png&quot;;
-            else if(isGif) imageType = &quot;gif&quot;;
+            if(isJpeg) {
+                imageType = &quot;jpeg&quot;;
+            }
+            else if(isPng) {
+                imageType = &quot;png&quot;;
+            }
+            else if(isGif) {
+                imageType = &quot;gif&quot;;
+            }
             // temporary image object
             var tmpImage = new Image();
             tmpImage.src = &quot;data:image/&quot; + imageType + &quot;;base64,&quot; + window.btoa(imageDataStr);

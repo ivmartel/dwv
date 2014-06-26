@@ -19,7 +19,7 @@
             
         </div>
         <div class="yui3-u-1-4 version">
-            <em>API Docs for: 0.6.0</em>
+            <em>API Docs for: 0.7.0</em>
         </div>
     </div>
     <div id="bd" class="yui3-g">
@@ -48,8 +48,6 @@
                 <li><a href="../classes/dwv.dicom.DataReader.html">dwv.dicom.DataReader</a></li>
             
                 <li><a href="../classes/dwv.dicom.DicomParser.html">dwv.dicom.DicomParser</a></li>
-            
-                <li><a href="../classes/dwv.dicom.Dictionary.html">dwv.dicom.Dictionary</a></li>
             
                 <li><a href="../classes/dwv.gui.html">dwv.gui</a></li>
             
@@ -89,6 +87,8 @@
             
                 <li><a href="../classes/dwv.math.Circle.html">dwv.math.Circle</a></li>
             
+                <li><a href="../classes/dwv.math.Ellipse.html">dwv.math.Ellipse</a></li>
+            
                 <li><a href="../classes/dwv.math.FastPoint2D.html">dwv.math.FastPoint2D</a></li>
             
                 <li><a href="../classes/dwv.math.Line.html">dwv.math.Line</a></li>
@@ -105,17 +105,13 @@
             
                 <li><a href="../classes/dwv.tool.html">dwv.tool</a></li>
             
+                <li><a href="../classes/dwv.tool.ChangeShapeCommand.html">dwv.tool.ChangeShapeCommand</a></li>
+            
+                <li><a href="../classes/dwv.tool.DeleteShapeCommand.html">dwv.tool.DeleteShapeCommand</a></li>
+            
                 <li><a href="../classes/dwv.tool.Draw.html">dwv.tool.Draw</a></li>
             
-                <li><a href="../classes/dwv.tool.DrawCircleCommand.html">dwv.tool.DrawCircleCommand</a></li>
-            
-                <li><a href="../classes/dwv.tool.DrawLineCommand.html">dwv.tool.DrawLineCommand</a></li>
-            
-                <li><a href="../classes/dwv.tool.DrawLivewireCommand.html">dwv.tool.DrawLivewireCommand</a></li>
-            
-                <li><a href="../classes/dwv.tool.DrawRectangleCommand.html">dwv.tool.DrawRectangleCommand</a></li>
-            
-                <li><a href="../classes/dwv.tool.DrawRoiCommand.html">dwv.tool.DrawRoiCommand</a></li>
+                <li><a href="../classes/dwv.tool.DrawShapeCommand.html">dwv.tool.DrawShapeCommand</a></li>
             
                 <li><a href="../classes/dwv.tool.Filter.html">dwv.tool.Filter</a></li>
             
@@ -125,9 +121,13 @@
             
                 <li><a href="../classes/dwv.tool.Livewire.html">dwv.tool.Livewire</a></li>
             
+                <li><a href="../classes/dwv.tool.MoveShapeCommand.html">dwv.tool.MoveShapeCommand</a></li>
+            
                 <li><a href="../classes/dwv.tool.RunFilterCommand.html">dwv.tool.RunFilterCommand</a></li>
             
                 <li><a href="../classes/dwv.tool.Scroll.html">dwv.tool.Scroll</a></li>
+            
+                <li><a href="../classes/dwv.tool.ShapeEditor.html">dwv.tool.ShapeEditor</a></li>
             
                 <li><a href="../classes/dwv.tool.ToolBox.html">dwv.tool.ToolBox</a></li>
             
@@ -204,7 +204,9 @@
     <pre class="code prettyprint linenums">
 // Main DWV namespace.
 var dwv = dwv || {};
- 
+
+var Kinetic = Kinetic || {};
+
 /**
  * Main application class.
  * @class App
@@ -217,21 +219,26 @@ dwv.App = function()
     var self = this;
     // Image
     var image = null;
+    // View
     var view = null;
     // Original image
     var originalImage = null;
     // Image data array
     var imageData = null;
+    // Image data width
     var dataWidth = 0;
+    // Image data height
     var dataHeight = 0;
-    var displayZoom = 1;
+
+    // display window scale
+    var windowScale = 1;
      
     // Image layer
     var imageLayer = null;
     // Draw layer
     var drawLayer = null;
-    // Temporary layer
-    var tempLayer = null;
+    // Draw stage
+    var drawStage = null;
     
     // flag to know if the info layer is listening on the image.
     var isInfoLayerListening = false;
@@ -239,14 +246,14 @@ dwv.App = function()
     // Tool box
     var toolBox = new dwv.tool.ToolBox(this);
     // UndoStack
-    var undoStack = new dwv.tool.UndoStack(this);
+    var undoStack = new dwv.tool.UndoStack();
     
     /** 
      * Get the version of the application.
      * @method getVersion
      * @return {String} The version of the application.
      */
-    this.getVersion = function() { return &quot;v0.6.0&quot;; };
+    this.getVersion = function() { return &quot;v0.7.0&quot;; };
     
     /** 
      * Get the image.
@@ -309,11 +316,11 @@ dwv.App = function()
      */
     this.getDrawLayer = function() { return drawLayer; };
     /** 
-     * Get the temporary layer.
-     * @method getTempLayer
-     * @return {Object} The temporary layer.
+     * Get the draw stage.
+     * @method getDrawStage
+     * @return {Object} The draw layer.
      */
-    this.getTempLayer = function() { return tempLayer; };
+    this.getDrawStage = function() { return drawStage; };
 
     /** 
      * Get the undo stack.
@@ -328,12 +335,12 @@ dwv.App = function()
      */
     this.init = function(){
         // align layers when the window is resized
-        window.onresize = app.resize;
+        window.onresize = this.resize;
         // possible load from URL
         if( typeof skipLoadUrl === &quot;undefined&quot; ) {
             var inputUrls = dwv.html.getUriParam(); 
             if( inputUrls &amp;&amp; inputUrls.length &gt; 0 ) {
-                app.loadURL(inputUrls);
+                this.loadURL(inputUrls);
             }
         }
         else{
@@ -349,7 +356,24 @@ dwv.App = function()
     {
         image = null;
         view = null;
-        undoStack = new dwv.tool.UndoStack(this);
+        undoStack = new dwv.tool.UndoStack();
+        dwv.gui.cleaUndoHtml();
+    };
+    
+    /**
+     * Reset the layout of the application.
+     * @method resetLayout
+     */
+    this.resetLayout = function () {
+        if ( imageLayer ) {
+            imageLayer.resetLayout(windowScale);
+            imageLayer.draw();
+        }
+        if ( drawStage ) {
+            drawStage.offset( {&#x27;x&#x27;: 0, &#x27;y&#x27;: 0} );
+            drawStage.scale( {&#x27;x&#x27;: windowScale, &#x27;y&#x27;: windowScale} );
+            drawStage.draw();
+        }
     };
     
     /**
@@ -364,11 +388,11 @@ dwv.App = function()
     {
         if( event.keyCode === 90 &amp;&amp; event.ctrlKey ) // ctrl-z
         {
-            self.getUndoStack().undo();
+            undoStack.undo();
         }
         else if( event.keyCode === 89 &amp;&amp; event.ctrlKey ) // ctrl-y
         {
-            self.getUndoStack().redo();
+            undoStack.redo();
         }
     };
     
@@ -379,7 +403,7 @@ dwv.App = function()
      */
     this.onChangeFiles = function(event)
     {
-        self.loadFiles(event.target.files);
+        this.loadFiles(event.target.files);
     };
 
     /**
@@ -394,7 +418,9 @@ dwv.App = function()
         // create IO
         var fileIO = new dwv.io.File();
         fileIO.onload = function(data){
-            if( image ) image.appendSlice( data.view.getImage() );
+            if( image ) {
+                image.appendSlice( data.view.getImage() );
+            }
             postLoadInit(data);
         };
         fileIO.onerror = function(error){ handleError(error); };
@@ -409,7 +435,7 @@ dwv.App = function()
      */
     this.onChangeURL = function(event)
     {
-        self.loadURL([event.target.value]);
+        this.loadURL([event.target.value]);
     };
 
     /**
@@ -424,7 +450,9 @@ dwv.App = function()
         // create IO
         var urlIO = new dwv.io.Url();
         urlIO.onload = function(data){
-            if( image ) image.appendSlice( data.view.getImage() );
+            if( image ) {
+                image.appendSlice( data.view.getImage() );
+            }
             postLoadInit(data);
         };
         urlIO.onerror = function(error){ handleError(error); };
@@ -439,11 +467,11 @@ dwv.App = function()
     this.generateAndDrawImage = function()
     {         
         // generate image data from DICOM
-        self.getView().generateImageData(imageData);         
+        view.generateImageData(imageData);         
         // set the image data of the layer
-        self.getImageLayer().setImageData(imageData);
+        imageLayer.setImageData(imageData);
         // draw the image
-        self.getImageLayer().draw();
+        imageLayer.draw();
     };
     
     /**
@@ -452,11 +480,42 @@ dwv.App = function()
      */
     this.resize = function()
     {
-        // adapt the size of the layer container
+        // previous width
+        var oldWidth = parseInt(windowScale*dataWidth, 10);
+        // find new best fit
         var size = dwv.gui.getWindowSize();
-        displayZoom = Math.min( (size.width / dataWidth), (size.height / dataHeight) );
-        $(&quot;#layerContainer&quot;).width(parseInt(displayZoom*dataWidth, 10));
-        $(&quot;#layerContainer&quot;).height(parseInt(displayZoom*dataHeight, 10));
+        windowScale = Math.min( (size.width / dataWidth), (size.height / dataHeight) );
+        // new sizes
+        var newWidth = parseInt(windowScale*dataWidth, 10);
+        var newHeight = parseInt(windowScale*dataHeight, 10);
+        // ratio previous/new to add to zoom
+        var mul = newWidth / oldWidth;
+
+        // resize container
+        $(&quot;#layerContainer&quot;).width(newWidth);
+        $(&quot;#layerContainer&quot;).height(newHeight + 1); // +1 to be sure...
+        // resize image layer
+        if( imageLayer ) {
+            var iZoomX = imageLayer.getZoom().x * mul;
+            var iZoomY = imageLayer.getZoom().y * mul;
+            imageLayer.setWidth(newWidth);
+            imageLayer.setHeight(newHeight);
+            imageLayer.zoom(iZoomX, iZoomY, 0, 0);
+            imageLayer.draw();
+        }
+        // resize draw stage
+        if( drawStage ) {
+            // resize div
+            $(&quot;#drawDiv&quot;).width(newWidth);
+            $(&quot;#drawDiv&quot;).height(newHeight);
+            // resize stage
+            var stageZomX = drawStage.scale().x * mul;
+            var stageZoomY = drawStage.scale().y * mul;
+            drawStage.setWidth(newWidth);
+            drawStage.setHeight(newHeight);
+            drawStage.scale( {x: stageZomX, y: stageZoomY} );
+            drawStage.draw();
+        }
     };
     
     /**
@@ -536,32 +595,30 @@ dwv.App = function()
         // Store the event position relative to the image canvas
         // in an extra member of the event:
         // event._x and event._y.
+        var offsets = null;
+        var position = null;
         if( event.type === &quot;touchstart&quot; ||
             event.type === &quot;touchmove&quot;)
         {
             event.preventDefault();
-            var touches = event.targetTouches;
-            // If there&#x27;s one or two fingers inside this element
-            if( touches.length === 1 || touches.length === 2)
-            {
-              var touch = touches[0];
-              // store
-              event._x = touch.pageX - parseInt(app.getImageLayer().getOffset().left, 10);
-              event._x = parseInt( (event._x / displayZoom), 10 );
-              event._y = touch.pageY - parseInt(app.getImageLayer().getOffset().top, 10);
-              event._y = parseInt( (event._y / displayZoom), 10 );
-              // second finger
-              if (touches.length === 2) {
-                  touch = touches[1];
-                  // store
-                  event._x1 = touch.pageX - parseInt(app.getImageLayer().getOffset().left, 10);
-                  event._x1 = parseInt( (event._x1 / displayZoom), 10 );
-                  event._y1 = touch.pageY - parseInt(app.getImageLayer().getOffset().top, 10);
-                  event._y1 = parseInt( (event._y1 / displayZoom), 10 );
-              }
-              // set handle event flag
-              handled = true;
+            // event offset(s)
+            offsets = dwv.html.getEventOffset(event);
+            // should have at least one offset
+            event._xs = offsets[0].x;
+            event._ys = offsets[0].y;
+            position = self.getImageLayer().displayToIndex( offsets[0] );
+            event._x = parseInt( position.x, 10 );
+            event._y = parseInt( position.y, 10 );
+            // possible second
+            if ( offsets.length === 2 ) {
+                event._x1s = offsets[1].x;
+                event._y1s = offsets[1].y;
+                position = self.getImageLayer().displayToIndex( offsets[1] );
+                event._x1 = parseInt( position.x, 10 );
+                event._y1 = parseInt( position.y, 10 );
             }
+            // set handle event flag
+            handled = true;
         }
         else if( event.type === &quot;mousemove&quot; ||
             event.type === &quot;mousedown&quot; ||
@@ -571,11 +628,12 @@ dwv.App = function()
             event.type === &quot;dblclick&quot; ||
             event.type === &quot;DOMMouseScroll&quot; )
         {
-            // layerX is for firefox
-            event._x = event.offsetX === undefined ? event.layerX : event.offsetX;
-            event._x = parseInt( (event._x / displayZoom), 10 );
-            event._y = event.offsetY === undefined ? event.layerY : event.offsetY;
-            event._y = parseInt( (event._y / displayZoom), 10 );
+            offsets = dwv.html.getEventOffset(event);
+            event._xs = offsets[0].x;
+            event._ys = offsets[0].y;
+            position = self.getImageLayer().displayToIndex( offsets[0] );
+            event._x = parseInt( position.x, 10 );
+            event._y = parseInt( position.y, 10 );
             // set handle event flag
             handled = true;
         }
@@ -604,9 +662,17 @@ dwv.App = function()
      */
     function handleError(error)
     {
-        if( error.name &amp;&amp; error.message) alert(error.name+&quot;: &quot;+error.message+&quot;.&quot;);
-        else alert(&quot;Error: &quot;+error+&quot;.&quot;);
-        if( error.stack ) console.log(error.stack);
+        // alert window
+        if( error.name &amp;&amp; error.message) {
+            alert(error.name+&quot;: &quot;+error.message+&quot;.&quot;);
+        }
+        else {
+            alert(&quot;Error: &quot;+error+&quot;.&quot;);
+        }
+        // log
+        if( error.stack ) {
+            console.error(error.stack);
+        }
     }
     
     /**
@@ -618,26 +684,31 @@ dwv.App = function()
      */
     function createLayers(dataWidth, dataHeight)
     {
-        // resize app
-        self.resize();
-        
         // image layer
         imageLayer = new dwv.html.Layer(&quot;imageLayer&quot;);
         imageLayer.initialise(dataWidth, dataHeight);
         imageLayer.fillContext();
         imageLayer.setStyleDisplay(true);
         // draw layer
-        if( document.getElementById(&quot;drawLayer&quot;) !== null) {
-            drawLayer = new dwv.html.Layer(&quot;drawLayer&quot;);
-            drawLayer.initialise(dataWidth, dataHeight);
-            drawLayer.setStyleDisplay(true);
+        if( document.getElementById(&quot;drawDiv&quot;) !== null) {
+            // create stage
+            drawStage = new Kinetic.Stage({
+                container: &#x27;drawDiv&#x27;,
+                width: dataWidth,
+                height: dataHeight,
+                listening: false
+            });
+            // create layer
+            drawLayer = new Kinetic.Layer({
+                listening: false,
+                hitGraphEnabled: false
+            });
+            // add the layer to the stage
+            drawStage.add(drawLayer);
         }
-        // temp layer
-        if( document.getElementById(&quot;tempLayer&quot;) !== null) {
-            tempLayer = new dwv.html.Layer(&quot;tempLayer&quot;);
-            tempLayer.initialise(dataWidth, dataHeight);
-            tempLayer.setStyleDisplay(true);
-        }
+        // resize app
+        self.resetLayout();
+        self.resize();
     }
     
     /**
@@ -650,9 +721,13 @@ dwv.App = function()
     {
         // HTML node
         var node = document.getElementById(&quot;tags&quot;);
-        if( node === null ) return;
+        if( node === null ) {
+            return;
+        }
         // tag list table (without the pixel data)
-        if(dataInfo.PixelData) dataInfo.PixelData.value = &quot;...&quot;;
+        if(dataInfo.PixelData) {
+            dataInfo.PixelData.value = &quot;...&quot;;
+        }
         // remove possible previous
         while (node.hasChildNodes()) { 
             node.removeChild(node.firstChild);
@@ -678,7 +753,9 @@ dwv.App = function()
     function postLoadInit(data)
     {
         // only initialise the first time
-        if( view ) return;
+        if( view ) {
+            return;
+        }
         
         // get the view from the loaded data
         view = data.view;
@@ -694,28 +771,31 @@ dwv.App = function()
         createLayers(dataWidth, dataHeight);
         
         // get the image data from the image layer
-        imageData = self.getImageLayer().getContext().createImageData( 
+        imageData = imageLayer.getContext().createImageData( 
                 dataWidth, dataHeight);
 
-        var topLayer = tempLayer === null ? imageLayer : tempLayer;
+        var topLayer = imageLayer.getCanvas();
+        if ( drawLayer ) {
+            topLayer = document.getElementById(&quot;drawDiv&quot;);
+        }
         // mouse listeners
-        topLayer.getCanvas().addEventListener(&quot;mousedown&quot;, eventHandler, false);
-        topLayer.getCanvas().addEventListener(&quot;mousemove&quot;, eventHandler, false);
-        topLayer.getCanvas().addEventListener(&quot;mouseup&quot;, eventHandler, false);
-        topLayer.getCanvas().addEventListener(&quot;mouseout&quot;, eventHandler, false);
-        topLayer.getCanvas().addEventListener(&quot;mousewheel&quot;, eventHandler, false);
-        topLayer.getCanvas().addEventListener(&quot;DOMMouseScroll&quot;, eventHandler, false);
-        topLayer.getCanvas().addEventListener(&quot;dblclick&quot;, eventHandler, false);
+        topLayer.addEventListener(&quot;mousedown&quot;, eventHandler, false);
+        topLayer.addEventListener(&quot;mousemove&quot;, eventHandler, false);
+        topLayer.addEventListener(&quot;mouseup&quot;, eventHandler, false);
+        topLayer.addEventListener(&quot;mouseout&quot;, eventHandler, false);
+        topLayer.addEventListener(&quot;mousewheel&quot;, eventHandler, false);
+        topLayer.addEventListener(&quot;DOMMouseScroll&quot;, eventHandler, false);
+        topLayer.addEventListener(&quot;dblclick&quot;, eventHandler, false);
         // touch listeners
-        topLayer.getCanvas().addEventListener(&quot;touchstart&quot;, eventHandler, false);
-        topLayer.getCanvas().addEventListener(&quot;touchmove&quot;, eventHandler, false);
-        topLayer.getCanvas().addEventListener(&quot;touchend&quot;, eventHandler, false);
+        topLayer.addEventListener(&quot;touchstart&quot;, eventHandler, false);
+        topLayer.addEventListener(&quot;touchmove&quot;, eventHandler, false);
+        topLayer.addEventListener(&quot;touchend&quot;, eventHandler, false);
         // keydown listener
         window.addEventListener(&quot;keydown&quot;, eventHandler, true);
         // image listeners
-        view.addEventListener(&quot;wlchange&quot;, app.generateAndDrawImage);
-        view.addEventListener(&quot;colorchange&quot;, app.generateAndDrawImage);
-        view.addEventListener(&quot;slicechange&quot;, app.generateAndDrawImage);
+        view.addEventListener(&quot;wlchange&quot;, self.generateAndDrawImage);
+        view.addEventListener(&quot;colorchange&quot;, self.generateAndDrawImage);
+        view.addEventListener(&quot;slicechange&quot;, self.generateAndDrawImage);
         
         // info layer
         if(document.getElementById(&quot;infoLayer&quot;)){
@@ -733,6 +813,7 @@ dwv.App = function()
         // init W/L display
         self.initWLDisplay();        
     }
+    
 };
 
     </pre>

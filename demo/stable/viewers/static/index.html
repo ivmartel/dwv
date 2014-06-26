@@ -4,8 +4,10 @@
 <head>
 <title>DICOM Web Viewer</title>
 <meta charset="UTF-8">
-<link rel="stylesheet" href="../../css/style.css">
-<style>
+<meta name="description" content="DICOM Web Viewer (DWV) static version">
+<meta name="keywords" content="DICOM,HTML5,JavaScript,medical,imaging,DWV">
+<link type="text/css" rel="stylesheet" href="../../css/style.css">
+<style type="text/css" >
 body { background-color: #222; color: white;
   margin: 10px; padding: 0; font-size: 80%; }
 #pageHeader h1 { display: inline-block; margin: 0; color: #fff; }
@@ -16,15 +18,16 @@ body { background-color: #222; color: white;
 #infotl { color: #333; text-shadow: 0 1px 0 #fff; }
 #infotr { color: #333; text-shadow: 0 1px 0 #fff; }
 </style>
-<link rel="stylesheet" href="../../ext/jquery-ui/themes/ui-darkness/jquery-ui-1.10.4.min.css">
+<link type="text/css" rel="stylesheet" href="../../ext/jquery-ui/themes/ui-darkness/jquery-ui-1.10.4.min.css">
 <!-- Third party -->  
-<script type="text/javascript" src="../../ext/jquery/jquery-2.1.0.min.js"></script>
+<script type="text/javascript" src="../../ext/jquery/jquery-2.1.1.min.js"></script>
 <script type="text/javascript" src="../../ext/jquery-ui/jquery-ui-1.10.4.min.js"></script>
 <script type="text/javascript" src="../../ext/flot/jquery.flot.min.js"></script>
 <script type="text/javascript" src="../../ext/openjpeg/openjpeg.js"></script>
+<script type="text/javascript" src="../../ext/kinetic/kinetic-v5.1.1-06.10.min.js"></script>
 <!-- Local -->
-<script type="text/javascript" src="../../dwv-0.6.0.min.js"></script>
-<!--  Launch the app -->
+<script type="text/javascript" src="../../dwv-0.7.0.min.js"></script>
+<!-- Launch the app -->
 <script type="text/javascript" src="appgui.js"></script>
 <script type="text/javascript" src="applauncher.js"></script>
 </head>
@@ -69,8 +72,7 @@ body { background-color: #222; color: white;
 <div id="layerDialog" title="Image">
 <div id="layerContainer">
 <canvas id="imageLayer">Only for HTML5 compatible browsers...</canvas>
-<canvas id="drawLayer">Only for HTML5 compatible browsers...</canvas>
-<canvas id="tempLayer">Only for HTML5 compatible browsers...</canvas>
+<div id="drawDiv"></div>
 <div id="infoLayer">
 <div id="infotl"></div>
 <div id="infotr"></div>

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>dwv.tool.DrawLineCommand - dwv</title>
+    <title>dwv.math.Ellipse - dwv</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
     <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
@@ -19,7 +19,7 @@
             
         </div>
         <div class="yui3-u-1-4 version">
-            <em>API Docs for: 0.6.0</em>
+            <em>API Docs for: 0.7.0</em>
         </div>
     </div>
     <div id="bd" class="yui3-g">
@@ -48,8 +48,6 @@
                 <li><a href="../classes/dwv.dicom.DataReader.html">dwv.dicom.DataReader</a></li>
             
                 <li><a href="../classes/dwv.dicom.DicomParser.html">dwv.dicom.DicomParser</a></li>
-            
-                <li><a href="../classes/dwv.dicom.Dictionary.html">dwv.dicom.Dictionary</a></li>
             
                 <li><a href="../classes/dwv.gui.html">dwv.gui</a></li>
             
@@ -89,6 +87,8 @@
             
                 <li><a href="../classes/dwv.math.Circle.html">dwv.math.Circle</a></li>
             
+                <li><a href="../classes/dwv.math.Ellipse.html">dwv.math.Ellipse</a></li>
+            
                 <li><a href="../classes/dwv.math.FastPoint2D.html">dwv.math.FastPoint2D</a></li>
             
                 <li><a href="../classes/dwv.math.Line.html">dwv.math.Line</a></li>
@@ -105,17 +105,13 @@
             
                 <li><a href="../classes/dwv.tool.html">dwv.tool</a></li>
             
+                <li><a href="../classes/dwv.tool.ChangeShapeCommand.html">dwv.tool.ChangeShapeCommand</a></li>
+            
+                <li><a href="../classes/dwv.tool.DeleteShapeCommand.html">dwv.tool.DeleteShapeCommand</a></li>
+            
                 <li><a href="../classes/dwv.tool.Draw.html">dwv.tool.Draw</a></li>
             
-                <li><a href="../classes/dwv.tool.DrawCircleCommand.html">dwv.tool.DrawCircleCommand</a></li>
-            
-                <li><a href="../classes/dwv.tool.DrawLineCommand.html">dwv.tool.DrawLineCommand</a></li>
-            
-                <li><a href="../classes/dwv.tool.DrawLivewireCommand.html">dwv.tool.DrawLivewireCommand</a></li>
-            
-                <li><a href="../classes/dwv.tool.DrawRectangleCommand.html">dwv.tool.DrawRectangleCommand</a></li>
-            
-                <li><a href="../classes/dwv.tool.DrawRoiCommand.html">dwv.tool.DrawRoiCommand</a></li>
+                <li><a href="../classes/dwv.tool.DrawShapeCommand.html">dwv.tool.DrawShapeCommand</a></li>
             
                 <li><a href="../classes/dwv.tool.Filter.html">dwv.tool.Filter</a></li>
             
@@ -125,9 +121,13 @@
             
                 <li><a href="../classes/dwv.tool.Livewire.html">dwv.tool.Livewire</a></li>
             
+                <li><a href="../classes/dwv.tool.MoveShapeCommand.html">dwv.tool.MoveShapeCommand</a></li>
+            
                 <li><a href="../classes/dwv.tool.RunFilterCommand.html">dwv.tool.RunFilterCommand</a></li>
             
                 <li><a href="../classes/dwv.tool.Scroll.html">dwv.tool.Scroll</a></li>
+            
+                <li><a href="../classes/dwv.tool.ShapeEditor.html">dwv.tool.ShapeEditor</a></li>
             
                 <li><a href="../classes/dwv.tool.ToolBox.html">dwv.tool.ToolBox</a></li>
             
@@ -198,7 +198,7 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-                        <h1>dwv.tool.DrawLineCommand Class</h1>
+                        <h1>dwv.math.Ellipse Class</h1>
 <div class="box meta">
     
 
@@ -206,13 +206,13 @@
 
     
         <div class="foundat">
-            Defined in: <a href="../files/src_tools_line.js.html#l8"><code>src&#x2F;tools&#x2F;line.js:8</code></a>
+            Defined in: <a href="../files/src_math_shapes.js.html#l139"><code>src&#x2F;math&#x2F;shapes.js:139</code></a>
         </div>
     
 
     
         
-            Module: <a href="../modules/tool.html">tool</a>
+            Module: <a href="../modules/math.html">math</a>
         
     
 
@@ -222,15 +222,15 @@
 
 
 <div class="box intro">
-    <p>Draw line command.</p>
+    <p>Ellipse shape.</p>
 
 </div>
 
 
     <div class="constructor">
         <h2>Constructor</h2>
-        <div id="method_dwv.tool.DrawLineCommand" class="method item">
-    <h3 class="name"><code>dwv.tool.DrawLineCommand</code></h3>
+        <div id="method_dwv.math.Ellipse" class="method item">
+    <h3 class="name"><code>dwv.math.Ellipse</code></h3>
 
     
         <div class="args">
@@ -238,19 +238,19 @@
             
                 <li class="arg">
                     
-                        <code>points</code>
+                        <code>centre</code>
                     
                 </li>
             
                 <li class="arg">
                     
-                        <code>app</code>
+                        <code>a</code>
                     
                 </li>
             
                 <li class="arg">
                     
-                        <code>style</code>
+                        <code>b</code>
                     
                 </li>
             
@@ -283,7 +283,7 @@
             
         
         
-        <a href="../files/src_tools_line.js.html#l8"><code>src&#x2F;tools&#x2F;line.js:8</code></a>
+        <a href="../files/src_math_shapes.js.html#l139"><code>src&#x2F;math&#x2F;shapes.js:139</code></a>
         
         </p>
 
@@ -305,30 +305,14 @@
             
                 <li class="param">
                     
-                        <code class="param-name">points</code>
-                        <span class="type">Array</span>
-                    
-
-                    
-
-                    <div class="param-description">
-                        <p>The points from which to extract the line.</p>
-
-                    </div>
-
-                    
-                </li>
-            
-                <li class="param">
-                    
-                        <code class="param-name">app</code>
+                        <code class="param-name">centre</code>
                         <span class="type">Object</span>
                     
 
                     
 
                     <div class="param-description">
-                        <p>The application to draw the line on.</p>
+                        <p>A Point2D representing the centre of the ellipse.</p>
 
                     </div>
 
@@ -337,14 +321,30 @@
             
                 <li class="param">
                     
-                        <code class="param-name">style</code>
-                        <span class="type">Style</span>
+                        <code class="param-name">a</code>
+                        <span class="type">Number</span>
                     
 
                     
 
                     <div class="param-description">
-                        <p>The drawing style.</p>
+                        <p>The radius of the ellipse on the horizontal axe.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+                <li class="param">
+                    
+                        <code class="param-name">b</code>
+                        <span class="type">Number</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The radius of the ellipse on the vertical axe.</p>
 
                     </div>
 
@@ -388,21 +388,35 @@
                     <ul class="index-list methods">
                         
                             <li class="index-item method">
-                                <a href="#method_execute">execute</a>
+                                <a href="#method_getA">getA</a>
 
                                 
                                 
                             </li>
                         
                             <li class="index-item method">
-                                <a href="#method_getName">getName</a>
+                                <a href="#method_getB">getB</a>
 
                                 
                                 
                             </li>
                         
                             <li class="index-item method">
-                                <a href="#method_setName">setName</a>
+                                <a href="#method_getCenter">getCenter</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_getSurface">getSurface</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_getWorldSurface">getWorldSurface</a>
 
                                 
                                 
@@ -419,28 +433,7 @@
                     <ul class="index-list properties">
                         
                             <li class="index-item property private">
-                                <a href="#property_context">context</a>
-
-                                
-                                
-                            </li>
-                        
-                            <li class="index-item property private">
-                                <a href="#property_line">line</a>
-
-                                
-                                
-                            </li>
-                        
-                            <li class="index-item property private">
-                                <a href="#property_lineColor">lineColor</a>
-
-                                
-                                
-                            </li>
-                        
-                            <li class="index-item property private">
-                                <a href="#property_name">name</a>
+                                <a href="#property_surface">surface</a>
 
                                 
                                 
@@ -460,63 +453,8 @@
                 <h2 class="off-left">Methods</h2>
 
                 
-                    <div id="method_execute" class="method item">
-    <h3 class="name"><code>execute</code></h3>
-
-    
-        <span class="paren">()</span>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/src_tools_line.js.html#l62"><code>src&#x2F;tools&#x2F;line.js:62</code></a>
-        
-        </p>
-
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        <p>Execute the command.</p>
-
-    </div>
-
-    
-
-    
-
-    
-</div>
-
-                
-                    <div id="method_getName" class="method item">
-    <h3 class="name"><code>getName</code></h3>
+                    <div id="method_getA" class="method item">
+    <h3 class="name"><code>getA</code></h3>
 
     
         <span class="paren">()</span>
@@ -524,7 +462,7 @@
 
     
         <span class="returns-inline">
-            <span class="type">String</span>
+            <span class="type">Number</span>
         </span>
     
 
@@ -551,7 +489,7 @@
             
         
         
-        <a href="../files/src_tools_line.js.html#l49"><code>src&#x2F;tools&#x2F;line.js:49</code></a>
+        <a href="../files/src_math_shapes.js.html#l164"><code>src&#x2F;math&#x2F;shapes.js:164</code></a>
         
         </p>
 
@@ -562,7 +500,7 @@
     </div>
 
     <div class="description">
-        <p>Get the command name.</p>
+        <p>Get the radius of the ellipse on the horizontal axe.</p>
 
     </div>
 
@@ -575,9 +513,9 @@
             <div class="returns-description">
                 
                     
-                        <span class="type">String</span>:
+                        <span class="type">Number</span>:
                     
-                    <p>The command name.</p>
+                    <p>The radius of the ellipse on the horizontal axe.</p>
 
                 
             </div>
@@ -588,23 +526,17 @@
 </div>
 
                 
-                    <div id="method_setName" class="method item">
-    <h3 class="name"><code>setName</code></h3>
+                    <div id="method_getB" class="method item">
+    <h3 class="name"><code>getB</code></h3>
 
     
-        <div class="args">
-            <span class="paren">(</span><ul class="args-list inline commas">
-            
-                <li class="arg">
-                    
-                        <code>str</code>
-                    
-                </li>
-            
-            </ul><span class="paren">)</span>
-        </div>
+        <span class="paren">()</span>
     
 
+    
+        <span class="returns-inline">
+            <span class="type">Number</span>
+        </span>
     
 
     
@@ -630,7 +562,7 @@
             
         
         
-        <a href="../files/src_tools_line.js.html#l55"><code>src&#x2F;tools&#x2F;line.js:55</code></a>
+        <a href="../files/src_math_shapes.js.html#l170"><code>src&#x2F;math&#x2F;shapes.js:170</code></a>
         
         </p>
 
@@ -641,7 +573,242 @@
     </div>
 
     <div class="description">
-        <p>Set the command name.</p>
+        <p>Get the radius of the ellipse on the vertical axe.</p>
+
+    </div>
+
+    
+
+    
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                
+                    
+                        <span class="type">Number</span>:
+                    
+                    <p>The radius of the ellipse on the vertical axe.</p>
+
+                
+            </div>
+        </div>
+    
+
+    
+</div>
+
+                
+                    <div id="method_getCenter" class="method item">
+    <h3 class="name"><code>getCenter</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+        <span class="returns-inline">
+            <span class="type">Object</span>
+        </span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_math_shapes.js.html#l158"><code>src&#x2F;math&#x2F;shapes.js:158</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Get the centre (point) of the ellipse.</p>
+
+    </div>
+
+    
+
+    
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                
+                    
+                        <span class="type">Object</span>:
+                    
+                    <p>The center (point) of the ellipse.</p>
+
+                
+            </div>
+        </div>
+    
+
+    
+</div>
+
+                
+                    <div id="method_getSurface" class="method item">
+    <h3 class="name"><code>getSurface</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+        <span class="returns-inline">
+            <span class="type">Number</span>
+        </span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_math_shapes.js.html#l176"><code>src&#x2F;math&#x2F;shapes.js:176</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Get the surface of the ellipse.</p>
+
+    </div>
+
+    
+
+    
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                
+                    
+                        <span class="type">Number</span>:
+                    
+                    <p>The surface of the ellipse.</p>
+
+                
+            </div>
+        </div>
+    
+
+    
+</div>
+
+                
+                    <div id="method_getWorldSurface" class="method item">
+    <h3 class="name"><code>getWorldSurface</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>spacingX</code>
+                    
+                </li>
+            
+                <li class="arg">
+                    
+                        <code>spacingY</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+        <span class="returns-inline">
+            <span class="type">Number</span>
+        </span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_math_shapes.js.html#l182"><code>src&#x2F;math&#x2F;shapes.js:182</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Get the surface of the ellipse with a spacing.</p>
 
     </div>
 
@@ -653,14 +820,30 @@
             
                 <li class="param">
                     
-                        <code class="param-name">str</code>
-                        <span class="type">String</span>
+                        <code class="param-name">spacingX</code>
+                        <span class="type">Number</span>
                     
 
                     
 
                     <div class="param-description">
-                        <p>The command name.</p>
+                        <p>The X spacing.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+                <li class="param">
+                    
+                        <code class="param-name">spacingY</code>
+                        <span class="type">Number</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The Y spacing.</p>
 
                     </div>
 
@@ -671,6 +854,20 @@
         </div>
     
 
+    
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                
+                    
+                        <span class="type">Number</span>:
+                    
+                    <p>The surface of the ellipse multiplied by the given spacing.</p>
+
+                
+            </div>
+        </div>
     
 
     
@@ -685,9 +882,9 @@
                 <h2 class="off-left">Properties</h2>
 
                 
-                    <div id="property_context" class="property item private">
-    <h3 class="name"><code>context</code></h3>
-    <span class="type">Object</span>
+                    <div id="property_surface" class="property item private">
+    <h3 class="name"><code>surface</code></h3>
+    <span class="type">Number</span>
 
     
 
@@ -710,7 +907,7 @@
             
         
         
-        <a href="../files/src_tools_line.js.html#l34"><code>src&#x2F;tools&#x2F;line.js:34</code></a>
+        <a href="../files/src_math_shapes.js.html#l150"><code>src&#x2F;math&#x2F;shapes.js:150</code></a>
         
         </p>
 
@@ -720,148 +917,7 @@
     </div>
 
     <div class="description">
-        <p>HTML context.</p>
-
-    </div>
-
-    
-
-    
-
-    
-</div>
-
-                
-                    <div id="property_line" class="property item private">
-    <h3 class="name"><code>line</code></h3>
-    <span class="type">Line</span>
-
-    
-
-    
-        <span class="flag private">private</span>
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/src_tools_line.js.html#l19"><code>src&#x2F;tools&#x2F;line.js:19</code></a>
-        
-        </p>
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        <p>Line object.</p>
-
-    </div>
-
-    
-
-    
-
-    
-</div>
-
-                
-                    <div id="property_lineColor" class="property item private">
-    <h3 class="name"><code>lineColor</code></h3>
-    <span class="type">String</span>
-
-    
-
-    
-        <span class="flag private">private</span>
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/src_tools_line.js.html#l27"><code>src&#x2F;tools&#x2F;line.js:27</code></a>
-        
-        </p>
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        <p>Line color.</p>
-
-    </div>
-
-    
-
-    
-
-    
-</div>
-
-                
-                    <div id="property_name" class="property item private">
-    <h3 class="name"><code>name</code></h3>
-    <span class="type">String</span>
-
-    
-
-    
-        <span class="flag private">private</span>
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/src_tools_line.js.html#l42"><code>src&#x2F;tools&#x2F;line.js:42</code></a>
-        
-        </p>
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        <p>Command name.</p>
+        <p>Circle surface.</p>
 
     </div>
 

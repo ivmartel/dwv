@@ -19,7 +19,7 @@
             
         </div>
         <div class="yui3-u-1-4 version">
-            <em>API Docs for: 0.6.0</em>
+            <em>API Docs for: 0.7.0</em>
         </div>
     </div>
     <div id="bd" class="yui3-g">
@@ -48,8 +48,6 @@
                 <li><a href="../classes/dwv.dicom.DataReader.html">dwv.dicom.DataReader</a></li>
             
                 <li><a href="../classes/dwv.dicom.DicomParser.html">dwv.dicom.DicomParser</a></li>
-            
-                <li><a href="../classes/dwv.dicom.Dictionary.html">dwv.dicom.Dictionary</a></li>
             
                 <li><a href="../classes/dwv.gui.html">dwv.gui</a></li>
             
@@ -89,6 +87,8 @@
             
                 <li><a href="../classes/dwv.math.Circle.html">dwv.math.Circle</a></li>
             
+                <li><a href="../classes/dwv.math.Ellipse.html">dwv.math.Ellipse</a></li>
+            
                 <li><a href="../classes/dwv.math.FastPoint2D.html">dwv.math.FastPoint2D</a></li>
             
                 <li><a href="../classes/dwv.math.Line.html">dwv.math.Line</a></li>
@@ -105,17 +105,13 @@
             
                 <li><a href="../classes/dwv.tool.html">dwv.tool</a></li>
             
+                <li><a href="../classes/dwv.tool.ChangeShapeCommand.html">dwv.tool.ChangeShapeCommand</a></li>
+            
+                <li><a href="../classes/dwv.tool.DeleteShapeCommand.html">dwv.tool.DeleteShapeCommand</a></li>
+            
                 <li><a href="../classes/dwv.tool.Draw.html">dwv.tool.Draw</a></li>
             
-                <li><a href="../classes/dwv.tool.DrawCircleCommand.html">dwv.tool.DrawCircleCommand</a></li>
-            
-                <li><a href="../classes/dwv.tool.DrawLineCommand.html">dwv.tool.DrawLineCommand</a></li>
-            
-                <li><a href="../classes/dwv.tool.DrawLivewireCommand.html">dwv.tool.DrawLivewireCommand</a></li>
-            
-                <li><a href="../classes/dwv.tool.DrawRectangleCommand.html">dwv.tool.DrawRectangleCommand</a></li>
-            
-                <li><a href="../classes/dwv.tool.DrawRoiCommand.html">dwv.tool.DrawRoiCommand</a></li>
+                <li><a href="../classes/dwv.tool.DrawShapeCommand.html">dwv.tool.DrawShapeCommand</a></li>
             
                 <li><a href="../classes/dwv.tool.Filter.html">dwv.tool.Filter</a></li>
             
@@ -125,9 +121,13 @@
             
                 <li><a href="../classes/dwv.tool.Livewire.html">dwv.tool.Livewire</a></li>
             
+                <li><a href="../classes/dwv.tool.MoveShapeCommand.html">dwv.tool.MoveShapeCommand</a></li>
+            
                 <li><a href="../classes/dwv.tool.RunFilterCommand.html">dwv.tool.RunFilterCommand</a></li>
             
                 <li><a href="../classes/dwv.tool.Scroll.html">dwv.tool.Scroll</a></li>
+            
+                <li><a href="../classes/dwv.tool.ShapeEditor.html">dwv.tool.ShapeEditor</a></li>
             
                 <li><a href="../classes/dwv.tool.ToolBox.html">dwv.tool.ToolBox</a></li>
             
@@ -206,7 +206,7 @@
 
     
         <div class="foundat">
-            Defined in: <a href="../files/src_application.js.html#l4"><code>src&#x2F;application.js:4</code></a>
+            Defined in: <a href="../files/src_application.js.html#l6"><code>src&#x2F;application.js:6</code></a>
         </div>
     
 
@@ -261,7 +261,7 @@
             
         
         
-        <a href="../files/src_application.js.html#l4"><code>src&#x2F;application.js:4</code></a>
+        <a href="../files/src_application.js.html#l6"><code>src&#x2F;application.js:6</code></a>
         
         </p>
 
@@ -350,6 +350,13 @@
                             </li>
                         
                             <li class="index-item method">
+                                <a href="#method_getDrawStage">getDrawStage</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
                                 <a href="#method_getImage">getImage</a>
 
                                 
@@ -365,13 +372,6 @@
                         
                             <li class="index-item method">
                                 <a href="#method_getImageLayer">getImageLayer</a>
-
-                                
-                                
-                            </li>
-                        
-                            <li class="index-item method">
-                                <a href="#method_getTempLayer">getTempLayer</a>
 
                                 
                                 
@@ -476,6 +476,13 @@
                             </li>
                         
                             <li class="index-item method">
+                                <a href="#method_resetLayout">resetLayout</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
                                 <a href="#method_resize">resize</a>
 
                                 
@@ -553,7 +560,7 @@
             
         
         
-        <a href="../files/src_application.js.html#l291"><code>src&#x2F;application.js:291</code></a>
+        <a href="../files/src_application.js.html#l350"><code>src&#x2F;application.js:350</code></a>
         
         </p>
 
@@ -626,7 +633,7 @@
             
         
         
-        <a href="../files/src_application.js.html#l408"><code>src&#x2F;application.js:408</code></a>
+        <a href="../files/src_application.js.html#l474"><code>src&#x2F;application.js:474</code></a>
         
         </p>
 
@@ -733,7 +740,7 @@
             
         
         
-        <a href="../files/src_application.js.html#l439"><code>src&#x2F;application.js:439</code></a>
+        <a href="../files/src_application.js.html#l510"><code>src&#x2F;application.js:510</code></a>
         
         </p>
 
@@ -824,7 +831,7 @@
             
         
         
-        <a href="../files/src_application.js.html#l321"><code>src&#x2F;application.js:321</code></a>
+        <a href="../files/src_application.js.html#l380"><code>src&#x2F;application.js:380</code></a>
         
         </p>
 
@@ -904,7 +911,7 @@ position relative to the canvas element. It then passes it to the current tool.<
             
         
         
-        <a href="../files/src_application.js.html#l231"><code>src&#x2F;application.js:231</code></a>
+        <a href="../files/src_application.js.html#l259"><code>src&#x2F;application.js:259</code></a>
         
         </p>
 
@@ -963,7 +970,7 @@ position relative to the canvas element. It then passes it to the current tool.<
             
         
         
-        <a href="../files/src_application.js.html#l101"><code>src&#x2F;application.js:101</code></a>
+        <a href="../files/src_application.js.html#l108"><code>src&#x2F;application.js:108</code></a>
         
         </p>
 
@@ -975,6 +982,79 @@ position relative to the canvas element. It then passes it to the current tool.<
 
     <div class="description">
         <p>Get the draw layer.</p>
+
+    </div>
+
+    
+
+    
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                
+                    
+                        <span class="type">Object</span>:
+                    
+                    <p>The draw layer.</p>
+
+                
+            </div>
+        </div>
+    
+
+    
+</div>
+
+                
+                    <div id="method_getDrawStage" class="method item">
+    <h3 class="name"><code>getDrawStage</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+        <span class="returns-inline">
+            <span class="type">Object</span>
+        </span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_application.js.html#l114"><code>src&#x2F;application.js:114</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Get the draw stage.</p>
 
     </div>
 
@@ -1036,7 +1116,7 @@ position relative to the canvas element. It then passes it to the current tool.<
             
         
         
-        <a href="../files/src_application.js.html#l47"><code>src&#x2F;application.js:47</code></a>
+        <a href="../files/src_application.js.html#l54"><code>src&#x2F;application.js:54</code></a>
         
         </p>
 
@@ -1109,7 +1189,7 @@ position relative to the canvas element. It then passes it to the current tool.<
             
         
         
-        <a href="../files/src_application.js.html#l81"><code>src&#x2F;application.js:81</code></a>
+        <a href="../files/src_application.js.html#l88"><code>src&#x2F;application.js:88</code></a>
         
         </p>
 
@@ -1182,7 +1262,7 @@ position relative to the canvas element. It then passes it to the current tool.<
             
         
         
-        <a href="../files/src_application.js.html#l95"><code>src&#x2F;application.js:95</code></a>
+        <a href="../files/src_application.js.html#l102"><code>src&#x2F;application.js:102</code></a>
         
         </p>
 
@@ -1209,79 +1289,6 @@ position relative to the canvas element. It then passes it to the current tool.<
                         <span class="type">Object</span>:
                     
                     <p>The image layer.</p>
-
-                
-            </div>
-        </div>
-    
-
-    
-</div>
-
-                
-                    <div id="method_getTempLayer" class="method item">
-    <h3 class="name"><code>getTempLayer</code></h3>
-
-    
-        <span class="paren">()</span>
-    
-
-    
-        <span class="returns-inline">
-            <span class="type">Object</span>
-        </span>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/src_application.js.html#l107"><code>src&#x2F;application.js:107</code></a>
-        
-        </p>
-
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        <p>Get the temporary layer.</p>
-
-    </div>
-
-    
-
-    
-        <div class="returns">
-            <h4>Returns:</h4>
-
-            <div class="returns-description">
-                
-                    
-                        <span class="type">Object</span>:
-                    
-                    <p>The temporary layer.</p>
 
                 
             </div>
@@ -1328,7 +1335,7 @@ position relative to the canvas element. It then passes it to the current tool.<
             
         
         
-        <a href="../files/src_application.js.html#l88"><code>src&#x2F;application.js:88</code></a>
+        <a href="../files/src_application.js.html#l95"><code>src&#x2F;application.js:95</code></a>
         
         </p>
 
@@ -1401,7 +1408,7 @@ position relative to the canvas element. It then passes it to the current tool.<
             
         
         
-        <a href="../files/src_application.js.html#l114"><code>src&#x2F;application.js:114</code></a>
+        <a href="../files/src_application.js.html#l121"><code>src&#x2F;application.js:121</code></a>
         
         </p>
 
@@ -1474,7 +1481,7 @@ position relative to the canvas element. It then passes it to the current tool.<
             
         
         
-        <a href="../files/src_application.js.html#l40"><code>src&#x2F;application.js:40</code></a>
+        <a href="../files/src_application.js.html#l47"><code>src&#x2F;application.js:47</code></a>
         
         </p>
 
@@ -1547,7 +1554,7 @@ position relative to the canvas element. It then passes it to the current tool.<
             
         
         
-        <a href="../files/src_application.js.html#l53"><code>src&#x2F;application.js:53</code></a>
+        <a href="../files/src_application.js.html#l60"><code>src&#x2F;application.js:60</code></a>
         
         </p>
 
@@ -1628,7 +1635,7 @@ position relative to the canvas element. It then passes it to the current tool.<
             
         
         
-        <a href="../files/src_application.js.html#l395"><code>src&#x2F;application.js:395</code></a>
+        <a href="../files/src_application.js.html#l453"><code>src&#x2F;application.js:453</code></a>
         
         </p>
 
@@ -1717,7 +1724,7 @@ position relative to the canvas element. It then passes it to the current tool.<
             
         
         
-        <a href="../files/src_application.js.html#l151"><code>src&#x2F;application.js:151</code></a>
+        <a href="../files/src_application.js.html#l175"><code>src&#x2F;application.js:175</code></a>
         
         </p>
 
@@ -1801,7 +1808,7 @@ Default behavior. Usually used in tools.</li>
             
         
         
-        <a href="../files/src_application.js.html#l121"><code>src&#x2F;application.js:121</code></a>
+        <a href="../files/src_application.js.html#l128"><code>src&#x2F;application.js:128</code></a>
         
         </p>
 
@@ -1866,7 +1873,7 @@ Default behavior. Usually used in tools.</li>
             
         
         
-        <a href="../files/src_application.js.html#l181"><code>src&#x2F;application.js:181</code></a>
+        <a href="../files/src_application.js.html#l205"><code>src&#x2F;application.js:205</code></a>
         
         </p>
 
@@ -1955,7 +1962,7 @@ Default behavior. Usually used in tools.</li>
             
         
         
-        <a href="../files/src_application.js.html#l211"><code>src&#x2F;application.js:211</code></a>
+        <a href="../files/src_application.js.html#l237"><code>src&#x2F;application.js:237</code></a>
         
         </p>
 
@@ -2044,7 +2051,7 @@ Default behavior. Usually used in tools.</li>
             
         
         
-        <a href="../files/src_application.js.html#l171"><code>src&#x2F;application.js:171</code></a>
+        <a href="../files/src_application.js.html#l195"><code>src&#x2F;application.js:195</code></a>
         
         </p>
 
@@ -2133,7 +2140,7 @@ Default behavior. Usually used in tools.</li>
             
         
         
-        <a href="../files/src_application.js.html#l201"><code>src&#x2F;application.js:201</code></a>
+        <a href="../files/src_application.js.html#l227"><code>src&#x2F;application.js:227</code></a>
         
         </p>
 
@@ -2224,7 +2231,7 @@ Default behavior. Usually used in tools.</li>
             
         
         
-        <a href="../files/src_application.js.html#l468"><code>src&#x2F;application.js:468</code></a>
+        <a href="../files/src_application.js.html#l543"><code>src&#x2F;application.js:543</code></a>
         
         </p>
 
@@ -2305,7 +2312,7 @@ Default behavior. Usually used in tools.</li>
             
         
         
-        <a href="../files/src_application.js.html#l306"><code>src&#x2F;application.js:306</code></a>
+        <a href="../files/src_application.js.html#l365"><code>src&#x2F;application.js:365</code></a>
         
         </p>
 
@@ -2360,7 +2367,7 @@ Default behavior. Usually used in tools.</li>
             
         
         
-        <a href="../files/src_application.js.html#l140"><code>src&#x2F;application.js:140</code></a>
+        <a href="../files/src_application.js.html#l147"><code>src&#x2F;application.js:147</code></a>
         
         </p>
 
@@ -2372,6 +2379,61 @@ Default behavior. Usually used in tools.</li>
 
     <div class="description">
         <p>Reset the application.</p>
+
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_resetLayout" class="method item">
+    <h3 class="name"><code>resetLayout</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_application.js.html#l159"><code>src&#x2F;application.js:159</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Reset the layout of the application.</p>
 
     </div>
 
@@ -2415,7 +2477,7 @@ Default behavior. Usually used in tools.</li>
             
         
         
-        <a href="../files/src_application.js.html#l245"><code>src&#x2F;application.js:245</code></a>
+        <a href="../files/src_application.js.html#l273"><code>src&#x2F;application.js:273</code></a>
         
         </p>
 
@@ -2470,7 +2532,7 @@ Default behavior. Usually used in tools.</li>
             
         
         
-        <a href="../files/src_application.js.html#l71"><code>src&#x2F;application.js:71</code></a>
+        <a href="../files/src_application.js.html#l78"><code>src&#x2F;application.js:78</code></a>
         
         </p>
 
@@ -2535,7 +2597,7 @@ Default behavior. Usually used in tools.</li>
             
         
         
-        <a href="../files/src_application.js.html#l60"><code>src&#x2F;application.js:60</code></a>
+        <a href="../files/src_application.js.html#l67"><code>src&#x2F;application.js:67</code></a>
         
         </p>
 
@@ -2614,7 +2676,7 @@ Default behavior. Usually used in tools.</li>
             
         
         
-        <a href="../files/src_application.js.html#l258"><code>src&#x2F;application.js:258</code></a>
+        <a href="../files/src_application.js.html#l317"><code>src&#x2F;application.js:317</code></a>
         
         </p>
 

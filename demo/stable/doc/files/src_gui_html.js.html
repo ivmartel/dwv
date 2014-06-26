@@ -19,7 +19,7 @@
             
         </div>
         <div class="yui3-u-1-4 version">
-            <em>API Docs for: 0.6.0</em>
+            <em>API Docs for: 0.7.0</em>
         </div>
     </div>
     <div id="bd" class="yui3-g">
@@ -48,8 +48,6 @@
                 <li><a href="../classes/dwv.dicom.DataReader.html">dwv.dicom.DataReader</a></li>
             
                 <li><a href="../classes/dwv.dicom.DicomParser.html">dwv.dicom.DicomParser</a></li>
-            
-                <li><a href="../classes/dwv.dicom.Dictionary.html">dwv.dicom.Dictionary</a></li>
             
                 <li><a href="../classes/dwv.gui.html">dwv.gui</a></li>
             
@@ -89,6 +87,8 @@
             
                 <li><a href="../classes/dwv.math.Circle.html">dwv.math.Circle</a></li>
             
+                <li><a href="../classes/dwv.math.Ellipse.html">dwv.math.Ellipse</a></li>
+            
                 <li><a href="../classes/dwv.math.FastPoint2D.html">dwv.math.FastPoint2D</a></li>
             
                 <li><a href="../classes/dwv.math.Line.html">dwv.math.Line</a></li>
@@ -105,17 +105,13 @@
             
                 <li><a href="../classes/dwv.tool.html">dwv.tool</a></li>
             
+                <li><a href="../classes/dwv.tool.ChangeShapeCommand.html">dwv.tool.ChangeShapeCommand</a></li>
+            
+                <li><a href="../classes/dwv.tool.DeleteShapeCommand.html">dwv.tool.DeleteShapeCommand</a></li>
+            
                 <li><a href="../classes/dwv.tool.Draw.html">dwv.tool.Draw</a></li>
             
-                <li><a href="../classes/dwv.tool.DrawCircleCommand.html">dwv.tool.DrawCircleCommand</a></li>
-            
-                <li><a href="../classes/dwv.tool.DrawLineCommand.html">dwv.tool.DrawLineCommand</a></li>
-            
-                <li><a href="../classes/dwv.tool.DrawLivewireCommand.html">dwv.tool.DrawLivewireCommand</a></li>
-            
-                <li><a href="../classes/dwv.tool.DrawRectangleCommand.html">dwv.tool.DrawRectangleCommand</a></li>
-            
-                <li><a href="../classes/dwv.tool.DrawRoiCommand.html">dwv.tool.DrawRoiCommand</a></li>
+                <li><a href="../classes/dwv.tool.DrawShapeCommand.html">dwv.tool.DrawShapeCommand</a></li>
             
                 <li><a href="../classes/dwv.tool.Filter.html">dwv.tool.Filter</a></li>
             
@@ -125,9 +121,13 @@
             
                 <li><a href="../classes/dwv.tool.Livewire.html">dwv.tool.Livewire</a></li>
             
+                <li><a href="../classes/dwv.tool.MoveShapeCommand.html">dwv.tool.MoveShapeCommand</a></li>
+            
                 <li><a href="../classes/dwv.tool.RunFilterCommand.html">dwv.tool.RunFilterCommand</a></li>
             
                 <li><a href="../classes/dwv.tool.Scroll.html">dwv.tool.Scroll</a></li>
+            
+                <li><a href="../classes/dwv.tool.ShapeEditor.html">dwv.tool.ShapeEditor</a></li>
             
                 <li><a href="../classes/dwv.tool.ToolBox.html">dwv.tool.ToolBox</a></li>
             
@@ -239,7 +239,9 @@ dwv.html.appendHCell = function(row, text)
 {
     var cell = document.createElement(&quot;th&quot;);
     // TODO jquery-mobile specific...
-    if( text !== &quot;Value&quot; &amp;&amp; text !== &quot;Name&quot; ) cell.setAttribute(&quot;data-priority&quot;, &quot;1&quot;);
+    if( text !== &quot;Value&quot; &amp;&amp; text !== &quot;Name&quot; ) {
+        cell.setAttribute(&quot;data-priority&quot;, &quot;1&quot;);
+    }
     cell.appendChild(document.createTextNode(text));
     row.appendChild(cell);
 };
@@ -529,7 +531,9 @@ dwv.html.removeNode = function(nodeId) {
     // find the node
     var node = document.getElementById(nodeId);
     // check node
-    if( !node ) return;
+    if( !node ) {
+        return;
+    }
     // remove its children
     dwv.html.cleanNode(node);
     // remove it from its parent
@@ -584,7 +588,9 @@ dwv.html.createHtmlSelect = function(name, list) {
 /**
  * Get a list of parameters from an input URI that looks like:
  *  [dwv root]?input=encodeURI([root]?key0=value0&amp;key1=value1)
- * 
+ * or
+ *  [dwv root]?input=encodeURI([manifest link])&amp;type=manifest
+ *  
  * @method getUriParam
  * @static
  * @param {String } uri The URI to decode.
@@ -593,21 +599,52 @@ dwv.html.createHtmlSelect = function(name, list) {
 dwv.html.getUriParam = function(uri)
 {
     var inputUri = uri || window.location.href;
-    var result = [];
     // split key/value pairs
     var mainQueryPairs = dwv.utils.splitQueryString(inputUri);
     // check pairs
-    if( mainQueryPairs === null ) return null;
+    if( mainQueryPairs === null ) {
+        return null;
+    }
     // has to have an input key
-    if( !mainQueryPairs.query || !mainQueryPairs.query.input ) 
+    var query = mainQueryPairs.query;
+    if( !query || !query.input ) { 
         throw new Error(&quot;No input parameter in query URI.&quot;);
+    }
+    
+    var result = [];
+    // if manifest
+    if( query.type &amp;&amp; query.type === &quot;manifest&quot; ) {
+        result = dwv.html.decodeManifestUri( query.input, query.nslices );
+    }
+    // if key/value uri
+    else {
+        result = dwv.html.decodeKeyValueUri( query.input, query.dwvReplaceMode );
+    }
+   
+    return result;
+};
+
+/**
+ * Decode a Key/Value pair uri. If a key is repeated, the result 
+ * be an array of base + each key. 
+ * @method decodeKeyValueUri
+ * @static
+ * @param {String} uri The uri to decode.
+ * @param {String} replaceMode The key replace more.
+ */
+dwv.html.decodeKeyValueUri = function(uri, replaceMode)
+{
+    var result = [];
+
     // decode input URI
-    var queryUri = decodeURIComponent(mainQueryPairs.query.input);
+    var queryUri = decodeURIComponent(uri);
     // get key/value pairs from input URI
     var inputQueryPairs = dwv.utils.splitQueryString(queryUri);
     // repeat key replace mode (default to keep key)
     var repeatKeyReplaceMode = &quot;key&quot;;
-    if( mainQueryPairs.query.dwvReplaceMode ) repeatKeyReplaceMode = mainQueryPairs.query.dwvReplaceMode;
+    if( replaceMode ) {
+        repeatKeyReplaceMode = replaceMode;
+    }
     
     if( !inputQueryPairs ) 
     {
@@ -638,13 +675,16 @@ dwv.html.getUriParam = function(uri)
             var baseUrl = inputQueryPairs.base;
             // do not add &#x27;?&#x27; for what looks like file elements
             // root/path/to/?key=0.jpg&amp;key=1.jpg
-            if( !( baseUrl[baseUrl.length-1] === &#x27;/&#x27; &amp;&amp; repeatList[0].indexOf(&#x27;.&#x27;) !== -1 ) ) 
+            if( !( baseUrl[baseUrl.length-1] === &#x27;/&#x27; &amp;&amp; repeatList[0].indexOf(&#x27;.&#x27;) !== -1 ) ) { 
                 baseUrl += &quot;?&quot;;
+            }
             var gotOneArg = false;
             for( var j = 0; j &lt; keys.length; ++j )
             {
                 if( keys[j] !== repeatKey ) {
-                    if( gotOneArg ) baseUrl += &quot;&amp;&quot;;
+                    if( gotOneArg ) {
+                        baseUrl += &quot;&amp;&quot;;
+                    }
                     baseUrl += keys[j] + &quot;=&quot; + inputQueryPairs.query[keys[j]];
                     gotOneArg = true;
                 }
@@ -654,22 +694,106 @@ dwv.html.getUriParam = function(uri)
             for( var k = 0; k &lt; repeatList.length; ++k )
             {
                 url = baseUrl;
-                if( gotOneArg ) url += &quot;&amp;&quot;;
-                if( repeatKeyReplaceMode === &quot;key&quot; ) url += repeatKey + &quot;=&quot;;
+                if( gotOneArg ) {
+                    url += &quot;&amp;&quot;;
+                }
+                if( repeatKeyReplaceMode === &quot;key&quot; ) {
+                    url += repeatKey + &quot;=&quot;;
+                }
                 // other than &#x27;key&#x27; mode: do nothing
                 url += repeatList[k];
                 result.push(url);
             }
         }
     }
-    
+    // return
     return result;
 };
 
+/**
+ * Decode a manifest uri. 
+ * @method decodeManifestUri
+ * @static
+ * @param {String} uri The uri to decode.
+ * @param {number} nslices The number of slices to load.
+ */
+dwv.html.decodeManifestUri = function(uri, nslices)
+{
+    var result = [];
+    
+    // Request error
+    var onErrorRequest = function(/*event*/)
+    {
+        console.warn( &quot;RequestError while receiving manifest: &quot;+this.status );
+    };
+
+    // Request handler
+    var onLoadRequest = function(/*event*/)
+    {
+        var doc = this.responseXML;
+        // wado url
+        var wadoElement = doc.getElementsByTagName(&quot;wado_query&quot;);
+        var wadoURL = wadoElement[0].getAttribute(&quot;wadoURL&quot;);
+        var rootURL = wadoURL + &quot;?requestType=WADO&amp;contentType=application/dicom&amp;&quot;;
+        // patient list
+        var patientList = doc.getElementsByTagName(&quot;Patient&quot;);
+        if( patientList.length &gt; 1 ) {
+            console.warn(&quot;More than one patient, loading first one.&quot;);
+        }
+        // study list
+        var studyList = patientList[0].getElementsByTagName(&quot;Study&quot;);
+        if( studyList.length &gt; 1 ) {
+            console.warn(&quot;More than one study, loading first one.&quot;);
+        }
+        var studyUID = studyList[0].getAttribute(&quot;StudyInstanceUID&quot;);
+        // series list
+        var seriesList = studyList[0].getElementsByTagName(&quot;Series&quot;);
+        if( seriesList.length &gt; 1 ) {
+            console.warn(&quot;More than one series, loading first one.&quot;);
+        }
+        var seriesUID = seriesList[0].getAttribute(&quot;SeriesInstanceUID&quot;);
+        // instance list
+        var instanceList = seriesList[0].getElementsByTagName(&quot;Instance&quot;);
+        // loop on instances and push links
+        var max = instanceList.length;
+        if( nslices &lt; max ) {
+            max = nslices;
+        }
+        for( var i = 0; i &lt; max; ++i ) {
+            var sopInstanceUID = instanceList[i].getAttribute(&quot;SOPInstanceUID&quot;);
+            var link = rootURL + 
+            &quot;&amp;studyUID=&quot; + studyUID +
+            &quot;&amp;seriesUID=&quot; + seriesUID +
+            &quot;&amp;objectUID=&quot; + sopInstanceUID;
+            result.push( link );
+        }
+    };
+    
+    var request = new XMLHttpRequest();
+    request.open(&#x27;GET&#x27;, decodeURIComponent(uri), false);
+    request.responseType = &quot;xml&quot;; 
+    request.onload = onLoadRequest;
+    request.onerror = onErrorRequest;
+    //request.onprogress = dwv.gui.updateProgress;
+    request.send(null);
+
+    // return
+    return result;
+};
+
+/**
+ * Display or not an element.
+ * @method displayElement
+ * @static
+ * @param {Number} id The id of the element to toggle its display.
+ * @param {Boolean} bool True to display the element.
+ */
 dwv.html.displayElement = function(id,bool)
 {
     var element = document.getElementById(id);
-    if( element ) element.style.display = bool ? &quot;&quot; : &quot;none&quot;;
+    if( element ) {
+        element.style.display = bool ? &quot;&quot; : &quot;none&quot;;
+    }
 };
 
 /**
@@ -683,8 +807,12 @@ dwv.html.toggleDisplay = function(id)
     if( document.getElementById(id) )
     {
         var div = document.getElementById(id);
-        if( div.style.display === &quot;none&quot; ) div.style.display = &#x27;&#x27;;
-        else div.style.display = &quot;none&quot;;
+        if( div.style.display === &quot;none&quot; ) {
+            div.style.display = &#x27;&#x27;;
+        }
+        else {
+            div.style.display = &quot;none&quot;;
+        }
     }
 };
 

@@ -19,7 +19,7 @@
             
         </div>
         <div class="yui3-u-1-4 version">
-            <em>API Docs for: 0.6.0</em>
+            <em>API Docs for: 0.7.0</em>
         </div>
     </div>
     <div id="bd" class="yui3-g">
@@ -48,8 +48,6 @@
                 <li><a href="../classes/dwv.dicom.DataReader.html">dwv.dicom.DataReader</a></li>
             
                 <li><a href="../classes/dwv.dicom.DicomParser.html">dwv.dicom.DicomParser</a></li>
-            
-                <li><a href="../classes/dwv.dicom.Dictionary.html">dwv.dicom.Dictionary</a></li>
             
                 <li><a href="../classes/dwv.gui.html">dwv.gui</a></li>
             
@@ -89,6 +87,8 @@
             
                 <li><a href="../classes/dwv.math.Circle.html">dwv.math.Circle</a></li>
             
+                <li><a href="../classes/dwv.math.Ellipse.html">dwv.math.Ellipse</a></li>
+            
                 <li><a href="../classes/dwv.math.FastPoint2D.html">dwv.math.FastPoint2D</a></li>
             
                 <li><a href="../classes/dwv.math.Line.html">dwv.math.Line</a></li>
@@ -105,17 +105,13 @@
             
                 <li><a href="../classes/dwv.tool.html">dwv.tool</a></li>
             
+                <li><a href="../classes/dwv.tool.ChangeShapeCommand.html">dwv.tool.ChangeShapeCommand</a></li>
+            
+                <li><a href="../classes/dwv.tool.DeleteShapeCommand.html">dwv.tool.DeleteShapeCommand</a></li>
+            
                 <li><a href="../classes/dwv.tool.Draw.html">dwv.tool.Draw</a></li>
             
-                <li><a href="../classes/dwv.tool.DrawCircleCommand.html">dwv.tool.DrawCircleCommand</a></li>
-            
-                <li><a href="../classes/dwv.tool.DrawLineCommand.html">dwv.tool.DrawLineCommand</a></li>
-            
-                <li><a href="../classes/dwv.tool.DrawLivewireCommand.html">dwv.tool.DrawLivewireCommand</a></li>
-            
-                <li><a href="../classes/dwv.tool.DrawRectangleCommand.html">dwv.tool.DrawRectangleCommand</a></li>
-            
-                <li><a href="../classes/dwv.tool.DrawRoiCommand.html">dwv.tool.DrawRoiCommand</a></li>
+                <li><a href="../classes/dwv.tool.DrawShapeCommand.html">dwv.tool.DrawShapeCommand</a></li>
             
                 <li><a href="../classes/dwv.tool.Filter.html">dwv.tool.Filter</a></li>
             
@@ -125,9 +121,13 @@
             
                 <li><a href="../classes/dwv.tool.Livewire.html">dwv.tool.Livewire</a></li>
             
+                <li><a href="../classes/dwv.tool.MoveShapeCommand.html">dwv.tool.MoveShapeCommand</a></li>
+            
                 <li><a href="../classes/dwv.tool.RunFilterCommand.html">dwv.tool.RunFilterCommand</a></li>
             
                 <li><a href="../classes/dwv.tool.Scroll.html">dwv.tool.Scroll</a></li>
+            
+                <li><a href="../classes/dwv.tool.ShapeEditor.html">dwv.tool.ShapeEditor</a></li>
             
                 <li><a href="../classes/dwv.tool.ToolBox.html">dwv.tool.ToolBox</a></li>
             
@@ -206,7 +206,7 @@
 
     
         <div class="foundat">
-            Defined in: <a href="../files/src_tools_draw.js.html#l13"><code>src&#x2F;tools&#x2F;draw.js:13</code></a>
+            Defined in: <a href="../files/src_tools_draw.js.html#l172"><code>src&#x2F;tools&#x2F;draw.js:172</code></a>
         </div>
     
 
@@ -271,7 +271,7 @@
             
         
         
-        <a href="../files/src_tools_draw.js.html#l13"><code>src&#x2F;tools&#x2F;draw.js:13</code></a>
+        <a href="../files/src_tools_draw.js.html#l172"><code>src&#x2F;tools&#x2F;draw.js:172</code></a>
         
         </p>
 
@@ -421,6 +421,20 @@
                             </li>
                         
                             <li class="index-item method">
+                                <a href="#method_setShapeOff">setShapeOff</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_setShapeOn">setShapeOn</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
                                 <a href="#method_touchend">touchend</a>
 
                                 
@@ -452,13 +466,41 @@
                     <ul class="index-list properties">
                         
                             <li class="index-item property private">
+                                <a href="#property_activeShape">activeShape</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item property private">
                                 <a href="#property_command">command</a>
 
                                 
                                 
                             </li>
                         
-                            <li class="index-item property">
+                            <li class="index-item property private">
+                                <a href="#property_createdShapes">createdShapes</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item property private">
+                                <a href="#property_justStarted">justStarted</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item property private">
+                                <a href="#property_lastPoint">lastPoint</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item property private">
                                 <a href="#property_points">points</a>
 
                                 
@@ -472,6 +514,20 @@
                                 
                             </li>
                         
+                            <li class="index-item property private">
+                                <a href="#property_shapeEditor">shapeEditor</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item property private">
+                                <a href="#property_shapeGroup">shapeGroup</a>
+
+                                
+                                
+                            </li>
+                        
                             <li class="index-item property">
                                 <a href="#property_shapeName">shapeName</a>
 
@@ -479,7 +535,7 @@
                                 
                             </li>
                         
-                            <li class="index-item property">
+                            <li class="index-item property private">
                                 <a href="#property_started">started</a>
 
                                 
@@ -488,6 +544,13 @@
                         
                             <li class="index-item property">
                                 <a href="#property_style">style</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item property private">
+                                <a href="#property_trash">trash</a>
 
                                 
                                 
@@ -516,7 +579,7 @@
             
                 <li class="arg">
                     
-                        <code>bool</code>
+                        <code>flag</code>
                     
                 </li>
             
@@ -549,7 +612,7 @@
             
         
         
-        <a href="../files/src_tools_draw.js.html#l161"><code>src&#x2F;tools&#x2F;draw.js:161</code></a>
+        <a href="../files/src_tools_draw.js.html#l445"><code>src&#x2F;tools&#x2F;draw.js:445</code></a>
         
         </p>
 
@@ -572,7 +635,7 @@
             
                 <li class="param">
                     
-                        <code class="param-name">bool</code>
+                        <code class="param-name">flag</code>
                         <span class="type">Boolean</span>
                     
 
@@ -632,7 +695,7 @@
             
         
         
-        <a href="../files/src_tools_draw.js.html#l172"><code>src&#x2F;tools&#x2F;draw.js:172</code></a>
+        <a href="../files/src_tools_draw.js.html#l616"><code>src&#x2F;tools&#x2F;draw.js:616</code></a>
         
         </p>
 
@@ -711,7 +774,7 @@
             
         
         
-        <a href="../files/src_tools_draw.js.html#l218"><code>src&#x2F;tools&#x2F;draw.js:218</code></a>
+        <a href="../files/src_tools_draw.js.html#l664"><code>src&#x2F;tools&#x2F;draw.js:664</code></a>
         
         </p>
 
@@ -790,7 +853,7 @@
             
         
         
-        <a href="../files/src_tools_draw.js.html#l227"><code>src&#x2F;tools&#x2F;draw.js:227</code></a>
+        <a href="../files/src_tools_draw.js.html#l673"><code>src&#x2F;tools&#x2F;draw.js:673</code></a>
         
         </p>
 
@@ -855,7 +918,7 @@
             
         
         
-        <a href="../files/src_tools_draw.js.html#l152"><code>src&#x2F;tools&#x2F;draw.js:152</code></a>
+        <a href="../files/src_tools_draw.js.html#l436"><code>src&#x2F;tools&#x2F;draw.js:436</code></a>
         
         </p>
 
@@ -944,7 +1007,7 @@
             
         
         
-        <a href="../files/src_tools_draw.js.html#l62"><code>src&#x2F;tools&#x2F;draw.js:62</code></a>
+        <a href="../files/src_tools_draw.js.html#l290"><code>src&#x2F;tools&#x2F;draw.js:290</code></a>
         
         </p>
 
@@ -1033,7 +1096,7 @@
             
         
         
-        <a href="../files/src_tools_draw.js.html#l75"><code>src&#x2F;tools&#x2F;draw.js:75</code></a>
+        <a href="../files/src_tools_draw.js.html#l329"><code>src&#x2F;tools&#x2F;draw.js:329</code></a>
         
         </p>
 
@@ -1122,7 +1185,7 @@
             
         
         
-        <a href="../files/src_tools_draw.js.html#l116"><code>src&#x2F;tools&#x2F;draw.js:116</code></a>
+        <a href="../files/src_tools_draw.js.html#l400"><code>src&#x2F;tools&#x2F;draw.js:400</code></a>
         
         </p>
 
@@ -1211,7 +1274,7 @@
             
         
         
-        <a href="../files/src_tools_draw.js.html#l99"><code>src&#x2F;tools&#x2F;draw.js:99</code></a>
+        <a href="../files/src_tools_draw.js.html#l366"><code>src&#x2F;tools&#x2F;draw.js:366</code></a>
         
         </p>
 
@@ -1300,7 +1363,7 @@
             
         
         
-        <a href="../files/src_tools_draw.js.html#l192"><code>src&#x2F;tools&#x2F;draw.js:192</code></a>
+        <a href="../files/src_tools_draw.js.html#l638"><code>src&#x2F;tools&#x2F;draw.js:638</code></a>
         
         </p>
 
@@ -1389,7 +1452,7 @@
             
         
         
-        <a href="../files/src_tools_draw.js.html#l203"><code>src&#x2F;tools&#x2F;draw.js:203</code></a>
+        <a href="../files/src_tools_draw.js.html#l649"><code>src&#x2F;tools&#x2F;draw.js:649</code></a>
         
         </p>
 
@@ -1420,6 +1483,184 @@
 
                     <div class="param-description">
                         <p>The name of the shape.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_setShapeOff" class="method item">
+    <h3 class="name"><code>setShapeOff</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>shape</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_tools_draw.js.html#l471"><code>src&#x2F;tools&#x2F;draw.js:471</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Set shape off properties.</p>
+
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">shape</code>
+                        <span class="type">Object</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The shape to set off.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_setShapeOn" class="method item">
+    <h3 class="name"><code>setShapeOn</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>shape</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_tools_draw.js.html#l496"><code>src&#x2F;tools&#x2F;draw.js:496</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Set shape on properties.</p>
+
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">shape</code>
+                        <span class="type">Object</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The shape to set on.</p>
 
                     </div>
 
@@ -1478,7 +1719,7 @@
             
         
         
-        <a href="../files/src_tools_draw.js.html#l143"><code>src&#x2F;tools&#x2F;draw.js:143</code></a>
+        <a href="../files/src_tools_draw.js.html#l427"><code>src&#x2F;tools&#x2F;draw.js:427</code></a>
         
         </p>
 
@@ -1567,7 +1808,7 @@
             
         
         
-        <a href="../files/src_tools_draw.js.html#l134"><code>src&#x2F;tools&#x2F;draw.js:134</code></a>
+        <a href="../files/src_tools_draw.js.html#l418"><code>src&#x2F;tools&#x2F;draw.js:418</code></a>
         
         </p>
 
@@ -1656,7 +1897,7 @@
             
         
         
-        <a href="../files/src_tools_draw.js.html#l125"><code>src&#x2F;tools&#x2F;draw.js:125</code></a>
+        <a href="../files/src_tools_draw.js.html#l409"><code>src&#x2F;tools&#x2F;draw.js:409</code></a>
         
         </p>
 
@@ -1711,6 +1952,53 @@
                 <h2 class="off-left">Properties</h2>
 
                 
+                    <div id="property_activeShape" class="property item private">
+    <h3 class="name"><code>activeShape</code></h3>
+    <span class="type">Object</span>
+
+    
+
+    
+        <span class="flag private">private</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_tools_draw.js.html#l210"><code>src&#x2F;tools&#x2F;draw.js:210</code></a>
+        
+        </p>
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Current active shape.</p>
+
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
                     <div id="property_command" class="property item private">
     <h3 class="name"><code>command</code></h3>
     <span class="type">Object</span>
@@ -1736,7 +2024,7 @@
             
         
         
-        <a href="../files/src_tools_draw.js.html#l36"><code>src&#x2F;tools&#x2F;draw.js:36</code></a>
+        <a href="../files/src_tools_draw.js.html#l203"><code>src&#x2F;tools&#x2F;draw.js:203</code></a>
         
         </p>
 
@@ -1758,12 +2046,14 @@
 </div>
 
                 
-                    <div id="property_points" class="property item">
-    <h3 class="name"><code>points</code></h3>
+                    <div id="property_createdShapes" class="property item private">
+    <h3 class="name"><code>createdShapes</code></h3>
     <span class="type">Array</span>
 
     
 
+    
+        <span class="flag private">private</span>
     
 
     
@@ -1781,7 +2071,7 @@
             
         
         
-        <a href="../files/src_tools_draw.js.html#l55"><code>src&#x2F;tools&#x2F;draw.js:55</code></a>
+        <a href="../files/src_tools_draw.js.html#l217"><code>src&#x2F;tools&#x2F;draw.js:217</code></a>
         
         </p>
 
@@ -1791,7 +2081,148 @@
     </div>
 
     <div class="description">
-        <p>List of points</p>
+        <p>List of created shapes.</p>
+
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="property_justStarted" class="property item private">
+    <h3 class="name"><code>justStarted</code></h3>
+    <span class="type">Boolean</span>
+
+    
+
+    
+        <span class="flag private">private</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_tools_draw.js.html#l195"><code>src&#x2F;tools&#x2F;draw.js:195</code></a>
+        
+        </p>
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Interaction just started flag.</p>
+
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="property_lastPoint" class="property item private">
+    <h3 class="name"><code>lastPoint</code></h3>
+    <span class="type">Object</span>
+
+    
+
+    
+        <span class="flag private">private</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_tools_draw.js.html#l253"><code>src&#x2F;tools&#x2F;draw.js:253</code></a>
+        
+        </p>
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Last selected point.</p>
+
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="property_points" class="property item private">
+    <h3 class="name"><code>points</code></h3>
+    <span class="type">Array</span>
+
+    
+
+    
+        <span class="flag private">private</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_tools_draw.js.html#l245"><code>src&#x2F;tools&#x2F;draw.js:245</code></a>
+        
+        </p>
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>List of points.</p>
 
     </div>
 
@@ -1828,7 +2259,7 @@
             
         
         
-        <a href="../files/src_tools_draw.js.html#l22"><code>src&#x2F;tools&#x2F;draw.js:22</code></a>
+        <a href="../files/src_tools_draw.js.html#l181"><code>src&#x2F;tools&#x2F;draw.js:181</code></a>
         
         </p>
 
@@ -1839,6 +2270,100 @@
 
     <div class="description">
         <p>Closure to self: to be used by event handlers.</p>
+
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="property_shapeEditor" class="property item private">
+    <h3 class="name"><code>shapeEditor</code></h3>
+    <span class="type">Object</span>
+
+    
+
+    
+        <span class="flag private">private</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_tools_draw.js.html#l261"><code>src&#x2F;tools&#x2F;draw.js:261</code></a>
+        
+        </p>
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Shape editor.</p>
+
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="property_shapeGroup" class="property item private">
+    <h3 class="name"><code>shapeGroup</code></h3>
+    <span class="type">Object</span>
+
+    
+
+    
+        <span class="flag private">private</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_tools_draw.js.html#l224"><code>src&#x2F;tools&#x2F;draw.js:224</code></a>
+        
+        </p>
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Current shape group.</p>
 
     </div>
 
@@ -1873,7 +2398,7 @@
             
         
         
-        <a href="../files/src_tools_draw.js.html#l49"><code>src&#x2F;tools&#x2F;draw.js:49</code></a>
+        <a href="../files/src_tools_draw.js.html#l238"><code>src&#x2F;tools&#x2F;draw.js:238</code></a>
         
         </p>
 
@@ -1895,12 +2420,14 @@
 </div>
 
                 
-                    <div id="property_started" class="property item">
+                    <div id="property_started" class="property item private">
     <h3 class="name"><code>started</code></h3>
     <span class="type">Boolean</span>
 
     
 
+    
+        <span class="flag private">private</span>
     
 
     
@@ -1918,7 +2445,7 @@
             
         
         
-        <a href="../files/src_tools_draw.js.html#l29"><code>src&#x2F;tools&#x2F;draw.js:29</code></a>
+        <a href="../files/src_tools_draw.js.html#l188"><code>src&#x2F;tools&#x2F;draw.js:188</code></a>
         
         </p>
 
@@ -1963,7 +2490,7 @@
             
         
         
-        <a href="../files/src_tools_draw.js.html#l43"><code>src&#x2F;tools&#x2F;draw.js:43</code></a>
+        <a href="../files/src_tools_draw.js.html#l232"><code>src&#x2F;tools&#x2F;draw.js:232</code></a>
         
         </p>
 
@@ -1974,6 +2501,53 @@
 
     <div class="description">
         <p>Drawing style.</p>
+
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="property_trash" class="property item private">
+    <h3 class="name"><code>trash</code></h3>
+    <span class="type">Object</span>
+
+    
+
+    
+        <span class="flag private">private</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_tools_draw.js.html#l269"><code>src&#x2F;tools&#x2F;draw.js:269</code></a>
+        
+        </p>
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Trash draw: a cross.</p>
 
     </div>
 

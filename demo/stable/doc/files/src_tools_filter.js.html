@@ -19,7 +19,7 @@
             
         </div>
         <div class="yui3-u-1-4 version">
-            <em>API Docs for: 0.6.0</em>
+            <em>API Docs for: 0.7.0</em>
         </div>
     </div>
     <div id="bd" class="yui3-g">
@@ -48,8 +48,6 @@
                 <li><a href="../classes/dwv.dicom.DataReader.html">dwv.dicom.DataReader</a></li>
             
                 <li><a href="../classes/dwv.dicom.DicomParser.html">dwv.dicom.DicomParser</a></li>
-            
-                <li><a href="../classes/dwv.dicom.Dictionary.html">dwv.dicom.Dictionary</a></li>
             
                 <li><a href="../classes/dwv.gui.html">dwv.gui</a></li>
             
@@ -89,6 +87,8 @@
             
                 <li><a href="../classes/dwv.math.Circle.html">dwv.math.Circle</a></li>
             
+                <li><a href="../classes/dwv.math.Ellipse.html">dwv.math.Ellipse</a></li>
+            
                 <li><a href="../classes/dwv.math.FastPoint2D.html">dwv.math.FastPoint2D</a></li>
             
                 <li><a href="../classes/dwv.math.Line.html">dwv.math.Line</a></li>
@@ -105,17 +105,13 @@
             
                 <li><a href="../classes/dwv.tool.html">dwv.tool</a></li>
             
+                <li><a href="../classes/dwv.tool.ChangeShapeCommand.html">dwv.tool.ChangeShapeCommand</a></li>
+            
+                <li><a href="../classes/dwv.tool.DeleteShapeCommand.html">dwv.tool.DeleteShapeCommand</a></li>
+            
                 <li><a href="../classes/dwv.tool.Draw.html">dwv.tool.Draw</a></li>
             
-                <li><a href="../classes/dwv.tool.DrawCircleCommand.html">dwv.tool.DrawCircleCommand</a></li>
-            
-                <li><a href="../classes/dwv.tool.DrawLineCommand.html">dwv.tool.DrawLineCommand</a></li>
-            
-                <li><a href="../classes/dwv.tool.DrawLivewireCommand.html">dwv.tool.DrawLivewireCommand</a></li>
-            
-                <li><a href="../classes/dwv.tool.DrawRectangleCommand.html">dwv.tool.DrawRectangleCommand</a></li>
-            
-                <li><a href="../classes/dwv.tool.DrawRoiCommand.html">dwv.tool.DrawRoiCommand</a></li>
+                <li><a href="../classes/dwv.tool.DrawShapeCommand.html">dwv.tool.DrawShapeCommand</a></li>
             
                 <li><a href="../classes/dwv.tool.Filter.html">dwv.tool.Filter</a></li>
             
@@ -125,9 +121,13 @@
             
                 <li><a href="../classes/dwv.tool.Livewire.html">dwv.tool.Livewire</a></li>
             
+                <li><a href="../classes/dwv.tool.MoveShapeCommand.html">dwv.tool.MoveShapeCommand</a></li>
+            
                 <li><a href="../classes/dwv.tool.RunFilterCommand.html">dwv.tool.RunFilterCommand</a></li>
             
                 <li><a href="../classes/dwv.tool.Scroll.html">dwv.tool.Scroll</a></li>
+            
+                <li><a href="../classes/dwv.tool.ShapeEditor.html">dwv.tool.ShapeEditor</a></li>
             
                 <li><a href="../classes/dwv.tool.ToolBox.html">dwv.tool.ToolBox</a></li>
             
@@ -216,7 +216,7 @@ dwv.tool = dwv.tool || {};
  * @constructor
  * @param {Object} app The associated application.
  */
-dwv.tool.Filter = function(app)
+dwv.tool.Filter = function(/*app*/)
 {
     /**
      * Selected filter.
@@ -230,7 +230,11 @@ dwv.tool.Filter = function(app)
      * @type String
      */
     this.defaultFilterName = 0;
-    
+    /**
+     * Display Flag.
+     * @property displayed
+     * @type Boolean
+     */
     this.displayed = false;
 };
 
@@ -346,7 +350,7 @@ dwv.tool.filter = dwv.tool.filter || {};
  * @constructor
  * @param {Object} app The associated application.
  */
-dwv.tool.filter.Threshold = function(app) {};
+dwv.tool.filter.Threshold = function(/*app*/) {};
 
 /**
  * Enable the filter.
@@ -387,7 +391,7 @@ dwv.tool.filter.Threshold.prototype.run = function(args)
  * @constructor
  * @param {Object} app The associated application.
  */
-dwv.tool.filter.Sharpen = function(app) {};
+dwv.tool.filter.Sharpen = function(/*app*/) {};
 
 /**
  * Enable the filter.
@@ -409,7 +413,7 @@ dwv.tool.filter.Sharpen.prototype.init = function()
  * @method run
  * @param {Mixed} args The filter arguments.
  */
-dwv.tool.filter.Sharpen.prototype.run = function(args)
+dwv.tool.filter.Sharpen.prototype.run = function(/*args*/)
 {
     var filter = new dwv.image.filter.Sharpen();
     var command = new dwv.tool.RunFilterCommand(filter, app);
@@ -425,7 +429,7 @@ dwv.tool.filter.Sharpen.prototype.run = function(args)
  * @constructor
  * @param {Object} app The associated application.
  */
-dwv.tool.filter.Sobel = function(app) {};
+dwv.tool.filter.Sobel = function(/*app*/) {};
 
 /**
  * Enable the filter.
@@ -447,7 +451,7 @@ dwv.tool.filter.Sobel.prototype.init = function()
  * @method run
  * @param {Mixed} args The filter arguments.
  */
-dwv.tool.filter.Sobel.prototype.run = function(args)
+dwv.tool.filter.Sobel.prototype.run = function(/*args*/)
 {
     var filter = new dwv.image.filter.Sobel();
     var command = new dwv.tool.RunFilterCommand(filter, app);
@@ -464,37 +468,32 @@ dwv.tool.filter.Sobel.prototype.run = function(args)
  * @param {Object} filter The filter to run.
  * @param {Object} app The associated application.
  */
-dwv.tool.RunFilterCommand = function(filter, app)
+dwv.tool.RunFilterCommand = function (filter, app)
 {
-    /**
-     * Command name.
-     * @property name
-     * @private
-     * @type String
-     */
-    var name = &quot;RunFilter: &quot; + filter.getName();
     /**
      * Get the command name.
      * @method getName
      * @return {String} The command name.
      */
-    this.getName = function() { return name; };
-    /**
-     * Set the command name.
-     * @method setName
-     * @param {String} str The command name.
-     */
-    this.setName = function(str) { name = str; };
+    this.getName = function () { return &quot;Filter-&quot; + filter.getName(); };
 
     /**
      * Execute the command.
      * @method execute
      */
-    this.execute = function()
+    this.execute = function ()
     {
         app.setImage(filter.update());
         app.generateAndDrawImage();
     }; 
+    /**
+     * Undo the command.
+     * @method undo
+     */
+    this.undo = function () {
+        app.setImage(filter.getOriginalImage());
+        app.generateAndDrawImage();
+    };
 }; // RunFilterCommand class
 
     </pre>

@@ -19,7 +19,7 @@
             
         </div>
         <div class="yui3-u-1-4 version">
-            <em>API Docs for: 0.6.0</em>
+            <em>API Docs for: 0.7.0</em>
         </div>
     </div>
     <div id="bd" class="yui3-g">
@@ -48,8 +48,6 @@
                 <li><a href="../classes/dwv.dicom.DataReader.html">dwv.dicom.DataReader</a></li>
             
                 <li><a href="../classes/dwv.dicom.DicomParser.html">dwv.dicom.DicomParser</a></li>
-            
-                <li><a href="../classes/dwv.dicom.Dictionary.html">dwv.dicom.Dictionary</a></li>
             
                 <li><a href="../classes/dwv.gui.html">dwv.gui</a></li>
             
@@ -89,6 +87,8 @@
             
                 <li><a href="../classes/dwv.math.Circle.html">dwv.math.Circle</a></li>
             
+                <li><a href="../classes/dwv.math.Ellipse.html">dwv.math.Ellipse</a></li>
+            
                 <li><a href="../classes/dwv.math.FastPoint2D.html">dwv.math.FastPoint2D</a></li>
             
                 <li><a href="../classes/dwv.math.Line.html">dwv.math.Line</a></li>
@@ -105,17 +105,13 @@
             
                 <li><a href="../classes/dwv.tool.html">dwv.tool</a></li>
             
+                <li><a href="../classes/dwv.tool.ChangeShapeCommand.html">dwv.tool.ChangeShapeCommand</a></li>
+            
+                <li><a href="../classes/dwv.tool.DeleteShapeCommand.html">dwv.tool.DeleteShapeCommand</a></li>
+            
                 <li><a href="../classes/dwv.tool.Draw.html">dwv.tool.Draw</a></li>
             
-                <li><a href="../classes/dwv.tool.DrawCircleCommand.html">dwv.tool.DrawCircleCommand</a></li>
-            
-                <li><a href="../classes/dwv.tool.DrawLineCommand.html">dwv.tool.DrawLineCommand</a></li>
-            
-                <li><a href="../classes/dwv.tool.DrawLivewireCommand.html">dwv.tool.DrawLivewireCommand</a></li>
-            
-                <li><a href="../classes/dwv.tool.DrawRectangleCommand.html">dwv.tool.DrawRectangleCommand</a></li>
-            
-                <li><a href="../classes/dwv.tool.DrawRoiCommand.html">dwv.tool.DrawRoiCommand</a></li>
+                <li><a href="../classes/dwv.tool.DrawShapeCommand.html">dwv.tool.DrawShapeCommand</a></li>
             
                 <li><a href="../classes/dwv.tool.Filter.html">dwv.tool.Filter</a></li>
             
@@ -125,9 +121,13 @@
             
                 <li><a href="../classes/dwv.tool.Livewire.html">dwv.tool.Livewire</a></li>
             
+                <li><a href="../classes/dwv.tool.MoveShapeCommand.html">dwv.tool.MoveShapeCommand</a></li>
+            
                 <li><a href="../classes/dwv.tool.RunFilterCommand.html">dwv.tool.RunFilterCommand</a></li>
             
                 <li><a href="../classes/dwv.tool.Scroll.html">dwv.tool.Scroll</a></li>
+            
+                <li><a href="../classes/dwv.tool.ShapeEditor.html">dwv.tool.ShapeEditor</a></li>
             
                 <li><a href="../classes/dwv.tool.ToolBox.html">dwv.tool.ToolBox</a></li>
             
@@ -331,10 +331,11 @@ dwv.image.View = function(image, isSigned)
     this.setColorMap = function(map) { 
         colorMap = map;
         // TODO Better handle this...
-        if( this.getImage().getPhotometricInterpretation() === &quot;MONOCHROME1&quot;) 
+        if( this.getImage().getPhotometricInterpretation() === &quot;MONOCHROME1&quot;) {
             colorMap = dwv.image.lut.invPlain;
+        }
         this.fireEvent({&quot;type&quot;: &quot;colorchange&quot;, 
-            &quot;wc&quot;: this.getWindowLut().getCenter(),
+           &quot;wc&quot;: this.getWindowLut().getCenter(),
            &quot;ww&quot;: this.getWindowLut().getWidth() });
     };
     
@@ -357,7 +358,9 @@ dwv.image.View = function(image, isSigned)
      * @param {Object} pos The current position.
      */ 
     this.setCurrentPosition = function(pos) { 
-        if( !image.getSize().isInBounds(pos.i,pos.j,pos.k) ) return false;
+        if( !image.getSize().isInBounds(pos.i,pos.j,pos.k) ) {
+            return false;
+        }
         var oldPosition = currentPosition;
         currentPosition = pos;
         // only display value for monochrome data
@@ -383,7 +386,7 @@ dwv.image.View = function(image, isSigned)
      * View listeners
      * @property listeners
      * @private
-     * @type Array
+     * @type Object
      */
     var listeners = {};
     /**
@@ -429,7 +432,19 @@ dwv.image.View.prototype.setWindowLevelMinMax = function()
     // set window level
     this.setWindowLevel(center,width);
 };
-
+/**
+ * Go to first slice .
+ * @method goFirstSlice
+ * @return {Boolean} False if not in bounds.
+ */
+dwv.image.View.prototype.goFirstSlice = function()
+{
+    return this.setCurrentPosition({
+        &quot;i&quot;: this.getCurrentPosition().i,
+        &quot;j&quot;: this.getCurrentPosition().j,
+        &quot;k&quot;:  0 
+    });
+};
 /**
  * Increment the current slice number.
  * @method incrementSliceNb
@@ -440,7 +455,8 @@ dwv.image.View.prototype.incrementSliceNb = function()
     return this.setCurrentPosition({
         &quot;i&quot;: this.getCurrentPosition().i,
         &quot;j&quot;: this.getCurrentPosition().j,
-        &quot;k&quot;: this.getCurrentPosition().k + 1 });
+        &quot;k&quot;: this.getCurrentPosition().k + 1 
+    });
 };
 
 /**
@@ -453,7 +469,8 @@ dwv.image.View.prototype.decrementSliceNb = function()
     return this.setCurrentPosition({
         &quot;i&quot;: this.getCurrentPosition().i,
         &quot;j&quot;: this.getCurrentPosition().j,
-        &quot;k&quot;: this.getCurrentPosition().k - 1 });
+        &quot;k&quot;: this.getCurrentPosition().k - 1 
+    });
 };
 
 /**
@@ -488,70 +505,71 @@ dwv.image.View.prototype.generateImageData = function( array )
     var index = 0;
     var sliceSize = 0;
     var sliceOffset = 0;
-    switch (photoInterpretation) {
-        case &quot;MONOCHROME1&quot;:
-        case &quot;MONOCHROME2&quot;:
-            sliceSize = image.getSize().getSliceSize();
-            sliceOffset = (sliceNumber || 0) * sliceSize;
-            var iMax = sliceOffset + sliceSize;
-            for(var i=sliceOffset; i &lt; iMax; ++i)
-            {        
-                pxValue = parseInt( windowLut.getValue( 
-                        image.getValueAtOffset(i) ), 10 );
-                array.data[index] = colorMap.red[pxValue];
-                array.data[index+1] = colorMap.green[pxValue];
-                array.data[index+2] = colorMap.blue[pxValue];
-                array.data[index+3] = 0xff;
-                index += 4;
-            }
+    switch (photoInterpretation)
+    {
+    case &quot;MONOCHROME1&quot;:
+    case &quot;MONOCHROME2&quot;:
+        sliceSize = image.getSize().getSliceSize();
+        sliceOffset = (sliceNumber || 0) * sliceSize;
+        var iMax = sliceOffset + sliceSize;
+        for(var i=sliceOffset; i &lt; iMax; ++i)
+        {        
+            pxValue = parseInt( windowLut.getValue( 
+                    image.getValueAtOffset(i) ), 10 );
+            array.data[index] = colorMap.red[pxValue];
+            array.data[index+1] = colorMap.green[pxValue];
+            array.data[index+2] = colorMap.blue[pxValue];
+            array.data[index+3] = 0xff;
+            index += 4;
+        }
         break;
+    
+    case &quot;RGB&quot;:
+        // the planar configuration defines the memory layout
+        if( planarConfig !== 0 &amp;&amp; planarConfig !== 1 ) {
+            throw new Error(&quot;Unsupported planar configuration: &quot;+planarConfig);
+        }
+        sliceSize = image.getSize().getSliceSize();
+        sliceOffset = (sliceNumber || 0) * 3 * sliceSize;
+        // default: RGBRGBRGBRGB...
+        var posR = sliceOffset;
+        var posG = sliceOffset + 1;
+        var posB = sliceOffset + 2;
+        var stepPos = 3;
+        // RRRR...GGGG...BBBB...
+        if (planarConfig === 1) { 
+            posR = sliceOffset;
+            posG = sliceOffset + sliceSize;
+            posB = sliceOffset + 2 * sliceSize;
+            stepPos = 1;
+        }
         
-        case &quot;RGB&quot;:
-            // the planar configuration defines the memory layout
-            if( planarConfig !== 0 &amp;&amp; planarConfig !== 1 ) {
-                throw new Error(&quot;Unsupported planar configuration: &quot;+planarConfig);
-            }
-            sliceSize = image.getSize().getSliceSize();
-            sliceOffset = (sliceNumber || 0) * 3 * sliceSize;
-            // default: RGBRGBRGBRGB...
-            var posR = sliceOffset;
-            var posG = sliceOffset + 1;
-            var posB = sliceOffset + 2;
-            var stepPos = 3;
-            // RRRR...GGGG...BBBB...
-            if (planarConfig === 1) { 
-                posR = sliceOffset;
-                posG = sliceOffset + sliceSize;
-                posB = sliceOffset + 2 * sliceSize;
-                stepPos = 1;
-            }
+        var redValue = 0;
+        var greenValue = 0;
+        var blueValue = 0;
+        for(var j=0; j &lt; image.getSize().getSliceSize(); ++j)
+        {        
+            redValue = parseInt( windowLut.getValue( 
+                    image.getValueAtOffset(posR) ), 10 );
+            greenValue = parseInt( windowLut.getValue( 
+                    image.getValueAtOffset(posG) ), 10 );
+            blueValue = parseInt( windowLut.getValue( 
+                    image.getValueAtOffset(posB) ), 10 );
             
-            var redValue = 0;
-            var greenValue = 0;
-            var blueValue = 0;
-            for(var j=0; j &lt; image.getSize().getSliceSize(); ++j)
-            {        
-                redValue = parseInt( windowLut.getValue( 
-                        image.getValueAtOffset(posR) ), 10 );
-                greenValue = parseInt( windowLut.getValue( 
-                        image.getValueAtOffset(posG) ), 10 );
-                blueValue = parseInt( windowLut.getValue( 
-                        image.getValueAtOffset(posB) ), 10 );
-                
-                array.data[index] = redValue;
-                array.data[index+1] = greenValue;
-                array.data[index+2] = blueValue;
-                array.data[index+3] = 0xff;
-                index += 4;
-                
-                posR += stepPos;
-                posG += stepPos;
-                posB += stepPos;
-            }
+            array.data[index] = redValue;
+            array.data[index+1] = greenValue;
+            array.data[index+2] = blueValue;
+            array.data[index+3] = 0xff;
+            index += 4;
+            
+            posR += stepPos;
+            posG += stepPos;
+            posB += stepPos;
+        }
         break;
-        
-        default: 
-            throw new Error(&quot;Unsupported photometric interpretation: &quot;+photoInterpretation);
+    
+    default: 
+        throw new Error(&quot;Unsupported photometric interpretation: &quot;+photoInterpretation);
     }
 };
 
@@ -564,7 +582,9 @@ dwv.image.View.prototype.generateImageData = function( array )
 dwv.image.View.prototype.addEventListener = function(type, listener)
 {
     var listeners = this.getListeners();
-    if( !listeners[type] ) listeners[type] = [];
+    if( !listeners[type] ) {
+        listeners[type] = [];
+    }
     listeners[type].push(listener);
 };
 
@@ -577,11 +597,14 @@ dwv.image.View.prototype.addEventListener = function(type, listener)
 dwv.image.View.prototype.removeEventListener = function(type, listener)
 {
     var listeners = this.getListeners();
-    if( !listeners[type] ) return;
+    if( !listeners[type] ) {
+        return;
+    }
     for(var i=0; i &lt; listeners[type].length; ++i)
     {   
-        if( listeners[type][i] === listener )
+        if( listeners[type][i] === listener ) {
             listeners[type].splice(i,1);
+        }
     }
 };
 
@@ -593,7 +616,9 @@ dwv.image.View.prototype.removeEventListener = function(type, listener)
 dwv.image.View.prototype.fireEvent = function(event)
 {
     var listeners = this.getListeners();
-    if( !listeners[event.type] ) return;
+    if( !listeners[event.type] ) {
+        return;
+    }
     for(var i=0; i &lt; listeners[event.type].length; ++i)
     {   
         listeners[event.type][i](event);

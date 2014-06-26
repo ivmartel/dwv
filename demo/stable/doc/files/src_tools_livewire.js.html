@@ -19,7 +19,7 @@
             
         </div>
         <div class="yui3-u-1-4 version">
-            <em>API Docs for: 0.6.0</em>
+            <em>API Docs for: 0.7.0</em>
         </div>
     </div>
     <div id="bd" class="yui3-g">
@@ -48,8 +48,6 @@
                 <li><a href="../classes/dwv.dicom.DataReader.html">dwv.dicom.DataReader</a></li>
             
                 <li><a href="../classes/dwv.dicom.DicomParser.html">dwv.dicom.DicomParser</a></li>
-            
-                <li><a href="../classes/dwv.dicom.Dictionary.html">dwv.dicom.Dictionary</a></li>
             
                 <li><a href="../classes/dwv.gui.html">dwv.gui</a></li>
             
@@ -89,6 +87,8 @@
             
                 <li><a href="../classes/dwv.math.Circle.html">dwv.math.Circle</a></li>
             
+                <li><a href="../classes/dwv.math.Ellipse.html">dwv.math.Ellipse</a></li>
+            
                 <li><a href="../classes/dwv.math.FastPoint2D.html">dwv.math.FastPoint2D</a></li>
             
                 <li><a href="../classes/dwv.math.Line.html">dwv.math.Line</a></li>
@@ -105,17 +105,13 @@
             
                 <li><a href="../classes/dwv.tool.html">dwv.tool</a></li>
             
+                <li><a href="../classes/dwv.tool.ChangeShapeCommand.html">dwv.tool.ChangeShapeCommand</a></li>
+            
+                <li><a href="../classes/dwv.tool.DeleteShapeCommand.html">dwv.tool.DeleteShapeCommand</a></li>
+            
                 <li><a href="../classes/dwv.tool.Draw.html">dwv.tool.Draw</a></li>
             
-                <li><a href="../classes/dwv.tool.DrawCircleCommand.html">dwv.tool.DrawCircleCommand</a></li>
-            
-                <li><a href="../classes/dwv.tool.DrawLineCommand.html">dwv.tool.DrawLineCommand</a></li>
-            
-                <li><a href="../classes/dwv.tool.DrawLivewireCommand.html">dwv.tool.DrawLivewireCommand</a></li>
-            
-                <li><a href="../classes/dwv.tool.DrawRectangleCommand.html">dwv.tool.DrawRectangleCommand</a></li>
-            
-                <li><a href="../classes/dwv.tool.DrawRoiCommand.html">dwv.tool.DrawRoiCommand</a></li>
+                <li><a href="../classes/dwv.tool.DrawShapeCommand.html">dwv.tool.DrawShapeCommand</a></li>
             
                 <li><a href="../classes/dwv.tool.Filter.html">dwv.tool.Filter</a></li>
             
@@ -125,9 +121,13 @@
             
                 <li><a href="../classes/dwv.tool.Livewire.html">dwv.tool.Livewire</a></li>
             
+                <li><a href="../classes/dwv.tool.MoveShapeCommand.html">dwv.tool.MoveShapeCommand</a></li>
+            
                 <li><a href="../classes/dwv.tool.RunFilterCommand.html">dwv.tool.RunFilterCommand</a></li>
             
                 <li><a href="../classes/dwv.tool.Scroll.html">dwv.tool.Scroll</a></li>
+            
+                <li><a href="../classes/dwv.tool.ShapeEditor.html">dwv.tool.ShapeEditor</a></li>
             
                 <li><a href="../classes/dwv.tool.ToolBox.html">dwv.tool.ToolBox</a></li>
             
@@ -208,6 +208,7 @@
  */
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
+var Kinetic = Kinetic || {};
 
 /**
  * Livewire painting tool.
@@ -231,6 +232,13 @@ dwv.tool.Livewire = function(app)
      * @type Boolean
      */
     this.started = false;
+    /**
+     * Interaction just started flag.
+     * @property justStarted
+     * @private
+     * @type Boolean
+     */
+    var justStarted = true;
     
     /**
      * Draw command.
@@ -239,6 +247,20 @@ dwv.tool.Livewire = function(app)
      * @type Object
      */
     var command = null;
+    /**
+     * Current active shape.
+     * @property activeShape
+     * @private
+     * @type Object
+     */
+    var activeShape = null;
+    /**
+     * Current shape group.
+     * @property shapeGroup
+     * @private
+     * @type Object
+     */
+    var shapeGroup = null;
     /**
      * Drawing style.
      * @property style
@@ -313,6 +335,7 @@ dwv.tool.Livewire = function(app)
         // first time
         if( !self.started ) {
             self.started = true;
+            shapeGroup = new Kinetic.Group();
             self.x0 = event._x;
             self.y0 = event._y;
             // clear vars
@@ -334,10 +357,9 @@ dwv.tool.Livewire = function(app)
                 console.log(&quot;Done.&quot;);
                 // save command in undo stack
                 app.getUndoStack().add(command);
-                // merge temporary layer
-                app.getDrawLayer().merge(app.getTempLayer());
                 // set flag
                 self.started = false;
+                justStarted = true;
             }
             // anchor point
             else {
@@ -404,10 +426,19 @@ dwv.tool.Livewire = function(app)
         }
         currentPath.appenPath(path);
         
-        // create draw command
-        command = new dwv.tool.DrawLivewireCommand(currentPath, app, self.style);
-        // clear the temporary layer
-        app.getTempLayer().clear();
+        // remove previous draw if not just started
+        if ( activeShape &amp;&amp; !justStarted ) {
+            activeShape.destroy();
+        }
+        if ( justStarted ) {
+            justStarted = false;
+        }
+        // create shape
+        activeShape = new dwv.tool.RoiCreator(currentPath.pointArray, self.style);
+        // add shape to group
+        shapeGroup.add(activeShape);
+        // draw shape command
+        command = new dwv.tool.DrawShapeCommand(activeShape, &quot;livewire&quot;, app);
         // draw
         command.execute();
     };
@@ -417,7 +448,7 @@ dwv.tool.Livewire = function(app)
      * @method mouseup
      * @param {Object} event The mouse up event.
      */
-    this.mouseup = function(event){
+    this.mouseup = function(/*event*/){
         // nothing to do
     };
     
@@ -529,77 +560,6 @@ dwv.tool.Livewire.prototype.setLineColour = function(colour)
     // set style var
     this.style.setLineColor(colour);
 };
-
-/**
- * Draw livewire command.
- * @class DrawLivewireCommand
- * @namespace dwv.tool
- * @param {Object} livewire The livewire to draw.
- * @param {Object} app The application to draw the livewire on.
- * @param {Object} style The style of the livewire.
- */
-dwv.tool.DrawLivewireCommand = function(livewire, app, style)
-{
-    /**
-     * The livewire color.
-     * @property livewireColor
-     * @private
-     * @type String
-     */
-    var livewireColor = style.getLineColor();
-    /**
-     * The HTML context.
-     * @property context
-     * @private
-     * @type Object
-     */
-    var context = app.getTempLayer().getContext();
-    
-    /**
-     * Command name.
-     * @property name
-     * @private
-     * @type String
-     */
-    var name = &quot;DrawLivewireCommand&quot;;
-    /**
-     * Get the command name.
-     * @method getName
-     * @return {String} The command name.
-     */
-    this.getName = function() { return name; };
-    /**
-     * Set the command name.
-     * @method setName
-     * @param {String} str The command name.
-     */
-    this.setName = function(str) { name = str; };
-
-    /**
-     * Execute the command.
-     * @method execute
-     */
-    this.execute = function()
-    {
-        // style
-        context.fillStyle = livewireColor;
-        context.strokeStyle = livewireColor;
-        // path
-        context.beginPath();
-        var p = livewire.getPoint(0);
-        context.moveTo( p.getX(), p.getY());
-        for( var i=1; i &lt; livewire.getLength(); ++i ) {
-            p = livewire.getPoint(i);
-            context.lineTo( p.getX(), p.getY());
-        }
-        for( var j=0; j &lt; livewire.controlPointIndexArray.length; ++j ) { 
-            p = livewire.getPoint(livewire.controlPointIndexArray[j]);
-            context.fillRect(p.getX()-3, p.getY()-3, 5, 5);
-        }
-        context.stroke();
-        //context.closePath();
-    }; 
-}; // DrawLivewireCommand class
 
     </pre>
 </div>

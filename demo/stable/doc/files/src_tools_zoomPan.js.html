@@ -19,7 +19,7 @@
             
         </div>
         <div class="yui3-u-1-4 version">
-            <em>API Docs for: 0.6.0</em>
+            <em>API Docs for: 0.7.0</em>
         </div>
     </div>
     <div id="bd" class="yui3-g">
@@ -48,8 +48,6 @@
                 <li><a href="../classes/dwv.dicom.DataReader.html">dwv.dicom.DataReader</a></li>
             
                 <li><a href="../classes/dwv.dicom.DicomParser.html">dwv.dicom.DicomParser</a></li>
-            
-                <li><a href="../classes/dwv.dicom.Dictionary.html">dwv.dicom.Dictionary</a></li>
             
                 <li><a href="../classes/dwv.gui.html">dwv.gui</a></li>
             
@@ -89,6 +87,8 @@
             
                 <li><a href="../classes/dwv.math.Circle.html">dwv.math.Circle</a></li>
             
+                <li><a href="../classes/dwv.math.Ellipse.html">dwv.math.Ellipse</a></li>
+            
                 <li><a href="../classes/dwv.math.FastPoint2D.html">dwv.math.FastPoint2D</a></li>
             
                 <li><a href="../classes/dwv.math.Line.html">dwv.math.Line</a></li>
@@ -105,17 +105,13 @@
             
                 <li><a href="../classes/dwv.tool.html">dwv.tool</a></li>
             
+                <li><a href="../classes/dwv.tool.ChangeShapeCommand.html">dwv.tool.ChangeShapeCommand</a></li>
+            
+                <li><a href="../classes/dwv.tool.DeleteShapeCommand.html">dwv.tool.DeleteShapeCommand</a></li>
+            
                 <li><a href="../classes/dwv.tool.Draw.html">dwv.tool.Draw</a></li>
             
-                <li><a href="../classes/dwv.tool.DrawCircleCommand.html">dwv.tool.DrawCircleCommand</a></li>
-            
-                <li><a href="../classes/dwv.tool.DrawLineCommand.html">dwv.tool.DrawLineCommand</a></li>
-            
-                <li><a href="../classes/dwv.tool.DrawLivewireCommand.html">dwv.tool.DrawLivewireCommand</a></li>
-            
-                <li><a href="../classes/dwv.tool.DrawRectangleCommand.html">dwv.tool.DrawRectangleCommand</a></li>
-            
-                <li><a href="../classes/dwv.tool.DrawRoiCommand.html">dwv.tool.DrawRoiCommand</a></li>
+                <li><a href="../classes/dwv.tool.DrawShapeCommand.html">dwv.tool.DrawShapeCommand</a></li>
             
                 <li><a href="../classes/dwv.tool.Filter.html">dwv.tool.Filter</a></li>
             
@@ -125,9 +121,13 @@
             
                 <li><a href="../classes/dwv.tool.Livewire.html">dwv.tool.Livewire</a></li>
             
+                <li><a href="../classes/dwv.tool.MoveShapeCommand.html">dwv.tool.MoveShapeCommand</a></li>
+            
                 <li><a href="../classes/dwv.tool.RunFilterCommand.html">dwv.tool.RunFilterCommand</a></li>
             
                 <li><a href="../classes/dwv.tool.Scroll.html">dwv.tool.Scroll</a></li>
+            
+                <li><a href="../classes/dwv.tool.ShapeEditor.html">dwv.tool.ShapeEditor</a></li>
             
                 <li><a href="../classes/dwv.tool.ToolBox.html">dwv.tool.ToolBox</a></li>
             
@@ -246,47 +246,45 @@ dwv.tool.ZoomAndPan = function(app)
     this.mousedown = function(event){
         self.started = true;
         // first position
+        self.x0 = event._xs;
+        self.y0 = event._ys;
+    };
+
+    /**
+     * Handle two touch down event.
+     * @method twotouchdown
+     * @param {Object} event The touch down event.
+     */
+    this.twotouchdown = function(event){
+        self.started = true;
+        // store first point
         self.x0 = event._x;
         self.y0 = event._y;
-     };
+        // first line
+        var point0 = new dwv.math.Point2D(event._x, event._y);
+        var point1 = new dwv.math.Point2D(event._x1, event._y1);
+        self.line0 = new dwv.math.Line(point0, point1);
+        self.midPoint = self.line0.getMidpoint();         
+    };
 
-     /**
-      * Handle two touch down event.
-      * @method twotouchdown
-      * @param {Object} event The touch down event.
-      */
-     this.twotouchdown = function(event){
-         self.started = true;
-         // store first point
-         self.x0 = event._x;
-         self.y0 = event._y;
-         // first line
-         var point0 = new dwv.math.Point2D(event._x, event._y);
-         var point1 = new dwv.math.Point2D(event._x1, event._y1);
-         self.line0 = new dwv.math.Line(point0, point1);
-         self.midPoint = self.line0.getMidpoint();         
-     };
-
-     /**
-      * Handle mouse move event.
-      * @method mousemove
-      * @param {Object} event The mouse move event.
-      */
-     this.mousemove = function(event){
+    /**
+     * Handle mouse move event.
+     * @method mousemove
+     * @param {Object} event The mouse move event.
+     */
+    this.mousemove = function(event){
         if (!self.started)
         {
             return;
         }
-
         // calculate translation
-        var tx = (event._x - self.x0);
-        var ty = (event._y - self.y0);
+        var tx = event._xs - self.x0;
+        var ty = event._ys - self.y0;
         // apply translation
         translateLayers(tx, ty);
-        
         // reset origin point
-        self.x0 = event._x;
-        self.y0 = event._y;
+        self.x0 = event._xs;
+        self.y0 = event._ys;
     };
 
     /**
@@ -295,33 +293,40 @@ dwv.tool.ZoomAndPan = function(app)
      * @param {Object} event The touch move event.
      */
     this.twotouchmove = function(event){
-       if (!self.started)
-       {
-           return;
-       }
-       var point0 = new dwv.math.Point2D(event._x, event._y);
-       var point1 = new dwv.math.Point2D(event._x1, event._y1);
-       var newLine = new dwv.math.Line(point0, point1);
-       var lineRatio = newLine.getLength() / self.line0.getLength();
-       
-       if( lineRatio === 1 )
-       {
-           // scroll mode
-           // difference  to last position
-           var diffY = event._y - self.y0;
-           // do not trigger for small moves
-           if( Math.abs(diffY) &lt; 15 ) return;
-           // update GUI
-           if( diffY &gt; 0 ) app.getView().incrementSliceNb();
-           else app.getView().decrementSliceNb();
-       }
-       else
-       {
-           // zoom mode
-           var zoom = (lineRatio - 1) / 2;
-           if( Math.abs(zoom) % 0.1 &lt;= 0.05 )
-               zoomLayers(zoom, self.midPoint.getX(), self.midPoint.getY());
-       }
+        if (!self.started)
+        {
+            return;
+        }
+        var point0 = new dwv.math.Point2D(event._x, event._y);
+        var point1 = new dwv.math.Point2D(event._x1, event._y1);
+        var newLine = new dwv.math.Line(point0, point1);
+        var lineRatio = newLine.getLength() / self.line0.getLength();
+        
+        if( lineRatio === 1 )
+        {
+            // scroll mode
+            // difference  to last position
+            var diffY = event._y - self.y0;
+            // do not trigger for small moves
+            if( Math.abs(diffY) &lt; 15 ) {
+                return;
+            }
+            // update GUI
+            if( diffY &gt; 0 ) {
+                app.getView().incrementSliceNb();
+            }
+            else {
+                app.getView().decrementSliceNb();
+            }
+        }
+        else
+        {
+            // zoom mode
+            var zoom = (lineRatio - 1) / 2;
+            if( Math.abs(zoom) % 0.1 &lt;= 0.05 ) {
+                zoomLayers(zoom, self.midPoint.getX(), self.midPoint.getY(),event._xs, event._ys);
+            }
+        }
     };
     
     /**
@@ -329,7 +334,7 @@ dwv.tool.ZoomAndPan = function(app)
      * @method mouseup
      * @param {Object} event The mouse up event.
      */
-    this.mouseup = function(event){
+    this.mouseup = function(/*event*/){
         if (self.started)
         {
             // stop recording
@@ -392,12 +397,8 @@ dwv.tool.ZoomAndPan = function(app)
      */
     this.DOMMouseScroll = function(event){
         // ev.detail on firefox is 3
-        var step = event.detail/30;
-        zoomLayers(step, event._x, event._y);
-        
-        // TODO slice scroll
-        //if( event.detail &gt; 0 ) app.getView().incrementSliceNb();
-        //else app.getView().decrementSliceNb();
+        var step = - event.detail / 30;
+        zoomLayers(step, event._x, event._y, event._xs, event._ys);
     };
 
     /**
@@ -407,12 +408,8 @@ dwv.tool.ZoomAndPan = function(app)
      */
     this.mousewheel = function(event){
         // ev.wheelDelta on chrome is 120
-        var step = event.wheelDelta/1200;
-        zoomLayers(step, event._x, event._y);
-        
-        // TODO slice scroll
-        //if( event.wheelDelta &gt; 0 ) app.getView().incrementSliceNb();
-        //else app.getView().decrementSliceNb();
+        var step = event.wheelDelta / 1200;
+        zoomLayers(step, event._x, event._y, event._xs, event._ys);
     };
     
     /**
@@ -440,12 +437,29 @@ dwv.tool.ZoomAndPan = function(app)
      * @param {Number} cx The zoom center X coordinate.
      * @param {Number} cy The zoom center Y coordinate.
      */ 
-    function zoomLayers(step, cx, cy)
+    function zoomLayers(step, cx, cy, cx2, cy2)
     {
-        if( app.getImageLayer() ) 
-            app.getImageLayer().zoom(step, step, cx, cy);
-        if( app.getDrawLayer() ) 
-            app.getDrawLayer().zoom(step, step, cx, cy);
+        if( app.getImageLayer() ) {
+            var oldZoom = app.getImageLayer().getZoom();
+            var newZoom = {&#x27;x&#x27;: (oldZoom.x + step), &#x27;y&#x27;: (oldZoom.y + step)};
+            app.getImageLayer().zoom(newZoom.x, newZoom.y, cx2, cy2);
+            app.getImageLayer().draw();
+        }
+        if( app.getDrawStage() ) { 
+            
+            var stage = app.getDrawStage();
+            var oldKZoom = stage.scale();
+            var newKZoom = {&#x27;x&#x27;: (oldKZoom.x + step), &#x27;y&#x27;: (oldKZoom.y + step)};
+            
+            var oldOffset = stage.offset();
+            var newOffsetX = (cx2 / oldKZoom.x) + oldOffset.x - (cx2 / newKZoom.x);
+            var newOffsetY = (cy2 / oldKZoom.y) + oldOffset.y - (cy2 / newKZoom.y);
+            var newOffset = { &#x27;x&#x27;: newOffsetX, &#x27;y&#x27;: newOffsetY };
+            
+            stage.offset( newOffset );
+            stage.scale( newKZoom );
+            stage.draw();
+        }
     }
 
     /**
@@ -456,10 +470,23 @@ dwv.tool.ZoomAndPan = function(app)
      */ 
     function translateLayers(tx, ty)
     {
-        if( app.getImageLayer() ) 
-            app.getImageLayer().translate(tx, ty);
-        if( app.getDrawLayer() ) 
-            app.getDrawLayer().translate(tx, ty);
+        if( app.getImageLayer() ) {
+            var layer = app.getImageLayer();
+            var zoom = layer.getZoom();
+            var txx = tx / zoom.x;
+            var tyy = ty / zoom.y;
+            layer.translate(txx, tyy);
+            layer.draw();
+        }
+        if( app.getDrawStage() ) { 
+            var stage = app.getDrawStage();
+            var offset = stage.offset();
+            var kzoom = stage.scale();
+            offset.x -= tx / kzoom.x;
+            offset.y -= ty / kzoom.y;
+            stage.offset( offset );
+            stage.draw();
+        }
     }
 
 }; // ZoomAndPan class

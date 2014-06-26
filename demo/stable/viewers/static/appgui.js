@@ -35,8 +35,12 @@ dwv.gui.initSliderHtml = function(){
 };
 function toggle(dialogId)
 {
-    if( $(dialogId).dialog('isOpen') ) $(dialogId).dialog('close');
-    else $(dialogId).dialog('open');
+    if( $(dialogId).dialog('isOpen') ) { 
+        $(dialogId).dialog('close');
+    }
+    else {
+        $(dialogId).dialog('open');
+    }
 }
 
 

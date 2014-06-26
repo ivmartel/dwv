@@ -19,7 +19,7 @@
             
         </div>
         <div class="yui3-u-1-4 version">
-            <em>API Docs for: 0.6.0</em>
+            <em>API Docs for: 0.7.0</em>
         </div>
     </div>
     <div id="bd" class="yui3-g">
@@ -48,8 +48,6 @@
                 <li><a href="../classes/dwv.dicom.DataReader.html">dwv.dicom.DataReader</a></li>
             
                 <li><a href="../classes/dwv.dicom.DicomParser.html">dwv.dicom.DicomParser</a></li>
-            
-                <li><a href="../classes/dwv.dicom.Dictionary.html">dwv.dicom.Dictionary</a></li>
             
                 <li><a href="../classes/dwv.gui.html">dwv.gui</a></li>
             
@@ -89,6 +87,8 @@
             
                 <li><a href="../classes/dwv.math.Circle.html">dwv.math.Circle</a></li>
             
+                <li><a href="../classes/dwv.math.Ellipse.html">dwv.math.Ellipse</a></li>
+            
                 <li><a href="../classes/dwv.math.FastPoint2D.html">dwv.math.FastPoint2D</a></li>
             
                 <li><a href="../classes/dwv.math.Line.html">dwv.math.Line</a></li>
@@ -105,17 +105,13 @@
             
                 <li><a href="../classes/dwv.tool.html">dwv.tool</a></li>
             
+                <li><a href="../classes/dwv.tool.ChangeShapeCommand.html">dwv.tool.ChangeShapeCommand</a></li>
+            
+                <li><a href="../classes/dwv.tool.DeleteShapeCommand.html">dwv.tool.DeleteShapeCommand</a></li>
+            
                 <li><a href="../classes/dwv.tool.Draw.html">dwv.tool.Draw</a></li>
             
-                <li><a href="../classes/dwv.tool.DrawCircleCommand.html">dwv.tool.DrawCircleCommand</a></li>
-            
-                <li><a href="../classes/dwv.tool.DrawLineCommand.html">dwv.tool.DrawLineCommand</a></li>
-            
-                <li><a href="../classes/dwv.tool.DrawLivewireCommand.html">dwv.tool.DrawLivewireCommand</a></li>
-            
-                <li><a href="../classes/dwv.tool.DrawRectangleCommand.html">dwv.tool.DrawRectangleCommand</a></li>
-            
-                <li><a href="../classes/dwv.tool.DrawRoiCommand.html">dwv.tool.DrawRoiCommand</a></li>
+                <li><a href="../classes/dwv.tool.DrawShapeCommand.html">dwv.tool.DrawShapeCommand</a></li>
             
                 <li><a href="../classes/dwv.tool.Filter.html">dwv.tool.Filter</a></li>
             
@@ -125,9 +121,13 @@
             
                 <li><a href="../classes/dwv.tool.Livewire.html">dwv.tool.Livewire</a></li>
             
+                <li><a href="../classes/dwv.tool.MoveShapeCommand.html">dwv.tool.MoveShapeCommand</a></li>
+            
                 <li><a href="../classes/dwv.tool.RunFilterCommand.html">dwv.tool.RunFilterCommand</a></li>
             
                 <li><a href="../classes/dwv.tool.Scroll.html">dwv.tool.Scroll</a></li>
+            
+                <li><a href="../classes/dwv.tool.ShapeEditor.html">dwv.tool.ShapeEditor</a></li>
             
                 <li><a href="../classes/dwv.tool.ToolBox.html">dwv.tool.ToolBox</a></li>
             
@@ -500,7 +500,7 @@
             
         
         
-        <a href="../files/src_tools_scroll.js.html#l127"><code>src&#x2F;tools&#x2F;scroll.js:127</code></a>
+        <a href="../files/src_tools_scroll.js.html#l135"><code>src&#x2F;tools&#x2F;scroll.js:135</code></a>
         
         </p>
 
@@ -583,7 +583,7 @@
             
         
         
-        <a href="../files/src_tools_scroll.js.html#l138"><code>src&#x2F;tools&#x2F;scroll.js:138</code></a>
+        <a href="../files/src_tools_scroll.js.html#l146"><code>src&#x2F;tools&#x2F;scroll.js:146</code></a>
         
         </p>
 
@@ -652,7 +652,7 @@
             
         
         
-        <a href="../files/src_tools_scroll.js.html#l157"><code>src&#x2F;tools&#x2F;scroll.js:157</code></a>
+        <a href="../files/src_tools_scroll.js.html#l165"><code>src&#x2F;tools&#x2F;scroll.js:165</code></a>
         
         </p>
 
@@ -717,7 +717,7 @@
             
         
         
-        <a href="../files/src_tools_scroll.js.html#l118"><code>src&#x2F;tools&#x2F;scroll.js:118</code></a>
+        <a href="../files/src_tools_scroll.js.html#l126"><code>src&#x2F;tools&#x2F;scroll.js:126</code></a>
         
         </p>
 
@@ -984,7 +984,7 @@
             
         
         
-        <a href="../files/src_tools_scroll.js.html#l82"><code>src&#x2F;tools&#x2F;scroll.js:82</code></a>
+        <a href="../files/src_tools_scroll.js.html#l90"><code>src&#x2F;tools&#x2F;scroll.js:90</code></a>
         
         </p>
 
@@ -1073,7 +1073,7 @@
             
         
         
-        <a href="../files/src_tools_scroll.js.html#l69"><code>src&#x2F;tools&#x2F;scroll.js:69</code></a>
+        <a href="../files/src_tools_scroll.js.html#l77"><code>src&#x2F;tools&#x2F;scroll.js:77</code></a>
         
         </p>
 
@@ -1162,7 +1162,7 @@
             
         
         
-        <a href="../files/src_tools_scroll.js.html#l109"><code>src&#x2F;tools&#x2F;scroll.js:109</code></a>
+        <a href="../files/src_tools_scroll.js.html#l117"><code>src&#x2F;tools&#x2F;scroll.js:117</code></a>
         
         </p>
 
@@ -1251,7 +1251,7 @@
             
         
         
-        <a href="../files/src_tools_scroll.js.html#l100"><code>src&#x2F;tools&#x2F;scroll.js:100</code></a>
+        <a href="../files/src_tools_scroll.js.html#l108"><code>src&#x2F;tools&#x2F;scroll.js:108</code></a>
         
         </p>
 
@@ -1340,7 +1340,7 @@
             
         
         
-        <a href="../files/src_tools_scroll.js.html#l91"><code>src&#x2F;tools&#x2F;scroll.js:91</code></a>
+        <a href="../files/src_tools_scroll.js.html#l99"><code>src&#x2F;tools&#x2F;scroll.js:99</code></a>
         
         </p>
 

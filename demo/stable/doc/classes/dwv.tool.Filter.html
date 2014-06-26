@@ -19,7 +19,7 @@
             
         </div>
         <div class="yui3-u-1-4 version">
-            <em>API Docs for: 0.6.0</em>
+            <em>API Docs for: 0.7.0</em>
         </div>
     </div>
     <div id="bd" class="yui3-g">
@@ -48,8 +48,6 @@
                 <li><a href="../classes/dwv.dicom.DataReader.html">dwv.dicom.DataReader</a></li>
             
                 <li><a href="../classes/dwv.dicom.DicomParser.html">dwv.dicom.DicomParser</a></li>
-            
-                <li><a href="../classes/dwv.dicom.Dictionary.html">dwv.dicom.Dictionary</a></li>
             
                 <li><a href="../classes/dwv.gui.html">dwv.gui</a></li>
             
@@ -89,6 +87,8 @@
             
                 <li><a href="../classes/dwv.math.Circle.html">dwv.math.Circle</a></li>
             
+                <li><a href="../classes/dwv.math.Ellipse.html">dwv.math.Ellipse</a></li>
+            
                 <li><a href="../classes/dwv.math.FastPoint2D.html">dwv.math.FastPoint2D</a></li>
             
                 <li><a href="../classes/dwv.math.Line.html">dwv.math.Line</a></li>
@@ -105,17 +105,13 @@
             
                 <li><a href="../classes/dwv.tool.html">dwv.tool</a></li>
             
+                <li><a href="../classes/dwv.tool.ChangeShapeCommand.html">dwv.tool.ChangeShapeCommand</a></li>
+            
+                <li><a href="../classes/dwv.tool.DeleteShapeCommand.html">dwv.tool.DeleteShapeCommand</a></li>
+            
                 <li><a href="../classes/dwv.tool.Draw.html">dwv.tool.Draw</a></li>
             
-                <li><a href="../classes/dwv.tool.DrawCircleCommand.html">dwv.tool.DrawCircleCommand</a></li>
-            
-                <li><a href="../classes/dwv.tool.DrawLineCommand.html">dwv.tool.DrawLineCommand</a></li>
-            
-                <li><a href="../classes/dwv.tool.DrawLivewireCommand.html">dwv.tool.DrawLivewireCommand</a></li>
-            
-                <li><a href="../classes/dwv.tool.DrawRectangleCommand.html">dwv.tool.DrawRectangleCommand</a></li>
-            
-                <li><a href="../classes/dwv.tool.DrawRoiCommand.html">dwv.tool.DrawRoiCommand</a></li>
+                <li><a href="../classes/dwv.tool.DrawShapeCommand.html">dwv.tool.DrawShapeCommand</a></li>
             
                 <li><a href="../classes/dwv.tool.Filter.html">dwv.tool.Filter</a></li>
             
@@ -125,9 +121,13 @@
             
                 <li><a href="../classes/dwv.tool.Livewire.html">dwv.tool.Livewire</a></li>
             
+                <li><a href="../classes/dwv.tool.MoveShapeCommand.html">dwv.tool.MoveShapeCommand</a></li>
+            
                 <li><a href="../classes/dwv.tool.RunFilterCommand.html">dwv.tool.RunFilterCommand</a></li>
             
                 <li><a href="../classes/dwv.tool.Scroll.html">dwv.tool.Scroll</a></li>
+            
+                <li><a href="../classes/dwv.tool.ShapeEditor.html">dwv.tool.ShapeEditor</a></li>
             
                 <li><a href="../classes/dwv.tool.ToolBox.html">dwv.tool.ToolBox</a></li>
             
@@ -344,6 +344,15 @@
                     <ul class="index-list methods">
                         
                             <li class="index-item method">
+                                <a href="#method_EllipseCreator">EllipseCreator</a>
+
+                                
+                                    <span class="flag static">static</span>
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
                                 <a href="#method_enable">enable</a>
 
                                 
@@ -392,6 +401,15 @@
                                 
                             </li>
                         
+                            <li class="index-item method">
+                                <a href="#method_UpdateEllipse">UpdateEllipse</a>
+
+                                
+                                    <span class="flag static">static</span>
+                                
+                                
+                            </li>
+                        
                     </ul>
                 </div>
             
@@ -404,6 +422,13 @@
                         
                             <li class="index-item property">
                                 <a href="#property_defaultFilterName">defaultFilterName</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item property">
+                                <a href="#property_displayed">displayed</a>
 
                                 
                                 
@@ -428,6 +453,119 @@
         
             <div id="methods" class="api-class-tabpanel">
                 <h2 class="off-left">Methods</h2>
+
+                
+                    <div id="method_EllipseCreator" class="method item">
+    <h3 class="name"><code>EllipseCreator</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>points</code>
+                    
+                </li>
+            
+                <li class="arg">
+                    
+                        <code>style</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <span class="flag static">static</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_tools_ellipse.js.html#l9"><code>src&#x2F;tools&#x2F;ellipse.js:9</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Create an ellipse shape to be displayed.</p>
+
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">points</code>
+                        <span class="type">Array</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The points from which to extract the ellipse.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+                <li class="param">
+                    
+                        <code class="param-name">style</code>
+                        <span class="type">Style</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The drawing style.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+
+    
+</div>
 
                 
                     <div id="method_enable" class="method item">
@@ -472,7 +610,7 @@
             
         
         
-        <a href="../files/src_tools_filter.js.html#l49"><code>src&#x2F;tools&#x2F;filter.js:49</code></a>
+        <a href="../files/src_tools_filter.js.html#l53"><code>src&#x2F;tools&#x2F;filter.js:53</code></a>
         
         </p>
 
@@ -555,7 +693,7 @@
             
         
         
-        <a href="../files/src_tools_filter.js.html#l33"><code>src&#x2F;tools&#x2F;filter.js:33</code></a>
+        <a href="../files/src_tools_filter.js.html#l37"><code>src&#x2F;tools&#x2F;filter.js:37</code></a>
         
         </p>
 
@@ -628,7 +766,7 @@
             
         
         
-        <a href="../files/src_tools_filter.js.html#l62"><code>src&#x2F;tools&#x2F;filter.js:62</code></a>
+        <a href="../files/src_tools_filter.js.html#l66"><code>src&#x2F;tools&#x2F;filter.js:66</code></a>
         
         </p>
 
@@ -711,7 +849,7 @@
             
         
         
-        <a href="../files/src_tools_filter.js.html#l96"><code>src&#x2F;tools&#x2F;filter.js:96</code></a>
+        <a href="../files/src_tools_filter.js.html#l100"><code>src&#x2F;tools&#x2F;filter.js:100</code></a>
         
         </p>
 
@@ -804,7 +942,7 @@
             
         
         
-        <a href="../files/src_tools_filter.js.html#l106"><code>src&#x2F;tools&#x2F;filter.js:106</code></a>
+        <a href="../files/src_tools_filter.js.html#l110"><code>src&#x2F;tools&#x2F;filter.js:110</code></a>
         
         </p>
 
@@ -869,7 +1007,7 @@
             
         
         
-        <a href="../files/src_tools_filter.js.html#l126"><code>src&#x2F;tools&#x2F;filter.js:126</code></a>
+        <a href="../files/src_tools_filter.js.html#l130"><code>src&#x2F;tools&#x2F;filter.js:130</code></a>
         
         </p>
 
@@ -952,7 +1090,7 @@
             
         
         
-        <a href="../files/src_tools_filter.js.html#l71"><code>src&#x2F;tools&#x2F;filter.js:71</code></a>
+        <a href="../files/src_tools_filter.js.html#l75"><code>src&#x2F;tools&#x2F;filter.js:75</code></a>
         
         </p>
 
@@ -983,6 +1121,119 @@
                 
             </div>
         </div>
+    
+
+    
+</div>
+
+                
+                    <div id="method_UpdateEllipse" class="method item">
+    <h3 class="name"><code>UpdateEllipse</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>ellipse</code>
+                    
+                </li>
+            
+                <li class="arg">
+                    
+                        <code>anchor</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <span class="flag static">static</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_tools_ellipse.js.html#l36"><code>src&#x2F;tools&#x2F;ellipse.js:36</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Update an ellipse shape.</p>
+
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">ellipse</code>
+                        <span class="type">Object</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The ellipse shape to update.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+                <li class="param">
+                    
+                        <code class="param-name">anchor</code>
+                        <span class="type">Object</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The active anchor.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
     
 
     
@@ -1031,6 +1282,51 @@
 
     <div class="description">
         <p>Default filter name.</p>
+
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="property_displayed" class="property item">
+    <h3 class="name"><code>displayed</code></h3>
+    <span class="type">Boolean</span>
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_tools_filter.js.html#l29"><code>src&#x2F;tools&#x2F;filter.js:29</code></a>
+        
+        </p>
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Display Flag.</p>
 
     </div>
 
