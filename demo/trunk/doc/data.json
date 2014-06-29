@@ -2345,7 +2345,7 @@
         {
             "file": "src/gui/generic.js",
             "line": 58,
-            "description": "Refresh a HTML select.",
+            "description": "Refresh a HTML select. Mainly for jquery-mobile.",
             "itemtype": "method",
             "name": "refreshSelect",
             "static": 1,
