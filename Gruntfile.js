@@ -12,7 +12,7 @@ module.exports = function(grunt) {
         qunit: {
             files: ['tests/tests.html'],
             coverage: {
-				src: [ "src/**/*.js" ],
+				src: [ "tests/**/*.js" ],
 				instrumentedFiles: "temp/",
 				htmlReport: "build/report/coverage",
 				lcovReport: "build/report/lcov",
