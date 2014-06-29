@@ -10,14 +10,16 @@ module.exports = function(grunt) {
             }
         },
         qunit: {
-            files: ['tests/tests.html'],
-            coverage: {
-				src: [ "tests/**/*.js" ],
-				instrumentedFiles: "temp/",
-				htmlReport: "build/report/coverage",
-				lcovReport: "build/report/lcov",
-				linesThresholdPct: 0
-			}
+            all: ['tests/tests.html'],
+            options: {
+                coverage: {
+					src: [ "src/**/*.js" ],
+					instrumentedFiles: "temp/",
+					htmlReport: "build/report/coverage",
+					lcovReport: "build/report/lcov",
+					linesThresholdPct: 0
+				}
+            }
         },
 		coveralls: {
 			options: {
