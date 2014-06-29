@@ -13,6 +13,10 @@ dwv.gui.displayProgress = function(percent){
         $("#progressbar").progressbar({ value: percent });
     }
 };
+// Select
+dwv.gui.refreshSelect = function(/*selectName*/){
+	// nothing to do
+};
 // Slider
 dwv.gui.appendSliderHtml = function(){
     // nothing to do
@@ -42,7 +46,6 @@ function toggle(dialogId)
         $(dialogId).dialog('open');
     }
 }
-
 
 // Loaders
 dwv.gui.appendLoadboxHtml = function(){

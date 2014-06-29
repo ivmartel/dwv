@@ -56,12 +56,12 @@ dwv.gui.base.displayProgress = function(percent)
 };
 
 /**
- * Refresh a HTML select.
+ * Refresh a HTML select. Mainly for jquery-mobile.
  * @method refreshSelect
  * @static
  * @param {String} selectName The name of the HTML select to refresh.
  */
-dwv.gui.refreshSelect = function(selectName)
+dwv.gui.base.refreshSelect = function(selectName)
 {
     // jquery-mobile
     if( $(selectName).selectmenu ) {

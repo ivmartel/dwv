@@ -19,7 +19,7 @@ appgui.js
 # third party
 
 # css
-/dwv/demo/stable/ext/jquery-ui/themes/ui-darkness/jquery-ui-1.10.4.min.css
+/dwv/demo/stable/ext/jquery-ui/themes/ui-darkness/jquery-ui-1.11.0.min.css
 /dwv/demo/stable/ext/jquery-ui/themes/ui-darkness/images/animated-overlay.gif
 /dwv/demo/stable/ext/jquery-ui/themes/ui-darkness/images/ui-bg_flat_30_cccccc_40x100.png
 /dwv/demo/stable/ext/jquery-ui/themes/ui-darkness/images/ui-bg_flat_50_5c5c5c_40x100.png
@@ -37,7 +37,7 @@ appgui.js
 /dwv/demo/stable/ext/jquery-ui/themes/ui-darkness/images/ui-icons_ffffff_256x240.png
 # js
 /dwv/demo/stable/ext/jquery/jquery-2.1.1.min.js
-/dwv/demo/stable/ext/jquery-ui/jquery-ui-1.10.4.min.js
+/dwv/demo/stable/ext/jquery-ui/jquery-ui-1.11.0.min.js
 /dwv/demo/stable/ext/flot/jquery.flot.min.js
 /dwv/demo/stable/ext/kinetic/kinetic-v5.1.1-06.10.min.js
 
