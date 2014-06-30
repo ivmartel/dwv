@@ -14,24 +14,24 @@ module.exports = function(grunt) {
             options: {
                 coverage: {
                     baseUrl: ".",
-					src: [ "src/**/*.js" ],
-					instrumentedFiles: "temp/",
-					htmlReport: "build/report/coverage",
-					lcovReport: "build/report/lcov",
-					linesThresholdPct: 0
-				}
+                    src: [ "src/**/*.js" ],
+                    instrumentedFiles: "temp/",
+                    htmlReport: "build/report/coverage",
+                    lcovReport: "build/report/lcov",
+                    linesThresholdPct: 0
+                }
             }
         },
-		coveralls: {
-			options: {
-				// don't fail if coveralls fails
-				force: true
-			},
-			main_target: {
-				src: "build/report/lcov/lcov.info"
-			}
-		},
-		concat: {
+        coveralls: {
+            options: {
+                // don't fail if coveralls fails
+                force: true
+            },
+            main_target: {
+                src: "build/report/lcov/lcov.info"
+            }
+        },
+        concat: {
             options: {
                 separator: ';'
             },
