@@ -21,6 +21,7 @@ test("Test Point2D.", function() {
     var p1 = new dwv.math.Point2D(1,2);
     equal(p0.equals(p1), true, "equals true");
     // equals: false
+    equal(p0.equals(null), false, "null equals false");
     var p2 = new dwv.math.Point2D(2,1);
     equal(p0.equals(p2), false, "equals false");
     // to string
