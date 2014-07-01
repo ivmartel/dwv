@@ -44,6 +44,7 @@ test("Test FastPoint2D.", function() {
     var p1 = new dwv.math.FastPoint2D(3,4);
     equal(p0.equals(p1), true, "equals true");
     // equals: false
+    equal(p0.equals(null), false, "null equals false");
     var p2 = new dwv.math.FastPoint2D(4,3);
     equal(p0.equals(p2), false, "equals false");
     // to string
@@ -134,3 +135,26 @@ test("Test ROI.", function() {
     // getPoint second
     equal(r0.getPoint(1), p1, "getPoint second");
 });
+
+test("Test Path.", function() {
+    var path0 = new dwv.math.Path();
+    // getLength
+    equal(path0.getLength(), 0, "getLength");
+    // add a point
+    var p0 = new dwv.math.Point2D(0,0);
+    path0.addPoint(p0);
+    // getLength
+    equal(path0.getLength(), 1, "getLength");
+    // add another point
+    var p1 = new dwv.math.Point2D(-4,-4);
+    path0.addPoint(p1);
+    // getPoint first
+    equal(path0.getPoint(0), p0, "getPoint first");
+    // getPoint second
+    equal(path0.getPoint(1), p1, "getPoint second");
+    // add first point a control point
+    path0.addControlPoint(p0);
+    // check if control point
+    equal(path0.isControlPoint(p0), 1, "isControlPoint");
+});
+
