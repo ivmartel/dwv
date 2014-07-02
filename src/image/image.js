@@ -535,19 +535,15 @@ dwv.image.Image.prototype.calculateHistogram = function()
     var histoPlot = [];
     var value = 0;
     var size = this.getSize().getTotalSize();
-    for(var i=0; i < size; ++i)
-    {    
+    for ( var i = 0; i < size; ++i ) {    
         value = this.getRescaledValueAtOffset(i);
-        histo[value] = histo[value] || 0;
-        histo[value] += 1;
+        histo[value] = ( histo[value] || 0 ) + 1;
     }
     // generate data for plotting
     var min = this.getRescaledDataRange().min;
     var max = this.getRescaledDataRange().max;
-    for(var j=min; j < max; ++j)
-    {    
-        value = histo[j] || 0;
-        histoPlot.push([j, value]);
+    for ( var j = min; j <= max; ++j ) {    
+        histoPlot.push([j, ( histo[j] || 0 ) ]);
     }
     return histoPlot;
 };
@@ -663,25 +659,25 @@ dwv.image.Image.prototype.convolute2D = function(weights)
                     if( i === 0 && j === 0 ) {
                         wOffFinal = wOff00;
                     }
-                    else if( i === 0 && j === nrows ) {
+                    else if( i === 0 && j === (nrows-1)  ) {
                         wOffFinal = wOff0n;
                     }
-                    else if( i === ncols && j === 0 ) {
+                    else if( i === (ncols-1) && j === 0 ) {
                         wOffFinal = wOffn0;
                     }
-                    else if( i === ncols && j === nrows ) {
+                    else if( i === (ncols-1) && j === (nrows-1) ) {
                         wOffFinal = wOffnn;
                     }
-                    else if( i === 0 && j !== nrows && j !== 0 ) {
+                    else if( i === 0 && j !== (nrows-1) && j !== 0 ) {
                         wOffFinal = wOff0x;
                     }
-                    else if( i === ncols && j !== nrows && j !== 0 ) {
+                    else if( i === (ncols-1) && j !== (nrows-1) && j !== 0 ) {
                         wOffFinal = wOffnx;
                     }
-                    else if( i !== 0 && i !== ncols && j === 0 ) {
+                    else if( i !== 0 && i !== (ncols-1) && j === 0 ) {
                         wOffFinal = wOffx0;
                     }
-                    else if( i !== 0 && i !== ncols && j === nrows ) {
+                    else if( i !== 0 && i !== (ncols-1) && j === (nrows-1) ) {
                         wOffFinal = wOffxn;
                     }
                         
