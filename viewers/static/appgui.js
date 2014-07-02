@@ -15,7 +15,7 @@ dwv.gui.displayProgress = function(percent){
 };
 // Select
 dwv.gui.refreshSelect = function(/*selectName*/){
-	// nothing to do
+    // nothing to do
 };
 // Slider
 dwv.gui.appendSliderHtml = function(){

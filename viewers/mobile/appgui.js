@@ -12,7 +12,7 @@ dwv.gui.displayProgress = function(percent){
 };
 // Select
 dwv.gui.refreshSelect = function(selectName){
-	dwv.gui.base.refreshSelect(selectName);
+    dwv.gui.base.refreshSelect(selectName);
 };
 // Slider
 dwv.gui.appendSliderHtml = function(){

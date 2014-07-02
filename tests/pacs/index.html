@@ -132,16 +132,16 @@ function createAndPutHtml(data, id)
 {
     for( var i = 0; i < data.length; ++i )
     {
-	    // image
-	    var image = document.createElement("img");
-	    image.src = "images/"+data[i].img;
-	    // title
-	    var title = document.createElement("h2");
-	    title.appendChild(document.createTextNode(data[i].title));
-	    // description
-	    var desc = document.createElement("p");
+        // image
+        var image = document.createElement("img");
+        image.src = "images/"+data[i].img;
+        // title
+        var title = document.createElement("h2");
+        title.appendChild(document.createTextNode(data[i].title));
+        // description
+        var desc = document.createElement("p");
         desc.appendChild(document.createTextNode(data[i].desc));
-	    if( data[i].comment ) {
+        if( data[i].comment ) {
             var comment = document.createElement("b");
             comment.appendChild(document.createTextNode(" "+data[i].comment));
             desc.appendChild(comment);
@@ -153,14 +153,14 @@ function createAndPutHtml(data, id)
         if( data[i].uriargs ) link.href += data[i].uriargs;
         link.className = "dwvlink";
         link.appendChild(image);
-	    
+        
         // list item
-	    var li = document.createElement("li");
-	    li.appendChild(link);
+        var li = document.createElement("li");
+        li.appendChild(link);
         li.appendChild(title);
         li.appendChild(desc);
-	    var ul = document.getElementById(id);
-	    ul.appendChild(li);
+        var ul = document.getElementById(id);
+        ul.appendChild(li);
     }
 }
 
