@@ -5105,7 +5105,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 555,
+            "line": 551,
             "description": "Convolute the image with a given 2D kernel.",
             "itemtype": "method",
             "name": "convolute2D",
@@ -5126,7 +5126,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 705,
+            "line": 701,
             "description": "Transform an image using a specific operator.",
             "itemtype": "method",
             "name": "transform",
@@ -5147,7 +5147,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 723,
+            "line": 719,
             "description": "Compose this image with another one and using a specific operator.",
             "itemtype": "method",
             "name": "compose",
