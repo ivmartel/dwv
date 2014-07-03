@@ -38,7 +38,85 @@ test("Test listeners.", function() {
     view0.setWindowLevel(1,1);
 });
 
-test("Test generate data.", function() {
+test("Test generate data MONO.", function() {
+    // create an image
+    var size0 = 2;
+    var imgSize0 = new dwv.image.Size(size0, size0, 1);
+    var imgSpacing0 = new dwv.image.Spacing(1, 1, 1);
+    var buffer0 = [];
+    for ( var i = 0; i < size0 * size0; ++i ) {
+        buffer0[i] = i;
+    }
+    var image0 = new dwv.image.Image(imgSize0, imgSpacing0, buffer0);
+    image0.setMeta( { 'BitsStored': 8 } );
+    // create a view
+    var view0 = new dwv.image.View(image0);
+    // create the image data
+    // TODO Uint8ClampedArray not in phantom??
+    var imageData = {'width': size0, 'height': size0, 'data': new Uint8Array(size0*size0*4) };
+    
+    // default window level
+    view0.setWindowLevelMinMax();
+    // call generate data
+    view0.generateImageData(imageData);
+    // TODO proper data?
+    var theoData0 = [ 0, 0, 0, 255, 127, 127, 127, 255,
+                      255, 255, 255, 255, 255, 255, 255, 255 ];
+    var testContent0 = true;
+    for ( i = 0; i < size0*size0*4; ++i) {
+        if ( theoData0[i] !== imageData.data[i] ) {
+            testContent0 = false;
+            break;
+        }
+    }
+    equal( testContent0, true, "check image data" );
+});
+
+test("Test generate data RGB.", function() {
+    // create an image
+    var size0 = 2;
+    var imgSize0 = new dwv.image.Size(size0, size0, 1);
+    var imgSpacing0 = new dwv.image.Spacing(1, 1, 1);
+    var buffer0 = [];
+    var index = 0;
+    var value = 0;
+    // 0, 85, 170, 255
+    for ( var i = 0; i < size0 * size0; ++i ) {
+        value = i * 255 / ((size0 * size0) - 1);
+        buffer0[index] = value;
+        buffer0[index+1] = value;
+        buffer0[index+2] = value;
+        index += 3;
+    }
+    var image0 = new dwv.image.Image(imgSize0, imgSpacing0, buffer0);
+    image0.setPhotometricInterpretation('RGB');
+    image0.setMeta( { 'BitsStored': 8 } );
+    // create a view
+    var view0 = new dwv.image.View(image0);
+    // create the image data
+    // TODO Uint8ClampedArray not in phantom??
+    var imageData = {'width': size0, 'height': size0, 'data': new Uint8Array(size0*size0*4) };
+    
+    // default window level
+    view0.setWindowLevel(127, 255);
+    // call generate data
+    view0.generateImageData(imageData);
+    console.log(buffer0);
+    console.log(imageData);
+    // TODO proper data?
+    var theoData0 = [ 0, 0, 0, 255, 85, 85, 85, 255,
+                      171, 171, 171, 255, 255, 255, 255, 255 ];
+    var testContent0 = true;
+    for ( i = 0; i < size0*size0*4; ++i) {
+        if ( theoData0[i] !== imageData.data[i] ) {
+            testContent0 = false;
+            break;
+        }
+    }
+    equal( testContent0, true, "check image data" );
+});
+
+test("Test generate data timing.", function() {
     // create an image
     var size0 = 128;
     var imgSize0 = new dwv.image.Size(size0, size0, 1);
@@ -52,8 +130,7 @@ test("Test generate data.", function() {
     // create a view
     var view0 = new dwv.image.View(image0);
     // create the image data
-    // TODO Uint8ClampedArray not in phantom??
-    var imageData = {"width": size0, "height": size0, "data": new Uint8Array(size0*size0) };
+    var imageData = {"width": size0, "height": size0, "data": new Uint8Array(size0*size0*4) };
     
     // default window level
     view0.setWindowLevelMinMax();
