@@ -250,7 +250,6 @@ test("Test Image transform.", function() {
         return value * 2;
     };
     var resImage1 = image0.transform( func1 );
-    console.log(resImage1.getBuffer());
     var theoResImage1 = [ 0, 2, 4, 6, 8, 10, 12, 14, 16 ];
     var testContent1 = true;
     for ( i = 0; i < size0*size0; ++i) {
