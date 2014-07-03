@@ -101,9 +101,7 @@ test("Test generate data RGB.", function() {
     view0.setWindowLevel(127, 255);
     // call generate data
     view0.generateImageData(imageData);
-    console.log(buffer0);
-    console.log(imageData);
-    // TODO proper data?
+    // check data content
     var theoData0 = [ 0, 0, 0, 255, 85, 85, 85, 255,
                       171, 171, 171, 255, 255, 255, 255, 255 ];
     var testContent0 = true;
@@ -113,7 +111,39 @@ test("Test generate data RGB.", function() {
             break;
         }
     }
-    equal( testContent0, true, "check image data" );
+    equal( testContent0, true, "check image data non planar" );
+    
+    var buffer1 = [];
+    index = 0;
+    // 0, 85, 170, 255
+    for ( i = 0; i < size0 * size0; ++i ) {
+        buffer1[index] = 0;
+        buffer1[index+1] = 85;
+        buffer1[index+2] = 170;
+        buffer1[index+3] = 255;
+        index += 4;
+    }
+    var image1 = new dwv.image.Image(imgSize0, imgSpacing0, buffer1);
+    image1.setPhotometricInterpretation('RGB');
+    image1.setPlanarConfiguration(1);
+    image1.setMeta( { 'BitsStored': 8 } );
+    // create a view
+    var view1 = new dwv.image.View(image1);
+    
+    // default window level
+    view1.setWindowLevel(127, 255);
+    // call generate data
+    view1.generateImageData(imageData);
+    // check data content
+    var testContent1 = true;
+    for ( i = 0; i < size0*size0*4; ++i) {
+        if ( theoData0[i] !== imageData.data[i] ) {
+            testContent1 = false;
+            break;
+        }
+    }
+    equal( testContent1, true, "check image data planar" );
+
 });
 
 test("Test generate data timing.", function() {
