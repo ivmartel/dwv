@@ -2170,14 +2170,14 @@
         },
         {
             "file": "src/gui/filter.js",
-            "line": 43,
+            "line": 37,
             "description": "Display the filter HTML.",
             "itemtype": "method",
             "name": "displayFilterHtml",
             "static": 1,
             "params": [
                 {
-                    "name": "bool",
+                    "name": "flag",
                     "description": "True to display, false to hide.",
                     "type": "Boolean"
                 }
@@ -2188,7 +2188,7 @@
         },
         {
             "file": "src/gui/filter.js",
-            "line": 56,
+            "line": 48,
             "description": "Initialise the filter HTML.",
             "itemtype": "method",
             "name": "displayFilterHtml",
@@ -2199,7 +2199,7 @@
         },
         {
             "file": "src/gui/filter.js",
-            "line": 72,
+            "line": 61,
             "description": "Append the threshold filter HTML to the page.",
             "itemtype": "method",
             "name": "appendThresholdHtml",
@@ -2210,14 +2210,14 @@
         },
         {
             "file": "src/gui/filter.js",
-            "line": 95,
+            "line": 82,
             "description": "Clear the treshold filter HTML.",
             "itemtype": "method",
             "name": "displayThresholdHtml",
             "static": 1,
             "params": [
                 {
-                    "name": "bool",
+                    "name": "flag",
                     "description": "True to display, false to hide.",
                     "type": "Boolean"
                 }
@@ -2228,7 +2228,7 @@
         },
         {
             "file": "src/gui/filter.js",
-            "line": 108,
+            "line": 93,
             "description": "Initialise the treshold filter HTML.",
             "itemtype": "method",
             "name": "initThresholdHtml",
@@ -2239,7 +2239,7 @@
         },
         {
             "file": "src/gui/filter.js",
-            "line": 119,
+            "line": 104,
             "description": "Append the sharpen filter HTML to the page.",
             "itemtype": "method",
             "name": "appendSharpenHtml",
@@ -2250,14 +2250,25 @@
         },
         {
             "file": "src/gui/filter.js",
-            "line": 147,
+            "line": 118,
+            "description": "Append the sharpen filter HTML to the page.",
+            "itemtype": "method",
+            "name": "appendSharpenHtml",
+            "static": 1,
+            "class": "dwv.gui",
+            "module": "gui",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/gui/filter.js",
+            "line": 134,
             "description": "Display the sharpen filter HTML.",
             "itemtype": "method",
             "name": "displaySharpenHtml",
             "static": 1,
             "params": [
                 {
-                    "name": "bool",
+                    "name": "flag",
                     "description": "True to display, false to hide.",
                     "type": "Boolean"
                 }
@@ -2268,7 +2279,7 @@
         },
         {
             "file": "src/gui/filter.js",
-            "line": 160,
+            "line": 145,
             "description": "Append the sobel filter HTML to the page.",
             "itemtype": "method",
             "name": "appendSobelHtml",
@@ -2279,14 +2290,14 @@
         },
         {
             "file": "src/gui/filter.js",
-            "line": 188,
+            "line": 161,
             "description": "Display the sobel filter HTML.",
             "itemtype": "method",
             "name": "displaySobelHtml",
             "static": 1,
             "params": [
                 {
-                    "name": "bool",
+                    "name": "flag",
                     "description": "True to display, false to hide.",
                     "type": "Boolean"
                 }
@@ -3135,7 +3146,7 @@
                     "type": "Number"
                 },
                 {
-                    "name": "bool",
+                    "name": "flag",
                     "description": "True to display the element.",
                     "type": "Boolean"
                 }
@@ -3155,6 +3166,52 @@
                 {
                     "name": "id",
                     "description": "The id of the element to toggle its display.",
+                    "type": "Number"
+                }
+            ],
+            "class": "dwv.html",
+            "module": "html",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/gui/html.js",
+            "line": 614,
+            "description": "Append an element.",
+            "itemtype": "method",
+            "name": "appendElement",
+            "static": 1,
+            "params": [
+                {
+                    "name": "parentId",
+                    "description": "The id of the element to append to.",
+                    "type": "Number"
+                },
+                {
+                    "name": "element",
+                    "description": "The element to append.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.html",
+            "module": "html",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/gui/html.js",
+            "line": 632,
+            "description": "Create an element.",
+            "itemtype": "method",
+            "name": "createElement",
+            "static": 1,
+            "params": [
+                {
+                    "name": "type",
+                    "description": "The type of the elemnt.",
+                    "type": "String"
+                },
+                {
+                    "name": "id",
+                    "description": "The id of the element",
                     "type": "Number"
                 }
             ],

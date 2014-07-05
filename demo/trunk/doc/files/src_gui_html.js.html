@@ -786,13 +786,13 @@ dwv.html.decodeManifestUri = function(uri, nslices)
  * @method displayElement
  * @static
  * @param {Number} id The id of the element to toggle its display.
- * @param {Boolean} bool True to display the element.
+ * @param {Boolean} flag True to display the element.
  */
-dwv.html.displayElement = function(id,bool)
+dwv.html.displayElement = function (id, flag)
 {
     var element = document.getElementById(id);
-    if( element ) {
-        element.style.display = bool ? &quot;&quot; : &quot;none&quot;;
+    if ( element ) {
+        element.style.display = flag ? &quot;&quot; : &quot;none&quot;;
     }
 };
 
@@ -802,18 +802,52 @@ dwv.html.displayElement = function(id,bool)
  * @static
  * @param {Number} id The id of the element to toggle its display.
  */
-dwv.html.toggleDisplay = function(id)
+dwv.html.toggleDisplay = function (id)
 {
-    if( document.getElementById(id) )
-    {
-        var div = document.getElementById(id);
-        if( div.style.display === &quot;none&quot; ) {
-            div.style.display = &#x27;&#x27;;
+    var element = document.getElementById(id);
+    if ( element ) {
+        if ( element.style.display === &quot;none&quot; ) {
+            element.style.display = &#x27;&#x27;;
         }
         else {
-            div.style.display = &quot;none&quot;;
+            element.style.display = &quot;none&quot;;
         }
     }
+};
+
+/**
+ * Append an element.
+ * @method appendElement
+ * @static
+ * @param {Number} parentId The id of the element to append to.
+ * @param {Object} element The element to append.
+ */
+dwv.html.appendElement = function (parentId, element)
+{
+    var node = document.getElementById(parentId);
+    if ( element ) {
+        // append
+        node.appendChild(element);
+        // trigger create event (mobile)
+        $(&#x27;#&#x27;+parentId).trigger(&quot;create&quot;);
+    }
+};
+
+/**
+ * Create an element.
+ * @method createElement
+ * @static
+ * @param {String} type The type of the elemnt.
+ * @param {Number} id The id of the element
+ */
+dwv.html.createHiddenElement = function (type, id)
+{
+    var element = document.createElement(type);
+    element.id = id;
+    // hide by default
+    element.style.display = &quot;none&quot;;
+    // return
+    return element;
 };
 
     </pre>
