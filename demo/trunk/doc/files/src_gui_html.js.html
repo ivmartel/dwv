@@ -602,7 +602,7 @@ dwv.html.getUriParam = function(uri)
     // split key/value pairs
     var mainQueryPairs = dwv.utils.splitQueryString(inputUri);
     // check pairs
-    if( mainQueryPairs === null ) {
+    if( Object.keys(mainQueryPairs).length === 0 ) {
         return null;
     }
     // has to have an input key
@@ -636,17 +636,17 @@ dwv.html.decodeKeyValueUri = function(uri, replaceMode)
 {
     var result = [];
 
-    // decode input URI
-    var queryUri = decodeURIComponent(uri);
-    // get key/value pairs from input URI
-    var inputQueryPairs = dwv.utils.splitQueryString(queryUri);
     // repeat key replace mode (default to keep key)
     var repeatKeyReplaceMode = &quot;key&quot;;
     if( replaceMode ) {
         repeatKeyReplaceMode = replaceMode;
     }
-    
-    if( !inputQueryPairs ) 
+
+    // decode input URI
+    var queryUri = decodeURIComponent(uri);
+    // get key/value pairs from input URI
+    var inputQueryPairs = dwv.utils.splitQueryString(queryUri);
+    if ( Object.keys(inputQueryPairs).length === 0 ) 
     {
         result.push(queryUri);
     }

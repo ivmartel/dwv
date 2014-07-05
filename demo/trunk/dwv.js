@@ -4326,7 +4326,7 @@ dwv.html.getUriParam = function(uri)
     // split key/value pairs
     var mainQueryPairs = dwv.utils.splitQueryString(inputUri);
     // check pairs
-    if( mainQueryPairs === null ) {
+    if( Object.keys(mainQueryPairs).length === 0 ) {
         return null;
     }
     // has to have an input key
@@ -4360,17 +4360,17 @@ dwv.html.decodeKeyValueUri = function(uri, replaceMode)
 {
     var result = [];
 
-    // decode input URI
-    var queryUri = decodeURIComponent(uri);
-    // get key/value pairs from input URI
-    var inputQueryPairs = dwv.utils.splitQueryString(queryUri);
     // repeat key replace mode (default to keep key)
     var repeatKeyReplaceMode = "key";
     if( replaceMode ) {
         repeatKeyReplaceMode = replaceMode;
     }
-    
-    if( !inputQueryPairs ) 
+
+    // decode input URI
+    var queryUri = decodeURIComponent(uri);
+    // get key/value pairs from input URI
+    var inputQueryPairs = dwv.utils.splitQueryString(queryUri);
+    if ( Object.keys(inputQueryPairs).length === 0 ) 
     {
         result.push(queryUri);
     }
@@ -12169,9 +12169,13 @@ dwv.utils = dwv.utils || {};
  * @param {String} string The string to capitalise the first letter.
  * @return {String} The new string.
  */
-dwv.utils.capitaliseFirstLetter = function(string)
+dwv.utils.capitaliseFirstLetter = function (string)
 {
-    return string.charAt(0).toUpperCase() + string.slice(1);
+    var res = string;
+    if ( string ) {
+        res = string.charAt(0).toUpperCase() + string.slice(1);
+    }
+    return res;
 };
 
 /**
@@ -12181,40 +12185,45 @@ dwv.utils.capitaliseFirstLetter = function(string)
  * @param {String} string The string to clean.
  * @return {String} The cleaned string.
  */
-dwv.utils.cleanString = function(string)
+dwv.utils.cleanString = function (string)
 {
-    var str = string.trim();
-    //get rid of ending zero-width space (u200B)
-    if( str[str.length-1] === String.fromCharCode("u200B") ) {
-        str = str.substring(0, str.length-1); 
+    var res = string;
+    if ( string ) {
+        // trim spaces
+        res = string.trim();
+        // get rid of ending zero-width space (u200B)
+        if ( res[res.length-1] === String.fromCharCode("u200B") ) {
+            res = res.substring(0, res.length-1);
+        }
     }
-    return str;
+    return res;
 };
 
 /**
  * Split query string:
  *  'root?key0=val00&key0=val01&key1=val10' returns 
  *  { base : root, query : [ key0 : [val00, val01], key1 : val1 ] }
- * Returns null if not a query string (no question mark).
+ * Returns an empty object if the input string is not correct (null, empty...)
+ *  or if it is not a query string (no question mark).
  * @method splitQueryString
  * @static
  * @param {String} inputStr The string to split.
  * @return {Object} The split string.
  */
-dwv.utils.splitQueryString = function(inputStr)
+dwv.utils.splitQueryString = function (inputStr)
 {
-    // check if query string
-    if( inputStr.indexOf('?') === -1 ) {
-        return null;
-    }
     // result
     var result = {};
-    // base
-    result.base = inputStr.substr(0, inputStr.indexOf('?'));
-    // take after the '?'
-    var query = inputStr.substr(inputStr.indexOf('?')+1);
-    // split key/value pairs
-    result.query = dwv.utils.splitKeyValueString(query);
+    // check if query string
+    var sepIndex = null;
+    if ( inputStr && (sepIndex = inputStr.indexOf('?')) !== -1 ) {
+        // base: before the '?'
+        result.base = inputStr.substr(0, sepIndex);
+        // query : after the '?'
+        var query = inputStr.substr(sepIndex + 1);
+        // split key/value pairs of the query
+        result.query = dwv.utils.splitKeyValueString(query);
+    }
     // return
     return result;
 };
@@ -12228,27 +12237,30 @@ dwv.utils.splitQueryString = function(inputStr)
  * @param {String} inputStr The string to split.
  * @return {Object} The split string.
  */
-dwv.utils.splitKeyValueString = function(inputStr)
+dwv.utils.splitKeyValueString = function (inputStr)
 {
     // result
     var result = {};
-    // split key/value pairs
-    var pairs = inputStr.split('&');
-    for( var i = 0; i < pairs.length; ++i )
-    {
-        var pair = pairs[i].split('=');
-        // if the key does not exist, create it
-        if( !result[pair[0]] ) 
+    // check input string
+    if ( inputStr ) {
+         // split key/value pairs
+        var pairs = inputStr.split('&');
+        for ( var i = 0; i < pairs.length; ++i )
         {
-            result[pair[0]] = pair[1];
-        }
-        else
-        {
-            // make it an array
-            if( !( result[pair[0]] instanceof Array) ) {
-                result[pair[0]] = [result[pair[0]]];
+            var pair = pairs[i].split('=');
+            // if the key does not exist, create it
+            if ( !result[pair[0]] ) 
+            {
+                result[pair[0]] = pair[1];
             }
-            result[pair[0]].push(pair[1]);
+            else
+            {
+                // make it an array
+                if ( !( result[pair[0]] instanceof Array ) ) {
+                    result[pair[0]] = [result[pair[0]]];
+                }
+                result[pair[0]].push(pair[1]);
+            }
         }
     }
     return result;
