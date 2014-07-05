@@ -52,7 +52,8 @@ dwv.utils.cleanString = function (string)
  * Split query string:
  *  'root?key0=val00&key0=val01&key1=val10' returns 
  *  { base : root, query : [ key0 : [val00, val01], key1 : val1 ] }
- * Returns null if not a query string (no question mark).
+ * Returns an empty object if the input string is not correct (null, empty...)
+ *  or if it is not a query string (no question mark).
  * @method splitQueryString
  * @static
  * @param {String} inputStr The string to split.
