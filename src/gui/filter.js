@@ -19,38 +19,30 @@ dwv.gui.filter.base = dwv.gui.filter.base || {};
  * @method appendFilterHtml
  * @static
  */
-dwv.gui.base.appendFilterHtml = function()
+dwv.gui.base.appendFilterHtml = function ()
 {
     // filter select
     var filterSelector = dwv.html.createHtmlSelect("filterSelect",dwv.tool.filters);
     filterSelector.onchange = dwv.gui.onChangeFilter;
 
     // filter list element
-    var filterLi = document.createElement("li");
-    filterLi.id = "filterLi";
-    filterLi.style.display = "none";
+    var filterLi = dwv.html.createHiddenElement("li", "filterLi");
     filterLi.setAttribute("class","ui-block-b");
     filterLi.appendChild(filterSelector);
     
-    // node
-    var node = document.getElementById("toolList");
-    // apend filter
-    node.appendChild(filterLi);
-    // trigger create event (mobile)
-    $("#toolList").trigger("create");
+    // append element
+    dwv.html.appendElement("toolList", filterLi);
 };
 
 /**
  * Display the filter HTML.
  * @method displayFilterHtml
  * @static
- * @param {Boolean} bool True to display, false to hide.
+ * @param {Boolean} flag True to display, false to hide.
  */
-dwv.gui.base.displayFilterHtml = function(bool)
+dwv.gui.base.displayFilterHtml = function (flag)
 {
-    // filter lsit element
-    var filterLi = document.getElementById("filterLi");
-    filterLi.style.display = bool ? "" : "none";
+    dwv.html.displayElement("filterLi", flag);
 };
 
 /**
@@ -58,7 +50,7 @@ dwv.gui.base.displayFilterHtml = function(bool)
  * @method displayFilterHtml
  * @static
  */
-dwv.gui.base.initFilterHtml = function()
+dwv.gui.base.initFilterHtml = function ()
 {
     // filter select: reset selected options
     var filterSelector = document.getElementById("filterSelect");
@@ -66,21 +58,16 @@ dwv.gui.base.initFilterHtml = function()
     dwv.gui.refreshSelect("#filterSelect");
 };
 
-// create namespace if not there
-dwv.gui.filter = dwv.gui.filter || {};
-
 /**
  * Append the threshold filter HTML to the page.
  * @method appendThresholdHtml
  * @static
  */
-dwv.gui.filter.base.appendThresholdHtml = function()
+dwv.gui.filter.base.appendThresholdHtml = function ()
 {
     // threshold list element
-    var thresholdLi = document.createElement("li");
-    thresholdLi.id = "thresholdLi";
+    var thresholdLi = dwv.html.createHiddenElement("li", "thresholdLi");
     thresholdLi.setAttribute("class","ui-block-c");
-    thresholdLi.style.display = "none";
     
     // node
     var node = document.getElementById("toolList");
@@ -96,13 +83,11 @@ dwv.gui.filter.base.appendThresholdHtml = function()
  * Clear the treshold filter HTML.
  * @method displayThresholdHtml
  * @static
- * @param {Boolean} bool True to display, false to hide.
+ * @param {Boolean} flag True to display, false to hide.
  */
-dwv.gui.filter.base.displayThresholdHtml = function(bool)
+dwv.gui.filter.base.displayThresholdHtml = function (flag)
 {
-    // threshold list element
-    var thresholdLi = document.getElementById("thresholdLi");
-    thresholdLi.style.display = bool ? "" : "none";
+    dwv.html.displayElement("thresholdLi", flag);
 };
 
 /**
@@ -110,7 +95,7 @@ dwv.gui.filter.base.displayThresholdHtml = function(bool)
  * @method initThresholdHtml
  * @static
  */
-dwv.gui.filter.base.initThresholdHtml = function()
+dwv.gui.filter.base.initThresholdHtml = function ()
 {
     // threshold slider
     dwv.gui.initSliderHtml();
@@ -121,40 +106,40 @@ dwv.gui.filter.base.initThresholdHtml = function()
  * @method appendSharpenHtml
  * @static
  */
-dwv.gui.filter.base.appendSharpenHtml = function()
+dwv.gui.filter.base.createFilterApplyButton = function ()
 {
-    // sharpen button
-    var buttonRun = document.createElement("button");
-    buttonRun.id = "runFilterButton";
-    buttonRun.onclick = dwv.gui.onRunFilter;
-    buttonRun.appendChild(document.createTextNode("Apply"));
+    var button = document.createElement("button");
+    button.id = "runFilterButton";
+    button.onclick = dwv.gui.onRunFilter;
+    button.appendChild(document.createTextNode("Apply"));
+    return button;
+};
 
+/**
+ * Append the sharpen filter HTML to the page.
+ * @method appendSharpenHtml
+ * @static
+ */
+dwv.gui.filter.base.appendSharpenHtml = function ()
+{
     // sharpen list element
-    var sharpenLi = document.createElement("li");
-    sharpenLi.id = "sharpenLi";
-    sharpenLi.style.display = "none";
+    var sharpenLi = dwv.html.createHiddenElement("li", "sharpenLi");
     sharpenLi.setAttribute("class","ui-block-c");
-    sharpenLi.appendChild(buttonRun);
+    sharpenLi.appendChild( dwv.gui.filter.base.createFilterApplyButton() );
     
-    // node
-    var node = document.getElementById("toolList");
-    // append threshold
-    node.appendChild(sharpenLi);
-    // trigger create event (mobile)
-    $("#toolList").trigger("create");
+    // append element
+    dwv.html.appendElement("toolList", sharpenLi);
 };
 
 /**
  * Display the sharpen filter HTML.
  * @method displaySharpenHtml
  * @static
- * @param {Boolean} bool True to display, false to hide.
+ * @param {Boolean} flag True to display, false to hide.
  */
-dwv.gui.filter.base.displaySharpenHtml = function(bool)
+dwv.gui.filter.base.displaySharpenHtml = function (flag)
 {
-    // sharpen list element
-    var sharpenLi = document.getElementById("sharpenLi");
-    sharpenLi.style.display = bool ? "" : "none";
+    dwv.html.displayElement("sharpenLi", flag);
 };
 
 /**
@@ -162,39 +147,25 @@ dwv.gui.filter.base.displaySharpenHtml = function(bool)
  * @method appendSobelHtml
  * @static
  */
-dwv.gui.filter.base.appendSobelHtml = function()
+dwv.gui.filter.base.appendSobelHtml = function ()
 {
-    // sobel button
-    var buttonRun = document.createElement("button");
-    buttonRun.id = "runFilterButton";
-    buttonRun.onclick = dwv.gui.onRunFilter;
-    buttonRun.appendChild(document.createTextNode("Apply"));
-
     // sobel list element
-    var sobelLi = document.createElement("li");
-    sobelLi.id = "sobelLi";
-    sobelLi.style.display = "none";
+    var sobelLi = dwv.html.createHiddenElement("li", "sobelLi");
     sobelLi.setAttribute("class","ui-block-c");
-    sobelLi.appendChild(buttonRun);
+    sobelLi.appendChild( dwv.gui.filter.base.createFilterApplyButton() );
     
-    // node
-    var node = document.getElementById("toolList");
-    // append sobel
-    node.appendChild(sobelLi);
-    // trigger create event (mobile)
-    $("#toolList").trigger("create");
+    // append element
+    dwv.html.appendElement("toolList", sobelLi);
 };
 
 /**
  * Display the sobel filter HTML.
  * @method displaySobelHtml
  * @static
- * @param {Boolean} bool True to display, false to hide.
+ * @param {Boolean} flag True to display, false to hide.
  */
-dwv.gui.filter.base.displaySobelHtml = function(bool)
+dwv.gui.filter.base.displaySobelHtml = function (flag)
 {
-    // sobel list element
-    var sobelLi = document.getElementById("sobelLi");
-    sobelLi.style.display = bool ? "" : "none";
+    dwv.html.displayElement("sobelLi", flag);
 };
 

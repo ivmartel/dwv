@@ -582,13 +582,13 @@ dwv.html.decodeManifestUri = function(uri, nslices)
  * @method displayElement
  * @static
  * @param {Number} id The id of the element to toggle its display.
- * @param {Boolean} bool True to display the element.
+ * @param {Boolean} flag True to display the element.
  */
-dwv.html.displayElement = function(id,bool)
+dwv.html.displayElement = function (id, flag)
 {
     var element = document.getElementById(id);
-    if( element ) {
-        element.style.display = bool ? "" : "none";
+    if ( element ) {
+        element.style.display = flag ? "" : "none";
     }
 };
 
@@ -598,16 +598,50 @@ dwv.html.displayElement = function(id,bool)
  * @static
  * @param {Number} id The id of the element to toggle its display.
  */
-dwv.html.toggleDisplay = function(id)
+dwv.html.toggleDisplay = function (id)
 {
-    if( document.getElementById(id) )
-    {
-        var div = document.getElementById(id);
-        if( div.style.display === "none" ) {
-            div.style.display = '';
+    var element = document.getElementById(id);
+    if ( element ) {
+        if ( element.style.display === "none" ) {
+            element.style.display = '';
         }
         else {
-            div.style.display = "none";
+            element.style.display = "none";
         }
     }
+};
+
+/**
+ * Append an element.
+ * @method appendElement
+ * @static
+ * @param {Number} parentId The id of the element to append to.
+ * @param {Object} element The element to append.
+ */
+dwv.html.appendElement = function (parentId, element)
+{
+    var node = document.getElementById(parentId);
+    if ( element ) {
+        // append
+        node.appendChild(element);
+        // trigger create event (mobile)
+        $('#'+parentId).trigger("create");
+    }
+};
+
+/**
+ * Create an element.
+ * @method createElement
+ * @static
+ * @param {String} type The type of the elemnt.
+ * @param {Number} id The id of the element
+ */
+dwv.html.createHiddenElement = function (type, id)
+{
+    var element = document.createElement(type);
+    element.id = id;
+    // hide by default
+    element.style.display = "none";
+    // return
+    return element;
 };
