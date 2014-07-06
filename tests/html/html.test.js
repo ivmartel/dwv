@@ -166,3 +166,64 @@ test("Test get URI param.", function() {
     equal(res40.toString(), theo40.toString(), "Multiple file-like uri");
 
 });
+
+test("Test decode Manifest.", function() {
+    // test values
+    var wadoUrl = "http://my.pacs.org:8089/wado";
+    var studyInstanceUID = "1.2.840.113619.2.134.1762680288.2032.1122564926.252";
+    var seriesInstanceUID0 = "1.2.840.113619.2.134.1762680288.2032.1122564926.253";
+    var sOPInstanceUID00 = "1.2.840.113619.2.134.1762680288.2032.1122564926.254";
+    var sOPInstanceUID01 = "1.2.840.113619.2.134.1762680288.2032.1122564926.255";
+    var seriesInstanceUID1 = "1.2.840.113619.2.134.1762680288.2032.1122564926.275";
+    var sOPInstanceUID10 = "1.2.840.113619.2.134.1762680288.2032.1122564926.276";
+    var sOPInstanceUID11 = "1.2.840.113619.2.134.1762680288.2032.1122564926.277";
+    var sOPInstanceUID12 = "1.2.840.113619.2.134.1762680288.2032.1122564926.275";
+    
+    // create a test manifest
+    var doc = document.implementation.createDocument(null, "wado_query", null);
+    doc.documentElement.setAttribute("wadoURL", wadoUrl);
+    // series 0
+    var instance00 = doc.createElement("Instance");
+    instance00.setAttribute("SOPInstanceUID", sOPInstanceUID00);
+    var instance01 = doc.createElement("Instance");
+    instance01.setAttribute("SOPInstanceUID", sOPInstanceUID01);
+    var series0 = doc.createElement("Series");
+    series0.setAttribute("SeriesInstanceUID", seriesInstanceUID0);
+    series0.appendChild(instance00);
+    series0.appendChild(instance01);
+    // series 1
+    var instance10 = doc.createElement("Instance");
+    instance10.setAttribute("SOPInstanceUID", sOPInstanceUID10);
+    var instance11 = doc.createElement("Instance");
+    instance11.setAttribute("SOPInstanceUID", sOPInstanceUID11);
+    var instance12 = doc.createElement("Instance");
+    instance12.setAttribute("SOPInstanceUID", sOPInstanceUID12);
+    var series1 = doc.createElement("Series");
+    series1.setAttribute("SeriesInstanceUID", seriesInstanceUID1);
+    series1.appendChild(instance10);
+    series1.appendChild(instance11);
+    series1.appendChild(instance12);
+    // study
+    var study = doc.createElement("Study");
+    study.setAttribute("StudyInstanceUID", studyInstanceUID);
+    study.appendChild(series0);
+    study.appendChild(series1);
+    // patient
+    var patient = doc.createElement("Patient");
+    patient.appendChild(study);
+    // main
+    doc.documentElement.appendChild(patient);
+    
+    // decode (only reads first series)
+    var res = dwv.html.decodeManifest(doc, 2);
+    // theoretical test decode result
+    var middle = "?requestType=WADO&contentType=application/dicom&";
+    var theoLinkRoot = wadoUrl + middle + "&studyUID=" + studyInstanceUID + 
+        "&seriesUID=" + seriesInstanceUID0;
+    var theoLink = [ theoLinkRoot + "&objectUID=" + sOPInstanceUID00,
+                     theoLinkRoot + "&objectUID=" + sOPInstanceUID01];
+    
+    equal(res[0], theoLink[0], "Read regular manifest link0");
+    equal(res[1], theoLink[1], "Read regular manifest link1");
+});
+
