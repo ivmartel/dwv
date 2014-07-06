@@ -4454,46 +4454,11 @@ dwv.html.decodeManifestUri = function(uri, nslices)
     // Request handler
     var onLoadRequest = function(/*event*/)
     {
-        var doc = this.responseXML;
-        // wado url
-        var wadoElement = doc.getElementsByTagName("wado_query");
-        var wadoURL = wadoElement[0].getAttribute("wadoURL");
-        var rootURL = wadoURL + "?requestType=WADO&contentType=application/dicom&";
-        // patient list
-        var patientList = doc.getElementsByTagName("Patient");
-        if( patientList.length > 1 ) {
-            console.warn("More than one patient, loading first one.");
-        }
-        // study list
-        var studyList = patientList[0].getElementsByTagName("Study");
-        if( studyList.length > 1 ) {
-            console.warn("More than one study, loading first one.");
-        }
-        var studyUID = studyList[0].getAttribute("StudyInstanceUID");
-        // series list
-        var seriesList = studyList[0].getElementsByTagName("Series");
-        if( seriesList.length > 1 ) {
-            console.warn("More than one series, loading first one.");
-        }
-        var seriesUID = seriesList[0].getAttribute("SeriesInstanceUID");
-        // instance list
-        var instanceList = seriesList[0].getElementsByTagName("Instance");
-        // loop on instances and push links
-        var max = instanceList.length;
-        if( nslices < max ) {
-            max = nslices;
-        }
-        for( var i = 0; i < max; ++i ) {
-            var sopInstanceUID = instanceList[i].getAttribute("SOPInstanceUID");
-            var link = rootURL + 
-            "&studyUID=" + studyUID +
-            "&seriesUID=" + seriesUID +
-            "&objectUID=" + sopInstanceUID;
-            result.push( link );
-        }
+        result = dwv.html.decodeManifest(this.responseXML, nslices);
     };
     
     var request = new XMLHttpRequest();
+    // synchronous request (third parameter)
     request.open('GET', decodeURIComponent(uri), false);
     request.responseType = "xml"; 
     request.onload = onLoadRequest;
@@ -4501,6 +4466,56 @@ dwv.html.decodeManifestUri = function(uri, nslices)
     //request.onprogress = dwv.gui.updateProgress;
     request.send(null);
 
+    // return
+    return result;
+};
+
+/**
+ * Decode an XML manifest. 
+ * @method decodeManifest
+ * @static
+ * @param {Object} manifest The manifest to decode.
+ * @param {Number} nslices The number of slices to load.
+ */
+dwv.html.decodeManifest = function(manifest, nslices)
+{
+    var result = [];
+    // wado url
+    var wadoElement = manifest.getElementsByTagName("wado_query");
+    var wadoURL = wadoElement[0].getAttribute("wadoURL");
+    var rootURL = wadoURL + "?requestType=WADO&contentType=application/dicom&";
+    // patient list
+    var patientList = manifest.getElementsByTagName("Patient");
+    if( patientList.length > 1 ) {
+        console.warn("More than one patient, loading first one.");
+    }
+    // study list
+    var studyList = patientList[0].getElementsByTagName("Study");
+    if( studyList.length > 1 ) {
+        console.warn("More than one study, loading first one.");
+    }
+    var studyUID = studyList[0].getAttribute("StudyInstanceUID");
+    // series list
+    var seriesList = studyList[0].getElementsByTagName("Series");
+    if( seriesList.length > 1 ) {
+        console.warn("More than one series, loading first one.");
+    }
+    var seriesUID = seriesList[0].getAttribute("SeriesInstanceUID");
+    // instance list
+    var instanceList = seriesList[0].getElementsByTagName("Instance");
+    // loop on instances and push links
+    var max = instanceList.length;
+    if( nslices < max ) {
+        max = nslices;
+    }
+    for( var i = 0; i < max; ++i ) {
+        var sopInstanceUID = instanceList[i].getAttribute("SOPInstanceUID");
+        var link = rootURL + 
+        "&studyUID=" + studyUID +
+        "&seriesUID=" + seriesUID +
+        "&objectUID=" + sopInstanceUID;
+        result.push( link );
+    }
     // return
     return result;
 };

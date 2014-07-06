@@ -3134,7 +3134,30 @@
         },
         {
             "file": "src/gui/html.js",
-            "line": 580,
+            "line": 545,
+            "description": "Decode an XML manifest.",
+            "itemtype": "method",
+            "name": "decodeManifest",
+            "static": 1,
+            "params": [
+                {
+                    "name": "manifest",
+                    "description": "The manifest to decode.",
+                    "type": "Object"
+                },
+                {
+                    "name": "nslices",
+                    "description": "The number of slices to load.",
+                    "type": "Number"
+                }
+            ],
+            "class": "dwv.html",
+            "module": "html",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/gui/html.js",
+            "line": 595,
             "description": "Display or not an element.",
             "itemtype": "method",
             "name": "displayElement",
@@ -3157,7 +3180,7 @@
         },
         {
             "file": "src/gui/html.js",
-            "line": 595,
+            "line": 610,
             "description": "Toggle the display of an element.",
             "itemtype": "method",
             "name": "toggleDisplay",
@@ -3175,7 +3198,7 @@
         },
         {
             "file": "src/gui/html.js",
-            "line": 614,
+            "line": 629,
             "description": "Append an element.",
             "itemtype": "method",
             "name": "appendElement",
@@ -3198,7 +3221,7 @@
         },
         {
             "file": "src/gui/html.js",
-            "line": 632,
+            "line": 647,
             "description": "Create an element.",
             "itemtype": "method",
             "name": "createElement",
