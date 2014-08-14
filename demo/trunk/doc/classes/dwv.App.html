@@ -413,13 +413,6 @@
                             </li>
                         
                             <li class="index-item method">
-                                <a href="#method_handleKeyDown">handleKeyDown</a>
-
-                                
-                                
-                            </li>
-                        
-                            <li class="index-item method">
                                 <a href="#method_init">init</a>
 
                                 
@@ -449,6 +442,34 @@
                         
                             <li class="index-item method">
                                 <a href="#method_onChangeURL">onChangeURL</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_onColorChange">onColorChange</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_onKeydown">onKeydown</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_onSliceChange">onSliceChange</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_onWLChange">onWLChange</a>
 
                                 
                                 
@@ -560,7 +581,7 @@
             
         
         
-        <a href="../files/src_application.js.html#l350"><code>src&#x2F;application.js:350</code></a>
+        <a href="../files/src_application.js.html#l386"><code>src&#x2F;application.js:386</code></a>
         
         </p>
 
@@ -633,7 +654,7 @@
             
         
         
-        <a href="../files/src_application.js.html#l474"><code>src&#x2F;application.js:474</code></a>
+        <a href="../files/src_application.js.html#l510"><code>src&#x2F;application.js:510</code></a>
         
         </p>
 
@@ -740,7 +761,7 @@
             
         
         
-        <a href="../files/src_application.js.html#l510"><code>src&#x2F;application.js:510</code></a>
+        <a href="../files/src_application.js.html#l546"><code>src&#x2F;application.js:546</code></a>
         
         </p>
 
@@ -831,7 +852,7 @@
             
         
         
-        <a href="../files/src_application.js.html#l380"><code>src&#x2F;application.js:380</code></a>
+        <a href="../files/src_application.js.html#l416"><code>src&#x2F;application.js:416</code></a>
         
         </p>
 
@@ -911,7 +932,7 @@ position relative to the canvas element. It then passes it to the current tool.<
             
         
         
-        <a href="../files/src_application.js.html#l259"><code>src&#x2F;application.js:259</code></a>
+        <a href="../files/src_application.js.html#l372"><code>src&#x2F;application.js:372</code></a>
         
         </p>
 
@@ -1635,7 +1656,7 @@ position relative to the canvas element. It then passes it to the current tool.<
             
         
         
-        <a href="../files/src_application.js.html#l453"><code>src&#x2F;application.js:453</code></a>
+        <a href="../files/src_application.js.html#l489"><code>src&#x2F;application.js:489</code></a>
         
         </p>
 
@@ -1666,100 +1687,6 @@ position relative to the canvas element. It then passes it to the current tool.<
 
                     <div class="param-description">
                         <p>The error to handle.</p>
-
-                    </div>
-
-                    
-                </li>
-            
-            </ul>
-        </div>
-    
-
-    
-
-    
-</div>
-
-                
-                    <div id="method_handleKeyDown" class="method item">
-    <h3 class="name"><code>handleKeyDown</code></h3>
-
-    
-        <div class="args">
-            <span class="paren">(</span><ul class="args-list inline commas">
-            
-                <li class="arg">
-                    
-                        <code>event</code>
-                    
-                </li>
-            
-            </ul><span class="paren">)</span>
-        </div>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/src_application.js.html#l175"><code>src&#x2F;application.js:175</code></a>
-        
-        </p>
-
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        <p>Handle key down event.</p>
-<ul>
-<li>CRTL-Z: undo</li>
-<li>CRTL-Y: redo
-Default behavior. Usually used in tools.</li>
-</ul>
-
-    </div>
-
-    
-        <div class="params">
-            <h4>Parameters:</h4>
-
-            <ul class="params-list">
-            
-                <li class="param">
-                    
-                        <code class="param-name">event</code>
-                        <span class="type">Object</span>
-                    
-
-                    
-
-                    <div class="param-description">
-                        <p>The key down event.</p>
 
                     </div>
 
@@ -2187,6 +2114,367 @@ Default behavior. Usually used in tools.</li>
 </div>
 
                 
+                    <div id="method_onColorChange" class="method item">
+    <h3 class="name"><code>onColorChange</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>event</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_application.js.html#l269"><code>src&#x2F;application.js:269</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Handle color map change.</p>
+
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">event</code>
+                        <span class="type">Object</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The event fired when changing the color map.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_onKeydown" class="method item">
+    <h3 class="name"><code>onKeydown</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>event</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_application.js.html#l175"><code>src&#x2F;application.js:175</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Handle key down event.</p>
+<ul>
+<li>CRTL-Z: undo</li>
+<li>CRTL-Y: redo
+Default behavior. Usually used in tools.</li>
+</ul>
+
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">event</code>
+                        <span class="type">Object</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The key down event.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_onSliceChange" class="method item">
+    <h3 class="name"><code>onSliceChange</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>event</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_application.js.html#l279"><code>src&#x2F;application.js:279</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Handle slice change.</p>
+
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">event</code>
+                        <span class="type">Object</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The event fired when changing the slice.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_onWLChange" class="method item">
+    <h3 class="name"><code>onWLChange</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>event</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_application.js.html#l259"><code>src&#x2F;application.js:259</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Handle window/level change.</p>
+
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">event</code>
+                        <span class="type">Object</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The event fired when changing the window/level.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+
+    
+</div>
+
+                
                     <div id="method_postLoadInit" class="method item private">
     <h3 class="name"><code>postLoadInit</code></h3>
 
@@ -2231,7 +2519,7 @@ Default behavior. Usually used in tools.</li>
             
         
         
-        <a href="../files/src_application.js.html#l543"><code>src&#x2F;application.js:543</code></a>
+        <a href="../files/src_application.js.html#l579"><code>src&#x2F;application.js:579</code></a>
         
         </p>
 
@@ -2312,7 +2600,7 @@ Default behavior. Usually used in tools.</li>
             
         
         
-        <a href="../files/src_application.js.html#l365"><code>src&#x2F;application.js:365</code></a>
+        <a href="../files/src_application.js.html#l401"><code>src&#x2F;application.js:401</code></a>
         
         </p>
 
@@ -2477,7 +2765,7 @@ Default behavior. Usually used in tools.</li>
             
         
         
-        <a href="../files/src_application.js.html#l273"><code>src&#x2F;application.js:273</code></a>
+        <a href="../files/src_application.js.html#l295"><code>src&#x2F;application.js:295</code></a>
         
         </p>
 
@@ -2676,7 +2964,7 @@ Default behavior. Usually used in tools.</li>
             
         
         
-        <a href="../files/src_application.js.html#l317"><code>src&#x2F;application.js:317</code></a>
+        <a href="../files/src_application.js.html#l339"><code>src&#x2F;application.js:339</code></a>
         
         </p>
 
