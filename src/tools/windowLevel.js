@@ -286,7 +286,7 @@ dwv.tool.WindowLevel = function(app)
      */
     this.keydown = function(event){
         // let the app handle it
-        app.handleKeyDown(event);
+        app.onKeydown(event);
     };
     
     /**

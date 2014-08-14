@@ -133,7 +133,7 @@ dwv.tool.Filter.prototype.init = function()
  * @param {Object} event The keydown event.
  */
 dwv.tool.Filter.prototype.keydown = function(event){
-    app.handleKeyDown(event);
+    app.onKeydown(event);
 };
 
 // Filter namespace

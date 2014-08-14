@@ -214,7 +214,7 @@ dwv.tool.ZoomAndPan = function(app)
      * @param {Object} event The key down event.
      */
     this.keydown = function(event){
-        app.handleKeyDown(event);
+        app.onKeydown(event);
     };
 
     /**

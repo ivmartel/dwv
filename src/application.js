@@ -177,10 +177,10 @@ dwv.App = function()
      * - CRTL-Z: undo
      * - CRTL-Y: redo
      * Default behavior. Usually used in tools. 
-     * @method handleKeyDown
+     * @method onKeydown
      * @param {Object} event The key down event.
      */
-    this.handleKeyDown = function(event)
+    this.onKeydown = function(event)
     {
         if( event.keyCode === 90 && event.ctrlKey ) // ctrl-z
         {
@@ -257,19 +257,41 @@ dwv.App = function()
     };
     
     /**
-     * Generate the image data and draw it.
-     * @method generateAndDrawImage
+     * Handle window/level change.
+     * @method onWLChange
+     * @param {Object} event The event fired when changing the window/level.
      */
-    this.generateAndDrawImage = function()
+    this.onWLChange = function (/*event*/)
     {         
-        // generate image data from DICOM
-        view.generateImageData(imageData);         
-        // set the image data of the layer
-        imageLayer.setImageData(imageData);
-        // draw the image
-        imageLayer.draw();
+        generateAndDrawImage();
     };
-    
+
+    /**
+     * Handle color map change.
+     * @method onColorChange
+     * @param {Object} event The event fired when changing the color map.
+     */
+    this.onColorChange = function (/*event*/)
+    {  
+        generateAndDrawImage();
+    };
+
+    /**
+     * Handle slice change.
+     * @method onSliceChange
+     * @param {Object} event The event fired when changing the slice.
+     */
+    this.onSliceChange = function (/*event*/)
+    {   
+        generateAndDrawImage();
+        // hide layers
+        /*for ( var i = 0; i < drawLayers.length; ++i ) {
+            drawLayers[i].visible( false );
+        }
+        // show current
+        drawLayers[view.getCurrentPosition().k].visible( true );*/
+    };
+
     /**
      * Resize the display window. To be called once the image is loaded.
      * @method resize
@@ -347,6 +369,20 @@ dwv.App = function()
 
     // Private Methods -------------------------------------------
 
+    /**
+     * Generate the image data and draw it.
+     * @method generateAndDrawImage
+     */
+    function generateAndDrawImage()
+    {         
+        // generate image data from DICOM
+        view.generateImageData(imageData);         
+        // set the image data of the layer
+        imageLayer.setImageData(imageData);
+        // draw the image
+        imageLayer.draw();
+    }
+    
     /**
      * Add image listeners.
      * @method addImageInfoListeners
@@ -589,9 +625,9 @@ dwv.App = function()
         // keydown listener
         window.addEventListener("keydown", eventHandler, true);
         // image listeners
-        view.addEventListener("wlchange", self.generateAndDrawImage);
-        view.addEventListener("colorchange", self.generateAndDrawImage);
-        view.addEventListener("slicechange", self.generateAndDrawImage);
+        view.addEventListener("wlchange", self.onWLChange);
+        view.addEventListener("colorchange", self.onColorChange);
+        view.addEventListener("slicechange", self.onSliceChange);
         
         // info layer
         if(document.getElementById("infoLayer")){
