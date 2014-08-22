@@ -1,7 +1,7 @@
 DWV
 ===
 
-An open source javascript / HTML5 _only_ DICOM web viewer. Try it [here](http://ivmartel.github.io/dwv/). 
+An open source javascript / HTML5 _only_ DICOM Web Viewer. Try it [here](http://ivmartel.github.io/dwv/). 
 More information on the [wiki](https://github.com/ivmartel/dwv/wiki).
 
 Not fully DICOM compliant, 
