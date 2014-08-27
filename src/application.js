@@ -31,8 +31,8 @@ dwv.App = function()
      
     // Image layer
     var imageLayer = null;
-    // Draw layer
-    var drawLayer = null;
+    // Draw layers
+    var drawLayers = [];
     // Draw stage
     var drawStage = null;
     
@@ -110,7 +110,9 @@ dwv.App = function()
      * @method getDrawLayer
      * @return {Object} The draw layer.
      */
-    this.getDrawLayer = function() { return drawLayer; };
+    this.getDrawLayer = function() { 
+        return drawLayers[view.getCurrentPosition().k];
+    };
     /** 
      * Get the draw stage.
      * @method getDrawStage
@@ -213,11 +215,25 @@ dwv.App = function()
         this.reset();
         // create IO
         var fileIO = new dwv.io.File();
-        fileIO.onload = function(data){
+        fileIO.onload = function (data) {
+            var isFirst = true;
             if( image ) {
                 image.appendSlice( data.view.getImage() );
+                isFirst = false;
             }
             postLoadInit(data);
+            if( drawStage ) {
+                // create slice draw layer
+                var drawLayer = new Kinetic.Layer({
+                    listening: false,
+                    hitGraphEnabled: false,
+                    visible: isFirst
+                });
+                // add to layers array
+                drawLayers.push(drawLayer);
+                // add the layer to the stage
+                drawStage.add(drawLayer);
+            }
         };
         fileIO.onerror = function(error){ handleError(error); };
         // main load (asynchronous)
@@ -245,11 +261,25 @@ dwv.App = function()
         this.reset();
         // create IO
         var urlIO = new dwv.io.Url();
-        urlIO.onload = function(data){
+        urlIO.onload = function (data) {
+            var isFirst = true;
             if( image ) {
                 image.appendSlice( data.view.getImage() );
+                isFirst = false;
             }
             postLoadInit(data);
+            if( drawStage ) {
+                // create slice draw layer
+                var drawLayer = new Kinetic.Layer({
+                    listening: false,
+                    hitGraphEnabled: false,
+                    visible: isFirst
+                });
+                // add to layers array
+                drawLayers.push(drawLayer);
+                // add the layer to the stage
+                drawStage.add(drawLayer);
+            }
         };
         urlIO.onerror = function(error){ handleError(error); };
         // main load (asynchronous)
@@ -285,11 +315,12 @@ dwv.App = function()
     {   
         generateAndDrawImage();
         // hide layers
-        /*for ( var i = 0; i < drawLayers.length; ++i ) {
+        for ( var i = 0; i < drawLayers.length; ++i ) {
             drawLayers[i].visible( false );
         }
         // show current
-        drawLayers[view.getCurrentPosition().k].visible( true );*/
+        var currentLayer = drawLayers[view.getCurrentPosition().k];
+        currentLayer.visible( true );
     };
 
     /**
@@ -365,6 +396,50 @@ dwv.App = function()
             dwv.tool.presets[keys[0]].width );
         // default position
         dwv.tool.updatePostionValue(0,0);
+    };
+
+    /**
+     * Add layer mouse and touch listeners.
+     * @method addLayerListeners
+     */
+    this.addLayerListeners = function(layer)
+    {
+        // allow pointer events
+        layer.setAttribute("style", "pointer-events: auto;");
+        // mouse listeners
+        layer.addEventListener("mousedown", eventHandler);
+        layer.addEventListener("mousemove", eventHandler);
+        layer.addEventListener("mouseup", eventHandler);
+        layer.addEventListener("mouseout", eventHandler);
+        layer.addEventListener("mousewheel", eventHandler);
+        layer.addEventListener("DOMMouseScroll", eventHandler);
+        layer.addEventListener("dblclick", eventHandler);
+        // touch listeners
+        layer.addEventListener("touchstart", eventHandler);
+        layer.addEventListener("touchmove", eventHandler);
+        layer.addEventListener("touchend", eventHandler);
+    };
+    
+    /**
+     * Remove layer mouse and touch listeners.
+     * @method removeLayerListeners
+     */
+    this.removeLayerListeners = function(layer)
+    {
+        // disable pointer events
+        layer.setAttribute("style", "pointer-events: none;");
+        // mouse listeners
+        layer.removeEventListener("mousedown", eventHandler);
+        layer.removeEventListener("mousemove", eventHandler);
+        layer.removeEventListener("mouseup", eventHandler);
+        layer.removeEventListener("mouseout", eventHandler);
+        layer.removeEventListener("mousewheel", eventHandler);
+        layer.removeEventListener("DOMMouseScroll", eventHandler);
+        layer.removeEventListener("dblclick", eventHandler);
+        // touch listeners
+        layer.removeEventListener("touchstart", eventHandler);
+        layer.removeEventListener("touchmove", eventHandler);
+        layer.removeEventListener("touchend", eventHandler);
     };
 
     // Private Methods -------------------------------------------
@@ -530,13 +605,6 @@ dwv.App = function()
                 height: dataHeight,
                 listening: false
             });
-            // create layer
-            drawLayer = new Kinetic.Layer({
-                listening: false,
-                hitGraphEnabled: false
-            });
-            // add the layer to the stage
-            drawStage.add(drawLayer);
         }
         // resize app
         self.resetLayout();
@@ -606,22 +674,8 @@ dwv.App = function()
         imageData = imageLayer.getContext().createImageData( 
                 dataWidth, dataHeight);
 
-        var topLayer = imageLayer.getCanvas();
-        if ( drawLayer ) {
-            topLayer = document.getElementById("drawDiv");
-        }
-        // mouse listeners
-        topLayer.addEventListener("mousedown", eventHandler, false);
-        topLayer.addEventListener("mousemove", eventHandler, false);
-        topLayer.addEventListener("mouseup", eventHandler, false);
-        topLayer.addEventListener("mouseout", eventHandler, false);
-        topLayer.addEventListener("mousewheel", eventHandler, false);
-        topLayer.addEventListener("DOMMouseScroll", eventHandler, false);
-        topLayer.addEventListener("dblclick", eventHandler, false);
-        // touch listeners
-        topLayer.addEventListener("touchstart", eventHandler, false);
-        topLayer.addEventListener("touchmove", eventHandler, false);
-        topLayer.addEventListener("touchend", eventHandler, false);
+        // mouse and touch listeners
+        self.addLayerListeners( imageLayer.getCanvas() );
         // keydown listener
         window.addEventListener("keydown", eventHandler, true);
         // image listeners

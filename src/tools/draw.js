@@ -12,7 +12,7 @@ var Kinetic = Kinetic || {};
  * @namespace dwv.tool
  * @constructor
  */
-dwv.tool.DrawShapeCommand = function (shape, name, app)
+dwv.tool.DrawShapeCommand = function (shape, name, layer)
 {
     /**
      * Get the command name.
@@ -27,9 +27,9 @@ dwv.tool.DrawShapeCommand = function (shape, name, app)
     this.execute = function () {
         var group = shape.getParent();
         // add the group to the layer
-        app.getDrawLayer().add(group);
+        layer.add(group);
         // draw
-        app.getDrawLayer().draw();
+        layer.draw();
     };
     /**
      * Undo the command.
@@ -40,7 +40,7 @@ dwv.tool.DrawShapeCommand = function (shape, name, app)
         // remove the group from the parent layer
         group.remove();
         // draw
-        app.getDrawLayer().draw();
+        layer.draw();
     };
 }; // DrawShapeCommand class
 
@@ -50,7 +50,7 @@ dwv.tool.DrawShapeCommand = function (shape, name, app)
  * @namespace dwv.tool
  * @constructor
  */
-dwv.tool.MoveShapeCommand = function (shape, name, translation, app)
+dwv.tool.MoveShapeCommand = function (shape, name, translation, layer)
 {
     /**
      * Get the command name.
@@ -71,7 +71,7 @@ dwv.tool.MoveShapeCommand = function (shape, name, translation, app)
             shape.y( shape.y() + translation.y );
         });
         // draw
-        app.getDrawLayer().draw();
+        layer.draw();
     };
     /**
      * Undo the command.
@@ -85,7 +85,7 @@ dwv.tool.MoveShapeCommand = function (shape, name, translation, app)
             shape.y( shape.y() - translation.y );
         });
         // draw
-        app.getDrawLayer().draw();
+        layer.draw();
     };
 }; // MoveShapeCommand class
 
@@ -95,7 +95,7 @@ dwv.tool.MoveShapeCommand = function (shape, name, translation, app)
  * @namespace dwv.tool
  * @constructor
  */
-dwv.tool.ChangeShapeCommand = function (shape, name, func, startAnchor, endAnchor, app)
+dwv.tool.ChangeShapeCommand = function (shape, name, func, startAnchor, endAnchor, layer)
 {
     /**
      * Get the command name.
@@ -112,7 +112,7 @@ dwv.tool.ChangeShapeCommand = function (shape, name, func, startAnchor, endAncho
         // change shape
         func( shape, endAnchor );
         // draw
-        app.getDrawLayer().draw();
+        layer.draw();
     };
     /**
      * Undo the command.
@@ -122,7 +122,7 @@ dwv.tool.ChangeShapeCommand = function (shape, name, func, startAnchor, endAncho
         // invert change shape
         func( shape, startAnchor );
         // draw
-        app.getDrawLayer().draw();
+        layer.draw();
     };
 }; // ChangeShapeCommand class
 
@@ -132,7 +132,7 @@ dwv.tool.ChangeShapeCommand = function (shape, name, func, startAnchor, endAncho
  * @namespace dwv.tool
  * @constructor
  */
-dwv.tool.DeleteShapeCommand = function (shape, name, app)
+dwv.tool.DeleteShapeCommand = function (shape, name, layer)
 {
     /**
      * Get the command name.
@@ -149,7 +149,7 @@ dwv.tool.DeleteShapeCommand = function (shape, name, app)
         // remove the group from the parent layer
         group.remove();
         // draw
-        app.getDrawLayer().draw();
+        layer.draw();
     };
     /**
      * Undo the command.
@@ -158,9 +158,9 @@ dwv.tool.DeleteShapeCommand = function (shape, name, app)
     this.undo = function () {
         var group = shape.getParent();
         // add the group to the layer
-        app.getDrawLayer().add(group);
+        layer.add(group);
         // draw
-        app.getDrawLayer().draw();
+        layer.draw();
     };
 }; // DeleteShapeCommand class
 
@@ -288,6 +288,14 @@ dwv.tool.Draw = function (app)
     trash.add(trashLine2);
 
     /**
+     * The associated draw layer.
+     * @property drawLayer
+     * @private
+     * @type Object
+     */
+    var drawLayer = null;
+    
+    /**
      * Handle mouse down event.
      * @method mousedown
      * @param {Object} event The mouse down event.
@@ -353,11 +361,11 @@ dwv.tool.Draw = function (app)
             activeShape = new dwv.tool.shapes[self.shapeName](points, self.style);
             // do not listen during creation
             activeShape.listening(false);
-            app.getDrawLayer().hitGraphEnabled(false);
+            drawLayer.hitGraphEnabled(false);
             // add shape to group
             shapeGroup.add(activeShape);
             // draw shape command
-            command = new dwv.tool.DrawShapeCommand(activeShape, self.shapeName, app);
+            command = new dwv.tool.DrawShapeCommand(activeShape, self.shapeName, drawLayer);
             // draw
             command.execute();
         }
@@ -378,11 +386,11 @@ dwv.tool.Draw = function (app)
             // create final shape
             activeShape = new dwv.tool.shapes[self.shapeName](points, self.style);
             // re-activate layer
-            app.getDrawLayer().hitGraphEnabled(true);
+            drawLayer.hitGraphEnabled(true);
             // add shape to group
             shapeGroup.add(activeShape);
             // draw shape command
-            command = new dwv.tool.DrawShapeCommand(activeShape, self.shapeName, app);
+            command = new dwv.tool.DrawShapeCommand(activeShape, self.shapeName, drawLayer);
             // execute it
             command.execute();
             // save it in undo stack
@@ -455,17 +463,20 @@ dwv.tool.Draw = function (app)
         document.body.style.cursor = 'default';
         // make layer listen or not to events
         app.getDrawStage().listening( flag );
-        app.getDrawLayer().listening( flag );
-        app.getDrawLayer().hitGraphEnabled( flag );
+        drawLayer = app.getDrawLayer();
+        drawLayer.listening( flag );
+        drawLayer.hitGraphEnabled( flag );
         // set shape display properties
         if ( flag ) {
+            app.addLayerListeners( app.getDrawStage().getContent() );
             createdShapes.forEach( function (shape){ self.setShapeOn( shape ); });
         }
         else {
+            app.removeLayerListeners( app.getDrawStage().getContent() );
             createdShapes.forEach( function (shape){ setShapeOff( shape ); });
         }
         // draw
-        app.getDrawLayer().draw();
+        drawLayer.draw();
     };
     
     /**
@@ -540,11 +551,11 @@ dwv.tool.Draw = function (app)
             trash.x( stage.offset().x + ( 256 / scale.x ) );
             trash.y( stage.offset().y + ( 20 / scale.y ) );
             trash.scale( invscale );
-            app.getDrawLayer().add( trash );
+            drawLayer.add( trash );
             // deactivate anchors to avoid events on null shape
             shapeEditor.setAnchorsActive(false);
             // draw
-            app.getDrawLayer().draw();
+            drawLayer.draw();
         });
         // drag move event handling
         shape.on('dragmove', function (event) {
@@ -564,7 +575,7 @@ dwv.tool.Draw = function (app)
             // reset anchors
             shapeEditor.resetAnchors();
             // draw
-            app.getDrawLayer().draw();
+            drawLayer.draw();
         });
         // drag end event handling
         shape.on('dragend', function (/*event*/) {
@@ -587,7 +598,7 @@ dwv.tool.Draw = function (app)
                 shapeEditor.setShape(null);
                 document.body.style.cursor = 'default';
                 // delete command
-                var delcmd = new dwv.tool.DeleteShapeCommand(this, cmdName, app);
+                var delcmd = new dwv.tool.DeleteShapeCommand(this, cmdName, drawLayer);
                 delcmd.execute();
                 app.getUndoStack().add(delcmd);
             }
@@ -596,7 +607,7 @@ dwv.tool.Draw = function (app)
                 var translation = {'x': pos.x - dragStartPos.x, 
                         'y': pos.y - dragStartPos.y};
                 if ( translation.x !== 0 || translation.y !== 0 ) {
-                    var mvcmd = new dwv.tool.MoveShapeCommand(this, cmdName, translation, app);
+                    var mvcmd = new dwv.tool.MoveShapeCommand(this, cmdName, translation, drawLayer);
                     app.getUndoStack().add(mvcmd);
                 }
                 // reset anchors
@@ -606,7 +617,7 @@ dwv.tool.Draw = function (app)
             // remove trash
             trash.remove();
             // draw
-            app.getDrawLayer().draw();
+            drawLayer.draw();
         });
     };
 

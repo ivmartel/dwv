@@ -3,7 +3,7 @@ body { font-family: Verdana, Arial, Helvetica, sans-serif; }
 /* Layers */
 #layerContainer { position: relative; padding: 0; }
 #imageLayer { position: absolute; }
-#drawDiv { position: absolute; }
+#drawDiv { position: absolute; pointer-events: none; }
 
 /* Info */
 #infotl { position: absolute; top: 0; left: 0; text-align: left; }

@@ -320,7 +320,7 @@ dwv.tool.ShapeEditor = function ()
             var endAnchor = getClone(this);
             // store the change command
             var chgcmd = new dwv.tool.ChangeShapeCommand(
-                    shape, cmdName, updateFunction, startAnchor, endAnchor, app);
+                    shape, cmdName, updateFunction, startAnchor, endAnchor, this.getLayer());
             chgcmd.execute();
             app.getUndoStack().add(chgcmd);
             // reset start anchor
