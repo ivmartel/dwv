@@ -31,8 +31,8 @@ dwv.App = function()
      
     // Image layer
     var imageLayer = null;
-    // Draw layer
-    var drawLayer = null;
+    // Draw layers
+    var drawLayers = [];
     // Draw stage
     var drawStage = null;
     
@@ -110,7 +110,9 @@ dwv.App = function()
      * @method getDrawLayer
      * @return {Object} The draw layer.
      */
-    this.getDrawLayer = function() { return drawLayer; };
+    this.getDrawLayer = function() { 
+        return drawLayers[view.getCurrentPosition().k];
+    };
     /** 
      * Get the draw stage.
      * @method getDrawStage
@@ -213,11 +215,25 @@ dwv.App = function()
         this.reset();
         // create IO
         var fileIO = new dwv.io.File();
-        fileIO.onload = function(data){
+        fileIO.onload = function (data) {
+            var isFirst = true;
             if( image ) {
                 image.appendSlice( data.view.getImage() );
+                isFirst = false;
             }
             postLoadInit(data);
+            if( drawStage ) {
+                // create slice draw layer
+                var drawLayer = new Kinetic.Layer({
+                    listening: false,
+                    hitGraphEnabled: false,
+                    visible: isFirst
+                });
+                // add to layers array
+                drawLayers.push(drawLayer);
+                // add the layer to the stage
+                drawStage.add(drawLayer);
+            }
         };
         fileIO.onerror = function(error){ handleError(error); };
         // main load (asynchronous)
@@ -245,11 +261,25 @@ dwv.App = function()
         this.reset();
         // create IO
         var urlIO = new dwv.io.Url();
-        urlIO.onload = function(data){
+        urlIO.onload = function (data) {
+            var isFirst = true;
             if( image ) {
                 image.appendSlice( data.view.getImage() );
+                isFirst = false;
             }
             postLoadInit(data);
+            if( drawStage ) {
+                // create slice draw layer
+                var drawLayer = new Kinetic.Layer({
+                    listening: false,
+                    hitGraphEnabled: false,
+                    visible: isFirst
+                });
+                // add to layers array
+                drawLayers.push(drawLayer);
+                // add the layer to the stage
+                drawStage.add(drawLayer);
+            }
         };
         urlIO.onerror = function(error){ handleError(error); };
         // main load (asynchronous)
@@ -285,11 +315,12 @@ dwv.App = function()
     {   
         generateAndDrawImage();
         // hide layers
-        /*for ( var i = 0; i < drawLayers.length; ++i ) {
+        for ( var i = 0; i < drawLayers.length; ++i ) {
             drawLayers[i].visible( false );
         }
         // show current
-        drawLayers[view.getCurrentPosition().k].visible( true );*/
+        var currentLayer = drawLayers[view.getCurrentPosition().k];
+        currentLayer.visible( true );
     };
 
     /**
@@ -365,6 +396,50 @@ dwv.App = function()
             dwv.tool.presets[keys[0]].width );
         // default position
         dwv.tool.updatePostionValue(0,0);
+    };
+
+    /**
+     * Add layer mouse and touch listeners.
+     * @method addLayerListeners
+     */
+    this.addLayerListeners = function(layer)
+    {
+        // allow pointer events
+        layer.setAttribute("style", "pointer-events: auto;");
+        // mouse listeners
+        layer.addEventListener("mousedown", eventHandler);
+        layer.addEventListener("mousemove", eventHandler);
+        layer.addEventListener("mouseup", eventHandler);
+        layer.addEventListener("mouseout", eventHandler);
+        layer.addEventListener("mousewheel", eventHandler);
+        layer.addEventListener("DOMMouseScroll", eventHandler);
+        layer.addEventListener("dblclick", eventHandler);
+        // touch listeners
+        layer.addEventListener("touchstart", eventHandler);
+        layer.addEventListener("touchmove", eventHandler);
+        layer.addEventListener("touchend", eventHandler);
+    };
+    
+    /**
+     * Remove layer mouse and touch listeners.
+     * @method removeLayerListeners
+     */
+    this.removeLayerListeners = function(layer)
+    {
+        // disable pointer events
+        layer.setAttribute("style", "pointer-events: none;");
+        // mouse listeners
+        layer.removeEventListener("mousedown", eventHandler);
+        layer.removeEventListener("mousemove", eventHandler);
+        layer.removeEventListener("mouseup", eventHandler);
+        layer.removeEventListener("mouseout", eventHandler);
+        layer.removeEventListener("mousewheel", eventHandler);
+        layer.removeEventListener("DOMMouseScroll", eventHandler);
+        layer.removeEventListener("dblclick", eventHandler);
+        // touch listeners
+        layer.removeEventListener("touchstart", eventHandler);
+        layer.removeEventListener("touchmove", eventHandler);
+        layer.removeEventListener("touchend", eventHandler);
     };
 
     // Private Methods -------------------------------------------
@@ -530,13 +605,6 @@ dwv.App = function()
                 height: dataHeight,
                 listening: false
             });
-            // create layer
-            drawLayer = new Kinetic.Layer({
-                listening: false,
-                hitGraphEnabled: false
-            });
-            // add the layer to the stage
-            drawStage.add(drawLayer);
         }
         // resize app
         self.resetLayout();
@@ -606,22 +674,8 @@ dwv.App = function()
         imageData = imageLayer.getContext().createImageData( 
                 dataWidth, dataHeight);
 
-        var topLayer = imageLayer.getCanvas();
-        if ( drawLayer ) {
-            topLayer = document.getElementById("drawDiv");
-        }
-        // mouse listeners
-        topLayer.addEventListener("mousedown", eventHandler, false);
-        topLayer.addEventListener("mousemove", eventHandler, false);
-        topLayer.addEventListener("mouseup", eventHandler, false);
-        topLayer.addEventListener("mouseout", eventHandler, false);
-        topLayer.addEventListener("mousewheel", eventHandler, false);
-        topLayer.addEventListener("DOMMouseScroll", eventHandler, false);
-        topLayer.addEventListener("dblclick", eventHandler, false);
-        // touch listeners
-        topLayer.addEventListener("touchstart", eventHandler, false);
-        topLayer.addEventListener("touchmove", eventHandler, false);
-        topLayer.addEventListener("touchend", eventHandler, false);
+        // mouse and touch listeners
+        self.addLayerListeners( imageLayer.getCanvas() );
         // keydown listener
         window.addEventListener("keydown", eventHandler, true);
         // image listeners
@@ -8933,7 +8987,7 @@ var Kinetic = Kinetic || {};
  * @namespace dwv.tool
  * @constructor
  */
-dwv.tool.DrawShapeCommand = function (shape, name, app)
+dwv.tool.DrawShapeCommand = function (shape, name, layer)
 {
     /**
      * Get the command name.
@@ -8948,9 +9002,9 @@ dwv.tool.DrawShapeCommand = function (shape, name, app)
     this.execute = function () {
         var group = shape.getParent();
         // add the group to the layer
-        app.getDrawLayer().add(group);
+        layer.add(group);
         // draw
-        app.getDrawLayer().draw();
+        layer.draw();
     };
     /**
      * Undo the command.
@@ -8961,7 +9015,7 @@ dwv.tool.DrawShapeCommand = function (shape, name, app)
         // remove the group from the parent layer
         group.remove();
         // draw
-        app.getDrawLayer().draw();
+        layer.draw();
     };
 }; // DrawShapeCommand class
 
@@ -8971,7 +9025,7 @@ dwv.tool.DrawShapeCommand = function (shape, name, app)
  * @namespace dwv.tool
  * @constructor
  */
-dwv.tool.MoveShapeCommand = function (shape, name, translation, app)
+dwv.tool.MoveShapeCommand = function (shape, name, translation, layer)
 {
     /**
      * Get the command name.
@@ -8992,7 +9046,7 @@ dwv.tool.MoveShapeCommand = function (shape, name, translation, app)
             shape.y( shape.y() + translation.y );
         });
         // draw
-        app.getDrawLayer().draw();
+        layer.draw();
     };
     /**
      * Undo the command.
@@ -9006,7 +9060,7 @@ dwv.tool.MoveShapeCommand = function (shape, name, translation, app)
             shape.y( shape.y() - translation.y );
         });
         // draw
-        app.getDrawLayer().draw();
+        layer.draw();
     };
 }; // MoveShapeCommand class
 
@@ -9016,7 +9070,7 @@ dwv.tool.MoveShapeCommand = function (shape, name, translation, app)
  * @namespace dwv.tool
  * @constructor
  */
-dwv.tool.ChangeShapeCommand = function (shape, name, func, startAnchor, endAnchor, app)
+dwv.tool.ChangeShapeCommand = function (shape, name, func, startAnchor, endAnchor, layer)
 {
     /**
      * Get the command name.
@@ -9033,7 +9087,7 @@ dwv.tool.ChangeShapeCommand = function (shape, name, func, startAnchor, endAncho
         // change shape
         func( shape, endAnchor );
         // draw
-        app.getDrawLayer().draw();
+        layer.draw();
     };
     /**
      * Undo the command.
@@ -9043,7 +9097,7 @@ dwv.tool.ChangeShapeCommand = function (shape, name, func, startAnchor, endAncho
         // invert change shape
         func( shape, startAnchor );
         // draw
-        app.getDrawLayer().draw();
+        layer.draw();
     };
 }; // ChangeShapeCommand class
 
@@ -9053,7 +9107,7 @@ dwv.tool.ChangeShapeCommand = function (shape, name, func, startAnchor, endAncho
  * @namespace dwv.tool
  * @constructor
  */
-dwv.tool.DeleteShapeCommand = function (shape, name, app)
+dwv.tool.DeleteShapeCommand = function (shape, name, layer)
 {
     /**
      * Get the command name.
@@ -9070,7 +9124,7 @@ dwv.tool.DeleteShapeCommand = function (shape, name, app)
         // remove the group from the parent layer
         group.remove();
         // draw
-        app.getDrawLayer().draw();
+        layer.draw();
     };
     /**
      * Undo the command.
@@ -9079,9 +9133,9 @@ dwv.tool.DeleteShapeCommand = function (shape, name, app)
     this.undo = function () {
         var group = shape.getParent();
         // add the group to the layer
-        app.getDrawLayer().add(group);
+        layer.add(group);
         // draw
-        app.getDrawLayer().draw();
+        layer.draw();
     };
 }; // DeleteShapeCommand class
 
@@ -9209,6 +9263,14 @@ dwv.tool.Draw = function (app)
     trash.add(trashLine2);
 
     /**
+     * The associated draw layer.
+     * @property drawLayer
+     * @private
+     * @type Object
+     */
+    var drawLayer = null;
+    
+    /**
      * Handle mouse down event.
      * @method mousedown
      * @param {Object} event The mouse down event.
@@ -9274,11 +9336,11 @@ dwv.tool.Draw = function (app)
             activeShape = new dwv.tool.shapes[self.shapeName](points, self.style);
             // do not listen during creation
             activeShape.listening(false);
-            app.getDrawLayer().hitGraphEnabled(false);
+            drawLayer.hitGraphEnabled(false);
             // add shape to group
             shapeGroup.add(activeShape);
             // draw shape command
-            command = new dwv.tool.DrawShapeCommand(activeShape, self.shapeName, app);
+            command = new dwv.tool.DrawShapeCommand(activeShape, self.shapeName, drawLayer);
             // draw
             command.execute();
         }
@@ -9299,11 +9361,11 @@ dwv.tool.Draw = function (app)
             // create final shape
             activeShape = new dwv.tool.shapes[self.shapeName](points, self.style);
             // re-activate layer
-            app.getDrawLayer().hitGraphEnabled(true);
+            drawLayer.hitGraphEnabled(true);
             // add shape to group
             shapeGroup.add(activeShape);
             // draw shape command
-            command = new dwv.tool.DrawShapeCommand(activeShape, self.shapeName, app);
+            command = new dwv.tool.DrawShapeCommand(activeShape, self.shapeName, drawLayer);
             // execute it
             command.execute();
             // save it in undo stack
@@ -9376,17 +9438,20 @@ dwv.tool.Draw = function (app)
         document.body.style.cursor = 'default';
         // make layer listen or not to events
         app.getDrawStage().listening( flag );
-        app.getDrawLayer().listening( flag );
-        app.getDrawLayer().hitGraphEnabled( flag );
+        drawLayer = app.getDrawLayer();
+        drawLayer.listening( flag );
+        drawLayer.hitGraphEnabled( flag );
         // set shape display properties
         if ( flag ) {
+            app.addLayerListeners( app.getDrawStage().getContent() );
             createdShapes.forEach( function (shape){ self.setShapeOn( shape ); });
         }
         else {
+            app.removeLayerListeners( app.getDrawStage().getContent() );
             createdShapes.forEach( function (shape){ setShapeOff( shape ); });
         }
         // draw
-        app.getDrawLayer().draw();
+        drawLayer.draw();
     };
     
     /**
@@ -9461,11 +9526,11 @@ dwv.tool.Draw = function (app)
             trash.x( stage.offset().x + ( 256 / scale.x ) );
             trash.y( stage.offset().y + ( 20 / scale.y ) );
             trash.scale( invscale );
-            app.getDrawLayer().add( trash );
+            drawLayer.add( trash );
             // deactivate anchors to avoid events on null shape
             shapeEditor.setAnchorsActive(false);
             // draw
-            app.getDrawLayer().draw();
+            drawLayer.draw();
         });
         // drag move event handling
         shape.on('dragmove', function (event) {
@@ -9485,7 +9550,7 @@ dwv.tool.Draw = function (app)
             // reset anchors
             shapeEditor.resetAnchors();
             // draw
-            app.getDrawLayer().draw();
+            drawLayer.draw();
         });
         // drag end event handling
         shape.on('dragend', function (/*event*/) {
@@ -9508,7 +9573,7 @@ dwv.tool.Draw = function (app)
                 shapeEditor.setShape(null);
                 document.body.style.cursor = 'default';
                 // delete command
-                var delcmd = new dwv.tool.DeleteShapeCommand(this, cmdName, app);
+                var delcmd = new dwv.tool.DeleteShapeCommand(this, cmdName, drawLayer);
                 delcmd.execute();
                 app.getUndoStack().add(delcmd);
             }
@@ -9517,7 +9582,7 @@ dwv.tool.Draw = function (app)
                 var translation = {'x': pos.x - dragStartPos.x, 
                         'y': pos.y - dragStartPos.y};
                 if ( translation.x !== 0 || translation.y !== 0 ) {
-                    var mvcmd = new dwv.tool.MoveShapeCommand(this, cmdName, translation, app);
+                    var mvcmd = new dwv.tool.MoveShapeCommand(this, cmdName, translation, drawLayer);
                     app.getUndoStack().add(mvcmd);
                 }
                 // reset anchors
@@ -9527,7 +9592,7 @@ dwv.tool.Draw = function (app)
             // remove trash
             trash.remove();
             // draw
-            app.getDrawLayer().draw();
+            drawLayer.draw();
         });
     };
 
@@ -9930,7 +9995,7 @@ dwv.tool.ShapeEditor = function ()
             var endAnchor = getClone(this);
             // store the change command
             var chgcmd = new dwv.tool.ChangeShapeCommand(
-                    shape, cmdName, updateFunction, startAnchor, endAnchor, app);
+                    shape, cmdName, updateFunction, startAnchor, endAnchor, this.getLayer());
             chgcmd.execute();
             app.getUndoStack().add(chgcmd);
             // reset start anchor
