@@ -280,7 +280,7 @@ dwv.tool.RunFilterCommand = function (filter, app)
     this.execute = function ()
     {
         app.setImage(filter.update());
-        app.generateAndDrawImage();
+        app.render();
     }; 
     /**
      * Undo the command.
@@ -288,6 +288,6 @@ dwv.tool.RunFilterCommand = function (filter, app)
      */
     this.undo = function () {
         app.setImage(filter.getOriginalImage());
-        app.generateAndDrawImage();
+        app.render();
     };
 }; // RunFilterCommand class

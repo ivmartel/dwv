@@ -441,6 +441,15 @@ dwv.App = function()
         layer.removeEventListener("touchmove", eventHandler);
         layer.removeEventListener("touchend", eventHandler);
     };
+    
+    /**
+     * Render the current image.
+     * @method render
+     */
+    this.render = function ()
+    {
+        generateAndDrawImage();
+    };
 
     // Private Methods -------------------------------------------
 
