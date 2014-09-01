@@ -441,6 +441,15 @@ dwv.App = function()
         layer.removeEventListener("touchmove", eventHandler);
         layer.removeEventListener("touchend", eventHandler);
     };
+    
+    /**
+     * Render the current image.
+     * @method render
+     */
+    this.render = function ()
+    {
+        generateAndDrawImage();
+    };
 
     // Private Methods -------------------------------------------
 
@@ -10425,7 +10434,7 @@ dwv.tool.RunFilterCommand = function (filter, app)
     this.execute = function ()
     {
         app.setImage(filter.update());
-        app.generateAndDrawImage();
+        app.render();
     }; 
     /**
      * Undo the command.
@@ -10433,7 +10442,7 @@ dwv.tool.RunFilterCommand = function (filter, app)
      */
     this.undo = function () {
         app.setImage(filter.getOriginalImage());
-        app.generateAndDrawImage();
+        app.render();
     };
 }; // RunFilterCommand class
 ;/** 

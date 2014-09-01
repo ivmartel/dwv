@@ -10026,7 +10026,17 @@
         },
         {
             "file": "src/application.js",
-            "line": 447,
+            "line": 445,
+            "description": "Render the current image.",
+            "itemtype": "method",
+            "name": "render",
+            "class": "dwv.App",
+            "module": "utils",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/application.js",
+            "line": 456,
             "description": "Generate the image data and draw it.",
             "itemtype": "method",
             "name": "generateAndDrawImage",
@@ -10036,7 +10046,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 461,
+            "line": 470,
             "description": "Add image listeners.",
             "itemtype": "method",
             "name": "addImageInfoListeners",
@@ -10048,7 +10058,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 476,
+            "line": 485,
             "description": "Remove image listeners.",
             "itemtype": "method",
             "name": "removeImageInfoListeners",
@@ -10060,7 +10070,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 491,
+            "line": 500,
             "description": "General-purpose event handler. This function just determines the mouse \nposition relative to the canvas element. It then passes it to the current tool.",
             "itemtype": "method",
             "name": "eventHandler",
@@ -10079,7 +10089,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 564,
+            "line": 573,
             "description": "Handle an error: display it to the user.",
             "itemtype": "method",
             "name": "handleError",
@@ -10098,7 +10108,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 585,
+            "line": 594,
             "description": "Create the application layers.",
             "itemtype": "method",
             "name": "createLayers",
@@ -10122,7 +10132,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 614,
+            "line": 623,
             "description": "Create the DICOM tags table. To be called once the DICOM has been parsed.",
             "itemtype": "method",
             "name": "createTagsTable",
@@ -10141,7 +10151,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 647,
+            "line": 656,
             "description": "Post load application initialisation. To be called once the DICOM has been parsed.",
             "itemtype": "method",
             "name": "postLoadInit",
