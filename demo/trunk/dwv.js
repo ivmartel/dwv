@@ -3477,7 +3477,7 @@ dwv.gui.filter.base.createFilterApplyButton = function ()
     var button = document.createElement("button");
     button.id = "runFilterButton";
     button.onclick = dwv.gui.onRunFilter;
-    button.setAttribute("style","width:100%;");
+    button.setAttribute("style","width:100%; margin-top:0.5em;");
     button.appendChild(document.createTextNode("Apply"));
     return button;
 };
@@ -5573,7 +5573,7 @@ dwv.gui.base.appendZoomAndPanHtml = function()
     button.id = "zoomResetButton";
     button.name = "zoomResetButton";
     button.onclick = dwv.gui.onZoomReset;
-    button.setAttribute("style","width:100%;");
+    button.setAttribute("style","width:100%; margin-top:0.5em;");
     var text = document.createTextNode("Reset");
     button.appendChild(text);
     
