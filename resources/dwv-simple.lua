@@ -78,13 +78,13 @@ print([[
 <title>DICOM Web Viewer</title>
 <meta charset="UTF-8">
 <link type="text/css" rel="stylesheet" href="/dwv/css/style.css">
-<link type="text/css" rel="stylesheet" href="/dwv/ext/jquery-mobile/jquery.mobile-1.4.2.min.css">
+<link type="text/css" rel="stylesheet" href="/dwv/ext/jquery-mobile/jquery.mobile-1.4.3.min.css">
 ]])
 
 print([[
 <!-- Third party --> 
 <script type="text/javascript" src="/dwv/ext/jquery/jquery-2.1.1.min.js"></script>
-<script type="text/javascript" src="/dwv/ext/jquery-mobile/jquery.mobile-1.4.2.min.js"></script>
+<script type="text/javascript" src="/dwv/ext/jquery-mobile/jquery.mobile-1.4.3.min.js"></script>
 <script type="text/javascript" src="/dwv/ext/openjpeg/openjpeg.js"></script>
 
 <!-- Local -->
