@@ -279,7 +279,7 @@ dwv.gui.base.appendZoomAndPanHtml = function()
     button.id = "zoomResetButton";
     button.name = "zoomResetButton";
     button.onclick = dwv.gui.onZoomReset;
-    button.setAttribute("style","width:100%;");
+    button.setAttribute("style","width:100%; margin-top:0.5em;");
     var text = document.createTextNode("Reset");
     button.appendChild(text);
     
