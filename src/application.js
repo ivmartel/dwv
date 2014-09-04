@@ -314,13 +314,14 @@ dwv.App = function()
     this.onSliceChange = function (/*event*/)
     {   
         generateAndDrawImage();
-        // hide layers
+        // hide all draw layers
         for ( var i = 0; i < drawLayers.length; ++i ) {
             drawLayers[i].visible( false );
         }
-        // show current
+        // show current draw layer
         var currentLayer = drawLayers[view.getCurrentPosition().k];
         currentLayer.visible( true );
+        currentLayer.draw();
     };
 
     /**
