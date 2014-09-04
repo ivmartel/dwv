@@ -273,6 +273,13 @@
                 "dwv.math": 1
             }
         },
+        "src/math/stats.js": {
+            "name": "src/math/stats.js",
+            "modules": {},
+            "classes": {},
+            "fors": {},
+            "namespaces": {}
+        },
         "src/tools/draw.js": {
             "name": "src/tools/draw.js",
             "modules": {},
@@ -6775,6 +6782,13 @@
             "namespace": "dwv.math"
         },
         {
+            "file": "src/math/stats.js",
+            "line": 8,
+            "description": "Get the minimum, maximum, mean and standard deviation\nof an array of values.\nNote: could use https://github.com/tmcw/simple-statistics",
+            "class": "dwv.tool.DrawShapeCommand",
+            "module": "math"
+        },
+        {
             "file": "src/tools/draw.js",
             "line": 17,
             "description": "Get the command name.",
@@ -10297,6 +10311,10 @@
         {
             "message": "Missing item type",
             "line": " src/math/scissors.js:108"
+        },
+        {
+            "message": "Missing item type\nGet the minimum, maximum, mean and standard deviation\nof an array of values.\nNote: could use https://github.com/tmcw/simple-statistics",
+            "line": " src/math/stats.js:8"
         },
         {
             "message": "Missing item type\nGet the real position from an event.",
