@@ -9978,7 +9978,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 326,
+            "line": 327,
             "description": "Resize the display window. To be called once the image is loaded.",
             "itemtype": "method",
             "name": "resize",
@@ -9988,7 +9988,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 370,
+            "line": 371,
             "description": "Toggle the display of the info layer.",
             "itemtype": "method",
             "name": "toggleInfoLayerDisplay",
@@ -9998,7 +9998,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 387,
+            "line": 388,
             "description": "Init the Window/Level display",
             "class": "dwv.App",
             "module": "utils",
@@ -10006,7 +10006,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 401,
+            "line": 402,
             "description": "Add layer mouse and touch listeners.",
             "itemtype": "method",
             "name": "addLayerListeners",
@@ -10016,7 +10016,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 423,
+            "line": 424,
             "description": "Remove layer mouse and touch listeners.",
             "itemtype": "method",
             "name": "removeLayerListeners",
@@ -10026,7 +10026,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 445,
+            "line": 446,
             "description": "Render the current image.",
             "itemtype": "method",
             "name": "render",
@@ -10036,7 +10036,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 456,
+            "line": 457,
             "description": "Generate the image data and draw it.",
             "itemtype": "method",
             "name": "generateAndDrawImage",
@@ -10046,7 +10046,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 470,
+            "line": 471,
             "description": "Add image listeners.",
             "itemtype": "method",
             "name": "addImageInfoListeners",
@@ -10058,7 +10058,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 485,
+            "line": 486,
             "description": "Remove image listeners.",
             "itemtype": "method",
             "name": "removeImageInfoListeners",
@@ -10070,7 +10070,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 500,
+            "line": 501,
             "description": "General-purpose event handler. This function just determines the mouse \nposition relative to the canvas element. It then passes it to the current tool.",
             "itemtype": "method",
             "name": "eventHandler",
@@ -10089,7 +10089,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 573,
+            "line": 574,
             "description": "Handle an error: display it to the user.",
             "itemtype": "method",
             "name": "handleError",
@@ -10108,7 +10108,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 594,
+            "line": 595,
             "description": "Create the application layers.",
             "itemtype": "method",
             "name": "createLayers",
@@ -10132,7 +10132,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 623,
+            "line": 624,
             "description": "Create the DICOM tags table. To be called once the DICOM has been parsed.",
             "itemtype": "method",
             "name": "createTagsTable",
@@ -10151,7 +10151,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 656,
+            "line": 657,
             "description": "Post load application initialisation. To be called once the DICOM has been parsed.",
             "itemtype": "method",
             "name": "postLoadInit",
@@ -10320,7 +10320,7 @@
         },
         {
             "message": "Missing item type\nInit the Window/Level display",
-            "line": " src/application.js:387"
+            "line": " src/application.js:388"
         }
     ]
 }
