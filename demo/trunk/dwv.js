@@ -6707,6 +6707,57 @@ dwv.image.Image.prototype.compose = function(rhs, operator)
     return newImage;
 };
 
+/**
+ * Quantify a line according to image information.
+ * @method quantifyLine
+ * @param {Object} line The line to quantify.
+ * @return {Object} A quantification object.
+ */
+dwv.image.Image.prototype.quantifyLine = function(line)
+{
+    var length = line.getWorldLength( this.getSpacing().getColumnSpacing(), 
+            this.getSpacing().getRowSpacing());
+    return {"length": length};
+};
+
+/**
+ * Quantify a rectangle according to image information.
+ * @method quantifyRect
+ * @param {Object} rect The rectangle to quantify.
+ * @return {Object} A quantification object.
+ */
+dwv.image.Image.prototype.quantifyRect = function(rect)
+{
+    var surface = rect.getWorldSurface( this.getSpacing().getColumnSpacing(), 
+            this.getSpacing().getRowSpacing());
+    var subBuffer = [];
+    var minJ = parseInt(rect.getBegin().getY(), 10);
+    var maxJ = parseInt(rect.getEnd().getY(), 10);
+    var minI = parseInt(rect.getBegin().getX(), 10);
+    var maxI = parseInt(rect.getEnd().getX(), 10);
+    for ( var j = minJ; j < maxJ; ++j ) {
+        for ( var i = minI; i < maxI; ++i ) {
+            subBuffer.push( this.getValue(i,j,0) );
+        }
+    }
+    var quantif = dwv.math.getStats( subBuffer );
+    return {"surface": surface, "min": quantif.min, 'max': quantif.max,
+        "mean": quantif.mean, 'stdDev': quantif.stdDev};
+};
+
+/**
+ * Quantify an ellipse according to image information.
+ * @method quantifyEllipse
+ * @param {Object} ellipse The ellipse to quantify.
+ * @return {Object} A quantification object.
+ */
+dwv.image.Image.prototype.quantifyEllipse = function(ellipse)
+{
+    var surface = ellipse.getWorldSurface( this.getSpacing().getColumnSpacing(), 
+            this.getSpacing().getRowSpacing());
+    return {"surface": surface};
+};
+
 ;/** 
  * Image module.
  * @module image
@@ -9124,7 +9175,7 @@ dwv.tool.MoveShapeCommand = function (shape, name, translation, layer)
  * @namespace dwv.tool
  * @constructor
  */
-dwv.tool.ChangeShapeCommand = function (shape, name, func, startAnchor, endAnchor, layer)
+dwv.tool.ChangeShapeCommand = function (shape, name, func, startAnchor, endAnchor, layer, image)
 {
     /**
      * Get the command name.
@@ -9139,7 +9190,7 @@ dwv.tool.ChangeShapeCommand = function (shape, name, func, startAnchor, endAncho
      */
     this.execute = function () {
         // change shape
-        func( shape, endAnchor );
+        func( shape, endAnchor, image );
         // draw
         layer.draw();
     };
@@ -9149,7 +9200,7 @@ dwv.tool.ChangeShapeCommand = function (shape, name, func, startAnchor, endAncho
      */
     this.undo = function () {
         // invert change shape
-        func( shape, startAnchor );
+        func( shape, startAnchor, image );
         // draw
         layer.draw();
     };
@@ -9243,6 +9294,7 @@ dwv.tool.Draw = function (app)
      * @type Object
      */
     var activeShape = null;
+    var activeText = null;
     /**
      * List of created shapes.
      * @property createdShapes
@@ -9345,6 +9397,7 @@ dwv.tool.Draw = function (app)
             if ( selectedShape && selectedShape !== shapeEditor.getShape() ) { 
                 shapeEditor.disable();
                 shapeEditor.setShape(selectedShape);
+                shapeEditor.setImage(app.getImage());
                 shapeEditor.enable();
             }
         }
@@ -9352,6 +9405,7 @@ dwv.tool.Draw = function (app)
             // disable edition
             shapeEditor.disable();
             shapeEditor.setShape(null);
+            shapeEditor.setImage(null);
             // start storing points
             started = true;
             shapeGroup = new Kinetic.Group();
@@ -9382,17 +9436,21 @@ dwv.tool.Draw = function (app)
             // remove previous draw if not just started
             if ( activeShape && !justStarted ) {
                 activeShape.destroy();
+                activeText.destroy();
             }
             if ( justStarted ) {
                 justStarted = false;
             }
             // create shape
-            activeShape = new dwv.tool.shapes[self.shapeName](points, self.style);
+            var tmp = new dwv.tool.shapes[self.shapeName](points, self.style, app.getImage());
+            activeShape = tmp.shape;
+            activeText = tmp.text;
             // do not listen during creation
             activeShape.listening(false);
             drawLayer.hitGraphEnabled(false);
             // add shape to group
             shapeGroup.add(activeShape);
+            shapeGroup.add(activeText);
             // draw shape command
             command = new dwv.tool.DrawShapeCommand(activeShape, self.shapeName, drawLayer);
             // draw
@@ -9411,13 +9469,17 @@ dwv.tool.Draw = function (app)
             // remove previous draw
             if ( activeShape ) {
                 activeShape.destroy();
+                activeText.destroy();
             }
             // create final shape
-            activeShape = new dwv.tool.shapes[self.shapeName](points, self.style);
+            var tmp = new dwv.tool.shapes[self.shapeName](points, self.style, app.getImage());
+            activeShape = tmp.shape;
+            activeText = tmp.text;
             // re-activate layer
             drawLayer.hitGraphEnabled(true);
             // add shape to group
             shapeGroup.add(activeShape);
+            shapeGroup.add(activeText);
             // draw shape command
             command = new dwv.tool.DrawShapeCommand(activeShape, self.shapeName, drawLayer);
             // execute it
@@ -9426,8 +9488,8 @@ dwv.tool.Draw = function (app)
             app.getUndoStack().add(command);
             
             // set shape on
-            self.setShapeOn(activeShape);
-            createdShapes.push(activeShape);
+            self.setShapeOn(activeShape, activeText);
+            createdShapes.push({"shape": activeShape, "text": activeText});
         }
         // reset flag
         started = false;
@@ -9489,6 +9551,7 @@ dwv.tool.Draw = function (app)
         // reset shape display properties
         shapeEditor.disable();
         shapeEditor.setShape(null);
+        shapeEditor.setImage(null);
         document.body.style.cursor = 'default';
         // make layer listen or not to events
         app.getDrawStage().listening( flag );
@@ -9498,11 +9561,11 @@ dwv.tool.Draw = function (app)
         // set shape display properties
         if ( flag ) {
             app.addLayerListeners( app.getDrawStage().getContent() );
-            createdShapes.forEach( function (shape){ self.setShapeOn( shape ); });
+            createdShapes.forEach( function (elem){ self.setShapeOn( elem.shape, elem.text ); });
         }
         else {
             app.removeLayerListeners( app.getDrawStage().getContent() );
-            createdShapes.forEach( function (shape){ setShapeOff( shape ); });
+            createdShapes.forEach( function (elem){ setShapeOff( elem.shape ); });
         }
         // draw
         drawLayer.draw();
@@ -9538,7 +9601,7 @@ dwv.tool.Draw = function (app)
      * @method setShapeOn
      * @param {Object} shape The shape to set on.
      */
-    this.setShapeOn = function ( shape ) {
+    this.setShapeOn = function ( shape, text ) {
         // mouse over styling
         shape.on('mouseover', function () {
             document.body.style.cursor = 'pointer';
@@ -9567,12 +9630,16 @@ dwv.tool.Draw = function (app)
         
         // shape color
         var color = shape.stroke();
+        var textX;
+        var textY;
         
         // drag start event handling
         shape.on('dragstart', function (event) {
             // save start position
             var offset = dwv.html.getEventOffset( event.evt )[0];
             dragStartPos = getRealPosition( offset );
+            textX = text.x();
+            textY = text.y();
             // display trash
             var stage = app.getDrawStage();
             var scale = stage.scale();
@@ -9601,6 +9668,12 @@ dwv.tool.Draw = function (app)
                 trash.getChildren().each( function (tshape){ tshape.stroke('red'); });
                 shape.stroke(color);
             }
+            // update text
+            var translation = {'x': pos.x - dragStartPos.x, 
+                    'y': pos.y - dragStartPos.y};
+            var newPos = { 'x': textX + translation.x, 
+                    'y': textY + translation.y};
+            text.position( newPos );
             // reset anchors
             shapeEditor.resetAnchors();
             // draw
@@ -9625,6 +9698,7 @@ dwv.tool.Draw = function (app)
                 // disable editor
                 shapeEditor.disable();
                 shapeEditor.setShape(null);
+                shapeEditor.setImage(null);
                 document.body.style.cursor = 'default';
                 // delete command
                 var delcmd = new dwv.tool.DeleteShapeCommand(this, cmdName, drawLayer);
@@ -9750,6 +9824,7 @@ dwv.tool.ShapeEditor = function ()
      * @type Object
      */
     var shape = null;
+    var image = null;
     /**
      * Active flag.
      * @property isActive
@@ -9779,6 +9854,9 @@ dwv.tool.ShapeEditor = function ()
         }
     };
     
+    this.setImage = function ( img ) {
+        image = img;
+    };
     /**
      * Get the edited shape.
      * @method getShape
@@ -10035,7 +10113,7 @@ dwv.tool.ShapeEditor = function ()
         // drag move listener
         anchor.on('dragmove', function () {
             if ( updateFunction ) {
-                updateFunction(shape, this);
+                updateFunction(shape, this, image);
             }
             if ( this.getLayer() ) {
                 this.getLayer().draw();
@@ -10049,7 +10127,7 @@ dwv.tool.ShapeEditor = function ()
             var endAnchor = getClone(this);
             // store the change command
             var chgcmd = new dwv.tool.ChangeShapeCommand(
-                    shape, cmdName, updateFunction, startAnchor, endAnchor, this.getLayer());
+                    shape, cmdName, updateFunction, startAnchor, endAnchor, this.getLayer(), image);
             chgcmd.execute();
             app.getUndoStack().add(chgcmd);
             // reset start anchor
@@ -10111,7 +10189,7 @@ var Kinetic = Kinetic || {};
  * @param {Array} points The points from which to extract the ellipse.
  * @param {Style} style The drawing style.
  */ 
-dwv.tool.EllipseCreator = function (points, style)
+dwv.tool.EllipseCreator = function (points, style, image)
 {
     // calculate radius
     var a = Math.abs(points[0].getX() - points[points.length-1].getX());
@@ -10127,18 +10205,31 @@ dwv.tool.EllipseCreator = function (points, style)
         strokeWidth: 2,
         name: "shape"
     });
+    // quantification
+    var quant = image.quantifyEllipse( ellipse );
+    var cm2 = quant.surface / 100;
+    var str = cm2.toPrecision(4) + " cm2";
+    var ktext = new Kinetic.Text({
+        x: ellipse.getCenter().getX(),
+        y: ellipse.getCenter().getY(),
+        text: str,
+        fontSize: style.getFontSize(),
+        fontFamily: "Verdana",
+        fill: style.getLineColor(),
+        name: "text"
+    });
     // return shape
-    return kellipse;
+    return {"shape": kellipse, "text": ktext};
 };
 
 /**
  * Update an ellipse shape.
  * @method UpdateEllipse
  * @static
- * @param {Object} ellipse The ellipse shape to update.
+ * @param {Object} kellipse The ellipse shape to update.
  * @param {Object} anchor The active anchor.
  */ 
-dwv.tool.UpdateEllipse = function (ellipse, anchor)
+dwv.tool.UpdateEllipse = function (kellipse, anchor, image)
 {
     // parent group
     var group = anchor.getParent();
@@ -10189,10 +10280,23 @@ dwv.tool.UpdateEllipse = function (ellipse, anchor)
     var radiusX = ( topRight.x() - topLeft.x() ) / 2;
     var radiusY = ( bottomRight.y() - topRight.y() ) / 2;
     var center = { 'x': topLeft.x() + radiusX, 'y': topRight.y() + radiusY };
-    ellipse.position( center );
+    kellipse.position( center );
     var radiusAbs = { 'x': Math.abs(radiusX), 'y': Math.abs(radiusY) };
     if ( radiusAbs ) {
-        ellipse.radius( radiusAbs );
+        kellipse.radius( radiusAbs );
+    }
+    // update text
+    var ktext = group.getChildren(function(node){
+        return node.name() === 'text';
+    })[0];
+    if ( ktext ) {
+        var ellipse = new dwv.math.Ellipse(center, radiusX, radiusY);
+        var quant = image.quantifyEllipse( ellipse );
+        var cm2 = quant.surface / 100;
+        var str = cm2.toPrecision(4) + " cm2";
+        var textPos = { 'x': center.x, 'y': center.y };
+        ktext.position(textPos);
+        ktext.text(str);
     }
 };
 ;/** 
@@ -10724,7 +10828,7 @@ var Kinetic = Kinetic || {};
  * @param {Array} points The points from which to extract the line.
  * @param {Style} style The drawing style.
  */ 
-dwv.tool.LineCreator = function (points, style)
+dwv.tool.LineCreator = function (points, style, image)
 {
     // physical object
     var line = new dwv.math.Line(points[0], points[points.length-1]);
@@ -10736,18 +10840,30 @@ dwv.tool.LineCreator = function (points, style)
         strokeWidth: 2,
         name: "shape"
     });
+    // quantification
+    var quant = image.quantifyLine( line );
+    var str = quant.length.toPrecision(4) + " mm";
+    var ktext = new Kinetic.Text({
+        x: line.getEnd().getX(),
+        y: line.getEnd().getY() - 15,
+        text: str,
+        fontSize: style.getFontSize(),
+        fontFamily: "Verdana",
+        fill: style.getLineColor(),
+        name: "text"
+    });
     // return shape
-    return kline;
+    return {"shape": kline, "text": ktext};
 };
 
 /**
  * Update a line shape.
  * @method UpdateLine
  * @static
- * @param {Object} line The line shape to update.
+ * @param {Object} kline The line shape to update.
  * @param {Object} anchor The active anchor.
  */ 
-dwv.tool.UpdateLine = function (line, anchor)
+dwv.tool.UpdateLine = function (kline, anchor, image)
 {
     // parent group
     var group = anchor.getParent();
@@ -10771,11 +10887,26 @@ dwv.tool.UpdateLine = function (line, anchor)
     }
     // update shape and compensate for possible drag
     // note: shape.position() and shape.size() won't work...
-    var bx = begin.x() - line.x();
-    var by = begin.y() - line.y();
-    var ex = end.x() - line.x();
-    var ey = end.y() - line.y();
-    line.points( [bx,by,ex,ey] );
+    var bx = begin.x() - kline.x();
+    var by = begin.y() - kline.y();
+    var ex = end.x() - kline.x();
+    var ey = end.y() - kline.y();
+    kline.points( [bx,by,ex,ey] );
+    // update text
+    var ktext = group.getChildren(function(node){
+        return node.name() === 'text';
+    })[0];
+    if ( ktext ) {
+        // update quantification
+        var p2d0 = new dwv.math.Point2D(begin.x(), begin.y());
+        var p2d1 = new dwv.math.Point2D(end.x(), end.y());
+        var line = new dwv.math.Line(p2d0, p2d1);
+        var quant = image.quantifyLine( line );
+        var str = quant.length.toPrecision(4) + " mm";
+        var textPos = { 'x': line.getEnd().getX(), 'y': line.getEnd().getY() - 15 };
+        ktext.position( textPos );
+        ktext.text(str);
+    }
 };
 ;/** 
  * Tool module.
@@ -11150,7 +11281,7 @@ var Kinetic = Kinetic || {};
  * @param {Array} points The points from which to extract the rectangle.
  * @param {Style} style The drawing style.
  */ 
-dwv.tool.RectangleCreator = function (points, style)
+dwv.tool.RectangleCreator = function (points, style, image)
 {
     // physical shape
     var rectangle = new dwv.math.Rectangle(points[0], points[points.length-1]);
@@ -11164,18 +11295,31 @@ dwv.tool.RectangleCreator = function (points, style)
         strokeWidth: 2,
         name: "shape"
     });
+    // quantification
+    var quant = image.quantifyRect( rectangle );
+    var cm2 = quant.surface / 100;
+    var str = cm2.toPrecision(4) + " cm2";
+    var ktext = new Kinetic.Text({
+        x: rectangle.getBegin().getX(),
+        y: rectangle.getEnd().getY() + 10,
+        text: str,
+        fontSize: style.getFontSize(),
+        fontFamily: "Verdana",
+        fill: style.getLineColor(),
+        name: "text"
+    });
     // return shape
-    return krect;
+    return {"shape": krect, "text": ktext};
 };
 
 /**
  * Update a rectangle shape.
  * @method UpdateRect
  * @static
- * @param {Object} rect The rectangle shape to update.
+ * @param {Object} krect The rectangle shape to update.
  * @param {Object} anchor The active anchor.
  */ 
-dwv.tool.UpdateRect = function (rect, anchor)
+dwv.tool.UpdateRect = function (krect, anchor, image)
 {
     // parent group
     var group = anchor.getParent();
@@ -11223,11 +11367,26 @@ dwv.tool.UpdateRect = function (rect, anchor)
         break;
     }
     // update shape
-    rect.position(topLeft.position());
+    krect.position(topLeft.position());
     var width = topRight.x() - topLeft.x();
     var height = bottomLeft.y() - topLeft.y();
     if ( width && height ) {
-        rect.size({'width': width, 'height': height});
+        krect.size({'width': width, 'height': height});
+    }
+    // update text
+    var ktext = group.getChildren(function(node){
+        return node.name() === 'text';
+    })[0];
+    if ( ktext ) {
+        var p2d0 = new dwv.math.Point2D(topLeft.x(), topLeft.y());
+        var p2d1 = new dwv.math.Point2D(bottomRight.x(), bottomRight.y());
+        var rect = new dwv.math.Rectangle(p2d0, p2d1);
+        var quant = image.quantifyRect( rect );
+        var cm2 = quant.surface / 100;
+        var str = cm2.toPrecision(4) + " cm2";
+        var textPos = { 'x': rect.getBegin().getX(), 'y': rect.getEnd().getY() + 10 };
+        ktext.position(textPos);
+        ktext.text(str);
     }
 };
 ;/** 
@@ -11245,7 +11404,7 @@ var Kinetic = Kinetic || {};
  * @param {Array} points The points from which to extract the line.
  * @param {Style} style The drawing style.
  */ 
-dwv.tool.RoiCreator = function (points, style)
+dwv.tool.RoiCreator = function (points, style /*, image*/)
 {
     // physical shape
     var roi = new dwv.math.ROI();
@@ -11284,18 +11443,28 @@ dwv.tool.RoiCreator = function (points, style)
         name: "shape",
         closed: true
     });
+    // quantification
+    var ktext = new Kinetic.Text({
+        x: 0,
+        y: 0,
+        text: "",
+        fontSize: style.getFontSize(),
+        fontFamily: "Verdana",
+        fill: style.getLineColor(),
+        name: "text"
+    });
     // return shape
-    return kline;
+    return {"shape": kline, "text": ktext};
 }; 
 
 /**
  * Update a roi shape.
  * @method UpdateRoi
  * @static
- * @param {Object} line The line shape to update.
+ * @param {Object} kroi The line shape to update.
  * @param {Object} anchor The active anchor.
  */ 
-dwv.tool.UpdateRoi = function (roi, anchor)
+dwv.tool.UpdateRoi = function (kroi, anchor /*, image*/)
 {
     // parent group
     var group = anchor.getParent();
@@ -11307,10 +11476,10 @@ dwv.tool.UpdateRoi = function (roi, anchor)
     point.y( anchor.y() );
     // update the roi point and compensate for possible drag
     // (the anchor id is the index of the point in the list)
-    var points = roi.points();
-    points[anchor.id()] = anchor.x() - roi.x();
-    points[anchor.id()+1] = anchor.y() - roi.y();
-    roi.points( points );
+    var points = kroi.points();
+    points[anchor.id()] = anchor.x() - kroi.x();
+    points[anchor.id()+1] = anchor.y() - kroi.y();
+    kroi.points( points );
 };
 ;/** 
  * Tool module.

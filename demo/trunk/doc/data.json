@@ -5259,6 +5259,69 @@
             "namespace": "dwv.image"
         },
         {
+            "file": "src/image/image.js",
+            "line": 739,
+            "description": "Quantify a line according to image information.",
+            "itemtype": "method",
+            "name": "quantifyLine",
+            "params": [
+                {
+                    "name": "line",
+                    "description": "The line to quantify.",
+                    "type": "Object"
+                }
+            ],
+            "return": {
+                "description": "A quantification object.",
+                "type": "Object"
+            },
+            "class": "dwv.image.Image",
+            "module": "image",
+            "namespace": "dwv.image"
+        },
+        {
+            "file": "src/image/image.js",
+            "line": 752,
+            "description": "Quantify a rectangle according to image information.",
+            "itemtype": "method",
+            "name": "quantifyRect",
+            "params": [
+                {
+                    "name": "rect",
+                    "description": "The rectangle to quantify.",
+                    "type": "Object"
+                }
+            ],
+            "return": {
+                "description": "A quantification object.",
+                "type": "Object"
+            },
+            "class": "dwv.image.Image",
+            "module": "image",
+            "namespace": "dwv.image"
+        },
+        {
+            "file": "src/image/image.js",
+            "line": 777,
+            "description": "Quantify an ellipse according to image information.",
+            "itemtype": "method",
+            "name": "quantifyEllipse",
+            "params": [
+                {
+                    "name": "ellipse",
+                    "description": "The ellipse to quantify.",
+                    "type": "Object"
+                }
+            ],
+            "return": {
+                "description": "A quantification object.",
+                "type": "Object"
+            },
+            "class": "dwv.image.Image",
+            "module": "image",
+            "namespace": "dwv.image"
+        },
+        {
             "file": "src/image/luts.js",
             "line": 19,
             "description": "The internal array.",
@@ -6991,7 +7054,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 217,
+            "line": 218,
             "description": "List of created shapes.",
             "itemtype": "property",
             "name": "createdShapes",
@@ -7004,7 +7067,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 224,
+            "line": 225,
             "description": "Current shape group.",
             "itemtype": "property",
             "name": "shapeGroup",
@@ -7017,7 +7080,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 232,
+            "line": 233,
             "description": "Drawing style.",
             "itemtype": "property",
             "name": "style",
@@ -7028,7 +7091,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 238,
+            "line": 239,
             "description": "Shape name.",
             "itemtype": "property",
             "name": "shapeName",
@@ -7039,7 +7102,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 245,
+            "line": 246,
             "description": "List of points.",
             "itemtype": "property",
             "name": "points",
@@ -7052,7 +7115,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 253,
+            "line": 254,
             "description": "Last selected point.",
             "itemtype": "property",
             "name": "lastPoint",
@@ -7065,7 +7128,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 261,
+            "line": 262,
             "description": "Shape editor.",
             "itemtype": "property",
             "name": "shapeEditor",
@@ -7078,7 +7141,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 269,
+            "line": 270,
             "description": "Trash draw: a cross.",
             "itemtype": "property",
             "name": "trash",
@@ -7091,7 +7154,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 290,
+            "line": 291,
             "description": "The associated draw layer.",
             "itemtype": "property",
             "name": "drawLayer",
@@ -7104,7 +7167,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 298,
+            "line": 299,
             "description": "Handle mouse down event.",
             "itemtype": "method",
             "name": "mousedown",
@@ -7121,7 +7184,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 337,
+            "line": 340,
             "description": "Handle mouse move event.",
             "itemtype": "method",
             "name": "mousemove",
@@ -7138,7 +7201,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 374,
+            "line": 381,
             "description": "Handle mouse up event.",
             "itemtype": "method",
             "name": "mouseup",
@@ -7155,7 +7218,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 408,
+            "line": 419,
             "description": "Handle mouse out event.",
             "itemtype": "method",
             "name": "mouseout",
@@ -7172,7 +7235,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 417,
+            "line": 428,
             "description": "Handle touch start event.",
             "itemtype": "method",
             "name": "touchstart",
@@ -7189,7 +7252,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 426,
+            "line": 437,
             "description": "Handle touch move event.",
             "itemtype": "method",
             "name": "touchmove",
@@ -7206,7 +7269,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 435,
+            "line": 446,
             "description": "Handle touch end event.",
             "itemtype": "method",
             "name": "touchend",
@@ -7223,7 +7286,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 444,
+            "line": 455,
             "description": "Handle key down event.",
             "itemtype": "method",
             "name": "keydown",
@@ -7240,7 +7303,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 453,
+            "line": 464,
             "description": "Enable the tool.",
             "itemtype": "method",
             "name": "enable",
@@ -7257,7 +7320,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 482,
+            "line": 494,
             "description": "Set shape off properties.",
             "itemtype": "method",
             "name": "setShapeOff",
@@ -7274,7 +7337,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 498,
+            "line": 510,
             "description": "Get the real position from an event.",
             "class": "dwv.tool.Draw",
             "module": "tool",
@@ -7282,7 +7345,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 507,
+            "line": 519,
             "description": "Set shape on properties.",
             "itemtype": "method",
             "name": "setShapeOn",
@@ -7299,7 +7362,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 627,
+            "line": 650,
             "description": "Help for this tool.",
             "itemtype": "method",
             "name": "getHelp",
@@ -7313,7 +7376,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 649,
+            "line": 672,
             "description": "Set the line color of the drawing.",
             "itemtype": "method",
             "name": "setLineColour",
@@ -7330,7 +7393,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 660,
+            "line": 683,
             "description": "Set the shape name of the drawing.",
             "itemtype": "method",
             "name": "setShapeName",
@@ -7347,7 +7410,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 675,
+            "line": 698,
             "description": "Check if the shape is in the shape list.",
             "itemtype": "method",
             "name": "hasShape",
@@ -7364,7 +7427,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 684,
+            "line": 707,
             "description": "Initialise the tool.",
             "itemtype": "method",
             "name": "init",
@@ -7387,7 +7450,7 @@
         },
         {
             "file": "src/tools/editor.js",
-            "line": 24,
+            "line": 25,
             "description": "Active flag.",
             "itemtype": "property",
             "name": "isActive",
@@ -7400,7 +7463,7 @@
         },
         {
             "file": "src/tools/editor.js",
-            "line": 31,
+            "line": 32,
             "description": "Update function used by anchors to update the shape.",
             "itemtype": "property",
             "name": "updateFunction",
@@ -7413,7 +7476,7 @@
         },
         {
             "file": "src/tools/editor.js",
-            "line": 39,
+            "line": 40,
             "description": "Set the shape to edit.",
             "itemtype": "method",
             "name": "setShape",
@@ -7430,7 +7493,7 @@
         },
         {
             "file": "src/tools/editor.js",
-            "line": 53,
+            "line": 57,
             "description": "Get the edited shape.",
             "itemtype": "method",
             "name": "getShape",
@@ -7444,7 +7507,7 @@
         },
         {
             "file": "src/tools/editor.js",
-            "line": 62,
+            "line": 66,
             "description": "Get the active flag.",
             "itemtype": "method",
             "name": "isActive",
@@ -7458,7 +7521,7 @@
         },
         {
             "file": "src/tools/editor.js",
-            "line": 71,
+            "line": 75,
             "description": "Enable the editor. Redraws the layer.",
             "itemtype": "method",
             "name": "enable",
@@ -7468,7 +7531,7 @@
         },
         {
             "file": "src/tools/editor.js",
-            "line": 85,
+            "line": 89,
             "description": "Disable the editor. Redraws the layer.",
             "itemtype": "method",
             "name": "disable",
@@ -7478,7 +7541,7 @@
         },
         {
             "file": "src/tools/editor.js",
-            "line": 99,
+            "line": 103,
             "description": "Reset the anchors.",
             "itemtype": "method",
             "name": "resetAnchors",
@@ -7488,7 +7551,7 @@
         },
         {
             "file": "src/tools/editor.js",
-            "line": 112,
+            "line": 116,
             "description": "Apply a function on all anchors.",
             "params": [
                 {
@@ -7503,7 +7566,7 @@
         },
         {
             "file": "src/tools/editor.js",
-            "line": 123,
+            "line": 127,
             "description": "Set anchors visibility.",
             "itemtype": "method",
             "name": "setAnchorsVisible",
@@ -7520,7 +7583,7 @@
         },
         {
             "file": "src/tools/editor.js",
-            "line": 134,
+            "line": 138,
             "description": "Set anchors active.",
             "itemtype": "method",
             "name": "setAnchorsActive",
@@ -7537,7 +7600,7 @@
         },
         {
             "file": "src/tools/editor.js",
-            "line": 154,
+            "line": 158,
             "description": "Remove anchors.",
             "itemtype": "method",
             "name": "removeAnchors",
@@ -7547,7 +7610,7 @@
         },
         {
             "file": "src/tools/editor.js",
-            "line": 164,
+            "line": 168,
             "description": "Add the shape anchors.",
             "itemtype": "method",
             "name": "addAnchors",
@@ -7557,7 +7620,7 @@
         },
         {
             "file": "src/tools/editor.js",
-            "line": 224,
+            "line": 228,
             "description": "Create shape editor controls, i.e. the anchors.",
             "itemtype": "method",
             "name": "addAnchor",
@@ -7589,7 +7652,7 @@
         },
         {
             "file": "src/tools/editor.js",
-            "line": 256,
+            "line": 260,
             "description": "Get a simple clone of the input anchor.",
             "params": [
                 {
@@ -7604,7 +7667,7 @@
         },
         {
             "file": "src/tools/editor.js",
-            "line": 283,
+            "line": 287,
             "description": "Set the anchor on listeners.",
             "params": [
                 {
@@ -7619,7 +7682,7 @@
         },
         {
             "file": "src/tools/editor.js",
-            "line": 357,
+            "line": 361,
             "description": "Set the anchor off listeners.",
             "params": [
                 {
@@ -7656,14 +7719,14 @@
         },
         {
             "file": "src/tools/ellipse.js",
-            "line": 36,
+            "line": 49,
             "description": "Update an ellipse shape.",
             "itemtype": "method",
             "name": "UpdateEllipse",
             "static": 1,
             "params": [
                 {
-                    "name": "ellipse",
+                    "name": "kellipse",
                     "description": "The ellipse shape to update.",
                     "type": "Object"
                 },
@@ -8092,14 +8155,14 @@
         },
         {
             "file": "src/tools/line.js",
-            "line": 32,
+            "line": 44,
             "description": "Update a line shape.",
             "itemtype": "method",
             "name": "UpdateLine",
             "static": 1,
             "params": [
                 {
-                    "name": "line",
+                    "name": "kline",
                     "description": "The line shape to update.",
                     "type": "Object"
                 },
@@ -8506,14 +8569,14 @@
         },
         {
             "file": "src/tools/rectangle.js",
-            "line": 34,
+            "line": 47,
             "description": "Update a rectangle shape.",
             "itemtype": "method",
             "name": "UpdateRect",
             "static": 1,
             "params": [
                 {
-                    "name": "rect",
+                    "name": "krect",
                     "description": "The rectangle shape to update.",
                     "type": "Object"
                 },
@@ -8550,14 +8613,14 @@
         },
         {
             "file": "src/tools/roi.js",
-            "line": 59,
+            "line": 69,
             "description": "Update a roi shape.",
             "itemtype": "method",
             "name": "UpdateRoi",
             "static": 1,
             "params": [
                 {
-                    "name": "line",
+                    "name": "kroi",
                     "description": "The line shape to update.",
                     "type": "Object"
                 },
@@ -10262,7 +10325,7 @@
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/tools/draw.js:627"
+            "line": " src/tools/draw.js:650"
         },
         {
             "message": "replacing incorrect tag: returns with return",
@@ -10318,23 +10381,23 @@
         },
         {
             "message": "Missing item type\nGet the real position from an event.",
-            "line": " src/tools/draw.js:498"
+            "line": " src/tools/draw.js:510"
         },
         {
             "message": "Missing item type\nApply a function on all anchors.",
-            "line": " src/tools/editor.js:112"
+            "line": " src/tools/editor.js:116"
         },
         {
             "message": "Missing item type\nGet a simple clone of the input anchor.",
-            "line": " src/tools/editor.js:256"
+            "line": " src/tools/editor.js:260"
         },
         {
             "message": "Missing item type\nSet the anchor on listeners.",
-            "line": " src/tools/editor.js:283"
+            "line": " src/tools/editor.js:287"
         },
         {
             "message": "Missing item type\nSet the anchor off listeners.",
-            "line": " src/tools/editor.js:357"
+            "line": " src/tools/editor.js:361"
         },
         {
             "message": "Missing item type\nInit the Window/Level display",
