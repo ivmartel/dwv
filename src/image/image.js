@@ -736,3 +736,54 @@ dwv.image.Image.prototype.compose = function(rhs, operator)
     return newImage;
 };
 
+/**
+ * Quantify a line according to image information.
+ * @method quantifyLine
+ * @param {Object} line The line to quantify.
+ * @return {Object} A quantification object.
+ */
+dwv.image.Image.prototype.quantifyLine = function(line)
+{
+    var length = line.getWorldLength( this.getSpacing().getColumnSpacing(), 
+            this.getSpacing().getRowSpacing());
+    return {"length": length};
+};
+
+/**
+ * Quantify a rectangle according to image information.
+ * @method quantifyRect
+ * @param {Object} rect The rectangle to quantify.
+ * @return {Object} A quantification object.
+ */
+dwv.image.Image.prototype.quantifyRect = function(rect)
+{
+    var surface = rect.getWorldSurface( this.getSpacing().getColumnSpacing(), 
+            this.getSpacing().getRowSpacing());
+    var subBuffer = [];
+    var minJ = parseInt(rect.getBegin().getY(), 10);
+    var maxJ = parseInt(rect.getEnd().getY(), 10);
+    var minI = parseInt(rect.getBegin().getX(), 10);
+    var maxI = parseInt(rect.getEnd().getX(), 10);
+    for ( var j = minJ; j < maxJ; ++j ) {
+        for ( var i = minI; i < maxI; ++i ) {
+            subBuffer.push( this.getValue(i,j,0) );
+        }
+    }
+    var quantif = dwv.math.getStats( subBuffer );
+    return {"surface": surface, "min": quantif.min, 'max': quantif.max,
+        "mean": quantif.mean, 'stdDev': quantif.stdDev};
+};
+
+/**
+ * Quantify an ellipse according to image information.
+ * @method quantifyEllipse
+ * @param {Object} ellipse The ellipse to quantify.
+ * @return {Object} A quantification object.
+ */
+dwv.image.Image.prototype.quantifyEllipse = function(ellipse)
+{
+    var surface = ellipse.getWorldSurface( this.getSpacing().getColumnSpacing(), 
+            this.getSpacing().getRowSpacing());
+    return {"surface": surface};
+};
+

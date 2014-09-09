@@ -13,7 +13,7 @@ var Kinetic = Kinetic || {};
  * @param {Array} points The points from which to extract the ellipse.
  * @param {Style} style The drawing style.
  */ 
-dwv.tool.EllipseCreator = function (points, style)
+dwv.tool.EllipseCreator = function (points, style, image)
 {
     // calculate radius
     var a = Math.abs(points[0].getX() - points[points.length-1].getX());
@@ -29,18 +29,31 @@ dwv.tool.EllipseCreator = function (points, style)
         strokeWidth: 2,
         name: "shape"
     });
+    // quantification
+    var quant = image.quantifyEllipse( ellipse );
+    var cm2 = quant.surface / 100;
+    var str = cm2.toPrecision(4) + " cm2";
+    var ktext = new Kinetic.Text({
+        x: ellipse.getCenter().getX(),
+        y: ellipse.getCenter().getY(),
+        text: str,
+        fontSize: style.getFontSize(),
+        fontFamily: "Verdana",
+        fill: style.getLineColor(),
+        name: "text"
+    });
     // return shape
-    return kellipse;
+    return {"shape": kellipse, "text": ktext};
 };
 
 /**
  * Update an ellipse shape.
  * @method UpdateEllipse
  * @static
- * @param {Object} ellipse The ellipse shape to update.
+ * @param {Object} kellipse The ellipse shape to update.
  * @param {Object} anchor The active anchor.
  */ 
-dwv.tool.UpdateEllipse = function (ellipse, anchor)
+dwv.tool.UpdateEllipse = function (kellipse, anchor, image)
 {
     // parent group
     var group = anchor.getParent();
@@ -91,9 +104,22 @@ dwv.tool.UpdateEllipse = function (ellipse, anchor)
     var radiusX = ( topRight.x() - topLeft.x() ) / 2;
     var radiusY = ( bottomRight.y() - topRight.y() ) / 2;
     var center = { 'x': topLeft.x() + radiusX, 'y': topRight.y() + radiusY };
-    ellipse.position( center );
+    kellipse.position( center );
     var radiusAbs = { 'x': Math.abs(radiusX), 'y': Math.abs(radiusY) };
     if ( radiusAbs ) {
-        ellipse.radius( radiusAbs );
+        kellipse.radius( radiusAbs );
+    }
+    // update text
+    var ktext = group.getChildren(function(node){
+        return node.name() === 'text';
+    })[0];
+    if ( ktext ) {
+        var ellipse = new dwv.math.Ellipse(center, radiusX, radiusY);
+        var quant = image.quantifyEllipse( ellipse );
+        var cm2 = quant.surface / 100;
+        var str = cm2.toPrecision(4) + " cm2";
+        var textPos = { 'x': center.x, 'y': center.y };
+        ktext.position(textPos);
+        ktext.text(str);
     }
 };

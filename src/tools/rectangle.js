@@ -13,7 +13,7 @@ var Kinetic = Kinetic || {};
  * @param {Array} points The points from which to extract the rectangle.
  * @param {Style} style The drawing style.
  */ 
-dwv.tool.RectangleCreator = function (points, style)
+dwv.tool.RectangleCreator = function (points, style, image)
 {
     // physical shape
     var rectangle = new dwv.math.Rectangle(points[0], points[points.length-1]);
@@ -27,18 +27,31 @@ dwv.tool.RectangleCreator = function (points, style)
         strokeWidth: 2,
         name: "shape"
     });
+    // quantification
+    var quant = image.quantifyRect( rectangle );
+    var cm2 = quant.surface / 100;
+    var str = cm2.toPrecision(4) + " cm2";
+    var ktext = new Kinetic.Text({
+        x: rectangle.getBegin().getX(),
+        y: rectangle.getEnd().getY() + 10,
+        text: str,
+        fontSize: style.getFontSize(),
+        fontFamily: "Verdana",
+        fill: style.getLineColor(),
+        name: "text"
+    });
     // return shape
-    return krect;
+    return {"shape": krect, "text": ktext};
 };
 
 /**
  * Update a rectangle shape.
  * @method UpdateRect
  * @static
- * @param {Object} rect The rectangle shape to update.
+ * @param {Object} krect The rectangle shape to update.
  * @param {Object} anchor The active anchor.
  */ 
-dwv.tool.UpdateRect = function (rect, anchor)
+dwv.tool.UpdateRect = function (krect, anchor, image)
 {
     // parent group
     var group = anchor.getParent();
@@ -86,10 +99,25 @@ dwv.tool.UpdateRect = function (rect, anchor)
         break;
     }
     // update shape
-    rect.position(topLeft.position());
+    krect.position(topLeft.position());
     var width = topRight.x() - topLeft.x();
     var height = bottomLeft.y() - topLeft.y();
     if ( width && height ) {
-        rect.size({'width': width, 'height': height});
+        krect.size({'width': width, 'height': height});
+    }
+    // update text
+    var ktext = group.getChildren(function(node){
+        return node.name() === 'text';
+    })[0];
+    if ( ktext ) {
+        var p2d0 = new dwv.math.Point2D(topLeft.x(), topLeft.y());
+        var p2d1 = new dwv.math.Point2D(bottomRight.x(), bottomRight.y());
+        var rect = new dwv.math.Rectangle(p2d0, p2d1);
+        var quant = image.quantifyRect( rect );
+        var cm2 = quant.surface / 100;
+        var str = cm2.toPrecision(4) + " cm2";
+        var textPos = { 'x': rect.getBegin().getX(), 'y': rect.getEnd().getY() + 10 };
+        ktext.position(textPos);
+        ktext.text(str);
     }
 };

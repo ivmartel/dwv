@@ -95,7 +95,7 @@ dwv.tool.MoveShapeCommand = function (shape, name, translation, layer)
  * @namespace dwv.tool
  * @constructor
  */
-dwv.tool.ChangeShapeCommand = function (shape, name, func, startAnchor, endAnchor, layer)
+dwv.tool.ChangeShapeCommand = function (shape, name, func, startAnchor, endAnchor, layer, image)
 {
     /**
      * Get the command name.
@@ -110,7 +110,7 @@ dwv.tool.ChangeShapeCommand = function (shape, name, func, startAnchor, endAncho
      */
     this.execute = function () {
         // change shape
-        func( shape, endAnchor );
+        func( shape, endAnchor, image );
         // draw
         layer.draw();
     };
@@ -120,7 +120,7 @@ dwv.tool.ChangeShapeCommand = function (shape, name, func, startAnchor, endAncho
      */
     this.undo = function () {
         // invert change shape
-        func( shape, startAnchor );
+        func( shape, startAnchor, image );
         // draw
         layer.draw();
     };
@@ -214,6 +214,7 @@ dwv.tool.Draw = function (app)
      * @type Object
      */
     var activeShape = null;
+    var activeText = null;
     /**
      * List of created shapes.
      * @property createdShapes
@@ -316,6 +317,7 @@ dwv.tool.Draw = function (app)
             if ( selectedShape && selectedShape !== shapeEditor.getShape() ) { 
                 shapeEditor.disable();
                 shapeEditor.setShape(selectedShape);
+                shapeEditor.setImage(app.getImage());
                 shapeEditor.enable();
             }
         }
@@ -323,6 +325,7 @@ dwv.tool.Draw = function (app)
             // disable edition
             shapeEditor.disable();
             shapeEditor.setShape(null);
+            shapeEditor.setImage(null);
             // start storing points
             started = true;
             shapeGroup = new Kinetic.Group();
@@ -353,17 +356,21 @@ dwv.tool.Draw = function (app)
             // remove previous draw if not just started
             if ( activeShape && !justStarted ) {
                 activeShape.destroy();
+                activeText.destroy();
             }
             if ( justStarted ) {
                 justStarted = false;
             }
             // create shape
-            activeShape = new dwv.tool.shapes[self.shapeName](points, self.style);
+            var tmp = new dwv.tool.shapes[self.shapeName](points, self.style, app.getImage());
+            activeShape = tmp.shape;
+            activeText = tmp.text;
             // do not listen during creation
             activeShape.listening(false);
             drawLayer.hitGraphEnabled(false);
             // add shape to group
             shapeGroup.add(activeShape);
+            shapeGroup.add(activeText);
             // draw shape command
             command = new dwv.tool.DrawShapeCommand(activeShape, self.shapeName, drawLayer);
             // draw
@@ -382,13 +389,17 @@ dwv.tool.Draw = function (app)
             // remove previous draw
             if ( activeShape ) {
                 activeShape.destroy();
+                activeText.destroy();
             }
             // create final shape
-            activeShape = new dwv.tool.shapes[self.shapeName](points, self.style);
+            var tmp = new dwv.tool.shapes[self.shapeName](points, self.style, app.getImage());
+            activeShape = tmp.shape;
+            activeText = tmp.text;
             // re-activate layer
             drawLayer.hitGraphEnabled(true);
             // add shape to group
             shapeGroup.add(activeShape);
+            shapeGroup.add(activeText);
             // draw shape command
             command = new dwv.tool.DrawShapeCommand(activeShape, self.shapeName, drawLayer);
             // execute it
@@ -397,8 +408,8 @@ dwv.tool.Draw = function (app)
             app.getUndoStack().add(command);
             
             // set shape on
-            self.setShapeOn(activeShape);
-            createdShapes.push(activeShape);
+            self.setShapeOn(activeShape, activeText);
+            createdShapes.push({"shape": activeShape, "text": activeText});
         }
         // reset flag
         started = false;
@@ -460,6 +471,7 @@ dwv.tool.Draw = function (app)
         // reset shape display properties
         shapeEditor.disable();
         shapeEditor.setShape(null);
+        shapeEditor.setImage(null);
         document.body.style.cursor = 'default';
         // make layer listen or not to events
         app.getDrawStage().listening( flag );
@@ -469,11 +481,11 @@ dwv.tool.Draw = function (app)
         // set shape display properties
         if ( flag ) {
             app.addLayerListeners( app.getDrawStage().getContent() );
-            createdShapes.forEach( function (shape){ self.setShapeOn( shape ); });
+            createdShapes.forEach( function (elem){ self.setShapeOn( elem.shape, elem.text ); });
         }
         else {
             app.removeLayerListeners( app.getDrawStage().getContent() );
-            createdShapes.forEach( function (shape){ setShapeOff( shape ); });
+            createdShapes.forEach( function (elem){ setShapeOff( elem.shape ); });
         }
         // draw
         drawLayer.draw();
@@ -509,7 +521,7 @@ dwv.tool.Draw = function (app)
      * @method setShapeOn
      * @param {Object} shape The shape to set on.
      */
-    this.setShapeOn = function ( shape ) {
+    this.setShapeOn = function ( shape, text ) {
         // mouse over styling
         shape.on('mouseover', function () {
             document.body.style.cursor = 'pointer';
@@ -538,12 +550,16 @@ dwv.tool.Draw = function (app)
         
         // shape color
         var color = shape.stroke();
+        var textX;
+        var textY;
         
         // drag start event handling
         shape.on('dragstart', function (event) {
             // save start position
             var offset = dwv.html.getEventOffset( event.evt )[0];
             dragStartPos = getRealPosition( offset );
+            textX = text.x();
+            textY = text.y();
             // display trash
             var stage = app.getDrawStage();
             var scale = stage.scale();
@@ -572,6 +588,12 @@ dwv.tool.Draw = function (app)
                 trash.getChildren().each( function (tshape){ tshape.stroke('red'); });
                 shape.stroke(color);
             }
+            // update text
+            var translation = {'x': pos.x - dragStartPos.x, 
+                    'y': pos.y - dragStartPos.y};
+            var newPos = { 'x': textX + translation.x, 
+                    'y': textY + translation.y};
+            text.position( newPos );
             // reset anchors
             shapeEditor.resetAnchors();
             // draw
@@ -596,6 +618,7 @@ dwv.tool.Draw = function (app)
                 // disable editor
                 shapeEditor.disable();
                 shapeEditor.setShape(null);
+                shapeEditor.setImage(null);
                 document.body.style.cursor = 'default';
                 // delete command
                 var delcmd = new dwv.tool.DeleteShapeCommand(this, cmdName, drawLayer);

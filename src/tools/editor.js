@@ -21,6 +21,7 @@ dwv.tool.ShapeEditor = function ()
      * @type Object
      */
     var shape = null;
+    var image = null;
     /**
      * Active flag.
      * @property isActive
@@ -50,6 +51,9 @@ dwv.tool.ShapeEditor = function ()
         }
     };
     
+    this.setImage = function ( img ) {
+        image = img;
+    };
     /**
      * Get the edited shape.
      * @method getShape
@@ -306,7 +310,7 @@ dwv.tool.ShapeEditor = function ()
         // drag move listener
         anchor.on('dragmove', function () {
             if ( updateFunction ) {
-                updateFunction(shape, this);
+                updateFunction(shape, this, image);
             }
             if ( this.getLayer() ) {
                 this.getLayer().draw();
@@ -320,7 +324,7 @@ dwv.tool.ShapeEditor = function ()
             var endAnchor = getClone(this);
             // store the change command
             var chgcmd = new dwv.tool.ChangeShapeCommand(
-                    shape, cmdName, updateFunction, startAnchor, endAnchor, this.getLayer());
+                    shape, cmdName, updateFunction, startAnchor, endAnchor, this.getLayer(), image);
             chgcmd.execute();
             app.getUndoStack().add(chgcmd);
             // reset start anchor

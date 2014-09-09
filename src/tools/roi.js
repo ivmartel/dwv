@@ -13,7 +13,7 @@ var Kinetic = Kinetic || {};
  * @param {Array} points The points from which to extract the line.
  * @param {Style} style The drawing style.
  */ 
-dwv.tool.RoiCreator = function (points, style)
+dwv.tool.RoiCreator = function (points, style /*, image*/)
 {
     // physical shape
     var roi = new dwv.math.ROI();
@@ -52,18 +52,28 @@ dwv.tool.RoiCreator = function (points, style)
         name: "shape",
         closed: true
     });
+    // quantification
+    var ktext = new Kinetic.Text({
+        x: 0,
+        y: 0,
+        text: "",
+        fontSize: style.getFontSize(),
+        fontFamily: "Verdana",
+        fill: style.getLineColor(),
+        name: "text"
+    });
     // return shape
-    return kline;
+    return {"shape": kline, "text": ktext};
 }; 
 
 /**
  * Update a roi shape.
  * @method UpdateRoi
  * @static
- * @param {Object} line The line shape to update.
+ * @param {Object} kroi The line shape to update.
  * @param {Object} anchor The active anchor.
  */ 
-dwv.tool.UpdateRoi = function (roi, anchor)
+dwv.tool.UpdateRoi = function (kroi, anchor /*, image*/)
 {
     // parent group
     var group = anchor.getParent();
@@ -75,8 +85,8 @@ dwv.tool.UpdateRoi = function (roi, anchor)
     point.y( anchor.y() );
     // update the roi point and compensate for possible drag
     // (the anchor id is the index of the point in the list)
-    var points = roi.points();
-    points[anchor.id()] = anchor.x() - roi.x();
-    points[anchor.id()+1] = anchor.y() - roi.y();
-    roi.points( points );
+    var points = kroi.points();
+    points[anchor.id()] = anchor.x() - kroi.x();
+    points[anchor.id()+1] = anchor.y() - kroi.y();
+    kroi.points( points );
 };
