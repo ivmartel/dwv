@@ -96,12 +96,35 @@ dwv.gui.base.appendHelpHtml = function(mobile)
     
     var helpNode = document.getElementById("help");
 
+    var dwvLink = document.createElement("a");
+    dwvLink.href = "https://github.com/ivmartel/dwv/wiki";
+    dwvLink.title = "DWV wiki on github.";
+    dwvLink.appendChild(document.createTextNode("DWV"));
+    
+    var dwvExampleLink = document.createElement("a");
+    var inputIdx = document.URL.indexOf("?input=");
+    dwvExampleLink.href = document.URL.substr(0, inputIdx+7) + 
+        "http%3A%2F%2Fx.babymri.org%2F%3F53320924%26.dcm";
+    dwvExampleLink.title = "Brain MRI in DWV.";
+    dwvExampleLink.target = "_top";
+    dwvExampleLink.appendChild(document.createTextNode("MRI"));
+
+    var bbmriLink = document.createElement("a");
+    bbmriLink.href = "http://www.babymri.org";
+    bbmriLink.title = "babymri.org";
+    bbmriLink.appendChild(document.createTextNode("babymri.org"));
+
     var headPara = document.createElement("p");
-    headPara.appendChild(document.createTextNode("DWV can load DICOM data " +
+    headPara.appendChild(dwvLink);
+    headPara.appendChild(document.createTextNode(" can load DICOM data " +
         "either from a local file or from an URL. All DICOM tags are available " +
         "in a searchable table, press the 'tags' or grid button. " + 
         "You can choose to display the image information overlay by pressing the " + 
-        "'info' or i button. "));
+        "'info' or i button. For some example data, check this "));
+    headPara.appendChild(dwvExampleLink);
+    headPara.appendChild(document.createTextNode(" from the " ));
+    headPara.appendChild(bbmriLink);
+    headPara.appendChild(document.createTextNode(" database." ));
     helpNode.appendChild(headPara);
     
     var toolPara = document.createElement("p");
