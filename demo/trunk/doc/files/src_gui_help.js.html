@@ -300,12 +300,35 @@ dwv.gui.base.appendHelpHtml = function(mobile)
     
     var helpNode = document.getElementById(&quot;help&quot;);
 
+    var dwvLink = document.createElement(&quot;a&quot;);
+    dwvLink.href = &quot;https://github.com/ivmartel/dwv/wiki&quot;;
+    dwvLink.title = &quot;DWV wiki on github.&quot;;
+    dwvLink.appendChild(document.createTextNode(&quot;DWV&quot;));
+    
+    var dwvExampleLink = document.createElement(&quot;a&quot;);
+    var inputIdx = document.URL.indexOf(&quot;?input=&quot;);
+    dwvExampleLink.href = document.URL.substr(0, inputIdx+7) + 
+        &quot;http%3A%2F%2Fx.babymri.org%2F%3F53320924%26.dcm&quot;;
+    dwvExampleLink.title = &quot;Brain MRI in DWV.&quot;;
+    dwvExampleLink.target = &quot;_top&quot;;
+    dwvExampleLink.appendChild(document.createTextNode(&quot;MRI&quot;));
+
+    var bbmriLink = document.createElement(&quot;a&quot;);
+    bbmriLink.href = &quot;http://www.babymri.org&quot;;
+    bbmriLink.title = &quot;babymri.org&quot;;
+    bbmriLink.appendChild(document.createTextNode(&quot;babymri.org&quot;));
+
     var headPara = document.createElement(&quot;p&quot;);
-    headPara.appendChild(document.createTextNode(&quot;DWV can load DICOM data &quot; +
+    headPara.appendChild(dwvLink);
+    headPara.appendChild(document.createTextNode(&quot; can load DICOM data &quot; +
         &quot;either from a local file or from an URL. All DICOM tags are available &quot; +
         &quot;in a searchable table, press the &#x27;tags&#x27; or grid button. &quot; + 
         &quot;You can choose to display the image information overlay by pressing the &quot; + 
-        &quot;&#x27;info&#x27; or i button. &quot;));
+        &quot;&#x27;info&#x27; or i button. For some example data, check this &quot;));
+    headPara.appendChild(dwvExampleLink);
+    headPara.appendChild(document.createTextNode(&quot; from the &quot; ));
+    headPara.appendChild(bbmriLink);
+    headPara.appendChild(document.createTextNode(&quot; database.&quot; ));
     helpNode.appendChild(headPara);
     
     var toolPara = document.createElement(&quot;p&quot;);
