@@ -26,14 +26,14 @@ var dataDicom = [
     title: "Baby MRI", 
     uri: "http://x.babymri.org/?53320924&.dcm", 
     img: "babymri.png", 
-    desc: "Brain MR, 256*256*1, LittleEndianExplicit [1.2.840.10008.1.2.1]"
+    desc: "Brain MR, 256*256*1, LittleEndianExplicit [1.2.840.10008.1.2.1], bits: 16-12-11"
     },
     {
     title: "Multiple Baby MRI", 
     uri: "http://x.babymri.org/?key=53320924&key=53321068&key=53322843&key=53322987&key=53323131",
     uriargs: "&dwvReplaceMode=void",
     img: "babymri.png", 
-    desc: "Brain MR, 256*256*5, LittleEndianExplicit [1.2.840.10008.1.2.1]"
+    desc: "Brain MR, 256*256*5, LittleEndianExplicit [1.2.840.10008.1.2.1], bits: 16-12-11"
     }];
 var dataDicomSop = [
     {
@@ -41,31 +41,31 @@ var dataDicomSop = [
     uri: "https://github.com/ivmartel/dwv/raw/master/data/?file=cta-100.dcm&file=cta-101.dcm", 
     uriargs: "&dwvReplaceMode=void",
     img: "toutatix.png", 
-    desc: "Chest CT(A), 512*512*1, LittleEndianExplicit [1.2.840.10008.1.2.1], from the Osirix examples, hosted on the dwv github."
+    desc: "Chest CT(A), 512*512*1, LittleEndianExplicit [1.2.840.10008.1.2.1], bits: 16-12-11, from the Osirix examples, hosted on the dwv github."
     },
     {
     title: "Goudurix", 
     uri: "https://github.com/ivmartel/dwv/raw/master/data/cta2.dcm", 
     img: "goudurix.png", 
-    desc: "Chest CT(A), 512*512*1, LittleEndianExplicit [1.2.840.10008.1.2.1], from the Osirix examples, hosted on the dwv github.",
+    desc: "Chest CT(A), 512*512*1, LittleEndianExplicit [1.2.840.10008.1.2.1], bits: 16-12-11, from the Osirix examples, hosted on the dwv github.",
     },
     {
     title: "US", 
     uri: "https://github.com/ivmartel/dwv/raw/master/data/us.dcm", 
     img: "us.png", 
-    desc: "US, 640*480*1, BigEndianExplicit [1.2.840.10008.1.2.2], from the GDCM examples, hosted on the dwv github.",
+    desc: "US, 640*480*1, BigEndianExplicit [1.2.840.10008.1.2.2], bits: 8-8-7, from the GDCM examples, hosted on the dwv github.",
     },
     {
     title: "Cerebrix", 
     uri: "https://github.com/ivmartel/dwv/raw/master/data/mr.dcm", 
     img: "cerebrix.png", 
-    desc: "Brain SC (Secondary Capture), 176*224*1, JPEG2000 [1.2.840.10008.1.2.4.91], from the Osirix examples, hosted on the dwv github.",
+    desc: "Brain SC (Secondary Capture), 176*224*1, JPEG2000 [1.2.840.10008.1.2.4.91], bits: 16-16-15, from the Osirix examples, hosted on the dwv github.",
     },
     {
     title: "Aneurix (direct link)", 
     uri: "http://dicom.vital-it.ch:8089/wado?requestType=WADO&contentType=application/dicom&studyUID=2.16.840.1.113669.632.20.1211.10000744858&seriesUID=1.3.6.1.4.1.19291.2.1.2.2413568109772100001&objectUID=1.3.6.1.4.1.19291.2.1.3.2413568110716100007", 
     img: "vitalitch0.png", 
-    desc: "Via wado, 176*224*1, JPEG2000 [1.2.840.10008.1.2.4.91], from the dicom.vital-it.ch examples.",
+    desc: "Via wado, 176*224*1, JPEG2000 [1.2.840.10008.1.2.4.91], bits: 16-16-15, from the dicom.vital-it.ch examples.",
     },
     {
     title: "Aneurix (from manifest)", 
@@ -78,7 +78,7 @@ var dataDicomSop = [
     title: "Anonymous", 
     uri: "http://dicom.vital-it.ch:8089/wado?requestType=WADO&contentType=application/dicom&studyUID=1.2.840.113564.3.1.2.20110912134402.100261&seriesUID=1.2.840.113564.1921680151.20110912125724093870&objectUID=1.2.840.113564.1921680151.20110912125724093880.2003000225000", 
     img: "vitalitch3.png", 
-    desc: "Via wado, 2018x4915x1, LittleEndianExplicit [1.2.840.10008.1.2.1], MONOCHROME1, 16 bits,from the dicom.vital-it.ch examples.",
+    desc: "Via wado, 2018x4915x1, LittleEndianExplicit [1.2.840.10008.1.2.1], MONOCHROME1, bits: 16-12-11, from the dicom.vital-it.ch examples.",
     comment: "Carefull, big!"
     }
     ];
