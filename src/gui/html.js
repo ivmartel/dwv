@@ -21,7 +21,18 @@ dwv.html = dwv.html || {};
 dwv.html.appendCell = function(row, text)
 {
     var cell = row.insertCell(-1);
-    cell.appendChild(document.createTextNode(text));
+    var str = text;
+    // special case for Uint8Array (no default toString)
+    if ( text instanceof Uint8Array ) {
+        str = "";
+        for ( var i = 0; i < text.length; ++i ) {
+            if ( i > 0 ) { 
+                str += ",";
+            }
+            str += text[i];
+        }
+    }
+    cell.appendChild(document.createTextNode(str));
 };
 
 /**
