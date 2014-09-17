@@ -342,13 +342,24 @@ dwv.dicom.DicomParser.prototype.readDataElement = function(reader, offset, impli
     {
         data = [reader.readNumber( dataOffset, vl )];
     }
-    else if( vr === "OX" || vr === "OW" )
+    else if( vr === "OW" )
     {
         data = reader.readUint16Array( dataOffset, vl );
     }
     else if( vr === "OB" || vr === "N/A")
     {
         data = reader.readUint8Array( dataOffset, vl );
+    }
+    else if( vr === "OX" )
+    {
+        console.warn("OX value representation for tag: "+tag.name+".");
+        if ( typeof(this.dicomElements.BitsAllocated) !== 'undefined' &&
+                this.dicomElements.BitsAllocated.value[0] === 8 ) {
+            data = reader.readUint8Array( dataOffset, vl );
+        }
+        else {
+            data = reader.readUint16Array( dataOffset, vl );
+        }
     }
     else
     {
