@@ -1055,13 +1055,24 @@ dwv.dicom.DicomParser.prototype.readDataElement = function(reader, offset, impli
     {
         data = [reader.readNumber( dataOffset, vl )];
     }
-    else if( vr === "OX" || vr === "OW" )
+    else if( vr === "OW" )
     {
         data = reader.readUint16Array( dataOffset, vl );
     }
     else if( vr === "OB" || vr === "N/A")
     {
         data = reader.readUint8Array( dataOffset, vl );
+    }
+    else if( vr === "OX" )
+    {
+        console.warn("OX value representation for tag: "+tag.name+".");
+        if ( typeof(this.dicomElements.BitsAllocated) !== 'undefined' &&
+                this.dicomElements.BitsAllocated.value[0] === 8 ) {
+            data = reader.readUint8Array( dataOffset, vl );
+        }
+        else {
+            data = reader.readUint16Array( dataOffset, vl );
+        }
     }
     else
     {
@@ -4073,7 +4084,18 @@ dwv.html = dwv.html || {};
 dwv.html.appendCell = function(row, text)
 {
     var cell = row.insertCell(-1);
-    cell.appendChild(document.createTextNode(text));
+    var str = text;
+    // special case for Uint8Array (no default toString)
+    if ( text instanceof Uint8Array ) {
+        str = "";
+        for ( var i = 0; i < text.length; ++i ) {
+            if ( i > 0 ) { 
+                str += ",";
+            }
+            str += text[i];
+        }
+    }
+    cell.appendChild(document.createTextNode(str));
 };
 
 /**
