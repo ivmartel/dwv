@@ -10,6 +10,10 @@ dwv.gui.getWindowSize = function(){
 dwv.gui.displayProgress = function(percent){
     dwv.gui.base.displayProgress(percent);
 };
+// Select
+dwv.gui.refreshSelect = function(selectName){
+    dwv.gui.base.refreshSelect(selectName);
+};
 // Slider
 dwv.gui.appendSliderHtml = function(){
     dwv.gui.base.appendSliderHtml();

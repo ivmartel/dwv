@@ -19,7 +19,7 @@
             
         </div>
         <div class="yui3-u-1-4 version">
-            <em>API Docs for: 0.7.0</em>
+            <em>API Docs for: 0.7.1</em>
         </div>
     </div>
     <div id="bd" class="yui3-g">
@@ -337,7 +337,7 @@ dwv.tool.Filter.prototype.init = function()
  * @param {Object} event The keydown event.
  */
 dwv.tool.Filter.prototype.keydown = function(event){
-    app.handleKeyDown(event);
+    app.onKeydown(event);
 };
 
 // Filter namespace
@@ -484,7 +484,7 @@ dwv.tool.RunFilterCommand = function (filter, app)
     this.execute = function ()
     {
         app.setImage(filter.update());
-        app.generateAndDrawImage();
+        app.render();
     }; 
     /**
      * Undo the command.
@@ -492,7 +492,7 @@ dwv.tool.RunFilterCommand = function (filter, app)
      */
     this.undo = function () {
         app.setImage(filter.getOriginalImage());
-        app.generateAndDrawImage();
+        app.render();
     };
 }; // RunFilterCommand class
 

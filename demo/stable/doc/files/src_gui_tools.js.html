@@ -19,7 +19,7 @@
             
         </div>
         <div class="yui3-u-1-4 version">
-            <em>API Docs for: 0.7.0</em>
+            <em>API Docs for: 0.7.1</em>
         </div>
     </div>
     <div id="bd" class="yui3-g">
@@ -483,6 +483,7 @@ dwv.gui.base.appendZoomAndPanHtml = function()
     button.id = &quot;zoomResetButton&quot;;
     button.name = &quot;zoomResetButton&quot;;
     button.onclick = dwv.gui.onZoomReset;
+    button.setAttribute(&quot;style&quot;,&quot;width:100%; margin-top:0.5em;&quot;);
     var text = document.createTextNode(&quot;Reset&quot;);
     button.appendChild(text);
     
