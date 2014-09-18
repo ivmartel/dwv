@@ -314,14 +314,16 @@ dwv.App = function()
     this.onSliceChange = function (/*event*/)
     {   
         generateAndDrawImage();
-        // hide all draw layers
-        for ( var i = 0; i < drawLayers.length; ++i ) {
-            drawLayers[i].visible( false );
+        if ( drawStage ) {
+            // hide all draw layers
+            for ( var i = 0; i < drawLayers.length; ++i ) {
+                drawLayers[i].visible( false );
+            }
+            // show current draw layer
+            var currentLayer = drawLayers[view.getCurrentPosition().k];
+            currentLayer.visible( true );
+            currentLayer.draw();
         }
-        // show current draw layer
-        var currentLayer = drawLayers[view.getCurrentPosition().k];
-        currentLayer.visible( true );
-        currentLayer.draw();
     };
 
     /**
@@ -10733,7 +10735,7 @@ dwv.info.updatePositionDiv = function(event)
     dwv.html.cleanNode(lipos);
     lipos.appendChild(document.createTextNode("Pos = "+event.i+", "+event.j+", "+event.k));
     // value list item
-    if( event.value )
+    if( typeof(event.value) != "undefined" )
     {
         var livalue = document.getElementById("livalueinfotl");
         dwv.html.cleanNode(livalue);
