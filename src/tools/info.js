@@ -92,7 +92,7 @@ dwv.info.updatePositionDiv = function(event)
     dwv.html.cleanNode(lipos);
     lipos.appendChild(document.createTextNode("Pos = "+event.i+", "+event.j+", "+event.k));
     // value list item
-    if( event.value )
+    if( typeof(event.value) != "undefined" )
     {
         var livalue = document.getElementById("livalueinfotl");
         dwv.html.cleanNode(livalue);
