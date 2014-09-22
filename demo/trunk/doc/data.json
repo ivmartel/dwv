@@ -5512,7 +5512,7 @@
         },
         {
             "file": "src/image/luts.js",
-            "line": 191,
+            "line": 194,
             "description": "Get the length of the LUT array.",
             "itemtype": "method",
             "name": "getLength",
@@ -5526,7 +5526,7 @@
         },
         {
             "file": "src/image/luts.js",
-            "line": 198,
+            "line": 201,
             "description": "Get the value of the LUT at the given offset.",
             "itemtype": "method",
             "name": "getValue",
@@ -5540,7 +5540,7 @@
         },
         {
             "file": "src/image/luts.js",
-            "line": 210,
+            "line": 213,
             "description": "Lookup tables for image color display.",
             "class": "dwv.image.lut.Window",
             "module": "image",
@@ -10364,7 +10364,7 @@
         },
         {
             "message": "Missing item type\nLookup tables for image color display.",
-            "line": " src/image/luts.js:210"
+            "line": " src/image/luts.js:213"
         },
         {
             "message": "Missing item type",
