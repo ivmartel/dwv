@@ -150,7 +150,10 @@ dwv.image.lut.Window = function(rescaleLut_, isSigned_)
         width_ = width;
         // pre calculate loop values
         var size = windowLut_.length;
-        var center0 = isSigned_ ? center - 0.5 + size / 2 : center - 0.5;
+        var center0 = center - 0.5;
+        if ( isSigned_ ) {
+            center0 += rescaleLut_.getValue( parseInt(size / 2, 10) );
+        }
         var width0 = width - 1;
         var dispval = 0;
         if( !dwv.browser.hasClampedArray() )
