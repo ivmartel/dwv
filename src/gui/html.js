@@ -480,9 +480,9 @@ dwv.html.decodeKeyValueUri = function(uri, replaceMode)
             var repeatList = inputQueryPairs.query[repeatKey];
             // build base uri
             var baseUrl = inputQueryPairs.base;
-            // do not add '?' for what looks like file elements
-            // root/path/to/?key=0.jpg&key=1.jpg
-            if( !( baseUrl[baseUrl.length-1] === '/' && repeatList[0].indexOf('.') !== -1 ) ) { 
+            // do not add '?' when the repeatKey is 'file'
+            // root/path/to/?file=0.jpg&file=1.jpg
+            if( repeatKey !== "file" ) { 
                 baseUrl += "?";
             }
             var gotOneArg = false;

@@ -108,7 +108,7 @@ test("Test get URI param.", function() {
     var full20 = root20 + encodeURIComponent(uri20);
     var res20 = dwv.html.getUriParam(full20);
     var theo20 = ["result?a=0"];
-    equal(res20.toString(), theo20.toString(), "Multiple File uri with one arg");
+    equal(res20.toString(), theo20.toString(), "Multiple key uri with one arg");
     
     // simple test: two arguments
     var root21 = "file:///test.html?input=";
@@ -116,7 +116,7 @@ test("Test get URI param.", function() {
     var full21 = root21 + encodeURIComponent(uri21);
     var res21 = dwv.html.getUriParam(full21);
     var theo21 = ["result?a=0", "result?a=1"];
-    equal(res21.toString(), theo21.toString(), "Multiple File uri with two args");
+    equal(res21.toString(), theo21.toString(), "Multiple key uri with two args");
 
     // simple test: three arguments
     var root22 = "file:///test.html?input=";
@@ -124,7 +124,7 @@ test("Test get URI param.", function() {
     var full22 = root22 + encodeURIComponent(uri22);
     var res22 = dwv.html.getUriParam(full22);
     var theo22 = ["result?a=0", "result?a=1", "result?a=2"];
-    equal(res22.toString(), theo22.toString(), "Multiple File uri with three args");
+    equal(res22.toString(), theo22.toString(), "Multiple key uri with three args");
     
     // simple test: plenty arguments
     var root23 = "file:///test.html?input=";
@@ -132,7 +132,7 @@ test("Test get URI param.", function() {
     var full23 = root23 + encodeURIComponent(uri23);
     var res23 = dwv.html.getUriParam(full23);
     var theo23 = ["result?b=3&c=4&a=0", "result?b=3&c=4&a=1", "result?b=3&c=4&a=2"];
-    equal(res23.toString(), theo23.toString(), "Multiple File uri with plenty args");
+    equal(res23.toString(), theo23.toString(), "Multiple key uri with plenty args");
 
     // real world multiple URI
 
@@ -159,7 +159,7 @@ test("Test get URI param.", function() {
     
     // simple test: plenty arguments
     var root40 = "file:///test.html?input=";
-    var uri40 = "web/path/to/file/?a=0.dcm&a=1.dcm&a=2.dcm";
+    var uri40 = "web/path/to/file/?file=0.dcm&file=1.dcm&file=2.dcm";
     var full40 = root40 + encodeURIComponent(uri40) + "&dwvReplaceMode=void";
     var res40 = dwv.html.getUriParam(full40);
     var theo40 = ["web/path/to/file/0.dcm", "web/path/to/file/1.dcm", "web/path/to/file/2.dcm"];
