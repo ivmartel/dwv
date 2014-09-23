@@ -88,7 +88,7 @@ print([[
 <script type="text/javascript" src="/dwv/ext/openjpeg/openjpeg.js"></script>
 
 <!-- Local -->
-<script type="text/javascript" src="/dwv/dwv-0.7.2beta.min.js"></script>
+<script type="text/javascript" src="/dwv/dwv-0.8.0beta.min.js"></script>
 <!-- Launch the app -->
 <script type="text/javascript" src="/dwv/viewers/simple/appgui.js"></script>
 <script type="text/javascript" src="/dwv/viewers/simple/applauncher.js"></script>
