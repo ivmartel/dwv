@@ -1606,7 +1606,7 @@
             "module": "tool",
             "namespace": "dwv.tool",
             "file": "src/tools/windowLevel.js",
-            "line": 152,
+            "line": 149,
             "description": "WindowLevel tool: handle window/level related events.",
             "is_constructor": 1,
             "params": [
@@ -9115,7 +9115,7 @@
         },
         {
             "file": "src/tools/windowLevel.js",
-            "line": 161,
+            "line": 158,
             "description": "Closure to self: to be used by event handlers.",
             "itemtype": "property",
             "name": "self",
@@ -9128,7 +9128,7 @@
         },
         {
             "file": "src/tools/windowLevel.js",
-            "line": 168,
+            "line": 165,
             "description": "Interaction start flag.",
             "itemtype": "property",
             "name": "started",
@@ -9139,7 +9139,7 @@
         },
         {
             "file": "src/tools/windowLevel.js",
-            "line": 175,
+            "line": 172,
             "description": "Handle mouse down event.",
             "itemtype": "method",
             "name": "mousedown",
@@ -9156,7 +9156,7 @@
         },
         {
             "file": "src/tools/windowLevel.js",
-            "line": 190,
+            "line": 187,
             "description": "Handle mouse move event.",
             "itemtype": "method",
             "name": "mousemove",
@@ -9173,7 +9173,7 @@
         },
         {
             "file": "src/tools/windowLevel.js",
-            "line": 213,
+            "line": 210,
             "description": "Handle mouse up event.",
             "itemtype": "method",
             "name": "mouseup",
@@ -9190,7 +9190,7 @@
         },
         {
             "file": "src/tools/windowLevel.js",
-            "line": 233,
+            "line": 230,
             "description": "Handle mouse out event.",
             "itemtype": "method",
             "name": "mouseout",
@@ -9207,7 +9207,7 @@
         },
         {
             "file": "src/tools/windowLevel.js",
-            "line": 243,
+            "line": 240,
             "description": "Handle touch start event.",
             "itemtype": "method",
             "name": "touchstart",
@@ -9224,7 +9224,7 @@
         },
         {
             "file": "src/tools/windowLevel.js",
-            "line": 252,
+            "line": 249,
             "description": "Handle touch move event.",
             "itemtype": "method",
             "name": "touchmove",
@@ -9241,7 +9241,7 @@
         },
         {
             "file": "src/tools/windowLevel.js",
-            "line": 261,
+            "line": 258,
             "description": "Handle touch end event.",
             "itemtype": "method",
             "name": "touchend",
@@ -9258,7 +9258,7 @@
         },
         {
             "file": "src/tools/windowLevel.js",
-            "line": 270,
+            "line": 267,
             "description": "Handle double click event.",
             "itemtype": "method",
             "name": "dblclick",
@@ -9275,7 +9275,7 @@
         },
         {
             "file": "src/tools/windowLevel.js",
-            "line": 282,
+            "line": 279,
             "description": "Handle key down event.",
             "itemtype": "method",
             "name": "keydown",
@@ -9292,7 +9292,7 @@
         },
         {
             "file": "src/tools/windowLevel.js",
-            "line": 292,
+            "line": 289,
             "description": "Enable the tool.",
             "itemtype": "method",
             "name": "enable",
@@ -9309,7 +9309,7 @@
         },
         {
             "file": "src/tools/windowLevel.js",
-            "line": 306,
+            "line": 303,
             "description": "Initialise the tool.",
             "itemtype": "method",
             "name": "init",
@@ -9319,7 +9319,7 @@
         },
         {
             "file": "src/tools/windowLevel.js",
-            "line": 316,
+            "line": 313,
             "description": "Help for this tool.",
             "itemtype": "method",
             "name": "getHelp",
@@ -10352,7 +10352,7 @@
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/tools/windowLevel.js:316"
+            "line": " src/tools/windowLevel.js:313"
         },
         {
             "message": "replacing incorrect tag: returns with return",
