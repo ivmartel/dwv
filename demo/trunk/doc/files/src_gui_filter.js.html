@@ -316,6 +316,7 @@ dwv.gui.filter.base.createFilterApplyButton = function ()
     button.id = &quot;runFilterButton&quot;;
     button.onclick = dwv.gui.onRunFilter;
     button.setAttribute(&quot;style&quot;,&quot;width:100%; margin-top:0.5em;&quot;);
+    button.setAttribute(&quot;class&quot;,&quot;ui-btn ui-btn-b&quot;);
     button.appendChild(document.createTextNode(&quot;Apply&quot;));
     return button;
 };

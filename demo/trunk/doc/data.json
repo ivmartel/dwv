@@ -2257,7 +2257,7 @@
         },
         {
             "file": "src/gui/filter.js",
-            "line": 119,
+            "line": 120,
             "description": "Append the sharpen filter HTML to the page.",
             "itemtype": "method",
             "name": "appendSharpenHtml",
@@ -2268,7 +2268,7 @@
         },
         {
             "file": "src/gui/filter.js",
-            "line": 135,
+            "line": 136,
             "description": "Display the sharpen filter HTML.",
             "itemtype": "method",
             "name": "displaySharpenHtml",
@@ -2286,7 +2286,7 @@
         },
         {
             "file": "src/gui/filter.js",
-            "line": 146,
+            "line": 147,
             "description": "Append the sobel filter HTML to the page.",
             "itemtype": "method",
             "name": "appendSobelHtml",
@@ -2297,7 +2297,7 @@
         },
         {
             "file": "src/gui/filter.js",
-            "line": 162,
+            "line": 163,
             "description": "Display the sobel filter HTML.",
             "itemtype": "method",
             "name": "displaySobelHtml",
@@ -4057,7 +4057,7 @@
         },
         {
             "file": "src/gui/tools.js",
-            "line": 301,
+            "line": 302,
             "description": "Display the ZoomAndPan HTML.",
             "itemtype": "method",
             "name": "displayZoomAndPanHtml",
@@ -4075,7 +4075,7 @@
         },
         {
             "file": "src/gui/tools.js",
-            "line": 313,
+            "line": 314,
             "description": "Append the Scroll HTML to the page.",
             "itemtype": "method",
             "name": "appendScrollHtml",
@@ -4086,7 +4086,7 @@
         },
         {
             "file": "src/gui/tools.js",
-            "line": 334,
+            "line": 335,
             "description": "Display the Scroll HTML.",
             "itemtype": "method",
             "name": "displayScrollHtml",
