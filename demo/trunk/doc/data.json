@@ -2073,7 +2073,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 383,
+            "line": 387,
             "description": "Parse the complete DICOM file (given as input to the class).\nFills in the member object 'dicomElements'.",
             "itemtype": "method",
             "name": "parse",
@@ -2089,7 +2089,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 562,
+            "line": 566,
             "description": "Get an Image object from the read DICOM file.",
             "itemtype": "method",
             "name": "createImage",
@@ -10276,7 +10276,7 @@
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/dicom/dicomParser.js:562"
+            "line": " src/dicom/dicomParser.js:566"
         },
         {
             "message": "unknown tag: input",

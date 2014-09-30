@@ -288,8 +288,8 @@ dwv.dicom.DataReader = function(buffer, isLittleEndian)
             return this.readFloat32(byteOffset, isLittleEndian);
         }
         else { 
-            console.log(&quot;Non number: &#x27;&quot;+this.readString(byteOffset, nBytes)+&quot;&#x27;&quot;);
-            throw new Error(&quot;Unsupported number size.&quot;);
+            console.warn(&quot;Non number: &#x27;&quot;+this.readString(byteOffset, nBytes)+&quot;&#x27; of &quot;+nBytes+&quot; bytes.&quot;);
+            return Number.NaN;
         }
     };
     /**
@@ -544,7 +544,11 @@ dwv.dicom.DicomParser.prototype.readDataElement = function(reader, offset, impli
     var dataOffset = offset+tagOffset+vrOffset+vlOffset;
     if( vr === &quot;US&quot; || vr === &quot;UL&quot;)
     {
-        data = [reader.readNumber( dataOffset, vl )];
+        var num = reader.readNumber( dataOffset, vl );
+        if ( isNaN(num) ) {
+            console.warn(&quot;Not a number returned for tag: &quot;+tag.name);
+        }
+        data = [num];
     }
     else if( vr === &quot;OW&quot; )
     {

@@ -799,8 +799,8 @@ dwv.dicom.DataReader = function(buffer, isLittleEndian)
             return this.readFloat32(byteOffset, isLittleEndian);
         }
         else { 
-            console.log("Non number: '"+this.readString(byteOffset, nBytes)+"'");
-            throw new Error("Unsupported number size.");
+            console.warn("Non number: '"+this.readString(byteOffset, nBytes)+"' of "+nBytes+" bytes.");
+            return Number.NaN;
         }
     };
     /**
@@ -1055,7 +1055,11 @@ dwv.dicom.DicomParser.prototype.readDataElement = function(reader, offset, impli
     var dataOffset = offset+tagOffset+vrOffset+vlOffset;
     if( vr === "US" || vr === "UL")
     {
-        data = [reader.readNumber( dataOffset, vl )];
+        var num = reader.readNumber( dataOffset, vl );
+        if ( isNaN(num) ) {
+            console.warn("Not a number returned for tag: "+tag.name);
+        }
+        data = [num];
     }
     else if( vr === "OW" )
     {
