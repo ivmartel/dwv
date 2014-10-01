@@ -356,7 +356,7 @@ dwv.image.lut.Window = function(rescaleLut_, isSigned_)
         var size = windowLut_.length;
         var center0 = center - 0.5;
         if ( isSigned_ ) {
-            center0 += rescaleLut_.getValue( parseInt(size / 2, 10) );
+            center0 += rescaleLut_.getSlope() * (size / 2);
         }
         var width0 = width - 1;
         var dispval = 0;
