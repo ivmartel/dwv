@@ -9902,7 +9902,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 149,
+            "line": 154,
             "description": "Reset the application.",
             "itemtype": "method",
             "name": "reset",
@@ -9912,7 +9912,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 161,
+            "line": 166,
             "description": "Reset the layout of the application.",
             "itemtype": "method",
             "name": "resetLayout",
@@ -9922,7 +9922,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 177,
+            "line": 182,
             "description": "Handle key down event.\n- CRTL-Z: undo\n- CRTL-Y: redo\nDefault behavior. Usually used in tools.",
             "itemtype": "method",
             "name": "onKeydown",
@@ -9939,7 +9939,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 197,
+            "line": 202,
             "description": "Handle change files event.",
             "itemtype": "method",
             "name": "onChangeFiles",
@@ -9956,7 +9956,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 207,
+            "line": 212,
             "description": "Load a list of files.",
             "itemtype": "method",
             "name": "loadFiles",
@@ -9973,7 +9973,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 243,
+            "line": 248,
             "description": "Handle change url event.",
             "itemtype": "method",
             "name": "onChangeURL",
@@ -9990,7 +9990,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 253,
+            "line": 258,
             "description": "Load a list of URLs.",
             "itemtype": "method",
             "name": "loadURL",
@@ -10007,7 +10007,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 289,
+            "line": 294,
             "description": "Handle window/level change.",
             "itemtype": "method",
             "name": "onWLChange",
@@ -10024,7 +10024,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 299,
+            "line": 304,
             "description": "Handle color map change.",
             "itemtype": "method",
             "name": "onColorChange",
@@ -10041,7 +10041,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 309,
+            "line": 314,
             "description": "Handle slice change.",
             "itemtype": "method",
             "name": "onSliceChange",
@@ -10058,7 +10058,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 329,
+            "line": 334,
             "description": "Resize the display window. To be called once the image is loaded.",
             "itemtype": "method",
             "name": "resize",
@@ -10068,7 +10068,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 373,
+            "line": 378,
             "description": "Toggle the display of the info layer.",
             "itemtype": "method",
             "name": "toggleInfoLayerDisplay",
@@ -10078,7 +10078,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 390,
+            "line": 395,
             "description": "Init the Window/Level display",
             "class": "dwv.App",
             "module": "utils",
@@ -10086,7 +10086,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 404,
+            "line": 409,
             "description": "Add layer mouse and touch listeners.",
             "itemtype": "method",
             "name": "addLayerListeners",
@@ -10096,7 +10096,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 426,
+            "line": 431,
             "description": "Remove layer mouse and touch listeners.",
             "itemtype": "method",
             "name": "removeLayerListeners",
@@ -10106,7 +10106,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 448,
+            "line": 453,
             "description": "Render the current image.",
             "itemtype": "method",
             "name": "render",
@@ -10116,7 +10116,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 459,
+            "line": 464,
             "description": "Generate the image data and draw it.",
             "itemtype": "method",
             "name": "generateAndDrawImage",
@@ -10126,7 +10126,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 473,
+            "line": 478,
             "description": "Add image listeners.",
             "itemtype": "method",
             "name": "addImageInfoListeners",
@@ -10138,7 +10138,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 488,
+            "line": 493,
             "description": "Remove image listeners.",
             "itemtype": "method",
             "name": "removeImageInfoListeners",
@@ -10150,7 +10150,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 503,
+            "line": 508,
             "description": "General-purpose event handler. This function just determines the mouse \nposition relative to the canvas element. It then passes it to the current tool.",
             "itemtype": "method",
             "name": "eventHandler",
@@ -10169,7 +10169,64 @@
         },
         {
             "file": "src/application.js",
-            "line": 576,
+            "line": 581,
+            "description": "Handle a drag over.",
+            "itemtype": "method",
+            "name": "onDragOver",
+            "access": "private",
+            "tagname": "",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The event to handle.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.App",
+            "module": "utils",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/application.js",
+            "line": 597,
+            "description": "Handle a drag leave.",
+            "itemtype": "method",
+            "name": "onDragLeave",
+            "access": "private",
+            "tagname": "",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The event to handle.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.App",
+            "module": "utils",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/application.js",
+            "line": 613,
+            "description": "Handle a drop event.",
+            "itemtype": "method",
+            "name": "onDrop",
+            "access": "private",
+            "tagname": "",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The event to handle.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.App",
+            "module": "utils",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/application.js",
+            "line": 636,
             "description": "Handle an error: display it to the user.",
             "itemtype": "method",
             "name": "handleError",
@@ -10188,7 +10245,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 597,
+            "line": 657,
             "description": "Create the application layers.",
             "itemtype": "method",
             "name": "createLayers",
@@ -10212,7 +10269,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 626,
+            "line": 686,
             "description": "Create the DICOM tags table. To be called once the DICOM has been parsed.",
             "itemtype": "method",
             "name": "createTagsTable",
@@ -10231,7 +10288,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 659,
+            "line": 719,
             "description": "Post load application initialisation. To be called once the DICOM has been parsed.",
             "itemtype": "method",
             "name": "postLoadInit",
@@ -10400,7 +10457,7 @@
         },
         {
             "message": "Missing item type\nInit the Window/Level display",
-            "line": " src/application.js:390"
+            "line": " src/application.js:395"
         }
     ]
 }

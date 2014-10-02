@@ -338,6 +338,11 @@ dwv.App = function()
     this.init = function(){
         // align layers when the window is resized
         window.onresize = this.resize;
+        // listen to drag&amp;drop
+        var box = document.getElementById(&quot;dropBox&quot;);
+        box.addEventListener(&quot;dragover&quot;, onDragOver);
+        box.addEventListener(&quot;dragleave&quot;, onDragLeave);
+        box.addEventListener(&quot;drop&quot;, onDrop);
         // possible load from URL
         if( typeof skipLoadUrl === &quot;undefined&quot; ) {
             var inputUrls = dwv.html.getUriParam(); 
@@ -777,6 +782,61 @@ dwv.App = function()
         }
     }
     
+    /**
+     * Handle a drag over.
+     * @method onDragOver
+     * @private
+     * @param {Object} event The event to handle.
+     */
+    function onDragOver(event)
+    {
+        // prevent default handling
+        event.stopPropagation();
+        event.preventDefault();
+        // update box 
+        var box = document.getElementById(&quot;dropBox&quot;);
+        box.className = &#x27;hover&#x27;;
+    }
+    
+    /**
+     * Handle a drag leave.
+     * @method onDragLeave
+     * @private
+     * @param {Object} event The event to handle.
+     */
+    function onDragLeave(event)
+    {
+        // prevent default handling
+        event.stopPropagation();
+        event.preventDefault();
+        // update box 
+        var box = document.getElementById(&quot;dropBox&quot;);
+        box.className = &#x27;&#x27;;
+    }
+
+    /**
+     * Handle a drop event.
+     * @method onDrop
+     * @private
+     * @param {Object} event The event to handle.
+     */
+    function onDrop(event)
+    {
+        // prevent default handling
+        event.stopPropagation();
+        event.preventDefault();
+        // hide box 
+        var box = document.getElementById(&quot;dropBox&quot;);
+        box.style.display = &#x27;none&#x27;;
+        // load files
+        self.loadFiles(event.dataTransfer.files);
+        // listen to drag&amp;drop: switch to layerContainer
+        var div = document.getElementById(&quot;layerContainer&quot;);
+        div.addEventListener(&quot;dragover&quot;, onDragOver);
+        div.addEventListener(&quot;dragleave&quot;, onDragLeave);
+        div.addEventListener(&quot;drop&quot;, onDrop);
+    }
+
     /**
      * Handle an error: display it to the user.
      * @method handleError
