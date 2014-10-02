@@ -134,6 +134,11 @@ dwv.App = function()
     this.init = function(){
         // align layers when the window is resized
         window.onresize = this.resize;
+        // listen to drag&drop
+        var box = document.getElementById("dropBox");
+        box.addEventListener("dragover", onDragOver);
+        box.addEventListener("dragleave", onDragLeave);
+        box.addEventListener("drop", onDrop);
         // possible load from URL
         if( typeof skipLoadUrl === "undefined" ) {
             var inputUrls = dwv.html.getUriParam(); 
@@ -573,6 +578,61 @@ dwv.App = function()
         }
     }
     
+    /**
+     * Handle a drag over.
+     * @method onDragOver
+     * @private
+     * @param {Object} event The event to handle.
+     */
+    function onDragOver(event)
+    {
+        // prevent default handling
+        event.stopPropagation();
+        event.preventDefault();
+        // update box 
+        var box = document.getElementById("dropBox");
+        box.className = 'hover';
+    }
+    
+    /**
+     * Handle a drag leave.
+     * @method onDragLeave
+     * @private
+     * @param {Object} event The event to handle.
+     */
+    function onDragLeave(event)
+    {
+        // prevent default handling
+        event.stopPropagation();
+        event.preventDefault();
+        // update box 
+        var box = document.getElementById("dropBox");
+        box.className = '';
+    }
+
+    /**
+     * Handle a drop event.
+     * @method onDrop
+     * @private
+     * @param {Object} event The event to handle.
+     */
+    function onDrop(event)
+    {
+        // prevent default handling
+        event.stopPropagation();
+        event.preventDefault();
+        // hide box 
+        var box = document.getElementById("dropBox");
+        box.style.display = 'none';
+        // load files
+        self.loadFiles(event.dataTransfer.files);
+        // listen to drag&drop: switch to layerContainer
+        var div = document.getElementById("layerContainer");
+        div.addEventListener("dragover", onDragOver);
+        div.addEventListener("dragleave", onDragLeave);
+        div.addEventListener("drop", onDrop);
+    }
+
     /**
      * Handle an error: display it to the user.
      * @method handleError

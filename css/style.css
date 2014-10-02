@@ -4,6 +4,8 @@ body { font-family: Verdana, Arial, Helvetica, sans-serif; }
 #layerContainer { position: relative; padding: 0; }
 #imageLayer { position: absolute; }
 #drawDiv { position: absolute; pointer-events: none; }
+#dropBox { border: 5px dashed #ccc; margin: 20px auto; }
+#dropBox.hover { border: 5px dashed #cc0; }
 
 /* Info */
 #infotl { position: absolute; top: 0; left: 0; text-align: left; }
