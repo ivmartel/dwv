@@ -157,10 +157,18 @@ dwv.App = function()
      */
     this.reset = function()
     {
+        // clear tools
+        toolBox.reset();
+        // clear draw
+        if ( drawStage ) {
+            drawLayers = [];
+        }
+        // clear objects
         image = null;
         view = null;
+        // clear undo/redo
         undoStack = new dwv.tool.UndoStack();
-        dwv.gui.cleaUndoHtml();
+        dwv.gui.cleanUndoHtml();
     };
     
     /**
@@ -591,7 +599,9 @@ dwv.App = function()
         event.preventDefault();
         // update box 
         var box = document.getElementById("dropBox");
-        box.className = 'hover';
+        if ( box ) {
+            box.className = 'hover';
+        }
     }
     
     /**
@@ -607,7 +617,9 @@ dwv.App = function()
         event.preventDefault();
         // update box 
         var box = document.getElementById("dropBox");
-        box.className = '';
+        if ( box ) {
+            box.className = '';
+        }
     }
 
     /**
@@ -621,16 +633,8 @@ dwv.App = function()
         // prevent default handling
         event.stopPropagation();
         event.preventDefault();
-        // hide box 
-        var box = document.getElementById("dropBox");
-        box.style.display = 'none';
         // load files
         self.loadFiles(event.dataTransfer.files);
-        // listen to drag&drop: switch to layerContainer
-        var div = document.getElementById("layerContainer");
-        div.addEventListener("dragover", onDragOver);
-        div.addEventListener("dragleave", onDragLeave);
-        div.addEventListener("drop", onDrop);
     }
 
     /**
@@ -755,6 +759,20 @@ dwv.App = function()
         view.addEventListener("colorchange", self.onColorChange);
         view.addEventListener("slicechange", self.onSliceChange);
         
+        // stop box listening to drag (after first drag)
+        var box = document.getElementById("dropBox");
+        if ( box ) {
+            box.removeEventListener("dragover", onDragOver);
+            box.removeEventListener("dragleave", onDragLeave);
+            box.removeEventListener("drop", onDrop);
+            dwv.html.removeNode("dropBox");
+            // switch listening to layerContainer
+            var div = document.getElementById("layerContainer");
+            div.addEventListener("dragover", onDragOver);
+            div.addEventListener("dragleave", onDragLeave);
+            div.addEventListener("drop", onDrop);
+        }
+
         // info layer
         if(document.getElementById("infoLayer")){
             dwv.info.createWindowingDiv();

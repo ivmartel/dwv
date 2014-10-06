@@ -100,3 +100,18 @@ dwv.tool.ToolBox.prototype.init = function()
     // init html
     dwv.gui.initToolboxHtml();
 };
+
+/**
+ * Reset the tool box.
+ * @method init
+ */
+dwv.tool.ToolBox.prototype.reset = function()
+{
+    // hide last selected
+    if( this.selectedTool )
+    {
+        this.selectedTool.display(false);
+    }
+    this.selectedTool = 0;
+    this.defaultToolName = 0;
+};

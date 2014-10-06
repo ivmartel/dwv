@@ -41,10 +41,10 @@ dwv.gui.base.appendUndoHtml = function()
 
 /**
  * Clear the command list of the undo HTML.
- * @method cleaUndoHtml
+ * @method cleanUndoHtml
  * @static
  */
-dwv.gui.cleaUndoHtml = function ()
+dwv.gui.cleanUndoHtml = function ()
 {
     var select = document.getElementById("history_list");
     if ( select && select.length !== 0 ) {
