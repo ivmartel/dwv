@@ -157,10 +157,18 @@ dwv.App = function()
      */
     this.reset = function()
     {
+        // clear tools
+        toolBox.reset();
+        // clear draw
+        if ( drawStage ) {
+            drawLayers = [];
+        }
+        // clear objects
         image = null;
         view = null;
+        // clear undo/redo
         undoStack = new dwv.tool.UndoStack();
-        dwv.gui.cleaUndoHtml();
+        dwv.gui.cleanUndoHtml();
     };
     
     /**
@@ -591,7 +599,9 @@ dwv.App = function()
         event.preventDefault();
         // update box 
         var box = document.getElementById("dropBox");
-        box.className = 'hover';
+        if ( box ) {
+            box.className = 'hover';
+        }
     }
     
     /**
@@ -607,7 +617,9 @@ dwv.App = function()
         event.preventDefault();
         // update box 
         var box = document.getElementById("dropBox");
-        box.className = '';
+        if ( box ) {
+            box.className = '';
+        }
     }
 
     /**
@@ -621,16 +633,8 @@ dwv.App = function()
         // prevent default handling
         event.stopPropagation();
         event.preventDefault();
-        // hide box 
-        var box = document.getElementById("dropBox");
-        box.style.display = 'none';
         // load files
         self.loadFiles(event.dataTransfer.files);
-        // listen to drag&drop: switch to layerContainer
-        var div = document.getElementById("layerContainer");
-        div.addEventListener("dragover", onDragOver);
-        div.addEventListener("dragleave", onDragLeave);
-        div.addEventListener("drop", onDrop);
     }
 
     /**
@@ -755,6 +759,20 @@ dwv.App = function()
         view.addEventListener("colorchange", self.onColorChange);
         view.addEventListener("slicechange", self.onSliceChange);
         
+        // stop box listening to drag (after first drag)
+        var box = document.getElementById("dropBox");
+        if ( box ) {
+            box.removeEventListener("dragover", onDragOver);
+            box.removeEventListener("dragleave", onDragLeave);
+            box.removeEventListener("drop", onDrop);
+            dwv.html.removeNode("dropBox");
+            // switch listening to layerContainer
+            var div = document.getElementById("layerContainer");
+            div.addEventListener("dragover", onDragOver);
+            div.addEventListener("dragleave", onDragLeave);
+            div.addEventListener("drop", onDrop);
+        }
+
         // info layer
         if(document.getElementById("infoLayer")){
             dwv.info.createWindowingDiv();
@@ -4462,7 +4480,7 @@ dwv.html.cleanNode = function(node) {
  * Remove a HTML node and all its children.
  * @method removeNode
  * @static
- * @param {Number} nodeId The id of the node to delete.
+ * @param {String} nodeId The string id of the node to delete.
  */
 dwv.html.removeNode = function(nodeId) {
     // find the node
@@ -5802,10 +5820,10 @@ dwv.gui.base.appendUndoHtml = function()
 
 /**
  * Clear the command list of the undo HTML.
- * @method cleaUndoHtml
+ * @method cleanUndoHtml
  * @static
  */
-dwv.gui.cleaUndoHtml = function ()
+dwv.gui.cleanUndoHtml = function ()
 {
     var select = document.getElementById("history_list");
     if ( select && select.length !== 0 ) {
@@ -11872,7 +11890,21 @@ dwv.tool.ToolBox.prototype.init = function()
     // init html
     dwv.gui.initToolboxHtml();
 };
-;/** 
+
+/**
+ * Reset the tool box.
+ * @method init
+ */
+dwv.tool.ToolBox.prototype.reset = function()
+{
+    // hide last selected
+    if( this.selectedTool )
+    {
+        this.selectedTool.display(false);
+    }
+    this.selectedTool = 0;
+    this.defaultToolName = 0;
+};;/** 
  * Tool module.
  * @module tool
  */
