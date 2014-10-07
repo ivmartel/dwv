@@ -134,6 +134,18 @@ dwv.App = function()
     this.init = function(){
         // align layers when the window is resized
         window.onresize = this.resize;
+        // listen to drag&drop
+        var box = document.getElementById("dropBox");
+        if ( box ) {
+            box.addEventListener("dragover", onDragOver);
+            box.addEventListener("dragleave", onDragLeave);
+            box.addEventListener("drop", onDrop);
+            // initial size
+            var size = dwv.gui.getWindowSize();
+            var dropBoxSize = 2 * size.height / 3;
+            $("#dropBox").height( dropBoxSize );
+            $("#dropBox").width( dropBoxSize );
+        }
         // possible load from URL
         if( typeof skipLoadUrl === "undefined" ) {
             var inputUrls = dwv.html.getUriParam(); 
@@ -152,10 +164,18 @@ dwv.App = function()
      */
     this.reset = function()
     {
+        // clear tools
+        toolBox.reset();
+        // clear draw
+        if ( drawStage ) {
+            drawLayers = [];
+        }
+        // clear objects
         image = null;
         view = null;
+        // clear undo/redo
         undoStack = new dwv.tool.UndoStack();
-        dwv.gui.cleaUndoHtml();
+        dwv.gui.cleanUndoHtml();
     };
     
     /**
@@ -574,6 +594,57 @@ dwv.App = function()
     }
     
     /**
+     * Handle a drag over.
+     * @method onDragOver
+     * @private
+     * @param {Object} event The event to handle.
+     */
+    function onDragOver(event)
+    {
+        // prevent default handling
+        event.stopPropagation();
+        event.preventDefault();
+        // update box 
+        var box = document.getElementById("dropBox");
+        if ( box ) {
+            box.className = 'hover';
+        }
+    }
+    
+    /**
+     * Handle a drag leave.
+     * @method onDragLeave
+     * @private
+     * @param {Object} event The event to handle.
+     */
+    function onDragLeave(event)
+    {
+        // prevent default handling
+        event.stopPropagation();
+        event.preventDefault();
+        // update box 
+        var box = document.getElementById("dropBox");
+        if ( box ) {
+            box.className = '';
+        }
+    }
+
+    /**
+     * Handle a drop event.
+     * @method onDrop
+     * @private
+     * @param {Object} event The event to handle.
+     */
+    function onDrop(event)
+    {
+        // prevent default handling
+        event.stopPropagation();
+        event.preventDefault();
+        // load files
+        self.loadFiles(event.dataTransfer.files);
+    }
+
+    /**
      * Handle an error: display it to the user.
      * @method handleError
      * @private
@@ -624,39 +695,6 @@ dwv.App = function()
     }
     
     /**
-     * Create the DICOM tags table. To be called once the DICOM has been parsed.
-     * @method createTagsTable
-     * @private
-     * @param {Object} dataInfo The data information.
-     */
-    function createTagsTable(dataInfo)
-    {
-        // HTML node
-        var node = document.getElementById("tags");
-        if( node === null ) {
-            return;
-        }
-        // tag list table (without the pixel data)
-        if(dataInfo.PixelData) {
-            dataInfo.PixelData.value = "...";
-        }
-        // remove possible previous
-        while (node.hasChildNodes()) { 
-            node.removeChild(node.firstChild);
-        }
-        // tags HTML table
-        var table = dwv.html.toTable(dataInfo);
-        table.id = "tagsTable";
-        table.className = "tagsList table-stripe";
-        table.setAttribute("data-role", "table");
-        table.setAttribute("data-mode", "columntoggle");
-        // search form
-        node.appendChild(dwv.html.getHtmlSearchForm(table));
-        // tags table
-        node.appendChild(table);
-    }
-    
-    /**
      * Post load application initialisation. To be called once the DICOM has been parsed.
      * @method postLoadInit
      * @private
@@ -671,8 +709,8 @@ dwv.App = function()
         
         // get the view from the loaded data
         view = data.view;
-        // create the DICOM tags table
-        createTagsTable(data.info);
+        // append the DICOM tags table
+        dwv.gui.appendTagsTable(data.info);
         // store image
         originalImage = view.getImage();
         image = originalImage;
@@ -695,6 +733,20 @@ dwv.App = function()
         view.addEventListener("colorchange", self.onColorChange);
         view.addEventListener("slicechange", self.onSliceChange);
         
+        // stop box listening to drag (after first drag)
+        var box = document.getElementById("dropBox");
+        if ( box ) {
+            box.removeEventListener("dragover", onDragOver);
+            box.removeEventListener("dragleave", onDragLeave);
+            box.removeEventListener("drop", onDrop);
+            dwv.html.removeNode("dropBox");
+            // switch listening to layerContainer
+            var div = document.getElementById("layerContainer");
+            div.addEventListener("dragover", onDragOver);
+            div.addEventListener("dragleave", onDragLeave);
+            div.addEventListener("drop", onDrop);
+        }
+
         // info layer
         if(document.getElementById("infoLayer")){
             dwv.info.createWindowingDiv();
