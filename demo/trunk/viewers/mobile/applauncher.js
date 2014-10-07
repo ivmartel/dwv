@@ -67,4 +67,8 @@ $(document).ready( function()
 
     // initialise the application
     app.init();
+    
+    var size = dwv.gui.getWindowSize();
+    $("#layerContainer").height(size.height);
+
 });

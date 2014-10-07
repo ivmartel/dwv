@@ -21,6 +21,10 @@ dwv.gui.appendSliderHtml = function(){
 dwv.gui.initSliderHtml = function(){
     dwv.gui.base.initSliderHtml();
 };
+// Tags table
+dwv.gui.appendTagsTable = function(dataInfo){
+    dwv.gui.base.appendTagsTable(dataInfo);
+};
 
 // Loaders
 dwv.gui.appendLoadboxHtml = function(){

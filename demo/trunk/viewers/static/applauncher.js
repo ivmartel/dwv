@@ -34,7 +34,7 @@ $(document).ready( function()
     // Resizable but keep aspect ratio
     // TODO it seems to add a border that bothers getting the cursor position...
     //$("#layerContainer").resizable({ aspectRatio: true });
-        
+
     // Add required loaders to the loader list
     dwv.io.loaders = {};
     dwv.io.loaders.file = dwv.io.File;
