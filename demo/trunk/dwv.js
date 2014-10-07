@@ -136,9 +136,16 @@ dwv.App = function()
         window.onresize = this.resize;
         // listen to drag&drop
         var box = document.getElementById("dropBox");
-        box.addEventListener("dragover", onDragOver);
-        box.addEventListener("dragleave", onDragLeave);
-        box.addEventListener("drop", onDrop);
+        if ( box ) {
+            box.addEventListener("dragover", onDragOver);
+            box.addEventListener("dragleave", onDragLeave);
+            box.addEventListener("drop", onDrop);
+            // initial size
+            var size = dwv.gui.getWindowSize();
+            var dropBoxSize = 2 * size.height / 3;
+            $("#dropBox").height( dropBoxSize );
+            $("#dropBox").width( dropBoxSize );
+        }
         // possible load from URL
         if( typeof skipLoadUrl === "undefined" ) {
             var inputUrls = dwv.html.getUriParam(); 
@@ -688,39 +695,6 @@ dwv.App = function()
     }
     
     /**
-     * Create the DICOM tags table. To be called once the DICOM has been parsed.
-     * @method createTagsTable
-     * @private
-     * @param {Object} dataInfo The data information.
-     */
-    function createTagsTable(dataInfo)
-    {
-        // HTML node
-        var node = document.getElementById("tags");
-        if( node === null ) {
-            return;
-        }
-        // tag list table (without the pixel data)
-        if(dataInfo.PixelData) {
-            dataInfo.PixelData.value = "...";
-        }
-        // remove possible previous
-        while (node.hasChildNodes()) { 
-            node.removeChild(node.firstChild);
-        }
-        // tags HTML table
-        var table = dwv.html.toTable(dataInfo);
-        table.id = "tagsTable";
-        table.className = "tagsList table-stripe";
-        table.setAttribute("data-role", "table");
-        table.setAttribute("data-mode", "columntoggle");
-        // search form
-        node.appendChild(dwv.html.getHtmlSearchForm(table));
-        // tags table
-        node.appendChild(table);
-    }
-    
-    /**
      * Post load application initialisation. To be called once the DICOM has been parsed.
      * @method postLoadInit
      * @private
@@ -735,8 +709,8 @@ dwv.App = function()
         
         // get the view from the loaded data
         view = data.view;
-        // create the DICOM tags table
-        createTagsTable(data.info);
+        // append the DICOM tags table
+        dwv.gui.appendTagsTable(data.info);
         // store image
         originalImage = view.getImage();
         image = originalImage;
@@ -3804,7 +3778,40 @@ dwv.gui.base.initSliderHtml = function()
     $("#toolList").trigger("create");
 };
 
-
+/**
+ * Create the DICOM tags table. To be called once the DICOM has been parsed.
+ * @method createTagsTable
+ * @private
+ * @param {Object} dataInfo The data information.
+ */
+dwv.gui.base.appendTagsTable = function (dataInfo)
+{
+    // HTML node
+    var node = document.getElementById("tags");
+    if( node === null ) {
+        return;
+    }
+    // remove possible previous
+    while (node.hasChildNodes()) { 
+        node.removeChild(node.firstChild);
+    }
+    // tag list table (without the pixel data)
+    if(dataInfo.PixelData) {
+        dataInfo.PixelData.value = "...";
+    }
+    // tags HTML table
+    var table = dwv.html.toTable(dataInfo);
+    table.id = "tagsTable";
+    table.className = "tagsList table-stripe";
+    table.setAttribute("data-role", "table");
+    table.setAttribute("data-mode", "columntoggle");
+    // search form
+    node.appendChild(dwv.html.getHtmlSearchForm(table));
+    // tags table
+    node.appendChild(table);
+    // trigger create event (mobile)
+    $("#tags").trigger("create");
+};
 ;/** 
  * GUI module.
  * @module gui

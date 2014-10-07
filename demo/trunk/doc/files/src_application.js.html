@@ -340,9 +340,16 @@ dwv.App = function()
         window.onresize = this.resize;
         // listen to drag&amp;drop
         var box = document.getElementById(&quot;dropBox&quot;);
-        box.addEventListener(&quot;dragover&quot;, onDragOver);
-        box.addEventListener(&quot;dragleave&quot;, onDragLeave);
-        box.addEventListener(&quot;drop&quot;, onDrop);
+        if ( box ) {
+            box.addEventListener(&quot;dragover&quot;, onDragOver);
+            box.addEventListener(&quot;dragleave&quot;, onDragLeave);
+            box.addEventListener(&quot;drop&quot;, onDrop);
+            // initial size
+            var size = dwv.gui.getWindowSize();
+            var dropBoxSize = 2 * size.height / 3;
+            $(&quot;#dropBox&quot;).height( dropBoxSize );
+            $(&quot;#dropBox&quot;).width( dropBoxSize );
+        }
         // possible load from URL
         if( typeof skipLoadUrl === &quot;undefined&quot; ) {
             var inputUrls = dwv.html.getUriParam(); 
@@ -892,39 +899,6 @@ dwv.App = function()
     }
     
     /**
-     * Create the DICOM tags table. To be called once the DICOM has been parsed.
-     * @method createTagsTable
-     * @private
-     * @param {Object} dataInfo The data information.
-     */
-    function createTagsTable(dataInfo)
-    {
-        // HTML node
-        var node = document.getElementById(&quot;tags&quot;);
-        if( node === null ) {
-            return;
-        }
-        // tag list table (without the pixel data)
-        if(dataInfo.PixelData) {
-            dataInfo.PixelData.value = &quot;...&quot;;
-        }
-        // remove possible previous
-        while (node.hasChildNodes()) { 
-            node.removeChild(node.firstChild);
-        }
-        // tags HTML table
-        var table = dwv.html.toTable(dataInfo);
-        table.id = &quot;tagsTable&quot;;
-        table.className = &quot;tagsList table-stripe&quot;;
-        table.setAttribute(&quot;data-role&quot;, &quot;table&quot;);
-        table.setAttribute(&quot;data-mode&quot;, &quot;columntoggle&quot;);
-        // search form
-        node.appendChild(dwv.html.getHtmlSearchForm(table));
-        // tags table
-        node.appendChild(table);
-    }
-    
-    /**
      * Post load application initialisation. To be called once the DICOM has been parsed.
      * @method postLoadInit
      * @private
@@ -939,8 +913,8 @@ dwv.App = function()
         
         // get the view from the loaded data
         view = data.view;
-        // create the DICOM tags table
-        createTagsTable(data.info);
+        // append the DICOM tags table
+        dwv.gui.appendTagsTable(data.info);
         // store image
         originalImage = view.getImage();
         image = originalImage;
