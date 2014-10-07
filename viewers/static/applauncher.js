@@ -35,11 +35,6 @@ $(document).ready( function()
     // TODO it seems to add a border that bothers getting the cursor position...
     //$("#layerContainer").resizable({ aspectRatio: true });
 
-    var size = dwv.gui.getWindowSize();
-    var dropBoxSize = size.height / 2;
-    $("#dropBox").height( dropBoxSize );
-    $("#dropBox").width( dropBoxSize );
-
     // Add required loaders to the loader list
     dwv.io.loaders = {};
     dwv.io.loaders.file = dwv.io.File;

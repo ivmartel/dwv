@@ -70,8 +70,5 @@ $(document).ready( function()
     
     var size = dwv.gui.getWindowSize();
     $("#layerContainer").height(size.height);
-    var dropBoxSize = 2 * size.height / 3;
-    $("#dropBox").height( dropBoxSize );
-    $("#dropBox").width( dropBoxSize );
 
 });
