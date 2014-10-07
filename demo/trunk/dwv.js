@@ -7540,8 +7540,11 @@ dwv.image.View = function(image, isSigned)
  */
 dwv.image.View.prototype.setWindowLevel = function( center, width )
 {
-    this.getWindowLut().setCenterAndWidth(center, width);
-    this.fireEvent({"type": "wlchange", "wc": center, "ww": width });
+    // window width shall be >= 1 (see https://www.dabsoft.ch/dicom/3/C.11.2.1.2/)
+    if ( width >= 1 ) {
+        this.getWindowLut().setCenterAndWidth(center, width);
+        this.fireEvent({"type": "wlchange", "wc": center, "ww": width });
+    }
 };
 
 /**
