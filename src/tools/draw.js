@@ -373,8 +373,6 @@ dwv.tool.Draw = function (app)
             shapeGroup.add(activeText);
             // draw shape command
             command = new dwv.tool.DrawShapeCommand(activeShape, self.shapeName, drawLayer);
-            // draw
-            command.execute();
         }
     };
 
