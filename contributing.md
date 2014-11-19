@@ -11,6 +11,7 @@ Steps
 If something is not right, the first step is to submit an issue with as much detail
 about your problem and your configuration. This is to make sure this behavior is not
 intended (a 'feature').
+
 The second step, for the braves, is to fork the repository and work on a fix. Don't hesitate
 to ask for help, I am here for that! Once finished, you can propose a pull request. I will review
 it, make comments and hopefully merge it.
