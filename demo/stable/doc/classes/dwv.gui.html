@@ -19,7 +19,7 @@
             
         </div>
         <div class="yui3-u-1-4 version">
-            <em>API Docs for: 0.7.1</em>
+            <em>API Docs for: 0.8.0</em>
         </div>
     </div>
     <div id="bd" class="yui3-g">
@@ -418,7 +418,7 @@
                             </li>
                         
                             <li class="index-item method">
-                                <a href="#method_clearUrlLoadHtml">clearUrlLoadHtml</a>
+                                <a href="#method_cleanUndoHtml">cleanUndoHtml</a>
 
                                 
                                     <span class="flag static">static</span>
@@ -436,10 +436,17 @@
                             </li>
                         
                             <li class="index-item method">
-                                <a href="#method_cleaUndoHtml">cleaUndoHtml</a>
+                                <a href="#method_clearUrlLoadHtml">clearUrlLoadHtml</a>
 
                                 
                                     <span class="flag static">static</span>
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method private">
+                                <a href="#method_createTagsTable">createTagsTable</a>
+
                                 
                                 
                             </li>
@@ -1310,7 +1317,7 @@
             
         
         
-        <a href="../files/src_gui_tools.js.html#l313"><code>src&#x2F;gui&#x2F;tools.js:313</code></a>
+        <a href="../files/src_gui_tools.js.html#l314"><code>src&#x2F;gui&#x2F;tools.js:314</code></a>
         
         </p>
 
@@ -1367,7 +1374,7 @@
             
         
         
-        <a href="../files/src_gui_filter.js.html#l104"><code>src&#x2F;gui&#x2F;filter.js:104</code></a>
+        <a href="../files/src_gui_filter.js.html#l120"><code>src&#x2F;gui&#x2F;filter.js:120</code></a>
         
         </p>
 
@@ -1424,7 +1431,7 @@
             
         
         
-        <a href="../files/src_gui_filter.js.html#l119"><code>src&#x2F;gui&#x2F;filter.js:119</code></a>
+        <a href="../files/src_gui_filter.js.html#l104"><code>src&#x2F;gui&#x2F;filter.js:104</code></a>
         
         </p>
 
@@ -1538,7 +1545,7 @@
             
         
         
-        <a href="../files/src_gui_filter.js.html#l146"><code>src&#x2F;gui&#x2F;filter.js:146</code></a>
+        <a href="../files/src_gui_filter.js.html#l147"><code>src&#x2F;gui&#x2F;filter.js:147</code></a>
         
         </p>
 
@@ -1958,6 +1965,63 @@
 </div>
 
                 
+                    <div id="method_cleanUndoHtml" class="method item">
+    <h3 class="name"><code>cleanUndoHtml</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <span class="flag static">static</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_gui_undo.js.html#l42"><code>src&#x2F;gui&#x2F;undo.js:42</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Clear the command list of the undo HTML.</p>
+
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
                     <div id="method_clearUrlLoadHtml" class="method item">
     <h3 class="name"><code>clearUrlLoadHtml</code></h3>
 
@@ -2140,11 +2204,21 @@
 </div>
 
                 
-                    <div id="method_cleaUndoHtml" class="method item">
-    <h3 class="name"><code>cleaUndoHtml</code></h3>
+                    <div id="method_createTagsTable" class="method item private">
+    <h3 class="name"><code>createTagsTable</code></h3>
 
     
-        <span class="paren">()</span>
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>dataInfo</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
     
 
     
@@ -2152,11 +2226,11 @@
     
 
     
-
+        <span class="flag private">private</span>
     
 
     
-        <span class="flag static">static</span>
+
     
 
     
@@ -2174,7 +2248,7 @@
             
         
         
-        <a href="../files/src_gui_undo.js.html#l42"><code>src&#x2F;gui&#x2F;undo.js:42</code></a>
+        <a href="../files/src_gui_generic.js.html#l163"><code>src&#x2F;gui&#x2F;generic.js:163</code></a>
         
         </p>
 
@@ -2185,67 +2259,34 @@
     </div>
 
     <div class="description">
-        <p>Clear the command list of the undo HTML.</p>
+        <p>Create the DICOM tags table. To be called once the DICOM has been parsed.</p>
 
     </div>
 
     
+        <div class="params">
+            <h4>Parameters:</h4>
 
-    
-
-    
-</div>
-
-                
-                    <div id="method_displayDrawHtml" class="method item">
-    <h3 class="name"><code>displayDrawHtml</code></h3>
-
-    
-        <span class="paren">()</span>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-        <span class="flag static">static</span>
-    
-
-    
-
-    
-
-    <div class="meta">
-        
+            <ul class="params-list">
             
-                
-                <p>
-                
-                Defined in
-                
+                <li class="param">
+                    
+                        <code class="param-name">dataInfo</code>
+                        <span class="type">Object</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The data information.</p>
+
+                    </div>
+
+                    
+                </li>
             
-        
-        
-        <a href="../files/src_gui_tools.js.html#l203"><code>src&#x2F;gui&#x2F;tools.js:203</code></a>
-        
-        </p>
-
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        <p>Initialise the draw HTML.</p>
-
-    </div>
-
+            </ul>
+        </div>
     
 
     
@@ -2345,6 +2386,120 @@
 </div>
 
                 
+                    <div id="method_displayDrawHtml" class="method item">
+    <h3 class="name"><code>displayDrawHtml</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <span class="flag static">static</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_gui_tools.js.html#l203"><code>src&#x2F;gui&#x2F;tools.js:203</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Initialise the draw HTML.</p>
+
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_displayFilterHtml" class="method item">
+    <h3 class="name"><code>displayFilterHtml</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <span class="flag static">static</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_gui_filter.js.html#l48"><code>src&#x2F;gui&#x2F;filter.js:48</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Initialise the filter HTML.</p>
+
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
                     <div id="method_displayFilterHtml" class="method item">
     <h3 class="name"><code>displayFilterHtml</code></h3>
 
@@ -2428,63 +2583,6 @@
             
             </ul>
         </div>
-    
-
-    
-
-    
-</div>
-
-                
-                    <div id="method_displayFilterHtml" class="method item">
-    <h3 class="name"><code>displayFilterHtml</code></h3>
-
-    
-        <span class="paren">()</span>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-        <span class="flag static">static</span>
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/src_gui_filter.js.html#l48"><code>src&#x2F;gui&#x2F;filter.js:48</code></a>
-        
-        </p>
-
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        <p>Initialise the filter HTML.</p>
-
-    </div>
-
     
 
     
@@ -2719,7 +2817,7 @@
             
         
         
-        <a href="../files/src_gui_tools.js.html#l334"><code>src&#x2F;gui&#x2F;tools.js:334</code></a>
+        <a href="../files/src_gui_tools.js.html#l335"><code>src&#x2F;gui&#x2F;tools.js:335</code></a>
         
         </p>
 
@@ -2810,7 +2908,7 @@
             
         
         
-        <a href="../files/src_gui_filter.js.html#l135"><code>src&#x2F;gui&#x2F;filter.js:135</code></a>
+        <a href="../files/src_gui_filter.js.html#l136"><code>src&#x2F;gui&#x2F;filter.js:136</code></a>
         
         </p>
 
@@ -2901,7 +2999,7 @@
             
         
         
-        <a href="../files/src_gui_filter.js.html#l162"><code>src&#x2F;gui&#x2F;filter.js:162</code></a>
+        <a href="../files/src_gui_filter.js.html#l163"><code>src&#x2F;gui&#x2F;filter.js:163</code></a>
         
         </p>
 
@@ -3265,7 +3363,7 @@
             
         
         
-        <a href="../files/src_gui_tools.js.html#l301"><code>src&#x2F;gui&#x2F;tools.js:301</code></a>
+        <a href="../files/src_gui_tools.js.html#l302"><code>src&#x2F;gui&#x2F;tools.js:302</code></a>
         
         </p>
 

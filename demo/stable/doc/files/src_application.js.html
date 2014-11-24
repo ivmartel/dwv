@@ -19,7 +19,7 @@
             
         </div>
         <div class="yui3-u-1-4 version">
-            <em>API Docs for: 0.7.1</em>
+            <em>API Docs for: 0.8.0</em>
         </div>
     </div>
     <div id="bd" class="yui3-g">
@@ -253,7 +253,7 @@ dwv.App = function()
      * @method getVersion
      * @return {String} The version of the application.
      */
-    this.getVersion = function() { return &quot;v0.7.1&quot;; };
+    this.getVersion = function() { return &quot;v0.8.0&quot;; };
     
     /** 
      * Get the image.
@@ -338,6 +338,18 @@ dwv.App = function()
     this.init = function(){
         // align layers when the window is resized
         window.onresize = this.resize;
+        // listen to drag&amp;drop
+        var box = document.getElementById(&quot;dropBox&quot;);
+        if ( box ) {
+            box.addEventListener(&quot;dragover&quot;, onDragOver);
+            box.addEventListener(&quot;dragleave&quot;, onDragLeave);
+            box.addEventListener(&quot;drop&quot;, onDrop);
+            // initial size
+            var size = dwv.gui.getWindowSize();
+            var dropBoxSize = 2 * size.height / 3;
+            $(&quot;#dropBox&quot;).height( dropBoxSize );
+            $(&quot;#dropBox&quot;).width( dropBoxSize );
+        }
         // possible load from URL
         if( typeof skipLoadUrl === &quot;undefined&quot; ) {
             var inputUrls = dwv.html.getUriParam(); 
@@ -356,10 +368,18 @@ dwv.App = function()
      */
     this.reset = function()
     {
+        // clear tools
+        toolBox.reset();
+        // clear draw
+        if ( drawStage ) {
+            drawLayers = [];
+        }
+        // clear objects
         image = null;
         view = null;
+        // clear undo/redo
         undoStack = new dwv.tool.UndoStack();
-        dwv.gui.cleaUndoHtml();
+        dwv.gui.cleanUndoHtml();
     };
     
     /**
@@ -778,6 +798,57 @@ dwv.App = function()
     }
     
     /**
+     * Handle a drag over.
+     * @method onDragOver
+     * @private
+     * @param {Object} event The event to handle.
+     */
+    function onDragOver(event)
+    {
+        // prevent default handling
+        event.stopPropagation();
+        event.preventDefault();
+        // update box 
+        var box = document.getElementById(&quot;dropBox&quot;);
+        if ( box ) {
+            box.className = &#x27;hover&#x27;;
+        }
+    }
+    
+    /**
+     * Handle a drag leave.
+     * @method onDragLeave
+     * @private
+     * @param {Object} event The event to handle.
+     */
+    function onDragLeave(event)
+    {
+        // prevent default handling
+        event.stopPropagation();
+        event.preventDefault();
+        // update box 
+        var box = document.getElementById(&quot;dropBox&quot;);
+        if ( box ) {
+            box.className = &#x27;&#x27;;
+        }
+    }
+
+    /**
+     * Handle a drop event.
+     * @method onDrop
+     * @private
+     * @param {Object} event The event to handle.
+     */
+    function onDrop(event)
+    {
+        // prevent default handling
+        event.stopPropagation();
+        event.preventDefault();
+        // load files
+        self.loadFiles(event.dataTransfer.files);
+    }
+
+    /**
      * Handle an error: display it to the user.
      * @method handleError
      * @private
@@ -828,39 +899,6 @@ dwv.App = function()
     }
     
     /**
-     * Create the DICOM tags table. To be called once the DICOM has been parsed.
-     * @method createTagsTable
-     * @private
-     * @param {Object} dataInfo The data information.
-     */
-    function createTagsTable(dataInfo)
-    {
-        // HTML node
-        var node = document.getElementById(&quot;tags&quot;);
-        if( node === null ) {
-            return;
-        }
-        // tag list table (without the pixel data)
-        if(dataInfo.PixelData) {
-            dataInfo.PixelData.value = &quot;...&quot;;
-        }
-        // remove possible previous
-        while (node.hasChildNodes()) { 
-            node.removeChild(node.firstChild);
-        }
-        // tags HTML table
-        var table = dwv.html.toTable(dataInfo);
-        table.id = &quot;tagsTable&quot;;
-        table.className = &quot;tagsList table-stripe&quot;;
-        table.setAttribute(&quot;data-role&quot;, &quot;table&quot;);
-        table.setAttribute(&quot;data-mode&quot;, &quot;columntoggle&quot;);
-        // search form
-        node.appendChild(dwv.html.getHtmlSearchForm(table));
-        // tags table
-        node.appendChild(table);
-    }
-    
-    /**
      * Post load application initialisation. To be called once the DICOM has been parsed.
      * @method postLoadInit
      * @private
@@ -875,8 +913,8 @@ dwv.App = function()
         
         // get the view from the loaded data
         view = data.view;
-        // create the DICOM tags table
-        createTagsTable(data.info);
+        // append the DICOM tags table
+        dwv.gui.appendTagsTable(data.info);
         // store image
         originalImage = view.getImage();
         image = originalImage;
@@ -899,6 +937,20 @@ dwv.App = function()
         view.addEventListener(&quot;colorchange&quot;, self.onColorChange);
         view.addEventListener(&quot;slicechange&quot;, self.onSliceChange);
         
+        // stop box listening to drag (after first drag)
+        var box = document.getElementById(&quot;dropBox&quot;);
+        if ( box ) {
+            box.removeEventListener(&quot;dragover&quot;, onDragOver);
+            box.removeEventListener(&quot;dragleave&quot;, onDragLeave);
+            box.removeEventListener(&quot;drop&quot;, onDrop);
+            dwv.html.removeNode(&quot;dropBox&quot;);
+            // switch listening to layerContainer
+            var div = document.getElementById(&quot;layerContainer&quot;);
+            div.addEventListener(&quot;dragover&quot;, onDragOver);
+            div.addEventListener(&quot;dragleave&quot;, onDragLeave);
+            div.addEventListener(&quot;drop&quot;, onDrop);
+        }
+
         // info layer
         if(document.getElementById(&quot;infoLayer&quot;)){
             dwv.info.createWindowingDiv();

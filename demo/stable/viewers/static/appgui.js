@@ -46,6 +46,10 @@ function toggle(dialogId)
         $(dialogId).dialog('open');
     }
 }
+// Tags table
+dwv.gui.appendTagsTable = function(dataInfo){
+    dwv.gui.base.appendTagsTable(dataInfo);
+};
 
 // Loaders
 dwv.gui.appendLoadboxHtml = function(){

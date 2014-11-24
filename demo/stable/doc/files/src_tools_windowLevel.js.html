@@ -19,7 +19,7 @@
             
         </div>
         <div class="yui3-u-1-4 version">
-            <em>API Docs for: 0.7.1</em>
+            <em>API Docs for: 0.8.0</em>
         </div>
     </div>
     <div id="bd" class="yui3-g">
@@ -329,14 +329,6 @@ dwv.tool.updatePresets = function(full)
         }
     }
     
-    // min/max preset
-    if( full ) {
-        var range = app.getImage().getRescaledDataRange();
-        var width = range.max - range.min;
-        var center = range.min + width/2;
-        dwv.tool.presets[&quot;min/max&quot;] = {&quot;center&quot;: center, &quot;width&quot;: width};
-    }
-    
     // default presets
     var modality = app.getImage().getMeta().Modality;
     for( var key in dwv.tool.defaultpresets[modality] ) {
@@ -347,6 +339,11 @@ dwv.tool.updatePresets = function(full)
             dwv.tool.presets[key2] = dwv.tool.defaultpresets[modality+&quot;extra&quot;][key2];
         }
     }
+    // min/max preset
+    var range = app.getImage().getRescaledDataRange();
+    var width = range.max - range.min;
+    var center = range.min + width/2;
+    dwv.tool.presets[&quot;min/max&quot;] = {&quot;center&quot;: center, &quot;width&quot;: width};
     // manual preset
     if( manual ){
         dwv.tool.presets.manual = manual;

@@ -19,7 +19,7 @@
             
         </div>
         <div class="yui3-u-1-4 version">
-            <em>API Docs for: 0.7.1</em>
+            <em>API Docs for: 0.8.0</em>
         </div>
     </div>
     <div id="bd" class="yui3-g">
@@ -300,9 +300,9 @@ dwv.gui.base.appendWindowLevelHtml = function()
 
     // node
     var node = document.getElementById(&quot;toolList&quot;);
-    // apend preset
+    // append preset
     node.appendChild(wlLi);
-    // apend color map if monochrome image
+    // append color map
     node.appendChild(cmLi);
     // trigger create event (mobile)
     $(&quot;#toolList&quot;).trigger(&quot;create&quot;);
@@ -484,6 +484,7 @@ dwv.gui.base.appendZoomAndPanHtml = function()
     button.name = &quot;zoomResetButton&quot;;
     button.onclick = dwv.gui.onZoomReset;
     button.setAttribute(&quot;style&quot;,&quot;width:100%; margin-top:0.5em;&quot;);
+    button.setAttribute(&quot;class&quot;,&quot;ui-btn ui-btn-b&quot;);
     var text = document.createTextNode(&quot;Reset&quot;);
     button.appendChild(text);
     
