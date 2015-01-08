@@ -19,7 +19,7 @@ appgui.js
 # third party
 
 # css
-/dwv/demo/stable/ext/jquery-mobile/jquery.mobile-1.4.4.min.css
+/dwv/demo/stable/ext/jquery-mobile/jquery.mobile-1.4.5.min.css
 /dwv/demo/stable/ext/jquery-mobile/images/ajax-loader.gif
 /dwv/demo/stable/ext/jquery-mobile/images/icons-svg/plus-white.svg
 /dwv/demo/stable/ext/jquery-mobile/images/icons-svg/forward-white.svg
@@ -32,9 +32,9 @@ appgui.js
 /dwv/demo/stable/ext/jquery-mobile/images/icons-png/info-white.png
 /dwv/demo/stable/ext/jquery-mobile/images/icons-png/grid-black.png
 # js
-/dwv/demo/stable/ext/jquery/jquery-2.1.1.min.js
-/dwv/demo/stable/ext/jquery-mobile/jquery.mobile-1.4.4.min.js
-/dwv/demo/stable/ext/jquery-mobile/jquery.mobile-1.4.4.min.map
+/dwv/demo/stable/ext/jquery/jquery-2.1.3.min.js
+/dwv/demo/stable/ext/jquery-mobile/jquery.mobile-1.4.5.min.js
+/dwv/demo/stable/ext/jquery-mobile/jquery.mobile-1.4.5.min.map
 /dwv/demo/stable/ext/flot/jquery.flot.min.js
 /dwv/demo/stable/ext/kinetic/kinetic-v5.1.1-06.10.min.js
 
