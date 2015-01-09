@@ -14,8 +14,7 @@
     "jquery": "2.1.3",
     "jquery-ui": "~1.10",
     "jquery-mobile": "~1.4",
-    "kinetic": "~5",
-    "flot": "~0.8"
+    "kinetic": "~5"
   },
   "devDependencies": {
     "grunt": "~0.4",
