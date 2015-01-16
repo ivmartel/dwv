@@ -10,7 +10,7 @@ module.exports = function(grunt) {
             }
         },
         qunit: {
-            all: ['tests/tests.html'],
+            all: ['tests/index.html'],
             options: {
                 coverage: {
                     src: [ "src/**/*.js" ],
