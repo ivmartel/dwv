@@ -9578,7 +9578,20 @@ dwv.tool.Draw = function (app)
         {
             // current point
             lastPoint = new dwv.math.Point2D(event._x, event._y);
+            // clear last added point from the list
+            if ( !justStarted ) {
+                points.pop();
+            }
+            // add current one to the list
             points.push( lastPoint );
+            // allow for anchor points
+            var factory = new dwv.tool.shapes[self.shapeName]();
+            if( points.length < factory.getNPoints() ) {
+                clearTimeout(this.timer);
+                this.timer = setTimeout(function(){
+                    points.push( lastPoint );
+                }, factory.getTimeout() );
+            }
             // remove previous draw if not just started
             if ( activeShape && !justStarted ) {
                 activeShape.destroy();
@@ -9588,7 +9601,7 @@ dwv.tool.Draw = function (app)
                 justStarted = false;
             }
             // create shape
-            var tmp = new dwv.tool.shapes[self.shapeName](points, self.style, app.getImage());
+            var tmp = factory.create(points, self.style, app.getImage());
             activeShape = tmp.shape;
             activeText = tmp.text;
             // do not listen during creation
@@ -9618,7 +9631,8 @@ dwv.tool.Draw = function (app)
                 activeText.destroy();
             }
             // create final shape
-            var tmp = new dwv.tool.shapes[self.shapeName](points, self.style, app.getImage());
+            var factory = new dwv.tool.shapes[self.shapeName]();
+            var tmp = factory.create(points, self.style, app.getImage());
             activeShape = tmp.shape;
             activeText = tmp.text;
             // re-activate layer
@@ -10328,18 +10342,40 @@ var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
 var Kinetic = Kinetic || {};
 
+/** 
+ * Ellipse factory.
+ * @class EllipseFactory
+ * @namespace dwv.tool
+ * @constructor
+ */
+dwv.tool.EllipseFactory = function ()
+{
+    /** 
+     * Get the number of points needed to build the shape.
+     * @method getNPoints
+     * @return {Number} The number of points.
+     */
+    this.getNPoints = function () { return 2; };
+    /** 
+     * Get the timeout between point storage.
+     * @method getTimeout
+     * @return {Number} The timeout in milliseconds.
+     */
+    this.getTimeout = function () { return 0; };
+};  
+
 /**
  * Create an ellipse shape to be displayed.
- * @method EllipseCreator
- * @static
+ * @method create
  * @param {Array} points The points from which to extract the ellipse.
- * @param {Style} style The drawing style.
+ * @param {Object} style The drawing style.
+ * @param {Object} image The associated image.
  */ 
-dwv.tool.EllipseCreator = function (points, style, image)
+dwv.tool.EllipseFactory.prototype.create = function (points, style, image)
 {
     // calculate radius
-    var a = Math.abs(points[0].getX() - points[points.length-1].getX());
-    var b = Math.abs(points[0].getY() - points[points.length-1].getY());
+    var a = Math.abs(points[0].getX() - points[1].getX());
+    var b = Math.abs(points[0].getY() - points[1].getY());
     // physical object
     var ellipse = new dwv.math.Ellipse(points[0], a, b);
     // shape
@@ -10967,17 +11003,39 @@ var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
 var Kinetic = Kinetic || {};
 
+/** 
+ * Line factory.
+ * @class LineFactory
+ * @namespace dwv.tool
+ * @constructor
+ */
+dwv.tool.LineFactory = function ()
+{
+    /** 
+     * Get the number of points needed to build the shape.
+     * @method getNPoints
+     * @return {Number} The number of points.
+     */
+    this.getNPoints = function () { return 2; };
+    /** 
+     * Get the timeout between point storage.
+     * @method getTimeout
+     * @return {Number} The timeout in milliseconds.
+     */
+    this.getTimeout = function () { return 0; };
+};  
+
 /**
  * Create a line shape to be displayed.
- * @method LineCreator
- * @static
+ * @method create
  * @param {Array} points The points from which to extract the line.
- * @param {Style} style The drawing style.
+ * @param {Object} style The drawing style.
+ * @param {Object} image The associated image.
  */ 
-dwv.tool.LineCreator = function (points, style, image)
+dwv.tool.LineFactory.prototype.create = function (points, style, image)
 {
     // physical object
-    var line = new dwv.math.Line(points[0], points[points.length-1]);
+    var line = new dwv.math.Line(points[0], points[1]);
     // shape
     var kline = new Kinetic.Line({
         points: [line.getBegin().getX(), line.getBegin().getY(), 
@@ -11008,6 +11066,7 @@ dwv.tool.LineCreator = function (points, style, image)
  * @static
  * @param {Object} kline The line shape to update.
  * @param {Object} anchor The active anchor.
+ * @param {Object} image The associated image.
  */ 
 dwv.tool.UpdateLine = function (kline, anchor, image)
 {
@@ -11420,17 +11479,39 @@ var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
 var Kinetic = Kinetic || {};
 
+/** 
+ * Rectangle factory.
+ * @class RectangleFactory
+ * @namespace dwv.tool
+ * @constructor
+ */
+dwv.tool.RectangleFactory = function ()
+{
+    /** 
+     * Get the number of points needed to build the shape.
+     * @method getNPoints
+     * @return {Number} The number of points.
+     */
+    this.getNPoints = function () { return 2; };
+    /** 
+     * Get the timeout between point storage.
+     * @method getTimeout
+     * @return {Number} The timeout in milliseconds.
+     */
+    this.getTimeout = function () { return 0; };
+};  
+
 /**
  * Create a rectangle shape to be displayed.
- * @method RectangleCreator
- * @static
+ * @method create
  * @param {Array} points The points from which to extract the rectangle.
- * @param {Style} style The drawing style.
+ * @param {Object} style The drawing style.
+ * @param {Object} image The associated image.
  */ 
-dwv.tool.RectangleCreator = function (points, style, image)
+dwv.tool.RectangleFactory.prototype.create = function (points, style, image)
 {
     // physical shape
-    var rectangle = new dwv.math.Rectangle(points[0], points[points.length-1]);
+    var rectangle = new dwv.math.Rectangle(points[0], points[1]);
     // shape
     var krect = new Kinetic.Rect({
         x: rectangle.getBegin().getX(),
@@ -11543,43 +11624,47 @@ var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
 var Kinetic = Kinetic || {};
 
+/** 
+ * ROI factory.
+ * @class RoiFactory
+ * @namespace dwv.tool
+ * @constructor
+ */
+dwv.tool.RoiFactory = function ()
+{
+    /** 
+     * Get the number of points needed to build the shape.
+     * @method getNPoints
+     * @return {Number} The number of points.
+     */
+    this.getNPoints = function () { return 50; };
+    /** 
+     * Get the timeout between point storage.
+     * @method getTimeout
+     * @return {Number} The timeout in milliseconds.
+     */
+    this.getTimeout = function () { return 100; };
+};  
+
 /**
  * Create a roi shape to be displayed.
  * @method RoiCreator
- * @static
  * @param {Array} points The points from which to extract the line.
- * @param {Style} style The drawing style.
+ * @param {Object} style The drawing style.
+ * @param {Object} image The associated image.
  */ 
-dwv.tool.RoiCreator = function (points, style /*, image*/)
+dwv.tool.RoiFactory.prototype.create = function (points, style /*, image*/)
 {
     // physical shape
     var roi = new dwv.math.ROI();
-    // sample points so that they are not too close 
-    // to one another
-    /*if ( isFinal ) {
-        var size = points.length;
-        var clean = [];
-        if ( size > 0 ) {
-            clean.push( points[0] );
-            var last = points[0];
-            for ( var j = 1; j < size; ++j ) {
-                var line = new dwv.math.Line( last, points[j] );
-                if( line.getLength() > 2 ) {
-                    clean.push( points[j] );
-                    last = points[j];
-                }
-            }
-            points = clean;
-        }
-    }*/
     // add input points to the ROI
     roi.addPoints(points);
     // points stored the kineticjs way
     var arr = [];
-    for( var i = 1; i < roi.getLength(); ++i )
+    for( var i = 0; i < roi.getLength(); ++i )
     {
-        arr = arr.concat( roi.getPoint(i).getX() );
-        arr = arr.concat( roi.getPoint(i).getY() );
+        arr.push( roi.getPoint(i).getX() );
+        arr.push( roi.getPoint(i).getY() );
     }
     // shape
     var kline = new Kinetic.Line({

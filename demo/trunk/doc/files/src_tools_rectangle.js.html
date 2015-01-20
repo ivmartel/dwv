@@ -74,11 +74,15 @@
                                 <li><a href="../classes/dwv.tool.DeleteShapeCommand.html">dwv.tool.DeleteShapeCommand</a></li>
                                 <li><a href="../classes/dwv.tool.Draw.html">dwv.tool.Draw</a></li>
                                 <li><a href="../classes/dwv.tool.DrawShapeCommand.html">dwv.tool.DrawShapeCommand</a></li>
+                                <li><a href="../classes/dwv.tool.EllipseFactory.html">dwv.tool.EllipseFactory</a></li>
                                 <li><a href="../classes/dwv.tool.Filter.html">dwv.tool.Filter</a></li>
                                 <li><a href="../classes/dwv.tool.filter.Sharpen.html">dwv.tool.filter.Sharpen</a></li>
                                 <li><a href="../classes/dwv.tool.filter.Threshold.html">dwv.tool.filter.Threshold</a></li>
+                                <li><a href="../classes/dwv.tool.LineFactory.html">dwv.tool.LineFactory</a></li>
                                 <li><a href="../classes/dwv.tool.Livewire.html">dwv.tool.Livewire</a></li>
                                 <li><a href="../classes/dwv.tool.MoveShapeCommand.html">dwv.tool.MoveShapeCommand</a></li>
+                                <li><a href="../classes/dwv.tool.RectangleFactory.html">dwv.tool.RectangleFactory</a></li>
+                                <li><a href="../classes/dwv.tool.RoiFactory.html">dwv.tool.RoiFactory</a></li>
                                 <li><a href="../classes/dwv.tool.RunFilterCommand.html">dwv.tool.RunFilterCommand</a></li>
                                 <li><a href="../classes/dwv.tool.Scroll.html">dwv.tool.Scroll</a></li>
                                 <li><a href="../classes/dwv.tool.ShapeEditor.html">dwv.tool.ShapeEditor</a></li>
@@ -145,17 +149,39 @@
                         dwv.tool = dwv.tool || {};
                         var Kinetic = Kinetic || {};
                         
+                        /** 
+                         * Rectangle factory.
+                         * @class RectangleFactory
+                         * @namespace dwv.tool
+                         * @constructor
+                         */
+                        dwv.tool.RectangleFactory = function ()
+                        {
+                            /** 
+                             * Get the number of points needed to build the shape.
+                             * @method getNPoints
+                             * @return {Number} The number of points.
+                             */
+                            this.getNPoints = function () { return 2; };
+                            /** 
+                             * Get the timeout between point storage.
+                             * @method getTimeout
+                             * @return {Number} The timeout in milliseconds.
+                             */
+                            this.getTimeout = function () { return 0; };
+                        };  
+                        
                         /**
                          * Create a rectangle shape to be displayed.
-                         * @method RectangleCreator
-                         * @static
+                         * @method create
                          * @param {Array} points The points from which to extract the rectangle.
-                         * @param {Style} style The drawing style.
+                         * @param {Object} style The drawing style.
+                         * @param {Object} image The associated image.
                          */ 
-                        dwv.tool.RectangleCreator = function (points, style, image)
+                        dwv.tool.RectangleFactory.prototype.create = function (points, style, image)
                         {
                             // physical shape
-                            var rectangle = new dwv.math.Rectangle(points[0], points[points.length-1]);
+                            var rectangle = new dwv.math.Rectangle(points[0], points[1]);
                             // shape
                             var krect = new Kinetic.Rect({
                                 x: rectangle.getBegin().getX(),

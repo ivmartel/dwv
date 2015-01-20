@@ -309,9 +309,13 @@
         "src/tools/ellipse.js": {
             "name": "src/tools/ellipse.js",
             "modules": {},
-            "classes": {},
+            "classes": {
+                "dwv.tool.EllipseFactory": 1
+            },
             "fors": {},
-            "namespaces": {}
+            "namespaces": {
+                "dwv.tool": 1
+            }
         },
         "src/tools/filter.js": {
             "name": "src/tools/filter.js",
@@ -346,9 +350,13 @@
             "modules": {
                 "tool": 1
             },
-            "classes": {},
+            "classes": {
+                "dwv.tool.LineFactory": 1
+            },
             "fors": {},
-            "namespaces": {}
+            "namespaces": {
+                "dwv.tool": 1
+            }
         },
         "src/tools/livewire.js": {
             "name": "src/tools/livewire.js",
@@ -364,16 +372,24 @@
         "src/tools/rectangle.js": {
             "name": "src/tools/rectangle.js",
             "modules": {},
-            "classes": {},
+            "classes": {
+                "dwv.tool.RectangleFactory": 1
+            },
             "fors": {},
-            "namespaces": {}
+            "namespaces": {
+                "dwv.tool": 1
+            }
         },
         "src/tools/roi.js": {
             "name": "src/tools/roi.js",
             "modules": {},
-            "classes": {},
+            "classes": {
+                "dwv.tool.RoiFactory": 1
+            },
             "fors": {},
-            "namespaces": {}
+            "namespaces": {
+                "dwv.tool": 1
+            }
         },
         "src/tools/scroll.js": {
             "name": "src/tools/scroll.js",
@@ -602,11 +618,15 @@
                 "dwv.tool.DeleteShapeCommand": 1,
                 "dwv.tool.Draw": 1,
                 "dwv.tool.ShapeEditor": 1,
+                "dwv.tool.EllipseFactory": 1,
                 "dwv.tool.Filter": 1,
                 "dwv.tool.filter.Threshold": 1,
                 "dwv.tool.filter.Sharpen": 1,
                 "dwv.tool.RunFilterCommand": 1,
+                "dwv.tool.LineFactory": 1,
                 "dwv.tool.Livewire": 1,
+                "dwv.tool.RectangleFactory": 1,
+                "dwv.tool.RoiFactory": 1,
                 "dwv.tool": 1,
                 "dwv.tool.Scroll": 1,
                 "dwv.tool.ToolBox": 1,
@@ -1391,6 +1411,21 @@
             "description": "Shape editor.",
             "is_constructor": 1
         },
+        "dwv.tool.EllipseFactory": {
+            "name": "dwv.tool.EllipseFactory",
+            "shortname": "dwv.tool.EllipseFactory",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "tool",
+            "namespace": "dwv.tool",
+            "file": "src/tools/ellipse.js",
+            "line": 9,
+            "description": "Ellipse factory.",
+            "is_constructor": 1
+        },
         "dwv.tool.Filter": {
             "name": "dwv.tool.Filter",
             "shortname": "dwv.tool.Filter",
@@ -1499,6 +1534,21 @@
             "description": "Namespace for info functions.",
             "static": 1
         },
+        "dwv.tool.LineFactory": {
+            "name": "dwv.tool.LineFactory",
+            "shortname": "dwv.tool.LineFactory",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "tool",
+            "namespace": "dwv.tool",
+            "file": "src/tools/line.js",
+            "line": 9,
+            "description": "Line factory.",
+            "is_constructor": 1
+        },
         "dwv.tool.Livewire": {
             "name": "dwv.tool.Livewire",
             "shortname": "dwv.tool.Livewire",
@@ -1520,6 +1570,36 @@
                     "type": "Object"
                 }
             ]
+        },
+        "dwv.tool.RectangleFactory": {
+            "name": "dwv.tool.RectangleFactory",
+            "shortname": "dwv.tool.RectangleFactory",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "tool",
+            "namespace": "dwv.tool",
+            "file": "src/tools/rectangle.js",
+            "line": 9,
+            "description": "Rectangle factory.",
+            "is_constructor": 1
+        },
+        "dwv.tool.RoiFactory": {
+            "name": "dwv.tool.RoiFactory",
+            "shortname": "dwv.tool.RoiFactory",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "tool",
+            "namespace": "dwv.tool",
+            "file": "src/tools/roi.js",
+            "line": 9,
+            "description": "ROI factory.",
+            "is_constructor": 1
         },
         "dwv.tool": {
             "name": "dwv.tool",
@@ -7223,7 +7303,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 381,
+            "line": 394,
             "description": "Handle mouse up event.",
             "itemtype": "method",
             "name": "mouseup",
@@ -7240,7 +7320,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 419,
+            "line": 433,
             "description": "Handle mouse out event.",
             "itemtype": "method",
             "name": "mouseout",
@@ -7257,7 +7337,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 428,
+            "line": 442,
             "description": "Handle touch start event.",
             "itemtype": "method",
             "name": "touchstart",
@@ -7274,7 +7354,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 437,
+            "line": 451,
             "description": "Handle touch move event.",
             "itemtype": "method",
             "name": "touchmove",
@@ -7291,7 +7371,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 446,
+            "line": 460,
             "description": "Handle touch end event.",
             "itemtype": "method",
             "name": "touchend",
@@ -7308,7 +7388,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 455,
+            "line": 469,
             "description": "Handle key down event.",
             "itemtype": "method",
             "name": "keydown",
@@ -7325,7 +7405,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 464,
+            "line": 478,
             "description": "Enable the tool.",
             "itemtype": "method",
             "name": "enable",
@@ -7342,7 +7422,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 494,
+            "line": 508,
             "description": "Set shape off properties.",
             "itemtype": "method",
             "name": "setShapeOff",
@@ -7359,7 +7439,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 510,
+            "line": 524,
             "description": "Get the real position from an event.",
             "class": "dwv.tool.Draw",
             "module": "tool",
@@ -7367,7 +7447,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 519,
+            "line": 533,
             "description": "Set shape on properties.",
             "itemtype": "method",
             "name": "setShapeOn",
@@ -7384,7 +7464,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 650,
+            "line": 664,
             "description": "Help for this tool.",
             "itemtype": "method",
             "name": "getHelp",
@@ -7398,7 +7478,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 672,
+            "line": 686,
             "description": "Set the line color of the drawing.",
             "itemtype": "method",
             "name": "setLineColour",
@@ -7415,7 +7495,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 683,
+            "line": 697,
             "description": "Set the shape name of the drawing.",
             "itemtype": "method",
             "name": "setShapeName",
@@ -7432,7 +7512,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 698,
+            "line": 712,
             "description": "Check if the shape is in the shape list.",
             "itemtype": "method",
             "name": "hasShape",
@@ -7449,7 +7529,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 707,
+            "line": 721,
             "description": "Initialise the tool.",
             "itemtype": "method",
             "name": "init",
@@ -7719,11 +7799,38 @@
         },
         {
             "file": "src/tools/ellipse.js",
-            "line": 9,
+            "line": 17,
+            "description": "Get the number of points needed to build the shape.",
+            "itemtype": "method",
+            "name": "getNPoints",
+            "return": {
+                "description": "The number of points.",
+                "type": "Number"
+            },
+            "class": "dwv.tool.EllipseFactory",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/ellipse.js",
+            "line": 23,
+            "description": "Get the timeout between point storage.",
+            "itemtype": "method",
+            "name": "getTimeout",
+            "return": {
+                "description": "The timeout in milliseconds.",
+                "type": "Number"
+            },
+            "class": "dwv.tool.EllipseFactory",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/ellipse.js",
+            "line": 31,
             "description": "Create an ellipse shape to be displayed.",
             "itemtype": "method",
-            "name": "EllipseCreator",
-            "static": 1,
+            "name": "create",
             "params": [
                 {
                     "name": "points",
@@ -7733,15 +7840,21 @@
                 {
                     "name": "style",
                     "description": "The drawing style.",
-                    "type": "Style"
+                    "type": "Object"
+                },
+                {
+                    "name": "image",
+                    "description": "The associated image.",
+                    "type": "Object"
                 }
             ],
-            "class": "dwv.tool.Filter",
-            "module": "tool"
+            "class": "dwv.tool.EllipseFactory",
+            "module": "tool",
+            "namespace": "dwv.tool"
         },
         {
             "file": "src/tools/ellipse.js",
-            "line": 49,
+            "line": 71,
             "description": "Update an ellipse shape.",
             "itemtype": "method",
             "name": "UpdateEllipse",
@@ -7758,8 +7871,9 @@
                     "type": "Object"
                 }
             ],
-            "class": "dwv.tool.Filter",
-            "module": "tool"
+            "class": "dwv.tool.EllipseFactory",
+            "module": "tool",
+            "namespace": "dwv.tool"
         },
         {
             "file": "src/tools/filter.js",
@@ -8155,11 +8269,38 @@
         },
         {
             "file": "src/tools/line.js",
-            "line": 9,
+            "line": 17,
+            "description": "Get the number of points needed to build the shape.",
+            "itemtype": "method",
+            "name": "getNPoints",
+            "return": {
+                "description": "The number of points.",
+                "type": "Number"
+            },
+            "class": "dwv.tool.LineFactory",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/line.js",
+            "line": 23,
+            "description": "Get the timeout between point storage.",
+            "itemtype": "method",
+            "name": "getTimeout",
+            "return": {
+                "description": "The timeout in milliseconds.",
+                "type": "Number"
+            },
+            "class": "dwv.tool.LineFactory",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/line.js",
+            "line": 31,
             "description": "Create a line shape to be displayed.",
             "itemtype": "method",
-            "name": "LineCreator",
-            "static": 1,
+            "name": "create",
             "params": [
                 {
                     "name": "points",
@@ -8169,15 +8310,21 @@
                 {
                     "name": "style",
                     "description": "The drawing style.",
-                    "type": "Style"
+                    "type": "Object"
+                },
+                {
+                    "name": "image",
+                    "description": "The associated image.",
+                    "type": "Object"
                 }
             ],
-            "class": "dwv.tool.Livewire",
-            "module": "tool"
+            "class": "dwv.tool.LineFactory",
+            "module": "tool",
+            "namespace": "dwv.tool"
         },
         {
             "file": "src/tools/line.js",
-            "line": 44,
+            "line": 66,
             "description": "Update a line shape.",
             "itemtype": "method",
             "name": "UpdateLine",
@@ -8192,10 +8339,16 @@
                     "name": "anchor",
                     "description": "The active anchor.",
                     "type": "Object"
+                },
+                {
+                    "name": "image",
+                    "description": "The associated image.",
+                    "type": "Object"
                 }
             ],
-            "class": "dwv.tool.Livewire",
-            "module": "tool"
+            "class": "dwv.tool.LineFactory",
+            "module": "tool",
+            "namespace": "dwv.tool"
         },
         {
             "file": "src/tools/livewire.js",
@@ -8569,11 +8722,38 @@
         },
         {
             "file": "src/tools/rectangle.js",
-            "line": 9,
+            "line": 17,
+            "description": "Get the number of points needed to build the shape.",
+            "itemtype": "method",
+            "name": "getNPoints",
+            "return": {
+                "description": "The number of points.",
+                "type": "Number"
+            },
+            "class": "dwv.tool.RectangleFactory",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/rectangle.js",
+            "line": 23,
+            "description": "Get the timeout between point storage.",
+            "itemtype": "method",
+            "name": "getTimeout",
+            "return": {
+                "description": "The timeout in milliseconds.",
+                "type": "Number"
+            },
+            "class": "dwv.tool.RectangleFactory",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/rectangle.js",
+            "line": 31,
             "description": "Create a rectangle shape to be displayed.",
             "itemtype": "method",
-            "name": "RectangleCreator",
-            "static": 1,
+            "name": "create",
             "params": [
                 {
                     "name": "points",
@@ -8583,15 +8763,21 @@
                 {
                     "name": "style",
                     "description": "The drawing style.",
-                    "type": "Style"
+                    "type": "Object"
+                },
+                {
+                    "name": "image",
+                    "description": "The associated image.",
+                    "type": "Object"
                 }
             ],
-            "class": "dwv.tool",
-            "module": "tool"
+            "class": "dwv.tool.RectangleFactory",
+            "module": "tool",
+            "namespace": "dwv.tool"
         },
         {
             "file": "src/tools/rectangle.js",
-            "line": 47,
+            "line": 69,
             "description": "Update a rectangle shape.",
             "itemtype": "method",
             "name": "UpdateRect",
@@ -8608,16 +8794,44 @@
                     "type": "Object"
                 }
             ],
-            "class": "dwv.tool",
-            "module": "tool"
+            "class": "dwv.tool.RectangleFactory",
+            "module": "tool",
+            "namespace": "dwv.tool"
         },
         {
             "file": "src/tools/roi.js",
-            "line": 9,
+            "line": 17,
+            "description": "Get the number of points needed to build the shape.",
+            "itemtype": "method",
+            "name": "getNPoints",
+            "return": {
+                "description": "The number of points.",
+                "type": "Number"
+            },
+            "class": "dwv.tool.RoiFactory",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/roi.js",
+            "line": 23,
+            "description": "Get the timeout between point storage.",
+            "itemtype": "method",
+            "name": "getTimeout",
+            "return": {
+                "description": "The timeout in milliseconds.",
+                "type": "Number"
+            },
+            "class": "dwv.tool.RoiFactory",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/roi.js",
+            "line": 31,
             "description": "Create a roi shape to be displayed.",
             "itemtype": "method",
             "name": "RoiCreator",
-            "static": 1,
             "params": [
                 {
                     "name": "points",
@@ -8627,15 +8841,21 @@
                 {
                     "name": "style",
                     "description": "The drawing style.",
-                    "type": "Style"
+                    "type": "Object"
+                },
+                {
+                    "name": "image",
+                    "description": "The associated image.",
+                    "type": "Object"
                 }
             ],
-            "class": "dwv.tool",
-            "module": "tool"
+            "class": "dwv.tool.RoiFactory",
+            "module": "tool",
+            "namespace": "dwv.tool"
         },
         {
             "file": "src/tools/roi.js",
-            "line": 69,
+            "line": 73,
             "description": "Update a roi shape.",
             "itemtype": "method",
             "name": "UpdateRoi",
@@ -8652,8 +8872,9 @@
                     "type": "Object"
                 }
             ],
-            "class": "dwv.tool",
-            "module": "tool"
+            "class": "dwv.tool.RoiFactory",
+            "module": "tool",
+            "namespace": "dwv.tool"
         },
         {
             "file": "src/tools/scroll.js",
@@ -10395,7 +10616,7 @@
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/tools/draw.js:650"
+            "line": " src/tools/draw.js:664"
         },
         {
             "message": "replacing incorrect tag: returns with return",
@@ -10447,7 +10668,7 @@
         },
         {
             "message": "Missing item type\nGet the real position from an event.",
-            "line": " src/tools/draw.js:510"
+            "line": " src/tools/draw.js:524"
         },
         {
             "message": "Missing item type\nApply a function on all anchors.",

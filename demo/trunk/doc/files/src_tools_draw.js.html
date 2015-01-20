@@ -74,11 +74,15 @@
                                 <li><a href="../classes/dwv.tool.DeleteShapeCommand.html">dwv.tool.DeleteShapeCommand</a></li>
                                 <li><a href="../classes/dwv.tool.Draw.html">dwv.tool.Draw</a></li>
                                 <li><a href="../classes/dwv.tool.DrawShapeCommand.html">dwv.tool.DrawShapeCommand</a></li>
+                                <li><a href="../classes/dwv.tool.EllipseFactory.html">dwv.tool.EllipseFactory</a></li>
                                 <li><a href="../classes/dwv.tool.Filter.html">dwv.tool.Filter</a></li>
                                 <li><a href="../classes/dwv.tool.filter.Sharpen.html">dwv.tool.filter.Sharpen</a></li>
                                 <li><a href="../classes/dwv.tool.filter.Threshold.html">dwv.tool.filter.Threshold</a></li>
+                                <li><a href="../classes/dwv.tool.LineFactory.html">dwv.tool.LineFactory</a></li>
                                 <li><a href="../classes/dwv.tool.Livewire.html">dwv.tool.Livewire</a></li>
                                 <li><a href="../classes/dwv.tool.MoveShapeCommand.html">dwv.tool.MoveShapeCommand</a></li>
+                                <li><a href="../classes/dwv.tool.RectangleFactory.html">dwv.tool.RectangleFactory</a></li>
+                                <li><a href="../classes/dwv.tool.RoiFactory.html">dwv.tool.RoiFactory</a></li>
                                 <li><a href="../classes/dwv.tool.RunFilterCommand.html">dwv.tool.RunFilterCommand</a></li>
                                 <li><a href="../classes/dwv.tool.Scroll.html">dwv.tool.Scroll</a></li>
                                 <li><a href="../classes/dwv.tool.ShapeEditor.html">dwv.tool.ShapeEditor</a></li>
@@ -491,7 +495,20 @@
                                 {
                                     // current point
                                     lastPoint = new dwv.math.Point2D(event._x, event._y);
+                                    // clear last added point from the list
+                                    if ( !justStarted ) {
+                                        points.pop();
+                                    }
+                                    // add current one to the list
                                     points.push( lastPoint );
+                                    // allow for anchor points
+                                    var factory = new dwv.tool.shapes[self.shapeName]();
+                                    if( points.length &lt; factory.getNPoints() ) {
+                                        clearTimeout(this.timer);
+                                        this.timer = setTimeout(function(){
+                                            points.push( lastPoint );
+                                        }, factory.getTimeout() );
+                                    }
                                     // remove previous draw if not just started
                                     if ( activeShape &amp;&amp; !justStarted ) {
                                         activeShape.destroy();
@@ -501,7 +518,7 @@
                                         justStarted = false;
                                     }
                                     // create shape
-                                    var tmp = new dwv.tool.shapes[self.shapeName](points, self.style, app.getImage());
+                                    var tmp = factory.create(points, self.style, app.getImage());
                                     activeShape = tmp.shape;
                                     activeText = tmp.text;
                                     // do not listen during creation
@@ -531,7 +548,8 @@
                                         activeText.destroy();
                                     }
                                     // create final shape
-                                    var tmp = new dwv.tool.shapes[self.shapeName](points, self.style, app.getImage());
+                                    var factory = new dwv.tool.shapes[self.shapeName]();
+                                    var tmp = factory.create(points, self.style, app.getImage());
                                     activeShape = tmp.shape;
                                     activeText = tmp.text;
                                     // re-activate layer
