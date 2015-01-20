@@ -64,10 +64,10 @@ $(document).ready( function()
 
     // Add shapes to the shape list for the draw tool
     dwv.tool.shapes = {};
-    dwv.tool.shapes.line = dwv.tool.LineCreator;
-    dwv.tool.shapes.rectangle = dwv.tool.RectangleCreator;
-    dwv.tool.shapes.roi = dwv.tool.RoiCreator;
-    dwv.tool.shapes.ellipse = dwv.tool.EllipseCreator;
+    dwv.tool.shapes.line = dwv.tool.LineFactory;
+    dwv.tool.shapes.rectangle = dwv.tool.RectangleFactory;
+    dwv.tool.shapes.roi = dwv.tool.RoiFactory;
+    dwv.tool.shapes.ellipse = dwv.tool.EllipseFactory;
 
     // append tool container HTML
     dwv.gui.appendToolboxHtml();

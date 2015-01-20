@@ -6,18 +6,40 @@ var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
 var Kinetic = Kinetic || {};
 
+/** 
+ * Ellipse factory.
+ * @class EllipseFactory
+ * @namespace dwv.tool
+ * @constructor
+ */
+dwv.tool.EllipseFactory = function ()
+{
+    /** 
+     * Get the number of points needed to build the shape.
+     * @method getNPoints
+     * @return {Number} The number of points.
+     */
+    this.getNPoints = function () { return 2; };
+    /** 
+     * Get the timeout between point storage.
+     * @method getTimeout
+     * @return {Number} The timeout in milliseconds.
+     */
+    this.getTimeout = function () { return 0; };
+};  
+
 /**
  * Create an ellipse shape to be displayed.
- * @method EllipseCreator
- * @static
+ * @method create
  * @param {Array} points The points from which to extract the ellipse.
- * @param {Style} style The drawing style.
+ * @param {Object} style The drawing style.
+ * @param {Object} image The associated image.
  */ 
-dwv.tool.EllipseCreator = function (points, style, image)
+dwv.tool.EllipseFactory.prototype.create = function (points, style, image)
 {
     // calculate radius
-    var a = Math.abs(points[0].getX() - points[points.length-1].getX());
-    var b = Math.abs(points[0].getY() - points[points.length-1].getY());
+    var a = Math.abs(points[0].getX() - points[1].getX());
+    var b = Math.abs(points[0].getY() - points[1].getY());
     // physical object
     var ellipse = new dwv.math.Ellipse(points[0], a, b);
     // shape

@@ -352,7 +352,20 @@ dwv.tool.Draw = function (app)
         {
             // current point
             lastPoint = new dwv.math.Point2D(event._x, event._y);
+            // clear last added point from the list
+            if ( !justStarted ) {
+                points.pop();
+            }
+            // add current one to the list
             points.push( lastPoint );
+            // allow for anchor points
+            var factory = new dwv.tool.shapes[self.shapeName]();
+            if( points.length < factory.getNPoints() ) {
+                clearTimeout(this.timer);
+                this.timer = setTimeout(function(){
+                    points.push( lastPoint );
+                }, factory.getTimeout() );
+            }
             // remove previous draw if not just started
             if ( activeShape && !justStarted ) {
                 activeShape.destroy();
@@ -362,7 +375,7 @@ dwv.tool.Draw = function (app)
                 justStarted = false;
             }
             // create shape
-            var tmp = new dwv.tool.shapes[self.shapeName](points, self.style, app.getImage());
+            var tmp = factory.create(points, self.style, app.getImage());
             activeShape = tmp.shape;
             activeText = tmp.text;
             // do not listen during creation
@@ -392,7 +405,8 @@ dwv.tool.Draw = function (app)
                 activeText.destroy();
             }
             // create final shape
-            var tmp = new dwv.tool.shapes[self.shapeName](points, self.style, app.getImage());
+            var factory = new dwv.tool.shapes[self.shapeName]();
+            var tmp = factory.create(points, self.style, app.getImage());
             activeShape = tmp.shape;
             activeText = tmp.text;
             // re-activate layer

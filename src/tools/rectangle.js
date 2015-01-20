@@ -6,17 +6,39 @@ var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
 var Kinetic = Kinetic || {};
 
+/** 
+ * Rectangle factory.
+ * @class RectangleFactory
+ * @namespace dwv.tool
+ * @constructor
+ */
+dwv.tool.RectangleFactory = function ()
+{
+    /** 
+     * Get the number of points needed to build the shape.
+     * @method getNPoints
+     * @return {Number} The number of points.
+     */
+    this.getNPoints = function () { return 2; };
+    /** 
+     * Get the timeout between point storage.
+     * @method getTimeout
+     * @return {Number} The timeout in milliseconds.
+     */
+    this.getTimeout = function () { return 0; };
+};  
+
 /**
  * Create a rectangle shape to be displayed.
- * @method RectangleCreator
- * @static
+ * @method create
  * @param {Array} points The points from which to extract the rectangle.
- * @param {Style} style The drawing style.
+ * @param {Object} style The drawing style.
+ * @param {Object} image The associated image.
  */ 
-dwv.tool.RectangleCreator = function (points, style, image)
+dwv.tool.RectangleFactory.prototype.create = function (points, style, image)
 {
     // physical shape
-    var rectangle = new dwv.math.Rectangle(points[0], points[points.length-1]);
+    var rectangle = new dwv.math.Rectangle(points[0], points[1]);
     // shape
     var krect = new Kinetic.Rect({
         x: rectangle.getBegin().getX(),
