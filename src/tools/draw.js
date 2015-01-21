@@ -553,7 +553,15 @@ dwv.tool.Draw = function (app)
         // command name based on shape type
         var cmdName = "shape";
         if ( shape instanceof Kinetic.Line ) {
-            cmdName = "line";
+            if ( shape.points.length == 2 ) {
+                cmdName = "line";
+            }
+            else if ( shape.points.length == 3 ) {
+                cmdName = "protractor";
+            }
+            else {
+                cmdName = "roi";
+            }
         }
         else if ( shape instanceof Kinetic.Rect ) {
             cmdName = "rectangle";

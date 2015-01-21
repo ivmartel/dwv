@@ -254,7 +254,29 @@ dwv.math.Line = function(begin, end)
             parseInt( (begin.getX()+end.getX()) / 2, 10 ), 
             parseInt( (begin.getY()+end.getY()) / 2, 10 ) );
     };
+    /**
+     * Get the slope of the line.
+     * @method getSlope
+     * @return {Number} The slope of the line.
+     */
+    this.getSlope = function()
+    { 
+        return (end.getY() - begin.getY()) / (end.getX() - begin.getX());
+    };
 }; // Line class
+
+/**
+ * Get the angle between two lines.
+ * @param line0 The first line.
+ * @param line1 The second line.
+ */
+dwv.math.getAngle = function (line0, line1)
+{
+    var s0 = line0.getSlope();
+    var s1 = line1.getSlope();
+    var angle = Math.atan( Math.abs( (s0 - s1) / (1 + s0*s1) ) ) * 180 / Math.PI;
+    return angle;
+};
 
 /**
  * Rectangle shape.

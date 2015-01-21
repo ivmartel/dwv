@@ -179,15 +179,24 @@ dwv.tool.ShapeEditor = function ()
         // add shape specific anchors to the shape group
         if ( shape instanceof Kinetic.Line ) {
             var points = shape.points();
-            if ( points.length === 4 ) {
-                updateFunction = dwv.tool.UpdateLine;
+            if ( points.length === 4 || points.length === 6) {
                 // add shape offset
-                var lineBeginX = points[0] + shape.x();
-                var lineBeginY = points[1] + shape.y();
-                var lineEndX = points[2] + shape.x();
-                var lineEndY = points[3] + shape.y();
-                addAnchor(group, lineBeginX, lineBeginY, 'begin');
-                addAnchor(group, lineEndX, lineEndY, 'end');
+                var p0x = points[0] + shape.x();
+                var p0y = points[1] + shape.y();
+                var p1x = points[2] + shape.x();
+                var p1y = points[3] + shape.y();
+                addAnchor(group, p0x, p0y, 'begin');
+                if ( points.length === 4 ) {
+                    updateFunction = dwv.tool.UpdateLine;
+                    addAnchor(group, p1x, p1y, 'end');
+                }
+                else {
+                    updateFunction = dwv.tool.UpdateProtractor;
+                    addAnchor(group, p1x, p1y, 'mid');
+                    var p2x = points[4] + shape.x();
+                    var p2y = points[5] + shape.y();
+                    addAnchor(group, p2x, p2y, 'end');
+                }
             }
             else {
                 updateFunction = dwv.tool.UpdateRoi;
@@ -294,7 +303,15 @@ dwv.tool.ShapeEditor = function ()
         // command name based on shape type
         var cmdName = "shape";
         if ( shape instanceof Kinetic.Line ) {
-            cmdName = "line";
+            if ( shape.points.length == 2 ) {
+                cmdName = "line";
+            }
+            else if ( shape.points.length == 3 ) {
+                cmdName = "protractor";
+            }
+            else {
+                cmdName = "roi";
+            }
         }
         else if ( shape instanceof Kinetic.Rect ) {
             cmdName = "rectangle";
