@@ -81,6 +81,7 @@
                                 <li><a href="../classes/dwv.tool.LineFactory.html">dwv.tool.LineFactory</a></li>
                                 <li><a href="../classes/dwv.tool.Livewire.html">dwv.tool.Livewire</a></li>
                                 <li><a href="../classes/dwv.tool.MoveShapeCommand.html">dwv.tool.MoveShapeCommand</a></li>
+                                <li><a href="../classes/dwv.tool.ProtractorFactory.html">dwv.tool.ProtractorFactory</a></li>
                                 <li><a href="../classes/dwv.tool.RectangleFactory.html">dwv.tool.RectangleFactory</a></li>
                                 <li><a href="../classes/dwv.tool.RoiFactory.html">dwv.tool.RoiFactory</a></li>
                                 <li><a href="../classes/dwv.tool.RunFilterCommand.html">dwv.tool.RunFilterCommand</a></li>
@@ -322,15 +323,24 @@
                                 // add shape specific anchors to the shape group
                                 if ( shape instanceof Kinetic.Line ) {
                                     var points = shape.points();
-                                    if ( points.length === 4 ) {
-                                        updateFunction = dwv.tool.UpdateLine;
+                                    if ( points.length === 4 || points.length === 6) {
                                         // add shape offset
-                                        var lineBeginX = points[0] + shape.x();
-                                        var lineBeginY = points[1] + shape.y();
-                                        var lineEndX = points[2] + shape.x();
-                                        var lineEndY = points[3] + shape.y();
-                                        addAnchor(group, lineBeginX, lineBeginY, &#x27;begin&#x27;);
-                                        addAnchor(group, lineEndX, lineEndY, &#x27;end&#x27;);
+                                        var p0x = points[0] + shape.x();
+                                        var p0y = points[1] + shape.y();
+                                        var p1x = points[2] + shape.x();
+                                        var p1y = points[3] + shape.y();
+                                        addAnchor(group, p0x, p0y, &#x27;begin&#x27;);
+                                        if ( points.length === 4 ) {
+                                            updateFunction = dwv.tool.UpdateLine;
+                                            addAnchor(group, p1x, p1y, &#x27;end&#x27;);
+                                        }
+                                        else {
+                                            updateFunction = dwv.tool.UpdateProtractor;
+                                            addAnchor(group, p1x, p1y, &#x27;mid&#x27;);
+                                            var p2x = points[4] + shape.x();
+                                            var p2y = points[5] + shape.y();
+                                            addAnchor(group, p2x, p2y, &#x27;end&#x27;);
+                                        }
                                     }
                                     else {
                                         updateFunction = dwv.tool.UpdateRoi;
@@ -437,7 +447,15 @@
                                 // command name based on shape type
                                 var cmdName = &quot;shape&quot;;
                                 if ( shape instanceof Kinetic.Line ) {
-                                    cmdName = &quot;line&quot;;
+                                    if ( shape.points.length == 2 ) {
+                                        cmdName = &quot;line&quot;;
+                                    }
+                                    else if ( shape.points.length == 3 ) {
+                                        cmdName = &quot;protractor&quot;;
+                                    }
+                                    else {
+                                        cmdName = &quot;roi&quot;;
+                                    }
                                 }
                                 else if ( shape instanceof Kinetic.Rect ) {
                                     cmdName = &quot;rectangle&quot;;

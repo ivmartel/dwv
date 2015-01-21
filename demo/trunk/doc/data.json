@@ -369,6 +369,17 @@
                 "dwv.tool": 1
             }
         },
+        "src/tools/protractor.js": {
+            "name": "src/tools/protractor.js",
+            "modules": {},
+            "classes": {
+                "dwv.tool.ProtractorFactory": 1
+            },
+            "fors": {},
+            "namespaces": {
+                "dwv.tool": 1
+            }
+        },
         "src/tools/rectangle.js": {
             "name": "src/tools/rectangle.js",
             "modules": {},
@@ -605,7 +616,7 @@
             },
             "tag": "module",
             "file": "src/math/shapes.js",
-            "line": 385,
+            "line": 407,
             "description": "Math module."
         },
         "tool": {
@@ -625,6 +636,7 @@
                 "dwv.tool.RunFilterCommand": 1,
                 "dwv.tool.LineFactory": 1,
                 "dwv.tool.Livewire": 1,
+                "dwv.tool.ProtractorFactory": 1,
                 "dwv.tool.RectangleFactory": 1,
                 "dwv.tool.RoiFactory": 1,
                 "dwv.tool": 1,
@@ -1256,7 +1268,7 @@
             "module": "math",
             "namespace": "dwv.math",
             "file": "src/math/shapes.js",
-            "line": 259,
+            "line": 281,
             "description": "Rectangle shape.",
             "is_constructor": 1,
             "params": [
@@ -1283,7 +1295,7 @@
             "module": "math",
             "namespace": "dwv.math",
             "file": "src/math/shapes.js",
-            "line": 341,
+            "line": 363,
             "description": "Region Of Interest shape.",
             "is_constructor": 1
         },
@@ -1298,7 +1310,7 @@
             "module": "math",
             "namespace": "dwv.math",
             "file": "src/math/shapes.js",
-            "line": 385,
+            "line": 407,
             "description": "Path shape.",
             "is_constructor": 1,
             "params": [
@@ -1570,6 +1582,21 @@
                     "type": "Object"
                 }
             ]
+        },
+        "dwv.tool.ProtractorFactory": {
+            "name": "dwv.tool.ProtractorFactory",
+            "shortname": "dwv.tool.ProtractorFactory",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "tool",
+            "namespace": "dwv.tool",
+            "file": "src/tools/protractor.js",
+            "line": 9,
+            "description": "Protractor factory.",
+            "is_constructor": 1
         },
         "dwv.tool.RectangleFactory": {
             "name": "dwv.tool.RectangleFactory",
@@ -6592,7 +6619,39 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 280,
+            "line": 257,
+            "description": "Get the slope of the line.",
+            "itemtype": "method",
+            "name": "getSlope",
+            "return": {
+                "description": "The slope of the line.",
+                "type": "Number"
+            },
+            "class": "dwv.math.Line",
+            "module": "math",
+            "namespace": "dwv.math"
+        },
+        {
+            "file": "src/math/shapes.js",
+            "line": 268,
+            "description": "Get the angle between two lines.",
+            "params": [
+                {
+                    "name": "line0",
+                    "description": "The first line."
+                },
+                {
+                    "name": "line1",
+                    "description": "The second line."
+                }
+            ],
+            "class": "dwv.math.Line",
+            "module": "math",
+            "namespace": "dwv.math"
+        },
+        {
+            "file": "src/math/shapes.js",
+            "line": 302,
             "description": "Rectangle surface.",
             "itemtype": "property",
             "name": "surface",
@@ -6605,7 +6664,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 288,
+            "line": 310,
             "description": "Get the begin point of the rectangle.",
             "itemtype": "method",
             "name": "getBegin",
@@ -6619,7 +6678,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 294,
+            "line": 316,
             "description": "Get the end point of the rectangle.",
             "itemtype": "method",
             "name": "getEnd",
@@ -6633,7 +6692,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 300,
+            "line": 322,
             "description": "Get the real width of the rectangle.",
             "itemtype": "method",
             "name": "getRealWidth",
@@ -6647,7 +6706,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 306,
+            "line": 328,
             "description": "Get the real height of the rectangle.",
             "itemtype": "method",
             "name": "getRealHeight",
@@ -6661,7 +6720,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 312,
+            "line": 334,
             "description": "Get the width of the rectangle.",
             "itemtype": "method",
             "name": "getWidth",
@@ -6675,7 +6734,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 318,
+            "line": 340,
             "description": "Get the height of the rectangle.",
             "itemtype": "method",
             "name": "getHeight",
@@ -6689,7 +6748,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 324,
+            "line": 346,
             "description": "Get the surface of the rectangle.",
             "itemtype": "method",
             "name": "getSurface",
@@ -6703,7 +6762,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 330,
+            "line": 352,
             "description": "Get the surface of the rectangle with a spacing.",
             "itemtype": "method",
             "name": "getWorldSurface",
@@ -6717,7 +6776,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 350,
+            "line": 372,
             "description": "List of points.",
             "itemtype": "property",
             "name": "points",
@@ -6730,7 +6789,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 358,
+            "line": 380,
             "description": "Get a point of the list at a given index.",
             "itemtype": "method",
             "name": "getPoint",
@@ -6751,7 +6810,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 365,
+            "line": 387,
             "description": "Get the length of the point list.",
             "itemtype": "method",
             "name": "getLength",
@@ -6765,7 +6824,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 371,
+            "line": 393,
             "description": "Add a point to the ROI.",
             "itemtype": "method",
             "name": "addPoint",
@@ -6782,7 +6841,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 377,
+            "line": 399,
             "description": "Add points to the ROI.",
             "itemtype": "method",
             "name": "addPoints",
@@ -6799,7 +6858,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 397,
+            "line": 419,
             "description": "List of points.",
             "itemtype": "property",
             "name": "pointArray",
@@ -6810,7 +6869,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 403,
+            "line": 425,
             "description": "List of control points.",
             "itemtype": "property",
             "name": "controlPointIndexArray",
@@ -6821,7 +6880,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 412,
+            "line": 434,
             "description": "Get a point of the list.",
             "itemtype": "method",
             "name": "getPoint",
@@ -6842,7 +6901,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 422,
+            "line": 444,
             "description": "Is the given point a control point.",
             "itemtype": "method",
             "name": "isControlPoint",
@@ -6863,7 +6922,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 438,
+            "line": 460,
             "description": "Get the length of the path.",
             "itemtype": "method",
             "name": "getLength",
@@ -6877,7 +6936,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 447,
+            "line": 469,
             "description": "Add a point to the path.",
             "itemtype": "method",
             "name": "addPoint",
@@ -6894,7 +6953,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 456,
+            "line": 478,
             "description": "Add a control point to the path.",
             "itemtype": "method",
             "name": "addControlPoint",
@@ -6911,7 +6970,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 471,
+            "line": 493,
             "description": "Add points to the path.",
             "itemtype": "method",
             "name": "addPoints",
@@ -6928,7 +6987,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 480,
+            "line": 502,
             "description": "Append a Path to this one.",
             "itemtype": "method",
             "name": "appenPath",
@@ -7464,7 +7523,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 664,
+            "line": 672,
             "description": "Help for this tool.",
             "itemtype": "method",
             "name": "getHelp",
@@ -7478,7 +7537,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 686,
+            "line": 694,
             "description": "Set the line color of the drawing.",
             "itemtype": "method",
             "name": "setLineColour",
@@ -7495,7 +7554,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 697,
+            "line": 705,
             "description": "Set the shape name of the drawing.",
             "itemtype": "method",
             "name": "setShapeName",
@@ -7512,7 +7571,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 712,
+            "line": 720,
             "description": "Check if the shape is in the shape list.",
             "itemtype": "method",
             "name": "hasShape",
@@ -7529,7 +7588,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 721,
+            "line": 729,
             "description": "Initialise the tool.",
             "itemtype": "method",
             "name": "init",
@@ -7722,7 +7781,7 @@
         },
         {
             "file": "src/tools/editor.js",
-            "line": 228,
+            "line": 237,
             "description": "Create shape editor controls, i.e. the anchors.",
             "itemtype": "method",
             "name": "addAnchor",
@@ -7754,7 +7813,7 @@
         },
         {
             "file": "src/tools/editor.js",
-            "line": 260,
+            "line": 269,
             "description": "Get a simple clone of the input anchor.",
             "params": [
                 {
@@ -7769,7 +7828,7 @@
         },
         {
             "file": "src/tools/editor.js",
-            "line": 287,
+            "line": 296,
             "description": "Set the anchor on listeners.",
             "params": [
                 {
@@ -7784,7 +7843,7 @@
         },
         {
             "file": "src/tools/editor.js",
-            "line": 361,
+            "line": 378,
             "description": "Set the anchor off listeners.",
             "params": [
                 {
@@ -8717,6 +8776,90 @@
                 }
             ],
             "class": "dwv.tool.Livewire",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/protractor.js",
+            "line": 17,
+            "description": "Get the number of points needed to build the shape.",
+            "itemtype": "method",
+            "name": "getNPoints",
+            "return": {
+                "description": "The number of points.",
+                "type": "Number"
+            },
+            "class": "dwv.tool.ProtractorFactory",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/protractor.js",
+            "line": 23,
+            "description": "Get the timeout between point storage.",
+            "itemtype": "method",
+            "name": "getTimeout",
+            "return": {
+                "description": "The timeout in milliseconds.",
+                "type": "Number"
+            },
+            "class": "dwv.tool.ProtractorFactory",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/protractor.js",
+            "line": 31,
+            "description": "Create a protractor shape to be displayed.",
+            "itemtype": "method",
+            "name": "ProtractorCreator",
+            "static": 1,
+            "params": [
+                {
+                    "name": "points",
+                    "description": "The points from which to extract the protractor.",
+                    "type": "Array"
+                },
+                {
+                    "name": "style",
+                    "description": "The drawing style.",
+                    "type": "Object"
+                },
+                {
+                    "name": "image",
+                    "description": "The associated image.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.tool.ProtractorFactory",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/protractor.js",
+            "line": 89,
+            "description": "Update a protractor shape.",
+            "itemtype": "method",
+            "name": "UpdateProtractor",
+            "static": 1,
+            "params": [
+                {
+                    "name": "kline",
+                    "description": "The protractor shape to update.",
+                    "type": "Object"
+                },
+                {
+                    "name": "anchor",
+                    "description": "The active anchor.",
+                    "type": "Object"
+                },
+                {
+                    "name": "image",
+                    "description": "The associated image.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.tool.ProtractorFactory",
             "module": "tool",
             "namespace": "dwv.tool"
         },
@@ -10616,7 +10759,7 @@
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/tools/draw.js:664"
+            "line": " src/tools/draw.js:672"
         },
         {
             "message": "replacing incorrect tag: returns with return",
@@ -10667,6 +10810,10 @@
             "line": " src/math/scissors.js:108"
         },
         {
+            "message": "Missing item type\nGet the angle between two lines.",
+            "line": " src/math/shapes.js:268"
+        },
+        {
             "message": "Missing item type\nGet the real position from an event.",
             "line": " src/tools/draw.js:524"
         },
@@ -10676,15 +10823,15 @@
         },
         {
             "message": "Missing item type\nGet a simple clone of the input anchor.",
-            "line": " src/tools/editor.js:260"
+            "line": " src/tools/editor.js:269"
         },
         {
             "message": "Missing item type\nSet the anchor on listeners.",
-            "line": " src/tools/editor.js:287"
+            "line": " src/tools/editor.js:296"
         },
         {
             "message": "Missing item type\nSet the anchor off listeners.",
-            "line": " src/tools/editor.js:361"
+            "line": " src/tools/editor.js:378"
         },
         {
             "message": "Missing item type\nInit the Window/Level display",

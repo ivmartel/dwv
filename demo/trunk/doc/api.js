@@ -42,6 +42,7 @@ YUI.add("yuidoc-meta", function(Y) {
         "dwv.tool.LineFactory",
         "dwv.tool.Livewire",
         "dwv.tool.MoveShapeCommand",
+        "dwv.tool.ProtractorFactory",
         "dwv.tool.RectangleFactory",
         "dwv.tool.RoiFactory",
         "dwv.tool.RunFilterCommand",

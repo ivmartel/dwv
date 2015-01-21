@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>info - dwv</title>
+    <title>src/tools/protractor.js - dwv</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
     <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
@@ -138,38 +138,164 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-                        <h1>info Module</h1>
-                        <div class="box clearfix meta">
+                        <h1 class="file-heading">File: src/tools/protractor.js</h1>
                         
+                        <div class="file">
+                            <pre class="code prettyprint linenums">
+                        /** 
+                         * Tool module.
+                         * @module tool
+                         */
+                        var dwv = dwv || {};
+                        dwv.tool = dwv.tool || {};
+                        var Kinetic = Kinetic || {};
                         
-                                <div class="foundat">
-                                    Defined in: <a href="../files/src_tools_info.js.html#l6"><code>src&#x2F;tools&#x2F;info.js:6</code></a>
-                                </div>
+                        /** 
+                         * Protractor factory.
+                         * @class ProtractorFactory
+                         * @namespace dwv.tool
+                         * @constructor
+                         */
+                        dwv.tool.ProtractorFactory = function ()
+                        {
+                            /** 
+                             * Get the number of points needed to build the shape.
+                             * @method getNPoints
+                             * @return {Number} The number of points.
+                             */
+                            this.getNPoints = function () { return 3; };
+                            /** 
+                             * Get the timeout between point storage.
+                             * @method getTimeout
+                             * @return {Number} The timeout in milliseconds.
+                             */
+                            this.getTimeout = function () { return 500; };
+                        };  
                         
-                        </div>
+                        /**
+                         * Create a protractor shape to be displayed.
+                         * @method ProtractorCreator
+                         * @static
+                         * @param {Array} points The points from which to extract the protractor.
+                         * @param {Object} style The drawing style.
+                         * @param {Object} image The associated image.
+                         */ 
+                        dwv.tool.ProtractorFactory.prototype.create = function (points, style/*, image*/)
+                        {
+                            // physical shape
+                            var line0 = new dwv.math.Line(points[0], points[1]);
+                            // points stored the kineticjs way
+                            var pointsArray = [];
+                            for( var i = 0; i &lt; points.length; ++i )
+                            {
+                                pointsArray.push( points[i].getX() );
+                                pointsArray.push( points[i].getY() );
+                            }
+                            // shape
+                            var kline = new Kinetic.Line({
+                                points: pointsArray,
+                                stroke: style.getLineColor(),
+                                strokeWidth: 2,
+                                name: &quot;shape&quot;
+                            });
+                            
+                            var ktext;
+                            if ( points.length == 3 ) {
+                                var line1 = new dwv.math.Line(points[1], points[2]);
+                                // quantification
+                                var quant = dwv.math.getAngle(line0, line1);
+                                var str = quant.toPrecision(4) + &quot; deg&quot;;
+                                ktext = new Kinetic.Text({
+                                    x: line0.getEnd().getX(),
+                                    y: line0.getEnd().getY() - 15,
+                                    text: str,
+                                    fontSize: style.getFontSize(),
+                                    fontFamily: &quot;Verdana&quot;,
+                                    fill: style.getLineColor(),
+                                    name: &quot;text&quot;
+                                });
+                            }
+                            else {
+                                ktext = new Kinetic.Text({
+                                    x: 0,
+                                    y: 0,
+                                    text: &quot;&quot;,
+                                    fontSize: style.getFontSize(),
+                                    fontFamily: &quot;Verdana&quot;,
+                                    fill: style.getLineColor(),
+                                    name: &quot;text&quot;
+                                });
+                            }
+                            // return shape
+                            return {&quot;shape&quot;: kline, &quot;text&quot;: ktext};
+                        };
                         
+                        /**
+                         * Update a protractor shape.
+                         * @method UpdateProtractor
+                         * @static
+                         * @param {Object} kline The protractor shape to update.
+                         * @param {Object} anchor The active anchor.
+                         * @param {Object} image The associated image.
+                         */ 
+                        dwv.tool.UpdateProtractor = function (kline, anchor/*, image*/)
+                        {
+                            // parent group
+                            var group = anchor.getParent();
+                            // find special points
+                            var begin = group.getChildren( function (node){
+                                return node.id() === &#x27;begin&#x27;;
+                            })[0];
+                            var mid = group.getChildren( function (node){
+                                return node.id() === &#x27;mid&#x27;;
+                            })[0];
+                            var end = group.getChildren( function (node){
+                                return node.id() === &#x27;end&#x27;;
+                            })[0];
+                            // update special points
+                            switch ( anchor.id() ) {
+                            case &#x27;begin&#x27;:
+                                begin.x( anchor.x() );
+                                begin.y( anchor.y() );
+                                break;
+                            case &#x27;mid&#x27;:
+                                mid.x( anchor.x() );
+                                mid.y( anchor.y() );
+                                break;
+                            case &#x27;end&#x27;:
+                                end.x( anchor.x() );
+                                end.y( anchor.y() );
+                                break;
+                            }
+                            // update shape and compensate for possible drag
+                            // note: shape.position() and shape.size() won&#x27;t work...
+                            var bx = begin.x() - kline.x();
+                            var by = begin.y() - kline.y();
+                            var mx = mid.x() - kline.x();
+                            var my = mid.y() - kline.y();
+                            var ex = end.x() - kline.x();
+                            var ey = end.y() - kline.y();
+                            kline.points( [bx,by,mx,my,ex,ey] );
+                            // update text
+                            var ktext = group.getChildren(function(node){
+                                return node.name() === &#x27;text&#x27;;
+                            })[0];
+                            if ( ktext ) {
+                                // update quantification
+                                var p2d0 = new dwv.math.Point2D(begin.x(), begin.y());
+                                var p2d1 = new dwv.math.Point2D(mid.x(), mid.y());
+                                var p2d2 = new dwv.math.Point2D(end.x(), end.y());
+                                var line0 = new dwv.math.Line(p2d0, p2d1);
+                                var line1 = new dwv.math.Line(p2d1, p2d2);
+                                var quant = dwv.math.getAngle( line0, line1 );
+                                var str = quant.toPrecision(4) + &quot; deg&quot;;
+                                var textPos = { &#x27;x&#x27;: line0.getEnd().getX(), &#x27;y&#x27;: line0.getEnd().getY() - 15 };
+                                ktext.position( textPos );
+                                ktext.text(str);
+                            }
+                        };
                         
-                        <div class="box intro">
-                            <p>Info module.</p>
-                        
-                        </div>
-                        
-                        
-                        <div class="yui3-g">
-                            <div class="yui3-u-1-2">
-                                    <p>This module provides the following classes:</p>
-                        
-                                    <ul class="module-classes">
-                                        <li class="module-class">
-                                            <a href="../classes/dwv.info.html">
-                                                dwv.info
-                                            </a>
-                                        </li>
-                                    </ul>
-                            </div>
-                        
-                            <div class="yui3-u-1-2">
-                            </div>
+                            </pre>
                         </div>
                     </div>
                 </div>

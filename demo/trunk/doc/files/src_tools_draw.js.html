@@ -81,6 +81,7 @@
                                 <li><a href="../classes/dwv.tool.LineFactory.html">dwv.tool.LineFactory</a></li>
                                 <li><a href="../classes/dwv.tool.Livewire.html">dwv.tool.Livewire</a></li>
                                 <li><a href="../classes/dwv.tool.MoveShapeCommand.html">dwv.tool.MoveShapeCommand</a></li>
+                                <li><a href="../classes/dwv.tool.ProtractorFactory.html">dwv.tool.ProtractorFactory</a></li>
                                 <li><a href="../classes/dwv.tool.RectangleFactory.html">dwv.tool.RectangleFactory</a></li>
                                 <li><a href="../classes/dwv.tool.RoiFactory.html">dwv.tool.RoiFactory</a></li>
                                 <li><a href="../classes/dwv.tool.RunFilterCommand.html">dwv.tool.RunFilterCommand</a></li>
@@ -696,7 +697,15 @@
                                 // command name based on shape type
                                 var cmdName = &quot;shape&quot;;
                                 if ( shape instanceof Kinetic.Line ) {
-                                    cmdName = &quot;line&quot;;
+                                    if ( shape.points.length == 2 ) {
+                                        cmdName = &quot;line&quot;;
+                                    }
+                                    else if ( shape.points.length == 3 ) {
+                                        cmdName = &quot;protractor&quot;;
+                                    }
+                                    else {
+                                        cmdName = &quot;roi&quot;;
+                                    }
                                 }
                                 else if ( shape instanceof Kinetic.Rect ) {
                                     cmdName = &quot;rectangle&quot;;

@@ -8943,7 +8943,29 @@ dwv.math.Line = function(begin, end)
             parseInt( (begin.getX()+end.getX()) / 2, 10 ), 
             parseInt( (begin.getY()+end.getY()) / 2, 10 ) );
     };
+    /**
+     * Get the slope of the line.
+     * @method getSlope
+     * @return {Number} The slope of the line.
+     */
+    this.getSlope = function()
+    { 
+        return (end.getY() - begin.getY()) / (end.getX() - begin.getX());
+    };
 }; // Line class
+
+/**
+ * Get the angle between two lines.
+ * @param line0 The first line.
+ * @param line1 The second line.
+ */
+dwv.math.getAngle = function (line0, line1)
+{
+    var s0 = line0.getSlope();
+    var s1 = line1.getSlope();
+    var angle = Math.atan( Math.abs( (s0 - s1) / (1 + s0*s1) ) ) * 180 / Math.PI;
+    return angle;
+};
 
 /**
  * Rectangle shape.
@@ -9779,7 +9801,15 @@ dwv.tool.Draw = function (app)
         // command name based on shape type
         var cmdName = "shape";
         if ( shape instanceof Kinetic.Line ) {
-            cmdName = "line";
+            if ( shape.points.length == 2 ) {
+                cmdName = "line";
+            }
+            else if ( shape.points.length == 3 ) {
+                cmdName = "protractor";
+            }
+            else {
+                cmdName = "roi";
+            }
         }
         else if ( shape instanceof Kinetic.Rect ) {
             cmdName = "rectangle";
@@ -10142,15 +10172,24 @@ dwv.tool.ShapeEditor = function ()
         // add shape specific anchors to the shape group
         if ( shape instanceof Kinetic.Line ) {
             var points = shape.points();
-            if ( points.length === 4 ) {
-                updateFunction = dwv.tool.UpdateLine;
+            if ( points.length === 4 || points.length === 6) {
                 // add shape offset
-                var lineBeginX = points[0] + shape.x();
-                var lineBeginY = points[1] + shape.y();
-                var lineEndX = points[2] + shape.x();
-                var lineEndY = points[3] + shape.y();
-                addAnchor(group, lineBeginX, lineBeginY, 'begin');
-                addAnchor(group, lineEndX, lineEndY, 'end');
+                var p0x = points[0] + shape.x();
+                var p0y = points[1] + shape.y();
+                var p1x = points[2] + shape.x();
+                var p1y = points[3] + shape.y();
+                addAnchor(group, p0x, p0y, 'begin');
+                if ( points.length === 4 ) {
+                    updateFunction = dwv.tool.UpdateLine;
+                    addAnchor(group, p1x, p1y, 'end');
+                }
+                else {
+                    updateFunction = dwv.tool.UpdateProtractor;
+                    addAnchor(group, p1x, p1y, 'mid');
+                    var p2x = points[4] + shape.x();
+                    var p2y = points[5] + shape.y();
+                    addAnchor(group, p2x, p2y, 'end');
+                }
             }
             else {
                 updateFunction = dwv.tool.UpdateRoi;
@@ -10257,7 +10296,15 @@ dwv.tool.ShapeEditor = function ()
         // command name based on shape type
         var cmdName = "shape";
         if ( shape instanceof Kinetic.Line ) {
-            cmdName = "line";
+            if ( shape.points.length == 2 ) {
+                cmdName = "line";
+            }
+            else if ( shape.points.length == 3 ) {
+                cmdName = "protractor";
+            }
+            else {
+                cmdName = "roi";
+            }
         }
         else if ( shape instanceof Kinetic.Rect ) {
             cmdName = "rectangle";
@@ -11470,6 +11517,158 @@ dwv.tool.Livewire.prototype.setLineColour = function(colour)
 {
     // set style var
     this.style.setLineColor(colour);
+};
+;/** 
+ * Tool module.
+ * @module tool
+ */
+var dwv = dwv || {};
+dwv.tool = dwv.tool || {};
+var Kinetic = Kinetic || {};
+
+/** 
+ * Protractor factory.
+ * @class ProtractorFactory
+ * @namespace dwv.tool
+ * @constructor
+ */
+dwv.tool.ProtractorFactory = function ()
+{
+    /** 
+     * Get the number of points needed to build the shape.
+     * @method getNPoints
+     * @return {Number} The number of points.
+     */
+    this.getNPoints = function () { return 3; };
+    /** 
+     * Get the timeout between point storage.
+     * @method getTimeout
+     * @return {Number} The timeout in milliseconds.
+     */
+    this.getTimeout = function () { return 500; };
+};  
+
+/**
+ * Create a protractor shape to be displayed.
+ * @method ProtractorCreator
+ * @static
+ * @param {Array} points The points from which to extract the protractor.
+ * @param {Object} style The drawing style.
+ * @param {Object} image The associated image.
+ */ 
+dwv.tool.ProtractorFactory.prototype.create = function (points, style/*, image*/)
+{
+    // physical shape
+    var line0 = new dwv.math.Line(points[0], points[1]);
+    // points stored the kineticjs way
+    var pointsArray = [];
+    for( var i = 0; i < points.length; ++i )
+    {
+        pointsArray.push( points[i].getX() );
+        pointsArray.push( points[i].getY() );
+    }
+    // shape
+    var kline = new Kinetic.Line({
+        points: pointsArray,
+        stroke: style.getLineColor(),
+        strokeWidth: 2,
+        name: "shape"
+    });
+    
+    var ktext;
+    if ( points.length == 3 ) {
+        var line1 = new dwv.math.Line(points[1], points[2]);
+        // quantification
+        var quant = dwv.math.getAngle(line0, line1);
+        var str = quant.toPrecision(4) + " deg";
+        ktext = new Kinetic.Text({
+            x: line0.getEnd().getX(),
+            y: line0.getEnd().getY() - 15,
+            text: str,
+            fontSize: style.getFontSize(),
+            fontFamily: "Verdana",
+            fill: style.getLineColor(),
+            name: "text"
+        });
+    }
+    else {
+        ktext = new Kinetic.Text({
+            x: 0,
+            y: 0,
+            text: "",
+            fontSize: style.getFontSize(),
+            fontFamily: "Verdana",
+            fill: style.getLineColor(),
+            name: "text"
+        });
+    }
+    // return shape
+    return {"shape": kline, "text": ktext};
+};
+
+/**
+ * Update a protractor shape.
+ * @method UpdateProtractor
+ * @static
+ * @param {Object} kline The protractor shape to update.
+ * @param {Object} anchor The active anchor.
+ * @param {Object} image The associated image.
+ */ 
+dwv.tool.UpdateProtractor = function (kline, anchor/*, image*/)
+{
+    // parent group
+    var group = anchor.getParent();
+    // find special points
+    var begin = group.getChildren( function (node){
+        return node.id() === 'begin';
+    })[0];
+    var mid = group.getChildren( function (node){
+        return node.id() === 'mid';
+    })[0];
+    var end = group.getChildren( function (node){
+        return node.id() === 'end';
+    })[0];
+    // update special points
+    switch ( anchor.id() ) {
+    case 'begin':
+        begin.x( anchor.x() );
+        begin.y( anchor.y() );
+        break;
+    case 'mid':
+        mid.x( anchor.x() );
+        mid.y( anchor.y() );
+        break;
+    case 'end':
+        end.x( anchor.x() );
+        end.y( anchor.y() );
+        break;
+    }
+    // update shape and compensate for possible drag
+    // note: shape.position() and shape.size() won't work...
+    var bx = begin.x() - kline.x();
+    var by = begin.y() - kline.y();
+    var mx = mid.x() - kline.x();
+    var my = mid.y() - kline.y();
+    var ex = end.x() - kline.x();
+    var ey = end.y() - kline.y();
+    kline.points( [bx,by,mx,my,ex,ey] );
+    // update text
+    var ktext = group.getChildren(function(node){
+        return node.name() === 'text';
+    })[0];
+    if ( ktext ) {
+        // update quantification
+        var p2d0 = new dwv.math.Point2D(begin.x(), begin.y());
+        var p2d1 = new dwv.math.Point2D(mid.x(), mid.y());
+        var p2d2 = new dwv.math.Point2D(end.x(), end.y());
+        var line0 = new dwv.math.Line(p2d0, p2d1);
+        var line1 = new dwv.math.Line(p2d1, p2d2);
+        var quant = dwv.math.getAngle( line0, line1 );
+        var str = quant.toPrecision(4) + " deg";
+        var textPos = { 'x': line0.getEnd().getX(), 'y': line0.getEnd().getY() - 15 };
+        ktext.position( textPos );
+        ktext.text(str);
+    }
 };
 ;/** 
  * Tool module.
