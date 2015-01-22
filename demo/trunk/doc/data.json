@@ -8621,7 +8621,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 242,
+            "line": 244,
             "description": "Handle mouse up event.",
             "itemtype": "method",
             "name": "mouseup",
@@ -8638,7 +8638,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 251,
+            "line": 253,
             "description": "Handle mouse out event.",
             "itemtype": "method",
             "name": "mouseout",
@@ -8655,7 +8655,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 261,
+            "line": 263,
             "description": "Handle touch start event.",
             "itemtype": "method",
             "name": "touchstart",
@@ -8672,7 +8672,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 271,
+            "line": 273,
             "description": "Handle touch move event.",
             "itemtype": "method",
             "name": "touchmove",
@@ -8689,7 +8689,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 281,
+            "line": 283,
             "description": "Handle touch end event.",
             "itemtype": "method",
             "name": "touchend",
@@ -8706,7 +8706,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 291,
+            "line": 293,
             "description": "Handle key down event.",
             "itemtype": "method",
             "name": "keydown",
@@ -8723,7 +8723,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 300,
+            "line": 302,
             "description": "Enable the tool.",
             "itemtype": "method",
             "name": "enable",
@@ -8740,7 +8740,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 311,
+            "line": 313,
             "description": "Initialise the tool.",
             "itemtype": "method",
             "name": "init",
@@ -8750,7 +8750,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 331,
+            "line": 333,
             "description": "Help for this tool.",
             "itemtype": "method",
             "name": "getHelp",
@@ -8764,7 +8764,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 349,
+            "line": 351,
             "description": "Set the line color of the drawing.",
             "itemtype": "method",
             "name": "setLineColour",
@@ -10767,7 +10767,7 @@
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/tools/livewire.js:331"
+            "line": " src/tools/livewire.js:333"
         },
         {
             "message": "replacing incorrect tag: returns with return",

@@ -11392,11 +11392,13 @@ dwv.tool.Livewire = function(app)
             justStarted = false;
         }
         // create shape
-        activeShape = new dwv.tool.RoiCreator(currentPath.pointArray, self.style);
+        var factory = new dwv.tool.RoiFactory();
+        var tmp = factory.create(currentPath.pointArray, self.style);
+        activeShape = tmp.shape;
         // add shape to group
         shapeGroup.add(activeShape);
         // draw shape command
-        command = new dwv.tool.DrawShapeCommand(activeShape, "livewire", app);
+        command = new dwv.tool.DrawShapeCommand(activeShape, "livewire", app.getDrawLayer());
         // draw
         command.execute();
     };
