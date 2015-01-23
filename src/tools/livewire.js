@@ -28,13 +28,6 @@ dwv.tool.Livewire = function(app)
      * @type Boolean
      */
     this.started = false;
-    /**
-     * Interaction just started flag.
-     * @property justStarted
-     * @private
-     * @type Boolean
-     */
-    var justStarted = true;
     
     /**
      * Draw command.
@@ -43,13 +36,6 @@ dwv.tool.Livewire = function(app)
      * @type Object
      */
     var command = null;
-    /**
-     * Current active shape.
-     * @property activeShape
-     * @private
-     * @type Object
-     */
-    var activeShape = null;
     /**
      * Current shape group.
      * @property shapeGroup
@@ -131,7 +117,6 @@ dwv.tool.Livewire = function(app)
         // first time
         if( !self.started ) {
             self.started = true;
-            shapeGroup = new Kinetic.Group();
             self.x0 = event._x;
             self.y0 = event._y;
             // clear vars
@@ -155,7 +140,6 @@ dwv.tool.Livewire = function(app)
                 app.getUndoStack().add(command);
                 // set flag
                 self.started = false;
-                justStarted = true;
             }
             // anchor point
             else {
@@ -222,19 +206,13 @@ dwv.tool.Livewire = function(app)
         }
         currentPath.appenPath(path);
         
-        // remove previous draw if not just started
-        if ( activeShape && !justStarted ) {
-            activeShape.destroy();
-        }
-        if ( justStarted ) {
-            justStarted = false;
+        // remove previous draw
+        if ( shapeGroup ) {
+            shapeGroup.destroy();
         }
         // create shape
         var factory = new dwv.tool.RoiFactory();
-        var tmp = factory.create(currentPath.pointArray, self.style);
-        activeShape = tmp.shape;
-        // add shape to group
-        shapeGroup.add(activeShape);
+        shapeGroup = factory.create(currentPath.pointArray, self.style);
         // draw shape command
         command = new dwv.tool.DrawGroupCommand(shapeGroup, "livewire", app.getDrawLayer());
         // draw

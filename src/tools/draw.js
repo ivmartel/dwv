@@ -186,13 +186,6 @@ dwv.tool.Draw = function (app)
      * @type Boolean
      */
     var started = false;
-    /**
-     * Interaction just started flag.
-     * @property justStarted
-     * @private
-     * @type Boolean
-     */
-    var justStarted = true;
     
     /**
      * Draw command.
@@ -207,8 +200,7 @@ dwv.tool.Draw = function (app)
      * @private
      * @type Object
      */
-    var activeShape = null;
-    var activeText = null;
+    //var activeShape = null;
     /**
      * List of created shapes.
      * @property createdShapes
@@ -322,7 +314,6 @@ dwv.tool.Draw = function (app)
             shapeEditor.setImage(null);
             // start storing points
             started = true;
-            shapeGroup = new Kinetic.Group();
             // clear array
             points = [];
             // store point
@@ -346,8 +337,8 @@ dwv.tool.Draw = function (app)
         {
             // current point
             lastPoint = new dwv.math.Point2D(event._x, event._y);
-            // clear last added point from the list
-            if ( !justStarted ) {
+            // clear last added point from the list (but not the first one)
+            if ( points.length != 1 ) {
                 points.pop();
             }
             // add current one to the list
@@ -356,28 +347,22 @@ dwv.tool.Draw = function (app)
             var factory = new dwv.tool.shapes[self.shapeName]();
             if( points.length < factory.getNPoints() ) {
                 clearTimeout(this.timer);
-                this.timer = setTimeout(function(){
+                this.timer = setTimeout( function () {
                     points.push( lastPoint );
                 }, factory.getTimeout() );
             }
-            // remove previous draw if not just started
-            if ( activeShape && !justStarted ) {
-                activeShape.destroy();
-                activeText.destroy();
+            // remove previous draw
+            if ( shapeGroup ) {
+                shapeGroup.destroy();
             }
-            if ( justStarted ) {
-                justStarted = false;
-            }
-            // create shape
-            var tmp = factory.create(points, self.style, app.getImage());
-            activeShape = tmp.shape;
-            activeText = tmp.text;
+            // create shape group
+            shapeGroup = factory.create(points, self.style, app.getImage());
             // do not listen during creation
-            activeShape.listening(false);
+            var shape = shapeGroup.getChildren( function (node) {
+                return node.name() === 'shape';
+            })[0];
+            shape.listening(false);
             drawLayer.hitGraphEnabled(false);
-            // add shape to group
-            shapeGroup.add(activeShape);
-            shapeGroup.add(activeText);
             // draw shape command
             command = new dwv.tool.DrawGroupCommand(shapeGroup, self.shapeName, drawLayer);
             // draw
@@ -393,35 +378,31 @@ dwv.tool.Draw = function (app)
     this.mouseup = function (/*event*/){
         if (started && points.length > 1 )
         {
-            // remove previous draw
-            if ( activeShape ) {
-                activeShape.destroy();
-                activeText.destroy();
+            // reset shape group
+            if ( shapeGroup ) {
+                shapeGroup.destroy();
             }
             // create final shape
             var factory = new dwv.tool.shapes[self.shapeName]();
-            var tmp = factory.create(points, self.style, app.getImage());
-            activeShape = tmp.shape;
-            activeText = tmp.text;
+            var group = factory.create(points, self.style, app.getImage());
             // re-activate layer
             drawLayer.hitGraphEnabled(true);
-            // add shape to group
-            shapeGroup.add(activeShape);
-            shapeGroup.add(activeText);
             // draw shape command
-            command = new dwv.tool.DrawGroupCommand(shapeGroup, self.shapeName, drawLayer);
+            command = new dwv.tool.DrawGroupCommand(group, self.shapeName, drawLayer);
             // execute it
             command.execute();
             // save it in undo stack
             app.getUndoStack().add(command);
             
             // set shape on
-            self.setShapeOn(activeShape);
-            createdShapes.push({"shape": activeShape, "text": activeText});
+            var shape = group.getChildren( function (node) {
+                return node.name() === 'shape';
+            })[0];
+            self.setShapeOn( shape );
+            createdShapes.push( shape );
         }
         // reset flag
         started = false;
-        justStarted = true;
     };
     
     /**
@@ -489,11 +470,11 @@ dwv.tool.Draw = function (app)
         // set shape display properties
         if ( flag ) {
             app.addLayerListeners( app.getDrawStage().getContent() );
-            createdShapes.forEach( function (elem){ self.setShapeOn( elem.shape ); });
+            createdShapes.forEach( function (shape){ self.setShapeOn( shape ); });
         }
         else {
             app.removeLayerListeners( app.getDrawStage().getContent() );
-            createdShapes.forEach( function (elem){ setShapeOff( elem.shape ); });
+            createdShapes.forEach( function (shape){ setShapeOff( shape ); });
         }
         // draw
         drawLayer.draw();

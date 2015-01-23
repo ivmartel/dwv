@@ -48,26 +48,18 @@ dwv.tool.RoiFactory.prototype.create = function (points, style /*, image*/)
         arr.push( roi.getPoint(i).getX() );
         arr.push( roi.getPoint(i).getY() );
     }
-    // shape
-    var kline = new Kinetic.Line({
+    // draw shape
+    var kshape = new Kinetic.Line({
         points: arr,
         stroke: style.getLineColor(),
         strokeWidth: 2,
         name: "shape",
         closed: true
     });
-    // quantification
-    var ktext = new Kinetic.Text({
-        x: 0,
-        y: 0,
-        text: "",
-        fontSize: style.getFontSize(),
-        fontFamily: "Verdana",
-        fill: style.getLineColor(),
-        name: "text"
-    });
-    // return shape
-    return {"shape": kline, "text": ktext};
+    // return group
+    var group = new Kinetic.Group();
+    group.add(kshape);
+    return group;
 }; 
 
 /**
@@ -82,11 +74,11 @@ dwv.tool.UpdateRoi = function (anchor /*, image*/)
     // parent group
     var group = anchor.getParent();
     // associated shape
-    var kroi = group.getChildren(function(node){
+    var kroi = group.getChildren( function (node) {
         return node.name() === 'shape';
     })[0];
     // update self
-    var point = group.getChildren(function(node){
+    var point = group.getChildren( function (node) {
         return node.id() === anchor.id();
     })[0];
     point.x( anchor.x() );

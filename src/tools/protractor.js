@@ -47,8 +47,8 @@ dwv.tool.ProtractorFactory.prototype.create = function (points, style/*, image*/
         pointsArray.push( points[i].getX() );
         pointsArray.push( points[i].getY() );
     }
-    // shape
-    var kline = new Kinetic.Line({
+    // draw shape
+    var kshape = new Kinetic.Line({
         points: pointsArray,
         stroke: style.getLineColor(),
         strokeWidth: 2,
@@ -82,8 +82,11 @@ dwv.tool.ProtractorFactory.prototype.create = function (points, style/*, image*/
             name: "text"
         });
     }
-    // return shape
-    return {"shape": kline, "text": ktext};
+    // return group
+    var group = new Kinetic.Group();
+    group.add(kshape);
+    group.add(ktext);
+    return group;
 };
 
 /**
@@ -98,17 +101,21 @@ dwv.tool.UpdateProtractor = function (anchor/*, image*/)
     // parent group
     var group = anchor.getParent();
     // associated shape
-    var kline = group.getChildren(function(node){
+    var kline = group.getChildren( function (node) {
         return node.name() === 'shape';
     })[0];
+    // associated text
+    var ktext = group.getChildren( function (node) {
+        return node.name() === 'text';
+    })[0];
     // find special points
-    var begin = group.getChildren( function (node){
+    var begin = group.getChildren( function (node) {
         return node.id() === 'begin';
     })[0];
-    var mid = group.getChildren( function (node){
+    var mid = group.getChildren( function (node) {
         return node.id() === 'mid';
     })[0];
-    var end = group.getChildren( function (node){
+    var end = group.getChildren( function (node) {
         return node.id() === 'end';
     })[0];
     // update special points
@@ -136,20 +143,14 @@ dwv.tool.UpdateProtractor = function (anchor/*, image*/)
     var ey = end.y() - kline.y();
     kline.points( [bx,by,mx,my,ex,ey] );
     // update text
-    var ktext = group.getChildren(function(node){
-        return node.name() === 'text';
-    })[0];
-    if ( ktext ) {
-        // update quantification
-        var p2d0 = new dwv.math.Point2D(begin.x(), begin.y());
-        var p2d1 = new dwv.math.Point2D(mid.x(), mid.y());
-        var p2d2 = new dwv.math.Point2D(end.x(), end.y());
-        var line0 = new dwv.math.Line(p2d0, p2d1);
-        var line1 = new dwv.math.Line(p2d1, p2d2);
-        var quant = dwv.math.getAngle( line0, line1 );
-        var str = quant.toPrecision(4) + " deg";
-        var textPos = { 'x': line0.getEnd().getX(), 'y': line0.getEnd().getY() - 15 };
-        ktext.position( textPos );
-        ktext.text(str);
-    }
+    var p2d0 = new dwv.math.Point2D(begin.x(), begin.y());
+    var p2d1 = new dwv.math.Point2D(mid.x(), mid.y());
+    var p2d2 = new dwv.math.Point2D(end.x(), end.y());
+    var line0 = new dwv.math.Line(p2d0, p2d1);
+    var line1 = new dwv.math.Line(p2d1, p2d2);
+    var quant = dwv.math.getAngle( line0, line1 );
+    var str = quant.toPrecision(4) + " deg";
+    var textPos = { 'x': line0.getEnd().getX(), 'y': line0.getEnd().getY() - 15 };
+    ktext.position( textPos );
+    ktext.text(str);
 };

@@ -40,10 +40,10 @@ dwv.tool.EllipseFactory.prototype.create = function (points, style, image)
     // calculate radius
     var a = Math.abs(points[0].getX() - points[1].getX());
     var b = Math.abs(points[0].getY() - points[1].getY());
-    // physical object
+    // physical shape
     var ellipse = new dwv.math.Ellipse(points[0], a, b);
-    // shape
-    var kellipse = new Kinetic.Ellipse({
+    // draw shape
+    var kshape = new Kinetic.Ellipse({
         x: ellipse.getCenter().getX(),
         y: ellipse.getCenter().getY(),
         radius: { x: ellipse.getA(), y: ellipse.getB() },
@@ -55,6 +55,7 @@ dwv.tool.EllipseFactory.prototype.create = function (points, style, image)
     var quant = image.quantifyEllipse( ellipse );
     var cm2 = quant.surface / 100;
     var str = cm2.toPrecision(4) + " cm2";
+    // quantification text
     var ktext = new Kinetic.Text({
         x: ellipse.getCenter().getX(),
         y: ellipse.getCenter().getY(),
@@ -64,8 +65,11 @@ dwv.tool.EllipseFactory.prototype.create = function (points, style, image)
         fill: style.getLineColor(),
         name: "text"
     });
-    // return shape
-    return {"shape": kellipse, "text": ktext};
+    // return group
+    var group = new Kinetic.Group();
+    group.add(kshape);
+    group.add(ktext);
+    return group;
 };
 
 /**
@@ -80,20 +84,24 @@ dwv.tool.UpdateEllipse = function (anchor, image)
     // parent group
     var group = anchor.getParent();
     // associated shape
-    var kellipse = group.getChildren(function(node){
+    var kellipse = group.getChildren( function (node) {
         return node.name() === 'shape';
     })[0];
+    // associated text
+    var ktext = group.getChildren(function(node){
+        return node.name() === 'text';
+    })[0];
     // find special points
-    var topLeft = group.getChildren(function(node){
+    var topLeft = group.getChildren( function (node) {
         return node.id() === 'topLeft';
     })[0];
-    var topRight = group.getChildren(function(node){
+    var topRight = group.getChildren( function (node) {
         return node.id() === 'topRight';
     })[0];
-    var bottomRight = group.getChildren(function(node){
+    var bottomRight = group.getChildren( function (node) {
         return node.id() === 'bottomRight';
     })[0];
-    var bottomLeft = group.getChildren(function(node){
+    var bottomLeft = group.getChildren( function (node) {
         return node.id() === 'bottomLeft';
     })[0];
     // update 'self' (undo case) and special points
@@ -136,16 +144,11 @@ dwv.tool.UpdateEllipse = function (anchor, image)
         kellipse.radius( radiusAbs );
     }
     // update text
-    var ktext = group.getChildren(function(node){
-        return node.name() === 'text';
-    })[0];
-    if ( ktext ) {
-        var ellipse = new dwv.math.Ellipse(center, radiusX, radiusY);
-        var quant = image.quantifyEllipse( ellipse );
-        var cm2 = quant.surface / 100;
-        var str = cm2.toPrecision(4) + " cm2";
-        var textPos = { 'x': center.x, 'y': center.y };
-        ktext.position(textPos);
-        ktext.text(str);
-    }
+    var ellipse = new dwv.math.Ellipse(center, radiusX, radiusY);
+    var quant = image.quantifyEllipse( ellipse );
+    var cm2 = quant.surface / 100;
+    var str = cm2.toPrecision(4) + " cm2";
+    var textPos = { 'x': center.x, 'y': center.y };
+    ktext.position(textPos);
+    ktext.text(str);
 };
