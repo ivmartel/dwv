@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>dwv.tool.DrawShapeCommand - dwv</title>
+    <title>dwv.tool.MoveGroupCommand - dwv</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
     <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
@@ -70,17 +70,17 @@
                                 <li><a href="../classes/dwv.math.ROI.html">dwv.math.ROI</a></li>
                                 <li><a href="../classes/dwv.math.Scissors.html">dwv.math.Scissors</a></li>
                                 <li><a href="../classes/dwv.tool.html">dwv.tool</a></li>
-                                <li><a href="../classes/dwv.tool.ChangeShapeCommand.html">dwv.tool.ChangeShapeCommand</a></li>
-                                <li><a href="../classes/dwv.tool.DeleteShapeCommand.html">dwv.tool.DeleteShapeCommand</a></li>
+                                <li><a href="../classes/dwv.tool.ChangeGroupCommand.html">dwv.tool.ChangeGroupCommand</a></li>
+                                <li><a href="../classes/dwv.tool.DeleteGroupCommand.html">dwv.tool.DeleteGroupCommand</a></li>
                                 <li><a href="../classes/dwv.tool.Draw.html">dwv.tool.Draw</a></li>
-                                <li><a href="../classes/dwv.tool.DrawShapeCommand.html">dwv.tool.DrawShapeCommand</a></li>
+                                <li><a href="../classes/dwv.tool.DrawGroupCommand.html">dwv.tool.DrawGroupCommand</a></li>
                                 <li><a href="../classes/dwv.tool.EllipseFactory.html">dwv.tool.EllipseFactory</a></li>
                                 <li><a href="../classes/dwv.tool.Filter.html">dwv.tool.Filter</a></li>
                                 <li><a href="../classes/dwv.tool.filter.Sharpen.html">dwv.tool.filter.Sharpen</a></li>
                                 <li><a href="../classes/dwv.tool.filter.Threshold.html">dwv.tool.filter.Threshold</a></li>
                                 <li><a href="../classes/dwv.tool.LineFactory.html">dwv.tool.LineFactory</a></li>
                                 <li><a href="../classes/dwv.tool.Livewire.html">dwv.tool.Livewire</a></li>
-                                <li><a href="../classes/dwv.tool.MoveShapeCommand.html">dwv.tool.MoveShapeCommand</a></li>
+                                <li><a href="../classes/dwv.tool.MoveGroupCommand.html">dwv.tool.MoveGroupCommand</a></li>
                                 <li><a href="../classes/dwv.tool.ProtractorFactory.html">dwv.tool.ProtractorFactory</a></li>
                                 <li><a href="../classes/dwv.tool.RectangleFactory.html">dwv.tool.RectangleFactory</a></li>
                                 <li><a href="../classes/dwv.tool.RoiFactory.html">dwv.tool.RoiFactory</a></li>
@@ -138,12 +138,12 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-                        <h1>dwv.tool.DrawShapeCommand Class</h1>
+                        <h1>dwv.tool.MoveGroupCommand Class</h1>
                         <div class="box meta">
                         
                         
                                 <div class="foundat">
-                                    Defined in: <a href="../files/src_tools_draw.js.html#l9"><code>src&#x2F;tools&#x2F;draw.js:9</code></a>
+                                    Defined in: <a href="../files/src_tools_draw.js.html#l45"><code>src&#x2F;tools&#x2F;draw.js:45</code></a>
                                 </div>
                         
                                     Module: <a href="../modules/tool.html">tool</a>
@@ -152,14 +152,14 @@
                         
                         
                         <div class="box intro">
-                            <p>Draw shape command.</p>
+                            <p>Move group command.</p>
                         
                         </div>
                         
                             <div class="constructor">
                                 <h2>Constructor</h2>
-                                <div id="method_dwv.tool.DrawShapeCommand" class="method item">
-                                    <h3 class="name"><code>dwv.tool.DrawShapeCommand</code></h3>
+                                <div id="method_dwv.tool.MoveGroupCommand" class="method item">
+                                    <h3 class="name"><code>dwv.tool.MoveGroupCommand</code></h3>
                                 
                                         <span class="paren">()</span>
                                 
@@ -173,7 +173,7 @@
                                     <div class="meta">
                                                 <p>
                                                 Defined in
-                                        <a href="../files/src_tools_draw.js.html#l9"><code>src&#x2F;tools&#x2F;draw.js:9</code></a>
+                                        <a href="../files/src_tools_draw.js.html#l45"><code>src&#x2F;tools&#x2F;draw.js:45</code></a>
                                         </p>
                                 
                                 
@@ -213,11 +213,6 @@
                         
                                                     </li>
                                                     <li class="index-item method">
-                                                        <a href="#method_getStats">getStats</a>
-                        
-                                                            <span class="flag static">static</span>
-                                                    </li>
-                                                    <li class="index-item method">
                                                         <a href="#method_undo">undo</a>
                         
                                                     </li>
@@ -246,7 +241,7 @@
                                                 <div class="meta">
                                                             <p>
                                                             Defined in
-                                                    <a href="../files/src_tools_draw.js.html#l23"><code>src&#x2F;tools&#x2F;draw.js:23</code></a>
+                                                    <a href="../files/src_tools_draw.js.html#l60"><code>src&#x2F;tools&#x2F;draw.js:60</code></a>
                                                     </p>
                                             
                                             
@@ -279,7 +274,7 @@
                                                 <div class="meta">
                                                             <p>
                                                             Defined in
-                                                    <a href="../files/src_tools_draw.js.html#l17"><code>src&#x2F;tools&#x2F;draw.js:17</code></a>
+                                                    <a href="../files/src_tools_draw.js.html#l53"><code>src&#x2F;tools&#x2F;draw.js:53</code></a>
                                                     </p>
                                             
                                             
@@ -303,40 +298,6 @@
                                                     </div>
                                             
                                             </div>
-                                            <div id="method_getStats" class="method item">
-                                                <h3 class="name"><code>getStats</code></h3>
-                                            
-                                                    <span class="paren">()</span>
-                                            
-                                            
-                                            
-                                            
-                                            
-                                                    <span class="flag static">static</span>
-                                            
-                                            
-                                            
-                                                <div class="meta">
-                                                                <p>Provided by the <a href="../modules/math.html">math</a> module.</p>
-                                                            <p>
-                                                            Defined in
-                                                    <a href="../files/src_math_stats.js.html#l8"><code>src&#x2F;math&#x2F;stats.js:8</code></a>
-                                                    </p>
-                                            
-                                            
-                                            
-                                                </div>
-                                            
-                                                <div class="description">
-                                                    <p>Get the minimum, maximum, mean and standard deviation
-                                            of an array of values.
-                                            Note: could use <a href="https://github.com/tmcw/simple-statistics">https://github.com/tmcw/simple-statistics</a></p>
-                                            
-                                                </div>
-                                            
-                                            
-                                            
-                                            </div>
                                             <div id="method_undo" class="method item">
                                                 <h3 class="name"><code>undo</code></h3>
                                             
@@ -352,7 +313,7 @@
                                                 <div class="meta">
                                                             <p>
                                                             Defined in
-                                                    <a href="../files/src_tools_draw.js.html#l34"><code>src&#x2F;tools&#x2F;draw.js:34</code></a>
+                                                    <a href="../files/src_tools_draw.js.html#l73"><code>src&#x2F;tools&#x2F;draw.js:73</code></a>
                                                     </p>
                                             
                                             

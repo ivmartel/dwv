@@ -70,17 +70,17 @@
                                 <li><a href="../classes/dwv.math.ROI.html">dwv.math.ROI</a></li>
                                 <li><a href="../classes/dwv.math.Scissors.html">dwv.math.Scissors</a></li>
                                 <li><a href="../classes/dwv.tool.html">dwv.tool</a></li>
-                                <li><a href="../classes/dwv.tool.ChangeShapeCommand.html">dwv.tool.ChangeShapeCommand</a></li>
-                                <li><a href="../classes/dwv.tool.DeleteShapeCommand.html">dwv.tool.DeleteShapeCommand</a></li>
+                                <li><a href="../classes/dwv.tool.ChangeGroupCommand.html">dwv.tool.ChangeGroupCommand</a></li>
+                                <li><a href="../classes/dwv.tool.DeleteGroupCommand.html">dwv.tool.DeleteGroupCommand</a></li>
                                 <li><a href="../classes/dwv.tool.Draw.html">dwv.tool.Draw</a></li>
-                                <li><a href="../classes/dwv.tool.DrawShapeCommand.html">dwv.tool.DrawShapeCommand</a></li>
+                                <li><a href="../classes/dwv.tool.DrawGroupCommand.html">dwv.tool.DrawGroupCommand</a></li>
                                 <li><a href="../classes/dwv.tool.EllipseFactory.html">dwv.tool.EllipseFactory</a></li>
                                 <li><a href="../classes/dwv.tool.Filter.html">dwv.tool.Filter</a></li>
                                 <li><a href="../classes/dwv.tool.filter.Sharpen.html">dwv.tool.filter.Sharpen</a></li>
                                 <li><a href="../classes/dwv.tool.filter.Threshold.html">dwv.tool.filter.Threshold</a></li>
                                 <li><a href="../classes/dwv.tool.LineFactory.html">dwv.tool.LineFactory</a></li>
                                 <li><a href="../classes/dwv.tool.Livewire.html">dwv.tool.Livewire</a></li>
-                                <li><a href="../classes/dwv.tool.MoveShapeCommand.html">dwv.tool.MoveShapeCommand</a></li>
+                                <li><a href="../classes/dwv.tool.MoveGroupCommand.html">dwv.tool.MoveGroupCommand</a></li>
                                 <li><a href="../classes/dwv.tool.ProtractorFactory.html">dwv.tool.ProtractorFactory</a></li>
                                 <li><a href="../classes/dwv.tool.RectangleFactory.html">dwv.tool.RectangleFactory</a></li>
                                 <li><a href="../classes/dwv.tool.RoiFactory.html">dwv.tool.RoiFactory</a></li>
@@ -151,12 +151,12 @@
                         var Kinetic = Kinetic || {};
                         
                         /**
-                         * Draw shape command.
-                         * @class DrawShapeCommand
+                         * Draw group command.
+                         * @class DrawGroupCommand
                          * @namespace dwv.tool
                          * @constructor
                          */
-                        dwv.tool.DrawShapeCommand = function (shape, name, layer)
+                        dwv.tool.DrawGroupCommand = function (group, name, layer)
                         {
                             /**
                              * Get the command name.
@@ -169,7 +169,6 @@
                              * @method execute
                              */
                             this.execute = function () {
-                                var group = shape.getParent();
                                 // add the group to the layer
                                 layer.add(group);
                                 // draw
@@ -180,21 +179,20 @@
                              * @method undo
                              */
                             this.undo = function () {
-                                var group = shape.getParent();
                                 // remove the group from the parent layer
                                 group.remove();
                                 // draw
                                 layer.draw();
                             };
-                        }; // DrawShapeCommand class
+                        }; // DrawGroupCommand class
                         
                         /**
-                         * Move shape command.
-                         * @class MoveShapeCommand
+                         * Move group command.
+                         * @class MoveGroupCommand
                          * @namespace dwv.tool
                          * @constructor
                          */
-                        dwv.tool.MoveShapeCommand = function (shape, name, translation, layer)
+                        dwv.tool.MoveGroupCommand = function (group, name, translation, layer)
                         {
                             /**
                              * Get the command name.
@@ -208,7 +206,6 @@
                              * @method execute
                              */
                             this.execute = function () {
-                                var group = shape.getParent();
                                 // translate all children of group
                                 group.getChildren().each( function (shape) {
                                     shape.x( shape.x() + translation.x );
@@ -222,7 +219,6 @@
                              * @method undo
                              */
                             this.undo = function () {
-                                var group = shape.getParent();
                                 // invert translate all children of group
                                 group.getChildren().each( function (shape) {
                                     shape.x( shape.x() - translation.x );
@@ -234,12 +230,12 @@
                         }; // MoveShapeCommand class
                         
                         /**
-                         * Change shape command.
-                         * @class ChangeShapeCommand
+                         * Change group command.
+                         * @class ChangeGroupCommand
                          * @namespace dwv.tool
                          * @constructor
                          */
-                        dwv.tool.ChangeShapeCommand = function (shape, name, func, startAnchor, endAnchor, layer, image)
+                        dwv.tool.ChangeGroupCommand = function (name, func, startAnchor, endAnchor, layer, image)
                         {
                             /**
                              * Get the command name.
@@ -254,7 +250,7 @@
                              */
                             this.execute = function () {
                                 // change shape
-                                func( shape, endAnchor, image );
+                                func( endAnchor, image );
                                 // draw
                                 layer.draw();
                             };
@@ -264,19 +260,19 @@
                              */
                             this.undo = function () {
                                 // invert change shape
-                                func( shape, startAnchor, image );
+                                func( startAnchor, image );
                                 // draw
                                 layer.draw();
                             };
                         }; // ChangeShapeCommand class
                         
                         /**
-                         * Delete shape command.
-                         * @class DeleteShapeCommand
+                         * Delete group command.
+                         * @class DeleteGroupCommand
                          * @namespace dwv.tool
                          * @constructor
                          */
-                        dwv.tool.DeleteShapeCommand = function (shape, name, layer)
+                        dwv.tool.DeleteGroupCommand = function (group, name, layer)
                         {
                             /**
                              * Get the command name.
@@ -289,7 +285,6 @@
                              * @method execute
                              */
                             this.execute = function () {
-                                var group = shape.getParent();
                                 // remove the group from the parent layer
                                 group.remove();
                                 // draw
@@ -300,7 +295,6 @@
                              * @method undo
                              */
                             this.undo = function () {
-                                var group = shape.getParent();
                                 // add the group to the layer
                                 layer.add(group);
                                 // draw
@@ -529,7 +523,7 @@
                                     shapeGroup.add(activeShape);
                                     shapeGroup.add(activeText);
                                     // draw shape command
-                                    command = new dwv.tool.DrawShapeCommand(activeShape, self.shapeName, drawLayer);
+                                    command = new dwv.tool.DrawGroupCommand(shapeGroup, self.shapeName, drawLayer);
                                     // draw
                                     command.execute();
                                 }
@@ -559,14 +553,14 @@
                                     shapeGroup.add(activeShape);
                                     shapeGroup.add(activeText);
                                     // draw shape command
-                                    command = new dwv.tool.DrawShapeCommand(activeShape, self.shapeName, drawLayer);
+                                    command = new dwv.tool.DrawGroupCommand(shapeGroup, self.shapeName, drawLayer);
                                     // execute it
                                     command.execute();
                                     // save it in undo stack
                                     app.getUndoStack().add(command);
                                     
                                     // set shape on
-                                    self.setShapeOn(activeShape, activeText);
+                                    self.setShapeOn(activeShape);
                                     createdShapes.push({&quot;shape&quot;: activeShape, &quot;text&quot;: activeText});
                                 }
                                 // reset flag
@@ -639,7 +633,7 @@
                                 // set shape display properties
                                 if ( flag ) {
                                     app.addLayerListeners( app.getDrawStage().getContent() );
-                                    createdShapes.forEach( function (elem){ self.setShapeOn( elem.shape, elem.text ); });
+                                    createdShapes.forEach( function (elem){ self.setShapeOn( elem.shape ); });
                                 }
                                 else {
                                     app.removeLayerListeners( app.getDrawStage().getContent() );
@@ -679,7 +673,7 @@
                              * @method setShapeOn
                              * @param {Object} shape The shape to set on.
                              */
-                            this.setShapeOn = function ( shape, text ) {
+                            this.setShapeOn = function ( shape ) {
                                 // mouse over styling
                                 shape.on(&#x27;mouseover&#x27;, function () {
                                     document.body.style.cursor = &#x27;pointer&#x27;;
@@ -697,10 +691,10 @@
                                 // command name based on shape type
                                 var cmdName = &quot;shape&quot;;
                                 if ( shape instanceof Kinetic.Line ) {
-                                    if ( shape.points.length == 2 ) {
+                                    if ( shape.points().length == 4 ) {
                                         cmdName = &quot;line&quot;;
                                     }
-                                    else if ( shape.points.length == 3 ) {
+                                    else if ( shape.points().length == 6 ) {
                                         cmdName = &quot;protractor&quot;;
                                     }
                                     else {
@@ -716,16 +710,12 @@
                                 
                                 // shape color
                                 var color = shape.stroke();
-                                var textX;
-                                var textY;
                                 
                                 // drag start event handling
                                 shape.on(&#x27;dragstart&#x27;, function (event) {
                                     // save start position
                                     var offset = dwv.html.getEventOffset( event.evt )[0];
                                     dragStartPos = getRealPosition( offset );
-                                    textX = text.x();
-                                    textY = text.y();
                                     // display trash
                                     var stage = app.getDrawStage();
                                     var scale = stage.scale();
@@ -743,6 +733,15 @@
                                 shape.on(&#x27;dragmove&#x27;, function (event) {
                                     var offset = dwv.html.getEventOffset( event.evt )[0];
                                     var pos = getRealPosition( offset );
+                                    var translation;
+                                    if ( dragLastPos ) {
+                                        translation = {&#x27;x&#x27;: pos.x - dragLastPos.x, 
+                                            &#x27;y&#x27;: pos.y - dragLastPos.y};
+                                    }
+                                    else {
+                                        translation = {&#x27;x&#x27;: pos.x - dragStartPos.x, 
+                                                &#x27;y&#x27;: pos.y - dragStartPos.y};
+                                    }
                                     dragLastPos = pos;
                                     // highlight trash when on it
                                     if ( Math.abs( pos.x - trash.x() ) &lt; 10 &amp;&amp;
@@ -754,12 +753,15 @@
                                         trash.getChildren().each( function (tshape){ tshape.stroke(&#x27;red&#x27;); });
                                         shape.stroke(color);
                                     }
-                                    // update text
-                                    var translation = {&#x27;x&#x27;: pos.x - dragStartPos.x, 
-                                            &#x27;y&#x27;: pos.y - dragStartPos.y};
-                                    var newPos = { &#x27;x&#x27;: textX + translation.x, 
-                                            &#x27;y&#x27;: textY + translation.y};
-                                    text.position( newPos );
+                                    // update group but not &#x27;this&#x27; shape
+                                    var group = this.getParent();
+                                    group.getChildren().each( function (shape) {
+                                        if ( shape === this ) {
+                                            return;
+                                        }
+                                        shape.x( shape.x() + translation.x );
+                                        shape.y( shape.y() + translation.y );
+                                    });
                                     // reset anchors
                                     shapeEditor.resetAnchors();
                                     // draw
@@ -768,6 +770,7 @@
                                 // drag end event handling
                                 shape.on(&#x27;dragend&#x27;, function (/*event*/) {
                                     var pos = dragLastPos;
+                                    dragLastPos = null;
                                     // delete case
                                     if ( Math.abs( pos.x - trash.x() ) &lt; 10 &amp;&amp;
                                             Math.abs( pos.y - trash.y() ) &lt; 10   ) {
@@ -787,7 +790,7 @@
                                         shapeEditor.setImage(null);
                                         document.body.style.cursor = &#x27;default&#x27;;
                                         // delete command
-                                        var delcmd = new dwv.tool.DeleteShapeCommand(this, cmdName, drawLayer);
+                                        var delcmd = new dwv.tool.DeleteGroupCommand(this.getParent(), cmdName, drawLayer);
                                         delcmd.execute();
                                         app.getUndoStack().add(delcmd);
                                     }
@@ -796,7 +799,7 @@
                                         var translation = {&#x27;x&#x27;: pos.x - dragStartPos.x, 
                                                 &#x27;y&#x27;: pos.y - dragStartPos.y};
                                         if ( translation.x !== 0 || translation.y !== 0 ) {
-                                            var mvcmd = new dwv.tool.MoveShapeCommand(this, cmdName, translation, drawLayer);
+                                            var mvcmd = new dwv.tool.MoveGroupCommand(this.getParent(), cmdName, translation, drawLayer);
                                             app.getUndoStack().add(mvcmd);
                                         }
                                         // reset anchors

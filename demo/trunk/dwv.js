@@ -9287,12 +9287,12 @@ dwv.tool = dwv.tool || {};
 var Kinetic = Kinetic || {};
 
 /**
- * Draw shape command.
- * @class DrawShapeCommand
+ * Draw group command.
+ * @class DrawGroupCommand
  * @namespace dwv.tool
  * @constructor
  */
-dwv.tool.DrawShapeCommand = function (shape, name, layer)
+dwv.tool.DrawGroupCommand = function (group, name, layer)
 {
     /**
      * Get the command name.
@@ -9305,7 +9305,6 @@ dwv.tool.DrawShapeCommand = function (shape, name, layer)
      * @method execute
      */
     this.execute = function () {
-        var group = shape.getParent();
         // add the group to the layer
         layer.add(group);
         // draw
@@ -9316,21 +9315,20 @@ dwv.tool.DrawShapeCommand = function (shape, name, layer)
      * @method undo
      */
     this.undo = function () {
-        var group = shape.getParent();
         // remove the group from the parent layer
         group.remove();
         // draw
         layer.draw();
     };
-}; // DrawShapeCommand class
+}; // DrawGroupCommand class
 
 /**
- * Move shape command.
- * @class MoveShapeCommand
+ * Move group command.
+ * @class MoveGroupCommand
  * @namespace dwv.tool
  * @constructor
  */
-dwv.tool.MoveShapeCommand = function (shape, name, translation, layer)
+dwv.tool.MoveGroupCommand = function (group, name, translation, layer)
 {
     /**
      * Get the command name.
@@ -9344,7 +9342,6 @@ dwv.tool.MoveShapeCommand = function (shape, name, translation, layer)
      * @method execute
      */
     this.execute = function () {
-        var group = shape.getParent();
         // translate all children of group
         group.getChildren().each( function (shape) {
             shape.x( shape.x() + translation.x );
@@ -9358,7 +9355,6 @@ dwv.tool.MoveShapeCommand = function (shape, name, translation, layer)
      * @method undo
      */
     this.undo = function () {
-        var group = shape.getParent();
         // invert translate all children of group
         group.getChildren().each( function (shape) {
             shape.x( shape.x() - translation.x );
@@ -9370,12 +9366,12 @@ dwv.tool.MoveShapeCommand = function (shape, name, translation, layer)
 }; // MoveShapeCommand class
 
 /**
- * Change shape command.
- * @class ChangeShapeCommand
+ * Change group command.
+ * @class ChangeGroupCommand
  * @namespace dwv.tool
  * @constructor
  */
-dwv.tool.ChangeShapeCommand = function (shape, name, func, startAnchor, endAnchor, layer, image)
+dwv.tool.ChangeGroupCommand = function (name, func, startAnchor, endAnchor, layer, image)
 {
     /**
      * Get the command name.
@@ -9390,7 +9386,7 @@ dwv.tool.ChangeShapeCommand = function (shape, name, func, startAnchor, endAncho
      */
     this.execute = function () {
         // change shape
-        func( shape, endAnchor, image );
+        func( endAnchor, image );
         // draw
         layer.draw();
     };
@@ -9400,19 +9396,19 @@ dwv.tool.ChangeShapeCommand = function (shape, name, func, startAnchor, endAncho
      */
     this.undo = function () {
         // invert change shape
-        func( shape, startAnchor, image );
+        func( startAnchor, image );
         // draw
         layer.draw();
     };
 }; // ChangeShapeCommand class
 
 /**
- * Delete shape command.
- * @class DeleteShapeCommand
+ * Delete group command.
+ * @class DeleteGroupCommand
  * @namespace dwv.tool
  * @constructor
  */
-dwv.tool.DeleteShapeCommand = function (shape, name, layer)
+dwv.tool.DeleteGroupCommand = function (group, name, layer)
 {
     /**
      * Get the command name.
@@ -9425,7 +9421,6 @@ dwv.tool.DeleteShapeCommand = function (shape, name, layer)
      * @method execute
      */
     this.execute = function () {
-        var group = shape.getParent();
         // remove the group from the parent layer
         group.remove();
         // draw
@@ -9436,7 +9431,6 @@ dwv.tool.DeleteShapeCommand = function (shape, name, layer)
      * @method undo
      */
     this.undo = function () {
-        var group = shape.getParent();
         // add the group to the layer
         layer.add(group);
         // draw
@@ -9665,7 +9659,7 @@ dwv.tool.Draw = function (app)
             shapeGroup.add(activeShape);
             shapeGroup.add(activeText);
             // draw shape command
-            command = new dwv.tool.DrawShapeCommand(activeShape, self.shapeName, drawLayer);
+            command = new dwv.tool.DrawGroupCommand(shapeGroup, self.shapeName, drawLayer);
             // draw
             command.execute();
         }
@@ -9695,14 +9689,14 @@ dwv.tool.Draw = function (app)
             shapeGroup.add(activeShape);
             shapeGroup.add(activeText);
             // draw shape command
-            command = new dwv.tool.DrawShapeCommand(activeShape, self.shapeName, drawLayer);
+            command = new dwv.tool.DrawGroupCommand(shapeGroup, self.shapeName, drawLayer);
             // execute it
             command.execute();
             // save it in undo stack
             app.getUndoStack().add(command);
             
             // set shape on
-            self.setShapeOn(activeShape, activeText);
+            self.setShapeOn(activeShape);
             createdShapes.push({"shape": activeShape, "text": activeText});
         }
         // reset flag
@@ -9775,7 +9769,7 @@ dwv.tool.Draw = function (app)
         // set shape display properties
         if ( flag ) {
             app.addLayerListeners( app.getDrawStage().getContent() );
-            createdShapes.forEach( function (elem){ self.setShapeOn( elem.shape, elem.text ); });
+            createdShapes.forEach( function (elem){ self.setShapeOn( elem.shape ); });
         }
         else {
             app.removeLayerListeners( app.getDrawStage().getContent() );
@@ -9815,7 +9809,7 @@ dwv.tool.Draw = function (app)
      * @method setShapeOn
      * @param {Object} shape The shape to set on.
      */
-    this.setShapeOn = function ( shape, text ) {
+    this.setShapeOn = function ( shape ) {
         // mouse over styling
         shape.on('mouseover', function () {
             document.body.style.cursor = 'pointer';
@@ -9833,10 +9827,10 @@ dwv.tool.Draw = function (app)
         // command name based on shape type
         var cmdName = "shape";
         if ( shape instanceof Kinetic.Line ) {
-            if ( shape.points.length == 2 ) {
+            if ( shape.points().length == 4 ) {
                 cmdName = "line";
             }
-            else if ( shape.points.length == 3 ) {
+            else if ( shape.points().length == 6 ) {
                 cmdName = "protractor";
             }
             else {
@@ -9852,16 +9846,12 @@ dwv.tool.Draw = function (app)
         
         // shape color
         var color = shape.stroke();
-        var textX;
-        var textY;
         
         // drag start event handling
         shape.on('dragstart', function (event) {
             // save start position
             var offset = dwv.html.getEventOffset( event.evt )[0];
             dragStartPos = getRealPosition( offset );
-            textX = text.x();
-            textY = text.y();
             // display trash
             var stage = app.getDrawStage();
             var scale = stage.scale();
@@ -9879,6 +9869,15 @@ dwv.tool.Draw = function (app)
         shape.on('dragmove', function (event) {
             var offset = dwv.html.getEventOffset( event.evt )[0];
             var pos = getRealPosition( offset );
+            var translation;
+            if ( dragLastPos ) {
+                translation = {'x': pos.x - dragLastPos.x, 
+                    'y': pos.y - dragLastPos.y};
+            }
+            else {
+                translation = {'x': pos.x - dragStartPos.x, 
+                        'y': pos.y - dragStartPos.y};
+            }
             dragLastPos = pos;
             // highlight trash when on it
             if ( Math.abs( pos.x - trash.x() ) < 10 &&
@@ -9890,12 +9889,15 @@ dwv.tool.Draw = function (app)
                 trash.getChildren().each( function (tshape){ tshape.stroke('red'); });
                 shape.stroke(color);
             }
-            // update text
-            var translation = {'x': pos.x - dragStartPos.x, 
-                    'y': pos.y - dragStartPos.y};
-            var newPos = { 'x': textX + translation.x, 
-                    'y': textY + translation.y};
-            text.position( newPos );
+            // update group but not 'this' shape
+            var group = this.getParent();
+            group.getChildren().each( function (shape) {
+                if ( shape === this ) {
+                    return;
+                }
+                shape.x( shape.x() + translation.x );
+                shape.y( shape.y() + translation.y );
+            });
             // reset anchors
             shapeEditor.resetAnchors();
             // draw
@@ -9904,6 +9906,7 @@ dwv.tool.Draw = function (app)
         // drag end event handling
         shape.on('dragend', function (/*event*/) {
             var pos = dragLastPos;
+            dragLastPos = null;
             // delete case
             if ( Math.abs( pos.x - trash.x() ) < 10 &&
                     Math.abs( pos.y - trash.y() ) < 10   ) {
@@ -9923,7 +9926,7 @@ dwv.tool.Draw = function (app)
                 shapeEditor.setImage(null);
                 document.body.style.cursor = 'default';
                 // delete command
-                var delcmd = new dwv.tool.DeleteShapeCommand(this, cmdName, drawLayer);
+                var delcmd = new dwv.tool.DeleteGroupCommand(this.getParent(), cmdName, drawLayer);
                 delcmd.execute();
                 app.getUndoStack().add(delcmd);
             }
@@ -9932,7 +9935,7 @@ dwv.tool.Draw = function (app)
                 var translation = {'x': pos.x - dragStartPos.x, 
                         'y': pos.y - dragStartPos.y};
                 if ( translation.x !== 0 || translation.y !== 0 ) {
-                    var mvcmd = new dwv.tool.MoveShapeCommand(this, cmdName, translation, drawLayer);
+                    var mvcmd = new dwv.tool.MoveGroupCommand(this.getParent(), cmdName, translation, drawLayer);
                     app.getUndoStack().add(mvcmd);
                 }
                 // reset anchors
@@ -10328,10 +10331,10 @@ dwv.tool.ShapeEditor = function ()
         // command name based on shape type
         var cmdName = "shape";
         if ( shape instanceof Kinetic.Line ) {
-            if ( shape.points.length == 2 ) {
+            if ( shape.points().length == 4 ) {
                 cmdName = "line";
             }
-            else if ( shape.points.length == 3 ) {
+            else if ( shape.points().length == 6 ) {
                 cmdName = "protractor";
             }
             else {
@@ -10352,7 +10355,7 @@ dwv.tool.ShapeEditor = function ()
         // drag move listener
         anchor.on('dragmove', function () {
             if ( updateFunction ) {
-                updateFunction(shape, this, image);
+                updateFunction(this, image);
             }
             if ( this.getLayer() ) {
                 this.getLayer().draw();
@@ -10365,8 +10368,8 @@ dwv.tool.ShapeEditor = function ()
         anchor.on('dragend', function () {
             var endAnchor = getClone(this);
             // store the change command
-            var chgcmd = new dwv.tool.ChangeShapeCommand(
-                    shape, cmdName, updateFunction, startAnchor, endAnchor, this.getLayer(), image);
+            var chgcmd = new dwv.tool.ChangeGroupCommand(
+                    cmdName, updateFunction, startAnchor, endAnchor, this.getLayer(), image);
             chgcmd.execute();
             app.getUndoStack().add(chgcmd);
             // reset start anchor
@@ -10487,13 +10490,17 @@ dwv.tool.EllipseFactory.prototype.create = function (points, style, image)
  * Update an ellipse shape.
  * @method UpdateEllipse
  * @static
- * @param {Object} kellipse The ellipse shape to update.
  * @param {Object} anchor The active anchor.
+ * @param {Object} image The associated image.
  */ 
-dwv.tool.UpdateEllipse = function (kellipse, anchor, image)
+dwv.tool.UpdateEllipse = function (anchor, image)
 {
     // parent group
     var group = anchor.getParent();
+    // associated shape
+    var kellipse = group.getChildren(function(node){
+        return node.name() === 'shape';
+    })[0];
     // find special points
     var topLeft = group.getChildren(function(node){
         return node.id() === 'topLeft';
@@ -11143,14 +11150,17 @@ dwv.tool.LineFactory.prototype.create = function (points, style, image)
  * Update a line shape.
  * @method UpdateLine
  * @static
- * @param {Object} kline The line shape to update.
  * @param {Object} anchor The active anchor.
  * @param {Object} image The associated image.
  */ 
-dwv.tool.UpdateLine = function (kline, anchor, image)
+dwv.tool.UpdateLine = function (anchor, image)
 {
     // parent group
     var group = anchor.getParent();
+    // associated shape
+    var kline = group.getChildren(function(node){
+        return node.name() === 'shape';
+    })[0];
     // find special points
     var begin = group.getChildren(function(node){
         return node.id() === 'begin';
@@ -11430,7 +11440,7 @@ dwv.tool.Livewire = function(app)
         // add shape to group
         shapeGroup.add(activeShape);
         // draw shape command
-        command = new dwv.tool.DrawShapeCommand(activeShape, "livewire", app.getDrawLayer());
+        command = new dwv.tool.DrawGroupCommand(shapeGroup, "livewire", app.getDrawLayer());
         // draw
         command.execute();
     };
@@ -11644,14 +11654,17 @@ dwv.tool.ProtractorFactory.prototype.create = function (points, style/*, image*/
  * Update a protractor shape.
  * @method UpdateProtractor
  * @static
- * @param {Object} kline The protractor shape to update.
  * @param {Object} anchor The active anchor.
  * @param {Object} image The associated image.
  */ 
-dwv.tool.UpdateProtractor = function (kline, anchor/*, image*/)
+dwv.tool.UpdateProtractor = function (anchor/*, image*/)
 {
     // parent group
     var group = anchor.getParent();
+    // associated shape
+    var kline = group.getChildren(function(node){
+        return node.name() === 'shape';
+    })[0];
     // find special points
     var begin = group.getChildren( function (node){
         return node.id() === 'begin';
@@ -11776,13 +11789,17 @@ dwv.tool.RectangleFactory.prototype.create = function (points, style, image)
  * Update a rectangle shape.
  * @method UpdateRect
  * @static
- * @param {Object} krect The rectangle shape to update.
  * @param {Object} anchor The active anchor.
+ * @param {Object} image The associated image.
  */ 
-dwv.tool.UpdateRect = function (krect, anchor, image)
+dwv.tool.UpdateRect = function (anchor, image)
 {
     // parent group
     var group = anchor.getParent();
+    // associated shape
+    var krect = group.getChildren(function(node){
+        return node.name() === 'shape';
+    })[0];
     // find special points
     var topLeft = group.getChildren(function(node){
         return node.id() === 'topLeft';
@@ -11925,13 +11942,17 @@ dwv.tool.RoiFactory.prototype.create = function (points, style /*, image*/)
  * Update a roi shape.
  * @method UpdateRoi
  * @static
- * @param {Object} kroi The line shape to update.
  * @param {Object} anchor The active anchor.
+ * @param {Object} image The associated image.
  */ 
-dwv.tool.UpdateRoi = function (kroi, anchor /*, image*/)
+dwv.tool.UpdateRoi = function (anchor /*, image*/)
 {
     // parent group
     var group = anchor.getParent();
+    // associated shape
+    var kroi = group.getChildren(function(node){
+        return node.name() === 'shape';
+    })[0];
     // update self
     var point = group.getChildren(function(node){
         return node.id() === anchor.id();
