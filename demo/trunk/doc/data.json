@@ -7230,20 +7230,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 189,
-            "description": "Interaction just started flag.",
-            "itemtype": "property",
-            "name": "justStarted",
-            "access": "private",
-            "tagname": "",
-            "type": "Boolean",
-            "class": "dwv.tool.Draw",
-            "module": "tool",
-            "namespace": "dwv.tool"
-        },
-        {
-            "file": "src/tools/draw.js",
-            "line": 197,
+            "line": 190,
             "description": "Draw command.",
             "itemtype": "property",
             "name": "command",
@@ -7256,7 +7243,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 204,
+            "line": 197,
             "description": "Current active shape.",
             "itemtype": "property",
             "name": "activeShape",
@@ -7269,7 +7256,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 212,
+            "line": 204,
             "description": "List of created shapes.",
             "itemtype": "property",
             "name": "createdShapes",
@@ -7282,7 +7269,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 219,
+            "line": 211,
             "description": "Current shape group.",
             "itemtype": "property",
             "name": "shapeGroup",
@@ -7295,7 +7282,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 227,
+            "line": 219,
             "description": "Drawing style.",
             "itemtype": "property",
             "name": "style",
@@ -7306,7 +7293,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 233,
+            "line": 225,
             "description": "Shape name.",
             "itemtype": "property",
             "name": "shapeName",
@@ -7317,7 +7304,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 240,
+            "line": 232,
             "description": "List of points.",
             "itemtype": "property",
             "name": "points",
@@ -7330,7 +7317,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 248,
+            "line": 240,
             "description": "Last selected point.",
             "itemtype": "property",
             "name": "lastPoint",
@@ -7343,7 +7330,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 256,
+            "line": 248,
             "description": "Shape editor.",
             "itemtype": "property",
             "name": "shapeEditor",
@@ -7356,7 +7343,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 264,
+            "line": 256,
             "description": "Trash draw: a cross.",
             "itemtype": "property",
             "name": "trash",
@@ -7369,7 +7356,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 285,
+            "line": 277,
             "description": "The associated draw layer.",
             "itemtype": "property",
             "name": "drawLayer",
@@ -7382,7 +7369,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 293,
+            "line": 285,
             "description": "Handle mouse down event.",
             "itemtype": "method",
             "name": "mousedown",
@@ -7399,7 +7386,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 334,
+            "line": 325,
             "description": "Handle mouse move event.",
             "itemtype": "method",
             "name": "mousemove",
@@ -7416,7 +7403,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 388,
+            "line": 373,
             "description": "Handle mouse up event.",
             "itemtype": "method",
             "name": "mouseup",
@@ -7433,7 +7420,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 427,
+            "line": 408,
             "description": "Handle mouse out event.",
             "itemtype": "method",
             "name": "mouseout",
@@ -7450,7 +7437,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 436,
+            "line": 417,
             "description": "Handle touch start event.",
             "itemtype": "method",
             "name": "touchstart",
@@ -7467,7 +7454,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 445,
+            "line": 426,
             "description": "Handle touch move event.",
             "itemtype": "method",
             "name": "touchmove",
@@ -7484,7 +7471,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 454,
+            "line": 435,
             "description": "Handle touch end event.",
             "itemtype": "method",
             "name": "touchend",
@@ -7501,7 +7488,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 463,
+            "line": 444,
             "description": "Handle key down event.",
             "itemtype": "method",
             "name": "keydown",
@@ -7518,7 +7505,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 472,
+            "line": 453,
             "description": "Enable the tool.",
             "itemtype": "method",
             "name": "enable",
@@ -7535,7 +7522,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 502,
+            "line": 483,
             "description": "Set shape off properties.",
             "itemtype": "method",
             "name": "setShapeOff",
@@ -7552,7 +7539,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 518,
+            "line": 499,
             "description": "Get the real position from an event.",
             "class": "dwv.tool.Draw",
             "module": "tool",
@@ -7560,7 +7547,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 527,
+            "line": 508,
             "description": "Set shape on properties.",
             "itemtype": "method",
             "name": "setShapeOn",
@@ -7577,7 +7564,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 675,
+            "line": 656,
             "description": "Help for this tool.",
             "itemtype": "method",
             "name": "getHelp",
@@ -7591,7 +7578,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 697,
+            "line": 678,
             "description": "Set the line color of the drawing.",
             "itemtype": "method",
             "name": "setLineColour",
@@ -7608,7 +7595,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 708,
+            "line": 689,
             "description": "Set the shape name of the drawing.",
             "itemtype": "method",
             "name": "setShapeName",
@@ -7625,7 +7612,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 723,
+            "line": 704,
             "description": "Check if the shape is in the shape list.",
             "itemtype": "method",
             "name": "hasShape",
@@ -7642,7 +7629,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 732,
+            "line": 713,
             "description": "Initialise the tool.",
             "itemtype": "method",
             "name": "init",
@@ -7967,7 +7954,7 @@
         },
         {
             "file": "src/tools/ellipse.js",
-            "line": 71,
+            "line": 75,
             "description": "Update an ellipse shape.",
             "itemtype": "method",
             "name": "UpdateEllipse",
@@ -8437,7 +8424,7 @@
         },
         {
             "file": "src/tools/line.js",
-            "line": 66,
+            "line": 70,
             "description": "Update a line shape.",
             "itemtype": "method",
             "name": "UpdateLine",
@@ -8484,20 +8471,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 31,
-            "description": "Interaction just started flag.",
-            "itemtype": "property",
-            "name": "justStarted",
-            "access": "private",
-            "tagname": "",
-            "type": "Boolean",
-            "class": "dwv.tool.Livewire",
-            "module": "tool",
-            "namespace": "dwv.tool"
-        },
-        {
-            "file": "src/tools/livewire.js",
-            "line": 39,
+            "line": 32,
             "description": "Draw command.",
             "itemtype": "property",
             "name": "command",
@@ -8510,20 +8484,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 46,
-            "description": "Current active shape.",
-            "itemtype": "property",
-            "name": "activeShape",
-            "access": "private",
-            "tagname": "",
-            "type": "Object",
-            "class": "dwv.tool.Livewire",
-            "module": "tool",
-            "namespace": "dwv.tool"
-        },
-        {
-            "file": "src/tools/livewire.js",
-            "line": 53,
+            "line": 39,
             "description": "Current shape group.",
             "itemtype": "property",
             "name": "shapeGroup",
@@ -8536,7 +8497,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 60,
+            "line": 46,
             "description": "Drawing style.",
             "itemtype": "property",
             "name": "style",
@@ -8547,7 +8508,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 67,
+            "line": 53,
             "description": "Path storage. Paths are stored in reverse order.",
             "itemtype": "property",
             "name": "path",
@@ -8560,7 +8521,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 74,
+            "line": 60,
             "description": "Current path storage. Paths are stored in reverse order.",
             "itemtype": "property",
             "name": "currentPath",
@@ -8573,7 +8534,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 81,
+            "line": 67,
             "description": "List of parent points.",
             "itemtype": "property",
             "name": "parentPoints",
@@ -8586,7 +8547,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 88,
+            "line": 74,
             "description": "Tolerance.",
             "itemtype": "property",
             "name": "tolerance",
@@ -8599,7 +8560,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 96,
+            "line": 82,
             "description": "Clear the parent points list.",
             "itemtype": "method",
             "name": "clearParentPoints",
@@ -8611,7 +8572,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 107,
+            "line": 93,
             "description": "Clear the stored paths.",
             "itemtype": "method",
             "name": "clearPaths",
@@ -8623,7 +8584,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 117,
+            "line": 103,
             "description": "Scissor representation.",
             "itemtype": "property",
             "name": "scissors",
@@ -8636,7 +8597,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 125,
+            "line": 111,
             "description": "Handle mouse down event.",
             "itemtype": "method",
             "name": "mousedown",
@@ -8653,7 +8614,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 171,
+            "line": 155,
             "description": "Handle mouse move event.",
             "itemtype": "method",
             "name": "mousemove",
@@ -8670,7 +8631,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 244,
+            "line": 222,
             "description": "Handle mouse up event.",
             "itemtype": "method",
             "name": "mouseup",
@@ -8687,7 +8648,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 253,
+            "line": 231,
             "description": "Handle mouse out event.",
             "itemtype": "method",
             "name": "mouseout",
@@ -8704,7 +8665,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 263,
+            "line": 241,
             "description": "Handle touch start event.",
             "itemtype": "method",
             "name": "touchstart",
@@ -8721,7 +8682,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 273,
+            "line": 251,
             "description": "Handle touch move event.",
             "itemtype": "method",
             "name": "touchmove",
@@ -8738,7 +8699,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 283,
+            "line": 261,
             "description": "Handle touch end event.",
             "itemtype": "method",
             "name": "touchend",
@@ -8755,7 +8716,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 293,
+            "line": 271,
             "description": "Handle key down event.",
             "itemtype": "method",
             "name": "keydown",
@@ -8772,7 +8733,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 302,
+            "line": 280,
             "description": "Enable the tool.",
             "itemtype": "method",
             "name": "enable",
@@ -8789,7 +8750,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 313,
+            "line": 291,
             "description": "Initialise the tool.",
             "itemtype": "method",
             "name": "init",
@@ -8799,7 +8760,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 333,
+            "line": 311,
             "description": "Help for this tool.",
             "itemtype": "method",
             "name": "getHelp",
@@ -8813,7 +8774,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 351,
+            "line": 329,
             "description": "Set the line color of the drawing.",
             "itemtype": "method",
             "name": "setLineColour",
@@ -8886,7 +8847,7 @@
         },
         {
             "file": "src/tools/protractor.js",
-            "line": 89,
+            "line": 92,
             "description": "Update a protractor shape.",
             "itemtype": "method",
             "name": "UpdateProtractor",
@@ -8964,7 +8925,7 @@
         },
         {
             "file": "src/tools/rectangle.js",
-            "line": 69,
+            "line": 73,
             "description": "Update a rectangle shape.",
             "itemtype": "method",
             "name": "UpdateRect",
@@ -9042,7 +9003,7 @@
         },
         {
             "file": "src/tools/roi.js",
-            "line": 73,
+            "line": 65,
             "description": "Update a roi shape.",
             "itemtype": "method",
             "name": "UpdateRoi",
@@ -10803,7 +10764,7 @@
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/tools/draw.js:675"
+            "line": " src/tools/draw.js:656"
         },
         {
             "message": "replacing incorrect tag: returns with return",
@@ -10811,7 +10772,7 @@
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/tools/livewire.js:333"
+            "line": " src/tools/livewire.js:311"
         },
         {
             "message": "replacing incorrect tag: returns with return",
@@ -10859,7 +10820,7 @@
         },
         {
             "message": "Missing item type\nGet the real position from an event.",
-            "line": " src/tools/draw.js:518"
+            "line": " src/tools/draw.js:499"
         },
         {
             "message": "Missing item type\nApply a function on all anchors.",

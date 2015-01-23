@@ -183,8 +183,8 @@
                         {
                             // physical shape
                             var rectangle = new dwv.math.Rectangle(points[0], points[1]);
-                            // shape
-                            var krect = new Kinetic.Rect({
+                            // draw shape
+                            var kshape = new Kinetic.Rect({
                                 x: rectangle.getBegin().getX(),
                                 y: rectangle.getBegin().getY(),
                                 width: rectangle.getWidth(),
@@ -197,6 +197,7 @@
                             var quant = image.quantifyRect( rectangle );
                             var cm2 = quant.surface / 100;
                             var str = cm2.toPrecision(4) + &quot; cm2&quot;;
+                            // quantification text
                             var ktext = new Kinetic.Text({
                                 x: rectangle.getBegin().getX(),
                                 y: rectangle.getEnd().getY() + 10,
@@ -206,8 +207,11 @@
                                 fill: style.getLineColor(),
                                 name: &quot;text&quot;
                             });
-                            // return shape
-                            return {&quot;shape&quot;: krect, &quot;text&quot;: ktext};
+                            // return group
+                            var group = new Kinetic.Group();
+                            group.add(kshape);
+                            group.add(ktext);
+                            return group;
                         };
                         
                         /**
@@ -222,20 +226,24 @@
                             // parent group
                             var group = anchor.getParent();
                             // associated shape
-                            var krect = group.getChildren(function(node){
+                            var krect = group.getChildren( function (node) {
                                 return node.name() === &#x27;shape&#x27;;
                             })[0];
+                            // associated text
+                            var ktext = group.getChildren( function (node) {
+                                return node.name() === &#x27;text&#x27;;
+                            })[0];
                             // find special points
-                            var topLeft = group.getChildren(function(node){
+                            var topLeft = group.getChildren( function (node) {
                                 return node.id() === &#x27;topLeft&#x27;;
                             })[0];
-                            var topRight = group.getChildren(function(node){
+                            var topRight = group.getChildren( function (node) {
                                 return node.id() === &#x27;topRight&#x27;;
                             })[0];
-                            var bottomRight = group.getChildren(function(node){
+                            var bottomRight = group.getChildren( function (node) {
                                 return node.id() === &#x27;bottomRight&#x27;;
                             })[0];
-                            var bottomLeft = group.getChildren(function(node){
+                            var bottomLeft = group.getChildren( function (node) {
                                 return node.id() === &#x27;bottomLeft&#x27;;
                             })[0];
                             // update &#x27;self&#x27; (undo case) and special points
@@ -276,20 +284,15 @@
                                 krect.size({&#x27;width&#x27;: width, &#x27;height&#x27;: height});
                             }
                             // update text
-                            var ktext = group.getChildren(function(node){
-                                return node.name() === &#x27;text&#x27;;
-                            })[0];
-                            if ( ktext ) {
-                                var p2d0 = new dwv.math.Point2D(topLeft.x(), topLeft.y());
-                                var p2d1 = new dwv.math.Point2D(bottomRight.x(), bottomRight.y());
-                                var rect = new dwv.math.Rectangle(p2d0, p2d1);
-                                var quant = image.quantifyRect( rect );
-                                var cm2 = quant.surface / 100;
-                                var str = cm2.toPrecision(4) + &quot; cm2&quot;;
-                                var textPos = { &#x27;x&#x27;: rect.getBegin().getX(), &#x27;y&#x27;: rect.getEnd().getY() + 10 };
-                                ktext.position(textPos);
-                                ktext.text(str);
-                            }
+                            var p2d0 = new dwv.math.Point2D(topLeft.x(), topLeft.y());
+                            var p2d1 = new dwv.math.Point2D(bottomRight.x(), bottomRight.y());
+                            var rect = new dwv.math.Rectangle(p2d0, p2d1);
+                            var quant = image.quantifyRect( rect );
+                            var cm2 = quant.surface / 100;
+                            var str = cm2.toPrecision(4) + &quot; cm2&quot;;
+                            var textPos = { &#x27;x&#x27;: rect.getBegin().getX(), &#x27;y&#x27;: rect.getEnd().getY() + 10 };
+                            ktext.position(textPos);
+                            ktext.text(str);
                         };
                         
                             </pre>

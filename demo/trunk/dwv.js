@@ -9466,13 +9466,6 @@ dwv.tool.Draw = function (app)
      * @type Boolean
      */
     var started = false;
-    /**
-     * Interaction just started flag.
-     * @property justStarted
-     * @private
-     * @type Boolean
-     */
-    var justStarted = true;
     
     /**
      * Draw command.
@@ -9487,8 +9480,7 @@ dwv.tool.Draw = function (app)
      * @private
      * @type Object
      */
-    var activeShape = null;
-    var activeText = null;
+    //var activeShape = null;
     /**
      * List of created shapes.
      * @property createdShapes
@@ -9602,7 +9594,6 @@ dwv.tool.Draw = function (app)
             shapeEditor.setImage(null);
             // start storing points
             started = true;
-            shapeGroup = new Kinetic.Group();
             // clear array
             points = [];
             // store point
@@ -9626,8 +9617,8 @@ dwv.tool.Draw = function (app)
         {
             // current point
             lastPoint = new dwv.math.Point2D(event._x, event._y);
-            // clear last added point from the list
-            if ( !justStarted ) {
+            // clear last added point from the list (but not the first one)
+            if ( points.length != 1 ) {
                 points.pop();
             }
             // add current one to the list
@@ -9636,28 +9627,22 @@ dwv.tool.Draw = function (app)
             var factory = new dwv.tool.shapes[self.shapeName]();
             if( points.length < factory.getNPoints() ) {
                 clearTimeout(this.timer);
-                this.timer = setTimeout(function(){
+                this.timer = setTimeout( function () {
                     points.push( lastPoint );
                 }, factory.getTimeout() );
             }
-            // remove previous draw if not just started
-            if ( activeShape && !justStarted ) {
-                activeShape.destroy();
-                activeText.destroy();
+            // remove previous draw
+            if ( shapeGroup ) {
+                shapeGroup.destroy();
             }
-            if ( justStarted ) {
-                justStarted = false;
-            }
-            // create shape
-            var tmp = factory.create(points, self.style, app.getImage());
-            activeShape = tmp.shape;
-            activeText = tmp.text;
+            // create shape group
+            shapeGroup = factory.create(points, self.style, app.getImage());
             // do not listen during creation
-            activeShape.listening(false);
+            var shape = shapeGroup.getChildren( function (node) {
+                return node.name() === 'shape';
+            })[0];
+            shape.listening(false);
             drawLayer.hitGraphEnabled(false);
-            // add shape to group
-            shapeGroup.add(activeShape);
-            shapeGroup.add(activeText);
             // draw shape command
             command = new dwv.tool.DrawGroupCommand(shapeGroup, self.shapeName, drawLayer);
             // draw
@@ -9673,35 +9658,31 @@ dwv.tool.Draw = function (app)
     this.mouseup = function (/*event*/){
         if (started && points.length > 1 )
         {
-            // remove previous draw
-            if ( activeShape ) {
-                activeShape.destroy();
-                activeText.destroy();
+            // reset shape group
+            if ( shapeGroup ) {
+                shapeGroup.destroy();
             }
             // create final shape
             var factory = new dwv.tool.shapes[self.shapeName]();
-            var tmp = factory.create(points, self.style, app.getImage());
-            activeShape = tmp.shape;
-            activeText = tmp.text;
+            var group = factory.create(points, self.style, app.getImage());
             // re-activate layer
             drawLayer.hitGraphEnabled(true);
-            // add shape to group
-            shapeGroup.add(activeShape);
-            shapeGroup.add(activeText);
             // draw shape command
-            command = new dwv.tool.DrawGroupCommand(shapeGroup, self.shapeName, drawLayer);
+            command = new dwv.tool.DrawGroupCommand(group, self.shapeName, drawLayer);
             // execute it
             command.execute();
             // save it in undo stack
             app.getUndoStack().add(command);
             
             // set shape on
-            self.setShapeOn(activeShape);
-            createdShapes.push({"shape": activeShape, "text": activeText});
+            var shape = group.getChildren( function (node) {
+                return node.name() === 'shape';
+            })[0];
+            self.setShapeOn( shape );
+            createdShapes.push( shape );
         }
         // reset flag
         started = false;
-        justStarted = true;
     };
     
     /**
@@ -9769,11 +9750,11 @@ dwv.tool.Draw = function (app)
         // set shape display properties
         if ( flag ) {
             app.addLayerListeners( app.getDrawStage().getContent() );
-            createdShapes.forEach( function (elem){ self.setShapeOn( elem.shape ); });
+            createdShapes.forEach( function (shape){ self.setShapeOn( shape ); });
         }
         else {
             app.removeLayerListeners( app.getDrawStage().getContent() );
-            createdShapes.forEach( function (elem){ setShapeOff( elem.shape ); });
+            createdShapes.forEach( function (shape){ setShapeOff( shape ); });
         }
         // draw
         drawLayer.draw();
@@ -10458,10 +10439,10 @@ dwv.tool.EllipseFactory.prototype.create = function (points, style, image)
     // calculate radius
     var a = Math.abs(points[0].getX() - points[1].getX());
     var b = Math.abs(points[0].getY() - points[1].getY());
-    // physical object
+    // physical shape
     var ellipse = new dwv.math.Ellipse(points[0], a, b);
-    // shape
-    var kellipse = new Kinetic.Ellipse({
+    // draw shape
+    var kshape = new Kinetic.Ellipse({
         x: ellipse.getCenter().getX(),
         y: ellipse.getCenter().getY(),
         radius: { x: ellipse.getA(), y: ellipse.getB() },
@@ -10473,6 +10454,7 @@ dwv.tool.EllipseFactory.prototype.create = function (points, style, image)
     var quant = image.quantifyEllipse( ellipse );
     var cm2 = quant.surface / 100;
     var str = cm2.toPrecision(4) + " cm2";
+    // quantification text
     var ktext = new Kinetic.Text({
         x: ellipse.getCenter().getX(),
         y: ellipse.getCenter().getY(),
@@ -10482,8 +10464,11 @@ dwv.tool.EllipseFactory.prototype.create = function (points, style, image)
         fill: style.getLineColor(),
         name: "text"
     });
-    // return shape
-    return {"shape": kellipse, "text": ktext};
+    // return group
+    var group = new Kinetic.Group();
+    group.add(kshape);
+    group.add(ktext);
+    return group;
 };
 
 /**
@@ -10498,20 +10483,24 @@ dwv.tool.UpdateEllipse = function (anchor, image)
     // parent group
     var group = anchor.getParent();
     // associated shape
-    var kellipse = group.getChildren(function(node){
+    var kellipse = group.getChildren( function (node) {
         return node.name() === 'shape';
     })[0];
+    // associated text
+    var ktext = group.getChildren(function(node){
+        return node.name() === 'text';
+    })[0];
     // find special points
-    var topLeft = group.getChildren(function(node){
+    var topLeft = group.getChildren( function (node) {
         return node.id() === 'topLeft';
     })[0];
-    var topRight = group.getChildren(function(node){
+    var topRight = group.getChildren( function (node) {
         return node.id() === 'topRight';
     })[0];
-    var bottomRight = group.getChildren(function(node){
+    var bottomRight = group.getChildren( function (node) {
         return node.id() === 'bottomRight';
     })[0];
-    var bottomLeft = group.getChildren(function(node){
+    var bottomLeft = group.getChildren( function (node) {
         return node.id() === 'bottomLeft';
     })[0];
     // update 'self' (undo case) and special points
@@ -10554,18 +10543,13 @@ dwv.tool.UpdateEllipse = function (anchor, image)
         kellipse.radius( radiusAbs );
     }
     // update text
-    var ktext = group.getChildren(function(node){
-        return node.name() === 'text';
-    })[0];
-    if ( ktext ) {
-        var ellipse = new dwv.math.Ellipse(center, radiusX, radiusY);
-        var quant = image.quantifyEllipse( ellipse );
-        var cm2 = quant.surface / 100;
-        var str = cm2.toPrecision(4) + " cm2";
-        var textPos = { 'x': center.x, 'y': center.y };
-        ktext.position(textPos);
-        ktext.text(str);
-    }
+    var ellipse = new dwv.math.Ellipse(center, radiusX, radiusY);
+    var quant = image.quantifyEllipse( ellipse );
+    var cm2 = quant.surface / 100;
+    var str = cm2.toPrecision(4) + " cm2";
+    var textPos = { 'x': center.x, 'y': center.y };
+    ktext.position(textPos);
+    ktext.text(str);
 };
 ;/** 
  * Tool module.
@@ -11120,10 +11104,10 @@ dwv.tool.LineFactory = function ()
  */ 
 dwv.tool.LineFactory.prototype.create = function (points, style, image)
 {
-    // physical object
+    // physical shape
     var line = new dwv.math.Line(points[0], points[1]);
-    // shape
-    var kline = new Kinetic.Line({
+    // draw shape
+    var kshape = new Kinetic.Line({
         points: [line.getBegin().getX(), line.getBegin().getY(), 
                  line.getEnd().getX(), line.getEnd().getY() ],
         stroke: style.getLineColor(),
@@ -11133,6 +11117,7 @@ dwv.tool.LineFactory.prototype.create = function (points, style, image)
     // quantification
     var quant = image.quantifyLine( line );
     var str = quant.length.toPrecision(4) + " mm";
+    // quantification text
     var ktext = new Kinetic.Text({
         x: line.getEnd().getX(),
         y: line.getEnd().getY() - 15,
@@ -11142,8 +11127,11 @@ dwv.tool.LineFactory.prototype.create = function (points, style, image)
         fill: style.getLineColor(),
         name: "text"
     });
-    // return shape
-    return {"shape": kline, "text": ktext};
+    // return group
+    var group = new Kinetic.Group();
+    group.add(kshape);
+    group.add(ktext);
+    return group;
 };
 
 /**
@@ -11158,14 +11146,18 @@ dwv.tool.UpdateLine = function (anchor, image)
     // parent group
     var group = anchor.getParent();
     // associated shape
-    var kline = group.getChildren(function(node){
+    var kline = group.getChildren( function (node) {
         return node.name() === 'shape';
     })[0];
+    // associated text
+    var ktext = group.getChildren( function (node) {
+        return node.name() === 'text';
+    })[0];
     // find special points
-    var begin = group.getChildren(function(node){
+    var begin = group.getChildren( function (node) {
         return node.id() === 'begin';
     })[0];
-    var end = group.getChildren(function(node){
+    var end = group.getChildren( function (node) {
         return node.id() === 'end';
     })[0];
     // update special points
@@ -11187,20 +11179,14 @@ dwv.tool.UpdateLine = function (anchor, image)
     var ey = end.y() - kline.y();
     kline.points( [bx,by,ex,ey] );
     // update text
-    var ktext = group.getChildren(function(node){
-        return node.name() === 'text';
-    })[0];
-    if ( ktext ) {
-        // update quantification
-        var p2d0 = new dwv.math.Point2D(begin.x(), begin.y());
-        var p2d1 = new dwv.math.Point2D(end.x(), end.y());
-        var line = new dwv.math.Line(p2d0, p2d1);
-        var quant = image.quantifyLine( line );
-        var str = quant.length.toPrecision(4) + " mm";
-        var textPos = { 'x': line.getEnd().getX(), 'y': line.getEnd().getY() - 15 };
-        ktext.position( textPos );
-        ktext.text(str);
-    }
+    var p2d0 = new dwv.math.Point2D(begin.x(), begin.y());
+    var p2d1 = new dwv.math.Point2D(end.x(), end.y());
+    var line = new dwv.math.Line(p2d0, p2d1);
+    var quant = image.quantifyLine( line );
+    var str = quant.length.toPrecision(4) + " mm";
+    var textPos = { 'x': line.getEnd().getX(), 'y': line.getEnd().getY() - 15 };
+    ktext.position( textPos );
+    ktext.text(str);
 };
 ;/** 
  * Tool module.
@@ -11232,13 +11218,6 @@ dwv.tool.Livewire = function(app)
      * @type Boolean
      */
     this.started = false;
-    /**
-     * Interaction just started flag.
-     * @property justStarted
-     * @private
-     * @type Boolean
-     */
-    var justStarted = true;
     
     /**
      * Draw command.
@@ -11247,13 +11226,6 @@ dwv.tool.Livewire = function(app)
      * @type Object
      */
     var command = null;
-    /**
-     * Current active shape.
-     * @property activeShape
-     * @private
-     * @type Object
-     */
-    var activeShape = null;
     /**
      * Current shape group.
      * @property shapeGroup
@@ -11335,7 +11307,6 @@ dwv.tool.Livewire = function(app)
         // first time
         if( !self.started ) {
             self.started = true;
-            shapeGroup = new Kinetic.Group();
             self.x0 = event._x;
             self.y0 = event._y;
             // clear vars
@@ -11359,7 +11330,6 @@ dwv.tool.Livewire = function(app)
                 app.getUndoStack().add(command);
                 // set flag
                 self.started = false;
-                justStarted = true;
             }
             // anchor point
             else {
@@ -11426,19 +11396,13 @@ dwv.tool.Livewire = function(app)
         }
         currentPath.appenPath(path);
         
-        // remove previous draw if not just started
-        if ( activeShape && !justStarted ) {
-            activeShape.destroy();
-        }
-        if ( justStarted ) {
-            justStarted = false;
+        // remove previous draw
+        if ( shapeGroup ) {
+            shapeGroup.destroy();
         }
         // create shape
         var factory = new dwv.tool.RoiFactory();
-        var tmp = factory.create(currentPath.pointArray, self.style);
-        activeShape = tmp.shape;
-        // add shape to group
-        shapeGroup.add(activeShape);
+        shapeGroup = factory.create(currentPath.pointArray, self.style);
         // draw shape command
         command = new dwv.tool.DrawGroupCommand(shapeGroup, "livewire", app.getDrawLayer());
         // draw
@@ -11611,8 +11575,8 @@ dwv.tool.ProtractorFactory.prototype.create = function (points, style/*, image*/
         pointsArray.push( points[i].getX() );
         pointsArray.push( points[i].getY() );
     }
-    // shape
-    var kline = new Kinetic.Line({
+    // draw shape
+    var kshape = new Kinetic.Line({
         points: pointsArray,
         stroke: style.getLineColor(),
         strokeWidth: 2,
@@ -11646,8 +11610,11 @@ dwv.tool.ProtractorFactory.prototype.create = function (points, style/*, image*/
             name: "text"
         });
     }
-    // return shape
-    return {"shape": kline, "text": ktext};
+    // return group
+    var group = new Kinetic.Group();
+    group.add(kshape);
+    group.add(ktext);
+    return group;
 };
 
 /**
@@ -11662,17 +11629,21 @@ dwv.tool.UpdateProtractor = function (anchor/*, image*/)
     // parent group
     var group = anchor.getParent();
     // associated shape
-    var kline = group.getChildren(function(node){
+    var kline = group.getChildren( function (node) {
         return node.name() === 'shape';
     })[0];
+    // associated text
+    var ktext = group.getChildren( function (node) {
+        return node.name() === 'text';
+    })[0];
     // find special points
-    var begin = group.getChildren( function (node){
+    var begin = group.getChildren( function (node) {
         return node.id() === 'begin';
     })[0];
-    var mid = group.getChildren( function (node){
+    var mid = group.getChildren( function (node) {
         return node.id() === 'mid';
     })[0];
-    var end = group.getChildren( function (node){
+    var end = group.getChildren( function (node) {
         return node.id() === 'end';
     })[0];
     // update special points
@@ -11700,22 +11671,16 @@ dwv.tool.UpdateProtractor = function (anchor/*, image*/)
     var ey = end.y() - kline.y();
     kline.points( [bx,by,mx,my,ex,ey] );
     // update text
-    var ktext = group.getChildren(function(node){
-        return node.name() === 'text';
-    })[0];
-    if ( ktext ) {
-        // update quantification
-        var p2d0 = new dwv.math.Point2D(begin.x(), begin.y());
-        var p2d1 = new dwv.math.Point2D(mid.x(), mid.y());
-        var p2d2 = new dwv.math.Point2D(end.x(), end.y());
-        var line0 = new dwv.math.Line(p2d0, p2d1);
-        var line1 = new dwv.math.Line(p2d1, p2d2);
-        var quant = dwv.math.getAngle( line0, line1 );
-        var str = quant.toPrecision(4) + " deg";
-        var textPos = { 'x': line0.getEnd().getX(), 'y': line0.getEnd().getY() - 15 };
-        ktext.position( textPos );
-        ktext.text(str);
-    }
+    var p2d0 = new dwv.math.Point2D(begin.x(), begin.y());
+    var p2d1 = new dwv.math.Point2D(mid.x(), mid.y());
+    var p2d2 = new dwv.math.Point2D(end.x(), end.y());
+    var line0 = new dwv.math.Line(p2d0, p2d1);
+    var line1 = new dwv.math.Line(p2d1, p2d2);
+    var quant = dwv.math.getAngle( line0, line1 );
+    var str = quant.toPrecision(4) + " deg";
+    var textPos = { 'x': line0.getEnd().getX(), 'y': line0.getEnd().getY() - 15 };
+    ktext.position( textPos );
+    ktext.text(str);
 };
 ;/** 
  * Tool module.
@@ -11758,8 +11723,8 @@ dwv.tool.RectangleFactory.prototype.create = function (points, style, image)
 {
     // physical shape
     var rectangle = new dwv.math.Rectangle(points[0], points[1]);
-    // shape
-    var krect = new Kinetic.Rect({
+    // draw shape
+    var kshape = new Kinetic.Rect({
         x: rectangle.getBegin().getX(),
         y: rectangle.getBegin().getY(),
         width: rectangle.getWidth(),
@@ -11772,6 +11737,7 @@ dwv.tool.RectangleFactory.prototype.create = function (points, style, image)
     var quant = image.quantifyRect( rectangle );
     var cm2 = quant.surface / 100;
     var str = cm2.toPrecision(4) + " cm2";
+    // quantification text
     var ktext = new Kinetic.Text({
         x: rectangle.getBegin().getX(),
         y: rectangle.getEnd().getY() + 10,
@@ -11781,8 +11747,11 @@ dwv.tool.RectangleFactory.prototype.create = function (points, style, image)
         fill: style.getLineColor(),
         name: "text"
     });
-    // return shape
-    return {"shape": krect, "text": ktext};
+    // return group
+    var group = new Kinetic.Group();
+    group.add(kshape);
+    group.add(ktext);
+    return group;
 };
 
 /**
@@ -11797,20 +11766,24 @@ dwv.tool.UpdateRect = function (anchor, image)
     // parent group
     var group = anchor.getParent();
     // associated shape
-    var krect = group.getChildren(function(node){
+    var krect = group.getChildren( function (node) {
         return node.name() === 'shape';
     })[0];
+    // associated text
+    var ktext = group.getChildren( function (node) {
+        return node.name() === 'text';
+    })[0];
     // find special points
-    var topLeft = group.getChildren(function(node){
+    var topLeft = group.getChildren( function (node) {
         return node.id() === 'topLeft';
     })[0];
-    var topRight = group.getChildren(function(node){
+    var topRight = group.getChildren( function (node) {
         return node.id() === 'topRight';
     })[0];
-    var bottomRight = group.getChildren(function(node){
+    var bottomRight = group.getChildren( function (node) {
         return node.id() === 'bottomRight';
     })[0];
-    var bottomLeft = group.getChildren(function(node){
+    var bottomLeft = group.getChildren( function (node) {
         return node.id() === 'bottomLeft';
     })[0];
     // update 'self' (undo case) and special points
@@ -11851,20 +11824,15 @@ dwv.tool.UpdateRect = function (anchor, image)
         krect.size({'width': width, 'height': height});
     }
     // update text
-    var ktext = group.getChildren(function(node){
-        return node.name() === 'text';
-    })[0];
-    if ( ktext ) {
-        var p2d0 = new dwv.math.Point2D(topLeft.x(), topLeft.y());
-        var p2d1 = new dwv.math.Point2D(bottomRight.x(), bottomRight.y());
-        var rect = new dwv.math.Rectangle(p2d0, p2d1);
-        var quant = image.quantifyRect( rect );
-        var cm2 = quant.surface / 100;
-        var str = cm2.toPrecision(4) + " cm2";
-        var textPos = { 'x': rect.getBegin().getX(), 'y': rect.getEnd().getY() + 10 };
-        ktext.position(textPos);
-        ktext.text(str);
-    }
+    var p2d0 = new dwv.math.Point2D(topLeft.x(), topLeft.y());
+    var p2d1 = new dwv.math.Point2D(bottomRight.x(), bottomRight.y());
+    var rect = new dwv.math.Rectangle(p2d0, p2d1);
+    var quant = image.quantifyRect( rect );
+    var cm2 = quant.surface / 100;
+    var str = cm2.toPrecision(4) + " cm2";
+    var textPos = { 'x': rect.getBegin().getX(), 'y': rect.getEnd().getY() + 10 };
+    ktext.position(textPos);
+    ktext.text(str);
 };
 ;/** 
  * Tool module.
@@ -11916,26 +11884,18 @@ dwv.tool.RoiFactory.prototype.create = function (points, style /*, image*/)
         arr.push( roi.getPoint(i).getX() );
         arr.push( roi.getPoint(i).getY() );
     }
-    // shape
-    var kline = new Kinetic.Line({
+    // draw shape
+    var kshape = new Kinetic.Line({
         points: arr,
         stroke: style.getLineColor(),
         strokeWidth: 2,
         name: "shape",
         closed: true
     });
-    // quantification
-    var ktext = new Kinetic.Text({
-        x: 0,
-        y: 0,
-        text: "",
-        fontSize: style.getFontSize(),
-        fontFamily: "Verdana",
-        fill: style.getLineColor(),
-        name: "text"
-    });
-    // return shape
-    return {"shape": kline, "text": ktext};
+    // return group
+    var group = new Kinetic.Group();
+    group.add(kshape);
+    return group;
 }; 
 
 /**
@@ -11950,11 +11910,11 @@ dwv.tool.UpdateRoi = function (anchor /*, image*/)
     // parent group
     var group = anchor.getParent();
     // associated shape
-    var kroi = group.getChildren(function(node){
+    var kroi = group.getChildren( function (node) {
         return node.name() === 'shape';
     })[0];
     // update self
-    var point = group.getChildren(function(node){
+    var point = group.getChildren( function (node) {
         return node.id() === anchor.id();
     })[0];
     point.x( anchor.x() );
