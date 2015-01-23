@@ -74,13 +74,17 @@ dwv.tool.RoiFactory.prototype.create = function (points, style /*, image*/)
  * Update a roi shape.
  * @method UpdateRoi
  * @static
- * @param {Object} kroi The line shape to update.
  * @param {Object} anchor The active anchor.
+ * @param {Object} image The associated image.
  */ 
-dwv.tool.UpdateRoi = function (kroi, anchor /*, image*/)
+dwv.tool.UpdateRoi = function (anchor /*, image*/)
 {
     // parent group
     var group = anchor.getParent();
+    // associated shape
+    var kroi = group.getChildren(function(node){
+        return node.name() === 'shape';
+    })[0];
     // update self
     var point = group.getChildren(function(node){
         return node.id() === anchor.id();

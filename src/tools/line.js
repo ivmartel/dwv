@@ -67,14 +67,17 @@ dwv.tool.LineFactory.prototype.create = function (points, style, image)
  * Update a line shape.
  * @method UpdateLine
  * @static
- * @param {Object} kline The line shape to update.
  * @param {Object} anchor The active anchor.
  * @param {Object} image The associated image.
  */ 
-dwv.tool.UpdateLine = function (kline, anchor, image)
+dwv.tool.UpdateLine = function (anchor, image)
 {
     // parent group
     var group = anchor.getParent();
+    // associated shape
+    var kline = group.getChildren(function(node){
+        return node.name() === 'shape';
+    })[0];
     // find special points
     var begin = group.getChildren(function(node){
         return node.id() === 'begin';

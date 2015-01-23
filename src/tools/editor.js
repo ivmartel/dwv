@@ -303,10 +303,10 @@ dwv.tool.ShapeEditor = function ()
         // command name based on shape type
         var cmdName = "shape";
         if ( shape instanceof Kinetic.Line ) {
-            if ( shape.points.length == 2 ) {
+            if ( shape.points().length == 4 ) {
                 cmdName = "line";
             }
-            else if ( shape.points.length == 3 ) {
+            else if ( shape.points().length == 6 ) {
                 cmdName = "protractor";
             }
             else {
@@ -327,7 +327,7 @@ dwv.tool.ShapeEditor = function ()
         // drag move listener
         anchor.on('dragmove', function () {
             if ( updateFunction ) {
-                updateFunction(shape, this, image);
+                updateFunction(this, image);
             }
             if ( this.getLayer() ) {
                 this.getLayer().draw();
@@ -340,8 +340,8 @@ dwv.tool.ShapeEditor = function ()
         anchor.on('dragend', function () {
             var endAnchor = getClone(this);
             // store the change command
-            var chgcmd = new dwv.tool.ChangeShapeCommand(
-                    shape, cmdName, updateFunction, startAnchor, endAnchor, this.getLayer(), image);
+            var chgcmd = new dwv.tool.ChangeGroupCommand(
+                    cmdName, updateFunction, startAnchor, endAnchor, this.getLayer(), image);
             chgcmd.execute();
             app.getUndoStack().add(chgcmd);
             // reset start anchor

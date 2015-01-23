@@ -90,14 +90,17 @@ dwv.tool.ProtractorFactory.prototype.create = function (points, style/*, image*/
  * Update a protractor shape.
  * @method UpdateProtractor
  * @static
- * @param {Object} kline The protractor shape to update.
  * @param {Object} anchor The active anchor.
  * @param {Object} image The associated image.
  */ 
-dwv.tool.UpdateProtractor = function (kline, anchor/*, image*/)
+dwv.tool.UpdateProtractor = function (anchor/*, image*/)
 {
     // parent group
     var group = anchor.getParent();
+    // associated shape
+    var kline = group.getChildren(function(node){
+        return node.name() === 'shape';
+    })[0];
     // find special points
     var begin = group.getChildren( function (node){
         return node.id() === 'begin';

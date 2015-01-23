@@ -70,13 +70,17 @@ dwv.tool.RectangleFactory.prototype.create = function (points, style, image)
  * Update a rectangle shape.
  * @method UpdateRect
  * @static
- * @param {Object} krect The rectangle shape to update.
  * @param {Object} anchor The active anchor.
+ * @param {Object} image The associated image.
  */ 
-dwv.tool.UpdateRect = function (krect, anchor, image)
+dwv.tool.UpdateRect = function (anchor, image)
 {
     // parent group
     var group = anchor.getParent();
+    // associated shape
+    var krect = group.getChildren(function(node){
+        return node.name() === 'shape';
+    })[0];
     // find special points
     var topLeft = group.getChildren(function(node){
         return node.id() === 'topLeft';

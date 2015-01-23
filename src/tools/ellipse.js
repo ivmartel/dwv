@@ -72,13 +72,17 @@ dwv.tool.EllipseFactory.prototype.create = function (points, style, image)
  * Update an ellipse shape.
  * @method UpdateEllipse
  * @static
- * @param {Object} kellipse The ellipse shape to update.
  * @param {Object} anchor The active anchor.
+ * @param {Object} image The associated image.
  */ 
-dwv.tool.UpdateEllipse = function (kellipse, anchor, image)
+dwv.tool.UpdateEllipse = function (anchor, image)
 {
     // parent group
     var group = anchor.getParent();
+    // associated shape
+    var kellipse = group.getChildren(function(node){
+        return node.name() === 'shape';
+    })[0];
     // find special points
     var topLeft = group.getChildren(function(node){
         return node.id() === 'topLeft';
