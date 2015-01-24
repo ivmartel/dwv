@@ -11721,6 +11721,8 @@ dwv.tool.UpdateProtractor = function (anchor/*, image*/)
     karc.outerRadius(radius);
     karc.angle(angle);
     karc.rotation(-inclination);
+    var arcPos = { 'x': mx, 'y': my };
+    karc.position(arcPos);
 };
 ;/** 
  * Tool module.
