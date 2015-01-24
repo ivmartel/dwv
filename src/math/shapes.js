@@ -287,6 +287,18 @@ dwv.math.Line = function(begin, end)
     { 
         return dy / dx;
     };
+    /**
+     * Get the inclination of the line.
+     * @method getInclination
+     * @return {Number} The inclination of the line.
+     */
+    this.getInclination = function()
+    { 
+        // tan(theta) = slope
+        var angle = Math.atan2( dy, dx ) * 180 / Math.PI;
+        // shift?
+        return 180 - angle;
+    };
 }; // Line class
 
 /**
@@ -305,9 +317,10 @@ dwv.math.getAngle = function (line0, line1)
     // cross = ||a||*||b||*sin(theta)
     var det = dx0 * dy1 - dy0 * dx1;
     // tan = sin / cos
-    var angle = Math.abs(Math.atan2( det, dot )) * 180 / Math.PI;
+    var angle = Math.atan2( det, dot ) * 180 / Math.PI;
+    // complementary angle
     // shift?
-    return 180 - angle;
+    return 360 - (180 - angle);
 };
 
 /**
