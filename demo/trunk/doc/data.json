@@ -616,7 +616,7 @@
             },
             "tag": "module",
             "file": "src/math/shapes.js",
-            "line": 439,
+            "line": 452,
             "description": "Math module."
         },
         "tool": {
@@ -1268,7 +1268,7 @@
             "module": "math",
             "namespace": "dwv.math",
             "file": "src/math/shapes.js",
-            "line": 313,
+            "line": 326,
             "description": "Rectangle shape.",
             "is_constructor": 1,
             "params": [
@@ -1295,7 +1295,7 @@
             "module": "math",
             "namespace": "dwv.math",
             "file": "src/math/shapes.js",
-            "line": 395,
+            "line": 408,
             "description": "Region Of Interest shape.",
             "is_constructor": 1
         },
@@ -1310,7 +1310,7 @@
             "module": "math",
             "namespace": "dwv.math",
             "file": "src/math/shapes.js",
-            "line": 439,
+            "line": 452,
             "description": "Path shape.",
             "is_constructor": 1,
             "params": [
@@ -6687,7 +6687,21 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 292,
+            "line": 290,
+            "description": "Get the inclination of the line.",
+            "itemtype": "method",
+            "name": "getInclination",
+            "return": {
+                "description": "The inclination of the line.",
+                "type": "Number"
+            },
+            "class": "dwv.math.Line",
+            "module": "math",
+            "namespace": "dwv.math"
+        },
+        {
+            "file": "src/math/shapes.js",
+            "line": 304,
             "description": "Get the angle between two lines.",
             "params": [
                 {
@@ -6705,7 +6719,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 334,
+            "line": 347,
             "description": "Rectangle surface.",
             "itemtype": "property",
             "name": "surface",
@@ -6718,7 +6732,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 342,
+            "line": 355,
             "description": "Get the begin point of the rectangle.",
             "itemtype": "method",
             "name": "getBegin",
@@ -6732,7 +6746,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 348,
+            "line": 361,
             "description": "Get the end point of the rectangle.",
             "itemtype": "method",
             "name": "getEnd",
@@ -6746,7 +6760,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 354,
+            "line": 367,
             "description": "Get the real width of the rectangle.",
             "itemtype": "method",
             "name": "getRealWidth",
@@ -6760,7 +6774,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 360,
+            "line": 373,
             "description": "Get the real height of the rectangle.",
             "itemtype": "method",
             "name": "getRealHeight",
@@ -6774,7 +6788,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 366,
+            "line": 379,
             "description": "Get the width of the rectangle.",
             "itemtype": "method",
             "name": "getWidth",
@@ -6788,7 +6802,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 372,
+            "line": 385,
             "description": "Get the height of the rectangle.",
             "itemtype": "method",
             "name": "getHeight",
@@ -6802,7 +6816,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 378,
+            "line": 391,
             "description": "Get the surface of the rectangle.",
             "itemtype": "method",
             "name": "getSurface",
@@ -6816,7 +6830,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 384,
+            "line": 397,
             "description": "Get the surface of the rectangle with a spacing.",
             "itemtype": "method",
             "name": "getWorldSurface",
@@ -6830,7 +6844,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 404,
+            "line": 417,
             "description": "List of points.",
             "itemtype": "property",
             "name": "points",
@@ -6843,7 +6857,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 412,
+            "line": 425,
             "description": "Get a point of the list at a given index.",
             "itemtype": "method",
             "name": "getPoint",
@@ -6864,7 +6878,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 419,
+            "line": 432,
             "description": "Get the length of the point list.",
             "itemtype": "method",
             "name": "getLength",
@@ -6878,7 +6892,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 425,
+            "line": 438,
             "description": "Add a point to the ROI.",
             "itemtype": "method",
             "name": "addPoint",
@@ -6895,7 +6909,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 431,
+            "line": 444,
             "description": "Add points to the ROI.",
             "itemtype": "method",
             "name": "addPoints",
@@ -6912,7 +6926,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 451,
+            "line": 464,
             "description": "List of points.",
             "itemtype": "property",
             "name": "pointArray",
@@ -6923,7 +6937,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 457,
+            "line": 470,
             "description": "List of control points.",
             "itemtype": "property",
             "name": "controlPointIndexArray",
@@ -6934,7 +6948,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 466,
+            "line": 479,
             "description": "Get a point of the list.",
             "itemtype": "method",
             "name": "getPoint",
@@ -6955,7 +6969,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 476,
+            "line": 489,
             "description": "Is the given point a control point.",
             "itemtype": "method",
             "name": "isControlPoint",
@@ -6976,7 +6990,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 492,
+            "line": 505,
             "description": "Get the length of the path.",
             "itemtype": "method",
             "name": "getLength",
@@ -6990,7 +7004,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 501,
+            "line": 514,
             "description": "Add a point to the path.",
             "itemtype": "method",
             "name": "addPoint",
@@ -7007,7 +7021,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 510,
+            "line": 523,
             "description": "Add a control point to the path.",
             "itemtype": "method",
             "name": "addControlPoint",
@@ -7024,7 +7038,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 525,
+            "line": 538,
             "description": "Add points to the path.",
             "itemtype": "method",
             "name": "addPoints",
@@ -7041,7 +7055,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 534,
+            "line": 547,
             "description": "Append a Path to this one.",
             "itemtype": "method",
             "name": "appenPath",
@@ -8847,7 +8861,7 @@
         },
         {
             "file": "src/tools/protractor.js",
-            "line": 92,
+            "line": 102,
             "description": "Update a protractor shape.",
             "itemtype": "method",
             "name": "UpdateProtractor",
@@ -10816,7 +10830,7 @@
         },
         {
             "message": "Missing item type\nGet the angle between two lines.",
-            "line": " src/math/shapes.js:292"
+            "line": " src/math/shapes.js:304"
         },
         {
             "message": "Missing item type\nGet the real position from an event.",

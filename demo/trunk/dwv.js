@@ -8976,6 +8976,18 @@ dwv.math.Line = function(begin, end)
     { 
         return dy / dx;
     };
+    /**
+     * Get the inclination of the line.
+     * @method getInclination
+     * @return {Number} The inclination of the line.
+     */
+    this.getInclination = function()
+    { 
+        // tan(theta) = slope
+        var angle = Math.atan2( dy, dx ) * 180 / Math.PI;
+        // shift?
+        return 180 - angle;
+    };
 }; // Line class
 
 /**
@@ -8994,9 +9006,10 @@ dwv.math.getAngle = function (line0, line1)
     // cross = ||a||*||b||*sin(theta)
     var det = dx0 * dy1 - dy0 * dx1;
     // tan = sin / cos
-    var angle = Math.abs(Math.atan2( det, dot )) * 180 / Math.PI;
+    var angle = Math.atan2( det, dot ) * 180 / Math.PI;
+    // complementary angle
     // shift?
-    return 180 - angle;
+    return 360 - (180 - angle);
 };
 
 /**
@@ -11582,38 +11595,48 @@ dwv.tool.ProtractorFactory.prototype.create = function (points, style/*, image*/
         strokeWidth: 2,
         name: "shape"
     });
-    
-    var ktext;
+    var group = new Kinetic.Group();
+    group.add(kshape);
+    // text and decoration
     if ( points.length == 3 ) {
         var line1 = new dwv.math.Line(points[1], points[2]);
         // quantification
-        var quant = dwv.math.getAngle(line0, line1);
-        var str = quant.toPrecision(4) + " deg";
-        ktext = new Kinetic.Text({
-            x: line0.getEnd().getX(),
-            y: line0.getEnd().getY() - 15,
-            text: str,
+        var angle = dwv.math.getAngle(line0, line1);
+        var inclination = line0.getInclination();
+        if ( angle > 180 ) {
+            angle = 360 - angle;
+            inclination += angle;
+        }
+        var angleStr = angle.toPrecision(4) + "\u00B0";
+        // quantification text
+        var midX = ( line0.getMidpoint().getX() + line1.getMidpoint().getX() ) / 2;
+        var midY = ( line0.getMidpoint().getY() + line1.getMidpoint().getY() ) / 2;
+        var ktext = new Kinetic.Text({
+            x: midX,
+            y: midY - 15,
+            text: angleStr,
             fontSize: style.getFontSize(),
             fontFamily: "Verdana",
             fill: style.getLineColor(),
             name: "text"
         });
-    }
-    else {
-        ktext = new Kinetic.Text({
-            x: 0,
-            y: 0,
-            text: "",
-            fontSize: style.getFontSize(),
-            fontFamily: "Verdana",
-            fill: style.getLineColor(),
-            name: "text"
-        });
+        // arc
+        var radius = Math.min(line0.getLength(), line1.getLength()) * 33 / 100;
+        var karc = new Kinetic.Arc({
+            innerRadius: radius,
+            outerRadius: radius,
+            stroke: style.getLineColor(),
+            angle: angle,
+            rotationDeg: -inclination,
+            x: points[1].getX(),
+            y: points[1].getY(),
+            name: "arc"
+         });
+        // add to group
+        group.add(ktext);
+        group.add(karc);
     }
     // return group
-    var group = new Kinetic.Group();
-    group.add(kshape);
-    group.add(ktext);
     return group;
 };
 
@@ -11635,6 +11658,10 @@ dwv.tool.UpdateProtractor = function (anchor/*, image*/)
     // associated text
     var ktext = group.getChildren( function (node) {
         return node.name() === 'text';
+    })[0];
+    // associated arc
+    var karc = group.getChildren( function (node) {
+        return node.name() === 'arc';
     })[0];
     // find special points
     var begin = group.getChildren( function (node) {
@@ -11676,11 +11703,24 @@ dwv.tool.UpdateProtractor = function (anchor/*, image*/)
     var p2d2 = new dwv.math.Point2D(end.x(), end.y());
     var line0 = new dwv.math.Line(p2d0, p2d1);
     var line1 = new dwv.math.Line(p2d1, p2d2);
-    var quant = dwv.math.getAngle( line0, line1 );
-    var str = quant.toPrecision(4) + " deg";
-    var textPos = { 'x': line0.getEnd().getX(), 'y': line0.getEnd().getY() - 15 };
+    var angle = dwv.math.getAngle(line0, line1);
+    var inclination = line0.getInclination();
+    if ( angle > 180 ) {
+        angle = 360 - angle;
+        inclination += angle;
+    }
+    var str = angle.toPrecision(4) + "\u00B0";
+    var midX = ( line0.getMidpoint().getX() + line1.getMidpoint().getX() ) / 2;
+    var midY = ( line0.getMidpoint().getY() + line1.getMidpoint().getY() ) / 2;
+    var textPos = { 'x': midX, 'y': midY - 15 };
     ktext.position( textPos );
     ktext.text(str);
+    // arc
+    var radius = Math.min(line0.getLength(), line1.getLength()) * 33 / 100;
+    karc.innerRadius(radius);
+    karc.outerRadius(radius);
+    karc.angle(angle);
+    karc.rotation(-inclination);
 };
 ;/** 
  * Tool module.
