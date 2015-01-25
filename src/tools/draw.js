@@ -363,7 +363,16 @@ dwv.tool.Draw = function (app)
             })[0];
             shape.listening(false);
             drawLayer.hitGraphEnabled(false);
-            // draw shape command
+           
+            //add name to the added group element 
+            
+            var childrens = drawLayer.getChildren();
+            numofchilds = childrens.length - 1;
+            var extraname = numofchilds + 1;
+            shapeGroup.name = "ShapeGroup" + extraname;
+            
+             // draw shape command
+            
             command = new dwv.tool.DrawGroupCommand(shapeGroup, self.shapeName, drawLayer);
             // draw
             command.execute();
