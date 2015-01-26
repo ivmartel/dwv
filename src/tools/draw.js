@@ -283,6 +283,14 @@ dwv.tool.Draw = function (app)
     var drawLayer = null;
     
     /**
+     * The associated draw layer.
+     * @property drawLayer
+     * @private
+     * @type Object
+     */
+    var idGenerator = new dwv.math.IdGenerator();
+
+    /**
      * Handle mouse down event.
      * @method mousedown
      * @param {Object} event The mouse down event.
@@ -385,6 +393,7 @@ dwv.tool.Draw = function (app)
             // create final shape
             var factory = new dwv.tool.shapes[self.shapeName]();
             var group = factory.create(points, self.style, app.getImage());
+            group.id( idGenerator.get() );
             // re-activate layer
             drawLayer.hitGraphEnabled(true);
             // draw shape command

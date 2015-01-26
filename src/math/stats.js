@@ -42,3 +42,28 @@ dwv.math.getStats = function (array)
     
     return { 'min': min, 'max': max, 'mean': mean, 'stdDev': stdDev };
 };
+
+/** 
+ * Unique ID generator.
+ * @class IdGenerator
+ * @namespace dwv.math
+ * @constructor
+ */
+dwv.math.IdGenerator = function ()
+{
+    /**
+     * Root for IDs.
+     * @property root
+     * @private
+     * @type Number
+     */
+    var root = Math.floor( Math.random() * 26 ) + Date.now();
+    /**
+     * Get a unique id.
+     * @method get
+     * @return {Number} The unique Id.
+     */
+    this.get = function () {
+        return root++;
+    };
+};
