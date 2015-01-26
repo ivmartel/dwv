@@ -180,6 +180,6 @@ dwv.tool.UpdateProtractor = function (anchor/*, image*/)
     karc.outerRadius(radius);
     karc.angle(angle);
     karc.rotation(-inclination);
-    var arcPos = { 'x': mx, 'y': my };
+    var arcPos = { 'x': mid.x(), 'y': mid.y() };
     karc.position(arcPos);
 };
