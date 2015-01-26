@@ -67,6 +67,7 @@ dwv.tool.EllipseFactory.prototype.create = function (points, style, image)
     });
     // return group
     var group = new Kinetic.Group();
+    group.name("ellipse-group");
     group.add(kshape);
     group.add(ktext);
     return group;

@@ -58,6 +58,7 @@ dwv.tool.RoiFactory.prototype.create = function (points, style /*, image*/)
     });
     // return group
     var group = new Kinetic.Group();
+    group.name("roi-group");
     group.add(kshape);
     return group;
 }; 

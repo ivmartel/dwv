@@ -65,6 +65,7 @@ dwv.tool.RectangleFactory.prototype.create = function (points, style, image)
     });
     // return group
     var group = new Kinetic.Group();
+    group.name("rectangle-group");
     group.add(kshape);
     group.add(ktext);
     return group;

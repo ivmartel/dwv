@@ -55,6 +55,7 @@ dwv.tool.ProtractorFactory.prototype.create = function (points, style/*, image*/
         name: "shape"
     });
     var group = new Kinetic.Group();
+    group.name("protractor-group");
     group.add(kshape);
     // text and decoration
     if ( points.length == 3 ) {
