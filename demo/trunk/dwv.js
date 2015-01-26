@@ -9291,6 +9291,31 @@ dwv.math.getStats = function (array)
     
     return { 'min': min, 'max': max, 'mean': mean, 'stdDev': stdDev };
 };
+
+/** 
+ * Unique ID generator.
+ * @class IdGenerator
+ * @namespace dwv.math
+ * @constructor
+ */
+dwv.math.IdGenerator = function ()
+{
+    /**
+     * Root for IDs.
+     * @property root
+     * @private
+     * @type Number
+     */
+    var root = Math.floor( Math.random() * 26 ) + Date.now();
+    /**
+     * Get a unique id.
+     * @method get
+     * @return {Number} The unique Id.
+     */
+    this.get = function () {
+        return root++;
+    };
+};
 ;/** 
  * Tool module.
  * @module tool
@@ -9576,6 +9601,14 @@ dwv.tool.Draw = function (app)
     var drawLayer = null;
     
     /**
+     * The associated draw layer.
+     * @property drawLayer
+     * @private
+     * @type Object
+     */
+    var idGenerator = new dwv.math.IdGenerator();
+
+    /**
      * Handle mouse down event.
      * @method mousedown
      * @param {Object} event The mouse down event.
@@ -9678,6 +9711,7 @@ dwv.tool.Draw = function (app)
             // create final shape
             var factory = new dwv.tool.shapes[self.shapeName]();
             var group = factory.create(points, self.style, app.getImage());
+            group.id( idGenerator.get() );
             // re-activate layer
             drawLayer.hitGraphEnabled(true);
             // draw shape command
@@ -10479,6 +10513,7 @@ dwv.tool.EllipseFactory.prototype.create = function (points, style, image)
     });
     // return group
     var group = new Kinetic.Group();
+    group.name("ellipse-group");
     group.add(kshape);
     group.add(ktext);
     return group;
@@ -11142,6 +11177,7 @@ dwv.tool.LineFactory.prototype.create = function (points, style, image)
     });
     // return group
     var group = new Kinetic.Group();
+    group.name("line-group");
     group.add(kshape);
     group.add(ktext);
     return group;
@@ -11596,6 +11632,7 @@ dwv.tool.ProtractorFactory.prototype.create = function (points, style/*, image*/
         name: "shape"
     });
     var group = new Kinetic.Group();
+    group.name("protractor-group");
     group.add(kshape);
     // text and decoration
     if ( points.length == 3 ) {
@@ -11721,7 +11758,7 @@ dwv.tool.UpdateProtractor = function (anchor/*, image*/)
     karc.outerRadius(radius);
     karc.angle(angle);
     karc.rotation(-inclination);
-    var arcPos = { 'x': mx, 'y': my };
+    var arcPos = { 'x': mid.x(), 'y': mid.y() };
     karc.position(arcPos);
 };
 ;/** 
@@ -11791,6 +11828,7 @@ dwv.tool.RectangleFactory.prototype.create = function (points, style, image)
     });
     // return group
     var group = new Kinetic.Group();
+    group.name("rectangle-group");
     group.add(kshape);
     group.add(ktext);
     return group;
@@ -11936,6 +11974,7 @@ dwv.tool.RoiFactory.prototype.create = function (points, style /*, image*/)
     });
     // return group
     var group = new Kinetic.Group();
+    group.name("roi-group");
     group.add(kshape);
     return group;
 }; 

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>dwv.io.File - dwv</title>
+    <title>dwv.math.IdGenerator - dwv</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
     <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
@@ -139,28 +139,28 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-                        <h1>dwv.io.File Class</h1>
+                        <h1>dwv.math.IdGenerator Class</h1>
                         <div class="box meta">
                         
                         
                                 <div class="foundat">
-                                    Defined in: <a href="../files/src_io_file.js.html#l8"><code>src&#x2F;io&#x2F;file.js:8</code></a>
+                                    Defined in: <a href="../files/src_math_stats.js.html#l46"><code>src&#x2F;math&#x2F;stats.js:46</code></a>
                                 </div>
                         
-                                    Module: <a href="../modules/io.html">io</a>
+                                    Module: <a href="../modules/math.html">math</a>
                         
                         </div>
                         
                         
                         <div class="box intro">
-                            <p>File loader.</p>
+                            <p>Unique ID generator.</p>
                         
                         </div>
                         
                             <div class="constructor">
                                 <h2>Constructor</h2>
-                                <div id="method_dwv.io.File" class="method item">
-                                    <h3 class="name"><code>dwv.io.File</code></h3>
+                                <div id="method_dwv.math.IdGenerator" class="method item">
+                                    <h3 class="name"><code>dwv.math.IdGenerator</code></h3>
                                 
                                         <span class="paren">()</span>
                                 
@@ -174,7 +174,7 @@
                                     <div class="meta">
                                                 <p>
                                                 Defined in
-                                        <a href="../files/src_io_file.js.html#l8"><code>src&#x2F;io&#x2F;file.js:8</code></a>
+                                        <a href="../files/src_math_stats.js.html#l46"><code>src&#x2F;math&#x2F;stats.js:46</code></a>
                                         </p>
                                 
                                 
@@ -195,6 +195,7 @@
                                 <li class="api-class-tab index"><a href="#index">Index</a></li>
                         
                                     <li class="api-class-tab methods"><a href="#methods">Methods</a></li>
+                                    <li class="api-class-tab properties"><a href="#properties">Properties</a></li>
                             </ul>
                         
                             <div>
@@ -206,12 +207,27 @@
                         
                                             <ul class="index-list methods">
                                                     <li class="index-item method">
-                                                        <a href="#method_load">load</a>
+                                                        <a href="#method_get">get</a>
                         
+                                                    </li>
+                                                    <li class="index-item method">
+                                                        <a href="#method_getStats">getStats</a>
+                        
+                                                            <span class="flag static">static</span>
                                                     </li>
                                             </ul>
                                         </div>
                         
+                                        <div class="index-section properties">
+                                            <h3>Properties</h3>
+                        
+                                            <ul class="index-list properties">
+                                                    <li class="index-item property private">
+                                                        <a href="#property_root">root</a>
+                        
+                                                    </li>
+                                            </ul>
+                                        </div>
                         
                         
                                 </div>
@@ -219,17 +235,14 @@
                                     <div id="methods" class="api-class-tabpanel">
                                         <h2 class="off-left">Methods</h2>
                         
-                                            <div id="method_load" class="method item">
-                                                <h3 class="name"><code>load</code></h3>
+                                            <div id="method_get" class="method item">
+                                                <h3 class="name"><code>get</code></h3>
                                             
-                                                    <div class="args">
-                                                        <span class="paren">(</span><ul class="args-list inline commas">
-                                                            <li class="arg">
-                                                                    <code>ioArray</code>
-                                                            </li>
-                                                        </ul><span class="paren">)</span>
-                                                    </div>
+                                                    <span class="paren">()</span>
                                             
+                                                    <span class="returns-inline">
+                                                        <span class="type">Number</span>
+                                                    </span>
                                             
                                             
                                             
@@ -240,7 +253,7 @@
                                                 <div class="meta">
                                                             <p>
                                                             Defined in
-                                                    <a href="../files/src_io_file.js.html#l20"><code>src&#x2F;io&#x2F;file.js:20</code></a>
+                                                    <a href="../files/src_math_stats.js.html#l61"><code>src&#x2F;math&#x2F;stats.js:61</code></a>
                                                     </p>
                                             
                                             
@@ -248,32 +261,87 @@
                                                 </div>
                                             
                                                 <div class="description">
-                                                    <p>Load a list of files.</p>
+                                                    <p>Get a unique id.</p>
                                             
                                                 </div>
                                             
-                                                    <div class="params">
-                                                        <h4>Parameters:</h4>
                                             
-                                                        <ul class="params-list">
-                                                            <li class="param">
-                                                                    <code class="param-name">ioArray</code>
-                                                                    <span class="type">Array</span>
+                                                    <div class="returns">
+                                                        <h4>Returns:</h4>
                                             
+                                                        <div class="returns-description">
+                                                                    <span class="type">Number</span>:
+                                                                <p>The unique Id.</p>
                                             
-                                                                <div class="param-description">
-                                                                    <p>The list of files to load.</p>
-                                            
-                                                                </div>
-                                            
-                                                            </li>
-                                                        </ul>
+                                                        </div>
                                                     </div>
+                                            
+                                            </div>
+                                            <div id="method_getStats" class="method item">
+                                                <h3 class="name"><code>getStats</code></h3>
+                                            
+                                                    <span class="paren">()</span>
+                                            
+                                            
+                                            
+                                            
+                                            
+                                                    <span class="flag static">static</span>
+                                            
+                                            
+                                            
+                                                <div class="meta">
+                                                            <p>
+                                                            Defined in
+                                                    <a href="../files/src_math_stats.js.html#l8"><code>src&#x2F;math&#x2F;stats.js:8</code></a>
+                                                    </p>
+                                            
+                                            
+                                            
+                                                </div>
+                                            
+                                                <div class="description">
+                                                    <p>Get the minimum, maximum, mean and standard deviation
+                                            of an array of values.
+                                            Note: could use <a href="https://github.com/tmcw/simple-statistics">https://github.com/tmcw/simple-statistics</a></p>
+                                            
+                                                </div>
+                                            
                                             
                                             
                                             </div>
                                     </div>
                         
+                                    <div id="properties" class="api-class-tabpanel">
+                                        <h2 class="off-left">Properties</h2>
+                        
+                                            <div id="property_root" class="property item private">
+                                                <h3 class="name"><code>root</code></h3>
+                                                <span class="type">Number</span>
+                                            
+                                            
+                                                    <span class="flag private">private</span>
+                                            
+                                            
+                                            
+                                                <div class="meta">
+                                                            <p>
+                                                            Defined in
+                                                    <a href="../files/src_math_stats.js.html#l54"><code>src&#x2F;math&#x2F;stats.js:54</code></a>
+                                                    </p>
+                                            
+                                            
+                                                </div>
+                                            
+                                                <div class="description">
+                                                    <p>Root for IDs.</p>
+                                            
+                                                </div>
+                                            
+                                            
+                                            
+                                            </div>
+                                    </div>
                         
                         
                             </div>

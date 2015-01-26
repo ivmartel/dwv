@@ -63,6 +63,7 @@
                                 <li><a href="../classes/dwv.math.Circle.html">dwv.math.Circle</a></li>
                                 <li><a href="../classes/dwv.math.Ellipse.html">dwv.math.Ellipse</a></li>
                                 <li><a href="../classes/dwv.math.FastPoint2D.html">dwv.math.FastPoint2D</a></li>
+                                <li><a href="../classes/dwv.math.IdGenerator.html">dwv.math.IdGenerator</a></li>
                                 <li><a href="../classes/dwv.math.Line.html">dwv.math.Line</a></li>
                                 <li><a href="../classes/dwv.math.Path.html">dwv.math.Path</a></li>
                                 <li><a href="../classes/dwv.math.Point2D.html">dwv.math.Point2D</a></li>
@@ -199,6 +200,7 @@
                                 name: &quot;shape&quot;
                             });
                             var group = new Kinetic.Group();
+                            group.name(&quot;protractor-group&quot;);
                             group.add(kshape);
                             // text and decoration
                             if ( points.length == 3 ) {
@@ -324,7 +326,7 @@
                             karc.outerRadius(radius);
                             karc.angle(angle);
                             karc.rotation(-inclination);
-                            var arcPos = { &#x27;x&#x27;: mx, &#x27;y&#x27;: my };
+                            var arcPos = { &#x27;x&#x27;: mid.x(), &#x27;y&#x27;: mid.y() };
                             karc.position(arcPos);
                         };
                         

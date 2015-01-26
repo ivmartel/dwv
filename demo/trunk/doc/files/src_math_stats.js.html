@@ -63,6 +63,7 @@
                                 <li><a href="../classes/dwv.math.Circle.html">dwv.math.Circle</a></li>
                                 <li><a href="../classes/dwv.math.Ellipse.html">dwv.math.Ellipse</a></li>
                                 <li><a href="../classes/dwv.math.FastPoint2D.html">dwv.math.FastPoint2D</a></li>
+                                <li><a href="../classes/dwv.math.IdGenerator.html">dwv.math.IdGenerator</a></li>
                                 <li><a href="../classes/dwv.math.Line.html">dwv.math.Line</a></li>
                                 <li><a href="../classes/dwv.math.Path.html">dwv.math.Path</a></li>
                                 <li><a href="../classes/dwv.math.Point2D.html">dwv.math.Point2D</a></li>
@@ -185,6 +186,31 @@
                             stdDev = Math.sqrt(variance);
                             
                             return { &#x27;min&#x27;: min, &#x27;max&#x27;: max, &#x27;mean&#x27;: mean, &#x27;stdDev&#x27;: stdDev };
+                        };
+                        
+                        /** 
+                         * Unique ID generator.
+                         * @class IdGenerator
+                         * @namespace dwv.math
+                         * @constructor
+                         */
+                        dwv.math.IdGenerator = function ()
+                        {
+                            /**
+                             * Root for IDs.
+                             * @property root
+                             * @private
+                             * @type Number
+                             */
+                            var root = Math.floor( Math.random() * 26 ) + Date.now();
+                            /**
+                             * Get a unique id.
+                             * @method get
+                             * @return {Number} The unique Id.
+                             */
+                            this.get = function () {
+                                return root++;
+                            };
                         };
                         
                             </pre>

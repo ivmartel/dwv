@@ -276,9 +276,13 @@
         "src/math/stats.js": {
             "name": "src/math/stats.js",
             "modules": {},
-            "classes": {},
+            "classes": {
+                "dwv.math.IdGenerator": 1
+            },
             "fors": {},
-            "namespaces": {}
+            "namespaces": {
+                "dwv.math": 1
+            }
         },
         "src/tools/draw.js": {
             "name": "src/tools/draw.js",
@@ -608,15 +612,16 @@
                 "dwv.math.Line": 1,
                 "dwv.math.Rectangle": 1,
                 "dwv.math.ROI": 1,
-                "dwv.math.Path": 1
+                "dwv.math.Path": 1,
+                "dwv.math.IdGenerator": 1
             },
             "fors": {},
             "namespaces": {
                 "dwv.math": 1
             },
             "tag": "module",
-            "file": "src/math/shapes.js",
-            "line": 452,
+            "file": "src/math/stats.js",
+            "line": 46,
             "description": "Math module."
         },
         "tool": {
@@ -1325,6 +1330,21 @@
                     "type": "Array"
                 }
             ]
+        },
+        "dwv.math.IdGenerator": {
+            "name": "dwv.math.IdGenerator",
+            "shortname": "dwv.math.IdGenerator",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "math",
+            "namespace": "dwv.math",
+            "file": "src/math/stats.js",
+            "line": 46,
+            "description": "Unique ID generator.",
+            "is_constructor": 1
         },
         "dwv.tool.DrawGroupCommand": {
             "name": "dwv.tool.DrawGroupCommand",
@@ -7077,8 +7097,35 @@
             "itemtype": "method",
             "name": "getStats",
             "static": 1,
-            "class": "dwv.tool.DrawGroupCommand",
+            "class": "dwv.math.IdGenerator",
             "module": "math"
+        },
+        {
+            "file": "src/math/stats.js",
+            "line": 54,
+            "description": "Root for IDs.",
+            "itemtype": "property",
+            "name": "root",
+            "access": "private",
+            "tagname": "",
+            "type": "Number",
+            "class": "dwv.math.IdGenerator",
+            "module": "math",
+            "namespace": "dwv.math"
+        },
+        {
+            "file": "src/math/stats.js",
+            "line": 61,
+            "description": "Get a unique id.",
+            "itemtype": "method",
+            "name": "get",
+            "return": {
+                "description": "The unique Id.",
+                "type": "Number"
+            },
+            "class": "dwv.math.IdGenerator",
+            "module": "math",
+            "namespace": "dwv.math"
         },
         {
             "file": "src/tools/draw.js",
@@ -7384,6 +7431,19 @@
         {
             "file": "src/tools/draw.js",
             "line": 285,
+            "description": "The associated draw layer.",
+            "itemtype": "property",
+            "name": "drawLayer",
+            "access": "private",
+            "tagname": "",
+            "type": "Object",
+            "class": "dwv.tool.Draw",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/draw.js",
+            "line": 293,
             "description": "Handle mouse down event.",
             "itemtype": "method",
             "name": "mousedown",
@@ -7400,7 +7460,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 325,
+            "line": 333,
             "description": "Handle mouse move event.",
             "itemtype": "method",
             "name": "mousemove",
@@ -7417,7 +7477,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 373,
+            "line": 381,
             "description": "Handle mouse up event.",
             "itemtype": "method",
             "name": "mouseup",
@@ -7434,7 +7494,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 408,
+            "line": 417,
             "description": "Handle mouse out event.",
             "itemtype": "method",
             "name": "mouseout",
@@ -7451,7 +7511,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 417,
+            "line": 426,
             "description": "Handle touch start event.",
             "itemtype": "method",
             "name": "touchstart",
@@ -7468,7 +7528,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 426,
+            "line": 435,
             "description": "Handle touch move event.",
             "itemtype": "method",
             "name": "touchmove",
@@ -7485,7 +7545,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 435,
+            "line": 444,
             "description": "Handle touch end event.",
             "itemtype": "method",
             "name": "touchend",
@@ -7502,7 +7562,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 444,
+            "line": 453,
             "description": "Handle key down event.",
             "itemtype": "method",
             "name": "keydown",
@@ -7519,7 +7579,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 453,
+            "line": 462,
             "description": "Enable the tool.",
             "itemtype": "method",
             "name": "enable",
@@ -7536,7 +7596,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 483,
+            "line": 492,
             "description": "Set shape off properties.",
             "itemtype": "method",
             "name": "setShapeOff",
@@ -7553,7 +7613,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 499,
+            "line": 508,
             "description": "Get the real position from an event.",
             "class": "dwv.tool.Draw",
             "module": "tool",
@@ -7561,7 +7621,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 508,
+            "line": 517,
             "description": "Set shape on properties.",
             "itemtype": "method",
             "name": "setShapeOn",
@@ -7578,7 +7638,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 656,
+            "line": 665,
             "description": "Help for this tool.",
             "itemtype": "method",
             "name": "getHelp",
@@ -7592,7 +7652,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 678,
+            "line": 687,
             "description": "Set the line color of the drawing.",
             "itemtype": "method",
             "name": "setLineColour",
@@ -7609,7 +7669,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 689,
+            "line": 698,
             "description": "Set the shape name of the drawing.",
             "itemtype": "method",
             "name": "setShapeName",
@@ -7626,7 +7686,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 704,
+            "line": 713,
             "description": "Check if the shape is in the shape list.",
             "itemtype": "method",
             "name": "hasShape",
@@ -7643,7 +7703,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 713,
+            "line": 722,
             "description": "Initialise the tool.",
             "itemtype": "method",
             "name": "init",
@@ -7968,7 +8028,7 @@
         },
         {
             "file": "src/tools/ellipse.js",
-            "line": 75,
+            "line": 76,
             "description": "Update an ellipse shape.",
             "itemtype": "method",
             "name": "UpdateEllipse",
@@ -8438,7 +8498,7 @@
         },
         {
             "file": "src/tools/line.js",
-            "line": 70,
+            "line": 71,
             "description": "Update a line shape.",
             "itemtype": "method",
             "name": "UpdateLine",
@@ -8861,7 +8921,7 @@
         },
         {
             "file": "src/tools/protractor.js",
-            "line": 102,
+            "line": 103,
             "description": "Update a protractor shape.",
             "itemtype": "method",
             "name": "UpdateProtractor",
@@ -8939,7 +8999,7 @@
         },
         {
             "file": "src/tools/rectangle.js",
-            "line": 73,
+            "line": 74,
             "description": "Update a rectangle shape.",
             "itemtype": "method",
             "name": "UpdateRect",
@@ -9017,7 +9077,7 @@
         },
         {
             "file": "src/tools/roi.js",
-            "line": 65,
+            "line": 66,
             "description": "Update a roi shape.",
             "itemtype": "method",
             "name": "UpdateRoi",
@@ -10778,7 +10838,7 @@
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/tools/draw.js:656"
+            "line": " src/tools/draw.js:665"
         },
         {
             "message": "replacing incorrect tag: returns with return",
@@ -10834,7 +10894,7 @@
         },
         {
             "message": "Missing item type\nGet the real position from an event.",
-            "line": " src/tools/draw.js:499"
+            "line": " src/tools/draw.js:508"
         },
         {
             "message": "Missing item type\nApply a function on all anchors.",

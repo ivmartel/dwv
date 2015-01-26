@@ -63,6 +63,7 @@
                                 <li><a href="../classes/dwv.math.Circle.html">dwv.math.Circle</a></li>
                                 <li><a href="../classes/dwv.math.Ellipse.html">dwv.math.Ellipse</a></li>
                                 <li><a href="../classes/dwv.math.FastPoint2D.html">dwv.math.FastPoint2D</a></li>
+                                <li><a href="../classes/dwv.math.IdGenerator.html">dwv.math.IdGenerator</a></li>
                                 <li><a href="../classes/dwv.math.Line.html">dwv.math.Line</a></li>
                                 <li><a href="../classes/dwv.math.Path.html">dwv.math.Path</a></li>
                                 <li><a href="../classes/dwv.math.Point2D.html">dwv.math.Point2D</a></li>
@@ -427,6 +428,14 @@
                             var drawLayer = null;
                             
                             /**
+                             * The associated draw layer.
+                             * @property drawLayer
+                             * @private
+                             * @type Object
+                             */
+                            var idGenerator = new dwv.math.IdGenerator();
+                        
+                            /**
                              * Handle mouse down event.
                              * @method mousedown
                              * @param {Object} event The mouse down event.
@@ -529,6 +538,7 @@
                                     // create final shape
                                     var factory = new dwv.tool.shapes[self.shapeName]();
                                     var group = factory.create(points, self.style, app.getImage());
+                                    group.id( idGenerator.get() );
                                     // re-activate layer
                                     drawLayer.hitGraphEnabled(true);
                                     // draw shape command
