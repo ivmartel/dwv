@@ -94,6 +94,30 @@ test("Test Line.", function() {
     // getMidpoint
     var pMid = new dwv.math.Point2D(0,-2); // rounded...
     equal(l0.getMidpoint().equals(pMid), true, "getMidpoint");
+    // slope
+    var p20 = new dwv.math.Point2D(1,1);
+    var l10 = new dwv.math.Line(p0,p20);
+    equal(l10.getSlope(), 1, "getSlope");
+    var p21 = new dwv.math.Point2D(1,-1);
+    var l11 = new dwv.math.Line(p0,p21);
+    equal(l11.getSlope(), -1, "getSlope (negative)");
+    var p3 = new dwv.math.Point2D(1,0);
+    var l2 = new dwv.math.Line(p0,p3);
+    equal(l2.getSlope(), 0, "getSlope (horizontal)");
+    equal(l0.getSlope(), -Infinity, "getSlope (vertical)");
+    // inclination
+    equal(l10.getInclination(), 135, "Inclination"); // 180 - 45
+    equal(l11.getInclination(), 225, "Inclination (negative)"); // 180 + 45
+    equal(l2.getInclination(), 180, "Inclination (horizontal)");
+    equal(l0.getInclination(), 270, "Inclination (vertical)"); // 180 + 90
+    // angle
+    equal(dwv.math.getAngle(l10, l11), 90, "getAngle");
+    var p4 = new dwv.math.Point2D(0,-1);
+    var p5 = new dwv.math.Point2D(1,-1);
+    var l3 = new dwv.math.Line(p4,p5);
+    equal(dwv.math.getAngle(l2, l3), 180, "getAngle (horizontal parallel)");
+    var l4 = new dwv.math.Line(p3,p21);
+    equal(dwv.math.getAngle(l0, l4), 180, "getAngle (vertical parallel)");
 });
 
 test("Test Rectangle.", function() {

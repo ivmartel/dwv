@@ -28,3 +28,16 @@ test("Test getStats.", function() {
     // stdDev
     equal(q1.stdDev, 2.9832867780352594, "stdDev.1");
 });
+
+test("Test IdGenerator.", function() {
+    var generator = new dwv.math.IdGenerator();
+    var id0 = generator.get();
+    var id1 = generator.get();
+    equal((id0 == id1), false, "Ids should not be equal.");
+    
+    var generator2 = new dwv.math.IdGenerator();
+    var id2 = generator2.get();
+    equal((id0 == id2), false, "Ids should not be equal.");
+    equal((id1 == id2), false, "Ids should not be equal.");
+
+});
