@@ -55,7 +55,9 @@ YUI.add("yuidoc-meta", function(Y) {
         "dwv.tool.ZoomAndPan",
         "dwv.tool.filter.Sharpen",
         "dwv.tool.filter.Threshold",
-        "dwv.utils"
+        "dwv.utils",
+        "image.ImageFactory",
+        "image.ViewFactory"
     ],
     "modules": [
         "browser",

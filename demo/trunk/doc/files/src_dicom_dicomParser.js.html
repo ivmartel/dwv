@@ -93,6 +93,8 @@
                                 <li><a href="../classes/dwv.tool.WindowLevel.html">dwv.tool.WindowLevel</a></li>
                                 <li><a href="../classes/dwv.tool.ZoomAndPan.html">dwv.tool.ZoomAndPan</a></li>
                                 <li><a href="../classes/dwv.utils.html">dwv.utils</a></li>
+                                <li><a href="../classes/image.ImageFactory.html">image.ImageFactory</a></li>
+                                <li><a href="../classes/image.ViewFactory.html">image.ViewFactory</a></li>
                             </ul>
                 
                             <ul id="api-modules" class="apis modules">
@@ -352,6 +354,16 @@
                              * @type Array
                              */
                             this.pixelBuffer = [];
+                        };
+                        
+                        /**
+                         * Get the DICOM data elements.
+                         * @method getDicomElements
+                         * @returns {Object} The DICOM elements.
+                         */
+                        dwv.dicom.DicomParser.prototype.getDicomElements = function()
+                        {
+                            return this.dicomElements;
                         };
                         
                         /**
@@ -706,161 +718,6 @@
                                 }
                                 this.pixelBuffer = uint8Image.data;
                             }
-                        };
-                        
-                        /**
-                         * Get an Image object from the read DICOM file.
-                         * @method createImage
-                         * @returns {View} A new Image.
-                         */
-                        dwv.dicom.DicomParser.prototype.createImage = function()
-                        {
-                            // size
-                            if( !this.dicomElements.Columns ) {
-                                throw new Error(&quot;Missing DICOM image number of columns&quot;);
-                            }
-                            if( !this.dicomElements.Rows ) {
-                                throw new Error(&quot;Missing DICOM image number of rows&quot;);
-                            }
-                            var size = new dwv.image.Size(
-                                this.dicomElements.Columns.value[0], 
-                                this.dicomElements.Rows.value[0] );
-                            // spacing
-                            var rowSpacing = 1;
-                            var columnSpacing = 1;
-                            if( this.dicomElements.PixelSpacing ) {
-                                rowSpacing = parseFloat(this.dicomElements.PixelSpacing.value[0]);
-                                columnSpacing = parseFloat(this.dicomElements.PixelSpacing.value[1]);
-                            }
-                            else if( this.dicomElements.ImagerPixelSpacing ) {
-                                rowSpacing = parseFloat(this.dicomElements.ImagerPixelSpacing.value[0]);
-                                columnSpacing = parseFloat(this.dicomElements.ImagerPixelSpacing.value[1]);
-                            }
-                            var spacing = new dwv.image.Spacing( columnSpacing, rowSpacing);
-                        
-                            // special jpeg 2000 case: openjpeg returns a Uint8 planar MONO or RGB image
-                            var syntax = dwv.utils.cleanString(
-                                this.dicomElements.TransferSyntaxUID.value[0] );
-                            var jpeg2000 = dwv.dicom.isJpeg2000TransferSyntax( syntax );
-                            
-                            // buffer data
-                            var buffer = null;
-                            // convert to 16bit if needed
-                            if( jpeg2000 &amp;&amp; this.dicomElements.BitsAllocated.value[0] === 16 )
-                            {
-                                var sliceSize = size.getSliceSize();
-                                buffer = new Int16Array( sliceSize );
-                                var k = 0;
-                                for( var p = 0; p &lt; sliceSize; ++p ) {
-                                    buffer[p] = 256 * this.pixelBuffer[k] + this.pixelBuffer[k+1];
-                                    k += 2;
-                                }
-                            }
-                            else
-                            {
-                                buffer = new Int16Array(this.pixelBuffer.length);
-                                // unsigned to signed data if needed
-                                var shift = false;
-                                if( this.dicomElements.PixelRepresentation &amp;&amp;
-                                        this.dicomElements.PixelRepresentation.value[0] == 1) {
-                                    shift = true;
-                                }
-                                // copy
-                                for( var i=0; i&lt;this.pixelBuffer.length; ++i ) {
-                                    buffer[i] = this.pixelBuffer[i];
-                                    if( shift &amp;&amp; buffer[i] &gt;= Math.pow(2, 15) ) {
-                                        buffer[i] -= Math.pow(2, 16);
-                                    }
-                                }
-                            }
-                            
-                            // slice position
-                            var slicePosition = new Array(0,0,0);
-                            if( this.dicomElements.ImagePositionPatient ) {
-                                slicePosition = [ parseFloat(this.dicomElements.ImagePositionPatient.value[0]),
-                                    parseFloat(this.dicomElements.ImagePositionPatient.value[1]),
-                                    parseFloat(this.dicomElements.ImagePositionPatient.value[2]) ];
-                            }
-                            
-                            // image
-                            var image = new dwv.image.Image( size, spacing, buffer, [slicePosition] );
-                            // photometricInterpretation
-                            if( this.dicomElements.PhotometricInterpretation ) {
-                                var photo = dwv.utils.cleanString(
-                                    this.dicomElements.PhotometricInterpretation.value[0]).toUpperCase();
-                                if( jpeg2000 &amp;&amp; photo.match(/YBR/) ) {
-                                    photo = &quot;RGB&quot;;
-                                }
-                                image.setPhotometricInterpretation( photo );
-                            }        
-                            // planarConfiguration
-                            if( this.dicomElements.PlanarConfiguration ) {
-                                var planar = this.dicomElements.PlanarConfiguration.value[0];
-                                if( jpeg2000 ) {
-                                    planar = 1;
-                                }
-                                image.setPlanarConfiguration( planar );
-                            }        
-                            // rescale slope
-                            if( this.dicomElements.RescaleSlope ) {
-                                image.setRescaleSlope( parseFloat(this.dicomElements.RescaleSlope.value[0]) );
-                            }
-                            // rescale intercept
-                            if( this.dicomElements.RescaleIntercept ) {
-                                image.setRescaleIntercept( parseFloat(this.dicomElements.RescaleIntercept.value[0]) );
-                            }
-                            // meta information
-                            var meta = {};
-                            if( this.dicomElements.Modality ) {
-                                meta.Modality = this.dicomElements.Modality.value[0];
-                            }
-                            if( this.dicomElements.StudyInstanceUID ) {
-                                meta.StudyInstanceUID = this.dicomElements.StudyInstanceUID.value[0];
-                            }
-                            if( this.dicomElements.SeriesInstanceUID ) {
-                                meta.SeriesInstanceUID = this.dicomElements.SeriesInstanceUID.value[0];
-                            }
-                            if( this.dicomElements.BitsStored ) {
-                                meta.BitsStored = parseInt(this.dicomElements.BitsStored.value[0], 10);
-                            }
-                            image.setMeta(meta);
-                            
-                            // pixel representation
-                            var isSigned = 0;
-                            if( this.dicomElements.PixelRepresentation ) {
-                                isSigned = this.dicomElements.PixelRepresentation.value[0];
-                            }
-                            // view
-                            var view = new dwv.image.View(image, isSigned);
-                            // window center and width
-                            var windowPresets = [];
-                            if( this.dicomElements.WindowCenter &amp;&amp; this.dicomElements.WindowWidth ) {
-                                var name;
-                                for( var j = 0; j &lt; this.dicomElements.WindowCenter.value.length; ++j) {
-                                    var width = parseFloat( this.dicomElements.WindowWidth.value[j], 10 );
-                                    if( width !== 0 ) {
-                                        if( this.dicomElements.WindowCenterWidthExplanation ) {
-                                            name = this.dicomElements.WindowCenterWidthExplanation.value[j];
-                                        }
-                                        else {
-                                            name = &quot;Default&quot;+j;
-                                        }
-                                        windowPresets.push({
-                                            &quot;center&quot;: parseFloat( this.dicomElements.WindowCenter.value[j], 10 ),
-                                            &quot;width&quot;: width, 
-                                            &quot;name&quot;: name
-                                        });
-                                    }
-                                }
-                            }
-                            if( windowPresets.length !== 0 ) {
-                                view.setWindowPresets( windowPresets );
-                            }
-                            else {
-                                view.setWindowLevelMinMax();
-                            }
-                        
-                            return view;
                         };
                         
                             </pre>

@@ -93,6 +93,8 @@
                                 <li><a href="../classes/dwv.tool.WindowLevel.html">dwv.tool.WindowLevel</a></li>
                                 <li><a href="../classes/dwv.tool.ZoomAndPan.html">dwv.tool.ZoomAndPan</a></li>
                                 <li><a href="../classes/dwv.utils.html">dwv.utils</a></li>
+                                <li><a href="../classes/image.ImageFactory.html">image.ImageFactory</a></li>
+                                <li><a href="../classes/image.ViewFactory.html">image.ViewFactory</a></li>
                             </ul>
                 
                             <ul id="api-modules" class="apis modules">
@@ -224,9 +226,11 @@
                             var dicomParser = new dwv.dicom.DicomParser();
                             // parse the buffer
                             dicomParser.parse(buffer);
-                            var view = dicomParser.createImage();
+                            // create the view
+                            var viewFactory = new dwv.image.ViewFactory();
+                            var view = viewFactory.create( dicomParser.getDicomElements(), dicomParser.getPixelBuffer() );
                             // return
-                            return {&quot;view&quot;: view, &quot;info&quot;: dicomParser.dicomElements};
+                            return {&quot;view&quot;: view, &quot;info&quot;: dicomParser.getDicomElements()};
                         };
                         
                         

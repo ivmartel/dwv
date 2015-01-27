@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>dwv.browser - dwv</title>
+    <title>image.ImageFactory - dwv</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
     <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
@@ -141,24 +141,56 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-                        <h1>dwv.browser Class</h1>
+                        <h1>image.ImageFactory Class</h1>
                         <div class="box meta">
                         
                         
                                 <div class="foundat">
-                                    Defined in: <a href="../files/src_gui_browser.js.html#l6"><code>src&#x2F;gui&#x2F;browser.js:6</code></a>
+                                    Defined in: <a href="../files/src_image_image.js.html#l790"><code>src&#x2F;image&#x2F;image.js:790</code></a>
                                 </div>
                         
-                                    Module: <a href="../modules/browser.html">browser</a>
+                                    Module: <a href="../modules/image.html">image</a>
                         
                         </div>
                         
                         
                         <div class="box intro">
-                            <p>Namespace for browser related functions.</p>
+                            <p>Image factory.</p>
                         
                         </div>
                         
+                            <div class="constructor">
+                                <h2>Constructor</h2>
+                                <div id="method_image.ImageFactory" class="method item">
+                                    <h3 class="name"><code>image.ImageFactory</code></h3>
+                                
+                                        <span class="paren">()</span>
+                                
+                                
+                                
+                                
+                                
+                                
+                                
+                                
+                                    <div class="meta">
+                                                <p>
+                                                Defined in
+                                        <a href="../files/src_image_image.js.html#l790"><code>src&#x2F;image&#x2F;image.js:790</code></a>
+                                        </p>
+                                
+                                
+                                
+                                    </div>
+                                
+                                    <div class="description">
+                                        
+                                    </div>
+                                
+                                
+                                
+                                </div>
+                            </div>
                         
                         <div id="classdocs" class="tabview">
                             <ul class="api-class-tabs">
@@ -176,29 +208,8 @@
                         
                                             <ul class="index-list methods">
                                                     <li class="index-item method">
-                                                        <a href="#method_check">check</a>
+                                                        <a href="#method_create">create</a>
                         
-                                                            <span class="flag static">static</span>
-                                                    </li>
-                                                    <li class="index-item method">
-                                                        <a href="#method_hasClampedArray">hasClampedArray</a>
-                        
-                                                            <span class="flag static">static</span>
-                                                    </li>
-                                                    <li class="index-item method">
-                                                        <a href="#method_hasFileApi">hasFileApi</a>
-                        
-                                                            <span class="flag static">static</span>
-                                                    </li>
-                                                    <li class="index-item method">
-                                                        <a href="#method_hasTypedArray">hasTypedArray</a>
-                        
-                                                            <span class="flag static">static</span>
-                                                    </li>
-                                                    <li class="index-item method">
-                                                        <a href="#method_hasXmlHttpRequest">hasXmlHttpRequest</a>
-                        
-                                                            <span class="flag static">static</span>
                                                     </li>
                                             </ul>
                                         </div>
@@ -210,23 +221,34 @@
                                     <div id="methods" class="api-class-tabpanel">
                                         <h2 class="off-left">Methods</h2>
                         
-                                            <div id="method_check" class="method item">
-                                                <h3 class="name"><code>check</code></h3>
+                                            <div id="method_create" class="method item">
+                                                <h3 class="name"><code>create</code></h3>
                                             
-                                                    <span class="paren">()</span>
+                                                    <div class="args">
+                                                        <span class="paren">(</span><ul class="args-list inline commas">
+                                                            <li class="arg">
+                                                                    <code>dicomElements</code>
+                                                            </li>
+                                                            <li class="arg">
+                                                                    <code>pixelBuffer</code>
+                                                            </li>
+                                                        </ul><span class="paren">)</span>
+                                                    </div>
+                                            
+                                                    <span class="returns-inline">
+                                                        <span class="type">View</span>
+                                                    </span>
                                             
                                             
                                             
                                             
-                                            
-                                                    <span class="flag static">static</span>
                                             
                                             
                                             
                                                 <div class="meta">
                                                             <p>
                                                             Defined in
-                                                    <a href="../files/src_gui_browser.js.html#l65"><code>src&#x2F;gui&#x2F;browser.js:65</code></a>
+                                                    <a href="../files/src_image_image.js.html#l798"><code>src&#x2F;image&#x2F;image.js:798</code></a>
                                                     </p>
                                             
                                             
@@ -234,136 +256,48 @@
                                                 </div>
                                             
                                                 <div class="description">
-                                                    <p>Browser checks to see if it can run dwv. Throws an error if not.
-                                            TODO Maybe use <a href="http://modernizr.com/">http://modernizr.com/</a>.</p>
+                                                    <p>Get an Image object from the read DICOM file.</p>
                                             
                                                 </div>
                                             
+                                                    <div class="params">
+                                                        <h4>Parameters:</h4>
                                             
+                                                        <ul class="params-list">
+                                                            <li class="param">
+                                                                    <code class="param-name">dicomElements</code>
+                                                                    <span class="type">Object</span>
                                             
-                                            </div>
-                                            <div id="method_hasClampedArray" class="method item">
-                                                <h3 class="name"><code>hasClampedArray</code></h3>
                                             
-                                                    <span class="paren">()</span>
+                                                                <div class="param-description">
+                                                                    <p>The DICOM tags.</p>
                                             
+                                                                </div>
                                             
+                                                            </li>
+                                                            <li class="param">
+                                                                    <code class="param-name">pixelBuffer</code>
+                                                                    <span class="type">Array</span>
                                             
                                             
+                                                                <div class="param-description">
+                                                                    <p>The pixel buffer.</p>
                                             
-                                                    <span class="flag static">static</span>
+                                                                </div>
                                             
+                                                            </li>
+                                                        </ul>
+                                                    </div>
                                             
+                                                    <div class="returns">
+                                                        <h4>Returns:</h4>
                                             
-                                                <div class="meta">
-                                                            <p>
-                                                            Defined in
-                                                    <a href="../files/src_gui_browser.js.html#l55"><code>src&#x2F;gui&#x2F;browser.js:55</code></a>
-                                                    </p>
+                                                        <div class="returns-description">
+                                                                    <span class="type">View</span>:
+                                                                <p>A new Image.</p>
                                             
-                                            
-                                            
-                                                </div>
-                                            
-                                                <div class="description">
-                                                    <p>Browser check for clamped array.</p>
-                                            
-                                                </div>
-                                            
-                                            
-                                            
-                                            </div>
-                                            <div id="method_hasFileApi" class="method item">
-                                                <h3 class="name"><code>hasFileApi</code></h3>
-                                            
-                                                    <span class="paren">()</span>
-                                            
-                                            
-                                            
-                                            
-                                            
-                                                    <span class="flag static">static</span>
-                                            
-                                            
-                                            
-                                                <div class="meta">
-                                                            <p>
-                                                            Defined in
-                                                    <a href="../files/src_gui_browser.js.html#l14"><code>src&#x2F;gui&#x2F;browser.js:14</code></a>
-                                                    </p>
-                                            
-                                            
-                                            
-                                                </div>
-                                            
-                                                <div class="description">
-                                                    <p>Browser check for the FileAPI.</p>
-                                            
-                                                </div>
-                                            
-                                            
-                                            
-                                            </div>
-                                            <div id="method_hasTypedArray" class="method item">
-                                                <h3 class="name"><code>hasTypedArray</code></h3>
-                                            
-                                                    <span class="paren">()</span>
-                                            
-                                            
-                                            
-                                            
-                                            
-                                                    <span class="flag static">static</span>
-                                            
-                                            
-                                            
-                                                <div class="meta">
-                                                            <p>
-                                                            Defined in
-                                                    <a href="../files/src_gui_browser.js.html#l45"><code>src&#x2F;gui&#x2F;browser.js:45</code></a>
-                                                    </p>
-                                            
-                                            
-                                            
-                                                </div>
-                                            
-                                                <div class="description">
-                                                    <p>Browser check for typed array.</p>
-                                            
-                                                </div>
-                                            
-                                            
-                                            
-                                            </div>
-                                            <div id="method_hasXmlHttpRequest" class="method item">
-                                                <h3 class="name"><code>hasXmlHttpRequest</code></h3>
-                                            
-                                                    <span class="paren">()</span>
-                                            
-                                            
-                                            
-                                            
-                                            
-                                                    <span class="flag static">static</span>
-                                            
-                                            
-                                            
-                                                <div class="meta">
-                                                            <p>
-                                                            Defined in
-                                                    <a href="../files/src_gui_browser.js.html#l35"><code>src&#x2F;gui&#x2F;browser.js:35</code></a>
-                                                    </p>
-                                            
-                                            
-                                            
-                                                </div>
-                                            
-                                                <div class="description">
-                                                    <p>Browser check for the XMLHttpRequest.</p>
-                                            
-                                                </div>
-                                            
-                                            
+                                                        </div>
+                                                    </div>
                                             
                                             </div>
                                     </div>

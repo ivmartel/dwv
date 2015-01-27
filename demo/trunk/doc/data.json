@@ -166,11 +166,13 @@
             "classes": {
                 "dwv.image.Size": 1,
                 "dwv.image.Spacing": 1,
-                "dwv.image.Image": 1
+                "dwv.image.Image": 1,
+                "image.ImageFactory": 1
             },
             "fors": {},
             "namespaces": {
-                "dwv.image": 1
+                "dwv.image": 1,
+                "image": 1
             }
         },
         "src/image/luts.js": {
@@ -200,11 +202,13 @@
             "name": "src/image/view.js",
             "modules": {},
             "classes": {
-                "dwv.image.View": 1
+                "dwv.image.View": 1,
+                "image.ViewFactory": 1
             },
             "fors": {},
             "namespaces": {
-                "dwv.image": 1
+                "dwv.image": 1,
+                "image": 1
             }
         },
         "src/io/file.js": {
@@ -566,21 +570,24 @@
                 "dwv.image.Size": 1,
                 "dwv.image.Spacing": 1,
                 "dwv.image.Image": 1,
+                "image.ImageFactory": 1,
                 "dwv.image.lut.Rescale": 1,
                 "dwv.image.lut.Window": 1,
                 "dwv.image": 1,
-                "dwv.image.View": 1
+                "dwv.image.View": 1,
+                "image.ViewFactory": 1
             },
             "fors": {},
             "namespaces": {
                 "dwv.image.filter": 1,
                 "dwv.image": 1,
+                "image": 1,
                 "dwv.image.lut": 1,
                 "dwv": 1
             },
             "tag": "module",
             "file": "src/image/view.js",
-            "line": 8,
+            "line": 427,
             "description": "Image module."
         },
         "io": {
@@ -965,6 +972,21 @@
                 }
             ]
         },
+        "image.ImageFactory": {
+            "name": "image.ImageFactory",
+            "shortname": "image.ImageFactory",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "image",
+            "namespace": "image",
+            "file": "src/image/image.js",
+            "line": 790,
+            "description": "Image factory.",
+            "is_constructor": 1
+        },
         "dwv.image.lut.Rescale": {
             "name": "dwv.image.lut.Rescale",
             "shortname": "dwv.image.lut.Rescale",
@@ -1060,6 +1082,21 @@
                     "type": "Boolean"
                 }
             ]
+        },
+        "image.ViewFactory": {
+            "name": "image.ViewFactory",
+            "shortname": "image.ViewFactory",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "image",
+            "namespace": "image",
+            "file": "src/image/view.js",
+            "line": 427,
+            "description": "View factory.",
+            "is_constructor": 1
         },
         "dwv.io.File": {
             "name": "dwv.io.File",
@@ -2119,6 +2156,20 @@
         {
             "file": "src/dicom/dicomParser.js",
             "line": 212,
+            "description": "Get the DICOM data elements.",
+            "itemtype": "method",
+            "name": "getDicomElements",
+            "return": {
+                "description": "The DICOM elements.",
+                "type": "Object"
+            },
+            "class": "dwv.dicom.DicomParser",
+            "module": "dicom",
+            "namespace": "dwv.dicom"
+        },
+        {
+            "file": "src/dicom/dicomParser.js",
+            "line": 222,
             "description": "Get the DICOM data pixel buffer.",
             "itemtype": "method",
             "name": "getPixelBuffer",
@@ -2132,7 +2183,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 222,
+            "line": 232,
             "description": "Append a DICOM element to the dicomElements member object.\nAllows for easy retrieval of DICOM tag values from the tag name.\nIf tags have same name (for the 'unknown' and private tags cases), a number is appended\nmaking the name unique.",
             "itemtype": "method",
             "name": "appendDicomElement",
@@ -2149,7 +2200,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 252,
+            "line": 262,
             "description": "Read a DICOM tag.",
             "itemtype": "method",
             "name": "readTag",
@@ -2172,7 +2223,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 276,
+            "line": 286,
             "description": "Read a DICOM data element.",
             "itemtype": "method",
             "name": "readDataElement",
@@ -2200,7 +2251,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 387,
+            "line": 397,
             "description": "Parse the complete DICOM file (given as input to the class).\nFills in the member object 'dicomElements'.",
             "itemtype": "method",
             "name": "parse",
@@ -2210,20 +2261,6 @@
                     "description": "The input array buffer."
                 }
             ],
-            "class": "dwv.dicom.DicomParser",
-            "module": "dicom",
-            "namespace": "dwv.dicom"
-        },
-        {
-            "file": "src/dicom/dicomParser.js",
-            "line": 566,
-            "description": "Get an Image object from the read DICOM file.",
-            "itemtype": "method",
-            "name": "createImage",
-            "return": {
-                "description": "A new Image.",
-                "type": "View"
-            },
             "class": "dwv.dicom.DicomParser",
             "module": "dicom",
             "namespace": "dwv.dicom"
@@ -5468,6 +5505,32 @@
             "namespace": "dwv.image"
         },
         {
+            "file": "src/image/image.js",
+            "line": 798,
+            "description": "Get an Image object from the read DICOM file.",
+            "itemtype": "method",
+            "name": "create",
+            "params": [
+                {
+                    "name": "dicomElements",
+                    "description": "The DICOM tags.",
+                    "type": "Object"
+                },
+                {
+                    "name": "pixelBuffer",
+                    "description": "The pixel buffer.",
+                    "type": "Array"
+                }
+            ],
+            "return": {
+                "description": "A new Image.",
+                "type": "View"
+            },
+            "class": "image.ImageFactory",
+            "module": "image",
+            "namespace": "image"
+        },
+        {
             "file": "src/image/luts.js",
             "line": 19,
             "description": "The internal array.",
@@ -6215,6 +6278,32 @@
             "class": "dwv.image.View",
             "module": "image",
             "namespace": "dwv.image"
+        },
+        {
+            "file": "src/image/view.js",
+            "line": 435,
+            "description": "Get an View object from the read DICOM file.",
+            "itemtype": "method",
+            "name": "create",
+            "params": [
+                {
+                    "name": "dicomElements",
+                    "description": "The DICOM tags.",
+                    "type": "Object"
+                },
+                {
+                    "name": "pixelBuffer",
+                    "description": "The pixel buffer.",
+                    "type": "Array"
+                }
+            ],
+            "return": {
+                "description": "The new View.",
+                "type": "View"
+            },
+            "class": "image.ViewFactory",
+            "module": "image",
+            "namespace": "image"
         },
         {
             "file": "src/io/file.js",
@@ -10778,15 +10867,15 @@
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/dicom/dicomParser.js:252"
+            "line": " src/dicom/dicomParser.js:222"
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/dicom/dicomParser.js:276"
+            "line": " src/dicom/dicomParser.js:262"
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/dicom/dicomParser.js:566"
+            "line": " src/dicom/dicomParser.js:286"
         },
         {
             "message": "unknown tag: input",
@@ -10827,6 +10916,14 @@
         {
             "message": "unknown tag: pqrqm",
             "line": " src/image/image.js:275"
+        },
+        {
+            "message": "replacing incorrect tag: returns with return",
+            "line": " src/image/image.js:798"
+        },
+        {
+            "message": "replacing incorrect tag: returns with return",
+            "line": " src/image/view.js:435"
         },
         {
             "message": "unknown tag: input",
