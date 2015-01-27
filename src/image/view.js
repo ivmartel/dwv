@@ -424,3 +424,61 @@ dwv.image.View.prototype.fireEvent = function(event)
     }
 };
 
+/**
+ * View factory.
+ * @class ViewFactory
+ * @namespace image
+ * @constructor
+ */
+dwv.image.ViewFactory = function () {};
+
+/**
+ * Get an View object from the read DICOM file.
+ * @method create
+ * @param {Object} dicomElements The DICOM tags.
+ * @param {Array} pixelBuffer The pixel buffer.
+ * @returns {View} The new View.
+ */
+dwv.image.ViewFactory.prototype.create = function (dicomElements, pixelBuffer)
+{
+    // create the image
+    var imageFactory = new dwv.image.ImageFactory();
+    var image = imageFactory.create(dicomElements, pixelBuffer);
+    
+    // pixel representation
+    var isSigned = 0;
+    if ( dicomElements.PixelRepresentation ) {
+        isSigned = dicomElements.PixelRepresentation.value[0];
+    }
+    // view
+    var view = new dwv.image.View(image, isSigned);
+    // window center and width
+    var windowPresets = [];
+    if ( dicomElements.WindowCenter && dicomElements.WindowWidth ) {
+        var name;
+        for ( var j = 0; j < dicomElements.WindowCenter.value.length; ++j) {
+            var width = parseFloat( dicomElements.WindowWidth.value[j], 10 );
+            if ( width !== 0 ) {
+                if ( dicomElements.WindowCenterWidthExplanation ) {
+                    name = dicomElements.WindowCenterWidthExplanation.value[j];
+                }
+                else {
+                    name = "Default"+j;
+                }
+                windowPresets.push({
+                    "center": parseFloat( dicomElements.WindowCenter.value[j], 10 ),
+                    "width": width, 
+                    "name": name
+                });
+            }
+        }
+    }
+    if ( windowPresets.length !== 0 ) {
+        view.setWindowPresets( windowPresets );
+    }
+    else {
+        view.setWindowLevelMinMax();
+    }
+
+    return view;
+};
