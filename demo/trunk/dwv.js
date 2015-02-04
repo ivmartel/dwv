@@ -1235,7 +1235,7 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
                 throw new Error("Unsupported DICOM transfer syntax (MPEG2): "+syntax);
             }
             // RLE (lossless)
-            else if( syntax === "1.2.840.10008.1.2.4.5" ) {
+            else if( syntax === "1.2.840.10008.1.2.5" ) {
                 throw new Error("Unsupported DICOM transfer syntax (RLE): "+syntax);
             }
         }            
