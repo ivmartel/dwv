@@ -503,17 +503,15 @@
                                 }
                                 data = [num];
                             }
-                            else if( vr === &quot;OW&quot; )
-                            {
-                                data = reader.readUint16Array( dataOffset, vl );
-                            }
                             else if( vr === &quot;OB&quot; || vr === &quot;N/A&quot;)
                             {
                                 data = reader.readUint8Array( dataOffset, vl );
                             }
-                            else if( vr === &quot;OX&quot; )
+                            else if( vr === &quot;OX&quot; || vr === &quot;OW&quot; )
                             {
-                                console.warn(&quot;OX value representation for tag: &quot;+tag.name+&quot;.&quot;);
+                                if ( vr === &quot;OX&quot; ) {
+                                    console.warn(&quot;OX value representation for tag: &quot;+tag.name+&quot;.&quot;);
+                                }
                                 if ( typeof(this.dicomElements.BitsAllocated) !== &#x27;undefined&#x27; &amp;&amp;
                                         this.dicomElements.BitsAllocated.value[0] === 8 ) {
                                     data = reader.readUint8Array( dataOffset, vl );

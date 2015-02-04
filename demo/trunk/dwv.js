@@ -1123,17 +1123,15 @@ dwv.dicom.DicomParser.prototype.readDataElement = function(reader, offset, impli
         }
         data = [num];
     }
-    else if( vr === "OW" )
-    {
-        data = reader.readUint16Array( dataOffset, vl );
-    }
     else if( vr === "OB" || vr === "N/A")
     {
         data = reader.readUint8Array( dataOffset, vl );
     }
-    else if( vr === "OX" )
+    else if( vr === "OX" || vr === "OW" )
     {
-        console.warn("OX value representation for tag: "+tag.name+".");
+        if ( vr === "OX" ) {
+            console.warn("OX value representation for tag: "+tag.name+".");
+        }
         if ( typeof(this.dicomElements.BitsAllocated) !== 'undefined' &&
                 this.dicomElements.BitsAllocated.value[0] === 8 ) {
             data = reader.readUint8Array( dataOffset, vl );
