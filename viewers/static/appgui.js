@@ -123,8 +123,8 @@ dwv.gui.initToolboxHtml = function(){
 };
 
 // Window/level
-dwv.gui.appendWindowLevelHtml = function(){
-    dwv.gui.base.appendWindowLevelHtml();
+dwv.gui.appendWindowLevelHtml = function(app){
+    dwv.gui.base.appendWindowLevelHtml(app);
 };
 dwv.gui.displayWindowLevelHtml = function(bool){
     dwv.gui.base.displayWindowLevelHtml(bool);

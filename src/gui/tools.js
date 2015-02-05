@@ -17,10 +17,10 @@ dwv.gui.base = dwv.gui.base || {};
  * @method appendToolboxHtml
  * @static
  */
-dwv.gui.base.appendToolboxHtml = function()
+dwv.gui.base.appendToolboxHtml = function(app)
 {
     // tool select
-    var toolSelector = dwv.html.createHtmlSelect("toolSelect",dwv.tool.tools);
+    var toolSelector = dwv.html.createHtmlSelect("toolSelect", app.getToolBox().getToolList());
     toolSelector.onchange = dwv.gui.onChangeTool;
     
     // tool list element
@@ -72,14 +72,14 @@ dwv.gui.base.initToolboxHtml = function()
  * @method appendWindowLevelHtml
  * @static
  */
-dwv.gui.base.appendWindowLevelHtml = function()
+dwv.gui.base.appendWindowLevelHtml = function( app )
 {
     // preset select
-    var wlSelector = dwv.html.createHtmlSelect("presetSelect",dwv.tool.presets);
-    wlSelector.onchange = dwv.gui.onChangeWindowLevelPreset;
+    var wlSelector = dwv.html.createHtmlSelect("presetSelect", app.getPresets());
+    wlSelector.onchange = app.onChangeWindowLevelPreset;
     // colour map select
     var cmSelector = dwv.html.createHtmlSelect("colourMapSelect",dwv.tool.colourMaps);
-    cmSelector.onchange = dwv.gui.onChangeColourMap;
+    cmSelector.onchange = app.onChangeColourMap;
 
     // preset list element
     var wlLi = document.createElement("li");
@@ -123,10 +123,10 @@ dwv.gui.base.displayWindowLevelHtml = function(bool)
  * @method initWindowLevelHtml
  * @static
  */
-dwv.gui.base.initWindowLevelHtml = function()
+dwv.gui.base.initWindowLevelHtml = function(app)
 {
     // create new preset select
-    var wlSelector = dwv.html.createHtmlSelect("presetSelect",dwv.tool.presets);
+    var wlSelector = dwv.html.createHtmlSelect("presetSelect", app.getPresets());
     wlSelector.onchange = dwv.gui.onChangeWindowLevelPreset;
     wlSelector.title = "Select w/l preset.";
     

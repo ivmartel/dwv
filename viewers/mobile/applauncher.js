@@ -22,15 +22,6 @@ $(document).ready( function()
     dwv.gui.appendUrlLoadHtml();
     dwv.gui.displayFileLoadHtml(true);
 
-    // Add tools to the tool list
-    dwv.tool.tools = {};
-    dwv.tool.tools["Window/Level"] = new dwv.tool.WindowLevel(app);
-    dwv.tool.tools["Zoom/Pan"] = new dwv.tool.ZoomAndPan(app);
-    dwv.tool.tools.scroll = new dwv.tool.Scroll(app);
-    dwv.tool.tools.draw = new dwv.tool.Draw(app);
-    dwv.tool.tools.livewire = new dwv.tool.Livewire(app);
-    dwv.tool.tools.filter = new dwv.tool.Filter(app);
-
     // Add filters to the filter list for the filter tool
     dwv.tool.filters = {};
     dwv.tool.filters.threshold = new dwv.tool.filter.Threshold(app);
@@ -45,10 +36,19 @@ $(document).ready( function()
     dwv.tool.shapes.roi = dwv.tool.RoiFactory;
     dwv.tool.shapes.ellipse = dwv.tool.EllipseFactory;
 
+    var config = {
+        "containerDivId": "dwv",
+        "fitToWindow": true,
+        "tools": ["WindowLevel", "ZoomPan", "Scroll", "Draw", "Livewire", "Filter"]
+    };
+
+    // initialise the application
+    app.init(config);
+
     // append tool container HTML
-    dwv.gui.appendToolboxHtml();
+    dwv.gui.appendToolboxHtml(app);
     // append tools HTML
-    dwv.gui.appendWindowLevelHtml();
+    dwv.gui.appendWindowLevelHtml(app);
     dwv.gui.appendZoomAndPanHtml();
     dwv.gui.appendScrollHtml();
     dwv.gui.appendDrawHtml();
@@ -62,14 +62,12 @@ $(document).ready( function()
     dwv.gui.filter.appendSobelHtml();
     
     // append help HTML
-    dwv.gui.appendHelpHtml(true);
+    dwv.gui.appendHelpHtml(app, true);
     dwv.gui.appendVersionHtml();
     dwv.gui.appendUndoHtml();
 
-    // initialise the application
-    app.init();
     
     var size = dwv.gui.getWindowSize();
-    $("#layerContainer").height(size.height);
+    $(".layerContainer").height(size.height);
 
 });

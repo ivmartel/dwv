@@ -73,7 +73,7 @@ $(document).ready( function()
     // append tool container HTML
     dwv.gui.appendToolboxHtml();
     // append tools HTML
-    dwv.gui.appendWindowLevelHtml();
+    dwv.gui.appendWindowLevelHtml(app);
     dwv.gui.appendZoomAndPanHtml();
     dwv.gui.appendScrollHtml();
     dwv.gui.appendDrawHtml();

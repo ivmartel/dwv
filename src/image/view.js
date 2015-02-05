@@ -160,7 +160,7 @@ dwv.image.View = function(image, isSigned)
         var oldPosition = currentPosition;
         currentPosition = pos;
         // only display value for monochrome data
-        if( app.getImage().getPhotometricInterpretation().match(/MONOCHROME/) !== null )
+        if( image.getPhotometricInterpretation().match(/MONOCHROME/) !== null )
         {
             this.fireEvent({"type": "positionchange", 
                 "i": pos.i, "j": pos.j, "k": pos.k,

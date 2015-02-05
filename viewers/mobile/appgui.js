@@ -48,8 +48,8 @@ dwv.gui.displayUrlLoadHtml = function(bool){
 };
 
 // Toolbox 
-dwv.gui.appendToolboxHtml = function(){
-    dwv.gui.base.appendToolboxHtml();
+dwv.gui.appendToolboxHtml = function(app){
+    dwv.gui.base.appendToolboxHtml(app);
     
     // toolbar
     var buttonClass = "ui-btn ui-btn-inline ui-btn-icon-notext ui-mini"; 
@@ -92,14 +92,14 @@ dwv.gui.initToolboxHtml = function(){
 };
 
 // Window/level
-dwv.gui.appendWindowLevelHtml = function(){
-    dwv.gui.base.appendWindowLevelHtml();
+dwv.gui.appendWindowLevelHtml = function(app){
+    dwv.gui.base.appendWindowLevelHtml(app);
 };
 dwv.gui.displayWindowLevelHtml = function(bool){
     dwv.gui.base.displayWindowLevelHtml(bool);
 };
-dwv.gui.initWindowLevelHtml = function(){
-    dwv.gui.base.initWindowLevelHtml();
+dwv.gui.initWindowLevelHtml = function(app){
+    dwv.gui.base.initWindowLevelHtml(app);
 };
 
 // Draw

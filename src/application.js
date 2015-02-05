@@ -28,7 +28,18 @@ dwv.App = function()
 
     // display window scale
     var windowScale = 1;
+    
+    var containerDivId = null;
+    this.getContainerDivId = function () { return containerDivId; };
+    
+    var presets = {};
+    this.getPresets = function () { return presets; };
      
+    var plotInfo = null;
+    var windowingInfo = null;
+    var positionInfo = null;
+    var miniColorMap = null;    
+    
     // Image layer
     var imageLayer = null;
     // Draw layers
@@ -40,7 +51,7 @@ dwv.App = function()
     var isInfoLayerListening = false;
     
     // Tool box
-    var toolBox = new dwv.tool.ToolBox(this);
+    var toolBox = null;
     // UndoStack
     var undoStack = new dwv.tool.UndoStack();
     
@@ -131,11 +142,44 @@ dwv.App = function()
      * Initialise the HTML for the application.
      * @method init
      */
-    this.init = function(){
+    this.init = function ( config ) {
+        containerDivId = config.containerDivId;
         // align layers when the window is resized
-        window.onresize = this.resize;
+        if ( config.fitToWindow ) {
+            window.onresize = this.fitToWindow;
+        }
+        // tools
+        if ( config.tools.length !== 0 ) {
+            var toolList = {};
+            for ( var i = 0; i < config.tools.length; ++i ) {
+                switch( config.tools[i] ) {
+                case "WindowLevel":
+                    toolList["Window/Level"] = new dwv.tool.WindowLevel(this);
+                    break;
+                case "ZoomPan":
+                    toolList["Zoom/Pan"] = new dwv.tool.ZoomAndPan(this);
+                    break;
+                case "Scroll":
+                    toolList.Scroll = new dwv.tool.Scroll(this);
+                    break;
+                case "Draw":
+                    toolList.Draw = new dwv.tool.Draw(this);
+                    break;
+                case "Livewire":
+                    toolList.Livewire = new dwv.tool.Livewire(this);
+                    break;
+                case "Filter":
+                    toolList.Filter = new dwv.tool.Filter(this);
+                    break;
+                default:
+                    throw new Error("Unknown tool: '" + config.tools[i] + "'");
+                }
+            }
+            toolBox = new dwv.tool.ToolBox(toolList);
+        }
         // listen to drag&drop
-        var box = document.getElementById("dropBox");
+        var dropBoxDivId = containerDivId + "-dropBox";
+        var box = document.getElementById(dropBoxDivId);
         if ( box ) {
             box.addEventListener("dragover", onDragOver);
             box.addEventListener("dragleave", onDragLeave);
@@ -143,11 +187,11 @@ dwv.App = function()
             // initial size
             var size = dwv.gui.getWindowSize();
             var dropBoxSize = 2 * size.height / 3;
-            $("#dropBox").height( dropBoxSize );
-            $("#dropBox").width( dropBoxSize );
+            $("#"+dropBoxDivId).height( dropBoxSize );
+            $("#"+dropBoxDivId).width( dropBoxSize );
         }
         // possible load from URL
-        if( typeof skipLoadUrl === "undefined" ) {
+        if( typeof config.skipLoadUrl === "undefined" ) {
             var inputUrls = dwv.html.getUriParam(); 
             if( inputUrls && inputUrls.length > 0 ) {
                 this.loadURL(inputUrls);
@@ -165,7 +209,9 @@ dwv.App = function()
     this.reset = function()
     {
         // clear tools
-        toolBox.reset();
+        if ( toolBox ) {
+            toolBox.reset();
+        }
         // clear draw
         if ( drawStage ) {
             drawLayers = [];
@@ -347,10 +393,10 @@ dwv.App = function()
     };
 
     /**
-     * Resize the display window. To be called once the image is loaded.
+     * Fit the display to the window. To be called once the image is loaded.
      * @method resize
      */
-    this.resize = function()
+    this.fitToWindow = function()
     {
         // previous width
         var oldWidth = parseInt(windowScale*dataWidth, 10);
@@ -364,8 +410,9 @@ dwv.App = function()
         var mul = newWidth / oldWidth;
 
         // resize container
-        $("#layerContainer").width(newWidth);
-        $("#layerContainer").height(newHeight + 1); // +1 to be sure...
+        var jqDivId = "#"+containerDivId;
+        $(jqDivId).width(newWidth);
+        $(jqDivId).height(newHeight + 1); // +1 to be sure...
         // resize image layer
         if( imageLayer ) {
             var iZoomX = imageLayer.getZoom().x * mul;
@@ -378,8 +425,9 @@ dwv.App = function()
         // resize draw stage
         if( drawStage ) {
             // resize div
-            $("#drawDiv").width(newWidth);
-            $("#drawDiv").height(newHeight);
+            var drawDivId = "#" + containerDivId + "-drawDiv";
+            $(drawDivId).width(newWidth);
+            $(drawDivId).height(newHeight);
             // resize stage
             var stageZomX = drawStage.scale().x * mul;
             var stageZoomY = drawStage.scale().y * mul;
@@ -391,13 +439,14 @@ dwv.App = function()
     };
     
     /**
-     * Toggle the display of the info layer.
+     * Toggle the display of the information layer.
      * @method toggleInfoLayerDisplay
      */
     this.toggleInfoLayerDisplay = function()
     {
         // toggle html
-        dwv.html.toggleDisplay('infoLayer');
+        var infoDivId = containerDivId + "-infoLayer";
+        dwv.html.toggleDisplay(infoDivId);
         // toggle listeners
         if( isInfoLayerListening ) {
             removeImageInfoListeners();
@@ -413,12 +462,12 @@ dwv.App = function()
     this.initWLDisplay = function()
     {
         // set window/level
-        var keys = Object.keys(dwv.tool.presets);
-        dwv.tool.updateWindowingData(
-            dwv.tool.presets[keys[0]].center, 
-            dwv.tool.presets[keys[0]].width );
+        var keys = Object.keys(this.presets);
+        this.updateWindowingData(
+            this.presets[keys[0]].center, 
+            this.presets[keys[0]].width );
         // default position
-        dwv.tool.updatePostionValue(0,0);
+        this.updatePostionValue(0,0);
     };
 
     /**
@@ -473,6 +522,125 @@ dwv.App = function()
     {
         generateAndDrawImage();
     };
+    
+    /**
+     * Update the window/level presets.
+     * @function updatePresets
+     * @param {Boolean} full If true, shows all presets.
+     */
+    this.updatePresets = function (full)
+    {    
+        // store the manual preset
+        var manual = null;
+        if ( this.presets ) {
+            manual = this.presets.manual;
+        }
+        // reinitialize the presets
+        this.presets = {};
+        
+        // DICOM presets
+        var dicomPresets = this.getView().getWindowPresets();
+        if( dicomPresets ) {
+            if( full ) {
+                for( var i = 0; i < dicomPresets.length; ++i ) {
+                    this.presets[dicomPresets[i].name.toLowerCase()] = dicomPresets[i];
+                }
+            }
+            // just the first one
+            else {
+                this.presets["default"] = dicomPresets[0];
+            }
+        }
+        
+        // default presets
+        var modality = this.getImage().getMeta().Modality;
+        console.log("moda:"+modality);
+        for( var key in dwv.tool.defaultpresets[modality] ) {
+            this.presets[key] = dwv.tool.defaultpresets[modality][key];
+        }
+        if( full ) {
+            for( var key2 in dwv.tool.defaultpresets[modality+"extra"] ) {
+                this.presets[key2] = dwv.tool.defaultpresets[modality+"extra"][key2];
+            }
+        }
+        // min/max preset
+        var range = this.getImage().getRescaledDataRange();
+        var width = range.max - range.min;
+        var center = range.min + width/2;
+        this.presets["min/max"] = {"center": center, "width": width};
+        // manual preset
+        if( manual ){
+            this.presets.manual = manual;
+        }
+    };
+
+    /**
+     * Update the views' current position.
+     * @method updatePostionValue
+     * @static
+     * @param {Number} i The column index.
+     * @param {Number} j The row index.
+     */
+    this.updatePostionValue = function(i,j)
+    {
+        this.getView().setCurrentPosition({"i": i, "j": j, "k": this.getView().getCurrentPosition().k});
+    };
+
+    /**
+     * Update the views' windowing data.
+     * @method updateWindowingData
+     * @static
+     * @param {Number} wc The window center.
+     * @param {Number} ww The window width.
+     */
+    this.updateWindowingData = function(wc,ww)
+    {
+        this.getView().setWindowLevel(wc,ww);
+    };
+
+    /**
+     * Set the active window/level preset.
+     * @method updateWindowingData
+     * @param {String} name The name of the preset to set.
+     */
+    this.updateWindowingDataFromName = function(name)
+    {
+        // check if we have it
+        if( !this.presets[name] ) {
+            throw new Error("Unknown window level preset: '" + name + "'");
+        }
+        // enable it
+        this.updateWindowingData( 
+            this.presets[name].center, 
+            this.presets[name].width );
+    };
+
+    /**
+     * Update the views' colour map.
+     * @method updateColourMap
+     * @static
+     * @param {Object} colourMap The colour map.
+     */
+    this.updateColourMap = function(colourMap)
+    {
+        this.getView().setColorMap(colourMap);
+    };
+
+    /**
+     * Update the views' colour map.
+     * @function updateColourMap
+     * @param {String} name The name of the colour map to set.
+     */
+    this.updateColourMapFromName = function(name)
+    {
+        // check if we have it
+        if( !dwv.tool.colourMaps[name] ) {
+            throw new Error("Unknown colour map: '" + name + "'");
+        }
+        // enable it
+        this.updateColourMap( dwv.tool.colourMaps[name] );
+    };
+
 
     // Private Methods -------------------------------------------
 
@@ -497,11 +665,11 @@ dwv.App = function()
      */
     function addImageInfoListeners()
     {
-        view.addEventListener("wlchange", dwv.info.updateWindowingDiv);
-        view.addEventListener("wlchange", dwv.info.updateMiniColorMap);
-        view.addEventListener("wlchange", dwv.info.updatePlotMarkings);
-        view.addEventListener("colorchange", dwv.info.updateMiniColorMap);
-        view.addEventListener("positionchange", dwv.info.updatePositionDiv);
+        view.addEventListener("wlchange", windowingInfo.update);
+        view.addEventListener("wlchange", miniColorMap.update);
+        view.addEventListener("wlchange", plotInfo.update);
+        view.addEventListener("colorchange", miniColorMap.update);
+        view.addEventListener("positionchange", positionInfo.update);
         isInfoLayerListening = true;
     }
     
@@ -512,11 +680,11 @@ dwv.App = function()
      */
     function removeImageInfoListeners()
     {
-        view.removeEventListener("wlchange", dwv.info.updateWindowingDiv);
-        view.removeEventListener("wlchange", dwv.info.updateMiniColorMap);
-        view.removeEventListener("wlchange", dwv.info.updatePlotMarkings);
-        view.removeEventListener("colorchange", dwv.info.updateMiniColorMap);
-        view.removeEventListener("positionchange", dwv.info.updatePositionDiv);
+        view.removeEventListener("wlchange", windowingInfo.update);
+        view.removeEventListener("wlchange", miniColorMap.update);
+        view.removeEventListener("wlchange", plotInfo.update);
+        view.removeEventListener("colorchange", miniColorMap.update);
+        view.removeEventListener("positionchange", positionInfo.update);
         isInfoLayerListening = false;
     }
     
@@ -605,9 +773,10 @@ dwv.App = function()
         event.stopPropagation();
         event.preventDefault();
         // update box 
-        var box = document.getElementById("dropBox");
+        var dropBoxDivId = containerDivId + "-dropBox";
+        var box = document.getElementById(dropBoxDivId);
         if ( box ) {
-            box.className = 'hover';
+            box.className = 'dropBox hover';
         }
     }
     
@@ -622,10 +791,11 @@ dwv.App = function()
         // prevent default handling
         event.stopPropagation();
         event.preventDefault();
-        // update box 
-        var box = document.getElementById("dropBox");
+        // update box
+        var dropBoxDivId = containerDivId + "-dropBox";
+        var box = document.getElementById(dropBoxDivId);
         if ( box ) {
-            box.className = '';
+            box.className = 'dropBox';
         }
     }
 
@@ -675,23 +845,25 @@ dwv.App = function()
     function createLayers(dataWidth, dataHeight)
     {
         // image layer
-        imageLayer = new dwv.html.Layer("imageLayer");
+        imageLayer = new dwv.html.Layer(containerDivId + "-imageLayer");
         imageLayer.initialise(dataWidth, dataHeight);
         imageLayer.fillContext();
         imageLayer.setStyleDisplay(true);
         // draw layer
-        if( document.getElementById("drawDiv") !== null) {
+        var drawDivId = containerDivId + "-drawDiv";
+        if( document.getElementById(drawDivId) !== null) {
             // create stage
             drawStage = new Kinetic.Stage({
-                container: 'drawDiv',
+                container: drawDivId,
                 width: dataWidth,
                 height: dataHeight,
                 listening: false
             });
         }
         // resize app
+        //windowScale = $('#'+containerDivId).width() / dataWidth;
+        self.fitToWindow();
         self.resetLayout();
-        self.resize();
     }
     
     /**
@@ -724,44 +896,59 @@ dwv.App = function()
         imageData = imageLayer.getContext().createImageData( 
                 dataWidth, dataHeight);
 
-        // mouse and touch listeners
-        self.addLayerListeners( imageLayer.getCanvas() );
-        // keydown listener
-        window.addEventListener("keydown", eventHandler, true);
         // image listeners
         view.addEventListener("wlchange", self.onWLChange);
         view.addEventListener("colorchange", self.onColorChange);
         view.addEventListener("slicechange", self.onSliceChange);
         
+        // initialise the toolbox
+        if ( toolBox ) {
+            // mouse and touch listeners
+            self.addLayerListeners( imageLayer.getCanvas() );
+            // keydown listener
+            window.addEventListener("keydown", eventHandler, true);
+            
+            toolBox.init();
+            toolBox.display(true);
+        }
+        
         // stop box listening to drag (after first drag)
-        var box = document.getElementById("dropBox");
+        var dropBoxDivId = containerDivId + "-dropBox";
+        var box = document.getElementById(dropBoxDivId);
         if ( box ) {
             box.removeEventListener("dragover", onDragOver);
             box.removeEventListener("dragleave", onDragLeave);
             box.removeEventListener("drop", onDrop);
-            dwv.html.removeNode("dropBox");
+            dwv.html.removeNode(dropBoxDivId);
             // switch listening to layerContainer
-            var div = document.getElementById("layerContainer");
+            var div = document.getElementById(containerDivId);
             div.addEventListener("dragover", onDragOver);
             div.addEventListener("dragleave", onDragLeave);
             div.addEventListener("drop", onDrop);
         }
 
         // info layer
-        if(document.getElementById("infoLayer")){
-            dwv.info.createWindowingDiv();
-            dwv.info.createPositionDiv();
-            dwv.info.createMiniColorMap();
-            dwv.info.createPlot();
+        var infoDivId = containerDivId + "-infoLayer";
+        if ( document.getElementById(infoDivId) ) {
+            windowingInfo = new dwv.info.Windowing(self);
+            windowingInfo.create();
+            
+            positionInfo = new dwv.info.Position(self);
+            positionInfo.create();
+            
+            miniColorMap = new dwv.info.MiniColorMap(self);
+            miniColorMap.create();
+            
+            plotInfo = new dwv.info.Plot(self);
+            plotInfo.create();
+            
             addImageInfoListeners();
         }
         
-        // initialise the toolbox
-        toolBox.init();
-        toolBox.display(true);
-        
         // init W/L display
+        //self.updatePresets(true);
         self.initWLDisplay();        
     }
     
+
 };
