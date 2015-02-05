@@ -11,6 +11,73 @@ var dwv = dwv || {};
  */
 dwv.tool = dwv.tool || {};
 
+/**
+ * Update the views' current position.
+ * @method updatePostionValue
+ * @static
+ * @param {Number} i The column index.
+ * @param {Number} j The row index.
+ */
+dwv.tool.updatePostionValue = function(i,j)
+{
+    app.getView().setCurrentPosition({"i": i, "j": j, "k": app.getView().getCurrentPosition().k});
+};
+
+/**
+ * Update the views' windowing data.
+ * @method updateWindowingData
+ * @static
+ * @param {Number} wc The window center.
+ * @param {Number} ww The window width.
+ */
+dwv.tool.updateWindowingData = function(wc,ww)
+{
+    app.getView().setWindowLevel(wc,ww);
+};
+
+/**
+ * Set the active window/level preset.
+ * @method updateWindowingData
+ * @param {String} name The name of the preset to set.
+ */
+dwv.tool.updateWindowingDataFromName = function(name)
+{
+    // check if we have it
+    if( !dwv.tool.presets[name] ) {
+        throw new Error("Unknown window level preset: '" + name + "'");
+    }
+    // enable it
+    dwv.tool.updateWindowingData( 
+        dwv.tool.presets[name].center, 
+        dwv.tool.presets[name].width );
+};
+
+/**
+ * Update the views' colour map.
+ * @method updateColourMap
+ * @static
+ * @param {Object} colourMap The colour map.
+ */
+dwv.tool.updateColourMap = function(colourMap)
+{
+    app.getView().setColorMap(colourMap);
+};
+
+/**
+ * Update the views' colour map.
+ * @function updateColourMap
+ * @param {String} name The name of the colour map to set.
+ */
+dwv.tool.updateColourMapFromName = function(name)
+{
+    // check if we have it
+    if( !dwv.tool.colourMaps[name] ) {
+        throw new Error("Unknown colour map: '" + name + "'");
+    }
+    // enable it
+    dwv.tool.updateColourMap( dwv.tool.colourMaps[name] );
+};
+
 // Default colour maps.
 dwv.tool.colourMaps = {
     "plain": dwv.image.lut.plain,
@@ -20,6 +87,7 @@ dwv.tool.colourMaps = {
     "test": dwv.image.lut.test
 };
 // Default window level presets.
+dwv.tool.presets = {};
 dwv.tool.defaultpresets = {};
 dwv.tool.defaultpresets.CT = {
     "mediastinum": {"center": 40, "width": 400},
@@ -29,6 +97,53 @@ dwv.tool.defaultpresets.CT = {
 dwv.tool.defaultpresets.CTextra = {
     "brain": {"center": 40, "width": 80},
     "head": {"center": 90, "width": 350}
+};
+
+/**
+ * Update the window/level presets.
+ * @function updatePresets
+ * @param {Boolean} full If true, shows all presets.
+ */
+dwv.tool.updatePresets = function(full)
+{    
+    // store the manual preset
+    var manual = dwv.tool.presets.manual;
+    // reinitialize the presets
+    dwv.tool.presets = {};
+    
+    // DICOM presets
+    var dicomPresets = app.getView().getWindowPresets();
+    if( dicomPresets ) {
+        if( full ) {
+            for( var i = 0; i < dicomPresets.length; ++i ) {
+                dwv.tool.presets[dicomPresets[i].name.toLowerCase()] = dicomPresets[i];
+            }
+        }
+        // just the first one
+        else {
+            dwv.tool.presets["default"] = dicomPresets[0];
+        }
+    }
+    
+    // default presets
+    var modality = app.getImage().getMeta().Modality;
+    for( var key in dwv.tool.defaultpresets[modality] ) {
+        dwv.tool.presets[key] = dwv.tool.defaultpresets[modality][key];
+    }
+    if( full ) {
+        for( var key2 in dwv.tool.defaultpresets[modality+"extra"] ) {
+            dwv.tool.presets[key2] = dwv.tool.defaultpresets[modality+"extra"][key2];
+        }
+    }
+    // min/max preset
+    var range = app.getImage().getRescaledDataRange();
+    var width = range.max - range.min;
+    var center = range.min + width/2;
+    dwv.tool.presets["min/max"] = {"center": center, "width": width};
+    // manual preset
+    if( manual ){
+        dwv.tool.presets.manual = manual;
+    }
 };
 
 /**
@@ -66,7 +181,7 @@ dwv.tool.WindowLevel = function(app)
         self.x0 = event._x;
         self.y0 = event._y;
         // update GUI
-        app.updatePostionValue(event._x, event._y);
+        dwv.tool.updatePostionValue(event._x, event._y);
     };
     
     /**
@@ -86,7 +201,7 @@ dwv.tool.WindowLevel = function(app)
         var windowCenter = parseInt(app.getView().getWindowLut().getCenter(), 10) + diffY;
         var windowWidth = parseInt(app.getView().getWindowLut().getWidth(), 10) + diffX;
         // update GUI
-        app.updateWindowingData(windowCenter,windowWidth);
+        dwv.tool.updateWindowingData(windowCenter,windowWidth);
         // store position
         self.x0 = event._x;
         self.y0 = event._y;
@@ -104,9 +219,9 @@ dwv.tool.WindowLevel = function(app)
             // store the manual preset
             var windowCenter = parseInt(app.getView().getWindowLut().getCenter(), 10);
             var windowWidth = parseInt(app.getView().getWindowLut().getWidth(), 10);
-            app.getPresets().manual = {"center": windowCenter, "width": windowWidth};
+            dwv.tool.presets.manual = {"center": windowCenter, "width": windowWidth};
             // update gui
-            dwv.gui.initWindowLevelHtml(app);
+            dwv.gui.initWindowLevelHtml();
             // set selected
             dwv.gui.setSelected("presetSelect", "Manual");
         }
@@ -156,7 +271,7 @@ dwv.tool.WindowLevel = function(app)
      */
     this.dblclick = function(event){
         // update GUI
-        app.updateWindowingData(
+        dwv.tool.updateWindowingData(
             parseInt(app.getImage().getRescaledValue(event._x, event._y, app.getView().getCurrentPosition().k), 10),
             parseInt(app.getView().getWindowLut().getWidth(), 10) );    
     };
@@ -190,8 +305,8 @@ dwv.tool.WindowLevel = function(app)
      * @method init
      */
     this.init = function() {
-        app.updatePresets(true);
-        dwv.gui.initWindowLevelHtml(app);
+        dwv.tool.updatePresets(true);
+        dwv.gui.initWindowLevelHtml();
     };
 }; // WindowLevel class
 

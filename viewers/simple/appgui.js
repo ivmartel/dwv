@@ -55,7 +55,7 @@ dwv.gui.initToolboxHtml = function(){
 };
 
 // Window/level
-dwv.gui.appendWindowLevelHtml = function(/*app*/){
+dwv.gui.appendWindowLevelHtml = function(){
     var input = document.createElement("input");
     input.id = "wlLi";
     input.name = "radio-choice";

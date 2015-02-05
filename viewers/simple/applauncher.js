@@ -25,7 +25,7 @@ $(document).ready( function()
     // append tools HTML
     dwv.gui.appendScrollHtml();
     dwv.gui.appendZoomAndPanHtml();
-    dwv.gui.appendWindowLevelHtml(app);
+    dwv.gui.appendWindowLevelHtml();
     dwv.gui.appendResetHtml();
     
     // initialise the application

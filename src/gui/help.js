@@ -29,7 +29,7 @@ dwv.gui.base.appendVersionHtml = function()
  * @method appendHelpHtml
  * @param {Boolean} mobile Flag for mobile or not environement.
  */
-dwv.gui.base.appendHelpHtml = function(app, mobile)
+dwv.gui.base.appendHelpHtml = function(mobile)
 {
     var actionType = "mouse";
     if( mobile ) {
@@ -42,11 +42,9 @@ dwv.gui.base.appendHelpHtml = function(app, mobile)
     var loc = window.location.pathname;
     var dir = loc.substring(0, loc.lastIndexOf('/'));
 
-    var toolList = app.getToolBox().getToolList();
-    var tool = null;
-    for ( var t=0; t < toolList.length; ++t )
+    for ( var t in dwv.tool.tools )
     {
-        tool = toolList[t];
+        var tool = dwv.tool.tools[t];
         // title
         var title = document.createElement("h3");
         title.appendChild(document.createTextNode(tool.getHelp().title));

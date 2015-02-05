@@ -79,16 +79,14 @@ dwv.gui.base.refreshSelect = function(selectName)
 dwv.gui.setSelected = function(selectName, itemName)
 {
     var select = document.getElementById(selectName);
-    if ( select ) {
-        var index = 0;
-        for( index in select.options){ 
-            if( select.options[index].text === itemName ) {
-                break;
-            }
+    var index = 0;
+    for( index in select.options){ 
+        if( select.options[index].text === itemName ) {
+            break;
         }
-        select.selectedIndex = index;
-        dwv.gui.refreshSelect("#" + selectName);
     }
+    select.selectedIndex = index;
+    dwv.gui.refreshSelect("#" + selectName);
 };
 
 /**

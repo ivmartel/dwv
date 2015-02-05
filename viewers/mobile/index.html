@@ -11,9 +11,9 @@
 <link type="text/css" rel="stylesheet" href="../../css/style.css" />
 <style type="text/css" >
 body { margin: 10px; padding: 0; }
-.layerContainer { margin: auto; text-align: center; }
-.imageLayer { left: 0px; }
-.dropBox { margin: 20px auto; }
+#layerContainer { margin: auto; text-align: center; }
+#imageLayer { left: 0px; }
+#dropBox { margin: 20px auto; }
 </style>
 <link type="text/css" rel="stylesheet" href="../../ext/jquery-mobile/jquery.mobile-1.4.5.min.css" />
 <!-- mobile web app -->
@@ -109,17 +109,17 @@ body { margin: 10px; padding: 0; }
 </div><!-- /popup -->
  
 <!-- Layer Container -->
-<div id="dwv" class="layerContainer">
-<div id="dwv-dropBox" class="dropBox" ></div>
-<canvas id="dwv-imageLayer" class="imageLayer">Only for HTML5 compatible browsers...</canvas>
-<div id="dwv-drawDiv" class="drawDiv"></div>
-<div id="dwv-infoLayer" class="infoLayer">
-<div id="dwv-infotl" class="infotl"></div>
-<div id="dwv-infotr" class="infotr"></div>
-<div id="dwv-infobl" class="infobl"></div>
-<div id="dwv-infobr" class="infobr"><div id="dwv-plot" class="plot"></div></div>
-</div><!-- /dwv-infoLayer -->
-</div><!-- /dwv -->
+<div id="layerContainer">
+<div id="dropBox"></div>
+<canvas id="imageLayer">Only for HTML5 compatible browsers...</canvas>
+<div id="drawDiv"></div>
+<div id="infoLayer">
+<div id="infotl"></div>
+<div id="infotr"></div>
+<div id="infobl"></div>
+<div id="infobr"><div id="plot"></div></div>
+</div><!-- /infoLayer -->
+</div><!-- /layerContainer -->
 
 <!-- History -->
 <div id="history" title="History" style="display:none;"></div>
