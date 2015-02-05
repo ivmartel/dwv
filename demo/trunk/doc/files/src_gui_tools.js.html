@@ -164,10 +164,10 @@
                          * @method appendToolboxHtml
                          * @static
                          */
-                        dwv.gui.base.appendToolboxHtml = function()
+                        dwv.gui.base.appendToolboxHtml = function(app)
                         {
                             // tool select
-                            var toolSelector = dwv.html.createHtmlSelect(&quot;toolSelect&quot;,dwv.tool.tools);
+                            var toolSelector = dwv.html.createHtmlSelect(&quot;toolSelect&quot;, app.getToolBox().getToolList());
                             toolSelector.onchange = dwv.gui.onChangeTool;
                             
                             // tool list element
@@ -219,14 +219,14 @@
                          * @method appendWindowLevelHtml
                          * @static
                          */
-                        dwv.gui.base.appendWindowLevelHtml = function()
+                        dwv.gui.base.appendWindowLevelHtml = function( app )
                         {
                             // preset select
-                            var wlSelector = dwv.html.createHtmlSelect(&quot;presetSelect&quot;,dwv.tool.presets);
-                            wlSelector.onchange = dwv.gui.onChangeWindowLevelPreset;
+                            var wlSelector = dwv.html.createHtmlSelect(&quot;presetSelect&quot;, app.getPresets());
+                            wlSelector.onchange = app.onChangeWindowLevelPreset;
                             // colour map select
                             var cmSelector = dwv.html.createHtmlSelect(&quot;colourMapSelect&quot;,dwv.tool.colourMaps);
-                            cmSelector.onchange = dwv.gui.onChangeColourMap;
+                            cmSelector.onchange = app.onChangeColourMap;
                         
                             // preset list element
                             var wlLi = document.createElement(&quot;li&quot;);
@@ -270,10 +270,10 @@
                          * @method initWindowLevelHtml
                          * @static
                          */
-                        dwv.gui.base.initWindowLevelHtml = function()
+                        dwv.gui.base.initWindowLevelHtml = function(app)
                         {
                             // create new preset select
-                            var wlSelector = dwv.html.createHtmlSelect(&quot;presetSelect&quot;,dwv.tool.presets);
+                            var wlSelector = dwv.html.createHtmlSelect(&quot;presetSelect&quot;, app.getPresets());
                             wlSelector.onchange = dwv.gui.onChangeWindowLevelPreset;
                             wlSelector.title = &quot;Select w/l preset.&quot;;
                             
