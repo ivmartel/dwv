@@ -307,7 +307,7 @@
                                 var oldPosition = currentPosition;
                                 currentPosition = pos;
                                 // only display value for monochrome data
-                                if( image.getPhotometricInterpretation().match(/MONOCHROME/) !== null )
+                                if( app.getImage().getPhotometricInterpretation().match(/MONOCHROME/) !== null )
                                 {
                                     this.fireEvent({&quot;type&quot;: &quot;positionchange&quot;, 
                                         &quot;i&quot;: pos.i, &quot;j&quot;: pos.j, &quot;k&quot;: pos.k,

@@ -155,7 +155,9 @@
                         
                         
                         <div class="box intro">
-                            <p>Tool box.</p>
+                            <p>Tool box.
+                        Relies on the static variable dwv.tool.tools. The available tools 
+                        of the gui will be those of this list.</p>
                         
                         </div>
                         
@@ -167,7 +169,7 @@
                                         <div class="args">
                                             <span class="paren">(</span><ul class="args-list inline commas">
                                                 <li class="arg">
-                                                        <code>toolList</code>
+                                                        <code>app</code>
                                                 </li>
                                             </ul><span class="paren">)</span>
                                         </div>
@@ -198,12 +200,12 @@
                                 
                                             <ul class="params-list">
                                                 <li class="param">
-                                                        <code class="param-name">toolList</code>
-                                                        <span class="type">Array</span>
+                                                        <code class="param-name">app</code>
+                                                        <span class="type">Object</span>
                                 
                                 
                                                     <div class="param-description">
-                                                        <p>The list of tool objects.</p>
+                                                        <p>The associated application.</p>
                                 
                                                     </div>
                                 
@@ -240,10 +242,6 @@
                         
                                                     </li>
                                                     <li class="index-item method">
-                                                        <a href="#method_getToolList">getToolList</a>
-                        
-                                                    </li>
-                                                    <li class="index-item method">
                                                         <a href="#method_hasTool">hasTool</a>
                         
                                                     </li>
@@ -272,10 +270,6 @@
                                                     </li>
                                                     <li class="index-item property">
                                                         <a href="#property_selectedTool">selectedTool</a>
-                        
-                                                    </li>
-                                                    <li class="index-item property">
-                                                        <a href="#property_toolList">toolList</a>
                         
                                                     </li>
                                             </ul>
@@ -308,7 +302,7 @@
                                                 <div class="meta">
                                                             <p>
                                                             Defined in
-                                                    <a href="../files/src_tools_toolbox.js.html#l37"><code>src&#x2F;tools&#x2F;toolbox.js:37</code></a>
+                                                    <a href="../files/src_tools_toolbox.js.html#l33"><code>src&#x2F;tools&#x2F;toolbox.js:33</code></a>
                                                     </p>
                                             
                                             
@@ -358,7 +352,7 @@
                                                 <div class="meta">
                                                             <p>
                                                             Defined in
-                                                    <a href="../files/src_tools_toolbox.js.html#l58"><code>src&#x2F;tools&#x2F;toolbox.js:58</code></a>
+                                                    <a href="../files/src_tools_toolbox.js.html#l43"><code>src&#x2F;tools&#x2F;toolbox.js:43</code></a>
                                                     </p>
                                             
                                             
@@ -377,48 +371,6 @@
                                                         <div class="returns-description">
                                                                     <span class="type">Object</span>:
                                                                 <p>The selected tool.</p>
-                                            
-                                                        </div>
-                                                    </div>
-                                            
-                                            </div>
-                                            <div id="method_getToolList" class="method item">
-                                                <h3 class="name"><code>getToolList</code></h3>
-                                            
-                                                    <span class="paren">()</span>
-                                            
-                                                    <span class="returns-inline">
-                                                        <span class="type">Array</span>
-                                                    </span>
-                                            
-                                            
-                                            
-                                            
-                                            
-                                            
-                                            
-                                                <div class="meta">
-                                                            <p>
-                                                            Defined in
-                                                    <a href="../files/src_tools_toolbox.js.html#l49"><code>src&#x2F;tools&#x2F;toolbox.js:49</code></a>
-                                                    </p>
-                                            
-                                            
-                                            
-                                                </div>
-                                            
-                                                <div class="description">
-                                                    <p>Get the list of tools.</p>
-                                            
-                                                </div>
-                                            
-                                            
-                                                    <div class="returns">
-                                                        <h4>Returns:</h4>
-                                            
-                                                        <div class="returns-description">
-                                                                    <span class="type">Array</span>:
-                                                                <p>The list of tool objects.</p>
                                             
                                                         </div>
                                                     </div>
@@ -448,7 +400,7 @@
                                                 <div class="meta">
                                                             <p>
                                                             Defined in
-                                                    <a href="../files/src_tools_toolbox.js.html#l89"><code>src&#x2F;tools&#x2F;toolbox.js:89</code></a>
+                                                    <a href="../files/src_tools_toolbox.js.html#l74"><code>src&#x2F;tools&#x2F;toolbox.js:74</code></a>
                                                     </p>
                                             
                                             
@@ -504,7 +456,7 @@
                                                 <div class="meta">
                                                             <p>
                                                             Defined in
-                                                    <a href="../files/src_tools_toolbox.js.html#l99"><code>src&#x2F;tools&#x2F;toolbox.js:99</code></a>
+                                                    <a href="../files/src_tools_toolbox.js.html#l84"><code>src&#x2F;tools&#x2F;toolbox.js:84</code></a>
                                                     </p>
                                             
                                             
@@ -534,7 +486,7 @@
                                                 <div class="meta">
                                                             <p>
                                                             Defined in
-                                                    <a href="../files/src_tools_toolbox.js.html#l123"><code>src&#x2F;tools&#x2F;toolbox.js:123</code></a>
+                                                    <a href="../files/src_tools_toolbox.js.html#l104"><code>src&#x2F;tools&#x2F;toolbox.js:104</code></a>
                                                     </p>
                                             
                                             
@@ -567,7 +519,7 @@
                                                 <div class="meta">
                                                             <p>
                                                             Defined in
-                                                    <a href="../files/src_tools_toolbox.js.html#l67"><code>src&#x2F;tools&#x2F;toolbox.js:67</code></a>
+                                                    <a href="../files/src_tools_toolbox.js.html#l52"><code>src&#x2F;tools&#x2F;toolbox.js:52</code></a>
                                                     </p>
                                             
                                             
@@ -607,7 +559,7 @@
                                                 <div class="meta">
                                                             <p>
                                                             Defined in
-                                                    <a href="../files/src_tools_toolbox.js.html#l29"><code>src&#x2F;tools&#x2F;toolbox.js:29</code></a>
+                                                    <a href="../files/src_tools_toolbox.js.html#l25"><code>src&#x2F;tools&#x2F;toolbox.js:25</code></a>
                                                     </p>
                                             
                                             
@@ -632,7 +584,7 @@
                                                 <div class="meta">
                                                             <p>
                                                             Defined in
-                                                    <a href="../files/src_tools_toolbox.js.html#l23"><code>src&#x2F;tools&#x2F;toolbox.js:23</code></a>
+                                                    <a href="../files/src_tools_toolbox.js.html#l19"><code>src&#x2F;tools&#x2F;toolbox.js:19</code></a>
                                                     </p>
                                             
                                             
@@ -640,31 +592,6 @@
                                             
                                                 <div class="description">
                                                     <p>Selected tool.</p>
-                                            
-                                                </div>
-                                            
-                                            
-                                            
-                                            </div>
-                                            <div id="property_toolList" class="property item">
-                                                <h3 class="name"><code>toolList</code></h3>
-                                                <span class="type">Object</span>
-                                            
-                                            
-                                            
-                                            
-                                            
-                                                <div class="meta">
-                                                            <p>
-                                                            Defined in
-                                                    <a href="../files/src_tools_toolbox.js.html#l17"><code>src&#x2F;tools&#x2F;toolbox.js:17</code></a>
-                                                    </p>
-                                            
-                                            
-                                                </div>
-                                            
-                                                <div class="description">
-                                                    <p>Tool list</p>
                                             
                                                 </div>
                                             
