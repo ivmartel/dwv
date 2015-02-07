@@ -43,6 +43,17 @@
                                 <li><a href="../classes/dwv.dicom.DataReader.html">dwv.dicom.DataReader</a></li>
                                 <li><a href="../classes/dwv.dicom.DicomParser.html">dwv.dicom.DicomParser</a></li>
                                 <li><a href="../classes/dwv.gui.html">dwv.gui</a></li>
+                                <li><a href="../classes/dwv.gui.base.Draw.html">dwv.gui.base.Draw</a></li>
+                                <li><a href="../classes/dwv.gui.base.Filter.html">dwv.gui.base.Filter</a></li>
+                                <li><a href="../classes/dwv.gui.base.Livewire.html">dwv.gui.base.Livewire</a></li>
+                                <li><a href="../classes/dwv.gui.base.Scroll.html">dwv.gui.base.Scroll</a></li>
+                                <li><a href="../classes/dwv.gui.base.Sharpen.html">dwv.gui.base.Sharpen</a></li>
+                                <li><a href="../classes/dwv.gui.base.Slider.html">dwv.gui.base.Slider</a></li>
+                                <li><a href="../classes/dwv.gui.base.Sobel.html">dwv.gui.base.Sobel</a></li>
+                                <li><a href="../classes/dwv.gui.base.Threshold.html">dwv.gui.base.Threshold</a></li>
+                                <li><a href="../classes/dwv.gui.base.Toolbox.html">dwv.gui.base.Toolbox</a></li>
+                                <li><a href="../classes/dwv.gui.base.WindowLevel.html">dwv.gui.base.WindowLevel</a></li>
+                                <li><a href="../classes/dwv.gui.base.ZoomAndPan.html">dwv.gui.base.ZoomAndPan</a></li>
                                 <li><a href="../classes/dwv.html.html">dwv.html</a></li>
                                 <li><a href="../classes/dwv.html.Layer.html">dwv.html.Layer</a></li>
                                 <li><a href="../classes/dwv.html.Style.html">dwv.html.Style</a></li>
@@ -78,6 +89,7 @@
                                 <li><a href="../classes/dwv.tool.EllipseFactory.html">dwv.tool.EllipseFactory</a></li>
                                 <li><a href="../classes/dwv.tool.Filter.html">dwv.tool.Filter</a></li>
                                 <li><a href="../classes/dwv.tool.filter.Sharpen.html">dwv.tool.filter.Sharpen</a></li>
+                                <li><a href="../classes/dwv.tool.filter.Sobel.html">dwv.tool.filter.Sobel</a></li>
                                 <li><a href="../classes/dwv.tool.filter.Threshold.html">dwv.tool.filter.Threshold</a></li>
                                 <li><a href="../classes/dwv.tool.LineFactory.html">dwv.tool.LineFactory</a></li>
                                 <li><a href="../classes/dwv.tool.Livewire.html">dwv.tool.Livewire</a></li>
@@ -92,7 +104,9 @@
                                 <li><a href="../classes/dwv.tool.UndoStack.html">dwv.tool.UndoStack</a></li>
                                 <li><a href="../classes/dwv.tool.WindowLevel.html">dwv.tool.WindowLevel</a></li>
                                 <li><a href="../classes/dwv.tool.ZoomAndPan.html">dwv.tool.ZoomAndPan</a></li>
+                                <li><a href="../classes/dwv.ToolBoxController.html">dwv.ToolBoxController</a></li>
                                 <li><a href="../classes/dwv.utils.html">dwv.utils</a></li>
+                                <li><a href="../classes/dwv.ViewController.html">dwv.ViewController</a></li>
                                 <li><a href="../classes/image.ImageFactory.html">image.ImageFactory</a></li>
                                 <li><a href="../classes/image.ViewFactory.html">image.ViewFactory</a></li>
                             </ul>
@@ -146,7 +160,7 @@
                         
                         
                                 <div class="foundat">
-                                    Defined in: <a href="../files/src_tools_draw.js.html#l166"><code>src&#x2F;tools&#x2F;draw.js:166</code></a>
+                                    Defined in: <a href="../files/src_tools_draw.js.html#l161"><code>src&#x2F;tools&#x2F;draw.js:161</code></a>
                                 </div>
                         
                                     Module: <a href="../modules/tool.html">tool</a>
@@ -182,7 +196,7 @@
                                     <div class="meta">
                                                 <p>
                                                 Defined in
-                                        <a href="../files/src_tools_draw.js.html#l166"><code>src&#x2F;tools&#x2F;draw.js:166</code></a>
+                                        <a href="../files/src_tools_draw.js.html#l161"><code>src&#x2F;tools&#x2F;draw.js:161</code></a>
                                         </p>
                                 
                                 
@@ -284,6 +298,10 @@
                         
                                                     </li>
                                                     <li class="index-item method">
+                                                        <a href="#method_setup">setup</a>
+                        
+                                                    </li>
+                                                    <li class="index-item method">
                                                         <a href="#method_touchend">touchend</a>
                         
                                                     </li>
@@ -303,10 +321,6 @@
                         
                                             <ul class="index-list properties">
                                                     <li class="index-item property private">
-                                                        <a href="#property_activeShape">activeShape</a>
-                        
-                                                    </li>
-                                                    <li class="index-item property private">
                                                         <a href="#property_command">command</a>
                         
                                                     </li>
@@ -320,6 +334,10 @@
                                                     </li>
                                                     <li class="index-item property private">
                                                         <a href="#property_drawLayer">drawLayer</a>
+                        
+                                                    </li>
+                                                    <li class="index-item property">
+                                                        <a href="#property_gui">gui</a>
                         
                                                     </li>
                                                     <li class="index-item property private">
@@ -336,6 +354,10 @@
                                                     </li>
                                                     <li class="index-item property private">
                                                         <a href="#property_shapeEditor">shapeEditor</a>
+                        
+                                                    </li>
+                                                    <li class="index-item property">
+                                                        <a href="#property_shapeFactoryList">shapeFactoryList</a>
                         
                                                     </li>
                                                     <li class="index-item property private">
@@ -388,7 +410,7 @@
                                                 <div class="meta">
                                                             <p>
                                                             Defined in
-                                                    <a href="../files/src_tools_draw.js.html#l462"><code>src&#x2F;tools&#x2F;draw.js:462</code></a>
+                                                    <a href="../files/src_tools_draw.js.html#l471"><code>src&#x2F;tools&#x2F;draw.js:471</code></a>
                                                     </p>
                                             
                                             
@@ -438,7 +460,7 @@
                                                 <div class="meta">
                                                             <p>
                                                             Defined in
-                                                    <a href="../files/src_tools_draw.js.html#l665"><code>src&#x2F;tools&#x2F;draw.js:665</code></a>
+                                                    <a href="../files/src_tools_draw.js.html#l691"><code>src&#x2F;tools&#x2F;draw.js:691</code></a>
                                                     </p>
                                             
                                             
@@ -483,7 +505,7 @@
                                                 <div class="meta">
                                                             <p>
                                                             Defined in
-                                                    <a href="../files/src_tools_draw.js.html#l713"><code>src&#x2F;tools&#x2F;draw.js:713</code></a>
+                                                    <a href="../files/src_tools_draw.js.html#l739"><code>src&#x2F;tools&#x2F;draw.js:739</code></a>
                                                     </p>
                                             
                                             
@@ -530,7 +552,7 @@
                                                 <div class="meta">
                                                             <p>
                                                             Defined in
-                                                    <a href="../files/src_tools_draw.js.html#l722"><code>src&#x2F;tools&#x2F;draw.js:722</code></a>
+                                                    <a href="../files/src_tools_draw.js.html#l671"><code>src&#x2F;tools&#x2F;draw.js:671</code></a>
                                                     </p>
                                             
                                             
@@ -831,7 +853,7 @@
                                                 <div class="meta">
                                                             <p>
                                                             Defined in
-                                                    <a href="../files/src_tools_draw.js.html#l687"><code>src&#x2F;tools&#x2F;draw.js:687</code></a>
+                                                    <a href="../files/src_tools_draw.js.html#l713"><code>src&#x2F;tools&#x2F;draw.js:713</code></a>
                                                     </p>
                                             
                                             
@@ -884,7 +906,7 @@
                                                 <div class="meta">
                                                             <p>
                                                             Defined in
-                                                    <a href="../files/src_tools_draw.js.html#l698"><code>src&#x2F;tools&#x2F;draw.js:698</code></a>
+                                                    <a href="../files/src_tools_draw.js.html#l724"><code>src&#x2F;tools&#x2F;draw.js:724</code></a>
                                                     </p>
                                             
                                             
@@ -937,7 +959,7 @@
                                                 <div class="meta">
                                                             <p>
                                                             Defined in
-                                                    <a href="../files/src_tools_draw.js.html#l492"><code>src&#x2F;tools&#x2F;draw.js:492</code></a>
+                                                    <a href="../files/src_tools_draw.js.html#l501"><code>src&#x2F;tools&#x2F;draw.js:501</code></a>
                                                     </p>
                                             
                                             
@@ -990,7 +1012,7 @@
                                                 <div class="meta">
                                                             <p>
                                                             Defined in
-                                                    <a href="../files/src_tools_draw.js.html#l517"><code>src&#x2F;tools&#x2F;draw.js:517</code></a>
+                                                    <a href="../files/src_tools_draw.js.html#l526"><code>src&#x2F;tools&#x2F;draw.js:526</code></a>
                                                     </p>
                                             
                                             
@@ -1019,6 +1041,36 @@
                                                             </li>
                                                         </ul>
                                                     </div>
+                                            
+                                            
+                                            </div>
+                                            <div id="method_setup" class="method item">
+                                                <h3 class="name"><code>setup</code></h3>
+                                            
+                                                    <span class="paren">()</span>
+                                            
+                                            
+                                            
+                                            
+                                            
+                                            
+                                            
+                                            
+                                                <div class="meta">
+                                                            <p>
+                                                            Defined in
+                                                    <a href="../files/src_tools_draw.js.html#l462"><code>src&#x2F;tools&#x2F;draw.js:462</code></a>
+                                                    </p>
+                                            
+                                            
+                                            
+                                                </div>
+                                            
+                                                <div class="description">
+                                                    <p>Setup the tool GUI.</p>
+                                            
+                                                </div>
+                                            
                                             
                                             
                                             </div>
@@ -1186,32 +1238,6 @@
                                     <div id="properties" class="api-class-tabpanel">
                                         <h2 class="off-left">Properties</h2>
                         
-                                            <div id="property_activeShape" class="property item private">
-                                                <h3 class="name"><code>activeShape</code></h3>
-                                                <span class="type">Object</span>
-                                            
-                                            
-                                                    <span class="flag private">private</span>
-                                            
-                                            
-                                            
-                                                <div class="meta">
-                                                            <p>
-                                                            Defined in
-                                                    <a href="../files/src_tools_draw.js.html#l197"><code>src&#x2F;tools&#x2F;draw.js:197</code></a>
-                                                    </p>
-                                            
-                                            
-                                                </div>
-                                            
-                                                <div class="description">
-                                                    <p>Current active shape.</p>
-                                            
-                                                </div>
-                                            
-                                            
-                                            
-                                            </div>
                                             <div id="property_command" class="property item private">
                                                 <h3 class="name"><code>command</code></h3>
                                                 <span class="type">Object</span>
@@ -1224,7 +1250,7 @@
                                                 <div class="meta">
                                                             <p>
                                                             Defined in
-                                                    <a href="../files/src_tools_draw.js.html#l190"><code>src&#x2F;tools&#x2F;draw.js:190</code></a>
+                                                    <a href="../files/src_tools_draw.js.html#l197"><code>src&#x2F;tools&#x2F;draw.js:197</code></a>
                                                     </p>
                                             
                                             
@@ -1316,6 +1342,31 @@
                                             
                                             
                                             </div>
+                                            <div id="property_gui" class="property item">
+                                                <h3 class="name"><code>gui</code></h3>
+                                                <span class="type">Object</span>
+                                            
+                                            
+                                            
+                                            
+                                            
+                                                <div class="meta">
+                                                            <p>
+                                                            Defined in
+                                                    <a href="../files/src_tools_draw.js.html#l177"><code>src&#x2F;tools&#x2F;draw.js:177</code></a>
+                                                    </p>
+                                            
+                                            
+                                                </div>
+                                            
+                                                <div class="description">
+                                                    <p>Draw GUI.</p>
+                                            
+                                                </div>
+                                            
+                                            
+                                            
+                                            </div>
                                             <div id="property_lastPoint" class="property item private">
                                                 <h3 class="name"><code>lastPoint</code></h3>
                                                 <span class="type">Object</span>
@@ -1380,7 +1431,7 @@
                                                 <div class="meta">
                                                             <p>
                                                             Defined in
-                                                    <a href="../files/src_tools_draw.js.html#l175"><code>src&#x2F;tools&#x2F;draw.js:175</code></a>
+                                                    <a href="../files/src_tools_draw.js.html#l170"><code>src&#x2F;tools&#x2F;draw.js:170</code></a>
                                                     </p>
                                             
                                             
@@ -1414,6 +1465,31 @@
                                             
                                                 <div class="description">
                                                     <p>Shape editor.</p>
+                                            
+                                                </div>
+                                            
+                                            
+                                            
+                                            </div>
+                                            <div id="property_shapeFactoryList" class="property item">
+                                                <h3 class="name"><code>shapeFactoryList</code></h3>
+                                                <span class="type">Object</span>
+                                            
+                                            
+                                            
+                                            
+                                            
+                                                <div class="meta">
+                                                            <p>
+                                                            Defined in
+                                                    <a href="../files/src_tools_draw.js.html#l191"><code>src&#x2F;tools&#x2F;draw.js:191</code></a>
+                                                    </p>
+                                            
+                                            
+                                                </div>
+                                            
+                                                <div class="description">
+                                                    <p>Shape factory list</p>
                                             
                                                 </div>
                                             
@@ -1483,7 +1559,7 @@
                                                 <div class="meta">
                                                             <p>
                                                             Defined in
-                                                    <a href="../files/src_tools_draw.js.html#l182"><code>src&#x2F;tools&#x2F;draw.js:182</code></a>
+                                                    <a href="../files/src_tools_draw.js.html#l183"><code>src&#x2F;tools&#x2F;draw.js:183</code></a>
                                                     </p>
                                             
                                             

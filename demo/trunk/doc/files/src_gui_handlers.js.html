@@ -43,6 +43,17 @@
                                 <li><a href="../classes/dwv.dicom.DataReader.html">dwv.dicom.DataReader</a></li>
                                 <li><a href="../classes/dwv.dicom.DicomParser.html">dwv.dicom.DicomParser</a></li>
                                 <li><a href="../classes/dwv.gui.html">dwv.gui</a></li>
+                                <li><a href="../classes/dwv.gui.base.Draw.html">dwv.gui.base.Draw</a></li>
+                                <li><a href="../classes/dwv.gui.base.Filter.html">dwv.gui.base.Filter</a></li>
+                                <li><a href="../classes/dwv.gui.base.Livewire.html">dwv.gui.base.Livewire</a></li>
+                                <li><a href="../classes/dwv.gui.base.Scroll.html">dwv.gui.base.Scroll</a></li>
+                                <li><a href="../classes/dwv.gui.base.Sharpen.html">dwv.gui.base.Sharpen</a></li>
+                                <li><a href="../classes/dwv.gui.base.Slider.html">dwv.gui.base.Slider</a></li>
+                                <li><a href="../classes/dwv.gui.base.Sobel.html">dwv.gui.base.Sobel</a></li>
+                                <li><a href="../classes/dwv.gui.base.Threshold.html">dwv.gui.base.Threshold</a></li>
+                                <li><a href="../classes/dwv.gui.base.Toolbox.html">dwv.gui.base.Toolbox</a></li>
+                                <li><a href="../classes/dwv.gui.base.WindowLevel.html">dwv.gui.base.WindowLevel</a></li>
+                                <li><a href="../classes/dwv.gui.base.ZoomAndPan.html">dwv.gui.base.ZoomAndPan</a></li>
                                 <li><a href="../classes/dwv.html.html">dwv.html</a></li>
                                 <li><a href="../classes/dwv.html.Layer.html">dwv.html.Layer</a></li>
                                 <li><a href="../classes/dwv.html.Style.html">dwv.html.Style</a></li>
@@ -78,6 +89,7 @@
                                 <li><a href="../classes/dwv.tool.EllipseFactory.html">dwv.tool.EllipseFactory</a></li>
                                 <li><a href="../classes/dwv.tool.Filter.html">dwv.tool.Filter</a></li>
                                 <li><a href="../classes/dwv.tool.filter.Sharpen.html">dwv.tool.filter.Sharpen</a></li>
+                                <li><a href="../classes/dwv.tool.filter.Sobel.html">dwv.tool.filter.Sobel</a></li>
                                 <li><a href="../classes/dwv.tool.filter.Threshold.html">dwv.tool.filter.Threshold</a></li>
                                 <li><a href="../classes/dwv.tool.LineFactory.html">dwv.tool.LineFactory</a></li>
                                 <li><a href="../classes/dwv.tool.Livewire.html">dwv.tool.Livewire</a></li>
@@ -92,7 +104,9 @@
                                 <li><a href="../classes/dwv.tool.UndoStack.html">dwv.tool.UndoStack</a></li>
                                 <li><a href="../classes/dwv.tool.WindowLevel.html">dwv.tool.WindowLevel</a></li>
                                 <li><a href="../classes/dwv.tool.ZoomAndPan.html">dwv.tool.ZoomAndPan</a></li>
+                                <li><a href="../classes/dwv.ToolBoxController.html">dwv.ToolBoxController</a></li>
                                 <li><a href="../classes/dwv.utils.html">dwv.utils</a></li>
+                                <li><a href="../classes/dwv.ViewController.html">dwv.ViewController</a></li>
                                 <li><a href="../classes/image.ImageFactory.html">image.ImageFactory</a></li>
                                 <li><a href="../classes/image.ViewFactory.html">image.ViewFactory</a></li>
                             </ul>
@@ -159,29 +173,6 @@
                         dwv.gui = dwv.gui || {};
                         
                         /**
-                         * Handle window/level change.
-                         * @method onChangeWindowLevelPreset
-                         * @namespace dwv.gui
-                         * @static
-                         * @param {Object} event The change event.
-                         */
-                        dwv.gui.onChangeWindowLevelPreset = function(/*event*/)
-                        {
-                            dwv.tool.updateWindowingDataFromName(this.value);
-                        };
-                        
-                        /**
-                         * Handle colour map change.
-                         * @method onChangeColourMap
-                         * @static
-                         * @param {Object} event The change event.
-                         */
-                        dwv.gui.onChangeColourMap = function(/*event*/)
-                        {
-                            dwv.tool.updateColourMapFromName(this.value);
-                        };
-                        
-                        /**
                          * Handle loader change.
                          * @method onChangeLoader
                          * @static
@@ -219,87 +210,6 @@
                         dwv.gui.onChangeURL = function(event)
                         {
                             app.onChangeURL(event);
-                        };
-                        
-                        /**
-                         * Handle tool change.
-                         * @method onChangeTool
-                         * @static
-                         * @param {Object} event The change event.
-                         */
-                        dwv.gui.onChangeTool = function(/*event*/)
-                        {
-                            app.getToolBox().setSelectedTool(this.value);
-                        };
-                        
-                        /**
-                         * Handle filter change.
-                         * @method onChangeFilter
-                         * @static
-                         * @param {Object} event The change event.
-                         */
-                        dwv.gui.onChangeFilter = function(/*event*/)
-                        {
-                            app.getToolBox().getSelectedTool().setSelectedFilter(this.value);
-                        };
-                        
-                        /**
-                         * Handle filter run.
-                         * @method onRunFilter
-                         * @static
-                         * @param {Object} event The run event.
-                         */
-                        dwv.gui.onRunFilter = function(/*event*/)
-                        {
-                            app.getToolBox().getSelectedTool().getSelectedFilter().run();
-                        };
-                        
-                        /**
-                         * Handle min/max slider change.
-                         * @method onChangeMinMax
-                         * @static
-                         * @param {Object} range The new range of the data.
-                         */
-                        dwv.gui.onChangeMinMax = function(range)
-                        {
-                            // seems like jquery is checking if the method exists before it 
-                            // is used...
-                            if( app.getToolBox().getSelectedTool().getSelectedFilter ) {
-                                app.getToolBox().getSelectedTool().getSelectedFilter().run(range);
-                            }
-                        };
-                        
-                        /**
-                         * Handle shape change.
-                         * @method onChangeShape
-                         * @static
-                         * @param {Object} event The change event.
-                         */
-                        dwv.gui.onChangeShape = function(/*event*/)
-                        {
-                            app.getToolBox().getSelectedTool().setShapeName(this.value);
-                        };
-                        
-                        /**
-                         * Handle line color change.
-                         * @method onChangeLineColour
-                         * @static
-                         * @param {Object} event The change event.
-                         */
-                        dwv.gui.onChangeLineColour = function(/*event*/)
-                        {
-                            app.getToolBox().getSelectedTool().setLineColour(this.value);
-                        };
-                        
-                        /**
-                         * Handle zoom reset.
-                         * @method onZoomReset
-                         * @static
-                         * @param {Object} event The change event.
-                         */
-                        dwv.gui.onZoomReset = function(/*event*/)
-                        {
-                            app.resetLayout();
                         };
                         
                         /**

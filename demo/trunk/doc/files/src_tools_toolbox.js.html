@@ -43,6 +43,17 @@
                                 <li><a href="../classes/dwv.dicom.DataReader.html">dwv.dicom.DataReader</a></li>
                                 <li><a href="../classes/dwv.dicom.DicomParser.html">dwv.dicom.DicomParser</a></li>
                                 <li><a href="../classes/dwv.gui.html">dwv.gui</a></li>
+                                <li><a href="../classes/dwv.gui.base.Draw.html">dwv.gui.base.Draw</a></li>
+                                <li><a href="../classes/dwv.gui.base.Filter.html">dwv.gui.base.Filter</a></li>
+                                <li><a href="../classes/dwv.gui.base.Livewire.html">dwv.gui.base.Livewire</a></li>
+                                <li><a href="../classes/dwv.gui.base.Scroll.html">dwv.gui.base.Scroll</a></li>
+                                <li><a href="../classes/dwv.gui.base.Sharpen.html">dwv.gui.base.Sharpen</a></li>
+                                <li><a href="../classes/dwv.gui.base.Slider.html">dwv.gui.base.Slider</a></li>
+                                <li><a href="../classes/dwv.gui.base.Sobel.html">dwv.gui.base.Sobel</a></li>
+                                <li><a href="../classes/dwv.gui.base.Threshold.html">dwv.gui.base.Threshold</a></li>
+                                <li><a href="../classes/dwv.gui.base.Toolbox.html">dwv.gui.base.Toolbox</a></li>
+                                <li><a href="../classes/dwv.gui.base.WindowLevel.html">dwv.gui.base.WindowLevel</a></li>
+                                <li><a href="../classes/dwv.gui.base.ZoomAndPan.html">dwv.gui.base.ZoomAndPan</a></li>
                                 <li><a href="../classes/dwv.html.html">dwv.html</a></li>
                                 <li><a href="../classes/dwv.html.Layer.html">dwv.html.Layer</a></li>
                                 <li><a href="../classes/dwv.html.Style.html">dwv.html.Style</a></li>
@@ -78,6 +89,7 @@
                                 <li><a href="../classes/dwv.tool.EllipseFactory.html">dwv.tool.EllipseFactory</a></li>
                                 <li><a href="../classes/dwv.tool.Filter.html">dwv.tool.Filter</a></li>
                                 <li><a href="../classes/dwv.tool.filter.Sharpen.html">dwv.tool.filter.Sharpen</a></li>
+                                <li><a href="../classes/dwv.tool.filter.Sobel.html">dwv.tool.filter.Sobel</a></li>
                                 <li><a href="../classes/dwv.tool.filter.Threshold.html">dwv.tool.filter.Threshold</a></li>
                                 <li><a href="../classes/dwv.tool.LineFactory.html">dwv.tool.LineFactory</a></li>
                                 <li><a href="../classes/dwv.tool.Livewire.html">dwv.tool.Livewire</a></li>
@@ -92,7 +104,9 @@
                                 <li><a href="../classes/dwv.tool.UndoStack.html">dwv.tool.UndoStack</a></li>
                                 <li><a href="../classes/dwv.tool.WindowLevel.html">dwv.tool.WindowLevel</a></li>
                                 <li><a href="../classes/dwv.tool.ZoomAndPan.html">dwv.tool.ZoomAndPan</a></li>
+                                <li><a href="../classes/dwv.ToolBoxController.html">dwv.ToolBoxController</a></li>
                                 <li><a href="../classes/dwv.utils.html">dwv.utils</a></li>
+                                <li><a href="../classes/dwv.ViewController.html">dwv.ViewController</a></li>
                                 <li><a href="../classes/image.ImageFactory.html">image.ImageFactory</a></li>
                                 <li><a href="../classes/image.ViewFactory.html">image.ViewFactory</a></li>
                             </ul>
@@ -154,15 +168,26 @@
                         
                         /**
                          * Tool box.
-                         * Relies on the static variable dwv.tool.tools. The available tools 
-                         * of the gui will be those of this list.
                          * @class ToolBox
                          * @namespace dwv.tool
                          * @constructor
-                         * @param {Object} app The associated application.
+                         * @param {Array} toolList The list of tool objects.
+                         * @param {Object} gui The associated gui.
                          */
-                        dwv.tool.ToolBox = function(/*app*/)
+                        dwv.tool.ToolBox = function( toolList, app )
                         {
+                            /**
+                             * Toolbox GUI.
+                             * @property gui
+                             * @type Object
+                             */
+                            var gui = new dwv.gui.Toolbox(app);
+                            /**
+                             * Tool list.
+                             * @property toolList
+                             * @type Object
+                             */
+                            this.toolList = toolList;
                             /**
                              * Selected tool.
                              * @property selectedTool
@@ -175,16 +200,66 @@
                              * @type String
                              */
                             this.defaultToolName = 0;
+                            
+                            /**
+                             * Setup the toolbox GUI.
+                             * @method setup
+                             */
+                            this.setup = function ()
+                            {
+                                if ( Object.keys(this.toolList).length !== 0 ) {
+                                    gui.setup(this.toolList);
+                                    for( var key in this.toolList ) {
+                                        this.toolList[key].setup();
+                                    }
+                                }
+                            };
+                        
+                            /**
+                             * Display the toolbox.
+                             * @method display
+                             * @param {Boolean} bool Flag to display or not.
+                             */
+                            this.display = function (bool)
+                            {
+                                if ( Object.keys(this.toolList).length !== 0 ) {
+                                    gui.display(bool);
+                                }
+                            };
+                            
+                            /**
+                             * Initialise the tool box.
+                             * @method init
+                             */
+                            this.init = function ()
+                            {
+                                // check if we have tools
+                                if ( Object.keys(this.toolList).length === 0 ) {
+                                    return;
+                                }
+                                // set the default to the first in the list
+                                for( var key in this.toolList ){
+                                    this.defaultToolName = key;
+                                    break;
+                                }
+                                this.setSelectedTool(this.defaultToolName);
+                                // init all tools
+                                for( key in this.toolList ) {
+                                    this.toolList[key].init();
+                                }    
+                                // init html
+                                gui.initialise();
+                            };
                         };
                         
                         /**
-                         * Enable the toolbox.
-                         * @method enable
-                         * @param {Boolean} bool Flag to enable or not.
+                         * Get the list of tools.
+                         * @method getToolList
+                         * @return {Array} The list of tool objects.
                          */
-                        dwv.tool.ToolBox.prototype.display = function(bool)
+                        dwv.tool.ToolBox.prototype.getToolList = function ()
                         {
-                            dwv.gui.displayToolboxHtml(bool);
+                            return this.toolList;
                         };
                         
                         /**
@@ -192,7 +267,8 @@
                          * @method getSelectedTool
                          * @return {Object} The selected tool.
                          */
-                        dwv.tool.ToolBox.prototype.getSelectedTool = function() {
+                        dwv.tool.ToolBox.prototype.getSelectedTool = function ()
+                        {
                             return this.selectedTool;
                         };
                         
@@ -201,7 +277,8 @@
                          * @method setSelectedTool
                          * @return {String} The name of the tool to select.
                          */
-                        dwv.tool.ToolBox.prototype.setSelectedTool = function(name) {
+                        dwv.tool.ToolBox.prototype.setSelectedTool = function (name)
+                        {
                             // check if we have it
                             if( !this.hasTool(name) )
                             {
@@ -213,7 +290,7 @@
                                 this.selectedTool.display(false);
                             }
                             // enable new one
-                            this.selectedTool = dwv.tool.tools[name];
+                            this.selectedTool = this.toolList[name];
                             // display it
                             this.selectedTool.display(true);
                         };
@@ -224,39 +301,19 @@
                          * @param {String} name The name to check.
                          * @return {String} The tool list element for the given name.
                          */
-                        dwv.tool.ToolBox.prototype.hasTool = function(name) {
-                            return dwv.tool.tools[name];
-                        };
-                        
-                        /**
-                         * Initialise the tool box.
-                         * @method init
-                         */
-                        dwv.tool.ToolBox.prototype.init = function()
+                        dwv.tool.ToolBox.prototype.hasTool = function (name)
                         {
-                            // set the default to the first in the list
-                            for( var key in dwv.tool.tools ){
-                                this.defaultToolName = key;
-                                break;
-                            }
-                            this.setSelectedTool(this.defaultToolName);
-                            // init all tools
-                            for( key in dwv.tool.tools ) {
-                                dwv.tool.tools[key].init();
-                            }    
-                            // init html
-                            dwv.gui.initToolboxHtml();
+                            return this.toolList[name];
                         };
                         
                         /**
                          * Reset the tool box.
                          * @method init
                          */
-                        dwv.tool.ToolBox.prototype.reset = function()
+                        dwv.tool.ToolBox.prototype.reset = function ()
                         {
                             // hide last selected
-                            if( this.selectedTool )
-                            {
+                            if ( this.selectedTool ) {
                                 this.selectedTool.display(false);
                             }
                             this.selectedTool = 0;

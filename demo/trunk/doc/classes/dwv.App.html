@@ -43,6 +43,17 @@
                                 <li><a href="../classes/dwv.dicom.DataReader.html">dwv.dicom.DataReader</a></li>
                                 <li><a href="../classes/dwv.dicom.DicomParser.html">dwv.dicom.DicomParser</a></li>
                                 <li><a href="../classes/dwv.gui.html">dwv.gui</a></li>
+                                <li><a href="../classes/dwv.gui.base.Draw.html">dwv.gui.base.Draw</a></li>
+                                <li><a href="../classes/dwv.gui.base.Filter.html">dwv.gui.base.Filter</a></li>
+                                <li><a href="../classes/dwv.gui.base.Livewire.html">dwv.gui.base.Livewire</a></li>
+                                <li><a href="../classes/dwv.gui.base.Scroll.html">dwv.gui.base.Scroll</a></li>
+                                <li><a href="../classes/dwv.gui.base.Sharpen.html">dwv.gui.base.Sharpen</a></li>
+                                <li><a href="../classes/dwv.gui.base.Slider.html">dwv.gui.base.Slider</a></li>
+                                <li><a href="../classes/dwv.gui.base.Sobel.html">dwv.gui.base.Sobel</a></li>
+                                <li><a href="../classes/dwv.gui.base.Threshold.html">dwv.gui.base.Threshold</a></li>
+                                <li><a href="../classes/dwv.gui.base.Toolbox.html">dwv.gui.base.Toolbox</a></li>
+                                <li><a href="../classes/dwv.gui.base.WindowLevel.html">dwv.gui.base.WindowLevel</a></li>
+                                <li><a href="../classes/dwv.gui.base.ZoomAndPan.html">dwv.gui.base.ZoomAndPan</a></li>
                                 <li><a href="../classes/dwv.html.html">dwv.html</a></li>
                                 <li><a href="../classes/dwv.html.Layer.html">dwv.html.Layer</a></li>
                                 <li><a href="../classes/dwv.html.Style.html">dwv.html.Style</a></li>
@@ -78,6 +89,7 @@
                                 <li><a href="../classes/dwv.tool.EllipseFactory.html">dwv.tool.EllipseFactory</a></li>
                                 <li><a href="../classes/dwv.tool.Filter.html">dwv.tool.Filter</a></li>
                                 <li><a href="../classes/dwv.tool.filter.Sharpen.html">dwv.tool.filter.Sharpen</a></li>
+                                <li><a href="../classes/dwv.tool.filter.Sobel.html">dwv.tool.filter.Sobel</a></li>
                                 <li><a href="../classes/dwv.tool.filter.Threshold.html">dwv.tool.filter.Threshold</a></li>
                                 <li><a href="../classes/dwv.tool.LineFactory.html">dwv.tool.LineFactory</a></li>
                                 <li><a href="../classes/dwv.tool.Livewire.html">dwv.tool.Livewire</a></li>
@@ -92,7 +104,9 @@
                                 <li><a href="../classes/dwv.tool.UndoStack.html">dwv.tool.UndoStack</a></li>
                                 <li><a href="../classes/dwv.tool.WindowLevel.html">dwv.tool.WindowLevel</a></li>
                                 <li><a href="../classes/dwv.tool.ZoomAndPan.html">dwv.tool.ZoomAndPan</a></li>
+                                <li><a href="../classes/dwv.ToolBoxController.html">dwv.ToolBoxController</a></li>
                                 <li><a href="../classes/dwv.utils.html">dwv.utils</a></li>
+                                <li><a href="../classes/dwv.ViewController.html">dwv.ViewController</a></li>
                                 <li><a href="../classes/image.ImageFactory.html">image.ImageFactory</a></li>
                                 <li><a href="../classes/image.ViewFactory.html">image.ViewFactory</a></li>
                             </ul>
@@ -280,11 +294,39 @@
                         
                                                     </li>
                                                     <li class="index-item method">
+                                                        <a href="#method_onChangeColourMap">onChangeColourMap</a>
+                        
+                                                    </li>
+                                                    <li class="index-item method">
                                                         <a href="#method_onChangeFiles">onChangeFiles</a>
                         
                                                     </li>
                                                     <li class="index-item method">
+                                                        <a href="#method_onChangeFilter">onChangeFilter</a>
+                        
+                                                    </li>
+                                                    <li class="index-item method">
+                                                        <a href="#method_onChangeLineColour">onChangeLineColour</a>
+                        
+                                                    </li>
+                                                    <li class="index-item method">
+                                                        <a href="#method_onChangeMinMax">onChangeMinMax</a>
+                        
+                                                    </li>
+                                                    <li class="index-item method">
+                                                        <a href="#method_onChangeShape">onChangeShape</a>
+                        
+                                                    </li>
+                                                    <li class="index-item method">
+                                                        <a href="#method_onChangeTool">onChangeTool</a>
+                        
+                                                    </li>
+                                                    <li class="index-item method">
                                                         <a href="#method_onChangeURL">onChangeURL</a>
+                        
+                                                    </li>
+                                                    <li class="index-item method">
+                                                        <a href="#method_onChangeWindowLevelPreset">onChangeWindowLevelPreset</a>
                         
                                                     </li>
                                                     <li class="index-item method">
@@ -308,11 +350,19 @@
                         
                                                     </li>
                                                     <li class="index-item method">
+                                                        <a href="#method_onRunFilter">onRunFilter</a>
+                        
+                                                    </li>
+                                                    <li class="index-item method">
                                                         <a href="#method_onSliceChange">onSliceChange</a>
                         
                                                     </li>
                                                     <li class="index-item method">
                                                         <a href="#method_onWLChange">onWLChange</a>
+                        
+                                                    </li>
+                                                    <li class="index-item method">
+                                                        <a href="#method_onZoomReset">onZoomReset</a>
                         
                                                     </li>
                                                     <li class="index-item method private">
@@ -348,11 +398,19 @@
                         
                                                     </li>
                                                     <li class="index-item method">
+                                                        <a href="#method_setCurrentPostion">setCurrentPostion</a>
+                        
+                                                    </li>
+                                                    <li class="index-item method">
                                                         <a href="#method_setImage">setImage</a>
                         
                                                     </li>
                                                     <li class="index-item method">
                                                         <a href="#method_toggleInfoLayerDisplay">toggleInfoLayerDisplay</a>
+                        
+                                                    </li>
+                                                    <li class="index-item method">
+                                                        <a href="#method_updatePresets">updatePresets</a>
                         
                                                     </li>
                                             </ul>
@@ -381,7 +439,7 @@
                                                 <div class="meta">
                                                             <p>
                                                             Defined in
-                                                    <a href="../files/src_application.js.html#l493"><code>src&#x2F;application.js:493</code></a>
+                                                    <a href="../files/src_application.js.html#l752"><code>src&#x2F;application.js:752</code></a>
                                                     </p>
                                             
                                             
@@ -411,7 +469,7 @@
                                                 <div class="meta">
                                                             <p>
                                                             Defined in
-                                                    <a href="../files/src_application.js.html#l424"><code>src&#x2F;application.js:424</code></a>
+                                                    <a href="../files/src_application.js.html#l522"><code>src&#x2F;application.js:522</code></a>
                                                     </p>
                                             
                                             
@@ -451,7 +509,7 @@
                                                 <div class="meta">
                                                             <p>
                                                             Defined in
-                                                    <a href="../files/src_application.js.html#l668"><code>src&#x2F;application.js:668</code></a>
+                                                    <a href="../files/src_application.js.html#l929"><code>src&#x2F;application.js:929</code></a>
                                                     </p>
                                             
                                             
@@ -516,7 +574,7 @@
                                                 <div class="meta">
                                                             <p>
                                                             Defined in
-                                                    <a href="../files/src_application.js.html#l523"><code>src&#x2F;application.js:523</code></a>
+                                                    <a href="../files/src_application.js.html#l782"><code>src&#x2F;application.js:782</code></a>
                                                     </p>
                                             
                                             
@@ -564,7 +622,7 @@
                                                 <div class="meta">
                                                             <p>
                                                             Defined in
-                                                    <a href="../files/src_application.js.html#l479"><code>src&#x2F;application.js:479</code></a>
+                                                    <a href="../files/src_application.js.html#l738"><code>src&#x2F;application.js:738</code></a>
                                                     </p>
                                             
                                             
@@ -597,7 +655,7 @@
                                                 <div class="meta">
                                                             <p>
                                                             Defined in
-                                                    <a href="../files/src_application.js.html#l108"><code>src&#x2F;application.js:108</code></a>
+                                                    <a href="../files/src_application.js.html#l125"><code>src&#x2F;application.js:125</code></a>
                                                     </p>
                                             
                                             
@@ -639,7 +697,7 @@
                                                 <div class="meta">
                                                             <p>
                                                             Defined in
-                                                    <a href="../files/src_application.js.html#l116"><code>src&#x2F;application.js:116</code></a>
+                                                    <a href="../files/src_application.js.html#l133"><code>src&#x2F;application.js:133</code></a>
                                                     </p>
                                             
                                             
@@ -681,7 +739,7 @@
                                                 <div class="meta">
                                                             <p>
                                                             Defined in
-                                                    <a href="../files/src_application.js.html#l54"><code>src&#x2F;application.js:54</code></a>
+                                                    <a href="../files/src_application.js.html#l71"><code>src&#x2F;application.js:71</code></a>
                                                     </p>
                                             
                                             
@@ -723,7 +781,7 @@
                                                 <div class="meta">
                                                             <p>
                                                             Defined in
-                                                    <a href="../files/src_application.js.html#l88"><code>src&#x2F;application.js:88</code></a>
+                                                    <a href="../files/src_application.js.html#l105"><code>src&#x2F;application.js:105</code></a>
                                                     </p>
                                             
                                             
@@ -765,7 +823,7 @@
                                                 <div class="meta">
                                                             <p>
                                                             Defined in
-                                                    <a href="../files/src_application.js.html#l102"><code>src&#x2F;application.js:102</code></a>
+                                                    <a href="../files/src_application.js.html#l119"><code>src&#x2F;application.js:119</code></a>
                                                     </p>
                                             
                                             
@@ -807,7 +865,7 @@
                                                 <div class="meta">
                                                             <p>
                                                             Defined in
-                                                    <a href="../files/src_application.js.html#l95"><code>src&#x2F;application.js:95</code></a>
+                                                    <a href="../files/src_application.js.html#l112"><code>src&#x2F;application.js:112</code></a>
                                                     </p>
                                             
                                             
@@ -849,7 +907,7 @@
                                                 <div class="meta">
                                                             <p>
                                                             Defined in
-                                                    <a href="../files/src_application.js.html#l123"><code>src&#x2F;application.js:123</code></a>
+                                                    <a href="../files/src_application.js.html#l140"><code>src&#x2F;application.js:140</code></a>
                                                     </p>
                                             
                                             
@@ -891,7 +949,7 @@
                                                 <div class="meta">
                                                             <p>
                                                             Defined in
-                                                    <a href="../files/src_application.js.html#l47"><code>src&#x2F;application.js:47</code></a>
+                                                    <a href="../files/src_application.js.html#l64"><code>src&#x2F;application.js:64</code></a>
                                                     </p>
                                             
                                             
@@ -933,7 +991,7 @@
                                                 <div class="meta">
                                                             <p>
                                                             Defined in
-                                                    <a href="../files/src_application.js.html#l60"><code>src&#x2F;application.js:60</code></a>
+                                                    <a href="../files/src_application.js.html#l77"><code>src&#x2F;application.js:77</code></a>
                                                     </p>
                                             
                                             
@@ -979,7 +1037,7 @@
                                                 <div class="meta">
                                                             <p>
                                                             Defined in
-                                                    <a href="../files/src_application.js.html#l647"><code>src&#x2F;application.js:647</code></a>
+                                                    <a href="../files/src_application.js.html#l908"><code>src&#x2F;application.js:908</code></a>
                                                     </p>
                                             
                                             
@@ -1026,7 +1084,7 @@
                                                 <div class="meta">
                                                             <p>
                                                             Defined in
-                                                    <a href="../files/src_application.js.html#l130"><code>src&#x2F;application.js:130</code></a>
+                                                    <a href="../files/src_application.js.html#l147"><code>src&#x2F;application.js:147</code></a>
                                                     </p>
                                             
                                             
@@ -1062,7 +1120,7 @@
                                                 <div class="meta">
                                                             <p>
                                                             Defined in
-                                                    <a href="../files/src_application.js.html#l227"><code>src&#x2F;application.js:227</code></a>
+                                                    <a href="../files/src_application.js.html#l322"><code>src&#x2F;application.js:322</code></a>
                                                     </p>
                                             
                                             
@@ -1115,7 +1173,7 @@
                                                 <div class="meta">
                                                             <p>
                                                             Defined in
-                                                    <a href="../files/src_application.js.html#l273"><code>src&#x2F;application.js:273</code></a>
+                                                    <a href="../files/src_application.js.html#l368"><code>src&#x2F;application.js:368</code></a>
                                                     </p>
                                             
                                             
@@ -1147,6 +1205,59 @@
                                             
                                             
                                             </div>
+                                            <div id="method_onChangeColourMap" class="method item">
+                                                <h3 class="name"><code>onChangeColourMap</code></h3>
+                                            
+                                                    <div class="args">
+                                                        <span class="paren">(</span><ul class="args-list inline commas">
+                                                            <li class="arg">
+                                                                    <code>event</code>
+                                                            </li>
+                                                        </ul><span class="paren">)</span>
+                                                    </div>
+                                            
+                                            
+                                            
+                                            
+                                            
+                                            
+                                            
+                                            
+                                                <div class="meta">
+                                                            <p>
+                                                            Defined in
+                                                    <a href="../files/src_application.js.html#l648"><code>src&#x2F;application.js:648</code></a>
+                                                    </p>
+                                            
+                                            
+                                            
+                                                </div>
+                                            
+                                                <div class="description">
+                                                    <p>Handle colour map change.</p>
+                                            
+                                                </div>
+                                            
+                                                    <div class="params">
+                                                        <h4>Parameters:</h4>
+                                            
+                                                        <ul class="params-list">
+                                                            <li class="param">
+                                                                    <code class="param-name">event</code>
+                                                                    <span class="type">Object</span>
+                                            
+                                            
+                                                                <div class="param-description">
+                                                                    <p>The change event.</p>
+                                            
+                                                                </div>
+                                            
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                            
+                                            
+                                            </div>
                                             <div id="method_onChangeFiles" class="method item">
                                                 <h3 class="name"><code>onChangeFiles</code></h3>
                                             
@@ -1168,7 +1279,7 @@
                                                 <div class="meta">
                                                             <p>
                                                             Defined in
-                                                    <a href="../files/src_application.js.html#l217"><code>src&#x2F;application.js:217</code></a>
+                                                    <a href="../files/src_application.js.html#l312"><code>src&#x2F;application.js:312</code></a>
                                                     </p>
                                             
                                             
@@ -1200,6 +1311,271 @@
                                             
                                             
                                             </div>
+                                            <div id="method_onChangeFilter" class="method item">
+                                                <h3 class="name"><code>onChangeFilter</code></h3>
+                                            
+                                                    <div class="args">
+                                                        <span class="paren">(</span><ul class="args-list inline commas">
+                                                            <li class="arg">
+                                                                    <code>event</code>
+                                                            </li>
+                                                        </ul><span class="paren">)</span>
+                                                    </div>
+                                            
+                                            
+                                            
+                                            
+                                            
+                                            
+                                            
+                                            
+                                                <div class="meta">
+                                                            <p>
+                                                            Defined in
+                                                    <a href="../files/src_application.js.html#l696"><code>src&#x2F;application.js:696</code></a>
+                                                    </p>
+                                            
+                                            
+                                            
+                                                </div>
+                                            
+                                                <div class="description">
+                                                    <p>Handle filter change.</p>
+                                            
+                                                </div>
+                                            
+                                                    <div class="params">
+                                                        <h4>Parameters:</h4>
+                                            
+                                                        <ul class="params-list">
+                                                            <li class="param">
+                                                                    <code class="param-name">event</code>
+                                                                    <span class="type">Object</span>
+                                            
+                                            
+                                                                <div class="param-description">
+                                                                    <p>The change event.</p>
+                                            
+                                                                </div>
+                                            
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                            
+                                            
+                                            </div>
+                                            <div id="method_onChangeLineColour" class="method item">
+                                                <h3 class="name"><code>onChangeLineColour</code></h3>
+                                            
+                                                    <div class="args">
+                                                        <span class="paren">(</span><ul class="args-list inline commas">
+                                                            <li class="arg">
+                                                                    <code>event</code>
+                                                            </li>
+                                                        </ul><span class="paren">)</span>
+                                                    </div>
+                                            
+                                            
+                                            
+                                            
+                                            
+                                            
+                                            
+                                            
+                                                <div class="meta">
+                                                            <p>
+                                                            Defined in
+                                                    <a href="../files/src_application.js.html#l716"><code>src&#x2F;application.js:716</code></a>
+                                                    </p>
+                                            
+                                            
+                                            
+                                                </div>
+                                            
+                                                <div class="description">
+                                                    <p>Handle line colour change.</p>
+                                            
+                                                </div>
+                                            
+                                                    <div class="params">
+                                                        <h4>Parameters:</h4>
+                                            
+                                                        <ul class="params-list">
+                                                            <li class="param">
+                                                                    <code class="param-name">event</code>
+                                                                    <span class="type">Object</span>
+                                            
+                                            
+                                                                <div class="param-description">
+                                                                    <p>The change event.</p>
+                                            
+                                                                </div>
+                                            
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                            
+                                            
+                                            </div>
+                                            <div id="method_onChangeMinMax" class="method item">
+                                                <h3 class="name"><code>onChangeMinMax</code></h3>
+                                            
+                                                    <div class="args">
+                                                        <span class="paren">(</span><ul class="args-list inline commas">
+                                                            <li class="arg">
+                                                                    <code>range</code>
+                                                            </li>
+                                                        </ul><span class="paren">)</span>
+                                                    </div>
+                                            
+                                            
+                                            
+                                            
+                                            
+                                            
+                                            
+                                            
+                                                <div class="meta">
+                                                            <p>
+                                                            Defined in
+                                                    <a href="../files/src_application.js.html#l726"><code>src&#x2F;application.js:726</code></a>
+                                                    </p>
+                                            
+                                            
+                                            
+                                                </div>
+                                            
+                                                <div class="description">
+                                                    <p>Handle min/max slider change.</p>
+                                            
+                                                </div>
+                                            
+                                                    <div class="params">
+                                                        <h4>Parameters:</h4>
+                                            
+                                                        <ul class="params-list">
+                                                            <li class="param">
+                                                                    <code class="param-name">range</code>
+                                                                    <span class="type">Object</span>
+                                            
+                                            
+                                                                <div class="param-description">
+                                                                    <p>The new range of the data.</p>
+                                            
+                                                                </div>
+                                            
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                            
+                                            
+                                            </div>
+                                            <div id="method_onChangeShape" class="method item">
+                                                <h3 class="name"><code>onChangeShape</code></h3>
+                                            
+                                                    <div class="args">
+                                                        <span class="paren">(</span><ul class="args-list inline commas">
+                                                            <li class="arg">
+                                                                    <code>event</code>
+                                                            </li>
+                                                        </ul><span class="paren">)</span>
+                                                    </div>
+                                            
+                                            
+                                            
+                                            
+                                            
+                                            
+                                            
+                                            
+                                                <div class="meta">
+                                                            <p>
+                                                            Defined in
+                                                    <a href="../files/src_application.js.html#l686"><code>src&#x2F;application.js:686</code></a>
+                                                    </p>
+                                            
+                                            
+                                            
+                                                </div>
+                                            
+                                                <div class="description">
+                                                    <p>Handle shape change.</p>
+                                            
+                                                </div>
+                                            
+                                                    <div class="params">
+                                                        <h4>Parameters:</h4>
+                                            
+                                                        <ul class="params-list">
+                                                            <li class="param">
+                                                                    <code class="param-name">event</code>
+                                                                    <span class="type">Object</span>
+                                            
+                                            
+                                                                <div class="param-description">
+                                                                    <p>The change event.</p>
+                                            
+                                                                </div>
+                                            
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                            
+                                            
+                                            </div>
+                                            <div id="method_onChangeTool" class="method item">
+                                                <h3 class="name"><code>onChangeTool</code></h3>
+                                            
+                                                    <div class="args">
+                                                        <span class="paren">(</span><ul class="args-list inline commas">
+                                                            <li class="arg">
+                                                                    <code>event</code>
+                                                            </li>
+                                                        </ul><span class="paren">)</span>
+                                                    </div>
+                                            
+                                            
+                                            
+                                            
+                                            
+                                            
+                                            
+                                            
+                                                <div class="meta">
+                                                            <p>
+                                                            Defined in
+                                                    <a href="../files/src_application.js.html#l676"><code>src&#x2F;application.js:676</code></a>
+                                                    </p>
+                                            
+                                            
+                                            
+                                                </div>
+                                            
+                                                <div class="description">
+                                                    <p>Handle tool change.</p>
+                                            
+                                                </div>
+                                            
+                                                    <div class="params">
+                                                        <h4>Parameters:</h4>
+                                            
+                                                        <ul class="params-list">
+                                                            <li class="param">
+                                                                    <code class="param-name">event</code>
+                                                                    <span class="type">Object</span>
+                                            
+                                            
+                                                                <div class="param-description">
+                                                                    <p>The change event.</p>
+                                            
+                                                                </div>
+                                            
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                            
+                                            
+                                            </div>
                                             <div id="method_onChangeURL" class="method item">
                                                 <h3 class="name"><code>onChangeURL</code></h3>
                                             
@@ -1221,7 +1597,7 @@
                                                 <div class="meta">
                                                             <p>
                                                             Defined in
-                                                    <a href="../files/src_application.js.html#l263"><code>src&#x2F;application.js:263</code></a>
+                                                    <a href="../files/src_application.js.html#l358"><code>src&#x2F;application.js:358</code></a>
                                                     </p>
                                             
                                             
@@ -1253,6 +1629,59 @@
                                             
                                             
                                             </div>
+                                            <div id="method_onChangeWindowLevelPreset" class="method item">
+                                                <h3 class="name"><code>onChangeWindowLevelPreset</code></h3>
+                                            
+                                                    <div class="args">
+                                                        <span class="paren">(</span><ul class="args-list inline commas">
+                                                            <li class="arg">
+                                                                    <code>event</code>
+                                                            </li>
+                                                        </ul><span class="paren">)</span>
+                                                    </div>
+                                            
+                                            
+                                            
+                                            
+                                            
+                                            
+                                            
+                                            
+                                                <div class="meta">
+                                                            <p>
+                                                            Defined in
+                                                    <a href="../files/src_application.js.html#l658"><code>src&#x2F;application.js:658</code></a>
+                                                    </p>
+                                            
+                                            
+                                            
+                                                </div>
+                                            
+                                                <div class="description">
+                                                    <p>Handle window/level preset change.</p>
+                                            
+                                                </div>
+                                            
+                                                    <div class="params">
+                                                        <h4>Parameters:</h4>
+                                            
+                                                        <ul class="params-list">
+                                                            <li class="param">
+                                                                    <code class="param-name">event</code>
+                                                                    <span class="type">Object</span>
+                                            
+                                            
+                                                                <div class="param-description">
+                                                                    <p>The change event.</p>
+                                            
+                                                                </div>
+                                            
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                            
+                                            
+                                            </div>
                                             <div id="method_onColorChange" class="method item">
                                                 <h3 class="name"><code>onColorChange</code></h3>
                                             
@@ -1274,7 +1703,7 @@
                                                 <div class="meta">
                                                             <p>
                                                             Defined in
-                                                    <a href="../files/src_application.js.html#l319"><code>src&#x2F;application.js:319</code></a>
+                                                    <a href="../files/src_application.js.html#l414"><code>src&#x2F;application.js:414</code></a>
                                                     </p>
                                             
                                             
@@ -1328,7 +1757,7 @@
                                                 <div class="meta">
                                                             <p>
                                                             Defined in
-                                                    <a href="../files/src_application.js.html#l614"><code>src&#x2F;application.js:614</code></a>
+                                                    <a href="../files/src_application.js.html#l874"><code>src&#x2F;application.js:874</code></a>
                                                     </p>
                                             
                                             
@@ -1382,7 +1811,7 @@
                                                 <div class="meta">
                                                             <p>
                                                             Defined in
-                                                    <a href="../files/src_application.js.html#l596"><code>src&#x2F;application.js:596</code></a>
+                                                    <a href="../files/src_application.js.html#l855"><code>src&#x2F;application.js:855</code></a>
                                                     </p>
                                             
                                             
@@ -1436,7 +1865,7 @@
                                                 <div class="meta">
                                                             <p>
                                                             Defined in
-                                                    <a href="../files/src_application.js.html#l632"><code>src&#x2F;application.js:632</code></a>
+                                                    <a href="../files/src_application.js.html#l893"><code>src&#x2F;application.js:893</code></a>
                                                     </p>
                                             
                                             
@@ -1489,7 +1918,7 @@
                                                 <div class="meta">
                                                             <p>
                                                             Defined in
-                                                    <a href="../files/src_application.js.html#l197"><code>src&#x2F;application.js:197</code></a>
+                                                    <a href="../files/src_application.js.html#l292"><code>src&#x2F;application.js:292</code></a>
                                                     </p>
                                             
                                             
@@ -1526,6 +1955,59 @@
                                             
                                             
                                             </div>
+                                            <div id="method_onRunFilter" class="method item">
+                                                <h3 class="name"><code>onRunFilter</code></h3>
+                                            
+                                                    <div class="args">
+                                                        <span class="paren">(</span><ul class="args-list inline commas">
+                                                            <li class="arg">
+                                                                    <code>event</code>
+                                                            </li>
+                                                        </ul><span class="paren">)</span>
+                                                    </div>
+                                            
+                                            
+                                            
+                                            
+                                            
+                                            
+                                            
+                                            
+                                                <div class="meta">
+                                                            <p>
+                                                            Defined in
+                                                    <a href="../files/src_application.js.html#l706"><code>src&#x2F;application.js:706</code></a>
+                                                    </p>
+                                            
+                                            
+                                            
+                                                </div>
+                                            
+                                                <div class="description">
+                                                    <p>Handle filter run.</p>
+                                            
+                                                </div>
+                                            
+                                                    <div class="params">
+                                                        <h4>Parameters:</h4>
+                                            
+                                                        <ul class="params-list">
+                                                            <li class="param">
+                                                                    <code class="param-name">event</code>
+                                                                    <span class="type">Object</span>
+                                            
+                                            
+                                                                <div class="param-description">
+                                                                    <p>The run event.</p>
+                                            
+                                                                </div>
+                                            
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                            
+                                            
+                                            </div>
                                             <div id="method_onSliceChange" class="method item">
                                                 <h3 class="name"><code>onSliceChange</code></h3>
                                             
@@ -1547,7 +2029,7 @@
                                                 <div class="meta">
                                                             <p>
                                                             Defined in
-                                                    <a href="../files/src_application.js.html#l329"><code>src&#x2F;application.js:329</code></a>
+                                                    <a href="../files/src_application.js.html#l424"><code>src&#x2F;application.js:424</code></a>
                                                     </p>
                                             
                                             
@@ -1600,7 +2082,7 @@
                                                 <div class="meta">
                                                             <p>
                                                             Defined in
-                                                    <a href="../files/src_application.js.html#l309"><code>src&#x2F;application.js:309</code></a>
+                                                    <a href="../files/src_application.js.html#l404"><code>src&#x2F;application.js:404</code></a>
                                                     </p>
                                             
                                             
@@ -1632,6 +2114,59 @@
                                             
                                             
                                             </div>
+                                            <div id="method_onZoomReset" class="method item">
+                                                <h3 class="name"><code>onZoomReset</code></h3>
+                                            
+                                                    <div class="args">
+                                                        <span class="paren">(</span><ul class="args-list inline commas">
+                                                            <li class="arg">
+                                                                    <code>event</code>
+                                                            </li>
+                                                        </ul><span class="paren">)</span>
+                                                    </div>
+                                            
+                                            
+                                            
+                                            
+                                            
+                                            
+                                            
+                                            
+                                                <div class="meta">
+                                                            <p>
+                                                            Defined in
+                                                    <a href="../files/src_application.js.html#l627"><code>src&#x2F;application.js:627</code></a>
+                                                    </p>
+                                            
+                                            
+                                            
+                                                </div>
+                                            
+                                                <div class="description">
+                                                    <p>Handle zoom reset.</p>
+                                            
+                                                </div>
+                                            
+                                                    <div class="params">
+                                                        <h4>Parameters:</h4>
+                                            
+                                                        <ul class="params-list">
+                                                            <li class="param">
+                                                                    <code class="param-name">event</code>
+                                                                    <span class="type">Object</span>
+                                            
+                                            
+                                                                <div class="param-description">
+                                                                    <p>The change event.</p>
+                                            
+                                                                </div>
+                                            
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                            
+                                            
+                                            </div>
                                             <div id="method_postLoadInit" class="method item private">
                                                 <h3 class="name"><code>postLoadInit</code></h3>
                                             
@@ -1654,7 +2189,7 @@
                                                 <div class="meta">
                                                             <p>
                                                             Defined in
-                                                    <a href="../files/src_application.js.html#l697"><code>src&#x2F;application.js:697</code></a>
+                                                    <a href="../files/src_application.js.html#l960"><code>src&#x2F;application.js:960</code></a>
                                                     </p>
                                             
                                             
@@ -1702,7 +2237,7 @@
                                                 <div class="meta">
                                                             <p>
                                                             Defined in
-                                                    <a href="../files/src_application.js.html#l508"><code>src&#x2F;application.js:508</code></a>
+                                                    <a href="../files/src_application.js.html#l767"><code>src&#x2F;application.js:767</code></a>
                                                     </p>
                                             
                                             
@@ -1732,7 +2267,7 @@
                                                 <div class="meta">
                                                             <p>
                                                             Defined in
-                                                    <a href="../files/src_application.js.html#l446"><code>src&#x2F;application.js:446</code></a>
+                                                    <a href="../files/src_application.js.html#l544"><code>src&#x2F;application.js:544</code></a>
                                                     </p>
                                             
                                             
@@ -1762,7 +2297,7 @@
                                                 <div class="meta">
                                                             <p>
                                                             Defined in
-                                                    <a href="../files/src_application.js.html#l468"><code>src&#x2F;application.js:468</code></a>
+                                                    <a href="../files/src_application.js.html#l566"><code>src&#x2F;application.js:566</code></a>
                                                     </p>
                                             
                                             
@@ -1792,7 +2327,7 @@
                                                 <div class="meta">
                                                             <p>
                                                             Defined in
-                                                    <a href="../files/src_application.js.html#l161"><code>src&#x2F;application.js:161</code></a>
+                                                    <a href="../files/src_application.js.html#l254"><code>src&#x2F;application.js:254</code></a>
                                                     </p>
                                             
                                             
@@ -1822,7 +2357,7 @@
                                                 <div class="meta">
                                                             <p>
                                                             Defined in
-                                                    <a href="../files/src_application.js.html#l181"><code>src&#x2F;application.js:181</code></a>
+                                                    <a href="../files/src_application.js.html#l276"><code>src&#x2F;application.js:276</code></a>
                                                     </p>
                                             
                                             
@@ -1852,7 +2387,7 @@
                                                 <div class="meta">
                                                             <p>
                                                             Defined in
-                                                    <a href="../files/src_application.js.html#l349"><code>src&#x2F;application.js:349</code></a>
+                                                    <a href="../files/src_application.js.html#l444"><code>src&#x2F;application.js:444</code></a>
                                                     </p>
                                             
                                             
@@ -1860,7 +2395,7 @@
                                                 </div>
                                             
                                                 <div class="description">
-                                                    <p>Resize the display window. To be called once the image is loaded.</p>
+                                                    <p>Fit the display to the window. To be called once the image is loaded.</p>
                                             
                                                 </div>
                                             
@@ -1882,7 +2417,7 @@
                                                 <div class="meta">
                                                             <p>
                                                             Defined in
-                                                    <a href="../files/src_application.js.html#l78"><code>src&#x2F;application.js:78</code></a>
+                                                    <a href="../files/src_application.js.html#l95"><code>src&#x2F;application.js:95</code></a>
                                                     </p>
                                             
                                             
@@ -1894,6 +2429,73 @@
                                             
                                                 </div>
                                             
+                                            
+                                            
+                                            </div>
+                                            <div id="method_setCurrentPostion" class="method item">
+                                                <h3 class="name"><code>setCurrentPostion</code></h3>
+                                            
+                                                    <div class="args">
+                                                        <span class="paren">(</span><ul class="args-list inline commas">
+                                                            <li class="arg">
+                                                                    <code>i</code>
+                                                            </li>
+                                                            <li class="arg">
+                                                                    <code>j</code>
+                                                            </li>
+                                                        </ul><span class="paren">)</span>
+                                                    </div>
+                                            
+                                            
+                                            
+                                            
+                                            
+                                            
+                                            
+                                            
+                                                <div class="meta">
+                                                            <p>
+                                                            Defined in
+                                                    <a href="../files/src_application.js.html#l637"><code>src&#x2F;application.js:637</code></a>
+                                                    </p>
+                                            
+                                            
+                                            
+                                                </div>
+                                            
+                                                <div class="description">
+                                                    <p>Set the current position.</p>
+                                            
+                                                </div>
+                                            
+                                                    <div class="params">
+                                                        <h4>Parameters:</h4>
+                                            
+                                                        <ul class="params-list">
+                                                            <li class="param">
+                                                                    <code class="param-name">i</code>
+                                                                    <span class="type">Number</span>
+                                            
+                                            
+                                                                <div class="param-description">
+                                                                    <p>The column index.</p>
+                                            
+                                                                </div>
+                                            
+                                                            </li>
+                                                            <li class="param">
+                                                                    <code class="param-name">j</code>
+                                                                    <span class="type">Number</span>
+                                            
+                                            
+                                                                <div class="param-description">
+                                                                    <p>The row index.</p>
+                                            
+                                                                </div>
+                                            
+                                                            </li>
+                                                        </ul>
+                                                    </div>
                                             
                                             
                                             </div>
@@ -1918,7 +2520,7 @@
                                                 <div class="meta">
                                                             <p>
                                                             Defined in
-                                                    <a href="../files/src_application.js.html#l67"><code>src&#x2F;application.js:67</code></a>
+                                                    <a href="../files/src_application.js.html#l84"><code>src&#x2F;application.js:84</code></a>
                                                     </p>
                                             
                                             
@@ -1965,7 +2567,7 @@
                                                 <div class="meta">
                                                             <p>
                                                             Defined in
-                                                    <a href="../files/src_application.js.html#l393"><code>src&#x2F;application.js:393</code></a>
+                                                    <a href="../files/src_application.js.html#l490"><code>src&#x2F;application.js:490</code></a>
                                                     </p>
                                             
                                             
@@ -1973,10 +2575,63 @@
                                                 </div>
                                             
                                                 <div class="description">
-                                                    <p>Toggle the display of the info layer.</p>
+                                                    <p>Toggle the display of the information layer.</p>
                                             
                                                 </div>
                                             
+                                            
+                                            
+                                            </div>
+                                            <div id="method_updatePresets" class="method item">
+                                                <h3 class="name"><code>updatePresets</code></h3>
+                                            
+                                                    <div class="args">
+                                                        <span class="paren">(</span><ul class="args-list inline commas">
+                                                            <li class="arg">
+                                                                    <code>full</code>
+                                                            </li>
+                                                        </ul><span class="paren">)</span>
+                                                    </div>
+                                            
+                                            
+                                            
+                                            
+                                            
+                                            
+                                            
+                                            
+                                                <div class="meta">
+                                                            <p>
+                                                            Defined in
+                                                    <a href="../files/src_application.js.html#l575"><code>src&#x2F;application.js:575</code></a>
+                                                    </p>
+                                            
+                                            
+                                            
+                                                </div>
+                                            
+                                                <div class="description">
+                                                    <p>Update the window/level presets.</p>
+                                            
+                                                </div>
+                                            
+                                                    <div class="params">
+                                                        <h4>Parameters:</h4>
+                                            
+                                                        <ul class="params-list">
+                                                            <li class="param">
+                                                                    <code class="param-name">full</code>
+                                                                    <span class="type">Boolean</span>
+                                            
+                                            
+                                                                <div class="param-description">
+                                                                    <p>If true, shows all presets.</p>
+                                            
+                                                                </div>
+                                            
+                                                            </li>
+                                                        </ul>
+                                                    </div>
                                             
                                             
                                             </div>
