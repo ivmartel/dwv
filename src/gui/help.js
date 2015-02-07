@@ -16,7 +16,7 @@ dwv.gui.base = dwv.gui.base || {};
  * Append the version HTML.
  * @method appendVersionHtml
  */
-dwv.gui.base.appendVersionHtml = function()
+dwv.gui.base.appendVersionHtml = function (app)
 {
     var nodes = document.getElementsByClassName("dwv-version");
     for( var i = 0; i < nodes.length; ++i ){

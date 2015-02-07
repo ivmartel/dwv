@@ -15,12 +15,7 @@ dwv.gui.refreshSelect = function(selectName){
     dwv.gui.base.refreshSelect(selectName);
 };
 // Slider
-dwv.gui.appendSliderHtml = function(){
-    dwv.gui.base.appendSliderHtml();
-};
-dwv.gui.initSliderHtml = function(){
-    dwv.gui.base.initSliderHtml();
-};
+dwv.gui.Slider = dwv.gui.base.Slider;
 // Tags table
 dwv.gui.appendTagsTable = function(dataInfo){
     dwv.gui.base.appendTagsTable(dataInfo);
@@ -48,135 +43,76 @@ dwv.gui.displayUrlLoadHtml = function(bool){
 };
 
 // Toolbox 
-dwv.gui.appendToolboxHtml = function(app){
-    dwv.gui.base.appendToolboxHtml(app);
+dwv.gui.Toolbox = function (app)
+{
+    var base = new dwv.gui.base.Toolbox(app);
     
-    // toolbar
-    var buttonClass = "ui-btn ui-btn-inline ui-btn-icon-notext ui-mini"; 
+    this.setup = function (list)
+    {
+        base.setup(list);
+        
+        // toolbar
+        var buttonClass = "ui-btn ui-btn-inline ui-btn-icon-notext ui-mini"; 
+        
+        var open = document.createElement("a");
+        open.href = "#popupOpen";
+        open.setAttribute("class", buttonClass + " ui-icon-plus");
+        open.setAttribute("data-rel", "popup");
+        open.setAttribute("data-position-to", "window");
     
-    var open = document.createElement("a");
-    open.href = "#popupOpen";
-    open.setAttribute("class", buttonClass + " ui-icon-plus");
-    open.setAttribute("data-rel", "popup");
-    open.setAttribute("data-position-to", "window");
-
-    var undo = document.createElement("a");
-    undo.setAttribute("class", buttonClass + " ui-icon-back");
-    undo.onclick = dwv.gui.onUndo;
-
-    var redo = document.createElement("a");
-    redo.setAttribute("class", buttonClass + " ui-icon-forward");
-    redo.onclick = dwv.gui.onRedo;
-
-    var toggleInfo = document.createElement("a");
-    toggleInfo.setAttribute("class", buttonClass + " ui-icon-info");
-    toggleInfo.onclick = dwv.gui.onToggleInfoLayer;
-
-    var tags = document.createElement("a");
-    tags.href = "#tags_page";
-    tags.setAttribute("class", buttonClass + " ui-icon-grid");
-
-    var node = document.getElementById("toolbar");
-    node.appendChild(open);
-    node.appendChild(undo);
-    node.appendChild(redo);
-    node.appendChild(toggleInfo);
-    node.appendChild(tags);
-    $("#toolbar").trigger("create");
-};
-dwv.gui.displayToolboxHtml = function(bool){
-    dwv.gui.base.displayToolboxHtml(bool);
-};
-dwv.gui.initToolboxHtml = function(){
-    dwv.gui.base.initToolboxHtml();
+        var undo = document.createElement("a");
+        undo.setAttribute("class", buttonClass + " ui-icon-back");
+        undo.onclick = dwv.gui.onUndo;
+    
+        var redo = document.createElement("a");
+        redo.setAttribute("class", buttonClass + " ui-icon-forward");
+        redo.onclick = dwv.gui.onRedo;
+    
+        var toggleInfo = document.createElement("a");
+        toggleInfo.setAttribute("class", buttonClass + " ui-icon-info");
+        toggleInfo.onclick = dwv.gui.onToggleInfoLayer;
+    
+        var tags = document.createElement("a");
+        tags.href = "#tags_page";
+        tags.setAttribute("class", buttonClass + " ui-icon-grid");
+    
+        var node = document.getElementById("toolbar");
+        node.appendChild(open);
+        node.appendChild(undo);
+        node.appendChild(redo);
+        node.appendChild(toggleInfo);
+        node.appendChild(tags);
+        $("#toolbar").trigger("create");
+    };
+    this.display = function (flag)
+    {
+        base.display(flag);
+    };
+    this.initialise = function ()
+    {
+        base.initialise();
+    };
 };
 
 // Window/level
-dwv.gui.appendWindowLevelHtml = function(app){
-    dwv.gui.base.appendWindowLevelHtml(app);
-};
-dwv.gui.displayWindowLevelHtml = function(bool){
-    dwv.gui.base.displayWindowLevelHtml(bool);
-};
-dwv.gui.initWindowLevelHtml = function(app){
-    dwv.gui.base.initWindowLevelHtml(app);
-};
-
+dwv.gui.WindowLevel = dwv.gui.base.WindowLevel;
 // Draw
-dwv.gui.appendDrawHtml = function(){
-    dwv.gui.base.appendDrawHtml();
-};
-dwv.gui.displayDrawHtml = function(bool){
-    dwv.gui.base.displayDrawHtml(bool);  
-};
-dwv.gui.initDrawHtml = function(){
-    dwv.gui.base.initDrawHtml();  
-};
-
+dwv.gui.Draw = dwv.gui.base.Draw;
 // Livewire
-dwv.gui.appendLivewireHtml = function(){
-    dwv.gui.base.appendLivewireHtml();  
-};
-dwv.gui.displayLivewireHtml = function(bool){
-    dwv.gui.base.displayLivewireHtml(bool);
-};
-dwv.gui.initLivewireHtml = function(){
-    dwv.gui.base.initLivewireHtml();
-};
-
-// Navigate
-dwv.gui.appendZoomAndPanHtml = function(){
-    dwv.gui.base.appendZoomAndPanHtml();
-};
-dwv.gui.displayZoomAndPanHtml = function(bool){
-    dwv.gui.base.displayZoomAndPanHtml(bool);
-};
-
+dwv.gui.Livewire = dwv.gui.base.Livewire;  
+// ZoomAndPan
+dwv.gui.ZoomAndPan = dwv.gui.base.ZoomAndPan;
 // Scroll
-dwv.gui.appendScrollHtml = function(){
-    dwv.gui.base.appendScrollHtml();
-};
-dwv.gui.displayScrollHtml = function(bool){
-    dwv.gui.base.displayScrollHtml(bool);
-};
-
+dwv.gui.Scroll = dwv.gui.base.Scroll;
 // Filter
-dwv.gui.appendFilterHtml = function(){
-    dwv.gui.base.appendFilterHtml();
-};
-dwv.gui.displayFilterHtml = function(bool){
-    dwv.gui.base.displayFilterHtml(bool);
-};
-dwv.gui.initFilterHtml = function(){
-    dwv.gui.base.initFilterHtml();
-};
+dwv.gui.Filter = dwv.gui.base.Filter;
 
-// Threshold
-dwv.gui.filter.appendThresholdHtml = function(){
-    dwv.gui.filter.base.appendThresholdHtml();
-};
-dwv.gui.filter.displayThresholdHtml = function(bool){
-    dwv.gui.filter.base.displayThresholdHtml(bool);
-};
-dwv.gui.filter.initThresholdHtml = function(){
-    dwv.gui.filter.base.initThresholdHtml();
-};
-
-// Sharpen
-dwv.gui.filter.appendSharpenHtml = function(){
-    dwv.gui.filter.base.appendSharpenHtml();
-};
-dwv.gui.filter.displaySharpenHtml = function(bool){
-    dwv.gui.filter.base.displaySharpenHtml(bool);
-};
-
-// Sobel
-dwv.gui.filter.appendSobelHtml = function(){
-    dwv.gui.filter.base.appendSobelHtml();
-};
-dwv.gui.filter.displaySobelHtml = function(bool){
-    dwv.gui.filter.base.displaySobelHtml(bool);
-};
+// Filter: threshold
+dwv.gui.Threshold = dwv.gui.base.Threshold;
+// Filter: sharpen
+dwv.gui.Sharpen = dwv.gui.base.Sharpen;
+// Filter: sobel
+dwv.gui.Sobel = dwv.gui.base.Sobel;
 
 // Undo/redo
 dwv.gui.appendUndoHtml = function(){
@@ -187,6 +123,6 @@ dwv.gui.appendUndoHtml = function(){
 dwv.gui.appendHelpHtml = function(mobile){
     dwv.gui.base.appendHelpHtml(mobile);
 };
-dwv.gui.appendVersionHtml = function(){
-    dwv.gui.base.appendVersionHtml();
+dwv.gui.appendVersionHtml = function(app){
+    dwv.gui.base.appendVersionHtml(app);
 };

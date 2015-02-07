@@ -11,11 +11,18 @@ dwv.tool = dwv.tool || {};
  * @namespace dwv.tool
  * @constructor
  * @param {Array} toolList The list of tool objects.
+ * @param {Object} gui The associated gui.
  */
-dwv.tool.ToolBox = function( toolList )
+dwv.tool.ToolBox = function( toolList, app )
 {
     /**
-     * Tool list
+     * Toolbox GUI.
+     * @property gui
+     * @type Object
+     */
+    var gui = new dwv.gui.Toolbox(app);
+    /**
+     * Tool list.
      * @property toolList
      * @type Object
      */
@@ -32,18 +39,56 @@ dwv.tool.ToolBox = function( toolList )
      * @type String
      */
     this.defaultToolName = 0;
-};
+    
+    /**
+     * Setup the toolbox GUI.
+     * @method setup
+     */
+    this.setup = function ()
+    {
+        if ( Object.keys(this.toolList).length !== 0 ) {
+            gui.setup(this.toolList);
+            for( var key in this.toolList ) {
+                this.toolList[key].setup();
+            }
+        }
+    };
 
-/**
- * Enable the toolbox.
- * @method enable
- * @param {Boolean} bool Flag to enable or not.
- */
-dwv.tool.ToolBox.prototype.display = function(bool)
-{
-    if ( this.toolList.length !== 0 ) {
-        dwv.gui.displayToolboxHtml(bool);
-    }
+    /**
+     * Display the toolbox.
+     * @method display
+     * @param {Boolean} bool Flag to display or not.
+     */
+    this.display = function (bool)
+    {
+        if ( Object.keys(this.toolList).length !== 0 ) {
+            gui.display(bool);
+        }
+    };
+    
+    /**
+     * Initialise the tool box.
+     * @method init
+     */
+    this.init = function ()
+    {
+        // check if we have tools
+        if ( Object.keys(this.toolList).length === 0 ) {
+            return;
+        }
+        // set the default to the first in the list
+        for( var key in this.toolList ){
+            this.defaultToolName = key;
+            break;
+        }
+        this.setSelectedTool(this.defaultToolName);
+        // init all tools
+        for( key in this.toolList ) {
+            this.toolList[key].init();
+        }    
+        // init html
+        gui.initialise();
+    };
 };
 
 /**
@@ -51,7 +96,8 @@ dwv.tool.ToolBox.prototype.display = function(bool)
  * @method getToolList
  * @return {Array} The list of tool objects.
  */
-dwv.tool.ToolBox.prototype.getToolList = function() {
+dwv.tool.ToolBox.prototype.getToolList = function ()
+{
     return this.toolList;
 };
 
@@ -60,7 +106,8 @@ dwv.tool.ToolBox.prototype.getToolList = function() {
  * @method getSelectedTool
  * @return {Object} The selected tool.
  */
-dwv.tool.ToolBox.prototype.getSelectedTool = function() {
+dwv.tool.ToolBox.prototype.getSelectedTool = function ()
+{
     return this.selectedTool;
 };
 
@@ -69,7 +116,8 @@ dwv.tool.ToolBox.prototype.getSelectedTool = function() {
  * @method setSelectedTool
  * @return {String} The name of the tool to select.
  */
-dwv.tool.ToolBox.prototype.setSelectedTool = function(name) {
+dwv.tool.ToolBox.prototype.setSelectedTool = function (name)
+{
     // check if we have it
     if( !this.hasTool(name) )
     {
@@ -92,43 +140,19 @@ dwv.tool.ToolBox.prototype.setSelectedTool = function(name) {
  * @param {String} name The name to check.
  * @return {String} The tool list element for the given name.
  */
-dwv.tool.ToolBox.prototype.hasTool = function(name) {
-    return this.toolList[name];
-};
-
-/**
- * Initialise the tool box.
- * @method init
- */
-dwv.tool.ToolBox.prototype.init = function()
+dwv.tool.ToolBox.prototype.hasTool = function (name)
 {
-    // check if we have tools
-    if ( this.toolList.length === 0 ) {
-        return;
-    }
-    // set the default to the first in the list
-    for( var key in this.toolList ){
-        this.defaultToolName = key;
-        break;
-    }
-    this.setSelectedTool(this.defaultToolName);
-    // init all tools
-    for( key in this.toolList ) {
-        this.toolList[key].init();
-    }    
-    // init html
-    dwv.gui.initToolboxHtml();
+    return this.toolList[name];
 };
 
 /**
  * Reset the tool box.
  * @method init
  */
-dwv.tool.ToolBox.prototype.reset = function()
+dwv.tool.ToolBox.prototype.reset = function ()
 {
     // hide last selected
-    if( this.selectedTool )
-    {
+    if ( this.selectedTool ) {
         this.selectedTool.display(false);
     }
     this.selectedTool = 0;

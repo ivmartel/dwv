@@ -34,6 +34,12 @@ dwv.App = function()
     
     var presets = {};
     this.getPresets = function () { return presets; };
+    
+    var toolBoxController = null;
+    this.getToolboxController = function () { return toolBoxController; };
+
+    var viewController = null;
+    this.getViewController = function () { return viewController; };
      
     var plotInfo = null;
     var windowingInfo = null;
@@ -150,32 +156,75 @@ dwv.App = function()
         }
         // tools
         if ( config.tools.length !== 0 ) {
+            // setup the tool list
             var toolList = {};
-            for ( var i = 0; i < config.tools.length; ++i ) {
-                switch( config.tools[i] ) {
-                case "WindowLevel":
+            for ( var t = 0; t < config.tools.length; ++t ) {
+                switch( config.tools[t] ) {
+                case "Window/Level":
                     toolList["Window/Level"] = new dwv.tool.WindowLevel(this);
                     break;
-                case "ZoomPan":
+                case "Zoom/Pan":
                     toolList["Zoom/Pan"] = new dwv.tool.ZoomAndPan(this);
                     break;
                 case "Scroll":
                     toolList.Scroll = new dwv.tool.Scroll(this);
                     break;
                 case "Draw":
-                    toolList.Draw = new dwv.tool.Draw(this);
+                    if ( config.shapes !== 0 ) {
+                        // setup the shape list
+                        var shapeList = {};
+                        for ( var s = 0; s < config.shapes.length; ++s ) {
+                            switch( config.shapes[s] ) {
+                            case "Line":
+                                shapeList.Line = dwv.tool.LineFactory;
+                                break;
+                            case "Protractor":
+                                shapeList.Protractor = dwv.tool.ProtractorFactory;
+                                break;
+                            case "Rectangle":
+                                shapeList.Rectangle = dwv.tool.RectangleFactory;
+                                break;
+                            case "Roi":
+                                shapeList.Roi = dwv.tool.RoiFactory;
+                                break;
+                            case "Ellipse":
+                                shapeList.Ellipse = dwv.tool.EllipseFactory;
+                                break;
+                            }
+                        }
+                        toolList.Draw = new dwv.tool.Draw(this, shapeList);
+                    }
                     break;
                 case "Livewire":
                     toolList.Livewire = new dwv.tool.Livewire(this);
                     break;
                 case "Filter":
-                    toolList.Filter = new dwv.tool.Filter(this);
+                    if ( config.filters.length !== 0 ) {
+                        // setup the filter list
+                        var filterList = {};
+                        for ( var f = 0; f < config.filters.length; ++f ) {
+                            switch( config.filters[f] ) {
+                            case "Threshold":
+                                filterList.Threshold = new dwv.tool.filter.Threshold(this);
+                                break;
+                            case "Sharpen":
+                                filterList.Sharpen = new dwv.tool.filter.Sharpen(this);
+                                break;
+                            case "Sobel":
+                                filterList.Sobel = new dwv.tool.filter.Sobel(this);
+                                break;
+                            }
+                        }
+                        toolList.Filter = new dwv.tool.Filter(filterList, this);
+                    }
                     break;
                 default:
-                    throw new Error("Unknown tool: '" + config.tools[i] + "'");
+                    throw new Error("Unknown tool: '" + config.tools[t] + "'");
                 }
             }
-            toolBox = new dwv.tool.ToolBox(toolList);
+            toolBox = new dwv.tool.ToolBox(toolList, this);
+            toolBoxController = new dwv.ToolBoxController(toolBox);
+            toolBox.setup();
         }
         // listen to drag&drop
         var dropBoxDivId = containerDivId + "-dropBox";
@@ -463,11 +512,11 @@ dwv.App = function()
     {
         // set window/level
         var keys = Object.keys(this.presets);
-        this.updateWindowingData(
+        viewController.setWindowLevel(
             this.presets[keys[0]].center, 
             this.presets[keys[0]].width );
         // default position
-        this.updatePostionValue(0,0);
+        this.setCurrentPostion(0,0);
     };
 
     /**
@@ -554,7 +603,6 @@ dwv.App = function()
         
         // default presets
         var modality = this.getImage().getMeta().Modality;
-        console.log("moda:"+modality);
         for( var key in dwv.tool.defaultpresets[modality] ) {
             this.presets[key] = dwv.tool.defaultpresets[modality][key];
         }
@@ -574,75 +622,118 @@ dwv.App = function()
         }
     };
 
+    // Controller Methods -----------------------------------------------------------
+
     /**
-     * Update the views' current position.
-     * @method updatePostionValue
-     * @static
+     * Handle zoom reset.
+     * @method onZoomReset
+     * @param {Object} event The change event.
+     */
+    this.onZoomReset = function (/*event*/)
+    {
+        app.resetLayout();
+    };
+
+    /**
+     * Set the current position.
+     * @method setCurrentPostion
      * @param {Number} i The column index.
      * @param {Number} j The row index.
      */
-    this.updatePostionValue = function(i,j)
+    this.setCurrentPostion = function (i,j)
     {
-        this.getView().setCurrentPosition({"i": i, "j": j, "k": this.getView().getCurrentPosition().k});
+        viewController.setCurrentPosition(i,j);
     };
 
     /**
-     * Update the views' windowing data.
-     * @method updateWindowingData
-     * @static
-     * @param {Number} wc The window center.
-     * @param {Number} ww The window width.
+     * Handle colour map change.
+     * @method onChangeColourMap
+     * @param {Object} event The change event.
      */
-    this.updateWindowingData = function(wc,ww)
+    this.onChangeColourMap = function (/*event*/)
     {
-        this.getView().setWindowLevel(wc,ww);
+        viewController.setColourMapFromName(this.value);
     };
 
     /**
-     * Set the active window/level preset.
-     * @method updateWindowingData
-     * @param {String} name The name of the preset to set.
+     * Handle window/level preset change.
+     * @method onChangeWindowLevelPreset
+     * @param {Object} event The change event.
      */
-    this.updateWindowingDataFromName = function(name)
+    this.onChangeWindowLevelPreset = function (/*event*/)
     {
+        var name = this.value;
         // check if we have it
         if( !this.presets[name] ) {
             throw new Error("Unknown window level preset: '" + name + "'");
         }
         // enable it
-        this.updateWindowingData( 
+        viewController.setWindowLevel( 
             this.presets[name].center, 
             this.presets[name].width );
     };
 
     /**
-     * Update the views' colour map.
-     * @method updateColourMap
-     * @static
-     * @param {Object} colourMap The colour map.
+     * Handle tool change.
+     * @method onChangeTool
+     * @param {Object} event The change event.
      */
-    this.updateColourMap = function(colourMap)
+    this.onChangeTool = function (/*event*/)
     {
-        this.getView().setColorMap(colourMap);
+        toolBoxController.setSelectedTool(this.value);
     };
 
     /**
-     * Update the views' colour map.
-     * @function updateColourMap
-     * @param {String} name The name of the colour map to set.
+     * Handle shape change.
+     * @method onChangeShape
+     * @param {Object} event The change event.
      */
-    this.updateColourMapFromName = function(name)
+    this.onChangeShape = function (/*event*/)
     {
-        // check if we have it
-        if( !dwv.tool.colourMaps[name] ) {
-            throw new Error("Unknown colour map: '" + name + "'");
-        }
-        // enable it
-        this.updateColourMap( dwv.tool.colourMaps[name] );
+        toolBoxController.setSelectedShape(this.value);
     };
 
+    /**
+     * Handle filter change.
+     * @method onChangeFilter
+     * @param {Object} event The change event.
+     */
+    this.onChangeFilter = function (/*event*/)
+    {
+        toolBoxController.setSelectedFilter(this.value);
+    };
 
-    // Private Methods -------------------------------------------
+    /**
+     * Handle filter run.
+     * @method onRunFilter
+     * @param {Object} event The run event.
+     */
+    this.onRunFilter = function (/*event*/)
+    {
+        toolBoxController.runSelectedFilter();
+    };
+
+    /**
+     * Handle line colour change.
+     * @method onChangeLineColour
+     * @param {Object} event The change event.
+     */
+    this.onChangeLineColour = function (/*event*/)
+    {
+        toolBoxController.setLineColour(this.value);
+    };
+
+    /**
+     * Handle min/max slider change.
+     * @method onChangeMinMax
+     * @param {Object} range The new range of the data.
+     */
+    this.onChangeMinMax = function (range)
+    {
+        toolBoxController.setRange(range);
+    };
+
+    // Private Methods -----------------------------------------------------------
 
     /**
      * Generate the image data and draw it.
@@ -881,6 +972,7 @@ dwv.App = function()
         
         // get the view from the loaded data
         view = data.view;
+        viewController = new dwv.ViewController(view);
         // append the DICOM tags table
         dwv.gui.appendTagsTable(data.info);
         // store image
@@ -949,6 +1041,137 @@ dwv.App = function()
         //self.updatePresets(true);
         self.initWLDisplay();        
     }
-    
 
 };
+
+/**
+ * View controller.
+ * @class ViewController
+ * @namespace dwv
+ * @constructor
+ */
+dwv.ViewController = function ( view )
+{
+    /**
+     * Set the current position.
+     * @method setWindowLevel
+     * @param {Number} i The column index.
+     * @param {Number} j The row index.
+     */
+    this.setCurrentPosition = function (i, j)
+    {
+        view.setCurrentPosition( { 
+            "i": i, "j": j, "k": view.getCurrentPosition().k});
+    };
+    
+    /**
+     * Set the window/level.
+     * @method setWindowLevel
+     * @param {Number} wc The window center.
+     * @param {Number} ww The window width.
+     */
+    this.setWindowLevel = function (wc, ww)
+    {
+        view.setWindowLevel(wc,ww);
+    };
+
+    /**
+     * Set the colour map.
+     * @method setColourMap
+     * @param {Object} colourMap The colour map.
+     */
+    this.setColourMap = function (colourMap)
+    {
+        view.setColorMap(colourMap);
+    };
+
+    /**
+     * Set the colour map from a name.
+     * @function setColourMapFromName
+     * @param {String} name The name of the colour map to set.
+     */
+    this.setColourMapFromName = function (name)
+    {
+        // check if we have it
+        if( !dwv.tool.colourMaps[name] ) {
+            throw new Error("Unknown colour map: '" + name + "'");
+        }
+        // enable it
+        this.setColourMap( dwv.tool.colourMaps[name] );
+    };
+    
+}; // class dwv.ViewController
+
+/**
+ * Tool Box controller.
+ * @class ToolBoxController
+ * @namespace dwv
+ * @constructor
+ */
+dwv.ToolBoxController = function (toolbox)
+{
+    /**
+     * Set the selected tool.
+     * @method setSelectedTool
+     * @param {String} name The name of the tool.
+     */
+    this.setSelectedTool = function (name)
+    {
+        toolbox.setSelectedTool(name);
+    };
+    
+    /**
+     * Set the selected shape.
+     * @method setSelectedShape
+     * @param {String} name The name of the shape.
+     */
+    this.setSelectedShape = function (name)
+    {
+        toolbox.getSelectedTool().setShapeName(name);
+    };
+    
+    /**
+     * Set the selected filter.
+     * @method setSelectedFilter
+     * @param {String} name The name of the filter.
+     */
+    this.setSelectedFilter = function (name)
+    {
+        toolbox.getSelectedTool().setSelectedFilter(name);
+    };
+    
+    /**
+     * Run the selected filter.
+     * @method runSelectedFilter
+     */
+    this.runSelectedFilter = function ()
+    {
+        toolbox.getSelectedTool().getSelectedFilter().run();
+    };
+    
+    /**
+     * Set the tool line color.
+     * @method runFilter
+     * @param {String} name The name of the color.
+     */
+    this.setLineColour = function (name)
+    {
+        toolbox.getSelectedTool().setLineColour(name);
+    };
+    
+    /**
+     * Set the tool range.
+     * @method setRange
+     * @param {Object} range The new range of the data.
+     */
+    this.setRange = function (range)
+    {
+        // seems like jquery is checking if the method exists before it 
+        // is used...
+        if( toolbox && toolbox.getSelectedTool() &&
+                toolbox.getSelectedTool().getSelectedFilter() ) {
+            toolbox.getSelectedTool().getSelectedFilter().run(range);
+        }
+    };
+    
+}; // class dwv.ToolboxController
