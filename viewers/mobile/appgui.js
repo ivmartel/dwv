@@ -22,25 +22,11 @@ dwv.gui.appendTagsTable = function(dataInfo){
 };
 
 // Loaders
-dwv.gui.appendLoadboxHtml = function(){
-    dwv.gui.base.appendLoadboxHtml();
-};
-
+dwv.gui.Loadbox = dwv.gui.base.Loadbox;
 // File loader
-dwv.gui.appendFileLoadHtml = function(){
-    dwv.gui.base.appendFileLoadHtml();
-};
-dwv.gui.displayFileLoadHtml = function(bool){
-    dwv.gui.base.displayFileLoadHtml(bool);
-};
-
+dwv.gui.FileLoad = dwv.gui.base.FileLoad;
 // Url loader
-dwv.gui.appendUrlLoadHtml = function(){
-    dwv.gui.base.appendUrlLoadHtml();
-};
-dwv.gui.displayUrlLoadHtml = function(bool){
-    dwv.gui.base.displayUrlLoadHtml(bool);
-};
+dwv.gui.UrlLoad =  dwv.gui.base.UrlLoad;
 
 // Toolbox 
 dwv.gui.Toolbox = function (app)
@@ -62,15 +48,15 @@ dwv.gui.Toolbox = function (app)
     
         var undo = document.createElement("a");
         undo.setAttribute("class", buttonClass + " ui-icon-back");
-        undo.onclick = dwv.gui.onUndo;
+        undo.onclick = app.onUndo;
     
         var redo = document.createElement("a");
         redo.setAttribute("class", buttonClass + " ui-icon-forward");
-        redo.onclick = dwv.gui.onRedo;
+        redo.onclick = app.onRedo;
     
         var toggleInfo = document.createElement("a");
         toggleInfo.setAttribute("class", buttonClass + " ui-icon-info");
-        toggleInfo.onclick = dwv.gui.onToggleInfoLayer;
+        toggleInfo.onclick = app.onToggleInfoLayer;
     
         var tags = document.createElement("a");
         tags.href = "#tags_page";
@@ -115,14 +101,8 @@ dwv.gui.Sharpen = dwv.gui.base.Sharpen;
 dwv.gui.Sobel = dwv.gui.base.Sobel;
 
 // Undo/redo
-dwv.gui.appendUndoHtml = function(){
-    dwv.gui.base.appendUndoHtml();
-};
-
+dwv.gui.Undo = dwv.gui.base.Undo;
 // Help
-dwv.gui.appendHelpHtml = function(mobile){
-    dwv.gui.base.appendHelpHtml(mobile);
-};
-dwv.gui.appendVersionHtml = function(app){
-    dwv.gui.base.appendVersionHtml(app);
-};
+dwv.gui.appendHelpHtml = dwv.gui.base.appendHelpHtml;
+// Version
+dwv.gui.appendVersionHtml = dwv.gui.base.appendVersionHtml;

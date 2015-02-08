@@ -86,20 +86,20 @@ dwv.image.filter.Threshold = function()
  * @method update
  * @return {Object} The transformed image.
  */ 
-dwv.image.filter.Threshold.prototype.update = function()
+dwv.image.filter.Threshold.prototype.update = function ()
 {
+    var image = this.getOriginalImage();
+    var imageMin = image.getDataRange().min;
     var self = this;
-    var imageMin = app.getImage().getDataRange().min;
-    self.setOriginalImage( app.getImage() );
-    var threshFunction = function(value){
-        if(value<self.getMin()||value>self.getMax()) {
+    var threshFunction = function (value) {
+        if ( value < self.getMin() || value > self.getMax() ) {
             return imageMin;
         }
         else {
             return value;
         }
     };
-    return app.getImage().transform( threshFunction );
+    return image.transform( threshFunction );
 };
 
 /**
@@ -144,9 +144,9 @@ dwv.image.filter.Sharpen = function()
  */ 
 dwv.image.filter.Sharpen.prototype.update = function()
 {
-    this.setOriginalImage( app.getImage() );
+    var image = this.getOriginalImage();
     
-    return app.getImage().convolute2D(
+    return image.convolute2D(
         [  0, -1,  0,
           -1,  5, -1,
            0, -1,  0 ] );
@@ -194,18 +194,18 @@ dwv.image.filter.Sobel = function()
  */ 
 dwv.image.filter.Sobel.prototype.update = function()
 {
-    this.setOriginalImage( app.getImage() );
+    var image = this.getOriginalImage();
     
-    var gradX = app.getImage().convolute2D(
+    var gradX = image.convolute2D(
         [ 1,  0,  -1,
           2,  0,  -2,
           1,  0,  -1 ] );
 
-    var gradY = app.getImage().convolute2D(
+    var gradY = image.convolute2D(
         [  1,  2,  1,
            0,  0,  0,
           -1, -2, -1 ] );
     
-    return gradX.compose( gradY, function(x,y){return Math.sqrt(x*x+y*y);} );
+    return gradX.compose( gradY, function (x,y) { return Math.sqrt(x*x+y*y); } );
 };
 

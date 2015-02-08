@@ -17,7 +17,6 @@
 <script type="text/javascript" src="../../../src/gui/filter.js"></script>
 <script type="text/javascript" src="../../../src/gui/browser.js"></script>
 <script type="text/javascript" src="../../../src/gui/generic.js"></script>
-<script type="text/javascript" src="../../../src/gui/handlers.js"></script>
 <script type="text/javascript" src="../../../src/gui/help.js"></script>
 <script type="text/javascript" src="../../../src/gui/html.js"></script>
 <script type="text/javascript" src="../../../src/gui/layer.js"></script>
@@ -49,16 +48,16 @@ dwv.gui.getWindowSize = function(){
     return dwv.gui.base.getWindowSize();
 };
 //Progress
-dwv.gui.displayProgress = function(percent){};
+dwv.gui.displayProgress = function (percent){};
 //Tags table
-dwv.gui.appendTagsTable = function(dataInfo){};
-dwv.gui.displayWindowLevelHtml = function(/*bool*/){};
-dwv.gui.initWindowLevelHtml = function(){};
-dwv.gui.initToolboxHtml = function(){};
-dwv.gui.displayToolboxHtml = function(bool){};
+dwv.gui.appendTagsTable = function (dataInfo){};
+//Window/level
+dwv.gui.Toolbox = dwv.gui.base.Toolbox;
+dwv.gui.WindowLevel = dwv.gui.base.WindowLevel;
 
 //check browser support
 dwv.browser.check();
+
 // launch when page is loaded
 $(document).ready( function()
 {
@@ -66,7 +65,7 @@ $(document).ready( function()
     var config0 = {
         "containerDivId": "layerContainer0",
         "fitToWindow": false,
-        "tools": ["WindowLevel"]
+        "tools": ["Window/Level"]
     };
     var app0 = new dwv.App();
     app0.init(config0);
@@ -76,7 +75,7 @@ $(document).ready( function()
     var config1 = {
         "containerDivId": "layerContainer1",
         "fitToWindow": false,
-        "tools": ["WindowLevel"]
+        "tools": ["Window/Level"]
     };
     var app1 = new dwv.App();
     app1.init(config1);

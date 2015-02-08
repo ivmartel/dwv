@@ -7,13 +7,13 @@ dwv.tool = dwv.tool || {};
 
 /**
  * Tool box.
- * @class ToolBox
+ * @class Toolbox
  * @namespace dwv.tool
  * @constructor
  * @param {Array} toolList The list of tool objects.
  * @param {Object} gui The associated gui.
  */
-dwv.tool.ToolBox = function( toolList, app )
+dwv.tool.Toolbox = function( toolList, app )
 {
     /**
      * Toolbox GUI.
@@ -96,7 +96,7 @@ dwv.tool.ToolBox = function( toolList, app )
  * @method getToolList
  * @return {Array} The list of tool objects.
  */
-dwv.tool.ToolBox.prototype.getToolList = function ()
+dwv.tool.Toolbox.prototype.getToolList = function ()
 {
     return this.toolList;
 };
@@ -106,7 +106,7 @@ dwv.tool.ToolBox.prototype.getToolList = function ()
  * @method getSelectedTool
  * @return {Object} The selected tool.
  */
-dwv.tool.ToolBox.prototype.getSelectedTool = function ()
+dwv.tool.Toolbox.prototype.getSelectedTool = function ()
 {
     return this.selectedTool;
 };
@@ -116,7 +116,7 @@ dwv.tool.ToolBox.prototype.getSelectedTool = function ()
  * @method setSelectedTool
  * @return {String} The name of the tool to select.
  */
-dwv.tool.ToolBox.prototype.setSelectedTool = function (name)
+dwv.tool.Toolbox.prototype.setSelectedTool = function (name)
 {
     // check if we have it
     if( !this.hasTool(name) )
@@ -140,7 +140,7 @@ dwv.tool.ToolBox.prototype.setSelectedTool = function (name)
  * @param {String} name The name to check.
  * @return {String} The tool list element for the given name.
  */
-dwv.tool.ToolBox.prototype.hasTool = function (name)
+dwv.tool.Toolbox.prototype.hasTool = function (name)
 {
     return this.toolList[name];
 };
@@ -149,7 +149,7 @@ dwv.tool.ToolBox.prototype.hasTool = function (name)
  * Reset the tool box.
  * @method init
  */
-dwv.tool.ToolBox.prototype.reset = function ()
+dwv.tool.Toolbox.prototype.reset = function ()
 {
     // hide last selected
     if ( this.selectedTool ) {

@@ -251,7 +251,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
      * @private
      * @type Object
      */
-    var shapeEditor = new dwv.tool.ShapeEditor();
+    var shapeEditor = new dwv.tool.ShapeEditor(app);
 
     /**
      * Trash draw: a cross.

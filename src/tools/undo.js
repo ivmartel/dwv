@@ -11,8 +11,14 @@ dwv.tool = dwv.tool || {};
  * @namespace dwv.tool
  * @constructor
  */
-dwv.tool.UndoStack = function()
+dwv.tool.UndoStack = function ()
 { 
+    /**
+     * Undo GUI.
+     * @property gui
+     * @type Object
+     */
+    var gui = new dwv.gui.Undo();
     /**
      * Array of commands.
      * @property stack
@@ -43,7 +49,7 @@ dwv.tool.UndoStack = function()
         // increment index
         ++curCmdIndex;
         // add command to display history
-        dwv.gui.addCommandToUndoHtml(cmd.getName());
+        gui.addCommandToUndoHtml(cmd.getName());
     };
 
     /**
@@ -60,7 +66,7 @@ dwv.tool.UndoStack = function()
             // undo last command
             stack[curCmdIndex].undo();
             // disable last in display history
-            dwv.gui.enableInUndoHtml(false);
+            gui.enableInUndoHtml(false);
         }
     }; 
 
@@ -77,8 +83,26 @@ dwv.tool.UndoStack = function()
             // increment command index
             ++curCmdIndex;
             // enable next in display history
-            dwv.gui.enableInUndoHtml(true);
+            gui.enableInUndoHtml(true);
         }
+    };
+
+    /**
+     * Setup the tool GUI.
+     * @method setup
+     */
+    this.setup = function ()
+    {
+        gui.setup();
+    };
+
+    /**
+     * Initialise the tool GUI.
+     * @method initialise
+     */
+    this.initialise = function ()
+    {
+        gui.initialise();
     };
 
 }; // UndoStack class

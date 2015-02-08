@@ -387,6 +387,7 @@ dwv.tool.RunFilterCommand = function (filter, app) {
      */
     this.execute = function ()
     {
+        filter.setOriginalImage(app.getImage());
         app.setImage(filter.update());
         app.render();
     }; 
