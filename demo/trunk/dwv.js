@@ -32,11 +32,11 @@ dwv.App = function()
     var containerDivId = null;
     this.getContainerDivId = function () { return containerDivId; };
     
-    var presets = {};
-    this.getPresets = function () { return presets; };
+    this.presets = {};
+    this.getPresets = function () { return this.presets; };
     
-    var toolBoxController = null;
-    this.getToolboxController = function () { return toolBoxController; };
+    var toolboxController = null;
+    this.getToolboxController = function () { return toolboxController; };
 
     var viewController = null;
     this.getViewController = function () { return viewController; };
@@ -56,10 +56,11 @@ dwv.App = function()
     // flag to know if the info layer is listening on the image.
     var isInfoLayerListening = false;
     
-    // Tool box
-    var toolBox = null;
+    // Toolbox
+    var toolbox = null;
+    var loadbox = null;
     // UndoStack
-    var undoStack = new dwv.tool.UndoStack();
+    var undoStack = null;
     
     /** 
      * Get the version of the application.
@@ -110,11 +111,11 @@ dwv.App = function()
     this.getImageData = function() { return imageData; };
 
     /** 
-     * Get the tool box.
-     * @method getToolBox
+     * Get the toolbox.
+     * @method getToolbox
      * @return {Object} The associated toolbox.
      */
-    this.getToolBox = function() { return toolBox; };
+    this.getToolbox = function() { return toolbox; };
 
     /** 
      * Get the image layer.
@@ -144,16 +145,20 @@ dwv.App = function()
      */
     this.getUndoStack = function() { return undoStack; };
 
+    this.getLoaders = function () 
+    {
+        return {
+            'file': dwv.io.File,
+            'url': dwv.io.Url
+        };        
+    };
+    
     /**
      * Initialise the HTML for the application.
      * @method init
      */
     this.init = function ( config ) {
         containerDivId = config.containerDivId;
-        // align layers when the window is resized
-        if ( config.fitToWindow ) {
-            window.onresize = this.fitToWindow;
-        }
         // tools
         if ( config.tools.length !== 0 ) {
             // setup the tool list
@@ -222,10 +227,42 @@ dwv.App = function()
                     throw new Error("Unknown tool: '" + config.tools[t] + "'");
                 }
             }
-            toolBox = new dwv.tool.ToolBox(toolList, this);
-            toolBoxController = new dwv.ToolBoxController(toolBox);
-            toolBox.setup();
+            toolbox = new dwv.tool.Toolbox(toolList, this);
+            toolboxController = new dwv.ToolboxController(toolbox);
+            toolbox.setup();
         }
+        // gui
+        if ( config.gui ) {
+            // load
+            if ( config.gui.indexOf("load") !== -1 ) {
+                var fileLoadGui = new dwv.gui.FileLoad(this);
+                var urlLoadGui = new dwv.gui.UrlLoad(this);
+                loadbox = new dwv.gui.Loadbox(this, fileLoadGui, urlLoadGui);
+                loadbox.setup();
+                fileLoadGui.setup();
+                urlLoadGui.setup();
+                fileLoadGui.display(true);
+                urlLoadGui.display(false);
+            }
+            // undo
+            if ( config.gui.indexOf("undo") !== -1 ) {
+                undoStack = new dwv.tool.UndoStack();
+                undoStack.setup();
+            }
+            // version number
+            if ( config.gui.indexOf("version") !== -1 ) {
+                dwv.gui.appendVersionHtml(this.getVersion());
+            }
+            // help
+            if ( config.gui.indexOf("help") !== -1 ) {
+                var isMobile = true;
+                if ( config.isMobile ) {
+                    isMobile = config.isMobile;
+                }
+                dwv.gui.appendHelpHtml( toolbox.getToolList(), isMobile );
+            }
+        }
+        
         // listen to drag&drop
         var dropBoxDivId = containerDivId + "-dropBox";
         var box = document.getElementById(dropBoxDivId);
@@ -249,6 +286,10 @@ dwv.App = function()
         else{
             console.log("Not loading url from adress since skipLoadUrl is defined.");
         }
+        // align layers when the window is resized
+        if ( config.fitToWindow ) {
+            window.onresize = this.fitToWindow;
+        }
     };
     
     /**
@@ -258,8 +299,8 @@ dwv.App = function()
     this.reset = function()
     {
         // clear tools
-        if ( toolBox ) {
-            toolBox.reset();
+        if ( toolbox ) {
+            toolbox.reset();
         }
         // clear draw
         if ( drawStage ) {
@@ -268,9 +309,11 @@ dwv.App = function()
         // clear objects
         image = null;
         view = null;
-        // clear undo/redo
-        undoStack = new dwv.tool.UndoStack();
-        dwv.gui.cleanUndoHtml();
+        // reset undo/redo
+        if ( undoStack ) {
+            undoStack = new dwv.tool.UndoStack();
+            undoStack.initialise();
+        }
     };
     
     /**
@@ -310,16 +353,6 @@ dwv.App = function()
     };
     
     /**
-     * Handle change files event.
-     * @method onChangeFiles
-     * @param {Object} event The event fired when changing the file field.
-     */
-    this.onChangeFiles = function(event)
-    {
-        this.loadFiles(event.target.files);
-    };
-
-    /**
      * Load a list of files.
      * @method loadFiles
      * @param {Array} files The list of files to load.
@@ -355,16 +388,6 @@ dwv.App = function()
         fileIO.load(files);
     };
     
-    /**
-     * Handle change url event.
-     * @method onChangeURL
-     * @param {Object} event The event fired when changing the url field.
-     */
-    this.onChangeURL = function(event)
-    {
-        this.loadURL([event.target.value]);
-    };
-
     /**
      * Load a list of URLs.
      * @method loadURL
@@ -631,7 +654,37 @@ dwv.App = function()
      */
     this.onZoomReset = function (/*event*/)
     {
-        app.resetLayout();
+        self.resetLayout();
+    };
+
+    /**
+     * Handle loader change.
+     * @method onChangeLoader
+     * @param {Object} event The change event.
+     */
+    this.onChangeLoader = function (/*event*/)
+    {
+        loadbox.displayLoader( this.value );
+    };
+
+    /**
+     * Handle change url event.
+     * @method onChangeURL
+     * @param {Object} event The event fired when changing the url field.
+     */
+    this.onChangeURL = function (event)
+    {
+        self.loadURL([event.target.value]);
+    };
+
+    /**
+     * Handle change files event.
+     * @method onChangeFiles
+     * @param {Object} event The event fired when changing the file field.
+     */
+    this.onChangeFiles = function (event)
+    {
+        self.loadFiles(event.target.files);
     };
 
     /**
@@ -664,13 +717,13 @@ dwv.App = function()
     {
         var name = this.value;
         // check if we have it
-        if( !this.presets[name] ) {
+        if( !self.presets[name] ) {
             throw new Error("Unknown window level preset: '" + name + "'");
         }
         // enable it
         viewController.setWindowLevel( 
-            this.presets[name].center, 
-            this.presets[name].width );
+            self.presets[name].center, 
+            self.presets[name].width );
     };
 
     /**
@@ -680,7 +733,7 @@ dwv.App = function()
      */
     this.onChangeTool = function (/*event*/)
     {
-        toolBoxController.setSelectedTool(this.value);
+        toolboxController.setSelectedTool(this.value);
     };
 
     /**
@@ -690,7 +743,7 @@ dwv.App = function()
      */
     this.onChangeShape = function (/*event*/)
     {
-        toolBoxController.setSelectedShape(this.value);
+        toolboxController.setSelectedShape(this.value);
     };
 
     /**
@@ -700,7 +753,7 @@ dwv.App = function()
      */
     this.onChangeFilter = function (/*event*/)
     {
-        toolBoxController.setSelectedFilter(this.value);
+        toolboxController.setSelectedFilter(this.value);
     };
 
     /**
@@ -710,7 +763,7 @@ dwv.App = function()
      */
     this.onRunFilter = function (/*event*/)
     {
-        toolBoxController.runSelectedFilter();
+        toolboxController.runSelectedFilter();
     };
 
     /**
@@ -720,7 +773,7 @@ dwv.App = function()
      */
     this.onChangeLineColour = function (/*event*/)
     {
-        toolBoxController.setLineColour(this.value);
+        toolboxController.setLineColour(this.value);
     };
 
     /**
@@ -730,7 +783,52 @@ dwv.App = function()
      */
     this.onChangeMinMax = function (range)
     {
-        toolBoxController.setRange(range);
+        toolboxController.setRange(range);
+    };
+
+    /**
+     * Handle undo.
+     * @method onUndo
+     * @param {Object} event The associated event.
+     */
+    this.onUndo = function (/*event*/)
+    {
+        undoStack.undo();
+    };
+
+    /**
+     * Handle redo.
+     * @method onRedo
+     * @param {Object} event The associated event.
+     */
+    this.onRedo = function (/*event*/)
+    {
+        undoStack.redo();
+    };
+
+    /**
+     * Handle toggle of info layer.
+     * @method onToggleInfoLayer
+     * @param {Object} event The associated event.
+     */
+    this.onToggleInfoLayer = function (/*event*/)
+    {
+        self.toggleInfoLayerDisplay();
+    };
+    
+    /**
+     * Handle display reset.
+     * @method onDisplayReset
+     * @param {Object} event The change event.
+     */
+    this.onDisplayReset = function (/*event*/)
+    {
+        self.resetLayout();
+        self.initWLDisplay();
+        // update preset select
+        var select = document.getElementById("presetSelect");
+        select.selectedIndex = 0;
+        dwv.gui.refreshSelect("#presetSelect");
     };
 
     // Private Methods -----------------------------------------------------------
@@ -844,7 +942,7 @@ dwv.App = function()
         // Call the event handler of the tool.
         if( handled )
         {
-            var func = self.getToolBox().getSelectedTool()[event.type];
+            var func = self.getToolbox().getSelectedTool()[event.type];
             if( func )
             {
                 func(event);
@@ -994,14 +1092,14 @@ dwv.App = function()
         view.addEventListener("slicechange", self.onSliceChange);
         
         // initialise the toolbox
-        if ( toolBox ) {
+        if ( toolbox ) {
             // mouse and touch listeners
             self.addLayerListeners( imageLayer.getCanvas() );
             // keydown listener
             window.addEventListener("keydown", eventHandler, true);
             
-            toolBox.init();
-            toolBox.display(true);
+            toolbox.init();
+            toolbox.display(true);
         }
         
         // stop box listening to drag (after first drag)
@@ -1103,12 +1201,12 @@ dwv.ViewController = function ( view )
 }; // class dwv.ViewController
 
 /**
- * Tool Box controller.
- * @class ToolBoxController
+ * Toolbox controller.
+ * @class ToolboxController
  * @namespace dwv
  * @constructor
  */
-dwv.ToolBoxController = function (toolbox)
+dwv.ToolboxController = function (toolbox)
 {
     /**
      * Set the selected tool.
@@ -4133,118 +4231,19 @@ var dwv = dwv || {};
  * @static
  */
 dwv.gui = dwv.gui || {};
-
-/**
- * Handle loader change.
- * @method onChangeLoader
- * @static
- * @param {Object} event The change event.
- */
-dwv.gui.onChangeLoader = function(/*event*/)
-{
-    if( this.value === "file") {
-        dwv.gui.displayUrlLoadHtml(false);
-        dwv.gui.displayFileLoadHtml(true);
-    }
-    else if( this.value === "url") {
-        dwv.gui.displayFileLoadHtml(false);
-        dwv.gui.displayUrlLoadHtml(true);
-    }
-};
-
-/**
- * Handle files change.
- * @method onChangeFiles
- * @static
- * @param {Object} event The change event.
- */
-dwv.gui.onChangeFiles = function(event)
-{
-    app.onChangeFiles(event);
-};
-
-/**
- * Handle URL change.
- * @method onChangeURL
- * @static
- * @param {Object} event The change event.
- */
-dwv.gui.onChangeURL = function(event)
-{
-    app.onChangeURL(event);
-};
-
-/**
- * Handle display reset.
- * @method onDisplayReset
- * @static
- * @param {Object} event The change event.
- */
-dwv.gui.onDisplayReset = function(event)
-{
-    dwv.gui.onZoomReset(event);
-    app.initWLDisplay();
-    // update preset select
-    var select = document.getElementById("presetSelect");
-    select.selectedIndex = 0;
-    dwv.gui.refreshSelect("#presetSelect");
-};
-
-/**
- * Handle undo.
- * @method onUndo
- * @static
- * @param {Object} event The associated event.
- */
-dwv.gui.onUndo = function(/*event*/)
-{
-    app.getUndoStack().undo();
-};
-
-/**
- * Handle redo.
- * @method onRedo
- * @static
- * @param {Object} event The associated event.
- */
-dwv.gui.onRedo = function(/*event*/)
-{
-    app.getUndoStack().redo();
-};
-
-/**
- * Handle toggle of info layer.
- * @method onToggleInfoLayer
- * @static
- * @param {Object} event The associated event.
- */
-dwv.gui.onToggleInfoLayer = function(/*event*/)
-{
-    app.toggleInfoLayerDisplay();
-};
-;/** 
- * GUI module.
- * @module gui
- */
-var dwv = dwv || {};
-/**
- * Namespace for GUI functions.
- * @class gui
- * @namespace dwv
- * @static
- */
-dwv.gui = dwv.gui || {};
 dwv.gui.base = dwv.gui.base || {};
 
 /**
  * Append the version HTML.
  * @method appendVersionHtml
  */
-dwv.gui.base.appendVersionHtml = function (app)
+dwv.gui.base.appendVersionHtml = function (version)
 {
     var nodes = document.getElementsByClassName("dwv-version");
-    for( var i = 0; i < nodes.length; ++i ){
-        nodes[i].appendChild(document.createTextNode(app.getVersion()));
+    if ( nodes ) {
+        for( var i = 0; i < nodes.length; ++i ){
+            nodes[i].appendChild( document.createTextNode(version) );
+        }
     }
 };
 
@@ -4253,7 +4252,7 @@ dwv.gui.base.appendVersionHtml = function (app)
  * @method appendHelpHtml
  * @param {Boolean} mobile Flag for mobile or not environement.
  */
-dwv.gui.base.appendHelpHtml = function(app, mobile)
+dwv.gui.base.appendHelpHtml = function(toolList, mobile)
 {
     var actionType = "mouse";
     if( mobile ) {
@@ -4266,7 +4265,6 @@ dwv.gui.base.appendHelpHtml = function(app, mobile)
     var loc = window.location.pathname;
     var dir = loc.substring(0, loc.lastIndexOf('/'));
 
-    var toolList = app.getToolBox().getToolList();
     var tool = null;
     for ( var t=0; t < toolList.length; ++t )
     {
@@ -5447,112 +5445,153 @@ dwv.gui = dwv.gui || {};
 dwv.gui.base = dwv.gui.base || {};
 
 /**
- * Append the loadbox HTML to the page.
- * @method appendLoadboxHtml
- * @static
+ * Loadbox base gui.
+ * @class Loadbox
+ * @namespace dwv.gui.base
+ * @constructor
  */
-dwv.gui.base.appendLoadboxHtml = function()
+dwv.gui.base.Loadbox = function (app, fileLoadGui, urlLoadGui)
 {
-    // loader select
-    var loaderSelector = dwv.html.createHtmlSelect("loaderSelect",dwv.io.loaders);
-    loaderSelector.onchange = dwv.gui.onChangeLoader;
+    /**
+     * Setup the loadbox HTML.
+     * @method setup
+     */
+    this.setup = function ()
+    {
+        // loader select
+        var loaderSelector = dwv.html.createHtmlSelect("loaderSelect", app.getLoaders());
+        loaderSelector.onchange = app.onChangeLoader;
+        
+        // node
+        var node = document.getElementById("loaderlist");
+        // clear it
+        while(node.hasChildNodes()) {
+            node.removeChild(node.firstChild);
+        }
+        // append
+        node.appendChild(loaderSelector);
+        // trigger create event (mobile)
+        $("#loaderlist").trigger("create");
+    };
     
-    // node
-    var node = document.getElementById("loaderlist");
-    // clear it
-    while(node.hasChildNodes()) {
-        node.removeChild(node.firstChild);
-    }
-    // append
-    node.appendChild(loaderSelector);
-    // trigger create event (mobile)
-    $("#loaderlist").trigger("create");
-};
-
-/**
- * Append the file load HTML to the page.
- * @method appendFileLoadHtml
- * @static
- */
-dwv.gui.base.appendFileLoadHtml = function()
-{
-    // input
-    var fileLoadInput = document.createElement("input");
-    fileLoadInput.onchange = dwv.gui.onChangeFiles;
-    fileLoadInput.type = "file";
-    fileLoadInput.multiple = true;
-    fileLoadInput.id = "imagefiles";
-    fileLoadInput.setAttribute("data-clear-btn","true");
-    fileLoadInput.setAttribute("data-mini","true");
-
-    // associated div
-    var fileLoadDiv = document.createElement("div");
-    fileLoadDiv.id = "imagefilesdiv";
-    fileLoadDiv.style.display = "none";
-    fileLoadDiv.appendChild(fileLoadInput);
+    /**
+     * Display a loader.
+     * @param {String} name The name of the loader to show.
+     */
+    this.displayLoader = function (name)
+    {
+        if( name === "file") {
+            fileLoadGui.display(true);
+            urlLoadGui.display(false);
+        }
+        else if( name === "url") {
+            fileLoadGui.display(false);
+            urlLoadGui.display(true);
+        }        
+    };
     
-    // node
-    var node = document.getElementById("loaderlist");
-    // append
-    node.appendChild(fileLoadDiv);
-    // trigger create event (mobile)
-    $("#loaderlist").trigger("create");
-};
+}; // class dwv.gui.base.Loadbox
 
 /**
- * Display the file load HTML.
- * @method clearUrlLoadHtml
- * @static
- * @param {Boolean} bool True to display, false to hide.
+ * FileLoad base gui.
+ * @class FileLoad
+ * @namespace dwv.gui.base
+ * @constructor
  */
-dwv.gui.base.displayFileLoadHtml = function(bool)
+dwv.gui.base.FileLoad = function (app)
 {
-    // file div element
-    var filediv = document.getElementById("imagefilesdiv");
-    filediv.style.display = bool ? "" : "none";
-};
+    /**
+     * Setup the file load HTML to the page.
+     * @method setup
+     */
+    this.setup = function()
+    {
+        // input
+        var fileLoadInput = document.createElement("input");
+        fileLoadInput.onchange = app.onChangeFiles;
+        fileLoadInput.type = "file";
+        fileLoadInput.multiple = true;
+        fileLoadInput.id = "imagefiles";
+        fileLoadInput.setAttribute("data-clear-btn","true");
+        fileLoadInput.setAttribute("data-mini","true");
+    
+        // associated div
+        var fileLoadDiv = document.createElement("div");
+        fileLoadDiv.id = "imagefilesdiv";
+        fileLoadDiv.style.display = "none";
+        fileLoadDiv.appendChild(fileLoadInput);
+        
+        // node
+        var node = document.getElementById("loaderlist");
+        // append
+        node.appendChild(fileLoadDiv);
+        // trigger create event (mobile)
+        $("#loaderlist").trigger("create");
+    };
+    
+    /**
+     * Display the file load HTML.
+     * @method display
+     * @param {Boolean} bool True to display, false to hide.
+     */
+    this.display = function (bool)
+    {
+        // file div element
+        var filediv = document.getElementById("imagefilesdiv");
+        filediv.style.display = bool ? "" : "none";
+    };
+    
+}; // class dwv.gui.base.FileLoad
 
 /**
- * Append the url load HTML to the page.
- * @method appendUrlLoadHtml
- * @static
+ * FileLoad base gui.
+ * @class FileLoad
+ * @namespace dwv.gui.base
+ * @constructor
  */
-dwv.gui.base.appendUrlLoadHtml = function()
+dwv.gui.base.UrlLoad = function (app)
 {
-    // input
-    var urlLoadInput = document.createElement("input");
-    urlLoadInput.onchange = dwv.gui.onChangeURL;
-    urlLoadInput.type = "url";
-    urlLoadInput.id = "imageurl";
-    urlLoadInput.setAttribute("data-clear-btn","true");
-    urlLoadInput.setAttribute("data-mini","true");
+    /**
+     * Setup the url load HTML to the page.
+     * @method setup
+     */
+    this.setup = function ()
+    {
+        // input
+        var urlLoadInput = document.createElement("input");
+        urlLoadInput.onchange = app.onChangeURL;
+        urlLoadInput.type = "url";
+        urlLoadInput.id = "imageurl";
+        urlLoadInput.setAttribute("data-clear-btn","true");
+        urlLoadInput.setAttribute("data-mini","true");
+    
+        // associated div
+        var urlLoadDiv = document.createElement("div");
+        urlLoadDiv.id = "imageurldiv";
+        urlLoadDiv.style.display = "none";
+        urlLoadDiv.appendChild(urlLoadInput);
+    
+        // node
+        var node = document.getElementById("loaderlist");
+        // append
+        node.appendChild(urlLoadDiv);
+        // trigger create event (mobile)
+        $("#loaderlist").trigger("create");
+    };
+    
+    /**
+     * Display the url load HTML.
+     * @method display
+     * @param {Boolean} bool True to display, false to hide.
+     */
+    this.display = function (bool)
+    {
+        // url div element
+        var urldiv = document.getElementById("imageurldiv");
+        urldiv.style.display = bool ? "" : "none";
+    };
 
-    // associated div
-    var urlLoadDiv = document.createElement("div");
-    urlLoadDiv.id = "imageurldiv";
-    urlLoadDiv.style.display = "none";
-    urlLoadDiv.appendChild(urlLoadInput);
-
-    // node
-    var node = document.getElementById("loaderlist");
-    // append
-    node.appendChild(urlLoadDiv);
-    // trigger create event (mobile)
-    $("#loaderlist").trigger("create");
-};
-
-/**
- * Display the url load HTML.
- * @method clearUrlLoadHtml
- * @static
- * @param {Boolean} bool True to display, false to hide.
- */
-dwv.gui.base.displayUrlLoadHtml = function(bool)
-{
-    // url div element
-    var urldiv = document.getElementById("imageurldiv");
-    urldiv.style.display = bool ? "" : "none";
-};
+}; // class dwv.gui.base.UrlLoad
 ;/** 
  * HTML module.
  * @module html
@@ -6060,103 +6099,110 @@ dwv.gui = dwv.gui || {};
 dwv.gui.base = dwv.gui.base || {};
 
 /**
- * Append the undo HTML to the page.
- * @method appendUndoHtml
- * @static
+ * Undo base gui.
+ * @class Undo
+ * @namespace dwv.gui.base
+ * @constructor
  */
-dwv.gui.base.appendUndoHtml = function()
+dwv.gui.base.Undo = function ()
 {
-    var paragraph = document.createElement("p");  
-    paragraph.appendChild(document.createTextNode("History:"));
-    paragraph.appendChild(document.createElement("br"));
+    /**
+     * Setup the undo HTML.
+     * @method setup
+     * @static
+     */
+    this.setup = function ()
+    {
+        var paragraph = document.createElement("p");  
+        paragraph.appendChild(document.createTextNode("History:"));
+        paragraph.appendChild(document.createElement("br"));
+        
+        var select = document.createElement("select");
+        select.id = "history_list";
+        select.name = "history_list";
+        select.multiple = "multiple";
+        paragraph.appendChild(select);
     
-    var select = document.createElement("select");
-    select.id = "history_list";
-    select.name = "history_list";
-    select.multiple = "multiple";
-    paragraph.appendChild(select);
-
-    // node
-    var node = document.getElementById("history");
-    // clear it
-    while(node.hasChildNodes()) {
-        node.removeChild(node.firstChild);
-    }
-    // append
-    node.appendChild(paragraph);
-};
-
-/**
- * Clear the command list of the undo HTML.
- * @method cleanUndoHtml
- * @static
- */
-dwv.gui.cleanUndoHtml = function ()
-{
-    var select = document.getElementById("history_list");
-    if ( select && select.length !== 0 ) {
-        for( var i = select.length - 1; i >= 0; --i)
-        {
-            select.remove(i);
+        // node
+        var node = document.getElementById("history");
+        // clear it
+        while(node.hasChildNodes()) {
+            node.removeChild(node.firstChild);
         }
-    }
-};
-
-/**
- * Add a command to the undo HTML.
- * @method addCommandToUndoHtml
- * @static
- * @param {String} commandName The name of the command to add.
- */
-dwv.gui.addCommandToUndoHtml = function(commandName)
-{
-    var select = document.getElementById("history_list");
-    // remove undone commands
-    var count = select.length - (select.selectedIndex+1);
-    if( count > 0 )
+        // append
+        node.appendChild(paragraph);
+    };
+    
+    /**
+     * Clear the command list of the undo HTML.
+     * @method cleanUndoHtml
+     */
+    this.initialise = function ()
     {
-        for( var i = 0; i < count; ++i)
-        {
-            select.remove(select.length-1);
+        var select = document.getElementById("history_list");
+        if ( select && select.length !== 0 ) {
+            for( var i = select.length - 1; i >= 0; --i)
+            {
+                select.remove(i);
+            }
         }
-    }
-    // add new option
-    var option = document.createElement("option");
-    option.text = commandName;
-    option.value = commandName;
-    select.add(option);
-    // increment selected index
-    select.selectedIndex++;
-};
-
-/**
- * Enable the last command of the undo HTML.
- * @method enableInUndoHtml
- * @static
- * @param {Boolean} enable Flag to enable or disable the command.
- */
-dwv.gui.enableInUndoHtml = function(enable)
-{
-    var select = document.getElementById("history_list");
-    // enable or not (order is important)
-    var option;
-    if( enable ) 
+    };
+    
+    /**
+     * Add a command to the undo HTML.
+     * @method addCommandToUndoHtml
+     * @param {String} commandName The name of the command to add.
+     */
+    this.addCommandToUndoHtml = function (commandName)
     {
+        var select = document.getElementById("history_list");
+        // remove undone commands
+        var count = select.length - (select.selectedIndex+1);
+        if( count > 0 )
+        {
+            for( var i = 0; i < count; ++i)
+            {
+                select.remove(select.length-1);
+            }
+        }
+        // add new option
+        var option = document.createElement("option");
+        option.text = commandName;
+        option.value = commandName;
+        select.add(option);
         // increment selected index
         select.selectedIndex++;
-        // enable option
-        option = select.options[select.selectedIndex];
-        option.disabled = false;
-    }
-    else 
+    };
+    
+    /**
+     * Enable the last command of the undo HTML.
+     * @method enableInUndoHtml
+     * @param {Boolean} enable Flag to enable or disable the command.
+     */
+    this.enableInUndoHtml = function (enable)
     {
-        // disable option
-        option = select.options[select.selectedIndex];
-        option.disabled = true;
-        // decrement selected index
-        select.selectedIndex--;
-    }
-};
+        var select = document.getElementById("history_list");
+        // enable or not (order is important)
+        var option;
+        if( enable ) 
+        {
+            // increment selected index
+            select.selectedIndex++;
+            // enable option
+            option = select.options[select.selectedIndex];
+            option.disabled = false;
+        }
+        else 
+        {
+            // disable option
+            option = select.options[select.selectedIndex];
+            option.disabled = true;
+            // decrement selected index
+            select.selectedIndex--;
+        }
+    };
+
+}; // class dwv.gui.base.Undo
 ;/** 
  * Image module.
  * @module image
@@ -6245,20 +6291,20 @@ dwv.image.filter.Threshold = function()
  * @method update
  * @return {Object} The transformed image.
  */ 
-dwv.image.filter.Threshold.prototype.update = function()
+dwv.image.filter.Threshold.prototype.update = function ()
 {
+    var image = this.getOriginalImage();
+    var imageMin = image.getDataRange().min;
     var self = this;
-    var imageMin = app.getImage().getDataRange().min;
-    self.setOriginalImage( app.getImage() );
-    var threshFunction = function(value){
-        if(value<self.getMin()||value>self.getMax()) {
+    var threshFunction = function (value) {
+        if ( value < self.getMin() || value > self.getMax() ) {
             return imageMin;
         }
         else {
             return value;
         }
     };
-    return app.getImage().transform( threshFunction );
+    return image.transform( threshFunction );
 };
 
 /**
@@ -6303,9 +6349,9 @@ dwv.image.filter.Sharpen = function()
  */ 
 dwv.image.filter.Sharpen.prototype.update = function()
 {
-    this.setOriginalImage( app.getImage() );
+    var image = this.getOriginalImage();
     
-    return app.getImage().convolute2D(
+    return image.convolute2D(
         [  0, -1,  0,
           -1,  5, -1,
            0, -1,  0 ] );
@@ -6353,19 +6399,19 @@ dwv.image.filter.Sobel = function()
  */ 
 dwv.image.filter.Sobel.prototype.update = function()
 {
-    this.setOriginalImage( app.getImage() );
+    var image = this.getOriginalImage();
     
-    var gradX = app.getImage().convolute2D(
+    var gradX = image.convolute2D(
         [ 1,  0,  -1,
           2,  0,  -2,
           1,  0,  -1 ] );
 
-    var gradY = app.getImage().convolute2D(
+    var gradY = image.convolute2D(
         [  1,  2,  1,
            0,  0,  0,
           -1, -2, -1 ] );
     
-    return gradX.compose( gradY, function(x,y){return Math.sqrt(x*x+y*y);} );
+    return gradX.compose( gradY, function (x,y) { return Math.sqrt(x*x+y*y); } );
 };
 
 ;/** 
@@ -10020,7 +10066,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
      * @private
      * @type Object
      */
-    var shapeEditor = new dwv.tool.ShapeEditor();
+    var shapeEditor = new dwv.tool.ShapeEditor(app);
 
     /**
      * Trash draw: a cross.
@@ -10527,7 +10573,7 @@ var Kinetic = Kinetic || {};
  * @namespace dwv.tool
  * @constructor
  */
-dwv.tool.ShapeEditor = function ()
+dwv.tool.ShapeEditor = function (app)
 {
     /**
      * Edited shape.
@@ -11447,6 +11493,7 @@ dwv.tool.RunFilterCommand = function (filter, app) {
      */
     this.execute = function ()
     {
+        filter.setOriginalImage(app.getImage());
         app.setImage(filter.update());
         app.render();
     }; 
@@ -12810,13 +12857,13 @@ dwv.tool = dwv.tool || {};
 
 /**
  * Tool box.
- * @class ToolBox
+ * @class Toolbox
  * @namespace dwv.tool
  * @constructor
  * @param {Array} toolList The list of tool objects.
  * @param {Object} gui The associated gui.
  */
-dwv.tool.ToolBox = function( toolList, app )
+dwv.tool.Toolbox = function( toolList, app )
 {
     /**
      * Toolbox GUI.
@@ -12899,7 +12946,7 @@ dwv.tool.ToolBox = function( toolList, app )
  * @method getToolList
  * @return {Array} The list of tool objects.
  */
-dwv.tool.ToolBox.prototype.getToolList = function ()
+dwv.tool.Toolbox.prototype.getToolList = function ()
 {
     return this.toolList;
 };
@@ -12909,7 +12956,7 @@ dwv.tool.ToolBox.prototype.getToolList = function ()
  * @method getSelectedTool
  * @return {Object} The selected tool.
  */
-dwv.tool.ToolBox.prototype.getSelectedTool = function ()
+dwv.tool.Toolbox.prototype.getSelectedTool = function ()
 {
     return this.selectedTool;
 };
@@ -12919,7 +12966,7 @@ dwv.tool.ToolBox.prototype.getSelectedTool = function ()
  * @method setSelectedTool
  * @return {String} The name of the tool to select.
  */
-dwv.tool.ToolBox.prototype.setSelectedTool = function (name)
+dwv.tool.Toolbox.prototype.setSelectedTool = function (name)
 {
     // check if we have it
     if( !this.hasTool(name) )
@@ -12943,7 +12990,7 @@ dwv.tool.ToolBox.prototype.setSelectedTool = function (name)
  * @param {String} name The name to check.
  * @return {String} The tool list element for the given name.
  */
-dwv.tool.ToolBox.prototype.hasTool = function (name)
+dwv.tool.Toolbox.prototype.hasTool = function (name)
 {
     return this.toolList[name];
 };
@@ -12952,7 +12999,7 @@ dwv.tool.ToolBox.prototype.hasTool = function (name)
  * Reset the tool box.
  * @method init
  */
-dwv.tool.ToolBox.prototype.reset = function ()
+dwv.tool.Toolbox.prototype.reset = function ()
 {
     // hide last selected
     if ( this.selectedTool ) {
@@ -12960,7 +13007,8 @@ dwv.tool.ToolBox.prototype.reset = function ()
     }
     this.selectedTool = 0;
     this.defaultToolName = 0;
-};;/** 
+};
+;/** 
  * Tool module.
  * @module tool
  */
@@ -12973,8 +13021,14 @@ dwv.tool = dwv.tool || {};
  * @namespace dwv.tool
  * @constructor
  */
-dwv.tool.UndoStack = function()
+dwv.tool.UndoStack = function ()
 { 
+    /**
+     * Undo GUI.
+     * @property gui
+     * @type Object
+     */
+    var gui = new dwv.gui.Undo();
     /**
      * Array of commands.
      * @property stack
@@ -13005,7 +13059,7 @@ dwv.tool.UndoStack = function()
         // increment index
         ++curCmdIndex;
         // add command to display history
-        dwv.gui.addCommandToUndoHtml(cmd.getName());
+        gui.addCommandToUndoHtml(cmd.getName());
     };
 
     /**
@@ -13022,7 +13076,7 @@ dwv.tool.UndoStack = function()
             // undo last command
             stack[curCmdIndex].undo();
             // disable last in display history
-            dwv.gui.enableInUndoHtml(false);
+            gui.enableInUndoHtml(false);
         }
     }; 
 
@@ -13039,8 +13093,26 @@ dwv.tool.UndoStack = function()
             // increment command index
             ++curCmdIndex;
             // enable next in display history
-            dwv.gui.enableInUndoHtml(true);
+            gui.enableInUndoHtml(true);
         }
+    };
+
+    /**
+     * Setup the tool GUI.
+     * @method setup
+     */
+    this.setup = function ()
+    {
+        gui.setup();
+    };
+
+    /**
+     * Initialise the tool GUI.
+     * @method initialise
+     */
+    this.initialise = function ()
+    {
+        gui.initialise();
     };
 
 }; // UndoStack class

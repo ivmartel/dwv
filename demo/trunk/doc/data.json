@@ -69,15 +69,6 @@
                 "dwv.gui.base": 1
             }
         },
-        "src/gui/handlers.js": {
-            "name": "src/gui/handlers.js",
-            "modules": {},
-            "classes": {},
-            "fors": {},
-            "namespaces": {
-                "dwv": 1
-            }
-        },
         "src/gui/help.js": {
             "name": "src/gui/help.js",
             "modules": {},
@@ -112,10 +103,14 @@
         "src/gui/loader.js": {
             "name": "src/gui/loader.js",
             "modules": {},
-            "classes": {},
+            "classes": {
+                "dwv.gui.base.Loadbox": 1,
+                "dwv.gui.base.FileLoad": 1
+            },
             "fors": {},
             "namespaces": {
-                "dwv": 1
+                "dwv": 1,
+                "dwv.gui.base": 1
             }
         },
         "src/gui/style.js": {
@@ -154,11 +149,13 @@
             "name": "src/gui/undo.js",
             "modules": {},
             "classes": {
-                "dwv.gui": 1
+                "dwv.gui": 1,
+                "dwv.gui.base.Undo": 1
             },
             "fors": {},
             "namespaces": {
-                "dwv": 1
+                "dwv": 1,
+                "dwv.gui.base": 1
             }
         },
         "src/image/filter.js": {
@@ -443,7 +440,7 @@
             "name": "src/tools/toolbox.js",
             "modules": {},
             "classes": {
-                "dwv.tool.ToolBox": 1
+                "dwv.tool.Toolbox": 1
             },
             "fors": {},
             "namespaces": {
@@ -505,7 +502,7 @@
             "classes": {
                 "dwv.App": 1,
                 "dwv.ViewController": 1,
-                "dwv.ToolBoxController": 1
+                "dwv.ToolboxController": 1
             },
             "fors": {},
             "namespaces": {
@@ -555,12 +552,15 @@
                 "dwv.gui.base.Sharpen": 1,
                 "dwv.gui.base.Sobel": 1,
                 "dwv.gui.base.Slider": 1,
+                "dwv.gui.base.Loadbox": 1,
+                "dwv.gui.base.FileLoad": 1,
                 "dwv.gui.base.Toolbox": 1,
                 "dwv.gui.base.WindowLevel": 1,
                 "dwv.gui.base.Draw": 1,
                 "dwv.gui.base.Livewire": 1,
                 "dwv.gui.base.ZoomAndPan": 1,
-                "dwv.gui.base.Scroll": 1
+                "dwv.gui.base.Scroll": 1,
+                "dwv.gui.base.Undo": 1
             },
             "fors": {},
             "namespaces": {
@@ -568,8 +568,8 @@
                 "dwv.gui.base": 1
             },
             "tag": "module",
-            "file": "src/gui/tools.js",
-            "line": 360,
+            "file": "src/gui/undo.js",
+            "line": 15,
             "description": "GUI module."
         },
         "html": {
@@ -684,7 +684,7 @@
                 "dwv.tool.RoiFactory": 1,
                 "dwv.tool": 1,
                 "dwv.tool.Scroll": 1,
-                "dwv.tool.ToolBox": 1,
+                "dwv.tool.Toolbox": 1,
                 "dwv.tool.UndoStack": 1,
                 "dwv.tool.WindowLevel": 1,
                 "dwv.tool.ZoomAndPan": 1
@@ -722,7 +722,7 @@
                 "dwv.utils": 1,
                 "dwv.App": 1,
                 "dwv.ViewController": 1,
-                "dwv.ToolBoxController": 1
+                "dwv.ToolboxController": 1
             },
             "fors": {},
             "namespaces": {
@@ -730,7 +730,7 @@
             },
             "tag": "module",
             "file": "src/application.js",
-            "line": 1105,
+            "line": 1203,
             "description": "Utility module."
         }
     },
@@ -919,6 +919,36 @@
                 }
             ]
         },
+        "dwv.gui.base.Loadbox": {
+            "name": "dwv.gui.base.Loadbox",
+            "shortname": "dwv.gui.base.Loadbox",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "gui",
+            "namespace": "dwv.gui.base",
+            "file": "src/gui/loader.js",
+            "line": 15,
+            "description": "Loadbox base gui.",
+            "is_constructor": 1
+        },
+        "dwv.gui.base.FileLoad": {
+            "name": "dwv.gui.base.FileLoad",
+            "shortname": "dwv.gui.base.FileLoad",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "gui",
+            "namespace": "dwv.gui.base",
+            "file": "src/gui/loader.js",
+            "line": 114,
+            "description": "FileLoad base gui.",
+            "is_constructor": 1
+        },
         "dwv.html.Style": {
             "name": "dwv.html.Style",
             "shortname": "dwv.html.Style",
@@ -1022,6 +1052,21 @@
             "file": "src/gui/tools.js",
             "line": 360,
             "description": "Scroll tool base gui.",
+            "is_constructor": 1
+        },
+        "dwv.gui.base.Undo": {
+            "name": "dwv.gui.base.Undo",
+            "shortname": "dwv.gui.base.Undo",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "gui",
+            "namespace": "dwv.gui.base",
+            "file": "src/gui/undo.js",
+            "line": 15,
+            "description": "Undo base gui.",
             "is_constructor": 1
         },
         "dwv.image.filter.Threshold": {
@@ -1947,9 +1992,9 @@
                 }
             ]
         },
-        "dwv.tool.ToolBox": {
-            "name": "dwv.tool.ToolBox",
-            "shortname": "dwv.tool.ToolBox",
+        "dwv.tool.Toolbox": {
+            "name": "dwv.tool.Toolbox",
+            "shortname": "dwv.tool.Toolbox",
             "classitems": [],
             "plugins": [],
             "extensions": [],
@@ -2074,13 +2119,13 @@
             "module": "utils",
             "namespace": "dwv",
             "file": "src/application.js",
-            "line": 1047,
+            "line": 1145,
             "description": "View controller.",
             "is_constructor": 1
         },
-        "dwv.ToolBoxController": {
-            "name": "dwv.ToolBoxController",
-            "shortname": "dwv.ToolBoxController",
+        "dwv.ToolboxController": {
+            "name": "dwv.ToolboxController",
+            "shortname": "dwv.ToolboxController",
             "classitems": [],
             "plugins": [],
             "extensions": [],
@@ -2089,8 +2134,8 @@
             "module": "utils",
             "namespace": "dwv",
             "file": "src/application.js",
-            "line": 1105,
-            "description": "Tool Box controller.",
+            "line": 1203,
+            "description": "Toolbox controller.",
             "is_constructor": 1
         }
     },
@@ -2868,132 +2913,6 @@
             "namespace": "dwv.gui.base"
         },
         {
-            "file": "src/gui/handlers.js",
-            "line": 14,
-            "description": "Handle loader change.",
-            "itemtype": "method",
-            "name": "onChangeLoader",
-            "static": 1,
-            "params": [
-                {
-                    "name": "event",
-                    "description": "The change event.",
-                    "type": "Object"
-                }
-            ],
-            "class": "dwv.gui",
-            "module": "gui",
-            "namespace": "dwv"
-        },
-        {
-            "file": "src/gui/handlers.js",
-            "line": 32,
-            "description": "Handle files change.",
-            "itemtype": "method",
-            "name": "onChangeFiles",
-            "static": 1,
-            "params": [
-                {
-                    "name": "event",
-                    "description": "The change event.",
-                    "type": "Object"
-                }
-            ],
-            "class": "dwv.gui",
-            "module": "gui",
-            "namespace": "dwv"
-        },
-        {
-            "file": "src/gui/handlers.js",
-            "line": 43,
-            "description": "Handle URL change.",
-            "itemtype": "method",
-            "name": "onChangeURL",
-            "static": 1,
-            "params": [
-                {
-                    "name": "event",
-                    "description": "The change event.",
-                    "type": "Object"
-                }
-            ],
-            "class": "dwv.gui",
-            "module": "gui",
-            "namespace": "dwv"
-        },
-        {
-            "file": "src/gui/handlers.js",
-            "line": 54,
-            "description": "Handle display reset.",
-            "itemtype": "method",
-            "name": "onDisplayReset",
-            "static": 1,
-            "params": [
-                {
-                    "name": "event",
-                    "description": "The change event.",
-                    "type": "Object"
-                }
-            ],
-            "class": "dwv.gui",
-            "module": "gui",
-            "namespace": "dwv"
-        },
-        {
-            "file": "src/gui/handlers.js",
-            "line": 70,
-            "description": "Handle undo.",
-            "itemtype": "method",
-            "name": "onUndo",
-            "static": 1,
-            "params": [
-                {
-                    "name": "event",
-                    "description": "The associated event.",
-                    "type": "Object"
-                }
-            ],
-            "class": "dwv.gui",
-            "module": "gui",
-            "namespace": "dwv"
-        },
-        {
-            "file": "src/gui/handlers.js",
-            "line": 81,
-            "description": "Handle redo.",
-            "itemtype": "method",
-            "name": "onRedo",
-            "static": 1,
-            "params": [
-                {
-                    "name": "event",
-                    "description": "The associated event.",
-                    "type": "Object"
-                }
-            ],
-            "class": "dwv.gui",
-            "module": "gui",
-            "namespace": "dwv"
-        },
-        {
-            "file": "src/gui/handlers.js",
-            "line": 92,
-            "description": "Handle toggle of info layer.",
-            "itemtype": "method",
-            "name": "onToggleInfoLayer",
-            "static": 1,
-            "params": [
-                {
-                    "name": "event",
-                    "description": "The associated event.",
-                    "type": "Object"
-                }
-            ],
-            "class": "dwv.gui",
-            "module": "gui",
-            "namespace": "dwv"
-        },
-        {
             "file": "src/gui/help.js",
             "line": 15,
             "description": "Append the version HTML.",
@@ -3005,7 +2924,7 @@
         },
         {
             "file": "src/gui/help.js",
-            "line": 27,
+            "line": 29,
             "description": "Build the help HTML.",
             "itemtype": "method",
             "name": "appendHelpHtml",
@@ -3947,33 +3866,45 @@
         },
         {
             "file": "src/gui/loader.js",
-            "line": 15,
-            "description": "Append the loadbox HTML to the page.",
+            "line": 23,
+            "description": "Setup the loadbox HTML.",
             "itemtype": "method",
-            "name": "appendLoadboxHtml",
-            "static": 1,
-            "class": "dwv.gui",
+            "name": "setup",
+            "class": "dwv.gui.base.Loadbox",
             "module": "gui",
-            "namespace": "dwv"
+            "namespace": "dwv.gui.base"
         },
         {
             "file": "src/gui/loader.js",
-            "line": 38,
-            "description": "Append the file load HTML to the page.",
-            "itemtype": "method",
-            "name": "appendFileLoadHtml",
-            "static": 1,
-            "class": "dwv.gui",
+            "line": 45,
+            "description": "Display a loader.",
+            "params": [
+                {
+                    "name": "name",
+                    "description": "The name of the loader to show.",
+                    "type": "String"
+                }
+            ],
+            "class": "dwv.gui.base.Loadbox",
             "module": "gui",
-            "namespace": "dwv"
+            "namespace": "dwv.gui.base"
         },
         {
             "file": "src/gui/loader.js",
-            "line": 68,
+            "line": 71,
+            "description": "Setup the file load HTML to the page.",
+            "itemtype": "method",
+            "name": "setup",
+            "class": "dwv.gui.base.FileLoad",
+            "module": "gui",
+            "namespace": "dwv.gui.base"
+        },
+        {
+            "file": "src/gui/loader.js",
+            "line": 100,
             "description": "Display the file load HTML.",
             "itemtype": "method",
-            "name": "clearUrlLoadHtml",
-            "static": 1,
+            "name": "display",
             "params": [
                 {
                     "name": "bool",
@@ -3981,28 +3912,26 @@
                     "type": "Boolean"
                 }
             ],
-            "class": "dwv.gui",
+            "class": "dwv.gui.base.FileLoad",
             "module": "gui",
-            "namespace": "dwv"
+            "namespace": "dwv.gui.base"
         },
         {
             "file": "src/gui/loader.js",
-            "line": 81,
-            "description": "Append the url load HTML to the page.",
+            "line": 122,
+            "description": "Setup the url load HTML to the page.",
             "itemtype": "method",
-            "name": "appendUrlLoadHtml",
-            "static": 1,
-            "class": "dwv.gui",
+            "name": "setup",
+            "class": "dwv.gui.base.FileLoad",
             "module": "gui",
-            "namespace": "dwv"
+            "namespace": "dwv.gui.base"
         },
         {
             "file": "src/gui/loader.js",
-            "line": 110,
+            "line": 150,
             "description": "Display the url load HTML.",
             "itemtype": "method",
-            "name": "clearUrlLoadHtml",
-            "static": 1,
+            "name": "display",
             "params": [
                 {
                     "name": "bool",
@@ -4010,9 +3939,9 @@
                     "type": "Boolean"
                 }
             ],
-            "class": "dwv.gui",
+            "class": "dwv.gui.base.FileLoad",
             "module": "gui",
-            "namespace": "dwv"
+            "namespace": "dwv.gui.base"
         },
         {
             "file": "src/gui/style.js",
@@ -4370,33 +4299,31 @@
         },
         {
             "file": "src/gui/undo.js",
-            "line": 15,
-            "description": "Append the undo HTML to the page.",
+            "line": 23,
+            "description": "Setup the undo HTML.",
             "itemtype": "method",
-            "name": "appendUndoHtml",
+            "name": "setup",
             "static": 1,
-            "class": "dwv.gui",
+            "class": "dwv.gui.base.Undo",
             "module": "gui",
-            "namespace": "dwv"
+            "namespace": "dwv.gui.base"
         },
         {
             "file": "src/gui/undo.js",
-            "line": 42,
+            "line": 50,
             "description": "Clear the command list of the undo HTML.",
             "itemtype": "method",
             "name": "cleanUndoHtml",
-            "static": 1,
-            "class": "dwv.gui",
+            "class": "dwv.gui.base.Undo",
             "module": "gui",
-            "namespace": "dwv"
+            "namespace": "dwv.gui.base"
         },
         {
             "file": "src/gui/undo.js",
-            "line": 58,
+            "line": 65,
             "description": "Add a command to the undo HTML.",
             "itemtype": "method",
             "name": "addCommandToUndoHtml",
-            "static": 1,
             "params": [
                 {
                     "name": "commandName",
@@ -4404,17 +4331,16 @@
                     "type": "String"
                 }
             ],
-            "class": "dwv.gui",
+            "class": "dwv.gui.base.Undo",
             "module": "gui",
-            "namespace": "dwv"
+            "namespace": "dwv.gui.base"
         },
         {
             "file": "src/gui/undo.js",
-            "line": 85,
+            "line": 91,
             "description": "Enable the last command of the undo HTML.",
             "itemtype": "method",
             "name": "enableInUndoHtml",
-            "static": 1,
             "params": [
                 {
                     "name": "enable",
@@ -4422,9 +4348,9 @@
                     "type": "Boolean"
                 }
             ],
-            "class": "dwv.gui",
+            "class": "dwv.gui.base.Undo",
             "module": "gui",
-            "namespace": "dwv"
+            "namespace": "dwv.gui.base"
         },
         {
             "file": "src/image/filter.js",
@@ -8647,7 +8573,7 @@
         },
         {
             "file": "src/tools/filter.js",
-            "line": 393,
+            "line": 394,
             "description": "Undo the command.",
             "itemtype": "method",
             "name": "undo",
@@ -9699,7 +9625,7 @@
             "itemtype": "property",
             "name": "gui",
             "type": "Object",
-            "class": "dwv.tool.ToolBox",
+            "class": "dwv.tool.Toolbox",
             "module": "tool",
             "namespace": "dwv.tool"
         },
@@ -9710,7 +9636,7 @@
             "itemtype": "property",
             "name": "toolList",
             "type": "Object",
-            "class": "dwv.tool.ToolBox",
+            "class": "dwv.tool.Toolbox",
             "module": "tool",
             "namespace": "dwv.tool"
         },
@@ -9721,7 +9647,7 @@
             "itemtype": "property",
             "name": "selectedTool",
             "type": "Object",
-            "class": "dwv.tool.ToolBox",
+            "class": "dwv.tool.Toolbox",
             "module": "tool",
             "namespace": "dwv.tool"
         },
@@ -9732,7 +9658,7 @@
             "itemtype": "property",
             "name": "defaultToolName",
             "type": "String",
-            "class": "dwv.tool.ToolBox",
+            "class": "dwv.tool.Toolbox",
             "module": "tool",
             "namespace": "dwv.tool"
         },
@@ -9742,7 +9668,7 @@
             "description": "Setup the toolbox GUI.",
             "itemtype": "method",
             "name": "setup",
-            "class": "dwv.tool.ToolBox",
+            "class": "dwv.tool.Toolbox",
             "module": "tool",
             "namespace": "dwv.tool"
         },
@@ -9759,7 +9685,7 @@
                     "type": "Boolean"
                 }
             ],
-            "class": "dwv.tool.ToolBox",
+            "class": "dwv.tool.Toolbox",
             "module": "tool",
             "namespace": "dwv.tool"
         },
@@ -9769,7 +9695,7 @@
             "description": "Initialise the tool box.",
             "itemtype": "method",
             "name": "init",
-            "class": "dwv.tool.ToolBox",
+            "class": "dwv.tool.Toolbox",
             "module": "tool",
             "namespace": "dwv.tool"
         },
@@ -9783,7 +9709,7 @@
                 "description": "The list of tool objects.",
                 "type": "Array"
             },
-            "class": "dwv.tool.ToolBox",
+            "class": "dwv.tool.Toolbox",
             "module": "tool",
             "namespace": "dwv.tool"
         },
@@ -9797,7 +9723,7 @@
                 "description": "The selected tool.",
                 "type": "Object"
             },
-            "class": "dwv.tool.ToolBox",
+            "class": "dwv.tool.Toolbox",
             "module": "tool",
             "namespace": "dwv.tool"
         },
@@ -9811,7 +9737,7 @@
                 "description": "The name of the tool to select.",
                 "type": "String"
             },
-            "class": "dwv.tool.ToolBox",
+            "class": "dwv.tool.Toolbox",
             "module": "tool",
             "namespace": "dwv.tool"
         },
@@ -9832,7 +9758,7 @@
                 "description": "The tool list element for the given name.",
                 "type": "String"
             },
-            "class": "dwv.tool.ToolBox",
+            "class": "dwv.tool.Toolbox",
             "module": "tool",
             "namespace": "dwv.tool"
         },
@@ -9842,13 +9768,24 @@
             "description": "Reset the tool box.",
             "itemtype": "method",
             "name": "init",
-            "class": "dwv.tool.ToolBox",
+            "class": "dwv.tool.Toolbox",
             "module": "tool",
             "namespace": "dwv.tool"
         },
         {
             "file": "src/tools/undo.js",
             "line": 16,
+            "description": "Undo GUI.",
+            "itemtype": "property",
+            "name": "gui",
+            "type": "Object",
+            "class": "dwv.tool.UndoStack",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/undo.js",
+            "line": 22,
             "description": "Array of commands.",
             "itemtype": "property",
             "name": "stack",
@@ -9861,7 +9798,7 @@
         },
         {
             "file": "src/tools/undo.js",
-            "line": 23,
+            "line": 29,
             "description": "Current command index.",
             "itemtype": "property",
             "name": "curCmdIndex",
@@ -9874,7 +9811,7 @@
         },
         {
             "file": "src/tools/undo.js",
-            "line": 31,
+            "line": 37,
             "description": "Add a command to the stack.",
             "itemtype": "method",
             "name": "add",
@@ -9891,7 +9828,7 @@
         },
         {
             "file": "src/tools/undo.js",
-            "line": 49,
+            "line": 55,
             "description": "Undo the last command.",
             "itemtype": "method",
             "name": "undo",
@@ -9901,10 +9838,30 @@
         },
         {
             "file": "src/tools/undo.js",
-            "line": 67,
+            "line": 73,
             "description": "Redo the last command.",
             "itemtype": "method",
             "name": "redo",
+            "class": "dwv.tool.UndoStack",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/undo.js",
+            "line": 90,
+            "description": "Setup the tool GUI.",
+            "itemtype": "method",
+            "name": "setup",
+            "class": "dwv.tool.UndoStack",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/undo.js",
+            "line": 99,
+            "description": "Initialise the tool GUI.",
+            "itemtype": "method",
+            "name": "initialise",
             "class": "dwv.tool.UndoStack",
             "module": "tool",
             "namespace": "dwv.tool"
@@ -10577,7 +10534,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 64,
+            "line": 65,
             "description": "Get the version of the application.",
             "itemtype": "method",
             "name": "getVersion",
@@ -10591,7 +10548,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 71,
+            "line": 72,
             "description": "Get the image.",
             "itemtype": "method",
             "name": "getImage",
@@ -10605,7 +10562,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 77,
+            "line": 78,
             "description": "Get the view.",
             "itemtype": "method",
             "name": "getView",
@@ -10619,7 +10576,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 84,
+            "line": 85,
             "description": "Set the view.",
             "itemtype": "method",
             "name": "setImage",
@@ -10636,7 +10593,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 95,
+            "line": 96,
             "description": "Restore the original image.",
             "itemtype": "method",
             "name": "restoreOriginalImage",
@@ -10646,7 +10603,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 105,
+            "line": 106,
             "description": "Get the image data array.",
             "itemtype": "method",
             "name": "getImageData",
@@ -10660,10 +10617,10 @@
         },
         {
             "file": "src/application.js",
-            "line": 112,
-            "description": "Get the tool box.",
+            "line": 113,
+            "description": "Get the toolbox.",
             "itemtype": "method",
-            "name": "getToolBox",
+            "name": "getToolbox",
             "return": {
                 "description": "The associated toolbox.",
                 "type": "Object"
@@ -10674,7 +10631,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 119,
+            "line": 120,
             "description": "Get the image layer.",
             "itemtype": "method",
             "name": "getImageLayer",
@@ -10688,7 +10645,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 125,
+            "line": 126,
             "description": "Get the draw layer.",
             "itemtype": "method",
             "name": "getDrawLayer",
@@ -10702,7 +10659,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 133,
+            "line": 134,
             "description": "Get the draw stage.",
             "itemtype": "method",
             "name": "getDrawStage",
@@ -10716,7 +10673,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 140,
+            "line": 141,
             "description": "Get the undo stack.",
             "itemtype": "method",
             "name": "getUndoStack",
@@ -10730,7 +10687,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 147,
+            "line": 156,
             "description": "Initialise the HTML for the application.",
             "itemtype": "method",
             "name": "init",
@@ -10740,7 +10697,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 254,
+            "line": 295,
             "description": "Reset the application.",
             "itemtype": "method",
             "name": "reset",
@@ -10750,7 +10707,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 276,
+            "line": 319,
             "description": "Reset the layout of the application.",
             "itemtype": "method",
             "name": "resetLayout",
@@ -10760,7 +10717,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 292,
+            "line": 335,
             "description": "Handle key down event.\n- CRTL-Z: undo\n- CRTL-Y: redo\nDefault behavior. Usually used in tools.",
             "itemtype": "method",
             "name": "onKeydown",
@@ -10777,24 +10734,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 312,
-            "description": "Handle change files event.",
-            "itemtype": "method",
-            "name": "onChangeFiles",
-            "params": [
-                {
-                    "name": "event",
-                    "description": "The event fired when changing the file field.",
-                    "type": "Object"
-                }
-            ],
-            "class": "dwv.App",
-            "module": "utils",
-            "namespace": "dwv"
-        },
-        {
-            "file": "src/application.js",
-            "line": 322,
+            "line": 355,
             "description": "Load a list of files.",
             "itemtype": "method",
             "name": "loadFiles",
@@ -10811,24 +10751,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 358,
-            "description": "Handle change url event.",
-            "itemtype": "method",
-            "name": "onChangeURL",
-            "params": [
-                {
-                    "name": "event",
-                    "description": "The event fired when changing the url field.",
-                    "type": "Object"
-                }
-            ],
-            "class": "dwv.App",
-            "module": "utils",
-            "namespace": "dwv"
-        },
-        {
-            "file": "src/application.js",
-            "line": 368,
+            "line": 391,
             "description": "Load a list of URLs.",
             "itemtype": "method",
             "name": "loadURL",
@@ -10845,7 +10768,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 404,
+            "line": 427,
             "description": "Handle window/level change.",
             "itemtype": "method",
             "name": "onWLChange",
@@ -10862,7 +10785,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 414,
+            "line": 437,
             "description": "Handle color map change.",
             "itemtype": "method",
             "name": "onColorChange",
@@ -10879,7 +10802,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 424,
+            "line": 447,
             "description": "Handle slice change.",
             "itemtype": "method",
             "name": "onSliceChange",
@@ -10896,7 +10819,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 444,
+            "line": 467,
             "description": "Fit the display to the window. To be called once the image is loaded.",
             "itemtype": "method",
             "name": "resize",
@@ -10906,7 +10829,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 490,
+            "line": 513,
             "description": "Toggle the display of the information layer.",
             "itemtype": "method",
             "name": "toggleInfoLayerDisplay",
@@ -10916,7 +10839,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 508,
+            "line": 531,
             "description": "Init the Window/Level display",
             "class": "dwv.App",
             "module": "utils",
@@ -10924,7 +10847,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 522,
+            "line": 545,
             "description": "Add layer mouse and touch listeners.",
             "itemtype": "method",
             "name": "addLayerListeners",
@@ -10934,7 +10857,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 544,
+            "line": 567,
             "description": "Remove layer mouse and touch listeners.",
             "itemtype": "method",
             "name": "removeLayerListeners",
@@ -10944,7 +10867,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 566,
+            "line": 589,
             "description": "Render the current image.",
             "itemtype": "method",
             "name": "render",
@@ -10954,7 +10877,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 575,
+            "line": 598,
             "description": "Update the window/level presets.",
             "itemtype": "method",
             "name": "updatePresets",
@@ -10971,7 +10894,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 627,
+            "line": 650,
             "description": "Handle zoom reset.",
             "itemtype": "method",
             "name": "onZoomReset",
@@ -10988,7 +10911,58 @@
         },
         {
             "file": "src/application.js",
-            "line": 637,
+            "line": 660,
+            "description": "Handle loader change.",
+            "itemtype": "method",
+            "name": "onChangeLoader",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The change event.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.App",
+            "module": "utils",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/application.js",
+            "line": 670,
+            "description": "Handle change url event.",
+            "itemtype": "method",
+            "name": "onChangeURL",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The event fired when changing the url field.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.App",
+            "module": "utils",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/application.js",
+            "line": 680,
+            "description": "Handle change files event.",
+            "itemtype": "method",
+            "name": "onChangeFiles",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The event fired when changing the file field.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.App",
+            "module": "utils",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/application.js",
+            "line": 690,
             "description": "Set the current position.",
             "itemtype": "method",
             "name": "setCurrentPostion",
@@ -11010,7 +10984,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 648,
+            "line": 701,
             "description": "Handle colour map change.",
             "itemtype": "method",
             "name": "onChangeColourMap",
@@ -11027,7 +11001,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 658,
+            "line": 711,
             "description": "Handle window/level preset change.",
             "itemtype": "method",
             "name": "onChangeWindowLevelPreset",
@@ -11044,7 +11018,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 676,
+            "line": 729,
             "description": "Handle tool change.",
             "itemtype": "method",
             "name": "onChangeTool",
@@ -11061,7 +11035,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 686,
+            "line": 739,
             "description": "Handle shape change.",
             "itemtype": "method",
             "name": "onChangeShape",
@@ -11078,7 +11052,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 696,
+            "line": 749,
             "description": "Handle filter change.",
             "itemtype": "method",
             "name": "onChangeFilter",
@@ -11095,7 +11069,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 706,
+            "line": 759,
             "description": "Handle filter run.",
             "itemtype": "method",
             "name": "onRunFilter",
@@ -11112,7 +11086,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 716,
+            "line": 769,
             "description": "Handle line colour change.",
             "itemtype": "method",
             "name": "onChangeLineColour",
@@ -11129,7 +11103,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 726,
+            "line": 779,
             "description": "Handle min/max slider change.",
             "itemtype": "method",
             "name": "onChangeMinMax",
@@ -11146,7 +11120,75 @@
         },
         {
             "file": "src/application.js",
-            "line": 738,
+            "line": 789,
+            "description": "Handle undo.",
+            "itemtype": "method",
+            "name": "onUndo",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The associated event.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.App",
+            "module": "utils",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/application.js",
+            "line": 799,
+            "description": "Handle redo.",
+            "itemtype": "method",
+            "name": "onRedo",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The associated event.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.App",
+            "module": "utils",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/application.js",
+            "line": 809,
+            "description": "Handle toggle of info layer.",
+            "itemtype": "method",
+            "name": "onToggleInfoLayer",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The associated event.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.App",
+            "module": "utils",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/application.js",
+            "line": 819,
+            "description": "Handle display reset.",
+            "itemtype": "method",
+            "name": "onDisplayReset",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The change event.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.App",
+            "module": "utils",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/application.js",
+            "line": 836,
             "description": "Generate the image data and draw it.",
             "itemtype": "method",
             "name": "generateAndDrawImage",
@@ -11156,7 +11198,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 752,
+            "line": 850,
             "description": "Add image listeners.",
             "itemtype": "method",
             "name": "addImageInfoListeners",
@@ -11168,7 +11210,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 767,
+            "line": 865,
             "description": "Remove image listeners.",
             "itemtype": "method",
             "name": "removeImageInfoListeners",
@@ -11180,7 +11222,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 782,
+            "line": 880,
             "description": "General-purpose event handler. This function just determines the mouse \nposition relative to the canvas element. It then passes it to the current tool.",
             "itemtype": "method",
             "name": "eventHandler",
@@ -11199,7 +11241,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 855,
+            "line": 953,
             "description": "Handle a drag over.",
             "itemtype": "method",
             "name": "onDragOver",
@@ -11218,7 +11260,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 874,
+            "line": 972,
             "description": "Handle a drag leave.",
             "itemtype": "method",
             "name": "onDragLeave",
@@ -11237,7 +11279,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 893,
+            "line": 991,
             "description": "Handle a drop event.",
             "itemtype": "method",
             "name": "onDrop",
@@ -11256,7 +11298,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 908,
+            "line": 1006,
             "description": "Handle an error: display it to the user.",
             "itemtype": "method",
             "name": "handleError",
@@ -11275,7 +11317,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 929,
+            "line": 1027,
             "description": "Create the application layers.",
             "itemtype": "method",
             "name": "createLayers",
@@ -11299,7 +11341,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 960,
+            "line": 1058,
             "description": "Post load application initialisation. To be called once the DICOM has been parsed.",
             "itemtype": "method",
             "name": "postLoadInit",
@@ -11318,7 +11360,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 1055,
+            "line": 1153,
             "description": "Set the current position.",
             "itemtype": "method",
             "name": "setWindowLevel",
@@ -11340,7 +11382,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 1067,
+            "line": 1165,
             "description": "Set the window/level.",
             "itemtype": "method",
             "name": "setWindowLevel",
@@ -11362,7 +11404,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 1078,
+            "line": 1176,
             "description": "Set the colour map.",
             "itemtype": "method",
             "name": "setColourMap",
@@ -11379,7 +11421,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 1088,
+            "line": 1186,
             "description": "Set the colour map from a name.",
             "itemtype": "method",
             "name": "setColourMapFromName",
@@ -11396,7 +11438,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 1113,
+            "line": 1211,
             "description": "Set the selected tool.",
             "itemtype": "method",
             "name": "setSelectedTool",
@@ -11407,13 +11449,13 @@
                     "type": "String"
                 }
             ],
-            "class": "dwv.ToolBoxController",
+            "class": "dwv.ToolboxController",
             "module": "utils",
             "namespace": "dwv"
         },
         {
             "file": "src/application.js",
-            "line": 1123,
+            "line": 1221,
             "description": "Set the selected shape.",
             "itemtype": "method",
             "name": "setSelectedShape",
@@ -11424,13 +11466,13 @@
                     "type": "String"
                 }
             ],
-            "class": "dwv.ToolBoxController",
+            "class": "dwv.ToolboxController",
             "module": "utils",
             "namespace": "dwv"
         },
         {
             "file": "src/application.js",
-            "line": 1133,
+            "line": 1231,
             "description": "Set the selected filter.",
             "itemtype": "method",
             "name": "setSelectedFilter",
@@ -11441,23 +11483,23 @@
                     "type": "String"
                 }
             ],
-            "class": "dwv.ToolBoxController",
+            "class": "dwv.ToolboxController",
             "module": "utils",
             "namespace": "dwv"
         },
         {
             "file": "src/application.js",
-            "line": 1143,
+            "line": 1241,
             "description": "Run the selected filter.",
             "itemtype": "method",
             "name": "runSelectedFilter",
-            "class": "dwv.ToolBoxController",
+            "class": "dwv.ToolboxController",
             "module": "utils",
             "namespace": "dwv"
         },
         {
             "file": "src/application.js",
-            "line": 1152,
+            "line": 1250,
             "description": "Set the tool line color.",
             "itemtype": "method",
             "name": "runFilter",
@@ -11468,13 +11510,13 @@
                     "type": "String"
                 }
             ],
-            "class": "dwv.ToolBoxController",
+            "class": "dwv.ToolboxController",
             "module": "utils",
             "namespace": "dwv"
         },
         {
             "file": "src/application.js",
-            "line": 1162,
+            "line": 1260,
             "description": "Set the tool range.",
             "itemtype": "method",
             "name": "setRange",
@@ -11485,7 +11527,7 @@
                     "type": "Object"
                 }
             ],
-            "class": "dwv.ToolBoxController",
+            "class": "dwv.ToolboxController",
             "module": "utils",
             "namespace": "dwv"
         }
@@ -11601,15 +11643,19 @@
         },
         {
             "message": "replacing incorrect tag: function with method",
-            "line": " src/application.js:575"
+            "line": " src/application.js:598"
         },
         {
             "message": "replacing incorrect tag: function with method",
-            "line": " src/application.js:1088"
+            "line": " src/application.js:1186"
         },
         {
             "message": "Missing item type\nDICOM tag dictionary.",
             "line": " src/dicom/dictionary.js:8"
+        },
+        {
+            "message": "Missing item type\nDisplay a loader.",
+            "line": " src/gui/loader.js:45"
         },
         {
             "message": "Missing item type\nLookup tables for image color display.",
@@ -11653,7 +11699,7 @@
         },
         {
             "message": "Missing item type\nInit the Window/Level display",
-            "line": " src/application.js:508"
+            "line": " src/application.js:531"
         }
     ]
 }

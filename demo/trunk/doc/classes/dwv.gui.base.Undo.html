@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>dwv.tool.ChangeGroupCommand - dwv</title>
+    <title>dwv.gui.base.Undo - dwv</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
     <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
@@ -158,28 +158,28 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-                        <h1>dwv.tool.ChangeGroupCommand Class</h1>
+                        <h1>dwv.gui.base.Undo Class</h1>
                         <div class="box meta">
                         
                         
                                 <div class="foundat">
-                                    Defined in: <a href="../files/src_tools_draw.js.html#l88"><code>src&#x2F;tools&#x2F;draw.js:88</code></a>
+                                    Defined in: <a href="../files/src_gui_undo.js.html#l15"><code>src&#x2F;gui&#x2F;undo.js:15</code></a>
                                 </div>
                         
-                                    Module: <a href="../modules/tool.html">tool</a>
+                                    Module: <a href="../modules/gui.html">gui</a>
                         
                         </div>
                         
                         
                         <div class="box intro">
-                            <p>Change group command.</p>
+                            <p>Undo base gui.</p>
                         
                         </div>
                         
                             <div class="constructor">
                                 <h2>Constructor</h2>
-                                <div id="method_dwv.tool.ChangeGroupCommand" class="method item">
-                                    <h3 class="name"><code>dwv.tool.ChangeGroupCommand</code></h3>
+                                <div id="method_dwv.gui.base.Undo" class="method item">
+                                    <h3 class="name"><code>dwv.gui.base.Undo</code></h3>
                                 
                                         <span class="paren">()</span>
                                 
@@ -193,7 +193,7 @@
                                     <div class="meta">
                                                 <p>
                                                 Defined in
-                                        <a href="../files/src_tools_draw.js.html#l88"><code>src&#x2F;tools&#x2F;draw.js:88</code></a>
+                                        <a href="../files/src_gui_undo.js.html#l15"><code>src&#x2F;gui&#x2F;undo.js:15</code></a>
                                         </p>
                                 
                                 
@@ -225,16 +225,21 @@
                         
                                             <ul class="index-list methods">
                                                     <li class="index-item method">
-                                                        <a href="#method_execute">execute</a>
+                                                        <a href="#method_addCommandToUndoHtml">addCommandToUndoHtml</a>
                         
                                                     </li>
                                                     <li class="index-item method">
-                                                        <a href="#method_getName">getName</a>
+                                                        <a href="#method_cleanUndoHtml">cleanUndoHtml</a>
                         
                                                     </li>
                                                     <li class="index-item method">
-                                                        <a href="#method_undo">undo</a>
+                                                        <a href="#method_enableInUndoHtml">enableInUndoHtml</a>
                         
+                                                    </li>
+                                                    <li class="index-item method">
+                                                        <a href="#method_setup">setup</a>
+                        
+                                                            <span class="flag static">static</span>
                                                     </li>
                                             </ul>
                                         </div>
@@ -246,80 +251,61 @@
                                     <div id="methods" class="api-class-tabpanel">
                                         <h2 class="off-left">Methods</h2>
                         
-                                            <div id="method_execute" class="method item">
-                                                <h3 class="name"><code>execute</code></h3>
+                                            <div id="method_addCommandToUndoHtml" class="method item">
+                                                <h3 class="name"><code>addCommandToUndoHtml</code></h3>
                                             
-                                                    <span class="paren">()</span>
-                                            
-                                            
-                                            
-                                            
-                                            
-                                            
-                                            
-                                            
-                                                <div class="meta">
-                                                            <p>
-                                                            Defined in
-                                                    <a href="../files/src_tools_draw.js.html#l103"><code>src&#x2F;tools&#x2F;draw.js:103</code></a>
-                                                    </p>
-                                            
-                                            
-                                            
-                                                </div>
-                                            
-                                                <div class="description">
-                                                    <p>Execute the command.</p>
-                                            
-                                                </div>
-                                            
-                                            
-                                            
-                                            </div>
-                                            <div id="method_getName" class="method item">
-                                                <h3 class="name"><code>getName</code></h3>
-                                            
-                                                    <span class="paren">()</span>
-                                            
-                                                    <span class="returns-inline">
-                                                        <span class="type">String</span>
-                                                    </span>
-                                            
-                                            
-                                            
-                                            
-                                            
-                                            
-                                            
-                                                <div class="meta">
-                                                            <p>
-                                                            Defined in
-                                                    <a href="../files/src_tools_draw.js.html#l96"><code>src&#x2F;tools&#x2F;draw.js:96</code></a>
-                                                    </p>
-                                            
-                                            
-                                            
-                                                </div>
-                                            
-                                                <div class="description">
-                                                    <p>Get the command name.</p>
-                                            
-                                                </div>
-                                            
-                                            
-                                                    <div class="returns">
-                                                        <h4>Returns:</h4>
-                                            
-                                                        <div class="returns-description">
-                                                                    <span class="type">String</span>:
-                                                                <p>The command name.</p>
-                                            
-                                                        </div>
+                                                    <div class="args">
+                                                        <span class="paren">(</span><ul class="args-list inline commas">
+                                                            <li class="arg">
+                                                                    <code>commandName</code>
+                                                            </li>
+                                                        </ul><span class="paren">)</span>
                                                     </div>
                                             
+                                            
+                                            
+                                            
+                                            
+                                            
+                                            
+                                            
+                                                <div class="meta">
+                                                            <p>
+                                                            Defined in
+                                                    <a href="../files/src_gui_undo.js.html#l65"><code>src&#x2F;gui&#x2F;undo.js:65</code></a>
+                                                    </p>
+                                            
+                                            
+                                            
+                                                </div>
+                                            
+                                                <div class="description">
+                                                    <p>Add a command to the undo HTML.</p>
+                                            
+                                                </div>
+                                            
+                                                    <div class="params">
+                                                        <h4>Parameters:</h4>
+                                            
+                                                        <ul class="params-list">
+                                                            <li class="param">
+                                                                    <code class="param-name">commandName</code>
+                                                                    <span class="type">String</span>
+                                            
+                                            
+                                                                <div class="param-description">
+                                                                    <p>The name of the command to add.</p>
+                                            
+                                                                </div>
+                                            
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                            
+                                            
                                             </div>
-                                            <div id="method_undo" class="method item">
-                                                <h3 class="name"><code>undo</code></h3>
+                                            <div id="method_cleanUndoHtml" class="method item">
+                                                <h3 class="name"><code>cleanUndoHtml</code></h3>
                                             
                                                     <span class="paren">()</span>
                                             
@@ -333,7 +319,7 @@
                                                 <div class="meta">
                                                             <p>
                                                             Defined in
-                                                    <a href="../files/src_tools_draw.js.html#l113"><code>src&#x2F;tools&#x2F;draw.js:113</code></a>
+                                                    <a href="../files/src_gui_undo.js.html#l50"><code>src&#x2F;gui&#x2F;undo.js:50</code></a>
                                                     </p>
                                             
                                             
@@ -341,7 +327,91 @@
                                                 </div>
                                             
                                                 <div class="description">
-                                                    <p>Undo the command.</p>
+                                                    <p>Clear the command list of the undo HTML.</p>
+                                            
+                                                </div>
+                                            
+                                            
+                                            
+                                            </div>
+                                            <div id="method_enableInUndoHtml" class="method item">
+                                                <h3 class="name"><code>enableInUndoHtml</code></h3>
+                                            
+                                                    <div class="args">
+                                                        <span class="paren">(</span><ul class="args-list inline commas">
+                                                            <li class="arg">
+                                                                    <code>enable</code>
+                                                            </li>
+                                                        </ul><span class="paren">)</span>
+                                                    </div>
+                                            
+                                            
+                                            
+                                            
+                                            
+                                            
+                                            
+                                            
+                                                <div class="meta">
+                                                            <p>
+                                                            Defined in
+                                                    <a href="../files/src_gui_undo.js.html#l91"><code>src&#x2F;gui&#x2F;undo.js:91</code></a>
+                                                    </p>
+                                            
+                                            
+                                            
+                                                </div>
+                                            
+                                                <div class="description">
+                                                    <p>Enable the last command of the undo HTML.</p>
+                                            
+                                                </div>
+                                            
+                                                    <div class="params">
+                                                        <h4>Parameters:</h4>
+                                            
+                                                        <ul class="params-list">
+                                                            <li class="param">
+                                                                    <code class="param-name">enable</code>
+                                                                    <span class="type">Boolean</span>
+                                            
+                                            
+                                                                <div class="param-description">
+                                                                    <p>Flag to enable or disable the command.</p>
+                                            
+                                                                </div>
+                                            
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                            
+                                            
+                                            </div>
+                                            <div id="method_setup" class="method item">
+                                                <h3 class="name"><code>setup</code></h3>
+                                            
+                                                    <span class="paren">()</span>
+                                            
+                                            
+                                            
+                                            
+                                            
+                                                    <span class="flag static">static</span>
+                                            
+                                            
+                                            
+                                                <div class="meta">
+                                                            <p>
+                                                            Defined in
+                                                    <a href="../files/src_gui_undo.js.html#l23"><code>src&#x2F;gui&#x2F;undo.js:23</code></a>
+                                                    </p>
+                                            
+                                            
+                                            
+                                                </div>
+                                            
+                                                <div class="description">
+                                                    <p>Setup the undo HTML.</p>
                                             
                                                 </div>
                                             

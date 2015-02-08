@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>dwv.tool.ChangeGroupCommand - dwv</title>
+    <title>dwv.ToolboxController - dwv</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
     <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
@@ -158,28 +158,28 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-                        <h1>dwv.tool.ChangeGroupCommand Class</h1>
+                        <h1>dwv.ToolboxController Class</h1>
                         <div class="box meta">
                         
                         
                                 <div class="foundat">
-                                    Defined in: <a href="../files/src_tools_draw.js.html#l88"><code>src&#x2F;tools&#x2F;draw.js:88</code></a>
+                                    Defined in: <a href="../files/src_application.js.html#l1203"><code>src&#x2F;application.js:1203</code></a>
                                 </div>
                         
-                                    Module: <a href="../modules/tool.html">tool</a>
+                                    Module: <a href="../modules/utils.html">utils</a>
                         
                         </div>
                         
                         
                         <div class="box intro">
-                            <p>Change group command.</p>
+                            <p>Toolbox controller.</p>
                         
                         </div>
                         
                             <div class="constructor">
                                 <h2>Constructor</h2>
-                                <div id="method_dwv.tool.ChangeGroupCommand" class="method item">
-                                    <h3 class="name"><code>dwv.tool.ChangeGroupCommand</code></h3>
+                                <div id="method_dwv.ToolboxController" class="method item">
+                                    <h3 class="name"><code>dwv.ToolboxController</code></h3>
                                 
                                         <span class="paren">()</span>
                                 
@@ -193,7 +193,7 @@
                                     <div class="meta">
                                                 <p>
                                                 Defined in
-                                        <a href="../files/src_tools_draw.js.html#l88"><code>src&#x2F;tools&#x2F;draw.js:88</code></a>
+                                        <a href="../files/src_application.js.html#l1203"><code>src&#x2F;application.js:1203</code></a>
                                         </p>
                                 
                                 
@@ -225,15 +225,27 @@
                         
                                             <ul class="index-list methods">
                                                     <li class="index-item method">
-                                                        <a href="#method_execute">execute</a>
+                                                        <a href="#method_runFilter">runFilter</a>
                         
                                                     </li>
                                                     <li class="index-item method">
-                                                        <a href="#method_getName">getName</a>
+                                                        <a href="#method_runSelectedFilter">runSelectedFilter</a>
                         
                                                     </li>
                                                     <li class="index-item method">
-                                                        <a href="#method_undo">undo</a>
+                                                        <a href="#method_setRange">setRange</a>
+                        
+                                                    </li>
+                                                    <li class="index-item method">
+                                                        <a href="#method_setSelectedFilter">setSelectedFilter</a>
+                        
+                                                    </li>
+                                                    <li class="index-item method">
+                                                        <a href="#method_setSelectedShape">setSelectedShape</a>
+                        
+                                                    </li>
+                                                    <li class="index-item method">
+                                                        <a href="#method_setSelectedTool">setSelectedTool</a>
                         
                                                     </li>
                                             </ul>
@@ -246,80 +258,61 @@
                                     <div id="methods" class="api-class-tabpanel">
                                         <h2 class="off-left">Methods</h2>
                         
-                                            <div id="method_execute" class="method item">
-                                                <h3 class="name"><code>execute</code></h3>
+                                            <div id="method_runFilter" class="method item">
+                                                <h3 class="name"><code>runFilter</code></h3>
                                             
-                                                    <span class="paren">()</span>
-                                            
-                                            
-                                            
-                                            
-                                            
-                                            
-                                            
-                                            
-                                                <div class="meta">
-                                                            <p>
-                                                            Defined in
-                                                    <a href="../files/src_tools_draw.js.html#l103"><code>src&#x2F;tools&#x2F;draw.js:103</code></a>
-                                                    </p>
-                                            
-                                            
-                                            
-                                                </div>
-                                            
-                                                <div class="description">
-                                                    <p>Execute the command.</p>
-                                            
-                                                </div>
-                                            
-                                            
-                                            
-                                            </div>
-                                            <div id="method_getName" class="method item">
-                                                <h3 class="name"><code>getName</code></h3>
-                                            
-                                                    <span class="paren">()</span>
-                                            
-                                                    <span class="returns-inline">
-                                                        <span class="type">String</span>
-                                                    </span>
-                                            
-                                            
-                                            
-                                            
-                                            
-                                            
-                                            
-                                                <div class="meta">
-                                                            <p>
-                                                            Defined in
-                                                    <a href="../files/src_tools_draw.js.html#l96"><code>src&#x2F;tools&#x2F;draw.js:96</code></a>
-                                                    </p>
-                                            
-                                            
-                                            
-                                                </div>
-                                            
-                                                <div class="description">
-                                                    <p>Get the command name.</p>
-                                            
-                                                </div>
-                                            
-                                            
-                                                    <div class="returns">
-                                                        <h4>Returns:</h4>
-                                            
-                                                        <div class="returns-description">
-                                                                    <span class="type">String</span>:
-                                                                <p>The command name.</p>
-                                            
-                                                        </div>
+                                                    <div class="args">
+                                                        <span class="paren">(</span><ul class="args-list inline commas">
+                                                            <li class="arg">
+                                                                    <code>name</code>
+                                                            </li>
+                                                        </ul><span class="paren">)</span>
                                                     </div>
                                             
+                                            
+                                            
+                                            
+                                            
+                                            
+                                            
+                                            
+                                                <div class="meta">
+                                                            <p>
+                                                            Defined in
+                                                    <a href="../files/src_application.js.html#l1250"><code>src&#x2F;application.js:1250</code></a>
+                                                    </p>
+                                            
+                                            
+                                            
+                                                </div>
+                                            
+                                                <div class="description">
+                                                    <p>Set the tool line color.</p>
+                                            
+                                                </div>
+                                            
+                                                    <div class="params">
+                                                        <h4>Parameters:</h4>
+                                            
+                                                        <ul class="params-list">
+                                                            <li class="param">
+                                                                    <code class="param-name">name</code>
+                                                                    <span class="type">String</span>
+                                            
+                                            
+                                                                <div class="param-description">
+                                                                    <p>The name of the color.</p>
+                                            
+                                                                </div>
+                                            
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                            
+                                            
                                             </div>
-                                            <div id="method_undo" class="method item">
-                                                <h3 class="name"><code>undo</code></h3>
+                                            <div id="method_runSelectedFilter" class="method item">
+                                                <h3 class="name"><code>runSelectedFilter</code></h3>
                                             
                                                     <span class="paren">()</span>
                                             
@@ -333,7 +326,7 @@
                                                 <div class="meta">
                                                             <p>
                                                             Defined in
-                                                    <a href="../files/src_tools_draw.js.html#l113"><code>src&#x2F;tools&#x2F;draw.js:113</code></a>
+                                                    <a href="../files/src_application.js.html#l1241"><code>src&#x2F;application.js:1241</code></a>
                                                     </p>
                                             
                                             
@@ -341,10 +334,222 @@
                                                 </div>
                                             
                                                 <div class="description">
-                                                    <p>Undo the command.</p>
+                                                    <p>Run the selected filter.</p>
                                             
                                                 </div>
                                             
+                                            
+                                            
+                                            </div>
+                                            <div id="method_setRange" class="method item">
+                                                <h3 class="name"><code>setRange</code></h3>
+                                            
+                                                    <div class="args">
+                                                        <span class="paren">(</span><ul class="args-list inline commas">
+                                                            <li class="arg">
+                                                                    <code>range</code>
+                                                            </li>
+                                                        </ul><span class="paren">)</span>
+                                                    </div>
+                                            
+                                            
+                                            
+                                            
+                                            
+                                            
+                                            
+                                            
+                                                <div class="meta">
+                                                            <p>
+                                                            Defined in
+                                                    <a href="../files/src_application.js.html#l1260"><code>src&#x2F;application.js:1260</code></a>
+                                                    </p>
+                                            
+                                            
+                                            
+                                                </div>
+                                            
+                                                <div class="description">
+                                                    <p>Set the tool range.</p>
+                                            
+                                                </div>
+                                            
+                                                    <div class="params">
+                                                        <h4>Parameters:</h4>
+                                            
+                                                        <ul class="params-list">
+                                                            <li class="param">
+                                                                    <code class="param-name">range</code>
+                                                                    <span class="type">Object</span>
+                                            
+                                            
+                                                                <div class="param-description">
+                                                                    <p>The new range of the data.</p>
+                                            
+                                                                </div>
+                                            
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                            
+                                            
+                                            </div>
+                                            <div id="method_setSelectedFilter" class="method item">
+                                                <h3 class="name"><code>setSelectedFilter</code></h3>
+                                            
+                                                    <div class="args">
+                                                        <span class="paren">(</span><ul class="args-list inline commas">
+                                                            <li class="arg">
+                                                                    <code>name</code>
+                                                            </li>
+                                                        </ul><span class="paren">)</span>
+                                                    </div>
+                                            
+                                            
+                                            
+                                            
+                                            
+                                            
+                                            
+                                            
+                                                <div class="meta">
+                                                            <p>
+                                                            Defined in
+                                                    <a href="../files/src_application.js.html#l1231"><code>src&#x2F;application.js:1231</code></a>
+                                                    </p>
+                                            
+                                            
+                                            
+                                                </div>
+                                            
+                                                <div class="description">
+                                                    <p>Set the selected filter.</p>
+                                            
+                                                </div>
+                                            
+                                                    <div class="params">
+                                                        <h4>Parameters:</h4>
+                                            
+                                                        <ul class="params-list">
+                                                            <li class="param">
+                                                                    <code class="param-name">name</code>
+                                                                    <span class="type">String</span>
+                                            
+                                            
+                                                                <div class="param-description">
+                                                                    <p>The name of the filter.</p>
+                                            
+                                                                </div>
+                                            
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                            
+                                            
+                                            </div>
+                                            <div id="method_setSelectedShape" class="method item">
+                                                <h3 class="name"><code>setSelectedShape</code></h3>
+                                            
+                                                    <div class="args">
+                                                        <span class="paren">(</span><ul class="args-list inline commas">
+                                                            <li class="arg">
+                                                                    <code>name</code>
+                                                            </li>
+                                                        </ul><span class="paren">)</span>
+                                                    </div>
+                                            
+                                            
+                                            
+                                            
+                                            
+                                            
+                                            
+                                            
+                                                <div class="meta">
+                                                            <p>
+                                                            Defined in
+                                                    <a href="../files/src_application.js.html#l1221"><code>src&#x2F;application.js:1221</code></a>
+                                                    </p>
+                                            
+                                            
+                                            
+                                                </div>
+                                            
+                                                <div class="description">
+                                                    <p>Set the selected shape.</p>
+                                            
+                                                </div>
+                                            
+                                                    <div class="params">
+                                                        <h4>Parameters:</h4>
+                                            
+                                                        <ul class="params-list">
+                                                            <li class="param">
+                                                                    <code class="param-name">name</code>
+                                                                    <span class="type">String</span>
+                                            
+                                            
+                                                                <div class="param-description">
+                                                                    <p>The name of the shape.</p>
+                                            
+                                                                </div>
+                                            
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                            
+                                            
+                                            </div>
+                                            <div id="method_setSelectedTool" class="method item">
+                                                <h3 class="name"><code>setSelectedTool</code></h3>
+                                            
+                                                    <div class="args">
+                                                        <span class="paren">(</span><ul class="args-list inline commas">
+                                                            <li class="arg">
+                                                                    <code>name</code>
+                                                            </li>
+                                                        </ul><span class="paren">)</span>
+                                                    </div>
+                                            
+                                            
+                                            
+                                            
+                                            
+                                            
+                                            
+                                            
+                                                <div class="meta">
+                                                            <p>
+                                                            Defined in
+                                                    <a href="../files/src_application.js.html#l1211"><code>src&#x2F;application.js:1211</code></a>
+                                                    </p>
+                                            
+                                            
+                                            
+                                                </div>
+                                            
+                                                <div class="description">
+                                                    <p>Set the selected tool.</p>
+                                            
+                                                </div>
+                                            
+                                                    <div class="params">
+                                                        <h4>Parameters:</h4>
+                                            
+                                                        <ul class="params-list">
+                                                            <li class="param">
+                                                                    <code class="param-name">name</code>
+                                                                    <span class="type">String</span>
+                                            
+                                            
+                                                                <div class="param-description">
+                                                                    <p>The name of the tool.</p>
+                                            
+                                                                </div>
+                                            
+                                                            </li>
+                                                        </ul>
+                                                    </div>
                                             
                                             
                                             </div>

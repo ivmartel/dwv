@@ -44,14 +44,17 @@
                                 <li><a href="../classes/dwv.dicom.DicomParser.html">dwv.dicom.DicomParser</a></li>
                                 <li><a href="../classes/dwv.gui.html">dwv.gui</a></li>
                                 <li><a href="../classes/dwv.gui.base.Draw.html">dwv.gui.base.Draw</a></li>
+                                <li><a href="../classes/dwv.gui.base.FileLoad.html">dwv.gui.base.FileLoad</a></li>
                                 <li><a href="../classes/dwv.gui.base.Filter.html">dwv.gui.base.Filter</a></li>
                                 <li><a href="../classes/dwv.gui.base.Livewire.html">dwv.gui.base.Livewire</a></li>
+                                <li><a href="../classes/dwv.gui.base.Loadbox.html">dwv.gui.base.Loadbox</a></li>
                                 <li><a href="../classes/dwv.gui.base.Scroll.html">dwv.gui.base.Scroll</a></li>
                                 <li><a href="../classes/dwv.gui.base.Sharpen.html">dwv.gui.base.Sharpen</a></li>
                                 <li><a href="../classes/dwv.gui.base.Slider.html">dwv.gui.base.Slider</a></li>
                                 <li><a href="../classes/dwv.gui.base.Sobel.html">dwv.gui.base.Sobel</a></li>
                                 <li><a href="../classes/dwv.gui.base.Threshold.html">dwv.gui.base.Threshold</a></li>
                                 <li><a href="../classes/dwv.gui.base.Toolbox.html">dwv.gui.base.Toolbox</a></li>
+                                <li><a href="../classes/dwv.gui.base.Undo.html">dwv.gui.base.Undo</a></li>
                                 <li><a href="../classes/dwv.gui.base.WindowLevel.html">dwv.gui.base.WindowLevel</a></li>
                                 <li><a href="../classes/dwv.gui.base.ZoomAndPan.html">dwv.gui.base.ZoomAndPan</a></li>
                                 <li><a href="../classes/dwv.html.html">dwv.html</a></li>
@@ -100,11 +103,11 @@
                                 <li><a href="../classes/dwv.tool.RunFilterCommand.html">dwv.tool.RunFilterCommand</a></li>
                                 <li><a href="../classes/dwv.tool.Scroll.html">dwv.tool.Scroll</a></li>
                                 <li><a href="../classes/dwv.tool.ShapeEditor.html">dwv.tool.ShapeEditor</a></li>
-                                <li><a href="../classes/dwv.tool.ToolBox.html">dwv.tool.ToolBox</a></li>
+                                <li><a href="../classes/dwv.tool.Toolbox.html">dwv.tool.Toolbox</a></li>
                                 <li><a href="../classes/dwv.tool.UndoStack.html">dwv.tool.UndoStack</a></li>
                                 <li><a href="../classes/dwv.tool.WindowLevel.html">dwv.tool.WindowLevel</a></li>
                                 <li><a href="../classes/dwv.tool.ZoomAndPan.html">dwv.tool.ZoomAndPan</a></li>
-                                <li><a href="../classes/dwv.ToolBoxController.html">dwv.ToolBoxController</a></li>
+                                <li><a href="../classes/dwv.ToolboxController.html">dwv.ToolboxController</a></li>
                                 <li><a href="../classes/dwv.utils.html">dwv.utils</a></li>
                                 <li><a href="../classes/dwv.ViewController.html">dwv.ViewController</a></li>
                                 <li><a href="../classes/image.ImageFactory.html">image.ImageFactory</a></li>
@@ -193,11 +196,11 @@
                             var containerDivId = null;
                             this.getContainerDivId = function () { return containerDivId; };
                             
-                            var presets = {};
-                            this.getPresets = function () { return presets; };
+                            this.presets = {};
+                            this.getPresets = function () { return this.presets; };
                             
-                            var toolBoxController = null;
-                            this.getToolboxController = function () { return toolBoxController; };
+                            var toolboxController = null;
+                            this.getToolboxController = function () { return toolboxController; };
                         
                             var viewController = null;
                             this.getViewController = function () { return viewController; };
@@ -217,10 +220,11 @@
                             // flag to know if the info layer is listening on the image.
                             var isInfoLayerListening = false;
                             
-                            // Tool box
-                            var toolBox = null;
+                            // Toolbox
+                            var toolbox = null;
+                            var loadbox = null;
                             // UndoStack
-                            var undoStack = new dwv.tool.UndoStack();
+                            var undoStack = null;
                             
                             /** 
                              * Get the version of the application.
@@ -271,11 +275,11 @@
                             this.getImageData = function() { return imageData; };
                         
                             /** 
-                             * Get the tool box.
-                             * @method getToolBox
+                             * Get the toolbox.
+                             * @method getToolbox
                              * @return {Object} The associated toolbox.
                              */
-                            this.getToolBox = function() { return toolBox; };
+                            this.getToolbox = function() { return toolbox; };
                         
                             /** 
                              * Get the image layer.
@@ -305,16 +309,20 @@
                              */
                             this.getUndoStack = function() { return undoStack; };
                         
+                            this.getLoaders = function () 
+                            {
+                                return {
+                                    &#x27;file&#x27;: dwv.io.File,
+                                    &#x27;url&#x27;: dwv.io.Url
+                                };        
+                            };
+                            
                             /**
                              * Initialise the HTML for the application.
                              * @method init
                              */
                             this.init = function ( config ) {
                                 containerDivId = config.containerDivId;
-                                // align layers when the window is resized
-                                if ( config.fitToWindow ) {
-                                    window.onresize = this.fitToWindow;
-                                }
                                 // tools
                                 if ( config.tools.length !== 0 ) {
                                     // setup the tool list
@@ -383,10 +391,42 @@
                                             throw new Error(&quot;Unknown tool: &#x27;&quot; + config.tools[t] + &quot;&#x27;&quot;);
                                         }
                                     }
-                                    toolBox = new dwv.tool.ToolBox(toolList, this);
-                                    toolBoxController = new dwv.ToolBoxController(toolBox);
-                                    toolBox.setup();
+                                    toolbox = new dwv.tool.Toolbox(toolList, this);
+                                    toolboxController = new dwv.ToolboxController(toolbox);
+                                    toolbox.setup();
                                 }
+                                // gui
+                                if ( config.gui ) {
+                                    // load
+                                    if ( config.gui.indexOf(&quot;load&quot;) !== -1 ) {
+                                        var fileLoadGui = new dwv.gui.FileLoad(this);
+                                        var urlLoadGui = new dwv.gui.UrlLoad(this);
+                                        loadbox = new dwv.gui.Loadbox(this, fileLoadGui, urlLoadGui);
+                                        loadbox.setup();
+                                        fileLoadGui.setup();
+                                        urlLoadGui.setup();
+                                        fileLoadGui.display(true);
+                                        urlLoadGui.display(false);
+                                    }
+                                    // undo
+                                    if ( config.gui.indexOf(&quot;undo&quot;) !== -1 ) {
+                                        undoStack = new dwv.tool.UndoStack();
+                                        undoStack.setup();
+                                    }
+                                    // version number
+                                    if ( config.gui.indexOf(&quot;version&quot;) !== -1 ) {
+                                        dwv.gui.appendVersionHtml(this.getVersion());
+                                    }
+                                    // help
+                                    if ( config.gui.indexOf(&quot;help&quot;) !== -1 ) {
+                                        var isMobile = true;
+                                        if ( config.isMobile ) {
+                                            isMobile = config.isMobile;
+                                        }
+                                        dwv.gui.appendHelpHtml( toolbox.getToolList(), isMobile );
+                                    }
+                                }
+                                
                                 // listen to drag&amp;drop
                                 var dropBoxDivId = containerDivId + &quot;-dropBox&quot;;
                                 var box = document.getElementById(dropBoxDivId);
@@ -410,6 +450,10 @@
                                 else{
                                     console.log(&quot;Not loading url from adress since skipLoadUrl is defined.&quot;);
                                 }
+                                // align layers when the window is resized
+                                if ( config.fitToWindow ) {
+                                    window.onresize = this.fitToWindow;
+                                }
                             };
                             
                             /**
@@ -419,8 +463,8 @@
                             this.reset = function()
                             {
                                 // clear tools
-                                if ( toolBox ) {
-                                    toolBox.reset();
+                                if ( toolbox ) {
+                                    toolbox.reset();
                                 }
                                 // clear draw
                                 if ( drawStage ) {
@@ -429,9 +473,11 @@
                                 // clear objects
                                 image = null;
                                 view = null;
-                                // clear undo/redo
-                                undoStack = new dwv.tool.UndoStack();
-                                dwv.gui.cleanUndoHtml();
+                                // reset undo/redo
+                                if ( undoStack ) {
+                                    undoStack = new dwv.tool.UndoStack();
+                                    undoStack.initialise();
+                                }
                             };
                             
                             /**
@@ -471,16 +517,6 @@
                             };
                             
                             /**
-                             * Handle change files event.
-                             * @method onChangeFiles
-                             * @param {Object} event The event fired when changing the file field.
-                             */
-                            this.onChangeFiles = function(event)
-                            {
-                                this.loadFiles(event.target.files);
-                            };
-                        
-                            /**
                              * Load a list of files.
                              * @method loadFiles
                              * @param {Array} files The list of files to load.
@@ -516,16 +552,6 @@
                                 fileIO.load(files);
                             };
                             
-                            /**
-                             * Handle change url event.
-                             * @method onChangeURL
-                             * @param {Object} event The event fired when changing the url field.
-                             */
-                            this.onChangeURL = function(event)
-                            {
-                                this.loadURL([event.target.value]);
-                            };
-                        
                             /**
                              * Load a list of URLs.
                              * @method loadURL
@@ -792,7 +818,37 @@
                              */
                             this.onZoomReset = function (/*event*/)
                             {
-                                app.resetLayout();
+                                self.resetLayout();
+                            };
+                        
+                            /**
+                             * Handle loader change.
+                             * @method onChangeLoader
+                             * @param {Object} event The change event.
+                             */
+                            this.onChangeLoader = function (/*event*/)
+                            {
+                                loadbox.displayLoader( this.value );
+                            };
+                        
+                            /**
+                             * Handle change url event.
+                             * @method onChangeURL
+                             * @param {Object} event The event fired when changing the url field.
+                             */
+                            this.onChangeURL = function (event)
+                            {
+                                self.loadURL([event.target.value]);
+                            };
+                        
+                            /**
+                             * Handle change files event.
+                             * @method onChangeFiles
+                             * @param {Object} event The event fired when changing the file field.
+                             */
+                            this.onChangeFiles = function (event)
+                            {
+                                self.loadFiles(event.target.files);
                             };
                         
                             /**
@@ -825,13 +881,13 @@
                             {
                                 var name = this.value;
                                 // check if we have it
-                                if( !this.presets[name] ) {
+                                if( !self.presets[name] ) {
                                     throw new Error(&quot;Unknown window level preset: &#x27;&quot; + name + &quot;&#x27;&quot;);
                                 }
                                 // enable it
                                 viewController.setWindowLevel( 
-                                    this.presets[name].center, 
-                                    this.presets[name].width );
+                                    self.presets[name].center, 
+                                    self.presets[name].width );
                             };
                         
                             /**
@@ -841,7 +897,7 @@
                              */
                             this.onChangeTool = function (/*event*/)
                             {
-                                toolBoxController.setSelectedTool(this.value);
+                                toolboxController.setSelectedTool(this.value);
                             };
                         
                             /**
@@ -851,7 +907,7 @@
                              */
                             this.onChangeShape = function (/*event*/)
                             {
-                                toolBoxController.setSelectedShape(this.value);
+                                toolboxController.setSelectedShape(this.value);
                             };
                         
                             /**
@@ -861,7 +917,7 @@
                              */
                             this.onChangeFilter = function (/*event*/)
                             {
-                                toolBoxController.setSelectedFilter(this.value);
+                                toolboxController.setSelectedFilter(this.value);
                             };
                         
                             /**
@@ -871,7 +927,7 @@
                              */
                             this.onRunFilter = function (/*event*/)
                             {
-                                toolBoxController.runSelectedFilter();
+                                toolboxController.runSelectedFilter();
                             };
                         
                             /**
@@ -881,7 +937,7 @@
                              */
                             this.onChangeLineColour = function (/*event*/)
                             {
-                                toolBoxController.setLineColour(this.value);
+                                toolboxController.setLineColour(this.value);
                             };
                         
                             /**
@@ -891,7 +947,52 @@
                              */
                             this.onChangeMinMax = function (range)
                             {
-                                toolBoxController.setRange(range);
+                                toolboxController.setRange(range);
+                            };
+                        
+                            /**
+                             * Handle undo.
+                             * @method onUndo
+                             * @param {Object} event The associated event.
+                             */
+                            this.onUndo = function (/*event*/)
+                            {
+                                undoStack.undo();
+                            };
+                        
+                            /**
+                             * Handle redo.
+                             * @method onRedo
+                             * @param {Object} event The associated event.
+                             */
+                            this.onRedo = function (/*event*/)
+                            {
+                                undoStack.redo();
+                            };
+                        
+                            /**
+                             * Handle toggle of info layer.
+                             * @method onToggleInfoLayer
+                             * @param {Object} event The associated event.
+                             */
+                            this.onToggleInfoLayer = function (/*event*/)
+                            {
+                                self.toggleInfoLayerDisplay();
+                            };
+                            
+                            /**
+                             * Handle display reset.
+                             * @method onDisplayReset
+                             * @param {Object} event The change event.
+                             */
+                            this.onDisplayReset = function (/*event*/)
+                            {
+                                self.resetLayout();
+                                self.initWLDisplay();
+                                // update preset select
+                                var select = document.getElementById(&quot;presetSelect&quot;);
+                                select.selectedIndex = 0;
+                                dwv.gui.refreshSelect(&quot;#presetSelect&quot;);
                             };
                         
                             // Private Methods -----------------------------------------------------------
@@ -1005,7 +1106,7 @@
                                 // Call the event handler of the tool.
                                 if( handled )
                                 {
-                                    var func = self.getToolBox().getSelectedTool()[event.type];
+                                    var func = self.getToolbox().getSelectedTool()[event.type];
                                     if( func )
                                     {
                                         func(event);
@@ -1155,14 +1256,14 @@
                                 view.addEventListener(&quot;slicechange&quot;, self.onSliceChange);
                                 
                                 // initialise the toolbox
-                                if ( toolBox ) {
+                                if ( toolbox ) {
                                     // mouse and touch listeners
                                     self.addLayerListeners( imageLayer.getCanvas() );
                                     // keydown listener
                                     window.addEventListener(&quot;keydown&quot;, eventHandler, true);
                                     
-                                    toolBox.init();
-                                    toolBox.display(true);
+                                    toolbox.init();
+                                    toolbox.display(true);
                                 }
                                 
                                 // stop box listening to drag (after first drag)
@@ -1264,12 +1365,12 @@
                         }; // class dwv.ViewController
                         
                         /**
-                         * Tool Box controller.
-                         * @class ToolBoxController
+                         * Toolbox controller.
+                         * @class ToolboxController
                          * @namespace dwv
                          * @constructor
                          */
-                        dwv.ToolBoxController = function (toolbox)
+                        dwv.ToolboxController = function (toolbox)
                         {
                             /**
                              * Set the selected tool.
