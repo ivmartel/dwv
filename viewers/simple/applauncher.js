@@ -15,6 +15,7 @@ $(document).ready( function()
         "containerDivId": "dwv",
         "fitToWindow": true,
         "tools": ["Scroll", "Zoom/Pan", "Window/Level"],
+        "gui": ["tool"],
         "isMobile": true
     });
     dwv.gui.appendResetHtml(myapp);

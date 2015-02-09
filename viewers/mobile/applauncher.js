@@ -17,7 +17,7 @@ $(document).ready( function()
         "tools": ["Window/Level", "Zoom/Pan", "Scroll", "Draw", "Livewire", "Filter"],
         "filters": ["Threshold", "Sharpen", "Sobel"],
         "shapes": ["Line", "Protractor", "Rectangle", "Roi", "Ellipse"],
-        "gui": ["load", "help", "undo", "version"],
+        "gui": ["tool", "load", "help", "undo", "version"],
         "isMobile": true
     });
 

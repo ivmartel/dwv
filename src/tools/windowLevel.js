@@ -52,7 +52,7 @@ dwv.tool.WindowLevel = function(app)
      * @property gui
      * @type Object
      */
-    var gui = new dwv.gui.WindowLevel(app);
+    var gui = null;
     /**
      * Interaction start flag.
      * @property started
@@ -112,9 +112,11 @@ dwv.tool.WindowLevel = function(app)
             var windowWidth = parseInt(app.getView().getWindowLut().getWidth(), 10);
             app.getPresets().manual = {"center": windowCenter, "width": windowWidth};
             // update gui
-            gui.initialise();
-            // set selected
-            dwv.gui.setSelected("presetSelect", "Manual");
+            if ( gui ) {
+                gui.initialise();
+                // set selected
+                dwv.gui.setSelected("presetSelect", "Manual");
+            }
         }
     };
     
@@ -183,6 +185,7 @@ dwv.tool.WindowLevel = function(app)
      */
     this.setup = function ()
     {
+        gui = new dwv.gui.WindowLevel(app);
         gui.setup();
     };
     
@@ -193,11 +196,14 @@ dwv.tool.WindowLevel = function(app)
      */
     this.display = function (bool)
     {
-        if( app.getImage().getPhotometricInterpretation().match(/MONOCHROME/) !== null ) {
-            gui.display(bool);
-        }
-        else {
-            gui.display(false);
+        if ( gui )
+        {
+            if( app.getImage().getPhotometricInterpretation().match(/MONOCHROME/) !== null ) {
+                gui.display(bool);
+            }
+            else {
+                gui.display(false);
+            }
         }
     };
     
@@ -207,7 +213,9 @@ dwv.tool.WindowLevel = function(app)
      */
     this.init = function() {
         app.updatePresets(true);
-        gui.initialise();
+        if ( gui ) {
+            gui.initialise();
+        }
     };
 }; // WindowLevel class
 

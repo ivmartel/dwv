@@ -20,7 +20,7 @@ dwv.tool.Toolbox = function( toolList, app )
      * @property gui
      * @type Object
      */
-    var gui = new dwv.gui.Toolbox(app);
+    var gui = null;
     /**
      * Tool list.
      * @property toolList
@@ -47,6 +47,7 @@ dwv.tool.Toolbox = function( toolList, app )
     this.setup = function ()
     {
         if ( Object.keys(this.toolList).length !== 0 ) {
+            gui = new dwv.gui.Toolbox(app);
             gui.setup(this.toolList);
             for( var key in this.toolList ) {
                 this.toolList[key].setup();
@@ -61,7 +62,7 @@ dwv.tool.Toolbox = function( toolList, app )
      */
     this.display = function (bool)
     {
-        if ( Object.keys(this.toolList).length !== 0 ) {
+        if ( Object.keys(this.toolList).length !== 0 && gui ) {
             gui.display(bool);
         }
     };
@@ -87,7 +88,9 @@ dwv.tool.Toolbox = function( toolList, app )
             this.toolList[key].init();
         }    
         // init html
-        gui.initialise();
+        if ( gui ) {
+            gui.initialise();
+        }
     };
 };
 

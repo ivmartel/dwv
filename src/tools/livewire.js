@@ -27,7 +27,7 @@ dwv.tool.Livewire = function(app)
      * @property gui
      * @type Object
      */
-    var gui = new dwv.gui.Livewire(app);
+    var gui = null;
     /**
      * Interaction start flag.
      * @property started
@@ -289,6 +289,7 @@ dwv.tool.Livewire = function(app)
      */
     this.setup = function ()
     {
+        gui = new dwv.gui.Livewire(app);
         gui.setup();
     };
     
@@ -298,7 +299,9 @@ dwv.tool.Livewire = function(app)
      * @param {Boolean} bool The flag to enable or not.
      */
     this.display = function(bool){
-        gui.display(bool);
+        if ( gui ) {
+            gui.display(bool);
+        }
         // TODO why twice?
         this.init();
     };
@@ -309,10 +312,12 @@ dwv.tool.Livewire = function(app)
      */
     this.init = function()
     {
-        // set the default to the first in the list
-        this.setLineColour(gui.getColours()[0]);
-        // init html
-        gui.initialise();
+        if ( gui ) {
+            // set the default to the first in the list
+            this.setLineColour(gui.getColours()[0]);
+            // init html
+            gui.initialise();
+        }
         
         //scissors = new dwv.math.Scissors();
         scissors.setDimensions(

@@ -229,10 +229,13 @@ dwv.App = function()
             }
             toolbox = new dwv.tool.Toolbox(toolList, this);
             toolboxController = new dwv.ToolboxController(toolbox);
-            toolbox.setup();
         }
         // gui
         if ( config.gui ) {
+            // tools
+            if ( config.gui.indexOf("tool") !== -1 && toolbox) {
+                toolbox.setup();
+            }
             // load
             if ( config.gui.indexOf("load") !== -1 ) {
                 var fileLoadGui = new dwv.gui.FileLoad(this);
@@ -288,7 +291,7 @@ dwv.App = function()
         }
         // align layers when the window is resized
         if ( config.fitToWindow ) {
-            window.onresize = this.fitToWindow;
+            window.onresize = this.onResize;
         }
     };
     
@@ -465,15 +468,14 @@ dwv.App = function()
     };
 
     /**
-     * Fit the display to the window. To be called once the image is loaded.
-     * @method resize
+     * Fit the display to the given size. To be called once the image is loaded.
+     * @method fitToSize
      */
-    this.fitToWindow = function()
+    this.fitToSize = function (size)
     {
         // previous width
         var oldWidth = parseInt(windowScale*dataWidth, 10);
         // find new best fit
-        var size = dwv.gui.getWindowSize();
         windowScale = Math.min( (size.width / dataWidth), (size.height / dataHeight) );
         // new sizes
         var newWidth = parseInt(windowScale*dataWidth, 10);
@@ -647,6 +649,17 @@ dwv.App = function()
 
     // Controller Methods -----------------------------------------------------------
 
+    /**
+     * Handle resize.
+     * Fit the display to the window. To be called once the image is loaded.
+     * @method onResize
+     * @param {Object} event The change event.
+     */
+    this.onResize = function (/*event*/)
+    {
+        self.fitToSize(dwv.gui.getWindowSize());
+    };
+    
     /**
      * Handle zoom reset.
      * @method onZoomReset
@@ -1050,8 +1063,9 @@ dwv.App = function()
             });
         }
         // resize app
-        //windowScale = $('#'+containerDivId).width() / dataWidth;
-        self.fitToWindow();
+        self.fitToSize( { 
+            'width': $('#'+containerDivId).width(), 
+            'height': $('#'+containerDivId).height() } );
         self.resetLayout();
     }
     

@@ -32,7 +32,7 @@ dwv.tool.ZoomAndPan = function(app)
      * @property gui
      * @type Object
      */
-    var gui = new dwv.gui.ZoomAndPan(app);
+    var gui = null;
     /**
      * Interaction start flag.
      * @property started
@@ -229,6 +229,7 @@ dwv.tool.ZoomAndPan = function(app)
      */
     this.setup = function ()
     {
+        gui = new dwv.gui.ZoomAndPan(app);
         gui.setup();
     };
     
@@ -238,7 +239,9 @@ dwv.tool.ZoomAndPan = function(app)
      * @param {Boolean} bool The flag to enable or not.
      */
     this.display = function(bool){
-        gui.display(bool);
+        if ( gui ) {
+            gui.display(bool);
+        }
     };
 
     /**

@@ -32,7 +32,7 @@ dwv.tool.Scroll = function(app)
      * @property gui
      * @type Object
      */
-    var gui = new dwv.gui.Scroll(app);
+    var gui = null;
     /**
      * Interaction start flag.
      * @property started
@@ -144,6 +144,7 @@ dwv.tool.Scroll = function(app)
      */
     this.setup = function ()
     {
+        gui = new dwv.gui.Scroll(app);
         gui.setup();
     };
     
@@ -153,7 +154,9 @@ dwv.tool.Scroll = function(app)
      * @param {Boolean} bool The flag to enable or not.
      */
     this.display = function(bool){
-        gui.display(bool);
+        if ( gui ) {
+            gui.display(bool);
+        }
     };
 
 }; // Scroll class

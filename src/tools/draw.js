@@ -179,7 +179,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
      * @property gui
      * @type Object
      */
-    var gui = new dwv.gui.Draw(app);
+    var gui = null;
     /**
      * Interaction start flag.
      * @property started
@@ -465,6 +465,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
      */
     this.setup = function ()
     {
+        gui = new dwv.gui.Draw(app);
         gui.setup(this.shapeFactoryList);
     };
     
@@ -474,7 +475,9 @@ dwv.tool.Draw = function (app, shapeFactoryList)
      * @param {Boolean} flag The flag to enable or not.
      */
     this.display = function ( flag ){
-        gui.display( flag );
+        if ( gui ) {
+            gui.display( flag );
+        }
         // reset shape display properties
         shapeEditor.disable();
         shapeEditor.setShape(null);
@@ -680,10 +683,13 @@ dwv.tool.Draw = function (app, shapeFactoryList)
             break;
         }
         this.setShapeName(shapeName);
-        // same for color
-        this.setLineColour(gui.getColours()[0]);
-        // init html
-        gui.initialise();
+        // init gui
+        if ( gui ) {
+            // same for color
+            this.setLineColour(gui.getColours()[0]);
+            // init html
+            gui.initialise();
+        }
     };
 
 }; // Draw class

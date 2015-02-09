@@ -20,7 +20,7 @@ dwv.tool.Filter = function ( filterList, app )
      * @property gui
      * @type Object
      */
-    var gui = new dwv.gui.Filter(app);
+    var gui = null;
     /**
      * Filter list
      * @property filterList
@@ -53,6 +53,7 @@ dwv.tool.Filter = function ( filterList, app )
     this.setup = function ()
     {
         if ( Object.keys(this.filterList).length !== 0 ) {
+            gui = new dwv.gui.Filter(app);
             gui.setup(this.filterList);
             for( var key in this.filterList ){
                 this.filterList[key].setup();
@@ -67,7 +68,9 @@ dwv.tool.Filter = function ( filterList, app )
      */
     this.display = function (bool)
     {
-        gui.display(bool);
+        if ( gui ) {
+            gui.display(bool);
+        }
         this.displayed = bool;
         // display the selected filter
         this.selectedFilter.display(bool);
@@ -90,7 +93,9 @@ dwv.tool.Filter = function ( filterList, app )
             this.filterList[key].init();
         }    
         // init html
-        gui.initialise();
+        if ( gui ) {
+            gui.initialise();
+        }
     };
 
 }; // class dwv.tool.Filter
