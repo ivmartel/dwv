@@ -3,18 +3,18 @@
  */
 
 // Window
-dwv.gui.getWindowSize = function(){
+dwv.gui.getWindowSize = function () {
     return { 'width': ($('#pageMain').width() - 360), 'height': ($('#pageMain').height() - 75) };
 };
 // Progress
-dwv.gui.displayProgress = function(percent){
+dwv.gui.displayProgress = function (percent) {
     // jquery-ui progress bar
     if( percent <= 100 ) {
         $("#progressbar").progressbar({ value: percent });
     }
 };
 // Select
-dwv.gui.refreshSelect = function(/*selectName*/){
+dwv.gui.refreshSelect = function (/*selectName*/) {
     // nothing to do
 };
 // Slider
@@ -53,11 +53,9 @@ function toggle(dialogId)
     }
 }
 // Tags table
-dwv.gui.appendTagsTable = function(dataInfo){
-    dwv.gui.base.appendTagsTable(dataInfo);
-};
+dwv.gui.DicomTags = dwv.gui.base.DicomTags;
 
-//Loaders
+// Loaders
 dwv.gui.Loadbox = dwv.gui.base.Loadbox;
 // File loader
 dwv.gui.FileLoad = dwv.gui.base.FileLoad;

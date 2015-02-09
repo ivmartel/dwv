@@ -43,19 +43,12 @@
 <!-- Launch the app -->
 <script type="text/javascript">
 
-//Window
-dwv.gui.getWindowSize = function(){
-    return dwv.gui.base.getWindowSize();
-};
-//Progress
-dwv.gui.displayProgress = function (percent){};
-//Tags table
-dwv.gui.appendTagsTable = function (dataInfo){};
-//Window/level
-dwv.gui.Toolbox = dwv.gui.base.Toolbox;
-dwv.gui.WindowLevel = dwv.gui.base.WindowLevel;
+// Window
+dwv.gui.getWindowSize = dwv.gui.base.getWindowSize;
+// Progress
+dwv.gui.displayProgress = function (percent) {};
 
-//check browser support
+// check browser support
 dwv.browser.check();
 
 // launch when page is loaded
@@ -94,22 +87,34 @@ $(document).ready( function()
 <div data-role="content">
 
 <!-- Layer Container -->
-<div id="layerContainer0" style="float:left; border: 2px solid blue; padding: 2px; width: 200px; height: 200px;">
+<div id="layerContainer0" 
+    style="float:left; width: 200px; height: 200px; margin: 5px;">
 <canvas id="layerContainer0-imageLayer">Only for HTML5 compatible browsers...</canvas>
 </div><!-- /layerContainer -->
 
-<img src="dicompyler-ct.0.png" width="200px" style="float:left; margin: 10px"/>
-<p>Origin: dicompyler. Mod: CT, Photo: Monochrome2, Bits: 16-16-15, Pix VR: OX</p>
+
+<img src="dicompyler-ct.0.png" width="200px" height="200px" style="float:left; margin: 5px"/>
+
+<div style="clear:both"></div>
+
+<p>Origin: dicompyler (dicompyler/ct/ct.0.dcm). 
+Mod: CT, Photo: Monochrome2, Bits: 16-16-15, Pix VR: OX</p>
 
 <div style="clear:both"></div>
 
 <!-- Layer Container -->
-<div id="layerContainer1" style="float:left; border: 2px solid blue; padding: 2px; width: 200px; height: 200px;">
+<div id="layerContainer1" 
+    style="float:left; width: 200px; height: 200px; margin: 5px;">
 <canvas id="layerContainer1-imageLayer">Only for HTML5 compatible browsers...</canvas>
 </div><!-- /layerContainer -->
 
-<img src="toutatix.png" width="200px" style="float:left; margin: 10px"/>
-<p>Origin: osirix. Mod: CT, Photo: Monochrome2, Bits: 16-12-11, Pix VR: OW</p>
+<img src="toutatix.png" width="200px" height="200px" style="float:left; margin: 5px;"/>
+
+<div style="clear:both"></div>
+
+<p>Origin: Osirix (TOUTATIX/Cardiac 1CTA_CORONARY_ARTERIES_TESTBOLUS (Adult)/Heart w-o  
+1.5  B25f  55% /IM-0001-0100.dcm). 
+Mod: CT, Photo: Monochrome2, Bits: 16-12-11, Pix VR: OW</p>
 
 </div><!-- /content -->
 

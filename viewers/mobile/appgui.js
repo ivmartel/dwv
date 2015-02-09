@@ -3,23 +3,15 @@
  */
 
 // Window
-dwv.gui.getWindowSize = function(){
-    return dwv.gui.base.getWindowSize();
-};
+dwv.gui.getWindowSize = dwv.gui.base.getWindowSize;
 // Progress
-dwv.gui.displayProgress = function(percent){
-    dwv.gui.base.displayProgress(percent);
-};
+dwv.gui.displayProgress = dwv.gui.base.displayProgress;
 // Select
-dwv.gui.refreshSelect = function(selectName){
-    dwv.gui.base.refreshSelect(selectName);
-};
+dwv.gui.refreshSelect = dwv.gui.base.refreshSelect;
 // Slider
 dwv.gui.Slider = dwv.gui.base.Slider;
-// Tags table
-dwv.gui.appendTagsTable = function(dataInfo){
-    dwv.gui.base.appendTagsTable(dataInfo);
-};
+// Tags gui
+dwv.gui.DicomTags = dwv.gui.base.DicomTags;
 
 // Loaders
 dwv.gui.Loadbox = dwv.gui.base.Loadbox;

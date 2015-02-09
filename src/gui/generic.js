@@ -171,36 +171,45 @@ dwv.gui.base.Slider = function (app)
 }; // class dwv.gui.base.Slider
 
 /**
- * Create the DICOM tags table. To be called once the DICOM has been parsed.
- * @method createTagsTable
- * @private
- * @param {Object} dataInfo The data information.
+ * DICOM tags base gui.
+ * @class DicomTags
+ * @namespace dwv.gui.base
+ * @constructor
  */
-dwv.gui.base.appendTagsTable = function (dataInfo)
+dwv.gui.base.DicomTags = function ()
 {
-    // HTML node
-    var node = document.getElementById("tags");
-    if( node === null ) {
-        return;
-    }
-    // remove possible previous
-    while (node.hasChildNodes()) { 
-        node.removeChild(node.firstChild);
-    }
-    // tag list table (without the pixel data)
-    if(dataInfo.PixelData) {
-        dataInfo.PixelData.value = "...";
-    }
-    // tags HTML table
-    var table = dwv.html.toTable(dataInfo);
-    table.id = "tagsTable";
-    table.className = "tagsList table-stripe";
-    table.setAttribute("data-role", "table");
-    table.setAttribute("data-mode", "columntoggle");
-    // search form
-    node.appendChild(dwv.html.getHtmlSearchForm(table));
-    // tags table
-    node.appendChild(table);
-    // trigger create event (mobile)
-    $("#tags").trigger("create");
-};
+    /**
+     * Initialise the DICOM tags table. To be called once the DICOM has been parsed.
+     * @method initialise
+     * @param {Object} dataInfo The data information.
+     */
+    this.initialise = function (dataInfo)
+    {
+        // HTML node
+        var node = document.getElementById("tags");
+        if( node === null ) {
+            return;
+        }
+        // remove possible previous
+        while (node.hasChildNodes()) { 
+            node.removeChild(node.firstChild);
+        }
+        // tag list table (without the pixel data)
+        if(dataInfo.PixelData) {
+            dataInfo.PixelData.value = "...";
+        }
+        // tags HTML table
+        var table = dwv.html.toTable(dataInfo);
+        table.id = "tagsTable";
+        table.className = "tagsList table-stripe";
+        table.setAttribute("data-role", "table");
+        table.setAttribute("data-mode", "columntoggle");
+        // search form
+        node.appendChild(dwv.html.getHtmlSearchForm(table));
+        // tags table
+        node.appendChild(table);
+        // trigger create event (mobile)
+        $("#tags").trigger("create");
+    };
+    
+}; // class dwv.gui.base.DicomTags

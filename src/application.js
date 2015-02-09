@@ -44,7 +44,9 @@ dwv.App = function()
     var plotInfo = null;
     var windowingInfo = null;
     var positionInfo = null;
-    var miniColorMap = null;    
+    var miniColorMap = null; 
+    
+    var tagsGui = null;
     
     // Image layer
     var imageLayer = null;
@@ -160,7 +162,7 @@ dwv.App = function()
     this.init = function ( config ) {
         containerDivId = config.containerDivId;
         // tools
-        if ( config.tools.length !== 0 ) {
+        if ( config.tools && config.tools.length !== 0 ) {
             // setup the tool list
             var toolList = {};
             for ( var t = 0; t < config.tools.length; ++t ) {
@@ -251,6 +253,10 @@ dwv.App = function()
             if ( config.gui.indexOf("undo") !== -1 ) {
                 undoStack = new dwv.tool.UndoStack();
                 undoStack.setup();
+            }
+            // DICOM Tags
+            if ( config.gui.indexOf("tags") !== -1 ) {
+                tagsGui = new dwv.gui.DicomTags();
             }
             // version number
             if ( config.gui.indexOf("version") !== -1 ) {
@@ -1086,7 +1092,9 @@ dwv.App = function()
         view = data.view;
         viewController = new dwv.ViewController(view);
         // append the DICOM tags table
-        dwv.gui.appendTagsTable(data.info);
+        if ( tagsGui ) {
+            tagsGui.initialise(data.info);
+        }
         // store image
         originalImage = view.getImage();
         image = originalImage;
