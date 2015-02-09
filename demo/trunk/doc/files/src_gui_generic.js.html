@@ -43,6 +43,7 @@
                                 <li><a href="../classes/dwv.dicom.DataReader.html">dwv.dicom.DataReader</a></li>
                                 <li><a href="../classes/dwv.dicom.DicomParser.html">dwv.dicom.DicomParser</a></li>
                                 <li><a href="../classes/dwv.gui.html">dwv.gui</a></li>
+                                <li><a href="../classes/dwv.gui.base.DicomTags.html">dwv.gui.base.DicomTags</a></li>
                                 <li><a href="../classes/dwv.gui.base.Draw.html">dwv.gui.base.Draw</a></li>
                                 <li><a href="../classes/dwv.gui.base.FileLoad.html">dwv.gui.base.FileLoad</a></li>
                                 <li><a href="../classes/dwv.gui.base.Filter.html">dwv.gui.base.Filter</a></li>
@@ -335,39 +336,48 @@
                         }; // class dwv.gui.base.Slider
                         
                         /**
-                         * Create the DICOM tags table. To be called once the DICOM has been parsed.
-                         * @method createTagsTable
-                         * @private
-                         * @param {Object} dataInfo The data information.
+                         * DICOM tags base gui.
+                         * @class DicomTags
+                         * @namespace dwv.gui.base
+                         * @constructor
                          */
-                        dwv.gui.base.appendTagsTable = function (dataInfo)
+                        dwv.gui.base.DicomTags = function ()
                         {
-                            // HTML node
-                            var node = document.getElementById(&quot;tags&quot;);
-                            if( node === null ) {
-                                return;
-                            }
-                            // remove possible previous
-                            while (node.hasChildNodes()) { 
-                                node.removeChild(node.firstChild);
-                            }
-                            // tag list table (without the pixel data)
-                            if(dataInfo.PixelData) {
-                                dataInfo.PixelData.value = &quot;...&quot;;
-                            }
-                            // tags HTML table
-                            var table = dwv.html.toTable(dataInfo);
-                            table.id = &quot;tagsTable&quot;;
-                            table.className = &quot;tagsList table-stripe&quot;;
-                            table.setAttribute(&quot;data-role&quot;, &quot;table&quot;);
-                            table.setAttribute(&quot;data-mode&quot;, &quot;columntoggle&quot;);
-                            // search form
-                            node.appendChild(dwv.html.getHtmlSearchForm(table));
-                            // tags table
-                            node.appendChild(table);
-                            // trigger create event (mobile)
-                            $(&quot;#tags&quot;).trigger(&quot;create&quot;);
-                        };
+                            /**
+                             * Initialise the DICOM tags table. To be called once the DICOM has been parsed.
+                             * @method initialise
+                             * @param {Object} dataInfo The data information.
+                             */
+                            this.initialise = function (dataInfo)
+                            {
+                                // HTML node
+                                var node = document.getElementById(&quot;tags&quot;);
+                                if( node === null ) {
+                                    return;
+                                }
+                                // remove possible previous
+                                while (node.hasChildNodes()) { 
+                                    node.removeChild(node.firstChild);
+                                }
+                                // tag list table (without the pixel data)
+                                if(dataInfo.PixelData) {
+                                    dataInfo.PixelData.value = &quot;...&quot;;
+                                }
+                                // tags HTML table
+                                var table = dwv.html.toTable(dataInfo);
+                                table.id = &quot;tagsTable&quot;;
+                                table.className = &quot;tagsList table-stripe&quot;;
+                                table.setAttribute(&quot;data-role&quot;, &quot;table&quot;);
+                                table.setAttribute(&quot;data-mode&quot;, &quot;columntoggle&quot;);
+                                // search form
+                                node.appendChild(dwv.html.getHtmlSearchForm(table));
+                                // tags table
+                                node.appendChild(table);
+                                // trigger create event (mobile)
+                                $(&quot;#tags&quot;).trigger(&quot;create&quot;);
+                            };
+                            
+                        }; // class dwv.gui.base.DicomTags
                         
                             </pre>
                         </div>

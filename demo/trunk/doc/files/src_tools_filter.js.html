@@ -43,6 +43,7 @@
                                 <li><a href="../classes/dwv.dicom.DataReader.html">dwv.dicom.DataReader</a></li>
                                 <li><a href="../classes/dwv.dicom.DicomParser.html">dwv.dicom.DicomParser</a></li>
                                 <li><a href="../classes/dwv.gui.html">dwv.gui</a></li>
+                                <li><a href="../classes/dwv.gui.base.DicomTags.html">dwv.gui.base.DicomTags</a></li>
                                 <li><a href="../classes/dwv.gui.base.Draw.html">dwv.gui.base.Draw</a></li>
                                 <li><a href="../classes/dwv.gui.base.FileLoad.html">dwv.gui.base.FileLoad</a></li>
                                 <li><a href="../classes/dwv.gui.base.Filter.html">dwv.gui.base.Filter</a></li>
@@ -184,7 +185,7 @@
                              * @property gui
                              * @type Object
                              */
-                            var gui = new dwv.gui.Filter(app);
+                            var gui = null;
                             /**
                              * Filter list
                              * @property filterList
@@ -217,6 +218,7 @@
                             this.setup = function ()
                             {
                                 if ( Object.keys(this.filterList).length !== 0 ) {
+                                    gui = new dwv.gui.Filter(app);
                                     gui.setup(this.filterList);
                                     for( var key in this.filterList ){
                                         this.filterList[key].setup();
@@ -231,7 +233,9 @@
                              */
                             this.display = function (bool)
                             {
-                                gui.display(bool);
+                                if ( gui ) {
+                                    gui.display(bool);
+                                }
                                 this.displayed = bool;
                                 // display the selected filter
                                 this.selectedFilter.display(bool);
@@ -254,7 +258,9 @@
                                     this.filterList[key].init();
                                 }    
                                 // init html
-                                gui.initialise();
+                                if ( gui ) {
+                                    gui.initialise();
+                                }
                             };
                         
                         }; // class dwv.tool.Filter

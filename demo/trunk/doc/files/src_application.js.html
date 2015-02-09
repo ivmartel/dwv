@@ -43,6 +43,7 @@
                                 <li><a href="../classes/dwv.dicom.DataReader.html">dwv.dicom.DataReader</a></li>
                                 <li><a href="../classes/dwv.dicom.DicomParser.html">dwv.dicom.DicomParser</a></li>
                                 <li><a href="../classes/dwv.gui.html">dwv.gui</a></li>
+                                <li><a href="../classes/dwv.gui.base.DicomTags.html">dwv.gui.base.DicomTags</a></li>
                                 <li><a href="../classes/dwv.gui.base.Draw.html">dwv.gui.base.Draw</a></li>
                                 <li><a href="../classes/dwv.gui.base.FileLoad.html">dwv.gui.base.FileLoad</a></li>
                                 <li><a href="../classes/dwv.gui.base.Filter.html">dwv.gui.base.Filter</a></li>
@@ -208,7 +209,9 @@
                             var plotInfo = null;
                             var windowingInfo = null;
                             var positionInfo = null;
-                            var miniColorMap = null;    
+                            var miniColorMap = null; 
+                            
+                            var tagsGui = null;
                             
                             // Image layer
                             var imageLayer = null;
@@ -324,7 +327,7 @@
                             this.init = function ( config ) {
                                 containerDivId = config.containerDivId;
                                 // tools
-                                if ( config.tools.length !== 0 ) {
+                                if ( config.tools &amp;&amp; config.tools.length !== 0 ) {
                                     // setup the tool list
                                     var toolList = {};
                                     for ( var t = 0; t &lt; config.tools.length; ++t ) {
@@ -393,10 +396,13 @@
                                     }
                                     toolbox = new dwv.tool.Toolbox(toolList, this);
                                     toolboxController = new dwv.ToolboxController(toolbox);
-                                    toolbox.setup();
                                 }
                                 // gui
                                 if ( config.gui ) {
+                                    // tools
+                                    if ( config.gui.indexOf(&quot;tool&quot;) !== -1 &amp;&amp; toolbox) {
+                                        toolbox.setup();
+                                    }
                                     // load
                                     if ( config.gui.indexOf(&quot;load&quot;) !== -1 ) {
                                         var fileLoadGui = new dwv.gui.FileLoad(this);
@@ -412,6 +418,10 @@
                                     if ( config.gui.indexOf(&quot;undo&quot;) !== -1 ) {
                                         undoStack = new dwv.tool.UndoStack();
                                         undoStack.setup();
+                                    }
+                                    // DICOM Tags
+                                    if ( config.gui.indexOf(&quot;tags&quot;) !== -1 ) {
+                                        tagsGui = new dwv.gui.DicomTags();
                                     }
                                     // version number
                                     if ( config.gui.indexOf(&quot;version&quot;) !== -1 ) {
@@ -452,7 +462,7 @@
                                 }
                                 // align layers when the window is resized
                                 if ( config.fitToWindow ) {
-                                    window.onresize = this.fitToWindow;
+                                    window.onresize = this.onResize;
                                 }
                             };
                             
@@ -629,15 +639,14 @@
                             };
                         
                             /**
-                             * Fit the display to the window. To be called once the image is loaded.
-                             * @method resize
+                             * Fit the display to the given size. To be called once the image is loaded.
+                             * @method fitToSize
                              */
-                            this.fitToWindow = function()
+                            this.fitToSize = function (size)
                             {
                                 // previous width
                                 var oldWidth = parseInt(windowScale*dataWidth, 10);
                                 // find new best fit
-                                var size = dwv.gui.getWindowSize();
                                 windowScale = Math.min( (size.width / dataWidth), (size.height / dataHeight) );
                                 // new sizes
                                 var newWidth = parseInt(windowScale*dataWidth, 10);
@@ -811,6 +820,17 @@
                         
                             // Controller Methods -----------------------------------------------------------
                         
+                            /**
+                             * Handle resize.
+                             * Fit the display to the window. To be called once the image is loaded.
+                             * @method onResize
+                             * @param {Object} event The change event.
+                             */
+                            this.onResize = function (/*event*/)
+                            {
+                                self.fitToSize(dwv.gui.getWindowSize());
+                            };
+                            
                             /**
                              * Handle zoom reset.
                              * @method onZoomReset
@@ -1214,8 +1234,9 @@
                                     });
                                 }
                                 // resize app
-                                //windowScale = $(&#x27;#&#x27;+containerDivId).width() / dataWidth;
-                                self.fitToWindow();
+                                self.fitToSize( { 
+                                    &#x27;width&#x27;: $(&#x27;#&#x27;+containerDivId).width(), 
+                                    &#x27;height&#x27;: $(&#x27;#&#x27;+containerDivId).height() } );
                                 self.resetLayout();
                             }
                             
@@ -1236,7 +1257,9 @@
                                 view = data.view;
                                 viewController = new dwv.ViewController(view);
                                 // append the DICOM tags table
-                                dwv.gui.appendTagsTable(data.info);
+                                if ( tagsGui ) {
+                                    tagsGui.initialise(data.info);
+                                }
                                 // store image
                                 originalImage = view.getImage();
                                 image = originalImage;

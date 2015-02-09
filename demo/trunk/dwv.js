@@ -44,7 +44,9 @@ dwv.App = function()
     var plotInfo = null;
     var windowingInfo = null;
     var positionInfo = null;
-    var miniColorMap = null;    
+    var miniColorMap = null; 
+    
+    var tagsGui = null;
     
     // Image layer
     var imageLayer = null;
@@ -160,7 +162,7 @@ dwv.App = function()
     this.init = function ( config ) {
         containerDivId = config.containerDivId;
         // tools
-        if ( config.tools.length !== 0 ) {
+        if ( config.tools && config.tools.length !== 0 ) {
             // setup the tool list
             var toolList = {};
             for ( var t = 0; t < config.tools.length; ++t ) {
@@ -229,10 +231,13 @@ dwv.App = function()
             }
             toolbox = new dwv.tool.Toolbox(toolList, this);
             toolboxController = new dwv.ToolboxController(toolbox);
-            toolbox.setup();
         }
         // gui
         if ( config.gui ) {
+            // tools
+            if ( config.gui.indexOf("tool") !== -1 && toolbox) {
+                toolbox.setup();
+            }
             // load
             if ( config.gui.indexOf("load") !== -1 ) {
                 var fileLoadGui = new dwv.gui.FileLoad(this);
@@ -248,6 +253,10 @@ dwv.App = function()
             if ( config.gui.indexOf("undo") !== -1 ) {
                 undoStack = new dwv.tool.UndoStack();
                 undoStack.setup();
+            }
+            // DICOM Tags
+            if ( config.gui.indexOf("tags") !== -1 ) {
+                tagsGui = new dwv.gui.DicomTags();
             }
             // version number
             if ( config.gui.indexOf("version") !== -1 ) {
@@ -288,7 +297,7 @@ dwv.App = function()
         }
         // align layers when the window is resized
         if ( config.fitToWindow ) {
-            window.onresize = this.fitToWindow;
+            window.onresize = this.onResize;
         }
     };
     
@@ -465,15 +474,14 @@ dwv.App = function()
     };
 
     /**
-     * Fit the display to the window. To be called once the image is loaded.
-     * @method resize
+     * Fit the display to the given size. To be called once the image is loaded.
+     * @method fitToSize
      */
-    this.fitToWindow = function()
+    this.fitToSize = function (size)
     {
         // previous width
         var oldWidth = parseInt(windowScale*dataWidth, 10);
         // find new best fit
-        var size = dwv.gui.getWindowSize();
         windowScale = Math.min( (size.width / dataWidth), (size.height / dataHeight) );
         // new sizes
         var newWidth = parseInt(windowScale*dataWidth, 10);
@@ -647,6 +655,17 @@ dwv.App = function()
 
     // Controller Methods -----------------------------------------------------------
 
+    /**
+     * Handle resize.
+     * Fit the display to the window. To be called once the image is loaded.
+     * @method onResize
+     * @param {Object} event The change event.
+     */
+    this.onResize = function (/*event*/)
+    {
+        self.fitToSize(dwv.gui.getWindowSize());
+    };
+    
     /**
      * Handle zoom reset.
      * @method onZoomReset
@@ -1050,8 +1069,9 @@ dwv.App = function()
             });
         }
         // resize app
-        //windowScale = $('#'+containerDivId).width() / dataWidth;
-        self.fitToWindow();
+        self.fitToSize( { 
+            'width': $('#'+containerDivId).width(), 
+            'height': $('#'+containerDivId).height() } );
         self.resetLayout();
     }
     
@@ -1072,7 +1092,9 @@ dwv.App = function()
         view = data.view;
         viewController = new dwv.ViewController(view);
         // append the DICOM tags table
-        dwv.gui.appendTagsTable(data.info);
+        if ( tagsGui ) {
+            tagsGui.initialise(data.info);
+        }
         // store image
         originalImage = view.getImage();
         image = originalImage;
@@ -4186,39 +4208,48 @@ dwv.gui.base.Slider = function (app)
 }; // class dwv.gui.base.Slider
 
 /**
- * Create the DICOM tags table. To be called once the DICOM has been parsed.
- * @method createTagsTable
- * @private
- * @param {Object} dataInfo The data information.
+ * DICOM tags base gui.
+ * @class DicomTags
+ * @namespace dwv.gui.base
+ * @constructor
  */
-dwv.gui.base.appendTagsTable = function (dataInfo)
+dwv.gui.base.DicomTags = function ()
 {
-    // HTML node
-    var node = document.getElementById("tags");
-    if( node === null ) {
-        return;
-    }
-    // remove possible previous
-    while (node.hasChildNodes()) { 
-        node.removeChild(node.firstChild);
-    }
-    // tag list table (without the pixel data)
-    if(dataInfo.PixelData) {
-        dataInfo.PixelData.value = "...";
-    }
-    // tags HTML table
-    var table = dwv.html.toTable(dataInfo);
-    table.id = "tagsTable";
-    table.className = "tagsList table-stripe";
-    table.setAttribute("data-role", "table");
-    table.setAttribute("data-mode", "columntoggle");
-    // search form
-    node.appendChild(dwv.html.getHtmlSearchForm(table));
-    // tags table
-    node.appendChild(table);
-    // trigger create event (mobile)
-    $("#tags").trigger("create");
-};
+    /**
+     * Initialise the DICOM tags table. To be called once the DICOM has been parsed.
+     * @method initialise
+     * @param {Object} dataInfo The data information.
+     */
+    this.initialise = function (dataInfo)
+    {
+        // HTML node
+        var node = document.getElementById("tags");
+        if( node === null ) {
+            return;
+        }
+        // remove possible previous
+        while (node.hasChildNodes()) { 
+            node.removeChild(node.firstChild);
+        }
+        // tag list table (without the pixel data)
+        if(dataInfo.PixelData) {
+            dataInfo.PixelData.value = "...";
+        }
+        // tags HTML table
+        var table = dwv.html.toTable(dataInfo);
+        table.id = "tagsTable";
+        table.className = "tagsList table-stripe";
+        table.setAttribute("data-role", "table");
+        table.setAttribute("data-mode", "columntoggle");
+        // search form
+        node.appendChild(dwv.html.getHtmlSearchForm(table));
+        // tags table
+        node.appendChild(table);
+        // trigger create event (mobile)
+        $("#tags").trigger("create");
+    };
+    
+}; // class dwv.gui.base.DicomTags
 ;/** 
  * GUI module.
  * @module gui
@@ -9994,7 +10025,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
      * @property gui
      * @type Object
      */
-    var gui = new dwv.gui.Draw(app);
+    var gui = null;
     /**
      * Interaction start flag.
      * @property started
@@ -10280,6 +10311,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
      */
     this.setup = function ()
     {
+        gui = new dwv.gui.Draw(app);
         gui.setup(this.shapeFactoryList);
     };
     
@@ -10289,7 +10321,9 @@ dwv.tool.Draw = function (app, shapeFactoryList)
      * @param {Boolean} flag The flag to enable or not.
      */
     this.display = function ( flag ){
-        gui.display( flag );
+        if ( gui ) {
+            gui.display( flag );
+        }
         // reset shape display properties
         shapeEditor.disable();
         shapeEditor.setShape(null);
@@ -10495,10 +10529,13 @@ dwv.tool.Draw = function (app, shapeFactoryList)
             break;
         }
         this.setShapeName(shapeName);
-        // same for color
-        this.setLineColour(gui.getColours()[0]);
-        // init html
-        gui.initialise();
+        // init gui
+        if ( gui ) {
+            // same for color
+            this.setLineColour(gui.getColours()[0]);
+            // init html
+            gui.initialise();
+        }
     };
 
 }; // Draw class
@@ -11126,7 +11163,7 @@ dwv.tool.Filter = function ( filterList, app )
      * @property gui
      * @type Object
      */
-    var gui = new dwv.gui.Filter(app);
+    var gui = null;
     /**
      * Filter list
      * @property filterList
@@ -11159,6 +11196,7 @@ dwv.tool.Filter = function ( filterList, app )
     this.setup = function ()
     {
         if ( Object.keys(this.filterList).length !== 0 ) {
+            gui = new dwv.gui.Filter(app);
             gui.setup(this.filterList);
             for( var key in this.filterList ){
                 this.filterList[key].setup();
@@ -11173,7 +11211,9 @@ dwv.tool.Filter = function ( filterList, app )
      */
     this.display = function (bool)
     {
-        gui.display(bool);
+        if ( gui ) {
+            gui.display(bool);
+        }
         this.displayed = bool;
         // display the selected filter
         this.selectedFilter.display(bool);
@@ -11196,7 +11236,9 @@ dwv.tool.Filter = function ( filterList, app )
             this.filterList[key].init();
         }    
         // init html
-        gui.initialise();
+        if ( gui ) {
+            gui.initialise();
+        }
     };
 
 }; // class dwv.tool.Filter
@@ -11906,7 +11948,7 @@ dwv.tool.Livewire = function(app)
      * @property gui
      * @type Object
      */
-    var gui = new dwv.gui.Livewire(app);
+    var gui = null;
     /**
      * Interaction start flag.
      * @property started
@@ -12168,6 +12210,7 @@ dwv.tool.Livewire = function(app)
      */
     this.setup = function ()
     {
+        gui = new dwv.gui.Livewire(app);
         gui.setup();
     };
     
@@ -12177,7 +12220,9 @@ dwv.tool.Livewire = function(app)
      * @param {Boolean} bool The flag to enable or not.
      */
     this.display = function(bool){
-        gui.display(bool);
+        if ( gui ) {
+            gui.display(bool);
+        }
         // TODO why twice?
         this.init();
     };
@@ -12188,10 +12233,12 @@ dwv.tool.Livewire = function(app)
      */
     this.init = function()
     {
-        // set the default to the first in the list
-        this.setLineColour(gui.getColours()[0]);
-        // init html
-        gui.initialise();
+        if ( gui ) {
+            // set the default to the first in the list
+            this.setLineColour(gui.getColours()[0]);
+            // init html
+            gui.initialise();
+        }
         
         //scissors = new dwv.math.Scissors();
         scissors.setDimensions(
@@ -12696,7 +12743,7 @@ dwv.tool.Scroll = function(app)
      * @property gui
      * @type Object
      */
-    var gui = new dwv.gui.Scroll(app);
+    var gui = null;
     /**
      * Interaction start flag.
      * @property started
@@ -12808,6 +12855,7 @@ dwv.tool.Scroll = function(app)
      */
     this.setup = function ()
     {
+        gui = new dwv.gui.Scroll(app);
         gui.setup();
     };
     
@@ -12817,7 +12865,9 @@ dwv.tool.Scroll = function(app)
      * @param {Boolean} bool The flag to enable or not.
      */
     this.display = function(bool){
-        gui.display(bool);
+        if ( gui ) {
+            gui.display(bool);
+        }
     };
 
 }; // Scroll class
@@ -12870,7 +12920,7 @@ dwv.tool.Toolbox = function( toolList, app )
      * @property gui
      * @type Object
      */
-    var gui = new dwv.gui.Toolbox(app);
+    var gui = null;
     /**
      * Tool list.
      * @property toolList
@@ -12897,6 +12947,7 @@ dwv.tool.Toolbox = function( toolList, app )
     this.setup = function ()
     {
         if ( Object.keys(this.toolList).length !== 0 ) {
+            gui = new dwv.gui.Toolbox(app);
             gui.setup(this.toolList);
             for( var key in this.toolList ) {
                 this.toolList[key].setup();
@@ -12911,7 +12962,7 @@ dwv.tool.Toolbox = function( toolList, app )
      */
     this.display = function (bool)
     {
-        if ( Object.keys(this.toolList).length !== 0 ) {
+        if ( Object.keys(this.toolList).length !== 0 && gui ) {
             gui.display(bool);
         }
     };
@@ -12937,7 +12988,9 @@ dwv.tool.Toolbox = function( toolList, app )
             this.toolList[key].init();
         }    
         // init html
-        gui.initialise();
+        if ( gui ) {
+            gui.initialise();
+        }
     };
 };
 
@@ -13170,7 +13223,7 @@ dwv.tool.WindowLevel = function(app)
      * @property gui
      * @type Object
      */
-    var gui = new dwv.gui.WindowLevel(app);
+    var gui = null;
     /**
      * Interaction start flag.
      * @property started
@@ -13230,9 +13283,11 @@ dwv.tool.WindowLevel = function(app)
             var windowWidth = parseInt(app.getView().getWindowLut().getWidth(), 10);
             app.getPresets().manual = {"center": windowCenter, "width": windowWidth};
             // update gui
-            gui.initialise();
-            // set selected
-            dwv.gui.setSelected("presetSelect", "Manual");
+            if ( gui ) {
+                gui.initialise();
+                // set selected
+                dwv.gui.setSelected("presetSelect", "Manual");
+            }
         }
     };
     
@@ -13301,6 +13356,7 @@ dwv.tool.WindowLevel = function(app)
      */
     this.setup = function ()
     {
+        gui = new dwv.gui.WindowLevel(app);
         gui.setup();
     };
     
@@ -13311,11 +13367,14 @@ dwv.tool.WindowLevel = function(app)
      */
     this.display = function (bool)
     {
-        if( app.getImage().getPhotometricInterpretation().match(/MONOCHROME/) !== null ) {
-            gui.display(bool);
-        }
-        else {
-            gui.display(false);
+        if ( gui )
+        {
+            if( app.getImage().getPhotometricInterpretation().match(/MONOCHROME/) !== null ) {
+                gui.display(bool);
+            }
+            else {
+                gui.display(false);
+            }
         }
     };
     
@@ -13325,7 +13384,9 @@ dwv.tool.WindowLevel = function(app)
      */
     this.init = function() {
         app.updatePresets(true);
-        gui.initialise();
+        if ( gui ) {
+            gui.initialise();
+        }
     };
 }; // WindowLevel class
 
@@ -13382,7 +13443,7 @@ dwv.tool.ZoomAndPan = function(app)
      * @property gui
      * @type Object
      */
-    var gui = new dwv.gui.ZoomAndPan(app);
+    var gui = null;
     /**
      * Interaction start flag.
      * @property started
@@ -13579,6 +13640,7 @@ dwv.tool.ZoomAndPan = function(app)
      */
     this.setup = function ()
     {
+        gui = new dwv.gui.ZoomAndPan(app);
         gui.setup();
     };
     
@@ -13588,7 +13650,9 @@ dwv.tool.ZoomAndPan = function(app)
      * @param {Boolean} bool The flag to enable or not.
      */
     this.display = function(bool){
-        gui.display(bool);
+        if ( gui ) {
+            gui.display(bool);
+        }
     };
 
     /**

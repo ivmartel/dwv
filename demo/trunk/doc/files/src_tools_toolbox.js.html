@@ -43,6 +43,7 @@
                                 <li><a href="../classes/dwv.dicom.DataReader.html">dwv.dicom.DataReader</a></li>
                                 <li><a href="../classes/dwv.dicom.DicomParser.html">dwv.dicom.DicomParser</a></li>
                                 <li><a href="../classes/dwv.gui.html">dwv.gui</a></li>
+                                <li><a href="../classes/dwv.gui.base.DicomTags.html">dwv.gui.base.DicomTags</a></li>
                                 <li><a href="../classes/dwv.gui.base.Draw.html">dwv.gui.base.Draw</a></li>
                                 <li><a href="../classes/dwv.gui.base.FileLoad.html">dwv.gui.base.FileLoad</a></li>
                                 <li><a href="../classes/dwv.gui.base.Filter.html">dwv.gui.base.Filter</a></li>
@@ -184,7 +185,7 @@
                              * @property gui
                              * @type Object
                              */
-                            var gui = new dwv.gui.Toolbox(app);
+                            var gui = null;
                             /**
                              * Tool list.
                              * @property toolList
@@ -211,6 +212,7 @@
                             this.setup = function ()
                             {
                                 if ( Object.keys(this.toolList).length !== 0 ) {
+                                    gui = new dwv.gui.Toolbox(app);
                                     gui.setup(this.toolList);
                                     for( var key in this.toolList ) {
                                         this.toolList[key].setup();
@@ -225,7 +227,7 @@
                              */
                             this.display = function (bool)
                             {
-                                if ( Object.keys(this.toolList).length !== 0 ) {
+                                if ( Object.keys(this.toolList).length !== 0 &amp;&amp; gui ) {
                                     gui.display(bool);
                                 }
                             };
@@ -251,7 +253,9 @@
                                     this.toolList[key].init();
                                 }    
                                 // init html
-                                gui.initialise();
+                                if ( gui ) {
+                                    gui.initialise();
+                                }
                             };
                         };
                         

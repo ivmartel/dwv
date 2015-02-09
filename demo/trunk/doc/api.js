@@ -8,6 +8,7 @@ YUI.add("yuidoc-meta", function(Y) {
         "dwv.dicom.DataReader",
         "dwv.dicom.DicomParser",
         "dwv.gui",
+        "dwv.gui.base.DicomTags",
         "dwv.gui.base.Draw",
         "dwv.gui.base.FileLoad",
         "dwv.gui.base.Filter",

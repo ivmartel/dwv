@@ -43,6 +43,7 @@
                                 <li><a href="../classes/dwv.dicom.DataReader.html">dwv.dicom.DataReader</a></li>
                                 <li><a href="../classes/dwv.dicom.DicomParser.html">dwv.dicom.DicomParser</a></li>
                                 <li><a href="../classes/dwv.gui.html">dwv.gui</a></li>
+                                <li><a href="../classes/dwv.gui.base.DicomTags.html">dwv.gui.base.DicomTags</a></li>
                                 <li><a href="../classes/dwv.gui.base.Draw.html">dwv.gui.base.Draw</a></li>
                                 <li><a href="../classes/dwv.gui.base.FileLoad.html">dwv.gui.base.FileLoad</a></li>
                                 <li><a href="../classes/dwv.gui.base.Filter.html">dwv.gui.base.Filter</a></li>
@@ -216,7 +217,7 @@
                              * @property gui
                              * @type Object
                              */
-                            var gui = new dwv.gui.WindowLevel(app);
+                            var gui = null;
                             /**
                              * Interaction start flag.
                              * @property started
@@ -276,9 +277,11 @@
                                     var windowWidth = parseInt(app.getView().getWindowLut().getWidth(), 10);
                                     app.getPresets().manual = {&quot;center&quot;: windowCenter, &quot;width&quot;: windowWidth};
                                     // update gui
-                                    gui.initialise();
-                                    // set selected
-                                    dwv.gui.setSelected(&quot;presetSelect&quot;, &quot;Manual&quot;);
+                                    if ( gui ) {
+                                        gui.initialise();
+                                        // set selected
+                                        dwv.gui.setSelected(&quot;presetSelect&quot;, &quot;Manual&quot;);
+                                    }
                                 }
                             };
                             
@@ -347,6 +350,7 @@
                              */
                             this.setup = function ()
                             {
+                                gui = new dwv.gui.WindowLevel(app);
                                 gui.setup();
                             };
                             
@@ -357,11 +361,14 @@
                              */
                             this.display = function (bool)
                             {
-                                if( app.getImage().getPhotometricInterpretation().match(/MONOCHROME/) !== null ) {
-                                    gui.display(bool);
-                                }
-                                else {
-                                    gui.display(false);
+                                if ( gui )
+                                {
+                                    if( app.getImage().getPhotometricInterpretation().match(/MONOCHROME/) !== null ) {
+                                        gui.display(bool);
+                                    }
+                                    else {
+                                        gui.display(false);
+                                    }
                                 }
                             };
                             
@@ -371,7 +378,9 @@
                              */
                             this.init = function() {
                                 app.updatePresets(true);
-                                gui.initialise();
+                                if ( gui ) {
+                                    gui.initialise();
+                                }
                             };
                         }; // WindowLevel class
                         

@@ -43,6 +43,7 @@
                                 <li><a href="../classes/dwv.dicom.DataReader.html">dwv.dicom.DataReader</a></li>
                                 <li><a href="../classes/dwv.dicom.DicomParser.html">dwv.dicom.DicomParser</a></li>
                                 <li><a href="../classes/dwv.gui.html">dwv.gui</a></li>
+                                <li><a href="../classes/dwv.gui.base.DicomTags.html">dwv.gui.base.DicomTags</a></li>
                                 <li><a href="../classes/dwv.gui.base.Draw.html">dwv.gui.base.Draw</a></li>
                                 <li><a href="../classes/dwv.gui.base.FileLoad.html">dwv.gui.base.FileLoad</a></li>
                                 <li><a href="../classes/dwv.gui.base.Filter.html">dwv.gui.base.Filter</a></li>
@@ -196,7 +197,7 @@
                              * @property gui
                              * @type Object
                              */
-                            var gui = new dwv.gui.Scroll(app);
+                            var gui = null;
                             /**
                              * Interaction start flag.
                              * @property started
@@ -308,6 +309,7 @@
                              */
                             this.setup = function ()
                             {
+                                gui = new dwv.gui.Scroll(app);
                                 gui.setup();
                             };
                             
@@ -317,7 +319,9 @@
                              * @param {Boolean} bool The flag to enable or not.
                              */
                             this.display = function(bool){
-                                gui.display(bool);
+                                if ( gui ) {
+                                    gui.display(bool);
+                                }
                             };
                         
                         }; // Scroll class
