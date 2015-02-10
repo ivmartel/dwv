@@ -213,6 +213,8 @@
                             
                             var tagsGui = null;
                             
+                            var fitToWindow = false;
+                            
                             // Image layer
                             var imageLayer = null;
                             // Draw layers
@@ -462,6 +464,7 @@
                                 }
                                 // align layers when the window is resized
                                 if ( config.fitToWindow ) {
+                                    fitToWindow = true;
                                     window.onresize = this.onResize;
                                 }
                             };
@@ -1234,9 +1237,14 @@
                                     });
                                 }
                                 // resize app
-                                self.fitToSize( { 
-                                    &#x27;width&#x27;: $(&#x27;#&#x27;+containerDivId).width(), 
-                                    &#x27;height&#x27;: $(&#x27;#&#x27;+containerDivId).height() } );
+                                if ( fitToWindow ) {
+                                    self.fitToSize( dwv.gui.getWindowSize() );
+                                }
+                                else {
+                                    self.fitToSize( { 
+                                        &#x27;width&#x27;: $(&#x27;#&#x27;+containerDivId).width(), 
+                                        &#x27;height&#x27;: $(&#x27;#&#x27;+containerDivId).height() } );
+                                }
                                 self.resetLayout();
                             }
                             
@@ -1323,7 +1331,7 @@
                                 }
                                 
                                 // init W/L display
-                                //self.updatePresets(true);
+                                self.updatePresets(true);
                                 self.initWLDisplay();        
                             }
                         

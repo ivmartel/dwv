@@ -186,7 +186,7 @@
                         dwv.image.getDataFromImage = function(image)
                         {
                             // draw the image in the canvas in order to get its data
-                            var canvas = document.getElementById(&#x27;imageLayer&#x27;);
+                            var canvas = document.createElement(&#x27;canvas&#x27;);
                             canvas.width = image.width;
                             canvas.height = image.height;
                             var ctx = canvas.getContext(&#x27;2d&#x27;);

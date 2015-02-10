@@ -48,6 +48,8 @@ dwv.App = function()
     
     var tagsGui = null;
     
+    var fitToWindow = false;
+    
     // Image layer
     var imageLayer = null;
     // Draw layers
@@ -297,6 +299,7 @@ dwv.App = function()
         }
         // align layers when the window is resized
         if ( config.fitToWindow ) {
+            fitToWindow = true;
             window.onresize = this.onResize;
         }
     };
@@ -1069,9 +1072,14 @@ dwv.App = function()
             });
         }
         // resize app
-        self.fitToSize( { 
-            'width': $('#'+containerDivId).width(), 
-            'height': $('#'+containerDivId).height() } );
+        if ( fitToWindow ) {
+            self.fitToSize( dwv.gui.getWindowSize() );
+        }
+        else {
+            self.fitToSize( { 
+                'width': $('#'+containerDivId).width(), 
+                'height': $('#'+containerDivId).height() } );
+        }
         self.resetLayout();
     }
     
@@ -1158,7 +1166,7 @@ dwv.App = function()
         }
         
         // init W/L display
-        //self.updatePresets(true);
+        self.updatePresets(true);
         self.initWLDisplay();        
     }
 
@@ -7736,7 +7744,7 @@ dwv.image = dwv.image || {};
 dwv.image.getDataFromImage = function(image)
 {
     // draw the image in the canvas in order to get its data
-    var canvas = document.getElementById('imageLayer');
+    var canvas = document.createElement('canvas');
     canvas.width = image.width;
     canvas.height = image.height;
     var ctx = canvas.getContext('2d');
