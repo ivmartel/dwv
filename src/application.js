@@ -48,6 +48,8 @@ dwv.App = function()
     
     var tagsGui = null;
     
+    var fitToWindow = false;
+    
     // Image layer
     var imageLayer = null;
     // Draw layers
@@ -297,6 +299,7 @@ dwv.App = function()
         }
         // align layers when the window is resized
         if ( config.fitToWindow ) {
+            fitToWindow = true;
             window.onresize = this.onResize;
         }
     };
@@ -1069,9 +1072,14 @@ dwv.App = function()
             });
         }
         // resize app
-        self.fitToSize( { 
-            'width': $('#'+containerDivId).width(), 
-            'height': $('#'+containerDivId).height() } );
+        if ( fitToWindow ) {
+            self.fitToSize( dwv.gui.getWindowSize() );
+        }
+        else {
+            self.fitToSize( { 
+                'width': $('#'+containerDivId).width(), 
+                'height': $('#'+containerDivId).height() } );
+        }
         self.resetLayout();
     }
     
@@ -1158,7 +1166,7 @@ dwv.App = function()
         }
         
         // init W/L display
-        //self.updatePresets(true);
+        self.updatePresets(true);
         self.initWLDisplay();        
     }
 
