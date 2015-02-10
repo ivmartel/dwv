@@ -19,8 +19,8 @@ body { font-family: Verdana, Arial, Helvetica, sans-serif; }
 }
 .doc { float: left; margin: 5px; }
 .path {
-    border-bottom: 1px dashed #999;
-    text-decoration: none; 
+  border-bottom: 1px dashed #999;
+  text-decoration: none; 
 }
 .key {
     color: #999;
@@ -72,39 +72,39 @@ body { font-family: Verdana, Arial, Helvetica, sans-serif; }
 // launch when page is loaded
 $(document).ready( function()
 {
-    dwv.addDataLine("dwv0", "osirix-toutatix-100", {
+    dwv.addDataLine("dwv0", "osirix-cerebrix", {
         'origin': 'Osirix',
-        'path': 'TOUTATIX/Cardiac 1CTA_CORONARY_ARTERIES_TESTBOLUS (Adult)/Heart w-o 1.5  B25f  55% /IM-0001-0100.dcm',
-        't-syntax': '1.2.840.10008.1.2.1',
-        'modality': 'CT', 'photo': 'Monochrome2',
-        'bits': '16-12-11', 'pixel-vr': 'OW',
+        'path': 'CEREBRIX/Neuro Crane/Axial_T1 - 5352/IM-0001-0100.dcm',
+        't-syntax': '1.2.840.10008.1.2.4.91 (jpeg2000)',
+        'modality': 'SC', 'photo': 'MONOCHROME2',
+        'bits': '16-16-15', 'pixel-vr': 'OW',
     });
-    dwv.addDataLine("dwv1", "osirix-goudurix", {
-        'origin': 'Osirix',
-        'path': 'GOUDURIX/Specials 1_CORONARY_CTA_COMBI_SMH/70 % 1.0  B30f/IM-0001-0100.dcm',
-        't-syntax': '1.2.840.10008.1.2',
-        'modality': 'CT', 'photo': 'Monochrome2',
-        'bits': '16-12-11', 'pixel-vr': 'OX',
+    dwv.addDataLine("dwv1", "j2ki", {
+        'origin': 'Nema WG04',
+        'path': 'compsamples_j2k/IMAGES/J2KI/CT1_J2KI',
+        't-syntax': '1.2.840.10008.1.2.4.91 (jpeg2000)',
+        'modality': 'CT', 'photo': 'MONOCHROME2',
+        'bits': '16-16-15', 'pixel-vr': 'OB',
     });
-    dwv.addDataLine("dwv2", "dicompyler-ct.0", {
-        'origin': 'dicompyler',
-        'path': 'dicompyler/ct/ct.0.dcm',
-        't-syntax': '1.2.840.10008.1.2',
-        'modality': 'CT', 'photo': 'Monochrome2',
-        'bits': '16-16-15', 'pixel-vr': 'OX',
+    dwv.addDataLine("dwv2", "j2ki-ybr", {
+        'origin': 'Nema WG04',
+        'path': 'compsamples_j2k/IMAGES/J2KI/US1_J2KI',
+        't-syntax': '1.2.840.10008.1.2.4.91 (jpeg2000)',
+        'modality': 'US', 'photo': 'YBR_ICT (planar=0)',
+        'bits': '8-8-7', 'pixel-vr': 'OB',
     });
-    dwv.addDataLine("dwv3", "gdcm-CT-MONO2-8-abdo", {
-        'origin': 'GDCM',
-        'path': 'CT-MONO2-8-abdo.dcm',
-        't-syntax': '1.2.840.10008.1.2',
-        'modality': 'CT', 'photo': 'Monochrome2',
-        'bits': '8-8-7', 'pixel-vr': 'OX',
+    dwv.addDataLine("dwv3", "j2kr", {
+        'origin': 'Nema WG04',
+        'path': 'compsamples_j2k/IMAGES/J2KR/NM1_J2KR',
+        't-syntax': '1.2.840.10008.1.2.4.90 (jpeg2000)',
+        'modality': 'NM', 'photo': 'MONOCHROME2',
+        'bits': '16-16-15', 'pixel-vr': 'OB',
     });
-    dwv.addDataLine("dwv4", "gdcm-US-RGB-8-epicard", {
-        'origin': 'GDCM',
-        'path': 'US-RGB-8-epicard.dcm',
-        't-syntax': '1.2.840.10008.1.2.2',
-        'modality': 'US', 'photo': 'RGB (planar=1)',
+    dwv.addDataLine("dwv4", "j2kr-ybr", {
+        'origin': 'Nema WG04',
+        'path': 'compsamples_j2k/IMAGES/J2KR/VL2_J2KR',
+        't-syntax': '1.2.840.10008.1.2.4.90 (jpeg2000)',
+        'modality': 'OT', 'photo': 'YBR_RCT (planar=0)',
         'bits': '8-8-7', 'pixel-vr': 'OB',
     });
 });
@@ -116,11 +116,10 @@ $(document).ready( function()
 <div id="data-lines"></div>
 
 <div class="footer">
-<p><b>Missing data</b>: 8 bits with pixel VR OW, RGB with planar=0, Monochrome1</p>
 <p>Data sources:</p>
 <ul>
 <li>Osirix <a href="http://www.osirix-viewer.com/datasets/">datasets</a></li>
-<li>Gdcm: :pserver:xxx@cvs.creatis.insa-lyon.fr:2402/cvs/public</li>
+<li>Nema WG04 (jpeg2000) <a href="ftp://medical.nema.org/MEDICAL/Dicom/DataSets/WG04/">dataSets</a></li>
 </ul>
 <p>The left image is created with DWV, the right one is a snapshot 
 generated using <a href="https://www.synedra.com">Synedra</a> View Personnal.</p>
