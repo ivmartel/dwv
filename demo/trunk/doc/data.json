@@ -8275,7 +8275,24 @@
         },
         {
             "file": "src/tools/filter.js",
-            "line": 103,
+            "line": 101,
+            "description": "Handle keydown event.",
+            "itemtype": "method",
+            "name": "keydown",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The keydown event.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.tool.Filter",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/filter.js",
+            "line": 113,
             "description": "Help for this tool.",
             "itemtype": "method",
             "name": "getHelp",
@@ -8289,7 +8306,7 @@
         },
         {
             "file": "src/tools/filter.js",
-            "line": 119,
+            "line": 129,
             "description": "Get the selected filter.",
             "itemtype": "method",
             "name": "getSelectedFilter",
@@ -8303,7 +8320,7 @@
         },
         {
             "file": "src/tools/filter.js",
-            "line": 129,
+            "line": 139,
             "description": "Set the selected filter.",
             "itemtype": "method",
             "name": "setSelectedFilter",
@@ -8317,7 +8334,7 @@
         },
         {
             "file": "src/tools/filter.js",
-            "line": 155,
+            "line": 165,
             "description": "Get the list of filters.",
             "itemtype": "method",
             "name": "getFilterList",
@@ -8331,7 +8348,7 @@
         },
         {
             "file": "src/tools/filter.js",
-            "line": 165,
+            "line": 175,
             "description": "Check if a filter is in the filter list.",
             "itemtype": "method",
             "name": "hasFilter",
@@ -8346,23 +8363,6 @@
                 "description": "The filter list element for the given name.",
                 "type": "String"
             },
-            "class": "dwv.tool.Filter",
-            "module": "tool",
-            "namespace": "dwv.tool"
-        },
-        {
-            "file": "src/tools/filter.js",
-            "line": 176,
-            "description": "Handle keydown event.",
-            "itemtype": "method",
-            "name": "keydown",
-            "params": [
-                {
-                    "name": "event",
-                    "description": "The keydown event.",
-                    "type": "Object"
-                }
-            ],
             "class": "dwv.tool.Filter",
             "module": "tool",
             "namespace": "dwv.tool"
@@ -11655,7 +11655,7 @@
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/tools/filter.js:103"
+            "line": " src/tools/filter.js:113"
         },
         {
             "message": "replacing incorrect tag: returns with return",
