@@ -98,6 +98,16 @@ dwv.tool.Filter = function ( filterList, app )
         }
     };
 
+    /**
+     * Handle keydown event.
+     * @method keydown
+     * @param {Object} event The keydown event.
+     */
+    this.keydown = function (event)
+    {
+        app.onKeydown(event);
+    };
+
 }; // class dwv.tool.Filter
 
 /**
@@ -171,16 +181,6 @@ dwv.tool.Filter.prototype.getFilterList = function ()
 dwv.tool.Filter.prototype.hasFilter = function (name)
 {
     return this.filterList[name];
-};
-
-/**
- * Handle keydown event.
- * @method keydown
- * @param {Object} event The keydown event.
- */
-dwv.tool.Filter.prototype.keydown = function (event)
-{
-    app.onKeydown(event);
 };
 
 // Filter namespace
