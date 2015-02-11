@@ -635,7 +635,12 @@ dwv.App = function()
             }
         }
         
-        // default presets
+        // min/max preset
+        var range = this.getImage().getRescaledDataRange();
+        var width = range.max - range.min;
+        var center = range.min + width/2;
+        this.presets["min/max"] = {"center": center, "width": width};
+        // modality presets
         var modality = this.getImage().getMeta().Modality;
         for( var key in dwv.tool.defaultpresets[modality] ) {
             this.presets[key] = dwv.tool.defaultpresets[modality][key];
@@ -645,11 +650,6 @@ dwv.App = function()
                 this.presets[key2] = dwv.tool.defaultpresets[modality+"extra"][key2];
             }
         }
-        // min/max preset
-        var range = this.getImage().getRescaledDataRange();
-        var width = range.max - range.min;
-        var center = range.min + width/2;
-        this.presets["min/max"] = {"center": center, "width": width};
         // manual preset
         if( manual ){
             this.presets.manual = manual;
