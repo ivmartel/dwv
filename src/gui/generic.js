@@ -201,7 +201,7 @@ dwv.gui.base.DicomTags = function ()
         // tags HTML table
         var table = dwv.html.toTable(dataInfo);
         table.id = "tagsTable";
-        table.className = "tagsList table-stripe";
+        table.setAttribute("class", "tagsList");
         table.setAttribute("data-role", "table");
         table.setAttribute("data-mode", "columntoggle");
         // search form
