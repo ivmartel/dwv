@@ -171,9 +171,14 @@ dwv.gui.base.WindowLevel = function (app)
  */
 dwv.gui.base.Draw = function (app)
 {
+    // default colours
     var colours = [
        "Yellow", "Red", "White", "Green", "Blue", "Lime", "Fuchsia", "Black"
     ];
+    /**
+     * Get the available colours.
+     * @method getColours
+     */
     this.getColours = function () { return colours; };
     
     /**
@@ -251,9 +256,14 @@ dwv.gui.base.Draw = function (app)
  */
 dwv.gui.base.Livewire = function (app)
 {
+    // default colours
     var colours = [
        "Yellow", "Red", "White", "Green", "Blue", "Lime", "Fuchsia", "Black"
     ];
+    /**
+     * Get the available colours.
+     * @method getColours
+     */
     this.getColours = function () { return colours; };
 
     /**
