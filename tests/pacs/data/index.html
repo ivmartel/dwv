@@ -93,18 +93,32 @@ $(document).ready( function()
         'modality': 'CT', 'photo': 'Monochrome2',
         'bits': '16-16-15', 'pixel-vr': 'OX',
     });
-    dwv.addDataLine("dwv3", "gdcm-CT-MONO2-8-abdo", {
+    dwv.addDataLine("dwv3", "gdcm-CR-MONO1-10-chest", {
+        'origin': 'GDCM (+ DCIM prefix)',
+        'path': 'CR-MONO1-10-chest.dcm',
+        't-syntax': '1.2.840.10008.1.2.1',
+        'modality': 'CR', 'photo': 'Monochrome1',
+        'bits': '16-10-9', 'pixel-vr': 'OW',
+    });
+    dwv.addDataLine("dwv4", "gdcm-CT-MONO2-8-abdo", {
         'origin': 'GDCM',
         'path': 'CT-MONO2-8-abdo.dcm',
         't-syntax': '1.2.840.10008.1.2',
         'modality': 'CT', 'photo': 'Monochrome2',
         'bits': '8-8-7', 'pixel-vr': 'OX',
     });
-    dwv.addDataLine("dwv4", "gdcm-US-RGB-8-epicard", {
+    dwv.addDataLine("dwv5", "gdcm-US-RGB-8-epicard", {
         'origin': 'GDCM',
         'path': 'US-RGB-8-epicard.dcm',
         't-syntax': '1.2.840.10008.1.2.2',
         'modality': 'US', 'photo': 'RGB (planar=1)',
+        'bits': '8-8-7', 'pixel-vr': 'OB',
+    });
+    dwv.addDataLine("dwv6", "gdcm-US-RGB-8-esopecho", {
+        'origin': 'GDCM',
+        'path': 'US-RGB-8-esopecho.dcm',
+        't-syntax': '1.2.840.10008.1.2.1',
+        'modality': 'US', 'photo': 'RGB (planar=0)',
         'bits': '8-8-7', 'pixel-vr': 'OB',
     });
 });
@@ -116,7 +130,7 @@ $(document).ready( function()
 <div id="data-lines"></div>
 
 <div class="footer">
-<p><b>Missing data</b>: 8 bits with pixel VR OW, RGB with planar=0, Monochrome1</p>
+<p><b>Missing data</b>: 8 bits with pixel VR OW</p>
 <p>Data sources:</p>
 <ul>
 <li>Osirix <a href="http://www.osirix-viewer.com/datasets/">datasets</a></li>
