@@ -9,14 +9,13 @@ var Kinetic = Kinetic || {};
  * @namespace dwv
  * @constructor
  */
-dwv.App = function()
+dwv.App = function ()
 {
     // Local object
     var self = this;
+    
     // Image
     var image = null;
-    // View
-    var view = null;
     // Original image
     var originalImage = null;
     // Image data array
@@ -26,29 +25,33 @@ dwv.App = function()
     // Image data height
     var dataHeight = 0;
 
-    // display window scale
-    var windowScale = 1;
-    
+    // Container div id
     var containerDivId = null;
-    this.getContainerDivId = function () { return containerDivId; };
-    
-    this.presets = {};
-    this.getPresets = function () { return this.presets; };
-    
-    var toolboxController = null;
-    this.getToolboxController = function () { return toolboxController; };
-
-    var viewController = null;
-    this.getViewController = function () { return viewController; };
-     
-    var plotInfo = null;
-    var windowingInfo = null;
-    var positionInfo = null;
-    var miniColorMap = null; 
-    
-    var tagsGui = null;
-    
+    // Display window scale
+    var windowScale = 1;
+    // Fit display to window flag
     var fitToWindow = false;
+
+    // View
+    var view = null;
+    // View controller
+    var viewController = null;
+    // Window/level presets
+    var presets = null;
+     
+    // Info layer plot gui
+    var plotInfo = null;
+    // Info layer windowing gui
+    var windowingInfo = null;
+    // Info layer position gui
+    var positionInfo = null;
+    // Info layer color map gui
+    var miniColorMap = null; 
+    // flag to know if the info layer is listening on the image.
+    var isInfoLayerListening = false;
+
+    // Dicom tags gui
+    var tagsGui = null;
     
     // Image layer
     var imageLayer = null;
@@ -57,11 +60,12 @@ dwv.App = function()
     // Draw stage
     var drawStage = null;
     
-    // flag to know if the info layer is listening on the image.
-    var isInfoLayerListening = false;
-    
     // Toolbox
     var toolbox = null;
+    // Toolbox controller
+    var toolboxController = null;
+
+    // Loadbox
     var loadbox = null;
     // UndoStack
     var undoStack = null;
@@ -71,68 +75,78 @@ dwv.App = function()
      * @method getVersion
      * @return {String} The version of the application.
      */
-    this.getVersion = function() { return "v0.9.0beta"; };
+    this.getVersion = function () { return "v0.9.0beta"; };
     
     /** 
      * Get the image.
      * @method getImage
      * @return {Image} The associated image.
      */
-    this.getImage = function() { return image; };
-    /** 
-     * Get the view.
-     * @method getView
-     * @return {Image} The associated view.
-     */
-    this.getView = function() { return view; };
-    
+    this.getImage = function () { return image; };
     /** 
      * Set the view.
      * @method setImage
      * @param {Image} img The associated image.
      */
-    this.setImage = function(img)
+    this.setImage = function (img)
     { 
         image = img; 
         view.setImage(img);
     };
-    
     /** 
      * Restore the original image.
      * @method restoreOriginalImage
      */
-    this.restoreOriginalImage = function() 
+    this.restoreOriginalImage = function () 
     { 
         image = originalImage; 
         view.setImage(originalImage); 
     }; 
-    
     /** 
      * Get the image data array.
      * @method getImageData
      * @return {Array} The image data array.
      */
-    this.getImageData = function() { return imageData; };
+    this.getImageData = function () { return imageData; };
 
     /** 
-     * Get the toolbox.
-     * @method getToolbox
-     * @return {Object} The associated toolbox.
+     * Get the container div id.
+     * @method getContainerDivId
+     * @return {String} The div id.
      */
-    this.getToolbox = function() { return toolbox; };
+    this.getContainerDivId = function () { return containerDivId; };
+
+    /** 
+     * Get the view.
+     * @method getView
+     * @return {Image} The associated view.
+     */
+    this.getView = function () { return view; };
+    /** 
+     * Get the view controller.
+     * @method getViewController
+     * @return {Object} The controller.
+     */
+    this.getViewController = function () { return viewController; };
+    /** 
+     * Get the window/level presets.
+     * @method getPresets
+     * @return {Object} The presets.
+     */
+    this.getPresets = function () { return presets; };
 
     /** 
      * Get the image layer.
      * @method getImageLayer
      * @return {Object} The image layer.
      */
-    this.getImageLayer = function() { return imageLayer; };
+    this.getImageLayer = function () { return imageLayer; };
     /** 
      * Get the draw layer.
      * @method getDrawLayer
      * @return {Object} The draw layer.
      */
-    this.getDrawLayer = function() { 
+    this.getDrawLayer = function () { 
         return drawLayers[view.getCurrentPosition().k];
     };
     /** 
@@ -140,15 +154,33 @@ dwv.App = function()
      * @method getDrawStage
      * @return {Object} The draw layer.
      */
-    this.getDrawStage = function() { return drawStage; };
+    this.getDrawStage = function () { return drawStage; };
+
+    /** 
+     * Get the toolbox.
+     * @method getToolbox
+     * @return {Object} The associated toolbox.
+     */
+    this.getToolbox = function () { return toolbox; };
+    /** 
+     * Get the toolbox controller.
+     * @method getToolboxController
+     * @return {Object} The controller.
+     */
+    this.getToolboxController = function () { return toolboxController; };
 
     /** 
      * Get the undo stack.
      * @method getUndoStack
      * @return {Object} The undo stack.
      */
-    this.getUndoStack = function() { return undoStack; };
+    this.getUndoStack = function () { return undoStack; };
 
+    /** 
+     * Get the data loaders.
+     * @method getLoaders
+     * @return {Object} The loaders.
+     */
     this.getLoaders = function () 
     {
         return {
@@ -288,9 +320,9 @@ dwv.App = function()
             $("#"+dropBoxDivId).width( dropBoxSize );
         }
         // possible load from URL
-        if( typeof config.skipLoadUrl === "undefined" ) {
+        if ( typeof config.skipLoadUrl === "undefined" ) {
             var inputUrls = dwv.html.getUriParam(); 
-            if( inputUrls && inputUrls.length > 0 ) {
+            if ( inputUrls && inputUrls.length > 0 ) {
                 this.loadURL(inputUrls);
             }
         }
@@ -308,7 +340,7 @@ dwv.App = function()
      * Reset the application.
      * @method reset
      */
-    this.reset = function()
+    this.reset = function ()
     {
         // clear tools
         if ( toolbox ) {
@@ -345,31 +377,11 @@ dwv.App = function()
     };
     
     /**
-     * Handle key down event.
-     * - CRTL-Z: undo
-     * - CRTL-Y: redo
-     * Default behavior. Usually used in tools. 
-     * @method onKeydown
-     * @param {Object} event The key down event.
-     */
-    this.onKeydown = function(event)
-    {
-        if( event.keyCode === 90 && event.ctrlKey ) // ctrl-z
-        {
-            undoStack.undo();
-        }
-        else if( event.keyCode === 89 && event.ctrlKey ) // ctrl-y
-        {
-            undoStack.redo();
-        }
-    };
-    
-    /**
      * Load a list of files.
      * @method loadFiles
      * @param {Array} files The list of files to load.
      */
-    this.loadFiles = function(files) 
+    this.loadFiles = function (files) 
     {
         // clear variables
         this.reset();
@@ -377,12 +389,12 @@ dwv.App = function()
         var fileIO = new dwv.io.File();
         fileIO.onload = function (data) {
             var isFirst = true;
-            if( image ) {
+            if ( image ) {
                 image.appendSlice( data.view.getImage() );
                 isFirst = false;
             }
             postLoadInit(data);
-            if( drawStage ) {
+            if ( drawStage ) {
                 // create slice draw layer
                 var drawLayer = new Kinetic.Layer({
                     listening: false,
@@ -395,7 +407,7 @@ dwv.App = function()
                 drawStage.add(drawLayer);
             }
         };
-        fileIO.onerror = function(error){ handleError(error); };
+        fileIO.onerror = function (error){ handleError(error); };
         // main load (asynchronous)
         fileIO.load(files);
     };
@@ -405,7 +417,7 @@ dwv.App = function()
      * @method loadURL
      * @param {Array} urls The list of urls to load.
      */
-    this.loadURL = function(urls) 
+    this.loadURL = function (urls) 
     {
         // clear variables
         this.reset();
@@ -413,12 +425,12 @@ dwv.App = function()
         var urlIO = new dwv.io.Url();
         urlIO.onload = function (data) {
             var isFirst = true;
-            if( image ) {
+            if ( image ) {
                 image.appendSlice( data.view.getImage() );
                 isFirst = false;
             }
             postLoadInit(data);
-            if( drawStage ) {
+            if ( drawStage ) {
                 // create slice draw layer
                 var drawLayer = new Kinetic.Layer({
                     listening: false,
@@ -431,11 +443,193 @@ dwv.App = function()
                 drawStage.add(drawLayer);
             }
         };
-        urlIO.onerror = function(error){ handleError(error); };
+        urlIO.onerror = function (error){ handleError(error); };
         // main load (asynchronous)
         urlIO.load(urls);
     };
     
+    /**
+     * Fit the display to the given size. To be called once the image is loaded.
+     * @method fitToSize
+     */
+    this.fitToSize = function (size)
+    {
+        // previous width
+        var oldWidth = parseInt(windowScale*dataWidth, 10);
+        // find new best fit
+        windowScale = Math.min( (size.width / dataWidth), (size.height / dataHeight) );
+        // new sizes
+        var newWidth = parseInt(windowScale*dataWidth, 10);
+        var newHeight = parseInt(windowScale*dataHeight, 10);
+        // ratio previous/new to add to zoom
+        var mul = newWidth / oldWidth;
+
+        // resize container
+        var jqDivId = "#"+containerDivId;
+        $(jqDivId).width(newWidth);
+        $(jqDivId).height(newHeight + 1); // +1 to be sure...
+        // resize image layer
+        if ( imageLayer ) {
+            var iZoomX = imageLayer.getZoom().x * mul;
+            var iZoomY = imageLayer.getZoom().y * mul;
+            imageLayer.setWidth(newWidth);
+            imageLayer.setHeight(newHeight);
+            imageLayer.zoom(iZoomX, iZoomY, 0, 0);
+            imageLayer.draw();
+        }
+        // resize draw stage
+        if ( drawStage ) {
+            // resize div
+            var drawDivId = "#" + containerDivId + "-drawDiv";
+            $(drawDivId).width(newWidth);
+            $(drawDivId).height(newHeight);
+            // resize stage
+            var stageZomX = drawStage.scale().x * mul;
+            var stageZoomY = drawStage.scale().y * mul;
+            drawStage.setWidth(newWidth);
+            drawStage.setHeight(newHeight);
+            drawStage.scale( {x: stageZomX, y: stageZoomY} );
+            drawStage.draw();
+        }
+    };
+    
+    /**
+     * Toggle the display of the information layer.
+     * @method toggleInfoLayerDisplay
+     */
+    this.toggleInfoLayerDisplay = function ()
+    {
+        // toggle html
+        var infoDivId = containerDivId + "-infoLayer";
+        dwv.html.toggleDisplay(infoDivId);
+        // toggle listeners
+        if ( isInfoLayerListening ) {
+            removeImageInfoListeners();
+        }
+        else {
+            addImageInfoListeners();
+        }
+    };
+    
+    /**
+     * Init the Window/Level display
+     */
+    this.initWLDisplay = function ()
+    {
+        // set window/level
+        var keys = Object.keys(presets);
+        viewController.setWindowLevel(
+            presets[keys[0]].center, 
+            presets[keys[0]].width );
+        // default position
+        this.setCurrentPostion(0,0);
+    };
+
+    /**
+     * Add layer mouse and touch listeners.
+     * @method addLayerListeners
+     */
+    this.addLayerListeners = function (layer)
+    {
+        // allow pointer events
+        layer.setAttribute("style", "pointer-events: auto;");
+        // mouse listeners
+        layer.addEventListener("mousedown", eventHandler);
+        layer.addEventListener("mousemove", eventHandler);
+        layer.addEventListener("mouseup", eventHandler);
+        layer.addEventListener("mouseout", eventHandler);
+        layer.addEventListener("mousewheel", eventHandler);
+        layer.addEventListener("DOMMouseScroll", eventHandler);
+        layer.addEventListener("dblclick", eventHandler);
+        // touch listeners
+        layer.addEventListener("touchstart", eventHandler);
+        layer.addEventListener("touchmove", eventHandler);
+        layer.addEventListener("touchend", eventHandler);
+    };
+    
+    /**
+     * Remove layer mouse and touch listeners.
+     * @method removeLayerListeners
+     */
+    this.removeLayerListeners = function (layer)
+    {
+        // disable pointer events
+        layer.setAttribute("style", "pointer-events: none;");
+        // mouse listeners
+        layer.removeEventListener("mousedown", eventHandler);
+        layer.removeEventListener("mousemove", eventHandler);
+        layer.removeEventListener("mouseup", eventHandler);
+        layer.removeEventListener("mouseout", eventHandler);
+        layer.removeEventListener("mousewheel", eventHandler);
+        layer.removeEventListener("DOMMouseScroll", eventHandler);
+        layer.removeEventListener("dblclick", eventHandler);
+        // touch listeners
+        layer.removeEventListener("touchstart", eventHandler);
+        layer.removeEventListener("touchmove", eventHandler);
+        layer.removeEventListener("touchend", eventHandler);
+    };
+    
+    /**
+     * Render the current image.
+     * @method render
+     */
+    this.render = function ()
+    {
+        generateAndDrawImage();
+    };
+    
+    /**
+     * Update the window/level presets.
+     * @function updatePresets
+     * @param {Boolean} full If true, shows all presets.
+     */
+    this.updatePresets = function (full)
+    {    
+        // store the manual preset
+        var manual = null;
+        if ( presets ) {
+            manual = presets.manual;
+        }
+        // reinitialize the presets
+        presets = {};
+        
+        // DICOM presets
+        var dicomPresets = this.getView().getWindowPresets();
+        if ( dicomPresets ) {
+            if ( full ) {
+                for( var i = 0; i < dicomPresets.length; ++i ) {
+                    presets[dicomPresets[i].name.toLowerCase()] = dicomPresets[i];
+                }
+            }
+            // just the first one
+            else {
+                presets["default"] = dicomPresets[0];
+            }
+        }
+        
+        // min/max preset
+        var range = this.getImage().getRescaledDataRange();
+        var width = range.max - range.min;
+        var center = range.min + width/2;
+        presets["min/max"] = {"center": center, "width": width};
+        // modality presets
+        var modality = this.getImage().getMeta().Modality;
+        for( var key in dwv.tool.defaultpresets[modality] ) {
+            presets[key] = dwv.tool.defaultpresets[modality][key];
+        }
+        if ( full ) {
+            for( var key2 in dwv.tool.defaultpresets[modality+"extra"] ) {
+                presets[key2] = dwv.tool.defaultpresets[modality+"extra"][key2];
+            }
+        }
+        // manual preset
+        if ( manual ){
+            presets.manual = manual;
+        }
+    };
+
+    // Handler Methods -----------------------------------------------------------
+
     /**
      * Handle window/level change.
      * @method onWLChange
@@ -477,187 +671,25 @@ dwv.App = function()
     };
 
     /**
-     * Fit the display to the given size. To be called once the image is loaded.
-     * @method fitToSize
+     * Handle key down event.
+     * - CRTL-Z: undo
+     * - CRTL-Y: redo
+     * Default behavior. Usually used in tools. 
+     * @method onKeydown
+     * @param {Object} event The key down event.
      */
-    this.fitToSize = function (size)
+    this.onKeydown = function (event)
     {
-        // previous width
-        var oldWidth = parseInt(windowScale*dataWidth, 10);
-        // find new best fit
-        windowScale = Math.min( (size.width / dataWidth), (size.height / dataHeight) );
-        // new sizes
-        var newWidth = parseInt(windowScale*dataWidth, 10);
-        var newHeight = parseInt(windowScale*dataHeight, 10);
-        // ratio previous/new to add to zoom
-        var mul = newWidth / oldWidth;
-
-        // resize container
-        var jqDivId = "#"+containerDivId;
-        $(jqDivId).width(newWidth);
-        $(jqDivId).height(newHeight + 1); // +1 to be sure...
-        // resize image layer
-        if( imageLayer ) {
-            var iZoomX = imageLayer.getZoom().x * mul;
-            var iZoomY = imageLayer.getZoom().y * mul;
-            imageLayer.setWidth(newWidth);
-            imageLayer.setHeight(newHeight);
-            imageLayer.zoom(iZoomX, iZoomY, 0, 0);
-            imageLayer.draw();
+        if ( event.keyCode === 90 && event.ctrlKey ) // ctrl-z
+        {
+            undoStack.undo();
         }
-        // resize draw stage
-        if( drawStage ) {
-            // resize div
-            var drawDivId = "#" + containerDivId + "-drawDiv";
-            $(drawDivId).width(newWidth);
-            $(drawDivId).height(newHeight);
-            // resize stage
-            var stageZomX = drawStage.scale().x * mul;
-            var stageZoomY = drawStage.scale().y * mul;
-            drawStage.setWidth(newWidth);
-            drawStage.setHeight(newHeight);
-            drawStage.scale( {x: stageZomX, y: stageZoomY} );
-            drawStage.draw();
+        else if ( event.keyCode === 89 && event.ctrlKey ) // ctrl-y
+        {
+            undoStack.redo();
         }
     };
     
-    /**
-     * Toggle the display of the information layer.
-     * @method toggleInfoLayerDisplay
-     */
-    this.toggleInfoLayerDisplay = function()
-    {
-        // toggle html
-        var infoDivId = containerDivId + "-infoLayer";
-        dwv.html.toggleDisplay(infoDivId);
-        // toggle listeners
-        if( isInfoLayerListening ) {
-            removeImageInfoListeners();
-        }
-        else {
-            addImageInfoListeners();
-        }
-    };
-    
-    /**
-     * Init the Window/Level display
-     */
-    this.initWLDisplay = function()
-    {
-        // set window/level
-        var keys = Object.keys(this.presets);
-        viewController.setWindowLevel(
-            this.presets[keys[0]].center, 
-            this.presets[keys[0]].width );
-        // default position
-        this.setCurrentPostion(0,0);
-    };
-
-    /**
-     * Add layer mouse and touch listeners.
-     * @method addLayerListeners
-     */
-    this.addLayerListeners = function(layer)
-    {
-        // allow pointer events
-        layer.setAttribute("style", "pointer-events: auto;");
-        // mouse listeners
-        layer.addEventListener("mousedown", eventHandler);
-        layer.addEventListener("mousemove", eventHandler);
-        layer.addEventListener("mouseup", eventHandler);
-        layer.addEventListener("mouseout", eventHandler);
-        layer.addEventListener("mousewheel", eventHandler);
-        layer.addEventListener("DOMMouseScroll", eventHandler);
-        layer.addEventListener("dblclick", eventHandler);
-        // touch listeners
-        layer.addEventListener("touchstart", eventHandler);
-        layer.addEventListener("touchmove", eventHandler);
-        layer.addEventListener("touchend", eventHandler);
-    };
-    
-    /**
-     * Remove layer mouse and touch listeners.
-     * @method removeLayerListeners
-     */
-    this.removeLayerListeners = function(layer)
-    {
-        // disable pointer events
-        layer.setAttribute("style", "pointer-events: none;");
-        // mouse listeners
-        layer.removeEventListener("mousedown", eventHandler);
-        layer.removeEventListener("mousemove", eventHandler);
-        layer.removeEventListener("mouseup", eventHandler);
-        layer.removeEventListener("mouseout", eventHandler);
-        layer.removeEventListener("mousewheel", eventHandler);
-        layer.removeEventListener("DOMMouseScroll", eventHandler);
-        layer.removeEventListener("dblclick", eventHandler);
-        // touch listeners
-        layer.removeEventListener("touchstart", eventHandler);
-        layer.removeEventListener("touchmove", eventHandler);
-        layer.removeEventListener("touchend", eventHandler);
-    };
-    
-    /**
-     * Render the current image.
-     * @method render
-     */
-    this.render = function ()
-    {
-        generateAndDrawImage();
-    };
-    
-    /**
-     * Update the window/level presets.
-     * @function updatePresets
-     * @param {Boolean} full If true, shows all presets.
-     */
-    this.updatePresets = function (full)
-    {    
-        // store the manual preset
-        var manual = null;
-        if ( this.presets ) {
-            manual = this.presets.manual;
-        }
-        // reinitialize the presets
-        this.presets = {};
-        
-        // DICOM presets
-        var dicomPresets = this.getView().getWindowPresets();
-        if( dicomPresets ) {
-            if( full ) {
-                for( var i = 0; i < dicomPresets.length; ++i ) {
-                    this.presets[dicomPresets[i].name.toLowerCase()] = dicomPresets[i];
-                }
-            }
-            // just the first one
-            else {
-                this.presets["default"] = dicomPresets[0];
-            }
-        }
-        
-        // default presets
-        var modality = this.getImage().getMeta().Modality;
-        for( var key in dwv.tool.defaultpresets[modality] ) {
-            this.presets[key] = dwv.tool.defaultpresets[modality][key];
-        }
-        if( full ) {
-            for( var key2 in dwv.tool.defaultpresets[modality+"extra"] ) {
-                this.presets[key2] = dwv.tool.defaultpresets[modality+"extra"][key2];
-            }
-        }
-        // min/max preset
-        var range = this.getImage().getRescaledDataRange();
-        var width = range.max - range.min;
-        var center = range.min + width/2;
-        this.presets["min/max"] = {"center": center, "width": width};
-        // manual preset
-        if( manual ){
-            this.presets.manual = manual;
-        }
-    };
-
-    // Controller Methods -----------------------------------------------------------
-
     /**
      * Handle resize.
      * Fit the display to the window. To be called once the image is loaded.
@@ -739,13 +771,13 @@ dwv.App = function()
     {
         var name = this.value;
         // check if we have it
-        if( !self.presets[name] ) {
+        if ( !presets[name] ) {
             throw new Error("Unknown window level preset: '" + name + "'");
         }
         // enable it
         viewController.setWindowLevel( 
-            self.presets[name].center, 
-            self.presets[name].width );
+            presets[name].center, 
+            presets[name].width );
     };
 
     /**
@@ -915,7 +947,7 @@ dwv.App = function()
         // event._x and event._y.
         var offsets = null;
         var position = null;
-        if( event.type === "touchstart" ||
+        if ( event.type === "touchstart" ||
             event.type === "touchmove")
         {
             event.preventDefault();
@@ -938,7 +970,7 @@ dwv.App = function()
             // set handle event flag
             handled = true;
         }
-        else if( event.type === "mousemove" ||
+        else if ( event.type === "mousemove" ||
             event.type === "mousedown" ||
             event.type === "mouseup" ||
             event.type === "mouseout" ||
@@ -955,17 +987,17 @@ dwv.App = function()
             // set handle event flag
             handled = true;
         }
-        else if( event.type === "keydown" || 
+        else if ( event.type === "keydown" || 
                 event.type === "touchend")
         {
             handled = true;
         }
             
         // Call the event handler of the tool.
-        if( handled )
+        if ( handled )
         {
             var func = self.getToolbox().getSelectedTool()[event.type];
-            if( func )
+            if ( func )
             {
                 func(event);
             }
@@ -1034,14 +1066,14 @@ dwv.App = function()
     function handleError(error)
     {
         // alert window
-        if( error.name && error.message) {
+        if ( error.name && error.message) {
             alert(error.name+": "+error.message+".");
         }
         else {
             alert("Error: "+error+".");
         }
         // log
-        if( error.stack ) {
+        if ( error.stack ) {
             console.error(error.stack);
         }
     }
@@ -1062,7 +1094,7 @@ dwv.App = function()
         imageLayer.setStyleDisplay(true);
         // draw layer
         var drawDivId = containerDivId + "-drawDiv";
-        if( document.getElementById(drawDivId) !== null) {
+        if ( document.getElementById(drawDivId) !== null) {
             // create stage
             drawStage = new Kinetic.Stage({
                 container: drawDivId,
@@ -1092,7 +1124,7 @@ dwv.App = function()
     function postLoadInit(data)
     {
         // only initialise the first time
-        if( view ) {
+        if ( view ) {
             return;
         }
         
@@ -1221,7 +1253,7 @@ dwv.ViewController = function ( view )
     this.setColourMapFromName = function (name)
     {
         // check if we have it
-        if( !dwv.tool.colourMaps[name] ) {
+        if ( !dwv.tool.colourMaps[name] ) {
             throw new Error("Unknown colour map: '" + name + "'");
         }
         // enable it
@@ -1296,7 +1328,7 @@ dwv.ToolboxController = function (toolbox)
     {
         // seems like jquery is checking if the method exists before it 
         // is used...
-        if( toolbox && toolbox.getSelectedTool() &&
+        if ( toolbox && toolbox.getSelectedTool() &&
                 toolbox.getSelectedTool().getSelectedFilter() ) {
             toolbox.getSelectedTool().getSelectedFilter().run(range);
         }
@@ -5898,9 +5930,14 @@ dwv.gui.base.WindowLevel = function (app)
  */
 dwv.gui.base.Draw = function (app)
 {
+    // default colours
     var colours = [
        "Yellow", "Red", "White", "Green", "Blue", "Lime", "Fuchsia", "Black"
     ];
+    /**
+     * Get the available colours.
+     * @method getColours
+     */
     this.getColours = function () { return colours; };
     
     /**
@@ -5978,9 +6015,14 @@ dwv.gui.base.Draw = function (app)
  */
 dwv.gui.base.Livewire = function (app)
 {
+    // default colours
     var colours = [
        "Yellow", "Red", "White", "Green", "Blue", "Lime", "Fuchsia", "Black"
     ];
+    /**
+     * Get the available colours.
+     * @method getColours
+     */
     this.getColours = function () { return colours; };
 
     /**
