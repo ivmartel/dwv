@@ -4246,7 +4246,7 @@ dwv.gui.base.DicomTags = function ()
         // tags HTML table
         var table = dwv.html.toTable(dataInfo);
         table.id = "tagsTable";
-        table.className = "tagsList table-stripe";
+        table.setAttribute("class", "tagsList");
         table.setAttribute("data-role", "table");
         table.setAttribute("data-mode", "columntoggle");
         // search form
@@ -4305,9 +4305,10 @@ dwv.gui.base.appendHelpHtml = function(toolList, mobile)
     var dir = loc.substring(0, loc.lastIndexOf('/'));
 
     var tool = null;
-    for ( var t=0; t < toolList.length; ++t )
+    var tkeys = Object.keys(toolList);
+    for ( var t=0; t < tkeys.length; ++t )
     {
-        tool = toolList[t];
+        tool = toolList[tkeys[t]];
         // title
         var title = document.createElement("h3");
         title.appendChild(document.createTextNode(tool.getHelp().title));

@@ -210,9 +210,10 @@
                             var dir = loc.substring(0, loc.lastIndexOf(&#x27;/&#x27;));
                         
                             var tool = null;
-                            for ( var t=0; t &lt; toolList.length; ++t )
+                            var tkeys = Object.keys(toolList);
+                            for ( var t=0; t &lt; tkeys.length; ++t )
                             {
-                                tool = toolList[t];
+                                tool = toolList[tkeys[t]];
                                 // title
                                 var title = document.createElement(&quot;h3&quot;);
                                 title.appendChild(document.createTextNode(tool.getHelp().title));
