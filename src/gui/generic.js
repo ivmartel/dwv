@@ -10,6 +10,12 @@ var dwv = dwv || {};
  * @static
  */
 dwv.gui = dwv.gui || {};
+/**
+ * Namespace for base GUI functions.
+ * @class base
+ * @namespace dwv.gui
+ * @static
+ */
 dwv.gui.base = dwv.gui.base || {};
 
 /**

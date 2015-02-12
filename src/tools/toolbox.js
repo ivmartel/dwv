@@ -3,6 +3,12 @@
  * @module tool
  */
 var dwv = dwv || {};
+/**
+ * Namespace for tool functions.
+ * @class tool
+ * @namespace dwv
+ * @static
+ */
 dwv.tool = dwv.tool || {};
 
 /**

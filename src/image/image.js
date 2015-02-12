@@ -790,7 +790,7 @@ dwv.image.Image.prototype.quantifyEllipse = function(ellipse)
 /**
  * Image factory.
  * @class ImageFactory
- * @namespace image
+ * @namespace dwv.image
  * @constructor
  */
 dwv.image.ImageFactory = function () {};

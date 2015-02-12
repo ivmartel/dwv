@@ -427,7 +427,7 @@ dwv.image.View.prototype.fireEvent = function(event)
 /**
  * View factory.
  * @class ViewFactory
- * @namespace image
+ * @namespace dwv.image
  * @constructor
  */
 dwv.image.ViewFactory = function () {};

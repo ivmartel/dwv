@@ -3,6 +3,12 @@
  * @module io
  */
 var dwv = dwv || {};
+/**
+ * Namespace for I/O functions.
+ * @class io
+ * @namespace dwv
+ * @static
+ */
 dwv.io = dwv.io || {};
 
 /**
