@@ -163,12 +163,18 @@ dwv.tool.WindowLevel = function(app)
      */
     var self = this;
     /**
+     * WindowLevel GUI.
+     * @property gui
+     * @type Object
+     */
+    var gui = null;
+    /**
      * Interaction start flag.
      * @property started
      * @type Boolean
      */
     this.started = false;
-
+    
     /**
      * Handle mouse down event.
      * @method mousedown
@@ -181,7 +187,7 @@ dwv.tool.WindowLevel = function(app)
         self.x0 = event._x;
         self.y0 = event._y;
         // update GUI
-        dwv.tool.updatePostionValue(event._x, event._y);
+        app.setCurrentPostion(event._x, event._y);
     };
     
     /**
@@ -201,7 +207,7 @@ dwv.tool.WindowLevel = function(app)
         var windowCenter = parseInt(app.getView().getWindowLut().getCenter(), 10) + diffY;
         var windowWidth = parseInt(app.getView().getWindowLut().getWidth(), 10) + diffX;
         // update GUI
-        dwv.tool.updateWindowingData(windowCenter,windowWidth);
+        app.getViewController().setWindowLevel(windowCenter,windowWidth);
         // store position
         self.x0 = event._x;
         self.y0 = event._y;
@@ -221,9 +227,11 @@ dwv.tool.WindowLevel = function(app)
             var windowWidth = parseInt(app.getView().getWindowLut().getWidth(), 10);
             dwv.tool.presets.manual = {"center": windowCenter, "width": windowWidth};
             // update gui
-            dwv.gui.initWindowLevelHtml();
-            // set selected
-            dwv.gui.setSelected("presetSelect", "Manual");
+            if ( gui ) {
+                gui.initialise();
+                // set selected
+                dwv.gui.setSelected("presetSelect", "Manual");
+            }
         }
     };
     
@@ -271,7 +279,7 @@ dwv.tool.WindowLevel = function(app)
      */
     this.dblclick = function(event){
         // update GUI
-        dwv.tool.updateWindowingData(
+        app.getViewController().setWindowLevel(
             parseInt(app.getImage().getRescaledValue(event._x, event._y, app.getView().getCurrentPosition().k), 10),
             parseInt(app.getView().getWindowLut().getWidth(), 10) );    
     };
@@ -287,16 +295,30 @@ dwv.tool.WindowLevel = function(app)
     };
     
     /**
-     * Enable the tool.
-     * @method enable
-     * @param {Boolean} bool The flag to enable or not.
+     * Setup the tool GUI.
+     * @method setup
      */
-    this.display = function(bool){
-        if( app.getImage().getPhotometricInterpretation().match(/MONOCHROME/) !== null ) {
-            dwv.gui.displayWindowLevelHtml(bool);
-        }
-        else {
-            dwv.gui.displayWindowLevelHtml(false);
+    this.setup = function ()
+    {
+        gui = new dwv.gui.WindowLevel(app);
+        gui.setup();
+    };
+    
+    /**
+     * Display the tool.
+     * @method display
+     * @param {Boolean} bool The flag to display or not.
+     */
+    this.display = function (bool)
+    {
+        if ( gui )
+        {
+            if( app.getImage().getPhotometricInterpretation().match(/MONOCHROME/) !== null ) {
+                gui.display(bool);
+            }
+            else {
+                gui.display(false);
+            }
         }
     };
     
@@ -305,8 +327,10 @@ dwv.tool.WindowLevel = function(app)
      * @method init
      */
     this.init = function() {
-        dwv.tool.updatePresets(true);
-        dwv.gui.initWindowLevelHtml();
+        app.updatePresets(true);
+        if ( gui ) {
+            gui.initialise();
+        }
     };
 }; // WindowLevel class
 

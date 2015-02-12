@@ -158,11 +158,6 @@ dwv.tool.DeleteGroupCommand = function (group, name, layer)
     };
 }; // DeleteShapeCommand class
 
-// List of colors
-dwv.tool.colors = [
-    "Yellow", "Red", "White", "Green", "Blue", "Lime", "Fuchsia", "Black"
-];
-
 /**
  * Drawing tool.
  * @class Draw
@@ -170,7 +165,7 @@ dwv.tool.colors = [
  * @constructor
  * @param {Object} app The associated application.
  */
-dwv.tool.Draw = function (app)
+dwv.tool.Draw = function (app, shapeFactoryList)
 {
     /**
      * Closure to self: to be used by event handlers.
@@ -180,6 +175,12 @@ dwv.tool.Draw = function (app)
      */
     var self = this;
     /**
+     * Draw GUI.
+     * @property gui
+     * @type Object
+     */
+    var gui = null;
+    /**
      * Interaction start flag.
      * @property started
      * @private
@@ -188,19 +189,18 @@ dwv.tool.Draw = function (app)
     var started = false;
     
     /**
+     * Shape factory list
+     * @property shapeFactoryList
+     * @type Object
+     */
+    this.shapeFactoryList = shapeFactoryList;
+    /**
      * Draw command.
      * @property command
      * @private
      * @type Object
      */
     var command = null;
-    /**
-     * Current active shape.
-     * @property activeShape
-     * @private
-     * @type Object
-     */
-    //var activeShape = null;
     /**
      * List of created shapes.
      * @property createdShapes
@@ -251,7 +251,7 @@ dwv.tool.Draw = function (app)
      * @private
      * @type Object
      */
-    var shapeEditor = new dwv.tool.ShapeEditor();
+    var shapeEditor = new dwv.tool.ShapeEditor(app);
 
     /**
      * Trash draw: a cross.
@@ -352,7 +352,7 @@ dwv.tool.Draw = function (app)
             // add current one to the list
             points.push( lastPoint );
             // allow for anchor points
-            var factory = new dwv.tool.shapes[self.shapeName]();
+            var factory = new self.shapeFactoryList[self.shapeName]();
             if( points.length < factory.getNPoints() ) {
                 clearTimeout(this.timer);
                 this.timer = setTimeout( function () {
@@ -391,7 +391,7 @@ dwv.tool.Draw = function (app)
                 shapeGroup.destroy();
             }
             // create final shape
-            var factory = new dwv.tool.shapes[self.shapeName]();
+            var factory = new self.shapeFactoryList[self.shapeName]();
             var group = factory.create(points, self.style, app.getImage());
             group.id( idGenerator.get() );
             // re-activate layer
@@ -460,12 +460,24 @@ dwv.tool.Draw = function (app)
     };
 
     /**
+     * Setup the tool GUI.
+     * @method setup
+     */
+    this.setup = function ()
+    {
+        gui = new dwv.gui.Draw(app);
+        gui.setup(this.shapeFactoryList);
+    };
+    
+    /**
      * Enable the tool.
      * @method enable
      * @param {Boolean} flag The flag to enable or not.
      */
     this.display = function ( flag ){
-        dwv.gui.displayDrawHtml( flag );
+        if ( gui ) {
+            gui.display( flag );
+        }
         // reset shape display properties
         shapeEditor.disable();
         shapeEditor.setShape(null);
@@ -659,6 +671,26 @@ dwv.tool.Draw = function (app)
         });
     };
 
+    /**
+     * Initialise the tool.
+     * @method init
+     */
+    this.init = function() {
+        // set the default to the first in the list
+        var shapeName = 0;
+        for( var key in this.shapeFactoryList ){
+            shapeName = key;
+            break;
+        }
+        this.setShapeName(shapeName);
+        // init gui
+        if ( gui ) {
+            // same for color
+            this.setLineColour(gui.getColours()[0]);
+            // init html
+            gui.initialise();
+        }
+    };
 
 }; // Draw class
 
@@ -716,23 +748,5 @@ dwv.tool.Draw.prototype.setShapeName = function(name)
  * @param {String} name The name of the shape.
  */
 dwv.tool.Draw.prototype.hasShape = function(name) {
-    return dwv.tool.shapes[name];
-};
-
-/**
- * Initialise the tool.
- * @method init
- */
-dwv.tool.Draw.prototype.init = function() {
-    // set the default to the first in the list
-    var shapeName = 0;
-    for( var key in dwv.tool.shapes ){
-        shapeName = key;
-        break;
-    }
-    this.setShapeName(shapeName);
-    // same for color
-    this.setLineColour(dwv.tool.colors[0]);
-    // init html
-    dwv.gui.initDrawHtml();
+    return this.shapeFactoryList[name];
 };

@@ -90,107 +90,124 @@ dwv.gui.setSelected = function(selectName, itemName)
 };
 
 /**
- * Append the slider HTML.
- * @method appendSliderHtml
- * @static
+ * Slider base gui.
+ * @class Slider
+ * @namespace dwv.gui.base
+ * @constructor
  */
-dwv.gui.base.appendSliderHtml = function()
+dwv.gui.base.Slider = function (app)
 {
-    // default values
-    var min = 0;
-    var max = 1;
+    /**
+     * Append the slider HTML.
+     * @method append
+     */
+    this.append = function ()
+    {
+        // default values
+        var min = 0;
+        var max = 1;
+        
+        // jquery-mobile range slider
+        // minimum input
+        var inputMin = document.createElement("input");
+        inputMin.id = "threshold-min";
+        inputMin.type = "range";
+        inputMin.max = max;
+        inputMin.min = min;
+        inputMin.value = min;
+        // maximum input
+        var inputMax = document.createElement("input");
+        inputMax.id = "threshold-max";
+        inputMax.type = "range";
+        inputMax.max = max;
+        inputMax.min = min;
+        inputMax.value = max;
+        // slicer div
+        var div = document.createElement("div");
+        div.id = "threshold-div";
+        div.setAttribute("data-role", "rangeslider");
+        div.appendChild(inputMin);
+        div.appendChild(inputMax);
+        div.setAttribute("data-mini", "true");
+        // append to document
+        document.getElementById("thresholdLi").appendChild(div);
+        // bind change
+        $("#threshold-div").on("change",
+                function(/*event*/) {
+                    app.onChangeMinMax(
+                        { "min":$("#threshold-min").val(),
+                          "max":$("#threshold-max").val() } );
+                }
+            );
+        // trigger creation
+        $("#toolList").trigger("create");
+    };
     
-    // jquery-mobile range slider
-    // minimum input
-    var inputMin = document.createElement("input");
-    inputMin.id = "threshold-min";
-    inputMin.type = "range";
-    inputMin.max = max;
-    inputMin.min = min;
-    inputMin.value = min;
-    // maximum input
-    var inputMax = document.createElement("input");
-    inputMax.id = "threshold-max";
-    inputMax.type = "range";
-    inputMax.max = max;
-    inputMax.min = min;
-    inputMax.value = max;
-    // slicer div
-    var div = document.createElement("div");
-    div.id = "threshold-div";
-    div.setAttribute("data-role", "rangeslider");
-    div.appendChild(inputMin);
-    div.appendChild(inputMax);
-    div.setAttribute("data-mini", "true");
-    // append to document
-    document.getElementById("thresholdLi").appendChild(div);
-    // bind change
-    $("#threshold-div").on("change",
-            function(/*event*/) {
-                dwv.gui.onChangeMinMax(
-                    { "min":$("#threshold-min").val(),
-                      "max":$("#threshold-max").val() } );
-            }
-        );
-    // trigger creation
-    $("#toolList").trigger("create");
-};
+    /**
+     * Initialise the slider HTML.
+     * @method initialise
+     */
+    this.initialise = function ()
+    {
+        var min = app.getImage().getDataRange().min;
+        var max = app.getImage().getDataRange().max;
+        
+        // minimum input
+        var inputMin = document.getElementById("threshold-min");
+        inputMin.max = max;
+        inputMin.min = min;
+        inputMin.value = min;
+        // maximum input
+        var inputMax = document.getElementById("threshold-max");
+        inputMax.max = max;
+        inputMax.min = min;
+        inputMax.value = max;
+        // trigger creation
+        $("#toolList").trigger("create");
+    };
+
+}; // class dwv.gui.base.Slider
 
 /**
- * Initialise the slider HTML.
- * @method initSliderHtml
- * @static
+ * DICOM tags base gui.
+ * @class DicomTags
+ * @namespace dwv.gui.base
+ * @constructor
  */
-dwv.gui.base.initSliderHtml = function()
+dwv.gui.base.DicomTags = function ()
 {
-    var min = app.getImage().getDataRange().min;
-    var max = app.getImage().getDataRange().max;
+    /**
+     * Initialise the DICOM tags table. To be called once the DICOM has been parsed.
+     * @method initialise
+     * @param {Object} dataInfo The data information.
+     */
+    this.initialise = function (dataInfo)
+    {
+        // HTML node
+        var node = document.getElementById("tags");
+        if( node === null ) {
+            return;
+        }
+        // remove possible previous
+        while (node.hasChildNodes()) { 
+            node.removeChild(node.firstChild);
+        }
+        // tag list table (without the pixel data)
+        if(dataInfo.PixelData) {
+            dataInfo.PixelData.value = "...";
+        }
+        // tags HTML table
+        var table = dwv.html.toTable(dataInfo);
+        table.id = "tagsTable";
+        table.setAttribute("class", "tagsList");
+        table.setAttribute("data-role", "table");
+        table.setAttribute("data-mode", "columntoggle");
+        // search form
+        node.appendChild(dwv.html.getHtmlSearchForm(table));
+        // tags table
+        node.appendChild(table);
+        // trigger create event (mobile)
+        $("#tags").trigger("create");
+    };
     
-    // minimum input
-    var inputMin = document.getElementById("threshold-min");
-    inputMin.max = max;
-    inputMin.min = min;
-    inputMin.value = min;
-    // maximum input
-    var inputMax = document.getElementById("threshold-max");
-    inputMax.max = max;
-    inputMax.min = min;
-    inputMax.value = max;
-    // trigger creation
-    $("#toolList").trigger("create");
-};
-
-/**
- * Create the DICOM tags table. To be called once the DICOM has been parsed.
- * @method createTagsTable
- * @private
- * @param {Object} dataInfo The data information.
- */
-dwv.gui.base.appendTagsTable = function (dataInfo)
-{
-    // HTML node
-    var node = document.getElementById("tags");
-    if( node === null ) {
-        return;
-    }
-    // remove possible previous
-    while (node.hasChildNodes()) { 
-        node.removeChild(node.firstChild);
-    }
-    // tag list table (without the pixel data)
-    if(dataInfo.PixelData) {
-        dataInfo.PixelData.value = "...";
-    }
-    // tags HTML table
-    var table = dwv.html.toTable(dataInfo);
-    table.id = "tagsTable";
-    table.className = "tagsList table-stripe";
-    table.setAttribute("data-role", "table");
-    table.setAttribute("data-mode", "columntoggle");
-    // search form
-    node.appendChild(dwv.html.getHtmlSearchForm(table));
-    // tags table
-    node.appendChild(table);
-    // trigger create event (mobile)
-    $("#tags").trigger("create");
-};
+}; // class dwv.gui.base.DicomTags

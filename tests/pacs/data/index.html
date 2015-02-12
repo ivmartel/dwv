@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<title>DWV DICOM Check</title>
+<meta charset="UTF-8">
+<meta name="description" content="DICOM Web Viewer (DWV) simple version">
+<meta name="keywords" content="DICOM,HTML5,JavaScript,medical,imaging,DWV">
+<!-- Style -->
+<style type="text/css">
+body { font-family: Verdana, Arial, Helvetica, sans-serif; }
+.snapshot {
+    float: left; margin: 5px;
+    max-width: 200px; max-height: 200px;
+}
+.layerContainer {
+    float: left; margin: 5px;
+    width: 200px; height: 200px; 
+}
+.doc { float: left; margin: 5px; }
+.path {
+    border-bottom: 1px dashed #999;
+    text-decoration: none; 
+}
+.key {
+    color: #999;
+}
+.separator { clear: both; }
+.footer {
+    margin-top: 15px; padding: 5px;
+    background-color: #ccc;
+}
+</style>  
+<!-- Third party -->  
+<script type="text/javascript" src="../../../ext/jquery/jquery-2.1.3.min.js"></script>
+<script type="text/javascript" src="../../../ext/openjpeg/openjpeg.js"></script>
+<!-- Local -->
+<script type="text/javascript" src="../../../src/application.js"></script>
+<script type="text/javascript" src="../../../src/dicom/dicomParser.js"></script>
+<script type="text/javascript" src="../../../src/dicom/dictionary.js"></script>
+<script type="text/javascript" src="../../../src/gui/filter.js"></script>
+<script type="text/javascript" src="../../../src/gui/browser.js"></script>
+<script type="text/javascript" src="../../../src/gui/generic.js"></script>
+<script type="text/javascript" src="../../../src/gui/help.js"></script>
+<script type="text/javascript" src="../../../src/gui/html.js"></script>
+<script type="text/javascript" src="../../../src/gui/layer.js"></script>
+<script type="text/javascript" src="../../../src/gui/loader.js"></script>
+<script type="text/javascript" src="../../../src/gui/style.js"></script>
+<script type="text/javascript" src="../../../src/gui/tools.js"></script>
+<script type="text/javascript" src="../../../src/gui/undo.js"></script>
+<script type="text/javascript" src="../../../src/image/filter.js"></script>
+<script type="text/javascript" src="../../../src/image/image.js"></script>
+<script type="text/javascript" src="../../../src/image/luts.js"></script>
+<script type="text/javascript" src="../../../src/image/view.js"></script>
+<script type="text/javascript" src="../../../src/image/reader.js"></script>
+<script type="text/javascript" src="../../../src/io/file.js"></script>
+<script type="text/javascript" src="../../../src/io/url.js"></script>
+<script type="text/javascript" src="../../../src/math/bucketQueue.js"></script>
+<script type="text/javascript" src="../../../src/math/scissors.js"></script>
+<script type="text/javascript" src="../../../src/math/shapes.js"></script>
+<script type="text/javascript" src="../../../src/math/stats.js"></script>
+<script type="text/javascript" src="../../../src/tools/toolbox.js"></script>
+<script type="text/javascript" src="../../../src/tools/undo.js"></script>
+<script type="text/javascript" src="../../../src/tools/windowLevel.js"></script>
+<script type="text/javascript" src="../../../src/utils/string.js"></script>
+
+<!-- Local -->
+<script type="text/javascript" src="appgui.js"></script>
+
+<!-- Launch the app -->
+<script type="text/javascript">
+// launch when page is loaded
+$(document).ready( function()
+{
+    dwv.addDataLine("dwv0", "osirix-toutatix-100", {
+        'origin': 'Osirix',
+        'path': 'TOUTATIX/Cardiac 1CTA_CORONARY_ARTERIES_TESTBOLUS (Adult)/Heart w-o 1.5  B25f  55% /IM-0001-0100.dcm',
+        't-syntax': '1.2.840.10008.1.2.1',
+        'modality': 'CT', 'photo': 'Monochrome2',
+        'bits': '16-12-11', 'pixel-vr': 'OW',
+    });
+    dwv.addDataLine("dwv1", "osirix-goudurix", {
+        'origin': 'Osirix',
+        'path': 'GOUDURIX/Specials 1_CORONARY_CTA_COMBI_SMH/70 % 1.0  B30f/IM-0001-0100.dcm',
+        't-syntax': '1.2.840.10008.1.2',
+        'modality': 'CT', 'photo': 'Monochrome2',
+        'bits': '16-12-11', 'pixel-vr': 'OX',
+    });
+    dwv.addDataLine("dwv2", "dicompyler-ct.0", {
+        'origin': 'dicompyler',
+        'path': 'dicompyler/ct/ct.0.dcm',
+        't-syntax': '1.2.840.10008.1.2',
+        'modality': 'CT', 'photo': 'Monochrome2',
+        'bits': '16-16-15', 'pixel-vr': 'OX',
+    });
+    dwv.addDataLine("dwv3", "gdcm-CR-MONO1-10-chest", {
+        'origin': 'GDCM (+ DCIM prefix)',
+        'path': 'CR-MONO1-10-chest.dcm',
+        't-syntax': '1.2.840.10008.1.2.1',
+        'modality': 'CR', 'photo': 'Monochrome1',
+        'bits': '16-10-9', 'pixel-vr': 'OW',
+    });
+    dwv.addDataLine("dwv4", "gdcm-CT-MONO2-8-abdo", {
+        'origin': 'GDCM',
+        'path': 'CT-MONO2-8-abdo.dcm',
+        't-syntax': '1.2.840.10008.1.2',
+        'modality': 'CT', 'photo': 'Monochrome2',
+        'bits': '8-8-7', 'pixel-vr': 'OX',
+    });
+    dwv.addDataLine("dwv5", "gdcm-US-RGB-8-epicard", {
+        'origin': 'GDCM',
+        'path': 'US-RGB-8-epicard.dcm',
+        't-syntax': '1.2.840.10008.1.2.2',
+        'modality': 'US', 'photo': 'RGB (planar=1)',
+        'bits': '8-8-7', 'pixel-vr': 'OB',
+    });
+    dwv.addDataLine("dwv6", "gdcm-US-RGB-8-esopecho", {
+        'origin': 'GDCM',
+        'path': 'US-RGB-8-esopecho.dcm',
+        't-syntax': '1.2.840.10008.1.2.1',
+        'modality': 'US', 'photo': 'RGB (planar=0)',
+        'bits': '8-8-7', 'pixel-vr': 'OB',
+    });
+});
+</script>
+</head>
+
+<body>
+
+<div id="data-lines"></div>
+
+<div class="footer">
+<p><b>Missing data</b>: 8 bits with pixel VR OW</p>
+<p>Data sources:</p>
+<ul>
+<li>Osirix <a href="http://www.osirix-viewer.com/datasets/">datasets</a></li>
+<li>Gdcm: :pserver:xxx@cvs.creatis.insa-lyon.fr:2402/cvs/public</li>
+</ul>
+<p>The left image is created with DWV, the right one is a snapshot 
+generated using <a href="https://www.synedra.com">Synedra</a> View Personnal.</p>
+</div>
+
+</body>
+</html>

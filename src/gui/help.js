@@ -16,11 +16,13 @@ dwv.gui.base = dwv.gui.base || {};
  * Append the version HTML.
  * @method appendVersionHtml
  */
-dwv.gui.base.appendVersionHtml = function()
+dwv.gui.base.appendVersionHtml = function (version)
 {
     var nodes = document.getElementsByClassName("dwv-version");
-    for( var i = 0; i < nodes.length; ++i ){
-        nodes[i].appendChild(document.createTextNode(app.getVersion()));
+    if ( nodes ) {
+        for( var i = 0; i < nodes.length; ++i ){
+            nodes[i].appendChild( document.createTextNode(version) );
+        }
     }
 };
 
@@ -29,7 +31,7 @@ dwv.gui.base.appendVersionHtml = function()
  * @method appendHelpHtml
  * @param {Boolean} mobile Flag for mobile or not environement.
  */
-dwv.gui.base.appendHelpHtml = function(mobile)
+dwv.gui.base.appendHelpHtml = function(toolList, mobile)
 {
     var actionType = "mouse";
     if( mobile ) {
@@ -42,9 +44,11 @@ dwv.gui.base.appendHelpHtml = function(mobile)
     var loc = window.location.pathname;
     var dir = loc.substring(0, loc.lastIndexOf('/'));
 
-    for ( var t in dwv.tool.tools )
+    var tool = null;
+    var tkeys = Object.keys(toolList);
+    for ( var t=0; t < tkeys.length; ++t )
     {
-        var tool = dwv.tool.tools[t];
+        tool = toolList[tkeys[t]];
         // title
         var title = document.createElement("h3");
         title.appendChild(document.createTextNode(tool.getHelp().title));

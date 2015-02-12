@@ -12,7 +12,7 @@ var Kinetic = Kinetic || {};
  * @namespace dwv.tool
  * @constructor
  */
-dwv.tool.ShapeEditor = function ()
+dwv.tool.ShapeEditor = function (app)
 {
     /**
      * Edited shape.

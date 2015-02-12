@@ -24,9 +24,15 @@ dwv.tool.ZoomAndPan = function(app)
      * Closure to self: to be used by event handlers.
      * @property self
      * @private
-     * @type WindowLevel
+     * @type Object
      */
     var self = this;
+    /**
+     * ZoomAndPan GUI.
+     * @property gui
+     * @type Object
+     */
+    var gui = null;
     /**
      * Interaction start flag.
      * @property started
@@ -218,12 +224,24 @@ dwv.tool.ZoomAndPan = function(app)
     };
 
     /**
+     * Setup the tool GUI.
+     * @method setup
+     */
+    this.setup = function ()
+    {
+        gui = new dwv.gui.ZoomAndPan(app);
+        gui.setup();
+    };
+    
+    /**
      * Enable the tool.
      * @method enable
      * @param {Boolean} bool The flag to enable or not.
      */
     this.display = function(bool){
-        dwv.gui.displayZoomAndPanHtml(bool);
+        if ( gui ) {
+            gui.display(bool);
+        }
     };
 
     /**
