@@ -43,6 +43,21 @@
                                 <li><a href="../classes/dwv.dicom.DataReader.html">dwv.dicom.DataReader</a></li>
                                 <li><a href="../classes/dwv.dicom.DicomParser.html">dwv.dicom.DicomParser</a></li>
                                 <li><a href="../classes/dwv.gui.html">dwv.gui</a></li>
+                                <li><a href="../classes/dwv.gui.base.DicomTags.html">dwv.gui.base.DicomTags</a></li>
+                                <li><a href="../classes/dwv.gui.base.Draw.html">dwv.gui.base.Draw</a></li>
+                                <li><a href="../classes/dwv.gui.base.FileLoad.html">dwv.gui.base.FileLoad</a></li>
+                                <li><a href="../classes/dwv.gui.base.Filter.html">dwv.gui.base.Filter</a></li>
+                                <li><a href="../classes/dwv.gui.base.Livewire.html">dwv.gui.base.Livewire</a></li>
+                                <li><a href="../classes/dwv.gui.base.Loadbox.html">dwv.gui.base.Loadbox</a></li>
+                                <li><a href="../classes/dwv.gui.base.Scroll.html">dwv.gui.base.Scroll</a></li>
+                                <li><a href="../classes/dwv.gui.base.Sharpen.html">dwv.gui.base.Sharpen</a></li>
+                                <li><a href="../classes/dwv.gui.base.Slider.html">dwv.gui.base.Slider</a></li>
+                                <li><a href="../classes/dwv.gui.base.Sobel.html">dwv.gui.base.Sobel</a></li>
+                                <li><a href="../classes/dwv.gui.base.Threshold.html">dwv.gui.base.Threshold</a></li>
+                                <li><a href="../classes/dwv.gui.base.Toolbox.html">dwv.gui.base.Toolbox</a></li>
+                                <li><a href="../classes/dwv.gui.base.Undo.html">dwv.gui.base.Undo</a></li>
+                                <li><a href="../classes/dwv.gui.base.WindowLevel.html">dwv.gui.base.WindowLevel</a></li>
+                                <li><a href="../classes/dwv.gui.base.ZoomAndPan.html">dwv.gui.base.ZoomAndPan</a></li>
                                 <li><a href="../classes/dwv.html.html">dwv.html</a></li>
                                 <li><a href="../classes/dwv.html.Layer.html">dwv.html.Layer</a></li>
                                 <li><a href="../classes/dwv.html.Style.html">dwv.html.Style</a></li>
@@ -78,6 +93,7 @@
                                 <li><a href="../classes/dwv.tool.EllipseFactory.html">dwv.tool.EllipseFactory</a></li>
                                 <li><a href="../classes/dwv.tool.Filter.html">dwv.tool.Filter</a></li>
                                 <li><a href="../classes/dwv.tool.filter.Sharpen.html">dwv.tool.filter.Sharpen</a></li>
+                                <li><a href="../classes/dwv.tool.filter.Sobel.html">dwv.tool.filter.Sobel</a></li>
                                 <li><a href="../classes/dwv.tool.filter.Threshold.html">dwv.tool.filter.Threshold</a></li>
                                 <li><a href="../classes/dwv.tool.LineFactory.html">dwv.tool.LineFactory</a></li>
                                 <li><a href="../classes/dwv.tool.Livewire.html">dwv.tool.Livewire</a></li>
@@ -88,11 +104,13 @@
                                 <li><a href="../classes/dwv.tool.RunFilterCommand.html">dwv.tool.RunFilterCommand</a></li>
                                 <li><a href="../classes/dwv.tool.Scroll.html">dwv.tool.Scroll</a></li>
                                 <li><a href="../classes/dwv.tool.ShapeEditor.html">dwv.tool.ShapeEditor</a></li>
-                                <li><a href="../classes/dwv.tool.ToolBox.html">dwv.tool.ToolBox</a></li>
+                                <li><a href="../classes/dwv.tool.Toolbox.html">dwv.tool.Toolbox</a></li>
                                 <li><a href="../classes/dwv.tool.UndoStack.html">dwv.tool.UndoStack</a></li>
                                 <li><a href="../classes/dwv.tool.WindowLevel.html">dwv.tool.WindowLevel</a></li>
                                 <li><a href="../classes/dwv.tool.ZoomAndPan.html">dwv.tool.ZoomAndPan</a></li>
+                                <li><a href="../classes/dwv.ToolboxController.html">dwv.ToolboxController</a></li>
                                 <li><a href="../classes/dwv.utils.html">dwv.utils</a></li>
+                                <li><a href="../classes/dwv.ViewController.html">dwv.ViewController</a></li>
                                 <li><a href="../classes/image.ImageFactory.html">image.ImageFactory</a></li>
                                 <li><a href="../classes/image.ViewFactory.html">image.ViewFactory</a></li>
                             </ul>
@@ -146,7 +164,7 @@
                         
                         
                                 <div class="foundat">
-                                    Defined in: <a href="../files/src_tools_windowLevel.js.html#l149"><code>src&#x2F;tools&#x2F;windowLevel.js:149</code></a>
+                                    Defined in: <a href="../files/src_tools_windowLevel.js.html#l34"><code>src&#x2F;tools&#x2F;windowLevel.js:34</code></a>
                                 </div>
                         
                                     Module: <a href="../modules/tool.html">tool</a>
@@ -182,7 +200,7 @@
                                     <div class="meta">
                                                 <p>
                                                 Defined in
-                                        <a href="../files/src_tools_windowLevel.js.html#l149"><code>src&#x2F;tools&#x2F;windowLevel.js:149</code></a>
+                                        <a href="../files/src_tools_windowLevel.js.html#l34"><code>src&#x2F;tools&#x2F;windowLevel.js:34</code></a>
                                         </p>
                                 
                                 
@@ -236,7 +254,7 @@
                         
                                                     </li>
                                                     <li class="index-item method">
-                                                        <a href="#method_enable">enable</a>
+                                                        <a href="#method_display">display</a>
                         
                                                     </li>
                                                     <li class="index-item method">
@@ -268,6 +286,10 @@
                         
                                                     </li>
                                                     <li class="index-item method">
+                                                        <a href="#method_setup">setup</a>
+                        
+                                                    </li>
+                                                    <li class="index-item method">
                                                         <a href="#method_touchend">touchend</a>
                         
                                                     </li>
@@ -286,6 +308,10 @@
                                             <h3>Properties</h3>
                         
                                             <ul class="index-list properties">
+                                                    <li class="index-item property">
+                                                        <a href="#property_gui">gui</a>
+                        
+                                                    </li>
                                                     <li class="index-item property private">
                                                         <a href="#property_self">self</a>
                         
@@ -324,7 +350,7 @@
                                                 <div class="meta">
                                                             <p>
                                                             Defined in
-                                                    <a href="../files/src_tools_windowLevel.js.html#l267"><code>src&#x2F;tools&#x2F;windowLevel.js:267</code></a>
+                                                    <a href="../files/src_tools_windowLevel.js.html#l160"><code>src&#x2F;tools&#x2F;windowLevel.js:160</code></a>
                                                     </p>
                                             
                                             
@@ -356,8 +382,8 @@
                                             
                                             
                                             </div>
-                                            <div id="method_enable" class="method item">
-                                                <h3 class="name"><code>enable</code></h3>
+                                            <div id="method_display" class="method item">
+                                                <h3 class="name"><code>display</code></h3>
                                             
                                                     <div class="args">
                                                         <span class="paren">(</span><ul class="args-list inline commas">
@@ -377,7 +403,7 @@
                                                 <div class="meta">
                                                             <p>
                                                             Defined in
-                                                    <a href="../files/src_tools_windowLevel.js.html#l289"><code>src&#x2F;tools&#x2F;windowLevel.js:289</code></a>
+                                                    <a href="../files/src_tools_windowLevel.js.html#l192"><code>src&#x2F;tools&#x2F;windowLevel.js:192</code></a>
                                                     </p>
                                             
                                             
@@ -385,7 +411,7 @@
                                                 </div>
                                             
                                                 <div class="description">
-                                                    <p>Enable the tool.</p>
+                                                    <p>Display the tool.</p>
                                             
                                                 </div>
                                             
@@ -399,7 +425,7 @@
                                             
                                             
                                                                 <div class="param-description">
-                                                                    <p>The flag to enable or not.</p>
+                                                                    <p>The flag to display or not.</p>
                                             
                                                                 </div>
                                             
@@ -427,7 +453,7 @@
                                                 <div class="meta">
                                                             <p>
                                                             Defined in
-                                                    <a href="../files/src_tools_windowLevel.js.html#l313"><code>src&#x2F;tools&#x2F;windowLevel.js:313</code></a>
+                                                    <a href="../files/src_tools_windowLevel.js.html#l222"><code>src&#x2F;tools&#x2F;windowLevel.js:222</code></a>
                                                     </p>
                                             
                                             
@@ -466,7 +492,7 @@
                                                 <div class="meta">
                                                             <p>
                                                             Defined in
-                                                    <a href="../files/src_tools_windowLevel.js.html#l303"><code>src&#x2F;tools&#x2F;windowLevel.js:303</code></a>
+                                                    <a href="../files/src_tools_windowLevel.js.html#l210"><code>src&#x2F;tools&#x2F;windowLevel.js:210</code></a>
                                                     </p>
                                             
                                             
@@ -502,7 +528,7 @@
                                                 <div class="meta">
                                                             <p>
                                                             Defined in
-                                                    <a href="../files/src_tools_windowLevel.js.html#l279"><code>src&#x2F;tools&#x2F;windowLevel.js:279</code></a>
+                                                    <a href="../files/src_tools_windowLevel.js.html#l172"><code>src&#x2F;tools&#x2F;windowLevel.js:172</code></a>
                                                     </p>
                                             
                                             
@@ -555,7 +581,7 @@
                                                 <div class="meta">
                                                             <p>
                                                             Defined in
-                                                    <a href="../files/src_tools_windowLevel.js.html#l172"><code>src&#x2F;tools&#x2F;windowLevel.js:172</code></a>
+                                                    <a href="../files/src_tools_windowLevel.js.html#l63"><code>src&#x2F;tools&#x2F;windowLevel.js:63</code></a>
                                                     </p>
                                             
                                             
@@ -608,7 +634,7 @@
                                                 <div class="meta">
                                                             <p>
                                                             Defined in
-                                                    <a href="../files/src_tools_windowLevel.js.html#l187"><code>src&#x2F;tools&#x2F;windowLevel.js:187</code></a>
+                                                    <a href="../files/src_tools_windowLevel.js.html#l78"><code>src&#x2F;tools&#x2F;windowLevel.js:78</code></a>
                                                     </p>
                                             
                                             
@@ -661,7 +687,7 @@
                                                 <div class="meta">
                                                             <p>
                                                             Defined in
-                                                    <a href="../files/src_tools_windowLevel.js.html#l230"><code>src&#x2F;tools&#x2F;windowLevel.js:230</code></a>
+                                                    <a href="../files/src_tools_windowLevel.js.html#l123"><code>src&#x2F;tools&#x2F;windowLevel.js:123</code></a>
                                                     </p>
                                             
                                             
@@ -714,7 +740,7 @@
                                                 <div class="meta">
                                                             <p>
                                                             Defined in
-                                                    <a href="../files/src_tools_windowLevel.js.html#l210"><code>src&#x2F;tools&#x2F;windowLevel.js:210</code></a>
+                                                    <a href="../files/src_tools_windowLevel.js.html#l101"><code>src&#x2F;tools&#x2F;windowLevel.js:101</code></a>
                                                     </p>
                                             
                                             
@@ -746,6 +772,36 @@
                                             
                                             
                                             </div>
+                                            <div id="method_setup" class="method item">
+                                                <h3 class="name"><code>setup</code></h3>
+                                            
+                                                    <span class="paren">()</span>
+                                            
+                                            
+                                            
+                                            
+                                            
+                                            
+                                            
+                                            
+                                                <div class="meta">
+                                                            <p>
+                                                            Defined in
+                                                    <a href="../files/src_tools_windowLevel.js.html#l182"><code>src&#x2F;tools&#x2F;windowLevel.js:182</code></a>
+                                                    </p>
+                                            
+                                            
+                                            
+                                                </div>
+                                            
+                                                <div class="description">
+                                                    <p>Setup the tool GUI.</p>
+                                            
+                                                </div>
+                                            
+                                            
+                                            
+                                            </div>
                                             <div id="method_touchend" class="method item">
                                                 <h3 class="name"><code>touchend</code></h3>
                                             
@@ -767,7 +823,7 @@
                                                 <div class="meta">
                                                             <p>
                                                             Defined in
-                                                    <a href="../files/src_tools_windowLevel.js.html#l258"><code>src&#x2F;tools&#x2F;windowLevel.js:258</code></a>
+                                                    <a href="../files/src_tools_windowLevel.js.html#l151"><code>src&#x2F;tools&#x2F;windowLevel.js:151</code></a>
                                                     </p>
                                             
                                             
@@ -820,7 +876,7 @@
                                                 <div class="meta">
                                                             <p>
                                                             Defined in
-                                                    <a href="../files/src_tools_windowLevel.js.html#l249"><code>src&#x2F;tools&#x2F;windowLevel.js:249</code></a>
+                                                    <a href="../files/src_tools_windowLevel.js.html#l142"><code>src&#x2F;tools&#x2F;windowLevel.js:142</code></a>
                                                     </p>
                                             
                                             
@@ -873,7 +929,7 @@
                                                 <div class="meta">
                                                             <p>
                                                             Defined in
-                                                    <a href="../files/src_tools_windowLevel.js.html#l240"><code>src&#x2F;tools&#x2F;windowLevel.js:240</code></a>
+                                                    <a href="../files/src_tools_windowLevel.js.html#l133"><code>src&#x2F;tools&#x2F;windowLevel.js:133</code></a>
                                                     </p>
                                             
                                             
@@ -910,6 +966,31 @@
                                     <div id="properties" class="api-class-tabpanel">
                                         <h2 class="off-left">Properties</h2>
                         
+                                            <div id="property_gui" class="property item">
+                                                <h3 class="name"><code>gui</code></h3>
+                                                <span class="type">Object</span>
+                                            
+                                            
+                                            
+                                            
+                                            
+                                                <div class="meta">
+                                                            <p>
+                                                            Defined in
+                                                    <a href="../files/src_tools_windowLevel.js.html#l50"><code>src&#x2F;tools&#x2F;windowLevel.js:50</code></a>
+                                                    </p>
+                                            
+                                            
+                                                </div>
+                                            
+                                                <div class="description">
+                                                    <p>WindowLevel GUI.</p>
+                                            
+                                                </div>
+                                            
+                                            
+                                            
+                                            </div>
                                             <div id="property_self" class="property item private">
                                                 <h3 class="name"><code>self</code></h3>
                                                 <span class="type">WindowLevel</span>
@@ -922,7 +1003,7 @@
                                                 <div class="meta">
                                                             <p>
                                                             Defined in
-                                                    <a href="../files/src_tools_windowLevel.js.html#l158"><code>src&#x2F;tools&#x2F;windowLevel.js:158</code></a>
+                                                    <a href="../files/src_tools_windowLevel.js.html#l43"><code>src&#x2F;tools&#x2F;windowLevel.js:43</code></a>
                                                     </p>
                                             
                                             
@@ -947,7 +1028,7 @@
                                                 <div class="meta">
                                                             <p>
                                                             Defined in
-                                                    <a href="../files/src_tools_windowLevel.js.html#l165"><code>src&#x2F;tools&#x2F;windowLevel.js:165</code></a>
+                                                    <a href="../files/src_tools_windowLevel.js.html#l56"><code>src&#x2F;tools&#x2F;windowLevel.js:56</code></a>
                                                     </p>
                                             
                                             

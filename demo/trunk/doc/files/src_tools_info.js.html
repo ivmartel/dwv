@@ -43,6 +43,21 @@
                                 <li><a href="../classes/dwv.dicom.DataReader.html">dwv.dicom.DataReader</a></li>
                                 <li><a href="../classes/dwv.dicom.DicomParser.html">dwv.dicom.DicomParser</a></li>
                                 <li><a href="../classes/dwv.gui.html">dwv.gui</a></li>
+                                <li><a href="../classes/dwv.gui.base.DicomTags.html">dwv.gui.base.DicomTags</a></li>
+                                <li><a href="../classes/dwv.gui.base.Draw.html">dwv.gui.base.Draw</a></li>
+                                <li><a href="../classes/dwv.gui.base.FileLoad.html">dwv.gui.base.FileLoad</a></li>
+                                <li><a href="../classes/dwv.gui.base.Filter.html">dwv.gui.base.Filter</a></li>
+                                <li><a href="../classes/dwv.gui.base.Livewire.html">dwv.gui.base.Livewire</a></li>
+                                <li><a href="../classes/dwv.gui.base.Loadbox.html">dwv.gui.base.Loadbox</a></li>
+                                <li><a href="../classes/dwv.gui.base.Scroll.html">dwv.gui.base.Scroll</a></li>
+                                <li><a href="../classes/dwv.gui.base.Sharpen.html">dwv.gui.base.Sharpen</a></li>
+                                <li><a href="../classes/dwv.gui.base.Slider.html">dwv.gui.base.Slider</a></li>
+                                <li><a href="../classes/dwv.gui.base.Sobel.html">dwv.gui.base.Sobel</a></li>
+                                <li><a href="../classes/dwv.gui.base.Threshold.html">dwv.gui.base.Threshold</a></li>
+                                <li><a href="../classes/dwv.gui.base.Toolbox.html">dwv.gui.base.Toolbox</a></li>
+                                <li><a href="../classes/dwv.gui.base.Undo.html">dwv.gui.base.Undo</a></li>
+                                <li><a href="../classes/dwv.gui.base.WindowLevel.html">dwv.gui.base.WindowLevel</a></li>
+                                <li><a href="../classes/dwv.gui.base.ZoomAndPan.html">dwv.gui.base.ZoomAndPan</a></li>
                                 <li><a href="../classes/dwv.html.html">dwv.html</a></li>
                                 <li><a href="../classes/dwv.html.Layer.html">dwv.html.Layer</a></li>
                                 <li><a href="../classes/dwv.html.Style.html">dwv.html.Style</a></li>
@@ -78,6 +93,7 @@
                                 <li><a href="../classes/dwv.tool.EllipseFactory.html">dwv.tool.EllipseFactory</a></li>
                                 <li><a href="../classes/dwv.tool.Filter.html">dwv.tool.Filter</a></li>
                                 <li><a href="../classes/dwv.tool.filter.Sharpen.html">dwv.tool.filter.Sharpen</a></li>
+                                <li><a href="../classes/dwv.tool.filter.Sobel.html">dwv.tool.filter.Sobel</a></li>
                                 <li><a href="../classes/dwv.tool.filter.Threshold.html">dwv.tool.filter.Threshold</a></li>
                                 <li><a href="../classes/dwv.tool.LineFactory.html">dwv.tool.LineFactory</a></li>
                                 <li><a href="../classes/dwv.tool.Livewire.html">dwv.tool.Livewire</a></li>
@@ -88,11 +104,13 @@
                                 <li><a href="../classes/dwv.tool.RunFilterCommand.html">dwv.tool.RunFilterCommand</a></li>
                                 <li><a href="../classes/dwv.tool.Scroll.html">dwv.tool.Scroll</a></li>
                                 <li><a href="../classes/dwv.tool.ShapeEditor.html">dwv.tool.ShapeEditor</a></li>
-                                <li><a href="../classes/dwv.tool.ToolBox.html">dwv.tool.ToolBox</a></li>
+                                <li><a href="../classes/dwv.tool.Toolbox.html">dwv.tool.Toolbox</a></li>
                                 <li><a href="../classes/dwv.tool.UndoStack.html">dwv.tool.UndoStack</a></li>
                                 <li><a href="../classes/dwv.tool.WindowLevel.html">dwv.tool.WindowLevel</a></li>
                                 <li><a href="../classes/dwv.tool.ZoomAndPan.html">dwv.tool.ZoomAndPan</a></li>
+                                <li><a href="../classes/dwv.ToolboxController.html">dwv.ToolboxController</a></li>
                                 <li><a href="../classes/dwv.utils.html">dwv.utils</a></li>
+                                <li><a href="../classes/dwv.ViewController.html">dwv.ViewController</a></li>
                                 <li><a href="../classes/image.ImageFactory.html">image.ImageFactory</a></li>
                                 <li><a href="../classes/image.ViewFactory.html">image.ViewFactory</a></li>
                             </ul>
@@ -158,214 +176,239 @@
                          */
                         dwv.info = dwv.info || {};
                         
-                        /**
-                         * Create the windowing info div.
-                         * @method createWindowingDiv
-                         * @static
-                         */
-                        dwv.info.createWindowingDiv = function()
-                        {
-                            var div = document.getElementById(&quot;infotr&quot;);
-                            dwv.html.removeNode(&quot;ulinfotr&quot;);
-                            // windowing list
-                            var ul = document.createElement(&quot;ul&quot;);
-                            ul.id = &quot;ulinfotr&quot;;
-                            // window center list item
-                            var liwc = document.createElement(&quot;li&quot;);
-                            liwc.id = &quot;liwcinfotr&quot;;
-                            ul.appendChild(liwc);
-                            // window width list item
-                            var liww = document.createElement(&quot;li&quot;);
-                            liww.id = &quot;liwwinfotr&quot;;
-                            ul.appendChild(liww);
-                            // add list to div
-                            div.appendChild(ul);
-                        };
-                        
-                        /**
-                         * Update the Top Right info div.
-                         * @method updateWindowingDiv
-                         * @static
-                         * @param {Object} event The windowing change event containing the new values.
-                         * Warning: expects the windowing info div to exist (use after createWindowingDiv).
-                         */
-                        dwv.info.updateWindowingDiv = function(event)
-                        {
-                            // window center list item
-                            var liwc = document.getElementById(&quot;liwcinfotr&quot;);
-                            dwv.html.cleanNode(liwc);
-                            liwc.appendChild(document.createTextNode(&quot;WindowCenter = &quot;+event.wc));
-                            // window width list item
-                            var liww = document.getElementById(&quot;liwwinfotr&quot;);
-                            dwv.html.cleanNode(liww);
-                            liww.appendChild(document.createTextNode(&quot;WindowWidth = &quot;+event.ww));
-                        };
-                        
-                        /**
-                         * Create the position info div.
-                         * @method createPositionDiv
-                         * @static
-                         */
-                        dwv.info.createPositionDiv = function()
-                        {
-                            var div = document.getElementById(&quot;infotl&quot;);
-                            dwv.html.removeNode(&quot;ulinfotl&quot;);
-                            // position list
-                            var ul = document.createElement(&quot;ul&quot;);
-                            ul.id = &quot;ulinfotl&quot;;
-                            // position
-                            var lipos = document.createElement(&quot;li&quot;);
-                            lipos.id = &quot;liposinfotl&quot;;
-                            ul.appendChild(lipos);
-                            // value
-                            var livalue = document.createElement(&quot;li&quot;);
-                            livalue.id = &quot;livalueinfotl&quot;;
-                            ul.appendChild(livalue);
-                            // add list to div
-                            div.appendChild(ul);
-                        };
-                        
-                        /**
-                         * Update the position info div.
-                         * @method updatePositionDiv
-                         * @static
-                         * @param {Object} event The position change event containing the new values.
-                         * Warning: expects the position info div to exist (use after createPositionDiv).
-                         */
-                        dwv.info.updatePositionDiv = function(event)
-                        {
-                            // position list item
-                            var lipos = document.getElementById(&quot;liposinfotl&quot;);
-                            dwv.html.cleanNode(lipos);
-                            lipos.appendChild(document.createTextNode(&quot;Pos = &quot;+event.i+&quot;, &quot;+event.j+&quot;, &quot;+event.k));
-                            // value list item
-                            if( typeof(event.value) != &quot;undefined&quot; )
+                        dwv.info.Windowing = function ( app ) {
+                            /**
+                             * Create the windowing info div.
+                             * @method createWindowingDiv
+                             * @static
+                             * @param {String} rootId The div root ID.
+                             */
+                            this.create = function ()
                             {
-                                var livalue = document.getElementById(&quot;livalueinfotl&quot;);
-                                dwv.html.cleanNode(livalue);
-                                livalue.appendChild(document.createTextNode(&quot;Value = &quot;+event.value));
-                            }
-                        };
+                                var rootId = app.getContainerDivId();
+                                var div = document.getElementById(rootId+&quot;-infotr&quot;);
+                                dwv.html.removeNode(rootId+&quot;-ulinfotr&quot;);
+                                // windowing list
+                                var ul = document.createElement(&quot;ul&quot;);
+                                ul.id = rootId+&quot;-ulinfotr&quot;;
+                                // window center list item
+                                var liwc = document.createElement(&quot;li&quot;);
+                                liwc.id = rootId+&quot;-liwcinfotr&quot;;
+                                ul.appendChild(liwc);
+                                // window width list item
+                                var liww = document.createElement(&quot;li&quot;);
+                                liww.id = rootId+&quot;-liwwinfotr&quot;;
+                                ul.appendChild(liww);
+                                // add list to div
+                                div.appendChild(ul);
+                            };
+                            
+                            /**
+                             * Update the Top Right info div.
+                             * @method updateWindowingDiv
+                             * @static
+                             * @param {Object} event The windowing change event containing the new values.
+                             * Warning: expects the windowing info div to exist (use after createWindowingDiv).
+                             */
+                            this.update = function (event)
+                            {
+                                var rootId = app.getContainerDivId();
+                                // window center list item
+                                var liwc = document.getElementById(rootId+&quot;-liwcinfotr&quot;);
+                                dwv.html.cleanNode(liwc);
+                                liwc.appendChild(document.createTextNode(&quot;WindowCenter = &quot;+event.wc));
+                                // window width list item
+                                var liww = document.getElementById(rootId+&quot;-liwwinfotr&quot;);
+                                dwv.html.cleanNode(liww);
+                                liww.appendChild(document.createTextNode(&quot;WindowWidth = &quot;+event.ww));
+                            };
+                            
+                        }; // class dwv.info.Windowing
                         
-                        /**
-                         * Create the mini color map info div.
-                         * @method createMiniColorMap
-                         * @static
-                         */
-                        dwv.info.createMiniColorMap = function()
-                        {    
-                            // color map
-                            var div = document.getElementById(&quot;infobr&quot;);
-                            dwv.html.removeNode(&quot;canvasinfobr&quot;);
-                            var canvas = document.createElement(&quot;canvas&quot;);
-                            canvas.id = &quot;canvasinfobr&quot;;
-                            canvas.width = 98;
-                            canvas.height = 10;
-                            // add canvas to div
-                            div.appendChild(canvas);
-                        };
-                        
-                        /**
-                         * Update the mini color map info div.
-                         * @method updateMiniColorMap
-                         * @static
-                         * @param {Object} event The windowing change event containing the new values.
-                         * Warning: expects the mini color map div to exist (use after createMiniColorMap).
-                         */
-                        dwv.info.updateMiniColorMap = function(event)
-                        {    
-                            var windowCenter = event.wc;
-                            var windowWidth = event.ww;
+                        dwv.info.Position = function ( app ) {
+                            /**
+                             * Create the position info div.
+                             * @method createPositionDiv
+                             * @static
+                             * @param {String} rootId The div root ID.
+                             */
+                            this.create = function ()
+                            {
+                                var rootId = app.getContainerDivId();
+                                
+                                var div = document.getElementById(rootId+&quot;-infotl&quot;);
+                                dwv.html.removeNode(rootId+&quot;-ulinfotl&quot;);
+                                // position list
+                                var ul = document.createElement(&quot;ul&quot;);
+                                ul.id = rootId+&quot;-ulinfotl&quot;;
+                                // position
+                                var lipos = document.createElement(&quot;li&quot;);
+                                lipos.id = rootId+&quot;-liposinfotl&quot;;
+                                ul.appendChild(lipos);
+                                // value
+                                var livalue = document.createElement(&quot;li&quot;);
+                                livalue.id = rootId+&quot;-livalueinfotl&quot;;
+                                ul.appendChild(livalue);
+                                // add list to div
+                                div.appendChild(ul);
+                            };
                             
-                            var canvas = document.getElementById(&quot;canvasinfobr&quot;);
-                            var context = canvas.getContext(&#x27;2d&#x27;);
-                            
-                            // fill in the image data
-                            var colourMap = app.getView().getColorMap();
-                            var imageData = context.getImageData(0,0,canvas.width, canvas.height);
-                            
-                            var c = 0;
-                            var minInt = app.getImage().getRescaledDataRange().min;
-                            var range = app.getImage().getRescaledDataRange().max - minInt;
-                            var incrC = range / canvas.width;
-                            var y = 0;
-                            
-                            var yMax = 255;
-                            var yMin = 0;
-                            var xMin = windowCenter - 0.5 - (windowWidth-1) / 2;
-                            var xMax = windowCenter - 0.5 + (windowWidth-1) / 2;    
-                            
-                            var index;
-                            for( var j=0; j&lt;canvas.height; ++j ) {
-                                c = minInt;
-                                for( var i=0; i&lt;canvas.width; ++i ) {
-                                    if( c &lt;= xMin ) {
-                                        y = yMin;
-                                    }
-                                    else if( c &gt; xMax ) {
-                                        y = yMax;
-                                    }
-                                    else {
-                                        y = ( (c - (windowCenter-0.5) ) / (windowWidth-1) + 0.5 ) *
-                                            (yMax-yMin) + yMin;
-                                        y = parseInt(y,10);
-                                    }
-                                    index = (i + j * canvas.width) * 4;
-                                    imageData.data[index] = colourMap.red[y];
-                                    imageData.data[index+1] = colourMap.green[y];
-                                    imageData.data[index+2] = colourMap.blue[y];
-                                    imageData.data[index+3] = 0xff;
-                                    c += incrC;
+                            /**
+                             * Update the position info div.
+                             * @method updatePositionDiv
+                             * @static
+                             * @param {Object} event The position change event containing the new values.
+                             * Warning: expects the position info div to exist (use after createPositionDiv).
+                             */
+                            this.update = function (event)
+                            {
+                                var rootId = app.getContainerDivId();
+                                
+                                // position list item
+                                var lipos = document.getElementById(rootId+&quot;-liposinfotl&quot;);
+                                dwv.html.cleanNode(lipos);
+                                lipos.appendChild(document.createTextNode(&quot;Pos = &quot;+event.i+&quot;, &quot;+event.j+&quot;, &quot;+event.k));
+                                // value list item
+                                if( typeof(event.value) != &quot;undefined&quot; )
+                                {
+                                    var livalue = document.getElementById(rootId+&quot;-livalueinfotl&quot;);
+                                    dwv.html.cleanNode(livalue);
+                                    livalue.appendChild(document.createTextNode(&quot;Value = &quot;+event.value));
                                 }
-                            }
-                            // put the image data in the context
-                            context.putImageData(imageData, 0, 0);
-                        };
+                            };
+                        }; // class dwv.info.Position
                         
-                        /**
-                         * Create the plot info.
-                         * @method createPlot
-                         * @static
-                         */
-                        dwv.info.createPlot = function()
-                        {
-                            $.plot($(&quot;#plot&quot;), [ app.getImage().getHistogram() ], {
-                                &quot;bars&quot;: { &quot;show&quot;: true },
-                                &quot;grid&quot;: { &quot;backgroundColor&quot;: null },
-                                &quot;xaxis&quot;: { &quot;show&quot;: true },
-                                &quot;yaxis&quot;: { &quot;show&quot;: false }
-                            });
-                        };
-                        
-                        /**
-                         * Update the plot markings.
-                         * @method updatePlotMarkings
-                         * @static
-                         * @param {Object} event The windowing change event containing the new values.
-                         * Warning: expects the plot to exist (use after createPlot).
-                         */
-                        dwv.info.updatePlotMarkings = function(event)
-                        {
-                            var wc = event.wc;
-                            var ww = event.ww;
+                        dwv.info.MiniColorMap = function ( app ) {
+                            /**
+                             * Create the mini color map info div.
+                             * @method createMiniColorMap
+                             * @static
+                             */
+                            this.create = function ()
+                            {    
+                                var rootId = app.getContainerDivId();
+                                
+                                // color map
+                                var div = document.getElementById(rootId+&quot;-infobr&quot;);
+                                dwv.html.removeNode(rootId+&quot;-canvasinfobr&quot;);
+                                var canvas = document.createElement(&quot;canvas&quot;);
+                                canvas.id = rootId+&quot;-canvasinfobr&quot;;
+                                canvas.width = 98;
+                                canvas.height = 10;
+                                // add canvas to div
+                                div.appendChild(canvas);
+                            };
                             
-                            var half = parseInt( (ww-1) / 2, 10 );
-                            var center = parseInt( (wc-0.5), 10 );
-                            var min = center - half;
-                            var max = center + half;
-                            
-                            var markings = [
-                                { &quot;color&quot;: &quot;#faa&quot;, &quot;lineWidth&quot;: 1, &quot;xaxis&quot;: { &quot;from&quot;: min, &quot;to&quot;: min } },
-                                { &quot;color&quot;: &quot;#aaf&quot;, &quot;lineWidth&quot;: 1, &quot;xaxis&quot;: { &quot;from&quot;: max, &quot;to&quot;: max } }
-                            ];
+                            /**
+                             * Update the mini color map info div.
+                             * @method updateMiniColorMap
+                             * @static
+                             * @param {Object} event The windowing change event containing the new values.
+                             * Warning: expects the mini color map div to exist (use after createMiniColorMap).
+                             */
+                            this.update = function (event)
+                            {    
+                                var rootId = app.getContainerDivId();
+                                
+                                var windowCenter = event.wc;
+                                var windowWidth = event.ww;
+                                
+                                var canvas = document.getElementById(rootId+&quot;-canvasinfobr&quot;);
+                                var context = canvas.getContext(&#x27;2d&#x27;);
+                                
+                                // fill in the image data
+                                var colourMap = app.getView().getColorMap();
+                                var imageData = context.getImageData(0,0,canvas.width, canvas.height);
+                                
+                                var c = 0;
+                                var minInt = app.getImage().getRescaledDataRange().min;
+                                var range = app.getImage().getRescaledDataRange().max - minInt;
+                                var incrC = range / canvas.width;
+                                var y = 0;
+                                
+                                var yMax = 255;
+                                var yMin = 0;
+                                var xMin = windowCenter - 0.5 - (windowWidth-1) / 2;
+                                var xMax = windowCenter - 0.5 + (windowWidth-1) / 2;    
+                                
+                                var index;
+                                for( var j=0; j&lt;canvas.height; ++j ) {
+                                    c = minInt;
+                                    for( var i=0; i&lt;canvas.width; ++i ) {
+                                        if( c &lt;= xMin ) {
+                                            y = yMin;
+                                        }
+                                        else if( c &gt; xMax ) {
+                                            y = yMax;
+                                        }
+                                        else {
+                                            y = ( (c - (windowCenter-0.5) ) / (windowWidth-1) + 0.5 ) *
+                                                (yMax-yMin) + yMin;
+                                            y = parseInt(y,10);
+                                        }
+                                        index = (i + j * canvas.width) * 4;
+                                        imageData.data[index] = colourMap.red[y];
+                                        imageData.data[index+1] = colourMap.green[y];
+                                        imageData.data[index+2] = colourMap.blue[y];
+                                        imageData.data[index+3] = 0xff;
+                                        c += incrC;
+                                    }
+                                }
+                                // put the image data in the context
+                                context.putImageData(imageData, 0, 0);
+                            };
+                        }; // class dwv.info.MiniColorMap
                         
-                            $.plot($(&quot;#plot&quot;), [ app.getImage().getHistogram() ], {
-                                &quot;bars&quot;: { &quot;show&quot;: true },
-                                &quot;grid&quot;: { &quot;markings&quot;: markings, &quot;backgroundColor&quot;: null },
-                                &quot;xaxis&quot;: { &quot;show&quot;: false },
-                                &quot;yaxis&quot;: { &quot;show&quot;: false }
-                            });
-                        };
+                        
+                        dwv.info.Plot = function (app) {
+                        
+                            /**
+                             * Create the plot info.
+                             * @method create
+                             * @static
+                             * @param {String} rootId The div root ID.
+                             */
+                            this.create = function()
+                            {
+                                $.plot($(&quot;#&quot;+app.getContainerDivId()+&quot;-plot&quot;), [ app.getImage().getHistogram() ], {
+                                    &quot;bars&quot;: { &quot;show&quot;: true },
+                                    &quot;grid&quot;: { &quot;backgroundColor&quot;: null },
+                                    &quot;xaxis&quot;: { &quot;show&quot;: true },
+                                    &quot;yaxis&quot;: { &quot;show&quot;: false }
+                                });
+                            };
+                        
+                            /**
+                             * Update plot.
+                             * @method update
+                             * @static
+                             * @param {Object} event The windowing change event containing the new values.
+                             * Warning: expects the plot to exist (use after createPlot).
+                             */
+                            this.update = function (event)
+                            {
+                                var wc = event.wc;
+                                var ww = event.ww;
+                                
+                                var half = parseInt( (ww-1) / 2, 10 );
+                                var center = parseInt( (wc-0.5), 10 );
+                                var min = center - half;
+                                var max = center + half;
+                                
+                                var markings = [
+                                    { &quot;color&quot;: &quot;#faa&quot;, &quot;lineWidth&quot;: 1, &quot;xaxis&quot;: { &quot;from&quot;: min, &quot;to&quot;: min } },
+                                    { &quot;color&quot;: &quot;#aaf&quot;, &quot;lineWidth&quot;: 1, &quot;xaxis&quot;: { &quot;from&quot;: max, &quot;to&quot;: max } }
+                                ];
+                            
+                                $.plot($(&quot;#&quot;+app.getContainerDivId()+&quot;-plot&quot;), [ app.getImage().getHistogram() ], {
+                                    &quot;bars&quot;: { &quot;show&quot;: true },
+                                    &quot;grid&quot;: { &quot;markings&quot;: markings, &quot;backgroundColor&quot;: null },
+                                    &quot;xaxis&quot;: { &quot;show&quot;: false },
+                                    &quot;yaxis&quot;: { &quot;show&quot;: false }
+                                });
+                            };
+                        
+                        }; // class dwv.info.Plot
                         
                             </pre>
                         </div>

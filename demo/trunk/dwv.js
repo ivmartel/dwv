@@ -9,14 +9,13 @@ var Kinetic = Kinetic || {};
  * @namespace dwv
  * @constructor
  */
-dwv.App = function()
+dwv.App = function ()
 {
     // Local object
     var self = this;
+    
     // Image
     var image = null;
-    // View
-    var view = null;
     // Original image
     var originalImage = null;
     // Image data array
@@ -26,9 +25,34 @@ dwv.App = function()
     // Image data height
     var dataHeight = 0;
 
-    // display window scale
+    // Container div id
+    var containerDivId = null;
+    // Display window scale
     var windowScale = 1;
+    // Fit display to window flag
+    var fitToWindow = false;
+
+    // View
+    var view = null;
+    // View controller
+    var viewController = null;
+    // Window/level presets
+    var presets = null;
      
+    // Info layer plot gui
+    var plotInfo = null;
+    // Info layer windowing gui
+    var windowingInfo = null;
+    // Info layer position gui
+    var positionInfo = null;
+    // Info layer color map gui
+    var miniColorMap = null; 
+    // flag to know if the info layer is listening on the image.
+    var isInfoLayerListening = false;
+
+    // Dicom tags gui
+    var tagsGui = null;
+    
     // Image layer
     var imageLayer = null;
     // Draw layers
@@ -36,81 +60,93 @@ dwv.App = function()
     // Draw stage
     var drawStage = null;
     
-    // flag to know if the info layer is listening on the image.
-    var isInfoLayerListening = false;
-    
-    // Tool box
-    var toolBox = new dwv.tool.ToolBox(this);
+    // Toolbox
+    var toolbox = null;
+    // Toolbox controller
+    var toolboxController = null;
+
+    // Loadbox
+    var loadbox = null;
     // UndoStack
-    var undoStack = new dwv.tool.UndoStack();
+    var undoStack = null;
     
     /** 
      * Get the version of the application.
      * @method getVersion
      * @return {String} The version of the application.
      */
-    this.getVersion = function() { return "v0.9.0beta"; };
+    this.getVersion = function () { return "v0.9.0beta"; };
     
     /** 
      * Get the image.
      * @method getImage
      * @return {Image} The associated image.
      */
-    this.getImage = function() { return image; };
-    /** 
-     * Get the view.
-     * @method getView
-     * @return {Image} The associated view.
-     */
-    this.getView = function() { return view; };
-    
+    this.getImage = function () { return image; };
     /** 
      * Set the view.
      * @method setImage
      * @param {Image} img The associated image.
      */
-    this.setImage = function(img)
+    this.setImage = function (img)
     { 
         image = img; 
         view.setImage(img);
     };
-    
     /** 
      * Restore the original image.
      * @method restoreOriginalImage
      */
-    this.restoreOriginalImage = function() 
+    this.restoreOriginalImage = function () 
     { 
         image = originalImage; 
         view.setImage(originalImage); 
     }; 
-    
     /** 
      * Get the image data array.
      * @method getImageData
      * @return {Array} The image data array.
      */
-    this.getImageData = function() { return imageData; };
+    this.getImageData = function () { return imageData; };
 
     /** 
-     * Get the tool box.
-     * @method getToolBox
-     * @return {Object} The associated toolbox.
+     * Get the container div id.
+     * @method getContainerDivId
+     * @return {String} The div id.
      */
-    this.getToolBox = function() { return toolBox; };
+    this.getContainerDivId = function () { return containerDivId; };
+
+    /** 
+     * Get the view.
+     * @method getView
+     * @return {Image} The associated view.
+     */
+    this.getView = function () { return view; };
+    /** 
+     * Get the view controller.
+     * @method getViewController
+     * @return {Object} The controller.
+     */
+    this.getViewController = function () { return viewController; };
+    /** 
+     * Get the window/level presets.
+     * @method getPresets
+     * @return {Object} The presets.
+     */
+    this.getPresets = function () { return presets; };
 
     /** 
      * Get the image layer.
      * @method getImageLayer
      * @return {Object} The image layer.
      */
-    this.getImageLayer = function() { return imageLayer; };
+    this.getImageLayer = function () { return imageLayer; };
     /** 
      * Get the draw layer.
      * @method getDrawLayer
      * @return {Object} The draw layer.
      */
-    this.getDrawLayer = function() { 
+    this.getDrawLayer = function () { 
         return drawLayers[view.getCurrentPosition().k];
     };
     /** 
@@ -118,24 +154,161 @@ dwv.App = function()
      * @method getDrawStage
      * @return {Object} The draw layer.
      */
-    this.getDrawStage = function() { return drawStage; };
+    this.getDrawStage = function () { return drawStage; };
+
+    /** 
+     * Get the toolbox.
+     * @method getToolbox
+     * @return {Object} The associated toolbox.
+     */
+    this.getToolbox = function () { return toolbox; };
+    /** 
+     * Get the toolbox controller.
+     * @method getToolboxController
+     * @return {Object} The controller.
+     */
+    this.getToolboxController = function () { return toolboxController; };
 
     /** 
      * Get the undo stack.
      * @method getUndoStack
      * @return {Object} The undo stack.
      */
-    this.getUndoStack = function() { return undoStack; };
+    this.getUndoStack = function () { return undoStack; };
 
+    /** 
+     * Get the data loaders.
+     * @method getLoaders
+     * @return {Object} The loaders.
+     */
+    this.getLoaders = function () 
+    {
+        return {
+            'file': dwv.io.File,
+            'url': dwv.io.Url
+        };        
+    };
+    
     /**
      * Initialise the HTML for the application.
      * @method init
      */
-    this.init = function(){
-        // align layers when the window is resized
-        window.onresize = this.resize;
+    this.init = function ( config ) {
+        containerDivId = config.containerDivId;
+        // tools
+        if ( config.tools && config.tools.length !== 0 ) {
+            // setup the tool list
+            var toolList = {};
+            for ( var t = 0; t < config.tools.length; ++t ) {
+                switch( config.tools[t] ) {
+                case "Window/Level":
+                    toolList["Window/Level"] = new dwv.tool.WindowLevel(this);
+                    break;
+                case "Zoom/Pan":
+                    toolList["Zoom/Pan"] = new dwv.tool.ZoomAndPan(this);
+                    break;
+                case "Scroll":
+                    toolList.Scroll = new dwv.tool.Scroll(this);
+                    break;
+                case "Draw":
+                    if ( config.shapes !== 0 ) {
+                        // setup the shape list
+                        var shapeList = {};
+                        for ( var s = 0; s < config.shapes.length; ++s ) {
+                            switch( config.shapes[s] ) {
+                            case "Line":
+                                shapeList.Line = dwv.tool.LineFactory;
+                                break;
+                            case "Protractor":
+                                shapeList.Protractor = dwv.tool.ProtractorFactory;
+                                break;
+                            case "Rectangle":
+                                shapeList.Rectangle = dwv.tool.RectangleFactory;
+                                break;
+                            case "Roi":
+                                shapeList.Roi = dwv.tool.RoiFactory;
+                                break;
+                            case "Ellipse":
+                                shapeList.Ellipse = dwv.tool.EllipseFactory;
+                                break;
+                            }
+                        }
+                        toolList.Draw = new dwv.tool.Draw(this, shapeList);
+                    }
+                    break;
+                case "Livewire":
+                    toolList.Livewire = new dwv.tool.Livewire(this);
+                    break;
+                case "Filter":
+                    if ( config.filters.length !== 0 ) {
+                        // setup the filter list
+                        var filterList = {};
+                        for ( var f = 0; f < config.filters.length; ++f ) {
+                            switch( config.filters[f] ) {
+                            case "Threshold":
+                                filterList.Threshold = new dwv.tool.filter.Threshold(this);
+                                break;
+                            case "Sharpen":
+                                filterList.Sharpen = new dwv.tool.filter.Sharpen(this);
+                                break;
+                            case "Sobel":
+                                filterList.Sobel = new dwv.tool.filter.Sobel(this);
+                                break;
+                            }
+                        }
+                        toolList.Filter = new dwv.tool.Filter(filterList, this);
+                    }
+                    break;
+                default:
+                    throw new Error("Unknown tool: '" + config.tools[t] + "'");
+                }
+            }
+            toolbox = new dwv.tool.Toolbox(toolList, this);
+            toolboxController = new dwv.ToolboxController(toolbox);
+        }
+        // gui
+        if ( config.gui ) {
+            // tools
+            if ( config.gui.indexOf("tool") !== -1 && toolbox) {
+                toolbox.setup();
+            }
+            // load
+            if ( config.gui.indexOf("load") !== -1 ) {
+                var fileLoadGui = new dwv.gui.FileLoad(this);
+                var urlLoadGui = new dwv.gui.UrlLoad(this);
+                loadbox = new dwv.gui.Loadbox(this, fileLoadGui, urlLoadGui);
+                loadbox.setup();
+                fileLoadGui.setup();
+                urlLoadGui.setup();
+                fileLoadGui.display(true);
+                urlLoadGui.display(false);
+            }
+            // undo
+            if ( config.gui.indexOf("undo") !== -1 ) {
+                undoStack = new dwv.tool.UndoStack();
+                undoStack.setup();
+            }
+            // DICOM Tags
+            if ( config.gui.indexOf("tags") !== -1 ) {
+                tagsGui = new dwv.gui.DicomTags();
+            }
+            // version number
+            if ( config.gui.indexOf("version") !== -1 ) {
+                dwv.gui.appendVersionHtml(this.getVersion());
+            }
+            // help
+            if ( config.gui.indexOf("help") !== -1 ) {
+                var isMobile = true;
+                if ( config.isMobile ) {
+                    isMobile = config.isMobile;
+                }
+                dwv.gui.appendHelpHtml( toolbox.getToolList(), isMobile );
+            }
+        }
+        
         // listen to drag&drop
-        var box = document.getElementById("dropBox");
+        var dropBoxDivId = containerDivId + "-dropBox";
+        var box = document.getElementById(dropBoxDivId);
         if ( box ) {
             box.addEventListener("dragover", onDragOver);
             box.addEventListener("dragleave", onDragLeave);
@@ -143,18 +316,23 @@ dwv.App = function()
             // initial size
             var size = dwv.gui.getWindowSize();
             var dropBoxSize = 2 * size.height / 3;
-            $("#dropBox").height( dropBoxSize );
-            $("#dropBox").width( dropBoxSize );
+            $("#"+dropBoxDivId).height( dropBoxSize );
+            $("#"+dropBoxDivId).width( dropBoxSize );
         }
         // possible load from URL
-        if( typeof skipLoadUrl === "undefined" ) {
+        if ( typeof config.skipLoadUrl === "undefined" ) {
             var inputUrls = dwv.html.getUriParam(); 
-            if( inputUrls && inputUrls.length > 0 ) {
+            if ( inputUrls && inputUrls.length > 0 ) {
                 this.loadURL(inputUrls);
             }
         }
         else{
             console.log("Not loading url from adress since skipLoadUrl is defined.");
+        }
+        // align layers when the window is resized
+        if ( config.fitToWindow ) {
+            fitToWindow = true;
+            window.onresize = this.onResize;
         }
     };
     
@@ -162,10 +340,12 @@ dwv.App = function()
      * Reset the application.
      * @method reset
      */
-    this.reset = function()
+    this.reset = function ()
     {
         // clear tools
-        toolBox.reset();
+        if ( toolbox ) {
+            toolbox.reset();
+        }
         // clear draw
         if ( drawStage ) {
             drawLayers = [];
@@ -173,9 +353,11 @@ dwv.App = function()
         // clear objects
         image = null;
         view = null;
-        // clear undo/redo
-        undoStack = new dwv.tool.UndoStack();
-        dwv.gui.cleanUndoHtml();
+        // reset undo/redo
+        if ( undoStack ) {
+            undoStack = new dwv.tool.UndoStack();
+            undoStack.initialise();
+        }
     };
     
     /**
@@ -195,41 +377,11 @@ dwv.App = function()
     };
     
     /**
-     * Handle key down event.
-     * - CRTL-Z: undo
-     * - CRTL-Y: redo
-     * Default behavior. Usually used in tools. 
-     * @method onKeydown
-     * @param {Object} event The key down event.
-     */
-    this.onKeydown = function(event)
-    {
-        if( event.keyCode === 90 && event.ctrlKey ) // ctrl-z
-        {
-            undoStack.undo();
-        }
-        else if( event.keyCode === 89 && event.ctrlKey ) // ctrl-y
-        {
-            undoStack.redo();
-        }
-    };
-    
-    /**
-     * Handle change files event.
-     * @method onChangeFiles
-     * @param {Object} event The event fired when changing the file field.
-     */
-    this.onChangeFiles = function(event)
-    {
-        this.loadFiles(event.target.files);
-    };
-
-    /**
      * Load a list of files.
      * @method loadFiles
      * @param {Array} files The list of files to load.
      */
-    this.loadFiles = function(files) 
+    this.loadFiles = function (files) 
     {
         // clear variables
         this.reset();
@@ -237,12 +389,12 @@ dwv.App = function()
         var fileIO = new dwv.io.File();
         fileIO.onload = function (data) {
             var isFirst = true;
-            if( image ) {
+            if ( image ) {
                 image.appendSlice( data.view.getImage() );
                 isFirst = false;
             }
             postLoadInit(data);
-            if( drawStage ) {
+            if ( drawStage ) {
                 // create slice draw layer
                 var drawLayer = new Kinetic.Layer({
                     listening: false,
@@ -255,27 +407,17 @@ dwv.App = function()
                 drawStage.add(drawLayer);
             }
         };
-        fileIO.onerror = function(error){ handleError(error); };
+        fileIO.onerror = function (error){ handleError(error); };
         // main load (asynchronous)
         fileIO.load(files);
     };
     
     /**
-     * Handle change url event.
-     * @method onChangeURL
-     * @param {Object} event The event fired when changing the url field.
-     */
-    this.onChangeURL = function(event)
-    {
-        this.loadURL([event.target.value]);
-    };
-
-    /**
      * Load a list of URLs.
      * @method loadURL
      * @param {Array} urls The list of urls to load.
      */
-    this.loadURL = function(urls) 
+    this.loadURL = function (urls) 
     {
         // clear variables
         this.reset();
@@ -283,12 +425,12 @@ dwv.App = function()
         var urlIO = new dwv.io.Url();
         urlIO.onload = function (data) {
             var isFirst = true;
-            if( image ) {
+            if ( image ) {
                 image.appendSlice( data.view.getImage() );
                 isFirst = false;
             }
             postLoadInit(data);
-            if( drawStage ) {
+            if ( drawStage ) {
                 // create slice draw layer
                 var drawLayer = new Kinetic.Layer({
                     listening: false,
@@ -301,11 +443,193 @@ dwv.App = function()
                 drawStage.add(drawLayer);
             }
         };
-        urlIO.onerror = function(error){ handleError(error); };
+        urlIO.onerror = function (error){ handleError(error); };
         // main load (asynchronous)
         urlIO.load(urls);
     };
     
+    /**
+     * Fit the display to the given size. To be called once the image is loaded.
+     * @method fitToSize
+     */
+    this.fitToSize = function (size)
+    {
+        // previous width
+        var oldWidth = parseInt(windowScale*dataWidth, 10);
+        // find new best fit
+        windowScale = Math.min( (size.width / dataWidth), (size.height / dataHeight) );
+        // new sizes
+        var newWidth = parseInt(windowScale*dataWidth, 10);
+        var newHeight = parseInt(windowScale*dataHeight, 10);
+        // ratio previous/new to add to zoom
+        var mul = newWidth / oldWidth;
+
+        // resize container
+        var jqDivId = "#"+containerDivId;
+        $(jqDivId).width(newWidth);
+        $(jqDivId).height(newHeight + 1); // +1 to be sure...
+        // resize image layer
+        if ( imageLayer ) {
+            var iZoomX = imageLayer.getZoom().x * mul;
+            var iZoomY = imageLayer.getZoom().y * mul;
+            imageLayer.setWidth(newWidth);
+            imageLayer.setHeight(newHeight);
+            imageLayer.zoom(iZoomX, iZoomY, 0, 0);
+            imageLayer.draw();
+        }
+        // resize draw stage
+        if ( drawStage ) {
+            // resize div
+            var drawDivId = "#" + containerDivId + "-drawDiv";
+            $(drawDivId).width(newWidth);
+            $(drawDivId).height(newHeight);
+            // resize stage
+            var stageZomX = drawStage.scale().x * mul;
+            var stageZoomY = drawStage.scale().y * mul;
+            drawStage.setWidth(newWidth);
+            drawStage.setHeight(newHeight);
+            drawStage.scale( {x: stageZomX, y: stageZoomY} );
+            drawStage.draw();
+        }
+    };
+    
+    /**
+     * Toggle the display of the information layer.
+     * @method toggleInfoLayerDisplay
+     */
+    this.toggleInfoLayerDisplay = function ()
+    {
+        // toggle html
+        var infoDivId = containerDivId + "-infoLayer";
+        dwv.html.toggleDisplay(infoDivId);
+        // toggle listeners
+        if ( isInfoLayerListening ) {
+            removeImageInfoListeners();
+        }
+        else {
+            addImageInfoListeners();
+        }
+    };
+    
+    /**
+     * Init the Window/Level display
+     */
+    this.initWLDisplay = function ()
+    {
+        // set window/level
+        var keys = Object.keys(presets);
+        viewController.setWindowLevel(
+            presets[keys[0]].center, 
+            presets[keys[0]].width );
+        // default position
+        this.setCurrentPostion(0,0);
+    };
+
+    /**
+     * Add layer mouse and touch listeners.
+     * @method addLayerListeners
+     */
+    this.addLayerListeners = function (layer)
+    {
+        // allow pointer events
+        layer.setAttribute("style", "pointer-events: auto;");
+        // mouse listeners
+        layer.addEventListener("mousedown", eventHandler);
+        layer.addEventListener("mousemove", eventHandler);
+        layer.addEventListener("mouseup", eventHandler);
+        layer.addEventListener("mouseout", eventHandler);
+        layer.addEventListener("mousewheel", eventHandler);
+        layer.addEventListener("DOMMouseScroll", eventHandler);
+        layer.addEventListener("dblclick", eventHandler);
+        // touch listeners
+        layer.addEventListener("touchstart", eventHandler);
+        layer.addEventListener("touchmove", eventHandler);
+        layer.addEventListener("touchend", eventHandler);
+    };
+    
+    /**
+     * Remove layer mouse and touch listeners.
+     * @method removeLayerListeners
+     */
+    this.removeLayerListeners = function (layer)
+    {
+        // disable pointer events
+        layer.setAttribute("style", "pointer-events: none;");
+        // mouse listeners
+        layer.removeEventListener("mousedown", eventHandler);
+        layer.removeEventListener("mousemove", eventHandler);
+        layer.removeEventListener("mouseup", eventHandler);
+        layer.removeEventListener("mouseout", eventHandler);
+        layer.removeEventListener("mousewheel", eventHandler);
+        layer.removeEventListener("DOMMouseScroll", eventHandler);
+        layer.removeEventListener("dblclick", eventHandler);
+        // touch listeners
+        layer.removeEventListener("touchstart", eventHandler);
+        layer.removeEventListener("touchmove", eventHandler);
+        layer.removeEventListener("touchend", eventHandler);
+    };
+    
+    /**
+     * Render the current image.
+     * @method render
+     */
+    this.render = function ()
+    {
+        generateAndDrawImage();
+    };
+    
+    /**
+     * Update the window/level presets.
+     * @function updatePresets
+     * @param {Boolean} full If true, shows all presets.
+     */
+    this.updatePresets = function (full)
+    {    
+        // store the manual preset
+        var manual = null;
+        if ( presets ) {
+            manual = presets.manual;
+        }
+        // reinitialize the presets
+        presets = {};
+        
+        // DICOM presets
+        var dicomPresets = this.getView().getWindowPresets();
+        if ( dicomPresets ) {
+            if ( full ) {
+                for( var i = 0; i < dicomPresets.length; ++i ) {
+                    presets[dicomPresets[i].name.toLowerCase()] = dicomPresets[i];
+                }
+            }
+            // just the first one
+            else {
+                presets["default"] = dicomPresets[0];
+            }
+        }
+        
+        // min/max preset
+        var range = this.getImage().getRescaledDataRange();
+        var width = range.max - range.min;
+        var center = range.min + width/2;
+        presets["min/max"] = {"center": center, "width": width};
+        // modality presets
+        var modality = this.getImage().getMeta().Modality;
+        for( var key in dwv.tool.defaultpresets[modality] ) {
+            presets[key] = dwv.tool.defaultpresets[modality][key];
+        }
+        if ( full ) {
+            for( var key2 in dwv.tool.defaultpresets[modality+"extra"] ) {
+                presets[key2] = dwv.tool.defaultpresets[modality+"extra"][key2];
+            }
+        }
+        // manual preset
+        if ( manual ){
+            presets.manual = manual;
+        }
+    };
+
+    // Handler Methods -----------------------------------------------------------
+
     /**
      * Handle window/level change.
      * @method onWLChange
@@ -347,134 +671,221 @@ dwv.App = function()
     };
 
     /**
-     * Resize the display window. To be called once the image is loaded.
-     * @method resize
+     * Handle key down event.
+     * - CRTL-Z: undo
+     * - CRTL-Y: redo
+     * Default behavior. Usually used in tools. 
+     * @method onKeydown
+     * @param {Object} event The key down event.
      */
-    this.resize = function()
+    this.onKeydown = function (event)
     {
-        // previous width
-        var oldWidth = parseInt(windowScale*dataWidth, 10);
-        // find new best fit
-        var size = dwv.gui.getWindowSize();
-        windowScale = Math.min( (size.width / dataWidth), (size.height / dataHeight) );
-        // new sizes
-        var newWidth = parseInt(windowScale*dataWidth, 10);
-        var newHeight = parseInt(windowScale*dataHeight, 10);
-        // ratio previous/new to add to zoom
-        var mul = newWidth / oldWidth;
-
-        // resize container
-        $("#layerContainer").width(newWidth);
-        $("#layerContainer").height(newHeight + 1); // +1 to be sure...
-        // resize image layer
-        if( imageLayer ) {
-            var iZoomX = imageLayer.getZoom().x * mul;
-            var iZoomY = imageLayer.getZoom().y * mul;
-            imageLayer.setWidth(newWidth);
-            imageLayer.setHeight(newHeight);
-            imageLayer.zoom(iZoomX, iZoomY, 0, 0);
-            imageLayer.draw();
+        if ( event.keyCode === 90 && event.ctrlKey ) // ctrl-z
+        {
+            undoStack.undo();
         }
-        // resize draw stage
-        if( drawStage ) {
-            // resize div
-            $("#drawDiv").width(newWidth);
-            $("#drawDiv").height(newHeight);
-            // resize stage
-            var stageZomX = drawStage.scale().x * mul;
-            var stageZoomY = drawStage.scale().y * mul;
-            drawStage.setWidth(newWidth);
-            drawStage.setHeight(newHeight);
-            drawStage.scale( {x: stageZomX, y: stageZoomY} );
-            drawStage.draw();
+        else if ( event.keyCode === 89 && event.ctrlKey ) // ctrl-y
+        {
+            undoStack.redo();
         }
     };
     
     /**
-     * Toggle the display of the info layer.
-     * @method toggleInfoLayerDisplay
+     * Handle resize.
+     * Fit the display to the window. To be called once the image is loaded.
+     * @method onResize
+     * @param {Object} event The change event.
      */
-    this.toggleInfoLayerDisplay = function()
+    this.onResize = function (/*event*/)
     {
-        // toggle html
-        dwv.html.toggleDisplay('infoLayer');
-        // toggle listeners
-        if( isInfoLayerListening ) {
-            removeImageInfoListeners();
-        }
-        else {
-            addImageInfoListeners();
-        }
+        self.fitToSize(dwv.gui.getWindowSize());
     };
     
     /**
-     * Init the Window/Level display
+     * Handle zoom reset.
+     * @method onZoomReset
+     * @param {Object} event The change event.
      */
-    this.initWLDisplay = function()
+    this.onZoomReset = function (/*event*/)
     {
-        // set window/level
-        var keys = Object.keys(dwv.tool.presets);
-        dwv.tool.updateWindowingData(
-            dwv.tool.presets[keys[0]].center, 
-            dwv.tool.presets[keys[0]].width );
-        // default position
-        dwv.tool.updatePostionValue(0,0);
+        self.resetLayout();
     };
 
     /**
-     * Add layer mouse and touch listeners.
-     * @method addLayerListeners
+     * Handle loader change.
+     * @method onChangeLoader
+     * @param {Object} event The change event.
      */
-    this.addLayerListeners = function(layer)
+    this.onChangeLoader = function (/*event*/)
     {
-        // allow pointer events
-        layer.setAttribute("style", "pointer-events: auto;");
-        // mouse listeners
-        layer.addEventListener("mousedown", eventHandler);
-        layer.addEventListener("mousemove", eventHandler);
-        layer.addEventListener("mouseup", eventHandler);
-        layer.addEventListener("mouseout", eventHandler);
-        layer.addEventListener("mousewheel", eventHandler);
-        layer.addEventListener("DOMMouseScroll", eventHandler);
-        layer.addEventListener("dblclick", eventHandler);
-        // touch listeners
-        layer.addEventListener("touchstart", eventHandler);
-        layer.addEventListener("touchmove", eventHandler);
-        layer.addEventListener("touchend", eventHandler);
-    };
-    
-    /**
-     * Remove layer mouse and touch listeners.
-     * @method removeLayerListeners
-     */
-    this.removeLayerListeners = function(layer)
-    {
-        // disable pointer events
-        layer.setAttribute("style", "pointer-events: none;");
-        // mouse listeners
-        layer.removeEventListener("mousedown", eventHandler);
-        layer.removeEventListener("mousemove", eventHandler);
-        layer.removeEventListener("mouseup", eventHandler);
-        layer.removeEventListener("mouseout", eventHandler);
-        layer.removeEventListener("mousewheel", eventHandler);
-        layer.removeEventListener("DOMMouseScroll", eventHandler);
-        layer.removeEventListener("dblclick", eventHandler);
-        // touch listeners
-        layer.removeEventListener("touchstart", eventHandler);
-        layer.removeEventListener("touchmove", eventHandler);
-        layer.removeEventListener("touchend", eventHandler);
-    };
-    
-    /**
-     * Render the current image.
-     * @method render
-     */
-    this.render = function ()
-    {
-        generateAndDrawImage();
+        loadbox.displayLoader( this.value );
     };
 
-    // Private Methods -------------------------------------------
+    /**
+     * Handle change url event.
+     * @method onChangeURL
+     * @param {Object} event The event fired when changing the url field.
+     */
+    this.onChangeURL = function (event)
+    {
+        self.loadURL([event.target.value]);
+    };
+
+    /**
+     * Handle change files event.
+     * @method onChangeFiles
+     * @param {Object} event The event fired when changing the file field.
+     */
+    this.onChangeFiles = function (event)
+    {
+        self.loadFiles(event.target.files);
+    };
+
+    /**
+     * Set the current position.
+     * @method setCurrentPostion
+     * @param {Number} i The column index.
+     * @param {Number} j The row index.
+     */
+    this.setCurrentPostion = function (i,j)
+    {
+        viewController.setCurrentPosition(i,j);
+    };
+
+    /**
+     * Handle colour map change.
+     * @method onChangeColourMap
+     * @param {Object} event The change event.
+     */
+    this.onChangeColourMap = function (/*event*/)
+    {
+        viewController.setColourMapFromName(this.value);
+    };
+
+    /**
+     * Handle window/level preset change.
+     * @method onChangeWindowLevelPreset
+     * @param {Object} event The change event.
+     */
+    this.onChangeWindowLevelPreset = function (/*event*/)
+    {
+        var name = this.value;
+        // check if we have it
+        if ( !presets[name] ) {
+            throw new Error("Unknown window level preset: '" + name + "'");
+        }
+        // enable it
+        viewController.setWindowLevel( 
+            presets[name].center, 
+            presets[name].width );
+    };
+
+    /**
+     * Handle tool change.
+     * @method onChangeTool
+     * @param {Object} event The change event.
+     */
+    this.onChangeTool = function (/*event*/)
+    {
+        toolboxController.setSelectedTool(this.value);
+    };
+
+    /**
+     * Handle shape change.
+     * @method onChangeShape
+     * @param {Object} event The change event.
+     */
+    this.onChangeShape = function (/*event*/)
+    {
+        toolboxController.setSelectedShape(this.value);
+    };
+
+    /**
+     * Handle filter change.
+     * @method onChangeFilter
+     * @param {Object} event The change event.
+     */
+    this.onChangeFilter = function (/*event*/)
+    {
+        toolboxController.setSelectedFilter(this.value);
+    };
+
+    /**
+     * Handle filter run.
+     * @method onRunFilter
+     * @param {Object} event The run event.
+     */
+    this.onRunFilter = function (/*event*/)
+    {
+        toolboxController.runSelectedFilter();
+    };
+
+    /**
+     * Handle line colour change.
+     * @method onChangeLineColour
+     * @param {Object} event The change event.
+     */
+    this.onChangeLineColour = function (/*event*/)
+    {
+        toolboxController.setLineColour(this.value);
+    };
+
+    /**
+     * Handle min/max slider change.
+     * @method onChangeMinMax
+     * @param {Object} range The new range of the data.
+     */
+    this.onChangeMinMax = function (range)
+    {
+        toolboxController.setRange(range);
+    };
+
+    /**
+     * Handle undo.
+     * @method onUndo
+     * @param {Object} event The associated event.
+     */
+    this.onUndo = function (/*event*/)
+    {
+        undoStack.undo();
+    };
+
+    /**
+     * Handle redo.
+     * @method onRedo
+     * @param {Object} event The associated event.
+     */
+    this.onRedo = function (/*event*/)
+    {
+        undoStack.redo();
+    };
+
+    /**
+     * Handle toggle of info layer.
+     * @method onToggleInfoLayer
+     * @param {Object} event The associated event.
+     */
+    this.onToggleInfoLayer = function (/*event*/)
+    {
+        self.toggleInfoLayerDisplay();
+    };
+    
+    /**
+     * Handle display reset.
+     * @method onDisplayReset
+     * @param {Object} event The change event.
+     */
+    this.onDisplayReset = function (/*event*/)
+    {
+        self.resetLayout();
+        self.initWLDisplay();
+        // update preset select
+        var select = document.getElementById("presetSelect");
+        select.selectedIndex = 0;
+        dwv.gui.refreshSelect("#presetSelect");
+    };
+
+    // Private Methods -----------------------------------------------------------
 
     /**
      * Generate the image data and draw it.
@@ -497,11 +908,11 @@ dwv.App = function()
      */
     function addImageInfoListeners()
     {
-        view.addEventListener("wlchange", dwv.info.updateWindowingDiv);
-        view.addEventListener("wlchange", dwv.info.updateMiniColorMap);
-        view.addEventListener("wlchange", dwv.info.updatePlotMarkings);
-        view.addEventListener("colorchange", dwv.info.updateMiniColorMap);
-        view.addEventListener("positionchange", dwv.info.updatePositionDiv);
+        view.addEventListener("wlchange", windowingInfo.update);
+        view.addEventListener("wlchange", miniColorMap.update);
+        view.addEventListener("wlchange", plotInfo.update);
+        view.addEventListener("colorchange", miniColorMap.update);
+        view.addEventListener("positionchange", positionInfo.update);
         isInfoLayerListening = true;
     }
     
@@ -512,11 +923,11 @@ dwv.App = function()
      */
     function removeImageInfoListeners()
     {
-        view.removeEventListener("wlchange", dwv.info.updateWindowingDiv);
-        view.removeEventListener("wlchange", dwv.info.updateMiniColorMap);
-        view.removeEventListener("wlchange", dwv.info.updatePlotMarkings);
-        view.removeEventListener("colorchange", dwv.info.updateMiniColorMap);
-        view.removeEventListener("positionchange", dwv.info.updatePositionDiv);
+        view.removeEventListener("wlchange", windowingInfo.update);
+        view.removeEventListener("wlchange", miniColorMap.update);
+        view.removeEventListener("wlchange", plotInfo.update);
+        view.removeEventListener("colorchange", miniColorMap.update);
+        view.removeEventListener("positionchange", positionInfo.update);
         isInfoLayerListening = false;
     }
     
@@ -536,7 +947,7 @@ dwv.App = function()
         // event._x and event._y.
         var offsets = null;
         var position = null;
-        if( event.type === "touchstart" ||
+        if ( event.type === "touchstart" ||
             event.type === "touchmove")
         {
             event.preventDefault();
@@ -559,7 +970,7 @@ dwv.App = function()
             // set handle event flag
             handled = true;
         }
-        else if( event.type === "mousemove" ||
+        else if ( event.type === "mousemove" ||
             event.type === "mousedown" ||
             event.type === "mouseup" ||
             event.type === "mouseout" ||
@@ -576,17 +987,17 @@ dwv.App = function()
             // set handle event flag
             handled = true;
         }
-        else if( event.type === "keydown" || 
+        else if ( event.type === "keydown" || 
                 event.type === "touchend")
         {
             handled = true;
         }
             
         // Call the event handler of the tool.
-        if( handled )
+        if ( handled )
         {
-            var func = self.getToolBox().getSelectedTool()[event.type];
-            if( func )
+            var func = self.getToolbox().getSelectedTool()[event.type];
+            if ( func )
             {
                 func(event);
             }
@@ -605,9 +1016,10 @@ dwv.App = function()
         event.stopPropagation();
         event.preventDefault();
         // update box 
-        var box = document.getElementById("dropBox");
+        var dropBoxDivId = containerDivId + "-dropBox";
+        var box = document.getElementById(dropBoxDivId);
         if ( box ) {
-            box.className = 'hover';
+            box.className = 'dropBox hover';
         }
     }
     
@@ -622,10 +1034,11 @@ dwv.App = function()
         // prevent default handling
         event.stopPropagation();
         event.preventDefault();
-        // update box 
-        var box = document.getElementById("dropBox");
+        // update box
+        var dropBoxDivId = containerDivId + "-dropBox";
+        var box = document.getElementById(dropBoxDivId);
         if ( box ) {
-            box.className = '';
+            box.className = 'dropBox';
         }
     }
 
@@ -653,14 +1066,14 @@ dwv.App = function()
     function handleError(error)
     {
         // alert window
-        if( error.name && error.message) {
+        if ( error.name && error.message) {
             alert(error.name+": "+error.message+".");
         }
         else {
             alert("Error: "+error+".");
         }
         // log
-        if( error.stack ) {
+        if ( error.stack ) {
             console.error(error.stack);
         }
     }
@@ -675,23 +1088,31 @@ dwv.App = function()
     function createLayers(dataWidth, dataHeight)
     {
         // image layer
-        imageLayer = new dwv.html.Layer("imageLayer");
+        imageLayer = new dwv.html.Layer(containerDivId + "-imageLayer");
         imageLayer.initialise(dataWidth, dataHeight);
         imageLayer.fillContext();
         imageLayer.setStyleDisplay(true);
         // draw layer
-        if( document.getElementById("drawDiv") !== null) {
+        var drawDivId = containerDivId + "-drawDiv";
+        if ( document.getElementById(drawDivId) !== null) {
             // create stage
             drawStage = new Kinetic.Stage({
-                container: 'drawDiv',
+                container: drawDivId,
                 width: dataWidth,
                 height: dataHeight,
                 listening: false
             });
         }
         // resize app
+        if ( fitToWindow ) {
+            self.fitToSize( dwv.gui.getWindowSize() );
+        }
+        else {
+            self.fitToSize( { 
+                'width': $('#'+containerDivId).width(), 
+                'height': $('#'+containerDivId).height() } );
+        }
         self.resetLayout();
-        self.resize();
     }
     
     /**
@@ -703,14 +1124,17 @@ dwv.App = function()
     function postLoadInit(data)
     {
         // only initialise the first time
-        if( view ) {
+        if ( view ) {
             return;
         }
         
         // get the view from the loaded data
         view = data.view;
+        viewController = new dwv.ViewController(view);
         // append the DICOM tags table
-        dwv.gui.appendTagsTable(data.info);
+        if ( tagsGui ) {
+            tagsGui.initialise(data.info);
+        }
         // store image
         originalImage = view.getImage();
         image = originalImage;
@@ -724,47 +1148,193 @@ dwv.App = function()
         imageData = imageLayer.getContext().createImageData( 
                 dataWidth, dataHeight);
 
-        // mouse and touch listeners
-        self.addLayerListeners( imageLayer.getCanvas() );
-        // keydown listener
-        window.addEventListener("keydown", eventHandler, true);
         // image listeners
         view.addEventListener("wlchange", self.onWLChange);
         view.addEventListener("colorchange", self.onColorChange);
         view.addEventListener("slicechange", self.onSliceChange);
         
+        // initialise the toolbox
+        if ( toolbox ) {
+            // mouse and touch listeners
+            self.addLayerListeners( imageLayer.getCanvas() );
+            // keydown listener
+            window.addEventListener("keydown", eventHandler, true);
+            
+            toolbox.init();
+            toolbox.display(true);
+        }
+        
         // stop box listening to drag (after first drag)
-        var box = document.getElementById("dropBox");
+        var dropBoxDivId = containerDivId + "-dropBox";
+        var box = document.getElementById(dropBoxDivId);
         if ( box ) {
             box.removeEventListener("dragover", onDragOver);
             box.removeEventListener("dragleave", onDragLeave);
             box.removeEventListener("drop", onDrop);
-            dwv.html.removeNode("dropBox");
+            dwv.html.removeNode(dropBoxDivId);
             // switch listening to layerContainer
-            var div = document.getElementById("layerContainer");
+            var div = document.getElementById(containerDivId);
             div.addEventListener("dragover", onDragOver);
             div.addEventListener("dragleave", onDragLeave);
             div.addEventListener("drop", onDrop);
         }
 
         // info layer
-        if(document.getElementById("infoLayer")){
-            dwv.info.createWindowingDiv();
-            dwv.info.createPositionDiv();
-            dwv.info.createMiniColorMap();
-            dwv.info.createPlot();
+        var infoDivId = containerDivId + "-infoLayer";
+        if ( document.getElementById(infoDivId) ) {
+            windowingInfo = new dwv.info.Windowing(self);
+            windowingInfo.create();
+            
+            positionInfo = new dwv.info.Position(self);
+            positionInfo.create();
+            
+            miniColorMap = new dwv.info.MiniColorMap(self);
+            miniColorMap.create();
+            
+            plotInfo = new dwv.info.Plot(self);
+            plotInfo.create();
+            
             addImageInfoListeners();
         }
         
-        // initialise the toolbox
-        toolBox.init();
-        toolBox.display(true);
-        
         // init W/L display
+        self.updatePresets(true);
         self.initWLDisplay();        
     }
-    
+
 };
+
+/**
+ * View controller.
+ * @class ViewController
+ * @namespace dwv
+ * @constructor
+ */
+dwv.ViewController = function ( view )
+{
+    /**
+     * Set the current position.
+     * @method setWindowLevel
+     * @param {Number} i The column index.
+     * @param {Number} j The row index.
+     */
+    this.setCurrentPosition = function (i, j)
+    {
+        view.setCurrentPosition( { 
+            "i": i, "j": j, "k": view.getCurrentPosition().k});
+    };
+    
+    /**
+     * Set the window/level.
+     * @method setWindowLevel
+     * @param {Number} wc The window center.
+     * @param {Number} ww The window width.
+     */
+    this.setWindowLevel = function (wc, ww)
+    {
+        view.setWindowLevel(wc,ww);
+    };
+
+    /**
+     * Set the colour map.
+     * @method setColourMap
+     * @param {Object} colourMap The colour map.
+     */
+    this.setColourMap = function (colourMap)
+    {
+        view.setColorMap(colourMap);
+    };
+
+    /**
+     * Set the colour map from a name.
+     * @function setColourMapFromName
+     * @param {String} name The name of the colour map to set.
+     */
+    this.setColourMapFromName = function (name)
+    {
+        // check if we have it
+        if ( !dwv.tool.colourMaps[name] ) {
+            throw new Error("Unknown colour map: '" + name + "'");
+        }
+        // enable it
+        this.setColourMap( dwv.tool.colourMaps[name] );
+    };
+    
+}; // class dwv.ViewController
+
+/**
+ * Toolbox controller.
+ * @class ToolboxController
+ * @namespace dwv
+ * @constructor
+ */
+dwv.ToolboxController = function (toolbox)
+{
+    /**
+     * Set the selected tool.
+     * @method setSelectedTool
+     * @param {String} name The name of the tool.
+     */
+    this.setSelectedTool = function (name)
+    {
+        toolbox.setSelectedTool(name);
+    };
+    
+    /**
+     * Set the selected shape.
+     * @method setSelectedShape
+     * @param {String} name The name of the shape.
+     */
+    this.setSelectedShape = function (name)
+    {
+        toolbox.getSelectedTool().setShapeName(name);
+    };
+    
+    /**
+     * Set the selected filter.
+     * @method setSelectedFilter
+     * @param {String} name The name of the filter.
+     */
+    this.setSelectedFilter = function (name)
+    {
+        toolbox.getSelectedTool().setSelectedFilter(name);
+    };
+    
+    /**
+     * Run the selected filter.
+     * @method runSelectedFilter
+     */
+    this.runSelectedFilter = function ()
+    {
+        toolbox.getSelectedTool().getSelectedFilter().run();
+    };
+    
+    /**
+     * Set the tool line color.
+     * @method runFilter
+     * @param {String} name The name of the color.
+     */
+    this.setLineColour = function (name)
+    {
+        toolbox.getSelectedTool().setLineColour(name);
+    };
+    
+    /**
+     * Set the tool range.
+     * @method setRange
+     * @param {Object} range The new range of the data.
+     */
+    this.setRange = function (range)
+    {
+        // seems like jquery is checking if the method exists before it 
+        // is used...
+        if ( toolbox && toolbox.getSelectedTool() &&
+                toolbox.getSelectedTool().getSelectedFilter() ) {
+            toolbox.getSelectedTool().getSelectedFilter().run(range);
+        }
+    };
+    
+}; // class dwv.ToolboxController
 ;/** 
  * DICOM module.
  * @module dicom
@@ -3313,102 +3883,124 @@ dwv.gui.filter = dwv.gui.filter || {};
 dwv.gui.filter.base = dwv.gui.filter.base || {};
 
 /**
- * Append the filter HTML to the page.
- * @method appendFilterHtml
- * @static
+ * Filter tool base gui.
+ * @class Filter
+ * @namespace dwv.gui.base
+ * @constructor
  */
-dwv.gui.base.appendFilterHtml = function ()
+dwv.gui.base.Filter = function (app)
 {
-    // filter select
-    var filterSelector = dwv.html.createHtmlSelect("filterSelect",dwv.tool.filters);
-    filterSelector.onchange = dwv.gui.onChangeFilter;
-
-    // filter list element
-    var filterLi = dwv.html.createHiddenElement("li", "filterLi");
-    filterLi.setAttribute("class","ui-block-b");
-    filterLi.appendChild(filterSelector);
+    /**
+     * Setup the filter tool HTML.
+     * @method setup
+     */
+    this.setup = function (list)
+    {
+        // filter select
+        var filterSelector = dwv.html.createHtmlSelect("filterSelect", list);
+        filterSelector.onchange = app.onChangeFilter;
     
-    // append element
-    dwv.html.appendElement("toolList", filterLi);
-};
-
-/**
- * Display the filter HTML.
- * @method displayFilterHtml
- * @static
- * @param {Boolean} flag True to display, false to hide.
- */
-dwv.gui.base.displayFilterHtml = function (flag)
-{
-    dwv.html.displayElement("filterLi", flag);
-};
-
-/**
- * Initialise the filter HTML.
- * @method displayFilterHtml
- * @static
- */
-dwv.gui.base.initFilterHtml = function ()
-{
-    // filter select: reset selected options
-    var filterSelector = document.getElementById("filterSelect");
-    filterSelector.selectedIndex = 0;
-    dwv.gui.refreshSelect("#filterSelect");
-};
-
-/**
- * Append the threshold filter HTML to the page.
- * @method appendThresholdHtml
- * @static
- */
-dwv.gui.filter.base.appendThresholdHtml = function ()
-{
-    // threshold list element
-    var thresholdLi = dwv.html.createHiddenElement("li", "thresholdLi");
-    thresholdLi.setAttribute("class","ui-block-c");
+        // filter list element
+        var filterLi = dwv.html.createHiddenElement("li", "filterLi");
+        filterLi.setAttribute("class","ui-block-b");
+        filterLi.appendChild(filterSelector);
+        
+        // append element
+        dwv.html.appendElement("toolList", filterLi);
+    };
     
-    // node
-    var node = document.getElementById("toolList");
-    // append threshold
-    node.appendChild(thresholdLi);
-    // threshold slider
-    dwv.gui.appendSliderHtml();
-    // trigger create event (mobile)
-    $("#toolList").trigger("create");
-};
+    /**
+     * Display the tool HTML.
+     * @method display
+     * @param {Boolean} flag True to display, false to hide.
+     */
+    this.display = function (flag)
+    {
+        dwv.html.displayElement("filterLi", flag);
+    };
+    
+    /**
+     * Initialise the tool HTML.
+     * @method initialise
+     */
+    this.initialise = function ()
+    {
+        // filter select: reset selected options
+        var filterSelector = document.getElementById("filterSelect");
+        filterSelector.selectedIndex = 0;
+        dwv.gui.refreshSelect("#filterSelect");
+    };
+
+}; // class dwv.gui.base.Filter
 
 /**
- * Clear the treshold filter HTML.
- * @method displayThresholdHtml
- * @static
- * @param {Boolean} flag True to display, false to hide.
+ * Threshold filter base gui.
+ * @class Threshold
+ * @namespace dwv.gui.base
+ * @constructor
  */
-dwv.gui.filter.base.displayThresholdHtml = function (flag)
+dwv.gui.base.Threshold = function (app)
 {
-    dwv.html.displayElement("thresholdLi", flag);
-};
+    /**
+     * Threshold slider.
+     * @property slider
+     * @private
+     * @type Object
+     */
+    var slider = new dwv.gui.Slider(app);
+    
+    /**
+     * Setup the threshold filter HTML.
+     * @method setup
+     */
+    this.setup = function ()
+    {
+        // threshold list element
+        var thresholdLi = dwv.html.createHiddenElement("li", "thresholdLi");
+        thresholdLi.setAttribute("class","ui-block-c");
+        
+        // node
+        var node = document.getElementById("toolList");
+        // append threshold
+        node.appendChild(thresholdLi);
+        // threshold slider
+        slider.append();
+        // trigger create event (mobile)
+        $("#toolList").trigger("create");
+    };
+    
+    /**
+     * Clear the threshold filter HTML.
+     * @method display
+     * @param {Boolean} flag True to display, false to hide.
+     */
+    this.display = function (flag)
+    {
+        dwv.html.displayElement("thresholdLi", flag);
+    };
+    
+    /**
+     * Initialise the threshold filter HTML.
+     * @method initialise
+     */
+    this.initialise = function ()
+    {
+        // threshold slider
+        slider.initialise();
+    };
 
+}; // class dwv.gui.base.Threshold
+    
 /**
- * Initialise the treshold filter HTML.
- * @method initThresholdHtml
+ * Create the apply filter button.
+ * @method createFilterApplyButton
  * @static
  */
-dwv.gui.filter.base.initThresholdHtml = function ()
-{
-    // threshold slider
-    dwv.gui.initSliderHtml();
-};
-
-/**
- * Append the sharpen filter HTML to the page.
- * @method appendSharpenHtml
- * @static
- */
-dwv.gui.filter.base.createFilterApplyButton = function ()
+dwv.gui.filter.base.createFilterApplyButton = function (app)
 {
     var button = document.createElement("button");
     button.id = "runFilterButton";
-    button.onclick = dwv.gui.onRunFilter;
+    button.onclick = app.onRunFilter;
     button.setAttribute("style","width:100%; margin-top:0.5em;");
     button.setAttribute("class","ui-btn ui-btn-b");
     button.appendChild(document.createTextNode("Apply"));
@@ -3416,58 +4008,72 @@ dwv.gui.filter.base.createFilterApplyButton = function ()
 };
 
 /**
- * Append the sharpen filter HTML to the page.
- * @method appendSharpenHtml
- * @static
+ * Sharpen filter base gui.
+ * @class Sharpen
+ * @namespace dwv.gui.base
+ * @constructor
  */
-dwv.gui.filter.base.appendSharpenHtml = function ()
+dwv.gui.base.Sharpen = function (app)
 {
-    // sharpen list element
-    var sharpenLi = dwv.html.createHiddenElement("li", "sharpenLi");
-    sharpenLi.setAttribute("class","ui-block-c");
-    sharpenLi.appendChild( dwv.gui.filter.base.createFilterApplyButton() );
+    /**
+     * Setup the sharpen filter HTML.
+     * @method setup
+     */
+    this.setup = function ()
+    {
+        // sharpen list element
+        var sharpenLi = dwv.html.createHiddenElement("li", "sharpenLi");
+        sharpenLi.setAttribute("class","ui-block-c");
+        sharpenLi.appendChild( dwv.gui.filter.base.createFilterApplyButton(app) );
+        // append element
+        dwv.html.appendElement("toolList", sharpenLi);
+    };
     
-    // append element
-    dwv.html.appendElement("toolList", sharpenLi);
-};
-
-/**
- * Display the sharpen filter HTML.
- * @method displaySharpenHtml
- * @static
- * @param {Boolean} flag True to display, false to hide.
- */
-dwv.gui.filter.base.displaySharpenHtml = function (flag)
-{
-    dwv.html.displayElement("sharpenLi", flag);
-};
-
-/**
- * Append the sobel filter HTML to the page.
- * @method appendSobelHtml
- * @static
- */
-dwv.gui.filter.base.appendSobelHtml = function ()
-{
-    // sobel list element
-    var sobelLi = dwv.html.createHiddenElement("li", "sobelLi");
-    sobelLi.setAttribute("class","ui-block-c");
-    sobelLi.appendChild( dwv.gui.filter.base.createFilterApplyButton() );
+    /**
+     * Display the sharpen filter HTML.
+     * @method display
+     * @param {Boolean} flag True to display, false to hide.
+     */
+    this.display = function (flag)
+    {
+        dwv.html.displayElement("sharpenLi", flag);
+    };
     
-    // append element
-    dwv.html.appendElement("toolList", sobelLi);
-};
+}; // class dwv.gui.base.Sharpen
 
 /**
- * Display the sobel filter HTML.
- * @method displaySobelHtml
- * @static
- * @param {Boolean} flag True to display, false to hide.
+ * Sobel filter base gui.
+ * @class Sobel
+ * @namespace dwv.gui.base
+ * @constructor
  */
-dwv.gui.filter.base.displaySobelHtml = function (flag)
+dwv.gui.base.Sobel = function (app)
 {
-    dwv.html.displayElement("sobelLi", flag);
-};
+    /**
+     * Setup the sobel filter HTML.
+     * @method setup
+     */
+    this.setup = function ()
+    {
+        // sobel list element
+        var sobelLi = dwv.html.createHiddenElement("li", "sobelLi");
+        sobelLi.setAttribute("class","ui-block-c");
+        sobelLi.appendChild( dwv.gui.filter.base.createFilterApplyButton(app) );
+       // append element
+        dwv.html.appendElement("toolList", sobelLi);
+    };
+    
+    /**
+     * Display the sobel filter HTML.
+     * @method display
+     * @param {Boolean} flag True to display, false to hide.
+     */
+    this.display = function (flag)
+    {
+        dwv.html.displayElement("sobelLi", flag);
+    };
+    
+}; // class dwv.gui.base.Sobel
 
 ;/** 
  * GUI module.
@@ -3550,326 +4156,140 @@ dwv.gui.base.refreshSelect = function(selectName)
 dwv.gui.setSelected = function(selectName, itemName)
 {
     var select = document.getElementById(selectName);
-    var index = 0;
-    for( index in select.options){ 
-        if( select.options[index].text === itemName ) {
-            break;
-        }
-    }
-    select.selectedIndex = index;
-    dwv.gui.refreshSelect("#" + selectName);
-};
-
-/**
- * Append the slider HTML.
- * @method appendSliderHtml
- * @static
- */
-dwv.gui.base.appendSliderHtml = function()
-{
-    // default values
-    var min = 0;
-    var max = 1;
-    
-    // jquery-mobile range slider
-    // minimum input
-    var inputMin = document.createElement("input");
-    inputMin.id = "threshold-min";
-    inputMin.type = "range";
-    inputMin.max = max;
-    inputMin.min = min;
-    inputMin.value = min;
-    // maximum input
-    var inputMax = document.createElement("input");
-    inputMax.id = "threshold-max";
-    inputMax.type = "range";
-    inputMax.max = max;
-    inputMax.min = min;
-    inputMax.value = max;
-    // slicer div
-    var div = document.createElement("div");
-    div.id = "threshold-div";
-    div.setAttribute("data-role", "rangeslider");
-    div.appendChild(inputMin);
-    div.appendChild(inputMax);
-    div.setAttribute("data-mini", "true");
-    // append to document
-    document.getElementById("thresholdLi").appendChild(div);
-    // bind change
-    $("#threshold-div").on("change",
-            function(/*event*/) {
-                dwv.gui.onChangeMinMax(
-                    { "min":$("#threshold-min").val(),
-                      "max":$("#threshold-max").val() } );
+    if ( select ) {
+        var index = 0;
+        for( index in select.options){ 
+            if( select.options[index].text === itemName ) {
+                break;
             }
-        );
-    // trigger creation
-    $("#toolList").trigger("create");
+        }
+        select.selectedIndex = index;
+        dwv.gui.refreshSelect("#" + selectName);
+    }
 };
 
 /**
- * Initialise the slider HTML.
- * @method initSliderHtml
- * @static
+ * Slider base gui.
+ * @class Slider
+ * @namespace dwv.gui.base
+ * @constructor
  */
-dwv.gui.base.initSliderHtml = function()
+dwv.gui.base.Slider = function (app)
 {
-    var min = app.getImage().getDataRange().min;
-    var max = app.getImage().getDataRange().max;
+    /**
+     * Append the slider HTML.
+     * @method append
+     */
+    this.append = function ()
+    {
+        // default values
+        var min = 0;
+        var max = 1;
+        
+        // jquery-mobile range slider
+        // minimum input
+        var inputMin = document.createElement("input");
+        inputMin.id = "threshold-min";
+        inputMin.type = "range";
+        inputMin.max = max;
+        inputMin.min = min;
+        inputMin.value = min;
+        // maximum input
+        var inputMax = document.createElement("input");
+        inputMax.id = "threshold-max";
+        inputMax.type = "range";
+        inputMax.max = max;
+        inputMax.min = min;
+        inputMax.value = max;
+        // slicer div
+        var div = document.createElement("div");
+        div.id = "threshold-div";
+        div.setAttribute("data-role", "rangeslider");
+        div.appendChild(inputMin);
+        div.appendChild(inputMax);
+        div.setAttribute("data-mini", "true");
+        // append to document
+        document.getElementById("thresholdLi").appendChild(div);
+        // bind change
+        $("#threshold-div").on("change",
+                function(/*event*/) {
+                    app.onChangeMinMax(
+                        { "min":$("#threshold-min").val(),
+                          "max":$("#threshold-max").val() } );
+                }
+            );
+        // trigger creation
+        $("#toolList").trigger("create");
+    };
     
-    // minimum input
-    var inputMin = document.getElementById("threshold-min");
-    inputMin.max = max;
-    inputMin.min = min;
-    inputMin.value = min;
-    // maximum input
-    var inputMax = document.getElementById("threshold-max");
-    inputMax.max = max;
-    inputMax.min = min;
-    inputMax.value = max;
-    // trigger creation
-    $("#toolList").trigger("create");
-};
+    /**
+     * Initialise the slider HTML.
+     * @method initialise
+     */
+    this.initialise = function ()
+    {
+        var min = app.getImage().getDataRange().min;
+        var max = app.getImage().getDataRange().max;
+        
+        // minimum input
+        var inputMin = document.getElementById("threshold-min");
+        inputMin.max = max;
+        inputMin.min = min;
+        inputMin.value = min;
+        // maximum input
+        var inputMax = document.getElementById("threshold-max");
+        inputMax.max = max;
+        inputMax.min = min;
+        inputMax.value = max;
+        // trigger creation
+        $("#toolList").trigger("create");
+    };
+
+}; // class dwv.gui.base.Slider
 
 /**
- * Create the DICOM tags table. To be called once the DICOM has been parsed.
- * @method createTagsTable
- * @private
- * @param {Object} dataInfo The data information.
+ * DICOM tags base gui.
+ * @class DicomTags
+ * @namespace dwv.gui.base
+ * @constructor
  */
-dwv.gui.base.appendTagsTable = function (dataInfo)
+dwv.gui.base.DicomTags = function ()
 {
-    // HTML node
-    var node = document.getElementById("tags");
-    if( node === null ) {
-        return;
-    }
-    // remove possible previous
-    while (node.hasChildNodes()) { 
-        node.removeChild(node.firstChild);
-    }
-    // tag list table (without the pixel data)
-    if(dataInfo.PixelData) {
-        dataInfo.PixelData.value = "...";
-    }
-    // tags HTML table
-    var table = dwv.html.toTable(dataInfo);
-    table.id = "tagsTable";
-    table.className = "tagsList table-stripe";
-    table.setAttribute("data-role", "table");
-    table.setAttribute("data-mode", "columntoggle");
-    // search form
-    node.appendChild(dwv.html.getHtmlSearchForm(table));
-    // tags table
-    node.appendChild(table);
-    // trigger create event (mobile)
-    $("#tags").trigger("create");
-};
-;/** 
- * GUI module.
- * @module gui
- */
-var dwv = dwv || {};
-/**
- * Namespace for GUI functions.
- * @class gui
- * @namespace dwv
- * @static
- */
-dwv.gui = dwv.gui || {};
-
-/**
- * Handle window/level change.
- * @method onChangeWindowLevelPreset
- * @namespace dwv.gui
- * @static
- * @param {Object} event The change event.
- */
-dwv.gui.onChangeWindowLevelPreset = function(/*event*/)
-{
-    dwv.tool.updateWindowingDataFromName(this.value);
-};
-
-/**
- * Handle colour map change.
- * @method onChangeColourMap
- * @static
- * @param {Object} event The change event.
- */
-dwv.gui.onChangeColourMap = function(/*event*/)
-{
-    dwv.tool.updateColourMapFromName(this.value);
-};
-
-/**
- * Handle loader change.
- * @method onChangeLoader
- * @static
- * @param {Object} event The change event.
- */
-dwv.gui.onChangeLoader = function(/*event*/)
-{
-    if( this.value === "file") {
-        dwv.gui.displayUrlLoadHtml(false);
-        dwv.gui.displayFileLoadHtml(true);
-    }
-    else if( this.value === "url") {
-        dwv.gui.displayFileLoadHtml(false);
-        dwv.gui.displayUrlLoadHtml(true);
-    }
-};
-
-/**
- * Handle files change.
- * @method onChangeFiles
- * @static
- * @param {Object} event The change event.
- */
-dwv.gui.onChangeFiles = function(event)
-{
-    app.onChangeFiles(event);
-};
-
-/**
- * Handle URL change.
- * @method onChangeURL
- * @static
- * @param {Object} event The change event.
- */
-dwv.gui.onChangeURL = function(event)
-{
-    app.onChangeURL(event);
-};
-
-/**
- * Handle tool change.
- * @method onChangeTool
- * @static
- * @param {Object} event The change event.
- */
-dwv.gui.onChangeTool = function(/*event*/)
-{
-    app.getToolBox().setSelectedTool(this.value);
-};
-
-/**
- * Handle filter change.
- * @method onChangeFilter
- * @static
- * @param {Object} event The change event.
- */
-dwv.gui.onChangeFilter = function(/*event*/)
-{
-    app.getToolBox().getSelectedTool().setSelectedFilter(this.value);
-};
-
-/**
- * Handle filter run.
- * @method onRunFilter
- * @static
- * @param {Object} event The run event.
- */
-dwv.gui.onRunFilter = function(/*event*/)
-{
-    app.getToolBox().getSelectedTool().getSelectedFilter().run();
-};
-
-/**
- * Handle min/max slider change.
- * @method onChangeMinMax
- * @static
- * @param {Object} range The new range of the data.
- */
-dwv.gui.onChangeMinMax = function(range)
-{
-    // seems like jquery is checking if the method exists before it 
-    // is used...
-    if( app.getToolBox().getSelectedTool().getSelectedFilter ) {
-        app.getToolBox().getSelectedTool().getSelectedFilter().run(range);
-    }
-};
-
-/**
- * Handle shape change.
- * @method onChangeShape
- * @static
- * @param {Object} event The change event.
- */
-dwv.gui.onChangeShape = function(/*event*/)
-{
-    app.getToolBox().getSelectedTool().setShapeName(this.value);
-};
-
-/**
- * Handle line color change.
- * @method onChangeLineColour
- * @static
- * @param {Object} event The change event.
- */
-dwv.gui.onChangeLineColour = function(/*event*/)
-{
-    app.getToolBox().getSelectedTool().setLineColour(this.value);
-};
-
-/**
- * Handle zoom reset.
- * @method onZoomReset
- * @static
- * @param {Object} event The change event.
- */
-dwv.gui.onZoomReset = function(/*event*/)
-{
-    app.resetLayout();
-};
-
-/**
- * Handle display reset.
- * @method onDisplayReset
- * @static
- * @param {Object} event The change event.
- */
-dwv.gui.onDisplayReset = function(event)
-{
-    dwv.gui.onZoomReset(event);
-    app.initWLDisplay();
-    // update preset select
-    var select = document.getElementById("presetSelect");
-    select.selectedIndex = 0;
-    dwv.gui.refreshSelect("#presetSelect");
-};
-
-/**
- * Handle undo.
- * @method onUndo
- * @static
- * @param {Object} event The associated event.
- */
-dwv.gui.onUndo = function(/*event*/)
-{
-    app.getUndoStack().undo();
-};
-
-/**
- * Handle redo.
- * @method onRedo
- * @static
- * @param {Object} event The associated event.
- */
-dwv.gui.onRedo = function(/*event*/)
-{
-    app.getUndoStack().redo();
-};
-
-/**
- * Handle toggle of info layer.
- * @method onToggleInfoLayer
- * @static
- * @param {Object} event The associated event.
- */
-dwv.gui.onToggleInfoLayer = function(/*event*/)
-{
-    app.toggleInfoLayerDisplay();
-};
+    /**
+     * Initialise the DICOM tags table. To be called once the DICOM has been parsed.
+     * @method initialise
+     * @param {Object} dataInfo The data information.
+     */
+    this.initialise = function (dataInfo)
+    {
+        // HTML node
+        var node = document.getElementById("tags");
+        if( node === null ) {
+            return;
+        }
+        // remove possible previous
+        while (node.hasChildNodes()) { 
+            node.removeChild(node.firstChild);
+        }
+        // tag list table (without the pixel data)
+        if(dataInfo.PixelData) {
+            dataInfo.PixelData.value = "...";
+        }
+        // tags HTML table
+        var table = dwv.html.toTable(dataInfo);
+        table.id = "tagsTable";
+        table.setAttribute("class", "tagsList");
+        table.setAttribute("data-role", "table");
+        table.setAttribute("data-mode", "columntoggle");
+        // search form
+        node.appendChild(dwv.html.getHtmlSearchForm(table));
+        // tags table
+        node.appendChild(table);
+        // trigger create event (mobile)
+        $("#tags").trigger("create");
+    };
+    
+}; // class dwv.gui.base.DicomTags
 ;/** 
  * GUI module.
  * @module gui
@@ -3888,11 +4308,13 @@ dwv.gui.base = dwv.gui.base || {};
  * Append the version HTML.
  * @method appendVersionHtml
  */
-dwv.gui.base.appendVersionHtml = function()
+dwv.gui.base.appendVersionHtml = function (version)
 {
     var nodes = document.getElementsByClassName("dwv-version");
-    for( var i = 0; i < nodes.length; ++i ){
-        nodes[i].appendChild(document.createTextNode(app.getVersion()));
+    if ( nodes ) {
+        for( var i = 0; i < nodes.length; ++i ){
+            nodes[i].appendChild( document.createTextNode(version) );
+        }
     }
 };
 
@@ -3901,7 +4323,7 @@ dwv.gui.base.appendVersionHtml = function()
  * @method appendHelpHtml
  * @param {Boolean} mobile Flag for mobile or not environement.
  */
-dwv.gui.base.appendHelpHtml = function(mobile)
+dwv.gui.base.appendHelpHtml = function(toolList, mobile)
 {
     var actionType = "mouse";
     if( mobile ) {
@@ -3914,9 +4336,11 @@ dwv.gui.base.appendHelpHtml = function(mobile)
     var loc = window.location.pathname;
     var dir = loc.substring(0, loc.lastIndexOf('/'));
 
-    for ( var t in dwv.tool.tools )
+    var tool = null;
+    var tkeys = Object.keys(toolList);
+    for ( var t=0; t < tkeys.length; ++t )
     {
-        var tool = dwv.tool.tools[t];
+        tool = toolList[tkeys[t]];
         // title
         var title = document.createElement("h3");
         title.appendChild(document.createTextNode(tool.getHelp().title));
@@ -5093,112 +5517,153 @@ dwv.gui = dwv.gui || {};
 dwv.gui.base = dwv.gui.base || {};
 
 /**
- * Append the loadbox HTML to the page.
- * @method appendLoadboxHtml
- * @static
+ * Loadbox base gui.
+ * @class Loadbox
+ * @namespace dwv.gui.base
+ * @constructor
  */
-dwv.gui.base.appendLoadboxHtml = function()
+dwv.gui.base.Loadbox = function (app, fileLoadGui, urlLoadGui)
 {
-    // loader select
-    var loaderSelector = dwv.html.createHtmlSelect("loaderSelect",dwv.io.loaders);
-    loaderSelector.onchange = dwv.gui.onChangeLoader;
+    /**
+     * Setup the loadbox HTML.
+     * @method setup
+     */
+    this.setup = function ()
+    {
+        // loader select
+        var loaderSelector = dwv.html.createHtmlSelect("loaderSelect", app.getLoaders());
+        loaderSelector.onchange = app.onChangeLoader;
+        
+        // node
+        var node = document.getElementById("loaderlist");
+        // clear it
+        while(node.hasChildNodes()) {
+            node.removeChild(node.firstChild);
+        }
+        // append
+        node.appendChild(loaderSelector);
+        // trigger create event (mobile)
+        $("#loaderlist").trigger("create");
+    };
     
-    // node
-    var node = document.getElementById("loaderlist");
-    // clear it
-    while(node.hasChildNodes()) {
-        node.removeChild(node.firstChild);
-    }
-    // append
-    node.appendChild(loaderSelector);
-    // trigger create event (mobile)
-    $("#loaderlist").trigger("create");
-};
-
-/**
- * Append the file load HTML to the page.
- * @method appendFileLoadHtml
- * @static
- */
-dwv.gui.base.appendFileLoadHtml = function()
-{
-    // input
-    var fileLoadInput = document.createElement("input");
-    fileLoadInput.onchange = dwv.gui.onChangeFiles;
-    fileLoadInput.type = "file";
-    fileLoadInput.multiple = true;
-    fileLoadInput.id = "imagefiles";
-    fileLoadInput.setAttribute("data-clear-btn","true");
-    fileLoadInput.setAttribute("data-mini","true");
-
-    // associated div
-    var fileLoadDiv = document.createElement("div");
-    fileLoadDiv.id = "imagefilesdiv";
-    fileLoadDiv.style.display = "none";
-    fileLoadDiv.appendChild(fileLoadInput);
+    /**
+     * Display a loader.
+     * @param {String} name The name of the loader to show.
+     */
+    this.displayLoader = function (name)
+    {
+        if( name === "file") {
+            fileLoadGui.display(true);
+            urlLoadGui.display(false);
+        }
+        else if( name === "url") {
+            fileLoadGui.display(false);
+            urlLoadGui.display(true);
+        }        
+    };
     
-    // node
-    var node = document.getElementById("loaderlist");
-    // append
-    node.appendChild(fileLoadDiv);
-    // trigger create event (mobile)
-    $("#loaderlist").trigger("create");
-};
+}; // class dwv.gui.base.Loadbox
 
 /**
- * Display the file load HTML.
- * @method clearUrlLoadHtml
- * @static
- * @param {Boolean} bool True to display, false to hide.
+ * FileLoad base gui.
+ * @class FileLoad
+ * @namespace dwv.gui.base
+ * @constructor
  */
-dwv.gui.base.displayFileLoadHtml = function(bool)
+dwv.gui.base.FileLoad = function (app)
 {
-    // file div element
-    var filediv = document.getElementById("imagefilesdiv");
-    filediv.style.display = bool ? "" : "none";
-};
+    /**
+     * Setup the file load HTML to the page.
+     * @method setup
+     */
+    this.setup = function()
+    {
+        // input
+        var fileLoadInput = document.createElement("input");
+        fileLoadInput.onchange = app.onChangeFiles;
+        fileLoadInput.type = "file";
+        fileLoadInput.multiple = true;
+        fileLoadInput.id = "imagefiles";
+        fileLoadInput.setAttribute("data-clear-btn","true");
+        fileLoadInput.setAttribute("data-mini","true");
+    
+        // associated div
+        var fileLoadDiv = document.createElement("div");
+        fileLoadDiv.id = "imagefilesdiv";
+        fileLoadDiv.style.display = "none";
+        fileLoadDiv.appendChild(fileLoadInput);
+        
+        // node
+        var node = document.getElementById("loaderlist");
+        // append
+        node.appendChild(fileLoadDiv);
+        // trigger create event (mobile)
+        $("#loaderlist").trigger("create");
+    };
+    
+    /**
+     * Display the file load HTML.
+     * @method display
+     * @param {Boolean} bool True to display, false to hide.
+     */
+    this.display = function (bool)
+    {
+        // file div element
+        var filediv = document.getElementById("imagefilesdiv");
+        filediv.style.display = bool ? "" : "none";
+    };
+    
+}; // class dwv.gui.base.FileLoad
 
 /**
- * Append the url load HTML to the page.
- * @method appendUrlLoadHtml
- * @static
+ * FileLoad base gui.
+ * @class FileLoad
+ * @namespace dwv.gui.base
+ * @constructor
  */
-dwv.gui.base.appendUrlLoadHtml = function()
+dwv.gui.base.UrlLoad = function (app)
 {
-    // input
-    var urlLoadInput = document.createElement("input");
-    urlLoadInput.onchange = dwv.gui.onChangeURL;
-    urlLoadInput.type = "url";
-    urlLoadInput.id = "imageurl";
-    urlLoadInput.setAttribute("data-clear-btn","true");
-    urlLoadInput.setAttribute("data-mini","true");
+    /**
+     * Setup the url load HTML to the page.
+     * @method setup
+     */
+    this.setup = function ()
+    {
+        // input
+        var urlLoadInput = document.createElement("input");
+        urlLoadInput.onchange = app.onChangeURL;
+        urlLoadInput.type = "url";
+        urlLoadInput.id = "imageurl";
+        urlLoadInput.setAttribute("data-clear-btn","true");
+        urlLoadInput.setAttribute("data-mini","true");
+    
+        // associated div
+        var urlLoadDiv = document.createElement("div");
+        urlLoadDiv.id = "imageurldiv";
+        urlLoadDiv.style.display = "none";
+        urlLoadDiv.appendChild(urlLoadInput);
+    
+        // node
+        var node = document.getElementById("loaderlist");
+        // append
+        node.appendChild(urlLoadDiv);
+        // trigger create event (mobile)
+        $("#loaderlist").trigger("create");
+    };
+    
+    /**
+     * Display the url load HTML.
+     * @method display
+     * @param {Boolean} bool True to display, false to hide.
+     */
+    this.display = function (bool)
+    {
+        // url div element
+        var urldiv = document.getElementById("imageurldiv");
+        urldiv.style.display = bool ? "" : "none";
+    };
 
-    // associated div
-    var urlLoadDiv = document.createElement("div");
-    urlLoadDiv.id = "imageurldiv";
-    urlLoadDiv.style.display = "none";
-    urlLoadDiv.appendChild(urlLoadInput);
-
-    // node
-    var node = document.getElementById("loaderlist");
-    // append
-    node.appendChild(urlLoadDiv);
-    // trigger create event (mobile)
-    $("#loaderlist").trigger("create");
-};
-
-/**
- * Display the url load HTML.
- * @method clearUrlLoadHtml
- * @static
- * @param {Boolean} bool True to display, false to hide.
- */
-dwv.gui.base.displayUrlLoadHtml = function(bool)
-{
-    // url div element
-    var urldiv = document.getElementById("imageurldiv");
-    urldiv.style.display = bool ? "" : "none";
-};
+}; // class dwv.gui.base.UrlLoad
 ;/** 
  * HTML module.
  * @module html
@@ -5307,336 +5772,400 @@ dwv.gui = dwv.gui || {};
 dwv.gui.base = dwv.gui.base || {};
 
 /**
- * Append the toolbox HTML to the page.
- * @method appendToolboxHtml
- * @static
+ * Toolbox base gui.
+ * @class Toolbox
+ * @namespace dwv.gui.base
+ * @constructor
  */
-dwv.gui.base.appendToolboxHtml = function()
+dwv.gui.base.Toolbox = function (app)
 {
-    // tool select
-    var toolSelector = dwv.html.createHtmlSelect("toolSelect",dwv.tool.tools);
-    toolSelector.onchange = dwv.gui.onChangeTool;
-    
-    // tool list element
-    var toolLi = document.createElement("li");
-    toolLi.id = "toolLi";
-    toolLi.style.display = "none";
-    toolLi.appendChild(toolSelector);
-    toolLi.setAttribute("class","ui-block-a");
-
-    // node
-    var node = document.getElementById("toolList");
-    // clear it
-    while(node.hasChildNodes()) {
-        node.removeChild(node.firstChild);
-    }
-    // append
-    node.appendChild(toolLi);
-    // trigger create event (mobile)
-    $("#toolList").trigger("create");
-};
-
-/**
- * Display the toolbox HTML.
- * @method displayToolboxHtml
- * @static
- * @param {Boolean} bool True to display, false to hide.
- */
-dwv.gui.base.displayToolboxHtml = function(bool)
-{
-    // tool list element
-    dwv.html.displayElement("toolLi", bool);
-};
-
-/**
- * Initialise the toolbox HTML.
- * @method initToolboxHtml
- * @static
- */
-dwv.gui.base.initToolboxHtml = function()
-{
-    // tool select: reset selected option
-    var toolSelector = document.getElementById("toolSelect");
-    toolSelector.selectedIndex = 0;
-    dwv.gui.refreshSelect("#toolSelect");
-};
-
-/**
- * Append the window/level HTML to the page.
- * @method appendWindowLevelHtml
- * @static
- */
-dwv.gui.base.appendWindowLevelHtml = function()
-{
-    // preset select
-    var wlSelector = dwv.html.createHtmlSelect("presetSelect",dwv.tool.presets);
-    wlSelector.onchange = dwv.gui.onChangeWindowLevelPreset;
-    // colour map select
-    var cmSelector = dwv.html.createHtmlSelect("colourMapSelect",dwv.tool.colourMaps);
-    cmSelector.onchange = dwv.gui.onChangeColourMap;
-
-    // preset list element
-    var wlLi = document.createElement("li");
-    wlLi.id = "wlLi";
-    wlLi.style.display = "none";
-    wlLi.appendChild(wlSelector);
-    wlLi.setAttribute("class","ui-block-b");
-    // color map list element
-    var cmLi = document.createElement("li");
-    cmLi.id = "cmLi";
-    cmLi.style.display = "none";
-    cmLi.appendChild(cmSelector);
-    cmLi.setAttribute("class","ui-block-c");
-
-    // node
-    var node = document.getElementById("toolList");
-    // append preset
-    node.appendChild(wlLi);
-    // append color map
-    node.appendChild(cmLi);
-    // trigger create event (mobile)
-    $("#toolList").trigger("create");
-};
-
-/**
- * Display the window/level HTML.
- * @method displayWindowLevelHtml
- * @static
- * @param {Boolean} bool True to display, false to hide.
- */
-dwv.gui.base.displayWindowLevelHtml = function(bool)
-{
-    // presets list element
-    dwv.html.displayElement("wlLi", bool);
-    // color map list element
-    dwv.html.displayElement("cmLi", bool);
-};
-
-/**
- * Initialise the window/level HTML.
- * @method initWindowLevelHtml
- * @static
- */
-dwv.gui.base.initWindowLevelHtml = function()
-{
-    // create new preset select
-    var wlSelector = dwv.html.createHtmlSelect("presetSelect",dwv.tool.presets);
-    wlSelector.onchange = dwv.gui.onChangeWindowLevelPreset;
-    wlSelector.title = "Select w/l preset.";
-    
-    // copy html list
-    var wlLi = document.getElementById("wlLi");
-    // clear node
-    dwv.html.cleanNode(wlLi);
-    // add children
-    wlLi.appendChild(wlSelector);
-    $("#toolList").trigger("create");
-    
-    // colour map select
-    var cmSelector = document.getElementById("colourMapSelect");
-    cmSelector.selectedIndex = 0;
-    // special monochrome1 case
-    if( app.getImage().getPhotometricInterpretation() === "MONOCHROME1" )
+    /**
+     * Setup the toolbox HTML.
+     * @method setup
+     */
+    this.setup = function (list)
     {
-        cmSelector.selectedIndex = 1;
-    }
-    dwv.gui.refreshSelect("#colourMapSelect");
-};
-
-/**
- * Append the draw HTML to the page.
- * @method appendDrawHtml
- * @static
- */
-dwv.gui.base.appendDrawHtml = function()
-{
-    // shape select
-    var shapeSelector = dwv.html.createHtmlSelect("shapeSelect",dwv.tool.shapes);
-    shapeSelector.onchange = dwv.gui.onChangeShape;
-    // colour select
-    var colourSelector = dwv.html.createHtmlSelect("colourSelect",dwv.tool.colors);
-    colourSelector.onchange = dwv.gui.onChangeLineColour;
-
-    // shape list element
-    var shapeLi = document.createElement("li");
-    shapeLi.id = "shapeLi";
-    shapeLi.style.display = "none";
-    shapeLi.appendChild(shapeSelector);
-    shapeLi.setAttribute("class","ui-block-c");
-    // colour list element
-    var colourLi = document.createElement("li");
-    colourLi.id = "colourLi";
-    colourLi.style.display = "none";
-    colourLi.appendChild(colourSelector);
-    colourLi.setAttribute("class","ui-block-b");
+        // tool select
+        var toolSelector = dwv.html.createHtmlSelect("toolSelect", list);
+        toolSelector.onchange = app.onChangeTool;
+        
+        // tool list element
+        var toolLi = document.createElement("li");
+        toolLi.id = "toolLi";
+        toolLi.style.display = "none";
+        toolLi.appendChild(toolSelector);
+        toolLi.setAttribute("class","ui-block-a");
     
-    // node
-    var node = document.getElementById("toolList");
-    // apend shape
-    node.appendChild(shapeLi);
-    // append color
-    node.appendChild(colourLi);
-    // trigger create event (mobile)
-    $("#toolList").trigger("create");
-};
-
-/**
- * Display the draw HTML.
- * @method displayDrawHtml
- * @static
- * @param {Boolean} bool True to display, false to hide.
- */
-dwv.gui.base.displayDrawHtml = function(bool)
-{
-    // color list element
-    dwv.html.displayElement("colourLi", bool);
-    // shape list element
-    dwv.html.displayElement("shapeLi", bool);
-};
-
-/**
- * Initialise the draw HTML.
- * @method displayDrawHtml
- * @static
- * */
-dwv.gui.base.initDrawHtml = function()
-{
-    // shape select: reset selected option
-    var shapeSelector = document.getElementById("shapeSelect");
-    shapeSelector.selectedIndex = 0;
-    dwv.gui.refreshSelect("#shapeSelect");
-    // color select: reset selected option
-    var colourSelector = document.getElementById("colourSelect");
-    colourSelector.selectedIndex = 0;
-    dwv.gui.refreshSelect("#colourSelect");
-};
-
-/**
- * Append the color chooser HTML to the page.
- * @method appendLivewireHtml
- * @static
- */
-dwv.gui.base.appendLivewireHtml = function()
-{
-    // colour select
-    var colourSelector = dwv.html.createHtmlSelect("lwColourSelect",dwv.tool.colors);
-    colourSelector.onchange = dwv.gui.onChangeLineColour;
+        // node
+        var node = document.getElementById("toolList");
+        // clear it
+        while(node.hasChildNodes()) {
+            node.removeChild(node.firstChild);
+        }
+        // append
+        node.appendChild(toolLi);
+        // trigger create event (mobile)
+        $("#toolList").trigger("create");
+    };
     
-    // colour list element
-    var colourLi = document.createElement("li");
-    colourLi.id = "lwColourLi";
-    colourLi.style.display = "none";
-    colourLi.setAttribute("class","ui-block-b");
-    colourLi.appendChild(colourSelector);
+    /**
+     * Display the toolbox HTML.
+     * @method display
+     * @param {Boolean} bool True to display, false to hide.
+     */
+    this.display = function (bool)
+    {
+        // tool list element
+        dwv.html.displayElement("toolLi", bool);
+    };
     
-    // node
-    var node = document.getElementById("toolList");
-    // apend colour
-    node.appendChild(colourLi);
-    // trigger create event (mobile)
-    $("#toolList").trigger("create");
-};
-
-/**
- * Display the livewire HTML.
- * @method displayLivewireHtml
- * @static
- * @param {Boolean} bool True to display, false to hide.
- */
-dwv.gui.base.displayLivewireHtml = function(bool)
-{
-    // colour list
-    dwv.html.displayElement("lwColourLi", bool);
-};
-
-/**
- * Initialise the livewire HTML.
- * @method initLivewireHtml
- * @static
- */
-dwv.gui.base.initLivewireHtml = function()
-{
-    var colourSelector = document.getElementById("lwColourSelect");
-    colourSelector.selectedIndex = 0;
-    dwv.gui.refreshSelect("#lwColourSelect");
-};
-
-/**
- * Append the ZoomAndPan HTML to the page.
- * @method appendZoomAndPanHtml
- * @static
- */
-dwv.gui.base.appendZoomAndPanHtml = function()
-{
-    // reset button
-    var button = document.createElement("button");
-    button.id = "zoomResetButton";
-    button.name = "zoomResetButton";
-    button.onclick = dwv.gui.onZoomReset;
-    button.setAttribute("style","width:100%; margin-top:0.5em;");
-    button.setAttribute("class","ui-btn ui-btn-b");
-    var text = document.createTextNode("Reset");
-    button.appendChild(text);
+    /**
+     * Initialise the toolbox HTML.
+     * @method initialise
+     */
+    this.initialise = function ()
+    {
+        // tool select: reset selected option
+        var toolSelector = document.getElementById("toolSelect");
+        toolSelector.selectedIndex = 0;
+        dwv.gui.refreshSelect("#toolSelect");
+    };
     
-    // list element
-    var liElement = document.createElement("li");
-    liElement.id = "zoomLi";
-    liElement.style.display = "none";
-    liElement.setAttribute("class","ui-block-c");
-    liElement.appendChild(button);
+}; // dwv.gui.base.Toolbox
+
+/**
+ * WindowLevel tool base gui.
+ * @class WindowLevel
+ * @namespace dwv.gui.base
+ * @constructor
+ */
+dwv.gui.base.WindowLevel = function (app)
+{
+    /**
+     * Setup the tool HTML.
+     * @method setup
+     */
+    this.setup = function ()
+    {
+        // preset select
+        var wlSelector = dwv.html.createHtmlSelect("presetSelect", app.getPresets());
+        wlSelector.onchange = app.onChangeWindowLevelPreset;
+        // colour map select
+        var cmSelector = dwv.html.createHtmlSelect("colourMapSelect",dwv.tool.colourMaps);
+        cmSelector.onchange = app.onChangeColourMap;
     
-    // node
-    var node = document.getElementById("toolList");
-    // append element
-    node.appendChild(liElement);
-    // trigger create event (mobile)
-    $("#toolList").trigger("create");
-};
-
-/**
- * Display the ZoomAndPan HTML.
- * @method displayZoomAndPanHtml
- * @static
- * @param {Boolean} bool True to display, false to hide.
- */
-dwv.gui.base.displayZoomAndPanHtml = function(bool)
-{
-    // display list element
-    dwv.html.displayElement("zoomLi", bool);
-};
-
-/**
- * Append the Scroll HTML to the page.
- * @method appendScrollHtml
- * @static
- */
-dwv.gui.base.appendScrollHtml = function()
-{
-    // list element
-    var liElement = document.createElement("li");
-    liElement.id = "scrollLi";
-    liElement.style.display = "none";
-    liElement.setAttribute("class","ui-block-c");
+        // preset list element
+        var wlLi = document.createElement("li");
+        wlLi.id = "wlLi";
+        wlLi.style.display = "none";
+        wlLi.appendChild(wlSelector);
+        wlLi.setAttribute("class","ui-block-b");
+        // color map list element
+        var cmLi = document.createElement("li");
+        cmLi.id = "cmLi";
+        cmLi.style.display = "none";
+        cmLi.appendChild(cmSelector);
+        cmLi.setAttribute("class","ui-block-c");
     
-    // node
-    var node = document.getElementById("toolList");
-    // append element
-    node.appendChild(liElement);
-    // trigger create event (mobile)
-    $("#toolList").trigger("create");
-};
+        // node
+        var node = document.getElementById("toolList");
+        // append preset
+        node.appendChild(wlLi);
+        // append color map
+        node.appendChild(cmLi);
+        // trigger create event (mobile)
+        $("#toolList").trigger("create");
+    };
+    
+    /**
+     * Display the tool HTML.
+     * @method display
+     * @param {Boolean} bool True to display, false to hide.
+     */
+    this.display = function (bool)
+    {
+        // presets list element
+        dwv.html.displayElement("wlLi", bool);
+        // color map list element
+        dwv.html.displayElement("cmLi", bool);
+    };
+    
+    /**
+     * Initialise the tool HTML.
+     * @method initialise
+     */
+    this.initialise = function ()
+    {
+        // create new preset select
+        var wlSelector = dwv.html.createHtmlSelect("presetSelect", app.getPresets());
+        wlSelector.onchange = app.onChangeWindowLevelPreset;
+        wlSelector.title = "Select w/l preset.";
+        
+        // copy html list
+        var wlLi = document.getElementById("wlLi");
+        // clear node
+        dwv.html.cleanNode(wlLi);
+        // add children
+        wlLi.appendChild(wlSelector);
+        $("#toolList").trigger("create");
+        
+        // colour map select
+        var cmSelector = document.getElementById("colourMapSelect");
+        cmSelector.selectedIndex = 0;
+        // special monochrome1 case
+        if( app.getImage().getPhotometricInterpretation() === "MONOCHROME1" )
+        {
+            cmSelector.selectedIndex = 1;
+        }
+        dwv.gui.refreshSelect("#colourMapSelect");
+    };
+    
+}; // class dwv.gui.base.WindowLevel
 
 /**
- * Display the Scroll HTML.
- * @method displayScrollHtml
- * @static
- * @param {Boolean} bool True to display, false to hide.
+ * Draw tool base gui.
+ * @class Draw
+ * @namespace dwv.gui.base
+ * @constructor
  */
-dwv.gui.base.displayScrollHtml = function(bool)
+dwv.gui.base.Draw = function (app)
 {
-    // display list element
-    dwv.html.displayElement("scrollLi", bool);
-};
+    // default colours
+    var colours = [
+       "Yellow", "Red", "White", "Green", "Blue", "Lime", "Fuchsia", "Black"
+    ];
+    /**
+     * Get the available colours.
+     * @method getColours
+     */
+    this.getColours = function () { return colours; };
+    
+    /**
+     * Setup the tool HTML.
+     * @method setup
+     */
+    this.setup = function (shapeList)
+    {
+        // shape select
+        var shapeSelector = dwv.html.createHtmlSelect("shapeSelect", shapeList);
+        shapeSelector.onchange = app.onChangeShape;
+        // colour select
+        var colourSelector = dwv.html.createHtmlSelect("colourSelect", colours);
+        colourSelector.onchange = app.onChangeLineColour;
+    
+        // shape list element
+        var shapeLi = document.createElement("li");
+        shapeLi.id = "shapeLi";
+        shapeLi.style.display = "none";
+        shapeLi.appendChild(shapeSelector);
+        shapeLi.setAttribute("class","ui-block-c");
+        // colour list element
+        var colourLi = document.createElement("li");
+        colourLi.id = "colourLi";
+        colourLi.style.display = "none";
+        colourLi.appendChild(colourSelector);
+        colourLi.setAttribute("class","ui-block-b");
+        
+        // node
+        var node = document.getElementById("toolList");
+        // apend shape
+        node.appendChild(shapeLi);
+        // append color
+        node.appendChild(colourLi);
+        // trigger create event (mobile)
+        $("#toolList").trigger("create");
+    };
+
+    /**
+     * Display the tool HTML.
+     * @method display
+     * @param {Boolean} bool True to display, false to hide.
+     */
+    this.display = function (bool)
+    {
+        // color list element
+        dwv.html.displayElement("colourLi", bool);
+        // shape list element
+        dwv.html.displayElement("shapeLi", bool);
+    };
+    
+    /**
+     * Initialise the tool HTML.
+     * @method initialise
+     */
+    this.initialise = function ()
+    {
+        // shape select: reset selected option
+        var shapeSelector = document.getElementById("shapeSelect");
+        shapeSelector.selectedIndex = 0;
+        dwv.gui.refreshSelect("#shapeSelect");
+        // color select: reset selected option
+        var colourSelector = document.getElementById("colourSelect");
+        colourSelector.selectedIndex = 0;
+        dwv.gui.refreshSelect("#colourSelect");
+    };
+    
+}; // class dwv.gui.base.Draw
+
+/**
+ * Livewire tool base gui.
+ * @class Livewire
+ * @namespace dwv.gui.base
+ * @constructor
+ */
+dwv.gui.base.Livewire = function (app)
+{
+    // default colours
+    var colours = [
+       "Yellow", "Red", "White", "Green", "Blue", "Lime", "Fuchsia", "Black"
+    ];
+    /**
+     * Get the available colours.
+     * @method getColours
+     */
+    this.getColours = function () { return colours; };
+
+    /**
+     * Setup the tool HTML.
+     * @method setup
+     */
+    this.setup = function ()
+    {
+        // colour select
+        var colourSelector = dwv.html.createHtmlSelect("lwColourSelect", colours);
+        colourSelector.onchange = app.onChangeLineColour;
+        
+        // colour list element
+        var colourLi = document.createElement("li");
+        colourLi.id = "lwColourLi";
+        colourLi.style.display = "none";
+        colourLi.setAttribute("class","ui-block-b");
+        colourLi.appendChild(colourSelector);
+        
+        // node
+        var node = document.getElementById("toolList");
+        // apend colour
+        node.appendChild(colourLi);
+        // trigger create event (mobile)
+        $("#toolList").trigger("create");
+    };
+    
+    /**
+     * Display the tool HTML.
+     * @method display
+     * @param {Boolean} bool True to display, false to hide.
+     */
+    this.display = function (bool)
+    {
+        // colour list
+        dwv.html.displayElement("lwColourLi", bool);
+    };
+    
+    /**
+     * Initialise the tool HTML.
+     * @method initialise
+     */
+    this.initialise = function ()
+    {
+        var colourSelector = document.getElementById("lwColourSelect");
+        colourSelector.selectedIndex = 0;
+        dwv.gui.refreshSelect("#lwColourSelect");
+    };
+    
+}; // class dwv.gui.base.Livewire
+
+/**
+ * ZoomAndPan tool base gui.
+ * @class ZoomAndPan
+ * @namespace dwv.gui.base
+ * @constructor
+ */
+dwv.gui.base.ZoomAndPan = function (app)
+{
+    /**
+     * Setup the tool HTML.
+     * @method setup
+     */
+    this.setup = function()
+    {
+        // reset button
+        var button = document.createElement("button");
+        button.id = "zoomResetButton";
+        button.name = "zoomResetButton";
+        button.onclick = app.onZoomReset;
+        button.setAttribute("style","width:100%; margin-top:0.5em;");
+        button.setAttribute("class","ui-btn ui-btn-b");
+        var text = document.createTextNode("Reset");
+        button.appendChild(text);
+        
+        // list element
+        var liElement = document.createElement("li");
+        liElement.id = "zoomLi";
+        liElement.style.display = "none";
+        liElement.setAttribute("class","ui-block-c");
+        liElement.appendChild(button);
+        
+        // node
+        var node = document.getElementById("toolList");
+        // append element
+        node.appendChild(liElement);
+        // trigger create event (mobile)
+        $("#toolList").trigger("create");
+    };
+    
+    /**
+     * Display the tool HTML.
+     * @method display
+     * @param {Boolean} bool True to display, false to hide.
+     */
+    this.display = function(bool)
+    {
+        // display list element
+        dwv.html.displayElement("zoomLi", bool);
+    };
+    
+}; // class dwv.gui.base.ZoomAndPan
+
+/**
+ * Scroll tool base gui.
+ * @class Scroll
+ * @namespace dwv.gui.base
+ * @constructor
+ */
+dwv.gui.base.Scroll = function ()
+{
+    /**
+     * Setup the tool HTML.
+     * @method setup
+     */
+    this.setup = function()
+    {
+        // list element
+        var liElement = document.createElement("li");
+        liElement.id = "scrollLi";
+        liElement.style.display = "none";
+        liElement.setAttribute("class","ui-block-c");
+        
+        // node
+        var node = document.getElementById("toolList");
+        // append element
+        node.appendChild(liElement);
+        // trigger create event (mobile)
+        $("#toolList").trigger("create");
+    };
+    
+    /**
+     * Display the tool HTML.
+     * @method display
+     * @param {Boolean} bool True to display, false to hide.
+     */
+    this.display = function(bool)
+    {
+        // display list element
+        dwv.html.displayElement("scrollLi", bool);
+    };
+    
+}; // class dwv.gui.base.Scroll
 ;/** 
  * GUI module.
  * @module gui
@@ -5652,103 +6181,110 @@ dwv.gui = dwv.gui || {};
 dwv.gui.base = dwv.gui.base || {};
 
 /**
- * Append the undo HTML to the page.
- * @method appendUndoHtml
- * @static
+ * Undo base gui.
+ * @class Undo
+ * @namespace dwv.gui.base
+ * @constructor
  */
-dwv.gui.base.appendUndoHtml = function()
+dwv.gui.base.Undo = function ()
 {
-    var paragraph = document.createElement("p");  
-    paragraph.appendChild(document.createTextNode("History:"));
-    paragraph.appendChild(document.createElement("br"));
+    /**
+     * Setup the undo HTML.
+     * @method setup
+     * @static
+     */
+    this.setup = function ()
+    {
+        var paragraph = document.createElement("p");  
+        paragraph.appendChild(document.createTextNode("History:"));
+        paragraph.appendChild(document.createElement("br"));
+        
+        var select = document.createElement("select");
+        select.id = "history_list";
+        select.name = "history_list";
+        select.multiple = "multiple";
+        paragraph.appendChild(select);
     
-    var select = document.createElement("select");
-    select.id = "history_list";
-    select.name = "history_list";
-    select.multiple = "multiple";
-    paragraph.appendChild(select);
-
-    // node
-    var node = document.getElementById("history");
-    // clear it
-    while(node.hasChildNodes()) {
-        node.removeChild(node.firstChild);
-    }
-    // append
-    node.appendChild(paragraph);
-};
-
-/**
- * Clear the command list of the undo HTML.
- * @method cleanUndoHtml
- * @static
- */
-dwv.gui.cleanUndoHtml = function ()
-{
-    var select = document.getElementById("history_list");
-    if ( select && select.length !== 0 ) {
-        for( var i = select.length - 1; i >= 0; --i)
-        {
-            select.remove(i);
+        // node
+        var node = document.getElementById("history");
+        // clear it
+        while(node.hasChildNodes()) {
+            node.removeChild(node.firstChild);
         }
-    }
-};
-
-/**
- * Add a command to the undo HTML.
- * @method addCommandToUndoHtml
- * @static
- * @param {String} commandName The name of the command to add.
- */
-dwv.gui.addCommandToUndoHtml = function(commandName)
-{
-    var select = document.getElementById("history_list");
-    // remove undone commands
-    var count = select.length - (select.selectedIndex+1);
-    if( count > 0 )
+        // append
+        node.appendChild(paragraph);
+    };
+    
+    /**
+     * Clear the command list of the undo HTML.
+     * @method cleanUndoHtml
+     */
+    this.initialise = function ()
     {
-        for( var i = 0; i < count; ++i)
-        {
-            select.remove(select.length-1);
+        var select = document.getElementById("history_list");
+        if ( select && select.length !== 0 ) {
+            for( var i = select.length - 1; i >= 0; --i)
+            {
+                select.remove(i);
+            }
         }
-    }
-    // add new option
-    var option = document.createElement("option");
-    option.text = commandName;
-    option.value = commandName;
-    select.add(option);
-    // increment selected index
-    select.selectedIndex++;
-};
-
-/**
- * Enable the last command of the undo HTML.
- * @method enableInUndoHtml
- * @static
- * @param {Boolean} enable Flag to enable or disable the command.
- */
-dwv.gui.enableInUndoHtml = function(enable)
-{
-    var select = document.getElementById("history_list");
-    // enable or not (order is important)
-    var option;
-    if( enable ) 
+    };
+    
+    /**
+     * Add a command to the undo HTML.
+     * @method addCommandToUndoHtml
+     * @param {String} commandName The name of the command to add.
+     */
+    this.addCommandToUndoHtml = function (commandName)
     {
+        var select = document.getElementById("history_list");
+        // remove undone commands
+        var count = select.length - (select.selectedIndex+1);
+        if( count > 0 )
+        {
+            for( var i = 0; i < count; ++i)
+            {
+                select.remove(select.length-1);
+            }
+        }
+        // add new option
+        var option = document.createElement("option");
+        option.text = commandName;
+        option.value = commandName;
+        select.add(option);
         // increment selected index
         select.selectedIndex++;
-        // enable option
-        option = select.options[select.selectedIndex];
-        option.disabled = false;
-    }
-    else 
+    };
+    
+    /**
+     * Enable the last command of the undo HTML.
+     * @method enableInUndoHtml
+     * @param {Boolean} enable Flag to enable or disable the command.
+     */
+    this.enableInUndoHtml = function (enable)
     {
-        // disable option
-        option = select.options[select.selectedIndex];
-        option.disabled = true;
-        // decrement selected index
-        select.selectedIndex--;
-    }
-};
+        var select = document.getElementById("history_list");
+        // enable or not (order is important)
+        var option;
+        if( enable ) 
+        {
+            // increment selected index
+            select.selectedIndex++;
+            // enable option
+            option = select.options[select.selectedIndex];
+            option.disabled = false;
+        }
+        else 
+        {
+            // disable option
+            option = select.options[select.selectedIndex];
+            option.disabled = true;
+            // decrement selected index
+            select.selectedIndex--;
+        }
+    };
+
+}; // class dwv.gui.base.Undo
 ;/** 
  * Image module.
  * @module image
@@ -5837,20 +6373,20 @@ dwv.image.filter.Threshold = function()
  * @method update
  * @return {Object} The transformed image.
  */ 
-dwv.image.filter.Threshold.prototype.update = function()
+dwv.image.filter.Threshold.prototype.update = function ()
 {
+    var image = this.getOriginalImage();
+    var imageMin = image.getDataRange().min;
     var self = this;
-    var imageMin = app.getImage().getDataRange().min;
-    self.setOriginalImage( app.getImage() );
-    var threshFunction = function(value){
-        if(value<self.getMin()||value>self.getMax()) {
+    var threshFunction = function (value) {
+        if ( value < self.getMin() || value > self.getMax() ) {
             return imageMin;
         }
         else {
             return value;
         }
     };
-    return app.getImage().transform( threshFunction );
+    return image.transform( threshFunction );
 };
 
 /**
@@ -5895,9 +6431,9 @@ dwv.image.filter.Sharpen = function()
  */ 
 dwv.image.filter.Sharpen.prototype.update = function()
 {
-    this.setOriginalImage( app.getImage() );
+    var image = this.getOriginalImage();
     
-    return app.getImage().convolute2D(
+    return image.convolute2D(
         [  0, -1,  0,
           -1,  5, -1,
            0, -1,  0 ] );
@@ -5945,19 +6481,19 @@ dwv.image.filter.Sobel = function()
  */ 
 dwv.image.filter.Sobel.prototype.update = function()
 {
-    this.setOriginalImage( app.getImage() );
+    var image = this.getOriginalImage();
     
-    var gradX = app.getImage().convolute2D(
+    var gradX = image.convolute2D(
         [ 1,  0,  -1,
           2,  0,  -2,
           1,  0,  -1 ] );
 
-    var gradY = app.getImage().convolute2D(
+    var gradY = image.convolute2D(
         [  1,  2,  1,
            0,  0,  0,
           -1, -2, -1 ] );
     
-    return gradX.compose( gradY, function(x,y){return Math.sqrt(x*x+y*y);} );
+    return gradX.compose( gradY, function (x,y) { return Math.sqrt(x*x+y*y); } );
 };
 
 ;/** 
@@ -7251,7 +7787,7 @@ dwv.image = dwv.image || {};
 dwv.image.getDataFromImage = function(image)
 {
     // draw the image in the canvas in order to get its data
-    var canvas = document.getElementById('imageLayer');
+    var canvas = document.createElement('canvas');
     canvas.width = image.width;
     canvas.height = image.height;
     var ctx = canvas.getContext('2d');
@@ -7478,7 +8014,7 @@ dwv.image.View = function(image, isSigned)
         var oldPosition = currentPosition;
         currentPosition = pos;
         // only display value for monochrome data
-        if( app.getImage().getPhotometricInterpretation().match(/MONOCHROME/) !== null )
+        if( image.getPhotometricInterpretation().match(/MONOCHROME/) !== null )
         {
             this.fireEvent({"type": "positionchange", 
                 "i": pos.i, "j": pos.j, "k": pos.k,
@@ -9519,11 +10055,6 @@ dwv.tool.DeleteGroupCommand = function (group, name, layer)
     };
 }; // DeleteShapeCommand class
 
-// List of colors
-dwv.tool.colors = [
-    "Yellow", "Red", "White", "Green", "Blue", "Lime", "Fuchsia", "Black"
-];
-
 /**
  * Drawing tool.
  * @class Draw
@@ -9531,7 +10062,7 @@ dwv.tool.colors = [
  * @constructor
  * @param {Object} app The associated application.
  */
-dwv.tool.Draw = function (app)
+dwv.tool.Draw = function (app, shapeFactoryList)
 {
     /**
      * Closure to self: to be used by event handlers.
@@ -9541,6 +10072,12 @@ dwv.tool.Draw = function (app)
      */
     var self = this;
     /**
+     * Draw GUI.
+     * @property gui
+     * @type Object
+     */
+    var gui = null;
+    /**
      * Interaction start flag.
      * @property started
      * @private
@@ -9549,19 +10086,18 @@ dwv.tool.Draw = function (app)
     var started = false;
     
     /**
+     * Shape factory list
+     * @property shapeFactoryList
+     * @type Object
+     */
+    this.shapeFactoryList = shapeFactoryList;
+    /**
      * Draw command.
      * @property command
      * @private
      * @type Object
      */
     var command = null;
-    /**
-     * Current active shape.
-     * @property activeShape
-     * @private
-     * @type Object
-     */
-    //var activeShape = null;
     /**
      * List of created shapes.
      * @property createdShapes
@@ -9612,7 +10148,7 @@ dwv.tool.Draw = function (app)
      * @private
      * @type Object
      */
-    var shapeEditor = new dwv.tool.ShapeEditor();
+    var shapeEditor = new dwv.tool.ShapeEditor(app);
 
     /**
      * Trash draw: a cross.
@@ -9713,7 +10249,7 @@ dwv.tool.Draw = function (app)
             // add current one to the list
             points.push( lastPoint );
             // allow for anchor points
-            var factory = new dwv.tool.shapes[self.shapeName]();
+            var factory = new self.shapeFactoryList[self.shapeName]();
             if( points.length < factory.getNPoints() ) {
                 clearTimeout(this.timer);
                 this.timer = setTimeout( function () {
@@ -9752,7 +10288,7 @@ dwv.tool.Draw = function (app)
                 shapeGroup.destroy();
             }
             // create final shape
-            var factory = new dwv.tool.shapes[self.shapeName]();
+            var factory = new self.shapeFactoryList[self.shapeName]();
             var group = factory.create(points, self.style, app.getImage());
             group.id( idGenerator.get() );
             // re-activate layer
@@ -9821,12 +10357,24 @@ dwv.tool.Draw = function (app)
     };
 
     /**
+     * Setup the tool GUI.
+     * @method setup
+     */
+    this.setup = function ()
+    {
+        gui = new dwv.gui.Draw(app);
+        gui.setup(this.shapeFactoryList);
+    };
+    
+    /**
      * Enable the tool.
      * @method enable
      * @param {Boolean} flag The flag to enable or not.
      */
     this.display = function ( flag ){
-        dwv.gui.displayDrawHtml( flag );
+        if ( gui ) {
+            gui.display( flag );
+        }
         // reset shape display properties
         shapeEditor.disable();
         shapeEditor.setShape(null);
@@ -10020,6 +10568,26 @@ dwv.tool.Draw = function (app)
         });
     };
 
+    /**
+     * Initialise the tool.
+     * @method init
+     */
+    this.init = function() {
+        // set the default to the first in the list
+        var shapeName = 0;
+        for( var key in this.shapeFactoryList ){
+            shapeName = key;
+            break;
+        }
+        this.setShapeName(shapeName);
+        // init gui
+        if ( gui ) {
+            // same for color
+            this.setLineColour(gui.getColours()[0]);
+            // init html
+            gui.initialise();
+        }
+    };
 
 }; // Draw class
 
@@ -10077,25 +10645,7 @@ dwv.tool.Draw.prototype.setShapeName = function(name)
  * @param {String} name The name of the shape.
  */
 dwv.tool.Draw.prototype.hasShape = function(name) {
-    return dwv.tool.shapes[name];
-};
-
-/**
- * Initialise the tool.
- * @method init
- */
-dwv.tool.Draw.prototype.init = function() {
-    // set the default to the first in the list
-    var shapeName = 0;
-    for( var key in dwv.tool.shapes ){
-        shapeName = key;
-        break;
-    }
-    this.setShapeName(shapeName);
-    // same for color
-    this.setLineColour(dwv.tool.colors[0]);
-    // init html
-    dwv.gui.initDrawHtml();
+    return this.shapeFactoryList[name];
 };
 ;/** 
  * Tool module.
@@ -10111,7 +10661,7 @@ var Kinetic = Kinetic || {};
  * @namespace dwv.tool
  * @constructor
  */
-dwv.tool.ShapeEditor = function ()
+dwv.tool.ShapeEditor = function (app)
 {
     /**
      * Edited shape.
@@ -10654,10 +11204,23 @@ dwv.tool = dwv.tool || {};
  * @class Filter
  * @namespace dwv.tool
  * @constructor
- * @param {Object} app The associated application.
+ * @param {Array} filterList The list of filter objects.
+ * @param {Object} gui The associated gui.
  */
-dwv.tool.Filter = function(/*app*/)
+dwv.tool.Filter = function ( filterList, app )
 {
+    /**
+     * Filter GUI.
+     * @property gui
+     * @type Object
+     */
+    var gui = null;
+    /**
+     * Filter list
+     * @property filterList
+     * @type Object
+     */
+    this.filterList = filterList;
     /**
      * Selected filter.
      * @property selectedFilter
@@ -10676,14 +11239,77 @@ dwv.tool.Filter = function(/*app*/)
      * @type Boolean
      */
     this.displayed = false;
-};
+    
+    /**
+     * Setup the filter GUI.
+     * @method setup
+     */
+    this.setup = function ()
+    {
+        if ( Object.keys(this.filterList).length !== 0 ) {
+            gui = new dwv.gui.Filter(app);
+            gui.setup(this.filterList);
+            for( var key in this.filterList ){
+                this.filterList[key].setup();
+            }
+        }
+    };
+
+    /**
+     * Enable the filter.
+     * @method enable
+     * @param {Boolean} bool Flag to enable or not.
+     */
+    this.display = function (bool)
+    {
+        if ( gui ) {
+            gui.display(bool);
+        }
+        this.displayed = bool;
+        // display the selected filter
+        this.selectedFilter.display(bool);
+    };
+
+    /**
+     * Initialise the filter.
+     * @method init
+     */
+    this.init = function ()
+    {
+        // set the default to the first in the list
+        for( var key in this.filterList ){
+            this.defaultFilterName = key;
+            break;
+        }
+        this.setSelectedFilter(this.defaultFilterName);
+        // init all filters
+        for( key in this.filterList ) {
+            this.filterList[key].init();
+        }    
+        // init html
+        if ( gui ) {
+            gui.initialise();
+        }
+    };
+
+    /**
+     * Handle keydown event.
+     * @method keydown
+     * @param {Object} event The keydown event.
+     */
+    this.keydown = function (event)
+    {
+        app.onKeydown(event);
+    };
+
+}; // class dwv.tool.Filter
 
 /**
  * Help for this tool.
  * @method getHelp
  * @returns {Object} The help content.
  */
-dwv.tool.Filter.prototype.getHelp = function()
+dwv.tool.Filter.prototype.getHelp = function ()
 {
     return {
         'title': "Filter",
@@ -10695,24 +11321,12 @@ dwv.tool.Filter.prototype.getHelp = function()
 };
 
 /**
- * Enable the filter.
- * @method enable
- * @param {Boolean} bool Flag to enable or not.
- */
-dwv.tool.Filter.prototype.display = function(bool)
-{
-    dwv.gui.displayFilterHtml(bool);
-    this.displayed = bool;
-    // display the selected filter
-    this.selectedFilter.display(bool);
-};
-
-/**
  * Get the selected filter.
  * @method getSelectedFilter
  * @return {Object} The selected filter.
  */
-dwv.tool.Filter.prototype.getSelectedFilter = function() {
+dwv.tool.Filter.prototype.getSelectedFilter = function ()
+{
     return this.selectedFilter;
 };
 
@@ -10721,7 +11335,8 @@ dwv.tool.Filter.prototype.getSelectedFilter = function() {
  * @method setSelectedFilter
  * @return {String} The name of the filter to select.
  */
-dwv.tool.Filter.prototype.setSelectedFilter = function(name) {
+dwv.tool.Filter.prototype.setSelectedFilter = function (name)
+{
     // check if we have it
     if( !this.hasFilter(name) )
     {
@@ -10733,7 +11348,7 @@ dwv.tool.Filter.prototype.setSelectedFilter = function(name) {
         this.selectedFilter.display(false);
     }
     // enable new one
-    this.selectedFilter = dwv.tool.filters[name];
+    this.selectedFilter = this.filterList[name];
     // display the selected filter
     if( this.displayed )
     {
@@ -10742,42 +11357,24 @@ dwv.tool.Filter.prototype.setSelectedFilter = function(name) {
 };
 
 /**
+ * Get the list of filters.
+ * @method getFilterList
+ * @return {Array} The list of filter objects.
+ */
+dwv.tool.Filter.prototype.getFilterList = function ()
+{
+    return this.filterList;
+};
+
+/**
  * Check if a filter is in the filter list.
  * @method hasFilter
  * @param {String} name The name to check.
  * @return {String} The filter list element for the given name.
  */
-dwv.tool.Filter.prototype.hasFilter = function(name) {
-    return dwv.tool.filters[name];
-};
-
-/**
- * Initialise the filter.
- * @method init
- */
-dwv.tool.Filter.prototype.init = function()
+dwv.tool.Filter.prototype.hasFilter = function (name)
 {
-    // set the default to the first in the list
-    for( var key in dwv.tool.filters ){
-        this.defaultFilterName = key;
-        break;
-    }
-    this.setSelectedFilter(this.defaultFilterName);
-    // init all filters
-    for( key in dwv.tool.filters ) {
-        dwv.tool.filters[key].init();
-    }    
-    // init html
-    dwv.gui.initFilterHtml();
-};
-
-/**
- * Handle keydown event.
- * @method keydown
- * @param {Object} event The keydown event.
- */
-dwv.tool.Filter.prototype.keydown = function(event){
-    app.onKeydown(event);
+    return this.filterList[name];
 };
 
 // Filter namespace
@@ -10790,39 +11387,61 @@ dwv.tool.filter = dwv.tool.filter || {};
  * @constructor
  * @param {Object} app The associated application.
  */
-dwv.tool.filter.Threshold = function(/*app*/) {};
-
-/**
- * Enable the filter.
- * @method enable
- * @param {Boolean} bool Flag to enable or not.
- */
-dwv.tool.filter.Threshold.prototype.display = function(bool)
+dwv.tool.filter.Threshold = function ( app )
 {
-    dwv.gui.filter.displayThresholdHtml(bool);
-};
+    /**
+     * Filter GUI.
+     * @property gui
+     * @type Object
+     */
+    var gui = new dwv.gui.Threshold(app);
+    
+    /**
+     * Setup the filter GUI.
+     * @method setup
+     */
+    this.setup = function ()
+    {
+        gui.setup();
+    };
 
-dwv.tool.filter.Threshold.prototype.init = function()
-{
-    // init html
-    dwv.gui.filter.initThresholdHtml();
-};
+    /**
+     * Display the filter.
+     * @method display
+     * @param {Boolean} bool Flag to display or not.
+     */
+    this.display = function (bool)
+    {
+        gui.display(bool);
+    };
+    
+    /**
+     * Initialise the filter.
+     * @method init
+     */
+    this.init = function ()
+    {
+        gui.initialise();
+    };
+    
+    /**
+     * Run the filter.
+     * @method run
+     * @param {Mixed} args The filter arguments.
+     */
+    this.run = function (args)
+    {
+        var filter = new dwv.image.filter.Threshold();
+        filter.setMin(args.min);
+        filter.setMax(args.max);
+        var command = new dwv.tool.RunFilterCommand(filter, app);
+        command.execute();
+        // save command in undo stack
+        app.getUndoStack().add(command);
+    };
+    
+}; // class dwv.tool.filter.Threshold
 
-/**
- * Run the filter.
- * @method run
- * @param {Mixed} args The filter arguments.
- */
-dwv.tool.filter.Threshold.prototype.run = function(args)
-{
-    var filter = new dwv.image.filter.Threshold();
-    filter.setMin(args.min);
-    filter.setMax(args.max);
-    var command = new dwv.tool.RunFilterCommand(filter, app);
-    command.execute();
-    // save command in undo stack
-    app.getUndoStack().add(command);
-};
 
 /**
  * Sharpen filter tool.
@@ -10831,74 +11450,118 @@ dwv.tool.filter.Threshold.prototype.run = function(args)
  * @constructor
  * @param {Object} app The associated application.
  */
-dwv.tool.filter.Sharpen = function(/*app*/) {};
-
-/**
- * Enable the filter.
- * @method enable
- * @param {Boolean} bool Flag to enable or not.
- */
-dwv.tool.filter.Sharpen.prototype.display = function(bool)
+dwv.tool.filter.Sharpen = function ( app )
 {
-    dwv.gui.filter.displaySharpenHtml(bool);
-};
+    /**
+     * Filter GUI.
+     * @property gui
+     * @type Object
+     */
+    var gui = new dwv.gui.Sharpen(app);
+    
+    /**
+     * Setup the filter GUI.
+     * @method setup
+     */
+    this.setup = function ()
+    {
+        gui.setup();
+    };
 
-dwv.tool.filter.Sharpen.prototype.init = function()
-{
-    // nothing to do...
-};
+    /**
+     * Display the filter.
+     * @method display
+     * @param {Boolean} bool Flag to enable or not.
+     */
+    this.display = function (bool)
+    {
+        gui.display(bool);
+    };
+    
+    /**
+     * Initialise the filter.
+     * @method init
+     */
+    this.init = function()
+    {
+        // nothing to do...
+    };
+    
+    /**
+     * Run the filter.
+     * @method run
+     * @param {Mixed} args The filter arguments.
+     */
+    this.run = function(/*args*/)
+    {
+        var filter = new dwv.image.filter.Sharpen();
+        var command = new dwv.tool.RunFilterCommand(filter, app);
+        command.execute();
+        // save command in undo stack
+        app.getUndoStack().add(command);
+    };
 
-/**
- * Run the filter.
- * @method run
- * @param {Mixed} args The filter arguments.
- */
-dwv.tool.filter.Sharpen.prototype.run = function(/*args*/)
-{
-    var filter = new dwv.image.filter.Sharpen();
-    var command = new dwv.tool.RunFilterCommand(filter, app);
-    command.execute();
-    // save command in undo stack
-    app.getUndoStack().add(command);
-};
+}; // dwv.tool.filter.Sharpen
 
 /**
  * Sobel filter tool.
- * @class Sharpen
+ * @class Sobel
  * @namespace dwv.tool.filter
  * @constructor
  * @param {Object} app The associated application.
  */
-dwv.tool.filter.Sobel = function(/*app*/) {};
-
-/**
- * Enable the filter.
- * @method enable
- * @param {Boolean} bool Flag to enable or not.
- */
-dwv.tool.filter.Sobel.prototype.display = function(bool)
+dwv.tool.filter.Sobel = function ( app )
 {
-    dwv.gui.filter.displaySobelHtml(bool);
-};
+    /**
+     * Filter GUI.
+     * @property gui
+     * @type Object
+     */
+    var gui = new dwv.gui.Sobel(app);
+    
+    /**
+     * Setup the filter GUI.
+     * @method setup
+     */
+    this.setup = function ()
+    {
+        gui.setup();
+    };
 
-dwv.tool.filter.Sobel.prototype.init = function()
-{
-    // nothing to do...
-};
+    /**
+     * Enable the filter.
+     * @method enable
+     * @param {Boolean} bool Flag to enable or not.
+     */
+    this.display = function(bool)
+    {
+        gui.display(bool);
+    };
+    
+    /**
+     * Initialise the filter.
+     * @method init
+     */
+    this.init = function()
+    {
+        // nothing to do...
+    };
+    
+    /**
+     * Run the filter.
+     * @method run
+     * @param {Mixed} args The filter arguments.
+     */
+    dwv.tool.filter.Sobel.prototype.run = function(/*args*/)
+    {
+        var filter = new dwv.image.filter.Sobel();
+        var command = new dwv.tool.RunFilterCommand(filter, app);
+        command.execute();
+        // save command in undo stack
+        app.getUndoStack().add(command);
+    };
 
-/**
- * Run the filter.
- * @method run
- * @param {Mixed} args The filter arguments.
- */
-dwv.tool.filter.Sobel.prototype.run = function(/*args*/)
-{
-    var filter = new dwv.image.filter.Sobel();
-    var command = new dwv.tool.RunFilterCommand(filter, app);
-    command.execute();
-    // save command in undo stack
-    app.getUndoStack().add(command);
-};
+}; // class dwv.tool.filter.Sobel
 
 /**
  * Run filter command.
@@ -10908,8 +11571,8 @@ dwv.tool.filter.Sobel.prototype.run = function(/*args*/)
  * @param {Object} filter The filter to run.
  * @param {Object} app The associated application.
  */
-dwv.tool.RunFilterCommand = function (filter, app)
-{
+dwv.tool.RunFilterCommand = function (filter, app) {
+    
     /**
      * Get the command name.
      * @method getName
@@ -10923,6 +11586,7 @@ dwv.tool.RunFilterCommand = function (filter, app)
      */
     this.execute = function ()
     {
+        filter.setOriginalImage(app.getImage());
         app.setImage(filter.update());
         app.render();
     }; 
@@ -10934,6 +11598,7 @@ dwv.tool.RunFilterCommand = function (filter, app)
         app.setImage(filter.getOriginalImage());
         app.render();
     };
+    
 }; // RunFilterCommand class
 ;/** 
  * Info module.
@@ -10948,214 +11613,239 @@ var dwv = dwv || {};
  */
 dwv.info = dwv.info || {};
 
-/**
- * Create the windowing info div.
- * @method createWindowingDiv
- * @static
- */
-dwv.info.createWindowingDiv = function()
-{
-    var div = document.getElementById("infotr");
-    dwv.html.removeNode("ulinfotr");
-    // windowing list
-    var ul = document.createElement("ul");
-    ul.id = "ulinfotr";
-    // window center list item
-    var liwc = document.createElement("li");
-    liwc.id = "liwcinfotr";
-    ul.appendChild(liwc);
-    // window width list item
-    var liww = document.createElement("li");
-    liww.id = "liwwinfotr";
-    ul.appendChild(liww);
-    // add list to div
-    div.appendChild(ul);
-};
-
-/**
- * Update the Top Right info div.
- * @method updateWindowingDiv
- * @static
- * @param {Object} event The windowing change event containing the new values.
- * Warning: expects the windowing info div to exist (use after createWindowingDiv).
- */
-dwv.info.updateWindowingDiv = function(event)
-{
-    // window center list item
-    var liwc = document.getElementById("liwcinfotr");
-    dwv.html.cleanNode(liwc);
-    liwc.appendChild(document.createTextNode("WindowCenter = "+event.wc));
-    // window width list item
-    var liww = document.getElementById("liwwinfotr");
-    dwv.html.cleanNode(liww);
-    liww.appendChild(document.createTextNode("WindowWidth = "+event.ww));
-};
-
-/**
- * Create the position info div.
- * @method createPositionDiv
- * @static
- */
-dwv.info.createPositionDiv = function()
-{
-    var div = document.getElementById("infotl");
-    dwv.html.removeNode("ulinfotl");
-    // position list
-    var ul = document.createElement("ul");
-    ul.id = "ulinfotl";
-    // position
-    var lipos = document.createElement("li");
-    lipos.id = "liposinfotl";
-    ul.appendChild(lipos);
-    // value
-    var livalue = document.createElement("li");
-    livalue.id = "livalueinfotl";
-    ul.appendChild(livalue);
-    // add list to div
-    div.appendChild(ul);
-};
-
-/**
- * Update the position info div.
- * @method updatePositionDiv
- * @static
- * @param {Object} event The position change event containing the new values.
- * Warning: expects the position info div to exist (use after createPositionDiv).
- */
-dwv.info.updatePositionDiv = function(event)
-{
-    // position list item
-    var lipos = document.getElementById("liposinfotl");
-    dwv.html.cleanNode(lipos);
-    lipos.appendChild(document.createTextNode("Pos = "+event.i+", "+event.j+", "+event.k));
-    // value list item
-    if( typeof(event.value) != "undefined" )
+dwv.info.Windowing = function ( app ) {
+    /**
+     * Create the windowing info div.
+     * @method createWindowingDiv
+     * @static
+     * @param {String} rootId The div root ID.
+     */
+    this.create = function ()
     {
-        var livalue = document.getElementById("livalueinfotl");
-        dwv.html.cleanNode(livalue);
-        livalue.appendChild(document.createTextNode("Value = "+event.value));
-    }
-};
+        var rootId = app.getContainerDivId();
+        var div = document.getElementById(rootId+"-infotr");
+        dwv.html.removeNode(rootId+"-ulinfotr");
+        // windowing list
+        var ul = document.createElement("ul");
+        ul.id = rootId+"-ulinfotr";
+        // window center list item
+        var liwc = document.createElement("li");
+        liwc.id = rootId+"-liwcinfotr";
+        ul.appendChild(liwc);
+        // window width list item
+        var liww = document.createElement("li");
+        liww.id = rootId+"-liwwinfotr";
+        ul.appendChild(liww);
+        // add list to div
+        div.appendChild(ul);
+    };
+    
+    /**
+     * Update the Top Right info div.
+     * @method updateWindowingDiv
+     * @static
+     * @param {Object} event The windowing change event containing the new values.
+     * Warning: expects the windowing info div to exist (use after createWindowingDiv).
+     */
+    this.update = function (event)
+    {
+        var rootId = app.getContainerDivId();
+        // window center list item
+        var liwc = document.getElementById(rootId+"-liwcinfotr");
+        dwv.html.cleanNode(liwc);
+        liwc.appendChild(document.createTextNode("WindowCenter = "+event.wc));
+        // window width list item
+        var liww = document.getElementById(rootId+"-liwwinfotr");
+        dwv.html.cleanNode(liww);
+        liww.appendChild(document.createTextNode("WindowWidth = "+event.ww));
+    };
+    
+}; // class dwv.info.Windowing
 
-/**
- * Create the mini color map info div.
- * @method createMiniColorMap
- * @static
- */
-dwv.info.createMiniColorMap = function()
-{    
-    // color map
-    var div = document.getElementById("infobr");
-    dwv.html.removeNode("canvasinfobr");
-    var canvas = document.createElement("canvas");
-    canvas.id = "canvasinfobr";
-    canvas.width = 98;
-    canvas.height = 10;
-    // add canvas to div
-    div.appendChild(canvas);
-};
-
-/**
- * Update the mini color map info div.
- * @method updateMiniColorMap
- * @static
- * @param {Object} event The windowing change event containing the new values.
- * Warning: expects the mini color map div to exist (use after createMiniColorMap).
- */
-dwv.info.updateMiniColorMap = function(event)
-{    
-    var windowCenter = event.wc;
-    var windowWidth = event.ww;
+dwv.info.Position = function ( app ) {
+    /**
+     * Create the position info div.
+     * @method createPositionDiv
+     * @static
+     * @param {String} rootId The div root ID.
+     */
+    this.create = function ()
+    {
+        var rootId = app.getContainerDivId();
+        
+        var div = document.getElementById(rootId+"-infotl");
+        dwv.html.removeNode(rootId+"-ulinfotl");
+        // position list
+        var ul = document.createElement("ul");
+        ul.id = rootId+"-ulinfotl";
+        // position
+        var lipos = document.createElement("li");
+        lipos.id = rootId+"-liposinfotl";
+        ul.appendChild(lipos);
+        // value
+        var livalue = document.createElement("li");
+        livalue.id = rootId+"-livalueinfotl";
+        ul.appendChild(livalue);
+        // add list to div
+        div.appendChild(ul);
+    };
     
-    var canvas = document.getElementById("canvasinfobr");
-    var context = canvas.getContext('2d');
-    
-    // fill in the image data
-    var colourMap = app.getView().getColorMap();
-    var imageData = context.getImageData(0,0,canvas.width, canvas.height);
-    
-    var c = 0;
-    var minInt = app.getImage().getRescaledDataRange().min;
-    var range = app.getImage().getRescaledDataRange().max - minInt;
-    var incrC = range / canvas.width;
-    var y = 0;
-    
-    var yMax = 255;
-    var yMin = 0;
-    var xMin = windowCenter - 0.5 - (windowWidth-1) / 2;
-    var xMax = windowCenter - 0.5 + (windowWidth-1) / 2;    
-    
-    var index;
-    for( var j=0; j<canvas.height; ++j ) {
-        c = minInt;
-        for( var i=0; i<canvas.width; ++i ) {
-            if( c <= xMin ) {
-                y = yMin;
-            }
-            else if( c > xMax ) {
-                y = yMax;
-            }
-            else {
-                y = ( (c - (windowCenter-0.5) ) / (windowWidth-1) + 0.5 ) *
-                    (yMax-yMin) + yMin;
-                y = parseInt(y,10);
-            }
-            index = (i + j * canvas.width) * 4;
-            imageData.data[index] = colourMap.red[y];
-            imageData.data[index+1] = colourMap.green[y];
-            imageData.data[index+2] = colourMap.blue[y];
-            imageData.data[index+3] = 0xff;
-            c += incrC;
+    /**
+     * Update the position info div.
+     * @method updatePositionDiv
+     * @static
+     * @param {Object} event The position change event containing the new values.
+     * Warning: expects the position info div to exist (use after createPositionDiv).
+     */
+    this.update = function (event)
+    {
+        var rootId = app.getContainerDivId();
+        
+        // position list item
+        var lipos = document.getElementById(rootId+"-liposinfotl");
+        dwv.html.cleanNode(lipos);
+        lipos.appendChild(document.createTextNode("Pos = "+event.i+", "+event.j+", "+event.k));
+        // value list item
+        if( typeof(event.value) != "undefined" )
+        {
+            var livalue = document.getElementById(rootId+"-livalueinfotl");
+            dwv.html.cleanNode(livalue);
+            livalue.appendChild(document.createTextNode("Value = "+event.value));
         }
-    }
-    // put the image data in the context
-    context.putImageData(imageData, 0, 0);
-};
+    };
+}; // class dwv.info.Position
 
-/**
- * Create the plot info.
- * @method createPlot
- * @static
- */
-dwv.info.createPlot = function()
-{
-    $.plot($("#plot"), [ app.getImage().getHistogram() ], {
-        "bars": { "show": true },
-        "grid": { "backgroundColor": null },
-        "xaxis": { "show": true },
-        "yaxis": { "show": false }
-    });
-};
-
-/**
- * Update the plot markings.
- * @method updatePlotMarkings
- * @static
- * @param {Object} event The windowing change event containing the new values.
- * Warning: expects the plot to exist (use after createPlot).
- */
-dwv.info.updatePlotMarkings = function(event)
-{
-    var wc = event.wc;
-    var ww = event.ww;
+dwv.info.MiniColorMap = function ( app ) {
+    /**
+     * Create the mini color map info div.
+     * @method createMiniColorMap
+     * @static
+     */
+    this.create = function ()
+    {    
+        var rootId = app.getContainerDivId();
+        
+        // color map
+        var div = document.getElementById(rootId+"-infobr");
+        dwv.html.removeNode(rootId+"-canvasinfobr");
+        var canvas = document.createElement("canvas");
+        canvas.id = rootId+"-canvasinfobr";
+        canvas.width = 98;
+        canvas.height = 10;
+        // add canvas to div
+        div.appendChild(canvas);
+    };
     
-    var half = parseInt( (ww-1) / 2, 10 );
-    var center = parseInt( (wc-0.5), 10 );
-    var min = center - half;
-    var max = center + half;
-    
-    var markings = [
-        { "color": "#faa", "lineWidth": 1, "xaxis": { "from": min, "to": min } },
-        { "color": "#aaf", "lineWidth": 1, "xaxis": { "from": max, "to": max } }
-    ];
+    /**
+     * Update the mini color map info div.
+     * @method updateMiniColorMap
+     * @static
+     * @param {Object} event The windowing change event containing the new values.
+     * Warning: expects the mini color map div to exist (use after createMiniColorMap).
+     */
+    this.update = function (event)
+    {    
+        var rootId = app.getContainerDivId();
+        
+        var windowCenter = event.wc;
+        var windowWidth = event.ww;
+        
+        var canvas = document.getElementById(rootId+"-canvasinfobr");
+        var context = canvas.getContext('2d');
+        
+        // fill in the image data
+        var colourMap = app.getView().getColorMap();
+        var imageData = context.getImageData(0,0,canvas.width, canvas.height);
+        
+        var c = 0;
+        var minInt = app.getImage().getRescaledDataRange().min;
+        var range = app.getImage().getRescaledDataRange().max - minInt;
+        var incrC = range / canvas.width;
+        var y = 0;
+        
+        var yMax = 255;
+        var yMin = 0;
+        var xMin = windowCenter - 0.5 - (windowWidth-1) / 2;
+        var xMax = windowCenter - 0.5 + (windowWidth-1) / 2;    
+        
+        var index;
+        for( var j=0; j<canvas.height; ++j ) {
+            c = minInt;
+            for( var i=0; i<canvas.width; ++i ) {
+                if( c <= xMin ) {
+                    y = yMin;
+                }
+                else if( c > xMax ) {
+                    y = yMax;
+                }
+                else {
+                    y = ( (c - (windowCenter-0.5) ) / (windowWidth-1) + 0.5 ) *
+                        (yMax-yMin) + yMin;
+                    y = parseInt(y,10);
+                }
+                index = (i + j * canvas.width) * 4;
+                imageData.data[index] = colourMap.red[y];
+                imageData.data[index+1] = colourMap.green[y];
+                imageData.data[index+2] = colourMap.blue[y];
+                imageData.data[index+3] = 0xff;
+                c += incrC;
+            }
+        }
+        // put the image data in the context
+        context.putImageData(imageData, 0, 0);
+    };
+}; // class dwv.info.MiniColorMap
 
-    $.plot($("#plot"), [ app.getImage().getHistogram() ], {
-        "bars": { "show": true },
-        "grid": { "markings": markings, "backgroundColor": null },
-        "xaxis": { "show": false },
-        "yaxis": { "show": false }
-    });
-};
+
+dwv.info.Plot = function (app) {
+
+    /**
+     * Create the plot info.
+     * @method create
+     * @static
+     * @param {String} rootId The div root ID.
+     */
+    this.create = function()
+    {
+        $.plot($("#"+app.getContainerDivId()+"-plot"), [ app.getImage().getHistogram() ], {
+            "bars": { "show": true },
+            "grid": { "backgroundColor": null },
+            "xaxis": { "show": true },
+            "yaxis": { "show": false }
+        });
+    };
+
+    /**
+     * Update plot.
+     * @method update
+     * @static
+     * @param {Object} event The windowing change event containing the new values.
+     * Warning: expects the plot to exist (use after createPlot).
+     */
+    this.update = function (event)
+    {
+        var wc = event.wc;
+        var ww = event.ww;
+        
+        var half = parseInt( (ww-1) / 2, 10 );
+        var center = parseInt( (wc-0.5), 10 );
+        var min = center - half;
+        var max = center + half;
+        
+        var markings = [
+            { "color": "#faa", "lineWidth": 1, "xaxis": { "from": min, "to": min } },
+            { "color": "#aaf", "lineWidth": 1, "xaxis": { "from": max, "to": max } }
+        ];
+    
+        $.plot($("#"+app.getContainerDivId()+"-plot"), [ app.getImage().getHistogram() ], {
+            "bars": { "show": true },
+            "grid": { "markings": markings, "backgroundColor": null },
+            "xaxis": { "show": false },
+            "yaxis": { "show": false }
+        });
+    };
+
+}; // class dwv.info.Plot
 ;/** 
  * Tool module.
  * @module tool
@@ -11304,6 +11994,12 @@ dwv.tool.Livewire = function(app)
      * @type WindowLevel
      */
     var self = this;
+    /**
+     * Livewire GUI.
+     * @property gui
+     * @type Object
+     */
+    var gui = null;
     /**
      * Interaction start flag.
      * @property started
@@ -11560,12 +12256,24 @@ dwv.tool.Livewire = function(app)
     };
 
     /**
+     * Setup the tool GUI.
+     * @method setup
+     */
+    this.setup = function ()
+    {
+        gui = new dwv.gui.Livewire(app);
+        gui.setup();
+    };
+    
+    /**
      * Enable the tool.
      * @method enable
      * @param {Boolean} bool The flag to enable or not.
      */
     this.display = function(bool){
-        dwv.gui.displayLivewireHtml(bool);
+        if ( gui ) {
+            gui.display(bool);
+        }
         // TODO why twice?
         this.init();
     };
@@ -11576,10 +12284,12 @@ dwv.tool.Livewire = function(app)
      */
     this.init = function()
     {
-        // set the default to the first in the list
-        this.setLineColour(dwv.tool.colors[0]);
-        // init html
-        dwv.gui.initLivewireHtml();
+        if ( gui ) {
+            // set the default to the first in the list
+            this.setLineColour(gui.getColours()[0]);
+            // init html
+            gui.initialise();
+        }
         
         //scissors = new dwv.math.Scissors();
         scissors.setDimensions(
@@ -12080,6 +12790,12 @@ dwv.tool.Scroll = function(app)
      */
     var self = this;
     /**
+     * Scroll GUI.
+     * @property gui
+     * @type Object
+     */
+    var gui = null;
+    /**
      * Interaction start flag.
      * @property started
      * @type Boolean
@@ -12185,12 +12901,24 @@ dwv.tool.Scroll = function(app)
     };
 
     /**
+     * Setup the tool GUI.
+     * @method setup
+     */
+    this.setup = function ()
+    {
+        gui = new dwv.gui.Scroll(app);
+        gui.setup();
+    };
+    
+    /**
      * Enable the tool.
      * @method enable
      * @param {Boolean} bool The flag to enable or not.
      */
     this.display = function(bool){
-        dwv.gui.displayScrollHtml(bool);
+        if ( gui ) {
+            gui.display(bool);
+        }
     };
 
 }; // Scroll class
@@ -12230,15 +12958,26 @@ dwv.tool = dwv.tool || {};
 
 /**
  * Tool box.
- * Relies on the static variable dwv.tool.tools. The available tools 
- * of the gui will be those of this list.
- * @class ToolBox
+ * @class Toolbox
  * @namespace dwv.tool
  * @constructor
- * @param {Object} app The associated application.
+ * @param {Array} toolList The list of tool objects.
+ * @param {Object} gui The associated gui.
  */
-dwv.tool.ToolBox = function(/*app*/)
+dwv.tool.Toolbox = function( toolList, app )
 {
+    /**
+     * Toolbox GUI.
+     * @property gui
+     * @type Object
+     */
+    var gui = null;
+    /**
+     * Tool list.
+     * @property toolList
+     * @type Object
+     */
+    this.toolList = toolList;
     /**
      * Selected tool.
      * @property selectedTool
@@ -12251,16 +12990,69 @@ dwv.tool.ToolBox = function(/*app*/)
      * @type String
      */
     this.defaultToolName = 0;
+    
+    /**
+     * Setup the toolbox GUI.
+     * @method setup
+     */
+    this.setup = function ()
+    {
+        if ( Object.keys(this.toolList).length !== 0 ) {
+            gui = new dwv.gui.Toolbox(app);
+            gui.setup(this.toolList);
+            for( var key in this.toolList ) {
+                this.toolList[key].setup();
+            }
+        }
+    };
+
+    /**
+     * Display the toolbox.
+     * @method display
+     * @param {Boolean} bool Flag to display or not.
+     */
+    this.display = function (bool)
+    {
+        if ( Object.keys(this.toolList).length !== 0 && gui ) {
+            gui.display(bool);
+        }
+    };
+    
+    /**
+     * Initialise the tool box.
+     * @method init
+     */
+    this.init = function ()
+    {
+        // check if we have tools
+        if ( Object.keys(this.toolList).length === 0 ) {
+            return;
+        }
+        // set the default to the first in the list
+        for( var key in this.toolList ){
+            this.defaultToolName = key;
+            break;
+        }
+        this.setSelectedTool(this.defaultToolName);
+        // init all tools
+        for( key in this.toolList ) {
+            this.toolList[key].init();
+        }    
+        // init html
+        if ( gui ) {
+            gui.initialise();
+        }
+    };
 };
 
 /**
- * Enable the toolbox.
- * @method enable
- * @param {Boolean} bool Flag to enable or not.
+ * Get the list of tools.
+ * @method getToolList
+ * @return {Array} The list of tool objects.
  */
-dwv.tool.ToolBox.prototype.display = function(bool)
+dwv.tool.Toolbox.prototype.getToolList = function ()
 {
-    dwv.gui.displayToolboxHtml(bool);
+    return this.toolList;
 };
 
 /**
@@ -12268,7 +13060,8 @@ dwv.tool.ToolBox.prototype.display = function(bool)
  * @method getSelectedTool
  * @return {Object} The selected tool.
  */
-dwv.tool.ToolBox.prototype.getSelectedTool = function() {
+dwv.tool.Toolbox.prototype.getSelectedTool = function ()
+{
     return this.selectedTool;
 };
 
@@ -12277,7 +13070,8 @@ dwv.tool.ToolBox.prototype.getSelectedTool = function() {
  * @method setSelectedTool
  * @return {String} The name of the tool to select.
  */
-dwv.tool.ToolBox.prototype.setSelectedTool = function(name) {
+dwv.tool.Toolbox.prototype.setSelectedTool = function (name)
+{
     // check if we have it
     if( !this.hasTool(name) )
     {
@@ -12289,7 +13083,7 @@ dwv.tool.ToolBox.prototype.setSelectedTool = function(name) {
         this.selectedTool.display(false);
     }
     // enable new one
-    this.selectedTool = dwv.tool.tools[name];
+    this.selectedTool = this.toolList[name];
     // display it
     this.selectedTool.display(true);
 };
@@ -12300,44 +13094,25 @@ dwv.tool.ToolBox.prototype.setSelectedTool = function(name) {
  * @param {String} name The name to check.
  * @return {String} The tool list element for the given name.
  */
-dwv.tool.ToolBox.prototype.hasTool = function(name) {
-    return dwv.tool.tools[name];
-};
-
-/**
- * Initialise the tool box.
- * @method init
- */
-dwv.tool.ToolBox.prototype.init = function()
+dwv.tool.Toolbox.prototype.hasTool = function (name)
 {
-    // set the default to the first in the list
-    for( var key in dwv.tool.tools ){
-        this.defaultToolName = key;
-        break;
-    }
-    this.setSelectedTool(this.defaultToolName);
-    // init all tools
-    for( key in dwv.tool.tools ) {
-        dwv.tool.tools[key].init();
-    }    
-    // init html
-    dwv.gui.initToolboxHtml();
+    return this.toolList[name];
 };
 
 /**
  * Reset the tool box.
  * @method init
  */
-dwv.tool.ToolBox.prototype.reset = function()
+dwv.tool.Toolbox.prototype.reset = function ()
 {
     // hide last selected
-    if( this.selectedTool )
-    {
+    if ( this.selectedTool ) {
         this.selectedTool.display(false);
     }
     this.selectedTool = 0;
     this.defaultToolName = 0;
-};;/** 
+};
+;/** 
  * Tool module.
  * @module tool
  */
@@ -12350,8 +13125,14 @@ dwv.tool = dwv.tool || {};
  * @namespace dwv.tool
  * @constructor
  */
-dwv.tool.UndoStack = function()
+dwv.tool.UndoStack = function ()
 { 
+    /**
+     * Undo GUI.
+     * @property gui
+     * @type Object
+     */
+    var gui = new dwv.gui.Undo();
     /**
      * Array of commands.
      * @property stack
@@ -12382,7 +13163,7 @@ dwv.tool.UndoStack = function()
         // increment index
         ++curCmdIndex;
         // add command to display history
-        dwv.gui.addCommandToUndoHtml(cmd.getName());
+        gui.addCommandToUndoHtml(cmd.getName());
     };
 
     /**
@@ -12399,7 +13180,7 @@ dwv.tool.UndoStack = function()
             // undo last command
             stack[curCmdIndex].undo();
             // disable last in display history
-            dwv.gui.enableInUndoHtml(false);
+            gui.enableInUndoHtml(false);
         }
     }; 
 
@@ -12416,8 +13197,26 @@ dwv.tool.UndoStack = function()
             // increment command index
             ++curCmdIndex;
             // enable next in display history
-            dwv.gui.enableInUndoHtml(true);
+            gui.enableInUndoHtml(true);
         }
+    };
+
+    /**
+     * Setup the tool GUI.
+     * @method setup
+     */
+    this.setup = function ()
+    {
+        gui.setup();
+    };
+
+    /**
+     * Initialise the tool GUI.
+     * @method initialise
+     */
+    this.initialise = function ()
+    {
+        gui.initialise();
     };
 
 }; // UndoStack class
@@ -12434,73 +13233,6 @@ var dwv = dwv || {};
  */
 dwv.tool = dwv.tool || {};
 
-/**
- * Update the views' current position.
- * @method updatePostionValue
- * @static
- * @param {Number} i The column index.
- * @param {Number} j The row index.
- */
-dwv.tool.updatePostionValue = function(i,j)
-{
-    app.getView().setCurrentPosition({"i": i, "j": j, "k": app.getView().getCurrentPosition().k});
-};
-
-/**
- * Update the views' windowing data.
- * @method updateWindowingData
- * @static
- * @param {Number} wc The window center.
- * @param {Number} ww The window width.
- */
-dwv.tool.updateWindowingData = function(wc,ww)
-{
-    app.getView().setWindowLevel(wc,ww);
-};
-
-/**
- * Set the active window/level preset.
- * @method updateWindowingData
- * @param {String} name The name of the preset to set.
- */
-dwv.tool.updateWindowingDataFromName = function(name)
-{
-    // check if we have it
-    if( !dwv.tool.presets[name] ) {
-        throw new Error("Unknown window level preset: '" + name + "'");
-    }
-    // enable it
-    dwv.tool.updateWindowingData( 
-        dwv.tool.presets[name].center, 
-        dwv.tool.presets[name].width );
-};
-
-/**
- * Update the views' colour map.
- * @method updateColourMap
- * @static
- * @param {Object} colourMap The colour map.
- */
-dwv.tool.updateColourMap = function(colourMap)
-{
-    app.getView().setColorMap(colourMap);
-};
-
-/**
- * Update the views' colour map.
- * @function updateColourMap
- * @param {String} name The name of the colour map to set.
- */
-dwv.tool.updateColourMapFromName = function(name)
-{
-    // check if we have it
-    if( !dwv.tool.colourMaps[name] ) {
-        throw new Error("Unknown colour map: '" + name + "'");
-    }
-    // enable it
-    dwv.tool.updateColourMap( dwv.tool.colourMaps[name] );
-};
-
 // Default colour maps.
 dwv.tool.colourMaps = {
     "plain": dwv.image.lut.plain,
@@ -12510,7 +13242,6 @@ dwv.tool.colourMaps = {
     "test": dwv.image.lut.test
 };
 // Default window level presets.
-dwv.tool.presets = {};
 dwv.tool.defaultpresets = {};
 dwv.tool.defaultpresets.CT = {
     "mediastinum": {"center": 40, "width": 400},
@@ -12520,53 +13251,6 @@ dwv.tool.defaultpresets.CT = {
 dwv.tool.defaultpresets.CTextra = {
     "brain": {"center": 40, "width": 80},
     "head": {"center": 90, "width": 350}
-};
-
-/**
- * Update the window/level presets.
- * @function updatePresets
- * @param {Boolean} full If true, shows all presets.
- */
-dwv.tool.updatePresets = function(full)
-{    
-    // store the manual preset
-    var manual = dwv.tool.presets.manual;
-    // reinitialize the presets
-    dwv.tool.presets = {};
-    
-    // DICOM presets
-    var dicomPresets = app.getView().getWindowPresets();
-    if( dicomPresets ) {
-        if( full ) {
-            for( var i = 0; i < dicomPresets.length; ++i ) {
-                dwv.tool.presets[dicomPresets[i].name.toLowerCase()] = dicomPresets[i];
-            }
-        }
-        // just the first one
-        else {
-            dwv.tool.presets["default"] = dicomPresets[0];
-        }
-    }
-    
-    // default presets
-    var modality = app.getImage().getMeta().Modality;
-    for( var key in dwv.tool.defaultpresets[modality] ) {
-        dwv.tool.presets[key] = dwv.tool.defaultpresets[modality][key];
-    }
-    if( full ) {
-        for( var key2 in dwv.tool.defaultpresets[modality+"extra"] ) {
-            dwv.tool.presets[key2] = dwv.tool.defaultpresets[modality+"extra"][key2];
-        }
-    }
-    // min/max preset
-    var range = app.getImage().getRescaledDataRange();
-    var width = range.max - range.min;
-    var center = range.min + width/2;
-    dwv.tool.presets["min/max"] = {"center": center, "width": width};
-    // manual preset
-    if( manual ){
-        dwv.tool.presets.manual = manual;
-    }
 };
 
 /**
@@ -12586,12 +13270,18 @@ dwv.tool.WindowLevel = function(app)
      */
     var self = this;
     /**
+     * WindowLevel GUI.
+     * @property gui
+     * @type Object
+     */
+    var gui = null;
+    /**
      * Interaction start flag.
      * @property started
      * @type Boolean
      */
     this.started = false;
-
+    
     /**
      * Handle mouse down event.
      * @method mousedown
@@ -12604,7 +13294,7 @@ dwv.tool.WindowLevel = function(app)
         self.x0 = event._x;
         self.y0 = event._y;
         // update GUI
-        dwv.tool.updatePostionValue(event._x, event._y);
+        app.setCurrentPostion(event._x, event._y);
     };
     
     /**
@@ -12624,7 +13314,7 @@ dwv.tool.WindowLevel = function(app)
         var windowCenter = parseInt(app.getView().getWindowLut().getCenter(), 10) + diffY;
         var windowWidth = parseInt(app.getView().getWindowLut().getWidth(), 10) + diffX;
         // update GUI
-        dwv.tool.updateWindowingData(windowCenter,windowWidth);
+        app.getViewController().setWindowLevel(windowCenter,windowWidth);
         // store position
         self.x0 = event._x;
         self.y0 = event._y;
@@ -12642,11 +13332,13 @@ dwv.tool.WindowLevel = function(app)
             // store the manual preset
             var windowCenter = parseInt(app.getView().getWindowLut().getCenter(), 10);
             var windowWidth = parseInt(app.getView().getWindowLut().getWidth(), 10);
-            dwv.tool.presets.manual = {"center": windowCenter, "width": windowWidth};
+            app.getPresets().manual = {"center": windowCenter, "width": windowWidth};
             // update gui
-            dwv.gui.initWindowLevelHtml();
-            // set selected
-            dwv.gui.setSelected("presetSelect", "Manual");
+            if ( gui ) {
+                gui.initialise();
+                // set selected
+                dwv.gui.setSelected("presetSelect", "Manual");
+            }
         }
     };
     
@@ -12694,7 +13386,7 @@ dwv.tool.WindowLevel = function(app)
      */
     this.dblclick = function(event){
         // update GUI
-        dwv.tool.updateWindowingData(
+        app.getViewController().setWindowLevel(
             parseInt(app.getImage().getRescaledValue(event._x, event._y, app.getView().getCurrentPosition().k), 10),
             parseInt(app.getView().getWindowLut().getWidth(), 10) );    
     };
@@ -12710,16 +13402,30 @@ dwv.tool.WindowLevel = function(app)
     };
     
     /**
-     * Enable the tool.
-     * @method enable
-     * @param {Boolean} bool The flag to enable or not.
+     * Setup the tool GUI.
+     * @method setup
      */
-    this.display = function(bool){
-        if( app.getImage().getPhotometricInterpretation().match(/MONOCHROME/) !== null ) {
-            dwv.gui.displayWindowLevelHtml(bool);
-        }
-        else {
-            dwv.gui.displayWindowLevelHtml(false);
+    this.setup = function ()
+    {
+        gui = new dwv.gui.WindowLevel(app);
+        gui.setup();
+    };
+    
+    /**
+     * Display the tool.
+     * @method display
+     * @param {Boolean} bool The flag to display or not.
+     */
+    this.display = function (bool)
+    {
+        if ( gui )
+        {
+            if( app.getImage().getPhotometricInterpretation().match(/MONOCHROME/) !== null ) {
+                gui.display(bool);
+            }
+            else {
+                gui.display(false);
+            }
         }
     };
     
@@ -12728,8 +13434,10 @@ dwv.tool.WindowLevel = function(app)
      * @method init
      */
     this.init = function() {
-        dwv.tool.updatePresets(true);
-        dwv.gui.initWindowLevelHtml();
+        app.updatePresets(true);
+        if ( gui ) {
+            gui.initialise();
+        }
     };
 }; // WindowLevel class
 
@@ -12778,9 +13486,15 @@ dwv.tool.ZoomAndPan = function(app)
      * Closure to self: to be used by event handlers.
      * @property self
      * @private
-     * @type WindowLevel
+     * @type Object
      */
     var self = this;
+    /**
+     * ZoomAndPan GUI.
+     * @property gui
+     * @type Object
+     */
+    var gui = null;
     /**
      * Interaction start flag.
      * @property started
@@ -12972,12 +13686,24 @@ dwv.tool.ZoomAndPan = function(app)
     };
 
     /**
+     * Setup the tool GUI.
+     * @method setup
+     */
+    this.setup = function ()
+    {
+        gui = new dwv.gui.ZoomAndPan(app);
+        gui.setup();
+    };
+    
+    /**
      * Enable the tool.
      * @method enable
      * @param {Boolean} bool The flag to enable or not.
      */
     this.display = function(bool){
-        dwv.gui.displayZoomAndPanHtml(bool);
+        if ( gui ) {
+            gui.display(bool);
+        }
     };
 
     /**

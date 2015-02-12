@@ -43,6 +43,21 @@
                                 <li><a href="../classes/dwv.dicom.DataReader.html">dwv.dicom.DataReader</a></li>
                                 <li><a href="../classes/dwv.dicom.DicomParser.html">dwv.dicom.DicomParser</a></li>
                                 <li><a href="../classes/dwv.gui.html">dwv.gui</a></li>
+                                <li><a href="../classes/dwv.gui.base.DicomTags.html">dwv.gui.base.DicomTags</a></li>
+                                <li><a href="../classes/dwv.gui.base.Draw.html">dwv.gui.base.Draw</a></li>
+                                <li><a href="../classes/dwv.gui.base.FileLoad.html">dwv.gui.base.FileLoad</a></li>
+                                <li><a href="../classes/dwv.gui.base.Filter.html">dwv.gui.base.Filter</a></li>
+                                <li><a href="../classes/dwv.gui.base.Livewire.html">dwv.gui.base.Livewire</a></li>
+                                <li><a href="../classes/dwv.gui.base.Loadbox.html">dwv.gui.base.Loadbox</a></li>
+                                <li><a href="../classes/dwv.gui.base.Scroll.html">dwv.gui.base.Scroll</a></li>
+                                <li><a href="../classes/dwv.gui.base.Sharpen.html">dwv.gui.base.Sharpen</a></li>
+                                <li><a href="../classes/dwv.gui.base.Slider.html">dwv.gui.base.Slider</a></li>
+                                <li><a href="../classes/dwv.gui.base.Sobel.html">dwv.gui.base.Sobel</a></li>
+                                <li><a href="../classes/dwv.gui.base.Threshold.html">dwv.gui.base.Threshold</a></li>
+                                <li><a href="../classes/dwv.gui.base.Toolbox.html">dwv.gui.base.Toolbox</a></li>
+                                <li><a href="../classes/dwv.gui.base.Undo.html">dwv.gui.base.Undo</a></li>
+                                <li><a href="../classes/dwv.gui.base.WindowLevel.html">dwv.gui.base.WindowLevel</a></li>
+                                <li><a href="../classes/dwv.gui.base.ZoomAndPan.html">dwv.gui.base.ZoomAndPan</a></li>
                                 <li><a href="../classes/dwv.html.html">dwv.html</a></li>
                                 <li><a href="../classes/dwv.html.Layer.html">dwv.html.Layer</a></li>
                                 <li><a href="../classes/dwv.html.Style.html">dwv.html.Style</a></li>
@@ -78,6 +93,7 @@
                                 <li><a href="../classes/dwv.tool.EllipseFactory.html">dwv.tool.EllipseFactory</a></li>
                                 <li><a href="../classes/dwv.tool.Filter.html">dwv.tool.Filter</a></li>
                                 <li><a href="../classes/dwv.tool.filter.Sharpen.html">dwv.tool.filter.Sharpen</a></li>
+                                <li><a href="../classes/dwv.tool.filter.Sobel.html">dwv.tool.filter.Sobel</a></li>
                                 <li><a href="../classes/dwv.tool.filter.Threshold.html">dwv.tool.filter.Threshold</a></li>
                                 <li><a href="../classes/dwv.tool.LineFactory.html">dwv.tool.LineFactory</a></li>
                                 <li><a href="../classes/dwv.tool.Livewire.html">dwv.tool.Livewire</a></li>
@@ -88,11 +104,13 @@
                                 <li><a href="../classes/dwv.tool.RunFilterCommand.html">dwv.tool.RunFilterCommand</a></li>
                                 <li><a href="../classes/dwv.tool.Scroll.html">dwv.tool.Scroll</a></li>
                                 <li><a href="../classes/dwv.tool.ShapeEditor.html">dwv.tool.ShapeEditor</a></li>
-                                <li><a href="../classes/dwv.tool.ToolBox.html">dwv.tool.ToolBox</a></li>
+                                <li><a href="../classes/dwv.tool.Toolbox.html">dwv.tool.Toolbox</a></li>
                                 <li><a href="../classes/dwv.tool.UndoStack.html">dwv.tool.UndoStack</a></li>
                                 <li><a href="../classes/dwv.tool.WindowLevel.html">dwv.tool.WindowLevel</a></li>
                                 <li><a href="../classes/dwv.tool.ZoomAndPan.html">dwv.tool.ZoomAndPan</a></li>
+                                <li><a href="../classes/dwv.ToolboxController.html">dwv.ToolboxController</a></li>
                                 <li><a href="../classes/dwv.utils.html">dwv.utils</a></li>
+                                <li><a href="../classes/dwv.ViewController.html">dwv.ViewController</a></li>
                                 <li><a href="../classes/image.ImageFactory.html">image.ImageFactory</a></li>
                                 <li><a href="../classes/image.ViewFactory.html">image.ViewFactory</a></li>
                             </ul>
@@ -157,10 +175,23 @@
                          * @class Filter
                          * @namespace dwv.tool
                          * @constructor
-                         * @param {Object} app The associated application.
+                         * @param {Array} filterList The list of filter objects.
+                         * @param {Object} gui The associated gui.
                          */
-                        dwv.tool.Filter = function(/*app*/)
+                        dwv.tool.Filter = function ( filterList, app )
                         {
+                            /**
+                             * Filter GUI.
+                             * @property gui
+                             * @type Object
+                             */
+                            var gui = null;
+                            /**
+                             * Filter list
+                             * @property filterList
+                             * @type Object
+                             */
+                            this.filterList = filterList;
                             /**
                              * Selected filter.
                              * @property selectedFilter
@@ -179,14 +210,77 @@
                              * @type Boolean
                              */
                             this.displayed = false;
-                        };
+                            
+                            /**
+                             * Setup the filter GUI.
+                             * @method setup
+                             */
+                            this.setup = function ()
+                            {
+                                if ( Object.keys(this.filterList).length !== 0 ) {
+                                    gui = new dwv.gui.Filter(app);
+                                    gui.setup(this.filterList);
+                                    for( var key in this.filterList ){
+                                        this.filterList[key].setup();
+                                    }
+                                }
+                            };
+                        
+                            /**
+                             * Enable the filter.
+                             * @method enable
+                             * @param {Boolean} bool Flag to enable or not.
+                             */
+                            this.display = function (bool)
+                            {
+                                if ( gui ) {
+                                    gui.display(bool);
+                                }
+                                this.displayed = bool;
+                                // display the selected filter
+                                this.selectedFilter.display(bool);
+                            };
+                        
+                            /**
+                             * Initialise the filter.
+                             * @method init
+                             */
+                            this.init = function ()
+                            {
+                                // set the default to the first in the list
+                                for( var key in this.filterList ){
+                                    this.defaultFilterName = key;
+                                    break;
+                                }
+                                this.setSelectedFilter(this.defaultFilterName);
+                                // init all filters
+                                for( key in this.filterList ) {
+                                    this.filterList[key].init();
+                                }    
+                                // init html
+                                if ( gui ) {
+                                    gui.initialise();
+                                }
+                            };
+                        
+                            /**
+                             * Handle keydown event.
+                             * @method keydown
+                             * @param {Object} event The keydown event.
+                             */
+                            this.keydown = function (event)
+                            {
+                                app.onKeydown(event);
+                            };
+                        
+                        }; // class dwv.tool.Filter
                         
                         /**
                          * Help for this tool.
                          * @method getHelp
                          * @returns {Object} The help content.
                          */
-                        dwv.tool.Filter.prototype.getHelp = function()
+                        dwv.tool.Filter.prototype.getHelp = function ()
                         {
                             return {
                                 &#x27;title&#x27;: &quot;Filter&quot;,
@@ -198,24 +292,12 @@
                         };
                         
                         /**
-                         * Enable the filter.
-                         * @method enable
-                         * @param {Boolean} bool Flag to enable or not.
-                         */
-                        dwv.tool.Filter.prototype.display = function(bool)
-                        {
-                            dwv.gui.displayFilterHtml(bool);
-                            this.displayed = bool;
-                            // display the selected filter
-                            this.selectedFilter.display(bool);
-                        };
-                        
-                        /**
                          * Get the selected filter.
                          * @method getSelectedFilter
                          * @return {Object} The selected filter.
                          */
-                        dwv.tool.Filter.prototype.getSelectedFilter = function() {
+                        dwv.tool.Filter.prototype.getSelectedFilter = function ()
+                        {
                             return this.selectedFilter;
                         };
                         
@@ -224,7 +306,8 @@
                          * @method setSelectedFilter
                          * @return {String} The name of the filter to select.
                          */
-                        dwv.tool.Filter.prototype.setSelectedFilter = function(name) {
+                        dwv.tool.Filter.prototype.setSelectedFilter = function (name)
+                        {
                             // check if we have it
                             if( !this.hasFilter(name) )
                             {
@@ -236,7 +319,7 @@
                                 this.selectedFilter.display(false);
                             }
                             // enable new one
-                            this.selectedFilter = dwv.tool.filters[name];
+                            this.selectedFilter = this.filterList[name];
                             // display the selected filter
                             if( this.displayed )
                             {
@@ -245,42 +328,24 @@
                         };
                         
                         /**
+                         * Get the list of filters.
+                         * @method getFilterList
+                         * @return {Array} The list of filter objects.
+                         */
+                        dwv.tool.Filter.prototype.getFilterList = function ()
+                        {
+                            return this.filterList;
+                        };
+                        
+                        /**
                          * Check if a filter is in the filter list.
                          * @method hasFilter
                          * @param {String} name The name to check.
                          * @return {String} The filter list element for the given name.
                          */
-                        dwv.tool.Filter.prototype.hasFilter = function(name) {
-                            return dwv.tool.filters[name];
-                        };
-                        
-                        /**
-                         * Initialise the filter.
-                         * @method init
-                         */
-                        dwv.tool.Filter.prototype.init = function()
+                        dwv.tool.Filter.prototype.hasFilter = function (name)
                         {
-                            // set the default to the first in the list
-                            for( var key in dwv.tool.filters ){
-                                this.defaultFilterName = key;
-                                break;
-                            }
-                            this.setSelectedFilter(this.defaultFilterName);
-                            // init all filters
-                            for( key in dwv.tool.filters ) {
-                                dwv.tool.filters[key].init();
-                            }    
-                            // init html
-                            dwv.gui.initFilterHtml();
-                        };
-                        
-                        /**
-                         * Handle keydown event.
-                         * @method keydown
-                         * @param {Object} event The keydown event.
-                         */
-                        dwv.tool.Filter.prototype.keydown = function(event){
-                            app.onKeydown(event);
+                            return this.filterList[name];
                         };
                         
                         // Filter namespace
@@ -293,39 +358,61 @@
                          * @constructor
                          * @param {Object} app The associated application.
                          */
-                        dwv.tool.filter.Threshold = function(/*app*/) {};
-                        
-                        /**
-                         * Enable the filter.
-                         * @method enable
-                         * @param {Boolean} bool Flag to enable or not.
-                         */
-                        dwv.tool.filter.Threshold.prototype.display = function(bool)
+                        dwv.tool.filter.Threshold = function ( app )
                         {
-                            dwv.gui.filter.displayThresholdHtml(bool);
-                        };
+                            /**
+                             * Filter GUI.
+                             * @property gui
+                             * @type Object
+                             */
+                            var gui = new dwv.gui.Threshold(app);
+                            
+                            /**
+                             * Setup the filter GUI.
+                             * @method setup
+                             */
+                            this.setup = function ()
+                            {
+                                gui.setup();
+                            };
                         
-                        dwv.tool.filter.Threshold.prototype.init = function()
-                        {
-                            // init html
-                            dwv.gui.filter.initThresholdHtml();
-                        };
+                            /**
+                             * Display the filter.
+                             * @method display
+                             * @param {Boolean} bool Flag to display or not.
+                             */
+                            this.display = function (bool)
+                            {
+                                gui.display(bool);
+                            };
+                            
+                            /**
+                             * Initialise the filter.
+                             * @method init
+                             */
+                            this.init = function ()
+                            {
+                                gui.initialise();
+                            };
+                            
+                            /**
+                             * Run the filter.
+                             * @method run
+                             * @param {Mixed} args The filter arguments.
+                             */
+                            this.run = function (args)
+                            {
+                                var filter = new dwv.image.filter.Threshold();
+                                filter.setMin(args.min);
+                                filter.setMax(args.max);
+                                var command = new dwv.tool.RunFilterCommand(filter, app);
+                                command.execute();
+                                // save command in undo stack
+                                app.getUndoStack().add(command);
+                            };
+                            
+                        }; // class dwv.tool.filter.Threshold
                         
-                        /**
-                         * Run the filter.
-                         * @method run
-                         * @param {Mixed} args The filter arguments.
-                         */
-                        dwv.tool.filter.Threshold.prototype.run = function(args)
-                        {
-                            var filter = new dwv.image.filter.Threshold();
-                            filter.setMin(args.min);
-                            filter.setMax(args.max);
-                            var command = new dwv.tool.RunFilterCommand(filter, app);
-                            command.execute();
-                            // save command in undo stack
-                            app.getUndoStack().add(command);
-                        };
                         
                         /**
                          * Sharpen filter tool.
@@ -334,74 +421,118 @@
                          * @constructor
                          * @param {Object} app The associated application.
                          */
-                        dwv.tool.filter.Sharpen = function(/*app*/) {};
-                        
-                        /**
-                         * Enable the filter.
-                         * @method enable
-                         * @param {Boolean} bool Flag to enable or not.
-                         */
-                        dwv.tool.filter.Sharpen.prototype.display = function(bool)
+                        dwv.tool.filter.Sharpen = function ( app )
                         {
-                            dwv.gui.filter.displaySharpenHtml(bool);
-                        };
+                            /**
+                             * Filter GUI.
+                             * @property gui
+                             * @type Object
+                             */
+                            var gui = new dwv.gui.Sharpen(app);
+                            
+                            /**
+                             * Setup the filter GUI.
+                             * @method setup
+                             */
+                            this.setup = function ()
+                            {
+                                gui.setup();
+                            };
                         
-                        dwv.tool.filter.Sharpen.prototype.init = function()
-                        {
-                            // nothing to do...
-                        };
+                            /**
+                             * Display the filter.
+                             * @method display
+                             * @param {Boolean} bool Flag to enable or not.
+                             */
+                            this.display = function (bool)
+                            {
+                                gui.display(bool);
+                            };
+                            
+                            /**
+                             * Initialise the filter.
+                             * @method init
+                             */
+                            this.init = function()
+                            {
+                                // nothing to do...
+                            };
+                            
+                            /**
+                             * Run the filter.
+                             * @method run
+                             * @param {Mixed} args The filter arguments.
+                             */
+                            this.run = function(/*args*/)
+                            {
+                                var filter = new dwv.image.filter.Sharpen();
+                                var command = new dwv.tool.RunFilterCommand(filter, app);
+                                command.execute();
+                                // save command in undo stack
+                                app.getUndoStack().add(command);
+                            };
                         
-                        /**
-                         * Run the filter.
-                         * @method run
-                         * @param {Mixed} args The filter arguments.
-                         */
-                        dwv.tool.filter.Sharpen.prototype.run = function(/*args*/)
-                        {
-                            var filter = new dwv.image.filter.Sharpen();
-                            var command = new dwv.tool.RunFilterCommand(filter, app);
-                            command.execute();
-                            // save command in undo stack
-                            app.getUndoStack().add(command);
-                        };
+                        }; // dwv.tool.filter.Sharpen
                         
                         /**
                          * Sobel filter tool.
-                         * @class Sharpen
+                         * @class Sobel
                          * @namespace dwv.tool.filter
                          * @constructor
                          * @param {Object} app The associated application.
                          */
-                        dwv.tool.filter.Sobel = function(/*app*/) {};
-                        
-                        /**
-                         * Enable the filter.
-                         * @method enable
-                         * @param {Boolean} bool Flag to enable or not.
-                         */
-                        dwv.tool.filter.Sobel.prototype.display = function(bool)
+                        dwv.tool.filter.Sobel = function ( app )
                         {
-                            dwv.gui.filter.displaySobelHtml(bool);
-                        };
+                            /**
+                             * Filter GUI.
+                             * @property gui
+                             * @type Object
+                             */
+                            var gui = new dwv.gui.Sobel(app);
+                            
+                            /**
+                             * Setup the filter GUI.
+                             * @method setup
+                             */
+                            this.setup = function ()
+                            {
+                                gui.setup();
+                            };
                         
-                        dwv.tool.filter.Sobel.prototype.init = function()
-                        {
-                            // nothing to do...
-                        };
+                            /**
+                             * Enable the filter.
+                             * @method enable
+                             * @param {Boolean} bool Flag to enable or not.
+                             */
+                            this.display = function(bool)
+                            {
+                                gui.display(bool);
+                            };
+                            
+                            /**
+                             * Initialise the filter.
+                             * @method init
+                             */
+                            this.init = function()
+                            {
+                                // nothing to do...
+                            };
+                            
+                            /**
+                             * Run the filter.
+                             * @method run
+                             * @param {Mixed} args The filter arguments.
+                             */
+                            dwv.tool.filter.Sobel.prototype.run = function(/*args*/)
+                            {
+                                var filter = new dwv.image.filter.Sobel();
+                                var command = new dwv.tool.RunFilterCommand(filter, app);
+                                command.execute();
+                                // save command in undo stack
+                                app.getUndoStack().add(command);
+                            };
                         
-                        /**
-                         * Run the filter.
-                         * @method run
-                         * @param {Mixed} args The filter arguments.
-                         */
-                        dwv.tool.filter.Sobel.prototype.run = function(/*args*/)
-                        {
-                            var filter = new dwv.image.filter.Sobel();
-                            var command = new dwv.tool.RunFilterCommand(filter, app);
-                            command.execute();
-                            // save command in undo stack
-                            app.getUndoStack().add(command);
-                        };
+                        }; // class dwv.tool.filter.Sobel
                         
                         /**
                          * Run filter command.
@@ -411,8 +542,8 @@
                          * @param {Object} filter The filter to run.
                          * @param {Object} app The associated application.
                          */
-                        dwv.tool.RunFilterCommand = function (filter, app)
-                        {
+                        dwv.tool.RunFilterCommand = function (filter, app) {
+                            
                             /**
                              * Get the command name.
                              * @method getName
@@ -426,6 +557,7 @@
                              */
                             this.execute = function ()
                             {
+                                filter.setOriginalImage(app.getImage());
                                 app.setImage(filter.update());
                                 app.render();
                             }; 
@@ -437,6 +569,7 @@
                                 app.setImage(filter.getOriginalImage());
                                 app.render();
                             };
+                            
                         }; // RunFilterCommand class
                         
                             </pre>

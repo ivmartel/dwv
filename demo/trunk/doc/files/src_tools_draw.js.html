@@ -43,6 +43,21 @@
                                 <li><a href="../classes/dwv.dicom.DataReader.html">dwv.dicom.DataReader</a></li>
                                 <li><a href="../classes/dwv.dicom.DicomParser.html">dwv.dicom.DicomParser</a></li>
                                 <li><a href="../classes/dwv.gui.html">dwv.gui</a></li>
+                                <li><a href="../classes/dwv.gui.base.DicomTags.html">dwv.gui.base.DicomTags</a></li>
+                                <li><a href="../classes/dwv.gui.base.Draw.html">dwv.gui.base.Draw</a></li>
+                                <li><a href="../classes/dwv.gui.base.FileLoad.html">dwv.gui.base.FileLoad</a></li>
+                                <li><a href="../classes/dwv.gui.base.Filter.html">dwv.gui.base.Filter</a></li>
+                                <li><a href="../classes/dwv.gui.base.Livewire.html">dwv.gui.base.Livewire</a></li>
+                                <li><a href="../classes/dwv.gui.base.Loadbox.html">dwv.gui.base.Loadbox</a></li>
+                                <li><a href="../classes/dwv.gui.base.Scroll.html">dwv.gui.base.Scroll</a></li>
+                                <li><a href="../classes/dwv.gui.base.Sharpen.html">dwv.gui.base.Sharpen</a></li>
+                                <li><a href="../classes/dwv.gui.base.Slider.html">dwv.gui.base.Slider</a></li>
+                                <li><a href="../classes/dwv.gui.base.Sobel.html">dwv.gui.base.Sobel</a></li>
+                                <li><a href="../classes/dwv.gui.base.Threshold.html">dwv.gui.base.Threshold</a></li>
+                                <li><a href="../classes/dwv.gui.base.Toolbox.html">dwv.gui.base.Toolbox</a></li>
+                                <li><a href="../classes/dwv.gui.base.Undo.html">dwv.gui.base.Undo</a></li>
+                                <li><a href="../classes/dwv.gui.base.WindowLevel.html">dwv.gui.base.WindowLevel</a></li>
+                                <li><a href="../classes/dwv.gui.base.ZoomAndPan.html">dwv.gui.base.ZoomAndPan</a></li>
                                 <li><a href="../classes/dwv.html.html">dwv.html</a></li>
                                 <li><a href="../classes/dwv.html.Layer.html">dwv.html.Layer</a></li>
                                 <li><a href="../classes/dwv.html.Style.html">dwv.html.Style</a></li>
@@ -78,6 +93,7 @@
                                 <li><a href="../classes/dwv.tool.EllipseFactory.html">dwv.tool.EllipseFactory</a></li>
                                 <li><a href="../classes/dwv.tool.Filter.html">dwv.tool.Filter</a></li>
                                 <li><a href="../classes/dwv.tool.filter.Sharpen.html">dwv.tool.filter.Sharpen</a></li>
+                                <li><a href="../classes/dwv.tool.filter.Sobel.html">dwv.tool.filter.Sobel</a></li>
                                 <li><a href="../classes/dwv.tool.filter.Threshold.html">dwv.tool.filter.Threshold</a></li>
                                 <li><a href="../classes/dwv.tool.LineFactory.html">dwv.tool.LineFactory</a></li>
                                 <li><a href="../classes/dwv.tool.Livewire.html">dwv.tool.Livewire</a></li>
@@ -88,11 +104,13 @@
                                 <li><a href="../classes/dwv.tool.RunFilterCommand.html">dwv.tool.RunFilterCommand</a></li>
                                 <li><a href="../classes/dwv.tool.Scroll.html">dwv.tool.Scroll</a></li>
                                 <li><a href="../classes/dwv.tool.ShapeEditor.html">dwv.tool.ShapeEditor</a></li>
-                                <li><a href="../classes/dwv.tool.ToolBox.html">dwv.tool.ToolBox</a></li>
+                                <li><a href="../classes/dwv.tool.Toolbox.html">dwv.tool.Toolbox</a></li>
                                 <li><a href="../classes/dwv.tool.UndoStack.html">dwv.tool.UndoStack</a></li>
                                 <li><a href="../classes/dwv.tool.WindowLevel.html">dwv.tool.WindowLevel</a></li>
                                 <li><a href="../classes/dwv.tool.ZoomAndPan.html">dwv.tool.ZoomAndPan</a></li>
+                                <li><a href="../classes/dwv.ToolboxController.html">dwv.ToolboxController</a></li>
                                 <li><a href="../classes/dwv.utils.html">dwv.utils</a></li>
+                                <li><a href="../classes/dwv.ViewController.html">dwv.ViewController</a></li>
                                 <li><a href="../classes/image.ImageFactory.html">image.ImageFactory</a></li>
                                 <li><a href="../classes/image.ViewFactory.html">image.ViewFactory</a></li>
                             </ul>
@@ -305,11 +323,6 @@
                             };
                         }; // DeleteShapeCommand class
                         
-                        // List of colors
-                        dwv.tool.colors = [
-                            &quot;Yellow&quot;, &quot;Red&quot;, &quot;White&quot;, &quot;Green&quot;, &quot;Blue&quot;, &quot;Lime&quot;, &quot;Fuchsia&quot;, &quot;Black&quot;
-                        ];
-                        
                         /**
                          * Drawing tool.
                          * @class Draw
@@ -317,7 +330,7 @@
                          * @constructor
                          * @param {Object} app The associated application.
                          */
-                        dwv.tool.Draw = function (app)
+                        dwv.tool.Draw = function (app, shapeFactoryList)
                         {
                             /**
                              * Closure to self: to be used by event handlers.
@@ -327,6 +340,12 @@
                              */
                             var self = this;
                             /**
+                             * Draw GUI.
+                             * @property gui
+                             * @type Object
+                             */
+                            var gui = null;
+                            /**
                              * Interaction start flag.
                              * @property started
                              * @private
@@ -335,19 +354,18 @@
                             var started = false;
                             
                             /**
+                             * Shape factory list
+                             * @property shapeFactoryList
+                             * @type Object
+                             */
+                            this.shapeFactoryList = shapeFactoryList;
+                            /**
                              * Draw command.
                              * @property command
                              * @private
                              * @type Object
                              */
                             var command = null;
-                            /**
-                             * Current active shape.
-                             * @property activeShape
-                             * @private
-                             * @type Object
-                             */
-                            //var activeShape = null;
                             /**
                              * List of created shapes.
                              * @property createdShapes
@@ -398,7 +416,7 @@
                              * @private
                              * @type Object
                              */
-                            var shapeEditor = new dwv.tool.ShapeEditor();
+                            var shapeEditor = new dwv.tool.ShapeEditor(app);
                         
                             /**
                              * Trash draw: a cross.
@@ -499,7 +517,7 @@
                                     // add current one to the list
                                     points.push( lastPoint );
                                     // allow for anchor points
-                                    var factory = new dwv.tool.shapes[self.shapeName]();
+                                    var factory = new self.shapeFactoryList[self.shapeName]();
                                     if( points.length &lt; factory.getNPoints() ) {
                                         clearTimeout(this.timer);
                                         this.timer = setTimeout( function () {
@@ -538,7 +556,7 @@
                                         shapeGroup.destroy();
                                     }
                                     // create final shape
-                                    var factory = new dwv.tool.shapes[self.shapeName]();
+                                    var factory = new self.shapeFactoryList[self.shapeName]();
                                     var group = factory.create(points, self.style, app.getImage());
                                     group.id( idGenerator.get() );
                                     // re-activate layer
@@ -607,12 +625,24 @@
                             };
                         
                             /**
+                             * Setup the tool GUI.
+                             * @method setup
+                             */
+                            this.setup = function ()
+                            {
+                                gui = new dwv.gui.Draw(app);
+                                gui.setup(this.shapeFactoryList);
+                            };
+                            
+                            /**
                              * Enable the tool.
                              * @method enable
                              * @param {Boolean} flag The flag to enable or not.
                              */
                             this.display = function ( flag ){
-                                dwv.gui.displayDrawHtml( flag );
+                                if ( gui ) {
+                                    gui.display( flag );
+                                }
                                 // reset shape display properties
                                 shapeEditor.disable();
                                 shapeEditor.setShape(null);
@@ -806,6 +836,26 @@
                                 });
                             };
                         
+                            /**
+                             * Initialise the tool.
+                             * @method init
+                             */
+                            this.init = function() {
+                                // set the default to the first in the list
+                                var shapeName = 0;
+                                for( var key in this.shapeFactoryList ){
+                                    shapeName = key;
+                                    break;
+                                }
+                                this.setShapeName(shapeName);
+                                // init gui
+                                if ( gui ) {
+                                    // same for color
+                                    this.setLineColour(gui.getColours()[0]);
+                                    // init html
+                                    gui.initialise();
+                                }
+                            };
                         
                         }; // Draw class
                         
@@ -863,25 +913,7 @@
                          * @param {String} name The name of the shape.
                          */
                         dwv.tool.Draw.prototype.hasShape = function(name) {
-                            return dwv.tool.shapes[name];
-                        };
-                        
-                        /**
-                         * Initialise the tool.
-                         * @method init
-                         */
-                        dwv.tool.Draw.prototype.init = function() {
-                            // set the default to the first in the list
-                            var shapeName = 0;
-                            for( var key in dwv.tool.shapes ){
-                                shapeName = key;
-                                break;
-                            }
-                            this.setShapeName(shapeName);
-                            // same for color
-                            this.setLineColour(dwv.tool.colors[0]);
-                            // init html
-                            dwv.gui.initDrawHtml();
+                            return this.shapeFactoryList[name];
                         };
                         
                             </pre>
