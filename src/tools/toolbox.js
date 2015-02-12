@@ -132,7 +132,7 @@ dwv.tool.Toolbox.prototype.setSelectedTool = function (name)
         this.selectedTool.display(false);
     }
     // enable new one
-    this.selectedTool = dwv.tool.tools[name];
+    this.selectedTool = this.toolList[name];
     // display it
     this.selectedTool.display(true);
 };

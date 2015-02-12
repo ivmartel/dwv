@@ -22,6 +22,6 @@ $(document).ready( function()
     });
 
     var size = dwv.gui.getWindowSize();
-    $("#layerContainer").height(size.height);
+    $(".layerContainer").height(size.height);
 
 });

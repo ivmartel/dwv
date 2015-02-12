@@ -307,7 +307,8 @@ dwv.App = function ()
         }
         
         // listen to drag&drop
-        var box = document.getElementById("dropBox");
+        var dropBoxDivId = containerDivId + "-dropBox";
+        var box = document.getElementById(dropBoxDivId);
         if ( box ) {
             box.addEventListener("dragover", onDragOver);
             box.addEventListener("dragleave", onDragLeave);
@@ -315,8 +316,8 @@ dwv.App = function ()
             // initial size
             var size = dwv.gui.getWindowSize();
             var dropBoxSize = 2 * size.height / 3;
-            $("#dropBox").height( dropBoxSize );
-            $("#dropBox").width( dropBoxSize );
+            $("#"+dropBoxDivId).height( dropBoxSize );
+            $("#"+dropBoxDivId).width( dropBoxSize );
         }
         // possible load from URL
         if ( typeof config.skipLoadUrl === "undefined" ) {
@@ -464,8 +465,9 @@ dwv.App = function ()
         var mul = newWidth / oldWidth;
 
         // resize container
-        $("#layerContainer").width(newWidth);
-        $("#layerContainer").height(newHeight + 1); // +1 to be sure...
+        var jqDivId = "#"+containerDivId;
+        $(jqDivId).width(newWidth);
+        $(jqDivId).height(newHeight + 1); // +1 to be sure...
         // resize image layer
         if ( imageLayer ) {
             var iZoomX = imageLayer.getZoom().x * mul;
@@ -478,8 +480,9 @@ dwv.App = function ()
         // resize draw stage
         if ( drawStage ) {
             // resize div
-            $("#drawDiv").width(newWidth);
-            $("#drawDiv").height(newHeight);
+            var drawDivId = "#" + containerDivId + "-drawDiv";
+            $(drawDivId).width(newWidth);
+            $(drawDivId).height(newHeight);
             // resize stage
             var stageZomX = drawStage.scale().x * mul;
             var stageZoomY = drawStage.scale().y * mul;
@@ -491,13 +494,14 @@ dwv.App = function ()
     };
     
     /**
-     * Toggle the display of the info layer.
+     * Toggle the display of the information layer.
      * @method toggleInfoLayerDisplay
      */
     this.toggleInfoLayerDisplay = function ()
     {
         // toggle html
-        dwv.html.toggleDisplay('infoLayer');
+        var infoDivId = containerDivId + "-infoLayer";
+        dwv.html.toggleDisplay(infoDivId);
         // toggle listeners
         if ( isInfoLayerListening ) {
             removeImageInfoListeners();
@@ -904,11 +908,11 @@ dwv.App = function ()
      */
     function addImageInfoListeners()
     {
-        view.addEventListener("wlchange", dwv.info.updateWindowingDiv);
-        view.addEventListener("wlchange", dwv.info.updateMiniColorMap);
-        view.addEventListener("wlchange", dwv.info.updatePlotMarkings);
-        view.addEventListener("colorchange", dwv.info.updateMiniColorMap);
-        view.addEventListener("positionchange", dwv.info.updatePositionDiv);
+        view.addEventListener("wlchange", windowingInfo.update);
+        view.addEventListener("wlchange", miniColorMap.update);
+        view.addEventListener("wlchange", plotInfo.update);
+        view.addEventListener("colorchange", miniColorMap.update);
+        view.addEventListener("positionchange", positionInfo.update);
         isInfoLayerListening = true;
     }
     
@@ -919,11 +923,11 @@ dwv.App = function ()
      */
     function removeImageInfoListeners()
     {
-        view.removeEventListener("wlchange", dwv.info.updateWindowingDiv);
-        view.removeEventListener("wlchange", dwv.info.updateMiniColorMap);
-        view.removeEventListener("wlchange", dwv.info.updatePlotMarkings);
-        view.removeEventListener("colorchange", dwv.info.updateMiniColorMap);
-        view.removeEventListener("positionchange", dwv.info.updatePositionDiv);
+        view.removeEventListener("wlchange", windowingInfo.update);
+        view.removeEventListener("wlchange", miniColorMap.update);
+        view.removeEventListener("wlchange", plotInfo.update);
+        view.removeEventListener("colorchange", miniColorMap.update);
+        view.removeEventListener("positionchange", positionInfo.update);
         isInfoLayerListening = false;
     }
     
@@ -1012,9 +1016,10 @@ dwv.App = function ()
         event.stopPropagation();
         event.preventDefault();
         // update box 
-        var box = document.getElementById("dropBox");
+        var dropBoxDivId = containerDivId + "-dropBox";
+        var box = document.getElementById(dropBoxDivId);
         if ( box ) {
-            box.className = 'hover';
+            box.className = 'dropBox hover';
         }
     }
     
@@ -1029,10 +1034,11 @@ dwv.App = function ()
         // prevent default handling
         event.stopPropagation();
         event.preventDefault();
-        // update box 
-        var box = document.getElementById("dropBox");
+        // update box
+        var dropBoxDivId = containerDivId + "-dropBox";
+        var box = document.getElementById(dropBoxDivId);
         if ( box ) {
-            box.className = '';
+            box.className = 'dropBox';
         }
     }
 
@@ -1082,7 +1088,7 @@ dwv.App = function ()
     function createLayers(dataWidth, dataHeight)
     {
         // image layer
-        imageLayer = new dwv.html.Layer("imageLayer");
+        imageLayer = new dwv.html.Layer(containerDivId + "-imageLayer");
         imageLayer.initialise(dataWidth, dataHeight);
         imageLayer.fillContext();
         imageLayer.setStyleDisplay(true);
@@ -1091,7 +1097,7 @@ dwv.App = function ()
         if ( document.getElementById(drawDivId) !== null) {
             // create stage
             drawStage = new Kinetic.Stage({
-                container: 'drawDiv',
+                container: drawDivId,
                 width: dataWidth,
                 height: dataHeight,
                 listening: false
@@ -1107,7 +1113,6 @@ dwv.App = function ()
                 'height': $('#'+containerDivId).height() } );
         }
         self.resetLayout();
-        self.resize();
     }
     
     /**
@@ -1143,10 +1148,6 @@ dwv.App = function ()
         imageData = imageLayer.getContext().createImageData( 
                 dataWidth, dataHeight);
 
-        // mouse and touch listeners
-        self.addLayerListeners( imageLayer.getCanvas() );
-        // keydown listener
-        window.addEventListener("keydown", eventHandler, true);
         // image listeners
         view.addEventListener("wlchange", self.onWLChange);
         view.addEventListener("colorchange", self.onColorChange);
@@ -1164,31 +1165,37 @@ dwv.App = function ()
         }
         
         // stop box listening to drag (after first drag)
-        var box = document.getElementById("dropBox");
+        var dropBoxDivId = containerDivId + "-dropBox";
+        var box = document.getElementById(dropBoxDivId);
         if ( box ) {
             box.removeEventListener("dragover", onDragOver);
             box.removeEventListener("dragleave", onDragLeave);
             box.removeEventListener("drop", onDrop);
-            dwv.html.removeNode("dropBox");
+            dwv.html.removeNode(dropBoxDivId);
             // switch listening to layerContainer
-            var div = document.getElementById("layerContainer");
+            var div = document.getElementById(containerDivId);
             div.addEventListener("dragover", onDragOver);
             div.addEventListener("dragleave", onDragLeave);
             div.addEventListener("drop", onDrop);
         }
 
         // info layer
-        if(document.getElementById("infoLayer")){
-            dwv.info.createWindowingDiv();
-            dwv.info.createPositionDiv();
-            dwv.info.createMiniColorMap();
-            dwv.info.createPlot();
+        var infoDivId = containerDivId + "-infoLayer";
+        if ( document.getElementById(infoDivId) ) {
+            windowingInfo = new dwv.info.Windowing(self);
+            windowingInfo.create();
+            
+            positionInfo = new dwv.info.Position(self);
+            positionInfo.create();
+            
+            miniColorMap = new dwv.info.MiniColorMap(self);
+            miniColorMap.create();
+            
+            plotInfo = new dwv.info.Plot(self);
+            plotInfo.create();
+            
             addImageInfoListeners();
         }
-        
-        // initialise the toolbox
-        toolBox.init();
-        toolBox.display(true);
         
         // init W/L display
         self.updatePresets(true);
