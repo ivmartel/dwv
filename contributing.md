@@ -23,6 +23,13 @@ governed by the GNU General Public License (GNU GPL) version 3. By contributing 
 you confirm that, to the best of your knowledge, the code does not violate the
 rights of any person or entity.
 
-Not too sure what to do yet about Contributor License Agreement (CLA), I'm in between:
+You hereby grant me (ivmartel) and to recipients of software distributed by me
+a perpetual, worldwide, non-exclusive, no-charge, royalty-free, irrevocable copyright 
+license to reproduce, prepare derivative works of, publicly display, publicly perform, 
+sublicense, and distribute Your Contributions and such derivative works. Except for this license 
+You reserve all right, title, and interest in and to Your Contributions.
+
+Some references about Contributor License Agreement (CLA):
+ * This text was inspired from [The Apache Software Foundation Individual Contributor License Agreement](https://www.apache.org/licenses/icla.txt)
  * [in-defense-of-contributor-license-agreements](https://julien.ponge.org/blog/in-defense-of-contributor-license-agreements/)
  * [should-open-source-communities-avoid-contributor-agreements](http://www.computerworlduk.com/blogs/simon-says/should-open-source-communities-avoid-contributor-agreements-3569648/)
