@@ -43,21 +43,6 @@
                                 <li><a href="../classes/dwv.dicom.DataReader.html">dwv.dicom.DataReader</a></li>
                                 <li><a href="../classes/dwv.dicom.DicomParser.html">dwv.dicom.DicomParser</a></li>
                                 <li><a href="../classes/dwv.gui.html">dwv.gui</a></li>
-                                <li><a href="../classes/dwv.gui.base.DicomTags.html">dwv.gui.base.DicomTags</a></li>
-                                <li><a href="../classes/dwv.gui.base.Draw.html">dwv.gui.base.Draw</a></li>
-                                <li><a href="../classes/dwv.gui.base.FileLoad.html">dwv.gui.base.FileLoad</a></li>
-                                <li><a href="../classes/dwv.gui.base.Filter.html">dwv.gui.base.Filter</a></li>
-                                <li><a href="../classes/dwv.gui.base.Livewire.html">dwv.gui.base.Livewire</a></li>
-                                <li><a href="../classes/dwv.gui.base.Loadbox.html">dwv.gui.base.Loadbox</a></li>
-                                <li><a href="../classes/dwv.gui.base.Scroll.html">dwv.gui.base.Scroll</a></li>
-                                <li><a href="../classes/dwv.gui.base.Sharpen.html">dwv.gui.base.Sharpen</a></li>
-                                <li><a href="../classes/dwv.gui.base.Slider.html">dwv.gui.base.Slider</a></li>
-                                <li><a href="../classes/dwv.gui.base.Sobel.html">dwv.gui.base.Sobel</a></li>
-                                <li><a href="../classes/dwv.gui.base.Threshold.html">dwv.gui.base.Threshold</a></li>
-                                <li><a href="../classes/dwv.gui.base.Toolbox.html">dwv.gui.base.Toolbox</a></li>
-                                <li><a href="../classes/dwv.gui.base.Undo.html">dwv.gui.base.Undo</a></li>
-                                <li><a href="../classes/dwv.gui.base.WindowLevel.html">dwv.gui.base.WindowLevel</a></li>
-                                <li><a href="../classes/dwv.gui.base.ZoomAndPan.html">dwv.gui.base.ZoomAndPan</a></li>
                                 <li><a href="../classes/dwv.html.html">dwv.html</a></li>
                                 <li><a href="../classes/dwv.html.Layer.html">dwv.html.Layer</a></li>
                                 <li><a href="../classes/dwv.html.Style.html">dwv.html.Style</a></li>
@@ -93,7 +78,6 @@
                                 <li><a href="../classes/dwv.tool.EllipseFactory.html">dwv.tool.EllipseFactory</a></li>
                                 <li><a href="../classes/dwv.tool.Filter.html">dwv.tool.Filter</a></li>
                                 <li><a href="../classes/dwv.tool.filter.Sharpen.html">dwv.tool.filter.Sharpen</a></li>
-                                <li><a href="../classes/dwv.tool.filter.Sobel.html">dwv.tool.filter.Sobel</a></li>
                                 <li><a href="../classes/dwv.tool.filter.Threshold.html">dwv.tool.filter.Threshold</a></li>
                                 <li><a href="../classes/dwv.tool.LineFactory.html">dwv.tool.LineFactory</a></li>
                                 <li><a href="../classes/dwv.tool.Livewire.html">dwv.tool.Livewire</a></li>
@@ -104,13 +88,11 @@
                                 <li><a href="../classes/dwv.tool.RunFilterCommand.html">dwv.tool.RunFilterCommand</a></li>
                                 <li><a href="../classes/dwv.tool.Scroll.html">dwv.tool.Scroll</a></li>
                                 <li><a href="../classes/dwv.tool.ShapeEditor.html">dwv.tool.ShapeEditor</a></li>
-                                <li><a href="../classes/dwv.tool.Toolbox.html">dwv.tool.Toolbox</a></li>
+                                <li><a href="../classes/dwv.tool.ToolBox.html">dwv.tool.ToolBox</a></li>
                                 <li><a href="../classes/dwv.tool.UndoStack.html">dwv.tool.UndoStack</a></li>
                                 <li><a href="../classes/dwv.tool.WindowLevel.html">dwv.tool.WindowLevel</a></li>
                                 <li><a href="../classes/dwv.tool.ZoomAndPan.html">dwv.tool.ZoomAndPan</a></li>
-                                <li><a href="../classes/dwv.ToolboxController.html">dwv.ToolboxController</a></li>
                                 <li><a href="../classes/dwv.utils.html">dwv.utils</a></li>
-                                <li><a href="../classes/dwv.ViewController.html">dwv.ViewController</a></li>
                                 <li><a href="../classes/image.ImageFactory.html">image.ImageFactory</a></li>
                                 <li><a href="../classes/image.ViewFactory.html">image.ViewFactory</a></li>
                             </ul>
@@ -244,140 +226,121 @@
                         dwv.gui.setSelected = function(selectName, itemName)
                         {
                             var select = document.getElementById(selectName);
-                            if ( select ) {
-                                var index = 0;
-                                for( index in select.options){ 
-                                    if( select.options[index].text === itemName ) {
-                                        break;
-                                    }
+                            var index = 0;
+                            for( index in select.options){ 
+                                if( select.options[index].text === itemName ) {
+                                    break;
                                 }
-                                select.selectedIndex = index;
-                                dwv.gui.refreshSelect(&quot;#&quot; + selectName);
                             }
+                            select.selectedIndex = index;
+                            dwv.gui.refreshSelect(&quot;#&quot; + selectName);
                         };
                         
                         /**
-                         * Slider base gui.
-                         * @class Slider
-                         * @namespace dwv.gui.base
-                         * @constructor
+                         * Append the slider HTML.
+                         * @method appendSliderHtml
+                         * @static
                          */
-                        dwv.gui.base.Slider = function (app)
+                        dwv.gui.base.appendSliderHtml = function()
                         {
-                            /**
-                             * Append the slider HTML.
-                             * @method append
-                             */
-                            this.append = function ()
-                            {
-                                // default values
-                                var min = 0;
-                                var max = 1;
-                                
-                                // jquery-mobile range slider
-                                // minimum input
-                                var inputMin = document.createElement(&quot;input&quot;);
-                                inputMin.id = &quot;threshold-min&quot;;
-                                inputMin.type = &quot;range&quot;;
-                                inputMin.max = max;
-                                inputMin.min = min;
-                                inputMin.value = min;
-                                // maximum input
-                                var inputMax = document.createElement(&quot;input&quot;);
-                                inputMax.id = &quot;threshold-max&quot;;
-                                inputMax.type = &quot;range&quot;;
-                                inputMax.max = max;
-                                inputMax.min = min;
-                                inputMax.value = max;
-                                // slicer div
-                                var div = document.createElement(&quot;div&quot;);
-                                div.id = &quot;threshold-div&quot;;
-                                div.setAttribute(&quot;data-role&quot;, &quot;rangeslider&quot;);
-                                div.appendChild(inputMin);
-                                div.appendChild(inputMax);
-                                div.setAttribute(&quot;data-mini&quot;, &quot;true&quot;);
-                                // append to document
-                                document.getElementById(&quot;thresholdLi&quot;).appendChild(div);
-                                // bind change
-                                $(&quot;#threshold-div&quot;).on(&quot;change&quot;,
-                                        function(/*event*/) {
-                                            app.onChangeMinMax(
-                                                { &quot;min&quot;:$(&quot;#threshold-min&quot;).val(),
-                                                  &quot;max&quot;:$(&quot;#threshold-max&quot;).val() } );
-                                        }
-                                    );
-                                // trigger creation
-                                $(&quot;#toolList&quot;).trigger(&quot;create&quot;);
-                            };
+                            // default values
+                            var min = 0;
+                            var max = 1;
                             
-                            /**
-                             * Initialise the slider HTML.
-                             * @method initialise
-                             */
-                            this.initialise = function ()
-                            {
-                                var min = app.getImage().getDataRange().min;
-                                var max = app.getImage().getDataRange().max;
-                                
-                                // minimum input
-                                var inputMin = document.getElementById(&quot;threshold-min&quot;);
-                                inputMin.max = max;
-                                inputMin.min = min;
-                                inputMin.value = min;
-                                // maximum input
-                                var inputMax = document.getElementById(&quot;threshold-max&quot;);
-                                inputMax.max = max;
-                                inputMax.min = min;
-                                inputMax.value = max;
-                                // trigger creation
-                                $(&quot;#toolList&quot;).trigger(&quot;create&quot;);
-                            };
-                        
-                        }; // class dwv.gui.base.Slider
+                            // jquery-mobile range slider
+                            // minimum input
+                            var inputMin = document.createElement(&quot;input&quot;);
+                            inputMin.id = &quot;threshold-min&quot;;
+                            inputMin.type = &quot;range&quot;;
+                            inputMin.max = max;
+                            inputMin.min = min;
+                            inputMin.value = min;
+                            // maximum input
+                            var inputMax = document.createElement(&quot;input&quot;);
+                            inputMax.id = &quot;threshold-max&quot;;
+                            inputMax.type = &quot;range&quot;;
+                            inputMax.max = max;
+                            inputMax.min = min;
+                            inputMax.value = max;
+                            // slicer div
+                            var div = document.createElement(&quot;div&quot;);
+                            div.id = &quot;threshold-div&quot;;
+                            div.setAttribute(&quot;data-role&quot;, &quot;rangeslider&quot;);
+                            div.appendChild(inputMin);
+                            div.appendChild(inputMax);
+                            div.setAttribute(&quot;data-mini&quot;, &quot;true&quot;);
+                            // append to document
+                            document.getElementById(&quot;thresholdLi&quot;).appendChild(div);
+                            // bind change
+                            $(&quot;#threshold-div&quot;).on(&quot;change&quot;,
+                                    function(/*event*/) {
+                                        dwv.gui.onChangeMinMax(
+                                            { &quot;min&quot;:$(&quot;#threshold-min&quot;).val(),
+                                              &quot;max&quot;:$(&quot;#threshold-max&quot;).val() } );
+                                    }
+                                );
+                            // trigger creation
+                            $(&quot;#toolList&quot;).trigger(&quot;create&quot;);
+                        };
                         
                         /**
-                         * DICOM tags base gui.
-                         * @class DicomTags
-                         * @namespace dwv.gui.base
-                         * @constructor
+                         * Initialise the slider HTML.
+                         * @method initSliderHtml
+                         * @static
                          */
-                        dwv.gui.base.DicomTags = function ()
+                        dwv.gui.base.initSliderHtml = function()
                         {
-                            /**
-                             * Initialise the DICOM tags table. To be called once the DICOM has been parsed.
-                             * @method initialise
-                             * @param {Object} dataInfo The data information.
-                             */
-                            this.initialise = function (dataInfo)
-                            {
-                                // HTML node
-                                var node = document.getElementById(&quot;tags&quot;);
-                                if( node === null ) {
-                                    return;
-                                }
-                                // remove possible previous
-                                while (node.hasChildNodes()) { 
-                                    node.removeChild(node.firstChild);
-                                }
-                                // tag list table (without the pixel data)
-                                if(dataInfo.PixelData) {
-                                    dataInfo.PixelData.value = &quot;...&quot;;
-                                }
-                                // tags HTML table
-                                var table = dwv.html.toTable(dataInfo);
-                                table.id = &quot;tagsTable&quot;;
-                                table.setAttribute(&quot;class&quot;, &quot;tagsList&quot;);
-                                table.setAttribute(&quot;data-role&quot;, &quot;table&quot;);
-                                table.setAttribute(&quot;data-mode&quot;, &quot;columntoggle&quot;);
-                                // search form
-                                node.appendChild(dwv.html.getHtmlSearchForm(table));
-                                // tags table
-                                node.appendChild(table);
-                                // trigger create event (mobile)
-                                $(&quot;#tags&quot;).trigger(&quot;create&quot;);
-                            };
+                            var min = app.getImage().getDataRange().min;
+                            var max = app.getImage().getDataRange().max;
                             
-                        }; // class dwv.gui.base.DicomTags
+                            // minimum input
+                            var inputMin = document.getElementById(&quot;threshold-min&quot;);
+                            inputMin.max = max;
+                            inputMin.min = min;
+                            inputMin.value = min;
+                            // maximum input
+                            var inputMax = document.getElementById(&quot;threshold-max&quot;);
+                            inputMax.max = max;
+                            inputMax.min = min;
+                            inputMax.value = max;
+                            // trigger creation
+                            $(&quot;#toolList&quot;).trigger(&quot;create&quot;);
+                        };
+                        
+                        /**
+                         * Create the DICOM tags table. To be called once the DICOM has been parsed.
+                         * @method createTagsTable
+                         * @private
+                         * @param {Object} dataInfo The data information.
+                         */
+                        dwv.gui.base.appendTagsTable = function (dataInfo)
+                        {
+                            // HTML node
+                            var node = document.getElementById(&quot;tags&quot;);
+                            if( node === null ) {
+                                return;
+                            }
+                            // remove possible previous
+                            while (node.hasChildNodes()) { 
+                                node.removeChild(node.firstChild);
+                            }
+                            // tag list table (without the pixel data)
+                            if(dataInfo.PixelData) {
+                                dataInfo.PixelData.value = &quot;...&quot;;
+                            }
+                            // tags HTML table
+                            var table = dwv.html.toTable(dataInfo);
+                            table.id = &quot;tagsTable&quot;;
+                            table.className = &quot;tagsList table-stripe&quot;;
+                            table.setAttribute(&quot;data-role&quot;, &quot;table&quot;);
+                            table.setAttribute(&quot;data-mode&quot;, &quot;columntoggle&quot;);
+                            // search form
+                            node.appendChild(dwv.html.getHtmlSearchForm(table));
+                            // tags table
+                            node.appendChild(table);
+                            // trigger create event (mobile)
+                            $(&quot;#tags&quot;).trigger(&quot;create&quot;);
+                        };
                         
                             </pre>
                         </div>

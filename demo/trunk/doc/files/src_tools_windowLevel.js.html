@@ -43,21 +43,6 @@
                                 <li><a href="../classes/dwv.dicom.DataReader.html">dwv.dicom.DataReader</a></li>
                                 <li><a href="../classes/dwv.dicom.DicomParser.html">dwv.dicom.DicomParser</a></li>
                                 <li><a href="../classes/dwv.gui.html">dwv.gui</a></li>
-                                <li><a href="../classes/dwv.gui.base.DicomTags.html">dwv.gui.base.DicomTags</a></li>
-                                <li><a href="../classes/dwv.gui.base.Draw.html">dwv.gui.base.Draw</a></li>
-                                <li><a href="../classes/dwv.gui.base.FileLoad.html">dwv.gui.base.FileLoad</a></li>
-                                <li><a href="../classes/dwv.gui.base.Filter.html">dwv.gui.base.Filter</a></li>
-                                <li><a href="../classes/dwv.gui.base.Livewire.html">dwv.gui.base.Livewire</a></li>
-                                <li><a href="../classes/dwv.gui.base.Loadbox.html">dwv.gui.base.Loadbox</a></li>
-                                <li><a href="../classes/dwv.gui.base.Scroll.html">dwv.gui.base.Scroll</a></li>
-                                <li><a href="../classes/dwv.gui.base.Sharpen.html">dwv.gui.base.Sharpen</a></li>
-                                <li><a href="../classes/dwv.gui.base.Slider.html">dwv.gui.base.Slider</a></li>
-                                <li><a href="../classes/dwv.gui.base.Sobel.html">dwv.gui.base.Sobel</a></li>
-                                <li><a href="../classes/dwv.gui.base.Threshold.html">dwv.gui.base.Threshold</a></li>
-                                <li><a href="../classes/dwv.gui.base.Toolbox.html">dwv.gui.base.Toolbox</a></li>
-                                <li><a href="../classes/dwv.gui.base.Undo.html">dwv.gui.base.Undo</a></li>
-                                <li><a href="../classes/dwv.gui.base.WindowLevel.html">dwv.gui.base.WindowLevel</a></li>
-                                <li><a href="../classes/dwv.gui.base.ZoomAndPan.html">dwv.gui.base.ZoomAndPan</a></li>
                                 <li><a href="../classes/dwv.html.html">dwv.html</a></li>
                                 <li><a href="../classes/dwv.html.Layer.html">dwv.html.Layer</a></li>
                                 <li><a href="../classes/dwv.html.Style.html">dwv.html.Style</a></li>
@@ -93,7 +78,6 @@
                                 <li><a href="../classes/dwv.tool.EllipseFactory.html">dwv.tool.EllipseFactory</a></li>
                                 <li><a href="../classes/dwv.tool.Filter.html">dwv.tool.Filter</a></li>
                                 <li><a href="../classes/dwv.tool.filter.Sharpen.html">dwv.tool.filter.Sharpen</a></li>
-                                <li><a href="../classes/dwv.tool.filter.Sobel.html">dwv.tool.filter.Sobel</a></li>
                                 <li><a href="../classes/dwv.tool.filter.Threshold.html">dwv.tool.filter.Threshold</a></li>
                                 <li><a href="../classes/dwv.tool.LineFactory.html">dwv.tool.LineFactory</a></li>
                                 <li><a href="../classes/dwv.tool.Livewire.html">dwv.tool.Livewire</a></li>
@@ -104,13 +88,11 @@
                                 <li><a href="../classes/dwv.tool.RunFilterCommand.html">dwv.tool.RunFilterCommand</a></li>
                                 <li><a href="../classes/dwv.tool.Scroll.html">dwv.tool.Scroll</a></li>
                                 <li><a href="../classes/dwv.tool.ShapeEditor.html">dwv.tool.ShapeEditor</a></li>
-                                <li><a href="../classes/dwv.tool.Toolbox.html">dwv.tool.Toolbox</a></li>
+                                <li><a href="../classes/dwv.tool.ToolBox.html">dwv.tool.ToolBox</a></li>
                                 <li><a href="../classes/dwv.tool.UndoStack.html">dwv.tool.UndoStack</a></li>
                                 <li><a href="../classes/dwv.tool.WindowLevel.html">dwv.tool.WindowLevel</a></li>
                                 <li><a href="../classes/dwv.tool.ZoomAndPan.html">dwv.tool.ZoomAndPan</a></li>
-                                <li><a href="../classes/dwv.ToolboxController.html">dwv.ToolboxController</a></li>
                                 <li><a href="../classes/dwv.utils.html">dwv.utils</a></li>
-                                <li><a href="../classes/dwv.ViewController.html">dwv.ViewController</a></li>
                                 <li><a href="../classes/image.ImageFactory.html">image.ImageFactory</a></li>
                                 <li><a href="../classes/image.ViewFactory.html">image.ViewFactory</a></li>
                             </ul>
@@ -176,6 +158,73 @@
                          */
                         dwv.tool = dwv.tool || {};
                         
+                        /**
+                         * Update the views&#x27; current position.
+                         * @method updatePostionValue
+                         * @static
+                         * @param {Number} i The column index.
+                         * @param {Number} j The row index.
+                         */
+                        dwv.tool.updatePostionValue = function(i,j)
+                        {
+                            app.getView().setCurrentPosition({&quot;i&quot;: i, &quot;j&quot;: j, &quot;k&quot;: app.getView().getCurrentPosition().k});
+                        };
+                        
+                        /**
+                         * Update the views&#x27; windowing data.
+                         * @method updateWindowingData
+                         * @static
+                         * @param {Number} wc The window center.
+                         * @param {Number} ww The window width.
+                         */
+                        dwv.tool.updateWindowingData = function(wc,ww)
+                        {
+                            app.getView().setWindowLevel(wc,ww);
+                        };
+                        
+                        /**
+                         * Set the active window/level preset.
+                         * @method updateWindowingData
+                         * @param {String} name The name of the preset to set.
+                         */
+                        dwv.tool.updateWindowingDataFromName = function(name)
+                        {
+                            // check if we have it
+                            if( !dwv.tool.presets[name] ) {
+                                throw new Error(&quot;Unknown window level preset: &#x27;&quot; + name + &quot;&#x27;&quot;);
+                            }
+                            // enable it
+                            dwv.tool.updateWindowingData( 
+                                dwv.tool.presets[name].center, 
+                                dwv.tool.presets[name].width );
+                        };
+                        
+                        /**
+                         * Update the views&#x27; colour map.
+                         * @method updateColourMap
+                         * @static
+                         * @param {Object} colourMap The colour map.
+                         */
+                        dwv.tool.updateColourMap = function(colourMap)
+                        {
+                            app.getView().setColorMap(colourMap);
+                        };
+                        
+                        /**
+                         * Update the views&#x27; colour map.
+                         * @function updateColourMap
+                         * @param {String} name The name of the colour map to set.
+                         */
+                        dwv.tool.updateColourMapFromName = function(name)
+                        {
+                            // check if we have it
+                            if( !dwv.tool.colourMaps[name] ) {
+                                throw new Error(&quot;Unknown colour map: &#x27;&quot; + name + &quot;&#x27;&quot;);
+                            }
+                            // enable it
+                            dwv.tool.updateColourMap( dwv.tool.colourMaps[name] );
+                        };
+                        
                         // Default colour maps.
                         dwv.tool.colourMaps = {
                             &quot;plain&quot;: dwv.image.lut.plain,
@@ -185,6 +234,7 @@
                             &quot;test&quot;: dwv.image.lut.test
                         };
                         // Default window level presets.
+                        dwv.tool.presets = {};
                         dwv.tool.defaultpresets = {};
                         dwv.tool.defaultpresets.CT = {
                             &quot;mediastinum&quot;: {&quot;center&quot;: 40, &quot;width&quot;: 400},
@@ -194,6 +244,53 @@
                         dwv.tool.defaultpresets.CTextra = {
                             &quot;brain&quot;: {&quot;center&quot;: 40, &quot;width&quot;: 80},
                             &quot;head&quot;: {&quot;center&quot;: 90, &quot;width&quot;: 350}
+                        };
+                        
+                        /**
+                         * Update the window/level presets.
+                         * @function updatePresets
+                         * @param {Boolean} full If true, shows all presets.
+                         */
+                        dwv.tool.updatePresets = function(full)
+                        {    
+                            // store the manual preset
+                            var manual = dwv.tool.presets.manual;
+                            // reinitialize the presets
+                            dwv.tool.presets = {};
+                            
+                            // DICOM presets
+                            var dicomPresets = app.getView().getWindowPresets();
+                            if( dicomPresets ) {
+                                if( full ) {
+                                    for( var i = 0; i &lt; dicomPresets.length; ++i ) {
+                                        dwv.tool.presets[dicomPresets[i].name.toLowerCase()] = dicomPresets[i];
+                                    }
+                                }
+                                // just the first one
+                                else {
+                                    dwv.tool.presets[&quot;default&quot;] = dicomPresets[0];
+                                }
+                            }
+                            
+                            // default presets
+                            var modality = app.getImage().getMeta().Modality;
+                            for( var key in dwv.tool.defaultpresets[modality] ) {
+                                dwv.tool.presets[key] = dwv.tool.defaultpresets[modality][key];
+                            }
+                            if( full ) {
+                                for( var key2 in dwv.tool.defaultpresets[modality+&quot;extra&quot;] ) {
+                                    dwv.tool.presets[key2] = dwv.tool.defaultpresets[modality+&quot;extra&quot;][key2];
+                                }
+                            }
+                            // min/max preset
+                            var range = app.getImage().getRescaledDataRange();
+                            var width = range.max - range.min;
+                            var center = range.min + width/2;
+                            dwv.tool.presets[&quot;min/max&quot;] = {&quot;center&quot;: center, &quot;width&quot;: width};
+                            // manual preset
+                            if( manual ){
+                                dwv.tool.presets.manual = manual;
+                            }
                         };
                         
                         /**
@@ -213,18 +310,12 @@
                              */
                             var self = this;
                             /**
-                             * WindowLevel GUI.
-                             * @property gui
-                             * @type Object
-                             */
-                            var gui = null;
-                            /**
                              * Interaction start flag.
                              * @property started
                              * @type Boolean
                              */
                             this.started = false;
-                            
+                        
                             /**
                              * Handle mouse down event.
                              * @method mousedown
@@ -237,7 +328,7 @@
                                 self.x0 = event._x;
                                 self.y0 = event._y;
                                 // update GUI
-                                app.setCurrentPostion(event._x, event._y);
+                                dwv.tool.updatePostionValue(event._x, event._y);
                             };
                             
                             /**
@@ -257,7 +348,7 @@
                                 var windowCenter = parseInt(app.getView().getWindowLut().getCenter(), 10) + diffY;
                                 var windowWidth = parseInt(app.getView().getWindowLut().getWidth(), 10) + diffX;
                                 // update GUI
-                                app.getViewController().setWindowLevel(windowCenter,windowWidth);
+                                dwv.tool.updateWindowingData(windowCenter,windowWidth);
                                 // store position
                                 self.x0 = event._x;
                                 self.y0 = event._y;
@@ -275,13 +366,11 @@
                                     // store the manual preset
                                     var windowCenter = parseInt(app.getView().getWindowLut().getCenter(), 10);
                                     var windowWidth = parseInt(app.getView().getWindowLut().getWidth(), 10);
-                                    app.getPresets().manual = {&quot;center&quot;: windowCenter, &quot;width&quot;: windowWidth};
+                                    dwv.tool.presets.manual = {&quot;center&quot;: windowCenter, &quot;width&quot;: windowWidth};
                                     // update gui
-                                    if ( gui ) {
-                                        gui.initialise();
-                                        // set selected
-                                        dwv.gui.setSelected(&quot;presetSelect&quot;, &quot;Manual&quot;);
-                                    }
+                                    dwv.gui.initWindowLevelHtml();
+                                    // set selected
+                                    dwv.gui.setSelected(&quot;presetSelect&quot;, &quot;Manual&quot;);
                                 }
                             };
                             
@@ -329,7 +418,7 @@
                              */
                             this.dblclick = function(event){
                                 // update GUI
-                                app.getViewController().setWindowLevel(
+                                dwv.tool.updateWindowingData(
                                     parseInt(app.getImage().getRescaledValue(event._x, event._y, app.getView().getCurrentPosition().k), 10),
                                     parseInt(app.getView().getWindowLut().getWidth(), 10) );    
                             };
@@ -345,30 +434,16 @@
                             };
                             
                             /**
-                             * Setup the tool GUI.
-                             * @method setup
+                             * Enable the tool.
+                             * @method enable
+                             * @param {Boolean} bool The flag to enable or not.
                              */
-                            this.setup = function ()
-                            {
-                                gui = new dwv.gui.WindowLevel(app);
-                                gui.setup();
-                            };
-                            
-                            /**
-                             * Display the tool.
-                             * @method display
-                             * @param {Boolean} bool The flag to display or not.
-                             */
-                            this.display = function (bool)
-                            {
-                                if ( gui )
-                                {
-                                    if( app.getImage().getPhotometricInterpretation().match(/MONOCHROME/) !== null ) {
-                                        gui.display(bool);
-                                    }
-                                    else {
-                                        gui.display(false);
-                                    }
+                            this.display = function(bool){
+                                if( app.getImage().getPhotometricInterpretation().match(/MONOCHROME/) !== null ) {
+                                    dwv.gui.displayWindowLevelHtml(bool);
+                                }
+                                else {
+                                    dwv.gui.displayWindowLevelHtml(false);
                                 }
                             };
                             
@@ -377,10 +452,8 @@
                              * @method init
                              */
                             this.init = function() {
-                                app.updatePresets(true);
-                                if ( gui ) {
-                                    gui.initialise();
-                                }
+                                dwv.tool.updatePresets(true);
+                                dwv.gui.initWindowLevelHtml();
                             };
                         }; // WindowLevel class
                         

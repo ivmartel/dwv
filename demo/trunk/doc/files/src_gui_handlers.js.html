@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>dwv.gui.base.Loadbox - dwv</title>
+    <title>src/gui/handlers.js - dwv</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
     <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
@@ -43,21 +43,6 @@
                                 <li><a href="../classes/dwv.dicom.DataReader.html">dwv.dicom.DataReader</a></li>
                                 <li><a href="../classes/dwv.dicom.DicomParser.html">dwv.dicom.DicomParser</a></li>
                                 <li><a href="../classes/dwv.gui.html">dwv.gui</a></li>
-                                <li><a href="../classes/dwv.gui.base.DicomTags.html">dwv.gui.base.DicomTags</a></li>
-                                <li><a href="../classes/dwv.gui.base.Draw.html">dwv.gui.base.Draw</a></li>
-                                <li><a href="../classes/dwv.gui.base.FileLoad.html">dwv.gui.base.FileLoad</a></li>
-                                <li><a href="../classes/dwv.gui.base.Filter.html">dwv.gui.base.Filter</a></li>
-                                <li><a href="../classes/dwv.gui.base.Livewire.html">dwv.gui.base.Livewire</a></li>
-                                <li><a href="../classes/dwv.gui.base.Loadbox.html">dwv.gui.base.Loadbox</a></li>
-                                <li><a href="../classes/dwv.gui.base.Scroll.html">dwv.gui.base.Scroll</a></li>
-                                <li><a href="../classes/dwv.gui.base.Sharpen.html">dwv.gui.base.Sharpen</a></li>
-                                <li><a href="../classes/dwv.gui.base.Slider.html">dwv.gui.base.Slider</a></li>
-                                <li><a href="../classes/dwv.gui.base.Sobel.html">dwv.gui.base.Sobel</a></li>
-                                <li><a href="../classes/dwv.gui.base.Threshold.html">dwv.gui.base.Threshold</a></li>
-                                <li><a href="../classes/dwv.gui.base.Toolbox.html">dwv.gui.base.Toolbox</a></li>
-                                <li><a href="../classes/dwv.gui.base.Undo.html">dwv.gui.base.Undo</a></li>
-                                <li><a href="../classes/dwv.gui.base.WindowLevel.html">dwv.gui.base.WindowLevel</a></li>
-                                <li><a href="../classes/dwv.gui.base.ZoomAndPan.html">dwv.gui.base.ZoomAndPan</a></li>
                                 <li><a href="../classes/dwv.html.html">dwv.html</a></li>
                                 <li><a href="../classes/dwv.html.Layer.html">dwv.html.Layer</a></li>
                                 <li><a href="../classes/dwv.html.Style.html">dwv.html.Style</a></li>
@@ -93,7 +78,6 @@
                                 <li><a href="../classes/dwv.tool.EllipseFactory.html">dwv.tool.EllipseFactory</a></li>
                                 <li><a href="../classes/dwv.tool.Filter.html">dwv.tool.Filter</a></li>
                                 <li><a href="../classes/dwv.tool.filter.Sharpen.html">dwv.tool.filter.Sharpen</a></li>
-                                <li><a href="../classes/dwv.tool.filter.Sobel.html">dwv.tool.filter.Sobel</a></li>
                                 <li><a href="../classes/dwv.tool.filter.Threshold.html">dwv.tool.filter.Threshold</a></li>
                                 <li><a href="../classes/dwv.tool.LineFactory.html">dwv.tool.LineFactory</a></li>
                                 <li><a href="../classes/dwv.tool.Livewire.html">dwv.tool.Livewire</a></li>
@@ -104,13 +88,11 @@
                                 <li><a href="../classes/dwv.tool.RunFilterCommand.html">dwv.tool.RunFilterCommand</a></li>
                                 <li><a href="../classes/dwv.tool.Scroll.html">dwv.tool.Scroll</a></li>
                                 <li><a href="../classes/dwv.tool.ShapeEditor.html">dwv.tool.ShapeEditor</a></li>
-                                <li><a href="../classes/dwv.tool.Toolbox.html">dwv.tool.Toolbox</a></li>
+                                <li><a href="../classes/dwv.tool.ToolBox.html">dwv.tool.ToolBox</a></li>
                                 <li><a href="../classes/dwv.tool.UndoStack.html">dwv.tool.UndoStack</a></li>
                                 <li><a href="../classes/dwv.tool.WindowLevel.html">dwv.tool.WindowLevel</a></li>
                                 <li><a href="../classes/dwv.tool.ZoomAndPan.html">dwv.tool.ZoomAndPan</a></li>
-                                <li><a href="../classes/dwv.ToolboxController.html">dwv.ToolboxController</a></li>
                                 <li><a href="../classes/dwv.utils.html">dwv.utils</a></li>
-                                <li><a href="../classes/dwv.ViewController.html">dwv.ViewController</a></li>
                                 <li><a href="../classes/image.ImageFactory.html">image.ImageFactory</a></li>
                                 <li><a href="../classes/image.ViewFactory.html">image.ViewFactory</a></li>
                             </ul>
@@ -159,121 +141,217 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-                        <h1>dwv.gui.base.Loadbox Class</h1>
-                        <div class="box meta">
+                        <h1 class="file-heading">File: src/gui/handlers.js</h1>
                         
+                        <div class="file">
+                            <pre class="code prettyprint linenums">
+                        /** 
+                         * GUI module.
+                         * @module gui
+                         */
+                        var dwv = dwv || {};
+                        /**
+                         * Namespace for GUI functions.
+                         * @class gui
+                         * @namespace dwv
+                         * @static
+                         */
+                        dwv.gui = dwv.gui || {};
                         
-                                <div class="foundat">
-                                    Defined in: <a href="../files/src_gui_loader.js.html#l15"><code>src&#x2F;gui&#x2F;loader.js:15</code></a>
-                                </div>
+                        /**
+                         * Handle window/level change.
+                         * @method onChangeWindowLevelPreset
+                         * @namespace dwv.gui
+                         * @static
+                         * @param {Object} event The change event.
+                         */
+                        dwv.gui.onChangeWindowLevelPreset = function(/*event*/)
+                        {
+                            dwv.tool.updateWindowingDataFromName(this.value);
+                        };
                         
-                                    Module: <a href="../modules/gui.html">gui</a>
+                        /**
+                         * Handle colour map change.
+                         * @method onChangeColourMap
+                         * @static
+                         * @param {Object} event The change event.
+                         */
+                        dwv.gui.onChangeColourMap = function(/*event*/)
+                        {
+                            dwv.tool.updateColourMapFromName(this.value);
+                        };
                         
-                        </div>
+                        /**
+                         * Handle loader change.
+                         * @method onChangeLoader
+                         * @static
+                         * @param {Object} event The change event.
+                         */
+                        dwv.gui.onChangeLoader = function(/*event*/)
+                        {
+                            if( this.value === &quot;file&quot;) {
+                                dwv.gui.displayUrlLoadHtml(false);
+                                dwv.gui.displayFileLoadHtml(true);
+                            }
+                            else if( this.value === &quot;url&quot;) {
+                                dwv.gui.displayFileLoadHtml(false);
+                                dwv.gui.displayUrlLoadHtml(true);
+                            }
+                        };
                         
+                        /**
+                         * Handle files change.
+                         * @method onChangeFiles
+                         * @static
+                         * @param {Object} event The change event.
+                         */
+                        dwv.gui.onChangeFiles = function(event)
+                        {
+                            app.onChangeFiles(event);
+                        };
                         
-                        <div class="box intro">
-                            <p>Loadbox base gui.</p>
+                        /**
+                         * Handle URL change.
+                         * @method onChangeURL
+                         * @static
+                         * @param {Object} event The change event.
+                         */
+                        dwv.gui.onChangeURL = function(event)
+                        {
+                            app.onChangeURL(event);
+                        };
                         
-                        </div>
+                        /**
+                         * Handle tool change.
+                         * @method onChangeTool
+                         * @static
+                         * @param {Object} event The change event.
+                         */
+                        dwv.gui.onChangeTool = function(/*event*/)
+                        {
+                            app.getToolBox().setSelectedTool(this.value);
+                        };
                         
-                            <div class="constructor">
-                                <h2>Constructor</h2>
-                                <div id="method_dwv.gui.base.Loadbox" class="method item">
-                                    <h3 class="name"><code>dwv.gui.base.Loadbox</code></h3>
-                                
-                                        <span class="paren">()</span>
-                                
-                                
-                                
-                                
-                                
-                                
-                                
-                                
-                                    <div class="meta">
-                                                <p>
-                                                Defined in
-                                        <a href="../files/src_gui_loader.js.html#l15"><code>src&#x2F;gui&#x2F;loader.js:15</code></a>
-                                        </p>
-                                
-                                
-                                
-                                    </div>
-                                
-                                    <div class="description">
-                                        
-                                    </div>
-                                
-                                
-                                
-                                </div>
-                            </div>
+                        /**
+                         * Handle filter change.
+                         * @method onChangeFilter
+                         * @static
+                         * @param {Object} event The change event.
+                         */
+                        dwv.gui.onChangeFilter = function(/*event*/)
+                        {
+                            app.getToolBox().getSelectedTool().setSelectedFilter(this.value);
+                        };
                         
-                        <div id="classdocs" class="tabview">
-                            <ul class="api-class-tabs">
-                                <li class="api-class-tab index"><a href="#index">Index</a></li>
+                        /**
+                         * Handle filter run.
+                         * @method onRunFilter
+                         * @static
+                         * @param {Object} event The run event.
+                         */
+                        dwv.gui.onRunFilter = function(/*event*/)
+                        {
+                            app.getToolBox().getSelectedTool().getSelectedFilter().run();
+                        };
                         
-                                    <li class="api-class-tab methods"><a href="#methods">Methods</a></li>
-                            </ul>
+                        /**
+                         * Handle min/max slider change.
+                         * @method onChangeMinMax
+                         * @static
+                         * @param {Object} range The new range of the data.
+                         */
+                        dwv.gui.onChangeMinMax = function(range)
+                        {
+                            // seems like jquery is checking if the method exists before it 
+                            // is used...
+                            if( app.getToolBox().getSelectedTool().getSelectedFilter ) {
+                                app.getToolBox().getSelectedTool().getSelectedFilter().run(range);
+                            }
+                        };
                         
-                            <div>
-                                <div id="index" class="api-class-tabpanel index">
-                                    <h2 class="off-left">Item Index</h2>
+                        /**
+                         * Handle shape change.
+                         * @method onChangeShape
+                         * @static
+                         * @param {Object} event The change event.
+                         */
+                        dwv.gui.onChangeShape = function(/*event*/)
+                        {
+                            app.getToolBox().getSelectedTool().setShapeName(this.value);
+                        };
                         
-                                        <div class="index-section methods">
-                                            <h3>Methods</h3>
+                        /**
+                         * Handle line color change.
+                         * @method onChangeLineColour
+                         * @static
+                         * @param {Object} event The change event.
+                         */
+                        dwv.gui.onChangeLineColour = function(/*event*/)
+                        {
+                            app.getToolBox().getSelectedTool().setLineColour(this.value);
+                        };
                         
-                                            <ul class="index-list methods">
-                                                    <li class="index-item method">
-                                                        <a href="#method_setup">setup</a>
+                        /**
+                         * Handle zoom reset.
+                         * @method onZoomReset
+                         * @static
+                         * @param {Object} event The change event.
+                         */
+                        dwv.gui.onZoomReset = function(/*event*/)
+                        {
+                            app.resetLayout();
+                        };
                         
-                                                    </li>
-                                            </ul>
-                                        </div>
+                        /**
+                         * Handle display reset.
+                         * @method onDisplayReset
+                         * @static
+                         * @param {Object} event The change event.
+                         */
+                        dwv.gui.onDisplayReset = function(event)
+                        {
+                            dwv.gui.onZoomReset(event);
+                            app.initWLDisplay();
+                            // update preset select
+                            var select = document.getElementById(&quot;presetSelect&quot;);
+                            select.selectedIndex = 0;
+                            dwv.gui.refreshSelect(&quot;#presetSelect&quot;);
+                        };
                         
+                        /**
+                         * Handle undo.
+                         * @method onUndo
+                         * @static
+                         * @param {Object} event The associated event.
+                         */
+                        dwv.gui.onUndo = function(/*event*/)
+                        {
+                            app.getUndoStack().undo();
+                        };
                         
+                        /**
+                         * Handle redo.
+                         * @method onRedo
+                         * @static
+                         * @param {Object} event The associated event.
+                         */
+                        dwv.gui.onRedo = function(/*event*/)
+                        {
+                            app.getUndoStack().redo();
+                        };
                         
-                                </div>
+                        /**
+                         * Handle toggle of info layer.
+                         * @method onToggleInfoLayer
+                         * @static
+                         * @param {Object} event The associated event.
+                         */
+                        dwv.gui.onToggleInfoLayer = function(/*event*/)
+                        {
+                            app.toggleInfoLayerDisplay();
+                        };
                         
-                                    <div id="methods" class="api-class-tabpanel">
-                                        <h2 class="off-left">Methods</h2>
-                        
-                                            <div id="method_setup" class="method item">
-                                                <h3 class="name"><code>setup</code></h3>
-                                            
-                                                    <span class="paren">()</span>
-                                            
-                                            
-                                            
-                                            
-                                            
-                                            
-                                            
-                                            
-                                                <div class="meta">
-                                                            <p>
-                                                            Defined in
-                                                    <a href="../files/src_gui_loader.js.html#l23"><code>src&#x2F;gui&#x2F;loader.js:23</code></a>
-                                                    </p>
-                                            
-                                            
-                                            
-                                                </div>
-                                            
-                                                <div class="description">
-                                                    <p>Setup the loadbox HTML.</p>
-                                            
-                                                </div>
-                                            
-                                            
-                                            
-                                            </div>
-                                    </div>
-                        
-                        
-                        
-                            </div>
+                            </pre>
                         </div>
                     </div>
                 </div>
