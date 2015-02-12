@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
     <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
-    <link rel="shortcut icon" type="image/png" href="../assets/favicon.png">
+    <link rel="icon" href="../assets/favicon.ico">
     <script src="http://yui.yahooapis.com/combo?3.9.1/build/yui/yui-min.js"></script>
 </head>
 <body class="yui3-skin-sam">
@@ -14,7 +14,7 @@
 <div id="doc">
     <div id="hd" class="yui3-g header">
         <div class="yui3-u-3-4">
-                <h1><img src="../assets/css/logo.png" title="dwv"></h1>
+                <h1><img src="../assets/css/logo.png" title="dwv" width="117" height="52"></h1>
         </div>
         <div class="yui3-u-1-4 version">
             <em>API Docs for: 0.9.0beta</em>
@@ -166,585 +166,585 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-                        <h1 class="file-heading">File: src/dicom/dicomParser.js</h1>
-                        
-                        <div class="file">
-                            <pre class="code prettyprint linenums">
-                        /** 
-                         * DICOM module.
-                         * @module dicom
-                         */
-                        var dwv = dwv || {};
-                        dwv.dicom = dwv.dicom || {};
-                        
-                        /**
-                         * Data reader.
-                         * @class DataReader
-                         * @namespace dwv.dicom
-                         * @constructor
-                         * @param {Array} buffer The input array buffer.
-                         * @param {Boolean} isLittleEndian Flag to tell if the data is little or big endian.
-                         */
-                        dwv.dicom.DataReader = function(buffer, isLittleEndian)
-                        {
-                            /**
-                             * The main data view.
-                             * @property view
-                             * @private
-                             * @type DataView
-                             */
-                            var view = new DataView(buffer);
-                            // Set endian flag if not defined.
-                            if(typeof(isLittleEndian)===&#x27;undefined&#x27;) {
-                                isLittleEndian = true;
-                            }
-                            
-                            /**
-                             * Read Uint8 (1 byte) data.
-                             * @method readUint8
-                             * @param {Number} byteOffset The offset to start reading from.
-                             * @return {Number} The read data.
-                             */
-                            this.readUint8 = function(byteOffset) {
-                                return view.getUint8(byteOffset, isLittleEndian);
-                            };
-                            /**
-                             * Read Uint16 (2 bytes) data.
-                             * @method readUint16
-                             * @param {Number} byteOffset The offset to start reading from.
-                             * @return {Number} The read data.
-                             */
-                            this.readUint16 = function(byteOffset) {
-                                return view.getUint16(byteOffset, isLittleEndian);
-                            };
-                            /**
-                             * Read Uint32 (4 bytes) data.
-                             * @method readUint32
-                             * @param {Number} byteOffset The offset to start reading from.
-                             * @return {Number} The read data.
-                             */
-                            this.readUint32 = function(byteOffset) {
-                                return view.getUint32(byteOffset, isLittleEndian);
-                            };
-                            /**
-                             * Read Float32 (8 bytes) data.
-                             * @method readFloat32
-                             * @param {Number} byteOffset The offset to start reading from.
-                             * @return {Number} The read data.
-                             */
-                            this.readFloat32 = function(byteOffset) {
-                                return view.getFloat32(byteOffset, isLittleEndian);
-                            };
-                            /**
-                             * Read Uint data of nBytes size.
-                             * @method readNumber
-                             * @param {Number} byteOffset The offset to start reading from.
-                             * @param {Number} nBytes The number of bytes to read.
-                             * @return {Number} The read data.
-                             */
-                            this.readNumber = function(byteOffset, nBytes) {
-                                if( nBytes === 1 ) {
-                                    return this.readUint8(byteOffset, isLittleEndian);
-                                }
-                                else if( nBytes === 2 ) {
-                                    return this.readUint16(byteOffset, isLittleEndian);
-                                }
-                                else if( nBytes === 4 ) {
-                                    return this.readUint32(byteOffset, isLittleEndian);
-                                }
-                                else if( nBytes === 8 ) {
-                                    return this.readFloat32(byteOffset, isLittleEndian);
-                                }
-                                else { 
-                                    console.warn(&quot;Non number: &#x27;&quot;+this.readString(byteOffset, nBytes)+&quot;&#x27; of &quot;+nBytes+&quot; bytes.&quot;);
-                                    return Number.NaN;
-                                }
-                            };
-                            /**
-                             * Read Uint8 array.
-                             * @method readUint8Array
-                             * @param {Number} byteOffset The offset to start reading from.
-                             * @param {Number} size The size of the array.
-                             * @return {Array} The read data.
-                             */
-                            this.readUint8Array = function(byteOffset, size) {
-                                var data = new Uint8Array(size);
-                                var index = 0;
-                                for(var i=byteOffset; i&lt;byteOffset + size; ++i) {     
-                                    data[index++] = this.readUint8(i);
-                                }
-                                return data;
-                            };
-                            /**
-                             * Read Uint16 array.
-                             * @method readUint16Array
-                             * @param {Number} byteOffset The offset to start reading from.
-                             * @param {Number} size The size of the array.
-                             * @return {Array} The read data.
-                             */
-                            this.readUint16Array = function(byteOffset, size) {
-                                var data = new Uint16Array(size/2);
-                                var index = 0;
-                                for(var i=byteOffset; i&lt;byteOffset + size; i+=2) {     
-                                    data[index++] = this.readUint16(i);
-                                }
-                                return data;
-                            };
-                            /**
-                             * Read data as an hexadecimal string.
-                             * @method readHex
-                             * @param {Number} byteOffset The offset to start reading from.
-                             * @return {Array} The read data.
-                             */
-                            this.readHex = function(byteOffset) {
-                                // read and convert to hex string
-                                var str = this.readUint16(byteOffset).toString(16);
-                                // return padded
-                                return &quot;0x0000&quot;.substr(0, 6 - str.length) + str.toUpperCase();
-                            };
-                            /**
-                             * Read data as a string.
-                             * @method readString
-                             * @param {Number} byteOffset The offset to start reading from.
-                             * @param {Number} nChars The number of characters to read.
-                             * @return {String} The read data.
-                             */
-                            this.readString = function(byteOffset, nChars) {
-                                var result = &quot;&quot;;
-                                for(var i=byteOffset; i&lt;byteOffset + nChars; ++i){
-                                    result += String.fromCharCode( this.readUint8(i) );
-                                }
-                                return result;
-                            };
-                        };
-                        
-                        /**
-                         * Tell if a given syntax is a JPEG one.
-                         * @method isJpegTransferSyntax
-                         * @param {String} The transfer syntax to test.
-                         * @returns {Boolean} True if a jpeg syntax.
-                         */
-                        dwv.dicom.isJpegTransferSyntax = function(syntax)
-                        {
-                            return syntax.match(/1.2.840.10008.1.2.4.5/) !== null ||
-                                syntax.match(/1.2.840.10008.1.2.4.6/) !== null||
-                                syntax.match(/1.2.840.10008.1.2.4.7/) !== null;
-                        };
-                        
-                        /**
-                         * Tell if a given syntax is a JPEG-LS one.
-                         * @method isJpeglsTransferSyntax
-                         * @param {String} The transfer syntax to test.
-                         * @returns {Boolean} True if a jpeg-ls syntax.
-                         */
-                        dwv.dicom.isJpeglsTransferSyntax = function(syntax)
-                        {
-                            return syntax.match(/1.2.840.10008.1.2.4.8/) !== null;
-                        };
-                        
-                        /**
-                         * Tell if a given syntax is a JPEG 2000 one.
-                         * @method isJpeg2000TransferSyntax
-                         * @param {String} The transfer syntax to test.
-                         * @returns {Boolean} True if a jpeg 2000 syntax.
-                         */
-                        dwv.dicom.isJpeg2000TransferSyntax = function(syntax)
-                        {
-                            return syntax.match(/1.2.840.10008.1.2.4.9/) !== null;
-                        };
-                        
-                        /**
-                         * DicomParser class.
-                         * @class DicomParser
-                         * @namespace dwv.dicom
-                         * @constructor
-                         */
-                        dwv.dicom.DicomParser = function()
-                        {
-                            /**
-                             * The list of DICOM elements.
-                             * @property dicomElements
-                             * @type Array
-                             */
-                            this.dicomElements = {};
-                            /**
-                             * The number of DICOM Items.
-                             * @property numberOfItems
-                             * @type Number
-                             */
-                            this.numberOfItems = 0;
-                            /**
-                             * The pixel buffer.
-                             * @property pixelBuffer
-                             * @type Array
-                             */
-                            this.pixelBuffer = [];
-                        };
-                        
-                        /**
-                         * Get the DICOM data elements.
-                         * @method getDicomElements
-                         * @returns {Object} The DICOM elements.
-                         */
-                        dwv.dicom.DicomParser.prototype.getDicomElements = function()
-                        {
-                            return this.dicomElements;
-                        };
-                        
-                        /**
-                         * Get the DICOM data pixel buffer.
-                         * @method getPixelBuffer
-                         * @returns {Array} The pixel buffer.
-                         */
-                        dwv.dicom.DicomParser.prototype.getPixelBuffer = function()
-                        {
-                            return this.pixelBuffer;
-                        };
-                        
-                        /**
-                         * Append a DICOM element to the dicomElements member object.
-                         * Allows for easy retrieval of DICOM tag values from the tag name.
-                         * If tags have same name (for the &#x27;unknown&#x27; and private tags cases), a number is appended
-                         * making the name unique.
-                         * @method appendDicomElement
-                         * @param {Object} element The element to add.
-                         */
-                        dwv.dicom.DicomParser.prototype.appendDicomElement = function( element )
-                        {
-                            // find a good tag name
-                            var name = element.name;
-                            // count the number of items
-                            if( name === &quot;Item&quot; ) {
-                                ++this.numberOfItems;
-                            }
-                            var count = 1;
-                            while( this.dicomElements[name] ) {
-                                name = element.name + (count++).toString();
-                            }
-                            // store it
-                            this.dicomElements[name] = { 
-                                &quot;group&quot;: element.group, 
-                                &quot;element&quot;: element.element,
-                                &quot;vr&quot;: element.vr,
-                                &quot;vl&quot;: element.vl,
-                                &quot;value&quot;: element.value 
-                            };
-                        };
-                        
-                        /**
-                         * Read a DICOM tag.
-                         * @method readTag
-                         * @param reader The raw data reader.
-                         * @param offset The offset where to start to read.
-                         * @returns An object containing the tags &#x27;group&#x27;, &#x27;element&#x27; and &#x27;name&#x27;.
-                         */
-                        dwv.dicom.DicomParser.prototype.readTag = function(reader, offset)
-                        {
-                            // group
-                            var group = reader.readHex(offset);
-                            // element
-                            var element = reader.readHex(offset+2);
-                            // name
-                            var name = &quot;dwv::unknown&quot;;
-                            if( dwv.dicom.dictionary[group] ) {
-                                if( dwv.dicom.dictionary[group][element] ) {
-                                    name = dwv.dicom.dictionary[group][element][2];
-                                }
-                            }
-                            // return
-                            return {&#x27;group&#x27;: group, &#x27;element&#x27;: element, &#x27;name&#x27;: name};
-                        };
-                        
-                        /**
-                         * Read a DICOM data element.
-                         * @method readDataElement
-                         * @param reader The raw data reader.
-                         * @param offset The offset where to start to read.
-                         * @param implicit Is the DICOM VR implicit?
-                         * @returns {Object} An object containing the element &#x27;tag&#x27;, &#x27;vl&#x27;, &#x27;vr&#x27;, &#x27;data&#x27; and &#x27;offset&#x27;.
-                         */
-                        dwv.dicom.DicomParser.prototype.readDataElement = function(reader, offset, implicit)
-                        {
-                            // tag: group, element
-                            var tag = this.readTag(reader, offset);
-                            var tagOffset = 4;
-                            
-                            var vr; // Value Representation (VR)
-                            var vl; // Value Length (VL)
-                            var vrOffset = 0; // byte size of VR
-                            var vlOffset = 0; // byte size of VL
-                            
-                            // (private) Item group case
-                            if( tag.group === &quot;0xFFFE&quot; ) {
-                                vr = &quot;N/A&quot;;
-                                vrOffset = 0;
-                                vl = reader.readUint32( offset+tagOffset );
-                                vlOffset = 4;
-                            }
-                            // non Item case
-                            else {
-                                // implicit VR?
-                                if(implicit) {
-                                    vr = &quot;UN&quot;;
-                                    if( dwv.dicom.dictionary[tag.group] ) {
-                                        if( dwv.dicom.dictionary[tag.group][tag.element] ) {
-                                            vr = dwv.dicom.dictionary[tag.group][tag.element][0];
-                                        }
-                                    }
-                                    vrOffset = 0;
-                                    vl = reader.readUint32( offset+tagOffset+vrOffset );
-                                    vlOffset = 4;
-                                }
-                                else {
-                                    vr = reader.readString( offset+tagOffset, 2 );
-                                    vrOffset = 2;
-                                    // long representations
-                                    if(vr === &quot;OB&quot; || vr === &quot;OF&quot; || vr === &quot;SQ&quot; || vr === &quot;OW&quot; || vr === &quot;UN&quot;) {
-                                        vl = reader.readUint32( offset+tagOffset+vrOffset+2 );
-                                        vlOffset = 6;
-                                    }
-                                    // short representation
-                                    else {
-                                        vl = reader.readUint16( offset+tagOffset+vrOffset );
-                                        vlOffset = 2;
-                                    }
-                                }
-                            }
-                            
-                            // check the value of VL
-                            if( vl === 0xffffffff ) {
-                                vl = 0;
-                            }
-                            
-                            
-                            // data
-                            var data;
-                            var dataOffset = offset+tagOffset+vrOffset+vlOffset;
-                            if( vr === &quot;US&quot; || vr === &quot;UL&quot;)
-                            {
-                                var num = reader.readNumber( dataOffset, vl );
-                                if ( isNaN(num) ) {
-                                    console.warn(&quot;Not a number returned for tag: &quot;+tag.name);
-                                }
-                                data = [num];
-                            }
-                            else if( vr === &quot;OB&quot; || vr === &quot;N/A&quot;)
-                            {
-                                data = reader.readUint8Array( dataOffset, vl );
-                            }
-                            else if( vr === &quot;OX&quot; || vr === &quot;OW&quot; )
-                            {
-                                if ( vr === &quot;OX&quot; ) {
-                                    console.warn(&quot;OX value representation for tag: &quot;+tag.name+&quot;.&quot;);
-                                }
-                                if ( typeof(this.dicomElements.BitsAllocated) !== &#x27;undefined&#x27; &amp;&amp;
-                                        this.dicomElements.BitsAllocated.value[0] === 8 ) {
-                                    data = reader.readUint8Array( dataOffset, vl );
-                                }
-                                else {
-                                    data = reader.readUint16Array( dataOffset, vl );
-                                }
-                            }
-                            else
-                            {
-                                data = reader.readString( dataOffset, vl);
-                                data = data.split(&quot;\\&quot;);                
-                            }    
-                        
-                            // total element offset
-                            var elementOffset = tagOffset + vrOffset + vlOffset + vl;
-                            
-                            // return
-                            return { 
-                                &#x27;tag&#x27;: tag, 
-                                &#x27;vr&#x27;: vr, 
-                                &#x27;vl&#x27;: vl, 
-                                &#x27;data&#x27;: data,
-                                &#x27;offset&#x27;: elementOffset
-                            };    
-                        };
-                        
-                        /**
-                         * Parse the complete DICOM file (given as input to the class).
-                         * Fills in the member object &#x27;dicomElements&#x27;.
-                         * @method parse
-                         * @param buffer The input array buffer.
-                         */
-                        dwv.dicom.DicomParser.prototype.parse = function(buffer)
-                        {
-                            var offset = 0;
-                            var implicit = false;
-                            var jpeg = false;
-                            var jpeg2000 = false;
-                            // default readers
-                            var metaReader = new dwv.dicom.DataReader(buffer);
-                            var dataReader = new dwv.dicom.DataReader(buffer);
-                        
-                            // 128 -&gt; 132: magic word
-                            offset = 128;
-                            var magicword = metaReader.readString( offset, 4 );
-                            if(magicword !== &quot;DICM&quot;)
-                            {
-                                throw new Error(&quot;Not a valid DICOM file (no magic DICM word found)&quot;);
-                            }
-                            offset += 4;
-                            
-                            // 0x0002, 0x0000: MetaElementGroupLength
-                            var dataElement = this.readDataElement(metaReader, offset);
-                            var metaLength = parseInt(dataElement.data, 10);
-                            offset += dataElement.offset;
-                            
-                            // meta elements
-                            var metaStart = offset;
-                            var metaEnd = metaStart + metaLength;
-                            var i = metaStart;
-                            while( i &lt; metaEnd ) 
-                            {
-                                // get the data element
-                                dataElement = this.readDataElement(metaReader, i, false);
-                                // check the transfer syntax
-                                if( dataElement.tag.name === &quot;TransferSyntaxUID&quot; ) {
-                                    var syntax = dwv.utils.cleanString(dataElement.data[0]);
-                                    
-                                    // Implicit VR - Little Endian
-                                    if( syntax === &quot;1.2.840.10008.1.2&quot; ) {
-                                        implicit = true;
-                                    }
-                                    // Explicit VR - Little Endian (default): 1.2.840.10008.1.2.1 
-                                    // Deflated Explicit VR - Little Endian
-                                    else if( syntax === &quot;1.2.840.10008.1.2.1.99&quot; ) {
-                                        throw new Error(&quot;Unsupported DICOM transfer syntax (Deflated Explicit VR): &quot;+syntax);
-                                    }
-                                    // Explicit VR - Big Endian
-                                    else if( syntax === &quot;1.2.840.10008.1.2.2&quot; ) {
-                                        dataReader = new dwv.dicom.DataReader(buffer,false);
-                                    }
-                                    // JPEG
-                                    else if( dwv.dicom.isJpegTransferSyntax(syntax) ) {
-                                        jpeg = true;
-                                        //console.log(&quot;JPEG compressed DICOM data: &quot; + syntax);
-                                        throw new Error(&quot;Unsupported DICOM transfer syntax (JPEG): &quot;+syntax);
-                                    }
-                                    // JPEG-LS
-                                    else if( dwv.dicom.isJpeglsTransferSyntax(syntax) ) {
-                                        //console.log(&quot;JPEG-LS compressed DICOM data: &quot; + syntax);
-                                        throw new Error(&quot;Unsupported DICOM transfer syntax (JPEG-LS): &quot;+syntax);
-                                    }
-                                    // JPEG 2000
-                                    else if( dwv.dicom.isJpeg2000TransferSyntax(syntax) ) {
-                                        console.log(&quot;JPEG 2000 compressed DICOM data: &quot; + syntax);
-                                        jpeg2000 = true;
-                                    }
-                                    // MPEG2 Image Compression
-                                    else if( syntax === &quot;1.2.840.10008.1.2.4.100&quot; ) {
-                                        throw new Error(&quot;Unsupported DICOM transfer syntax (MPEG2): &quot;+syntax);
-                                    }
-                                    // RLE (lossless)
-                                    else if( syntax === &quot;1.2.840.10008.1.2.5&quot; ) {
-                                        throw new Error(&quot;Unsupported DICOM transfer syntax (RLE): &quot;+syntax);
-                                    }
-                                }            
-                                // store the data element
-                                this.appendDicomElement( { 
-                                    &#x27;name&#x27;: dataElement.tag.name,
-                                    &#x27;group&#x27;: dataElement.tag.group, 
-                                    &#x27;vr&#x27; : dataElement.vr, 
-                                    &#x27;vl&#x27; : dataElement.vl, 
-                                    &#x27;element&#x27;: dataElement.tag.element,
-                                    &#x27;value&#x27;: dataElement.data 
-                                });
-                                // increment index
-                                i += dataElement.offset;
-                            }
-                            
-                            var startedPixelItems = false;
-                            
-                            var tagName = &quot;&quot;;
-                            // DICOM data elements
-                            while( i &lt; buffer.byteLength ) 
-                            {
-                                // get the data element
-                                try
-                                {
-                                    dataElement = this.readDataElement(dataReader, i, implicit);
-                                }
-                                catch(err)
-                                {
-                                    console.warn(&quot;Problem reading at &quot; + i + &quot; / &quot; + buffer.byteLength +
-                                        &quot;, after &quot; + tagName + &quot;.\n&quot; + err);
-                                }
-                                tagName = dataElement.tag.name;
-                                // store pixel data from multiple items
-                                if( startedPixelItems ) {
-                                    if( tagName === &quot;Item&quot; ) {
-                                        if( dataElement.data.length === 4 ) {
-                                            console.log(&quot;Skipping Basic Offset Table.&quot;);
-                                        }
-                                        else if( dataElement.data.length !== 0 ) {
-                                            console.log(&quot;Concatenating multiple pixel data items, length: &quot;+dataElement.data.length);
-                                            // concat does not work on typed arrays
-                                            //this.pixelBuffer = this.pixelBuffer.concat( dataElement.data );
-                                            // manual concat...
-                                            var size = dataElement.data.length + this.pixelBuffer.length;
-                                            var newBuffer = new Uint16Array(size);
-                                            newBuffer.set( this.pixelBuffer, 0 );
-                                            newBuffer.set( dataElement.data, this.pixelBuffer.length );
-                                            this.pixelBuffer = newBuffer;
-                                        }
-                                    }
-                                    else if( tagName === &quot;SequenceDelimitationItem&quot; ) {
-                                        startedPixelItems = false;
-                                    }
-                                    else {
-                                        throw new Error(&quot;Unexpected tag in encapsulated pixel data: &quot;+dataElement.tag.name);
-                                    }
-                                }
-                                // check the pixel data tag
-                                if( tagName === &quot;PixelData&quot;) {
-                                    if( dataElement.data.length !== 0 ) {
-                                        this.pixelBuffer = dataElement.data;
-                                    }
-                                    else {
-                                        startedPixelItems = true;
-                                    }
-                                }
-                                // store the data element
-                                this.appendDicomElement( {
-                                    &#x27;name&#x27;: tagName,
-                                    &#x27;group&#x27; : dataElement.tag.group, 
-                                    &#x27;vr&#x27; : dataElement.vr, 
-                                    &#x27;vl&#x27; : dataElement.vl, 
-                                    &#x27;element&#x27;: dataElement.tag.element,
-                                    &#x27;value&#x27;: dataElement.data 
-                                });
-                                // increment index
-                                i += dataElement.offset;
-                            }
-                            
-                            // uncompress data
-                            if( jpeg ) {
-                                // using jpgjs from https://github.com/notmasteryet/jpgjs
-                                // -&gt; error with ffc3 and ffc1 jpeg jfif marker
-                                /*var j = new JpegImage();
-                                j.parse(this.pixelBuffer);
-                                var d = 0;
-                                j.copyToImageData(d);
-                                this.pixelBuffer = d.data;*/
-                            }
-                            else if( jpeg2000 ) {
-                                // decompress pixel buffer into Uint8 image
-                                var uint8Image = null;
-                                try {
-                                    uint8Image = openjpeg(this.pixelBuffer, &quot;j2k&quot;);
-                                } catch(error) {
-                                    throw new Error(&quot;Cannot decode JPEG 2000 ([&quot; +error.name + &quot;] &quot; + error.message + &quot;)&quot;);
-                                }
-                                this.pixelBuffer = uint8Image.data;
-                            }
-                        };
-                        
-                            </pre>
-                        </div>
+<h1 class="file-heading">File: src/dicom/dicomParser.js</h1>
+
+<div class="file">
+    <pre class="code prettyprint linenums">
+/** 
+ * DICOM module.
+ * @module dicom
+ */
+var dwv = dwv || {};
+dwv.dicom = dwv.dicom || {};
+
+/**
+ * Data reader.
+ * @class DataReader
+ * @namespace dwv.dicom
+ * @constructor
+ * @param {Array} buffer The input array buffer.
+ * @param {Boolean} isLittleEndian Flag to tell if the data is little or big endian.
+ */
+dwv.dicom.DataReader = function(buffer, isLittleEndian)
+{
+    /**
+     * The main data view.
+     * @property view
+     * @private
+     * @type DataView
+     */
+    var view = new DataView(buffer);
+    // Set endian flag if not defined.
+    if(typeof(isLittleEndian)===&#x27;undefined&#x27;) {
+        isLittleEndian = true;
+    }
+    
+    /**
+     * Read Uint8 (1 byte) data.
+     * @method readUint8
+     * @param {Number} byteOffset The offset to start reading from.
+     * @return {Number} The read data.
+     */
+    this.readUint8 = function(byteOffset) {
+        return view.getUint8(byteOffset, isLittleEndian);
+    };
+    /**
+     * Read Uint16 (2 bytes) data.
+     * @method readUint16
+     * @param {Number} byteOffset The offset to start reading from.
+     * @return {Number} The read data.
+     */
+    this.readUint16 = function(byteOffset) {
+        return view.getUint16(byteOffset, isLittleEndian);
+    };
+    /**
+     * Read Uint32 (4 bytes) data.
+     * @method readUint32
+     * @param {Number} byteOffset The offset to start reading from.
+     * @return {Number} The read data.
+     */
+    this.readUint32 = function(byteOffset) {
+        return view.getUint32(byteOffset, isLittleEndian);
+    };
+    /**
+     * Read Float32 (8 bytes) data.
+     * @method readFloat32
+     * @param {Number} byteOffset The offset to start reading from.
+     * @return {Number} The read data.
+     */
+    this.readFloat32 = function(byteOffset) {
+        return view.getFloat32(byteOffset, isLittleEndian);
+    };
+    /**
+     * Read Uint data of nBytes size.
+     * @method readNumber
+     * @param {Number} byteOffset The offset to start reading from.
+     * @param {Number} nBytes The number of bytes to read.
+     * @return {Number} The read data.
+     */
+    this.readNumber = function(byteOffset, nBytes) {
+        if( nBytes === 1 ) {
+            return this.readUint8(byteOffset, isLittleEndian);
+        }
+        else if( nBytes === 2 ) {
+            return this.readUint16(byteOffset, isLittleEndian);
+        }
+        else if( nBytes === 4 ) {
+            return this.readUint32(byteOffset, isLittleEndian);
+        }
+        else if( nBytes === 8 ) {
+            return this.readFloat32(byteOffset, isLittleEndian);
+        }
+        else { 
+            console.warn(&quot;Non number: &#x27;&quot;+this.readString(byteOffset, nBytes)+&quot;&#x27; of &quot;+nBytes+&quot; bytes.&quot;);
+            return Number.NaN;
+        }
+    };
+    /**
+     * Read Uint8 array.
+     * @method readUint8Array
+     * @param {Number} byteOffset The offset to start reading from.
+     * @param {Number} size The size of the array.
+     * @return {Array} The read data.
+     */
+    this.readUint8Array = function(byteOffset, size) {
+        var data = new Uint8Array(size);
+        var index = 0;
+        for(var i=byteOffset; i&lt;byteOffset + size; ++i) {     
+            data[index++] = this.readUint8(i);
+        }
+        return data;
+    };
+    /**
+     * Read Uint16 array.
+     * @method readUint16Array
+     * @param {Number} byteOffset The offset to start reading from.
+     * @param {Number} size The size of the array.
+     * @return {Array} The read data.
+     */
+    this.readUint16Array = function(byteOffset, size) {
+        var data = new Uint16Array(size/2);
+        var index = 0;
+        for(var i=byteOffset; i&lt;byteOffset + size; i+=2) {     
+            data[index++] = this.readUint16(i);
+        }
+        return data;
+    };
+    /**
+     * Read data as an hexadecimal string.
+     * @method readHex
+     * @param {Number} byteOffset The offset to start reading from.
+     * @return {Array} The read data.
+     */
+    this.readHex = function(byteOffset) {
+        // read and convert to hex string
+        var str = this.readUint16(byteOffset).toString(16);
+        // return padded
+        return &quot;0x0000&quot;.substr(0, 6 - str.length) + str.toUpperCase();
+    };
+    /**
+     * Read data as a string.
+     * @method readString
+     * @param {Number} byteOffset The offset to start reading from.
+     * @param {Number} nChars The number of characters to read.
+     * @return {String} The read data.
+     */
+    this.readString = function(byteOffset, nChars) {
+        var result = &quot;&quot;;
+        for(var i=byteOffset; i&lt;byteOffset + nChars; ++i){
+            result += String.fromCharCode( this.readUint8(i) );
+        }
+        return result;
+    };
+};
+
+/**
+ * Tell if a given syntax is a JPEG one.
+ * @method isJpegTransferSyntax
+ * @param {String} The transfer syntax to test.
+ * @returns {Boolean} True if a jpeg syntax.
+ */
+dwv.dicom.isJpegTransferSyntax = function(syntax)
+{
+    return syntax.match(/1.2.840.10008.1.2.4.5/) !== null ||
+        syntax.match(/1.2.840.10008.1.2.4.6/) !== null||
+        syntax.match(/1.2.840.10008.1.2.4.7/) !== null;
+};
+
+/**
+ * Tell if a given syntax is a JPEG-LS one.
+ * @method isJpeglsTransferSyntax
+ * @param {String} The transfer syntax to test.
+ * @returns {Boolean} True if a jpeg-ls syntax.
+ */
+dwv.dicom.isJpeglsTransferSyntax = function(syntax)
+{
+    return syntax.match(/1.2.840.10008.1.2.4.8/) !== null;
+};
+
+/**
+ * Tell if a given syntax is a JPEG 2000 one.
+ * @method isJpeg2000TransferSyntax
+ * @param {String} The transfer syntax to test.
+ * @returns {Boolean} True if a jpeg 2000 syntax.
+ */
+dwv.dicom.isJpeg2000TransferSyntax = function(syntax)
+{
+    return syntax.match(/1.2.840.10008.1.2.4.9/) !== null;
+};
+
+/**
+ * DicomParser class.
+ * @class DicomParser
+ * @namespace dwv.dicom
+ * @constructor
+ */
+dwv.dicom.DicomParser = function()
+{
+    /**
+     * The list of DICOM elements.
+     * @property dicomElements
+     * @type Array
+     */
+    this.dicomElements = {};
+    /**
+     * The number of DICOM Items.
+     * @property numberOfItems
+     * @type Number
+     */
+    this.numberOfItems = 0;
+    /**
+     * The pixel buffer.
+     * @property pixelBuffer
+     * @type Array
+     */
+    this.pixelBuffer = [];
+};
+
+/**
+ * Get the DICOM data elements.
+ * @method getDicomElements
+ * @returns {Object} The DICOM elements.
+ */
+dwv.dicom.DicomParser.prototype.getDicomElements = function()
+{
+    return this.dicomElements;
+};
+
+/**
+ * Get the DICOM data pixel buffer.
+ * @method getPixelBuffer
+ * @returns {Array} The pixel buffer.
+ */
+dwv.dicom.DicomParser.prototype.getPixelBuffer = function()
+{
+    return this.pixelBuffer;
+};
+
+/**
+ * Append a DICOM element to the dicomElements member object.
+ * Allows for easy retrieval of DICOM tag values from the tag name.
+ * If tags have same name (for the &#x27;unknown&#x27; and private tags cases), a number is appended
+ * making the name unique.
+ * @method appendDicomElement
+ * @param {Object} element The element to add.
+ */
+dwv.dicom.DicomParser.prototype.appendDicomElement = function( element )
+{
+    // find a good tag name
+    var name = element.name;
+    // count the number of items
+    if( name === &quot;Item&quot; ) {
+        ++this.numberOfItems;
+    }
+    var count = 1;
+    while( this.dicomElements[name] ) {
+        name = element.name + (count++).toString();
+    }
+    // store it
+    this.dicomElements[name] = { 
+        &quot;group&quot;: element.group, 
+        &quot;element&quot;: element.element,
+        &quot;vr&quot;: element.vr,
+        &quot;vl&quot;: element.vl,
+        &quot;value&quot;: element.value 
+    };
+};
+
+/**
+ * Read a DICOM tag.
+ * @method readTag
+ * @param reader The raw data reader.
+ * @param offset The offset where to start to read.
+ * @returns An object containing the tags &#x27;group&#x27;, &#x27;element&#x27; and &#x27;name&#x27;.
+ */
+dwv.dicom.DicomParser.prototype.readTag = function(reader, offset)
+{
+    // group
+    var group = reader.readHex(offset);
+    // element
+    var element = reader.readHex(offset+2);
+    // name
+    var name = &quot;dwv::unknown&quot;;
+    if( dwv.dicom.dictionary[group] ) {
+        if( dwv.dicom.dictionary[group][element] ) {
+            name = dwv.dicom.dictionary[group][element][2];
+        }
+    }
+    // return
+    return {&#x27;group&#x27;: group, &#x27;element&#x27;: element, &#x27;name&#x27;: name};
+};
+
+/**
+ * Read a DICOM data element.
+ * @method readDataElement
+ * @param reader The raw data reader.
+ * @param offset The offset where to start to read.
+ * @param implicit Is the DICOM VR implicit?
+ * @returns {Object} An object containing the element &#x27;tag&#x27;, &#x27;vl&#x27;, &#x27;vr&#x27;, &#x27;data&#x27; and &#x27;offset&#x27;.
+ */
+dwv.dicom.DicomParser.prototype.readDataElement = function(reader, offset, implicit)
+{
+    // tag: group, element
+    var tag = this.readTag(reader, offset);
+    var tagOffset = 4;
+    
+    var vr; // Value Representation (VR)
+    var vl; // Value Length (VL)
+    var vrOffset = 0; // byte size of VR
+    var vlOffset = 0; // byte size of VL
+    
+    // (private) Item group case
+    if( tag.group === &quot;0xFFFE&quot; ) {
+        vr = &quot;N/A&quot;;
+        vrOffset = 0;
+        vl = reader.readUint32( offset+tagOffset );
+        vlOffset = 4;
+    }
+    // non Item case
+    else {
+        // implicit VR?
+        if(implicit) {
+            vr = &quot;UN&quot;;
+            if( dwv.dicom.dictionary[tag.group] ) {
+                if( dwv.dicom.dictionary[tag.group][tag.element] ) {
+                    vr = dwv.dicom.dictionary[tag.group][tag.element][0];
+                }
+            }
+            vrOffset = 0;
+            vl = reader.readUint32( offset+tagOffset+vrOffset );
+            vlOffset = 4;
+        }
+        else {
+            vr = reader.readString( offset+tagOffset, 2 );
+            vrOffset = 2;
+            // long representations
+            if(vr === &quot;OB&quot; || vr === &quot;OF&quot; || vr === &quot;SQ&quot; || vr === &quot;OW&quot; || vr === &quot;UN&quot;) {
+                vl = reader.readUint32( offset+tagOffset+vrOffset+2 );
+                vlOffset = 6;
+            }
+            // short representation
+            else {
+                vl = reader.readUint16( offset+tagOffset+vrOffset );
+                vlOffset = 2;
+            }
+        }
+    }
+    
+    // check the value of VL
+    if( vl === 0xffffffff ) {
+        vl = 0;
+    }
+    
+    
+    // data
+    var data;
+    var dataOffset = offset+tagOffset+vrOffset+vlOffset;
+    if( vr === &quot;US&quot; || vr === &quot;UL&quot;)
+    {
+        var num = reader.readNumber( dataOffset, vl );
+        if ( isNaN(num) ) {
+            console.warn(&quot;Not a number returned for tag: &quot;+tag.name);
+        }
+        data = [num];
+    }
+    else if( vr === &quot;OB&quot; || vr === &quot;N/A&quot;)
+    {
+        data = reader.readUint8Array( dataOffset, vl );
+    }
+    else if( vr === &quot;OX&quot; || vr === &quot;OW&quot; )
+    {
+        if ( vr === &quot;OX&quot; ) {
+            console.warn(&quot;OX value representation for tag: &quot;+tag.name+&quot;.&quot;);
+        }
+        if ( typeof(this.dicomElements.BitsAllocated) !== &#x27;undefined&#x27; &amp;&amp;
+                this.dicomElements.BitsAllocated.value[0] === 8 ) {
+            data = reader.readUint8Array( dataOffset, vl );
+        }
+        else {
+            data = reader.readUint16Array( dataOffset, vl );
+        }
+    }
+    else
+    {
+        data = reader.readString( dataOffset, vl);
+        data = data.split(&quot;\\&quot;);                
+    }    
+
+    // total element offset
+    var elementOffset = tagOffset + vrOffset + vlOffset + vl;
+    
+    // return
+    return { 
+        &#x27;tag&#x27;: tag, 
+        &#x27;vr&#x27;: vr, 
+        &#x27;vl&#x27;: vl, 
+        &#x27;data&#x27;: data,
+        &#x27;offset&#x27;: elementOffset
+    };    
+};
+
+/**
+ * Parse the complete DICOM file (given as input to the class).
+ * Fills in the member object &#x27;dicomElements&#x27;.
+ * @method parse
+ * @param buffer The input array buffer.
+ */
+dwv.dicom.DicomParser.prototype.parse = function(buffer)
+{
+    var offset = 0;
+    var implicit = false;
+    var jpeg = false;
+    var jpeg2000 = false;
+    // default readers
+    var metaReader = new dwv.dicom.DataReader(buffer);
+    var dataReader = new dwv.dicom.DataReader(buffer);
+
+    // 128 -&gt; 132: magic word
+    offset = 128;
+    var magicword = metaReader.readString( offset, 4 );
+    if(magicword !== &quot;DICM&quot;)
+    {
+        throw new Error(&quot;Not a valid DICOM file (no magic DICM word found)&quot;);
+    }
+    offset += 4;
+    
+    // 0x0002, 0x0000: MetaElementGroupLength
+    var dataElement = this.readDataElement(metaReader, offset);
+    var metaLength = parseInt(dataElement.data, 10);
+    offset += dataElement.offset;
+    
+    // meta elements
+    var metaStart = offset;
+    var metaEnd = metaStart + metaLength;
+    var i = metaStart;
+    while( i &lt; metaEnd ) 
+    {
+        // get the data element
+        dataElement = this.readDataElement(metaReader, i, false);
+        // check the transfer syntax
+        if( dataElement.tag.name === &quot;TransferSyntaxUID&quot; ) {
+            var syntax = dwv.utils.cleanString(dataElement.data[0]);
+            
+            // Implicit VR - Little Endian
+            if( syntax === &quot;1.2.840.10008.1.2&quot; ) {
+                implicit = true;
+            }
+            // Explicit VR - Little Endian (default): 1.2.840.10008.1.2.1 
+            // Deflated Explicit VR - Little Endian
+            else if( syntax === &quot;1.2.840.10008.1.2.1.99&quot; ) {
+                throw new Error(&quot;Unsupported DICOM transfer syntax (Deflated Explicit VR): &quot;+syntax);
+            }
+            // Explicit VR - Big Endian
+            else if( syntax === &quot;1.2.840.10008.1.2.2&quot; ) {
+                dataReader = new dwv.dicom.DataReader(buffer,false);
+            }
+            // JPEG
+            else if( dwv.dicom.isJpegTransferSyntax(syntax) ) {
+                jpeg = true;
+                //console.log(&quot;JPEG compressed DICOM data: &quot; + syntax);
+                throw new Error(&quot;Unsupported DICOM transfer syntax (JPEG): &quot;+syntax);
+            }
+            // JPEG-LS
+            else if( dwv.dicom.isJpeglsTransferSyntax(syntax) ) {
+                //console.log(&quot;JPEG-LS compressed DICOM data: &quot; + syntax);
+                throw new Error(&quot;Unsupported DICOM transfer syntax (JPEG-LS): &quot;+syntax);
+            }
+            // JPEG 2000
+            else if( dwv.dicom.isJpeg2000TransferSyntax(syntax) ) {
+                console.log(&quot;JPEG 2000 compressed DICOM data: &quot; + syntax);
+                jpeg2000 = true;
+            }
+            // MPEG2 Image Compression
+            else if( syntax === &quot;1.2.840.10008.1.2.4.100&quot; ) {
+                throw new Error(&quot;Unsupported DICOM transfer syntax (MPEG2): &quot;+syntax);
+            }
+            // RLE (lossless)
+            else if( syntax === &quot;1.2.840.10008.1.2.5&quot; ) {
+                throw new Error(&quot;Unsupported DICOM transfer syntax (RLE): &quot;+syntax);
+            }
+        }            
+        // store the data element
+        this.appendDicomElement( { 
+            &#x27;name&#x27;: dataElement.tag.name,
+            &#x27;group&#x27;: dataElement.tag.group, 
+            &#x27;vr&#x27; : dataElement.vr, 
+            &#x27;vl&#x27; : dataElement.vl, 
+            &#x27;element&#x27;: dataElement.tag.element,
+            &#x27;value&#x27;: dataElement.data 
+        });
+        // increment index
+        i += dataElement.offset;
+    }
+    
+    var startedPixelItems = false;
+    
+    var tagName = &quot;&quot;;
+    // DICOM data elements
+    while( i &lt; buffer.byteLength ) 
+    {
+        // get the data element
+        try
+        {
+            dataElement = this.readDataElement(dataReader, i, implicit);
+        }
+        catch(err)
+        {
+            console.warn(&quot;Problem reading at &quot; + i + &quot; / &quot; + buffer.byteLength +
+                &quot;, after &quot; + tagName + &quot;.\n&quot; + err);
+        }
+        tagName = dataElement.tag.name;
+        // store pixel data from multiple items
+        if( startedPixelItems ) {
+            if( tagName === &quot;Item&quot; ) {
+                if( dataElement.data.length === 4 ) {
+                    console.log(&quot;Skipping Basic Offset Table.&quot;);
+                }
+                else if( dataElement.data.length !== 0 ) {
+                    console.log(&quot;Concatenating multiple pixel data items, length: &quot;+dataElement.data.length);
+                    // concat does not work on typed arrays
+                    //this.pixelBuffer = this.pixelBuffer.concat( dataElement.data );
+                    // manual concat...
+                    var size = dataElement.data.length + this.pixelBuffer.length;
+                    var newBuffer = new Uint16Array(size);
+                    newBuffer.set( this.pixelBuffer, 0 );
+                    newBuffer.set( dataElement.data, this.pixelBuffer.length );
+                    this.pixelBuffer = newBuffer;
+                }
+            }
+            else if( tagName === &quot;SequenceDelimitationItem&quot; ) {
+                startedPixelItems = false;
+            }
+            else {
+                throw new Error(&quot;Unexpected tag in encapsulated pixel data: &quot;+dataElement.tag.name);
+            }
+        }
+        // check the pixel data tag
+        if( tagName === &quot;PixelData&quot;) {
+            if( dataElement.data.length !== 0 ) {
+                this.pixelBuffer = dataElement.data;
+            }
+            else {
+                startedPixelItems = true;
+            }
+        }
+        // store the data element
+        this.appendDicomElement( {
+            &#x27;name&#x27;: tagName,
+            &#x27;group&#x27; : dataElement.tag.group, 
+            &#x27;vr&#x27; : dataElement.vr, 
+            &#x27;vl&#x27; : dataElement.vl, 
+            &#x27;element&#x27;: dataElement.tag.element,
+            &#x27;value&#x27;: dataElement.data 
+        });
+        // increment index
+        i += dataElement.offset;
+    }
+    
+    // uncompress data
+    if( jpeg ) {
+        // using jpgjs from https://github.com/notmasteryet/jpgjs
+        // -&gt; error with ffc3 and ffc1 jpeg jfif marker
+        /*var j = new JpegImage();
+        j.parse(this.pixelBuffer);
+        var d = 0;
+        j.copyToImageData(d);
+        this.pixelBuffer = d.data;*/
+    }
+    else if( jpeg2000 ) {
+        // decompress pixel buffer into Uint8 image
+        var uint8Image = null;
+        try {
+            uint8Image = openjpeg(this.pixelBuffer, &quot;j2k&quot;);
+        } catch(error) {
+            throw new Error(&quot;Cannot decode JPEG 2000 ([&quot; +error.name + &quot;] &quot; + error.message + &quot;)&quot;);
+        }
+        this.pixelBuffer = uint8Image.data;
+    }
+};
+
+    </pre>
+</div>
                     </div>
                 </div>
             </div>
