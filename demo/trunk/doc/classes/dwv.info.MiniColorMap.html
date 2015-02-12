@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>image.ViewFactory - dwv</title>
+    <title>dwv.info.MiniColorMap - dwv</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
     <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
@@ -43,6 +43,7 @@
                                 <li><a href="../classes/dwv.dicom.DataReader.html">dwv.dicom.DataReader</a></li>
                                 <li><a href="../classes/dwv.dicom.DicomParser.html">dwv.dicom.DicomParser</a></li>
                                 <li><a href="../classes/dwv.gui.html">dwv.gui</a></li>
+                                <li><a href="../classes/dwv.gui.base.html">dwv.gui.base</a></li>
                                 <li><a href="../classes/dwv.gui.base.DicomTags.html">dwv.gui.base.DicomTags</a></li>
                                 <li><a href="../classes/dwv.gui.base.Draw.html">dwv.gui.base.Draw</a></li>
                                 <li><a href="../classes/dwv.gui.base.FileLoad.html">dwv.gui.base.FileLoad</a></li>
@@ -66,14 +67,22 @@
                                 <li><a href="../classes/dwv.image.filter.Sobel.html">dwv.image.filter.Sobel</a></li>
                                 <li><a href="../classes/dwv.image.filter.Threshold.html">dwv.image.filter.Threshold</a></li>
                                 <li><a href="../classes/dwv.image.Image.html">dwv.image.Image</a></li>
+                                <li><a href="../classes/dwv.image.ImageFactory.html">dwv.image.ImageFactory</a></li>
                                 <li><a href="../classes/dwv.image.lut.Rescale.html">dwv.image.lut.Rescale</a></li>
                                 <li><a href="../classes/dwv.image.lut.Window.html">dwv.image.lut.Window</a></li>
                                 <li><a href="../classes/dwv.image.Size.html">dwv.image.Size</a></li>
                                 <li><a href="../classes/dwv.image.Spacing.html">dwv.image.Spacing</a></li>
                                 <li><a href="../classes/dwv.image.View.html">dwv.image.View</a></li>
+                                <li><a href="../classes/dwv.image.ViewFactory.html">dwv.image.ViewFactory</a></li>
                                 <li><a href="../classes/dwv.info.html">dwv.info</a></li>
+                                <li><a href="../classes/dwv.info.MiniColorMap.html">dwv.info.MiniColorMap</a></li>
+                                <li><a href="../classes/dwv.info.Plot.html">dwv.info.Plot</a></li>
+                                <li><a href="../classes/dwv.info.Position.html">dwv.info.Position</a></li>
+                                <li><a href="../classes/dwv.info.WindowLevel.html">dwv.info.WindowLevel</a></li>
+                                <li><a href="../classes/dwv.io.html">dwv.io</a></li>
                                 <li><a href="../classes/dwv.io.File.html">dwv.io.File</a></li>
                                 <li><a href="../classes/dwv.io.Url.html">dwv.io.Url</a></li>
+                                <li><a href="../classes/dwv.math.html">dwv.math</a></li>
                                 <li><a href="../classes/dwv.math.BucketQueue.html">dwv.math.BucketQueue</a></li>
                                 <li><a href="../classes/dwv.math.Circle.html">dwv.math.Circle</a></li>
                                 <li><a href="../classes/dwv.math.Ellipse.html">dwv.math.Ellipse</a></li>
@@ -111,8 +120,6 @@
                                 <li><a href="../classes/dwv.ToolboxController.html">dwv.ToolboxController</a></li>
                                 <li><a href="../classes/dwv.utils.html">dwv.utils</a></li>
                                 <li><a href="../classes/dwv.ViewController.html">dwv.ViewController</a></li>
-                                <li><a href="../classes/image.ImageFactory.html">image.ImageFactory</a></li>
-                                <li><a href="../classes/image.ViewFactory.html">image.ViewFactory</a></li>
                             </ul>
                 
                             <ul id="api-modules" class="apis modules">
@@ -159,30 +166,36 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-                        <h1>image.ViewFactory Class</h1>
+                        <h1>dwv.info.MiniColorMap Class</h1>
                         <div class="box meta">
                         
                         
                                 <div class="foundat">
-                                    Defined in: <a href="../files/src_image_view.js.html#l427"><code>src&#x2F;image&#x2F;view.js:427</code></a>
+                                    Defined in: <a href="../files/src_tools_info.js.html#l128"><code>src&#x2F;tools&#x2F;info.js:128</code></a>
                                 </div>
                         
-                                    Module: <a href="../modules/image.html">image</a>
+                                    Module: <a href="../modules/info.html">info</a>
                         
                         </div>
                         
                         
                         <div class="box intro">
-                            <p>View factory.</p>
+                            <p>MiniColorMap info layer.</p>
                         
                         </div>
                         
                             <div class="constructor">
                                 <h2>Constructor</h2>
-                                <div id="method_image.ViewFactory" class="method item">
-                                    <h3 class="name"><code>image.ViewFactory</code></h3>
+                                <div id="method_dwv.info.MiniColorMap" class="method item">
+                                    <h3 class="name"><code>dwv.info.MiniColorMap</code></h3>
                                 
-                                        <span class="paren">()</span>
+                                        <div class="args">
+                                            <span class="paren">(</span><ul class="args-list inline commas">
+                                                <li class="arg">
+                                                        <code>app</code>
+                                                </li>
+                                            </ul><span class="paren">)</span>
+                                        </div>
                                 
                                 
                                 
@@ -194,7 +207,7 @@
                                     <div class="meta">
                                                 <p>
                                                 Defined in
-                                        <a href="../files/src_image_view.js.html#l427"><code>src&#x2F;image&#x2F;view.js:427</code></a>
+                                        <a href="../files/src_tools_info.js.html#l128"><code>src&#x2F;tools&#x2F;info.js:128</code></a>
                                         </p>
                                 
                                 
@@ -205,6 +218,23 @@
                                         
                                     </div>
                                 
+                                        <div class="params">
+                                            <h4>Parameters:</h4>
+                                
+                                            <ul class="params-list">
+                                                <li class="param">
+                                                        <code class="param-name">app</code>
+                                                        <span class="type">Object</span>
+                                
+                                
+                                                    <div class="param-description">
+                                                        <p>The associated application.</p>
+                                
+                                                    </div>
+                                
+                                                </li>
+                                            </ul>
+                                        </div>
                                 
                                 
                                 </div>
@@ -226,7 +256,11 @@
                         
                                             <ul class="index-list methods">
                                                     <li class="index-item method">
-                                                        <a href="#method_create">create</a>
+                                                        <a href="#method_createMiniColorMap">createMiniColorMap</a>
+                        
+                                                    </li>
+                                                    <li class="index-item method">
+                                                        <a href="#method_updateMiniColorMap">updateMiniColorMap</a>
                         
                                                     </li>
                                             </ul>
@@ -239,23 +273,11 @@
                                     <div id="methods" class="api-class-tabpanel">
                                         <h2 class="off-left">Methods</h2>
                         
-                                            <div id="method_create" class="method item">
-                                                <h3 class="name"><code>create</code></h3>
+                                            <div id="method_createMiniColorMap" class="method item">
+                                                <h3 class="name"><code>createMiniColorMap</code></h3>
                                             
-                                                    <div class="args">
-                                                        <span class="paren">(</span><ul class="args-list inline commas">
-                                                            <li class="arg">
-                                                                    <code>dicomElements</code>
-                                                            </li>
-                                                            <li class="arg">
-                                                                    <code>pixelBuffer</code>
-                                                            </li>
-                                                        </ul><span class="paren">)</span>
-                                                    </div>
+                                                    <span class="paren">()</span>
                                             
-                                                    <span class="returns-inline">
-                                                        <span class="type">View</span>
-                                                    </span>
                                             
                                             
                                             
@@ -266,7 +288,7 @@
                                                 <div class="meta">
                                                             <p>
                                                             Defined in
-                                                    <a href="../files/src_image_view.js.html#l435"><code>src&#x2F;image&#x2F;view.js:435</code></a>
+                                                    <a href="../files/src_tools_info.js.html#l137"><code>src&#x2F;tools&#x2F;info.js:137</code></a>
                                                     </p>
                                             
                                             
@@ -274,7 +296,43 @@
                                                 </div>
                                             
                                                 <div class="description">
-                                                    <p>Get an View object from the read DICOM file.</p>
+                                                    <p>Create the mini color map info div.</p>
+                                            
+                                                </div>
+                                            
+                                            
+                                            
+                                            </div>
+                                            <div id="method_updateMiniColorMap" class="method item">
+                                                <h3 class="name"><code>updateMiniColorMap</code></h3>
+                                            
+                                                    <div class="args">
+                                                        <span class="paren">(</span><ul class="args-list inline commas">
+                                                            <li class="arg">
+                                                                    <code>event</code>
+                                                            </li>
+                                                        </ul><span class="paren">)</span>
+                                                    </div>
+                                            
+                                            
+                                            
+                                            
+                                            
+                                            
+                                            
+                                            
+                                                <div class="meta">
+                                                            <p>
+                                                            Defined in
+                                                    <a href="../files/src_tools_info.js.html#l156"><code>src&#x2F;tools&#x2F;info.js:156</code></a>
+                                                    </p>
+                                            
+                                            
+                                            
+                                                </div>
+                                            
+                                                <div class="description">
+                                                    <p>Update the mini color map info div.</p>
                                             
                                                 </div>
                                             
@@ -283,23 +341,13 @@
                                             
                                                         <ul class="params-list">
                                                             <li class="param">
-                                                                    <code class="param-name">dicomElements</code>
+                                                                    <code class="param-name">event</code>
                                                                     <span class="type">Object</span>
                                             
                                             
                                                                 <div class="param-description">
-                                                                    <p>The DICOM tags.</p>
-                                            
-                                                                </div>
-                                            
-                                                            </li>
-                                                            <li class="param">
-                                                                    <code class="param-name">pixelBuffer</code>
-                                                                    <span class="type">Array</span>
-                                            
-                                            
-                                                                <div class="param-description">
-                                                                    <p>The pixel buffer.</p>
+                                                                    <p>The windowing change event containing the new values.
+                                            Warning: expects the mini color map div to exist (use after createMiniColorMap).</p>
                                             
                                                                 </div>
                                             
@@ -307,15 +355,6 @@
                                                         </ul>
                                                     </div>
                                             
-                                                    <div class="returns">
-                                                        <h4>Returns:</h4>
-                                            
-                                                        <div class="returns-description">
-                                                                    <span class="type">View</span>:
-                                                                <p>The new View.</p>
-                                            
-                                                        </div>
-                                                    </div>
                                             
                                             </div>
                                     </div>

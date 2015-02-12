@@ -43,6 +43,7 @@
                                 <li><a href="../classes/dwv.dicom.DataReader.html">dwv.dicom.DataReader</a></li>
                                 <li><a href="../classes/dwv.dicom.DicomParser.html">dwv.dicom.DicomParser</a></li>
                                 <li><a href="../classes/dwv.gui.html">dwv.gui</a></li>
+                                <li><a href="../classes/dwv.gui.base.html">dwv.gui.base</a></li>
                                 <li><a href="../classes/dwv.gui.base.DicomTags.html">dwv.gui.base.DicomTags</a></li>
                                 <li><a href="../classes/dwv.gui.base.Draw.html">dwv.gui.base.Draw</a></li>
                                 <li><a href="../classes/dwv.gui.base.FileLoad.html">dwv.gui.base.FileLoad</a></li>
@@ -66,14 +67,22 @@
                                 <li><a href="../classes/dwv.image.filter.Sobel.html">dwv.image.filter.Sobel</a></li>
                                 <li><a href="../classes/dwv.image.filter.Threshold.html">dwv.image.filter.Threshold</a></li>
                                 <li><a href="../classes/dwv.image.Image.html">dwv.image.Image</a></li>
+                                <li><a href="../classes/dwv.image.ImageFactory.html">dwv.image.ImageFactory</a></li>
                                 <li><a href="../classes/dwv.image.lut.Rescale.html">dwv.image.lut.Rescale</a></li>
                                 <li><a href="../classes/dwv.image.lut.Window.html">dwv.image.lut.Window</a></li>
                                 <li><a href="../classes/dwv.image.Size.html">dwv.image.Size</a></li>
                                 <li><a href="../classes/dwv.image.Spacing.html">dwv.image.Spacing</a></li>
                                 <li><a href="../classes/dwv.image.View.html">dwv.image.View</a></li>
+                                <li><a href="../classes/dwv.image.ViewFactory.html">dwv.image.ViewFactory</a></li>
                                 <li><a href="../classes/dwv.info.html">dwv.info</a></li>
+                                <li><a href="../classes/dwv.info.MiniColorMap.html">dwv.info.MiniColorMap</a></li>
+                                <li><a href="../classes/dwv.info.Plot.html">dwv.info.Plot</a></li>
+                                <li><a href="../classes/dwv.info.Position.html">dwv.info.Position</a></li>
+                                <li><a href="../classes/dwv.info.WindowLevel.html">dwv.info.WindowLevel</a></li>
+                                <li><a href="../classes/dwv.io.html">dwv.io</a></li>
                                 <li><a href="../classes/dwv.io.File.html">dwv.io.File</a></li>
                                 <li><a href="../classes/dwv.io.Url.html">dwv.io.Url</a></li>
+                                <li><a href="../classes/dwv.math.html">dwv.math</a></li>
                                 <li><a href="../classes/dwv.math.BucketQueue.html">dwv.math.BucketQueue</a></li>
                                 <li><a href="../classes/dwv.math.Circle.html">dwv.math.Circle</a></li>
                                 <li><a href="../classes/dwv.math.Ellipse.html">dwv.math.Ellipse</a></li>
@@ -111,8 +120,6 @@
                                 <li><a href="../classes/dwv.ToolboxController.html">dwv.ToolboxController</a></li>
                                 <li><a href="../classes/dwv.utils.html">dwv.utils</a></li>
                                 <li><a href="../classes/dwv.ViewController.html">dwv.ViewController</a></li>
-                                <li><a href="../classes/image.ImageFactory.html">image.ImageFactory</a></li>
-                                <li><a href="../classes/image.ViewFactory.html">image.ViewFactory</a></li>
                             </ul>
                 
                             <ul id="api-modules" class="apis modules">
@@ -176,11 +183,18 @@
                          */
                         dwv.info = dwv.info || {};
                         
-                        dwv.info.Windowing = function ( app ) {
+                        /**
+                         * WindowLevel info layer.
+                         * @class WindowLevel
+                         * @namespace dwv.info
+                         * @constructor
+                         * @param {Object} app The associated application.
+                         */
+                        dwv.info.Windowing = function ( app )
+                        {
                             /**
                              * Create the windowing info div.
                              * @method createWindowingDiv
-                             * @static
                              * @param {String} rootId The div root ID.
                              */
                             this.create = function ()
@@ -206,7 +220,6 @@
                             /**
                              * Update the Top Right info div.
                              * @method updateWindowingDiv
-                             * @static
                              * @param {Object} event The windowing change event containing the new values.
                              * Warning: expects the windowing info div to exist (use after createWindowingDiv).
                              */
@@ -225,11 +238,18 @@
                             
                         }; // class dwv.info.Windowing
                         
-                        dwv.info.Position = function ( app ) {
+                        /**
+                         * Position info layer.
+                         * @class Position
+                         * @namespace dwv.info
+                         * @constructor
+                         * @param {Object} app The associated application.
+                         */
+                        dwv.info.Position = function ( app )
+                        {
                             /**
                              * Create the position info div.
                              * @method createPositionDiv
-                             * @static
                              * @param {String} rootId The div root ID.
                              */
                             this.create = function ()
@@ -256,7 +276,6 @@
                             /**
                              * Update the position info div.
                              * @method updatePositionDiv
-                             * @static
                              * @param {Object} event The position change event containing the new values.
                              * Warning: expects the position info div to exist (use after createPositionDiv).
                              */
@@ -278,11 +297,18 @@
                             };
                         }; // class dwv.info.Position
                         
-                        dwv.info.MiniColorMap = function ( app ) {
+                        /**
+                         * MiniColorMap info layer.
+                         * @class MiniColorMap
+                         * @namespace dwv.info
+                         * @constructor
+                         * @param {Object} app The associated application.
+                         */
+                        dwv.info.MiniColorMap = function ( app )
+                        {
                             /**
                              * Create the mini color map info div.
                              * @method createMiniColorMap
-                             * @static
                              */
                             this.create = function ()
                             {    
@@ -302,7 +328,6 @@
                             /**
                              * Update the mini color map info div.
                              * @method updateMiniColorMap
-                             * @static
                              * @param {Object} event The windowing change event containing the new values.
                              * Warning: expects the mini color map div to exist (use after createMiniColorMap).
                              */
@@ -360,12 +385,18 @@
                         }; // class dwv.info.MiniColorMap
                         
                         
-                        dwv.info.Plot = function (app) {
-                        
+                        /**
+                         * Plot info layer.
+                         * @class Plot
+                         * @namespace dwv.info
+                         * @constructor
+                         * @param {Object} app The associated application.
+                         */
+                        dwv.info.Plot = function (app)
+                        {
                             /**
                              * Create the plot info.
                              * @method create
-                             * @static
                              * @param {String} rootId The div root ID.
                              */
                             this.create = function()
@@ -381,7 +412,6 @@
                             /**
                              * Update plot.
                              * @method update
-                             * @static
                              * @param {Object} event The windowing change event containing the new values.
                              * Warning: expects the plot to exist (use after createPlot).
                              */

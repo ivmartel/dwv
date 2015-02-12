@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>dwv.tool.MoveGroupCommand - dwv</title>
+    <title>dwv.gui.base - dwv</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
     <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
@@ -166,56 +166,24 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-                        <h1>dwv.tool.MoveGroupCommand Class</h1>
+                        <h1>dwv.gui.base Class</h1>
                         <div class="box meta">
                         
                         
                                 <div class="foundat">
-                                    Defined in: <a href="../files/src_tools_draw.js.html#l45"><code>src&#x2F;tools&#x2F;draw.js:45</code></a>
+                                    Defined in: <a href="../files/src_gui_generic.js.html#l13"><code>src&#x2F;gui&#x2F;generic.js:13</code></a>
                                 </div>
                         
-                                    Module: <a href="../modules/tool.html">tool</a>
+                                    Module: <a href="../modules/gui.html">gui</a>
                         
                         </div>
                         
                         
                         <div class="box intro">
-                            <p>Move group command.</p>
+                            <p>Namespace for base GUI functions.</p>
                         
                         </div>
                         
-                            <div class="constructor">
-                                <h2>Constructor</h2>
-                                <div id="method_dwv.tool.MoveGroupCommand" class="method item">
-                                    <h3 class="name"><code>dwv.tool.MoveGroupCommand</code></h3>
-                                
-                                        <span class="paren">()</span>
-                                
-                                
-                                
-                                
-                                
-                                
-                                
-                                
-                                    <div class="meta">
-                                                <p>
-                                                Defined in
-                                        <a href="../files/src_tools_draw.js.html#l45"><code>src&#x2F;tools&#x2F;draw.js:45</code></a>
-                                        </p>
-                                
-                                
-                                
-                                    </div>
-                                
-                                    <div class="description">
-                                        
-                                    </div>
-                                
-                                
-                                
-                                </div>
-                            </div>
                         
                         <div id="classdocs" class="tabview">
                             <ul class="api-class-tabs">
@@ -233,16 +201,29 @@
                         
                                             <ul class="index-list methods">
                                                     <li class="index-item method">
-                                                        <a href="#method_execute">execute</a>
+                                                        <a href="#method_displayProgress">displayProgress</a>
                         
+                                                            <span class="flag static">static</span>
                                                     </li>
                                                     <li class="index-item method">
-                                                        <a href="#method_getName">getName</a>
+                                                        <a href="#method_getWindowSize">getWindowSize</a>
                         
+                                                            <span class="flag static">static</span>
                                                     </li>
                                                     <li class="index-item method">
-                                                        <a href="#method_undo">undo</a>
+                                                        <a href="#method_refreshSelect">refreshSelect</a>
                         
+                                                            <span class="flag static">static</span>
+                                                    </li>
+                                                    <li class="index-item method">
+                                                        <a href="#method_refreshSelect">refreshSelect</a>
+                        
+                                                            <span class="flag static">static</span>
+                                                    </li>
+                                                    <li class="index-item method">
+                                                        <a href="#method_updateProgress">updateProgress</a>
+                        
+                                                            <span class="flag static">static</span>
                                                     </li>
                                             </ul>
                                         </div>
@@ -254,94 +235,29 @@
                                     <div id="methods" class="api-class-tabpanel">
                                         <h2 class="off-left">Methods</h2>
                         
-                                            <div id="method_execute" class="method item">
-                                                <h3 class="name"><code>execute</code></h3>
+                                            <div id="method_displayProgress" class="method item">
+                                                <h3 class="name"><code>displayProgress</code></h3>
                                             
-                                                    <span class="paren">()</span>
-                                            
-                                            
-                                            
-                                            
-                                            
-                                            
-                                            
-                                            
-                                                <div class="meta">
-                                                            <p>
-                                                            Defined in
-                                                    <a href="../files/src_tools_draw.js.html#l60"><code>src&#x2F;tools&#x2F;draw.js:60</code></a>
-                                                    </p>
-                                            
-                                            
-                                            
-                                                </div>
-                                            
-                                                <div class="description">
-                                                    <p>Execute the command.</p>
-                                            
-                                                </div>
-                                            
-                                            
-                                            
-                                            </div>
-                                            <div id="method_getName" class="method item">
-                                                <h3 class="name"><code>getName</code></h3>
-                                            
-                                                    <span class="paren">()</span>
-                                            
-                                                    <span class="returns-inline">
-                                                        <span class="type">String</span>
-                                                    </span>
-                                            
-                                            
-                                            
-                                            
-                                            
-                                            
-                                            
-                                                <div class="meta">
-                                                            <p>
-                                                            Defined in
-                                                    <a href="../files/src_tools_draw.js.html#l53"><code>src&#x2F;tools&#x2F;draw.js:53</code></a>
-                                                    </p>
-                                            
-                                            
-                                            
-                                                </div>
-                                            
-                                                <div class="description">
-                                                    <p>Get the command name.</p>
-                                            
-                                                </div>
-                                            
-                                            
-                                                    <div class="returns">
-                                                        <h4>Returns:</h4>
-                                            
-                                                        <div class="returns-description">
-                                                                    <span class="type">String</span>:
-                                                                <p>The command name.</p>
-                                            
-                                                        </div>
+                                                    <div class="args">
+                                                        <span class="paren">(</span><ul class="args-list inline commas">
+                                                            <li class="arg">
+                                                                    <code>percent</code>
+                                                            </li>
+                                                        </ul><span class="paren">)</span>
                                                     </div>
                                             
-                                            </div>
-                                            <div id="method_undo" class="method item">
-                                                <h3 class="name"><code>undo</code></h3>
-                                            
-                                                    <span class="paren">()</span>
                                             
                                             
                                             
                                             
-                                            
+                                                    <span class="flag static">static</span>
                                             
                                             
                                             
                                                 <div class="meta">
                                                             <p>
                                                             Defined in
-                                                    <a href="../files/src_tools_draw.js.html#l73"><code>src&#x2F;tools&#x2F;draw.js:73</code></a>
+                                                    <a href="../files/src_gui_generic.js.html#l47"><code>src&#x2F;gui&#x2F;generic.js:47</code></a>
                                                     </p>
                                             
                                             
@@ -349,10 +265,234 @@
                                                 </div>
                                             
                                                 <div class="description">
-                                                    <p>Undo the command.</p>
+                                                    <p>Display a progress value.</p>
                                             
                                                 </div>
                                             
+                                                    <div class="params">
+                                                        <h4>Parameters:</h4>
+                                            
+                                                        <ul class="params-list">
+                                                            <li class="param">
+                                                                    <code class="param-name">percent</code>
+                                                                    <span class="type">Number</span>
+                                            
+                                            
+                                                                <div class="param-description">
+                                                                    <p>The progress percentage.</p>
+                                            
+                                                                </div>
+                                            
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                            
+                                            
+                                            </div>
+                                            <div id="method_getWindowSize" class="method item">
+                                                <h3 class="name"><code>getWindowSize</code></h3>
+                                            
+                                                    <span class="paren">()</span>
+                                            
+                                            
+                                            
+                                            
+                                            
+                                                    <span class="flag static">static</span>
+                                            
+                                            
+                                            
+                                                <div class="meta">
+                                                            <p>
+                                                            Defined in
+                                                    <a href="../files/src_gui_generic.js.html#l21"><code>src&#x2F;gui&#x2F;generic.js:21</code></a>
+                                                    </p>
+                                            
+                                            
+                                            
+                                                </div>
+                                            
+                                                <div class="description">
+                                                    <p>Get the size of the image display window.</p>
+                                            
+                                                </div>
+                                            
+                                            
+                                            
+                                            </div>
+                                            <div id="method_refreshSelect" class="method item">
+                                                <h3 class="name"><code>refreshSelect</code></h3>
+                                            
+                                                    <div class="args">
+                                                        <span class="paren">(</span><ul class="args-list inline commas">
+                                                            <li class="arg">
+                                                                    <code>selectName</code>
+                                                            </li>
+                                                        </ul><span class="paren">)</span>
+                                                    </div>
+                                            
+                                            
+                                            
+                                            
+                                            
+                                                    <span class="flag static">static</span>
+                                            
+                                            
+                                            
+                                                <div class="meta">
+                                                            <p>
+                                                            Defined in
+                                                    <a href="../files/src_gui_generic.js.html#l64"><code>src&#x2F;gui&#x2F;generic.js:64</code></a>
+                                                    </p>
+                                            
+                                            
+                                            
+                                                </div>
+                                            
+                                                <div class="description">
+                                                    <p>Refresh a HTML select. Mainly for jquery-mobile.</p>
+                                            
+                                                </div>
+                                            
+                                                    <div class="params">
+                                                        <h4>Parameters:</h4>
+                                            
+                                                        <ul class="params-list">
+                                                            <li class="param">
+                                                                    <code class="param-name">selectName</code>
+                                                                    <span class="type">String</span>
+                                            
+                                            
+                                                                <div class="param-description">
+                                                                    <p>The name of the HTML select to refresh.</p>
+                                            
+                                                                </div>
+                                            
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                            
+                                            
+                                            </div>
+                                            <div id="method_refreshSelect" class="method item">
+                                                <h3 class="name"><code>refreshSelect</code></h3>
+                                            
+                                                    <div class="args">
+                                                        <span class="paren">(</span><ul class="args-list inline commas">
+                                                            <li class="arg">
+                                                                    <code>selectName</code>
+                                                            </li>
+                                                            <li class="arg">
+                                                                    <code>itemName</code>
+                                                            </li>
+                                                        </ul><span class="paren">)</span>
+                                                    </div>
+                                            
+                                            
+                                            
+                                            
+                                            
+                                                    <span class="flag static">static</span>
+                                            
+                                            
+                                            
+                                                <div class="meta">
+                                                            <p>
+                                                            Defined in
+                                                    <a href="../files/src_gui_generic.js.html#l78"><code>src&#x2F;gui&#x2F;generic.js:78</code></a>
+                                                    </p>
+                                            
+                                            
+                                            
+                                                </div>
+                                            
+                                                <div class="description">
+                                                    <p>Set the selected item of a HTML select.</p>
+                                            
+                                                </div>
+                                            
+                                                    <div class="params">
+                                                        <h4>Parameters:</h4>
+                                            
+                                                        <ul class="params-list">
+                                                            <li class="param">
+                                                                    <code class="param-name">selectName</code>
+                                                                    <span class="type">String</span>
+                                            
+                                            
+                                                                <div class="param-description">
+                                                                    <p>The name of the HTML select.</p>
+                                            
+                                                                </div>
+                                            
+                                                            </li>
+                                                            <li class="param">
+                                                                    <code class="param-name">itemName</code>
+                                                                    <span class="type">String</span>
+                                            
+                                            
+                                                                <div class="param-description">
+                                                                    <p>The name of the itme to mark as selected.</p>
+                                            
+                                                                </div>
+                                            
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                            
+                                            
+                                            </div>
+                                            <div id="method_updateProgress" class="method item">
+                                                <h3 class="name"><code>updateProgress</code></h3>
+                                            
+                                                    <div class="args">
+                                                        <span class="paren">(</span><ul class="args-list inline commas">
+                                                            <li class="arg">
+                                                                    <code>event</code>
+                                                            </li>
+                                                        </ul><span class="paren">)</span>
+                                                    </div>
+                                            
+                                            
+                                            
+                                            
+                                            
+                                                    <span class="flag static">static</span>
+                                            
+                                            
+                                            
+                                                <div class="meta">
+                                                            <p>
+                                                            Defined in
+                                                    <a href="../files/src_gui_generic.js.html#l31"><code>src&#x2F;gui&#x2F;generic.js:31</code></a>
+                                                    </p>
+                                            
+                                            
+                                            
+                                                </div>
+                                            
+                                                <div class="description">
+                                                    <p>Update the progress bar.</p>
+                                            
+                                                </div>
+                                            
+                                                    <div class="params">
+                                                        <h4>Parameters:</h4>
+                                            
+                                                        <ul class="params-list">
+                                                            <li class="param">
+                                                                    <code class="param-name">event</code>
+                                                                    <span class="type">Object</span>
+                                            
+                                            
+                                                                <div class="param-description">
+                                                                    <p>A ProgressEvent.</p>
+                                            
+                                                                </div>
+                                            
+                                                            </li>
+                                                        </ul>
+                                                    </div>
                                             
                                             
                                             </div>

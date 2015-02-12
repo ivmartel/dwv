@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>image.ImageFactory - dwv</title>
+    <title>dwv.image.ViewFactory - dwv</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
     <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
@@ -43,6 +43,7 @@
                                 <li><a href="../classes/dwv.dicom.DataReader.html">dwv.dicom.DataReader</a></li>
                                 <li><a href="../classes/dwv.dicom.DicomParser.html">dwv.dicom.DicomParser</a></li>
                                 <li><a href="../classes/dwv.gui.html">dwv.gui</a></li>
+                                <li><a href="../classes/dwv.gui.base.html">dwv.gui.base</a></li>
                                 <li><a href="../classes/dwv.gui.base.DicomTags.html">dwv.gui.base.DicomTags</a></li>
                                 <li><a href="../classes/dwv.gui.base.Draw.html">dwv.gui.base.Draw</a></li>
                                 <li><a href="../classes/dwv.gui.base.FileLoad.html">dwv.gui.base.FileLoad</a></li>
@@ -66,14 +67,22 @@
                                 <li><a href="../classes/dwv.image.filter.Sobel.html">dwv.image.filter.Sobel</a></li>
                                 <li><a href="../classes/dwv.image.filter.Threshold.html">dwv.image.filter.Threshold</a></li>
                                 <li><a href="../classes/dwv.image.Image.html">dwv.image.Image</a></li>
+                                <li><a href="../classes/dwv.image.ImageFactory.html">dwv.image.ImageFactory</a></li>
                                 <li><a href="../classes/dwv.image.lut.Rescale.html">dwv.image.lut.Rescale</a></li>
                                 <li><a href="../classes/dwv.image.lut.Window.html">dwv.image.lut.Window</a></li>
                                 <li><a href="../classes/dwv.image.Size.html">dwv.image.Size</a></li>
                                 <li><a href="../classes/dwv.image.Spacing.html">dwv.image.Spacing</a></li>
                                 <li><a href="../classes/dwv.image.View.html">dwv.image.View</a></li>
+                                <li><a href="../classes/dwv.image.ViewFactory.html">dwv.image.ViewFactory</a></li>
                                 <li><a href="../classes/dwv.info.html">dwv.info</a></li>
+                                <li><a href="../classes/dwv.info.MiniColorMap.html">dwv.info.MiniColorMap</a></li>
+                                <li><a href="../classes/dwv.info.Plot.html">dwv.info.Plot</a></li>
+                                <li><a href="../classes/dwv.info.Position.html">dwv.info.Position</a></li>
+                                <li><a href="../classes/dwv.info.WindowLevel.html">dwv.info.WindowLevel</a></li>
+                                <li><a href="../classes/dwv.io.html">dwv.io</a></li>
                                 <li><a href="../classes/dwv.io.File.html">dwv.io.File</a></li>
                                 <li><a href="../classes/dwv.io.Url.html">dwv.io.Url</a></li>
+                                <li><a href="../classes/dwv.math.html">dwv.math</a></li>
                                 <li><a href="../classes/dwv.math.BucketQueue.html">dwv.math.BucketQueue</a></li>
                                 <li><a href="../classes/dwv.math.Circle.html">dwv.math.Circle</a></li>
                                 <li><a href="../classes/dwv.math.Ellipse.html">dwv.math.Ellipse</a></li>
@@ -111,8 +120,6 @@
                                 <li><a href="../classes/dwv.ToolboxController.html">dwv.ToolboxController</a></li>
                                 <li><a href="../classes/dwv.utils.html">dwv.utils</a></li>
                                 <li><a href="../classes/dwv.ViewController.html">dwv.ViewController</a></li>
-                                <li><a href="../classes/image.ImageFactory.html">image.ImageFactory</a></li>
-                                <li><a href="../classes/image.ViewFactory.html">image.ViewFactory</a></li>
                             </ul>
                 
                             <ul id="api-modules" class="apis modules">
@@ -159,12 +166,12 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-                        <h1>image.ImageFactory Class</h1>
+                        <h1>dwv.image.ViewFactory Class</h1>
                         <div class="box meta">
                         
                         
                                 <div class="foundat">
-                                    Defined in: <a href="../files/src_image_image.js.html#l790"><code>src&#x2F;image&#x2F;image.js:790</code></a>
+                                    Defined in: <a href="../files/src_image_view.js.html#l427"><code>src&#x2F;image&#x2F;view.js:427</code></a>
                                 </div>
                         
                                     Module: <a href="../modules/image.html">image</a>
@@ -173,14 +180,14 @@
                         
                         
                         <div class="box intro">
-                            <p>Image factory.</p>
+                            <p>View factory.</p>
                         
                         </div>
                         
                             <div class="constructor">
                                 <h2>Constructor</h2>
-                                <div id="method_image.ImageFactory" class="method item">
-                                    <h3 class="name"><code>image.ImageFactory</code></h3>
+                                <div id="method_dwv.image.ViewFactory" class="method item">
+                                    <h3 class="name"><code>dwv.image.ViewFactory</code></h3>
                                 
                                         <span class="paren">()</span>
                                 
@@ -194,7 +201,7 @@
                                     <div class="meta">
                                                 <p>
                                                 Defined in
-                                        <a href="../files/src_image_image.js.html#l790"><code>src&#x2F;image&#x2F;image.js:790</code></a>
+                                        <a href="../files/src_image_view.js.html#l427"><code>src&#x2F;image&#x2F;view.js:427</code></a>
                                         </p>
                                 
                                 
@@ -266,7 +273,7 @@
                                                 <div class="meta">
                                                             <p>
                                                             Defined in
-                                                    <a href="../files/src_image_image.js.html#l798"><code>src&#x2F;image&#x2F;image.js:798</code></a>
+                                                    <a href="../files/src_image_view.js.html#l435"><code>src&#x2F;image&#x2F;view.js:435</code></a>
                                                     </p>
                                             
                                             
@@ -274,7 +281,7 @@
                                                 </div>
                                             
                                                 <div class="description">
-                                                    <p>Get an Image object from the read DICOM file.</p>
+                                                    <p>Get an View object from the read DICOM file.</p>
                                             
                                                 </div>
                                             
@@ -312,7 +319,7 @@
                                             
                                                         <div class="returns-description">
                                                                     <span class="type">View</span>:
-                                                                <p>A new Image.</p>
+                                                                <p>The new View.</p>
                                             
                                                         </div>
                                                     </div>
