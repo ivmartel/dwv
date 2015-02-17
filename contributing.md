@@ -29,8 +29,8 @@ license to reproduce, prepare derivative works of, publicly display, publicly pe
 sublicense, relicense, and distribute Your Contributions and such derivative works. Except for this license 
 You reserve all right, title, and interest in and to Your Contributions.
 
-In plain English, I do this to simplify the licensing process and not have to ask every contributor
-for his approval each time. Rest assured, the code and your contributions will always stay GPL.
+_In plain English, I do this to simplify the licensing process and not have to ask every contributor
+for his approval each time. Rest assured, the code and your contributions will always stay GPL._
 
 Some references about Contributor License Agreement (CLA):
  * This text was inspired from [The Apache Software Foundation Individual Contributor License Agreement](https://www.apache.org/licenses/icla.txt)
