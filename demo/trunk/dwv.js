@@ -8542,11 +8542,20 @@ dwv.io.Url.prototype.load = function(ioArray)
     // Request handler
     var onLoadRequest = function(/*event*/)
     {
-        // find the image type
+        // find the image type from its signature
         var view = new DataView(this.response);
         var isJpeg = view.getUint32(0) === 0xffd8ffe0;
         var isPng = view.getUint32(0) === 0x89504e47;
         var isGif = view.getUint32(0) === 0x47494638;
+        
+        // check possible extension
+        if( !isJpeg && !isPng && !isGif )
+        {
+            var ext = this.responseURL.split('.').pop().toLowerCase();
+            isJpeg = (ext === "jpg") || (ext === "jpeg");
+            isPng = (ext === "png");
+            isGif = (ext === "gif");
+        }
         
         // non DICOM
         if( isJpeg || isPng || isGif )
