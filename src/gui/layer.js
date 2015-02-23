@@ -381,11 +381,25 @@ dwv.html.getEventOffset = function (event) {
     var ex = 0;
     var ey = 0;
     if ( event.targetTouches ) {
+        // get the touch offset from all its parents
+        var offsetLeft = 0;
+        var offsetTop = 0;
+        var offsetParent = event.targetTouches[0].target.offsetParent;
+        while ( offsetParent ) {
+            if (!isNaN(offsetParent.offsetLeft)) {
+                offsetLeft += offsetParent.offsetLeft;
+            }
+            if (!isNaN(offsetParent.offsetTop)) {
+                offsetTop += offsetParent.offsetTop;
+            }
+            offsetParent = offsetParent.offsetParent;
+        }
+        // set its position
         var touch = null;
         for ( var i = 0 ; i < event.targetTouches.length; ++i ) {
             touch = event.targetTouches[i];
-            ex = touch.pageX - app.getImageLayer().getOffset().left;
-            ey = touch.pageY - app.getImageLayer().getOffset().top;
+            ex = touch.pageX - offsetLeft;
+            ey = touch.pageY - offsetTop;
             positions.push({'x': ex, 'y': ey});
         }
     }
