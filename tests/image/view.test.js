@@ -10,11 +10,13 @@ test("Test listeners.", function() {
     var size0 = 4;
     var imgSize0 = new dwv.image.Size(size0, size0, 1);
     var imgSpacing0 = new dwv.image.Spacing(1, 1, 1);
+    var imgOrigin0 = new dwv.math.Point3D(0,0,0);
+    var imgGeometry0 = new dwv.image.Geometry(imgOrigin0, imgSize0, imgSpacing0);
     var buffer0 = [];
     for(var i=0; i<size0*size0; ++i) {
         buffer0[i] = i;
     }
-    var image0 = new dwv.image.Image(imgSize0, imgSpacing0, buffer0);
+    var image0 = new dwv.image.Image(imgGeometry0, buffer0);
     image0.setMeta( { BitsStored: 8 } );
     // create a view
     var view0 = new dwv.image.View(image0);
@@ -43,11 +45,13 @@ test("Test generate data MONO.", function() {
     var size0 = 2;
     var imgSize0 = new dwv.image.Size(size0, size0, 1);
     var imgSpacing0 = new dwv.image.Spacing(1, 1, 1);
+    var imgOrigin0 = new dwv.math.Point3D(0,0,0);
+    var imgGeometry0 = new dwv.image.Geometry(imgOrigin0, imgSize0, imgSpacing0);
     var buffer0 = [];
     for ( var i = 0; i < size0 * size0; ++i ) {
         buffer0[i] = i;
     }
-    var image0 = new dwv.image.Image(imgSize0, imgSpacing0, buffer0);
+    var image0 = new dwv.image.Image(imgGeometry0, buffer0);
     image0.setMeta( { 'BitsStored': 8 } );
     // create a view
     var view0 = new dwv.image.View(image0);
@@ -77,6 +81,8 @@ test("Test generate data RGB.", function() {
     var size0 = 2;
     var imgSize0 = new dwv.image.Size(size0, size0, 1);
     var imgSpacing0 = new dwv.image.Spacing(1, 1, 1);
+    var imgOrigin0 = new dwv.math.Point3D(0,0,0);
+    var imgGeometry0 = new dwv.image.Geometry(imgOrigin0, imgSize0, imgSpacing0);
     var buffer0 = [];
     var index = 0;
     var value = 0;
@@ -88,7 +94,7 @@ test("Test generate data RGB.", function() {
         buffer0[index+2] = value;
         index += 3;
     }
-    var image0 = new dwv.image.Image(imgSize0, imgSpacing0, buffer0);
+    var image0 = new dwv.image.Image(imgGeometry0, buffer0);
     image0.setPhotometricInterpretation('RGB');
     image0.setMeta( { 'BitsStored': 8 } );
     // create a view
@@ -123,7 +129,7 @@ test("Test generate data RGB.", function() {
         buffer1[index+3] = 255;
         index += 4;
     }
-    var image1 = new dwv.image.Image(imgSize0, imgSpacing0, buffer1);
+    var image1 = new dwv.image.Image(imgGeometry0, buffer1);
     image1.setPhotometricInterpretation('RGB');
     image1.setPlanarConfiguration(1);
     image1.setMeta( { 'BitsStored': 8 } );
@@ -151,11 +157,13 @@ test("Test generate data timing.", function() {
     var size0 = 128;
     var imgSize0 = new dwv.image.Size(size0, size0, 1);
     var imgSpacing0 = new dwv.image.Spacing(1, 1, 1);
+    var imgOrigin0 = new dwv.math.Point3D(0,0,0);
+    var imgGeometry0 = new dwv.image.Geometry(imgOrigin0, imgSize0, imgSpacing0);
     var buffer0 = [];
     for(var i=0; i<size0*size0; ++i) {
         buffer0[i] = i;
     }
-    var image0 = new dwv.image.Image(imgSize0, imgSpacing0, buffer0);
+    var image0 = new dwv.image.Image(imgGeometry0, buffer0);
     image0.setMeta( { BitsStored: 8 } );
     // create a view
     var view0 = new dwv.image.View(image0);

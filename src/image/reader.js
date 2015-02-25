@@ -43,7 +43,9 @@ dwv.image.getDataFromImage = function(image)
     // TODO: wrong info...
     var imageSpacing = new dwv.image.Spacing(1,1);
     var sliceIndex = image.index ? image.index : 0;
-    var dwvImage = new dwv.image.Image(imageSize, imageSpacing, buffer, [[0,0,sliceIndex]]);
+    var origin = new dwv.math.Point3D(0,0,sliceIndex);
+    var geometry = new dwv.image.Geometry(origin, imageSize, imageSpacing );
+    var dwvImage = new dwv.image.Image( geometry, buffer );
     dwvImage.setPhotometricInterpretation("RGB");
     // meta information
     var meta = {};

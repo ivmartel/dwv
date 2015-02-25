@@ -24,7 +24,8 @@ dwv.image.View = function(image, isSigned)
      * @type Rescale
      */
     var rescaleLut = new dwv.image.lut.Rescale(
-        image.getRescaleSlope(), image.getRescaleIntercept() );
+        image.getRescaleSlopeAndIntercept().getSlope(), 
+        image.getRescaleSlopeAndIntercept().getIntercept() );
     // initialise it
     rescaleLut.initialise(image.getMeta().BitsStored);
     
@@ -154,7 +155,7 @@ dwv.image.View = function(image, isSigned)
      * @param {Object} pos The current position.
      */ 
     this.setCurrentPosition = function(pos) { 
-        if( !image.getSize().isInBounds(pos.i,pos.j,pos.k) ) {
+        if( !image.getGeometry().getSize().isInBounds(pos.i,pos.j,pos.k) ) {
             return false;
         }
         var oldPosition = currentPosition;
@@ -302,13 +303,12 @@ dwv.image.View.prototype.generateImageData = function( array )
     var windowLut = this.getWindowLut();
     var colorMap = this.getColorMap();
     var index = 0;
-    var sliceSize = 0;
+    var sliceSize = image.getGeometry().getSize().getSliceSize();
     var sliceOffset = 0;
     switch (photoInterpretation)
     {
     case "MONOCHROME1":
     case "MONOCHROME2":
-        sliceSize = image.getSize().getSliceSize();
         sliceOffset = (sliceNumber || 0) * sliceSize;
         var iMax = sliceOffset + sliceSize;
         for(var i=sliceOffset; i < iMax; ++i)
@@ -328,7 +328,6 @@ dwv.image.View.prototype.generateImageData = function( array )
         if( planarConfig !== 0 && planarConfig !== 1 ) {
             throw new Error("Unsupported planar configuration: "+planarConfig);
         }
-        sliceSize = image.getSize().getSliceSize();
         sliceOffset = (sliceNumber || 0) * 3 * sliceSize;
         // default: RGBRGBRGBRGB...
         var posR = sliceOffset;
@@ -346,7 +345,7 @@ dwv.image.View.prototype.generateImageData = function( array )
         var redValue = 0;
         var greenValue = 0;
         var blueValue = 0;
-        for(var j=0; j < image.getSize().getSliceSize(); ++j)
+        for(var j=0; j < sliceSize; ++j)
         {        
             redValue = parseInt( windowLut.getValue( 
                     image.getValueAtOffset(posR) ), 10 );

@@ -5,51 +5,18 @@
 /* global module, test, equal, deepEqual */
 module("image");
 
-test("Test Size.", function() {
-    var size0 = new dwv.image.Size(2, 3, 4);
-    // test its values
-    equal( size0.getNumberOfColumns(), 2, "getNumberOfColumns" );
-    equal( size0.getNumberOfRows(), 3, "getNumberOfRows" );
-    equal( size0.getNumberOfSlices(), 4, "getNumberOfSlices" );
-    equal( size0.getSliceSize(), 6, "getSliceSize" );
-    equal( size0.getTotalSize(), 24, "getTotalSize" );
-    // equality
-    equal( size0.equals(size0), 1, "equals self true" );
-    var size1 = new dwv.image.Size(2, 3, 4);
-    equal( size0.equals(size1), 1, "equals true" );
-    var size2 = new dwv.image.Size(3, 3, 4);
-    equal( size0.equals(size2), 0, "equals false" );
-    // is in bounds
-    equal( size0.isInBounds(0,0,0), 1, "isInBounds 0" );
-    equal( size0.isInBounds(1,2,3), 1, "isInBounds max" );
-    equal( size0.isInBounds(2,3,4), 0, "isInBounds too big" );
-    equal( size0.isInBounds(-1,2,3), 0, "isInBounds too small" );
-});
-
-test("Test Spacing.", function() {
-    var spacing0 = new dwv.image.Spacing(2, 3, 4);
-    // test its values
-    equal( spacing0.getColumnSpacing(), 2, "getColumnSpacing" );
-    equal( spacing0.getRowSpacing(), 3, "getRowSpacing" );
-    equal( spacing0.getSliceSpacing(), 4, "getSliceSpacing" );
-    // equality
-    equal( spacing0.equals(spacing0), 1, "equals self true" );
-    var spacing1 = new dwv.image.Spacing(2, 3, 4);
-    equal( spacing0.equals(spacing1), 1, "equals true" );
-    var spacing2 = new dwv.image.Spacing(3, 3, 4);
-    equal( spacing0.equals(spacing2), 0, "equals false" );
-});
-
 test("Test Image getValue.", function() {
     // create a simple image
     var size0 = 4;
     var imgSize0 = new dwv.image.Size(size0, size0, 1);
     var imgSpacing0 = new dwv.image.Spacing(1, 1, 1);
+    var imgOrigin0 = new dwv.math.Point3D(0,0,0);
+    var imgGeometry0 = new dwv.image.Geometry(imgOrigin0, imgSize0, imgSpacing0);
     var buffer0 = [];
     for(var i=0; i<size0*size0; ++i) {
         buffer0[i] = i;
     }
-    var image0 = new dwv.image.Image(imgSize0, imgSpacing0, buffer0);
+    var image0 = new dwv.image.Image(imgGeometry0, buffer0);
     // test its values
     equal( image0.getValue(0, 0, 0), 0, "Value at 0,0,0" );
     equal( image0.getValue(1, 0, 0), 1, "Value at 1,0,0" );
@@ -75,11 +42,11 @@ test("Test Image getValue.", function() {
     equal( histoContentTest, true, "histogram content" );
     
     // image with rescale
-    var image1 = new dwv.image.Image(imgSize0, imgSpacing0, buffer0);
+    var image1 = new dwv.image.Image(imgGeometry0, buffer0);
     var slope1 = 2;
-    image1.setRescaleSlope(slope1);
     var intercept1 = 10;
-    image1.setRescaleIntercept(intercept1);
+    var rsi1 = new dwv.image.RescaleSlopeAndIntercept(slope1, intercept1);
+    image1.setRescaleSlopeAndIntercept(rsi1);
     // test its values
     equal( image1.getValue(0, 0, 0), 0, "Value at 0,0,0" );
     equal( image1.getValue(1, 0, 0), 1, "Value at 1,0,0" );
@@ -95,7 +62,10 @@ test("Test Image append slice.", function (assert) {
     var size = 4;
     var imgSize = new dwv.image.Size(size, size, 2);
     var imgSpacing = new dwv.image.Spacing(1, 1, 1);
-
+    var imgOrigin = new dwv.math.Point3D(0,0,0);
+    var imgGeometry0 = new dwv.image.Geometry(imgOrigin, imgSize, imgSpacing);
+    imgGeometry0.appendOrigin(new dwv.math.Point3D(0,0,1), 1);
+    
     // slice to append
     var sliceSize = new dwv.image.Size(size, size, 1);
     var sliceBuffer = new Int16Array(sliceSize.getTotalSize());
@@ -113,13 +83,15 @@ test("Test Image append slice.", function (assert) {
     }
     
     // image 0
-    var image0 = new dwv.image.Image(imgSize, imgSpacing, buffer, [[0,0,0],[0,0,1]]);
+    var image0 = new dwv.image.Image(imgGeometry0, buffer);
     // append null
     assert.throws( function () {
             image0.appendSlice(null);
         }, new Error("Cannot append null slice"), "append null slice");
     // real slice
-    var slice0 = new dwv.image.Image(sliceSize, imgSpacing, sliceBuffer, [[0,0,-1]]);
+    var sliceOrigin = new dwv.math.Point3D(0,0,-1);
+    var sliceGeometry = new dwv.image.Geometry(sliceOrigin, sliceSize, imgSpacing);
+    var slice0 = new dwv.image.Image(sliceGeometry, sliceBuffer);
     // append slice before
     image0.appendSlice(slice0);
     // test its values
@@ -130,15 +102,19 @@ test("Test Image append slice.", function (assert) {
     equal( image0.getValue(0, 0, 2), 1, "Value at 0,0,2 (append before)" );
     equal( image0.getValue(3, 3, 2), 1, "Value at 3,3,2 (append before)" );
     // test its positions
-    var slicePositions0 = [];
-    slicePositions0[0] = [0,0,-1];
-    slicePositions0[1] = [0,0,0];
-    slicePositions0[2] = [0,0,1];
-    deepEqual( image0.getSlicePositions(), slicePositions0, "Slice positions (append before)" );
+    var sliceOrigins0 = [];
+    sliceOrigins0[0] = new dwv.math.Point3D(0,0,-1);
+    sliceOrigins0[1] = new dwv.math.Point3D(0,0,0);
+    sliceOrigins0[2] = new dwv.math.Point3D(0,0,1);
+    deepEqual( imgGeometry0.getOrigins(), sliceOrigins0, "Slice positions (append before)" );
     
     // image 1
-    var image1 = new dwv.image.Image(imgSize, imgSpacing, buffer, [[0,0,0],[0,0,1]]);
-    var slice1 = new dwv.image.Image(sliceSize, imgSpacing, sliceBuffer, [[0,0,2]]);
+    var imgGeometry1 = new dwv.image.Geometry(imgOrigin, imgSize, imgSpacing);
+    imgGeometry1.appendOrigin(new dwv.math.Point3D(0,0,1), 1);
+    var image1 = new dwv.image.Image(imgGeometry1, buffer);
+    var sliceOrigin1 = new dwv.math.Point3D(0,0,2);
+    var sliceGeometry1 = new dwv.image.Geometry(sliceOrigin1, sliceSize, imgSpacing);
+    var slice1 = new dwv.image.Image(sliceGeometry1, sliceBuffer);
     // append slice before
     image1.appendSlice(slice1);
     // test its values
@@ -149,15 +125,19 @@ test("Test Image append slice.", function (assert) {
     equal( image1.getValue(0, 0, 2), 2, "Value at 0,0,2 (append after)" );
     equal( image1.getValue(3, 3, 2), 2, "Value at 3,3,2 (append after)" );
     // test its positions
-    var slicePositions1 = [];
-    slicePositions1[0] = [0,0,0];
-    slicePositions1[1] = [0,0,1];
-    slicePositions1[2] = [0,0,2];
-    deepEqual( image1.getSlicePositions(), slicePositions1, "Slice positions (append after)" );
+    var sliceOrigins1 = [];
+    sliceOrigins1[0] = new dwv.math.Point3D(0,0,0);
+    sliceOrigins1[1] = new dwv.math.Point3D(0,0,1);
+    sliceOrigins1[2] = new dwv.math.Point3D(0,0,2);
+    deepEqual( imgGeometry1.getOrigins(), sliceOrigins1, "Slice positions (append after)" );
 
     // image 2
-    var image2 = new dwv.image.Image(imgSize, imgSpacing, buffer, [[0,0,0],[0,0,1]]);
-    var slice2 = new dwv.image.Image(sliceSize, imgSpacing, sliceBuffer, [[0,0,0.4]]);
+    var imgGeometry2 = new dwv.image.Geometry(imgOrigin, imgSize, imgSpacing);
+    imgGeometry2.appendOrigin(new dwv.math.Point3D(0,0,1), 1);
+    var image2 = new dwv.image.Image(imgGeometry2, buffer);
+    var sliceOrigin2 = new dwv.math.Point3D(0,0,0.4);
+    var sliceGeometry2 = new dwv.image.Geometry(sliceOrigin2, sliceSize, imgSpacing);
+    var slice2 = new dwv.image.Image(sliceGeometry2, sliceBuffer);
     // append slice before
     image2.appendSlice(slice2);
     // test its values
@@ -168,11 +148,11 @@ test("Test Image append slice.", function (assert) {
     equal( image2.getValue(0, 0, 2), 1, "Value at 0,0,2 (append between)" );
     equal( image2.getValue(3, 3, 2), 1, "Value at 3,3,2 (append between)" );
     // test its positions
-    var slicePositions2 = [];
-    slicePositions2[0] = [0,0,0];
-    slicePositions2[1] = [0,0,0.4];
-    slicePositions2[2] = [0,0,1];
-    deepEqual( image2.getSlicePositions(), slicePositions2, "Slice positions (append between)" );
+    var sliceOrigins2 = [];
+    sliceOrigins2[0] = new dwv.math.Point3D(0,0,0);
+    sliceOrigins2[1] = new dwv.math.Point3D(0,0,0.4);
+    sliceOrigins2[2] = new dwv.math.Point3D(0,0,1);
+    deepEqual( imgGeometry2.getOrigins(), sliceOrigins2, "Slice positions (append between)" );
 });
 
 test("Test Image convolute2D.", function() {
@@ -180,11 +160,13 @@ test("Test Image convolute2D.", function() {
     var size0 = 3;
     var imgSize0 = new dwv.image.Size(size0, size0, 1);
     var imgSpacing0 = new dwv.image.Spacing(1, 1, 1);
+    var imgOrigin0 = new dwv.math.Point3D(0,0,0);
+    var imgGeometry0 = new dwv.image.Geometry(imgOrigin0, imgSize0, imgSpacing0);
     var buffer0 = [];
     for ( var i = 0; i < size0*size0; ++i ) {
         buffer0[i] = i;
     }
-    var image0 = new dwv.image.Image(imgSize0, imgSpacing0, buffer0);
+    var image0 = new dwv.image.Image(imgGeometry0, buffer0);
     // id convolution
     var weights0 = [ 0, 0, 0, 0, 1, 0, 0, 0, 0 ];
     var resImage0 = image0.convolute2D( weights0 );
@@ -216,11 +198,13 @@ test("Test Image transform.", function() {
     var size0 = 3;
     var imgSize0 = new dwv.image.Size(size0, size0, 1);
     var imgSpacing0 = new dwv.image.Spacing(1, 1, 1);
+    var imgOrigin0 = new dwv.math.Point3D(0,0,0);
+    var imgGeometry0 = new dwv.image.Geometry(imgOrigin0, imgSize0, imgSpacing0);
     var buffer0 = [];
     for ( var i = 0; i < size0*size0; ++i ) {
         buffer0[i] = i;
     }
-    var image0 = new dwv.image.Image(imgSize0, imgSpacing0, buffer0);
+    var image0 = new dwv.image.Image(imgGeometry0, buffer0);
     
     // treshold function
     var func0 = function ( value ) {
@@ -243,7 +227,7 @@ test("Test Image transform.", function() {
     equal( testContent0, true, "transform threshold" );
     
     // transform changes the calling image... reset it
-    image0 = new dwv.image.Image(imgSize0, imgSpacing0, buffer0);
+    image0 = new dwv.image.Image(imgGeometry0, buffer0);
     
     // multiply function
     var func1 = function ( value ) {

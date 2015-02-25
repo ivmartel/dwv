@@ -1140,8 +1140,9 @@ dwv.App = function ()
         image = originalImage;
         
         // layout
-        dataWidth = image.getSize().getNumberOfColumns();
-        dataHeight = image.getSize().getNumberOfRows();
+        var size = image.getGeometry().getSize();
+        dataWidth = size.getNumberOfColumns();
+        dataHeight = size.getNumberOfRows();
         createLayers(dataWidth, dataHeight);
         
         // get the image data from the image layer

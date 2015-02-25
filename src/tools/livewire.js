@@ -91,7 +91,8 @@ dwv.tool.Livewire = function(app)
      * @private
      */
     function clearParentPoints() {
-        for( var i = 0; i < app.getImage().getSize().getNumberOfRows(); ++i ) {
+        var nrows = app.getImage().getGeometry().getSize().getNumberOfRows();
+        for( var i = 0; i < nrows; ++i ) {
             parentPoints[i] = [];
         }
     }
@@ -320,9 +321,10 @@ dwv.tool.Livewire = function(app)
         }
         
         //scissors = new dwv.math.Scissors();
+        var size = app.getImage().getGeometry().getSize();
         scissors.setDimensions(
-                app.getImage().getSize().getNumberOfColumns(),
-                app.getImage().getSize().getNumberOfRows() );
+                size.getNumberOfColumns(),
+                size.getNumberOfRows() );
         scissors.setData(app.getImageData().data);
     };
     
