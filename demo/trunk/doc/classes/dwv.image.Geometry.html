@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>dwv.tool.ProtractorFactory - dwv</title>
+    <title>dwv.image.Geometry - dwv</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
     <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
@@ -169,30 +169,42 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-<h1>dwv.tool.ProtractorFactory Class</h1>
+<h1>dwv.image.Geometry Class</h1>
 <div class="box meta">
 
 
         <div class="foundat">
-            Defined in: <a href="../files/src_tools_protractor.js.html#l9"><code>src&#x2F;tools&#x2F;protractor.js:9</code></a>
+            Defined in: <a href="../files/src_image_geometry.js.html#l131"><code>src&#x2F;image&#x2F;geometry.js:131</code></a>
         </div>
 
-            Module: <a href="../modules/tool.html">tool</a>
+            Module: <a href="../modules/image.html">image</a>
 
 </div>
 
 
 <div class="box intro">
-    <p>Protractor factory.</p>
+    <p>2D/3D Geometry class.</p>
 
 </div>
 
     <div class="constructor">
         <h2>Constructor</h2>
-        <div id="method_dwv.tool.ProtractorFactory" class="method item">
-            <h3 class="name"><code>dwv.tool.ProtractorFactory</code></h3>
+        <div id="method_dwv.image.Geometry" class="method item">
+            <h3 class="name"><code>dwv.image.Geometry</code></h3>
         
-                <span class="paren">()</span>
+                <div class="args">
+                    <span class="paren">(</span><ul class="args-list inline commas">
+                        <li class="arg">
+                                <code>origin</code>
+                        </li>
+                        <li class="arg">
+                                <code>size</code>
+                        </li>
+                        <li class="arg">
+                                <code>spacing</code>
+                        </li>
+                    </ul><span class="paren">)</span>
+                </div>
         
         
         
@@ -204,7 +216,7 @@
             <div class="meta">
                         <p>
                         Defined in
-                <a href="../files/src_tools_protractor.js.html#l9"><code>src&#x2F;tools&#x2F;protractor.js:9</code></a>
+                <a href="../files/src_image_geometry.js.html#l131"><code>src&#x2F;image&#x2F;geometry.js:131</code></a>
                 </p>
         
         
@@ -215,6 +227,45 @@
                 
             </div>
         
+                <div class="params">
+                    <h4>Parameters:</h4>
+        
+                    <ul class="params-list">
+                        <li class="param">
+                                <code class="param-name">origin</code>
+                                <span class="type">Object</span>
+        
+        
+                            <div class="param-description">
+                                <p>The object origin.</p>
+        
+                            </div>
+        
+                        </li>
+                        <li class="param">
+                                <code class="param-name">size</code>
+                                <span class="type">Object</span>
+        
+        
+                            <div class="param-description">
+                                <p>The object size.</p>
+        
+                            </div>
+        
+                        </li>
+                        <li class="param">
+                                <code class="param-name">spacing</code>
+                                <span class="type">Object</span>
+        
+        
+                            <div class="param-description">
+                                <p>The object spacing.</p>
+        
+                            </div>
+        
+                        </li>
+                    </ul>
+                </div>
         
         
         
@@ -237,22 +288,20 @@
 
                     <ul class="index-list methods">
                             <li class="index-item method">
-                                <a href="#method_getNPoints">getNPoints</a>
+                                <a href="#method_equals">equals</a>
 
                             </li>
                             <li class="index-item method">
-                                <a href="#method_getTimeout">getTimeout</a>
+                                <a href="#method_getOrigin">getOrigin</a>
 
                             </li>
                             <li class="index-item method">
-                                <a href="#method_ProtractorCreator">ProtractorCreator</a>
+                                <a href="#method_getSize">getSize</a>
 
-                                    <span class="flag static">static</span>
                             </li>
                             <li class="index-item method">
-                                <a href="#method_UpdateProtractor">UpdateProtractor</a>
+                                <a href="#method_getSpacing">getSpacing</a>
 
-                                    <span class="flag static">static</span>
                             </li>
                     </ul>
                 </div>
@@ -264,13 +313,19 @@
             <div id="methods" class="api-class-tabpanel">
                 <h2 class="off-left">Methods</h2>
 
-<div id="method_getNPoints" class="method item">
-    <h3 class="name"><code>getNPoints</code></h3>
+<div id="method_equals" class="method item">
+    <h3 class="name"><code>equals</code></h3>
 
-        <span class="paren">()</span>
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>rhs</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
 
         <span class="returns-inline">
-            <span class="type">Number</span>
+            <span class="type">Boolean</span>
         </span>
 
 
@@ -282,7 +337,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_tools_protractor.js.html#l17"><code>src&#x2F;tools&#x2F;protractor.js:17</code></a>
+        <a href="../files/src_image_geometry.js.html#l199"><code>src&#x2F;image&#x2F;geometry.js:199</code></a>
         </p>
 
 
@@ -290,30 +345,47 @@
     </div>
 
     <div class="description">
-        <p>Get the number of points needed to build the shape.</p>
+        <p>Check for equality.</p>
 
     </div>
 
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">rhs</code>
+                        <span class="type">Geometry</span>
+
+
+                    <div class="param-description">
+                        <p>The object to compare to.</p>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
 
         <div class="returns">
             <h4>Returns:</h4>
 
             <div class="returns-description">
-                        <span class="type">Number</span>:
-                    <p>The number of points.</p>
+                        <span class="type">Boolean</span>:
+                    <p>True if both objects are equal.</p>
 
             </div>
         </div>
 
 
 </div>
-<div id="method_getTimeout" class="method item">
-    <h3 class="name"><code>getTimeout</code></h3>
+<div id="method_getOrigin" class="method item">
+    <h3 class="name"><code>getOrigin</code></h3>
 
         <span class="paren">()</span>
 
         <span class="returns-inline">
-            <span class="type">Number</span>
+            <span class="type">Object</span>
         </span>
 
 
@@ -325,7 +397,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_tools_protractor.js.html#l23"><code>src&#x2F;tools&#x2F;protractor.js:23</code></a>
+        <a href="../files/src_image_geometry.js.html#l148"><code>src&#x2F;image&#x2F;geometry.js:148</code></a>
         </p>
 
 
@@ -333,7 +405,7 @@
     </div>
 
     <div class="description">
-        <p>Get the timeout between point storage.</p>
+        <p>Get the object origin.</p>
 
     </div>
 
@@ -342,43 +414,33 @@
             <h4>Returns:</h4>
 
             <div class="returns-description">
-                        <span class="type">Number</span>:
-                    <p>The timeout in milliseconds.</p>
+                        <span class="type">Object</span>:
+                    <p>The object origin.</p>
 
             </div>
         </div>
 
 
 </div>
-<div id="method_ProtractorCreator" class="method item">
-    <h3 class="name"><code>ProtractorCreator</code></h3>
+<div id="method_getSize" class="method item">
+    <h3 class="name"><code>getSize</code></h3>
 
-        <div class="args">
-            <span class="paren">(</span><ul class="args-list inline commas">
-                <li class="arg">
-                        <code>points</code>
-                </li>
-                <li class="arg">
-                        <code>style</code>
-                </li>
-                <li class="arg">
-                        <code>image</code>
-                </li>
-            </ul><span class="paren">)</span>
-        </div>
+        <span class="paren">()</span>
+
+        <span class="returns-inline">
+            <span class="type">Object</span>
+        </span>
 
 
 
 
-
-        <span class="flag static">static</span>
 
 
 
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_tools_protractor.js.html#l31"><code>src&#x2F;tools&#x2F;protractor.js:31</code></a>
+        <a href="../files/src_image_geometry.js.html#l155"><code>src&#x2F;image&#x2F;geometry.js:155</code></a>
         </p>
 
 
@@ -386,79 +448,42 @@
     </div>
 
     <div class="description">
-        <p>Create a protractor shape to be displayed.</p>
+        <p>Get the object size.</p>
 
     </div>
 
-        <div class="params">
-            <h4>Parameters:</h4>
 
-            <ul class="params-list">
-                <li class="param">
-                        <code class="param-name">points</code>
-                        <span class="type">Array</span>
+        <div class="returns">
+            <h4>Returns:</h4>
 
+            <div class="returns-description">
+                        <span class="type">Object</span>:
+                    <p>The object size.</p>
 
-                    <div class="param-description">
-                        <p>The points from which to extract the protractor.</p>
-
-                    </div>
-
-                </li>
-                <li class="param">
-                        <code class="param-name">style</code>
-                        <span class="type">Object</span>
-
-
-                    <div class="param-description">
-                        <p>The drawing style.</p>
-
-                    </div>
-
-                </li>
-                <li class="param">
-                        <code class="param-name">image</code>
-                        <span class="type">Object</span>
-
-
-                    <div class="param-description">
-                        <p>The associated image.</p>
-
-                    </div>
-
-                </li>
-            </ul>
+            </div>
         </div>
-
 
 
 </div>
-<div id="method_UpdateProtractor" class="method item">
-    <h3 class="name"><code>UpdateProtractor</code></h3>
+<div id="method_getSpacing" class="method item">
+    <h3 class="name"><code>getSpacing</code></h3>
 
-        <div class="args">
-            <span class="paren">(</span><ul class="args-list inline commas">
-                <li class="arg">
-                        <code>anchor</code>
-                </li>
-                <li class="arg">
-                        <code>image</code>
-                </li>
-            </ul><span class="paren">)</span>
-        </div>
+        <span class="paren">()</span>
+
+        <span class="returns-inline">
+            <span class="type">Object</span>
+        </span>
 
 
 
 
-
-        <span class="flag static">static</span>
 
 
 
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_tools_protractor.js.html#l103"><code>src&#x2F;tools&#x2F;protractor.js:103</code></a>
+        <a href="../files/src_image_geometry.js.html#l161"><code>src&#x2F;image&#x2F;geometry.js:161</code></a>
         </p>
 
 
@@ -466,39 +491,20 @@
     </div>
 
     <div class="description">
-        <p>Update a protractor shape.</p>
+        <p>Get the object spacing.</p>
 
     </div>
 
-        <div class="params">
-            <h4>Parameters:</h4>
 
-            <ul class="params-list">
-                <li class="param">
-                        <code class="param-name">anchor</code>
-                        <span class="type">Object</span>
+        <div class="returns">
+            <h4>Returns:</h4>
 
+            <div class="returns-description">
+                        <span class="type">Object</span>:
+                    <p>The object spacing.</p>
 
-                    <div class="param-description">
-                        <p>The active anchor.</p>
-
-                    </div>
-
-                </li>
-                <li class="param">
-                        <code class="param-name">image</code>
-                        <span class="type">Object</span>
-
-
-                    <div class="param-description">
-                        <p>The associated image.</p>
-
-                    </div>
-
-                </li>
-            </ul>
+            </div>
         </div>
-
 
 
 </div>

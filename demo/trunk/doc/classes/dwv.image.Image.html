@@ -66,6 +66,7 @@
                                 <li><a href="../classes/dwv.image.filter.Sharpen.html">dwv.image.filter.Sharpen</a></li>
                                 <li><a href="../classes/dwv.image.filter.Sobel.html">dwv.image.filter.Sobel</a></li>
                                 <li><a href="../classes/dwv.image.filter.Threshold.html">dwv.image.filter.Threshold</a></li>
+                                <li><a href="../classes/dwv.image.Geometry.html">dwv.image.Geometry</a></li>
                                 <li><a href="../classes/dwv.image.Image.html">dwv.image.Image</a></li>
                                 <li><a href="../classes/dwv.image.ImageFactory.html">dwv.image.ImageFactory</a></li>
                                 <li><a href="../classes/dwv.image.lut.Rescale.html">dwv.image.lut.Rescale</a></li>
@@ -88,9 +89,11 @@
                                 <li><a href="../classes/dwv.math.Ellipse.html">dwv.math.Ellipse</a></li>
                                 <li><a href="../classes/dwv.math.FastPoint2D.html">dwv.math.FastPoint2D</a></li>
                                 <li><a href="../classes/dwv.math.IdGenerator.html">dwv.math.IdGenerator</a></li>
+                                <li><a href="../classes/dwv.math.Index3D.html">dwv.math.Index3D</a></li>
                                 <li><a href="../classes/dwv.math.Line.html">dwv.math.Line</a></li>
                                 <li><a href="../classes/dwv.math.Path.html">dwv.math.Path</a></li>
                                 <li><a href="../classes/dwv.math.Point2D.html">dwv.math.Point2D</a></li>
+                                <li><a href="../classes/dwv.math.Point3D.html">dwv.math.Point3D</a></li>
                                 <li><a href="../classes/dwv.math.Rectangle.html">dwv.math.Rectangle</a></li>
                                 <li><a href="../classes/dwv.math.ROI.html">dwv.math.ROI</a></li>
                                 <li><a href="../classes/dwv.math.Scissors.html">dwv.math.Scissors</a></li>
@@ -171,7 +174,7 @@
 
 
         <div class="foundat">
-            Defined in: <a href="../files/src_image_image.js.html#l133"><code>src&#x2F;image&#x2F;image.js:133</code></a>
+            Defined in: <a href="../files/src_image_image.js.html#l25"><code>src&#x2F;image&#x2F;image.js:25</code></a>
         </div>
 
             Module: <a href="../modules/image.html">image</a>
@@ -198,16 +201,10 @@ Usable once created, optional are:</p>
                 <div class="args">
                     <span class="paren">(</span><ul class="args-list inline commas">
                         <li class="arg">
-                                <code>size</code>
-                        </li>
-                        <li class="arg">
-                                <code>spacing</code>
+                                <code>geometry</code>
                         </li>
                         <li class="arg">
                                 <code>buffer</code>
-                        </li>
-                        <li class="arg">
-                                <code>slicePositions</code>
                         </li>
                     </ul><span class="paren">)</span>
                 </div>
@@ -222,7 +219,7 @@ Usable once created, optional are:</p>
             <div class="meta">
                         <p>
                         Defined in
-                <a href="../files/src_image_image.js.html#l133"><code>src&#x2F;image&#x2F;image.js:133</code></a>
+                <a href="../files/src_image_image.js.html#l25"><code>src&#x2F;image&#x2F;image.js:25</code></a>
                 </p>
         
         
@@ -238,23 +235,12 @@ Usable once created, optional are:</p>
         
                     <ul class="params-list">
                         <li class="param">
-                                <code class="param-name">size</code>
-                                <span class="type">Size</span>
+                                <code class="param-name">geometry</code>
+                                <span class="type">Object</span>
         
         
                             <div class="param-description">
-                                <p>The size of the image.</p>
-        
-                            </div>
-        
-                        </li>
-                        <li class="param">
-                                <code class="param-name">spacing</code>
-                                <span class="type">Spacing</span>
-        
-        
-                            <div class="param-description">
-                                <p>The spacing of the image.</p>
+                                <p>The geometry of the image.</p>
         
                             </div>
         
@@ -266,17 +252,6 @@ Usable once created, optional are:</p>
         
                             <div class="param-description">
                                 <p>The image data.</p>
-        
-                            </div>
-        
-                        </li>
-                        <li class="param">
-                                <code class="param-name">slicePositions</code>
-                                <span class="type">Array</span>
-        
-        
-                            <div class="param-description">
-                                <p>The slice positions.</p>
         
                             </div>
         
@@ -338,6 +313,10 @@ Usable once created, optional are:</p>
 
                             </li>
                             <li class="index-item method">
+                                <a href="#method_getGeometry">getGeometry</a>
+
+                            </li>
+                            <li class="index-item method">
                                 <a href="#method_getHistogram">getHistogram</a>
 
                             </li>
@@ -370,23 +349,7 @@ Usable once created, optional are:</p>
 
                             </li>
                             <li class="index-item method">
-                                <a href="#method_getRescaleIntercept">getRescaleIntercept</a>
-
-                            </li>
-                            <li class="index-item method">
-                                <a href="#method_getRescaleSlope">getRescaleSlope</a>
-
-                            </li>
-                            <li class="index-item method">
-                                <a href="#method_getSize">getSize</a>
-
-                            </li>
-                            <li class="index-item method">
-                                <a href="#method_getSlicePositions">getSlicePositions</a>
-
-                            </li>
-                            <li class="index-item method">
-                                <a href="#method_getSpacing">getSpacing</a>
+                                <a href="#method_getRescaleSlopeAndIntercept">getRescaleSlopeAndIntercept</a>
 
                             </li>
                             <li class="index-item method">
@@ -422,11 +385,7 @@ Usable once created, optional are:</p>
 
                             </li>
                             <li class="index-item method">
-                                <a href="#method_setRescaleIntercept">setRescaleIntercept</a>
-
-                            </li>
-                            <li class="index-item method">
-                                <a href="#method_setRescaleSlope">setRescaleSlope</a>
+                                <a href="#method_setRescaleSlopeAndIntercept">setRescaleSlopeAndIntercept</a>
 
                             </li>
                             <li class="index-item method">
@@ -469,11 +428,7 @@ Usable once created, optional are:</p>
 
                             </li>
                             <li class="index-item property private">
-                                <a href="#property_rescaleIntercept">rescaleIntercept</a>
-
-                            </li>
-                            <li class="index-item property private">
-                                <a href="#property_rescaleSlope">rescaleSlope</a>
+                                <a href="#property_rsi">rsi</a>
 
                             </li>
                     </ul>
@@ -506,7 +461,7 @@ Usable once created, optional are:</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_image_image.js.html#l339"><code>src&#x2F;image&#x2F;image.js:339</code></a>
+        <a href="../files/src_image_image.js.html#l192"><code>src&#x2F;image&#x2F;image.js:192</code></a>
         </p>
 
 
@@ -557,7 +512,7 @@ Usable once created, optional are:</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_image_image.js.html#l496"><code>src&#x2F;image&#x2F;image.js:496</code></a>
+        <a href="../files/src_image_image.js.html#l334"><code>src&#x2F;image&#x2F;image.js:334</code></a>
         </p>
 
 
@@ -600,7 +555,7 @@ Usable once created, optional are:</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_image_image.js.html#l527"><code>src&#x2F;image&#x2F;image.js:527</code></a>
+        <a href="../files/src_image_image.js.html#l365"><code>src&#x2F;image&#x2F;image.js:365</code></a>
         </p>
 
 
@@ -643,7 +598,7 @@ Usable once created, optional are:</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_image_image.js.html#l323"><code>src&#x2F;image&#x2F;image.js:323</code></a>
+        <a href="../files/src_image_image.js.html#l177"><code>src&#x2F;image&#x2F;image.js:177</code></a>
         </p>
 
 
@@ -695,7 +650,7 @@ Usable once created, optional are:</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_image_image.js.html#l719"><code>src&#x2F;image&#x2F;image.js:719</code></a>
+        <a href="../files/src_image_image.js.html#l558"><code>src&#x2F;image&#x2F;image.js:558</code></a>
         </p>
 
 
@@ -773,7 +728,7 @@ Note: Uses the raw buffer values.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_image_image.js.html#l551"><code>src&#x2F;image&#x2F;image.js:551</code></a>
+        <a href="../files/src_image_image.js.html#l389"><code>src&#x2F;image&#x2F;image.js:389</code></a>
         </p>
 
 
@@ -834,7 +789,7 @@ Note: Uses the raw buffer values.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_image_image.js.html#l232"><code>src&#x2F;image&#x2F;image.js:232</code></a>
+        <a href="../files/src_image_image.js.html#l104"><code>src&#x2F;image&#x2F;image.js:104</code></a>
         </p>
 
 
@@ -877,7 +832,7 @@ Note: Uses the raw buffer values.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_image_image.js.html#l429"><code>src&#x2F;image&#x2F;image.js:429</code></a>
+        <a href="../files/src_image_image.js.html#l268"><code>src&#x2F;image&#x2F;image.js:268</code></a>
         </p>
 
 
@@ -902,6 +857,49 @@ Note: Uses the raw buffer values.</p>
 
 
 </div>
+<div id="method_getGeometry" class="method item">
+    <h3 class="name"><code>getGeometry</code></h3>
+
+        <span class="paren">()</span>
+
+        <span class="returns-inline">
+            <span class="type">Object</span>
+        </span>
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/src_image_image.js.html#l98"><code>src&#x2F;image&#x2F;image.js:98</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Get the geometry of the image.</p>
+
+    </div>
+
+
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                        <span class="type">Object</span>:
+                    <p>The size of the image.</p>
+
+            </div>
+        </div>
+
+
+</div>
 <div id="method_getHistogram" class="method item">
     <h3 class="name"><code>getHistogram</code></h3>
 
@@ -920,7 +918,7 @@ Note: Uses the raw buffer values.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_image_image.js.html#l441"><code>src&#x2F;image&#x2F;image.js:441</code></a>
+        <a href="../files/src_image_image.js.html#l280"><code>src&#x2F;image&#x2F;image.js:280</code></a>
         </p>
 
 
@@ -963,7 +961,7 @@ Note: Uses the raw buffer values.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_image_image.js.html#l300"><code>src&#x2F;image&#x2F;image.js:300</code></a>
+        <a href="../files/src_image_image.js.html#l154"><code>src&#x2F;image&#x2F;image.js:154</code></a>
         </p>
 
 
@@ -1006,7 +1004,7 @@ Note: Uses the raw buffer values.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_image_image.js.html#l293"><code>src&#x2F;image&#x2F;image.js:293</code></a>
+        <a href="../files/src_image_image.js.html#l147"><code>src&#x2F;image&#x2F;image.js:147</code></a>
         </p>
 
 
@@ -1049,7 +1047,7 @@ Note: Uses the raw buffer values.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_image_image.js.html#l269"><code>src&#x2F;image&#x2F;image.js:269</code></a>
+        <a href="../files/src_image_image.js.html#l123"><code>src&#x2F;image&#x2F;image.js:123</code></a>
         </p>
 
 
@@ -1092,7 +1090,7 @@ Note: Uses the raw buffer values.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_image_image.js.html#l281"><code>src&#x2F;image&#x2F;image.js:281</code></a>
+        <a href="../files/src_image_image.js.html#l135"><code>src&#x2F;image&#x2F;image.js:135</code></a>
         </p>
 
 
@@ -1135,7 +1133,7 @@ Note: Uses the raw buffer values.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_image_image.js.html#l515"><code>src&#x2F;image&#x2F;image.js:515</code></a>
+        <a href="../files/src_image_image.js.html#l353"><code>src&#x2F;image&#x2F;image.js:353</code></a>
         </p>
 
 
@@ -1190,7 +1188,7 @@ Note: Uses the raw buffer values.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_image_image.js.html#l482"><code>src&#x2F;image&#x2F;image.js:482</code></a>
+        <a href="../files/src_image_image.js.html#l320"><code>src&#x2F;image&#x2F;image.js:320</code></a>
         </p>
 
 
@@ -1279,7 +1277,7 @@ Warning: No size check...</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_image_image.js.html#l470"><code>src&#x2F;image&#x2F;image.js:470</code></a>
+        <a href="../files/src_image_image.js.html#l308"><code>src&#x2F;image&#x2F;image.js:308</code></a>
         </p>
 
 
@@ -1322,13 +1320,13 @@ Warning: No size check...</p>
 
 
 </div>
-<div id="method_getRescaleIntercept" class="method item">
-    <h3 class="name"><code>getRescaleIntercept</code></h3>
+<div id="method_getRescaleSlopeAndIntercept" class="method item">
+    <h3 class="name"><code>getRescaleSlopeAndIntercept</code></h3>
 
         <span class="paren">()</span>
 
         <span class="returns-inline">
-            <span class="type">Number</span>
+            <span class="type">Object</span>
         </span>
 
 
@@ -1340,7 +1338,7 @@ Warning: No size check...</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_image_image.js.html#l257"><code>src&#x2F;image&#x2F;image.js:257</code></a>
+        <a href="../files/src_image_image.js.html#l111"><code>src&#x2F;image&#x2F;image.js:111</code></a>
         </p>
 
 
@@ -1348,7 +1346,7 @@ Warning: No size check...</p>
     </div>
 
     <div class="description">
-        <p>Get the rescale intercept.</p>
+        <p>Get the rescale slope and intercept.</p>
 
     </div>
 
@@ -1357,180 +1355,8 @@ Warning: No size check...</p>
             <h4>Returns:</h4>
 
             <div class="returns-description">
-                        <span class="type">Number</span>:
-                    <p>The rescale intercept.</p>
-
-            </div>
-        </div>
-
-
-</div>
-<div id="method_getRescaleSlope" class="method item">
-    <h3 class="name"><code>getRescaleSlope</code></h3>
-
-        <span class="paren">()</span>
-
-        <span class="returns-inline">
-            <span class="type">Number</span>
-        </span>
-
-
-
-
-
-
-
-    <div class="meta">
-                <p>
-                Defined in
-        <a href="../files/src_image_image.js.html#l245"><code>src&#x2F;image&#x2F;image.js:245</code></a>
-        </p>
-
-
-
-    </div>
-
-    <div class="description">
-        <p>Get the rescale slope.</p>
-
-    </div>
-
-
-        <div class="returns">
-            <h4>Returns:</h4>
-
-            <div class="returns-description">
-                        <span class="type">Number</span>:
-                    <p>The rescale slope.</p>
-
-            </div>
-        </div>
-
-
-</div>
-<div id="method_getSize" class="method item">
-    <h3 class="name"><code>getSize</code></h3>
-
-        <span class="paren">()</span>
-
-        <span class="returns-inline">
-            <span class="type">Size</span>
-        </span>
-
-
-
-
-
-
-
-    <div class="meta">
-                <p>
-                Defined in
-        <a href="../files/src_image_image.js.html#l220"><code>src&#x2F;image&#x2F;image.js:220</code></a>
-        </p>
-
-
-
-    </div>
-
-    <div class="description">
-        <p>Get the size of the image.</p>
-
-    </div>
-
-
-        <div class="returns">
-            <h4>Returns:</h4>
-
-            <div class="returns-description">
-                        <span class="type">Size</span>:
-                    <p>The size of the image.</p>
-
-            </div>
-        </div>
-
-
-</div>
-<div id="method_getSlicePositions" class="method item">
-    <h3 class="name"><code>getSlicePositions</code></h3>
-
-        <span class="paren">()</span>
-
-        <span class="returns-inline">
-            <span class="type">Array</span>
-        </span>
-
-
-
-
-
-
-
-    <div class="meta">
-                <p>
-                Defined in
-        <a href="../files/src_image_image.js.html#l238"><code>src&#x2F;image&#x2F;image.js:238</code></a>
-        </p>
-
-
-
-    </div>
-
-    <div class="description">
-        <p>Get the slice positions.</p>
-
-    </div>
-
-
-        <div class="returns">
-            <h4>Returns:</h4>
-
-            <div class="returns-description">
-                        <span class="type">Array</span>:
-                    <p>The slice positions.</p>
-
-            </div>
-        </div>
-
-
-</div>
-<div id="method_getSpacing" class="method item">
-    <h3 class="name"><code>getSpacing</code></h3>
-
-        <span class="paren">()</span>
-
-        <span class="returns-inline">
-            <span class="type">Spacing</span>
-        </span>
-
-
-
-
-
-
-
-    <div class="meta">
-                <p>
-                Defined in
-        <a href="../files/src_image_image.js.html#l226"><code>src&#x2F;image&#x2F;image.js:226</code></a>
-        </p>
-
-
-
-    </div>
-
-    <div class="description">
-        <p>Get the spacing of the image.</p>
-
-    </div>
-
-
-        <div class="returns">
-            <h4>Returns:</h4>
-
-            <div class="returns-description">
-                        <span class="type">Spacing</span>:
-                    <p>The spacing of the image.</p>
+                        <span class="type">Object</span>:
+                    <p>The rescale slope and intercept.</p>
 
             </div>
         </div>
@@ -1567,7 +1393,7 @@ Warning: No size check...</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_image_image.js.html#l454"><code>src&#x2F;image&#x2F;image.js:454</code></a>
+        <a href="../files/src_image_image.js.html#l293"><code>src&#x2F;image&#x2F;image.js:293</code></a>
         </p>
 
 
@@ -1656,7 +1482,7 @@ Warning: No size check...</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_image_image.js.html#l313"><code>src&#x2F;image&#x2F;image.js:313</code></a>
+        <a href="../files/src_image_image.js.html#l167"><code>src&#x2F;image&#x2F;image.js:167</code></a>
         </p>
 
 
@@ -1722,7 +1548,7 @@ Warning: No size check...</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_image_image.js.html#l777"><code>src&#x2F;image&#x2F;image.js:777</code></a>
+        <a href="../files/src_image_image.js.html#l618"><code>src&#x2F;image&#x2F;image.js:618</code></a>
         </p>
 
 
@@ -1788,7 +1614,7 @@ Warning: No size check...</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_image_image.js.html#l739"><code>src&#x2F;image&#x2F;image.js:739</code></a>
+        <a href="../files/src_image_image.js.html#l578"><code>src&#x2F;image&#x2F;image.js:578</code></a>
         </p>
 
 
@@ -1854,7 +1680,7 @@ Warning: No size check...</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_image_image.js.html#l752"><code>src&#x2F;image&#x2F;image.js:752</code></a>
+        <a href="../files/src_image_image.js.html#l592"><code>src&#x2F;image&#x2F;image.js:592</code></a>
         </p>
 
 
@@ -1917,7 +1743,7 @@ Warning: No size check...</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_image_image.js.html#l306"><code>src&#x2F;image&#x2F;image.js:306</code></a>
+        <a href="../files/src_image_image.js.html#l160"><code>src&#x2F;image&#x2F;image.js:160</code></a>
         </p>
 
 
@@ -1965,7 +1791,7 @@ Warning: No size check...</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_image_image.js.html#l275"><code>src&#x2F;image&#x2F;image.js:275</code></a>
+        <a href="../files/src_image_image.js.html#l129"><code>src&#x2F;image&#x2F;image.js:129</code></a>
         </p>
 
 
@@ -2002,7 +1828,7 @@ Warning: No size check...</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_image_image.js.html#l287"><code>src&#x2F;image&#x2F;image.js:287</code></a>
+        <a href="../files/src_image_image.js.html#l141"><code>src&#x2F;image&#x2F;image.js:141</code></a>
         </p>
 
 
@@ -2035,13 +1861,13 @@ Warning: No size check...</p>
 
 
 </div>
-<div id="method_setRescaleIntercept" class="method item">
-    <h3 class="name"><code>setRescaleIntercept</code></h3>
+<div id="method_setRescaleSlopeAndIntercept" class="method item">
+    <h3 class="name"><code>setRescaleSlopeAndIntercept</code></h3>
 
         <div class="args">
             <span class="paren">(</span><ul class="args-list inline commas">
                 <li class="arg">
-                        <code>ri</code>
+                        <code>rsi</code>
                 </li>
             </ul><span class="paren">)</span>
         </div>
@@ -2056,7 +1882,7 @@ Warning: No size check...</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_image_image.js.html#l263"><code>src&#x2F;image&#x2F;image.js:263</code></a>
+        <a href="../files/src_image_image.js.html#l117"><code>src&#x2F;image&#x2F;image.js:117</code></a>
         </p>
 
 
@@ -2064,7 +1890,7 @@ Warning: No size check...</p>
     </div>
 
     <div class="description">
-        <p>Set the rescale intercept.</p>
+        <p>Set the rescale slope and intercept.</p>
 
     </div>
 
@@ -2073,66 +1899,12 @@ Warning: No size check...</p>
 
             <ul class="params-list">
                 <li class="param">
-                        <code class="param-name">ri</code>
-                        <span class="type">Number</span>
+                        <code class="param-name">rsi</code>
+                        <span class="type">Object</span>
 
 
                     <div class="param-description">
-                        <p>The rescale intercept.</p>
-
-                    </div>
-
-                </li>
-            </ul>
-        </div>
-
-
-
-</div>
-<div id="method_setRescaleSlope" class="method item">
-    <h3 class="name"><code>setRescaleSlope</code></h3>
-
-        <div class="args">
-            <span class="paren">(</span><ul class="args-list inline commas">
-                <li class="arg">
-                        <code>rs</code>
-                </li>
-            </ul><span class="paren">)</span>
-        </div>
-
-
-
-
-
-
-
-
-    <div class="meta">
-                <p>
-                Defined in
-        <a href="../files/src_image_image.js.html#l251"><code>src&#x2F;image&#x2F;image.js:251</code></a>
-        </p>
-
-
-
-    </div>
-
-    <div class="description">
-        <p>Set the rescale slope.</p>
-
-    </div>
-
-        <div class="params">
-            <h4>Parameters:</h4>
-
-            <ul class="params-list">
-                <li class="param">
-                        <code class="param-name">rs</code>
-                        <span class="type">Number</span>
-
-
-                    <div class="param-description">
-                        <p>The rescale slope.</p>
+                        <p>The rescale slope and intercept.</p>
 
                     </div>
 
@@ -2167,7 +1939,7 @@ Warning: No size check...</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_image_image.js.html#l701"><code>src&#x2F;image&#x2F;image.js:701</code></a>
+        <a href="../files/src_image_image.js.html#l540"><code>src&#x2F;image&#x2F;image.js:540</code></a>
         </p>
 
 
@@ -2227,7 +1999,7 @@ Note: Uses the raw buffer values.</p>
                         <div class="meta">
                                     <p>
                                     Defined in
-                            <a href="../files/src_image_image.js.html#l205"><code>src&#x2F;image&#x2F;image.js:205</code></a>
+                            <a href="../files/src_image_image.js.html#l83"><code>src&#x2F;image&#x2F;image.js:83</code></a>
                             </p>
                     
                     
@@ -2253,7 +2025,7 @@ Note: Uses the raw buffer values.</p>
                         <div class="meta">
                                     <p>
                                     Defined in
-                            <a href="../files/src_image_image.js.html#l212"><code>src&#x2F;image&#x2F;image.js:212</code></a>
+                            <a href="../files/src_image_image.js.html#l90"><code>src&#x2F;image&#x2F;image.js:90</code></a>
                             </p>
                     
                     
@@ -2279,7 +2051,7 @@ Note: Uses the raw buffer values.</p>
                         <div class="meta">
                                     <p>
                                     Defined in
-                            <a href="../files/src_image_image.js.html#l184"><code>src&#x2F;image&#x2F;image.js:184</code></a>
+                            <a href="../files/src_image_image.js.html#l67"><code>src&#x2F;image&#x2F;image.js:67</code></a>
                             </p>
                     
                     
@@ -2305,7 +2077,7 @@ Note: Uses the raw buffer values.</p>
                         <div class="meta">
                                     <p>
                                     Defined in
-                            <a href="../files/src_image_image.js.html#l192"><code>src&#x2F;image&#x2F;image.js:192</code></a>
+                            <a href="../files/src_image_image.js.html#l75"><code>src&#x2F;image&#x2F;image.js:75</code></a>
                             </p>
                     
                     
@@ -2331,7 +2103,7 @@ Note: Uses the raw buffer values.</p>
                         <div class="meta">
                                     <p>
                                     Defined in
-                            <a href="../files/src_image_image.js.html#l163"><code>src&#x2F;image&#x2F;image.js:163</code></a>
+                            <a href="../files/src_image_image.js.html#l46"><code>src&#x2F;image&#x2F;image.js:46</code></a>
                             </p>
                     
                     
@@ -2357,7 +2129,7 @@ Note: Uses the raw buffer values.</p>
                         <div class="meta">
                                     <p>
                                     Defined in
-                            <a href="../files/src_image_image.js.html#l170"><code>src&#x2F;image&#x2F;image.js:170</code></a>
+                            <a href="../files/src_image_image.js.html#l53"><code>src&#x2F;image&#x2F;image.js:53</code></a>
                             </p>
                     
                     
@@ -2383,7 +2155,7 @@ Note: Uses the raw buffer values.</p>
                         <div class="meta">
                                     <p>
                                     Defined in
-                            <a href="../files/src_image_image.js.html#l177"><code>src&#x2F;image&#x2F;image.js:177</code></a>
+                            <a href="../files/src_image_image.js.html#l60"><code>src&#x2F;image&#x2F;image.js:60</code></a>
                             </p>
                     
                     
@@ -2397,8 +2169,8 @@ Note: Uses the raw buffer values.</p>
                     
                     
                     </div>
-                    <div id="property_rescaleIntercept" class="property item private">
-                        <h3 class="name"><code>rescaleIntercept</code></h3>
+                    <div id="property_rsi" class="property item private">
+                        <h3 class="name"><code>rsi</code></h3>
                         <span class="type">Number</span>
                     
                     
@@ -2409,40 +2181,14 @@ Note: Uses the raw buffer values.</p>
                         <div class="meta">
                                     <p>
                                     Defined in
-                            <a href="../files/src_image_image.js.html#l156"><code>src&#x2F;image&#x2F;image.js:156</code></a>
+                            <a href="../files/src_image_image.js.html#l39"><code>src&#x2F;image&#x2F;image.js:39</code></a>
                             </p>
                     
                     
                         </div>
                     
                         <div class="description">
-                            <p>Rescale intercept.</p>
-                    
-                        </div>
-                    
-                    
-                    
-                    </div>
-                    <div id="property_rescaleSlope" class="property item private">
-                        <h3 class="name"><code>rescaleSlope</code></h3>
-                        <span class="type">Number</span>
-                    
-                    
-                            <span class="flag private">private</span>
-                    
-                    
-                    
-                        <div class="meta">
-                                    <p>
-                                    Defined in
-                            <a href="../files/src_image_image.js.html#l149"><code>src&#x2F;image&#x2F;image.js:149</code></a>
-                            </p>
-                    
-                    
-                        </div>
-                    
-                        <div class="description">
-                            <p>Rescale slope.</p>
+                            <p>Rescale slope and intercept.</p>
                     
                         </div>
                     

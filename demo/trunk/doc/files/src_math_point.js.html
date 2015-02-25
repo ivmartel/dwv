@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>dwv.tool.ProtractorFactory - dwv</title>
+    <title>src/math/point.js - dwv</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
     <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
@@ -169,344 +169,216 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-<h1>dwv.tool.ProtractorFactory Class</h1>
-<div class="box meta">
-
-
-        <div class="foundat">
-            Defined in: <a href="../files/src_tools_protractor.js.html#l9"><code>src&#x2F;tools&#x2F;protractor.js:9</code></a>
-        </div>
-
-            Module: <a href="../modules/tool.html">tool</a>
-
-</div>
-
-
-<div class="box intro">
-    <p>Protractor factory.</p>
-
-</div>
-
-    <div class="constructor">
-        <h2>Constructor</h2>
-        <div id="method_dwv.tool.ProtractorFactory" class="method item">
-            <h3 class="name"><code>dwv.tool.ProtractorFactory</code></h3>
-        
-                <span class="paren">()</span>
-        
-        
-        
-        
-        
-        
-        
-        
-            <div class="meta">
-                        <p>
-                        Defined in
-                <a href="../files/src_tools_protractor.js.html#l9"><code>src&#x2F;tools&#x2F;protractor.js:9</code></a>
-                </p>
-        
-        
-        
-            </div>
-        
-            <div class="description">
-                
-            </div>
-        
-        
-        
-        
-        </div>
-    </div>
-
-<div id="classdocs" class="tabview">
-    <ul class="api-class-tabs">
-        <li class="api-class-tab index"><a href="#index">Index</a></li>
-
-            <li class="api-class-tab methods"><a href="#methods">Methods</a></li>
-    </ul>
-
-    <div>
-        <div id="index" class="api-class-tabpanel index">
-            <h2 class="off-left">Item Index</h2>
-
-                <div class="index-section methods">
-                    <h3>Methods</h3>
-
-                    <ul class="index-list methods">
-                            <li class="index-item method">
-                                <a href="#method_getNPoints">getNPoints</a>
-
-                            </li>
-                            <li class="index-item method">
-                                <a href="#method_getTimeout">getTimeout</a>
-
-                            </li>
-                            <li class="index-item method">
-                                <a href="#method_ProtractorCreator">ProtractorCreator</a>
-
-                                    <span class="flag static">static</span>
-                            </li>
-                            <li class="index-item method">
-                                <a href="#method_UpdateProtractor">UpdateProtractor</a>
-
-                                    <span class="flag static">static</span>
-                            </li>
-                    </ul>
-                </div>
-
-
-
-        </div>
-
-            <div id="methods" class="api-class-tabpanel">
-                <h2 class="off-left">Methods</h2>
-
-<div id="method_getNPoints" class="method item">
-    <h3 class="name"><code>getNPoints</code></h3>
-
-        <span class="paren">()</span>
-
-        <span class="returns-inline">
-            <span class="type">Number</span>
-        </span>
-
-
-
-
-
-
-
-    <div class="meta">
-                <p>
-                Defined in
-        <a href="../files/src_tools_protractor.js.html#l17"><code>src&#x2F;tools&#x2F;protractor.js:17</code></a>
-        </p>
-
-
-
-    </div>
-
-    <div class="description">
-        <p>Get the number of points needed to build the shape.</p>
-
-    </div>
-
-
-        <div class="returns">
-            <h4>Returns:</h4>
-
-            <div class="returns-description">
-                        <span class="type">Number</span>:
-                    <p>The number of points.</p>
-
-            </div>
-        </div>
-
-
-</div>
-<div id="method_getTimeout" class="method item">
-    <h3 class="name"><code>getTimeout</code></h3>
-
-        <span class="paren">()</span>
-
-        <span class="returns-inline">
-            <span class="type">Number</span>
-        </span>
-
-
-
-
-
-
-
-    <div class="meta">
-                <p>
-                Defined in
-        <a href="../files/src_tools_protractor.js.html#l23"><code>src&#x2F;tools&#x2F;protractor.js:23</code></a>
-        </p>
-
-
-
-    </div>
-
-    <div class="description">
-        <p>Get the timeout between point storage.</p>
-
-    </div>
-
-
-        <div class="returns">
-            <h4>Returns:</h4>
-
-            <div class="returns-description">
-                        <span class="type">Number</span>:
-                    <p>The timeout in milliseconds.</p>
-
-            </div>
-        </div>
-
-
-</div>
-<div id="method_ProtractorCreator" class="method item">
-    <h3 class="name"><code>ProtractorCreator</code></h3>
-
-        <div class="args">
-            <span class="paren">(</span><ul class="args-list inline commas">
-                <li class="arg">
-                        <code>points</code>
-                </li>
-                <li class="arg">
-                        <code>style</code>
-                </li>
-                <li class="arg">
-                        <code>image</code>
-                </li>
-            </ul><span class="paren">)</span>
-        </div>
-
-
-
-
-
-        <span class="flag static">static</span>
-
-
-
-    <div class="meta">
-                <p>
-                Defined in
-        <a href="../files/src_tools_protractor.js.html#l31"><code>src&#x2F;tools&#x2F;protractor.js:31</code></a>
-        </p>
-
-
-
-    </div>
-
-    <div class="description">
-        <p>Create a protractor shape to be displayed.</p>
-
-    </div>
-
-        <div class="params">
-            <h4>Parameters:</h4>
-
-            <ul class="params-list">
-                <li class="param">
-                        <code class="param-name">points</code>
-                        <span class="type">Array</span>
-
-
-                    <div class="param-description">
-                        <p>The points from which to extract the protractor.</p>
-
-                    </div>
-
-                </li>
-                <li class="param">
-                        <code class="param-name">style</code>
-                        <span class="type">Object</span>
-
-
-                    <div class="param-description">
-                        <p>The drawing style.</p>
-
-                    </div>
-
-                </li>
-                <li class="param">
-                        <code class="param-name">image</code>
-                        <span class="type">Object</span>
-
-
-                    <div class="param-description">
-                        <p>The associated image.</p>
-
-                    </div>
-
-                </li>
-            </ul>
-        </div>
-
-
-
-</div>
-<div id="method_UpdateProtractor" class="method item">
-    <h3 class="name"><code>UpdateProtractor</code></h3>
-
-        <div class="args">
-            <span class="paren">(</span><ul class="args-list inline commas">
-                <li class="arg">
-                        <code>anchor</code>
-                </li>
-                <li class="arg">
-                        <code>image</code>
-                </li>
-            </ul><span class="paren">)</span>
-        </div>
-
-
-
-
-
-        <span class="flag static">static</span>
-
-
-
-    <div class="meta">
-                <p>
-                Defined in
-        <a href="../files/src_tools_protractor.js.html#l103"><code>src&#x2F;tools&#x2F;protractor.js:103</code></a>
-        </p>
-
-
-
-    </div>
-
-    <div class="description">
-        <p>Update a protractor shape.</p>
-
-    </div>
-
-        <div class="params">
-            <h4>Parameters:</h4>
-
-            <ul class="params-list">
-                <li class="param">
-                        <code class="param-name">anchor</code>
-                        <span class="type">Object</span>
-
-
-                    <div class="param-description">
-                        <p>The active anchor.</p>
-
-                    </div>
-
-                </li>
-                <li class="param">
-                        <code class="param-name">image</code>
-                        <span class="type">Object</span>
-
-
-                    <div class="param-description">
-                        <p>The associated image.</p>
-
-                    </div>
-
-                </li>
-            </ul>
-        </div>
-
-
-
-</div>
-            </div>
-
-
-
-    </div>
+<h1 class="file-heading">File: src/math/point.js</h1>
+
+<div class="file">
+    <pre class="code prettyprint linenums">
+/** 
+ * Math module.
+ * @module math
+ */
+var dwv = dwv || {};
+/**
+ * Namespace for math functions.
+ * @class math
+ * @namespace dwv
+ * @static
+ */
+dwv.math = dwv.math || {};
+
+/** 
+ * Immutable 2D point.
+ * @class Point2D
+ * @namespace dwv.math
+ * @constructor
+ * @param {Number} x The X coordinate for the point.
+ * @param {Number} y The Y coordinate for the point.
+ */
+dwv.math.Point2D = function (x,y)
+{
+    /** 
+     * Get the X position of the point.
+     * @method getX
+     * @return {Number} The X position of the point.
+     */
+    this.getX = function () { return x; };
+    /** 
+     * Get the Y position of the point.
+     * @method getY
+     * @return {Number} The Y position of the point. 
+     */
+    this.getY = function () { return y; };
+}; // Point2D class
+
+/** 
+ * Check for Point2D equality.
+ * @method equals
+ * @param {Point2D} rhs The other Point2D to compare to.
+ * @return {Boolean} True if both points are equal.
+ */ 
+dwv.math.Point2D.prototype.equals = function (rhs) {
+    return rhs !== null &amp;&amp;
+        this.getX() === rhs.getX() &amp;&amp;
+        this.getY() === rhs.getY();
+};
+
+/** 
+ * Get a string representation of the Point2D.
+ * @method toString
+ * @return {String} The Point2D as a string.
+ */ 
+dwv.math.Point2D.prototype.toString = function () {
+    return &quot;(&quot; + this.getX() + &quot;, &quot; + this.getY() + &quot;)&quot;;
+};
+
+/** 
+ * Mutable 2D point.
+ * @class FastPoint2D
+ * @namespace dwv.math
+ * @constructor
+ * @param {Number} x The X coordinate for the point.
+ * @param {Number} y The Y coordinate for the point.
+ */
+dwv.math.FastPoint2D = function (x,y)
+{
+    this.x = x;
+    this.y = y;
+}; // FastPoint2D class
+
+/** 
+ * Check for FastPoint2D equality.
+ * @method equals
+ * @param {FastPoint2D} other The other FastPoint2D to compare to.
+ * @return {Boolean} True if both points are equal.
+ */ 
+dwv.math.FastPoint2D.prototype.equals = function (rhs) {
+    return rhs !== null &amp;&amp;
+        this.x === rhs.x &amp;&amp;
+        this.y === rhs.y;
+};
+
+/** 
+ * Get a string representation of the FastPoint2D.
+ * @method toString
+ * @return {String} The Point2D as a string.
+ */ 
+dwv.math.FastPoint2D.prototype.toString = function () {
+    return &quot;(&quot; + this.x + &quot;, &quot; + this.y + &quot;)&quot;;
+};
+
+/** 
+ * Immutable 3D point.
+ * @class Point3D
+ * @namespace dwv.math
+ * @constructor
+ * @param {Number} x The X coordinate for the point.
+ * @param {Number} y The Y coordinate for the point.
+ * @param {Number} z The Z coordinate for the point.
+ */
+dwv.math.Point3D = function (x,y,z)
+{
+    /** 
+     * Get the X position of the point.
+     * @method getX
+     * @return {Number} The X position of the point.
+     */
+    this.getX = function () { return x; };
+    /** 
+     * Get the Y position of the point.
+     * @method getY
+     * @return {Number} The Y position of the point. 
+     */
+    this.getY = function () { return y; };
+    /** 
+     * Get the Z position of the point.
+     * @method getZ
+     * @return {Number} The Z position of the point. 
+     */
+    this.getZ = function () { return z; };
+}; // Point3D class
+
+/** 
+ * Check for Point3D equality.
+ * @method equals
+ * @param {Point3D} rhs The other Point3D to compare to.
+ * @return {Boolean} True if both points are equal.
+ */ 
+dwv.math.Point3D.prototype.equals = function (rhs) {
+    return rhs !== null &amp;&amp;
+        this.getX() === rhs.getX() &amp;&amp;
+        this.getY() === rhs.getY() &amp;&amp;
+        this.getZ() === rhs.getZ();
+};
+
+/** 
+ * Get a string representation of the Point3D.
+ * @method toString
+ * @return {String} The Point3D as a string.
+ */ 
+dwv.math.Point3D.prototype.toString = function () {
+    return &quot;(&quot; + this.getX() + 
+        &quot;, &quot; + this.getY() +
+        &quot;, &quot; + this.getZ() + &quot;)&quot;;
+};
+
+/** 
+ * Immutable 3D index.
+ * @class Index3D
+ * @namespace dwv.math
+ * @constructor
+ * @param {Number} i The column index.
+ * @param {Number} j The row index.
+ * @param {Number} k The slice index.
+ */
+dwv.math.Index3D = function (i,j,k)
+{
+    /** 
+     * Get the column index.
+     * @method getI
+     * @return {Number} The column index.
+     */
+    this.getI = function () { return i; };
+    /** 
+     * Get the row index.
+     * @method getJ
+     * @return {Number} The row index. 
+     */
+    this.getJ = function () { return j; };
+    /** 
+     * Get the slice index.
+     * @method getK
+     * @return {Number} The slice index. 
+     */
+    this.getK = function () { return k; };
+}; // Index3D class
+
+/** 
+ * Check for Index3D equality.
+ * @method equals
+ * @param {Index3D} rhs The other Index3D to compare to.
+ * @return {Boolean} True if both points are equal.
+ */ 
+dwv.math.Index3D.prototype.equals = function (rhs) {
+    return rhs !== null &amp;&amp;
+        this.getI() === rhs.getI() &amp;&amp;
+        this.getJ() === rhs.getJ() &amp;&amp;
+        this.getK() === rhs.getK();
+};
+
+/** 
+ * Get a string representation of the Index3D.
+ * @method toString
+ * @return {String} The Index3D as a string.
+ */ 
+dwv.math.Index3D.prototype.toString = function () {
+    return &quot;(&quot; + this.getI() + 
+        &quot;, &quot; + this.getJ() +
+        &quot;, &quot; + this.getK() + &quot;)&quot;;
+};
+
+
+
+    </pre>
 </div>
                     </div>
                 </div>

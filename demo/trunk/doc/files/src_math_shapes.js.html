@@ -66,6 +66,7 @@
                                 <li><a href="../classes/dwv.image.filter.Sharpen.html">dwv.image.filter.Sharpen</a></li>
                                 <li><a href="../classes/dwv.image.filter.Sobel.html">dwv.image.filter.Sobel</a></li>
                                 <li><a href="../classes/dwv.image.filter.Threshold.html">dwv.image.filter.Threshold</a></li>
+                                <li><a href="../classes/dwv.image.Geometry.html">dwv.image.Geometry</a></li>
                                 <li><a href="../classes/dwv.image.Image.html">dwv.image.Image</a></li>
                                 <li><a href="../classes/dwv.image.ImageFactory.html">dwv.image.ImageFactory</a></li>
                                 <li><a href="../classes/dwv.image.lut.Rescale.html">dwv.image.lut.Rescale</a></li>
@@ -88,9 +89,11 @@
                                 <li><a href="../classes/dwv.math.Ellipse.html">dwv.math.Ellipse</a></li>
                                 <li><a href="../classes/dwv.math.FastPoint2D.html">dwv.math.FastPoint2D</a></li>
                                 <li><a href="../classes/dwv.math.IdGenerator.html">dwv.math.IdGenerator</a></li>
+                                <li><a href="../classes/dwv.math.Index3D.html">dwv.math.Index3D</a></li>
                                 <li><a href="../classes/dwv.math.Line.html">dwv.math.Line</a></li>
                                 <li><a href="../classes/dwv.math.Path.html">dwv.math.Path</a></li>
                                 <li><a href="../classes/dwv.math.Point2D.html">dwv.math.Point2D</a></li>
+                                <li><a href="../classes/dwv.math.Point3D.html">dwv.math.Point3D</a></li>
                                 <li><a href="../classes/dwv.math.Rectangle.html">dwv.math.Rectangle</a></li>
                                 <li><a href="../classes/dwv.math.ROI.html">dwv.math.ROI</a></li>
                                 <li><a href="../classes/dwv.math.Scissors.html">dwv.math.Scissors</a></li>
@@ -182,88 +185,6 @@ var dwv = dwv || {};
  * @static
  */
 dwv.math = dwv.math || {};
-
-/** 
- * 2D point. Immutable.
- * @class Point2D
- * @namespace dwv.math
- * @constructor
- * @param {Number} x The X coordinate for the point.
- * @param {Number} y The Y coordinate for the point.
- */
-dwv.math.Point2D = function(x,y)
-{
-    /** 
-     * Get the X position of the point.
-     * @method getX
-     * @return {Number} The X position of the point.
-     */
-    this.getX = function() { return x; };
-    /** 
-     * Get the Y position of the point.
-     * @method getY
-     * @return {Number} The Y position of the point. 
-     */
-    this.getY = function() { return y; };
-}; // Point2D class
-
-/** 
- * Check for Point2D equality.
- * @method equals
- * @param {Point2D} other The other Point2D to compare to.
- * @return {Boolean} True if both points are equal.
- */ 
-dwv.math.Point2D.prototype.equals = function(other) {
-    if( !other ) { 
-        return false;
-    }
-    return ( this.getX() === other.getX() &amp;&amp; this.getY() === other.getY() );
-};
-
-/** 
- * Get a string representation of the Point2D.
- * @method toString
- * @return {String} The Point2D as a string.
- */ 
-dwv.math.Point2D.prototype.toString = function() {
-    return &quot;(&quot; + this.getX() + &quot;, &quot; + this.getY() + &quot;)&quot;;
-};
-
-/** 
- * Fast 2D point since it&#x27;s mutable!
- * @class FastPoint2D
- * @namespace dwv.math
- * @constructor
- * @param {Number} x The X coordinate for the point.
- * @param {Number} y The Y coordinate for the point.
- */
-dwv.math.FastPoint2D = function(x,y)
-{
-    this.x = x;
-    this.y = y;
-}; // FastPoint2D class
-
-/** 
- * Check for FastPoint2D equality.
- * @method equals
- * @param {FastPoint2D} other The other FastPoint2D to compare to.
- * @return {Boolean} True if both points are equal.
- */ 
-dwv.math.FastPoint2D.prototype.equals = function(other) {
-    if( !other ) { 
-        return false;
-    }
-    return ( this.x === other.x &amp;&amp; this.y === other.y );
-};
-
-/** 
- * Get a string representation of the FastPoint2D.
- * @method toString
- * @return {String} The Point2D as a string.
- */ 
-dwv.math.FastPoint2D.prototype.toString = function() {
-    return &quot;(&quot; + this.x + &quot;, &quot; + this.y + &quot;)&quot;;
-};
 
 /** 
  * Circle shape.

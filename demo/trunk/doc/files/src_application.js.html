@@ -66,6 +66,7 @@
                                 <li><a href="../classes/dwv.image.filter.Sharpen.html">dwv.image.filter.Sharpen</a></li>
                                 <li><a href="../classes/dwv.image.filter.Sobel.html">dwv.image.filter.Sobel</a></li>
                                 <li><a href="../classes/dwv.image.filter.Threshold.html">dwv.image.filter.Threshold</a></li>
+                                <li><a href="../classes/dwv.image.Geometry.html">dwv.image.Geometry</a></li>
                                 <li><a href="../classes/dwv.image.Image.html">dwv.image.Image</a></li>
                                 <li><a href="../classes/dwv.image.ImageFactory.html">dwv.image.ImageFactory</a></li>
                                 <li><a href="../classes/dwv.image.lut.Rescale.html">dwv.image.lut.Rescale</a></li>
@@ -88,9 +89,11 @@
                                 <li><a href="../classes/dwv.math.Ellipse.html">dwv.math.Ellipse</a></li>
                                 <li><a href="../classes/dwv.math.FastPoint2D.html">dwv.math.FastPoint2D</a></li>
                                 <li><a href="../classes/dwv.math.IdGenerator.html">dwv.math.IdGenerator</a></li>
+                                <li><a href="../classes/dwv.math.Index3D.html">dwv.math.Index3D</a></li>
                                 <li><a href="../classes/dwv.math.Line.html">dwv.math.Line</a></li>
                                 <li><a href="../classes/dwv.math.Path.html">dwv.math.Path</a></li>
                                 <li><a href="../classes/dwv.math.Point2D.html">dwv.math.Point2D</a></li>
+                                <li><a href="../classes/dwv.math.Point3D.html">dwv.math.Point3D</a></li>
                                 <li><a href="../classes/dwv.math.Rectangle.html">dwv.math.Rectangle</a></li>
                                 <li><a href="../classes/dwv.math.ROI.html">dwv.math.ROI</a></li>
                                 <li><a href="../classes/dwv.math.Scissors.html">dwv.math.Scissors</a></li>
@@ -1312,8 +1315,9 @@ dwv.App = function ()
         image = originalImage;
         
         // layout
-        dataWidth = image.getSize().getNumberOfColumns();
-        dataHeight = image.getSize().getNumberOfRows();
+        var size = image.getGeometry().getSize();
+        dataWidth = size.getNumberOfColumns();
+        dataHeight = size.getNumberOfRows();
         createLayers(dataWidth, dataHeight);
         
         // get the image data from the image layer

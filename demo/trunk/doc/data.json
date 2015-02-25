@@ -176,12 +176,23 @@
                 "dwv.image.filter": 1
             }
         },
-        "src/image/image.js": {
-            "name": "src/image/image.js",
+        "src/image/geometry.js": {
+            "name": "src/image/geometry.js",
             "modules": {},
             "classes": {
                 "dwv.image.Size": 1,
                 "dwv.image.Spacing": 1,
+                "dwv.image.Geometry": 1
+            },
+            "fors": {},
+            "namespaces": {
+                "dwv.image": 1
+            }
+        },
+        "src/image/image.js": {
+            "name": "src/image/image.js",
+            "modules": {},
+            "classes": {
                 "dwv.image.Image": 1,
                 "dwv.image.ImageFactory": 1
             },
@@ -265,6 +276,21 @@
                 "dwv.math": 1
             }
         },
+        "src/math/point.js": {
+            "name": "src/math/point.js",
+            "modules": {},
+            "classes": {
+                "dwv.math.Point2D": 1,
+                "dwv.math.FastPoint2D": 1,
+                "dwv.math.Point3D": 1,
+                "dwv.math.Index3D": 1
+            },
+            "fors": {},
+            "namespaces": {
+                "dwv": 1,
+                "dwv.math": 1
+            }
+        },
         "src/math/scissors.js": {
             "name": "src/math/scissors.js",
             "modules": {},
@@ -281,8 +307,6 @@
             "modules": {},
             "classes": {
                 "dwv.math": 1,
-                "dwv.math.Point2D": 1,
-                "dwv.math.FastPoint2D": 1,
                 "dwv.math.Circle": 1,
                 "dwv.math.Ellipse": 1,
                 "dwv.math.Line": 1,
@@ -614,6 +638,7 @@
                 "dwv.image.filter.Sobel": 1,
                 "dwv.image.Size": 1,
                 "dwv.image.Spacing": 1,
+                "dwv.image.Geometry": 1,
                 "dwv.image.Image": 1,
                 "dwv.image.ImageFactory": 1,
                 "dwv.image.lut.Rescale": 1,
@@ -631,7 +656,7 @@
             },
             "tag": "module",
             "file": "src/image/view.js",
-            "line": 427,
+            "line": 426,
             "description": "Image module."
         },
         "io": {
@@ -657,10 +682,12 @@
             "submodules": {},
             "classes": {
                 "dwv.math.BucketQueue": 1,
-                "dwv.math.Scissors": 1,
                 "dwv.math": 1,
                 "dwv.math.Point2D": 1,
                 "dwv.math.FastPoint2D": 1,
+                "dwv.math.Point3D": 1,
+                "dwv.math.Index3D": 1,
+                "dwv.math.Scissors": 1,
                 "dwv.math.Circle": 1,
                 "dwv.math.Ellipse": 1,
                 "dwv.math.Line": 1,
@@ -753,7 +780,7 @@
             },
             "tag": "module",
             "file": "src/application.js",
-            "line": 1265,
+            "line": 1266,
             "description": "Utility module."
         }
     },
@@ -1177,9 +1204,9 @@
             "extension_for": [],
             "module": "image",
             "namespace": "dwv.image",
-            "file": "src/image/image.js",
+            "file": "src/image/geometry.js",
             "line": 8,
-            "description": "Image Size class.\nSupports 2D and 3D images.",
+            "description": "2D/3D Size class.",
             "is_constructor": 1,
             "params": [
                 {
@@ -1209,9 +1236,9 @@
             "extension_for": [],
             "module": "image",
             "namespace": "dwv.image",
-            "file": "src/image/image.js",
-            "line": 88,
-            "description": "Image Spacing class. \nSupports 2D and 3D images.",
+            "file": "src/image/geometry.js",
+            "line": 87,
+            "description": "2D/3D Spacing class.",
             "is_constructor": 1,
             "params": [
                 {
@@ -1231,6 +1258,38 @@
                 }
             ]
         },
+        "dwv.image.Geometry": {
+            "name": "dwv.image.Geometry",
+            "shortname": "dwv.image.Geometry",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "image",
+            "namespace": "dwv.image",
+            "file": "src/image/geometry.js",
+            "line": 131,
+            "description": "2D/3D Geometry class.",
+            "is_constructor": 1,
+            "params": [
+                {
+                    "name": "origin",
+                    "description": "The object origin.",
+                    "type": "Object"
+                },
+                {
+                    "name": "size",
+                    "description": "The object size.",
+                    "type": "Object"
+                },
+                {
+                    "name": "spacing",
+                    "description": "The object spacing.",
+                    "type": "Object"
+                }
+            ]
+        },
         "dwv.image.Image": {
             "name": "dwv.image.Image",
             "shortname": "dwv.image.Image",
@@ -1242,28 +1301,18 @@
             "module": "image",
             "namespace": "dwv.image",
             "file": "src/image/image.js",
-            "line": 133,
+            "line": 25,
             "description": "Image class.\nUsable once created, optional are:\n- rescale slope and intercept (default 1:0), \n- photometric interpretation (default MONOCHROME2),\n- planar configuration (default RGBRGB...).",
             "is_constructor": 1,
             "params": [
                 {
-                    "name": "size",
-                    "description": "The size of the image.",
-                    "type": "Size"
-                },
-                {
-                    "name": "spacing",
-                    "description": "The spacing of the image.",
-                    "type": "Spacing"
+                    "name": "geometry",
+                    "description": "The geometry of the image.",
+                    "type": "Object"
                 },
                 {
                     "name": "buffer",
                     "description": "The image data.",
-                    "type": "Array"
-                },
-                {
-                    "name": "slicePositions",
-                    "description": "The slice positions.",
                     "type": "Array"
                 }
             ]
@@ -1279,7 +1328,7 @@
             "module": "image",
             "namespace": "dwv.image",
             "file": "src/image/image.js",
-            "line": 790,
+            "line": 632,
             "description": "Image factory.",
             "is_constructor": 1
         },
@@ -1390,7 +1439,7 @@
             "module": "image",
             "namespace": "dwv.image",
             "file": "src/image/view.js",
-            "line": 427,
+            "line": 426,
             "description": "View factory.",
             "is_constructor": 1
         },
@@ -1455,21 +1504,6 @@
             "is_constructor": 1,
             "input": "cost_functor"
         },
-        "dwv.math.Scissors": {
-            "name": "dwv.math.Scissors",
-            "shortname": "dwv.math.Scissors",
-            "classitems": [],
-            "plugins": [],
-            "extensions": [],
-            "plugin_for": [],
-            "extension_for": [],
-            "module": "math",
-            "namespace": "dwv.math",
-            "file": "src/math/scissors.js",
-            "line": 280,
-            "description": "Scissors",
-            "is_constructor": 1
-        },
         "dwv.math": {
             "name": "dwv.math",
             "shortname": "dwv.math",
@@ -1495,9 +1529,9 @@
             "extension_for": [],
             "module": "math",
             "namespace": "dwv.math",
-            "file": "src/math/shapes.js",
+            "file": "src/math/point.js",
             "line": 14,
-            "description": "2D point. Immutable.",
+            "description": "Immutable 2D point.",
             "is_constructor": 1,
             "params": [
                 {
@@ -1522,9 +1556,9 @@
             "extension_for": [],
             "module": "math",
             "namespace": "dwv.math",
-            "file": "src/math/shapes.js",
-            "line": 60,
-            "description": "Fast 2D point since it's mutable!",
+            "file": "src/math/point.js",
+            "line": 59,
+            "description": "Mutable 2D point.",
             "is_constructor": 1,
             "params": [
                 {
@@ -1539,6 +1573,85 @@
                 }
             ]
         },
+        "dwv.math.Point3D": {
+            "name": "dwv.math.Point3D",
+            "shortname": "dwv.math.Point3D",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "math",
+            "namespace": "dwv.math",
+            "file": "src/math/point.js",
+            "line": 94,
+            "description": "Immutable 3D point.",
+            "is_constructor": 1,
+            "params": [
+                {
+                    "name": "x",
+                    "description": "The X coordinate for the point.",
+                    "type": "Number"
+                },
+                {
+                    "name": "y",
+                    "description": "The Y coordinate for the point.",
+                    "type": "Number"
+                },
+                {
+                    "name": "z",
+                    "description": "The Z coordinate for the point.",
+                    "type": "Number"
+                }
+            ]
+        },
+        "dwv.math.Index3D": {
+            "name": "dwv.math.Index3D",
+            "shortname": "dwv.math.Index3D",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "math",
+            "namespace": "dwv.math",
+            "file": "src/math/point.js",
+            "line": 149,
+            "description": "Immutable 3D index.",
+            "is_constructor": 1,
+            "params": [
+                {
+                    "name": "i",
+                    "description": "The column index.",
+                    "type": "Number"
+                },
+                {
+                    "name": "j",
+                    "description": "The row index.",
+                    "type": "Number"
+                },
+                {
+                    "name": "k",
+                    "description": "The slice index.",
+                    "type": "Number"
+                }
+            ]
+        },
+        "dwv.math.Scissors": {
+            "name": "dwv.math.Scissors",
+            "shortname": "dwv.math.Scissors",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "math",
+            "namespace": "dwv.math",
+            "file": "src/math/scissors.js",
+            "line": 280,
+            "description": "Scissors",
+            "is_constructor": 1
+        },
         "dwv.math.Circle": {
             "name": "dwv.math.Circle",
             "shortname": "dwv.math.Circle",
@@ -1550,7 +1663,7 @@
             "module": "math",
             "namespace": "dwv.math",
             "file": "src/math/shapes.js",
-            "line": 96,
+            "line": 14,
             "description": "Circle shape.",
             "is_constructor": 1,
             "params": [
@@ -1577,7 +1690,7 @@
             "module": "math",
             "namespace": "dwv.math",
             "file": "src/math/shapes.js",
-            "line": 145,
+            "line": 63,
             "description": "Ellipse shape.",
             "is_constructor": 1,
             "params": [
@@ -1609,7 +1722,7 @@
             "module": "math",
             "namespace": "dwv.math",
             "file": "src/math/shapes.js",
-            "line": 201,
+            "line": 119,
             "description": "Line shape.",
             "is_constructor": 1,
             "params": [
@@ -1636,7 +1749,7 @@
             "module": "math",
             "namespace": "dwv.math",
             "file": "src/math/shapes.js",
-            "line": 332,
+            "line": 250,
             "description": "Rectangle shape.",
             "is_constructor": 1,
             "params": [
@@ -1663,7 +1776,7 @@
             "module": "math",
             "namespace": "dwv.math",
             "file": "src/math/shapes.js",
-            "line": 414,
+            "line": 332,
             "description": "Region Of Interest shape.",
             "is_constructor": 1
         },
@@ -1678,7 +1791,7 @@
             "module": "math",
             "namespace": "dwv.math",
             "file": "src/math/shapes.js",
-            "line": 458,
+            "line": 376,
             "description": "Path shape.",
             "is_constructor": 1,
             "params": [
@@ -2290,7 +2403,7 @@
             "module": "utils",
             "namespace": "dwv",
             "file": "src/application.js",
-            "line": 1207,
+            "line": 1208,
             "description": "View controller.",
             "is_constructor": 1
         },
@@ -2305,7 +2418,7 @@
             "module": "utils",
             "namespace": "dwv",
             "file": "src/application.js",
-            "line": 1265,
+            "line": 1266,
             "description": "Toolbox controller.",
             "is_constructor": 1
         }
@@ -4846,8 +4959,8 @@
             "namespace": "dwv.image.filter"
         },
         {
-            "file": "src/image/image.js",
-            "line": 20,
+            "file": "src/image/geometry.js",
+            "line": 19,
             "description": "Get the number of columns.",
             "itemtype": "method",
             "name": "getNumberOfColumns",
@@ -4860,8 +4973,8 @@
             "namespace": "dwv.image"
         },
         {
-            "file": "src/image/image.js",
-            "line": 26,
+            "file": "src/image/geometry.js",
+            "line": 25,
             "description": "Get the number of rows.",
             "itemtype": "method",
             "name": "getNumberOfRows",
@@ -4874,8 +4987,8 @@
             "namespace": "dwv.image"
         },
         {
-            "file": "src/image/image.js",
-            "line": 32,
+            "file": "src/image/geometry.js",
+            "line": 31,
             "description": "Get the number of slices.",
             "itemtype": "method",
             "name": "getNumberOfSlices",
@@ -4888,8 +5001,8 @@
             "namespace": "dwv.image"
         },
         {
-            "file": "src/image/image.js",
-            "line": 40,
+            "file": "src/image/geometry.js",
+            "line": 39,
             "description": "Get the size of a slice.",
             "itemtype": "method",
             "name": "getSliceSize",
@@ -4902,8 +5015,8 @@
             "namespace": "dwv.image"
         },
         {
-            "file": "src/image/image.js",
-            "line": 49,
+            "file": "src/image/geometry.js",
+            "line": 48,
             "description": "Get the total size.",
             "itemtype": "method",
             "name": "getTotalSize",
@@ -4916,8 +5029,8 @@
             "namespace": "dwv.image"
         },
         {
-            "file": "src/image/image.js",
-            "line": 58,
+            "file": "src/image/geometry.js",
+            "line": 57,
             "description": "Check for equality.",
             "itemtype": "method",
             "name": "equals",
@@ -4937,8 +5050,8 @@
             "namespace": "dwv.image"
         },
         {
-            "file": "src/image/image.js",
-            "line": 71,
+            "file": "src/image/geometry.js",
+            "line": 70,
             "description": "Check that coordinates are within bounds.",
             "itemtype": "method",
             "name": "isInBounds",
@@ -4968,8 +5081,8 @@
             "namespace": "dwv.image"
         },
         {
-            "file": "src/image/image.js",
-            "line": 100,
+            "file": "src/image/geometry.js",
+            "line": 98,
             "description": "Get the column spacing.",
             "itemtype": "method",
             "name": "getColumnSpacing",
@@ -4982,8 +5095,8 @@
             "namespace": "dwv.image"
         },
         {
-            "file": "src/image/image.js",
-            "line": 106,
+            "file": "src/image/geometry.js",
+            "line": 104,
             "description": "Get the row spacing.",
             "itemtype": "method",
             "name": "getRowSpacing",
@@ -4996,8 +5109,8 @@
             "namespace": "dwv.image"
         },
         {
-            "file": "src/image/image.js",
-            "line": 112,
+            "file": "src/image/geometry.js",
+            "line": 110,
             "description": "Get the slice spacing.",
             "itemtype": "method",
             "name": "getSliceSpacing",
@@ -5010,8 +5123,8 @@
             "namespace": "dwv.image"
         },
         {
-            "file": "src/image/image.js",
-            "line": 120,
+            "file": "src/image/geometry.js",
+            "line": 118,
             "description": "Check for equality.",
             "itemtype": "method",
             "name": "equals",
@@ -5031,11 +5144,119 @@
             "namespace": "dwv.image"
         },
         {
+            "file": "src/image/geometry.js",
+            "line": 148,
+            "description": "Get the object origin.",
+            "itemtype": "method",
+            "name": "getOrigin",
+            "return": {
+                "description": "The object origin.",
+                "type": "Object"
+            },
+            "class": "dwv.image.Geometry",
+            "module": "image",
+            "namespace": "dwv.image"
+        },
+        {
+            "file": "src/image/geometry.js",
+            "line": 155,
+            "description": "Get the object size.",
+            "itemtype": "method",
+            "name": "getSize",
+            "return": {
+                "description": "The object size.",
+                "type": "Object"
+            },
+            "class": "dwv.image.Geometry",
+            "module": "image",
+            "namespace": "dwv.image"
+        },
+        {
+            "file": "src/image/geometry.js",
+            "line": 161,
+            "description": "Get the object spacing.",
+            "itemtype": "method",
+            "name": "getSpacing",
+            "return": {
+                "description": "The object spacing.",
+                "type": "Object"
+            },
+            "class": "dwv.image.Geometry",
+            "module": "image",
+            "namespace": "dwv.image"
+        },
+        {
+            "file": "src/image/geometry.js",
+            "line": 168,
+            "description": "Get the slice position of a point in the current slice layout.",
+            "class": "dwv.image.Geometry",
+            "module": "image",
+            "namespace": "dwv.image"
+        },
+        {
+            "file": "src/image/geometry.js",
+            "line": 199,
+            "description": "Check for equality.",
+            "itemtype": "method",
+            "name": "equals",
+            "params": [
+                {
+                    "name": "rhs",
+                    "description": "The object to compare to.",
+                    "type": "Geometry"
+                }
+            ],
+            "return": {
+                "description": "True if both objects are equal.",
+                "type": "Boolean"
+            },
+            "class": "dwv.image.Geometry",
+            "module": "image",
+            "namespace": "dwv.image"
+        },
+        {
+            "file": "src/image/geometry.js",
+            "line": 212,
+            "class": "dwv.image.Geometry",
+            "module": "image",
+            "namespace": "dwv.image"
+        },
+        {
+            "file": "src/image/geometry.js",
+            "line": 222,
+            "class": "dwv.image.Geometry",
+            "module": "image",
+            "namespace": "dwv.image"
+        },
+        {
+            "file": "src/image/geometry.js",
+            "line": 234,
+            "class": "dwv.image.Geometry",
+            "module": "image",
+            "namespace": "dwv.image"
+        },
+        {
             "file": "src/image/image.js",
-            "line": 149,
-            "description": "Rescale slope.",
+            "line": 8,
+            "params": [
+                {
+                    "name": "slope",
+                    "description": ""
+                },
+                {
+                    "name": "intercept",
+                    "description": ""
+                }
+            ],
+            "class": "dwv.image.Image",
+            "module": "image"
+        },
+        {
+            "file": "src/image/image.js",
+            "line": 39,
+            "description": "Rescale slope and intercept.",
             "itemtype": "property",
-            "name": "rescaleSlope",
+            "name": "rsi",
             "access": "private",
             "tagname": "",
             "type": "Number",
@@ -5045,20 +5266,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 156,
-            "description": "Rescale intercept.",
-            "itemtype": "property",
-            "name": "rescaleIntercept",
-            "access": "private",
-            "tagname": "",
-            "type": "Number",
-            "class": "dwv.image.Image",
-            "module": "image",
-            "namespace": "dwv.image"
-        },
-        {
-            "file": "src/image/image.js",
-            "line": 163,
+            "line": 46,
             "description": "Photometric interpretation (MONOCHROME, RGB...).",
             "itemtype": "property",
             "name": "photometricInterpretation",
@@ -5071,7 +5279,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 170,
+            "line": 53,
             "description": "Planar configuration for RGB data (0:RGBRGBRGBRGB... or 1:RRR...GGG...BBB...).",
             "itemtype": "property",
             "name": "planarConfiguration",
@@ -5084,7 +5292,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 177,
+            "line": 60,
             "description": "Number of components.",
             "itemtype": "property",
             "name": "planarConfiguration",
@@ -5097,7 +5305,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 184,
+            "line": 67,
             "description": "Meta information.",
             "itemtype": "property",
             "name": "meta",
@@ -5110,7 +5318,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 192,
+            "line": 75,
             "description": "Original buffer.",
             "itemtype": "property",
             "name": "originalBuffer",
@@ -5123,7 +5331,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 205,
+            "line": 83,
             "description": "Data range.",
             "itemtype": "property",
             "name": "dataRange",
@@ -5136,7 +5344,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 212,
+            "line": 90,
             "description": "Histogram.",
             "itemtype": "property",
             "name": "histogram",
@@ -5149,13 +5357,13 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 220,
-            "description": "Get the size of the image.",
+            "line": 98,
+            "description": "Get the geometry of the image.",
             "itemtype": "method",
-            "name": "getSize",
+            "name": "getGeometry",
             "return": {
                 "description": "The size of the image.",
-                "type": "Size"
+                "type": "Object"
             },
             "class": "dwv.image.Image",
             "module": "image",
@@ -5163,21 +5371,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 226,
-            "description": "Get the spacing of the image.",
-            "itemtype": "method",
-            "name": "getSpacing",
-            "return": {
-                "description": "The spacing of the image.",
-                "type": "Spacing"
-            },
-            "class": "dwv.image.Image",
-            "module": "image",
-            "namespace": "dwv.image"
-        },
-        {
-            "file": "src/image/image.js",
-            "line": 232,
+            "line": 104,
             "description": "Get the data buffer of the image. TODO dangerous...",
             "itemtype": "method",
             "name": "getBuffer",
@@ -5191,13 +5385,13 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 238,
-            "description": "Get the slice positions.",
+            "line": 111,
+            "description": "Get the rescale slope and intercept.",
             "itemtype": "method",
-            "name": "getSlicePositions",
+            "name": "getRescaleSlopeAndIntercept",
             "return": {
-                "description": "The slice positions.",
-                "type": "Array"
+                "description": "The rescale slope and intercept.",
+                "type": "Object"
             },
             "class": "dwv.image.Image",
             "module": "image",
@@ -5205,29 +5399,15 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 245,
-            "description": "Get the rescale slope.",
+            "line": 117,
+            "description": "Set the rescale slope and intercept.",
             "itemtype": "method",
-            "name": "getRescaleSlope",
-            "return": {
-                "description": "The rescale slope.",
-                "type": "Number"
-            },
-            "class": "dwv.image.Image",
-            "module": "image",
-            "namespace": "dwv.image"
-        },
-        {
-            "file": "src/image/image.js",
-            "line": 251,
-            "description": "Set the rescale slope.",
-            "itemtype": "method",
-            "name": "setRescaleSlope",
+            "name": "setRescaleSlopeAndIntercept",
             "params": [
                 {
-                    "name": "rs",
-                    "description": "The rescale slope.",
-                    "type": "Number"
+                    "name": "rsi",
+                    "description": "The rescale slope and intercept.",
+                    "type": "Object"
                 }
             ],
             "class": "dwv.image.Image",
@@ -5236,38 +5416,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 257,
-            "description": "Get the rescale intercept.",
-            "itemtype": "method",
-            "name": "getRescaleIntercept",
-            "return": {
-                "description": "The rescale intercept.",
-                "type": "Number"
-            },
-            "class": "dwv.image.Image",
-            "module": "image",
-            "namespace": "dwv.image"
-        },
-        {
-            "file": "src/image/image.js",
-            "line": 263,
-            "description": "Set the rescale intercept.",
-            "itemtype": "method",
-            "name": "setRescaleIntercept",
-            "params": [
-                {
-                    "name": "ri",
-                    "description": "The rescale intercept.",
-                    "type": "Number"
-                }
-            ],
-            "class": "dwv.image.Image",
-            "module": "image",
-            "namespace": "dwv.image"
-        },
-        {
-            "file": "src/image/image.js",
-            "line": 269,
+            "line": 123,
             "description": "Get the photometricInterpretation of the image.",
             "itemtype": "method",
             "name": "getPhotometricInterpretation",
@@ -5281,7 +5430,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 275,
+            "line": 129,
             "description": "Set the photometricInterpretation of the image.",
             "itemtype": "method",
             "name": "setPhotometricInterpretation",
@@ -5292,7 +5441,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 281,
+            "line": 135,
             "description": "Get the planarConfiguration of the image.",
             "itemtype": "method",
             "name": "getPlanarConfiguration",
@@ -5306,7 +5455,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 287,
+            "line": 141,
             "description": "Set the planarConfiguration of the image.",
             "itemtype": "method",
             "name": "setPlanarConfiguration",
@@ -5323,7 +5472,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 293,
+            "line": 147,
             "description": "Get the numberOfComponents of the image.",
             "itemtype": "method",
             "name": "getNumberOfComponents",
@@ -5337,7 +5486,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 300,
+            "line": 154,
             "description": "Get the meta information of the image.",
             "itemtype": "method",
             "name": "getMeta",
@@ -5351,7 +5500,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 306,
+            "line": 160,
             "description": "Set the meta information of the image.",
             "itemtype": "method",
             "name": "setMeta",
@@ -5368,7 +5517,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 313,
+            "line": 167,
             "description": "Get value at offset. Warning: No size check...",
             "itemtype": "method",
             "name": "getValueAtOffset",
@@ -5389,7 +5538,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 323,
+            "line": 177,
             "description": "Clone the image.",
             "itemtype": "method",
             "name": "clone",
@@ -5403,7 +5552,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 339,
+            "line": 192,
             "description": "Append a slice to the image.",
             "itemtype": "method",
             "name": "appendSlice",
@@ -5420,7 +5569,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 429,
+            "line": 268,
             "description": "Get the data range.",
             "itemtype": "method",
             "name": "getDataRange",
@@ -5434,7 +5583,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 441,
+            "line": 280,
             "description": "Get the histogram.",
             "itemtype": "method",
             "name": "getHistogram",
@@ -5448,7 +5597,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 454,
+            "line": 293,
             "description": "Get the value of the image at a specific coordinate.",
             "itemtype": "method",
             "name": "getValue",
@@ -5479,7 +5628,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 470,
+            "line": 308,
             "description": "Get the rescaled value of the image at a specific offset.",
             "itemtype": "method",
             "name": "getRescaledValueAtOffset",
@@ -5500,7 +5649,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 482,
+            "line": 320,
             "description": "Get the rescaled value of the image at a specific coordinate.",
             "itemtype": "method",
             "name": "getRescaledValue",
@@ -5531,7 +5680,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 496,
+            "line": 334,
             "description": "Calculate the raw image data range.",
             "itemtype": "method",
             "name": "calculateDataRange",
@@ -5545,7 +5694,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 515,
+            "line": 353,
             "description": "Calculate the image data range after rescale.",
             "itemtype": "method",
             "name": "getRescaledDataRange",
@@ -5559,7 +5708,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 527,
+            "line": 365,
             "description": "Calculate the histogram of the image.",
             "itemtype": "method",
             "name": "calculateHistogram",
@@ -5573,7 +5722,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 551,
+            "line": 389,
             "description": "Convolute the image with a given 2D kernel.",
             "itemtype": "method",
             "name": "convolute2D",
@@ -5594,7 +5743,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 701,
+            "line": 540,
             "description": "Transform an image using a specific operator.",
             "itemtype": "method",
             "name": "transform",
@@ -5615,7 +5764,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 719,
+            "line": 558,
             "description": "Compose this image with another one and using a specific operator.",
             "itemtype": "method",
             "name": "compose",
@@ -5641,7 +5790,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 739,
+            "line": 578,
             "description": "Quantify a line according to image information.",
             "itemtype": "method",
             "name": "quantifyLine",
@@ -5662,7 +5811,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 752,
+            "line": 592,
             "description": "Quantify a rectangle according to image information.",
             "itemtype": "method",
             "name": "quantifyRect",
@@ -5683,7 +5832,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 777,
+            "line": 618,
             "description": "Quantify an ellipse according to image information.",
             "itemtype": "method",
             "name": "quantifyEllipse",
@@ -5704,7 +5853,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 798,
+            "line": 640,
             "description": "Get an Image object from the read DICOM file.",
             "itemtype": "method",
             "name": "create",
@@ -5977,7 +6126,7 @@
         },
         {
             "file": "src/image/reader.js",
-            "line": 69,
+            "line": 71,
             "description": "Get data from an input buffer using a DICOM parser.",
             "itemtype": "method",
             "name": "getDataFromDicomBuffer",
@@ -6012,7 +6161,7 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 31,
+            "line": 32,
             "description": "Window lookup table.",
             "itemtype": "property",
             "name": "windowLut",
@@ -6025,7 +6174,7 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 39,
+            "line": 40,
             "description": "Window presets.",
             "itemtype": "property",
             "name": "windowPresets",
@@ -6038,7 +6187,7 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 46,
+            "line": 47,
             "description": "Color map",
             "itemtype": "property",
             "name": "colorMap",
@@ -6051,7 +6200,7 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 53,
+            "line": 54,
             "description": "Current position",
             "itemtype": "property",
             "name": "currentPosition",
@@ -6064,7 +6213,7 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 61,
+            "line": 62,
             "description": "Get the associated image.",
             "itemtype": "method",
             "name": "getImage",
@@ -6078,7 +6227,7 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 67,
+            "line": 68,
             "description": "Set the associated image.",
             "itemtype": "method",
             "name": "setImage",
@@ -6095,7 +6244,7 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 74,
+            "line": 75,
             "description": "Get the rescale LUT of the image.",
             "itemtype": "method",
             "name": "getRescaleLut",
@@ -6109,7 +6258,7 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 80,
+            "line": 81,
             "description": "Set the rescale LUT of the image.",
             "itemtype": "method",
             "name": "setRescaleLut",
@@ -6126,7 +6275,7 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 87,
+            "line": 88,
             "description": "Get the window LUT of the image.",
             "itemtype": "method",
             "name": "getWindowLut",
@@ -6140,7 +6289,7 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 93,
+            "line": 94,
             "description": "Set the window LUT of the image.",
             "itemtype": "method",
             "name": "setWindowLut",
@@ -6157,7 +6306,7 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 100,
+            "line": 101,
             "description": "Get the window presets.",
             "itemtype": "method",
             "name": "getWindowPresets",
@@ -6171,7 +6320,7 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 106,
+            "line": 107,
             "description": "Set the window presets.",
             "itemtype": "method",
             "name": "setWindowPresets",
@@ -6188,7 +6337,7 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 116,
+            "line": 117,
             "description": "Get the color map of the image.",
             "itemtype": "method",
             "name": "getColorMap",
@@ -6202,7 +6351,7 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 122,
+            "line": 123,
             "description": "Set the color map of the image.",
             "itemtype": "method",
             "name": "setColorMap",
@@ -6219,7 +6368,7 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 138,
+            "line": 139,
             "description": "Is the data signed data.",
             "itemtype": "method",
             "name": "isSigned",
@@ -6233,7 +6382,7 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 145,
+            "line": 146,
             "description": "Get the current position.",
             "itemtype": "method",
             "name": "getCurrentPosition",
@@ -6247,7 +6396,7 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 151,
+            "line": 152,
             "description": "Set the current position. Returns false if not in bounds.",
             "itemtype": "method",
             "name": "setCurrentPosition",
@@ -6264,7 +6413,7 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 181,
+            "line": 182,
             "description": "View listeners",
             "itemtype": "property",
             "name": "listeners",
@@ -6277,7 +6426,7 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 188,
+            "line": 189,
             "description": "Get the view listeners.",
             "itemtype": "method",
             "name": "getListeners",
@@ -6291,7 +6440,7 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 194,
+            "line": 195,
             "description": "Set the view listeners.",
             "itemtype": "method",
             "name": "setListeners",
@@ -6308,7 +6457,7 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 202,
+            "line": 203,
             "description": "Set the view window/level.",
             "itemtype": "method",
             "name": "setWindowLevel",
@@ -6330,7 +6479,7 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 218,
+            "line": 219,
             "description": "Set the image window/level to cover the full data range.",
             "itemtype": "method",
             "name": "setWindowLevelMinMax\nWarning: uses the latest set rescale LUT or the default linear one.",
@@ -6340,7 +6489,7 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 234,
+            "line": 235,
             "description": "Go to first slice .",
             "itemtype": "method",
             "name": "goFirstSlice",
@@ -6354,7 +6503,7 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 247,
+            "line": 248,
             "description": "Increment the current slice number.",
             "itemtype": "method",
             "name": "incrementSliceNb",
@@ -6368,7 +6517,7 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 261,
+            "line": 262,
             "description": "Decrement the current slice number.",
             "itemtype": "method",
             "name": "decrementSliceNb",
@@ -6382,7 +6531,7 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 275,
+            "line": 276,
             "description": "Clone the image using all meta data and the original data buffer.",
             "itemtype": "method",
             "name": "clone",
@@ -6396,7 +6545,7 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 289,
+            "line": 290,
             "description": "Generate display image data to be given to a canvas.",
             "itemtype": "method",
             "name": "generateImageData",
@@ -6418,7 +6567,7 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 375,
+            "line": 374,
             "description": "Add an event listener on the view.",
             "itemtype": "method",
             "name": "addEventListener",
@@ -6440,7 +6589,7 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 390,
+            "line": 389,
             "description": "Remove an event listener on the view.",
             "itemtype": "method",
             "name": "removeEventListener",
@@ -6462,7 +6611,7 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 410,
+            "line": 409,
             "description": "Fire an event: call all associated listeners.",
             "itemtype": "method",
             "name": "fireEvent",
@@ -6479,7 +6628,7 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 435,
+            "line": 434,
             "description": "Get an View object from the read DICOM file.",
             "itemtype": "method",
             "name": "create",
@@ -6538,6 +6687,258 @@
             "namespace": "dwv.io"
         },
         {
+            "file": "src/math/point.js",
+            "line": 24,
+            "description": "Get the X position of the point.",
+            "itemtype": "method",
+            "name": "getX",
+            "return": {
+                "description": "The X position of the point.",
+                "type": "Number"
+            },
+            "class": "dwv.math.Point2D",
+            "module": "math",
+            "namespace": "dwv.math"
+        },
+        {
+            "file": "src/math/point.js",
+            "line": 30,
+            "description": "Get the Y position of the point.",
+            "itemtype": "method",
+            "name": "getY",
+            "return": {
+                "description": "The Y position of the point.",
+                "type": "Number"
+            },
+            "class": "dwv.math.Point2D",
+            "module": "math",
+            "namespace": "dwv.math"
+        },
+        {
+            "file": "src/math/point.js",
+            "line": 38,
+            "description": "Check for Point2D equality.",
+            "itemtype": "method",
+            "name": "equals",
+            "params": [
+                {
+                    "name": "rhs",
+                    "description": "The other Point2D to compare to.",
+                    "type": "Point2D"
+                }
+            ],
+            "return": {
+                "description": "True if both points are equal.",
+                "type": "Boolean"
+            },
+            "class": "dwv.math.Point2D",
+            "module": "math",
+            "namespace": "dwv.math"
+        },
+        {
+            "file": "src/math/point.js",
+            "line": 50,
+            "description": "Get a string representation of the Point2D.",
+            "itemtype": "method",
+            "name": "toString",
+            "return": {
+                "description": "The Point2D as a string.",
+                "type": "String"
+            },
+            "class": "dwv.math.Point2D",
+            "module": "math",
+            "namespace": "dwv.math"
+        },
+        {
+            "file": "src/math/point.js",
+            "line": 73,
+            "description": "Check for FastPoint2D equality.",
+            "itemtype": "method",
+            "name": "equals",
+            "params": [
+                {
+                    "name": "other",
+                    "description": "The other FastPoint2D to compare to.",
+                    "type": "FastPoint2D"
+                }
+            ],
+            "return": {
+                "description": "True if both points are equal.",
+                "type": "Boolean"
+            },
+            "class": "dwv.math.FastPoint2D",
+            "module": "math",
+            "namespace": "dwv.math"
+        },
+        {
+            "file": "src/math/point.js",
+            "line": 85,
+            "description": "Get a string representation of the FastPoint2D.",
+            "itemtype": "method",
+            "name": "toString",
+            "return": {
+                "description": "The Point2D as a string.",
+                "type": "String"
+            },
+            "class": "dwv.math.FastPoint2D",
+            "module": "math",
+            "namespace": "dwv.math"
+        },
+        {
+            "file": "src/math/point.js",
+            "line": 105,
+            "description": "Get the X position of the point.",
+            "itemtype": "method",
+            "name": "getX",
+            "return": {
+                "description": "The X position of the point.",
+                "type": "Number"
+            },
+            "class": "dwv.math.Point3D",
+            "module": "math",
+            "namespace": "dwv.math"
+        },
+        {
+            "file": "src/math/point.js",
+            "line": 111,
+            "description": "Get the Y position of the point.",
+            "itemtype": "method",
+            "name": "getY",
+            "return": {
+                "description": "The Y position of the point.",
+                "type": "Number"
+            },
+            "class": "dwv.math.Point3D",
+            "module": "math",
+            "namespace": "dwv.math"
+        },
+        {
+            "file": "src/math/point.js",
+            "line": 117,
+            "description": "Get the Z position of the point.",
+            "itemtype": "method",
+            "name": "getZ",
+            "return": {
+                "description": "The Z position of the point.",
+                "type": "Number"
+            },
+            "class": "dwv.math.Point3D",
+            "module": "math",
+            "namespace": "dwv.math"
+        },
+        {
+            "file": "src/math/point.js",
+            "line": 125,
+            "description": "Check for Point3D equality.",
+            "itemtype": "method",
+            "name": "equals",
+            "params": [
+                {
+                    "name": "rhs",
+                    "description": "The other Point3D to compare to.",
+                    "type": "Point3D"
+                }
+            ],
+            "return": {
+                "description": "True if both points are equal.",
+                "type": "Boolean"
+            },
+            "class": "dwv.math.Point3D",
+            "module": "math",
+            "namespace": "dwv.math"
+        },
+        {
+            "file": "src/math/point.js",
+            "line": 138,
+            "description": "Get a string representation of the Point3D.",
+            "itemtype": "method",
+            "name": "toString",
+            "return": {
+                "description": "The Point3D as a string.",
+                "type": "String"
+            },
+            "class": "dwv.math.Point3D",
+            "module": "math",
+            "namespace": "dwv.math"
+        },
+        {
+            "file": "src/math/point.js",
+            "line": 160,
+            "description": "Get the column index.",
+            "itemtype": "method",
+            "name": "getI",
+            "return": {
+                "description": "The column index.",
+                "type": "Number"
+            },
+            "class": "dwv.math.Index3D",
+            "module": "math",
+            "namespace": "dwv.math"
+        },
+        {
+            "file": "src/math/point.js",
+            "line": 166,
+            "description": "Get the row index.",
+            "itemtype": "method",
+            "name": "getJ",
+            "return": {
+                "description": "The row index.",
+                "type": "Number"
+            },
+            "class": "dwv.math.Index3D",
+            "module": "math",
+            "namespace": "dwv.math"
+        },
+        {
+            "file": "src/math/point.js",
+            "line": 172,
+            "description": "Get the slice index.",
+            "itemtype": "method",
+            "name": "getK",
+            "return": {
+                "description": "The slice index.",
+                "type": "Number"
+            },
+            "class": "dwv.math.Index3D",
+            "module": "math",
+            "namespace": "dwv.math"
+        },
+        {
+            "file": "src/math/point.js",
+            "line": 180,
+            "description": "Check for Index3D equality.",
+            "itemtype": "method",
+            "name": "equals",
+            "params": [
+                {
+                    "name": "rhs",
+                    "description": "The other Index3D to compare to.",
+                    "type": "Index3D"
+                }
+            ],
+            "return": {
+                "description": "True if both points are equal.",
+                "type": "Boolean"
+            },
+            "class": "dwv.math.Index3D",
+            "module": "math",
+            "namespace": "dwv.math"
+        },
+        {
+            "file": "src/math/point.js",
+            "line": 193,
+            "description": "Get a string representation of the Index3D.",
+            "itemtype": "method",
+            "name": "toString",
+            "return": {
+                "description": "The Index3D as a string.",
+                "type": "String"
+            },
+            "class": "dwv.math.Index3D",
+            "module": "math",
+            "namespace": "dwv.math"
+        },
+        {
             "file": "src/math/scissors.js",
             "line": 11,
             "class": "dwv.math.Scissors",
@@ -6558,104 +6959,6 @@
         {
             "file": "src/math/shapes.js",
             "line": 24,
-            "description": "Get the X position of the point.",
-            "itemtype": "method",
-            "name": "getX",
-            "return": {
-                "description": "The X position of the point.",
-                "type": "Number"
-            },
-            "class": "dwv.math.Point2D",
-            "module": "math",
-            "namespace": "dwv.math"
-        },
-        {
-            "file": "src/math/shapes.js",
-            "line": 30,
-            "description": "Get the Y position of the point.",
-            "itemtype": "method",
-            "name": "getY",
-            "return": {
-                "description": "The Y position of the point.",
-                "type": "Number"
-            },
-            "class": "dwv.math.Point2D",
-            "module": "math",
-            "namespace": "dwv.math"
-        },
-        {
-            "file": "src/math/shapes.js",
-            "line": 38,
-            "description": "Check for Point2D equality.",
-            "itemtype": "method",
-            "name": "equals",
-            "params": [
-                {
-                    "name": "other",
-                    "description": "The other Point2D to compare to.",
-                    "type": "Point2D"
-                }
-            ],
-            "return": {
-                "description": "True if both points are equal.",
-                "type": "Boolean"
-            },
-            "class": "dwv.math.Point2D",
-            "module": "math",
-            "namespace": "dwv.math"
-        },
-        {
-            "file": "src/math/shapes.js",
-            "line": 51,
-            "description": "Get a string representation of the Point2D.",
-            "itemtype": "method",
-            "name": "toString",
-            "return": {
-                "description": "The Point2D as a string.",
-                "type": "String"
-            },
-            "class": "dwv.math.Point2D",
-            "module": "math",
-            "namespace": "dwv.math"
-        },
-        {
-            "file": "src/math/shapes.js",
-            "line": 74,
-            "description": "Check for FastPoint2D equality.",
-            "itemtype": "method",
-            "name": "equals",
-            "params": [
-                {
-                    "name": "other",
-                    "description": "The other FastPoint2D to compare to.",
-                    "type": "FastPoint2D"
-                }
-            ],
-            "return": {
-                "description": "True if both points are equal.",
-                "type": "Boolean"
-            },
-            "class": "dwv.math.FastPoint2D",
-            "module": "math",
-            "namespace": "dwv.math"
-        },
-        {
-            "file": "src/math/shapes.js",
-            "line": 87,
-            "description": "Get a string representation of the FastPoint2D.",
-            "itemtype": "method",
-            "name": "toString",
-            "return": {
-                "description": "The Point2D as a string.",
-                "type": "String"
-            },
-            "class": "dwv.math.FastPoint2D",
-            "module": "math",
-            "namespace": "dwv.math"
-        },
-        {
-            "file": "src/math/shapes.js",
-            "line": 106,
             "description": "Circle surface.",
             "itemtype": "property",
             "name": "surface",
@@ -6668,7 +6971,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 114,
+            "line": 32,
             "description": "Get the centre (point) of the circle.",
             "itemtype": "method",
             "name": "getCenter",
@@ -6682,7 +6985,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 120,
+            "line": 38,
             "description": "Get the radius of the circle.",
             "itemtype": "method",
             "name": "getRadius",
@@ -6696,7 +6999,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 126,
+            "line": 44,
             "description": "Get the surface of the circle.",
             "itemtype": "method",
             "name": "getSurface",
@@ -6710,7 +7013,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 132,
+            "line": 50,
             "description": "Get the surface of the circle with a spacing.",
             "itemtype": "method",
             "name": "getWorldSurface",
@@ -6736,7 +7039,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 156,
+            "line": 74,
             "description": "Circle surface.",
             "itemtype": "property",
             "name": "surface",
@@ -6749,7 +7052,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 164,
+            "line": 82,
             "description": "Get the centre (point) of the ellipse.",
             "itemtype": "method",
             "name": "getCenter",
@@ -6763,7 +7066,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 170,
+            "line": 88,
             "description": "Get the radius of the ellipse on the horizontal axe.",
             "itemtype": "method",
             "name": "getA",
@@ -6777,7 +7080,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 176,
+            "line": 94,
             "description": "Get the radius of the ellipse on the vertical axe.",
             "itemtype": "method",
             "name": "getB",
@@ -6791,7 +7094,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 182,
+            "line": 100,
             "description": "Get the surface of the ellipse.",
             "itemtype": "method",
             "name": "getSurface",
@@ -6805,7 +7108,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 188,
+            "line": 106,
             "description": "Get the surface of the ellipse with a spacing.",
             "itemtype": "method",
             "name": "getWorldSurface",
@@ -6831,7 +7134,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 211,
+            "line": 129,
             "description": "Line delta in the X direction.",
             "itemtype": "property",
             "name": "dx",
@@ -6844,7 +7147,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 218,
+            "line": 136,
             "description": "Line delta in the Y direction.",
             "itemtype": "property",
             "name": "dy",
@@ -6857,7 +7160,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 225,
+            "line": 143,
             "description": "Line length.",
             "itemtype": "property",
             "name": "length",
@@ -6870,7 +7173,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 233,
+            "line": 151,
             "description": "Get the begin point of the line.",
             "itemtype": "method",
             "name": "getBegin",
@@ -6884,7 +7187,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 239,
+            "line": 157,
             "description": "Get the end point of the line.",
             "itemtype": "method",
             "name": "getEnd",
@@ -6898,7 +7201,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 245,
+            "line": 163,
             "description": "Get the line delta in the X direction.",
             "itemtype": "method",
             "name": "getDeltaX",
@@ -6912,7 +7215,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 251,
+            "line": 169,
             "description": "Get the line delta in the Y direction.",
             "itemtype": "method",
             "name": "getDeltaX",
@@ -6926,7 +7229,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 257,
+            "line": 175,
             "description": "Get the length of the line.",
             "itemtype": "method",
             "name": "getLength",
@@ -6940,7 +7243,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 263,
+            "line": 181,
             "description": "Get the length of the line with spacing.",
             "itemtype": "method",
             "name": "getWorldLength",
@@ -6966,7 +7269,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 276,
+            "line": 194,
             "description": "Get the mid point of the line.",
             "itemtype": "method",
             "name": "getMidpoint",
@@ -6980,7 +7283,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 287,
+            "line": 205,
             "description": "Get the slope of the line.",
             "itemtype": "method",
             "name": "getSlope",
@@ -6994,7 +7297,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 296,
+            "line": 214,
             "description": "Get the inclination of the line.",
             "itemtype": "method",
             "name": "getInclination",
@@ -7008,7 +7311,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 310,
+            "line": 228,
             "description": "Get the angle between two lines.",
             "params": [
                 {
@@ -7026,7 +7329,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 353,
+            "line": 271,
             "description": "Rectangle surface.",
             "itemtype": "property",
             "name": "surface",
@@ -7039,7 +7342,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 361,
+            "line": 279,
             "description": "Get the begin point of the rectangle.",
             "itemtype": "method",
             "name": "getBegin",
@@ -7053,7 +7356,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 367,
+            "line": 285,
             "description": "Get the end point of the rectangle.",
             "itemtype": "method",
             "name": "getEnd",
@@ -7067,7 +7370,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 373,
+            "line": 291,
             "description": "Get the real width of the rectangle.",
             "itemtype": "method",
             "name": "getRealWidth",
@@ -7081,7 +7384,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 379,
+            "line": 297,
             "description": "Get the real height of the rectangle.",
             "itemtype": "method",
             "name": "getRealHeight",
@@ -7095,7 +7398,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 385,
+            "line": 303,
             "description": "Get the width of the rectangle.",
             "itemtype": "method",
             "name": "getWidth",
@@ -7109,7 +7412,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 391,
+            "line": 309,
             "description": "Get the height of the rectangle.",
             "itemtype": "method",
             "name": "getHeight",
@@ -7123,7 +7426,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 397,
+            "line": 315,
             "description": "Get the surface of the rectangle.",
             "itemtype": "method",
             "name": "getSurface",
@@ -7137,7 +7440,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 403,
+            "line": 321,
             "description": "Get the surface of the rectangle with a spacing.",
             "itemtype": "method",
             "name": "getWorldSurface",
@@ -7151,7 +7454,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 423,
+            "line": 341,
             "description": "List of points.",
             "itemtype": "property",
             "name": "points",
@@ -7164,7 +7467,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 431,
+            "line": 349,
             "description": "Get a point of the list at a given index.",
             "itemtype": "method",
             "name": "getPoint",
@@ -7185,7 +7488,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 438,
+            "line": 356,
             "description": "Get the length of the point list.",
             "itemtype": "method",
             "name": "getLength",
@@ -7199,7 +7502,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 444,
+            "line": 362,
             "description": "Add a point to the ROI.",
             "itemtype": "method",
             "name": "addPoint",
@@ -7216,7 +7519,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 450,
+            "line": 368,
             "description": "Add points to the ROI.",
             "itemtype": "method",
             "name": "addPoints",
@@ -7233,7 +7536,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 470,
+            "line": 388,
             "description": "List of points.",
             "itemtype": "property",
             "name": "pointArray",
@@ -7244,7 +7547,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 476,
+            "line": 394,
             "description": "List of control points.",
             "itemtype": "property",
             "name": "controlPointIndexArray",
@@ -7255,7 +7558,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 485,
+            "line": 403,
             "description": "Get a point of the list.",
             "itemtype": "method",
             "name": "getPoint",
@@ -7276,7 +7579,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 495,
+            "line": 413,
             "description": "Is the given point a control point.",
             "itemtype": "method",
             "name": "isControlPoint",
@@ -7297,7 +7600,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 511,
+            "line": 429,
             "description": "Get the length of the path.",
             "itemtype": "method",
             "name": "getLength",
@@ -7311,7 +7614,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 520,
+            "line": 438,
             "description": "Add a point to the path.",
             "itemtype": "method",
             "name": "addPoint",
@@ -7328,7 +7631,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 529,
+            "line": 447,
             "description": "Add a control point to the path.",
             "itemtype": "method",
             "name": "addControlPoint",
@@ -7345,7 +7648,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 544,
+            "line": 462,
             "description": "Add points to the path.",
             "itemtype": "method",
             "name": "addPoints",
@@ -7362,7 +7665,7 @@
         },
         {
             "file": "src/math/shapes.js",
-            "line": 553,
+            "line": 471,
             "description": "Append a Path to this one.",
             "itemtype": "method",
             "name": "appenPath",
@@ -9115,7 +9418,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 99,
+            "line": 100,
             "description": "Clear the stored paths.",
             "itemtype": "method",
             "name": "clearPaths",
@@ -9127,7 +9430,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 109,
+            "line": 110,
             "description": "Scissor representation.",
             "itemtype": "property",
             "name": "scissors",
@@ -9140,7 +9443,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 117,
+            "line": 118,
             "description": "Handle mouse down event.",
             "itemtype": "method",
             "name": "mousedown",
@@ -9157,7 +9460,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 161,
+            "line": 162,
             "description": "Handle mouse move event.",
             "itemtype": "method",
             "name": "mousemove",
@@ -9174,7 +9477,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 228,
+            "line": 229,
             "description": "Handle mouse up event.",
             "itemtype": "method",
             "name": "mouseup",
@@ -9191,7 +9494,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 237,
+            "line": 238,
             "description": "Handle mouse out event.",
             "itemtype": "method",
             "name": "mouseout",
@@ -9208,7 +9511,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 247,
+            "line": 248,
             "description": "Handle touch start event.",
             "itemtype": "method",
             "name": "touchstart",
@@ -9225,7 +9528,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 257,
+            "line": 258,
             "description": "Handle touch move event.",
             "itemtype": "method",
             "name": "touchmove",
@@ -9242,7 +9545,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 267,
+            "line": 268,
             "description": "Handle touch end event.",
             "itemtype": "method",
             "name": "touchend",
@@ -9259,7 +9562,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 277,
+            "line": 278,
             "description": "Handle key down event.",
             "itemtype": "method",
             "name": "keydown",
@@ -9276,7 +9579,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 286,
+            "line": 287,
             "description": "Setup the tool GUI.",
             "itemtype": "method",
             "name": "setup",
@@ -9286,7 +9589,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 296,
+            "line": 297,
             "description": "Enable the tool.",
             "itemtype": "method",
             "name": "enable",
@@ -9303,7 +9606,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 309,
+            "line": 310,
             "description": "Initialise the tool.",
             "itemtype": "method",
             "name": "init",
@@ -9313,7 +9616,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 331,
+            "line": 333,
             "description": "Help for this tool.",
             "itemtype": "method",
             "name": "getHelp",
@@ -9327,7 +9630,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 349,
+            "line": 351,
             "description": "Set the line color of the drawing.",
             "itemtype": "method",
             "name": "setLineColour",
@@ -11628,7 +11931,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 1215,
+            "line": 1216,
             "description": "Set the current position.",
             "itemtype": "method",
             "name": "setWindowLevel",
@@ -11650,7 +11953,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 1227,
+            "line": 1228,
             "description": "Set the window/level.",
             "itemtype": "method",
             "name": "setWindowLevel",
@@ -11672,7 +11975,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 1238,
+            "line": 1239,
             "description": "Set the colour map.",
             "itemtype": "method",
             "name": "setColourMap",
@@ -11689,7 +11992,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 1248,
+            "line": 1249,
             "description": "Set the colour map from a name.",
             "itemtype": "method",
             "name": "setColourMapFromName",
@@ -11706,7 +12009,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 1273,
+            "line": 1274,
             "description": "Set the selected tool.",
             "itemtype": "method",
             "name": "setSelectedTool",
@@ -11723,7 +12026,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 1283,
+            "line": 1284,
             "description": "Set the selected shape.",
             "itemtype": "method",
             "name": "setSelectedShape",
@@ -11740,7 +12043,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 1293,
+            "line": 1294,
             "description": "Set the selected filter.",
             "itemtype": "method",
             "name": "setSelectedFilter",
@@ -11757,7 +12060,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 1303,
+            "line": 1304,
             "description": "Run the selected filter.",
             "itemtype": "method",
             "name": "runSelectedFilter",
@@ -11767,7 +12070,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 1312,
+            "line": 1313,
             "description": "Set the tool line color.",
             "itemtype": "method",
             "name": "runFilter",
@@ -11784,7 +12087,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 1322,
+            "line": 1323,
             "description": "Set the tool range.",
             "itemtype": "method",
             "name": "setRange",
@@ -11867,15 +12170,15 @@
         },
         {
             "message": "unknown tag: pqrqm",
-            "line": " src/image/image.js:275"
+            "line": " src/image/image.js:129"
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/image/image.js:798"
+            "line": " src/image/image.js:640"
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/image/view.js:435"
+            "line": " src/image/view.js:434"
         },
         {
             "message": "unknown tag: input",
@@ -11895,7 +12198,7 @@
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/tools/livewire.js:331"
+            "line": " src/tools/livewire.js:333"
         },
         {
             "message": "replacing incorrect tag: returns with return",
@@ -11915,7 +12218,7 @@
         },
         {
             "message": "replacing incorrect tag: function with method",
-            "line": " src/application.js:1248"
+            "line": " src/application.js:1249"
         },
         {
             "message": "Missing item type\nDICOM tag dictionary.",
@@ -11924,6 +12227,26 @@
         {
             "message": "Missing item type\nDisplay a loader.",
             "line": " src/gui/loader.js:45"
+        },
+        {
+            "message": "Missing item type\nGet the slice position of a point in the current slice layout.",
+            "line": " src/image/geometry.js:168"
+        },
+        {
+            "message": "Missing item type",
+            "line": " src/image/geometry.js:212"
+        },
+        {
+            "message": "Missing item type",
+            "line": " src/image/geometry.js:222"
+        },
+        {
+            "message": "Missing item type",
+            "line": " src/image/geometry.js:234"
+        },
+        {
+            "message": "Missing item type",
+            "line": " src/image/image.js:8"
         },
         {
             "message": "Missing item type\nLookup tables for image color display.",
@@ -11943,7 +12266,7 @@
         },
         {
             "message": "Missing item type\nGet the angle between two lines.",
-            "line": " src/math/shapes.js:310"
+            "line": " src/math/shapes.js:228"
         },
         {
             "message": "Missing item type\nGet the real position from an event.",

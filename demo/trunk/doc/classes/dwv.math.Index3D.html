@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>dwv.tool.ProtractorFactory - dwv</title>
+    <title>dwv.math.Index3D - dwv</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
     <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
@@ -169,30 +169,42 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-<h1>dwv.tool.ProtractorFactory Class</h1>
+<h1>dwv.math.Index3D Class</h1>
 <div class="box meta">
 
 
         <div class="foundat">
-            Defined in: <a href="../files/src_tools_protractor.js.html#l9"><code>src&#x2F;tools&#x2F;protractor.js:9</code></a>
+            Defined in: <a href="../files/src_math_point.js.html#l149"><code>src&#x2F;math&#x2F;point.js:149</code></a>
         </div>
 
-            Module: <a href="../modules/tool.html">tool</a>
+            Module: <a href="../modules/math.html">math</a>
 
 </div>
 
 
 <div class="box intro">
-    <p>Protractor factory.</p>
+    <p>Immutable 3D index.</p>
 
 </div>
 
     <div class="constructor">
         <h2>Constructor</h2>
-        <div id="method_dwv.tool.ProtractorFactory" class="method item">
-            <h3 class="name"><code>dwv.tool.ProtractorFactory</code></h3>
+        <div id="method_dwv.math.Index3D" class="method item">
+            <h3 class="name"><code>dwv.math.Index3D</code></h3>
         
-                <span class="paren">()</span>
+                <div class="args">
+                    <span class="paren">(</span><ul class="args-list inline commas">
+                        <li class="arg">
+                                <code>i</code>
+                        </li>
+                        <li class="arg">
+                                <code>j</code>
+                        </li>
+                        <li class="arg">
+                                <code>k</code>
+                        </li>
+                    </ul><span class="paren">)</span>
+                </div>
         
         
         
@@ -204,7 +216,7 @@
             <div class="meta">
                         <p>
                         Defined in
-                <a href="../files/src_tools_protractor.js.html#l9"><code>src&#x2F;tools&#x2F;protractor.js:9</code></a>
+                <a href="../files/src_math_point.js.html#l149"><code>src&#x2F;math&#x2F;point.js:149</code></a>
                 </p>
         
         
@@ -215,6 +227,45 @@
                 
             </div>
         
+                <div class="params">
+                    <h4>Parameters:</h4>
+        
+                    <ul class="params-list">
+                        <li class="param">
+                                <code class="param-name">i</code>
+                                <span class="type">Number</span>
+        
+        
+                            <div class="param-description">
+                                <p>The column index.</p>
+        
+                            </div>
+        
+                        </li>
+                        <li class="param">
+                                <code class="param-name">j</code>
+                                <span class="type">Number</span>
+        
+        
+                            <div class="param-description">
+                                <p>The row index.</p>
+        
+                            </div>
+        
+                        </li>
+                        <li class="param">
+                                <code class="param-name">k</code>
+                                <span class="type">Number</span>
+        
+        
+                            <div class="param-description">
+                                <p>The slice index.</p>
+        
+                            </div>
+        
+                        </li>
+                    </ul>
+                </div>
         
         
         
@@ -237,22 +288,24 @@
 
                     <ul class="index-list methods">
                             <li class="index-item method">
-                                <a href="#method_getNPoints">getNPoints</a>
+                                <a href="#method_equals">equals</a>
 
                             </li>
                             <li class="index-item method">
-                                <a href="#method_getTimeout">getTimeout</a>
+                                <a href="#method_getI">getI</a>
 
                             </li>
                             <li class="index-item method">
-                                <a href="#method_ProtractorCreator">ProtractorCreator</a>
+                                <a href="#method_getJ">getJ</a>
 
-                                    <span class="flag static">static</span>
                             </li>
                             <li class="index-item method">
-                                <a href="#method_UpdateProtractor">UpdateProtractor</a>
+                                <a href="#method_getK">getK</a>
 
-                                    <span class="flag static">static</span>
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_toString">toString</a>
+
                             </li>
                     </ul>
                 </div>
@@ -264,8 +317,74 @@
             <div id="methods" class="api-class-tabpanel">
                 <h2 class="off-left">Methods</h2>
 
-<div id="method_getNPoints" class="method item">
-    <h3 class="name"><code>getNPoints</code></h3>
+<div id="method_equals" class="method item">
+    <h3 class="name"><code>equals</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>rhs</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+        <span class="returns-inline">
+            <span class="type">Boolean</span>
+        </span>
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/src_math_point.js.html#l180"><code>src&#x2F;math&#x2F;point.js:180</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Check for Index3D equality.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">rhs</code>
+                        <span class="type">Index3D</span>
+
+
+                    <div class="param-description">
+                        <p>The other Index3D to compare to.</p>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                        <span class="type">Boolean</span>:
+                    <p>True if both points are equal.</p>
+
+            </div>
+        </div>
+
+
+</div>
+<div id="method_getI" class="method item">
+    <h3 class="name"><code>getI</code></h3>
 
         <span class="paren">()</span>
 
@@ -282,7 +401,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_tools_protractor.js.html#l17"><code>src&#x2F;tools&#x2F;protractor.js:17</code></a>
+        <a href="../files/src_math_point.js.html#l160"><code>src&#x2F;math&#x2F;point.js:160</code></a>
         </p>
 
 
@@ -290,7 +409,7 @@
     </div>
 
     <div class="description">
-        <p>Get the number of points needed to build the shape.</p>
+        <p>Get the column index.</p>
 
     </div>
 
@@ -300,15 +419,15 @@
 
             <div class="returns-description">
                         <span class="type">Number</span>:
-                    <p>The number of points.</p>
+                    <p>The column index.</p>
 
             </div>
         </div>
 
 
 </div>
-<div id="method_getTimeout" class="method item">
-    <h3 class="name"><code>getTimeout</code></h3>
+<div id="method_getJ" class="method item">
+    <h3 class="name"><code>getJ</code></h3>
 
         <span class="paren">()</span>
 
@@ -325,7 +444,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_tools_protractor.js.html#l23"><code>src&#x2F;tools&#x2F;protractor.js:23</code></a>
+        <a href="../files/src_math_point.js.html#l166"><code>src&#x2F;math&#x2F;point.js:166</code></a>
         </p>
 
 
@@ -333,7 +452,7 @@
     </div>
 
     <div class="description">
-        <p>Get the timeout between point storage.</p>
+        <p>Get the row index.</p>
 
     </div>
 
@@ -343,42 +462,32 @@
 
             <div class="returns-description">
                         <span class="type">Number</span>:
-                    <p>The timeout in milliseconds.</p>
+                    <p>The row index.</p>
 
             </div>
         </div>
 
 
 </div>
-<div id="method_ProtractorCreator" class="method item">
-    <h3 class="name"><code>ProtractorCreator</code></h3>
+<div id="method_getK" class="method item">
+    <h3 class="name"><code>getK</code></h3>
 
-        <div class="args">
-            <span class="paren">(</span><ul class="args-list inline commas">
-                <li class="arg">
-                        <code>points</code>
-                </li>
-                <li class="arg">
-                        <code>style</code>
-                </li>
-                <li class="arg">
-                        <code>image</code>
-                </li>
-            </ul><span class="paren">)</span>
-        </div>
+        <span class="paren">()</span>
+
+        <span class="returns-inline">
+            <span class="type">Number</span>
+        </span>
 
 
 
 
-
-        <span class="flag static">static</span>
 
 
 
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_tools_protractor.js.html#l31"><code>src&#x2F;tools&#x2F;protractor.js:31</code></a>
+        <a href="../files/src_math_point.js.html#l172"><code>src&#x2F;math&#x2F;point.js:172</code></a>
         </p>
 
 
@@ -386,79 +495,42 @@
     </div>
 
     <div class="description">
-        <p>Create a protractor shape to be displayed.</p>
+        <p>Get the slice index.</p>
 
     </div>
 
-        <div class="params">
-            <h4>Parameters:</h4>
 
-            <ul class="params-list">
-                <li class="param">
-                        <code class="param-name">points</code>
-                        <span class="type">Array</span>
+        <div class="returns">
+            <h4>Returns:</h4>
 
+            <div class="returns-description">
+                        <span class="type">Number</span>:
+                    <p>The slice index.</p>
 
-                    <div class="param-description">
-                        <p>The points from which to extract the protractor.</p>
-
-                    </div>
-
-                </li>
-                <li class="param">
-                        <code class="param-name">style</code>
-                        <span class="type">Object</span>
-
-
-                    <div class="param-description">
-                        <p>The drawing style.</p>
-
-                    </div>
-
-                </li>
-                <li class="param">
-                        <code class="param-name">image</code>
-                        <span class="type">Object</span>
-
-
-                    <div class="param-description">
-                        <p>The associated image.</p>
-
-                    </div>
-
-                </li>
-            </ul>
+            </div>
         </div>
-
 
 
 </div>
-<div id="method_UpdateProtractor" class="method item">
-    <h3 class="name"><code>UpdateProtractor</code></h3>
+<div id="method_toString" class="method item">
+    <h3 class="name"><code>toString</code></h3>
 
-        <div class="args">
-            <span class="paren">(</span><ul class="args-list inline commas">
-                <li class="arg">
-                        <code>anchor</code>
-                </li>
-                <li class="arg">
-                        <code>image</code>
-                </li>
-            </ul><span class="paren">)</span>
-        </div>
+        <span class="paren">()</span>
+
+        <span class="returns-inline">
+            <span class="type">String</span>
+        </span>
 
 
 
 
-
-        <span class="flag static">static</span>
 
 
 
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_tools_protractor.js.html#l103"><code>src&#x2F;tools&#x2F;protractor.js:103</code></a>
+        <a href="../files/src_math_point.js.html#l193"><code>src&#x2F;math&#x2F;point.js:193</code></a>
         </p>
 
 
@@ -466,39 +538,20 @@
     </div>
 
     <div class="description">
-        <p>Update a protractor shape.</p>
+        <p>Get a string representation of the Index3D.</p>
 
     </div>
 
-        <div class="params">
-            <h4>Parameters:</h4>
 
-            <ul class="params-list">
-                <li class="param">
-                        <code class="param-name">anchor</code>
-                        <span class="type">Object</span>
+        <div class="returns">
+            <h4>Returns:</h4>
 
+            <div class="returns-description">
+                        <span class="type">String</span>:
+                    <p>The Index3D as a string.</p>
 
-                    <div class="param-description">
-                        <p>The active anchor.</p>
-
-                    </div>
-
-                </li>
-                <li class="param">
-                        <code class="param-name">image</code>
-                        <span class="type">Object</span>
-
-
-                    <div class="param-description">
-                        <p>The associated image.</p>
-
-                    </div>
-
-                </li>
-            </ul>
+            </div>
         </div>
-
 
 
 </div>

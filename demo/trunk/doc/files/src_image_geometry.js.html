@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>dwv.tool.ProtractorFactory - dwv</title>
+    <title>src/image/geometry.js - dwv</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
     <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
@@ -169,344 +169,256 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-<h1>dwv.tool.ProtractorFactory Class</h1>
-<div class="box meta">
+<h1 class="file-heading">File: src/image/geometry.js</h1>
 
+<div class="file">
+    <pre class="code prettyprint linenums">
+/** 
+ * Image module.
+ * @module image
+ */
+var dwv = dwv || {};
+dwv.image = dwv.image || {};
 
-        <div class="foundat">
-            Defined in: <a href="../files/src_tools_protractor.js.html#l9"><code>src&#x2F;tools&#x2F;protractor.js:9</code></a>
-        </div>
+/**
+ * 2D/3D Size class.
+ * @class Size
+ * @namespace dwv.image
+ * @constructor
+ * @param {Number} numberOfColumns The number of columns.
+ * @param {Number} numberOfRows The number of rows.
+ * @param {Number} numberOfSlices The number of slices.
+*/
+dwv.image.Size = function ( numberOfColumns, numberOfRows, numberOfSlices )
+{
+    /**
+     * Get the number of columns.
+     * @method getNumberOfColumns
+     * @return {Number} The number of columns.
+     */ 
+    this.getNumberOfColumns = function () { return numberOfColumns; };
+    /**
+     * Get the number of rows.
+     * @method getNumberOfRows
+     * @return {Number} The number of rows.
+     */ 
+    this.getNumberOfRows = function () { return numberOfRows; };
+    /**
+     * Get the number of slices.
+     * @method getNumberOfSlices
+     * @return {Number} The number of slices.
+     */ 
+    this.getNumberOfSlices = function () { return (numberOfSlices || 1.0); };
+};
 
-            Module: <a href="../modules/tool.html">tool</a>
+/**
+ * Get the size of a slice.
+ * @method getSliceSize
+ * @return {Number} The size of a slice.
+ */ 
+dwv.image.Size.prototype.getSliceSize = function () {
+    return this.getNumberOfColumns() * this.getNumberOfRows();
+};
 
-</div>
+/**
+ * Get the total size.
+ * @method getTotalSize
+ * @return {Number} The total size.
+ */ 
+dwv.image.Size.prototype.getTotalSize = function () {
+    return this.getSliceSize() * this.getNumberOfSlices();
+};
 
+/**
+ * Check for equality.
+ * @method equals
+ * @param {Size} rhs The object to compare to.
+ * @return {Boolean} True if both objects are equal.
+ */ 
+dwv.image.Size.prototype.equals = function (rhs) {
+    return rhs !== null &amp;&amp;
+        this.getNumberOfColumns() === rhs.getNumberOfColumns() &amp;&amp;
+        this.getNumberOfRows() === rhs.getNumberOfRows() &amp;&amp;
+        this.getNumberOfSlices() === rhs.getNumberOfSlices();
+};
 
-<div class="box intro">
-    <p>Protractor factory.</p>
+/**
+ * Check that coordinates are within bounds.
+ * @method isInBounds
+ * @param {Number} i The column coordinate.
+ * @param {Number} j The row coordinate.
+ * @param {Number} k The slice coordinate.
+ * @return {Boolean} True if the given coordinates are within bounds.
+ */ 
+dwv.image.Size.prototype.isInBounds = function ( i, j, k ) {
+    if( i &lt; 0 || i &gt; this.getNumberOfColumns() - 1 ||
+        j &lt; 0 || j &gt; this.getNumberOfRows() - 1 ||
+        k &lt; 0 || k &gt; this.getNumberOfSlices() - 1 ) {
+        return false;
+    }
+    return true;
+};
 
-</div>
+/**
+ * 2D/3D Spacing class. 
+ * @class Spacing
+ * @namespace dwv.image
+ * @constructor
+ * @param {Number} columnSpacing The column spacing.
+ * @param {Number} rowSpacing The row spacing.
+ * @param {Number} sliceSpacing The slice spacing.
+ */
+dwv.image.Spacing = function ( columnSpacing, rowSpacing, sliceSpacing )
+{
+    /**
+     * Get the column spacing.
+     * @method getColumnSpacing
+     * @return {Number} The column spacing.
+     */ 
+    this.getColumnSpacing = function () { return columnSpacing; };
+    /**
+     * Get the row spacing.
+     * @method getRowSpacing
+     * @return {Number} The row spacing.
+     */ 
+    this.getRowSpacing = function () { return rowSpacing; };
+    /**
+     * Get the slice spacing.
+     * @method getSliceSpacing
+     * @return {Number} The slice spacing.
+     */ 
+    this.getSliceSpacing = function () { return (sliceSpacing || 1.0); };
+};
 
-    <div class="constructor">
-        <h2>Constructor</h2>
-        <div id="method_dwv.tool.ProtractorFactory" class="method item">
-            <h3 class="name"><code>dwv.tool.ProtractorFactory</code></h3>
+/**
+ * Check for equality.
+ * @method equals
+ * @param {Spacing} rhs The object to compare to.
+ * @return {Boolean} True if both objects are equal.
+ */ 
+dwv.image.Spacing.prototype.equals = function (rhs) {
+    return rhs !== null &amp;&amp;
+        this.getColumnSpacing() === rhs.getColumnSpacing() &amp;&amp;
+        this.getRowSpacing() === rhs.getRowSpacing() &amp;&amp;
+        this.getSliceSpacing() === rhs.getSliceSpacing();
+};
+
+/**
+ * 2D/3D Geometry class. 
+ * @class Geometry
+ * @namespace dwv.image
+ * @constructor
+ * @param {Object} origin The object origin.
+ * @param {Object} size The object size.
+ * @param {Object} spacing The object spacing.
+ */
+dwv.image.Geometry = function ( origin, size, spacing )
+{
+    // check input origin.
+    if( typeof(origin) === &#x27;undefined&#x27; ) {
+        origin = new dwv.math.Point3D(0,0,0);
+    }
+    var origins = [origin];
+    
+    /**
+     * Get the object origin.
+     * @method getOrigin
+     * @return {Object} The object origin.
+     */ 
+    this.getOrigin = function () { return origin; };
+    this.getOrigins = function () { return origins; };
+    /**
+     * Get the object size.
+     * @method getSize
+     * @return {Object} The object size.
+     */ 
+    this.getSize = function () { return size; };
+    /**
+     * Get the object spacing.
+     * @method getSpacing
+     * @return {Object} The object spacing.
+     */ 
+    this.getSpacing = function () { return spacing; };
+    
+    /**
+     * Get the slice position of a point in the current slice layout.
+     */
+    this.getSliceIndex = function (point) {
+        // cannot use this.worldToIndex(point).getK() since
+        // we cannot guaranty consecutive slices...
         
-                <span class="paren">()</span>
-        
-        
-        
-        
-        
-        
-        
-        
-            <div class="meta">
-                        <p>
-                        Defined in
-                <a href="../files/src_tools_protractor.js.html#l9"><code>src&#x2F;tools&#x2F;protractor.js:9</code></a>
-                </p>
-        
-        
-        
-            </div>
-        
-            <div class="description">
-                
-            </div>
-        
-        
-        
-        
-        </div>
-    </div>
-
-<div id="classdocs" class="tabview">
-    <ul class="api-class-tabs">
-        <li class="api-class-tab index"><a href="#index">Index</a></li>
-
-            <li class="api-class-tab methods"><a href="#methods">Methods</a></li>
-    </ul>
-
-    <div>
-        <div id="index" class="api-class-tabpanel index">
-            <h2 class="off-left">Item Index</h2>
-
-                <div class="index-section methods">
-                    <h3>Methods</h3>
-
-                    <ul class="index-list methods">
-                            <li class="index-item method">
-                                <a href="#method_getNPoints">getNPoints</a>
-
-                            </li>
-                            <li class="index-item method">
-                                <a href="#method_getTimeout">getTimeout</a>
-
-                            </li>
-                            <li class="index-item method">
-                                <a href="#method_ProtractorCreator">ProtractorCreator</a>
-
-                                    <span class="flag static">static</span>
-                            </li>
-                            <li class="index-item method">
-                                <a href="#method_UpdateProtractor">UpdateProtractor</a>
-
-                                    <span class="flag static">static</span>
-                            </li>
-                    </ul>
-                </div>
-
-
-
-        </div>
-
-            <div id="methods" class="api-class-tabpanel">
-                <h2 class="off-left">Methods</h2>
-
-<div id="method_getNPoints" class="method item">
-    <h3 class="name"><code>getNPoints</code></h3>
-
-        <span class="paren">()</span>
-
-        <span class="returns-inline">
-            <span class="type">Number</span>
-        </span>
-
-
-
-
-
-
-
-    <div class="meta">
-                <p>
-                Defined in
-        <a href="../files/src_tools_protractor.js.html#l17"><code>src&#x2F;tools&#x2F;protractor.js:17</code></a>
-        </p>
-
-
-
-    </div>
-
-    <div class="description">
-        <p>Get the number of points needed to build the shape.</p>
-
-    </div>
-
-
-        <div class="returns">
-            <h4>Returns:</h4>
-
-            <div class="returns-description">
-                        <span class="type">Number</span>:
-                    <p>The number of points.</p>
-
-            </div>
-        </div>
-
-
-</div>
-<div id="method_getTimeout" class="method item">
-    <h3 class="name"><code>getTimeout</code></h3>
-
-        <span class="paren">()</span>
-
-        <span class="returns-inline">
-            <span class="type">Number</span>
-        </span>
-
-
-
-
-
-
-
-    <div class="meta">
-                <p>
-                Defined in
-        <a href="../files/src_tools_protractor.js.html#l23"><code>src&#x2F;tools&#x2F;protractor.js:23</code></a>
-        </p>
-
-
-
-    </div>
-
-    <div class="description">
-        <p>Get the timeout between point storage.</p>
-
-    </div>
-
-
-        <div class="returns">
-            <h4>Returns:</h4>
-
-            <div class="returns-description">
-                        <span class="type">Number</span>:
-                    <p>The timeout in milliseconds.</p>
-
-            </div>
-        </div>
-
-
-</div>
-<div id="method_ProtractorCreator" class="method item">
-    <h3 class="name"><code>ProtractorCreator</code></h3>
-
-        <div class="args">
-            <span class="paren">(</span><ul class="args-list inline commas">
-                <li class="arg">
-                        <code>points</code>
-                </li>
-                <li class="arg">
-                        <code>style</code>
-                </li>
-                <li class="arg">
-                        <code>image</code>
-                </li>
-            </ul><span class="paren">)</span>
-        </div>
-
-
-
-
-
-        <span class="flag static">static</span>
-
-
-
-    <div class="meta">
-                <p>
-                Defined in
-        <a href="../files/src_tools_protractor.js.html#l31"><code>src&#x2F;tools&#x2F;protractor.js:31</code></a>
-        </p>
-
-
-
-    </div>
-
-    <div class="description">
-        <p>Create a protractor shape to be displayed.</p>
-
-    </div>
-
-        <div class="params">
-            <h4>Parameters:</h4>
-
-            <ul class="params-list">
-                <li class="param">
-                        <code class="param-name">points</code>
-                        <span class="type">Array</span>
-
-
-                    <div class="param-description">
-                        <p>The points from which to extract the protractor.</p>
-
-                    </div>
-
-                </li>
-                <li class="param">
-                        <code class="param-name">style</code>
-                        <span class="type">Object</span>
-
-
-                    <div class="param-description">
-                        <p>The drawing style.</p>
-
-                    </div>
-
-                </li>
-                <li class="param">
-                        <code class="param-name">image</code>
-                        <span class="type">Object</span>
-
-
-                    <div class="param-description">
-                        <p>The associated image.</p>
-
-                    </div>
-
-                </li>
-            </ul>
-        </div>
-
-
-
-</div>
-<div id="method_UpdateProtractor" class="method item">
-    <h3 class="name"><code>UpdateProtractor</code></h3>
-
-        <div class="args">
-            <span class="paren">(</span><ul class="args-list inline commas">
-                <li class="arg">
-                        <code>anchor</code>
-                </li>
-                <li class="arg">
-                        <code>image</code>
-                </li>
-            </ul><span class="paren">)</span>
-        </div>
-
-
-
-
-
-        <span class="flag static">static</span>
-
-
-
-    <div class="meta">
-                <p>
-                Defined in
-        <a href="../files/src_tools_protractor.js.html#l103"><code>src&#x2F;tools&#x2F;protractor.js:103</code></a>
-        </p>
-
-
-
-    </div>
-
-    <div class="description">
-        <p>Update a protractor shape.</p>
-
-    </div>
-
-        <div class="params">
-            <h4>Parameters:</h4>
-
-            <ul class="params-list">
-                <li class="param">
-                        <code class="param-name">anchor</code>
-                        <span class="type">Object</span>
-
-
-                    <div class="param-description">
-                        <p>The active anchor.</p>
-
-                    </div>
-
-                </li>
-                <li class="param">
-                        <code class="param-name">image</code>
-                        <span class="type">Object</span>
-
-
-                    <div class="param-description">
-                        <p>The associated image.</p>
-
-                    </div>
-
-                </li>
-            </ul>
-        </div>
-
-
-
-</div>
-            </div>
-
-
-
-    </div>
+        // find the closest index
+        var closestSliceIndex = 0;
+        var minDiff = Math.abs( origins[0].getZ() - point.getZ() );
+        var diff = 0;
+        for( var i = 0; i &lt; origins.length; ++i )
+        {
+            diff = Math.abs( origins[i].getZ() - point.getZ() );
+            if( diff &lt; minDiff ) 
+            {
+                minDiff = diff;
+                closestSliceIndex = i;
+            }
+        }
+        diff = origins[closestSliceIndex].getZ() - point.getZ();
+        var sliceIndex = ( diff &gt; 0 ) ? closestSliceIndex : closestSliceIndex + 1;
+        return sliceIndex;
+    };
+    
+    this.appendOrigin = function (origin, index) {
+        origins.splice(index, 0, origin);
+    };
+
+};
+
+/**
+ * Check for equality.
+ * @method equals
+ * @param {Geometry} rhs The object to compare to.
+ * @return {Boolean} True if both objects are equal.
+ */ 
+dwv.image.Geometry.prototype.equals = function (rhs) {
+    return rhs !== null &amp;&amp;
+        this.getOrigin() === rhs.getOrigin() &amp;&amp;
+        this.getSize() === rhs.getSize() &amp;&amp;
+        this.getSpacing() === rhs.getSpacing();
+};
+
+/**
+*
+*/
+dwv.image.Geometry.prototype.indexToOffset = function (index) {
+   var size = this.getSize();
+    return index.getI() +
+       index.getJ() * size.getNumberOfColumns() +
+       index.getK() * size.getSliceSize();
+};
+
+/**
+ *
+ */
+dwv.image.Geometry.prototype.indexToWorld = function (index) {
+    var origin = this.getOrigin();
+    var spacing = this.getSpacing();
+    return new dwv.math.Point3D(
+        origin.getX() + index.getI() * spacing.getColumnSpacing(),
+        origin.getY() + index.getJ() * spacing.getRowSpacing(),
+        origin.getZ() + index.getK() * spacing.getSliceSpacing() );
+};
+
+/**
+ *
+ */
+dwv.image.Geometry.prototype.worldToIndex = function (point) {
+    var origin = this.getOrigin();
+    var spacing = this.getSpacing();
+    return new dwv.math.Point3D(
+        point.getX() / spacing.getColumnSpacing() - origin.getX(),
+        point.getY() / spacing.getRowSpacing() - origin.getY(),
+        point.getZ() / spacing.getSliceSpacing() - origin.getZ() );
+};
+
+    </pre>
 </div>
                     </div>
                 </div>
