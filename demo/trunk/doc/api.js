@@ -31,6 +31,7 @@ YUI.add("yuidoc-meta", function(Y) {
         "dwv.image.Geometry",
         "dwv.image.Image",
         "dwv.image.ImageFactory",
+        "dwv.image.RescaleSlopeAndIntercept",
         "dwv.image.Size",
         "dwv.image.Spacing",
         "dwv.image.View",

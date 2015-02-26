@@ -71,6 +71,7 @@
                                 <li><a href="../classes/dwv.image.ImageFactory.html">dwv.image.ImageFactory</a></li>
                                 <li><a href="../classes/dwv.image.lut.Rescale.html">dwv.image.lut.Rescale</a></li>
                                 <li><a href="../classes/dwv.image.lut.Window.html">dwv.image.lut.Window</a></li>
+                                <li><a href="../classes/dwv.image.RescaleSlopeAndIntercept.html">dwv.image.RescaleSlopeAndIntercept</a></li>
                                 <li><a href="../classes/dwv.image.Size.html">dwv.image.Size</a></li>
                                 <li><a href="../classes/dwv.image.Spacing.html">dwv.image.Spacing</a></li>
                                 <li><a href="../classes/dwv.image.View.html">dwv.image.View</a></li>
@@ -174,7 +175,7 @@
 
 
         <div class="foundat">
-            Defined in: <a href="../files/src_image_luts.js.html#l79"><code>src&#x2F;image&#x2F;luts.js:79</code></a>
+            Defined in: <a href="../files/src_image_luts.js.html#l62"><code>src&#x2F;image&#x2F;luts.js:62</code></a>
         </div>
 
             Module: <a href="../modules/image.html">image</a>
@@ -213,7 +214,7 @@
             <div class="meta">
                         <p>
                         Defined in
-                <a href="../files/src_image_luts.js.html#l79"><code>src&#x2F;image&#x2F;luts.js:79</code></a>
+                <a href="../files/src_image_luts.js.html#l62"><code>src&#x2F;image&#x2F;luts.js:62</code></a>
                 </p>
         
         
@@ -306,15 +307,15 @@
 
                     <ul class="index-list properties">
                             <li class="index-item property private">
-                                <a href="#property_center_">center_</a>
+                                <a href="#property_center">center</a>
 
                             </li>
                             <li class="index-item property private">
-                                <a href="#property_rescaleLut_">rescaleLut_</a>
+                                <a href="#property_rescaleLut">rescaleLut</a>
 
                             </li>
                             <li class="index-item property private">
-                                <a href="#property_width_">width_</a>
+                                <a href="#property_width">width</a>
 
                             </li>
                     </ul>
@@ -344,7 +345,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_image_luts.js.html#l121"><code>src&#x2F;image&#x2F;luts.js:121</code></a>
+        <a href="../files/src_image_luts.js.html#l104"><code>src&#x2F;image&#x2F;luts.js:104</code></a>
         </p>
 
 
@@ -387,7 +388,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_image_luts.js.html#l194"><code>src&#x2F;image&#x2F;luts.js:194</code></a>
+        <a href="../files/src_image_luts.js.html#l177"><code>src&#x2F;image&#x2F;luts.js:177</code></a>
         </p>
 
 
@@ -430,7 +431,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_image_luts.js.html#l201"><code>src&#x2F;image&#x2F;luts.js:201</code></a>
+        <a href="../files/src_image_luts.js.html#l184"><code>src&#x2F;image&#x2F;luts.js:184</code></a>
         </p>
 
 
@@ -473,7 +474,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_image_luts.js.html#l127"><code>src&#x2F;image&#x2F;luts.js:127</code></a>
+        <a href="../files/src_image_luts.js.html#l110"><code>src&#x2F;image&#x2F;luts.js:110</code></a>
         </p>
 
 
@@ -516,7 +517,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_image_luts.js.html#l133"><code>src&#x2F;image&#x2F;luts.js:133</code></a>
+        <a href="../files/src_image_luts.js.html#l116"><code>src&#x2F;image&#x2F;luts.js:116</code></a>
         </p>
 
 
@@ -547,10 +548,10 @@
         <div class="args">
             <span class="paren">(</span><ul class="args-list inline commas">
                 <li class="arg">
-                        <code>center</code>
+                        <code>inCenter</code>
                 </li>
                 <li class="arg">
-                        <code>width</code>
+                        <code>inWidth</code>
                 </li>
             </ul><span class="paren">)</span>
         </div>
@@ -565,7 +566,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_image_luts.js.html#l140"><code>src&#x2F;image&#x2F;luts.js:140</code></a>
+        <a href="../files/src_image_luts.js.html#l123"><code>src&#x2F;image&#x2F;luts.js:123</code></a>
         </p>
 
 
@@ -582,7 +583,7 @@
 
             <ul class="params-list">
                 <li class="param">
-                        <code class="param-name">center</code>
+                        <code class="param-name">inCenter</code>
                         <span class="type">Number</span>
 
 
@@ -593,7 +594,7 @@
 
                 </li>
                 <li class="param">
-                        <code class="param-name">width</code>
+                        <code class="param-name">inWidth</code>
                         <span class="type">Number</span>
 
 
@@ -614,35 +615,9 @@
             <div id="properties" class="api-class-tabpanel">
                 <h2 class="off-left">Properties</h2>
 
-                    <div id="property_center_" class="property item private">
-                        <h3 class="name"><code>center_</code></h3>
+                    <div id="property_center" class="property item private">
+                        <h3 class="name"><code>center</code></h3>
                         <span class="type">Number</span>
-                    
-                    
-                            <span class="flag private">private</span>
-                    
-                    
-                    
-                        <div class="meta">
-                                    <p>
-                                    Defined in
-                            <a href="../files/src_image_luts.js.html#l106"><code>src&#x2F;image&#x2F;luts.js:106</code></a>
-                            </p>
-                    
-                    
-                        </div>
-                    
-                        <div class="description">
-                            <p>The window center.</p>
-                    
-                        </div>
-                    
-                    
-                    
-                    </div>
-                    <div id="property_rescaleLut_" class="property item private">
-                        <h3 class="name"><code>rescaleLut_</code></h3>
-                        <span class="type">Array</span>
                     
                     
                             <span class="flag private">private</span>
@@ -659,6 +634,32 @@
                         </div>
                     
                         <div class="description">
+                            <p>The window center.</p>
+                    
+                        </div>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_rescaleLut" class="property item private">
+                        <h3 class="name"><code>rescaleLut</code></h3>
+                        <span class="type">Array</span>
+                    
+                    
+                            <span class="flag private">private</span>
+                    
+                    
+                    
+                        <div class="meta">
+                                    <p>
+                                    Defined in
+                            <a href="../files/src_image_luts.js.html#l72"><code>src&#x2F;image&#x2F;luts.js:72</code></a>
+                            </p>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
                             <p>The internal array: Uint8ClampedArray clamps between 0 and 255.
                     (not supported on travis yet... using basic array, be sure not to overflow!)</p>
                     
@@ -667,8 +668,8 @@
                     
                     
                     </div>
-                    <div id="property_width_" class="property item private">
-                        <h3 class="name"><code>width_</code></h3>
+                    <div id="property_width" class="property item private">
+                        <h3 class="name"><code>width</code></h3>
                         <span class="type">Number</span>
                     
                     
@@ -679,7 +680,7 @@
                         <div class="meta">
                                     <p>
                                     Defined in
-                            <a href="../files/src_image_luts.js.html#l113"><code>src&#x2F;image&#x2F;luts.js:113</code></a>
+                            <a href="../files/src_image_luts.js.html#l96"><code>src&#x2F;image&#x2F;luts.js:96</code></a>
                             </p>
                     
                     

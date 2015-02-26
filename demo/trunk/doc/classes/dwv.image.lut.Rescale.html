@@ -71,6 +71,7 @@
                                 <li><a href="../classes/dwv.image.ImageFactory.html">dwv.image.ImageFactory</a></li>
                                 <li><a href="../classes/dwv.image.lut.Rescale.html">dwv.image.lut.Rescale</a></li>
                                 <li><a href="../classes/dwv.image.lut.Window.html">dwv.image.lut.Window</a></li>
+                                <li><a href="../classes/dwv.image.RescaleSlopeAndIntercept.html">dwv.image.RescaleSlopeAndIntercept</a></li>
                                 <li><a href="../classes/dwv.image.Size.html">dwv.image.Size</a></li>
                                 <li><a href="../classes/dwv.image.Spacing.html">dwv.image.Spacing</a></li>
                                 <li><a href="../classes/dwv.image.View.html">dwv.image.View</a></li>
@@ -195,10 +196,7 @@
                 <div class="args">
                     <span class="paren">(</span><ul class="args-list inline commas">
                         <li class="arg">
-                                <code>slope_</code>
-                        </li>
-                        <li class="arg">
-                                <code>intercept_</code>
+                                <code>rsi</code>
                         </li>
                     </ul><span class="paren">)</span>
                 </div>
@@ -229,23 +227,12 @@
         
                     <ul class="params-list">
                         <li class="param">
-                                <code class="param-name">slope_</code>
-                                <span class="type">Number</span>
+                                <code class="param-name">rsi</code>
+                                <span class="type">Object</span>
         
         
                             <div class="param-description">
-                                <p>The rescale slope.</p>
-        
-                            </div>
-        
-                        </li>
-                        <li class="param">
-                                <code class="param-name">intercept_</code>
-                                <span class="type">Number</span>
-        
-        
-                            <div class="param-description">
-                                <p>The rescale intercept.</p>
+                                <p>The rescale slope and intercept.</p>
         
                             </div>
         
@@ -275,15 +262,11 @@
 
                     <ul class="index-list methods">
                             <li class="index-item method">
-                                <a href="#method_getIntercept">getIntercept</a>
-
-                            </li>
-                            <li class="index-item method">
                                 <a href="#method_getLength">getLength</a>
 
                             </li>
                             <li class="index-item method">
-                                <a href="#method_getSlope">getSlope</a>
+                                <a href="#method_getRSI">getRSI</a>
 
                             </li>
                             <li class="index-item method">
@@ -302,7 +285,7 @@
 
                     <ul class="index-list properties">
                             <li class="index-item property private">
-                                <a href="#property_rescaleLut_">rescaleLut_</a>
+                                <a href="#property_rescaleLut">rescaleLut</a>
 
                             </li>
                     </ul>
@@ -314,49 +297,6 @@
             <div id="methods" class="api-class-tabpanel">
                 <h2 class="off-left">Methods</h2>
 
-<div id="method_getIntercept" class="method item">
-    <h3 class="name"><code>getIntercept</code></h3>
-
-        <span class="paren">()</span>
-
-        <span class="returns-inline">
-            <span class="type">Number</span>
-        </span>
-
-
-
-
-
-
-
-    <div class="meta">
-                <p>
-                Defined in
-        <a href="../files/src_image_luts.js.html#l42"><code>src&#x2F;image&#x2F;luts.js:42</code></a>
-        </p>
-
-
-
-    </div>
-
-    <div class="description">
-        <p>Get the rescale intercept.</p>
-
-    </div>
-
-
-        <div class="returns">
-            <h4>Returns:</h4>
-
-            <div class="returns-description">
-                        <span class="type">Number</span>:
-                    <p>The rescale intercept.</p>
-
-            </div>
-        </div>
-
-
-</div>
 <div id="method_getLength" class="method item">
     <h3 class="name"><code>getLength</code></h3>
 
@@ -375,7 +315,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_image_luts.js.html#l64"><code>src&#x2F;image&#x2F;luts.js:64</code></a>
+        <a href="../files/src_image_luts.js.html#l47"><code>src&#x2F;image&#x2F;luts.js:47</code></a>
         </p>
 
 
@@ -400,13 +340,13 @@
 
 
 </div>
-<div id="method_getSlope" class="method item">
-    <h3 class="name"><code>getSlope</code></h3>
+<div id="method_getRSI" class="method item">
+    <h3 class="name"><code>getRSI</code></h3>
 
         <span class="paren">()</span>
 
         <span class="returns-inline">
-            <span class="type">Number</span>
+            <span class="type">Object</span>
         </span>
 
 
@@ -418,7 +358,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_image_luts.js.html#l36"><code>src&#x2F;image&#x2F;luts.js:36</code></a>
+        <a href="../files/src_image_luts.js.html#l26"><code>src&#x2F;image&#x2F;luts.js:26</code></a>
         </p>
 
 
@@ -426,7 +366,7 @@
     </div>
 
     <div class="description">
-        <p>Get the rescale slope.</p>
+        <p>Get the Rescale Slope and Intercept (RSI).</p>
 
     </div>
 
@@ -435,8 +375,8 @@
             <h4>Returns:</h4>
 
             <div class="returns-description">
-                        <span class="type">Number</span>:
-                    <p>The rescale slope.</p>
+                        <span class="type">Object</span>:
+                    <p>The rescale slope and intercept.</p>
 
             </div>
         </div>
@@ -461,7 +401,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_image_luts.js.html#l71"><code>src&#x2F;image&#x2F;luts.js:71</code></a>
+        <a href="../files/src_image_luts.js.html#l54"><code>src&#x2F;image&#x2F;luts.js:54</code></a>
         </p>
 
 
@@ -507,7 +447,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_image_luts.js.html#l49"><code>src&#x2F;image&#x2F;luts.js:49</code></a>
+        <a href="../files/src_image_luts.js.html#l33"><code>src&#x2F;image&#x2F;luts.js:33</code></a>
         </p>
 
 
@@ -545,8 +485,8 @@
             <div id="properties" class="api-class-tabpanel">
                 <h2 class="off-left">Properties</h2>
 
-                    <div id="property_rescaleLut_" class="property item private">
-                        <h3 class="name"><code>rescaleLut_</code></h3>
+                    <div id="property_rescaleLut" class="property item private">
+                        <h3 class="name"><code>rescaleLut</code></h3>
                         <span class="type">Array</span>
                     
                     
@@ -557,7 +497,7 @@
                         <div class="meta">
                                     <p>
                                     Defined in
-                            <a href="../files/src_image_luts.js.html#l19"><code>src&#x2F;image&#x2F;luts.js:19</code></a>
+                            <a href="../files/src_image_luts.js.html#l18"><code>src&#x2F;image&#x2F;luts.js:18</code></a>
                             </p>
                     
                     

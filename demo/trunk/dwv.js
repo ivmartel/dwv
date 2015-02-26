@@ -390,7 +390,7 @@ dwv.App = function ()
         fileIO.onload = function (data) {
             var isFirst = true;
             if ( image ) {
-                image.appendSlice( data.view.getImage() );
+                view.append( data.view );
                 isFirst = false;
             }
             postLoadInit(data);
@@ -426,7 +426,7 @@ dwv.App = function ()
         urlIO.onload = function (data) {
             var isFirst = true;
             if ( image ) {
-                image.appendSlice( data.view.getImage() );
+                view.append( data.view );
                 isFirst = false;
             }
             postLoadInit(data);
@@ -6665,11 +6665,16 @@ dwv.image.Geometry = function ( origin, size, spacing )
     var origins = [origin];
     
     /**
-     * Get the object origin.
+     * Get the object first origin.
      * @method getOrigin
-     * @return {Object} The object origin.
+     * @return {Object} The object first origin.
      */ 
     this.getOrigin = function () { return origin; };
+    /**
+     * Get the object origins.
+     * @method getOrigins
+     * @return {Array} The object origins.
+     */ 
     this.getOrigins = function () { return origins; };
     /**
      * Get the object size.
@@ -6686,8 +6691,11 @@ dwv.image.Geometry = function ( origin, size, spacing )
     
     /**
      * Get the slice position of a point in the current slice layout.
+     * @method getSliceIndex
+     * @param {Object} point The point to evaluate.
      */
-    this.getSliceIndex = function (point) {
+    this.getSliceIndex = function (point)
+    {
         // cannot use this.worldToIndex(point).getK() since
         // we cannot guaranty consecutive slices...
         
@@ -6709,8 +6717,20 @@ dwv.image.Geometry = function ( origin, size, spacing )
         return sliceIndex;
     };
     
-    this.appendOrigin = function (origin, index) {
+    /**
+     * Append an origin to the geometry.
+     * @param {Object} origin The origin to append.
+     * @param {Number} index The index at which to append.
+     */
+    this.appendOrigin = function (origin, index)
+    {
+        // add in origin array
         origins.splice(index, 0, origin);
+        // increment slice number
+        size = new dwv.image.Size(
+            size.getNumberOfColumns(),
+            size.getNumberOfRows(),
+            size.getNumberOfSlices() + 1);
     };
 
 };
@@ -6729,17 +6749,19 @@ dwv.image.Geometry.prototype.equals = function (rhs) {
 };
 
 /**
-*
-*/
+ * Convert an index to an offset in memory.
+ * @param {Object} index The index to convert.
+ */
 dwv.image.Geometry.prototype.indexToOffset = function (index) {
-   var size = this.getSize();
+    var size = this.getSize();
     return index.getI() +
        index.getJ() * size.getNumberOfColumns() +
        index.getK() * size.getSliceSize();
 };
 
 /**
- *
+ * Convert an index into world coordinates.
+ * @param {Object} index The index to convert.
  */
 dwv.image.Geometry.prototype.indexToWorld = function (index) {
     var origin = this.getOrigin();
@@ -6751,7 +6773,8 @@ dwv.image.Geometry.prototype.indexToWorld = function (index) {
 };
 
 /**
- *
+ * Convert world coordinates into an index.
+ * @param {Object} THe point to convert.
  */
 dwv.image.Geometry.prototype.worldToIndex = function (point) {
     var origin = this.getOrigin();
@@ -6769,18 +6792,49 @@ var dwv = dwv || {};
 dwv.image = dwv.image || {};
 
 /**
+ * Rescale Slope and Intercept
+ * @class RescaleSlopeAndIntercept
+ * @namespace dwv.image
+ * @constructor
  * @param slope
  * @param intercept
  */
 dwv.image.RescaleSlopeAndIntercept = function (slope, intercept)
 {
-    this.getSlope = function () {
+    /*// Check the rescale slope.
+    if(typeof(slope) === 'undefined') {
+        slope = 1;
+    }
+    // Check the rescale intercept.
+    if(typeof(intercept) === 'undefined') {
+        intercept = 0;
+    }*/
+    
+    /**
+     * Get the slope of the RSI.
+     * @method getSlope
+     * @return {Number} The slope of the RSI.
+     */ 
+    this.getSlope = function ()
+    {
         return slope;
     };
-    this.getIntercept = function () {
+    /**
+     * Get the intercept of the RSI.
+     * @method getIntercept
+     * @return {Number} The intercept of the RSI.
+     */ 
+    this.getIntercept = function ()
+    {
         return intercept;
     };
-    this.apply = function (value) {
+    /**
+     * Apply the RSI on an input value.
+     * @method apply
+     * @return {Number} The value to rescale.
+     */ 
+    this.apply = function (value)
+    {
         return value * slope + intercept;
     };
 };
@@ -6984,11 +7038,6 @@ dwv.image.Image = function(geometry, buffer)
             }
         }
         
-        // new size
-        var newSize = new dwv.image.Size(size.getNumberOfColumns(),
-                size.getNumberOfRows(),
-                size.getNumberOfSlices() + 1 );
-        
         // calculate slice size
         var mul = 1;
         if( photometricInterpretation === "RGB" ) {
@@ -6997,7 +7046,7 @@ dwv.image.Image = function(geometry, buffer)
         var sliceSize = mul * size.getSliceSize();
         
         // create the new buffer
-        var newBuffer = new Int16Array(sliceSize * newSize.getNumberOfSlices());
+        var newBuffer = new Int16Array(sliceSize * (size.getNumberOfSlices() + 1) );
         
         // append slice at new position
         var newSliceNb = geometry.getSliceIndex( rhs.getGeometry().getOrigin() );
@@ -7019,11 +7068,10 @@ dwv.image.Image = function(geometry, buffer)
             newBuffer.set(buffer.subarray(offset), offset + sliceSize);
         }
         
-        // update slice positions
+        // update geometry
         geometry.appendOrigin( rhs.getGeometry().getOrigin(), newSliceNb );
         
         // copy to class variables
-        size = newSize;
         buffer = newBuffer;
         originalBuffer = new Int16Array(newBuffer);
     };
@@ -7543,53 +7591,36 @@ dwv.image.lut = dwv.image.lut || {};
  * @class Rescale
  * @namespace dwv.image.lut
  * @constructor
- * @param {Number} slope_ The rescale slope.
- * @param {Number} intercept_ The rescale intercept.
+ * @param {Object} rsi The rescale slope and intercept.
  */
-dwv.image.lut.Rescale = function(slope_,intercept_)
+dwv.image.lut.Rescale = function (rsi)
 {
     /**
      * The internal array.
-     * @property rescaleLut_
+     * @property rescaleLut
      * @private
      * @type Array
      */
-    var rescaleLut_ = null;
-    
-    // Check the rescale slope.
-    if(typeof(slope_) === 'undefined') {
-        slope_ = 1;
-    }
-    // Check the rescale intercept.
-    if(typeof(intercept_) === 'undefined') {
-        intercept_ = 0;
-    }
+    var rescaleLut = null;
     
     /**
-     * Get the rescale slope.
-     * @method getSlope
-     * @return {Number} The rescale slope.
+     * Get the Rescale Slope and Intercept (RSI).
+     * @method getRSI
+     * @return {Object} The rescale slope and intercept.
      */ 
-    this.getSlope = function() { return slope_; };
-    /**
-     * Get the rescale intercept.
-     * @method getIntercept
-     * @return {Number} The rescale intercept.
-     */ 
-    this.getIntercept = function() { return intercept_; };
+    this.getRSI = function () { return rsi; };
     
     /**
      * Initialise the LUT.
      * @method initialise
      * @param {Number} bitsStored The number of bits used to store the data.
      */ 
-    // Initialise the LUT.
-    this.initialise = function(bitsStored)
+    this.initialise = function (bitsStored)
     {
         var size = Math.pow(2, bitsStored);
-        rescaleLut_ = new Float32Array(size);
-        for(var i=0; i<size; ++i) {
-            rescaleLut_[i] = i * slope_ + intercept_;
+        rescaleLut = new Float32Array(size);
+        for ( var i = 0; i < size; ++i ) {
+            rescaleLut[i] = rsi.apply(i);
         }
     };
     
@@ -7598,14 +7629,14 @@ dwv.image.lut.Rescale = function(slope_,intercept_)
      * @method getLength
      * @return {Number} The length of the LUT array.
      */ 
-    this.getLength = function() { return rescaleLut_.length; };
+    this.getLength = function () { return rescaleLut.length; };
     
     /**
      * Get the value of the LUT at the given offset.
      * @method getValue
      * @return {Number} The value of the LUT at the given offset.
      */ 
-    this.getValue = function(offset) { return rescaleLut_[offset]; };
+    this.getValue = function (offset) { return rescaleLut[offset]; };
 };
 
 /**
@@ -7616,75 +7647,75 @@ dwv.image.lut.Rescale = function(slope_,intercept_)
  * @param {Number} rescaleLut_ The associated rescale LUT.
  * @param {Boolean} isSigned_ Flag to know if the data is signed.
  */
-dwv.image.lut.Window = function(rescaleLut_, isSigned_)
+dwv.image.lut.Window = function (rescaleLut, isSigned)
 {
     /**
      * The internal array: Uint8ClampedArray clamps between 0 and 255.
      * (not supported on travis yet... using basic array, be sure not to overflow!)
-     * @property rescaleLut_
+     * @property rescaleLut
      * @private
      * @type Array
      */
-    var windowLut_ = null;
+    var windowLut = null;
     
     // check Uint8ClampedArray support
-    if( !dwv.browser.hasClampedArray() ) {
-        windowLut_ = new Uint8Array(rescaleLut_.getLength());
+    if ( !dwv.browser.hasClampedArray() ) {
+        windowLut = new Uint8Array(rescaleLut.getLength());
     }
     else {
-        windowLut_ = new Uint8ClampedArray(rescaleLut_.getLength());
+        windowLut = new Uint8ClampedArray(rescaleLut.getLength());
     }
     
     /**
      * The window center.
-     * @property center_
+     * @property center
      * @private
      * @type Number
      */
-    var center_ = null;
+    var center = null;
     /**
      * The window width.
-     * @property width_
+     * @property width
      * @private
      * @type Number
      */
-    var width_ = null;
+    var width = null;
     
     /**
      * Get the window center.
      * @method getCenter
      * @return {Number} The window center.
      */ 
-    this.getCenter = function() { return center_; };
+    this.getCenter = function() { return center; };
     /**
      * Get the window width.
      * @method getWidth
      * @return {Number} The window width.
      */ 
-    this.getWidth = function() { return width_; };
+    this.getWidth = function() { return width; };
     /**
      * Get the signed flag.
      * @method isSigned
      * @return {Boolean} The signed flag.
      */ 
-    this.isSigned = function() { return isSigned_; };
+    this.isSigned = function() { return isSigned; };
     
     /**
      * Set the window center and width.
      * @method setCenterAndWidth
-     * @param {Number} center The window center.
-     * @param {Number} width The window width.
+     * @param {Number} inCenter The window center.
+     * @param {Number} inWidth The window width.
      */ 
-    this.setCenterAndWidth = function(center, width)
+    this.setCenterAndWidth = function (inCenter, inWidth)
     {
         // store the window values
-        center_ = center;
-        width_ = width;
+        center = inCenter;
+        width = inWidth;
         // pre calculate loop values
-        var size = windowLut_.length;
+        var size = windowLut.length;
         var center0 = center - 0.5;
-        if ( isSigned_ ) {
-            center0 += rescaleLut_.getSlope() * (size / 2);
+        if ( isSigned ) {
+            center0 += rescaleLut.getRSI().getSlope() * (size / 2);
         }
         var width0 = width - 1;
         var dispval = 0;
@@ -7696,16 +7727,16 @@ dwv.image.lut.Window = function(rescaleLut_, isSigned_)
             {
                 // from the DICOM specification (https://www.dabsoft.ch/dicom/3/C.11.2.1.2/)
                 // y = ((x - (c - 0.5)) / (w-1) + 0.5) * (ymax - ymin )+ ymin
-                dispval = ((rescaleLut_.getValue(j) - center0 ) / width0 + 0.5) * 255;
+                dispval = ((rescaleLut.getValue(j) - center0 ) / width0 + 0.5) * 255;
                 dispval = parseInt(dispval, 10);
                 if ( dispval <= yMin ) {
-                    windowLut_[j] = yMin;
+                    windowLut[j] = yMin;
                 }
                 else if ( dispval > yMax ) {
-                    windowLut_[j] = yMax;
+                    windowLut[j] = yMax;
                 }
                 else {
-                    windowLut_[j] = dispval;
+                    windowLut[j] = dispval;
                 }
             }
         }
@@ -7717,8 +7748,8 @@ dwv.image.lut.Window = function(rescaleLut_, isSigned_)
             {
                 // from the DICOM specification (https://www.dabsoft.ch/dicom/3/C.11.2.1.2/)
                 // y = ((x - (c - 0.5)) / (w-1) + 0.5) * (ymax - ymin )+ ymin
-                dispval = ((rescaleLut_.getValue(i) - center0 ) / width0 + 0.5) * 255;
-                windowLut_[i]= parseInt(dispval, 10);
+                dispval = ((rescaleLut.getValue(i) - center0 ) / width0 + 0.5) * 255;
+                windowLut[i]= parseInt(dispval, 10);
             }
         }
     };
@@ -7728,7 +7759,7 @@ dwv.image.lut.Window = function(rescaleLut_, isSigned_)
      * @method getLength
      * @return {Number} The length of the LUT array.
      */ 
-    this.getLength = function() { return windowLut_.length; };
+    this.getLength = function() { return windowLut.length; };
 
     /**
      * Get the value of the LUT at the given offset.
@@ -7737,8 +7768,8 @@ dwv.image.lut.Window = function(rescaleLut_, isSigned_)
      */ 
     this.getValue = function(offset)
     {
-        var shift = isSigned_ ? windowLut_.length / 2 : 0;
-        return windowLut_[offset+shift];
+        var shift = isSigned ? windowLut.length / 2 : 0;
+        return windowLut[offset+shift];
     };
 };
 
@@ -7993,19 +8024,14 @@ dwv.image.View = function(image, isSigned)
      * @private
      * @type Rescale
      */
-    var rescaleLut = new dwv.image.lut.Rescale(
-        image.getRescaleSlopeAndIntercept().getSlope(), 
-        image.getRescaleSlopeAndIntercept().getIntercept() );
-    // initialise it
-    rescaleLut.initialise(image.getMeta().BitsStored);
-    
+    var rescaleLut = null;
     /**
      * Window lookup table.
      * @property windowLut
      * @private
      * @type Window
      */
-    var windowLut = new dwv.image.lut.Window(rescaleLut, isSigned);
+    var windowLut = null;
     
     /**
      * Window presets.
@@ -8028,6 +8054,26 @@ dwv.image.View = function(image, isSigned)
      * @type Object
      */
     var currentPosition = {"i":0,"j":0,"k":0};
+    
+    /**
+     * Initialise the view.
+     * @method initialise
+     */ 
+    function initialise()
+    {
+        if ( !rescaleLut ) {
+            // create the rescale lookup table
+            rescaleLut = new dwv.image.lut.Rescale(
+                image.getRescaleSlopeAndIntercept() );
+            // initialise the rescale lookup table
+            rescaleLut.initialise(image.getMeta().BitsStored);
+            // create the window lookup table
+            windowLut = new dwv.image.lut.Window(rescaleLut, isSigned);
+        }
+    }
+    
+    // default contructor
+    initialise();
     
     /**
      * Get the associated image.
@@ -8147,6 +8193,19 @@ dwv.image.View = function(image, isSigned)
             this.fireEvent({"type": "slicechange"});
         }
         return true;
+    };
+    
+    /**
+     * Append another view to this one.
+     * @method append
+     * @param {Object} rhs The view to append.
+     */
+    this.append = function( rhs )
+    {  
+       // append images
+       this.getImage().appendSlice( rhs.getImage() );
+       // init to update self
+       initialise( rhs.getImage() );
     };
     
     /**
