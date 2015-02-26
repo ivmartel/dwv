@@ -390,7 +390,7 @@ dwv.App = function ()
         fileIO.onload = function (data) {
             var isFirst = true;
             if ( image ) {
-                image.appendSlice( data.view.getImage() );
+                view.append( data.view );
                 isFirst = false;
             }
             postLoadInit(data);
@@ -426,7 +426,7 @@ dwv.App = function ()
         urlIO.onload = function (data) {
             var isFirst = true;
             if ( image ) {
-                image.appendSlice( data.view.getImage() );
+                view.append( data.view );
                 isFirst = false;
             }
             postLoadInit(data);

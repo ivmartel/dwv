@@ -23,19 +23,14 @@ dwv.image.View = function(image, isSigned)
      * @private
      * @type Rescale
      */
-    var rescaleLut = new dwv.image.lut.Rescale(
-        image.getRescaleSlopeAndIntercept().getSlope(), 
-        image.getRescaleSlopeAndIntercept().getIntercept() );
-    // initialise it
-    rescaleLut.initialise(image.getMeta().BitsStored);
-    
+    var rescaleLut = null;
     /**
      * Window lookup table.
      * @property windowLut
      * @private
      * @type Window
      */
-    var windowLut = new dwv.image.lut.Window(rescaleLut, isSigned);
+    var windowLut = null;
     
     /**
      * Window presets.
@@ -58,6 +53,26 @@ dwv.image.View = function(image, isSigned)
      * @type Object
      */
     var currentPosition = {"i":0,"j":0,"k":0};
+    
+    /**
+     * Initialise the view.
+     * @method initialise
+     */ 
+    function initialise()
+    {
+        if ( !rescaleLut ) {
+            // create the rescale lookup table
+            rescaleLut = new dwv.image.lut.Rescale(
+                image.getRescaleSlopeAndIntercept() );
+            // initialise the rescale lookup table
+            rescaleLut.initialise(image.getMeta().BitsStored);
+            // create the window lookup table
+            windowLut = new dwv.image.lut.Window(rescaleLut, isSigned);
+        }
+    }
+    
+    // default contructor
+    initialise();
     
     /**
      * Get the associated image.
@@ -177,6 +192,19 @@ dwv.image.View = function(image, isSigned)
             this.fireEvent({"type": "slicechange"});
         }
         return true;
+    };
+    
+    /**
+     * Append another view to this one.
+     * @method append
+     * @param {Object} rhs The view to append.
+     */
+    this.append = function( rhs )
+    {  
+       // append images
+       this.getImage().appendSlice( rhs.getImage() );
+       // init to update self
+       initialise( rhs.getImage() );
     };
     
     /**

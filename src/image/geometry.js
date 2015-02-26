@@ -146,11 +146,16 @@ dwv.image.Geometry = function ( origin, size, spacing )
     var origins = [origin];
     
     /**
-     * Get the object origin.
+     * Get the object first origin.
      * @method getOrigin
-     * @return {Object} The object origin.
+     * @return {Object} The object first origin.
      */ 
     this.getOrigin = function () { return origin; };
+    /**
+     * Get the object origins.
+     * @method getOrigins
+     * @return {Array} The object origins.
+     */ 
     this.getOrigins = function () { return origins; };
     /**
      * Get the object size.
@@ -167,8 +172,11 @@ dwv.image.Geometry = function ( origin, size, spacing )
     
     /**
      * Get the slice position of a point in the current slice layout.
+     * @method getSliceIndex
+     * @param {Object} point The point to evaluate.
      */
-    this.getSliceIndex = function (point) {
+    this.getSliceIndex = function (point)
+    {
         // cannot use this.worldToIndex(point).getK() since
         // we cannot guaranty consecutive slices...
         
@@ -190,8 +198,20 @@ dwv.image.Geometry = function ( origin, size, spacing )
         return sliceIndex;
     };
     
-    this.appendOrigin = function (origin, index) {
+    /**
+     * Append an origin to the geometry.
+     * @param {Object} origin The origin to append.
+     * @param {Number} index The index at which to append.
+     */
+    this.appendOrigin = function (origin, index)
+    {
+        // add in origin array
         origins.splice(index, 0, origin);
+        // increment slice number
+        size = new dwv.image.Size(
+            size.getNumberOfColumns(),
+            size.getNumberOfRows(),
+            size.getNumberOfSlices() + 1);
     };
 
 };
@@ -210,17 +230,19 @@ dwv.image.Geometry.prototype.equals = function (rhs) {
 };
 
 /**
-*
-*/
+ * Convert an index to an offset in memory.
+ * @param {Object} index The index to convert.
+ */
 dwv.image.Geometry.prototype.indexToOffset = function (index) {
-   var size = this.getSize();
+    var size = this.getSize();
     return index.getI() +
        index.getJ() * size.getNumberOfColumns() +
        index.getK() * size.getSliceSize();
 };
 
 /**
- *
+ * Convert an index into world coordinates.
+ * @param {Object} index The index to convert.
  */
 dwv.image.Geometry.prototype.indexToWorld = function (index) {
     var origin = this.getOrigin();
@@ -232,7 +254,8 @@ dwv.image.Geometry.prototype.indexToWorld = function (index) {
 };
 
 /**
- *
+ * Convert world coordinates into an index.
+ * @param {Object} THe point to convert.
  */
 dwv.image.Geometry.prototype.worldToIndex = function (point) {
     var origin = this.getOrigin();

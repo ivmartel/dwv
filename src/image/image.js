@@ -6,18 +6,49 @@ var dwv = dwv || {};
 dwv.image = dwv.image || {};
 
 /**
+ * Rescale Slope and Intercept
+ * @class RescaleSlopeAndIntercept
+ * @namespace dwv.image
+ * @constructor
  * @param slope
  * @param intercept
  */
 dwv.image.RescaleSlopeAndIntercept = function (slope, intercept)
 {
-    this.getSlope = function () {
+    /*// Check the rescale slope.
+    if(typeof(slope) === 'undefined') {
+        slope = 1;
+    }
+    // Check the rescale intercept.
+    if(typeof(intercept) === 'undefined') {
+        intercept = 0;
+    }*/
+    
+    /**
+     * Get the slope of the RSI.
+     * @method getSlope
+     * @return {Number} The slope of the RSI.
+     */ 
+    this.getSlope = function ()
+    {
         return slope;
     };
-    this.getIntercept = function () {
+    /**
+     * Get the intercept of the RSI.
+     * @method getIntercept
+     * @return {Number} The intercept of the RSI.
+     */ 
+    this.getIntercept = function ()
+    {
         return intercept;
     };
-    this.apply = function (value) {
+    /**
+     * Apply the RSI on an input value.
+     * @method apply
+     * @return {Number} The value to rescale.
+     */ 
+    this.apply = function (value)
+    {
         return value * slope + intercept;
     };
 };
@@ -221,11 +252,6 @@ dwv.image.Image = function(geometry, buffer)
             }
         }
         
-        // new size
-        var newSize = new dwv.image.Size(size.getNumberOfColumns(),
-                size.getNumberOfRows(),
-                size.getNumberOfSlices() + 1 );
-        
         // calculate slice size
         var mul = 1;
         if( photometricInterpretation === "RGB" ) {
@@ -234,7 +260,7 @@ dwv.image.Image = function(geometry, buffer)
         var sliceSize = mul * size.getSliceSize();
         
         // create the new buffer
-        var newBuffer = new Int16Array(sliceSize * newSize.getNumberOfSlices());
+        var newBuffer = new Int16Array(sliceSize * (size.getNumberOfSlices() + 1) );
         
         // append slice at new position
         var newSliceNb = geometry.getSliceIndex( rhs.getGeometry().getOrigin() );
@@ -256,11 +282,10 @@ dwv.image.Image = function(geometry, buffer)
             newBuffer.set(buffer.subarray(offset), offset + sliceSize);
         }
         
-        // update slice positions
+        // update geometry
         geometry.appendOrigin( rhs.getGeometry().getOrigin(), newSliceNb );
         
         // copy to class variables
-        size = newSize;
         buffer = newBuffer;
         originalBuffer = new Int16Array(newBuffer);
     };

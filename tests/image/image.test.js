@@ -61,9 +61,10 @@ test("Test Image getValue.", function() {
 test("Test Image append slice.", function (assert) {
     var size = 4;
     var imgSize = new dwv.image.Size(size, size, 2);
+    var imgSizeMinusOne = new dwv.image.Size(size, size, 1);
     var imgSpacing = new dwv.image.Spacing(1, 1, 1);
     var imgOrigin = new dwv.math.Point3D(0,0,0);
-    var imgGeometry0 = new dwv.image.Geometry(imgOrigin, imgSize, imgSpacing);
+    var imgGeometry0 = new dwv.image.Geometry(imgOrigin, imgSizeMinusOne, imgSpacing);
     imgGeometry0.appendOrigin(new dwv.math.Point3D(0,0,1), 1);
     
     // slice to append
@@ -109,7 +110,7 @@ test("Test Image append slice.", function (assert) {
     deepEqual( imgGeometry0.getOrigins(), sliceOrigins0, "Slice positions (append before)" );
     
     // image 1
-    var imgGeometry1 = new dwv.image.Geometry(imgOrigin, imgSize, imgSpacing);
+    var imgGeometry1 = new dwv.image.Geometry(imgOrigin, imgSizeMinusOne, imgSpacing);
     imgGeometry1.appendOrigin(new dwv.math.Point3D(0,0,1), 1);
     var image1 = new dwv.image.Image(imgGeometry1, buffer);
     var sliceOrigin1 = new dwv.math.Point3D(0,0,2);
@@ -132,7 +133,7 @@ test("Test Image append slice.", function (assert) {
     deepEqual( imgGeometry1.getOrigins(), sliceOrigins1, "Slice positions (append after)" );
 
     // image 2
-    var imgGeometry2 = new dwv.image.Geometry(imgOrigin, imgSize, imgSpacing);
+    var imgGeometry2 = new dwv.image.Geometry(imgOrigin, imgSizeMinusOne, imgSpacing);
     imgGeometry2.appendOrigin(new dwv.math.Point3D(0,0,1), 1);
     var image2 = new dwv.image.Image(imgGeometry2, buffer);
     var sliceOrigin2 = new dwv.math.Point3D(0,0,0.4);
