@@ -63,7 +63,7 @@ dwv.image.View = function(image, isSigned)
         if ( !rescaleLut ) {
             // create the rescale lookup table
             rescaleLut = new dwv.image.lut.Rescale(
-                image.getRescaleSlopeAndIntercept() );
+                image.getRescaleSlopeAndIntercept(0) );
             // initialise the rescale lookup table
             rescaleLut.initialise(image.getMeta().BitsStored);
             // create the window lookup table
@@ -71,7 +71,7 @@ dwv.image.View = function(image, isSigned)
         }
     }
     
-    // default contructor
+    // default constructor
     initialise();
     
     /**
