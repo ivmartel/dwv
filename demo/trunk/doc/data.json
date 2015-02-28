@@ -1355,7 +1355,7 @@
             "module": "image",
             "namespace": "dwv.image",
             "file": "src/image/image.js",
-            "line": 657,
+            "line": 710,
             "description": "Image factory.",
             "is_constructor": 1
         },
@@ -5381,7 +5381,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 77,
+            "line": 80,
             "description": "Photometric interpretation (MONOCHROME, RGB...).",
             "itemtype": "property",
             "name": "photometricInterpretation",
@@ -5394,7 +5394,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 84,
+            "line": 87,
             "description": "Planar configuration for RGB data (0:RGBRGBRGBRGB... or 1:RRR...GGG...BBB...).",
             "itemtype": "property",
             "name": "planarConfiguration",
@@ -5407,7 +5407,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 91,
+            "line": 94,
             "description": "Number of components.",
             "itemtype": "property",
             "name": "planarConfiguration",
@@ -5420,7 +5420,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 98,
+            "line": 101,
             "description": "Meta information.",
             "itemtype": "property",
             "name": "meta",
@@ -5433,7 +5433,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 106,
+            "line": 109,
             "description": "Original buffer.",
             "itemtype": "property",
             "name": "originalBuffer",
@@ -5446,7 +5446,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 114,
+            "line": 117,
             "description": "Data range.",
             "itemtype": "property",
             "name": "dataRange",
@@ -5459,7 +5459,20 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 121,
+            "line": 124,
+            "description": "Rescaled data range.",
+            "itemtype": "property",
+            "name": "rescaledDataRange",
+            "access": "private",
+            "tagname": "",
+            "type": "Object",
+            "class": "dwv.image.Image",
+            "module": "image",
+            "namespace": "dwv.image"
+        },
+        {
+            "file": "src/image/image.js",
+            "line": 131,
             "description": "Histogram.",
             "itemtype": "property",
             "name": "histogram",
@@ -5472,7 +5485,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 129,
+            "line": 139,
             "description": "Get the geometry of the image.",
             "itemtype": "method",
             "name": "getGeometry",
@@ -5486,7 +5499,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 135,
+            "line": 145,
             "description": "Get the data buffer of the image. TODO dangerous...",
             "itemtype": "method",
             "name": "getBuffer",
@@ -5500,7 +5513,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 142,
+            "line": 152,
             "description": "Get the rescale slope and intercept.",
             "itemtype": "method",
             "name": "getRescaleSlopeAndIntercept",
@@ -5514,7 +5527,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 148,
+            "line": 158,
             "description": "Set the rescale slope and intercept.",
             "itemtype": "method",
             "name": "setRescaleSlopeAndIntercept",
@@ -5531,7 +5544,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 154,
+            "line": 169,
             "description": "Get the photometricInterpretation of the image.",
             "itemtype": "method",
             "name": "getPhotometricInterpretation",
@@ -5545,7 +5558,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 160,
+            "line": 175,
             "description": "Set the photometricInterpretation of the image.",
             "itemtype": "method",
             "name": "setPhotometricInterpretation",
@@ -5556,7 +5569,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 166,
+            "line": 181,
             "description": "Get the planarConfiguration of the image.",
             "itemtype": "method",
             "name": "getPlanarConfiguration",
@@ -5570,7 +5583,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 172,
+            "line": 187,
             "description": "Set the planarConfiguration of the image.",
             "itemtype": "method",
             "name": "setPlanarConfiguration",
@@ -5587,7 +5600,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 178,
+            "line": 193,
             "description": "Get the numberOfComponents of the image.",
             "itemtype": "method",
             "name": "getNumberOfComponents",
@@ -5601,7 +5614,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 185,
+            "line": 200,
             "description": "Get the meta information of the image.",
             "itemtype": "method",
             "name": "getMeta",
@@ -5615,7 +5628,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 191,
+            "line": 206,
             "description": "Set the meta information of the image.",
             "itemtype": "method",
             "name": "setMeta",
@@ -5632,7 +5645,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 198,
+            "line": 213,
             "description": "Get value at offset. Warning: No size check...",
             "itemtype": "method",
             "name": "getValueAtOffset",
@@ -5653,7 +5666,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 208,
+            "line": 223,
             "description": "Clone the image.",
             "itemtype": "method",
             "name": "clone",
@@ -5667,7 +5680,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 223,
+            "line": 241,
             "description": "Append a slice to the image.",
             "itemtype": "method",
             "name": "appendSlice",
@@ -5684,7 +5697,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 293,
+            "line": 313,
             "description": "Get the data range.",
             "itemtype": "method",
             "name": "getDataRange",
@@ -5698,7 +5711,21 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 305,
+            "line": 325,
+            "description": "Get the rescaled data range.",
+            "itemtype": "method",
+            "name": "getRescaledDataRange",
+            "return": {
+                "description": "The rescaled data range.",
+                "type": "Object"
+            },
+            "class": "dwv.image.Image",
+            "module": "image",
+            "namespace": "dwv.image"
+        },
+        {
+            "file": "src/image/image.js",
+            "line": 337,
             "description": "Get the histogram.",
             "itemtype": "method",
             "name": "getHistogram",
@@ -5712,7 +5739,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 318,
+            "line": 353,
             "description": "Get the value of the image at a specific coordinate.",
             "itemtype": "method",
             "name": "getValue",
@@ -5743,28 +5770,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 333,
-            "description": "Get the rescaled value of the image at a specific offset.",
-            "itemtype": "method",
-            "name": "getRescaledValueAtOffset",
-            "params": [
-                {
-                    "name": "offset",
-                    "description": "The offset in the buffer.",
-                    "type": "Number"
-                }
-            ],
-            "return": {
-                "description": "The rescaled value at the desired offset.\nWarning: No size check...",
-                "type": "Number"
-            },
-            "class": "dwv.image.Image",
-            "module": "image",
-            "namespace": "dwv.image"
-        },
-        {
-            "file": "src/image/image.js",
-            "line": 345,
+            "line": 368,
             "description": "Get the rescaled value of the image at a specific coordinate.",
             "itemtype": "method",
             "name": "getRescaledValue",
@@ -5795,8 +5801,8 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 359,
-            "description": "Calculate the raw image data range.",
+            "line": 382,
+            "description": "Calculate the data range of the image.",
             "itemtype": "method",
             "name": "calculateDataRange",
             "return": {
@@ -5809,12 +5815,12 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 378,
-            "description": "Calculate the image data range after rescale.",
+            "line": 402,
+            "description": "Calculate the rescaled data range of the image.",
             "itemtype": "method",
-            "name": "getRescaledDataRange",
+            "name": "calculateRescaledDataRange",
             "return": {
-                "description": "The rescaled data range {min, max}.",
+                "description": "The range {min, max}.",
                 "type": "Object"
             },
             "class": "dwv.image.Image",
@@ -5823,13 +5829,13 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 390,
+            "line": 426,
             "description": "Calculate the histogram of the image.",
             "itemtype": "method",
             "name": "calculateHistogram",
             "return": {
-                "description": "An array representing the histogram.",
-                "type": "Array"
+                "description": "The histogram, data range and rescaled data range.",
+                "type": "Object"
             },
             "class": "dwv.image.Image",
             "module": "image",
@@ -5837,7 +5843,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 414,
+            "line": 467,
             "description": "Convolute the image with a given 2D kernel.",
             "itemtype": "method",
             "name": "convolute2D",
@@ -5858,7 +5864,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 565,
+            "line": 618,
             "description": "Transform an image using a specific operator.",
             "itemtype": "method",
             "name": "transform",
@@ -5879,7 +5885,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 583,
+            "line": 636,
             "description": "Compose this image with another one and using a specific operator.",
             "itemtype": "method",
             "name": "compose",
@@ -5905,7 +5911,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 603,
+            "line": 656,
             "description": "Quantify a line according to image information.",
             "itemtype": "method",
             "name": "quantifyLine",
@@ -5926,7 +5932,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 617,
+            "line": 670,
             "description": "Quantify a rectangle according to image information.",
             "itemtype": "method",
             "name": "quantifyRect",
@@ -5947,7 +5953,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 643,
+            "line": 696,
             "description": "Quantify an ellipse according to image information.",
             "itemtype": "method",
             "name": "quantifyEllipse",
@@ -5968,7 +5974,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 665,
+            "line": 718,
             "description": "Get an Image object from the read DICOM file.",
             "itemtype": "method",
             "name": "create",
@@ -12298,11 +12304,11 @@
         },
         {
             "message": "unknown tag: pqrqm",
-            "line": " src/image/image.js:160"
+            "line": " src/image/image.js:175"
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/image/image.js:665"
+            "line": " src/image/image.js:718"
         },
         {
             "message": "replacing incorrect tag: returns with return",

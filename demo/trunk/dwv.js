@@ -6859,7 +6859,10 @@ dwv.image.Image = function(geometry, buffer)
      * @private
      * @type Number
      */
-    var rsi = new dwv.image.RescaleSlopeAndIntercept( 1, 0 );
+    var rsis = [];
+    for ( var s = 0; s < geometry.getSize().getNumberOfSlices(); ++s ) {
+        rsis.push( new dwv.image.RescaleSlopeAndIntercept( 1, 0 ) );
+    }
     /**
      * Photometric interpretation (MONOCHROME, RGB...).
      * @property photometricInterpretation
@@ -6905,6 +6908,13 @@ dwv.image.Image = function(geometry, buffer)
      */
     var dataRange = null;
     /**
+     * Rescaled data range.
+     * @property rescaledDataRange
+     * @private
+     * @type Object
+     */
+    var rescaledDataRange = null;
+    /**
      * Histogram.
      * @property histogram
      * @private
@@ -6930,13 +6940,18 @@ dwv.image.Image = function(geometry, buffer)
      * @method getRescaleSlopeAndIntercept
      * @return {Object} The rescale slope and intercept.
      */ 
-    this.getRescaleSlopeAndIntercept = function() { return rsi; };
+    this.getRescaleSlopeAndIntercept = function(k) { return rsis[k]; };
     /**
      * Set the rescale slope and intercept.
      * @method setRescaleSlopeAndIntercept
      * @param {Object} rsi The rescale slope and intercept.
      */ 
-    this.setRescaleSlopeAndIntercept = function(inRsi) { rsi = inRsi; };
+    this.setRescaleSlopeAndIntercept = function(inRsi, k) { 
+        if ( typeof k === 'undefined' ) {
+            k = 0;
+        }
+        rsis[k] = inRsi; 
+    };
     /**
      * Get the photometricInterpretation of the image.
      * @method getPhotometricInterpretation
@@ -6999,7 +7014,10 @@ dwv.image.Image = function(geometry, buffer)
     this.clone = function()
     {
         var copy = new dwv.image.Image(this.getGeometry(), originalBuffer);
-        copy.setRescaleSlopeAndIntercept(this.getRescaleSlopeAndIntercept());
+        var nslices = this.getGeometry().getSize().getNumberOfSlices();
+        for ( var k = 0; k < nslices; ++k ) {
+            copy.setRescaleSlopeAndIntercept(this.getRescaleSlopeAndIntercept(k), k);
+        }
         copy.setPhotometricInterpretation(this.getPhotometricInterpretation());
         copy.setPlanarConfiguration(this.getPlanarConfiguration());
         copy.setMeta(this.getMeta());
@@ -7070,6 +7088,8 @@ dwv.image.Image = function(geometry, buffer)
         
         // update geometry
         geometry.appendOrigin( rhs.getGeometry().getOrigin(), newSliceNb );
+        // update rsi
+        rsis.splice(newSliceNb, 0, rhs.getRescaleSlopeAndIntercept(0));
         
         // copy to class variables
         buffer = newBuffer;
@@ -7089,13 +7109,28 @@ dwv.image.Image = function(geometry, buffer)
     };
 
     /**
+     * Get the rescaled data range.
+     * @method getRescaledDataRange
+     * @return {Object} The rescaled data range.
+     */ 
+    this.getRescaledDataRange = function() { 
+        if( !rescaledDataRange ) {
+            rescaledDataRange = this.calculateRescaledDataRange();
+        }
+        return rescaledDataRange;
+    };
+
+    /**
      * Get the histogram.
      * @method getHistogram
      * @return {Array} The histogram.
      */ 
     this.getHistogram = function() { 
         if( !histogram ) {
-            histogram = this.calculateHistogram();
+            var res = this.calculateHistogram();
+            dataRange = res.dataRange;
+            rescaledDataRange = res.rescaledDataRange;
+            histogram = res.histogram;
         }
         return histogram;
     };
@@ -7117,18 +7152,6 @@ dwv.image.Image.prototype.getValue = function( i, j, k )
 };
 
 /**
- * Get the rescaled value of the image at a specific offset.
- * @method getRescaledValueAtOffset
- * @param {Number} offset The offset in the buffer. 
- * @return {Number} The rescaled value at the desired offset.
- * Warning: No size check...
- */
-dwv.image.Image.prototype.getRescaledValueAtOffset = function( offset )
-{
-    return this.getRescaleSlopeAndIntercept().apply( this.getValueAtOffset(offset) );
-};
-
-/**
  * Get the rescaled value of the image at a specific coordinate.
  * @method getRescaledValue
  * @param {Number} i The X index.
@@ -7139,62 +7162,92 @@ dwv.image.Image.prototype.getRescaledValueAtOffset = function( offset )
  */
 dwv.image.Image.prototype.getRescaledValue = function( i, j, k )
 {
-    return this.getRescaleSlopeAndIntercept().apply( this.getValue(i,j,k) );
+    return this.getRescaleSlopeAndIntercept(k).apply( this.getValue(i,j,k) );
 };
 
 /**
- * Calculate the raw image data range.
+ * Calculate the data range of the image.
  * @method calculateDataRange
  * @return {Object} The range {min, max}.
  */
-dwv.image.Image.prototype.calculateDataRange = function()
+dwv.image.Image.prototype.calculateDataRange = function ()
 {
+    var size = this.getGeometry().getSize().getTotalSize();
     var min = this.getValueAtOffset(0);
     var max = min;
     var value = 0;
-    for(var i=0; i < this.getGeometry().getSize().getTotalSize(); ++i)
-    {    
+    for ( var i = 0; i < size; ++i ) {    
         value = this.getValueAtOffset(i);
         if( value > max ) { max = value; }
         if( value < min ) { min = value; }
     }
+    // return
     return { "min": min, "max": max };
 };
 
 /**
- * Calculate the image data range after rescale.
- * @method getRescaledDataRange
- * @return {Object} The rescaled data range {min, max}.
+ * Calculate the rescaled data range of the image.
+ * @method calculateRescaledDataRange
+ * @return {Object} The range {min, max}.
  */
-dwv.image.Image.prototype.getRescaledDataRange = function()
+dwv.image.Image.prototype.calculateRescaledDataRange = function ()
 {
-    var rawRange = this.getDataRange();
-    return { "min": this.getRescaleSlopeAndIntercept().apply(rawRange.min),
-        "max": this.getRescaleSlopeAndIntercept().apply(rawRange.max)};
+    var size = this.getGeometry().getSize();
+    var rmin = this.getRescaledValue(0,0,0);
+    var rmax = rmin;
+    var rvalue = 0;
+    for ( var k = 0; k < size.getNumberOfSlices(); ++k ) {    
+        for ( var j = 0; j < size.getNumberOfRows(); ++j ) {    
+            for ( var i = 0; i < size.getNumberOfColumns(); ++i ) {    
+                rvalue = this.getRescaledValue(i,j,k);
+                if( rvalue > rmax ) { rmax = rvalue; }
+                if( rvalue < rmin ) { rmin = rvalue; }
+            }
+        }
+    }
+    // return
+    return { "min": rmin, "max": rmax };
 };
 
 /**
  * Calculate the histogram of the image.
  * @method calculateHistogram
- * @return {Array} An array representing the histogram.
+ * @return {Object} The histogram, data range and rescaled data range.
  */
-dwv.image.Image.prototype.calculateHistogram = function()
+dwv.image.Image.prototype.calculateHistogram = function ()
 {
+    var size = this.getGeometry().getSize();
     var histo = [];
-    var histoPlot = [];
+    var min = this.getValue(0,0,0);
+    var max = min;
     var value = 0;
-    var totalSize = this.getGeometry().getSize().getTotalSize();
-    for ( var i = 0; i < totalSize; ++i ) {    
-        value = this.getRescaledValueAtOffset(i);
-        histo[value] = ( histo[value] || 0 ) + 1;
+    var rmin = this.getRescaledValue(0,0,0);
+    var rmax = rmin;
+    var rvalue = 0;
+    for ( var k = 0; k < size.getNumberOfSlices(); ++k ) {    
+        for ( var j = 0; j < size.getNumberOfRows(); ++j ) {    
+            for ( var i = 0; i < size.getNumberOfColumns(); ++i ) {    
+                value = this.getValue(i,j,k);
+                if( value > max ) { max = value; }
+                if( value < min ) { min = value; }
+                rvalue = this.getRescaleSlopeAndIntercept(k).apply(value);
+                if( rvalue > rmax ) { rmax = rvalue; }
+                if( rvalue < rmin ) { rmin = rvalue; }
+                histo[rvalue] = ( histo[rvalue] || 0 ) + 1;
+            }
+        }
     }
+    // set data range
+    var dataRange = { "min": min, "max": max };
+    var rescaledDataRange = { "min": rmin, "max": rmax };
     // generate data for plotting
-    var min = this.getRescaledDataRange().min;
-    var max = this.getRescaledDataRange().max;
-    for ( var j = min; j <= max; ++j ) {    
-        histoPlot.push([j, ( histo[j] || 0 ) ]);
+    var histogram = [];
+    for ( var b = rmin; b <= rmax; ++b ) {    
+        histogram.push([b, ( histo[b] || 0 ) ]);
     }
-    return histoPlot;
+    // return
+    return { 'dataRange': dataRange, 'rescaledDataRange': rescaledDataRange,
+        'histogram': histogram };
 };
 
 /**
@@ -8064,7 +8117,7 @@ dwv.image.View = function(image, isSigned)
         if ( !rescaleLut ) {
             // create the rescale lookup table
             rescaleLut = new dwv.image.lut.Rescale(
-                image.getRescaleSlopeAndIntercept() );
+                image.getRescaleSlopeAndIntercept(0) );
             // initialise the rescale lookup table
             rescaleLut.initialise(image.getMeta().BitsStored);
             // create the window lookup table
@@ -8072,7 +8125,7 @@ dwv.image.View = function(image, isSigned)
         }
     }
     
-    // default contructor
+    // default constructor
     initialise();
     
     /**
