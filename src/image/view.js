@@ -18,13 +18,6 @@ dwv.image = dwv.image || {};
 dwv.image.View = function(image, isSigned)
 {
     /**
-     * Rescale lookup table.
-     * @property rescaleLut
-     * @private
-     * @type Rescale
-     */
-    var rescaleLut = null;
-    /**
      * Window lookup table.
      * @property windowLut
      * @private
@@ -60,9 +53,9 @@ dwv.image.View = function(image, isSigned)
      */ 
     function initialise()
     {
-        if ( !rescaleLut ) {
+        if ( !windowLut ) {
             // create the rescale lookup table
-            rescaleLut = new dwv.image.lut.Rescale(
+            var rescaleLut = new dwv.image.lut.Rescale(
                 image.getRescaleSlopeAndIntercept(0) );
             // initialise the rescale lookup table
             rescaleLut.initialise(image.getMeta().BitsStored);
@@ -87,19 +80,6 @@ dwv.image.View = function(image, isSigned)
      */ 
     this.setImage = function(inImage) { image = inImage; };
     
-    /**
-     * Get the rescale LUT of the image.
-     * @method getRescaleLut
-     * @return {Rescale} The rescale LUT of the image.
-     */ 
-    this.getRescaleLut = function() { return rescaleLut; };
-    /**
-     * Set the rescale LUT of the image.
-     * @method setRescaleLut
-     * @param {Rescale} lut The rescale LUT of the image.
-     */ 
-    this.setRescaleLut = function(lut) { rescaleLut = lut; };
-
     /**
      * Get the window LUT of the image.
      * @method getWindowLut
@@ -309,7 +289,6 @@ dwv.image.View.prototype.decrementSliceNb = function()
 dwv.image.View.prototype.clone = function()
 {
     var copy = new dwv.image.View(this.getImage());
-    copy.setRescaleLut(this.getRescaleLut());
     copy.setWindowLut(this.getWindowLut());
     copy.setListeners(this.getListeners());
     return copy;
