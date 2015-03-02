@@ -390,7 +390,7 @@ dwv.App = function ()
         fileIO.onload = function (data) {
             var isFirst = true;
             if ( image ) {
-                image.appendSlice( data.view.getImage() );
+                view.append( data.view );
                 isFirst = false;
             }
             postLoadInit(data);
@@ -426,7 +426,7 @@ dwv.App = function ()
         urlIO.onload = function (data) {
             var isFirst = true;
             if ( image ) {
-                image.appendSlice( data.view.getImage() );
+                view.append( data.view );
                 isFirst = false;
             }
             postLoadInit(data);
@@ -1140,8 +1140,9 @@ dwv.App = function ()
         image = originalImage;
         
         // layout
-        dataWidth = image.getSize().getNumberOfColumns();
-        dataHeight = image.getSize().getNumberOfRows();
+        var size = image.getGeometry().getSize();
+        dataWidth = size.getNumberOfColumns();
+        dataHeight = size.getNumberOfRows();
         createLayers(dataWidth, dataHeight);
         
         // get the image data from the image layer

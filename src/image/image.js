@@ -6,128 +6,72 @@ var dwv = dwv || {};
 dwv.image = dwv.image || {};
 
 /**
- * Image Size class.
- * Supports 2D and 3D images.
- * @class Size
+ * Rescale Slope and Intercept
+ * @class RescaleSlopeAndIntercept
  * @namespace dwv.image
  * @constructor
- * @param {Number} numberOfColumns The number of columns.
- * @param {Number} numberOfRows The number of rows.
- * @param {Number} numberOfSlices The number of slices.
-*/
-dwv.image.Size = function( numberOfColumns, numberOfRows, numberOfSlices )
-{
-    /**
-     * Get the number of columns.
-     * @method getNumberOfColumns
-     * @return {Number} The number of columns.
-     */ 
-    this.getNumberOfColumns = function() { return numberOfColumns; };
-    /**
-     * Get the number of rows.
-     * @method getNumberOfRows
-     * @return {Number} The number of rows.
-     */ 
-    this.getNumberOfRows = function() { return numberOfRows; };
-    /**
-     * Get the number of slices.
-     * @method getNumberOfSlices
-     * @return {Number} The number of slices.
-     */ 
-    this.getNumberOfSlices = function() { return (numberOfSlices || 1.0); };
-};
-
-/**
- * Get the size of a slice.
- * @method getSliceSize
- * @return {Number} The size of a slice.
- */ 
-dwv.image.Size.prototype.getSliceSize = function() {
-    return this.getNumberOfColumns()*this.getNumberOfRows();
-};
-
-/**
- * Get the total size.
- * @method getTotalSize
- * @return {Number} The total size.
- */ 
-dwv.image.Size.prototype.getTotalSize = function() {
-    return this.getSliceSize()*this.getNumberOfSlices();
-};
-
-/**
- * Check for equality.
- * @method equals
- * @param {Size} rhs The object to compare to.
- * @return {Boolean} True if both objects are equal.
- */ 
-dwv.image.Size.prototype.equals = function(rhs) {
-    return rhs !== null &&
-        this.getNumberOfColumns() === rhs.getNumberOfColumns() &&
-        this.getNumberOfRows() === rhs.getNumberOfRows() &&
-        this.getNumberOfSlices() === rhs.getNumberOfSlices();
-};
-
-/**
- * Check that coordinates are within bounds.
- * @method isInBounds
- * @param {Number} i The column coordinate.
- * @param {Number} j The row coordinate.
- * @param {Number} k The slice coordinate.
- * @return {Boolean} True if the given coordinates are within bounds.
- */ 
-dwv.image.Size.prototype.isInBounds = function( i, j, k ) {
-    if( i < 0 || i > this.getNumberOfColumns() - 1 ||
-        j < 0 || j > this.getNumberOfRows() - 1 ||
-        k < 0 || k > this.getNumberOfSlices() - 1 ) {
-        return false;
-    }
-    return true;
-};
-
-/**
- * Image Spacing class. 
- * Supports 2D and 3D images.
- * @class Spacing
- * @namespace dwv.image
- * @constructor
- * @param {Number} columnSpacing The column spacing.
- * @param {Number} rowSpacing The row spacing.
- * @param {Number} sliceSpacing The slice spacing.
+ * @param slope
+ * @param intercept
  */
-dwv.image.Spacing = function( columnSpacing, rowSpacing, sliceSpacing )
+dwv.image.RescaleSlopeAndIntercept = function (slope, intercept)
 {
+    /*// Check the rescale slope.
+    if(typeof(slope) === 'undefined') {
+        slope = 1;
+    }
+    // Check the rescale intercept.
+    if(typeof(intercept) === 'undefined') {
+        intercept = 0;
+    }*/
+    
     /**
-     * Get the column spacing.
-     * @method getColumnSpacing
-     * @return {Number} The column spacing.
+     * Get the slope of the RSI.
+     * @method getSlope
+     * @return {Number} The slope of the RSI.
      */ 
-    this.getColumnSpacing = function() { return columnSpacing; };
+    this.getSlope = function ()
+    {
+        return slope;
+    };
     /**
-     * Get the row spacing.
-     * @method getRowSpacing
-     * @return {Number} The row spacing.
+     * Get the intercept of the RSI.
+     * @method getIntercept
+     * @return {Number} The intercept of the RSI.
      */ 
-    this.getRowSpacing = function() { return rowSpacing; };
+    this.getIntercept = function ()
+    {
+        return intercept;
+    };
     /**
-     * Get the slice spacing.
-     * @method getSliceSpacing
-     * @return {Number} The slice spacing.
+     * Apply the RSI on an input value.
+     * @method apply
+     * @return {Number} The value to rescale.
      */ 
-    this.getSliceSpacing = function() { return (sliceSpacing || 1.0); };
+    this.apply = function (value)
+    {
+        return value * slope + intercept;
+    };
 };
 
-/**
- * Check for equality.
+/** 
+ * Check for RSI equality.
  * @method equals
- * @param {Spacing} rhs The object to compare to.
- * @return {Boolean} True if both objects are equal.
+ * @param {Object} rhs The other RSI to compare to.
+ * @return {Boolean} True if both RSI are equal.
  */ 
-dwv.image.Spacing.prototype.equals = function(rhs) {
+dwv.image.RescaleSlopeAndIntercept.prototype.equals = function (rhs) {
     return rhs !== null &&
-        this.getColumnSpacing() === rhs.getColumnSpacing() &&
-        this.getRowSpacing() === rhs.getRowSpacing() &&
-        this.getSliceSpacing() === rhs.getSliceSpacing();
+        this.getSlope() === rhs.getSlope() &&
+        this.getIntercept() === rhs.getIntercept();
+};
+
+/** 
+ * Get a string representation of the RSI.
+ * @method toString
+ * @return {String} The RSI as a string.
+ */ 
+dwv.image.RescaleSlopeAndIntercept.prototype.toString = function () {
+    return (this.getSlope() + ", " + this.getIntercept());
 };
 
 /**
@@ -139,27 +83,21 @@ dwv.image.Spacing.prototype.equals = function(rhs) {
  * @class Image
  * @namespace dwv.image
  * @constructor
- * @param {Size} size The size of the image.
- * @param {Spacing} spacing The spacing of the image.
+ * @param {Object} geometry The geometry of the image.
  * @param {Array} buffer The image data.
- * @param {Array} slicePositions The slice positions.
  */
-dwv.image.Image = function(size, spacing, buffer, slicePositions)
+dwv.image.Image = function(geometry, buffer)
 {
     /**
-     * Rescale slope.
-     * @property rescaleSlope
+     * Rescale slope and intercept.
+     * @property rsi
      * @private
      * @type Number
      */
-    var rescaleSlope = 1;
-    /**
-     * Rescale intercept.
-     * @property rescaleIntercept
-     * @private
-     * @type Number
-     */
-    var rescaleIntercept = 0;
+    var rsis = [];
+    for ( var s = 0; s < geometry.getSize().getNumberOfSlices(); ++s ) {
+        rsis.push( new dwv.image.RescaleSlopeAndIntercept( 1, 0 ) );
+    }
     /**
      * Photometric interpretation (MONOCHROME, RGB...).
      * @property photometricInterpretation
@@ -180,7 +118,7 @@ dwv.image.Image = function(size, spacing, buffer, slicePositions)
      * @private
      * @type Number
      */
-    var numberOfComponents = buffer.length / size.getTotalSize();
+    var numberOfComponents = buffer.length / geometry.getSize().getTotalSize();
     /**
      * Meta information.
      * @property meta
@@ -197,11 +135,6 @@ dwv.image.Image = function(size, spacing, buffer, slicePositions)
      */
     var originalBuffer = new Int16Array(buffer);
     
-    // check slice positions.
-    if( typeof(slicePositions) === 'undefined' ) {
-        slicePositions = [[0,0,0]];
-    }
-    
     /**
      * Data range.
      * @property dataRange
@@ -209,6 +142,13 @@ dwv.image.Image = function(size, spacing, buffer, slicePositions)
      * @type Object
      */
     var dataRange = null;
+    /**
+     * Rescaled data range.
+     * @property rescaledDataRange
+     * @private
+     * @type Object
+     */
+    var rescaledDataRange = null;
     /**
      * Histogram.
      * @property histogram
@@ -218,54 +158,35 @@ dwv.image.Image = function(size, spacing, buffer, slicePositions)
     var histogram = null;
      
     /**
-     * Get the size of the image.
-     * @method getSize
-     * @return {Size} The size of the image.
+     * Get the geometry of the image.
+     * @method getGeometry
+     * @return {Object} The size of the image.
      */ 
-    this.getSize = function() { return size; };
-    /**
-     * Get the spacing of the image.
-     * @method getSpacing
-     * @return {Spacing} The spacing of the image.
-     */ 
-    this.getSpacing = function() { return spacing; };
+    this.getGeometry = function() { return geometry; };
     /**
      * Get the data buffer of the image. TODO dangerous...
      * @method getBuffer
      * @return {Array} The data buffer of the image.
      */ 
     this.getBuffer = function() { return buffer; };
-    /**
-     * Get the slice positions.
-     * @method getSlicePositions
-     * @return {Array} The slice positions.
-     */ 
-    this.getSlicePositions = function() { return slicePositions; };
     
     /**
-     * Get the rescale slope.
-     * @method getRescaleSlope
-     * @return {Number} The rescale slope.
+     * Get the rescale slope and intercept.
+     * @method getRescaleSlopeAndIntercept
+     * @return {Object} The rescale slope and intercept.
      */ 
-    this.getRescaleSlope = function() { return rescaleSlope; };
+    this.getRescaleSlopeAndIntercept = function(k) { return rsis[k]; };
     /**
-     * Set the rescale slope.
-     * @method setRescaleSlope
-     * @param {Number} rs The rescale slope.
+     * Set the rescale slope and intercept.
+     * @method setRescaleSlopeAndIntercept
+     * @param {Object} rsi The rescale slope and intercept.
      */ 
-    this.setRescaleSlope = function(rs) { rescaleSlope = rs; };
-    /**
-     * Get the rescale intercept.
-     * @method getRescaleIntercept
-     * @return {Number} The rescale intercept.
-     */ 
-    this.getRescaleIntercept = function() { return rescaleIntercept; };
-    /**
-     * Set the rescale intercept.
-     * @method setRescaleIntercept
-     * @param {Number} ri The rescale intercept.
-     */ 
-    this.setRescaleIntercept = function(ri) { rescaleIntercept = ri; };
+    this.setRescaleSlopeAndIntercept = function(inRsi, k) { 
+        if ( typeof k === 'undefined' ) {
+            k = 0;
+        }
+        rsis[k] = inRsi; 
+    };
     /**
      * Get the photometricInterpretation of the image.
      * @method getPhotometricInterpretation
@@ -327,9 +248,11 @@ dwv.image.Image = function(size, spacing, buffer, slicePositions)
      */ 
     this.clone = function()
     {
-        var copy = new dwv.image.Image(this.getSize(), this.getSpacing(), originalBuffer, slicePositions);
-        copy.setRescaleSlope(this.getRescaleSlope());
-        copy.setRescaleIntercept(this.getRescaleIntercept());
+        var copy = new dwv.image.Image(this.getGeometry(), originalBuffer);
+        var nslices = this.getGeometry().getSize().getNumberOfSlices();
+        for ( var k = 0; k < nslices; ++k ) {
+            copy.setRescaleSlopeAndIntercept(this.getRescaleSlopeAndIntercept(k), k);
+        }
         copy.setPhotometricInterpretation(this.getPhotometricInterpretation());
         copy.setPlanarConfiguration(this.getPlanarConfiguration());
         copy.setMeta(this.getMeta());
@@ -347,13 +270,15 @@ dwv.image.Image = function(size, spacing, buffer, slicePositions)
         if( rhs === null ) {
             throw new Error("Cannot append null slice");
         }
-        if( rhs.getSize().getNumberOfSlices() !== 1 ) {
+        var rhsSize = rhs.getGeometry().getSize();
+        var size = geometry.getSize();
+        if( rhsSize.getNumberOfSlices() !== 1 ) {
             throw new Error("Cannot append more than one slice");
         }
-        if( size.getNumberOfColumns() !== rhs.getSize().getNumberOfColumns() ) {
+        if( size.getNumberOfColumns() !== rhsSize.getNumberOfColumns() ) {
             throw new Error("Cannot append a slice with different number of columns");
         }
-        if( size.getNumberOfRows() !== rhs.getSize().getNumberOfRows() ) {
+        if( size.getNumberOfRows() !== rhsSize.getNumberOfRows() ) {
             throw new Error("Cannot append a slice with different number of rows");
         }
         if( photometricInterpretation !== rhs.getPhotometricInterpretation() ) {
@@ -366,28 +291,6 @@ dwv.image.Image = function(size, spacing, buffer, slicePositions)
             }
         }
         
-        // find index where to append slice
-        var closestSliceIndex = 0;
-        var slicePosition = rhs.getSlicePositions()[0];
-        var minDiff = Math.abs( slicePositions[0][2] - slicePosition[2] );
-        var diff = 0;
-        for( var i = 0; i < slicePositions.length; ++i )
-        {
-            diff = Math.abs( slicePositions[i][2] - slicePosition[2] );
-            if( diff < minDiff ) 
-            {
-                minDiff = diff;
-                closestSliceIndex = i;
-            }
-        }
-        diff = slicePositions[closestSliceIndex][2] - slicePosition[2];
-        var newSliceNb = ( diff > 0 ) ? closestSliceIndex : closestSliceIndex + 1;
-        
-        // new size
-        var newSize = new dwv.image.Size(size.getNumberOfColumns(),
-                size.getNumberOfRows(),
-                size.getNumberOfSlices() + 1 );
-        
         // calculate slice size
         var mul = 1;
         if( photometricInterpretation === "RGB" ) {
@@ -396,9 +299,10 @@ dwv.image.Image = function(size, spacing, buffer, slicePositions)
         var sliceSize = mul * size.getSliceSize();
         
         // create the new buffer
-        var newBuffer = new Int16Array(sliceSize * newSize.getNumberOfSlices());
+        var newBuffer = new Int16Array(sliceSize * (size.getNumberOfSlices() + 1) );
         
         // append slice at new position
+        var newSliceNb = geometry.getSliceIndex( rhs.getGeometry().getOrigin() );
         if( newSliceNb === 0 )
         {
             newBuffer.set(rhs.getBuffer());
@@ -417,11 +321,12 @@ dwv.image.Image = function(size, spacing, buffer, slicePositions)
             newBuffer.set(buffer.subarray(offset), offset + sliceSize);
         }
         
-        // update slice positions
-        slicePositions.splice(newSliceNb, 0, slicePosition);
+        // update geometry
+        geometry.appendOrigin( rhs.getGeometry().getOrigin(), newSliceNb );
+        // update rsi
+        rsis.splice(newSliceNb, 0, rhs.getRescaleSlopeAndIntercept(0));
         
         // copy to class variables
-        size = newSize;
         buffer = newBuffer;
         originalBuffer = new Int16Array(newBuffer);
     };
@@ -439,13 +344,28 @@ dwv.image.Image = function(size, spacing, buffer, slicePositions)
     };
 
     /**
+     * Get the rescaled data range.
+     * @method getRescaledDataRange
+     * @return {Object} The rescaled data range.
+     */ 
+    this.getRescaledDataRange = function() { 
+        if( !rescaledDataRange ) {
+            rescaledDataRange = this.calculateRescaledDataRange();
+        }
+        return rescaledDataRange;
+    };
+
+    /**
      * Get the histogram.
      * @method getHistogram
      * @return {Array} The histogram.
      */ 
     this.getHistogram = function() { 
         if( !histogram ) {
-            histogram = this.calculateHistogram();
+            var res = this.calculateHistogram();
+            dataRange = res.dataRange;
+            rescaledDataRange = res.rescaledDataRange;
+            histogram = res.histogram;
         }
         return histogram;
     };
@@ -462,21 +382,8 @@ dwv.image.Image = function(size, spacing, buffer, slicePositions)
  */
 dwv.image.Image.prototype.getValue = function( i, j, k )
 {
-    return this.getValueAtOffset( i +
-        ( j * this.getSize().getNumberOfColumns() ) +
-        ( k * this.getSize().getSliceSize()) );
-};
-
-/**
- * Get the rescaled value of the image at a specific offset.
- * @method getRescaledValueAtOffset
- * @param {Number} offset The offset in the buffer. 
- * @return {Number} The rescaled value at the desired offset.
- * Warning: No size check...
- */
-dwv.image.Image.prototype.getRescaledValueAtOffset = function( offset )
-{
-    return (this.getValueAtOffset(offset)*this.getRescaleSlope())+this.getRescaleIntercept();
+    var index = new dwv.math.Index3D(i,j,k);
+    return this.getValueAtOffset( this.getGeometry().indexToOffset(index) );
 };
 
 /**
@@ -490,62 +397,92 @@ dwv.image.Image.prototype.getRescaledValueAtOffset = function( offset )
  */
 dwv.image.Image.prototype.getRescaledValue = function( i, j, k )
 {
-    return (this.getValue(i,j,k)*this.getRescaleSlope())+this.getRescaleIntercept();
+    return this.getRescaleSlopeAndIntercept(k).apply( this.getValue(i,j,k) );
 };
 
 /**
- * Calculate the raw image data range.
+ * Calculate the data range of the image.
  * @method calculateDataRange
  * @return {Object} The range {min, max}.
  */
-dwv.image.Image.prototype.calculateDataRange = function()
+dwv.image.Image.prototype.calculateDataRange = function ()
 {
+    var size = this.getGeometry().getSize().getTotalSize();
     var min = this.getValueAtOffset(0);
     var max = min;
     var value = 0;
-    for(var i=0; i < this.getSize().getTotalSize(); ++i)
-    {    
+    for ( var i = 0; i < size; ++i ) {    
         value = this.getValueAtOffset(i);
         if( value > max ) { max = value; }
         if( value < min ) { min = value; }
     }
+    // return
     return { "min": min, "max": max };
 };
 
 /**
- * Calculate the image data range after rescale.
- * @method getRescaledDataRange
- * @return {Object} The rescaled data range {min, max}.
+ * Calculate the rescaled data range of the image.
+ * @method calculateRescaledDataRange
+ * @return {Object} The range {min, max}.
  */
-dwv.image.Image.prototype.getRescaledDataRange = function()
+dwv.image.Image.prototype.calculateRescaledDataRange = function ()
 {
-    var rawRange = this.getDataRange();
-    return { "min": rawRange.min*this.getRescaleSlope()+this.getRescaleIntercept(),
-        "max": rawRange.max*this.getRescaleSlope()+this.getRescaleIntercept()};
+    var size = this.getGeometry().getSize();
+    var rmin = this.getRescaledValue(0,0,0);
+    var rmax = rmin;
+    var rvalue = 0;
+    for ( var k = 0; k < size.getNumberOfSlices(); ++k ) {    
+        for ( var j = 0; j < size.getNumberOfRows(); ++j ) {    
+            for ( var i = 0; i < size.getNumberOfColumns(); ++i ) {    
+                rvalue = this.getRescaledValue(i,j,k);
+                if( rvalue > rmax ) { rmax = rvalue; }
+                if( rvalue < rmin ) { rmin = rvalue; }
+            }
+        }
+    }
+    // return
+    return { "min": rmin, "max": rmax };
 };
 
 /**
  * Calculate the histogram of the image.
  * @method calculateHistogram
- * @return {Array} An array representing the histogram.
+ * @return {Object} The histogram, data range and rescaled data range.
  */
-dwv.image.Image.prototype.calculateHistogram = function()
+dwv.image.Image.prototype.calculateHistogram = function ()
 {
+    var size = this.getGeometry().getSize();
     var histo = [];
-    var histoPlot = [];
+    var min = this.getValue(0,0,0);
+    var max = min;
     var value = 0;
-    var size = this.getSize().getTotalSize();
-    for ( var i = 0; i < size; ++i ) {    
-        value = this.getRescaledValueAtOffset(i);
-        histo[value] = ( histo[value] || 0 ) + 1;
+    var rmin = this.getRescaledValue(0,0,0);
+    var rmax = rmin;
+    var rvalue = 0;
+    for ( var k = 0; k < size.getNumberOfSlices(); ++k ) {    
+        for ( var j = 0; j < size.getNumberOfRows(); ++j ) {    
+            for ( var i = 0; i < size.getNumberOfColumns(); ++i ) {    
+                value = this.getValue(i,j,k);
+                if( value > max ) { max = value; }
+                if( value < min ) { min = value; }
+                rvalue = this.getRescaleSlopeAndIntercept(k).apply(value);
+                if( rvalue > rmax ) { rmax = rvalue; }
+                if( rvalue < rmin ) { rmin = rvalue; }
+                histo[rvalue] = ( histo[rvalue] || 0 ) + 1;
+            }
+        }
     }
+    // set data range
+    var dataRange = { "min": min, "max": max };
+    var rescaledDataRange = { "min": rmin, "max": rmax };
     // generate data for plotting
-    var min = this.getRescaledDataRange().min;
-    var max = this.getRescaledDataRange().max;
-    for ( var j = min; j <= max; ++j ) {    
-        histoPlot.push([j, ( histo[j] || 0 ) ]);
+    var histogram = [];
+    for ( var b = rmin; b <= rmax; ++b ) {    
+        histogram.push([b, ( histo[b] || 0 ) ]);
     }
-    return histoPlot;
+    // return
+    return { 'dataRange': dataRange, 'rescaledDataRange': rescaledDataRange,
+        'histogram': histogram };
 };
 
 /**
@@ -564,9 +501,10 @@ dwv.image.Image.prototype.convolute2D = function(weights)
     var newImage = this.clone();
     var newBuffer = newImage.getBuffer();
 
-    var ncols = this.getSize().getNumberOfColumns();
-    var nrows = this.getSize().getNumberOfRows();
-    var nslices = this.getSize().getNumberOfSlices();
+    var imgSize = this.getGeometry().getSize();
+    var ncols = imgSize.getNumberOfColumns();
+    var nrows = imgSize.getNumberOfRows();
+    var nslices = imgSize.getNumberOfSlices();
     var ncomp = this.getNumberOfComponents();
     
     // adapt to number of component and planar configuration
@@ -580,7 +518,7 @@ dwv.image.Image.prototype.convolute2D = function(weights)
         }
         else
         {
-            componentOffset = this.getSize().getTotalSize();
+            componentOffset = imgSize.getTotalSize();
         }
     }
     
@@ -744,8 +682,9 @@ dwv.image.Image.prototype.compose = function(rhs, operator)
  */
 dwv.image.Image.prototype.quantifyLine = function(line)
 {
-    var length = line.getWorldLength( this.getSpacing().getColumnSpacing(), 
-            this.getSpacing().getRowSpacing());
+    var spacing = this.getGeometry().getSpacing();
+    var length = line.getWorldLength( spacing.getColumnSpacing(), 
+            spacing.getRowSpacing() );
     return {"length": length};
 };
 
@@ -757,8 +696,9 @@ dwv.image.Image.prototype.quantifyLine = function(line)
  */
 dwv.image.Image.prototype.quantifyRect = function(rect)
 {
-    var surface = rect.getWorldSurface( this.getSpacing().getColumnSpacing(), 
-            this.getSpacing().getRowSpacing());
+    var spacing = this.getGeometry().getSpacing();
+    var surface = rect.getWorldSurface( spacing.getColumnSpacing(), 
+            spacing.getRowSpacing());
     var subBuffer = [];
     var minJ = parseInt(rect.getBegin().getY(), 10);
     var maxJ = parseInt(rect.getEnd().getY(), 10);
@@ -782,8 +722,9 @@ dwv.image.Image.prototype.quantifyRect = function(rect)
  */
 dwv.image.Image.prototype.quantifyEllipse = function(ellipse)
 {
-    var surface = ellipse.getWorldSurface( this.getSpacing().getColumnSpacing(), 
-            this.getSpacing().getRowSpacing());
+    var spacing = this.getGeometry().getSpacing();
+    var surface = ellipse.getWorldSurface( spacing.getColumnSpacing(), 
+            spacing.getRowSpacing());
     return {"surface": surface};
 };
 
@@ -872,8 +813,12 @@ dwv.image.ImageFactory.prototype.create = function (dicomElements, pixelBuffer)
             parseFloat(dicomElements.ImagePositionPatient.value[2]) ];
     }
     
+    // geometry
+    var origin = new dwv.math.Point3D(slicePosition[0], slicePosition[1], slicePosition[2]);
+    var geometry = new dwv.image.Geometry( origin, size, spacing );
+    
     // image
-    var image = new dwv.image.Image( size, spacing, buffer, [slicePosition] );
+    var image = new dwv.image.Image( geometry, buffer );
     // photometricInterpretation
     if ( dicomElements.PhotometricInterpretation ) {
         var photo = dwv.utils.cleanString(
@@ -891,14 +836,17 @@ dwv.image.ImageFactory.prototype.create = function (dicomElements, pixelBuffer)
         }
         image.setPlanarConfiguration( planar );
     }        
-    // rescale slope
+    // rescale slope and intercept
+    var slope = 1;
     if ( dicomElements.RescaleSlope ) {
-        image.setRescaleSlope( parseFloat(dicomElements.RescaleSlope.value[0]) );
+        slope = parseFloat(dicomElements.RescaleSlope.value[0]);
     }
-    // rescale intercept
+    var intercept = 0;
     if ( dicomElements.RescaleIntercept ) {
-        image.setRescaleIntercept( parseFloat(dicomElements.RescaleIntercept.value[0]) );
+        intercept = parseFloat(dicomElements.RescaleIntercept.value[0]);
     }
+    var rsi = new dwv.image.RescaleSlopeAndIntercept(slope, intercept);
+    image.setRescaleSlopeAndIntercept( rsi );
     // meta information
     var meta = {};
     if ( dicomElements.Modality ) {
