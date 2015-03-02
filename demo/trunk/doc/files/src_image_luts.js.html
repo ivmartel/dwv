@@ -278,6 +278,14 @@ dwv.image.lut.Window = function (rescaleLut, isSigned)
     var width = null;
     
     /**
+     * Flag to know if the lut needs update or not.
+     * @property needsUpdate
+     * @private
+     * @type Boolean
+     */
+    var needsUpdate = false;
+    
+    /**
      * Get the window center.
      * @method getCenter
      * @return {Number} The window center.
@@ -295,6 +303,12 @@ dwv.image.lut.Window = function (rescaleLut, isSigned)
      * @return {Boolean} The signed flag.
      */ 
     this.isSigned = function() { return isSigned; };
+    /**
+     * Get the rescale lut.
+     * @method getRescaleLut
+     * @return {Object} The rescale lut.
+     */ 
+    this.getRescaleLut = function() { return rescaleLut; };
     
     /**
      * Set the window center and width.
@@ -307,6 +321,18 @@ dwv.image.lut.Window = function (rescaleLut, isSigned)
         // store the window values
         center = inCenter;
         width = inWidth;
+        needsUpdate = true;
+    };
+    
+    /**
+     * Update the lut if needed..
+     * @method update
+     */
+    this.update = function ()
+    {
+        if ( !needsUpdate ) {
+            return;
+        }
         // pre calculate loop values
         var size = windowLut.length;
         var center0 = center - 0.5;
@@ -348,6 +374,7 @@ dwv.image.lut.Window = function (rescaleLut, isSigned)
                 windowLut[i]= parseInt(dispval, 10);
             }
         }
+        needsUpdate = false;
     };
     
     /**

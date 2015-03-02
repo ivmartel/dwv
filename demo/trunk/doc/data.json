@@ -658,7 +658,7 @@
             },
             "tag": "module",
             "file": "src/image/view.js",
-            "line": 454,
+            "line": 450,
             "description": "Image module."
         },
         "io": {
@@ -1328,7 +1328,7 @@
             "module": "image",
             "namespace": "dwv.image",
             "file": "src/image/image.js",
-            "line": 56,
+            "line": 77,
             "description": "Image class.\nUsable once created, optional are:\n- rescale slope and intercept (default 1:0), \n- photometric interpretation (default MONOCHROME2),\n- planar configuration (default RGBRGB...).",
             "is_constructor": 1,
             "params": [
@@ -1355,7 +1355,7 @@
             "module": "image",
             "namespace": "dwv.image",
             "file": "src/image/image.js",
-            "line": 710,
+            "line": 731,
             "description": "Image factory.",
             "is_constructor": 1
         },
@@ -1461,7 +1461,7 @@
             "module": "image",
             "namespace": "dwv.image",
             "file": "src/image/view.js",
-            "line": 454,
+            "line": 450,
             "description": "View factory.",
             "is_constructor": 1
         },
@@ -5368,7 +5368,42 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 70,
+            "line": 56,
+            "description": "Check for RSI equality.",
+            "itemtype": "method",
+            "name": "equals",
+            "params": [
+                {
+                    "name": "rhs",
+                    "description": "The other RSI to compare to.",
+                    "type": "Object"
+                }
+            ],
+            "return": {
+                "description": "True if both RSI are equal.",
+                "type": "Boolean"
+            },
+            "class": "dwv.image.RescaleSlopeAndIntercept",
+            "module": "image",
+            "namespace": "dwv.image"
+        },
+        {
+            "file": "src/image/image.js",
+            "line": 68,
+            "description": "Get a string representation of the RSI.",
+            "itemtype": "method",
+            "name": "toString",
+            "return": {
+                "description": "The RSI as a string.",
+                "type": "String"
+            },
+            "class": "dwv.image.RescaleSlopeAndIntercept",
+            "module": "image",
+            "namespace": "dwv.image"
+        },
+        {
+            "file": "src/image/image.js",
+            "line": 91,
             "description": "Rescale slope and intercept.",
             "itemtype": "property",
             "name": "rsi",
@@ -5381,7 +5416,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 80,
+            "line": 101,
             "description": "Photometric interpretation (MONOCHROME, RGB...).",
             "itemtype": "property",
             "name": "photometricInterpretation",
@@ -5394,7 +5429,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 87,
+            "line": 108,
             "description": "Planar configuration for RGB data (0:RGBRGBRGBRGB... or 1:RRR...GGG...BBB...).",
             "itemtype": "property",
             "name": "planarConfiguration",
@@ -5407,7 +5442,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 94,
+            "line": 115,
             "description": "Number of components.",
             "itemtype": "property",
             "name": "planarConfiguration",
@@ -5420,7 +5455,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 101,
+            "line": 122,
             "description": "Meta information.",
             "itemtype": "property",
             "name": "meta",
@@ -5433,7 +5468,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 109,
+            "line": 130,
             "description": "Original buffer.",
             "itemtype": "property",
             "name": "originalBuffer",
@@ -5446,7 +5481,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 117,
+            "line": 138,
             "description": "Data range.",
             "itemtype": "property",
             "name": "dataRange",
@@ -5459,7 +5494,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 124,
+            "line": 145,
             "description": "Rescaled data range.",
             "itemtype": "property",
             "name": "rescaledDataRange",
@@ -5472,7 +5507,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 131,
+            "line": 152,
             "description": "Histogram.",
             "itemtype": "property",
             "name": "histogram",
@@ -5485,7 +5520,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 139,
+            "line": 160,
             "description": "Get the geometry of the image.",
             "itemtype": "method",
             "name": "getGeometry",
@@ -5499,7 +5534,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 145,
+            "line": 166,
             "description": "Get the data buffer of the image. TODO dangerous...",
             "itemtype": "method",
             "name": "getBuffer",
@@ -5513,7 +5548,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 152,
+            "line": 173,
             "description": "Get the rescale slope and intercept.",
             "itemtype": "method",
             "name": "getRescaleSlopeAndIntercept",
@@ -5527,7 +5562,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 158,
+            "line": 179,
             "description": "Set the rescale slope and intercept.",
             "itemtype": "method",
             "name": "setRescaleSlopeAndIntercept",
@@ -5544,7 +5579,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 169,
+            "line": 190,
             "description": "Get the photometricInterpretation of the image.",
             "itemtype": "method",
             "name": "getPhotometricInterpretation",
@@ -5558,7 +5593,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 175,
+            "line": 196,
             "description": "Set the photometricInterpretation of the image.",
             "itemtype": "method",
             "name": "setPhotometricInterpretation",
@@ -5569,7 +5604,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 181,
+            "line": 202,
             "description": "Get the planarConfiguration of the image.",
             "itemtype": "method",
             "name": "getPlanarConfiguration",
@@ -5583,7 +5618,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 187,
+            "line": 208,
             "description": "Set the planarConfiguration of the image.",
             "itemtype": "method",
             "name": "setPlanarConfiguration",
@@ -5600,7 +5635,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 193,
+            "line": 214,
             "description": "Get the numberOfComponents of the image.",
             "itemtype": "method",
             "name": "getNumberOfComponents",
@@ -5614,7 +5649,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 200,
+            "line": 221,
             "description": "Get the meta information of the image.",
             "itemtype": "method",
             "name": "getMeta",
@@ -5628,7 +5663,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 206,
+            "line": 227,
             "description": "Set the meta information of the image.",
             "itemtype": "method",
             "name": "setMeta",
@@ -5645,7 +5680,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 213,
+            "line": 234,
             "description": "Get value at offset. Warning: No size check...",
             "itemtype": "method",
             "name": "getValueAtOffset",
@@ -5666,7 +5701,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 223,
+            "line": 244,
             "description": "Clone the image.",
             "itemtype": "method",
             "name": "clone",
@@ -5680,7 +5715,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 241,
+            "line": 262,
             "description": "Append a slice to the image.",
             "itemtype": "method",
             "name": "appendSlice",
@@ -5697,7 +5732,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 313,
+            "line": 334,
             "description": "Get the data range.",
             "itemtype": "method",
             "name": "getDataRange",
@@ -5711,7 +5746,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 325,
+            "line": 346,
             "description": "Get the rescaled data range.",
             "itemtype": "method",
             "name": "getRescaledDataRange",
@@ -5725,7 +5760,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 337,
+            "line": 358,
             "description": "Get the histogram.",
             "itemtype": "method",
             "name": "getHistogram",
@@ -5739,7 +5774,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 353,
+            "line": 374,
             "description": "Get the value of the image at a specific coordinate.",
             "itemtype": "method",
             "name": "getValue",
@@ -5770,7 +5805,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 368,
+            "line": 389,
             "description": "Get the rescaled value of the image at a specific coordinate.",
             "itemtype": "method",
             "name": "getRescaledValue",
@@ -5801,7 +5836,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 382,
+            "line": 403,
             "description": "Calculate the data range of the image.",
             "itemtype": "method",
             "name": "calculateDataRange",
@@ -5815,7 +5850,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 402,
+            "line": 423,
             "description": "Calculate the rescaled data range of the image.",
             "itemtype": "method",
             "name": "calculateRescaledDataRange",
@@ -5829,7 +5864,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 426,
+            "line": 447,
             "description": "Calculate the histogram of the image.",
             "itemtype": "method",
             "name": "calculateHistogram",
@@ -5843,7 +5878,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 467,
+            "line": 488,
             "description": "Convolute the image with a given 2D kernel.",
             "itemtype": "method",
             "name": "convolute2D",
@@ -5864,7 +5899,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 618,
+            "line": 639,
             "description": "Transform an image using a specific operator.",
             "itemtype": "method",
             "name": "transform",
@@ -5885,7 +5920,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 636,
+            "line": 657,
             "description": "Compose this image with another one and using a specific operator.",
             "itemtype": "method",
             "name": "compose",
@@ -5911,7 +5946,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 656,
+            "line": 677,
             "description": "Quantify a line according to image information.",
             "itemtype": "method",
             "name": "quantifyLine",
@@ -5932,7 +5967,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 670,
+            "line": 691,
             "description": "Quantify a rectangle according to image information.",
             "itemtype": "method",
             "name": "quantifyRect",
@@ -5953,7 +5988,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 696,
+            "line": 717,
             "description": "Quantify an ellipse according to image information.",
             "itemtype": "method",
             "name": "quantifyEllipse",
@@ -5974,7 +6009,7 @@
         },
         {
             "file": "src/image/image.js",
-            "line": 718,
+            "line": 739,
             "description": "Get an Image object from the read DICOM file.",
             "itemtype": "method",
             "name": "create",
@@ -6112,6 +6147,19 @@
         {
             "file": "src/image/luts.js",
             "line": 104,
+            "description": "Flag to know if the lut needs update or not.",
+            "itemtype": "property",
+            "name": "needsUpdate",
+            "access": "private",
+            "tagname": "",
+            "type": "Boolean",
+            "class": "dwv.image.lut.Window",
+            "module": "image",
+            "namespace": "dwv.image.lut"
+        },
+        {
+            "file": "src/image/luts.js",
+            "line": 112,
             "description": "Get the window center.",
             "itemtype": "method",
             "name": "getCenter",
@@ -6125,7 +6173,7 @@
         },
         {
             "file": "src/image/luts.js",
-            "line": 110,
+            "line": 118,
             "description": "Get the window width.",
             "itemtype": "method",
             "name": "getWidth",
@@ -6139,7 +6187,7 @@
         },
         {
             "file": "src/image/luts.js",
-            "line": 116,
+            "line": 124,
             "description": "Get the signed flag.",
             "itemtype": "method",
             "name": "isSigned",
@@ -6153,7 +6201,21 @@
         },
         {
             "file": "src/image/luts.js",
-            "line": 123,
+            "line": 130,
+            "description": "Get the rescale lut.",
+            "itemtype": "method",
+            "name": "getRescaleLut",
+            "return": {
+                "description": "The rescale lut.",
+                "type": "Object"
+            },
+            "class": "dwv.image.lut.Window",
+            "module": "image",
+            "namespace": "dwv.image.lut"
+        },
+        {
+            "file": "src/image/luts.js",
+            "line": 137,
             "description": "Set the window center and width.",
             "itemtype": "method",
             "name": "setCenterAndWidth",
@@ -6175,7 +6237,17 @@
         },
         {
             "file": "src/image/luts.js",
-            "line": 177,
+            "line": 151,
+            "description": "Update the lut if needed..",
+            "itemtype": "method",
+            "name": "update",
+            "class": "dwv.image.lut.Window",
+            "module": "image",
+            "namespace": "dwv.image.lut"
+        },
+        {
+            "file": "src/image/luts.js",
+            "line": 204,
             "description": "Get the length of the LUT array.",
             "itemtype": "method",
             "name": "getLength",
@@ -6189,7 +6261,7 @@
         },
         {
             "file": "src/image/luts.js",
-            "line": 184,
+            "line": 211,
             "description": "Get the value of the LUT at the given offset.",
             "itemtype": "method",
             "name": "getValue",
@@ -6203,7 +6275,7 @@
         },
         {
             "file": "src/image/luts.js",
-            "line": 196,
+            "line": 223,
             "description": "Lookup tables for image color display.",
             "class": "dwv.image.lut.Window",
             "module": "image",
@@ -6256,22 +6328,9 @@
         {
             "file": "src/image/view.js",
             "line": 20,
-            "description": "Rescale lookup table.",
+            "description": "Window lookup tables, indexed per Rescale Slope and Intercept (RSI).",
             "itemtype": "property",
-            "name": "rescaleLut",
-            "access": "private",
-            "tagname": "",
-            "type": "Rescale",
-            "class": "dwv.image.View",
-            "module": "image",
-            "namespace": "dwv.image"
-        },
-        {
-            "file": "src/image/view.js",
-            "line": 27,
-            "description": "Window lookup table.",
-            "itemtype": "property",
-            "name": "windowLut",
+            "name": "windowLuts",
             "access": "private",
             "tagname": "",
             "type": "Window",
@@ -6281,7 +6340,7 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 35,
+            "line": 28,
             "description": "Window presets.",
             "itemtype": "property",
             "name": "windowPresets",
@@ -6294,7 +6353,7 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 42,
+            "line": 35,
             "description": "Color map",
             "itemtype": "property",
             "name": "colorMap",
@@ -6307,7 +6366,7 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 49,
+            "line": 42,
             "description": "Current position",
             "itemtype": "property",
             "name": "currentPosition",
@@ -6320,17 +6379,7 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 57,
-            "description": "Initialise the view.",
-            "itemtype": "method",
-            "name": "initialise",
-            "class": "dwv.image.View",
-            "module": "image",
-            "namespace": "dwv.image"
-        },
-        {
-            "file": "src/image/view.js",
-            "line": 77,
+            "line": 50,
             "description": "Get the associated image.",
             "itemtype": "method",
             "name": "getImage",
@@ -6344,7 +6393,7 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 83,
+            "line": 56,
             "description": "Set the associated image.",
             "itemtype": "method",
             "name": "setImage",
@@ -6361,38 +6410,7 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 90,
-            "description": "Get the rescale LUT of the image.",
-            "itemtype": "method",
-            "name": "getRescaleLut",
-            "return": {
-                "description": "The rescale LUT of the image.",
-                "type": "Rescale"
-            },
-            "class": "dwv.image.View",
-            "module": "image",
-            "namespace": "dwv.image"
-        },
-        {
-            "file": "src/image/view.js",
-            "line": 96,
-            "description": "Set the rescale LUT of the image.",
-            "itemtype": "method",
-            "name": "setRescaleLut",
-            "params": [
-                {
-                    "name": "lut",
-                    "description": "The rescale LUT of the image.",
-                    "type": "Rescale"
-                }
-            ],
-            "class": "dwv.image.View",
-            "module": "image",
-            "namespace": "dwv.image"
-        },
-        {
-            "file": "src/image/view.js",
-            "line": 103,
+            "line": 63,
             "description": "Get the window LUT of the image.",
             "itemtype": "method",
             "name": "getWindowLut",
@@ -6406,13 +6424,13 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 109,
+            "line": 75,
             "description": "Set the window LUT of the image.",
             "itemtype": "method",
             "name": "setWindowLut",
             "params": [
                 {
-                    "name": "lut",
+                    "name": "wlut",
                     "description": "The window LUT of the image.",
                     "type": "Window"
                 }
@@ -6423,7 +6441,19 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 116,
+            "line": 88,
+            "description": "Initialise the view. Only called at construction.",
+            "itemtype": "method",
+            "name": "initialise",
+            "access": "private",
+            "tagname": "",
+            "class": "dwv.image.View",
+            "module": "image",
+            "namespace": "dwv.image"
+        },
+        {
+            "file": "src/image/view.js",
+            "line": 108,
             "description": "Get the window presets.",
             "itemtype": "method",
             "name": "getWindowPresets",
@@ -6437,7 +6467,7 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 122,
+            "line": 114,
             "description": "Set the window presets.",
             "itemtype": "method",
             "name": "setWindowPresets",
@@ -6454,7 +6484,7 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 132,
+            "line": 124,
             "description": "Get the color map of the image.",
             "itemtype": "method",
             "name": "getColorMap",
@@ -6468,7 +6498,7 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 138,
+            "line": 130,
             "description": "Set the color map of the image.",
             "itemtype": "method",
             "name": "setColorMap",
@@ -6485,7 +6515,7 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 154,
+            "line": 146,
             "description": "Is the data signed data.",
             "itemtype": "method",
             "name": "isSigned",
@@ -6499,7 +6529,7 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 161,
+            "line": 153,
             "description": "Get the current position.",
             "itemtype": "method",
             "name": "getCurrentPosition",
@@ -6513,7 +6543,7 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 167,
+            "line": 159,
             "description": "Set the current position. Returns false if not in bounds.",
             "itemtype": "method",
             "name": "setCurrentPosition",
@@ -6530,7 +6560,7 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 197,
+            "line": 189,
             "description": "Append another view to this one.",
             "itemtype": "method",
             "name": "append",
@@ -6547,51 +6577,7 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 210,
-            "description": "View listeners",
-            "itemtype": "property",
-            "name": "listeners",
-            "access": "private",
-            "tagname": "",
-            "type": "Object",
-            "class": "dwv.image.View",
-            "module": "image",
-            "namespace": "dwv.image"
-        },
-        {
-            "file": "src/image/view.js",
-            "line": 217,
-            "description": "Get the view listeners.",
-            "itemtype": "method",
-            "name": "getListeners",
-            "return": {
-                "description": "The view listeners.",
-                "type": "Object"
-            },
-            "class": "dwv.image.View",
-            "module": "image",
-            "namespace": "dwv.image"
-        },
-        {
-            "file": "src/image/view.js",
-            "line": 223,
-            "description": "Set the view listeners.",
-            "itemtype": "method",
-            "name": "setListeners",
-            "params": [
-                {
-                    "name": "list",
-                    "description": "The view listeners.",
-                    "type": "Object"
-                }
-            ],
-            "class": "dwv.image.View",
-            "module": "image",
-            "namespace": "dwv.image"
-        },
-        {
-            "file": "src/image/view.js",
-            "line": 231,
+            "line": 202,
             "description": "Set the view window/level.",
             "itemtype": "method",
             "name": "setWindowLevel",
@@ -6613,7 +6599,65 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 247,
+            "line": 220,
+            "description": "Clone the image using all meta data and the original data buffer.",
+            "itemtype": "method",
+            "name": "clone",
+            "return": {
+                "description": "A full copy of this {dwv.image.View}.",
+                "type": "View"
+            },
+            "class": "dwv.image.View",
+            "module": "image",
+            "namespace": "dwv.image"
+        },
+        {
+            "file": "src/image/view.js",
+            "line": 235,
+            "description": "View listeners",
+            "itemtype": "property",
+            "name": "listeners",
+            "access": "private",
+            "tagname": "",
+            "type": "Object",
+            "class": "dwv.image.View",
+            "module": "image",
+            "namespace": "dwv.image"
+        },
+        {
+            "file": "src/image/view.js",
+            "line": 242,
+            "description": "Get the view listeners.",
+            "itemtype": "method",
+            "name": "getListeners",
+            "return": {
+                "description": "The view listeners.",
+                "type": "Object"
+            },
+            "class": "dwv.image.View",
+            "module": "image",
+            "namespace": "dwv.image"
+        },
+        {
+            "file": "src/image/view.js",
+            "line": 248,
+            "description": "Set the view listeners.",
+            "itemtype": "method",
+            "name": "setListeners",
+            "params": [
+                {
+                    "name": "list",
+                    "description": "The view listeners.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.image.View",
+            "module": "image",
+            "namespace": "dwv.image"
+        },
+        {
+            "file": "src/image/view.js",
+            "line": 256,
             "description": "Set the image window/level to cover the full data range.",
             "itemtype": "method",
             "name": "setWindowLevelMinMax\nWarning: uses the latest set rescale LUT or the default linear one.",
@@ -6623,7 +6667,7 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 263,
+            "line": 272,
             "description": "Go to first slice .",
             "itemtype": "method",
             "name": "goFirstSlice",
@@ -6637,7 +6681,7 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 276,
+            "line": 285,
             "description": "Increment the current slice number.",
             "itemtype": "method",
             "name": "incrementSliceNb",
@@ -6651,7 +6695,7 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 290,
+            "line": 299,
             "description": "Decrement the current slice number.",
             "itemtype": "method",
             "name": "decrementSliceNb",
@@ -6665,21 +6709,7 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 304,
-            "description": "Clone the image using all meta data and the original data buffer.",
-            "itemtype": "method",
-            "name": "clone",
-            "return": {
-                "description": "A full copy of this {dwv.image.Image}.",
-                "type": "View"
-            },
-            "class": "dwv.image.View",
-            "module": "image",
-            "namespace": "dwv.image"
-        },
-        {
-            "file": "src/image/view.js",
-            "line": 318,
+            "line": 313,
             "description": "Generate display image data to be given to a canvas.",
             "itemtype": "method",
             "name": "generateImageData",
@@ -6701,7 +6731,7 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 402,
+            "line": 398,
             "description": "Add an event listener on the view.",
             "itemtype": "method",
             "name": "addEventListener",
@@ -6723,7 +6753,7 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 417,
+            "line": 413,
             "description": "Remove an event listener on the view.",
             "itemtype": "method",
             "name": "removeEventListener",
@@ -6745,7 +6775,7 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 437,
+            "line": 433,
             "description": "Fire an event: call all associated listeners.",
             "itemtype": "method",
             "name": "fireEvent",
@@ -6762,7 +6792,7 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 462,
+            "line": 458,
             "description": "Get an View object from the read DICOM file.",
             "itemtype": "method",
             "name": "create",
@@ -12304,15 +12334,15 @@
         },
         {
             "message": "unknown tag: pqrqm",
-            "line": " src/image/image.js:175"
+            "line": " src/image/image.js:196"
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/image/image.js:718"
+            "line": " src/image/image.js:739"
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/image/view.js:462"
+            "line": " src/image/view.js:458"
         },
         {
             "message": "unknown tag: input",
@@ -12380,7 +12410,7 @@
         },
         {
             "message": "Missing item type\nLookup tables for image color display.",
-            "line": " src/image/luts.js:196"
+            "line": " src/image/luts.js:223"
         },
         {
             "message": "Missing item type",
