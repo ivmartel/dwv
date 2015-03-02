@@ -18,12 +18,12 @@ dwv.image = dwv.image || {};
 dwv.image.View = function(image, isSigned)
 {
     /**
-     * Window lookup table.
-     * @property windowLut
+     * Window lookup tables, indexed per Rescale Slope and Intercept (RSI).
+     * @property windowLuts
      * @private
      * @type Window
      */
-    var windowLut = null;
+    var windowLuts = {};
     
     /**
      * Window presets.
@@ -48,26 +48,6 @@ dwv.image.View = function(image, isSigned)
     var currentPosition = {"i":0,"j":0,"k":0};
     
     /**
-     * Initialise the view.
-     * @method initialise
-     */ 
-    function initialise()
-    {
-        if ( !windowLut ) {
-            // create the rescale lookup table
-            var rescaleLut = new dwv.image.lut.Rescale(
-                image.getRescaleSlopeAndIntercept(0) );
-            // initialise the rescale lookup table
-            rescaleLut.initialise(image.getMeta().BitsStored);
-            // create the window lookup table
-            windowLut = new dwv.image.lut.Window(rescaleLut, isSigned);
-        }
-    }
-    
-    // default constructor
-    initialise();
-    
-    /**
      * Get the associated image.
      * @method getImage
      * @return {Image} The associated image.
@@ -85,14 +65,46 @@ dwv.image.View = function(image, isSigned)
      * @method getWindowLut
      * @return {Window} The window LUT of the image.
      */ 
-    this.getWindowLut = function() { return windowLut; };
+    this.getWindowLut = function (rsi) { 
+        if ( typeof rsi === "undefined" ) {
+            var sliceNumber = this.getCurrentPosition().k;
+            rsi = image.getRescaleSlopeAndIntercept(sliceNumber);
+        }
+        return windowLuts[ rsi.toString() ];
+    };
     /**
      * Set the window LUT of the image.
      * @method setWindowLut
-     * @param {Window} lut The window LUT of the image.
+     * @param {Window} wlut The window LUT of the image.
      */ 
-    this.setWindowLut = function(lut) { windowLut = lut; };
+    this.setWindowLut = function (wlut) 
+    {
+        var rsi = wlut.getRescaleLut().getRSI();
+        windowLuts[rsi.toString()] = wlut;
+    };
     
+    var self = this;
+    
+    /**
+     * Initialise the view. Only called at construction.
+     * @method initialise
+     * @private
+     */ 
+    function initialise()
+    {
+        // create the rescale lookup table
+        var rescaleLut = new dwv.image.lut.Rescale(
+            image.getRescaleSlopeAndIntercept(0) );
+        // initialise the rescale lookup table
+        rescaleLut.initialise(image.getMeta().BitsStored);
+        // create the window lookup table
+        var windowLut = new dwv.image.lut.Window(rescaleLut, isSigned);
+        self.setWindowLut(windowLut);
+    }
+    
+    // default constructor
+    initialise();
+
     /**
      * Get the window presets.
      * @method getWindowPresets
@@ -184,9 +196,42 @@ dwv.image.View = function(image, isSigned)
        // append images
        this.getImage().appendSlice( rhs.getImage() );
        // init to update self
-       initialise( rhs.getImage() );
+       this.setWindowLut(rhs.getWindowLut());
     };
     
+    /**
+     * Set the view window/level.
+     * @method setWindowLevel
+     * @param {Number} center The window center.
+     * @param {Number} width The window width.
+     * Warning: uses the latest set rescale LUT or the default linear one.
+     */
+    this.setWindowLevel = function ( center, width )
+    {
+        // window width shall be >= 1 (see https://www.dabsoft.ch/dicom/3/C.11.2.1.2/)
+        if ( width >= 1 ) {
+            for ( var key in windowLuts ) {
+                windowLuts[key].setCenterAndWidth(center, width);
+            }
+            this.fireEvent({"type": "wlchange", "wc": center, "ww": width });
+        }
+    };
+
+    /**
+     * Clone the image using all meta data and the original data buffer.
+     * @method clone
+     * @return {View} A full copy of this {dwv.image.View}.
+     */
+    this.clone = function ()
+    {
+        var copy = new dwv.image.View(this.getImage());
+        for ( var key in windowLuts ) {
+            copy.setWindowLut(windowLuts[key]);
+        }
+        copy.setListeners(this.getListeners());
+        return copy;
+    };
+
     /**
      * View listeners
      * @property listeners
@@ -206,22 +251,6 @@ dwv.image.View = function(image, isSigned)
      * @param {Object} list The view listeners.
      */ 
     this.setListeners = function(list) { listeners = list; };
-};
-
-/**
- * Set the view window/level.
- * @method setWindowLevel
- * @param {Number} center The window center.
- * @param {Number} width The window width.
- * Warning: uses the latest set rescale LUT or the default linear one.
- */
-dwv.image.View.prototype.setWindowLevel = function( center, width )
-{
-    // window width shall be >= 1 (see https://www.dabsoft.ch/dicom/3/C.11.2.1.2/)
-    if ( width >= 1 ) {
-        this.getWindowLut().setCenterAndWidth(center, width);
-        this.fireEvent({"type": "wlchange", "wc": center, "ww": width });
-    }
 };
 
 /**
@@ -282,19 +311,6 @@ dwv.image.View.prototype.decrementSliceNb = function()
 };
 
 /**
- * Clone the image using all meta data and the original data buffer.
- * @method clone
- * @return {View} A full copy of this {dwv.image.Image}.
- */
-dwv.image.View.prototype.clone = function()
-{
-    var copy = new dwv.image.View(this.getImage());
-    copy.setWindowLut(this.getWindowLut());
-    copy.setListeners(this.getListeners());
-    return copy;
-};
-
-/**
  * Generate display image data to be given to a canvas.
  * @method generateImageData
  * @param {Array} array The array to fill in.
@@ -308,6 +324,7 @@ dwv.image.View.prototype.generateImageData = function( array )
     var photoInterpretation = image.getPhotometricInterpretation();
     var planarConfig = image.getPlanarConfiguration();
     var windowLut = this.getWindowLut();
+    windowLut.update();
     var colorMap = this.getColorMap();
     var index = 0;
     var sliceSize = image.getGeometry().getSize().getSliceSize();

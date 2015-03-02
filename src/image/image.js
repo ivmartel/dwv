@@ -53,6 +53,27 @@ dwv.image.RescaleSlopeAndIntercept = function (slope, intercept)
     };
 };
 
+/** 
+ * Check for RSI equality.
+ * @method equals
+ * @param {Object} rhs The other RSI to compare to.
+ * @return {Boolean} True if both RSI are equal.
+ */ 
+dwv.image.RescaleSlopeAndIntercept.prototype.equals = function (rhs) {
+    return rhs !== null &&
+        this.getSlope() === rhs.getSlope() &&
+        this.getIntercept() === rhs.getIntercept();
+};
+
+/** 
+ * Get a string representation of the RSI.
+ * @method toString
+ * @return {String} The RSI as a string.
+ */ 
+dwv.image.RescaleSlopeAndIntercept.prototype.toString = function () {
+    return (this.getSlope() + ", " + this.getIntercept());
+};
+
 /**
  * Image class.
  * Usable once created, optional are:
