@@ -321,10 +321,7 @@ dwv.App = function ()
         }
         // possible load from URL
         if ( typeof config.skipLoadUrl === "undefined" ) {
-            var inputUrls = dwv.html.getUriParam(); 
-            if ( inputUrls && inputUrls.length > 0 ) {
-                this.loadURL(inputUrls);
-            }
+            dwv.html.getUriParam(window.location.href, this.onInputURLs); 
         }
         else{
             console.log("Not loading url from adress since skipLoadUrl is defined.");
@@ -729,6 +726,16 @@ dwv.App = function ()
     this.onChangeURL = function (event)
     {
         self.loadURL([event.target.value]);
+    };
+
+    /**
+     * Handle input urls.
+     * @method onInputURLs
+     * @param {Array} urls The list of input urls.
+     */
+    this.onInputURLs = function (urls)
+    {
+        self.loadURL(urls);
     };
 
     /**
