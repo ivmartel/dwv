@@ -321,10 +321,7 @@ dwv.App = function ()
         }
         // possible load from URL
         if ( typeof config.skipLoadUrl === "undefined" ) {
-            var inputUrls = dwv.html.getUriParam(); 
-            if ( inputUrls && inputUrls.length > 0 ) {
-                this.loadURL(inputUrls);
-            }
+            dwv.html.getUriParam(window.location.href, this.onInputURLs); 
         }
         else{
             console.log("Not loading url from adress since skipLoadUrl is defined.");
@@ -729,6 +726,16 @@ dwv.App = function ()
     this.onChangeURL = function (event)
     {
         self.loadURL([event.target.value]);
+    };
+
+    /**
+     * Handle input urls.
+     * @method onInputURLs
+     * @param {Array} urls The list of input urls.
+     */
+    this.onInputURLs = function (urls)
+    {
+        self.loadURL(urls);
     };
 
     /**
@@ -4840,13 +4847,13 @@ dwv.html.createHtmlSelect = function(name, list) {
  * @method getUriParam
  * @static
  * @param {String } uri The URI to decode.
- * @return {Array} The array of parameters.
+ * @param {Function} The function to call with the decoded urls.
+ * @return {Array} The list of urls if in uri, null otherwise.
  */
-dwv.html.getUriParam = function(uri)
+dwv.html.getUriParam = function(uri, callback)
 {
-    var inputUri = uri || window.location.href;
     // split key/value pairs
-    var mainQueryPairs = dwv.utils.splitQueryString(inputUri);
+    var mainQueryPairs = dwv.utils.splitQueryString(uri);
     // check pairs
     if( Object.keys(mainQueryPairs).length === 0 ) {
         return null;
@@ -4857,17 +4864,22 @@ dwv.html.getUriParam = function(uri)
         throw new Error("No input parameter in query URI.");
     }
     
-    var result = [];
     // if manifest
     if( query.type && query.type === "manifest" ) {
-        result = dwv.html.decodeManifestUri( query.input, query.nslices );
+        dwv.html.decodeManifestUri( query.input, query.nslices, callback );
     }
     // if key/value uri
     else {
-        result = dwv.html.decodeKeyValueUri( query.input, query.dwvReplaceMode );
+        var urls = dwv.html.decodeKeyValueUri( query.input, query.dwvReplaceMode );
+        if ( typeof callback != "undefined" ) {
+            callback(urls);
+        }
+        else {
+            return urls;
+        }
     }
-   
-    return result;
+    // default return
+    return null;
 };
 
 /**
@@ -4962,11 +4974,10 @@ dwv.html.decodeKeyValueUri = function(uri, replaceMode)
  * @static
  * @param {String} uri The uri to decode.
  * @param {number} nslices The number of slices to load.
+ * @param {Function} The function to call with the decoded urls.
  */
-dwv.html.decodeManifestUri = function(uri, nslices)
+dwv.html.decodeManifestUri = function(uri, nslices, callback)
 {
-    var result = [];
-    
     // Request error
     var onErrorRequest = function(/*event*/)
     {
@@ -4976,20 +4987,18 @@ dwv.html.decodeManifestUri = function(uri, nslices)
     // Request handler
     var onLoadRequest = function(/*event*/)
     {
-        result = dwv.html.decodeManifest(this.responseXML, nslices);
+        var urls = dwv.html.decodeManifest(this.responseXML, nslices);
+        callback(urls);
     };
     
     var request = new XMLHttpRequest();
     // synchronous request (third parameter)
-    request.open('GET', decodeURIComponent(uri), false);
+    request.open('GET', decodeURIComponent(uri), true);
     request.responseType = "xml"; 
     request.onload = onLoadRequest;
     request.onerror = onErrorRequest;
     //request.onprogress = dwv.gui.updateProgress;
     request.send(null);
-
-    // return
-    return result;
 };
 
 /**
