@@ -96,6 +96,7 @@ dwv.tool.Filter = function ( filterList, app )
         if ( gui ) {
             gui.initialise();
         }
+        return true;
     };
 
     /**

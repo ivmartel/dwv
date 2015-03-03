@@ -39,7 +39,7 @@ $(document).ready( function()
     myapp.init({
         "containerDivId": "dwv",
         "fitToWindow": true,
-        "tools": ["Window/Level", "Zoom/Pan", "Scroll", "Draw", "Livewire", "Filter"],
+        "tools": ["Scroll", "Window/Level", "Zoom/Pan", "Draw", "Livewire", "Filter"],
         "filters": ["Threshold", "Sharpen", "Sobel"],
         "shapes": ["Line", "Protractor", "Rectangle", "Roi", "Ellipse"],
         "gui": ["tool", "load", "help", "undo", "version", "tags"],

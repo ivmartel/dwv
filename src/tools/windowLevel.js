@@ -216,6 +216,7 @@ dwv.tool.WindowLevel = function(app)
         if ( gui ) {
             gui.initialise();
         }
+        return true;
     };
 }; // WindowLevel class
 

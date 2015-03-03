@@ -66,9 +66,9 @@ dwv.gui.Toolbox = function (app)
     {
         base.display(flag);
     };
-    this.initialise = function ()
+    this.initialise = function (list)
     {
-        base.initialise();
+        base.initialise(list);
     };
 };
 

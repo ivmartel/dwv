@@ -114,9 +114,9 @@ dwv.gui.Toolbox = function (app)
     {
         base.display(bool);
     };
-    this.initialise = function ()
+    this.initialise = function (list)
     {
-        base.initialise();
+        base.initialise(list);
     };
 };
 

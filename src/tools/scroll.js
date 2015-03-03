@@ -130,6 +130,35 @@ dwv.tool.Scroll = function(app)
     };
 
     /**
+     * Handle mouse scroll event (fired by Firefox).
+     * @method DOMMouseScroll
+     * @param {Object} event The mouse scroll event.
+     */
+    this.DOMMouseScroll = function(event){
+        // ev.detail on firefox is 3
+        if( event.detail < 0 ) {
+            app.getView().incrementSliceNb();
+        }
+        else {
+            app.getView().decrementSliceNb();
+        }
+    };
+
+    /**
+     * Handle mouse wheel event.
+     * @method mousewheel
+     * @param {Object} event The mouse wheel event.
+     */
+    this.mousewheel = function(event){
+        // ev.wheelDelta on chrome is 120
+        if( event.wheelDelta > 0 ) {
+            app.getView().incrementSliceNb();
+        }
+        else {
+            app.getView().decrementSliceNb();
+        }
+    };
+    /**
      * Handle key down event.
      * @method keydown
      * @param {Object} event The key down event.
@@ -159,6 +188,17 @@ dwv.tool.Scroll = function(app)
         }
     };
 
+    /**
+     * Initialise the tool.
+     * @method init
+     */
+    this.init = function() {
+        if ( app.getNSlicesToLoad() === 1 ) {
+            return false;
+        }
+        return true;
+    };
+    
 }; // Scroll class
 
 /**
@@ -180,10 +220,3 @@ dwv.tool.Scroll.prototype.getHelp = function()
     };
 };
 
-/**
- * Initialise the tool.
- * @method init
- */
-dwv.tool.Scroll.prototype.init = function() {
-    // nothing to do.
-};

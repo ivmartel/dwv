@@ -28,35 +28,49 @@ dwv.tool.Toolbox = function( toolList, app )
      */
     var gui = null;
     /**
-     * Tool list.
-     * @property toolList
-     * @type Object
-     */
-    this.toolList = toolList;
-    /**
      * Selected tool.
      * @property selectedTool
      * @type Object
      */
-    this.selectedTool = 0;
+    var selectedTool = null;
     /**
      * Default tool name.
      * @property defaultToolName
      * @type String
      */
-    this.defaultToolName = 0;
+    var defaultToolName = null;
     
+    /**
+     * Get the list of tools.
+     * @method getToolList
+     * @return {Array} The list of tool objects.
+     */
+    this.getToolList = function ()
+    {
+        return toolList;
+    };
+
+    /**
+     * Get the selected tool.
+     * @method getSelectedTool
+     * @return {Object} The selected tool.
+     */
+    this.getSelectedTool = function ()
+    {
+        return selectedTool;
+    };
+
     /**
      * Setup the toolbox GUI.
      * @method setup
      */
     this.setup = function ()
     {
-        if ( Object.keys(this.toolList).length !== 0 ) {
+        if ( Object.keys(toolList).length !== 0 ) {
             gui = new dwv.gui.Toolbox(app);
-            gui.setup(this.toolList);
-            for( var key in this.toolList ) {
-                this.toolList[key].setup();
+            gui.setup(toolList);
+            for( var key in toolList ) {
+                toolList[key].setup();
             }
         }
     };
@@ -68,7 +82,7 @@ dwv.tool.Toolbox = function( toolList, app )
      */
     this.display = function (bool)
     {
-        if ( Object.keys(this.toolList).length !== 0 && gui ) {
+        if ( Object.keys(toolList).length !== 0 && gui ) {
             gui.display(bool);
         }
     };
@@ -79,68 +93,65 @@ dwv.tool.Toolbox = function( toolList, app )
      */
     this.init = function ()
     {
+        var keys = Object.keys(toolList);
         // check if we have tools
-        if ( Object.keys(this.toolList).length === 0 ) {
+        if ( keys.length === 0 ) {
             return;
         }
-        // set the default to the first in the list
-        for( var key in this.toolList ){
-            this.defaultToolName = key;
-            break;
-        }
-        this.setSelectedTool(this.defaultToolName);
         // init all tools
-        for( key in this.toolList ) {
-            this.toolList[key].init();
-        }    
+        defaultToolName = "";
+        var displays = [];
+        var display = null;
+        for( var key in toolList ) {
+            display = toolList[key].init();
+            if ( display && defaultToolName === "" ) {
+                defaultToolName = key;
+            }
+            displays.push(display);
+        }
+        this.setSelectedTool(defaultToolName);
         // init html
         if ( gui ) {
-            gui.initialise();
+            gui.initialise(displays);
         }
     };
-};
 
-/**
- * Get the list of tools.
- * @method getToolList
- * @return {Array} The list of tool objects.
- */
-dwv.tool.Toolbox.prototype.getToolList = function ()
-{
-    return this.toolList;
-};
-
-/**
- * Get the selected tool.
- * @method getSelectedTool
- * @return {Object} The selected tool.
- */
-dwv.tool.Toolbox.prototype.getSelectedTool = function ()
-{
-    return this.selectedTool;
-};
-
-/**
- * Set the selected tool.
- * @method setSelectedTool
- * @return {String} The name of the tool to select.
- */
-dwv.tool.Toolbox.prototype.setSelectedTool = function (name)
-{
-    // check if we have it
-    if( !this.hasTool(name) )
+    /**
+     * Set the selected tool.
+     * @method setSelectedTool
+     * @return {String} The name of the tool to select.
+     */
+    this.setSelectedTool = function (name)
     {
-        throw new Error("Unknown tool: '" + name + "'");
-    }
-    // hide last selected
-    if( this.selectedTool )
+        // check if we have it
+        if( !this.hasTool(name) )
+        {
+            throw new Error("Unknown tool: '" + name + "'");
+        }
+        // hide last selected
+        if( selectedTool )
+        {
+            selectedTool.display(false);
+        }
+        // enable new one
+        selectedTool = toolList[name];
+        // display it
+        selectedTool.display(true);
+    };
+
+    /**
+     * Reset the tool box.
+     * @method init
+     */
+    this.reset = function ()
     {
-        this.selectedTool.display(false);
-    }
-    // enable new one
-    this.selectedTool = this.toolList[name];
-    // display it
-    this.selectedTool.display(true);
+        // hide last selected
+        if ( selectedTool ) {
+            selectedTool.display(false);
+        }
+        selectedTool = null;
+        defaultToolName = null;
+    };
 };
 
 /**
@@ -151,19 +162,5 @@ dwv.tool.Toolbox.prototype.setSelectedTool = function (name)
  */
 dwv.tool.Toolbox.prototype.hasTool = function (name)
 {
-    return this.toolList[name];
-};
-
-/**
- * Reset the tool box.
- * @method init
- */
-dwv.tool.Toolbox.prototype.reset = function ()
-{
-    // hide last selected
-    if ( this.selectedTool ) {
-        this.selectedTool.display(false);
-    }
-    this.selectedTool = 0;
-    this.defaultToolName = 0;
+    return this.getToolList()[name];
 };

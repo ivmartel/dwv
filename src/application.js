@@ -24,6 +24,8 @@ dwv.App = function ()
     var dataWidth = 0;
     // Image data height
     var dataHeight = 0;
+    // Number of slices to load
+    var nSlicesToLoad = 0;
 
     // Container div id
     var containerDivId = null;
@@ -108,6 +110,12 @@ dwv.App = function ()
      * @return {Array} The image data array.
      */
     this.getImageData = function () { return imageData; };
+    /** 
+     * Get the number of slices to load.
+     * @method getNSlicesToLoad
+     * @return {Number} The number of slices to load.
+     */
+    this.getNSlicesToLoad = function () { return nSlicesToLoad; };
 
     /** 
      * Get the container div id.
@@ -350,6 +358,7 @@ dwv.App = function ()
         // clear objects
         image = null;
         view = null;
+        nSlicesToLoad = 0;
         // reset undo/redo
         if ( undoStack ) {
             undoStack = new dwv.tool.UndoStack();
@@ -382,6 +391,7 @@ dwv.App = function ()
     {
         // clear variables
         this.reset();
+        nSlicesToLoad = files.length;
         // create IO
         var fileIO = new dwv.io.File();
         fileIO.onload = function (data) {
@@ -418,6 +428,7 @@ dwv.App = function ()
     {
         // clear variables
         this.reset();
+        nSlicesToLoad = urls.length;
         // create IO
         var urlIO = new dwv.io.Url();
         urlIO.onload = function (data) {

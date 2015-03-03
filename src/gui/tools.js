@@ -64,11 +64,28 @@ dwv.gui.base.Toolbox = function (app)
      * Initialise the toolbox HTML.
      * @method initialise
      */
-    this.initialise = function ()
+    this.initialise = function (displays)
     {
         // tool select: reset selected option
         var toolSelector = document.getElementById("toolSelect");
-        toolSelector.selectedIndex = 0;
+        
+        // update list
+        var options = toolSelector.options;
+        var selectedIndex = -1;
+        for ( var i = 0; i < options.length; ++i ) {
+            if ( !displays[i] ) {
+                options[i].style.display = "none";
+            }
+            else {
+                if ( selectedIndex === -1 ) {
+                    selectedIndex = i;
+                }
+                options[i].style.display = "";
+            }
+        }
+        toolSelector.selectedIndex = selectedIndex;
+        
+        // refresh
         dwv.gui.refreshSelect("#toolSelect");
     };
     

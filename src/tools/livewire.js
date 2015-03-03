@@ -326,6 +326,8 @@ dwv.tool.Livewire = function(app)
                 size.getNumberOfColumns(),
                 size.getNumberOfRows() );
         scissors.setData(app.getImageData().data);
+        
+        return true;
     };
     
 }; // Livewire class
