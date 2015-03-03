@@ -24,6 +24,8 @@ dwv.App = function ()
     var dataWidth = 0;
     // Image data height
     var dataHeight = 0;
+    // Number of slices to load
+    var nSlicesToLoad = 0;
 
     // Container div id
     var containerDivId = null;
@@ -108,6 +110,12 @@ dwv.App = function ()
      * @return {Array} The image data array.
      */
     this.getImageData = function () { return imageData; };
+    /** 
+     * Get the number of slices to load.
+     * @method getNSlicesToLoad
+     * @return {Number} The number of slices to load.
+     */
+    this.getNSlicesToLoad = function () { return nSlicesToLoad; };
 
     /** 
      * Get the container div id.
@@ -350,6 +358,7 @@ dwv.App = function ()
         // clear objects
         image = null;
         view = null;
+        nSlicesToLoad = 0;
         // reset undo/redo
         if ( undoStack ) {
             undoStack = new dwv.tool.UndoStack();
@@ -382,6 +391,7 @@ dwv.App = function ()
     {
         // clear variables
         this.reset();
+        nSlicesToLoad = files.length;
         // create IO
         var fileIO = new dwv.io.File();
         fileIO.onload = function (data) {
@@ -418,6 +428,7 @@ dwv.App = function ()
     {
         // clear variables
         this.reset();
+        nSlicesToLoad = urls.length;
         // create IO
         var urlIO = new dwv.io.Url();
         urlIO.onload = function (data) {
@@ -5853,11 +5864,28 @@ dwv.gui.base.Toolbox = function (app)
      * Initialise the toolbox HTML.
      * @method initialise
      */
-    this.initialise = function ()
+    this.initialise = function (displays)
     {
         // tool select: reset selected option
         var toolSelector = document.getElementById("toolSelect");
-        toolSelector.selectedIndex = 0;
+        
+        // update list
+        var options = toolSelector.options;
+        var selectedIndex = -1;
+        for ( var i = 0; i < options.length; ++i ) {
+            if ( !displays[i] ) {
+                options[i].style.display = "none";
+            }
+            else {
+                if ( selectedIndex === -1 ) {
+                    selectedIndex = i;
+                }
+                options[i].style.display = "";
+            }
+        }
+        toolSelector.selectedIndex = selectedIndex;
+        
+        // refresh
         dwv.gui.refreshSelect("#toolSelect");
     };
     
@@ -11016,6 +11044,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
             // init html
             gui.initialise();
         }
+        return true;
     };
 
 }; // Draw class
@@ -11719,6 +11748,7 @@ dwv.tool.Filter = function ( filterList, app )
         if ( gui ) {
             gui.initialise();
         }
+        return true;
     };
 
     /**
@@ -12750,6 +12780,8 @@ dwv.tool.Livewire = function(app)
                 size.getNumberOfColumns(),
                 size.getNumberOfRows() );
         scissors.setData(app.getImageData().data);
+        
+        return true;
     };
     
 }; // Livewire class
@@ -13346,6 +13378,35 @@ dwv.tool.Scroll = function(app)
     };
 
     /**
+     * Handle mouse scroll event (fired by Firefox).
+     * @method DOMMouseScroll
+     * @param {Object} event The mouse scroll event.
+     */
+    this.DOMMouseScroll = function(event){
+        // ev.detail on firefox is 3
+        if( event.detail < 0 ) {
+            app.getView().incrementSliceNb();
+        }
+        else {
+            app.getView().decrementSliceNb();
+        }
+    };
+
+    /**
+     * Handle mouse wheel event.
+     * @method mousewheel
+     * @param {Object} event The mouse wheel event.
+     */
+    this.mousewheel = function(event){
+        // ev.wheelDelta on chrome is 120
+        if( event.wheelDelta > 0 ) {
+            app.getView().incrementSliceNb();
+        }
+        else {
+            app.getView().decrementSliceNb();
+        }
+    };
+    /**
      * Handle key down event.
      * @method keydown
      * @param {Object} event The key down event.
@@ -13375,6 +13436,17 @@ dwv.tool.Scroll = function(app)
         }
     };
 
+    /**
+     * Initialise the tool.
+     * @method init
+     */
+    this.init = function() {
+        if ( app.getNSlicesToLoad() === 1 ) {
+            return false;
+        }
+        return true;
+    };
+    
 }; // Scroll class
 
 /**
@@ -13396,13 +13468,6 @@ dwv.tool.Scroll.prototype.getHelp = function()
     };
 };
 
-/**
- * Initialise the tool.
- * @method init
- */
-dwv.tool.Scroll.prototype.init = function() {
-    // nothing to do.
-};
 ;/** 
  * Tool module.
  * @module tool
@@ -13433,35 +13498,49 @@ dwv.tool.Toolbox = function( toolList, app )
      */
     var gui = null;
     /**
-     * Tool list.
-     * @property toolList
-     * @type Object
-     */
-    this.toolList = toolList;
-    /**
      * Selected tool.
      * @property selectedTool
      * @type Object
      */
-    this.selectedTool = 0;
+    var selectedTool = null;
     /**
      * Default tool name.
      * @property defaultToolName
      * @type String
      */
-    this.defaultToolName = 0;
+    var defaultToolName = null;
     
+    /**
+     * Get the list of tools.
+     * @method getToolList
+     * @return {Array} The list of tool objects.
+     */
+    this.getToolList = function ()
+    {
+        return toolList;
+    };
+
+    /**
+     * Get the selected tool.
+     * @method getSelectedTool
+     * @return {Object} The selected tool.
+     */
+    this.getSelectedTool = function ()
+    {
+        return selectedTool;
+    };
+
     /**
      * Setup the toolbox GUI.
      * @method setup
      */
     this.setup = function ()
     {
-        if ( Object.keys(this.toolList).length !== 0 ) {
+        if ( Object.keys(toolList).length !== 0 ) {
             gui = new dwv.gui.Toolbox(app);
-            gui.setup(this.toolList);
-            for( var key in this.toolList ) {
-                this.toolList[key].setup();
+            gui.setup(toolList);
+            for( var key in toolList ) {
+                toolList[key].setup();
             }
         }
     };
@@ -13473,7 +13552,7 @@ dwv.tool.Toolbox = function( toolList, app )
      */
     this.display = function (bool)
     {
-        if ( Object.keys(this.toolList).length !== 0 && gui ) {
+        if ( Object.keys(toolList).length !== 0 && gui ) {
             gui.display(bool);
         }
     };
@@ -13484,68 +13563,65 @@ dwv.tool.Toolbox = function( toolList, app )
      */
     this.init = function ()
     {
+        var keys = Object.keys(toolList);
         // check if we have tools
-        if ( Object.keys(this.toolList).length === 0 ) {
+        if ( keys.length === 0 ) {
             return;
         }
-        // set the default to the first in the list
-        for( var key in this.toolList ){
-            this.defaultToolName = key;
-            break;
-        }
-        this.setSelectedTool(this.defaultToolName);
         // init all tools
-        for( key in this.toolList ) {
-            this.toolList[key].init();
-        }    
+        defaultToolName = "";
+        var displays = [];
+        var display = null;
+        for( var key in toolList ) {
+            display = toolList[key].init();
+            if ( display && defaultToolName === "" ) {
+                defaultToolName = key;
+            }
+            displays.push(display);
+        }
+        this.setSelectedTool(defaultToolName);
         // init html
         if ( gui ) {
-            gui.initialise();
+            gui.initialise(displays);
         }
     };
-};
 
-/**
- * Get the list of tools.
- * @method getToolList
- * @return {Array} The list of tool objects.
- */
-dwv.tool.Toolbox.prototype.getToolList = function ()
-{
-    return this.toolList;
-};
-
-/**
- * Get the selected tool.
- * @method getSelectedTool
- * @return {Object} The selected tool.
- */
-dwv.tool.Toolbox.prototype.getSelectedTool = function ()
-{
-    return this.selectedTool;
-};
-
-/**
- * Set the selected tool.
- * @method setSelectedTool
- * @return {String} The name of the tool to select.
- */
-dwv.tool.Toolbox.prototype.setSelectedTool = function (name)
-{
-    // check if we have it
-    if( !this.hasTool(name) )
+    /**
+     * Set the selected tool.
+     * @method setSelectedTool
+     * @return {String} The name of the tool to select.
+     */
+    this.setSelectedTool = function (name)
     {
-        throw new Error("Unknown tool: '" + name + "'");
-    }
-    // hide last selected
-    if( this.selectedTool )
+        // check if we have it
+        if( !this.hasTool(name) )
+        {
+            throw new Error("Unknown tool: '" + name + "'");
+        }
+        // hide last selected
+        if( selectedTool )
+        {
+            selectedTool.display(false);
+        }
+        // enable new one
+        selectedTool = toolList[name];
+        // display it
+        selectedTool.display(true);
+    };
+
+    /**
+     * Reset the tool box.
+     * @method init
+     */
+    this.reset = function ()
     {
-        this.selectedTool.display(false);
-    }
-    // enable new one
-    this.selectedTool = this.toolList[name];
-    // display it
-    this.selectedTool.display(true);
+        // hide last selected
+        if ( selectedTool ) {
+            selectedTool.display(false);
+        }
+        selectedTool = null;
+        defaultToolName = null;
+    };
 };
 
 /**
@@ -13556,21 +13632,7 @@ dwv.tool.Toolbox.prototype.setSelectedTool = function (name)
  */
 dwv.tool.Toolbox.prototype.hasTool = function (name)
 {
-    return this.toolList[name];
-};
-
-/**
- * Reset the tool box.
- * @method init
- */
-dwv.tool.Toolbox.prototype.reset = function ()
-{
-    // hide last selected
-    if ( this.selectedTool ) {
-        this.selectedTool.display(false);
-    }
-    this.selectedTool = 0;
-    this.defaultToolName = 0;
+    return this.getToolList()[name];
 };
 ;/** 
  * Tool module.
@@ -13898,6 +13960,7 @@ dwv.tool.WindowLevel = function(app)
         if ( gui ) {
             gui.initialise();
         }
+        return true;
     };
 }; // WindowLevel class
 
@@ -14253,7 +14316,7 @@ dwv.tool.ZoomAndPan.prototype.getHelp = function()
  * @method init
  */
 dwv.tool.ZoomAndPan.prototype.init = function() {
-    // nothing to do.
+    return true;
 };;/** 
  * Utility module.
  * @module utils

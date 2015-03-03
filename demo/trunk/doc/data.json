@@ -782,7 +782,7 @@
             },
             "tag": "module",
             "file": "src/application.js",
-            "line": 1273,
+            "line": 1284,
             "description": "Utility module."
         }
     },
@@ -1072,7 +1072,7 @@
             "module": "gui",
             "namespace": "dwv.gui.base",
             "file": "src/gui/tools.js",
-            "line": 77,
+            "line": 94,
             "description": "WindowLevel tool base gui.",
             "is_constructor": 1
         },
@@ -1087,7 +1087,7 @@
             "module": "gui",
             "namespace": "dwv.gui.base",
             "file": "src/gui/tools.js",
-            "line": 166,
+            "line": 183,
             "description": "Draw tool base gui.",
             "is_constructor": 1
         },
@@ -1102,7 +1102,7 @@
             "module": "gui",
             "namespace": "dwv.gui.base",
             "file": "src/gui/tools.js",
-            "line": 251,
+            "line": 268,
             "description": "Livewire tool base gui.",
             "is_constructor": 1
         },
@@ -1117,7 +1117,7 @@
             "module": "gui",
             "namespace": "dwv.gui.base",
             "file": "src/gui/tools.js",
-            "line": 318,
+            "line": 335,
             "description": "ZoomAndPan tool base gui.",
             "is_constructor": 1
         },
@@ -1132,7 +1132,7 @@
             "module": "gui",
             "namespace": "dwv.gui.base",
             "file": "src/gui/tools.js",
-            "line": 370,
+            "line": 387,
             "description": "Scroll tool base gui.",
             "is_constructor": 1
         },
@@ -1994,7 +1994,7 @@
             "module": "tool",
             "namespace": "dwv.tool.filter",
             "file": "src/tools/filter.js",
-            "line": 189,
+            "line": 190,
             "description": "Threshold filter tool.",
             "is_constructor": 1,
             "params": [
@@ -2016,7 +2016,7 @@
             "module": "tool",
             "namespace": "dwv.tool.filter",
             "file": "src/tools/filter.js",
-            "line": 252,
+            "line": 253,
             "description": "Sharpen filter tool.",
             "is_constructor": 1,
             "params": [
@@ -2038,7 +2038,7 @@
             "module": "tool",
             "namespace": "dwv.tool.filter",
             "file": "src/tools/filter.js",
-            "line": 312,
+            "line": 313,
             "description": "Sobel filter tool.",
             "is_constructor": 1,
             "params": [
@@ -2060,7 +2060,7 @@
             "module": "tool",
             "namespace": "dwv.tool",
             "file": "src/tools/filter.js",
-            "line": 372,
+            "line": 373,
             "description": "Run filter command.",
             "is_constructor": 1,
             "params": [
@@ -2425,7 +2425,7 @@
             "module": "utils",
             "namespace": "dwv",
             "file": "src/application.js",
-            "line": 1215,
+            "line": 1226,
             "description": "View controller.",
             "is_constructor": 1
         },
@@ -2440,7 +2440,7 @@
             "module": "utils",
             "namespace": "dwv",
             "file": "src/application.js",
-            "line": 1273,
+            "line": 1284,
             "description": "Toolbox controller.",
             "is_constructor": 1
         }
@@ -4448,7 +4448,7 @@
         },
         {
             "file": "src/gui/tools.js",
-            "line": 85,
+            "line": 102,
             "description": "Setup the tool HTML.",
             "itemtype": "method",
             "name": "setup",
@@ -4458,7 +4458,7 @@
         },
         {
             "file": "src/gui/tools.js",
-            "line": 121,
+            "line": 138,
             "description": "Display the tool HTML.",
             "itemtype": "method",
             "name": "display",
@@ -4475,7 +4475,7 @@
         },
         {
             "file": "src/gui/tools.js",
-            "line": 134,
+            "line": 151,
             "description": "Initialise the tool HTML.",
             "itemtype": "method",
             "name": "initialise",
@@ -4485,7 +4485,7 @@
         },
         {
             "file": "src/gui/tools.js",
-            "line": 178,
+            "line": 195,
             "description": "Get the available colours.",
             "itemtype": "method",
             "name": "getColours",
@@ -4495,7 +4495,7 @@
         },
         {
             "file": "src/gui/tools.js",
-            "line": 184,
+            "line": 201,
             "description": "Setup the tool HTML.",
             "itemtype": "method",
             "name": "setup",
@@ -4505,7 +4505,7 @@
         },
         {
             "file": "src/gui/tools.js",
-            "line": 220,
+            "line": 237,
             "description": "Display the tool HTML.",
             "itemtype": "method",
             "name": "display",
@@ -4522,7 +4522,7 @@
         },
         {
             "file": "src/gui/tools.js",
-            "line": 233,
+            "line": 250,
             "description": "Initialise the tool HTML.",
             "itemtype": "method",
             "name": "initialise",
@@ -4532,7 +4532,7 @@
         },
         {
             "file": "src/gui/tools.js",
-            "line": 263,
+            "line": 280,
             "description": "Get the available colours.",
             "itemtype": "method",
             "name": "getColours",
@@ -4542,7 +4542,7 @@
         },
         {
             "file": "src/gui/tools.js",
-            "line": 269,
+            "line": 286,
             "description": "Setup the tool HTML.",
             "itemtype": "method",
             "name": "setup",
@@ -4552,7 +4552,7 @@
         },
         {
             "file": "src/gui/tools.js",
-            "line": 294,
+            "line": 311,
             "description": "Display the tool HTML.",
             "itemtype": "method",
             "name": "display",
@@ -4569,7 +4569,7 @@
         },
         {
             "file": "src/gui/tools.js",
-            "line": 305,
+            "line": 322,
             "description": "Initialise the tool HTML.",
             "itemtype": "method",
             "name": "initialise",
@@ -4579,7 +4579,7 @@
         },
         {
             "file": "src/gui/tools.js",
-            "line": 326,
+            "line": 343,
             "description": "Setup the tool HTML.",
             "itemtype": "method",
             "name": "setup",
@@ -4589,7 +4589,7 @@
         },
         {
             "file": "src/gui/tools.js",
-            "line": 357,
+            "line": 374,
             "description": "Display the tool HTML.",
             "itemtype": "method",
             "name": "display",
@@ -4606,7 +4606,7 @@
         },
         {
             "file": "src/gui/tools.js",
-            "line": 378,
+            "line": 395,
             "description": "Setup the tool HTML.",
             "itemtype": "method",
             "name": "setup",
@@ -4616,7 +4616,7 @@
         },
         {
             "file": "src/gui/tools.js",
-            "line": 398,
+            "line": 415,
             "description": "Display the tool HTML.",
             "itemtype": "method",
             "name": "display",
@@ -8431,7 +8431,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 697,
+            "line": 698,
             "description": "Help for this tool.",
             "itemtype": "method",
             "name": "getHelp",
@@ -8445,7 +8445,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 719,
+            "line": 720,
             "description": "Set the line color of the drawing.",
             "itemtype": "method",
             "name": "setLineColour",
@@ -8462,7 +8462,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 730,
+            "line": 731,
             "description": "Set the shape name of the drawing.",
             "itemtype": "method",
             "name": "setShapeName",
@@ -8479,7 +8479,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 745,
+            "line": 746,
             "description": "Check if the shape is in the shape list.",
             "itemtype": "method",
             "name": "hasShape",
@@ -8926,7 +8926,7 @@
         },
         {
             "file": "src/tools/filter.js",
-            "line": 101,
+            "line": 102,
             "description": "Handle keydown event.",
             "itemtype": "method",
             "name": "keydown",
@@ -8943,7 +8943,7 @@
         },
         {
             "file": "src/tools/filter.js",
-            "line": 113,
+            "line": 114,
             "description": "Help for this tool.",
             "itemtype": "method",
             "name": "getHelp",
@@ -8957,7 +8957,7 @@
         },
         {
             "file": "src/tools/filter.js",
-            "line": 129,
+            "line": 130,
             "description": "Get the selected filter.",
             "itemtype": "method",
             "name": "getSelectedFilter",
@@ -8971,7 +8971,7 @@
         },
         {
             "file": "src/tools/filter.js",
-            "line": 139,
+            "line": 140,
             "description": "Set the selected filter.",
             "itemtype": "method",
             "name": "setSelectedFilter",
@@ -8985,7 +8985,7 @@
         },
         {
             "file": "src/tools/filter.js",
-            "line": 165,
+            "line": 166,
             "description": "Get the list of filters.",
             "itemtype": "method",
             "name": "getFilterList",
@@ -8999,7 +8999,7 @@
         },
         {
             "file": "src/tools/filter.js",
-            "line": 175,
+            "line": 176,
             "description": "Check if a filter is in the filter list.",
             "itemtype": "method",
             "name": "hasFilter",
@@ -9020,7 +9020,7 @@
         },
         {
             "file": "src/tools/filter.js",
-            "line": 198,
+            "line": 199,
             "description": "Filter GUI.",
             "itemtype": "property",
             "name": "gui",
@@ -9031,7 +9031,7 @@
         },
         {
             "file": "src/tools/filter.js",
-            "line": 205,
+            "line": 206,
             "description": "Setup the filter GUI.",
             "itemtype": "method",
             "name": "setup",
@@ -9041,7 +9041,7 @@
         },
         {
             "file": "src/tools/filter.js",
-            "line": 214,
+            "line": 215,
             "description": "Display the filter.",
             "itemtype": "method",
             "name": "display",
@@ -9058,7 +9058,7 @@
         },
         {
             "file": "src/tools/filter.js",
-            "line": 224,
+            "line": 225,
             "description": "Initialise the filter.",
             "itemtype": "method",
             "name": "init",
@@ -9068,7 +9068,7 @@
         },
         {
             "file": "src/tools/filter.js",
-            "line": 233,
+            "line": 234,
             "description": "Run the filter.",
             "itemtype": "method",
             "name": "run",
@@ -9085,7 +9085,7 @@
         },
         {
             "file": "src/tools/filter.js",
-            "line": 261,
+            "line": 262,
             "description": "Filter GUI.",
             "itemtype": "property",
             "name": "gui",
@@ -9096,7 +9096,7 @@
         },
         {
             "file": "src/tools/filter.js",
-            "line": 268,
+            "line": 269,
             "description": "Setup the filter GUI.",
             "itemtype": "method",
             "name": "setup",
@@ -9106,7 +9106,7 @@
         },
         {
             "file": "src/tools/filter.js",
-            "line": 277,
+            "line": 278,
             "description": "Display the filter.",
             "itemtype": "method",
             "name": "display",
@@ -9123,7 +9123,7 @@
         },
         {
             "file": "src/tools/filter.js",
-            "line": 287,
+            "line": 288,
             "description": "Initialise the filter.",
             "itemtype": "method",
             "name": "init",
@@ -9133,7 +9133,7 @@
         },
         {
             "file": "src/tools/filter.js",
-            "line": 296,
+            "line": 297,
             "description": "Run the filter.",
             "itemtype": "method",
             "name": "run",
@@ -9150,7 +9150,7 @@
         },
         {
             "file": "src/tools/filter.js",
-            "line": 321,
+            "line": 322,
             "description": "Filter GUI.",
             "itemtype": "property",
             "name": "gui",
@@ -9161,7 +9161,7 @@
         },
         {
             "file": "src/tools/filter.js",
-            "line": 328,
+            "line": 329,
             "description": "Setup the filter GUI.",
             "itemtype": "method",
             "name": "setup",
@@ -9171,7 +9171,7 @@
         },
         {
             "file": "src/tools/filter.js",
-            "line": 337,
+            "line": 338,
             "description": "Enable the filter.",
             "itemtype": "method",
             "name": "enable",
@@ -9188,7 +9188,7 @@
         },
         {
             "file": "src/tools/filter.js",
-            "line": 347,
+            "line": 348,
             "description": "Initialise the filter.",
             "itemtype": "method",
             "name": "init",
@@ -9198,7 +9198,7 @@
         },
         {
             "file": "src/tools/filter.js",
-            "line": 356,
+            "line": 357,
             "description": "Run the filter.",
             "itemtype": "method",
             "name": "run",
@@ -9215,7 +9215,7 @@
         },
         {
             "file": "src/tools/filter.js",
-            "line": 382,
+            "line": 383,
             "description": "Get the command name.",
             "itemtype": "method",
             "name": "getName",
@@ -9229,7 +9229,7 @@
         },
         {
             "file": "src/tools/filter.js",
-            "line": 389,
+            "line": 390,
             "description": "Execute the command.",
             "itemtype": "method",
             "name": "execute",
@@ -9239,7 +9239,7 @@
         },
         {
             "file": "src/tools/filter.js",
-            "line": 399,
+            "line": 400,
             "description": "Undo the command.",
             "itemtype": "method",
             "name": "undo",
@@ -9790,7 +9790,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 333,
+            "line": 335,
             "description": "Help for this tool.",
             "itemtype": "method",
             "name": "getHelp",
@@ -9804,7 +9804,7 @@
         },
         {
             "file": "src/tools/livewire.js",
-            "line": 351,
+            "line": 353,
             "description": "Set the line color of the drawing.",
             "itemtype": "method",
             "name": "setLineColour",
@@ -10211,6 +10211,40 @@
         {
             "file": "src/tools/scroll.js",
             "line": 132,
+            "description": "Handle mouse scroll event (fired by Firefox).",
+            "itemtype": "method",
+            "name": "DOMMouseScroll",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The mouse scroll event.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.tool.Scroll",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/scroll.js",
+            "line": 147,
+            "description": "Handle mouse wheel event.",
+            "itemtype": "method",
+            "name": "mousewheel",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The mouse wheel event.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.tool.Scroll",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/scroll.js",
+            "line": 161,
             "description": "Handle key down event.",
             "itemtype": "method",
             "name": "keydown",
@@ -10227,7 +10261,7 @@
         },
         {
             "file": "src/tools/scroll.js",
-            "line": 141,
+            "line": 170,
             "description": "Setup the tool GUI.",
             "itemtype": "method",
             "name": "setup",
@@ -10237,7 +10271,7 @@
         },
         {
             "file": "src/tools/scroll.js",
-            "line": 151,
+            "line": 180,
             "description": "Enable the tool.",
             "itemtype": "method",
             "name": "enable",
@@ -10254,7 +10288,17 @@
         },
         {
             "file": "src/tools/scroll.js",
-            "line": 164,
+            "line": 191,
+            "description": "Initialise the tool.",
+            "itemtype": "method",
+            "name": "init",
+            "class": "dwv.tool.Scroll",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/scroll.js",
+            "line": 204,
             "description": "Help for this tool.",
             "itemtype": "method",
             "name": "getHelp",
@@ -10262,16 +10306,6 @@
                 "description": "The help content.",
                 "type": "Object"
             },
-            "class": "dwv.tool.Scroll",
-            "module": "tool",
-            "namespace": "dwv.tool"
-        },
-        {
-            "file": "src/tools/scroll.js",
-            "line": 183,
-            "description": "Initialise the tool.",
-            "itemtype": "method",
-            "name": "init",
             "class": "dwv.tool.Scroll",
             "module": "tool",
             "namespace": "dwv.tool"
@@ -10290,17 +10324,6 @@
         {
             "file": "src/tools/toolbox.js",
             "line": 30,
-            "description": "Tool list.",
-            "itemtype": "property",
-            "name": "toolList",
-            "type": "Object",
-            "class": "dwv.tool.Toolbox",
-            "module": "tool",
-            "namespace": "dwv.tool"
-        },
-        {
-            "file": "src/tools/toolbox.js",
-            "line": 36,
             "description": "Selected tool.",
             "itemtype": "property",
             "name": "selectedTool",
@@ -10311,7 +10334,7 @@
         },
         {
             "file": "src/tools/toolbox.js",
-            "line": 42,
+            "line": 36,
             "description": "Default tool name.",
             "itemtype": "property",
             "name": "defaultToolName",
@@ -10322,7 +10345,35 @@
         },
         {
             "file": "src/tools/toolbox.js",
-            "line": 49,
+            "line": 43,
+            "description": "Get the list of tools.",
+            "itemtype": "method",
+            "name": "getToolList",
+            "return": {
+                "description": "The list of tool objects.",
+                "type": "Array"
+            },
+            "class": "dwv.tool.Toolbox",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/toolbox.js",
+            "line": 53,
+            "description": "Get the selected tool.",
+            "itemtype": "method",
+            "name": "getSelectedTool",
+            "return": {
+                "description": "The selected tool.",
+                "type": "Object"
+            },
+            "class": "dwv.tool.Toolbox",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/toolbox.js",
+            "line": 63,
             "description": "Setup the toolbox GUI.",
             "itemtype": "method",
             "name": "setup",
@@ -10332,7 +10383,7 @@
         },
         {
             "file": "src/tools/toolbox.js",
-            "line": 64,
+            "line": 78,
             "description": "Display the toolbox.",
             "itemtype": "method",
             "name": "display",
@@ -10349,7 +10400,7 @@
         },
         {
             "file": "src/tools/toolbox.js",
-            "line": 76,
+            "line": 90,
             "description": "Initialise the tool box.",
             "itemtype": "method",
             "name": "init",
@@ -10359,35 +10410,7 @@
         },
         {
             "file": "src/tools/toolbox.js",
-            "line": 103,
-            "description": "Get the list of tools.",
-            "itemtype": "method",
-            "name": "getToolList",
-            "return": {
-                "description": "The list of tool objects.",
-                "type": "Array"
-            },
-            "class": "dwv.tool.Toolbox",
-            "module": "tool",
-            "namespace": "dwv.tool"
-        },
-        {
-            "file": "src/tools/toolbox.js",
-            "line": 113,
-            "description": "Get the selected tool.",
-            "itemtype": "method",
-            "name": "getSelectedTool",
-            "return": {
-                "description": "The selected tool.",
-                "type": "Object"
-            },
-            "class": "dwv.tool.Toolbox",
-            "module": "tool",
-            "namespace": "dwv.tool"
-        },
-        {
-            "file": "src/tools/toolbox.js",
-            "line": 123,
+            "line": 119,
             "description": "Set the selected tool.",
             "itemtype": "method",
             "name": "setSelectedTool",
@@ -10401,7 +10424,17 @@
         },
         {
             "file": "src/tools/toolbox.js",
-            "line": 146,
+            "line": 142,
+            "description": "Reset the tool box.",
+            "itemtype": "method",
+            "name": "init",
+            "class": "dwv.tool.Toolbox",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/toolbox.js",
+            "line": 157,
             "description": "Check if a tool is in the tool list.",
             "itemtype": "method",
             "name": "hasTool",
@@ -10416,16 +10449,6 @@
                 "description": "The tool list element for the given name.",
                 "type": "String"
             },
-            "class": "dwv.tool.Toolbox",
-            "module": "tool",
-            "namespace": "dwv.tool"
-        },
-        {
-            "file": "src/tools/toolbox.js",
-            "line": 157,
-            "description": "Reset the tool box.",
-            "itemtype": "method",
-            "name": "init",
             "class": "dwv.tool.Toolbox",
             "module": "tool",
             "namespace": "dwv.tool"
@@ -10751,7 +10774,7 @@
         },
         {
             "file": "src/tools/windowLevel.js",
-            "line": 222,
+            "line": 223,
             "description": "Help for this tool.",
             "itemtype": "method",
             "name": "getHelp",
@@ -11192,7 +11215,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 73,
+            "line": 75,
             "description": "Get the version of the application.",
             "itemtype": "method",
             "name": "getVersion",
@@ -11206,7 +11229,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 80,
+            "line": 82,
             "description": "Get the image.",
             "itemtype": "method",
             "name": "getImage",
@@ -11220,7 +11243,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 86,
+            "line": 88,
             "description": "Set the view.",
             "itemtype": "method",
             "name": "setImage",
@@ -11237,7 +11260,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 96,
+            "line": 98,
             "description": "Restore the original image.",
             "itemtype": "method",
             "name": "restoreOriginalImage",
@@ -11247,7 +11270,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 105,
+            "line": 107,
             "description": "Get the image data array.",
             "itemtype": "method",
             "name": "getImageData",
@@ -11261,7 +11284,21 @@
         },
         {
             "file": "src/application.js",
-            "line": 112,
+            "line": 113,
+            "description": "Get the number of slices to load.",
+            "itemtype": "method",
+            "name": "getNSlicesToLoad",
+            "return": {
+                "description": "The number of slices to load.",
+                "type": "Number"
+            },
+            "class": "dwv.App",
+            "module": "utils",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/application.js",
+            "line": 120,
             "description": "Get the container div id.",
             "itemtype": "method",
             "name": "getContainerDivId",
@@ -11275,7 +11312,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 119,
+            "line": 127,
             "description": "Get the view.",
             "itemtype": "method",
             "name": "getView",
@@ -11289,7 +11326,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 125,
+            "line": 133,
             "description": "Get the view controller.",
             "itemtype": "method",
             "name": "getViewController",
@@ -11303,7 +11340,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 131,
+            "line": 139,
             "description": "Get the window/level presets.",
             "itemtype": "method",
             "name": "getPresets",
@@ -11317,7 +11354,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 138,
+            "line": 146,
             "description": "Get the image layer.",
             "itemtype": "method",
             "name": "getImageLayer",
@@ -11331,7 +11368,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 144,
+            "line": 152,
             "description": "Get the draw layer.",
             "itemtype": "method",
             "name": "getDrawLayer",
@@ -11345,7 +11382,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 152,
+            "line": 160,
             "description": "Get the draw stage.",
             "itemtype": "method",
             "name": "getDrawStage",
@@ -11359,7 +11396,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 159,
+            "line": 167,
             "description": "Get the toolbox.",
             "itemtype": "method",
             "name": "getToolbox",
@@ -11373,7 +11410,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 165,
+            "line": 173,
             "description": "Get the toolbox controller.",
             "itemtype": "method",
             "name": "getToolboxController",
@@ -11387,7 +11424,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 172,
+            "line": 180,
             "description": "Get the undo stack.",
             "itemtype": "method",
             "name": "getUndoStack",
@@ -11401,7 +11438,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 179,
+            "line": 187,
             "description": "Get the data loaders.",
             "itemtype": "method",
             "name": "getLoaders",
@@ -11415,7 +11452,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 192,
+            "line": 200,
             "description": "Initialise the HTML for the application.",
             "itemtype": "method",
             "name": "init",
@@ -11425,7 +11462,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 336,
+            "line": 344,
             "description": "Reset the application.",
             "itemtype": "method",
             "name": "reset",
@@ -11435,7 +11472,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 360,
+            "line": 369,
             "description": "Reset the layout of the application.",
             "itemtype": "method",
             "name": "resetLayout",
@@ -11445,7 +11482,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 376,
+            "line": 385,
             "description": "Load a list of files.",
             "itemtype": "method",
             "name": "loadFiles",
@@ -11462,7 +11499,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 412,
+            "line": 422,
             "description": "Load a list of URLs.",
             "itemtype": "method",
             "name": "loadURL",
@@ -11479,7 +11516,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 448,
+            "line": 459,
             "description": "Fit the display to the given size. To be called once the image is loaded.",
             "itemtype": "method",
             "name": "fitToSize",
@@ -11489,7 +11526,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 493,
+            "line": 504,
             "description": "Toggle the display of the information layer.",
             "itemtype": "method",
             "name": "toggleInfoLayerDisplay",
@@ -11499,7 +11536,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 511,
+            "line": 522,
             "description": "Init the Window/Level display",
             "class": "dwv.App",
             "module": "utils",
@@ -11507,7 +11544,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 525,
+            "line": 536,
             "description": "Add layer mouse and touch listeners.",
             "itemtype": "method",
             "name": "addLayerListeners",
@@ -11517,7 +11554,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 547,
+            "line": 558,
             "description": "Remove layer mouse and touch listeners.",
             "itemtype": "method",
             "name": "removeLayerListeners",
@@ -11527,7 +11564,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 569,
+            "line": 580,
             "description": "Render the current image.",
             "itemtype": "method",
             "name": "render",
@@ -11537,7 +11574,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 578,
+            "line": 589,
             "description": "Update the window/level presets.",
             "itemtype": "method",
             "name": "updatePresets",
@@ -11554,7 +11591,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 630,
+            "line": 641,
             "description": "Handle window/level change.",
             "itemtype": "method",
             "name": "onWLChange",
@@ -11571,7 +11608,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 640,
+            "line": 651,
             "description": "Handle color map change.",
             "itemtype": "method",
             "name": "onColorChange",
@@ -11588,7 +11625,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 650,
+            "line": 661,
             "description": "Handle slice change.",
             "itemtype": "method",
             "name": "onSliceChange",
@@ -11605,7 +11642,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 670,
+            "line": 681,
             "description": "Handle key down event.\n- CRTL-Z: undo\n- CRTL-Y: redo\nDefault behavior. Usually used in tools.",
             "itemtype": "method",
             "name": "onKeydown",
@@ -11622,7 +11659,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 690,
+            "line": 701,
             "description": "Handle resize.\nFit the display to the window. To be called once the image is loaded.",
             "itemtype": "method",
             "name": "onResize",
@@ -11639,7 +11676,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 701,
+            "line": 712,
             "description": "Handle zoom reset.",
             "itemtype": "method",
             "name": "onZoomReset",
@@ -11656,7 +11693,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 711,
+            "line": 722,
             "description": "Handle loader change.",
             "itemtype": "method",
             "name": "onChangeLoader",
@@ -11673,7 +11710,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 721,
+            "line": 732,
             "description": "Handle change url event.",
             "itemtype": "method",
             "name": "onChangeURL",
@@ -11690,7 +11727,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 731,
+            "line": 742,
             "description": "Handle input urls.",
             "itemtype": "method",
             "name": "onInputURLs",
@@ -11707,7 +11744,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 741,
+            "line": 752,
             "description": "Handle change files event.",
             "itemtype": "method",
             "name": "onChangeFiles",
@@ -11724,7 +11761,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 751,
+            "line": 762,
             "description": "Set the current position.",
             "itemtype": "method",
             "name": "setCurrentPostion",
@@ -11746,7 +11783,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 762,
+            "line": 773,
             "description": "Handle colour map change.",
             "itemtype": "method",
             "name": "onChangeColourMap",
@@ -11763,7 +11800,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 772,
+            "line": 783,
             "description": "Handle window/level preset change.",
             "itemtype": "method",
             "name": "onChangeWindowLevelPreset",
@@ -11780,7 +11817,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 790,
+            "line": 801,
             "description": "Handle tool change.",
             "itemtype": "method",
             "name": "onChangeTool",
@@ -11797,7 +11834,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 800,
+            "line": 811,
             "description": "Handle shape change.",
             "itemtype": "method",
             "name": "onChangeShape",
@@ -11814,7 +11851,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 810,
+            "line": 821,
             "description": "Handle filter change.",
             "itemtype": "method",
             "name": "onChangeFilter",
@@ -11831,7 +11868,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 820,
+            "line": 831,
             "description": "Handle filter run.",
             "itemtype": "method",
             "name": "onRunFilter",
@@ -11848,7 +11885,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 830,
+            "line": 841,
             "description": "Handle line colour change.",
             "itemtype": "method",
             "name": "onChangeLineColour",
@@ -11865,7 +11902,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 840,
+            "line": 851,
             "description": "Handle min/max slider change.",
             "itemtype": "method",
             "name": "onChangeMinMax",
@@ -11882,7 +11919,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 850,
+            "line": 861,
             "description": "Handle undo.",
             "itemtype": "method",
             "name": "onUndo",
@@ -11899,7 +11936,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 860,
+            "line": 871,
             "description": "Handle redo.",
             "itemtype": "method",
             "name": "onRedo",
@@ -11916,7 +11953,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 870,
+            "line": 881,
             "description": "Handle toggle of info layer.",
             "itemtype": "method",
             "name": "onToggleInfoLayer",
@@ -11933,7 +11970,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 880,
+            "line": 891,
             "description": "Handle display reset.",
             "itemtype": "method",
             "name": "onDisplayReset",
@@ -11950,7 +11987,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 897,
+            "line": 908,
             "description": "Generate the image data and draw it.",
             "itemtype": "method",
             "name": "generateAndDrawImage",
@@ -11960,7 +11997,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 911,
+            "line": 922,
             "description": "Add image listeners.",
             "itemtype": "method",
             "name": "addImageInfoListeners",
@@ -11972,7 +12009,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 926,
+            "line": 937,
             "description": "Remove image listeners.",
             "itemtype": "method",
             "name": "removeImageInfoListeners",
@@ -11984,7 +12021,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 941,
+            "line": 952,
             "description": "General-purpose event handler. This function just determines the mouse \nposition relative to the canvas element. It then passes it to the current tool.",
             "itemtype": "method",
             "name": "eventHandler",
@@ -12003,7 +12040,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 1014,
+            "line": 1025,
             "description": "Handle a drag over.",
             "itemtype": "method",
             "name": "onDragOver",
@@ -12022,7 +12059,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 1033,
+            "line": 1044,
             "description": "Handle a drag leave.",
             "itemtype": "method",
             "name": "onDragLeave",
@@ -12041,7 +12078,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 1052,
+            "line": 1063,
             "description": "Handle a drop event.",
             "itemtype": "method",
             "name": "onDrop",
@@ -12060,7 +12097,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 1067,
+            "line": 1078,
             "description": "Handle an error: display it to the user.",
             "itemtype": "method",
             "name": "handleError",
@@ -12079,7 +12116,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 1088,
+            "line": 1099,
             "description": "Create the application layers.",
             "itemtype": "method",
             "name": "createLayers",
@@ -12103,7 +12140,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 1125,
+            "line": 1136,
             "description": "Post load application initialisation. To be called once the DICOM has been parsed.",
             "itemtype": "method",
             "name": "postLoadInit",
@@ -12122,7 +12159,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 1223,
+            "line": 1234,
             "description": "Set the current position.",
             "itemtype": "method",
             "name": "setWindowLevel",
@@ -12144,7 +12181,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 1235,
+            "line": 1246,
             "description": "Set the window/level.",
             "itemtype": "method",
             "name": "setWindowLevel",
@@ -12166,7 +12203,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 1246,
+            "line": 1257,
             "description": "Set the colour map.",
             "itemtype": "method",
             "name": "setColourMap",
@@ -12183,7 +12220,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 1256,
+            "line": 1267,
             "description": "Set the colour map from a name.",
             "itemtype": "method",
             "name": "setColourMapFromName",
@@ -12200,7 +12237,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 1281,
+            "line": 1292,
             "description": "Set the selected tool.",
             "itemtype": "method",
             "name": "setSelectedTool",
@@ -12217,7 +12254,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 1291,
+            "line": 1302,
             "description": "Set the selected shape.",
             "itemtype": "method",
             "name": "setSelectedShape",
@@ -12234,7 +12271,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 1301,
+            "line": 1312,
             "description": "Set the selected filter.",
             "itemtype": "method",
             "name": "setSelectedFilter",
@@ -12251,7 +12288,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 1311,
+            "line": 1322,
             "description": "Run the selected filter.",
             "itemtype": "method",
             "name": "runSelectedFilter",
@@ -12261,7 +12298,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 1320,
+            "line": 1331,
             "description": "Set the tool line color.",
             "itemtype": "method",
             "name": "runFilter",
@@ -12278,7 +12315,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 1330,
+            "line": 1341,
             "description": "Set the tool range.",
             "itemtype": "method",
             "name": "setRange",
@@ -12381,23 +12418,23 @@
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/tools/draw.js:697"
+            "line": " src/tools/draw.js:698"
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/tools/filter.js:113"
+            "line": " src/tools/filter.js:114"
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/tools/livewire.js:333"
+            "line": " src/tools/livewire.js:335"
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/tools/scroll.js:164"
+            "line": " src/tools/scroll.js:204"
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/tools/windowLevel.js:222"
+            "line": " src/tools/windowLevel.js:223"
         },
         {
             "message": "replacing incorrect tag: returns with return",
@@ -12405,11 +12442,11 @@
         },
         {
             "message": "replacing incorrect tag: function with method",
-            "line": " src/application.js:578"
+            "line": " src/application.js:589"
         },
         {
             "message": "replacing incorrect tag: function with method",
-            "line": " src/application.js:1256"
+            "line": " src/application.js:1267"
         },
         {
             "message": "Missing item type\nDICOM tag dictionary.",
@@ -12477,7 +12514,7 @@
         },
         {
             "message": "Missing item type\nInit the Window/Level display",
-            "line": " src/application.js:511"
+            "line": " src/application.js:522"
         }
     ]
 }
