@@ -44,9 +44,22 @@ dwv.gui.Toolbox = function (app)
     {
         base.display(bool);
     };
-    this.initialise = function (/*list*/)
+    this.initialise = function (list)
     {
         //base.initialise(list);
+        
+        // not wonderful: first one should be scroll...
+        if ( list[0] === false ) {
+            var inputScroll = document.getElementById("scrollLi");
+            inputScroll.parentNode.style.display = "none";
+            inputScroll.checked = false;
+            var inputZoom = document.getElementById("zoomLi");
+            inputZoom.checked = true;
+        }
+        
+        // refresh
+        $("input[type='radio']").checkboxradio("refresh");
+        $("#toolfieldset").trigger("create");
     };
 };
 
