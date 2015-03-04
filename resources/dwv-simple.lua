@@ -91,25 +91,41 @@ print([[
 <script type="text/javascript" src="/dwv/dwv-0.9.0beta.min.js"></script>
 <!-- Launch the app -->
 <script type="text/javascript" src="/dwv/viewers/simple/appgui.js"></script>
-<script type="text/javascript" src="/dwv/viewers/simple/applauncher.js"></script>
 ]])
 
 print([[
 <script type="text/javascript">
-// prevent default url load
-var skipLoadUrl = true;
+// check browser support
+dwv.browser.check();
 // launch when page is loaded
-$(document).ready(function(){
+$(document).ready( function()
+{
+    // main application
+    var myapp = new dwv.App();
+    // initialise the application
+    myapp.init({
+        "containerDivId": "dwv",
+        "fitToWindow": true,
+        "tools": ["Scroll", "Zoom/Pan", "Window/Level"],
+        "gui": ["tool"],
+        "isMobile": true,
+        "skipLoadUrl": true
+    });
+    dwv.gui.appendResetHtml(myapp);
 ]])
 -- create javascript url array
-print([[    var inputUrls = []])
+print([[
+    var inputUrls = [
+]])
 for i=1, #images do
   print('      "'..urls[i]..'",')
 end
-print([[    ];]])
+print([[
+    ];
+]])
 -- load data
 print([[
-    if( inputUrls && inputUrls.length > 0 ) app.loadURL(inputUrls);
+    if( inputUrls && inputUrls.length > 0 ) myapp.loadURL(inputUrls);
 }); // end $(document).ready
 </script>
 ]])
@@ -129,8 +145,8 @@ print([[
 <div id="toolbar"></div>
 
 <!-- Layer Container -->
-<div id="layerContainer">
-<canvas id="imageLayer">Only for HTML5 compatible browsers...</canvas>
+<div id="dwv" class="layerContainer">
+<canvas id="dwv-imageLayer" class="imageLayer">Only for HTML5 compatible browsers...</canvas>
 </div><!-- /layerContainer -->
 
 </div><!-- /content -->

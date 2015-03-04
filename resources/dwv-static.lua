@@ -89,6 +89,7 @@ body { background-color: #222; color: white;
 #pageMain { position: absolute; height: 92%; width: 99%; bottom: 5px; left: 5px; background-color: #333; }
 #infotl { color: #333; text-shadow: 0 1px 0 #fff; }
 #infotr { color: #333; text-shadow: 0 1px 0 #fff; }
+#dropBox { margin: 20px; }
 </style>
 <link type="text/css" rel="stylesheet" href="/dwv/ext/jquery-ui/themes/ui-darkness/jquery-ui-1.11.2.min.css">
 ]])
@@ -105,25 +106,47 @@ print([[
 <script type="text/javascript" src="/dwv/dwv-0.9.0beta.min.js"></script>
 <!-- Launch the app -->
 <script type="text/javascript" src="/dwv/viewers/static/appgui.js"></script>
-<script type="text/javascript" src="/dwv/viewers/static/applauncher.js"></script>
 ]])
 
 print([[
 <script type="text/javascript">
-// prevent default url load
-var skipLoadUrl = true;
+// check browser support
+dwv.browser.check();
 // launch when page is loaded
-$(document).ready(function(){
+$(document).ready( function()
+{
+    // gui setup
+    dwv.gui.setup();
+    // main application
+    var myapp = new dwv.App();
+    // initialise the application
+    myapp.init({
+        "containerDivId": "dwv",
+        "fitToWindow": true,
+        "tools": ["Scroll", "Window/Level", "Zoom/Pan", "Draw", "Livewire", "Filter"],
+        "filters": ["Threshold", "Sharpen", "Sobel"],
+        "shapes": ["Line", "Protractor", "Rectangle", "Roi", "Ellipse"],
+        "gui": ["tool", "load", "help", "undo", "version", "tags"],
+        "isMobile": false,
+        "skipLoadUrl": true
+    });
+    // help
+    // TODO Seems accordion only works when at end...
+    $("#accordion").accordion({ collapsible: "true", active: "false", heightStyle: "content" });
 ]])
 -- create javascript url array
-print([[    var inputUrls = []])
+print([[
+    var inputUrls = [
+]])
 for i=1, #images do
   print('      "'..urls[i]..'",')
 end
-print([[    ];]])
+print([[
+    ];
+]])
 -- load data
 print([[
-    if( inputUrls && inputUrls.length > 0 ) app.loadURL(inputUrls);
+    if( inputUrls && inputUrls.length > 0 ) myapp.loadURL(inputUrls);
 }); // end $(document).ready
 </script>
 ]])
@@ -169,14 +192,15 @@ print([[
 
 <!-- Layer Container -->
 <div id="layerDialog" title="Image">
-<div id="layerContainer">
-<canvas id="imageLayer">Only for HTML5 compatible browsers...</canvas>
-<div id="drawDiv"></div>
-<div id="infoLayer">
-<div id="infotl"></div>
-<div id="infotr"></div>
-<div id="infobl"></div>
-<div id="infobr"><div id="plot"></div></div>
+<div id="dwv-dropBox" class="dropBox"></div>
+<div id="dwv" class="layerContainer">
+<canvas id="dwv-imageLayer" class="imageLayer">Only for HTML5 compatible browsers...</canvas>
+<div id="dwv-drawDiv" class="drawDiv"></div>
+<div id="dwv-infoLayer" class="infoLayer">
+<div id="dwv-infotl" class="infotl"></div>
+<div id="dwv-infotr" class="infotr"></div>
+<div id="dwv-infobl" class="infobl"></div>
+<div id="dwv-infobr" class="infobr"><div id="dwv-plot" class="plot"></div></div>
 </div><!-- /infoLayer -->
 </div><!-- /layerContainer -->
 </div><!-- /layerDialog -->
