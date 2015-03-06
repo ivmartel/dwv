@@ -782,7 +782,7 @@
             },
             "tag": "module",
             "file": "src/application.js",
-            "line": 1284,
+            "line": 1287,
             "description": "Utility module."
         }
     },
@@ -2425,7 +2425,7 @@
             "module": "utils",
             "namespace": "dwv",
             "file": "src/application.js",
-            "line": 1226,
+            "line": 1229,
             "description": "View controller.",
             "is_constructor": 1
         },
@@ -2440,7 +2440,7 @@
             "module": "utils",
             "namespace": "dwv",
             "file": "src/application.js",
-            "line": 1284,
+            "line": 1287,
             "description": "Toolbox controller.",
             "is_constructor": 1
         }
@@ -12140,7 +12140,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 1136,
+            "line": 1139,
             "description": "Post load application initialisation. To be called once the DICOM has been parsed.",
             "itemtype": "method",
             "name": "postLoadInit",
@@ -12159,7 +12159,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 1234,
+            "line": 1237,
             "description": "Set the current position.",
             "itemtype": "method",
             "name": "setWindowLevel",
@@ -12181,7 +12181,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 1246,
+            "line": 1249,
             "description": "Set the window/level.",
             "itemtype": "method",
             "name": "setWindowLevel",
@@ -12203,7 +12203,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 1257,
+            "line": 1260,
             "description": "Set the colour map.",
             "itemtype": "method",
             "name": "setColourMap",
@@ -12220,7 +12220,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 1267,
+            "line": 1270,
             "description": "Set the colour map from a name.",
             "itemtype": "method",
             "name": "setColourMapFromName",
@@ -12237,7 +12237,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 1292,
+            "line": 1295,
             "description": "Set the selected tool.",
             "itemtype": "method",
             "name": "setSelectedTool",
@@ -12254,7 +12254,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 1302,
+            "line": 1305,
             "description": "Set the selected shape.",
             "itemtype": "method",
             "name": "setSelectedShape",
@@ -12271,7 +12271,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 1312,
+            "line": 1315,
             "description": "Set the selected filter.",
             "itemtype": "method",
             "name": "setSelectedFilter",
@@ -12288,7 +12288,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 1322,
+            "line": 1325,
             "description": "Run the selected filter.",
             "itemtype": "method",
             "name": "runSelectedFilter",
@@ -12298,7 +12298,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 1331,
+            "line": 1334,
             "description": "Set the tool line color.",
             "itemtype": "method",
             "name": "runFilter",
@@ -12315,7 +12315,7 @@
         },
         {
             "file": "src/application.js",
-            "line": 1341,
+            "line": 1344,
             "description": "Set the tool range.",
             "itemtype": "method",
             "name": "setRange",
@@ -12446,7 +12446,7 @@
         },
         {
             "message": "replacing incorrect tag: function with method",
-            "line": " src/application.js:1267"
+            "line": " src/application.js:1270"
         },
         {
             "message": "Missing item type\nDICOM tag dictionary.",

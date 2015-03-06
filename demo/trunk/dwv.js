@@ -475,7 +475,7 @@ dwv.App = function ()
         // resize container
         var jqDivId = "#"+containerDivId;
         $(jqDivId).width(newWidth);
-        $(jqDivId).height(newHeight + 1); // +1 to be sure...
+        $(jqDivId).height(newHeight);
         // resize image layer
         if ( imageLayer ) {
             var iZoomX = imageLayer.getZoom().x * mul;
@@ -1120,6 +1120,9 @@ dwv.App = function ()
                 height: dataHeight,
                 listening: false
             });
+            // reset style
+            // (avoids a not needed vertical scrollbar) 
+            drawStage.getContent().setAttribute("style", "");
         }
         // resize app
         if ( fitToWindow ) {
@@ -8837,7 +8840,8 @@ dwv.io.Url.prototype.load = function(ioArray)
         var isGif = view.getUint32(0) === 0x47494638;
         
         // check possible extension
-        if( !isJpeg && !isPng && !isGif )
+        // (responseURL is supported on major browsers but not IE...)
+        if ( !isJpeg && !isPng && !isGif && this.responseURL )
         {
             var ext = this.responseURL.split('.').pop().toLowerCase();
             isJpeg = (ext === "jpg") || (ext === "jpeg");
