@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>src/image/geometry.js - dwv</title>
+    <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
+    <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
+    <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
+    <link rel="icon" href="../assets/favicon.ico">
+    <script src="http://yui.yahooapis.com/combo?3.9.1/build/yui/yui-min.js"></script>
+</head>
+<body class="yui3-skin-sam">
+
+<div id="doc">
+    <div id="hd" class="yui3-g header">
+        <div class="yui3-u-3-4">
+                <h1><img src="../assets/css/logo.png" title="dwv" width="117" height="52"></h1>
+        </div>
+        <div class="yui3-u-1-4 version">
+            <em>API Docs for: 0.9.0</em>
+        </div>
+    </div>
+    <div id="bd" class="yui3-g">
+
+        <div class="yui3-u-1-4">
+            <div id="docs-sidebar" class="sidebar apidocs">
+                <div id="api-list">
+                    <h2 class="off-left">APIs</h2>
+                    <div id="api-tabview" class="tabview">
+                        <ul class="tabs">
+                            <li><a href="#api-classes">Classes</a></li>
+                            <li><a href="#api-modules">Modules</a></li>
+                        </ul>
+                
+                        <div id="api-tabview-filter">
+                            <input type="search" id="api-filter" placeholder="Type to filter APIs">
+                        </div>
+                
+                        <div id="api-tabview-panel">
+                            <ul id="api-classes" class="apis classes">
+                                <li><a href="../classes/dwv.App.html">dwv.App</a></li>
+                                <li><a href="../classes/dwv.browser.html">dwv.browser</a></li>
+                                <li><a href="../classes/dwv.dicom.DataReader.html">dwv.dicom.DataReader</a></li>
+                                <li><a href="../classes/dwv.dicom.DicomParser.html">dwv.dicom.DicomParser</a></li>
+                                <li><a href="../classes/dwv.gui.html">dwv.gui</a></li>
+                                <li><a href="../classes/dwv.gui.base.html">dwv.gui.base</a></li>
+                                <li><a href="../classes/dwv.gui.base.DicomTags.html">dwv.gui.base.DicomTags</a></li>
+                                <li><a href="../classes/dwv.gui.base.Draw.html">dwv.gui.base.Draw</a></li>
+                                <li><a href="../classes/dwv.gui.base.FileLoad.html">dwv.gui.base.FileLoad</a></li>
+                                <li><a href="../classes/dwv.gui.base.Filter.html">dwv.gui.base.Filter</a></li>
+                                <li><a href="../classes/dwv.gui.base.Livewire.html">dwv.gui.base.Livewire</a></li>
+                                <li><a href="../classes/dwv.gui.base.Loadbox.html">dwv.gui.base.Loadbox</a></li>
+                                <li><a href="../classes/dwv.gui.base.Scroll.html">dwv.gui.base.Scroll</a></li>
+                                <li><a href="../classes/dwv.gui.base.Sharpen.html">dwv.gui.base.Sharpen</a></li>
+                                <li><a href="../classes/dwv.gui.base.Slider.html">dwv.gui.base.Slider</a></li>
+                                <li><a href="../classes/dwv.gui.base.Sobel.html">dwv.gui.base.Sobel</a></li>
+                                <li><a href="../classes/dwv.gui.base.Threshold.html">dwv.gui.base.Threshold</a></li>
+                                <li><a href="../classes/dwv.gui.base.Toolbox.html">dwv.gui.base.Toolbox</a></li>
+                                <li><a href="../classes/dwv.gui.base.Undo.html">dwv.gui.base.Undo</a></li>
+                                <li><a href="../classes/dwv.gui.base.WindowLevel.html">dwv.gui.base.WindowLevel</a></li>
+                                <li><a href="../classes/dwv.gui.base.ZoomAndPan.html">dwv.gui.base.ZoomAndPan</a></li>
+                                <li><a href="../classes/dwv.html.html">dwv.html</a></li>
+                                <li><a href="../classes/dwv.html.Layer.html">dwv.html.Layer</a></li>
+                                <li><a href="../classes/dwv.html.Style.html">dwv.html.Style</a></li>
+                                <li><a href="../classes/dwv.image.html">dwv.image</a></li>
+                                <li><a href="../classes/dwv.image.filter.Sharpen.html">dwv.image.filter.Sharpen</a></li>
+                                <li><a href="../classes/dwv.image.filter.Sobel.html">dwv.image.filter.Sobel</a></li>
+                                <li><a href="../classes/dwv.image.filter.Threshold.html">dwv.image.filter.Threshold</a></li>
+                                <li><a href="../classes/dwv.image.Geometry.html">dwv.image.Geometry</a></li>
+                                <li><a href="../classes/dwv.image.Image.html">dwv.image.Image</a></li>
+                                <li><a href="../classes/dwv.image.ImageFactory.html">dwv.image.ImageFactory</a></li>
+                                <li><a href="../classes/dwv.image.lut.Rescale.html">dwv.image.lut.Rescale</a></li>
+                                <li><a href="../classes/dwv.image.lut.Window.html">dwv.image.lut.Window</a></li>
+                                <li><a href="../classes/dwv.image.RescaleSlopeAndIntercept.html">dwv.image.RescaleSlopeAndIntercept</a></li>
+                                <li><a href="../classes/dwv.image.Size.html">dwv.image.Size</a></li>
+                                <li><a href="../classes/dwv.image.Spacing.html">dwv.image.Spacing</a></li>
+                                <li><a href="../classes/dwv.image.View.html">dwv.image.View</a></li>
+                                <li><a href="../classes/dwv.image.ViewFactory.html">dwv.image.ViewFactory</a></li>
+                                <li><a href="../classes/dwv.info.html">dwv.info</a></li>
+                                <li><a href="../classes/dwv.info.MiniColorMap.html">dwv.info.MiniColorMap</a></li>
+                                <li><a href="../classes/dwv.info.Plot.html">dwv.info.Plot</a></li>
+                                <li><a href="../classes/dwv.info.Position.html">dwv.info.Position</a></li>
+                                <li><a href="../classes/dwv.info.WindowLevel.html">dwv.info.WindowLevel</a></li>
+                                <li><a href="../classes/dwv.io.html">dwv.io</a></li>
+                                <li><a href="../classes/dwv.io.File.html">dwv.io.File</a></li>
+                                <li><a href="../classes/dwv.io.Url.html">dwv.io.Url</a></li>
+                                <li><a href="../classes/dwv.math.html">dwv.math</a></li>
+                                <li><a href="../classes/dwv.math.BucketQueue.html">dwv.math.BucketQueue</a></li>
+                                <li><a href="../classes/dwv.math.Circle.html">dwv.math.Circle</a></li>
+                                <li><a href="../classes/dwv.math.Ellipse.html">dwv.math.Ellipse</a></li>
+                                <li><a href="../classes/dwv.math.FastPoint2D.html">dwv.math.FastPoint2D</a></li>
+                                <li><a href="../classes/dwv.math.IdGenerator.html">dwv.math.IdGenerator</a></li>
+                                <li><a href="../classes/dwv.math.Index3D.html">dwv.math.Index3D</a></li>
+                                <li><a href="../classes/dwv.math.Line.html">dwv.math.Line</a></li>
+                                <li><a href="../classes/dwv.math.Path.html">dwv.math.Path</a></li>
+                                <li><a href="../classes/dwv.math.Point2D.html">dwv.math.Point2D</a></li>
+                                <li><a href="../classes/dwv.math.Point3D.html">dwv.math.Point3D</a></li>
+                                <li><a href="../classes/dwv.math.Rectangle.html">dwv.math.Rectangle</a></li>
+                                <li><a href="../classes/dwv.math.ROI.html">dwv.math.ROI</a></li>
+                                <li><a href="../classes/dwv.math.Scissors.html">dwv.math.Scissors</a></li>
+                                <li><a href="../classes/dwv.tool.html">dwv.tool</a></li>
+                                <li><a href="../classes/dwv.tool.ChangeGroupCommand.html">dwv.tool.ChangeGroupCommand</a></li>
+                                <li><a href="../classes/dwv.tool.DeleteGroupCommand.html">dwv.tool.DeleteGroupCommand</a></li>
+                                <li><a href="../classes/dwv.tool.Draw.html">dwv.tool.Draw</a></li>
+                                <li><a href="../classes/dwv.tool.DrawGroupCommand.html">dwv.tool.DrawGroupCommand</a></li>
+                                <li><a href="../classes/dwv.tool.EllipseFactory.html">dwv.tool.EllipseFactory</a></li>
+                                <li><a href="../classes/dwv.tool.Filter.html">dwv.tool.Filter</a></li>
+                                <li><a href="../classes/dwv.tool.filter.Sharpen.html">dwv.tool.filter.Sharpen</a></li>
+                                <li><a href="../classes/dwv.tool.filter.Sobel.html">dwv.tool.filter.Sobel</a></li>
+                                <li><a href="../classes/dwv.tool.filter.Threshold.html">dwv.tool.filter.Threshold</a></li>
+                                <li><a href="../classes/dwv.tool.LineFactory.html">dwv.tool.LineFactory</a></li>
+                                <li><a href="../classes/dwv.tool.Livewire.html">dwv.tool.Livewire</a></li>
+                                <li><a href="../classes/dwv.tool.MoveGroupCommand.html">dwv.tool.MoveGroupCommand</a></li>
+                                <li><a href="../classes/dwv.tool.ProtractorFactory.html">dwv.tool.ProtractorFactory</a></li>
+                                <li><a href="../classes/dwv.tool.RectangleFactory.html">dwv.tool.RectangleFactory</a></li>
+                                <li><a href="../classes/dwv.tool.RoiFactory.html">dwv.tool.RoiFactory</a></li>
+                                <li><a href="../classes/dwv.tool.RunFilterCommand.html">dwv.tool.RunFilterCommand</a></li>
+                                <li><a href="../classes/dwv.tool.Scroll.html">dwv.tool.Scroll</a></li>
+                                <li><a href="../classes/dwv.tool.ShapeEditor.html">dwv.tool.ShapeEditor</a></li>
+                                <li><a href="../classes/dwv.tool.Toolbox.html">dwv.tool.Toolbox</a></li>
+                                <li><a href="../classes/dwv.tool.UndoStack.html">dwv.tool.UndoStack</a></li>
+                                <li><a href="../classes/dwv.tool.WindowLevel.html">dwv.tool.WindowLevel</a></li>
+                                <li><a href="../classes/dwv.tool.ZoomAndPan.html">dwv.tool.ZoomAndPan</a></li>
+                                <li><a href="../classes/dwv.ToolboxController.html">dwv.ToolboxController</a></li>
+                                <li><a href="../classes/dwv.utils.html">dwv.utils</a></li>
+                                <li><a href="../classes/dwv.ViewController.html">dwv.ViewController</a></li>
+                            </ul>
+                
+                            <ul id="api-modules" class="apis modules">
+                                <li><a href="../modules/browser.html">browser</a></li>
+                                <li><a href="../modules/dicom.html">dicom</a></li>
+                                <li><a href="../modules/gui.html">gui</a></li>
+                                <li><a href="../modules/html.html">html</a></li>
+                                <li><a href="../modules/image.html">image</a></li>
+                                <li><a href="../modules/info.html">info</a></li>
+                                <li><a href="../modules/io.html">io</a></li>
+                                <li><a href="../modules/math.html">math</a></li>
+                                <li><a href="../modules/tool.html">tool</a></li>
+                                <li><a href="../modules/utils.html">utils</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="yui3-u-3-4">
+                <div id="api-options">
+                    Show:
+                    <label for="api-show-inherited">
+                        <input type="checkbox" id="api-show-inherited" checked>
+                        Inherited
+                    </label>
+            
+                    <label for="api-show-protected">
+                        <input type="checkbox" id="api-show-protected">
+                        Protected
+                    </label>
+            
+                    <label for="api-show-private">
+                        <input type="checkbox" id="api-show-private">
+                        Private
+                    </label>
+                    <label for="api-show-deprecated">
+                        <input type="checkbox" id="api-show-deprecated">
+                        Deprecated
+                    </label>
+            
+                </div>
+            
+            <div class="apidocs">
+                <div id="docs-main">
+                    <div class="content">
+<h1 class="file-heading">File: src/image/geometry.js</h1>
+
+<div class="file">
+    <pre class="code prettyprint linenums">
+/** 
+ * Image module.
+ * @module image
+ */
+var dwv = dwv || {};
+dwv.image = dwv.image || {};
+
+/**
+ * 2D/3D Size class.
+ * @class Size
+ * @namespace dwv.image
+ * @constructor
+ * @param {Number} numberOfColumns The number of columns.
+ * @param {Number} numberOfRows The number of rows.
+ * @param {Number} numberOfSlices The number of slices.
+*/
+dwv.image.Size = function ( numberOfColumns, numberOfRows, numberOfSlices )
+{
+    /**
+     * Get the number of columns.
+     * @method getNumberOfColumns
+     * @return {Number} The number of columns.
+     */ 
+    this.getNumberOfColumns = function () { return numberOfColumns; };
+    /**
+     * Get the number of rows.
+     * @method getNumberOfRows
+     * @return {Number} The number of rows.
+     */ 
+    this.getNumberOfRows = function () { return numberOfRows; };
+    /**
+     * Get the number of slices.
+     * @method getNumberOfSlices
+     * @return {Number} The number of slices.
+     */ 
+    this.getNumberOfSlices = function () { return (numberOfSlices || 1.0); };
+};
+
+/**
+ * Get the size of a slice.
+ * @method getSliceSize
+ * @return {Number} The size of a slice.
+ */ 
+dwv.image.Size.prototype.getSliceSize = function () {
+    return this.getNumberOfColumns() * this.getNumberOfRows();
+};
+
+/**
+ * Get the total size.
+ * @method getTotalSize
+ * @return {Number} The total size.
+ */ 
+dwv.image.Size.prototype.getTotalSize = function () {
+    return this.getSliceSize() * this.getNumberOfSlices();
+};
+
+/**
+ * Check for equality.
+ * @method equals
+ * @param {Size} rhs The object to compare to.
+ * @return {Boolean} True if both objects are equal.
+ */ 
+dwv.image.Size.prototype.equals = function (rhs) {
+    return rhs !== null &amp;&amp;
+        this.getNumberOfColumns() === rhs.getNumberOfColumns() &amp;&amp;
+        this.getNumberOfRows() === rhs.getNumberOfRows() &amp;&amp;
+        this.getNumberOfSlices() === rhs.getNumberOfSlices();
+};
+
+/**
+ * Check that coordinates are within bounds.
+ * @method isInBounds
+ * @param {Number} i The column coordinate.
+ * @param {Number} j The row coordinate.
+ * @param {Number} k The slice coordinate.
+ * @return {Boolean} True if the given coordinates are within bounds.
+ */ 
+dwv.image.Size.prototype.isInBounds = function ( i, j, k ) {
+    if( i &lt; 0 || i &gt; this.getNumberOfColumns() - 1 ||
+        j &lt; 0 || j &gt; this.getNumberOfRows() - 1 ||
+        k &lt; 0 || k &gt; this.getNumberOfSlices() - 1 ) {
+        return false;
+    }
+    return true;
+};
+
+/**
+ * 2D/3D Spacing class. 
+ * @class Spacing
+ * @namespace dwv.image
+ * @constructor
+ * @param {Number} columnSpacing The column spacing.
+ * @param {Number} rowSpacing The row spacing.
+ * @param {Number} sliceSpacing The slice spacing.
+ */
+dwv.image.Spacing = function ( columnSpacing, rowSpacing, sliceSpacing )
+{
+    /**
+     * Get the column spacing.
+     * @method getColumnSpacing
+     * @return {Number} The column spacing.
+     */ 
+    this.getColumnSpacing = function () { return columnSpacing; };
+    /**
+     * Get the row spacing.
+     * @method getRowSpacing
+     * @return {Number} The row spacing.
+     */ 
+    this.getRowSpacing = function () { return rowSpacing; };
+    /**
+     * Get the slice spacing.
+     * @method getSliceSpacing
+     * @return {Number} The slice spacing.
+     */ 
+    this.getSliceSpacing = function () { return (sliceSpacing || 1.0); };
+};
+
+/**
+ * Check for equality.
+ * @method equals
+ * @param {Spacing} rhs The object to compare to.
+ * @return {Boolean} True if both objects are equal.
+ */ 
+dwv.image.Spacing.prototype.equals = function (rhs) {
+    return rhs !== null &amp;&amp;
+        this.getColumnSpacing() === rhs.getColumnSpacing() &amp;&amp;
+        this.getRowSpacing() === rhs.getRowSpacing() &amp;&amp;
+        this.getSliceSpacing() === rhs.getSliceSpacing();
+};
+
+/**
+ * 2D/3D Geometry class. 
+ * @class Geometry
+ * @namespace dwv.image
+ * @constructor
+ * @param {Object} origin The object origin.
+ * @param {Object} size The object size.
+ * @param {Object} spacing The object spacing.
+ */
+dwv.image.Geometry = function ( origin, size, spacing )
+{
+    // check input origin.
+    if( typeof(origin) === &#x27;undefined&#x27; ) {
+        origin = new dwv.math.Point3D(0,0,0);
+    }
+    var origins = [origin];
+    
+    /**
+     * Get the object first origin.
+     * @method getOrigin
+     * @return {Object} The object first origin.
+     */ 
+    this.getOrigin = function () { return origin; };
+    /**
+     * Get the object origins.
+     * @method getOrigins
+     * @return {Array} The object origins.
+     */ 
+    this.getOrigins = function () { return origins; };
+    /**
+     * Get the object size.
+     * @method getSize
+     * @return {Object} The object size.
+     */ 
+    this.getSize = function () { return size; };
+    /**
+     * Get the object spacing.
+     * @method getSpacing
+     * @return {Object} The object spacing.
+     */ 
+    this.getSpacing = function () { return spacing; };
+    
+    /**
+     * Get the slice position of a point in the current slice layout.
+     * @method getSliceIndex
+     * @param {Object} point The point to evaluate.
+     */
+    this.getSliceIndex = function (point)
+    {
+        // cannot use this.worldToIndex(point).getK() since
+        // we cannot guaranty consecutive slices...
+        
+        // find the closest index
+        var closestSliceIndex = 0;
+        var minDiff = Math.abs( origins[0].getZ() - point.getZ() );
+        var diff = 0;
+        for( var i = 0; i &lt; origins.length; ++i )
+        {
+            diff = Math.abs( origins[i].getZ() - point.getZ() );
+            if( diff &lt; minDiff ) 
+            {
+                minDiff = diff;
+                closestSliceIndex = i;
+            }
+        }
+        diff = origins[closestSliceIndex].getZ() - point.getZ();
+        var sliceIndex = ( diff &gt; 0 ) ? closestSliceIndex : closestSliceIndex + 1;
+        return sliceIndex;
+    };
+    
+    /**
+     * Append an origin to the geometry.
+     * @param {Object} origin The origin to append.
+     * @param {Number} index The index at which to append.
+     */
+    this.appendOrigin = function (origin, index)
+    {
+        // add in origin array
+        origins.splice(index, 0, origin);
+        // increment slice number
+        size = new dwv.image.Size(
+            size.getNumberOfColumns(),
+            size.getNumberOfRows(),
+            size.getNumberOfSlices() + 1);
+    };
+
+};
+
+/**
+ * Check for equality.
+ * @method equals
+ * @param {Geometry} rhs The object to compare to.
+ * @return {Boolean} True if both objects are equal.
+ */ 
+dwv.image.Geometry.prototype.equals = function (rhs) {
+    return rhs !== null &amp;&amp;
+        this.getOrigin() === rhs.getOrigin() &amp;&amp;
+        this.getSize() === rhs.getSize() &amp;&amp;
+        this.getSpacing() === rhs.getSpacing();
+};
+
+/**
+ * Convert an index to an offset in memory.
+ * @param {Object} index The index to convert.
+ */
+dwv.image.Geometry.prototype.indexToOffset = function (index) {
+    var size = this.getSize();
+    return index.getI() +
+       index.getJ() * size.getNumberOfColumns() +
+       index.getK() * size.getSliceSize();
+};
+
+/**
+ * Convert an index into world coordinates.
+ * @param {Object} index The index to convert.
+ */
+dwv.image.Geometry.prototype.indexToWorld = function (index) {
+    var origin = this.getOrigin();
+    var spacing = this.getSpacing();
+    return new dwv.math.Point3D(
+        origin.getX() + index.getI() * spacing.getColumnSpacing(),
+        origin.getY() + index.getJ() * spacing.getRowSpacing(),
+        origin.getZ() + index.getK() * spacing.getSliceSpacing() );
+};
+
+/**
+ * Convert world coordinates into an index.
+ * @param {Object} THe point to convert.
+ */
+dwv.image.Geometry.prototype.worldToIndex = function (point) {
+    var origin = this.getOrigin();
+    var spacing = this.getSpacing();
+    return new dwv.math.Point3D(
+        point.getX() / spacing.getColumnSpacing() - origin.getX(),
+        point.getY() / spacing.getRowSpacing() - origin.getY(),
+        point.getZ() / spacing.getSliceSpacing() - origin.getZ() );
+};
+
+    </pre>
+</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="../assets/vendor/prettify/prettify-min.js"></script>
+<script>prettyPrint();</script>
+<script src="../assets/js/yui-prettify.js"></script>
+<script src="../assets/../api.js"></script>
+<script src="../assets/js/api-filter.js"></script>
+<script src="../assets/js/api-list.js"></script>
+<script src="../assets/js/api-search.js"></script>
+<script src="../assets/js/apidocs.js"></script>
+</body>
+</html>

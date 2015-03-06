@@ -19,15 +19,15 @@ body { background-color: #222; color: white;
 #infotr { color: #333; text-shadow: 0 1px 0 #fff; }
 #dropBox { margin: 20px; }
 </style>
-<link type="text/css" rel="stylesheet" href="../../ext/jquery-ui/themes/ui-darkness/jquery-ui-1.11.1.min.css">
+<link type="text/css" rel="stylesheet" href="../../ext/jquery-ui/themes/ui-darkness/jquery-ui-1.11.2.min.css">
 <!-- Third party -->  
-<script type="text/javascript" src="../../ext/jquery/jquery-2.1.1.min.js"></script>
-<script type="text/javascript" src="../../ext/jquery-ui/jquery-ui-1.11.1.min.js"></script>
+<script type="text/javascript" src="../../ext/jquery/jquery-2.1.3.min.js"></script>
+<script type="text/javascript" src="../../ext/jquery-ui/jquery-ui-1.11.2.min.js"></script>
 <script type="text/javascript" src="../../ext/flot/jquery.flot.min.js"></script>
 <script type="text/javascript" src="../../ext/openjpeg/openjpeg.js"></script>
 <script type="text/javascript" src="../../ext/kinetic/kinetic-v5.1.1-06.10.min.js"></script>
 <!-- Local -->
-<script type="text/javascript" src="../../dwv-0.8.0.min.js"></script>
+<script type="text/javascript" src="../../dwv-0.9.0.min.js"></script>
 <!-- Launch the app -->
 <script type="text/javascript" src="appgui.js"></script>
 <script type="text/javascript" src="applauncher.js"></script>
@@ -71,15 +71,15 @@ body { background-color: #222; color: white;
 
 <!-- Layer Container -->
 <div id="layerDialog" title="Image">
-<div id="dropBox"></div>
-<div id="layerContainer">
-<canvas id="imageLayer">Only for HTML5 compatible browsers...</canvas>
-<div id="drawDiv"></div>
-<div id="infoLayer">
-<div id="infotl"></div>
-<div id="infotr"></div>
-<div id="infobl"></div>
-<div id="infobr"><div id="plot"></div></div>
+<div id="dwv-dropBox" class="dropBox"></div>
+<div id="dwv" class="layerContainer">
+<canvas id="dwv-imageLayer" class="imageLayer">Only for HTML5 compatible browsers...</canvas>
+<div id="dwv-drawDiv" class="drawDiv"></div>
+<div id="dwv-infoLayer" class="infoLayer">
+<div id="dwv-infotl" class="infotl"></div>
+<div id="dwv-infotr" class="infotr"></div>
+<div id="dwv-infobl" class="infobl"></div>
+<div id="dwv-infobr" class="infobr"><div id="dwv-plot" class="plot"></div></div>
 </div><!-- /infoLayer -->
 </div><!-- /layerContainer -->
 </div><!-- /layerDialog -->
