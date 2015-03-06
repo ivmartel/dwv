@@ -475,7 +475,7 @@ dwv.App = function ()
         // resize container
         var jqDivId = "#"+containerDivId;
         $(jqDivId).width(newWidth);
-        $(jqDivId).height(newHeight + 1); // +1 to be sure...
+        $(jqDivId).height(newHeight);
         // resize image layer
         if ( imageLayer ) {
             var iZoomX = imageLayer.getZoom().x * mul;
@@ -1120,6 +1120,9 @@ dwv.App = function ()
                 height: dataHeight,
                 listening: false
             });
+            // reset style
+            // (avoids a not needed vertical scrollbar) 
+            drawStage.getContent().setAttribute("style", "");
         }
         // resize app
         if ( fitToWindow ) {
