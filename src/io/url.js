@@ -77,7 +77,8 @@ dwv.io.Url.prototype.load = function(ioArray)
         var isGif = view.getUint32(0) === 0x47494638;
         
         // check possible extension
-        if( !isJpeg && !isPng && !isGif )
+        // (responseURL is supported on major browsers but not IE...)
+        if ( !isJpeg && !isPng && !isGif && this.responseURL )
         {
             var ext = this.responseURL.split('.').pop().toLowerCase();
             isJpeg = (ext === "jpg") || (ext === "jpeg");
