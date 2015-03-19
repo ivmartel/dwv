@@ -193,7 +193,8 @@ dwv.App = function ()
     {
         return {
             'file': dwv.io.File,
-            'url': dwv.io.Url
+            'url': dwv.io.Url,
+            'state': dwv.io.File
         };        
     };
     
@@ -284,12 +285,16 @@ dwv.App = function ()
             if ( config.gui.indexOf("load") !== -1 ) {
                 var fileLoadGui = new dwv.gui.FileLoad(this);
                 var urlLoadGui = new dwv.gui.UrlLoad(this);
-                loadbox = new dwv.gui.Loadbox(this, fileLoadGui, urlLoadGui);
+                var stateSaveGui = new dwv.gui.StateSave(this);
+                loadbox = new dwv.gui.Loadbox(this, 
+                    {"file": fileLoadGui, "url": urlLoadGui, "state": stateSaveGui} );
                 loadbox.setup();
                 fileLoadGui.setup();
                 urlLoadGui.setup();
+                stateSaveGui.setup();
                 fileLoadGui.display(true);
                 urlLoadGui.display(false);
+                stateSaveGui.display(false);
             }
             // undo
             if ( config.gui.indexOf("undo") !== -1 ) {
@@ -395,6 +400,14 @@ dwv.App = function ()
         // create IO
         var fileIO = new dwv.io.File();
         fileIO.onload = function (data) {
+            
+            // TODO better test, binary?
+            if ( data[0] === "{" ) {
+                var state = new dwv.State();
+                state.fromJSON(data);
+                return;
+            }
+            
             var isFirst = true;
             if ( image ) {
                 view.append( data.view );
@@ -757,6 +770,18 @@ dwv.App = function ()
     this.onChangeFiles = function (event)
     {
         self.loadFiles(event.target.files);
+    };
+
+    /**
+     * Handle state save event.
+     * @method onStateSave
+     * @param {Object} event The event fired when changing the state save field.
+     */
+    this.onStateSave = function (/*event*/)
+    {
+        var state = new dwv.State();
+        state.setUrls(["a","b"]);
+        // see http://stackoverflow.com/questions/28120177/save-json-file-locally
     };
 
     /**

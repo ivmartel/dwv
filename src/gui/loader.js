@@ -18,7 +18,7 @@ dwv.gui.base = dwv.gui.base || {};
  * @namespace dwv.gui.base
  * @constructor
  */
-dwv.gui.base.Loadbox = function (app, fileLoadGui, urlLoadGui)
+dwv.gui.base.Loadbox = function (app, loaders)
 {
     /**
      * Setup the loadbox HTML.
@@ -48,14 +48,15 @@ dwv.gui.base.Loadbox = function (app, fileLoadGui, urlLoadGui)
      */
     this.displayLoader = function (name)
     {
-        if( name === "file") {
-            fileLoadGui.display(true);
-            urlLoadGui.display(false);
+        var keys = Object.keys(loaders);
+        for ( var i = 0; i < keys.length; ++i ) {
+            if ( keys[i] === name ) {
+                loaders[keys[i]].display(true);
+            }
+            else {
+                loaders[keys[i]].display(false);
+            }
         }
-        else if( name === "url") {
-            fileLoadGui.display(false);
-            urlLoadGui.display(true);
-        }        
     };
     
 }; // class dwv.gui.base.Loadbox
@@ -156,6 +157,56 @@ dwv.gui.base.UrlLoad = function (app)
     {
         // url div element
         var urldiv = document.getElementById("imageurldiv");
+        urldiv.style.display = bool ? "" : "none";
+    };
+
+}; // class dwv.gui.base.UrlLoad
+
+/**
+ * StateSave base gui.
+ * @class StateSave
+ * @namespace dwv.gui.base
+ * @constructor
+ */
+dwv.gui.base.StateSave = function (app)
+{
+    /**
+     * Setup the state save HTML to the page.
+     * @method setup
+     */
+    this.setup = function ()
+    {
+        // input
+        var stateSaveInput = document.createElement("input");
+        stateSaveInput.onchange = app.onStateSave;
+        stateSaveInput.type = "file";
+        stateSaveInput.id = "statesave";
+        stateSaveInput.setAttribute("data-clear-btn","true");
+        stateSaveInput.setAttribute("data-mini","true");
+    
+        // associated div
+        var stateSaveDiv = document.createElement("div");
+        stateSaveDiv.id = "statesavediv";
+        stateSaveDiv.style.display = "none";
+        stateSaveDiv.appendChild(stateSaveInput);
+    
+        // node
+        var node = document.getElementById("loaderlist");
+        // append
+        node.appendChild(stateSaveDiv);
+        // trigger create event (mobile)
+        $("#loaderlist").trigger("create");
+    };
+    
+    /**
+     * Display the state save HTML.
+     * @method display
+     * @param {Boolean} bool True to display, false to hide.
+     */
+    this.display = function (bool)
+    {
+        // url div element
+        var urldiv = document.getElementById("statesavediv");
         urldiv.style.display = bool ? "" : "none";
     };
 

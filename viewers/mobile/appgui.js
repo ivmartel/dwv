@@ -19,6 +19,8 @@ dwv.gui.Loadbox = dwv.gui.base.Loadbox;
 dwv.gui.FileLoad = dwv.gui.base.FileLoad;
 // Url loader
 dwv.gui.UrlLoad =  dwv.gui.base.UrlLoad;
+// State saver
+dwv.gui.StateSave =  dwv.gui.base.StateSave;
 
 // Toolbox 
 dwv.gui.Toolbox = function (app)
