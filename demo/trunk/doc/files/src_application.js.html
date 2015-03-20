@@ -54,6 +54,7 @@
                                 <li><a href="../classes/dwv.gui.base.Sharpen.html">dwv.gui.base.Sharpen</a></li>
                                 <li><a href="../classes/dwv.gui.base.Slider.html">dwv.gui.base.Slider</a></li>
                                 <li><a href="../classes/dwv.gui.base.Sobel.html">dwv.gui.base.Sobel</a></li>
+                                <li><a href="../classes/dwv.gui.base.StateSave.html">dwv.gui.base.StateSave</a></li>
                                 <li><a href="../classes/dwv.gui.base.Threshold.html">dwv.gui.base.Threshold</a></li>
                                 <li><a href="../classes/dwv.gui.base.Toolbox.html">dwv.gui.base.Toolbox</a></li>
                                 <li><a href="../classes/dwv.gui.base.Undo.html">dwv.gui.base.Undo</a></li>
@@ -98,6 +99,7 @@
                                 <li><a href="../classes/dwv.math.Rectangle.html">dwv.math.Rectangle</a></li>
                                 <li><a href="../classes/dwv.math.ROI.html">dwv.math.ROI</a></li>
                                 <li><a href="../classes/dwv.math.Scissors.html">dwv.math.Scissors</a></li>
+                                <li><a href="../classes/dwv.State.html">dwv.State</a></li>
                                 <li><a href="../classes/dwv.tool.html">dwv.tool</a></li>
                                 <li><a href="../classes/dwv.tool.ChangeGroupCommand.html">dwv.tool.ChangeGroupCommand</a></li>
                                 <li><a href="../classes/dwv.tool.DeleteGroupCommand.html">dwv.tool.DeleteGroupCommand</a></li>
@@ -369,7 +371,8 @@ dwv.App = function ()
     {
         return {
             &#x27;file&#x27;: dwv.io.File,
-            &#x27;url&#x27;: dwv.io.Url
+            &#x27;url&#x27;: dwv.io.Url,
+            &#x27;state&#x27;: dwv.io.File
         };        
     };
     
@@ -460,12 +463,16 @@ dwv.App = function ()
             if ( config.gui.indexOf(&quot;load&quot;) !== -1 ) {
                 var fileLoadGui = new dwv.gui.FileLoad(this);
                 var urlLoadGui = new dwv.gui.UrlLoad(this);
-                loadbox = new dwv.gui.Loadbox(this, fileLoadGui, urlLoadGui);
+                var stateSaveGui = new dwv.gui.StateSave(this);
+                loadbox = new dwv.gui.Loadbox(this, 
+                    {&quot;file&quot;: fileLoadGui, &quot;url&quot;: urlLoadGui, &quot;state&quot;: stateSaveGui} );
                 loadbox.setup();
                 fileLoadGui.setup();
                 urlLoadGui.setup();
+                stateSaveGui.setup();
                 fileLoadGui.display(true);
                 urlLoadGui.display(false);
+                stateSaveGui.display(false);
             }
             // undo
             if ( config.gui.indexOf(&quot;undo&quot;) !== -1 ) {
@@ -571,6 +578,14 @@ dwv.App = function ()
         // create IO
         var fileIO = new dwv.io.File();
         fileIO.onload = function (data) {
+            
+            // TODO better test, binary?
+            if ( data[0] === &quot;{&quot; ) {
+                var state = new dwv.State();
+                state.fromJSON(data);
+                return;
+            }
+            
             var isFirst = true;
             if ( image ) {
                 view.append( data.view );
@@ -933,6 +948,18 @@ dwv.App = function ()
     this.onChangeFiles = function (event)
     {
         self.loadFiles(event.target.files);
+    };
+
+    /**
+     * Handle state save event.
+     * @method onStateSave
+     * @param {Object} event The event fired when changing the state save field.
+     */
+    this.onStateSave = function (/*event*/)
+    {
+        var state = new dwv.State();
+        state.setUrls([&quot;a&quot;,&quot;b&quot;]);
+        // see http://stackoverflow.com/questions/28120177/save-json-file-locally
     };
 
     /**

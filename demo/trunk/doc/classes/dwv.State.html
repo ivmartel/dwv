@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>dwv.gui.base.ZoomAndPan - dwv</title>
+    <title>dwv.State - dwv</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
     <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
@@ -172,30 +172,37 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-<h1>dwv.gui.base.ZoomAndPan Class</h1>
+<h1>dwv.State Class</h1>
 <div class="box meta">
 
 
         <div class="foundat">
-            Defined in: <a href="../files/src_gui_tools.js.html#l335"><code>src&#x2F;gui&#x2F;tools.js:335</code></a>
+            Defined in: <a href="../files/src_state.js.html#l7"><code>src&#x2F;state.js:7</code></a>
         </div>
 
-            Module: <a href="../modules/gui.html">gui</a>
+            Module: <a href="../modules/tool.html">tool</a>
 
 </div>
 
 
 <div class="box intro">
-    <p>ZoomAndPan tool base gui.</p>
+    <p>State class.
+Saves: data url/path, display info, undo stack.</p>
 
 </div>
 
     <div class="constructor">
         <h2>Constructor</h2>
-        <div id="method_dwv.gui.base.ZoomAndPan" class="method item">
-            <h3 class="name"><code>dwv.gui.base.ZoomAndPan</code></h3>
+        <div id="method_dwv.State" class="method item">
+            <h3 class="name"><code>dwv.State</code></h3>
         
-                <span class="paren">()</span>
+                <div class="args">
+                    <span class="paren">(</span><ul class="args-list inline commas">
+                        <li class="arg">
+                                <code>app</code>
+                        </li>
+                    </ul><span class="paren">)</span>
+                </div>
         
         
         
@@ -207,7 +214,7 @@
             <div class="meta">
                         <p>
                         Defined in
-                <a href="../files/src_gui_tools.js.html#l335"><code>src&#x2F;gui&#x2F;tools.js:335</code></a>
+                <a href="../files/src_state.js.html#l7"><code>src&#x2F;state.js:7</code></a>
                 </p>
         
         
@@ -218,6 +225,23 @@
                 
             </div>
         
+                <div class="params">
+                    <h4>Parameters:</h4>
+        
+                    <ul class="params-list">
+                        <li class="param">
+                                <code class="param-name">app</code>
+                                <span class="type">Object</span>
+        
+        
+                            <div class="param-description">
+                                <p>The associated application.</p>
+        
+                            </div>
+        
+                        </li>
+                    </ul>
+                </div>
         
         
         
@@ -240,11 +264,11 @@
 
                     <ul class="index-list methods">
                             <li class="index-item method">
-                                <a href="#method_display">display</a>
+                                <a href="#method_load">load</a>
 
                             </li>
                             <li class="index-item method">
-                                <a href="#method_setup">setup</a>
+                                <a href="#method_save">save</a>
 
                             </li>
                     </ul>
@@ -257,62 +281,8 @@
             <div id="methods" class="api-class-tabpanel">
                 <h2 class="off-left">Methods</h2>
 
-<div id="method_display" class="method item">
-    <h3 class="name"><code>display</code></h3>
-
-        <div class="args">
-            <span class="paren">(</span><ul class="args-list inline commas">
-                <li class="arg">
-                        <code>bool</code>
-                </li>
-            </ul><span class="paren">)</span>
-        </div>
-
-
-
-
-
-
-
-
-    <div class="meta">
-                <p>
-                Defined in
-        <a href="../files/src_gui_tools.js.html#l374"><code>src&#x2F;gui&#x2F;tools.js:374</code></a>
-        </p>
-
-
-
-    </div>
-
-    <div class="description">
-        <p>Display the tool HTML.</p>
-
-    </div>
-
-        <div class="params">
-            <h4>Parameters:</h4>
-
-            <ul class="params-list">
-                <li class="param">
-                        <code class="param-name">bool</code>
-                        <span class="type">Boolean</span>
-
-
-                    <div class="param-description">
-                        <p>True to display, false to hide.</p>
-
-                    </div>
-
-                </li>
-            </ul>
-        </div>
-
-
-
-</div>
-<div id="method_setup" class="method item">
-    <h3 class="name"><code>setup</code></h3>
+<div id="method_load" class="method item">
+    <h3 class="name"><code>load</code></h3>
 
         <span class="paren">()</span>
 
@@ -326,7 +296,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_gui_tools.js.html#l343"><code>src&#x2F;gui&#x2F;tools.js:343</code></a>
+        <a href="../files/src_state.js.html#l32"><code>src&#x2F;state.js:32</code></a>
         </p>
 
 
@@ -334,7 +304,38 @@
     </div>
 
     <div class="description">
-        <p>Setup the tool HTML.</p>
+        <p>Load state.</p>
+
+    </div>
+
+
+
+
+</div>
+<div id="method_save" class="method item">
+    <h3 class="name"><code>save</code></h3>
+
+        <span class="paren">()</span>
+
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/src_state.js.html#l23"><code>src&#x2F;state.js:23</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Save state.</p>
 
     </div>
 

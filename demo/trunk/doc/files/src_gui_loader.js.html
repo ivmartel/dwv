@@ -54,6 +54,7 @@
                                 <li><a href="../classes/dwv.gui.base.Sharpen.html">dwv.gui.base.Sharpen</a></li>
                                 <li><a href="../classes/dwv.gui.base.Slider.html">dwv.gui.base.Slider</a></li>
                                 <li><a href="../classes/dwv.gui.base.Sobel.html">dwv.gui.base.Sobel</a></li>
+                                <li><a href="../classes/dwv.gui.base.StateSave.html">dwv.gui.base.StateSave</a></li>
                                 <li><a href="../classes/dwv.gui.base.Threshold.html">dwv.gui.base.Threshold</a></li>
                                 <li><a href="../classes/dwv.gui.base.Toolbox.html">dwv.gui.base.Toolbox</a></li>
                                 <li><a href="../classes/dwv.gui.base.Undo.html">dwv.gui.base.Undo</a></li>
@@ -98,6 +99,7 @@
                                 <li><a href="../classes/dwv.math.Rectangle.html">dwv.math.Rectangle</a></li>
                                 <li><a href="../classes/dwv.math.ROI.html">dwv.math.ROI</a></li>
                                 <li><a href="../classes/dwv.math.Scissors.html">dwv.math.Scissors</a></li>
+                                <li><a href="../classes/dwv.State.html">dwv.State</a></li>
                                 <li><a href="../classes/dwv.tool.html">dwv.tool</a></li>
                                 <li><a href="../classes/dwv.tool.ChangeGroupCommand.html">dwv.tool.ChangeGroupCommand</a></li>
                                 <li><a href="../classes/dwv.tool.DeleteGroupCommand.html">dwv.tool.DeleteGroupCommand</a></li>
@@ -194,7 +196,7 @@ dwv.gui.base = dwv.gui.base || {};
  * @namespace dwv.gui.base
  * @constructor
  */
-dwv.gui.base.Loadbox = function (app, fileLoadGui, urlLoadGui)
+dwv.gui.base.Loadbox = function (app, loaders)
 {
     /**
      * Setup the loadbox HTML.
@@ -224,14 +226,15 @@ dwv.gui.base.Loadbox = function (app, fileLoadGui, urlLoadGui)
      */
     this.displayLoader = function (name)
     {
-        if( name === &quot;file&quot;) {
-            fileLoadGui.display(true);
-            urlLoadGui.display(false);
+        var keys = Object.keys(loaders);
+        for ( var i = 0; i &lt; keys.length; ++i ) {
+            if ( keys[i] === name ) {
+                loaders[keys[i]].display(true);
+            }
+            else {
+                loaders[keys[i]].display(false);
+            }
         }
-        else if( name === &quot;url&quot;) {
-            fileLoadGui.display(false);
-            urlLoadGui.display(true);
-        }        
     };
     
 }; // class dwv.gui.base.Loadbox
@@ -332,6 +335,56 @@ dwv.gui.base.UrlLoad = function (app)
     {
         // url div element
         var urldiv = document.getElementById(&quot;imageurldiv&quot;);
+        urldiv.style.display = bool ? &quot;&quot; : &quot;none&quot;;
+    };
+
+}; // class dwv.gui.base.UrlLoad
+
+/**
+ * StateSave base gui.
+ * @class StateSave
+ * @namespace dwv.gui.base
+ * @constructor
+ */
+dwv.gui.base.StateSave = function (app)
+{
+    /**
+     * Setup the state save HTML to the page.
+     * @method setup
+     */
+    this.setup = function ()
+    {
+        // input
+        var stateSaveInput = document.createElement(&quot;input&quot;);
+        stateSaveInput.onchange = app.onStateSave;
+        stateSaveInput.type = &quot;file&quot;;
+        stateSaveInput.id = &quot;statesave&quot;;
+        stateSaveInput.setAttribute(&quot;data-clear-btn&quot;,&quot;true&quot;);
+        stateSaveInput.setAttribute(&quot;data-mini&quot;,&quot;true&quot;);
+    
+        // associated div
+        var stateSaveDiv = document.createElement(&quot;div&quot;);
+        stateSaveDiv.id = &quot;statesavediv&quot;;
+        stateSaveDiv.style.display = &quot;none&quot;;
+        stateSaveDiv.appendChild(stateSaveInput);
+    
+        // node
+        var node = document.getElementById(&quot;loaderlist&quot;);
+        // append
+        node.appendChild(stateSaveDiv);
+        // trigger create event (mobile)
+        $(&quot;#loaderlist&quot;).trigger(&quot;create&quot;);
+    };
+    
+    /**
+     * Display the state save HTML.
+     * @method display
+     * @param {Boolean} bool True to display, false to hide.
+     */
+    this.display = function (bool)
+    {
+        // url div element
+        var urldiv = document.getElementById(&quot;statesavediv&quot;);
         urldiv.style.display = bool ? &quot;&quot; : &quot;none&quot;;
     };
 
