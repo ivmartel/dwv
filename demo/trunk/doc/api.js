@@ -2,7 +2,6 @@ YUI.add("yuidoc-meta", function(Y) {
    Y.YUIDoc = { meta: {
     "classes": [
         "dwv.App",
-        "dwv.State",
         "dwv.ToolboxController",
         "dwv.ViewController",
         "dwv.browser",
@@ -20,7 +19,6 @@ YUI.add("yuidoc-meta", function(Y) {
         "dwv.gui.base.Sharpen",
         "dwv.gui.base.Slider",
         "dwv.gui.base.Sobel",
-        "dwv.gui.base.StateSave",
         "dwv.gui.base.Threshold",
         "dwv.gui.base.Toolbox",
         "dwv.gui.base.Undo",

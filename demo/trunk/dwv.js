@@ -193,8 +193,7 @@ dwv.App = function ()
     {
         return {
             'file': dwv.io.File,
-            'url': dwv.io.Url,
-            'state': dwv.io.File
+            'url': dwv.io.Url
         };        
     };
     
@@ -285,16 +284,12 @@ dwv.App = function ()
             if ( config.gui.indexOf("load") !== -1 ) {
                 var fileLoadGui = new dwv.gui.FileLoad(this);
                 var urlLoadGui = new dwv.gui.UrlLoad(this);
-                var stateSaveGui = new dwv.gui.StateSave(this);
-                loadbox = new dwv.gui.Loadbox(this, 
-                    {"file": fileLoadGui, "url": urlLoadGui, "state": stateSaveGui} );
+                loadbox = new dwv.gui.Loadbox(this, fileLoadGui, urlLoadGui);
                 loadbox.setup();
                 fileLoadGui.setup();
                 urlLoadGui.setup();
-                stateSaveGui.setup();
                 fileLoadGui.display(true);
                 urlLoadGui.display(false);
-                stateSaveGui.display(false);
             }
             // undo
             if ( config.gui.indexOf("undo") !== -1 ) {
@@ -400,14 +395,6 @@ dwv.App = function ()
         // create IO
         var fileIO = new dwv.io.File();
         fileIO.onload = function (data) {
-            
-            // TODO better test, binary?
-            if ( data[0] === "{" ) {
-                var state = new dwv.State();
-                state.fromJSON(data);
-                return;
-            }
-            
             var isFirst = true;
             if ( image ) {
                 view.append( data.view );
@@ -770,18 +757,6 @@ dwv.App = function ()
     this.onChangeFiles = function (event)
     {
         self.loadFiles(event.target.files);
-    };
-
-    /**
-     * Handle state save event.
-     * @method onStateSave
-     * @param {Object} event The event fired when changing the state save field.
-     */
-    this.onStateSave = function (/*event*/)
-    {
-        var state = new dwv.State();
-        state.setUrls(["a","b"]);
-        // see http://stackoverflow.com/questions/28120177/save-json-file-locally
     };
 
     /**
@@ -5591,7 +5566,7 @@ dwv.gui.base = dwv.gui.base || {};
  * @namespace dwv.gui.base
  * @constructor
  */
-dwv.gui.base.Loadbox = function (app, loaders)
+dwv.gui.base.Loadbox = function (app, fileLoadGui, urlLoadGui)
 {
     /**
      * Setup the loadbox HTML.
@@ -5621,15 +5596,14 @@ dwv.gui.base.Loadbox = function (app, loaders)
      */
     this.displayLoader = function (name)
     {
-        var keys = Object.keys(loaders);
-        for ( var i = 0; i < keys.length; ++i ) {
-            if ( keys[i] === name ) {
-                loaders[keys[i]].display(true);
-            }
-            else {
-                loaders[keys[i]].display(false);
-            }
+        if( name === "file") {
+            fileLoadGui.display(true);
+            urlLoadGui.display(false);
         }
+        else if( name === "url") {
+            fileLoadGui.display(false);
+            urlLoadGui.display(true);
+        }        
     };
     
 }; // class dwv.gui.base.Loadbox
@@ -5730,56 +5704,6 @@ dwv.gui.base.UrlLoad = function (app)
     {
         // url div element
         var urldiv = document.getElementById("imageurldiv");
-        urldiv.style.display = bool ? "" : "none";
-    };
-
-}; // class dwv.gui.base.UrlLoad
-
-/**
- * StateSave base gui.
- * @class StateSave
- * @namespace dwv.gui.base
- * @constructor
- */
-dwv.gui.base.StateSave = function (app)
-{
-    /**
-     * Setup the state save HTML to the page.
-     * @method setup
-     */
-    this.setup = function ()
-    {
-        // input
-        var stateSaveInput = document.createElement("input");
-        stateSaveInput.onchange = app.onStateSave;
-        stateSaveInput.type = "file";
-        stateSaveInput.id = "statesave";
-        stateSaveInput.setAttribute("data-clear-btn","true");
-        stateSaveInput.setAttribute("data-mini","true");
-    
-        // associated div
-        var stateSaveDiv = document.createElement("div");
-        stateSaveDiv.id = "statesavediv";
-        stateSaveDiv.style.display = "none";
-        stateSaveDiv.appendChild(stateSaveInput);
-    
-        // node
-        var node = document.getElementById("loaderlist");
-        // append
-        node.appendChild(stateSaveDiv);
-        // trigger create event (mobile)
-        $("#loaderlist").trigger("create");
-    };
-    
-    /**
-     * Display the state save HTML.
-     * @method display
-     * @param {Boolean} bool True to display, false to hide.
-     */
-    this.display = function (bool)
-    {
-        // url div element
-        var urldiv = document.getElementById("statesavediv");
         urldiv.style.display = bool ? "" : "none";
     };
 
@@ -8772,13 +8696,6 @@ dwv.io.File.prototype.load = function(ioArray)
         onerror( {'name': "RequestError", 
             'message': "An error occurred while reading the DICOM file: "+event.getMessage() } );
     };
-    
-    // Request error
-    var onErrorJSONReader = function(event)
-    {
-        onerror( {'name': "RequestError", 
-            'message': "An error occurred while reading the JSON file: "+event.getMessage() } );
-    };
 
     // DICOM reader loader
     var onLoadDicomReader = function(event)
@@ -8794,18 +8711,6 @@ dwv.io.File.prototype.load = function(ioArray)
         // force 100% progress (sometimes with firefox)
         var endEvent = {lengthComputable: true, loaded: 1, total: 1};
         dwv.gui.updateProgress(endEvent);
-    };
-
-    // JSON loader
-    var onLoadJSONReader = function(/*event*/)
-    {
-        // parse image file
-        try {
-            // call listener
-            onload(event.target.result);
-        } catch(error) {
-            onerror(error);
-        }
     };
 
     // Image loader
@@ -8829,7 +8734,6 @@ dwv.io.File.prototype.load = function(ioArray)
         // storing values to pass them on
         theImage.file = this.file;
         theImage.index = this.index;
-        // triggered by ctx.drawImage
         theImage.onload = onLoadImageFile;
     };
 
@@ -8838,19 +8742,11 @@ dwv.io.File.prototype.load = function(ioArray)
     {
         var file = ioArray[i];
         var reader = new FileReader();
-        if ( file.name.split('.').pop().toLowerCase() === "json" )
-        {
-            reader.onload = onLoadJSONReader;
-            reader.onprogress = dwv.gui.updateProgress;
-            reader.onerror = onErrorJSONReader;
-            reader.readAsText(file);
-        }
-        else if ( file.type.match("image.*") )
+        if( file.type.match("image.*") )
         {
             // storing values to pass them on
             reader.file = file;
             reader.index = i;
-            // callbacks
             reader.onload = onLoadImageReader;
             reader.onprogress = dwv.gui.updateProgress;
             reader.onerror = onErrorImageReader;
@@ -10460,45 +10356,6 @@ dwv.math.IdGenerator = function ()
         return root++;
     };
 };
-;/** 
- * Tool module.
- * @module tool
- */
-var dwv = dwv || {};
-
-/**
- * State class.
- * Saves: data url/path, display info, undo stack.
- * @class State
- * @namespace dwv
- * @constructor
- * @param {Object} app The associated application.
- */
-dwv.State = function (/*app*/)
-{
-    var _urls = [];
-    
-    this.setUrls = function (urls) {
-        _urls = urls;
-    };
-    
-    /**
-     * Save state.
-     * @method save
-     */
-    this.toJSON = function () {
-        return $.toJSON({
-            'urls': _urls
-        });
-    };
-    /**
-     * Load state.
-     * @method load
-     */
-    this.fromJSON = function (json) {
-        console.log(json);
-    };
-}; // State class
 ;/** 
  * Tool module.
  * @module tool

@@ -54,7 +54,6 @@
                                 <li><a href="../classes/dwv.gui.base.Sharpen.html">dwv.gui.base.Sharpen</a></li>
                                 <li><a href="../classes/dwv.gui.base.Slider.html">dwv.gui.base.Slider</a></li>
                                 <li><a href="../classes/dwv.gui.base.Sobel.html">dwv.gui.base.Sobel</a></li>
-                                <li><a href="../classes/dwv.gui.base.StateSave.html">dwv.gui.base.StateSave</a></li>
                                 <li><a href="../classes/dwv.gui.base.Threshold.html">dwv.gui.base.Threshold</a></li>
                                 <li><a href="../classes/dwv.gui.base.Toolbox.html">dwv.gui.base.Toolbox</a></li>
                                 <li><a href="../classes/dwv.gui.base.Undo.html">dwv.gui.base.Undo</a></li>
@@ -99,7 +98,6 @@
                                 <li><a href="../classes/dwv.math.Rectangle.html">dwv.math.Rectangle</a></li>
                                 <li><a href="../classes/dwv.math.ROI.html">dwv.math.ROI</a></li>
                                 <li><a href="../classes/dwv.math.Scissors.html">dwv.math.Scissors</a></li>
-                                <li><a href="../classes/dwv.State.html">dwv.State</a></li>
                                 <li><a href="../classes/dwv.tool.html">dwv.tool</a></li>
                                 <li><a href="../classes/dwv.tool.ChangeGroupCommand.html">dwv.tool.ChangeGroupCommand</a></li>
                                 <li><a href="../classes/dwv.tool.DeleteGroupCommand.html">dwv.tool.DeleteGroupCommand</a></li>
@@ -226,13 +224,6 @@ dwv.io.File.prototype.load = function(ioArray)
         onerror( {&#x27;name&#x27;: &quot;RequestError&quot;, 
             &#x27;message&#x27;: &quot;An error occurred while reading the DICOM file: &quot;+event.getMessage() } );
     };
-    
-    // Request error
-    var onErrorJSONReader = function(event)
-    {
-        onerror( {&#x27;name&#x27;: &quot;RequestError&quot;, 
-            &#x27;message&#x27;: &quot;An error occurred while reading the JSON file: &quot;+event.getMessage() } );
-    };
 
     // DICOM reader loader
     var onLoadDicomReader = function(event)
@@ -248,18 +239,6 @@ dwv.io.File.prototype.load = function(ioArray)
         // force 100% progress (sometimes with firefox)
         var endEvent = {lengthComputable: true, loaded: 1, total: 1};
         dwv.gui.updateProgress(endEvent);
-    };
-
-    // JSON loader
-    var onLoadJSONReader = function(/*event*/)
-    {
-        // parse image file
-        try {
-            // call listener
-            onload(event.target.result);
-        } catch(error) {
-            onerror(error);
-        }
     };
 
     // Image loader
@@ -283,7 +262,6 @@ dwv.io.File.prototype.load = function(ioArray)
         // storing values to pass them on
         theImage.file = this.file;
         theImage.index = this.index;
-        // triggered by ctx.drawImage
         theImage.onload = onLoadImageFile;
     };
 
@@ -292,19 +270,11 @@ dwv.io.File.prototype.load = function(ioArray)
     {
         var file = ioArray[i];
         var reader = new FileReader();
-        if ( file.name.split(&#x27;.&#x27;).pop().toLowerCase() === &quot;json&quot; )
-        {
-            reader.onload = onLoadJSONReader;
-            reader.onprogress = dwv.gui.updateProgress;
-            reader.onerror = onErrorJSONReader;
-            reader.readAsText(file);
-        }
-        else if ( file.type.match(&quot;image.*&quot;) )
+        if( file.type.match(&quot;image.*&quot;) )
         {
             // storing values to pass them on
             reader.file = file;
             reader.index = i;
-            // callbacks
             reader.onload = onLoadImageReader;
             reader.onprogress = dwv.gui.updateProgress;
             reader.onerror = onErrorImageReader;
