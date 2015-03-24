@@ -2,6 +2,25 @@
  * Application GUI.
  */
 
+// Default colour maps.
+dwv.tool.colourMaps = {
+    "plain": dwv.image.lut.plain,
+    "invplain": dwv.image.lut.invPlain,
+    "rainbow": dwv.image.lut.rainbow,
+    "hot": dwv.image.lut.hot,
+    "test": dwv.image.lut.test
+};
+// Default window level presets.
+dwv.tool.defaultpresets = {};
+// Default window level presets for CT.
+dwv.tool.defaultpresets.CT = {
+    "mediastinum": {"center": 40, "width": 400},
+    "lung": {"center": -500, "width": 1500},
+    "bone": {"center": 500, "width": 2000},
+    "brain": {"center": 40, "width": 80},
+    "head": {"center": 90, "width": 350}
+};
+
 // Window
 dwv.gui.getWindowSize = function () {
     return { 'width': ($('#pageMain').width() - 360), 'height': ($('#pageMain').height() - 75) };

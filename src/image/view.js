@@ -269,46 +269,6 @@ dwv.image.View.prototype.setWindowLevelMinMax = function()
     // set window level
     this.setWindowLevel(center,width);
 };
-/**
- * Go to first slice .
- * @method goFirstSlice
- * @return {Boolean} False if not in bounds.
- */
-dwv.image.View.prototype.goFirstSlice = function()
-{
-    return this.setCurrentPosition({
-        "i": this.getCurrentPosition().i,
-        "j": this.getCurrentPosition().j,
-        "k":  0 
-    });
-};
-/**
- * Increment the current slice number.
- * @method incrementSliceNb
- * @return {Boolean} False if not in bounds.
- */
-dwv.image.View.prototype.incrementSliceNb = function()
-{
-    return this.setCurrentPosition({
-        "i": this.getCurrentPosition().i,
-        "j": this.getCurrentPosition().j,
-        "k": this.getCurrentPosition().k + 1 
-    });
-};
-
-/**
- * Decrement the current slice number.
- * @method decrementSliceNb
- * @return {Boolean} False if not in bounds.
- */
-dwv.image.View.prototype.decrementSliceNb = function()
-{
-    return this.setCurrentPosition({
-        "i": this.getCurrentPosition().i,
-        "j": this.getCurrentPosition().j,
-        "k": this.getCurrentPosition().k - 1 
-    });
-};
 
 /**
  * Generate display image data to be given to a canvas.
