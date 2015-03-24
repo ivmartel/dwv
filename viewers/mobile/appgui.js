@@ -52,6 +52,12 @@ dwv.gui.Toolbox = function (app)
         toggleInfo.setAttribute("class", buttonClass + " ui-icon-info");
         toggleInfo.onclick = app.onToggleInfoLayer;
     
+        var toggleSaveState = document.createElement("a");
+        toggleSaveState.setAttribute("class", buttonClass + " ui-icon-action");
+        toggleSaveState.onclick = app.onStateSave;
+        toggleSaveState.download = "state.json";
+        toggleSaveState.id = "download-state";
+
         var tags = document.createElement("a");
         tags.href = "#tags_page";
         tags.setAttribute("class", buttonClass + " ui-icon-grid");
@@ -61,6 +67,7 @@ dwv.gui.Toolbox = function (app)
         node.appendChild(undo);
         node.appendChild(redo);
         node.appendChild(toggleInfo);
+        node.appendChild(toggleSaveState);
         node.appendChild(tags);
         $("#toolbar").trigger("create");
     };

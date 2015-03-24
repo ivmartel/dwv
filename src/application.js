@@ -781,7 +781,17 @@ dwv.App = function ()
     {
         var state = new dwv.State();
         state.setUrls(["a","b"]);
-        // see http://stackoverflow.com/questions/28120177/save-json-file-locally
+        
+        var data = {
+            "window": 500, 
+            "level": 430,
+            "position": self.getView().getCurrentPosition()
+        };
+        
+        // add href to link (html5)
+        var element = document.getElementById("download-state");
+        element.href = "data:application/json;charset=utf8;base64," +
+            window.btoa(JSON.stringify(data));
     };
 
     /**
