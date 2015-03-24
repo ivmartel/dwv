@@ -98,6 +98,7 @@
                                 <li><a href="../classes/dwv.math.Rectangle.html">dwv.math.Rectangle</a></li>
                                 <li><a href="../classes/dwv.math.ROI.html">dwv.math.ROI</a></li>
                                 <li><a href="../classes/dwv.math.Scissors.html">dwv.math.Scissors</a></li>
+                                <li><a href="../classes/dwv.State.html">dwv.State</a></li>
                                 <li><a href="../classes/dwv.tool.html">dwv.tool</a></li>
                                 <li><a href="../classes/dwv.tool.ChangeGroupCommand.html">dwv.tool.ChangeGroupCommand</a></li>
                                 <li><a href="../classes/dwv.tool.DeleteGroupCommand.html">dwv.tool.DeleteGroupCommand</a></li>
@@ -194,7 +195,7 @@ dwv.gui.base = dwv.gui.base || {};
  * @namespace dwv.gui.base
  * @constructor
  */
-dwv.gui.base.Loadbox = function (app, fileLoadGui, urlLoadGui)
+dwv.gui.base.Loadbox = function (app, loaders)
 {
     /**
      * Setup the loadbox HTML.
@@ -224,14 +225,15 @@ dwv.gui.base.Loadbox = function (app, fileLoadGui, urlLoadGui)
      */
     this.displayLoader = function (name)
     {
-        if( name === &quot;file&quot;) {
-            fileLoadGui.display(true);
-            urlLoadGui.display(false);
+        var keys = Object.keys(loaders);
+        for ( var i = 0; i &lt; keys.length; ++i ) {
+            if ( keys[i] === name ) {
+                loaders[keys[i]].display(true);
+            }
+            else {
+                loaders[keys[i]].display(false);
+            }
         }
-        else if( name === &quot;url&quot;) {
-            fileLoadGui.display(false);
-            urlLoadGui.display(true);
-        }        
     };
     
 }; // class dwv.gui.base.Loadbox

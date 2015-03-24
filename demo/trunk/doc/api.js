@@ -2,6 +2,7 @@ YUI.add("yuidoc-meta", function(Y) {
    Y.YUIDoc = { meta: {
     "classes": [
         "dwv.App",
+        "dwv.State",
         "dwv.ToolboxController",
         "dwv.ViewController",
         "dwv.browser",

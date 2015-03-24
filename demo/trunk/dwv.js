@@ -193,7 +193,8 @@ dwv.App = function ()
     {
         return {
             'file': dwv.io.File,
-            'url': dwv.io.Url
+            'url': dwv.io.Url,
+            'state': dwv.io.File
         };        
     };
     
@@ -284,12 +285,16 @@ dwv.App = function ()
             if ( config.gui.indexOf("load") !== -1 ) {
                 var fileLoadGui = new dwv.gui.FileLoad(this);
                 var urlLoadGui = new dwv.gui.UrlLoad(this);
-                loadbox = new dwv.gui.Loadbox(this, fileLoadGui, urlLoadGui);
+                var stateSaveGui = new dwv.gui.StateSave(this);
+                loadbox = new dwv.gui.Loadbox(this, 
+                    {"file": fileLoadGui, "url": urlLoadGui, "state": stateSaveGui} );
                 loadbox.setup();
                 fileLoadGui.setup();
                 urlLoadGui.setup();
+                stateSaveGui.setup();
                 fileLoadGui.display(true);
                 urlLoadGui.display(false);
+                stateSaveGui.display(false);
             }
             // undo
             if ( config.gui.indexOf("undo") !== -1 ) {
@@ -395,6 +400,14 @@ dwv.App = function ()
         // create IO
         var fileIO = new dwv.io.File();
         fileIO.onload = function (data) {
+            
+            // TODO better test, binary?
+            if ( data[0] === "{" ) {
+                var state = new dwv.State();
+                state.fromJSON(data);
+                return;
+            }
+            
             var isFirst = true;
             if ( image ) {
                 view.append( data.view );
@@ -757,6 +770,28 @@ dwv.App = function ()
     this.onChangeFiles = function (event)
     {
         self.loadFiles(event.target.files);
+    };
+
+    /**
+     * Handle state save event.
+     * @method onStateSave
+     * @param {Object} event The event fired when changing the state save field.
+     */
+    this.onStateSave = function (/*event*/)
+    {
+        var state = new dwv.State();
+        state.setUrls(["a","b"]);
+        
+        var data = {
+            "window": 500, 
+            "level": 430,
+            "position": self.getView().getCurrentPosition()
+        };
+        
+        // add href to link (html5)
+        var element = document.getElementById("download-state");
+        element.href = "data:application/json;charset=utf8;base64," +
+            window.btoa(JSON.stringify(data));
     };
 
     /**
@@ -5566,7 +5601,7 @@ dwv.gui.base = dwv.gui.base || {};
  * @namespace dwv.gui.base
  * @constructor
  */
-dwv.gui.base.Loadbox = function (app, fileLoadGui, urlLoadGui)
+dwv.gui.base.Loadbox = function (app, loaders)
 {
     /**
      * Setup the loadbox HTML.
@@ -5596,14 +5631,15 @@ dwv.gui.base.Loadbox = function (app, fileLoadGui, urlLoadGui)
      */
     this.displayLoader = function (name)
     {
-        if( name === "file") {
-            fileLoadGui.display(true);
-            urlLoadGui.display(false);
+        var keys = Object.keys(loaders);
+        for ( var i = 0; i < keys.length; ++i ) {
+            if ( keys[i] === name ) {
+                loaders[keys[i]].display(true);
+            }
+            else {
+                loaders[keys[i]].display(false);
+            }
         }
-        else if( name === "url") {
-            fileLoadGui.display(false);
-            urlLoadGui.display(true);
-        }        
     };
     
 }; // class dwv.gui.base.Loadbox
@@ -8696,6 +8732,13 @@ dwv.io.File.prototype.load = function(ioArray)
         onerror( {'name': "RequestError", 
             'message': "An error occurred while reading the DICOM file: "+event.getMessage() } );
     };
+    
+    // Request error
+    var onErrorJSONReader = function(event)
+    {
+        onerror( {'name': "RequestError", 
+            'message': "An error occurred while reading the JSON file: "+event.getMessage() } );
+    };
 
     // DICOM reader loader
     var onLoadDicomReader = function(event)
@@ -8711,6 +8754,18 @@ dwv.io.File.prototype.load = function(ioArray)
         // force 100% progress (sometimes with firefox)
         var endEvent = {lengthComputable: true, loaded: 1, total: 1};
         dwv.gui.updateProgress(endEvent);
+    };
+
+    // JSON loader
+    var onLoadJSONReader = function(/*event*/)
+    {
+        // parse image file
+        try {
+            // call listener
+            onload(event.target.result);
+        } catch(error) {
+            onerror(error);
+        }
     };
 
     // Image loader
@@ -8734,6 +8789,7 @@ dwv.io.File.prototype.load = function(ioArray)
         // storing values to pass them on
         theImage.file = this.file;
         theImage.index = this.index;
+        // triggered by ctx.drawImage
         theImage.onload = onLoadImageFile;
     };
 
@@ -8742,11 +8798,19 @@ dwv.io.File.prototype.load = function(ioArray)
     {
         var file = ioArray[i];
         var reader = new FileReader();
-        if( file.type.match("image.*") )
+        if ( file.name.split('.').pop().toLowerCase() === "json" )
+        {
+            reader.onload = onLoadJSONReader;
+            reader.onprogress = dwv.gui.updateProgress;
+            reader.onerror = onErrorJSONReader;
+            reader.readAsText(file);
+        }
+        else if ( file.type.match("image.*") )
         {
             // storing values to pass them on
             reader.file = file;
             reader.index = i;
+            // callbacks
             reader.onload = onLoadImageReader;
             reader.onprogress = dwv.gui.updateProgress;
             reader.onerror = onErrorImageReader;
@@ -10356,6 +10420,45 @@ dwv.math.IdGenerator = function ()
         return root++;
     };
 };
+;/** 
+ * Tool module.
+ * @module tool
+ */
+var dwv = dwv || {};
+
+/**
+ * State class.
+ * Saves: data url/path, display info, undo stack.
+ * @class State
+ * @namespace dwv
+ * @constructor
+ * @param {Object} app The associated application.
+ */
+dwv.State = function (/*app*/)
+{
+    var _urls = [];
+    
+    this.setUrls = function (urls) {
+        _urls = urls;
+    };
+    
+    /**
+     * Save state.
+     * @method save
+     */
+    this.toJSON = function () {
+        return $.toJSON({
+            'urls': _urls
+        });
+    };
+    /**
+     * Load state.
+     * @method load
+     */
+    this.fromJSON = function (json) {
+        console.log(json);
+    };
+}; // State class
 ;/** 
  * Tool module.
  * @module tool
