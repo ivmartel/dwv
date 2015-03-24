@@ -283,10 +283,10 @@ dwv.gui.base.WindowLevel = function (app)
     this.setup = function ()
     {
         // preset select
-        var wlSelector = dwv.html.createHtmlSelect(&quot;presetSelect&quot;, app.getPresets());
+        var wlSelector = dwv.html.createHtmlSelect(&quot;presetSelect&quot;, []);
         wlSelector.onchange = app.onChangeWindowLevelPreset;
         // colour map select
-        var cmSelector = dwv.html.createHtmlSelect(&quot;colourMapSelect&quot;,dwv.tool.colourMaps);
+        var cmSelector = dwv.html.createHtmlSelect(&quot;colourMapSelect&quot;, dwv.tool.colourMaps);
         cmSelector.onchange = app.onChangeColourMap;
     
         // preset list element
@@ -332,7 +332,7 @@ dwv.gui.base.WindowLevel = function (app)
     this.initialise = function ()
     {
         // create new preset select
-        var wlSelector = dwv.html.createHtmlSelect(&quot;presetSelect&quot;, app.getPresets());
+        var wlSelector = dwv.html.createHtmlSelect(&quot;presetSelect&quot;, app.getViewController().getPresets());
         wlSelector.onchange = app.onChangeWindowLevelPreset;
         wlSelector.title = &quot;Select w/l preset.&quot;;
         

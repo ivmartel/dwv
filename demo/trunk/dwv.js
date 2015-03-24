@@ -38,8 +38,6 @@ dwv.App = function ()
     var view = null;
     // View controller
     var viewController = null;
-    // Window/level presets
-    var presets = null;
      
     // Info layer plot gui
     var plotInfo = null;
@@ -125,23 +123,11 @@ dwv.App = function ()
     this.getContainerDivId = function () { return containerDivId; };
 
     /** 
-     * Get the view.
-     * @method getView
-     * @return {Image} The associated view.
-     */
-    this.getView = function () { return view; };
-    /** 
      * Get the view controller.
      * @method getViewController
      * @return {Object} The controller.
      */
     this.getViewController = function () { return viewController; };
-    /** 
-     * Get the window/level presets.
-     * @method getPresets
-     * @return {Object} The presets.
-     */
-    this.getPresets = function () { return presets; };
 
     /** 
      * Get the image layer.
@@ -193,8 +179,7 @@ dwv.App = function ()
     {
         return {
             'file': dwv.io.File,
-            'url': dwv.io.Url,
-            'state': dwv.io.File
+            'url': dwv.io.Url
         };        
     };
     
@@ -285,16 +270,13 @@ dwv.App = function ()
             if ( config.gui.indexOf("load") !== -1 ) {
                 var fileLoadGui = new dwv.gui.FileLoad(this);
                 var urlLoadGui = new dwv.gui.UrlLoad(this);
-                var stateSaveGui = new dwv.gui.StateSave(this);
                 loadbox = new dwv.gui.Loadbox(this, 
-                    {"file": fileLoadGui, "url": urlLoadGui, "state": stateSaveGui} );
+                    {"file": fileLoadGui, "url": urlLoadGui} );
                 loadbox.setup();
                 fileLoadGui.setup();
                 urlLoadGui.setup();
-                stateSaveGui.setup();
                 fileLoadGui.display(true);
                 urlLoadGui.display(false);
-                stateSaveGui.display(false);
             }
             // undo
             if ( config.gui.indexOf("undo") !== -1 ) {
@@ -392,21 +374,31 @@ dwv.App = function ()
      * @method loadFiles
      * @param {Array} files The list of files to load.
      */
-    this.loadFiles = function (files) 
+    this.loadFiles = function (files)
+    {
+        // has been checked for emptiness.
+        var ext = files[0].name.split('.').pop().toLowerCase();
+        if ( ext === "json" ) {
+            loadJSONFile(files);
+        }
+        else {
+            loadImageFiles(files);
+        }
+    };
+
+    /**
+     * Load a list of files.
+     * @method loadFiles
+     * @param {Array} files The list of files to load.
+     */
+    function loadImageFiles (files) 
     {
         // clear variables
-        this.reset();
+        self.reset();
         nSlicesToLoad = files.length;
         // create IO
         var fileIO = new dwv.io.File();
         fileIO.onload = function (data) {
-            
-            // TODO better test, binary?
-            if ( data[0] === "{" ) {
-                var state = new dwv.State();
-                state.fromJSON(data);
-                return;
-            }
             
             var isFirst = true;
             if ( image ) {
@@ -430,14 +422,33 @@ dwv.App = function ()
         fileIO.onerror = function (error){ handleError(error); };
         // main load (asynchronous)
         fileIO.load(files);
-    };
+    }
     
+    /**
+     * Load a JSON file.
+     * @method loadJSON
+     * @param {Array} file An array with the file to load.
+     */
+    function loadJSONFile(file) 
+    {
+        // create IO
+        var fileIO = new dwv.io.File();
+        fileIO.onload = function (data) {
+            // load state
+            var state = new dwv.State(self);
+            state.fromJSON(data);
+        };
+        fileIO.onerror = function (error){ handleError(error); };
+        // main load (asynchronous)
+        fileIO.load(file);
+    }
+
     /**
      * Load a list of URLs.
      * @method loadURL
      * @param {Array} urls The list of urls to load.
      */
-    this.loadURL = function (urls) 
+    this.loadURL = function(urls) 
     {
         // clear variables
         this.reset();
@@ -537,13 +548,14 @@ dwv.App = function ()
      */
     this.initWLDisplay = function ()
     {
-        // set window/level
+        // set window/level from first preset
+        var presets = viewController.getPresets();
         var keys = Object.keys(presets);
         viewController.setWindowLevel(
             presets[keys[0]].center, 
             presets[keys[0]].width );
         // default position
-        this.setCurrentPostion(0,0);
+        viewController.setCurrentPosition2D(0,0);
     };
 
     /**
@@ -599,56 +611,6 @@ dwv.App = function ()
         generateAndDrawImage();
     };
     
-    /**
-     * Update the window/level presets.
-     * @function updatePresets
-     * @param {Boolean} full If true, shows all presets.
-     */
-    this.updatePresets = function (full)
-    {    
-        // store the manual preset
-        var manual = null;
-        if ( presets ) {
-            manual = presets.manual;
-        }
-        // reinitialize the presets
-        presets = {};
-        
-        // DICOM presets
-        var dicomPresets = this.getView().getWindowPresets();
-        if ( dicomPresets ) {
-            if ( full ) {
-                for( var i = 0; i < dicomPresets.length; ++i ) {
-                    presets[dicomPresets[i].name.toLowerCase()] = dicomPresets[i];
-                }
-            }
-            // just the first one
-            else {
-                presets["default"] = dicomPresets[0];
-            }
-        }
-        
-        // min/max preset
-        var range = this.getImage().getRescaledDataRange();
-        var width = range.max - range.min;
-        var center = range.min + width/2;
-        presets["min/max"] = {"center": center, "width": width};
-        // modality presets
-        var modality = this.getImage().getMeta().Modality;
-        for( var key in dwv.tool.defaultpresets[modality] ) {
-            presets[key] = dwv.tool.defaultpresets[modality][key];
-        }
-        if ( full ) {
-            for( var key2 in dwv.tool.defaultpresets[modality+"extra"] ) {
-                presets[key2] = dwv.tool.defaultpresets[modality+"extra"][key2];
-            }
-        }
-        // manual preset
-        if ( manual ){
-            presets.manual = manual;
-        }
-    };
-
     // Handler Methods -----------------------------------------------------------
 
     /**
@@ -769,7 +731,10 @@ dwv.App = function ()
      */
     this.onChangeFiles = function (event)
     {
-        self.loadFiles(event.target.files);
+        var files = event.target.files;
+        if ( files.length !== 0 ) {
+            self.loadFiles(files);
+        }  
     };
 
     /**
@@ -779,30 +744,10 @@ dwv.App = function ()
      */
     this.onStateSave = function (/*event*/)
     {
-        var state = new dwv.State();
-        state.setUrls(["a","b"]);
-        
-        var data = {
-            "window": 500, 
-            "level": 430,
-            "position": self.getView().getCurrentPosition()
-        };
-        
+        var state = new dwv.State(self);
         // add href to link (html5)
         var element = document.getElementById("download-state");
-        element.href = "data:application/json;charset=utf8;base64," +
-            window.btoa(JSON.stringify(data));
-    };
-
-    /**
-     * Set the current position.
-     * @method setCurrentPostion
-     * @param {Number} i The column index.
-     * @param {Number} j The row index.
-     */
-    this.setCurrentPostion = function (i,j)
-    {
-        viewController.setCurrentPosition(i,j);
+        element.href = "data:application/json;charset=utf8;base64," + state.toJSON();
     };
 
     /**
@@ -823,14 +768,14 @@ dwv.App = function ()
     this.onChangeWindowLevelPreset = function (/*event*/)
     {
         var name = this.value;
+        var preset = viewController.getPresets()[name];
         // check if we have it
-        if ( !presets[name] ) {
+        if ( !preset ) {
             throw new Error("Unknown window level preset: '" + name + "'");
         }
         // enable it
         viewController.setWindowLevel( 
-            presets[name].center, 
-            presets[name].width );
+            preset.center, preset.width );
     };
 
     /**
@@ -936,6 +881,66 @@ dwv.App = function ()
         var select = document.getElementById("presetSelect");
         select.selectedIndex = 0;
         dwv.gui.refreshSelect("#presetSelect");
+    };
+
+    /**
+     * Apply the zoom to the layers.
+     * @method zoomLayers
+     * @param {Number} step The zoom step increment. A good step is of 0.1.
+     * @param {Number} cx The zoom center X coordinate.
+     * @param {Number} cy The zoom center Y coordinate.
+     */ 
+    this.zoomLayers = function (step, cx, cy)
+    {
+        if( this.getImageLayer() ) {
+            var layer = this.getImageLayer();
+            var oldZoom = layer.getZoom();
+            var newZoom = {'x': (oldZoom.x + step), 'y': (oldZoom.y + step)};
+            layer.zoom(newZoom.x, newZoom.y, cx, cy);
+            layer.draw();
+        }
+        if( this.getDrawStage() ) { 
+            
+            var stage = this.getDrawStage();
+            var oldKZoom = stage.scale();
+            var newKZoom = {'x': (oldKZoom.x + step), 'y': (oldKZoom.y + step)};
+            
+            var oldOffset = stage.offset();
+            var newOffsetX = (cx / oldKZoom.x) + oldOffset.x - (cx / newKZoom.x);
+            var newOffsetY = (cy / oldKZoom.y) + oldOffset.y - (cy / newKZoom.y);
+            var newOffset = { 'x': newOffsetX, 'y': newOffsetY };
+            
+            stage.offset( newOffset );
+            stage.scale( newKZoom );
+            stage.draw();
+        }
+    };
+
+    /**
+     * Apply a translation to the layers.
+     * @method translateLayers
+     * @param {Number} tx The translation along X.
+     * @param {Number} ty The translation along Y.
+     */ 
+    this.translateLayers = function (tx, ty)
+    {
+        if( this.getImageLayer() ) {
+            var layer = this.getImageLayer();
+            var zoom = layer.getZoom();
+            var txx = tx / zoom.x;
+            var tyy = ty / zoom.y;
+            layer.translate(txx, tyy);
+            layer.draw();
+        }
+        if( this.getDrawStage() ) { 
+            var stage = this.getDrawStage();
+            var offset = stage.offset();
+            var kzoom = stage.scale();
+            offset.x -= tx / kzoom.x;
+            offset.y -= ty / kzoom.y;
+            stage.offset( offset );
+            stage.draw();
+        }
     };
 
     // Private Methods -----------------------------------------------------------
@@ -1210,6 +1215,9 @@ dwv.App = function ()
         view.addEventListener("colorchange", self.onColorChange);
         view.addEventListener("slicechange", self.onSliceChange);
         
+        // update presets with loaded image (used in w/l tool)
+        viewController.updatePresets(image, true);
+
         // initialise the toolbox
         if ( toolbox ) {
             // mouse and touch listeners
@@ -1254,70 +1262,52 @@ dwv.App = function ()
             addImageInfoListeners();
         }
         
-        // init W/L display
-        self.updatePresets(true);
+        // init W/L display: triggers a wlchange event
+        //   listened by the view and a general display.
         self.initWLDisplay();        
     }
 
 };
+;/** 
+ * Tool module.
+ * @module tool
+ */
+var dwv = dwv || {};
 
 /**
- * View controller.
- * @class ViewController
+ * State class.
+ * Saves: data url/path, display info, undo stack.
+ * @class State
  * @namespace dwv
  * @constructor
+ * @param {Object} app The associated application.
  */
-dwv.ViewController = function ( view )
+dwv.State = function (app)
 {
     /**
-     * Set the current position.
-     * @method setWindowLevel
-     * @param {Number} i The column index.
-     * @param {Number} j The row index.
+     * Save state.
+     * @method save
      */
-    this.setCurrentPosition = function (i, j)
-    {
-        view.setCurrentPosition( { 
-            "i": i, "j": j, "k": view.getCurrentPosition().k});
+    this.toJSON = function () {
+        var data = {
+            "window-center": app.getViewController().getWindowLevel().center, 
+            "window-width": app.getViewController().getWindowLevel().width,
+            "position": app.getViewController().getCurrentPosition()
+        };
+        return window.btoa(JSON.stringify(data));
     };
-    
     /**
-     * Set the window/level.
-     * @method setWindowLevel
-     * @param {Number} wc The window center.
-     * @param {Number} ww The window width.
+     * Load state.
+     * @method load
      */
-    this.setWindowLevel = function (wc, ww)
-    {
-        view.setWindowLevel(wc,ww);
+    this.fromJSON = function (json) {
+        var data = JSON.parse(json);
+        app.getViewController().setWindowLevel(data["window-center"], data["window-width"]);
+        app.getViewController().setCurrentPosition(data.position);
     };
-
-    /**
-     * Set the colour map.
-     * @method setColourMap
-     * @param {Object} colourMap The colour map.
-     */
-    this.setColourMap = function (colourMap)
-    {
-        view.setColorMap(colourMap);
-    };
-
-    /**
-     * Set the colour map from a name.
-     * @function setColourMapFromName
-     * @param {String} name The name of the colour map to set.
-     */
-    this.setColourMapFromName = function (name)
-    {
-        // check if we have it
-        if ( !dwv.tool.colourMaps[name] ) {
-            throw new Error("Unknown colour map: '" + name + "'");
-        }
-        // enable it
-        this.setColourMap( dwv.tool.colourMaps[name] );
-    };
-    
-}; // class dwv.ViewController
+}; // State class
+;// Main DWV namespace.
+var dwv = dwv || {};
 
 /**
  * Toolbox controller.
@@ -1392,6 +1382,210 @@ dwv.ToolboxController = function (toolbox)
     };
     
 }; // class dwv.ToolboxController
+;// Main DWV namespace.
+var dwv = dwv || {};
+
+/**
+ * View controller.
+ * @class ViewController
+ * @namespace dwv
+ * @constructor
+ */
+dwv.ViewController = function ( view )
+{
+    // Window/level presets
+    var presets = null;
+
+    /** 
+     * Get the window/level presets.
+     * @method getPresets
+     * @return {Object} The presets.
+     */
+    this.getPresets = function () { return presets; };
+
+    /**
+     * Get the current position.
+     * @method getCurrentPosition
+     * @return {Object} The position.
+      */
+    this.getCurrentPosition = function ()
+    {
+        return view.getCurrentPosition();
+    };
+    
+    /**
+     * Set the current position.
+     * @method setCurrentPosition2D
+     * @param {Object} pos The position.
+     * @return {Boolean} False if not in bounds.
+      */
+    this.setCurrentPosition = function (pos)
+    {
+        return view.setCurrentPosition(pos);
+    };
+
+    /**
+     * Set the current 2D (i,j) position.
+     * @method setCurrentPosition2D
+     * @param {Number} i The column index.
+     * @param {Number} j The row index.
+     * @return {Boolean} False if not in bounds.
+      */
+    this.setCurrentPosition2D = function (i, j)
+    {
+        return view.setCurrentPosition({ 
+            "i": i, 
+            "j": j, 
+            "k": view.getCurrentPosition().k
+        });
+    };
+    
+    /**
+     * Increment the current slice number.
+     * @method incrementSliceNb
+     * @return {Boolean} False if not in bounds.
+     */
+    this.incrementSliceNb = function ()
+    {
+        return view.setCurrentPosition({
+            "i": view.getCurrentPosition().i,
+            "j": view.getCurrentPosition().j,
+            "k": view.getCurrentPosition().k + 1 
+        });
+    };
+
+    /**
+     * Decrement the current slice number.
+     * @method decrementSliceNb
+     * @return {Boolean} False if not in bounds.
+     */
+    this.decrementSliceNb = function ()
+    {
+        return view.setCurrentPosition({
+            "i": view.getCurrentPosition().i,
+            "j": view.getCurrentPosition().j,
+            "k": view.getCurrentPosition().k - 1 
+        });
+    };
+
+    /**
+     * Go to first slice .
+     * @method goFirstSlice
+     * @return {Boolean} False if not in bounds.
+     */
+    this.goFirstSlice = function()
+    {
+        return view.setCurrentPosition({
+            "i": view.getCurrentPosition().i,
+            "j": view.getCurrentPosition().j,
+            "k":  0 
+        });
+    };
+
+    /**
+     * Get the window/level.
+     * @method getWindowLevel
+     * @return {Object} The window center and width.
+     */
+    this.getWindowLevel = function ()
+    {
+        return { 
+            "width": view.getWindowLut().getWidth(),
+            "center": view.getWindowLut().getCenter() 
+        };
+    };
+
+    /**
+     * Set the window/level.
+     * @method setWindowLevel
+     * @param {Number} wc The window center.
+     * @param {Number} ww The window width.
+     */
+    this.setWindowLevel = function (wc, ww)
+    {
+        view.setWindowLevel(wc,ww);
+    };
+
+    /**
+     * Update the window/level presets.
+     * @function updatePresets
+     * @param {Object} image The associated image.
+     * @param {Boolean} full If true, shows all presets.
+     */
+    this.updatePresets = function (image)
+    {    
+        // store the manual preset
+        var manual = null;
+        if ( presets ) {
+            manual = presets.manual;
+        }
+        // reinitialize the presets
+        presets = {};
+        
+        // DICOM presets
+        var dicomPresets = view.getWindowPresets();
+        if ( dicomPresets ) {
+            for( var i = 0; i < dicomPresets.length; ++i ) {
+                presets[dicomPresets[i].name.toLowerCase()] = dicomPresets[i];
+            }
+        }
+        
+        // Image presets
+        
+        // min/max preset
+        var range = image.getRescaledDataRange();
+        var width = range.max - range.min;
+        var center = range.min + width/2;
+        presets["min/max"] = {"center": center, "width": width};
+        // modality presets
+        var modality = image.getMeta().Modality;
+        for( var key in dwv.tool.defaultpresets[modality] ) {
+            presets[key] = dwv.tool.defaultpresets[modality][key];
+        }
+        
+        // Manual preset
+        if ( manual ){
+            presets.manual = manual;
+        }
+    };
+
+    /**
+     * Get the colour map.
+     * @method getColourMap
+     * @return {Object} The colour map.
+     */
+    this.getColourMap = function ()
+    {
+        return view.getColorMap();
+    };
+
+    /**
+     * Set the colour map.
+     * @method setColourMap
+     * @param {Object} colourMap The colour map.
+     */
+    this.setColourMap = function (colourMap)
+    {
+        view.setColorMap(colourMap);
+    };
+
+    /**
+     * Set the colour map from a name.
+     * @function setColourMapFromName
+     * @param {String} name The name of the colour map to set.
+     */
+    this.setColourMapFromName = function (name)
+    {
+        // check if we have it
+        if ( !dwv.tool.colourMaps[name] ) {
+            throw new Error("Unknown colour map: '" + name + "'");
+        }
+        // enable it
+        this.setColourMap( dwv.tool.colourMaps[name] );
+    };
+    
+}; // class dwv.ViewController
+
 ;/** 
  * DICOM module.
  * @module dicom
@@ -5945,10 +6139,10 @@ dwv.gui.base.WindowLevel = function (app)
     this.setup = function ()
     {
         // preset select
-        var wlSelector = dwv.html.createHtmlSelect("presetSelect", app.getPresets());
+        var wlSelector = dwv.html.createHtmlSelect("presetSelect", []);
         wlSelector.onchange = app.onChangeWindowLevelPreset;
         // colour map select
-        var cmSelector = dwv.html.createHtmlSelect("colourMapSelect",dwv.tool.colourMaps);
+        var cmSelector = dwv.html.createHtmlSelect("colourMapSelect", dwv.tool.colourMaps);
         cmSelector.onchange = app.onChangeColourMap;
     
         // preset list element
@@ -5994,7 +6188,7 @@ dwv.gui.base.WindowLevel = function (app)
     this.initialise = function ()
     {
         // create new preset select
-        var wlSelector = dwv.html.createHtmlSelect("presetSelect", app.getPresets());
+        var wlSelector = dwv.html.createHtmlSelect("presetSelect", app.getViewController().getPresets());
         wlSelector.onchange = app.onChangeWindowLevelPreset;
         wlSelector.title = "Select w/l preset.";
         
@@ -8447,46 +8641,6 @@ dwv.image.View.prototype.setWindowLevelMinMax = function()
     // set window level
     this.setWindowLevel(center,width);
 };
-/**
- * Go to first slice .
- * @method goFirstSlice
- * @return {Boolean} False if not in bounds.
- */
-dwv.image.View.prototype.goFirstSlice = function()
-{
-    return this.setCurrentPosition({
-        "i": this.getCurrentPosition().i,
-        "j": this.getCurrentPosition().j,
-        "k":  0 
-    });
-};
-/**
- * Increment the current slice number.
- * @method incrementSliceNb
- * @return {Boolean} False if not in bounds.
- */
-dwv.image.View.prototype.incrementSliceNb = function()
-{
-    return this.setCurrentPosition({
-        "i": this.getCurrentPosition().i,
-        "j": this.getCurrentPosition().j,
-        "k": this.getCurrentPosition().k + 1 
-    });
-};
-
-/**
- * Decrement the current slice number.
- * @method decrementSliceNb
- * @return {Boolean} False if not in bounds.
- */
-dwv.image.View.prototype.decrementSliceNb = function()
-{
-    return this.setCurrentPosition({
-        "i": this.getCurrentPosition().i,
-        "j": this.getCurrentPosition().j,
-        "k": this.getCurrentPosition().k - 1 
-    });
-};
 
 /**
  * Generate display image data to be given to a canvas.
@@ -10425,45 +10579,6 @@ dwv.math.IdGenerator = function ()
  * @module tool
  */
 var dwv = dwv || {};
-
-/**
- * State class.
- * Saves: data url/path, display info, undo stack.
- * @class State
- * @namespace dwv
- * @constructor
- * @param {Object} app The associated application.
- */
-dwv.State = function (/*app*/)
-{
-    var _urls = [];
-    
-    this.setUrls = function (urls) {
-        _urls = urls;
-    };
-    
-    /**
-     * Save state.
-     * @method save
-     */
-    this.toJSON = function () {
-        return $.toJSON({
-            'urls': _urls
-        });
-    };
-    /**
-     * Load state.
-     * @method load
-     */
-    this.fromJSON = function (json) {
-        console.log(json);
-    };
-}; // State class
-;/** 
- * Tool module.
- * @module tool
- */
-var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
 var Kinetic = Kinetic || {};
 
@@ -12338,7 +12453,7 @@ dwv.info.MiniColorMap = function ( app )
         var context = canvas.getContext('2d');
         
         // fill in the image data
-        var colourMap = app.getView().getColorMap();
+        var colourMap = app.getViewController().getColourMap();
         var imageData = context.getImageData(0,0,canvas.width, canvas.height);
         
         var c = 0;
@@ -13425,10 +13540,10 @@ dwv.tool.Scroll = function(app)
         }
         // update GUI
         if( diffY > 0 ) {
-            app.getView().incrementSliceNb();
+            app.getViewController().incrementSliceNb();
         }
         else {
-            app.getView().decrementSliceNb();
+            app.getViewController().decrementSliceNb();
         }
         // reset origin point
         self.x0 = event._x;
@@ -13492,10 +13607,10 @@ dwv.tool.Scroll = function(app)
     this.DOMMouseScroll = function(event){
         // ev.detail on firefox is 3
         if( event.detail < 0 ) {
-            app.getView().incrementSliceNb();
+            app.getViewController().incrementSliceNb();
         }
         else {
-            app.getView().decrementSliceNb();
+            app.getViewController().decrementSliceNb();
         }
     };
 
@@ -13507,10 +13622,10 @@ dwv.tool.Scroll = function(app)
     this.mousewheel = function(event){
         // ev.wheelDelta on chrome is 120
         if( event.wheelDelta > 0 ) {
-            app.getView().incrementSliceNb();
+            app.getViewController().incrementSliceNb();
         }
         else {
-            app.getView().decrementSliceNb();
+            app.getViewController().decrementSliceNb();
         }
     };
     /**
@@ -13862,26 +13977,6 @@ var dwv = dwv || {};
  */
 dwv.tool = dwv.tool || {};
 
-// Default colour maps.
-dwv.tool.colourMaps = {
-    "plain": dwv.image.lut.plain,
-    "invplain": dwv.image.lut.invPlain,
-    "rainbow": dwv.image.lut.rainbow,
-    "hot": dwv.image.lut.hot,
-    "test": dwv.image.lut.test
-};
-// Default window level presets.
-dwv.tool.defaultpresets = {};
-dwv.tool.defaultpresets.CT = {
-    "mediastinum": {"center": 40, "width": 400},
-    "lung": {"center": -500, "width": 1500},
-    "bone": {"center": 500, "width": 2000},
-};
-dwv.tool.defaultpresets.CTextra = {
-    "brain": {"center": 40, "width": 80},
-    "head": {"center": 90, "width": 350}
-};
-
 /**
  * WindowLevel tool: handle window/level related events.
  * @class WindowLevel
@@ -13923,7 +14018,7 @@ dwv.tool.WindowLevel = function(app)
         self.x0 = event._x;
         self.y0 = event._y;
         // update GUI
-        app.setCurrentPostion(event._x, event._y);
+        app.getViewController().setCurrentPosition2D(event._x, event._y);
     };
     
     /**
@@ -13940,8 +14035,8 @@ dwv.tool.WindowLevel = function(app)
         var diffX = event._x - self.x0;
         var diffY = self.y0 - event._y;
         // calculate new window level
-        var windowCenter = parseInt(app.getView().getWindowLut().getCenter(), 10) + diffY;
-        var windowWidth = parseInt(app.getView().getWindowLut().getWidth(), 10) + diffX;
+        var windowCenter = parseInt(app.getViewController().getWindowLevel().center, 10) + diffY;
+        var windowWidth = parseInt(app.getViewController().getWindowLevel().width, 10) + diffX;
         // update GUI
         app.getViewController().setWindowLevel(windowCenter,windowWidth);
         // store position
@@ -13959,9 +14054,9 @@ dwv.tool.WindowLevel = function(app)
         if( self.started ) {
             self.started = false;
             // store the manual preset
-            var windowCenter = parseInt(app.getView().getWindowLut().getCenter(), 10);
-            var windowWidth = parseInt(app.getView().getWindowLut().getWidth(), 10);
-            app.getPresets().manual = {"center": windowCenter, "width": windowWidth};
+            var windowCenter = parseInt(app.getViewController().getWindowLevel().center, 10);
+            var windowWidth = parseInt(app.getViewController().getWindowLevel().width, 10);
+            app.getViewController().getPresets().manual = {"center": windowCenter, "width": windowWidth};
             // update gui
             if ( gui ) {
                 gui.initialise();
@@ -14016,8 +14111,9 @@ dwv.tool.WindowLevel = function(app)
     this.dblclick = function(event){
         // update GUI
         app.getViewController().setWindowLevel(
-            parseInt(app.getImage().getRescaledValue(event._x, event._y, app.getView().getCurrentPosition().k), 10),
-            parseInt(app.getView().getWindowLut().getWidth(), 10) );    
+            parseInt(app.getImage().getRescaledValue(
+                event._x, event._y, app.getViewController().getCurrentPosition().k), 10),
+            parseInt(app.getViewController().getWindowLevel().width, 10) );    
     };
     
     /**
@@ -14063,7 +14159,6 @@ dwv.tool.WindowLevel = function(app)
      * @method init
      */
     this.init = function() {
-        app.updatePresets(true);
         if ( gui ) {
             gui.initialise();
         }
@@ -14175,7 +14270,7 @@ dwv.tool.ZoomAndPan = function(app)
         var tx = event._xs - self.x0;
         var ty = event._ys - self.y0;
         // apply translation
-        translateLayers(tx, ty);
+        app.translateLayers(tx, ty);
         // reset origin point
         self.x0 = event._xs;
         self.y0 = event._ys;
@@ -14207,10 +14302,10 @@ dwv.tool.ZoomAndPan = function(app)
             }
             // update GUI
             if( diffY > 0 ) {
-                app.getView().incrementSliceNb();
+                app.getViewController().incrementSliceNb();
             }
             else {
-                app.getView().decrementSliceNb();
+                app.getViewController().decrementSliceNb();
             }
         }
         else
@@ -14218,7 +14313,7 @@ dwv.tool.ZoomAndPan = function(app)
             // zoom mode
             var zoom = (lineRatio - 1) / 2;
             if( Math.abs(zoom) % 0.1 <= 0.05 ) {
-                zoomLayers(zoom, self.midPoint.getX(), self.midPoint.getY(),event._xs, event._ys);
+                app.zoomLayers(zoom, event._xs, event._ys);
             }
         }
     };
@@ -14292,7 +14387,7 @@ dwv.tool.ZoomAndPan = function(app)
     this.DOMMouseScroll = function(event){
         // ev.detail on firefox is 3
         var step = - event.detail / 30;
-        zoomLayers(step, event._x, event._y, event._xs, event._ys);
+        app.zoomLayers(step, event._xs, event._ys);
     };
 
     /**
@@ -14303,7 +14398,7 @@ dwv.tool.ZoomAndPan = function(app)
     this.mousewheel = function(event){
         // ev.wheelDelta on chrome is 120
         var step = event.wheelDelta / 1200;
-        zoomLayers(step, event._x, event._y, event._xs, event._ys);
+        app.zoomLayers(step, event._xs, event._ys);
     };
     
     /**
@@ -14335,65 +14430,6 @@ dwv.tool.ZoomAndPan = function(app)
             gui.display(bool);
         }
     };
-
-    /**
-     * Apply the zoom to the layers.
-     * @method zoomLayers
-     * @param {Number} step The zoom step increment. A good step is of 0.1.
-     * @param {Number} cx The zoom center X coordinate.
-     * @param {Number} cy The zoom center Y coordinate.
-     */ 
-    function zoomLayers(step, cx, cy, cx2, cy2)
-    {
-        if( app.getImageLayer() ) {
-            var oldZoom = app.getImageLayer().getZoom();
-            var newZoom = {'x': (oldZoom.x + step), 'y': (oldZoom.y + step)};
-            app.getImageLayer().zoom(newZoom.x, newZoom.y, cx2, cy2);
-            app.getImageLayer().draw();
-        }
-        if( app.getDrawStage() ) { 
-            
-            var stage = app.getDrawStage();
-            var oldKZoom = stage.scale();
-            var newKZoom = {'x': (oldKZoom.x + step), 'y': (oldKZoom.y + step)};
-            
-            var oldOffset = stage.offset();
-            var newOffsetX = (cx2 / oldKZoom.x) + oldOffset.x - (cx2 / newKZoom.x);
-            var newOffsetY = (cy2 / oldKZoom.y) + oldOffset.y - (cy2 / newKZoom.y);
-            var newOffset = { 'x': newOffsetX, 'y': newOffsetY };
-            
-            stage.offset( newOffset );
-            stage.scale( newKZoom );
-            stage.draw();
-        }
-    }
-
-    /**
-     * Apply a translation to the layers.
-     * @method translateLayers
-     * @param {Number} tx The translation along X.
-     * @param {Number} ty The translation along Y.
-     */ 
-    function translateLayers(tx, ty)
-    {
-        if( app.getImageLayer() ) {
-            var layer = app.getImageLayer();
-            var zoom = layer.getZoom();
-            var txx = tx / zoom.x;
-            var tyy = ty / zoom.y;
-            layer.translate(txx, tyy);
-            layer.draw();
-        }
-        if( app.getDrawStage() ) { 
-            var stage = app.getDrawStage();
-            var offset = stage.offset();
-            var kzoom = stage.scale();
-            offset.x -= tx / kzoom.x;
-            offset.y -= ty / kzoom.y;
-            stage.offset( offset );
-            stage.draw();
-        }
-    }
 
 }; // ZoomAndPan class
 

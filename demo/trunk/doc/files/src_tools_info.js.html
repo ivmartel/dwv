@@ -347,7 +347,7 @@ dwv.info.MiniColorMap = function ( app )
         var context = canvas.getContext(&#x27;2d&#x27;);
         
         // fill in the image data
-        var colourMap = app.getView().getColorMap();
+        var colourMap = app.getViewController().getColourMap();
         var imageData = context.getImageData(0,0,canvas.width, canvas.height);
         
         var c = 0;

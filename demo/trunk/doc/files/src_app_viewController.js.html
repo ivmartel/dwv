@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>utils - dwv</title>
+    <title>src/app/viewController.js - dwv</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
     <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
@@ -171,38 +171,216 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-<h1>utils Module</h1>
-<div class="box clearfix meta">
+<h1 class="file-heading">File: src/app/viewController.js</h1>
+
+<div class="file">
+    <pre class="code prettyprint linenums">
+// Main DWV namespace.
+var dwv = dwv || {};
+
+/**
+ * View controller.
+ * @class ViewController
+ * @namespace dwv
+ * @constructor
+ */
+dwv.ViewController = function ( view )
+{
+    // Window/level presets
+    var presets = null;
+
+    /** 
+     * Get the window/level presets.
+     * @method getPresets
+     * @return {Object} The presets.
+     */
+    this.getPresets = function () { return presets; };
+
+    /**
+     * Get the current position.
+     * @method getCurrentPosition
+     * @return {Object} The position.
+      */
+    this.getCurrentPosition = function ()
+    {
+        return view.getCurrentPosition();
+    };
+    
+    /**
+     * Set the current position.
+     * @method setCurrentPosition2D
+     * @param {Object} pos The position.
+     * @return {Boolean} False if not in bounds.
+      */
+    this.setCurrentPosition = function (pos)
+    {
+        return view.setCurrentPosition(pos);
+    };
+
+    /**
+     * Set the current 2D (i,j) position.
+     * @method setCurrentPosition2D
+     * @param {Number} i The column index.
+     * @param {Number} j The row index.
+     * @return {Boolean} False if not in bounds.
+      */
+    this.setCurrentPosition2D = function (i, j)
+    {
+        return view.setCurrentPosition({ 
+            &quot;i&quot;: i, 
+            &quot;j&quot;: j, 
+            &quot;k&quot;: view.getCurrentPosition().k
+        });
+    };
+    
+    /**
+     * Increment the current slice number.
+     * @method incrementSliceNb
+     * @return {Boolean} False if not in bounds.
+     */
+    this.incrementSliceNb = function ()
+    {
+        return view.setCurrentPosition({
+            &quot;i&quot;: view.getCurrentPosition().i,
+            &quot;j&quot;: view.getCurrentPosition().j,
+            &quot;k&quot;: view.getCurrentPosition().k + 1 
+        });
+    };
+
+    /**
+     * Decrement the current slice number.
+     * @method decrementSliceNb
+     * @return {Boolean} False if not in bounds.
+     */
+    this.decrementSliceNb = function ()
+    {
+        return view.setCurrentPosition({
+            &quot;i&quot;: view.getCurrentPosition().i,
+            &quot;j&quot;: view.getCurrentPosition().j,
+            &quot;k&quot;: view.getCurrentPosition().k - 1 
+        });
+    };
+
+    /**
+     * Go to first slice .
+     * @method goFirstSlice
+     * @return {Boolean} False if not in bounds.
+     */
+    this.goFirstSlice = function()
+    {
+        return view.setCurrentPosition({
+            &quot;i&quot;: view.getCurrentPosition().i,
+            &quot;j&quot;: view.getCurrentPosition().j,
+            &quot;k&quot;:  0 
+        });
+    };
+
+    /**
+     * Get the window/level.
+     * @method getWindowLevel
+     * @return {Object} The window center and width.
+     */
+    this.getWindowLevel = function ()
+    {
+        return { 
+            &quot;width&quot;: view.getWindowLut().getWidth(),
+            &quot;center&quot;: view.getWindowLut().getCenter() 
+        };
+    };
+
+    /**
+     * Set the window/level.
+     * @method setWindowLevel
+     * @param {Number} wc The window center.
+     * @param {Number} ww The window width.
+     */
+    this.setWindowLevel = function (wc, ww)
+    {
+        view.setWindowLevel(wc,ww);
+    };
+
+    /**
+     * Update the window/level presets.
+     * @function updatePresets
+     * @param {Object} image The associated image.
+     * @param {Boolean} full If true, shows all presets.
+     */
+    this.updatePresets = function (image)
+    {    
+        // store the manual preset
+        var manual = null;
+        if ( presets ) {
+            manual = presets.manual;
+        }
+        // reinitialize the presets
+        presets = {};
+        
+        // DICOM presets
+        var dicomPresets = view.getWindowPresets();
+        if ( dicomPresets ) {
+            for( var i = 0; i &lt; dicomPresets.length; ++i ) {
+                presets[dicomPresets[i].name.toLowerCase()] = dicomPresets[i];
+            }
+        }
+        
+        // Image presets
+        
+        // min/max preset
+        var range = image.getRescaledDataRange();
+        var width = range.max - range.min;
+        var center = range.min + width/2;
+        presets[&quot;min/max&quot;] = {&quot;center&quot;: center, &quot;width&quot;: width};
+        // modality presets
+        var modality = image.getMeta().Modality;
+        for( var key in dwv.tool.defaultpresets[modality] ) {
+            presets[key] = dwv.tool.defaultpresets[modality][key];
+        }
+        
+        // Manual preset
+        if ( manual ){
+            presets.manual = manual;
+        }
+    };
+
+    /**
+     * Get the colour map.
+     * @method getColourMap
+     * @return {Object} The colour map.
+     */
+    this.getColourMap = function ()
+    {
+        return view.getColorMap();
+    };
+
+    /**
+     * Set the colour map.
+     * @method setColourMap
+     * @param {Object} colourMap The colour map.
+     */
+    this.setColourMap = function (colourMap)
+    {
+        view.setColorMap(colourMap);
+    };
+
+    /**
+     * Set the colour map from a name.
+     * @function setColourMapFromName
+     * @param {String} name The name of the colour map to set.
+     */
+    this.setColourMapFromName = function (name)
+    {
+        // check if we have it
+        if ( !dwv.tool.colourMaps[name] ) {
+            throw new Error(&quot;Unknown colour map: &#x27;&quot; + name + &quot;&#x27;&quot;);
+        }
+        // enable it
+        this.setColourMap( dwv.tool.colourMaps[name] );
+    };
+    
+}; // class dwv.ViewController
 
 
-        <div class="foundat">
-            Defined in: <a href="../files/src_utils_string.js.html#l6"><code>src&#x2F;utils&#x2F;string.js:6</code></a>
-        </div>
-
-</div>
-
-
-<div class="box intro">
-    <p>Utility module.</p>
-
-</div>
-
-
-<div class="yui3-g">
-    <div class="yui3-u-1-2">
-            <p>This module provides the following classes:</p>
-
-            <ul class="module-classes">
-                <li class="module-class">
-                    <a href="../classes/dwv.utils.html">
-                        dwv.utils
-                    </a>
-                </li>
-            </ul>
-    </div>
-
-    <div class="yui3-u-1-2">
-    </div>
+    </pre>
 </div>
                     </div>
                 </div>
