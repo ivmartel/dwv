@@ -845,7 +845,7 @@
             "module": "tool",
             "namespace": "dwv",
             "file": "src/app/state.js",
-            "line": 7,
+            "line": 9,
             "description": "State class.\nSaves: data url/path, display info, undo stack.",
             "is_constructor": 1,
             "params": [
@@ -1969,7 +1969,7 @@
             "module": "tool",
             "namespace": "dwv.tool",
             "file": "src/tools/draw.js",
-            "line": 45,
+            "line": 57,
             "description": "Move group command.",
             "is_constructor": 1
         },
@@ -1984,7 +1984,7 @@
             "module": "tool",
             "namespace": "dwv.tool",
             "file": "src/tools/draw.js",
-            "line": 88,
+            "line": 100,
             "description": "Change group command.",
             "is_constructor": 1
         },
@@ -1999,7 +1999,7 @@
             "module": "tool",
             "namespace": "dwv.tool",
             "file": "src/tools/draw.js",
-            "line": 125,
+            "line": 137,
             "description": "Delete group command.",
             "is_constructor": 1
         },
@@ -2014,7 +2014,7 @@
             "module": "tool",
             "namespace": "dwv.tool",
             "file": "src/tools/draw.js",
-            "line": 161,
+            "line": 173,
             "description": "Drawing tool.",
             "is_constructor": 1,
             "params": [
@@ -3416,7 +3416,7 @@
         },
         {
             "file": "src/app/state.js",
-            "line": 17,
+            "line": 19,
             "description": "Save state.",
             "itemtype": "method",
             "name": "save",
@@ -3426,7 +3426,7 @@
         },
         {
             "file": "src/app/state.js",
-            "line": 29,
+            "line": 32,
             "description": "Load state.",
             "itemtype": "method",
             "name": "load",
@@ -9191,7 +9191,17 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 53,
+            "line": 43,
+            "description": "Get a JSON representation of the object.",
+            "itemtype": "method",
+            "name": "toJSON",
+            "class": "dwv.tool.DrawGroupCommand",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/draw.js",
+            "line": 65,
             "description": "Get the command name.",
             "itemtype": "method",
             "name": "getName",
@@ -9205,7 +9215,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 60,
+            "line": 72,
             "description": "Execute the command.",
             "itemtype": "method",
             "name": "execute",
@@ -9215,7 +9225,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 73,
+            "line": 85,
             "description": "Undo the command.",
             "itemtype": "method",
             "name": "undo",
@@ -9225,7 +9235,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 96,
+            "line": 108,
             "description": "Get the command name.",
             "itemtype": "method",
             "name": "getName",
@@ -9239,7 +9249,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 103,
+            "line": 115,
             "description": "Execute the command.",
             "itemtype": "method",
             "name": "execute",
@@ -9249,7 +9259,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 113,
+            "line": 125,
             "description": "Undo the command.",
             "itemtype": "method",
             "name": "undo",
@@ -9259,7 +9269,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 133,
+            "line": 145,
             "description": "Get the command name.",
             "itemtype": "method",
             "name": "getName",
@@ -9273,7 +9283,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 139,
+            "line": 151,
             "description": "Execute the command.",
             "itemtype": "method",
             "name": "execute",
@@ -9283,7 +9293,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 149,
+            "line": 161,
             "description": "Undo the command.",
             "itemtype": "method",
             "name": "undo",
@@ -9293,7 +9303,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 170,
+            "line": 182,
             "description": "Closure to self: to be used by event handlers.",
             "itemtype": "property",
             "name": "self",
@@ -9306,7 +9316,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 177,
+            "line": 189,
             "description": "Draw GUI.",
             "itemtype": "property",
             "name": "gui",
@@ -9317,7 +9327,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 183,
+            "line": 195,
             "description": "Interaction start flag.",
             "itemtype": "property",
             "name": "started",
@@ -9330,7 +9340,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 191,
+            "line": 203,
             "description": "Shape factory list",
             "itemtype": "property",
             "name": "shapeFactoryList",
@@ -9341,7 +9351,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 197,
+            "line": 209,
             "description": "Draw command.",
             "itemtype": "property",
             "name": "command",
@@ -9354,7 +9364,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 204,
+            "line": 216,
             "description": "List of created shapes.",
             "itemtype": "property",
             "name": "createdShapes",
@@ -9367,7 +9377,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 211,
+            "line": 223,
             "description": "Current shape group.",
             "itemtype": "property",
             "name": "shapeGroup",
@@ -9380,7 +9390,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 219,
+            "line": 231,
             "description": "Drawing style.",
             "itemtype": "property",
             "name": "style",
@@ -9391,7 +9401,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 225,
+            "line": 237,
             "description": "Shape name.",
             "itemtype": "property",
             "name": "shapeName",
@@ -9402,7 +9412,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 232,
+            "line": 244,
             "description": "List of points.",
             "itemtype": "property",
             "name": "points",
@@ -9415,7 +9425,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 240,
+            "line": 252,
             "description": "Last selected point.",
             "itemtype": "property",
             "name": "lastPoint",
@@ -9428,7 +9438,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 248,
+            "line": 260,
             "description": "Shape editor.",
             "itemtype": "property",
             "name": "shapeEditor",
@@ -9441,7 +9451,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 256,
+            "line": 268,
             "description": "Trash draw: a cross.",
             "itemtype": "property",
             "name": "trash",
@@ -9454,7 +9464,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 277,
+            "line": 289,
             "description": "The associated draw layer.",
             "itemtype": "property",
             "name": "drawLayer",
@@ -9467,7 +9477,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 285,
+            "line": 297,
             "description": "The associated draw layer.",
             "itemtype": "property",
             "name": "drawLayer",
@@ -9480,7 +9490,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 293,
+            "line": 305,
             "description": "Handle mouse down event.",
             "itemtype": "method",
             "name": "mousedown",
@@ -9497,7 +9507,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 333,
+            "line": 345,
             "description": "Handle mouse move event.",
             "itemtype": "method",
             "name": "mousemove",
@@ -9514,7 +9524,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 381,
+            "line": 393,
             "description": "Handle mouse up event.",
             "itemtype": "method",
             "name": "mouseup",
@@ -9531,7 +9541,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 417,
+            "line": 429,
             "description": "Handle mouse out event.",
             "itemtype": "method",
             "name": "mouseout",
@@ -9548,7 +9558,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 426,
+            "line": 438,
             "description": "Handle touch start event.",
             "itemtype": "method",
             "name": "touchstart",
@@ -9565,7 +9575,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 435,
+            "line": 447,
             "description": "Handle touch move event.",
             "itemtype": "method",
             "name": "touchmove",
@@ -9582,7 +9592,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 444,
+            "line": 456,
             "description": "Handle touch end event.",
             "itemtype": "method",
             "name": "touchend",
@@ -9599,7 +9609,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 453,
+            "line": 465,
             "description": "Handle key down event.",
             "itemtype": "method",
             "name": "keydown",
@@ -9616,7 +9626,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 462,
+            "line": 474,
             "description": "Setup the tool GUI.",
             "itemtype": "method",
             "name": "setup",
@@ -9626,7 +9636,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 472,
+            "line": 484,
             "description": "Enable the tool.",
             "itemtype": "method",
             "name": "enable",
@@ -9643,7 +9653,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 504,
+            "line": 516,
             "description": "Set shape off properties.",
             "itemtype": "method",
             "name": "setShapeOff",
@@ -9660,7 +9670,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 520,
+            "line": 532,
             "description": "Get the real position from an event.",
             "class": "dwv.tool.Draw",
             "module": "tool",
@@ -9668,7 +9678,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 529,
+            "line": 541,
             "description": "Set shape on properties.",
             "itemtype": "method",
             "name": "setShapeOn",
@@ -9685,7 +9695,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 674,
+            "line": 686,
             "description": "Initialise the tool.",
             "itemtype": "method",
             "name": "init",
@@ -9695,7 +9705,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 698,
+            "line": 710,
             "description": "Help for this tool.",
             "itemtype": "method",
             "name": "getHelp",
@@ -9709,7 +9719,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 720,
+            "line": 732,
             "description": "Set the line colour of the drawing.",
             "itemtype": "method",
             "name": "setLineColour",
@@ -9726,7 +9736,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 731,
+            "line": 743,
             "description": "Set the shape name of the drawing.",
             "itemtype": "method",
             "name": "setShapeName",
@@ -9743,7 +9753,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 746,
+            "line": 758,
             "description": "Check if the shape is in the shape list.",
             "itemtype": "method",
             "name": "hasShape",
@@ -11743,7 +11753,21 @@
         },
         {
             "file": "src/tools/undo.js",
-            "line": 29,
+            "line": 30,
+            "description": "Get the stack.",
+            "itemtype": "method",
+            "name": "getStack",
+            "return": {
+                "description": "The list of stored commands.",
+                "type": "Array"
+            },
+            "class": "dwv.tool.UndoStack",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/undo.js",
+            "line": 37,
             "description": "Current command index.",
             "itemtype": "property",
             "name": "curCmdIndex",
@@ -11756,7 +11780,7 @@
         },
         {
             "file": "src/tools/undo.js",
-            "line": 37,
+            "line": 45,
             "description": "Add a command to the stack.",
             "itemtype": "method",
             "name": "add",
@@ -11773,7 +11797,7 @@
         },
         {
             "file": "src/tools/undo.js",
-            "line": 55,
+            "line": 63,
             "description": "Undo the last command.",
             "itemtype": "method",
             "name": "undo",
@@ -11783,7 +11807,7 @@
         },
         {
             "file": "src/tools/undo.js",
-            "line": 73,
+            "line": 81,
             "description": "Redo the last command.",
             "itemtype": "method",
             "name": "redo",
@@ -11793,7 +11817,7 @@
         },
         {
             "file": "src/tools/undo.js",
-            "line": 90,
+            "line": 98,
             "description": "Setup the tool GUI.",
             "itemtype": "method",
             "name": "setup",
@@ -11803,7 +11827,7 @@
         },
         {
             "file": "src/tools/undo.js",
-            "line": 99,
+            "line": 107,
             "description": "Initialise the tool GUI.",
             "itemtype": "method",
             "name": "initialise",
@@ -12524,7 +12548,7 @@
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/tools/draw.js:698"
+            "line": " src/tools/draw.js:710"
         },
         {
             "message": "replacing incorrect tag: returns with return",
@@ -12596,7 +12620,7 @@
         },
         {
             "message": "Missing item type\nGet the real position from an event.",
-            "line": " src/tools/draw.js:520"
+            "line": " src/tools/draw.js:532"
         },
         {
             "message": "Missing item type\nApply a function on all anchors.",

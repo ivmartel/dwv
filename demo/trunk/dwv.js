@@ -1274,6 +1274,8 @@ dwv.App = function ()
  */
 var dwv = dwv || {};
 
+var Kinetic = Kinetic || {};
+
 /**
  * State class.
  * Saves: data url/path, display info, undo stack.
@@ -1292,7 +1294,8 @@ dwv.State = function (app)
         var data = {
             "window-center": app.getViewController().getWindowLevel().center, 
             "window-width": app.getViewController().getWindowLevel().width,
-            "position": app.getViewController().getCurrentPosition()
+            "position": app.getViewController().getCurrentPosition(),
+            "undo": app.getUndoStack().getStack()
         };
         return window.btoa(JSON.stringify(data));
     };
@@ -1302,8 +1305,19 @@ dwv.State = function (app)
      */
     this.fromJSON = function (json) {
         var data = JSON.parse(json);
+        // display
         app.getViewController().setWindowLevel(data["window-center"], data["window-width"]);
         app.getViewController().setCurrentPosition(data.position);
+        // undo stack
+        for ( var i = 0 ; i < data.undo.length; ++i ) {
+            if ( data.undo[i].type === "DrawGroupCommand" ) {
+                var cmd = new dwv.tool.DrawGroupCommand(
+                    Kinetic.Node.create(data.undo[i].group), 
+                    data.undo[i].name, 
+                    app.getDrawLayer() );
+                cmd.execute();
+            }
+        }
     };
 }; // State class
 ;// Main DWV namespace.
@@ -10616,6 +10630,18 @@ dwv.tool.DrawGroupCommand = function (group, name, layer)
         // draw
         layer.draw();
     };
+    /**
+     * Get a JSON representation of the object.
+     * @method toJSON
+     */
+    this.toJSON = function () {
+        return {
+            "type": "DrawGroupCommand",
+            "group": group.toJSON(), 
+            "name": name, 
+            "layer": layer
+        };
+    };
 }; // DrawGroupCommand class
 
 /**
@@ -13884,6 +13910,14 @@ dwv.tool.UndoStack = function ()
      * @type Array
      */
     var stack = [];
+    
+    /**
+     * Get the stack.
+     * @method getStack
+     * @return {Array} The list of stored commands.
+     */
+    this.getStack = function () { return stack; };
+    
     /**
      * Current command index.
      * @property curCmdIndex

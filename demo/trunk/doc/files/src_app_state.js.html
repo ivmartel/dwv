@@ -181,6 +181,8 @@
  */
 var dwv = dwv || {};
 
+var Kinetic = Kinetic || {};
+
 /**
  * State class.
  * Saves: data url/path, display info, undo stack.
@@ -199,7 +201,8 @@ dwv.State = function (app)
         var data = {
             &quot;window-center&quot;: app.getViewController().getWindowLevel().center, 
             &quot;window-width&quot;: app.getViewController().getWindowLevel().width,
-            &quot;position&quot;: app.getViewController().getCurrentPosition()
+            &quot;position&quot;: app.getViewController().getCurrentPosition(),
+            &quot;undo&quot;: app.getUndoStack().getStack()
         };
         return window.btoa(JSON.stringify(data));
     };
@@ -209,8 +212,19 @@ dwv.State = function (app)
      */
     this.fromJSON = function (json) {
         var data = JSON.parse(json);
+        // display
         app.getViewController().setWindowLevel(data[&quot;window-center&quot;], data[&quot;window-width&quot;]);
         app.getViewController().setCurrentPosition(data.position);
+        // undo stack
+        for ( var i = 0 ; i &lt; data.undo.length; ++i ) {
+            if ( data.undo[i].type === &quot;DrawGroupCommand&quot; ) {
+                var cmd = new dwv.tool.DrawGroupCommand(
+                    Kinetic.Node.create(data.undo[i].group), 
+                    data.undo[i].name, 
+                    app.getDrawLayer() );
+                cmd.execute();
+            }
+        }
     };
 }; // State class
 
