@@ -77,7 +77,7 @@
                                 <li><a href="../classes/dwv.image.View.html">dwv.image.View</a></li>
                                 <li><a href="../classes/dwv.image.ViewFactory.html">dwv.image.ViewFactory</a></li>
                                 <li><a href="../classes/dwv.info.html">dwv.info</a></li>
-                                <li><a href="../classes/dwv.info.MiniColorMap.html">dwv.info.MiniColorMap</a></li>
+                                <li><a href="../classes/dwv.info.MiniColourMap.html">dwv.info.MiniColourMap</a></li>
                                 <li><a href="../classes/dwv.info.Plot.html">dwv.info.Plot</a></li>
                                 <li><a href="../classes/dwv.info.Position.html">dwv.info.Position</a></li>
                                 <li><a href="../classes/dwv.info.WindowLevel.html">dwv.info.WindowLevel</a></li>
@@ -210,12 +210,12 @@ dwv.image.View = function(image, isSigned)
      */
     var windowPresets = null;
     /**
-     * Color map
-     * @property colorMap
+     * colour map
+     * @property colourMap
      * @private
      * @type Object
      */
-    var colorMap = dwv.image.lut.plain;
+    var colourMap = dwv.image.lut.plain;
     /**
      * Current position
      * @property currentPosition
@@ -299,23 +299,23 @@ dwv.image.View = function(image, isSigned)
     };
     
     /**
-     * Get the color map of the image.
-     * @method getColorMap
-     * @return {Object} The color map of the image.
+     * Get the colour map of the image.
+     * @method getColourMap
+     * @return {Object} The colour map of the image.
      */ 
-    this.getColorMap = function() { return colorMap; };
+    this.getColourMap = function() { return colourMap; };
     /**
-     * Set the color map of the image.
-     * @method setColorMap
-     * @param {Object} map The color map of the image.
+     * Set the colour map of the image.
+     * @method setColourMap
+     * @param {Object} map The colour map of the image.
      */ 
-    this.setColorMap = function(map) { 
-        colorMap = map;
+    this.setColourMap = function(map) { 
+        colourMap = map;
         // TODO Better handle this...
         if( this.getImage().getPhotometricInterpretation() === &quot;MONOCHROME1&quot;) {
-            colorMap = dwv.image.lut.invPlain;
+            colourMap = dwv.image.lut.invPlain;
         }
-        this.fireEvent({&quot;type&quot;: &quot;colorchange&quot;, 
+        this.fireEvent({&quot;type&quot;: &quot;colourchange&quot;, 
            &quot;wc&quot;: this.getWindowLut().getCenter(),
            &quot;ww&quot;: this.getWindowLut().getWidth() });
     };
@@ -462,7 +462,7 @@ dwv.image.View.prototype.generateImageData = function( array )
     var planarConfig = image.getPlanarConfiguration();
     var windowLut = this.getWindowLut();
     windowLut.update();
-    var colorMap = this.getColorMap();
+    var colourMap = this.getColourMap();
     var index = 0;
     var sliceSize = image.getGeometry().getSize().getSliceSize();
     var sliceOffset = 0;
@@ -476,9 +476,9 @@ dwv.image.View.prototype.generateImageData = function( array )
         {        
             pxValue = parseInt( windowLut.getValue( 
                     image.getValueAtOffset(i) ), 10 );
-            array.data[index] = colorMap.red[pxValue];
-            array.data[index+1] = colorMap.green[pxValue];
-            array.data[index+2] = colorMap.blue[pxValue];
+            array.data[index] = colourMap.red[pxValue];
+            array.data[index+1] = colourMap.green[pxValue];
+            array.data[index+2] = colourMap.blue[pxValue];
             array.data[index+3] = 0xff;
             index += 4;
         }

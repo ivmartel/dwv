@@ -77,7 +77,7 @@
                                 <li><a href="../classes/dwv.image.View.html">dwv.image.View</a></li>
                                 <li><a href="../classes/dwv.image.ViewFactory.html">dwv.image.ViewFactory</a></li>
                                 <li><a href="../classes/dwv.info.html">dwv.info</a></li>
-                                <li><a href="../classes/dwv.info.MiniColorMap.html">dwv.info.MiniColorMap</a></li>
+                                <li><a href="../classes/dwv.info.MiniColourMap.html">dwv.info.MiniColourMap</a></li>
                                 <li><a href="../classes/dwv.info.Plot.html">dwv.info.Plot</a></li>
                                 <li><a href="../classes/dwv.info.Position.html">dwv.info.Position</a></li>
                                 <li><a href="../classes/dwv.info.WindowLevel.html">dwv.info.WindowLevel</a></li>
@@ -224,7 +224,7 @@ dwv.tool.EllipseFactory.prototype.create = function (points, style, image)
         x: ellipse.getCenter().getX(),
         y: ellipse.getCenter().getY(),
         radius: { x: ellipse.getA(), y: ellipse.getB() },
-        stroke: style.getLineColor(),
+        stroke: style.getLineColour(),
         strokeWidth: 2,
         name: &quot;shape&quot;
     });
@@ -239,7 +239,7 @@ dwv.tool.EllipseFactory.prototype.create = function (points, style, image)
         text: str,
         fontSize: style.getFontSize(),
         fontFamily: &quot;Verdana&quot;,
-        fill: style.getLineColor(),
+        fill: style.getLineColour(),
         name: &quot;text&quot;
     });
     // return group

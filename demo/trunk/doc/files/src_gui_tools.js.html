@@ -77,7 +77,7 @@
                                 <li><a href="../classes/dwv.image.View.html">dwv.image.View</a></li>
                                 <li><a href="../classes/dwv.image.ViewFactory.html">dwv.image.ViewFactory</a></li>
                                 <li><a href="../classes/dwv.info.html">dwv.info</a></li>
-                                <li><a href="../classes/dwv.info.MiniColorMap.html">dwv.info.MiniColorMap</a></li>
+                                <li><a href="../classes/dwv.info.MiniColourMap.html">dwv.info.MiniColourMap</a></li>
                                 <li><a href="../classes/dwv.info.Plot.html">dwv.info.Plot</a></li>
                                 <li><a href="../classes/dwv.info.Position.html">dwv.info.Position</a></li>
                                 <li><a href="../classes/dwv.info.WindowLevel.html">dwv.info.WindowLevel</a></li>
@@ -295,7 +295,7 @@ dwv.gui.base.WindowLevel = function (app)
         wlLi.style.display = &quot;none&quot;;
         wlLi.appendChild(wlSelector);
         wlLi.setAttribute(&quot;class&quot;,&quot;ui-block-b&quot;);
-        // color map list element
+        // colour map list element
         var cmLi = document.createElement(&quot;li&quot;);
         cmLi.id = &quot;cmLi&quot;;
         cmLi.style.display = &quot;none&quot;;
@@ -306,7 +306,7 @@ dwv.gui.base.WindowLevel = function (app)
         var node = document.getElementById(&quot;toolList&quot;);
         // append preset
         node.appendChild(wlLi);
-        // append color map
+        // append colour map
         node.appendChild(cmLi);
         // trigger create event (mobile)
         $(&quot;#toolList&quot;).trigger(&quot;create&quot;);
@@ -321,7 +321,7 @@ dwv.gui.base.WindowLevel = function (app)
     {
         // presets list element
         dwv.html.displayElement(&quot;wlLi&quot;, bool);
-        // color map list element
+        // colour map list element
         dwv.html.displayElement(&quot;cmLi&quot;, bool);
     };
     
@@ -405,7 +405,7 @@ dwv.gui.base.Draw = function (app)
         var node = document.getElementById(&quot;toolList&quot;);
         // apend shape
         node.appendChild(shapeLi);
-        // append color
+        // append colour
         node.appendChild(colourLi);
         // trigger create event (mobile)
         $(&quot;#toolList&quot;).trigger(&quot;create&quot;);
@@ -418,7 +418,7 @@ dwv.gui.base.Draw = function (app)
      */
     this.display = function (bool)
     {
-        // color list element
+        // colour list element
         dwv.html.displayElement(&quot;colourLi&quot;, bool);
         // shape list element
         dwv.html.displayElement(&quot;shapeLi&quot;, bool);
@@ -434,7 +434,7 @@ dwv.gui.base.Draw = function (app)
         var shapeSelector = document.getElementById(&quot;shapeSelect&quot;);
         shapeSelector.selectedIndex = 0;
         dwv.gui.refreshSelect(&quot;#shapeSelect&quot;);
-        // color select: reset selected option
+        // colour select: reset selected option
         var colourSelector = document.getElementById(&quot;colourSelect&quot;);
         colourSelector.selectedIndex = 0;
         dwv.gui.refreshSelect(&quot;#colourSelect&quot;);

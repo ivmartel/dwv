@@ -438,7 +438,7 @@
                 "dwv.info": 1,
                 "dwv.info.WindowLevel": 1,
                 "dwv.info.Position": 1,
-                "dwv.info.MiniColorMap": 1,
+                "dwv.info.MiniColourMap": 1,
                 "dwv.info.Plot": 1
             },
             "fors": {},
@@ -789,7 +789,7 @@
                 "dwv.info": 1,
                 "dwv.info.WindowLevel": 1,
                 "dwv.info.Position": 1,
-                "dwv.info.MiniColorMap": 1,
+                "dwv.info.MiniColourMap": 1,
                 "dwv.info.Plot": 1
             },
             "fors": {},
@@ -2234,9 +2234,9 @@
                 }
             ]
         },
-        "dwv.info.MiniColorMap": {
-            "name": "dwv.info.MiniColorMap",
-            "shortname": "dwv.info.MiniColorMap",
+        "dwv.info.MiniColourMap": {
+            "name": "dwv.info.MiniColourMap",
+            "shortname": "dwv.info.MiniColourMap",
             "classitems": [],
             "plugins": [],
             "extensions": [],
@@ -2246,7 +2246,7 @@
             "namespace": "dwv.info",
             "file": "src/tools/info.js",
             "line": 128,
-            "description": "MiniColorMap info layer.",
+            "description": "MiniColourMap info layer.",
             "is_constructor": 1,
             "params": [
                 {
@@ -2856,13 +2856,13 @@
         {
             "file": "src/app/application.js",
             "line": 626,
-            "description": "Handle color map change.",
+            "description": "Handle colour map change.",
             "itemtype": "method",
-            "name": "onColorChange",
+            "name": "onColourChange",
             "params": [
                 {
                     "name": "event",
-                    "description": "The event fired when changing the color map.",
+                    "description": "The event fired when changing the colour map.",
                     "type": "Object"
                 }
             ],
@@ -3498,13 +3498,13 @@
         {
             "file": "src/app/toolboxController.js",
             "line": 51,
-            "description": "Set the tool line color.",
+            "description": "Set the tool line colour.",
             "itemtype": "method",
             "name": "runFilter",
             "params": [
                 {
                     "name": "name",
-                    "description": "The name of the color.",
+                    "description": "The name of the colour.",
                     "type": "String"
                 }
             ],
@@ -5412,10 +5412,10 @@
         {
             "file": "src/gui/layer.js",
             "line": 317,
-            "description": "Set the line color for the layer.",
+            "description": "Set the line colour for the layer.",
             "itemtype": "method",
-            "name": "setLineColor",
-            "input": "{String} color The line color.",
+            "name": "setLineColour",
+            "input": "{String} colour The line colour.",
             "class": "dwv.html.Layer",
             "module": "html",
             "namespace": "dwv.html"
@@ -5605,9 +5605,9 @@
         {
             "file": "src/gui/style.js",
             "line": 37,
-            "description": "Text color.",
+            "description": "Text colour.",
             "itemtype": "property",
-            "name": "textColor",
+            "name": "textColour",
             "access": "private",
             "tagname": "",
             "type": "String",
@@ -5618,9 +5618,9 @@
         {
             "file": "src/gui/style.js",
             "line": 44,
-            "description": "Line color.",
+            "description": "Line colour.",
             "itemtype": "property",
-            "name": "lineColor",
+            "name": "lineColour",
             "access": "private",
             "tagname": "",
             "type": "String",
@@ -5673,11 +5673,11 @@
         {
             "file": "src/gui/style.js",
             "line": 73,
-            "description": "Get the text color.",
+            "description": "Get the text colour.",
             "itemtype": "method",
-            "name": "getTextColor",
+            "name": "getTextColour",
             "return": {
-                "description": "The text color.",
+                "description": "The text colour.",
                 "type": "String"
             },
             "class": "dwv.html.Style",
@@ -5687,11 +5687,11 @@
         {
             "file": "src/gui/style.js",
             "line": 80,
-            "description": "Get the line color.",
+            "description": "Get the line colour.",
             "itemtype": "method",
-            "name": "getLineColor",
+            "name": "getLineColour",
             "return": {
-                "description": "The line color.",
+                "description": "The line colour.",
                 "type": "String"
             },
             "class": "dwv.html.Style",
@@ -5701,13 +5701,13 @@
         {
             "file": "src/gui/style.js",
             "line": 87,
-            "description": "Set the line color.",
+            "description": "Set the line colour.",
             "itemtype": "method",
-            "name": "setLineColor",
+            "name": "setLineColour",
             "params": [
                 {
-                    "name": "color",
-                    "description": "The line color.",
+                    "name": "colour",
+                    "description": "The line colour.",
                     "type": "String"
                 }
             ],
@@ -7592,7 +7592,7 @@
         {
             "file": "src/image/luts.js",
             "line": 223,
-            "description": "Lookup tables for image color display.",
+            "description": "Lookup tables for image colour display.",
             "class": "dwv.image.lut.Window",
             "module": "image",
             "namespace": "dwv.image.lut"
@@ -7670,9 +7670,9 @@
         {
             "file": "src/image/view.js",
             "line": 35,
-            "description": "Color map",
+            "description": "colour map",
             "itemtype": "property",
-            "name": "colorMap",
+            "name": "colourMap",
             "access": "private",
             "tagname": "",
             "type": "Object",
@@ -7801,11 +7801,11 @@
         {
             "file": "src/image/view.js",
             "line": 124,
-            "description": "Get the color map of the image.",
+            "description": "Get the colour map of the image.",
             "itemtype": "method",
-            "name": "getColorMap",
+            "name": "getColourMap",
             "return": {
-                "description": "The color map of the image.",
+                "description": "The colour map of the image.",
                 "type": "Object"
             },
             "class": "dwv.image.View",
@@ -7815,13 +7815,13 @@
         {
             "file": "src/image/view.js",
             "line": 130,
-            "description": "Set the color map of the image.",
+            "description": "Set the colour map of the image.",
             "itemtype": "method",
-            "name": "setColorMap",
+            "name": "setColourMap",
             "params": [
                 {
                     "name": "map",
-                    "description": "The color map of the image.",
+                    "description": "The colour map of the image.",
                     "type": "Object"
                 }
             ],
@@ -9710,7 +9710,7 @@
         {
             "file": "src/tools/draw.js",
             "line": 720,
-            "description": "Set the line color of the drawing.",
+            "description": "Set the line colour of the drawing.",
             "itemtype": "method",
             "name": "setLineColour",
             "params": [
@@ -10582,27 +10582,27 @@
         {
             "file": "src/tools/info.js",
             "line": 137,
-            "description": "Create the mini color map info div.",
+            "description": "Create the mini colour map info div.",
             "itemtype": "method",
-            "name": "createMiniColorMap",
-            "class": "dwv.info.MiniColorMap",
+            "name": "createMiniColourMap",
+            "class": "dwv.info.MiniColourMap",
             "module": "info",
             "namespace": "dwv.info"
         },
         {
             "file": "src/tools/info.js",
             "line": 156,
-            "description": "Update the mini color map info div.",
+            "description": "Update the mini colour map info div.",
             "itemtype": "method",
-            "name": "updateMiniColorMap",
+            "name": "updateMiniColourMap",
             "params": [
                 {
                     "name": "event",
-                    "description": "The windowing change event containing the new values.\nWarning: expects the mini color map div to exist (use after createMiniColorMap).",
+                    "description": "The windowing change event containing the new values.\nWarning: expects the mini colour map div to exist (use after createMiniColourMap).",
                     "type": "Object"
                 }
             ],
-            "class": "dwv.info.MiniColorMap",
+            "class": "dwv.info.MiniColourMap",
             "module": "info",
             "namespace": "dwv.info"
         },
@@ -11069,7 +11069,7 @@
         {
             "file": "src/tools/livewire.js",
             "line": 353,
-            "description": "Set the line color of the drawing.",
+            "description": "Set the line colour of the drawing.",
             "itemtype": "method",
             "name": "setLineColour",
             "params": [
@@ -12575,7 +12575,7 @@
             "line": " src/image/geometry.js:256"
         },
         {
-            "message": "Missing item type\nLookup tables for image color display.",
+            "message": "Missing item type\nLookup tables for image colour display.",
             "line": " src/image/luts.js:223"
         },
         {

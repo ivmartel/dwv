@@ -77,7 +77,7 @@
                                 <li><a href="../classes/dwv.image.View.html">dwv.image.View</a></li>
                                 <li><a href="../classes/dwv.image.ViewFactory.html">dwv.image.ViewFactory</a></li>
                                 <li><a href="../classes/dwv.info.html">dwv.info</a></li>
-                                <li><a href="../classes/dwv.info.MiniColorMap.html">dwv.info.MiniColorMap</a></li>
+                                <li><a href="../classes/dwv.info.MiniColourMap.html">dwv.info.MiniColourMap</a></li>
                                 <li><a href="../classes/dwv.info.Plot.html">dwv.info.Plot</a></li>
                                 <li><a href="../classes/dwv.info.Position.html">dwv.info.Position</a></li>
                                 <li><a href="../classes/dwv.info.WindowLevel.html">dwv.info.WindowLevel</a></li>
@@ -303,23 +303,23 @@ dwv.info.Position = function ( app )
 }; // class dwv.info.Position
 
 /**
- * MiniColorMap info layer.
- * @class MiniColorMap
+ * MiniColourMap info layer.
+ * @class MiniColourMap
  * @namespace dwv.info
  * @constructor
  * @param {Object} app The associated application.
  */
-dwv.info.MiniColorMap = function ( app )
+dwv.info.MiniColourMap = function ( app )
 {
     /**
-     * Create the mini color map info div.
-     * @method createMiniColorMap
+     * Create the mini colour map info div.
+     * @method createMiniColourMap
      */
     this.create = function ()
     {    
         var rootId = app.getContainerDivId();
         
-        // color map
+        // colour map
         var div = document.getElementById(rootId+&quot;-infobr&quot;);
         dwv.html.removeNode(rootId+&quot;-canvasinfobr&quot;);
         var canvas = document.createElement(&quot;canvas&quot;);
@@ -331,10 +331,10 @@ dwv.info.MiniColorMap = function ( app )
     };
     
     /**
-     * Update the mini color map info div.
-     * @method updateMiniColorMap
+     * Update the mini colour map info div.
+     * @method updateMiniColourMap
      * @param {Object} event The windowing change event containing the new values.
-     * Warning: expects the mini color map div to exist (use after createMiniColorMap).
+     * Warning: expects the mini colour map div to exist (use after createMiniColourMap).
      */
     this.update = function (event)
     {    
@@ -387,7 +387,7 @@ dwv.info.MiniColorMap = function ( app )
         // put the image data in the context
         context.putImageData(imageData, 0, 0);
     };
-}; // class dwv.info.MiniColorMap
+}; // class dwv.info.MiniColourMap
 
 
 /**
@@ -408,7 +408,7 @@ dwv.info.Plot = function (app)
     {
         $.plot($(&quot;#&quot;+app.getContainerDivId()+&quot;-plot&quot;), [ app.getImage().getHistogram() ], {
             &quot;bars&quot;: { &quot;show&quot;: true },
-            &quot;grid&quot;: { &quot;backgroundColor&quot;: null },
+            &quot;grid&quot;: { &quot;backgroundcolor&quot;: null },
             &quot;xaxis&quot;: { &quot;show&quot;: true },
             &quot;yaxis&quot;: { &quot;show&quot;: false }
         });
@@ -437,7 +437,7 @@ dwv.info.Plot = function (app)
     
         $.plot($(&quot;#&quot;+app.getContainerDivId()+&quot;-plot&quot;), [ app.getImage().getHistogram() ], {
             &quot;bars&quot;: { &quot;show&quot;: true },
-            &quot;grid&quot;: { &quot;markings&quot;: markings, &quot;backgroundColor&quot;: null },
+            &quot;grid&quot;: { &quot;markings&quot;: markings, &quot;backgroundcolour&quot;: null },
             &quot;xaxis&quot;: { &quot;show&quot;: false },
             &quot;yaxis&quot;: { &quot;show&quot;: false }
         });

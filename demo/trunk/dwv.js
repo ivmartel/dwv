@@ -45,8 +45,8 @@ dwv.App = function ()
     var windowingInfo = null;
     // Info layer position gui
     var positionInfo = null;
-    // Info layer color map gui
-    var miniColorMap = null; 
+    // Info layer colour map gui
+    var miniColourMap = null; 
     // flag to know if the info layer is listening on the image.
     var isInfoLayerListening = false;
 
@@ -624,11 +624,11 @@ dwv.App = function ()
     };
 
     /**
-     * Handle color map change.
-     * @method onColorChange
-     * @param {Object} event The event fired when changing the color map.
+     * Handle colour map change.
+     * @method onColourChange
+     * @param {Object} event The event fired when changing the colour map.
      */
-    this.onColorChange = function (/*event*/)
+    this.onColourChange = function (/*event*/)
     {  
         generateAndDrawImage();
     };
@@ -967,9 +967,9 @@ dwv.App = function ()
     function addImageInfoListeners()
     {
         view.addEventListener("wlchange", windowingInfo.update);
-        view.addEventListener("wlchange", miniColorMap.update);
+        view.addEventListener("wlchange", miniColourMap.update);
         view.addEventListener("wlchange", plotInfo.update);
-        view.addEventListener("colorchange", miniColorMap.update);
+        view.addEventListener("colourchange", miniColourMap.update);
         view.addEventListener("positionchange", positionInfo.update);
         isInfoLayerListening = true;
     }
@@ -982,9 +982,9 @@ dwv.App = function ()
     function removeImageInfoListeners()
     {
         view.removeEventListener("wlchange", windowingInfo.update);
-        view.removeEventListener("wlchange", miniColorMap.update);
+        view.removeEventListener("wlchange", miniColourMap.update);
         view.removeEventListener("wlchange", plotInfo.update);
-        view.removeEventListener("colorchange", miniColorMap.update);
+        view.removeEventListener("colourchange", miniColourMap.update);
         view.removeEventListener("positionchange", positionInfo.update);
         isInfoLayerListening = false;
     }
@@ -1212,7 +1212,7 @@ dwv.App = function ()
 
         // image listeners
         view.addEventListener("wlchange", self.onWLChange);
-        view.addEventListener("colorchange", self.onColorChange);
+        view.addEventListener("colourchange", self.onColourChange);
         view.addEventListener("slicechange", self.onSliceChange);
         
         // update presets with loaded image (used in w/l tool)
@@ -1253,8 +1253,8 @@ dwv.App = function ()
             positionInfo = new dwv.info.Position(self);
             positionInfo.create();
             
-            miniColorMap = new dwv.info.MiniColorMap(self);
-            miniColorMap.create();
+            miniColourMap = new dwv.info.MiniColourMap(self);
+            miniColourMap.create();
             
             plotInfo = new dwv.info.Plot(self);
             plotInfo.create();
@@ -1357,9 +1357,9 @@ dwv.ToolboxController = function (toolbox)
     };
     
     /**
-     * Set the tool line color.
+     * Set the tool line colour.
      * @method runFilter
-     * @param {String} name The name of the color.
+     * @param {String} name The name of the colour.
      */
     this.setLineColour = function (name)
     {
@@ -1556,7 +1556,7 @@ dwv.ViewController = function ( view )
      */
     this.getColourMap = function ()
     {
-        return view.getColorMap();
+        return view.getColourMap();
     };
 
     /**
@@ -1566,7 +1566,7 @@ dwv.ViewController = function ( view )
      */
     this.setColourMap = function (colourMap)
     {
-        view.setColorMap(colourMap);
+        view.setColourMap(colourMap);
     };
 
     /**
@@ -5679,14 +5679,14 @@ dwv.html.Layer = function(name)
     };
     
     /**
-     * Set the line color for the layer.
-     * @method setLineColor
-     * @input {String} color The line color.
+     * Set the line colour for the layer.
+     * @method setLineColour
+     * @input {String} colour The line colour.
      */
-    this.setLineColor = function(color)
+    this.setLineColour = function(colour)
     {
-        context.fillStyle = color;
-        context.strokeStyle = color;
+        context.fillStyle = colour;
+        context.strokeStyle = colour;
     };
     
     /**
@@ -5975,19 +5975,19 @@ dwv.html.Style = function()
      */
     var lineHeight = this.fontSize + this.fontSize/5;
     /**
-     * Text color.
-     * @property textColor
+     * Text colour.
+     * @property textColour
      * @private
      * @type String
      */
-    var textColor = "#fff";
+    var textColour = "#fff";
     /**
-     * Line color.
-     * @property lineColor
+     * Line colour.
+     * @property lineColour
      * @private
      * @type String
      */
-    var lineColor = 0;
+    var lineColour = 0;
     
     /**
      * Get the font size.
@@ -6011,25 +6011,25 @@ dwv.html.Style = function()
     dwv.html.Style.prototype.getLineHeight = function() { return lineHeight; };
 
     /**
-     * Get the text color.
-     * @method getTextColor
-     * @return {String} The text color.
+     * Get the text colour.
+     * @method getTextColour
+     * @return {String} The text colour.
      */
-    dwv.html.Style.prototype.getTextColor = function() { return textColor; };
+    dwv.html.Style.prototype.getTextColour = function() { return textColour; };
 
     /**
-     * Get the line color.
-     * @method getLineColor
-     * @return {String} The line color.
+     * Get the line colour.
+     * @method getLineColour
+     * @return {String} The line colour.
      */
-    dwv.html.Style.prototype.getLineColor = function() { return lineColor; };
+    dwv.html.Style.prototype.getLineColour = function() { return lineColour; };
 
     /**
-     * Set the line color.
-     * @method setLineColor
-     * @param {String} color The line color.
+     * Set the line colour.
+     * @method setLineColour
+     * @param {String} colour The line colour.
      */
-    dwv.html.Style.prototype.setLineColor = function(color) { lineColor = color; };
+    dwv.html.Style.prototype.setLineColour = function(colour) { lineColour = colour; };
 };
 ;/** 
  * GUI module.
@@ -6151,7 +6151,7 @@ dwv.gui.base.WindowLevel = function (app)
         wlLi.style.display = "none";
         wlLi.appendChild(wlSelector);
         wlLi.setAttribute("class","ui-block-b");
-        // color map list element
+        // colour map list element
         var cmLi = document.createElement("li");
         cmLi.id = "cmLi";
         cmLi.style.display = "none";
@@ -6162,7 +6162,7 @@ dwv.gui.base.WindowLevel = function (app)
         var node = document.getElementById("toolList");
         // append preset
         node.appendChild(wlLi);
-        // append color map
+        // append colour map
         node.appendChild(cmLi);
         // trigger create event (mobile)
         $("#toolList").trigger("create");
@@ -6177,7 +6177,7 @@ dwv.gui.base.WindowLevel = function (app)
     {
         // presets list element
         dwv.html.displayElement("wlLi", bool);
-        // color map list element
+        // colour map list element
         dwv.html.displayElement("cmLi", bool);
     };
     
@@ -6261,7 +6261,7 @@ dwv.gui.base.Draw = function (app)
         var node = document.getElementById("toolList");
         // apend shape
         node.appendChild(shapeLi);
-        // append color
+        // append colour
         node.appendChild(colourLi);
         // trigger create event (mobile)
         $("#toolList").trigger("create");
@@ -6274,7 +6274,7 @@ dwv.gui.base.Draw = function (app)
      */
     this.display = function (bool)
     {
-        // color list element
+        // colour list element
         dwv.html.displayElement("colourLi", bool);
         // shape list element
         dwv.html.displayElement("shapeLi", bool);
@@ -6290,7 +6290,7 @@ dwv.gui.base.Draw = function (app)
         var shapeSelector = document.getElementById("shapeSelect");
         shapeSelector.selectedIndex = 0;
         dwv.gui.refreshSelect("#shapeSelect");
-        // color select: reset selected option
+        // colour select: reset selected option
         var colourSelector = document.getElementById("colourSelect");
         colourSelector.selectedIndex = 0;
         dwv.gui.refreshSelect("#colourSelect");
@@ -8145,7 +8145,7 @@ dwv.image.lut.Window = function (rescaleLut, isSigned)
 };
 
 /**
-* Lookup tables for image color display. 
+* Lookup tables for image colour display. 
 */
 
 dwv.image.lut.range_max = 256;
@@ -8405,12 +8405,12 @@ dwv.image.View = function(image, isSigned)
      */
     var windowPresets = null;
     /**
-     * Color map
-     * @property colorMap
+     * colour map
+     * @property colourMap
      * @private
      * @type Object
      */
-    var colorMap = dwv.image.lut.plain;
+    var colourMap = dwv.image.lut.plain;
     /**
      * Current position
      * @property currentPosition
@@ -8494,23 +8494,23 @@ dwv.image.View = function(image, isSigned)
     };
     
     /**
-     * Get the color map of the image.
-     * @method getColorMap
-     * @return {Object} The color map of the image.
+     * Get the colour map of the image.
+     * @method getColourMap
+     * @return {Object} The colour map of the image.
      */ 
-    this.getColorMap = function() { return colorMap; };
+    this.getColourMap = function() { return colourMap; };
     /**
-     * Set the color map of the image.
-     * @method setColorMap
-     * @param {Object} map The color map of the image.
+     * Set the colour map of the image.
+     * @method setColourMap
+     * @param {Object} map The colour map of the image.
      */ 
-    this.setColorMap = function(map) { 
-        colorMap = map;
+    this.setColourMap = function(map) { 
+        colourMap = map;
         // TODO Better handle this...
         if( this.getImage().getPhotometricInterpretation() === "MONOCHROME1") {
-            colorMap = dwv.image.lut.invPlain;
+            colourMap = dwv.image.lut.invPlain;
         }
-        this.fireEvent({"type": "colorchange", 
+        this.fireEvent({"type": "colourchange", 
            "wc": this.getWindowLut().getCenter(),
            "ww": this.getWindowLut().getWidth() });
     };
@@ -8657,7 +8657,7 @@ dwv.image.View.prototype.generateImageData = function( array )
     var planarConfig = image.getPlanarConfiguration();
     var windowLut = this.getWindowLut();
     windowLut.update();
-    var colorMap = this.getColorMap();
+    var colourMap = this.getColourMap();
     var index = 0;
     var sliceSize = image.getGeometry().getSize().getSliceSize();
     var sliceOffset = 0;
@@ -8671,9 +8671,9 @@ dwv.image.View.prototype.generateImageData = function( array )
         {        
             pxValue = parseInt( windowLut.getValue( 
                     image.getValueAtOffset(i) ), 10 );
-            array.data[index] = colorMap.red[pxValue];
-            array.data[index+1] = colorMap.green[pxValue];
-            array.data[index+2] = colorMap.blue[pxValue];
+            array.data[index] = colourMap.red[pxValue];
+            array.data[index+1] = colourMap.green[pxValue];
+            array.data[index+2] = colourMap.blue[pxValue];
             array.data[index+3] = 0xff;
             index += 4;
         }
@@ -9443,7 +9443,7 @@ var __twothirdpi = ( 2 / (3 * Math.PI) );
  */
 dwv.math.computeGreyscale = function(data, width, height) {
     // Returns 2D augmented array containing greyscale data
-    // Greyscale values found by averaging color channels
+    // Greyscale values found by averaging colour channels
     // Input should be in a flat RGBA array, with values between 0 and 255
     var greyscale = [];
 
@@ -11142,8 +11142,8 @@ dwv.tool.Draw = function (app, shapeFactoryList)
             cmdName = "ellipse";
         }
         
-        // shape color
-        var color = shape.stroke();
+        // shape colour
+        var colour = shape.stroke();
         
         // drag start event handling
         shape.on('dragstart', function (event) {
@@ -11185,7 +11185,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
             }
             else {
                 trash.getChildren().each( function (tshape){ tshape.stroke('red'); });
-                shape.stroke(color);
+                shape.stroke(colour);
             }
             // update group but not 'this' shape
             var group = this.getParent();
@@ -11216,8 +11216,8 @@ dwv.tool.Draw = function (app, shapeFactoryList)
                     shape.x( shape.x() - delTranslation.x );
                     shape.y( shape.y() - delTranslation.y );
                 });
-                // restore color
-                shape.stroke(color);
+                // restore colour
+                shape.stroke(colour);
                 // disable editor
                 shapeEditor.disable();
                 shapeEditor.setShape(null);
@@ -11261,7 +11261,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
         this.setShapeName(shapeName);
         // init gui
         if ( gui ) {
-            // same for color
+            // same for colour
             this.setLineColour(gui.getColours()[0]);
             // init html
             gui.initialise();
@@ -11281,7 +11281,7 @@ dwv.tool.Draw.prototype.getHelp = function()
     return {
         'title': "Draw",
         'brief': "Allows to draw shapes on the image. " +
-            "Choose the shape and its color from the drop down menus. Once created, shapes " +
+            "Choose the shape and its colour from the drop down menus. Once created, shapes " +
             "can be edited by selecting them. Anchors will appear and allow specific shape edition. " +
             "Drag the shape on the top red cross to delete it. All actions are undoable. ",
         'mouse': {
@@ -11294,14 +11294,14 @@ dwv.tool.Draw.prototype.getHelp = function()
 };
 
 /**
- * Set the line color of the drawing.
+ * Set the line colour of the drawing.
  * @method setLineColour
  * @param {String} colour The colour to set.
  */
 dwv.tool.Draw.prototype.setLineColour = function(colour)
 {
     // set style var
-    this.style.setLineColor(colour);
+    this.style.setLineColour(colour);
 };
 
 /**
@@ -11766,7 +11766,7 @@ dwv.tool.EllipseFactory.prototype.create = function (points, style, image)
         x: ellipse.getCenter().getX(),
         y: ellipse.getCenter().getY(),
         radius: { x: ellipse.getA(), y: ellipse.getB() },
-        stroke: style.getLineColor(),
+        stroke: style.getLineColour(),
         strokeWidth: 2,
         name: "shape"
     });
@@ -11781,7 +11781,7 @@ dwv.tool.EllipseFactory.prototype.create = function (points, style, image)
         text: str,
         fontSize: style.getFontSize(),
         fontFamily: "Verdana",
-        fill: style.getLineColor(),
+        fill: style.getLineColour(),
         name: "text"
     });
     // return group
@@ -12409,23 +12409,23 @@ dwv.info.Position = function ( app )
 }; // class dwv.info.Position
 
 /**
- * MiniColorMap info layer.
- * @class MiniColorMap
+ * MiniColourMap info layer.
+ * @class MiniColourMap
  * @namespace dwv.info
  * @constructor
  * @param {Object} app The associated application.
  */
-dwv.info.MiniColorMap = function ( app )
+dwv.info.MiniColourMap = function ( app )
 {
     /**
-     * Create the mini color map info div.
-     * @method createMiniColorMap
+     * Create the mini colour map info div.
+     * @method createMiniColourMap
      */
     this.create = function ()
     {    
         var rootId = app.getContainerDivId();
         
-        // color map
+        // colour map
         var div = document.getElementById(rootId+"-infobr");
         dwv.html.removeNode(rootId+"-canvasinfobr");
         var canvas = document.createElement("canvas");
@@ -12437,10 +12437,10 @@ dwv.info.MiniColorMap = function ( app )
     };
     
     /**
-     * Update the mini color map info div.
-     * @method updateMiniColorMap
+     * Update the mini colour map info div.
+     * @method updateMiniColourMap
      * @param {Object} event The windowing change event containing the new values.
-     * Warning: expects the mini color map div to exist (use after createMiniColorMap).
+     * Warning: expects the mini colour map div to exist (use after createMiniColourMap).
      */
     this.update = function (event)
     {    
@@ -12493,7 +12493,7 @@ dwv.info.MiniColorMap = function ( app )
         // put the image data in the context
         context.putImageData(imageData, 0, 0);
     };
-}; // class dwv.info.MiniColorMap
+}; // class dwv.info.MiniColourMap
 
 
 /**
@@ -12514,7 +12514,7 @@ dwv.info.Plot = function (app)
     {
         $.plot($("#"+app.getContainerDivId()+"-plot"), [ app.getImage().getHistogram() ], {
             "bars": { "show": true },
-            "grid": { "backgroundColor": null },
+            "grid": { "backgroundcolor": null },
             "xaxis": { "show": true },
             "yaxis": { "show": false }
         });
@@ -12543,7 +12543,7 @@ dwv.info.Plot = function (app)
     
         $.plot($("#"+app.getContainerDivId()+"-plot"), [ app.getImage().getHistogram() ], {
             "bars": { "show": true },
-            "grid": { "markings": markings, "backgroundColor": null },
+            "grid": { "markings": markings, "backgroundcolour": null },
             "xaxis": { "show": false },
             "yaxis": { "show": false }
         });
@@ -12595,7 +12595,7 @@ dwv.tool.LineFactory.prototype.create = function (points, style, image)
     var kshape = new Kinetic.Line({
         points: [line.getBegin().getX(), line.getBegin().getY(), 
                  line.getEnd().getX(), line.getEnd().getY() ],
-        stroke: style.getLineColor(),
+        stroke: style.getLineColour(),
         strokeWidth: 2,
         name: "shape"
     });
@@ -12609,7 +12609,7 @@ dwv.tool.LineFactory.prototype.create = function (points, style, image)
         text: str,
         fontSize: style.getFontSize(),
         fontFamily: "Verdana",
-        fill: style.getLineColor(),
+        fill: style.getLineColour(),
         name: "text"
     });
     // return group
@@ -13027,14 +13027,14 @@ dwv.tool.Livewire.prototype.getHelp = function()
 };
 
 /**
- * Set the line color of the drawing.
+ * Set the line colour of the drawing.
  * @method setLineColour
  * @param {String} colour The colour to set.
  */
 dwv.tool.Livewire.prototype.setLineColour = function(colour)
 {
     // set style var
-    this.style.setLineColor(colour);
+    this.style.setLineColour(colour);
 };
 ;/** 
  * Tool module.
@@ -13088,7 +13088,7 @@ dwv.tool.ProtractorFactory.prototype.create = function (points, style/*, image*/
     // draw shape
     var kshape = new Kinetic.Line({
         points: pointsArray,
-        stroke: style.getLineColor(),
+        stroke: style.getLineColour(),
         strokeWidth: 2,
         name: "shape"
     });
@@ -13115,7 +13115,7 @@ dwv.tool.ProtractorFactory.prototype.create = function (points, style/*, image*/
             text: angleStr,
             fontSize: style.getFontSize(),
             fontFamily: "Verdana",
-            fill: style.getLineColor(),
+            fill: style.getLineColour(),
             name: "text"
         });
         // arc
@@ -13123,7 +13123,7 @@ dwv.tool.ProtractorFactory.prototype.create = function (points, style/*, image*/
         var karc = new Kinetic.Arc({
             innerRadius: radius,
             outerRadius: radius,
-            stroke: style.getLineColor(),
+            stroke: style.getLineColour(),
             angle: angle,
             rotationDeg: -inclination,
             x: points[1].getX(),
@@ -13269,7 +13269,7 @@ dwv.tool.RectangleFactory.prototype.create = function (points, style, image)
         y: rectangle.getBegin().getY(),
         width: rectangle.getWidth(),
         height: rectangle.getHeight(),
-        stroke: style.getLineColor(),
+        stroke: style.getLineColour(),
         strokeWidth: 2,
         name: "shape"
     });
@@ -13284,7 +13284,7 @@ dwv.tool.RectangleFactory.prototype.create = function (points, style, image)
         text: str,
         fontSize: style.getFontSize(),
         fontFamily: "Verdana",
-        fill: style.getLineColor(),
+        fill: style.getLineColour(),
         name: "text"
     });
     // return group
@@ -13428,7 +13428,7 @@ dwv.tool.RoiFactory.prototype.create = function (points, style /*, image*/)
     // draw shape
     var kshape = new Kinetic.Line({
         points: arr,
-        stroke: style.getLineColor(),
+        stroke: style.getLineColour(),
         strokeWidth: 2,
         name: "shape",
         closed: true

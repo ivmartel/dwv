@@ -43,7 +43,7 @@ YUI.add("yuidoc-meta", function(Y) {
         "dwv.image.lut.Rescale",
         "dwv.image.lut.Window",
         "dwv.info",
-        "dwv.info.MiniColorMap",
+        "dwv.info.MiniColourMap",
         "dwv.info.Plot",
         "dwv.info.Position",
         "dwv.info.WindowLevel",

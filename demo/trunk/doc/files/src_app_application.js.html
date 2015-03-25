@@ -77,7 +77,7 @@
                                 <li><a href="../classes/dwv.image.View.html">dwv.image.View</a></li>
                                 <li><a href="../classes/dwv.image.ViewFactory.html">dwv.image.ViewFactory</a></li>
                                 <li><a href="../classes/dwv.info.html">dwv.info</a></li>
-                                <li><a href="../classes/dwv.info.MiniColorMap.html">dwv.info.MiniColorMap</a></li>
+                                <li><a href="../classes/dwv.info.MiniColourMap.html">dwv.info.MiniColourMap</a></li>
                                 <li><a href="../classes/dwv.info.Plot.html">dwv.info.Plot</a></li>
                                 <li><a href="../classes/dwv.info.Position.html">dwv.info.Position</a></li>
                                 <li><a href="../classes/dwv.info.WindowLevel.html">dwv.info.WindowLevel</a></li>
@@ -222,8 +222,8 @@ dwv.App = function ()
     var windowingInfo = null;
     // Info layer position gui
     var positionInfo = null;
-    // Info layer color map gui
-    var miniColorMap = null; 
+    // Info layer colour map gui
+    var miniColourMap = null; 
     // flag to know if the info layer is listening on the image.
     var isInfoLayerListening = false;
 
@@ -801,11 +801,11 @@ dwv.App = function ()
     };
 
     /**
-     * Handle color map change.
-     * @method onColorChange
-     * @param {Object} event The event fired when changing the color map.
+     * Handle colour map change.
+     * @method onColourChange
+     * @param {Object} event The event fired when changing the colour map.
      */
-    this.onColorChange = function (/*event*/)
+    this.onColourChange = function (/*event*/)
     {  
         generateAndDrawImage();
     };
@@ -1144,9 +1144,9 @@ dwv.App = function ()
     function addImageInfoListeners()
     {
         view.addEventListener(&quot;wlchange&quot;, windowingInfo.update);
-        view.addEventListener(&quot;wlchange&quot;, miniColorMap.update);
+        view.addEventListener(&quot;wlchange&quot;, miniColourMap.update);
         view.addEventListener(&quot;wlchange&quot;, plotInfo.update);
-        view.addEventListener(&quot;colorchange&quot;, miniColorMap.update);
+        view.addEventListener(&quot;colourchange&quot;, miniColourMap.update);
         view.addEventListener(&quot;positionchange&quot;, positionInfo.update);
         isInfoLayerListening = true;
     }
@@ -1159,9 +1159,9 @@ dwv.App = function ()
     function removeImageInfoListeners()
     {
         view.removeEventListener(&quot;wlchange&quot;, windowingInfo.update);
-        view.removeEventListener(&quot;wlchange&quot;, miniColorMap.update);
+        view.removeEventListener(&quot;wlchange&quot;, miniColourMap.update);
         view.removeEventListener(&quot;wlchange&quot;, plotInfo.update);
-        view.removeEventListener(&quot;colorchange&quot;, miniColorMap.update);
+        view.removeEventListener(&quot;colourchange&quot;, miniColourMap.update);
         view.removeEventListener(&quot;positionchange&quot;, positionInfo.update);
         isInfoLayerListening = false;
     }
@@ -1389,7 +1389,7 @@ dwv.App = function ()
 
         // image listeners
         view.addEventListener(&quot;wlchange&quot;, self.onWLChange);
-        view.addEventListener(&quot;colorchange&quot;, self.onColorChange);
+        view.addEventListener(&quot;colourchange&quot;, self.onColourChange);
         view.addEventListener(&quot;slicechange&quot;, self.onSliceChange);
         
         // update presets with loaded image (used in w/l tool)
@@ -1430,8 +1430,8 @@ dwv.App = function ()
             positionInfo = new dwv.info.Position(self);
             positionInfo.create();
             
-            miniColorMap = new dwv.info.MiniColorMap(self);
-            miniColorMap.create();
+            miniColourMap = new dwv.info.MiniColourMap(self);
+            miniColourMap.create();
             
             plotInfo = new dwv.info.Plot(self);
             plotInfo.create();

@@ -77,7 +77,7 @@
                                 <li><a href="../classes/dwv.image.View.html">dwv.image.View</a></li>
                                 <li><a href="../classes/dwv.image.ViewFactory.html">dwv.image.ViewFactory</a></li>
                                 <li><a href="../classes/dwv.info.html">dwv.info</a></li>
-                                <li><a href="../classes/dwv.info.MiniColorMap.html">dwv.info.MiniColorMap</a></li>
+                                <li><a href="../classes/dwv.info.MiniColourMap.html">dwv.info.MiniColourMap</a></li>
                                 <li><a href="../classes/dwv.info.Plot.html">dwv.info.Plot</a></li>
                                 <li><a href="../classes/dwv.info.Position.html">dwv.info.Position</a></li>
                                 <li><a href="../classes/dwv.info.WindowLevel.html">dwv.info.WindowLevel</a></li>
@@ -743,8 +743,8 @@ dwv.tool.Draw = function (app, shapeFactoryList)
             cmdName = &quot;ellipse&quot;;
         }
         
-        // shape color
-        var color = shape.stroke();
+        // shape colour
+        var colour = shape.stroke();
         
         // drag start event handling
         shape.on(&#x27;dragstart&#x27;, function (event) {
@@ -786,7 +786,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
             }
             else {
                 trash.getChildren().each( function (tshape){ tshape.stroke(&#x27;red&#x27;); });
-                shape.stroke(color);
+                shape.stroke(colour);
             }
             // update group but not &#x27;this&#x27; shape
             var group = this.getParent();
@@ -817,8 +817,8 @@ dwv.tool.Draw = function (app, shapeFactoryList)
                     shape.x( shape.x() - delTranslation.x );
                     shape.y( shape.y() - delTranslation.y );
                 });
-                // restore color
-                shape.stroke(color);
+                // restore colour
+                shape.stroke(colour);
                 // disable editor
                 shapeEditor.disable();
                 shapeEditor.setShape(null);
@@ -862,7 +862,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
         this.setShapeName(shapeName);
         // init gui
         if ( gui ) {
-            // same for color
+            // same for colour
             this.setLineColour(gui.getColours()[0]);
             // init html
             gui.initialise();
@@ -882,7 +882,7 @@ dwv.tool.Draw.prototype.getHelp = function()
     return {
         &#x27;title&#x27;: &quot;Draw&quot;,
         &#x27;brief&#x27;: &quot;Allows to draw shapes on the image. &quot; +
-            &quot;Choose the shape and its color from the drop down menus. Once created, shapes &quot; +
+            &quot;Choose the shape and its colour from the drop down menus. Once created, shapes &quot; +
             &quot;can be edited by selecting them. Anchors will appear and allow specific shape edition. &quot; +
             &quot;Drag the shape on the top red cross to delete it. All actions are undoable. &quot;,
         &#x27;mouse&#x27;: {
@@ -895,14 +895,14 @@ dwv.tool.Draw.prototype.getHelp = function()
 };
 
 /**
- * Set the line color of the drawing.
+ * Set the line colour of the drawing.
  * @method setLineColour
  * @param {String} colour The colour to set.
  */
 dwv.tool.Draw.prototype.setLineColour = function(colour)
 {
     // set style var
-    this.style.setLineColor(colour);
+    this.style.setLineColour(colour);
 };
 
 /**
