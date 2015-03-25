@@ -35,19 +35,19 @@ dwv.html.Style = function()
      */
     var lineHeight = this.fontSize + this.fontSize/5;
     /**
-     * Text color.
-     * @property textColor
+     * Text colour.
+     * @property textColour
      * @private
      * @type String
      */
-    var textColor = "#fff";
+    var textColour = "#fff";
     /**
-     * Line color.
-     * @property lineColor
+     * Line colour.
+     * @property lineColour
      * @private
      * @type String
      */
-    var lineColor = 0;
+    var lineColour = 0;
     
     /**
      * Get the font size.
@@ -71,23 +71,23 @@ dwv.html.Style = function()
     dwv.html.Style.prototype.getLineHeight = function() { return lineHeight; };
 
     /**
-     * Get the text color.
-     * @method getTextColor
-     * @return {String} The text color.
+     * Get the text colour.
+     * @method getTextColour
+     * @return {String} The text colour.
      */
-    dwv.html.Style.prototype.getTextColor = function() { return textColor; };
+    dwv.html.Style.prototype.getTextColour = function() { return textColour; };
 
     /**
-     * Get the line color.
-     * @method getLineColor
-     * @return {String} The line color.
+     * Get the line colour.
+     * @method getLineColour
+     * @return {String} The line colour.
      */
-    dwv.html.Style.prototype.getLineColor = function() { return lineColor; };
+    dwv.html.Style.prototype.getLineColour = function() { return lineColour; };
 
     /**
-     * Set the line color.
-     * @method setLineColor
-     * @param {String} color The line color.
+     * Set the line colour.
+     * @method setLineColour
+     * @param {String} colour The line colour.
      */
-    dwv.html.Style.prototype.setLineColor = function(color) { lineColor = color; };
+    dwv.html.Style.prototype.setLineColour = function(colour) { lineColour = colour; };
 };

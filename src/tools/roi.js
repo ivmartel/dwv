@@ -51,7 +51,7 @@ dwv.tool.RoiFactory.prototype.create = function (points, style /*, image*/)
     // draw shape
     var kshape = new Kinetic.Line({
         points: arr,
-        stroke: style.getLineColor(),
+        stroke: style.getLineColour(),
         strokeWidth: 2,
         name: "shape",
         closed: true

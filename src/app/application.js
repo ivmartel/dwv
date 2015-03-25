@@ -45,8 +45,8 @@ dwv.App = function ()
     var windowingInfo = null;
     // Info layer position gui
     var positionInfo = null;
-    // Info layer color map gui
-    var miniColorMap = null; 
+    // Info layer colour map gui
+    var miniColourMap = null; 
     // flag to know if the info layer is listening on the image.
     var isInfoLayerListening = false;
 
@@ -624,11 +624,11 @@ dwv.App = function ()
     };
 
     /**
-     * Handle color map change.
-     * @method onColorChange
-     * @param {Object} event The event fired when changing the color map.
+     * Handle colour map change.
+     * @method onColourChange
+     * @param {Object} event The event fired when changing the colour map.
      */
-    this.onColorChange = function (/*event*/)
+    this.onColourChange = function (/*event*/)
     {  
         generateAndDrawImage();
     };
@@ -967,9 +967,9 @@ dwv.App = function ()
     function addImageInfoListeners()
     {
         view.addEventListener("wlchange", windowingInfo.update);
-        view.addEventListener("wlchange", miniColorMap.update);
+        view.addEventListener("wlchange", miniColourMap.update);
         view.addEventListener("wlchange", plotInfo.update);
-        view.addEventListener("colorchange", miniColorMap.update);
+        view.addEventListener("colourchange", miniColourMap.update);
         view.addEventListener("positionchange", positionInfo.update);
         isInfoLayerListening = true;
     }
@@ -982,9 +982,9 @@ dwv.App = function ()
     function removeImageInfoListeners()
     {
         view.removeEventListener("wlchange", windowingInfo.update);
-        view.removeEventListener("wlchange", miniColorMap.update);
+        view.removeEventListener("wlchange", miniColourMap.update);
         view.removeEventListener("wlchange", plotInfo.update);
-        view.removeEventListener("colorchange", miniColorMap.update);
+        view.removeEventListener("colourchange", miniColourMap.update);
         view.removeEventListener("positionchange", positionInfo.update);
         isInfoLayerListening = false;
     }
@@ -1212,7 +1212,7 @@ dwv.App = function ()
 
         // image listeners
         view.addEventListener("wlchange", self.onWLChange);
-        view.addEventListener("colorchange", self.onColorChange);
+        view.addEventListener("colourchange", self.onColourChange);
         view.addEventListener("slicechange", self.onSliceChange);
         
         // update presets with loaded image (used in w/l tool)
@@ -1253,8 +1253,8 @@ dwv.App = function ()
             positionInfo = new dwv.info.Position(self);
             positionInfo.create();
             
-            miniColorMap = new dwv.info.MiniColorMap(self);
-            miniColorMap.create();
+            miniColourMap = new dwv.info.MiniColourMap(self);
+            miniColourMap.create();
             
             plotInfo = new dwv.info.Plot(self);
             plotInfo.create();

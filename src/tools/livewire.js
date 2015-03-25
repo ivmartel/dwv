@@ -351,12 +351,12 @@ dwv.tool.Livewire.prototype.getHelp = function()
 };
 
 /**
- * Set the line color of the drawing.
+ * Set the line colour of the drawing.
  * @method setLineColour
  * @param {String} colour The colour to set.
  */
 dwv.tool.Livewire.prototype.setLineColour = function(colour)
 {
     // set style var
-    this.style.setLineColor(colour);
+    this.style.setLineColour(colour);
 };

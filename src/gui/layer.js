@@ -315,14 +315,14 @@ dwv.html.Layer = function(name)
     };
     
     /**
-     * Set the line color for the layer.
-     * @method setLineColor
-     * @input {String} color The line color.
+     * Set the line colour for the layer.
+     * @method setLineColour
+     * @input {String} colour The line colour.
      */
-    this.setLineColor = function(color)
+    this.setLineColour = function(colour)
     {
-        context.fillStyle = color;
-        context.strokeStyle = color;
+        context.fillStyle = colour;
+        context.strokeStyle = colour;
     };
     
     /**

@@ -566,8 +566,8 @@ dwv.tool.Draw = function (app, shapeFactoryList)
             cmdName = "ellipse";
         }
         
-        // shape color
-        var color = shape.stroke();
+        // shape colour
+        var colour = shape.stroke();
         
         // drag start event handling
         shape.on('dragstart', function (event) {
@@ -609,7 +609,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
             }
             else {
                 trash.getChildren().each( function (tshape){ tshape.stroke('red'); });
-                shape.stroke(color);
+                shape.stroke(colour);
             }
             // update group but not 'this' shape
             var group = this.getParent();
@@ -640,8 +640,8 @@ dwv.tool.Draw = function (app, shapeFactoryList)
                     shape.x( shape.x() - delTranslation.x );
                     shape.y( shape.y() - delTranslation.y );
                 });
-                // restore color
-                shape.stroke(color);
+                // restore colour
+                shape.stroke(colour);
                 // disable editor
                 shapeEditor.disable();
                 shapeEditor.setShape(null);
@@ -685,7 +685,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
         this.setShapeName(shapeName);
         // init gui
         if ( gui ) {
-            // same for color
+            // same for colour
             this.setLineColour(gui.getColours()[0]);
             // init html
             gui.initialise();
@@ -705,7 +705,7 @@ dwv.tool.Draw.prototype.getHelp = function()
     return {
         'title': "Draw",
         'brief': "Allows to draw shapes on the image. " +
-            "Choose the shape and its color from the drop down menus. Once created, shapes " +
+            "Choose the shape and its colour from the drop down menus. Once created, shapes " +
             "can be edited by selecting them. Anchors will appear and allow specific shape edition. " +
             "Drag the shape on the top red cross to delete it. All actions are undoable. ",
         'mouse': {
@@ -718,14 +718,14 @@ dwv.tool.Draw.prototype.getHelp = function()
 };
 
 /**
- * Set the line color of the drawing.
+ * Set the line colour of the drawing.
  * @method setLineColour
  * @param {String} colour The colour to set.
  */
 dwv.tool.Draw.prototype.setLineColour = function(colour)
 {
     // set style var
-    this.style.setLineColor(colour);
+    this.style.setLineColour(colour);
 };
 
 /**

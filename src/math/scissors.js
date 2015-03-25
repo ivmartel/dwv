@@ -13,7 +13,7 @@ var __twothirdpi = ( 2 / (3 * Math.PI) );
  */
 dwv.math.computeGreyscale = function(data, width, height) {
     // Returns 2D augmented array containing greyscale data
-    // Greyscale values found by averaging color channels
+    // Greyscale values found by averaging colour channels
     // Input should be in a flat RGBA array, with values between 0 and 255
     var greyscale = [];
 

@@ -49,9 +49,9 @@ dwv.ToolboxController = function (toolbox)
     };
     
     /**
-     * Set the tool line color.
+     * Set the tool line colour.
      * @method runFilter
-     * @param {String} name The name of the color.
+     * @param {String} name The name of the colour.
      */
     this.setLineColour = function (name)
     {

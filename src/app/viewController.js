@@ -172,7 +172,7 @@ dwv.ViewController = function ( view )
      */
     this.getColourMap = function ()
     {
-        return view.getColorMap();
+        return view.getColourMap();
     };
 
     /**
@@ -182,7 +182,7 @@ dwv.ViewController = function ( view )
      */
     this.setColourMap = function (colourMap)
     {
-        view.setColorMap(colourMap);
+        view.setColourMap(colourMap);
     };
 
     /**

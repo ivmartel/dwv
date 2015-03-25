@@ -47,7 +47,7 @@ dwv.tool.EllipseFactory.prototype.create = function (points, style, image)
         x: ellipse.getCenter().getX(),
         y: ellipse.getCenter().getY(),
         radius: { x: ellipse.getA(), y: ellipse.getB() },
-        stroke: style.getLineColor(),
+        stroke: style.getLineColour(),
         strokeWidth: 2,
         name: "shape"
     });
@@ -62,7 +62,7 @@ dwv.tool.EllipseFactory.prototype.create = function (points, style, image)
         text: str,
         fontSize: style.getFontSize(),
         fontFamily: "Verdana",
-        fill: style.getLineColor(),
+        fill: style.getLineColour(),
         name: "text"
     });
     // return group

@@ -126,23 +126,23 @@ dwv.info.Position = function ( app )
 }; // class dwv.info.Position
 
 /**
- * MiniColorMap info layer.
- * @class MiniColorMap
+ * MiniColourMap info layer.
+ * @class MiniColourMap
  * @namespace dwv.info
  * @constructor
  * @param {Object} app The associated application.
  */
-dwv.info.MiniColorMap = function ( app )
+dwv.info.MiniColourMap = function ( app )
 {
     /**
-     * Create the mini color map info div.
-     * @method createMiniColorMap
+     * Create the mini colour map info div.
+     * @method createMiniColourMap
      */
     this.create = function ()
     {    
         var rootId = app.getContainerDivId();
         
-        // color map
+        // colour map
         var div = document.getElementById(rootId+"-infobr");
         dwv.html.removeNode(rootId+"-canvasinfobr");
         var canvas = document.createElement("canvas");
@@ -154,10 +154,10 @@ dwv.info.MiniColorMap = function ( app )
     };
     
     /**
-     * Update the mini color map info div.
-     * @method updateMiniColorMap
+     * Update the mini colour map info div.
+     * @method updateMiniColourMap
      * @param {Object} event The windowing change event containing the new values.
-     * Warning: expects the mini color map div to exist (use after createMiniColorMap).
+     * Warning: expects the mini colour map div to exist (use after createMiniColourMap).
      */
     this.update = function (event)
     {    
@@ -210,7 +210,7 @@ dwv.info.MiniColorMap = function ( app )
         // put the image data in the context
         context.putImageData(imageData, 0, 0);
     };
-}; // class dwv.info.MiniColorMap
+}; // class dwv.info.MiniColourMap
 
 
 /**
@@ -231,7 +231,7 @@ dwv.info.Plot = function (app)
     {
         $.plot($("#"+app.getContainerDivId()+"-plot"), [ app.getImage().getHistogram() ], {
             "bars": { "show": true },
-            "grid": { "backgroundColor": null },
+            "grid": { "backgroundcolor": null },
             "xaxis": { "show": true },
             "yaxis": { "show": false }
         });
@@ -260,7 +260,7 @@ dwv.info.Plot = function (app)
     
         $.plot($("#"+app.getContainerDivId()+"-plot"), [ app.getImage().getHistogram() ], {
             "bars": { "show": true },
-            "grid": { "markings": markings, "backgroundColor": null },
+            "grid": { "markings": markings, "backgroundcolour": null },
             "xaxis": { "show": false },
             "yaxis": { "show": false }
         });
