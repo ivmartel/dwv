@@ -26,6 +26,14 @@ dwv.tool.UndoStack = function ()
      * @type Array
      */
     var stack = [];
+    
+    /**
+     * Get the stack.
+     * @method getStack
+     * @return {Array} The list of stored commands.
+     */
+    this.getStack = function () { return stack; };
+    
     /**
      * Current command index.
      * @property curCmdIndex

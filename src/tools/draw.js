@@ -40,6 +40,18 @@ dwv.tool.DrawGroupCommand = function (group, name, layer)
         // draw
         layer.draw();
     };
+    /**
+     * Get a JSON representation of the object.
+     * @method toJSON
+     */
+    this.toJSON = function () {
+        return {
+            "type": "DrawGroupCommand",
+            "group": group.toJSON(), 
+            "name": name, 
+            "layer": layer
+        };
+    };
 }; // DrawGroupCommand class
 
 /**
