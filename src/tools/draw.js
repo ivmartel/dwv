@@ -40,18 +40,6 @@ dwv.tool.DrawGroupCommand = function (group, name, layer)
         // draw
         layer.draw();
     };
-    /**
-     * Get a JSON representation of the object.
-     * @method toJSON
-     */
-    this.toJSON = function () {
-        return {
-            "type": "DrawGroupCommand",
-            "group": group.toJSON(), 
-            "name": name, 
-            "layer": layer
-        };
-    };
 }; // DrawGroupCommand class
 
 /**
@@ -213,13 +201,6 @@ dwv.tool.Draw = function (app, shapeFactoryList)
      * @type Object
      */
     var command = null;
-    /**
-     * List of created shapes.
-     * @property createdShapes
-     * @private
-     * @type Array
-     */
-    var createdShapes = [];
     /**
      * Current shape group.
      * @property shapeGroup
@@ -420,7 +401,6 @@ dwv.tool.Draw = function (app, shapeFactoryList)
                 return node.name() === 'shape';
             })[0];
             self.setShapeOn( shape );
-            createdShapes.push( shape );
         }
         // reset flag
         started = false;
@@ -500,14 +480,24 @@ dwv.tool.Draw = function (app, shapeFactoryList)
         drawLayer = app.getDrawLayer();
         drawLayer.listening( flag );
         drawLayer.hitGraphEnabled( flag );
+        // get the list of shapes
+        var groups = drawLayer.getChildren();
+        var shapes = [];
+        var fshape = function (node) {
+            return node.name() === 'shape';
+        };
+        for ( var i = 0; i < groups.length; ++i ) {
+            // should only be one shape per group
+            shapes.push( groups[i].getChildren(fshape)[0] );
+        }
         // set shape display properties
         if ( flag ) {
             app.addLayerListeners( app.getDrawStage().getContent() );
-            createdShapes.forEach( function (shape){ self.setShapeOn( shape ); });
+            shapes.forEach( function (shape){ self.setShapeOn( shape ); });
         }
         else {
             app.removeLayerListeners( app.getDrawStage().getContent() );
-            createdShapes.forEach( function (shape){ setShapeOff( shape ); });
+            shapes.forEach( function (shape){ setShapeOff( shape ); });
         }
         // draw
         drawLayer.draw();

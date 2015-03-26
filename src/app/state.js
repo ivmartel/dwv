@@ -25,7 +25,7 @@ dwv.State = function (app)
             "window-center": app.getViewController().getWindowLevel().center, 
             "window-width": app.getViewController().getWindowLevel().width,
             "position": app.getViewController().getCurrentPosition(),
-            "undo": app.getUndoStack().getStack()
+            "drawings": app.getDrawLayer().getChildren()
         };
         return window.btoa(JSON.stringify(data));
     };
@@ -38,15 +38,14 @@ dwv.State = function (app)
         // display
         app.getViewController().setWindowLevel(data["window-center"], data["window-width"]);
         app.getViewController().setCurrentPosition(data.position);
-        // undo stack
-        for ( var i = 0 ; i < data.undo.length; ++i ) {
-            if ( data.undo[i].type === "DrawGroupCommand" ) {
-                var cmd = new dwv.tool.DrawGroupCommand(
-                    Kinetic.Node.create(data.undo[i].group), 
-                    data.undo[i].name, 
-                    app.getDrawLayer() );
-                cmd.execute();
-            }
+        // drawings
+        for ( var i = 0 ; i < data.drawings.length; ++i ) {
+            var cmd = new dwv.tool.DrawGroupCommand(
+                Kinetic.Node.create(data.drawings[i]), 
+                "Draw", 
+                app.getDrawLayer() );
+            cmd.execute();
+            app.getUndoStack().add(cmd);
         }
     };
 }; // State class
