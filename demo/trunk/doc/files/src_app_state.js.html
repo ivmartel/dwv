@@ -198,13 +198,28 @@ dwv.State = function (app)
      * @method save
      */
     this.toJSON = function () {
-        var data = {
+        // store each slice drawings group
+        var nSlices = app.getImage().getGeometry().getSize().getNumberOfSlices();
+        var drawings = [];
+        for ( var k = 0; k &lt; nSlices; ++k ) {
+            // getChildren always return, so drawings will have the good size
+            var groups = app.getDrawLayer(k).getChildren();
+            // remove anchors
+            for ( var i = 0; i &lt; groups.length; ++i ) {
+                var anchors  = groups[i].find(&quot;.anchor&quot;);
+                for ( var a = 0; a &lt; anchors.length; ++a ) {
+                    anchors[a].remove();
+                }
+            }
+            drawings.push(groups);
+        }
+        // return a JSON string
+        return window.btoa( JSON.stringify( {
             &quot;window-center&quot;: app.getViewController().getWindowLevel().center, 
             &quot;window-width&quot;: app.getViewController().getWindowLevel().width,
             &quot;position&quot;: app.getViewController().getCurrentPosition(),
-            &quot;drawings&quot;: app.getDrawLayer().getChildren()
-        };
-        return window.btoa(JSON.stringify(data));
+            &quot;drawings&quot;: drawings
+        } ) );
     };
     /**
      * Load state.
@@ -216,13 +231,20 @@ dwv.State = function (app)
         app.getViewController().setWindowLevel(data[&quot;window-center&quot;], data[&quot;window-width&quot;]);
         app.getViewController().setCurrentPosition(data.position);
         // drawings
-        for ( var i = 0 ; i &lt; data.drawings.length; ++i ) {
-            var cmd = new dwv.tool.DrawGroupCommand(
-                Kinetic.Node.create(data.drawings[i]), 
-                &quot;Draw&quot;, 
-                app.getDrawLayer() );
-            cmd.execute();
-            app.getUndoStack().add(cmd);
+        var nSlices = app.getImage().getGeometry().getSize().getNumberOfSlices();
+        var isShape = function (node) {
+            return node.name() === &quot;shape&quot;;
+        };
+        for ( var k = 0 ; k &lt; nSlices; ++k ) {
+            for ( var i = 0 ; i &lt; data.drawings[k].length; ++i ) {
+                var group = Kinetic.Node.create(data.drawings[k][i]);
+                var shape = group.getChildren( isShape )[0];
+                var cmd = new dwv.tool.DrawGroupCommand(
+                    group, shape.className,
+                    app.getDrawLayer(k) );
+                cmd.execute();
+                app.getUndoStack().add(cmd);
+            }
         }
     };
 }; // State class
