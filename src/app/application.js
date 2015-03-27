@@ -140,8 +140,13 @@ dwv.App = function ()
      * @method getDrawLayer
      * @return {Object} The draw layer.
      */
-    this.getDrawLayer = function () { 
-        return drawLayers[view.getCurrentPosition().k];
+    this.getDrawLayer = function (k) { 
+        if ( typeof  k === "undefined" ) {
+            return drawLayers[view.getCurrentPosition().k];
+        }
+        else {
+            return drawLayers[k];
+        }
     };
     /** 
      * Get the draw stage.
