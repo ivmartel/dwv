@@ -218,6 +218,8 @@ dwv.State = function (app)
             &quot;window-center&quot;: app.getViewController().getWindowLevel().center, 
             &quot;window-width&quot;: app.getViewController().getWindowLevel().width,
             &quot;position&quot;: app.getViewController().getCurrentPosition(),
+            &quot;scale&quot;: app.getScale(),
+            &quot;scaleCenter&quot;: app.getScaleCenter(),
             &quot;drawings&quot;: drawings
         } ) );
     };
@@ -230,6 +232,7 @@ dwv.State = function (app)
         // display
         app.getViewController().setWindowLevel(data[&quot;window-center&quot;], data[&quot;window-width&quot;]);
         app.getViewController().setCurrentPosition(data.position);
+        app.setScale(data.scale, data.scaleCenter);
         // drawings
         var nSlices = app.getImage().getGeometry().getSize().getNumberOfSlices();
         var isShape = function (node) {
