@@ -33,7 +33,11 @@ dwv.App = function ()
     var windowScale = 1;
     // Fit display to window flag
     var fitToWindow = false;
-
+    // main scale
+    var scale = 1;
+    // zoom center
+    var scaleCenter = {"x": 0, "y": 0};
+    
     // View
     var view = null;
     // View controller
@@ -121,6 +125,30 @@ dwv.App = function ()
      * @return {String} The div id.
      */
     this.getContainerDivId = function () { return containerDivId; };
+
+    /** 
+     * Get the main scale.
+     * @method getScale
+     * @return {Number} The main scale.
+     */
+    this.getScale = function () { return scale / windowScale; };
+
+    /** 
+     * Set the main scale.
+     * @method getScale
+     * @param {Number} The main scale.
+     */
+    this.setScale = function (zoom, center) { 
+        scale = zoom * windowScale;
+        scaleCenter = center;
+    };
+
+    /** 
+     * Get the scale center.
+     * @method getScaleCenter
+     * @return {Object} The coordinates of the scale center.
+     */
+    this.getScaleCenter = function () { return scaleCenter; };
 
     /** 
      * Get the view controller.
@@ -363,6 +391,7 @@ dwv.App = function ()
      * @method resetLayout
      */
     this.resetLayout = function () {
+        scale = windowScale;
         if ( imageLayer ) {
             imageLayer.resetLayout(windowScale);
             imageLayer.draw();
@@ -500,6 +529,7 @@ dwv.App = function ()
         var newHeight = parseInt(windowScale*dataHeight, 10);
         // ratio previous/new to add to zoom
         var mul = newWidth / oldWidth;
+        scale *= mul;
 
         // resize container
         var jqDivId = "#"+containerDivId;
@@ -507,11 +537,9 @@ dwv.App = function ()
         $(jqDivId).height(newHeight);
         // resize image layer
         if ( imageLayer ) {
-            var iZoomX = imageLayer.getZoom().x * mul;
-            var iZoomY = imageLayer.getZoom().y * mul;
             imageLayer.setWidth(newWidth);
             imageLayer.setHeight(newHeight);
-            imageLayer.zoom(iZoomX, iZoomY, 0, 0);
+            imageLayer.zoom(scale, scale, 0, 0);
             imageLayer.draw();
         }
         // resize draw stage
@@ -521,11 +549,9 @@ dwv.App = function ()
             $(drawDivId).width(newWidth);
             $(drawDivId).height(newHeight);
             // resize stage
-            var stageZomX = drawStage.scale().x * mul;
-            var stageZoomY = drawStage.scale().y * mul;
             drawStage.setWidth(newWidth);
             drawStage.setHeight(newHeight);
-            drawStage.scale( {x: stageZomX, y: stageZoomY} );
+            drawStage.scale( {x: scale, y: scale} );
             drawStage.draw();
         }
     };
@@ -897,18 +923,20 @@ dwv.App = function ()
      */ 
     this.zoomLayers = function (step, cx, cy)
     {
+        // store zoom and center
+        scale += step;
+        scaleCenter = {"x": cx, "y": cy};
+        
         if( this.getImageLayer() ) {
             var layer = this.getImageLayer();
-            var oldZoom = layer.getZoom();
-            var newZoom = {'x': (oldZoom.x + step), 'y': (oldZoom.y + step)};
-            layer.zoom(newZoom.x, newZoom.y, cx, cy);
+            layer.zoom(scale, scale, cx, cy);
             layer.draw();
         }
         if( this.getDrawStage() ) { 
             
             var stage = this.getDrawStage();
             var oldKZoom = stage.scale();
-            var newKZoom = {'x': (oldKZoom.x + step), 'y': (oldKZoom.y + step)};
+            var newKZoom = {'x': scale, 'y': scale};
             
             var oldOffset = stage.offset();
             var newOffsetX = (cx / oldKZoom.x) + oldOffset.x - (cx / newKZoom.x);
