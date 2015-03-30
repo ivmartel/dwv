@@ -100,6 +100,8 @@ dwv.html.Layer = function(name)
         return zoom;
     };
     
+    var trans = {'x': 0, 'y': 0};
+    
     /**
      * Set the canvas width.
      * @method setWidth
@@ -152,9 +154,8 @@ dwv.html.Layer = function(name)
      */
     this.translate = function(tx,ty)
     {
-        // new origin
-        origin.x += tx * zoom.x;
-        origin.y += ty * zoom.y;
+        trans.x = tx;
+        trans.y = ty;
     };
     
     /**
@@ -179,6 +180,8 @@ dwv.html.Layer = function(name)
         origin.y = 0;
         zoom.x = izoom;
         zoom.y = izoom;
+        trans.x = 0;
+        trans.y = 0;
     };
     
     /**
@@ -212,7 +215,9 @@ dwv.html.Layer = function(name)
         // [ a c e ]
         // [ b d f ]
         // [ 0 0 1 ]
-        context.setTransform( zoom.x, 0, 0, zoom.y, origin.x, origin.y );
+        context.setTransform( zoom.x, 0, 0, zoom.y, 
+            origin.x + (trans.x * zoom.x), 
+            origin.y + (trans.y * zoom.y) );
         context.drawImage( cacheCanvas, 0, 0 );
     };
     

@@ -43,6 +43,7 @@ dwv.State = function (app)
             "position": app.getViewController().getCurrentPosition(),
             "scale": app.getScale(),
             "scaleCenter": app.getScaleCenter(),
+            "translation": app.getTranslation(),
             "drawings": drawings
         } ) );
     };
@@ -55,7 +56,8 @@ dwv.State = function (app)
         // display
         app.getViewController().setWindowLevel(data["window-center"], data["window-width"]);
         app.getViewController().setCurrentPosition(data.position);
-        app.setScale(data.scale, data.scaleCenter);
+        app.zoom(data.scale, data.scaleCenter.x, data.scaleCenter.y);
+        app.translate(data.translation.x, data.translation.y);
         // drawings
         var nSlices = app.getImage().getGeometry().getSize().getNumberOfSlices();
         var isShape = function (node) {

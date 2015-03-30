@@ -37,6 +37,8 @@ dwv.App = function ()
     var scale = 1;
     // zoom center
     var scaleCenter = {"x": 0, "y": 0};
+    // translation
+    var translation = {"x": 0, "y": 0};
     
     // View
     var view = null;
@@ -134,21 +136,18 @@ dwv.App = function ()
     this.getScale = function () { return scale / windowScale; };
 
     /** 
-     * Set the main scale.
-     * @method getScale
-     * @param {Number} The main scale.
-     */
-    this.setScale = function (zoom, center) { 
-        scale = zoom * windowScale;
-        scaleCenter = center;
-    };
-
-    /** 
      * Get the scale center.
      * @method getScaleCenter
      * @return {Object} The coordinates of the scale center.
      */
     this.getScaleCenter = function () { return scaleCenter; };
+
+    /** 
+     * Get the translation.
+     * @method getTranslation
+     * @return {Object} The translation.
+     */
+    this.getTranslation = function () { return translation; };
 
     /** 
      * Get the view controller.
@@ -392,6 +391,8 @@ dwv.App = function ()
      */
     this.resetLayout = function () {
         scale = windowScale;
+        scaleCenter = {"x": 0, "y": 0};
+        translation = {"x": 0, "y": 0};
         if ( imageLayer ) {
             imageLayer.resetLayout(windowScale);
             imageLayer.draw();
@@ -642,6 +643,58 @@ dwv.App = function ()
         generateAndDrawImage();
     };
     
+    /**
+     * Zoom to the layers.
+     * @method zoom
+     * @param {Number} zoom The zoom to apply.
+     * @param {Number} cx The zoom center X coordinate.
+     * @param {Number} cy The zoom center Y coordinate.
+     */ 
+    this.zoom = function (zoom, cx, cy) {
+        scale = zoom * windowScale;
+        scaleCenter = {"x": cx, "y": cy};
+        zoomLayers();
+    };
+    
+    /**
+     * Add a step to the layers zoom.
+     * @method stepZoom
+     * @param {Number} step The zoom step increment. A good step is of 0.1.
+     * @param {Number} cx The zoom center X coordinate.
+     * @param {Number} cy The zoom center Y coordinate.
+     */ 
+    this.stepZoom = function (step, cx, cy) {
+        scale += step;
+        scaleCenter = {"x": cx, "y": cy};
+        zoomLayers();
+    };
+
+    /**
+     * Apply a translation to the layers.
+     * @method translate
+     * @param {Number} tx The translation along X.
+     * @param {Number} ty The translation along Y.
+     */ 
+    this.translate = function (tx, ty)
+    {
+        translation = {"x": tx, "y": ty};
+        translateLayers();
+    };
+    
+    /**
+     * Apply a translation to the layers.
+     * @method translate
+     * @param {Number} tx The step translation along X.
+     * @param {Number} ty The step translation along Y.
+     */ 
+    this.stepTranslate = function (tx, ty)
+    {
+        var txx = translation.x + tx / scale;
+        var tyy = translation.y + ty / scale;
+        translation = {"x": txx, "y": tyy};
+        translateLayers();
+    };
+
     // Handler Methods -----------------------------------------------------------
 
     /**
@@ -914,67 +967,6 @@ dwv.App = function ()
         dwv.gui.refreshSelect("#presetSelect");
     };
 
-    /**
-     * Apply the zoom to the layers.
-     * @method zoomLayers
-     * @param {Number} step The zoom step increment. A good step is of 0.1.
-     * @param {Number} cx The zoom center X coordinate.
-     * @param {Number} cy The zoom center Y coordinate.
-     */ 
-    this.zoomLayers = function (step, cx, cy)
-    {
-        // store zoom and center
-        scale += step;
-        scaleCenter = {"x": cx, "y": cy};
-        
-        if( this.getImageLayer() ) {
-            var layer = this.getImageLayer();
-            layer.zoom(scale, scale, cx, cy);
-            layer.draw();
-        }
-        if( this.getDrawStage() ) { 
-            
-            var stage = this.getDrawStage();
-            var oldKZoom = stage.scale();
-            var newKZoom = {'x': scale, 'y': scale};
-            
-            var oldOffset = stage.offset();
-            var newOffsetX = (cx / oldKZoom.x) + oldOffset.x - (cx / newKZoom.x);
-            var newOffsetY = (cy / oldKZoom.y) + oldOffset.y - (cy / newKZoom.y);
-            var newOffset = { 'x': newOffsetX, 'y': newOffsetY };
-            
-            stage.offset( newOffset );
-            stage.scale( newKZoom );
-            stage.draw();
-        }
-    };
-
-    /**
-     * Apply a translation to the layers.
-     * @method translateLayers
-     * @param {Number} tx The translation along X.
-     * @param {Number} ty The translation along Y.
-     */ 
-    this.translateLayers = function (tx, ty)
-    {
-        if( this.getImageLayer() ) {
-            var layer = this.getImageLayer();
-            var zoom = layer.getZoom();
-            var txx = tx / zoom.x;
-            var tyy = ty / zoom.y;
-            layer.translate(txx, tyy);
-            layer.draw();
-        }
-        if( this.getDrawStage() ) { 
-            var stage = this.getDrawStage();
-            var offset = stage.offset();
-            var kzoom = stage.scale();
-            offset.x -= tx / kzoom.x;
-            offset.y -= ty / kzoom.y;
-            stage.offset( offset );
-            stage.draw();
-        }
-    };
 
     // Private Methods -----------------------------------------------------------
 
@@ -992,6 +984,60 @@ dwv.App = function ()
         imageLayer.draw();
     }
     
+    var newOffset;
+    
+    /**
+     * Apply the stored zoom to the layers.
+     * @method zoomLayers
+     */ 
+    function zoomLayers()
+    {
+        // image layer
+        if( imageLayer ) {
+            imageLayer.zoom(scale, scale, scaleCenter.x, scaleCenter.y);
+            imageLayer.draw();
+        }
+        // draw layer
+        if( drawStage ) { 
+            var oldKZoom = drawStage.scale();
+            var newKZoom = {'x': scale, 'y': scale};
+            
+            var oldOffset = drawStage.offset();
+            var newOffsetX = (scaleCenter.x / oldKZoom.x) + 
+                oldOffset.x - (scaleCenter.x / newKZoom.x);
+            var newOffsetY = (scaleCenter.y / oldKZoom.y) + 
+                oldOffset.y - (scaleCenter.y / newKZoom.y);
+            newOffset = { 'x': newOffsetX, 'y': newOffsetY };
+            
+            drawStage.offset( newOffset );
+            drawStage.scale( newKZoom );
+            drawStage.draw();
+        }
+    }
+
+    /**
+     * Apply the stored translation to the layers.
+     * @method translateLayers
+     */ 
+    function translateLayers()
+    {
+        // image layer
+        if( imageLayer ) {
+            imageLayer.translate(translation.x, translation.y);
+            imageLayer.draw();
+        }
+        // draw layer
+        if( drawStage ) { 
+            var offset = drawStage.offset();
+            offset.x = newOffset.x - translation.x;
+            offset.y = newOffset.y - translation.y;
+            //offset.x = - imageLayer.getOrigin().x - translation.x;
+            //offset.y = - imageLayer.getOrigin().y - translation.y;
+            drawStage.offset( offset );
+            drawStage.draw();
+        }
+    }
+
     /**
      * Add image listeners.
      * @method addImageInfoListeners
