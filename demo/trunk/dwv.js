@@ -37,6 +37,8 @@ dwv.App = function ()
     var scale = 1;
     // zoom center
     var scaleCenter = {"x": 0, "y": 0};
+    // translation
+    var translation = {"x": 0, "y": 0};
     
     // View
     var view = null;
@@ -134,21 +136,18 @@ dwv.App = function ()
     this.getScale = function () { return scale / windowScale; };
 
     /** 
-     * Set the main scale.
-     * @method getScale
-     * @param {Number} The main scale.
-     */
-    this.setScale = function (zoom, center) { 
-        scale = zoom * windowScale;
-        scaleCenter = center;
-    };
-
-    /** 
      * Get the scale center.
      * @method getScaleCenter
      * @return {Object} The coordinates of the scale center.
      */
     this.getScaleCenter = function () { return scaleCenter; };
+
+    /** 
+     * Get the translation.
+     * @method getTranslation
+     * @return {Object} The translation.
+     */
+    this.getTranslation = function () { return translation; };
 
     /** 
      * Get the view controller.
@@ -392,6 +391,8 @@ dwv.App = function ()
      */
     this.resetLayout = function () {
         scale = windowScale;
+        scaleCenter = {"x": 0, "y": 0};
+        translation = {"x": 0, "y": 0};
         if ( imageLayer ) {
             imageLayer.resetLayout(windowScale);
             imageLayer.draw();
@@ -642,6 +643,58 @@ dwv.App = function ()
         generateAndDrawImage();
     };
     
+    /**
+     * Zoom to the layers.
+     * @method zoom
+     * @param {Number} zoom The zoom to apply.
+     * @param {Number} cx The zoom center X coordinate.
+     * @param {Number} cy The zoom center Y coordinate.
+     */ 
+    this.zoom = function (zoom, cx, cy) {
+        scale = zoom * windowScale;
+        scaleCenter = {"x": cx, "y": cy};
+        zoomLayers();
+    };
+    
+    /**
+     * Add a step to the layers zoom.
+     * @method stepZoom
+     * @param {Number} step The zoom step increment. A good step is of 0.1.
+     * @param {Number} cx The zoom center X coordinate.
+     * @param {Number} cy The zoom center Y coordinate.
+     */ 
+    this.stepZoom = function (step, cx, cy) {
+        scale += step;
+        scaleCenter = {"x": cx, "y": cy};
+        zoomLayers();
+    };
+
+    /**
+     * Apply a translation to the layers.
+     * @method translate
+     * @param {Number} tx The translation along X.
+     * @param {Number} ty The translation along Y.
+     */ 
+    this.translate = function (tx, ty)
+    {
+        translation = {"x": tx, "y": ty};
+        translateLayers();
+    };
+    
+    /**
+     * Apply a translation to the layers.
+     * @method translate
+     * @param {Number} tx The step translation along X.
+     * @param {Number} ty The step translation along Y.
+     */ 
+    this.stepTranslate = function (tx, ty)
+    {
+        var txx = translation.x + tx / scale;
+        var tyy = translation.y + ty / scale;
+        translation = {"x": txx, "y": tyy};
+        translateLayers();
+    };
+
     // Handler Methods -----------------------------------------------------------
 
     /**
@@ -914,67 +967,6 @@ dwv.App = function ()
         dwv.gui.refreshSelect("#presetSelect");
     };
 
-    /**
-     * Apply the zoom to the layers.
-     * @method zoomLayers
-     * @param {Number} step The zoom step increment. A good step is of 0.1.
-     * @param {Number} cx The zoom center X coordinate.
-     * @param {Number} cy The zoom center Y coordinate.
-     */ 
-    this.zoomLayers = function (step, cx, cy)
-    {
-        // store zoom and center
-        scale += step;
-        scaleCenter = {"x": cx, "y": cy};
-        
-        if( this.getImageLayer() ) {
-            var layer = this.getImageLayer();
-            layer.zoom(scale, scale, cx, cy);
-            layer.draw();
-        }
-        if( this.getDrawStage() ) { 
-            
-            var stage = this.getDrawStage();
-            var oldKZoom = stage.scale();
-            var newKZoom = {'x': scale, 'y': scale};
-            
-            var oldOffset = stage.offset();
-            var newOffsetX = (cx / oldKZoom.x) + oldOffset.x - (cx / newKZoom.x);
-            var newOffsetY = (cy / oldKZoom.y) + oldOffset.y - (cy / newKZoom.y);
-            var newOffset = { 'x': newOffsetX, 'y': newOffsetY };
-            
-            stage.offset( newOffset );
-            stage.scale( newKZoom );
-            stage.draw();
-        }
-    };
-
-    /**
-     * Apply a translation to the layers.
-     * @method translateLayers
-     * @param {Number} tx The translation along X.
-     * @param {Number} ty The translation along Y.
-     */ 
-    this.translateLayers = function (tx, ty)
-    {
-        if( this.getImageLayer() ) {
-            var layer = this.getImageLayer();
-            var zoom = layer.getZoom();
-            var txx = tx / zoom.x;
-            var tyy = ty / zoom.y;
-            layer.translate(txx, tyy);
-            layer.draw();
-        }
-        if( this.getDrawStage() ) { 
-            var stage = this.getDrawStage();
-            var offset = stage.offset();
-            var kzoom = stage.scale();
-            offset.x -= tx / kzoom.x;
-            offset.y -= ty / kzoom.y;
-            stage.offset( offset );
-            stage.draw();
-        }
-    };
 
     // Private Methods -----------------------------------------------------------
 
@@ -992,6 +984,60 @@ dwv.App = function ()
         imageLayer.draw();
     }
     
+    var newOffset;
+    
+    /**
+     * Apply the stored zoom to the layers.
+     * @method zoomLayers
+     */ 
+    function zoomLayers()
+    {
+        // image layer
+        if( imageLayer ) {
+            imageLayer.zoom(scale, scale, scaleCenter.x, scaleCenter.y);
+            imageLayer.draw();
+        }
+        // draw layer
+        if( drawStage ) { 
+            var oldKZoom = drawStage.scale();
+            var newKZoom = {'x': scale, 'y': scale};
+            
+            var oldOffset = drawStage.offset();
+            var newOffsetX = (scaleCenter.x / oldKZoom.x) + 
+                oldOffset.x - (scaleCenter.x / newKZoom.x);
+            var newOffsetY = (scaleCenter.y / oldKZoom.y) + 
+                oldOffset.y - (scaleCenter.y / newKZoom.y);
+            newOffset = { 'x': newOffsetX, 'y': newOffsetY };
+            
+            drawStage.offset( newOffset );
+            drawStage.scale( newKZoom );
+            drawStage.draw();
+        }
+    }
+
+    /**
+     * Apply the stored translation to the layers.
+     * @method translateLayers
+     */ 
+    function translateLayers()
+    {
+        // image layer
+        if( imageLayer ) {
+            imageLayer.translate(translation.x, translation.y);
+            imageLayer.draw();
+        }
+        // draw layer
+        if( drawStage ) { 
+            var offset = drawStage.offset();
+            offset.x = newOffset.x - translation.x;
+            offset.y = newOffset.y - translation.y;
+            //offset.x = - imageLayer.getOrigin().x - translation.x;
+            //offset.y = - imageLayer.getOrigin().y - translation.y;
+            drawStage.offset( offset );
+            drawStage.draw();
+        }
+    }
+
     /**
      * Add image listeners.
      * @method addImageInfoListeners
@@ -1346,6 +1392,7 @@ dwv.State = function (app)
             "position": app.getViewController().getCurrentPosition(),
             "scale": app.getScale(),
             "scaleCenter": app.getScaleCenter(),
+            "translation": app.getTranslation(),
             "drawings": drawings
         } ) );
     };
@@ -1358,7 +1405,8 @@ dwv.State = function (app)
         // display
         app.getViewController().setWindowLevel(data["window-center"], data["window-width"]);
         app.getViewController().setCurrentPosition(data.position);
-        app.setScale(data.scale, data.scaleCenter);
+        app.zoom(data.scale, data.scaleCenter.x, data.scaleCenter.y);
+        app.translate(data.translation.x, data.translation.y);
         // drawings
         var nSlices = app.getImage().getGeometry().getSize().getNumberOfSlices();
         var isShape = function (node) {
@@ -5535,6 +5583,8 @@ dwv.html.Layer = function(name)
         return zoom;
     };
     
+    var trans = {'x': 0, 'y': 0};
+    
     /**
      * Set the canvas width.
      * @method setWidth
@@ -5587,9 +5637,8 @@ dwv.html.Layer = function(name)
      */
     this.translate = function(tx,ty)
     {
-        // new origin
-        origin.x += tx * zoom.x;
-        origin.y += ty * zoom.y;
+        trans.x = tx;
+        trans.y = ty;
     };
     
     /**
@@ -5614,6 +5663,8 @@ dwv.html.Layer = function(name)
         origin.y = 0;
         zoom.x = izoom;
         zoom.y = izoom;
+        trans.x = 0;
+        trans.y = 0;
     };
     
     /**
@@ -5647,7 +5698,9 @@ dwv.html.Layer = function(name)
         // [ a c e ]
         // [ b d f ]
         // [ 0 0 1 ]
-        context.setTransform( zoom.x, 0, 0, zoom.y, origin.x, origin.y );
+        context.setTransform( zoom.x, 0, 0, zoom.y, 
+            origin.x + (trans.x * zoom.x), 
+            origin.y + (trans.y * zoom.y) );
         context.drawImage( cacheCanvas, 0, 0 );
     };
     
@@ -14351,7 +14404,8 @@ dwv.tool.ZoomAndPan = function(app)
         var tx = event._xs - self.x0;
         var ty = event._ys - self.y0;
         // apply translation
-        app.translateLayers(tx, ty);
+        //app.translate(tx, ty);
+        app.stepTranslate(tx, ty);
         // reset origin point
         self.x0 = event._xs;
         self.y0 = event._ys;
@@ -14394,7 +14448,7 @@ dwv.tool.ZoomAndPan = function(app)
             // zoom mode
             var zoom = (lineRatio - 1) / 2;
             if( Math.abs(zoom) % 0.1 <= 0.05 ) {
-                app.zoomLayers(zoom, event._xs, event._ys);
+                app.stepZoom(zoom, event._xs, event._ys);
             }
         }
     };
@@ -14468,7 +14522,7 @@ dwv.tool.ZoomAndPan = function(app)
     this.DOMMouseScroll = function(event){
         // ev.detail on firefox is 3
         var step = - event.detail / 30;
-        app.zoomLayers(step, event._xs, event._ys);
+        app.stepZoom(step, event._xs, event._ys);
     };
 
     /**
@@ -14479,7 +14533,7 @@ dwv.tool.ZoomAndPan = function(app)
     this.mousewheel = function(event){
         // ev.wheelDelta on chrome is 120
         var step = event.wheelDelta / 1200;
-        app.zoomLayers(step, event._xs, event._ys);
+        app.stepZoom(step, event._xs, event._ys);
     };
     
     /**
