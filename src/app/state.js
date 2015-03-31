@@ -37,7 +37,7 @@ dwv.State = function (app)
             drawings.push(groups);
         }
         // return a JSON string
-        return window.btoa( JSON.stringify( {
+        return JSON.stringify( {
             "window-center": app.getViewController().getWindowLevel().center, 
             "window-width": app.getViewController().getWindowLevel().width,
             "position": app.getViewController().getCurrentPosition(),
@@ -45,7 +45,7 @@ dwv.State = function (app)
             "scaleCenter": app.getScaleCenter(),
             "translation": app.getTranslation(),
             "drawings": drawings
-        } ) );
+        } );
     };
     /**
      * Load state.
