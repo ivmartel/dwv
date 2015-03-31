@@ -831,7 +831,7 @@ dwv.App = function ()
         var state = new dwv.State(self);
         // add href to link (html5)
         var element = document.getElementById("download-state");
-        element.href = "data:application/json;charset=utf8;base64," + state.toJSON();
+        element.href = "data:application/json," + state.toJSON();
     };
 
     /**
@@ -984,8 +984,6 @@ dwv.App = function ()
         imageLayer.draw();
     }
     
-    var newOffset;
-    
     /**
      * Apply the stored zoom to the layers.
      * @method zoomLayers
@@ -999,16 +997,18 @@ dwv.App = function ()
         }
         // draw layer
         if( drawStage ) { 
-            var oldKZoom = drawStage.scale();
+            // zoom
             var newKZoom = {'x': scale, 'y': scale};
-            
+            // offset
+            // TODO different from the imageLayer offset?
+            var oldKZoom = drawStage.scale();
             var oldOffset = drawStage.offset();
             var newOffsetX = (scaleCenter.x / oldKZoom.x) + 
                 oldOffset.x - (scaleCenter.x / newKZoom.x);
             var newOffsetY = (scaleCenter.y / oldKZoom.y) + 
                 oldOffset.y - (scaleCenter.y / newKZoom.y);
-            newOffset = { 'x': newOffsetX, 'y': newOffsetY };
-            
+            var newOffset = { 'x': newOffsetX, 'y': newOffsetY };
+            // store
             drawStage.offset( newOffset );
             drawStage.scale( newKZoom );
             drawStage.draw();
@@ -1027,13 +1027,10 @@ dwv.App = function ()
             imageLayer.draw();
         }
         // draw layer
-        if( drawStage ) { 
-            var offset = drawStage.offset();
-            offset.x = newOffset.x - translation.x;
-            offset.y = newOffset.y - translation.y;
-            //offset.x = - imageLayer.getOrigin().x - translation.x;
-            //offset.y = - imageLayer.getOrigin().y - translation.y;
-            drawStage.offset( offset );
+        if( drawStage && imageLayer ) { 
+            var ox = - imageLayer.getOrigin().x / scale - translation.x;
+            var oy = - imageLayer.getOrigin().y / scale - translation.y;
+            drawStage.offset( { 'x': ox, 'y': oy } );
             drawStage.draw();
         }
     }
@@ -1386,7 +1383,7 @@ dwv.State = function (app)
             drawings.push(groups);
         }
         // return a JSON string
-        return window.btoa( JSON.stringify( {
+        return JSON.stringify( {
             "window-center": app.getViewController().getWindowLevel().center, 
             "window-width": app.getViewController().getWindowLevel().width,
             "position": app.getViewController().getCurrentPosition(),
@@ -1394,7 +1391,7 @@ dwv.State = function (app)
             "scaleCenter": app.getScaleCenter(),
             "translation": app.getTranslation(),
             "drawings": drawings
-        } ) );
+        } );
     };
     /**
      * Load state.
