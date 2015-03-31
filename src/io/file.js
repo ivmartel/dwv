@@ -48,6 +48,13 @@ dwv.io.File.prototype.load = function(ioArray)
         onerror( {'name': "RequestError", 
             'message': "An error occurred while reading the DICOM file: "+event.getMessage() } );
     };
+    
+    // Request error
+    var onErrorJSONReader = function(event)
+    {
+        onerror( {'name': "RequestError", 
+            'message': "An error occurred while reading the JSON file: "+event.getMessage() } );
+    };
 
     // DICOM reader loader
     var onLoadDicomReader = function(event)
@@ -63,6 +70,18 @@ dwv.io.File.prototype.load = function(ioArray)
         // force 100% progress (sometimes with firefox)
         var endEvent = {lengthComputable: true, loaded: 1, total: 1};
         dwv.gui.updateProgress(endEvent);
+    };
+
+    // JSON loader
+    var onLoadJSONReader = function(/*event*/)
+    {
+        // parse image file
+        try {
+            // call listener
+            onload(event.target.result);
+        } catch(error) {
+            onerror(error);
+        }
     };
 
     // Image loader
@@ -86,6 +105,7 @@ dwv.io.File.prototype.load = function(ioArray)
         // storing values to pass them on
         theImage.file = this.file;
         theImage.index = this.index;
+        // triggered by ctx.drawImage
         theImage.onload = onLoadImageFile;
     };
 
@@ -94,11 +114,19 @@ dwv.io.File.prototype.load = function(ioArray)
     {
         var file = ioArray[i];
         var reader = new FileReader();
-        if( file.type.match("image.*") )
+        if ( file.name.split('.').pop().toLowerCase() === "json" )
+        {
+            reader.onload = onLoadJSONReader;
+            reader.onprogress = dwv.gui.updateProgress;
+            reader.onerror = onErrorJSONReader;
+            reader.readAsText(file);
+        }
+        else if ( file.type.match("image.*") )
         {
             // storing values to pass them on
             reader.file = file;
             reader.index = i;
+            // callbacks
             reader.onload = onLoadImageReader;
             reader.onprogress = dwv.gui.updateProgress;
             reader.onerror = onErrorImageReader;

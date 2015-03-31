@@ -50,7 +50,7 @@ dwv.tool.ProtractorFactory.prototype.create = function (points, style/*, image*/
     // draw shape
     var kshape = new Kinetic.Line({
         points: pointsArray,
-        stroke: style.getLineColor(),
+        stroke: style.getLineColour(),
         strokeWidth: 2,
         name: "shape"
     });
@@ -77,7 +77,7 @@ dwv.tool.ProtractorFactory.prototype.create = function (points, style/*, image*/
             text: angleStr,
             fontSize: style.getFontSize(),
             fontFamily: "Verdana",
-            fill: style.getLineColor(),
+            fill: style.getLineColour(),
             name: "text"
         });
         // arc
@@ -85,7 +85,7 @@ dwv.tool.ProtractorFactory.prototype.create = function (points, style/*, image*/
         var karc = new Kinetic.Arc({
             innerRadius: radius,
             outerRadius: radius,
-            stroke: style.getLineColor(),
+            stroke: style.getLineColour(),
             angle: angle,
             rotationDeg: -inclination,
             x: points[1].getX(),

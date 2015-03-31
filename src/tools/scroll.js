@@ -70,10 +70,10 @@ dwv.tool.Scroll = function(app)
         }
         // update GUI
         if( diffY > 0 ) {
-            app.getView().incrementSliceNb();
+            app.getViewController().incrementSliceNb();
         }
         else {
-            app.getView().decrementSliceNb();
+            app.getViewController().decrementSliceNb();
         }
         // reset origin point
         self.x0 = event._x;
@@ -137,10 +137,10 @@ dwv.tool.Scroll = function(app)
     this.DOMMouseScroll = function(event){
         // ev.detail on firefox is 3
         if( event.detail < 0 ) {
-            app.getView().incrementSliceNb();
+            app.getViewController().incrementSliceNb();
         }
         else {
-            app.getView().decrementSliceNb();
+            app.getViewController().decrementSliceNb();
         }
     };
 
@@ -152,10 +152,10 @@ dwv.tool.Scroll = function(app)
     this.mousewheel = function(event){
         // ev.wheelDelta on chrome is 120
         if( event.wheelDelta > 0 ) {
-            app.getView().incrementSliceNb();
+            app.getViewController().incrementSliceNb();
         }
         else {
-            app.getView().decrementSliceNb();
+            app.getViewController().decrementSliceNb();
         }
     };
     /**

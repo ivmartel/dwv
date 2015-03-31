@@ -43,7 +43,7 @@ dwv.tool.LineFactory.prototype.create = function (points, style, image)
     var kshape = new Kinetic.Line({
         points: [line.getBegin().getX(), line.getBegin().getY(), 
                  line.getEnd().getX(), line.getEnd().getY() ],
-        stroke: style.getLineColor(),
+        stroke: style.getLineColour(),
         strokeWidth: 2,
         name: "shape"
     });
@@ -57,7 +57,7 @@ dwv.tool.LineFactory.prototype.create = function (points, style, image)
         text: str,
         fontSize: style.getFontSize(),
         fontFamily: "Verdana",
-        fill: style.getLineColor(),
+        fill: style.getLineColour(),
         name: "text"
     });
     // return group

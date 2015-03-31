@@ -221,7 +221,7 @@ dwv.image.lut.Window = function (rescaleLut, isSigned)
 };
 
 /**
-* Lookup tables for image color display. 
+* Lookup tables for image colour display. 
 */
 
 dwv.image.lut.range_max = 256;

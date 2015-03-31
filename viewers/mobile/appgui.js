@@ -2,6 +2,25 @@
  * Application GUI.
  */
 
+// Default colour maps.
+dwv.tool.colourMaps = {
+    "plain": dwv.image.lut.plain,
+    "invplain": dwv.image.lut.invPlain,
+    "rainbow": dwv.image.lut.rainbow,
+    "hot": dwv.image.lut.hot,
+    "test": dwv.image.lut.test
+};
+// Default window level presets.
+dwv.tool.defaultpresets = {};
+// Default window level presets for CT.
+dwv.tool.defaultpresets.CT = {
+    "mediastinum": {"center": 40, "width": 400},
+    "lung": {"center": -500, "width": 1500},
+    "bone": {"center": 500, "width": 2000},
+    "brain": {"center": 40, "width": 80},
+    "head": {"center": 90, "width": 350}
+};
+
 // Window
 dwv.gui.getWindowSize = dwv.gui.base.getWindowSize;
 // Progress
@@ -50,6 +69,12 @@ dwv.gui.Toolbox = function (app)
         toggleInfo.setAttribute("class", buttonClass + " ui-icon-info");
         toggleInfo.onclick = app.onToggleInfoLayer;
     
+        var toggleSaveState = document.createElement("a");
+        toggleSaveState.setAttribute("class", buttonClass + " ui-icon-action");
+        toggleSaveState.onclick = app.onStateSave;
+        toggleSaveState.download = "state.json";
+        toggleSaveState.id = "download-state";
+
         var tags = document.createElement("a");
         tags.href = "#tags_page";
         tags.setAttribute("class", buttonClass + " ui-icon-grid");
@@ -59,6 +84,7 @@ dwv.gui.Toolbox = function (app)
         node.appendChild(undo);
         node.appendChild(redo);
         node.appendChild(toggleInfo);
+        node.appendChild(toggleSaveState);
         node.appendChild(tags);
         $("#toolbar").trigger("create");
     };

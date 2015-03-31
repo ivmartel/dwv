@@ -33,12 +33,12 @@ dwv.image.View = function(image, isSigned)
      */
     var windowPresets = null;
     /**
-     * Color map
-     * @property colorMap
+     * colour map
+     * @property colourMap
      * @private
      * @type Object
      */
-    var colorMap = dwv.image.lut.plain;
+    var colourMap = dwv.image.lut.plain;
     /**
      * Current position
      * @property currentPosition
@@ -122,23 +122,23 @@ dwv.image.View = function(image, isSigned)
     };
     
     /**
-     * Get the color map of the image.
-     * @method getColorMap
-     * @return {Object} The color map of the image.
+     * Get the colour map of the image.
+     * @method getColourMap
+     * @return {Object} The colour map of the image.
      */ 
-    this.getColorMap = function() { return colorMap; };
+    this.getColourMap = function() { return colourMap; };
     /**
-     * Set the color map of the image.
-     * @method setColorMap
-     * @param {Object} map The color map of the image.
+     * Set the colour map of the image.
+     * @method setColourMap
+     * @param {Object} map The colour map of the image.
      */ 
-    this.setColorMap = function(map) { 
-        colorMap = map;
+    this.setColourMap = function(map) { 
+        colourMap = map;
         // TODO Better handle this...
         if( this.getImage().getPhotometricInterpretation() === "MONOCHROME1") {
-            colorMap = dwv.image.lut.invPlain;
+            colourMap = dwv.image.lut.invPlain;
         }
-        this.fireEvent({"type": "colorchange", 
+        this.fireEvent({"type": "colourchange", 
            "wc": this.getWindowLut().getCenter(),
            "ww": this.getWindowLut().getWidth() });
     };
@@ -269,46 +269,6 @@ dwv.image.View.prototype.setWindowLevelMinMax = function()
     // set window level
     this.setWindowLevel(center,width);
 };
-/**
- * Go to first slice .
- * @method goFirstSlice
- * @return {Boolean} False if not in bounds.
- */
-dwv.image.View.prototype.goFirstSlice = function()
-{
-    return this.setCurrentPosition({
-        "i": this.getCurrentPosition().i,
-        "j": this.getCurrentPosition().j,
-        "k":  0 
-    });
-};
-/**
- * Increment the current slice number.
- * @method incrementSliceNb
- * @return {Boolean} False if not in bounds.
- */
-dwv.image.View.prototype.incrementSliceNb = function()
-{
-    return this.setCurrentPosition({
-        "i": this.getCurrentPosition().i,
-        "j": this.getCurrentPosition().j,
-        "k": this.getCurrentPosition().k + 1 
-    });
-};
-
-/**
- * Decrement the current slice number.
- * @method decrementSliceNb
- * @return {Boolean} False if not in bounds.
- */
-dwv.image.View.prototype.decrementSliceNb = function()
-{
-    return this.setCurrentPosition({
-        "i": this.getCurrentPosition().i,
-        "j": this.getCurrentPosition().j,
-        "k": this.getCurrentPosition().k - 1 
-    });
-};
 
 /**
  * Generate display image data to be given to a canvas.
@@ -325,7 +285,7 @@ dwv.image.View.prototype.generateImageData = function( array )
     var planarConfig = image.getPlanarConfiguration();
     var windowLut = this.getWindowLut();
     windowLut.update();
-    var colorMap = this.getColorMap();
+    var colourMap = this.getColourMap();
     var index = 0;
     var sliceSize = image.getGeometry().getSize().getSliceSize();
     var sliceOffset = 0;
@@ -339,9 +299,9 @@ dwv.image.View.prototype.generateImageData = function( array )
         {        
             pxValue = parseInt( windowLut.getValue( 
                     image.getValueAtOffset(i) ), 10 );
-            array.data[index] = colorMap.red[pxValue];
-            array.data[index+1] = colorMap.green[pxValue];
-            array.data[index+2] = colorMap.blue[pxValue];
+            array.data[index] = colourMap.red[pxValue];
+            array.data[index+1] = colourMap.green[pxValue];
+            array.data[index+2] = colourMap.blue[pxValue];
             array.data[index+3] = 0xff;
             index += 4;
         }

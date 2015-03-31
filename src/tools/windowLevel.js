@@ -11,26 +11,6 @@ var dwv = dwv || {};
  */
 dwv.tool = dwv.tool || {};
 
-// Default colour maps.
-dwv.tool.colourMaps = {
-    "plain": dwv.image.lut.plain,
-    "invplain": dwv.image.lut.invPlain,
-    "rainbow": dwv.image.lut.rainbow,
-    "hot": dwv.image.lut.hot,
-    "test": dwv.image.lut.test
-};
-// Default window level presets.
-dwv.tool.defaultpresets = {};
-dwv.tool.defaultpresets.CT = {
-    "mediastinum": {"center": 40, "width": 400},
-    "lung": {"center": -500, "width": 1500},
-    "bone": {"center": 500, "width": 2000},
-};
-dwv.tool.defaultpresets.CTextra = {
-    "brain": {"center": 40, "width": 80},
-    "head": {"center": 90, "width": 350}
-};
-
 /**
  * WindowLevel tool: handle window/level related events.
  * @class WindowLevel
@@ -72,7 +52,7 @@ dwv.tool.WindowLevel = function(app)
         self.x0 = event._x;
         self.y0 = event._y;
         // update GUI
-        app.setCurrentPostion(event._x, event._y);
+        app.getViewController().setCurrentPosition2D(event._x, event._y);
     };
     
     /**
@@ -89,8 +69,8 @@ dwv.tool.WindowLevel = function(app)
         var diffX = event._x - self.x0;
         var diffY = self.y0 - event._y;
         // calculate new window level
-        var windowCenter = parseInt(app.getView().getWindowLut().getCenter(), 10) + diffY;
-        var windowWidth = parseInt(app.getView().getWindowLut().getWidth(), 10) + diffX;
+        var windowCenter = parseInt(app.getViewController().getWindowLevel().center, 10) + diffY;
+        var windowWidth = parseInt(app.getViewController().getWindowLevel().width, 10) + diffX;
         // update GUI
         app.getViewController().setWindowLevel(windowCenter,windowWidth);
         // store position
@@ -108,9 +88,9 @@ dwv.tool.WindowLevel = function(app)
         if( self.started ) {
             self.started = false;
             // store the manual preset
-            var windowCenter = parseInt(app.getView().getWindowLut().getCenter(), 10);
-            var windowWidth = parseInt(app.getView().getWindowLut().getWidth(), 10);
-            app.getPresets().manual = {"center": windowCenter, "width": windowWidth};
+            var windowCenter = parseInt(app.getViewController().getWindowLevel().center, 10);
+            var windowWidth = parseInt(app.getViewController().getWindowLevel().width, 10);
+            app.getViewController().getPresets().manual = {"center": windowCenter, "width": windowWidth};
             // update gui
             if ( gui ) {
                 gui.initialise();
@@ -165,8 +145,9 @@ dwv.tool.WindowLevel = function(app)
     this.dblclick = function(event){
         // update GUI
         app.getViewController().setWindowLevel(
-            parseInt(app.getImage().getRescaledValue(event._x, event._y, app.getView().getCurrentPosition().k), 10),
-            parseInt(app.getView().getWindowLut().getWidth(), 10) );    
+            parseInt(app.getImage().getRescaledValue(
+                event._x, event._y, app.getViewController().getCurrentPosition().k), 10),
+            parseInt(app.getViewController().getWindowLevel().width, 10) );    
     };
     
     /**
@@ -212,7 +193,6 @@ dwv.tool.WindowLevel = function(app)
      * @method init
      */
     this.init = function() {
-        app.updatePresets(true);
         if ( gui ) {
             gui.initialise();
         }

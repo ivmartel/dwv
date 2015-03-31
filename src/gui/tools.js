@@ -106,10 +106,10 @@ dwv.gui.base.WindowLevel = function (app)
     this.setup = function ()
     {
         // preset select
-        var wlSelector = dwv.html.createHtmlSelect("presetSelect", app.getPresets());
+        var wlSelector = dwv.html.createHtmlSelect("presetSelect", []);
         wlSelector.onchange = app.onChangeWindowLevelPreset;
         // colour map select
-        var cmSelector = dwv.html.createHtmlSelect("colourMapSelect",dwv.tool.colourMaps);
+        var cmSelector = dwv.html.createHtmlSelect("colourMapSelect", dwv.tool.colourMaps);
         cmSelector.onchange = app.onChangeColourMap;
     
         // preset list element
@@ -118,7 +118,7 @@ dwv.gui.base.WindowLevel = function (app)
         wlLi.style.display = "none";
         wlLi.appendChild(wlSelector);
         wlLi.setAttribute("class","ui-block-b");
-        // color map list element
+        // colour map list element
         var cmLi = document.createElement("li");
         cmLi.id = "cmLi";
         cmLi.style.display = "none";
@@ -129,7 +129,7 @@ dwv.gui.base.WindowLevel = function (app)
         var node = document.getElementById("toolList");
         // append preset
         node.appendChild(wlLi);
-        // append color map
+        // append colour map
         node.appendChild(cmLi);
         // trigger create event (mobile)
         $("#toolList").trigger("create");
@@ -144,7 +144,7 @@ dwv.gui.base.WindowLevel = function (app)
     {
         // presets list element
         dwv.html.displayElement("wlLi", bool);
-        // color map list element
+        // colour map list element
         dwv.html.displayElement("cmLi", bool);
     };
     
@@ -155,7 +155,7 @@ dwv.gui.base.WindowLevel = function (app)
     this.initialise = function ()
     {
         // create new preset select
-        var wlSelector = dwv.html.createHtmlSelect("presetSelect", app.getPresets());
+        var wlSelector = dwv.html.createHtmlSelect("presetSelect", app.getViewController().getPresets());
         wlSelector.onchange = app.onChangeWindowLevelPreset;
         wlSelector.title = "Select w/l preset.";
         
@@ -228,7 +228,7 @@ dwv.gui.base.Draw = function (app)
         var node = document.getElementById("toolList");
         // apend shape
         node.appendChild(shapeLi);
-        // append color
+        // append colour
         node.appendChild(colourLi);
         // trigger create event (mobile)
         $("#toolList").trigger("create");
@@ -241,7 +241,7 @@ dwv.gui.base.Draw = function (app)
      */
     this.display = function (bool)
     {
-        // color list element
+        // colour list element
         dwv.html.displayElement("colourLi", bool);
         // shape list element
         dwv.html.displayElement("shapeLi", bool);
@@ -257,7 +257,7 @@ dwv.gui.base.Draw = function (app)
         var shapeSelector = document.getElementById("shapeSelect");
         shapeSelector.selectedIndex = 0;
         dwv.gui.refreshSelect("#shapeSelect");
-        // color select: reset selected option
+        // colour select: reset selected option
         var colourSelector = document.getElementById("colourSelect");
         colourSelector.selectedIndex = 0;
         dwv.gui.refreshSelect("#colourSelect");

@@ -18,7 +18,7 @@ dwv.gui.base = dwv.gui.base || {};
  * @namespace dwv.gui.base
  * @constructor
  */
-dwv.gui.base.Loadbox = function (app, fileLoadGui, urlLoadGui)
+dwv.gui.base.Loadbox = function (app, loaders)
 {
     /**
      * Setup the loadbox HTML.
@@ -48,14 +48,15 @@ dwv.gui.base.Loadbox = function (app, fileLoadGui, urlLoadGui)
      */
     this.displayLoader = function (name)
     {
-        if( name === "file") {
-            fileLoadGui.display(true);
-            urlLoadGui.display(false);
+        var keys = Object.keys(loaders);
+        for ( var i = 0; i < keys.length; ++i ) {
+            if ( keys[i] === name ) {
+                loaders[keys[i]].display(true);
+            }
+            else {
+                loaders[keys[i]].display(false);
+            }
         }
-        else if( name === "url") {
-            fileLoadGui.display(false);
-            urlLoadGui.display(true);
-        }        
     };
     
 }; // class dwv.gui.base.Loadbox

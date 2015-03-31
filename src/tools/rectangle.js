@@ -45,7 +45,7 @@ dwv.tool.RectangleFactory.prototype.create = function (points, style, image)
         y: rectangle.getBegin().getY(),
         width: rectangle.getWidth(),
         height: rectangle.getHeight(),
-        stroke: style.getLineColor(),
+        stroke: style.getLineColour(),
         strokeWidth: 2,
         name: "shape"
     });
@@ -60,7 +60,7 @@ dwv.tool.RectangleFactory.prototype.create = function (points, style, image)
         text: str,
         fontSize: style.getFontSize(),
         fontFamily: "Verdana",
-        fill: style.getLineColor(),
+        fill: style.getLineColour(),
         name: "text"
     });
     // return group

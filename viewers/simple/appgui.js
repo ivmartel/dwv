@@ -2,6 +2,15 @@
  * Application GUI.
  */
 
+// Default window level presets.
+dwv.tool.defaultpresets = {};
+// Default window level presets for CT.
+dwv.tool.defaultpresets.CT = {
+    "mediastinum": {"center": 40, "width": 400},
+    "lung": {"center": -500, "width": 1500},
+    "bone": {"center": 500, "width": 2000},
+};
+
 // Window
 dwv.gui.getWindowSize = dwv.gui.base.getWindowSize;
 // Progress
@@ -13,7 +22,7 @@ dwv.gui.Slider = dwv.gui.base.Slider;
 // Tags table
 dwv.gui.DicomTags = dwv.gui.base.DicomTags;
 
-//Toolbox 
+// Toolbox 
 dwv.gui.Toolbox = function (app)
 {
     var base = new dwv.gui.base.Toolbox(app);
@@ -101,8 +110,7 @@ dwv.gui.WindowLevel = function (app)
         $("#presetLabel").remove();
         
         // create preset select
-        app.updatePresets(false);
-        var select = dwv.html.createHtmlSelect("presetSelect", app.getPresets());
+        var select = dwv.html.createHtmlSelect("presetSelect", app.getViewController().getPresets());
         select.onchange = app.onChangeWindowLevelPreset;
         select.title = "Select w/l preset.";
         select.setAttribute("data-inline","true");
