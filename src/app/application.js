@@ -984,8 +984,6 @@ dwv.App = function ()
         imageLayer.draw();
     }
     
-    var newOffset;
-    
     /**
      * Apply the stored zoom to the layers.
      * @method zoomLayers
@@ -999,16 +997,18 @@ dwv.App = function ()
         }
         // draw layer
         if( drawStage ) { 
-            var oldKZoom = drawStage.scale();
+            // zoom
             var newKZoom = {'x': scale, 'y': scale};
-            
+            // offset
+            // TODO different from the imageLayer offset?
+            var oldKZoom = drawStage.scale();
             var oldOffset = drawStage.offset();
             var newOffsetX = (scaleCenter.x / oldKZoom.x) + 
                 oldOffset.x - (scaleCenter.x / newKZoom.x);
             var newOffsetY = (scaleCenter.y / oldKZoom.y) + 
                 oldOffset.y - (scaleCenter.y / newKZoom.y);
-            newOffset = { 'x': newOffsetX, 'y': newOffsetY };
-            
+            var newOffset = { 'x': newOffsetX, 'y': newOffsetY };
+            // store
             drawStage.offset( newOffset );
             drawStage.scale( newKZoom );
             drawStage.draw();
@@ -1027,13 +1027,10 @@ dwv.App = function ()
             imageLayer.draw();
         }
         // draw layer
-        if( drawStage ) { 
-            var offset = drawStage.offset();
-            offset.x = newOffset.x - translation.x;
-            offset.y = newOffset.y - translation.y;
-            //offset.x = - imageLayer.getOrigin().x - translation.x;
-            //offset.y = - imageLayer.getOrigin().y - translation.y;
-            drawStage.offset( offset );
+        if( drawStage && imageLayer ) { 
+            var ox = - imageLayer.getOrigin().x / scale - translation.x;
+            var oy = - imageLayer.getOrigin().y / scale - translation.y;
+            drawStage.offset( { 'x': ox, 'y': oy } );
             drawStage.draw();
         }
     }
