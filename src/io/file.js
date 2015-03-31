@@ -73,7 +73,7 @@ dwv.io.File.prototype.load = function(ioArray)
     };
 
     // JSON loader
-    var onLoadJSONReader = function(/*event*/)
+    var onLoadJSONReader = function(event)
     {
         // parse image file
         try {
