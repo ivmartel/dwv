@@ -127,7 +127,22 @@ dwv.gui.Toolbox = function (app)
         node.appendChild(image);
         node.appendChild(info);
         node.appendChild(help);
+        
+        // apply button style
         $("button").button();
+        
+        // save state button
+        var saveButton = document.createElement("button");
+        saveButton.appendChild(document.createTextNode("Download State"));
+        // save state link
+        var toggleSaveState = document.createElement("a");
+        toggleSaveState.onclick = app.onStateSave;
+        toggleSaveState.download = "state.json";
+        toggleSaveState.id = "download-state";
+        toggleSaveState.appendChild(saveButton);
+        // add to openData window
+        node = document.getElementById("openData");
+        node.appendChild(toggleSaveState);
     };
     this.display = function (bool)
     {
