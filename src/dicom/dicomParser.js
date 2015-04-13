@@ -407,7 +407,7 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
     }
     offset += 4;
     
-    // 0x0002, 0x0000: MetaElementGroupLength
+    // 0x0002, 0x0000: FileMetaInformationGroupLength
     var dataElement = this.readDataElement(metaReader, offset);
     var metaLength = parseInt(dataElement.data[0], 10);
     offset += dataElement.offset;

@@ -66,7 +66,7 @@ dwv.dicom.dictionary = {
         '0x51B0': ['US', '1-n', 'Overlays'],
     },
     '0x0002': {
-        '0x0000': ['UL', '1', 'MetaElementGroupLength'],
+        '0x0000': ['UL', '1', 'FileMetaInformationGroupLength'],
         '0x0001': ['OB', '1', 'FileMetaInformationVersion'],
         '0x0002': ['UI', '1', 'MediaStorageSOPClassUID'],
         '0x0003': ['UI', '1', 'MediaStorageSOPInstanceUID'],
