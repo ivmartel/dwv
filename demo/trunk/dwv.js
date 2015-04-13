@@ -1768,31 +1768,6 @@ dwv.dicom.DataReader = function(buffer, isLittleEndian)
         return view.getFloat32(byteOffset, isLittleEndian);
     };
     /**
-     * Read Uint data of nBytes size.
-     * @method readNumber
-     * @param {Number} byteOffset The offset to start reading from.
-     * @param {Number} nBytes The number of bytes to read.
-     * @return {Number} The read data.
-     */
-    this.readNumber = function(byteOffset, nBytes) {
-        if( nBytes === 1 ) {
-            return this.readUint8(byteOffset, isLittleEndian);
-        }
-        else if( nBytes === 2 ) {
-            return this.readUint16(byteOffset, isLittleEndian);
-        }
-        else if( nBytes === 4 ) {
-            return this.readUint32(byteOffset, isLittleEndian);
-        }
-        else if( nBytes === 8 ) {
-            return this.readFloat32(byteOffset, isLittleEndian);
-        }
-        else { 
-            console.warn("Non number: '"+this.readString(byteOffset, nBytes)+"' of "+nBytes+" bytes.");
-            return Number.NaN;
-        }
-    };
-    /**
      * Read Uint8 array.
      * @method readUint8Array
      * @param {Number} byteOffset The offset to start reading from.
@@ -1819,6 +1794,21 @@ dwv.dicom.DataReader = function(buffer, isLittleEndian)
         var index = 0;
         for(var i=byteOffset; i<byteOffset + size; i+=2) {     
             data[index++] = this.readUint16(i);
+        }
+        return data;
+    };
+    /**
+     * Read Uint32 array.
+     * @method readUint32Array
+     * @param {Number} byteOffset The offset to start reading from.
+     * @param {Number} size The size of the array.
+     * @return {Array} The read data.
+     */
+    this.readUint32Array = function(byteOffset, size) {
+        var data = new Uint32Array(size/4);
+        var index = 0;
+        for(var i=byteOffset; i<byteOffset + size; i+=4) {     
+            data[index++] = this.readUint32(i);
         }
         return data;
     };
@@ -2052,17 +2042,17 @@ dwv.dicom.DicomParser.prototype.readDataElement = function(reader, offset, impli
     // data
     var data;
     var dataOffset = offset+tagOffset+vrOffset+vlOffset;
-    if( vr === "US" || vr === "UL")
-    {
-        var num = reader.readNumber( dataOffset, vl );
-        if ( isNaN(num) ) {
-            console.warn("Not a number returned for tag: "+tag.name);
-        }
-        data = [num];
-    }
-    else if( vr === "OB" || vr === "N/A")
+    if( vr === "OB" || vr === "N/A")
     {
         data = reader.readUint8Array( dataOffset, vl );
+    }
+    else if( vr === "US")
+    {
+        data = reader.readUint16Array( dataOffset, vl );
+    }
+    else if( vr === "UL")
+    {
+        data = reader.readUint32Array( dataOffset, vl );
     }
     else if( vr === "OX" || vr === "OW" )
     {
@@ -2121,9 +2111,9 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
     }
     offset += 4;
     
-    // 0x0002, 0x0000: MetaElementGroupLength
+    // 0x0002, 0x0000: FileMetaInformationGroupLength
     var dataElement = this.readDataElement(metaReader, offset);
-    var metaLength = parseInt(dataElement.data, 10);
+    var metaLength = parseInt(dataElement.data[0], 10);
     offset += dataElement.offset;
     
     // meta elements
@@ -2342,7 +2332,7 @@ dwv.dicom.dictionary = {
         '0x51B0': ['US', '1-n', 'Overlays'],
     },
     '0x0002': {
-        '0x0000': ['UL', '1', 'MetaElementGroupLength'],
+        '0x0000': ['UL', '1', 'FileMetaInformationGroupLength'],
         '0x0001': ['OB', '1', 'FileMetaInformationVersion'],
         '0x0002': ['UI', '1', 'MediaStorageSOPClassUID'],
         '0x0003': ['UI', '1', 'MediaStorageSOPInstanceUID'],
