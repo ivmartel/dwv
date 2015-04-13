@@ -4734,7 +4734,7 @@
         },
         {
             "file": "src/gui/html.js",
-            "line": 89,
+            "line": 101,
             "description": "Append a row to an object.",
             "itemtype": "method",
             "name": "appendRowForObject",
@@ -4767,7 +4767,7 @@
         },
         {
             "file": "src/gui/html.js",
-            "line": 138,
+            "line": 162,
             "description": "Append a row to an object or an array.",
             "itemtype": "method",
             "name": "appendRow",
@@ -4800,7 +4800,7 @@
         },
         {
             "file": "src/gui/html.js",
-            "line": 163,
+            "line": 187,
             "description": "Converts the input to an HTML table.",
             "itemtype": "method",
             "name": "toTable",
@@ -4817,7 +4817,7 @@
         },
         {
             "file": "src/gui/html.js",
-            "line": 178,
+            "line": 202,
             "description": "Get an HTML search form.",
             "itemtype": "method",
             "name": "getHtmlSearchForm",
@@ -4839,7 +4839,7 @@
         },
         {
             "file": "src/gui/html.js",
-            "line": 198,
+            "line": 222,
             "description": "Filter a table with a given parameter: sets the display css of rows to\ntrue or false if it contains the term.",
             "itemtype": "method",
             "name": "filterTable",
@@ -4862,7 +4862,7 @@
         },
         {
             "file": "src/gui/html.js",
-            "line": 231,
+            "line": 255,
             "description": "Transform back each\n'preText <span class=\"highlighted\">term</span> postText'\ninto its original 'preText term postText'.",
             "itemtype": "method",
             "name": "dehighlight",
@@ -4880,7 +4880,7 @@
         },
         {
             "file": "src/gui/html.js",
-            "line": 259,
+            "line": 283,
             "description": "Create a\n'preText <span class=\"highlighted\">term</span> postText'\naround each search term.",
             "itemtype": "method",
             "name": "highlight",
@@ -4903,7 +4903,7 @@
         },
         {
             "file": "src/gui/html.js",
-            "line": 303,
+            "line": 327,
             "description": "Highlight a HTML node.",
             "itemtype": "method",
             "name": "createHighlightNode",
@@ -4925,7 +4925,7 @@
         },
         {
             "file": "src/gui/html.js",
-            "line": 318,
+            "line": 342,
             "description": "Remove all children of a HTML node.",
             "itemtype": "method",
             "name": "cleanNode",
@@ -4943,7 +4943,7 @@
         },
         {
             "file": "src/gui/html.js",
-            "line": 331,
+            "line": 355,
             "description": "Remove a HTML node and all its children.",
             "itemtype": "method",
             "name": "removeNode",
@@ -4961,7 +4961,7 @@
         },
         {
             "file": "src/gui/html.js",
-            "line": 351,
+            "line": 375,
             "description": "Create a HTML select from an input array of options.\nThe values of the options are the name of the option made lower case.\nIt is left to the user to set the 'onchange' method of the select.",
             "itemtype": "method",
             "name": "createHtmlSelect",
@@ -4988,7 +4988,7 @@
         },
         {
             "file": "src/gui/html.js",
-            "line": 395,
+            "line": 419,
             "description": "Get a list of parameters from an input URI that looks like:\n [dwv root]?input=encodeURI([root]?key0=value0&key1=value1)\nor\n [dwv root]?input=encodeURI([manifest link])&type=manifest",
             "itemtype": "method",
             "name": "getUriParam",
@@ -5015,7 +5015,7 @@
         },
         {
             "file": "src/gui/html.js",
-            "line": 439,
+            "line": 463,
             "description": "Decode a Key/Value pair uri. If a key is repeated, the result \nbe an array of base + each key.",
             "itemtype": "method",
             "name": "decodeKeyValueUri",
@@ -5038,7 +5038,7 @@
         },
         {
             "file": "src/gui/html.js",
-            "line": 525,
+            "line": 549,
             "description": "Decode a manifest uri.",
             "itemtype": "method",
             "name": "decodeManifestUri",
@@ -5066,7 +5066,7 @@
         },
         {
             "file": "src/gui/html.js",
-            "line": 558,
+            "line": 582,
             "description": "Decode an XML manifest.",
             "itemtype": "method",
             "name": "decodeManifest",
@@ -5089,7 +5089,7 @@
         },
         {
             "file": "src/gui/html.js",
-            "line": 608,
+            "line": 632,
             "description": "Display or not an element.",
             "itemtype": "method",
             "name": "displayElement",
@@ -5112,7 +5112,7 @@
         },
         {
             "file": "src/gui/html.js",
-            "line": 623,
+            "line": 647,
             "description": "Toggle the display of an element.",
             "itemtype": "method",
             "name": "toggleDisplay",
@@ -5130,7 +5130,7 @@
         },
         {
             "file": "src/gui/html.js",
-            "line": 642,
+            "line": 666,
             "description": "Append an element.",
             "itemtype": "method",
             "name": "appendElement",
@@ -5153,7 +5153,7 @@
         },
         {
             "file": "src/gui/html.js",
-            "line": 660,
+            "line": 684,
             "description": "Create an element.",
             "itemtype": "method",
             "name": "createElement",
@@ -12573,11 +12573,11 @@
         },
         {
             "message": "unknown tag: input",
-            "line": " src/gui/html.js:163"
+            "line": " src/gui/html.js:187"
         },
         {
             "message": "unknown tag: warning",
-            "line": " src/gui/html.js:163"
+            "line": " src/gui/html.js:187"
         },
         {
             "message": "replacing incorrect tag: returns with return",

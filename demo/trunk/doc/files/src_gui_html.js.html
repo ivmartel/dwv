@@ -240,25 +240,37 @@ dwv.html.appendHCell = function(row, text)
  * @param {} maxLevel
  * @param {} rowHeader
  */
-dwv.html.appendRowForArray = function(table, input, level, maxLevel, rowHeader)
+dwv.html.appendRowForArray = function (table, input, level, maxLevel, rowHeader)
 {
     var row = null;
     // loop through
-    for(var i=0; i&lt;input.length; ++i) {
-        // more to come
-        if( typeof input[i] === &#x27;number&#x27; ||
-            typeof input[i] === &#x27;string&#x27; ||
-            input[i] === null ||
-            input[i] === undefined ||
-            level &gt;= maxLevel ) {
-            if( !row ) {
+    for ( var i=0; i&lt;input.length; ++i ) {
+        var value = input[i];
+        // last level
+        if ( typeof value === &#x27;number&#x27; ||
+                typeof value === &#x27;string&#x27; ||
+                value === null ||
+                value === undefined ||
+                level &gt;= maxLevel ) {
+            if ( !row ) {
                 row = table.insertRow(-1);
             }
-            dwv.html.appendCell(row, input[i]);
+            if ( value instanceof Uint8Array ||
+                    value instanceof Uint16Array ||
+                    value instanceof Uint32Array ) {
+                if ( value.length &gt; 10 ) {
+                    value = Array.prototype.slice.call( value, 0, 10 );
+                    value[10] = &quot;...&quot;;
+                }
+                dwv.html.appendCell(row, Array.prototype.join.call( value, &#x27;, &#x27; ));
+            }
+            else {
+                dwv.html.appendCell(row, value);
+            }
         }
-        // last level
+        // more to come
         else {
-            dwv.html.appendRow(table, input[i], level+i, maxLevel, rowHeader);
+            dwv.html.appendRow(table, value, level+i, maxLevel, rowHeader);
         }
     }
 };
@@ -273,28 +285,40 @@ dwv.html.appendRowForArray = function(table, input, level, maxLevel, rowHeader)
  * @param {} maxLevel
  * @param {} rowHeader
  */
-dwv.html.appendRowForObject = function(table, input, level, maxLevel, rowHeader)
+dwv.html.appendRowForObject = function (table, input, level, maxLevel, rowHeader)
 {
     var keys = Object.keys(input);
     var row = null;
-    for( var o=0; o&lt;keys.length; ++o ) {
-        // more to come
-        if( typeof input[keys[o]] === &#x27;number&#x27; ||
-            typeof input[keys[o]] === &#x27;string&#x27; ||
-            input[keys[o]] === null ||
-            input[keys[o]] === undefined ||
-            level &gt;= maxLevel ) {
-            if( !row ) {
+    for ( var o=0; o&lt;keys.length; ++o ) {
+        var value = input[keys[o]];
+        // last level
+        if ( typeof value === &#x27;number&#x27; ||
+                typeof value === &#x27;string&#x27; ||
+                value === null ||
+                value === undefined ||
+                level &gt;= maxLevel ) {
+            if ( !row ) {
                 row = table.insertRow(-1);
             }
-            if( o === 0 &amp;&amp; rowHeader) {
+            if ( o === 0 &amp;&amp; rowHeader) {
                 dwv.html.appendCell(row, rowHeader);
             }
-            dwv.html.appendCell(row, input[keys[o]]);
+            if ( value instanceof Uint8Array ||
+                    value instanceof Uint16Array ||
+                    value instanceof Uint32Array ) {
+                if ( value.length &gt; 10 ) {
+                    value = Array.prototype.slice.call( value, 0, 10 );
+                    value[10] = &quot;...&quot;;
+                }
+                dwv.html.appendCell(row, Array.prototype.join.call( value, &#x27;, &#x27; ));
+            }
+            else {
+                dwv.html.appendCell(row, value);
+            }
         }
-        // last level
+        // more to come
         else {
-            dwv.html.appendRow(table, input[keys[o]], level+o, maxLevel, keys[o]);
+            dwv.html.appendRow(table, value, level+o, maxLevel, keys[o]);
         }
     }
     // header row
