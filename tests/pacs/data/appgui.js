@@ -2,6 +2,9 @@
  * Application GUI.
  */
 
+// Default window level presets.
+dwv.tool.defaultpresets = {};
+
 // Window
 dwv.gui.getWindowSize = dwv.gui.base.getWindowSize;
 // Progress
