@@ -24,8 +24,8 @@ asyncTest("Test DICOM parsing.", 2, function() {
         // parse DICOM
         var data = dwv.image.getDataFromDicomBuffer(request.response);
         // check values
-        equal(data.info.Rows.value, 256, "Number of rows");
-        equal(data.info.Columns.value, 256, "Number of columns");
+        equal(data.info.Rows.value[0], 256, "Number of rows");
+        equal(data.info.Columns.value[0], 256, "Number of columns");
         // start async test
         start();
     };
