@@ -4811,22 +4811,24 @@ dwv.html = dwv.html || {};
  * @method appendCell
  * @static
  * @param {Object} row The row to append the cell to.
- * @param {String} text The text of the cell.
+ * @param {Object} content The content of the cell.
  */
-dwv.html.appendCell = function(row, text)
+dwv.html.appendCell = function (row, content)
 {
     var cell = row.insertCell(-1);
-    var str = text;
-    // special case for Uint8Array (no default toString)
-    if ( text instanceof Uint8Array ) {
-        str = "";
-        for ( var i = 0; i < text.length; ++i ) {
-            if ( i > 0 ) { 
-                str += ",";
-            }
-            str += text[i];
+    var str = content;
+    // special care for arrays
+    if ( content instanceof Array || 
+            content instanceof Uint8Array ||
+            content instanceof Uint16Array ||
+            content instanceof Uint32Array ) {
+        if ( content.length > 10 ) {
+            content = Array.prototype.slice.call( content, 0, 10 );
+            content[10] = "...";
         }
+        str = Array.prototype.join.call( content, ', ' );
     }
+    // append
     cell.appendChild(document.createTextNode(str));
 };
 
@@ -4837,11 +4839,11 @@ dwv.html.appendCell = function(row, text)
  * @param {Object} row The row to append the header cell to.
  * @param {String} text The text of the header cell.
  */
-dwv.html.appendHCell = function(row, text)
+dwv.html.appendHCell = function (row, text)
 {
     var cell = document.createElement("th");
     // TODO jquery-mobile specific...
-    if( text !== "Value" && text !== "Name" ) {
+    if ( text !== "Value" && text !== "Name" ) {
         cell.setAttribute("data-priority", "1");
     }
     cell.appendChild(document.createTextNode(text));
@@ -4873,18 +4875,7 @@ dwv.html.appendRowForArray = function (table, input, level, maxLevel, rowHeader)
             if ( !row ) {
                 row = table.insertRow(-1);
             }
-            if ( value instanceof Uint8Array ||
-                    value instanceof Uint16Array ||
-                    value instanceof Uint32Array ) {
-                if ( value.length > 10 ) {
-                    value = Array.prototype.slice.call( value, 0, 10 );
-                    value[10] = "...";
-                }
-                dwv.html.appendCell(row, Array.prototype.join.call( value, ', ' ));
-            }
-            else {
-                dwv.html.appendCell(row, value);
-            }
+            dwv.html.appendCell(row, value);
         }
         // more to come
         else {
@@ -4921,18 +4912,7 @@ dwv.html.appendRowForObject = function (table, input, level, maxLevel, rowHeader
             if ( o === 0 && rowHeader) {
                 dwv.html.appendCell(row, rowHeader);
             }
-            if ( value instanceof Uint8Array ||
-                    value instanceof Uint16Array ||
-                    value instanceof Uint32Array ) {
-                if ( value.length > 10 ) {
-                    value = Array.prototype.slice.call( value, 0, 10 );
-                    value[10] = "...";
-                }
-                dwv.html.appendCell(row, Array.prototype.join.call( value, ', ' ));
-            }
-            else {
-                dwv.html.appendCell(row, value);
-            }
+            dwv.html.appendCell(row, value);
         }
         // more to come
         else {
@@ -4942,13 +4922,13 @@ dwv.html.appendRowForObject = function (table, input, level, maxLevel, rowHeader
     // header row
     // warn: need to create the header after the rest
     // otherwise the data will inserted in the thead...
-    if( level === 2 ) {
+    if ( level === 2 ) {
         var header = table.createTHead();
         var th = header.insertRow(-1);
-        if( rowHeader ) {
+        if ( rowHeader ) {
             dwv.html.appendHCell(th, "Name");
         }
-        for( var k=0; k<keys.length; ++k ) {
+        for ( var k=0; k<keys.length; ++k ) {
             dwv.html.appendHCell(th, dwv.utils.capitaliseFirstLetter(keys[k]));
         }
     }
@@ -4964,14 +4944,14 @@ dwv.html.appendRowForObject = function (table, input, level, maxLevel, rowHeader
  * @param {} maxLevel
  * @param {} rowHeader
  */
-dwv.html.appendRow = function(table, input, level, maxLevel, rowHeader)
+dwv.html.appendRow = function (table, input, level, maxLevel, rowHeader)
 {
     // array
-    if( input instanceof Array ) {
+    if ( input instanceof Array ) {
         dwv.html.appendRowForArray(table, input, level+1, maxLevel, rowHeader);
     }
     // object
-    else if( typeof input === 'object') {
+    else if ( typeof input === 'object') {
         dwv.html.appendRowForObject(table, input, level+1, maxLevel, rowHeader);
     }
     else {
@@ -4987,7 +4967,7 @@ dwv.html.appendRow = function(table, input, level, maxLevel, rowHeader)
  * @return {Object} The created HTML table.
  * @warning Null is interpreted differently in browsers, firefox will not display it.
  */
-dwv.html.toTable = function(input)
+dwv.html.toTable = function (input)
 {
     var table = document.createElement('table');
     dwv.html.appendRow(table, input, 0, 2);
@@ -5001,12 +4981,12 @@ dwv.html.toTable = function(input)
  * @param {Object} htmlTableToSearch The table to do the search on.
  * @return {Object} The HTML search form.
  */
-dwv.html.getHtmlSearchForm = function(htmlTableToSearch)
+dwv.html.getHtmlSearchForm = function (htmlTableToSearch)
 {
     var form = document.createElement("form");
     form.setAttribute("class", "filter");
     var input = document.createElement("input");
-    input.onkeyup = function() {
+    input.onkeyup = function () {
         dwv.html.filterTable(input, htmlTableToSearch);
     };
     form.appendChild(input);
@@ -5022,7 +5002,7 @@ dwv.html.getHtmlSearchForm = function(htmlTableToSearch)
  * @param {String} term The term to filter the table with.
  * @param {Object} table The table to filter.
  */
-dwv.html.filterTable = function(term, table) {
+dwv.html.filterTable = function (term, table) {
     // de-highlight
     dwv.html.dehighlight(table);
     // split search terms
@@ -5055,7 +5035,7 @@ dwv.html.filterTable = function(term, table) {
  * @static
  * @param {Object} container The container to de-highlight.
  */
-dwv.html.dehighlight = function(container) {
+dwv.html.dehighlight = function (container) {
     for (var i = 0; i < container.childNodes.length; i++) {
         var node = container.childNodes[i];
 
@@ -5084,7 +5064,7 @@ dwv.html.dehighlight = function(container) {
  * @param {String} term The term to highlight.
  * @param {Object} container The container where to highlight the term.
  */
-dwv.html.highlight = function(term, container) {
+dwv.html.highlight = function (term, container) {
     for (var i = 0; i < container.childNodes.length; i++) {
         var node = container.childNodes[i];
 
@@ -5126,7 +5106,7 @@ dwv.html.highlight = function(term, container) {
  * @param {Object} child The child to highlight.
  * @return {Object} The created HTML node.
  */
-dwv.html.createHighlightNode = function(child) {
+dwv.html.createHighlightNode = function (child) {
     var node = document.createElement('span');
     node.setAttribute('class', 'highlighted');
     node.attributes['class'].value = 'highlighted';
@@ -5140,7 +5120,7 @@ dwv.html.createHighlightNode = function(child) {
  * @static
  * @param {Object} node The node to remove kids.
  */
-dwv.html.cleanNode = function(node) {
+dwv.html.cleanNode = function (node) {
     // remove its children
     while (node.hasChildNodes()) {
         node.removeChild(node.firstChild);
@@ -5153,11 +5133,11 @@ dwv.html.cleanNode = function(node) {
  * @static
  * @param {String} nodeId The string id of the node to delete.
  */
-dwv.html.removeNode = function(nodeId) {
+dwv.html.removeNode = function (nodeId) {
     // find the node
     var node = document.getElementById(nodeId);
     // check node
-    if( !node ) {
+    if ( !node ) {
         return;
     }
     // remove its children
@@ -5177,14 +5157,14 @@ dwv.html.removeNode = function(nodeId) {
  * @param {Mixed} list The list of options of the HTML select.
  * @return {Object} The created HTML select.
  */
-dwv.html.createHtmlSelect = function(name, list) {
+dwv.html.createHtmlSelect = function (name, list) {
     // select
     var select = document.createElement("select");
     select.id = name;
     select.name = name;
     // options
     var option;
-    if( list instanceof Array )
+    if ( list instanceof Array )
     {
         for ( var i in list )
         {
@@ -5194,7 +5174,7 @@ dwv.html.createHtmlSelect = function(name, list) {
             select.appendChild(option);
         }
     }
-    else if( typeof list === 'object')
+    else if ( typeof list === 'object')
     {
         for ( var item in list )
         {
@@ -5223,22 +5203,22 @@ dwv.html.createHtmlSelect = function(name, list) {
  * @param {Function} The function to call with the decoded urls.
  * @return {Array} The list of urls if in uri, null otherwise.
  */
-dwv.html.getUriParam = function(uri, callback)
+dwv.html.getUriParam = function (uri, callback)
 {
     // split key/value pairs
     var mainQueryPairs = dwv.utils.splitQueryString(uri);
     // check pairs
-    if( Object.keys(mainQueryPairs).length === 0 ) {
+    if ( Object.keys(mainQueryPairs).length === 0 ) {
         return null;
     }
     // has to have an input key
     var query = mainQueryPairs.query;
-    if( !query || !query.input ) { 
+    if ( !query || !query.input ) { 
         throw new Error("No input parameter in query URI.");
     }
     
     // if manifest
-    if( query.type && query.type === "manifest" ) {
+    if ( query.type && query.type === "manifest" ) {
         dwv.html.decodeManifestUri( query.input, query.nslices, callback );
     }
     // if key/value uri
@@ -5263,13 +5243,13 @@ dwv.html.getUriParam = function(uri, callback)
  * @param {String} uri The uri to decode.
  * @param {String} replaceMode The key replace more.
  */
-dwv.html.decodeKeyValueUri = function(uri, replaceMode)
+dwv.html.decodeKeyValueUri = function (uri, replaceMode)
 {
     var result = [];
 
     // repeat key replace mode (default to keep key)
     var repeatKeyReplaceMode = "key";
-    if( replaceMode ) {
+    if ( replaceMode ) {
         repeatKeyReplaceMode = replaceMode;
     }
 
@@ -5286,16 +5266,16 @@ dwv.html.decodeKeyValueUri = function(uri, replaceMode)
         var keys = Object.keys(inputQueryPairs.query);
         // find repeat key
         var repeatKey = null;
-        for( var i = 0; i < keys.length; ++i )
+        for ( var i = 0; i < keys.length; ++i )
         {
-            if( inputQueryPairs.query[keys[i]] instanceof Array )
+            if ( inputQueryPairs.query[keys[i]] instanceof Array )
             {
                 repeatKey = keys[i];
                 break;
             }
         }
     
-        if( !repeatKey ) 
+        if ( !repeatKey ) 
         {
             result.push(queryUri);
         }
@@ -5306,14 +5286,14 @@ dwv.html.decodeKeyValueUri = function(uri, replaceMode)
             var baseUrl = inputQueryPairs.base;
             // do not add '?' when the repeatKey is 'file'
             // root/path/to/?file=0.jpg&file=1.jpg
-            if( repeatKey !== "file" ) { 
+            if ( repeatKey !== "file" ) { 
                 baseUrl += "?";
             }
             var gotOneArg = false;
-            for( var j = 0; j < keys.length; ++j )
+            for ( var j = 0; j < keys.length; ++j )
             {
-                if( keys[j] !== repeatKey ) {
-                    if( gotOneArg ) {
+                if ( keys[j] !== repeatKey ) {
+                    if ( gotOneArg ) {
                         baseUrl += "&";
                     }
                     baseUrl += keys[j] + "=" + inputQueryPairs.query[keys[j]];
@@ -5322,13 +5302,13 @@ dwv.html.decodeKeyValueUri = function(uri, replaceMode)
             }
             // append built urls to result
             var url;
-            for( var k = 0; k < repeatList.length; ++k )
+            for ( var k = 0; k < repeatList.length; ++k )
             {
                 url = baseUrl;
-                if( gotOneArg ) {
+                if ( gotOneArg ) {
                     url += "&";
                 }
-                if( repeatKeyReplaceMode === "key" ) {
+                if ( repeatKeyReplaceMode === "key" ) {
                     url += repeatKey + "=";
                 }
                 // other than 'key' mode: do nothing
@@ -5349,16 +5329,16 @@ dwv.html.decodeKeyValueUri = function(uri, replaceMode)
  * @param {number} nslices The number of slices to load.
  * @param {Function} The function to call with the decoded urls.
  */
-dwv.html.decodeManifestUri = function(uri, nslices, callback)
+dwv.html.decodeManifestUri = function (uri, nslices, callback)
 {
     // Request error
-    var onErrorRequest = function(/*event*/)
+    var onErrorRequest = function (/*event*/)
     {
         console.warn( "RequestError while receiving manifest: "+this.status );
     };
 
     // Request handler
-    var onLoadRequest = function(/*event*/)
+    var onLoadRequest = function (/*event*/)
     {
         var urls = dwv.html.decodeManifest(this.responseXML, nslices);
         callback(urls);
@@ -5381,7 +5361,7 @@ dwv.html.decodeManifestUri = function(uri, nslices, callback)
  * @param {Object} manifest The manifest to decode.
  * @param {Number} nslices The number of slices to load.
  */
-dwv.html.decodeManifest = function(manifest, nslices)
+dwv.html.decodeManifest = function (manifest, nslices)
 {
     var result = [];
     // wado url
@@ -5390,18 +5370,18 @@ dwv.html.decodeManifest = function(manifest, nslices)
     var rootURL = wadoURL + "?requestType=WADO&contentType=application/dicom&";
     // patient list
     var patientList = manifest.getElementsByTagName("Patient");
-    if( patientList.length > 1 ) {
+    if ( patientList.length > 1 ) {
         console.warn("More than one patient, loading first one.");
     }
     // study list
     var studyList = patientList[0].getElementsByTagName("Study");
-    if( studyList.length > 1 ) {
+    if ( studyList.length > 1 ) {
         console.warn("More than one study, loading first one.");
     }
     var studyUID = studyList[0].getAttribute("StudyInstanceUID");
     // series list
     var seriesList = studyList[0].getElementsByTagName("Series");
-    if( seriesList.length > 1 ) {
+    if ( seriesList.length > 1 ) {
         console.warn("More than one series, loading first one.");
     }
     var seriesUID = seriesList[0].getAttribute("SeriesInstanceUID");
@@ -5409,10 +5389,10 @@ dwv.html.decodeManifest = function(manifest, nslices)
     var instanceList = seriesList[0].getElementsByTagName("Instance");
     // loop on instances and push links
     var max = instanceList.length;
-    if( nslices < max ) {
+    if ( nslices < max ) {
         max = nslices;
     }
-    for( var i = 0; i < max; ++i ) {
+    for ( var i = 0; i < max; ++i ) {
         var sopInstanceUID = instanceList[i].getAttribute("SOPInstanceUID");
         var link = rootURL + 
         "&studyUID=" + studyUID +

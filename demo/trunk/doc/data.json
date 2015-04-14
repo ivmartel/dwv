@@ -4667,9 +4667,9 @@
                     "type": "Object"
                 },
                 {
-                    "name": "text",
-                    "description": "The text of the cell.",
-                    "type": "String"
+                    "name": "content",
+                    "description": "The content of the cell.",
+                    "type": "Object"
                 }
             ],
             "class": "dwv.html",
@@ -4678,7 +4678,7 @@
         },
         {
             "file": "src/gui/html.js",
-            "line": 38,
+            "line": 40,
             "description": "Append a header cell to a given row.",
             "itemtype": "method",
             "name": "appendHCell",
@@ -4701,7 +4701,7 @@
         },
         {
             "file": "src/gui/html.js",
-            "line": 56,
+            "line": 58,
             "description": "Append a row to an array.",
             "itemtype": "method",
             "name": "appendRowForArray",
@@ -4734,7 +4734,7 @@
         },
         {
             "file": "src/gui/html.js",
-            "line": 101,
+            "line": 92,
             "description": "Append a row to an object.",
             "itemtype": "method",
             "name": "appendRowForObject",
@@ -4767,7 +4767,7 @@
         },
         {
             "file": "src/gui/html.js",
-            "line": 162,
+            "line": 142,
             "description": "Append a row to an object or an array.",
             "itemtype": "method",
             "name": "appendRow",
@@ -4800,7 +4800,7 @@
         },
         {
             "file": "src/gui/html.js",
-            "line": 187,
+            "line": 167,
             "description": "Converts the input to an HTML table.",
             "itemtype": "method",
             "name": "toTable",
@@ -4817,7 +4817,7 @@
         },
         {
             "file": "src/gui/html.js",
-            "line": 202,
+            "line": 182,
             "description": "Get an HTML search form.",
             "itemtype": "method",
             "name": "getHtmlSearchForm",
@@ -4839,7 +4839,7 @@
         },
         {
             "file": "src/gui/html.js",
-            "line": 222,
+            "line": 202,
             "description": "Filter a table with a given parameter: sets the display css of rows to\ntrue or false if it contains the term.",
             "itemtype": "method",
             "name": "filterTable",
@@ -4862,7 +4862,7 @@
         },
         {
             "file": "src/gui/html.js",
-            "line": 255,
+            "line": 235,
             "description": "Transform back each\n'preText <span class=\"highlighted\">term</span> postText'\ninto its original 'preText term postText'.",
             "itemtype": "method",
             "name": "dehighlight",
@@ -4880,7 +4880,7 @@
         },
         {
             "file": "src/gui/html.js",
-            "line": 283,
+            "line": 263,
             "description": "Create a\n'preText <span class=\"highlighted\">term</span> postText'\naround each search term.",
             "itemtype": "method",
             "name": "highlight",
@@ -4903,7 +4903,7 @@
         },
         {
             "file": "src/gui/html.js",
-            "line": 327,
+            "line": 307,
             "description": "Highlight a HTML node.",
             "itemtype": "method",
             "name": "createHighlightNode",
@@ -4925,7 +4925,7 @@
         },
         {
             "file": "src/gui/html.js",
-            "line": 342,
+            "line": 322,
             "description": "Remove all children of a HTML node.",
             "itemtype": "method",
             "name": "cleanNode",
@@ -4943,7 +4943,7 @@
         },
         {
             "file": "src/gui/html.js",
-            "line": 355,
+            "line": 335,
             "description": "Remove a HTML node and all its children.",
             "itemtype": "method",
             "name": "removeNode",
@@ -4961,7 +4961,7 @@
         },
         {
             "file": "src/gui/html.js",
-            "line": 375,
+            "line": 355,
             "description": "Create a HTML select from an input array of options.\nThe values of the options are the name of the option made lower case.\nIt is left to the user to set the 'onchange' method of the select.",
             "itemtype": "method",
             "name": "createHtmlSelect",
@@ -4988,7 +4988,7 @@
         },
         {
             "file": "src/gui/html.js",
-            "line": 419,
+            "line": 399,
             "description": "Get a list of parameters from an input URI that looks like:\n [dwv root]?input=encodeURI([root]?key0=value0&key1=value1)\nor\n [dwv root]?input=encodeURI([manifest link])&type=manifest",
             "itemtype": "method",
             "name": "getUriParam",
@@ -5015,7 +5015,7 @@
         },
         {
             "file": "src/gui/html.js",
-            "line": 463,
+            "line": 443,
             "description": "Decode a Key/Value pair uri. If a key is repeated, the result \nbe an array of base + each key.",
             "itemtype": "method",
             "name": "decodeKeyValueUri",
@@ -5038,7 +5038,7 @@
         },
         {
             "file": "src/gui/html.js",
-            "line": 549,
+            "line": 529,
             "description": "Decode a manifest uri.",
             "itemtype": "method",
             "name": "decodeManifestUri",
@@ -5066,7 +5066,7 @@
         },
         {
             "file": "src/gui/html.js",
-            "line": 582,
+            "line": 562,
             "description": "Decode an XML manifest.",
             "itemtype": "method",
             "name": "decodeManifest",
@@ -5089,7 +5089,7 @@
         },
         {
             "file": "src/gui/html.js",
-            "line": 632,
+            "line": 612,
             "description": "Display or not an element.",
             "itemtype": "method",
             "name": "displayElement",
@@ -5112,7 +5112,7 @@
         },
         {
             "file": "src/gui/html.js",
-            "line": 647,
+            "line": 627,
             "description": "Toggle the display of an element.",
             "itemtype": "method",
             "name": "toggleDisplay",
@@ -5130,7 +5130,7 @@
         },
         {
             "file": "src/gui/html.js",
-            "line": 666,
+            "line": 646,
             "description": "Append an element.",
             "itemtype": "method",
             "name": "appendElement",
@@ -5153,7 +5153,7 @@
         },
         {
             "file": "src/gui/html.js",
-            "line": 684,
+            "line": 664,
             "description": "Create an element.",
             "itemtype": "method",
             "name": "createElement",
@@ -12573,11 +12573,11 @@
         },
         {
             "message": "unknown tag: input",
-            "line": " src/gui/html.js:187"
+            "line": " src/gui/html.js:167"
         },
         {
             "message": "unknown tag: warning",
-            "line": " src/gui/html.js:187"
+            "line": " src/gui/html.js:167"
         },
         {
             "message": "replacing incorrect tag: returns with return",
