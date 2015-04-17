@@ -22,10 +22,12 @@ asyncTest("Test DICOM parsing.", 2, function() {
     request.responseType = "arraybuffer"; 
     request.onload = function(/*event*/) {
         // parse DICOM
-        var data = dwv.image.getDataFromDicomBuffer(request.response);
+        var dicomParser = new dwv.dicom.DicomParser();
+        dicomParser.parse(this.response);
+        var tags = dicomParser.getDicomElements();
         // check values
-        equal(data.info.Rows.value[0], 256, "Number of rows");
-        equal(data.info.Columns.value[0], 256, "Number of columns");
+        equal(tags.Rows.value[0], 256, "Number of rows");
+        equal(tags.Columns.value[0], 256, "Number of columns");
         // start async test
         start();
     };
