@@ -186,12 +186,6 @@ dwv.dicom.DicomParser = function()
      */
     this.dicomElements = {};
     /**
-     * The number of DICOM Items.
-     * @property numberOfItems
-     * @type Number
-     */
-    this.numberOfItems = 0;
-    /**
      * The pixel buffer.
      * @property pixelBuffer
      * @type Array
@@ -222,31 +216,68 @@ dwv.dicom.DicomParser.prototype.getPixelBuffer = function()
 /**
  * Append a DICOM element to the dicomElements member object.
  * Allows for easy retrieval of DICOM tag values from the tag name.
- * If tags have same name (for the 'unknown' and private tags cases), a number is appended
+ * If tags have same name (for the 'unknown' private tags cases), a number is appended
  * making the name unique.
  * @method appendDicomElement
  * @param {Object} element The element to add.
+ * @param {String} sequenceName The name of the sequence the element belongs to (optional).
+ * @param {Number} itemNumber The number of the item the element belongs to (optional).
  */
-dwv.dicom.DicomParser.prototype.appendDicomElement = function( element )
+dwv.dicom.DicomParser.prototype.appendDicomElement = function( element, sequenceName, itemNumber )
 {
-    // find a good tag name
-    var name = element.name;
-    // count the number of items
-    if( name === "Item" ) {
-        ++this.numberOfItems;
+    // simple case: not a sequence
+    if ( typeof sequenceName === "undefined" || sequenceName.length === 0) {
+        var name = element.name;
+        // find a good unique name
+        if ( name === "dwv::unknown" ) {
+            var count = 1;
+            while ( this.dicomElements[name] ) {
+                name = element.name + (count++).toString();
+            }
+        }
+        this.dicomElements[name] = { 
+            "group": element.group, 
+            "element": element.element,
+            "vr": element.vr,
+            "vl": element.vl,
+            "value": element.value 
+        };
     }
-    var count = 1;
-    while( this.dicomElements[name] ) {
-        name = element.name + (count++).toString();
+    else {
+        // nothing to do for items and delimitations
+        if ( element.name === "Item" || 
+                element.name === "ItemDelimitationItem" ||
+                element.name === "SequenceDelimitationItem" ) {
+            return;
+        }
+        
+        // TODO support nested sequences
+
+        // start the sequence
+        if ( typeof this.dicomElements[sequenceName] === "undefined" ) {
+            this.dicomElements[sequenceName] = { 
+                "group": element.group, 
+                "element": element.element,
+                "vr": element.vr,
+                "vl": element.vl,
+                "value": [] 
+            };
+        }
+        // continue the sequence
+        else {
+            // add item array if needed
+            if ( typeof this.dicomElements[sequenceName].value[itemNumber] === "undefined" ) {
+                this.dicomElements[sequenceName].value[itemNumber] = {};
+            }
+            this.dicomElements[sequenceName].value[itemNumber][element.name] = { 
+                "group": element.group, 
+                "element": element.element,
+                "vr": element.vr,
+                "vl": element.vl,
+                "value": element.value 
+            };
+        }
     }
-    // store it
-    this.dicomElements[name] = { 
-        "group": element.group, 
-        "element": element.element,
-        "vr": element.vr,
-        "vl": element.vl,
-        "value": element.value 
-    };
 };
 
 /**
@@ -363,6 +394,9 @@ dwv.dicom.DicomParser.prototype.readDataElement = function(reader, offset, impli
             data = reader.readUint16Array( dataOffset, vl );
         }
     }
+    else if ( vr === "SQ" || tag.name === "Item" ) {
+        data = [];
+    }
     else
     {
         data = reader.readString( dataOffset, vl);
@@ -371,6 +405,10 @@ dwv.dicom.DicomParser.prototype.readDataElement = function(reader, offset, impli
 
     // total element offset
     var elementOffset = tagOffset + vrOffset + vlOffset + vl;
+    // do not increment offset for sequences and items
+    if ( vr === "SQ" || tag.name === "Item" ) {
+        elementOffset -= vl;
+    }
     
     // return
     return { 
@@ -478,6 +516,10 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
     var startedPixelItems = false;
     
     var tagName = "";
+    var sequenceName = "";
+    var sequenceVl = 0;
+    var sequenceVlCount = 0;
+    var itemNumber = -1;
     // DICOM data elements
     while( i < buffer.byteLength ) 
     {
@@ -492,6 +534,25 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
                 ", after " + tagName + ".\n" + err);
         }
         tagName = dataElement.tag.name;
+        
+        // sequence
+        if ( dataElement.vr === "SQ" ) {
+            sequenceName += tagName;
+            // explicit length
+            if ( dataElement.vl !== 0 ) {
+                sequenceVl = dataElement.vl;
+            }
+        }
+        // item
+        if ( tagName === "Item" ) {
+            itemNumber += 1;
+        }
+        // end of sequence with implicit length
+        else if ( tagName === "SequenceDelimitationItem" ) {
+            sequenceName = "";
+            itemNumber = -1;
+        }
+        
         // store pixel data from multiple items
         if( startedPixelItems ) {
             if( tagName === "Item" ) {
@@ -534,7 +595,19 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
             'vl' : dataElement.vl, 
             'element': dataElement.tag.element,
             'value': dataElement.data 
-        });
+        }, sequenceName, itemNumber );
+        
+        // end of sequence with explicit length
+        if ( dataElement.vr !== "SQ" && sequenceVl !== 0 ) {
+            sequenceVlCount += dataElement.offset;
+            if ( sequenceVlCount === sequenceVl ) {
+                sequenceName = "";
+                sequenceVl = 0;
+                sequenceVlCount = 0;
+                itemNumber = -1;
+            }
+        }
+        
         // increment index
         i += dataElement.offset;
     }
