@@ -4155,17 +4155,6 @@
         {
             "file": "src/dicom/dicomParser.js",
             "line": 188,
-            "description": "The number of DICOM Items.",
-            "itemtype": "property",
-            "name": "numberOfItems",
-            "type": "Number",
-            "class": "dwv.dicom.DicomParser",
-            "module": "dicom",
-            "namespace": "dwv.dicom"
-        },
-        {
-            "file": "src/dicom/dicomParser.js",
-            "line": 194,
             "description": "The pixel buffer.",
             "itemtype": "property",
             "name": "pixelBuffer",
@@ -4176,7 +4165,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 202,
+            "line": 196,
             "description": "Get the DICOM data elements.",
             "itemtype": "method",
             "name": "getDicomElements",
@@ -4190,7 +4179,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 212,
+            "line": 206,
             "description": "Get the DICOM data pixel buffer.",
             "itemtype": "method",
             "name": "getPixelBuffer",
@@ -4204,8 +4193,8 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 222,
-            "description": "Append a DICOM element to the dicomElements member object.\nAllows for easy retrieval of DICOM tag values from the tag name.\nIf tags have same name (for the 'unknown' and private tags cases), a number is appended\nmaking the name unique.",
+            "line": 216,
+            "description": "Append a DICOM element to the dicomElements member object.\nAllows for easy retrieval of DICOM tag values from the tag name.\nIf tags have same name (for the 'unknown' private tags cases), a number is appended\nmaking the name unique.",
             "itemtype": "method",
             "name": "appendDicomElement",
             "params": [
@@ -4213,6 +4202,16 @@
                     "name": "element",
                     "description": "The element to add.",
                     "type": "Object"
+                },
+                {
+                    "name": "sequenceName",
+                    "description": "The name of the sequence the element belongs to (optional).",
+                    "type": "String"
+                },
+                {
+                    "name": "itemNumber",
+                    "description": "The number of the item the element belongs to (optional).",
+                    "type": "Number"
                 }
             ],
             "class": "dwv.dicom.DicomParser",
@@ -4221,7 +4220,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 252,
+            "line": 283,
             "description": "Read a DICOM tag.",
             "itemtype": "method",
             "name": "readTag",
@@ -4244,7 +4243,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 276,
+            "line": 307,
             "description": "Read a DICOM data element.",
             "itemtype": "method",
             "name": "readDataElement",
@@ -4272,7 +4271,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 385,
+            "line": 423,
             "description": "Parse the complete DICOM file (given as input to the class).\nFills in the member object 'dicomElements'.",
             "itemtype": "method",
             "name": "parse",
@@ -12557,19 +12556,19 @@
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/dicom/dicomParser.js:202"
+            "line": " src/dicom/dicomParser.js:196"
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/dicom/dicomParser.js:212"
+            "line": " src/dicom/dicomParser.js:206"
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/dicom/dicomParser.js:252"
+            "line": " src/dicom/dicomParser.js:283"
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/dicom/dicomParser.js:276"
+            "line": " src/dicom/dicomParser.js:307"
         },
         {
             "message": "unknown tag: input",

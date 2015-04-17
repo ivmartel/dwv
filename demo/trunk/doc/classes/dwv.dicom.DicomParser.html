@@ -275,10 +275,6 @@
 
                             </li>
                             <li class="index-item property">
-                                <a href="#property_numberOfItems">numberOfItems</a>
-
-                            </li>
-                            <li class="index-item property">
                                 <a href="#property_pixelBuffer">pixelBuffer</a>
 
                             </li>
@@ -299,6 +295,12 @@
                 <li class="arg">
                         <code>element</code>
                 </li>
+                <li class="arg">
+                        <code>sequenceName</code>
+                </li>
+                <li class="arg">
+                        <code>itemNumber</code>
+                </li>
             </ul><span class="paren">)</span>
         </div>
 
@@ -312,7 +314,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_dicom_dicomParser.js.html#l222"><code>src&#x2F;dicom&#x2F;dicomParser.js:222</code></a>
+        <a href="../files/src_dicom_dicomParser.js.html#l216"><code>src&#x2F;dicom&#x2F;dicomParser.js:216</code></a>
         </p>
 
 
@@ -322,7 +324,7 @@
     <div class="description">
         <p>Append a DICOM element to the dicomElements member object.
 Allows for easy retrieval of DICOM tag values from the tag name.
-If tags have same name (for the &#39;unknown&#39; and private tags cases), a number is appended
+If tags have same name (for the &#39;unknown&#39; private tags cases), a number is appended
 making the name unique.</p>
 
     </div>
@@ -338,6 +340,28 @@ making the name unique.</p>
 
                     <div class="param-description">
                         <p>The element to add.</p>
+
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name">sequenceName</code>
+                        <span class="type">String</span>
+
+
+                    <div class="param-description">
+                        <p>The name of the sequence the element belongs to (optional).</p>
+
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name">itemNumber</code>
+                        <span class="type">Number</span>
+
+
+                    <div class="param-description">
+                        <p>The number of the item the element belongs to (optional).</p>
 
                     </div>
 
@@ -366,7 +390,7 @@ making the name unique.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_dicom_dicomParser.js.html#l202"><code>src&#x2F;dicom&#x2F;dicomParser.js:202</code></a>
+        <a href="../files/src_dicom_dicomParser.js.html#l196"><code>src&#x2F;dicom&#x2F;dicomParser.js:196</code></a>
         </p>
 
 
@@ -409,7 +433,7 @@ making the name unique.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_dicom_dicomParser.js.html#l212"><code>src&#x2F;dicom&#x2F;dicomParser.js:212</code></a>
+        <a href="../files/src_dicom_dicomParser.js.html#l206"><code>src&#x2F;dicom&#x2F;dicomParser.js:206</code></a>
         </p>
 
 
@@ -455,7 +479,7 @@ making the name unique.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_dicom_dicomParser.js.html#l385"><code>src&#x2F;dicom&#x2F;dicomParser.js:385</code></a>
+        <a href="../files/src_dicom_dicomParser.js.html#l423"><code>src&#x2F;dicom&#x2F;dicomParser.js:423</code></a>
         </p>
 
 
@@ -519,7 +543,7 @@ Fills in the member object &#39;dicomElements&#39;.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_dicom_dicomParser.js.html#l276"><code>src&#x2F;dicom&#x2F;dicomParser.js:276</code></a>
+        <a href="../files/src_dicom_dicomParser.js.html#l307"><code>src&#x2F;dicom&#x2F;dicomParser.js:307</code></a>
         </p>
 
 
@@ -610,7 +634,7 @@ Fills in the member object &#39;dicomElements&#39;.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_dicom_dicomParser.js.html#l252"><code>src&#x2F;dicom&#x2F;dicomParser.js:252</code></a>
+        <a href="../files/src_dicom_dicomParser.js.html#l283"><code>src&#x2F;dicom&#x2F;dicomParser.js:283</code></a>
         </p>
 
 
@@ -692,31 +716,6 @@ Fills in the member object &#39;dicomElements&#39;.</p>
                     
                     
                     </div>
-                    <div id="property_numberOfItems" class="property item">
-                        <h3 class="name"><code>numberOfItems</code></h3>
-                        <span class="type">Number</span>
-                    
-                    
-                    
-                    
-                    
-                        <div class="meta">
-                                    <p>
-                                    Defined in
-                            <a href="../files/src_dicom_dicomParser.js.html#l188"><code>src&#x2F;dicom&#x2F;dicomParser.js:188</code></a>
-                            </p>
-                    
-                    
-                        </div>
-                    
-                        <div class="description">
-                            <p>The number of DICOM Items.</p>
-                    
-                        </div>
-                    
-                    
-                    
-                    </div>
                     <div id="property_pixelBuffer" class="property item">
                         <h3 class="name"><code>pixelBuffer</code></h3>
                         <span class="type">Array</span>
@@ -728,7 +727,7 @@ Fills in the member object &#39;dicomElements&#39;.</p>
                         <div class="meta">
                                     <p>
                                     Defined in
-                            <a href="../files/src_dicom_dicomParser.js.html#l194"><code>src&#x2F;dicom&#x2F;dicomParser.js:194</code></a>
+                            <a href="../files/src_dicom_dicomParser.js.html#l188"><code>src&#x2F;dicom&#x2F;dicomParser.js:188</code></a>
                             </p>
                     
                     
