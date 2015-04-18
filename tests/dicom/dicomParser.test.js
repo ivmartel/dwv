@@ -5,7 +5,7 @@
 /* global module, asyncTest, equal, start */
 module("dicomParser");
 
-asyncTest("Test DICOM parsing.", 2, function() {
+asyncTest("Test DICOM parsing.", 3, function() {
     // Local file: forbidden...
     // parse the DICOM file
     /*var reader = new FileReader();
@@ -28,6 +28,9 @@ asyncTest("Test DICOM parsing.", 2, function() {
         // check values
         equal(tags.Rows.value[0], 256, "Number of rows");
         equal(tags.Columns.value[0], 256, "Number of columns");
+        equal(tags.ReferencedImageSequence.value[0].ReferencedSOPInstanceUID.value[0], 
+            "1.3.12.2.1107.5.2.32.35162.2012021515511672669154094", 
+            "ReferencedImageSequence SQ");
         // start async test
         start();
     };
