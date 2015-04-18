@@ -619,8 +619,7 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
             }, sequences );
         
         // end of sequence with explicit length
-        if ( sequences.length !== 0 &&
-                typeof sequences[sequences.length-1] !== "undefined" &&
+        if ( dataElement.vr !== "SQ" && sequences.length !== 0 &&
                 sequences[sequences.length-1].vl !== 0 ) {
             var last = sequences.length - 1;
             sequences[last].vlCount += dataElement.offset;
