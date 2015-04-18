@@ -1924,13 +1924,12 @@ dwv.dicom.DicomParser.prototype.getPixelBuffer = function()
  * making the name unique.
  * @method appendDicomElement
  * @param {Object} element The element to add.
- * @param {String} sequenceName The name of the sequence the element belongs to (optional).
- * @param {Number} itemNumber The number of the item the element belongs to (optional).
+ * @param {Object} sequences The sequence the element belongs to (optional).
  */
-dwv.dicom.DicomParser.prototype.appendDicomElement = function( element, sequenceName, itemNumber )
+dwv.dicom.DicomParser.prototype.appendDicomElement = function( element, sequences )
 {
     // simple case: not a sequence
-    if ( typeof sequenceName === "undefined" || sequenceName.length === 0) {
+    if ( typeof sequences === "undefined" || sequences.length === 0) {
         var name = element.name;
         // find a good unique name
         if ( name === "dwv::unknown" ) {
@@ -1954,33 +1953,59 @@ dwv.dicom.DicomParser.prototype.appendDicomElement = function( element, sequence
                 element.name === "SequenceDelimitationItem" ) {
             return;
         }
-        
-        // TODO support nested sequences
-
-        // start the sequence
-        if ( typeof this.dicomElements[sequenceName] === "undefined" ) {
-            this.dicomElements[sequenceName] = { 
-                "group": element.group, 
-                "element": element.element,
-                "vr": element.vr,
-                "vl": element.vl,
-                "value": [] 
-            };
-        }
-        // continue the sequence
-        else {
-            // add item array if needed
-            if ( typeof this.dicomElements[sequenceName].value[itemNumber] === "undefined" ) {
-                this.dicomElements[sequenceName].value[itemNumber] = {};
+        // create root for nested sequences
+        var sequenceName = sequences[0].name;
+        var itemNumber = sequences[0].itemNumber;
+        var root = this.dicomElements;
+        for ( var i = 1; i < sequences.length; ++i ) {
+            // update root with previous name and number
+            if ( typeof root[sequenceName].value[itemNumber] !== "undefined" ) {
+                root = root[sequenceName].value[itemNumber];
             }
-            this.dicomElements[sequenceName].value[itemNumber][element.name] = { 
-                "group": element.group, 
-                "element": element.element,
-                "vr": element.vr,
-                "vl": element.vl,
-                "value": element.value 
-            };
+            // update name and number
+            sequenceName = sequences[i].name;
+            itemNumber = sequences[i].itemNumber;
         }
+        // append
+        this.appendElementToSequence(root, sequenceName, itemNumber, element);
+
+    }
+};
+
+/**
+ * Append an element to a sequence.
+ * @method appendElementToSequence
+ * @param {Object} root The DICOM element root where to append the element.
+ * @param {String} sequenceName The tail sequence name.
+ * @param {Number} itemNumber The tail item number.
+ * @param {Object} element The element to append.
+ */
+dwv.dicom.DicomParser.prototype.appendElementToSequence = function (root, sequenceName, itemNumber, element)
+{
+    // start the sequence
+    if ( typeof root[sequenceName] === "undefined" ) {
+        root[sequenceName] = { 
+            "group": element.group, 
+            "element": element.element,
+            "vr": element.vr,
+            "vl": element.vl,
+            "value": [] 
+        };
+    }
+    // continue the sequence
+    else {
+        // add item array if needed
+        if ( typeof root[sequenceName].value[itemNumber] === "undefined" ) {
+            root[sequenceName].value[itemNumber] = {};
+        }
+        // append element
+        root[sequenceName].value[itemNumber][element.name] = { 
+            "group": element.group, 
+            "element": element.element,
+            "vr": element.vr,
+            "vl": element.vl,
+            "value": element.value 
+        };
     }
 };
 
@@ -2220,10 +2245,7 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
     var startedPixelItems = false;
     
     var tagName = "";
-    var sequenceName = "";
-    var sequenceVl = 0;
-    var sequenceVlCount = 0;
-    var itemNumber = -1;
+    var sequences = [];
     // DICOM data elements
     while( i < buffer.byteLength ) 
     {
@@ -2239,22 +2261,20 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
         }
         tagName = dataElement.tag.name;
         
-        // sequence
+        // new sequence
         if ( dataElement.vr === "SQ" ) {
-            sequenceName += tagName;
-            // explicit length
-            if ( dataElement.vl !== 0 ) {
-                sequenceVl = dataElement.vl;
-            }
+            sequences.push( {
+                'name': tagName, 'itemNumber': -1,
+                'vl': dataElement.vl, 'vlCount': 0
+            });
         }
-        // item
+        // new item
         if ( tagName === "Item" ) {
-            itemNumber += 1;
+            sequences[sequences.length-1].itemNumber += 1;
         }
         // end of sequence with implicit length
         else if ( tagName === "SequenceDelimitationItem" ) {
-            sequenceName = "";
-            itemNumber = -1;
+            sequences = sequences.slice(0, -1);
         }
         
         // store pixel data from multiple items
@@ -2291,6 +2311,7 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
                 startedPixelItems = true;
             }
         }
+        
         // store the data element
         this.appendDicomElement( {
             'name': tagName,
@@ -2299,22 +2320,23 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
             'vl' : dataElement.vl, 
             'element': dataElement.tag.element,
             'value': dataElement.data 
-        }, sequenceName, itemNumber );
+            }, sequences );
         
         // end of sequence with explicit length
-        if ( dataElement.vr !== "SQ" && sequenceVl !== 0 ) {
-            sequenceVlCount += dataElement.offset;
-            if ( sequenceVlCount === sequenceVl ) {
-                sequenceName = "";
-                sequenceVl = 0;
-                sequenceVlCount = 0;
-                itemNumber = -1;
+        if ( dataElement.vr !== "SQ" && sequences.length !== 0 &&
+                sequences[sequences.length-1].vl !== 0 ) {
+            var last = sequences.length - 1;
+            sequences[last].vlCount += dataElement.offset;
+            if ( sequences[last].vlCount === sequences[last].vl ) {
+                sequences = sequences.slice(0, -1);
             }
         }
         
         // increment index
         i += dataElement.offset;
     }
+    
+    console.log(this.dicomElements);
     
     // uncompress data
     if( jpeg ) {

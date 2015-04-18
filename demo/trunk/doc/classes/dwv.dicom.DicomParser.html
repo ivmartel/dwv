@@ -244,6 +244,10 @@
 
                             </li>
                             <li class="index-item method">
+                                <a href="#method_appendElementToSequence">appendElementToSequence</a>
+
+                            </li>
+                            <li class="index-item method">
                                 <a href="#method_getDicomElements">getDicomElements</a>
 
                             </li>
@@ -296,10 +300,7 @@
                         <code>element</code>
                 </li>
                 <li class="arg">
-                        <code>sequenceName</code>
-                </li>
-                <li class="arg">
-                        <code>itemNumber</code>
+                        <code>sequences</code>
                 </li>
             </ul><span class="paren">)</span>
         </div>
@@ -345,12 +346,86 @@ making the name unique.</p>
 
                 </li>
                 <li class="param">
+                        <code class="param-name">sequences</code>
+                        <span class="type">Object</span>
+
+
+                    <div class="param-description">
+                        <p>The sequence the element belongs to (optional).</p>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+
+</div>
+<div id="method_appendElementToSequence" class="method item">
+    <h3 class="name"><code>appendElementToSequence</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>root</code>
+                </li>
+                <li class="arg">
+                        <code>sequenceName</code>
+                </li>
+                <li class="arg">
+                        <code>itemNumber</code>
+                </li>
+                <li class="arg">
+                        <code>element</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/src_dicom_dicomParser.js.html#l271"><code>src&#x2F;dicom&#x2F;dicomParser.js:271</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Append an element to a sequence.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">root</code>
+                        <span class="type">Object</span>
+
+
+                    <div class="param-description">
+                        <p>The DICOM element root where to append the element.</p>
+
+                    </div>
+
+                </li>
+                <li class="param">
                         <code class="param-name">sequenceName</code>
                         <span class="type">String</span>
 
 
                     <div class="param-description">
-                        <p>The name of the sequence the element belongs to (optional).</p>
+                        <p>The tail sequence name.</p>
 
                     </div>
 
@@ -361,7 +436,18 @@ making the name unique.</p>
 
 
                     <div class="param-description">
-                        <p>The number of the item the element belongs to (optional).</p>
+                        <p>The tail item number.</p>
+
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name">element</code>
+                        <span class="type">Object</span>
+
+
+                    <div class="param-description">
+                        <p>The element to append.</p>
 
                     </div>
 
@@ -479,7 +565,7 @@ making the name unique.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_dicom_dicomParser.js.html#l423"><code>src&#x2F;dicom&#x2F;dicomParser.js:423</code></a>
+        <a href="../files/src_dicom_dicomParser.js.html#l448"><code>src&#x2F;dicom&#x2F;dicomParser.js:448</code></a>
         </p>
 
 
@@ -543,7 +629,7 @@ Fills in the member object &#39;dicomElements&#39;.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_dicom_dicomParser.js.html#l307"><code>src&#x2F;dicom&#x2F;dicomParser.js:307</code></a>
+        <a href="../files/src_dicom_dicomParser.js.html#l332"><code>src&#x2F;dicom&#x2F;dicomParser.js:332</code></a>
         </p>
 
 
@@ -634,7 +720,7 @@ Fills in the member object &#39;dicomElements&#39;.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_dicom_dicomParser.js.html#l283"><code>src&#x2F;dicom&#x2F;dicomParser.js:283</code></a>
+        <a href="../files/src_dicom_dicomParser.js.html#l308"><code>src&#x2F;dicom&#x2F;dicomParser.js:308</code></a>
         </p>
 
 

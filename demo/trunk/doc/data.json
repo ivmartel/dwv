@@ -4204,14 +4204,9 @@
                     "type": "Object"
                 },
                 {
-                    "name": "sequenceName",
-                    "description": "The name of the sequence the element belongs to (optional).",
-                    "type": "String"
-                },
-                {
-                    "name": "itemNumber",
-                    "description": "The number of the item the element belongs to (optional).",
-                    "type": "Number"
+                    "name": "sequences",
+                    "description": "The sequence the element belongs to (optional).",
+                    "type": "Object"
                 }
             ],
             "class": "dwv.dicom.DicomParser",
@@ -4220,7 +4215,39 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 283,
+            "line": 271,
+            "description": "Append an element to a sequence.",
+            "itemtype": "method",
+            "name": "appendElementToSequence",
+            "params": [
+                {
+                    "name": "root",
+                    "description": "The DICOM element root where to append the element.",
+                    "type": "Object"
+                },
+                {
+                    "name": "sequenceName",
+                    "description": "The tail sequence name.",
+                    "type": "String"
+                },
+                {
+                    "name": "itemNumber",
+                    "description": "The tail item number.",
+                    "type": "Number"
+                },
+                {
+                    "name": "element",
+                    "description": "The element to append.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.dicom.DicomParser",
+            "module": "dicom",
+            "namespace": "dwv.dicom"
+        },
+        {
+            "file": "src/dicom/dicomParser.js",
+            "line": 308,
             "description": "Read a DICOM tag.",
             "itemtype": "method",
             "name": "readTag",
@@ -4243,7 +4270,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 307,
+            "line": 332,
             "description": "Read a DICOM data element.",
             "itemtype": "method",
             "name": "readDataElement",
@@ -4271,7 +4298,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 423,
+            "line": 448,
             "description": "Parse the complete DICOM file (given as input to the class).\nFills in the member object 'dicomElements'.",
             "itemtype": "method",
             "name": "parse",
@@ -12564,11 +12591,11 @@
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/dicom/dicomParser.js:283"
+            "line": " src/dicom/dicomParser.js:308"
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/dicom/dicomParser.js:307"
+            "line": " src/dicom/dicomParser.js:332"
         },
         {
             "message": "unknown tag: input",
