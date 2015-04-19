@@ -30,6 +30,7 @@ dwv.addDataLine = function (id, fileroot, doc)
     // dwv application
     var config = {
         "containerDivId": id,
+        "skipLoadUrl": true
     };
     var app = new dwv.App();
     app.init(config);

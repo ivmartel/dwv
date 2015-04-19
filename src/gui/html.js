@@ -405,39 +405,26 @@ dwv.html.createHtmlSelect = function (name, list) {
  * @method getUriParam
  * @static
  * @param {String } uri The URI to decode.
- * @param {Function} The function to call with the decoded urls.
- * @return {Array} The list of urls if in uri, null otherwise.
+ * @return {Object} The parameters found in the input uri.
  */
-dwv.html.getUriParam = function (uri, callback)
+dwv.html.getUriParam = function (uri)
 {
     // split key/value pairs
     var mainQueryPairs = dwv.utils.splitQueryString(uri);
     // check pairs
     if ( Object.keys(mainQueryPairs).length === 0 ) {
-        return null;
+        throw new Error("No query pairs in query URI.");
     }
     // has to have an input key
     var query = mainQueryPairs.query;
-    if ( !query || !query.input ) { 
+    if ( !query ) { 
+        throw new Error("No query in query URI.");
+    }
+    if ( !query.input ) { 
         throw new Error("No input parameter in query URI.");
     }
-    
-    // if manifest
-    if ( query.type && query.type === "manifest" ) {
-        dwv.html.decodeManifestUri( query.input, query.nslices, callback );
-    }
-    // if key/value uri
-    else {
-        var urls = dwv.html.decodeKeyValueUri( query.input, query.dwvReplaceMode );
-        if ( typeof callback != "undefined" ) {
-            callback(urls);
-        }
-        else {
-            return urls;
-        }
-    }
     // default return
-    return null;
+    return query;
 };
 
 /**
@@ -550,7 +537,6 @@ dwv.html.decodeManifestUri = function (uri, nslices, callback)
     };
     
     var request = new XMLHttpRequest();
-    // synchronous request (third parameter)
     request.open('GET', decodeURIComponent(uri), true);
     request.responseType = "xml"; 
     request.onload = onLoadRequest;

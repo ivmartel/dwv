@@ -348,10 +348,19 @@ dwv.App = function ()
         }
         // possible load from URL
         if ( typeof config.skipLoadUrl === "undefined" ) {
-            dwv.html.getUriParam(window.location.href, this.onInputURLs); 
+            var query = dwv.html.getUriParam(window.location.href); 
+            // manifest
+            if ( query.type && query.type === "manifest" ) {
+                dwv.html.decodeManifestUri( query.input, query.nslices, this.onInputURLs );
+            }
+            // urls
+            else {
+                var urls = dwv.html.decodeKeyValueUri( query.input, query.dwvReplaceMode );
+                this.onInputURLs(urls);
+            }
         }
         else{
-            console.log("Not loading url from adress since skipLoadUrl is defined.");
+            console.log("Not loading url from address since skipLoadUrl is defined.");
         }
         // align layers when the window is resized
         if ( config.fitToWindow ) {

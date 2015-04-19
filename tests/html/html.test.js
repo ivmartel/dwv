@@ -39,25 +39,30 @@ test("Test array to html function.", function() {
 test("Test get URI param.", function() {
     // simple test URI
     
+    var params;
+    
     // test 00
     var root00 = "http://test.com?input=";
     var uri00 = "result";
     var full00 = root00 + encodeURIComponent(uri00);
-    var res00 = dwv.html.getUriParam(full00);
+    params = dwv.html.getUriParam(full00);
+    var res00 = dwv.html.decodeKeyValueUri( params.input, params.dwvReplaceMode );
     var theo00 = [uri00];
     equal(res00.toString(), theo00.toString(), "Http uri");
     // test 01
     var root01 = "file:///test.html?input=";
     var uri01 = "result";
     var full01 = root01 + encodeURIComponent(uri01);
-    var res01 = dwv.html.getUriParam(full01);
+    params = dwv.html.getUriParam(full01);
+    var res01 = dwv.html.decodeKeyValueUri( params.input, params.dwvReplaceMode );
     var theo01 = [uri01];
     equal(res01.toString(), theo01.toString(), "File uri");
     // test 02
     var root02 = "file:///test.html?input=";
     var uri02 = "result?a=0&b=1";
     var full02 = root02 + encodeURIComponent(uri02);
-    var res02 = dwv.html.getUriParam(full02);
+    params = dwv.html.getUriParam(full02);
+    var res02 = dwv.html.decodeKeyValueUri( params.input, params.dwvReplaceMode );
     var theo02 = [uri02];
     equal(res02.toString(), theo02.toString(), "File uri with args");
 
@@ -80,7 +85,8 @@ test("Test get URI param.", function() {
     var root10 = "http://ivmartel.github.io/dwv/demo/static/index.html?input=";
     var uri10 = "http://dicom.vital-it.ch:8089/wado?requestType=WADO&contentType=application/dicom&studyUID=1.3.6.1.4.1.19291.2.1.1.2675258517533100002&seriesUID=1.2.392.200036.9116.2.6.1.48.1215564802.1245749034.88493&objectUID=1.2.392.200036.9116.2.6.1.48.1215564802.1245749034.96207";
     var full10 = root10 + encodeURIComponent(uri10);
-    var res10 = dwv.html.getUriParam(full10);
+    params = dwv.html.getUriParam(full10);
+    var res10 = dwv.html.decodeKeyValueUri( params.input, params.dwvReplaceMode );
     var theo10 = [uri10];
     equal(res10.toString(), theo10.toString(), "Wado url");
     
@@ -88,7 +94,8 @@ test("Test get URI param.", function() {
     var root11 = "http://ivmartel.github.io/dwv/demo/static/index.html?input=";
     var uri11 = "http://x.babymri.org/?53320924&.dcm";
     var full11 = root11 + encodeURIComponent(uri11);
-    var res11 = dwv.html.getUriParam(full11);
+    params = dwv.html.getUriParam(full11);
+    var res11 = dwv.html.decodeKeyValueUri( params.input, params.dwvReplaceMode );
     var theo11 = [uri11];
     equal(res11.toString(), theo11.toString(), "Babymri uri");
     
@@ -96,7 +103,8 @@ test("Test get URI param.", function() {
     var root12 = "http://ivmartel.github.io/dwv/demo/static/index.html?input=";
     var uri12 = "https://github.com/ivmartel/dwv/blob/master/data/cta0.dcm?raw=true";
     var full12 = root12 + encodeURIComponent(uri12);
-    var res12 = dwv.html.getUriParam(full12);
+    params = dwv.html.getUriParam(full12);
+    var res12 = dwv.html.decodeKeyValueUri( params.input, params.dwvReplaceMode );
     var theo12 = [uri12];
     equal(res12.toString(), theo12.toString(), "Github uri");
     
@@ -106,7 +114,8 @@ test("Test get URI param.", function() {
     var root20 = "file:///test.html?input=";
     var uri20 = "result?a=0";
     var full20 = root20 + encodeURIComponent(uri20);
-    var res20 = dwv.html.getUriParam(full20);
+    params = dwv.html.getUriParam(full20);
+    var res20 = dwv.html.decodeKeyValueUri( params.input, params.dwvReplaceMode );
     var theo20 = ["result?a=0"];
     equal(res20.toString(), theo20.toString(), "Multiple key uri with one arg");
     
@@ -114,7 +123,8 @@ test("Test get URI param.", function() {
     var root21 = "file:///test.html?input=";
     var uri21 = "result?a=0&a=1";
     var full21 = root21 + encodeURIComponent(uri21);
-    var res21 = dwv.html.getUriParam(full21);
+    params = dwv.html.getUriParam(full21);
+    var res21 = dwv.html.decodeKeyValueUri( params.input, params.dwvReplaceMode );
     var theo21 = ["result?a=0", "result?a=1"];
     equal(res21.toString(), theo21.toString(), "Multiple key uri with two args");
 
@@ -122,7 +132,8 @@ test("Test get URI param.", function() {
     var root22 = "file:///test.html?input=";
     var uri22 = "result?a=0&a=1&a=2";
     var full22 = root22 + encodeURIComponent(uri22);
-    var res22 = dwv.html.getUriParam(full22);
+    params = dwv.html.getUriParam(full22);
+    var res22 = dwv.html.decodeKeyValueUri( params.input, params.dwvReplaceMode );
     var theo22 = ["result?a=0", "result?a=1", "result?a=2"];
     equal(res22.toString(), theo22.toString(), "Multiple key uri with three args");
     
@@ -130,7 +141,8 @@ test("Test get URI param.", function() {
     var root23 = "file:///test.html?input=";
     var uri23 = "result?a=0&a=1&a=2&b=3&c=4";
     var full23 = root23 + encodeURIComponent(uri23);
-    var res23 = dwv.html.getUriParam(full23);
+    params = dwv.html.getUriParam(full23);
+    var res23 = dwv.html.decodeKeyValueUri( params.input, params.dwvReplaceMode );
     var theo23 = ["result?b=3&c=4&a=0", "result?b=3&c=4&a=1", "result?b=3&c=4&a=2"];
     equal(res23.toString(), theo23.toString(), "Multiple key uri with plenty args");
 
@@ -140,7 +152,8 @@ test("Test get URI param.", function() {
     var root30 = "http://ivmartel.github.io/dwv/demo/static/index.html?input=";
     var uri30 = "http://dicom.vital-it.ch:8089/wado?requestType=WADO&contentType=application/dicom&studyUID=1.3.6.1.4.1.19291.2.1.1.2675258517533100002&seriesUID=1.2.392.200036.9116.2.6.1.48.1215564802.1245749034.88493&objectUID=1.2.392.200036.9116.2.6.1.48.1215564802.1245749034.96207&objectUID=1.2.392.200036.9116.2.6.1.48.1215564802.1245749216.165708";
     var full30 = root30 + encodeURIComponent(uri30);
-    var res30 = dwv.html.getUriParam(full30);
+    params = dwv.html.getUriParam(full30);
+    var res30 = dwv.html.decodeKeyValueUri( params.input, params.dwvReplaceMode );
     var theo30 = ["http://dicom.vital-it.ch:8089/wado?requestType=WADO&contentType=application/dicom&studyUID=1.3.6.1.4.1.19291.2.1.1.2675258517533100002&seriesUID=1.2.392.200036.9116.2.6.1.48.1215564802.1245749034.88493&objectUID=1.2.392.200036.9116.2.6.1.48.1215564802.1245749034.96207", 
                   "http://dicom.vital-it.ch:8089/wado?requestType=WADO&contentType=application/dicom&studyUID=1.3.6.1.4.1.19291.2.1.1.2675258517533100002&seriesUID=1.2.392.200036.9116.2.6.1.48.1215564802.1245749034.88493&objectUID=1.2.392.200036.9116.2.6.1.48.1215564802.1245749216.165708"];
     equal(res30.toString(), theo30.toString(), "Multiple Wado url");
@@ -149,7 +162,8 @@ test("Test get URI param.", function() {
     var root31 = "http://ivmartel.github.io/dwv/demo/static/index.html?input=";
     var uri31 = "http://x.babymri.org/?key=53320924&key=53320925&key=53320926";
     var full31 = root31 + encodeURIComponent(uri31) + "&dwvReplaceMode=void";
-    var res31 = dwv.html.getUriParam(full31);
+    params = dwv.html.getUriParam(full31);
+    var res31 = dwv.html.decodeKeyValueUri( params.input, params.dwvReplaceMode );
     var theo31 = ["http://x.babymri.org/?53320924", "http://x.babymri.org/?53320925", "http://x.babymri.org/?53320926"];
     equal(res31.toString(), theo31.toString(), "Multiple baby mri (replaceMode)");
     
@@ -161,7 +175,8 @@ test("Test get URI param.", function() {
     var root40 = "file:///test.html?input=";
     var uri40 = "web/path/to/file/?file=0.dcm&file=1.dcm&file=2.dcm";
     var full40 = root40 + encodeURIComponent(uri40) + "&dwvReplaceMode=void";
-    var res40 = dwv.html.getUriParam(full40);
+    params = dwv.html.getUriParam(full40);
+    var res40 = dwv.html.decodeKeyValueUri( params.input, params.dwvReplaceMode );
     var theo40 = ["web/path/to/file/0.dcm", "web/path/to/file/1.dcm", "web/path/to/file/2.dcm"];
     equal(res40.toString(), theo40.toString(), "Multiple file-like uri");
 
