@@ -413,18 +413,10 @@ dwv.html.getUriParam = function (uri)
     var mainQueryPairs = dwv.utils.splitQueryString(uri);
     // check pairs
     if ( Object.keys(mainQueryPairs).length === 0 ) {
-        throw new Error("No query pairs in query URI.");
+        return null;
     }
     // has to have an input key
-    var query = mainQueryPairs.query;
-    if ( !query ) { 
-        throw new Error("No query in query URI.");
-    }
-    if ( !query.input ) { 
-        throw new Error("No input parameter in query URI.");
-    }
-    // default return
-    return query;
+    return mainQueryPairs.query;
 };
 
 /**

@@ -2,7 +2,7 @@
  * Tests for the 'html/html.js' file.
  */
 // Do not warn if these variables were not defined before.
-/* global module, test, equal, ok */
+/* global module, test, equal */
 module("html");
 
 test("Test array to html function.", function() {
@@ -67,17 +67,10 @@ test("Test get URI param.", function() {
     equal(res02.toString(), theo02.toString(), "File uri with args");
 
     // test 03
-    var root03 = "file:///test.html?";
-    var uri03 = "result?a=0";
-    var full03 = root03 + encodeURIComponent(uri03);
-    var caughtError = false;
-    try {
-        dwv.html.getUriParam(full03);
-    }
-    catch(error){ 
-        caughtError = true;
-    }
-    ok(caughtError, "Throws error when no input.");
+    var root03 = "file:///test.html";
+    var full03 = root03 + encodeURIComponent(root03);
+    var res03 = dwv.html.getUriParam(full03);
+    equal(res03, null, "File uri with no args");
 
     // real world URI
     
