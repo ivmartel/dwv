@@ -349,14 +349,17 @@ dwv.App = function ()
         // possible load from URL
         if ( typeof config.skipLoadUrl === "undefined" ) {
             var query = dwv.html.getUriParam(window.location.href); 
-            // manifest
-            if ( query.type && query.type === "manifest" ) {
-                dwv.html.decodeManifestUri( query.input, query.nslices, this.onInputURLs );
-            }
-            // urls
-            else {
-                var urls = dwv.html.decodeKeyValueUri( query.input, query.dwvReplaceMode );
-                this.onInputURLs(urls);
+            // check query
+            if ( query && typeof query.input !== "undefined" ) {
+                // manifest
+                if ( query.type && query.type === "manifest" ) {
+                    dwv.html.decodeManifestUri( query.input, query.nslices, this.onInputURLs );
+                }
+                // urls
+                else {
+                    var urls = dwv.html.decodeKeyValueUri( query.input, query.dwvReplaceMode );
+                    this.onInputURLs(urls);
+                }
             }
         }
         else{
@@ -2132,9 +2135,6 @@ dwv.dicom.DicomParser.prototype.readDataElement = function(reader, offset, impli
             data = reader.readUint16Array( dataOffset, vl );
         }
     }
-    else if ( vr === "SQ" || tag.name === "Item" ) {
-        data = [];
-    }
     else
     {
         data = reader.readString( dataOffset, vl);
@@ -2143,10 +2143,6 @@ dwv.dicom.DicomParser.prototype.readDataElement = function(reader, offset, impli
 
     // total element offset
     var elementOffset = tagOffset + vrOffset + vlOffset + vl;
-    // do not increment offset for sequences and items
-    if ( vr === "SQ" || tag.name === "Item" ) {
-        elementOffset -= vl;
-    }
     
     // return
     return { 
@@ -2254,6 +2250,7 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
     var startedPixelItems = false;
     
     var tagName = "";
+    var tagOffset = 0;
     var sequences = [];
     // DICOM data elements
     while( i < buffer.byteLength ) 
@@ -2268,7 +2265,10 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
             console.warn("Problem reading at " + i + " / " + buffer.byteLength +
                 ", after " + tagName + ".\n" + err);
         }
+        
+        // locals
         tagName = dataElement.tag.name;
+        tagOffset = dataElement.offset;
         
         // new sequence
         if ( dataElement.vr === "SQ" ) {
@@ -2276,10 +2276,14 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
                 'name': tagName, 'itemNumber': -1,
                 'vl': dataElement.vl, 'vlCount': 0
             });
+            tagOffset -= dataElement.vl;
         }
         // new item
-        if ( tagName === "Item" ) {
+        if ( sequences.length!== 0 && tagName === "Item" ) {
             sequences[sequences.length-1].itemNumber += 1;
+            if ( !startedPixelItems ) {
+                tagOffset -= dataElement.vl;
+            }
         }
         // end of sequence with implicit length
         else if ( tagName === "SequenceDelimitationItem" ) {
@@ -2335,17 +2339,15 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
         if ( dataElement.vr !== "SQ" && sequences.length !== 0 &&
                 sequences[sequences.length-1].vl !== 0 ) {
             var last = sequences.length - 1;
-            sequences[last].vlCount += dataElement.offset;
+            sequences[last].vlCount += tagOffset;
             if ( sequences[last].vlCount === sequences[last].vl ) {
                 sequences = sequences.slice(0, -1);
             }
         }
         
         // increment index
-        i += dataElement.offset;
+        i += tagOffset;
     }
-    
-    console.log(this.dicomElements);
     
     // uncompress data
     if( jpeg ) {
@@ -5312,18 +5314,10 @@ dwv.html.getUriParam = function (uri)
     var mainQueryPairs = dwv.utils.splitQueryString(uri);
     // check pairs
     if ( Object.keys(mainQueryPairs).length === 0 ) {
-        throw new Error("No query pairs in query URI.");
+        return null;
     }
     // has to have an input key
-    var query = mainQueryPairs.query;
-    if ( !query ) { 
-        throw new Error("No query in query URI.");
-    }
-    if ( !query.input ) { 
-        throw new Error("No input parameter in query URI.");
-    }
-    // default return
-    return query;
+    return mainQueryPairs.query;
 };
 
 /**

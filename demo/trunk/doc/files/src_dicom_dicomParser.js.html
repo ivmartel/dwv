@@ -596,9 +596,6 @@ dwv.dicom.DicomParser.prototype.readDataElement = function(reader, offset, impli
             data = reader.readUint16Array( dataOffset, vl );
         }
     }
-    else if ( vr === &quot;SQ&quot; || tag.name === &quot;Item&quot; ) {
-        data = [];
-    }
     else
     {
         data = reader.readString( dataOffset, vl);
@@ -607,10 +604,6 @@ dwv.dicom.DicomParser.prototype.readDataElement = function(reader, offset, impli
 
     // total element offset
     var elementOffset = tagOffset + vrOffset + vlOffset + vl;
-    // do not increment offset for sequences and items
-    if ( vr === &quot;SQ&quot; || tag.name === &quot;Item&quot; ) {
-        elementOffset -= vl;
-    }
     
     // return
     return { 
@@ -718,6 +711,7 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
     var startedPixelItems = false;
     
     var tagName = &quot;&quot;;
+    var tagOffset = 0;
     var sequences = [];
     // DICOM data elements
     while( i &lt; buffer.byteLength ) 
@@ -732,7 +726,10 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
             console.warn(&quot;Problem reading at &quot; + i + &quot; / &quot; + buffer.byteLength +
                 &quot;, after &quot; + tagName + &quot;.\n&quot; + err);
         }
+        
+        // locals
         tagName = dataElement.tag.name;
+        tagOffset = dataElement.offset;
         
         // new sequence
         if ( dataElement.vr === &quot;SQ&quot; ) {
@@ -740,10 +737,14 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
                 &#x27;name&#x27;: tagName, &#x27;itemNumber&#x27;: -1,
                 &#x27;vl&#x27;: dataElement.vl, &#x27;vlCount&#x27;: 0
             });
+            tagOffset -= dataElement.vl;
         }
         // new item
-        if ( tagName === &quot;Item&quot; ) {
+        if ( sequences.length!== 0 &amp;&amp; tagName === &quot;Item&quot; ) {
             sequences[sequences.length-1].itemNumber += 1;
+            if ( !startedPixelItems ) {
+                tagOffset -= dataElement.vl;
+            }
         }
         // end of sequence with implicit length
         else if ( tagName === &quot;SequenceDelimitationItem&quot; ) {
@@ -799,17 +800,15 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
         if ( dataElement.vr !== &quot;SQ&quot; &amp;&amp; sequences.length !== 0 &amp;&amp;
                 sequences[sequences.length-1].vl !== 0 ) {
             var last = sequences.length - 1;
-            sequences[last].vlCount += dataElement.offset;
+            sequences[last].vlCount += tagOffset;
             if ( sequences[last].vlCount === sequences[last].vl ) {
                 sequences = sequences.slice(0, -1);
             }
         }
         
         // increment index
-        i += dataElement.offset;
+        i += tagOffset;
     }
-    
-    console.log(this.dicomElements);
     
     // uncompress data
     if( jpeg ) {
