@@ -21,6 +21,15 @@ dwv.io.Url = function()
 {
     this.onload = null;
     this.onerror = null;
+    
+    var nLoaded = 0;
+    this.nToLoad = 0;
+    this.addLoaded = function () {
+        nLoaded++;
+        if ( nLoaded === this.nToLoad ) {
+            this.ondone();
+        }
+    };
 };
 
 /**
@@ -33,6 +42,8 @@ dwv.io.Url.prototype.load = function(ioArray)
     // create closure to the class data
     var onload = this.onload;
     var onerror = this.onerror;
+    
+    this.nToLoad = ioArray.length;
     
     // Request error
     var onErrorRequest = function(/*event*/)
@@ -52,6 +63,19 @@ dwv.io.Url.prototype.load = function(ioArray)
         } catch(error) {
             onerror(error);
         }
+        this.addLoaded();
+    };
+
+    // JSON request loader
+    var onLoadJSONRequest = function(response)
+    {
+        // parse DICOM file
+        try {
+            // call listener
+            onload(response);
+        } catch(error) {
+            onerror(error);
+        }
     };
 
     // Image request loader
@@ -67,6 +91,12 @@ dwv.io.Url.prototype.load = function(ioArray)
         }
     };
 
+    // Request handler
+    var onLoadTextRequest = function(/*event*/)
+    {
+        onLoadJSONRequest(this.responseText);
+    };
+    
     // Request handler
     var onLoadRequest = function(/*event*/)
     {
@@ -122,10 +152,15 @@ dwv.io.Url.prototype.load = function(ioArray)
     {
         var url = ioArray[i];
         var request = new XMLHttpRequest();
-        // TODO Verify URL...
         request.open('GET', url, true);
-        request.responseType = "arraybuffer"; 
-        request.onload = onLoadRequest;
+        var isJSON = ( url.split('.').pop().toLowerCase() === "json" );
+        if ( !isJSON ) {
+            request.responseType = "arraybuffer"; 
+            request.onload = onLoadRequest;
+        }
+        else {
+            request.onload = onLoadTextRequest;
+        }
         request.onerror = onErrorRequest;
         request.onprogress = dwv.gui.updateProgress;
         request.send(null);

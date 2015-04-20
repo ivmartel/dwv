@@ -358,7 +358,10 @@ dwv.App = function ()
                 // urls
                 else {
                     var urls = dwv.html.decodeKeyValueUri( query.input, query.dwvReplaceMode );
-                    this.onInputURLs(urls);
+                    this.loadURL(urls);
+                    if ( typeof query.state !== "undefined" ) {
+                        loadStateUrl([query.state]);
+                    }
                 }
             }
         }
@@ -426,7 +429,7 @@ dwv.App = function ()
         // has been checked for emptiness.
         var ext = files[0].name.split('.').pop().toLowerCase();
         if ( ext === "json" ) {
-            loadJSONFile(files);
+            loadStateFile(files);
         }
         else {
             loadImageFiles(files);
@@ -472,11 +475,11 @@ dwv.App = function ()
     }
     
     /**
-     * Load a JSON file.
-     * @method loadJSON
-     * @param {Array} file An array with the file to load.
+     * Load a State file.
+     * @method loadStateFile
+     * @param {Array} file An array with the state file to load.
      */
-    function loadJSONFile(file) 
+    function loadStateFile(file) 
     {
         // create IO
         var fileIO = new dwv.io.File();
@@ -523,10 +526,30 @@ dwv.App = function ()
             }
         };
         urlIO.onerror = function (error){ handleError(error); };
+        urlIO.ondone = onLoadedData;
         // main load (asynchronous)
         urlIO.load(urls);
     };
     
+    /**
+     * Load a State url.
+     * @method loadStateUrl
+     * @param {Array} file An array with the state url to load.
+     */
+    function loadStateUrl(url) 
+    {
+        // create IO
+        var urlIO = new dwv.io.Url();
+        urlIO.onload = function (data) {
+            // load state
+            var state = new dwv.State(self);
+            state.fromJSON(data);
+        };
+        urlIO.onerror = function (error){ handleError(error); };
+        // main load (asynchronous)
+        urlIO.load(url);
+    }
+
     /**
      * Fit the display to the given size. To be called once the image is loaded.
      * @method fitToSize
