@@ -21,6 +21,12 @@ dwv.tool.ShapeEditor = function (app)
      * @type Object
      */
     var shape = null;
+    /**
+     * Edited image. Used for quantification update.
+     * @property image
+     * @private
+     * @type Object
+     */
     var image = null;
     /**
      * Active flag.
@@ -33,9 +39,16 @@ dwv.tool.ShapeEditor = function (app)
      * Update function used by anchors to update the shape.
      * @property updateFunction
      * @private
-     * @type Object
+     * @type Function
      */
     var updateFunction = null;
+    /**
+     * Draw event callback.
+     * @property drawEventCallback
+     * @private
+     * @type Function
+     */
+    var drawEventCallback = null;
     
     /**
      * Set the shape to edit.
@@ -51,9 +64,15 @@ dwv.tool.ShapeEditor = function (app)
         }
     };
     
+    /**
+     * Set the associated image.
+     * @method setImage
+     * @param {Object} img The associated image.
+     */
     this.setImage = function ( img ) {
         image = img;
     };
+    
     /**
      * Get the edited shape.
      * @method getShape
@@ -72,6 +91,15 @@ dwv.tool.ShapeEditor = function (app)
         return isActive;
     };
 
+    /**
+     * Set the draw event callback.
+     * @method setDrawEventCallback
+     * @param {Object} callback The callback.
+     */
+    this.setDrawEventCallback = function ( callback ) {
+        drawEventCallback = callback;
+    };
+    
     /**
      * Enable the editor. Redraws the layer.
      * @method enable
@@ -344,6 +372,7 @@ dwv.tool.ShapeEditor = function (app)
                     cmdName, updateFunction, startAnchor, endAnchor, this.getLayer(), image);
             chgcmd.execute();
             app.getUndoStack().add(chgcmd);
+            drawEventCallback({'type': 'draw-change'});
             // reset start anchor
             startAnchor = endAnchor;
         });
