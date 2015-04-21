@@ -245,6 +245,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
      * @type Object
      */
     var shapeEditor = new dwv.tool.ShapeEditor(app);
+    shapeEditor.setDrawEventCallback(fireEvent);
 
     /**
      * Trash draw: a cross.
@@ -266,6 +267,9 @@ dwv.tool.Draw = function (app, shapeFactoryList)
     });
     trash.add(trashLine1);
     trash.add(trashLine2);
+
+    // listeners
+    var listeners = {};
 
     /**
      * The associated draw layer.
@@ -395,6 +399,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
             command.execute();
             // save it in undo stack
             app.getUndoStack().add(command);
+            fireEvent({'type': 'draw-create'});
             
             // set shape on
             var shape = group.getChildren( function (node) {
@@ -653,6 +658,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
                 var delcmd = new dwv.tool.DeleteGroupCommand(this.getParent(), cmdName, drawLayer);
                 delcmd.execute();
                 app.getUndoStack().add(delcmd);
+                fireEvent({'type': 'draw-delete'});
             }
             else {
                 // save drag move
@@ -661,6 +667,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
                 if ( translation.x !== 0 || translation.y !== 0 ) {
                     var mvcmd = new dwv.tool.MoveGroupCommand(this.getParent(), cmdName, translation, drawLayer);
                     app.getUndoStack().add(mvcmd);
+                    fireEvent({'type': 'draw-move'});
                 }
                 // reset anchors
                 shapeEditor.setAnchorsActive(true);
@@ -694,6 +701,57 @@ dwv.tool.Draw = function (app, shapeFactoryList)
         }
         return true;
     };
+
+    /**
+     * Add an event listener on the app.
+     * @method addEventListener
+     * @param {String} type The event type.
+     * @param {Object} listener The method associated with the provided event type.
+     */
+    this.addEventListener = function (type, listener)
+    {
+        if ( typeof listeners[type] === "undefined" ) {
+            listeners[type] = [];
+        }
+        listeners[type].push(listener);
+    };
+
+    /**
+     * Remove an event listener from the app.
+     * @method removeEventListener
+     * @param {String} type The event type.
+     * @param {Object} listener The method associated with the provided event type.
+     */
+    this.removeEventListener = function (type, listener)
+    {
+        if( typeof listeners[type] === "undefined" ) {
+            return;
+        }
+        for ( var i = 0; i < listeners[type].length; ++i )
+        {   
+            if ( listeners[type][i] === listener ) {
+                listeners[type].splice(i,1);
+            }
+        }
+    };
+
+    // Private Methods -----------------------------------------------------------
+
+    /**
+     * Fire an event: call all associated listeners.
+     * @method fireEvent
+     * @param {Object} event The event to fire.
+     */
+    function fireEvent (event)
+    {
+        if ( typeof listeners[event.type] === "undefined" ) {
+            return;
+        }
+        for ( var i=0; i < listeners[event.type].length; ++i )
+        {   
+            listeners[event.type][i](event);
+        }
+    }
 
 }; // Draw class
 

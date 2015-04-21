@@ -76,6 +76,9 @@ dwv.App = function ()
     // UndoStack
     var undoStack = null;
     
+    // listeners
+    var listeners = {};
+
     /** 
      * Get the version of the application.
      * @method getVersion
@@ -260,6 +263,10 @@ dwv.App = function ()
                             }
                         }
                         toolList.Draw = new dwv.tool.Draw(this, shapeList);
+                        toolList.Draw.addEventListener("draw-create", fireEvent);
+                        toolList.Draw.addEventListener("draw-change", fireEvent);
+                        toolList.Draw.addEventListener("draw-move", fireEvent);
+                        toolList.Draw.addEventListener("draw-delete", fireEvent);
                     }
                     break;
                 case "Livewire":
@@ -358,7 +365,14 @@ dwv.App = function ()
                 // urls
                 else {
                     var urls = dwv.html.decodeKeyValueUri( query.input, query.dwvReplaceMode );
-                    this.onInputURLs(urls);
+                    this.loadURL(urls);
+                    if ( typeof query.state !== "undefined" ) {
+                        var onLoadEnd = function (/*event*/) {
+                            loadStateUrl([query.state]);
+                        };
+                        this.addEventListener( "onloadend", onLoadEnd );
+                        
+                    }
                 }
             }
         }
@@ -417,6 +431,39 @@ dwv.App = function ()
     };
     
     /**
+     * Add an event listener on the app.
+     * @method addEventListener
+     * @param {String} type The event type.
+     * @param {Object} listener The method associated with the provided event type.
+     */
+    this.addEventListener = function (type, listener)
+    {
+        if ( typeof listeners[type] === "undefined" ) {
+            listeners[type] = [];
+        }
+        listeners[type].push(listener);
+    };
+
+    /**
+     * Remove an event listener from the app.
+     * @method removeEventListener
+     * @param {String} type The event type.
+     * @param {Object} listener The method associated with the provided event type.
+     */
+    this.removeEventListener = function (type, listener)
+    {
+        if( typeof listeners[type] === "undefined" ) {
+            return;
+        }
+        for ( var i = 0; i < listeners[type].length; ++i )
+        {   
+            if ( listeners[type][i] === listener ) {
+                listeners[type].splice(i,1);
+            }
+        }
+    };
+
+    /**
      * Load a list of files.
      * @method loadFiles
      * @param {Array} files The list of files to load.
@@ -426,7 +473,7 @@ dwv.App = function ()
         // has been checked for emptiness.
         var ext = files[0].name.split('.').pop().toLowerCase();
         if ( ext === "json" ) {
-            loadJSONFile(files);
+            loadStateFile(files);
         }
         else {
             loadImageFiles(files);
@@ -466,17 +513,17 @@ dwv.App = function ()
                 drawStage.add(drawLayer);
             }
         };
-        fileIO.onerror = function (error){ handleError(error); };
+        fileIO.onerror = function (error) { handleError(error); };
         // main load (asynchronous)
         fileIO.load(files);
     }
     
     /**
-     * Load a JSON file.
-     * @method loadJSON
-     * @param {Array} file An array with the file to load.
+     * Load a State file.
+     * @method loadStateFile
+     * @param {Array} file An array with the state file to load.
      */
-    function loadJSONFile(file) 
+    function loadStateFile(file) 
     {
         // create IO
         var fileIO = new dwv.io.File();
@@ -485,7 +532,7 @@ dwv.App = function ()
             var state = new dwv.State(self);
             state.fromJSON(data);
         };
-        fileIO.onerror = function (error){ handleError(error); };
+        fileIO.onerror = function (error) { handleError(error); };
         // main load (asynchronous)
         fileIO.load(file);
     }
@@ -522,11 +569,31 @@ dwv.App = function ()
                 drawStage.add(drawLayer);
             }
         };
-        urlIO.onerror = function (error){ handleError(error); };
+        urlIO.onerror = function (error) { handleError(error); };
+        urlIO.onloadend = function (/*event*/) { fireEvent({ 'type': 'onloadend' }); };
         // main load (asynchronous)
         urlIO.load(urls);
     };
     
+    /**
+     * Load a State url.
+     * @method loadStateUrl
+     * @param {Array} file An array with the state url to load.
+     */
+    function loadStateUrl(url) 
+    {
+        // create IO
+        var urlIO = new dwv.io.Url();
+        urlIO.onload = function (data) {
+            // load state
+            var state = new dwv.State(self);
+            state.fromJSON(data);
+        };
+        urlIO.onerror = function (error) { handleError(error); };
+        // main load (asynchronous)
+        urlIO.load(url);
+    }
+
     /**
      * Fit the display to the given size. To be called once the image is loaded.
      * @method fitToSize
@@ -982,6 +1049,22 @@ dwv.App = function ()
 
     // Private Methods -----------------------------------------------------------
 
+    /**
+     * Fire an event: call all associated listeners.
+     * @method fireEvent
+     * @param {Object} event The event to fire.
+     */
+    function fireEvent (event)
+    {
+        if ( typeof listeners[event.type] === "undefined" ) {
+            return;
+        }
+        for ( var i = 0; i < listeners[event.type].length; ++i )
+        {   
+            listeners[event.type][i](event);
+        }
+    }
+    
     /**
      * Generate the image data and draw it.
      * @method generateAndDrawImage

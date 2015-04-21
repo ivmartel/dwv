@@ -17,10 +17,84 @@ dwv.io = dwv.io || {};
  * @namespace dwv.io
  * @constructor
  */
-dwv.io.Url = function()
+dwv.io.Url = function ()
 {
-    this.onload = null;
-    this.onerror = null;
+    /**
+     * Number of data to load.
+     * @property nToLoad
+     * @private
+     * @type Number
+     */
+    var nToLoad = 0;
+    /**
+     * Number of loaded data.
+     * @property nLoaded
+     * @private
+     * @type Number
+     */
+    var nLoaded = 0;
+    
+    /**
+     * Set the number of data to load.
+     * @method setNToLoad
+     */ 
+    this.setNToLoad = function (n) { nToLoad = n; };
+    
+    /**
+     * Increment the number of loaded data
+     * and call onloadend if loaded all data.
+     * @method addLoaded
+     */ 
+    this.addLoaded = function () {
+        nLoaded++;
+        if ( nLoaded === nToLoad ) {
+            this.onloadend();
+        }
+    };
+}; // class Url
+
+/**
+ * Handle a load event.
+ * @method onload
+ * @param {Object} event The load event, event.target 
+ *  should be the loaded data.
+ */
+dwv.io.Url.prototype.onload = function (/*event*/) 
+{
+    // default does nothing.
+};
+/**
+ * Handle a load end event.
+ * @method onloadend
+ */
+dwv.io.Url.prototype.onloadend = function () 
+{
+    // default does nothing.
+};
+/**
+ * Handle an error event.
+ * @method onerror
+ * @param {Object} event The error event, event.message 
+ *  should be the error message.
+ */
+dwv.io.Url.prototype.onerror = function (/*event*/) 
+{
+    // default does nothing.
+};
+
+/**
+ * Create an error handler from a base one and locals.
+ * @method createErrorHandler
+ * @param {String} url The related url.
+ * @param {String} text The text to insert in the message.
+ * @param {Function} baseHandler The base handler.
+ */
+dwv.io.Url.createErrorHandler = function (url, text, baseHandler) {
+    return function (/*event*/) {
+        baseHandler( {'name': "RequestError", 
+            'message': "An error occurred while retrieving the " + text + " file (via http): " + url + 
+            " (status: "+this.status + ")" } );
+    };
 };
 
 /**
@@ -28,47 +102,52 @@ dwv.io.Url = function()
  * @method load
  * @param {Array} ioArray The list of urls to load.
  */
-dwv.io.Url.prototype.load = function(ioArray) 
+dwv.io.Url.prototype.load = function (ioArray) 
 {
-    // create closure to the class data
-    var onload = this.onload;
-    var onerror = this.onerror;
+    // closure to self for handlers
+    var self = this;
+    // set the number of data to load
+    this.setNToLoad( ioArray.length );
+
+    // call the listeners
+    var onLoad = function (data)
+    {
+        self.onload(data);
+        self.addLoaded();
+    };
+
+    // DICOM request
+    var onLoadDicomRequest = function (response)
+    {
+        try {
+            onLoad( dwv.image.getDataFromDicomBuffer(response) );
+        } catch (error) {
+            self.onerror(error);
+        }
+    };
+
+    // image request
+    var onLoadImage = function (/*event*/)
+    {
+        try {
+            onLoad( dwv.image.getDataFromImage(this) );
+        } catch (error) {
+            self.onerror(error);
+        }
+    };
+
+    // text request
+    var onLoadTextRequest = function (/*event*/)
+    {
+        try {
+            onLoad( this.responseText );
+        } catch (error) {
+            self.onerror(error);
+        }
+    };
     
-    // Request error
-    var onErrorRequest = function(/*event*/)
-    {
-        onerror( {'name': "RequestError", 
-            'message': "An error occurred while retrieving the file: (http) "+this.status } );
-    };
-
-    // DICOM request loader
-    var onLoadDicomRequest = function(response)
-    {
-        // parse DICOM file
-        try {
-            var tmpdata = dwv.image.getDataFromDicomBuffer(response);
-            // call listener
-            onload(tmpdata);
-        } catch(error) {
-            onerror(error);
-        }
-    };
-
-    // Image request loader
-    var onLoadImageRequest = function(/*event*/)
-    {
-        // parse image data
-        try {
-            var tmpdata = dwv.image.getDataFromImage(this);
-            // call listener
-            onload(tmpdata);
-        } catch(error) {
-            onerror(error);
-        }
-    };
-
-    // Request handler
-    var onLoadRequest = function(/*event*/)
+    // binary request
+    var onLoadBinaryRequest = function (/*event*/)
     {
         // find the image type from its signature
         var view = new DataView(this.response);
@@ -109,7 +188,7 @@ dwv.io.Url.prototype.load = function(ioArray)
             // temporary image object
             var tmpImage = new Image();
             tmpImage.src = "data:image/" + imageType + ";base64," + window.btoa(imageDataStr);
-            tmpImage.onload = onLoadImageRequest;
+            tmpImage.onload = onLoadImage;
         }
         else
         {
@@ -121,12 +200,20 @@ dwv.io.Url.prototype.load = function(ioArray)
     for (var i = 0; i < ioArray.length; ++i)
     {
         var url = ioArray[i];
+        // read as text according to extension
+        var isText = ( url.split('.').pop().toLowerCase() === "json" );
+
         var request = new XMLHttpRequest();
-        // TODO Verify URL...
         request.open('GET', url, true);
-        request.responseType = "arraybuffer"; 
-        request.onload = onLoadRequest;
-        request.onerror = onErrorRequest;
+        if ( !isText ) {
+            request.responseType = "arraybuffer"; 
+            request.onload = onLoadBinaryRequest;
+            request.onerror = dwv.io.Url.createErrorHandler(url, "binary", self.onerror);
+        }
+        else {
+            request.onload = onLoadTextRequest;
+            request.onerror = dwv.io.Url.createErrorHandler(url, "text", self.onerror);
+        }
         request.onprogress = dwv.gui.updateProgress;
         request.send(null);
     }
