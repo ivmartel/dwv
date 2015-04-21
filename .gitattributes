@@ -1,22 +1,33 @@
 # Auto detect text files and perform LF normalization
 * text=auto
 
-# Custom for Visual Studio
-*.cs     diff=csharp
-*.sln    merge=union
-*.csproj merge=union
-*.vbproj merge=union
-*.fsproj merge=union
-*.dbproj merge=union
+# source code
+*.js text
+*.json text
+*.lua text
+*.sh text
+*.html text
+*.css text
+*.xml text
+*.svg text
 
-# Standard to msysgit
-*.doc   diff=astextplain
-*.DOC   diff=astextplain
-*.docx  diff=astextplain
-*.DOCX  diff=astextplain
-*.dot   diff=astextplain
-*.DOT   diff=astextplain
-*.pdf   diff=astextplain
-*.PDF   diff=astextplain
-*.rtf   diff=astextplain
-*.RTF   diff=astextplain
+# git config
+.gitattributes text
+.gitignore text
+
+# misc config
+.jshintrc text
+.project text
+*.epf text
+*.webapp text
+*.yml text
+*.map text
+
+# documentation
+*.md text
+
+# binary (should be left untouched)
+*.dcm binary
+*.png binary
+*.jpg binary
+*.gif binary
