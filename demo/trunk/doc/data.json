@@ -2502,7 +2502,7 @@
     "classitems": [
         {
             "file": "src/app/application.js",
-            "line": 79,
+            "line": 82,
             "description": "Get the version of the application.",
             "itemtype": "method",
             "name": "getVersion",
@@ -2515,7 +2515,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 86,
+            "line": 89,
             "description": "Get the image.",
             "itemtype": "method",
             "name": "getImage",
@@ -2528,7 +2528,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 92,
+            "line": 95,
             "description": "Set the view.",
             "itemtype": "method",
             "name": "setImage",
@@ -2544,7 +2544,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 102,
+            "line": 105,
             "description": "Restore the original image.",
             "itemtype": "method",
             "name": "restoreOriginalImage",
@@ -2553,7 +2553,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 111,
+            "line": 114,
             "description": "Get the image data array.",
             "itemtype": "method",
             "name": "getImageData",
@@ -2566,7 +2566,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 117,
+            "line": 120,
             "description": "Get the number of slices to load.",
             "itemtype": "method",
             "name": "getNSlicesToLoad",
@@ -2579,7 +2579,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 124,
+            "line": 127,
             "description": "Get the container div id.",
             "itemtype": "method",
             "name": "getContainerDivId",
@@ -2592,7 +2592,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 131,
+            "line": 134,
             "description": "Get the main scale.",
             "itemtype": "method",
             "name": "getScale",
@@ -2605,7 +2605,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 138,
+            "line": 141,
             "description": "Get the scale center.",
             "itemtype": "method",
             "name": "getScaleCenter",
@@ -2618,7 +2618,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 145,
+            "line": 148,
             "description": "Get the translation.",
             "itemtype": "method",
             "name": "getTranslation",
@@ -2631,7 +2631,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 152,
+            "line": 155,
             "description": "Get the view controller.",
             "itemtype": "method",
             "name": "getViewController",
@@ -2644,7 +2644,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 159,
+            "line": 162,
             "description": "Get the image layer.",
             "itemtype": "method",
             "name": "getImageLayer",
@@ -2657,7 +2657,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 165,
+            "line": 168,
             "description": "Get the draw layer.",
             "itemtype": "method",
             "name": "getDrawLayer",
@@ -2670,7 +2670,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 178,
+            "line": 181,
             "description": "Get the draw stage.",
             "itemtype": "method",
             "name": "getDrawStage",
@@ -2683,7 +2683,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 185,
+            "line": 188,
             "description": "Get the toolbox.",
             "itemtype": "method",
             "name": "getToolbox",
@@ -2696,7 +2696,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 191,
+            "line": 194,
             "description": "Get the toolbox controller.",
             "itemtype": "method",
             "name": "getToolboxController",
@@ -2709,7 +2709,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 198,
+            "line": 201,
             "description": "Get the undo stack.",
             "itemtype": "method",
             "name": "getUndoStack",
@@ -2722,7 +2722,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 205,
+            "line": 208,
             "description": "Get the data loaders.",
             "itemtype": "method",
             "name": "getLoaders",
@@ -2735,7 +2735,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 218,
+            "line": 221,
             "description": "Initialise the HTML for the application.",
             "itemtype": "method",
             "name": "init",
@@ -2744,7 +2744,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 375,
+            "line": 389,
             "description": "Reset the application.",
             "itemtype": "method",
             "name": "reset",
@@ -2753,7 +2753,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 400,
+            "line": 414,
             "description": "Reset the layout of the application.",
             "itemtype": "method",
             "name": "resetLayout",
@@ -2762,7 +2762,49 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 419,
+            "line": 433,
+            "description": "Add an event listener on the app.",
+            "itemtype": "method",
+            "name": "addEventListener",
+            "params": [
+                {
+                    "name": "type",
+                    "description": "The event type.",
+                    "type": "String"
+                },
+                {
+                    "name": "listener",
+                    "description": "The method associated with the provided event type.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.App",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/app/application.js",
+            "line": 447,
+            "description": "Remove an event listener from the app.",
+            "itemtype": "method",
+            "name": "removeEventListener",
+            "params": [
+                {
+                    "name": "type",
+                    "description": "The event type.",
+                    "type": "String"
+                },
+                {
+                    "name": "listener",
+                    "description": "The method associated with the provided event type.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.App",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/app/application.js",
+            "line": 466,
             "description": "Load a list of files.",
             "itemtype": "method",
             "name": "loadFiles",
@@ -2778,7 +2820,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 436,
+            "line": 483,
             "description": "Load a list of files.",
             "itemtype": "method",
             "name": "loadFiles",
@@ -2794,14 +2836,14 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 474,
-            "description": "Load a JSON file.",
+            "line": 521,
+            "description": "Load a State file.",
             "itemtype": "method",
-            "name": "loadJSON",
+            "name": "loadStateFile",
             "params": [
                 {
                     "name": "file",
-                    "description": "An array with the file to load.",
+                    "description": "An array with the state file to load.",
                     "type": "Array"
                 }
             ],
@@ -2810,7 +2852,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 493,
+            "line": 540,
             "description": "Load a list of URLs.",
             "itemtype": "method",
             "name": "loadURL",
@@ -2826,7 +2868,23 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 530,
+            "line": 578,
+            "description": "Load a State url.",
+            "itemtype": "method",
+            "name": "loadStateUrl",
+            "params": [
+                {
+                    "name": "file",
+                    "description": "An array with the state url to load.",
+                    "type": "Array"
+                }
+            ],
+            "class": "dwv.App",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/app/application.js",
+            "line": 597,
             "description": "Fit the display to the given size. To be called once the image is loaded.",
             "itemtype": "method",
             "name": "fitToSize",
@@ -2835,7 +2893,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 572,
+            "line": 639,
             "description": "Toggle the display of the information layer.",
             "itemtype": "method",
             "name": "toggleInfoLayerDisplay",
@@ -2844,14 +2902,14 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 590,
+            "line": 657,
             "description": "Init the Window/Level display",
             "class": "dwv.App",
             "namespace": "dwv"
         },
         {
             "file": "src/app/application.js",
-            "line": 605,
+            "line": 672,
             "description": "Add layer mouse and touch listeners.",
             "itemtype": "method",
             "name": "addLayerListeners",
@@ -2860,7 +2918,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 627,
+            "line": 694,
             "description": "Remove layer mouse and touch listeners.",
             "itemtype": "method",
             "name": "removeLayerListeners",
@@ -2869,7 +2927,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 649,
+            "line": 716,
             "description": "Render the current image.",
             "itemtype": "method",
             "name": "render",
@@ -2878,7 +2936,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 658,
+            "line": 725,
             "description": "Zoom to the layers.",
             "itemtype": "method",
             "name": "zoom",
@@ -2904,7 +2962,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 671,
+            "line": 738,
             "description": "Add a step to the layers zoom.",
             "itemtype": "method",
             "name": "stepZoom",
@@ -2930,7 +2988,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 684,
+            "line": 751,
             "description": "Apply a translation to the layers.",
             "itemtype": "method",
             "name": "translate",
@@ -2951,7 +3009,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 696,
+            "line": 763,
             "description": "Apply a translation to the layers.",
             "itemtype": "method",
             "name": "translate",
@@ -2972,7 +3030,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 712,
+            "line": 779,
             "description": "Handle window/level change.",
             "itemtype": "method",
             "name": "onWLChange",
@@ -2988,7 +3046,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 722,
+            "line": 789,
             "description": "Handle colour map change.",
             "itemtype": "method",
             "name": "onColourChange",
@@ -3004,7 +3062,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 732,
+            "line": 799,
             "description": "Handle slice change.",
             "itemtype": "method",
             "name": "onSliceChange",
@@ -3020,7 +3078,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 752,
+            "line": 819,
             "description": "Handle key down event.\n- CRTL-Z: undo\n- CRTL-Y: redo\nDefault behavior. Usually used in tools.",
             "itemtype": "method",
             "name": "onKeydown",
@@ -3036,7 +3094,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 772,
+            "line": 839,
             "description": "Handle resize.\nFit the display to the window. To be called once the image is loaded.",
             "itemtype": "method",
             "name": "onResize",
@@ -3052,7 +3110,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 783,
+            "line": 850,
             "description": "Handle zoom reset.",
             "itemtype": "method",
             "name": "onZoomReset",
@@ -3068,7 +3126,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 793,
+            "line": 860,
             "description": "Handle loader change.",
             "itemtype": "method",
             "name": "onChangeLoader",
@@ -3084,7 +3142,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 803,
+            "line": 870,
             "description": "Handle change url event.",
             "itemtype": "method",
             "name": "onChangeURL",
@@ -3100,7 +3158,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 813,
+            "line": 880,
             "description": "Handle input urls.",
             "itemtype": "method",
             "name": "onInputURLs",
@@ -3116,7 +3174,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 823,
+            "line": 890,
             "description": "Handle change files event.",
             "itemtype": "method",
             "name": "onChangeFiles",
@@ -3132,7 +3190,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 836,
+            "line": 903,
             "description": "Handle state save event.",
             "itemtype": "method",
             "name": "onStateSave",
@@ -3148,7 +3206,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 849,
+            "line": 916,
             "description": "Handle colour map change.",
             "itemtype": "method",
             "name": "onChangeColourMap",
@@ -3164,7 +3222,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 859,
+            "line": 926,
             "description": "Handle window/level preset change.",
             "itemtype": "method",
             "name": "onChangeWindowLevelPreset",
@@ -3180,7 +3238,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 877,
+            "line": 944,
             "description": "Handle tool change.",
             "itemtype": "method",
             "name": "onChangeTool",
@@ -3196,7 +3254,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 887,
+            "line": 954,
             "description": "Handle shape change.",
             "itemtype": "method",
             "name": "onChangeShape",
@@ -3212,7 +3270,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 897,
+            "line": 964,
             "description": "Handle filter change.",
             "itemtype": "method",
             "name": "onChangeFilter",
@@ -3228,7 +3286,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 907,
+            "line": 974,
             "description": "Handle filter run.",
             "itemtype": "method",
             "name": "onRunFilter",
@@ -3244,7 +3302,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 917,
+            "line": 984,
             "description": "Handle line colour change.",
             "itemtype": "method",
             "name": "onChangeLineColour",
@@ -3260,7 +3318,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 927,
+            "line": 994,
             "description": "Handle min/max slider change.",
             "itemtype": "method",
             "name": "onChangeMinMax",
@@ -3276,7 +3334,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 937,
+            "line": 1004,
             "description": "Handle undo.",
             "itemtype": "method",
             "name": "onUndo",
@@ -3292,7 +3350,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 947,
+            "line": 1014,
             "description": "Handle redo.",
             "itemtype": "method",
             "name": "onRedo",
@@ -3308,7 +3366,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 957,
+            "line": 1024,
             "description": "Handle toggle of info layer.",
             "itemtype": "method",
             "name": "onToggleInfoLayer",
@@ -3324,7 +3382,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 967,
+            "line": 1034,
             "description": "Handle display reset.",
             "itemtype": "method",
             "name": "onDisplayReset",
@@ -3340,7 +3398,23 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 985,
+            "line": 1052,
+            "description": "Fire an event: call all associated listeners.",
+            "itemtype": "method",
+            "name": "fireEvent",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The event to fire.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.App",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/app/application.js",
+            "line": 1068,
             "description": "Generate the image data and draw it.",
             "itemtype": "method",
             "name": "generateAndDrawImage",
@@ -3349,7 +3423,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 999,
+            "line": 1082,
             "description": "Apply the stored zoom to the layers.",
             "itemtype": "method",
             "name": "zoomLayers",
@@ -3358,7 +3432,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1030,
+            "line": 1113,
             "description": "Apply the stored translation to the layers.",
             "itemtype": "method",
             "name": "translateLayers",
@@ -3367,7 +3441,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1050,
+            "line": 1133,
             "description": "Add image listeners.",
             "itemtype": "method",
             "name": "addImageInfoListeners",
@@ -3378,7 +3452,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1065,
+            "line": 1148,
             "description": "Remove image listeners.",
             "itemtype": "method",
             "name": "removeImageInfoListeners",
@@ -3389,7 +3463,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1080,
+            "line": 1163,
             "description": "General-purpose event handler. This function just determines the mouse \nposition relative to the canvas element. It then passes it to the current tool.",
             "itemtype": "method",
             "name": "eventHandler",
@@ -3407,7 +3481,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1153,
+            "line": 1236,
             "description": "Handle a drag over.",
             "itemtype": "method",
             "name": "onDragOver",
@@ -3425,7 +3499,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1172,
+            "line": 1255,
             "description": "Handle a drag leave.",
             "itemtype": "method",
             "name": "onDragLeave",
@@ -3443,7 +3517,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1191,
+            "line": 1274,
             "description": "Handle a drop event.",
             "itemtype": "method",
             "name": "onDrop",
@@ -3461,7 +3535,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1206,
+            "line": 1289,
             "description": "Handle an error: display it to the user.",
             "itemtype": "method",
             "name": "handleError",
@@ -3479,7 +3553,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1227,
+            "line": 1310,
             "description": "Create the application layers.",
             "itemtype": "method",
             "name": "createLayers",
@@ -3502,7 +3576,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1267,
+            "line": 1350,
             "description": "Post load application initialisation. To be called once the DICOM has been parsed.",
             "itemtype": "method",
             "name": "postLoadInit",
@@ -8217,7 +8291,124 @@
         },
         {
             "file": "src/io/file.js",
-            "line": 26,
+            "line": 22,
+            "description": "Number of data to load.",
+            "itemtype": "property",
+            "name": "nToLoad",
+            "access": "private",
+            "tagname": "",
+            "type": "Number",
+            "class": "dwv.io.File",
+            "module": "io",
+            "namespace": "dwv.io"
+        },
+        {
+            "file": "src/io/file.js",
+            "line": 29,
+            "description": "Number of loaded data.",
+            "itemtype": "property",
+            "name": "nLoaded",
+            "access": "private",
+            "tagname": "",
+            "type": "Number",
+            "class": "dwv.io.File",
+            "module": "io",
+            "namespace": "dwv.io"
+        },
+        {
+            "file": "src/io/file.js",
+            "line": 37,
+            "description": "Set the number of data to load.",
+            "itemtype": "method",
+            "name": "setNToLoad",
+            "class": "dwv.io.File",
+            "module": "io",
+            "namespace": "dwv.io"
+        },
+        {
+            "file": "src/io/file.js",
+            "line": 43,
+            "description": "Increment the number of loaded data\nand call onloadend if loaded all data.",
+            "itemtype": "method",
+            "name": "addLoaded",
+            "class": "dwv.io.File",
+            "module": "io",
+            "namespace": "dwv.io"
+        },
+        {
+            "file": "src/io/file.js",
+            "line": 56,
+            "description": "Handle a load event.",
+            "itemtype": "method",
+            "name": "onload",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The load event, event.target \n should be the loaded data.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.io.File",
+            "module": "io",
+            "namespace": "dwv.io"
+        },
+        {
+            "file": "src/io/file.js",
+            "line": 66,
+            "description": "Handle a load end event.",
+            "itemtype": "method",
+            "name": "onloadend",
+            "class": "dwv.io.File",
+            "module": "io",
+            "namespace": "dwv.io"
+        },
+        {
+            "file": "src/io/file.js",
+            "line": 74,
+            "description": "Handle an error event.",
+            "itemtype": "method",
+            "name": "onerror",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The error event, event.message\n should be the error message.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.io.File",
+            "module": "io",
+            "namespace": "dwv.io"
+        },
+        {
+            "file": "src/io/file.js",
+            "line": 85,
+            "description": "Create an error handler from a base one and locals.",
+            "itemtype": "method",
+            "name": "createErrorHandler",
+            "params": [
+                {
+                    "name": "file",
+                    "description": "The related file.",
+                    "type": "String"
+                },
+                {
+                    "name": "text",
+                    "description": "The text to insert in the message.",
+                    "type": "String"
+                },
+                {
+                    "name": "baseHandler",
+                    "description": "The base handler.",
+                    "type": "Function"
+                }
+            ],
+            "class": "dwv.io.File",
+            "module": "io",
+            "namespace": "dwv.io"
+        },
+        {
+            "file": "src/io/file.js",
+            "line": 100,
             "description": "Load a list of files.",
             "itemtype": "method",
             "name": "load",
@@ -8234,7 +8425,124 @@
         },
         {
             "file": "src/io/url.js",
-            "line": 26,
+            "line": 22,
+            "description": "Number of data to load.",
+            "itemtype": "property",
+            "name": "nToLoad",
+            "access": "private",
+            "tagname": "",
+            "type": "Number",
+            "class": "dwv.io.Url",
+            "module": "io",
+            "namespace": "dwv.io"
+        },
+        {
+            "file": "src/io/url.js",
+            "line": 29,
+            "description": "Number of loaded data.",
+            "itemtype": "property",
+            "name": "nLoaded",
+            "access": "private",
+            "tagname": "",
+            "type": "Number",
+            "class": "dwv.io.Url",
+            "module": "io",
+            "namespace": "dwv.io"
+        },
+        {
+            "file": "src/io/url.js",
+            "line": 37,
+            "description": "Set the number of data to load.",
+            "itemtype": "method",
+            "name": "setNToLoad",
+            "class": "dwv.io.Url",
+            "module": "io",
+            "namespace": "dwv.io"
+        },
+        {
+            "file": "src/io/url.js",
+            "line": 43,
+            "description": "Increment the number of loaded data\nand call onloadend if loaded all data.",
+            "itemtype": "method",
+            "name": "addLoaded",
+            "class": "dwv.io.Url",
+            "module": "io",
+            "namespace": "dwv.io"
+        },
+        {
+            "file": "src/io/url.js",
+            "line": 56,
+            "description": "Handle a load event.",
+            "itemtype": "method",
+            "name": "onload",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The load event, event.target \n should be the loaded data.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.io.Url",
+            "module": "io",
+            "namespace": "dwv.io"
+        },
+        {
+            "file": "src/io/url.js",
+            "line": 66,
+            "description": "Handle a load end event.",
+            "itemtype": "method",
+            "name": "onloadend",
+            "class": "dwv.io.Url",
+            "module": "io",
+            "namespace": "dwv.io"
+        },
+        {
+            "file": "src/io/url.js",
+            "line": 74,
+            "description": "Handle an error event.",
+            "itemtype": "method",
+            "name": "onerror",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The error event, event.message \n should be the error message.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.io.Url",
+            "module": "io",
+            "namespace": "dwv.io"
+        },
+        {
+            "file": "src/io/url.js",
+            "line": 85,
+            "description": "Create an error handler from a base one and locals.",
+            "itemtype": "method",
+            "name": "createErrorHandler",
+            "params": [
+                {
+                    "name": "url",
+                    "description": "The related url.",
+                    "type": "String"
+                },
+                {
+                    "name": "text",
+                    "description": "The text to insert in the message.",
+                    "type": "String"
+                },
+                {
+                    "name": "baseHandler",
+                    "description": "The base handler.",
+                    "type": "Function"
+                }
+            ],
+            "class": "dwv.io.Url",
+            "module": "io",
+            "namespace": "dwv.io"
+        },
+        {
+            "file": "src/io/url.js",
+            "line": 100,
             "description": "Load a list of URLs.",
             "itemtype": "method",
             "name": "load",
@@ -9553,7 +9861,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 249,
+            "line": 250,
             "description": "Trash draw: a cross.",
             "itemtype": "property",
             "name": "trash",
@@ -9566,7 +9874,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 270,
+            "line": 274,
             "description": "The associated draw layer.",
             "itemtype": "property",
             "name": "drawLayer",
@@ -9579,7 +9887,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 278,
+            "line": 282,
             "description": "The associated draw layer.",
             "itemtype": "property",
             "name": "drawLayer",
@@ -9592,7 +9900,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 286,
+            "line": 290,
             "description": "Handle mouse down event.",
             "itemtype": "method",
             "name": "mousedown",
@@ -9609,7 +9917,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 326,
+            "line": 330,
             "description": "Handle mouse move event.",
             "itemtype": "method",
             "name": "mousemove",
@@ -9626,7 +9934,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 374,
+            "line": 378,
             "description": "Handle mouse up event.",
             "itemtype": "method",
             "name": "mouseup",
@@ -9643,7 +9951,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 409,
+            "line": 414,
             "description": "Handle mouse out event.",
             "itemtype": "method",
             "name": "mouseout",
@@ -9660,7 +9968,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 418,
+            "line": 423,
             "description": "Handle touch start event.",
             "itemtype": "method",
             "name": "touchstart",
@@ -9677,7 +9985,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 427,
+            "line": 432,
             "description": "Handle touch move event.",
             "itemtype": "method",
             "name": "touchmove",
@@ -9694,7 +10002,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 436,
+            "line": 441,
             "description": "Handle touch end event.",
             "itemtype": "method",
             "name": "touchend",
@@ -9711,7 +10019,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 445,
+            "line": 450,
             "description": "Handle key down event.",
             "itemtype": "method",
             "name": "keydown",
@@ -9728,7 +10036,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 454,
+            "line": 459,
             "description": "Setup the tool GUI.",
             "itemtype": "method",
             "name": "setup",
@@ -9738,7 +10046,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 464,
+            "line": 469,
             "description": "Enable the tool.",
             "itemtype": "method",
             "name": "enable",
@@ -9755,7 +10063,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 506,
+            "line": 511,
             "description": "Set shape off properties.",
             "itemtype": "method",
             "name": "setShapeOff",
@@ -9772,7 +10080,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 522,
+            "line": 527,
             "description": "Get the real position from an event.",
             "class": "dwv.tool.Draw",
             "module": "tool",
@@ -9780,7 +10088,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 531,
+            "line": 536,
             "description": "Set shape on properties.",
             "itemtype": "method",
             "name": "setShapeOn",
@@ -9797,7 +10105,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 676,
+            "line": 683,
             "description": "Initialise the tool.",
             "itemtype": "method",
             "name": "init",
@@ -9807,7 +10115,68 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 700,
+            "line": 705,
+            "description": "Add an event listener on the app.",
+            "itemtype": "method",
+            "name": "addEventListener",
+            "params": [
+                {
+                    "name": "type",
+                    "description": "The event type.",
+                    "type": "String"
+                },
+                {
+                    "name": "listener",
+                    "description": "The method associated with the provided event type.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.tool.Draw",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/draw.js",
+            "line": 719,
+            "description": "Remove an event listener from the app.",
+            "itemtype": "method",
+            "name": "removeEventListener",
+            "params": [
+                {
+                    "name": "type",
+                    "description": "The event type.",
+                    "type": "String"
+                },
+                {
+                    "name": "listener",
+                    "description": "The method associated with the provided event type.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.tool.Draw",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/draw.js",
+            "line": 740,
+            "description": "Fire an event: call all associated listeners.",
+            "itemtype": "method",
+            "name": "fireEvent",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The event to fire.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.tool.Draw",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/draw.js",
+            "line": 758,
             "description": "Help for this tool.",
             "itemtype": "method",
             "name": "getHelp",
@@ -9821,7 +10190,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 722,
+            "line": 780,
             "description": "Set the line colour of the drawing.",
             "itemtype": "method",
             "name": "setLineColour",
@@ -9838,7 +10207,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 733,
+            "line": 791,
             "description": "Set the shape name of the drawing.",
             "itemtype": "method",
             "name": "setShapeName",
@@ -9855,7 +10224,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 748,
+            "line": 806,
             "description": "Check if the shape is in the shape list.",
             "itemtype": "method",
             "name": "hasShape",
@@ -9885,7 +10254,20 @@
         },
         {
             "file": "src/tools/editor.js",
-            "line": 25,
+            "line": 24,
+            "description": "Edited image. Used for quantification update.",
+            "itemtype": "property",
+            "name": "image",
+            "access": "private",
+            "tagname": "",
+            "type": "Object",
+            "class": "dwv.tool.ShapeEditor",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/editor.js",
+            "line": 31,
             "description": "Active flag.",
             "itemtype": "property",
             "name": "isActive",
@@ -9898,20 +10280,33 @@
         },
         {
             "file": "src/tools/editor.js",
-            "line": 32,
+            "line": 38,
             "description": "Update function used by anchors to update the shape.",
             "itemtype": "property",
             "name": "updateFunction",
             "access": "private",
             "tagname": "",
-            "type": "Object",
+            "type": "Function",
             "class": "dwv.tool.ShapeEditor",
             "module": "tool",
             "namespace": "dwv.tool"
         },
         {
             "file": "src/tools/editor.js",
-            "line": 40,
+            "line": 45,
+            "description": "Draw event callback.",
+            "itemtype": "property",
+            "name": "drawEventCallback",
+            "access": "private",
+            "tagname": "",
+            "type": "Function",
+            "class": "dwv.tool.ShapeEditor",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/editor.js",
+            "line": 53,
             "description": "Set the shape to edit.",
             "itemtype": "method",
             "name": "setShape",
@@ -9928,7 +10323,24 @@
         },
         {
             "file": "src/tools/editor.js",
-            "line": 57,
+            "line": 67,
+            "description": "Set the associated image.",
+            "itemtype": "method",
+            "name": "setImage",
+            "params": [
+                {
+                    "name": "img",
+                    "description": "The associated image.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.tool.ShapeEditor",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/editor.js",
+            "line": 76,
             "description": "Get the edited shape.",
             "itemtype": "method",
             "name": "getShape",
@@ -9942,7 +10354,7 @@
         },
         {
             "file": "src/tools/editor.js",
-            "line": 66,
+            "line": 85,
             "description": "Get the active flag.",
             "itemtype": "method",
             "name": "isActive",
@@ -9956,7 +10368,24 @@
         },
         {
             "file": "src/tools/editor.js",
-            "line": 75,
+            "line": 94,
+            "description": "Set the draw event callback.",
+            "itemtype": "method",
+            "name": "setDrawEventCallback",
+            "params": [
+                {
+                    "name": "callback",
+                    "description": "The callback.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.tool.ShapeEditor",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/editor.js",
+            "line": 103,
             "description": "Enable the editor. Redraws the layer.",
             "itemtype": "method",
             "name": "enable",
@@ -9966,7 +10395,7 @@
         },
         {
             "file": "src/tools/editor.js",
-            "line": 89,
+            "line": 117,
             "description": "Disable the editor. Redraws the layer.",
             "itemtype": "method",
             "name": "disable",
@@ -9976,7 +10405,7 @@
         },
         {
             "file": "src/tools/editor.js",
-            "line": 103,
+            "line": 131,
             "description": "Reset the anchors.",
             "itemtype": "method",
             "name": "resetAnchors",
@@ -9986,7 +10415,7 @@
         },
         {
             "file": "src/tools/editor.js",
-            "line": 116,
+            "line": 144,
             "description": "Apply a function on all anchors.",
             "params": [
                 {
@@ -10001,7 +10430,7 @@
         },
         {
             "file": "src/tools/editor.js",
-            "line": 127,
+            "line": 155,
             "description": "Set anchors visibility.",
             "itemtype": "method",
             "name": "setAnchorsVisible",
@@ -10018,7 +10447,7 @@
         },
         {
             "file": "src/tools/editor.js",
-            "line": 138,
+            "line": 166,
             "description": "Set anchors active.",
             "itemtype": "method",
             "name": "setAnchorsActive",
@@ -10035,7 +10464,7 @@
         },
         {
             "file": "src/tools/editor.js",
-            "line": 158,
+            "line": 186,
             "description": "Remove anchors.",
             "itemtype": "method",
             "name": "removeAnchors",
@@ -10045,7 +10474,7 @@
         },
         {
             "file": "src/tools/editor.js",
-            "line": 168,
+            "line": 196,
             "description": "Add the shape anchors.",
             "itemtype": "method",
             "name": "addAnchors",
@@ -10055,7 +10484,7 @@
         },
         {
             "file": "src/tools/editor.js",
-            "line": 237,
+            "line": 265,
             "description": "Create shape editor controls, i.e. the anchors.",
             "itemtype": "method",
             "name": "addAnchor",
@@ -10087,7 +10516,7 @@
         },
         {
             "file": "src/tools/editor.js",
-            "line": 269,
+            "line": 297,
             "description": "Get a simple clone of the input anchor.",
             "params": [
                 {
@@ -10102,7 +10531,7 @@
         },
         {
             "file": "src/tools/editor.js",
-            "line": 296,
+            "line": 324,
             "description": "Set the anchor on listeners.",
             "params": [
                 {
@@ -10117,7 +10546,7 @@
         },
         {
             "file": "src/tools/editor.js",
-            "line": 378,
+            "line": 407,
             "description": "Set the anchor off listeners.",
             "params": [
                 {
@@ -12650,7 +13079,7 @@
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/tools/draw.js:700"
+            "line": " src/tools/draw.js:758"
         },
         {
             "message": "replacing incorrect tag: returns with return",
@@ -12674,7 +13103,7 @@
         },
         {
             "message": "Missing item type\nInit the Window/Level display",
-            "line": " src/app/application.js:590"
+            "line": " src/app/application.js:657"
         },
         {
             "message": "Missing item type\nDICOM tag dictionary.",
@@ -12722,23 +13151,23 @@
         },
         {
             "message": "Missing item type\nGet the real position from an event.",
-            "line": " src/tools/draw.js:522"
+            "line": " src/tools/draw.js:527"
         },
         {
             "message": "Missing item type\nApply a function on all anchors.",
-            "line": " src/tools/editor.js:116"
+            "line": " src/tools/editor.js:144"
         },
         {
             "message": "Missing item type\nGet a simple clone of the input anchor.",
-            "line": " src/tools/editor.js:269"
+            "line": " src/tools/editor.js:297"
         },
         {
             "message": "Missing item type\nSet the anchor on listeners.",
-            "line": " src/tools/editor.js:296"
+            "line": " src/tools/editor.js:324"
         },
         {
             "message": "Missing item type\nSet the anchor off listeners.",
-            "line": " src/tools/editor.js:378"
+            "line": " src/tools/editor.js:407"
         }
     ]
 }

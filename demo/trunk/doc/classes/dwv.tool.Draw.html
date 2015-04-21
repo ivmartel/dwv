@@ -263,7 +263,15 @@
 
                     <ul class="index-list methods">
                             <li class="index-item method">
+                                <a href="#method_addEventListener">addEventListener</a>
+
+                            </li>
+                            <li class="index-item method">
                                 <a href="#method_enable">enable</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_fireEvent">fireEvent</a>
 
                             </li>
                             <li class="index-item method">
@@ -296,6 +304,10 @@
                             </li>
                             <li class="index-item method">
                                 <a href="#method_mouseup">mouseup</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_removeEventListener">removeEventListener</a>
 
                             </li>
                             <li class="index-item method">
@@ -402,6 +414,74 @@
             <div id="methods" class="api-class-tabpanel">
                 <h2 class="off-left">Methods</h2>
 
+<div id="method_addEventListener" class="method item">
+    <h3 class="name"><code>addEventListener</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>type</code>
+                </li>
+                <li class="arg">
+                        <code>listener</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/src_tools_draw.js.html#l705"><code>src&#x2F;tools&#x2F;draw.js:705</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Add an event listener on the app.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">type</code>
+                        <span class="type">String</span>
+
+
+                    <div class="param-description">
+                        <p>The event type.</p>
+
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name">listener</code>
+                        <span class="type">Object</span>
+
+
+                    <div class="param-description">
+                        <p>The method associated with the provided event type.</p>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+
+</div>
 <div id="method_enable" class="method item">
     <h3 class="name"><code>enable</code></h3>
 
@@ -423,7 +503,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_tools_draw.js.html#l464"><code>src&#x2F;tools&#x2F;draw.js:464</code></a>
+        <a href="../files/src_tools_draw.js.html#l469"><code>src&#x2F;tools&#x2F;draw.js:469</code></a>
         </p>
 
 
@@ -456,6 +536,60 @@
 
 
 </div>
+<div id="method_fireEvent" class="method item">
+    <h3 class="name"><code>fireEvent</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>event</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/src_tools_draw.js.html#l740"><code>src&#x2F;tools&#x2F;draw.js:740</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Fire an event: call all associated listeners.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">event</code>
+                        <span class="type">Object</span>
+
+
+                    <div class="param-description">
+                        <p>The event to fire.</p>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+
+</div>
 <div id="method_getHelp" class="method item">
     <h3 class="name"><code>getHelp</code></h3>
 
@@ -474,7 +608,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_tools_draw.js.html#l700"><code>src&#x2F;tools&#x2F;draw.js:700</code></a>
+        <a href="../files/src_tools_draw.js.html#l758"><code>src&#x2F;tools&#x2F;draw.js:758</code></a>
         </p>
 
 
@@ -520,7 +654,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_tools_draw.js.html#l748"><code>src&#x2F;tools&#x2F;draw.js:748</code></a>
+        <a href="../files/src_tools_draw.js.html#l806"><code>src&#x2F;tools&#x2F;draw.js:806</code></a>
         </p>
 
 
@@ -568,7 +702,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_tools_draw.js.html#l676"><code>src&#x2F;tools&#x2F;draw.js:676</code></a>
+        <a href="../files/src_tools_draw.js.html#l683"><code>src&#x2F;tools&#x2F;draw.js:683</code></a>
         </p>
 
 
@@ -605,7 +739,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_tools_draw.js.html#l445"><code>src&#x2F;tools&#x2F;draw.js:445</code></a>
+        <a href="../files/src_tools_draw.js.html#l450"><code>src&#x2F;tools&#x2F;draw.js:450</code></a>
         </p>
 
 
@@ -659,7 +793,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_tools_draw.js.html#l286"><code>src&#x2F;tools&#x2F;draw.js:286</code></a>
+        <a href="../files/src_tools_draw.js.html#l290"><code>src&#x2F;tools&#x2F;draw.js:290</code></a>
         </p>
 
 
@@ -713,7 +847,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_tools_draw.js.html#l326"><code>src&#x2F;tools&#x2F;draw.js:326</code></a>
+        <a href="../files/src_tools_draw.js.html#l330"><code>src&#x2F;tools&#x2F;draw.js:330</code></a>
         </p>
 
 
@@ -767,7 +901,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_tools_draw.js.html#l409"><code>src&#x2F;tools&#x2F;draw.js:409</code></a>
+        <a href="../files/src_tools_draw.js.html#l414"><code>src&#x2F;tools&#x2F;draw.js:414</code></a>
         </p>
 
 
@@ -821,7 +955,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_tools_draw.js.html#l374"><code>src&#x2F;tools&#x2F;draw.js:374</code></a>
+        <a href="../files/src_tools_draw.js.html#l378"><code>src&#x2F;tools&#x2F;draw.js:378</code></a>
         </p>
 
 
@@ -854,6 +988,74 @@
 
 
 </div>
+<div id="method_removeEventListener" class="method item">
+    <h3 class="name"><code>removeEventListener</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>type</code>
+                </li>
+                <li class="arg">
+                        <code>listener</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/src_tools_draw.js.html#l719"><code>src&#x2F;tools&#x2F;draw.js:719</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Remove an event listener from the app.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">type</code>
+                        <span class="type">String</span>
+
+
+                    <div class="param-description">
+                        <p>The event type.</p>
+
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name">listener</code>
+                        <span class="type">Object</span>
+
+
+                    <div class="param-description">
+                        <p>The method associated with the provided event type.</p>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+
+</div>
 <div id="method_setLineColour" class="method item">
     <h3 class="name"><code>setLineColour</code></h3>
 
@@ -875,7 +1077,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_tools_draw.js.html#l722"><code>src&#x2F;tools&#x2F;draw.js:722</code></a>
+        <a href="../files/src_tools_draw.js.html#l780"><code>src&#x2F;tools&#x2F;draw.js:780</code></a>
         </p>
 
 
@@ -929,7 +1131,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_tools_draw.js.html#l733"><code>src&#x2F;tools&#x2F;draw.js:733</code></a>
+        <a href="../files/src_tools_draw.js.html#l791"><code>src&#x2F;tools&#x2F;draw.js:791</code></a>
         </p>
 
 
@@ -983,7 +1185,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_tools_draw.js.html#l506"><code>src&#x2F;tools&#x2F;draw.js:506</code></a>
+        <a href="../files/src_tools_draw.js.html#l511"><code>src&#x2F;tools&#x2F;draw.js:511</code></a>
         </p>
 
 
@@ -1037,7 +1239,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_tools_draw.js.html#l531"><code>src&#x2F;tools&#x2F;draw.js:531</code></a>
+        <a href="../files/src_tools_draw.js.html#l536"><code>src&#x2F;tools&#x2F;draw.js:536</code></a>
         </p>
 
 
@@ -1085,7 +1287,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_tools_draw.js.html#l454"><code>src&#x2F;tools&#x2F;draw.js:454</code></a>
+        <a href="../files/src_tools_draw.js.html#l459"><code>src&#x2F;tools&#x2F;draw.js:459</code></a>
         </p>
 
 
@@ -1122,7 +1324,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_tools_draw.js.html#l436"><code>src&#x2F;tools&#x2F;draw.js:436</code></a>
+        <a href="../files/src_tools_draw.js.html#l441"><code>src&#x2F;tools&#x2F;draw.js:441</code></a>
         </p>
 
 
@@ -1176,7 +1378,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_tools_draw.js.html#l427"><code>src&#x2F;tools&#x2F;draw.js:427</code></a>
+        <a href="../files/src_tools_draw.js.html#l432"><code>src&#x2F;tools&#x2F;draw.js:432</code></a>
         </p>
 
 
@@ -1230,7 +1432,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_tools_draw.js.html#l418"><code>src&#x2F;tools&#x2F;draw.js:418</code></a>
+        <a href="../files/src_tools_draw.js.html#l423"><code>src&#x2F;tools&#x2F;draw.js:423</code></a>
         </p>
 
 
@@ -1306,7 +1508,7 @@
                         <div class="meta">
                                     <p>
                                     Defined in
-                            <a href="../files/src_tools_draw.js.html#l278"><code>src&#x2F;tools&#x2F;draw.js:278</code></a>
+                            <a href="../files/src_tools_draw.js.html#l282"><code>src&#x2F;tools&#x2F;draw.js:282</code></a>
                             </p>
                     
                     
@@ -1332,7 +1534,7 @@
                         <div class="meta">
                                     <p>
                                     Defined in
-                            <a href="../files/src_tools_draw.js.html#l270"><code>src&#x2F;tools&#x2F;draw.js:270</code></a>
+                            <a href="../files/src_tools_draw.js.html#l274"><code>src&#x2F;tools&#x2F;draw.js:274</code></a>
                             </p>
                     
                     
@@ -1614,7 +1816,7 @@
                         <div class="meta">
                                     <p>
                                     Defined in
-                            <a href="../files/src_tools_draw.js.html#l249"><code>src&#x2F;tools&#x2F;draw.js:249</code></a>
+                            <a href="../files/src_tools_draw.js.html#l250"><code>src&#x2F;tools&#x2F;draw.js:250</code></a>
                             </p>
                     
                     

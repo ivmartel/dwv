@@ -238,6 +238,10 @@
                     <h3>Methods</h3>
 
                     <ul class="index-list methods">
+                            <li class="index-item method">
+                                <a href="#method_addEventListener">addEventListener</a>
+
+                            </li>
                             <li class="index-item method private">
                                 <a href="#method_addImageInfoListeners">addImageInfoListeners</a>
 
@@ -252,6 +256,10 @@
                             </li>
                             <li class="index-item method private">
                                 <a href="#method_eventHandler">eventHandler</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_fireEvent">fireEvent</a>
 
                             </li>
                             <li class="index-item method">
@@ -343,7 +351,11 @@
 
                             </li>
                             <li class="index-item method">
-                                <a href="#method_loadJSON">loadJSON</a>
+                                <a href="#method_loadStateFile">loadStateFile</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_loadStateUrl">loadStateUrl</a>
 
                             </li>
                             <li class="index-item method">
@@ -458,6 +470,10 @@
                                 <a href="#method_postLoadInit">postLoadInit</a>
 
                             </li>
+                            <li class="index-item method">
+                                <a href="#method_removeEventListener">removeEventListener</a>
+
+                            </li>
                             <li class="index-item method private">
                                 <a href="#method_removeImageInfoListeners">removeImageInfoListeners</a>
 
@@ -524,6 +540,74 @@
             <div id="methods" class="api-class-tabpanel">
                 <h2 class="off-left">Methods</h2>
 
+<div id="method_addEventListener" class="method item">
+    <h3 class="name"><code>addEventListener</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>type</code>
+                </li>
+                <li class="arg">
+                        <code>listener</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/src_app_application.js.html#l433"><code>src&#x2F;app&#x2F;application.js:433</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Add an event listener on the app.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">type</code>
+                        <span class="type">String</span>
+
+
+                    <div class="param-description">
+                        <p>The event type.</p>
+
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name">listener</code>
+                        <span class="type">Object</span>
+
+
+                    <div class="param-description">
+                        <p>The method associated with the provided event type.</p>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+
+</div>
 <div id="method_addImageInfoListeners" class="method item private">
     <h3 class="name"><code>addImageInfoListeners</code></h3>
 
@@ -540,7 +624,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l1050"><code>src&#x2F;app&#x2F;application.js:1050</code></a>
+        <a href="../files/src_app_application.js.html#l1133"><code>src&#x2F;app&#x2F;application.js:1133</code></a>
         </p>
 
 
@@ -571,7 +655,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l605"><code>src&#x2F;app&#x2F;application.js:605</code></a>
+        <a href="../files/src_app_application.js.html#l672"><code>src&#x2F;app&#x2F;application.js:672</code></a>
         </p>
 
 
@@ -612,7 +696,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l1227"><code>src&#x2F;app&#x2F;application.js:1227</code></a>
+        <a href="../files/src_app_application.js.html#l1310"><code>src&#x2F;app&#x2F;application.js:1310</code></a>
         </p>
 
 
@@ -678,7 +762,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l1080"><code>src&#x2F;app&#x2F;application.js:1080</code></a>
+        <a href="../files/src_app_application.js.html#l1163"><code>src&#x2F;app&#x2F;application.js:1163</code></a>
         </p>
 
 
@@ -712,6 +796,60 @@ position relative to the canvas element. It then passes it to the current tool.<
 
 
 </div>
+<div id="method_fireEvent" class="method item">
+    <h3 class="name"><code>fireEvent</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>event</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/src_app_application.js.html#l1052"><code>src&#x2F;app&#x2F;application.js:1052</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Fire an event: call all associated listeners.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">event</code>
+                        <span class="type">Object</span>
+
+
+                    <div class="param-description">
+                        <p>The event to fire.</p>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+
+</div>
 <div id="method_fitToSize" class="method item">
     <h3 class="name"><code>fitToSize</code></h3>
 
@@ -727,7 +865,7 @@ position relative to the canvas element. It then passes it to the current tool.<
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l530"><code>src&#x2F;app&#x2F;application.js:530</code></a>
+        <a href="../files/src_app_application.js.html#l597"><code>src&#x2F;app&#x2F;application.js:597</code></a>
         </p>
 
 
@@ -758,7 +896,7 @@ position relative to the canvas element. It then passes it to the current tool.<
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l985"><code>src&#x2F;app&#x2F;application.js:985</code></a>
+        <a href="../files/src_app_application.js.html#l1068"><code>src&#x2F;app&#x2F;application.js:1068</code></a>
         </p>
 
 
@@ -792,7 +930,7 @@ position relative to the canvas element. It then passes it to the current tool.<
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l124"><code>src&#x2F;app&#x2F;application.js:124</code></a>
+        <a href="../files/src_app_application.js.html#l127"><code>src&#x2F;app&#x2F;application.js:127</code></a>
         </p>
 
 
@@ -835,7 +973,7 @@ position relative to the canvas element. It then passes it to the current tool.<
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l165"><code>src&#x2F;app&#x2F;application.js:165</code></a>
+        <a href="../files/src_app_application.js.html#l168"><code>src&#x2F;app&#x2F;application.js:168</code></a>
         </p>
 
 
@@ -878,7 +1016,7 @@ position relative to the canvas element. It then passes it to the current tool.<
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l178"><code>src&#x2F;app&#x2F;application.js:178</code></a>
+        <a href="../files/src_app_application.js.html#l181"><code>src&#x2F;app&#x2F;application.js:181</code></a>
         </p>
 
 
@@ -921,7 +1059,7 @@ position relative to the canvas element. It then passes it to the current tool.<
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l86"><code>src&#x2F;app&#x2F;application.js:86</code></a>
+        <a href="../files/src_app_application.js.html#l89"><code>src&#x2F;app&#x2F;application.js:89</code></a>
         </p>
 
 
@@ -964,7 +1102,7 @@ position relative to the canvas element. It then passes it to the current tool.<
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l111"><code>src&#x2F;app&#x2F;application.js:111</code></a>
+        <a href="../files/src_app_application.js.html#l114"><code>src&#x2F;app&#x2F;application.js:114</code></a>
         </p>
 
 
@@ -1007,7 +1145,7 @@ position relative to the canvas element. It then passes it to the current tool.<
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l159"><code>src&#x2F;app&#x2F;application.js:159</code></a>
+        <a href="../files/src_app_application.js.html#l162"><code>src&#x2F;app&#x2F;application.js:162</code></a>
         </p>
 
 
@@ -1050,7 +1188,7 @@ position relative to the canvas element. It then passes it to the current tool.<
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l205"><code>src&#x2F;app&#x2F;application.js:205</code></a>
+        <a href="../files/src_app_application.js.html#l208"><code>src&#x2F;app&#x2F;application.js:208</code></a>
         </p>
 
 
@@ -1093,7 +1231,7 @@ position relative to the canvas element. It then passes it to the current tool.<
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l117"><code>src&#x2F;app&#x2F;application.js:117</code></a>
+        <a href="../files/src_app_application.js.html#l120"><code>src&#x2F;app&#x2F;application.js:120</code></a>
         </p>
 
 
@@ -1136,7 +1274,7 @@ position relative to the canvas element. It then passes it to the current tool.<
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l131"><code>src&#x2F;app&#x2F;application.js:131</code></a>
+        <a href="../files/src_app_application.js.html#l134"><code>src&#x2F;app&#x2F;application.js:134</code></a>
         </p>
 
 
@@ -1179,7 +1317,7 @@ position relative to the canvas element. It then passes it to the current tool.<
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l138"><code>src&#x2F;app&#x2F;application.js:138</code></a>
+        <a href="../files/src_app_application.js.html#l141"><code>src&#x2F;app&#x2F;application.js:141</code></a>
         </p>
 
 
@@ -1222,7 +1360,7 @@ position relative to the canvas element. It then passes it to the current tool.<
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l185"><code>src&#x2F;app&#x2F;application.js:185</code></a>
+        <a href="../files/src_app_application.js.html#l188"><code>src&#x2F;app&#x2F;application.js:188</code></a>
         </p>
 
 
@@ -1265,7 +1403,7 @@ position relative to the canvas element. It then passes it to the current tool.<
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l191"><code>src&#x2F;app&#x2F;application.js:191</code></a>
+        <a href="../files/src_app_application.js.html#l194"><code>src&#x2F;app&#x2F;application.js:194</code></a>
         </p>
 
 
@@ -1308,7 +1446,7 @@ position relative to the canvas element. It then passes it to the current tool.<
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l145"><code>src&#x2F;app&#x2F;application.js:145</code></a>
+        <a href="../files/src_app_application.js.html#l148"><code>src&#x2F;app&#x2F;application.js:148</code></a>
         </p>
 
 
@@ -1351,7 +1489,7 @@ position relative to the canvas element. It then passes it to the current tool.<
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l198"><code>src&#x2F;app&#x2F;application.js:198</code></a>
+        <a href="../files/src_app_application.js.html#l201"><code>src&#x2F;app&#x2F;application.js:201</code></a>
         </p>
 
 
@@ -1394,7 +1532,7 @@ position relative to the canvas element. It then passes it to the current tool.<
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l79"><code>src&#x2F;app&#x2F;application.js:79</code></a>
+        <a href="../files/src_app_application.js.html#l82"><code>src&#x2F;app&#x2F;application.js:82</code></a>
         </p>
 
 
@@ -1437,7 +1575,7 @@ position relative to the canvas element. It then passes it to the current tool.<
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l152"><code>src&#x2F;app&#x2F;application.js:152</code></a>
+        <a href="../files/src_app_application.js.html#l155"><code>src&#x2F;app&#x2F;application.js:155</code></a>
         </p>
 
 
@@ -1484,7 +1622,7 @@ position relative to the canvas element. It then passes it to the current tool.<
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l1206"><code>src&#x2F;app&#x2F;application.js:1206</code></a>
+        <a href="../files/src_app_application.js.html#l1289"><code>src&#x2F;app&#x2F;application.js:1289</code></a>
         </p>
 
 
@@ -1532,7 +1670,7 @@ position relative to the canvas element. It then passes it to the current tool.<
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l218"><code>src&#x2F;app&#x2F;application.js:218</code></a>
+        <a href="../files/src_app_application.js.html#l221"><code>src&#x2F;app&#x2F;application.js:221</code></a>
         </p>
 
 
@@ -1569,7 +1707,7 @@ position relative to the canvas element. It then passes it to the current tool.<
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l419"><code>src&#x2F;app&#x2F;application.js:419</code></a>
+        <a href="../files/src_app_application.js.html#l483"><code>src&#x2F;app&#x2F;application.js:483</code></a>
         </p>
 
 
@@ -1623,7 +1761,7 @@ position relative to the canvas element. It then passes it to the current tool.<
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l436"><code>src&#x2F;app&#x2F;application.js:436</code></a>
+        <a href="../files/src_app_application.js.html#l466"><code>src&#x2F;app&#x2F;application.js:466</code></a>
         </p>
 
 
@@ -1656,8 +1794,8 @@ position relative to the canvas element. It then passes it to the current tool.<
 
 
 </div>
-<div id="method_loadJSON" class="method item">
-    <h3 class="name"><code>loadJSON</code></h3>
+<div id="method_loadStateFile" class="method item">
+    <h3 class="name"><code>loadStateFile</code></h3>
 
         <div class="args">
             <span class="paren">(</span><ul class="args-list inline commas">
@@ -1677,7 +1815,7 @@ position relative to the canvas element. It then passes it to the current tool.<
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l474"><code>src&#x2F;app&#x2F;application.js:474</code></a>
+        <a href="../files/src_app_application.js.html#l521"><code>src&#x2F;app&#x2F;application.js:521</code></a>
         </p>
 
 
@@ -1685,7 +1823,7 @@ position relative to the canvas element. It then passes it to the current tool.<
     </div>
 
     <div class="description">
-        <p>Load a JSON file.</p>
+        <p>Load a State file.</p>
 
     </div>
 
@@ -1699,7 +1837,61 @@ position relative to the canvas element. It then passes it to the current tool.<
 
 
                     <div class="param-description">
-                        <p>An array with the file to load.</p>
+                        <p>An array with the state file to load.</p>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+
+</div>
+<div id="method_loadStateUrl" class="method item">
+    <h3 class="name"><code>loadStateUrl</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>file</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/src_app_application.js.html#l578"><code>src&#x2F;app&#x2F;application.js:578</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Load a State url.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">file</code>
+                        <span class="type">Array</span>
+
+
+                    <div class="param-description">
+                        <p>An array with the state url to load.</p>
 
                     </div>
 
@@ -1731,7 +1923,7 @@ position relative to the canvas element. It then passes it to the current tool.<
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l493"><code>src&#x2F;app&#x2F;application.js:493</code></a>
+        <a href="../files/src_app_application.js.html#l540"><code>src&#x2F;app&#x2F;application.js:540</code></a>
         </p>
 
 
@@ -1785,7 +1977,7 @@ position relative to the canvas element. It then passes it to the current tool.<
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l849"><code>src&#x2F;app&#x2F;application.js:849</code></a>
+        <a href="../files/src_app_application.js.html#l916"><code>src&#x2F;app&#x2F;application.js:916</code></a>
         </p>
 
 
@@ -1839,7 +2031,7 @@ position relative to the canvas element. It then passes it to the current tool.<
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l823"><code>src&#x2F;app&#x2F;application.js:823</code></a>
+        <a href="../files/src_app_application.js.html#l890"><code>src&#x2F;app&#x2F;application.js:890</code></a>
         </p>
 
 
@@ -1893,7 +2085,7 @@ position relative to the canvas element. It then passes it to the current tool.<
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l897"><code>src&#x2F;app&#x2F;application.js:897</code></a>
+        <a href="../files/src_app_application.js.html#l964"><code>src&#x2F;app&#x2F;application.js:964</code></a>
         </p>
 
 
@@ -1947,7 +2139,7 @@ position relative to the canvas element. It then passes it to the current tool.<
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l917"><code>src&#x2F;app&#x2F;application.js:917</code></a>
+        <a href="../files/src_app_application.js.html#l984"><code>src&#x2F;app&#x2F;application.js:984</code></a>
         </p>
 
 
@@ -2001,7 +2193,7 @@ position relative to the canvas element. It then passes it to the current tool.<
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l793"><code>src&#x2F;app&#x2F;application.js:793</code></a>
+        <a href="../files/src_app_application.js.html#l860"><code>src&#x2F;app&#x2F;application.js:860</code></a>
         </p>
 
 
@@ -2055,7 +2247,7 @@ position relative to the canvas element. It then passes it to the current tool.<
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l927"><code>src&#x2F;app&#x2F;application.js:927</code></a>
+        <a href="../files/src_app_application.js.html#l994"><code>src&#x2F;app&#x2F;application.js:994</code></a>
         </p>
 
 
@@ -2109,7 +2301,7 @@ position relative to the canvas element. It then passes it to the current tool.<
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l887"><code>src&#x2F;app&#x2F;application.js:887</code></a>
+        <a href="../files/src_app_application.js.html#l954"><code>src&#x2F;app&#x2F;application.js:954</code></a>
         </p>
 
 
@@ -2163,7 +2355,7 @@ position relative to the canvas element. It then passes it to the current tool.<
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l877"><code>src&#x2F;app&#x2F;application.js:877</code></a>
+        <a href="../files/src_app_application.js.html#l944"><code>src&#x2F;app&#x2F;application.js:944</code></a>
         </p>
 
 
@@ -2217,7 +2409,7 @@ position relative to the canvas element. It then passes it to the current tool.<
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l803"><code>src&#x2F;app&#x2F;application.js:803</code></a>
+        <a href="../files/src_app_application.js.html#l870"><code>src&#x2F;app&#x2F;application.js:870</code></a>
         </p>
 
 
@@ -2271,7 +2463,7 @@ position relative to the canvas element. It then passes it to the current tool.<
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l859"><code>src&#x2F;app&#x2F;application.js:859</code></a>
+        <a href="../files/src_app_application.js.html#l926"><code>src&#x2F;app&#x2F;application.js:926</code></a>
         </p>
 
 
@@ -2325,7 +2517,7 @@ position relative to the canvas element. It then passes it to the current tool.<
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l722"><code>src&#x2F;app&#x2F;application.js:722</code></a>
+        <a href="../files/src_app_application.js.html#l789"><code>src&#x2F;app&#x2F;application.js:789</code></a>
         </p>
 
 
@@ -2379,7 +2571,7 @@ position relative to the canvas element. It then passes it to the current tool.<
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l967"><code>src&#x2F;app&#x2F;application.js:967</code></a>
+        <a href="../files/src_app_application.js.html#l1034"><code>src&#x2F;app&#x2F;application.js:1034</code></a>
         </p>
 
 
@@ -2434,7 +2626,7 @@ position relative to the canvas element. It then passes it to the current tool.<
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l1172"><code>src&#x2F;app&#x2F;application.js:1172</code></a>
+        <a href="../files/src_app_application.js.html#l1255"><code>src&#x2F;app&#x2F;application.js:1255</code></a>
         </p>
 
 
@@ -2489,7 +2681,7 @@ position relative to the canvas element. It then passes it to the current tool.<
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l1153"><code>src&#x2F;app&#x2F;application.js:1153</code></a>
+        <a href="../files/src_app_application.js.html#l1236"><code>src&#x2F;app&#x2F;application.js:1236</code></a>
         </p>
 
 
@@ -2544,7 +2736,7 @@ position relative to the canvas element. It then passes it to the current tool.<
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l1191"><code>src&#x2F;app&#x2F;application.js:1191</code></a>
+        <a href="../files/src_app_application.js.html#l1274"><code>src&#x2F;app&#x2F;application.js:1274</code></a>
         </p>
 
 
@@ -2598,7 +2790,7 @@ position relative to the canvas element. It then passes it to the current tool.<
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l813"><code>src&#x2F;app&#x2F;application.js:813</code></a>
+        <a href="../files/src_app_application.js.html#l880"><code>src&#x2F;app&#x2F;application.js:880</code></a>
         </p>
 
 
@@ -2652,7 +2844,7 @@ position relative to the canvas element. It then passes it to the current tool.<
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l752"><code>src&#x2F;app&#x2F;application.js:752</code></a>
+        <a href="../files/src_app_application.js.html#l819"><code>src&#x2F;app&#x2F;application.js:819</code></a>
         </p>
 
 
@@ -2711,7 +2903,7 @@ Default behavior. Usually used in tools.</li>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l947"><code>src&#x2F;app&#x2F;application.js:947</code></a>
+        <a href="../files/src_app_application.js.html#l1014"><code>src&#x2F;app&#x2F;application.js:1014</code></a>
         </p>
 
 
@@ -2765,7 +2957,7 @@ Default behavior. Usually used in tools.</li>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l772"><code>src&#x2F;app&#x2F;application.js:772</code></a>
+        <a href="../files/src_app_application.js.html#l839"><code>src&#x2F;app&#x2F;application.js:839</code></a>
         </p>
 
 
@@ -2820,7 +3012,7 @@ Fit the display to the window. To be called once the image is loaded.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l907"><code>src&#x2F;app&#x2F;application.js:907</code></a>
+        <a href="../files/src_app_application.js.html#l974"><code>src&#x2F;app&#x2F;application.js:974</code></a>
         </p>
 
 
@@ -2874,7 +3066,7 @@ Fit the display to the window. To be called once the image is loaded.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l732"><code>src&#x2F;app&#x2F;application.js:732</code></a>
+        <a href="../files/src_app_application.js.html#l799"><code>src&#x2F;app&#x2F;application.js:799</code></a>
         </p>
 
 
@@ -2928,7 +3120,7 @@ Fit the display to the window. To be called once the image is loaded.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l836"><code>src&#x2F;app&#x2F;application.js:836</code></a>
+        <a href="../files/src_app_application.js.html#l903"><code>src&#x2F;app&#x2F;application.js:903</code></a>
         </p>
 
 
@@ -2982,7 +3174,7 @@ Fit the display to the window. To be called once the image is loaded.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l957"><code>src&#x2F;app&#x2F;application.js:957</code></a>
+        <a href="../files/src_app_application.js.html#l1024"><code>src&#x2F;app&#x2F;application.js:1024</code></a>
         </p>
 
 
@@ -3036,7 +3228,7 @@ Fit the display to the window. To be called once the image is loaded.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l937"><code>src&#x2F;app&#x2F;application.js:937</code></a>
+        <a href="../files/src_app_application.js.html#l1004"><code>src&#x2F;app&#x2F;application.js:1004</code></a>
         </p>
 
 
@@ -3090,7 +3282,7 @@ Fit the display to the window. To be called once the image is loaded.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l712"><code>src&#x2F;app&#x2F;application.js:712</code></a>
+        <a href="../files/src_app_application.js.html#l779"><code>src&#x2F;app&#x2F;application.js:779</code></a>
         </p>
 
 
@@ -3144,7 +3336,7 @@ Fit the display to the window. To be called once the image is loaded.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l783"><code>src&#x2F;app&#x2F;application.js:783</code></a>
+        <a href="../files/src_app_application.js.html#l850"><code>src&#x2F;app&#x2F;application.js:850</code></a>
         </p>
 
 
@@ -3199,7 +3391,7 @@ Fit the display to the window. To be called once the image is loaded.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l1267"><code>src&#x2F;app&#x2F;application.js:1267</code></a>
+        <a href="../files/src_app_application.js.html#l1350"><code>src&#x2F;app&#x2F;application.js:1350</code></a>
         </p>
 
 
@@ -3232,6 +3424,74 @@ Fit the display to the window. To be called once the image is loaded.</p>
 
 
 </div>
+<div id="method_removeEventListener" class="method item">
+    <h3 class="name"><code>removeEventListener</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>type</code>
+                </li>
+                <li class="arg">
+                        <code>listener</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/src_app_application.js.html#l447"><code>src&#x2F;app&#x2F;application.js:447</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Remove an event listener from the app.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">type</code>
+                        <span class="type">String</span>
+
+
+                    <div class="param-description">
+                        <p>The event type.</p>
+
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name">listener</code>
+                        <span class="type">Object</span>
+
+
+                    <div class="param-description">
+                        <p>The method associated with the provided event type.</p>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+
+</div>
 <div id="method_removeImageInfoListeners" class="method item private">
     <h3 class="name"><code>removeImageInfoListeners</code></h3>
 
@@ -3248,7 +3508,7 @@ Fit the display to the window. To be called once the image is loaded.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l1065"><code>src&#x2F;app&#x2F;application.js:1065</code></a>
+        <a href="../files/src_app_application.js.html#l1148"><code>src&#x2F;app&#x2F;application.js:1148</code></a>
         </p>
 
 
@@ -3279,7 +3539,7 @@ Fit the display to the window. To be called once the image is loaded.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l627"><code>src&#x2F;app&#x2F;application.js:627</code></a>
+        <a href="../files/src_app_application.js.html#l694"><code>src&#x2F;app&#x2F;application.js:694</code></a>
         </p>
 
 
@@ -3310,7 +3570,7 @@ Fit the display to the window. To be called once the image is loaded.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l649"><code>src&#x2F;app&#x2F;application.js:649</code></a>
+        <a href="../files/src_app_application.js.html#l716"><code>src&#x2F;app&#x2F;application.js:716</code></a>
         </p>
 
 
@@ -3341,7 +3601,7 @@ Fit the display to the window. To be called once the image is loaded.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l375"><code>src&#x2F;app&#x2F;application.js:375</code></a>
+        <a href="../files/src_app_application.js.html#l389"><code>src&#x2F;app&#x2F;application.js:389</code></a>
         </p>
 
 
@@ -3372,7 +3632,7 @@ Fit the display to the window. To be called once the image is loaded.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l400"><code>src&#x2F;app&#x2F;application.js:400</code></a>
+        <a href="../files/src_app_application.js.html#l414"><code>src&#x2F;app&#x2F;application.js:414</code></a>
         </p>
 
 
@@ -3403,7 +3663,7 @@ Fit the display to the window. To be called once the image is loaded.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l102"><code>src&#x2F;app&#x2F;application.js:102</code></a>
+        <a href="../files/src_app_application.js.html#l105"><code>src&#x2F;app&#x2F;application.js:105</code></a>
         </p>
 
 
@@ -3440,7 +3700,7 @@ Fit the display to the window. To be called once the image is loaded.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l92"><code>src&#x2F;app&#x2F;application.js:92</code></a>
+        <a href="../files/src_app_application.js.html#l95"><code>src&#x2F;app&#x2F;application.js:95</code></a>
         </p>
 
 
@@ -3500,7 +3760,7 @@ Fit the display to the window. To be called once the image is loaded.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l671"><code>src&#x2F;app&#x2F;application.js:671</code></a>
+        <a href="../files/src_app_application.js.html#l738"><code>src&#x2F;app&#x2F;application.js:738</code></a>
         </p>
 
 
@@ -3570,7 +3830,7 @@ Fit the display to the window. To be called once the image is loaded.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l572"><code>src&#x2F;app&#x2F;application.js:572</code></a>
+        <a href="../files/src_app_application.js.html#l639"><code>src&#x2F;app&#x2F;application.js:639</code></a>
         </p>
 
 
@@ -3610,7 +3870,7 @@ Fit the display to the window. To be called once the image is loaded.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l684"><code>src&#x2F;app&#x2F;application.js:684</code></a>
+        <a href="../files/src_app_application.js.html#l751"><code>src&#x2F;app&#x2F;application.js:751</code></a>
         </p>
 
 
@@ -3678,7 +3938,7 @@ Fit the display to the window. To be called once the image is loaded.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l696"><code>src&#x2F;app&#x2F;application.js:696</code></a>
+        <a href="../files/src_app_application.js.html#l763"><code>src&#x2F;app&#x2F;application.js:763</code></a>
         </p>
 
 
@@ -3737,7 +3997,7 @@ Fit the display to the window. To be called once the image is loaded.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l1030"><code>src&#x2F;app&#x2F;application.js:1030</code></a>
+        <a href="../files/src_app_application.js.html#l1113"><code>src&#x2F;app&#x2F;application.js:1113</code></a>
         </p>
 
 
@@ -3780,7 +4040,7 @@ Fit the display to the window. To be called once the image is loaded.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l658"><code>src&#x2F;app&#x2F;application.js:658</code></a>
+        <a href="../files/src_app_application.js.html#l725"><code>src&#x2F;app&#x2F;application.js:725</code></a>
         </p>
 
 
@@ -3850,7 +4110,7 @@ Fit the display to the window. To be called once the image is loaded.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l999"><code>src&#x2F;app&#x2F;application.js:999</code></a>
+        <a href="../files/src_app_application.js.html#l1082"><code>src&#x2F;app&#x2F;application.js:1082</code></a>
         </p>
 
 
