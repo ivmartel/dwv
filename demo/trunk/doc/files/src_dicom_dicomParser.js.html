@@ -368,6 +368,22 @@ dwv.dicom.DicomParser = function()
      * @type Array
      */
     this.pixelBuffer = [];
+    
+    /**
+     * Unknown tags count.
+     * @property unknownCount
+     * @type Number
+     */
+    var unknownCount = 0;
+    /**
+     * Get the next unknown tags count.
+     * @method getNextUnknownCount
+     * @returns {Number} The next count.
+     */
+    this.getNextUnknownCount = function () {
+        unknownCount++;    
+        return unknownCount;
+    }; 
 };
 
 /**
@@ -403,15 +419,7 @@ dwv.dicom.DicomParser.prototype.appendDicomElement = function( element, sequence
 {
     // simple case: not a sequence
     if ( typeof sequences === &quot;undefined&quot; || sequences.length === 0) {
-        var name = element.name;
-        // find a good unique name
-        if ( name === &quot;dwv::unknown&quot; ) {
-            var count = 1;
-            while ( this.dicomElements[name] ) {
-                name = element.name + (count++).toString();
-            }
-        }
-        this.dicomElements[name] = { 
+        this.dicomElements[element.name] = { 
             &quot;group&quot;: element.group, 
             &quot;element&quot;: element.element,
             &quot;vr&quot;: element.vr,
@@ -496,12 +504,15 @@ dwv.dicom.DicomParser.prototype.readTag = function(reader, offset)
     // element
     var element = reader.readHex(offset+2);
     // name
-    var name = &quot;dwv::unknown&quot;;
-    if( dwv.dicom.dictionary[group] ) {
-        if( dwv.dicom.dictionary[group][element] ) {
-            name = dwv.dicom.dictionary[group][element][2];
-        }
+    var name = null;
+    if( typeof dwv.dicom.dictionary[group] !== &quot;undefined&quot; &amp;&amp;
+            typeof dwv.dicom.dictionary[group][element] !== &quot;undefined&quot; ) {
+        name = dwv.dicom.dictionary[group][element][2];
     }
+    else {
+        name = &quot;dwv::unknown&quot; + this.getNextUnknownCount().toString();
+    }
+
     // return
     return {&#x27;group&#x27;: group, &#x27;element&#x27;: element, &#x27;name&#x27;: name};
 };
@@ -732,12 +743,13 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
         tagOffset = dataElement.offset;
         
         // new sequence
-        if ( dataElement.vr === &quot;SQ&quot; ) {
+        if ( dataElement.vr === &quot;SQ&quot; &amp;&amp; dataElement.vl !== 0) {
+            var vl = dataElement.vl;
             sequences.push( {
                 &#x27;name&#x27;: tagName, &#x27;itemNumber&#x27;: -1,
-                &#x27;vl&#x27;: dataElement.vl, &#x27;vlCount&#x27;: 0
+                &#x27;vl&#x27;: vl, &#x27;vlCount&#x27;: 0
             });
-            tagOffset -= dataElement.vl;
+            tagOffset -= vl;
         }
         // new item
         if ( sequences.length!== 0 &amp;&amp; tagName === &quot;Item&quot; ) {
