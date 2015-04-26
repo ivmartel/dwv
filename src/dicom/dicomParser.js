@@ -191,6 +191,22 @@ dwv.dicom.DicomParser = function()
      * @type Array
      */
     this.pixelBuffer = [];
+    
+    /**
+     * Unknown tags count.
+     * @property unknownCount
+     * @type Number
+     */
+    var unknownCount = 0;
+    /**
+     * Get the next unknown tags count.
+     * @method getNextUnknownCount
+     * @returns {Number} The next count.
+     */
+    this.getNextUnknownCount = function () {
+        unknownCount++;    
+        return unknownCount;
+    }; 
 };
 
 /**
@@ -226,15 +242,7 @@ dwv.dicom.DicomParser.prototype.appendDicomElement = function( element, sequence
 {
     // simple case: not a sequence
     if ( typeof sequences === "undefined" || sequences.length === 0) {
-        var name = element.name;
-        // find a good unique name
-        if ( name === "dwv::unknown" ) {
-            var count = 1;
-            while ( this.dicomElements[name] ) {
-                name = element.name + (count++).toString();
-            }
-        }
-        this.dicomElements[name] = { 
+        this.dicomElements[element.name] = { 
             "group": element.group, 
             "element": element.element,
             "vr": element.vr,
@@ -319,12 +327,15 @@ dwv.dicom.DicomParser.prototype.readTag = function(reader, offset)
     // element
     var element = reader.readHex(offset+2);
     // name
-    var name = "dwv::unknown";
-    if( dwv.dicom.dictionary[group] ) {
-        if( dwv.dicom.dictionary[group][element] ) {
-            name = dwv.dicom.dictionary[group][element][2];
-        }
+    var name = null;
+    if( typeof dwv.dicom.dictionary[group] !== "undefined" &&
+            typeof dwv.dicom.dictionary[group][element] !== "undefined" ) {
+        name = dwv.dicom.dictionary[group][element][2];
     }
+    else {
+        name = "dwv::unknown" + this.getNextUnknownCount().toString();
+    }
+
     // return
     return {'group': group, 'element': element, 'name': name};
 };
@@ -555,12 +566,13 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
         tagOffset = dataElement.offset;
         
         // new sequence
-        if ( dataElement.vr === "SQ" ) {
+        if ( dataElement.vr === "SQ" && dataElement.vl !== 0) {
+            var vl = dataElement.vl;
             sequences.push( {
                 'name': tagName, 'itemNumber': -1,
-                'vl': dataElement.vl, 'vlCount': 0
+                'vl': vl, 'vlCount': 0
             });
-            tagOffset -= dataElement.vl;
+            tagOffset -= vl;
         }
         // new item
         if ( sequences.length!== 0 && tagName === "Item" ) {
