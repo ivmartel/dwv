@@ -4239,7 +4239,32 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 196,
+            "line": 195,
+            "description": "Unknown tags count.",
+            "itemtype": "property",
+            "name": "unknownCount",
+            "type": "Number",
+            "class": "dwv.dicom.DicomParser",
+            "module": "dicom",
+            "namespace": "dwv.dicom"
+        },
+        {
+            "file": "src/dicom/dicomParser.js",
+            "line": 201,
+            "description": "Get the next unknown tags count.",
+            "itemtype": "method",
+            "name": "getNextUnknownCount",
+            "return": {
+                "description": "The next count.",
+                "type": "Number"
+            },
+            "class": "dwv.dicom.DicomParser",
+            "module": "dicom",
+            "namespace": "dwv.dicom"
+        },
+        {
+            "file": "src/dicom/dicomParser.js",
+            "line": 212,
             "description": "Get the DICOM data elements.",
             "itemtype": "method",
             "name": "getDicomElements",
@@ -4253,7 +4278,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 206,
+            "line": 222,
             "description": "Get the DICOM data pixel buffer.",
             "itemtype": "method",
             "name": "getPixelBuffer",
@@ -4267,7 +4292,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 216,
+            "line": 232,
             "description": "Append a DICOM element to the dicomElements member object.\nAllows for easy retrieval of DICOM tag values from the tag name.\nIf tags have same name (for the 'unknown' private tags cases), a number is appended\nmaking the name unique.",
             "itemtype": "method",
             "name": "appendDicomElement",
@@ -4289,7 +4314,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 271,
+            "line": 279,
             "description": "Append an element to a sequence.",
             "itemtype": "method",
             "name": "appendElementToSequence",
@@ -4321,7 +4346,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 308,
+            "line": 316,
             "description": "Read a DICOM tag.",
             "itemtype": "method",
             "name": "readTag",
@@ -4344,7 +4369,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 332,
+            "line": 343,
             "description": "Read a DICOM data element.",
             "itemtype": "method",
             "name": "readDataElement",
@@ -4372,7 +4397,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 441,
+            "line": 453,
             "description": "Parse the complete DICOM file (given as input to the class).\nFills in the member object 'dicomElements'.",
             "itemtype": "method",
             "name": "parse",
@@ -13007,19 +13032,23 @@
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/dicom/dicomParser.js:196"
+            "line": " src/dicom/dicomParser.js:201"
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/dicom/dicomParser.js:206"
+            "line": " src/dicom/dicomParser.js:212"
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/dicom/dicomParser.js:308"
+            "line": " src/dicom/dicomParser.js:222"
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/dicom/dicomParser.js:332"
+            "line": " src/dicom/dicomParser.js:316"
+        },
+        {
+            "message": "replacing incorrect tag: returns with return",
+            "line": " src/dicom/dicomParser.js:343"
         },
         {
             "message": "unknown tag: input",

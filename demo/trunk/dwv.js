@@ -1990,6 +1990,22 @@ dwv.dicom.DicomParser = function()
      * @type Array
      */
     this.pixelBuffer = [];
+    
+    /**
+     * Unknown tags count.
+     * @property unknownCount
+     * @type Number
+     */
+    var unknownCount = 0;
+    /**
+     * Get the next unknown tags count.
+     * @method getNextUnknownCount
+     * @returns {Number} The next count.
+     */
+    this.getNextUnknownCount = function () {
+        unknownCount++;    
+        return unknownCount;
+    }; 
 };
 
 /**
@@ -2025,15 +2041,7 @@ dwv.dicom.DicomParser.prototype.appendDicomElement = function( element, sequence
 {
     // simple case: not a sequence
     if ( typeof sequences === "undefined" || sequences.length === 0) {
-        var name = element.name;
-        // find a good unique name
-        if ( name === "dwv::unknown" ) {
-            var count = 1;
-            while ( this.dicomElements[name] ) {
-                name = element.name + (count++).toString();
-            }
-        }
-        this.dicomElements[name] = { 
+        this.dicomElements[element.name] = { 
             "group": element.group, 
             "element": element.element,
             "vr": element.vr,
@@ -2118,12 +2126,15 @@ dwv.dicom.DicomParser.prototype.readTag = function(reader, offset)
     // element
     var element = reader.readHex(offset+2);
     // name
-    var name = "dwv::unknown";
-    if( dwv.dicom.dictionary[group] ) {
-        if( dwv.dicom.dictionary[group][element] ) {
-            name = dwv.dicom.dictionary[group][element][2];
-        }
+    var name = null;
+    if( typeof dwv.dicom.dictionary[group] !== "undefined" &&
+            typeof dwv.dicom.dictionary[group][element] !== "undefined" ) {
+        name = dwv.dicom.dictionary[group][element][2];
     }
+    else {
+        name = "dwv::unknown" + this.getNextUnknownCount().toString();
+    }
+
     // return
     return {'group': group, 'element': element, 'name': name};
 };
@@ -2185,13 +2196,14 @@ dwv.dicom.DicomParser.prototype.readDataElement = function(reader, offset, impli
     }
     
     // check the value of VL
+    var vlString = vl;
     if( vl === 0xffffffff ) {
+        vlString = "u/l";
         vl = 0;
     }
     
-    
     // data
-    var data;
+    var data = null;
     var dataOffset = offset+tagOffset+vrOffset+vlOffset;
     if( vr === "OB" || vr === "N/A")
     {
@@ -2231,7 +2243,7 @@ dwv.dicom.DicomParser.prototype.readDataElement = function(reader, offset, impli
     return { 
         'tag': tag, 
         'vr': vr, 
-        'vl': vl, 
+        'vl': vlString, 
         'data': data,
         'offset': elementOffset
     };    
@@ -2352,20 +2364,21 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
         // locals
         tagName = dataElement.tag.name;
         tagOffset = dataElement.offset;
+        var vlNumber = (dataElement.vl === "u/l") ? 0 : dataElement.vl;
         
         // new sequence
-        if ( dataElement.vr === "SQ" ) {
+        if ( dataElement.vr === "SQ" && dataElement.vl !== 0 ) {
             sequences.push( {
                 'name': tagName, 'itemNumber': -1,
                 'vl': dataElement.vl, 'vlCount': 0
             });
-            tagOffset -= dataElement.vl;
+            tagOffset -= vlNumber;
         }
         // new item
-        if ( sequences.length!== 0 && tagName === "Item" ) {
+        if ( sequences.length !== 0 && tagName === "Item" ) {
             sequences[sequences.length-1].itemNumber += 1;
             if ( !startedPixelItems ) {
-                tagOffset -= dataElement.vl;
+                tagOffset -= vlNumber;
             }
         }
         // end of sequence with implicit length
@@ -2419,8 +2432,7 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
             }, sequences );
         
         // end of sequence with explicit length
-        if ( dataElement.vr !== "SQ" && sequences.length !== 0 &&
-                sequences[sequences.length-1].vl !== 0 ) {
+        if ( dataElement.vr !== "SQ" && sequences.length !== 0 ) {
             var last = sequences.length - 1;
             sequences[last].vlCount += tagOffset;
             if ( sequences[last].vlCount === sequences[last].vl ) {
