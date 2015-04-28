@@ -731,6 +731,9 @@ dwv.App = function ()
      */ 
     this.zoom = function (zoom, cx, cy) {
         scale = zoom * windowScale;
+        if ( scale <= 0.1 ) {
+            scale = 0.1;
+        }
         scaleCenter = {"x": cx, "y": cy};
         zoomLayers();
     };
@@ -744,6 +747,9 @@ dwv.App = function ()
      */ 
     this.stepZoom = function (step, cx, cy) {
         scale += step;
+        if ( scale <= 0.1 ) {
+            scale = 0.1;
+        }
         scaleCenter = {"x": cx, "y": cy};
         zoomLayers();
     };
