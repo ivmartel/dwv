@@ -33,11 +33,11 @@ test("Test IdGenerator.", function() {
     var generator = new dwv.math.IdGenerator();
     var id0 = generator.get();
     var id1 = generator.get();
-    equal((id0 == id1), false, "Ids should not be equal.");
+    equal((id0 == id1), false, "Ids should not be equal for the same generator.");
     
     var generator2 = new dwv.math.IdGenerator();
     var id2 = generator2.get();
-    equal((id0 == id2), false, "Ids should not be equal.");
-    equal((id1 == id2), false, "Ids should not be equal.");
+    equal((id0 == id2), false, "Ids should not be equal for different generators (1).");
+    equal((id1 == id2), false, "Ids should not be equal for different generators (2).");
 
 });
