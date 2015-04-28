@@ -174,12 +174,11 @@ test("Test generate data timing.", function() {
     view0.setWindowLevelMinMax();
     
     // start time
-    // TODO window.performance.now() not in phantom??
-    var start0 = (new Date()).getMilliseconds(); 
+    var start0 = new Date(); 
     // call generate data
     view0.generateImageData(imageData);
     // time taken 
-    var time0 = (new Date()).getMilliseconds() - start0;
+    var time0 = (new Date()) - start0;
     // check time taken
     ok( time0 < 90, "First generateImageData: "+time0+"ms.");
     
