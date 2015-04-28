@@ -32,9 +32,24 @@ dwv.addDataLine = function (id, fileroot, doc)
         "containerDivId": id,
         "skipLoadUrl": true
     };
+    var url = fileroot + ".dcm";
     var app = new dwv.App();
     app.init(config);
-    app.loadURL([fileroot + ".dcm"]);
+    app.loadURL([url]);
+    
+    // parsing timing
+    var request = new XMLHttpRequest();
+    request.open('GET', url, true);
+    request.responseType = "arraybuffer";
+    request.onload = function (/*event*/) {
+        // setup the dicom parser
+        var dicomParser = new dwv.dicom.DicomParser();
+        // parse the buffer
+        console.time("parse::"+fileroot);
+        dicomParser.parse(this.response);
+        console.timeEnd("parse::"+fileroot);
+    };
+    request.send(null);
     
     // image
     var image = document.createElement("img");
