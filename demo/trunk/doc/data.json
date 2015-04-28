@@ -4369,7 +4369,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 343,
+            "line": 345,
             "description": "Read a DICOM data element.",
             "itemtype": "method",
             "name": "readDataElement",
@@ -4397,7 +4397,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 453,
+            "line": 450,
             "description": "Parse the complete DICOM file (given as input to the class).\nFills in the member object 'dicomElements'.",
             "itemtype": "method",
             "name": "parse",
@@ -13048,7 +13048,7 @@
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/dicom/dicomParser.js:343"
+            "line": " src/dicom/dicomParser.js:345"
         },
         {
             "message": "unknown tag: input",

@@ -2131,10 +2131,12 @@ dwv.dicom.DicomParser.prototype.readTag = function(reader, offset)
     var group = reader.readHex(offset);
     // element
     var element = reader.readHex(offset+2);
-    // name
+    // vr and name
+    var vr = "UN";
     var name = null;
     if( typeof dwv.dicom.dictionary[group] !== "undefined" &&
             typeof dwv.dicom.dictionary[group][element] !== "undefined" ) {
+        vr = dwv.dicom.dictionary[group][element][0];
         name = dwv.dicom.dictionary[group][element][2];
     }
     else {
@@ -2142,7 +2144,7 @@ dwv.dicom.DicomParser.prototype.readTag = function(reader, offset)
     }
 
     // return
-    return {'group': group, 'element': element, 'name': name};
+    return {'group': group, 'element': element, 'name': name, 'vr': vr};
 };
 
 /**
@@ -2175,12 +2177,7 @@ dwv.dicom.DicomParser.prototype.readDataElement = function(reader, offset, impli
     else {
         // implicit VR?
         if(implicit) {
-            vr = "UN";
-            if( dwv.dicom.dictionary[tag.group] ) {
-                if( dwv.dicom.dictionary[tag.group][tag.element] ) {
-                    vr = dwv.dicom.dictionary[tag.group][tag.element][0];
-                }
-            }
+            vr = tag.vr;
             vrOffset = 0;
             vl = reader.readUint32( offset+tagOffset+vrOffset );
             vlOffset = 4;
@@ -2293,48 +2290,6 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
     {
         // get the data element
         dataElement = this.readDataElement(metaReader, i, false);
-        // check the transfer syntax
-        if( dataElement.tag.name === "TransferSyntaxUID" ) {
-            var syntax = dwv.utils.cleanString(dataElement.data[0]);
-            
-            // Implicit VR - Little Endian
-            if( syntax === "1.2.840.10008.1.2" ) {
-                implicit = true;
-            }
-            // Explicit VR - Little Endian (default): 1.2.840.10008.1.2.1 
-            // Deflated Explicit VR - Little Endian
-            else if( syntax === "1.2.840.10008.1.2.1.99" ) {
-                throw new Error("Unsupported DICOM transfer syntax (Deflated Explicit VR): "+syntax);
-            }
-            // Explicit VR - Big Endian
-            else if( syntax === "1.2.840.10008.1.2.2" ) {
-                dataReader = new dwv.dicom.DataReader(buffer,false);
-            }
-            // JPEG
-            else if( dwv.dicom.isJpegTransferSyntax(syntax) ) {
-                jpeg = true;
-                //console.log("JPEG compressed DICOM data: " + syntax);
-                throw new Error("Unsupported DICOM transfer syntax (JPEG): "+syntax);
-            }
-            // JPEG-LS
-            else if( dwv.dicom.isJpeglsTransferSyntax(syntax) ) {
-                //console.log("JPEG-LS compressed DICOM data: " + syntax);
-                throw new Error("Unsupported DICOM transfer syntax (JPEG-LS): "+syntax);
-            }
-            // JPEG 2000
-            else if( dwv.dicom.isJpeg2000TransferSyntax(syntax) ) {
-                console.log("JPEG 2000 compressed DICOM data: " + syntax);
-                jpeg2000 = true;
-            }
-            // MPEG2 Image Compression
-            else if( syntax === "1.2.840.10008.1.2.4.100" ) {
-                throw new Error("Unsupported DICOM transfer syntax (MPEG2): "+syntax);
-            }
-            // RLE (lossless)
-            else if( syntax === "1.2.840.10008.1.2.5" ) {
-                throw new Error("Unsupported DICOM transfer syntax (RLE): "+syntax);
-            }
-        }            
         // store the data element
         this.appendDicomElement( { 
             'name': dataElement.tag.name,
@@ -2348,6 +2303,47 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
         i += dataElement.offset;
     }
     
+    // check the transfer syntax
+    var syntax = dwv.utils.cleanString(this.dicomElements.TransferSyntaxUID.value[0]);
+    
+    // Implicit VR - Little Endian
+    if( syntax === "1.2.840.10008.1.2" ) {
+        implicit = true;
+    }
+    // Explicit VR - Little Endian (default): 1.2.840.10008.1.2.1 
+    // Deflated Explicit VR - Little Endian
+    else if( syntax === "1.2.840.10008.1.2.1.99" ) {
+        throw new Error("Unsupported DICOM transfer syntax (Deflated Explicit VR): "+syntax);
+    }
+    // Explicit VR - Big Endian
+    else if( syntax === "1.2.840.10008.1.2.2" ) {
+        dataReader = new dwv.dicom.DataReader(buffer,false);
+    }
+    // JPEG
+    else if( dwv.dicom.isJpegTransferSyntax(syntax) ) {
+        jpeg = true;
+        //console.log("JPEG compressed DICOM data: " + syntax);
+        throw new Error("Unsupported DICOM transfer syntax (JPEG): "+syntax);
+    }
+    // JPEG-LS
+    else if( dwv.dicom.isJpeglsTransferSyntax(syntax) ) {
+        //console.log("JPEG-LS compressed DICOM data: " + syntax);
+        throw new Error("Unsupported DICOM transfer syntax (JPEG-LS): "+syntax);
+    }
+    // JPEG 2000
+    else if( dwv.dicom.isJpeg2000TransferSyntax(syntax) ) {
+        console.log("JPEG 2000 compressed DICOM data: " + syntax);
+        jpeg2000 = true;
+    }
+    // MPEG2 Image Compression
+    else if( syntax === "1.2.840.10008.1.2.4.100" ) {
+        throw new Error("Unsupported DICOM transfer syntax (MPEG2): "+syntax);
+    }
+    // RLE (lossless)
+    else if( syntax === "1.2.840.10008.1.2.5" ) {
+        throw new Error("Unsupported DICOM transfer syntax (RLE): "+syntax);
+    }
+
     var startedPixelItems = false;
     
     var tagName = "";
