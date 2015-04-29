@@ -1877,9 +1877,8 @@ dwv.dicom.DataReader = function(buffer, isLittleEndian)
      */
     this.readUint8Array = function(byteOffset, size) {
         var data = new Uint8Array(size);
-        var index = 0;
-        for(var i=byteOffset; i<byteOffset + size; ++i) {     
-            data[index++] = this.readUint8(i);
+        for ( var i = 0; i < size; ++i ) {
+            data[i] = this.readUint8( byteOffset + i );
         }
         return data;
     };
@@ -1891,10 +1890,10 @@ dwv.dicom.DataReader = function(buffer, isLittleEndian)
      * @return {Array} The read data.
      */
     this.readUint16Array = function(byteOffset, size) {
-        var data = new Uint16Array(size/2);
-        var index = 0;
-        for(var i=byteOffset; i<byteOffset + size; i+=2) {     
-            data[index++] = this.readUint16(i);
+        var arraySize = size / 2;
+        var data = new Uint16Array(arraySize);
+        for ( var i = 0; i < arraySize; ++i ) {
+            data[i] = this.readUint16( byteOffset + 2*i );
         }
         return data;
     };
@@ -1906,10 +1905,10 @@ dwv.dicom.DataReader = function(buffer, isLittleEndian)
      * @return {Array} The read data.
      */
     this.readUint32Array = function(byteOffset, size) {
-        var data = new Uint32Array(size/4);
-        var index = 0;
-        for(var i=byteOffset; i<byteOffset + size; i+=4) {     
-            data[index++] = this.readUint32(i);
+        var arraySize = size / 4;
+        var data = new Uint32Array(arraySize);
+        for ( var i = 0; i < arraySize; ++i ) {
+            data[i] = this.readUint32( byteOffset + 4*i );
         }
         return data;
     };
@@ -1934,8 +1933,8 @@ dwv.dicom.DataReader = function(buffer, isLittleEndian)
      */
     this.readString = function(byteOffset, nChars) {
         var result = "";
-        for(var i=byteOffset; i<byteOffset + nChars; ++i){
-            result += String.fromCharCode( this.readUint8(i) );
+        for ( var i = 0; i < nChars; ++i ) {
+            result += String.fromCharCode( this.readUint8( byteOffset + i ) );
         }
         return result;
     };
@@ -2345,23 +2344,15 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
     }
 
     var startedPixelItems = false;
-    
     var tagName = "";
     var tagOffset = 0;
     var sequences = [];
+
     // DICOM data elements
     while( i < buffer.byteLength ) 
     {
         // get the data element
-        try
-        {
-            dataElement = this.readDataElement(dataReader, i, implicit);
-        }
-        catch(err)
-        {
-            console.warn("Problem reading at " + i + " / " + buffer.byteLength +
-                ", after " + tagName + ".\n" + err);
-        }
+        dataElement = this.readDataElement(dataReader, i, implicit);
         
         // locals
         tagName = dataElement.tag.name;
@@ -2458,12 +2449,8 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
     }
     else if( jpeg2000 ) {
         // decompress pixel buffer into Uint8 image
-        var uint8Image = null;
-        try {
-            uint8Image = openjpeg(this.pixelBuffer, "j2k");
-        } catch(error) {
-            throw new Error("Cannot decode JPEG 2000 ([" +error.name + "] " + error.message + ")");
-        }
+        var uint8Image =  openjpeg(this.pixelBuffer, "j2k");
+        // set the pixel buffer
         this.pixelBuffer = uint8Image.data;
     }
 };
