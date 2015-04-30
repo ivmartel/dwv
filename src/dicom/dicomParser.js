@@ -15,6 +15,27 @@ dwv.dicom = dwv.dicom || {};
  */
 dwv.dicom.DataReader = function(buffer, isLittleEndian)
 {
+    // Set endian flag if not defined.
+    if(typeof(isLittleEndian)==='undefined') {
+        isLittleEndian = true;
+    }
+    
+    /**
+     * Native endianness.
+     * @property isNativeLittleEndian
+     * @private
+     * @type Boolean
+     */
+    var isNativeLittleEndian = new Int8Array(new Int16Array([1]).buffer)[0] > 0;
+
+    /**
+     * Flag to know if the TypedArray data needs flipping.
+     * @property needFlip
+     * @private
+     * @type Boolean
+     */
+    var needFlip = (isLittleEndian !== isNativeLittleEndian);
+    
     /**
      * The main data view.
      * @property view
@@ -22,11 +43,27 @@ dwv.dicom.DataReader = function(buffer, isLittleEndian)
      * @type DataView
      */
     var view = new DataView(buffer);
-    // Set endian flag if not defined.
-    if(typeof(isLittleEndian)==='undefined') {
-        isLittleEndian = true;
-    }
     
+    /**
+     * Flip an array's endianness.
+     * Inspired from https://github.com/kig/DataStream.js.
+     * @method flipArrayEndianness
+     * @param {Object} array The array to flip.
+     * @return {Object} The flipped array.
+     */
+    this.flipArrayEndianness = function (array) {
+       var u8 = new Uint8Array(array.buffer, array.byteOffset, array.byteLength);
+       var tmp;
+       for ( var i = 0; i < array.byteLength; i += array.BYTES_PER_ELEMENT ) {
+         for ( var j = i + array.BYTES_PER_ELEMENT - 1, k = i; j > k; j--, k++ ) {
+           tmp = u8[k];
+           u8[k] = u8[j];
+           u8[j] = tmp;
+         }
+       }
+       return array;
+    };
+      
     /**
      * Read Uint8 (1 byte) data.
      * @method readUint8
@@ -71,9 +108,9 @@ dwv.dicom.DataReader = function(buffer, isLittleEndian)
      * @return {Array} The read data.
      */
     this.readUint8Array = function(byteOffset, size) {
-        var data = new Uint8Array(size);
-        for ( var i = 0; i < size; ++i ) {
-            data[i] = this.readUint8( byteOffset + i );
+        var data = new Uint8Array(buffer, byteOffset, size);
+        if ( needFlip ) {
+            this.flipArrayEndianness(data);
         }
         return data;
     };
@@ -85,10 +122,9 @@ dwv.dicom.DataReader = function(buffer, isLittleEndian)
      * @return {Array} The read data.
      */
     this.readUint16Array = function(byteOffset, size) {
-        var arraySize = size / 2;
-        var data = new Uint16Array(arraySize);
-        for ( var i = 0; i < arraySize; ++i ) {
-            data[i] = this.readUint16( byteOffset + 2*i );
+        var data = new Uint16Array(buffer, byteOffset, (size / 2));
+        if ( needFlip ) {
+            this.flipArrayEndianness(data);
         }
         return data;
     };
@@ -101,9 +137,18 @@ dwv.dicom.DataReader = function(buffer, isLittleEndian)
      */
     this.readUint32Array = function(byteOffset, size) {
         var arraySize = size / 4;
-        var data = new Uint32Array(arraySize);
-        for ( var i = 0; i < arraySize; ++i ) {
-            data[i] = this.readUint32( byteOffset + 4*i );
+        var data = null;
+        if ( (byteOffset % 4) === 0 ) {
+            data = new Uint32Array(buffer, byteOffset, arraySize);
+            if ( needFlip ) {
+                this.flipArrayEndianness(data);
+            }
+        }
+        else {
+            data = new Uint32Array(arraySize);
+            for ( var i = 0; i < arraySize; ++i ) {
+                data[i] = this.readUint32( byteOffset + 4*i );
+            }
         }
         return data;
     };
@@ -128,8 +173,9 @@ dwv.dicom.DataReader = function(buffer, isLittleEndian)
      */
     this.readString = function(byteOffset, nChars) {
         var result = "";
+        var data = this.readUint8Array(byteOffset, nChars);
         for ( var i = 0; i < nChars; ++i ) {
-            result += String.fromCharCode( this.readUint8( byteOffset + i ) );
+            result += String.fromCharCode( data[ i ] );
         }
         return result;
     };
@@ -328,10 +374,11 @@ dwv.dicom.DicomParser.prototype.readTag = function(reader, offset)
     // vr and name
     var vr = "UN";
     var name = null;
-    if( typeof dwv.dicom.dictionary[group] !== "undefined" &&
-            typeof dwv.dicom.dictionary[group][element] !== "undefined" ) {
-        vr = dwv.dicom.dictionary[group][element][0];
-        name = dwv.dicom.dictionary[group][element][2];
+    var dict = dwv.dicom.dictionary;
+    if( typeof dict[group] !== "undefined" &&
+            typeof dict[group][element] !== "undefined" ) {
+        vr = dict[group][element][0];
+        name = dict[group][element][2];
     }
     else {
         name = "dwv::unknown" + this.getNextUnknownCount().toString();
@@ -355,10 +402,12 @@ dwv.dicom.DicomParser.prototype.readDataElement = function(reader, offset, impli
     var tag = this.readTag(reader, offset);
     var tagOffset = 4;
     
-    var vr; // Value Representation (VR)
-    var vl; // Value Length (VL)
+    var vr = ""; // Value Representation (VR)
+    var vl = 0; // Value Length (VL)
     var vrOffset = 0; // byte size of VR
     var vlOffset = 0; // byte size of VL
+    
+    var isOtherVR = false; // OX, OW, OB and OF
     
     // (private) Item group case
     if( tag.group === "0xFFFE" ) {
@@ -372,15 +421,17 @@ dwv.dicom.DicomParser.prototype.readDataElement = function(reader, offset, impli
         // implicit VR?
         if(implicit) {
             vr = tag.vr;
+            isOtherVR = (vr[0] === 'O');
             vrOffset = 0;
             vl = reader.readUint32( offset+tagOffset+vrOffset );
             vlOffset = 4;
         }
         else {
             vr = reader.readString( offset+tagOffset, 2 );
+            isOtherVR = (vr[0] === 'O');
             vrOffset = 2;
             // long representations
-            if(vr === "OB" || vr === "OF" || vr === "SQ" || vr === "OW" || vr === "UN") {
+            if ( isOtherVR || vr === "SQ" ) {
                 vl = reader.readUint32( offset+tagOffset+vrOffset+2 );
                 vlOffset = 6;
             }
@@ -392,6 +443,8 @@ dwv.dicom.DicomParser.prototype.readDataElement = function(reader, offset, impli
         }
     }
     
+    var isUnsignedVR = ( vr === "US" || vr === "UL" );
+    
     // check the value of VL
     var vlString = vl;
     if( vl === 0xffffffff ) {
@@ -402,25 +455,29 @@ dwv.dicom.DicomParser.prototype.readDataElement = function(reader, offset, impli
     // data
     var data = null;
     var dataOffset = offset+tagOffset+vrOffset+vlOffset;
-    if( vr === "OB" || vr === "N/A")
+    if( vr === "N/A")
     {
         data = reader.readUint8Array( dataOffset, vl );
     }
-    else if( vr === "US")
+    else if ( isUnsignedVR ) 
     {
-        data = reader.readUint16Array( dataOffset, vl );
+        if( vr === "US")
+        {
+            data = reader.readUint16Array( dataOffset, vl );
+        }
+        else // UL
+        {
+            data = reader.readUint32Array( dataOffset, vl );
+        }
     }
-    else if( vr === "UL")
-    {
-        data = reader.readUint32Array( dataOffset, vl );
-    }
-    else if( vr === "OX" || vr === "OW" )
+    else if( isOtherVR )
     {
         if ( vr === "OX" ) {
             console.warn("OX value representation for tag: "+tag.name+".");
         }
-        if ( typeof(this.dicomElements.BitsAllocated) !== 'undefined' &&
-                this.dicomElements.BitsAllocated.value[0] === 8 ) {
+        if ( ( vr === "OB" ) || 
+                ( typeof this.dicomElements.BitsAllocated !== 'undefined' &&
+                this.dicomElements.BitsAllocated.value[0] === 8 ) ) {
             data = reader.readUint8Array( dataOffset, vl );
         }
         else {
