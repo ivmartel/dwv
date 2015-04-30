@@ -2236,7 +2236,7 @@ dwv.dicom.DicomParser.prototype.readDataElement = function(reader, offset, impli
             isOtherVR = (vr[0] === 'O');
             vrOffset = 2;
             // long representations
-            if ( isOtherVR || vr === "SQ" ) {
+            if ( isOtherVR || vr === "SQ" || vr === "UN" ) {
                 vl = reader.readUint32( offset+tagOffset+vrOffset+2 );
                 vlOffset = 6;
             }
