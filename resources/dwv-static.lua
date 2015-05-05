@@ -99,7 +99,9 @@ print([[
 <script type="text/javascript" src="/dwv/ext/jquery/jquery-2.1.3.min.js"></script>
 <script type="text/javascript" src="/dwv/ext/jquery-ui/jquery-ui-1.11.2.min.js"></script>
 <script type="text/javascript" src="/dwv/ext/flot/jquery.flot.min.js"></script>
-<script type="text/javascript" src="/dwv/ext/openjpeg/openjpeg.js"></script>
+<script type="text/javascript" src="/dwv/ext/pdfjs/jpx.js"></script>
+<script type="text/javascript" src="/dwv/ext/pdfjs/util.js"></script>
+<script type="text/javascript" src="/dwv/ext/pdfjs/arithmetic_decoder.js"></script>
 <script type="text/javascript" src="/dwv/ext/kinetic/kinetic-v5.1.1-06.10.min.js"></script>
 
 <!-- Local -->

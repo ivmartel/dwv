@@ -769,39 +769,23 @@ dwv.image.ImageFactory.prototype.create = function (dicomElements, pixelBuffer)
     }
     var spacing = new dwv.image.Spacing( columnSpacing, rowSpacing);
 
-    // special jpeg 2000 case: openjpeg returns a Uint8 planar MONO or RGB image
     var syntax = dwv.utils.cleanString(
         dicomElements.TransferSyntaxUID.value[0] );
     var jpeg2000 = dwv.dicom.isJpeg2000TransferSyntax( syntax );
     
     // buffer data
-    var buffer = null;
-    // convert to 16bit if needed
-    if ( jpeg2000 && dicomElements.BitsAllocated.value[0] === 16 )
-    {
-        var sliceSize = size.getSliceSize();
-        buffer = new Int16Array( sliceSize );
-        var k = 0;
-        for ( var p = 0; p < sliceSize; ++p ) {
-            buffer[p] = 256 * pixelBuffer[k] + pixelBuffer[k+1];
-            k += 2;
-        }
+    var buffer =  new Int16Array(pixelBuffer.length);
+    // unsigned to signed data if needed
+    var shift = false;
+    if ( dicomElements.PixelRepresentation &&
+            dicomElements.PixelRepresentation.value[0] == 1) {
+        shift = true;
     }
-    else
-    {
-        buffer = new Int16Array(pixelBuffer.length);
-        // unsigned to signed data if needed
-        var shift = false;
-        if ( dicomElements.PixelRepresentation &&
-                dicomElements.PixelRepresentation.value[0] == 1) {
-            shift = true;
-        }
-        // copy
-        for ( var i=0; i<pixelBuffer.length; ++i ) {
-            buffer[i] = pixelBuffer[i];
-            if ( shift && buffer[i] >= Math.pow(2, 15) ) {
-                buffer[i] -= Math.pow(2, 16);
-            }
+    // copy
+    for ( var i=0; i<pixelBuffer.length; ++i ) {
+        buffer[i] = pixelBuffer[i];
+        if ( shift && buffer[i] >= Math.pow(2, 15) ) {
+            buffer[i] -= Math.pow(2, 16);
         }
     }
     
@@ -830,11 +814,7 @@ dwv.image.ImageFactory.prototype.create = function (dicomElements, pixelBuffer)
     }        
     // planarConfiguration
     if ( dicomElements.PlanarConfiguration ) {
-        var planar = dicomElements.PlanarConfiguration.value[0];
-        if ( jpeg2000 ) {
-            planar = 1;
-        }
-        image.setPlanarConfiguration( planar );
+        image.setPlanarConfiguration( dicomElements.PlanarConfiguration.value[0] );
     }        
     // rescale slope and intercept
     var slope = 1;

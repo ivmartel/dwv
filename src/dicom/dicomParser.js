@@ -5,6 +5,8 @@
 var dwv = dwv || {};
 dwv.dicom = dwv.dicom || {};
 
+var JpxImage = JpxImage || {};
+
 /**
  * Data reader.
  * @class DataReader
@@ -700,9 +702,10 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
         this.pixelBuffer = d.data;*/
     }
     else if( jpeg2000 ) {
-        // decompress pixel buffer into Uint8 image
-        var uint8Image =  openjpeg(this.pixelBuffer, "j2k");
+        // decompress pixel buffer into Int16 image
+        var jpxImage = new JpxImage();
+        jpxImage.parse( this.pixelBuffer );
         // set the pixel buffer
-        this.pixelBuffer = uint8Image.data;
+        this.pixelBuffer = jpxImage.tiles[0].items;
     }
 };

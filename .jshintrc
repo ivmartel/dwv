@@ -5,8 +5,7 @@
     "unused": true,
     "undef": true,
     "globals": {
-        "dwv": true,
-        "openjpeg": false
+        "dwv": true
     },
     "curly": true,
     "newcap": true,

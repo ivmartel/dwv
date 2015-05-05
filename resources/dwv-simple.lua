@@ -85,7 +85,9 @@ print([[
 <!-- Third party --> 
 <script type="text/javascript" src="/dwv/ext/jquery/jquery-2.1.3.min.js"></script>
 <script type="text/javascript" src="/dwv/ext/jquery-mobile/jquery.mobile-1.4.5.min.js"></script>
-<script type="text/javascript" src="/dwv/ext/openjpeg/openjpeg.js"></script>
+<script type="text/javascript" src="/dwv/ext/pdfjs/jpx.js"></script>
+<script type="text/javascript" src="/dwv/ext/pdfjs/util.js"></script>
+<script type="text/javascript" src="/dwv/ext/pdfjs/arithmetic_decoder.js"></script>
 
 <!-- Local -->
 <script type="text/javascript" src="/dwv/dwv-0.10.0beta.min.js"></script>
