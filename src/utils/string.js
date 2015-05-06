@@ -78,7 +78,6 @@ dwv.utils.splitQueryString = function (inputStr)
         result.query = dwv.utils.splitKeyValueString(query);
     }
     // return
-    console.log(result);
     return result;
 };
 
