@@ -15090,12 +15090,17 @@ dwv.utils.splitQueryString = function (inputStr)
     if ( inputStr && (sepIndex = inputStr.indexOf('?')) !== -1 ) {
         // base: before the '?'
         result.base = inputStr.substr(0, sepIndex);
-        // query : after the '?'
-        var query = inputStr.substr(sepIndex + 1);
+        // query : after the '?' and until possible '#'
+        var hashIndex = inputStr.indexOf('#');
+        if ( hashIndex === -1 ) {
+            hashIndex = inputStr.length;
+        }
+        var query = inputStr.substr(sepIndex + 1, (hashIndex - 1 - sepIndex));
         // split key/value pairs of the query
         result.query = dwv.utils.splitKeyValueString(query);
     }
     // return
+    console.log(result);
     return result;
 };
 

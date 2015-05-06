@@ -245,12 +245,17 @@ dwv.utils.splitQueryString = function (inputStr)
     if ( inputStr &amp;&amp; (sepIndex = inputStr.indexOf(&#x27;?&#x27;)) !== -1 ) {
         // base: before the &#x27;?&#x27;
         result.base = inputStr.substr(0, sepIndex);
-        // query : after the &#x27;?&#x27;
-        var query = inputStr.substr(sepIndex + 1);
+        // query : after the &#x27;?&#x27; and until possible &#x27;#&#x27;
+        var hashIndex = inputStr.indexOf(&#x27;#&#x27;);
+        if ( hashIndex === -1 ) {
+            hashIndex = inputStr.length;
+        }
+        var query = inputStr.substr(sepIndex + 1, (hashIndex - 1 - sepIndex));
         // split key/value pairs of the query
         result.query = dwv.utils.splitKeyValueString(query);
     }
     // return
+    console.log(result);
     return result;
 };
 
