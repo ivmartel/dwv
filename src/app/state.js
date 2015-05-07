@@ -51,7 +51,7 @@ dwv.State = function (app)
      * Load state.
      * @method load
      */
-    this.fromJSON = function (json) {
+    this.fromJSON = function (json, eventCallback) {
         var data = JSON.parse(json);
         // display
         app.getViewController().setWindowLevel(data["window-center"], data["window-width"]);
@@ -70,6 +70,10 @@ dwv.State = function (app)
                 var cmd = new dwv.tool.DrawGroupCommand(
                     group, shape.className,
                     app.getDrawLayer(k) );
+                if ( typeof eventCallback !== "undefined" ) {
+                    cmd.onExecute = eventCallback;
+                    cmd.onUndo = eventCallback;
+                }
                 cmd.execute();
                 app.getUndoStack().add(cmd);
             }

@@ -370,9 +370,10 @@ dwv.tool.ShapeEditor = function (app)
             // store the change command
             var chgcmd = new dwv.tool.ChangeGroupCommand(
                     cmdName, updateFunction, startAnchor, endAnchor, this.getLayer(), image);
+            chgcmd.onExecute = drawEventCallback;
+            chgcmd.onUndo = drawEventCallback;
             chgcmd.execute();
             app.getUndoStack().add(chgcmd);
-            drawEventCallback({'type': 'draw-change'});
             // reset start anchor
             startAnchor = endAnchor;
         });

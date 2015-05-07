@@ -530,7 +530,7 @@ dwv.App = function ()
         fileIO.onload = function (data) {
             // load state
             var state = new dwv.State(self);
-            state.fromJSON(data);
+            state.fromJSON(data, fireEvent);
         };
         fileIO.onerror = function (error) { handleError(error); };
         // main load (asynchronous)
@@ -587,7 +587,7 @@ dwv.App = function ()
         urlIO.onload = function (data) {
             // load state
             var state = new dwv.State(self);
-            state.fromJSON(data);
+            state.fromJSON(data, fireEvent);
         };
         urlIO.onerror = function (error) { handleError(error); };
         // main load (asynchronous)

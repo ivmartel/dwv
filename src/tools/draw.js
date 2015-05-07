@@ -29,6 +29,8 @@ dwv.tool.DrawGroupCommand = function (group, name, layer)
         layer.add(group);
         // draw
         layer.draw();
+        // callback
+        this.onExecute({'type': 'draw-create', 'id': group.id});
     };
     /**
      * Undo the command.
@@ -39,8 +41,29 @@ dwv.tool.DrawGroupCommand = function (group, name, layer)
         group.remove();
         // draw
         layer.draw();
+        // callback
+        this.onUndo({'type': 'draw-delete', 'id': group.id});
     };
 }; // DrawGroupCommand class
+
+/**
+ * Handle an execute event.
+ * @method onExecute
+ * @param {Object} event The execute event with type and id.
+ */
+dwv.tool.DrawGroupCommand.prototype.onExecute = function (/*event*/) 
+{
+    // default does nothing.
+};
+/**
+ * Handle an undo event.
+ * @method onUndo
+ * @param {Object} event The undo event with type and id.
+ */
+dwv.tool.DrawGroupCommand.prototype.onUndo = function (/*event*/) 
+{
+    // default does nothing.
+};
 
 /**
  * Move group command.
@@ -69,6 +92,8 @@ dwv.tool.MoveGroupCommand = function (group, name, translation, layer)
         });
         // draw
         layer.draw();
+        // callback
+        this.onExecute({'type': 'draw-move', 'id': group.id});
     };
     /**
      * Undo the command.
@@ -82,8 +107,29 @@ dwv.tool.MoveGroupCommand = function (group, name, translation, layer)
         });
         // draw
         layer.draw();
+        // callback
+        this.onUndo({'type': 'draw-move', 'id': group.id});
     };
-}; // MoveShapeCommand class
+}; // MoveGroupCommand class
+
+/**
+ * Handle an execute event.
+ * @method onExecute
+ * @param {Object} event The execute event with type and id.
+ */
+dwv.tool.MoveGroupCommand.prototype.onExecute = function (/*event*/) 
+{
+    // default does nothing.
+};
+/**
+ * Handle an undo event.
+ * @method onUndo
+ * @param {Object} event The undo event with type and id.
+ */
+dwv.tool.MoveGroupCommand.prototype.onUndo = function (/*event*/) 
+{
+    // default does nothing.
+};
 
 /**
  * Change group command.
@@ -109,6 +155,8 @@ dwv.tool.ChangeGroupCommand = function (name, func, startAnchor, endAnchor, laye
         func( endAnchor, image );
         // draw
         layer.draw();
+        // callback
+        this.onExecute({'type': 'draw-change'});
     };
     /**
      * Undo the command.
@@ -119,8 +167,29 @@ dwv.tool.ChangeGroupCommand = function (name, func, startAnchor, endAnchor, laye
         func( startAnchor, image );
         // draw
         layer.draw();
+        // callback
+        this.onUndo({'type': 'draw-change'});
     };
-}; // ChangeShapeCommand class
+}; // ChangeGroupCommand class
+
+/**
+ * Handle an execute event.
+ * @method onExecute
+ * @param {Object} event The execute event with type and id.
+ */
+dwv.tool.ChangeGroupCommand.prototype.onExecute = function (/*event*/) 
+{
+    // default does nothing.
+};
+/**
+ * Handle an undo event.
+ * @method onUndo
+ * @param {Object} event The undo event with type and id.
+ */
+dwv.tool.ChangeGroupCommand.prototype.onUndo = function (/*event*/) 
+{
+    // default does nothing.
+};
 
 /**
  * Delete group command.
@@ -145,6 +214,8 @@ dwv.tool.DeleteGroupCommand = function (group, name, layer)
         group.remove();
         // draw
         layer.draw();
+        // callback
+        this.onExecute({'type': 'draw-delete', 'id': group.id});
     };
     /**
      * Undo the command.
@@ -155,8 +226,29 @@ dwv.tool.DeleteGroupCommand = function (group, name, layer)
         layer.add(group);
         // draw
         layer.draw();
+        // callback
+        this.onUndo({'type': 'draw-create', 'id': group.id});
     };
-}; // DeleteShapeCommand class
+}; // DeleteGroupCommand class
+
+/**
+ * Handle an execute event.
+ * @method onExecute
+ * @param {Object} event The execute event with type and id.
+ */
+dwv.tool.DeleteGroupCommand.prototype.onExecute = function (/*event*/) 
+{
+    // default does nothing.
+};
+/**
+ * Handle an undo event.
+ * @method onUndo
+ * @param {Object} event The undo event with type and id.
+ */
+dwv.tool.DeleteGroupCommand.prototype.onUndo = function (/*event*/) 
+{
+    // default does nothing.
+};
 
 /**
  * Drawing tool.
@@ -395,11 +487,12 @@ dwv.tool.Draw = function (app, shapeFactoryList)
             drawLayer.hitGraphEnabled(true);
             // draw shape command
             command = new dwv.tool.DrawGroupCommand(group, self.shapeName, drawLayer);
+            command.onExecute = fireEvent;
+            command.onUndo = fireEvent;
             // execute it
             command.execute();
             // save it in undo stack
             app.getUndoStack().add(command);
-            fireEvent({'type': 'draw-create'});
             
             // set shape on
             var shape = group.getChildren( function (node) {
@@ -656,9 +749,10 @@ dwv.tool.Draw = function (app, shapeFactoryList)
                 document.body.style.cursor = 'default';
                 // delete command
                 var delcmd = new dwv.tool.DeleteGroupCommand(this.getParent(), cmdName, drawLayer);
+                delcmd.onExecute = fireEvent;
+                delcmd.onUndo = fireEvent;
                 delcmd.execute();
                 app.getUndoStack().add(delcmd);
-                fireEvent({'type': 'draw-delete'});
             }
             else {
                 // save drag move
@@ -666,7 +760,10 @@ dwv.tool.Draw = function (app, shapeFactoryList)
                         'y': pos.y - dragStartPos.y};
                 if ( translation.x !== 0 || translation.y !== 0 ) {
                     var mvcmd = new dwv.tool.MoveGroupCommand(this.getParent(), cmdName, translation, drawLayer);
+                    mvcmd.onExecute = fireEvent;
+                    mvcmd.onUndo = fireEvent;
                     app.getUndoStack().add(mvcmd);
+                    // the move is handled by kinetic, trigger an event manually
                     fireEvent({'type': 'draw-move'});
                 }
                 // reset anchors
