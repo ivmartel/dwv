@@ -5895,8 +5895,8 @@ dwv.html.Layer = function(name)
      * @method displayToIndex
      */ 
     this.displayToIndex = function ( point2D ) {
-        return {'x': (point2D.x - origin.x) / zoom.x,
-            'y': (point2D.y - origin.y) / zoom.y };
+        return {'x': ( (point2D.x - origin.x) / zoom.x ) - trans.x,
+            'y': ( (point2D.y - origin.y) / zoom.y ) - trans.y};
     };
     
     /**
