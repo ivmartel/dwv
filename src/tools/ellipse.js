@@ -48,7 +48,7 @@ dwv.tool.EllipseFactory.prototype.create = function (points, style, image)
         y: ellipse.getCenter().getY(),
         radius: { x: ellipse.getA(), y: ellipse.getB() },
         stroke: style.getLineColour(),
-        strokeWidth: 2,
+        strokeWidth: style.getScaledStrokeWidth(),
         name: "shape"
     });
     // quantification
@@ -60,8 +60,8 @@ dwv.tool.EllipseFactory.prototype.create = function (points, style, image)
         x: ellipse.getCenter().getX(),
         y: ellipse.getCenter().getY(),
         text: str,
-        fontSize: style.getFontSize(),
-        fontFamily: "Verdana",
+        fontSize: style.getScaledFontSize(),
+        fontFamily: style.getFontFamily(),
         fill: style.getLineColour(),
         name: "text"
     });

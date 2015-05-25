@@ -51,7 +51,7 @@ dwv.tool.ProtractorFactory.prototype.create = function (points, style/*, image*/
     var kshape = new Kinetic.Line({
         points: pointsArray,
         stroke: style.getLineColour(),
-        strokeWidth: 2,
+        strokeWidth: style.getScaledStrokeWidth(),
         name: "shape"
     });
     var group = new Kinetic.Group();
@@ -75,8 +75,8 @@ dwv.tool.ProtractorFactory.prototype.create = function (points, style/*, image*/
             x: midX,
             y: midY - 15,
             text: angleStr,
-            fontSize: style.getFontSize(),
-            fontFamily: "Verdana",
+            fontSize: style.getScaledFontSize(),
+            fontFamily: style.getFontFamily(),
             fill: style.getLineColour(),
             name: "text"
         });
@@ -86,6 +86,7 @@ dwv.tool.ProtractorFactory.prototype.create = function (points, style/*, image*/
             innerRadius: radius,
             outerRadius: radius,
             stroke: style.getLineColour(),
+            strokeWidth: style.getScaledStrokeWidth(),
             angle: angle,
             rotationDeg: -inclination,
             x: points[1].getX(),

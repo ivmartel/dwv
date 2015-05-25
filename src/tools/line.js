@@ -44,7 +44,7 @@ dwv.tool.LineFactory.prototype.create = function (points, style, image)
         points: [line.getBegin().getX(), line.getBegin().getY(), 
                  line.getEnd().getX(), line.getEnd().getY() ],
         stroke: style.getLineColour(),
-        strokeWidth: 2,
+        strokeWidth: style.getScaledStrokeWidth(),
         name: "shape"
     });
     // quantification
@@ -55,8 +55,8 @@ dwv.tool.LineFactory.prototype.create = function (points, style, image)
         x: line.getEnd().getX(),
         y: line.getEnd().getY() - 15,
         text: str,
-        fontSize: style.getFontSize(),
-        fontFamily: "Verdana",
+        fontSize: style.getScaledFontSize(),
+        fontFamily: style.getFontFamily(),
         fill: style.getLineColour(),
         name: "text"
     });

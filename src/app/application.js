@@ -66,6 +66,9 @@ dwv.App = function ()
     // Draw stage
     var drawStage = null;
     
+    // Generic style
+    var style = new dwv.html.Style();
+    
     // Toolbox
     var toolbox = null;
     // Toolbox controller
@@ -184,6 +187,13 @@ dwv.App = function ()
      * @return {Object} The draw layer.
      */
     this.getDrawStage = function () { return drawStage; };
+
+    /** 
+     * Get the app style.
+     * @method getStyle
+     * @return {Object} The app style.
+     */
+    this.getStyle = function () { return style; };
 
     /** 
      * Get the toolbox.
@@ -610,6 +620,9 @@ dwv.App = function ()
         // ratio previous/new to add to zoom
         var mul = newWidth / oldWidth;
         scale *= mul;
+        
+        // update style
+        style.setScale(windowScale);
 
         // resize container
         var jqDivId = "#"+containerDivId;
