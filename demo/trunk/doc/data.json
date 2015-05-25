@@ -11551,7 +11551,7 @@
         },
         {
             "file": "src/tools/line.js",
-            "line": 71,
+            "line": 73,
             "description": "Update a line shape.",
             "itemtype": "method",
             "name": "UpdateLine",

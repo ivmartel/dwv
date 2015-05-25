@@ -228,9 +228,11 @@ dwv.tool.LineFactory.prototype.create = function (points, style, image)
     var quant = image.quantifyLine( line );
     var str = quant.length.toPrecision(4) + &quot; mm&quot;;
     // quantification text
+    var dX = line.getBegin().getX() &gt; line.getEnd().getX() ? 0 : -1;
+    var dY = line.getBegin().getY() &gt; line.getEnd().getY() ? -1 : 0.5;
     var ktext = new Kinetic.Text({
-        x: line.getEnd().getX(),
-        y: line.getEnd().getY() - 15,
+        x: line.getEnd().getX() + dX * 25,
+        y: line.getEnd().getY() + dY * 15,
         text: str,
         fontSize: style.getScaledFontSize(),
         fontFamily: style.getFontFamily(),
@@ -295,7 +297,11 @@ dwv.tool.UpdateLine = function (anchor, image)
     var line = new dwv.math.Line(p2d0, p2d1);
     var quant = image.quantifyLine( line );
     var str = quant.length.toPrecision(4) + &quot; mm&quot;;
-    var textPos = { &#x27;x&#x27;: line.getEnd().getX(), &#x27;y&#x27;: line.getEnd().getY() - 15 };
+    var dX = line.getBegin().getX() &gt; line.getEnd().getX() ? 0 : -1;
+    var dY = line.getBegin().getY() &gt; line.getEnd().getY() ? -1 : 0.5;
+    var textPos = { 
+        &#x27;x&#x27;: line.getEnd().getX() + dX * 25,
+        &#x27;y&#x27;: line.getEnd().getY() + dY * 15, };
     ktext.position( textPos );
     ktext.text(str);
 };
