@@ -2502,7 +2502,7 @@
     "classitems": [
         {
             "file": "src/app/application.js",
-            "line": 82,
+            "line": 85,
             "description": "Get the version of the application.",
             "itemtype": "method",
             "name": "getVersion",
@@ -2515,7 +2515,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 89,
+            "line": 92,
             "description": "Get the image.",
             "itemtype": "method",
             "name": "getImage",
@@ -2528,7 +2528,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 95,
+            "line": 98,
             "description": "Set the view.",
             "itemtype": "method",
             "name": "setImage",
@@ -2544,7 +2544,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 105,
+            "line": 108,
             "description": "Restore the original image.",
             "itemtype": "method",
             "name": "restoreOriginalImage",
@@ -2553,7 +2553,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 114,
+            "line": 117,
             "description": "Get the image data array.",
             "itemtype": "method",
             "name": "getImageData",
@@ -2566,7 +2566,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 120,
+            "line": 123,
             "description": "Get the number of slices to load.",
             "itemtype": "method",
             "name": "getNSlicesToLoad",
@@ -2579,7 +2579,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 127,
+            "line": 130,
             "description": "Get the container div id.",
             "itemtype": "method",
             "name": "getContainerDivId",
@@ -2592,7 +2592,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 134,
+            "line": 137,
             "description": "Get the main scale.",
             "itemtype": "method",
             "name": "getScale",
@@ -2605,7 +2605,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 141,
+            "line": 144,
             "description": "Get the scale center.",
             "itemtype": "method",
             "name": "getScaleCenter",
@@ -2618,7 +2618,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 148,
+            "line": 151,
             "description": "Get the translation.",
             "itemtype": "method",
             "name": "getTranslation",
@@ -2631,7 +2631,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 155,
+            "line": 158,
             "description": "Get the view controller.",
             "itemtype": "method",
             "name": "getViewController",
@@ -2644,7 +2644,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 162,
+            "line": 165,
             "description": "Get the image layer.",
             "itemtype": "method",
             "name": "getImageLayer",
@@ -2657,7 +2657,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 168,
+            "line": 171,
             "description": "Get the draw layer.",
             "itemtype": "method",
             "name": "getDrawLayer",
@@ -2670,7 +2670,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 181,
+            "line": 184,
             "description": "Get the draw stage.",
             "itemtype": "method",
             "name": "getDrawStage",
@@ -2683,7 +2683,20 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 188,
+            "line": 191,
+            "description": "Get the app style.",
+            "itemtype": "method",
+            "name": "getStyle",
+            "return": {
+                "description": "The app style.",
+                "type": "Object"
+            },
+            "class": "dwv.App",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/app/application.js",
+            "line": 198,
             "description": "Get the toolbox.",
             "itemtype": "method",
             "name": "getToolbox",
@@ -2696,7 +2709,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 194,
+            "line": 204,
             "description": "Get the toolbox controller.",
             "itemtype": "method",
             "name": "getToolboxController",
@@ -2709,7 +2722,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 201,
+            "line": 211,
             "description": "Get the undo stack.",
             "itemtype": "method",
             "name": "getUndoStack",
@@ -2722,7 +2735,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 208,
+            "line": 218,
             "description": "Get the data loaders.",
             "itemtype": "method",
             "name": "getLoaders",
@@ -2735,7 +2748,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 221,
+            "line": 231,
             "description": "Initialise the HTML for the application.",
             "itemtype": "method",
             "name": "init",
@@ -2744,7 +2757,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 389,
+            "line": 399,
             "description": "Reset the application.",
             "itemtype": "method",
             "name": "reset",
@@ -2753,7 +2766,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 414,
+            "line": 424,
             "description": "Reset the layout of the application.",
             "itemtype": "method",
             "name": "resetLayout",
@@ -2762,7 +2775,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 433,
+            "line": 443,
             "description": "Add an event listener on the app.",
             "itemtype": "method",
             "name": "addEventListener",
@@ -2783,7 +2796,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 447,
+            "line": 457,
             "description": "Remove an event listener from the app.",
             "itemtype": "method",
             "name": "removeEventListener",
@@ -2804,7 +2817,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 466,
+            "line": 476,
             "description": "Load a list of files.",
             "itemtype": "method",
             "name": "loadFiles",
@@ -2820,7 +2833,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 483,
+            "line": 493,
             "description": "Load a list of files.",
             "itemtype": "method",
             "name": "loadFiles",
@@ -2836,7 +2849,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 521,
+            "line": 531,
             "description": "Load a State file.",
             "itemtype": "method",
             "name": "loadStateFile",
@@ -2852,7 +2865,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 540,
+            "line": 550,
             "description": "Load a list of URLs.",
             "itemtype": "method",
             "name": "loadURL",
@@ -2868,7 +2881,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 578,
+            "line": 588,
             "description": "Load a State url.",
             "itemtype": "method",
             "name": "loadStateUrl",
@@ -2884,7 +2897,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 597,
+            "line": 607,
             "description": "Fit the display to the given size. To be called once the image is loaded.",
             "itemtype": "method",
             "name": "fitToSize",
@@ -2893,7 +2906,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 639,
+            "line": 652,
             "description": "Toggle the display of the information layer.",
             "itemtype": "method",
             "name": "toggleInfoLayerDisplay",
@@ -2902,14 +2915,14 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 657,
+            "line": 670,
             "description": "Init the Window/Level display",
             "class": "dwv.App",
             "namespace": "dwv"
         },
         {
             "file": "src/app/application.js",
-            "line": 672,
+            "line": 685,
             "description": "Add layer mouse and touch listeners.",
             "itemtype": "method",
             "name": "addLayerListeners",
@@ -2918,7 +2931,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 694,
+            "line": 707,
             "description": "Remove layer mouse and touch listeners.",
             "itemtype": "method",
             "name": "removeLayerListeners",
@@ -2927,7 +2940,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 716,
+            "line": 729,
             "description": "Render the current image.",
             "itemtype": "method",
             "name": "render",
@@ -2936,7 +2949,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 725,
+            "line": 738,
             "description": "Zoom to the layers.",
             "itemtype": "method",
             "name": "zoom",
@@ -2962,7 +2975,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 741,
+            "line": 754,
             "description": "Add a step to the layers zoom.",
             "itemtype": "method",
             "name": "stepZoom",
@@ -2988,7 +3001,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 757,
+            "line": 770,
             "description": "Apply a translation to the layers.",
             "itemtype": "method",
             "name": "translate",
@@ -3009,7 +3022,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 769,
+            "line": 782,
             "description": "Apply a translation to the layers.",
             "itemtype": "method",
             "name": "translate",
@@ -3030,7 +3043,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 785,
+            "line": 798,
             "description": "Handle window/level change.",
             "itemtype": "method",
             "name": "onWLChange",
@@ -3046,7 +3059,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 795,
+            "line": 808,
             "description": "Handle colour map change.",
             "itemtype": "method",
             "name": "onColourChange",
@@ -3062,7 +3075,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 805,
+            "line": 818,
             "description": "Handle slice change.",
             "itemtype": "method",
             "name": "onSliceChange",
@@ -3078,7 +3091,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 825,
+            "line": 838,
             "description": "Handle key down event.\n- CRTL-Z: undo\n- CRTL-Y: redo\nDefault behavior. Usually used in tools.",
             "itemtype": "method",
             "name": "onKeydown",
@@ -3094,7 +3107,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 845,
+            "line": 858,
             "description": "Handle resize.\nFit the display to the window. To be called once the image is loaded.",
             "itemtype": "method",
             "name": "onResize",
@@ -3110,7 +3123,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 856,
+            "line": 869,
             "description": "Handle zoom reset.",
             "itemtype": "method",
             "name": "onZoomReset",
@@ -3126,7 +3139,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 866,
+            "line": 879,
             "description": "Handle loader change.",
             "itemtype": "method",
             "name": "onChangeLoader",
@@ -3142,7 +3155,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 876,
+            "line": 889,
             "description": "Handle change url event.",
             "itemtype": "method",
             "name": "onChangeURL",
@@ -3158,7 +3171,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 886,
+            "line": 899,
             "description": "Handle input urls.",
             "itemtype": "method",
             "name": "onInputURLs",
@@ -3174,7 +3187,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 896,
+            "line": 909,
             "description": "Handle change files event.",
             "itemtype": "method",
             "name": "onChangeFiles",
@@ -3190,7 +3203,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 909,
+            "line": 922,
             "description": "Handle state save event.",
             "itemtype": "method",
             "name": "onStateSave",
@@ -3206,7 +3219,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 922,
+            "line": 935,
             "description": "Handle colour map change.",
             "itemtype": "method",
             "name": "onChangeColourMap",
@@ -3222,7 +3235,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 932,
+            "line": 945,
             "description": "Handle window/level preset change.",
             "itemtype": "method",
             "name": "onChangeWindowLevelPreset",
@@ -3238,7 +3251,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 950,
+            "line": 963,
             "description": "Handle tool change.",
             "itemtype": "method",
             "name": "onChangeTool",
@@ -3254,7 +3267,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 960,
+            "line": 973,
             "description": "Handle shape change.",
             "itemtype": "method",
             "name": "onChangeShape",
@@ -3270,7 +3283,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 970,
+            "line": 983,
             "description": "Handle filter change.",
             "itemtype": "method",
             "name": "onChangeFilter",
@@ -3286,7 +3299,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 980,
+            "line": 993,
             "description": "Handle filter run.",
             "itemtype": "method",
             "name": "onRunFilter",
@@ -3302,7 +3315,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 990,
+            "line": 1003,
             "description": "Handle line colour change.",
             "itemtype": "method",
             "name": "onChangeLineColour",
@@ -3318,7 +3331,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1000,
+            "line": 1013,
             "description": "Handle min/max slider change.",
             "itemtype": "method",
             "name": "onChangeMinMax",
@@ -3334,7 +3347,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1010,
+            "line": 1023,
             "description": "Handle undo.",
             "itemtype": "method",
             "name": "onUndo",
@@ -3350,7 +3363,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1020,
+            "line": 1033,
             "description": "Handle redo.",
             "itemtype": "method",
             "name": "onRedo",
@@ -3366,7 +3379,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1030,
+            "line": 1043,
             "description": "Handle toggle of info layer.",
             "itemtype": "method",
             "name": "onToggleInfoLayer",
@@ -3382,7 +3395,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1040,
+            "line": 1053,
             "description": "Handle display reset.",
             "itemtype": "method",
             "name": "onDisplayReset",
@@ -3398,7 +3411,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1058,
+            "line": 1071,
             "description": "Fire an event: call all associated listeners.",
             "itemtype": "method",
             "name": "fireEvent",
@@ -3414,7 +3427,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1074,
+            "line": 1087,
             "description": "Generate the image data and draw it.",
             "itemtype": "method",
             "name": "generateAndDrawImage",
@@ -3423,7 +3436,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1088,
+            "line": 1101,
             "description": "Apply the stored zoom to the layers.",
             "itemtype": "method",
             "name": "zoomLayers",
@@ -3432,7 +3445,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1119,
+            "line": 1132,
             "description": "Apply the stored translation to the layers.",
             "itemtype": "method",
             "name": "translateLayers",
@@ -3441,7 +3454,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1139,
+            "line": 1152,
             "description": "Add image listeners.",
             "itemtype": "method",
             "name": "addImageInfoListeners",
@@ -3452,7 +3465,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1154,
+            "line": 1167,
             "description": "Remove image listeners.",
             "itemtype": "method",
             "name": "removeImageInfoListeners",
@@ -3463,7 +3476,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1169,
+            "line": 1182,
             "description": "General-purpose event handler. This function just determines the mouse \nposition relative to the canvas element. It then passes it to the current tool.",
             "itemtype": "method",
             "name": "eventHandler",
@@ -3481,7 +3494,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1242,
+            "line": 1255,
             "description": "Handle a drag over.",
             "itemtype": "method",
             "name": "onDragOver",
@@ -3499,7 +3512,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1261,
+            "line": 1274,
             "description": "Handle a drag leave.",
             "itemtype": "method",
             "name": "onDragLeave",
@@ -3517,7 +3530,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1280,
+            "line": 1293,
             "description": "Handle a drop event.",
             "itemtype": "method",
             "name": "onDrop",
@@ -3535,7 +3548,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1295,
+            "line": 1308,
             "description": "Handle an error: display it to the user.",
             "itemtype": "method",
             "name": "handleError",
@@ -3553,7 +3566,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1316,
+            "line": 1329,
             "description": "Create the application layers.",
             "itemtype": "method",
             "name": "createLayers",
@@ -3576,7 +3589,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1356,
+            "line": 1369,
             "description": "Post load application initialisation. To be called once the DICOM has been parsed.",
             "itemtype": "method",
             "name": "postLoadInit",
@@ -5850,9 +5863,9 @@
         {
             "file": "src/gui/style.js",
             "line": 23,
-            "description": "Font definition string.",
+            "description": "Font family.",
             "itemtype": "property",
-            "name": "fontStr",
+            "name": "fontFamily",
             "access": "private",
             "tagname": "",
             "type": "String",
@@ -5863,19 +5876,6 @@
         {
             "file": "src/gui/style.js",
             "line": 30,
-            "description": "Line height.",
-            "itemtype": "property",
-            "name": "lineHeight",
-            "access": "private",
-            "tagname": "",
-            "type": "Number",
-            "class": "dwv.html.Style",
-            "module": "html",
-            "namespace": "dwv.html"
-        },
-        {
-            "file": "src/gui/style.js",
-            "line": 37,
             "description": "Text colour.",
             "itemtype": "property",
             "name": "textColour",
@@ -5888,7 +5888,7 @@
         },
         {
             "file": "src/gui/style.js",
-            "line": 44,
+            "line": 37,
             "description": "Line colour.",
             "itemtype": "property",
             "name": "lineColour",
@@ -5901,7 +5901,47 @@
         },
         {
             "file": "src/gui/style.js",
-            "line": 52,
+            "line": 44,
+            "description": "Display scale.",
+            "itemtype": "property",
+            "name": "scale",
+            "access": "private",
+            "tagname": "",
+            "type": "Number",
+            "class": "dwv.html.Style",
+            "module": "html",
+            "namespace": "dwv.html"
+        },
+        {
+            "file": "src/gui/style.js",
+            "line": 51,
+            "description": "Stroke width.",
+            "itemtype": "property",
+            "name": "strokeWidth",
+            "access": "private",
+            "tagname": "",
+            "type": "Number",
+            "class": "dwv.html.Style",
+            "module": "html",
+            "namespace": "dwv.html"
+        },
+        {
+            "file": "src/gui/style.js",
+            "line": 59,
+            "description": "Get the font family.",
+            "itemtype": "method",
+            "name": "getFontFamily",
+            "return": {
+                "description": "The font family.",
+                "type": "String"
+            },
+            "class": "dwv.html.Style",
+            "module": "html",
+            "namespace": "dwv.html"
+        },
+        {
+            "file": "src/gui/style.js",
+            "line": 66,
             "description": "Get the font size.",
             "itemtype": "method",
             "name": "getFontSize",
@@ -5915,26 +5955,12 @@
         },
         {
             "file": "src/gui/style.js",
-            "line": 59,
-            "description": "Get the font definition string.",
+            "line": 73,
+            "description": "Get the stroke width.",
             "itemtype": "method",
-            "name": "getFontStr",
+            "name": "getStrokeWidth",
             "return": {
-                "description": "The font definition string.",
-                "type": "String"
-            },
-            "class": "dwv.html.Style",
-            "module": "html",
-            "namespace": "dwv.html"
-        },
-        {
-            "file": "src/gui/style.js",
-            "line": 66,
-            "description": "Get the line height.",
-            "itemtype": "method",
-            "name": "getLineHeight",
-            "return": {
-                "description": "The line height.",
+                "description": "The stroke width.",
                 "type": "Number"
             },
             "class": "dwv.html.Style",
@@ -5943,7 +5969,7 @@
         },
         {
             "file": "src/gui/style.js",
-            "line": 73,
+            "line": 80,
             "description": "Get the text colour.",
             "itemtype": "method",
             "name": "getTextColour",
@@ -5957,7 +5983,7 @@
         },
         {
             "file": "src/gui/style.js",
-            "line": 80,
+            "line": 87,
             "description": "Get the line colour.",
             "itemtype": "method",
             "name": "getLineColour",
@@ -5971,7 +5997,7 @@
         },
         {
             "file": "src/gui/style.js",
-            "line": 87,
+            "line": 94,
             "description": "Set the line colour.",
             "itemtype": "method",
             "name": "setLineColour",
@@ -5982,6 +6008,96 @@
                     "type": "String"
                 }
             ],
+            "class": "dwv.html.Style",
+            "module": "html",
+            "namespace": "dwv.html"
+        },
+        {
+            "file": "src/gui/style.js",
+            "line": 101,
+            "description": "Set the display scale.",
+            "itemtype": "method",
+            "name": "setScale",
+            "params": [
+                {
+                    "name": "scale",
+                    "description": "The display scale.",
+                    "type": "String"
+                }
+            ],
+            "class": "dwv.html.Style",
+            "module": "html",
+            "namespace": "dwv.html"
+        },
+        {
+            "file": "src/gui/style.js",
+            "line": 108,
+            "description": "Scale an input value.",
+            "itemtype": "method",
+            "name": "scale",
+            "params": [
+                {
+                    "name": "value",
+                    "description": "The value to scale.",
+                    "type": "Number"
+                }
+            ],
+            "class": "dwv.html.Style",
+            "module": "html",
+            "namespace": "dwv.html"
+        },
+        {
+            "file": "src/gui/style.js",
+            "line": 116,
+            "description": "Get the font definition string.",
+            "itemtype": "method",
+            "name": "getFontStr",
+            "return": {
+                "description": "The font definition string.",
+                "type": "String"
+            },
+            "class": "dwv.html.Style",
+            "module": "html",
+            "namespace": "dwv.html"
+        },
+        {
+            "file": "src/gui/style.js",
+            "line": 126,
+            "description": "Get the line height.",
+            "itemtype": "method",
+            "name": "getLineHeight",
+            "return": {
+                "description": "The line height.",
+                "type": "Number"
+            },
+            "class": "dwv.html.Style",
+            "module": "html",
+            "namespace": "dwv.html"
+        },
+        {
+            "file": "src/gui/style.js",
+            "line": 136,
+            "description": "Get the font size scaled to the display.",
+            "itemtype": "method",
+            "name": "getScaledFontSize",
+            "return": {
+                "description": "The scaled font size.",
+                "type": "Number"
+            },
+            "class": "dwv.html.Style",
+            "module": "html",
+            "namespace": "dwv.html"
+        },
+        {
+            "file": "src/gui/style.js",
+            "line": 146,
+            "description": "Get the stroke width scaled to the display.",
+            "itemtype": "method",
+            "name": "getScaledStrokeWidth",
+            "return": {
+                "description": "The scaled stroke width.",
+                "type": "Number"
+            },
             "class": "dwv.html.Style",
             "module": "html",
             "namespace": "dwv.html"
@@ -10009,17 +10125,6 @@
         {
             "file": "src/tools/draw.js",
             "line": 304,
-            "description": "Drawing style.",
-            "itemtype": "property",
-            "name": "style",
-            "type": "Style",
-            "class": "dwv.tool.Draw",
-            "module": "tool",
-            "namespace": "dwv.tool"
-        },
-        {
-            "file": "src/tools/draw.js",
-            "line": 310,
             "description": "Shape name.",
             "itemtype": "property",
             "name": "shapeName",
@@ -10030,7 +10135,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 317,
+            "line": 311,
             "description": "List of points.",
             "itemtype": "property",
             "name": "points",
@@ -10043,7 +10148,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 325,
+            "line": 319,
             "description": "Last selected point.",
             "itemtype": "property",
             "name": "lastPoint",
@@ -10056,7 +10161,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 333,
+            "line": 327,
             "description": "Shape editor.",
             "itemtype": "property",
             "name": "shapeEditor",
@@ -10069,7 +10174,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 342,
+            "line": 339,
             "description": "Trash draw: a cross.",
             "itemtype": "property",
             "name": "trash",
@@ -10082,7 +10187,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 366,
+            "line": 363,
             "description": "The associated draw layer.",
             "itemtype": "property",
             "name": "drawLayer",
@@ -10095,7 +10200,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 374,
+            "line": 371,
             "description": "The associated draw layer.",
             "itemtype": "property",
             "name": "drawLayer",
@@ -10108,7 +10213,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 382,
+            "line": 379,
             "description": "Handle mouse down event.",
             "itemtype": "method",
             "name": "mousedown",
@@ -10125,7 +10230,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 422,
+            "line": 419,
             "description": "Handle mouse move event.",
             "itemtype": "method",
             "name": "mousemove",
@@ -10142,7 +10247,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 470,
+            "line": 467,
             "description": "Handle mouse up event.",
             "itemtype": "method",
             "name": "mouseup",
@@ -10159,7 +10264,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 507,
+            "line": 504,
             "description": "Handle mouse out event.",
             "itemtype": "method",
             "name": "mouseout",
@@ -10176,7 +10281,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 516,
+            "line": 513,
             "description": "Handle touch start event.",
             "itemtype": "method",
             "name": "touchstart",
@@ -10193,7 +10298,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 525,
+            "line": 522,
             "description": "Handle touch move event.",
             "itemtype": "method",
             "name": "touchmove",
@@ -10210,7 +10315,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 534,
+            "line": 531,
             "description": "Handle touch end event.",
             "itemtype": "method",
             "name": "touchend",
@@ -10227,7 +10332,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 543,
+            "line": 540,
             "description": "Handle key down event.",
             "itemtype": "method",
             "name": "keydown",
@@ -10244,7 +10349,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 552,
+            "line": 549,
             "description": "Setup the tool GUI.",
             "itemtype": "method",
             "name": "setup",
@@ -10254,7 +10359,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 562,
+            "line": 559,
             "description": "Enable the tool.",
             "itemtype": "method",
             "name": "enable",
@@ -10271,7 +10376,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 604,
+            "line": 601,
             "description": "Set shape off properties.",
             "itemtype": "method",
             "name": "setShapeOff",
@@ -10288,7 +10393,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 620,
+            "line": 617,
             "description": "Get the real position from an event.",
             "class": "dwv.tool.Draw",
             "module": "tool",
@@ -10296,7 +10401,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 629,
+            "line": 626,
             "description": "Set shape on properties.",
             "itemtype": "method",
             "name": "setShapeOn",
@@ -10313,7 +10418,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 780,
+            "line": 777,
             "description": "Initialise the tool.",
             "itemtype": "method",
             "name": "init",
@@ -10323,7 +10428,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 802,
+            "line": 799,
             "description": "Add an event listener on the app.",
             "itemtype": "method",
             "name": "addEventListener",
@@ -10345,7 +10450,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 816,
+            "line": 813,
             "description": "Remove an event listener from the app.",
             "itemtype": "method",
             "name": "removeEventListener",
@@ -10367,38 +10472,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 837,
-            "description": "Fire an event: call all associated listeners.",
-            "itemtype": "method",
-            "name": "fireEvent",
-            "params": [
-                {
-                    "name": "event",
-                    "description": "The event to fire.",
-                    "type": "Object"
-                }
-            ],
-            "class": "dwv.tool.Draw",
-            "module": "tool",
-            "namespace": "dwv.tool"
-        },
-        {
-            "file": "src/tools/draw.js",
-            "line": 855,
-            "description": "Help for this tool.",
-            "itemtype": "method",
-            "name": "getHelp",
-            "return": {
-                "description": "The help content.",
-                "type": "Object"
-            },
-            "class": "dwv.tool.Draw",
-            "module": "tool",
-            "namespace": "dwv.tool"
-        },
-        {
-            "file": "src/tools/draw.js",
-            "line": 877,
+            "line": 832,
             "description": "Set the line colour of the drawing.",
             "itemtype": "method",
             "name": "setLineColour",
@@ -10415,7 +10489,38 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 888,
+            "line": 844,
+            "description": "Fire an event: call all associated listeners.",
+            "itemtype": "method",
+            "name": "fireEvent",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The event to fire.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.tool.Draw",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/draw.js",
+            "line": 862,
+            "description": "Help for this tool.",
+            "itemtype": "method",
+            "name": "getHelp",
+            "return": {
+                "description": "The help content.",
+                "type": "Object"
+            },
+            "class": "dwv.tool.Draw",
+            "module": "tool",
+            "namespace": "dwv.tool"
+        },
+        {
+            "file": "src/tools/draw.js",
+            "line": 884,
             "description": "Set the shape name of the drawing.",
             "itemtype": "method",
             "name": "setShapeName",
@@ -10432,7 +10537,7 @@
         },
         {
             "file": "src/tools/draw.js",
-            "line": 903,
+            "line": 899,
             "description": "Check if the shape is in the shape list.",
             "itemtype": "method",
             "name": "hasShape",
@@ -11890,7 +11995,7 @@
         },
         {
             "file": "src/tools/protractor.js",
-            "line": 103,
+            "line": 104,
             "description": "Update a protractor shape.",
             "itemtype": "method",
             "name": "UpdateProtractor",
@@ -13291,7 +13396,7 @@
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/tools/draw.js:855"
+            "line": " src/tools/draw.js:862"
         },
         {
             "message": "replacing incorrect tag: returns with return",
@@ -13315,7 +13420,7 @@
         },
         {
             "message": "Missing item type\nInit the Window/Level display",
-            "line": " src/app/application.js:657"
+            "line": " src/app/application.js:670"
         },
         {
             "message": "Missing item type\nDICOM tag dictionary.",
@@ -13363,7 +13468,7 @@
         },
         {
             "message": "Missing item type\nGet the real position from an event.",
-            "line": " src/tools/draw.js:620"
+            "line": " src/tools/draw.js:617"
         },
         {
             "message": "Missing item type\nApply a function on all anchors.",

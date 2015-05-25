@@ -66,6 +66,9 @@ dwv.App = function ()
     // Draw stage
     var drawStage = null;
     
+    // Generic style
+    var style = new dwv.html.Style();
+    
     // Toolbox
     var toolbox = null;
     // Toolbox controller
@@ -184,6 +187,13 @@ dwv.App = function ()
      * @return {Object} The draw layer.
      */
     this.getDrawStage = function () { return drawStage; };
+
+    /** 
+     * Get the app style.
+     * @method getStyle
+     * @return {Object} The app style.
+     */
+    this.getStyle = function () { return style; };
 
     /** 
      * Get the toolbox.
@@ -610,6 +620,9 @@ dwv.App = function ()
         // ratio previous/new to add to zoom
         var mul = newWidth / oldWidth;
         scale *= mul;
+        
+        // update style
+        style.setScale(windowScale);
 
         // resize container
         var jqDivId = "#"+containerDivId;
@@ -6298,7 +6311,7 @@ dwv.html = dwv.html || {};
  * @namespace dwv.html
  * @constructor
  */
-dwv.html.Style = function()
+dwv.html.Style = function ()
 {
     /**
      * Font size.
@@ -6308,19 +6321,12 @@ dwv.html.Style = function()
      */
     var fontSize = 12;
     /**
-     * Font definition string.
-     * @property fontStr
+     * Font family.
+     * @property fontFamily
      * @private
      * @type String
      */
-    var fontStr = "normal "+this.fontSize+"px sans-serif";
-    /**
-     * Line height.
-     * @property lineHeight
-     * @private
-     * @type Number
-     */
-    var lineHeight = this.fontSize + this.fontSize/5;
+    var fontFamily = "Verdana";
     /**
      * Text colour.
      * @property textColour
@@ -6334,49 +6340,117 @@ dwv.html.Style = function()
      * @private
      * @type String
      */
-    var lineColour = 0;
+    var lineColour = "";
+    /**
+     * Display scale.
+     * @property scale
+     * @private
+     * @type Number
+     */
+    var displayScale = 1;
+    /**
+     * Stroke width.
+     * @property strokeWidth
+     * @private
+     * @type Number
+     */
+    var strokeWidth = 2;
     
+    /**
+     * Get the font family.
+     * @method getFontFamily
+     * @return {String} The font family.
+     */
+    this.getFontFamily = function () { return fontFamily; };
+
     /**
      * Get the font size.
      * @method getFontSize
      * @return {Number} The font size.
      */
-    dwv.html.Style.prototype.getFontSize = function() { return fontSize; };
-
+    this.getFontSize = function () { return fontSize; };
+    
     /**
-     * Get the font definition string.
-     * @method getFontStr
-     * @return {String} The font definition string.
+     * Get the stroke width.
+     * @method getStrokeWidth
+     * @return {Number} The stroke width.
      */
-    dwv.html.Style.prototype.getFontStr = function() { return fontStr; };
-
-    /**
-     * Get the line height.
-     * @method getLineHeight
-     * @return {Number} The line height.
-     */
-    dwv.html.Style.prototype.getLineHeight = function() { return lineHeight; };
+    this.getStrokeWidth = function () { return strokeWidth; };
 
     /**
      * Get the text colour.
      * @method getTextColour
      * @return {String} The text colour.
      */
-    dwv.html.Style.prototype.getTextColour = function() { return textColour; };
+    this.getTextColour = function () { return textColour; };
 
     /**
      * Get the line colour.
      * @method getLineColour
      * @return {String} The line colour.
      */
-    dwv.html.Style.prototype.getLineColour = function() { return lineColour; };
+    this.getLineColour = function () { return lineColour; };
 
     /**
      * Set the line colour.
      * @method setLineColour
      * @param {String} colour The line colour.
      */
-    dwv.html.Style.prototype.setLineColour = function(colour) { lineColour = colour; };
+    this.setLineColour = function (colour) { lineColour = colour; };
+
+    /**
+     * Set the display scale.
+     * @method setScale
+     * @param {String} scale The display scale.
+     */
+    this.setScale = function (scale) { displayScale = scale; };
+    
+    /**
+     * Scale an input value.
+     * @method scale
+     * @param {Number} value The value to scale.
+     */
+    this.scale = function (value) { return value / displayScale; };
+};
+
+/**
+ * Get the font definition string.
+ * @method getFontStr
+ * @return {String} The font definition string.
+ */
+dwv.html.Style.prototype.getFontStr = function ()
+{
+    return ("normal " + this.getFontSize() + "px sans-serif"); 
+};
+
+/**
+ * Get the line height.
+ * @method getLineHeight
+ * @return {Number} The line height.
+ */
+dwv.html.Style.prototype.getLineHeight = function ()
+{
+    return ( this.getFontSize() + this.getFontSize() / 5 ); 
+};
+
+/**
+ * Get the font size scaled to the display.
+ * @method getScaledFontSize
+ * @return {Number} The scaled font size.
+ */
+dwv.html.Style.prototype.getScaledFontSize = function () 
+{ 
+    return this.scale( this.getFontSize() );
+};
+
+/**
+ * Get the stroke width scaled to the display.
+ * @method getScaledStrokeWidth
+ * @return {Number} The scaled stroke width.
+ */
+dwv.html.Style.prototype.getScaledStrokeWidth = function () 
+{ 
+    return this.scale( this.getStrokeWidth() ); 
 };
 ;/** 
  * GUI module.
@@ -11344,12 +11418,6 @@ dwv.tool.Draw = function (app, shapeFactoryList)
     var shapeGroup = null;
 
     /**
-     * Drawing style.
-     * @property style
-     * @type Style
-     */
-    this.style = new dwv.html.Style();
-    /**
      * Shape name.
      * @property shapeName
      * @type String
@@ -11379,6 +11447,9 @@ dwv.tool.Draw = function (app, shapeFactoryList)
      * @type Object
      */
     var shapeEditor = new dwv.tool.ShapeEditor(app);
+    
+    // associate the event listeners of the editor
+    //  with those of the draw tool
     shapeEditor.setDrawEventCallback(fireEvent);
 
     /**
@@ -11495,7 +11566,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
                 shapeGroup.destroy();
             }
             // create shape group
-            shapeGroup = factory.create(points, self.style, app.getImage());
+            shapeGroup = factory.create(points, app.getStyle(), app.getImage());
             // do not listen during creation
             var shape = shapeGroup.getChildren( function (node) {
                 return node.name() === 'shape';
@@ -11523,7 +11594,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
             }
             // create final shape
             var factory = new self.shapeFactoryList[self.shapeName]();
-            var group = factory.create(points, self.style, app.getImage());
+            var group = factory.create(points, app.getStyle(), app.getImage());
             group.id( idGenerator.get() );
             // re-activate layer
             drawLayer.hitGraphEnabled(true);
@@ -11874,6 +11945,16 @@ dwv.tool.Draw = function (app, shapeFactoryList)
         }
     };
 
+    /**
+     * Set the line colour of the drawing.
+     * @method setLineColour
+     * @param {String} colour The colour to set.
+     */
+    this.setLineColour = function (colour)
+    {
+        app.getStyle().setLineColour(colour);
+    };
+
     // Private Methods -----------------------------------------------------------
 
     /**
@@ -11914,17 +11995,6 @@ dwv.tool.Draw.prototype.getHelp = function()
             'touch_drag': "A single touch drag draws the desired shape.",
         }
     };
-};
-
-/**
- * Set the line colour of the drawing.
- * @method setLineColour
- * @param {String} colour The colour to set.
- */
-dwv.tool.Draw.prototype.setLineColour = function(colour)
-{
-    // set style var
-    this.style.setLineColour(colour);
 };
 
 /**
@@ -12232,8 +12302,8 @@ dwv.tool.ShapeEditor = function (app)
             fillBlue: 100,
             fillGreen: 100,
             fillAlpha: 0.7,
-            strokeWidth: 2,
-            radius: 6,
+            strokeWidth: app.getStyle().getScaledStrokeWidth(),
+            radius: app.getStyle().scale(6),
             name: 'anchor',
             id: id,
             dragOnTop: false,
@@ -12420,7 +12490,7 @@ dwv.tool.EllipseFactory.prototype.create = function (points, style, image)
         y: ellipse.getCenter().getY(),
         radius: { x: ellipse.getA(), y: ellipse.getB() },
         stroke: style.getLineColour(),
-        strokeWidth: 2,
+        strokeWidth: style.getScaledStrokeWidth(),
         name: "shape"
     });
     // quantification
@@ -12432,8 +12502,8 @@ dwv.tool.EllipseFactory.prototype.create = function (points, style, image)
         x: ellipse.getCenter().getX(),
         y: ellipse.getCenter().getY(),
         text: str,
-        fontSize: style.getFontSize(),
-        fontFamily: "Verdana",
+        fontSize: style.getScaledFontSize(),
+        fontFamily: style.getFontFamily(),
         fill: style.getLineColour(),
         name: "text"
     });
@@ -13249,7 +13319,7 @@ dwv.tool.LineFactory.prototype.create = function (points, style, image)
         points: [line.getBegin().getX(), line.getBegin().getY(), 
                  line.getEnd().getX(), line.getEnd().getY() ],
         stroke: style.getLineColour(),
-        strokeWidth: 2,
+        strokeWidth: style.getScaledStrokeWidth(),
         name: "shape"
     });
     // quantification
@@ -13260,8 +13330,8 @@ dwv.tool.LineFactory.prototype.create = function (points, style, image)
         x: line.getEnd().getX(),
         y: line.getEnd().getY() - 15,
         text: str,
-        fontSize: style.getFontSize(),
-        fontFamily: "Verdana",
+        fontSize: style.getScaledFontSize(),
+        fontFamily: style.getFontFamily(),
         fill: style.getLineColour(),
         name: "text"
     });
@@ -13742,7 +13812,7 @@ dwv.tool.ProtractorFactory.prototype.create = function (points, style/*, image*/
     var kshape = new Kinetic.Line({
         points: pointsArray,
         stroke: style.getLineColour(),
-        strokeWidth: 2,
+        strokeWidth: style.getScaledStrokeWidth(),
         name: "shape"
     });
     var group = new Kinetic.Group();
@@ -13766,8 +13836,8 @@ dwv.tool.ProtractorFactory.prototype.create = function (points, style/*, image*/
             x: midX,
             y: midY - 15,
             text: angleStr,
-            fontSize: style.getFontSize(),
-            fontFamily: "Verdana",
+            fontSize: style.getScaledFontSize(),
+            fontFamily: style.getFontFamily(),
             fill: style.getLineColour(),
             name: "text"
         });
@@ -13777,6 +13847,7 @@ dwv.tool.ProtractorFactory.prototype.create = function (points, style/*, image*/
             innerRadius: radius,
             outerRadius: radius,
             stroke: style.getLineColour(),
+            strokeWidth: style.getScaledStrokeWidth(),
             angle: angle,
             rotationDeg: -inclination,
             x: points[1].getX(),
@@ -13923,7 +13994,7 @@ dwv.tool.RectangleFactory.prototype.create = function (points, style, image)
         width: rectangle.getWidth(),
         height: rectangle.getHeight(),
         stroke: style.getLineColour(),
-        strokeWidth: 2,
+        strokeWidth: style.getScaledStrokeWidth(),
         name: "shape"
     });
     // quantification
@@ -13935,8 +14006,8 @@ dwv.tool.RectangleFactory.prototype.create = function (points, style, image)
         x: rectangle.getBegin().getX(),
         y: rectangle.getEnd().getY() + 10,
         text: str,
-        fontSize: style.getFontSize(),
-        fontFamily: "Verdana",
+        fontSize: style.getScaledFontSize(),
+        fontFamily: style.getFontFamily(),
         fill: style.getLineColour(),
         name: "text"
     });
@@ -14082,7 +14153,7 @@ dwv.tool.RoiFactory.prototype.create = function (points, style /*, image*/)
     var kshape = new Kinetic.Line({
         points: arr,
         stroke: style.getLineColour(),
-        strokeWidth: 2,
+        strokeWidth: style.getScaledStrokeWidth(),
         name: "shape",
         closed: true
     });

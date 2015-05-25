@@ -223,7 +223,7 @@ dwv.tool.RectangleFactory.prototype.create = function (points, style, image)
         width: rectangle.getWidth(),
         height: rectangle.getHeight(),
         stroke: style.getLineColour(),
-        strokeWidth: 2,
+        strokeWidth: style.getScaledStrokeWidth(),
         name: &quot;shape&quot;
     });
     // quantification
@@ -235,8 +235,8 @@ dwv.tool.RectangleFactory.prototype.create = function (points, style, image)
         x: rectangle.getBegin().getX(),
         y: rectangle.getEnd().getY() + 10,
         text: str,
-        fontSize: style.getFontSize(),
-        fontFamily: &quot;Verdana&quot;,
+        fontSize: style.getScaledFontSize(),
+        fontFamily: style.getFontFamily(),
         fill: style.getLineColour(),
         name: &quot;text&quot;
     });

@@ -479,12 +479,6 @@ dwv.tool.Draw = function (app, shapeFactoryList)
     var shapeGroup = null;
 
     /**
-     * Drawing style.
-     * @property style
-     * @type Style
-     */
-    this.style = new dwv.html.Style();
-    /**
      * Shape name.
      * @property shapeName
      * @type String
@@ -514,6 +508,9 @@ dwv.tool.Draw = function (app, shapeFactoryList)
      * @type Object
      */
     var shapeEditor = new dwv.tool.ShapeEditor(app);
+    
+    // associate the event listeners of the editor
+    //  with those of the draw tool
     shapeEditor.setDrawEventCallback(fireEvent);
 
     /**
@@ -630,7 +627,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
                 shapeGroup.destroy();
             }
             // create shape group
-            shapeGroup = factory.create(points, self.style, app.getImage());
+            shapeGroup = factory.create(points, app.getStyle(), app.getImage());
             // do not listen during creation
             var shape = shapeGroup.getChildren( function (node) {
                 return node.name() === &#x27;shape&#x27;;
@@ -658,7 +655,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
             }
             // create final shape
             var factory = new self.shapeFactoryList[self.shapeName]();
-            var group = factory.create(points, self.style, app.getImage());
+            var group = factory.create(points, app.getStyle(), app.getImage());
             group.id( idGenerator.get() );
             // re-activate layer
             drawLayer.hitGraphEnabled(true);
@@ -1009,6 +1006,16 @@ dwv.tool.Draw = function (app, shapeFactoryList)
         }
     };
 
+    /**
+     * Set the line colour of the drawing.
+     * @method setLineColour
+     * @param {String} colour The colour to set.
+     */
+    this.setLineColour = function (colour)
+    {
+        app.getStyle().setLineColour(colour);
+    };
+
     // Private Methods -----------------------------------------------------------
 
     /**
@@ -1049,17 +1056,6 @@ dwv.tool.Draw.prototype.getHelp = function()
             &#x27;touch_drag&#x27;: &quot;A single touch drag draws the desired shape.&quot;,
         }
     };
-};
-
-/**
- * Set the line colour of the drawing.
- * @method setLineColour
- * @param {String} colour The colour to set.
- */
-dwv.tool.Draw.prototype.setLineColour = function(colour)
-{
-    // set style var
-    this.style.setLineColour(colour);
 };
 
 /**

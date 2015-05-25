@@ -240,6 +240,10 @@
 
                     <ul class="index-list methods">
                             <li class="index-item method">
+                                <a href="#method_getFontFamily">getFontFamily</a>
+
+                            </li>
+                            <li class="index-item method">
                                 <a href="#method_getFontSize">getFontSize</a>
 
                             </li>
@@ -256,11 +260,31 @@
 
                             </li>
                             <li class="index-item method">
+                                <a href="#method_getScaledFontSize">getScaledFontSize</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_getScaledStrokeWidth">getScaledStrokeWidth</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_getStrokeWidth">getStrokeWidth</a>
+
+                            </li>
+                            <li class="index-item method">
                                 <a href="#method_getTextColour">getTextColour</a>
 
                             </li>
                             <li class="index-item method">
+                                <a href="#method_scale">scale</a>
+
+                            </li>
+                            <li class="index-item method">
                                 <a href="#method_setLineColour">setLineColour</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_setScale">setScale</a>
 
                             </li>
                     </ul>
@@ -271,11 +295,11 @@
 
                     <ul class="index-list properties">
                             <li class="index-item property private">
-                                <a href="#property_fontSize">fontSize</a>
+                                <a href="#property_fontFamily">fontFamily</a>
 
                             </li>
                             <li class="index-item property private">
-                                <a href="#property_fontStr">fontStr</a>
+                                <a href="#property_fontSize">fontSize</a>
 
                             </li>
                             <li class="index-item property private">
@@ -283,7 +307,11 @@
 
                             </li>
                             <li class="index-item property private">
-                                <a href="#property_lineHeight">lineHeight</a>
+                                <a href="#property_scale">scale</a>
+
+                            </li>
+                            <li class="index-item property private">
+                                <a href="#property_strokeWidth">strokeWidth</a>
 
                             </li>
                             <li class="index-item property private">
@@ -299,6 +327,49 @@
             <div id="methods" class="api-class-tabpanel">
                 <h2 class="off-left">Methods</h2>
 
+<div id="method_getFontFamily" class="method item">
+    <h3 class="name"><code>getFontFamily</code></h3>
+
+        <span class="paren">()</span>
+
+        <span class="returns-inline">
+            <span class="type">String</span>
+        </span>
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/src_gui_style.js.html#l59"><code>src&#x2F;gui&#x2F;style.js:59</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Get the font family.</p>
+
+    </div>
+
+
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                        <span class="type">String</span>:
+                    <p>The font family.</p>
+
+            </div>
+        </div>
+
+
+</div>
 <div id="method_getFontSize" class="method item">
     <h3 class="name"><code>getFontSize</code></h3>
 
@@ -317,7 +388,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_gui_style.js.html#l52"><code>src&#x2F;gui&#x2F;style.js:52</code></a>
+        <a href="../files/src_gui_style.js.html#l66"><code>src&#x2F;gui&#x2F;style.js:66</code></a>
         </p>
 
 
@@ -360,7 +431,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_gui_style.js.html#l59"><code>src&#x2F;gui&#x2F;style.js:59</code></a>
+        <a href="../files/src_gui_style.js.html#l116"><code>src&#x2F;gui&#x2F;style.js:116</code></a>
         </p>
 
 
@@ -403,7 +474,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_gui_style.js.html#l80"><code>src&#x2F;gui&#x2F;style.js:80</code></a>
+        <a href="../files/src_gui_style.js.html#l87"><code>src&#x2F;gui&#x2F;style.js:87</code></a>
         </p>
 
 
@@ -446,7 +517,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_gui_style.js.html#l66"><code>src&#x2F;gui&#x2F;style.js:66</code></a>
+        <a href="../files/src_gui_style.js.html#l126"><code>src&#x2F;gui&#x2F;style.js:126</code></a>
         </p>
 
 
@@ -471,6 +542,135 @@
 
 
 </div>
+<div id="method_getScaledFontSize" class="method item">
+    <h3 class="name"><code>getScaledFontSize</code></h3>
+
+        <span class="paren">()</span>
+
+        <span class="returns-inline">
+            <span class="type">Number</span>
+        </span>
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/src_gui_style.js.html#l136"><code>src&#x2F;gui&#x2F;style.js:136</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Get the font size scaled to the display.</p>
+
+    </div>
+
+
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                        <span class="type">Number</span>:
+                    <p>The scaled font size.</p>
+
+            </div>
+        </div>
+
+
+</div>
+<div id="method_getScaledStrokeWidth" class="method item">
+    <h3 class="name"><code>getScaledStrokeWidth</code></h3>
+
+        <span class="paren">()</span>
+
+        <span class="returns-inline">
+            <span class="type">Number</span>
+        </span>
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/src_gui_style.js.html#l146"><code>src&#x2F;gui&#x2F;style.js:146</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Get the stroke width scaled to the display.</p>
+
+    </div>
+
+
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                        <span class="type">Number</span>:
+                    <p>The scaled stroke width.</p>
+
+            </div>
+        </div>
+
+
+</div>
+<div id="method_getStrokeWidth" class="method item">
+    <h3 class="name"><code>getStrokeWidth</code></h3>
+
+        <span class="paren">()</span>
+
+        <span class="returns-inline">
+            <span class="type">Number</span>
+        </span>
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/src_gui_style.js.html#l73"><code>src&#x2F;gui&#x2F;style.js:73</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Get the stroke width.</p>
+
+    </div>
+
+
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                        <span class="type">Number</span>:
+                    <p>The stroke width.</p>
+
+            </div>
+        </div>
+
+
+</div>
 <div id="method_getTextColour" class="method item">
     <h3 class="name"><code>getTextColour</code></h3>
 
@@ -489,7 +689,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_gui_style.js.html#l73"><code>src&#x2F;gui&#x2F;style.js:73</code></a>
+        <a href="../files/src_gui_style.js.html#l80"><code>src&#x2F;gui&#x2F;style.js:80</code></a>
         </p>
 
 
@@ -514,6 +714,60 @@
 
 
 </div>
+<div id="method_scale" class="method item">
+    <h3 class="name"><code>scale</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>value</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/src_gui_style.js.html#l108"><code>src&#x2F;gui&#x2F;style.js:108</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Scale an input value.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">value</code>
+                        <span class="type">Number</span>
+
+
+                    <div class="param-description">
+                        <p>The value to scale.</p>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+
+</div>
 <div id="method_setLineColour" class="method item">
     <h3 class="name"><code>setLineColour</code></h3>
 
@@ -535,7 +789,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_gui_style.js.html#l87"><code>src&#x2F;gui&#x2F;style.js:87</code></a>
+        <a href="../files/src_gui_style.js.html#l94"><code>src&#x2F;gui&#x2F;style.js:94</code></a>
         </p>
 
 
@@ -568,11 +822,91 @@
 
 
 </div>
+<div id="method_setScale" class="method item">
+    <h3 class="name"><code>setScale</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>scale</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/src_gui_style.js.html#l101"><code>src&#x2F;gui&#x2F;style.js:101</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Set the display scale.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">scale</code>
+                        <span class="type">String</span>
+
+
+                    <div class="param-description">
+                        <p>The display scale.</p>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+
+</div>
             </div>
 
             <div id="properties" class="api-class-tabpanel">
                 <h2 class="off-left">Properties</h2>
 
+                    <div id="property_fontFamily" class="property item private">
+                        <h3 class="name"><code>fontFamily</code></h3>
+                        <span class="type">String</span>
+                    
+                    
+                            <span class="flag private">private</span>
+                    
+                    
+                    
+                        <div class="meta">
+                                    <p>
+                                    Defined in
+                            <a href="../files/src_gui_style.js.html#l23"><code>src&#x2F;gui&#x2F;style.js:23</code></a>
+                            </p>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                            <p>Font family.</p>
+                    
+                        </div>
+                    
+                    
+                    
+                    </div>
                     <div id="property_fontSize" class="property item private">
                         <h3 class="name"><code>fontSize</code></h3>
                         <span class="type">Number</span>
@@ -599,8 +933,8 @@
                     
                     
                     </div>
-                    <div id="property_fontStr" class="property item private">
-                        <h3 class="name"><code>fontStr</code></h3>
+                    <div id="property_lineColour" class="property item private">
+                        <h3 class="name"><code>lineColour</code></h3>
                         <span class="type">String</span>
                     
                     
@@ -611,23 +945,23 @@
                         <div class="meta">
                                     <p>
                                     Defined in
-                            <a href="../files/src_gui_style.js.html#l23"><code>src&#x2F;gui&#x2F;style.js:23</code></a>
+                            <a href="../files/src_gui_style.js.html#l37"><code>src&#x2F;gui&#x2F;style.js:37</code></a>
                             </p>
                     
                     
                         </div>
                     
                         <div class="description">
-                            <p>Font definition string.</p>
+                            <p>Line colour.</p>
                     
                         </div>
                     
                     
                     
                     </div>
-                    <div id="property_lineColour" class="property item private">
-                        <h3 class="name"><code>lineColour</code></h3>
-                        <span class="type">String</span>
+                    <div id="property_scale" class="property item private">
+                        <h3 class="name"><code>scale</code></h3>
+                        <span class="type">Number</span>
                     
                     
                             <span class="flag private">private</span>
@@ -644,15 +978,15 @@
                         </div>
                     
                         <div class="description">
-                            <p>Line colour.</p>
+                            <p>Display scale.</p>
                     
                         </div>
                     
                     
                     
                     </div>
-                    <div id="property_lineHeight" class="property item private">
-                        <h3 class="name"><code>lineHeight</code></h3>
+                    <div id="property_strokeWidth" class="property item private">
+                        <h3 class="name"><code>strokeWidth</code></h3>
                         <span class="type">Number</span>
                     
                     
@@ -663,14 +997,14 @@
                         <div class="meta">
                                     <p>
                                     Defined in
-                            <a href="../files/src_gui_style.js.html#l30"><code>src&#x2F;gui&#x2F;style.js:30</code></a>
+                            <a href="../files/src_gui_style.js.html#l51"><code>src&#x2F;gui&#x2F;style.js:51</code></a>
                             </p>
                     
                     
                         </div>
                     
                         <div class="description">
-                            <p>Line height.</p>
+                            <p>Stroke width.</p>
                     
                         </div>
                     
@@ -689,7 +1023,7 @@
                         <div class="meta">
                                     <p>
                                     Defined in
-                            <a href="../files/src_gui_style.js.html#l37"><code>src&#x2F;gui&#x2F;style.js:37</code></a>
+                            <a href="../files/src_gui_style.js.html#l30"><code>src&#x2F;gui&#x2F;style.js:30</code></a>
                             </p>
                     
                     
