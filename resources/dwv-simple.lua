@@ -90,7 +90,7 @@ print([[
 <script type="text/javascript" src="/dwv/ext/pdfjs/arithmetic_decoder.js"></script>
 
 <!-- Local -->
-<script type="text/javascript" src="/dwv/dwv-0.10.0beta.min.js"></script>
+<script type="text/javascript" src="/dwv/dwv-0.10.0.min.js"></script>
 <!-- Launch the app -->
 <script type="text/javascript" src="/dwv/viewers/simple/appgui.js"></script>
 ]])
