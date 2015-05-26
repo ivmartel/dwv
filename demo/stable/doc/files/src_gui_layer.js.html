@@ -17,7 +17,7 @@
                 <h1><img src="../assets/css/logo.png" title="dwv" width="117" height="52"></h1>
         </div>
         <div class="yui3-u-1-4 version">
-            <em>API Docs for: 0.9.0</em>
+            <em>API Docs for: 0.10.0</em>
         </div>
     </div>
     <div id="bd" class="yui3-g">
@@ -77,7 +77,7 @@
                                 <li><a href="../classes/dwv.image.View.html">dwv.image.View</a></li>
                                 <li><a href="../classes/dwv.image.ViewFactory.html">dwv.image.ViewFactory</a></li>
                                 <li><a href="../classes/dwv.info.html">dwv.info</a></li>
-                                <li><a href="../classes/dwv.info.MiniColorMap.html">dwv.info.MiniColorMap</a></li>
+                                <li><a href="../classes/dwv.info.MiniColourMap.html">dwv.info.MiniColourMap</a></li>
                                 <li><a href="../classes/dwv.info.Plot.html">dwv.info.Plot</a></li>
                                 <li><a href="../classes/dwv.info.Position.html">dwv.info.Position</a></li>
                                 <li><a href="../classes/dwv.info.WindowLevel.html">dwv.info.WindowLevel</a></li>
@@ -98,6 +98,7 @@
                                 <li><a href="../classes/dwv.math.Rectangle.html">dwv.math.Rectangle</a></li>
                                 <li><a href="../classes/dwv.math.ROI.html">dwv.math.ROI</a></li>
                                 <li><a href="../classes/dwv.math.Scissors.html">dwv.math.Scissors</a></li>
+                                <li><a href="../classes/dwv.State.html">dwv.State</a></li>
                                 <li><a href="../classes/dwv.tool.html">dwv.tool</a></li>
                                 <li><a href="../classes/dwv.tool.ChangeGroupCommand.html">dwv.tool.ChangeGroupCommand</a></li>
                                 <li><a href="../classes/dwv.tool.DeleteGroupCommand.html">dwv.tool.DeleteGroupCommand</a></li>
@@ -276,6 +277,8 @@ dwv.html.Layer = function(name)
         return zoom;
     };
     
+    var trans = {&#x27;x&#x27;: 0, &#x27;y&#x27;: 0};
+    
     /**
      * Set the canvas width.
      * @method setWidth
@@ -328,9 +331,8 @@ dwv.html.Layer = function(name)
      */
     this.translate = function(tx,ty)
     {
-        // new origin
-        origin.x += tx * zoom.x;
-        origin.y += ty * zoom.y;
+        trans.x = tx;
+        trans.y = ty;
     };
     
     /**
@@ -355,6 +357,8 @@ dwv.html.Layer = function(name)
         origin.y = 0;
         zoom.x = izoom;
         zoom.y = izoom;
+        trans.x = 0;
+        trans.y = 0;
     };
     
     /**
@@ -362,8 +366,8 @@ dwv.html.Layer = function(name)
      * @method displayToIndex
      */ 
     this.displayToIndex = function ( point2D ) {
-        return {&#x27;x&#x27;: (point2D.x - origin.x) / zoom.x,
-            &#x27;y&#x27;: (point2D.y - origin.y) / zoom.y };
+        return {&#x27;x&#x27;: ( (point2D.x - origin.x) / zoom.x ) - trans.x,
+            &#x27;y&#x27;: ( (point2D.y - origin.y) / zoom.y ) - trans.y};
     };
     
     /**
@@ -388,7 +392,9 @@ dwv.html.Layer = function(name)
         // [ a c e ]
         // [ b d f ]
         // [ 0 0 1 ]
-        context.setTransform( zoom.x, 0, 0, zoom.y, origin.x, origin.y );
+        context.setTransform( zoom.x, 0, 0, zoom.y, 
+            origin.x + (trans.x * zoom.x), 
+            origin.y + (trans.y * zoom.y) );
         context.drawImage( cacheCanvas, 0, 0 );
     };
     
@@ -491,14 +497,14 @@ dwv.html.Layer = function(name)
     };
     
     /**
-     * Set the line color for the layer.
-     * @method setLineColor
-     * @input {String} color The line color.
+     * Set the line colour for the layer.
+     * @method setLineColour
+     * @input {String} colour The line colour.
      */
-    this.setLineColor = function(color)
+    this.setLineColour = function(colour)
     {
-        context.fillStyle = color;
-        context.strokeStyle = color;
+        context.fillStyle = colour;
+        context.strokeStyle = colour;
     };
     
     /**

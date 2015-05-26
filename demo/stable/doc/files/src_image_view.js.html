@@ -17,7 +17,7 @@
                 <h1><img src="../assets/css/logo.png" title="dwv" width="117" height="52"></h1>
         </div>
         <div class="yui3-u-1-4 version">
-            <em>API Docs for: 0.9.0</em>
+            <em>API Docs for: 0.10.0</em>
         </div>
     </div>
     <div id="bd" class="yui3-g">
@@ -77,7 +77,7 @@
                                 <li><a href="../classes/dwv.image.View.html">dwv.image.View</a></li>
                                 <li><a href="../classes/dwv.image.ViewFactory.html">dwv.image.ViewFactory</a></li>
                                 <li><a href="../classes/dwv.info.html">dwv.info</a></li>
-                                <li><a href="../classes/dwv.info.MiniColorMap.html">dwv.info.MiniColorMap</a></li>
+                                <li><a href="../classes/dwv.info.MiniColourMap.html">dwv.info.MiniColourMap</a></li>
                                 <li><a href="../classes/dwv.info.Plot.html">dwv.info.Plot</a></li>
                                 <li><a href="../classes/dwv.info.Position.html">dwv.info.Position</a></li>
                                 <li><a href="../classes/dwv.info.WindowLevel.html">dwv.info.WindowLevel</a></li>
@@ -98,6 +98,7 @@
                                 <li><a href="../classes/dwv.math.Rectangle.html">dwv.math.Rectangle</a></li>
                                 <li><a href="../classes/dwv.math.ROI.html">dwv.math.ROI</a></li>
                                 <li><a href="../classes/dwv.math.Scissors.html">dwv.math.Scissors</a></li>
+                                <li><a href="../classes/dwv.State.html">dwv.State</a></li>
                                 <li><a href="../classes/dwv.tool.html">dwv.tool</a></li>
                                 <li><a href="../classes/dwv.tool.ChangeGroupCommand.html">dwv.tool.ChangeGroupCommand</a></li>
                                 <li><a href="../classes/dwv.tool.DeleteGroupCommand.html">dwv.tool.DeleteGroupCommand</a></li>
@@ -209,12 +210,12 @@ dwv.image.View = function(image, isSigned)
      */
     var windowPresets = null;
     /**
-     * Color map
-     * @property colorMap
+     * colour map
+     * @property colourMap
      * @private
      * @type Object
      */
-    var colorMap = dwv.image.lut.plain;
+    var colourMap = dwv.image.lut.plain;
     /**
      * Current position
      * @property currentPosition
@@ -298,23 +299,23 @@ dwv.image.View = function(image, isSigned)
     };
     
     /**
-     * Get the color map of the image.
-     * @method getColorMap
-     * @return {Object} The color map of the image.
+     * Get the colour map of the image.
+     * @method getColourMap
+     * @return {Object} The colour map of the image.
      */ 
-    this.getColorMap = function() { return colorMap; };
+    this.getColourMap = function() { return colourMap; };
     /**
-     * Set the color map of the image.
-     * @method setColorMap
-     * @param {Object} map The color map of the image.
+     * Set the colour map of the image.
+     * @method setColourMap
+     * @param {Object} map The colour map of the image.
      */ 
-    this.setColorMap = function(map) { 
-        colorMap = map;
+    this.setColourMap = function(map) { 
+        colourMap = map;
         // TODO Better handle this...
         if( this.getImage().getPhotometricInterpretation() === &quot;MONOCHROME1&quot;) {
-            colorMap = dwv.image.lut.invPlain;
+            colourMap = dwv.image.lut.invPlain;
         }
-        this.fireEvent({&quot;type&quot;: &quot;colorchange&quot;, 
+        this.fireEvent({&quot;type&quot;: &quot;colourchange&quot;, 
            &quot;wc&quot;: this.getWindowLut().getCenter(),
            &quot;ww&quot;: this.getWindowLut().getWidth() });
     };
@@ -445,46 +446,6 @@ dwv.image.View.prototype.setWindowLevelMinMax = function()
     // set window level
     this.setWindowLevel(center,width);
 };
-/**
- * Go to first slice .
- * @method goFirstSlice
- * @return {Boolean} False if not in bounds.
- */
-dwv.image.View.prototype.goFirstSlice = function()
-{
-    return this.setCurrentPosition({
-        &quot;i&quot;: this.getCurrentPosition().i,
-        &quot;j&quot;: this.getCurrentPosition().j,
-        &quot;k&quot;:  0 
-    });
-};
-/**
- * Increment the current slice number.
- * @method incrementSliceNb
- * @return {Boolean} False if not in bounds.
- */
-dwv.image.View.prototype.incrementSliceNb = function()
-{
-    return this.setCurrentPosition({
-        &quot;i&quot;: this.getCurrentPosition().i,
-        &quot;j&quot;: this.getCurrentPosition().j,
-        &quot;k&quot;: this.getCurrentPosition().k + 1 
-    });
-};
-
-/**
- * Decrement the current slice number.
- * @method decrementSliceNb
- * @return {Boolean} False if not in bounds.
- */
-dwv.image.View.prototype.decrementSliceNb = function()
-{
-    return this.setCurrentPosition({
-        &quot;i&quot;: this.getCurrentPosition().i,
-        &quot;j&quot;: this.getCurrentPosition().j,
-        &quot;k&quot;: this.getCurrentPosition().k - 1 
-    });
-};
 
 /**
  * Generate display image data to be given to a canvas.
@@ -501,7 +462,7 @@ dwv.image.View.prototype.generateImageData = function( array )
     var planarConfig = image.getPlanarConfiguration();
     var windowLut = this.getWindowLut();
     windowLut.update();
-    var colorMap = this.getColorMap();
+    var colourMap = this.getColourMap();
     var index = 0;
     var sliceSize = image.getGeometry().getSize().getSliceSize();
     var sliceOffset = 0;
@@ -515,9 +476,9 @@ dwv.image.View.prototype.generateImageData = function( array )
         {        
             pxValue = parseInt( windowLut.getValue( 
                     image.getValueAtOffset(i) ), 10 );
-            array.data[index] = colorMap.red[pxValue];
-            array.data[index+1] = colorMap.green[pxValue];
-            array.data[index+2] = colorMap.blue[pxValue];
+            array.data[index] = colourMap.red[pxValue];
+            array.data[index+1] = colourMap.green[pxValue];
+            array.data[index+2] = colourMap.blue[pxValue];
             array.data[index+3] = 0xff;
             index += 4;
         }

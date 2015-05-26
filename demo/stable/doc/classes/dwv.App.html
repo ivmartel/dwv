@@ -17,7 +17,7 @@
                 <h1><img src="../assets/css/logo.png" title="dwv" width="117" height="52"></h1>
         </div>
         <div class="yui3-u-1-4 version">
-            <em>API Docs for: 0.9.0</em>
+            <em>API Docs for: 0.10.0</em>
         </div>
     </div>
     <div id="bd" class="yui3-g">
@@ -77,7 +77,7 @@
                                 <li><a href="../classes/dwv.image.View.html">dwv.image.View</a></li>
                                 <li><a href="../classes/dwv.image.ViewFactory.html">dwv.image.ViewFactory</a></li>
                                 <li><a href="../classes/dwv.info.html">dwv.info</a></li>
-                                <li><a href="../classes/dwv.info.MiniColorMap.html">dwv.info.MiniColorMap</a></li>
+                                <li><a href="../classes/dwv.info.MiniColourMap.html">dwv.info.MiniColourMap</a></li>
                                 <li><a href="../classes/dwv.info.Plot.html">dwv.info.Plot</a></li>
                                 <li><a href="../classes/dwv.info.Position.html">dwv.info.Position</a></li>
                                 <li><a href="../classes/dwv.info.WindowLevel.html">dwv.info.WindowLevel</a></li>
@@ -98,6 +98,7 @@
                                 <li><a href="../classes/dwv.math.Rectangle.html">dwv.math.Rectangle</a></li>
                                 <li><a href="../classes/dwv.math.ROI.html">dwv.math.ROI</a></li>
                                 <li><a href="../classes/dwv.math.Scissors.html">dwv.math.Scissors</a></li>
+                                <li><a href="../classes/dwv.State.html">dwv.State</a></li>
                                 <li><a href="../classes/dwv.tool.html">dwv.tool</a></li>
                                 <li><a href="../classes/dwv.tool.ChangeGroupCommand.html">dwv.tool.ChangeGroupCommand</a></li>
                                 <li><a href="../classes/dwv.tool.DeleteGroupCommand.html">dwv.tool.DeleteGroupCommand</a></li>
@@ -175,10 +176,10 @@
 
 
         <div class="foundat">
-            Defined in: <a href="../files/src_application.js.html#l6"><code>src&#x2F;application.js:6</code></a>
+            Defined in: <a href="../files/src_app_application.js.html#l6"><code>src&#x2F;app&#x2F;application.js:6</code></a>
         </div>
 
-            Module: <a href="../modules/utils.html">utils</a>
+            Module: <a href="../modules/tool.html">tool</a>
 
 </div>
 
@@ -205,7 +206,7 @@
             <div class="meta">
                         <p>
                         Defined in
-                <a href="../files/src_application.js.html#l6"><code>src&#x2F;application.js:6</code></a>
+                <a href="../files/src_app_application.js.html#l6"><code>src&#x2F;app&#x2F;application.js:6</code></a>
                 </p>
         
         
@@ -237,6 +238,10 @@
                     <h3>Methods</h3>
 
                     <ul class="index-list methods">
+                            <li class="index-item method">
+                                <a href="#method_addEventListener">addEventListener</a>
+
+                            </li>
                             <li class="index-item method private">
                                 <a href="#method_addImageInfoListeners">addImageInfoListeners</a>
 
@@ -251,6 +256,10 @@
                             </li>
                             <li class="index-item method private">
                                 <a href="#method_eventHandler">eventHandler</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_fireEvent">fireEvent</a>
 
                             </li>
                             <li class="index-item method">
@@ -294,7 +303,15 @@
 
                             </li>
                             <li class="index-item method">
-                                <a href="#method_getPresets">getPresets</a>
+                                <a href="#method_getScale">getScale</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_getScaleCenter">getScaleCenter</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_getStyle">getStyle</a>
 
                             </li>
                             <li class="index-item method">
@@ -306,15 +323,15 @@
 
                             </li>
                             <li class="index-item method">
+                                <a href="#method_getTranslation">getTranslation</a>
+
+                            </li>
+                            <li class="index-item method">
                                 <a href="#method_getUndoStack">getUndoStack</a>
 
                             </li>
                             <li class="index-item method">
                                 <a href="#method_getVersion">getVersion</a>
-
-                            </li>
-                            <li class="index-item method">
-                                <a href="#method_getView">getView</a>
 
                             </li>
                             <li class="index-item method">
@@ -331,6 +348,18 @@
                             </li>
                             <li class="index-item method">
                                 <a href="#method_loadFiles">loadFiles</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_loadFiles">loadFiles</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_loadStateFile">loadStateFile</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_loadStateUrl">loadStateUrl</a>
 
                             </li>
                             <li class="index-item method">
@@ -378,7 +407,7 @@
 
                             </li>
                             <li class="index-item method">
-                                <a href="#method_onColorChange">onColorChange</a>
+                                <a href="#method_onColourChange">onColourChange</a>
 
                             </li>
                             <li class="index-item method">
@@ -422,6 +451,10 @@
 
                             </li>
                             <li class="index-item method">
+                                <a href="#method_onStateSave">onStateSave</a>
+
+                            </li>
+                            <li class="index-item method">
                                 <a href="#method_onToggleInfoLayer">onToggleInfoLayer</a>
 
                             </li>
@@ -439,6 +472,10 @@
                             </li>
                             <li class="index-item method private">
                                 <a href="#method_postLoadInit">postLoadInit</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_removeEventListener">removeEventListener</a>
 
                             </li>
                             <li class="index-item method private">
@@ -466,11 +503,11 @@
 
                             </li>
                             <li class="index-item method">
-                                <a href="#method_setCurrentPostion">setCurrentPostion</a>
+                                <a href="#method_setImage">setImage</a>
 
                             </li>
                             <li class="index-item method">
-                                <a href="#method_setImage">setImage</a>
+                                <a href="#method_stepZoom">stepZoom</a>
 
                             </li>
                             <li class="index-item method">
@@ -478,7 +515,23 @@
 
                             </li>
                             <li class="index-item method">
-                                <a href="#method_updatePresets">updatePresets</a>
+                                <a href="#method_translate">translate</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_translate">translate</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_translateLayers">translateLayers</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_zoom">zoom</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_zoomLayers">zoomLayers</a>
 
                             </li>
                     </ul>
@@ -491,6 +544,74 @@
             <div id="methods" class="api-class-tabpanel">
                 <h2 class="off-left">Methods</h2>
 
+<div id="method_addEventListener" class="method item">
+    <h3 class="name"><code>addEventListener</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>type</code>
+                </li>
+                <li class="arg">
+                        <code>listener</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/src_app_application.js.html#l443"><code>src&#x2F;app&#x2F;application.js:443</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Add an event listener on the app.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">type</code>
+                        <span class="type">String</span>
+
+
+                    <div class="param-description">
+                        <p>The event type.</p>
+
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name">listener</code>
+                        <span class="type">Object</span>
+
+
+                    <div class="param-description">
+                        <p>The method associated with the provided event type.</p>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+
+</div>
 <div id="method_addImageInfoListeners" class="method item private">
     <h3 class="name"><code>addImageInfoListeners</code></h3>
 
@@ -507,7 +628,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_application.js.html#l922"><code>src&#x2F;application.js:922</code></a>
+        <a href="../files/src_app_application.js.html#l1152"><code>src&#x2F;app&#x2F;application.js:1152</code></a>
         </p>
 
 
@@ -538,7 +659,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_application.js.html#l536"><code>src&#x2F;application.js:536</code></a>
+        <a href="../files/src_app_application.js.html#l685"><code>src&#x2F;app&#x2F;application.js:685</code></a>
         </p>
 
 
@@ -579,7 +700,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_application.js.html#l1099"><code>src&#x2F;application.js:1099</code></a>
+        <a href="../files/src_app_application.js.html#l1329"><code>src&#x2F;app&#x2F;application.js:1329</code></a>
         </p>
 
 
@@ -645,7 +766,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_application.js.html#l952"><code>src&#x2F;application.js:952</code></a>
+        <a href="../files/src_app_application.js.html#l1182"><code>src&#x2F;app&#x2F;application.js:1182</code></a>
         </p>
 
 
@@ -679,6 +800,60 @@ position relative to the canvas element. It then passes it to the current tool.<
 
 
 </div>
+<div id="method_fireEvent" class="method item">
+    <h3 class="name"><code>fireEvent</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>event</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/src_app_application.js.html#l1071"><code>src&#x2F;app&#x2F;application.js:1071</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Fire an event: call all associated listeners.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">event</code>
+                        <span class="type">Object</span>
+
+
+                    <div class="param-description">
+                        <p>The event to fire.</p>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+
+</div>
 <div id="method_fitToSize" class="method item">
     <h3 class="name"><code>fitToSize</code></h3>
 
@@ -694,7 +869,7 @@ position relative to the canvas element. It then passes it to the current tool.<
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_application.js.html#l459"><code>src&#x2F;application.js:459</code></a>
+        <a href="../files/src_app_application.js.html#l607"><code>src&#x2F;app&#x2F;application.js:607</code></a>
         </p>
 
 
@@ -725,7 +900,7 @@ position relative to the canvas element. It then passes it to the current tool.<
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_application.js.html#l908"><code>src&#x2F;application.js:908</code></a>
+        <a href="../files/src_app_application.js.html#l1087"><code>src&#x2F;app&#x2F;application.js:1087</code></a>
         </p>
 
 
@@ -759,7 +934,7 @@ position relative to the canvas element. It then passes it to the current tool.<
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_application.js.html#l120"><code>src&#x2F;application.js:120</code></a>
+        <a href="../files/src_app_application.js.html#l130"><code>src&#x2F;app&#x2F;application.js:130</code></a>
         </p>
 
 
@@ -802,7 +977,7 @@ position relative to the canvas element. It then passes it to the current tool.<
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_application.js.html#l152"><code>src&#x2F;application.js:152</code></a>
+        <a href="../files/src_app_application.js.html#l171"><code>src&#x2F;app&#x2F;application.js:171</code></a>
         </p>
 
 
@@ -845,7 +1020,7 @@ position relative to the canvas element. It then passes it to the current tool.<
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_application.js.html#l160"><code>src&#x2F;application.js:160</code></a>
+        <a href="../files/src_app_application.js.html#l184"><code>src&#x2F;app&#x2F;application.js:184</code></a>
         </p>
 
 
@@ -888,7 +1063,7 @@ position relative to the canvas element. It then passes it to the current tool.<
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_application.js.html#l82"><code>src&#x2F;application.js:82</code></a>
+        <a href="../files/src_app_application.js.html#l92"><code>src&#x2F;app&#x2F;application.js:92</code></a>
         </p>
 
 
@@ -931,7 +1106,7 @@ position relative to the canvas element. It then passes it to the current tool.<
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_application.js.html#l107"><code>src&#x2F;application.js:107</code></a>
+        <a href="../files/src_app_application.js.html#l117"><code>src&#x2F;app&#x2F;application.js:117</code></a>
         </p>
 
 
@@ -974,7 +1149,7 @@ position relative to the canvas element. It then passes it to the current tool.<
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_application.js.html#l146"><code>src&#x2F;application.js:146</code></a>
+        <a href="../files/src_app_application.js.html#l165"><code>src&#x2F;app&#x2F;application.js:165</code></a>
         </p>
 
 
@@ -1017,7 +1192,7 @@ position relative to the canvas element. It then passes it to the current tool.<
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_application.js.html#l187"><code>src&#x2F;application.js:187</code></a>
+        <a href="../files/src_app_application.js.html#l218"><code>src&#x2F;app&#x2F;application.js:218</code></a>
         </p>
 
 
@@ -1060,7 +1235,7 @@ position relative to the canvas element. It then passes it to the current tool.<
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_application.js.html#l113"><code>src&#x2F;application.js:113</code></a>
+        <a href="../files/src_app_application.js.html#l123"><code>src&#x2F;app&#x2F;application.js:123</code></a>
         </p>
 
 
@@ -1085,8 +1260,51 @@ position relative to the canvas element. It then passes it to the current tool.<
 
 
 </div>
-<div id="method_getPresets" class="method item">
-    <h3 class="name"><code>getPresets</code></h3>
+<div id="method_getScale" class="method item">
+    <h3 class="name"><code>getScale</code></h3>
+
+        <span class="paren">()</span>
+
+        <span class="returns-inline">
+            <span class="type">Number</span>
+        </span>
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/src_app_application.js.html#l137"><code>src&#x2F;app&#x2F;application.js:137</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Get the main scale.</p>
+
+    </div>
+
+
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                        <span class="type">Number</span>:
+                    <p>The main scale.</p>
+
+            </div>
+        </div>
+
+
+</div>
+<div id="method_getScaleCenter" class="method item">
+    <h3 class="name"><code>getScaleCenter</code></h3>
 
         <span class="paren">()</span>
 
@@ -1103,7 +1321,7 @@ position relative to the canvas element. It then passes it to the current tool.<
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_application.js.html#l139"><code>src&#x2F;application.js:139</code></a>
+        <a href="../files/src_app_application.js.html#l144"><code>src&#x2F;app&#x2F;application.js:144</code></a>
         </p>
 
 
@@ -1111,7 +1329,7 @@ position relative to the canvas element. It then passes it to the current tool.<
     </div>
 
     <div class="description">
-        <p>Get the window/level presets.</p>
+        <p>Get the scale center.</p>
 
     </div>
 
@@ -1121,7 +1339,50 @@ position relative to the canvas element. It then passes it to the current tool.<
 
             <div class="returns-description">
                         <span class="type">Object</span>:
-                    <p>The presets.</p>
+                    <p>The coordinates of the scale center.</p>
+
+            </div>
+        </div>
+
+
+</div>
+<div id="method_getStyle" class="method item">
+    <h3 class="name"><code>getStyle</code></h3>
+
+        <span class="paren">()</span>
+
+        <span class="returns-inline">
+            <span class="type">Object</span>
+        </span>
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/src_app_application.js.html#l191"><code>src&#x2F;app&#x2F;application.js:191</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Get the app style.</p>
+
+    </div>
+
+
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                        <span class="type">Object</span>:
+                    <p>The app style.</p>
 
             </div>
         </div>
@@ -1146,7 +1407,7 @@ position relative to the canvas element. It then passes it to the current tool.<
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_application.js.html#l167"><code>src&#x2F;application.js:167</code></a>
+        <a href="../files/src_app_application.js.html#l198"><code>src&#x2F;app&#x2F;application.js:198</code></a>
         </p>
 
 
@@ -1189,7 +1450,7 @@ position relative to the canvas element. It then passes it to the current tool.<
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_application.js.html#l173"><code>src&#x2F;application.js:173</code></a>
+        <a href="../files/src_app_application.js.html#l204"><code>src&#x2F;app&#x2F;application.js:204</code></a>
         </p>
 
 
@@ -1214,6 +1475,49 @@ position relative to the canvas element. It then passes it to the current tool.<
 
 
 </div>
+<div id="method_getTranslation" class="method item">
+    <h3 class="name"><code>getTranslation</code></h3>
+
+        <span class="paren">()</span>
+
+        <span class="returns-inline">
+            <span class="type">Object</span>
+        </span>
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/src_app_application.js.html#l151"><code>src&#x2F;app&#x2F;application.js:151</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Get the translation.</p>
+
+    </div>
+
+
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                        <span class="type">Object</span>:
+                    <p>The translation.</p>
+
+            </div>
+        </div>
+
+
+</div>
 <div id="method_getUndoStack" class="method item">
     <h3 class="name"><code>getUndoStack</code></h3>
 
@@ -1232,7 +1536,7 @@ position relative to the canvas element. It then passes it to the current tool.<
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_application.js.html#l180"><code>src&#x2F;application.js:180</code></a>
+        <a href="../files/src_app_application.js.html#l211"><code>src&#x2F;app&#x2F;application.js:211</code></a>
         </p>
 
 
@@ -1275,7 +1579,7 @@ position relative to the canvas element. It then passes it to the current tool.<
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_application.js.html#l75"><code>src&#x2F;application.js:75</code></a>
+        <a href="../files/src_app_application.js.html#l85"><code>src&#x2F;app&#x2F;application.js:85</code></a>
         </p>
 
 
@@ -1300,49 +1604,6 @@ position relative to the canvas element. It then passes it to the current tool.<
 
 
 </div>
-<div id="method_getView" class="method item">
-    <h3 class="name"><code>getView</code></h3>
-
-        <span class="paren">()</span>
-
-        <span class="returns-inline">
-            <span class="type">Image</span>
-        </span>
-
-
-
-
-
-
-
-    <div class="meta">
-                <p>
-                Defined in
-        <a href="../files/src_application.js.html#l127"><code>src&#x2F;application.js:127</code></a>
-        </p>
-
-
-
-    </div>
-
-    <div class="description">
-        <p>Get the view.</p>
-
-    </div>
-
-
-        <div class="returns">
-            <h4>Returns:</h4>
-
-            <div class="returns-description">
-                        <span class="type">Image</span>:
-                    <p>The associated view.</p>
-
-            </div>
-        </div>
-
-
-</div>
 <div id="method_getViewController" class="method item">
     <h3 class="name"><code>getViewController</code></h3>
 
@@ -1361,7 +1622,7 @@ position relative to the canvas element. It then passes it to the current tool.<
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_application.js.html#l133"><code>src&#x2F;application.js:133</code></a>
+        <a href="../files/src_app_application.js.html#l158"><code>src&#x2F;app&#x2F;application.js:158</code></a>
         </p>
 
 
@@ -1408,7 +1669,7 @@ position relative to the canvas element. It then passes it to the current tool.<
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_application.js.html#l1078"><code>src&#x2F;application.js:1078</code></a>
+        <a href="../files/src_app_application.js.html#l1308"><code>src&#x2F;app&#x2F;application.js:1308</code></a>
         </p>
 
 
@@ -1456,7 +1717,7 @@ position relative to the canvas element. It then passes it to the current tool.<
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_application.js.html#l200"><code>src&#x2F;application.js:200</code></a>
+        <a href="../files/src_app_application.js.html#l231"><code>src&#x2F;app&#x2F;application.js:231</code></a>
         </p>
 
 
@@ -1493,7 +1754,7 @@ position relative to the canvas element. It then passes it to the current tool.<
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_application.js.html#l385"><code>src&#x2F;application.js:385</code></a>
+        <a href="../files/src_app_application.js.html#l493"><code>src&#x2F;app&#x2F;application.js:493</code></a>
         </p>
 
 
@@ -1526,6 +1787,168 @@ position relative to the canvas element. It then passes it to the current tool.<
 
 
 </div>
+<div id="method_loadFiles" class="method item">
+    <h3 class="name"><code>loadFiles</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>files</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/src_app_application.js.html#l476"><code>src&#x2F;app&#x2F;application.js:476</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Load a list of files.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">files</code>
+                        <span class="type">Array</span>
+
+
+                    <div class="param-description">
+                        <p>The list of files to load.</p>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+
+</div>
+<div id="method_loadStateFile" class="method item">
+    <h3 class="name"><code>loadStateFile</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>file</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/src_app_application.js.html#l531"><code>src&#x2F;app&#x2F;application.js:531</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Load a State file.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">file</code>
+                        <span class="type">Array</span>
+
+
+                    <div class="param-description">
+                        <p>An array with the state file to load.</p>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+
+</div>
+<div id="method_loadStateUrl" class="method item">
+    <h3 class="name"><code>loadStateUrl</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>file</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/src_app_application.js.html#l588"><code>src&#x2F;app&#x2F;application.js:588</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Load a State url.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">file</code>
+                        <span class="type">Array</span>
+
+
+                    <div class="param-description">
+                        <p>An array with the state url to load.</p>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+
+</div>
 <div id="method_loadURL" class="method item">
     <h3 class="name"><code>loadURL</code></h3>
 
@@ -1547,7 +1970,7 @@ position relative to the canvas element. It then passes it to the current tool.<
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_application.js.html#l422"><code>src&#x2F;application.js:422</code></a>
+        <a href="../files/src_app_application.js.html#l550"><code>src&#x2F;app&#x2F;application.js:550</code></a>
         </p>
 
 
@@ -1601,7 +2024,7 @@ position relative to the canvas element. It then passes it to the current tool.<
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_application.js.html#l773"><code>src&#x2F;application.js:773</code></a>
+        <a href="../files/src_app_application.js.html#l935"><code>src&#x2F;app&#x2F;application.js:935</code></a>
         </p>
 
 
@@ -1655,7 +2078,7 @@ position relative to the canvas element. It then passes it to the current tool.<
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_application.js.html#l752"><code>src&#x2F;application.js:752</code></a>
+        <a href="../files/src_app_application.js.html#l909"><code>src&#x2F;app&#x2F;application.js:909</code></a>
         </p>
 
 
@@ -1709,7 +2132,7 @@ position relative to the canvas element. It then passes it to the current tool.<
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_application.js.html#l821"><code>src&#x2F;application.js:821</code></a>
+        <a href="../files/src_app_application.js.html#l983"><code>src&#x2F;app&#x2F;application.js:983</code></a>
         </p>
 
 
@@ -1763,7 +2186,7 @@ position relative to the canvas element. It then passes it to the current tool.<
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_application.js.html#l841"><code>src&#x2F;application.js:841</code></a>
+        <a href="../files/src_app_application.js.html#l1003"><code>src&#x2F;app&#x2F;application.js:1003</code></a>
         </p>
 
 
@@ -1817,7 +2240,7 @@ position relative to the canvas element. It then passes it to the current tool.<
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_application.js.html#l722"><code>src&#x2F;application.js:722</code></a>
+        <a href="../files/src_app_application.js.html#l879"><code>src&#x2F;app&#x2F;application.js:879</code></a>
         </p>
 
 
@@ -1871,7 +2294,7 @@ position relative to the canvas element. It then passes it to the current tool.<
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_application.js.html#l851"><code>src&#x2F;application.js:851</code></a>
+        <a href="../files/src_app_application.js.html#l1013"><code>src&#x2F;app&#x2F;application.js:1013</code></a>
         </p>
 
 
@@ -1925,7 +2348,7 @@ position relative to the canvas element. It then passes it to the current tool.<
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_application.js.html#l811"><code>src&#x2F;application.js:811</code></a>
+        <a href="../files/src_app_application.js.html#l973"><code>src&#x2F;app&#x2F;application.js:973</code></a>
         </p>
 
 
@@ -1979,7 +2402,7 @@ position relative to the canvas element. It then passes it to the current tool.<
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_application.js.html#l801"><code>src&#x2F;application.js:801</code></a>
+        <a href="../files/src_app_application.js.html#l963"><code>src&#x2F;app&#x2F;application.js:963</code></a>
         </p>
 
 
@@ -2033,7 +2456,7 @@ position relative to the canvas element. It then passes it to the current tool.<
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_application.js.html#l732"><code>src&#x2F;application.js:732</code></a>
+        <a href="../files/src_app_application.js.html#l889"><code>src&#x2F;app&#x2F;application.js:889</code></a>
         </p>
 
 
@@ -2087,7 +2510,7 @@ position relative to the canvas element. It then passes it to the current tool.<
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_application.js.html#l783"><code>src&#x2F;application.js:783</code></a>
+        <a href="../files/src_app_application.js.html#l945"><code>src&#x2F;app&#x2F;application.js:945</code></a>
         </p>
 
 
@@ -2120,8 +2543,8 @@ position relative to the canvas element. It then passes it to the current tool.<
 
 
 </div>
-<div id="method_onColorChange" class="method item">
-    <h3 class="name"><code>onColorChange</code></h3>
+<div id="method_onColourChange" class="method item">
+    <h3 class="name"><code>onColourChange</code></h3>
 
         <div class="args">
             <span class="paren">(</span><ul class="args-list inline commas">
@@ -2141,7 +2564,7 @@ position relative to the canvas element. It then passes it to the current tool.<
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_application.js.html#l651"><code>src&#x2F;application.js:651</code></a>
+        <a href="../files/src_app_application.js.html#l808"><code>src&#x2F;app&#x2F;application.js:808</code></a>
         </p>
 
 
@@ -2149,7 +2572,7 @@ position relative to the canvas element. It then passes it to the current tool.<
     </div>
 
     <div class="description">
-        <p>Handle color map change.</p>
+        <p>Handle colour map change.</p>
 
     </div>
 
@@ -2163,7 +2586,7 @@ position relative to the canvas element. It then passes it to the current tool.<
 
 
                     <div class="param-description">
-                        <p>The event fired when changing the color map.</p>
+                        <p>The event fired when changing the colour map.</p>
 
                     </div>
 
@@ -2195,7 +2618,7 @@ position relative to the canvas element. It then passes it to the current tool.<
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_application.js.html#l891"><code>src&#x2F;application.js:891</code></a>
+        <a href="../files/src_app_application.js.html#l1053"><code>src&#x2F;app&#x2F;application.js:1053</code></a>
         </p>
 
 
@@ -2250,7 +2673,7 @@ position relative to the canvas element. It then passes it to the current tool.<
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_application.js.html#l1044"><code>src&#x2F;application.js:1044</code></a>
+        <a href="../files/src_app_application.js.html#l1274"><code>src&#x2F;app&#x2F;application.js:1274</code></a>
         </p>
 
 
@@ -2305,7 +2728,7 @@ position relative to the canvas element. It then passes it to the current tool.<
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_application.js.html#l1025"><code>src&#x2F;application.js:1025</code></a>
+        <a href="../files/src_app_application.js.html#l1255"><code>src&#x2F;app&#x2F;application.js:1255</code></a>
         </p>
 
 
@@ -2360,7 +2783,7 @@ position relative to the canvas element. It then passes it to the current tool.<
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_application.js.html#l1063"><code>src&#x2F;application.js:1063</code></a>
+        <a href="../files/src_app_application.js.html#l1293"><code>src&#x2F;app&#x2F;application.js:1293</code></a>
         </p>
 
 
@@ -2414,7 +2837,7 @@ position relative to the canvas element. It then passes it to the current tool.<
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_application.js.html#l742"><code>src&#x2F;application.js:742</code></a>
+        <a href="../files/src_app_application.js.html#l899"><code>src&#x2F;app&#x2F;application.js:899</code></a>
         </p>
 
 
@@ -2468,7 +2891,7 @@ position relative to the canvas element. It then passes it to the current tool.<
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_application.js.html#l681"><code>src&#x2F;application.js:681</code></a>
+        <a href="../files/src_app_application.js.html#l838"><code>src&#x2F;app&#x2F;application.js:838</code></a>
         </p>
 
 
@@ -2527,7 +2950,7 @@ Default behavior. Usually used in tools.</li>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_application.js.html#l871"><code>src&#x2F;application.js:871</code></a>
+        <a href="../files/src_app_application.js.html#l1033"><code>src&#x2F;app&#x2F;application.js:1033</code></a>
         </p>
 
 
@@ -2581,7 +3004,7 @@ Default behavior. Usually used in tools.</li>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_application.js.html#l701"><code>src&#x2F;application.js:701</code></a>
+        <a href="../files/src_app_application.js.html#l858"><code>src&#x2F;app&#x2F;application.js:858</code></a>
         </p>
 
 
@@ -2636,7 +3059,7 @@ Fit the display to the window. To be called once the image is loaded.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_application.js.html#l831"><code>src&#x2F;application.js:831</code></a>
+        <a href="../files/src_app_application.js.html#l993"><code>src&#x2F;app&#x2F;application.js:993</code></a>
         </p>
 
 
@@ -2690,7 +3113,7 @@ Fit the display to the window. To be called once the image is loaded.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_application.js.html#l661"><code>src&#x2F;application.js:661</code></a>
+        <a href="../files/src_app_application.js.html#l818"><code>src&#x2F;app&#x2F;application.js:818</code></a>
         </p>
 
 
@@ -2723,6 +3146,60 @@ Fit the display to the window. To be called once the image is loaded.</p>
 
 
 </div>
+<div id="method_onStateSave" class="method item">
+    <h3 class="name"><code>onStateSave</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>event</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/src_app_application.js.html#l922"><code>src&#x2F;app&#x2F;application.js:922</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Handle state save event.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">event</code>
+                        <span class="type">Object</span>
+
+
+                    <div class="param-description">
+                        <p>The event fired when changing the state save field.</p>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+
+</div>
 <div id="method_onToggleInfoLayer" class="method item">
     <h3 class="name"><code>onToggleInfoLayer</code></h3>
 
@@ -2744,7 +3221,7 @@ Fit the display to the window. To be called once the image is loaded.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_application.js.html#l881"><code>src&#x2F;application.js:881</code></a>
+        <a href="../files/src_app_application.js.html#l1043"><code>src&#x2F;app&#x2F;application.js:1043</code></a>
         </p>
 
 
@@ -2798,7 +3275,7 @@ Fit the display to the window. To be called once the image is loaded.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_application.js.html#l861"><code>src&#x2F;application.js:861</code></a>
+        <a href="../files/src_app_application.js.html#l1023"><code>src&#x2F;app&#x2F;application.js:1023</code></a>
         </p>
 
 
@@ -2852,7 +3329,7 @@ Fit the display to the window. To be called once the image is loaded.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_application.js.html#l641"><code>src&#x2F;application.js:641</code></a>
+        <a href="../files/src_app_application.js.html#l798"><code>src&#x2F;app&#x2F;application.js:798</code></a>
         </p>
 
 
@@ -2906,7 +3383,7 @@ Fit the display to the window. To be called once the image is loaded.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_application.js.html#l712"><code>src&#x2F;application.js:712</code></a>
+        <a href="../files/src_app_application.js.html#l869"><code>src&#x2F;app&#x2F;application.js:869</code></a>
         </p>
 
 
@@ -2961,7 +3438,7 @@ Fit the display to the window. To be called once the image is loaded.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_application.js.html#l1139"><code>src&#x2F;application.js:1139</code></a>
+        <a href="../files/src_app_application.js.html#l1369"><code>src&#x2F;app&#x2F;application.js:1369</code></a>
         </p>
 
 
@@ -2994,6 +3471,74 @@ Fit the display to the window. To be called once the image is loaded.</p>
 
 
 </div>
+<div id="method_removeEventListener" class="method item">
+    <h3 class="name"><code>removeEventListener</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>type</code>
+                </li>
+                <li class="arg">
+                        <code>listener</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/src_app_application.js.html#l457"><code>src&#x2F;app&#x2F;application.js:457</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Remove an event listener from the app.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">type</code>
+                        <span class="type">String</span>
+
+
+                    <div class="param-description">
+                        <p>The event type.</p>
+
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name">listener</code>
+                        <span class="type">Object</span>
+
+
+                    <div class="param-description">
+                        <p>The method associated with the provided event type.</p>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+
+</div>
 <div id="method_removeImageInfoListeners" class="method item private">
     <h3 class="name"><code>removeImageInfoListeners</code></h3>
 
@@ -3010,7 +3555,7 @@ Fit the display to the window. To be called once the image is loaded.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_application.js.html#l937"><code>src&#x2F;application.js:937</code></a>
+        <a href="../files/src_app_application.js.html#l1167"><code>src&#x2F;app&#x2F;application.js:1167</code></a>
         </p>
 
 
@@ -3041,7 +3586,7 @@ Fit the display to the window. To be called once the image is loaded.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_application.js.html#l558"><code>src&#x2F;application.js:558</code></a>
+        <a href="../files/src_app_application.js.html#l707"><code>src&#x2F;app&#x2F;application.js:707</code></a>
         </p>
 
 
@@ -3072,7 +3617,7 @@ Fit the display to the window. To be called once the image is loaded.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_application.js.html#l580"><code>src&#x2F;application.js:580</code></a>
+        <a href="../files/src_app_application.js.html#l729"><code>src&#x2F;app&#x2F;application.js:729</code></a>
         </p>
 
 
@@ -3103,7 +3648,7 @@ Fit the display to the window. To be called once the image is loaded.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_application.js.html#l344"><code>src&#x2F;application.js:344</code></a>
+        <a href="../files/src_app_application.js.html#l399"><code>src&#x2F;app&#x2F;application.js:399</code></a>
         </p>
 
 
@@ -3134,7 +3679,7 @@ Fit the display to the window. To be called once the image is loaded.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_application.js.html#l369"><code>src&#x2F;application.js:369</code></a>
+        <a href="../files/src_app_application.js.html#l424"><code>src&#x2F;app&#x2F;application.js:424</code></a>
         </p>
 
 
@@ -3165,7 +3710,7 @@ Fit the display to the window. To be called once the image is loaded.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_application.js.html#l98"><code>src&#x2F;application.js:98</code></a>
+        <a href="../files/src_app_application.js.html#l108"><code>src&#x2F;app&#x2F;application.js:108</code></a>
         </p>
 
 
@@ -3177,74 +3722,6 @@ Fit the display to the window. To be called once the image is loaded.</p>
 
     </div>
 
-
-
-
-</div>
-<div id="method_setCurrentPostion" class="method item">
-    <h3 class="name"><code>setCurrentPostion</code></h3>
-
-        <div class="args">
-            <span class="paren">(</span><ul class="args-list inline commas">
-                <li class="arg">
-                        <code>i</code>
-                </li>
-                <li class="arg">
-                        <code>j</code>
-                </li>
-            </ul><span class="paren">)</span>
-        </div>
-
-
-
-
-
-
-
-
-    <div class="meta">
-                <p>
-                Defined in
-        <a href="../files/src_application.js.html#l762"><code>src&#x2F;application.js:762</code></a>
-        </p>
-
-
-
-    </div>
-
-    <div class="description">
-        <p>Set the current position.</p>
-
-    </div>
-
-        <div class="params">
-            <h4>Parameters:</h4>
-
-            <ul class="params-list">
-                <li class="param">
-                        <code class="param-name">i</code>
-                        <span class="type">Number</span>
-
-
-                    <div class="param-description">
-                        <p>The column index.</p>
-
-                    </div>
-
-                </li>
-                <li class="param">
-                        <code class="param-name">j</code>
-                        <span class="type">Number</span>
-
-
-                    <div class="param-description">
-                        <p>The row index.</p>
-
-                    </div>
-
-                </li>
-            </ul>
-        </div>
 
 
 
@@ -3270,7 +3747,7 @@ Fit the display to the window. To be called once the image is loaded.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_application.js.html#l88"><code>src&#x2F;application.js:88</code></a>
+        <a href="../files/src_app_application.js.html#l98"><code>src&#x2F;app&#x2F;application.js:98</code></a>
         </p>
 
 
@@ -3303,6 +3780,88 @@ Fit the display to the window. To be called once the image is loaded.</p>
 
 
 </div>
+<div id="method_stepZoom" class="method item">
+    <h3 class="name"><code>stepZoom</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>step</code>
+                </li>
+                <li class="arg">
+                        <code>cx</code>
+                </li>
+                <li class="arg">
+                        <code>cy</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/src_app_application.js.html#l754"><code>src&#x2F;app&#x2F;application.js:754</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Add a step to the layers zoom.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">step</code>
+                        <span class="type">Number</span>
+
+
+                    <div class="param-description">
+                        <p>The zoom step increment. A good step is of 0.1.</p>
+
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name">cx</code>
+                        <span class="type">Number</span>
+
+
+                    <div class="param-description">
+                        <p>The zoom center X coordinate.</p>
+
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name">cy</code>
+                        <span class="type">Number</span>
+
+
+                    <div class="param-description">
+                        <p>The zoom center Y coordinate.</p>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+
+</div>
 <div id="method_toggleInfoLayerDisplay" class="method item">
     <h3 class="name"><code>toggleInfoLayerDisplay</code></h3>
 
@@ -3318,7 +3877,7 @@ Fit the display to the window. To be called once the image is loaded.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_application.js.html#l504"><code>src&#x2F;application.js:504</code></a>
+        <a href="../files/src_app_application.js.html#l652"><code>src&#x2F;app&#x2F;application.js:652</code></a>
         </p>
 
 
@@ -3334,13 +3893,16 @@ Fit the display to the window. To be called once the image is loaded.</p>
 
 
 </div>
-<div id="method_updatePresets" class="method item">
-    <h3 class="name"><code>updatePresets</code></h3>
+<div id="method_translate" class="method item">
+    <h3 class="name"><code>translate</code></h3>
 
         <div class="args">
             <span class="paren">(</span><ul class="args-list inline commas">
                 <li class="arg">
-                        <code>full</code>
+                        <code>tx</code>
+                </li>
+                <li class="arg">
+                        <code>ty</code>
                 </li>
             </ul><span class="paren">)</span>
         </div>
@@ -3355,7 +3917,7 @@ Fit the display to the window. To be called once the image is loaded.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_application.js.html#l589"><code>src&#x2F;application.js:589</code></a>
+        <a href="../files/src_app_application.js.html#l770"><code>src&#x2F;app&#x2F;application.js:770</code></a>
         </p>
 
 
@@ -3363,7 +3925,7 @@ Fit the display to the window. To be called once the image is loaded.</p>
     </div>
 
     <div class="description">
-        <p>Update the window/level presets.</p>
+        <p>Apply a translation to the layers.</p>
 
     </div>
 
@@ -3372,18 +3934,241 @@ Fit the display to the window. To be called once the image is loaded.</p>
 
             <ul class="params-list">
                 <li class="param">
-                        <code class="param-name">full</code>
-                        <span class="type">Boolean</span>
+                        <code class="param-name">tx</code>
+                        <span class="type">Number</span>
 
 
                     <div class="param-description">
-                        <p>If true, shows all presets.</p>
+                        <p>The translation along X.</p>
+
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name">ty</code>
+                        <span class="type">Number</span>
+
+
+                    <div class="param-description">
+                        <p>The translation along Y.</p>
 
                     </div>
 
                 </li>
             </ul>
         </div>
+
+
+
+</div>
+<div id="method_translate" class="method item">
+    <h3 class="name"><code>translate</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>tx</code>
+                </li>
+                <li class="arg">
+                        <code>ty</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/src_app_application.js.html#l782"><code>src&#x2F;app&#x2F;application.js:782</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Apply a translation to the layers.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">tx</code>
+                        <span class="type">Number</span>
+
+
+                    <div class="param-description">
+                        <p>The step translation along X.</p>
+
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name">ty</code>
+                        <span class="type">Number</span>
+
+
+                    <div class="param-description">
+                        <p>The step translation along Y.</p>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+
+</div>
+<div id="method_translateLayers" class="method item">
+    <h3 class="name"><code>translateLayers</code></h3>
+
+        <span class="paren">()</span>
+
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/src_app_application.js.html#l1132"><code>src&#x2F;app&#x2F;application.js:1132</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Apply the stored translation to the layers.</p>
+
+    </div>
+
+
+
+
+</div>
+<div id="method_zoom" class="method item">
+    <h3 class="name"><code>zoom</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>zoom</code>
+                </li>
+                <li class="arg">
+                        <code>cx</code>
+                </li>
+                <li class="arg">
+                        <code>cy</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/src_app_application.js.html#l738"><code>src&#x2F;app&#x2F;application.js:738</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Zoom to the layers.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">zoom</code>
+                        <span class="type">Number</span>
+
+
+                    <div class="param-description">
+                        <p>The zoom to apply.</p>
+
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name">cx</code>
+                        <span class="type">Number</span>
+
+
+                    <div class="param-description">
+                        <p>The zoom center X coordinate.</p>
+
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name">cy</code>
+                        <span class="type">Number</span>
+
+
+                    <div class="param-description">
+                        <p>The zoom center Y coordinate.</p>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+
+</div>
+<div id="method_zoomLayers" class="method item">
+    <h3 class="name"><code>zoomLayers</code></h3>
+
+        <span class="paren">()</span>
+
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/src_app_application.js.html#l1101"><code>src&#x2F;app&#x2F;application.js:1101</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Apply the stored zoom to the layers.</p>
+
+    </div>
+
 
 
 

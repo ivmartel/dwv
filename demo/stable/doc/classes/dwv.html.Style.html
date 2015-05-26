@@ -17,7 +17,7 @@
                 <h1><img src="../assets/css/logo.png" title="dwv" width="117" height="52"></h1>
         </div>
         <div class="yui3-u-1-4 version">
-            <em>API Docs for: 0.9.0</em>
+            <em>API Docs for: 0.10.0</em>
         </div>
     </div>
     <div id="bd" class="yui3-g">
@@ -77,7 +77,7 @@
                                 <li><a href="../classes/dwv.image.View.html">dwv.image.View</a></li>
                                 <li><a href="../classes/dwv.image.ViewFactory.html">dwv.image.ViewFactory</a></li>
                                 <li><a href="../classes/dwv.info.html">dwv.info</a></li>
-                                <li><a href="../classes/dwv.info.MiniColorMap.html">dwv.info.MiniColorMap</a></li>
+                                <li><a href="../classes/dwv.info.MiniColourMap.html">dwv.info.MiniColourMap</a></li>
                                 <li><a href="../classes/dwv.info.Plot.html">dwv.info.Plot</a></li>
                                 <li><a href="../classes/dwv.info.Position.html">dwv.info.Position</a></li>
                                 <li><a href="../classes/dwv.info.WindowLevel.html">dwv.info.WindowLevel</a></li>
@@ -98,6 +98,7 @@
                                 <li><a href="../classes/dwv.math.Rectangle.html">dwv.math.Rectangle</a></li>
                                 <li><a href="../classes/dwv.math.ROI.html">dwv.math.ROI</a></li>
                                 <li><a href="../classes/dwv.math.Scissors.html">dwv.math.Scissors</a></li>
+                                <li><a href="../classes/dwv.State.html">dwv.State</a></li>
                                 <li><a href="../classes/dwv.tool.html">dwv.tool</a></li>
                                 <li><a href="../classes/dwv.tool.ChangeGroupCommand.html">dwv.tool.ChangeGroupCommand</a></li>
                                 <li><a href="../classes/dwv.tool.DeleteGroupCommand.html">dwv.tool.DeleteGroupCommand</a></li>
@@ -239,6 +240,10 @@
 
                     <ul class="index-list methods">
                             <li class="index-item method">
+                                <a href="#method_getFontFamily">getFontFamily</a>
+
+                            </li>
+                            <li class="index-item method">
                                 <a href="#method_getFontSize">getFontSize</a>
 
                             </li>
@@ -247,7 +252,7 @@
 
                             </li>
                             <li class="index-item method">
-                                <a href="#method_getLineColor">getLineColor</a>
+                                <a href="#method_getLineColour">getLineColour</a>
 
                             </li>
                             <li class="index-item method">
@@ -255,11 +260,31 @@
 
                             </li>
                             <li class="index-item method">
-                                <a href="#method_getTextColor">getTextColor</a>
+                                <a href="#method_getScaledFontSize">getScaledFontSize</a>
 
                             </li>
                             <li class="index-item method">
-                                <a href="#method_setLineColor">setLineColor</a>
+                                <a href="#method_getScaledStrokeWidth">getScaledStrokeWidth</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_getStrokeWidth">getStrokeWidth</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_getTextColour">getTextColour</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_scale">scale</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_setLineColour">setLineColour</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_setScale">setScale</a>
 
                             </li>
                     </ul>
@@ -270,23 +295,27 @@
 
                     <ul class="index-list properties">
                             <li class="index-item property private">
+                                <a href="#property_fontFamily">fontFamily</a>
+
+                            </li>
+                            <li class="index-item property private">
                                 <a href="#property_fontSize">fontSize</a>
 
                             </li>
                             <li class="index-item property private">
-                                <a href="#property_fontStr">fontStr</a>
+                                <a href="#property_lineColour">lineColour</a>
 
                             </li>
                             <li class="index-item property private">
-                                <a href="#property_lineColor">lineColor</a>
+                                <a href="#property_scale">scale</a>
 
                             </li>
                             <li class="index-item property private">
-                                <a href="#property_lineHeight">lineHeight</a>
+                                <a href="#property_strokeWidth">strokeWidth</a>
 
                             </li>
                             <li class="index-item property private">
-                                <a href="#property_textColor">textColor</a>
+                                <a href="#property_textColour">textColour</a>
 
                             </li>
                     </ul>
@@ -298,6 +327,49 @@
             <div id="methods" class="api-class-tabpanel">
                 <h2 class="off-left">Methods</h2>
 
+<div id="method_getFontFamily" class="method item">
+    <h3 class="name"><code>getFontFamily</code></h3>
+
+        <span class="paren">()</span>
+
+        <span class="returns-inline">
+            <span class="type">String</span>
+        </span>
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/src_gui_style.js.html#l59"><code>src&#x2F;gui&#x2F;style.js:59</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Get the font family.</p>
+
+    </div>
+
+
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                        <span class="type">String</span>:
+                    <p>The font family.</p>
+
+            </div>
+        </div>
+
+
+</div>
 <div id="method_getFontSize" class="method item">
     <h3 class="name"><code>getFontSize</code></h3>
 
@@ -316,7 +388,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_gui_style.js.html#l52"><code>src&#x2F;gui&#x2F;style.js:52</code></a>
+        <a href="../files/src_gui_style.js.html#l66"><code>src&#x2F;gui&#x2F;style.js:66</code></a>
         </p>
 
 
@@ -359,7 +431,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_gui_style.js.html#l59"><code>src&#x2F;gui&#x2F;style.js:59</code></a>
+        <a href="../files/src_gui_style.js.html#l116"><code>src&#x2F;gui&#x2F;style.js:116</code></a>
         </p>
 
 
@@ -384,8 +456,8 @@
 
 
 </div>
-<div id="method_getLineColor" class="method item">
-    <h3 class="name"><code>getLineColor</code></h3>
+<div id="method_getLineColour" class="method item">
+    <h3 class="name"><code>getLineColour</code></h3>
 
         <span class="paren">()</span>
 
@@ -402,7 +474,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_gui_style.js.html#l80"><code>src&#x2F;gui&#x2F;style.js:80</code></a>
+        <a href="../files/src_gui_style.js.html#l87"><code>src&#x2F;gui&#x2F;style.js:87</code></a>
         </p>
 
 
@@ -410,7 +482,7 @@
     </div>
 
     <div class="description">
-        <p>Get the line color.</p>
+        <p>Get the line colour.</p>
 
     </div>
 
@@ -420,7 +492,7 @@
 
             <div class="returns-description">
                         <span class="type">String</span>:
-                    <p>The line color.</p>
+                    <p>The line colour.</p>
 
             </div>
         </div>
@@ -445,7 +517,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_gui_style.js.html#l66"><code>src&#x2F;gui&#x2F;style.js:66</code></a>
+        <a href="../files/src_gui_style.js.html#l126"><code>src&#x2F;gui&#x2F;style.js:126</code></a>
         </p>
 
 
@@ -470,13 +542,99 @@
 
 
 </div>
-<div id="method_getTextColor" class="method item">
-    <h3 class="name"><code>getTextColor</code></h3>
+<div id="method_getScaledFontSize" class="method item">
+    <h3 class="name"><code>getScaledFontSize</code></h3>
 
         <span class="paren">()</span>
 
         <span class="returns-inline">
-            <span class="type">String</span>
+            <span class="type">Number</span>
+        </span>
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/src_gui_style.js.html#l136"><code>src&#x2F;gui&#x2F;style.js:136</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Get the font size scaled to the display.</p>
+
+    </div>
+
+
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                        <span class="type">Number</span>:
+                    <p>The scaled font size.</p>
+
+            </div>
+        </div>
+
+
+</div>
+<div id="method_getScaledStrokeWidth" class="method item">
+    <h3 class="name"><code>getScaledStrokeWidth</code></h3>
+
+        <span class="paren">()</span>
+
+        <span class="returns-inline">
+            <span class="type">Number</span>
+        </span>
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/src_gui_style.js.html#l146"><code>src&#x2F;gui&#x2F;style.js:146</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Get the stroke width scaled to the display.</p>
+
+    </div>
+
+
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                        <span class="type">Number</span>:
+                    <p>The scaled stroke width.</p>
+
+            </div>
+        </div>
+
+
+</div>
+<div id="method_getStrokeWidth" class="method item">
+    <h3 class="name"><code>getStrokeWidth</code></h3>
+
+        <span class="paren">()</span>
+
+        <span class="returns-inline">
+            <span class="type">Number</span>
         </span>
 
 
@@ -496,7 +654,50 @@
     </div>
 
     <div class="description">
-        <p>Get the text color.</p>
+        <p>Get the stroke width.</p>
+
+    </div>
+
+
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                        <span class="type">Number</span>:
+                    <p>The stroke width.</p>
+
+            </div>
+        </div>
+
+
+</div>
+<div id="method_getTextColour" class="method item">
+    <h3 class="name"><code>getTextColour</code></h3>
+
+        <span class="paren">()</span>
+
+        <span class="returns-inline">
+            <span class="type">String</span>
+        </span>
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/src_gui_style.js.html#l80"><code>src&#x2F;gui&#x2F;style.js:80</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Get the text colour.</p>
 
     </div>
 
@@ -506,20 +707,20 @@
 
             <div class="returns-description">
                         <span class="type">String</span>:
-                    <p>The text color.</p>
+                    <p>The text colour.</p>
 
             </div>
         </div>
 
 
 </div>
-<div id="method_setLineColor" class="method item">
-    <h3 class="name"><code>setLineColor</code></h3>
+<div id="method_scale" class="method item">
+    <h3 class="name"><code>scale</code></h3>
 
         <div class="args">
             <span class="paren">(</span><ul class="args-list inline commas">
                 <li class="arg">
-                        <code>color</code>
+                        <code>value</code>
                 </li>
             </ul><span class="paren">)</span>
         </div>
@@ -534,7 +735,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_gui_style.js.html#l87"><code>src&#x2F;gui&#x2F;style.js:87</code></a>
+        <a href="../files/src_gui_style.js.html#l108"><code>src&#x2F;gui&#x2F;style.js:108</code></a>
         </p>
 
 
@@ -542,7 +743,7 @@
     </div>
 
     <div class="description">
-        <p>Set the line color.</p>
+        <p>Scale an input value.</p>
 
     </div>
 
@@ -551,12 +752,120 @@
 
             <ul class="params-list">
                 <li class="param">
-                        <code class="param-name">color</code>
+                        <code class="param-name">value</code>
+                        <span class="type">Number</span>
+
+
+                    <div class="param-description">
+                        <p>The value to scale.</p>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+
+</div>
+<div id="method_setLineColour" class="method item">
+    <h3 class="name"><code>setLineColour</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>colour</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/src_gui_style.js.html#l94"><code>src&#x2F;gui&#x2F;style.js:94</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Set the line colour.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">colour</code>
                         <span class="type">String</span>
 
 
                     <div class="param-description">
-                        <p>The line color.</p>
+                        <p>The line colour.</p>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+
+</div>
+<div id="method_setScale" class="method item">
+    <h3 class="name"><code>setScale</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>scale</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/src_gui_style.js.html#l101"><code>src&#x2F;gui&#x2F;style.js:101</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Set the display scale.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">scale</code>
+                        <span class="type">String</span>
+
+
+                    <div class="param-description">
+                        <p>The display scale.</p>
 
                     </div>
 
@@ -572,6 +881,32 @@
             <div id="properties" class="api-class-tabpanel">
                 <h2 class="off-left">Properties</h2>
 
+                    <div id="property_fontFamily" class="property item private">
+                        <h3 class="name"><code>fontFamily</code></h3>
+                        <span class="type">String</span>
+                    
+                    
+                            <span class="flag private">private</span>
+                    
+                    
+                    
+                        <div class="meta">
+                                    <p>
+                                    Defined in
+                            <a href="../files/src_gui_style.js.html#l23"><code>src&#x2F;gui&#x2F;style.js:23</code></a>
+                            </p>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                            <p>Font family.</p>
+                    
+                        </div>
+                    
+                    
+                    
+                    </div>
                     <div id="property_fontSize" class="property item private">
                         <h3 class="name"><code>fontSize</code></h3>
                         <span class="type">Number</span>
@@ -598,86 +933,8 @@
                     
                     
                     </div>
-                    <div id="property_fontStr" class="property item private">
-                        <h3 class="name"><code>fontStr</code></h3>
-                        <span class="type">String</span>
-                    
-                    
-                            <span class="flag private">private</span>
-                    
-                    
-                    
-                        <div class="meta">
-                                    <p>
-                                    Defined in
-                            <a href="../files/src_gui_style.js.html#l23"><code>src&#x2F;gui&#x2F;style.js:23</code></a>
-                            </p>
-                    
-                    
-                        </div>
-                    
-                        <div class="description">
-                            <p>Font definition string.</p>
-                    
-                        </div>
-                    
-                    
-                    
-                    </div>
-                    <div id="property_lineColor" class="property item private">
-                        <h3 class="name"><code>lineColor</code></h3>
-                        <span class="type">String</span>
-                    
-                    
-                            <span class="flag private">private</span>
-                    
-                    
-                    
-                        <div class="meta">
-                                    <p>
-                                    Defined in
-                            <a href="../files/src_gui_style.js.html#l44"><code>src&#x2F;gui&#x2F;style.js:44</code></a>
-                            </p>
-                    
-                    
-                        </div>
-                    
-                        <div class="description">
-                            <p>Line color.</p>
-                    
-                        </div>
-                    
-                    
-                    
-                    </div>
-                    <div id="property_lineHeight" class="property item private">
-                        <h3 class="name"><code>lineHeight</code></h3>
-                        <span class="type">Number</span>
-                    
-                    
-                            <span class="flag private">private</span>
-                    
-                    
-                    
-                        <div class="meta">
-                                    <p>
-                                    Defined in
-                            <a href="../files/src_gui_style.js.html#l30"><code>src&#x2F;gui&#x2F;style.js:30</code></a>
-                            </p>
-                    
-                    
-                        </div>
-                    
-                        <div class="description">
-                            <p>Line height.</p>
-                    
-                        </div>
-                    
-                    
-                    
-                    </div>
-                    <div id="property_textColor" class="property item private">
-                        <h3 class="name"><code>textColor</code></h3>
+                    <div id="property_lineColour" class="property item private">
+                        <h3 class="name"><code>lineColour</code></h3>
                         <span class="type">String</span>
                     
                     
@@ -695,7 +952,85 @@
                         </div>
                     
                         <div class="description">
-                            <p>Text color.</p>
+                            <p>Line colour.</p>
+                    
+                        </div>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_scale" class="property item private">
+                        <h3 class="name"><code>scale</code></h3>
+                        <span class="type">Number</span>
+                    
+                    
+                            <span class="flag private">private</span>
+                    
+                    
+                    
+                        <div class="meta">
+                                    <p>
+                                    Defined in
+                            <a href="../files/src_gui_style.js.html#l44"><code>src&#x2F;gui&#x2F;style.js:44</code></a>
+                            </p>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                            <p>Display scale.</p>
+                    
+                        </div>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_strokeWidth" class="property item private">
+                        <h3 class="name"><code>strokeWidth</code></h3>
+                        <span class="type">Number</span>
+                    
+                    
+                            <span class="flag private">private</span>
+                    
+                    
+                    
+                        <div class="meta">
+                                    <p>
+                                    Defined in
+                            <a href="../files/src_gui_style.js.html#l51"><code>src&#x2F;gui&#x2F;style.js:51</code></a>
+                            </p>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                            <p>Stroke width.</p>
+                    
+                        </div>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_textColour" class="property item private">
+                        <h3 class="name"><code>textColour</code></h3>
+                        <span class="type">String</span>
+                    
+                    
+                            <span class="flag private">private</span>
+                    
+                    
+                    
+                        <div class="meta">
+                                    <p>
+                                    Defined in
+                            <a href="../files/src_gui_style.js.html#l30"><code>src&#x2F;gui&#x2F;style.js:30</code></a>
+                            </p>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                            <p>Text colour.</p>
                     
                         </div>
                     

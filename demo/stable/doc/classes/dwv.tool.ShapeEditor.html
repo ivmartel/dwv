@@ -17,7 +17,7 @@
                 <h1><img src="../assets/css/logo.png" title="dwv" width="117" height="52"></h1>
         </div>
         <div class="yui3-u-1-4 version">
-            <em>API Docs for: 0.9.0</em>
+            <em>API Docs for: 0.10.0</em>
         </div>
     </div>
     <div id="bd" class="yui3-g">
@@ -77,7 +77,7 @@
                                 <li><a href="../classes/dwv.image.View.html">dwv.image.View</a></li>
                                 <li><a href="../classes/dwv.image.ViewFactory.html">dwv.image.ViewFactory</a></li>
                                 <li><a href="../classes/dwv.info.html">dwv.info</a></li>
-                                <li><a href="../classes/dwv.info.MiniColorMap.html">dwv.info.MiniColorMap</a></li>
+                                <li><a href="../classes/dwv.info.MiniColourMap.html">dwv.info.MiniColourMap</a></li>
                                 <li><a href="../classes/dwv.info.Plot.html">dwv.info.Plot</a></li>
                                 <li><a href="../classes/dwv.info.Position.html">dwv.info.Position</a></li>
                                 <li><a href="../classes/dwv.info.WindowLevel.html">dwv.info.WindowLevel</a></li>
@@ -98,6 +98,7 @@
                                 <li><a href="../classes/dwv.math.Rectangle.html">dwv.math.Rectangle</a></li>
                                 <li><a href="../classes/dwv.math.ROI.html">dwv.math.ROI</a></li>
                                 <li><a href="../classes/dwv.math.Scissors.html">dwv.math.Scissors</a></li>
+                                <li><a href="../classes/dwv.State.html">dwv.State</a></li>
                                 <li><a href="../classes/dwv.tool.html">dwv.tool</a></li>
                                 <li><a href="../classes/dwv.tool.ChangeGroupCommand.html">dwv.tool.ChangeGroupCommand</a></li>
                                 <li><a href="../classes/dwv.tool.DeleteGroupCommand.html">dwv.tool.DeleteGroupCommand</a></li>
@@ -279,6 +280,14 @@
 
                             </li>
                             <li class="index-item method">
+                                <a href="#method_setDrawEventCallback">setDrawEventCallback</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_setImage">setImage</a>
+
+                            </li>
+                            <li class="index-item method">
                                 <a href="#method_setShape">setShape</a>
 
                             </li>
@@ -289,6 +298,14 @@
                     <h3>Properties</h3>
 
                     <ul class="index-list properties">
+                            <li class="index-item property private">
+                                <a href="#property_drawEventCallback">drawEventCallback</a>
+
+                            </li>
+                            <li class="index-item property private">
+                                <a href="#property_image">image</a>
+
+                            </li>
                             <li class="index-item property private">
                                 <a href="#property_isActive">isActive</a>
 
@@ -340,7 +357,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_tools_editor.js.html#l237"><code>src&#x2F;tools&#x2F;editor.js:237</code></a>
+        <a href="../files/src_tools_editor.js.html#l265"><code>src&#x2F;tools&#x2F;editor.js:265</code></a>
         </p>
 
 
@@ -421,7 +438,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_tools_editor.js.html#l168"><code>src&#x2F;tools&#x2F;editor.js:168</code></a>
+        <a href="../files/src_tools_editor.js.html#l196"><code>src&#x2F;tools&#x2F;editor.js:196</code></a>
         </p>
 
 
@@ -452,7 +469,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_tools_editor.js.html#l89"><code>src&#x2F;tools&#x2F;editor.js:89</code></a>
+        <a href="../files/src_tools_editor.js.html#l117"><code>src&#x2F;tools&#x2F;editor.js:117</code></a>
         </p>
 
 
@@ -483,7 +500,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_tools_editor.js.html#l75"><code>src&#x2F;tools&#x2F;editor.js:75</code></a>
+        <a href="../files/src_tools_editor.js.html#l103"><code>src&#x2F;tools&#x2F;editor.js:103</code></a>
         </p>
 
 
@@ -517,7 +534,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_tools_editor.js.html#l57"><code>src&#x2F;tools&#x2F;editor.js:57</code></a>
+        <a href="../files/src_tools_editor.js.html#l76"><code>src&#x2F;tools&#x2F;editor.js:76</code></a>
         </p>
 
 
@@ -560,7 +577,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_tools_editor.js.html#l66"><code>src&#x2F;tools&#x2F;editor.js:66</code></a>
+        <a href="../files/src_tools_editor.js.html#l85"><code>src&#x2F;tools&#x2F;editor.js:85</code></a>
         </p>
 
 
@@ -600,7 +617,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_tools_editor.js.html#l158"><code>src&#x2F;tools&#x2F;editor.js:158</code></a>
+        <a href="../files/src_tools_editor.js.html#l186"><code>src&#x2F;tools&#x2F;editor.js:186</code></a>
         </p>
 
 
@@ -631,7 +648,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_tools_editor.js.html#l103"><code>src&#x2F;tools&#x2F;editor.js:103</code></a>
+        <a href="../files/src_tools_editor.js.html#l131"><code>src&#x2F;tools&#x2F;editor.js:131</code></a>
         </p>
 
 
@@ -668,7 +685,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_tools_editor.js.html#l138"><code>src&#x2F;tools&#x2F;editor.js:138</code></a>
+        <a href="../files/src_tools_editor.js.html#l166"><code>src&#x2F;tools&#x2F;editor.js:166</code></a>
         </p>
 
 
@@ -722,7 +739,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_tools_editor.js.html#l127"><code>src&#x2F;tools&#x2F;editor.js:127</code></a>
+        <a href="../files/src_tools_editor.js.html#l155"><code>src&#x2F;tools&#x2F;editor.js:155</code></a>
         </p>
 
 
@@ -755,6 +772,114 @@
 
 
 </div>
+<div id="method_setDrawEventCallback" class="method item">
+    <h3 class="name"><code>setDrawEventCallback</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>callback</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/src_tools_editor.js.html#l94"><code>src&#x2F;tools&#x2F;editor.js:94</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Set the draw event callback.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">callback</code>
+                        <span class="type">Object</span>
+
+
+                    <div class="param-description">
+                        <p>The callback.</p>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+
+</div>
+<div id="method_setImage" class="method item">
+    <h3 class="name"><code>setImage</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>img</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/src_tools_editor.js.html#l67"><code>src&#x2F;tools&#x2F;editor.js:67</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Set the associated image.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">img</code>
+                        <span class="type">Object</span>
+
+
+                    <div class="param-description">
+                        <p>The associated image.</p>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+
+</div>
 <div id="method_setShape" class="method item">
     <h3 class="name"><code>setShape</code></h3>
 
@@ -776,7 +901,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_tools_editor.js.html#l40"><code>src&#x2F;tools&#x2F;editor.js:40</code></a>
+        <a href="../files/src_tools_editor.js.html#l53"><code>src&#x2F;tools&#x2F;editor.js:53</code></a>
         </p>
 
 
@@ -814,6 +939,58 @@
             <div id="properties" class="api-class-tabpanel">
                 <h2 class="off-left">Properties</h2>
 
+                    <div id="property_drawEventCallback" class="property item private">
+                        <h3 class="name"><code>drawEventCallback</code></h3>
+                        <span class="type">Function</span>
+                    
+                    
+                            <span class="flag private">private</span>
+                    
+                    
+                    
+                        <div class="meta">
+                                    <p>
+                                    Defined in
+                            <a href="../files/src_tools_editor.js.html#l45"><code>src&#x2F;tools&#x2F;editor.js:45</code></a>
+                            </p>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                            <p>Draw event callback.</p>
+                    
+                        </div>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_image" class="property item private">
+                        <h3 class="name"><code>image</code></h3>
+                        <span class="type">Object</span>
+                    
+                    
+                            <span class="flag private">private</span>
+                    
+                    
+                    
+                        <div class="meta">
+                                    <p>
+                                    Defined in
+                            <a href="../files/src_tools_editor.js.html#l24"><code>src&#x2F;tools&#x2F;editor.js:24</code></a>
+                            </p>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                            <p>Edited image. Used for quantification update.</p>
+                    
+                        </div>
+                    
+                    
+                    
+                    </div>
                     <div id="property_isActive" class="property item private">
                         <h3 class="name"><code>isActive</code></h3>
                         <span class="type">Boolean</span>
@@ -826,7 +1003,7 @@
                         <div class="meta">
                                     <p>
                                     Defined in
-                            <a href="../files/src_tools_editor.js.html#l25"><code>src&#x2F;tools&#x2F;editor.js:25</code></a>
+                            <a href="../files/src_tools_editor.js.html#l31"><code>src&#x2F;tools&#x2F;editor.js:31</code></a>
                             </p>
                     
                     
@@ -868,7 +1045,7 @@
                     </div>
                     <div id="property_updateFunction" class="property item private">
                         <h3 class="name"><code>updateFunction</code></h3>
-                        <span class="type">Object</span>
+                        <span class="type">Function</span>
                     
                     
                             <span class="flag private">private</span>
@@ -878,7 +1055,7 @@
                         <div class="meta">
                                     <p>
                                     Defined in
-                            <a href="../files/src_tools_editor.js.html#l32"><code>src&#x2F;tools&#x2F;editor.js:32</code></a>
+                            <a href="../files/src_tools_editor.js.html#l38"><code>src&#x2F;tools&#x2F;editor.js:38</code></a>
                             </p>
                     
                     

@@ -17,7 +17,7 @@
                 <h1><img src="../assets/css/logo.png" title="dwv" width="117" height="52"></h1>
         </div>
         <div class="yui3-u-1-4 version">
-            <em>API Docs for: 0.9.0</em>
+            <em>API Docs for: 0.10.0</em>
         </div>
     </div>
     <div id="bd" class="yui3-g">
@@ -77,7 +77,7 @@
                                 <li><a href="../classes/dwv.image.View.html">dwv.image.View</a></li>
                                 <li><a href="../classes/dwv.image.ViewFactory.html">dwv.image.ViewFactory</a></li>
                                 <li><a href="../classes/dwv.info.html">dwv.info</a></li>
-                                <li><a href="../classes/dwv.info.MiniColorMap.html">dwv.info.MiniColorMap</a></li>
+                                <li><a href="../classes/dwv.info.MiniColourMap.html">dwv.info.MiniColourMap</a></li>
                                 <li><a href="../classes/dwv.info.Plot.html">dwv.info.Plot</a></li>
                                 <li><a href="../classes/dwv.info.Position.html">dwv.info.Position</a></li>
                                 <li><a href="../classes/dwv.info.WindowLevel.html">dwv.info.WindowLevel</a></li>
@@ -98,6 +98,7 @@
                                 <li><a href="../classes/dwv.math.Rectangle.html">dwv.math.Rectangle</a></li>
                                 <li><a href="../classes/dwv.math.ROI.html">dwv.math.ROI</a></li>
                                 <li><a href="../classes/dwv.math.Scissors.html">dwv.math.Scissors</a></li>
+                                <li><a href="../classes/dwv.State.html">dwv.State</a></li>
                                 <li><a href="../classes/dwv.tool.html">dwv.tool</a></li>
                                 <li><a href="../classes/dwv.tool.ChangeGroupCommand.html">dwv.tool.ChangeGroupCommand</a></li>
                                 <li><a href="../classes/dwv.tool.DeleteGroupCommand.html">dwv.tool.DeleteGroupCommand</a></li>
@@ -259,7 +260,8 @@ dwv.tool.ZoomAndPan = function(app)
         var tx = event._xs - self.x0;
         var ty = event._ys - self.y0;
         // apply translation
-        translateLayers(tx, ty);
+        //app.translate(tx, ty);
+        app.stepTranslate(tx, ty);
         // reset origin point
         self.x0 = event._xs;
         self.y0 = event._ys;
@@ -291,10 +293,10 @@ dwv.tool.ZoomAndPan = function(app)
             }
             // update GUI
             if( diffY &gt; 0 ) {
-                app.getView().incrementSliceNb();
+                app.getViewController().incrementSliceNb();
             }
             else {
-                app.getView().decrementSliceNb();
+                app.getViewController().decrementSliceNb();
             }
         }
         else
@@ -302,7 +304,7 @@ dwv.tool.ZoomAndPan = function(app)
             // zoom mode
             var zoom = (lineRatio - 1) / 2;
             if( Math.abs(zoom) % 0.1 &lt;= 0.05 ) {
-                zoomLayers(zoom, self.midPoint.getX(), self.midPoint.getY(),event._xs, event._ys);
+                app.stepZoom(zoom, event._xs, event._ys);
             }
         }
     };
@@ -376,7 +378,7 @@ dwv.tool.ZoomAndPan = function(app)
     this.DOMMouseScroll = function(event){
         // ev.detail on firefox is 3
         var step = - event.detail / 30;
-        zoomLayers(step, event._x, event._y, event._xs, event._ys);
+        app.stepZoom(step, event._xs, event._ys);
     };
 
     /**
@@ -387,7 +389,7 @@ dwv.tool.ZoomAndPan = function(app)
     this.mousewheel = function(event){
         // ev.wheelDelta on chrome is 120
         var step = event.wheelDelta / 1200;
-        zoomLayers(step, event._x, event._y, event._xs, event._ys);
+        app.stepZoom(step, event._xs, event._ys);
     };
     
     /**
@@ -419,65 +421,6 @@ dwv.tool.ZoomAndPan = function(app)
             gui.display(bool);
         }
     };
-
-    /**
-     * Apply the zoom to the layers.
-     * @method zoomLayers
-     * @param {Number} step The zoom step increment. A good step is of 0.1.
-     * @param {Number} cx The zoom center X coordinate.
-     * @param {Number} cy The zoom center Y coordinate.
-     */ 
-    function zoomLayers(step, cx, cy, cx2, cy2)
-    {
-        if( app.getImageLayer() ) {
-            var oldZoom = app.getImageLayer().getZoom();
-            var newZoom = {&#x27;x&#x27;: (oldZoom.x + step), &#x27;y&#x27;: (oldZoom.y + step)};
-            app.getImageLayer().zoom(newZoom.x, newZoom.y, cx2, cy2);
-            app.getImageLayer().draw();
-        }
-        if( app.getDrawStage() ) { 
-            
-            var stage = app.getDrawStage();
-            var oldKZoom = stage.scale();
-            var newKZoom = {&#x27;x&#x27;: (oldKZoom.x + step), &#x27;y&#x27;: (oldKZoom.y + step)};
-            
-            var oldOffset = stage.offset();
-            var newOffsetX = (cx2 / oldKZoom.x) + oldOffset.x - (cx2 / newKZoom.x);
-            var newOffsetY = (cy2 / oldKZoom.y) + oldOffset.y - (cy2 / newKZoom.y);
-            var newOffset = { &#x27;x&#x27;: newOffsetX, &#x27;y&#x27;: newOffsetY };
-            
-            stage.offset( newOffset );
-            stage.scale( newKZoom );
-            stage.draw();
-        }
-    }
-
-    /**
-     * Apply a translation to the layers.
-     * @method translateLayers
-     * @param {Number} tx The translation along X.
-     * @param {Number} ty The translation along Y.
-     */ 
-    function translateLayers(tx, ty)
-    {
-        if( app.getImageLayer() ) {
-            var layer = app.getImageLayer();
-            var zoom = layer.getZoom();
-            var txx = tx / zoom.x;
-            var tyy = ty / zoom.y;
-            layer.translate(txx, tyy);
-            layer.draw();
-        }
-        if( app.getDrawStage() ) { 
-            var stage = app.getDrawStage();
-            var offset = stage.offset();
-            var kzoom = stage.scale();
-            offset.x -= tx / kzoom.x;
-            offset.y -= ty / kzoom.y;
-            stage.offset( offset );
-            stage.draw();
-        }
-    }
 
 }; // ZoomAndPan class
 

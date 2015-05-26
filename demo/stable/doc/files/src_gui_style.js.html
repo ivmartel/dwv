@@ -17,7 +17,7 @@
                 <h1><img src="../assets/css/logo.png" title="dwv" width="117" height="52"></h1>
         </div>
         <div class="yui3-u-1-4 version">
-            <em>API Docs for: 0.9.0</em>
+            <em>API Docs for: 0.10.0</em>
         </div>
     </div>
     <div id="bd" class="yui3-g">
@@ -77,7 +77,7 @@
                                 <li><a href="../classes/dwv.image.View.html">dwv.image.View</a></li>
                                 <li><a href="../classes/dwv.image.ViewFactory.html">dwv.image.ViewFactory</a></li>
                                 <li><a href="../classes/dwv.info.html">dwv.info</a></li>
-                                <li><a href="../classes/dwv.info.MiniColorMap.html">dwv.info.MiniColorMap</a></li>
+                                <li><a href="../classes/dwv.info.MiniColourMap.html">dwv.info.MiniColourMap</a></li>
                                 <li><a href="../classes/dwv.info.Plot.html">dwv.info.Plot</a></li>
                                 <li><a href="../classes/dwv.info.Position.html">dwv.info.Position</a></li>
                                 <li><a href="../classes/dwv.info.WindowLevel.html">dwv.info.WindowLevel</a></li>
@@ -98,6 +98,7 @@
                                 <li><a href="../classes/dwv.math.Rectangle.html">dwv.math.Rectangle</a></li>
                                 <li><a href="../classes/dwv.math.ROI.html">dwv.math.ROI</a></li>
                                 <li><a href="../classes/dwv.math.Scissors.html">dwv.math.Scissors</a></li>
+                                <li><a href="../classes/dwv.State.html">dwv.State</a></li>
                                 <li><a href="../classes/dwv.tool.html">dwv.tool</a></li>
                                 <li><a href="../classes/dwv.tool.ChangeGroupCommand.html">dwv.tool.ChangeGroupCommand</a></li>
                                 <li><a href="../classes/dwv.tool.DeleteGroupCommand.html">dwv.tool.DeleteGroupCommand</a></li>
@@ -187,7 +188,7 @@ dwv.html = dwv.html || {};
  * @namespace dwv.html
  * @constructor
  */
-dwv.html.Style = function()
+dwv.html.Style = function ()
 {
     /**
      * Font size.
@@ -197,75 +198,136 @@ dwv.html.Style = function()
      */
     var fontSize = 12;
     /**
-     * Font definition string.
-     * @property fontStr
+     * Font family.
+     * @property fontFamily
      * @private
      * @type String
      */
-    var fontStr = &quot;normal &quot;+this.fontSize+&quot;px sans-serif&quot;;
+    var fontFamily = &quot;Verdana&quot;;
     /**
-     * Line height.
-     * @property lineHeight
+     * Text colour.
+     * @property textColour
+     * @private
+     * @type String
+     */
+    var textColour = &quot;#fff&quot;;
+    /**
+     * Line colour.
+     * @property lineColour
+     * @private
+     * @type String
+     */
+    var lineColour = &quot;&quot;;
+    /**
+     * Display scale.
+     * @property scale
      * @private
      * @type Number
      */
-    var lineHeight = this.fontSize + this.fontSize/5;
+    var displayScale = 1;
     /**
-     * Text color.
-     * @property textColor
+     * Stroke width.
+     * @property strokeWidth
      * @private
-     * @type String
+     * @type Number
      */
-    var textColor = &quot;#fff&quot;;
-    /**
-     * Line color.
-     * @property lineColor
-     * @private
-     * @type String
-     */
-    var lineColor = 0;
+    var strokeWidth = 2;
     
+    /**
+     * Get the font family.
+     * @method getFontFamily
+     * @return {String} The font family.
+     */
+    this.getFontFamily = function () { return fontFamily; };
+
     /**
      * Get the font size.
      * @method getFontSize
      * @return {Number} The font size.
      */
-    dwv.html.Style.prototype.getFontSize = function() { return fontSize; };
+    this.getFontSize = function () { return fontSize; };
+    
+    /**
+     * Get the stroke width.
+     * @method getStrokeWidth
+     * @return {Number} The stroke width.
+     */
+    this.getStrokeWidth = function () { return strokeWidth; };
 
     /**
-     * Get the font definition string.
-     * @method getFontStr
-     * @return {String} The font definition string.
+     * Get the text colour.
+     * @method getTextColour
+     * @return {String} The text colour.
      */
-    dwv.html.Style.prototype.getFontStr = function() { return fontStr; };
+    this.getTextColour = function () { return textColour; };
 
     /**
-     * Get the line height.
-     * @method getLineHeight
-     * @return {Number} The line height.
+     * Get the line colour.
+     * @method getLineColour
+     * @return {String} The line colour.
      */
-    dwv.html.Style.prototype.getLineHeight = function() { return lineHeight; };
+    this.getLineColour = function () { return lineColour; };
 
     /**
-     * Get the text color.
-     * @method getTextColor
-     * @return {String} The text color.
+     * Set the line colour.
+     * @method setLineColour
+     * @param {String} colour The line colour.
      */
-    dwv.html.Style.prototype.getTextColor = function() { return textColor; };
+    this.setLineColour = function (colour) { lineColour = colour; };
 
     /**
-     * Get the line color.
-     * @method getLineColor
-     * @return {String} The line color.
+     * Set the display scale.
+     * @method setScale
+     * @param {String} scale The display scale.
      */
-    dwv.html.Style.prototype.getLineColor = function() { return lineColor; };
-
+    this.setScale = function (scale) { displayScale = scale; };
+    
     /**
-     * Set the line color.
-     * @method setLineColor
-     * @param {String} color The line color.
+     * Scale an input value.
+     * @method scale
+     * @param {Number} value The value to scale.
      */
-    dwv.html.Style.prototype.setLineColor = function(color) { lineColor = color; };
+    this.scale = function (value) { return value / displayScale; };
+};
+
+/**
+ * Get the font definition string.
+ * @method getFontStr
+ * @return {String} The font definition string.
+ */
+dwv.html.Style.prototype.getFontStr = function ()
+{
+    return (&quot;normal &quot; + this.getFontSize() + &quot;px sans-serif&quot;); 
+};
+
+/**
+ * Get the line height.
+ * @method getLineHeight
+ * @return {Number} The line height.
+ */
+dwv.html.Style.prototype.getLineHeight = function ()
+{
+    return ( this.getFontSize() + this.getFontSize() / 5 ); 
+};
+
+/**
+ * Get the font size scaled to the display.
+ * @method getScaledFontSize
+ * @return {Number} The scaled font size.
+ */
+dwv.html.Style.prototype.getScaledFontSize = function () 
+{ 
+    return this.scale( this.getFontSize() );
+};
+
+/**
+ * Get the stroke width scaled to the display.
+ * @method getScaledStrokeWidth
+ * @return {Number} The scaled stroke width.
+ */
+dwv.html.Style.prototype.getScaledStrokeWidth = function () 
+{ 
+    return this.scale( this.getStrokeWidth() ); 
 };
 
     </pre>

@@ -17,7 +17,7 @@
                 <h1><img src="../assets/css/logo.png" title="dwv" width="117" height="52"></h1>
         </div>
         <div class="yui3-u-1-4 version">
-            <em>API Docs for: 0.9.0</em>
+            <em>API Docs for: 0.10.0</em>
         </div>
     </div>
     <div id="bd" class="yui3-g">
@@ -77,7 +77,7 @@
                                 <li><a href="../classes/dwv.image.View.html">dwv.image.View</a></li>
                                 <li><a href="../classes/dwv.image.ViewFactory.html">dwv.image.ViewFactory</a></li>
                                 <li><a href="../classes/dwv.info.html">dwv.info</a></li>
-                                <li><a href="../classes/dwv.info.MiniColorMap.html">dwv.info.MiniColorMap</a></li>
+                                <li><a href="../classes/dwv.info.MiniColourMap.html">dwv.info.MiniColourMap</a></li>
                                 <li><a href="../classes/dwv.info.Plot.html">dwv.info.Plot</a></li>
                                 <li><a href="../classes/dwv.info.Position.html">dwv.info.Position</a></li>
                                 <li><a href="../classes/dwv.info.WindowLevel.html">dwv.info.WindowLevel</a></li>
@@ -98,6 +98,7 @@
                                 <li><a href="../classes/dwv.math.Rectangle.html">dwv.math.Rectangle</a></li>
                                 <li><a href="../classes/dwv.math.ROI.html">dwv.math.ROI</a></li>
                                 <li><a href="../classes/dwv.math.Scissors.html">dwv.math.Scissors</a></li>
+                                <li><a href="../classes/dwv.State.html">dwv.State</a></li>
                                 <li><a href="../classes/dwv.tool.html">dwv.tool</a></li>
                                 <li><a href="../classes/dwv.tool.ChangeGroupCommand.html">dwv.tool.ChangeGroupCommand</a></li>
                                 <li><a href="../classes/dwv.tool.DeleteGroupCommand.html">dwv.tool.DeleteGroupCommand</a></li>
@@ -197,6 +198,12 @@ dwv.tool.ShapeEditor = function (app)
      * @type Object
      */
     var shape = null;
+    /**
+     * Edited image. Used for quantification update.
+     * @property image
+     * @private
+     * @type Object
+     */
     var image = null;
     /**
      * Active flag.
@@ -209,9 +216,16 @@ dwv.tool.ShapeEditor = function (app)
      * Update function used by anchors to update the shape.
      * @property updateFunction
      * @private
-     * @type Object
+     * @type Function
      */
     var updateFunction = null;
+    /**
+     * Draw event callback.
+     * @property drawEventCallback
+     * @private
+     * @type Function
+     */
+    var drawEventCallback = null;
     
     /**
      * Set the shape to edit.
@@ -227,9 +241,15 @@ dwv.tool.ShapeEditor = function (app)
         }
     };
     
+    /**
+     * Set the associated image.
+     * @method setImage
+     * @param {Object} img The associated image.
+     */
     this.setImage = function ( img ) {
         image = img;
     };
+    
     /**
      * Get the edited shape.
      * @method getShape
@@ -248,6 +268,15 @@ dwv.tool.ShapeEditor = function (app)
         return isActive;
     };
 
+    /**
+     * Set the draw event callback.
+     * @method setDrawEventCallback
+     * @param {Object} callback The callback.
+     */
+    this.setDrawEventCallback = function ( callback ) {
+        drawEventCallback = callback;
+    };
+    
     /**
      * Enable the editor. Redraws the layer.
      * @method enable
@@ -428,8 +457,8 @@ dwv.tool.ShapeEditor = function (app)
             fillBlue: 100,
             fillGreen: 100,
             fillAlpha: 0.7,
-            strokeWidth: 2,
-            radius: 6,
+            strokeWidth: app.getStyle().getScaledStrokeWidth(),
+            radius: app.getStyle().scale(6),
             name: &#x27;anchor&#x27;,
             id: id,
             dragOnTop: false,
@@ -518,6 +547,8 @@ dwv.tool.ShapeEditor = function (app)
             // store the change command
             var chgcmd = new dwv.tool.ChangeGroupCommand(
                     cmdName, updateFunction, startAnchor, endAnchor, this.getLayer(), image);
+            chgcmd.onExecute = drawEventCallback;
+            chgcmd.onUndo = drawEventCallback;
             chgcmd.execute();
             app.getUndoStack().add(chgcmd);
             // reset start anchor

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>dwv.info.MiniColorMap - dwv</title>
+    <title>src/app/state.js - dwv</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
     <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
@@ -17,7 +17,7 @@
                 <h1><img src="../assets/css/logo.png" title="dwv" width="117" height="52"></h1>
         </div>
         <div class="yui3-u-1-4 version">
-            <em>API Docs for: 0.9.0</em>
+            <em>API Docs for: 0.10.0</em>
         </div>
     </div>
     <div id="bd" class="yui3-g">
@@ -77,7 +77,7 @@
                                 <li><a href="../classes/dwv.image.View.html">dwv.image.View</a></li>
                                 <li><a href="../classes/dwv.image.ViewFactory.html">dwv.image.ViewFactory</a></li>
                                 <li><a href="../classes/dwv.info.html">dwv.info</a></li>
-                                <li><a href="../classes/dwv.info.MiniColorMap.html">dwv.info.MiniColorMap</a></li>
+                                <li><a href="../classes/dwv.info.MiniColourMap.html">dwv.info.MiniColourMap</a></li>
                                 <li><a href="../classes/dwv.info.Plot.html">dwv.info.Plot</a></li>
                                 <li><a href="../classes/dwv.info.Position.html">dwv.info.Position</a></li>
                                 <li><a href="../classes/dwv.info.WindowLevel.html">dwv.info.WindowLevel</a></li>
@@ -98,6 +98,7 @@
                                 <li><a href="../classes/dwv.math.Rectangle.html">dwv.math.Rectangle</a></li>
                                 <li><a href="../classes/dwv.math.ROI.html">dwv.math.ROI</a></li>
                                 <li><a href="../classes/dwv.math.Scissors.html">dwv.math.Scissors</a></li>
+                                <li><a href="../classes/dwv.State.html">dwv.State</a></li>
                                 <li><a href="../classes/dwv.tool.html">dwv.tool</a></li>
                                 <li><a href="../classes/dwv.tool.ChangeGroupCommand.html">dwv.tool.ChangeGroupCommand</a></li>
                                 <li><a href="../classes/dwv.tool.DeleteGroupCommand.html">dwv.tool.DeleteGroupCommand</a></li>
@@ -170,205 +171,94 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-<h1>dwv.info.MiniColorMap Class</h1>
-<div class="box meta">
-
-
-        <div class="foundat">
-            Defined in: <a href="../files/src_tools_info.js.html#l128"><code>src&#x2F;tools&#x2F;info.js:128</code></a>
-        </div>
-
-            Module: <a href="../modules/info.html">info</a>
-
-</div>
-
-
-<div class="box intro">
-    <p>MiniColorMap info layer.</p>
-
-</div>
-
-    <div class="constructor">
-        <h2>Constructor</h2>
-        <div id="method_dwv.info.MiniColorMap" class="method item">
-            <h3 class="name"><code>dwv.info.MiniColorMap</code></h3>
-        
-                <div class="args">
-                    <span class="paren">(</span><ul class="args-list inline commas">
-                        <li class="arg">
-                                <code>app</code>
-                        </li>
-                    </ul><span class="paren">)</span>
-                </div>
-        
-        
-        
-        
-        
-        
-        
-        
-            <div class="meta">
-                        <p>
-                        Defined in
-                <a href="../files/src_tools_info.js.html#l128"><code>src&#x2F;tools&#x2F;info.js:128</code></a>
-                </p>
-        
-        
-        
-            </div>
-        
-            <div class="description">
-                
-            </div>
-        
-                <div class="params">
-                    <h4>Parameters:</h4>
-        
-                    <ul class="params-list">
-                        <li class="param">
-                                <code class="param-name">app</code>
-                                <span class="type">Object</span>
-        
-        
-                            <div class="param-description">
-                                <p>The associated application.</p>
-        
-                            </div>
-        
-                        </li>
-                    </ul>
-                </div>
-        
-        
-        
-        </div>
-    </div>
-
-<div id="classdocs" class="tabview">
-    <ul class="api-class-tabs">
-        <li class="api-class-tab index"><a href="#index">Index</a></li>
-
-            <li class="api-class-tab methods"><a href="#methods">Methods</a></li>
-    </ul>
-
-    <div>
-        <div id="index" class="api-class-tabpanel index">
-            <h2 class="off-left">Item Index</h2>
-
-                <div class="index-section methods">
-                    <h3>Methods</h3>
-
-                    <ul class="index-list methods">
-                            <li class="index-item method">
-                                <a href="#method_createMiniColorMap">createMiniColorMap</a>
-
-                            </li>
-                            <li class="index-item method">
-                                <a href="#method_updateMiniColorMap">updateMiniColorMap</a>
-
-                            </li>
-                    </ul>
-                </div>
-
-
-
-        </div>
-
-            <div id="methods" class="api-class-tabpanel">
-                <h2 class="off-left">Methods</h2>
-
-<div id="method_createMiniColorMap" class="method item">
-    <h3 class="name"><code>createMiniColorMap</code></h3>
-
-        <span class="paren">()</span>
-
-
-
-
-
-
-
-
-    <div class="meta">
-                <p>
-                Defined in
-        <a href="../files/src_tools_info.js.html#l137"><code>src&#x2F;tools&#x2F;info.js:137</code></a>
-        </p>
-
-
-
-    </div>
-
-    <div class="description">
-        <p>Create the mini color map info div.</p>
-
-    </div>
-
-
-
-
-</div>
-<div id="method_updateMiniColorMap" class="method item">
-    <h3 class="name"><code>updateMiniColorMap</code></h3>
-
-        <div class="args">
-            <span class="paren">(</span><ul class="args-list inline commas">
-                <li class="arg">
-                        <code>event</code>
-                </li>
-            </ul><span class="paren">)</span>
-        </div>
-
-
-
-
-
-
-
-
-    <div class="meta">
-                <p>
-                Defined in
-        <a href="../files/src_tools_info.js.html#l156"><code>src&#x2F;tools&#x2F;info.js:156</code></a>
-        </p>
-
-
-
-    </div>
-
-    <div class="description">
-        <p>Update the mini color map info div.</p>
-
-    </div>
-
-        <div class="params">
-            <h4>Parameters:</h4>
-
-            <ul class="params-list">
-                <li class="param">
-                        <code class="param-name">event</code>
-                        <span class="type">Object</span>
-
-
-                    <div class="param-description">
-                        <p>The windowing change event containing the new values.
-Warning: expects the mini color map div to exist (use after createMiniColorMap).</p>
-
-                    </div>
-
-                </li>
-            </ul>
-        </div>
-
-
-
-</div>
-            </div>
-
-
-
-    </div>
+<h1 class="file-heading">File: src/app/state.js</h1>
+
+<div class="file">
+    <pre class="code prettyprint linenums">
+/** 
+ * Tool module.
+ * @module tool
+ */
+var dwv = dwv || {};
+
+var Kinetic = Kinetic || {};
+
+/**
+ * State class.
+ * Saves: data url/path, display info, undo stack.
+ * @class State
+ * @namespace dwv
+ * @constructor
+ * @param {Object} app The associated application.
+ */
+dwv.State = function (app)
+{
+    /**
+     * Save state.
+     * @method save
+     */
+    this.toJSON = function () {
+        // store each slice drawings group
+        var nSlices = app.getImage().getGeometry().getSize().getNumberOfSlices();
+        var drawings = [];
+        for ( var k = 0; k &lt; nSlices; ++k ) {
+            // getChildren always return, so drawings will have the good size
+            var groups = app.getDrawLayer(k).getChildren();
+            // remove anchors
+            for ( var i = 0; i &lt; groups.length; ++i ) {
+                var anchors  = groups[i].find(&quot;.anchor&quot;);
+                for ( var a = 0; a &lt; anchors.length; ++a ) {
+                    anchors[a].remove();
+                }
+            }
+            drawings.push(groups);
+        }
+        // return a JSON string
+        return JSON.stringify( {
+            &quot;window-center&quot;: app.getViewController().getWindowLevel().center, 
+            &quot;window-width&quot;: app.getViewController().getWindowLevel().width,
+            &quot;position&quot;: app.getViewController().getCurrentPosition(),
+            &quot;scale&quot;: app.getScale(),
+            &quot;scaleCenter&quot;: app.getScaleCenter(),
+            &quot;translation&quot;: app.getTranslation(),
+            &quot;drawings&quot;: drawings
+        } );
+    };
+    /**
+     * Load state.
+     * @method load
+     */
+    this.fromJSON = function (json, eventCallback) {
+        var data = JSON.parse(json);
+        // display
+        app.getViewController().setWindowLevel(data[&quot;window-center&quot;], data[&quot;window-width&quot;]);
+        app.getViewController().setCurrentPosition(data.position);
+        app.zoom(data.scale, data.scaleCenter.x, data.scaleCenter.y);
+        app.translate(data.translation.x, data.translation.y);
+        // drawings
+        var nSlices = app.getImage().getGeometry().getSize().getNumberOfSlices();
+        var isShape = function (node) {
+            return node.name() === &quot;shape&quot;;
+        };
+        for ( var k = 0 ; k &lt; nSlices; ++k ) {
+            for ( var i = 0 ; i &lt; data.drawings[k].length; ++i ) {
+                var group = Kinetic.Node.create(data.drawings[k][i]);
+                var shape = group.getChildren( isShape )[0];
+                var cmd = new dwv.tool.DrawGroupCommand(
+                    group, shape.className,
+                    app.getDrawLayer(k) );
+                if ( typeof eventCallback !== &quot;undefined&quot; ) {
+                    cmd.onExecute = eventCallback;
+                    cmd.onUndo = eventCallback;
+                }
+                cmd.execute();
+                app.getUndoStack().add(cmd);
+            }
+        }
+    };
+}; // State class
+
+    </pre>
 </div>
                     </div>
                 </div>

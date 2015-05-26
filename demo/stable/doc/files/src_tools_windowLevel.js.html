@@ -17,7 +17,7 @@
                 <h1><img src="../assets/css/logo.png" title="dwv" width="117" height="52"></h1>
         </div>
         <div class="yui3-u-1-4 version">
-            <em>API Docs for: 0.9.0</em>
+            <em>API Docs for: 0.10.0</em>
         </div>
     </div>
     <div id="bd" class="yui3-g">
@@ -77,7 +77,7 @@
                                 <li><a href="../classes/dwv.image.View.html">dwv.image.View</a></li>
                                 <li><a href="../classes/dwv.image.ViewFactory.html">dwv.image.ViewFactory</a></li>
                                 <li><a href="../classes/dwv.info.html">dwv.info</a></li>
-                                <li><a href="../classes/dwv.info.MiniColorMap.html">dwv.info.MiniColorMap</a></li>
+                                <li><a href="../classes/dwv.info.MiniColourMap.html">dwv.info.MiniColourMap</a></li>
                                 <li><a href="../classes/dwv.info.Plot.html">dwv.info.Plot</a></li>
                                 <li><a href="../classes/dwv.info.Position.html">dwv.info.Position</a></li>
                                 <li><a href="../classes/dwv.info.WindowLevel.html">dwv.info.WindowLevel</a></li>
@@ -98,6 +98,7 @@
                                 <li><a href="../classes/dwv.math.Rectangle.html">dwv.math.Rectangle</a></li>
                                 <li><a href="../classes/dwv.math.ROI.html">dwv.math.ROI</a></li>
                                 <li><a href="../classes/dwv.math.Scissors.html">dwv.math.Scissors</a></li>
+                                <li><a href="../classes/dwv.State.html">dwv.State</a></li>
                                 <li><a href="../classes/dwv.tool.html">dwv.tool</a></li>
                                 <li><a href="../classes/dwv.tool.ChangeGroupCommand.html">dwv.tool.ChangeGroupCommand</a></li>
                                 <li><a href="../classes/dwv.tool.DeleteGroupCommand.html">dwv.tool.DeleteGroupCommand</a></li>
@@ -187,26 +188,6 @@ var dwv = dwv || {};
  */
 dwv.tool = dwv.tool || {};
 
-// Default colour maps.
-dwv.tool.colourMaps = {
-    &quot;plain&quot;: dwv.image.lut.plain,
-    &quot;invplain&quot;: dwv.image.lut.invPlain,
-    &quot;rainbow&quot;: dwv.image.lut.rainbow,
-    &quot;hot&quot;: dwv.image.lut.hot,
-    &quot;test&quot;: dwv.image.lut.test
-};
-// Default window level presets.
-dwv.tool.defaultpresets = {};
-dwv.tool.defaultpresets.CT = {
-    &quot;mediastinum&quot;: {&quot;center&quot;: 40, &quot;width&quot;: 400},
-    &quot;lung&quot;: {&quot;center&quot;: -500, &quot;width&quot;: 1500},
-    &quot;bone&quot;: {&quot;center&quot;: 500, &quot;width&quot;: 2000},
-};
-dwv.tool.defaultpresets.CTextra = {
-    &quot;brain&quot;: {&quot;center&quot;: 40, &quot;width&quot;: 80},
-    &quot;head&quot;: {&quot;center&quot;: 90, &quot;width&quot;: 350}
-};
-
 /**
  * WindowLevel tool: handle window/level related events.
  * @class WindowLevel
@@ -248,7 +229,7 @@ dwv.tool.WindowLevel = function(app)
         self.x0 = event._x;
         self.y0 = event._y;
         // update GUI
-        app.setCurrentPostion(event._x, event._y);
+        app.getViewController().setCurrentPosition2D(event._x, event._y);
     };
     
     /**
@@ -265,8 +246,8 @@ dwv.tool.WindowLevel = function(app)
         var diffX = event._x - self.x0;
         var diffY = self.y0 - event._y;
         // calculate new window level
-        var windowCenter = parseInt(app.getView().getWindowLut().getCenter(), 10) + diffY;
-        var windowWidth = parseInt(app.getView().getWindowLut().getWidth(), 10) + diffX;
+        var windowCenter = parseInt(app.getViewController().getWindowLevel().center, 10) + diffY;
+        var windowWidth = parseInt(app.getViewController().getWindowLevel().width, 10) + diffX;
         // update GUI
         app.getViewController().setWindowLevel(windowCenter,windowWidth);
         // store position
@@ -284,9 +265,9 @@ dwv.tool.WindowLevel = function(app)
         if( self.started ) {
             self.started = false;
             // store the manual preset
-            var windowCenter = parseInt(app.getView().getWindowLut().getCenter(), 10);
-            var windowWidth = parseInt(app.getView().getWindowLut().getWidth(), 10);
-            app.getPresets().manual = {&quot;center&quot;: windowCenter, &quot;width&quot;: windowWidth};
+            var windowCenter = parseInt(app.getViewController().getWindowLevel().center, 10);
+            var windowWidth = parseInt(app.getViewController().getWindowLevel().width, 10);
+            app.getViewController().getPresets().manual = {&quot;center&quot;: windowCenter, &quot;width&quot;: windowWidth};
             // update gui
             if ( gui ) {
                 gui.initialise();
@@ -341,8 +322,9 @@ dwv.tool.WindowLevel = function(app)
     this.dblclick = function(event){
         // update GUI
         app.getViewController().setWindowLevel(
-            parseInt(app.getImage().getRescaledValue(event._x, event._y, app.getView().getCurrentPosition().k), 10),
-            parseInt(app.getView().getWindowLut().getWidth(), 10) );    
+            parseInt(app.getImage().getRescaledValue(
+                event._x, event._y, app.getViewController().getCurrentPosition().k), 10),
+            parseInt(app.getViewController().getWindowLevel().width, 10) );    
     };
     
     /**
@@ -388,7 +370,6 @@ dwv.tool.WindowLevel = function(app)
      * @method init
      */
     this.init = function() {
-        app.updatePresets(true);
         if ( gui ) {
             gui.initialise();
         }

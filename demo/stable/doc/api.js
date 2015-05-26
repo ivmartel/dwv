@@ -2,6 +2,7 @@ YUI.add("yuidoc-meta", function(Y) {
    Y.YUIDoc = { meta: {
     "classes": [
         "dwv.App",
+        "dwv.State",
         "dwv.ToolboxController",
         "dwv.ViewController",
         "dwv.browser",
@@ -42,7 +43,7 @@ YUI.add("yuidoc-meta", function(Y) {
         "dwv.image.lut.Rescale",
         "dwv.image.lut.Window",
         "dwv.info",
-        "dwv.info.MiniColorMap",
+        "dwv.info.MiniColourMap",
         "dwv.info.Plot",
         "dwv.info.Position",
         "dwv.info.WindowLevel",

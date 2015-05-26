@@ -17,7 +17,7 @@
                 <h1><img src="../assets/css/logo.png" title="dwv" width="117" height="52"></h1>
         </div>
         <div class="yui3-u-1-4 version">
-            <em>API Docs for: 0.9.0</em>
+            <em>API Docs for: 0.10.0</em>
         </div>
     </div>
     <div id="bd" class="yui3-g">
@@ -77,7 +77,7 @@
                                 <li><a href="../classes/dwv.image.View.html">dwv.image.View</a></li>
                                 <li><a href="../classes/dwv.image.ViewFactory.html">dwv.image.ViewFactory</a></li>
                                 <li><a href="../classes/dwv.info.html">dwv.info</a></li>
-                                <li><a href="../classes/dwv.info.MiniColorMap.html">dwv.info.MiniColorMap</a></li>
+                                <li><a href="../classes/dwv.info.MiniColourMap.html">dwv.info.MiniColourMap</a></li>
                                 <li><a href="../classes/dwv.info.Plot.html">dwv.info.Plot</a></li>
                                 <li><a href="../classes/dwv.info.Position.html">dwv.info.Position</a></li>
                                 <li><a href="../classes/dwv.info.WindowLevel.html">dwv.info.WindowLevel</a></li>
@@ -98,6 +98,7 @@
                                 <li><a href="../classes/dwv.math.Rectangle.html">dwv.math.Rectangle</a></li>
                                 <li><a href="../classes/dwv.math.ROI.html">dwv.math.ROI</a></li>
                                 <li><a href="../classes/dwv.math.Scissors.html">dwv.math.Scissors</a></li>
+                                <li><a href="../classes/dwv.State.html">dwv.State</a></li>
                                 <li><a href="../classes/dwv.tool.html">dwv.tool</a></li>
                                 <li><a href="../classes/dwv.tool.ChangeGroupCommand.html">dwv.tool.ChangeGroupCommand</a></li>
                                 <li><a href="../classes/dwv.tool.DeleteGroupCommand.html">dwv.tool.DeleteGroupCommand</a></li>
@@ -175,7 +176,7 @@
 
 
         <div class="foundat">
-            Defined in: <a href="../files/src_tools_draw.js.html#l45"><code>src&#x2F;tools&#x2F;draw.js:45</code></a>
+            Defined in: <a href="../files/src_tools_draw.js.html#l68"><code>src&#x2F;tools&#x2F;draw.js:68</code></a>
         </div>
 
             Module: <a href="../modules/tool.html">tool</a>
@@ -205,7 +206,7 @@
             <div class="meta">
                         <p>
                         Defined in
-                <a href="../files/src_tools_draw.js.html#l45"><code>src&#x2F;tools&#x2F;draw.js:45</code></a>
+                <a href="../files/src_tools_draw.js.html#l68"><code>src&#x2F;tools&#x2F;draw.js:68</code></a>
                 </p>
         
         
@@ -246,6 +247,14 @@
 
                             </li>
                             <li class="index-item method">
+                                <a href="#method_onExecute">onExecute</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_onUndo">onUndo</a>
+
+                            </li>
+                            <li class="index-item method">
                                 <a href="#method_undo">undo</a>
 
                             </li>
@@ -274,7 +283,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_tools_draw.js.html#l60"><code>src&#x2F;tools&#x2F;draw.js:60</code></a>
+        <a href="../files/src_tools_draw.js.html#l83"><code>src&#x2F;tools&#x2F;draw.js:83</code></a>
         </p>
 
 
@@ -308,7 +317,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_tools_draw.js.html#l53"><code>src&#x2F;tools&#x2F;draw.js:53</code></a>
+        <a href="../files/src_tools_draw.js.html#l76"><code>src&#x2F;tools&#x2F;draw.js:76</code></a>
         </p>
 
 
@@ -333,6 +342,114 @@
 
 
 </div>
+<div id="method_onExecute" class="method item">
+    <h3 class="name"><code>onExecute</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>event</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/src_tools_draw.js.html#l115"><code>src&#x2F;tools&#x2F;draw.js:115</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Handle an execute event.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">event</code>
+                        <span class="type">Object</span>
+
+
+                    <div class="param-description">
+                        <p>The execute event with type and id.</p>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+
+</div>
+<div id="method_onUndo" class="method item">
+    <h3 class="name"><code>onUndo</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>event</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/src_tools_draw.js.html#l124"><code>src&#x2F;tools&#x2F;draw.js:124</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Handle an undo event.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">event</code>
+                        <span class="type">Object</span>
+
+
+                    <div class="param-description">
+                        <p>The undo event with type and id.</p>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+
+</div>
 <div id="method_undo" class="method item">
     <h3 class="name"><code>undo</code></h3>
 
@@ -348,7 +465,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_tools_draw.js.html#l73"><code>src&#x2F;tools&#x2F;draw.js:73</code></a>
+        <a href="../files/src_tools_draw.js.html#l98"><code>src&#x2F;tools&#x2F;draw.js:98</code></a>
         </p>
 
 
