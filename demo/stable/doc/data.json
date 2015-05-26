@@ -3897,7 +3897,7 @@
         },
         {
             "file": "src/app/viewController.js",
-            "line": 168,
+            "line": 170,
             "description": "Get the colour map.",
             "itemtype": "method",
             "name": "getColourMap",
@@ -3911,7 +3911,7 @@
         },
         {
             "file": "src/app/viewController.js",
-            "line": 178,
+            "line": 180,
             "description": "Set the colour map.",
             "itemtype": "method",
             "name": "setColourMap",
@@ -3928,7 +3928,7 @@
         },
         {
             "file": "src/app/viewController.js",
-            "line": 188,
+            "line": 190,
             "description": "Set the colour map from a name.",
             "itemtype": "method",
             "name": "setColourMapFromName",
@@ -13304,7 +13304,7 @@
         },
         {
             "message": "replacing incorrect tag: function with method",
-            "line": " src/app/viewController.js:188"
+            "line": " src/app/viewController.js:190"
         },
         {
             "message": "replacing incorrect tag: returns with return",

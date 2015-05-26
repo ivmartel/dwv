@@ -330,10 +330,12 @@ dwv.ViewController = function ( view )
         var width = range.max - range.min;
         var center = range.min + width/2;
         presets[&quot;min/max&quot;] = {&quot;center&quot;: center, &quot;width&quot;: width};
-        // modality presets
-        var modality = image.getMeta().Modality;
-        for( var key in dwv.tool.defaultpresets[modality] ) {
-            presets[key] = dwv.tool.defaultpresets[modality][key];
+        // optional modality presets
+        if ( typeof dwv.tool.defaultpresets != &quot;undefined&quot; ) {
+            var modality = image.getMeta().Modality;
+            for( var key in dwv.tool.defaultpresets[modality] ) {
+                presets[key] = dwv.tool.defaultpresets[modality][key];
+            }
         }
         
         // Manual preset
