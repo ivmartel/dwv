@@ -50,20 +50,20 @@ dwv.dicom.DataReader = function(buffer, isLittleEndian)
      * Flip an array's endianness.
      * Inspired from https://github.com/kig/DataStream.js.
      * @method flipArrayEndianness
-     * @param {Object} array The array to flip.
-     * @return {Object} The flipped array.
+     * @param {Object} array The array to flip (modified).
      */
     this.flipArrayEndianness = function (array) {
-       var u8 = new Uint8Array(array.buffer, array.byteOffset, array.byteLength);
+       var blen = array.byteLength;
+       var u8 = new Uint8Array(array.buffer, array.byteOffset, blen);
+       var bpel = array.BYTES_PER_ELEMENT;
        var tmp;
-       for ( var i = 0; i < array.byteLength; i += array.BYTES_PER_ELEMENT ) {
-         for ( var j = i + array.BYTES_PER_ELEMENT - 1, k = i; j > k; j--, k++ ) {
+       for ( var i = 0; i < blen; i += bpel ) {
+         for ( var j = i + bpel - 1, k = i; j > k; j--, k++ ) {
            tmp = u8[k];
            u8[k] = u8[j];
            u8[j] = tmp;
          }
        }
-       return array;
     };
       
     /**
@@ -110,11 +110,7 @@ dwv.dicom.DataReader = function(buffer, isLittleEndian)
      * @return {Array} The read data.
      */
     this.readUint8Array = function(byteOffset, size) {
-        var data = new Uint8Array(buffer, byteOffset, size);
-        if ( needFlip ) {
-            this.flipArrayEndianness(data);
-        }
-        return data;
+        return new Uint8Array(buffer, byteOffset, size);
     };
     /**
      * Read Uint16 array.
