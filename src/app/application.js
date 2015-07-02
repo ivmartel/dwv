@@ -491,9 +491,9 @@ dwv.App = function ()
     };
 
     /**
-     * Load a list of files.
-     * @method loadFiles
-     * @param {Array} files The list of files to load.
+     * Load a list of image files.
+     * @method loadImageFiles
+     * @param {Array} files The list of image files to load.
      */
     function loadImageFiles (files) 
     {
@@ -780,8 +780,8 @@ dwv.App = function ()
     };
     
     /**
-     * Apply a translation to the layers.
-     * @method translate
+     * Add a translation to the layers.
+     * @method stepTranslate
      * @param {Number} tx The step translation along X.
      * @param {Number} ty The step translation along Y.
      */ 

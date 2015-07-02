@@ -75,7 +75,7 @@ dwv.image.filter.Threshold = function()
     this.setOriginalImage = function (image) { originalImage = image; };
     /**
      * Get the original image.
-     * @method setOriginalImage
+     * @method getOriginalImage
      * @return {Object} image The original image.
      */
     this.getOriginalImage = function () { return originalImage; };
@@ -131,7 +131,7 @@ dwv.image.filter.Sharpen = function()
     this.setOriginalImage = function (image) { originalImage = image; };
     /**
      * Get the original image.
-     * @method setOriginalImage
+     * @method getOriginalImage
      * @return {Object} image The original image.
      */
     this.getOriginalImage = function () { return originalImage; };
@@ -181,7 +181,7 @@ dwv.image.filter.Sobel = function()
     this.setOriginalImage = function (image) { originalImage = image; };
     /**
      * Get the original image.
-     * @method setOriginalImage
+     * @method getOriginalImage
      * @return {Object} image The original image.
      */
     this.getOriginalImage = function () { return originalImage; };

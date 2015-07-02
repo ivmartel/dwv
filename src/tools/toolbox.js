@@ -141,7 +141,7 @@ dwv.tool.Toolbox = function( toolList, app )
 
     /**
      * Reset the tool box.
-     * @method init
+     * @method reset
      */
     this.reset = function ()
     {
