@@ -491,9 +491,9 @@ dwv.App = function ()
     };
 
     /**
-     * Load a list of files.
-     * @method loadFiles
-     * @param {Array} files The list of files to load.
+     * Load a list of image files.
+     * @method loadImageFiles
+     * @param {Array} files The list of image files to load.
      */
     function loadImageFiles (files) 
     {
@@ -780,8 +780,8 @@ dwv.App = function ()
     };
     
     /**
-     * Apply a translation to the layers.
-     * @method translate
+     * Add a translation to the layers.
+     * @method stepTranslate
      * @param {Number} tx The step translation along X.
      * @param {Number} ty The step translation along Y.
      */ 
@@ -1649,7 +1649,7 @@ dwv.ViewController = function ( view )
     
     /**
      * Set the current position.
-     * @method setCurrentPosition2D
+     * @method setCurrentPosition
      * @param {Object} pos The position.
      * @return {Boolean} False if not in bounds.
       */
@@ -4776,7 +4776,7 @@ dwv.gui.base.refreshSelect = function(selectName)
 
 /**
  * Set the selected item of a HTML select.
- * @method refreshSelect
+ * @method setSelected
  * @static
  * @param {String} selectName The name of the HTML select.
  * @param {String} itemName The name of the itme to mark as selected.
@@ -7072,7 +7072,7 @@ dwv.image.filter.Threshold = function()
     this.setOriginalImage = function (image) { originalImage = image; };
     /**
      * Get the original image.
-     * @method setOriginalImage
+     * @method getOriginalImage
      * @return {Object} image The original image.
      */
     this.getOriginalImage = function () { return originalImage; };
@@ -7128,7 +7128,7 @@ dwv.image.filter.Sharpen = function()
     this.setOriginalImage = function (image) { originalImage = image; };
     /**
      * Get the original image.
-     * @method setOriginalImage
+     * @method getOriginalImage
      * @return {Object} image The original image.
      */
     this.getOriginalImage = function () { return originalImage; };
@@ -7178,7 +7178,7 @@ dwv.image.filter.Sobel = function()
     this.setOriginalImage = function (image) { originalImage = image; };
     /**
      * Get the original image.
-     * @method setOriginalImage
+     * @method getOriginalImage
      * @return {Object} image The original image.
      */
     this.getOriginalImage = function () { return originalImage; };
@@ -14561,7 +14561,7 @@ dwv.tool.Toolbox = function( toolList, app )
 
     /**
      * Reset the tool box.
-     * @method init
+     * @method reset
      */
     this.reset = function ()
     {

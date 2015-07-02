@@ -2834,13 +2834,13 @@
         {
             "file": "src/app/application.js",
             "line": 493,
-            "description": "Load a list of files.",
+            "description": "Load a list of image files.",
             "itemtype": "method",
-            "name": "loadFiles",
+            "name": "loadImageFiles",
             "params": [
                 {
                     "name": "files",
-                    "description": "The list of files to load.",
+                    "description": "The list of image files to load.",
                     "type": "Array"
                 }
             ],
@@ -3023,9 +3023,9 @@
         {
             "file": "src/app/application.js",
             "line": 782,
-            "description": "Apply a translation to the layers.",
+            "description": "Add a translation to the layers.",
             "itemtype": "method",
-            "name": "translate",
+            "name": "stepTranslate",
             "params": [
                 {
                     "name": "tx",
@@ -3753,7 +3753,7 @@
             "line": 32,
             "description": "Set the current position.",
             "itemtype": "method",
-            "name": "setCurrentPosition2D",
+            "name": "setCurrentPosition",
             "params": [
                 {
                     "name": "pos",
@@ -4752,7 +4752,7 @@
             "line": 78,
             "description": "Set the selected item of a HTML select.",
             "itemtype": "method",
-            "name": "refreshSelect",
+            "name": "setSelected",
             "static": 1,
             "params": [
                 {
@@ -6512,7 +6512,7 @@
             "line": 76,
             "description": "Get the original image.",
             "itemtype": "method",
-            "name": "setOriginalImage",
+            "name": "getOriginalImage",
             "return": {
                 "description": "image The original image.",
                 "type": "Object"
@@ -6584,7 +6584,7 @@
             "line": 132,
             "description": "Get the original image.",
             "itemtype": "method",
-            "name": "setOriginalImage",
+            "name": "getOriginalImage",
             "return": {
                 "description": "image The original image.",
                 "type": "Object"
@@ -6656,7 +6656,7 @@
             "line": 182,
             "description": "Get the original image.",
             "itemtype": "method",
-            "name": "setOriginalImage",
+            "name": "getOriginalImage",
             "return": {
                 "description": "image The original image.",
                 "type": "Object"
@@ -12541,7 +12541,7 @@
             "line": 142,
             "description": "Reset the tool box.",
             "itemtype": "method",
-            "name": "init",
+            "name": "reset",
             "class": "dwv.tool.Toolbox",
             "module": "tool",
             "namespace": "dwv.tool"
