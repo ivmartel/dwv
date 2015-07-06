@@ -428,28 +428,33 @@ dwv.image.ViewFactory.prototype.create = function (dicomElements, pixelBuffer)
     var imageFactory = new dwv.image.ImageFactory();
     var image = imageFactory.create(dicomElements, pixelBuffer);
     
-    // pixel representation
+    // PixelRepresentation
     var isSigned = 0;
-    if ( dicomElements.PixelRepresentation ) {
-        isSigned = dicomElements.PixelRepresentation.value[0];
+    var elPixelRepresentation = dicomElements.x00280103;
+    if ( elPixelRepresentation ) {
+        isSigned = elPixelRepresentation.value[0];
     }
     // view
     var view = new dwv.image.View(image, isSigned);
-    // window center and width
+    // presets
     var windowPresets = [];
-    if ( dicomElements.WindowCenter && dicomElements.WindowWidth ) {
+    // WindowCenter and WindowWidth
+    var elWindowCenter = dicomElements.x00281050;
+    var elWindowWidth = dicomElements.x00281051;
+    if ( elWindowCenter && elWindowWidth ) {
         var name;
-        for ( var j = 0; j < dicomElements.WindowCenter.value.length; ++j) {
-            var width = parseFloat( dicomElements.WindowWidth.value[j], 10 );
+        for ( var j = 0; j < elWindowCenter.value.length; ++j) {
+            var width = parseFloat( elWindowWidth.value[j], 10 );
             if ( width !== 0 ) {
-                if ( dicomElements.WindowCenterWidthExplanation ) {
-                    name = dicomElements.WindowCenterWidthExplanation.value[j];
+                var elWindowCenterWidthExplanation = dicomElements.x00281055;
+                if ( elWindowCenterWidthExplanation ) {
+                    name = elWindowCenterWidthExplanation.value[j];
                 }
                 else {
                     name = "Default"+j;
                 }
                 windowPresets.push({
-                    "center": parseFloat( dicomElements.WindowCenter.value[j], 10 ),
+                    "center": parseFloat( elWindowCenter.value[j], 10 ),
                     "width": width, 
                     "name": name
                 });
