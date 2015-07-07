@@ -8,6 +8,27 @@ dwv.dicom = dwv.dicom || {};
 var JpxImage = JpxImage || {};
 
 /**
+ * Clean string: trim and remove ending.
+ * @method cleanString
+ * @static
+ * @param {String} string The string to clean.
+ * @return {String} The cleaned string.
+ */
+dwv.dicom.cleanString = function (string)
+{
+    var res = string;
+    if ( string ) {
+        // trim spaces
+        res = string.trim();
+        // get rid of ending zero-width space (u200B)
+        if ( res[res.length-1] === String.fromCharCode("u200B") ) {
+            res = res.substring(0, res.length-1);
+        }
+    }
+    return res;
+};
+
+/**
  * Data reader.
  * @class DataReader
  * @namespace dwv.dicom
@@ -180,6 +201,27 @@ dwv.dicom.DataReader = function(buffer, isLittleEndian)
 };
 
 /**
+ * Get the group-element key used to store DICOM elements.
+ * @param {Number} group The DICOM group.
+ * @param {Number} element The DICOM element.
+ * @returns {String} The key.
+ */
+dwv.dicom.getGroupElementKey = function (group, element)
+{
+    return 'x' + group.substr(2,6) + element.substr(2,6);
+};
+
+/**
+ * Split a group-element key used to store DICOM elements.
+ * @param key The key in form "x00280102.
+ * @returns {Object} The DICOM group and element.
+ */
+dwv.dicom.splitGroupElementKey = function (key)
+{
+    return {'group': key.substr(1,4), 'element': key.substr(5,8) };
+};
+
+/**
  * Tell if a given syntax is a JPEG one.
  * @method isJpegTransferSyntax
  * @param {String} The transfer syntax to test.
@@ -259,7 +301,7 @@ dwv.dicom.DicomParser = function()
  */
 dwv.dicom.DicomParser.prototype.getDicomElements = function()
 {
-    return this.dicomElements;
+    return new dwv.dicom.DicomElementsWrapper(this.dicomElements);
 };
 
 /**
@@ -316,7 +358,6 @@ dwv.dicom.DicomParser.prototype.appendDicomElement = function( element, sequence
         }
         // append
         this.appendElementToSequence(root, sequenceName, itemNumber, element);
-
     }
 };
 
@@ -328,7 +369,8 @@ dwv.dicom.DicomParser.prototype.appendDicomElement = function( element, sequence
  * @param {Number} itemNumber The tail item number.
  * @param {Object} element The element to append.
  */
-dwv.dicom.DicomParser.prototype.appendElementToSequence = function (root, sequenceName, itemNumber, element)
+dwv.dicom.DicomParser.prototype.appendElementToSequence = function (
+    root, sequenceName, itemNumber, element)
 {
     // start the sequence
     if ( typeof root[sequenceName] === "undefined" ) {
@@ -371,7 +413,7 @@ dwv.dicom.DicomParser.prototype.readTag = function(reader, offset)
     // element
     var element = reader.readHex(offset+2);
     // name
-    var name = "x" + group.substr(2,6) + element.substr(2,6);
+    var name = dwv.dicom.getGroupElementKey(group, element);
     /*var dict = dwv.dicom.dictionary;
     if( typeof dict[group] !== "undefined" &&
             typeof dict[group][element] !== "undefined" ) {
@@ -418,8 +460,9 @@ dwv.dicom.DicomParser.prototype.readDataElement = function(reader, offset, impli
     else {
         // implicit VR?
         if(implicit) {
-            if( typeof dwv.dicom.dictionary[tag.group] !== "undefined" &&
-                    typeof dwv.dicom.dictionary[tag.group][tag.element] !== "undefined" ) {
+            var dict = dwv.dicom.dictionary;
+            if ( typeof dict[tag.group] !== "undefined" &&
+                    typeof dict[tag.group][tag.element] !== "undefined" ) {
                 vr = dwv.dicom.dictionary[tag.group][tag.element][0];
             }
             isOtherVR = (vr[0] === 'O');
@@ -477,9 +520,9 @@ dwv.dicom.DicomParser.prototype.readDataElement = function(reader, offset, impli
             console.warn("OX value representation for tag: "+tag.name+".");
         }
         // OB of BitsAllocated == 8
-        if ( ( vr === "OB" ) || 
+        if ( vr === "OB" || 
                 ( typeof this.dicomElements.x00280100 !== 'undefined' &&
-                this.dicomElements.x00280100.value[0] === 8 ) ) {
+                    this.dicomElements.x00280100.value[0] === 8 ) ) {
             data = reader.readUint8Array( dataOffset, vl );
         }
         else {
@@ -556,8 +599,8 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
         i += dataElement.offset;
     }
     
-    // check the TransferSyntaxUID
-    var syntax = dwv.utils.cleanString(this.dicomElements.x00020010.value[0]);
+    // check the TransferSyntaxUID (has to be there!)
+    var syntax = dwv.dicom.cleanString(this.dicomElements.x00020010.value[0]);
     
     // Implicit VR - Little Endian
     if( syntax === "1.2.840.10008.1.2" ) {
@@ -635,7 +678,7 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
         
         // store pixel data from multiple Items
         if( startedPixelItems ) {
-        	// Item
+            // Item
             if( tagName === "xFFFEE000" ) {
                 if( dataElement.data.length === 4 ) {
                     console.log("Skipping Basic Offset Table.");
@@ -711,3 +754,89 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
         this.pixelBuffer = jpxImage.tiles[0].items;
     }
 };
+
+/**
+ * DicomElements wrapper.
+ * @class DicomElementsWrapper
+ * @namespace dwv.dicom
+ * @constructor
+ * @param {Array} dicomElements The elements to wrap.
+ */
+dwv.dicom.DicomElementsWrapper = function (dicomElements) {
+
+    /**
+    * Get a DICOM Element value from a group/element key.
+    * @method getFromKey
+    * @param {String} groupElementKey The key to retrieve.
+    * @param {Boolean} asArray Get the value as an Array.
+    * @return {Object} The DICOM element value.
+    */
+    this.getFromKey = function ( groupElementKey, asArray ) {
+    	var asArray = asArray || false;
+        var value = null;
+        var dElement = dicomElements[groupElementKey];
+        if ( typeof dElement !== "undefined" ) {
+            // raw value if only one
+            if ( dElement.value.length === 1 && asArray === false) {
+                value = dElement.value[0];
+            }
+            else {
+                value = dElement.value;
+            }
+        }
+        return value;
+    };
+    
+}
+
+/**
+* Get a DICOM Element value from a group and an element.
+* @method getFromGroupElement
+* @param {Number} group The group.
+* @param {Number} element The element.
+* @return {Object} The DICOM element value.
+*/
+dwv.dicom.DicomElementsWrapper.prototype.getFromGroupElement = function ( 
+    group, element )
+{
+   return this.getFromKey(
+       dwv.dicom.getGroupElementKey(group, element) );
+};
+
+/**
+* Get a DICOM Element value from a tag name.
+* Uses the DICOM dictionary.
+* @method getFromName
+* @param {String} name The tag name.
+* @return {Object} The DICOM element value.
+*/
+dwv.dicom.DicomElementsWrapper.prototype.getFromName = function ( name )
+{
+   var group = null;
+   var element = null;
+   var dict = dwv.dicom.dictionary;
+   var keys0 = Object.keys(dict);
+   var keys1 = null;
+   var k0 = 0;
+   var k1 = 0;
+   // label for nested loop break
+   outLabel:
+   // search through dictionary 
+   for ( k0 = 0; k0 < keys0.length; ++k0 ) {
+       group = keys0[k0];
+       keys1 = Object.keys( dict[group] );
+       for ( k1 = 0; k1 < keys1.length; ++k1 ) {
+           element = keys1[k1];
+           if ( dict[group][element][2] === name ) {
+               break outLabel;
+           }
+       }
+   }
+   var dicomElement = null;
+   // check that we are not at the end of the dictionary
+   if ( k0 !== keys0.length && k1 !== keys1.length ) {
+       dicomElement = this.getFromKey(dwv.dicom.getGroupElementKey(group, element));
+   }
+   return dicomElement;
+};
+

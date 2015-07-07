@@ -429,32 +429,32 @@ dwv.image.ViewFactory.prototype.create = function (dicomElements, pixelBuffer)
     var image = imageFactory.create(dicomElements, pixelBuffer);
     
     // PixelRepresentation
-    var isSigned = 0;
-    var elPixelRepresentation = dicomElements.x00280103;
-    if ( elPixelRepresentation ) {
-        isSigned = elPixelRepresentation.value[0];
+    var isSigned = false;
+    var pixelRepresentation = dicomElements.getFromKey("x00280103");
+    if ( pixelRepresentation !== null ) {
+        isSigned = (pixelRepresentation === 1);
     }
     // view
     var view = new dwv.image.View(image, isSigned);
     // presets
     var windowPresets = [];
     // WindowCenter and WindowWidth
-    var elWindowCenter = dicomElements.x00281050;
-    var elWindowWidth = dicomElements.x00281051;
-    if ( elWindowCenter && elWindowWidth ) {
+    var windowCenter = dicomElements.getFromKey("x00281050", true);
+    var windowWidth = dicomElements.getFromKey("x00281051", true);
+    if ( windowCenter !== null && windowWidth !== null ) {
         var name;
-        for ( var j = 0; j < elWindowCenter.value.length; ++j) {
-            var width = parseFloat( elWindowWidth.value[j], 10 );
+        for ( var j = 0; j < windowCenter.length; ++j) {
+            var width = parseFloat( windowWidth[j], 10 );
             if ( width !== 0 ) {
-                var elWindowCenterWidthExplanation = dicomElements.x00281055;
-                if ( elWindowCenterWidthExplanation ) {
-                    name = elWindowCenterWidthExplanation.value[j];
+                var windowCenterWidthExplanation = dicomElements.getFromKey("x00281055");
+                if ( windowCenterWidthExplanation !== null ) {
+                    name = windowCenterWidthExplanation[j];
                 }
                 else {
                     name = "Default"+j;
                 }
                 windowPresets.push({
-                    "center": parseFloat( elWindowCenter.value[j], 10 ),
+                    "center": parseFloat( windowCenter[j], 10 ),
                     "width": width, 
                     "name": name
                 });

@@ -1384,7 +1384,8 @@ dwv.App = function ()
         viewController = new dwv.ViewController(view);
         // append the DICOM tags table
         if ( tagsGui ) {
-            tagsGui.initialise(data.info);
+        	// TODO
+            //tagsGui.initialise(data.info);
         }
         // store image
         originalImage = view.getImage();

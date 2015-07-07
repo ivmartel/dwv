@@ -745,43 +745,40 @@ dwv.image.ImageFactory = function () {};
  */
 dwv.image.ImageFactory.prototype.create = function (dicomElements, pixelBuffer)
 {
-    // size
-    
     // columns
-    var elColumns = dicomElements.x00280011;
-    if ( !elColumns ) {
+    var columns = dicomElements.getFromKey("x00280011");
+    if ( columns === null ) {
         throw new Error("Missing DICOM image number of columns");
     }
-    var columns = elColumns.value[0];
     // rows
-    var elRows = dicomElements.x00280010;
-    if ( !elRows ) {
+    var rows = dicomElements.getFromKey("x00280010");
+    if ( rows === null ) {
         throw new Error("Missing DICOM image number of rows");
     }
-    var rows = elRows.value[0];
-    
+    // image size
     var size = new dwv.image.Size( columns, rows );
     
     // spacing
     var rowSpacing = 1;
     var columnSpacing = 1;
     // PixelSpacing
-    var elPixelSpacing = dicomElements.x00280030;
+    var pixelSpacing = dicomElements.getFromKey("x00280030");
     // ImagerPixelSpacing
-    var elImagerPixelSpacing = dicomElements.x00181164;
-    if ( elPixelSpacing ) {
-        rowSpacing = parseFloat(elPixelSpacing.value[0]);
-        columnSpacing = parseFloat(elPixelSpacing.value[1]);
+    var imagerPixelSpacing = dicomElements.getFromKey("x00181164");
+    if ( pixelSpacing !== null ) {
+        rowSpacing = parseFloat( pixelSpacing[0] );
+        columnSpacing = parseFloat( pixelSpacing[1] );
     }
-    else if ( elImagerPixelSpacing ) {
-        rowSpacing = parseFloat(elImagerPixelSpacing.value[0]);
-        columnSpacing = parseFloat(elImagerPixelSpacing.value[1]);
+    else if ( imagerPixelSpacing !== null ) {
+        rowSpacing = parseFloat( imagerPixelSpacing[0] );
+        columnSpacing = parseFloat( imagerPixelSpacing[1] );
     }
+    // image spacing
     var spacing = new dwv.image.Spacing( columnSpacing, rowSpacing);
 
     // TransferSyntaxUID
-    var elTransferSyntaxUID = dicomElements.x00020010;
-    var syntax = dwv.utils.cleanString( elTransferSyntaxUID.value[0] );
+    var transferSyntaxUID = dicomElements.getFromKey("x00020010");
+    var syntax = dwv.dicom.cleanString( transferSyntaxUID );
     var jpeg2000 = dwv.dicom.isJpeg2000TransferSyntax( syntax );
     
     // buffer data
@@ -789,8 +786,8 @@ dwv.image.ImageFactory.prototype.create = function (dicomElements, pixelBuffer)
     // unsigned to signed data if needed
     var shift = false;
     // PixelRepresentation
-    var elPixelRepresentation = dicomElements.x00280103;
-    if ( elPixelRepresentation && elPixelRepresentation.value[0] == 1) {
+    var pixelRepresentation = dicomElements.getFromKey("x00280103");
+    if ( pixelRepresentation !== null && pixelRepresentation === 1 ) {
         shift = true;
     }
     // copy
@@ -804,11 +801,11 @@ dwv.image.ImageFactory.prototype.create = function (dicomElements, pixelBuffer)
     // slice position
     var slicePosition = new Array(0,0,0);
     // ImagePositionPatient
-    var elImagePositionPatient = dicomElements.x00200032;
-    if ( elImagePositionPatient ) {
-        slicePosition = [ parseFloat(elImagePositionPatient.value[0]),
-            parseFloat(elImagePositionPatient.value[1]),
-            parseFloat(elImagePositionPatient.value[2]) ];
+    var imagePositionPatient = dicomElements.getFromKey("x00200032");
+    if ( imagePositionPatient !== null ) {
+        slicePosition = [ parseFloat( imagePositionPatient[0] ),
+            parseFloat( imagePositionPatient[1] ),
+            parseFloat( imagePositionPatient[2] ) ];
     }
     
     // geometry
@@ -818,33 +815,32 @@ dwv.image.ImageFactory.prototype.create = function (dicomElements, pixelBuffer)
     // image
     var image = new dwv.image.Image( geometry, buffer );
     // PhotometricInterpretation
-    var elPhotometricInterpretation = dicomElements.x00280004;
-    if ( elPhotometricInterpretation ) {
-        var photo = dwv.utils.cleanString(
-                elPhotometricInterpretation.value[0]).toUpperCase();
+    var photometricInterpretation = dicomElements.getFromKey("x00280004");
+    if ( photometricInterpretation !== null ) {
+        var photo = dwv.dicom.cleanString(photometricInterpretation).toUpperCase();
         if ( jpeg2000 && photo.match(/YBR/) ) {
             photo = "RGB";
         }
         image.setPhotometricInterpretation( photo );
     }        
     // PlanarConfiguration
-    var elPlanarConfiguration = dicomElements.x00280006;
-    if ( elPlanarConfiguration ) {
-        image.setPlanarConfiguration( elPlanarConfiguration.value[0] );
+    var planarConfiguration = dicomElements.getFromKey("x00280006");
+    if ( planarConfiguration !== null ) {
+        image.setPlanarConfiguration( planarConfiguration );
     }  
     
     // rescale slope and intercept
     var slope = 1;
     // RescaleSlope
-    var elRescaleSlope = dicomElements.x00281053;
-    if ( elRescaleSlope ) {
-        slope = parseFloat(elRescaleSlope.value[0]);
+    var rescaleSlope = dicomElements.getFromKey("x00281053");
+    if ( rescaleSlope !== null ) {
+        slope = parseFloat(rescaleSlope);
     }
     var intercept = 0;
     // RescaleIntercept
-    var elRescaleIntercept = dicomElements.x00281052;
-    if ( elRescaleIntercept ) {
-        intercept = parseFloat(elRescaleIntercept.value[0]);
+    var rescaleIntercept = dicomElements.getFromKey("x00281052");
+    if ( rescaleIntercept !== null ) {
+        intercept = parseFloat(rescaleIntercept);
     }
     var rsi = new dwv.image.RescaleSlopeAndIntercept(slope, intercept);
     image.setRescaleSlopeAndIntercept( rsi );
@@ -852,24 +848,24 @@ dwv.image.ImageFactory.prototype.create = function (dicomElements, pixelBuffer)
     // meta information
     var meta = {};
     // Modality
-    var elModality = dicomElements.x00080060;
-    if ( elModality ) {
-        meta.Modality = elModality.value[0];
+    var modality = dicomElements.getFromKey("x00080060");
+    if ( modality !== null ) {
+        meta.Modality = modality;
     }
     // StudyInstanceUID
-    var elStudyInstanceUID = dicomElements.x0020000D;
-    if ( elStudyInstanceUID ) {
-        meta.StudyInstanceUID = elStudyInstanceUID.value[0];
+    var studyInstanceUID = dicomElements.getFromKey("x0020000D");
+    if ( studyInstanceUID !== null ) {
+        meta.StudyInstanceUID = studyInstanceUID;
     }
     // SeriesInstanceUID
-    var elSeriesInstanceUID = dicomElements.x0020000E;
-    if ( elSeriesInstanceUID ) {
-        meta.SeriesInstanceUID = elSeriesInstanceUID.value[0];
+    var seriesInstanceUID = dicomElements.getFromKey("x0020000E");
+    if ( seriesInstanceUID !== null ) {
+        meta.SeriesInstanceUID = seriesInstanceUID;
     }
     // BitsStored
-    var elBitsStored = dicomElements.x00280101;
-    if ( elBitsStored ) {
-        meta.BitsStored = parseInt(elBitsStored.value[0], 10);
+    var bitsStored = dicomElements.getFromKey("x00280101");
+    if ( bitsStored !== null ) {
+        meta.BitsStored = parseInt(bitsStored, 10);
     }
     image.setMeta(meta);
     
