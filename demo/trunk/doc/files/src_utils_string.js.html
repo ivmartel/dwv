@@ -41,6 +41,7 @@
                                 <li><a href="../classes/dwv.App.html">dwv.App</a></li>
                                 <li><a href="../classes/dwv.browser.html">dwv.browser</a></li>
                                 <li><a href="../classes/dwv.dicom.DataReader.html">dwv.dicom.DataReader</a></li>
+                                <li><a href="../classes/dwv.dicom.DicomElementsWrapper.html">dwv.dicom.DicomElementsWrapper</a></li>
                                 <li><a href="../classes/dwv.dicom.DicomParser.html">dwv.dicom.DicomParser</a></li>
                                 <li><a href="../classes/dwv.gui.html">dwv.gui</a></li>
                                 <li><a href="../classes/dwv.gui.base.html">dwv.gui.base</a></li>
@@ -200,27 +201,6 @@ dwv.utils.capitaliseFirstLetter = function (string)
     var res = string;
     if ( string ) {
         res = string.charAt(0).toUpperCase() + string.slice(1);
-    }
-    return res;
-};
-
-/**
- * Clean string: trim and remove ending.
- * @method cleanString
- * @static
- * @param {String} string The string to clean.
- * @return {String} The cleaned string.
- */
-dwv.utils.cleanString = function (string)
-{
-    var res = string;
-    if ( string ) {
-        // trim spaces
-        res = string.trim();
-        // get rid of ending zero-width space (u200B)
-        if ( res[res.length-1] === String.fromCharCode(&quot;u200B&quot;) ) {
-            res = res.substring(0, res.length-1);
-        }
     }
     return res;
 };

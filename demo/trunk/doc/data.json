@@ -57,7 +57,8 @@
             },
             "classes": {
                 "dwv.dicom.DataReader": 1,
-                "dwv.dicom.DicomParser": 1
+                "dwv.dicom.DicomParser": 1,
+                "dwv.dicom.DicomElementsWrapper": 1
             },
             "fors": {},
             "namespaces": {
@@ -627,7 +628,8 @@
             "submodules": {},
             "classes": {
                 "dwv.dicom.DataReader": 1,
-                "dwv.dicom.DicomParser": 1
+                "dwv.dicom.DicomParser": 1,
+                "dwv.dicom.DicomElementsWrapper": 1
             },
             "fors": {},
             "namespaces": {
@@ -635,7 +637,7 @@
             },
             "tag": "module",
             "file": "src/dicom/dicomParser.js",
-            "line": 217,
+            "line": 747,
             "description": "DICOM module."
         },
         "browser": {
@@ -897,7 +899,7 @@
             "module": "dicom",
             "namespace": "dwv.dicom",
             "file": "src/dicom/dicomParser.js",
-            "line": 10,
+            "line": 31,
             "description": "Data reader.",
             "is_constructor": 1,
             "params": [
@@ -924,9 +926,31 @@
             "module": "dicom",
             "namespace": "dwv.dicom",
             "file": "src/dicom/dicomParser.js",
-            "line": 217,
+            "line": 259,
             "description": "DicomParser class.",
             "is_constructor": 1
+        },
+        "dwv.dicom.DicomElementsWrapper": {
+            "name": "dwv.dicom.DicomElementsWrapper",
+            "shortname": "dwv.dicom.DicomElementsWrapper",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "dicom",
+            "namespace": "dwv.dicom",
+            "file": "src/dicom/dicomParser.js",
+            "line": 747,
+            "description": "DicomElements wrapper.",
+            "is_constructor": 1,
+            "params": [
+                {
+                    "name": "dicomElements",
+                    "description": "The elements to wrap.",
+                    "type": "Array"
+                }
+            ]
         },
         "dwv.browser": {
             "name": "dwv.browser",
@@ -3945,7 +3969,28 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 25,
+            "line": 10,
+            "description": "Clean string: trim and remove ending.",
+            "itemtype": "method",
+            "name": "cleanString",
+            "static": 1,
+            "params": [
+                {
+                    "name": "string",
+                    "description": "The string to clean.",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "The cleaned string.",
+                "type": "String"
+            },
+            "class": "dwv.dicom.DataReader",
+            "module": "dicom"
+        },
+        {
+            "file": "src/dicom/dicomParser.js",
+            "line": 46,
             "description": "Native endianness.",
             "itemtype": "property",
             "name": "isNativeLittleEndian",
@@ -3958,7 +4003,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 33,
+            "line": 54,
             "description": "Flag to know if the TypedArray data needs flipping.",
             "itemtype": "property",
             "name": "needFlip",
@@ -3971,7 +4016,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 41,
+            "line": 62,
             "description": "The main data view.",
             "itemtype": "property",
             "name": "view",
@@ -3984,7 +4029,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 49,
+            "line": 70,
             "description": "Flip an array's endianness.\nInspired from https://github.com/kig/DataStream.js.",
             "itemtype": "method",
             "name": "flipArrayEndianness",
@@ -4001,7 +4046,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 69,
+            "line": 90,
             "description": "Read Uint8 (1 byte) data.",
             "itemtype": "method",
             "name": "readUint8",
@@ -4022,7 +4067,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 78,
+            "line": 99,
             "description": "Read Uint16 (2 bytes) data.",
             "itemtype": "method",
             "name": "readUint16",
@@ -4043,7 +4088,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 87,
+            "line": 108,
             "description": "Read Uint32 (4 bytes) data.",
             "itemtype": "method",
             "name": "readUint32",
@@ -4064,7 +4109,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 96,
+            "line": 117,
             "description": "Read Float32 (8 bytes) data.",
             "itemtype": "method",
             "name": "readFloat32",
@@ -4085,7 +4130,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 105,
+            "line": 126,
             "description": "Read Uint8 array.",
             "itemtype": "method",
             "name": "readUint8Array",
@@ -4111,7 +4156,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 115,
+            "line": 136,
             "description": "Read Uint16 array.",
             "itemtype": "method",
             "name": "readUint16Array",
@@ -4137,7 +4182,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 129,
+            "line": 150,
             "description": "Read Uint32 array.",
             "itemtype": "method",
             "name": "readUint32Array",
@@ -4163,7 +4208,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 153,
+            "line": 174,
             "description": "Read data as an hexadecimal string.",
             "itemtype": "method",
             "name": "readHex",
@@ -4184,7 +4229,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 165,
+            "line": 186,
             "description": "Read data as a string.",
             "itemtype": "method",
             "name": "readString",
@@ -4210,7 +4255,49 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 182,
+            "line": 203,
+            "description": "Get the group-element key used to store DICOM elements.",
+            "params": [
+                {
+                    "name": "group",
+                    "description": "The DICOM group.",
+                    "type": "Number"
+                },
+                {
+                    "name": "element",
+                    "description": "The DICOM element.",
+                    "type": "Number"
+                }
+            ],
+            "return": {
+                "description": "The key.",
+                "type": "String"
+            },
+            "class": "dwv.dicom.DataReader",
+            "module": "dicom",
+            "namespace": "dwv.dicom"
+        },
+        {
+            "file": "src/dicom/dicomParser.js",
+            "line": 214,
+            "description": "Split a group-element key used to store DICOM elements.",
+            "params": [
+                {
+                    "name": "key",
+                    "description": "The key in form \"x00280102."
+                }
+            ],
+            "return": {
+                "description": "The DICOM group and element.",
+                "type": "Object"
+            },
+            "class": "dwv.dicom.DataReader",
+            "module": "dicom",
+            "namespace": "dwv.dicom"
+        },
+        {
+            "file": "src/dicom/dicomParser.js",
+            "line": 224,
             "description": "Tell if a given syntax is a JPEG one.",
             "itemtype": "method",
             "name": "isJpegTransferSyntax",
@@ -4231,7 +4318,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 195,
+            "line": 237,
             "description": "Tell if a given syntax is a JPEG-LS one.",
             "itemtype": "method",
             "name": "isJpeglsTransferSyntax",
@@ -4252,7 +4339,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 206,
+            "line": 248,
             "description": "Tell if a given syntax is a JPEG 2000 one.",
             "itemtype": "method",
             "name": "isJpeg2000TransferSyntax",
@@ -4273,7 +4360,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 225,
+            "line": 267,
             "description": "The list of DICOM elements.",
             "itemtype": "property",
             "name": "dicomElements",
@@ -4284,7 +4371,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 231,
+            "line": 273,
             "description": "The pixel buffer.",
             "itemtype": "property",
             "name": "pixelBuffer",
@@ -4295,7 +4382,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 238,
+            "line": 280,
             "description": "Unknown tags count.",
             "itemtype": "property",
             "name": "unknownCount",
@@ -4306,7 +4393,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 244,
+            "line": 286,
             "description": "Get the next unknown tags count.",
             "itemtype": "method",
             "name": "getNextUnknownCount",
@@ -4320,7 +4407,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 255,
+            "line": 297,
             "description": "Get the DICOM data elements.",
             "itemtype": "method",
             "name": "getDicomElements",
@@ -4334,7 +4421,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 265,
+            "line": 307,
             "description": "Get the DICOM data pixel buffer.",
             "itemtype": "method",
             "name": "getPixelBuffer",
@@ -4348,7 +4435,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 275,
+            "line": 317,
             "description": "Append a DICOM element to the dicomElements member object.\nAllows for easy retrieval of DICOM tag values from the tag name.\nIf tags have same name (for the 'unknown' private tags cases), a number is appended\nmaking the name unique.",
             "itemtype": "method",
             "name": "appendDicomElement",
@@ -4370,7 +4457,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 322,
+            "line": 364,
             "description": "Append an element to a sequence.",
             "itemtype": "method",
             "name": "appendElementToSequence",
@@ -4402,7 +4489,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 359,
+            "line": 402,
             "description": "Read a DICOM tag.",
             "itemtype": "method",
             "name": "readTag",
@@ -4425,7 +4512,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 389,
+            "line": 431,
             "description": "Read a DICOM data element.",
             "itemtype": "method",
             "name": "readDataElement",
@@ -4453,7 +4540,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 504,
+            "line": 551,
             "description": "Parse the complete DICOM file (given as input to the class).\nFills in the member object 'dicomElements'.",
             "itemtype": "method",
             "name": "parse",
@@ -4464,6 +4551,103 @@
                 }
             ],
             "class": "dwv.dicom.DicomParser",
+            "module": "dicom",
+            "namespace": "dwv.dicom"
+        },
+        {
+            "file": "src/dicom/dicomParser.js",
+            "line": 756,
+            "description": "Get a DICOM Element value from a group/element key.",
+            "itemtype": "method",
+            "name": "getFromKey",
+            "params": [
+                {
+                    "name": "groupElementKey",
+                    "description": "The key to retrieve.",
+                    "type": "String"
+                },
+                {
+                    "name": "asArray",
+                    "description": "Get the value as an Array.",
+                    "type": "Boolean"
+                }
+            ],
+            "return": {
+                "description": "The DICOM element value.",
+                "type": "Object"
+            },
+            "class": "dwv.dicom.DicomElementsWrapper",
+            "module": "dicom",
+            "namespace": "dwv.dicom"
+        },
+        {
+            "file": "src/dicom/dicomParser.js",
+            "line": 782,
+            "description": "Dump the DICOM tags to an array.",
+            "return": {
+                "description": "",
+                "type": "Array"
+            },
+            "class": "dwv.dicom.DicomElementsWrapper",
+            "module": "dicom",
+            "namespace": "dwv.dicom"
+        },
+        {
+            "file": "src/dicom/dicomParser.js",
+            "line": 806,
+            "description": "Dump the DICOM tags to a string.",
+            "return": {
+                "description": "The dumped file.",
+                "type": "String"
+            },
+            "class": "dwv.dicom.DicomElementsWrapper",
+            "module": "dicom",
+            "namespace": "dwv.dicom"
+        },
+        {
+            "file": "src/dicom/dicomParser.js",
+            "line": 895,
+            "description": "Get a DICOM Element value from a group and an element.",
+            "itemtype": "method",
+            "name": "getFromGroupElement",
+            "params": [
+                {
+                    "name": "group",
+                    "description": "The group.",
+                    "type": "Number"
+                },
+                {
+                    "name": "element",
+                    "description": "The element.",
+                    "type": "Number"
+                }
+            ],
+            "return": {
+                "description": "The DICOM element value.",
+                "type": "Object"
+            },
+            "class": "dwv.dicom.DicomElementsWrapper",
+            "module": "dicom",
+            "namespace": "dwv.dicom"
+        },
+        {
+            "file": "src/dicom/dicomParser.js",
+            "line": 909,
+            "description": "Get a DICOM Element value from a tag name.\nUses the DICOM dictionary.",
+            "itemtype": "method",
+            "name": "getFromName",
+            "params": [
+                {
+                    "name": "name",
+                    "description": "The tag name.",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "The DICOM element value.",
+                "type": "Object"
+            },
+            "class": "dwv.dicom.DicomElementsWrapper",
             "module": "dicom",
             "namespace": "dwv.dicom"
         },
@@ -13229,28 +13413,6 @@
         {
             "file": "src/utils/string.js",
             "line": 30,
-            "description": "Clean string: trim and remove ending.",
-            "itemtype": "method",
-            "name": "cleanString",
-            "static": 1,
-            "params": [
-                {
-                    "name": "string",
-                    "description": "The string to clean.",
-                    "type": "String"
-                }
-            ],
-            "return": {
-                "description": "The cleaned string.",
-                "type": "String"
-            },
-            "class": "dwv.utils",
-            "module": "utils",
-            "namespace": "dwv"
-        },
-        {
-            "file": "src/utils/string.js",
-            "line": 51,
             "description": "Split query string:\n 'root?key0=val00&key0=val01&key1=val10' returns \n { base : root, query : [ key0 : [val00, val01], key1 : val1 ] }\nReturns an empty object if the input string is not correct (null, empty...)\n or if it is not a query string (no question mark).",
             "itemtype": "method",
             "name": "splitQueryString",
@@ -13272,7 +13434,7 @@
         },
         {
             "file": "src/utils/string.js",
-            "line": 84,
+            "line": 63,
             "description": "Split key/value string:\n key0=val00&key0=val01&key1=val10 returns \n  { key0 : [val00, val01], key1 : val1 }",
             "itemtype": "method",
             "name": "splitKeyValueString",
@@ -13304,35 +13466,51 @@
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/dicom/dicomParser.js:182"
+            "line": " src/dicom/dicomParser.js:203"
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/dicom/dicomParser.js:195"
+            "line": " src/dicom/dicomParser.js:214"
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/dicom/dicomParser.js:206"
+            "line": " src/dicom/dicomParser.js:224"
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/dicom/dicomParser.js:244"
+            "line": " src/dicom/dicomParser.js:237"
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/dicom/dicomParser.js:255"
+            "line": " src/dicom/dicomParser.js:248"
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/dicom/dicomParser.js:265"
+            "line": " src/dicom/dicomParser.js:286"
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/dicom/dicomParser.js:359"
+            "line": " src/dicom/dicomParser.js:297"
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/dicom/dicomParser.js:389"
+            "line": " src/dicom/dicomParser.js:307"
+        },
+        {
+            "message": "replacing incorrect tag: returns with return",
+            "line": " src/dicom/dicomParser.js:402"
+        },
+        {
+            "message": "replacing incorrect tag: returns with return",
+            "line": " src/dicom/dicomParser.js:431"
+        },
+        {
+            "message": "replacing incorrect tag: returns with return",
+            "line": " src/dicom/dicomParser.js:782"
+        },
+        {
+            "message": "replacing incorrect tag: returns with return",
+            "line": " src/dicom/dicomParser.js:806"
         },
         {
             "message": "unknown tag: input",
@@ -13417,6 +13595,22 @@
         {
             "message": "Missing item type\nInit the Window/Level display",
             "line": " src/app/application.js:670"
+        },
+        {
+            "message": "Missing item type\nGet the group-element key used to store DICOM elements.",
+            "line": " src/dicom/dicomParser.js:203"
+        },
+        {
+            "message": "Missing item type\nSplit a group-element key used to store DICOM elements.",
+            "line": " src/dicom/dicomParser.js:214"
+        },
+        {
+            "message": "Missing item type\nDump the DICOM tags to an array.",
+            "line": " src/dicom/dicomParser.js:782"
+        },
+        {
+            "message": "Missing item type\nDump the DICOM tags to a string.",
+            "line": " src/dicom/dicomParser.js:806"
         },
         {
             "message": "Missing item type\nDICOM tag dictionary.",

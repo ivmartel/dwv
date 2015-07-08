@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>dwv.image.filter.Threshold - dwv</title>
+    <title>dwv.dicom.DicomElementsWrapper - dwv</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
     <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
@@ -172,30 +172,36 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-<h1>dwv.image.filter.Threshold Class</h1>
+<h1>dwv.dicom.DicomElementsWrapper Class</h1>
 <div class="box meta">
 
 
         <div class="foundat">
-            Defined in: <a href="../files/src_image_filter.js.html#l9"><code>src&#x2F;image&#x2F;filter.js:9</code></a>
+            Defined in: <a href="../files/src_dicom_dicomParser.js.html#l747"><code>src&#x2F;dicom&#x2F;dicomParser.js:747</code></a>
         </div>
 
-            Module: <a href="../modules/image.html">image</a>
+            Module: <a href="../modules/dicom.html">dicom</a>
 
 </div>
 
 
 <div class="box intro">
-    <p>Threshold an image between an input minimum and maximum.</p>
+    <p>DicomElements wrapper.</p>
 
 </div>
 
     <div class="constructor">
         <h2>Constructor</h2>
-<div id="method_dwv.image.filter.Threshold" class="method item">
-    <h3 class="name"><code>dwv.image.filter.Threshold</code></h3>
+<div id="method_dwv.dicom.DicomElementsWrapper" class="method item">
+    <h3 class="name"><code>dwv.dicom.DicomElementsWrapper</code></h3>
 
-        <span class="paren">()</span>
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>dicomElements</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
 
 
 
@@ -207,7 +213,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_image_filter.js.html#l9"><code>src&#x2F;image&#x2F;filter.js:9</code></a>
+        <a href="../files/src_dicom_dicomParser.js.html#l747"><code>src&#x2F;dicom&#x2F;dicomParser.js:747</code></a>
         </p>
 
 
@@ -218,6 +224,23 @@
         
     </div>
 
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">dicomElements</code>
+                        <span class="type">Array</span>
+
+
+                    <div class="param-description">
+                        <p>The elements to wrap.</p>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
 
 
 
@@ -229,7 +252,6 @@
         <li class="api-class-tab index"><a href="#index">Index</a></li>
 
             <li class="api-class-tab methods"><a href="#methods">Methods</a></li>
-            <li class="api-class-tab properties"><a href="#properties">Properties</a></li>
     </ul>
 
     <div>
@@ -241,58 +263,20 @@
 
                     <ul class="index-list methods">
                             <li class="index-item method">
-                                <a href="#method_getMax">getMax</a>
+                                <a href="#method_getFromGroupElement">getFromGroupElement</a>
 
                             </li>
                             <li class="index-item method">
-                                <a href="#method_getMin">getMin</a>
+                                <a href="#method_getFromKey">getFromKey</a>
 
                             </li>
                             <li class="index-item method">
-                                <a href="#method_getName">getName</a>
-
-                            </li>
-                            <li class="index-item method">
-                                <a href="#method_getOriginalImage">getOriginalImage</a>
-
-                            </li>
-                            <li class="index-item method">
-                                <a href="#method_setMax">setMax</a>
-
-                            </li>
-                            <li class="index-item method">
-                                <a href="#method_setMin">setMin</a>
-
-                            </li>
-                            <li class="index-item method">
-                                <a href="#method_setOriginalImage">setOriginalImage</a>
-
-                            </li>
-                            <li class="index-item method">
-                                <a href="#method_update">update</a>
+                                <a href="#method_getFromName">getFromName</a>
 
                             </li>
                     </ul>
                 </div>
 
-                <div class="index-section properties">
-                    <h3>Properties</h3>
-
-                    <ul class="index-list properties">
-                            <li class="index-item property private">
-                                <a href="#property_max">max</a>
-
-                            </li>
-                            <li class="index-item property private">
-                                <a href="#property_min">min</a>
-
-                            </li>
-                            <li class="index-item property private">
-                                <a href="#property_originalImage">originalImage</a>
-
-                            </li>
-                    </ul>
-                </div>
 
 
         </div>
@@ -300,139 +284,19 @@
             <div id="methods" class="api-class-tabpanel">
                 <h2 class="off-left">Methods</h2>
 
-<div id="method_getMax" class="method item">
-    <h3 class="name"><code>getMax</code></h3>
+<div id="method_getFromGroupElement" class="method item">
+    <h3 class="name"><code>getFromGroupElement</code></h3>
 
-        <span class="paren">()</span>
-
-        <span class="returns-inline">
-            <span class="type">Number</span>
-        </span>
-
-
-
-
-
-
-
-    <div class="meta">
-                <p>
-                Defined in
-        <a href="../files/src_image_filter.js.html#l44"><code>src&#x2F;image&#x2F;filter.js:44</code></a>
-        </p>
-
-
-
-    </div>
-
-    <div class="description">
-        <p>Get the threshold maximum.</p>
-
-    </div>
-
-
-        <div class="returns">
-            <h4>Returns:</h4>
-
-            <div class="returns-description">
-                        <span class="type">Number</span>:
-                    <p>The threshold maximum.</p>
-
-            </div>
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>group</code>
+                </li>
+                <li class="arg">
+                        <code>element</code>
+                </li>
+            </ul><span class="paren">)</span>
         </div>
-
-
-</div>
-<div id="method_getMin" class="method item">
-    <h3 class="name"><code>getMin</code></h3>
-
-        <span class="paren">()</span>
-
-        <span class="returns-inline">
-            <span class="type">Number</span>
-        </span>
-
-
-
-
-
-
-
-    <div class="meta">
-                <p>
-                Defined in
-        <a href="../files/src_image_filter.js.html#l32"><code>src&#x2F;image&#x2F;filter.js:32</code></a>
-        </p>
-
-
-
-    </div>
-
-    <div class="description">
-        <p>Get the threshold minimum.</p>
-
-    </div>
-
-
-        <div class="returns">
-            <h4>Returns:</h4>
-
-            <div class="returns-description">
-                        <span class="type">Number</span>:
-                    <p>The threshold minimum.</p>
-
-            </div>
-        </div>
-
-
-</div>
-<div id="method_getName" class="method item">
-    <h3 class="name"><code>getName</code></h3>
-
-        <span class="paren">()</span>
-
-        <span class="returns-inline">
-            <span class="type">String</span>
-        </span>
-
-
-
-
-
-
-
-    <div class="meta">
-                <p>
-                Defined in
-        <a href="../files/src_image_filter.js.html#l56"><code>src&#x2F;image&#x2F;filter.js:56</code></a>
-        </p>
-
-
-
-    </div>
-
-    <div class="description">
-        <p>Get the name of the filter.</p>
-
-    </div>
-
-
-        <div class="returns">
-            <h4>Returns:</h4>
-
-            <div class="returns-description">
-                        <span class="type">String</span>:
-                    <p>The name of the filter.</p>
-
-            </div>
-        </div>
-
-
-</div>
-<div id="method_getOriginalImage" class="method item">
-    <h3 class="name"><code>getOriginalImage</code></h3>
-
-        <span class="paren">()</span>
 
         <span class="returns-inline">
             <span class="type">Object</span>
@@ -447,7 +311,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_image_filter.js.html#l76"><code>src&#x2F;image&#x2F;filter.js:76</code></a>
+        <a href="../files/src_dicom_dicomParser.js.html#l895"><code>src&#x2F;dicom&#x2F;dicomParser.js:895</code></a>
         </p>
 
 
@@ -455,189 +319,64 @@
     </div>
 
     <div class="description">
-        <p>Get the original image.</p>
+        <p>Get a DICOM Element value from a group and an element.</p>
 
     </div>
 
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">group</code>
+                        <span class="type">Number</span>
+
+
+                    <div class="param-description">
+                        <p>The group.</p>
+
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name">element</code>
+                        <span class="type">Number</span>
+
+
+                    <div class="param-description">
+                        <p>The element.</p>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
 
         <div class="returns">
             <h4>Returns:</h4>
 
             <div class="returns-description">
                         <span class="type">Object</span>:
-                    <p>image The original image.</p>
+                    <p>The DICOM element value.</p>
 
             </div>
         </div>
 
 
 </div>
-<div id="method_setMax" class="method item">
-    <h3 class="name"><code>setMax</code></h3>
+<div id="method_getFromKey" class="method item">
+    <h3 class="name"><code>getFromKey</code></h3>
 
         <div class="args">
             <span class="paren">(</span><ul class="args-list inline commas">
                 <li class="arg">
-                        <code>val</code>
+                        <code>groupElementKey</code>
                 </li>
-            </ul><span class="paren">)</span>
-        </div>
-
-
-
-
-
-
-
-
-    <div class="meta">
-                <p>
-                Defined in
-        <a href="../files/src_image_filter.js.html#l50"><code>src&#x2F;image&#x2F;filter.js:50</code></a>
-        </p>
-
-
-
-    </div>
-
-    <div class="description">
-        <p>Set the threshold maximum.</p>
-
-    </div>
-
-        <div class="params">
-            <h4>Parameters:</h4>
-
-            <ul class="params-list">
-                <li class="param">
-                        <code class="param-name">val</code>
-                        <span class="type">Number</span>
-
-
-                    <div class="param-description">
-                        <p>The threshold maximum.</p>
-
-                    </div>
-
-                </li>
-            </ul>
-        </div>
-
-
-
-</div>
-<div id="method_setMin" class="method item">
-    <h3 class="name"><code>setMin</code></h3>
-
-        <div class="args">
-            <span class="paren">(</span><ul class="args-list inline commas">
                 <li class="arg">
-                        <code>val</code>
+                        <code>asArray</code>
                 </li>
             </ul><span class="paren">)</span>
         </div>
-
-
-
-
-
-
-
-
-    <div class="meta">
-                <p>
-                Defined in
-        <a href="../files/src_image_filter.js.html#l38"><code>src&#x2F;image&#x2F;filter.js:38</code></a>
-        </p>
-
-
-
-    </div>
-
-    <div class="description">
-        <p>Set the threshold minimum.</p>
-
-    </div>
-
-        <div class="params">
-            <h4>Parameters:</h4>
-
-            <ul class="params-list">
-                <li class="param">
-                        <code class="param-name">val</code>
-                        <span class="type">Number</span>
-
-
-                    <div class="param-description">
-                        <p>The threshold minimum.</p>
-
-                    </div>
-
-                </li>
-            </ul>
-        </div>
-
-
-
-</div>
-<div id="method_setOriginalImage" class="method item">
-    <h3 class="name"><code>setOriginalImage</code></h3>
-
-        <div class="args">
-            <span class="paren">(</span><ul class="args-list inline commas">
-                <li class="arg">
-                        <code>image</code>
-                </li>
-            </ul><span class="paren">)</span>
-        </div>
-
-
-
-
-
-
-
-
-    <div class="meta">
-                <p>
-                Defined in
-        <a href="../files/src_image_filter.js.html#l70"><code>src&#x2F;image&#x2F;filter.js:70</code></a>
-        </p>
-
-
-
-    </div>
-
-    <div class="description">
-        <p>Set the original image.</p>
-
-    </div>
-
-        <div class="params">
-            <h4>Parameters:</h4>
-
-            <ul class="params-list">
-                <li class="param">
-                        <code class="param-name">image</code>
-                        <span class="type">Object</span>
-
-
-                    <div class="param-description">
-                        <p>The original image.</p>
-
-                    </div>
-
-                </li>
-            </ul>
-        </div>
-
-
-
-</div>
-<div id="method_update" class="method item">
-    <h3 class="name"><code>update</code></h3>
-
-        <span class="paren">()</span>
 
         <span class="returns-inline">
             <span class="type">Object</span>
@@ -652,7 +391,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_image_filter.js.html#l84"><code>src&#x2F;image&#x2F;filter.js:84</code></a>
+        <a href="../files/src_dicom_dicomParser.js.html#l756"><code>src&#x2F;dicom&#x2F;dicomParser.js:756</code></a>
         </p>
 
 
@@ -660,17 +399,112 @@
     </div>
 
     <div class="description">
-        <p>Transform the main image using this filter.</p>
+        <p>Get a DICOM Element value from a group/element key.</p>
 
     </div>
 
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">groupElementKey</code>
+                        <span class="type">String</span>
+
+
+                    <div class="param-description">
+                        <p>The key to retrieve.</p>
+
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name">asArray</code>
+                        <span class="type">Boolean</span>
+
+
+                    <div class="param-description">
+                        <p>Get the value as an Array.</p>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
 
         <div class="returns">
             <h4>Returns:</h4>
 
             <div class="returns-description">
                         <span class="type">Object</span>:
-                    <p>The transformed image.</p>
+                    <p>The DICOM element value.</p>
+
+            </div>
+        </div>
+
+
+</div>
+<div id="method_getFromName" class="method item">
+    <h3 class="name"><code>getFromName</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>name</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+        <span class="returns-inline">
+            <span class="type">Object</span>
+        </span>
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/src_dicom_dicomParser.js.html#l909"><code>src&#x2F;dicom&#x2F;dicomParser.js:909</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Get a DICOM Element value from a tag name.
+Uses the DICOM dictionary.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">name</code>
+                        <span class="type">String</span>
+
+
+                    <div class="param-description">
+                        <p>The tag name.</p>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                        <span class="type">Object</span>:
+                    <p>The DICOM element value.</p>
 
             </div>
         </div>
@@ -679,88 +513,6 @@
 </div>
             </div>
 
-            <div id="properties" class="api-class-tabpanel">
-                <h2 class="off-left">Properties</h2>
-
-                    <div id="property_max" class="property item private">
-                        <h3 class="name"><code>max</code></h3>
-                        <span class="type">Number</span>
-                    
-                    
-                            <span class="flag private">private</span>
-                    
-                    
-                    
-                        <div class="meta">
-                                    <p>
-                                    Defined in
-                            <a href="../files/src_image_filter.js.html#l24"><code>src&#x2F;image&#x2F;filter.js:24</code></a>
-                            </p>
-                    
-                    
-                        </div>
-                    
-                        <div class="description">
-                            <p>Threshold maximum.</p>
-                    
-                        </div>
-                    
-                    
-                    
-                    </div>
-                    <div id="property_min" class="property item private">
-                        <h3 class="name"><code>min</code></h3>
-                        <span class="type">Number</span>
-                    
-                    
-                            <span class="flag private">private</span>
-                    
-                    
-                    
-                        <div class="meta">
-                                    <p>
-                                    Defined in
-                            <a href="../files/src_image_filter.js.html#l17"><code>src&#x2F;image&#x2F;filter.js:17</code></a>
-                            </p>
-                    
-                    
-                        </div>
-                    
-                        <div class="description">
-                            <p>Threshold minimum.</p>
-                    
-                        </div>
-                    
-                    
-                    
-                    </div>
-                    <div id="property_originalImage" class="property item private">
-                        <h3 class="name"><code>originalImage</code></h3>
-                        <span class="type">Object</span>
-                    
-                    
-                            <span class="flag private">private</span>
-                    
-                    
-                    
-                        <div class="meta">
-                                    <p>
-                                    Defined in
-                            <a href="../files/src_image_filter.js.html#l63"><code>src&#x2F;image&#x2F;filter.js:63</code></a>
-                            </p>
-                    
-                    
-                        </div>
-                    
-                        <div class="description">
-                            <p>Original image.</p>
-                    
-                        </div>
-                    
-                    
-                    
-                    </div>
-            </div>
 
 
     </div>

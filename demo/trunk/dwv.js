@@ -1384,7 +1384,7 @@ dwv.App = function ()
         viewController = new dwv.ViewController(view);
         // append the DICOM tags table
         if ( tagsGui ) {
-            tagsGui.initialise(data.info);
+            tagsGui.initialise(data.info.dumpToTable());
         }
         // store image
         originalImage = view.getImage();
@@ -1832,6 +1832,27 @@ dwv.dicom = dwv.dicom || {};
 var JpxImage = JpxImage || {};
 
 /**
+ * Clean string: trim and remove ending.
+ * @method cleanString
+ * @static
+ * @param {String} string The string to clean.
+ * @return {String} The cleaned string.
+ */
+dwv.dicom.cleanString = function (string)
+{
+    var res = string;
+    if ( string ) {
+        // trim spaces
+        res = string.trim();
+        // get rid of ending zero-width space (u200B)
+        if ( res[res.length-1] === String.fromCharCode("u200B") ) {
+            res = res.substring(0, res.length-1);
+        }
+    }
+    return res;
+};
+
+/**
  * Data reader.
  * @class DataReader
  * @namespace dwv.dicom
@@ -2004,6 +2025,27 @@ dwv.dicom.DataReader = function(buffer, isLittleEndian)
 };
 
 /**
+ * Get the group-element key used to store DICOM elements.
+ * @param {Number} group The DICOM group.
+ * @param {Number} element The DICOM element.
+ * @returns {String} The key.
+ */
+dwv.dicom.getGroupElementKey = function (group, element)
+{
+    return 'x' + group.substr(2,6) + element.substr(2,6);
+};
+
+/**
+ * Split a group-element key used to store DICOM elements.
+ * @param key The key in form "x00280102.
+ * @returns {Object} The DICOM group and element.
+ */
+dwv.dicom.splitGroupElementKey = function (key)
+{
+    return {'group': key.substr(1,4), 'element': key.substr(5,8) };
+};
+
+/**
  * Tell if a given syntax is a JPEG one.
  * @method isJpegTransferSyntax
  * @param {String} The transfer syntax to test.
@@ -2083,7 +2125,7 @@ dwv.dicom.DicomParser = function()
  */
 dwv.dicom.DicomParser.prototype.getDicomElements = function()
 {
-    return this.dicomElements;
+    return new dwv.dicom.DicomElementsWrapper(this.dicomElements);
 };
 
 /**
@@ -2109,19 +2151,20 @@ dwv.dicom.DicomParser.prototype.appendDicomElement = function( element, sequence
 {
     // simple case: not a sequence
     if ( typeof sequences === "undefined" || sequences.length === 0) {
-        this.dicomElements[element.name] = { 
-            "group": element.group, 
-            "element": element.element,
+        this.dicomElements[element.tag.name] = { 
+            "group": element.tag.group, 
+            "element": element.tag.element,
             "vr": element.vr,
             "vl": element.vl,
-            "value": element.value 
+            "value": element.data 
         };
     }
     else {
         // nothing to do for items and delimitations
-        if ( element.name === "Item" || 
-                element.name === "ItemDelimitationItem" ||
-                element.name === "SequenceDelimitationItem" ) {
+        // (Item, ItemDelimitationItem, SequenceDelimitationItem)
+        if ( element.tag.name === "xFFFEE000" ||
+                element.tag.name === "xFFFEE00D" ||
+                element.tag.name === "xFFFEE0DD" ) {
             return;
         }
         // create root for nested sequences
@@ -2139,7 +2182,6 @@ dwv.dicom.DicomParser.prototype.appendDicomElement = function( element, sequence
         }
         // append
         this.appendElementToSequence(root, sequenceName, itemNumber, element);
-
     }
 };
 
@@ -2151,16 +2193,17 @@ dwv.dicom.DicomParser.prototype.appendDicomElement = function( element, sequence
  * @param {Number} itemNumber The tail item number.
  * @param {Object} element The element to append.
  */
-dwv.dicom.DicomParser.prototype.appendElementToSequence = function (root, sequenceName, itemNumber, element)
+dwv.dicom.DicomParser.prototype.appendElementToSequence = function (
+    root, sequenceName, itemNumber, element)
 {
     // start the sequence
     if ( typeof root[sequenceName] === "undefined" ) {
-        root[sequenceName] = { 
-            "group": element.group, 
-            "element": element.element,
+        root[sequenceName] = {
+            "group": element.tag.group,
+            "element": element.tag.element,
             "vr": element.vr,
             "vl": element.vl,
-            "value": [] 
+            "value": []
         };
     }
     // continue the sequence
@@ -2170,12 +2213,12 @@ dwv.dicom.DicomParser.prototype.appendElementToSequence = function (root, sequen
             root[sequenceName].value[itemNumber] = {};
         }
         // append element
-        root[sequenceName].value[itemNumber][element.name] = { 
-            "group": element.group, 
-            "element": element.element,
+        root[sequenceName].value[itemNumber][element.tag.name] = {
+            "group": element.tag.group,
+            "element": element.tag.element,
             "vr": element.vr,
             "vl": element.vl,
-            "value": element.value 
+            "value": element.data
         };
     }
 };
@@ -2193,10 +2236,9 @@ dwv.dicom.DicomParser.prototype.readTag = function(reader, offset)
     var group = reader.readHex(offset);
     // element
     var element = reader.readHex(offset+2);
-    // vr and name
-    var vr = "UN";
-    var name = null;
-    var dict = dwv.dicom.dictionary;
+    // name
+    var name = dwv.dicom.getGroupElementKey(group, element);
+    /*var dict = dwv.dicom.dictionary;
     if( typeof dict[group] !== "undefined" &&
             typeof dict[group][element] !== "undefined" ) {
         vr = dict[group][element][0];
@@ -2204,10 +2246,10 @@ dwv.dicom.DicomParser.prototype.readTag = function(reader, offset)
     }
     else {
         name = "dwv::unknown" + this.getNextUnknownCount().toString();
-    }
+    }*/
 
     // return
-    return {'group': group, 'element': element, 'name': name, 'vr': vr};
+    return {'group': group, 'element': element, 'name': name};
 };
 
 /**
@@ -2224,7 +2266,7 @@ dwv.dicom.DicomParser.prototype.readDataElement = function(reader, offset, impli
     var tag = this.readTag(reader, offset);
     var tagOffset = 4;
     
-    var vr = ""; // Value Representation (VR)
+    var vr = null; // Value Representation (VR)
     var vl = 0; // Value Length (VL)
     var vrOffset = 0; // byte size of VR
     var vlOffset = 0; // byte size of VL
@@ -2242,7 +2284,11 @@ dwv.dicom.DicomParser.prototype.readDataElement = function(reader, offset, impli
     else {
         // implicit VR?
         if(implicit) {
-            vr = tag.vr;
+            var dict = dwv.dicom.dictionary;
+            if ( typeof dict[tag.group] !== "undefined" &&
+                    typeof dict[tag.group][tag.element] !== "undefined" ) {
+                vr = dwv.dicom.dictionary[tag.group][tag.element][0];
+            }
             isOtherVR = (vr[0] === 'O');
             vrOffset = 0;
             vl = reader.readUint32( offset+tagOffset+vrOffset );
@@ -2297,9 +2343,10 @@ dwv.dicom.DicomParser.prototype.readDataElement = function(reader, offset, impli
         if ( vr === "OX" ) {
             console.warn("OX value representation for tag: "+tag.name+".");
         }
-        if ( ( vr === "OB" ) || 
-                ( typeof this.dicomElements.BitsAllocated !== 'undefined' &&
-                this.dicomElements.BitsAllocated.value[0] === 8 ) ) {
+        // OB or BitsAllocated == 8
+        if ( vr === "OB" || 
+                ( typeof this.dicomElements.x00280100 !== 'undefined' &&
+                    this.dicomElements.x00280100.value[0] === 8 ) ) {
             data = reader.readUint8Array( dataOffset, vl );
         }
         else {
@@ -2352,6 +2399,9 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
     
     // 0x0002, 0x0000: FileMetaInformationGroupLength
     var dataElement = this.readDataElement(metaReader, offset);
+    // store the data element
+    this.appendDicomElement( dataElement );
+    // get meta length
     var metaLength = parseInt(dataElement.data[0], 10);
     offset += dataElement.offset;
     
@@ -2364,20 +2414,13 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
         // get the data element
         dataElement = this.readDataElement(metaReader, i, false);
         // store the data element
-        this.appendDicomElement( { 
-            'name': dataElement.tag.name,
-            'group': dataElement.tag.group, 
-            'vr' : dataElement.vr, 
-            'vl' : dataElement.vl, 
-            'element': dataElement.tag.element,
-            'value': dataElement.data 
-        });
+        this.appendDicomElement( dataElement );
         // increment index
         i += dataElement.offset;
     }
     
-    // check the transfer syntax
-    var syntax = dwv.utils.cleanString(this.dicomElements.TransferSyntaxUID.value[0]);
+    // check the TransferSyntaxUID (has to be there!)
+    var syntax = dwv.dicom.cleanString(this.dicomElements.x00020010.value[0]);
     
     // Implicit VR - Little Endian
     if( syntax === "1.2.840.10008.1.2" ) {
@@ -2441,21 +2484,22 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
             });
             tagOffset -= vlNumber;
         }
-        // new item
-        if ( sequences.length !== 0 && tagName === "Item" ) {
+        // new Item
+        if ( sequences.length !== 0 && tagName === "xFFFEE000" ) {
             sequences[sequences.length-1].itemNumber += 1;
             if ( !startedPixelItems ) {
                 tagOffset -= vlNumber;
             }
         }
-        // end of sequence with implicit length
-        else if ( tagName === "SequenceDelimitationItem" ) {
+        // end of sequence with implicit length (SequenceDelimitationItem)
+        else if ( tagName === "xFFFEE0DD" ) {
             sequences = sequences.slice(0, -1);
         }
         
-        // store pixel data from multiple items
+        // store pixel data from multiple Items
         if( startedPixelItems ) {
-            if( tagName === "Item" ) {
+            // Item
+            if( tagName === "xFFFEE000" ) {
                 if( dataElement.data.length === 4 ) {
                     console.log("Skipping Basic Offset Table.");
                 }
@@ -2471,15 +2515,16 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
                     this.pixelBuffer = newBuffer;
                 }
             }
-            else if( tagName === "SequenceDelimitationItem" ) {
+            // SequenceDelimitationItem
+            else if( tagName === "xFFFEE0DD" ) {
                 startedPixelItems = false;
             }
             else {
                 throw new Error("Unexpected tag in encapsulated pixel data: "+dataElement.tag.name);
             }
         }
-        // check the pixel data tag
-        if( tagName === "PixelData") {
+        // check the PixelData tag
+        if( tagName === "x7FE00010") {
             if( dataElement.data.length !== 0 ) {
                 this.pixelBuffer = dataElement.data;
             }
@@ -2489,14 +2534,7 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
         }
         
         // store the data element
-        this.appendDicomElement( {
-            'name': tagName,
-            'group' : dataElement.tag.group, 
-            'vr' : dataElement.vr, 
-            'vl' : dataElement.vl, 
-            'element': dataElement.tag.element,
-            'value': dataElement.data 
-            }, sequences );
+        this.appendDicomElement( dataElement, sequences );
         
         // end of sequence with explicit length
         if ( dataElement.vr !== "SQ" && sequences.length !== 0 ) {
@@ -2529,6 +2567,206 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
         this.pixelBuffer = jpxImage.tiles[0].items;
     }
 };
+
+/**
+ * DicomElements wrapper.
+ * @class DicomElementsWrapper
+ * @namespace dwv.dicom
+ * @constructor
+ * @param {Array} dicomElements The elements to wrap.
+ */
+dwv.dicom.DicomElementsWrapper = function (dicomElements) {
+
+    /**
+    * Get a DICOM Element value from a group/element key.
+    * @method getFromKey
+    * @param {String} groupElementKey The key to retrieve.
+    * @param {Boolean} asArray Get the value as an Array.
+    * @return {Object} The DICOM element value.
+    */
+    this.getFromKey = function ( groupElementKey, asArray ) {
+        // default
+        if ( typeof asArray === "undefined" ) {
+            asArray = false;
+        }
+        var value = null;
+        var dElement = dicomElements[groupElementKey];
+        if ( typeof dElement !== "undefined" ) {
+            // raw value if only one
+            if ( dElement.value.length === 1 && asArray === false) {
+                value = dElement.value[0];
+            }
+            else {
+                value = dElement.value;
+            }
+        }
+        return value;
+    };
+    
+    /**
+     * Dump the DICOM tags to an array.
+     * @returns {Array}
+     */
+    this.dumpToTable = function () {
+        var keys = Object.keys(dicomElements);
+        var dict = dwv.dicom.dictionary;
+        var table = [];
+        var dicomElement = null;
+        var row = null;
+        for ( var i = 0 ; i < keys.length; ++i ) {
+            dicomElement = dicomElements[keys[i]];
+            row = {};
+            // trying to have name first in row
+            row.name = dict[dicomElement.group][dicomElement.element][2];
+            var deKeys = Object.keys(dicomElement);
+            for ( var j = 0 ; j < deKeys.length; ++j ) {
+                row[deKeys[j]] = dicomElement[deKeys[j]];
+            }
+            table.push( row );
+        }
+        return table;
+    };
+
+    /**
+     * Dump the DICOM tags to a string.
+     * @returns {String} The dumped file.
+     */
+    this.dump = function () {
+        var keys = Object.keys(dicomElements);
+        var dict = dwv.dicom.dictionary;
+        var result = "\n";
+        result += "# Dicom-File-Format\n";
+        result += "\n";
+        result += "# Dicom-Meta-Information-Header\n";
+        result += "# Used TransferSyntax: Little Endian Explicit\n";
+        var dicomElement = null;
+        var dictElement = null;
+        var checkHeader = true;
+        var deSize = null;
+        var line = null;
+        for ( var i = 0 ; i < keys.length; ++i ) {
+            dicomElement = dicomElements[keys[i]];
+            if ( checkHeader && dicomElement.group !== "0x0002" ) {
+                result += "\n";
+                result += "# Dicom-Data-Set\n";
+                result += "# Used TransferSyntax: ...\n";
+                checkHeader = false;
+            }
+            dictElement = dict[dicomElement.group][dicomElement.element];
+            
+            line = "(";
+            line += dicomElement.group.substr(2,5).toLowerCase();
+            line += ",";
+            line += dicomElement.element.substr(2,5).toLowerCase();
+            line += ") ";
+            line += dicomElement.vr;
+            if ( dicomElement.group !== "0x7FE0" || dicomElement.element !== "0x0010" ) {
+                deSize = dicomElement.value.length;
+                if ( dicomElement.value.length === 1 && dicomElement.value[0] === "" ) {
+                    line += " (no value available)";
+                    deSize = 0;
+                }
+                else {
+                    if ( dicomElement.vr === "UL" || dicomElement.vr === "US" ) {
+                        line += " ";
+                        line += dicomElement.value[0];
+                    }
+                    else {
+                        line += " [";
+                        for ( var j = 0; j < dicomElement.value.length; ++j ) {
+                            if ( j !== 0 ) {
+                                line += "\\";
+                            }
+                            if ( typeof dicomElement.value[j] === "string" ) {
+                                line += dwv.dicom.cleanString(dicomElement.value[j]);
+                            }
+                            else {
+                                line += dicomElement.value[j];
+                            }
+                        }
+                        line += "]";
+                    }
+                }
+            }
+            // align #
+            var spaces = 55 - line.length;
+            if ( spaces > 0 ) {
+                for ( var s = 0; s < spaces; ++s ) {
+                    line += " ";
+                }
+            }
+            line += " # ";
+            if ( dicomElement.vl < 100 ) {
+                line += " ";
+            }
+            if ( dicomElement.vl < 10 ) {
+                line += " ";
+            }
+            line += dicomElement.vl;
+            line += ", ";
+            line += deSize; //dictElement[1];
+            line += " ";
+            line += dictElement[2];
+            
+            result += line + "\n";
+            
+        }
+        return result;
+    };
+
+};
+
+/**
+* Get a DICOM Element value from a group and an element.
+* @method getFromGroupElement
+* @param {Number} group The group.
+* @param {Number} element The element.
+* @return {Object} The DICOM element value.
+*/
+dwv.dicom.DicomElementsWrapper.prototype.getFromGroupElement = function ( 
+    group, element )
+{
+   return this.getFromKey(
+       dwv.dicom.getGroupElementKey(group, element) );
+};
+
+/**
+* Get a DICOM Element value from a tag name.
+* Uses the DICOM dictionary.
+* @method getFromName
+* @param {String} name The tag name.
+* @return {Object} The DICOM element value.
+*/
+dwv.dicom.DicomElementsWrapper.prototype.getFromName = function ( name )
+{
+   var group = null;
+   var element = null;
+   var dict = dwv.dicom.dictionary;
+   var keys0 = Object.keys(dict);
+   var keys1 = null;
+   var k0 = 0;
+   var k1 = 0;
+   // label for nested loop break
+   outLabel:
+   // search through dictionary 
+   for ( k0 = 0; k0 < keys0.length; ++k0 ) {
+       group = keys0[k0];
+       keys1 = Object.keys( dict[group] );
+       for ( k1 = 0; k1 < keys1.length; ++k1 ) {
+           element = keys1[k1];
+           if ( dict[group][element][2] === name ) {
+               break outLabel;
+           }
+       }
+   }
+   var dicomElement = null;
+   // check that we are not at the end of the dictionary
+   if ( k0 !== keys0.length && k1 !== keys1.length ) {
+       dicomElement = this.getFromKey(dwv.dicom.getGroupElementKey(group, element));
+   }
+   return dicomElement;
+};
+
 ;/** 
  * DICOM module.
  * @module dicom
@@ -2644,15 +2882,14 @@ dwv.dicom.dictionary = {
         '0x0020': ['DA', '1', 'StudyDate'],
         '0x0021': ['DA', '1', 'SeriesDate'],
         '0x0022': ['DA', '1', 'AcquisitionDate'],
-        '0x0023': ['DA', '1', 'ImageDate'],
-        /* '0x0023': ['DA','1','ContentDate'], */
+        '0x0023': ['DA', '1', 'ContentDate'],
         '0x0024': ['DA', '1', 'OverlayDate'],
         '0x0025': ['DA', '1', 'CurveDate'],
         '0x002A': ['DT', '1', 'AcquisitionDatetime'],
         '0x0030': ['TM', '1', 'StudyTime'],
         '0x0031': ['TM', '1', 'SeriesTime'],
         '0x0032': ['TM', '1', 'AcquisitionTime'],
-        '0x0033': ['TM', '1', 'ImageTime'],
+        '0x0033': ['TM', '1', 'ContentTime'],
         '0x0034': ['TM', '1', 'OverlayTime'],
         '0x0035': ['TM', '1', 'CurveTime'],
         '0x0040': ['US', '1', 'OldDataSetType'],
@@ -2919,7 +3156,7 @@ dwv.dicom.dictionary = {
         '0x1147': ['CS', '1', 'FieldOfViewShape'],
         '0x1149': ['IS', '2', 'FieldOfViewDimension'],
         '0x1150': ['IS', '1', 'ExposureTime'],
-        '0x1151': ['IS', '1', 'XrayTubeCurrent'],
+        '0x1151': ['IS', '1', 'XRayTubeCurrent'],
         '0x1152': ['IS', '1', 'Exposure'],
         '0x1153': ['IS', '1', 'ExposureinuAs'],
         '0x1154': ['DS', '1', 'AveragePulseWidth'],
@@ -3110,7 +3347,7 @@ dwv.dicom.dictionary = {
         '0x0010': ['SH', '1', 'StudyID'],
         '0x0011': ['IS', '1', 'SeriesNumber'],
         '0x0012': ['IS', '1', 'AcquisitionNumber'],
-        '0x0013': ['IS', '1', 'ImageNumber'],
+        '0x0013': ['IS', '1', 'InstanceNumber'],
         '0x0014': ['IS', '1', 'IsotopeNumber'],
         '0x0015': ['IS', '1', 'PhaseNumber'],
         '0x0016': ['IS', '1', 'IntervalNumber'],
@@ -8220,40 +8457,49 @@ dwv.image.ImageFactory = function () {};
  */
 dwv.image.ImageFactory.prototype.create = function (dicomElements, pixelBuffer)
 {
-    // size
-    if ( !dicomElements.Columns ) {
+    // columns
+    var columns = dicomElements.getFromKey("x00280011");
+    if ( columns === null ) {
         throw new Error("Missing DICOM image number of columns");
     }
-    if ( !dicomElements.Rows ) {
+    // rows
+    var rows = dicomElements.getFromKey("x00280010");
+    if ( rows === null ) {
         throw new Error("Missing DICOM image number of rows");
     }
-    var size = new dwv.image.Size(
-        dicomElements.Columns.value[0], 
-        dicomElements.Rows.value[0] );
+    // image size
+    var size = new dwv.image.Size( columns, rows );
     
     // spacing
     var rowSpacing = 1;
     var columnSpacing = 1;
-    if ( dicomElements.PixelSpacing ) {
-        rowSpacing = parseFloat(dicomElements.PixelSpacing.value[0]);
-        columnSpacing = parseFloat(dicomElements.PixelSpacing.value[1]);
+    // PixelSpacing
+    var pixelSpacing = dicomElements.getFromKey("x00280030");
+    // ImagerPixelSpacing
+    var imagerPixelSpacing = dicomElements.getFromKey("x00181164");
+    if ( pixelSpacing !== null ) {
+        rowSpacing = parseFloat( pixelSpacing[0] );
+        columnSpacing = parseFloat( pixelSpacing[1] );
     }
-    else if ( dicomElements.ImagerPixelSpacing ) {
-        rowSpacing = parseFloat(dicomElements.ImagerPixelSpacing.value[0]);
-        columnSpacing = parseFloat(dicomElements.ImagerPixelSpacing.value[1]);
+    else if ( imagerPixelSpacing !== null ) {
+        rowSpacing = parseFloat( imagerPixelSpacing[0] );
+        columnSpacing = parseFloat( imagerPixelSpacing[1] );
     }
+    // image spacing
     var spacing = new dwv.image.Spacing( columnSpacing, rowSpacing);
 
-    var syntax = dwv.utils.cleanString(
-        dicomElements.TransferSyntaxUID.value[0] );
+    // TransferSyntaxUID
+    var transferSyntaxUID = dicomElements.getFromKey("x00020010");
+    var syntax = dwv.dicom.cleanString( transferSyntaxUID );
     var jpeg2000 = dwv.dicom.isJpeg2000TransferSyntax( syntax );
     
     // buffer data
     var buffer =  new Int16Array(pixelBuffer.length);
     // unsigned to signed data if needed
     var shift = false;
-    if ( dicomElements.PixelRepresentation &&
-            dicomElements.PixelRepresentation.value[0] == 1) {
+    // PixelRepresentation
+    var pixelRepresentation = dicomElements.getFromKey("x00280103");
+    if ( pixelRepresentation !== null && pixelRepresentation === 1 ) {
         shift = true;
     }
     // copy
@@ -8266,10 +8512,12 @@ dwv.image.ImageFactory.prototype.create = function (dicomElements, pixelBuffer)
     
     // slice position
     var slicePosition = new Array(0,0,0);
-    if ( dicomElements.ImagePositionPatient ) {
-        slicePosition = [ parseFloat(dicomElements.ImagePositionPatient.value[0]),
-            parseFloat(dicomElements.ImagePositionPatient.value[1]),
-            parseFloat(dicomElements.ImagePositionPatient.value[2]) ];
+    // ImagePositionPatient
+    var imagePositionPatient = dicomElements.getFromKey("x00200032");
+    if ( imagePositionPatient !== null ) {
+        slicePosition = [ parseFloat( imagePositionPatient[0] ),
+            parseFloat( imagePositionPatient[1] ),
+            parseFloat( imagePositionPatient[2] ) ];
     }
     
     // geometry
@@ -8278,43 +8526,58 @@ dwv.image.ImageFactory.prototype.create = function (dicomElements, pixelBuffer)
     
     // image
     var image = new dwv.image.Image( geometry, buffer );
-    // photometricInterpretation
-    if ( dicomElements.PhotometricInterpretation ) {
-        var photo = dwv.utils.cleanString(
-            dicomElements.PhotometricInterpretation.value[0]).toUpperCase();
+    // PhotometricInterpretation
+    var photometricInterpretation = dicomElements.getFromKey("x00280004");
+    if ( photometricInterpretation !== null ) {
+        var photo = dwv.dicom.cleanString(photometricInterpretation).toUpperCase();
         if ( jpeg2000 && photo.match(/YBR/) ) {
             photo = "RGB";
         }
         image.setPhotometricInterpretation( photo );
     }        
-    // planarConfiguration
-    if ( dicomElements.PlanarConfiguration ) {
-        image.setPlanarConfiguration( dicomElements.PlanarConfiguration.value[0] );
-    }        
+    // PlanarConfiguration
+    var planarConfiguration = dicomElements.getFromKey("x00280006");
+    if ( planarConfiguration !== null ) {
+        image.setPlanarConfiguration( planarConfiguration );
+    }  
+    
     // rescale slope and intercept
     var slope = 1;
-    if ( dicomElements.RescaleSlope ) {
-        slope = parseFloat(dicomElements.RescaleSlope.value[0]);
+    // RescaleSlope
+    var rescaleSlope = dicomElements.getFromKey("x00281053");
+    if ( rescaleSlope !== null ) {
+        slope = parseFloat(rescaleSlope);
     }
     var intercept = 0;
-    if ( dicomElements.RescaleIntercept ) {
-        intercept = parseFloat(dicomElements.RescaleIntercept.value[0]);
+    // RescaleIntercept
+    var rescaleIntercept = dicomElements.getFromKey("x00281052");
+    if ( rescaleIntercept !== null ) {
+        intercept = parseFloat(rescaleIntercept);
     }
     var rsi = new dwv.image.RescaleSlopeAndIntercept(slope, intercept);
     image.setRescaleSlopeAndIntercept( rsi );
+    
     // meta information
     var meta = {};
-    if ( dicomElements.Modality ) {
-        meta.Modality = dicomElements.Modality.value[0];
+    // Modality
+    var modality = dicomElements.getFromKey("x00080060");
+    if ( modality !== null ) {
+        meta.Modality = modality;
     }
-    if ( dicomElements.StudyInstanceUID ) {
-        meta.StudyInstanceUID = dicomElements.StudyInstanceUID.value[0];
+    // StudyInstanceUID
+    var studyInstanceUID = dicomElements.getFromKey("x0020000D");
+    if ( studyInstanceUID !== null ) {
+        meta.StudyInstanceUID = studyInstanceUID;
     }
-    if ( dicomElements.SeriesInstanceUID ) {
-        meta.SeriesInstanceUID = dicomElements.SeriesInstanceUID.value[0];
+    // SeriesInstanceUID
+    var seriesInstanceUID = dicomElements.getFromKey("x0020000E");
+    if ( seriesInstanceUID !== null ) {
+        meta.SeriesInstanceUID = seriesInstanceUID;
     }
-    if ( dicomElements.BitsStored ) {
-        meta.BitsStored = parseInt(dicomElements.BitsStored.value[0], 10);
+    // BitsStored
+    var bitsStored = dicomElements.getFromKey("x00280101");
+    if ( bitsStored !== null ) {
+        meta.BitsStored = parseInt(bitsStored, 10);
     }
     image.setMeta(meta);
     
@@ -9199,28 +9462,33 @@ dwv.image.ViewFactory.prototype.create = function (dicomElements, pixelBuffer)
     var imageFactory = new dwv.image.ImageFactory();
     var image = imageFactory.create(dicomElements, pixelBuffer);
     
-    // pixel representation
-    var isSigned = 0;
-    if ( dicomElements.PixelRepresentation ) {
-        isSigned = dicomElements.PixelRepresentation.value[0];
+    // PixelRepresentation
+    var isSigned = false;
+    var pixelRepresentation = dicomElements.getFromKey("x00280103");
+    if ( pixelRepresentation !== null ) {
+        isSigned = (pixelRepresentation === 1);
     }
     // view
     var view = new dwv.image.View(image, isSigned);
-    // window center and width
+    // presets
     var windowPresets = [];
-    if ( dicomElements.WindowCenter && dicomElements.WindowWidth ) {
+    // WindowCenter and WindowWidth
+    var windowCenter = dicomElements.getFromKey("x00281050", true);
+    var windowWidth = dicomElements.getFromKey("x00281051", true);
+    if ( windowCenter !== null && windowWidth !== null ) {
         var name;
-        for ( var j = 0; j < dicomElements.WindowCenter.value.length; ++j) {
-            var width = parseFloat( dicomElements.WindowWidth.value[j], 10 );
+        for ( var j = 0; j < windowCenter.length; ++j) {
+            var width = parseFloat( windowWidth[j], 10 );
             if ( width !== 0 ) {
-                if ( dicomElements.WindowCenterWidthExplanation ) {
-                    name = dicomElements.WindowCenterWidthExplanation.value[j];
+                var windowCenterWidthExplanation = dicomElements.getFromKey("x00281055");
+                if ( windowCenterWidthExplanation !== null ) {
+                    name = windowCenterWidthExplanation[j];
                 }
                 else {
                     name = "Default"+j;
                 }
                 windowPresets.push({
-                    "center": parseFloat( dicomElements.WindowCenter.value[j], 10 ),
+                    "center": parseFloat( windowCenter[j], 10 ),
                     "width": width, 
                     "name": name
                 });
@@ -15222,27 +15490,6 @@ dwv.utils.capitaliseFirstLetter = function (string)
     var res = string;
     if ( string ) {
         res = string.charAt(0).toUpperCase() + string.slice(1);
-    }
-    return res;
-};
-
-/**
- * Clean string: trim and remove ending.
- * @method cleanString
- * @static
- * @param {String} string The string to clean.
- * @return {String} The cleaned string.
- */
-dwv.utils.cleanString = function (string)
-{
-    var res = string;
-    if ( string ) {
-        // trim spaces
-        res = string.trim();
-        // get rid of ending zero-width space (u200B)
-        if ( res[res.length-1] === String.fromCharCode("u200B") ) {
-            res = res.substring(0, res.length-1);
-        }
     }
     return res;
 };

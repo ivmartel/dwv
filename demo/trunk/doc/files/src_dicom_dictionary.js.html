@@ -41,6 +41,7 @@
                                 <li><a href="../classes/dwv.App.html">dwv.App</a></li>
                                 <li><a href="../classes/dwv.browser.html">dwv.browser</a></li>
                                 <li><a href="../classes/dwv.dicom.DataReader.html">dwv.dicom.DataReader</a></li>
+                                <li><a href="../classes/dwv.dicom.DicomElementsWrapper.html">dwv.dicom.DicomElementsWrapper</a></li>
                                 <li><a href="../classes/dwv.dicom.DicomParser.html">dwv.dicom.DicomParser</a></li>
                                 <li><a href="../classes/dwv.gui.html">dwv.gui</a></li>
                                 <li><a href="../classes/dwv.gui.base.html">dwv.gui.base</a></li>
@@ -290,15 +291,14 @@ dwv.dicom.dictionary = {
         &#x27;0x0020&#x27;: [&#x27;DA&#x27;, &#x27;1&#x27;, &#x27;StudyDate&#x27;],
         &#x27;0x0021&#x27;: [&#x27;DA&#x27;, &#x27;1&#x27;, &#x27;SeriesDate&#x27;],
         &#x27;0x0022&#x27;: [&#x27;DA&#x27;, &#x27;1&#x27;, &#x27;AcquisitionDate&#x27;],
-        &#x27;0x0023&#x27;: [&#x27;DA&#x27;, &#x27;1&#x27;, &#x27;ImageDate&#x27;],
-        /* &#x27;0x0023&#x27;: [&#x27;DA&#x27;,&#x27;1&#x27;,&#x27;ContentDate&#x27;], */
+        &#x27;0x0023&#x27;: [&#x27;DA&#x27;, &#x27;1&#x27;, &#x27;ContentDate&#x27;],
         &#x27;0x0024&#x27;: [&#x27;DA&#x27;, &#x27;1&#x27;, &#x27;OverlayDate&#x27;],
         &#x27;0x0025&#x27;: [&#x27;DA&#x27;, &#x27;1&#x27;, &#x27;CurveDate&#x27;],
         &#x27;0x002A&#x27;: [&#x27;DT&#x27;, &#x27;1&#x27;, &#x27;AcquisitionDatetime&#x27;],
         &#x27;0x0030&#x27;: [&#x27;TM&#x27;, &#x27;1&#x27;, &#x27;StudyTime&#x27;],
         &#x27;0x0031&#x27;: [&#x27;TM&#x27;, &#x27;1&#x27;, &#x27;SeriesTime&#x27;],
         &#x27;0x0032&#x27;: [&#x27;TM&#x27;, &#x27;1&#x27;, &#x27;AcquisitionTime&#x27;],
-        &#x27;0x0033&#x27;: [&#x27;TM&#x27;, &#x27;1&#x27;, &#x27;ImageTime&#x27;],
+        &#x27;0x0033&#x27;: [&#x27;TM&#x27;, &#x27;1&#x27;, &#x27;ContentTime&#x27;],
         &#x27;0x0034&#x27;: [&#x27;TM&#x27;, &#x27;1&#x27;, &#x27;OverlayTime&#x27;],
         &#x27;0x0035&#x27;: [&#x27;TM&#x27;, &#x27;1&#x27;, &#x27;CurveTime&#x27;],
         &#x27;0x0040&#x27;: [&#x27;US&#x27;, &#x27;1&#x27;, &#x27;OldDataSetType&#x27;],
@@ -565,7 +565,7 @@ dwv.dicom.dictionary = {
         &#x27;0x1147&#x27;: [&#x27;CS&#x27;, &#x27;1&#x27;, &#x27;FieldOfViewShape&#x27;],
         &#x27;0x1149&#x27;: [&#x27;IS&#x27;, &#x27;2&#x27;, &#x27;FieldOfViewDimension&#x27;],
         &#x27;0x1150&#x27;: [&#x27;IS&#x27;, &#x27;1&#x27;, &#x27;ExposureTime&#x27;],
-        &#x27;0x1151&#x27;: [&#x27;IS&#x27;, &#x27;1&#x27;, &#x27;XrayTubeCurrent&#x27;],
+        &#x27;0x1151&#x27;: [&#x27;IS&#x27;, &#x27;1&#x27;, &#x27;XRayTubeCurrent&#x27;],
         &#x27;0x1152&#x27;: [&#x27;IS&#x27;, &#x27;1&#x27;, &#x27;Exposure&#x27;],
         &#x27;0x1153&#x27;: [&#x27;IS&#x27;, &#x27;1&#x27;, &#x27;ExposureinuAs&#x27;],
         &#x27;0x1154&#x27;: [&#x27;DS&#x27;, &#x27;1&#x27;, &#x27;AveragePulseWidth&#x27;],
@@ -756,7 +756,7 @@ dwv.dicom.dictionary = {
         &#x27;0x0010&#x27;: [&#x27;SH&#x27;, &#x27;1&#x27;, &#x27;StudyID&#x27;],
         &#x27;0x0011&#x27;: [&#x27;IS&#x27;, &#x27;1&#x27;, &#x27;SeriesNumber&#x27;],
         &#x27;0x0012&#x27;: [&#x27;IS&#x27;, &#x27;1&#x27;, &#x27;AcquisitionNumber&#x27;],
-        &#x27;0x0013&#x27;: [&#x27;IS&#x27;, &#x27;1&#x27;, &#x27;ImageNumber&#x27;],
+        &#x27;0x0013&#x27;: [&#x27;IS&#x27;, &#x27;1&#x27;, &#x27;InstanceNumber&#x27;],
         &#x27;0x0014&#x27;: [&#x27;IS&#x27;, &#x27;1&#x27;, &#x27;IsotopeNumber&#x27;],
         &#x27;0x0015&#x27;: [&#x27;IS&#x27;, &#x27;1&#x27;, &#x27;PhaseNumber&#x27;],
         &#x27;0x0016&#x27;: [&#x27;IS&#x27;, &#x27;1&#x27;, &#x27;IntervalNumber&#x27;],
