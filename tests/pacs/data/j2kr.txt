@@ -1,0 +1,181 @@
+
+# Dicom-File-Format
+
+# Dicom-Meta-Information-Header
+# Used TransferSyntax: Little Endian Explicit
+(0002,0000) UL 192                                      #   4, 1 FileMetaInformationGroupLength
+(0002,0001) OB 00\01                                    #   2, 1 FileMetaInformationVersion
+(0002,0002) UI [1.2.840.10008.5.1.4.1.1.7]              #  26, 1 MediaStorageSOPClassUID
+(0002,0003) UI [1.3.6.1.4.1.5962.1.1.8.1.2.20040826185059.5457] #  46, 1 MediaStorageSOPInstanceUID
+(0002,0010) UI [1.2.840.10008.1.2.4.90]                 #  22, 1 TransferSyntaxUID
+(0002,0012) UI [1.3.6.1.4.1.5962.2]                     #  18, 1 ImplementationClassUID
+(0002,0013) SH [DCTOOL100]                              #  10, 1 ImplementationVersionName
+(0002,0016) AE [CLUNIE1]                                #   8, 1 SourceApplicationEntityTitle
+
+# Dicom-Data-Set
+# Used TransferSyntax: JPEG 2000 (Lossless only)
+(0008,0008) CS [DERIVED\PRIMARY\WHOLE BODY\EMISSION]    #  36, 4 ImageType
+(0008,0012) DA [19970911]                               #   8, 1 InstanceCreationDate
+(0008,0013) TM [125206]                                 #   6, 1 InstanceCreationTime
+(0008,0014) UI [1.3.6.1.4.1.5962.3]                     #  18, 1 InstanceCreatorUID
+(0008,0016) UI [1.2.840.10008.5.1.4.1.1.7]              #  26, 1 SOPClassUID
+(0008,0018) UI [1.3.6.1.4.1.5962.1.1.8.1.2.20040826185059.5457] #  46, 1 SOPInstanceUID
+(0008,0020) DA [20040826]                               #   8, 1 StudyDate
+(0008,0021) DA [19970806]                               #   8, 1 SeriesDate
+(0008,0022) DA [19970806]                               #   8, 1 AcquisitionDate
+(0008,0023) DA [19970806]                               #   8, 1 ContentDate
+(0008,0030) TM [185059]                                 #   6, 1 StudyTime
+(0008,0031) TM [122931]                                 #   6, 1 SeriesTime
+(0008,0032) TM [122931]                                 #   6, 1 AcquisitionTime
+(0008,0033) TM [122931]                                 #   6, 1 ContentTime
+(0008,0050) SH (no value available)                     #   0, 0 AccessionNumber
+(0008,0060) CS [NM]                                     #   2, 1 Modality
+(0008,0064) CS [WSD]                                    #   4, 1 ConversionType
+(0008,0070) LO [GE Medical Systems]                     #  18, 1 Manufacturer
+(0008,0080) LO [St. John's Memorial]                    #  20, 1 InstitutionName
+(0008,0090) PN (no value available)                     #   0, 0 ReferringPhysicianName
+(0008,0201) SH [-0400]                                  #   6, 1 TimezoneOffsetFromUTC
+(0008,1010) SH [genieacq]                               #   8, 1 StationName
+(0008,1030) LO [Whole Body Bone]                        #  16, 1 StudyDescription
+(0008,1060) PN (no value available)                     #   0, 0 NameOfPhysiciansReadingStudy
+(0008,1070) PN (no value available)                     #   0, 0 OperatorsName
+(0008,1090) LO [MILLENNIUM MG]                          #  14, 1 ManufacturerModelName
+(0008,2111) ST [JPEG 2000 reversible (lossless)]        #  32, 1 DerivationDescription
+(0008,2112) SQ (Sequence with undefined length #=1)     # u/l, 1 SourceImageSequence
+  (fffe,e000) na (Item with undefined length #=3)         # u/l, 1 Item
+    (0008,1150) UI [1.2.840.10008.5.1.4.1.1.7]              #  26, 1 ReferencedSOPClassUID
+    (0008,1155) UI [1.3.6.1.4.1.5962.1.1.8.1.1.20040826185059.5457] #  46, 1 ReferencedSOPInstanceUID
+    (0040,a170) SQ (Sequence with undefined length #=1)     # u/l, 1 PurposeOfReferenceCodeSequence
+      (fffe,e000) na (Item with undefined length #=3)         # u/l, 1 Item
+        (0008,0100) SH [121320]                                 #   6, 1 CodeValue
+        (0008,0102) SH [DCM]                                    #   4, 1 CodingSchemeDesignator
+        (0008,0104) LO [Uncompressed predecessor]               #  24, 1 CodeMeaning
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+    (fffe,e0dd) na (SequenceDelimitationItem)               #   0, 0 SequenceDelimitationItem
+  (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+(fffe,e0dd) na (SequenceDelimitationItem)               #   0, 0 SequenceDelimitationItem
+(0009,0010) LO [GEMS_GENIE_1]                           #  12, 1 PrivateCreator
+(0009,1010) LO [WB BONE]                                #   8, 1 Unknown Tag & Data
+(0009,1011) SL 1                                        #   4, 1 Unknown Tag & Data
+(0009,1012) SL 1                                        #   4, 1 Unknown Tag & Data
+(0009,101e) UI [1.2.840.113619.2.43.16112.2141964.41.61.870888524.19] #  52, 1 Unknown Tag & Data
+(0009,1020) LO [WHOLE BODY]                             #  10, 1 Unknown Tag & Data
+(0009,1021) SL 1                                        #   4, 1 Unknown Tag & Data
+(0009,1022) SH (no value available)                     #   0, 0 Unknown Tag & Data
+(0009,1023) SL 2                                        #   4, 1 Unknown Tag & Data
+(0009,1024) SL 60000                                    #   4, 1 Unknown Tag & Data
+(0009,1025) SL 20000                                    #   4, 1 Unknown Tag & Data
+(0009,1026) SL 1                                        #   4, 1 Unknown Tag & Data
+(0009,1027) SL 2                                        #   4, 1 Unknown Tag & Data
+(0009,102a) SL 0                                        #   4, 1 Unknown Tag & Data
+(0009,102c) LO (no value available)                     #   0, 0 Unknown Tag & Data
+(0009,102e) FD 1.8999999761581421                       #   8, 1 Unknown Tag & Data
+(0009,1030) LO [WHOLE BODY]                             #  10, 1 Unknown Tag & Data
+(0009,1040) LO [BERRA,JAMES]                            #  12, 1 Unknown Tag & Data
+(0009,1041) SL 1                                        #   4, 1 Unknown Tag & Data
+(0009,1042) DA [19970806]                               #   8, 1 Unknown Tag & Data
+(0009,1043) TM [122538]                                 #   6, 1 Unknown Tag & Data
+(0010,0010) PN [CompressedSamples^NM1]                  #  22, 1 PatientName
+(0010,0020) LO [8NM1]                                   #   4, 1 PatientID
+(0010,0030) DA (no value available)                     #   0, 0 PatientBirthDate
+(0010,0040) CS [M]                                      #   2, 1 PatientSex
+(0010,1000) LO (no value available)                     #   0, 0 OtherPatientIDs
+(0010,1001) PN (no value available)                     #   0, 0 OtherPatientNames
+(0010,1010) AS (no value available)                     #   0, 0 PatientAge
+(0010,1020) DS [0.000000]                               #   8, 1 PatientSize
+(0010,1030) DS [0.000000]                               #   8, 1 PatientWeight
+(0010,2160) SH (no value available)                     #   0, 0 EthnicGroup
+(0010,21b0) LT (no value available)                     #   0, 0 AdditionalPatientHistory
+(0010,4000) LT (no value available)                     #   0, 0 PatientComments
+(0011,0010) LO [GEMS_GENIE_1]                           #  12, 1 PrivateCreator
+(0011,100a) SL 1                                        #   4, 1 Unknown Tag & Data
+(0011,100b) SL 1210632                                  #   4, 1 Unknown Tag & Data
+(0011,100d) LO [Tc99m]                                  #   6, 1 Unknown Tag & Data
+(0011,1010) LO [WHOLE BODY_E]                           #  12, 1 Unknown Tag & Data
+(0011,1012) LO [WHOLE BODY_E]                           #  12, 1 Unknown Tag & Data
+(0011,1013) SL 2                                        #   4, 1 Unknown Tag & Data
+(0011,1015) SL 1                                        #   4, 1 Unknown Tag & Data
+(0011,1016) SL 1                                        #   4, 1 Unknown Tag & Data
+(0011,1019) FD 221.36400640010834                       #   8, 1 Unknown Tag & Data
+(0011,101a) SL 1                                        #   4, 1 Unknown Tag & Data
+(0011,101b) SL 1                                        #   4, 1 Unknown Tag & Data
+(0011,101c) SL 0\0\0\0                                  #  16, 4 Unknown Tag & Data
+(0011,101f) SL 4                                        #   4, 1 Unknown Tag & Data
+(0011,1023) SL 1                                        #   4, 1 Unknown Tag & Data
+(0011,1027) SL 0\0                                      #   8, 2 Unknown Tag & Data
+(0011,1028) SL 0\0                                      #   8, 2 Unknown Tag & Data
+(0011,1030) LO [WHOLE BODY_E]                           #  12, 1 Unknown Tag & Data
+(0011,1033) LO [ECOR]                                   #   4, 1 Unknown Tag & Data
+(0011,1034) LO [Tc99m]                                  #   6, 1 Unknown Tag & Data
+(0011,1035) LO [PMT]                                    #   4, 1 Unknown Tag & Data
+(0011,1038) SL 66                                       #   4, 1 Unknown Tag & Data
+(0011,103a) SL 5                                        #   4, 1 Unknown Tag & Data
+(0011,103b) FD 1                                        #   8, 1 Unknown Tag & Data
+(0011,103c) FD 0                                        #   8, 1 Unknown Tag & Data
+(0011,103e) SL 10                                       #   4, 1 Unknown Tag & Data
+(0011,103f) SL 1                                        #   4, 1 Unknown Tag & Data
+(0011,1044) FD 2048                                     #   8, 1 Unknown Tag & Data
+(0011,1045) FD 4096                                     #   8, 1 Unknown Tag & Data
+(0011,1046) SL 2                                        #   4, 1 Unknown Tag & Data
+(0011,1055) FD 1                                        #   8, 1 Unknown Tag & Data
+(0011,1056) FD 1                                        #   8, 1 Unknown Tag & Data
+(0013,0010) LO [GEMS_GENIE_1]                           #  12, 1 PrivateCreator
+(0013,1010) FD 578.55999755859375\2314.239990234375     #  16, 2 Unknown Tag & Data
+(0013,1011) SL 5                                        #   4, 1 Unknown Tag & Data
+(0013,1012) SL 0                                        #   4, 1 Unknown Tag & Data
+(0013,1016) SL 140                                      #   4, 1 Unknown Tag & Data
+(0013,1017) SL 5                                        #   4, 1 Unknown Tag & Data
+(0013,1018) FD 0                                        #   8, 1 Unknown Tag & Data
+(0013,1019) FD 70                                       #   8, 1 Unknown Tag & Data
+(0013,101a) FD 0                                        #   8, 1 Unknown Tag & Data
+(0013,101c) FD 0                                        #   8, 1 Unknown Tag & Data
+(0013,101d) FD 0                                        #   8, 1 Unknown Tag & Data
+(0013,1026) LT (no value available)                     #   0, 0 Unknown Tag & Data
+(0018,0015) CS [WHOLE BODY]                             #  10, 1 BodyPartExamined
+(0018,0070) IS [3596452]                                #   8, 1 CountsAccumulated
+(0018,0071) CS [MANU]                                   #   4, 1 AcquisitionTerminationCondition
+(0018,1000) LO [172.16.193.2]                           #  12, 1 DeviceSerialNumber
+(0018,1020) LO [2.0]                                    #   4, 1 SoftwareVersions
+(0018,1030) LO [Whole Body Bone]                        #  16, 1 ProtocolName
+(0018,1130) DS [654.820025]                             #  10, 1 TableHeight
+(0018,1131) DS [1572.260022]                            #  12, 1 TableTraverse
+(0018,1242) IS [1210434]                                #   8, 1 ActualFrameDuration
+(0018,1243) IS [950]                                    #   4, 1 CountRate
+(0018,1300) DS [1.671598]                               #   8, 1 ScanVelocity
+(0018,1301) CS [1PS]                                    #   4, 1 WholeBodyTechnique
+(0018,1302) IS [1899]                                   #   4, 1 ScanLength
+(0018,5100) CS [HFS]                                    #   4, 1 PatientPosition
+(0020,000d) UI [1.3.6.1.4.1.5962.1.2.8.20040826185059.5457] #  42, 1 StudyInstanceUID
+(0020,000e) UI [1.3.6.1.4.1.5962.1.3.8.1.20040826185059.5457] #  44, 1 SeriesInstanceUID
+(0020,0010) SH [8NM1]                                   #   4, 1 StudyID
+(0020,0011) IS [1]                                      #   2, 1 SeriesNumber
+(0020,0013) IS [2]                                      #   2, 1 InstanceNumber
+(0020,0020) CS (no value available)                     #   0, 0 PatientOrientation
+(0020,0052) UI [1.3.6.1.4.1.5962.1.4.8.1.20040826185059.5457] #  44, 1 FrameOfReferenceUID
+(0020,1040) LO (no value available)                     #   0, 0 PositionReferenceIndicator
+(0020,4000) LT [JPEG 2000 reversible (lossless)]        #  32, 1 ImageComments
+(0028,0002) US 1                                        #   2, 1 SamplesPerPixel
+(0028,0004) CS [MONOCHROME2]                            #  12, 1 PhotometricInterpretation
+(0028,0008) IS [1]                                      #   2, 1 NumberOfFrames
+(0028,0009) AT (0054,0010)\(0054,0020)                  #   8, 2 FrameIncrementPointer
+(0028,0010) US 1024                                     #   2, 1 Rows
+(0028,0011) US 256                                      #   2, 1 Columns
+(0028,0030) DS [2.260000\2.260000]                      #  18, 2 PixelSpacing
+(0028,0051) CS [NRGY\LIN]                               #   8, 2 CorrectedImage
+(0028,0100) US 16                                       #   2, 1 BitsAllocated
+(0028,0101) US 16                                       #   2, 1 BitsStored
+(0028,0102) US 15                                       #   2, 1 HighBit
+(0028,0103) US 1                                        #   2, 1 PixelRepresentation
+(0028,0106) SS 0                                        #   2, 1 SmallestImagePixelValue
+(0028,0107) SS 278                                      #   2, 1 LargestImagePixelValue
+(0028,2110) CS [00]                                     #   2, 1 LossyImageCompression
+(0054,0010) US 1                                        #   2, 1 EnergyWindowVector
+(0054,0011) US 1                                        #   2, 1 NumberOfEnergyWindows
+(0054,0020) US 1                                        #   2, 1 DetectorVector
+(0054,0021) US 1                                        #   2, 1 NumberOfDetectors
+(0054,0400) SH [WHOLE BODY_E]                           #  12, 1 ImageID
+(7fe0,0010) OB (PixelSequence #=3)                      # u/l, 1 PixelData
+  (fffe,e000) pi (no value available)                     #   0, 1 Item
+  (fffe,e000) pi ff\4f\ff\51\00\29\00\00\00\00\01\00\00\00\04\00\00\00\00\00\00\00... # 65536, 1 Item
+  (fffe,e000) pi 12\7e\74\ce\cd\f8\14\1d\ba\77\6f\e2\a8\fa\2e\0c\58\eb\8d\5a\e3\8a... # 21460, 1 Item
+(fffe,e0dd) na (SequenceDelimitationItem)               #   0, 0 SequenceDelimitationItem

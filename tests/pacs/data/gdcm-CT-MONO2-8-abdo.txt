@@ -1,0 +1,44 @@
+
+# Dicom-File-Format
+
+# Dicom-Meta-Information-Header
+# Used TransferSyntax: Little Endian Explicit
+(0002,0000) UL 86                                       #   4, 1 FileMetaInformationGroupLength
+(0002,0001) OB 01\00                                    #   2, 1 FileMetaInformationVersion
+(0002,0010) UI [1.2.840.10008.1.2]                      #  18, 1 TransferSyntaxUID
+(0002,0012) UI [1.2.124.113532.1.1]                     #  18, 1 ImplementationClassUID
+(0002,0013) SH [MITRA10SEP96]                           #  12, 1 ImplementationVersionName
+
+# Dicom-Data-Set
+# Used TransferSyntax: Little Endian Implicit
+(0008,0000) UL 180                                      #   4, 1 GenericGroupLength
+(0008,0016) UI [1.2.840.10008.5.1.4.1.1.7]              #  26, 1 SOPClassUID
+(0008,0018) UI [1.2.124.113532.1.1.1]                   #  20, 1 SOPInstanceUID
+(0008,0020) DA [0095.07.24]                             #  10, 1 StudyDate
+(0008,0030) TM [09:39:00]                               #   8, 1 StudyTime
+(0008,0050) SH []                                       #  16, 1 AccessionNumber
+(0008,0060) CS [CT]                                     #   2, 1 Modality
+(0008,0070) LO [FUJI]                                   #   4, 1 Manufacturer
+(0008,0080) LO [ANALOGIC/CDA]                           #  12, 1 InstitutionName
+(0008,0090) PN [Anonymized]                             #  10, 1 ReferringPhysicianName
+(0010,0000) UL 18                                       #   4, 1 GenericGroupLength
+(0010,0010) PN [Anonymized]                             #  10, 1 PatientName
+(0020,0000) UL 164                                      #   4, 1 GenericGroupLength
+(0020,000d) UI [072495.0449]                            #  64, 1 StudyInstanceUID
+(0020,000e) UI [REMSAMPLES1]                            #  64, 1 SeriesInstanceUID
+(0020,0011) IS [1]                                      #   2, 1 SeriesNumber
+(0020,0013) IS [1]                                      #   2, 1 InstanceNumber
+(0028,0000) UL 136                                      #   4, 1 GenericGroupLength
+(0028,0002) US 1                                        #   2, 1 SamplesPerPixel
+(0028,0004) CS [MONOCHROME2]                            #  12, 1 PhotometricInterpretation
+(0028,0010) US 512                                      #   2, 1 Rows
+(0028,0011) US 512                                      #   2, 1 Columns
+(0028,0030) DS [0.2\0\0.200000]                         #  14, 3 PixelSpacing
+(0028,0100) US 8                                        #   2, 1 BitsAllocated
+(0028,0101) US 8                                        #   2, 1 BitsStored
+(0028,0102) US 7                                        #   2, 1 HighBit
+(0028,0103) US 0                                        #   2, 1 PixelRepresentation
+(0028,1052) DS [0.0]                                    #   4, 1 RescaleIntercept
+(0028,1053) DS [1.0]                                    #   4, 1 RescaleSlope
+(7fe0,0000) UL 262152                                   #   4, 1 ACR_NEMA_2C_VariablePixelDataGroupLength
+(7fe0,0010) OW 0000\0000\0000\0000\0000\0000\0000\0000\0000\0000\0000\0000\0000... # 262144, 1 PixelData

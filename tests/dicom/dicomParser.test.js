@@ -2,7 +2,7 @@
  * Tests for the 'dicom/dicomParser.js' file.
  */
 // Do not warn if these variables were not defined before.
-/* global module, asyncTest, equal, start */
+/* global module, asyncTest, test, equal, start */
 module("dicomParser");
 
 asyncTest("Test DICOM parsing.", 3, function() {

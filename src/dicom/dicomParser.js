@@ -327,20 +327,20 @@ dwv.dicom.DicomParser.prototype.appendDicomElement = function( element, sequence
 {
     // simple case: not a sequence
     if ( typeof sequences === "undefined" || sequences.length === 0) {
-        this.dicomElements[element.name] = { 
-            "group": element.group, 
-            "element": element.element,
+        this.dicomElements[element.tag.name] = { 
+            "group": element.tag.group, 
+            "element": element.tag.element,
             "vr": element.vr,
             "vl": element.vl,
-            "value": element.value 
+            "value": element.data 
         };
     }
     else {
         // nothing to do for items and delimitations
         // (Item, ItemDelimitationItem, SequenceDelimitationItem)
-        if ( element.name === "xFFFEE000" || 
-                element.name === "xFFFEE00D" ||
-                element.name === "xFFFEE0DD" ) {
+        if ( element.tag.name === "xFFFEE000" ||
+                element.tag.name === "xFFFEE00D" ||
+                element.tag.name === "xFFFEE0DD" ) {
             return;
         }
         // create root for nested sequences
@@ -374,12 +374,12 @@ dwv.dicom.DicomParser.prototype.appendElementToSequence = function (
 {
     // start the sequence
     if ( typeof root[sequenceName] === "undefined" ) {
-        root[sequenceName] = { 
-            "group": element.group, 
-            "element": element.element,
+        root[sequenceName] = {
+            "group": element.tag.group,
+            "element": element.tag.element,
             "vr": element.vr,
             "vl": element.vl,
-            "value": [] 
+            "value": []
         };
     }
     // continue the sequence
@@ -389,12 +389,12 @@ dwv.dicom.DicomParser.prototype.appendElementToSequence = function (
             root[sequenceName].value[itemNumber] = {};
         }
         // append element
-        root[sequenceName].value[itemNumber][element.name] = { 
-            "group": element.group, 
-            "element": element.element,
+        root[sequenceName].value[itemNumber][element.tag.name] = {
+            "group": element.tag.group,
+            "element": element.tag.element,
             "vr": element.vr,
             "vl": element.vl,
-            "value": element.value 
+            "value": element.data
         };
     }
 };
@@ -519,7 +519,7 @@ dwv.dicom.DicomParser.prototype.readDataElement = function(reader, offset, impli
         if ( vr === "OX" ) {
             console.warn("OX value representation for tag: "+tag.name+".");
         }
-        // OB of BitsAllocated == 8
+        // OB or BitsAllocated == 8
         if ( vr === "OB" || 
                 ( typeof this.dicomElements.x00280100 !== 'undefined' &&
                     this.dicomElements.x00280100.value[0] === 8 ) ) {
@@ -575,6 +575,9 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
     
     // 0x0002, 0x0000: FileMetaInformationGroupLength
     var dataElement = this.readDataElement(metaReader, offset);
+    // store the data element
+    this.appendDicomElement( dataElement );
+    // get meta length
     var metaLength = parseInt(dataElement.data[0], 10);
     offset += dataElement.offset;
     
@@ -587,14 +590,7 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
         // get the data element
         dataElement = this.readDataElement(metaReader, i, false);
         // store the data element
-        this.appendDicomElement( { 
-            'name': dataElement.tag.name,
-            'group': dataElement.tag.group, 
-            'vr' : dataElement.vr, 
-            'vl' : dataElement.vl, 
-            'element': dataElement.tag.element,
-            'value': dataElement.data 
-        });
+        this.appendDicomElement( dataElement );
         // increment index
         i += dataElement.offset;
     }
@@ -714,14 +710,7 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
         }
         
         // store the data element
-        this.appendDicomElement( {
-            'name': tagName,
-            'group' : dataElement.tag.group, 
-            'vr' : dataElement.vr, 
-            'vl' : dataElement.vl, 
-            'element': dataElement.tag.element,
-            'value': dataElement.data 
-            }, sequences );
+        this.appendDicomElement( dataElement, sequences );
         
         // end of sequence with explicit length
         if ( dataElement.vr !== "SQ" && sequences.length !== 0 ) {
@@ -772,7 +761,10 @@ dwv.dicom.DicomElementsWrapper = function (dicomElements) {
     * @return {Object} The DICOM element value.
     */
     this.getFromKey = function ( groupElementKey, asArray ) {
-    	var asArray = asArray || false;
+        // default
+        if ( typeof asArray === "undefined" ) {
+            asArray = false;
+        }
         var value = null;
         var dElement = dicomElements[groupElementKey];
         if ( typeof dElement !== "undefined" ) {
@@ -787,7 +779,118 @@ dwv.dicom.DicomElementsWrapper = function (dicomElements) {
         return value;
     };
     
-}
+    /**
+     * Dump the DICOM tags to an array.
+     * @returns {Array}
+     */
+    this.dumpToTable = function () {
+        var keys = Object.keys(dicomElements);
+        var dict = dwv.dicom.dictionary;
+        var table = [];
+        var dicomElement = null;
+        var row = null;
+        for ( var i = 0 ; i < keys.length; ++i ) {
+            dicomElement = dicomElements[keys[i]];
+            row = {};
+            // trying to have name first in row
+            row.name = dict[dicomElement.group][dicomElement.element][2];
+            var deKeys = Object.keys(dicomElement);
+            for ( var j = 0 ; j < deKeys.length; ++j ) {
+                row[deKeys[j]] = dicomElement[deKeys[j]];
+            }
+            table.push( row );
+        }
+        return table;
+    };
+
+    /**
+     * Dump the DICOM tags to a string.
+     * @returns {String} The dumped file.
+     */
+    this.dump = function () {
+        var keys = Object.keys(dicomElements);
+        var dict = dwv.dicom.dictionary;
+        var result = "\n";
+        result += "# Dicom-File-Format\n";
+        result += "\n";
+        result += "# Dicom-Meta-Information-Header\n";
+        result += "# Used TransferSyntax: Little Endian Explicit\n";
+        var dicomElement = null;
+        var dictElement = null;
+        var checkHeader = true;
+        var deSize = null;
+        var line = null;
+        for ( var i = 0 ; i < keys.length; ++i ) {
+            dicomElement = dicomElements[keys[i]];
+            if ( checkHeader && dicomElement.group !== "0x0002" ) {
+                result += "\n";
+                result += "# Dicom-Data-Set\n";
+                result += "# Used TransferSyntax: ...\n";
+                checkHeader = false;
+            }
+            dictElement = dict[dicomElement.group][dicomElement.element];
+            
+            line = "(";
+            line += dicomElement.group.substr(2,5).toLowerCase();
+            line += ",";
+            line += dicomElement.element.substr(2,5).toLowerCase();
+            line += ") ";
+            line += dicomElement.vr;
+            if ( dicomElement.group !== "0x7FE0" || dicomElement.element !== "0x0010" ) {
+                deSize = dicomElement.value.length;
+                if ( dicomElement.value.length === 1 && dicomElement.value[0] === "" ) {
+                    line += " (no value available)";
+                    deSize = 0;
+                }
+                else {
+                    if ( dicomElement.vr === "UL" || dicomElement.vr === "US" ) {
+                        line += " ";
+                        line += dicomElement.value[0];
+                    }
+                    else {
+                        line += " [";
+                        for ( var j = 0; j < dicomElement.value.length; ++j ) {
+                            if ( j !== 0 ) {
+                                line += "\\";
+                            }
+                            if ( typeof dicomElement.value[j] === "string" ) {
+                                line += dwv.dicom.cleanString(dicomElement.value[j]);
+                            }
+                            else {
+                                line += dicomElement.value[j];
+                            }
+                        }
+                        line += "]";
+                    }
+                }
+            }
+            // align #
+            var spaces = 55 - line.length;
+            if ( spaces > 0 ) {
+                for ( var s = 0; s < spaces; ++s ) {
+                    line += " ";
+                }
+            }
+            line += " # ";
+            if ( dicomElement.vl < 100 ) {
+                line += " ";
+            }
+            if ( dicomElement.vl < 10 ) {
+                line += " ";
+            }
+            line += dicomElement.vl;
+            line += ", ";
+            line += deSize; //dictElement[1];
+            line += " ";
+            line += dictElement[2];
+            
+            result += line + "\n";
+            
+        }
+        return result;
+    };
+
+};
 
 /**
 * Get a DICOM Element value from a group and an element.

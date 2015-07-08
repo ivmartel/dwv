@@ -1,0 +1,89 @@
+
+# Dicom-File-Format
+
+# Dicom-Meta-Information-Header
+# Used TransferSyntax: Little Endian Explicit
+(0002,0000) UL 196                                      #   4, 1 FileMetaInformationGroupLength
+(0002,0001) OB 00\01                                    #   2, 1 FileMetaInformationVersion
+(0002,0002) UI [1.2.840.10008.5.1.4.1.1.6.1]            #  28, 1 MediaStorageSOPClassUID
+(0002,0003) UI [1.3.6.1.4.1.5962.1.1.13.1.3.20040826185059.5457] #  48, 1 MediaStorageSOPInstanceUID
+(0002,0010) UI [1.2.840.10008.1.2.4.91]                 #  22, 1 TransferSyntaxUID
+(0002,0012) UI [1.3.6.1.4.1.5962.2]                     #  18, 1 ImplementationClassUID
+(0002,0013) SH [DCTOOL100]                              #  10, 1 ImplementationVersionName
+(0002,0016) AE [CLUNIE1]                                #   8, 1 SourceApplicationEntityTitle
+
+# Dicom-Data-Set
+# Used TransferSyntax: JPEG 2000 (Lossless or Lossy)
+(0008,0008) CS [DERIVED\PRIMARY\SMALL PARTS]            #  28, 3 ImageType
+(0008,0012) DA [20040826]                               #   8, 1 InstanceCreationDate
+(0008,0013) TM [185844]                                 #   6, 1 InstanceCreationTime
+(0008,0014) UI [1.3.6.1.4.1.5962.3]                     #  18, 1 InstanceCreatorUID
+(0008,0016) UI [1.2.840.10008.5.1.4.1.1.6.1]            #  28, 1 SOPClassUID
+(0008,0018) UI [1.3.6.1.4.1.5962.1.1.13.1.3.20040826185059.5457] #  48, 1 SOPInstanceUID
+(0008,0020) DA [20040826]                               #   8, 1 StudyDate
+(0008,0030) TM [185059]                                 #   6, 1 StudyTime
+(0008,0050) SH (no value available)                     #   0, 0 AccessionNumber
+(0008,0060) CS [US]                                     #   2, 1 Modality
+(0008,0070) LO [G.E. Medical Systems]                   #  20, 1 Manufacturer
+(0008,0080) LO [BAPTIST MED CTR]                        #  16, 1 InstitutionName
+(0008,0090) PN (no value available)                     #   0, 0 ReferringPhysicianName
+(0008,0201) SH [-0400]                                  #   6, 1 TimezoneOffsetFromUTC
+(0008,1010) SH [mvme22]                                 #   6, 1 StationName
+(0008,1090) LO [LOGIQ 700]                              #  10, 1 ManufacturerModelName
+(0008,2111) ST [JPEG 2000 irreversible (lossy) 16:1]    #  36, 1 DerivationDescription
+(0008,2112) SQ (Sequence with undefined length #=1)     # u/l, 1 SourceImageSequence
+  (fffe,e000) na (Item with undefined length #=3)         # u/l, 1 Item
+    (0008,1150) UI [1.2.840.10008.5.1.4.1.1.6.1]            #  28, 1 ReferencedSOPClassUID
+    (0008,1155) UI [1.3.6.1.4.1.5962.1.1.13.1.1.20040826185059.5457] #  48, 1 ReferencedSOPInstanceUID
+    (0040,a170) SQ (Sequence with undefined length #=1)     # u/l, 1 PurposeOfReferenceCodeSequence
+      (fffe,e000) na (Item with undefined length #=3)         # u/l, 1 Item
+        (0008,0100) SH [121320]                                 #   6, 1 CodeValue
+        (0008,0102) SH [DCM]                                    #   4, 1 CodingSchemeDesignator
+        (0008,0104) LO [Uncompressed predecessor]               #  24, 1 CodeMeaning
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+    (fffe,e0dd) na (SequenceDelimitationItem)               #   0, 0 SequenceDelimitationItem
+  (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+(fffe,e0dd) na (SequenceDelimitationItem)               #   0, 0 SequenceDelimitationItem
+(0008,2122) IS [0]                                      #   2, 1 StageNumber
+(0008,2124) IS [1]                                      #   2, 1 NumberOfStages
+(0008,2128) IS [0]                                      #   2, 1 ViewNumber
+(0008,212a) IS [1]                                      #   2, 1 NumberOfViewsInStage
+(0008,9215) SQ (Sequence with undefined length #=1)     # u/l, 1 DerivationCodeSequence
+  (fffe,e000) na (Item with undefined length #=3)         # u/l, 1 Item
+    (0008,0100) SH [113040]                                 #   6, 1 CodeValue
+    (0008,0102) SH [DCM]                                    #   4, 1 CodingSchemeDesignator
+    (0008,0104) LO [Lossy Compression]                      #  18, 1 CodeMeaning
+  (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+(fffe,e0dd) na (SequenceDelimitationItem)               #   0, 0 SequenceDelimitationItem
+(0010,0010) PN [CompressedSamples^US1]                  #  22, 1 PatientName
+(0010,0020) LO [13US1]                                  #   6, 1 PatientID
+(0010,0030) DA (no value available)                     #   0, 0 PatientBirthDate
+(0010,0032) TM (no value available)                     #   0, 0 PatientBirthTime
+(0010,0040) CS [M]                                      #   2, 1 PatientSex
+(0010,1020) DS [0.000000]                               #   8, 1 PatientSize
+(0010,1030) DS [0.000000]                               #   8, 1 PatientWeight
+(0010,21b0) LT (no value available)                     #   0, 0 AdditionalPatientHistory
+(0018,1000) LO [4121885]                                #   8, 1 DeviceSerialNumber
+(0018,1020) LO [R1.0.D]                                 #   6, 1 SoftwareVersions
+(0020,000d) UI [1.3.6.1.4.1.5962.1.2.13.20040826185059.5457] #  44, 1 StudyInstanceUID
+(0020,000e) UI [1.3.6.1.4.1.5962.1.3.13.1.20040826185059.5457] #  46, 1 SeriesInstanceUID
+(0020,0010) SH [13US1]                                  #   6, 1 StudyID
+(0020,0011) IS [1]                                      #   2, 1 SeriesNumber
+(0020,0013) IS [3]                                      #   2, 1 InstanceNumber
+(0020,0020) CS (no value available)                     #   0, 0 PatientOrientation
+(0020,4000) LT [JPEG 2000 irreversible (lossy)]         #  30, 1 ImageComments
+(0028,0002) US 3                                        #   2, 1 SamplesPerPixel
+(0028,0004) CS [YBR_ICT]                                #   8, 1 PhotometricInterpretation
+(0028,0006) US 0                                        #   2, 1 PlanarConfiguration
+(0028,0010) US 480                                      #   2, 1 Rows
+(0028,0011) US 640                                      #   2, 1 Columns
+(0028,0100) US 8                                        #   2, 1 BitsAllocated
+(0028,0101) US 8                                        #   2, 1 BitsStored
+(0028,0102) US 7                                        #   2, 1 HighBit
+(0028,0103) US 0                                        #   2, 1 PixelRepresentation
+(0028,2110) CS [01]                                     #   2, 1 LossyImageCompression
+(0028,2112) DS [16]                                     #   2, 1 LossyImageCompressionRatio
+(7fe0,0010) OB (PixelSequence #=2)                      # u/l, 1 PixelData
+  (fffe,e000) pi (no value available)                     #   0, 1 Item
+  (fffe,e000) pi ff\4f\ff\51\00\2f\00\00\00\00\02\80\00\00\01\e0\00\00\00\00\00\00... # 57590, 1 Item
+(fffe,e0dd) na (SequenceDelimitationItem)               #   0, 0 SequenceDelimitationItem
