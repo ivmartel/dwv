@@ -317,7 +317,7 @@ dwv.dicom.dictionary = {
         '0x1019': ['LO', '1-n', 'SecondaryCaptureDeviceSoftwareVersion'],
         '0x101A': ['LO', '1-n', 'HardcopyDeviceSoftwareVersion'],
         '0x101B': ['LO', '1', 'HardcopyDeviceManfuacturersModelName'],
-        '0x1020': ['LO', '1-n', 'SoftwareVersion'],
+        '0x1020': ['LO', '1-n', 'SoftwareVersions'],
         '0x1022': ['SH', '1', 'VideoImageFormatAcquired'],
         '0x1023': ['LO', '1', 'DigitalImageFormatAcquired'],
         '0x1030': ['LO', '1', 'ProtocolName'],

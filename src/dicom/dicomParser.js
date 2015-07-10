@@ -29,6 +29,16 @@ dwv.dicom.cleanString = function (string)
 };
 
 /**
+ * Is the Native endianness Little Endian.
+ * @property isNativeLittleEndian
+ * @type Boolean
+ */
+dwv.dicom.isNativeLittleEndian = function ()
+{
+    return new Int8Array(new Int16Array([1]).buffer)[0] > 0;
+};
+
+/**
  * Data reader.
  * @class DataReader
  * @namespace dwv.dicom
@@ -36,20 +46,20 @@ dwv.dicom.cleanString = function (string)
  * @param {Array} buffer The input array buffer.
  * @param {Boolean} isLittleEndian Flag to tell if the data is little or big endian.
  */
-dwv.dicom.DataReader = function(buffer, isLittleEndian)
+dwv.dicom.DataReader = function (buffer, isLittleEndian)
 {
     // Set endian flag if not defined.
-    if(typeof(isLittleEndian)==='undefined') {
+    if ( typeof isLittleEndian === 'undefined' ) {
         isLittleEndian = true;
     }
     
     /**
-     * Native endianness.
+     * Is the Native endianness Little Endian.
      * @property isNativeLittleEndian
      * @private
      * @type Boolean
      */
-    var isNativeLittleEndian = new Int8Array(new Int16Array([1]).buffer)[0] > 0;
+    var isNativeLittleEndian = dwv.dicom.isNativeLittleEndian();
 
     /**
      * Flag to know if the TypedArray data needs flipping.
@@ -254,6 +264,55 @@ dwv.dicom.isJpeglsTransferSyntax = function(syntax)
 dwv.dicom.isJpeg2000TransferSyntax = function(syntax)
 {
     return syntax.match(/1.2.840.10008.1.2.4.9/) !== null;
+};
+
+/**
+ * Get the transfer syntax name.
+ * @method getTransferSyntaxName
+ * @param {String} The transfer syntax.
+ * @returns {String} The name of the transfer syntax.
+ */
+dwv.dicom.getTransferSyntaxName = function (syntax)
+{
+    var name = "unknown";
+    // Implicit VR - Little Endian
+    if( syntax === "1.2.840.10008.1.2" ) {
+        name = "Little Endian Implicit";
+    }
+    // Explicit VR - Little Endian
+    else if( syntax === "1.2.840.10008.1.2.1" ) {
+        name = "Little Endian Explicit";
+    }
+    // Deflated Explicit VR - Little Endian
+    else if( syntax === "1.2.840.10008.1.2.1.99" ) {
+        name = "Little Endian Deflated Explicit";
+    }
+    // Explicit VR - Big Endian
+    else if( syntax === "1.2.840.10008.1.2.2" ) {
+        name = "Big Endian Explicit";
+    }
+    // JPEG
+    else if( dwv.dicom.isJpegTransferSyntax(syntax) ) {
+        name = "JPEG";
+    }
+    // JPEG-LS
+    else if( dwv.dicom.isJpeglsTransferSyntax(syntax) ) {
+        name = "JPEG-LS";
+    }
+    // JPEG 2000
+    else if( dwv.dicom.isJpeg2000TransferSyntax(syntax) ) {
+        name = "JPEG 2000 (Lossless or Lossy)";
+    }
+    // MPEG2 Image Compression
+    else if( syntax === "1.2.840.10008.1.2.4.100" ) {
+        name = "MPEG2";
+    }
+    // RLE (lossless)
+    else if( syntax === "1.2.840.10008.1.2.5" ) {
+        name = "RLE";
+    }
+    // return
+    return name;
 };
 
 /**
@@ -788,12 +847,23 @@ dwv.dicom.DicomElementsWrapper = function (dicomElements) {
         var dict = dwv.dicom.dictionary;
         var table = [];
         var dicomElement = null;
+        var dictElement = null;
         var row = null;
         for ( var i = 0 ; i < keys.length; ++i ) {
             dicomElement = dicomElements[keys[i]];
             row = {};
             // trying to have name first in row
-            row.name = dict[dicomElement.group][dicomElement.element][2];
+            dictElement = null;
+            if ( typeof dict[dicomElement.group] !== "undefined" && 
+                    typeof dict[dicomElement.group][dicomElement.element] !== "undefined") {
+                dictElement = dict[dicomElement.group][dicomElement.element];
+            }
+            if ( dictElement !== null ) {
+                row.name = dictElement[2];
+            }
+            else {
+                row.name = "Unknown Tag & Data";
+            }
             var deKeys = Object.keys(dicomElement);
             for ( var j = 0 ; j < deKeys.length; ++j ) {
                 row[deKeys[j]] = dicomElement[deKeys[j]];
@@ -809,87 +879,185 @@ dwv.dicom.DicomElementsWrapper = function (dicomElements) {
      */
     this.dump = function () {
         var keys = Object.keys(dicomElements);
-        var dict = dwv.dicom.dictionary;
         var result = "\n";
         result += "# Dicom-File-Format\n";
         result += "\n";
         result += "# Dicom-Meta-Information-Header\n";
-        result += "# Used TransferSyntax: Little Endian Explicit\n";
+        result += "# Used TransferSyntax: ";
+        if ( dwv.dicom.isNativeLittleEndian() ) {
+            result += "Little Endian Explicit\n";
+        }
+        else {
+            result += "NOT Little Endian Explicit\n";
+        }
         var dicomElement = null;
-        var dictElement = null;
         var checkHeader = true;
-        var deSize = null;
-        var line = null;
         for ( var i = 0 ; i < keys.length; ++i ) {
             dicomElement = dicomElements[keys[i]];
             if ( checkHeader && dicomElement.group !== "0x0002" ) {
                 result += "\n";
                 result += "# Dicom-Data-Set\n";
-                result += "# Used TransferSyntax: ...\n";
+                result += "# Used TransferSyntax: ";
+                var syntax = dwv.dicom.cleanString(dicomElements.x00020010.value[0]);
+                result += dwv.dicom.getTransferSyntaxName(syntax);
+                result += "\n";
                 checkHeader = false;
             }
-            dictElement = dict[dicomElement.group][dicomElement.element];
-            
-            line = "(";
-            line += dicomElement.group.substr(2,5).toLowerCase();
-            line += ",";
-            line += dicomElement.element.substr(2,5).toLowerCase();
-            line += ") ";
-            line += dicomElement.vr;
-            if ( dicomElement.group !== "0x7FE0" || dicomElement.element !== "0x0010" ) {
-                deSize = dicomElement.value.length;
-                if ( dicomElement.value.length === 1 && dicomElement.value[0] === "" ) {
-                    line += " (no value available)";
-                    deSize = 0;
-                }
-                else {
-                    if ( dicomElement.vr === "UL" || dicomElement.vr === "US" ) {
-                        line += " ";
-                        line += dicomElement.value[0];
-                    }
-                    else {
-                        line += " [";
-                        for ( var j = 0; j < dicomElement.value.length; ++j ) {
-                            if ( j !== 0 ) {
-                                line += "\\";
-                            }
-                            if ( typeof dicomElement.value[j] === "string" ) {
-                                line += dwv.dicom.cleanString(dicomElement.value[j]);
-                            }
-                            else {
-                                line += dicomElement.value[j];
-                            }
-                        }
-                        line += "]";
-                    }
-                }
-            }
-            // align #
-            var spaces = 55 - line.length;
-            if ( spaces > 0 ) {
-                for ( var s = 0; s < spaces; ++s ) {
-                    line += " ";
-                }
-            }
-            line += " # ";
-            if ( dicomElement.vl < 100 ) {
-                line += " ";
-            }
-            if ( dicomElement.vl < 10 ) {
-                line += " ";
-            }
-            line += dicomElement.vl;
-            line += ", ";
-            line += deSize; //dictElement[1];
-            line += " ";
-            line += dictElement[2];
-            
-            result += line + "\n";
-            
+            result += this.getElementAsString(dicomElement) + "\n";
         }
         return result;
     };
 
+};
+
+/**
+ * 
+ * @param group
+ * @param element
+ * @returns
+ */
+dwv.dicom.DicomElementsWrapper.prototype.getElementAsString = function ( dicomElement, prefix )
+{
+    // default prefix
+    prefix = prefix || "";
+    
+    // get element from dictionary
+    var dict = dwv.dicom.dictionary;
+    var dictElement = null;
+    if ( typeof dict[dicomElement.group] !== "undefined" && 
+            typeof dict[dicomElement.group][dicomElement.element] !== "undefined") {
+        dictElement = dict[dicomElement.group][dicomElement.element];
+    }
+    
+    var deSize = dicomElement.value.length;
+
+    var line = null;
+    
+    // (group,element)
+    line = "(";
+    line += dicomElement.group.substr(2,5).toLowerCase();
+    line += ",";
+    line += dicomElement.element.substr(2,5).toLowerCase();
+    line += ") ";
+    // value representation
+    line += dicomElement.vr;
+    // value
+    if ( dicomElement.value.length === 1 && dicomElement.value[0] === "" ) {
+        line += " (no value available)";
+        deSize = 0;
+    }
+    else {
+        // simple number display
+        if ( dicomElement.vr === "UL" || 
+                dicomElement.vr === "US" ||
+                dicomElement.vr === "na" ) {
+            line += " ";
+            line += dicomElement.value[0];
+        }
+        // 'O'ther array, limited display length
+        else if ( dicomElement.vr[0] === 'O' ) {
+            line += " ";
+            var valuesStr = "";
+            var valueStr = "";
+            for ( var k = 0; k < dicomElement.value.length; ++k ) {
+                valueStr = "";
+                if ( k !== 0 ) {
+                    valueStr += "\\";
+                }
+                valueStr += dicomElement.value[k];
+                if ( valuesStr.length + valueStr.length <= 65 ) {
+                    valuesStr += valueStr;
+                }
+                else {
+                    valuesStr += "...";
+                    break;
+                }
+            }
+            line += valuesStr;
+        }
+        else if ( dicomElement.vr === 'SQ' ) {
+            line += " (Sequence with undefined length #=";
+    		line += dicomElement.value.length;
+    		line += ")";
+        }
+        // default
+        else {
+            line += " [";
+            for ( var j = 0; j < dicomElement.value.length; ++j ) {
+                if ( j !== 0 ) {
+                    line += "\\";
+                }
+                if ( typeof dicomElement.value[j] === "string" ) {
+                    line += dwv.dicom.cleanString(dicomElement.value[j]);
+                }
+                else {
+                    line += dicomElement.value[j];
+                }
+            }
+            line += "]";
+        }
+    }
+    
+    // align #
+    var nSpaces = 55 - line.length;
+    if ( nSpaces > 0 ) {
+        for ( var s = 0; s < nSpaces; ++s ) {
+            line += " ";
+        }
+    }
+    line += " # ";
+    if ( dicomElement.vl < 100 ) {
+        line += " ";
+    }
+    if ( dicomElement.vl < 10 ) {
+        line += " ";
+    }
+    line += dicomElement.vl;
+    line += ", ";
+    line += deSize; //dictElement[1];
+    line += " ";
+    if ( dictElement !== null ) {
+        line += dictElement[2];
+    }
+    else {
+        line += "Unknown Tag & Data";
+    }
+    
+    // continue for sequence
+    if ( dicomElement.vr === 'SQ' ) {
+        var item = null;
+        for ( var l = 0; l < dicomElement.value.length; ++l ) {
+            item = dicomElement.value[l];
+            var itemKeys = Object.keys(item);
+            var itemElement = {
+                "group": "0xFFFE",
+                "element": "0xE000",
+                "vr": "na", 
+                "vl": "u/l", 
+                "value": ["(Item with undefined length #="+itemKeys.length+")"],
+            };
+            
+            line += "\n";
+            line += this.getElementAsString(itemElement, "  ");
+            
+            for ( var m = 0; m < itemKeys.length; ++m ) {
+                line += "\n";
+                line += this.getElementAsString(item[itemKeys[m]], "    ");
+            }
+
+            var itemDelimElement = {
+                "group": "0xFFFE",
+                "element": "0xE00D",
+                "vr": "na", 
+                "vl": "0", 
+                "value": ["(ItemDelimitationItem)"],
+            };
+            line += "\n";
+            line += this.getElementAsString(itemDelimElement, "  ");
+        }
+    }
+
+    return prefix + line;
 };
 
 /**
