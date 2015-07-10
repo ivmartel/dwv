@@ -207,6 +207,16 @@ dwv.dicom.cleanString = function (string)
 };
 
 /**
+ * Is the Native endianness Little Endian.
+ * @property isNativeLittleEndian
+ * @type Boolean
+ */
+dwv.dicom.isNativeLittleEndian = function ()
+{
+    return new Int8Array(new Int16Array([1]).buffer)[0] &gt; 0;
+};
+
+/**
  * Data reader.
  * @class DataReader
  * @namespace dwv.dicom
@@ -214,20 +224,20 @@ dwv.dicom.cleanString = function (string)
  * @param {Array} buffer The input array buffer.
  * @param {Boolean} isLittleEndian Flag to tell if the data is little or big endian.
  */
-dwv.dicom.DataReader = function(buffer, isLittleEndian)
+dwv.dicom.DataReader = function (buffer, isLittleEndian)
 {
     // Set endian flag if not defined.
-    if(typeof(isLittleEndian)===&#x27;undefined&#x27;) {
+    if ( typeof isLittleEndian === &#x27;undefined&#x27; ) {
         isLittleEndian = true;
     }
     
     /**
-     * Native endianness.
+     * Is the Native endianness Little Endian.
      * @property isNativeLittleEndian
      * @private
      * @type Boolean
      */
-    var isNativeLittleEndian = new Int8Array(new Int16Array([1]).buffer)[0] &gt; 0;
+    var isNativeLittleEndian = dwv.dicom.isNativeLittleEndian();
 
     /**
      * Flag to know if the TypedArray data needs flipping.
@@ -432,6 +442,55 @@ dwv.dicom.isJpeglsTransferSyntax = function(syntax)
 dwv.dicom.isJpeg2000TransferSyntax = function(syntax)
 {
     return syntax.match(/1.2.840.10008.1.2.4.9/) !== null;
+};
+
+/**
+ * Get the transfer syntax name.
+ * @method getTransferSyntaxName
+ * @param {String} The transfer syntax.
+ * @returns {String} The name of the transfer syntax.
+ */
+dwv.dicom.getTransferSyntaxName = function (syntax)
+{
+    var name = &quot;unknown&quot;;
+    // Implicit VR - Little Endian
+    if( syntax === &quot;1.2.840.10008.1.2&quot; ) {
+        name = &quot;Little Endian Implicit&quot;;
+    }
+    // Explicit VR - Little Endian
+    else if( syntax === &quot;1.2.840.10008.1.2.1&quot; ) {
+        name = &quot;Little Endian Explicit&quot;;
+    }
+    // Deflated Explicit VR - Little Endian
+    else if( syntax === &quot;1.2.840.10008.1.2.1.99&quot; ) {
+        name = &quot;Little Endian Deflated Explicit&quot;;
+    }
+    // Explicit VR - Big Endian
+    else if( syntax === &quot;1.2.840.10008.1.2.2&quot; ) {
+        name = &quot;Big Endian Explicit&quot;;
+    }
+    // JPEG
+    else if( dwv.dicom.isJpegTransferSyntax(syntax) ) {
+        name = &quot;JPEG&quot;;
+    }
+    // JPEG-LS
+    else if( dwv.dicom.isJpeglsTransferSyntax(syntax) ) {
+        name = &quot;JPEG-LS&quot;;
+    }
+    // JPEG 2000
+    else if( dwv.dicom.isJpeg2000TransferSyntax(syntax) ) {
+        name = &quot;JPEG 2000 (Lossless or Lossy)&quot;;
+    }
+    // MPEG2 Image Compression
+    else if( syntax === &quot;1.2.840.10008.1.2.4.100&quot; ) {
+        name = &quot;MPEG2&quot;;
+    }
+    // RLE (lossless)
+    else if( syntax === &quot;1.2.840.10008.1.2.5&quot; ) {
+        name = &quot;RLE&quot;;
+    }
+    // return
+    return name;
 };
 
 /**
@@ -966,12 +1025,23 @@ dwv.dicom.DicomElementsWrapper = function (dicomElements) {
         var dict = dwv.dicom.dictionary;
         var table = [];
         var dicomElement = null;
+        var dictElement = null;
         var row = null;
         for ( var i = 0 ; i &lt; keys.length; ++i ) {
             dicomElement = dicomElements[keys[i]];
             row = {};
             // trying to have name first in row
-            row.name = dict[dicomElement.group][dicomElement.element][2];
+            dictElement = null;
+            if ( typeof dict[dicomElement.group] !== &quot;undefined&quot; &amp;&amp; 
+                    typeof dict[dicomElement.group][dicomElement.element] !== &quot;undefined&quot;) {
+                dictElement = dict[dicomElement.group][dicomElement.element];
+            }
+            if ( dictElement !== null ) {
+                row.name = dictElement[2];
+            }
+            else {
+                row.name = &quot;Unknown Tag &amp; Data&quot;;
+            }
             var deKeys = Object.keys(dicomElement);
             for ( var j = 0 ; j &lt; deKeys.length; ++j ) {
                 row[deKeys[j]] = dicomElement[deKeys[j]];
@@ -987,87 +1057,185 @@ dwv.dicom.DicomElementsWrapper = function (dicomElements) {
      */
     this.dump = function () {
         var keys = Object.keys(dicomElements);
-        var dict = dwv.dicom.dictionary;
         var result = &quot;\n&quot;;
         result += &quot;# Dicom-File-Format\n&quot;;
         result += &quot;\n&quot;;
         result += &quot;# Dicom-Meta-Information-Header\n&quot;;
-        result += &quot;# Used TransferSyntax: Little Endian Explicit\n&quot;;
+        result += &quot;# Used TransferSyntax: &quot;;
+        if ( dwv.dicom.isNativeLittleEndian() ) {
+            result += &quot;Little Endian Explicit\n&quot;;
+        }
+        else {
+            result += &quot;NOT Little Endian Explicit\n&quot;;
+        }
         var dicomElement = null;
-        var dictElement = null;
         var checkHeader = true;
-        var deSize = null;
-        var line = null;
         for ( var i = 0 ; i &lt; keys.length; ++i ) {
             dicomElement = dicomElements[keys[i]];
             if ( checkHeader &amp;&amp; dicomElement.group !== &quot;0x0002&quot; ) {
                 result += &quot;\n&quot;;
                 result += &quot;# Dicom-Data-Set\n&quot;;
-                result += &quot;# Used TransferSyntax: ...\n&quot;;
+                result += &quot;# Used TransferSyntax: &quot;;
+                var syntax = dwv.dicom.cleanString(dicomElements.x00020010.value[0]);
+                result += dwv.dicom.getTransferSyntaxName(syntax);
+                result += &quot;\n&quot;;
                 checkHeader = false;
             }
-            dictElement = dict[dicomElement.group][dicomElement.element];
-            
-            line = &quot;(&quot;;
-            line += dicomElement.group.substr(2,5).toLowerCase();
-            line += &quot;,&quot;;
-            line += dicomElement.element.substr(2,5).toLowerCase();
-            line += &quot;) &quot;;
-            line += dicomElement.vr;
-            if ( dicomElement.group !== &quot;0x7FE0&quot; || dicomElement.element !== &quot;0x0010&quot; ) {
-                deSize = dicomElement.value.length;
-                if ( dicomElement.value.length === 1 &amp;&amp; dicomElement.value[0] === &quot;&quot; ) {
-                    line += &quot; (no value available)&quot;;
-                    deSize = 0;
-                }
-                else {
-                    if ( dicomElement.vr === &quot;UL&quot; || dicomElement.vr === &quot;US&quot; ) {
-                        line += &quot; &quot;;
-                        line += dicomElement.value[0];
-                    }
-                    else {
-                        line += &quot; [&quot;;
-                        for ( var j = 0; j &lt; dicomElement.value.length; ++j ) {
-                            if ( j !== 0 ) {
-                                line += &quot;\\&quot;;
-                            }
-                            if ( typeof dicomElement.value[j] === &quot;string&quot; ) {
-                                line += dwv.dicom.cleanString(dicomElement.value[j]);
-                            }
-                            else {
-                                line += dicomElement.value[j];
-                            }
-                        }
-                        line += &quot;]&quot;;
-                    }
-                }
-            }
-            // align #
-            var spaces = 55 - line.length;
-            if ( spaces &gt; 0 ) {
-                for ( var s = 0; s &lt; spaces; ++s ) {
-                    line += &quot; &quot;;
-                }
-            }
-            line += &quot; # &quot;;
-            if ( dicomElement.vl &lt; 100 ) {
-                line += &quot; &quot;;
-            }
-            if ( dicomElement.vl &lt; 10 ) {
-                line += &quot; &quot;;
-            }
-            line += dicomElement.vl;
-            line += &quot;, &quot;;
-            line += deSize; //dictElement[1];
-            line += &quot; &quot;;
-            line += dictElement[2];
-            
-            result += line + &quot;\n&quot;;
-            
+            result += this.getElementAsString(dicomElement) + &quot;\n&quot;;
         }
         return result;
     };
 
+};
+
+/**
+ * 
+ * @param group
+ * @param element
+ * @returns
+ */
+dwv.dicom.DicomElementsWrapper.prototype.getElementAsString = function ( dicomElement, prefix )
+{
+    // default prefix
+    prefix = prefix || &quot;&quot;;
+    
+    // get element from dictionary
+    var dict = dwv.dicom.dictionary;
+    var dictElement = null;
+    if ( typeof dict[dicomElement.group] !== &quot;undefined&quot; &amp;&amp; 
+            typeof dict[dicomElement.group][dicomElement.element] !== &quot;undefined&quot;) {
+        dictElement = dict[dicomElement.group][dicomElement.element];
+    }
+    
+    var deSize = dicomElement.value.length;
+
+    var line = null;
+    
+    // (group,element)
+    line = &quot;(&quot;;
+    line += dicomElement.group.substr(2,5).toLowerCase();
+    line += &quot;,&quot;;
+    line += dicomElement.element.substr(2,5).toLowerCase();
+    line += &quot;) &quot;;
+    // value representation
+    line += dicomElement.vr;
+    // value
+    if ( dicomElement.value.length === 1 &amp;&amp; dicomElement.value[0] === &quot;&quot; ) {
+        line += &quot; (no value available)&quot;;
+        deSize = 0;
+    }
+    else {
+        // simple number display
+        if ( dicomElement.vr === &quot;UL&quot; || 
+                dicomElement.vr === &quot;US&quot; ||
+                dicomElement.vr === &quot;na&quot; ) {
+            line += &quot; &quot;;
+            line += dicomElement.value[0];
+        }
+        // &#x27;O&#x27;ther array, limited display length
+        else if ( dicomElement.vr[0] === &#x27;O&#x27; ) {
+            line += &quot; &quot;;
+            var valuesStr = &quot;&quot;;
+            var valueStr = &quot;&quot;;
+            for ( var k = 0; k &lt; dicomElement.value.length; ++k ) {
+                valueStr = &quot;&quot;;
+                if ( k !== 0 ) {
+                    valueStr += &quot;\\&quot;;
+                }
+                valueStr += dicomElement.value[k];
+                if ( valuesStr.length + valueStr.length &lt;= 65 ) {
+                    valuesStr += valueStr;
+                }
+                else {
+                    valuesStr += &quot;...&quot;;
+                    break;
+                }
+            }
+            line += valuesStr;
+        }
+        else if ( dicomElement.vr === &#x27;SQ&#x27; ) {
+            line += &quot; (Sequence with undefined length #=&quot;;
+    		line += dicomElement.value.length;
+    		line += &quot;)&quot;;
+        }
+        // default
+        else {
+            line += &quot; [&quot;;
+            for ( var j = 0; j &lt; dicomElement.value.length; ++j ) {
+                if ( j !== 0 ) {
+                    line += &quot;\\&quot;;
+                }
+                if ( typeof dicomElement.value[j] === &quot;string&quot; ) {
+                    line += dwv.dicom.cleanString(dicomElement.value[j]);
+                }
+                else {
+                    line += dicomElement.value[j];
+                }
+            }
+            line += &quot;]&quot;;
+        }
+    }
+    
+    // align #
+    var nSpaces = 55 - line.length;
+    if ( nSpaces &gt; 0 ) {
+        for ( var s = 0; s &lt; nSpaces; ++s ) {
+            line += &quot; &quot;;
+        }
+    }
+    line += &quot; # &quot;;
+    if ( dicomElement.vl &lt; 100 ) {
+        line += &quot; &quot;;
+    }
+    if ( dicomElement.vl &lt; 10 ) {
+        line += &quot; &quot;;
+    }
+    line += dicomElement.vl;
+    line += &quot;, &quot;;
+    line += deSize; //dictElement[1];
+    line += &quot; &quot;;
+    if ( dictElement !== null ) {
+        line += dictElement[2];
+    }
+    else {
+        line += &quot;Unknown Tag &amp; Data&quot;;
+    }
+    
+    // continue for sequence
+    if ( dicomElement.vr === &#x27;SQ&#x27; ) {
+        var item = null;
+        for ( var l = 0; l &lt; dicomElement.value.length; ++l ) {
+            item = dicomElement.value[l];
+            var itemKeys = Object.keys(item);
+            var itemElement = {
+                &quot;group&quot;: &quot;0xFFFE&quot;,
+                &quot;element&quot;: &quot;0xE000&quot;,
+                &quot;vr&quot;: &quot;na&quot;, 
+                &quot;vl&quot;: &quot;u/l&quot;, 
+                &quot;value&quot;: [&quot;(Item with undefined length #=&quot;+itemKeys.length+&quot;)&quot;],
+            };
+            
+            line += &quot;\n&quot;;
+            line += this.getElementAsString(itemElement, &quot;  &quot;);
+            
+            for ( var m = 0; m &lt; itemKeys.length; ++m ) {
+                line += &quot;\n&quot;;
+                line += this.getElementAsString(item[itemKeys[m]], &quot;    &quot;);
+            }
+
+            var itemDelimElement = {
+                &quot;group&quot;: &quot;0xFFFE&quot;,
+                &quot;element&quot;: &quot;0xE00D&quot;,
+                &quot;vr&quot;: &quot;na&quot;, 
+                &quot;vl&quot;: &quot;0&quot;, 
+                &quot;value&quot;: [&quot;(ItemDelimitationItem)&quot;],
+            };
+            line += &quot;\n&quot;;
+            line += this.getElementAsString(itemDelimElement, &quot;  &quot;);
+        }
+    }
+
+    return prefix + line;
 };
 
 /**
