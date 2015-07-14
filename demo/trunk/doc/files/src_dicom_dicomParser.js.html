@@ -562,8 +562,9 @@ dwv.dicom.DicomParser.prototype.getPixelBuffer = function()
  */
 dwv.dicom.DicomParser.prototype.appendDicomElement = function( element, sequences )
 {
-    // simple case: not a sequence
-    if ( typeof sequences === &quot;undefined&quot; || sequences.length === 0) {
+    // simple case: not a Sequence or a SequenceDelimitationItem
+    if ( ( typeof sequences === &quot;undefined&quot; || sequences.length === 0 ) &amp;&amp;
+            element.tag.name !== &quot;xFFFEE0DD&quot; ) {
         this.dicomElements[element.tag.name] = { 
             &quot;group&quot;: element.tag.group, 
             &quot;element&quot;: element.tag.element,
@@ -573,10 +574,11 @@ dwv.dicom.DicomParser.prototype.appendDicomElement = function( element, sequence
         };
     }
     else {
-        // nothing to do for items and delimitations
-        // (Item, ItemDelimitationItem, SequenceDelimitationItem)
-        if ( element.tag.name === &quot;xFFFEE000&quot; ||
-                element.tag.name === &quot;xFFFEE00D&quot; ||
+        // storing item element as other elements
+        
+        // nothing to do for delimitations
+        // (ItemDelimitationItem, SequenceDelimitationItem)
+        if ( element.tag.name === &quot;xFFFEE00D&quot; ||
                 element.tag.name === &quot;xFFFEE0DD&quot; ) {
             return;
         }
@@ -593,6 +595,7 @@ dwv.dicom.DicomParser.prototype.appendDicomElement = function( element, sequence
             sequenceName = sequences[i].name;
             itemNumber = sequences[i].itemNumber;
         }
+        
         // append
         this.appendElementToSequence(root, sequenceName, itemNumber, element);
     }
@@ -889,7 +892,7 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
         tagOffset = dataElement.offset;
         var vlNumber = (dataElement.vl === &quot;u/l&quot;) ? 0 : dataElement.vl;
         
-        // new sequence
+        // new sequence (either vl=&quot;u/l&quot; or vl!=0)
         if ( dataElement.vr === &quot;SQ&quot; &amp;&amp; dataElement.vl !== 0 ) {
             sequences.push( {
                 &#x27;name&#x27;: tagName, &#x27;itemNumber&#x27;: -1,
@@ -1108,6 +1111,13 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementAsString = function ( dicomEl
     }
     
     var deSize = dicomElement.value.length;
+    
+    // no size for delimitations
+    if ( dicomElement.group === &quot;0xFFFE&quot; &amp;&amp; (
+            dicomElement.element === &quot;0xE00D&quot; ||
+            dicomElement.element === &quot;0xE0DD&quot; ) ) {
+        deSize = 0;
+    }
 
     var line = null;
     
@@ -1154,7 +1164,14 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementAsString = function ( dicomEl
             line += valuesStr;
         }
         else if ( dicomElement.vr === &#x27;SQ&#x27; ) {
-            line += &quot; (Sequence with undefined length #=&quot;;
+            line += &quot; (Sequence with&quot;;
+            if ( dicomElement.vl === &quot;u/l&quot; ) {
+                line += &quot; undefined&quot;;
+            }
+            else {
+                line += &quot; explicit&quot;;
+            }
+            line += &quot; length #=&quot;;
     		line += dicomElement.value.length;
     		line += &quot;)&quot;;
         }
@@ -1201,38 +1218,69 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementAsString = function ( dicomEl
         line += &quot;Unknown Tag &amp; Data&quot;;
     }
     
+    var message = null;
+    
     // continue for sequence
     if ( dicomElement.vr === &#x27;SQ&#x27; ) {
         var item = null;
         for ( var l = 0; l &lt; dicomElement.value.length; ++l ) {
             item = dicomElement.value[l];
             var itemKeys = Object.keys(item);
-            var itemElement = {
-                &quot;group&quot;: &quot;0xFFFE&quot;,
-                &quot;element&quot;: &quot;0xE000&quot;,
-                &quot;vr&quot;: &quot;na&quot;, 
-                &quot;vl&quot;: &quot;u/l&quot;, 
-                &quot;value&quot;: [&quot;(Item with undefined length #=&quot;+itemKeys.length+&quot;)&quot;],
-            };
+            
+            // get the item element
+            var itemElement = item.xFFFEE000;
+            message = &quot;(Item with&quot;;
+            if ( itemElement.vl === &quot;u/l&quot; ) {
+                message += &quot; undefined&quot;;
+            }
+            else {
+                message += &quot; explicit&quot;;
+            }
+            message += &quot; length #=&quot;+(itemKeys.length - 1)+&quot;)&quot;;
+            itemElement.value = [message];
+            itemElement.vr = &quot;na&quot;;
             
             line += &quot;\n&quot;;
-            line += this.getElementAsString(itemElement, &quot;  &quot;);
+            line += this.getElementAsString(itemElement, prefix + &quot;  &quot;);
             
             for ( var m = 0; m &lt; itemKeys.length; ++m ) {
-                line += &quot;\n&quot;;
-                line += this.getElementAsString(item[itemKeys[m]], &quot;    &quot;);
+                if ( itemKeys[m] !== &quot;xFFFEE000&quot; ) {
+                    line += &quot;\n&quot;;
+                    line += this.getElementAsString(item[itemKeys[m]], prefix + &quot;    &quot;);
+                }
             }
 
+            message = &quot;(ItemDelimitationItem&quot;;
+            if ( itemElement.vl !== &quot;u/l&quot; ) {
+                message += &quot; for re-encoding&quot;;
+            }
+            message += &quot;)&quot;;
             var itemDelimElement = {
-                &quot;group&quot;: &quot;0xFFFE&quot;,
-                &quot;element&quot;: &quot;0xE00D&quot;,
-                &quot;vr&quot;: &quot;na&quot;, 
-                &quot;vl&quot;: &quot;0&quot;, 
-                &quot;value&quot;: [&quot;(ItemDelimitationItem)&quot;],
-            };
-            line += &quot;\n&quot;;
-            line += this.getElementAsString(itemDelimElement, &quot;  &quot;);
+                    &quot;group&quot;: &quot;0xFFFE&quot;,
+                    &quot;element&quot;: &quot;0xE00D&quot;,
+                    &quot;vr&quot;: &quot;na&quot;, 
+                    &quot;vl&quot;: &quot;0&quot;, 
+                    &quot;value&quot;: [message],
+                };
+                line += &quot;\n&quot;;
+                line += this.getElementAsString(itemDelimElement, prefix + &quot;  &quot;);
+
         }
+        
+        message = &quot;(SequenceDelimitationItem&quot;;
+        if ( dicomElement.vl !== &quot;u/l&quot; ) {
+            message += &quot; for re-encod.&quot;;
+        }
+        message += &quot;)&quot;;
+        var sqDelimElement = {
+            &quot;group&quot;: &quot;0xFFFE&quot;,
+            &quot;element&quot;: &quot;0xE0DD&quot;,
+            &quot;vr&quot;: &quot;na&quot;, 
+            &quot;vl&quot;: &quot;0&quot;, 
+            &quot;value&quot;: [message],
+        };
+        line += &quot;\n&quot;;
+        line += this.getElementAsString(sqDelimElement, prefix);
     }
 
     return prefix + line;

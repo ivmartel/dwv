@@ -2208,8 +2208,9 @@ dwv.dicom.DicomParser.prototype.getPixelBuffer = function()
  */
 dwv.dicom.DicomParser.prototype.appendDicomElement = function( element, sequences )
 {
-    // simple case: not a sequence
-    if ( typeof sequences === "undefined" || sequences.length === 0) {
+    // simple case: not a Sequence or a SequenceDelimitationItem
+    if ( ( typeof sequences === "undefined" || sequences.length === 0 ) &&
+            element.tag.name !== "xFFFEE0DD" ) {
         this.dicomElements[element.tag.name] = { 
             "group": element.tag.group, 
             "element": element.tag.element,
@@ -2219,10 +2220,11 @@ dwv.dicom.DicomParser.prototype.appendDicomElement = function( element, sequence
         };
     }
     else {
-        // nothing to do for items and delimitations
-        // (Item, ItemDelimitationItem, SequenceDelimitationItem)
-        if ( element.tag.name === "xFFFEE000" ||
-                element.tag.name === "xFFFEE00D" ||
+        // storing item element as other elements
+        
+        // nothing to do for delimitations
+        // (ItemDelimitationItem, SequenceDelimitationItem)
+        if ( element.tag.name === "xFFFEE00D" ||
                 element.tag.name === "xFFFEE0DD" ) {
             return;
         }
@@ -2239,6 +2241,7 @@ dwv.dicom.DicomParser.prototype.appendDicomElement = function( element, sequence
             sequenceName = sequences[i].name;
             itemNumber = sequences[i].itemNumber;
         }
+        
         // append
         this.appendElementToSequence(root, sequenceName, itemNumber, element);
     }
@@ -2535,7 +2538,7 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
         tagOffset = dataElement.offset;
         var vlNumber = (dataElement.vl === "u/l") ? 0 : dataElement.vl;
         
-        // new sequence
+        // new sequence (either vl="u/l" or vl!=0)
         if ( dataElement.vr === "SQ" && dataElement.vl !== 0 ) {
             sequences.push( {
                 'name': tagName, 'itemNumber': -1,
@@ -2754,6 +2757,13 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementAsString = function ( dicomEl
     }
     
     var deSize = dicomElement.value.length;
+    
+    // no size for delimitations
+    if ( dicomElement.group === "0xFFFE" && (
+            dicomElement.element === "0xE00D" ||
+            dicomElement.element === "0xE0DD" ) ) {
+        deSize = 0;
+    }
 
     var line = null;
     
@@ -2800,7 +2810,14 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementAsString = function ( dicomEl
             line += valuesStr;
         }
         else if ( dicomElement.vr === 'SQ' ) {
-            line += " (Sequence with undefined length #=";
+            line += " (Sequence with";
+            if ( dicomElement.vl === "u/l" ) {
+                line += " undefined";
+            }
+            else {
+                line += " explicit";
+            }
+            line += " length #=";
     		line += dicomElement.value.length;
     		line += ")";
         }
@@ -2847,38 +2864,69 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementAsString = function ( dicomEl
         line += "Unknown Tag & Data";
     }
     
+    var message = null;
+    
     // continue for sequence
     if ( dicomElement.vr === 'SQ' ) {
         var item = null;
         for ( var l = 0; l < dicomElement.value.length; ++l ) {
             item = dicomElement.value[l];
             var itemKeys = Object.keys(item);
-            var itemElement = {
-                "group": "0xFFFE",
-                "element": "0xE000",
-                "vr": "na", 
-                "vl": "u/l", 
-                "value": ["(Item with undefined length #="+itemKeys.length+")"],
-            };
+            
+            // get the item element
+            var itemElement = item.xFFFEE000;
+            message = "(Item with";
+            if ( itemElement.vl === "u/l" ) {
+                message += " undefined";
+            }
+            else {
+                message += " explicit";
+            }
+            message += " length #="+(itemKeys.length - 1)+")";
+            itemElement.value = [message];
+            itemElement.vr = "na";
             
             line += "\n";
-            line += this.getElementAsString(itemElement, "  ");
+            line += this.getElementAsString(itemElement, prefix + "  ");
             
             for ( var m = 0; m < itemKeys.length; ++m ) {
-                line += "\n";
-                line += this.getElementAsString(item[itemKeys[m]], "    ");
+                if ( itemKeys[m] !== "xFFFEE000" ) {
+                    line += "\n";
+                    line += this.getElementAsString(item[itemKeys[m]], prefix + "    ");
+                }
             }
 
+            message = "(ItemDelimitationItem";
+            if ( itemElement.vl !== "u/l" ) {
+                message += " for re-encoding";
+            }
+            message += ")";
             var itemDelimElement = {
-                "group": "0xFFFE",
-                "element": "0xE00D",
-                "vr": "na", 
-                "vl": "0", 
-                "value": ["(ItemDelimitationItem)"],
-            };
-            line += "\n";
-            line += this.getElementAsString(itemDelimElement, "  ");
+                    "group": "0xFFFE",
+                    "element": "0xE00D",
+                    "vr": "na", 
+                    "vl": "0", 
+                    "value": [message],
+                };
+                line += "\n";
+                line += this.getElementAsString(itemDelimElement, prefix + "  ");
+
         }
+        
+        message = "(SequenceDelimitationItem";
+        if ( dicomElement.vl !== "u/l" ) {
+            message += " for re-encod.";
+        }
+        message += ")";
+        var sqDelimElement = {
+            "group": "0xFFFE",
+            "element": "0xE0DD",
+            "vr": "na", 
+            "vl": "0", 
+            "value": [message],
+        };
+        line += "\n";
+        line += this.getElementAsString(sqDelimElement, prefix);
     }
 
     return prefix + line;
@@ -3096,7 +3144,7 @@ dwv.dicom.dictionary = {
         '0x1032': ['SQ', '1', 'ProcedureCodeSequence'],
         '0x103E': ['LO', '1', 'SeriesDescription'],
         '0x1040': ['LO', '1', 'InstitutionalDepartmentName'],
-        '0x1048': ['PN', '1-n', 'PhysicianOfRecord'],
+        '0x1048': ['PN', '1-n', 'PhysiciansOfRecord'],
         '0x1050': ['PN', '1-n', 'PerformingPhysicianName'],
         '0x1060': ['PN', '1-n', 'PhysicianReadingStudy'],
         '0x1070': ['PN', '1-n', 'OperatorName'],
@@ -3787,7 +3835,7 @@ dwv.dicom.dictionary = {
         '0x0005': ['TM', '1', 'ScheduledProcedureStepEndTime'],
         '0x0006': ['PN', '1', 'ScheduledPerformingPhysicianName'],
         '0x0007': ['LO', '1', 'ScheduledProcedureStepDescription'],
-        '0x0008': ['SQ', '1', 'ScheduledProcedureStepCodeSequence'],
+        '0x0008': ['SQ', '1', 'ScheduledProtocolCodeSequence'],
         '0x0009': ['SH', '1', 'ScheduledProcedureStepID'],
         '0x0010': ['SH', '1', 'ScheduledStationName'],
         '0x0011': ['SH', '1', 'ScheduledProcedureStepLocation'],
