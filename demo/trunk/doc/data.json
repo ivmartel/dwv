@@ -637,7 +637,7 @@
             },
             "tag": "module",
             "file": "src/dicom/dicomParser.js",
-            "line": 809,
+            "line": 825,
             "description": "DICOM module."
         },
         "browser": {
@@ -941,7 +941,7 @@
             "module": "dicom",
             "namespace": "dwv.dicom",
             "file": "src/dicom/dicomParser.js",
-            "line": 809,
+            "line": 825,
             "description": "DicomElements wrapper.",
             "is_constructor": 1,
             "params": [
@@ -4571,7 +4571,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 613,
+            "line": 614,
             "description": "Parse the complete DICOM file (given as input to the class).\nFills in the member object 'dicomElements'.",
             "itemtype": "method",
             "name": "parse",
@@ -4587,7 +4587,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 818,
+            "line": 834,
             "description": "Get a DICOM Element value from a group/element key.",
             "itemtype": "method",
             "name": "getFromKey",
@@ -4613,7 +4613,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 844,
+            "line": 860,
             "description": "Dump the DICOM tags to an array.",
             "return": {
                 "description": "",
@@ -4625,7 +4625,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 879,
+            "line": 895,
             "description": "Dump the DICOM tags to a string.",
             "return": {
                 "description": "The dumped file.",
@@ -4637,7 +4637,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 916,
+            "line": 932,
             "params": [
                 {
                     "name": "group",
@@ -4657,7 +4657,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 1111,
+            "line": 1165,
             "description": "Get a DICOM Element value from a group and an element.",
             "itemtype": "method",
             "name": "getFromGroupElement",
@@ -4683,7 +4683,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 1125,
+            "line": 1179,
             "description": "Get a DICOM Element value from a tag name.\nUses the DICOM dictionary.",
             "itemtype": "method",
             "name": "getFromName",
@@ -13561,15 +13561,15 @@
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/dicom/dicomParser.js:844"
+            "line": " src/dicom/dicomParser.js:860"
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/dicom/dicomParser.js:879"
+            "line": " src/dicom/dicomParser.js:895"
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/dicom/dicomParser.js:916"
+            "line": " src/dicom/dicomParser.js:932"
         },
         {
             "message": "unknown tag: input",
@@ -13665,15 +13665,15 @@
         },
         {
             "message": "Missing item type\nDump the DICOM tags to an array.",
-            "line": " src/dicom/dicomParser.js:844"
+            "line": " src/dicom/dicomParser.js:860"
         },
         {
             "message": "Missing item type\nDump the DICOM tags to a string.",
-            "line": " src/dicom/dicomParser.js:879"
+            "line": " src/dicom/dicomParser.js:895"
         },
         {
             "message": "Missing item type",
-            "line": " src/dicom/dicomParser.js:916"
+            "line": " src/dicom/dicomParser.js:932"
         },
         {
             "message": "Missing item type\nDICOM tag dictionary.",

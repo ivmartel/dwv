@@ -700,6 +700,7 @@ dwv.dicom.DicomParser.prototype.readDataElement = function(reader, offset, impli
     else {
         // implicit VR?
         if(implicit) {
+            vr = &quot;UN&quot;;
             var dict = dwv.dicom.dictionary;
             if ( typeof dict[tag.group] !== &quot;undefined&quot; &amp;&amp;
                     typeof dict[tag.group][tag.element] !== &quot;undefined&quot; ) {
@@ -945,7 +946,13 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
                 this.pixelBuffer = dataElement.data;
             }
             else {
+                // pixel data sequence
                 startedPixelItems = true;
+                sequences.push( {
+                    &#x27;name&#x27;: tagName, &#x27;itemNumber&#x27;: -1,
+                    &#x27;vl&#x27;: dataElement.vl, &#x27;vlCount&#x27;: 0
+                });
+                tagOffset -= vlNumber;
             }
         }
         
@@ -956,8 +963,17 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
         if ( dataElement.vr !== &quot;SQ&quot; &amp;&amp; sequences.length !== 0 ) {
             var last = sequences.length - 1;
             sequences[last].vlCount += tagOffset;
+            // check if we have reached the sequence vl
             if ( sequences[last].vlCount === sequences[last].vl ) {
+                // last count + size of a sequence
+                var lastVlCount = sequences[last].vlCount + 12;
+                // remove last sequence
                 sequences = sequences.slice(0, -1);
+                // add nested sequence vl
+                if ( sequences.length !== 0 ) {
+                    last = sequences.length - 1;
+                    sequences[last].vlCount += lastVlCount;
+                }
             }
         }
         
@@ -1119,6 +1135,10 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementAsString = function ( dicomEl
         deSize = 0;
     }
 
+    var isPixSequence = (dicomElement.group === &#x27;0x7FE0&#x27; &amp;&amp; 
+        dicomElement.element === &#x27;0x0010&#x27; &amp;&amp; 
+        dicomElement.vl === &#x27;u/l&#x27;);
+    
     var line = null;
     
     // (group,element)
@@ -1142,8 +1162,18 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementAsString = function ( dicomEl
             line += &quot; &quot;;
             line += dicomElement.value[0];
         }
+        else if ( dicomElement.vr === &#x27;SL&#x27; ||
+                dicomElement.vr === &#x27;SS&#x27; ) {
+            line += &quot; &quot;;
+            line += dicomElement.value[0];
+        }
+        // pixel sequence
+        else if ( isPixSequence ) {
+            line += &quot; (PixelSequence #=&quot; + deSize + &quot;)&quot;;
+        }
         // &#x27;O&#x27;ther array, limited display length
-        else if ( dicomElement.vr[0] === &#x27;O&#x27; ) {
+        else if ( dicomElement.vr[0] === &#x27;O&#x27; ||
+                dicomElement.vr === &#x27;pi&#x27; ) {
             line += &quot; &quot;;
             var valuesStr = &quot;&quot;;
             var valueStr = &quot;&quot;;
@@ -1281,6 +1311,30 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementAsString = function ( dicomEl
         };
         line += &quot;\n&quot;;
         line += this.getElementAsString(sqDelimElement, prefix);
+    }
+    // pixel sequence
+    else if ( isPixSequence ) {
+        var pixItem = null;
+        for ( var n = 0; n &lt; dicomElement.value.length; ++n ) {
+            pixItem = dicomElement.value[n];
+            var pixItemKeys = Object.keys(pixItem);
+            for ( var o = 0; o &lt; pixItemKeys.length; ++o ) {
+                line += &quot;\n&quot;;
+                var pixElement = pixItem[pixItemKeys[o]];
+                pixElement.vr = &#x27;pi&#x27;;
+                line += this.getElementAsString(pixElement, prefix + &quot;  &quot;);
+            }
+        }
+        
+        var pixDelimElement = {
+            &quot;group&quot;: &quot;0xFFFE&quot;,
+            &quot;element&quot;: &quot;0xE0DD&quot;,
+            &quot;vr&quot;: &quot;na&quot;, 
+            &quot;vl&quot;: &quot;0&quot;, 
+            &quot;value&quot;: [&quot;(SequenceDelimitationItem)&quot;],
+        };
+        line += &quot;\n&quot;;
+        line += this.getElementAsString(pixDelimElement, prefix);
     }
 
     return prefix + line;
