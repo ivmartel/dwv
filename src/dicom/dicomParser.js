@@ -522,6 +522,7 @@ dwv.dicom.DicomParser.prototype.readDataElement = function(reader, offset, impli
     else {
         // implicit VR?
         if(implicit) {
+            vr = "UN";
             var dict = dwv.dicom.dictionary;
             if ( typeof dict[tag.group] !== "undefined" &&
                     typeof dict[tag.group][tag.element] !== "undefined" ) {
