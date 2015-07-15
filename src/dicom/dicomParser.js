@@ -767,7 +767,13 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
                 this.pixelBuffer = dataElement.data;
             }
             else {
+                // pixel data sequence
                 startedPixelItems = true;
+                sequences.push( {
+                    'name': tagName, 'itemNumber': -1,
+                    'vl': dataElement.vl, 'vlCount': 0
+                });
+                tagOffset -= vlNumber;
             }
         }
         
@@ -778,8 +784,17 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
         if ( dataElement.vr !== "SQ" && sequences.length !== 0 ) {
             var last = sequences.length - 1;
             sequences[last].vlCount += tagOffset;
+            // check if we have reached the sequence vl
             if ( sequences[last].vlCount === sequences[last].vl ) {
+                // last count + size of a sequence
+                var lastVlCount = sequences[last].vlCount + 12;
+                // remove last sequence
                 sequences = sequences.slice(0, -1);
+                // add nested sequence vl
+                if ( sequences.length !== 0 ) {
+                    last = sequences.length - 1;
+                    sequences[last].vlCount += lastVlCount;
+                }
             }
         }
         
@@ -941,6 +956,10 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementAsString = function ( dicomEl
         deSize = 0;
     }
 
+    var isPixSequence = (dicomElement.group === '0x7FE0' && 
+        dicomElement.element === '0x0010' && 
+        dicomElement.vl === 'u/l');
+    
     var line = null;
     
     // (group,element)
@@ -964,8 +983,18 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementAsString = function ( dicomEl
             line += " ";
             line += dicomElement.value[0];
         }
+        else if ( dicomElement.vr === 'SL' ||
+                dicomElement.vr === 'SS' ) {
+            line += " ";
+            line += dicomElement.value[0];
+        }
+        // pixel sequence
+        else if ( isPixSequence ) {
+            line += " (PixelSequence #=" + deSize + ")";
+        }
         // 'O'ther array, limited display length
-        else if ( dicomElement.vr[0] === 'O' ) {
+        else if ( dicomElement.vr[0] === 'O' ||
+                dicomElement.vr === 'pi' ) {
             line += " ";
             var valuesStr = "";
             var valueStr = "";
@@ -1103,6 +1132,30 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementAsString = function ( dicomEl
         };
         line += "\n";
         line += this.getElementAsString(sqDelimElement, prefix);
+    }
+    // pixel sequence
+    else if ( isPixSequence ) {
+        var pixItem = null;
+        for ( var n = 0; n < dicomElement.value.length; ++n ) {
+            pixItem = dicomElement.value[n];
+            var pixItemKeys = Object.keys(pixItem);
+            for ( var o = 0; o < pixItemKeys.length; ++o ) {
+                line += "\n";
+                var pixElement = pixItem[pixItemKeys[o]];
+                pixElement.vr = 'pi';
+                line += this.getElementAsString(pixElement, prefix + "  ");
+            }
+        }
+        
+        var pixDelimElement = {
+            "group": "0xFFFE",
+            "element": "0xE0DD",
+            "vr": "na", 
+            "vl": "0", 
+            "value": ["(SequenceDelimitationItem)"],
+        };
+        line += "\n";
+        line += this.getElementAsString(pixDelimElement, prefix);
     }
 
     return prefix + line;
