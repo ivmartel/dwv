@@ -98,15 +98,6 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian)
     };
       
     /**
-     * Read Uint8 (1 byte) data.
-     * @method readUint8
-     * @param {Number} byteOffset The offset to start reading from.
-     * @return {Number} The read data.
-     */
-    this.readUint8 = function(byteOffset) {
-        return view.getUint8(byteOffset, isLittleEndian);
-    };
-    /**
      * Read Uint16 (2 bytes) data.
      * @method readUint16
      * @param {Number} byteOffset The offset to start reading from.
@@ -125,13 +116,13 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian)
         return view.getUint32(byteOffset, isLittleEndian);
     };
     /**
-     * Read Float32 (8 bytes) data.
-     * @method readFloat32
+     * Read Int32 (4 bytes) data.
+     * @method readInt32
      * @param {Number} byteOffset The offset to start reading from.
      * @return {Number} The read data.
      */
-    this.readFloat32 = function(byteOffset) {
-        return view.getFloat32(byteOffset, isLittleEndian);
+    this.readInt32 = function(byteOffset) {
+        return view.getInt32(byteOffset, isLittleEndian);
     };
     /**
      * Read Uint8 array.
@@ -142,6 +133,16 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian)
      */
     this.readUint8Array = function(byteOffset, size) {
         return new Uint8Array(buffer, byteOffset, size);
+    };
+    /**
+     * Read Int8 array.
+     * @method readInt8Array
+     * @param {Number} byteOffset The offset to start reading from.
+     * @param {Number} size The size of the array.
+     * @return {Array} The read data.
+     */
+    this.readInt8Array = function(byteOffset, size) {
+        return new Int8Array(buffer, byteOffset, size);
     };
     /**
      * Read Uint16 array.
@@ -158,6 +159,20 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian)
         return data;
     };
     /**
+     * Read Int16 array.
+     * @method readInt16Array
+     * @param {Number} byteOffset The offset to start reading from.
+     * @param {Number} size The size of the array.
+     * @return {Array} The read data.
+     */
+    this.readInt16Array = function(byteOffset, size) {
+        var data = new Int16Array(buffer, byteOffset, (size / 2));
+        if ( needFlip ) {
+            this.flipArrayEndianness(data);
+        }
+        return data;
+    };
+    /**
      * Read Uint32 array.
      * @method readUint32Array
      * @param {Number} byteOffset The offset to start reading from.
@@ -167,6 +182,7 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian)
     this.readUint32Array = function(byteOffset, size) {
         var arraySize = size / 4;
         var data = null;
+        // start offset of Uint32Array should be a multiple of 4
         if ( (byteOffset % 4) === 0 ) {
             data = new Uint32Array(buffer, byteOffset, arraySize);
             if ( needFlip ) {
@@ -176,7 +192,82 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian)
         else {
             data = new Uint32Array(arraySize);
             for ( var i = 0; i < arraySize; ++i ) {
-                data[i] = this.readUint32( byteOffset + 4*i );
+                data[i] = view.getUint32((byteOffset + 4*i), isLittleEndian);
+            }
+        }
+        return data;
+    };
+    /**
+     * Read Int32 array.
+     * @method readInt32Array
+     * @param {Number} byteOffset The offset to start reading from.
+     * @param {Number} size The size of the array.
+     * @return {Array} The read data.
+     */
+    this.readInt32Array = function(byteOffset, size) {
+        var arraySize = size / 4;
+        var data = null;
+        // start offset of Int32Array should be a multiple of 4
+        if ( (byteOffset % 4) === 0 ) {
+            data = new Int32Array(buffer, byteOffset, arraySize);
+            if ( needFlip ) {
+                this.flipArrayEndianness(data);
+            }
+        }
+        else {
+            data = new Int32Array(arraySize);
+            for ( var i = 0; i < arraySize; ++i ) {
+                data[i] = view.getInt32((byteOffset + 4*i), isLittleEndian);
+            }
+        }
+        return data;
+    };
+    /**
+     * Read Float32 array.
+     * @method readFloat32Array
+     * @param {Number} byteOffset The offset to start reading from.
+     * @param {Number} size The size of the array.
+     * @return {Array} The read data.
+     */
+    this.readFloat32Array = function(byteOffset, size) {
+        var arraySize = size / 4;
+        var data = null;
+        // start offset of Float32Array should be a multiple of 4
+        if ( (byteOffset % 4) === 0 ) {
+            data = new Float32Array(buffer, byteOffset, arraySize);
+            if ( needFlip ) {
+                this.flipArrayEndianness(data);
+            }
+        }
+        else {
+            data = new Float32Array(arraySize);
+            for ( var i = 0; i < arraySize; ++i ) {
+                data[i] = view.getFloat32((byteOffset + 4*i), isLittleEndian);
+            }
+        }
+        return data;
+    };
+    /**
+     * Read Float64 array.
+     * @method readFloat64Array
+     * @param {Number} byteOffset The offset to start reading from.
+     * @param {Number} size The size of the array.
+     * @return {Array} The read data.
+     */
+    this.readFloat64Array = function(byteOffset, size) {
+        var arraySize = size / 8;
+        var data = null;
+        // start offset of Float64Array should be a multiple of 8
+        if ( (byteOffset % 8) === 0 ) {
+            data = new Float64Array(buffer, byteOffset, arraySize);
+            if ( needFlip ) {
+                this.flipArrayEndianness(data);
+            }
+        }
+        else {
+            data = new Float64Array(arraySize);
+            for ( var i = 0; i < arraySize; ++i ) {
+                data[i] = view.getFloat64((byteOffset + 8*i), isLittleEndian);
             }
         }
         return data;
@@ -351,6 +442,16 @@ dwv.dicom.DicomParser = function()
         unknownCount++;    
         return unknownCount;
     }; 
+};
+
+/**
+ * Get the raw DICOM data elements.
+ * @method getRawDicomElements
+ * @returns {Object} The raw DICOM elements.
+ */
+dwv.dicom.DicomParser.prototype.getRawDicomElements = function()
+{
+    return this.dicomElements;
 };
 
 /**
@@ -550,8 +651,6 @@ dwv.dicom.DicomParser.prototype.readDataElement = function(reader, offset, impli
         }
     }
     
-    var isUnsignedVR = ( vr === "US" || vr === "UL" );
-    
     // check the value of VL
     var vlString = vl;
     if( vl === 0xffffffff ) {
@@ -562,22 +661,7 @@ dwv.dicom.DicomParser.prototype.readDataElement = function(reader, offset, impli
     // data
     var data = null;
     var dataOffset = offset+tagOffset+vrOffset+vlOffset;
-    if( vr === "N/A")
-    {
-        data = reader.readUint8Array( dataOffset, vl );
-    }
-    else if ( isUnsignedVR ) 
-    {
-        if( vr === "US")
-        {
-            data = reader.readUint16Array( dataOffset, vl );
-        }
-        else // UL
-        {
-            data = reader.readUint32Array( dataOffset, vl );
-        }
-    }
-    else if( isOtherVR )
+    if( isOtherVR )
     {
         if ( vr === "OX" ) {
             console.warn("OX value representation for tag: "+tag.name+".");
@@ -592,6 +676,53 @@ dwv.dicom.DicomParser.prototype.readDataElement = function(reader, offset, impli
             data = reader.readUint16Array( dataOffset, vl );
         }
     }
+    // numbers
+    else if( vr === "US")
+    {
+        data = reader.readUint16Array( dataOffset, vl );
+    }
+    else if( vr === "UL")
+    {
+        data = reader.readUint32Array( dataOffset, vl );
+    }
+    else if( vr === "SS")
+    {
+        data = reader.readInt16Array( dataOffset, vl );
+    }
+    else if( vr === "SL")
+    {
+        data = reader.readInt32Array( dataOffset, vl );
+    }
+    else if( vr === "FL")
+    {
+        data = reader.readFloat32Array( dataOffset, vl );
+    }
+    else if( vr === "FD")
+    {
+        data = reader.readFloat64Array( dataOffset, vl );
+    }
+    // attribute
+    else if( vr === "AT")
+    {
+        var raw = reader.readUint16Array( dataOffset, vl );
+        data = [];
+        for ( var i = 0; i < raw.length; i+=2 ) {
+            var stri = raw[i].toString(16);
+            var stri1 = raw[i+1].toString(16);
+            var str = "(";
+            str += "0000".substr(0, 4 - stri.length) + stri.toUpperCase();
+            str += ",";
+            str += "0000".substr(0, 4 - stri1.length) + stri1.toUpperCase();
+            str += ")";
+            data.push(str);
+        }
+    }
+    // not available
+    else if( vr === "N/A")
+    {
+        data = reader.readUint8Array( dataOffset, vl );
+    }
+    // raw
     else
     {
         data = reader.readString( dataOffset, vl);
@@ -978,14 +1109,7 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementAsString = function ( dicomEl
     }
     else {
         // simple number display
-        if ( dicomElement.vr === "UL" || 
-                dicomElement.vr === "US" ||
-                dicomElement.vr === "na" ) {
-            line += " ";
-            line += dicomElement.value[0];
-        }
-        else if ( dicomElement.vr === 'SL' ||
-                dicomElement.vr === 'SS' ) {
+        if ( dicomElement.vr === "na" ) {
             line += " ";
             line += dicomElement.value[0];
         }
@@ -995,7 +1119,14 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementAsString = function ( dicomEl
         }
         // 'O'ther array, limited display length
         else if ( dicomElement.vr[0] === 'O' ||
-                dicomElement.vr === 'pi' ) {
+                dicomElement.vr === 'pi' ||
+                dicomElement.vr === "UL" || 
+                dicomElement.vr === "US" ||
+                dicomElement.vr === "SL" ||
+                dicomElement.vr === "SS" ||
+                dicomElement.vr === "FL" ||
+                dicomElement.vr === "FD" ||
+                dicomElement.vr === "AT" ) {
             line += " ";
             var valuesStr = "";
             var valueStr = "";
@@ -1004,7 +1135,12 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementAsString = function ( dicomEl
                 if ( k !== 0 ) {
                     valueStr += "\\";
                 }
-                valueStr += dicomElement.value[k];
+                if ( dicomElement.vr === "FL" ) {
+                    valueStr += Number(dicomElement.value[k].toPrecision(8));
+                }
+                else {
+                    valueStr += dicomElement.value[k];
+                }
                 if ( valuesStr.length + valueStr.length <= 65 ) {
                     valuesStr += valueStr;
                 }
