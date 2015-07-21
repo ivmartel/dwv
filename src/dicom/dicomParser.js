@@ -1087,6 +1087,9 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementAsString = function ( dicomEl
             dicomElement.element === "0xE0DD" ) ) {
         deSize = 0;
     }
+    else if ( dicomElement.vr[0] === "O" ) {
+        deSize = 1;
+    }
 
     var isPixSequence = (dicomElement.group === '0x7FE0' && 
         dicomElement.element === '0x0010' && 
@@ -1137,6 +1140,16 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementAsString = function ( dicomEl
                 }
                 if ( dicomElement.vr === "FL" ) {
                     valueStr += Number(dicomElement.value[k].toPrecision(8));
+                }
+                else if ( dicomElement.vr[0] === "O" ) {
+                    var tmp = dicomElement.value[k].toString(16);
+                    if ( dicomElement.vr === "OB" ) {
+                        tmp = "00".substr(0, 2 - tmp.length) + tmp;
+                    }
+                    else {
+                        tmp = "0000".substr(0, 4 - tmp.length) + tmp;
+                    }
+                    valueStr += tmp;
                 }
                 else {
                     valueStr += dicomElement.value[k];
