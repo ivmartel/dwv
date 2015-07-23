@@ -2,10 +2,10 @@
  * Tests for the 'dicom/dicomParser.js' file.
  */
 // Do not warn if these variables were not defined before.
-/* global module, test, equal */
+/* global QUnit, module, equal */
 module("dicomParser");
 
-test("Test DICOM parsing.", 3, function(assert) {
+QUnit.test("Test DICOM parsing.", 3, function (assert) {
     // Local file: forbidden...
     // parse the DICOM file
     /*var reader = new FileReader();
@@ -22,7 +22,7 @@ test("Test DICOM parsing.", 3, function(assert) {
     var url = "http://x.babymri.org/?53320924&.dcm";
     request.open('GET', url, true);
     request.responseType = "arraybuffer"; 
-    request.onload = function(/*event*/) {
+    request.onload = function (/*event*/) {
         // parse DICOM
         var dicomParser = new dwv.dicom.DicomParser();
         dicomParser.parse(this.response);
@@ -40,29 +40,29 @@ test("Test DICOM parsing.", 3, function(assert) {
     request.send(null);
 });
 
-test("Test cleanString.", function() {
+QUnit.test("Test cleanString.", function (assert) {
     // undefined
-    equal(dwv.dicom.cleanString(), null, "Clean undefined");
+    assert.equal(dwv.dicom.cleanString(), null, "Clean undefined");
     // null
-    equal(dwv.dicom.cleanString(null), null, "Clean null");
+    assert.equal(dwv.dicom.cleanString(null), null, "Clean null");
     // empty
-    equal(dwv.dicom.cleanString(""), "", "Clean empty");
+    assert.equal(dwv.dicom.cleanString(""), "", "Clean empty");
     // short
-    equal(dwv.dicom.cleanString("a"), "a", "Clean short");
+    assert.equal(dwv.dicom.cleanString("a"), "a", "Clean short");
     // special
     var special = String.fromCharCode("u200B");
-    equal(dwv.dicom.cleanString(special), "", "Clean just special");
+    assert.equal(dwv.dicom.cleanString(special), "", "Clean just special");
     // regular
     var str = " El cielo azul ";
     var refStr = "El cielo azul";
-    equal(dwv.dicom.cleanString(str), refStr, "Clean regular");
+    assert.equal(dwv.dicom.cleanString(str), refStr, "Clean regular");
     // regular with special
     str = " El cielo azul" + special;
     refStr = "El cielo azul";
-    equal(dwv.dicom.cleanString(str), refStr, "Clean regular with special");
+    assert.equal(dwv.dicom.cleanString(str), refStr, "Clean regular with special");
     // regular with special and ending space (not trimmed)
     str = " El cielo azul " + special;
     refStr = "El cielo azul ";
-    equal(dwv.dicom.cleanString(str), refStr, "Clean regular with special 2");
+    assert.equal(dwv.dicom.cleanString(str), refStr, "Clean regular with special 2");
 });
 
