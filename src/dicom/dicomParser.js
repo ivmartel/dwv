@@ -1106,7 +1106,7 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementAsString = function ( dicomEl
     // value representation
     line += dicomElement.vr;
     // value
-    if ( dicomElement.value.length === 1 && dicomElement.value[0] === "" ) {
+    if ( dicomElement.vr !== "SQ" && dicomElement.value.length === 1 && dicomElement.value[0] === "" ) {
         line += " (no value available)";
         deSize = 0;
     }
@@ -1227,6 +1227,9 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementAsString = function ( dicomEl
         for ( var l = 0; l < dicomElement.value.length; ++l ) {
             item = dicomElement.value[l];
             var itemKeys = Object.keys(item);
+            if ( itemKeys.length === 0 ) {
+                continue;
+            }
             
             // get the item element
             var itemElement = item.xFFFEE000;
