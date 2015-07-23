@@ -2,10 +2,10 @@
  * Tests for the 'dicom/dicomParser.js' file.
  */
 // Do not warn if these variables were not defined before.
-/* global module, asyncTest, test, equal, start */
+/* global module, test, equal */
 module("dicomParser");
 
-asyncTest("Test DICOM parsing.", 3, function() {
+test("Test DICOM parsing.", 3, function(assert) {
     // Local file: forbidden...
     // parse the DICOM file
     /*var reader = new FileReader();
@@ -15,6 +15,8 @@ asyncTest("Test DICOM parsing.", 3, function() {
     };
     var file = new File("cta.dcm");
     reader.readAsArrayBuffer(file);*/
+    
+    var done = assert.async();
     
     var request = new XMLHttpRequest();
     var url = "http://x.babymri.org/?53320924&.dcm";
@@ -33,7 +35,7 @@ asyncTest("Test DICOM parsing.", 3, function() {
             "1.3.12.2.1107.5.2.32.35162.2012021515511672669154094", 
             "ReferencedImageSequence SQ");
         // start async test
-        start();
+        done();
     };
     request.send(null);
 });
