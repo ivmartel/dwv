@@ -577,16 +577,6 @@ dwv.dicom.DicomParser.prototype.readTag = function(reader, offset)
     var element = reader.readHex(offset+2);
     // name
     var name = dwv.dicom.getGroupElementKey(group, element);
-    /*var dict = dwv.dicom.dictionary;
-    if( typeof dict[group] !== "undefined" &&
-            typeof dict[group][element] !== "undefined" ) {
-        vr = dict[group][element][0];
-        name = dict[group][element][2];
-    }
-    else {
-        name = "dwv::unknown" + this.getNextUnknownCount().toString();
-    }*/
-
     // return
     return {'group': group, 'element': element, 'name': name};
 };
