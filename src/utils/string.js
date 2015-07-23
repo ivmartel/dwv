@@ -28,27 +28,6 @@ dwv.utils.capitaliseFirstLetter = function (string)
 };
 
 /**
- * Clean string: trim and remove ending.
- * @method cleanString
- * @static
- * @param {String} string The string to clean.
- * @return {String} The cleaned string.
- */
-dwv.utils.cleanString = function (string)
-{
-    var res = string;
-    if ( string ) {
-        // trim spaces
-        res = string.trim();
-        // get rid of ending zero-width space (u200B)
-        if ( res[res.length-1] === String.fromCharCode("u200B") ) {
-            res = res.substring(0, res.length-1);
-        }
-    }
-    return res;
-};
-
-/**
  * Split query string:
  *  'root?key0=val00&key0=val01&key1=val10' returns 
  *  { base : root, query : [ key0 : [val00, val01], key1 : val1 ] }

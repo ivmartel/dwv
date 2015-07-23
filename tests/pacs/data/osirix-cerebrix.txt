@@ -1,0 +1,68 @@
+
+# Dicom-File-Format
+
+# Dicom-Meta-Information-Header
+# Used TransferSyntax: Little Endian Explicit
+(0002,0000) UL 212                                      #   4, 1 FileMetaInformationGroupLength
+(0002,0001) OB 00\01                                    #   2, 1 FileMetaInformationVersion
+(0002,0002) UI [1.2.840.10008.5.1.4.1.1.7]              #  26, 1 MediaStorageSOPClassUID
+(0002,0003) UI [1.3.6.1.4.1.19291.2.1.3.1841973664631421918434383429496729553844] #  64, 1 MediaStorageSOPInstanceUID
+(0002,0010) UI [1.2.840.10008.1.2.4.91]                 #  22, 1 TransferSyntaxUID
+(0002,0012) UI [1.3.6.1.4.1.19291.2.1]                  #  22, 1 ImplementationClassUID
+(0002,0013) SH [OSIRIX001]                              #  10, 1 ImplementationVersionName
+(0002,0016) AE [OsiriX]                                 #   6, 1 SourceApplicationEntityTitle
+
+# Dicom-Data-Set
+# Used TransferSyntax: JPEG 2000 (Lossless or Lossy)
+(0008,0005) CS [ISO_IR 100]                             #  10, 1 SpecificCharacterSet
+(0008,0016) UI [1.2.840.10008.5.1.4.1.1.7]              #  26, 1 SOPClassUID
+(0008,0018) UI [1.3.6.1.4.1.19291.2.1.3.1841973664631421918434383429496729553844] #  64, 1 SOPInstanceUID
+(0008,0020) DA [20070720]                               #   8, 1 StudyDate
+(0008,0021) DA [20080201]                               #   8, 1 SeriesDate
+(0008,0022) DA [20080201]                               #   8, 1 AcquisitionDate
+(0008,0030) TM [081335.968000]                          #  14, 1 StudyTime
+(0008,0031) TM [191449.000000]                          #  14, 1 SeriesTime
+(0008,0032) TM [191449.000000]                          #  14, 1 AcquisitionTime
+(0008,0050) SH [0]                                      #   2, 1 AccessionNumber
+(0008,0060) CS [SC]                                     #   2, 1 Modality
+(0008,1030) LO [Neuro^Crane]                            #  12, 1 StudyDescription
+(0008,103e) LO [Axial_T1]                               #   8, 1 SeriesDescription
+(0008,1090) LO [OsiriX]                                 #   6, 1 ManufacturerModelName
+(0010,0010) PN [CEREBRIX]                               #   8, 1 PatientName
+(0010,0020) LO [XsxuId]                                 #   6, 1 PatientID
+(0010,0030) DA [19350401]                               #   8, 1 PatientBirthDate
+(0010,0040) CS [0000]                                   #   4, 1 PatientSex
+(0018,0050) DS [1]                                      #   2, 1 SliceThickness
+(0018,1010) LO [OsiriX]                                 #   6, 1 SecondaryCaptureDeviceID
+(0018,1012) DA [20080201]                               #   8, 1 DateOfSecondaryCapture
+(0018,1014) TM [191449.000000]                          #  14, 1 TimeOfSecondaryCapture
+(0018,1016) LO [OsiriX]                                 #   6, 1 SecondaryCaptureDeviceManufacturer
+(0018,1018) LO [OsiriX]                                 #   6, 1 SecondaryCaptureDeviceManufacturerModelName
+(0018,1019) LO [2.0.0]                                  #   6, 1 SecondaryCaptureDeviceSoftwareVersions
+(0020,000d) UI [2.16.840.1.113669.632.20.1211.10000502993] #  42, 1 StudyInstanceUID
+(0020,000e) UI [1.3.6.1.4.1.19291.2.1.2.3427837366291351879037691429496729553844] #  64, 1 SeriesInstanceUID
+(0020,0010) SH [A10041223026]                           #  12, 1 StudyID
+(0020,0011) IS [5352]                                   #   4, 1 SeriesNumber
+(0020,0013) IS [100]                                    #   4, 1 InstanceNumber
+(0020,0032) DS [-83.76733\-85.15102\-0.6373434]         #  30, 3 ImagePositionPatient
+(0020,0037) DS [0.9983222\0.02102422\0.05395257\-0.02105488\0.9997783\1.490116e-08] #  66, 6 ImageOrientationPatient
+(0020,1041) DS [-10.11706]                              #  10, 1 SliceLocation
+(0028,0002) US 1                                        #   2, 1 SamplesPerPixel
+(0028,0004) CS [MONOCHROME2]                            #  12, 1 PhotometricInterpretation
+(0028,0010) US 224                                      #   2, 1 Rows
+(0028,0011) US 176                                      #   2, 1 Columns
+(0028,0030) DS [0.9983215\0.9983215]                    #  20, 2 PixelSpacing
+(0028,0100) US 16                                       #   2, 1 BitsAllocated
+(0028,0101) US 16                                       #   2, 1 BitsStored
+(0028,0102) US 15                                       #   2, 1 HighBit
+(0028,0103) US 0                                        #   2, 1 PixelRepresentation
+(0028,1050) DS [1123]                                   #   4, 1 WindowCenter
+(0028,1051) DS [2228]                                   #   4, 1 WindowWidth
+(0028,1052) DS [-1024]                                  #   6, 1 RescaleIntercept
+(0028,1053) DS [1]                                      #   2, 1 RescaleSlope
+(0028,2110) CS [00]                                     #   2, 1 LossyImageCompression
+(0028,2112) DS [1.996556]                               #   8, 1 LossyImageCompressionRatio
+(7fe0,0010) OB (PixelSequence #=2)                      # u/l, 1 PixelData
+  (fffe,e000) pi 00\00\00\00                              #   4, 1 Item
+  (fffe,e000) pi ff\4f\ff\51\00\29\00\00\00\00\00\b0\00\00\00\e0\00\00\00\00\00\00... # 39492, 1 Item
+(fffe,e0dd) na (SequenceDelimitationItem)               #   0, 0 SequenceDelimitationItem

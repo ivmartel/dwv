@@ -2,7 +2,7 @@
  * Tests for the 'dicom/dicomParser.js' file.
  */
 // Do not warn if these variables were not defined before.
-/* global module, asyncTest, equal, start */
+/* global module, asyncTest, test, equal, start */
 module("dicomParser");
 
 asyncTest("Test DICOM parsing.", 3, function() {
@@ -26,9 +26,10 @@ asyncTest("Test DICOM parsing.", 3, function() {
         dicomParser.parse(this.response);
         var tags = dicomParser.getDicomElements();
         // check values
-        equal(tags.Rows.value[0], 256, "Number of rows");
-        equal(tags.Columns.value[0], 256, "Number of columns");
-        equal(tags.ReferencedImageSequence.value[0].ReferencedSOPInstanceUID.value[0], 
+        equal(tags.getFromName("Rows"), 256, "Number of rows");
+        equal(tags.getFromName("Columns"), 256, "Number of columns");
+        // ReferencedImageSequence - ReferencedSOPInstanceUID 
+        equal(tags.getFromName("ReferencedImageSequence")[0].x00081155.value[0], 
             "1.3.12.2.1107.5.2.32.35162.2012021515511672669154094", 
             "ReferencedImageSequence SQ");
         // start async test
@@ -36,3 +37,30 @@ asyncTest("Test DICOM parsing.", 3, function() {
     };
     request.send(null);
 });
+
+test("Test cleanString.", function() {
+    // undefined
+    equal(dwv.dicom.cleanString(), null, "Clean undefined");
+    // null
+    equal(dwv.dicom.cleanString(null), null, "Clean null");
+    // empty
+    equal(dwv.dicom.cleanString(""), "", "Clean empty");
+    // short
+    equal(dwv.dicom.cleanString("a"), "a", "Clean short");
+    // special
+    var special = String.fromCharCode("u200B");
+    equal(dwv.dicom.cleanString(special), "", "Clean just special");
+    // regular
+    var str = " El cielo azul ";
+    var refStr = "El cielo azul";
+    equal(dwv.dicom.cleanString(str), refStr, "Clean regular");
+    // regular with special
+    str = " El cielo azul" + special;
+    refStr = "El cielo azul";
+    equal(dwv.dicom.cleanString(str), refStr, "Clean regular with special");
+    // regular with special and ending space (not trimmed)
+    str = " El cielo azul " + special;
+    refStr = "El cielo azul ";
+    equal(dwv.dicom.cleanString(str), refStr, "Clean regular with special 2");
+});
+

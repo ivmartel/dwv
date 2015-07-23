@@ -745,40 +745,49 @@ dwv.image.ImageFactory = function () {};
  */
 dwv.image.ImageFactory.prototype.create = function (dicomElements, pixelBuffer)
 {
-    // size
-    if ( !dicomElements.Columns ) {
+    // columns
+    var columns = dicomElements.getFromKey("x00280011");
+    if ( columns === null ) {
         throw new Error("Missing DICOM image number of columns");
     }
-    if ( !dicomElements.Rows ) {
+    // rows
+    var rows = dicomElements.getFromKey("x00280010");
+    if ( rows === null ) {
         throw new Error("Missing DICOM image number of rows");
     }
-    var size = new dwv.image.Size(
-        dicomElements.Columns.value[0], 
-        dicomElements.Rows.value[0] );
+    // image size
+    var size = new dwv.image.Size( columns, rows );
     
     // spacing
     var rowSpacing = 1;
     var columnSpacing = 1;
-    if ( dicomElements.PixelSpacing ) {
-        rowSpacing = parseFloat(dicomElements.PixelSpacing.value[0]);
-        columnSpacing = parseFloat(dicomElements.PixelSpacing.value[1]);
+    // PixelSpacing
+    var pixelSpacing = dicomElements.getFromKey("x00280030");
+    // ImagerPixelSpacing
+    var imagerPixelSpacing = dicomElements.getFromKey("x00181164");
+    if ( pixelSpacing !== null ) {
+        rowSpacing = parseFloat( pixelSpacing[0] );
+        columnSpacing = parseFloat( pixelSpacing[1] );
     }
-    else if ( dicomElements.ImagerPixelSpacing ) {
-        rowSpacing = parseFloat(dicomElements.ImagerPixelSpacing.value[0]);
-        columnSpacing = parseFloat(dicomElements.ImagerPixelSpacing.value[1]);
+    else if ( imagerPixelSpacing !== null ) {
+        rowSpacing = parseFloat( imagerPixelSpacing[0] );
+        columnSpacing = parseFloat( imagerPixelSpacing[1] );
     }
+    // image spacing
     var spacing = new dwv.image.Spacing( columnSpacing, rowSpacing);
 
-    var syntax = dwv.utils.cleanString(
-        dicomElements.TransferSyntaxUID.value[0] );
+    // TransferSyntaxUID
+    var transferSyntaxUID = dicomElements.getFromKey("x00020010");
+    var syntax = dwv.dicom.cleanString( transferSyntaxUID );
     var jpeg2000 = dwv.dicom.isJpeg2000TransferSyntax( syntax );
     
     // buffer data
     var buffer =  new Int16Array(pixelBuffer.length);
     // unsigned to signed data if needed
     var shift = false;
-    if ( dicomElements.PixelRepresentation &&
-            dicomElements.PixelRepresentation.value[0] == 1) {
+    // PixelRepresentation
+    var pixelRepresentation = dicomElements.getFromKey("x00280103");
+    if ( pixelRepresentation !== null && pixelRepresentation === 1 ) {
         shift = true;
     }
     // copy
@@ -791,10 +800,12 @@ dwv.image.ImageFactory.prototype.create = function (dicomElements, pixelBuffer)
     
     // slice position
     var slicePosition = new Array(0,0,0);
-    if ( dicomElements.ImagePositionPatient ) {
-        slicePosition = [ parseFloat(dicomElements.ImagePositionPatient.value[0]),
-            parseFloat(dicomElements.ImagePositionPatient.value[1]),
-            parseFloat(dicomElements.ImagePositionPatient.value[2]) ];
+    // ImagePositionPatient
+    var imagePositionPatient = dicomElements.getFromKey("x00200032");
+    if ( imagePositionPatient !== null ) {
+        slicePosition = [ parseFloat( imagePositionPatient[0] ),
+            parseFloat( imagePositionPatient[1] ),
+            parseFloat( imagePositionPatient[2] ) ];
     }
     
     // geometry
@@ -803,43 +814,58 @@ dwv.image.ImageFactory.prototype.create = function (dicomElements, pixelBuffer)
     
     // image
     var image = new dwv.image.Image( geometry, buffer );
-    // photometricInterpretation
-    if ( dicomElements.PhotometricInterpretation ) {
-        var photo = dwv.utils.cleanString(
-            dicomElements.PhotometricInterpretation.value[0]).toUpperCase();
+    // PhotometricInterpretation
+    var photometricInterpretation = dicomElements.getFromKey("x00280004");
+    if ( photometricInterpretation !== null ) {
+        var photo = dwv.dicom.cleanString(photometricInterpretation).toUpperCase();
         if ( jpeg2000 && photo.match(/YBR/) ) {
             photo = "RGB";
         }
         image.setPhotometricInterpretation( photo );
     }        
-    // planarConfiguration
-    if ( dicomElements.PlanarConfiguration ) {
-        image.setPlanarConfiguration( dicomElements.PlanarConfiguration.value[0] );
-    }        
+    // PlanarConfiguration
+    var planarConfiguration = dicomElements.getFromKey("x00280006");
+    if ( planarConfiguration !== null ) {
+        image.setPlanarConfiguration( planarConfiguration );
+    }  
+    
     // rescale slope and intercept
     var slope = 1;
-    if ( dicomElements.RescaleSlope ) {
-        slope = parseFloat(dicomElements.RescaleSlope.value[0]);
+    // RescaleSlope
+    var rescaleSlope = dicomElements.getFromKey("x00281053");
+    if ( rescaleSlope !== null ) {
+        slope = parseFloat(rescaleSlope);
     }
     var intercept = 0;
-    if ( dicomElements.RescaleIntercept ) {
-        intercept = parseFloat(dicomElements.RescaleIntercept.value[0]);
+    // RescaleIntercept
+    var rescaleIntercept = dicomElements.getFromKey("x00281052");
+    if ( rescaleIntercept !== null ) {
+        intercept = parseFloat(rescaleIntercept);
     }
     var rsi = new dwv.image.RescaleSlopeAndIntercept(slope, intercept);
     image.setRescaleSlopeAndIntercept( rsi );
+    
     // meta information
     var meta = {};
-    if ( dicomElements.Modality ) {
-        meta.Modality = dicomElements.Modality.value[0];
+    // Modality
+    var modality = dicomElements.getFromKey("x00080060");
+    if ( modality !== null ) {
+        meta.Modality = modality;
     }
-    if ( dicomElements.StudyInstanceUID ) {
-        meta.StudyInstanceUID = dicomElements.StudyInstanceUID.value[0];
+    // StudyInstanceUID
+    var studyInstanceUID = dicomElements.getFromKey("x0020000D");
+    if ( studyInstanceUID !== null ) {
+        meta.StudyInstanceUID = studyInstanceUID;
     }
-    if ( dicomElements.SeriesInstanceUID ) {
-        meta.SeriesInstanceUID = dicomElements.SeriesInstanceUID.value[0];
+    // SeriesInstanceUID
+    var seriesInstanceUID = dicomElements.getFromKey("x0020000E");
+    if ( seriesInstanceUID !== null ) {
+        meta.SeriesInstanceUID = seriesInstanceUID;
     }
-    if ( dicomElements.BitsStored ) {
-        meta.BitsStored = parseInt(dicomElements.BitsStored.value[0], 10);
+    // BitsStored
+    var bitsStored = dicomElements.getFromKey("x00280101");
+    if ( bitsStored !== null ) {
+        meta.BitsStored = parseInt(bitsStored, 10);
     }
     image.setMeta(meta);
     

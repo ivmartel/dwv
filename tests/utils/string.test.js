@@ -24,32 +24,6 @@ test("Test CapitaliseFirstLetter.", function() {
             "Capitalise sentence");
 });
 
-test("Test cleanString.", function() {
-    // undefined
-    equal(dwv.utils.cleanString(), null, "Clean undefined");
-    // null
-    equal(dwv.utils.cleanString(null), null, "Clean null");
-    // empty
-    equal(dwv.utils.cleanString(""), "", "Clean empty");
-    // short
-    equal(dwv.utils.cleanString("a"), "a", "Clean short");
-    // special
-    var special = String.fromCharCode("u200B");
-    equal(dwv.utils.cleanString(special), "", "Clean just special");
-    // regular
-    var str = " El cielo azul ";
-    var refStr = "El cielo azul";
-    equal(dwv.utils.cleanString(str), refStr, "Clean regular");
-    // regular with special
-    str = " El cielo azul" + special;
-    refStr = "El cielo azul";
-    equal(dwv.utils.cleanString(str), refStr, "Clean regular with special");
-    // regular with special and ending space (not trimmed)
-    str = " El cielo azul " + special;
-    refStr = "El cielo azul ";
-    equal(dwv.utils.cleanString(str), refStr, "Clean regular with special 2");
-});
-
 test("Test splitQueryString.", function() {
     // using JSON.stringify to compare objects
     var strEmpty = JSON.stringify({});

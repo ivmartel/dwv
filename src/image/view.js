@@ -428,28 +428,33 @@ dwv.image.ViewFactory.prototype.create = function (dicomElements, pixelBuffer)
     var imageFactory = new dwv.image.ImageFactory();
     var image = imageFactory.create(dicomElements, pixelBuffer);
     
-    // pixel representation
-    var isSigned = 0;
-    if ( dicomElements.PixelRepresentation ) {
-        isSigned = dicomElements.PixelRepresentation.value[0];
+    // PixelRepresentation
+    var isSigned = false;
+    var pixelRepresentation = dicomElements.getFromKey("x00280103");
+    if ( pixelRepresentation !== null ) {
+        isSigned = (pixelRepresentation === 1);
     }
     // view
     var view = new dwv.image.View(image, isSigned);
-    // window center and width
+    // presets
     var windowPresets = [];
-    if ( dicomElements.WindowCenter && dicomElements.WindowWidth ) {
+    // WindowCenter and WindowWidth
+    var windowCenter = dicomElements.getFromKey("x00281050", true);
+    var windowWidth = dicomElements.getFromKey("x00281051", true);
+    if ( windowCenter !== null && windowWidth !== null ) {
         var name;
-        for ( var j = 0; j < dicomElements.WindowCenter.value.length; ++j) {
-            var width = parseFloat( dicomElements.WindowWidth.value[j], 10 );
+        for ( var j = 0; j < windowCenter.length; ++j) {
+            var width = parseFloat( windowWidth[j], 10 );
             if ( width !== 0 ) {
-                if ( dicomElements.WindowCenterWidthExplanation ) {
-                    name = dicomElements.WindowCenterWidthExplanation.value[j];
+                var windowCenterWidthExplanation = dicomElements.getFromKey("x00281055");
+                if ( windowCenterWidthExplanation !== null ) {
+                    name = windowCenterWidthExplanation[j];
                 }
                 else {
                     name = "Default"+j;
                 }
                 windowPresets.push({
-                    "center": parseFloat( dicomElements.WindowCenter.value[j], 10 ),
+                    "center": parseFloat( windowCenter[j], 10 ),
                     "width": width, 
                     "name": name
                 });
