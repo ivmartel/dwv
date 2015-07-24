@@ -24,10 +24,10 @@ QUnit.test("Test DICOM parsing.", function (assert) {
     request.responseType = "arraybuffer"; 
     request.onload = function (/*event*/) {
         // parse DICOM
-        /*var dicomParser = new dwv.dicom.DicomParser();
+        var dicomParser = new dwv.dicom.DicomParser();
         dicomParser.parse(this.response);
         
-        var rawTags = dicomParser.getRawDicomElements();
+        /*var rawTags = dicomParser.getRawDicomElements();
         // check values
         assert.equal(rawTags.x00280010.value[0], 256, "Number of rows (raw)");
         assert.equal(rawTags.x00280011.value[0], 256, "Number of columns (raw)");
