@@ -12,7 +12,7 @@ module.exports = function(grunt) {
         qunit: {
             all: ['tests/index.html'],
             options: {
-                timeout: 10000,
+                timeout: 20000,
                 coverage: {
                     src: [ "src/**/*.js" ],
                     instrumentedFiles: "temp/",
