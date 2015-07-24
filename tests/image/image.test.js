@@ -2,10 +2,10 @@
  * Tests for the 'image/image.js' file.
  */
 // Do not warn if these variables were not defined before.
-/* global module, test, equal, deepEqual */
-module("image");
+/* global QUnit */
+QUnit.module("image");
 
-test("Test Image getValue.", function() {
+QUnit.test("Test Image getValue.", function (assert) {
     // create a simple image
     var size0 = 4;
     var imgSize0 = new dwv.image.Size(size0, size0, 1);
@@ -18,16 +18,16 @@ test("Test Image getValue.", function() {
     }
     var image0 = new dwv.image.Image(imgGeometry0, buffer0);
     // test its values
-    equal( image0.getValue(0, 0, 0), 0, "Value at 0,0,0" );
-    equal( image0.getValue(1, 0, 0), 1, "Value at 1,0,0" );
-    equal( image0.getValue(1, 1, 0), 1*size0 + 1, "Value at 1,1,0" );
-    equal( image0.getValue(3, 3, 0), 3*size0 + 3, "Value at 3,3,0" );
-    equal( isNaN(image0.getValue(4, 3, 0)), true, "Value outside is NaN" );
+    assert.equal( image0.getValue(0, 0, 0), 0, "Value at 0,0,0" );
+    assert.equal( image0.getValue(1, 0, 0), 1, "Value at 1,0,0" );
+    assert.equal( image0.getValue(1, 1, 0), 1*size0 + 1, "Value at 1,1,0" );
+    assert.equal( image0.getValue(3, 3, 0), 3*size0 + 3, "Value at 3,3,0" );
+    assert.equal( isNaN(image0.getValue(4, 3, 0)), true, "Value outside is NaN" );
     // TODO: wrong, should not be accessed
-    equal( image0.getValue(5, 0, 0), 1*size0 + 1, "Value at 5,0,0" );
+    assert.equal( image0.getValue(5, 0, 0), 1*size0 + 1, "Value at 5,0,0" );
     // histogram
     var histogram = image0.getHistogram();
-    equal( histogram.length, size0*size0, "histogram size" );
+    assert.equal( histogram.length, size0*size0, "histogram size" );
     var histoContentTest = true;
     for ( var j=0; j<size0*size0; ++j) {
         if ( histogram[j][0] !== j ) {
@@ -39,7 +39,7 @@ test("Test Image getValue.", function() {
             break;
         }
     }
-    equal( histoContentTest, true, "histogram content" );
+    assert.equal( histoContentTest, true, "histogram content" );
     
     // image with rescale
     var image1 = new dwv.image.Image(imgGeometry0, buffer0);
@@ -48,17 +48,17 @@ test("Test Image getValue.", function() {
     var rsi1 = new dwv.image.RescaleSlopeAndIntercept(slope1, intercept1);
     image1.setRescaleSlopeAndIntercept(rsi1);
     // test its values
-    equal( image1.getValue(0, 0, 0), 0, "Value at 0,0,0" );
-    equal( image1.getValue(1, 0, 0), 1, "Value at 1,0,0" );
-    equal( image1.getValue(1, 1, 0), 1*size0 + 1, "Value at 1,1,0" );
-    equal( image1.getValue(3, 3, 0), 3*size0 + 3, "Value at 3,3,0" );
-    equal( image1.getRescaledValue(0, 0, 0), 0+intercept1, "Value at 0,0,0" );
-    equal( image1.getRescaledValue(1, 0, 0), 1*slope1+intercept1, "Value at 1,0,0" );
-    equal( image1.getRescaledValue(1, 1, 0), (1*size0 + 1)*slope1+intercept1, "Value at 1,1,0" );
-    equal( image1.getRescaledValue(3, 3, 0), (3*size0 + 3)*slope1+intercept1, "Value at 3,3,0" );
+    assert.equal( image1.getValue(0, 0, 0), 0, "Value at 0,0,0" );
+    assert.equal( image1.getValue(1, 0, 0), 1, "Value at 1,0,0" );
+    assert.equal( image1.getValue(1, 1, 0), 1*size0 + 1, "Value at 1,1,0" );
+    assert.equal( image1.getValue(3, 3, 0), 3*size0 + 3, "Value at 3,3,0" );
+    assert.equal( image1.getRescaledValue(0, 0, 0), 0+intercept1, "Value at 0,0,0" );
+    assert.equal( image1.getRescaledValue(1, 0, 0), 1*slope1+intercept1, "Value at 1,0,0" );
+    assert.equal( image1.getRescaledValue(1, 1, 0), (1*size0 + 1)*slope1+intercept1, "Value at 1,1,0" );
+    assert.equal( image1.getRescaledValue(3, 3, 0), (3*size0 + 3)*slope1+intercept1, "Value at 3,3,0" );
 });
 
-test("Test Image append slice.", function (assert) {
+QUnit.test("Test Image append slice.", function (assert) {
     var size = 4;
     var imgSize = new dwv.image.Size(size, size, 2);
     var imgSizeMinusOne = new dwv.image.Size(size, size, 1);
@@ -96,18 +96,18 @@ test("Test Image append slice.", function (assert) {
     // append slice before
     image0.appendSlice(slice0);
     // test its values
-    equal( image0.getValue(0, 0, 0), 2, "Value at 0,0,0 (append before)" );
-    equal( image0.getValue(3, 3, 0), 2, "Value at 3,3,0 (append before)" );
-    equal( image0.getValue(0, 0, 1), 0, "Value at 0,0,1 (append before)" );
-    equal( image0.getValue(3, 3, 1), 0, "Value at 3,3,1 (append before)" );
-    equal( image0.getValue(0, 0, 2), 1, "Value at 0,0,2 (append before)" );
-    equal( image0.getValue(3, 3, 2), 1, "Value at 3,3,2 (append before)" );
+    assert.equal( image0.getValue(0, 0, 0), 2, "Value at 0,0,0 (append before)" );
+    assert.equal( image0.getValue(3, 3, 0), 2, "Value at 3,3,0 (append before)" );
+    assert.equal( image0.getValue(0, 0, 1), 0, "Value at 0,0,1 (append before)" );
+    assert.equal( image0.getValue(3, 3, 1), 0, "Value at 3,3,1 (append before)" );
+    assert.equal( image0.getValue(0, 0, 2), 1, "Value at 0,0,2 (append before)" );
+    assert.equal( image0.getValue(3, 3, 2), 1, "Value at 3,3,2 (append before)" );
     // test its positions
     var sliceOrigins0 = [];
     sliceOrigins0[0] = new dwv.math.Point3D(0,0,-1);
     sliceOrigins0[1] = new dwv.math.Point3D(0,0,0);
     sliceOrigins0[2] = new dwv.math.Point3D(0,0,1);
-    deepEqual( imgGeometry0.getOrigins(), sliceOrigins0, "Slice positions (append before)" );
+    assert.deepEqual( imgGeometry0.getOrigins(), sliceOrigins0, "Slice positions (append before)" );
     
     // image 1
     var imgGeometry1 = new dwv.image.Geometry(imgOrigin, imgSizeMinusOne, imgSpacing);
@@ -119,18 +119,18 @@ test("Test Image append slice.", function (assert) {
     // append slice before
     image1.appendSlice(slice1);
     // test its values
-    equal( image1.getValue(0, 0, 0), 0, "Value at 0,0,0 (append after)" );
-    equal( image1.getValue(3, 3, 0), 0, "Value at 3,3,0 (append after)" );
-    equal( image1.getValue(0, 0, 1), 1, "Value at 0,0,1 (append after)" );
-    equal( image1.getValue(3, 3, 1), 1, "Value at 3,3,1 (append after)" );
-    equal( image1.getValue(0, 0, 2), 2, "Value at 0,0,2 (append after)" );
-    equal( image1.getValue(3, 3, 2), 2, "Value at 3,3,2 (append after)" );
+    assert.equal( image1.getValue(0, 0, 0), 0, "Value at 0,0,0 (append after)" );
+    assert.equal( image1.getValue(3, 3, 0), 0, "Value at 3,3,0 (append after)" );
+    assert.equal( image1.getValue(0, 0, 1), 1, "Value at 0,0,1 (append after)" );
+    assert.equal( image1.getValue(3, 3, 1), 1, "Value at 3,3,1 (append after)" );
+    assert.equal( image1.getValue(0, 0, 2), 2, "Value at 0,0,2 (append after)" );
+    assert.equal( image1.getValue(3, 3, 2), 2, "Value at 3,3,2 (append after)" );
     // test its positions
     var sliceOrigins1 = [];
     sliceOrigins1[0] = new dwv.math.Point3D(0,0,0);
     sliceOrigins1[1] = new dwv.math.Point3D(0,0,1);
     sliceOrigins1[2] = new dwv.math.Point3D(0,0,2);
-    deepEqual( imgGeometry1.getOrigins(), sliceOrigins1, "Slice positions (append after)" );
+    assert.deepEqual( imgGeometry1.getOrigins(), sliceOrigins1, "Slice positions (append after)" );
 
     // image 2
     var imgGeometry2 = new dwv.image.Geometry(imgOrigin, imgSizeMinusOne, imgSpacing);
@@ -142,21 +142,21 @@ test("Test Image append slice.", function (assert) {
     // append slice before
     image2.appendSlice(slice2);
     // test its values
-    equal( image2.getValue(0, 0, 0), 0, "Value at 0,0,0 (append between)" );
-    equal( image2.getValue(3, 3, 0), 0, "Value at 3,3,0 (append between)" );
-    equal( image2.getValue(0, 0, 1), 2, "Value at 0,0,1 (append between)" );
-    equal( image2.getValue(3, 3, 1), 2, "Value at 3,3,1 (append between)" );
-    equal( image2.getValue(0, 0, 2), 1, "Value at 0,0,2 (append between)" );
-    equal( image2.getValue(3, 3, 2), 1, "Value at 3,3,2 (append between)" );
+    assert.equal( image2.getValue(0, 0, 0), 0, "Value at 0,0,0 (append between)" );
+    assert.equal( image2.getValue(3, 3, 0), 0, "Value at 3,3,0 (append between)" );
+    assert.equal( image2.getValue(0, 0, 1), 2, "Value at 0,0,1 (append between)" );
+    assert.equal( image2.getValue(3, 3, 1), 2, "Value at 3,3,1 (append between)" );
+    assert.equal( image2.getValue(0, 0, 2), 1, "Value at 0,0,2 (append between)" );
+    assert.equal( image2.getValue(3, 3, 2), 1, "Value at 3,3,2 (append between)" );
     // test its positions
     var sliceOrigins2 = [];
     sliceOrigins2[0] = new dwv.math.Point3D(0,0,0);
     sliceOrigins2[1] = new dwv.math.Point3D(0,0,0.4);
     sliceOrigins2[2] = new dwv.math.Point3D(0,0,1);
-    deepEqual( imgGeometry2.getOrigins(), sliceOrigins2, "Slice positions (append between)" );
+    assert.deepEqual( imgGeometry2.getOrigins(), sliceOrigins2, "Slice positions (append between)" );
 });
 
-test("Test Image convolute2D.", function() {
+QUnit.test("Test Image convolute2D.", function (assert) {
     // create a simple image
     var size0 = 3;
     var imgSize0 = new dwv.image.Size(size0, size0, 1);
@@ -178,7 +178,7 @@ test("Test Image convolute2D.", function() {
             break;
         }
     }
-    equal( testContent0, true, "convolute2D id" );
+    assert.equal( testContent0, true, "convolute2D id" );
     // blur convolution
     var weights1 = [ 1, 1, 1, 1, 1, 1, 1, 1, 1 ];
     var resImage1 = image0.convolute2D( weights1 );
@@ -191,10 +191,10 @@ test("Test Image convolute2D.", function() {
             break;
         }
     }
-    equal( testContent1, true, "convolute2D blur" );
+    assert.equal( testContent1, true, "convolute2D blur" );
 });
 
-test("Test Image transform.", function() {
+QUnit.test("Test Image transform.", function (assert) {
     // create a simple image
     var size0 = 3;
     var imgSize0 = new dwv.image.Size(size0, size0, 1);
@@ -225,7 +225,7 @@ test("Test Image transform.", function() {
             break;
         }
     }
-    equal( testContent0, true, "transform threshold" );
+    assert.equal( testContent0, true, "transform threshold" );
     
     // transform changes the calling image... reset it
     image0 = new dwv.image.Image(imgGeometry0, buffer0);
@@ -243,5 +243,5 @@ test("Test Image transform.", function() {
             break;
         }
     }
-    equal( testContent1, true, "transform multiply" );
+    assert.equal( testContent1, true, "transform multiply" );
 });

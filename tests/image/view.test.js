@@ -2,10 +2,10 @@
  * Tests for the 'view/view.js' file.
  */
 // Do not warn if these variables were not defined before.
-/* global module, test, equal, ok */
-module("view");
+/* global QUnit */
+QUnit.module("view");
 
-test("Test listeners.", function() {
+QUnit.test("Test listeners.", function (assert) {
     // create an image
     var size0 = 4;
     var imgSize0 = new dwv.image.Size(size0, size0, 1);
@@ -23,10 +23,10 @@ test("Test listeners.", function() {
     
     // listeners
     var listener1 = function(event){
-        equal( event.wc, 0, "Expected call to listener1.");
+        assert.equal( event.wc, 0, "Expected call to listener1.");
     };
     var listener2 = function(event){
-        equal( event.ww, 1, "Expected call to listener2.");
+        assert.equal( event.ww, 1, "Expected call to listener2.");
     };
     // with two listeners
     view0.addEventListener("wlchange", listener1 );
@@ -40,7 +40,7 @@ test("Test listeners.", function() {
     view0.setWindowLevel(1,1);
 });
 
-test("Test generate data MONO.", function() {
+QUnit.test("Test generate data MONO.", function (assert) {
     // create an image
     var size0 = 2;
     var imgSize0 = new dwv.image.Size(size0, size0, 1);
@@ -73,10 +73,10 @@ test("Test generate data MONO.", function() {
             break;
         }
     }
-    equal( testContent0, true, "check image data" );
+    assert.equal( testContent0, true, "check image data" );
 });
 
-test("Test generate data RGB.", function() {
+QUnit.test("Test generate data RGB.", function (assert) {
     // create an image
     var size0 = 2;
     var imgSize0 = new dwv.image.Size(size0, size0, 1);
@@ -117,7 +117,7 @@ test("Test generate data RGB.", function() {
             break;
         }
     }
-    equal( testContent0, true, "check image data non planar" );
+    assert.equal( testContent0, true, "check image data non planar" );
     
     var buffer1 = [];
     index = 0;
@@ -148,11 +148,10 @@ test("Test generate data RGB.", function() {
             break;
         }
     }
-    equal( testContent1, true, "check image data planar" );
-
+    assert.equal( testContent1, true, "check image data planar" );
 });
 
-test("Test generate data timing.", function() {
+QUnit.test("Test generate data timing.", function (assert) {
     // create an image
     var size0 = 128;
     var imgSize0 = new dwv.image.Size(size0, size0, 1);
@@ -180,7 +179,7 @@ test("Test generate data timing.", function() {
     // time taken 
     var time0 = (new Date()) - start0;
     // check time taken
-    ok( time0 < 90, "First generateImageData: "+time0+"ms.");
+    assert.ok( time0 < 90, "First generateImageData: "+time0+"ms.");
     
     // Change the window level
     view0.setWindowLevel(4000, 200);
@@ -192,5 +191,5 @@ test("Test generate data timing.", function() {
     // time taken 
     var time1 = (new Date()).getMilliseconds() - start1;
     // check time taken
-    ok( time1 < 90, "Second generateImageData: "+time1+"ms.");
+    assert.ok( time1 < 90, "Second generateImageData: "+time1+"ms.");
 });

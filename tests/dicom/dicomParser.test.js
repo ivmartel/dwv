@@ -2,8 +2,8 @@
  * Tests for the 'dicom/dicomParser.js' file.
  */
 // Do not warn if these variables were not defined before.
-/* global QUnit, module */
-module("dicomParser");
+/* global QUnit */
+QUnit.module("dicomParser");
 
 QUnit.test("Test DICOM parsing.", 3, function (assert) {
     // Local file: forbidden...
