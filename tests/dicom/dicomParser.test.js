@@ -26,14 +26,24 @@ QUnit.test("Test DICOM parsing.", function (assert) {
         // parse DICOM
         var dicomParser = new dwv.dicom.DicomParser();
         dicomParser.parse(this.response);
-        var tags = dicomParser.getDicomElements();
+        
+        var rawTags = dicomParser.getRawDicomElements();
+        // check values
+        assert.equal(rawTags.x00280010.value[0], 256, "Number of rows (raw)");
+        assert.equal(rawTags.x00280011.value[0], 256, "Number of columns (raw)");
+        // ReferencedImageSequence - ReferencedSOPInstanceUID 
+        assert.equal(rawTags.x00081140.value[0].x00081155.value[0], 
+            "1.3.12.2.1107.5.2.32.35162.2012021515511672669154094", 
+            "ReferencedImageSequence SQ (raw)");
+
+        /*var tags = dicomParser.getDicomElements();
         // check values
         assert.equal(tags.getFromName("Rows"), 256, "Number of rows");
         assert.equal(tags.getFromName("Columns"), 256, "Number of columns");
         // ReferencedImageSequence - ReferencedSOPInstanceUID 
         assert.equal(tags.getFromName("ReferencedImageSequence")[0].x00081155.value[0], 
             "1.3.12.2.1107.5.2.32.35162.2012021515511672669154094", 
-            "ReferencedImageSequence SQ");
+            "ReferencedImageSequence SQ");*/
         // finish async test
         done();
     };
