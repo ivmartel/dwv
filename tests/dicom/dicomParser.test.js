@@ -23,6 +23,8 @@ QUnit.test("Test DICOM parsing.", function (assert) {
     request.open('GET', url, true);
     request.responseType = "arraybuffer"; 
     request.onload = function (/*event*/) {
+        assert.ok((this.response.length!==0), "Got a response.");
+        
         // parse DICOM
         var dicomParser = new dwv.dicom.DicomParser();
         dicomParser.parse(this.response);
@@ -45,7 +47,6 @@ QUnit.test("Test DICOM parsing.", function (assert) {
             "1.3.12.2.1107.5.2.32.35162.2012021515511672669154094", 
             "ReferencedImageSequence SQ");*/
         
-        assert.ok(true, "all good");
         
         // finish async test
         done();
