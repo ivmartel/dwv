@@ -25,8 +25,10 @@ QUnit.test("Test DICOM parsing.", function (assert) {
     request.onload = function (/*event*/) {
         assert.ok((this.response.length!==0), "Got a response.");
         
+        // TODO Something is going wrong at parsing time in Phantomjs...
+        
         // parse DICOM
-        /*var dicomParser = new dwv.dicom.DicomParser();
+        var dicomParser = new dwv.dicom.DicomParser();
         dicomParser.parse(this.response);
         
         var rawTags = dicomParser.getRawDicomElements();
@@ -45,8 +47,7 @@ QUnit.test("Test DICOM parsing.", function (assert) {
         // ReferencedImageSequence - ReferencedSOPInstanceUID 
         assert.equal(tags.getFromName("ReferencedImageSequence")[0].x00081155.value[0], 
             "1.3.12.2.1107.5.2.32.35162.2012021515511672669154094", 
-            "ReferencedImageSequence SQ");*/
-        
+            "ReferencedImageSequence SQ");
         
         // finish async test
         done();
