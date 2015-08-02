@@ -23,9 +23,12 @@ QUnit.test("Test DICOM parsing.", function (assert) {
     request.open('GET', url, true);
     request.responseType = "arraybuffer"; 
     request.onload = function (/*event*/) {
-        assert.ok((this.response.length!==0), "Got a response.");
+        assert.ok((this.response.byteLength!==0), "Got a response.");
         
-        // TODO Something is going wrong at parsing time in Phantomjs...
+        // cope with no support for Float64Array (Phantomjs for ex...)
+        if ( typeof Float64Array === "undefined" ) {
+            Float64Array = Float32Array; // jshint ignore:line
+        }            
         
         // parse DICOM
         var dicomParser = new dwv.dicom.DicomParser();
