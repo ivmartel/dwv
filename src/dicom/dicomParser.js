@@ -619,7 +619,7 @@ dwv.dicom.DicomParser.prototype.readDataElement = function(reader, offset, impli
                     typeof dict[tag.group][tag.element] !== "undefined" ) {
                 vr = dwv.dicom.dictionary[tag.group][tag.element][0];
             }
-            isOtherVR = (vr[0] === 'O');
+            isOtherVR = (vr[0].toUpperCase() === 'O');
             vrOffset = 0;
             vl = reader.readUint32( offset+tagOffset+vrOffset );
             vlOffset = 4;
@@ -653,9 +653,6 @@ dwv.dicom.DicomParser.prototype.readDataElement = function(reader, offset, impli
     var dataOffset = offset+tagOffset+vrOffset+vlOffset;
     if( isOtherVR )
     {
-        if ( vr === "OX" ) {
-            console.warn("OX value representation for tag: "+tag.name+".");
-        }
         // OB or BitsAllocated == 8
         if ( vr === "OB" || 
                 ( typeof this.dicomElements.x00280100 !== 'undefined' &&
@@ -1070,6 +1067,7 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementAsString = function ( dicomEl
     }
     
     var deSize = dicomElement.value.length;
+    var isOtherVR = ( dicomElement.vr[0].toUpperCase() === "O" );
     
     // no size for delimitations
     if ( dicomElement.group === "0xFFFE" && (
@@ -1077,7 +1075,7 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementAsString = function ( dicomEl
             dicomElement.element === "0xE0DD" ) ) {
         deSize = 0;
     }
-    else if ( dicomElement.vr[0] === "O" ) {
+    else if ( isOtherVR ) {
         deSize = 1;
     }
 
@@ -1111,7 +1109,7 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementAsString = function ( dicomEl
             line += " (PixelSequence #=" + deSize + ")";
         }
         // 'O'ther array, limited display length
-        else if ( dicomElement.vr[0] === 'O' ||
+        else if ( isOtherVR ||
                 dicomElement.vr === 'pi' ||
                 dicomElement.vr === "UL" || 
                 dicomElement.vr === "US" ||
@@ -1131,7 +1129,7 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementAsString = function ( dicomEl
                 if ( dicomElement.vr === "FL" ) {
                     valueStr += Number(dicomElement.value[k].toPrecision(8));
                 }
-                else if ( dicomElement.vr[0] === "O" ) {
+                else if ( isOtherVR ) {
                     var tmp = dicomElement.value[k].toString(16);
                     if ( dicomElement.vr === "OB" ) {
                         tmp = "00".substr(0, 2 - tmp.length) + tmp;
