@@ -797,7 +797,7 @@ dwv.dicom.DicomParser.prototype.readDataElement = function(reader, offset, impli
                     typeof dict[tag.group][tag.element] !== &quot;undefined&quot; ) {
                 vr = dwv.dicom.dictionary[tag.group][tag.element][0];
             }
-            isOtherVR = (vr[0] === &#x27;O&#x27;);
+            isOtherVR = (vr[0].toUpperCase() === &#x27;O&#x27;);
             vrOffset = 0;
             vl = reader.readUint32( offset+tagOffset+vrOffset );
             vlOffset = 4;
@@ -831,9 +831,6 @@ dwv.dicom.DicomParser.prototype.readDataElement = function(reader, offset, impli
     var dataOffset = offset+tagOffset+vrOffset+vlOffset;
     if( isOtherVR )
     {
-        if ( vr === &quot;OX&quot; ) {
-            console.warn(&quot;OX value representation for tag: &quot;+tag.name+&quot;.&quot;);
-        }
         // OB or BitsAllocated == 8
         if ( vr === &quot;OB&quot; || 
                 ( typeof this.dicomElements.x00280100 !== &#x27;undefined&#x27; &amp;&amp;
@@ -1248,6 +1245,7 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementAsString = function ( dicomEl
     }
     
     var deSize = dicomElement.value.length;
+    var isOtherVR = ( dicomElement.vr[0].toUpperCase() === &quot;O&quot; );
     
     // no size for delimitations
     if ( dicomElement.group === &quot;0xFFFE&quot; &amp;&amp; (
@@ -1255,7 +1253,7 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementAsString = function ( dicomEl
             dicomElement.element === &quot;0xE0DD&quot; ) ) {
         deSize = 0;
     }
-    else if ( dicomElement.vr[0] === &quot;O&quot; ) {
+    else if ( isOtherVR ) {
         deSize = 1;
     }
 
@@ -1289,7 +1287,7 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementAsString = function ( dicomEl
             line += &quot; (PixelSequence #=&quot; + deSize + &quot;)&quot;;
         }
         // &#x27;O&#x27;ther array, limited display length
-        else if ( dicomElement.vr[0] === &#x27;O&#x27; ||
+        else if ( isOtherVR ||
                 dicomElement.vr === &#x27;pi&#x27; ||
                 dicomElement.vr === &quot;UL&quot; || 
                 dicomElement.vr === &quot;US&quot; ||
@@ -1309,7 +1307,7 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementAsString = function ( dicomEl
                 if ( dicomElement.vr === &quot;FL&quot; ) {
                     valueStr += Number(dicomElement.value[k].toPrecision(8));
                 }
-                else if ( dicomElement.vr[0] === &quot;O&quot; ) {
+                else if ( isOtherVR ) {
                     var tmp = dicomElement.value[k].toString(16);
                     if ( dicomElement.vr === &quot;OB&quot; ) {
                         tmp = &quot;00&quot;.substr(0, 2 - tmp.length) + tmp;
