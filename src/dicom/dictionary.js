@@ -13,6 +13,8 @@ dwv.dicom = dwv.dicom || {};
  * Conversion changes: 
  * - (vr) "See Note" -> "NONE", "OB or OW" -> "ox", "US or SS" -> "xs"
  * - added "GenericGroupLength" element to each group
+ * Local changes:
+ * - tag numbers with 'xx' were replaced with '00', 'xxx' with '001' and 'xxxx' with '0004'
  * @namespace dwv.dicom
  */
 dwv.dicom.dictionary = {
@@ -1358,7 +1360,7 @@ dwv.dicom.dictionary = {
         '0x1206': ['IS', '1', 'NumberOfStudyRelatedSeries'],
         '0x1208': ['IS', '1', 'NumberOfStudyRelatedInstances'],
         '0x1209': ['IS', '1', 'NumberOfSeriesRelatedInstances'],
-        '0x31xx': ['CS', '1-n', 'SourceImageIDs'],
+        '0x3100': ['CS', '1-n', 'SourceImageIDs'],
         '0x3401': ['CS', '1', 'ModifyingDeviceID'],
         '0x3402': ['CS', '1', 'ModifiedImageID'],
         '0x3403': ['DA', '1', 'ModifiedImageDate'],
@@ -3176,16 +3178,16 @@ dwv.dicom.dictionary = {
     },
     '0x1000': {
         '0x0000': ['UL', '1', 'GenericGroupLength'],
-        '0xxxx0': ['US', '3', 'EscapeTriplet'],
-        '0xxxx1': ['US', '3', 'RunLengthTriplet'],
-        '0xxxx2': ['US', '1', 'HuffmanTableSize'],
-        '0xxxx3': ['US', '3', 'HuffmanTableTriplet'],
-        '0xxxx4': ['US', '1', 'ShiftTableSize'],
-        '0xxxx5': ['US', '3', 'ShiftTableTriplet'],
+        '0x0010': ['US', '3', 'EscapeTriplet'],
+        '0x0011': ['US', '3', 'RunLengthTriplet'],
+        '0x0012': ['US', '1', 'HuffmanTableSize'],
+        '0x0013': ['US', '3', 'HuffmanTableTriplet'],
+        '0x0014': ['US', '1', 'ShiftTableSize'],
+        '0x0015': ['US', '3', 'ShiftTableTriplet'],
     },
     '0x1010': {
         '0x0000': ['UL', '1', 'GenericGroupLength'],
-        '0xxxxx': ['US', '1-n', 'ZonalMap'],
+        '0x0004': ['US', '1-n', 'ZonalMap'],
     },
     '0x2000': {
         '0x0000': ['UL', '1', 'GenericGroupLength'],
@@ -4085,7 +4087,7 @@ dwv.dicom.dictionary = {
         '0x0000': ['UL', '1', 'GenericGroupLength'],
         '0x0001': ['SQ', '1', 'MACParametersSequence'],
     },
-    '0x50xx': {
+    '0x5000': {
         '0x0000': ['UL', '1', 'GenericGroupLength'],
         '0x0005': ['US', '1', 'CurveDimensions'],
         '0x0010': ['US', '1', 'NumberOfPoints'],
@@ -4134,7 +4136,7 @@ dwv.dicom.dictionary = {
         '0x0010': ['OF', '1', 'FirstOrderPhaseCorrectionAngle'],
         '0x0020': ['OF', '1', 'SpectroscopyData'],
     },
-    '0x60xx': {
+    '0x6000': {
         '0x0000': ['UL', '1', 'GenericGroupLength'],
         '0x0010': ['US', '1', 'OverlayRows'],
         '0x0011': ['US', '1', 'OverlayColumns'],
@@ -4186,7 +4188,7 @@ dwv.dicom.dictionary = {
         '0x0030': ['OW', '1', 'CoefficientsSDHN'],
         '0x0040': ['OW', '1', 'CoefficientsSDDN'],
     },
-    '0x7Fxx': {
+    '0x7F00': {
         '0x0000': ['UL', '1', 'GenericGroupLength'],
         '0x0010': ['ox', '1', 'VariablePixelData'],
         '0x0011': ['US', '1', 'VariableNextDataGroup'],
