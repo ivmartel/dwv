@@ -4828,7 +4828,7 @@
         {
             "file": "src/dicom/dictionary.js",
             "line": 8,
-            "description": "DICOM tag dictionary.",
+            "description": "DICOM tag dictionary.\nGenerated using xml standard conversion\n from https://github.com/ivmartel/dcmbench/tree/master/view/part06\n with http://medical.nema.org/medical/dicom/current/source/docbook/part06/part06.xml\nConversion changes: \n- (vr) \"See Note\" -> \"NONE\", \"OB or OW\" -> \"ox\", \"US or SS\" -> \"xs\"\n- added \"GenericGroupLength\" element to each group\nLocal changes:\n- tag numbers with 'xx' were replaced with '00', 'xxx' with '001' and 'xxxx' with '0004'",
             "class": "dwv.browser",
             "module": "dicom",
             "namespace": "dwv.dicom"
@@ -13803,7 +13803,7 @@
             "line": " src/dicom/dicomParser.js:1050"
         },
         {
-            "message": "Missing item type\nDICOM tag dictionary.",
+            "message": "Missing item type\nDICOM tag dictionary.\nGenerated using xml standard conversion\n from https://github.com/ivmartel/dcmbench/tree/master/view/part06\n with http://medical.nema.org/medical/dicom/current/source/docbook/part06/part06.xml\nConversion changes: \n- (vr) \"See Note\" -> \"NONE\", \"OB or OW\" -> \"ox\", \"US or SS\" -> \"xs\"\n- added \"GenericGroupLength\" element to each group\nLocal changes:\n- tag numbers with 'xx' were replaced with '00', 'xxx' with '001' and 'xxxx' with '0004'",
             "line": " src/dicom/dictionary.js:8"
         },
         {
