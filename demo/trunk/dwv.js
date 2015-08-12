@@ -1829,6 +1829,9 @@ dwv.ViewController = function ( view )
 var dwv = dwv || {};
 dwv.dicom = dwv.dicom || {};
 
+var jpeg = jpeg || {};
+jpeg.lossless = jpeg.lossless || {};
+
 var JpxImage = JpxImage || {};
 
 /**
@@ -2154,9 +2157,34 @@ dwv.dicom.splitGroupElementKey = function (key)
  */
 dwv.dicom.isJpegTransferSyntax = function(syntax)
 {
-    return syntax.match(/1.2.840.10008.1.2.4.5/) !== null ||
-        syntax.match(/1.2.840.10008.1.2.4.6/) !== null||
-        syntax.match(/1.2.840.10008.1.2.4.7/) !== null;
+    return syntax === "1.2.840.10008.1.2.4.50" ||
+        syntax === "1.2.840.10008.1.2.4.51";
+};
+
+/**
+ * Tell if a given syntax is a non supported JPEG one.
+ * @method isJpegNonSupportedTransferSyntax
+ * @param {String} The transfer syntax to test.
+ * @returns {Boolean} True if a non supported jpeg syntax.
+ */
+dwv.dicom.isJpegNonSupportedTransferSyntax = function(syntax)
+{
+    return ( syntax.match(/1.2.840.10008.1.2.4.5/) !== null &&
+        !dwv.dicom.isJpegTransferSyntax() &&
+        !dwv.dicom.isJpegLosslessTransferSyntax() ) ||
+        syntax.match(/1.2.840.10008.1.2.4.6/) !== null;
+};
+
+/**
+ * Tell if a given syntax is a JPEG Lossless one.
+ * @method isJpegLosslessTransferSyntax
+ * @param {String} The transfer syntax to test.
+ * @returns {Boolean} True if a jpeg lossless syntax.
+ */
+dwv.dicom.isJpegLosslessTransferSyntax = function(syntax)
+{
+    return syntax === "1.2.840.10008.1.2.4.57" ||
+        syntax === "1.2.840.10008.1.2.4.70";
 };
 
 /**
@@ -2209,6 +2237,14 @@ dwv.dicom.getTransferSyntaxName = function (syntax)
     // JPEG
     else if( dwv.dicom.isJpegTransferSyntax(syntax) ) {
         name = "JPEG";
+    }
+    // JPEG Lossless
+    else if( dwv.dicom.isJpegLosslessTransferSyntax(syntax) ) {
+        name = "JPEG Lossless";
+    }
+    // Non supported JPEG
+    else if( dwv.dicom.isJpegNonSupportedTransferSyntax(syntax) ) {
+        name = "Non supported JPEG";
     }
     // JPEG-LS
     else if( dwv.dicom.isJpeglsTransferSyntax(syntax) ) {
@@ -2563,8 +2599,9 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
 {
     var offset = 0;
     var implicit = false;
-    var jpeg = false;
-    var jpeg2000 = false;
+    var isJpeg = false;
+    var isJpegLossless = false;
+    var isJpeg2000 = false;
     // default readers
     var metaReader = new dwv.dicom.DataReader(buffer);
     var dataReader = new dwv.dicom.DataReader(buffer);
@@ -2618,9 +2655,17 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
     }
     // JPEG
     else if( dwv.dicom.isJpegTransferSyntax(syntax) ) {
-        jpeg = true;
-        //console.log("JPEG compressed DICOM data: " + syntax);
+        isJpeg = true;
         throw new Error("Unsupported DICOM transfer syntax (JPEG): "+syntax);
+    }
+    // JPEG Lossless
+    else if( dwv.dicom.isJpegLosslessTransferSyntax(syntax) ) {
+        isJpegLossless = true;
+        console.log("JPEG Lossless compressed DICOM data: " + syntax);
+    }
+    // non supported JPEG
+    else if( dwv.dicom.isJpegNonSupportedTransferSyntax(syntax) ) {
+        throw new Error("Unsupported DICOM transfer syntax (retired JPEG): "+syntax);
     }
     // JPEG-LS
     else if( dwv.dicom.isJpeglsTransferSyntax(syntax) ) {
@@ -2630,7 +2675,7 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
     // JPEG 2000
     else if( dwv.dicom.isJpeg2000TransferSyntax(syntax) ) {
         console.log("JPEG 2000 compressed DICOM data: " + syntax);
-        jpeg2000 = true;
+        isJpeg2000 = true;
     }
     // MPEG2 Image Compression
     else if( syntax === "1.2.840.10008.1.2.4.100" ) {
@@ -2745,17 +2790,14 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
         i += tagOffset;
     }
     
-    // uncompress data
-    if( jpeg ) {
-        // using jpgjs from https://github.com/notmasteryet/jpgjs
-        // -> error with ffc3 and ffc1 jpeg jfif marker
-        /*var j = new JpegImage();
-        j.parse(this.pixelBuffer);
-        var d = 0;
-        j.copyToImageData(d);
-        this.pixelBuffer = d.data;*/
+    // uncompress data if needed
+    if( isJpegLossless ) {
+        var buf = new Uint8Array(this.pixelBuffer);
+        var decoder = new jpeg.lossless.Decoder(buf.buffer);
+        var decoded = decoder.decode();
+        this.pixelBuffer = new Uint16Array(decoded.buffer);
     }
-    else if( jpeg2000 ) {
+    else if( isJpeg2000 ) {
         // decompress pixel buffer into Int16 image
         var jpxImage = new JpxImage();
         jpxImage.parse( this.pixelBuffer );
