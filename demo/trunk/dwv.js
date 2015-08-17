@@ -1384,7 +1384,7 @@ dwv.App = function ()
         viewController = new dwv.ViewController(view);
         // append the DICOM tags table
         if ( tagsGui ) {
-            tagsGui.initialise(data.info.dumpToTable());
+            tagsGui.initialise(data.info);
         }
         // store image
         originalImage = view.getImage();
@@ -11862,7 +11862,7 @@ dwv.image.getDataFromDicomBuffer = function(buffer)
     var viewFactory = new dwv.image.ViewFactory();
     var view = viewFactory.create( dicomParser.getDicomElements(), dicomParser.getPixelBuffer() );
     // return
-    return {"view": view, "info": dicomParser.getDicomElements()};
+    return {"view": view, "info": dicomParser.getDicomElements().dumpToTable()};
 };
 
 ;/** 
