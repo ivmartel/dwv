@@ -85,6 +85,6 @@ dwv.image.getDataFromDicomBuffer = function(buffer)
     var viewFactory = new dwv.image.ViewFactory();
     var view = viewFactory.create( dicomParser.getDicomElements(), dicomParser.getPixelBuffer() );
     // return
-    return {"view": view, "info": dicomParser.getDicomElements()};
+    return {"view": view, "info": dicomParser.getDicomElements().dumpToTable()};
 };
 
