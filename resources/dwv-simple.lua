@@ -1,18 +1,21 @@
 --
 -- DICOM Web Viewer (DWV) lua script for integration in a Conquest PACS server. 
 --
--- Usage
--- In the dicom.ini of your web server, create the dwv viewer:
+-- Usage:
+-- 1. copy this file onto your web server
+-- 2. in the 'dicom.ini' of your web server, create the dwv viewer:
 -- >> [dwv-simple]
--- >> source = viewers\dwv-simple.lua
+-- >> source = dwv-simple.lua
 -- And set it as the default viewer:
 -- >> [webdefaults]
 -- >> ...
 -- >> viewer = dwv-simple
+-- 3. copy the DWV distribution files in a 'dwv' folder
+-- in the web folder of your web server. It should be accessible
+-- via '[server address]/dwv'.
+--
 -- This script relies on the 'kFactorFile', 'ACRNemaMap' and 'Dictionary'
 -- variables being set correctly.
--- Then copy the DWV distribution files in a 'dwv' folder
--- in the web folder of your web server.
 
 -- Get ids
 
