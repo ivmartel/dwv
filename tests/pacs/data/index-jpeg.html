@@ -34,6 +34,7 @@ body { font-family: Verdana, Arial, Helvetica, sans-serif; }
 <!-- Third party -->  
 <script type="text/javascript" src="../../../ext/jquery/jquery-2.1.4.min.js"></script>
 <script type="text/javascript" src="../../../ext/rii-mango/lossless-min.js"></script>
+<script type="text/javascript" src="../../../ext/notmasteryet/jpg.js"></script>
 <!-- Local -->
 <script type="text/javascript" src="../../../src/app/application.js"></script>
 <script type="text/javascript" src="../../../src/app/viewController.js"></script>
@@ -75,16 +76,30 @@ body { font-family: Verdana, Arial, Helvetica, sans-serif; }
 // launch when page is loaded
 $(document).ready( function()
 {
-    dwv.addDataLine("dwv0", "ct1_jpll", {
+    dwv.addDataLine("dwv0", "mr1_jply", {
+        'origin': 'Nema WG04',
+        'path': 'compsamples_jpeg/IMAGES/JPLY/MR1_JPLY',
+        't-syntax': '1.2.840.10008.1.2.4.51 (jpeg baseline)',
+        'modality': 'MR', 'photo': 'MONOCHROME2',
+        'bits': '16-12-11', 'pixel-vr': 'OB',
+    });
+    dwv.addDataLine("dwv1", "nm1_jply", {
+        'origin': 'Nema WG04',
+        'path': 'compsamples_jpeg/IMAGES/JPLY/NM1_JPLY',
+        't-syntax': '1.2.840.10008.1.2.4.51 (jpeg baseline)',
+        'modality': 'NM', 'photo': 'MONOCHROME2',
+        'bits': '16-12-11', 'pixel-vr': 'OB',
+    });
+    dwv.addDataLine("dwv2", "ct1_jpll", {
         'origin': 'Nema WG04',
         'path': 'compsamples_jpeg/IMAGES/JPLL/CT1_JPLL',
         't-syntax': '1.2.840.10008.1.2.4.70 (jpeg lossless)',
         'modality': 'CT', 'photo': 'MONOCHROME2',
         'bits': '16-16-15', 'pixel-vr': 'OB',
     });
-    dwv.addDataLine("dwv1", "nm1_jpll", {
+    dwv.addDataLine("dwv3", "nm1_jpll", {
         'origin': 'Nema WG04',
-        'path': 'compsamples_j2k/IMAGES/JPLL/NM1_JPLL',
+        'path': 'compsamples_jpeg/IMAGES/JPLL/NM1_JPLL',
         't-syntax': '1.2.840.10008.1.2.4.70 (jpeg lossless)',
         'modality': 'NM', 'photo': 'MONOCHROME2',
         'bits': '16-16-15', 'pixel-vr': 'OB',
