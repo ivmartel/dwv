@@ -508,8 +508,10 @@ var JpegImage = (function jpegImage() {
     // convert to 8-bit integers
     for (i = 0; i < 64; ++i) {
       var index = blockBufferOffset + i;
-      var q = Math.floor(p[i]*component.bitConversion);
-      q = (q <= -2056) ? 0 : (q >= 2024) ? 255 : (q + 2056) >> 4;
+      var q = p[i];
+      q = (q <= -2056 / component.bitConversion) ? 0 :
+        (q >= 2024 / component.bitConversion) ? 255 / component.bitConversion :
+        (q + 2056 / component.bitConversion) >> 4;
       component.blockData[index] = q;
     }
   }
@@ -810,12 +812,12 @@ var JpegImage = (function jpegImage() {
       var colorTransform;
       var numComponents = this.components.length;
       var dataLength = width * height * numComponents;
-      var data = new Uint8Array(dataLength);
+      var data = new Uint16Array(dataLength);
       var componentLine;
 
       // lineData is reused for all components. Assume first component is
       // the biggest
-      var lineData = new Uint8Array((this.components[0].blocksPerLine << 3) *
+      var lineData = new Uint16Array((this.components[0].blocksPerLine << 3) *
                                     this.components[0].blocksPerColumn * 8);
 
       // First construct image data ...
