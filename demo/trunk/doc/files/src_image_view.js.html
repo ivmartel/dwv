@@ -609,7 +609,7 @@ dwv.image.ViewFactory.prototype.create = function (dicomElements, pixelBuffer)
     // PixelRepresentation
     var isSigned = false;
     var pixelRepresentation = dicomElements.getFromKey(&quot;x00280103&quot;);
-    if ( pixelRepresentation !== null ) {
+    if ( pixelRepresentation ) {
         isSigned = (pixelRepresentation === 1);
     }
     // view
@@ -619,20 +619,19 @@ dwv.image.ViewFactory.prototype.create = function (dicomElements, pixelBuffer)
     // WindowCenter and WindowWidth
     var windowCenter = dicomElements.getFromKey(&quot;x00281050&quot;, true);
     var windowWidth = dicomElements.getFromKey(&quot;x00281051&quot;, true);
-    if ( windowCenter !== null &amp;&amp; windowWidth !== null ) {
+    if ( windowCenter &amp;&amp; windowWidth ) {
         var name;
         for ( var j = 0; j &lt; windowCenter.length; ++j) {
             var width = parseFloat( windowWidth[j], 10 );
-            if ( width !== 0 ) {
+            var center = parseFloat( windowCenter[j], 10 );
+            if ( width &amp;&amp; center ) {
+                name = &quot;Default&quot;+j;
                 var windowCenterWidthExplanation = dicomElements.getFromKey(&quot;x00281055&quot;);
-                if ( windowCenterWidthExplanation !== null ) {
+                if ( windowCenterWidthExplanation ) {
                     name = windowCenterWidthExplanation[j];
                 }
-                else {
-                    name = &quot;Default&quot;+j;
-                }
                 windowPresets.push({
-                    &quot;center&quot;: parseFloat( windowCenter[j], 10 ),
+                    &quot;center&quot;: center,
                     &quot;width&quot;: width, 
                     &quot;name&quot;: name
                 });
