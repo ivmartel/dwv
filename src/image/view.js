@@ -431,7 +431,7 @@ dwv.image.ViewFactory.prototype.create = function (dicomElements, pixelBuffer)
     // PixelRepresentation
     var isSigned = false;
     var pixelRepresentation = dicomElements.getFromKey("x00280103");
-    if ( pixelRepresentation !== null ) {
+    if ( pixelRepresentation ) {
         isSigned = (pixelRepresentation === 1);
     }
     // view
@@ -441,21 +441,19 @@ dwv.image.ViewFactory.prototype.create = function (dicomElements, pixelBuffer)
     // WindowCenter and WindowWidth
     var windowCenter = dicomElements.getFromKey("x00281050", true);
     var windowWidth = dicomElements.getFromKey("x00281051", true);
-    if ( windowCenter !== null && windowWidth !== null ) {
+    if ( windowCenter && windowWidth ) {
         var name;
         for ( var j = 0; j < windowCenter.length; ++j) {
             var width = parseFloat( windowWidth[j], 10 );
-            if ( width !== 0 ) {
+            var center = parseFloat( windowCenter[j], 10 );
+            if ( width && center ) {
+                name = "Default"+j;
                 var windowCenterWidthExplanation = dicomElements.getFromKey("x00281055");
-                if ( windowCenterWidthExplanation !== null &&
-                        windowCenterWidthExplanation.length !== 0) {
+                if ( windowCenterWidthExplanation ) {
                     name = windowCenterWidthExplanation[j];
                 }
-                else {
-                    name = "Default"+j;
-                }
                 windowPresets.push({
-                    "center": parseFloat( windowCenter[j], 10 ),
+                    "center": center,
                     "width": width, 
                     "name": name
                 });

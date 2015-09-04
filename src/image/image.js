@@ -747,12 +747,12 @@ dwv.image.ImageFactory.prototype.create = function (dicomElements, pixelBuffer)
 {
     // columns
     var columns = dicomElements.getFromKey("x00280011");
-    if ( columns === null ) {
+    if ( !columns ) {
         throw new Error("Missing DICOM image number of columns");
     }
     // rows
     var rows = dicomElements.getFromKey("x00280010");
-    if ( rows === null ) {
+    if ( !rows ) {
         throw new Error("Missing DICOM image number of rows");
     }
     // image size
@@ -765,11 +765,11 @@ dwv.image.ImageFactory.prototype.create = function (dicomElements, pixelBuffer)
     var pixelSpacing = dicomElements.getFromKey("x00280030");
     // ImagerPixelSpacing
     var imagerPixelSpacing = dicomElements.getFromKey("x00181164");
-    if ( pixelSpacing !== null ) {
+    if ( pixelSpacing ) {
         rowSpacing = parseFloat( pixelSpacing[0] );
         columnSpacing = parseFloat( pixelSpacing[1] );
     }
-    else if ( imagerPixelSpacing !== null ) {
+    else if ( imagerPixelSpacing ) {
         rowSpacing = parseFloat( imagerPixelSpacing[0] );
         columnSpacing = parseFloat( imagerPixelSpacing[1] );
     }
@@ -787,7 +787,7 @@ dwv.image.ImageFactory.prototype.create = function (dicomElements, pixelBuffer)
     var shift = false;
     // PixelRepresentation
     var pixelRepresentation = dicomElements.getFromKey("x00280103");
-    if ( pixelRepresentation !== null && pixelRepresentation === 1 ) {
+    if ( pixelRepresentation === 1 ) {
         shift = true;
     }
     // copy
@@ -802,7 +802,7 @@ dwv.image.ImageFactory.prototype.create = function (dicomElements, pixelBuffer)
     var slicePosition = new Array(0,0,0);
     // ImagePositionPatient
     var imagePositionPatient = dicomElements.getFromKey("x00200032");
-    if ( imagePositionPatient !== null ) {
+    if ( imagePositionPatient ) {
         slicePosition = [ parseFloat( imagePositionPatient[0] ),
             parseFloat( imagePositionPatient[1] ),
             parseFloat( imagePositionPatient[2] ) ];
@@ -816,7 +816,7 @@ dwv.image.ImageFactory.prototype.create = function (dicomElements, pixelBuffer)
     var image = new dwv.image.Image( geometry, buffer );
     // PhotometricInterpretation
     var photometricInterpretation = dicomElements.getFromKey("x00280004");
-    if ( photometricInterpretation !== null ) {
+    if ( photometricInterpretation ) {
         var photo = dwv.dicom.cleanString(photometricInterpretation).toUpperCase();
         if ( jpeg2000 && photo.match(/YBR/) ) {
             photo = "RGB";
@@ -825,7 +825,7 @@ dwv.image.ImageFactory.prototype.create = function (dicomElements, pixelBuffer)
     }        
     // PlanarConfiguration
     var planarConfiguration = dicomElements.getFromKey("x00280006");
-    if ( planarConfiguration !== null ) {
+    if ( planarConfiguration ) {
         image.setPlanarConfiguration( planarConfiguration );
     }  
     
@@ -833,13 +833,13 @@ dwv.image.ImageFactory.prototype.create = function (dicomElements, pixelBuffer)
     var slope = 1;
     // RescaleSlope
     var rescaleSlope = dicomElements.getFromKey("x00281053");
-    if ( rescaleSlope !== null ) {
+    if ( rescaleSlope ) {
         slope = parseFloat(rescaleSlope);
     }
     var intercept = 0;
     // RescaleIntercept
     var rescaleIntercept = dicomElements.getFromKey("x00281052");
-    if ( rescaleIntercept !== null ) {
+    if ( rescaleIntercept ) {
         intercept = parseFloat(rescaleIntercept);
     }
     var rsi = new dwv.image.RescaleSlopeAndIntercept(slope, intercept);
@@ -849,22 +849,22 @@ dwv.image.ImageFactory.prototype.create = function (dicomElements, pixelBuffer)
     var meta = {};
     // Modality
     var modality = dicomElements.getFromKey("x00080060");
-    if ( modality !== null ) {
+    if ( modality ) {
         meta.Modality = modality;
     }
     // StudyInstanceUID
     var studyInstanceUID = dicomElements.getFromKey("x0020000D");
-    if ( studyInstanceUID !== null ) {
+    if ( studyInstanceUID ) {
         meta.StudyInstanceUID = studyInstanceUID;
     }
     // SeriesInstanceUID
     var seriesInstanceUID = dicomElements.getFromKey("x0020000E");
-    if ( seriesInstanceUID !== null ) {
+    if ( seriesInstanceUID ) {
         meta.SeriesInstanceUID = seriesInstanceUID;
     }
     // BitsStored
     var bitsStored = dicomElements.getFromKey("x00280101");
-    if ( bitsStored !== null ) {
+    if ( bitsStored ) {
         meta.BitsStored = parseInt(bitsStored, 10);
     }
     image.setMeta(meta);
