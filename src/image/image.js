@@ -748,12 +748,12 @@ dwv.image.ImageFactory.prototype.create = function (dicomElements, pixelBuffer)
     // columns
     var columns = dicomElements.getFromKey("x00280011");
     if ( !columns ) {
-        throw new Error("Missing DICOM image number of columns");
+        throw new Error("Missing or empty DICOM image number of columns");
     }
     // rows
     var rows = dicomElements.getFromKey("x00280010");
     if ( !rows ) {
-        throw new Error("Missing DICOM image number of rows");
+        throw new Error("Missing or empty DICOM image number of rows");
     }
     // image size
     var size = new dwv.image.Size( columns, rows );
@@ -765,11 +765,11 @@ dwv.image.ImageFactory.prototype.create = function (dicomElements, pixelBuffer)
     var pixelSpacing = dicomElements.getFromKey("x00280030");
     // ImagerPixelSpacing
     var imagerPixelSpacing = dicomElements.getFromKey("x00181164");
-    if ( pixelSpacing ) {
+    if ( pixelSpacing && pixelSpacing[0] && pixelSpacing[1] ) {
         rowSpacing = parseFloat( pixelSpacing[0] );
         columnSpacing = parseFloat( pixelSpacing[1] );
     }
-    else if ( imagerPixelSpacing ) {
+    else if ( imagerPixelSpacing && imagerPixelSpacing[0] && imagerPixelSpacing[1] ) {
         rowSpacing = parseFloat( imagerPixelSpacing[0] );
         columnSpacing = parseFloat( imagerPixelSpacing[1] );
     }
