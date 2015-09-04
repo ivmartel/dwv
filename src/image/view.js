@@ -447,7 +447,8 @@ dwv.image.ViewFactory.prototype.create = function (dicomElements, pixelBuffer)
             var width = parseFloat( windowWidth[j], 10 );
             if ( width !== 0 ) {
                 var windowCenterWidthExplanation = dicomElements.getFromKey("x00281055");
-                if ( windowCenterWidthExplanation !== null ) {
+                if ( windowCenterWidthExplanation !== null &&
+                        windowCenterWidthExplanation.length !== 0) {
                     name = windowCenterWidthExplanation[j];
                 }
                 else {
