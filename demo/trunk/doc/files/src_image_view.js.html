@@ -609,8 +609,8 @@ dwv.image.ViewFactory.prototype.create = function (dicomElements, pixelBuffer)
     // PixelRepresentation
     var isSigned = false;
     var pixelRepresentation = dicomElements.getFromKey(&quot;x00280103&quot;);
-    if ( pixelRepresentation ) {
-        isSigned = (pixelRepresentation === 1);
+    if ( pixelRepresentation === 1 ) {
+        isSigned = true;
     }
     // view
     var view = new dwv.image.View(image, isSigned);
@@ -624,7 +624,7 @@ dwv.image.ViewFactory.prototype.create = function (dicomElements, pixelBuffer)
         for ( var j = 0; j &lt; windowCenter.length; ++j) {
             var width = parseFloat( windowWidth[j], 10 );
             var center = parseFloat( windowCenter[j], 10 );
-            if ( width &amp;&amp; center ) {
+            if ( width ) {
                 name = &quot;Default&quot;+j;
                 var windowCenterWidthExplanation = dicomElements.getFromKey(&quot;x00281055&quot;);
                 if ( windowCenterWidthExplanation ) {
