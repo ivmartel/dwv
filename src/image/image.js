@@ -782,19 +782,17 @@ dwv.image.ImageFactory.prototype.create = function (dicomElements, pixelBuffer)
     var jpeg2000 = dwv.dicom.isJpeg2000TransferSyntax( syntax );
     
     // buffer data
-    var buffer =  new Int16Array(pixelBuffer.length);
-    // unsigned to signed data if needed
-    var shift = false;
+    var buffer = pixelBuffer;
     // PixelRepresentation
     var pixelRepresentation = dicomElements.getFromKey("x00280103");
     if ( pixelRepresentation === 1 ) {
-        shift = true;
-    }
-    // copy
-    for ( var i=0; i<pixelBuffer.length; ++i ) {
-        buffer[i] = pixelBuffer[i];
-        if ( shift && buffer[i] >= Math.pow(2, 15) ) {
-            buffer[i] -= Math.pow(2, 16);
+        // unsigned to signed data
+        buffer = new Int16Array(pixelBuffer.length);
+        for ( var i=0; i<pixelBuffer.length; ++i ) {
+            buffer[i] = pixelBuffer[i];
+            if ( buffer[i] >= Math.pow(2, 15) ) {
+                buffer[i] -= Math.pow(2, 16);
+            }
         }
     }
     
