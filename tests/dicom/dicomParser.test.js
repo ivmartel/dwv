@@ -34,6 +34,7 @@ QUnit.test("Test DICOM parsing.", function (assert) {
         var dicomParser = new dwv.dicom.DicomParser();
         dicomParser.parse(this.response);
         
+        // raw tags
         var rawTags = dicomParser.getRawDicomElements();
         // check values
         assert.equal(rawTags.x00280010.value[0], 256, "Number of rows (raw)");
@@ -43,7 +44,21 @@ QUnit.test("Test DICOM parsing.", function (assert) {
             "1.3.12.2.1107.5.2.32.35162.2012021515511672669154094", 
             "ReferencedImageSequence SQ (raw)");
 
+        // wrapped tags
         var tags = dicomParser.getDicomElements();
+        // wrong key
+        assert.equal(tags.getFromKey("x12345678"), null, "Wrong key");
+        assert.notOk(tags.getFromKey("x12345678"), "Wrong key fails if test" );
+        // empty key
+        assert.equal(tags.getFromKey("x00081050"), "", "Empty key");
+        assert.notOk(tags.getFromKey("x00081050"), "Empty key fails if test" );
+        // good key
+        assert.equal(tags.getFromKey("x00280010"), 256, "Good key");
+        assert.ok(tags.getFromKey("x00280010"), "Good key passes if test" );
+        // zero value (passes test since it is a string)
+        assert.equal(tags.getFromKey("x00181318"), 0, "Good key, zero value");
+        assert.ok(tags.getFromKey("x00181318"), "Good key, zero value passes if test" );
+
         // check values
         assert.equal(tags.getFromName("Rows"), 256, "Number of rows");
         assert.equal(tags.getFromName("Columns"), 256, "Number of columns");
