@@ -2150,25 +2150,15 @@ dwv.dicom.splitGroupElementKey = function (key)
 };
 
 /**
- * Tell if a given syntax is a JPEG baseline 8bit one.
- * @method isJpegBaseline8bitTransferSyntax
+ * Tell if a given syntax is a JPEG baseline one.
+ * @method isJpegBaselineTransferSyntax
  * @param {String} The transfer syntax to test.
- * @returns {Boolean} True if a jpeg baseline 8bit syntax.
+ * @returns {Boolean} True if a jpeg baseline syntax.
  */
-dwv.dicom.isJpegBaseline8bitTransferSyntax = function(syntax)
+dwv.dicom.isJpegBaselineTransferSyntax = function(syntax)
 {
-    return syntax === "1.2.840.10008.1.2.4.50";
-};
-
-/**
- * Tell if a given syntax is a JPEG baseline 12bit one.
- * @method isJpegBaseline8bitTransferSyntax
- * @param {String} The transfer syntax to test.
- * @returns {Boolean} True if a jpeg baseline 12bit syntax.
- */
-dwv.dicom.isJpegBaseline12bitTransferSyntax = function(syntax)
-{
-    return syntax === "1.2.840.10008.1.2.4.51";
+    return syntax === "1.2.840.10008.1.2.4.50" ||
+        syntax === "1.2.840.10008.1.2.4.51";
 };
 
 /**
@@ -2180,8 +2170,7 @@ dwv.dicom.isJpegBaseline12bitTransferSyntax = function(syntax)
 dwv.dicom.isJpegNonSupportedTransferSyntax = function(syntax)
 {
     return ( syntax.match(/1.2.840.10008.1.2.4.5/) !== null &&
-        !dwv.dicom.isJpegBaseline8bitTransferSyntax() &&
-        !dwv.dicom.isJpegBaseline12bitTransferSyntax() &&
+        !dwv.dicom.isJpegBaselineTransferSyntax() &&
         !dwv.dicom.isJpegLosslessTransferSyntax() ) ||
         syntax.match(/1.2.840.10008.1.2.4.6/) !== null;
 };
@@ -2245,13 +2234,9 @@ dwv.dicom.getTransferSyntaxName = function (syntax)
     else if( syntax === "1.2.840.10008.1.2.2" ) {
         name = "Big Endian Explicit";
     }
-    // JPEG baseline 8bit
-    else if( dwv.dicom.isJpegBaseline8bitTransferSyntax(syntax) ) {
-        name = "JPEG Baseline 8bit";
-    }
-    // JPEG baseline 12bit
-    else if( dwv.dicom.isJpegBaseline12bitTransferSyntax(syntax) ) {
-        name = "JPEG Baseline 12bit";
+    // JPEG baseline
+    else if( dwv.dicom.isJpegBaselineTransferSyntax(syntax) ) {
+        name = "JPEG Baseline";
     }
     // JPEG Lossless
     else if( dwv.dicom.isJpegLosslessTransferSyntax(syntax) ) {
@@ -2614,8 +2599,7 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
 {
     var offset = 0;
     var implicit = false;
-    var isJpegBaseline8bit = false;
-    var isJpegBaseline12bit = false;
+    var isJpegBaseline = false;
     var isJpegLossless = false;
     var isJpeg2000 = false;
     // default readers
@@ -2669,15 +2653,10 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
     else if( syntax === "1.2.840.10008.1.2.2" ) {
         dataReader = new dwv.dicom.DataReader(buffer,false);
     }
-    // JPEG baseline 8bit
-    else if( dwv.dicom.isJpegBaseline8bitTransferSyntax(syntax) ) {
-        isJpegBaseline8bit = true;
-        throw new Error("Unsupported DICOM transfer syntax (JPEG basline 8bit): "+syntax);
-    }
-    // JPEG baseline 12bit
-    else if( dwv.dicom.isJpegBaseline12bitTransferSyntax(syntax) ) {
-        isJpegBaseline12bit = true;
-        console.log("JPEG Baseline 12bit compressed DICOM data: " + syntax);
+    // JPEG baseline
+    else if( dwv.dicom.isJpegBaselineTransferSyntax(syntax) ) {
+        isJpegBaseline = true;
+        console.log("JPEG Baseline compressed DICOM data: " + syntax);
     }
     // JPEG Lossless
     else if( dwv.dicom.isJpegLosslessTransferSyntax(syntax) ) {
@@ -2819,7 +2798,7 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
         var decoded = decoder.decode();
         this.pixelBuffer = new Uint16Array(decoded.buffer);
     }
-    else if ( isJpegBaseline12bit ) {
+    else if ( isJpegBaseline ) {
         decoder = new JpegImage();
         decoder.parse( this.pixelBuffer );
         this.pixelBuffer = decoder.getData(decoder.width,decoder.height);
@@ -11326,19 +11305,17 @@ dwv.image.ImageFactory.prototype.create = function (dicomElements, pixelBuffer)
     var jpeg2000 = dwv.dicom.isJpeg2000TransferSyntax( syntax );
     
     // buffer data
-    var buffer =  new Int16Array(pixelBuffer.length);
-    // unsigned to signed data if needed
-    var shift = false;
+    var buffer = pixelBuffer;
     // PixelRepresentation
     var pixelRepresentation = dicomElements.getFromKey("x00280103");
     if ( pixelRepresentation === 1 ) {
-        shift = true;
-    }
-    // copy
-    for ( var i=0; i<pixelBuffer.length; ++i ) {
-        buffer[i] = pixelBuffer[i];
-        if ( shift && buffer[i] >= Math.pow(2, 15) ) {
-            buffer[i] -= Math.pow(2, 16);
+        // unsigned to signed data
+        buffer = new Int16Array(pixelBuffer.length);
+        for ( var i=0; i<pixelBuffer.length; ++i ) {
+            buffer[i] = pixelBuffer[i];
+            if ( buffer[i] >= Math.pow(2, 15) ) {
+                buffer[i] -= Math.pow(2, 16);
+            }
         }
     }
     
