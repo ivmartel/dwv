@@ -583,6 +583,7 @@
         "tool": {
             "name": "tool",
             "submodules": {},
+            "elements": {},
             "classes": {
                 "dwv.App": 1,
                 "dwv.State": 1,
@@ -626,6 +627,7 @@
         "dicom": {
             "name": "dicom",
             "submodules": {},
+            "elements": {},
             "classes": {
                 "dwv.dicom.DataReader": 1,
                 "dwv.dicom.DicomParser": 1,
@@ -643,6 +645,7 @@
         "browser": {
             "name": "browser",
             "submodules": {},
+            "elements": {},
             "classes": {
                 "dwv.browser": 1
             },
@@ -658,6 +661,7 @@
         "gui": {
             "name": "gui",
             "submodules": {},
+            "elements": {},
             "classes": {
                 "dwv.gui": 1,
                 "dwv.gui.base.Filter": 1,
@@ -691,6 +695,7 @@
         "html": {
             "name": "html",
             "submodules": {},
+            "elements": {},
             "classes": {
                 "dwv.html": 1,
                 "dwv.html.Layer": 1,
@@ -709,6 +714,7 @@
         "image": {
             "name": "image",
             "submodules": {},
+            "elements": {},
             "classes": {
                 "dwv.image.filter.Threshold": 1,
                 "dwv.image.filter.Sharpen": 1,
@@ -740,6 +746,7 @@
         "io": {
             "name": "io",
             "submodules": {},
+            "elements": {},
             "classes": {
                 "dwv.io": 1,
                 "dwv.io.File": 1,
@@ -758,6 +765,7 @@
         "math": {
             "name": "math",
             "submodules": {},
+            "elements": {},
             "classes": {
                 "dwv.math.BucketQueue": 1,
                 "dwv.math": 1,
@@ -787,6 +795,7 @@
         "info": {
             "name": "info",
             "submodules": {},
+            "elements": {},
             "classes": {
                 "dwv.info": 1,
                 "dwv.info.WindowLevel": 1,
@@ -807,6 +816,7 @@
         "utils": {
             "name": "utils",
             "submodules": {},
+            "elements": {},
             "classes": {
                 "dwv.utils": 1
             },
@@ -2523,6 +2533,7 @@
             "static": 1
         }
     },
+    "elements": {},
     "classitems": [
         {
             "file": "src/app/application.js",

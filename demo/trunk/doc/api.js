@@ -153,6 +153,7 @@ YUI.add("yuidoc-meta", function(Y) {
             "name": "utils",
             "description": "Utility module."
         }
-    ]
+    ],
+    "elements": []
 } };
 });
