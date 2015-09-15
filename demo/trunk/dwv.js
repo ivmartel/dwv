@@ -2236,7 +2236,12 @@ dwv.dicom.getTransferSyntaxName = function (syntax)
     }
     // JPEG baseline
     else if( dwv.dicom.isJpegBaselineTransferSyntax(syntax) ) {
-        name = "JPEG Baseline";
+        if ( syntax === "1.2.840.10008.1.2.4.50" ) {
+            name = "JPEG Baseline";
+        }
+        else { // *.51
+            name = "JPEG Baseline Extded, Process 2+4";
+        }
     }
     // JPEG Lossless
     else if( dwv.dicom.isJpegLosslessTransferSyntax(syntax) ) {
@@ -2252,7 +2257,12 @@ dwv.dicom.getTransferSyntaxName = function (syntax)
     }
     // JPEG 2000
     else if( dwv.dicom.isJpeg2000TransferSyntax(syntax) ) {
-        name = "JPEG 2000 (Lossless or Lossy)";
+        if ( syntax === "1.2.840.10008.1.2.4.90" ) {
+            name = "JPEG 2000 (Lossless or Lossy)";
+        }
+        else { // *.91
+            name = "JPEG 2000 (Lossless only)";
+        }
     }
     // MPEG2 Image Compression
     else if( syntax === "1.2.840.10008.1.2.4.100" ) {
