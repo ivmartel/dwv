@@ -416,12 +416,17 @@ dwv.dicom.getTransferSyntaxName = function (syntax)
             name = "JPEG Baseline";
         }
         else { // *.51
-            name = "JPEG Baseline Extded, Process 2+4";
+            name = "JPEG Extended, Process 2+4";
         }
     }
     // JPEG Lossless
     else if( dwv.dicom.isJpegLosslessTransferSyntax(syntax) ) {
-        name = "JPEG Lossless";
+        if ( syntax === "1.2.840.10008.1.2.4.57" ) {
+            name = "JPEG Lossless, Nonhierarchical (Processes 14)";
+        }
+        else { // *.70
+            name = "JPEG Lossless, Non-hierarchical, 1st Order Prediction";
+        }
     }
     // Non supported JPEG
     else if( dwv.dicom.isJpegNonSupportedTransferSyntax(syntax) ) {
@@ -433,10 +438,10 @@ dwv.dicom.getTransferSyntaxName = function (syntax)
     }
     // JPEG 2000
     else if( dwv.dicom.isJpeg2000TransferSyntax(syntax) ) {
-        if ( syntax === "1.2.840.10008.1.2.4.90" ) {
+        if ( syntax === "1.2.840.10008.1.2.4.91" ) {
             name = "JPEG 2000 (Lossless or Lossy)";
         }
-        else { // *.91
+        else { // *.90
             name = "JPEG 2000 (Lossless only)";
         }
     }
