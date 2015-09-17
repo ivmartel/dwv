@@ -17,7 +17,7 @@
                 <h1><img src="../assets/css/logo.png" title="dwv" width="117" height="52"></h1>
         </div>
         <div class="yui3-u-1-4 version">
-            <em>API Docs for: 0.10.1</em>
+            <em>API Docs for: 0.11.0</em>
         </div>
     </div>
     <div id="bd" class="yui3-g">
@@ -41,6 +41,7 @@
                                 <li><a href="../classes/dwv.App.html">dwv.App</a></li>
                                 <li><a href="../classes/dwv.browser.html">dwv.browser</a></li>
                                 <li><a href="../classes/dwv.dicom.DataReader.html">dwv.dicom.DataReader</a></li>
+                                <li><a href="../classes/dwv.dicom.DicomElementsWrapper.html">dwv.dicom.DicomElementsWrapper</a></li>
                                 <li><a href="../classes/dwv.dicom.DicomParser.html">dwv.dicom.DicomParser</a></li>
                                 <li><a href="../classes/dwv.gui.html">dwv.gui</a></li>
                                 <li><a href="../classes/dwv.gui.base.html">dwv.gui.base</a></li>
@@ -126,6 +127,7 @@
                                 <li><a href="../classes/dwv.utils.html">dwv.utils</a></li>
                                 <li><a href="../classes/dwv.ViewController.html">dwv.ViewController</a></li>
                             </ul>
+                
                 
                             <ul id="api-modules" class="apis modules">
                                 <li><a href="../modules/browser.html">browser</a></li>
@@ -252,7 +254,7 @@ dwv.image.filter.Threshold = function()
     this.setOriginalImage = function (image) { originalImage = image; };
     /**
      * Get the original image.
-     * @method setOriginalImage
+     * @method getOriginalImage
      * @return {Object} image The original image.
      */
     this.getOriginalImage = function () { return originalImage; };
@@ -308,7 +310,7 @@ dwv.image.filter.Sharpen = function()
     this.setOriginalImage = function (image) { originalImage = image; };
     /**
      * Get the original image.
-     * @method setOriginalImage
+     * @method getOriginalImage
      * @return {Object} image The original image.
      */
     this.getOriginalImage = function () { return originalImage; };
@@ -358,7 +360,7 @@ dwv.image.filter.Sobel = function()
     this.setOriginalImage = function (image) { originalImage = image; };
     /**
      * Get the original image.
-     * @method setOriginalImage
+     * @method getOriginalImage
      * @return {Object} image The original image.
      */
     this.getOriginalImage = function () { return originalImage; };

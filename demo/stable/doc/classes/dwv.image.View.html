@@ -17,7 +17,7 @@
                 <h1><img src="../assets/css/logo.png" title="dwv" width="117" height="52"></h1>
         </div>
         <div class="yui3-u-1-4 version">
-            <em>API Docs for: 0.10.1</em>
+            <em>API Docs for: 0.11.0</em>
         </div>
     </div>
     <div id="bd" class="yui3-g">
@@ -41,6 +41,7 @@
                                 <li><a href="../classes/dwv.App.html">dwv.App</a></li>
                                 <li><a href="../classes/dwv.browser.html">dwv.browser</a></li>
                                 <li><a href="../classes/dwv.dicom.DataReader.html">dwv.dicom.DataReader</a></li>
+                                <li><a href="../classes/dwv.dicom.DicomElementsWrapper.html">dwv.dicom.DicomElementsWrapper</a></li>
                                 <li><a href="../classes/dwv.dicom.DicomParser.html">dwv.dicom.DicomParser</a></li>
                                 <li><a href="../classes/dwv.gui.html">dwv.gui</a></li>
                                 <li><a href="../classes/dwv.gui.base.html">dwv.gui.base</a></li>
@@ -126,6 +127,7 @@
                                 <li><a href="../classes/dwv.utils.html">dwv.utils</a></li>
                                 <li><a href="../classes/dwv.ViewController.html">dwv.ViewController</a></li>
                             </ul>
+                
                 
                             <ul id="api-modules" class="apis modules">
                                 <li><a href="../modules/browser.html">browser</a></li>
@@ -1523,136 +1525,136 @@ Warning: uses the latest set rescale LUT or the default linear one.</code></h3>
             <div id="properties" class="api-class-tabpanel">
                 <h2 class="off-left">Properties</h2>
 
-                    <div id="property_colourMap" class="property item private">
-                        <h3 class="name"><code>colourMap</code></h3>
-                        <span class="type">Object</span>
-                    
-                    
-                            <span class="flag private">private</span>
-                    
-                    
-                    
-                        <div class="meta">
-                                    <p>
-                                    Defined in
-                            <a href="../files/src_image_view.js.html#l35"><code>src&#x2F;image&#x2F;view.js:35</code></a>
-                            </p>
-                    
-                    
-                        </div>
-                    
-                        <div class="description">
-                            <p>colour map</p>
-                    
-                        </div>
-                    
-                    
-                    
-                    </div>
-                    <div id="property_currentPosition" class="property item private">
-                        <h3 class="name"><code>currentPosition</code></h3>
-                        <span class="type">Object</span>
-                    
-                    
-                            <span class="flag private">private</span>
-                    
-                    
-                    
-                        <div class="meta">
-                                    <p>
-                                    Defined in
-                            <a href="../files/src_image_view.js.html#l42"><code>src&#x2F;image&#x2F;view.js:42</code></a>
-                            </p>
-                    
-                    
-                        </div>
-                    
-                        <div class="description">
-                            <p>Current position</p>
-                    
-                        </div>
-                    
-                    
-                    
-                    </div>
-                    <div id="property_listeners" class="property item private">
-                        <h3 class="name"><code>listeners</code></h3>
-                        <span class="type">Object</span>
-                    
-                    
-                            <span class="flag private">private</span>
-                    
-                    
-                    
-                        <div class="meta">
-                                    <p>
-                                    Defined in
-                            <a href="../files/src_image_view.js.html#l235"><code>src&#x2F;image&#x2F;view.js:235</code></a>
-                            </p>
-                    
-                    
-                        </div>
-                    
-                        <div class="description">
-                            <p>View listeners</p>
-                    
-                        </div>
-                    
-                    
-                    
-                    </div>
-                    <div id="property_windowLuts" class="property item private">
-                        <h3 class="name"><code>windowLuts</code></h3>
-                        <span class="type">Window</span>
-                    
-                    
-                            <span class="flag private">private</span>
-                    
-                    
-                    
-                        <div class="meta">
-                                    <p>
-                                    Defined in
-                            <a href="../files/src_image_view.js.html#l20"><code>src&#x2F;image&#x2F;view.js:20</code></a>
-                            </p>
-                    
-                    
-                        </div>
-                    
-                        <div class="description">
-                            <p>Window lookup tables, indexed per Rescale Slope and Intercept (RSI).</p>
-                    
-                        </div>
-                    
-                    
-                    
-                    </div>
-                    <div id="property_windowPresets" class="property item private">
-                        <h3 class="name"><code>windowPresets</code></h3>
-                        <span class="type">Object</span>
-                    
-                    
-                            <span class="flag private">private</span>
-                    
-                    
-                    
-                        <div class="meta">
-                                    <p>
-                                    Defined in
-                            <a href="../files/src_image_view.js.html#l28"><code>src&#x2F;image&#x2F;view.js:28</code></a>
-                            </p>
-                    
-                    
-                        </div>
-                    
-                        <div class="description">
-                            <p>Window presets.</p>
-                    
-                        </div>
-                    
-                    
-                    
-                    </div>
+<div id="property_colourMap" class="property item private">
+    <h3 class="name"><code>colourMap</code></h3>
+    <span class="type">Object</span>
+
+
+        <span class="flag private">private</span>
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/src_image_view.js.html#l35"><code>src&#x2F;image&#x2F;view.js:35</code></a>
+        </p>
+
+
+    </div>
+
+    <div class="description">
+        <p>colour map</p>
+
+    </div>
+
+
+
+</div>
+<div id="property_currentPosition" class="property item private">
+    <h3 class="name"><code>currentPosition</code></h3>
+    <span class="type">Object</span>
+
+
+        <span class="flag private">private</span>
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/src_image_view.js.html#l42"><code>src&#x2F;image&#x2F;view.js:42</code></a>
+        </p>
+
+
+    </div>
+
+    <div class="description">
+        <p>Current position</p>
+
+    </div>
+
+
+
+</div>
+<div id="property_listeners" class="property item private">
+    <h3 class="name"><code>listeners</code></h3>
+    <span class="type">Object</span>
+
+
+        <span class="flag private">private</span>
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/src_image_view.js.html#l235"><code>src&#x2F;image&#x2F;view.js:235</code></a>
+        </p>
+
+
+    </div>
+
+    <div class="description">
+        <p>View listeners</p>
+
+    </div>
+
+
+
+</div>
+<div id="property_windowLuts" class="property item private">
+    <h3 class="name"><code>windowLuts</code></h3>
+    <span class="type">Window</span>
+
+
+        <span class="flag private">private</span>
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/src_image_view.js.html#l20"><code>src&#x2F;image&#x2F;view.js:20</code></a>
+        </p>
+
+
+    </div>
+
+    <div class="description">
+        <p>Window lookup tables, indexed per Rescale Slope and Intercept (RSI).</p>
+
+    </div>
+
+
+
+</div>
+<div id="property_windowPresets" class="property item private">
+    <h3 class="name"><code>windowPresets</code></h3>
+    <span class="type">Object</span>
+
+
+        <span class="flag private">private</span>
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/src_image_view.js.html#l28"><code>src&#x2F;image&#x2F;view.js:28</code></a>
+        </p>
+
+
+    </div>
+
+    <div class="description">
+        <p>Window presets.</p>
+
+    </div>
+
+
+
+</div>
             </div>
 
 

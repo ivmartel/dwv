@@ -17,7 +17,7 @@
                 <h1><img src="../assets/css/logo.png" title="dwv" width="117" height="52"></h1>
         </div>
         <div class="yui3-u-1-4 version">
-            <em>API Docs for: 0.10.1</em>
+            <em>API Docs for: 0.11.0</em>
         </div>
     </div>
     <div id="bd" class="yui3-g">
@@ -41,6 +41,7 @@
                                 <li><a href="../classes/dwv.App.html">dwv.App</a></li>
                                 <li><a href="../classes/dwv.browser.html">dwv.browser</a></li>
                                 <li><a href="../classes/dwv.dicom.DataReader.html">dwv.dicom.DataReader</a></li>
+                                <li><a href="../classes/dwv.dicom.DicomElementsWrapper.html">dwv.dicom.DicomElementsWrapper</a></li>
                                 <li><a href="../classes/dwv.dicom.DicomParser.html">dwv.dicom.DicomParser</a></li>
                                 <li><a href="../classes/dwv.gui.html">dwv.gui</a></li>
                                 <li><a href="../classes/dwv.gui.base.html">dwv.gui.base</a></li>
@@ -127,6 +128,7 @@
                                 <li><a href="../classes/dwv.ViewController.html">dwv.ViewController</a></li>
                             </ul>
                 
+                
                             <ul id="api-modules" class="apis modules">
                                 <li><a href="../modules/browser.html">browser</a></li>
                                 <li><a href="../modules/dicom.html">dicom</a></li>
@@ -176,7 +178,7 @@
 
 
         <div class="foundat">
-            Defined in: <a href="../files/src_dicom_dicomParser.js.html#l217"><code>src&#x2F;dicom&#x2F;dicomParser.js:217</code></a>
+            Defined in: <a href="../files/src_dicom_dicomParser.js.html#l460"><code>src&#x2F;dicom&#x2F;dicomParser.js:460</code></a>
         </div>
 
             Module: <a href="../modules/dicom.html">dicom</a>
@@ -206,7 +208,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_dicom_dicomParser.js.html#l217"><code>src&#x2F;dicom&#x2F;dicomParser.js:217</code></a>
+        <a href="../files/src_dicom_dicomParser.js.html#l460"><code>src&#x2F;dicom&#x2F;dicomParser.js:460</code></a>
         </p>
 
 
@@ -257,6 +259,10 @@
                             </li>
                             <li class="index-item method">
                                 <a href="#method_getPixelBuffer">getPixelBuffer</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_getRawDicomElements">getRawDicomElements</a>
 
                             </li>
                             <li class="index-item method">
@@ -323,7 +329,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_dicom_dicomParser.js.html#l275"><code>src&#x2F;dicom&#x2F;dicomParser.js:275</code></a>
+        <a href="../files/src_dicom_dicomParser.js.html#l528"><code>src&#x2F;dicom&#x2F;dicomParser.js:528</code></a>
         </p>
 
 
@@ -400,7 +406,7 @@ making the name unique.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_dicom_dicomParser.js.html#l322"><code>src&#x2F;dicom&#x2F;dicomParser.js:322</code></a>
+        <a href="../files/src_dicom_dicomParser.js.html#l578"><code>src&#x2F;dicom&#x2F;dicomParser.js:578</code></a>
         </p>
 
 
@@ -484,7 +490,7 @@ making the name unique.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_dicom_dicomParser.js.html#l255"><code>src&#x2F;dicom&#x2F;dicomParser.js:255</code></a>
+        <a href="../files/src_dicom_dicomParser.js.html#l508"><code>src&#x2F;dicom&#x2F;dicomParser.js:508</code></a>
         </p>
 
 
@@ -527,7 +533,7 @@ making the name unique.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_dicom_dicomParser.js.html#l244"><code>src&#x2F;dicom&#x2F;dicomParser.js:244</code></a>
+        <a href="../files/src_dicom_dicomParser.js.html#l487"><code>src&#x2F;dicom&#x2F;dicomParser.js:487</code></a>
         </p>
 
 
@@ -570,7 +576,7 @@ making the name unique.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_dicom_dicomParser.js.html#l265"><code>src&#x2F;dicom&#x2F;dicomParser.js:265</code></a>
+        <a href="../files/src_dicom_dicomParser.js.html#l518"><code>src&#x2F;dicom&#x2F;dicomParser.js:518</code></a>
         </p>
 
 
@@ -589,6 +595,49 @@ making the name unique.</p>
             <div class="returns-description">
                         <span class="type">Array</span>:
                     <p>The pixel buffer.</p>
+
+            </div>
+        </div>
+
+
+</div>
+<div id="method_getRawDicomElements" class="method item">
+    <h3 class="name"><code>getRawDicomElements</code></h3>
+
+        <span class="paren">()</span>
+
+        <span class="returns-inline">
+            <span class="type">Object</span>
+        </span>
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/src_dicom_dicomParser.js.html#l498"><code>src&#x2F;dicom&#x2F;dicomParser.js:498</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Get the raw DICOM data elements.</p>
+
+    </div>
+
+
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                        <span class="type">Object</span>:
+                    <p>The raw DICOM elements.</p>
 
             </div>
         </div>
@@ -616,7 +665,7 @@ making the name unique.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_dicom_dicomParser.js.html#l504"><code>src&#x2F;dicom&#x2F;dicomParser.js:504</code></a>
+        <a href="../files/src_dicom_dicomParser.js.html#l783"><code>src&#x2F;dicom&#x2F;dicomParser.js:783</code></a>
         </p>
 
 
@@ -680,7 +729,7 @@ Fills in the member object 'dicomElements'.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_dicom_dicomParser.js.html#l389"><code>src&#x2F;dicom&#x2F;dicomParser.js:389</code></a>
+        <a href="../files/src_dicom_dicomParser.js.html#l635"><code>src&#x2F;dicom&#x2F;dicomParser.js:635</code></a>
         </p>
 
 
@@ -771,7 +820,7 @@ Fills in the member object 'dicomElements'.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_dicom_dicomParser.js.html#l359"><code>src&#x2F;dicom&#x2F;dicomParser.js:359</code></a>
+        <a href="../files/src_dicom_dicomParser.js.html#l616"><code>src&#x2F;dicom&#x2F;dicomParser.js:616</code></a>
         </p>
 
 
@@ -828,81 +877,81 @@ Fills in the member object 'dicomElements'.</p>
             <div id="properties" class="api-class-tabpanel">
                 <h2 class="off-left">Properties</h2>
 
-                    <div id="property_dicomElements" class="property item">
-                        <h3 class="name"><code>dicomElements</code></h3>
-                        <span class="type">Array</span>
-                    
-                    
-                    
-                    
-                    
-                        <div class="meta">
-                                    <p>
-                                    Defined in
-                            <a href="../files/src_dicom_dicomParser.js.html#l225"><code>src&#x2F;dicom&#x2F;dicomParser.js:225</code></a>
-                            </p>
-                    
-                    
-                        </div>
-                    
-                        <div class="description">
-                            <p>The list of DICOM elements.</p>
-                    
-                        </div>
-                    
-                    
-                    
-                    </div>
-                    <div id="property_pixelBuffer" class="property item">
-                        <h3 class="name"><code>pixelBuffer</code></h3>
-                        <span class="type">Array</span>
-                    
-                    
-                    
-                    
-                    
-                        <div class="meta">
-                                    <p>
-                                    Defined in
-                            <a href="../files/src_dicom_dicomParser.js.html#l231"><code>src&#x2F;dicom&#x2F;dicomParser.js:231</code></a>
-                            </p>
-                    
-                    
-                        </div>
-                    
-                        <div class="description">
-                            <p>The pixel buffer.</p>
-                    
-                        </div>
-                    
-                    
-                    
-                    </div>
-                    <div id="property_unknownCount" class="property item">
-                        <h3 class="name"><code>unknownCount</code></h3>
-                        <span class="type">Number</span>
-                    
-                    
-                    
-                    
-                    
-                        <div class="meta">
-                                    <p>
-                                    Defined in
-                            <a href="../files/src_dicom_dicomParser.js.html#l238"><code>src&#x2F;dicom&#x2F;dicomParser.js:238</code></a>
-                            </p>
-                    
-                    
-                        </div>
-                    
-                        <div class="description">
-                            <p>Unknown tags count.</p>
-                    
-                        </div>
-                    
-                    
-                    
-                    </div>
+<div id="property_dicomElements" class="property item">
+    <h3 class="name"><code>dicomElements</code></h3>
+    <span class="type">Array</span>
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/src_dicom_dicomParser.js.html#l468"><code>src&#x2F;dicom&#x2F;dicomParser.js:468</code></a>
+        </p>
+
+
+    </div>
+
+    <div class="description">
+        <p>The list of DICOM elements.</p>
+
+    </div>
+
+
+
+</div>
+<div id="property_pixelBuffer" class="property item">
+    <h3 class="name"><code>pixelBuffer</code></h3>
+    <span class="type">Array</span>
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/src_dicom_dicomParser.js.html#l474"><code>src&#x2F;dicom&#x2F;dicomParser.js:474</code></a>
+        </p>
+
+
+    </div>
+
+    <div class="description">
+        <p>The pixel buffer.</p>
+
+    </div>
+
+
+
+</div>
+<div id="property_unknownCount" class="property item">
+    <h3 class="name"><code>unknownCount</code></h3>
+    <span class="type">Number</span>
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/src_dicom_dicomParser.js.html#l481"><code>src&#x2F;dicom&#x2F;dicomParser.js:481</code></a>
+        </p>
+
+
+    </div>
+
+    <div class="description">
+        <p>Unknown tags count.</p>
+
+    </div>
+
+
+
+</div>
             </div>
 
 

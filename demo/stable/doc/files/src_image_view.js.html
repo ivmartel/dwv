@@ -17,7 +17,7 @@
                 <h1><img src="../assets/css/logo.png" title="dwv" width="117" height="52"></h1>
         </div>
         <div class="yui3-u-1-4 version">
-            <em>API Docs for: 0.10.1</em>
+            <em>API Docs for: 0.11.0</em>
         </div>
     </div>
     <div id="bd" class="yui3-g">
@@ -41,6 +41,7 @@
                                 <li><a href="../classes/dwv.App.html">dwv.App</a></li>
                                 <li><a href="../classes/dwv.browser.html">dwv.browser</a></li>
                                 <li><a href="../classes/dwv.dicom.DataReader.html">dwv.dicom.DataReader</a></li>
+                                <li><a href="../classes/dwv.dicom.DicomElementsWrapper.html">dwv.dicom.DicomElementsWrapper</a></li>
                                 <li><a href="../classes/dwv.dicom.DicomParser.html">dwv.dicom.DicomParser</a></li>
                                 <li><a href="../classes/dwv.gui.html">dwv.gui</a></li>
                                 <li><a href="../classes/dwv.gui.base.html">dwv.gui.base</a></li>
@@ -126,6 +127,7 @@
                                 <li><a href="../classes/dwv.utils.html">dwv.utils</a></li>
                                 <li><a href="../classes/dwv.ViewController.html">dwv.ViewController</a></li>
                             </ul>
+                
                 
                             <ul id="api-modules" class="apis modules">
                                 <li><a href="../modules/browser.html">browser</a></li>
@@ -605,28 +607,32 @@ dwv.image.ViewFactory.prototype.create = function (dicomElements, pixelBuffer)
     var imageFactory = new dwv.image.ImageFactory();
     var image = imageFactory.create(dicomElements, pixelBuffer);
     
-    // pixel representation
-    var isSigned = 0;
-    if ( dicomElements.PixelRepresentation ) {
-        isSigned = dicomElements.PixelRepresentation.value[0];
+    // PixelRepresentation
+    var isSigned = false;
+    var pixelRepresentation = dicomElements.getFromKey(&quot;x00280103&quot;);
+    if ( pixelRepresentation === 1 ) {
+        isSigned = true;
     }
     // view
     var view = new dwv.image.View(image, isSigned);
-    // window center and width
+    // presets
     var windowPresets = [];
-    if ( dicomElements.WindowCenter &amp;&amp; dicomElements.WindowWidth ) {
+    // WindowCenter and WindowWidth
+    var windowCenter = dicomElements.getFromKey(&quot;x00281050&quot;, true);
+    var windowWidth = dicomElements.getFromKey(&quot;x00281051&quot;, true);
+    if ( windowCenter &amp;&amp; windowWidth ) {
         var name;
-        for ( var j = 0; j &lt; dicomElements.WindowCenter.value.length; ++j) {
-            var width = parseFloat( dicomElements.WindowWidth.value[j], 10 );
-            if ( width !== 0 ) {
-                if ( dicomElements.WindowCenterWidthExplanation ) {
-                    name = dicomElements.WindowCenterWidthExplanation.value[j];
-                }
-                else {
-                    name = &quot;Default&quot;+j;
+        for ( var j = 0; j &lt; windowCenter.length; ++j) {
+            var width = parseFloat( windowWidth[j], 10 );
+            var center = parseFloat( windowCenter[j], 10 );
+            if ( width ) {
+                name = &quot;Default&quot;+j;
+                var windowCenterWidthExplanation = dicomElements.getFromKey(&quot;x00281055&quot;);
+                if ( windowCenterWidthExplanation ) {
+                    name = windowCenterWidthExplanation[j];
                 }
                 windowPresets.push({
-                    &quot;center&quot;: parseFloat( dicomElements.WindowCenter.value[j], 10 ),
+                    &quot;center&quot;: center,
                     &quot;width&quot;: width, 
                     &quot;name&quot;: name
                 });

@@ -26,16 +26,18 @@ body { margin: 10px; padding: 0; }
 <link rel="apple-touch-icon" sizes="16x16" href="../../resources/dwv-16.png" />
 <link rel="apple-touch-icon" sizes="60x60" href="../../resources/dwv-60.png" />
 <link rel="apple-touch-icon" sizes="128x128" href="../../resources/dwv-128.png" />
-<!-- Third party -->  
-<script type="text/javascript" src="../../ext/jquery/jquery-2.1.3.min.js"></script>
+<!-- Third party -->
+<script type="text/javascript" src="../../ext/jquery/jquery-2.1.4.min.js"></script>
 <script type="text/javascript" src="../../ext/jquery-mobile/jquery.mobile-1.4.5.min.js"></script>
 <script type="text/javascript" src="../../ext/flot/jquery.flot.min.js"></script>
 <script type="text/javascript" src="../../ext/pdfjs/jpx.js"></script>
 <script type="text/javascript" src="../../ext/pdfjs/util.js"></script>
 <script type="text/javascript" src="../../ext/pdfjs/arithmetic_decoder.js"></script>
+<script type="text/javascript" src="../../ext/rii-mango/lossless-min.js"></script>
+<script type="text/javascript" src="../../ext/notmasteryet/jpg.js"></script>
 <script type="text/javascript" src="../../ext/kinetic/kinetic-v5.1.1-06.10.min.js"></script>
 <!-- Local -->
-<script type="text/javascript" src="../../dwv-0.10.1.min.js"></script>
+<script type="text/javascript" src="../../dwv-0.11.0.min.js"></script>
 <!-- Launch the app -->
 <script type="text/javascript" src="appgui.js"></script>
 <script type="text/javascript" src="applauncher.js"></script>
@@ -53,21 +55,21 @@ body { margin: 10px; padding: 0; }
   data-transition="slide">Help</a>
 </div><!-- /pageHeader -->
 
-<div id="pageMain" data-role="content" style="padding:2px;">   
+<div id="pageMain" data-role="content" style="padding:2px;">
 
 <!-- Toolbar -->
 <div id="toolbar"></div>
 
 <!-- Open popup -->
 <div data-role="popup" id="popupOpen">
-<a href="#" data-rel="back" data-role="button" 
-  data-icon="delete" data-iconpos="notext" class="ui-btn-right">Close</a> 
+<a href="#" data-rel="back" data-role="button"
+  data-icon="delete" data-iconpos="notext" class="ui-btn-right">Close</a>
 <div style="padding:10px 20px;">
 <h3>Open</h3>
 <div id="loaderlist"></div>
 </div>
 </div><!-- /popup -->
- 
+
 <!-- Layer Container -->
 <div id="dwv" class="layerContainer">
 <div id="dwv-dropBox" class="dropBox"></div>
@@ -86,7 +88,7 @@ body { margin: 10px; padding: 0; }
 
 </div><!-- /content -->
 
-<div data-role="footer" id="footer">        
+<div data-role="footer" id="footer">
 <div data-role="navbar" id="toolbox">
 <ul id="toolList"><li></li><li></li><li></li></ul>
 </div><!-- /navbar: main -->
@@ -99,12 +101,12 @@ body { margin: 10px; padding: 0; }
 <div data-role="page" data-theme="b" id="tags_page">
 
 <div data-role="header">
-<a href="#main" data-icon="back" 
+<a href="#main" data-icon="back"
   data-transition="slide" data-direction="reverse">Back</a>
 <h1>DICOM Tags</h1>
 </div><!-- /header -->
 
-<div data-role="content">   
+<div data-role="content">
 <!-- Tags -->
 <div id="tags" title="Tags"></div>
 </div><!-- /content -->
@@ -115,12 +117,12 @@ body { margin: 10px; padding: 0; }
 <div data-role="page" data-theme="b" id="help_page">
 
 <div data-role="header">
-<a href="#main" data-icon="back" 
+<a href="#main" data-icon="back"
   data-transition="slide" data-direction="reverse">Back</a>
 <h1>DWV Help</h1>
 </div><!-- /header -->
 
-<div data-role="content">   
+<div data-role="content">
 <!-- Tags -->
 <div id="help" title="Help"></div>
 </div><!-- /content -->

@@ -7,6 +7,7 @@ YUI.add("yuidoc-meta", function(Y) {
         "dwv.ViewController",
         "dwv.browser",
         "dwv.dicom.DataReader",
+        "dwv.dicom.DicomElementsWrapper",
         "dwv.dicom.DicomParser",
         "dwv.gui",
         "dwv.gui.base",
@@ -152,6 +153,7 @@ YUI.add("yuidoc-meta", function(Y) {
             "name": "utils",
             "description": "Utility module."
         }
-    ]
+    ],
+    "elements": []
 } };
 });
