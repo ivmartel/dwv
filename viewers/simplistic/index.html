@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<title>DICOM Web Viewer</title>
+<meta charset="UTF-8">
+<meta name="description" content="DICOM Web Viewer (DWV) simple version">
+<meta name="keywords" content="DICOM,HTML5,JavaScript,medical,imaging,DWV">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<link type="text/css" rel="stylesheet" href="../../css/style.css" />
+<!-- mobile web app -->
+<meta name="mobile-web-app-capable" content="yes" />
+<link rel="shortcut icon" sizes="16x16" href="../../resources/dwv-16.png" />
+<link rel="shortcut icon" sizes="60x60" href="../../resources/dwv-60.png" />
+<link rel="shortcut icon" sizes="128x128" href="../../resources/dwv-128.png" />
+<!-- apple specific -->
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black" />
+<link rel="apple-touch-icon" sizes="16x16" href="../../resources/dwv-16.png" />
+<link rel="apple-touch-icon" sizes="60x60" href="../../resources/dwv-60.png" />
+<link rel="apple-touch-icon" sizes="128x128" href="../../resources/dwv-128.png" />
+<!-- Third party -->
+<script type="text/javascript" src="../../ext/jquery/jquery-2.1.4.min.js"></script>
+<script type="text/javascript" src="../../ext/pdfjs/jpx.js"></script>
+<script type="text/javascript" src="../../ext/pdfjs/util.js"></script>
+<script type="text/javascript" src="../../ext/pdfjs/arithmetic_decoder.js"></script>
+<script type="text/javascript" src="../../ext/rii-mango/lossless-min.js"></script>
+<script type="text/javascript" src="../../ext/notmasteryet/jpg.js"></script>
+<!-- Local -->
+<script type="text/javascript" src="../../src/app/application.js"></script>
+<script type="text/javascript" src="../../src/app/toolboxController.js"></script>
+<script type="text/javascript" src="../../src/app/viewController.js"></script>
+<script type="text/javascript" src="../../src/dicom/dicomParser.js"></script>
+<script type="text/javascript" src="../../src/dicom/dictionary.js"></script>
+<script type="text/javascript" src="../../src/gui/filter.js"></script>
+<script type="text/javascript" src="../../src/gui/browser.js"></script>
+<script type="text/javascript" src="../../src/gui/generic.js"></script>
+<script type="text/javascript" src="../../src/gui/help.js"></script>
+<script type="text/javascript" src="../../src/gui/html.js"></script>
+<script type="text/javascript" src="../../src/gui/layer.js"></script>
+<script type="text/javascript" src="../../src/gui/loader.js"></script>
+<script type="text/javascript" src="../../src/gui/style.js"></script>
+<script type="text/javascript" src="../../src/gui/tools.js"></script>
+<script type="text/javascript" src="../../src/gui/undo.js"></script>
+<script type="text/javascript" src="../../src/image/filter.js"></script>
+<script type="text/javascript" src="../../src/image/geometry.js"></script>
+<script type="text/javascript" src="../../src/image/image.js"></script>
+<script type="text/javascript" src="../../src/image/luts.js"></script>
+<script type="text/javascript" src="../../src/image/view.js"></script>
+<script type="text/javascript" src="../../src/image/reader.js"></script>
+<script type="text/javascript" src="../../src/io/file.js"></script>
+<script type="text/javascript" src="../../src/io/url.js"></script>
+<script type="text/javascript" src="../../src/math/bucketQueue.js"></script>
+<script type="text/javascript" src="../../src/math/point.js"></script>
+<script type="text/javascript" src="../../src/math/scissors.js"></script>
+<script type="text/javascript" src="../../src/math/shapes.js"></script>
+<script type="text/javascript" src="../../src/math/stats.js"></script>
+<script type="text/javascript" src="../../src/tools/draw.js"></script>
+<script type="text/javascript" src="../../src/tools/ellipse.js"></script>
+<script type="text/javascript" src="../../src/tools/filter.js"></script>
+<script type="text/javascript" src="../../src/tools/info.js"></script>
+<script type="text/javascript" src="../../src/tools/line.js"></script>
+<script type="text/javascript" src="../../src/tools/livewire.js"></script>
+<script type="text/javascript" src="../../src/tools/rectangle.js"></script>
+<script type="text/javascript" src="../../src/tools/roi.js"></script>
+<script type="text/javascript" src="../../src/tools/scroll.js"></script>
+<script type="text/javascript" src="../../src/tools/toolbox.js"></script>
+<script type="text/javascript" src="../../src/tools/undo.js"></script>
+<script type="text/javascript" src="../../src/tools/windowLevel.js"></script>
+<script type="text/javascript" src="../../src/tools/zoomPan.js"></script>
+<script type="text/javascript" src="../../src/utils/string.js"></script>
+
+<!-- Launch the app -->
+<script type="text/javascript" src="appgui.js"></script>
+<script type="text/javascript" src="applauncher.js"></script>
+</head>
+
+<body>
+
+<!-- Toolbar -->
+<div id="toolbar"></div>
+
+<!-- Layer Container -->
+<div id="dwv" class="layerContainer">
+<canvas id="dwv-imageLayer" class="imageLayer">Only for HTML5 compatible browsers...</canvas>
+</div><!-- /layerContainer -->
+
+</body>
+</html>
