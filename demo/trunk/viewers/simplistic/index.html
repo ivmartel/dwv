@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<title>DICOM Web Viewer</title>
+<meta charset="UTF-8">
+<meta name="description" content="DICOM Web Viewer (DWV) simple version">
+<meta name="keywords" content="DICOM,HTML5,JavaScript,medical,imaging,DWV">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<link type="text/css" rel="stylesheet" href="../../css/style.css" />
+<!-- mobile web app -->
+<meta name="mobile-web-app-capable" content="yes" />
+<link rel="shortcut icon" sizes="16x16" href="../../resources/dwv-16.png" />
+<link rel="shortcut icon" sizes="60x60" href="../../resources/dwv-60.png" />
+<link rel="shortcut icon" sizes="128x128" href="../../resources/dwv-128.png" />
+<!-- apple specific -->
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black" />
+<link rel="apple-touch-icon" sizes="16x16" href="../../resources/dwv-16.png" />
+<link rel="apple-touch-icon" sizes="60x60" href="../../resources/dwv-60.png" />
+<link rel="apple-touch-icon" sizes="128x128" href="../../resources/dwv-128.png" />
+<!-- Third party -->
+<script type="text/javascript" src="../../ext/jquery/jquery-2.1.4.min.js"></script>
+<script type="text/javascript" src="../../ext/pdfjs/jpx.js"></script>
+<script type="text/javascript" src="../../ext/pdfjs/util.js"></script>
+<script type="text/javascript" src="../../ext/pdfjs/arithmetic_decoder.js"></script>
+<script type="text/javascript" src="../../ext/rii-mango/lossless-min.js"></script>
+<script type="text/javascript" src="../../ext/notmasteryet/jpg.js"></script>
+<!-- Local -->
+<script type="text/javascript" src="../../dwv-0.11.0.min.js"></script>
+<!-- Launch the app -->
+<script type="text/javascript" src="appgui.js"></script>
+<script type="text/javascript" src="applauncher.js"></script>
+</head>
+
+<body>
+
+<!-- Toolbar -->
+<div id="toolbar"></div>
+
+<!-- Layer Container -->
+<div id="dwv" class="layerContainer">
+<canvas id="dwv-imageLayer" class="imageLayer">Only for HTML5 compatible browsers...</canvas>
+</div><!-- /layerContainer -->
+
+</body>
+</html>
