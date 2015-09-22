@@ -1,6 +1,6 @@
 {
   "name": "dwv",
-  "version": "0.11.0",
+  "version": "0.12.0beta",
   "homepage": "http://ivmartel.github.io/dwv/",
   "description": "Dicom Web Viewer.",
   "license": "GPL-3.0",
