@@ -14,13 +14,13 @@ dwv.tool.defaultpresets.CT = {
 // Window
 dwv.gui.getWindowSize = dwv.gui.base.getWindowSize;
 // Progress
-dwv.gui.displayProgress = dwv.gui.base.displayProgress;
+dwv.gui.displayProgress = function (/*percent*/) { /*does nothing*/ };
 // Select
-dwv.gui.refreshSelect = dwv.gui.base.refreshSelect;
+dwv.gui.refreshSelect = function (/*select*/) { /*does nothing*/ };
 // Slider
-dwv.gui.Slider = dwv.gui.base.Slider;
+dwv.gui.Slider = null;
 // Tags table
-dwv.gui.DicomTags = dwv.gui.base.DicomTags;
+dwv.gui.DicomTags = null;
 
 // Toolbox 
 dwv.gui.Toolbox = function (app)
@@ -35,9 +35,15 @@ dwv.gui.Toolbox = function (app)
     {
         base.display(bool);
     };
-    this.initialise = function (/*list*/)
+    this.initialise = function (list)
     {
-        // does nothing
+        // not wonderful: first one should be scroll is more than one slice
+        if ( list[0] === false ) {
+            var inputScroll = document.getElementById("scroll-button");
+            inputScroll.style.display = "none";
+            var inputZoom = document.getElementById("zoom-button");
+            inputZoom.checked = true;
+        }
     };
 };
 
@@ -63,11 +69,8 @@ dwv.gui.WindowLevel = function (app)
     this.initialise = function ()
     {
         // clear previous
-        var oldSelect = document.getElementById("presetSelect");
-        if ( oldSelect ) {
-            console.log(oldSelect);
-            dwv.html.removeNode(oldSelect);
-        }
+        $("#presetSelect").remove();
+        $("#presetLabel").remove();
 
         // create preset select
         var select = dwv.html.createHtmlSelect("presetSelect", app.getViewController().getPresets());
@@ -75,14 +78,13 @@ dwv.gui.WindowLevel = function (app)
         select.onchange = app.onChangeWindowLevelPreset;
         select.title = "Select w/l preset.";
         select.setAttribute("data-inline","true");
-    
-        // label as span (otherwise creates new line)
-        var span = document.createElement("span");
-        span.id = "presetLabel";
-        span.appendChild(document.createTextNode("Presets: "));
+        var label = document.createElement("label");
+        label.id = "presetLabel";
+        label.setAttribute("for", "presetSelect");
+        label.appendChild(document.createTextNode("Presets: "));
         
         var node = document.getElementById("toolbar");
-        node.appendChild(span);
+        node.appendChild(label);
         node.appendChild(select);
     };
 };
@@ -133,7 +135,7 @@ dwv.gui.Scroll = function (app)
 dwv.gui.appendResetHtml = function (app)
 {
     var button = document.createElement("button");
-    button.id = "resetLi";
+    button.id = "reset-button";
     button.value = "reset";
     button.onclick = app.onDisplayReset;
     button.appendChild(document.createTextNode("Reset"));
