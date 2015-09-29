@@ -1198,7 +1198,6 @@ dwv.App = function ()
         if ( event.type === "touchstart" ||
             event.type === "touchmove")
         {
-            event.preventDefault();
             // event offset(s)
             offsets = dwv.html.getEventOffset(event);
             // should have at least one offset
@@ -1244,6 +1243,7 @@ dwv.App = function ()
         // Call the event handler of the tool.
         if ( handled )
         {
+            event.preventDefault();
             var func = self.getToolbox().getSelectedTool()[event.type];
             if ( func )
             {
