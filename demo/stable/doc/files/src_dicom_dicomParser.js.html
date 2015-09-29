@@ -17,7 +17,7 @@
                 <h1><img src="../assets/css/logo.png" title="dwv" width="117" height="52"></h1>
         </div>
         <div class="yui3-u-1-4 version">
-            <em>API Docs for: 0.11.0</em>
+            <em>API Docs for: 0.11.1</em>
         </div>
     </div>
     <div id="bd" class="yui3-g">
@@ -1160,6 +1160,12 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
         i += tagOffset;
     }
     
+    // check numberOfFrames
+    if ( typeof this.dicomElements.x00280008 !== &#x27;undefined&#x27; &amp;&amp; 
+            this.dicomElements.x00280008.value[0] &gt; 1 ) {
+        throw new Error(&quot;Unsupported multi-frame data&quot;);
+    }
+
     // uncompress data if needed
     var decoder = null;
     if( isJpegLossless ) {
