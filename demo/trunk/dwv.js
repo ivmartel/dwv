@@ -87,7 +87,7 @@ dwv.App = function ()
      * @method getVersion
      * @return {String} The version of the application.
      */
-    this.getVersion = function () { return "v0.12.0beta"; };
+    this.getVersion = function () { return "v0.11.1"; };
     
     /** 
      * Get the image.
@@ -1198,7 +1198,6 @@ dwv.App = function ()
         if ( event.type === "touchstart" ||
             event.type === "touchmove")
         {
-            event.preventDefault();
             // event offset(s)
             offsets = dwv.html.getEventOffset(event);
             // should have at least one offset
@@ -1244,6 +1243,7 @@ dwv.App = function ()
         // Call the event handler of the tool.
         if ( handled )
         {
+            event.preventDefault();
             var func = self.getToolbox().getSelectedTool()[event.type];
             if ( func )
             {
@@ -2805,6 +2805,12 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
         i += tagOffset;
     }
     
+    // check numberOfFrames
+    if ( typeof this.dicomElements.x00280008 !== 'undefined' && 
+            this.dicomElements.x00280008.value[0] > 1 ) {
+        throw new Error("Unsupported multi-frame data");
+    }
+
     // uncompress data if needed
     var decoder = null;
     if( isJpegLossless ) {

@@ -2,7 +2,7 @@
     "project": {
         "name": "dwv",
         "description": "Dicom Web Viewer.",
-        "version": "0.12.0beta",
+        "version": "0.11.1",
         "url": "http://ivmartel.github.io/dwv/"
     },
     "files": {
@@ -639,7 +639,7 @@
             },
             "tag": "module",
             "file": "src/dicom/dicomParser.js",
-            "line": 1006,
+            "line": 1012,
             "description": "DICOM module."
         },
         "browser": {
@@ -951,7 +951,7 @@
             "module": "dicom",
             "namespace": "dwv.dicom",
             "file": "src/dicom/dicomParser.js",
-            "line": 1006,
+            "line": 1012,
             "description": "DicomElements wrapper.",
             "is_constructor": 1,
             "params": [
@@ -4763,7 +4763,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 1015,
+            "line": 1021,
             "description": "Get a DICOM Element value from a group/element key.",
             "itemtype": "method",
             "name": "getFromKey",
@@ -4789,7 +4789,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 1041,
+            "line": 1047,
             "description": "Dump the DICOM tags to an array.",
             "return": {
                 "description": "",
@@ -4801,7 +4801,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 1076,
+            "line": 1082,
             "description": "Dump the DICOM tags to a string.",
             "return": {
                 "description": "The dumped file.",
@@ -4813,7 +4813,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 1113,
+            "line": 1119,
             "params": [
                 {
                     "name": "group",
@@ -4833,7 +4833,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 1368,
+            "line": 1374,
             "description": "Get a DICOM Element value from a group and an element.",
             "itemtype": "method",
             "name": "getFromGroupElement",
@@ -4859,7 +4859,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 1382,
+            "line": 1388,
             "description": "Get a DICOM Element value from a tag name.\nUses the DICOM dictionary.",
             "itemtype": "method",
             "name": "getFromName",
@@ -13749,15 +13749,15 @@
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/dicom/dicomParser.js:1041"
+            "line": " src/dicom/dicomParser.js:1047"
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/dicom/dicomParser.js:1076"
+            "line": " src/dicom/dicomParser.js:1082"
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/dicom/dicomParser.js:1113"
+            "line": " src/dicom/dicomParser.js:1119"
         },
         {
             "message": "unknown tag: input",
@@ -13853,15 +13853,15 @@
         },
         {
             "message": "Missing item type\nDump the DICOM tags to an array.",
-            "line": " src/dicom/dicomParser.js:1041"
+            "line": " src/dicom/dicomParser.js:1047"
         },
         {
             "message": "Missing item type\nDump the DICOM tags to a string.",
-            "line": " src/dicom/dicomParser.js:1076"
+            "line": " src/dicom/dicomParser.js:1082"
         },
         {
             "message": "Missing item type",
-            "line": " src/dicom/dicomParser.js:1113"
+            "line": " src/dicom/dicomParser.js:1119"
         },
         {
             "message": "Missing item type\nDICOM tag dictionary.\nGenerated using xml standard conversion\n from https://github.com/ivmartel/dcmbench/tree/master/view/part06\n with http://medical.nema.org/medical/dicom/current/source/docbook/part06/part06.xml\nConversion changes: \n- (vr) \"See Note\" -> \"NONE\", \"OB or OW\" -> \"ox\", \"US or SS\" -> \"xs\"\n- added \"GenericGroupLength\" element to each group\nLocal changes:\n- tag numbers with 'xx' were replaced with '00', 'xxx' with '001' and 'xxxx' with '0004'",
