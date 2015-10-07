@@ -16,7 +16,7 @@ dwv.gui.getWindowSize = dwv.gui.base.getWindowSize;
 // Progress
 dwv.gui.displayProgress = function (/*percent*/) { /*does nothing*/ };
 // Select
-dwv.gui.refreshSelect = function (/*select*/) { /*does nothing*/ };
+dwv.gui.refreshSelect = dwv.gui.base.refreshSelect;
 // Slider
 dwv.gui.Slider = null;
 // Tags table
@@ -39,9 +39,9 @@ dwv.gui.Toolbox = function (app)
     {
         // not wonderful: first one should be scroll is more than one slice
         if ( list[0] === false ) {
-            var inputScroll = document.getElementById("scroll-button");
+            var inputScroll = app.getElementByClassName("scroll-button");
             inputScroll.style.display = "none";
-            var inputZoom = document.getElementById("zoom-button");
+            var inputZoom = app.getElementByClassName("zoom-button");
             inputZoom.checked = true;
         }
     };
@@ -53,37 +53,41 @@ dwv.gui.WindowLevel = function (app)
     this.setup = function ()
     {
         var button = document.createElement("button");
-        button.id = "wl-button";
+        button.className = "wl-button";
         button.value = "Window/Level";
         button.onclick = app.onChangeTool;
         button.appendChild(document.createTextNode("Window/Level"));
-        
-        var node = document.getElementById("toolbar");
+
+        var node = app.getElementByClassName("toolbar");
         node.appendChild(button);
     };
     this.display = function (bool)
     {
-        var button = document.getElementById("wl-button");
+        var button = app.getElementByClassName("wl-button");
         button.disabled = bool;
     };
     this.initialise = function ()
     {
         // clear previous
-        $("#presetSelect").remove();
-        $("#presetLabel").remove();
+        //$("#presetSelect").remove();
+        //$("#presetLabel").remove();
+        dwv.html.removeNode(app.getElementByClassName("presetSelect"));
+        dwv.html.removeNode(app.getElementByClassName("presetLabel"));
+        //app.getElementByClassName("presetSelect").remove();
+        //app.getElementByClassName("presetLabel").remove();
 
         // create preset select
         var select = dwv.html.createHtmlSelect("presetSelect", app.getViewController().getPresets());
-        select.id = "presetSelect";
+        select.className = "presetSelect";
         select.onchange = app.onChangeWindowLevelPreset;
         select.title = "Select w/l preset.";
         select.setAttribute("data-inline","true");
         var label = document.createElement("label");
-        label.id = "presetLabel";
+        label.className = "presetLabel";
         label.setAttribute("for", "presetSelect");
         label.appendChild(document.createTextNode("Presets: "));
-        
-        var node = document.getElementById("toolbar");
+
+        var node = app.getElementByClassName("toolbar");
         node.appendChild(label);
         node.appendChild(select);
     };
@@ -95,17 +99,17 @@ dwv.gui.ZoomAndPan = function (app)
     this.setup = function ()
     {
         var button = document.createElement("button");
-        button.id = "zoom-button";
+        button.className = "zoom-button";
         button.value = "Zoom/Pan";
         button.onclick = app.onChangeTool;
         button.appendChild(document.createTextNode("Zoom/Pan"));
-        
-        var node = document.getElementById("toolbar");
+
+        var node = app.getElementByClassName("toolbar");
         node.appendChild(button);
     };
     this.display = function (bool)
     {
-        var button = document.getElementById("zoom-button");
+        var button = app.getElementByClassName("zoom-button");
         button.disabled = bool;
     };
 };
@@ -116,17 +120,17 @@ dwv.gui.Scroll = function (app)
     this.setup = function ()
     {
         var button = document.createElement("button");
-        button.id = "scroll-button";
+        button.className = "scroll-button";
         button.value = "Scroll";
         button.onclick = app.onChangeTool;
         button.appendChild(document.createTextNode("Scroll"));
-        
-        var node = document.getElementById("toolbar");
+
+        var node = app.getElementByClassName("toolbar");
         node.appendChild(button);
     };
     this.display = function (bool)
     {
-        var button = document.getElementById("scroll-button");
+        var button = app.getElementByClassName("scroll-button");
         button.disabled = bool;
     };
 };
@@ -135,11 +139,11 @@ dwv.gui.Scroll = function (app)
 dwv.gui.appendResetHtml = function (app)
 {
     var button = document.createElement("button");
-    button.id = "reset-button";
+    button.className = "reset-button";
     button.value = "reset";
     button.onclick = app.onDisplayReset;
     button.appendChild(document.createTextNode("Reset"));
-    
-    var node = document.getElementById("toolbar");
+
+    var node = app.getElementByClassName("toolbar");
     node.appendChild(button);
 };

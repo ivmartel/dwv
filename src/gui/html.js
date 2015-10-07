@@ -338,9 +338,7 @@ dwv.html.cleanNode = function (node) {
  * @static
  * @param {String} nodeId The string id of the node to delete.
  */
-dwv.html.removeNode = function (nodeId) {
-    // find the node
-    var node = document.getElementById(nodeId);
+dwv.html.removeNode = function (node) {
     // check node
     if ( !node ) {
         return;
@@ -350,6 +348,13 @@ dwv.html.removeNode = function (nodeId) {
     // remove it from its parent
     var top = node.parentNode;
     top.removeChild(node);
+};
+
+dwv.html.removeNodeFromId = function (nodeId) {
+    // find the node
+    var node = document.getElementById(nodeId);
+    // check node
+    dwv.html.removeNode(node);
 };
 
 /**
@@ -637,6 +642,22 @@ dwv.html.appendElement = function (parentId, element)
         // trigger create event (mobile)
         $('#'+parentId).trigger("create");
     }
+};
+
+/**
+ * Get an element by className inside of an element with parentId.
+ * @method appendElement
+ * @static
+ * @param {Number} parentId The id of the element to append to.
+ * @param {Object} element The element to append.
+ */
+dwv.html.getElementByClassNameSonOf = function (parentId, className)
+{
+    var elements = document.getElementById(parentId).getElementsByClassName(className);
+    if ( elements.length > 1 ) {
+        throw new Error("Found more than one class '" + className + "' element in '" + parentId + "'.");
+    }
+    return elements[0];
 };
 
 /**

@@ -28,8 +28,12 @@ dwv.tool.defaultpresets.CT = {
 dwv.gui.getWindowSize = dwv.gui.base.getWindowSize;
 // Progress
 dwv.gui.displayProgress = dwv.gui.base.displayProgress;
-// Select
-dwv.gui.refreshSelect = dwv.gui.base.refreshSelect;
+// Refresh Select (jquery-mobile)
+dwv.gui.refreshSelect = function (element) {
+    if( element.selectmenu ) {
+        element.selectmenu('refresh');
+    }
+};
 // Slider
 dwv.gui.Slider = dwv.gui.base.Slider;
 // Tags gui

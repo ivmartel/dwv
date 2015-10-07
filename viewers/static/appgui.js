@@ -36,9 +36,7 @@ dwv.gui.displayProgress = function (percent) {
     }
 };
 // Select
-dwv.gui.refreshSelect = function (/*selectName*/) {
-    // nothing to do
-};
+dwv.gui.refreshSelect = dwv.gui.base.refreshSelect;
 // Slider
 dwv.gui.Slider = function (app)
 {
