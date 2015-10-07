@@ -246,12 +246,9 @@ dwv.gui.base.displayProgress = function(percent)
  * @static
  * @param {String} selectName The name of the HTML select to refresh.
  */
-dwv.gui.base.refreshSelect = function(selectName)
+dwv.gui.base.refreshSelect = function (/*element*/)
 {
-    // jquery-mobile
-    if( $(selectName).selectmenu ) {
-        $(selectName).selectmenu(&#x27;refresh&#x27;);
-    }
+    // base does nothing...
 };
 
 /**
@@ -261,18 +258,18 @@ dwv.gui.base.refreshSelect = function(selectName)
  * @param {String} selectName The name of the HTML select.
  * @param {String} itemName The name of the itme to mark as selected.
  */
-dwv.gui.setSelected = function(selectName, itemName)
+dwv.gui.setSelected = function(element, itemName)
 {
-    var select = document.getElementById(selectName);
-    if ( select ) {
+    //var select = document.getElementById(selectName);
+    if ( element ) {
         var index = 0;
-        for( index in select.options){ 
-            if( select.options[index].text === itemName ) {
+        for( index in element.options){
+            if( element.options[index].text === itemName ) {
                 break;
             }
         }
-        select.selectedIndex = index;
-        dwv.gui.refreshSelect(&quot;#&quot; + selectName);
+        element.selectedIndex = index;
+        dwv.gui.refreshSelect(element);
     }
 };
 

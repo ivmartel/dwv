@@ -576,6 +576,17 @@ dwv.App = function ()
     };
     
     /**
+     * Get a html element that is inside the containerDivId from its class name.
+     * @method getElementByClassName
+     * @param className The class of the element to search.
+     * @return The list of found elements.
+     */
+     this.getElementByClassName = function (className)
+     {
+         return dwv.html.getElementByClassNameSonOf(containerDivId, className);
+     };
+
+    /**
      * Reset the application.
      * @method reset
      */
@@ -804,9 +815,9 @@ dwv.App = function ()
         style.setScale(windowScale);
 
         // resize container
-        var jqDivId = &quot;#&quot;+containerDivId;
-        $(jqDivId).width(newWidth);
-        $(jqDivId).height(newHeight);
+        var container = this.getElementByClassName(&quot;layerContainer&quot;);
+        $(container).width(newWidth);
+        $(container).height(newHeight);
         // resize image layer
         if ( imageLayer ) {
             imageLayer.setWidth(newWidth);
@@ -817,7 +828,7 @@ dwv.App = function ()
         // resize draw stage
         if ( drawStage ) {
             // resize div
-            var drawDivId = &quot;#&quot; + containerDivId + &quot;-drawDiv&quot;;
+            var drawDivId = this.getElementByClassName(&quot;drawDiv&quot;);
             $(drawDivId).width(newWidth);
             $(drawDivId).height(newHeight);
             // resize stage
@@ -1239,9 +1250,9 @@ dwv.App = function ()
         self.resetLayout();
         self.initWLDisplay();
         // update preset select
-        var select = document.getElementById(&quot;presetSelect&quot;);
+        var select = this.getElementByClassName(&quot;presetSelect&quot;);
         select.selectedIndex = 0;
-        dwv.gui.refreshSelect(&quot;#presetSelect&quot;);
+        dwv.gui.refreshSelect(select);
     };
 
 
@@ -1515,7 +1526,7 @@ dwv.App = function ()
     function createLayers(dataWidth, dataHeight)
     {
         // image layer
-        imageLayer = new dwv.html.Layer(containerDivId + &quot;-imageLayer&quot;);
+        imageLayer = new dwv.html.Layer(self.getElementByClassName(&quot;imageLayer&quot;));
         imageLayer.initialise(dataWidth, dataHeight);
         imageLayer.fillContext();
         imageLayer.setStyleDisplay(true);
@@ -1538,13 +1549,13 @@ dwv.App = function ()
             self.fitToSize( dwv.gui.getWindowSize() );
         }
         else {
-            self.fitToSize( { 
-                &#x27;width&#x27;: $(&#x27;#&#x27;+containerDivId).width(), 
-                &#x27;height&#x27;: $(&#x27;#&#x27;+containerDivId).height() } );
+            self.fitToSize( {
+                &#x27;width&#x27;: this.getElementByClassName(&quot;imageLayer&quot;).width(),
+                &#x27;height&#x27;: this.getElementByClassName(&quot;imageLayer&quot;).height() } );
         }
         self.resetLayout();
     }
-    
+
     /**
      * Post load application initialisation. To be called once the DICOM has been parsed.
      * @method postLoadInit

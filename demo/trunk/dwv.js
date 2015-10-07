@@ -397,6 +397,17 @@ dwv.App = function ()
     };
     
     /**
+     * Get a html element that is inside the containerDivId from its class name.
+     * @method getElementByClassName
+     * @param className The class of the element to search.
+     * @return The list of found elements.
+     */
+     this.getElementByClassName = function (className)
+     {
+         return dwv.html.getElementByClassNameSonOf(containerDivId, className);
+     };
+
+    /**
      * Reset the application.
      * @method reset
      */
@@ -625,9 +636,9 @@ dwv.App = function ()
         style.setScale(windowScale);
 
         // resize container
-        var jqDivId = "#"+containerDivId;
-        $(jqDivId).width(newWidth);
-        $(jqDivId).height(newHeight);
+        var container = this.getElementByClassName("layerContainer");
+        $(container).width(newWidth);
+        $(container).height(newHeight);
         // resize image layer
         if ( imageLayer ) {
             imageLayer.setWidth(newWidth);
@@ -638,7 +649,7 @@ dwv.App = function ()
         // resize draw stage
         if ( drawStage ) {
             // resize div
-            var drawDivId = "#" + containerDivId + "-drawDiv";
+            var drawDivId = this.getElementByClassName("drawDiv");
             $(drawDivId).width(newWidth);
             $(drawDivId).height(newHeight);
             // resize stage
@@ -1060,9 +1071,9 @@ dwv.App = function ()
         self.resetLayout();
         self.initWLDisplay();
         // update preset select
-        var select = document.getElementById("presetSelect");
+        var select = this.getElementByClassName("presetSelect");
         select.selectedIndex = 0;
-        dwv.gui.refreshSelect("#presetSelect");
+        dwv.gui.refreshSelect(select);
     };
 
 
@@ -1336,7 +1347,7 @@ dwv.App = function ()
     function createLayers(dataWidth, dataHeight)
     {
         // image layer
-        imageLayer = new dwv.html.Layer(containerDivId + "-imageLayer");
+        imageLayer = new dwv.html.Layer(self.getElementByClassName("imageLayer"));
         imageLayer.initialise(dataWidth, dataHeight);
         imageLayer.fillContext();
         imageLayer.setStyleDisplay(true);
@@ -1359,13 +1370,13 @@ dwv.App = function ()
             self.fitToSize( dwv.gui.getWindowSize() );
         }
         else {
-            self.fitToSize( { 
-                'width': $('#'+containerDivId).width(), 
-                'height': $('#'+containerDivId).height() } );
+            self.fitToSize( {
+                'width': this.getElementByClassName("imageLayer").width(),
+                'height': this.getElementByClassName("imageLayer").height() } );
         }
         self.resetLayout();
     }
-    
+
     /**
      * Post load application initialisation. To be called once the DICOM has been parsed.
      * @method postLoadInit
@@ -7835,12 +7846,9 @@ dwv.gui.base.displayProgress = function(percent)
  * @static
  * @param {String} selectName The name of the HTML select to refresh.
  */
-dwv.gui.base.refreshSelect = function(selectName)
+dwv.gui.base.refreshSelect = function (/*element*/)
 {
-    // jquery-mobile
-    if( $(selectName).selectmenu ) {
-        $(selectName).selectmenu('refresh');
-    }
+    // base does nothing...
 };
 
 /**
@@ -7850,18 +7858,18 @@ dwv.gui.base.refreshSelect = function(selectName)
  * @param {String} selectName The name of the HTML select.
  * @param {String} itemName The name of the itme to mark as selected.
  */
-dwv.gui.setSelected = function(selectName, itemName)
+dwv.gui.setSelected = function(element, itemName)
 {
-    var select = document.getElementById(selectName);
-    if ( select ) {
+    //var select = document.getElementById(selectName);
+    if ( element ) {
         var index = 0;
-        for( index in select.options){ 
-            if( select.options[index].text === itemName ) {
+        for( index in element.options){
+            if( element.options[index].text === itemName ) {
                 break;
             }
         }
-        select.selectedIndex = index;
-        dwv.gui.refreshSelect("#" + selectName);
+        element.selectedIndex = index;
+        dwv.gui.refreshSelect(element);
     }
 };
 
@@ -8467,9 +8475,7 @@ dwv.html.cleanNode = function (node) {
  * @static
  * @param {String} nodeId The string id of the node to delete.
  */
-dwv.html.removeNode = function (nodeId) {
-    // find the node
-    var node = document.getElementById(nodeId);
+dwv.html.removeNode = function (node) {
     // check node
     if ( !node ) {
         return;
@@ -8479,6 +8485,13 @@ dwv.html.removeNode = function (nodeId) {
     // remove it from its parent
     var top = node.parentNode;
     top.removeChild(node);
+};
+
+dwv.html.removeNodeFromId = function (nodeId) {
+    // find the node
+    var node = document.getElementById(nodeId);
+    // check node
+    dwv.html.removeNode(node);
 };
 
 /**
@@ -8769,6 +8782,22 @@ dwv.html.appendElement = function (parentId, element)
 };
 
 /**
+ * Get an element by className inside of an element with parentId.
+ * @method appendElement
+ * @static
+ * @param {Number} parentId The id of the element to append to.
+ * @param {Object} element The element to append.
+ */
+dwv.html.getElementByClassNameSonOf = function (parentId, className)
+{
+    var elements = document.getElementById(parentId).getElementsByClassName(className);
+    if ( elements.length > 1 ) {
+        throw new Error("Found more than one class '" + className + "' element in '" + parentId + "'.");
+    }
+    return elements[0];
+};
+
+/**
  * Create an element.
  * @method createElement
  * @static
@@ -8798,7 +8827,7 @@ dwv.html = dwv.html || {};
  * @constructor
  * @param {String} name The name of the layer.
  */
-dwv.html.Layer = function(name)
+dwv.html.Layer = function(canvas)
 {
     /**
      * The associated HTMLCanvasElement.
@@ -8806,7 +8835,7 @@ dwv.html.Layer = function(name)
      * @private
      * @type Object
      */
-    var canvas = null;
+    //var canvas = null;
     /**
      * A cache of the initial canvas.
      * @property cacheCanvas
@@ -8821,13 +8850,13 @@ dwv.html.Layer = function(name)
      * @type Object
      */
     var context = null;
-    
+
     /**
      * Get the layer name.
      * @method getName
      * @return {String} The layer name.
      */
-    this.getName = function() { return name; };
+    //this.getName = function() { return name; };
     /**
      * Get the layer canvas.
      * @method getCanvas
@@ -8845,7 +8874,7 @@ dwv.html.Layer = function(name)
      * @method getOffset
      * @return {Number} The layer offset on page.
      */
-    this.getOffset = function() { return $('#'+name).offset(); };
+    this.getOffset = function() { return canvas.offset(); };
 
     /**
      * The image data array.
@@ -9016,23 +9045,23 @@ dwv.html.Layer = function(name)
     this.initialise = function(inputWidth, inputHeight)
     {
         // find the canvas element
-        canvas = document.getElementById(name);
-        if (!canvas)
-        {
-            alert("Error: cannot find the canvas element for '" + name + "'.");
-            return;
-        }
+        //canvas = document.getElementById(name);
+        //if (!canvas)
+        //{
+        //    alert("Error: cannot find the canvas element for '" + name + "'.");
+        //    return;
+        //}
         // check that the getContext method exists
         if (!canvas.getContext)
         {
-            alert("Error: no canvas.getContext method for '" + name + "'.");
+            alert("Error: no canvas.getContext method.");
             return;
         }
         // get the 2D context
         context = canvas.getContext('2d');
         if (!context)
         {
-            alert("Error: failed to get the 2D context for '" + name + "'.");
+            alert("Error: failed to get the 2D context.");
             return;
         }
         // canvas sizes
@@ -17925,7 +17954,7 @@ dwv.tool.WindowLevel = function(app)
             if ( gui ) {
                 gui.initialise();
                 // set selected
-                dwv.gui.setSelected("presetSelect", "Manual");
+                dwv.gui.setSelected(app.getElementByClassName("presetSelect"), "Manual");
             }
         }
     };

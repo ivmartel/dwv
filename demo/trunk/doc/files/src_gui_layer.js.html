@@ -191,7 +191,7 @@ dwv.html = dwv.html || {};
  * @constructor
  * @param {String} name The name of the layer.
  */
-dwv.html.Layer = function(name)
+dwv.html.Layer = function(canvas)
 {
     /**
      * The associated HTMLCanvasElement.
@@ -199,7 +199,7 @@ dwv.html.Layer = function(name)
      * @private
      * @type Object
      */
-    var canvas = null;
+    //var canvas = null;
     /**
      * A cache of the initial canvas.
      * @property cacheCanvas
@@ -214,13 +214,13 @@ dwv.html.Layer = function(name)
      * @type Object
      */
     var context = null;
-    
+
     /**
      * Get the layer name.
      * @method getName
      * @return {String} The layer name.
      */
-    this.getName = function() { return name; };
+    //this.getName = function() { return name; };
     /**
      * Get the layer canvas.
      * @method getCanvas
@@ -238,7 +238,7 @@ dwv.html.Layer = function(name)
      * @method getOffset
      * @return {Number} The layer offset on page.
      */
-    this.getOffset = function() { return $(&#x27;#&#x27;+name).offset(); };
+    this.getOffset = function() { return canvas.offset(); };
 
     /**
      * The image data array.
@@ -409,23 +409,23 @@ dwv.html.Layer = function(name)
     this.initialise = function(inputWidth, inputHeight)
     {
         // find the canvas element
-        canvas = document.getElementById(name);
-        if (!canvas)
-        {
-            alert(&quot;Error: cannot find the canvas element for &#x27;&quot; + name + &quot;&#x27;.&quot;);
-            return;
-        }
+        //canvas = document.getElementById(name);
+        //if (!canvas)
+        //{
+        //    alert(&quot;Error: cannot find the canvas element for &#x27;&quot; + name + &quot;&#x27;.&quot;);
+        //    return;
+        //}
         // check that the getContext method exists
         if (!canvas.getContext)
         {
-            alert(&quot;Error: no canvas.getContext method for &#x27;&quot; + name + &quot;&#x27;.&quot;);
+            alert(&quot;Error: no canvas.getContext method.&quot;);
             return;
         }
         // get the 2D context
         context = canvas.getContext(&#x27;2d&#x27;);
         if (!context)
         {
-            alert(&quot;Error: failed to get the 2D context for &#x27;&quot; + name + &quot;&#x27;.&quot;);
+            alert(&quot;Error: failed to get the 2D context.&quot;);
             return;
         }
         // canvas sizes
