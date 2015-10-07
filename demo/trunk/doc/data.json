@@ -740,7 +740,7 @@
             },
             "tag": "module",
             "file": "src/image/view.js",
-            "line": 410,
+            "line": 413,
             "description": "Image module."
         },
         "io": {
@@ -1594,7 +1594,7 @@
             "module": "image",
             "namespace": "dwv.image",
             "file": "src/image/view.js",
-            "line": 410,
+            "line": 413,
             "description": "View factory.",
             "is_constructor": 1
         },
@@ -8653,7 +8653,7 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 159,
+            "line": 162,
             "description": "Set the current position. Returns false if not in bounds.",
             "itemtype": "method",
             "name": "setCurrentPosition",
@@ -8670,7 +8670,7 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 189,
+            "line": 192,
             "description": "Append another view to this one.",
             "itemtype": "method",
             "name": "append",
@@ -8687,7 +8687,7 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 202,
+            "line": 205,
             "description": "Set the view window/level.",
             "itemtype": "method",
             "name": "setWindowLevel",
@@ -8709,7 +8709,7 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 220,
+            "line": 223,
             "description": "Clone the image using all meta data and the original data buffer.",
             "itemtype": "method",
             "name": "clone",
@@ -8723,7 +8723,7 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 235,
+            "line": 238,
             "description": "View listeners",
             "itemtype": "property",
             "name": "listeners",
@@ -8736,7 +8736,7 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 242,
+            "line": 245,
             "description": "Get the view listeners.",
             "itemtype": "method",
             "name": "getListeners",
@@ -8750,7 +8750,7 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 248,
+            "line": 251,
             "description": "Set the view listeners.",
             "itemtype": "method",
             "name": "setListeners",
@@ -8767,7 +8767,7 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 256,
+            "line": 259,
             "description": "Set the image window/level to cover the full data range.",
             "itemtype": "method",
             "name": "setWindowLevelMinMax\nWarning: uses the latest set rescale LUT or the default linear one.",
@@ -8777,7 +8777,7 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 273,
+            "line": 276,
             "description": "Generate display image data to be given to a canvas.",
             "itemtype": "method",
             "name": "generateImageData",
@@ -8799,7 +8799,7 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 358,
+            "line": 361,
             "description": "Add an event listener on the view.",
             "itemtype": "method",
             "name": "addEventListener",
@@ -8821,7 +8821,7 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 373,
+            "line": 376,
             "description": "Remove an event listener on the view.",
             "itemtype": "method",
             "name": "removeEventListener",
@@ -8843,7 +8843,7 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 393,
+            "line": 396,
             "description": "Fire an event: call all associated listeners.",
             "itemtype": "method",
             "name": "fireEvent",
@@ -8860,7 +8860,7 @@
         },
         {
             "file": "src/image/view.js",
-            "line": 418,
+            "line": 421,
             "description": "Get an View object from the read DICOM file.",
             "itemtype": "method",
             "name": "create",
@@ -13805,7 +13805,7 @@
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/image/view.js:418"
+            "line": " src/image/view.js:421"
         },
         {
             "message": "unknown tag: input",
