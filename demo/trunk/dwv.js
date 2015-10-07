@@ -12047,10 +12047,7 @@ dwv.image.View = function(image, isSigned)
      * @method getCurrentPosition
      * @return {Object} The current position.
      */ 
-    this.getCurrentPosition = function() { 
-        // return a clone to avoid reference problems
-        return {"i": currentPosition.i, "j": currentPosition.j, "k": currentPosition.k};
-    };
+    this.getCurrentPosition = function() { return currentPosition; };
     /**
      * Set the current position. Returns false if not in bounds.
      * @method setCurrentPosition
