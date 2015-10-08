@@ -62,12 +62,12 @@ dwv.gui.base.displayProgress = function(percent)
 };
 
 /**
- * Refresh a HTML select. Mainly for jquery-mobile.
- * @method refreshSelect
+ * Refresh a HTML element. Mainly for jquery-mobile.
+ * @method refreshElement
  * @static
- * @param {String} selectName The name of the HTML select to refresh.
+ * @param {String} element The HTML element to refresh.
  */
-dwv.gui.base.refreshSelect = function (/*element*/)
+dwv.gui.base.refreshElement = function (/*element*/)
 {
     // base does nothing...
 };
@@ -81,7 +81,6 @@ dwv.gui.base.refreshSelect = function (/*element*/)
  */
 dwv.gui.setSelected = function(element, itemName)
 {
-    //var select = document.getElementById(selectName);
     if ( element ) {
         var index = 0;
         for( index in element.options){
@@ -90,7 +89,7 @@ dwv.gui.setSelected = function(element, itemName)
             }
         }
         element.selectedIndex = index;
-        dwv.gui.refreshSelect(element);
+        dwv.gui.refreshElement(element);
     }
 };
 
@@ -135,7 +134,7 @@ dwv.gui.base.Slider = function (app)
         div.appendChild(inputMax);
         div.setAttribute("data-mini", "true");
         // append to document
-        document.getElementById("thresholdLi").appendChild(div);
+        app.getElementByClassName("thresholdLi").appendChild(div);
         // bind change
         $("#threshold-div").on("change",
                 function(/*event*/) {

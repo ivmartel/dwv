@@ -16,7 +16,7 @@ dwv.gui.getWindowSize = dwv.gui.base.getWindowSize;
 // Progress
 dwv.gui.displayProgress = function (/*percent*/) { /*does nothing*/ };
 // Select
-dwv.gui.refreshSelect = dwv.gui.base.refreshSelect;
+dwv.gui.refreshElement = dwv.gui.base.refreshElement;
 // Slider
 dwv.gui.Slider = null;
 // Tags table
@@ -25,15 +25,15 @@ dwv.gui.DicomTags = null;
 // Toolbox 
 dwv.gui.Toolbox = function (app)
 {
-    var base = new dwv.gui.base.Toolbox(app);
+    //var base = new dwv.gui.base.Toolbox(app);
     
     this.setup = function (/*list*/)
     {
         // does nothing
     };
-    this.display = function (bool)
+    this.display = function (/*bool*/)
     {
-        base.display(bool);
+     // does nothing
     };
     this.initialise = function (list)
     {
@@ -69,12 +69,8 @@ dwv.gui.WindowLevel = function (app)
     this.initialise = function ()
     {
         // clear previous
-        //$("#presetSelect").remove();
-        //$("#presetLabel").remove();
         dwv.html.removeNode(app.getElementByClassName("presetSelect"));
         dwv.html.removeNode(app.getElementByClassName("presetLabel"));
-        //app.getElementByClassName("presetSelect").remove();
-        //app.getElementByClassName("presetLabel").remove();
 
         // create preset select
         var select = dwv.html.createHtmlSelect("presetSelect", app.getViewController().getPresets());

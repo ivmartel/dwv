@@ -350,10 +350,16 @@ dwv.html.removeNode = function (node) {
     top.removeChild(node);
 };
 
-dwv.html.removeNodeFromId = function (nodeId) {
+dwv.html.removeNodes = function (nodes) {
+    for ( var i = 0; i < nodes.length; ++i ) {
+        dwv.html.removeNode(nodes[i]);
+    }
+};
+
+dwv.html.removeNodeById = function (nodeId) {
     // find the node
     var node = document.getElementById(nodeId);
-    // check node
+    // remove it
     dwv.html.removeNode(node);
 };
 
@@ -370,8 +376,8 @@ dwv.html.removeNodeFromId = function (nodeId) {
 dwv.html.createHtmlSelect = function (name, list) {
     // select
     var select = document.createElement("select");
-    select.id = name;
-    select.name = name;
+    //select.name = name;
+    select.className = name;
     // options
     var option;
     if ( list instanceof Array )
@@ -596,33 +602,27 @@ dwv.html.decodeManifest = function (manifest, nslices)
  * Display or not an element.
  * @method displayElement
  * @static
- * @param {Number} id The id of the element to toggle its display.
+ * @param {Object} element The HTML element to display.
  * @param {Boolean} flag True to display the element.
  */
-dwv.html.displayElement = function (id, flag)
+dwv.html.displayElement = function (element, flag)
 {
-    var element = document.getElementById(id);
-    if ( element ) {
-        element.style.display = flag ? "" : "none";
-    }
+    element.style.display = flag ? "" : "none";
 };
 
 /**
  * Toggle the display of an element.
  * @method toggleDisplay
  * @static
- * @param {Number} id The id of the element to toggle its display.
+ * @param {Object} element The HTML element to display.
  */
-dwv.html.toggleDisplay = function (id)
+dwv.html.toggleDisplay = function (element)
 {
-    var element = document.getElementById(id);
-    if ( element ) {
-        if ( element.style.display === "none" ) {
-            element.style.display = '';
-        }
-        else {
-            element.style.display = "none";
-        }
+    if ( element.style.display === "none" ) {
+        element.style.display = '';
+    }
+    else {
+        element.style.display = "none";
     }
 };
 
@@ -630,32 +630,30 @@ dwv.html.toggleDisplay = function (id)
  * Append an element.
  * @method appendElement
  * @static
- * @param {Number} parentId The id of the element to append to.
- * @param {Object} element The element to append.
+ * @param {Object} parent The HTML element to append to.
+ * @param {Object} element The HTML element to append.
  */
-dwv.html.appendElement = function (parentId, element)
+dwv.html.appendElement = function (parent, element)
 {
-    var node = document.getElementById(parentId);
-    if ( element ) {
-        // append
-        node.appendChild(element);
-        // trigger create event (mobile)
-        $('#'+parentId).trigger("create");
-    }
+    // append
+    parent.appendChild(element);
+    // refresh
+    dwv.gui.refreshElement(parent);
 };
 
 /**
  * Get an element by className inside of an element with parentId.
- * @method appendElement
+ * @method getElementByClassNameSonOf
  * @static
- * @param {Number} parentId The id of the element to append to.
+ * @param {Object} parent The HTML node to search.
  * @param {Object} element The element to append.
  */
-dwv.html.getElementByClassNameSonOf = function (parentId, className)
+dwv.html.getElementByClassNameSonOf = function (parent, className)
 {
-    var elements = document.getElementById(parentId).getElementsByClassName(className);
+    var elements = parent.getElementsByClassName(className);
     if ( elements.length > 1 ) {
-        throw new Error("Found more than one class '" + className + "' element in '" + parentId + "'.");
+        return elements[1];
+        //throw new Error("Found more than one class '" + className + "' element in '" + parent.id + "'.");
     }
     return elements[0];
 };
@@ -665,12 +663,12 @@ dwv.html.getElementByClassNameSonOf = function (parentId, className)
  * @method createElement
  * @static
  * @param {String} type The type of the elemnt.
- * @param {Number} id The id of the element
+ * @param {String} className The className of the element.
  */
-dwv.html.createHiddenElement = function (type, id)
+dwv.html.createHiddenElement = function (type, className)
 {
     var element = document.createElement(type);
-    element.id = id;
+    element.className = className;
     // hide by default
     element.style.display = "none";
     // return

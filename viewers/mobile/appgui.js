@@ -28,10 +28,13 @@ dwv.tool.defaultpresets.CT = {
 dwv.gui.getWindowSize = dwv.gui.base.getWindowSize;
 // Progress
 dwv.gui.displayProgress = dwv.gui.base.displayProgress;
-// Refresh Select (jquery-mobile)
-dwv.gui.refreshSelect = function (element) {
-    if( element.selectmenu ) {
-        element.selectmenu('refresh');
+// refresh
+dwv.gui.refreshElement = function (element) {
+    if( $(element)[0].nodeName.toLowerCase() === 'select' ) {
+        $(element).selectmenu('refresh');
+    }
+    else {
+        $(element).enhanceWithin();
     }
 };
 // Slider
@@ -77,16 +80,15 @@ dwv.gui.Toolbox = function (app)
         toggleInfo.onclick = app.onToggleInfoLayer;
     
         var toggleSaveState = document.createElement("a");
-        toggleSaveState.setAttribute("class", buttonClass + " ui-icon-action");
+        toggleSaveState.setAttribute("class", buttonClass + " download-state ui-icon-action");
         toggleSaveState.onclick = app.onStateSave;
         toggleSaveState.download = "state.json";
-        toggleSaveState.id = "download-state";
 
         var tags = document.createElement("a");
         tags.href = "#tags_page";
         tags.setAttribute("class", buttonClass + " ui-icon-grid");
     
-        var node = document.getElementById("toolbar");
+        var node = app.getElementByClassName("toolbar");
         node.appendChild(open);
         node.appendChild(undo);
         node.appendChild(redo);

@@ -16,7 +16,7 @@ dwv.gui.getWindowSize = dwv.gui.base.getWindowSize;
 // Progress
 dwv.gui.displayProgress = dwv.gui.base.displayProgress;
 // Select
-dwv.gui.refreshSelect = dwv.gui.base.refreshSelect;
+dwv.gui.refreshElement = dwv.gui.base.refreshElement;
 // Slider
 dwv.gui.Slider = dwv.gui.base.Slider;
 // Tags table
@@ -32,21 +32,21 @@ dwv.gui.Toolbox = function (app)
         //base.setup(list);
         
         var mainFieldset = document.createElement("fieldset");
-        mainFieldset.id = "mainfieldset";
+        mainFieldset.className = "mainfieldset";
         mainFieldset.setAttribute("data-role", "controlgroup");
         mainFieldset.setAttribute("data-type", "horizontal");
         
         var toolFieldset = document.createElement("fieldset");
-        toolFieldset.id = "toolfieldset";
+        toolFieldset.className = "toolfieldset";
         toolFieldset.setAttribute("data-role", "controlgroup");
         toolFieldset.setAttribute("data-type", "horizontal");
         toolFieldset.setAttribute("style", "padding-right:10px;");
     
         mainFieldset.appendChild(toolFieldset);
         
-        var node = document.getElementById("toolbar");
+        var node = app.getElementByClassName("toolbar");
         node.appendChild(mainFieldset);
-        $("#toolbar").trigger("create");
+        dwv.gui.refreshElement(node);
     };
     
     this.display = function (bool)
@@ -59,16 +59,17 @@ dwv.gui.Toolbox = function (app)
         
         // not wonderful: first one should be scroll...
         if ( list[0] === false ) {
-            var inputScroll = document.getElementById("scrollLi");
+            var inputScroll = app.getElementByClassName("scrollLi");
             inputScroll.parentNode.style.display = "none";
             inputScroll.checked = false;
-            var inputZoom = document.getElementById("zoomLi");
+            var inputZoom = app.getElementByClassName("zoomLi");
             inputZoom.checked = true;
         }
         
         // refresh
         $("input[type='radio']").checkboxradio("refresh");
-        $("#toolfieldset").trigger("create");
+        var node = app.getElementByClassName("toolfieldset");
+        dwv.gui.refreshElement(node);
     };
 };
 
@@ -82,7 +83,7 @@ dwv.gui.WindowLevel = function (app)
         //base.setup();
         
         var input = document.createElement("input");
-        input.id = "wlLi";
+        input.className = "wlLi";
         input.name = "radio-choice";
         input.type = "radio";
         input.value = "Window/Level";
@@ -92,10 +93,10 @@ dwv.gui.WindowLevel = function (app)
         label.setAttribute("for", "wlLi");
         label.appendChild(document.createTextNode("W/L"));
         
-        $("#toolfieldset").controlgroup("container").append(input);
-        $("#toolfieldset").controlgroup("container").append(label);
-        
-        $("#toolfieldset").trigger("create");
+        var node = app.getElementByClassName("toolfieldset");
+        $(node).controlgroup("container").append(input);
+        $(node).controlgroup("container").append(label);
+        dwv.gui.refreshElement(node);
     };
     this.display = function (/*bool*/)
     {
@@ -106,8 +107,8 @@ dwv.gui.WindowLevel = function (app)
         //base.initialise();
         
         // clear previous
-        $("#presetSelect").remove();
-        $("#presetLabel").remove();
+        dwv.html.removeNode(app.getElementByClassName("presetSelect"));
+        dwv.html.removeNode(app.getElementByClassName("presetLabel"));
         
         // create preset select
         var select = dwv.html.createHtmlSelect("presetSelect", app.getViewController().getPresets());
@@ -117,14 +118,13 @@ dwv.gui.WindowLevel = function (app)
     
         // label as span (otherwise creates new line)
         var span = document.createElement("span");
-        span.id = "presetLabel";
+        span.className = "presetLabel";
         span.appendChild(document.createTextNode("Presets: "));
         
-        var node = document.getElementById("mainfieldset");
+        var node = app.getElementByClassName("mainfieldset");
         node.appendChild(span);
         node.appendChild(select);
-        
-        $("#mainfieldset").trigger("create");
+        dwv.gui.refreshElement(node);
     };
 };
 
@@ -136,7 +136,7 @@ dwv.gui.ZoomAndPan = function (app)
     this.setup = function ()
     {
         var input = document.createElement("input");
-        input.id = "zoomLi";
+        input.className = "zoomLi";
         input.name = "radio-choice";
         input.type = "radio";
         input.value = "Zoom/Pan";
@@ -146,10 +146,10 @@ dwv.gui.ZoomAndPan = function (app)
         label.setAttribute("for", "zoomLi");
         label.appendChild(document.createTextNode("Zoom/Pan"));
     
-        $("#toolfieldset").controlgroup("container").append(input);
-        $("#toolfieldset").controlgroup("container").append(label);
-        
-        $("#toolfieldset").trigger("create");
+        var node = app.getElementByClassName("toolfieldset");
+        $(node).controlgroup("container").append(input);
+        $(node).controlgroup("container").append(label);
+        dwv.gui.refreshElement(node);
     };
     this.display = function (/*bool*/)
     {
@@ -165,7 +165,7 @@ dwv.gui.Scroll = function (app)
     this.setup = function ()
     {
         var input = document.createElement("input");
-        input.id = "scrollLi";
+        input.className = "scrollLi";
         input.name = "radio-choice";
         input.checked = "checked";
         input.type = "radio";
@@ -176,10 +176,10 @@ dwv.gui.Scroll = function (app)
         label.setAttribute("for", "scrollLi");
         label.appendChild(document.createTextNode("Scroll"));
     
-        $("#toolfieldset").controlgroup("container").append(input);
-        $("#toolfieldset").controlgroup("container").append(label);
-    
-        $("#toolfieldset").trigger("create");
+        var node = app.getElementByClassName("toolfieldset");
+        $(node).controlgroup("container").append(input);
+        $(node).controlgroup("container").append(label);
+        dwv.gui.refreshElement(node);
     };
     this.display = function (/*bool*/)
     {
@@ -191,13 +191,13 @@ dwv.gui.Scroll = function (app)
 dwv.gui.appendResetHtml = function (app)
 {
     var button = document.createElement("button");
-    button.id = "resetLi";
+    button.className = "resetLi";
     button.value = "reset";
     button.onclick = app.onDisplayReset;
     button.appendChild(document.createTextNode("Reset"));
     button.setAttribute("class","ui-btn ui-btn-inline");
     
-    var node = document.getElementById("mainfieldset");
+    var node = app.getElementByClassName("mainfieldset");
     node.appendChild(button);
-    $("#mainfieldset").trigger("create");
+    dwv.gui.refreshElement(node);
 };

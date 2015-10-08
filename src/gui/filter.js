@@ -34,11 +34,12 @@ dwv.gui.base.Filter = function (app)
     
         // filter list element
         var filterLi = dwv.html.createHiddenElement("li", "filterLi");
-        filterLi.setAttribute("class","ui-block-b");
+        filterLi.className += " ui-block-b";
         filterLi.appendChild(filterSelector);
         
         // append element
-        dwv.html.appendElement("toolList", filterLi);
+        var node = app.getElementByClassName("toolList");
+        dwv.html.appendElement(node, filterLi);
     };
     
     /**
@@ -48,7 +49,8 @@ dwv.gui.base.Filter = function (app)
      */
     this.display = function (flag)
     {
-        dwv.html.displayElement("filterLi", flag);
+        var node = app.getElementByClassName("filterLi");
+        dwv.html.displayElement(node, flag);
     };
     
     /**
@@ -58,9 +60,10 @@ dwv.gui.base.Filter = function (app)
     this.initialise = function ()
     {
         // filter select: reset selected options
-        var filterSelector = document.getElementById("filterSelect");
+        var filterSelector = app.getElementByClassName("filterSelect");
         filterSelector.selectedIndex = 0;
-        dwv.gui.refreshSelect("#filterSelect");
+        // refresh
+        dwv.gui.refreshElement(filterSelector);
     };
 
 }; // class dwv.gui.base.Filter
@@ -89,16 +92,16 @@ dwv.gui.base.Threshold = function (app)
     {
         // threshold list element
         var thresholdLi = dwv.html.createHiddenElement("li", "thresholdLi");
-        thresholdLi.setAttribute("class","ui-block-c");
+        thresholdLi.className += " ui-block-c";
         
         // node
-        var node = document.getElementById("toolList");
+        var node = app.getElementByClassName("toolList");
         // append threshold
         node.appendChild(thresholdLi);
         // threshold slider
         slider.append();
-        // trigger create event (mobile)
-        $("#toolList").trigger("create");
+        // refresh
+        dwv.gui.refreshElement(node);
     };
     
     /**
@@ -108,7 +111,8 @@ dwv.gui.base.Threshold = function (app)
      */
     this.display = function (flag)
     {
-        dwv.html.displayElement("thresholdLi", flag);
+        var node = app.getElementByClassName("thresholdLi");
+        dwv.html.displayElement(node, flag);
     };
     
     /**
@@ -155,10 +159,11 @@ dwv.gui.base.Sharpen = function (app)
     {
         // sharpen list element
         var sharpenLi = dwv.html.createHiddenElement("li", "sharpenLi");
-        sharpenLi.setAttribute("class","ui-block-c");
+        sharpenLi.className += " ui-block-c";
         sharpenLi.appendChild( dwv.gui.filter.base.createFilterApplyButton(app) );
         // append element
-        dwv.html.appendElement("toolList", sharpenLi);
+        var node = app.getElementByClassName("toolList");
+        dwv.html.appendElement(node, sharpenLi);
     };
     
     /**
@@ -168,7 +173,8 @@ dwv.gui.base.Sharpen = function (app)
      */
     this.display = function (flag)
     {
-        dwv.html.displayElement("sharpenLi", flag);
+        var node = app.getElementByClassName("sharpenLi");
+        dwv.html.displayElement(node, flag);
     };
     
 }; // class dwv.gui.base.Sharpen
@@ -189,10 +195,11 @@ dwv.gui.base.Sobel = function (app)
     {
         // sobel list element
         var sobelLi = dwv.html.createHiddenElement("li", "sobelLi");
-        sobelLi.setAttribute("class","ui-block-c");
+        sobelLi.className += " ui-block-c";
         sobelLi.appendChild( dwv.gui.filter.base.createFilterApplyButton(app) );
-       // append element
-        dwv.html.appendElement("toolList", sobelLi);
+        // append element
+        var node = app.getElementByClassName("toolList");
+        dwv.html.appendElement(node, sobelLi);
     };
     
     /**
@@ -202,7 +209,8 @@ dwv.gui.base.Sobel = function (app)
      */
     this.display = function (flag)
     {
-        dwv.html.displayElement("sobelLi", flag);
+        var node = app.getElementByClassName("sobelLi");
+        dwv.html.displayElement(node, flag);
     };
     
 }; // class dwv.gui.base.Sobel

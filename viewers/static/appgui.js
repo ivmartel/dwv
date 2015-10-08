@@ -35,8 +35,8 @@ dwv.gui.displayProgress = function (percent) {
         $("#progressbar").progressbar({ value: percent });
     }
 };
-// Select
-dwv.gui.refreshSelect = dwv.gui.base.refreshSelect;
+// refresh
+dwv.gui.refreshElement = dwv.gui.base.refreshElement;
 // Slider
 dwv.gui.Slider = function (app)
 {
