@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>dwv.info.WindowLevel - dwv</title>
+    <title>dwv.info.Windowing - dwv</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
     <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
@@ -81,7 +81,7 @@
                                 <li><a href="../classes/dwv.info.MiniColourMap.html">dwv.info.MiniColourMap</a></li>
                                 <li><a href="../classes/dwv.info.Plot.html">dwv.info.Plot</a></li>
                                 <li><a href="../classes/dwv.info.Position.html">dwv.info.Position</a></li>
-                                <li><a href="../classes/dwv.info.WindowLevel.html">dwv.info.WindowLevel</a></li>
+                                <li><a href="../classes/dwv.info.Windowing.html">dwv.info.Windowing</a></li>
                                 <li><a href="../classes/dwv.io.html">dwv.io</a></li>
                                 <li><a href="../classes/dwv.io.File.html">dwv.io.File</a></li>
                                 <li><a href="../classes/dwv.io.Url.html">dwv.io.Url</a></li>
@@ -173,7 +173,7 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-<h1>dwv.info.WindowLevel Class</h1>
+<h1>dwv.info.Windowing Class</h1>
 <div class="box meta">
 
 
@@ -193,13 +193,13 @@
 
     <div class="constructor">
         <h2>Constructor</h2>
-<div id="method_dwv.info.WindowLevel" class="method item">
-    <h3 class="name"><code>dwv.info.WindowLevel</code></h3>
+<div id="method_dwv.info.Windowing" class="method item">
+    <h3 class="name"><code>dwv.info.Windowing</code></h3>
 
         <div class="args">
             <span class="paren">(</span><ul class="args-list inline commas">
                 <li class="arg">
-                        <code>app</code>
+                        <code>div</code>
                 </li>
             </ul><span class="paren">)</span>
         </div>
@@ -230,12 +230,12 @@
 
             <ul class="params-list">
                 <li class="param">
-                        <code class="param-name">app</code>
+                        <code class="param-name">div</code>
                         <span class="type">Object</span>
 
 
                     <div class="param-description">
-                        <p>The associated application.</p>
+                        <p>The HTML element to add WindowLevel info to.</p>
 
                     </div>
 
@@ -264,11 +264,11 @@
 
                     <ul class="index-list methods">
                             <li class="index-item method">
-                                <a href="#method_createWindowingDiv">createWindowingDiv</a>
+                                <a href="#method_create">create</a>
 
                             </li>
                             <li class="index-item method">
-                                <a href="#method_updateWindowingDiv">updateWindowingDiv</a>
+                                <a href="#method_update">update</a>
 
                             </li>
                     </ul>
@@ -281,16 +281,10 @@
             <div id="methods" class="api-class-tabpanel">
                 <h2 class="off-left">Methods</h2>
 
-<div id="method_createWindowingDiv" class="method item">
-    <h3 class="name"><code>createWindowingDiv</code></h3>
+<div id="method_create" class="method item">
+    <h3 class="name"><code>create</code></h3>
 
-        <div class="args">
-            <span class="paren">(</span><ul class="args-list inline commas">
-                <li class="arg">
-                        <code>rootId</code>
-                </li>
-            </ul><span class="paren">)</span>
-        </div>
+        <span class="paren">()</span>
 
 
 
@@ -314,29 +308,12 @@
 
     </div>
 
-        <div class="params">
-            <h4>Parameters:</h4>
-
-            <ul class="params-list">
-                <li class="param">
-                        <code class="param-name">rootId</code>
-                        <span class="type">String</span>
-
-
-                    <div class="param-description">
-                        <p>The div root ID.</p>
-
-                    </div>
-
-                </li>
-            </ul>
-        </div>
 
 
 
 </div>
-<div id="method_updateWindowingDiv" class="method item">
-    <h3 class="name"><code>updateWindowingDiv</code></h3>
+<div id="method_update" class="method item">
+    <h3 class="name"><code>update</code></h3>
 
         <div class="args">
             <span class="paren">(</span><ul class="args-list inline commas">
@@ -356,7 +333,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_tools_info.js.html#l48"><code>src&#x2F;tools&#x2F;info.js:48</code></a>
+        <a href="../files/src_tools_info.js.html#l49"><code>src&#x2F;tools&#x2F;info.js:49</code></a>
         </p>
 
 
@@ -364,7 +341,7 @@
     </div>
 
     <div class="description">
-        <p>Update the Top Right info div.</p>
+        <p>Update the windowing info div.</p>
 
     </div>
 
@@ -378,8 +355,8 @@
 
 
                     <div class="param-description">
-                        <p>The windowing change event containing the new values.
-Warning: expects the windowing info div to exist (use after createWindowingDiv).</p>
+                        <p>The windowing change event containing the new values as {wc,ww}.
+Warning: expects the windowing info div to exist (use after create).</p>
 
                     </div>
 

@@ -47,7 +47,7 @@ YUI.add("yuidoc-meta", function(Y) {
         "dwv.info.MiniColourMap",
         "dwv.info.Plot",
         "dwv.info.Position",
-        "dwv.info.WindowLevel",
+        "dwv.info.Windowing",
         "dwv.io",
         "dwv.io.File",
         "dwv.io.Url",

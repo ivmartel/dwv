@@ -81,7 +81,7 @@
                                 <li><a href="../classes/dwv.info.MiniColourMap.html">dwv.info.MiniColourMap</a></li>
                                 <li><a href="../classes/dwv.info.Plot.html">dwv.info.Plot</a></li>
                                 <li><a href="../classes/dwv.info.Position.html">dwv.info.Position</a></li>
-                                <li><a href="../classes/dwv.info.WindowLevel.html">dwv.info.WindowLevel</a></li>
+                                <li><a href="../classes/dwv.info.Windowing.html">dwv.info.Windowing</a></li>
                                 <li><a href="../classes/dwv.io.html">dwv.io</a></li>
                                 <li><a href="../classes/dwv.io.File.html">dwv.io.File</a></li>
                                 <li><a href="../classes/dwv.io.Url.html">dwv.io.Url</a></li>
@@ -199,7 +199,7 @@
         <div class="args">
             <span class="paren">(</span><ul class="args-list inline commas">
                 <li class="arg">
-                        <code>app</code>
+                        <code>div</code>
                 </li>
             </ul><span class="paren">)</span>
         </div>
@@ -230,12 +230,12 @@
 
             <ul class="params-list">
                 <li class="param">
-                        <code class="param-name">app</code>
+                        <code class="param-name">div</code>
                         <span class="type">Object</span>
 
 
                     <div class="param-description">
-                        <p>The associated application.</p>
+                        <p>The HTML element to add Position info to.</p>
 
                     </div>
 
@@ -264,11 +264,11 @@
 
                     <ul class="index-list methods">
                             <li class="index-item method">
-                                <a href="#method_createPositionDiv">createPositionDiv</a>
+                                <a href="#method_create">create</a>
 
                             </li>
                             <li class="index-item method">
-                                <a href="#method_updatePositionDiv">updatePositionDiv</a>
+                                <a href="#method_update">update</a>
 
                             </li>
                     </ul>
@@ -281,16 +281,10 @@
             <div id="methods" class="api-class-tabpanel">
                 <h2 class="off-left">Methods</h2>
 
-<div id="method_createPositionDiv" class="method item">
-    <h3 class="name"><code>createPositionDiv</code></h3>
+<div id="method_create" class="method item">
+    <h3 class="name"><code>create</code></h3>
 
-        <div class="args">
-            <span class="paren">(</span><ul class="args-list inline commas">
-                <li class="arg">
-                        <code>rootId</code>
-                </li>
-            </ul><span class="paren">)</span>
-        </div>
+        <span class="paren">()</span>
 
 
 
@@ -314,29 +308,12 @@
 
     </div>
 
-        <div class="params">
-            <h4>Parameters:</h4>
-
-            <ul class="params-list">
-                <li class="param">
-                        <code class="param-name">rootId</code>
-                        <span class="type">String</span>
-
-
-                    <div class="param-description">
-                        <p>The div root ID.</p>
-
-                    </div>
-
-                </li>
-            </ul>
-        </div>
 
 
 
 </div>
-<div id="method_updatePositionDiv" class="method item">
-    <h3 class="name"><code>updatePositionDiv</code></h3>
+<div id="method_update" class="method item">
+    <h3 class="name"><code>update</code></h3>
 
         <div class="args">
             <span class="paren">(</span><ul class="args-list inline commas">
@@ -378,8 +355,9 @@
 
 
                     <div class="param-description">
-                        <p>The position change event containing the new values.
-Warning: expects the position info div to exist (use after createPositionDiv).</p>
+                        <p>The position change event containing the new values as {i,j,k}
+and optional 'value'.
+Warning: expects the position info div to exist (use after create).</p>
 
                     </div>
 

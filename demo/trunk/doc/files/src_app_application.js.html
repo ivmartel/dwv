@@ -81,7 +81,7 @@
                                 <li><a href="../classes/dwv.info.MiniColourMap.html">dwv.info.MiniColourMap</a></li>
                                 <li><a href="../classes/dwv.info.Plot.html">dwv.info.Plot</a></li>
                                 <li><a href="../classes/dwv.info.Position.html">dwv.info.Position</a></li>
-                                <li><a href="../classes/dwv.info.WindowLevel.html">dwv.info.WindowLevel</a></li>
+                                <li><a href="../classes/dwv.info.Windowing.html">dwv.info.Windowing</a></li>
                                 <li><a href="../classes/dwv.io.html">dwv.io</a></li>
                                 <li><a href="../classes/dwv.io.File.html">dwv.io.File</a></li>
                                 <li><a href="../classes/dwv.io.Url.html">dwv.io.Url</a></li>
@@ -530,8 +530,7 @@ dwv.App = function ()
         }
         
         // listen to drag&amp;drop
-        var dropBoxDivId = containerDivId + &quot;-dropBox&quot;;
-        var box = document.getElementById(dropBoxDivId);
+        var box = this.getElementByClassName(&quot;dropBox&quot;);
         if ( box ) {
             box.addEventListener(&quot;dragover&quot;, onDragOver);
             box.addEventListener(&quot;dragleave&quot;, onDragLeave);
@@ -539,8 +538,8 @@ dwv.App = function ()
             // initial size
             var size = dwv.gui.getWindowSize();
             var dropBoxSize = 2 * size.height / 3;
-            $(&quot;#&quot;+dropBoxDivId).height( dropBoxSize );
-            $(&quot;#&quot;+dropBoxDivId).width( dropBoxSize );
+            box.style.height = dropBoxSize;
+            box.style.width = dropBoxSize;
         }
         // possible load from URL
         if ( typeof config.skipLoadUrl === &quot;undefined&quot; ) {
@@ -583,7 +582,8 @@ dwv.App = function ()
      */
      this.getElementByClassName = function (className)
      {
-         return dwv.html.getElementByClassNameSonOf(containerDivId, className);
+         var parent = document.getElementById(containerDivId);
+         return dwv.html.getElementByClassNameSonOf(parent, className);
      };
 
     /**
@@ -816,8 +816,7 @@ dwv.App = function ()
 
         // resize container
         var container = this.getElementByClassName(&quot;layerContainer&quot;);
-        $(container).width(newWidth);
-        $(container).height(newHeight);
+        container.setAttribute(&quot;style&quot;,&quot;width:&quot;+newWidth+&quot;px;height:&quot;+newHeight+&quot;px&quot;);
         // resize image layer
         if ( imageLayer ) {
             imageLayer.setWidth(newWidth);
@@ -828,10 +827,9 @@ dwv.App = function ()
         // resize draw stage
         if ( drawStage ) {
             // resize div
-            var drawDivId = this.getElementByClassName(&quot;drawDiv&quot;);
-            $(drawDivId).width(newWidth);
-            $(drawDivId).height(newHeight);
-            // resize stage
+            var drawDiv = this.getElementByClassName(&quot;drawDiv&quot;);
+            drawDiv.setAttribute(&quot;style&quot;,&quot;width:&quot;+newWidth+&quot;px;height:&quot;+newHeight+&quot;px&quot;);
+           // resize stage
             drawStage.setWidth(newWidth);
             drawStage.setHeight(newHeight);
             drawStage.scale( {x: scale, y: scale} );
@@ -846,8 +844,8 @@ dwv.App = function ()
     this.toggleInfoLayerDisplay = function ()
     {
         // toggle html
-        var infoDivId = containerDivId + &quot;-infoLayer&quot;;
-        dwv.html.toggleDisplay(infoDivId);
+        var infoLayer = self.getElementByClassName(&quot;infoLayer&quot;);
+        dwv.html.toggleDisplay(infoLayer);
         // toggle listeners
         if ( isInfoLayerListening ) {
             removeImageInfoListeners();
@@ -1118,7 +1116,7 @@ dwv.App = function ()
     {
         var state = new dwv.State(self);
         // add href to link (html5)
-        var element = document.getElementById(&quot;download-state&quot;);
+        var element = self.getElementByClassName(&quot;download-state&quot;);
         element.href = &quot;data:application/json,&quot; + state.toJSON();
     };
 
@@ -1250,9 +1248,9 @@ dwv.App = function ()
         self.resetLayout();
         self.initWLDisplay();
         // update preset select
-        var select = this.getElementByClassName(&quot;presetSelect&quot;);
+        var select = self.getElementByClassName(&quot;presetSelect&quot;);
         select.selectedIndex = 0;
-        dwv.gui.refreshSelect(select);
+        dwv.gui.refreshElement(select);
     };
 
 
@@ -1454,8 +1452,7 @@ dwv.App = function ()
         event.stopPropagation();
         event.preventDefault();
         // update box 
-        var dropBoxDivId = containerDivId + &quot;-dropBox&quot;;
-        var box = document.getElementById(dropBoxDivId);
+        var box = self.getElementByClassName(&quot;dropBox&quot;);
         if ( box ) {
             box.className = &#x27;dropBox hover&#x27;;
         }
@@ -1473,8 +1470,7 @@ dwv.App = function ()
         event.stopPropagation();
         event.preventDefault();
         // update box
-        var dropBoxDivId = containerDivId + &quot;-dropBox&quot;;
-        var box = document.getElementById(dropBoxDivId);
+        var box = self.getElementByClassName(&quot;dropBox hover&quot;);
         if ( box ) {
             box.className = &#x27;dropBox&#x27;;
         }
@@ -1531,11 +1527,11 @@ dwv.App = function ()
         imageLayer.fillContext();
         imageLayer.setStyleDisplay(true);
         // draw layer
-        var drawDivId = containerDivId + &quot;-drawDiv&quot;;
-        if ( document.getElementById(drawDivId) !== null) {
+        var drawDiv = self.getElementByClassName(&quot;drawDiv&quot;);
+        if ( typeof drawDiv !== &#x27;undefined&#x27; ) {
             // create stage
             drawStage = new Kinetic.Stage({
-                container: drawDivId,
+                container: drawDiv,
                 width: dataWidth,
                 height: dataHeight,
                 listening: false
@@ -1550,8 +1546,8 @@ dwv.App = function ()
         }
         else {
             self.fitToSize( {
-                &#x27;width&#x27;: this.getElementByClassName(&quot;imageLayer&quot;).width(),
-                &#x27;height&#x27;: this.getElementByClassName(&quot;imageLayer&quot;).height() } );
+                &#x27;width&#x27;: self.getElementByClassName(&quot;imageLayer&quot;).width,
+                &#x27;height&#x27;: self.getElementByClassName(&quot;imageLayer&quot;).height } );
         }
         self.resetLayout();
     }
@@ -1610,33 +1606,36 @@ dwv.App = function ()
         }
         
         // stop box listening to drag (after first drag)
-        var dropBoxDivId = containerDivId + &quot;-dropBox&quot;;
-        var box = document.getElementById(dropBoxDivId);
+        var box = self.getElementByClassName(&quot;dropBox&quot;);
         if ( box ) {
             box.removeEventListener(&quot;dragover&quot;, onDragOver);
             box.removeEventListener(&quot;dragleave&quot;, onDragLeave);
             box.removeEventListener(&quot;drop&quot;, onDrop);
-            dwv.html.removeNode(dropBoxDivId);
+            dwv.html.removeNode(box);
             // switch listening to layerContainer
-            var div = document.getElementById(containerDivId);
+            var div = self.getElementByClassName(&quot;layerContainer&quot;);
             div.addEventListener(&quot;dragover&quot;, onDragOver);
             div.addEventListener(&quot;dragleave&quot;, onDragLeave);
             div.addEventListener(&quot;drop&quot;, onDrop);
         }
 
         // info layer
-        var infoDivId = containerDivId + &quot;-infoLayer&quot;;
-        if ( document.getElementById(infoDivId) ) {
-            windowingInfo = new dwv.info.Windowing(self);
+        var infoLayer = self.getElementByClassName(&quot;infoLayer&quot;); 
+        if ( infoLayer ) {
+            var infotr = self.getElementByClassName(&quot;infotr&quot;);
+            windowingInfo = new dwv.info.Windowing(infotr);
             windowingInfo.create();
             
-            positionInfo = new dwv.info.Position(self);
+            var infotl = self.getElementByClassName(&quot;infotl&quot;);
+            positionInfo = new dwv.info.Position(infotl);
             positionInfo.create();
             
-            miniColourMap = new dwv.info.MiniColourMap(self);
+            var infobr = self.getElementByClassName(&quot;infobr&quot;);
+            miniColourMap = new dwv.info.MiniColourMap(infobr, self);
             miniColourMap.create();
             
-            plotInfo = new dwv.info.Plot(self);
+            var plot = self.getElementByClassName(&quot;plot&quot;);
+            plotInfo = new dwv.info.Plot(plot, self);
             plotInfo.create();
             
             addImageInfoListeners();

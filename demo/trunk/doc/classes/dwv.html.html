@@ -81,7 +81,7 @@
                                 <li><a href="../classes/dwv.info.MiniColourMap.html">dwv.info.MiniColourMap</a></li>
                                 <li><a href="../classes/dwv.info.Plot.html">dwv.info.Plot</a></li>
                                 <li><a href="../classes/dwv.info.Position.html">dwv.info.Position</a></li>
-                                <li><a href="../classes/dwv.info.WindowLevel.html">dwv.info.WindowLevel</a></li>
+                                <li><a href="../classes/dwv.info.Windowing.html">dwv.info.Windowing</a></li>
                                 <li><a href="../classes/dwv.io.html">dwv.io</a></li>
                                 <li><a href="../classes/dwv.io.File.html">dwv.io.File</a></li>
                                 <li><a href="../classes/dwv.io.Url.html">dwv.io.Url</a></li>
@@ -218,11 +218,6 @@
                                     <span class="flag static">static</span>
                             </li>
                             <li class="index-item method">
-                                <a href="#method_appendElement">appendElement</a>
-
-                                    <span class="flag static">static</span>
-                            </li>
-                            <li class="index-item method">
                                 <a href="#method_appendHCell">appendHCell</a>
 
                                     <span class="flag static">static</span>
@@ -289,6 +284,11 @@
                             </li>
                             <li class="index-item method">
                                 <a href="#method_filterTable">filterTable</a>
+
+                                    <span class="flag static">static</span>
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_getElementByClassNameSonOf">getElementByClassNameSonOf</a>
 
                                     <span class="flag static">static</span>
                             </li>
@@ -407,76 +407,7 @@
         <div class="args">
             <span class="paren">(</span><ul class="args-list inline commas">
                 <li class="arg">
-                        <code>parentId</code>
-                </li>
-                <li class="arg">
-                        <code>element</code>
-                </li>
-            </ul><span class="paren">)</span>
-        </div>
-
-
-
-
-
-        <span class="flag static">static</span>
-
-
-
-    <div class="meta">
-                <p>
-                Defined in
-        <a href="../files/src_gui_html.js.html#l647"><code>src&#x2F;gui&#x2F;html.js:647</code></a>
-        </p>
-
-
-
-    </div>
-
-    <div class="description">
-        <p>Get an element by className inside of an element with parentId.</p>
-
-    </div>
-
-        <div class="params">
-            <h4>Parameters:</h4>
-
-            <ul class="params-list">
-                <li class="param">
-                        <code class="param-name">parentId</code>
-                        <span class="type">Number</span>
-
-
-                    <div class="param-description">
-                        <p>The id of the element to append to.</p>
-
-                    </div>
-
-                </li>
-                <li class="param">
-                        <code class="param-name">element</code>
-                        <span class="type">Object</span>
-
-
-                    <div class="param-description">
-                        <p>The element to append.</p>
-
-                    </div>
-
-                </li>
-            </ul>
-        </div>
-
-
-
-</div>
-<div id="method_appendElement" class="method item">
-    <h3 class="name"><code>appendElement</code></h3>
-
-        <div class="args">
-            <span class="paren">(</span><ul class="args-list inline commas">
-                <li class="arg">
-                        <code>parentId</code>
+                        <code>parent</code>
                 </li>
                 <li class="arg">
                         <code>element</code>
@@ -512,12 +443,12 @@
 
             <ul class="params-list">
                 <li class="param">
-                        <code class="param-name">parentId</code>
-                        <span class="type">Number</span>
+                        <code class="param-name">parent</code>
+                        <span class="type">Object</span>
 
 
                     <div class="param-description">
-                        <p>The id of the element to append to.</p>
+                        <p>The HTML element to append to.</p>
 
                     </div>
 
@@ -528,7 +459,7 @@
 
 
                     <div class="param-description">
-                        <p>The element to append.</p>
+                        <p>The HTML element to append.</p>
 
                     </div>
 
@@ -990,7 +921,7 @@
                         <code>type</code>
                 </li>
                 <li class="arg">
-                        <code>id</code>
+                        <code>className</code>
                 </li>
             </ul><span class="paren">)</span>
         </div>
@@ -1006,7 +937,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_gui_html.js.html#l663"><code>src&#x2F;gui&#x2F;html.js:663</code></a>
+        <a href="../files/src_gui_html.js.html#l661"><code>src&#x2F;gui&#x2F;html.js:661</code></a>
         </p>
 
 
@@ -1034,12 +965,12 @@
 
                 </li>
                 <li class="param">
-                        <code class="param-name">id</code>
-                        <span class="type">Number</span>
+                        <code class="param-name">className</code>
+                        <span class="type">String</span>
 
 
                     <div class="param-description">
-                        <p>The id of the element</p>
+                        <p>The className of the element.</p>
 
                     </div>
 
@@ -1145,7 +1076,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_gui_html.js.html#l360"><code>src&#x2F;gui&#x2F;html.js:360</code></a>
+        <a href="../files/src_gui_html.js.html#l366"><code>src&#x2F;gui&#x2F;html.js:366</code></a>
         </p>
 
 
@@ -1225,7 +1156,7 @@ It is left to the user to set the 'onchange' method of the select.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_gui_html.js.html#l427"><code>src&#x2F;gui&#x2F;html.js:427</code></a>
+        <a href="../files/src_gui_html.js.html#l433"><code>src&#x2F;gui&#x2F;html.js:433</code></a>
         </p>
 
 
@@ -1295,7 +1226,7 @@ be an array of base + each key.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_gui_html.js.html#l545"><code>src&#x2F;gui&#x2F;html.js:545</code></a>
+        <a href="../files/src_gui_html.js.html#l551"><code>src&#x2F;gui&#x2F;html.js:551</code></a>
         </p>
 
 
@@ -1367,7 +1298,7 @@ be an array of base + each key.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_gui_html.js.html#l513"><code>src&#x2F;gui&#x2F;html.js:513</code></a>
+        <a href="../files/src_gui_html.js.html#l519"><code>src&#x2F;gui&#x2F;html.js:519</code></a>
         </p>
 
 
@@ -1485,7 +1416,7 @@ into its original 'preText term postText'.</p>
         <div class="args">
             <span class="paren">(</span><ul class="args-list inline commas">
                 <li class="arg">
-                        <code>id</code>
+                        <code>element</code>
                 </li>
                 <li class="arg">
                         <code>flag</code>
@@ -1504,7 +1435,7 @@ into its original 'preText term postText'.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_gui_html.js.html#l595"><code>src&#x2F;gui&#x2F;html.js:595</code></a>
+        <a href="../files/src_gui_html.js.html#l601"><code>src&#x2F;gui&#x2F;html.js:601</code></a>
         </p>
 
 
@@ -1521,12 +1452,12 @@ into its original 'preText term postText'.</p>
 
             <ul class="params-list">
                 <li class="param">
-                        <code class="param-name">id</code>
-                        <span class="type">Number</span>
+                        <code class="param-name">element</code>
+                        <span class="type">Object</span>
 
 
                     <div class="param-description">
-                        <p>The id of the element to toggle its display.</p>
+                        <p>The HTML element to display.</p>
 
                     </div>
 
@@ -1608,6 +1539,75 @@ true or false if it contains the term.</p>
 
                     <div class="param-description">
                         <p>The table to filter.</p>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+
+</div>
+<div id="method_getElementByClassNameSonOf" class="method item">
+    <h3 class="name"><code>getElementByClassNameSonOf</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>parent</code>
+                </li>
+                <li class="arg">
+                        <code>element</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+
+
+        <span class="flag static">static</span>
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/src_gui_html.js.html#l644"><code>src&#x2F;gui&#x2F;html.js:644</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Get an element by className inside of an element with parentId.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">parent</code>
+                        <span class="type">Object</span>
+
+
+                    <div class="param-description">
+                        <p>The HTML node to search.</p>
+
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name">element</code>
+                        <span class="type">Object</span>
+
+
+                    <div class="param-description">
+                        <p>The element to append.</p>
 
                     </div>
 
@@ -1710,7 +1710,7 @@ true or false if it contains the term.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_gui_html.js.html#l404"><code>src&#x2F;gui&#x2F;html.js:404</code></a>
+        <a href="../files/src_gui_html.js.html#l410"><code>src&#x2F;gui&#x2F;html.js:410</code></a>
         </p>
 
 
@@ -1887,7 +1887,7 @@ around each search term.</p>
         <div class="args">
             <span class="paren">(</span><ul class="args-list inline commas">
                 <li class="arg">
-                        <code>id</code>
+                        <code>element</code>
                 </li>
             </ul><span class="paren">)</span>
         </div>
@@ -1903,7 +1903,7 @@ around each search term.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_gui_html.js.html#l610"><code>src&#x2F;gui&#x2F;html.js:610</code></a>
+        <a href="../files/src_gui_html.js.html#l613"><code>src&#x2F;gui&#x2F;html.js:613</code></a>
         </p>
 
 
@@ -1920,12 +1920,12 @@ around each search term.</p>
 
             <ul class="params-list">
                 <li class="param">
-                        <code class="param-name">id</code>
-                        <span class="type">Number</span>
+                        <code class="param-name">element</code>
+                        <span class="type">Object</span>
 
 
                     <div class="param-description">
-                        <p>The id of the element to toggle its display.</p>
+                        <p>The HTML element to display.</p>
 
                     </div>
 
