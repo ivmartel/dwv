@@ -6,14 +6,14 @@
 dwv.browser.check();
 
 // launch when page is loaded
-$(document).ready( function()
+document.addEventListener("DOMContentLoaded", function (/*event*/)
 {
     // main application
     var myapp = new dwv.App();
     // initialise the application
     myapp.init({
         "containerDivId": "dwv-0",
-        "fitToWindow": true,
+        "fitToWindow": false,
         "tools": ["Scroll", "Zoom/Pan", "Window/Level"],
         "gui": ["tool"],
         "isMobile": true
@@ -25,7 +25,7 @@ $(document).ready( function()
     // initialise the application
     myapp1.init({
         "containerDivId": "dwv-1",
-        "fitToWindow": true,
+        "fitToWindow": false,
         "tools": ["Scroll", "Zoom/Pan", "Window/Level"],
         "gui": ["tool"],
         "isMobile": true

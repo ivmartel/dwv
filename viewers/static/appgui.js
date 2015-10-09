@@ -120,7 +120,7 @@ dwv.gui.Toolbox = function (app)
         help.appendChild(document.createTextNode("Help"));
         help.onclick = function() { toggle("#help"); };
     
-        var node = document.getElementById("toolbar");
+        var node = app.getElementByClassName("toolbar");
         node.appendChild(open);
         node.appendChild(toolbox);
         node.appendChild(history);

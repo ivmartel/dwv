@@ -12,11 +12,20 @@ dwv.tool.defaultpresets.CT = {
 };
 
 // Window
-dwv.gui.getWindowSize = dwv.gui.base.getWindowSize;
+dwv.gui.getWindowSize = function () {
+    return { 'width': ($(window).width()), 'height': ($(window).height() - 147) };
+};
 // Progress
 dwv.gui.displayProgress = dwv.gui.base.displayProgress;
 // Select
-dwv.gui.refreshElement = dwv.gui.base.refreshElement;
+dwv.gui.refreshElement = function (element) {
+    if( $(element)[0].nodeName.toLowerCase() === 'select' ) {
+        $(element).selectmenu('refresh');
+    }
+    else {
+        $(element).enhanceWithin();
+    }
+};
 // Slider
 dwv.gui.Slider = dwv.gui.base.Slider;
 // Tags table
@@ -25,12 +34,8 @@ dwv.gui.DicomTags = dwv.gui.base.DicomTags;
 // Toolbox 
 dwv.gui.Toolbox = function (app)
 {
-    var base = new dwv.gui.base.Toolbox(app);
-    
     this.setup = function (/*list*/)
     {
-        //base.setup(list);
-        
         var mainFieldset = document.createElement("fieldset");
         mainFieldset.className = "mainfieldset";
         mainFieldset.setAttribute("data-role", "controlgroup");
@@ -49,14 +54,12 @@ dwv.gui.Toolbox = function (app)
         dwv.gui.refreshElement(node);
     };
     
-    this.display = function (bool)
+    this.display = function (/*bool*/)
     {
-        base.display(bool);
+        // does nothing...
     };
     this.initialise = function (list)
     {
-        //base.initialise(list);
-        
         // not wonderful: first one should be scroll...
         if ( list[0] === false ) {
             var inputScroll = app.getElementByClassName("scrollLi");
@@ -76,12 +79,8 @@ dwv.gui.Toolbox = function (app)
 // Window/level
 dwv.gui.WindowLevel = function (app)
 {
-    //var base = new dwv.gui.base.WindowLevel(app);
-    
     this.setup = function ()
     {
-        //base.setup();
-        
         var input = document.createElement("input");
         input.className = "wlLi";
         input.name = "radio-choice";
@@ -100,12 +99,10 @@ dwv.gui.WindowLevel = function (app)
     };
     this.display = function (/*bool*/)
     {
-        //base.display(bool);
+        // does nothing...
     };
     this.initialise = function ()
     {
-        //base.initialise();
-        
         // clear previous
         dwv.html.removeNode(app.getElementByClassName("presetSelect"));
         dwv.html.removeNode(app.getElementByClassName("presetLabel"));
@@ -131,8 +128,6 @@ dwv.gui.WindowLevel = function (app)
 // Zoom
 dwv.gui.ZoomAndPan = function (app)
 {
-    //var base = new dwv.gui.base.ZoomAndPan(app);
-    
     this.setup = function ()
     {
         var input = document.createElement("input");
@@ -153,15 +148,13 @@ dwv.gui.ZoomAndPan = function (app)
     };
     this.display = function (/*bool*/)
     {
-        //base.display(bool);
+        // does nothing...
     };
 };
 
 // Scroll
 dwv.gui.Scroll = function (app)
 {
-    //var base = new dwv.gui.base.Scroll(app);
-    
     this.setup = function ()
     {
         var input = document.createElement("input");
@@ -183,7 +176,7 @@ dwv.gui.Scroll = function (app)
     };
     this.display = function (/*bool*/)
     {
-        //base.display(bool);
+        // does nothing...
     };
 };
 

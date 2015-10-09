@@ -25,7 +25,7 @@ dwv.gui.base = dwv.gui.base || {};
  */
 dwv.gui.base.getWindowSize = function()
 {
-    return { 'width': ($(window).width()), 'height': ($(window).height() - 147) };
+    return { 'width': window.innerWidth, 'height': window.innerHeight - 147 };
 };
 
 /**

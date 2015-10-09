@@ -85,6 +85,9 @@ body { background-color: #222; color: white;
 
 <body>
 
+<!-- DWV -->
+<div id="dwv">
+
 <div id="pageHeader">
 
 <!-- Title -->
@@ -93,7 +96,7 @@ body { background-color: #222; color: white;
 <span class="dwv-version"></span>)</h1>
 
 <!-- Toolbar -->
-<div id="toolbar"></div>
+<div class="toolbar"></div>
 
 </div><!-- /pageHeader -->
 
@@ -106,9 +109,7 @@ body { background-color: #222; color: white;
 </div>
 
 <!-- Toolbox -->
-<div id="toolbox" title="Toolbox">
-<ul id="toolList"></ul>
-</div>
+<div class="toolList"></div> 
 
 <!-- History -->
 <div id="history" title="History"></div>
@@ -121,20 +122,22 @@ body { background-color: #222; color: white;
 
 <!-- Layer Container -->
 <div id="layerDialog" title="Image">
-<div id="dwv-dropBox" class="dropBox"></div>
-<div id="dwv" class="layerContainer">
-<canvas id="dwv-imageLayer" class="imageLayer">Only for HTML5 compatible browsers...</canvas>
-<div id="dwv-drawDiv" class="drawDiv"></div>
-<div id="dwv-infoLayer" class="infoLayer">
-<div id="dwv-infotl" class="infotl"></div>
-<div id="dwv-infotr" class="infotr"></div>
-<div id="dwv-infobl" class="infobl"></div>
-<div id="dwv-infobr" class="infobr"><div id="dwv-plot" class="plot"></div></div>
+<div class="dropBox"></div>
+<div class="layerContainer">
+<canvas class="imageLayer">Only for HTML5 compatible browsers...</canvas>
+<div class="drawDiv"></div>
+<div class="infoLayer">
+<div class="infotl"></div>
+<div class="infotr"></div>
+<div class="infobl"></div>
+<div class="infobr"><div class="plot"></div></div>
 </div><!-- /infoLayer -->
 </div><!-- /layerContainer -->
 </div><!-- /layerDialog -->
 
 </div><!-- /pageMain -->
+
+</div><!-- /dwv -->
 
 </body>
 </html>

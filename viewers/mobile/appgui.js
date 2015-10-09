@@ -25,7 +25,9 @@ dwv.tool.defaultpresets.CT = {
 };
 
 // Window
-dwv.gui.getWindowSize = dwv.gui.base.getWindowSize;
+dwv.gui.getWindowSize = function () {
+    return { 'width': ($(window).width()), 'height': ($(window).height() - 147) };
+};
 // Progress
 dwv.gui.displayProgress = dwv.gui.base.displayProgress;
 // refresh

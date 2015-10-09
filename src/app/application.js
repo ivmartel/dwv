@@ -351,8 +351,7 @@ dwv.App = function ()
         }
         
         // listen to drag&drop
-        var dropBoxDivId = containerDivId + "-dropBox";
-        var box = this.getElementByClassName(dropBoxDivId);
+        var box = this.getElementByClassName("dropBox");
         if ( box ) {
             box.addEventListener("dragover", onDragOver);
             box.addEventListener("dragleave", onDragLeave);
@@ -360,8 +359,8 @@ dwv.App = function ()
             // initial size
             var size = dwv.gui.getWindowSize();
             var dropBoxSize = 2 * size.height / 3;
-            $("#"+dropBoxDivId).height( dropBoxSize );
-            $("#"+dropBoxDivId).width( dropBoxSize );
+            box.style.height = dropBoxSize;
+            box.style.width = dropBoxSize;
         }
         // possible load from URL
         if ( typeof config.skipLoadUrl === "undefined" ) {
@@ -638,8 +637,7 @@ dwv.App = function ()
 
         // resize container
         var container = this.getElementByClassName("layerContainer");
-        $(container).width(newWidth);
-        $(container).height(newHeight);
+        container.setAttribute("style","width:"+newWidth+"px;height:"+newHeight+"px");
         // resize image layer
         if ( imageLayer ) {
             imageLayer.setWidth(newWidth);
@@ -650,10 +648,9 @@ dwv.App = function ()
         // resize draw stage
         if ( drawStage ) {
             // resize div
-            var drawDivId = this.getElementByClassName("drawDiv");
-            $(drawDivId).width(newWidth);
-            $(drawDivId).height(newHeight);
-            // resize stage
+            var drawDiv = this.getElementByClassName("drawDiv");
+            drawDiv.setAttribute("style","width:"+newWidth+"px;height:"+newHeight+"px");
+           // resize stage
             drawStage.setWidth(newWidth);
             drawStage.setHeight(newHeight);
             drawStage.scale( {x: scale, y: scale} );
@@ -1072,7 +1069,7 @@ dwv.App = function ()
         self.resetLayout();
         self.initWLDisplay();
         // update preset select
-        var select = this.getElementByClassName("presetSelect");
+        var select = self.getElementByClassName("presetSelect");
         select.selectedIndex = 0;
         dwv.gui.refreshElement(select);
     };
@@ -1370,8 +1367,8 @@ dwv.App = function ()
         }
         else {
             self.fitToSize( {
-                'width': this.getElementByClassName("imageLayer").width(),
-                'height': this.getElementByClassName("imageLayer").height() } );
+                'width': self.getElementByClassName("imageLayer").width,
+                'height': self.getElementByClassName("imageLayer").height } );
         }
         self.resetLayout();
     }
