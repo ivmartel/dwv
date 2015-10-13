@@ -190,14 +190,14 @@ dwv.tool = dwv.tool || {};
  * @namespace dwv.tool
  * @constructor
  */
-dwv.tool.UndoStack = function ()
+dwv.tool.UndoStack = function (app)
 { 
     /**
      * Undo GUI.
      * @property gui
      * @type Object
      */
-    var gui = new dwv.gui.Undo();
+    var gui = new dwv.gui.Undo(app);
     /**
      * Array of commands.
      * @property stack

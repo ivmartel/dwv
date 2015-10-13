@@ -210,7 +210,7 @@ dwv.gui.base.appendVersionHtml = function (version)
  * @method appendHelpHtml
  * @param {Boolean} mobile Flag for mobile or not environement.
  */
-dwv.gui.base.appendHelpHtml = function(toolList, mobile)
+dwv.gui.base.appendHelpHtml = function(toolList, mobile, app)
 {
     var actionType = &quot;mouse&quot;;
     if( mobile ) {
@@ -271,13 +271,13 @@ dwv.gui.base.appendHelpHtml = function(toolList, mobile)
         }
         else
         {
-            toolHelpDiv.id = &quot;accordion&quot;;
+            toolHelpDiv.className = &quot;accordion&quot;;
             toolHelpDiv.appendChild(title);
             toolHelpDiv.appendChild(docDiv);
         }
     }
     
-    var helpNode = document.getElementById(&quot;help&quot;);
+    var helpNode = app.getElement(&quot;help&quot;);
 
     var dwvLink = document.createElement(&quot;a&quot;);
     dwvLink.href = &quot;https://github.com/ivmartel/dwv/wiki&quot;;

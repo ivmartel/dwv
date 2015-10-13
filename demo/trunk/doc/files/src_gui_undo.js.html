@@ -197,7 +197,7 @@ dwv.gui.base = dwv.gui.base || {};
  * @namespace dwv.gui.base
  * @constructor
  */
-dwv.gui.base.Undo = function ()
+dwv.gui.base.Undo = function (app)
 {
     /**
      * Setup the undo HTML.
@@ -211,19 +211,21 @@ dwv.gui.base.Undo = function ()
         paragraph.appendChild(document.createElement(&quot;br&quot;));
         
         var select = document.createElement(&quot;select&quot;);
-        select.id = &quot;history_list&quot;;
+        select.className = &quot;history_list&quot;;
         select.name = &quot;history_list&quot;;
         select.multiple = &quot;multiple&quot;;
         paragraph.appendChild(select);
     
         // node
-        var node = document.getElementById(&quot;history&quot;);
+        var node = app.getElement(&quot;history&quot;);
         // clear it
         while(node.hasChildNodes()) {
             node.removeChild(node.firstChild);
         }
         // append
         node.appendChild(paragraph);
+        // refresh
+        dwv.gui.refreshElement(node);
     };
     
     /**
@@ -232,13 +234,15 @@ dwv.gui.base.Undo = function ()
      */
     this.initialise = function ()
     {
-        var select = document.getElementById(&quot;history_list&quot;);
+        var select = app.getElement(&quot;history_list&quot;);
         if ( select &amp;&amp; select.length !== 0 ) {
             for( var i = select.length - 1; i &gt;= 0; --i)
             {
                 select.remove(i);
             }
         }
+        // refresh
+        dwv.gui.refreshElement(select);
     };
     
     /**
@@ -248,7 +252,7 @@ dwv.gui.base.Undo = function ()
      */
     this.addCommandToUndoHtml = function (commandName)
     {
-        var select = document.getElementById(&quot;history_list&quot;);
+        var select = app.getElement(&quot;history_list&quot;);
         // remove undone commands
         var count = select.length - (select.selectedIndex+1);
         if( count &gt; 0 )
@@ -265,6 +269,8 @@ dwv.gui.base.Undo = function ()
         select.add(option);
         // increment selected index
         select.selectedIndex++;
+        // refresh
+        dwv.gui.refreshElement(select);
     };
     
     /**
@@ -274,7 +280,7 @@ dwv.gui.base.Undo = function ()
      */
     this.enableInUndoHtml = function (enable)
     {
-        var select = document.getElementById(&quot;history_list&quot;);
+        var select = app.getElement(&quot;history_list&quot;);
         // enable or not (order is important)
         var option;
         if( enable ) 
@@ -293,6 +299,8 @@ dwv.gui.base.Undo = function ()
             // decrement selected index
             select.selectedIndex--;
         }
+        // refresh
+        dwv.gui.refreshElement(select);
     };
 
 }; // class dwv.gui.base.Undo

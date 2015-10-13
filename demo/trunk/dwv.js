@@ -128,13 +128,6 @@ dwv.App = function ()
     this.getNSlicesToLoad = function () { return nSlicesToLoad; };
 
     /** 
-     * Get the container div id.
-     * @method getContainerDivId
-     * @return {String} The div id.
-     */
-    this.getContainerDivId = function () { return containerDivId; };
-
-    /** 
      * Get the main scale.
      * @method getScale
      * @return {Number} The main scale.
@@ -329,12 +322,12 @@ dwv.App = function ()
             }
             // undo
             if ( config.gui.indexOf("undo") !== -1 ) {
-                undoStack = new dwv.tool.UndoStack();
+                undoStack = new dwv.tool.UndoStack(this);
                 undoStack.setup();
             }
             // DICOM Tags
             if ( config.gui.indexOf("tags") !== -1 ) {
-                tagsGui = new dwv.gui.DicomTags();
+                tagsGui = new dwv.gui.DicomTags(this);
             }
             // version number
             if ( config.gui.indexOf("version") !== -1 ) {
@@ -346,12 +339,12 @@ dwv.App = function ()
                 if ( config.isMobile ) {
                     isMobile = config.isMobile;
                 }
-                dwv.gui.appendHelpHtml( toolbox.getToolList(), isMobile );
+                dwv.gui.appendHelpHtml( toolbox.getToolList(), isMobile, this );
             }
         }
         
         // listen to drag&drop
-        var box = this.getElementByClassName("dropBox");
+        var box = this.getElement("dropBox");
         if ( box ) {
             box.addEventListener("dragover", onDragOver);
             box.addEventListener("dragleave", onDragLeave);
@@ -396,15 +389,14 @@ dwv.App = function ()
     };
     
     /**
-     * Get a html element that is inside the containerDivId from its class name.
-     * @method getElementByClassName
-     * @param className The class of the element to search.
-     * @return The list of found elements.
+     * Get a HTML element associated to the application.
+     * @method getElement
+     * @param name The name or id to find.
+     * @return The found element or null.
      */
-     this.getElementByClassName = function (className)
+     this.getElement = function (name)
      {
-         var parent = document.getElementById(containerDivId);
-         return dwv.html.getElementByClassNameSonOf(parent, className);
+         return dwv.gui.getElement(containerDivId, name);
      };
 
     /**
@@ -427,7 +419,7 @@ dwv.App = function ()
         nSlicesToLoad = 0;
         // reset undo/redo
         if ( undoStack ) {
-            undoStack = new dwv.tool.UndoStack();
+            undoStack = new dwv.tool.UndoStack(this);
             undoStack.initialise();
         }
     };
@@ -636,7 +628,7 @@ dwv.App = function ()
         style.setScale(windowScale);
 
         // resize container
-        var container = this.getElementByClassName("layerContainer");
+        var container = this.getElement("layerContainer");
         container.setAttribute("style","width:"+newWidth+"px;height:"+newHeight+"px");
         // resize image layer
         if ( imageLayer ) {
@@ -648,7 +640,7 @@ dwv.App = function ()
         // resize draw stage
         if ( drawStage ) {
             // resize div
-            var drawDiv = this.getElementByClassName("drawDiv");
+            var drawDiv = this.getElement("drawDiv");
             drawDiv.setAttribute("style","width:"+newWidth+"px;height:"+newHeight+"px");
            // resize stage
             drawStage.setWidth(newWidth);
@@ -665,7 +657,7 @@ dwv.App = function ()
     this.toggleInfoLayerDisplay = function ()
     {
         // toggle html
-        var infoLayer = self.getElementByClassName("infoLayer");
+        var infoLayer = self.getElement("infoLayer");
         dwv.html.toggleDisplay(infoLayer);
         // toggle listeners
         if ( isInfoLayerListening ) {
@@ -937,7 +929,7 @@ dwv.App = function ()
     {
         var state = new dwv.State(self);
         // add href to link (html5)
-        var element = self.getElementByClassName("download-state");
+        var element = self.getElement("download-state");
         element.href = "data:application/json," + state.toJSON();
     };
 
@@ -1069,7 +1061,7 @@ dwv.App = function ()
         self.resetLayout();
         self.initWLDisplay();
         // update preset select
-        var select = self.getElementByClassName("presetSelect");
+        var select = self.getElement("presetSelect");
         select.selectedIndex = 0;
         dwv.gui.refreshElement(select);
     };
@@ -1273,7 +1265,7 @@ dwv.App = function ()
         event.stopPropagation();
         event.preventDefault();
         // update box 
-        var box = self.getElementByClassName("dropBox");
+        var box = self.getElement("dropBox");
         if ( box ) {
             box.className = 'dropBox hover';
         }
@@ -1291,7 +1283,7 @@ dwv.App = function ()
         event.stopPropagation();
         event.preventDefault();
         // update box
-        var box = self.getElementByClassName("dropBox hover");
+        var box = self.getElement("dropBox hover");
         if ( box ) {
             box.className = 'dropBox';
         }
@@ -1343,13 +1335,14 @@ dwv.App = function ()
     function createLayers(dataWidth, dataHeight)
     {
         // image layer
-        imageLayer = new dwv.html.Layer(self.getElementByClassName("imageLayer"));
+        var canImgLay = self.getElement("imageLayer");
+        imageLayer = new dwv.html.Layer(canImgLay);
         imageLayer.initialise(dataWidth, dataHeight);
         imageLayer.fillContext();
         imageLayer.setStyleDisplay(true);
         // draw layer
-        var drawDiv = self.getElementByClassName("drawDiv");
-        if ( typeof drawDiv !== 'undefined' ) {
+        var drawDiv = self.getElement("drawDiv");
+        if ( drawDiv ) {
             // create stage
             drawStage = new Kinetic.Stage({
                 container: drawDiv,
@@ -1367,8 +1360,8 @@ dwv.App = function ()
         }
         else {
             self.fitToSize( {
-                'width': self.getElementByClassName("imageLayer").width,
-                'height': self.getElementByClassName("imageLayer").height } );
+                'width': self.getElement("imageLayer").width,
+                'height': self.getElement("imageLayer").height } );
         }
         self.resetLayout();
     }
@@ -1427,35 +1420,35 @@ dwv.App = function ()
         }
         
         // stop box listening to drag (after first drag)
-        var box = self.getElementByClassName("dropBox");
+        var box = self.getElement("dropBox");
         if ( box ) {
             box.removeEventListener("dragover", onDragOver);
             box.removeEventListener("dragleave", onDragLeave);
             box.removeEventListener("drop", onDrop);
             dwv.html.removeNode(box);
             // switch listening to layerContainer
-            var div = self.getElementByClassName("layerContainer");
+            var div = self.getElement("layerContainer");
             div.addEventListener("dragover", onDragOver);
             div.addEventListener("dragleave", onDragLeave);
             div.addEventListener("drop", onDrop);
         }
 
         // info layer
-        var infoLayer = self.getElementByClassName("infoLayer"); 
+        var infoLayer = self.getElement("infoLayer"); 
         if ( infoLayer ) {
-            var infotr = self.getElementByClassName("infotr");
+            var infotr = self.getElement("infotr");
             windowingInfo = new dwv.info.Windowing(infotr);
             windowingInfo.create();
             
-            var infotl = self.getElementByClassName("infotl");
+            var infotl = self.getElement("infotl");
             positionInfo = new dwv.info.Position(infotl);
             positionInfo.create();
             
-            var infobr = self.getElementByClassName("infobr");
+            var infobr = self.getElement("infobr");
             miniColourMap = new dwv.info.MiniColourMap(infobr, self);
             miniColourMap.create();
             
-            var plot = self.getElementByClassName("plot");
+            var plot = self.getElement("plot");
             plotInfo = new dwv.info.Plot(plot, self);
             plotInfo.create();
             
@@ -7607,7 +7600,7 @@ dwv.gui.base.Filter = function (app)
         filterLi.appendChild(filterSelector);
         
         // append element
-        var node = app.getElementByClassName("toolList");
+        var node = app.getElement("toolList");
         dwv.html.appendElement(node, filterLi);
     };
     
@@ -7618,7 +7611,7 @@ dwv.gui.base.Filter = function (app)
      */
     this.display = function (flag)
     {
-        var node = app.getElementByClassName("filterLi");
+        var node = app.getElement("filterLi");
         dwv.html.displayElement(node, flag);
     };
     
@@ -7629,7 +7622,7 @@ dwv.gui.base.Filter = function (app)
     this.initialise = function ()
     {
         // filter select: reset selected options
-        var filterSelector = app.getElementByClassName("filterSelect");
+        var filterSelector = app.getElement("filterSelect");
         filterSelector.selectedIndex = 0;
         // refresh
         dwv.gui.refreshElement(filterSelector);
@@ -7664,7 +7657,7 @@ dwv.gui.base.Threshold = function (app)
         thresholdLi.className += " ui-block-c";
         
         // node
-        var node = app.getElementByClassName("toolList");
+        var node = app.getElement("toolList");
         // append threshold
         node.appendChild(thresholdLi);
         // threshold slider
@@ -7680,7 +7673,7 @@ dwv.gui.base.Threshold = function (app)
      */
     this.display = function (flag)
     {
-        var node = app.getElementByClassName("thresholdLi");
+        var node = app.getElement("thresholdLi");
         dwv.html.displayElement(node, flag);
     };
     
@@ -7731,7 +7724,7 @@ dwv.gui.base.Sharpen = function (app)
         sharpenLi.className += " ui-block-c";
         sharpenLi.appendChild( dwv.gui.filter.base.createFilterApplyButton(app) );
         // append element
-        var node = app.getElementByClassName("toolList");
+        var node = app.getElement("toolList");
         dwv.html.appendElement(node, sharpenLi);
     };
     
@@ -7742,7 +7735,7 @@ dwv.gui.base.Sharpen = function (app)
      */
     this.display = function (flag)
     {
-        var node = app.getElementByClassName("sharpenLi");
+        var node = app.getElement("sharpenLi");
         dwv.html.displayElement(node, flag);
     };
     
@@ -7767,7 +7760,7 @@ dwv.gui.base.Sobel = function (app)
         sobelLi.className += " ui-block-c";
         sobelLi.appendChild( dwv.gui.filter.base.createFilterApplyButton(app) );
         // append element
-        var node = app.getElementByClassName("toolList");
+        var node = app.getElement("toolList");
         dwv.html.appendElement(node, sobelLi);
     };
     
@@ -7778,7 +7771,7 @@ dwv.gui.base.Sobel = function (app)
      */
     this.display = function (flag)
     {
-        var node = app.getElementByClassName("sobelLi");
+        var node = app.getElement("sobelLi");
         dwv.html.displayElement(node, flag);
     };
     
@@ -7848,6 +7841,29 @@ dwv.gui.base.displayProgress = function(percent)
 };
 
 /**
+ * Get a HTML element associated to a container div.
+ * @method getElement
+ * @static
+ * @param containerDivId The id of the container div.
+ * @param name The name or id to find.
+ * @return The found element or null.
+ */
+dwv.gui.base.getElement = function (containerDivId, name)
+{
+    // get by class in the container div
+    var parent = document.getElementById(containerDivId);
+    var elements = parent.getElementsByClassName(name);
+    // getting the last element since some libraries (ie jquery-mobile) creates
+    // span in front of regular tags (such as select)...
+    var element = elements[elements.length-1];
+    // if not found get by id with 'containerDivId-className'
+    if ( typeof element === "undefined" ) {
+        element = document.getElementById(containerDivId + '-' + name);
+    }
+    return element;
+ };
+
+ /**
  * Refresh a HTML element. Mainly for jquery-mobile.
  * @method refreshElement
  * @static
@@ -7920,7 +7936,7 @@ dwv.gui.base.Slider = function (app)
         div.appendChild(inputMax);
         div.setAttribute("data-mini", "true");
         // append to document
-        app.getElementByClassName("thresholdLi").appendChild(div);
+        app.getElement("thresholdLi").appendChild(div);
         // bind change
         $("#threshold-div").on("change",
                 function(/*event*/) {
@@ -7929,8 +7945,8 @@ dwv.gui.base.Slider = function (app)
                           "max":$("#threshold-max").val() } );
                 }
             );
-        // trigger creation
-        $("#toolList").trigger("create");
+        // refresh
+        dwv.gui.refreshElement(app.getElement("toolList"));
     };
     
     /**
@@ -7953,7 +7969,7 @@ dwv.gui.base.Slider = function (app)
         inputMax.min = min;
         inputMax.value = max;
         // trigger creation
-        $("#toolList").trigger("create");
+        dwv.gui.refreshElement(app.getElement("toolList"));
     };
 
 }; // class dwv.gui.base.Slider
@@ -7964,7 +7980,7 @@ dwv.gui.base.Slider = function (app)
  * @namespace dwv.gui.base
  * @constructor
  */
-dwv.gui.base.DicomTags = function ()
+dwv.gui.base.DicomTags = function (app)
 {
     /**
      * Initialise the DICOM tags table. To be called once the DICOM has been parsed.
@@ -7974,7 +7990,7 @@ dwv.gui.base.DicomTags = function ()
     this.initialise = function (dataInfo)
     {
         // HTML node
-        var node = document.getElementById("tags");
+        var node = app.getElement("tags");
         if( node === null ) {
             return;
         }
@@ -7988,16 +8004,16 @@ dwv.gui.base.DicomTags = function ()
         }
         // tags HTML table
         var table = dwv.html.toTable(dataInfo);
-        table.id = "tagsTable";
-        table.setAttribute("class", "tagsList");
+        table.className = "tagsTable";
+        //table.setAttribute("class", "tagsList");
         table.setAttribute("data-role", "table");
         table.setAttribute("data-mode", "columntoggle");
         // search form
         node.appendChild(dwv.html.getHtmlSearchForm(table));
         // tags table
         node.appendChild(table);
-        // trigger create event (mobile)
-        $("#tags").trigger("create");
+        // refresh
+        dwv.gui.refreshElement(node);
     };
     
 }; // class dwv.gui.base.DicomTags
@@ -8034,7 +8050,7 @@ dwv.gui.base.appendVersionHtml = function (version)
  * @method appendHelpHtml
  * @param {Boolean} mobile Flag for mobile or not environement.
  */
-dwv.gui.base.appendHelpHtml = function(toolList, mobile)
+dwv.gui.base.appendHelpHtml = function(toolList, mobile, app)
 {
     var actionType = "mouse";
     if( mobile ) {
@@ -8095,13 +8111,13 @@ dwv.gui.base.appendHelpHtml = function(toolList, mobile)
         }
         else
         {
-            toolHelpDiv.id = "accordion";
+            toolHelpDiv.className = "accordion";
             toolHelpDiv.appendChild(title);
             toolHelpDiv.appendChild(docDiv);
         }
     }
     
-    var helpNode = document.getElementById("help");
+    var helpNode = app.getElement("help");
 
     var dwvLink = document.createElement("a");
     dwvLink.href = "https://github.com/ivmartel/dwv/wiki";
@@ -8499,13 +8515,6 @@ dwv.html.removeNodes = function (nodes) {
     }
 };
 
-dwv.html.removeNodeById = function (nodeId) {
-    // find the node
-    var node = document.getElementById(nodeId);
-    // remove it
-    dwv.html.removeNode(node);
-};
-
 /**
  * Create a HTML select from an input array of options.
  * The values of the options are the name of the option made lower case.
@@ -8782,23 +8791,6 @@ dwv.html.appendElement = function (parent, element)
     parent.appendChild(element);
     // refresh
     dwv.gui.refreshElement(parent);
-};
-
-/**
- * Get an element by className inside of an element with parentId.
- * @method getElementByClassNameSonOf
- * @static
- * @param {Object} parent The HTML node to search.
- * @param {Object} element The element to append.
- */
-dwv.html.getElementByClassNameSonOf = function (parent, className)
-{
-    var elements = parent.getElementsByClassName(className);
-    if ( elements.length > 1 ) {
-        return elements[1];
-        //throw new Error("Found more than one class '" + className + "' element in '" + parent.id + "'.");
-    }
-    return elements[0];
 };
 
 /**
@@ -9268,15 +9260,15 @@ dwv.gui.base.Loadbox = function (app, loaders)
         loaderSelector.onchange = app.onChangeLoader;
         
         // node
-        var node = document.getElementById("loaderlist");
+        var node = app.getElement("loaderlist");
         // clear it
         while(node.hasChildNodes()) {
             node.removeChild(node.firstChild);
         }
         // append
         node.appendChild(loaderSelector);
-        // trigger create event (mobile)
-        $("#loaderlist").trigger("create");
+        // refresh
+        dwv.gui.refreshElement(node);
     };
     
     /**
@@ -9317,22 +9309,22 @@ dwv.gui.base.FileLoad = function (app)
         fileLoadInput.onchange = app.onChangeFiles;
         fileLoadInput.type = "file";
         fileLoadInput.multiple = true;
-        fileLoadInput.id = "imagefiles";
+        fileLoadInput.className = "imagefiles";
         fileLoadInput.setAttribute("data-clear-btn","true");
         fileLoadInput.setAttribute("data-mini","true");
     
         // associated div
         var fileLoadDiv = document.createElement("div");
-        fileLoadDiv.id = "imagefilesdiv";
+        fileLoadDiv.className = "imagefilesdiv";
         fileLoadDiv.style.display = "none";
         fileLoadDiv.appendChild(fileLoadInput);
         
         // node
-        var node = document.getElementById("loaderlist");
+        var node = app.getElement("loaderlist");
         // append
         node.appendChild(fileLoadDiv);
-        // trigger create event (mobile)
-        $("#loaderlist").trigger("create");
+        // refresh
+        dwv.gui.refreshElement(node);
     };
     
     /**
@@ -9343,7 +9335,8 @@ dwv.gui.base.FileLoad = function (app)
     this.display = function (bool)
     {
         // file div element
-        var filediv = document.getElementById("imagefilesdiv");
+        var node = app.getElement("loaderlist");
+        var filediv = node.getElementsByClassName("imagefilesdiv")[0];
         filediv.style.display = bool ? "" : "none";
     };
     
@@ -9367,22 +9360,22 @@ dwv.gui.base.UrlLoad = function (app)
         var urlLoadInput = document.createElement("input");
         urlLoadInput.onchange = app.onChangeURL;
         urlLoadInput.type = "url";
-        urlLoadInput.id = "imageurl";
+        urlLoadInput.className = "imageurl";
         urlLoadInput.setAttribute("data-clear-btn","true");
         urlLoadInput.setAttribute("data-mini","true");
     
         // associated div
         var urlLoadDiv = document.createElement("div");
-        urlLoadDiv.id = "imageurldiv";
+        urlLoadDiv.className = "imageurldiv";
         urlLoadDiv.style.display = "none";
         urlLoadDiv.appendChild(urlLoadInput);
     
         // node
-        var node = document.getElementById("loaderlist");
+        var node = app.getElement("loaderlist");
         // append
         node.appendChild(urlLoadDiv);
-        // trigger create event (mobile)
-        $("#loaderlist").trigger("create");
+        // refresh
+        dwv.gui.refreshElement(node);
     };
     
     /**
@@ -9393,7 +9386,8 @@ dwv.gui.base.UrlLoad = function (app)
     this.display = function (bool)
     {
         // url div element
-        var urldiv = document.getElementById("imageurldiv");
+        var node = app.getElement("loaderlist");
+        var urldiv = node.getElementsByClassName("imageurldiv")[0];
         urldiv.style.display = bool ? "" : "none";
     };
 
@@ -9591,7 +9585,7 @@ dwv.gui.base.Toolbox = function (app)
         toolLi.appendChild(toolSelector);
     
         // node
-        var node = app.getElementByClassName("toolList");
+        var node = app.getElement("toolList");
         // clear it
         /*while(node.hasChildNodes()) {
             node.removeChild(node.firstChild);
@@ -9610,7 +9604,7 @@ dwv.gui.base.Toolbox = function (app)
     this.display = function (bool)
     {
         // tool list element
-        var node = app.getElementByClassName("toolLi");
+        var node = app.getElement("toolLi");
         dwv.html.displayElement(node, bool);
     };
     
@@ -9621,7 +9615,7 @@ dwv.gui.base.Toolbox = function (app)
     this.initialise = function (displays)
     {
         // tool select: reset selected option
-        var toolSelector = app.getElementByClassName("toolSelect");
+        var toolSelector = app.getElement("toolSelect");
         
         // update list
         var options = toolSelector.options;
@@ -9678,7 +9672,7 @@ dwv.gui.base.WindowLevel = function (app)
         cmLi.appendChild(cmSelector);
     
         // node
-        var node = app.getElementByClassName("toolList");
+        var node = app.getElement("toolList");
         // append preset
         node.appendChild(wlLi);
         // append colour map
@@ -9695,10 +9689,10 @@ dwv.gui.base.WindowLevel = function (app)
     this.display = function (bool)
     {
         // presets list element
-        var node = app.getElementByClassName("wlLi");
+        var node = app.getElement("wlLi");
         dwv.html.displayElement(node, bool);
         // colour map list element
-        node = app.getElementByClassName("cmLi");
+        node = app.getElement("cmLi");
         dwv.html.displayElement(node, bool);
     };
     
@@ -9714,7 +9708,7 @@ dwv.gui.base.WindowLevel = function (app)
         wlSelector.title = "Select w/l preset.";
         
         // copy html list
-        var wlLi = app.getElementByClassName("wlLi");
+        var wlLi = app.getElement("wlLi");
         // clear node
         dwv.html.cleanNode(wlLi);
         // add children
@@ -9723,7 +9717,7 @@ dwv.gui.base.WindowLevel = function (app)
         dwv.gui.refreshElement(wlLi);
         
         // colour map select
-        var cmSelector = app.getElementByClassName("colourMapSelect");
+        var cmSelector = app.getElement("colourMapSelect");
         cmSelector.selectedIndex = 0;
         // special monochrome1 case
         if( app.getImage().getPhotometricInterpretation() === "MONOCHROME1" )
@@ -9781,7 +9775,7 @@ dwv.gui.base.Draw = function (app)
         //colourLi.setAttribute("class","ui-block-b");
         
         // node
-        var node = app.getElementByClassName("toolList");
+        var node = app.getElement("toolList");
         // apend shape
         node.appendChild(shapeLi);
         // append colour
@@ -9798,10 +9792,10 @@ dwv.gui.base.Draw = function (app)
     this.display = function (bool)
     {
         // colour list element
-        var node = app.getElementByClassName("colourLi");
+        var node = app.getElement("colourLi");
         dwv.html.displayElement(node, bool);
         // shape list element
-        node = app.getElementByClassName("shapeLi");
+        node = app.getElement("shapeLi");
         dwv.html.displayElement(node, bool);
     };
     
@@ -9812,13 +9806,13 @@ dwv.gui.base.Draw = function (app)
     this.initialise = function ()
     {
         // shape select: reset selected option
-        var shapeSelector = app.getElementByClassName("shapeSelect");
+        var shapeSelector = app.getElement("shapeSelect");
         shapeSelector.selectedIndex = 0;
         // refresh
         dwv.gui.refreshElement(shapeSelector);
         
         // colour select: reset selected option
-        var colourSelector = app.getElementByClassName("colourSelect");
+        var colourSelector = app.getElement("colourSelect");
         colourSelector.selectedIndex = 0;
         // refresh
         dwv.gui.refreshElement(colourSelector);
@@ -9862,7 +9856,7 @@ dwv.gui.base.Livewire = function (app)
         colourLi.appendChild(colourSelector);
         
         // node
-        var node = app.getElementByClassName("toolList");
+        var node = app.getElement("toolList");
         // apend colour
         node.appendChild(colourLi);
         // refresh
@@ -9877,7 +9871,7 @@ dwv.gui.base.Livewire = function (app)
     this.display = function (bool)
     {
         // colour list
-        var node = app.getElementByClassName("lwColourLi");
+        var node = app.getElement("lwColourLi");
         dwv.html.displayElement(node, bool);
     };
     
@@ -9887,7 +9881,7 @@ dwv.gui.base.Livewire = function (app)
      */
     this.initialise = function ()
     {
-        var colourSelector = app.getElementByClassName("lwColourSelect");
+        var colourSelector = app.getElement("lwColourSelect");
         colourSelector.selectedIndex = 0;
         dwv.gui.refreshElement(colourSelector);
     };
@@ -9926,7 +9920,7 @@ dwv.gui.base.ZoomAndPan = function (app)
         liElement.appendChild(button);
         
         // node
-        var node = app.getElementByClassName("toolList");
+        var node = app.getElement("toolList");
         // append element
         node.appendChild(liElement);
         // refresh
@@ -9941,7 +9935,7 @@ dwv.gui.base.ZoomAndPan = function (app)
     this.display = function(bool)
     {
         // display list element
-        var node = app.getElementByClassName("zoomLi");
+        var node = app.getElement("zoomLi");
         dwv.html.displayElement(node, bool);
     };
     
@@ -9967,7 +9961,7 @@ dwv.gui.base.Scroll = function (app)
         liElement.style.display = "none";
         
         // node
-        var node = app.getElementByClassName("toolList");
+        var node = app.getElement("toolList");
         // append element
         node.appendChild(liElement);
         // refresh
@@ -9982,7 +9976,7 @@ dwv.gui.base.Scroll = function (app)
     this.display = function(bool)
     {
         // display list element
-        var node = app.getElementByClassName("scrollLi");
+        var node = app.getElement("scrollLi");
         dwv.html.displayElement(node, bool);
     };
     
@@ -10007,7 +10001,7 @@ dwv.gui.base = dwv.gui.base || {};
  * @namespace dwv.gui.base
  * @constructor
  */
-dwv.gui.base.Undo = function ()
+dwv.gui.base.Undo = function (app)
 {
     /**
      * Setup the undo HTML.
@@ -10021,19 +10015,21 @@ dwv.gui.base.Undo = function ()
         paragraph.appendChild(document.createElement("br"));
         
         var select = document.createElement("select");
-        select.id = "history_list";
+        select.className = "history_list";
         select.name = "history_list";
         select.multiple = "multiple";
         paragraph.appendChild(select);
     
         // node
-        var node = document.getElementById("history");
+        var node = app.getElement("history");
         // clear it
         while(node.hasChildNodes()) {
             node.removeChild(node.firstChild);
         }
         // append
         node.appendChild(paragraph);
+        // refresh
+        dwv.gui.refreshElement(node);
     };
     
     /**
@@ -10042,13 +10038,15 @@ dwv.gui.base.Undo = function ()
      */
     this.initialise = function ()
     {
-        var select = document.getElementById("history_list");
+        var select = app.getElement("history_list");
         if ( select && select.length !== 0 ) {
             for( var i = select.length - 1; i >= 0; --i)
             {
                 select.remove(i);
             }
         }
+        // refresh
+        dwv.gui.refreshElement(select);
     };
     
     /**
@@ -10058,7 +10056,7 @@ dwv.gui.base.Undo = function ()
      */
     this.addCommandToUndoHtml = function (commandName)
     {
-        var select = document.getElementById("history_list");
+        var select = app.getElement("history_list");
         // remove undone commands
         var count = select.length - (select.selectedIndex+1);
         if( count > 0 )
@@ -10075,6 +10073,8 @@ dwv.gui.base.Undo = function ()
         select.add(option);
         // increment selected index
         select.selectedIndex++;
+        // refresh
+        dwv.gui.refreshElement(select);
     };
     
     /**
@@ -10084,7 +10084,7 @@ dwv.gui.base.Undo = function ()
      */
     this.enableInUndoHtml = function (enable)
     {
-        var select = document.getElementById("history_list");
+        var select = app.getElement("history_list");
         // enable or not (order is important)
         var option;
         if( enable ) 
@@ -10103,6 +10103,8 @@ dwv.gui.base.Undo = function ()
             // decrement selected index
             select.selectedIndex--;
         }
+        // refresh
+        dwv.gui.refreshElement(select);
     };
 
 }; // class dwv.gui.base.Undo
@@ -17772,14 +17774,14 @@ dwv.tool = dwv.tool || {};
  * @namespace dwv.tool
  * @constructor
  */
-dwv.tool.UndoStack = function ()
+dwv.tool.UndoStack = function (app)
 { 
     /**
      * Undo GUI.
      * @property gui
      * @type Object
      */
-    var gui = new dwv.gui.Undo();
+    var gui = new dwv.gui.Undo(app);
     /**
      * Array of commands.
      * @property stack
@@ -17972,7 +17974,7 @@ dwv.tool.WindowLevel = function(app)
             if ( gui ) {
                 gui.initialise();
                 // set selected
-                dwv.gui.setSelected(app.getElementByClassName("presetSelect"), "Manual");
+                dwv.gui.setSelected(app.getElement("presetSelect"), "Manual");
             }
         }
     };
