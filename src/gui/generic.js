@@ -62,6 +62,29 @@ dwv.gui.base.displayProgress = function(percent)
 };
 
 /**
+ * Get a HTML element associated to a container div.
+ * @method getElement
+ * @static
+ * @param containerDivId The id of the container div.
+ * @param name The name or id to find.
+ * @return The found element or null.
+ */
+dwv.gui.base.getElement = function (containerDivId, name)
+{
+    // get by class in the container div
+    var parent = document.getElementById(containerDivId);
+    var elements = parent.getElementsByClassName(name);
+    // getting the last element since some libraries (ie jquery-mobile) creates
+    // span in front of regular tags (such as select)...
+    var element = elements[elements.length-1];
+    // if not found get by id with 'containerDivId-className'
+    if ( typeof element === "undefined" ) {
+        element = document.getElementById(containerDivId + '-' + name);
+    }
+    return element;
+ };
+
+ /**
  * Refresh a HTML element. Mainly for jquery-mobile.
  * @method refreshElement
  * @static
@@ -134,7 +157,7 @@ dwv.gui.base.Slider = function (app)
         div.appendChild(inputMax);
         div.setAttribute("data-mini", "true");
         // append to document
-        app.getElementByClassName("thresholdLi").appendChild(div);
+        app.getElement("thresholdLi").appendChild(div);
         // bind change
         $("#threshold-div").on("change",
                 function(/*event*/) {
@@ -143,8 +166,8 @@ dwv.gui.base.Slider = function (app)
                           "max":$("#threshold-max").val() } );
                 }
             );
-        // trigger creation
-        $("#toolList").trigger("create");
+        // refresh
+        dwv.gui.refreshElement(app.getElement("toolList"));
     };
     
     /**
@@ -167,7 +190,7 @@ dwv.gui.base.Slider = function (app)
         inputMax.min = min;
         inputMax.value = max;
         // trigger creation
-        $("#toolList").trigger("create");
+        dwv.gui.refreshElement(app.getElement("toolList"));
     };
 
 }; // class dwv.gui.base.Slider
@@ -178,7 +201,7 @@ dwv.gui.base.Slider = function (app)
  * @namespace dwv.gui.base
  * @constructor
  */
-dwv.gui.base.DicomTags = function ()
+dwv.gui.base.DicomTags = function (app)
 {
     /**
      * Initialise the DICOM tags table. To be called once the DICOM has been parsed.
@@ -188,7 +211,7 @@ dwv.gui.base.DicomTags = function ()
     this.initialise = function (dataInfo)
     {
         // HTML node
-        var node = document.getElementById("tags");
+        var node = app.getElement("tags");
         if( node === null ) {
             return;
         }
@@ -202,16 +225,16 @@ dwv.gui.base.DicomTags = function ()
         }
         // tags HTML table
         var table = dwv.html.toTable(dataInfo);
-        table.id = "tagsTable";
-        table.setAttribute("class", "tagsList");
+        table.className = "tagsTable";
+        //table.setAttribute("class", "tagsList");
         table.setAttribute("data-role", "table");
         table.setAttribute("data-mode", "columntoggle");
         // search form
         node.appendChild(dwv.html.getHtmlSearchForm(table));
         // tags table
         node.appendChild(table);
-        // trigger create event (mobile)
-        $("#tags").trigger("create");
+        // refresh
+        dwv.gui.refreshElement(node);
     };
     
 }; // class dwv.gui.base.DicomTags

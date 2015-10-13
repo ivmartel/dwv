@@ -13,12 +13,12 @@ body { background-color: #222; color: white;
   margin: 10px; padding: 0; font-size: 80%; }
 #pageHeader h1 { display: inline-block; margin: 0; color: #fff; }
 #pageHeader a { color: #ddf; }
-#pageHeader #toolbar { display: inline-block; float: right; }
-#toolbox li:first-child { list-style-type: none; padding-bottom: 10px; margin-left: -20px; }
+#pageHeader .toolbar { display: inline-block; float: right; }
+.toolbox li:first-child { list-style-type: none; padding-bottom: 10px; margin-left: -20px; }
 #pageMain { position: absolute; height: 92%; width: 99%; bottom: 5px; left: 5px; background-color: #333; }
-#infotl { color: #333; text-shadow: 0 1px 0 #fff; }
-#infotr { color: #333; text-shadow: 0 1px 0 #fff; }
-#dropBox { margin: 20px; }
+.infotl { color: #333; text-shadow: 0 1px 0 #fff; }
+.infotr { color: #333; text-shadow: 0 1px 0 #fff; }
+.dropBox { margin: 20px; }
 </style>
 <link type="text/css" rel="stylesheet" href="../../ext/jquery-ui/themes/ui-darkness/jquery-ui-1.11.2.min.css">
 <!-- Third party -->
@@ -103,25 +103,25 @@ body { background-color: #222; color: white;
 <div id="pageMain">
 
 <!-- Open file -->
-<div id="openData" title="File">
-<div id="loaderlist"></div>
-<div id="progressbar"></div>
+<div class="openData" title="File">
+<div class="loaderlist"></div>
+<div class="progressbar"></div>
 </div>
 
 <!-- Toolbox -->
-<div class="toolList"></div> 
+<div class="toolList" title="Toolbox"></div> 
 
 <!-- History -->
-<div id="history" title="History"></div>
+<div class="history" title="History"></div>
 
 <!-- Tags -->
-<div id="tags" title="Tags"></div>
+<div class="tags" title="Tags"></div>
 
 <!-- Help -->
-<div id="help" title="Help"></div>
+<div class="help" title="Help"></div>
 
 <!-- Layer Container -->
-<div id="layerDialog" title="Image">
+<div class="layerDialog" title="Image">
 <div class="dropBox"></div>
 <div class="layerContainer">
 <canvas class="imageLayer">Only for HTML5 compatible browsers...</canvas>

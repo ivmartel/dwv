@@ -30,6 +30,8 @@ dwv.gui.getWindowSize = function () {
 };
 // Progress
 dwv.gui.displayProgress = dwv.gui.base.displayProgress;
+// get element
+dwv.gui.getElement = dwv.gui.base.getElement;
 // refresh
 dwv.gui.refreshElement = function (element) {
     if( $(element)[0].nodeName.toLowerCase() === 'select' ) {
@@ -90,14 +92,14 @@ dwv.gui.Toolbox = function (app)
         tags.href = "#tags_page";
         tags.setAttribute("class", buttonClass + " ui-icon-grid");
     
-        var node = app.getElementByClassName("toolbar");
+        var node = app.getElement("toolbar");
         node.appendChild(open);
         node.appendChild(undo);
         node.appendChild(redo);
         node.appendChild(toggleInfo);
         node.appendChild(toggleSaveState);
         node.appendChild(tags);
-        $("#toolbar").trigger("create");
+        dwv.gui.refreshElement(node);
     };
     this.display = function (flag)
     {

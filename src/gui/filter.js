@@ -38,7 +38,7 @@ dwv.gui.base.Filter = function (app)
         filterLi.appendChild(filterSelector);
         
         // append element
-        var node = app.getElementByClassName("toolList");
+        var node = app.getElement("toolList");
         dwv.html.appendElement(node, filterLi);
     };
     
@@ -49,7 +49,7 @@ dwv.gui.base.Filter = function (app)
      */
     this.display = function (flag)
     {
-        var node = app.getElementByClassName("filterLi");
+        var node = app.getElement("filterLi");
         dwv.html.displayElement(node, flag);
     };
     
@@ -60,7 +60,7 @@ dwv.gui.base.Filter = function (app)
     this.initialise = function ()
     {
         // filter select: reset selected options
-        var filterSelector = app.getElementByClassName("filterSelect");
+        var filterSelector = app.getElement("filterSelect");
         filterSelector.selectedIndex = 0;
         // refresh
         dwv.gui.refreshElement(filterSelector);
@@ -95,7 +95,7 @@ dwv.gui.base.Threshold = function (app)
         thresholdLi.className += " ui-block-c";
         
         // node
-        var node = app.getElementByClassName("toolList");
+        var node = app.getElement("toolList");
         // append threshold
         node.appendChild(thresholdLi);
         // threshold slider
@@ -111,7 +111,7 @@ dwv.gui.base.Threshold = function (app)
      */
     this.display = function (flag)
     {
-        var node = app.getElementByClassName("thresholdLi");
+        var node = app.getElement("thresholdLi");
         dwv.html.displayElement(node, flag);
     };
     
@@ -162,7 +162,7 @@ dwv.gui.base.Sharpen = function (app)
         sharpenLi.className += " ui-block-c";
         sharpenLi.appendChild( dwv.gui.filter.base.createFilterApplyButton(app) );
         // append element
-        var node = app.getElementByClassName("toolList");
+        var node = app.getElement("toolList");
         dwv.html.appendElement(node, sharpenLi);
     };
     
@@ -173,7 +173,7 @@ dwv.gui.base.Sharpen = function (app)
      */
     this.display = function (flag)
     {
-        var node = app.getElementByClassName("sharpenLi");
+        var node = app.getElement("sharpenLi");
         dwv.html.displayElement(node, flag);
     };
     
@@ -198,7 +198,7 @@ dwv.gui.base.Sobel = function (app)
         sobelLi.className += " ui-block-c";
         sobelLi.appendChild( dwv.gui.filter.base.createFilterApplyButton(app) );
         // append element
-        var node = app.getElementByClassName("toolList");
+        var node = app.getElement("toolList");
         dwv.html.appendElement(node, sobelLi);
     };
     
@@ -209,7 +209,7 @@ dwv.gui.base.Sobel = function (app)
      */
     this.display = function (flag)
     {
-        var node = app.getElementByClassName("sobelLi");
+        var node = app.getElement("sobelLi");
         dwv.html.displayElement(node, flag);
     };
     

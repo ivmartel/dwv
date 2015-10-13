@@ -17,7 +17,9 @@ dwv.gui.getWindowSize = function () {
 };
 // Progress
 dwv.gui.displayProgress = dwv.gui.base.displayProgress;
-// Select
+// get element
+dwv.gui.getElement = dwv.gui.base.getElement;
+// refresh
 dwv.gui.refreshElement = function (element) {
     if( $(element)[0].nodeName.toLowerCase() === 'select' ) {
         $(element).selectmenu('refresh');
@@ -49,7 +51,7 @@ dwv.gui.Toolbox = function (app)
     
         mainFieldset.appendChild(toolFieldset);
         
-        var node = app.getElementByClassName("toolbar");
+        var node = app.getElement("toolbar");
         node.appendChild(mainFieldset);
         dwv.gui.refreshElement(node);
     };
@@ -62,16 +64,16 @@ dwv.gui.Toolbox = function (app)
     {
         // not wonderful: first one should be scroll...
         if ( list[0] === false ) {
-            var inputScroll = app.getElementByClassName("scrollLi");
+            var inputScroll = app.getElement("scrollLi");
             inputScroll.parentNode.style.display = "none";
             inputScroll.checked = false;
-            var inputZoom = app.getElementByClassName("zoomLi");
+            var inputZoom = app.getElement("zoomLi");
             inputZoom.checked = true;
         }
         
         // refresh
         $("input[type='radio']").checkboxradio("refresh");
-        var node = app.getElementByClassName("toolfieldset");
+        var node = app.getElement("toolfieldset");
         dwv.gui.refreshElement(node);
     };
 };
@@ -92,7 +94,7 @@ dwv.gui.WindowLevel = function (app)
         label.setAttribute("for", "wlLi");
         label.appendChild(document.createTextNode("W/L"));
         
-        var node = app.getElementByClassName("toolfieldset");
+        var node = app.getElement("toolfieldset");
         $(node).controlgroup("container").append(input);
         $(node).controlgroup("container").append(label);
         dwv.gui.refreshElement(node);
@@ -104,8 +106,8 @@ dwv.gui.WindowLevel = function (app)
     this.initialise = function ()
     {
         // clear previous
-        dwv.html.removeNode(app.getElementByClassName("presetSelect"));
-        dwv.html.removeNode(app.getElementByClassName("presetLabel"));
+        dwv.html.removeNode(app.getElement("presetSelect"));
+        dwv.html.removeNode(app.getElement("presetLabel"));
         
         // create preset select
         var select = dwv.html.createHtmlSelect("presetSelect", app.getViewController().getPresets());
@@ -118,7 +120,7 @@ dwv.gui.WindowLevel = function (app)
         span.className = "presetLabel";
         span.appendChild(document.createTextNode("Presets: "));
         
-        var node = app.getElementByClassName("mainfieldset");
+        var node = app.getElement("mainfieldset");
         node.appendChild(span);
         node.appendChild(select);
         dwv.gui.refreshElement(node);
@@ -141,7 +143,7 @@ dwv.gui.ZoomAndPan = function (app)
         label.setAttribute("for", "zoomLi");
         label.appendChild(document.createTextNode("Zoom/Pan"));
     
-        var node = app.getElementByClassName("toolfieldset");
+        var node = app.getElement("toolfieldset");
         $(node).controlgroup("container").append(input);
         $(node).controlgroup("container").append(label);
         dwv.gui.refreshElement(node);
@@ -169,7 +171,7 @@ dwv.gui.Scroll = function (app)
         label.setAttribute("for", "scrollLi");
         label.appendChild(document.createTextNode("Scroll"));
     
-        var node = app.getElementByClassName("toolfieldset");
+        var node = app.getElement("toolfieldset");
         $(node).controlgroup("container").append(input);
         $(node).controlgroup("container").append(label);
         dwv.gui.refreshElement(node);
@@ -190,7 +192,7 @@ dwv.gui.appendResetHtml = function (app)
     button.appendChild(document.createTextNode("Reset"));
     button.setAttribute("class","ui-btn ui-btn-inline");
     
-    var node = app.getElementByClassName("mainfieldset");
+    var node = app.getElement("mainfieldset");
     node.appendChild(button);
     dwv.gui.refreshElement(node);
 };

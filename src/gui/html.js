@@ -356,13 +356,6 @@ dwv.html.removeNodes = function (nodes) {
     }
 };
 
-dwv.html.removeNodeById = function (nodeId) {
-    // find the node
-    var node = document.getElementById(nodeId);
-    // remove it
-    dwv.html.removeNode(node);
-};
-
 /**
  * Create a HTML select from an input array of options.
  * The values of the options are the name of the option made lower case.
@@ -639,23 +632,6 @@ dwv.html.appendElement = function (parent, element)
     parent.appendChild(element);
     // refresh
     dwv.gui.refreshElement(parent);
-};
-
-/**
- * Get an element by className inside of an element with parentId.
- * @method getElementByClassNameSonOf
- * @static
- * @param {Object} parent The HTML node to search.
- * @param {Object} element The element to append.
- */
-dwv.html.getElementByClassNameSonOf = function (parent, className)
-{
-    var elements = parent.getElementsByClassName(className);
-    if ( elements.length > 1 ) {
-        return elements[1];
-        //throw new Error("Found more than one class '" + className + "' element in '" + parent.id + "'.");
-    }
-    return elements[0];
 };
 
 /**

@@ -35,6 +35,8 @@ dwv.gui.displayProgress = function (percent) {
         $("#progressbar").progressbar({ value: percent });
     }
 };
+// get element
+dwv.gui.getElement = dwv.gui.base.getElement;
 // refresh
 dwv.gui.refreshElement = dwv.gui.base.refreshElement;
 // Slider
@@ -50,7 +52,7 @@ dwv.gui.Slider = function (app)
         var max = app.getImage().getDataRange().max;
         
         // jquery-ui slider
-        $( "#thresholdLi" ).slider({
+        $( ".thresholdLi" ).slider({
             range: true,
             min: min,
             max: max,
@@ -94,23 +96,23 @@ dwv.gui.Toolbox = function (app)
         // toolbar
         var open = document.createElement("button");
         open.appendChild(document.createTextNode("File"));
-        open.onclick = function() { toggle("#openData"); };
+        open.onclick = function() { toggle(".openData"); };
         
         var toolbox = document.createElement("button");
         toolbox.appendChild(document.createTextNode("Toolbox"));
-        toolbox.onclick = function() { toggle("#toolbox"); };
+        toolbox.onclick = function() { toggle(".toolList"); };
     
         var history = document.createElement("button");
         history.appendChild(document.createTextNode("History"));
-        history.onclick = function() { toggle("#history"); };
+        history.onclick = function() { toggle(".history"); };
     
         var tags = document.createElement("button");
         tags.appendChild(document.createTextNode("Tags"));
-        tags.onclick = function() { toggle("#tags"); };
+        tags.onclick = function() { toggle(".tags"); };
     
         var image = document.createElement("button");
         image.appendChild(document.createTextNode("Image"));
-        image.onclick = function() { toggle("#layerDialog"); };
+        image.onclick = function() { toggle(".layerDialog"); };
     
         var info = document.createElement("button");
         info.appendChild(document.createTextNode("Info"));
@@ -118,9 +120,9 @@ dwv.gui.Toolbox = function (app)
     
         var help = document.createElement("button");
         help.appendChild(document.createTextNode("Help"));
-        help.onclick = function() { toggle("#help"); };
+        help.onclick = function() { toggle(".help"); };
     
-        var node = app.getElementByClassName("toolbar");
+        var node = app.getElement("toolbar");
         node.appendChild(open);
         node.appendChild(toolbox);
         node.appendChild(history);
@@ -142,7 +144,7 @@ dwv.gui.Toolbox = function (app)
         toggleSaveState.id = "download-state";
         toggleSaveState.appendChild(saveButton);
         // add to openData window
-        node = document.getElementById("openData");
+        node = app.getElement("openData");
         node.appendChild(toggleSaveState);
     };
     this.display = function (bool)
@@ -184,27 +186,41 @@ dwv.gui.appendVersionHtml = dwv.gui.base.appendVersionHtml;
 
 // special setup
 dwv.gui.setup = function () {
-    $("#toggleInfoLayer").button({ icons: 
-        { primary: "ui-icon-comment" }, text: false });
+    $(".toggleInfoLayer").button({ icons: 
+        { primary: "ui-icon-comment" }, text: false,
+        appendTo: "#dwv"
+    });
     // create dialogs
-    $("#openData").dialog({ position: 
-        {my: "left top", at: "left top", of: "#pageMain"} });
-    $("#toolbox").dialog({ position: 
-        {my: "left top+160", at: "left top", of: "#pageMain"} });
-    $("#history").dialog({ position: 
-        {my: "left top+350", at: "left top", of: "#pageMain"} });
-    $("#tags").dialog({ position: 
+    $(".openData").dialog({ position: 
+        {my: "left top", at: "left top", of: "#pageMain"},
+        appendTo: "#dwv"
+    });
+    $(".toolList").dialog({ position: 
+        {my: "left top+160", at: "left top", of: "#pageMain"},
+        appendTo: "#dwv"
+    });
+    $(".history").dialog({ position: 
+        {my: "left top+350", at: "left top", of: "#pageMain"},
+        appendTo: "#dwv"
+    });
+    $(".tags").dialog({ position: 
         {my: "right top", at: "right top", of: "#pageMain"},
-        autoOpen: false, width: 500, height: 590 });
-    $("#help").dialog({ position: 
+        autoOpen: false, width: 500, height: 590,
+        appendTo: "#dwv"
+    });
+    $(".help").dialog({ position: 
         {my: "right top", at: "right top", of: "#pageMain"},
-        autoOpen: false, width: 500, height: 590 });
+        autoOpen: false, width: 500, height: 590,
+        appendTo: "#dwv"
+    });
     
     // image dialog
-    $("#layerDialog").dialog({ position: 
-        {my: "left+320 top", at: "left top", of: "#pageMain"}});
+    $(".layerDialog").dialog({ position: 
+        {my: "left+320 top", at: "left top", of: "#pageMain"},
+        appendTo: "#dwv"
+    });
     // default size
-    $("#layerDialog").dialog({ width: "auto", resizable: false });
+    $(".layerDialog").dialog({ width: "auto", resizable: false });
     // Resizable but keep aspect ratio
     // TODO it seems to add a border that bothers getting the cursor position...
     //$("#layerContainer").resizable({ aspectRatio: true });

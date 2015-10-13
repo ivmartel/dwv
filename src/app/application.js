@@ -128,13 +128,6 @@ dwv.App = function ()
     this.getNSlicesToLoad = function () { return nSlicesToLoad; };
 
     /** 
-     * Get the container div id.
-     * @method getContainerDivId
-     * @return {String} The div id.
-     */
-    this.getContainerDivId = function () { return containerDivId; };
-
-    /** 
      * Get the main scale.
      * @method getScale
      * @return {Number} The main scale.
@@ -329,12 +322,12 @@ dwv.App = function ()
             }
             // undo
             if ( config.gui.indexOf("undo") !== -1 ) {
-                undoStack = new dwv.tool.UndoStack();
+                undoStack = new dwv.tool.UndoStack(this);
                 undoStack.setup();
             }
             // DICOM Tags
             if ( config.gui.indexOf("tags") !== -1 ) {
-                tagsGui = new dwv.gui.DicomTags();
+                tagsGui = new dwv.gui.DicomTags(this);
             }
             // version number
             if ( config.gui.indexOf("version") !== -1 ) {
@@ -346,12 +339,12 @@ dwv.App = function ()
                 if ( config.isMobile ) {
                     isMobile = config.isMobile;
                 }
-                dwv.gui.appendHelpHtml( toolbox.getToolList(), isMobile );
+                dwv.gui.appendHelpHtml( toolbox.getToolList(), isMobile, this );
             }
         }
         
         // listen to drag&drop
-        var box = this.getElementByClassName("dropBox");
+        var box = this.getElement("dropBox");
         if ( box ) {
             box.addEventListener("dragover", onDragOver);
             box.addEventListener("dragleave", onDragLeave);
@@ -396,15 +389,14 @@ dwv.App = function ()
     };
     
     /**
-     * Get a html element that is inside the containerDivId from its class name.
-     * @method getElementByClassName
-     * @param className The class of the element to search.
-     * @return The list of found elements.
+     * Get a HTML element associated to the application.
+     * @method getElement
+     * @param name The name or id to find.
+     * @return The found element or null.
      */
-     this.getElementByClassName = function (className)
+     this.getElement = function (name)
      {
-         var parent = document.getElementById(containerDivId);
-         return dwv.html.getElementByClassNameSonOf(parent, className);
+         return dwv.gui.getElement(containerDivId, name);
      };
 
     /**
@@ -427,7 +419,7 @@ dwv.App = function ()
         nSlicesToLoad = 0;
         // reset undo/redo
         if ( undoStack ) {
-            undoStack = new dwv.tool.UndoStack();
+            undoStack = new dwv.tool.UndoStack(this);
             undoStack.initialise();
         }
     };
@@ -636,7 +628,7 @@ dwv.App = function ()
         style.setScale(windowScale);
 
         // resize container
-        var container = this.getElementByClassName("layerContainer");
+        var container = this.getElement("layerContainer");
         container.setAttribute("style","width:"+newWidth+"px;height:"+newHeight+"px");
         // resize image layer
         if ( imageLayer ) {
@@ -648,7 +640,7 @@ dwv.App = function ()
         // resize draw stage
         if ( drawStage ) {
             // resize div
-            var drawDiv = this.getElementByClassName("drawDiv");
+            var drawDiv = this.getElement("drawDiv");
             drawDiv.setAttribute("style","width:"+newWidth+"px;height:"+newHeight+"px");
            // resize stage
             drawStage.setWidth(newWidth);
@@ -665,7 +657,7 @@ dwv.App = function ()
     this.toggleInfoLayerDisplay = function ()
     {
         // toggle html
-        var infoLayer = self.getElementByClassName("infoLayer");
+        var infoLayer = self.getElement("infoLayer");
         dwv.html.toggleDisplay(infoLayer);
         // toggle listeners
         if ( isInfoLayerListening ) {
@@ -937,7 +929,7 @@ dwv.App = function ()
     {
         var state = new dwv.State(self);
         // add href to link (html5)
-        var element = self.getElementByClassName("download-state");
+        var element = self.getElement("download-state");
         element.href = "data:application/json," + state.toJSON();
     };
 
@@ -1069,7 +1061,7 @@ dwv.App = function ()
         self.resetLayout();
         self.initWLDisplay();
         // update preset select
-        var select = self.getElementByClassName("presetSelect");
+        var select = self.getElement("presetSelect");
         select.selectedIndex = 0;
         dwv.gui.refreshElement(select);
     };
@@ -1273,7 +1265,7 @@ dwv.App = function ()
         event.stopPropagation();
         event.preventDefault();
         // update box 
-        var box = self.getElementByClassName("dropBox");
+        var box = self.getElement("dropBox");
         if ( box ) {
             box.className = 'dropBox hover';
         }
@@ -1291,7 +1283,7 @@ dwv.App = function ()
         event.stopPropagation();
         event.preventDefault();
         // update box
-        var box = self.getElementByClassName("dropBox hover");
+        var box = self.getElement("dropBox hover");
         if ( box ) {
             box.className = 'dropBox';
         }
@@ -1343,13 +1335,14 @@ dwv.App = function ()
     function createLayers(dataWidth, dataHeight)
     {
         // image layer
-        imageLayer = new dwv.html.Layer(self.getElementByClassName("imageLayer"));
+        var canImgLay = self.getElement("imageLayer");
+        imageLayer = new dwv.html.Layer(canImgLay);
         imageLayer.initialise(dataWidth, dataHeight);
         imageLayer.fillContext();
         imageLayer.setStyleDisplay(true);
         // draw layer
-        var drawDiv = self.getElementByClassName("drawDiv");
-        if ( typeof drawDiv !== 'undefined' ) {
+        var drawDiv = self.getElement("drawDiv");
+        if ( drawDiv ) {
             // create stage
             drawStage = new Kinetic.Stage({
                 container: drawDiv,
@@ -1367,8 +1360,8 @@ dwv.App = function ()
         }
         else {
             self.fitToSize( {
-                'width': self.getElementByClassName("imageLayer").width,
-                'height': self.getElementByClassName("imageLayer").height } );
+                'width': self.getElement("imageLayer").width,
+                'height': self.getElement("imageLayer").height } );
         }
         self.resetLayout();
     }
@@ -1427,35 +1420,35 @@ dwv.App = function ()
         }
         
         // stop box listening to drag (after first drag)
-        var box = self.getElementByClassName("dropBox");
+        var box = self.getElement("dropBox");
         if ( box ) {
             box.removeEventListener("dragover", onDragOver);
             box.removeEventListener("dragleave", onDragLeave);
             box.removeEventListener("drop", onDrop);
             dwv.html.removeNode(box);
             // switch listening to layerContainer
-            var div = self.getElementByClassName("layerContainer");
+            var div = self.getElement("layerContainer");
             div.addEventListener("dragover", onDragOver);
             div.addEventListener("dragleave", onDragLeave);
             div.addEventListener("drop", onDrop);
         }
 
         // info layer
-        var infoLayer = self.getElementByClassName("infoLayer"); 
+        var infoLayer = self.getElement("infoLayer"); 
         if ( infoLayer ) {
-            var infotr = self.getElementByClassName("infotr");
+            var infotr = self.getElement("infotr");
             windowingInfo = new dwv.info.Windowing(infotr);
             windowingInfo.create();
             
-            var infotl = self.getElementByClassName("infotl");
+            var infotl = self.getElement("infotl");
             positionInfo = new dwv.info.Position(infotl);
             positionInfo.create();
             
-            var infobr = self.getElementByClassName("infobr");
+            var infobr = self.getElement("infobr");
             miniColourMap = new dwv.info.MiniColourMap(infobr, self);
             miniColourMap.create();
             
-            var plot = self.getElementByClassName("plot");
+            var plot = self.getElement("plot");
             plotInfo = new dwv.info.Plot(plot, self);
             plotInfo.create();
             
