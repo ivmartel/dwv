@@ -531,8 +531,7 @@ dwv.App = function ()
             // initial size
             var size = dwv.gui.getWindowSize();
             var dropBoxSize = 2 * size.height / 3;
-            box.style.height = dropBoxSize;
-            box.style.width = dropBoxSize;
+            box.setAttribute(&quot;style&quot;,&quot;width:&quot;+dropBoxSize+&quot;px;height:&quot;+dropBoxSize+&quot;px&quot;);
         }
         // possible load from URL
         if ( typeof config.skipLoadUrl === &quot;undefined&quot; ) {

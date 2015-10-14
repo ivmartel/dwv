@@ -217,7 +217,7 @@ dwv.gui.base.Filter = function (app)
         filterLi.appendChild(filterSelector);
         
         // append element
-        var node = app.getElement(&quot;toolList&quot;);
+        var node = app.getElement(&quot;toolList&quot;).getElementsByTagName(&quot;ul&quot;)[0];
         dwv.html.appendElement(node, filterLi);
     };
     
@@ -274,7 +274,7 @@ dwv.gui.base.Threshold = function (app)
         thresholdLi.className += &quot; ui-block-c&quot;;
         
         // node
-        var node = app.getElement(&quot;toolList&quot;);
+        var node = app.getElement(&quot;toolList&quot;).getElementsByTagName(&quot;ul&quot;)[0];
         // append threshold
         node.appendChild(thresholdLi);
         // threshold slider
@@ -341,7 +341,7 @@ dwv.gui.base.Sharpen = function (app)
         sharpenLi.className += &quot; ui-block-c&quot;;
         sharpenLi.appendChild( dwv.gui.filter.base.createFilterApplyButton(app) );
         // append element
-        var node = app.getElement(&quot;toolList&quot;);
+        var node = app.getElement(&quot;toolList&quot;).getElementsByTagName(&quot;ul&quot;)[0];
         dwv.html.appendElement(node, sharpenLi);
     };
     
@@ -377,7 +377,7 @@ dwv.gui.base.Sobel = function (app)
         sobelLi.className += &quot; ui-block-c&quot;;
         sobelLi.appendChild( dwv.gui.filter.base.createFilterApplyButton(app) );
         // append element
-        var node = app.getElement(&quot;toolList&quot;);
+        var node = app.getElement(&quot;toolList&quot;).getElementsByTagName(&quot;ul&quot;)[0];
         dwv.html.appendElement(node, sobelLi);
     };
     

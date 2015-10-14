@@ -352,8 +352,7 @@ dwv.App = function ()
             // initial size
             var size = dwv.gui.getWindowSize();
             var dropBoxSize = 2 * size.height / 3;
-            box.style.height = dropBoxSize;
-            box.style.width = dropBoxSize;
+            box.setAttribute("style","width:"+dropBoxSize+"px;height:"+dropBoxSize+"px");
         }
         // possible load from URL
         if ( typeof config.skipLoadUrl === "undefined" ) {
@@ -7600,7 +7599,7 @@ dwv.gui.base.Filter = function (app)
         filterLi.appendChild(filterSelector);
         
         // append element
-        var node = app.getElement("toolList");
+        var node = app.getElement("toolList").getElementsByTagName("ul")[0];
         dwv.html.appendElement(node, filterLi);
     };
     
@@ -7657,7 +7656,7 @@ dwv.gui.base.Threshold = function (app)
         thresholdLi.className += " ui-block-c";
         
         // node
-        var node = app.getElement("toolList");
+        var node = app.getElement("toolList").getElementsByTagName("ul")[0];
         // append threshold
         node.appendChild(thresholdLi);
         // threshold slider
@@ -7724,7 +7723,7 @@ dwv.gui.base.Sharpen = function (app)
         sharpenLi.className += " ui-block-c";
         sharpenLi.appendChild( dwv.gui.filter.base.createFilterApplyButton(app) );
         // append element
-        var node = app.getElement("toolList");
+        var node = app.getElement("toolList").getElementsByTagName("ul")[0];
         dwv.html.appendElement(node, sharpenLi);
     };
     
@@ -7760,7 +7759,7 @@ dwv.gui.base.Sobel = function (app)
         sobelLi.className += " ui-block-c";
         sobelLi.appendChild( dwv.gui.filter.base.createFilterApplyButton(app) );
         // append element
-        var node = app.getElement("toolList");
+        var node = app.getElement("toolList").getElementsByTagName("ul")[0];
         dwv.html.appendElement(node, sobelLi);
     };
     
@@ -9583,15 +9582,16 @@ dwv.gui.base.Toolbox = function (app)
         toolLi.className = "toolLi ui-block-a";
         toolLi.style.display = "none";
         toolLi.appendChild(toolSelector);
-    
+
+        // tool ul
+        var toolUl = document.createElement("ul");
+        toolUl.appendChild(toolLi);
+        toolUl.className = "ui-grid-b"; 
+
         // node
         var node = app.getElement("toolList");
-        // clear it
-        /*while(node.hasChildNodes()) {
-            node.removeChild(node.firstChild);
-        }*/
         // append
-        node.appendChild(toolLi);
+        node.appendChild(toolUl);
         // refresh
         dwv.gui.refreshElement(node);
     };
@@ -9663,16 +9663,18 @@ dwv.gui.base.WindowLevel = function (app)
         // preset list element
         var wlLi = document.createElement("li");
         wlLi.className = "wlLi ui-block-b";
+        //wlLi.className = "wlLi";
         wlLi.style.display = "none";
         wlLi.appendChild(wlSelector);
         // colour map list element
         var cmLi = document.createElement("li");
         cmLi.className = "cmLi ui-block-c";
+        //cmLi.className = "cmLi";
         cmLi.style.display = "none";
         cmLi.appendChild(cmSelector);
     
         // node
-        var node = app.getElement("toolList");
+        var node = app.getElement("toolList").getElementsByTagName("ul")[0];
         // append preset
         node.appendChild(wlLi);
         // append colour map
@@ -9775,7 +9777,7 @@ dwv.gui.base.Draw = function (app)
         //colourLi.setAttribute("class","ui-block-b");
         
         // node
-        var node = app.getElement("toolList");
+        var node = app.getElement("toolList").getElementsByTagName("ul")[0];
         // apend shape
         node.appendChild(shapeLi);
         // append colour
@@ -9856,7 +9858,7 @@ dwv.gui.base.Livewire = function (app)
         colourLi.appendChild(colourSelector);
         
         // node
-        var node = app.getElement("toolList");
+        var node = app.getElement("toolList").getElementsByTagName("ul")[0];
         // apend colour
         node.appendChild(colourLi);
         // refresh
@@ -9920,7 +9922,7 @@ dwv.gui.base.ZoomAndPan = function (app)
         liElement.appendChild(button);
         
         // node
-        var node = app.getElement("toolList");
+        var node = app.getElement("toolList").getElementsByTagName("ul")[0];
         // append element
         node.appendChild(liElement);
         // refresh
@@ -9961,7 +9963,7 @@ dwv.gui.base.Scroll = function (app)
         liElement.style.display = "none";
         
         // node
-        var node = app.getElement("toolList");
+        var node = app.getElement("toolList").getElementsByTagName("ul")[0];
         // append element
         node.appendChild(liElement);
         // refresh
