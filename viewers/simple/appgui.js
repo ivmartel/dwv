@@ -84,7 +84,7 @@ dwv.gui.WindowLevel = function (app)
     this.setup = function ()
     {
         var input = document.createElement("input");
-        input.className = "wlLi";
+        input.id = "wlLi";
         input.name = "radio-choice";
         input.type = "radio";
         input.value = "Window/Level";
@@ -106,8 +106,8 @@ dwv.gui.WindowLevel = function (app)
     this.initialise = function ()
     {
         // clear previous
-        dwv.html.removeNode(app.getElement("presetSelect"));
-        dwv.html.removeNode(app.getElement("presetLabel"));
+        $(".presetSelect").remove();
+        $(".presetLabel").remove();
         
         // create preset select
         var select = dwv.html.createHtmlSelect("presetSelect", app.getViewController().getPresets());
@@ -133,7 +133,7 @@ dwv.gui.ZoomAndPan = function (app)
     this.setup = function ()
     {
         var input = document.createElement("input");
-        input.className = "zoomLi";
+        input.id = "zoomLi";
         input.name = "radio-choice";
         input.type = "radio";
         input.value = "Zoom/Pan";
@@ -160,7 +160,7 @@ dwv.gui.Scroll = function (app)
     this.setup = function ()
     {
         var input = document.createElement("input");
-        input.className = "scrollLi";
+        input.id = "scrollLi";
         input.name = "radio-choice";
         input.checked = "checked";
         input.type = "radio";
