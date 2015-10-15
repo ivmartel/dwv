@@ -189,7 +189,7 @@ dwv.gui.base.Slider = function (app)
         inputMax.max = max;
         inputMax.min = min;
         inputMax.value = max;
-        // trigger creation
+        // refresh
         dwv.gui.refreshElement(app.getElement("toolList"));
     };
 

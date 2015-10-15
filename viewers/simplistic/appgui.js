@@ -27,15 +27,13 @@ dwv.gui.DicomTags = null;
 // Toolbox 
 dwv.gui.Toolbox = function (app)
 {
-    //var base = new dwv.gui.base.Toolbox(app);
-    
     this.setup = function (/*list*/)
     {
         // does nothing
     };
     this.display = function (/*bool*/)
     {
-     // does nothing
+        // does nothing
     };
     this.initialise = function (list)
     {

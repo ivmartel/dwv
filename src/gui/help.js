@@ -92,7 +92,7 @@ dwv.gui.base.appendHelpHtml = function(toolList, mobile, app)
         }
         else
         {
-            toolHelpDiv.className = "accordion";
+            toolHelpDiv.id = "accordion";
             toolHelpDiv.appendChild(title);
             toolHelpDiv.appendChild(docDiv);
         }
