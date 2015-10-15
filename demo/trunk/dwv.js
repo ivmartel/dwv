@@ -7967,7 +7967,7 @@ dwv.gui.base.Slider = function (app)
         inputMax.max = max;
         inputMax.min = min;
         inputMax.value = max;
-        // trigger creation
+        // refresh
         dwv.gui.refreshElement(app.getElement("toolList"));
     };
 
@@ -8110,7 +8110,7 @@ dwv.gui.base.appendHelpHtml = function(toolList, mobile, app)
         }
         else
         {
-            toolHelpDiv.className = "accordion";
+            toolHelpDiv.id = "accordion";
             toolHelpDiv.appendChild(title);
             toolHelpDiv.appendChild(docDiv);
         }
