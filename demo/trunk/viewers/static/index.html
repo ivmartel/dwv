@@ -13,12 +13,12 @@ body { background-color: #222; color: white;
   margin: 10px; padding: 0; font-size: 80%; }
 #pageHeader h1 { display: inline-block; margin: 0; color: #fff; }
 #pageHeader a { color: #ddf; }
-#pageHeader #toolbar { display: inline-block; float: right; }
-#toolbox li:first-child { list-style-type: none; padding-bottom: 10px; margin-left: -20px; }
+#pageHeader .toolbar { display: inline-block; float: right; }
+.toolbox li:first-child { list-style-type: none; padding-bottom: 10px; margin-left: -20px; }
 #pageMain { position: absolute; height: 92%; width: 99%; bottom: 5px; left: 5px; background-color: #333; }
-#infotl { color: #333; text-shadow: 0 1px 0 #fff; }
-#infotr { color: #333; text-shadow: 0 1px 0 #fff; }
-#dropBox { margin: 20px; }
+.infotl { color: #333; text-shadow: 0 1px 0 #fff; }
+.infotr { color: #333; text-shadow: 0 1px 0 #fff; }
+.dropBox { margin: 20px; }
 </style>
 <link type="text/css" rel="stylesheet" href="../../ext/jquery-ui/themes/ui-darkness/jquery-ui-1.11.2.min.css">
 <!-- Third party -->
@@ -40,6 +40,9 @@ body { background-color: #222; color: white;
 
 <body>
 
+<!-- DWV -->
+<div id="dwv">
+
 <div id="pageHeader">
 
 <!-- Title -->
@@ -48,48 +51,48 @@ body { background-color: #222; color: white;
 <span class="dwv-version"></span>)</h1>
 
 <!-- Toolbar -->
-<div id="toolbar"></div>
+<div class="toolbar"></div>
 
 </div><!-- /pageHeader -->
 
 <div id="pageMain">
 
 <!-- Open file -->
-<div id="openData" title="File">
-<div id="loaderlist"></div>
-<div id="progressbar"></div>
+<div class="openData" title="File">
+<div class="loaderlist"></div>
+<div class="progressbar"></div>
 </div>
 
 <!-- Toolbox -->
-<div id="toolbox" title="Toolbox">
-<ul id="toolList"></ul>
-</div>
+<div class="toolList" title="Toolbox"></div> 
 
 <!-- History -->
-<div id="history" title="History"></div>
+<div class="history" title="History"></div>
 
 <!-- Tags -->
-<div id="tags" title="Tags"></div>
+<div class="tags" title="Tags"></div>
 
 <!-- Help -->
-<div id="help" title="Help"></div>
+<div class="help" title="Help"></div>
 
 <!-- Layer Container -->
-<div id="layerDialog" title="Image">
-<div id="dwv-dropBox" class="dropBox"></div>
-<div id="dwv" class="layerContainer">
-<canvas id="dwv-imageLayer" class="imageLayer">Only for HTML5 compatible browsers...</canvas>
-<div id="dwv-drawDiv" class="drawDiv"></div>
-<div id="dwv-infoLayer" class="infoLayer">
-<div id="dwv-infotl" class="infotl"></div>
-<div id="dwv-infotr" class="infotr"></div>
-<div id="dwv-infobl" class="infobl"></div>
-<div id="dwv-infobr" class="infobr"><div id="dwv-plot" class="plot"></div></div>
+<div class="layerDialog" title="Image">
+<div class="dropBox"></div>
+<div class="layerContainer">
+<canvas class="imageLayer">Only for HTML5 compatible browsers...</canvas>
+<div class="drawDiv"></div>
+<div class="infoLayer">
+<div class="infotl"></div>
+<div class="infotr"></div>
+<div class="infobl"></div>
+<div class="infobr"><div class="plot"></div></div>
 </div><!-- /infoLayer -->
 </div><!-- /layerContainer -->
 </div><!-- /layerDialog -->
 
 </div><!-- /pageMain -->
+
+</div><!-- /dwv -->
 
 </body>
 </html>

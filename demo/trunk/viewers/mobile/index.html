@@ -56,10 +56,13 @@ body { margin: 10px; padding: 0; }
   data-transition="slide">Help</a>
 </div><!-- /pageHeader -->
 
+<!-- DWV -->
+<div id="dwv">
+
 <div id="pageMain" data-role="content" style="padding:2px;">
 
 <!-- Toolbar -->
-<div id="toolbar"></div>
+<div class="toolbar"></div>
 
 <!-- Open popup -->
 <div data-role="popup" id="popupOpen">
@@ -67,36 +70,36 @@ body { margin: 10px; padding: 0; }
   data-icon="delete" data-iconpos="notext" class="ui-btn-right">Close</a>
 <div style="padding:10px 20px;">
 <h3>Open</h3>
-<div id="loaderlist"></div>
+<div id="dwv-loaderlist"></div>
 </div>
 </div><!-- /popup -->
 
 <!-- Layer Container -->
-<div id="dwv" class="layerContainer">
-<div id="dwv-dropBox" class="dropBox"></div>
-<canvas id="dwv-imageLayer" class="imageLayer">Only for HTML5 compatible browsers...</canvas>
-<div id="dwv-drawDiv" class="drawDiv"></div>
-<div id="dwv-infoLayer" class="infoLayer">
-<div id="dwv-infotl" class="infotl"></div>
-<div id="dwv-infotr" class="infotr"></div>
-<div id="dwv-infobl" class="infobl"></div>
-<div id="dwv-infobr" class="infobr"><div id="dwv-plot" class="plot"></div></div>
-</div><!-- /dwv-infoLayer -->
-</div><!-- /dwv -->
+<div class="layerContainer">
+<div class="dropBox"></div>
+<canvas class="imageLayer">Only for HTML5 compatible browsers...</canvas>
+<div class="drawDiv"></div>
+<div class="infoLayer">
+<div class="infotl"></div>
+<div class="infotr"></div>
+<div class="infobl"></div>
+<div class="infobr"><div class="plot"></div></div>
+</div><!-- /infoLayer -->
+</div><!-- /layerContainer -->
 
 <!-- History -->
-<div id="history" title="History" style="display:none;"></div>
+<div class="history" title="History" style="display:none;"></div>
 
 </div><!-- /content -->
 
-<div data-role="footer" id="footer">
-<div data-role="navbar" id="toolbox">
-<ul id="toolList"><li></li><li></li><li></li></ul>
-</div><!-- /navbar: main -->
+<div data-role="footer">
+<div data-role="navbar" class="toolList">
+</div><!-- /navbar -->
 </div><!-- /footer -->
 
 </div><!-- /page main -->
 
+</div><!-- /dwv -->
 
 <!-- Tags page -->
 <div data-role="page" data-theme="b" id="tags_page">
@@ -109,7 +112,7 @@ body { margin: 10px; padding: 0; }
 
 <div data-role="content">
 <!-- Tags -->
-<div id="tags" title="Tags"></div>
+<div id="dwv-tags" title="Tags"></div>
 </div><!-- /content -->
 
 </div><!-- /page tags_page-->
@@ -125,7 +128,7 @@ body { margin: 10px; padding: 0; }
 
 <div data-role="content">
 <!-- Tags -->
-<div id="help" title="Help"></div>
+<div id="dwv-help" title="Help"></div>
 </div><!-- /content -->
 
 </div><!-- /page help_page-->
