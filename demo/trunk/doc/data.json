@@ -3544,7 +3544,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1255,
+            "line": 1257,
             "description": "Handle a drag over.",
             "itemtype": "method",
             "name": "onDragOver",
@@ -3562,7 +3562,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1273,
+            "line": 1275,
             "description": "Handle a drag leave.",
             "itemtype": "method",
             "name": "onDragLeave",
@@ -3580,7 +3580,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1291,
+            "line": 1293,
             "description": "Handle a drop event.",
             "itemtype": "method",
             "name": "onDrop",
@@ -3598,7 +3598,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1306,
+            "line": 1308,
             "description": "Handle an error: display it to the user.",
             "itemtype": "method",
             "name": "handleError",
@@ -3616,7 +3616,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1327,
+            "line": 1329,
             "description": "Create the application layers.",
             "itemtype": "method",
             "name": "createLayers",
@@ -3639,7 +3639,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1368,
+            "line": 1370,
             "description": "Post load application initialisation. To be called once the DICOM has been parsed.",
             "itemtype": "method",
             "name": "postLoadInit",

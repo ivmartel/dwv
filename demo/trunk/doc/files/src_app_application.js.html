@@ -1422,7 +1422,9 @@ dwv.App = function ()
         // Call the event handler of the tool.
         if ( handled )
         {
-            event.preventDefault();
+            if ( event.type !== &quot;keydown&quot; ) {
+                event.preventDefault();
+            }
             var func = self.getToolbox().getSelectedTool()[event.type];
             if ( func )
             {
