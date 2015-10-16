@@ -13,53 +13,53 @@ dwv.info = dwv.info || {};
 
 /**
  * WindowLevel info layer.
- * @class WindowLevel
+ * @class Windowing
  * @namespace dwv.info
  * @constructor
- * @param {Object} app The associated application.
+ * @param {Object} div The HTML element to add WindowLevel info to.
  */
-dwv.info.Windowing = function ( app )
+dwv.info.Windowing = function ( div )
 {
     /**
      * Create the windowing info div.
-     * @method createWindowingDiv
-     * @param {String} rootId The div root ID.
+     * @method create
      */
     this.create = function ()
     {
-        var rootId = app.getContainerDivId();
-        var div = document.getElementById(rootId+"-infotr");
-        dwv.html.removeNode(rootId+"-ulinfotr");
-        // windowing list
+        // clean div
+        var elems = div.getElementsByClassName("wl-info");
+        if ( elems.length !== 0 ) {
+            dwv.html.removeNodes(elems);
+        }
+        // create windowing list
         var ul = document.createElement("ul");
-        ul.id = rootId+"-ulinfotr";
+        ul.className = "wl-info";
         // window center list item
         var liwc = document.createElement("li");
-        liwc.id = rootId+"-liwcinfotr";
+        liwc.className = "window-center";
         ul.appendChild(liwc);
         // window width list item
         var liww = document.createElement("li");
-        liww.id = rootId+"-liwwinfotr";
+        liww.className = "window-width";
         ul.appendChild(liww);
         // add list to div
         div.appendChild(ul);
     };
     
     /**
-     * Update the Top Right info div.
-     * @method updateWindowingDiv
-     * @param {Object} event The windowing change event containing the new values.
-     * Warning: expects the windowing info div to exist (use after createWindowingDiv).
+     * Update the windowing info div.
+     * @method update
+     * @param {Object} event The windowing change event containing the new values as {wc,ww}.
+     * Warning: expects the windowing info div to exist (use after create).
      */
     this.update = function (event)
     {
-        var rootId = app.getContainerDivId();
         // window center list item
-        var liwc = document.getElementById(rootId+"-liwcinfotr");
+        var liwc = div.getElementsByClassName("window-center")[0];
         dwv.html.cleanNode(liwc);
         liwc.appendChild(document.createTextNode("WindowCenter = "+event.wc));
         // window width list item
-        var liww = document.getElementById(rootId+"-liwwinfotr");
+        var liww = div.getElementsByClassName("window-width")[0];
         dwv.html.cleanNode(liww);
         liww.appendChild(document.createTextNode("WindowWidth = "+event.ww));
     };
@@ -71,31 +71,31 @@ dwv.info.Windowing = function ( app )
  * @class Position
  * @namespace dwv.info
  * @constructor
- * @param {Object} app The associated application.
+ * @param {Object} div The HTML element to add Position info to.
  */
-dwv.info.Position = function ( app )
+dwv.info.Position = function ( div )
 {
     /**
      * Create the position info div.
-     * @method createPositionDiv
-     * @param {String} rootId The div root ID.
+     * @method create
      */
     this.create = function ()
     {
-        var rootId = app.getContainerDivId();
-        
-        var div = document.getElementById(rootId+"-infotl");
-        dwv.html.removeNode(rootId+"-ulinfotl");
+        // clean div
+        var elems = div.getElementsByClassName("pos-info");
+        if ( elems.length !== 0 ) {
+            dwv.html.removeNodes(elems);
+        }
         // position list
         var ul = document.createElement("ul");
-        ul.id = rootId+"-ulinfotl";
+        ul.className = "pos-info";
         // position
         var lipos = document.createElement("li");
-        lipos.id = rootId+"-liposinfotl";
+        lipos.className = "position";
         ul.appendChild(lipos);
         // value
         var livalue = document.createElement("li");
-        livalue.id = rootId+"-livalueinfotl";
+        livalue.className = "value";
         ul.appendChild(livalue);
         // add list to div
         div.appendChild(ul);
@@ -103,22 +103,22 @@ dwv.info.Position = function ( app )
     
     /**
      * Update the position info div.
-     * @method updatePositionDiv
-     * @param {Object} event The position change event containing the new values.
-     * Warning: expects the position info div to exist (use after createPositionDiv).
+     * @method update
+     * @param {Object} event The position change event containing the new values as {i,j,k}
+     *  and optional 'value'.
+     * Warning: expects the position info div to exist (use after create).
      */
     this.update = function (event)
     {
-        var rootId = app.getContainerDivId();
-        
         // position list item
-        var lipos = document.getElementById(rootId+"-liposinfotl");
+        var lipos = div.getElementsByClassName("position")[0];
         dwv.html.cleanNode(lipos);
-        lipos.appendChild(document.createTextNode("Pos = "+event.i+", "+event.j+", "+event.k));
+        lipos.appendChild(document.createTextNode(
+            "Pos = "+event.i+", "+event.j+", "+event.k));
         // value list item
         if( typeof(event.value) != "undefined" )
         {
-            var livalue = document.getElementById(rootId+"-livalueinfotl");
+            var livalue = div.getElementsByClassName("value")[0];
             dwv.html.cleanNode(livalue);
             livalue.appendChild(document.createTextNode("Value = "+event.value));
         }
@@ -130,23 +130,25 @@ dwv.info.Position = function ( app )
  * @class MiniColourMap
  * @namespace dwv.info
  * @constructor
+ * @param {Object} div The HTML element to add colourMap info to.
  * @param {Object} app The associated application.
  */
-dwv.info.MiniColourMap = function ( app )
+dwv.info.MiniColourMap = function ( div, app )
 {
     /**
      * Create the mini colour map info div.
-     * @method createMiniColourMap
+     * @method create
      */
     this.create = function ()
     {    
-        var rootId = app.getContainerDivId();
-        
+        // clean div
+        var elems = div.getElementsByClassName("colour-map-info");
+        if ( elems.length !== 0 ) {
+            dwv.html.removeNodes(elems);
+        }
         // colour map
-        var div = document.getElementById(rootId+"-infobr");
-        dwv.html.removeNode(rootId+"-canvasinfobr");
         var canvas = document.createElement("canvas");
-        canvas.id = rootId+"-canvasinfobr";
+        canvas.className = "colour-map-info";
         canvas.width = 98;
         canvas.height = 10;
         // add canvas to div
@@ -155,18 +157,16 @@ dwv.info.MiniColourMap = function ( app )
     
     /**
      * Update the mini colour map info div.
-     * @method updateMiniColourMap
+     * @method update
      * @param {Object} event The windowing change event containing the new values.
      * Warning: expects the mini colour map div to exist (use after createMiniColourMap).
      */
     this.update = function (event)
     {    
-        var rootId = app.getContainerDivId();
-        
         var windowCenter = event.wc;
         var windowWidth = event.ww;
         
-        var canvas = document.getElementById(rootId+"-canvasinfobr");
+        var canvas = div.getElementsByClassName("colour-map-info")[0];
         var context = canvas.getContext('2d');
         
         // fill in the image data
@@ -218,18 +218,23 @@ dwv.info.MiniColourMap = function ( app )
  * @class Plot
  * @namespace dwv.info
  * @constructor
+ * @param {Object} div The HTML element to add colourMap info to.
  * @param {Object} app The associated application.
  */
-dwv.info.Plot = function (app)
+dwv.info.Plot = function (div, app)
 {
     /**
      * Create the plot info.
      * @method create
-     * @param {String} rootId The div root ID.
      */
     this.create = function()
     {
-        $.plot($("#"+app.getContainerDivId()+"-plot"), [ app.getImage().getHistogram() ], {
+        // clean div
+        if ( div ) {
+            dwv.html.cleanNode(div);
+        }
+        // create
+        $.plot(div, [ app.getImage().getHistogram() ], {
             "bars": { "show": true },
             "grid": { "backgroundcolor": null },
             "xaxis": { "show": true },
@@ -258,7 +263,7 @@ dwv.info.Plot = function (app)
             { "color": "#aaf", "lineWidth": 1, "xaxis": { "from": max, "to": max } }
         ];
     
-        $.plot($("#"+app.getContainerDivId()+"-plot"), [ app.getImage().getHistogram() ], {
+        $.plot(div, [ app.getImage().getHistogram() ], {
             "bars": { "show": true },
             "grid": { "markings": markings, "backgroundcolour": null },
             "xaxis": { "show": false },

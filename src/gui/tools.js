@@ -32,21 +32,21 @@ dwv.gui.base.Toolbox = function (app)
         
         // tool list element
         var toolLi = document.createElement("li");
-        toolLi.id = "toolLi";
+        toolLi.className = "toolLi ui-block-a";
         toolLi.style.display = "none";
         toolLi.appendChild(toolSelector);
-        toolLi.setAttribute("class","ui-block-a");
-    
+
+        // tool ul
+        var toolUl = document.createElement("ul");
+        toolUl.appendChild(toolLi);
+        toolUl.className = "ui-grid-b"; 
+
         // node
-        var node = document.getElementById("toolList");
-        // clear it
-        while(node.hasChildNodes()) {
-            node.removeChild(node.firstChild);
-        }
+        var node = app.getElement("toolList");
         // append
-        node.appendChild(toolLi);
-        // trigger create event (mobile)
-        $("#toolList").trigger("create");
+        node.appendChild(toolUl);
+        // refresh
+        dwv.gui.refreshElement(node);
     };
     
     /**
@@ -57,7 +57,8 @@ dwv.gui.base.Toolbox = function (app)
     this.display = function (bool)
     {
         // tool list element
-        dwv.html.displayElement("toolLi", bool);
+        var node = app.getElement("toolLi");
+        dwv.html.displayElement(node, bool);
     };
     
     /**
@@ -67,7 +68,7 @@ dwv.gui.base.Toolbox = function (app)
     this.initialise = function (displays)
     {
         // tool select: reset selected option
-        var toolSelector = document.getElementById("toolSelect");
+        var toolSelector = app.getElement("toolSelect");
         
         // update list
         var options = toolSelector.options;
@@ -86,7 +87,7 @@ dwv.gui.base.Toolbox = function (app)
         toolSelector.selectedIndex = selectedIndex;
         
         // refresh
-        dwv.gui.refreshSelect("#toolSelect");
+        dwv.gui.refreshElement(toolSelector);
     };
     
 }; // dwv.gui.base.Toolbox
@@ -114,25 +115,25 @@ dwv.gui.base.WindowLevel = function (app)
     
         // preset list element
         var wlLi = document.createElement("li");
-        wlLi.id = "wlLi";
+        wlLi.className = "wlLi ui-block-b";
+        //wlLi.className = "wlLi";
         wlLi.style.display = "none";
         wlLi.appendChild(wlSelector);
-        wlLi.setAttribute("class","ui-block-b");
         // colour map list element
         var cmLi = document.createElement("li");
-        cmLi.id = "cmLi";
+        cmLi.className = "cmLi ui-block-c";
+        //cmLi.className = "cmLi";
         cmLi.style.display = "none";
         cmLi.appendChild(cmSelector);
-        cmLi.setAttribute("class","ui-block-c");
     
         // node
-        var node = document.getElementById("toolList");
+        var node = app.getElement("toolList").getElementsByTagName("ul")[0];
         // append preset
         node.appendChild(wlLi);
         // append colour map
         node.appendChild(cmLi);
-        // trigger create event (mobile)
-        $("#toolList").trigger("create");
+        // refresh
+        dwv.gui.refreshElement(node);
     };
     
     /**
@@ -143,9 +144,11 @@ dwv.gui.base.WindowLevel = function (app)
     this.display = function (bool)
     {
         // presets list element
-        dwv.html.displayElement("wlLi", bool);
+        var node = app.getElement("wlLi");
+        dwv.html.displayElement(node, bool);
         // colour map list element
-        dwv.html.displayElement("cmLi", bool);
+        node = app.getElement("cmLi");
+        dwv.html.displayElement(node, bool);
     };
     
     /**
@@ -160,22 +163,24 @@ dwv.gui.base.WindowLevel = function (app)
         wlSelector.title = "Select w/l preset.";
         
         // copy html list
-        var wlLi = document.getElementById("wlLi");
+        var wlLi = app.getElement("wlLi");
         // clear node
         dwv.html.cleanNode(wlLi);
         // add children
         wlLi.appendChild(wlSelector);
-        $("#toolList").trigger("create");
+        // refresh
+        dwv.gui.refreshElement(wlLi);
         
         // colour map select
-        var cmSelector = document.getElementById("colourMapSelect");
+        var cmSelector = app.getElement("colourMapSelect");
         cmSelector.selectedIndex = 0;
         // special monochrome1 case
         if( app.getImage().getPhotometricInterpretation() === "MONOCHROME1" )
         {
             cmSelector.selectedIndex = 1;
         }
-        dwv.gui.refreshSelect("#colourMapSelect");
+        // refresh
+        dwv.gui.refreshElement(cmSelector);
     };
     
 }; // class dwv.gui.base.WindowLevel
@@ -213,25 +218,25 @@ dwv.gui.base.Draw = function (app)
     
         // shape list element
         var shapeLi = document.createElement("li");
-        shapeLi.id = "shapeLi";
+        shapeLi.className = "shapeLi ui-block-c";
         shapeLi.style.display = "none";
         shapeLi.appendChild(shapeSelector);
-        shapeLi.setAttribute("class","ui-block-c");
+        //shapeLi.setAttribute("class","ui-block-c");
         // colour list element
         var colourLi = document.createElement("li");
-        colourLi.id = "colourLi";
+        colourLi.className = "colourLi ui-block-b";
         colourLi.style.display = "none";
         colourLi.appendChild(colourSelector);
-        colourLi.setAttribute("class","ui-block-b");
+        //colourLi.setAttribute("class","ui-block-b");
         
         // node
-        var node = document.getElementById("toolList");
+        var node = app.getElement("toolList").getElementsByTagName("ul")[0];
         // apend shape
         node.appendChild(shapeLi);
         // append colour
         node.appendChild(colourLi);
-        // trigger create event (mobile)
-        $("#toolList").trigger("create");
+        // refresh
+        dwv.gui.refreshElement(node);
     };
 
     /**
@@ -242,9 +247,11 @@ dwv.gui.base.Draw = function (app)
     this.display = function (bool)
     {
         // colour list element
-        dwv.html.displayElement("colourLi", bool);
+        var node = app.getElement("colourLi");
+        dwv.html.displayElement(node, bool);
         // shape list element
-        dwv.html.displayElement("shapeLi", bool);
+        node = app.getElement("shapeLi");
+        dwv.html.displayElement(node, bool);
     };
     
     /**
@@ -254,13 +261,16 @@ dwv.gui.base.Draw = function (app)
     this.initialise = function ()
     {
         // shape select: reset selected option
-        var shapeSelector = document.getElementById("shapeSelect");
+        var shapeSelector = app.getElement("shapeSelect");
         shapeSelector.selectedIndex = 0;
-        dwv.gui.refreshSelect("#shapeSelect");
+        // refresh
+        dwv.gui.refreshElement(shapeSelector);
+        
         // colour select: reset selected option
-        var colourSelector = document.getElementById("colourSelect");
+        var colourSelector = app.getElement("colourSelect");
         colourSelector.selectedIndex = 0;
-        dwv.gui.refreshSelect("#colourSelect");
+        // refresh
+        dwv.gui.refreshElement(colourSelector);
     };
     
 }; // class dwv.gui.base.Draw
@@ -295,17 +305,17 @@ dwv.gui.base.Livewire = function (app)
         
         // colour list element
         var colourLi = document.createElement("li");
-        colourLi.id = "lwColourLi";
+        colourLi.className = "lwColourLi ui-block-b";
         colourLi.style.display = "none";
-        colourLi.setAttribute("class","ui-block-b");
+        //colourLi.setAttribute("class","ui-block-b");
         colourLi.appendChild(colourSelector);
         
         // node
-        var node = document.getElementById("toolList");
+        var node = app.getElement("toolList").getElementsByTagName("ul")[0];
         // apend colour
         node.appendChild(colourLi);
-        // trigger create event (mobile)
-        $("#toolList").trigger("create");
+        // refresh
+        dwv.gui.refreshElement(node);
     };
     
     /**
@@ -316,7 +326,8 @@ dwv.gui.base.Livewire = function (app)
     this.display = function (bool)
     {
         // colour list
-        dwv.html.displayElement("lwColourLi", bool);
+        var node = app.getElement("lwColourLi");
+        dwv.html.displayElement(node, bool);
     };
     
     /**
@@ -325,9 +336,9 @@ dwv.gui.base.Livewire = function (app)
      */
     this.initialise = function ()
     {
-        var colourSelector = document.getElementById("lwColourSelect");
+        var colourSelector = app.getElement("lwColourSelect");
         colourSelector.selectedIndex = 0;
-        dwv.gui.refreshSelect("#lwColourSelect");
+        dwv.gui.refreshElement(colourSelector);
     };
     
 }; // class dwv.gui.base.Livewire
@@ -348,7 +359,7 @@ dwv.gui.base.ZoomAndPan = function (app)
     {
         // reset button
         var button = document.createElement("button");
-        button.id = "zoomResetButton";
+        button.className = "zoomResetButton";
         button.name = "zoomResetButton";
         button.onclick = app.onZoomReset;
         button.setAttribute("style","width:100%; margin-top:0.5em;");
@@ -358,17 +369,17 @@ dwv.gui.base.ZoomAndPan = function (app)
         
         // list element
         var liElement = document.createElement("li");
-        liElement.id = "zoomLi";
+        liElement.className = "zoomLi ui-block-c";
         liElement.style.display = "none";
-        liElement.setAttribute("class","ui-block-c");
+        //liElement.setAttribute("class","ui-block-c");
         liElement.appendChild(button);
         
         // node
-        var node = document.getElementById("toolList");
+        var node = app.getElement("toolList").getElementsByTagName("ul")[0];
         // append element
         node.appendChild(liElement);
-        // trigger create event (mobile)
-        $("#toolList").trigger("create");
+        // refresh
+        dwv.gui.refreshElement(node);
     };
     
     /**
@@ -379,7 +390,8 @@ dwv.gui.base.ZoomAndPan = function (app)
     this.display = function(bool)
     {
         // display list element
-        dwv.html.displayElement("zoomLi", bool);
+        var node = app.getElement("zoomLi");
+        dwv.html.displayElement(node, bool);
     };
     
 }; // class dwv.gui.base.ZoomAndPan
@@ -390,7 +402,7 @@ dwv.gui.base.ZoomAndPan = function (app)
  * @namespace dwv.gui.base
  * @constructor
  */
-dwv.gui.base.Scroll = function ()
+dwv.gui.base.Scroll = function (app)
 {
     /**
      * Setup the tool HTML.
@@ -400,16 +412,15 @@ dwv.gui.base.Scroll = function ()
     {
         // list element
         var liElement = document.createElement("li");
-        liElement.id = "scrollLi";
+        liElement.className = "scrollLi ui-block-c";
         liElement.style.display = "none";
-        liElement.setAttribute("class","ui-block-c");
         
         // node
-        var node = document.getElementById("toolList");
+        var node = app.getElement("toolList").getElementsByTagName("ul")[0];
         // append element
         node.appendChild(liElement);
-        // trigger create event (mobile)
-        $("#toolList").trigger("create");
+        // refresh
+        dwv.gui.refreshElement(node);
     };
     
     /**
@@ -420,7 +431,8 @@ dwv.gui.base.Scroll = function ()
     this.display = function(bool)
     {
         // display list element
-        dwv.html.displayElement("scrollLi", bool);
+        var node = app.getElement("scrollLi");
+        dwv.html.displayElement(node, bool);
     };
     
 }; // class dwv.gui.base.Scroll

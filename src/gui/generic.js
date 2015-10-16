@@ -25,7 +25,7 @@ dwv.gui.base = dwv.gui.base || {};
  */
 dwv.gui.base.getWindowSize = function()
 {
-    return { 'width': ($(window).width()), 'height': ($(window).height() - 147) };
+    return { 'width': window.innerWidth, 'height': window.innerHeight - 147 };
 };
 
 /**
@@ -62,17 +62,37 @@ dwv.gui.base.displayProgress = function(percent)
 };
 
 /**
- * Refresh a HTML select. Mainly for jquery-mobile.
- * @method refreshSelect
+ * Get a HTML element associated to a container div.
+ * @method getElement
  * @static
- * @param {String} selectName The name of the HTML select to refresh.
+ * @param containerDivId The id of the container div.
+ * @param name The name or id to find.
+ * @return The found element or null.
  */
-dwv.gui.base.refreshSelect = function(selectName)
+dwv.gui.base.getElement = function (containerDivId, name)
 {
-    // jquery-mobile
-    if( $(selectName).selectmenu ) {
-        $(selectName).selectmenu('refresh');
+    // get by class in the container div
+    var parent = document.getElementById(containerDivId);
+    var elements = parent.getElementsByClassName(name);
+    // getting the last element since some libraries (ie jquery-mobile) creates
+    // span in front of regular tags (such as select)...
+    var element = elements[elements.length-1];
+    // if not found get by id with 'containerDivId-className'
+    if ( typeof element === "undefined" ) {
+        element = document.getElementById(containerDivId + '-' + name);
     }
+    return element;
+ };
+
+ /**
+ * Refresh a HTML element. Mainly for jquery-mobile.
+ * @method refreshElement
+ * @static
+ * @param {String} element The HTML element to refresh.
+ */
+dwv.gui.base.refreshElement = function (/*element*/)
+{
+    // base does nothing...
 };
 
 /**
@@ -82,18 +102,17 @@ dwv.gui.base.refreshSelect = function(selectName)
  * @param {String} selectName The name of the HTML select.
  * @param {String} itemName The name of the itme to mark as selected.
  */
-dwv.gui.setSelected = function(selectName, itemName)
+dwv.gui.setSelected = function(element, itemName)
 {
-    var select = document.getElementById(selectName);
-    if ( select ) {
+    if ( element ) {
         var index = 0;
-        for( index in select.options){ 
-            if( select.options[index].text === itemName ) {
+        for( index in element.options){
+            if( element.options[index].text === itemName ) {
                 break;
             }
         }
-        select.selectedIndex = index;
-        dwv.gui.refreshSelect("#" + selectName);
+        element.selectedIndex = index;
+        dwv.gui.refreshElement(element);
     }
 };
 
@@ -138,7 +157,7 @@ dwv.gui.base.Slider = function (app)
         div.appendChild(inputMax);
         div.setAttribute("data-mini", "true");
         // append to document
-        document.getElementById("thresholdLi").appendChild(div);
+        app.getElement("thresholdLi").appendChild(div);
         // bind change
         $("#threshold-div").on("change",
                 function(/*event*/) {
@@ -147,8 +166,8 @@ dwv.gui.base.Slider = function (app)
                           "max":$("#threshold-max").val() } );
                 }
             );
-        // trigger creation
-        $("#toolList").trigger("create");
+        // refresh
+        dwv.gui.refreshElement(app.getElement("toolList"));
     };
     
     /**
@@ -170,8 +189,8 @@ dwv.gui.base.Slider = function (app)
         inputMax.max = max;
         inputMax.min = min;
         inputMax.value = max;
-        // trigger creation
-        $("#toolList").trigger("create");
+        // refresh
+        dwv.gui.refreshElement(app.getElement("toolList"));
     };
 
 }; // class dwv.gui.base.Slider
@@ -182,7 +201,7 @@ dwv.gui.base.Slider = function (app)
  * @namespace dwv.gui.base
  * @constructor
  */
-dwv.gui.base.DicomTags = function ()
+dwv.gui.base.DicomTags = function (app)
 {
     /**
      * Initialise the DICOM tags table. To be called once the DICOM has been parsed.
@@ -192,7 +211,7 @@ dwv.gui.base.DicomTags = function ()
     this.initialise = function (dataInfo)
     {
         // HTML node
-        var node = document.getElementById("tags");
+        var node = app.getElement("tags");
         if( node === null ) {
             return;
         }
@@ -206,16 +225,16 @@ dwv.gui.base.DicomTags = function ()
         }
         // tags HTML table
         var table = dwv.html.toTable(dataInfo);
-        table.id = "tagsTable";
-        table.setAttribute("class", "tagsList");
+        table.className = "tagsTable";
+        //table.setAttribute("class", "tagsList");
         table.setAttribute("data-role", "table");
         table.setAttribute("data-mode", "columntoggle");
         // search form
         node.appendChild(dwv.html.getHtmlSearchForm(table));
         // tags table
         node.appendChild(table);
-        // trigger create event (mobile)
-        $("#tags").trigger("create");
+        // refresh
+        dwv.gui.refreshElement(node);
     };
     
 }; // class dwv.gui.base.DicomTags

@@ -128,13 +128,6 @@ dwv.App = function ()
     this.getNSlicesToLoad = function () { return nSlicesToLoad; };
 
     /** 
-     * Get the container div id.
-     * @method getContainerDivId
-     * @return {String} The div id.
-     */
-    this.getContainerDivId = function () { return containerDivId; };
-
-    /** 
      * Get the main scale.
      * @method getScale
      * @return {Number} The main scale.
@@ -329,12 +322,12 @@ dwv.App = function ()
             }
             // undo
             if ( config.gui.indexOf("undo") !== -1 ) {
-                undoStack = new dwv.tool.UndoStack();
+                undoStack = new dwv.tool.UndoStack(this);
                 undoStack.setup();
             }
             // DICOM Tags
             if ( config.gui.indexOf("tags") !== -1 ) {
-                tagsGui = new dwv.gui.DicomTags();
+                tagsGui = new dwv.gui.DicomTags(this);
             }
             // version number
             if ( config.gui.indexOf("version") !== -1 ) {
@@ -346,13 +339,12 @@ dwv.App = function ()
                 if ( config.isMobile ) {
                     isMobile = config.isMobile;
                 }
-                dwv.gui.appendHelpHtml( toolbox.getToolList(), isMobile );
+                dwv.gui.appendHelpHtml( toolbox.getToolList(), isMobile, this );
             }
         }
         
         // listen to drag&drop
-        var dropBoxDivId = containerDivId + "-dropBox";
-        var box = document.getElementById(dropBoxDivId);
+        var box = this.getElement("dropBox");
         if ( box ) {
             box.addEventListener("dragover", onDragOver);
             box.addEventListener("dragleave", onDragLeave);
@@ -360,8 +352,7 @@ dwv.App = function ()
             // initial size
             var size = dwv.gui.getWindowSize();
             var dropBoxSize = 2 * size.height / 3;
-            $("#"+dropBoxDivId).height( dropBoxSize );
-            $("#"+dropBoxDivId).width( dropBoxSize );
+            box.setAttribute("style","width:"+dropBoxSize+"px;height:"+dropBoxSize+"px");
         }
         // possible load from URL
         if ( typeof config.skipLoadUrl === "undefined" ) {
@@ -397,6 +388,17 @@ dwv.App = function ()
     };
     
     /**
+     * Get a HTML element associated to the application.
+     * @method getElement
+     * @param name The name or id to find.
+     * @return The found element or null.
+     */
+     this.getElement = function (name)
+     {
+         return dwv.gui.getElement(containerDivId, name);
+     };
+
+    /**
      * Reset the application.
      * @method reset
      */
@@ -416,7 +418,7 @@ dwv.App = function ()
         nSlicesToLoad = 0;
         // reset undo/redo
         if ( undoStack ) {
-            undoStack = new dwv.tool.UndoStack();
+            undoStack = new dwv.tool.UndoStack(this);
             undoStack.initialise();
         }
     };
@@ -625,9 +627,8 @@ dwv.App = function ()
         style.setScale(windowScale);
 
         // resize container
-        var jqDivId = "#"+containerDivId;
-        $(jqDivId).width(newWidth);
-        $(jqDivId).height(newHeight);
+        var container = this.getElement("layerContainer");
+        container.setAttribute("style","width:"+newWidth+"px;height:"+newHeight+"px");
         // resize image layer
         if ( imageLayer ) {
             imageLayer.setWidth(newWidth);
@@ -638,10 +639,9 @@ dwv.App = function ()
         // resize draw stage
         if ( drawStage ) {
             // resize div
-            var drawDivId = "#" + containerDivId + "-drawDiv";
-            $(drawDivId).width(newWidth);
-            $(drawDivId).height(newHeight);
-            // resize stage
+            var drawDiv = this.getElement("drawDiv");
+            drawDiv.setAttribute("style","width:"+newWidth+"px;height:"+newHeight+"px");
+           // resize stage
             drawStage.setWidth(newWidth);
             drawStage.setHeight(newHeight);
             drawStage.scale( {x: scale, y: scale} );
@@ -656,8 +656,8 @@ dwv.App = function ()
     this.toggleInfoLayerDisplay = function ()
     {
         // toggle html
-        var infoDivId = containerDivId + "-infoLayer";
-        dwv.html.toggleDisplay(infoDivId);
+        var infoLayer = self.getElement("infoLayer");
+        dwv.html.toggleDisplay(infoLayer);
         // toggle listeners
         if ( isInfoLayerListening ) {
             removeImageInfoListeners();
@@ -928,7 +928,7 @@ dwv.App = function ()
     {
         var state = new dwv.State(self);
         // add href to link (html5)
-        var element = document.getElementById("download-state");
+        var element = self.getElement("download-state");
         element.href = "data:application/json," + state.toJSON();
     };
 
@@ -1060,9 +1060,9 @@ dwv.App = function ()
         self.resetLayout();
         self.initWLDisplay();
         // update preset select
-        var select = document.getElementById("presetSelect");
+        var select = self.getElement("presetSelect");
         select.selectedIndex = 0;
-        dwv.gui.refreshSelect("#presetSelect");
+        dwv.gui.refreshElement(select);
     };
 
 
@@ -1264,8 +1264,7 @@ dwv.App = function ()
         event.stopPropagation();
         event.preventDefault();
         // update box 
-        var dropBoxDivId = containerDivId + "-dropBox";
-        var box = document.getElementById(dropBoxDivId);
+        var box = self.getElement("dropBox");
         if ( box ) {
             box.className = 'dropBox hover';
         }
@@ -1283,8 +1282,7 @@ dwv.App = function ()
         event.stopPropagation();
         event.preventDefault();
         // update box
-        var dropBoxDivId = containerDivId + "-dropBox";
-        var box = document.getElementById(dropBoxDivId);
+        var box = self.getElement("dropBox hover");
         if ( box ) {
             box.className = 'dropBox';
         }
@@ -1336,16 +1334,17 @@ dwv.App = function ()
     function createLayers(dataWidth, dataHeight)
     {
         // image layer
-        imageLayer = new dwv.html.Layer(containerDivId + "-imageLayer");
+        var canImgLay = self.getElement("imageLayer");
+        imageLayer = new dwv.html.Layer(canImgLay);
         imageLayer.initialise(dataWidth, dataHeight);
         imageLayer.fillContext();
         imageLayer.setStyleDisplay(true);
         // draw layer
-        var drawDivId = containerDivId + "-drawDiv";
-        if ( document.getElementById(drawDivId) !== null) {
+        var drawDiv = self.getElement("drawDiv");
+        if ( drawDiv ) {
             // create stage
             drawStage = new Kinetic.Stage({
-                container: drawDivId,
+                container: drawDiv,
                 width: dataWidth,
                 height: dataHeight,
                 listening: false
@@ -1359,13 +1358,13 @@ dwv.App = function ()
             self.fitToSize( dwv.gui.getWindowSize() );
         }
         else {
-            self.fitToSize( { 
-                'width': $('#'+containerDivId).width(), 
-                'height': $('#'+containerDivId).height() } );
+            self.fitToSize( {
+                'width': self.getElement("imageLayer").width,
+                'height': self.getElement("imageLayer").height } );
         }
         self.resetLayout();
     }
-    
+
     /**
      * Post load application initialisation. To be called once the DICOM has been parsed.
      * @method postLoadInit
@@ -1420,33 +1419,36 @@ dwv.App = function ()
         }
         
         // stop box listening to drag (after first drag)
-        var dropBoxDivId = containerDivId + "-dropBox";
-        var box = document.getElementById(dropBoxDivId);
+        var box = self.getElement("dropBox");
         if ( box ) {
             box.removeEventListener("dragover", onDragOver);
             box.removeEventListener("dragleave", onDragLeave);
             box.removeEventListener("drop", onDrop);
-            dwv.html.removeNode(dropBoxDivId);
+            dwv.html.removeNode(box);
             // switch listening to layerContainer
-            var div = document.getElementById(containerDivId);
+            var div = self.getElement("layerContainer");
             div.addEventListener("dragover", onDragOver);
             div.addEventListener("dragleave", onDragLeave);
             div.addEventListener("drop", onDrop);
         }
 
         // info layer
-        var infoDivId = containerDivId + "-infoLayer";
-        if ( document.getElementById(infoDivId) ) {
-            windowingInfo = new dwv.info.Windowing(self);
+        var infoLayer = self.getElement("infoLayer"); 
+        if ( infoLayer ) {
+            var infotr = self.getElement("infotr");
+            windowingInfo = new dwv.info.Windowing(infotr);
             windowingInfo.create();
             
-            positionInfo = new dwv.info.Position(self);
+            var infotl = self.getElement("infotl");
+            positionInfo = new dwv.info.Position(infotl);
             positionInfo.create();
             
-            miniColourMap = new dwv.info.MiniColourMap(self);
+            var infobr = self.getElement("infobr");
+            miniColourMap = new dwv.info.MiniColourMap(infobr, self);
             miniColourMap.create();
             
-            plotInfo = new dwv.info.Plot(self);
+            var plot = self.getElement("plot");
+            plotInfo = new dwv.info.Plot(plot, self);
             plotInfo.create();
             
             addImageInfoListeners();

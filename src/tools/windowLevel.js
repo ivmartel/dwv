@@ -95,7 +95,7 @@ dwv.tool.WindowLevel = function(app)
             if ( gui ) {
                 gui.initialise();
                 // set selected
-                dwv.gui.setSelected("presetSelect", "Manual");
+                dwv.gui.setSelected(app.getElement("presetSelect"), "Manual");
             }
         }
     };
