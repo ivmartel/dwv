@@ -1540,8 +1540,8 @@ dwv.App = function ()
         }
         else {
             self.fitToSize( {
-                &#x27;width&#x27;: self.getElement(&quot;imageLayer&quot;).width,
-                &#x27;height&#x27;: self.getElement(&quot;imageLayer&quot;).height } );
+                &#x27;width&#x27;: self.getElement(&quot;layerContainer&quot;).offsetWidth,
+                &#x27;height&#x27;: self.getElement(&quot;layerContainer&quot;).offsetHeight } );
         }
         self.resetLayout();
     }
