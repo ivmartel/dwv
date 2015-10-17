@@ -7,6 +7,8 @@ dwv.tool.defaultpresets = {};
 
 // Window
 dwv.gui.getWindowSize = dwv.gui.base.getWindowSize;
+// get element
+dwv.gui.getElement = dwv.gui.base.getElement;
 // Progress
 dwv.gui.displayProgress = function (/*percent*/) {};
 
@@ -21,10 +23,12 @@ dwv.addDataLine = function (id, fileroot, doc)
     // dwv container
     var dwvDiv = document.createElement("div");
     dwvDiv.id = id;
-    dwvDiv.setAttribute("class", "layerContainer");
+    var layConDiv = document.createElement("div");
+    layConDiv.className = "layerContainer";
     var imgCanvas = document.createElement("canvas");
-    imgCanvas.id = id + "-imageLayer";
-    dwvDiv.appendChild(imgCanvas);
+    imgCanvas.className = "imageLayer";
+    layConDiv.appendChild(imgCanvas);
+    dwvDiv.appendChild(layConDiv);
     mainDiv.appendChild(dwvDiv);
     
     // dwv application

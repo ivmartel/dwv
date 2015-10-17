@@ -1361,8 +1361,8 @@ dwv.App = function ()
         }
         else {
             self.fitToSize( {
-                'width': self.getElement("imageLayer").width,
-                'height': self.getElement("imageLayer").height } );
+                'width': self.getElement("layerContainer").offsetWidth,
+                'height': self.getElement("layerContainer").offsetHeight } );
         }
         self.resetLayout();
     }
