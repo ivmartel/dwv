@@ -1010,11 +1010,14 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
     // check the TransferSyntaxUID (has to be there!)
     var syntax = dwv.dicom.cleanString(this.dicomElements.x00020010.value[0]);
     
+    // Explicit VR - Little Endian
+    if( syntax === &quot;1.2.840.10008.1.2.1&quot; ) {
+        // nothing to do!
+    }
     // Implicit VR - Little Endian
-    if( syntax === &quot;1.2.840.10008.1.2&quot; ) {
+    else if( syntax === &quot;1.2.840.10008.1.2&quot; ) {
         implicit = true;
     }
-    // Explicit VR - Little Endian (default): 1.2.840.10008.1.2.1 
     // Deflated Explicit VR - Little Endian
     else if( syntax === &quot;1.2.840.10008.1.2.1.99&quot; ) {
         throw new Error(&quot;Unsupported DICOM transfer syntax (Deflated Explicit VR): &quot;+syntax);
@@ -1054,6 +1057,9 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
     // RLE (lossless)
     else if( syntax === &quot;1.2.840.10008.1.2.5&quot; ) {
         throw new Error(&quot;Unsupported DICOM transfer syntax (RLE): &quot;+syntax);
+    }
+    else {
+        throw new Error(&quot;Unknown transfer syntax.&quot;);
     }
 
     var startedPixelItems = false;

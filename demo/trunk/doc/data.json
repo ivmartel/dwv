@@ -639,7 +639,7 @@
             },
             "tag": "module",
             "file": "src/dicom/dicomParser.js",
-            "line": 1012,
+            "line": 1018,
             "description": "DICOM module."
         },
         "browser": {
@@ -951,7 +951,7 @@
             "module": "dicom",
             "namespace": "dwv.dicom",
             "file": "src/dicom/dicomParser.js",
-            "line": 1012,
+            "line": 1018,
             "description": "DicomElements wrapper.",
             "is_constructor": 1,
             "params": [
@@ -4778,7 +4778,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 1021,
+            "line": 1027,
             "description": "Get a DICOM Element value from a group/element key.",
             "itemtype": "method",
             "name": "getFromKey",
@@ -4804,7 +4804,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 1047,
+            "line": 1053,
             "description": "Dump the DICOM tags to an array.",
             "return": {
                 "description": "",
@@ -4816,7 +4816,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 1082,
+            "line": 1088,
             "description": "Dump the DICOM tags to a string.",
             "return": {
                 "description": "The dumped file.",
@@ -4828,7 +4828,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 1119,
+            "line": 1125,
             "params": [
                 {
                     "name": "group",
@@ -4848,7 +4848,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 1374,
+            "line": 1380,
             "description": "Get a DICOM Element value from a group and an element.",
             "itemtype": "method",
             "name": "getFromGroupElement",
@@ -4874,7 +4874,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 1388,
+            "line": 1394,
             "description": "Get a DICOM Element value from a tag name.\nUses the DICOM dictionary.",
             "itemtype": "method",
             "name": "getFromName",
@@ -13767,15 +13767,15 @@
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/dicom/dicomParser.js:1047"
+            "line": " src/dicom/dicomParser.js:1053"
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/dicom/dicomParser.js:1082"
+            "line": " src/dicom/dicomParser.js:1088"
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/dicom/dicomParser.js:1119"
+            "line": " src/dicom/dicomParser.js:1125"
         },
         {
             "message": "unknown tag: input",
@@ -13871,15 +13871,15 @@
         },
         {
             "message": "Missing item type\nDump the DICOM tags to an array.",
-            "line": " src/dicom/dicomParser.js:1047"
+            "line": " src/dicom/dicomParser.js:1053"
         },
         {
             "message": "Missing item type\nDump the DICOM tags to a string.",
-            "line": " src/dicom/dicomParser.js:1082"
+            "line": " src/dicom/dicomParser.js:1088"
         },
         {
             "message": "Missing item type",
-            "line": " src/dicom/dicomParser.js:1119"
+            "line": " src/dicom/dicomParser.js:1125"
         },
         {
             "message": "Missing item type\nDICOM tag dictionary.\nGenerated using xml standard conversion\n from https://github.com/ivmartel/dcmbench/tree/master/view/part06\n with http://medical.nema.org/medical/dicom/current/source/docbook/part06/part06.xml\nConversion changes: \n- (vr) \"See Note\" -> \"NONE\", \"OB or OW\" -> \"ox\", \"US or SS\" -> \"xs\"\n- added \"GenericGroupLength\" element to each group\nLocal changes:\n- tag numbers with 'xx' were replaced with '00', 'xxx' with '001' and 'xxxx' with '0004'",
