@@ -2798,9 +2798,15 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
             var last = sequences.length - 1;
             sequences[last].vlCount += tagOffset;
             // check if we have reached the sequence vl
-            if ( sequences[last].vlCount === sequences[last].vl ) {
+            //  and the next ones
+            while ( sequences.length > 0 &&
+                    sequences[last].vlCount === sequences[last].vl ) {
                 // last count + size of a sequence
-                var lastVlCount = sequences[last].vlCount + 12;
+                var lastVlCount = sequences[last].vlCount + 8;
+                // add VR size for explicit encoding
+                if ( !implicit ) {
+                    lastVlCount += 4;
+                }
                 // remove last sequence
                 sequences = sequences.slice(0, -1);
                 // add nested sequence vl
