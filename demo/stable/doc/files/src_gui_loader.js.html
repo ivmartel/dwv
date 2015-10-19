@@ -17,7 +17,7 @@
                 <h1><img src="../assets/css/logo.png" title="dwv" width="117" height="52"></h1>
         </div>
         <div class="yui3-u-1-4 version">
-            <em>API Docs for: 0.11.1</em>
+            <em>API Docs for: 0.12.0</em>
         </div>
     </div>
     <div id="bd" class="yui3-g">
@@ -81,7 +81,7 @@
                                 <li><a href="../classes/dwv.info.MiniColourMap.html">dwv.info.MiniColourMap</a></li>
                                 <li><a href="../classes/dwv.info.Plot.html">dwv.info.Plot</a></li>
                                 <li><a href="../classes/dwv.info.Position.html">dwv.info.Position</a></li>
-                                <li><a href="../classes/dwv.info.WindowLevel.html">dwv.info.WindowLevel</a></li>
+                                <li><a href="../classes/dwv.info.Windowing.html">dwv.info.Windowing</a></li>
                                 <li><a href="../classes/dwv.io.html">dwv.io</a></li>
                                 <li><a href="../classes/dwv.io.File.html">dwv.io.File</a></li>
                                 <li><a href="../classes/dwv.io.Url.html">dwv.io.Url</a></li>
@@ -210,15 +210,15 @@ dwv.gui.base.Loadbox = function (app, loaders)
         loaderSelector.onchange = app.onChangeLoader;
         
         // node
-        var node = document.getElementById(&quot;loaderlist&quot;);
+        var node = app.getElement(&quot;loaderlist&quot;);
         // clear it
         while(node.hasChildNodes()) {
             node.removeChild(node.firstChild);
         }
         // append
         node.appendChild(loaderSelector);
-        // trigger create event (mobile)
-        $(&quot;#loaderlist&quot;).trigger(&quot;create&quot;);
+        // refresh
+        dwv.gui.refreshElement(node);
     };
     
     /**
@@ -259,22 +259,22 @@ dwv.gui.base.FileLoad = function (app)
         fileLoadInput.onchange = app.onChangeFiles;
         fileLoadInput.type = &quot;file&quot;;
         fileLoadInput.multiple = true;
-        fileLoadInput.id = &quot;imagefiles&quot;;
+        fileLoadInput.className = &quot;imagefiles&quot;;
         fileLoadInput.setAttribute(&quot;data-clear-btn&quot;,&quot;true&quot;);
         fileLoadInput.setAttribute(&quot;data-mini&quot;,&quot;true&quot;);
     
         // associated div
         var fileLoadDiv = document.createElement(&quot;div&quot;);
-        fileLoadDiv.id = &quot;imagefilesdiv&quot;;
+        fileLoadDiv.className = &quot;imagefilesdiv&quot;;
         fileLoadDiv.style.display = &quot;none&quot;;
         fileLoadDiv.appendChild(fileLoadInput);
         
         // node
-        var node = document.getElementById(&quot;loaderlist&quot;);
+        var node = app.getElement(&quot;loaderlist&quot;);
         // append
         node.appendChild(fileLoadDiv);
-        // trigger create event (mobile)
-        $(&quot;#loaderlist&quot;).trigger(&quot;create&quot;);
+        // refresh
+        dwv.gui.refreshElement(node);
     };
     
     /**
@@ -285,7 +285,8 @@ dwv.gui.base.FileLoad = function (app)
     this.display = function (bool)
     {
         // file div element
-        var filediv = document.getElementById(&quot;imagefilesdiv&quot;);
+        var node = app.getElement(&quot;loaderlist&quot;);
+        var filediv = node.getElementsByClassName(&quot;imagefilesdiv&quot;)[0];
         filediv.style.display = bool ? &quot;&quot; : &quot;none&quot;;
     };
     
@@ -309,22 +310,22 @@ dwv.gui.base.UrlLoad = function (app)
         var urlLoadInput = document.createElement(&quot;input&quot;);
         urlLoadInput.onchange = app.onChangeURL;
         urlLoadInput.type = &quot;url&quot;;
-        urlLoadInput.id = &quot;imageurl&quot;;
+        urlLoadInput.className = &quot;imageurl&quot;;
         urlLoadInput.setAttribute(&quot;data-clear-btn&quot;,&quot;true&quot;);
         urlLoadInput.setAttribute(&quot;data-mini&quot;,&quot;true&quot;);
     
         // associated div
         var urlLoadDiv = document.createElement(&quot;div&quot;);
-        urlLoadDiv.id = &quot;imageurldiv&quot;;
+        urlLoadDiv.className = &quot;imageurldiv&quot;;
         urlLoadDiv.style.display = &quot;none&quot;;
         urlLoadDiv.appendChild(urlLoadInput);
     
         // node
-        var node = document.getElementById(&quot;loaderlist&quot;);
+        var node = app.getElement(&quot;loaderlist&quot;);
         // append
         node.appendChild(urlLoadDiv);
-        // trigger create event (mobile)
-        $(&quot;#loaderlist&quot;).trigger(&quot;create&quot;);
+        // refresh
+        dwv.gui.refreshElement(node);
     };
     
     /**
@@ -335,7 +336,8 @@ dwv.gui.base.UrlLoad = function (app)
     this.display = function (bool)
     {
         // url div element
-        var urldiv = document.getElementById(&quot;imageurldiv&quot;);
+        var node = app.getElement(&quot;loaderlist&quot;);
+        var urldiv = node.getElementsByClassName(&quot;imageurldiv&quot;)[0];
         urldiv.style.display = bool ? &quot;&quot; : &quot;none&quot;;
     };
 

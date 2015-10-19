@@ -9,8 +9,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
 <link type="text/css" rel="stylesheet" href="../../css/style.css" />
 <style type="text/css" >
-#toolbar { font: 14px arial, sans-serif; margin-bottom: 2px; }
-#wl-button, #reset-button { margin-right: 5px; }
+.toolbar { font: 14px arial, sans-serif; margin-bottom: 2px; }
+.wl-button, .reset-button { margin-right: 5px; }
 </style>
 <!-- mobile web app -->
 <meta name="mobile-web-app-capable" content="yes" />
@@ -24,14 +24,13 @@
 <link rel="apple-touch-icon" sizes="60x60" href="../../resources/dwv-60.png" />
 <link rel="apple-touch-icon" sizes="128x128" href="../../resources/dwv-128.png" />
 <!-- Third party -->
-<script type="text/javascript" src="../../ext/jquery/jquery-2.1.4.min.js"></script>
 <script type="text/javascript" src="../../ext/pdfjs/jpx.js"></script>
 <script type="text/javascript" src="../../ext/pdfjs/util.js"></script>
 <script type="text/javascript" src="../../ext/pdfjs/arithmetic_decoder.js"></script>
 <script type="text/javascript" src="../../ext/rii-mango/lossless-min.js"></script>
 <script type="text/javascript" src="../../ext/notmasteryet/jpg.js"></script>
 <!-- Local -->
-<script type="text/javascript" src="../../dwv-0.11.1.min.js"></script>
+<script type="text/javascript" src="../../dwv-0.12.0.min.js"></script>
 <!-- Launch the app -->
 <script type="text/javascript" src="appgui.js"></script>
 <script type="text/javascript" src="applauncher.js"></script>
@@ -39,13 +38,17 @@
 
 <body>
 
-<!-- Toolbar -->
-<div id="toolbar"></div>
+<!-- DWV -->
+<div id="dwv">
 
+<!-- Toolbar -->
+<div class="toolbar"></div>
 <!-- Layer Container -->
-<div id="dwv" class="layerContainer">
-<canvas id="dwv-imageLayer" class="imageLayer">Only for HTML5 compatible browsers...</canvas>
+<div class="layerContainer">
+<canvas class="imageLayer">Only for HTML5 compatible browsers...</canvas>
 </div><!-- /layerContainer -->
+
+</div><!-- /dwv -->
 
 </body>
 </html>

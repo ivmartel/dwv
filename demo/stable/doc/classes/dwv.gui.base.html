@@ -17,7 +17,7 @@
                 <h1><img src="../assets/css/logo.png" title="dwv" width="117" height="52"></h1>
         </div>
         <div class="yui3-u-1-4 version">
-            <em>API Docs for: 0.11.1</em>
+            <em>API Docs for: 0.12.0</em>
         </div>
     </div>
     <div id="bd" class="yui3-g">
@@ -81,7 +81,7 @@
                                 <li><a href="../classes/dwv.info.MiniColourMap.html">dwv.info.MiniColourMap</a></li>
                                 <li><a href="../classes/dwv.info.Plot.html">dwv.info.Plot</a></li>
                                 <li><a href="../classes/dwv.info.Position.html">dwv.info.Position</a></li>
-                                <li><a href="../classes/dwv.info.WindowLevel.html">dwv.info.WindowLevel</a></li>
+                                <li><a href="../classes/dwv.info.Windowing.html">dwv.info.Windowing</a></li>
                                 <li><a href="../classes/dwv.io.html">dwv.io</a></li>
                                 <li><a href="../classes/dwv.io.File.html">dwv.io.File</a></li>
                                 <li><a href="../classes/dwv.io.Url.html">dwv.io.Url</a></li>
@@ -213,12 +213,17 @@
                                     <span class="flag static">static</span>
                             </li>
                             <li class="index-item method">
+                                <a href="#method_getElement">getElement</a>
+
+                                    <span class="flag static">static</span>
+                            </li>
+                            <li class="index-item method">
                                 <a href="#method_getWindowSize">getWindowSize</a>
 
                                     <span class="flag static">static</span>
                             </li>
                             <li class="index-item method">
-                                <a href="#method_refreshSelect">refreshSelect</a>
+                                <a href="#method_refreshElement">refreshElement</a>
 
                                     <span class="flag static">static</span>
                             </li>
@@ -297,6 +302,86 @@
 
 
 </div>
+<div id="method_getElement" class="method item">
+    <h3 class="name"><code>getElement</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>containerDivId</code>
+                </li>
+                <li class="arg">
+                        <code>name</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+        <span class="returns-inline">
+            <span class="type"></span>
+        </span>
+
+
+
+
+        <span class="flag static">static</span>
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/src_gui_generic.js.html#l64"><code>src&#x2F;gui&#x2F;generic.js:64</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Get a HTML element associated to a container div.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">containerDivId</code>
+                        <span class="type">Object</span>
+
+
+                    <div class="param-description">
+                        <p>The id of the container div.</p>
+
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name">name</code>
+                        <span class="type">Object</span>
+
+
+                    <div class="param-description">
+                        <p>The name or id to find.</p>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                    <p>The found element or null.</p>
+
+            </div>
+        </div>
+
+
+</div>
 <div id="method_getWindowSize" class="method item">
     <h3 class="name"><code>getWindowSize</code></h3>
 
@@ -329,13 +414,13 @@
 
 
 </div>
-<div id="method_refreshSelect" class="method item">
-    <h3 class="name"><code>refreshSelect</code></h3>
+<div id="method_refreshElement" class="method item">
+    <h3 class="name"><code>refreshElement</code></h3>
 
         <div class="args">
             <span class="paren">(</span><ul class="args-list inline commas">
                 <li class="arg">
-                        <code>selectName</code>
+                        <code>element</code>
                 </li>
             </ul><span class="paren">)</span>
         </div>
@@ -351,7 +436,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_gui_generic.js.html#l64"><code>src&#x2F;gui&#x2F;generic.js:64</code></a>
+        <a href="../files/src_gui_generic.js.html#l87"><code>src&#x2F;gui&#x2F;generic.js:87</code></a>
         </p>
 
 
@@ -359,7 +444,7 @@
     </div>
 
     <div class="description">
-        <p>Refresh a HTML select. Mainly for jquery-mobile.</p>
+        <p>Refresh a HTML element. Mainly for jquery-mobile.</p>
 
     </div>
 
@@ -368,12 +453,12 @@
 
             <ul class="params-list">
                 <li class="param">
-                        <code class="param-name">selectName</code>
+                        <code class="param-name">element</code>
                         <span class="type">String</span>
 
 
                     <div class="param-description">
-                        <p>The name of the HTML select to refresh.</p>
+                        <p>The HTML element to refresh.</p>
 
                     </div>
 
@@ -409,7 +494,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_gui_generic.js.html#l78"><code>src&#x2F;gui&#x2F;generic.js:78</code></a>
+        <a href="../files/src_gui_generic.js.html#l98"><code>src&#x2F;gui&#x2F;generic.js:98</code></a>
         </p>
 
 

@@ -1,5 +1,5 @@
 CACHE MANIFEST
-# v6 2015-09-30
+# v7 2015-10-19
 
 CACHE:
 
@@ -8,7 +8,7 @@ index.html
 # css
 /dwv/demo/stable/css/style.css
 # js
-/dwv/demo/stable/dwv-0.11.1.min.js
+/dwv/demo/stable/dwv-0.12.0.min.js
 applauncher.js
 appgui.js
 # images
@@ -41,8 +41,8 @@ appgui.js
 /dwv/demo/stable/ext/pdfjs/arithmetic_decoder.js
 /dwv/demo/stable/ext/pdfjs/util.js
 /dwv/demo/stable/ext/rii-mango/lossless-min.js
-/dwv/demo/stable/ext/rii-mango/lossless-min.js
 /dwv/demo/stable/ext/notmasteryet/jpg.js
+/dwv/demo/stable/ext/flot/jquery.flot.min.js
 /dwv/demo/stable/ext/kinetic/kinetic-v5.1.1-06.10.min.js
 
 NETWORK:

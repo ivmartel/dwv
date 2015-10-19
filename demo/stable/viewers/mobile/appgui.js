@@ -25,11 +25,22 @@ dwv.tool.defaultpresets.CT = {
 };
 
 // Window
-dwv.gui.getWindowSize = dwv.gui.base.getWindowSize;
+dwv.gui.getWindowSize = function () {
+    return { 'width': ($(window).width()), 'height': ($(window).height() - 147) };
+};
 // Progress
 dwv.gui.displayProgress = dwv.gui.base.displayProgress;
-// Select
-dwv.gui.refreshSelect = dwv.gui.base.refreshSelect;
+// get element
+dwv.gui.getElement = dwv.gui.base.getElement;
+// refresh
+dwv.gui.refreshElement = function (element) {
+    if( $(element)[0].nodeName.toLowerCase() === 'select' ) {
+        $(element).selectmenu('refresh');
+    }
+    else {
+        $(element).enhanceWithin();
+    }
+};
 // Slider
 dwv.gui.Slider = dwv.gui.base.Slider;
 // Tags gui
@@ -73,23 +84,22 @@ dwv.gui.Toolbox = function (app)
         toggleInfo.onclick = app.onToggleInfoLayer;
     
         var toggleSaveState = document.createElement("a");
-        toggleSaveState.setAttribute("class", buttonClass + " ui-icon-action");
+        toggleSaveState.setAttribute("class", buttonClass + " download-state ui-icon-action");
         toggleSaveState.onclick = app.onStateSave;
         toggleSaveState.download = "state.json";
-        toggleSaveState.id = "download-state";
 
         var tags = document.createElement("a");
         tags.href = "#tags_page";
         tags.setAttribute("class", buttonClass + " ui-icon-grid");
     
-        var node = document.getElementById("toolbar");
+        var node = app.getElement("toolbar");
         node.appendChild(open);
         node.appendChild(undo);
         node.appendChild(redo);
         node.appendChild(toggleInfo);
         node.appendChild(toggleSaveState);
         node.appendChild(tags);
-        $("#toolbar").trigger("create");
+        dwv.gui.refreshElement(node);
     };
     this.display = function (flag)
     {
