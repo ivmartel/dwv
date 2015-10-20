@@ -5,7 +5,7 @@
 -- 1. copy this file onto your web server
 -- 2. in the 'dicom.ini' of your web server, create the dwv viewer:
 -- >> [dwv-simple]
--- >> source = dwv-simple.lua
+-- >> source = dwv-mobile.lua
 -- And set it as the default viewer:
 -- >> [webdefaults]
 -- >> ...
@@ -81,6 +81,12 @@ print([[
 <title>DICOM Web Viewer</title>
 <meta charset="UTF-8">
 <link type="text/css" rel="stylesheet" href="/dwv/css/style.css">
+<style type="text/css" >
+body { margin: 10px; padding: 0; }
+.layerContainer { margin: auto; text-align: center; }
+.imageLayer { left: 0px; }
+.dropBox { margin: 20px auto; }
+</style>
 <link type="text/css" rel="stylesheet" href="/dwv/ext/jquery-mobile/jquery.mobile-1.4.5.min.css">
 ]])
 
@@ -88,16 +94,18 @@ print([[
 <!-- Third party --> 
 <script type="text/javascript" src="/dwv/ext/jquery/jquery-2.1.4.min.js"></script>
 <script type="text/javascript" src="/dwv/ext/jquery-mobile/jquery.mobile-1.4.5.min.js"></script>
+<script type="text/javascript" src="/dwv/ext/flot/jquery.flot.min.js"></script>
 <script type="text/javascript" src="/dwv/ext/pdfjs/jpx.js"></script>
 <script type="text/javascript" src="/dwv/ext/pdfjs/util.js"></script>
 <script type="text/javascript" src="/dwv/ext/pdfjs/arithmetic_decoder.js"></script>
 <script type="text/javascript" src="/dwv/ext/rii-mango/lossless-min.js"></script>
 <script type="text/javascript" src="/dwv/ext/notmasteryet/jpg.js"></script>
+<script type="text/javascript" src="/dwv/ext/kinetic/kinetic-v5.1.1-06.10.min.js"></script>
 
 <!-- Local -->
 <script type="text/javascript" src="/dwv/dwv-0.12.0.min.js"></script>
 <!-- Launch the app -->
-<script type="text/javascript" src="/dwv/viewers/simple/appgui.js"></script>
+<script type="text/javascript" src="/dwv/viewers/mobile/appgui.js"></script>
 ]])
 
 print([[
@@ -109,16 +117,17 @@ $(document).ready( function()
 {
     // main application
     var myapp = new dwv.App();
-    // initialise the application
     myapp.init({
         "containerDivId": "dwv",
         "fitToWindow": true,
-        "tools": ["Scroll", "Zoom/Pan", "Window/Level"],
-        "gui": ["tool"],
-        "isMobile": true,
-        "skipLoadUrl": true
+        "tools": ["Scroll", "Window/Level", "Zoom/Pan", "Draw", "Livewire", "Filter"],
+        "filters": ["Threshold", "Sharpen", "Sobel"],
+        "shapes": ["Line", "Protractor", "Rectangle", "Roi", "Ellipse"],
+        "gui": ["tool", "load", "help", "undo", "version", "tags"],
+        "isMobile": true
     });
-    dwv.gui.appendResetHtml(myapp);
+    var size = dwv.gui.getWindowSize();
+    $(".layerContainer").height(size.height);
 ]])
 -- create javascript url array
 print([[
@@ -143,27 +152,91 @@ print([[
 <body>
 
 <!-- Main page -->
-<div data-role="page" data-theme="b">
+<div data-role="page" data-theme="b" id="main">
 
-<!-- Main content -->
-<div data-role="content">
+<!-- pageHeader #dwvversion -->
+<div id="pageHeader" data-role="header">
+<h1>DWV <span class="dwv-version"></span></h1>
+<a href="#help_page" data-icon="carat-r" class="ui-btn-right"
+  data-transition="slide">Help</a>
+</div><!-- /pageHeader -->
 
 <!-- DWV -->
 <div id="dwv">
 
+<div id="pageMain" data-role="content" style="padding:2px;">
+
 <!-- Toolbar -->
 <div class="toolbar"></div>
 
+<!-- Open popup -->
+<div data-role="popup" id="popupOpen">
+<a href="#" data-rel="back" data-role="button"
+  data-icon="delete" data-iconpos="notext" class="ui-btn-right">Close</a>
+<div style="padding:10px 20px;">
+<h3>Open</h3>
+<div id="dwv-loaderlist"></div>
+</div>
+</div><!-- /popup -->
+
 <!-- Layer Container -->
 <div class="layerContainer">
+<div class="dropBox"></div>
 <canvas class="imageLayer">Only for HTML5 compatible browsers...</canvas>
+<div class="drawDiv"></div>
+<div class="infoLayer">
+<div class="infotl"></div>
+<div class="infotr"></div>
+<div class="infobl"></div>
+<div class="infobr"><div class="plot"></div></div>
+</div><!-- /infoLayer -->
 </div><!-- /layerContainer -->
 
-</div><!-- /dwv -->
+<!-- History -->
+<div class="history" title="History" style="display:none;"></div>
 
 </div><!-- /content -->
 
-</div><!-- /page -->
+<div data-role="footer">
+<div data-role="navbar" class="toolList">
+</div><!-- /navbar -->
+</div><!-- /footer -->
+
+</div><!-- /page main -->
+
+</div><!-- /dwv -->
+
+<!-- Tags page -->
+<div data-role="page" data-theme="b" id="tags_page">
+
+<div data-role="header">
+<a href="#main" data-icon="back"
+  data-transition="slide" data-direction="reverse">Back</a>
+<h1>DICOM Tags</h1>
+</div><!-- /header -->
+
+<div data-role="content">
+<!-- Tags -->
+<div id="dwv-tags" title="Tags"></div>
+</div><!-- /content -->
+
+</div><!-- /page tags_page-->
+
+<!-- Help page -->
+<div data-role="page" data-theme="b" id="help_page">
+
+<div data-role="header">
+<a href="#main" data-icon="back"
+  data-transition="slide" data-direction="reverse">Back</a>
+<h1>DWV Help</h1>
+</div><!-- /header -->
+
+<div data-role="content">
+<!-- Tags -->
+<div id="dwv-help" title="Help"></div>
+</div><!-- /content -->
+
+</div><!-- /page help_page-->
 
 </body>
 </html>
