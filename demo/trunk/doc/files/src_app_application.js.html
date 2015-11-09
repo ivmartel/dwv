@@ -540,7 +540,12 @@ dwv.App = function ()
             if ( query &amp;&amp; typeof query.input !== &quot;undefined&quot; ) {
                 // manifest
                 if ( query.type &amp;&amp; query.type === &quot;manifest&quot; ) {
-                    dwv.html.decodeManifestUri( query.input, query.nslices, this.onInputURLs );
+                    var finalUri = &quot;&quot;;
+                    if ( query.input[0] === &#x27;/&#x27; ) {
+                        finalUri = window.location.protocol + &quot;//&quot; + window.location.host;
+                    }
+                    finalUri += query.input;
+                    dwv.html.decodeManifestUri( finalUri, query.nslices, this.onInputURLs );
                 }
                 // urls
                 else {
