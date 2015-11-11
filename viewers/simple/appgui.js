@@ -85,6 +85,7 @@ dwv.gui.WindowLevel = function (app)
     {
         var input = document.createElement("input");
         input.id = "wlLi";
+        input.className = "wlLi";
         input.name = "radio-choice";
         input.type = "radio";
         input.value = "Window/Level";
@@ -134,6 +135,7 @@ dwv.gui.ZoomAndPan = function (app)
     {
         var input = document.createElement("input");
         input.id = "zoomLi";
+        input.className = "zoomLi";
         input.name = "radio-choice";
         input.type = "radio";
         input.value = "Zoom/Pan";
@@ -161,6 +163,7 @@ dwv.gui.Scroll = function (app)
     {
         var input = document.createElement("input");
         input.id = "scrollLi";
+        input.className = "scrollLi";
         input.name = "radio-choice";
         input.checked = "checked";
         input.type = "radio";
