@@ -13,7 +13,7 @@ document.addEventListener("DOMContentLoaded", function (/*event*/)
     // initialise the application
     myapp.init({
         "containerDivId": "dwv",
-        "fitToWindow": false,
+        "fitToWindow": true,
         "tools": ["Scroll", "Zoom/Pan", "Window/Level"],
         "gui": ["tool"],
         "isMobile": true
