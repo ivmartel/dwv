@@ -32,7 +32,6 @@ body { font-family: Verdana, Arial, Helvetica, sans-serif; }
 }
 </style>  
 <!-- Third party -->  
-<script type="text/javascript" src="../../../ext/jquery/jquery-2.1.4.min.js"></script>
 <script type="text/javascript" src="../../../ext/rii-mango/lossless-min.js"></script>
 <script type="text/javascript" src="../../../ext/notmasteryet/jpg.js"></script>
 <!-- Local -->
@@ -74,7 +73,7 @@ body { font-family: Verdana, Arial, Helvetica, sans-serif; }
 <!-- Launch the app -->
 <script type="text/javascript">
 // launch when page is loaded
-$(document).ready( function()
+document.addEventListener("DOMContentLoaded", function (/*event*/)
 {
     dwv.addDataLine("dwv0", "leadtools-8BitsJpegLossyGrayScale", {
         'origin': 'LeadTools',

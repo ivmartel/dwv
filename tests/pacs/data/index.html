@@ -31,8 +31,6 @@ body { font-family: Verdana, Arial, Helvetica, sans-serif; }
     background-color: #ccc;
 }
 </style>  
-<!-- Third party -->  
-<script type="text/javascript" src="../../../ext/jquery/jquery-2.1.4.min.js"></script>
 <!-- Local -->
 <script type="text/javascript" src="../../../src/app/application.js"></script>
 <script type="text/javascript" src="../../../src/app/viewController.js"></script>
@@ -72,7 +70,7 @@ body { font-family: Verdana, Arial, Helvetica, sans-serif; }
 <!-- Launch the app -->
 <script type="text/javascript">
 // launch when page is loaded
-$(document).ready( function()
+document.addEventListener("DOMContentLoaded", function (/*event*/)
 {
     dwv.addDataLine("dwv0", "osirix-toutatix-100", {
         'origin': 'Osirix',
