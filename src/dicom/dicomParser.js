@@ -4,10 +4,16 @@
  */
 var dwv = dwv || {};
 dwv.dicom = dwv.dicom || {};
-
+// JPEG Baseline
+var hasJpegBaselineDecoder = (typeof JpegImage !== "undefined");
 var JpegImage = JpegImage || {};
+// JPEG Lossless
+var hasJpegLosslessDecoder = (typeof jpeg !== "undefined") &&
+    (typeof jpeg.lossless !== "undefined");
 var jpeg = jpeg || {};
 jpeg.lossless = jpeg.lossless || {};
+// JPEG 2000
+var hasJpeg2000Decoder = (typeof JpxImage !== "undefined");
 var JpxImage = JpxImage || {};
 
 /**
@@ -1002,17 +1008,26 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
     // uncompress data if needed
     var decoder = null;
     if( isJpegLossless ) {
+        if ( !hasJpegLosslessDecoder ) {
+            throw new Error("No JPEG Lossless decoder provided");
+        }
         var buf = new Uint8Array(this.pixelBuffer);
         decoder = new jpeg.lossless.Decoder(buf.buffer);
         var decoded = decoder.decode();
         this.pixelBuffer = new Uint16Array(decoded.buffer);
     }
     else if ( isJpegBaseline ) {
+        if ( !hasJpegBaselineDecoder ) {
+            throw new Error("No JPEG Baseline decoder provided");
+        }
         decoder = new JpegImage();
         decoder.parse( this.pixelBuffer );
         this.pixelBuffer = decoder.getData(decoder.width,decoder.height);
     }
     else if( isJpeg2000 ) {
+        if ( !hasJpeg2000Decoder ) {
+            throw new Error("No JPEG 2000 decoder provided");
+        }
         // decompress pixel buffer into Int16 image
         decoder = new JpxImage();
         decoder.parse( this.pixelBuffer );
