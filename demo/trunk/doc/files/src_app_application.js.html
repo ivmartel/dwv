@@ -555,7 +555,7 @@ dwv.App = function ()
                         var onLoadEnd = function (/*event*/) {
                             loadStateUrl([query.state]);
                         };
-                        this.addEventListener( &quot;onloadend&quot;, onLoadEnd );
+                        this.addEventListener( &quot;load-end&quot;, onLoadEnd );
                         
                     }
                 }
@@ -766,7 +766,7 @@ dwv.App = function ()
             }
         };
         urlIO.onerror = function (error) { handleError(error); };
-        urlIO.onloadend = function (/*event*/) { fireEvent({ &#x27;type&#x27;: &#x27;onloadend&#x27; }); };
+        urlIO.onloadend = function (/*event*/) { fireEvent({ &#x27;type&#x27;: &#x27;load-end&#x27; }); };
         // main load (asynchronous)
         urlIO.load(urls);
     };
@@ -1340,11 +1340,11 @@ dwv.App = function ()
      */
     function addImageInfoListeners()
     {
-        view.addEventListener(&quot;wlchange&quot;, windowingInfo.update);
-        view.addEventListener(&quot;wlchange&quot;, miniColourMap.update);
-        view.addEventListener(&quot;wlchange&quot;, plotInfo.update);
-        view.addEventListener(&quot;colourchange&quot;, miniColourMap.update);
-        view.addEventListener(&quot;positionchange&quot;, positionInfo.update);
+        view.addEventListener(&quot;wl-change&quot;, windowingInfo.update);
+        view.addEventListener(&quot;wl-change&quot;, miniColourMap.update);
+        view.addEventListener(&quot;wl-change&quot;, plotInfo.update);
+        view.addEventListener(&quot;colour-change&quot;, miniColourMap.update);
+        view.addEventListener(&quot;position-change&quot;, positionInfo.update);
         isInfoLayerListening = true;
     }
     
@@ -1355,11 +1355,11 @@ dwv.App = function ()
      */
     function removeImageInfoListeners()
     {
-        view.removeEventListener(&quot;wlchange&quot;, windowingInfo.update);
-        view.removeEventListener(&quot;wlchange&quot;, miniColourMap.update);
-        view.removeEventListener(&quot;wlchange&quot;, plotInfo.update);
-        view.removeEventListener(&quot;colourchange&quot;, miniColourMap.update);
-        view.removeEventListener(&quot;positionchange&quot;, positionInfo.update);
+        view.removeEventListener(&quot;wl-change&quot;, windowingInfo.update);
+        view.removeEventListener(&quot;wl-change&quot;, miniColourMap.update);
+        view.removeEventListener(&quot;wl-change&quot;, plotInfo.update);
+        view.removeEventListener(&quot;colour-change&quot;, miniColourMap.update);
+        view.removeEventListener(&quot;position-change&quot;, positionInfo.update);
         isInfoLayerListening = false;
     }
     
@@ -1586,9 +1586,15 @@ dwv.App = function ()
                 dataWidth, dataHeight);
 
         // image listeners
-        view.addEventListener(&quot;wlchange&quot;, self.onWLChange);
-        view.addEventListener(&quot;colourchange&quot;, self.onColourChange);
-        view.addEventListener(&quot;slicechange&quot;, self.onSliceChange);
+        view.addEventListener(&quot;wl-change&quot;, self.onWLChange);
+        view.addEventListener(&quot;colour-change&quot;, self.onColourChange);
+        view.addEventListener(&quot;slice-change&quot;, self.onSliceChange);
+        
+        // connect with local listeners
+        view.addEventListener(&quot;wl-change&quot;, fireEvent);
+        view.addEventListener(&quot;colour-change&quot;, fireEvent);
+        view.addEventListener(&quot;position-change&quot;, fireEvent);
+        view.addEventListener(&quot;slice-change&quot;, fireEvent);
         
         // update presets with loaded image (used in w/l tool)
         viewController.updatePresets(image, true);

@@ -376,7 +376,7 @@ dwv.App = function ()
                         var onLoadEnd = function (/*event*/) {
                             loadStateUrl([query.state]);
                         };
-                        this.addEventListener( "onloadend", onLoadEnd );
+                        this.addEventListener( "load-end", onLoadEnd );
                         
                     }
                 }
@@ -587,7 +587,7 @@ dwv.App = function ()
             }
         };
         urlIO.onerror = function (error) { handleError(error); };
-        urlIO.onloadend = function (/*event*/) { fireEvent({ 'type': 'onloadend' }); };
+        urlIO.onloadend = function (/*event*/) { fireEvent({ 'type': 'load-end' }); };
         // main load (asynchronous)
         urlIO.load(urls);
     };
@@ -1161,11 +1161,11 @@ dwv.App = function ()
      */
     function addImageInfoListeners()
     {
-        view.addEventListener("wlchange", windowingInfo.update);
-        view.addEventListener("wlchange", miniColourMap.update);
-        view.addEventListener("wlchange", plotInfo.update);
-        view.addEventListener("colourchange", miniColourMap.update);
-        view.addEventListener("positionchange", positionInfo.update);
+        view.addEventListener("wl-change", windowingInfo.update);
+        view.addEventListener("wl-change", miniColourMap.update);
+        view.addEventListener("wl-change", plotInfo.update);
+        view.addEventListener("colour-change", miniColourMap.update);
+        view.addEventListener("position-change", positionInfo.update);
         isInfoLayerListening = true;
     }
     
@@ -1176,11 +1176,11 @@ dwv.App = function ()
      */
     function removeImageInfoListeners()
     {
-        view.removeEventListener("wlchange", windowingInfo.update);
-        view.removeEventListener("wlchange", miniColourMap.update);
-        view.removeEventListener("wlchange", plotInfo.update);
-        view.removeEventListener("colourchange", miniColourMap.update);
-        view.removeEventListener("positionchange", positionInfo.update);
+        view.removeEventListener("wl-change", windowingInfo.update);
+        view.removeEventListener("wl-change", miniColourMap.update);
+        view.removeEventListener("wl-change", plotInfo.update);
+        view.removeEventListener("colour-change", miniColourMap.update);
+        view.removeEventListener("position-change", positionInfo.update);
         isInfoLayerListening = false;
     }
     
@@ -1407,9 +1407,15 @@ dwv.App = function ()
                 dataWidth, dataHeight);
 
         // image listeners
-        view.addEventListener("wlchange", self.onWLChange);
-        view.addEventListener("colourchange", self.onColourChange);
-        view.addEventListener("slicechange", self.onSliceChange);
+        view.addEventListener("wl-change", self.onWLChange);
+        view.addEventListener("colour-change", self.onColourChange);
+        view.addEventListener("slice-change", self.onSliceChange);
+        
+        // connect with local listeners
+        view.addEventListener("wl-change", fireEvent);
+        view.addEventListener("colour-change", fireEvent);
+        view.addEventListener("position-change", fireEvent);
+        view.addEventListener("slice-change", fireEvent);
         
         // update presets with loaded image (used in w/l tool)
         viewController.updatePresets(image, true);
@@ -12110,7 +12116,7 @@ dwv.image.View = function(image, isSigned)
         if( this.getImage().getPhotometricInterpretation() === "MONOCHROME1") {
             colourMap = dwv.image.lut.invPlain;
         }
-        this.fireEvent({"type": "colourchange", 
+        this.fireEvent({"type": "colour-change", 
            "wc": this.getWindowLut().getCenter(),
            "ww": this.getWindowLut().getWidth() });
     };
@@ -12145,18 +12151,18 @@ dwv.image.View = function(image, isSigned)
         // only display value for monochrome data
         if( image.getPhotometricInterpretation().match(/MONOCHROME/) !== null )
         {
-            this.fireEvent({"type": "positionchange", 
+            this.fireEvent({"type": "position-change", 
                 "i": pos.i, "j": pos.j, "k": pos.k,
                 "value": image.getRescaledValue(pos.i,pos.j,pos.k)});
         }
         else
         {
-            this.fireEvent({"type": "positionchange", 
+            this.fireEvent({"type": "position-change", 
                 "i": pos.i, "j": pos.j, "k": pos.k});
         }
         // slice change event (used to trigger redraw)
         if( oldPosition.k !== currentPosition.k ) {
-            this.fireEvent({"type": "slicechange"});
+            this.fireEvent({"type": "slice-change"});
         }
         return true;
     };
@@ -12188,7 +12194,7 @@ dwv.image.View = function(image, isSigned)
             for ( var key in windowLuts ) {
                 windowLuts[key].setCenterAndWidth(center, width);
             }
-            this.fireEvent({"type": "wlchange", "wc": center, "ww": width });
+            this.fireEvent({"type": "wl-change", "wc": center, "ww": width });
         }
     };
 
