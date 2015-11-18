@@ -29,14 +29,14 @@ QUnit.test("Test listeners.", function (assert) {
         assert.equal( event.ww, 1, "Expected call to listener2.");
     };
     // with two listeners
-    view0.addEventListener("wlchange", listener1 );
-    view0.addEventListener("wlchange", listener2 );
+    view0.addEventListener("wl-change", listener1 );
+    view0.addEventListener("wl-change", listener2 );
     view0.setWindowLevel(0,1);
     // without listener2
-    view0.removeEventListener("wlchange", listener2 );
+    view0.removeEventListener("wl-change", listener2 );
     view0.setWindowLevel(0,2);
     // without listener1
-    view0.removeEventListener("wlchange", listener1 );
+    view0.removeEventListener("wl-change", listener1 );
     view0.setWindowLevel(1,1);
 });
 

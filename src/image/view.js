@@ -138,7 +138,7 @@ dwv.image.View = function(image, isSigned)
         if( this.getImage().getPhotometricInterpretation() === "MONOCHROME1") {
             colourMap = dwv.image.lut.invPlain;
         }
-        this.fireEvent({"type": "colourchange", 
+        this.fireEvent({"type": "colour-change", 
            "wc": this.getWindowLut().getCenter(),
            "ww": this.getWindowLut().getWidth() });
     };
@@ -173,18 +173,18 @@ dwv.image.View = function(image, isSigned)
         // only display value for monochrome data
         if( image.getPhotometricInterpretation().match(/MONOCHROME/) !== null )
         {
-            this.fireEvent({"type": "positionchange", 
+            this.fireEvent({"type": "position-change", 
                 "i": pos.i, "j": pos.j, "k": pos.k,
                 "value": image.getRescaledValue(pos.i,pos.j,pos.k)});
         }
         else
         {
-            this.fireEvent({"type": "positionchange", 
+            this.fireEvent({"type": "position-change", 
                 "i": pos.i, "j": pos.j, "k": pos.k});
         }
         // slice change event (used to trigger redraw)
         if( oldPosition.k !== currentPosition.k ) {
-            this.fireEvent({"type": "slicechange"});
+            this.fireEvent({"type": "slice-change"});
         }
         return true;
     };
@@ -216,7 +216,7 @@ dwv.image.View = function(image, isSigned)
             for ( var key in windowLuts ) {
                 windowLuts[key].setCenterAndWidth(center, width);
             }
-            this.fireEvent({"type": "wlchange", "wc": center, "ww": width });
+            this.fireEvent({"type": "wl-change", "wc": center, "ww": width });
         }
     };
 
