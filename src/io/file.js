@@ -33,12 +33,24 @@ dwv.io.File = function ()
      * @type Number
      */
     var nLoaded = 0;
+    /**
+     * List of progresses.
+     * @property progressList
+     * @private
+     * @type Array
+     */
+    var progressList = [];
     
     /**
      * Set the number of data to load.
      * @method setNToLoad
      */ 
-    this.setNToLoad = function (n) { nToLoad = n; };
+    this.setNToLoad = function (n) { 
+        nToLoad = n;
+        for ( var i = 0; i < nToLoad; ++i ) {
+            progressList[i] = 0;
+        }
+    };
     
     /**
      * Increment the number of loaded data
@@ -50,6 +62,22 @@ dwv.io.File = function ()
         if ( nLoaded === nToLoad ) {
             this.onloadend();
         }
+    };
+    
+    /**
+     * Get the global load percent including the provided one.
+     * @method getGlobalPercent
+     * @param {Number} n The number of the loaded data.
+     * @param {Number} percent The percentage of data 'n' that has been loaded.
+     * @return {Number} The accumulated percentage. 
+     */
+    this.getGlobalPercent = function (n, percent) {
+        progressList[n] = percent/nToLoad;
+        var totPercent = 0;
+        for ( var i = 0; i < progressList.length; ++i ) {
+            totPercent += progressList[i];
+        }
+        return totPercent;
     };
 }; // class File
 
@@ -68,6 +96,14 @@ dwv.io.File.prototype.onload = function (/*event*/)
  * @method onloadend
  */
 dwv.io.File.prototype.onloadend = function () 
+{
+    // default does nothing.
+};
+/**
+ * Handle a progress event.
+ * @method onprogress
+ */
+dwv.io.File.prototype.onprogress = function () 
 {
     // default does nothing.
 };
@@ -98,6 +134,24 @@ dwv.io.File.createErrorHandler = function (file, text, baseHandler) {
 };
 
 /**
+ * Create an progress handler from a base one and locals.
+ * @method createProgressHandler
+ * @param {Number} n The number of the loaded data.
+ * @param {Function} calculator The load progress accumulator.
+ * @param {Function} baseHandler The base handler.
+ */
+dwv.io.File.createProgressHandler = function (n, calculator, baseHandler) {
+    return function (event) {
+        if( event.lengthComputable )
+        {
+            var percent = Math.round((event.loaded / event.total) * 100);
+            var ev = {lengthComputable: true, loaded: calculator(n, percent), total: 100};
+            baseHandler(ev);
+        }
+    };
+};
+
+/**
  * Load a list of files.
  * @method load
  * @param {Array} ioArray The list of files to load.
@@ -124,9 +178,6 @@ dwv.io.File.prototype.load = function (ioArray)
         } catch(error) {
             self.onerror(error);
         }
-        // force 100% progress (sometimes with firefox)
-        var endEvent = {lengthComputable: true, loaded: 1, total: 1};
-        dwv.gui.updateProgress(endEvent);
     };
 
     // image loader
@@ -166,10 +217,11 @@ dwv.io.File.prototype.load = function (ioArray)
     {
         var file = ioArray[i];
         var reader = new FileReader();
+        reader.onprogress = dwv.io.File.createProgressHandler(i, 
+                self.getGlobalPercent, self.onprogress);
         if ( file.name.split('.').pop().toLowerCase() === "json" )
         {
             reader.onload = onLoadTextReader;
-            reader.onprogress = dwv.gui.updateProgress;
             reader.onerror = dwv.io.File.createErrorHandler(file, "text", self.onerror);
             reader.readAsText(file);
         }
@@ -180,14 +232,12 @@ dwv.io.File.prototype.load = function (ioArray)
             reader.index = i;
             // callbacks
             reader.onload = onLoadImageReader;
-            reader.onprogress = dwv.gui.updateProgress;
             reader.onerror = dwv.io.File.createErrorHandler(file, "image", self.onerror);
             reader.readAsDataURL(file);
         }
         else
         {
             reader.onload = onLoadDicomReader;
-            reader.onprogress = dwv.gui.updateProgress;
             reader.onerror = dwv.io.File.createErrorHandler(file, "DICOM", self.onerror);
             reader.readAsArrayBuffer(file);
         }

@@ -531,6 +531,7 @@ dwv.App = function ()
             }
         };
         fileIO.onerror = function (error) { handleError(error); };
+        fileIO.onprogress = onLoadProgress;
         // main load (asynchronous)
         fileIO.load(files);
     }
@@ -588,6 +589,7 @@ dwv.App = function ()
         };
         urlIO.onerror = function (error) { handleError(error); };
         urlIO.onloadend = function (/*event*/) { fireEvent({ 'type': 'load-end' }); };
+        urlIO.onprogress = onLoadProgress;
         // main load (asynchronous)
         urlIO.load(urls);
     };
@@ -1331,6 +1333,21 @@ dwv.App = function ()
         }
     }
     
+    /**
+     * Handle a load progress.
+     * @method onLoadProgress
+     * @private
+     * @param {Object} event The event to handle.
+     */
+    function onLoadProgress(event)
+    {
+        if( event.lengthComputable )
+        {
+            var percent = Math.round((event.loaded / event.total) * 100);
+            dwv.gui.displayProgress(percent);
+        }
+    }
+
     /**
      * Create the application layers.
      * @method createLayers

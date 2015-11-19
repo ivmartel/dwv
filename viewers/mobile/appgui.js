@@ -29,7 +29,14 @@ dwv.gui.getWindowSize = function () {
     return { 'width': ($(window).width()), 'height': ($(window).height() - 147) };
 };
 // Progress
-dwv.gui.displayProgress = dwv.gui.base.displayProgress;
+dwv.gui.displayProgress = function (percent) {
+    if( percent < 100 ) {
+        $.mobile.loading("show", {text: percent+"%", textVisible: true, theme: "b"} );
+    }
+    else if( percent === 100 ) {
+        $.mobile.loading("hide");
+    }
+};
 // get element
 dwv.gui.getElement = dwv.gui.base.getElement;
 // refresh

@@ -537,7 +537,6 @@ dwv.html.decodeManifestUri = function (uri, nslices, callback)
     request.responseType = "xml"; 
     request.onload = onLoadRequest;
     request.onerror = onErrorRequest;
-    //request.onprogress = dwv.gui.updateProgress;
     request.send(null);
 };
 

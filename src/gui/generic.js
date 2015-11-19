@@ -29,36 +29,14 @@ dwv.gui.base.getWindowSize = function()
 };
 
 /**
- * Update the progress bar.
- * @method updateProgress
- * @static
- * @param {Object} event A ProgressEvent.
- */
-dwv.gui.updateProgress = function(event)
-{
-    // event is an ProgressEvent.
-    if( event.lengthComputable )
-    {
-        var percent = Math.round((event.loaded / event.total) * 100);
-        dwv.gui.displayProgress(percent);
-    }
-};
-
-/**
  * Display a progress value.
  * @method displayProgress
  * @static
  * @param {Number} percent The progress percentage.
  */
-dwv.gui.base.displayProgress = function(percent)
+dwv.gui.base.displayProgress = function(/*percent*/)
 {
-    // jquery-mobile specific
-    if( percent < 100 ) {
-        $.mobile.loading("show", {text: percent+"%", textVisible: true, theme: "b"} );
-    }
-    else if( percent === 100 ) {
-        $.mobile.loading("hide");
-    }
+    // default does nothing...
 };
 
 /**

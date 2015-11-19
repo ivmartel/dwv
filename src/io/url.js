@@ -33,12 +33,24 @@ dwv.io.Url = function ()
      * @type Number
      */
     var nLoaded = 0;
+    /**
+     * List of progresses.
+     * @property progressList
+     * @private
+     * @type Array
+     */
+    var progressList = [];
     
     /**
      * Set the number of data to load.
      * @method setNToLoad
      */ 
-    this.setNToLoad = function (n) { nToLoad = n; };
+    this.setNToLoad = function (n) {
+        nToLoad = n;
+        for ( var i = 0; i < nToLoad; ++i ) {
+            progressList[i] = 0;
+        }
+    };
     
     /**
      * Increment the number of loaded data
@@ -50,6 +62,22 @@ dwv.io.Url = function ()
         if ( nLoaded === nToLoad ) {
             this.onloadend();
         }
+    };
+    
+    /**
+     * Get the global load percent including the provided one.
+     * @method getGlobalPercent
+     * @param {Number} n The number of the loaded data.
+     * @param {Number} percent The percentage of data 'n' that has been loaded.
+     * @return {Number} The accumulated percentage. 
+     */
+    this.getGlobalPercent = function (n, percent) {
+        progressList[n] = percent/nToLoad;
+        var totPercent = 0;
+        for ( var i = 0; i < progressList.length; ++i ) {
+            totPercent += progressList[i];
+        }
+        return totPercent;
     };
 }; // class Url
 
@@ -68,6 +96,14 @@ dwv.io.Url.prototype.onload = function (/*event*/)
  * @method onloadend
  */
 dwv.io.Url.prototype.onloadend = function () 
+{
+    // default does nothing.
+};
+/**
+ * Handle a progress event.
+ * @method onprogress
+ */
+dwv.io.File.prototype.onprogress = function () 
 {
     // default does nothing.
 };
@@ -94,6 +130,24 @@ dwv.io.Url.createErrorHandler = function (url, text, baseHandler) {
         baseHandler( {'name': "RequestError", 
             'message': "An error occurred while retrieving the " + text + " file (via http): " + url + 
             " (status: "+this.status + ")" } );
+    };
+};
+
+/**
+ * Create an progress handler from a base one and locals.
+ * @method createProgressHandler
+ * @param {Number} n The number of the loaded data.
+ * @param {Function} calculator The load progress accumulator.
+ * @param {Function} baseHandler The base handler.
+ */
+dwv.io.Url.createProgressHandler = function (n, calculator, baseHandler) {
+    return function (event) {
+        if( event.lengthComputable )
+        {
+            var percent = Math.round((event.loaded / event.total) * 100);
+            var ev = {lengthComputable: true, loaded: calculator(n, percent), total: 100};
+            baseHandler(ev);
+        }
     };
 };
 
@@ -214,7 +268,8 @@ dwv.io.Url.prototype.load = function (ioArray)
             request.onload = onLoadTextRequest;
             request.onerror = dwv.io.Url.createErrorHandler(url, "text", self.onerror);
         }
-        request.onprogress = dwv.gui.updateProgress;
+        request.onprogress = dwv.io.File.createProgressHandler(i, 
+            self.getGlobalPercent, self.onprogress);
         request.send(null);
     }
 };
