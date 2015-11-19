@@ -24,6 +24,7 @@ $(document).ready( function()
     // example app listening
     //var listener = function (event) { console.log("event: "+event.type); };
     //myapp.addEventListener("load-end", listener);
+    //myapp.addEventListener("load-progress", listener);
     //myapp.addEventListener("draw-create", listener);
     //myapp.addEventListener("draw-move", listener);
     //myapp.addEventListener("draw-change", listener);
