@@ -114,17 +114,17 @@ function getDwvBaseUrl()
     var select = document.getElementById('select-dwv');
     var flag = select.options[select.selectedIndex].value;
 
-    var path = "";
-    if( !useTrunk ) {
-        if( flag === "dwv-mobile" ) path = "demo/stable/viewers/mobile/index.html";
-        else if( flag === "dwv-static" ) path = "demo/stable/viewers/static/index.html";
-        else if( flag === "dwv-simple" ) path = "demo/stable/viewers/simple/index.html";
-    }
-    else {
-        if( flag === "dwv-mobile" ) path = "demo/trunk/viewers/mobile/index.html";
-        else if( flag === "dwv-static" ) path = "demo/trunk/viewers/static/index.html";
-        else if( flag === "dwv-simple" ) path = "demo/trunk/viewers/simple/index.html";
-    }
+    var path = "demo";
+    // stable or trunk
+    if( !useTrunk ) path += "/stable";
+    else path += "/trunk";
+    // which viewer
+    if( flag === "dwv-mobile" ) path += "/viewers/mobile";
+    else if( flag === "dwv-static" ) path += "/viewers/static";
+    else if( flag === "dwv-simple" ) path += "/viewers/simple";
+    else if( flag === "dwv-simplistic" ) path += "/viewers/simplistic";
+    // finish
+    path += "/index.html";
     return path;
 }
 function getDwvUrl(uri)
