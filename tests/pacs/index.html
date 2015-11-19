@@ -115,10 +115,13 @@ function setDwv(obj)
 }
 function getDwvBaseUrl(flag)
 {
-    if( flag === "dwvmobile" ) return "../../viewers/mobile/index.html";
-    else if( flag === "dwvstatic" ) return "../../viewers/static/index.html";
-    else if( flag === "dwvsimple" ) return "../../viewers/simple/index.html";
-    else if( flag === "dwvsimplistic" ) return "../../viewers/simplistic/index.html";
+    var path = "../../viewers"; 
+    if( flag === "dwvmobile" ) path += "/mobile";
+    else if( flag === "dwvstatic" ) path += "/static";
+    else if( flag === "dwvsimple" ) path += "/simple";
+    else if( flag === "dwvsimplistic" ) path += "/simplistic";
+    path += "/index.html";
+    return path;
 }
 function getDwvUrl(uri)
 {
