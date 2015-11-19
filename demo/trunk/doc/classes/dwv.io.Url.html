@@ -250,6 +250,14 @@
 
                             </li>
                             <li class="index-item method">
+                                <a href="#method_createProgressHandler">createProgressHandler</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_getGlobalPercent">getGlobalPercent</a>
+
+                            </li>
+                            <li class="index-item method">
                                 <a href="#method_load">load</a>
 
                             </li>
@@ -263,6 +271,10 @@
                             </li>
                             <li class="index-item method">
                                 <a href="#method_onloadend">onloadend</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_onprogress">onprogress</a>
 
                             </li>
                             <li class="index-item method">
@@ -282,6 +294,10 @@
                             </li>
                             <li class="index-item property private">
                                 <a href="#property_nToLoad">nToLoad</a>
+
+                            </li>
+                            <li class="index-item property private">
+                                <a href="#property_progressList">progressList</a>
 
                             </li>
                     </ul>
@@ -308,7 +324,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_io_url.js.html#l43"><code>src&#x2F;io&#x2F;url.js:43</code></a>
+        <a href="../files/src_io_url.js.html#l55"><code>src&#x2F;io&#x2F;url.js:55</code></a>
         </p>
 
 
@@ -352,7 +368,7 @@ and call onloadend if loaded all data.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_io_url.js.html#l85"><code>src&#x2F;io&#x2F;url.js:85</code></a>
+        <a href="../files/src_io_url.js.html#l121"><code>src&#x2F;io&#x2F;url.js:121</code></a>
         </p>
 
 
@@ -407,6 +423,168 @@ and call onloadend if loaded all data.</p>
 
 
 </div>
+<div id="method_createProgressHandler" class="method item">
+    <h3 class="name"><code>createProgressHandler</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>n</code>
+                </li>
+                <li class="arg">
+                        <code>calculator</code>
+                </li>
+                <li class="arg">
+                        <code>baseHandler</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/src_io_url.js.html#l136"><code>src&#x2F;io&#x2F;url.js:136</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Create an progress handler from a base one and locals.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">n</code>
+                        <span class="type">Number</span>
+
+
+                    <div class="param-description">
+                        <p>The number of the loaded data.</p>
+
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name">calculator</code>
+                        <span class="type">Function</span>
+
+
+                    <div class="param-description">
+                        <p>The load progress accumulator.</p>
+
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name">baseHandler</code>
+                        <span class="type">Function</span>
+
+
+                    <div class="param-description">
+                        <p>The base handler.</p>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+
+</div>
+<div id="method_getGlobalPercent" class="method item">
+    <h3 class="name"><code>getGlobalPercent</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>n</code>
+                </li>
+                <li class="arg">
+                        <code>percent</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+        <span class="returns-inline">
+            <span class="type">Number</span>
+        </span>
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/src_io_url.js.html#l67"><code>src&#x2F;io&#x2F;url.js:67</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Get the global load percent including the provided one.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">n</code>
+                        <span class="type">Number</span>
+
+
+                    <div class="param-description">
+                        <p>The number of the loaded data.</p>
+
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name">percent</code>
+                        <span class="type">Number</span>
+
+
+                    <div class="param-description">
+                        <p>The percentage of data 'n' that has been loaded.</p>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                        <span class="type">Number</span>:
+                    <p>The accumulated percentage.</p>
+
+            </div>
+        </div>
+
+
+</div>
 <div id="method_load" class="method item">
     <h3 class="name"><code>load</code></h3>
 
@@ -428,7 +606,7 @@ and call onloadend if loaded all data.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_io_url.js.html#l100"><code>src&#x2F;io&#x2F;url.js:100</code></a>
+        <a href="../files/src_io_url.js.html#l154"><code>src&#x2F;io&#x2F;url.js:154</code></a>
         </p>
 
 
@@ -482,7 +660,7 @@ and call onloadend if loaded all data.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_io_url.js.html#l74"><code>src&#x2F;io&#x2F;url.js:74</code></a>
+        <a href="../files/src_io_url.js.html#l110"><code>src&#x2F;io&#x2F;url.js:110</code></a>
         </p>
 
 
@@ -537,7 +715,7 @@ should be the error message.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_io_url.js.html#l56"><code>src&#x2F;io&#x2F;url.js:56</code></a>
+        <a href="../files/src_io_url.js.html#l84"><code>src&#x2F;io&#x2F;url.js:84</code></a>
         </p>
 
 
@@ -586,7 +764,7 @@ should be the loaded data.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_io_url.js.html#l66"><code>src&#x2F;io&#x2F;url.js:66</code></a>
+        <a href="../files/src_io_url.js.html#l94"><code>src&#x2F;io&#x2F;url.js:94</code></a>
         </p>
 
 
@@ -595,6 +773,37 @@ should be the loaded data.</p>
 
     <div class="description">
         <p>Handle a load end event.</p>
+
+    </div>
+
+
+
+
+</div>
+<div id="method_onprogress" class="method item">
+    <h3 class="name"><code>onprogress</code></h3>
+
+        <span class="paren">()</span>
+
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/src_io_url.js.html#l102"><code>src&#x2F;io&#x2F;url.js:102</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Handle a progress event.</p>
 
     </div>
 
@@ -617,7 +826,7 @@ should be the loaded data.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_io_url.js.html#l37"><code>src&#x2F;io&#x2F;url.js:37</code></a>
+        <a href="../files/src_io_url.js.html#l44"><code>src&#x2F;io&#x2F;url.js:44</code></a>
         </p>
 
 
@@ -684,6 +893,32 @@ should be the loaded data.</p>
 
     <div class="description">
         <p>Number of data to load.</p>
+
+    </div>
+
+
+
+</div>
+<div id="property_progressList" class="property item private">
+    <h3 class="name"><code>progressList</code></h3>
+    <span class="type">Array</span>
+
+
+        <span class="flag private">private</span>
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/src_io_url.js.html#l36"><code>src&#x2F;io&#x2F;url.js:36</code></a>
+        </p>
+
+
+    </div>
+
+    <div class="description">
+        <p>List of progresses.</p>
 
     </div>
 

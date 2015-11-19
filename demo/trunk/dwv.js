@@ -531,6 +531,7 @@ dwv.App = function ()
             }
         };
         fileIO.onerror = function (error) { handleError(error); };
+        fileIO.onprogress = onLoadProgress;
         // main load (asynchronous)
         fileIO.load(files);
     }
@@ -588,6 +589,7 @@ dwv.App = function ()
         };
         urlIO.onerror = function (error) { handleError(error); };
         urlIO.onloadend = function (/*event*/) { fireEvent({ 'type': 'load-end' }); };
+        urlIO.onprogress = onLoadProgress;
         // main load (asynchronous)
         urlIO.load(urls);
     };
@@ -1331,6 +1333,21 @@ dwv.App = function ()
         }
     }
     
+    /**
+     * Handle a load progress.
+     * @method onLoadProgress
+     * @private
+     * @param {Object} event The event to handle.
+     */
+    function onLoadProgress(event)
+    {
+        if( event.lengthComputable )
+        {
+            var percent = Math.round((event.loaded / event.total) * 100);
+            dwv.gui.displayProgress(percent);
+        }
+    }
+
     /**
      * Create the application layers.
      * @method createLayers
@@ -7847,36 +7864,14 @@ dwv.gui.base.getWindowSize = function()
 };
 
 /**
- * Update the progress bar.
- * @method updateProgress
- * @static
- * @param {Object} event A ProgressEvent.
- */
-dwv.gui.updateProgress = function(event)
-{
-    // event is an ProgressEvent.
-    if( event.lengthComputable )
-    {
-        var percent = Math.round((event.loaded / event.total) * 100);
-        dwv.gui.displayProgress(percent);
-    }
-};
-
-/**
  * Display a progress value.
  * @method displayProgress
  * @static
  * @param {Number} percent The progress percentage.
  */
-dwv.gui.base.displayProgress = function(percent)
+dwv.gui.base.displayProgress = function(/*percent*/)
 {
-    // jquery-mobile specific
-    if( percent < 100 ) {
-        $.mobile.loading("show", {text: percent+"%", textVisible: true, theme: "b"} );
-    }
-    else if( percent === 100 ) {
-        $.mobile.loading("hide");
-    }
+    // default does nothing...
 };
 
 /**
@@ -8735,7 +8730,6 @@ dwv.html.decodeManifestUri = function (uri, nslices, callback)
     request.responseType = "xml"; 
     request.onload = onLoadRequest;
     request.onerror = onErrorRequest;
-    //request.onprogress = dwv.gui.updateProgress;
     request.send(null);
 };
 
@@ -12484,12 +12478,24 @@ dwv.io.File = function ()
      * @type Number
      */
     var nLoaded = 0;
+    /**
+     * List of progresses.
+     * @property progressList
+     * @private
+     * @type Array
+     */
+    var progressList = [];
     
     /**
      * Set the number of data to load.
      * @method setNToLoad
      */ 
-    this.setNToLoad = function (n) { nToLoad = n; };
+    this.setNToLoad = function (n) { 
+        nToLoad = n;
+        for ( var i = 0; i < nToLoad; ++i ) {
+            progressList[i] = 0;
+        }
+    };
     
     /**
      * Increment the number of loaded data
@@ -12501,6 +12507,22 @@ dwv.io.File = function ()
         if ( nLoaded === nToLoad ) {
             this.onloadend();
         }
+    };
+    
+    /**
+     * Get the global load percent including the provided one.
+     * @method getGlobalPercent
+     * @param {Number} n The number of the loaded data.
+     * @param {Number} percent The percentage of data 'n' that has been loaded.
+     * @return {Number} The accumulated percentage. 
+     */
+    this.getGlobalPercent = function (n, percent) {
+        progressList[n] = percent/nToLoad;
+        var totPercent = 0;
+        for ( var i = 0; i < progressList.length; ++i ) {
+            totPercent += progressList[i];
+        }
+        return totPercent;
     };
 }; // class File
 
@@ -12519,6 +12541,14 @@ dwv.io.File.prototype.onload = function (/*event*/)
  * @method onloadend
  */
 dwv.io.File.prototype.onloadend = function () 
+{
+    // default does nothing.
+};
+/**
+ * Handle a progress event.
+ * @method onprogress
+ */
+dwv.io.File.prototype.onprogress = function () 
 {
     // default does nothing.
 };
@@ -12549,6 +12579,24 @@ dwv.io.File.createErrorHandler = function (file, text, baseHandler) {
 };
 
 /**
+ * Create an progress handler from a base one and locals.
+ * @method createProgressHandler
+ * @param {Number} n The number of the loaded data.
+ * @param {Function} calculator The load progress accumulator.
+ * @param {Function} baseHandler The base handler.
+ */
+dwv.io.File.createProgressHandler = function (n, calculator, baseHandler) {
+    return function (event) {
+        if( event.lengthComputable )
+        {
+            var percent = Math.round((event.loaded / event.total) * 100);
+            var ev = {lengthComputable: true, loaded: calculator(n, percent), total: 100};
+            baseHandler(ev);
+        }
+    };
+};
+
+/**
  * Load a list of files.
  * @method load
  * @param {Array} ioArray The list of files to load.
@@ -12575,9 +12623,6 @@ dwv.io.File.prototype.load = function (ioArray)
         } catch(error) {
             self.onerror(error);
         }
-        // force 100% progress (sometimes with firefox)
-        var endEvent = {lengthComputable: true, loaded: 1, total: 1};
-        dwv.gui.updateProgress(endEvent);
     };
 
     // image loader
@@ -12617,10 +12662,11 @@ dwv.io.File.prototype.load = function (ioArray)
     {
         var file = ioArray[i];
         var reader = new FileReader();
+        reader.onprogress = dwv.io.File.createProgressHandler(i, 
+                self.getGlobalPercent, self.onprogress);
         if ( file.name.split('.').pop().toLowerCase() === "json" )
         {
             reader.onload = onLoadTextReader;
-            reader.onprogress = dwv.gui.updateProgress;
             reader.onerror = dwv.io.File.createErrorHandler(file, "text", self.onerror);
             reader.readAsText(file);
         }
@@ -12631,14 +12677,12 @@ dwv.io.File.prototype.load = function (ioArray)
             reader.index = i;
             // callbacks
             reader.onload = onLoadImageReader;
-            reader.onprogress = dwv.gui.updateProgress;
             reader.onerror = dwv.io.File.createErrorHandler(file, "image", self.onerror);
             reader.readAsDataURL(file);
         }
         else
         {
             reader.onload = onLoadDicomReader;
-            reader.onprogress = dwv.gui.updateProgress;
             reader.onerror = dwv.io.File.createErrorHandler(file, "DICOM", self.onerror);
             reader.readAsArrayBuffer(file);
         }
@@ -12679,12 +12723,24 @@ dwv.io.Url = function ()
      * @type Number
      */
     var nLoaded = 0;
+    /**
+     * List of progresses.
+     * @property progressList
+     * @private
+     * @type Array
+     */
+    var progressList = [];
     
     /**
      * Set the number of data to load.
      * @method setNToLoad
      */ 
-    this.setNToLoad = function (n) { nToLoad = n; };
+    this.setNToLoad = function (n) {
+        nToLoad = n;
+        for ( var i = 0; i < nToLoad; ++i ) {
+            progressList[i] = 0;
+        }
+    };
     
     /**
      * Increment the number of loaded data
@@ -12696,6 +12752,22 @@ dwv.io.Url = function ()
         if ( nLoaded === nToLoad ) {
             this.onloadend();
         }
+    };
+    
+    /**
+     * Get the global load percent including the provided one.
+     * @method getGlobalPercent
+     * @param {Number} n The number of the loaded data.
+     * @param {Number} percent The percentage of data 'n' that has been loaded.
+     * @return {Number} The accumulated percentage. 
+     */
+    this.getGlobalPercent = function (n, percent) {
+        progressList[n] = percent/nToLoad;
+        var totPercent = 0;
+        for ( var i = 0; i < progressList.length; ++i ) {
+            totPercent += progressList[i];
+        }
+        return totPercent;
     };
 }; // class Url
 
@@ -12714,6 +12786,14 @@ dwv.io.Url.prototype.onload = function (/*event*/)
  * @method onloadend
  */
 dwv.io.Url.prototype.onloadend = function () 
+{
+    // default does nothing.
+};
+/**
+ * Handle a progress event.
+ * @method onprogress
+ */
+dwv.io.File.prototype.onprogress = function () 
 {
     // default does nothing.
 };
@@ -12740,6 +12820,24 @@ dwv.io.Url.createErrorHandler = function (url, text, baseHandler) {
         baseHandler( {'name': "RequestError", 
             'message': "An error occurred while retrieving the " + text + " file (via http): " + url + 
             " (status: "+this.status + ")" } );
+    };
+};
+
+/**
+ * Create an progress handler from a base one and locals.
+ * @method createProgressHandler
+ * @param {Number} n The number of the loaded data.
+ * @param {Function} calculator The load progress accumulator.
+ * @param {Function} baseHandler The base handler.
+ */
+dwv.io.Url.createProgressHandler = function (n, calculator, baseHandler) {
+    return function (event) {
+        if( event.lengthComputable )
+        {
+            var percent = Math.round((event.loaded / event.total) * 100);
+            var ev = {lengthComputable: true, loaded: calculator(n, percent), total: 100};
+            baseHandler(ev);
+        }
     };
 };
 
@@ -12860,7 +12958,8 @@ dwv.io.Url.prototype.load = function (ioArray)
             request.onload = onLoadTextRequest;
             request.onerror = dwv.io.Url.createErrorHandler(url, "text", self.onerror);
         }
-        request.onprogress = dwv.gui.updateProgress;
+        request.onprogress = dwv.io.File.createProgressHandler(i, 
+            self.getGlobalPercent, self.onprogress);
         request.send(null);
     }
 };

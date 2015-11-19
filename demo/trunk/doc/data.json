@@ -1078,7 +1078,7 @@
             "module": "gui",
             "namespace": "dwv.gui.base",
             "file": "src/gui/generic.js",
-            "line": 119,
+            "line": 97,
             "description": "Slider base gui.",
             "is_constructor": 1
         },
@@ -1093,7 +1093,7 @@
             "module": "gui",
             "namespace": "dwv.gui.base",
             "file": "src/gui/generic.js",
-            "line": 198,
+            "line": 176,
             "description": "DICOM tags base gui.",
             "is_constructor": 1
         },
@@ -2899,7 +2899,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 538,
+            "line": 539,
             "description": "Load a State file.",
             "itemtype": "method",
             "name": "loadStateFile",
@@ -2915,7 +2915,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 557,
+            "line": 558,
             "description": "Load a list of URLs.",
             "itemtype": "method",
             "name": "loadURL",
@@ -2931,7 +2931,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 595,
+            "line": 597,
             "description": "Load a State url.",
             "itemtype": "method",
             "name": "loadStateUrl",
@@ -2947,7 +2947,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 614,
+            "line": 616,
             "description": "Fit the display to the given size. To be called once the image is loaded.",
             "itemtype": "method",
             "name": "fitToSize",
@@ -2956,7 +2956,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 657,
+            "line": 659,
             "description": "Toggle the display of the information layer.",
             "itemtype": "method",
             "name": "toggleInfoLayerDisplay",
@@ -2965,14 +2965,14 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 675,
+            "line": 677,
             "description": "Init the Window/Level display",
             "class": "dwv.App",
             "namespace": "dwv"
         },
         {
             "file": "src/app/application.js",
-            "line": 690,
+            "line": 692,
             "description": "Add layer mouse and touch listeners.",
             "itemtype": "method",
             "name": "addLayerListeners",
@@ -2981,7 +2981,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 712,
+            "line": 714,
             "description": "Remove layer mouse and touch listeners.",
             "itemtype": "method",
             "name": "removeLayerListeners",
@@ -2990,7 +2990,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 734,
+            "line": 736,
             "description": "Render the current image.",
             "itemtype": "method",
             "name": "render",
@@ -2999,7 +2999,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 743,
+            "line": 745,
             "description": "Zoom to the layers.",
             "itemtype": "method",
             "name": "zoom",
@@ -3025,7 +3025,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 759,
+            "line": 761,
             "description": "Add a step to the layers zoom.",
             "itemtype": "method",
             "name": "stepZoom",
@@ -3051,7 +3051,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 775,
+            "line": 777,
             "description": "Apply a translation to the layers.",
             "itemtype": "method",
             "name": "translate",
@@ -3072,7 +3072,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 787,
+            "line": 789,
             "description": "Add a translation to the layers.",
             "itemtype": "method",
             "name": "stepTranslate",
@@ -3093,7 +3093,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 803,
+            "line": 805,
             "description": "Handle window/level change.",
             "itemtype": "method",
             "name": "onWLChange",
@@ -3109,7 +3109,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 813,
+            "line": 815,
             "description": "Handle colour map change.",
             "itemtype": "method",
             "name": "onColourChange",
@@ -3125,7 +3125,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 823,
+            "line": 825,
             "description": "Handle slice change.",
             "itemtype": "method",
             "name": "onSliceChange",
@@ -3141,7 +3141,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 843,
+            "line": 845,
             "description": "Handle key down event.\n- CRTL-Z: undo\n- CRTL-Y: redo\nDefault behavior. Usually used in tools.",
             "itemtype": "method",
             "name": "onKeydown",
@@ -3157,7 +3157,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 863,
+            "line": 865,
             "description": "Handle resize.\nFit the display to the window. To be called once the image is loaded.",
             "itemtype": "method",
             "name": "onResize",
@@ -3173,7 +3173,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 874,
+            "line": 876,
             "description": "Handle zoom reset.",
             "itemtype": "method",
             "name": "onZoomReset",
@@ -3189,7 +3189,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 884,
+            "line": 886,
             "description": "Handle loader change.",
             "itemtype": "method",
             "name": "onChangeLoader",
@@ -3205,7 +3205,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 894,
+            "line": 896,
             "description": "Handle change url event.",
             "itemtype": "method",
             "name": "onChangeURL",
@@ -3221,7 +3221,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 904,
+            "line": 906,
             "description": "Handle input urls.",
             "itemtype": "method",
             "name": "onInputURLs",
@@ -3237,7 +3237,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 914,
+            "line": 916,
             "description": "Handle change files event.",
             "itemtype": "method",
             "name": "onChangeFiles",
@@ -3253,7 +3253,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 927,
+            "line": 929,
             "description": "Handle state save event.",
             "itemtype": "method",
             "name": "onStateSave",
@@ -3269,7 +3269,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 940,
+            "line": 942,
             "description": "Handle colour map change.",
             "itemtype": "method",
             "name": "onChangeColourMap",
@@ -3285,7 +3285,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 950,
+            "line": 952,
             "description": "Handle window/level preset change.",
             "itemtype": "method",
             "name": "onChangeWindowLevelPreset",
@@ -3301,7 +3301,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 968,
+            "line": 970,
             "description": "Handle tool change.",
             "itemtype": "method",
             "name": "onChangeTool",
@@ -3317,7 +3317,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 978,
+            "line": 980,
             "description": "Handle shape change.",
             "itemtype": "method",
             "name": "onChangeShape",
@@ -3333,7 +3333,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 988,
+            "line": 990,
             "description": "Handle filter change.",
             "itemtype": "method",
             "name": "onChangeFilter",
@@ -3349,7 +3349,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 998,
+            "line": 1000,
             "description": "Handle filter run.",
             "itemtype": "method",
             "name": "onRunFilter",
@@ -3365,7 +3365,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1008,
+            "line": 1010,
             "description": "Handle line colour change.",
             "itemtype": "method",
             "name": "onChangeLineColour",
@@ -3381,7 +3381,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1018,
+            "line": 1020,
             "description": "Handle min/max slider change.",
             "itemtype": "method",
             "name": "onChangeMinMax",
@@ -3397,7 +3397,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1028,
+            "line": 1030,
             "description": "Handle undo.",
             "itemtype": "method",
             "name": "onUndo",
@@ -3413,7 +3413,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1038,
+            "line": 1040,
             "description": "Handle redo.",
             "itemtype": "method",
             "name": "onRedo",
@@ -3429,7 +3429,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1048,
+            "line": 1050,
             "description": "Handle toggle of info layer.",
             "itemtype": "method",
             "name": "onToggleInfoLayer",
@@ -3445,7 +3445,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1058,
+            "line": 1060,
             "description": "Handle display reset.",
             "itemtype": "method",
             "name": "onDisplayReset",
@@ -3461,7 +3461,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1076,
+            "line": 1078,
             "description": "Fire an event: call all associated listeners.",
             "itemtype": "method",
             "name": "fireEvent",
@@ -3477,7 +3477,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1092,
+            "line": 1094,
             "description": "Generate the image data and draw it.",
             "itemtype": "method",
             "name": "generateAndDrawImage",
@@ -3486,7 +3486,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1106,
+            "line": 1108,
             "description": "Apply the stored zoom to the layers.",
             "itemtype": "method",
             "name": "zoomLayers",
@@ -3495,7 +3495,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1137,
+            "line": 1139,
             "description": "Apply the stored translation to the layers.",
             "itemtype": "method",
             "name": "translateLayers",
@@ -3504,7 +3504,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1157,
+            "line": 1159,
             "description": "Add image listeners.",
             "itemtype": "method",
             "name": "addImageInfoListeners",
@@ -3515,7 +3515,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1172,
+            "line": 1174,
             "description": "Remove image listeners.",
             "itemtype": "method",
             "name": "removeImageInfoListeners",
@@ -3526,7 +3526,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1187,
+            "line": 1189,
             "description": "General-purpose event handler. This function just determines the mouse \nposition relative to the canvas element. It then passes it to the current tool.",
             "itemtype": "method",
             "name": "eventHandler",
@@ -3544,7 +3544,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1262,
+            "line": 1264,
             "description": "Handle a drag over.",
             "itemtype": "method",
             "name": "onDragOver",
@@ -3562,7 +3562,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1280,
+            "line": 1282,
             "description": "Handle a drag leave.",
             "itemtype": "method",
             "name": "onDragLeave",
@@ -3580,7 +3580,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1298,
+            "line": 1300,
             "description": "Handle a drop event.",
             "itemtype": "method",
             "name": "onDrop",
@@ -3598,7 +3598,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1313,
+            "line": 1315,
             "description": "Handle an error: display it to the user.",
             "itemtype": "method",
             "name": "handleError",
@@ -3616,7 +3616,25 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1334,
+            "line": 1336,
+            "description": "Handle a load progress.",
+            "itemtype": "method",
+            "name": "onLoadProgress",
+            "access": "private",
+            "tagname": "",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The event to handle.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.App",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/app/application.js",
+            "line": 1351,
             "description": "Create the application layers.",
             "itemtype": "method",
             "name": "createLayers",
@@ -3639,7 +3657,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1375,
+            "line": 1392,
             "description": "Post load application initialisation. To be called once the DICOM has been parsed.",
             "itemtype": "method",
             "name": "postLoadInit",
@@ -5122,24 +5140,6 @@
         {
             "file": "src/gui/generic.js",
             "line": 31,
-            "description": "Update the progress bar.",
-            "itemtype": "method",
-            "name": "updateProgress",
-            "static": 1,
-            "params": [
-                {
-                    "name": "event",
-                    "description": "A ProgressEvent.",
-                    "type": "Object"
-                }
-            ],
-            "class": "dwv.gui.base",
-            "module": "gui",
-            "namespace": "dwv.gui"
-        },
-        {
-            "file": "src/gui/generic.js",
-            "line": 47,
             "description": "Display a progress value.",
             "itemtype": "method",
             "name": "displayProgress",
@@ -5157,7 +5157,7 @@
         },
         {
             "file": "src/gui/generic.js",
-            "line": 64,
+            "line": 42,
             "description": "Get a HTML element associated to a container div.",
             "itemtype": "method",
             "name": "getElement",
@@ -5181,7 +5181,7 @@
         },
         {
             "file": "src/gui/generic.js",
-            "line": 87,
+            "line": 65,
             "description": "Refresh a HTML element. Mainly for jquery-mobile.",
             "itemtype": "method",
             "name": "refreshElement",
@@ -5199,7 +5199,7 @@
         },
         {
             "file": "src/gui/generic.js",
-            "line": 98,
+            "line": 76,
             "description": "Set the selected item of a HTML select.",
             "itemtype": "method",
             "name": "setSelected",
@@ -5222,7 +5222,7 @@
         },
         {
             "file": "src/gui/generic.js",
-            "line": 127,
+            "line": 105,
             "description": "Append the slider HTML.",
             "itemtype": "method",
             "name": "append",
@@ -5232,7 +5232,7 @@
         },
         {
             "file": "src/gui/generic.js",
-            "line": 173,
+            "line": 151,
             "description": "Initialise the slider HTML.",
             "itemtype": "method",
             "name": "initialise",
@@ -5242,7 +5242,7 @@
         },
         {
             "file": "src/gui/generic.js",
-            "line": 206,
+            "line": 184,
             "description": "Initialise the DICOM tags table. To be called once the DICOM has been parsed.",
             "itemtype": "method",
             "name": "initialise",
@@ -5692,7 +5692,7 @@
         },
         {
             "file": "src/gui/html.js",
-            "line": 544,
+            "line": 543,
             "description": "Decode an XML manifest.",
             "itemtype": "method",
             "name": "decodeManifest",
@@ -5715,7 +5715,7 @@
         },
         {
             "file": "src/gui/html.js",
-            "line": 594,
+            "line": 593,
             "description": "Display or not an element.",
             "itemtype": "method",
             "name": "displayElement",
@@ -5738,7 +5738,7 @@
         },
         {
             "file": "src/gui/html.js",
-            "line": 606,
+            "line": 605,
             "description": "Toggle the display of an element.",
             "itemtype": "method",
             "name": "toggleDisplay",
@@ -5756,7 +5756,7 @@
         },
         {
             "file": "src/gui/html.js",
-            "line": 622,
+            "line": 621,
             "description": "Append an element.",
             "itemtype": "method",
             "name": "appendElement",
@@ -5779,7 +5779,7 @@
         },
         {
             "file": "src/gui/html.js",
-            "line": 637,
+            "line": 636,
             "description": "Create an element.",
             "itemtype": "method",
             "name": "createElement",
@@ -8951,7 +8951,20 @@
         },
         {
             "file": "src/io/file.js",
-            "line": 37,
+            "line": 36,
+            "description": "List of progresses.",
+            "itemtype": "property",
+            "name": "progressList",
+            "access": "private",
+            "tagname": "",
+            "type": "Array",
+            "class": "dwv.io.File",
+            "module": "io",
+            "namespace": "dwv.io"
+        },
+        {
+            "file": "src/io/file.js",
+            "line": 44,
             "description": "Set the number of data to load.",
             "itemtype": "method",
             "name": "setNToLoad",
@@ -8961,7 +8974,7 @@
         },
         {
             "file": "src/io/file.js",
-            "line": 43,
+            "line": 55,
             "description": "Increment the number of loaded data\nand call onloadend if loaded all data.",
             "itemtype": "method",
             "name": "addLoaded",
@@ -8971,7 +8984,33 @@
         },
         {
             "file": "src/io/file.js",
-            "line": 56,
+            "line": 67,
+            "description": "Get the global load percent including the provided one.",
+            "itemtype": "method",
+            "name": "getGlobalPercent",
+            "params": [
+                {
+                    "name": "n",
+                    "description": "The number of the loaded data.",
+                    "type": "Number"
+                },
+                {
+                    "name": "percent",
+                    "description": "The percentage of data 'n' that has been loaded.",
+                    "type": "Number"
+                }
+            ],
+            "return": {
+                "description": "The accumulated percentage.",
+                "type": "Number"
+            },
+            "class": "dwv.io.File",
+            "module": "io",
+            "namespace": "dwv.io"
+        },
+        {
+            "file": "src/io/file.js",
+            "line": 84,
             "description": "Handle a load event.",
             "itemtype": "method",
             "name": "onload",
@@ -8988,7 +9027,7 @@
         },
         {
             "file": "src/io/file.js",
-            "line": 66,
+            "line": 94,
             "description": "Handle a load end event.",
             "itemtype": "method",
             "name": "onloadend",
@@ -8998,7 +9037,17 @@
         },
         {
             "file": "src/io/file.js",
-            "line": 74,
+            "line": 102,
+            "description": "Handle a progress event.",
+            "itemtype": "method",
+            "name": "onprogress",
+            "class": "dwv.io.File",
+            "module": "io",
+            "namespace": "dwv.io"
+        },
+        {
+            "file": "src/io/file.js",
+            "line": 110,
             "description": "Handle an error event.",
             "itemtype": "method",
             "name": "onerror",
@@ -9015,7 +9064,7 @@
         },
         {
             "file": "src/io/file.js",
-            "line": 85,
+            "line": 121,
             "description": "Create an error handler from a base one and locals.",
             "itemtype": "method",
             "name": "createErrorHandler",
@@ -9042,7 +9091,34 @@
         },
         {
             "file": "src/io/file.js",
-            "line": 100,
+            "line": 136,
+            "description": "Create an progress handler from a base one and locals.",
+            "itemtype": "method",
+            "name": "createProgressHandler",
+            "params": [
+                {
+                    "name": "n",
+                    "description": "The number of the loaded data.",
+                    "type": "Number"
+                },
+                {
+                    "name": "calculator",
+                    "description": "The load progress accumulator.",
+                    "type": "Function"
+                },
+                {
+                    "name": "baseHandler",
+                    "description": "The base handler.",
+                    "type": "Function"
+                }
+            ],
+            "class": "dwv.io.File",
+            "module": "io",
+            "namespace": "dwv.io"
+        },
+        {
+            "file": "src/io/file.js",
+            "line": 154,
             "description": "Load a list of files.",
             "itemtype": "method",
             "name": "load",
@@ -9085,7 +9161,20 @@
         },
         {
             "file": "src/io/url.js",
-            "line": 37,
+            "line": 36,
+            "description": "List of progresses.",
+            "itemtype": "property",
+            "name": "progressList",
+            "access": "private",
+            "tagname": "",
+            "type": "Array",
+            "class": "dwv.io.Url",
+            "module": "io",
+            "namespace": "dwv.io"
+        },
+        {
+            "file": "src/io/url.js",
+            "line": 44,
             "description": "Set the number of data to load.",
             "itemtype": "method",
             "name": "setNToLoad",
@@ -9095,7 +9184,7 @@
         },
         {
             "file": "src/io/url.js",
-            "line": 43,
+            "line": 55,
             "description": "Increment the number of loaded data\nand call onloadend if loaded all data.",
             "itemtype": "method",
             "name": "addLoaded",
@@ -9105,7 +9194,33 @@
         },
         {
             "file": "src/io/url.js",
-            "line": 56,
+            "line": 67,
+            "description": "Get the global load percent including the provided one.",
+            "itemtype": "method",
+            "name": "getGlobalPercent",
+            "params": [
+                {
+                    "name": "n",
+                    "description": "The number of the loaded data.",
+                    "type": "Number"
+                },
+                {
+                    "name": "percent",
+                    "description": "The percentage of data 'n' that has been loaded.",
+                    "type": "Number"
+                }
+            ],
+            "return": {
+                "description": "The accumulated percentage.",
+                "type": "Number"
+            },
+            "class": "dwv.io.Url",
+            "module": "io",
+            "namespace": "dwv.io"
+        },
+        {
+            "file": "src/io/url.js",
+            "line": 84,
             "description": "Handle a load event.",
             "itemtype": "method",
             "name": "onload",
@@ -9122,7 +9237,7 @@
         },
         {
             "file": "src/io/url.js",
-            "line": 66,
+            "line": 94,
             "description": "Handle a load end event.",
             "itemtype": "method",
             "name": "onloadend",
@@ -9132,7 +9247,17 @@
         },
         {
             "file": "src/io/url.js",
-            "line": 74,
+            "line": 102,
+            "description": "Handle a progress event.",
+            "itemtype": "method",
+            "name": "onprogress",
+            "class": "dwv.io.Url",
+            "module": "io",
+            "namespace": "dwv.io"
+        },
+        {
+            "file": "src/io/url.js",
+            "line": 110,
             "description": "Handle an error event.",
             "itemtype": "method",
             "name": "onerror",
@@ -9149,7 +9274,7 @@
         },
         {
             "file": "src/io/url.js",
-            "line": 85,
+            "line": 121,
             "description": "Create an error handler from a base one and locals.",
             "itemtype": "method",
             "name": "createErrorHandler",
@@ -9176,7 +9301,34 @@
         },
         {
             "file": "src/io/url.js",
-            "line": 100,
+            "line": 136,
+            "description": "Create an progress handler from a base one and locals.",
+            "itemtype": "method",
+            "name": "createProgressHandler",
+            "params": [
+                {
+                    "name": "n",
+                    "description": "The number of the loaded data.",
+                    "type": "Number"
+                },
+                {
+                    "name": "calculator",
+                    "description": "The load progress accumulator.",
+                    "type": "Function"
+                },
+                {
+                    "name": "baseHandler",
+                    "description": "The base handler.",
+                    "type": "Function"
+                }
+            ],
+            "class": "dwv.io.Url",
+            "module": "io",
+            "namespace": "dwv.io"
+        },
+        {
+            "file": "src/io/url.js",
+            "line": 154,
             "description": "Load a list of URLs.",
             "itemtype": "method",
             "name": "load",
@@ -13859,7 +14011,7 @@
         },
         {
             "message": "Missing item type\nInit the Window/Level display",
-            "line": " src/app/application.js:675"
+            "line": " src/app/application.js:677"
         },
         {
             "message": "Missing item type\nGet the group-element key used to store DICOM elements.",
