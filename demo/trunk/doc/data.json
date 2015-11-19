@@ -3634,7 +3634,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1351,
+            "line": 1352,
             "description": "Create the application layers.",
             "itemtype": "method",
             "name": "createLayers",
@@ -3657,7 +3657,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1392,
+            "line": 1393,
             "description": "Post load application initialisation. To be called once the DICOM has been parsed.",
             "itemtype": "method",
             "name": "postLoadInit",
@@ -9118,7 +9118,7 @@
         },
         {
             "file": "src/io/file.js",
-            "line": 154,
+            "line": 155,
             "description": "Load a list of files.",
             "itemtype": "method",
             "name": "load",
@@ -9328,7 +9328,7 @@
         },
         {
             "file": "src/io/url.js",
-            "line": 154,
+            "line": 155,
             "description": "Load a list of URLs.",
             "itemtype": "method",
             "name": "load",
