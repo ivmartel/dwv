@@ -145,7 +145,8 @@ dwv.io.Url.createProgressHandler = function (n, calculator, baseHandler) {
         if( event.lengthComputable )
         {
             var percent = Math.round((event.loaded / event.total) * 100);
-            var ev = {lengthComputable: true, loaded: calculator(n, percent), total: 100};
+            var ev = {type: "load-progress", lengthComputable: true, 
+                    loaded: calculator(n, percent), total: 100};
             baseHandler(ev);
         }
     };

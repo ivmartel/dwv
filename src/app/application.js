@@ -1341,6 +1341,7 @@ dwv.App = function ()
      */
     function onLoadProgress(event)
     {
+        fireEvent(event);
         if( event.lengthComputable )
         {
             var percent = Math.round((event.loaded / event.total) * 100);
