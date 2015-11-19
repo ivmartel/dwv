@@ -698,17 +698,17 @@ dwv.App = function ()
         // allow pointer events
         layer.setAttribute("style", "pointer-events: auto;");
         // mouse listeners
-        layer.addEventListener("mousedown", eventHandler);
-        layer.addEventListener("mousemove", eventHandler);
-        layer.addEventListener("mouseup", eventHandler);
-        layer.addEventListener("mouseout", eventHandler);
-        layer.addEventListener("mousewheel", eventHandler);
-        layer.addEventListener("DOMMouseScroll", eventHandler);
-        layer.addEventListener("dblclick", eventHandler);
+        layer.addEventListener("mousedown", onMouch);
+        layer.addEventListener("mousemove", onMouch);
+        layer.addEventListener("mouseup", onMouch);
+        layer.addEventListener("mouseout", onMouch);
+        layer.addEventListener("mousewheel", onMouch);
+        layer.addEventListener("DOMMouseScroll", onMouch);
+        layer.addEventListener("dblclick", onMouch);
         // touch listeners
-        layer.addEventListener("touchstart", eventHandler);
-        layer.addEventListener("touchmove", eventHandler);
-        layer.addEventListener("touchend", eventHandler);
+        layer.addEventListener("touchstart", onMouch);
+        layer.addEventListener("touchmove", onMouch);
+        layer.addEventListener("touchend", onMouch);
     };
     
     /**
@@ -720,17 +720,17 @@ dwv.App = function ()
         // disable pointer events
         layer.setAttribute("style", "pointer-events: none;");
         // mouse listeners
-        layer.removeEventListener("mousedown", eventHandler);
-        layer.removeEventListener("mousemove", eventHandler);
-        layer.removeEventListener("mouseup", eventHandler);
-        layer.removeEventListener("mouseout", eventHandler);
-        layer.removeEventListener("mousewheel", eventHandler);
-        layer.removeEventListener("DOMMouseScroll", eventHandler);
-        layer.removeEventListener("dblclick", eventHandler);
+        layer.removeEventListener("mousedown", onMouch);
+        layer.removeEventListener("mousemove", onMouch);
+        layer.removeEventListener("mouseup", onMouch);
+        layer.removeEventListener("mouseout", onMouch);
+        layer.removeEventListener("mousewheel", onMouch);
+        layer.removeEventListener("DOMMouseScroll", onMouch);
+        layer.removeEventListener("dblclick", onMouch);
         // touch listeners
-        layer.removeEventListener("touchstart", eventHandler);
-        layer.removeEventListener("touchmove", eventHandler);
-        layer.removeEventListener("touchend", eventHandler);
+        layer.removeEventListener("touchstart", onMouch);
+        layer.removeEventListener("touchmove", onMouch);
+        layer.removeEventListener("touchend", onMouch);
     };
     
     /**
@@ -1187,13 +1187,13 @@ dwv.App = function ()
     }
     
     /**
-     * General-purpose event handler. This function just determines the mouse 
+     * Mou(se) and (T)ouch event handler. This function just determines the mouse/touch 
      * position relative to the canvas element. It then passes it to the current tool.
-     * @method eventHandler
+     * @method onMouch
      * @private
      * @param {Object} event The event to handle.
      */
-    function eventHandler(event)
+    function onMouch(event)
     {
         // flag not to get confused between touch and mouse
         var handled = false;
@@ -1443,7 +1443,7 @@ dwv.App = function ()
             // mouse and touch listeners
             self.addLayerListeners( imageLayer.getCanvas() );
             // keydown listener
-            window.addEventListener("keydown", eventHandler, true);
+            window.addEventListener("keydown", onMouch, true);
             
             toolbox.init();
             toolbox.display(true);
