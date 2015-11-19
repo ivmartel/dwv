@@ -3527,9 +3527,9 @@
         {
             "file": "src/app/application.js",
             "line": 1189,
-            "description": "General-purpose event handler. This function just determines the mouse \nposition relative to the canvas element. It then passes it to the current tool.",
+            "description": "Mou(se) and (T)ouch event handler. This function just determines the mouse/touch \nposition relative to the canvas element. It then passes it to the current tool.",
             "itemtype": "method",
-            "name": "eventHandler",
+            "name": "onMouch",
             "access": "private",
             "tagname": "",
             "params": [
