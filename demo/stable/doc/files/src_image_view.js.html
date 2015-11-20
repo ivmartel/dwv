@@ -17,7 +17,7 @@
                 <h1><img src="../assets/css/logo.png" title="dwv" width="117" height="52"></h1>
         </div>
         <div class="yui3-u-1-4 version">
-            <em>API Docs for: 0.12.0</em>
+            <em>API Docs for: 0.13.0</em>
         </div>
     </div>
     <div id="bd" class="yui3-g">
@@ -317,7 +317,7 @@ dwv.image.View = function(image, isSigned)
         if( this.getImage().getPhotometricInterpretation() === &quot;MONOCHROME1&quot;) {
             colourMap = dwv.image.lut.invPlain;
         }
-        this.fireEvent({&quot;type&quot;: &quot;colourchange&quot;, 
+        this.fireEvent({&quot;type&quot;: &quot;colour-change&quot;, 
            &quot;wc&quot;: this.getWindowLut().getCenter(),
            &quot;ww&quot;: this.getWindowLut().getWidth() });
     };
@@ -352,18 +352,18 @@ dwv.image.View = function(image, isSigned)
         // only display value for monochrome data
         if( image.getPhotometricInterpretation().match(/MONOCHROME/) !== null )
         {
-            this.fireEvent({&quot;type&quot;: &quot;positionchange&quot;, 
+            this.fireEvent({&quot;type&quot;: &quot;position-change&quot;, 
                 &quot;i&quot;: pos.i, &quot;j&quot;: pos.j, &quot;k&quot;: pos.k,
                 &quot;value&quot;: image.getRescaledValue(pos.i,pos.j,pos.k)});
         }
         else
         {
-            this.fireEvent({&quot;type&quot;: &quot;positionchange&quot;, 
+            this.fireEvent({&quot;type&quot;: &quot;position-change&quot;, 
                 &quot;i&quot;: pos.i, &quot;j&quot;: pos.j, &quot;k&quot;: pos.k});
         }
         // slice change event (used to trigger redraw)
         if( oldPosition.k !== currentPosition.k ) {
-            this.fireEvent({&quot;type&quot;: &quot;slicechange&quot;});
+            this.fireEvent({&quot;type&quot;: &quot;slice-change&quot;});
         }
         return true;
     };
@@ -395,7 +395,7 @@ dwv.image.View = function(image, isSigned)
             for ( var key in windowLuts ) {
                 windowLuts[key].setCenterAndWidth(center, width);
             }
-            this.fireEvent({&quot;type&quot;: &quot;wlchange&quot;, &quot;wc&quot;: center, &quot;ww&quot;: width });
+            this.fireEvent({&quot;type&quot;: &quot;wl-change&quot;, &quot;wc&quot;: center, &quot;ww&quot;: width });
         }
     };
 

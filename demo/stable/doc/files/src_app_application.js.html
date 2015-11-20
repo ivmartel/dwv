@@ -17,7 +17,7 @@
                 <h1><img src="../assets/css/logo.png" title="dwv" width="117" height="52"></h1>
         </div>
         <div class="yui3-u-1-4 version">
-            <em>API Docs for: 0.12.0</em>
+            <em>API Docs for: 0.13.0</em>
         </div>
     </div>
     <div id="bd" class="yui3-g">
@@ -266,7 +266,7 @@ dwv.App = function ()
      * @method getVersion
      * @return {String} The version of the application.
      */
-    this.getVersion = function () { return &quot;v0.12.0&quot;; };
+    this.getVersion = function () { return &quot;v0.13.0&quot;; };
     
     /** 
      * Get the image.
@@ -540,7 +540,12 @@ dwv.App = function ()
             if ( query &amp;&amp; typeof query.input !== &quot;undefined&quot; ) {
                 // manifest
                 if ( query.type &amp;&amp; query.type === &quot;manifest&quot; ) {
-                    dwv.html.decodeManifestUri( query.input, query.nslices, this.onInputURLs );
+                    var finalUri = &quot;&quot;;
+                    if ( query.input[0] === &#x27;/&#x27; ) {
+                        finalUri = window.location.protocol + &quot;//&quot; + window.location.host;
+                    }
+                    finalUri += query.input;
+                    dwv.html.decodeManifestUri( finalUri, query.nslices, this.onInputURLs );
                 }
                 // urls
                 else {
@@ -550,7 +555,7 @@ dwv.App = function ()
                         var onLoadEnd = function (/*event*/) {
                             loadStateUrl([query.state]);
                         };
-                        this.addEventListener( &quot;onloadend&quot;, onLoadEnd );
+                        this.addEventListener( &quot;load-end&quot;, onLoadEnd );
                         
                     }
                 }
@@ -705,6 +710,7 @@ dwv.App = function ()
             }
         };
         fileIO.onerror = function (error) { handleError(error); };
+        fileIO.onprogress = onLoadProgress;
         // main load (asynchronous)
         fileIO.load(files);
     }
@@ -761,7 +767,8 @@ dwv.App = function ()
             }
         };
         urlIO.onerror = function (error) { handleError(error); };
-        urlIO.onloadend = function (/*event*/) { fireEvent({ &#x27;type&#x27;: &#x27;onloadend&#x27; }); };
+        urlIO.onloadend = function (/*event*/) { fireEvent({ &#x27;type&#x27;: &#x27;load-end&#x27; }); };
+        urlIO.onprogress = onLoadProgress;
         // main load (asynchronous)
         urlIO.load(urls);
     };
@@ -870,17 +877,17 @@ dwv.App = function ()
         // allow pointer events
         layer.setAttribute(&quot;style&quot;, &quot;pointer-events: auto;&quot;);
         // mouse listeners
-        layer.addEventListener(&quot;mousedown&quot;, eventHandler);
-        layer.addEventListener(&quot;mousemove&quot;, eventHandler);
-        layer.addEventListener(&quot;mouseup&quot;, eventHandler);
-        layer.addEventListener(&quot;mouseout&quot;, eventHandler);
-        layer.addEventListener(&quot;mousewheel&quot;, eventHandler);
-        layer.addEventListener(&quot;DOMMouseScroll&quot;, eventHandler);
-        layer.addEventListener(&quot;dblclick&quot;, eventHandler);
+        layer.addEventListener(&quot;mousedown&quot;, onMouch);
+        layer.addEventListener(&quot;mousemove&quot;, onMouch);
+        layer.addEventListener(&quot;mouseup&quot;, onMouch);
+        layer.addEventListener(&quot;mouseout&quot;, onMouch);
+        layer.addEventListener(&quot;mousewheel&quot;, onMouch);
+        layer.addEventListener(&quot;DOMMouseScroll&quot;, onMouch);
+        layer.addEventListener(&quot;dblclick&quot;, onMouch);
         // touch listeners
-        layer.addEventListener(&quot;touchstart&quot;, eventHandler);
-        layer.addEventListener(&quot;touchmove&quot;, eventHandler);
-        layer.addEventListener(&quot;touchend&quot;, eventHandler);
+        layer.addEventListener(&quot;touchstart&quot;, onMouch);
+        layer.addEventListener(&quot;touchmove&quot;, onMouch);
+        layer.addEventListener(&quot;touchend&quot;, onMouch);
     };
     
     /**
@@ -892,17 +899,17 @@ dwv.App = function ()
         // disable pointer events
         layer.setAttribute(&quot;style&quot;, &quot;pointer-events: none;&quot;);
         // mouse listeners
-        layer.removeEventListener(&quot;mousedown&quot;, eventHandler);
-        layer.removeEventListener(&quot;mousemove&quot;, eventHandler);
-        layer.removeEventListener(&quot;mouseup&quot;, eventHandler);
-        layer.removeEventListener(&quot;mouseout&quot;, eventHandler);
-        layer.removeEventListener(&quot;mousewheel&quot;, eventHandler);
-        layer.removeEventListener(&quot;DOMMouseScroll&quot;, eventHandler);
-        layer.removeEventListener(&quot;dblclick&quot;, eventHandler);
+        layer.removeEventListener(&quot;mousedown&quot;, onMouch);
+        layer.removeEventListener(&quot;mousemove&quot;, onMouch);
+        layer.removeEventListener(&quot;mouseup&quot;, onMouch);
+        layer.removeEventListener(&quot;mouseout&quot;, onMouch);
+        layer.removeEventListener(&quot;mousewheel&quot;, onMouch);
+        layer.removeEventListener(&quot;DOMMouseScroll&quot;, onMouch);
+        layer.removeEventListener(&quot;dblclick&quot;, onMouch);
         // touch listeners
-        layer.removeEventListener(&quot;touchstart&quot;, eventHandler);
-        layer.removeEventListener(&quot;touchmove&quot;, eventHandler);
-        layer.removeEventListener(&quot;touchend&quot;, eventHandler);
+        layer.removeEventListener(&quot;touchstart&quot;, onMouch);
+        layer.removeEventListener(&quot;touchmove&quot;, onMouch);
+        layer.removeEventListener(&quot;touchend&quot;, onMouch);
     };
     
     /**
@@ -1335,11 +1342,11 @@ dwv.App = function ()
      */
     function addImageInfoListeners()
     {
-        view.addEventListener(&quot;wlchange&quot;, windowingInfo.update);
-        view.addEventListener(&quot;wlchange&quot;, miniColourMap.update);
-        view.addEventListener(&quot;wlchange&quot;, plotInfo.update);
-        view.addEventListener(&quot;colourchange&quot;, miniColourMap.update);
-        view.addEventListener(&quot;positionchange&quot;, positionInfo.update);
+        view.addEventListener(&quot;wl-change&quot;, windowingInfo.update);
+        view.addEventListener(&quot;wl-change&quot;, miniColourMap.update);
+        view.addEventListener(&quot;wl-change&quot;, plotInfo.update);
+        view.addEventListener(&quot;colour-change&quot;, miniColourMap.update);
+        view.addEventListener(&quot;position-change&quot;, positionInfo.update);
         isInfoLayerListening = true;
     }
     
@@ -1350,22 +1357,22 @@ dwv.App = function ()
      */
     function removeImageInfoListeners()
     {
-        view.removeEventListener(&quot;wlchange&quot;, windowingInfo.update);
-        view.removeEventListener(&quot;wlchange&quot;, miniColourMap.update);
-        view.removeEventListener(&quot;wlchange&quot;, plotInfo.update);
-        view.removeEventListener(&quot;colourchange&quot;, miniColourMap.update);
-        view.removeEventListener(&quot;positionchange&quot;, positionInfo.update);
+        view.removeEventListener(&quot;wl-change&quot;, windowingInfo.update);
+        view.removeEventListener(&quot;wl-change&quot;, miniColourMap.update);
+        view.removeEventListener(&quot;wl-change&quot;, plotInfo.update);
+        view.removeEventListener(&quot;colour-change&quot;, miniColourMap.update);
+        view.removeEventListener(&quot;position-change&quot;, positionInfo.update);
         isInfoLayerListening = false;
     }
     
     /**
-     * General-purpose event handler. This function just determines the mouse 
+     * Mou(se) and (T)ouch event handler. This function just determines the mouse/touch 
      * position relative to the canvas element. It then passes it to the current tool.
-     * @method eventHandler
+     * @method onMouch
      * @private
      * @param {Object} event The event to handle.
      */
-    function eventHandler(event)
+    function onMouch(event)
     {
         // flag not to get confused between touch and mouse
         var handled = false;
@@ -1506,6 +1513,22 @@ dwv.App = function ()
     }
     
     /**
+     * Handle a load progress.
+     * @method onLoadProgress
+     * @private
+     * @param {Object} event The event to handle.
+     */
+    function onLoadProgress(event)
+    {
+        fireEvent(event);
+        if( event.lengthComputable )
+        {
+            var percent = Math.round((event.loaded / event.total) * 100);
+            dwv.gui.displayProgress(percent);
+        }
+    }
+
+    /**
      * Create the application layers.
      * @method createLayers
      * @private
@@ -1581,9 +1604,15 @@ dwv.App = function ()
                 dataWidth, dataHeight);
 
         // image listeners
-        view.addEventListener(&quot;wlchange&quot;, self.onWLChange);
-        view.addEventListener(&quot;colourchange&quot;, self.onColourChange);
-        view.addEventListener(&quot;slicechange&quot;, self.onSliceChange);
+        view.addEventListener(&quot;wl-change&quot;, self.onWLChange);
+        view.addEventListener(&quot;colour-change&quot;, self.onColourChange);
+        view.addEventListener(&quot;slice-change&quot;, self.onSliceChange);
+        
+        // connect with local listeners
+        view.addEventListener(&quot;wl-change&quot;, fireEvent);
+        view.addEventListener(&quot;colour-change&quot;, fireEvent);
+        view.addEventListener(&quot;position-change&quot;, fireEvent);
+        view.addEventListener(&quot;slice-change&quot;, fireEvent);
         
         // update presets with loaded image (used in w/l tool)
         viewController.updatePresets(image, true);
@@ -1593,7 +1622,7 @@ dwv.App = function ()
             // mouse and touch listeners
             self.addLayerListeners( imageLayer.getCanvas() );
             // keydown listener
-            window.addEventListener(&quot;keydown&quot;, eventHandler, true);
+            window.addEventListener(&quot;keydown&quot;, onMouch, true);
             
             toolbox.init();
             toolbox.display(true);

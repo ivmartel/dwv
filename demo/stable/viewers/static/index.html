@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html manifest="cache.manifest">
+<!-- <html manifest="cache.manifest"> -->
+<html>
 
 <head>
 <title>DICOM Web Viewer</title>
@@ -31,7 +32,7 @@ body { background-color: #222; color: white;
 <script type="text/javascript" src="../../ext/notmasteryet/jpg.js"></script>
 <script type="text/javascript" src="../../ext/kinetic/kinetic-v5.1.1-06.10.min.js"></script>
 <!-- Local -->
-<script type="text/javascript" src="../../dwv-0.12.0.min.js"></script>
+<script type="text/javascript" src="../../dwv-0.13.0.min.js"></script>
 <!-- Launch the app -->
 <script type="text/javascript" src="appgui.js"></script>
 <script type="text/javascript" src="applauncher.js"></script>
@@ -59,7 +60,7 @@ body { background-color: #222; color: white;
 <!-- Open file -->
 <div class="openData" title="File">
 <div class="loaderlist"></div>
-<div class="progressbar"></div>
+<div id="progressbar"></div>
 </div>
 
 <!-- Toolbox -->
