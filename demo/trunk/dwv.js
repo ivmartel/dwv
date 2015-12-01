@@ -9377,8 +9377,8 @@ dwv.gui.base.FileLoad = function (app)
 }; // class dwv.gui.base.FileLoad
 
 /**
- * FileLoad base gui.
- * @class FileLoad
+ * UrlLoad base gui.
+ * @class UrlLoad
  * @namespace dwv.gui.base
  * @constructor
  */

@@ -153,7 +153,8 @@
             "modules": {},
             "classes": {
                 "dwv.gui.base.Loadbox": 1,
-                "dwv.gui.base.FileLoad": 1
+                "dwv.gui.base.FileLoad": 1,
+                "dwv.gui.base.UrlLoad": 1
             },
             "fors": {},
             "namespaces": {
@@ -673,6 +674,7 @@
                 "dwv.gui.base.DicomTags": 1,
                 "dwv.gui.base.Loadbox": 1,
                 "dwv.gui.base.FileLoad": 1,
+                "dwv.gui.base.UrlLoad": 1,
                 "dwv.gui.base.Toolbox": 1,
                 "dwv.gui.base.WindowLevel": 1,
                 "dwv.gui.base.Draw": 1,
@@ -1160,8 +1162,23 @@
             "module": "gui",
             "namespace": "dwv.gui.base",
             "file": "src/gui/loader.js",
-            "line": 116,
+            "line": 64,
             "description": "FileLoad base gui.",
+            "is_constructor": 1
+        },
+        "dwv.gui.base.UrlLoad": {
+            "name": "dwv.gui.base.UrlLoad",
+            "shortname": "dwv.gui.base.UrlLoad",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "gui",
+            "namespace": "dwv.gui.base",
+            "file": "src/gui/loader.js",
+            "line": 116,
+            "description": "UrlLoad base gui.",
             "is_constructor": 1
         },
         "dwv.html.Style": {
@@ -6272,7 +6289,7 @@
             "description": "Setup the url load HTML to the page.",
             "itemtype": "method",
             "name": "setup",
-            "class": "dwv.gui.base.FileLoad",
+            "class": "dwv.gui.base.UrlLoad",
             "module": "gui",
             "namespace": "dwv.gui.base"
         },
@@ -6289,7 +6306,7 @@
                     "type": "Boolean"
                 }
             ],
-            "class": "dwv.gui.base.FileLoad",
+            "class": "dwv.gui.base.UrlLoad",
             "module": "gui",
             "namespace": "dwv.gui.base"
         },

@@ -24,6 +24,7 @@ YUI.add("yuidoc-meta", function(Y) {
         "dwv.gui.base.Threshold",
         "dwv.gui.base.Toolbox",
         "dwv.gui.base.Undo",
+        "dwv.gui.base.UrlLoad",
         "dwv.gui.base.WindowLevel",
         "dwv.gui.base.ZoomAndPan",
         "dwv.html",
