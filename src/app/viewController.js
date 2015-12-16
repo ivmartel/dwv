@@ -12,7 +12,7 @@ dwv.ViewController = function ( view )
     // Window/level presets
     var presets = null;
 
-    /** 
+    /**
      * Get the window/level presets.
      * @method getPresets
      * @return {Object} The presets.
@@ -28,7 +28,7 @@ dwv.ViewController = function ( view )
     {
         return view.getCurrentPosition();
     };
-    
+
     /**
      * Set the current position.
      * @method setCurrentPosition
@@ -49,13 +49,13 @@ dwv.ViewController = function ( view )
       */
     this.setCurrentPosition2D = function (i, j)
     {
-        return view.setCurrentPosition({ 
-            "i": i, 
-            "j": j, 
+        return view.setCurrentPosition({
+            "i": i,
+            "j": j,
             "k": view.getCurrentPosition().k
         });
     };
-    
+
     /**
      * Increment the current slice number.
      * @method incrementSliceNb
@@ -66,7 +66,7 @@ dwv.ViewController = function ( view )
         return view.setCurrentPosition({
             "i": view.getCurrentPosition().i,
             "j": view.getCurrentPosition().j,
-            "k": view.getCurrentPosition().k + 1 
+            "k": view.getCurrentPosition().k + 1
         });
     };
 
@@ -80,7 +80,7 @@ dwv.ViewController = function ( view )
         return view.setCurrentPosition({
             "i": view.getCurrentPosition().i,
             "j": view.getCurrentPosition().j,
-            "k": view.getCurrentPosition().k - 1 
+            "k": view.getCurrentPosition().k - 1
         });
     };
 
@@ -94,7 +94,7 @@ dwv.ViewController = function ( view )
         return view.setCurrentPosition({
             "i": view.getCurrentPosition().i,
             "j": view.getCurrentPosition().j,
-            "k":  0 
+            "k":  0
         });
     };
 
@@ -105,9 +105,9 @@ dwv.ViewController = function ( view )
      */
     this.getWindowLevel = function ()
     {
-        return { 
+        return {
             "width": view.getWindowLut().getWidth(),
-            "center": view.getWindowLut().getCenter() 
+            "center": view.getWindowLut().getCenter()
         };
     };
 
@@ -129,7 +129,7 @@ dwv.ViewController = function ( view )
      * @param {Boolean} full If true, shows all presets.
      */
     this.updatePresets = function (image)
-    {    
+    {
         // store the manual preset
         var manual = null;
         if ( presets ) {
@@ -137,7 +137,7 @@ dwv.ViewController = function ( view )
         }
         // reinitialize the presets
         presets = {};
-        
+
         // DICOM presets
         var dicomPresets = view.getWindowPresets();
         if ( dicomPresets ) {
@@ -145,9 +145,9 @@ dwv.ViewController = function ( view )
                 presets[dicomPresets[i].name.toLowerCase()] = dicomPresets[i];
             }
         }
-        
+
         // Image presets
-        
+
         // min/max preset
         var range = image.getRescaledDataRange();
         var width = range.max - range.min;
@@ -160,7 +160,7 @@ dwv.ViewController = function ( view )
                 presets[key] = dwv.tool.defaultpresets[modality][key];
             }
         }
-        
+
         // Manual preset
         if ( manual ){
             presets.manual = manual;
@@ -201,6 +201,5 @@ dwv.ViewController = function ( view )
         // enable it
         this.setColourMap( dwv.tool.colourMaps[name] );
     };
-    
-}; // class dwv.ViewController
 
+}; // class dwv.ViewController

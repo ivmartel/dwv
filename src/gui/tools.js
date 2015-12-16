@@ -29,7 +29,7 @@ dwv.gui.base.Toolbox = function (app)
         // tool select
         var toolSelector = dwv.html.createHtmlSelect("toolSelect", list);
         toolSelector.onchange = app.onChangeTool;
-        
+
         // tool list element
         var toolLi = document.createElement("li");
         toolLi.className = "toolLi ui-block-a";
@@ -39,7 +39,7 @@ dwv.gui.base.Toolbox = function (app)
         // tool ul
         var toolUl = document.createElement("ul");
         toolUl.appendChild(toolLi);
-        toolUl.className = "ui-grid-b"; 
+        toolUl.className = "ui-grid-b";
 
         // node
         var node = app.getElement("toolList");
@@ -48,7 +48,7 @@ dwv.gui.base.Toolbox = function (app)
         // refresh
         dwv.gui.refreshElement(node);
     };
-    
+
     /**
      * Display the toolbox HTML.
      * @method display
@@ -60,7 +60,7 @@ dwv.gui.base.Toolbox = function (app)
         var node = app.getElement("toolLi");
         dwv.html.displayElement(node, bool);
     };
-    
+
     /**
      * Initialise the toolbox HTML.
      * @method initialise
@@ -69,7 +69,7 @@ dwv.gui.base.Toolbox = function (app)
     {
         // tool select: reset selected option
         var toolSelector = app.getElement("toolSelect");
-        
+
         // update list
         var options = toolSelector.options;
         var selectedIndex = -1;
@@ -85,11 +85,11 @@ dwv.gui.base.Toolbox = function (app)
             }
         }
         toolSelector.selectedIndex = selectedIndex;
-        
+
         // refresh
         dwv.gui.refreshElement(toolSelector);
     };
-    
+
 }; // dwv.gui.base.Toolbox
 
 /**
@@ -112,7 +112,7 @@ dwv.gui.base.WindowLevel = function (app)
         // colour map select
         var cmSelector = dwv.html.createHtmlSelect("colourMapSelect", dwv.tool.colourMaps);
         cmSelector.onchange = app.onChangeColourMap;
-    
+
         // preset list element
         var wlLi = document.createElement("li");
         wlLi.className = "wlLi ui-block-b";
@@ -125,7 +125,7 @@ dwv.gui.base.WindowLevel = function (app)
         //cmLi.className = "cmLi";
         cmLi.style.display = "none";
         cmLi.appendChild(cmSelector);
-    
+
         // node
         var node = app.getElement("toolList").getElementsByTagName("ul")[0];
         // append preset
@@ -135,7 +135,7 @@ dwv.gui.base.WindowLevel = function (app)
         // refresh
         dwv.gui.refreshElement(node);
     };
-    
+
     /**
      * Display the tool HTML.
      * @method display
@@ -150,7 +150,7 @@ dwv.gui.base.WindowLevel = function (app)
         node = app.getElement("cmLi");
         dwv.html.displayElement(node, bool);
     };
-    
+
     /**
      * Initialise the tool HTML.
      * @method initialise
@@ -161,7 +161,7 @@ dwv.gui.base.WindowLevel = function (app)
         var wlSelector = dwv.html.createHtmlSelect("presetSelect", app.getViewController().getPresets());
         wlSelector.onchange = app.onChangeWindowLevelPreset;
         wlSelector.title = "Select w/l preset.";
-        
+
         // copy html list
         var wlLi = app.getElement("wlLi");
         // clear node
@@ -170,7 +170,7 @@ dwv.gui.base.WindowLevel = function (app)
         wlLi.appendChild(wlSelector);
         // refresh
         dwv.gui.refreshElement(wlLi);
-        
+
         // colour map select
         var cmSelector = app.getElement("colourMapSelect");
         cmSelector.selectedIndex = 0;
@@ -182,7 +182,7 @@ dwv.gui.base.WindowLevel = function (app)
         // refresh
         dwv.gui.refreshElement(cmSelector);
     };
-    
+
 }; // class dwv.gui.base.WindowLevel
 
 /**
@@ -202,7 +202,7 @@ dwv.gui.base.Draw = function (app)
      * @method getColours
      */
     this.getColours = function () { return colours; };
-    
+
     /**
      * Setup the tool HTML.
      * @method setup
@@ -215,7 +215,7 @@ dwv.gui.base.Draw = function (app)
         // colour select
         var colourSelector = dwv.html.createHtmlSelect("colourSelect", colours);
         colourSelector.onchange = app.onChangeLineColour;
-    
+
         // shape list element
         var shapeLi = document.createElement("li");
         shapeLi.className = "shapeLi ui-block-c";
@@ -228,7 +228,7 @@ dwv.gui.base.Draw = function (app)
         colourLi.style.display = "none";
         colourLi.appendChild(colourSelector);
         //colourLi.setAttribute("class","ui-block-b");
-        
+
         // node
         var node = app.getElement("toolList").getElementsByTagName("ul")[0];
         // apend shape
@@ -253,7 +253,7 @@ dwv.gui.base.Draw = function (app)
         node = app.getElement("shapeLi");
         dwv.html.displayElement(node, bool);
     };
-    
+
     /**
      * Initialise the tool HTML.
      * @method initialise
@@ -265,14 +265,14 @@ dwv.gui.base.Draw = function (app)
         shapeSelector.selectedIndex = 0;
         // refresh
         dwv.gui.refreshElement(shapeSelector);
-        
+
         // colour select: reset selected option
         var colourSelector = app.getElement("colourSelect");
         colourSelector.selectedIndex = 0;
         // refresh
         dwv.gui.refreshElement(colourSelector);
     };
-    
+
 }; // class dwv.gui.base.Draw
 
 /**
@@ -302,14 +302,14 @@ dwv.gui.base.Livewire = function (app)
         // colour select
         var colourSelector = dwv.html.createHtmlSelect("lwColourSelect", colours);
         colourSelector.onchange = app.onChangeLineColour;
-        
+
         // colour list element
         var colourLi = document.createElement("li");
         colourLi.className = "lwColourLi ui-block-b";
         colourLi.style.display = "none";
         //colourLi.setAttribute("class","ui-block-b");
         colourLi.appendChild(colourSelector);
-        
+
         // node
         var node = app.getElement("toolList").getElementsByTagName("ul")[0];
         // apend colour
@@ -317,7 +317,7 @@ dwv.gui.base.Livewire = function (app)
         // refresh
         dwv.gui.refreshElement(node);
     };
-    
+
     /**
      * Display the tool HTML.
      * @method display
@@ -329,7 +329,7 @@ dwv.gui.base.Livewire = function (app)
         var node = app.getElement("lwColourLi");
         dwv.html.displayElement(node, bool);
     };
-    
+
     /**
      * Initialise the tool HTML.
      * @method initialise
@@ -340,7 +340,7 @@ dwv.gui.base.Livewire = function (app)
         colourSelector.selectedIndex = 0;
         dwv.gui.refreshElement(colourSelector);
     };
-    
+
 }; // class dwv.gui.base.Livewire
 
 /**
@@ -366,14 +366,14 @@ dwv.gui.base.ZoomAndPan = function (app)
         button.setAttribute("class","ui-btn ui-btn-b");
         var text = document.createTextNode("Reset");
         button.appendChild(text);
-        
+
         // list element
         var liElement = document.createElement("li");
         liElement.className = "zoomLi ui-block-c";
         liElement.style.display = "none";
         //liElement.setAttribute("class","ui-block-c");
         liElement.appendChild(button);
-        
+
         // node
         var node = app.getElement("toolList").getElementsByTagName("ul")[0];
         // append element
@@ -381,7 +381,7 @@ dwv.gui.base.ZoomAndPan = function (app)
         // refresh
         dwv.gui.refreshElement(node);
     };
-    
+
     /**
      * Display the tool HTML.
      * @method display
@@ -393,7 +393,7 @@ dwv.gui.base.ZoomAndPan = function (app)
         var node = app.getElement("zoomLi");
         dwv.html.displayElement(node, bool);
     };
-    
+
 }; // class dwv.gui.base.ZoomAndPan
 
 /**
@@ -414,7 +414,7 @@ dwv.gui.base.Scroll = function (app)
         var liElement = document.createElement("li");
         liElement.className = "scrollLi ui-block-c";
         liElement.style.display = "none";
-        
+
         // node
         var node = app.getElement("toolList").getElementsByTagName("ul")[0];
         // append element
@@ -422,7 +422,7 @@ dwv.gui.base.Scroll = function (app)
         // refresh
         dwv.gui.refreshElement(node);
     };
-    
+
     /**
      * Display the tool HTML.
      * @method display
@@ -434,5 +434,5 @@ dwv.gui.base.Scroll = function (app)
         var node = app.getElement("scrollLi");
         dwv.html.displayElement(node, bool);
     };
-    
+
 }; // class dwv.gui.base.Scroll

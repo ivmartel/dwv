@@ -1,4 +1,4 @@
-/** 
+/**
  * Application GUI.
  */
 
@@ -24,7 +24,7 @@ dwv.gui.Slider = null;
 // Tags table
 dwv.gui.DicomTags = null;
 
-// Toolbox 
+// Toolbox
 dwv.gui.Toolbox = function (app)
 {
     this.setup = function (/*list*/)

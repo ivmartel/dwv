@@ -18,7 +18,7 @@ dwv.ToolboxController = function (toolbox)
     {
         toolbox.setSelectedTool(name);
     };
-    
+
     /**
      * Set the selected shape.
      * @method setSelectedShape
@@ -28,7 +28,7 @@ dwv.ToolboxController = function (toolbox)
     {
         toolbox.getSelectedTool().setShapeName(name);
     };
-    
+
     /**
      * Set the selected filter.
      * @method setSelectedFilter
@@ -38,7 +38,7 @@ dwv.ToolboxController = function (toolbox)
     {
         toolbox.getSelectedTool().setSelectedFilter(name);
     };
-    
+
     /**
      * Run the selected filter.
      * @method runSelectedFilter
@@ -47,7 +47,7 @@ dwv.ToolboxController = function (toolbox)
     {
         toolbox.getSelectedTool().getSelectedFilter().run();
     };
-    
+
     /**
      * Set the tool line colour.
      * @method runFilter
@@ -57,7 +57,7 @@ dwv.ToolboxController = function (toolbox)
     {
         toolbox.getSelectedTool().setLineColour(name);
     };
-    
+
     /**
      * Set the tool range.
      * @method setRange
@@ -65,12 +65,12 @@ dwv.ToolboxController = function (toolbox)
      */
     this.setRange = function (range)
     {
-        // seems like jquery is checking if the method exists before it 
+        // seems like jquery is checking if the method exists before it
         // is used...
         if ( toolbox && toolbox.getSelectedTool() &&
                 toolbox.getSelectedTool().getSelectedFilter() ) {
             toolbox.getSelectedTool().getSelectedFilter().run(range);
         }
     };
-    
+
 }; // class dwv.ToolboxController

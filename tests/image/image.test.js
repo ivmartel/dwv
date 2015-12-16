@@ -40,7 +40,7 @@ QUnit.test("Test Image getValue.", function (assert) {
         }
     }
     assert.equal( histoContentTest, true, "histogram content" );
-    
+
     // image with rescale
     var image1 = new dwv.image.Image(imgGeometry0, buffer0);
     var slope1 = 2;
@@ -66,7 +66,7 @@ QUnit.test("Test Image append slice.", function (assert) {
     var imgOrigin = new dwv.math.Point3D(0,0,0);
     var imgGeometry0 = new dwv.image.Geometry(imgOrigin, imgSizeMinusOne, imgSpacing);
     imgGeometry0.appendOrigin(new dwv.math.Point3D(0,0,1), 1);
-    
+
     // slice to append
     var sliceSize = new dwv.image.Size(size, size, 1);
     var sliceBuffer = new Int16Array(sliceSize.getTotalSize());
@@ -82,7 +82,7 @@ QUnit.test("Test Image append slice.", function (assert) {
     for(var k=size*size; k<2*size*size; ++k) {
         buffer[k] = 1;
     }
-    
+
     // image 0
     var image0 = new dwv.image.Image(imgGeometry0, buffer);
     // append null
@@ -108,7 +108,7 @@ QUnit.test("Test Image append slice.", function (assert) {
     sliceOrigins0[1] = new dwv.math.Point3D(0,0,0);
     sliceOrigins0[2] = new dwv.math.Point3D(0,0,1);
     assert.deepEqual( imgGeometry0.getOrigins(), sliceOrigins0, "Slice positions (append before)" );
-    
+
     // image 1
     var imgGeometry1 = new dwv.image.Geometry(imgOrigin, imgSizeMinusOne, imgSpacing);
     imgGeometry1.appendOrigin(new dwv.math.Point3D(0,0,1), 1);
@@ -206,7 +206,7 @@ QUnit.test("Test Image transform.", function (assert) {
         buffer0[i] = i;
     }
     var image0 = new dwv.image.Image(imgGeometry0, buffer0);
-    
+
     // treshold function
     var func0 = function ( value ) {
         if ( value < 3 || value > 5 ) {
@@ -226,10 +226,10 @@ QUnit.test("Test Image transform.", function (assert) {
         }
     }
     assert.equal( testContent0, true, "transform threshold" );
-    
+
     // transform changes the calling image... reset it
     image0 = new dwv.image.Image(imgGeometry0, buffer0);
-    
+
     // multiply function
     var func1 = function ( value ) {
         return value * 2;

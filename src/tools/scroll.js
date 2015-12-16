@@ -92,7 +92,7 @@ dwv.tool.Scroll = function(app)
             self.started = false;
         }
     };
-    
+
     /**
      * Handle mouse out event.
      * @method mouseout
@@ -176,7 +176,7 @@ dwv.tool.Scroll = function(app)
         gui = new dwv.gui.Scroll(app);
         gui.setup();
     };
-    
+
     /**
      * Enable the tool.
      * @method enable
@@ -198,7 +198,7 @@ dwv.tool.Scroll = function(app)
         }
         return true;
     };
-    
+
 }; // Scroll class
 
 /**
@@ -219,4 +219,3 @@ dwv.tool.Scroll.prototype.getHelp = function()
         }
     };
 };
-

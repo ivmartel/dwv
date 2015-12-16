@@ -69,8 +69,7 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-yuidoc');
-    
+
     // Task to run tests
     grunt.registerTask('publish', ['jshint', 'qunit', 'coveralls', 'concat', 'uglify', 'yuidoc']);
 };
-

@@ -31,17 +31,17 @@ dwv.gui.base.Filter = function (app)
         // filter select
         var filterSelector = dwv.html.createHtmlSelect("filterSelect", list);
         filterSelector.onchange = app.onChangeFilter;
-    
+
         // filter list element
         var filterLi = dwv.html.createHiddenElement("li", "filterLi");
         filterLi.className += " ui-block-b";
         filterLi.appendChild(filterSelector);
-        
+
         // append element
         var node = app.getElement("toolList").getElementsByTagName("ul")[0];
         dwv.html.appendElement(node, filterLi);
     };
-    
+
     /**
      * Display the tool HTML.
      * @method display
@@ -52,7 +52,7 @@ dwv.gui.base.Filter = function (app)
         var node = app.getElement("filterLi");
         dwv.html.displayElement(node, flag);
     };
-    
+
     /**
      * Initialise the tool HTML.
      * @method initialise
@@ -83,7 +83,7 @@ dwv.gui.base.Threshold = function (app)
      * @type Object
      */
     var slider = new dwv.gui.Slider(app);
-    
+
     /**
      * Setup the threshold filter HTML.
      * @method setup
@@ -93,7 +93,7 @@ dwv.gui.base.Threshold = function (app)
         // threshold list element
         var thresholdLi = dwv.html.createHiddenElement("li", "thresholdLi");
         thresholdLi.className += " ui-block-c";
-        
+
         // node
         var node = app.getElement("toolList").getElementsByTagName("ul")[0];
         // append threshold
@@ -103,7 +103,7 @@ dwv.gui.base.Threshold = function (app)
         // refresh
         dwv.gui.refreshElement(node);
     };
-    
+
     /**
      * Clear the threshold filter HTML.
      * @method display
@@ -114,7 +114,7 @@ dwv.gui.base.Threshold = function (app)
         var node = app.getElement("thresholdLi");
         dwv.html.displayElement(node, flag);
     };
-    
+
     /**
      * Initialise the threshold filter HTML.
      * @method initialise
@@ -126,7 +126,7 @@ dwv.gui.base.Threshold = function (app)
     };
 
 }; // class dwv.gui.base.Threshold
-    
+
 /**
  * Create the apply filter button.
  * @method createFilterApplyButton
@@ -165,7 +165,7 @@ dwv.gui.base.Sharpen = function (app)
         var node = app.getElement("toolList").getElementsByTagName("ul")[0];
         dwv.html.appendElement(node, sharpenLi);
     };
-    
+
     /**
      * Display the sharpen filter HTML.
      * @method display
@@ -176,7 +176,7 @@ dwv.gui.base.Sharpen = function (app)
         var node = app.getElement("sharpenLi");
         dwv.html.displayElement(node, flag);
     };
-    
+
 }; // class dwv.gui.base.Sharpen
 
 /**
@@ -201,7 +201,7 @@ dwv.gui.base.Sobel = function (app)
         var node = app.getElement("toolList").getElementsByTagName("ul")[0];
         dwv.html.appendElement(node, sobelLi);
     };
-    
+
     /**
      * Display the sobel filter HTML.
      * @method display
@@ -212,6 +212,5 @@ dwv.gui.base.Sobel = function (app)
         var node = app.getElement("sobelLi");
         dwv.html.displayElement(node, flag);
     };
-    
-}; // class dwv.gui.base.Sobel
 
+}; // class dwv.gui.base.Sobel

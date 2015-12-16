@@ -10,7 +10,7 @@ dwv.dicom = dwv.dicom || {};
  * Generated using xml standard conversion
  *  from https://github.com/ivmartel/dcmbench/tree/master/view/part06
  *  with http://medical.nema.org/medical/dicom/current/source/docbook/part06/part06.xml
- * Conversion changes: 
+ * Conversion changes:
  * - (vr) "See Note" -> "NONE", "OB or OW" -> "ox", "US or SS" -> "xs"
  * - added "GenericGroupLength" element to each group
  * Local changes:
@@ -27,7 +27,7 @@ dwv.dicom.dictionary = {
         '0x0100': ['US', '1', 'CommandField'],
         '0x0110': ['US', '1', 'MessageID'],
         '0x0120': ['US', '1', 'MessageIDBeingRespondedTo'],
-        '0x0200': ['AE', '1', 'Initiator'], 
+        '0x0200': ['AE', '1', 'Initiator'],
         '0x0300': ['AE', '1', 'Receiver'],
         '0x0400': ['AE', '1', 'FindLocation'],
         '0x0600': ['AE', '1', 'MoveDestination'],

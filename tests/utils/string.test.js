@@ -20,14 +20,14 @@ QUnit.test("Test CapitaliseFirstLetter.", function (assert) {
     assert.equal(dwv.utils.capitaliseFirstLetter("dicom"), "Dicom", "Capitalise regular");
     assert.equal(dwv.utils.capitaliseFirstLetter("Dicom"), "Dicom", "Capitalise regular no need");
     // with spaces
-    assert.equal(dwv.utils.capitaliseFirstLetter("le ciel est bleu"), "Le ciel est bleu", 
+    assert.equal(dwv.utils.capitaliseFirstLetter("le ciel est bleu"), "Le ciel est bleu",
             "Capitalise sentence");
 });
 
 QUnit.test("Test splitQueryString.", function (assert) {
     // using JSON.stringify to compare objects
     var strEmpty = JSON.stringify({});
-    
+
     // undefined
     var res00 = dwv.utils.splitQueryString();
     assert.equal(JSON.stringify(res00), strEmpty, "Split null");
@@ -37,7 +37,7 @@ QUnit.test("Test splitQueryString.", function (assert) {
     // empty
     var res02 = dwv.utils.splitQueryString("");
     assert.equal(JSON.stringify(res02), strEmpty, "Split empty");
-    
+
     // test10
     var test10 = "root?key0";
     var res10 = dwv.utils.splitQueryString(test10);
@@ -48,7 +48,7 @@ QUnit.test("Test splitQueryString.", function (assert) {
     var res11 = dwv.utils.splitQueryString(test11);
     var ref11 = {'base': "root", 'query': {'key0': "val00"}};
     assert.equal(JSON.stringify(res11), JSON.stringify(ref11), "Split test11");
-    
+
     // test20
     var test20 = "root?key0=val00&key1";
     var res20 = dwv.utils.splitQueryString(test20);
@@ -59,7 +59,7 @@ QUnit.test("Test splitQueryString.", function (assert) {
     var res21 = dwv.utils.splitQueryString(test21);
     var ref21 = {'base': "root", 'query': {'key0': "val00", 'key1': "val10"}};
     assert.equal(JSON.stringify(res21), JSON.stringify(ref21), "Split test21");
-    
+
     // test30
     var test30 = "root?key0=val00&key0&key1=val10";
     var res30 = dwv.utils.splitQueryString(test30);

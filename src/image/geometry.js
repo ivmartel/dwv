@@ -20,19 +20,19 @@ dwv.image.Size = function ( numberOfColumns, numberOfRows, numberOfSlices )
      * Get the number of columns.
      * @method getNumberOfColumns
      * @return {Number} The number of columns.
-     */ 
+     */
     this.getNumberOfColumns = function () { return numberOfColumns; };
     /**
      * Get the number of rows.
      * @method getNumberOfRows
      * @return {Number} The number of rows.
-     */ 
+     */
     this.getNumberOfRows = function () { return numberOfRows; };
     /**
      * Get the number of slices.
      * @method getNumberOfSlices
      * @return {Number} The number of slices.
-     */ 
+     */
     this.getNumberOfSlices = function () { return (numberOfSlices || 1.0); };
 };
 
@@ -40,7 +40,7 @@ dwv.image.Size = function ( numberOfColumns, numberOfRows, numberOfSlices )
  * Get the size of a slice.
  * @method getSliceSize
  * @return {Number} The size of a slice.
- */ 
+ */
 dwv.image.Size.prototype.getSliceSize = function () {
     return this.getNumberOfColumns() * this.getNumberOfRows();
 };
@@ -49,7 +49,7 @@ dwv.image.Size.prototype.getSliceSize = function () {
  * Get the total size.
  * @method getTotalSize
  * @return {Number} The total size.
- */ 
+ */
 dwv.image.Size.prototype.getTotalSize = function () {
     return this.getSliceSize() * this.getNumberOfSlices();
 };
@@ -59,7 +59,7 @@ dwv.image.Size.prototype.getTotalSize = function () {
  * @method equals
  * @param {Size} rhs The object to compare to.
  * @return {Boolean} True if both objects are equal.
- */ 
+ */
 dwv.image.Size.prototype.equals = function (rhs) {
     return rhs !== null &&
         this.getNumberOfColumns() === rhs.getNumberOfColumns() &&
@@ -74,7 +74,7 @@ dwv.image.Size.prototype.equals = function (rhs) {
  * @param {Number} j The row coordinate.
  * @param {Number} k The slice coordinate.
  * @return {Boolean} True if the given coordinates are within bounds.
- */ 
+ */
 dwv.image.Size.prototype.isInBounds = function ( i, j, k ) {
     if( i < 0 || i > this.getNumberOfColumns() - 1 ||
         j < 0 || j > this.getNumberOfRows() - 1 ||
@@ -85,7 +85,7 @@ dwv.image.Size.prototype.isInBounds = function ( i, j, k ) {
 };
 
 /**
- * 2D/3D Spacing class. 
+ * 2D/3D Spacing class.
  * @class Spacing
  * @namespace dwv.image
  * @constructor
@@ -99,19 +99,19 @@ dwv.image.Spacing = function ( columnSpacing, rowSpacing, sliceSpacing )
      * Get the column spacing.
      * @method getColumnSpacing
      * @return {Number} The column spacing.
-     */ 
+     */
     this.getColumnSpacing = function () { return columnSpacing; };
     /**
      * Get the row spacing.
      * @method getRowSpacing
      * @return {Number} The row spacing.
-     */ 
+     */
     this.getRowSpacing = function () { return rowSpacing; };
     /**
      * Get the slice spacing.
      * @method getSliceSpacing
      * @return {Number} The slice spacing.
-     */ 
+     */
     this.getSliceSpacing = function () { return (sliceSpacing || 1.0); };
 };
 
@@ -120,7 +120,7 @@ dwv.image.Spacing = function ( columnSpacing, rowSpacing, sliceSpacing )
  * @method equals
  * @param {Spacing} rhs The object to compare to.
  * @return {Boolean} True if both objects are equal.
- */ 
+ */
 dwv.image.Spacing.prototype.equals = function (rhs) {
     return rhs !== null &&
         this.getColumnSpacing() === rhs.getColumnSpacing() &&
@@ -129,7 +129,7 @@ dwv.image.Spacing.prototype.equals = function (rhs) {
 };
 
 /**
- * 2D/3D Geometry class. 
+ * 2D/3D Geometry class.
  * @class Geometry
  * @namespace dwv.image
  * @constructor
@@ -144,32 +144,32 @@ dwv.image.Geometry = function ( origin, size, spacing )
         origin = new dwv.math.Point3D(0,0,0);
     }
     var origins = [origin];
-    
+
     /**
      * Get the object first origin.
      * @method getOrigin
      * @return {Object} The object first origin.
-     */ 
+     */
     this.getOrigin = function () { return origin; };
     /**
      * Get the object origins.
      * @method getOrigins
      * @return {Array} The object origins.
-     */ 
+     */
     this.getOrigins = function () { return origins; };
     /**
      * Get the object size.
      * @method getSize
      * @return {Object} The object size.
-     */ 
+     */
     this.getSize = function () { return size; };
     /**
      * Get the object spacing.
      * @method getSpacing
      * @return {Object} The object spacing.
-     */ 
+     */
     this.getSpacing = function () { return spacing; };
-    
+
     /**
      * Get the slice position of a point in the current slice layout.
      * @method getSliceIndex
@@ -179,7 +179,7 @@ dwv.image.Geometry = function ( origin, size, spacing )
     {
         // cannot use this.worldToIndex(point).getK() since
         // we cannot guaranty consecutive slices...
-        
+
         // find the closest index
         var closestSliceIndex = 0;
         var minDiff = Math.abs( origins[0].getZ() - point.getZ() );
@@ -187,7 +187,7 @@ dwv.image.Geometry = function ( origin, size, spacing )
         for( var i = 0; i < origins.length; ++i )
         {
             diff = Math.abs( origins[i].getZ() - point.getZ() );
-            if( diff < minDiff ) 
+            if( diff < minDiff )
             {
                 minDiff = diff;
                 closestSliceIndex = i;
@@ -197,7 +197,7 @@ dwv.image.Geometry = function ( origin, size, spacing )
         var sliceIndex = ( diff > 0 ) ? closestSliceIndex : closestSliceIndex + 1;
         return sliceIndex;
     };
-    
+
     /**
      * Append an origin to the geometry.
      * @param {Object} origin The origin to append.
@@ -221,7 +221,7 @@ dwv.image.Geometry = function ( origin, size, spacing )
  * @method equals
  * @param {Geometry} rhs The object to compare to.
  * @return {Boolean} True if both objects are equal.
- */ 
+ */
 dwv.image.Geometry.prototype.equals = function (rhs) {
     return rhs !== null &&
         this.getOrigin() === rhs.getOrigin() &&

@@ -23,12 +23,12 @@ dwv.image.RescaleSlopeAndIntercept = function (slope, intercept)
     if(typeof(intercept) === 'undefined') {
         intercept = 0;
     }*/
-    
+
     /**
      * Get the slope of the RSI.
      * @method getSlope
      * @return {Number} The slope of the RSI.
-     */ 
+     */
     this.getSlope = function ()
     {
         return slope;
@@ -37,7 +37,7 @@ dwv.image.RescaleSlopeAndIntercept = function (slope, intercept)
      * Get the intercept of the RSI.
      * @method getIntercept
      * @return {Number} The intercept of the RSI.
-     */ 
+     */
     this.getIntercept = function ()
     {
         return intercept;
@@ -46,30 +46,30 @@ dwv.image.RescaleSlopeAndIntercept = function (slope, intercept)
      * Apply the RSI on an input value.
      * @method apply
      * @return {Number} The value to rescale.
-     */ 
+     */
     this.apply = function (value)
     {
         return value * slope + intercept;
     };
 };
 
-/** 
+/**
  * Check for RSI equality.
  * @method equals
  * @param {Object} rhs The other RSI to compare to.
  * @return {Boolean} True if both RSI are equal.
- */ 
+ */
 dwv.image.RescaleSlopeAndIntercept.prototype.equals = function (rhs) {
     return rhs !== null &&
         this.getSlope() === rhs.getSlope() &&
         this.getIntercept() === rhs.getIntercept();
 };
 
-/** 
+/**
  * Get a string representation of the RSI.
  * @method toString
  * @return {String} The RSI as a string.
- */ 
+ */
 dwv.image.RescaleSlopeAndIntercept.prototype.toString = function () {
     return (this.getSlope() + ", " + this.getIntercept());
 };
@@ -77,7 +77,7 @@ dwv.image.RescaleSlopeAndIntercept.prototype.toString = function () {
 /**
  * Image class.
  * Usable once created, optional are:
- * - rescale slope and intercept (default 1:0), 
+ * - rescale slope and intercept (default 1:0),
  * - photometric interpretation (default MONOCHROME2),
  * - planar configuration (default RGBRGB...).
  * @class Image
@@ -126,7 +126,7 @@ dwv.image.Image = function(geometry, buffer)
      * @type Object
      */
     var meta = {};
-    
+
     /**
      * Original buffer.
      * @property originalBuffer
@@ -134,7 +134,7 @@ dwv.image.Image = function(geometry, buffer)
      * @type Array
      */
     var originalBuffer = new Int16Array(buffer);
-    
+
     /**
      * Data range.
      * @property dataRange
@@ -156,79 +156,79 @@ dwv.image.Image = function(geometry, buffer)
      * @type Array
      */
     var histogram = null;
-     
+
     /**
      * Get the geometry of the image.
      * @method getGeometry
      * @return {Object} The size of the image.
-     */ 
+     */
     this.getGeometry = function() { return geometry; };
     /**
      * Get the data buffer of the image. TODO dangerous...
      * @method getBuffer
      * @return {Array} The data buffer of the image.
-     */ 
+     */
     this.getBuffer = function() { return buffer; };
-    
+
     /**
      * Get the rescale slope and intercept.
      * @method getRescaleSlopeAndIntercept
      * @return {Object} The rescale slope and intercept.
-     */ 
+     */
     this.getRescaleSlopeAndIntercept = function(k) { return rsis[k]; };
     /**
      * Set the rescale slope and intercept.
      * @method setRescaleSlopeAndIntercept
      * @param {Object} rsi The rescale slope and intercept.
-     */ 
-    this.setRescaleSlopeAndIntercept = function(inRsi, k) { 
+     */
+    this.setRescaleSlopeAndIntercept = function(inRsi, k) {
         if ( typeof k === 'undefined' ) {
             k = 0;
         }
-        rsis[k] = inRsi; 
+        rsis[k] = inRsi;
     };
     /**
      * Get the photometricInterpretation of the image.
      * @method getPhotometricInterpretation
      * @return {String} The photometricInterpretation of the image.
-     */ 
+     */
     this.getPhotometricInterpretation = function() { return photometricInterpretation; };
     /**
      * Set the photometricInterpretation of the image.
      * @method setPhotometricInterpretation
      * @pqrqm {String} interp The photometricInterpretation of the image.
-     */ 
+     */
     this.setPhotometricInterpretation = function(interp) { photometricInterpretation = interp; };
     /**
      * Get the planarConfiguration of the image.
      * @method getPlanarConfiguration
      * @return {Number} The planarConfiguration of the image.
-     */ 
+     */
     this.getPlanarConfiguration = function() { return planarConfiguration; };
     /**
      * Set the planarConfiguration of the image.
      * @method setPlanarConfiguration
      * @param {Number} config The planarConfiguration of the image.
-     */ 
+     */
     this.setPlanarConfiguration = function(config) { planarConfiguration = config; };
     /**
      * Get the numberOfComponents of the image.
      * @method getNumberOfComponents
      * @return {Number} The numberOfComponents of the image.
-     */ 
+     */
     this.getNumberOfComponents = function() { return numberOfComponents; };
 
     /**
      * Get the meta information of the image.
      * @method getMeta
      * @return {Object} The meta information of the image.
-     */ 
+     */
     this.getMeta = function() { return meta; };
     /**
      * Set the meta information of the image.
      * @method setMeta
      * @param {Object} rhs The meta information of the image.
-     */ 
+     */
     this.setMeta = function(rhs) { meta = rhs; };
 
     /**
@@ -236,16 +236,16 @@ dwv.image.Image = function(geometry, buffer)
      * @method getValueAtOffset
      * @param {Number} offset The desired offset.
      * @return {Number} The value at offset.
-     */ 
+     */
     this.getValueAtOffset = function(offset) {
         return buffer[offset];
     };
-    
+
     /**
      * Clone the image.
      * @method clone
      * @return {Image} A clone of this image.
-     */ 
+     */
     this.clone = function()
     {
         var copy = new dwv.image.Image(this.getGeometry(), originalBuffer);
@@ -258,12 +258,12 @@ dwv.image.Image = function(geometry, buffer)
         copy.setMeta(this.getMeta());
         return copy;
     };
-    
+
     /**
      * Append a slice to the image.
      * @method appendSlice
      * @param {Image} The slice to append.
-     */ 
+     */
     this.appendSlice = function(rhs)
     {
         // check input
@@ -290,17 +290,17 @@ dwv.image.Image = function(geometry, buffer)
                 throw new Error("Cannot append a slice with different "+key);
             }
         }
-        
+
         // calculate slice size
         var mul = 1;
         if( photometricInterpretation === "RGB" ) {
             mul = 3;
         }
         var sliceSize = mul * size.getSliceSize();
-        
+
         // create the new buffer
         var newBuffer = new Int16Array(sliceSize * (size.getNumberOfSlices() + 1) );
-        
+
         // append slice at new position
         var newSliceNb = geometry.getSliceIndex( rhs.getGeometry().getOrigin() );
         if( newSliceNb === 0 )
@@ -320,23 +320,23 @@ dwv.image.Image = function(geometry, buffer)
             newBuffer.set(rhs.getBuffer(), offset);
             newBuffer.set(buffer.subarray(offset), offset + sliceSize);
         }
-        
+
         // update geometry
         geometry.appendOrigin( rhs.getGeometry().getOrigin(), newSliceNb );
         // update rsi
         rsis.splice(newSliceNb, 0, rhs.getRescaleSlopeAndIntercept(0));
-        
+
         // copy to class variables
         buffer = newBuffer;
         originalBuffer = new Int16Array(newBuffer);
     };
-    
+
     /**
      * Get the data range.
      * @method getDataRange
      * @return {Object} The data range.
-     */ 
-    this.getDataRange = function() { 
+     */
+    this.getDataRange = function() {
         if( !dataRange ) {
             dataRange = this.calculateDataRange();
         }
@@ -347,8 +347,8 @@ dwv.image.Image = function(geometry, buffer)
      * Get the rescaled data range.
      * @method getRescaledDataRange
      * @return {Object} The rescaled data range.
-     */ 
-    this.getRescaledDataRange = function() { 
+     */
+    this.getRescaledDataRange = function() {
         if( !rescaledDataRange ) {
             rescaledDataRange = this.calculateRescaledDataRange();
         }
@@ -359,8 +359,8 @@ dwv.image.Image = function(geometry, buffer)
      * Get the histogram.
      * @method getHistogram
      * @return {Array} The histogram.
-     */ 
-    this.getHistogram = function() { 
+     */
+    this.getHistogram = function() {
         if( !histogram ) {
             var res = this.calculateHistogram();
             dataRange = res.dataRange;
@@ -411,7 +411,7 @@ dwv.image.Image.prototype.calculateDataRange = function ()
     var min = this.getValueAtOffset(0);
     var max = min;
     var value = 0;
-    for ( var i = 0; i < size; ++i ) {    
+    for ( var i = 0; i < size; ++i ) {
         value = this.getValueAtOffset(i);
         if( value > max ) { max = value; }
         if( value < min ) { min = value; }
@@ -431,9 +431,9 @@ dwv.image.Image.prototype.calculateRescaledDataRange = function ()
     var rmin = this.getRescaledValue(0,0,0);
     var rmax = rmin;
     var rvalue = 0;
-    for ( var k = 0; k < size.getNumberOfSlices(); ++k ) {    
-        for ( var j = 0; j < size.getNumberOfRows(); ++j ) {    
-            for ( var i = 0; i < size.getNumberOfColumns(); ++i ) {    
+    for ( var k = 0; k < size.getNumberOfSlices(); ++k ) {
+        for ( var j = 0; j < size.getNumberOfRows(); ++j ) {
+            for ( var i = 0; i < size.getNumberOfColumns(); ++i ) {
                 rvalue = this.getRescaledValue(i,j,k);
                 if( rvalue > rmax ) { rmax = rvalue; }
                 if( rvalue < rmin ) { rmin = rvalue; }
@@ -459,9 +459,9 @@ dwv.image.Image.prototype.calculateHistogram = function ()
     var rmin = this.getRescaledValue(0,0,0);
     var rmax = rmin;
     var rvalue = 0;
-    for ( var k = 0; k < size.getNumberOfSlices(); ++k ) {    
-        for ( var j = 0; j < size.getNumberOfRows(); ++j ) {    
-            for ( var i = 0; i < size.getNumberOfColumns(); ++i ) {    
+    for ( var k = 0; k < size.getNumberOfSlices(); ++k ) {
+        for ( var j = 0; j < size.getNumberOfRows(); ++j ) {
+            for ( var i = 0; i < size.getNumberOfColumns(); ++i ) {
                 value = this.getValue(i,j,k);
                 if( value > max ) { max = value; }
                 if( value < min ) { min = value; }
@@ -477,7 +477,7 @@ dwv.image.Image.prototype.calculateHistogram = function ()
     var rescaledDataRange = { "min": rmin, "max": rmax };
     // generate data for plotting
     var histogram = [];
-    for ( var b = rmin; b <= rmax; ++b ) {    
+    for ( var b = rmin; b <= rmax; ++b ) {
         histogram.push([b, ( histo[b] || 0 ) ]);
     }
     // return
@@ -506,7 +506,7 @@ dwv.image.Image.prototype.convolute2D = function(weights)
     var nrows = imgSize.getNumberOfRows();
     var nslices = imgSize.getNumberOfSlices();
     var ncomp = this.getNumberOfComponents();
-    
+
     // adapt to number of component and planar configuration
     var factor = 1;
     var componentOffset = 1;
@@ -521,7 +521,7 @@ dwv.image.Image.prototype.convolute2D = function(weights)
             componentOffset = imgSize.getTotalSize();
         }
     }
-    
+
     // allow special indent for matrices
     /*jshint indent:false */
 
@@ -530,10 +530,10 @@ dwv.image.Image.prototype.convolute2D = function(weights)
     wOff[0] = (-ncols-1) * factor; wOff[1] = (-ncols) * factor; wOff[2] = (-ncols+1) * factor;
     wOff[3] = -factor; wOff[4] = 0; wOff[5] = 1 * factor;
     wOff[6] = (ncols-1) * factor; wOff[7] = (ncols) * factor; wOff[8] = (ncols+1) * factor;
-    
+
     // border weight offset matrices
     // borders are extended (see http://en.wikipedia.org/wiki/Kernel_%28image_processing%29)
-    
+
     // i=0, j=0
     var wOff00 = [];
     wOff00[0] = wOff[4]; wOff00[1] = wOff[4]; wOff00[2] = wOff[5];
@@ -549,7 +549,7 @@ dwv.image.Image.prototype.convolute2D = function(weights)
     wOff0n[0] = wOff[1]; wOff0n[1] = wOff[1]; wOff0n[2] = wOff[2];
     wOff0n[3] = wOff[4]; wOff0n[4] = wOff[4]; wOff0n[5] = wOff[5];
     wOff0n[6] = wOff[4]; wOff0n[7] = wOff[4]; wOff0n[8] = wOff[5];
-    
+
     // i=*, j=0
     var wOffx0 = [];
     wOffx0[0] = wOff[3]; wOffx0[1] = wOff[4]; wOffx0[2] = wOff[5];
@@ -561,7 +561,7 @@ dwv.image.Image.prototype.convolute2D = function(weights)
     wOffxn[0] = wOff[0]; wOffxn[1] = wOff[1]; wOffxn[2] = wOff[2];
     wOffxn[3] = wOff[3]; wOffxn[4] = wOff[4]; wOffxn[5] = wOff[5];
     wOffxn[6] = wOff[3]; wOffxn[7] = wOff[4]; wOffxn[8] = wOff[5];
-    
+
     // i=ncols, j=0
     var wOffn0 = [];
     wOffn0[0] = wOff[3]; wOffn0[1] = wOff[4]; wOffn0[2] = wOff[4];
@@ -577,7 +577,7 @@ dwv.image.Image.prototype.convolute2D = function(weights)
     wOffnn[0] = wOff[0]; wOffnn[1] = wOff[1]; wOffnn[2] = wOff[1];
     wOffnn[3] = wOff[3]; wOffnn[4] = wOff[4]; wOffnn[5] = wOff[4];
     wOffnn[6] = wOff[3]; wOffnn[7] = wOff[4]; wOffnn[8] = wOff[4];
-    
+
     // restore indent for rest of method
     /*jshint indent:4 */
 
@@ -618,7 +618,7 @@ dwv.image.Image.prototype.convolute2D = function(weights)
                     else if( i !== 0 && i !== (ncols-1) && j === (nrows-1) ) {
                         wOffFinal = wOffxn;
                     }
-                        
+
                     // calculate the weighed sum of the source image pixels that
                     // fall under the convolution matrix
                     newValue = 0;
@@ -648,7 +648,7 @@ dwv.image.Image.prototype.transform = function(operator)
     var newImage = this.clone();
     var newBuffer = newImage.getBuffer();
     for( var i=0; i < newBuffer.length; ++i )
-    {   
+    {
         newBuffer[i] = operator( newImage.getValueAtOffset(i) );
     }
     return newImage;
@@ -667,7 +667,7 @@ dwv.image.Image.prototype.compose = function(rhs, operator)
     var newImage = this.clone();
     var newBuffer = newImage.getBuffer();
     for( var i=0; i < newBuffer.length; ++i )
-    {   
+    {
         // using the operator on the local buffer, i.e. the latest (not original) data
         newBuffer[i] = Math.floor( operator( this.getValueAtOffset(i), rhs.getValueAtOffset(i) ) );
     }
@@ -683,7 +683,7 @@ dwv.image.Image.prototype.compose = function(rhs, operator)
 dwv.image.Image.prototype.quantifyLine = function(line)
 {
     var spacing = this.getGeometry().getSpacing();
-    var length = line.getWorldLength( spacing.getColumnSpacing(), 
+    var length = line.getWorldLength( spacing.getColumnSpacing(),
             spacing.getRowSpacing() );
     return {"length": length};
 };
@@ -697,7 +697,7 @@ dwv.image.Image.prototype.quantifyLine = function(line)
 dwv.image.Image.prototype.quantifyRect = function(rect)
 {
     var spacing = this.getGeometry().getSpacing();
-    var surface = rect.getWorldSurface( spacing.getColumnSpacing(), 
+    var surface = rect.getWorldSurface( spacing.getColumnSpacing(),
             spacing.getRowSpacing());
     var subBuffer = [];
     var minJ = parseInt(rect.getBegin().getY(), 10);
@@ -723,7 +723,7 @@ dwv.image.Image.prototype.quantifyRect = function(rect)
 dwv.image.Image.prototype.quantifyEllipse = function(ellipse)
 {
     var spacing = this.getGeometry().getSpacing();
-    var surface = ellipse.getWorldSurface( spacing.getColumnSpacing(), 
+    var surface = ellipse.getWorldSurface( spacing.getColumnSpacing(),
             spacing.getRowSpacing());
     return {"surface": surface};
 };
@@ -757,7 +757,7 @@ dwv.image.ImageFactory.prototype.create = function (dicomElements, pixelBuffer)
     }
     // image size
     var size = new dwv.image.Size( columns, rows );
-    
+
     // spacing
     var rowSpacing = 1;
     var columnSpacing = 1;
@@ -780,7 +780,7 @@ dwv.image.ImageFactory.prototype.create = function (dicomElements, pixelBuffer)
     var transferSyntaxUID = dicomElements.getFromKey("x00020010");
     var syntax = dwv.dicom.cleanString( transferSyntaxUID );
     var jpeg2000 = dwv.dicom.isJpeg2000TransferSyntax( syntax );
-    
+
     // buffer data
     var buffer = pixelBuffer;
     // PixelRepresentation
@@ -795,7 +795,7 @@ dwv.image.ImageFactory.prototype.create = function (dicomElements, pixelBuffer)
             }
         }
     }
-    
+
     // slice position
     var slicePosition = new Array(0,0,0);
     // ImagePositionPatient
@@ -805,11 +805,11 @@ dwv.image.ImageFactory.prototype.create = function (dicomElements, pixelBuffer)
             parseFloat( imagePositionPatient[1] ),
             parseFloat( imagePositionPatient[2] ) ];
     }
-    
+
     // geometry
     var origin = new dwv.math.Point3D(slicePosition[0], slicePosition[1], slicePosition[2]);
     var geometry = new dwv.image.Geometry( origin, size, spacing );
-    
+
     // image
     var image = new dwv.image.Image( geometry, buffer );
     // PhotometricInterpretation
@@ -820,13 +820,13 @@ dwv.image.ImageFactory.prototype.create = function (dicomElements, pixelBuffer)
             photo = "RGB";
         }
         image.setPhotometricInterpretation( photo );
-    }        
+    }
     // PlanarConfiguration
     var planarConfiguration = dicomElements.getFromKey("x00280006");
     if ( planarConfiguration ) {
         image.setPlanarConfiguration( planarConfiguration );
-    }  
-    
+    }
+
     // rescale slope and intercept
     var slope = 1;
     // RescaleSlope
@@ -842,7 +842,7 @@ dwv.image.ImageFactory.prototype.create = function (dicomElements, pixelBuffer)
     }
     var rsi = new dwv.image.RescaleSlopeAndIntercept(slope, intercept);
     image.setRescaleSlopeAndIntercept( rsi );
-    
+
     // meta information
     var meta = {};
     // Modality
@@ -866,7 +866,6 @@ dwv.image.ImageFactory.prototype.create = function (dicomElements, pixelBuffer)
         meta.BitsStored = parseInt(bitsStored, 10);
     }
     image.setMeta(meta);
-    
+
     return image;
 };
-

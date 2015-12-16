@@ -11,7 +11,7 @@ QUnit.test("Test array to html function.", function (assert) {
     var table0 = dwv.html.toTable(array0);
     var table0_ref = "<table><tbody><tr><td>0</td><td>1</td><td>2</td><td>3</td></tr></tbody></table>";
     assert.equal(table0.outerHTML, table0_ref, "1D array");
-   
+
     // 2D array
     var arrayIn0 = [0, 1];
     var arrayIn1 = [2, 3];
@@ -19,13 +19,13 @@ QUnit.test("Test array to html function.", function (assert) {
     var table1 = dwv.html.toTable(array1);
     var table1_ref = "<table><tbody><tr><td>0</td><td>1</td></tr><tr><td>2</td><td>3</td></tr></tbody></table>";
     assert.equal(table1.outerHTML, table1_ref, "2D array");
-   
+
     // array of objects
     var array2 = [{"a":0, "b":1}, {"a":2, "b":3}];
     var table2 = dwv.html.toTable(array2);
     var table2_ref = "<table><thead><tr><th data-priority=\"1\">A</th><th data-priority=\"1\">B</th></tr></thead><tbody><tr><td>0</td><td>1</td></tr><tr><td>2</td><td>3</td></tr></tbody></table>";
     assert.equal(table2.outerHTML, table2_ref, "Array of objects");
-    
+
     // object
     // not testing with null values since they are treated differently in browsers
     var obj = {};
@@ -38,9 +38,9 @@ QUnit.test("Test array to html function.", function (assert) {
 
 QUnit.test("Test get URI param.", function (assert) {
     // simple test URI
-    
+
     var params;
-    
+
     // test 00
     var root00 = "http://test.com?input=";
     var uri00 = "result";
@@ -73,7 +73,7 @@ QUnit.test("Test get URI param.", function (assert) {
     assert.equal(res03, null, "File uri with no args");
 
     // real world URI
-    
+
     // wado (called 'anonymised')
     var root10 = "http://ivmartel.github.io/dwv/demo/static/index.html?input=";
     var uri10 = "http://dicom.vital-it.ch:8089/wado?requestType=WADO&contentType=application/dicom&studyUID=1.3.6.1.4.1.19291.2.1.1.2675258517533100002&seriesUID=1.2.392.200036.9116.2.6.1.48.1215564802.1245749034.88493&objectUID=1.2.392.200036.9116.2.6.1.48.1215564802.1245749034.96207";
@@ -82,7 +82,7 @@ QUnit.test("Test get URI param.", function (assert) {
     var res10 = dwv.html.decodeKeyValueUri( params.input, params.dwvReplaceMode );
     var theo10 = [uri10];
     assert.equal(res10.toString(), theo10.toString(), "Wado url");
-    
+
     // babymri
     var root11 = "http://ivmartel.github.io/dwv/demo/static/index.html?input=";
     var uri11 = "http://x.babymri.org/?53320924&.dcm";
@@ -91,7 +91,7 @@ QUnit.test("Test get URI param.", function (assert) {
     var res11 = dwv.html.decodeKeyValueUri( params.input, params.dwvReplaceMode );
     var theo11 = [uri11];
     assert.equal(res11.toString(), theo11.toString(), "Babymri uri");
-    
+
     // github
     var root12 = "http://ivmartel.github.io/dwv/demo/static/index.html?input=";
     var uri12 = "https://github.com/ivmartel/dwv/blob/master/data/cta0.dcm?raw=true";
@@ -100,9 +100,9 @@ QUnit.test("Test get URI param.", function (assert) {
     var res12 = dwv.html.decodeKeyValueUri( params.input, params.dwvReplaceMode );
     var theo12 = [uri12];
     assert.equal(res12.toString(), theo12.toString(), "Github uri");
-    
+
     // multiple URI
-    
+
     // simple test: one argument
     var root20 = "file:///test.html?input=";
     var uri20 = "result?a=0";
@@ -111,7 +111,7 @@ QUnit.test("Test get URI param.", function (assert) {
     var res20 = dwv.html.decodeKeyValueUri( params.input, params.dwvReplaceMode );
     var theo20 = ["result?a=0"];
     assert.equal(res20.toString(), theo20.toString(), "Multiple key uri with one arg");
-    
+
     // simple test: two arguments
     var root21 = "file:///test.html?input=";
     var uri21 = "result?a=0&a=1";
@@ -129,7 +129,7 @@ QUnit.test("Test get URI param.", function (assert) {
     var res22 = dwv.html.decodeKeyValueUri( params.input, params.dwvReplaceMode );
     var theo22 = ["result?a=0", "result?a=1", "result?a=2"];
     assert.equal(res22.toString(), theo22.toString(), "Multiple key uri with three args");
-    
+
     // simple test: plenty arguments
     var root23 = "file:///test.html?input=";
     var uri23 = "result?a=0&a=1&a=2&b=3&c=4";
@@ -147,10 +147,10 @@ QUnit.test("Test get URI param.", function (assert) {
     var full30 = root30 + encodeURIComponent(uri30);
     params = dwv.html.getUriParam(full30);
     var res30 = dwv.html.decodeKeyValueUri( params.input, params.dwvReplaceMode );
-    var theo30 = ["http://dicom.vital-it.ch:8089/wado?requestType=WADO&contentType=application/dicom&studyUID=1.3.6.1.4.1.19291.2.1.1.2675258517533100002&seriesUID=1.2.392.200036.9116.2.6.1.48.1215564802.1245749034.88493&objectUID=1.2.392.200036.9116.2.6.1.48.1215564802.1245749034.96207", 
+    var theo30 = ["http://dicom.vital-it.ch:8089/wado?requestType=WADO&contentType=application/dicom&studyUID=1.3.6.1.4.1.19291.2.1.1.2675258517533100002&seriesUID=1.2.392.200036.9116.2.6.1.48.1215564802.1245749034.88493&objectUID=1.2.392.200036.9116.2.6.1.48.1215564802.1245749034.96207",
                   "http://dicom.vital-it.ch:8089/wado?requestType=WADO&contentType=application/dicom&studyUID=1.3.6.1.4.1.19291.2.1.1.2675258517533100002&seriesUID=1.2.392.200036.9116.2.6.1.48.1215564802.1245749034.88493&objectUID=1.2.392.200036.9116.2.6.1.48.1215564802.1245749216.165708"];
     assert.equal(res30.toString(), theo30.toString(), "Multiple Wado url");
-    
+
     // babymri: test for replaceMode
     var root31 = "http://ivmartel.github.io/dwv/demo/static/index.html?input=";
     var uri31 = "http://x.babymri.org/?key=53320924&key=53320925&key=53320926";
@@ -159,11 +159,11 @@ QUnit.test("Test get URI param.", function (assert) {
     var res31 = dwv.html.decodeKeyValueUri( params.input, params.dwvReplaceMode );
     var theo31 = ["http://x.babymri.org/?53320924", "http://x.babymri.org/?53320925", "http://x.babymri.org/?53320926"];
     assert.equal(res31.toString(), theo31.toString(), "Multiple baby mri (replaceMode)");
-    
+
     // github: not supported
-    
+
     // simple links (no query)
-    
+
     // simple test: plenty arguments
     var root40 = "file:///test.html?input=";
     var uri40 = "web/path/to/file/?file=0.dcm&file=1.dcm&file=2.dcm";
@@ -186,7 +186,7 @@ QUnit.test("Test decode Manifest.", function (assert) {
     var sOPInstanceUID10 = "1.2.840.113619.2.134.1762680288.2032.1122564926.276";
     var sOPInstanceUID11 = "1.2.840.113619.2.134.1762680288.2032.1122564926.277";
     var sOPInstanceUID12 = "1.2.840.113619.2.134.1762680288.2032.1122564926.275";
-    
+
     // create a test manifest
     var doc = document.implementation.createDocument(null, "wado_query", null);
     doc.documentElement.setAttribute("wadoURL", wadoUrl);
@@ -221,17 +221,16 @@ QUnit.test("Test decode Manifest.", function (assert) {
     patient.appendChild(study);
     // main
     doc.documentElement.appendChild(patient);
-    
+
     // decode (only reads first series)
     var res = dwv.html.decodeManifest(doc, 2);
     // theoretical test decode result
     var middle = "?requestType=WADO&contentType=application/dicom&";
-    var theoLinkRoot = wadoUrl + middle + "&studyUID=" + studyInstanceUID + 
+    var theoLinkRoot = wadoUrl + middle + "&studyUID=" + studyInstanceUID +
         "&seriesUID=" + seriesInstanceUID0;
     var theoLink = [ theoLinkRoot + "&objectUID=" + sOPInstanceUID00,
                      theoLinkRoot + "&objectUID=" + sOPInstanceUID01];
-    
+
     assert.equal(res[0], theoLink[0], "Read regular manifest link0");
     assert.equal(res[1], theoLink[1], "Read regular manifest link1");
 });
-

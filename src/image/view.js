@@ -13,7 +13,7 @@ dwv.image = dwv.image || {};
  * @param {Image} image The associated image.
  * @param {Boolean} isSigned Is the data signed.
  * Need to set the window lookup table once created
- * (either directly or with helper methods). 
+ * (either directly or with helper methods).
  */
 dwv.image.View = function(image, isSigned)
 {
@@ -24,7 +24,7 @@ dwv.image.View = function(image, isSigned)
      * @type Window
      */
     var windowLuts = {};
-    
+
     /**
      * Window presets.
      * @property windowPresets
@@ -46,26 +46,26 @@ dwv.image.View = function(image, isSigned)
      * @type Object
      */
     var currentPosition = {"i":0,"j":0,"k":0};
-    
+
     /**
      * Get the associated image.
      * @method getImage
      * @return {Image} The associated image.
-     */ 
+     */
     this.getImage = function() { return image; };
     /**
      * Set the associated image.
      * @method setImage
      * @param {Image} inImage The associated image.
-     */ 
+     */
     this.setImage = function(inImage) { image = inImage; };
-    
+
     /**
      * Get the window LUT of the image.
      * @method getWindowLut
      * @return {Window} The window LUT of the image.
-     */ 
-    this.getWindowLut = function (rsi) { 
+     */
+    this.getWindowLut = function (rsi) {
         if ( typeof rsi === "undefined" ) {
             var sliceNumber = this.getCurrentPosition().k;
             rsi = image.getRescaleSlopeAndIntercept(sliceNumber);
@@ -76,20 +76,20 @@ dwv.image.View = function(image, isSigned)
      * Set the window LUT of the image.
      * @method setWindowLut
      * @param {Window} wlut The window LUT of the image.
-     */ 
-    this.setWindowLut = function (wlut) 
+     */
+    this.setWindowLut = function (wlut)
     {
         var rsi = wlut.getRescaleLut().getRSI();
         windowLuts[rsi.toString()] = wlut;
     };
-    
+
     var self = this;
-    
+
     /**
      * Initialise the view. Only called at construction.
      * @method initialise
      * @private
-     */ 
+     */
     function initialise()
     {
         // create the rescale lookup table
@@ -101,7 +101,7 @@ dwv.image.View = function(image, isSigned)
         var windowLut = new dwv.image.lut.Window(rescaleLut, isSigned);
         self.setWindowLut(windowLut);
     }
-    
+
     // default constructor
     initialise();
 
@@ -109,53 +109,53 @@ dwv.image.View = function(image, isSigned)
      * Get the window presets.
      * @method getWindowPresets
      * @return {Object} The window presets.
-     */ 
+     */
     this.getWindowPresets = function() { return windowPresets; };
     /**
      * Set the window presets.
      * @method setWindowPresets
      * @param {Object} presets The window presets.
-     */ 
-    this.setWindowPresets = function(presets) { 
+     */
+    this.setWindowPresets = function(presets) {
         windowPresets = presets;
         this.setWindowLevel(presets[0].center, presets[0].width);
     };
-    
+
     /**
      * Get the colour map of the image.
      * @method getColourMap
      * @return {Object} The colour map of the image.
-     */ 
+     */
     this.getColourMap = function() { return colourMap; };
     /**
      * Set the colour map of the image.
      * @method setColourMap
      * @param {Object} map The colour map of the image.
-     */ 
-    this.setColourMap = function(map) { 
+     */
+    this.setColourMap = function(map) {
         colourMap = map;
         // TODO Better handle this...
         if( this.getImage().getPhotometricInterpretation() === "MONOCHROME1") {
             colourMap = dwv.image.lut.invPlain;
         }
-        this.fireEvent({"type": "colour-change", 
+        this.fireEvent({"type": "colour-change",
            "wc": this.getWindowLut().getCenter(),
            "ww": this.getWindowLut().getWidth() });
     };
-    
+
     /**
      * Is the data signed data.
      * @method isSigned
      * @return {Boolean} The signed data flag.
-     */ 
+     */
     this.isSigned = function() { return isSigned; };
-    
+
     /**
      * Get the current position.
      * @method getCurrentPosition
      * @return {Object} The current position.
-     */ 
-    this.getCurrentPosition = function() { 
+     */
+    this.getCurrentPosition = function() {
         // return a clone to avoid reference problems
         return {"i": currentPosition.i, "j": currentPosition.j, "k": currentPosition.k};
     };
@@ -163,8 +163,8 @@ dwv.image.View = function(image, isSigned)
      * Set the current position. Returns false if not in bounds.
      * @method setCurrentPosition
      * @param {Object} pos The current position.
-     */ 
-    this.setCurrentPosition = function(pos) { 
+     */
+    this.setCurrentPosition = function(pos) {
         if( !image.getGeometry().getSize().isInBounds(pos.i,pos.j,pos.k) ) {
             return false;
         }
@@ -173,13 +173,13 @@ dwv.image.View = function(image, isSigned)
         // only display value for monochrome data
         if( image.getPhotometricInterpretation().match(/MONOCHROME/) !== null )
         {
-            this.fireEvent({"type": "position-change", 
+            this.fireEvent({"type": "position-change",
                 "i": pos.i, "j": pos.j, "k": pos.k,
                 "value": image.getRescaledValue(pos.i,pos.j,pos.k)});
         }
         else
         {
-            this.fireEvent({"type": "position-change", 
+            this.fireEvent({"type": "position-change",
                 "i": pos.i, "j": pos.j, "k": pos.k});
         }
         // slice change event (used to trigger redraw)
@@ -188,20 +188,20 @@ dwv.image.View = function(image, isSigned)
         }
         return true;
     };
-    
+
     /**
      * Append another view to this one.
      * @method append
      * @param {Object} rhs The view to append.
      */
     this.append = function( rhs )
-    {  
+    {
        // append images
        this.getImage().appendSlice( rhs.getImage() );
        // init to update self
        this.setWindowLut(rhs.getWindowLut());
     };
-    
+
     /**
      * Set the view window/level.
      * @method setWindowLevel
@@ -246,13 +246,13 @@ dwv.image.View = function(image, isSigned)
      * Get the view listeners.
      * @method getListeners
      * @return {Object} The view listeners.
-     */ 
+     */
     this.getListeners = function() { return listeners; };
     /**
      * Set the view listeners.
      * @method setListeners
      * @param {Object} list The view listeners.
-     */ 
+     */
     this.setListeners = function(list) { listeners = list; };
 };
 
@@ -280,7 +280,7 @@ dwv.image.View.prototype.setWindowLevelMinMax = function()
  * @param {Number} sliceNumber The slice position.
  */
 dwv.image.View.prototype.generateImageData = function( array )
-{        
+{
     var sliceNumber = this.getCurrentPosition().k;
     var image = this.getImage();
     var pxValue = 0;
@@ -299,8 +299,8 @@ dwv.image.View.prototype.generateImageData = function( array )
         sliceOffset = (sliceNumber || 0) * sliceSize;
         var iMax = sliceOffset + sliceSize;
         for(var i=sliceOffset; i < iMax; ++i)
-        {        
-            pxValue = parseInt( windowLut.getValue( 
+        {
+            pxValue = parseInt( windowLut.getValue(
                     image.getValueAtOffset(i) ), 10 );
             array.data[index] = colourMap.red[pxValue];
             array.data[index+1] = colourMap.green[pxValue];
@@ -309,7 +309,7 @@ dwv.image.View.prototype.generateImageData = function( array )
             index += 4;
         }
         break;
-    
+
     case "RGB":
         // the planar configuration defines the memory layout
         if( planarConfig !== 0 && planarConfig !== 1 ) {
@@ -322,38 +322,38 @@ dwv.image.View.prototype.generateImageData = function( array )
         var posB = sliceOffset + 2;
         var stepPos = 3;
         // RRRR...GGGG...BBBB...
-        if (planarConfig === 1) { 
+        if (planarConfig === 1) {
             posR = sliceOffset;
             posG = sliceOffset + sliceSize;
             posB = sliceOffset + 2 * sliceSize;
             stepPos = 1;
         }
-        
+
         var redValue = 0;
         var greenValue = 0;
         var blueValue = 0;
         for(var j=0; j < sliceSize; ++j)
-        {        
-            redValue = parseInt( windowLut.getValue( 
+        {
+            redValue = parseInt( windowLut.getValue(
                     image.getValueAtOffset(posR) ), 10 );
-            greenValue = parseInt( windowLut.getValue( 
+            greenValue = parseInt( windowLut.getValue(
                     image.getValueAtOffset(posG) ), 10 );
-            blueValue = parseInt( windowLut.getValue( 
+            blueValue = parseInt( windowLut.getValue(
                     image.getValueAtOffset(posB) ), 10 );
-            
+
             array.data[index] = redValue;
             array.data[index+1] = greenValue;
             array.data[index+2] = blueValue;
             array.data[index+3] = 0xff;
             index += 4;
-            
+
             posR += stepPos;
             posG += stepPos;
             posB += stepPos;
         }
         break;
-    
-    default: 
+
+    default:
         throw new Error("Unsupported photometric interpretation: "+photoInterpretation);
     }
 };
@@ -386,7 +386,7 @@ dwv.image.View.prototype.removeEventListener = function(type, listener)
         return;
     }
     for(var i=0; i < listeners[type].length; ++i)
-    {   
+    {
         if( listeners[type][i] === listener ) {
             listeners[type].splice(i,1);
         }
@@ -405,7 +405,7 @@ dwv.image.View.prototype.fireEvent = function(event)
         return;
     }
     for(var i=0; i < listeners[event.type].length; ++i)
-    {   
+    {
         listeners[event.type][i](event);
     }
 };
@@ -430,7 +430,7 @@ dwv.image.ViewFactory.prototype.create = function (dicomElements, pixelBuffer)
     // create the image
     var imageFactory = new dwv.image.ImageFactory();
     var image = imageFactory.create(dicomElements, pixelBuffer);
-    
+
     // PixelRepresentation
     var isSigned = false;
     var pixelRepresentation = dicomElements.getFromKey("x00280103");
@@ -457,7 +457,7 @@ dwv.image.ViewFactory.prototype.create = function (dicomElements, pixelBuffer)
                 }
                 windowPresets.push({
                     "center": center,
-                    "width": width, 
+                    "width": width,
                     "name": name
                 });
             }
