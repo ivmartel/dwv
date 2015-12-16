@@ -217,9 +217,9 @@ dwv.gui.base.appendHelpHtml = function(toolList, mobile, app)
     if( mobile ) {
         actionType = &quot;touch&quot;;
     }
-    
+
     var toolHelpDiv = document.createElement(&quot;div&quot;);
-    
+
     // current location
     var loc = window.location.pathname;
     var dir = loc.substring(0, loc.lastIndexOf(&#x27;/&#x27;));
@@ -244,15 +244,15 @@ dwv.gui.base.appendHelpHtml = function(toolList, mobile, app)
             for( var i=0; i&lt;keys.length; ++i )
             {
                 var action = tool.getHelp()[actionType][keys[i]];
-                
+
                 var img = document.createElement(&quot;img&quot;);
                 img.src = dir + &quot;/../../resources/&quot;+keys[i]+&quot;.png&quot;;
                 img.style.float = &quot;left&quot;;
                 img.style.margin = &quot;0px 15px 15px 0px&quot;;
-                
+
                 var br = document.createElement(&quot;br&quot;);
                 br.style.clear = &quot;both&quot;;
-                
+
                 var para = document.createElement(&quot;p&quot;);
                 para.appendChild(img);
                 para.appendChild(document.createTextNode(action));
@@ -260,7 +260,7 @@ dwv.gui.base.appendHelpHtml = function(toolList, mobile, app)
                 docDiv.appendChild(para);
             }
         }
-        
+
         // different div structure for mobile or static
         if( mobile )
         {
@@ -277,17 +277,17 @@ dwv.gui.base.appendHelpHtml = function(toolList, mobile, app)
             toolHelpDiv.appendChild(docDiv);
         }
     }
-    
+
     var helpNode = app.getElement(&quot;help&quot;);
 
     var dwvLink = document.createElement(&quot;a&quot;);
     dwvLink.href = &quot;https://github.com/ivmartel/dwv/wiki&quot;;
     dwvLink.title = &quot;DWV wiki on github.&quot;;
     dwvLink.appendChild(document.createTextNode(&quot;DWV&quot;));
-    
+
     var dwvExampleLink = document.createElement(&quot;a&quot;);
     var inputIdx = document.URL.indexOf(&quot;?input=&quot;);
-    dwvExampleLink.href = document.URL.substr(0, inputIdx+7) + 
+    dwvExampleLink.href = document.URL.substr(0, inputIdx+7) +
         &quot;http%3A%2F%2Fx.babymri.org%2F%3F53320924%26.dcm&quot;;
     dwvExampleLink.title = &quot;Brain MRI in DWV.&quot;;
     dwvExampleLink.target = &quot;_top&quot;;
@@ -302,18 +302,18 @@ dwv.gui.base.appendHelpHtml = function(toolList, mobile, app)
     headPara.appendChild(dwvLink);
     headPara.appendChild(document.createTextNode(&quot; can load DICOM data &quot; +
         &quot;either from a local file or from an URL. All DICOM tags are available &quot; +
-        &quot;in a searchable table, press the &#x27;tags&#x27; or grid button. &quot; + 
-        &quot;You can choose to display the image information overlay by pressing the &quot; + 
+        &quot;in a searchable table, press the &#x27;tags&#x27; or grid button. &quot; +
+        &quot;You can choose to display the image information overlay by pressing the &quot; +
         &quot;&#x27;info&#x27; or i button. For some example data, check this &quot;));
     headPara.appendChild(dwvExampleLink);
     headPara.appendChild(document.createTextNode(&quot; from the &quot; ));
     headPara.appendChild(bbmriLink);
     headPara.appendChild(document.createTextNode(&quot; database.&quot; ));
     helpNode.appendChild(headPara);
-    
+
     var toolPara = document.createElement(&quot;p&quot;);
-    toolPara.appendChild(document.createTextNode(&quot;Each tool defines the possible &quot; + 
-        &quot;user interactions. The default tool is the window/level one. &quot; + 
+    toolPara.appendChild(document.createTextNode(&quot;Each tool defines the possible &quot; +
+        &quot;user interactions. The default tool is the window/level one. &quot; +
         &quot;Here are the available tools:&quot;));
     helpNode.appendChild(toolPara);
     helpNode.appendChild(toolHelpDiv);

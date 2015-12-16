@@ -211,17 +211,17 @@ dwv.gui.base.Filter = function (app)
         // filter select
         var filterSelector = dwv.html.createHtmlSelect(&quot;filterSelect&quot;, list);
         filterSelector.onchange = app.onChangeFilter;
-    
+
         // filter list element
         var filterLi = dwv.html.createHiddenElement(&quot;li&quot;, &quot;filterLi&quot;);
         filterLi.className += &quot; ui-block-b&quot;;
         filterLi.appendChild(filterSelector);
-        
+
         // append element
         var node = app.getElement(&quot;toolList&quot;).getElementsByTagName(&quot;ul&quot;)[0];
         dwv.html.appendElement(node, filterLi);
     };
-    
+
     /**
      * Display the tool HTML.
      * @method display
@@ -232,7 +232,7 @@ dwv.gui.base.Filter = function (app)
         var node = app.getElement(&quot;filterLi&quot;);
         dwv.html.displayElement(node, flag);
     };
-    
+
     /**
      * Initialise the tool HTML.
      * @method initialise
@@ -263,7 +263,7 @@ dwv.gui.base.Threshold = function (app)
      * @type Object
      */
     var slider = new dwv.gui.Slider(app);
-    
+
     /**
      * Setup the threshold filter HTML.
      * @method setup
@@ -273,7 +273,7 @@ dwv.gui.base.Threshold = function (app)
         // threshold list element
         var thresholdLi = dwv.html.createHiddenElement(&quot;li&quot;, &quot;thresholdLi&quot;);
         thresholdLi.className += &quot; ui-block-c&quot;;
-        
+
         // node
         var node = app.getElement(&quot;toolList&quot;).getElementsByTagName(&quot;ul&quot;)[0];
         // append threshold
@@ -283,7 +283,7 @@ dwv.gui.base.Threshold = function (app)
         // refresh
         dwv.gui.refreshElement(node);
     };
-    
+
     /**
      * Clear the threshold filter HTML.
      * @method display
@@ -294,7 +294,7 @@ dwv.gui.base.Threshold = function (app)
         var node = app.getElement(&quot;thresholdLi&quot;);
         dwv.html.displayElement(node, flag);
     };
-    
+
     /**
      * Initialise the threshold filter HTML.
      * @method initialise
@@ -306,7 +306,7 @@ dwv.gui.base.Threshold = function (app)
     };
 
 }; // class dwv.gui.base.Threshold
-    
+
 /**
  * Create the apply filter button.
  * @method createFilterApplyButton
@@ -345,7 +345,7 @@ dwv.gui.base.Sharpen = function (app)
         var node = app.getElement(&quot;toolList&quot;).getElementsByTagName(&quot;ul&quot;)[0];
         dwv.html.appendElement(node, sharpenLi);
     };
-    
+
     /**
      * Display the sharpen filter HTML.
      * @method display
@@ -356,7 +356,7 @@ dwv.gui.base.Sharpen = function (app)
         var node = app.getElement(&quot;sharpenLi&quot;);
         dwv.html.displayElement(node, flag);
     };
-    
+
 }; // class dwv.gui.base.Sharpen
 
 /**
@@ -381,7 +381,7 @@ dwv.gui.base.Sobel = function (app)
         var node = app.getElement(&quot;toolList&quot;).getElementsByTagName(&quot;ul&quot;)[0];
         dwv.html.appendElement(node, sobelLi);
     };
-    
+
     /**
      * Display the sobel filter HTML.
      * @method display
@@ -392,9 +392,8 @@ dwv.gui.base.Sobel = function (app)
         var node = app.getElement(&quot;sobelLi&quot;);
         dwv.html.displayElement(node, flag);
     };
-    
-}; // class dwv.gui.base.Sobel
 
+}; // class dwv.gui.base.Sobel
 
     </pre>
 </div>

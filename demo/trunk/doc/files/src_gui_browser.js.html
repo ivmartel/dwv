@@ -195,7 +195,7 @@ dwv.browser = dwv.browser || {};
  * Browser check for the FileAPI.
  * @method hasFileApi
  * @static
- */ 
+ */
 dwv.browser.hasFileApi = function()
 {
     // regular test does not work on Safari 5
@@ -203,7 +203,7 @@ dwv.browser.hasFileApi = function()
         (navigator.appVersion.indexOf(&quot;Chrome&quot;) === -1) &amp;&amp;
         ( (navigator.appVersion.indexOf(&quot;5.0.&quot;) !== -1) ||
           (navigator.appVersion.indexOf(&quot;5.1.&quot;) !== -1) );
-    if( isSafari5 ) 
+    if( isSafari5 )
     {
         console.warn(&quot;Assuming FileAPI support for Safari5...&quot;);
         return true;
@@ -216,7 +216,7 @@ dwv.browser.hasFileApi = function()
  * Browser check for the XMLHttpRequest.
  * @method hasXmlHttpRequest
  * @static
- */ 
+ */
 dwv.browser.hasXmlHttpRequest = function()
 {
     return &quot;XMLHttpRequest&quot; in window &amp;&amp; &quot;withCredentials&quot; in new XMLHttpRequest();
@@ -226,7 +226,7 @@ dwv.browser.hasXmlHttpRequest = function()
  * Browser check for typed array.
  * @method hasTypedArray
  * @static
- */ 
+ */
 dwv.browser.hasTypedArray = function()
 {
     return &quot;Uint8Array&quot; in window &amp;&amp; &quot;Uint16Array&quot; in window;
@@ -236,7 +236,7 @@ dwv.browser.hasTypedArray = function()
  * Browser check for clamped array.
  * @method hasClampedArray
  * @static
- */ 
+ */
 dwv.browser.hasClampedArray = function()
 {
     return &quot;Uint8ClampedArray&quot; in window;
@@ -247,7 +247,7 @@ dwv.browser.hasClampedArray = function()
  * TODO Maybe use http://modernizr.com/.
  * @method check
  * @static
- */ 
+ */
 dwv.browser.check = function()
 {
     var appnorun = &quot;The application cannot be run.&quot;;

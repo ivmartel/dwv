@@ -231,7 +231,7 @@ dwv.tool.DrawGroupCommand = function (group, name, layer)
  * @method onExecute
  * @param {Object} event The execute event with type and id.
  */
-dwv.tool.DrawGroupCommand.prototype.onExecute = function (/*event*/) 
+dwv.tool.DrawGroupCommand.prototype.onExecute = function (/*event*/)
 {
     // default does nothing.
 };
@@ -240,7 +240,7 @@ dwv.tool.DrawGroupCommand.prototype.onExecute = function (/*event*/)
  * @method onUndo
  * @param {Object} event The undo event with type and id.
  */
-dwv.tool.DrawGroupCommand.prototype.onUndo = function (/*event*/) 
+dwv.tool.DrawGroupCommand.prototype.onUndo = function (/*event*/)
 {
     // default does nothing.
 };
@@ -297,7 +297,7 @@ dwv.tool.MoveGroupCommand = function (group, name, translation, layer)
  * @method onExecute
  * @param {Object} event The execute event with type and id.
  */
-dwv.tool.MoveGroupCommand.prototype.onExecute = function (/*event*/) 
+dwv.tool.MoveGroupCommand.prototype.onExecute = function (/*event*/)
 {
     // default does nothing.
 };
@@ -306,7 +306,7 @@ dwv.tool.MoveGroupCommand.prototype.onExecute = function (/*event*/)
  * @method onUndo
  * @param {Object} event The undo event with type and id.
  */
-dwv.tool.MoveGroupCommand.prototype.onUndo = function (/*event*/) 
+dwv.tool.MoveGroupCommand.prototype.onUndo = function (/*event*/)
 {
     // default does nothing.
 };
@@ -357,7 +357,7 @@ dwv.tool.ChangeGroupCommand = function (name, func, startAnchor, endAnchor, laye
  * @method onExecute
  * @param {Object} event The execute event with type and id.
  */
-dwv.tool.ChangeGroupCommand.prototype.onExecute = function (/*event*/) 
+dwv.tool.ChangeGroupCommand.prototype.onExecute = function (/*event*/)
 {
     // default does nothing.
 };
@@ -366,7 +366,7 @@ dwv.tool.ChangeGroupCommand.prototype.onExecute = function (/*event*/)
  * @method onUndo
  * @param {Object} event The undo event with type and id.
  */
-dwv.tool.ChangeGroupCommand.prototype.onUndo = function (/*event*/) 
+dwv.tool.ChangeGroupCommand.prototype.onUndo = function (/*event*/)
 {
     // default does nothing.
 };
@@ -416,7 +416,7 @@ dwv.tool.DeleteGroupCommand = function (group, name, layer)
  * @method onExecute
  * @param {Object} event The execute event with type and id.
  */
-dwv.tool.DeleteGroupCommand.prototype.onExecute = function (/*event*/) 
+dwv.tool.DeleteGroupCommand.prototype.onExecute = function (/*event*/)
 {
     // default does nothing.
 };
@@ -425,7 +425,7 @@ dwv.tool.DeleteGroupCommand.prototype.onExecute = function (/*event*/)
  * @method onUndo
  * @param {Object} event The undo event with type and id.
  */
-dwv.tool.DeleteGroupCommand.prototype.onUndo = function (/*event*/) 
+dwv.tool.DeleteGroupCommand.prototype.onUndo = function (/*event*/)
 {
     // default does nothing.
 };
@@ -459,7 +459,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
      * @type Boolean
      */
     var started = false;
-    
+
     /**
      * Shape factory list
      * @property shapeFactoryList
@@ -487,7 +487,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
      * @type String
      */
     this.shapeName = 0;
-    
+
     /**
      * List of points.
      * @property points
@@ -495,7 +495,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
      * @type Array
      */
     var points = [];
-    
+
     /**
      * Last selected point.
      * @property lastPoint
@@ -503,7 +503,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
      * @type Object
      */
     var lastPoint = null;
-    
+
     /**
      * Shape editor.
      * @property shapeEditor
@@ -511,7 +511,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
      * @type Object
      */
     var shapeEditor = new dwv.tool.ShapeEditor(app);
-    
+
     // associate the event listeners of the editor
     //  with those of the draw tool
     shapeEditor.setDrawEventCallback(fireEvent);
@@ -547,7 +547,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
      * @type Object
      */
     var drawLayer = null;
-    
+
     /**
      * The associated draw layer.
      * @property drawLayer
@@ -565,16 +565,16 @@ dwv.tool.Draw = function (app, shapeFactoryList)
         // determine if the click happened in an existing shape
         var stage = app.getDrawStage();
         var kshape = stage.getIntersection({
-            x: event._xs, 
+            x: event._xs,
             y: event._ys
         });
-        
+
         if ( kshape ) {
             var group = kshape.getParent();
             var selectedShape = group.find(&quot;.shape&quot;)[0];
             // reset editor if click on other shape
             // (and avoid anchors mouse down)
-            if ( selectedShape &amp;&amp; selectedShape !== shapeEditor.getShape() ) { 
+            if ( selectedShape &amp;&amp; selectedShape !== shapeEditor.getShape() ) {
                 shapeEditor.disable();
                 shapeEditor.setShape(selectedShape);
                 shapeEditor.setImage(app.getImage());
@@ -670,7 +670,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
             command.execute();
             // save it in undo stack
             app.getUndoStack().add(command);
-            
+
             // set shape on
             var shape = group.getChildren( function (node) {
                 return node.name() === &#x27;shape&#x27;;
@@ -680,7 +680,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
         // reset flag
         started = false;
     };
-    
+
     /**
      * Handle mouse out event.
      * @method mouseout
@@ -735,7 +735,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
         gui = new dwv.gui.Draw(app);
         gui.setup(this.shapeFactoryList);
     };
-    
+
     /**
      * Enable the tool.
      * @method enable
@@ -777,7 +777,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
         // draw
         drawLayer.draw();
     };
-    
+
     /**
      * Set shape off properties.
      * @method setShapeOff
@@ -802,7 +802,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
         return { &#x27;x&#x27;: stage.offset().x + index.x / stage.scale().x,
             &#x27;y&#x27;: stage.offset().y + index.y / stage.scale().y };
     }
-    
+
     /**
      * Set shape on properties.
      * @method setShapeOn
@@ -822,7 +822,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
         shape.draggable(true);
         var dragStartPos = null;
         var dragLastPos = null;
-        
+
         // command name based on shape type
         var cmdName = &quot;shape&quot;;
         if ( shape instanceof Kinetic.Line ) {
@@ -842,10 +842,10 @@ dwv.tool.Draw = function (app, shapeFactoryList)
         else if ( shape instanceof Kinetic.Ellipse ) {
             cmdName = &quot;ellipse&quot;;
         }
-        
+
         // shape colour
         var colour = shape.stroke();
-        
+
         // drag start event handling
         shape.on(&#x27;dragstart&#x27;, function (event) {
             // save start position
@@ -870,11 +870,11 @@ dwv.tool.Draw = function (app, shapeFactoryList)
             var pos = getRealPosition( offset );
             var translation;
             if ( dragLastPos ) {
-                translation = {&#x27;x&#x27;: pos.x - dragLastPos.x, 
+                translation = {&#x27;x&#x27;: pos.x - dragLastPos.x,
                     &#x27;y&#x27;: pos.y - dragLastPos.y};
             }
             else {
-                translation = {&#x27;x&#x27;: pos.x - dragStartPos.x, 
+                translation = {&#x27;x&#x27;: pos.x - dragStartPos.x,
                         &#x27;y&#x27;: pos.y - dragStartPos.y};
             }
             dragLastPos = pos;
@@ -910,7 +910,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
             if ( Math.abs( pos.x - trash.x() ) &lt; 10 &amp;&amp;
                     Math.abs( pos.y - trash.y() ) &lt; 10   ) {
                 // compensate for the drag translation
-                var delTranslation = {&#x27;x&#x27;: pos.x - dragStartPos.x, 
+                var delTranslation = {&#x27;x&#x27;: pos.x - dragStartPos.x,
                         &#x27;y&#x27;: pos.y - dragStartPos.y};
                 var group = this.getParent();
                 group.getChildren().each( function (shape) {
@@ -933,7 +933,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
             }
             else {
                 // save drag move
-                var translation = {&#x27;x&#x27;: pos.x - dragStartPos.x, 
+                var translation = {&#x27;x&#x27;: pos.x - dragStartPos.x,
                         &#x27;y&#x27;: pos.y - dragStartPos.y};
                 if ( translation.x !== 0 || translation.y !== 0 ) {
                     var mvcmd = new dwv.tool.MoveGroupCommand(this.getParent(), cmdName, translation, drawLayer);
@@ -1002,7 +1002,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
             return;
         }
         for ( var i = 0; i &lt; listeners[type].length; ++i )
-        {   
+        {
             if ( listeners[type][i] === listener ) {
                 listeners[type].splice(i,1);
             }
@@ -1032,7 +1032,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
             return;
         }
         for ( var i=0; i &lt; listeners[event.type].length; ++i )
-        {   
+        {
             listeners[event.type][i](event);
         }
     }

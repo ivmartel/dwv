@@ -13,7 +13,7 @@ dwv.App = function ()
 {
     // Local object
     var self = this;
-    
+
     // Image
     var image = null;
     // Original image
@@ -39,12 +39,12 @@ dwv.App = function ()
     var scaleCenter = {"x": 0, "y": 0};
     // translation
     var translation = {"x": 0, "y": 0};
-    
+
     // View
     var view = null;
     // View controller
     var viewController = null;
-     
+
     // Info layer plot gui
     var plotInfo = null;
     // Info layer windowing gui
@@ -52,23 +52,23 @@ dwv.App = function ()
     // Info layer position gui
     var positionInfo = null;
     // Info layer colour map gui
-    var miniColourMap = null; 
+    var miniColourMap = null;
     // flag to know if the info layer is listening on the image.
     var isInfoLayerListening = false;
 
     // Dicom tags gui
     var tagsGui = null;
-    
+
     // Image layer
     var imageLayer = null;
     // Draw layers
     var drawLayers = [];
     // Draw stage
     var drawStage = null;
-    
+
     // Generic style
     var style = new dwv.html.Style();
-    
+
     // Toolbox
     var toolbox = null;
     // Toolbox controller
@@ -78,95 +78,95 @@ dwv.App = function ()
     var loadbox = null;
     // UndoStack
     var undoStack = null;
-    
+
     // listeners
     var listeners = {};
 
-    /** 
+    /**
      * Get the version of the application.
      * @method getVersion
      * @return {String} The version of the application.
      */
     this.getVersion = function () { return "v0.13.0"; };
-    
-    /** 
+
+    /**
      * Get the image.
      * @method getImage
      * @return {Image} The associated image.
      */
     this.getImage = function () { return image; };
-    /** 
+    /**
      * Set the view.
      * @method setImage
      * @param {Image} img The associated image.
      */
     this.setImage = function (img)
-    { 
-        image = img; 
+    {
+        image = img;
         view.setImage(img);
     };
-    /** 
+    /**
      * Restore the original image.
      * @method restoreOriginalImage
      */
-    this.restoreOriginalImage = function () 
-    { 
-        image = originalImage; 
-        view.setImage(originalImage); 
-    }; 
-    /** 
+    this.restoreOriginalImage = function ()
+    {
+        image = originalImage;
+        view.setImage(originalImage);
+    };
+    /**
      * Get the image data array.
      * @method getImageData
      * @return {Array} The image data array.
      */
     this.getImageData = function () { return imageData; };
-    /** 
+    /**
      * Get the number of slices to load.
      * @method getNSlicesToLoad
      * @return {Number} The number of slices to load.
      */
     this.getNSlicesToLoad = function () { return nSlicesToLoad; };
 
-    /** 
+    /**
      * Get the main scale.
      * @method getScale
      * @return {Number} The main scale.
      */
     this.getScale = function () { return scale / windowScale; };
 
-    /** 
+    /**
      * Get the scale center.
      * @method getScaleCenter
      * @return {Object} The coordinates of the scale center.
      */
     this.getScaleCenter = function () { return scaleCenter; };
 
-    /** 
+    /**
      * Get the translation.
      * @method getTranslation
      * @return {Object} The translation.
      */
     this.getTranslation = function () { return translation; };
 
-    /** 
+    /**
      * Get the view controller.
      * @method getViewController
      * @return {Object} The controller.
      */
     this.getViewController = function () { return viewController; };
 
-    /** 
+    /**
      * Get the image layer.
      * @method getImageLayer
      * @return {Object} The image layer.
      */
     this.getImageLayer = function () { return imageLayer; };
-    /** 
+    /**
      * Get the draw layer.
      * @method getDrawLayer
      * @return {Object} The draw layer.
      */
-    this.getDrawLayer = function (k) { 
+    this.getDrawLayer = function (k) {
         if ( typeof  k === "undefined" ) {
             return drawLayers[view.getCurrentPosition().k];
         }
@@ -174,53 +174,53 @@ dwv.App = function ()
             return drawLayers[k];
         }
     };
-    /** 
+    /**
      * Get the draw stage.
      * @method getDrawStage
      * @return {Object} The draw layer.
      */
     this.getDrawStage = function () { return drawStage; };
 
-    /** 
+    /**
      * Get the app style.
      * @method getStyle
      * @return {Object} The app style.
      */
     this.getStyle = function () { return style; };
 
-    /** 
+    /**
      * Get the toolbox.
      * @method getToolbox
      * @return {Object} The associated toolbox.
      */
     this.getToolbox = function () { return toolbox; };
-    /** 
+    /**
      * Get the toolbox controller.
      * @method getToolboxController
      * @return {Object} The controller.
      */
     this.getToolboxController = function () { return toolboxController; };
 
-    /** 
+    /**
      * Get the undo stack.
      * @method getUndoStack
      * @return {Object} The undo stack.
      */
     this.getUndoStack = function () { return undoStack; };
 
-    /** 
+    /**
      * Get the data loaders.
      * @method getLoaders
      * @return {Object} The loaders.
      */
-    this.getLoaders = function () 
+    this.getLoaders = function ()
     {
         return {
             'file': dwv.io.File,
             'url': dwv.io.Url
-        };        
+        };
     };
-    
+
     /**
      * Initialise the HTML for the application.
      * @method init
@@ -312,7 +312,7 @@ dwv.App = function ()
             if ( config.gui.indexOf("load") !== -1 ) {
                 var fileLoadGui = new dwv.gui.FileLoad(this);
                 var urlLoadGui = new dwv.gui.UrlLoad(this);
-                loadbox = new dwv.gui.Loadbox(this, 
+                loadbox = new dwv.gui.Loadbox(this,
                     {"file": fileLoadGui, "url": urlLoadGui} );
                 loadbox.setup();
                 fileLoadGui.setup();
@@ -342,7 +342,7 @@ dwv.App = function ()
                 dwv.gui.appendHelpHtml( toolbox.getToolList(), isMobile, this );
             }
         }
-        
+
         // listen to drag&drop
         var box = this.getElement("dropBox");
         if ( box ) {
@@ -356,7 +356,7 @@ dwv.App = function ()
         }
         // possible load from URL
         if ( typeof config.skipLoadUrl === "undefined" ) {
-            var query = dwv.html.getUriParam(window.location.href); 
+            var query = dwv.html.getUriParam(window.location.href);
             // check query
             if ( query && typeof query.input !== "undefined" ) {
                 // manifest
@@ -377,7 +377,7 @@ dwv.App = function ()
                             loadStateUrl([query.state]);
                         };
                         this.addEventListener( "load-end", onLoadEnd );
-                        
+
                     }
                 }
             }
@@ -391,7 +391,7 @@ dwv.App = function ()
             window.onresize = this.onResize;
         }
     };
-    
+
     /**
      * Get a HTML element associated to the application.
      * @method getElement
@@ -427,7 +427,7 @@ dwv.App = function ()
             undoStack.initialise();
         }
     };
-    
+
     /**
      * Reset the layout of the application.
      * @method resetLayout
@@ -446,7 +446,7 @@ dwv.App = function ()
             drawStage.draw();
         }
     };
-    
+
     /**
      * Add an event listener on the app.
      * @method addEventListener
@@ -473,7 +473,7 @@ dwv.App = function ()
             return;
         }
         for ( var i = 0; i < listeners[type].length; ++i )
-        {   
+        {
             if ( listeners[type][i] === listener ) {
                 listeners[type].splice(i,1);
             }
@@ -502,7 +502,7 @@ dwv.App = function ()
      * @method loadImageFiles
      * @param {Array} files The list of image files to load.
      */
-    function loadImageFiles (files) 
+    function loadImageFiles (files)
     {
         // clear variables
         self.reset();
@@ -510,7 +510,7 @@ dwv.App = function ()
         // create IO
         var fileIO = new dwv.io.File();
         fileIO.onload = function (data) {
-            
+
             var isFirst = true;
             if ( image ) {
                 view.append( data.view );
@@ -535,13 +535,13 @@ dwv.App = function ()
         // main load (asynchronous)
         fileIO.load(files);
     }
-    
+
     /**
      * Load a State file.
      * @method loadStateFile
      * @param {Array} file An array with the state file to load.
      */
-    function loadStateFile(file) 
+    function loadStateFile(file)
     {
         // create IO
         var fileIO = new dwv.io.File();
@@ -560,7 +560,7 @@ dwv.App = function ()
      * @method loadURL
      * @param {Array} urls The list of urls to load.
      */
-    this.loadURL = function(urls) 
+    this.loadURL = function(urls)
     {
         // clear variables
         this.reset();
@@ -593,13 +593,13 @@ dwv.App = function ()
         // main load (asynchronous)
         urlIO.load(urls);
     };
-    
+
     /**
      * Load a State url.
      * @method loadStateUrl
      * @param {Array} file An array with the state url to load.
      */
-    function loadStateUrl(url) 
+    function loadStateUrl(url)
     {
         // create IO
         var urlIO = new dwv.io.Url();
@@ -629,7 +629,7 @@ dwv.App = function ()
         // ratio previous/new to add to zoom
         var mul = newWidth / oldWidth;
         scale *= mul;
-        
+
         // update style
         style.setScale(windowScale);
 
@@ -655,7 +655,7 @@ dwv.App = function ()
             drawStage.draw();
         }
     };
-    
+
     /**
      * Toggle the display of the information layer.
      * @method toggleInfoLayerDisplay
@@ -673,7 +673,7 @@ dwv.App = function ()
             addImageInfoListeners();
         }
     };
-    
+
     /**
      * Init the Window/Level display
      */
@@ -683,7 +683,7 @@ dwv.App = function ()
         var presets = viewController.getPresets();
         var keys = Object.keys(presets);
         viewController.setWindowLevel(
-            presets[keys[0]].center, 
+            presets[keys[0]].center,
             presets[keys[0]].width );
         // default position
         viewController.setCurrentPosition2D(0,0);
@@ -710,7 +710,7 @@ dwv.App = function ()
         layer.addEventListener("touchmove", onMouch);
         layer.addEventListener("touchend", onMouch);
     };
-    
+
     /**
      * Remove layer mouse and touch listeners.
      * @method removeLayerListeners
@@ -732,7 +732,7 @@ dwv.App = function ()
         layer.removeEventListener("touchmove", onMouch);
         layer.removeEventListener("touchend", onMouch);
     };
-    
+
     /**
      * Render the current image.
      * @method render
@@ -741,14 +741,14 @@ dwv.App = function ()
     {
         generateAndDrawImage();
     };
-    
+
     /**
      * Zoom to the layers.
      * @method zoom
      * @param {Number} zoom The zoom to apply.
      * @param {Number} cx The zoom center X coordinate.
      * @param {Number} cy The zoom center Y coordinate.
-     */ 
+     */
     this.zoom = function (zoom, cx, cy) {
         scale = zoom * windowScale;
         if ( scale <= 0.1 ) {
@@ -757,14 +757,14 @@ dwv.App = function ()
         scaleCenter = {"x": cx, "y": cy};
         zoomLayers();
     };
-    
+
     /**
      * Add a step to the layers zoom.
      * @method stepZoom
      * @param {Number} step The zoom step increment. A good step is of 0.1.
      * @param {Number} cx The zoom center X coordinate.
      * @param {Number} cy The zoom center Y coordinate.
-     */ 
+     */
     this.stepZoom = function (step, cx, cy) {
         scale += step;
         if ( scale <= 0.1 ) {
@@ -779,19 +779,19 @@ dwv.App = function ()
      * @method translate
      * @param {Number} tx The translation along X.
      * @param {Number} ty The translation along Y.
-     */ 
+     */
     this.translate = function (tx, ty)
     {
         translation = {"x": tx, "y": ty};
         translateLayers();
     };
-    
+
     /**
      * Add a translation to the layers.
      * @method stepTranslate
      * @param {Number} tx The step translation along X.
      * @param {Number} ty The step translation along Y.
-     */ 
+     */
     this.stepTranslate = function (tx, ty)
     {
         var txx = translation.x + tx / scale;
@@ -808,7 +808,7 @@ dwv.App = function ()
      * @param {Object} event The event fired when changing the window/level.
      */
     this.onWLChange = function (/*event*/)
-    {         
+    {
         generateAndDrawImage();
     };
 
@@ -818,7 +818,7 @@ dwv.App = function ()
      * @param {Object} event The event fired when changing the colour map.
      */
     this.onColourChange = function (/*event*/)
-    {  
+    {
         generateAndDrawImage();
     };
 
@@ -828,7 +828,7 @@ dwv.App = function ()
      * @param {Object} event The event fired when changing the slice.
      */
     this.onSliceChange = function (/*event*/)
-    {   
+    {
         generateAndDrawImage();
         if ( drawStage ) {
             // hide all draw layers
@@ -846,7 +846,7 @@ dwv.App = function ()
      * Handle key down event.
      * - CRTL-Z: undo
      * - CRTL-Y: redo
-     * Default behavior. Usually used in tools. 
+     * Default behavior. Usually used in tools.
      * @method onKeydown
      * @param {Object} event The key down event.
      */
@@ -861,7 +861,7 @@ dwv.App = function ()
             undoStack.redo();
         }
     };
-    
+
     /**
      * Handle resize.
      * Fit the display to the window. To be called once the image is loaded.
@@ -872,7 +872,7 @@ dwv.App = function ()
     {
         self.fitToSize(dwv.gui.getWindowSize());
     };
-    
+
     /**
      * Handle zoom reset.
      * @method onZoomReset
@@ -923,7 +923,7 @@ dwv.App = function ()
         var files = event.target.files;
         if ( files.length !== 0 ) {
             self.loadFiles(files);
-        }  
+        }
     };
 
     /**
@@ -963,7 +963,7 @@ dwv.App = function ()
             throw new Error("Unknown window level preset: '" + name + "'");
         }
         // enable it
-        viewController.setWindowLevel( 
+        viewController.setWindowLevel(
             preset.center, preset.width );
     };
 
@@ -1056,7 +1056,7 @@ dwv.App = function ()
     {
         self.toggleInfoLayerDisplay();
     };
-    
+
     /**
      * Handle display reset.
      * @method onDisplayReset
@@ -1086,29 +1086,29 @@ dwv.App = function ()
             return;
         }
         for ( var i = 0; i < listeners[event.type].length; ++i )
-        {   
+        {
             listeners[event.type][i](event);
         }
     }
-    
+
     /**
      * Generate the image data and draw it.
      * @method generateAndDrawImage
      */
     function generateAndDrawImage()
-    {         
+    {
         // generate image data from DICOM
-        view.generateImageData(imageData);         
+        view.generateImageData(imageData);
         // set the image data of the layer
         imageLayer.setImageData(imageData);
         // draw the image
         imageLayer.draw();
     }
-    
+
     /**
      * Apply the stored zoom to the layers.
      * @method zoomLayers
-     */ 
+     */
     function zoomLayers()
     {
         // image layer
@@ -1117,16 +1117,16 @@ dwv.App = function ()
             imageLayer.draw();
         }
         // draw layer
-        if( drawStage ) { 
+        if( drawStage ) {
             // zoom
             var newKZoom = {'x': scale, 'y': scale};
             // offset
             // TODO different from the imageLayer offset?
             var oldKZoom = drawStage.scale();
             var oldOffset = drawStage.offset();
-            var newOffsetX = (scaleCenter.x / oldKZoom.x) + 
+            var newOffsetX = (scaleCenter.x / oldKZoom.x) +
                 oldOffset.x - (scaleCenter.x / newKZoom.x);
-            var newOffsetY = (scaleCenter.y / oldKZoom.y) + 
+            var newOffsetY = (scaleCenter.y / oldKZoom.y) +
                 oldOffset.y - (scaleCenter.y / newKZoom.y);
             var newOffset = { 'x': newOffsetX, 'y': newOffsetY };
             // store
@@ -1139,7 +1139,7 @@ dwv.App = function ()
     /**
      * Apply the stored translation to the layers.
      * @method translateLayers
-     */ 
+     */
     function translateLayers()
     {
         // image layer
@@ -1148,7 +1148,7 @@ dwv.App = function ()
             imageLayer.draw();
         }
         // draw layer
-        if( drawStage && imageLayer ) { 
+        if( drawStage && imageLayer ) {
             var ox = - imageLayer.getOrigin().x / scale - translation.x;
             var oy = - imageLayer.getOrigin().y / scale - translation.y;
             drawStage.offset( { 'x': ox, 'y': oy } );
@@ -1170,7 +1170,7 @@ dwv.App = function ()
         view.addEventListener("position-change", positionInfo.update);
         isInfoLayerListening = true;
     }
-    
+
     /**
      * Remove image listeners.
      * @method removeImageInfoListeners
@@ -1185,9 +1185,9 @@ dwv.App = function ()
         view.removeEventListener("position-change", positionInfo.update);
         isInfoLayerListening = false;
     }
-    
+
     /**
-     * Mou(se) and (T)ouch event handler. This function just determines the mouse/touch 
+     * Mou(se) and (T)ouch event handler. This function just determines the mouse/touch
      * position relative to the canvas element. It then passes it to the current tool.
      * @method onMouch
      * @private
@@ -1241,12 +1241,12 @@ dwv.App = function ()
             // set handle event flag
             handled = true;
         }
-        else if ( event.type === "keydown" || 
+        else if ( event.type === "keydown" ||
                 event.type === "touchend")
         {
             handled = true;
         }
-            
+
         // Call the event handler of the tool.
         if ( handled )
         {
@@ -1260,7 +1260,7 @@ dwv.App = function ()
             }
         }
     }
-    
+
     /**
      * Handle a drag over.
      * @method onDragOver
@@ -1272,13 +1272,13 @@ dwv.App = function ()
         // prevent default handling
         event.stopPropagation();
         event.preventDefault();
-        // update box 
+        // update box
         var box = self.getElement("dropBox");
         if ( box ) {
             box.className = 'dropBox hover';
         }
     }
-    
+
     /**
      * Handle a drag leave.
      * @method onDragLeave
@@ -1332,7 +1332,7 @@ dwv.App = function ()
             console.error(error.stack);
         }
     }
-    
+
     /**
      * Handle a load progress.
      * @method onLoadProgress
@@ -1375,7 +1375,7 @@ dwv.App = function ()
                 listening: false
             });
             // reset style
-            // (avoids a not needed vertical scrollbar) 
+            // (avoids a not needed vertical scrollbar)
             drawStage.getContent().setAttribute("style", "");
         }
         // resize app
@@ -1402,7 +1402,7 @@ dwv.App = function ()
         if ( view ) {
             return;
         }
-        
+
         // get the view from the loaded data
         view = data.view;
         viewController = new dwv.ViewController(view);
@@ -1413,28 +1413,28 @@ dwv.App = function ()
         // store image
         originalImage = view.getImage();
         image = originalImage;
-        
+
         // layout
         var size = image.getGeometry().getSize();
         dataWidth = size.getNumberOfColumns();
         dataHeight = size.getNumberOfRows();
         createLayers(dataWidth, dataHeight);
-        
+
         // get the image data from the image layer
-        imageData = imageLayer.getContext().createImageData( 
+        imageData = imageLayer.getContext().createImageData(
                 dataWidth, dataHeight);
 
         // image listeners
         view.addEventListener("wl-change", self.onWLChange);
         view.addEventListener("colour-change", self.onColourChange);
         view.addEventListener("slice-change", self.onSliceChange);
-        
+
         // connect with local listeners
         view.addEventListener("wl-change", fireEvent);
         view.addEventListener("colour-change", fireEvent);
         view.addEventListener("position-change", fireEvent);
         view.addEventListener("slice-change", fireEvent);
-        
+
         // update presets with loaded image (used in w/l tool)
         viewController.updatePresets(image, true);
 
@@ -1444,11 +1444,11 @@ dwv.App = function ()
             self.addLayerListeners( imageLayer.getCanvas() );
             // keydown listener
             window.addEventListener("keydown", onMouch, true);
-            
+
             toolbox.init();
             toolbox.display(true);
         }
-        
+
         // stop box listening to drag (after first drag)
         var box = self.getElement("dropBox");
         if ( box ) {
@@ -1464,30 +1464,30 @@ dwv.App = function ()
         }
 
         // info layer
-        var infoLayer = self.getElement("infoLayer"); 
+        var infoLayer = self.getElement("infoLayer");
         if ( infoLayer ) {
             var infotr = self.getElement("infotr");
             windowingInfo = new dwv.info.Windowing(infotr);
             windowingInfo.create();
-            
+
             var infotl = self.getElement("infotl");
             positionInfo = new dwv.info.Position(infotl);
             positionInfo.create();
-            
+
             var infobr = self.getElement("infobr");
             miniColourMap = new dwv.info.MiniColourMap(infobr, self);
             miniColourMap.create();
-            
+
             var plot = self.getElement("plot");
             plotInfo = new dwv.info.Plot(plot, self);
             plotInfo.create();
-            
+
             addImageInfoListeners();
         }
-        
+
         // init W/L display: triggers a wlchange event
         //   listened by the view and a general display.
-        self.initWLDisplay();        
+        self.initWLDisplay();
     }
 
 };
@@ -1531,7 +1531,7 @@ dwv.State = function (app)
         }
         // return a JSON string
         return JSON.stringify( {
-            "window-center": app.getViewController().getWindowLevel().center, 
+            "window-center": app.getViewController().getWindowLevel().center,
             "window-width": app.getViewController().getWindowLevel().width,
             "position": app.getViewController().getCurrentPosition(),
             "scale": app.getScale(),
@@ -1593,7 +1593,7 @@ dwv.ToolboxController = function (toolbox)
     {
         toolbox.setSelectedTool(name);
     };
-    
+
     /**
      * Set the selected shape.
      * @method setSelectedShape
@@ -1603,7 +1603,7 @@ dwv.ToolboxController = function (toolbox)
     {
         toolbox.getSelectedTool().setShapeName(name);
     };
-    
+
     /**
      * Set the selected filter.
      * @method setSelectedFilter
@@ -1613,7 +1613,7 @@ dwv.ToolboxController = function (toolbox)
     {
         toolbox.getSelectedTool().setSelectedFilter(name);
     };
-    
+
     /**
      * Run the selected filter.
      * @method runSelectedFilter
@@ -1622,7 +1622,7 @@ dwv.ToolboxController = function (toolbox)
     {
         toolbox.getSelectedTool().getSelectedFilter().run();
     };
-    
+
     /**
      * Set the tool line colour.
      * @method runFilter
@@ -1632,7 +1632,7 @@ dwv.ToolboxController = function (toolbox)
     {
         toolbox.getSelectedTool().setLineColour(name);
     };
-    
+
     /**
      * Set the tool range.
      * @method setRange
@@ -1640,14 +1640,14 @@ dwv.ToolboxController = function (toolbox)
      */
     this.setRange = function (range)
     {
-        // seems like jquery is checking if the method exists before it 
+        // seems like jquery is checking if the method exists before it
         // is used...
         if ( toolbox && toolbox.getSelectedTool() &&
                 toolbox.getSelectedTool().getSelectedFilter() ) {
             toolbox.getSelectedTool().getSelectedFilter().run(range);
         }
     };
-    
+
 }; // class dwv.ToolboxController
 ;// Main DWV namespace.
 var dwv = dwv || {};
@@ -1663,7 +1663,7 @@ dwv.ViewController = function ( view )
     // Window/level presets
     var presets = null;
 
-    /** 
+    /**
      * Get the window/level presets.
      * @method getPresets
      * @return {Object} The presets.
@@ -1679,7 +1679,7 @@ dwv.ViewController = function ( view )
     {
         return view.getCurrentPosition();
     };
-    
+
     /**
      * Set the current position.
      * @method setCurrentPosition
@@ -1700,13 +1700,13 @@ dwv.ViewController = function ( view )
       */
     this.setCurrentPosition2D = function (i, j)
     {
-        return view.setCurrentPosition({ 
-            "i": i, 
-            "j": j, 
+        return view.setCurrentPosition({
+            "i": i,
+            "j": j,
             "k": view.getCurrentPosition().k
         });
     };
-    
+
     /**
      * Increment the current slice number.
      * @method incrementSliceNb
@@ -1717,7 +1717,7 @@ dwv.ViewController = function ( view )
         return view.setCurrentPosition({
             "i": view.getCurrentPosition().i,
             "j": view.getCurrentPosition().j,
-            "k": view.getCurrentPosition().k + 1 
+            "k": view.getCurrentPosition().k + 1
         });
     };
 
@@ -1731,7 +1731,7 @@ dwv.ViewController = function ( view )
         return view.setCurrentPosition({
             "i": view.getCurrentPosition().i,
             "j": view.getCurrentPosition().j,
-            "k": view.getCurrentPosition().k - 1 
+            "k": view.getCurrentPosition().k - 1
         });
     };
 
@@ -1745,7 +1745,7 @@ dwv.ViewController = function ( view )
         return view.setCurrentPosition({
             "i": view.getCurrentPosition().i,
             "j": view.getCurrentPosition().j,
-            "k":  0 
+            "k":  0
         });
     };
 
@@ -1756,9 +1756,9 @@ dwv.ViewController = function ( view )
      */
     this.getWindowLevel = function ()
     {
-        return { 
+        return {
             "width": view.getWindowLut().getWidth(),
-            "center": view.getWindowLut().getCenter() 
+            "center": view.getWindowLut().getCenter()
         };
     };
 
@@ -1780,7 +1780,7 @@ dwv.ViewController = function ( view )
      * @param {Boolean} full If true, shows all presets.
      */
     this.updatePresets = function (image)
-    {    
+    {
         // store the manual preset
         var manual = null;
         if ( presets ) {
@@ -1788,7 +1788,7 @@ dwv.ViewController = function ( view )
         }
         // reinitialize the presets
         presets = {};
-        
+
         // DICOM presets
         var dicomPresets = view.getWindowPresets();
         if ( dicomPresets ) {
@@ -1796,9 +1796,9 @@ dwv.ViewController = function ( view )
                 presets[dicomPresets[i].name.toLowerCase()] = dicomPresets[i];
             }
         }
-        
+
         // Image presets
-        
+
         // min/max preset
         var range = image.getRescaledDataRange();
         var width = range.max - range.min;
@@ -1811,7 +1811,7 @@ dwv.ViewController = function ( view )
                 presets[key] = dwv.tool.defaultpresets[modality][key];
             }
         }
-        
+
         // Manual preset
         if ( manual ){
             presets.manual = manual;
@@ -1852,9 +1852,8 @@ dwv.ViewController = function ( view )
         // enable it
         this.setColourMap( dwv.tool.colourMaps[name] );
     };
-    
-}; // class dwv.ViewController
 
+}; // class dwv.ViewController
 ;/** 
  * DICOM module.
  * @module dicom
@@ -1918,7 +1917,7 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian)
     if ( typeof isLittleEndian === 'undefined' ) {
         isLittleEndian = true;
     }
-    
+
     /**
      * Is the Native endianness Little Endian.
      * @property isNativeLittleEndian
@@ -1934,7 +1933,7 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian)
      * @type Boolean
      */
     var needFlip = (isLittleEndian !== isNativeLittleEndian);
-    
+
     /**
      * The main data view.
      * @property view
@@ -1942,7 +1941,7 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian)
      * @type DataView
      */
     var view = new DataView(buffer);
-    
+
     /**
      * Flip an array's endianness.
      * Inspired from https://github.com/kig/DataStream.js.
@@ -1962,7 +1961,7 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian)
          }
        }
     };
-      
+
     /**
      * Read Uint16 (2 bytes) data.
      * @method readUint16
@@ -2340,7 +2339,7 @@ dwv.dicom.DicomParser = function()
      * @type Array
      */
     this.pixelBuffer = [];
-    
+
     /**
      * Unknown tags count.
      * @property unknownCount
@@ -2353,9 +2352,9 @@ dwv.dicom.DicomParser = function()
      * @returns {Number} The next count.
      */
     this.getNextUnknownCount = function () {
-        unknownCount++;    
+        unknownCount++;
         return unknownCount;
-    }; 
+    };
 };
 
 /**
@@ -2402,17 +2401,17 @@ dwv.dicom.DicomParser.prototype.appendDicomElement = function( element, sequence
     // simple case: not a Sequence or a SequenceDelimitationItem
     if ( ( typeof sequences === "undefined" || sequences.length === 0 ) &&
             element.tag.name !== "xFFFEE0DD" ) {
-        this.dicomElements[element.tag.name] = { 
-            "group": element.tag.group, 
+        this.dicomElements[element.tag.name] = {
+            "group": element.tag.group,
             "element": element.tag.element,
             "vr": element.vr,
             "vl": element.vl,
-            "value": element.data 
+            "value": element.data
         };
     }
     else {
         // storing item element as other elements
-        
+
         // nothing to do for delimitations
         // (ItemDelimitationItem, SequenceDelimitationItem)
         if ( element.tag.name === "xFFFEE00D" ||
@@ -2432,7 +2431,7 @@ dwv.dicom.DicomParser.prototype.appendDicomElement = function( element, sequence
             sequenceName = sequences[i].name;
             itemNumber = sequences[i].itemNumber;
         }
-        
+
         // append
         this.appendElementToSequence(root, sequenceName, itemNumber, element);
     }
@@ -2508,14 +2507,14 @@ dwv.dicom.DicomParser.prototype.readDataElement = function(reader, offset, impli
     // tag: group, element
     var tag = this.readTag(reader, offset);
     var tagOffset = 4;
-    
+
     var vr = null; // Value Representation (VR)
     var vl = 0; // Value Length (VL)
     var vrOffset = 0; // byte size of VR
     var vlOffset = 0; // byte size of VL
-    
+
     var isOtherVR = false; // OX, OW, OB and OF
-    
+
     // (private) Item group case
     if( tag.group === "0xFFFE" ) {
         vr = "N/A";
@@ -2554,21 +2553,21 @@ dwv.dicom.DicomParser.prototype.readDataElement = function(reader, offset, impli
             }
         }
     }
-    
+
     // check the value of VL
     var vlString = vl;
     if( vl === 0xffffffff ) {
         vlString = "u/l";
         vl = 0;
     }
-    
+
     // data
     var data = null;
     var dataOffset = offset+tagOffset+vrOffset+vlOffset;
     if( isOtherVR )
     {
         // OB or BitsAllocated == 8
-        if ( vr === "OB" || 
+        if ( vr === "OB" ||
                 ( typeof this.dicomElements.x00280100 !== 'undefined' &&
                     this.dicomElements.x00280100.value[0] === 8 ) ) {
             data = reader.readUint8Array( dataOffset, vl );
@@ -2627,20 +2626,20 @@ dwv.dicom.DicomParser.prototype.readDataElement = function(reader, offset, impli
     else
     {
         data = reader.readString( dataOffset, vl);
-        data = data.split("\\");                
-    }    
+        data = data.split("\\");
+    }
 
     // total element offset
     var elementOffset = tagOffset + vrOffset + vlOffset + vl;
-    
+
     // return
-    return { 
-        'tag': tag, 
-        'vr': vr, 
-        'vl': vlString, 
+    return {
+        'tag': tag,
+        'vr': vr,
+        'vl': vlString,
         'data': data,
         'offset': elementOffset
-    };    
+    };
 };
 
 /**
@@ -2668,7 +2667,7 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
         throw new Error("Not a valid DICOM file (no magic DICM word found)");
     }
     offset += 4;
-    
+
     // 0x0002, 0x0000: FileMetaInformationGroupLength
     var dataElement = this.readDataElement(metaReader, offset);
     // store the data element
@@ -2676,12 +2675,12 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
     // get meta length
     var metaLength = parseInt(dataElement.data[0], 10);
     offset += dataElement.offset;
-    
+
     // meta elements
     var metaStart = offset;
     var metaEnd = metaStart + metaLength;
     var i = metaStart;
-    while( i < metaEnd ) 
+    while( i < metaEnd )
     {
         // get the data element
         dataElement = this.readDataElement(metaReader, i, false);
@@ -2690,10 +2689,10 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
         // increment index
         i += dataElement.offset;
     }
-    
+
     // check the TransferSyntaxUID (has to be there!)
     var syntax = dwv.dicom.cleanString(this.dicomElements.x00020010.value[0]);
-    
+
     // Explicit VR - Little Endian
     if( syntax === "1.2.840.10008.1.2.1" ) {
         // nothing to do!
@@ -2752,16 +2751,16 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
     var sequences = [];
 
     // DICOM data elements
-    while( i < buffer.byteLength ) 
+    while( i < buffer.byteLength )
     {
         // get the data element
         dataElement = this.readDataElement(dataReader, i, implicit);
-        
+
         // locals
         tagName = dataElement.tag.name;
         tagOffset = dataElement.offset;
         var vlNumber = (dataElement.vl === "u/l") ? 0 : dataElement.vl;
-        
+
         // new sequence (either vl="u/l" or vl!=0)
         if ( dataElement.vr === "SQ" && dataElement.vl !== 0 ) {
             sequences.push( {
@@ -2781,7 +2780,7 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
         else if ( tagName === "xFFFEE0DD" ) {
             sequences = sequences.slice(0, -1);
         }
-        
+
         // store pixel data from multiple Items
         if( startedPixelItems ) {
             // Item
@@ -2824,10 +2823,10 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
                 tagOffset -= vlNumber;
             }
         }
-        
+
         // store the data element
         this.appendDicomElement( dataElement, sequences );
-        
+
         // end of sequence with explicit length
         if ( dataElement.vr !== "SQ" && sequences.length !== 0 ) {
             var last = sequences.length - 1;
@@ -2851,13 +2850,13 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
                 }
             }
         }
-        
+
         // increment index
         i += tagOffset;
     }
-    
+
     // check numberOfFrames
-    if ( typeof this.dicomElements.x00280008 !== 'undefined' && 
+    if ( typeof this.dicomElements.x00280008 !== 'undefined' &&
             this.dicomElements.x00280008.value[0] > 1 ) {
         throw new Error("Unsupported multi-frame data");
     }
@@ -2927,7 +2926,7 @@ dwv.dicom.DicomElementsWrapper = function (dicomElements) {
         }
         return value;
     };
-    
+
     /**
      * Dump the DICOM tags to an array.
      * @returns {Array}
@@ -2944,7 +2943,7 @@ dwv.dicom.DicomElementsWrapper = function (dicomElements) {
             row = {};
             // trying to have name first in row
             dictElement = null;
-            if ( typeof dict[dicomElement.group] !== "undefined" && 
+            if ( typeof dict[dicomElement.group] !== "undefined" &&
                     typeof dict[dicomElement.group][dicomElement.element] !== "undefined") {
                 dictElement = dict[dicomElement.group][dicomElement.element];
             }
@@ -3001,7 +3000,7 @@ dwv.dicom.DicomElementsWrapper = function (dicomElements) {
 };
 
 /**
- * 
+ *
  * @param group
  * @param element
  * @returns
@@ -3010,18 +3009,18 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementAsString = function ( dicomEl
 {
     // default prefix
     prefix = prefix || "";
-    
+
     // get element from dictionary
     var dict = dwv.dicom.dictionary;
     var dictElement = null;
-    if ( typeof dict[dicomElement.group] !== "undefined" && 
+    if ( typeof dict[dicomElement.group] !== "undefined" &&
             typeof dict[dicomElement.group][dicomElement.element] !== "undefined") {
         dictElement = dict[dicomElement.group][dicomElement.element];
     }
-    
+
     var deSize = dicomElement.value.length;
     var isOtherVR = ( dicomElement.vr[0].toUpperCase() === "O" );
-    
+
     // no size for delimitations
     if ( dicomElement.group === "0xFFFE" && (
             dicomElement.element === "0xE00D" ||
@@ -3032,12 +3031,12 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementAsString = function ( dicomEl
         deSize = 1;
     }
 
-    var isPixSequence = (dicomElement.group === '0x7FE0' && 
-        dicomElement.element === '0x0010' && 
+    var isPixSequence = (dicomElement.group === '0x7FE0' &&
+        dicomElement.element === '0x0010' &&
         dicomElement.vl === 'u/l');
-    
+
     var line = null;
-    
+
     // (group,element)
     line = "(";
     line += dicomElement.group.substr(2,5).toLowerCase();
@@ -3064,7 +3063,7 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementAsString = function ( dicomEl
         // 'O'ther array, limited display length
         else if ( isOtherVR ||
                 dicomElement.vr === 'pi' ||
-                dicomElement.vr === "UL" || 
+                dicomElement.vr === "UL" ||
                 dicomElement.vr === "US" ||
                 dicomElement.vr === "SL" ||
                 dicomElement.vr === "SS" ||
@@ -3134,7 +3133,7 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementAsString = function ( dicomEl
             line += "]";
         }
     }
-    
+
     // align #
     var nSpaces = 55 - line.length;
     if ( nSpaces > 0 ) {
@@ -3159,9 +3158,9 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementAsString = function ( dicomEl
     else {
         line += "Unknown Tag & Data";
     }
-    
+
     var message = null;
-    
+
     // continue for sequence
     if ( dicomElement.vr === 'SQ' ) {
         var item = null;
@@ -3171,7 +3170,7 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementAsString = function ( dicomEl
             if ( itemKeys.length === 0 ) {
                 continue;
             }
-            
+
             // get the item element
             var itemElement = item.xFFFEE000;
             message = "(Item with";
@@ -3184,10 +3183,10 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementAsString = function ( dicomEl
             message += " length #="+(itemKeys.length - 1)+")";
             itemElement.value = [message];
             itemElement.vr = "na";
-            
+
             line += "\n";
             line += this.getElementAsString(itemElement, prefix + "  ");
-            
+
             for ( var m = 0; m < itemKeys.length; ++m ) {
                 if ( itemKeys[m] !== "xFFFEE000" ) {
                     line += "\n";
@@ -3203,15 +3202,15 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementAsString = function ( dicomEl
             var itemDelimElement = {
                     "group": "0xFFFE",
                     "element": "0xE00D",
-                    "vr": "na", 
-                    "vl": "0", 
+                    "vr": "na",
+                    "vl": "0",
                     "value": [message],
                 };
                 line += "\n";
                 line += this.getElementAsString(itemDelimElement, prefix + "  ");
 
         }
-        
+
         message = "(SequenceDelimitationItem";
         if ( dicomElement.vl !== "u/l" ) {
             message += " for re-encod.";
@@ -3220,8 +3219,8 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementAsString = function ( dicomEl
         var sqDelimElement = {
             "group": "0xFFFE",
             "element": "0xE0DD",
-            "vr": "na", 
-            "vl": "0", 
+            "vr": "na",
+            "vl": "0",
             "value": [message],
         };
         line += "\n";
@@ -3240,12 +3239,12 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementAsString = function ( dicomEl
                 line += this.getElementAsString(pixElement, prefix + "  ");
             }
         }
-        
+
         var pixDelimElement = {
             "group": "0xFFFE",
             "element": "0xE0DD",
-            "vr": "na", 
-            "vl": "0", 
+            "vr": "na",
+            "vl": "0",
             "value": ["(SequenceDelimitationItem)"],
         };
         line += "\n";
@@ -3262,7 +3261,7 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementAsString = function ( dicomEl
 * @param {Number} element The element.
 * @return {Object} The DICOM element value.
 */
-dwv.dicom.DicomElementsWrapper.prototype.getFromGroupElement = function ( 
+dwv.dicom.DicomElementsWrapper.prototype.getFromGroupElement = function (
     group, element )
 {
    return this.getFromKey(
@@ -3287,7 +3286,7 @@ dwv.dicom.DicomElementsWrapper.prototype.getFromName = function ( name )
    var k1 = 0;
    // label for nested loop break
    outLabel:
-   // search through dictionary 
+   // search through dictionary
    for ( k0 = 0; k0 < keys0.length; ++k0 ) {
        group = keys0[k0];
        keys1 = Object.keys( dict[group] );
@@ -3305,7 +3304,6 @@ dwv.dicom.DicomElementsWrapper.prototype.getFromName = function ( name )
    }
    return dicomElement;
 };
-
 ;/** 
  * DICOM module.
  * @module dicom
@@ -3318,7 +3316,7 @@ dwv.dicom = dwv.dicom || {};
  * Generated using xml standard conversion
  *  from https://github.com/ivmartel/dcmbench/tree/master/view/part06
  *  with http://medical.nema.org/medical/dicom/current/source/docbook/part06/part06.xml
- * Conversion changes: 
+ * Conversion changes:
  * - (vr) "See Note" -> "NONE", "OB or OW" -> "ox", "US or SS" -> "xs"
  * - added "GenericGroupLength" element to each group
  * Local changes:
@@ -3335,7 +3333,7 @@ dwv.dicom.dictionary = {
         '0x0100': ['US', '1', 'CommandField'],
         '0x0110': ['US', '1', 'MessageID'],
         '0x0120': ['US', '1', 'MessageIDBeingRespondedTo'],
-        '0x0200': ['AE', '1', 'Initiator'], 
+        '0x0200': ['AE', '1', 'Initiator'],
         '0x0300': ['AE', '1', 'Receiver'],
         '0x0400': ['AE', '1', 'FindLocation'],
         '0x0600': ['AE', '1', 'MoveDestination'],
@@ -7613,7 +7611,7 @@ dwv.browser = dwv.browser || {};
  * Browser check for the FileAPI.
  * @method hasFileApi
  * @static
- */ 
+ */
 dwv.browser.hasFileApi = function()
 {
     // regular test does not work on Safari 5
@@ -7621,7 +7619,7 @@ dwv.browser.hasFileApi = function()
         (navigator.appVersion.indexOf("Chrome") === -1) &&
         ( (navigator.appVersion.indexOf("5.0.") !== -1) ||
           (navigator.appVersion.indexOf("5.1.") !== -1) );
-    if( isSafari5 ) 
+    if( isSafari5 )
     {
         console.warn("Assuming FileAPI support for Safari5...");
         return true;
@@ -7634,7 +7632,7 @@ dwv.browser.hasFileApi = function()
  * Browser check for the XMLHttpRequest.
  * @method hasXmlHttpRequest
  * @static
- */ 
+ */
 dwv.browser.hasXmlHttpRequest = function()
 {
     return "XMLHttpRequest" in window && "withCredentials" in new XMLHttpRequest();
@@ -7644,7 +7642,7 @@ dwv.browser.hasXmlHttpRequest = function()
  * Browser check for typed array.
  * @method hasTypedArray
  * @static
- */ 
+ */
 dwv.browser.hasTypedArray = function()
 {
     return "Uint8Array" in window && "Uint16Array" in window;
@@ -7654,7 +7652,7 @@ dwv.browser.hasTypedArray = function()
  * Browser check for clamped array.
  * @method hasClampedArray
  * @static
- */ 
+ */
 dwv.browser.hasClampedArray = function()
 {
     return "Uint8ClampedArray" in window;
@@ -7665,7 +7663,7 @@ dwv.browser.hasClampedArray = function()
  * TODO Maybe use http://modernizr.com/.
  * @method check
  * @static
- */ 
+ */
 dwv.browser.check = function()
 {
     var appnorun = "The application cannot be run.";
@@ -7727,17 +7725,17 @@ dwv.gui.base.Filter = function (app)
         // filter select
         var filterSelector = dwv.html.createHtmlSelect("filterSelect", list);
         filterSelector.onchange = app.onChangeFilter;
-    
+
         // filter list element
         var filterLi = dwv.html.createHiddenElement("li", "filterLi");
         filterLi.className += " ui-block-b";
         filterLi.appendChild(filterSelector);
-        
+
         // append element
         var node = app.getElement("toolList").getElementsByTagName("ul")[0];
         dwv.html.appendElement(node, filterLi);
     };
-    
+
     /**
      * Display the tool HTML.
      * @method display
@@ -7748,7 +7746,7 @@ dwv.gui.base.Filter = function (app)
         var node = app.getElement("filterLi");
         dwv.html.displayElement(node, flag);
     };
-    
+
     /**
      * Initialise the tool HTML.
      * @method initialise
@@ -7779,7 +7777,7 @@ dwv.gui.base.Threshold = function (app)
      * @type Object
      */
     var slider = new dwv.gui.Slider(app);
-    
+
     /**
      * Setup the threshold filter HTML.
      * @method setup
@@ -7789,7 +7787,7 @@ dwv.gui.base.Threshold = function (app)
         // threshold list element
         var thresholdLi = dwv.html.createHiddenElement("li", "thresholdLi");
         thresholdLi.className += " ui-block-c";
-        
+
         // node
         var node = app.getElement("toolList").getElementsByTagName("ul")[0];
         // append threshold
@@ -7799,7 +7797,7 @@ dwv.gui.base.Threshold = function (app)
         // refresh
         dwv.gui.refreshElement(node);
     };
-    
+
     /**
      * Clear the threshold filter HTML.
      * @method display
@@ -7810,7 +7808,7 @@ dwv.gui.base.Threshold = function (app)
         var node = app.getElement("thresholdLi");
         dwv.html.displayElement(node, flag);
     };
-    
+
     /**
      * Initialise the threshold filter HTML.
      * @method initialise
@@ -7822,7 +7820,7 @@ dwv.gui.base.Threshold = function (app)
     };
 
 }; // class dwv.gui.base.Threshold
-    
+
 /**
  * Create the apply filter button.
  * @method createFilterApplyButton
@@ -7861,7 +7859,7 @@ dwv.gui.base.Sharpen = function (app)
         var node = app.getElement("toolList").getElementsByTagName("ul")[0];
         dwv.html.appendElement(node, sharpenLi);
     };
-    
+
     /**
      * Display the sharpen filter HTML.
      * @method display
@@ -7872,7 +7870,7 @@ dwv.gui.base.Sharpen = function (app)
         var node = app.getElement("sharpenLi");
         dwv.html.displayElement(node, flag);
     };
-    
+
 }; // class dwv.gui.base.Sharpen
 
 /**
@@ -7897,7 +7895,7 @@ dwv.gui.base.Sobel = function (app)
         var node = app.getElement("toolList").getElementsByTagName("ul")[0];
         dwv.html.appendElement(node, sobelLi);
     };
-    
+
     /**
      * Display the sobel filter HTML.
      * @method display
@@ -7908,9 +7906,8 @@ dwv.gui.base.Sobel = function (app)
         var node = app.getElement("sobelLi");
         dwv.html.displayElement(node, flag);
     };
-    
-}; // class dwv.gui.base.Sobel
 
+}; // class dwv.gui.base.Sobel
 ;/** 
  * GUI module.
  * @module gui
@@ -8024,7 +8021,7 @@ dwv.gui.base.Slider = function (app)
         // default values
         var min = 0;
         var max = 1;
-        
+
         // jquery-mobile range slider
         // minimum input
         var inputMin = document.createElement("input");
@@ -8060,7 +8057,7 @@ dwv.gui.base.Slider = function (app)
         // refresh
         dwv.gui.refreshElement(app.getElement("toolList"));
     };
-    
+
     /**
      * Initialise the slider HTML.
      * @method initialise
@@ -8069,7 +8066,7 @@ dwv.gui.base.Slider = function (app)
     {
         var min = app.getImage().getDataRange().min;
         var max = app.getImage().getDataRange().max;
-        
+
         // minimum input
         var inputMin = document.getElementById("threshold-min");
         inputMin.max = max;
@@ -8107,7 +8104,7 @@ dwv.gui.base.DicomTags = function (app)
             return;
         }
         // remove possible previous
-        while (node.hasChildNodes()) { 
+        while (node.hasChildNodes()) {
             node.removeChild(node.firstChild);
         }
         // tag list table (without the pixel data)
@@ -8127,7 +8124,7 @@ dwv.gui.base.DicomTags = function (app)
         // refresh
         dwv.gui.refreshElement(node);
     };
-    
+
 }; // class dwv.gui.base.DicomTags
 ;/** 
  * GUI module.
@@ -8168,9 +8165,9 @@ dwv.gui.base.appendHelpHtml = function(toolList, mobile, app)
     if( mobile ) {
         actionType = "touch";
     }
-    
+
     var toolHelpDiv = document.createElement("div");
-    
+
     // current location
     var loc = window.location.pathname;
     var dir = loc.substring(0, loc.lastIndexOf('/'));
@@ -8195,15 +8192,15 @@ dwv.gui.base.appendHelpHtml = function(toolList, mobile, app)
             for( var i=0; i<keys.length; ++i )
             {
                 var action = tool.getHelp()[actionType][keys[i]];
-                
+
                 var img = document.createElement("img");
                 img.src = dir + "/../../resources/"+keys[i]+".png";
                 img.style.float = "left";
                 img.style.margin = "0px 15px 15px 0px";
-                
+
                 var br = document.createElement("br");
                 br.style.clear = "both";
-                
+
                 var para = document.createElement("p");
                 para.appendChild(img);
                 para.appendChild(document.createTextNode(action));
@@ -8211,7 +8208,7 @@ dwv.gui.base.appendHelpHtml = function(toolList, mobile, app)
                 docDiv.appendChild(para);
             }
         }
-        
+
         // different div structure for mobile or static
         if( mobile )
         {
@@ -8228,17 +8225,17 @@ dwv.gui.base.appendHelpHtml = function(toolList, mobile, app)
             toolHelpDiv.appendChild(docDiv);
         }
     }
-    
+
     var helpNode = app.getElement("help");
 
     var dwvLink = document.createElement("a");
     dwvLink.href = "https://github.com/ivmartel/dwv/wiki";
     dwvLink.title = "DWV wiki on github.";
     dwvLink.appendChild(document.createTextNode("DWV"));
-    
+
     var dwvExampleLink = document.createElement("a");
     var inputIdx = document.URL.indexOf("?input=");
-    dwvExampleLink.href = document.URL.substr(0, inputIdx+7) + 
+    dwvExampleLink.href = document.URL.substr(0, inputIdx+7) +
         "http%3A%2F%2Fx.babymri.org%2F%3F53320924%26.dcm";
     dwvExampleLink.title = "Brain MRI in DWV.";
     dwvExampleLink.target = "_top";
@@ -8253,18 +8250,18 @@ dwv.gui.base.appendHelpHtml = function(toolList, mobile, app)
     headPara.appendChild(dwvLink);
     headPara.appendChild(document.createTextNode(" can load DICOM data " +
         "either from a local file or from an URL. All DICOM tags are available " +
-        "in a searchable table, press the 'tags' or grid button. " + 
-        "You can choose to display the image information overlay by pressing the " + 
+        "in a searchable table, press the 'tags' or grid button. " +
+        "You can choose to display the image information overlay by pressing the " +
         "'info' or i button. For some example data, check this "));
     headPara.appendChild(dwvExampleLink);
     headPara.appendChild(document.createTextNode(" from the " ));
     headPara.appendChild(bbmriLink);
     headPara.appendChild(document.createTextNode(" database." ));
     helpNode.appendChild(headPara);
-    
+
     var toolPara = document.createElement("p");
-    toolPara.appendChild(document.createTextNode("Each tool defines the possible " + 
-        "user interactions. The default tool is the window/level one. " + 
+    toolPara.appendChild(document.createTextNode("Each tool defines the possible " +
+        "user interactions. The default tool is the window/level one. " +
         "Here are the available tools:"));
     helpNode.appendChild(toolPara);
     helpNode.appendChild(toolHelpDiv);
@@ -8294,7 +8291,7 @@ dwv.html.appendCell = function (row, content)
     var cell = row.insertCell(-1);
     var str = content;
     // special care for arrays
-    if ( content instanceof Array || 
+    if ( content instanceof Array ||
             content instanceof Uint8Array ||
             content instanceof Uint16Array ||
             content instanceof Uint32Array ) {
@@ -8466,7 +8463,7 @@ dwv.html.getHtmlSearchForm = function (htmlTableToSearch)
         dwv.html.filterTable(input, htmlTableToSearch);
     };
     form.appendChild(input);
-    
+
     return form;
 };
 
@@ -8676,7 +8673,7 @@ dwv.html.createHtmlSelect = function (name, list) {
  *  [dwv root]?input=encodeURI([root]?key0=value0&key1=value1)
  * or
  *  [dwv root]?input=encodeURI([manifest link])&type=manifest
- *  
+ *
  * @method getUriParam
  * @static
  * @param {String } uri The URI to decode.
@@ -8695,8 +8692,8 @@ dwv.html.getUriParam = function (uri)
 };
 
 /**
- * Decode a Key/Value pair uri. If a key is repeated, the result 
- * be an array of base + each key. 
+ * Decode a Key/Value pair uri. If a key is repeated, the result
+ * be an array of base + each key.
  * @method decodeKeyValueUri
  * @static
  * @param {String} uri The uri to decode.
@@ -8716,7 +8713,7 @@ dwv.html.decodeKeyValueUri = function (uri, replaceMode)
     var queryUri = decodeURIComponent(uri);
     // get key/value pairs from input URI
     var inputQueryPairs = dwv.utils.splitQueryString(queryUri);
-    if ( Object.keys(inputQueryPairs).length === 0 ) 
+    if ( Object.keys(inputQueryPairs).length === 0 )
     {
         result.push(queryUri);
     }
@@ -8733,8 +8730,8 @@ dwv.html.decodeKeyValueUri = function (uri, replaceMode)
                 break;
             }
         }
-    
-        if ( !repeatKey ) 
+
+        if ( !repeatKey )
         {
             result.push(queryUri);
         }
@@ -8745,7 +8742,7 @@ dwv.html.decodeKeyValueUri = function (uri, replaceMode)
             var baseUrl = inputQueryPairs.base;
             // do not add '?' when the repeatKey is 'file'
             // root/path/to/?file=0.jpg&file=1.jpg
-            if ( repeatKey !== "file" ) { 
+            if ( repeatKey !== "file" ) {
                 baseUrl += "?";
             }
             var gotOneArg = false;
@@ -8781,7 +8778,7 @@ dwv.html.decodeKeyValueUri = function (uri, replaceMode)
 };
 
 /**
- * Decode a manifest uri. 
+ * Decode a manifest uri.
  * @method decodeManifestUri
  * @static
  * @param {String} uri The uri to decode.
@@ -8802,17 +8799,17 @@ dwv.html.decodeManifestUri = function (uri, nslices, callback)
         var urls = dwv.html.decodeManifest(this.responseXML, nslices);
         callback(urls);
     };
-    
+
     var request = new XMLHttpRequest();
     request.open('GET', decodeURIComponent(uri), true);
-    request.responseType = "xml"; 
+    request.responseType = "xml";
     request.onload = onLoadRequest;
     request.onerror = onErrorRequest;
     request.send(null);
 };
 
 /**
- * Decode an XML manifest. 
+ * Decode an XML manifest.
  * @method decodeManifest
  * @static
  * @param {Object} manifest The manifest to decode.
@@ -8851,7 +8848,7 @@ dwv.html.decodeManifest = function (manifest, nslices)
     }
     for ( var i = 0; i < max; ++i ) {
         var sopInstanceUID = instanceList[i].getAttribute("SOPInstanceUID");
-        var link = rootURL + 
+        var link = rootURL +
         "&studyUID=" + studyUID +
         "&seriesUID=" + seriesUID +
         "&objectUID=" + sopInstanceUID;
@@ -8990,7 +8987,7 @@ dwv.html.Layer = function(canvas)
      * @type Array
      */
     var imageData = null;
-    
+
     /**
      * The layer origin.
      * @property origin
@@ -9021,9 +9018,9 @@ dwv.html.Layer = function(canvas)
     this.getZoom = function () {
         return zoom;
     };
-    
+
     var trans = {'x': 0, 'y': 0};
-    
+
     /**
      * Set the canvas width.
      * @method setWidth
@@ -9040,7 +9037,7 @@ dwv.html.Layer = function(canvas)
     this.setHeight = function ( height ) {
         canvas.height = height;
     };
-    
+
     /**
      * Set the layer zoom.
      * @method setZoom
@@ -9054,11 +9051,11 @@ dwv.html.Layer = function(canvas)
         // The zoom is the ratio between the differences from the center
         // to the origins:
         // centerX - originX = ( centerX - originX0 ) * zoomX
-        // (center in ~world coordinate system)  
+        // (center in ~world coordinate system)
         //originX = (centerX / zoomX) + originX - (centerX / newZoomX);
         //originY = (centerY / zoomY) + originY - (centerY / newZoomY);
-        
-        // center in image coordinate system        
+
+        // center in image coordinate system
         origin.x = centerX - (centerX - origin.x) * (newZoomX / zoom.x);
         origin.y = centerY - (centerY - origin.y) * (newZoomY / zoom.y);
 
@@ -9066,7 +9063,7 @@ dwv.html.Layer = function(canvas)
         zoom.x = newZoomX;
         zoom.y = newZoomY;
     };
-    
+
     /**
      * Set the layer translation.
      * Translation is according to the last one.
@@ -9079,7 +9076,7 @@ dwv.html.Layer = function(canvas)
         trans.x = tx;
         trans.y = ty;
     };
-    
+
     /**
      * Set the image data array.
      * @method setImageData
@@ -9091,11 +9088,11 @@ dwv.html.Layer = function(canvas)
         // update the cached canvas
         cacheCanvas.getContext("2d").putImageData(imageData, 0, 0);
     };
-    
+
     /**
      * Reset the layout.
      * @method resetLayout
-     */ 
+     */
     this.resetLayout = function(izoom)
     {
         origin.x = 0;
@@ -9105,16 +9102,16 @@ dwv.html.Layer = function(canvas)
         trans.x = 0;
         trans.y = 0;
     };
-    
+
     /**
      * Transform a display position to an index.
      * @method displayToIndex
-     */ 
+     */
     this.displayToIndex = function ( point2D ) {
         return {'x': ( (point2D.x - origin.x) / zoom.x ) - trans.x,
             'y': ( (point2D.y - origin.y) / zoom.y ) - trans.y};
     };
-    
+
     /**
      * Draw the content (imageData) of the layer.
      * The imageData variable needs to be set
@@ -9130,19 +9127,19 @@ dwv.html.Layer = function(canvas)
         context.clearRect( 0, 0, canvas.width, canvas.height );
         // restore the transform
         context.restore();
-        
+
         // draw the cached canvas on the context
         // transform takes as input a, b, c, d, e, f to create
         // the transform matrix (column-major order):
         // [ a c e ]
         // [ b d f ]
         // [ 0 0 1 ]
-        context.setTransform( zoom.x, 0, 0, zoom.y, 
-            origin.x + (trans.x * zoom.x), 
+        context.setTransform( zoom.x, 0, 0, zoom.y,
+            origin.x + (trans.x * zoom.x),
             origin.y + (trans.y * zoom.y) );
         context.drawImage( cacheCanvas, 0, 0 );
     };
-    
+
     /**
      * Initialise the layer: set the canvas and context
      * @method initialise
@@ -9182,7 +9179,7 @@ dwv.html.Layer = function(canvas)
         cacheCanvas.width = inputWidth;
         cacheCanvas.height = inputHeight;
     };
-    
+
     /**
      * Fill the full context with the current style.
      * @method fillContext
@@ -9191,7 +9188,7 @@ dwv.html.Layer = function(canvas)
     {
         context.fillRect( 0, 0, canvas.width, canvas.height );
     };
-    
+
     /**
      * Clear the context and reset the image data.
      * @method clear
@@ -9225,7 +9222,7 @@ dwv.html.Layer = function(canvas)
                 // 4 component data: RGB + alpha
                 offMerge = 4 * ( parseInt( (origin.x + i * zoom.x), 10 ) + offMergeJ );
                 offThis = 4 * ( i + offThisJ );
-                // merge non transparent 
+                // merge non transparent
                 alpha = mergeImageData.data[offMerge+3];
                 if( alpha !== 0 ) {
                     imageData.data[offThis] = mergeImageData.data[offMerge];
@@ -9240,7 +9237,7 @@ dwv.html.Layer = function(canvas)
         // draw the layer
         this.draw();
     };
-    
+
     /**
      * Set the line colour for the layer.
      * @method setLineColour
@@ -9251,7 +9248,7 @@ dwv.html.Layer = function(canvas)
         context.fillStyle = colour;
         context.strokeStyle = colour;
     };
-    
+
     /**
      * Display the layer.
      * @method setStyleDisplay
@@ -9268,7 +9265,7 @@ dwv.html.Layer = function(canvas)
             canvas.style.display = "none";
         }
     };
-    
+
     /**
      * Check if the layer is visible.
      * @method isVisible
@@ -9283,7 +9280,7 @@ dwv.html.Layer = function(canvas)
             return true;
         }
     };
-    
+
     /**
      * Align on another layer.
      * @method align
@@ -9369,7 +9366,7 @@ dwv.gui.base.Loadbox = function (app, loaders)
         // loader select
         var loaderSelector = dwv.html.createHtmlSelect("loaderSelect", app.getLoaders());
         loaderSelector.onchange = app.onChangeLoader;
-        
+
         // node
         var node = app.getElement("loaderlist");
         // clear it
@@ -9381,7 +9378,7 @@ dwv.gui.base.Loadbox = function (app, loaders)
         // refresh
         dwv.gui.refreshElement(node);
     };
-    
+
     /**
      * Display a loader.
      * @param {String} name The name of the loader to show.
@@ -9398,7 +9395,7 @@ dwv.gui.base.Loadbox = function (app, loaders)
             }
         }
     };
-    
+
 }; // class dwv.gui.base.Loadbox
 
 /**
@@ -9423,13 +9420,13 @@ dwv.gui.base.FileLoad = function (app)
         fileLoadInput.className = "imagefiles";
         fileLoadInput.setAttribute("data-clear-btn","true");
         fileLoadInput.setAttribute("data-mini","true");
-    
+
         // associated div
         var fileLoadDiv = document.createElement("div");
         fileLoadDiv.className = "imagefilesdiv";
         fileLoadDiv.style.display = "none";
         fileLoadDiv.appendChild(fileLoadInput);
-        
+
         // node
         var node = app.getElement("loaderlist");
         // append
@@ -9437,7 +9434,7 @@ dwv.gui.base.FileLoad = function (app)
         // refresh
         dwv.gui.refreshElement(node);
     };
-    
+
     /**
      * Display the file load HTML.
      * @method display
@@ -9450,7 +9447,7 @@ dwv.gui.base.FileLoad = function (app)
         var filediv = node.getElementsByClassName("imagefilesdiv")[0];
         filediv.style.display = bool ? "" : "none";
     };
-    
+
 }; // class dwv.gui.base.FileLoad
 
 /**
@@ -9474,13 +9471,13 @@ dwv.gui.base.UrlLoad = function (app)
         urlLoadInput.className = "imageurl";
         urlLoadInput.setAttribute("data-clear-btn","true");
         urlLoadInput.setAttribute("data-mini","true");
-    
+
         // associated div
         var urlLoadDiv = document.createElement("div");
         urlLoadDiv.className = "imageurldiv";
         urlLoadDiv.style.display = "none";
         urlLoadDiv.appendChild(urlLoadInput);
-    
+
         // node
         var node = app.getElement("loaderlist");
         // append
@@ -9488,7 +9485,7 @@ dwv.gui.base.UrlLoad = function (app)
         // refresh
         dwv.gui.refreshElement(node);
     };
-    
+
     /**
      * Display the url load HTML.
      * @method display
@@ -9560,7 +9557,7 @@ dwv.html.Style = function ()
      * @type Number
      */
     var strokeWidth = 2;
-    
+
     /**
      * Get the font family.
      * @method getFontFamily
@@ -9574,7 +9571,7 @@ dwv.html.Style = function ()
      * @return {Number} The font size.
      */
     this.getFontSize = function () { return fontSize; };
-    
+
     /**
      * Get the stroke width.
      * @method getStrokeWidth
@@ -9609,7 +9606,7 @@ dwv.html.Style = function ()
      * @param {String} scale The display scale.
      */
     this.setScale = function (scale) { displayScale = scale; };
-    
+
     /**
      * Scale an input value.
      * @method scale
@@ -9625,7 +9622,7 @@ dwv.html.Style = function ()
  */
 dwv.html.Style.prototype.getFontStr = function ()
 {
-    return ("normal " + this.getFontSize() + "px sans-serif"); 
+    return ("normal " + this.getFontSize() + "px sans-serif");
 };
 
 /**
@@ -9635,7 +9632,7 @@ dwv.html.Style.prototype.getFontStr = function ()
  */
 dwv.html.Style.prototype.getLineHeight = function ()
 {
-    return ( this.getFontSize() + this.getFontSize() / 5 ); 
+    return ( this.getFontSize() + this.getFontSize() / 5 );
 };
 
 /**
@@ -9643,8 +9640,8 @@ dwv.html.Style.prototype.getLineHeight = function ()
  * @method getScaledFontSize
  * @return {Number} The scaled font size.
  */
-dwv.html.Style.prototype.getScaledFontSize = function () 
-{ 
+dwv.html.Style.prototype.getScaledFontSize = function ()
+{
     return this.scale( this.getFontSize() );
 };
 
@@ -9653,9 +9650,9 @@ dwv.html.Style.prototype.getScaledFontSize = function ()
  * @method getScaledStrokeWidth
  * @return {Number} The scaled stroke width.
  */
-dwv.html.Style.prototype.getScaledStrokeWidth = function () 
-{ 
-    return this.scale( this.getStrokeWidth() ); 
+dwv.html.Style.prototype.getScaledStrokeWidth = function ()
+{
+    return this.scale( this.getStrokeWidth() );
 };
 ;/** 
  * GUI module.
@@ -9688,7 +9685,7 @@ dwv.gui.base.Toolbox = function (app)
         // tool select
         var toolSelector = dwv.html.createHtmlSelect("toolSelect", list);
         toolSelector.onchange = app.onChangeTool;
-        
+
         // tool list element
         var toolLi = document.createElement("li");
         toolLi.className = "toolLi ui-block-a";
@@ -9698,7 +9695,7 @@ dwv.gui.base.Toolbox = function (app)
         // tool ul
         var toolUl = document.createElement("ul");
         toolUl.appendChild(toolLi);
-        toolUl.className = "ui-grid-b"; 
+        toolUl.className = "ui-grid-b";
 
         // node
         var node = app.getElement("toolList");
@@ -9707,7 +9704,7 @@ dwv.gui.base.Toolbox = function (app)
         // refresh
         dwv.gui.refreshElement(node);
     };
-    
+
     /**
      * Display the toolbox HTML.
      * @method display
@@ -9719,7 +9716,7 @@ dwv.gui.base.Toolbox = function (app)
         var node = app.getElement("toolLi");
         dwv.html.displayElement(node, bool);
     };
-    
+
     /**
      * Initialise the toolbox HTML.
      * @method initialise
@@ -9728,7 +9725,7 @@ dwv.gui.base.Toolbox = function (app)
     {
         // tool select: reset selected option
         var toolSelector = app.getElement("toolSelect");
-        
+
         // update list
         var options = toolSelector.options;
         var selectedIndex = -1;
@@ -9744,11 +9741,11 @@ dwv.gui.base.Toolbox = function (app)
             }
         }
         toolSelector.selectedIndex = selectedIndex;
-        
+
         // refresh
         dwv.gui.refreshElement(toolSelector);
     };
-    
+
 }; // dwv.gui.base.Toolbox
 
 /**
@@ -9771,7 +9768,7 @@ dwv.gui.base.WindowLevel = function (app)
         // colour map select
         var cmSelector = dwv.html.createHtmlSelect("colourMapSelect", dwv.tool.colourMaps);
         cmSelector.onchange = app.onChangeColourMap;
-    
+
         // preset list element
         var wlLi = document.createElement("li");
         wlLi.className = "wlLi ui-block-b";
@@ -9784,7 +9781,7 @@ dwv.gui.base.WindowLevel = function (app)
         //cmLi.className = "cmLi";
         cmLi.style.display = "none";
         cmLi.appendChild(cmSelector);
-    
+
         // node
         var node = app.getElement("toolList").getElementsByTagName("ul")[0];
         // append preset
@@ -9794,7 +9791,7 @@ dwv.gui.base.WindowLevel = function (app)
         // refresh
         dwv.gui.refreshElement(node);
     };
-    
+
     /**
      * Display the tool HTML.
      * @method display
@@ -9809,7 +9806,7 @@ dwv.gui.base.WindowLevel = function (app)
         node = app.getElement("cmLi");
         dwv.html.displayElement(node, bool);
     };
-    
+
     /**
      * Initialise the tool HTML.
      * @method initialise
@@ -9820,7 +9817,7 @@ dwv.gui.base.WindowLevel = function (app)
         var wlSelector = dwv.html.createHtmlSelect("presetSelect", app.getViewController().getPresets());
         wlSelector.onchange = app.onChangeWindowLevelPreset;
         wlSelector.title = "Select w/l preset.";
-        
+
         // copy html list
         var wlLi = app.getElement("wlLi");
         // clear node
@@ -9829,7 +9826,7 @@ dwv.gui.base.WindowLevel = function (app)
         wlLi.appendChild(wlSelector);
         // refresh
         dwv.gui.refreshElement(wlLi);
-        
+
         // colour map select
         var cmSelector = app.getElement("colourMapSelect");
         cmSelector.selectedIndex = 0;
@@ -9841,7 +9838,7 @@ dwv.gui.base.WindowLevel = function (app)
         // refresh
         dwv.gui.refreshElement(cmSelector);
     };
-    
+
 }; // class dwv.gui.base.WindowLevel
 
 /**
@@ -9861,7 +9858,7 @@ dwv.gui.base.Draw = function (app)
      * @method getColours
      */
     this.getColours = function () { return colours; };
-    
+
     /**
      * Setup the tool HTML.
      * @method setup
@@ -9874,7 +9871,7 @@ dwv.gui.base.Draw = function (app)
         // colour select
         var colourSelector = dwv.html.createHtmlSelect("colourSelect", colours);
         colourSelector.onchange = app.onChangeLineColour;
-    
+
         // shape list element
         var shapeLi = document.createElement("li");
         shapeLi.className = "shapeLi ui-block-c";
@@ -9887,7 +9884,7 @@ dwv.gui.base.Draw = function (app)
         colourLi.style.display = "none";
         colourLi.appendChild(colourSelector);
         //colourLi.setAttribute("class","ui-block-b");
-        
+
         // node
         var node = app.getElement("toolList").getElementsByTagName("ul")[0];
         // apend shape
@@ -9912,7 +9909,7 @@ dwv.gui.base.Draw = function (app)
         node = app.getElement("shapeLi");
         dwv.html.displayElement(node, bool);
     };
-    
+
     /**
      * Initialise the tool HTML.
      * @method initialise
@@ -9924,14 +9921,14 @@ dwv.gui.base.Draw = function (app)
         shapeSelector.selectedIndex = 0;
         // refresh
         dwv.gui.refreshElement(shapeSelector);
-        
+
         // colour select: reset selected option
         var colourSelector = app.getElement("colourSelect");
         colourSelector.selectedIndex = 0;
         // refresh
         dwv.gui.refreshElement(colourSelector);
     };
-    
+
 }; // class dwv.gui.base.Draw
 
 /**
@@ -9961,14 +9958,14 @@ dwv.gui.base.Livewire = function (app)
         // colour select
         var colourSelector = dwv.html.createHtmlSelect("lwColourSelect", colours);
         colourSelector.onchange = app.onChangeLineColour;
-        
+
         // colour list element
         var colourLi = document.createElement("li");
         colourLi.className = "lwColourLi ui-block-b";
         colourLi.style.display = "none";
         //colourLi.setAttribute("class","ui-block-b");
         colourLi.appendChild(colourSelector);
-        
+
         // node
         var node = app.getElement("toolList").getElementsByTagName("ul")[0];
         // apend colour
@@ -9976,7 +9973,7 @@ dwv.gui.base.Livewire = function (app)
         // refresh
         dwv.gui.refreshElement(node);
     };
-    
+
     /**
      * Display the tool HTML.
      * @method display
@@ -9988,7 +9985,7 @@ dwv.gui.base.Livewire = function (app)
         var node = app.getElement("lwColourLi");
         dwv.html.displayElement(node, bool);
     };
-    
+
     /**
      * Initialise the tool HTML.
      * @method initialise
@@ -9999,7 +9996,7 @@ dwv.gui.base.Livewire = function (app)
         colourSelector.selectedIndex = 0;
         dwv.gui.refreshElement(colourSelector);
     };
-    
+
 }; // class dwv.gui.base.Livewire
 
 /**
@@ -10025,14 +10022,14 @@ dwv.gui.base.ZoomAndPan = function (app)
         button.setAttribute("class","ui-btn ui-btn-b");
         var text = document.createTextNode("Reset");
         button.appendChild(text);
-        
+
         // list element
         var liElement = document.createElement("li");
         liElement.className = "zoomLi ui-block-c";
         liElement.style.display = "none";
         //liElement.setAttribute("class","ui-block-c");
         liElement.appendChild(button);
-        
+
         // node
         var node = app.getElement("toolList").getElementsByTagName("ul")[0];
         // append element
@@ -10040,7 +10037,7 @@ dwv.gui.base.ZoomAndPan = function (app)
         // refresh
         dwv.gui.refreshElement(node);
     };
-    
+
     /**
      * Display the tool HTML.
      * @method display
@@ -10052,7 +10049,7 @@ dwv.gui.base.ZoomAndPan = function (app)
         var node = app.getElement("zoomLi");
         dwv.html.displayElement(node, bool);
     };
-    
+
 }; // class dwv.gui.base.ZoomAndPan
 
 /**
@@ -10073,7 +10070,7 @@ dwv.gui.base.Scroll = function (app)
         var liElement = document.createElement("li");
         liElement.className = "scrollLi ui-block-c";
         liElement.style.display = "none";
-        
+
         // node
         var node = app.getElement("toolList").getElementsByTagName("ul")[0];
         // append element
@@ -10081,7 +10078,7 @@ dwv.gui.base.Scroll = function (app)
         // refresh
         dwv.gui.refreshElement(node);
     };
-    
+
     /**
      * Display the tool HTML.
      * @method display
@@ -10093,7 +10090,7 @@ dwv.gui.base.Scroll = function (app)
         var node = app.getElement("scrollLi");
         dwv.html.displayElement(node, bool);
     };
-    
+
 }; // class dwv.gui.base.Scroll
 ;/** 
  * GUI module.
@@ -10124,16 +10121,16 @@ dwv.gui.base.Undo = function (app)
      */
     this.setup = function ()
     {
-        var paragraph = document.createElement("p");  
+        var paragraph = document.createElement("p");
         paragraph.appendChild(document.createTextNode("History:"));
         paragraph.appendChild(document.createElement("br"));
-        
+
         var select = document.createElement("select");
         select.className = "history_list";
         select.name = "history_list";
         select.multiple = "multiple";
         paragraph.appendChild(select);
-    
+
         // node
         var node = app.getElement("history");
         // clear it
@@ -10145,7 +10142,7 @@ dwv.gui.base.Undo = function (app)
         // refresh
         dwv.gui.refreshElement(node);
     };
-    
+
     /**
      * Clear the command list of the undo HTML.
      * @method cleanUndoHtml
@@ -10162,7 +10159,7 @@ dwv.gui.base.Undo = function (app)
         // refresh
         dwv.gui.refreshElement(select);
     };
-    
+
     /**
      * Add a command to the undo HTML.
      * @method addCommandToUndoHtml
@@ -10190,7 +10187,7 @@ dwv.gui.base.Undo = function (app)
         // refresh
         dwv.gui.refreshElement(select);
     };
-    
+
     /**
      * Enable the last command of the undo HTML.
      * @method enableInUndoHtml
@@ -10201,7 +10198,7 @@ dwv.gui.base.Undo = function (app)
         var select = app.getElement("history_list");
         // enable or not (order is important)
         var option;
-        if( enable ) 
+        if( enable )
         {
             // increment selected index
             select.selectedIndex++;
@@ -10209,7 +10206,7 @@ dwv.gui.base.Undo = function (app)
             option = select.options[select.selectedIndex];
             option.disabled = false;
         }
-        else 
+        else
         {
             // disable option
             option = select.options[select.selectedIndex];
@@ -10283,7 +10280,7 @@ dwv.image.filter.Threshold = function()
      * @return {String} The name of the filter.
      */
     this.getName = function() { return "Threshold"; };
-    
+
     /**
      * Original image.
      * @property originalImage
@@ -10309,7 +10306,7 @@ dwv.image.filter.Threshold = function()
  * Transform the main image using this filter.
  * @method update
  * @return {Object} The transformed image.
- */ 
+ */
 dwv.image.filter.Threshold.prototype.update = function ()
 {
     var image = this.getOriginalImage();
@@ -10365,11 +10362,11 @@ dwv.image.filter.Sharpen = function()
  * Transform the main image using this filter.
  * @method update
  * @return {Object} The transformed image.
- */ 
+ */
 dwv.image.filter.Sharpen.prototype.update = function()
 {
     var image = this.getOriginalImage();
-    
+
     return image.convolute2D(
         [  0, -1,  0,
           -1,  5, -1,
@@ -10415,11 +10412,11 @@ dwv.image.filter.Sobel = function()
  * Transform the main image using this filter.
  * @method update
  * @return {Object} The transformed image.
- */ 
+ */
 dwv.image.filter.Sobel.prototype.update = function()
 {
     var image = this.getOriginalImage();
-    
+
     var gradX = image.convolute2D(
         [ 1,  0,  -1,
           2,  0,  -2,
@@ -10429,10 +10426,9 @@ dwv.image.filter.Sobel.prototype.update = function()
         [  1,  2,  1,
            0,  0,  0,
           -1, -2, -1 ] );
-    
+
     return gradX.compose( gradY, function (x,y) { return Math.sqrt(x*x+y*y); } );
 };
-
 ;/** 
  * Image module.
  * @module image
@@ -10455,19 +10451,19 @@ dwv.image.Size = function ( numberOfColumns, numberOfRows, numberOfSlices )
      * Get the number of columns.
      * @method getNumberOfColumns
      * @return {Number} The number of columns.
-     */ 
+     */
     this.getNumberOfColumns = function () { return numberOfColumns; };
     /**
      * Get the number of rows.
      * @method getNumberOfRows
      * @return {Number} The number of rows.
-     */ 
+     */
     this.getNumberOfRows = function () { return numberOfRows; };
     /**
      * Get the number of slices.
      * @method getNumberOfSlices
      * @return {Number} The number of slices.
-     */ 
+     */
     this.getNumberOfSlices = function () { return (numberOfSlices || 1.0); };
 };
 
@@ -10475,7 +10471,7 @@ dwv.image.Size = function ( numberOfColumns, numberOfRows, numberOfSlices )
  * Get the size of a slice.
  * @method getSliceSize
  * @return {Number} The size of a slice.
- */ 
+ */
 dwv.image.Size.prototype.getSliceSize = function () {
     return this.getNumberOfColumns() * this.getNumberOfRows();
 };
@@ -10484,7 +10480,7 @@ dwv.image.Size.prototype.getSliceSize = function () {
  * Get the total size.
  * @method getTotalSize
  * @return {Number} The total size.
- */ 
+ */
 dwv.image.Size.prototype.getTotalSize = function () {
     return this.getSliceSize() * this.getNumberOfSlices();
 };
@@ -10494,7 +10490,7 @@ dwv.image.Size.prototype.getTotalSize = function () {
  * @method equals
  * @param {Size} rhs The object to compare to.
  * @return {Boolean} True if both objects are equal.
- */ 
+ */
 dwv.image.Size.prototype.equals = function (rhs) {
     return rhs !== null &&
         this.getNumberOfColumns() === rhs.getNumberOfColumns() &&
@@ -10509,7 +10505,7 @@ dwv.image.Size.prototype.equals = function (rhs) {
  * @param {Number} j The row coordinate.
  * @param {Number} k The slice coordinate.
  * @return {Boolean} True if the given coordinates are within bounds.
- */ 
+ */
 dwv.image.Size.prototype.isInBounds = function ( i, j, k ) {
     if( i < 0 || i > this.getNumberOfColumns() - 1 ||
         j < 0 || j > this.getNumberOfRows() - 1 ||
@@ -10520,7 +10516,7 @@ dwv.image.Size.prototype.isInBounds = function ( i, j, k ) {
 };
 
 /**
- * 2D/3D Spacing class. 
+ * 2D/3D Spacing class.
  * @class Spacing
  * @namespace dwv.image
  * @constructor
@@ -10534,19 +10530,19 @@ dwv.image.Spacing = function ( columnSpacing, rowSpacing, sliceSpacing )
      * Get the column spacing.
      * @method getColumnSpacing
      * @return {Number} The column spacing.
-     */ 
+     */
     this.getColumnSpacing = function () { return columnSpacing; };
     /**
      * Get the row spacing.
      * @method getRowSpacing
      * @return {Number} The row spacing.
-     */ 
+     */
     this.getRowSpacing = function () { return rowSpacing; };
     /**
      * Get the slice spacing.
      * @method getSliceSpacing
      * @return {Number} The slice spacing.
-     */ 
+     */
     this.getSliceSpacing = function () { return (sliceSpacing || 1.0); };
 };
 
@@ -10555,7 +10551,7 @@ dwv.image.Spacing = function ( columnSpacing, rowSpacing, sliceSpacing )
  * @method equals
  * @param {Spacing} rhs The object to compare to.
  * @return {Boolean} True if both objects are equal.
- */ 
+ */
 dwv.image.Spacing.prototype.equals = function (rhs) {
     return rhs !== null &&
         this.getColumnSpacing() === rhs.getColumnSpacing() &&
@@ -10564,7 +10560,7 @@ dwv.image.Spacing.prototype.equals = function (rhs) {
 };
 
 /**
- * 2D/3D Geometry class. 
+ * 2D/3D Geometry class.
  * @class Geometry
  * @namespace dwv.image
  * @constructor
@@ -10579,32 +10575,32 @@ dwv.image.Geometry = function ( origin, size, spacing )
         origin = new dwv.math.Point3D(0,0,0);
     }
     var origins = [origin];
-    
+
     /**
      * Get the object first origin.
      * @method getOrigin
      * @return {Object} The object first origin.
-     */ 
+     */
     this.getOrigin = function () { return origin; };
     /**
      * Get the object origins.
      * @method getOrigins
      * @return {Array} The object origins.
-     */ 
+     */
     this.getOrigins = function () { return origins; };
     /**
      * Get the object size.
      * @method getSize
      * @return {Object} The object size.
-     */ 
+     */
     this.getSize = function () { return size; };
     /**
      * Get the object spacing.
      * @method getSpacing
      * @return {Object} The object spacing.
-     */ 
+     */
     this.getSpacing = function () { return spacing; };
-    
+
     /**
      * Get the slice position of a point in the current slice layout.
      * @method getSliceIndex
@@ -10614,7 +10610,7 @@ dwv.image.Geometry = function ( origin, size, spacing )
     {
         // cannot use this.worldToIndex(point).getK() since
         // we cannot guaranty consecutive slices...
-        
+
         // find the closest index
         var closestSliceIndex = 0;
         var minDiff = Math.abs( origins[0].getZ() - point.getZ() );
@@ -10622,7 +10618,7 @@ dwv.image.Geometry = function ( origin, size, spacing )
         for( var i = 0; i < origins.length; ++i )
         {
             diff = Math.abs( origins[i].getZ() - point.getZ() );
-            if( diff < minDiff ) 
+            if( diff < minDiff )
             {
                 minDiff = diff;
                 closestSliceIndex = i;
@@ -10632,7 +10628,7 @@ dwv.image.Geometry = function ( origin, size, spacing )
         var sliceIndex = ( diff > 0 ) ? closestSliceIndex : closestSliceIndex + 1;
         return sliceIndex;
     };
-    
+
     /**
      * Append an origin to the geometry.
      * @param {Object} origin The origin to append.
@@ -10656,7 +10652,7 @@ dwv.image.Geometry = function ( origin, size, spacing )
  * @method equals
  * @param {Geometry} rhs The object to compare to.
  * @return {Boolean} True if both objects are equal.
- */ 
+ */
 dwv.image.Geometry.prototype.equals = function (rhs) {
     return rhs !== null &&
         this.getOrigin() === rhs.getOrigin() &&
@@ -10725,12 +10721,12 @@ dwv.image.RescaleSlopeAndIntercept = function (slope, intercept)
     if(typeof(intercept) === 'undefined') {
         intercept = 0;
     }*/
-    
+
     /**
      * Get the slope of the RSI.
      * @method getSlope
      * @return {Number} The slope of the RSI.
-     */ 
+     */
     this.getSlope = function ()
     {
         return slope;
@@ -10739,7 +10735,7 @@ dwv.image.RescaleSlopeAndIntercept = function (slope, intercept)
      * Get the intercept of the RSI.
      * @method getIntercept
      * @return {Number} The intercept of the RSI.
-     */ 
+     */
     this.getIntercept = function ()
     {
         return intercept;
@@ -10748,30 +10744,30 @@ dwv.image.RescaleSlopeAndIntercept = function (slope, intercept)
      * Apply the RSI on an input value.
      * @method apply
      * @return {Number} The value to rescale.
-     */ 
+     */
     this.apply = function (value)
     {
         return value * slope + intercept;
     };
 };
 
-/** 
+/**
  * Check for RSI equality.
  * @method equals
  * @param {Object} rhs The other RSI to compare to.
  * @return {Boolean} True if both RSI are equal.
- */ 
+ */
 dwv.image.RescaleSlopeAndIntercept.prototype.equals = function (rhs) {
     return rhs !== null &&
         this.getSlope() === rhs.getSlope() &&
         this.getIntercept() === rhs.getIntercept();
 };
 
-/** 
+/**
  * Get a string representation of the RSI.
  * @method toString
  * @return {String} The RSI as a string.
- */ 
+ */
 dwv.image.RescaleSlopeAndIntercept.prototype.toString = function () {
     return (this.getSlope() + ", " + this.getIntercept());
 };
@@ -10779,7 +10775,7 @@ dwv.image.RescaleSlopeAndIntercept.prototype.toString = function () {
 /**
  * Image class.
  * Usable once created, optional are:
- * - rescale slope and intercept (default 1:0), 
+ * - rescale slope and intercept (default 1:0),
  * - photometric interpretation (default MONOCHROME2),
  * - planar configuration (default RGBRGB...).
  * @class Image
@@ -10828,7 +10824,7 @@ dwv.image.Image = function(geometry, buffer)
      * @type Object
      */
     var meta = {};
-    
+
     /**
      * Original buffer.
      * @property originalBuffer
@@ -10836,7 +10832,7 @@ dwv.image.Image = function(geometry, buffer)
      * @type Array
      */
     var originalBuffer = new Int16Array(buffer);
-    
+
     /**
      * Data range.
      * @property dataRange
@@ -10858,79 +10854,79 @@ dwv.image.Image = function(geometry, buffer)
      * @type Array
      */
     var histogram = null;
-     
+
     /**
      * Get the geometry of the image.
      * @method getGeometry
      * @return {Object} The size of the image.
-     */ 
+     */
     this.getGeometry = function() { return geometry; };
     /**
      * Get the data buffer of the image. TODO dangerous...
      * @method getBuffer
      * @return {Array} The data buffer of the image.
-     */ 
+     */
     this.getBuffer = function() { return buffer; };
-    
+
     /**
      * Get the rescale slope and intercept.
      * @method getRescaleSlopeAndIntercept
      * @return {Object} The rescale slope and intercept.
-     */ 
+     */
     this.getRescaleSlopeAndIntercept = function(k) { return rsis[k]; };
     /**
      * Set the rescale slope and intercept.
      * @method setRescaleSlopeAndIntercept
      * @param {Object} rsi The rescale slope and intercept.
-     */ 
-    this.setRescaleSlopeAndIntercept = function(inRsi, k) { 
+     */
+    this.setRescaleSlopeAndIntercept = function(inRsi, k) {
         if ( typeof k === 'undefined' ) {
             k = 0;
         }
-        rsis[k] = inRsi; 
+        rsis[k] = inRsi;
     };
     /**
      * Get the photometricInterpretation of the image.
      * @method getPhotometricInterpretation
      * @return {String} The photometricInterpretation of the image.
-     */ 
+     */
     this.getPhotometricInterpretation = function() { return photometricInterpretation; };
     /**
      * Set the photometricInterpretation of the image.
      * @method setPhotometricInterpretation
      * @pqrqm {String} interp The photometricInterpretation of the image.
-     */ 
+     */
     this.setPhotometricInterpretation = function(interp) { photometricInterpretation = interp; };
     /**
      * Get the planarConfiguration of the image.
      * @method getPlanarConfiguration
      * @return {Number} The planarConfiguration of the image.
-     */ 
+     */
     this.getPlanarConfiguration = function() { return planarConfiguration; };
     /**
      * Set the planarConfiguration of the image.
      * @method setPlanarConfiguration
      * @param {Number} config The planarConfiguration of the image.
-     */ 
+     */
     this.setPlanarConfiguration = function(config) { planarConfiguration = config; };
     /**
      * Get the numberOfComponents of the image.
      * @method getNumberOfComponents
      * @return {Number} The numberOfComponents of the image.
-     */ 
+     */
     this.getNumberOfComponents = function() { return numberOfComponents; };
 
     /**
      * Get the meta information of the image.
      * @method getMeta
      * @return {Object} The meta information of the image.
-     */ 
+     */
     this.getMeta = function() { return meta; };
     /**
      * Set the meta information of the image.
      * @method setMeta
      * @param {Object} rhs The meta information of the image.
-     */ 
+     */
     this.setMeta = function(rhs) { meta = rhs; };
 
     /**
@@ -10938,16 +10934,16 @@ dwv.image.Image = function(geometry, buffer)
      * @method getValueAtOffset
      * @param {Number} offset The desired offset.
      * @return {Number} The value at offset.
-     */ 
+     */
     this.getValueAtOffset = function(offset) {
         return buffer[offset];
     };
-    
+
     /**
      * Clone the image.
      * @method clone
      * @return {Image} A clone of this image.
-     */ 
+     */
     this.clone = function()
     {
         var copy = new dwv.image.Image(this.getGeometry(), originalBuffer);
@@ -10960,12 +10956,12 @@ dwv.image.Image = function(geometry, buffer)
         copy.setMeta(this.getMeta());
         return copy;
     };
-    
+
     /**
      * Append a slice to the image.
      * @method appendSlice
      * @param {Image} The slice to append.
-     */ 
+     */
     this.appendSlice = function(rhs)
     {
         // check input
@@ -10992,17 +10988,17 @@ dwv.image.Image = function(geometry, buffer)
                 throw new Error("Cannot append a slice with different "+key);
             }
         }
-        
+
         // calculate slice size
         var mul = 1;
         if( photometricInterpretation === "RGB" ) {
             mul = 3;
         }
         var sliceSize = mul * size.getSliceSize();
-        
+
         // create the new buffer
         var newBuffer = new Int16Array(sliceSize * (size.getNumberOfSlices() + 1) );
-        
+
         // append slice at new position
         var newSliceNb = geometry.getSliceIndex( rhs.getGeometry().getOrigin() );
         if( newSliceNb === 0 )
@@ -11022,23 +11018,23 @@ dwv.image.Image = function(geometry, buffer)
             newBuffer.set(rhs.getBuffer(), offset);
             newBuffer.set(buffer.subarray(offset), offset + sliceSize);
         }
-        
+
         // update geometry
         geometry.appendOrigin( rhs.getGeometry().getOrigin(), newSliceNb );
         // update rsi
         rsis.splice(newSliceNb, 0, rhs.getRescaleSlopeAndIntercept(0));
-        
+
         // copy to class variables
         buffer = newBuffer;
         originalBuffer = new Int16Array(newBuffer);
     };
-    
+
     /**
      * Get the data range.
      * @method getDataRange
      * @return {Object} The data range.
-     */ 
-    this.getDataRange = function() { 
+     */
+    this.getDataRange = function() {
         if( !dataRange ) {
             dataRange = this.calculateDataRange();
         }
@@ -11049,8 +11045,8 @@ dwv.image.Image = function(geometry, buffer)
      * Get the rescaled data range.
      * @method getRescaledDataRange
      * @return {Object} The rescaled data range.
-     */ 
-    this.getRescaledDataRange = function() { 
+     */
+    this.getRescaledDataRange = function() {
         if( !rescaledDataRange ) {
             rescaledDataRange = this.calculateRescaledDataRange();
         }
@@ -11061,8 +11057,8 @@ dwv.image.Image = function(geometry, buffer)
      * Get the histogram.
      * @method getHistogram
      * @return {Array} The histogram.
-     */ 
-    this.getHistogram = function() { 
+     */
+    this.getHistogram = function() {
         if( !histogram ) {
             var res = this.calculateHistogram();
             dataRange = res.dataRange;
@@ -11113,7 +11109,7 @@ dwv.image.Image.prototype.calculateDataRange = function ()
     var min = this.getValueAtOffset(0);
     var max = min;
     var value = 0;
-    for ( var i = 0; i < size; ++i ) {    
+    for ( var i = 0; i < size; ++i ) {
         value = this.getValueAtOffset(i);
         if( value > max ) { max = value; }
         if( value < min ) { min = value; }
@@ -11133,9 +11129,9 @@ dwv.image.Image.prototype.calculateRescaledDataRange = function ()
     var rmin = this.getRescaledValue(0,0,0);
     var rmax = rmin;
     var rvalue = 0;
-    for ( var k = 0; k < size.getNumberOfSlices(); ++k ) {    
-        for ( var j = 0; j < size.getNumberOfRows(); ++j ) {    
-            for ( var i = 0; i < size.getNumberOfColumns(); ++i ) {    
+    for ( var k = 0; k < size.getNumberOfSlices(); ++k ) {
+        for ( var j = 0; j < size.getNumberOfRows(); ++j ) {
+            for ( var i = 0; i < size.getNumberOfColumns(); ++i ) {
                 rvalue = this.getRescaledValue(i,j,k);
                 if( rvalue > rmax ) { rmax = rvalue; }
                 if( rvalue < rmin ) { rmin = rvalue; }
@@ -11161,9 +11157,9 @@ dwv.image.Image.prototype.calculateHistogram = function ()
     var rmin = this.getRescaledValue(0,0,0);
     var rmax = rmin;
     var rvalue = 0;
-    for ( var k = 0; k < size.getNumberOfSlices(); ++k ) {    
-        for ( var j = 0; j < size.getNumberOfRows(); ++j ) {    
-            for ( var i = 0; i < size.getNumberOfColumns(); ++i ) {    
+    for ( var k = 0; k < size.getNumberOfSlices(); ++k ) {
+        for ( var j = 0; j < size.getNumberOfRows(); ++j ) {
+            for ( var i = 0; i < size.getNumberOfColumns(); ++i ) {
                 value = this.getValue(i,j,k);
                 if( value > max ) { max = value; }
                 if( value < min ) { min = value; }
@@ -11179,7 +11175,7 @@ dwv.image.Image.prototype.calculateHistogram = function ()
     var rescaledDataRange = { "min": rmin, "max": rmax };
     // generate data for plotting
     var histogram = [];
-    for ( var b = rmin; b <= rmax; ++b ) {    
+    for ( var b = rmin; b <= rmax; ++b ) {
         histogram.push([b, ( histo[b] || 0 ) ]);
     }
     // return
@@ -11208,7 +11204,7 @@ dwv.image.Image.prototype.convolute2D = function(weights)
     var nrows = imgSize.getNumberOfRows();
     var nslices = imgSize.getNumberOfSlices();
     var ncomp = this.getNumberOfComponents();
-    
+
     // adapt to number of component and planar configuration
     var factor = 1;
     var componentOffset = 1;
@@ -11223,7 +11219,7 @@ dwv.image.Image.prototype.convolute2D = function(weights)
             componentOffset = imgSize.getTotalSize();
         }
     }
-    
+
     // allow special indent for matrices
     /*jshint indent:false */
 
@@ -11232,10 +11228,10 @@ dwv.image.Image.prototype.convolute2D = function(weights)
     wOff[0] = (-ncols-1) * factor; wOff[1] = (-ncols) * factor; wOff[2] = (-ncols+1) * factor;
     wOff[3] = -factor; wOff[4] = 0; wOff[5] = 1 * factor;
     wOff[6] = (ncols-1) * factor; wOff[7] = (ncols) * factor; wOff[8] = (ncols+1) * factor;
-    
+
     // border weight offset matrices
     // borders are extended (see http://en.wikipedia.org/wiki/Kernel_%28image_processing%29)
-    
+
     // i=0, j=0
     var wOff00 = [];
     wOff00[0] = wOff[4]; wOff00[1] = wOff[4]; wOff00[2] = wOff[5];
@@ -11251,7 +11247,7 @@ dwv.image.Image.prototype.convolute2D = function(weights)
     wOff0n[0] = wOff[1]; wOff0n[1] = wOff[1]; wOff0n[2] = wOff[2];
     wOff0n[3] = wOff[4]; wOff0n[4] = wOff[4]; wOff0n[5] = wOff[5];
     wOff0n[6] = wOff[4]; wOff0n[7] = wOff[4]; wOff0n[8] = wOff[5];
-    
+
     // i=*, j=0
     var wOffx0 = [];
     wOffx0[0] = wOff[3]; wOffx0[1] = wOff[4]; wOffx0[2] = wOff[5];
@@ -11263,7 +11259,7 @@ dwv.image.Image.prototype.convolute2D = function(weights)
     wOffxn[0] = wOff[0]; wOffxn[1] = wOff[1]; wOffxn[2] = wOff[2];
     wOffxn[3] = wOff[3]; wOffxn[4] = wOff[4]; wOffxn[5] = wOff[5];
     wOffxn[6] = wOff[3]; wOffxn[7] = wOff[4]; wOffxn[8] = wOff[5];
-    
+
     // i=ncols, j=0
     var wOffn0 = [];
     wOffn0[0] = wOff[3]; wOffn0[1] = wOff[4]; wOffn0[2] = wOff[4];
@@ -11279,7 +11275,7 @@ dwv.image.Image.prototype.convolute2D = function(weights)
     wOffnn[0] = wOff[0]; wOffnn[1] = wOff[1]; wOffnn[2] = wOff[1];
     wOffnn[3] = wOff[3]; wOffnn[4] = wOff[4]; wOffnn[5] = wOff[4];
     wOffnn[6] = wOff[3]; wOffnn[7] = wOff[4]; wOffnn[8] = wOff[4];
-    
+
     // restore indent for rest of method
     /*jshint indent:4 */
 
@@ -11320,7 +11316,7 @@ dwv.image.Image.prototype.convolute2D = function(weights)
                     else if( i !== 0 && i !== (ncols-1) && j === (nrows-1) ) {
                         wOffFinal = wOffxn;
                     }
-                        
+
                     // calculate the weighed sum of the source image pixels that
                     // fall under the convolution matrix
                     newValue = 0;
@@ -11350,7 +11346,7 @@ dwv.image.Image.prototype.transform = function(operator)
     var newImage = this.clone();
     var newBuffer = newImage.getBuffer();
     for( var i=0; i < newBuffer.length; ++i )
-    {   
+    {
         newBuffer[i] = operator( newImage.getValueAtOffset(i) );
     }
     return newImage;
@@ -11369,7 +11365,7 @@ dwv.image.Image.prototype.compose = function(rhs, operator)
     var newImage = this.clone();
     var newBuffer = newImage.getBuffer();
     for( var i=0; i < newBuffer.length; ++i )
-    {   
+    {
         // using the operator on the local buffer, i.e. the latest (not original) data
         newBuffer[i] = Math.floor( operator( this.getValueAtOffset(i), rhs.getValueAtOffset(i) ) );
     }
@@ -11385,7 +11381,7 @@ dwv.image.Image.prototype.compose = function(rhs, operator)
 dwv.image.Image.prototype.quantifyLine = function(line)
 {
     var spacing = this.getGeometry().getSpacing();
-    var length = line.getWorldLength( spacing.getColumnSpacing(), 
+    var length = line.getWorldLength( spacing.getColumnSpacing(),
             spacing.getRowSpacing() );
     return {"length": length};
 };
@@ -11399,7 +11395,7 @@ dwv.image.Image.prototype.quantifyLine = function(line)
 dwv.image.Image.prototype.quantifyRect = function(rect)
 {
     var spacing = this.getGeometry().getSpacing();
-    var surface = rect.getWorldSurface( spacing.getColumnSpacing(), 
+    var surface = rect.getWorldSurface( spacing.getColumnSpacing(),
             spacing.getRowSpacing());
     var subBuffer = [];
     var minJ = parseInt(rect.getBegin().getY(), 10);
@@ -11425,7 +11421,7 @@ dwv.image.Image.prototype.quantifyRect = function(rect)
 dwv.image.Image.prototype.quantifyEllipse = function(ellipse)
 {
     var spacing = this.getGeometry().getSpacing();
-    var surface = ellipse.getWorldSurface( spacing.getColumnSpacing(), 
+    var surface = ellipse.getWorldSurface( spacing.getColumnSpacing(),
             spacing.getRowSpacing());
     return {"surface": surface};
 };
@@ -11459,7 +11455,7 @@ dwv.image.ImageFactory.prototype.create = function (dicomElements, pixelBuffer)
     }
     // image size
     var size = new dwv.image.Size( columns, rows );
-    
+
     // spacing
     var rowSpacing = 1;
     var columnSpacing = 1;
@@ -11482,7 +11478,7 @@ dwv.image.ImageFactory.prototype.create = function (dicomElements, pixelBuffer)
     var transferSyntaxUID = dicomElements.getFromKey("x00020010");
     var syntax = dwv.dicom.cleanString( transferSyntaxUID );
     var jpeg2000 = dwv.dicom.isJpeg2000TransferSyntax( syntax );
-    
+
     // buffer data
     var buffer = pixelBuffer;
     // PixelRepresentation
@@ -11497,7 +11493,7 @@ dwv.image.ImageFactory.prototype.create = function (dicomElements, pixelBuffer)
             }
         }
     }
-    
+
     // slice position
     var slicePosition = new Array(0,0,0);
     // ImagePositionPatient
@@ -11507,11 +11503,11 @@ dwv.image.ImageFactory.prototype.create = function (dicomElements, pixelBuffer)
             parseFloat( imagePositionPatient[1] ),
             parseFloat( imagePositionPatient[2] ) ];
     }
-    
+
     // geometry
     var origin = new dwv.math.Point3D(slicePosition[0], slicePosition[1], slicePosition[2]);
     var geometry = new dwv.image.Geometry( origin, size, spacing );
-    
+
     // image
     var image = new dwv.image.Image( geometry, buffer );
     // PhotometricInterpretation
@@ -11522,13 +11518,13 @@ dwv.image.ImageFactory.prototype.create = function (dicomElements, pixelBuffer)
             photo = "RGB";
         }
         image.setPhotometricInterpretation( photo );
-    }        
+    }
     // PlanarConfiguration
     var planarConfiguration = dicomElements.getFromKey("x00280006");
     if ( planarConfiguration ) {
         image.setPlanarConfiguration( planarConfiguration );
-    }  
-    
+    }
+
     // rescale slope and intercept
     var slope = 1;
     // RescaleSlope
@@ -11544,7 +11540,7 @@ dwv.image.ImageFactory.prototype.create = function (dicomElements, pixelBuffer)
     }
     var rsi = new dwv.image.RescaleSlopeAndIntercept(slope, intercept);
     image.setRescaleSlopeAndIntercept( rsi );
-    
+
     // meta information
     var meta = {};
     // Modality
@@ -11568,10 +11564,9 @@ dwv.image.ImageFactory.prototype.create = function (dicomElements, pixelBuffer)
         meta.BitsStored = parseInt(bitsStored, 10);
     }
     image.setMeta(meta);
-    
+
     return image;
 };
-
 ;/** 
  * Image module.
  * @module image
@@ -11596,19 +11591,19 @@ dwv.image.lut.Rescale = function (rsi)
      * @type Array
      */
     var rescaleLut = null;
-    
+
     /**
      * Get the Rescale Slope and Intercept (RSI).
      * @method getRSI
      * @return {Object} The rescale slope and intercept.
-     */ 
+     */
     this.getRSI = function () { return rsi; };
-    
+
     /**
      * Initialise the LUT.
      * @method initialise
      * @param {Number} bitsStored The number of bits used to store the data.
-     */ 
+     */
     this.initialise = function (bitsStored)
     {
         var size = Math.pow(2, bitsStored);
@@ -11617,19 +11612,19 @@ dwv.image.lut.Rescale = function (rsi)
             rescaleLut[i] = rsi.apply(i);
         }
     };
-    
+
     /**
      * Get the length of the LUT array.
      * @method getLength
      * @return {Number} The length of the LUT array.
-     */ 
+     */
     this.getLength = function () { return rescaleLut.length; };
-    
+
     /**
      * Get the value of the LUT at the given offset.
      * @method getValue
      * @return {Number} The value of the LUT at the given offset.
-     */ 
+     */
     this.getValue = function (offset) { return rescaleLut[offset]; };
 };
 
@@ -11651,7 +11646,7 @@ dwv.image.lut.Window = function (rescaleLut, isSigned)
      * @type Array
      */
     var windowLut = null;
-    
+
     // check Uint8ClampedArray support
     if ( !dwv.browser.hasClampedArray() ) {
         windowLut = new Uint8Array(rescaleLut.getLength());
@@ -11659,7 +11654,7 @@ dwv.image.lut.Window = function (rescaleLut, isSigned)
     else {
         windowLut = new Uint8ClampedArray(rescaleLut.getLength());
     }
-    
+
     /**
      * The window center.
      * @property center
@@ -11674,7 +11669,7 @@ dwv.image.lut.Window = function (rescaleLut, isSigned)
      * @type Number
      */
     var width = null;
-    
+
     /**
      * Flag to know if the lut needs update or not.
      * @property needsUpdate
@@ -11682,38 +11677,38 @@ dwv.image.lut.Window = function (rescaleLut, isSigned)
      * @type Boolean
      */
     var needsUpdate = false;
-    
+
     /**
      * Get the window center.
      * @method getCenter
      * @return {Number} The window center.
-     */ 
+     */
     this.getCenter = function() { return center; };
     /**
      * Get the window width.
      * @method getWidth
      * @return {Number} The window width.
-     */ 
+     */
     this.getWidth = function() { return width; };
     /**
      * Get the signed flag.
      * @method isSigned
      * @return {Boolean} The signed flag.
-     */ 
+     */
     this.isSigned = function() { return isSigned; };
     /**
      * Get the rescale lut.
      * @method getRescaleLut
      * @return {Object} The rescale lut.
-     */ 
+     */
     this.getRescaleLut = function() { return rescaleLut; };
-    
+
     /**
      * Set the window center and width.
      * @method setCenterAndWidth
      * @param {Number} inCenter The window center.
      * @param {Number} inWidth The window width.
-     */ 
+     */
     this.setCenterAndWidth = function (inCenter, inWidth)
     {
         // store the window values
@@ -11721,7 +11716,7 @@ dwv.image.lut.Window = function (rescaleLut, isSigned)
         width = inWidth;
         needsUpdate = true;
     };
-    
+
     /**
      * Update the lut if needed..
      * @method update
@@ -11774,19 +11769,19 @@ dwv.image.lut.Window = function (rescaleLut, isSigned)
         }
         needsUpdate = false;
     };
-    
+
     /**
      * Get the length of the LUT array.
      * @method getLength
      * @return {Number} The length of the LUT array.
-     */ 
+     */
     this.getLength = function() { return windowLut.length; };
 
     /**
      * Get the value of the LUT at the given offset.
      * @method getValue
      * @return {Number} The value of the LUT at the given offset.
-     */ 
+     */
     this.getValue = function(offset)
     {
         var shift = isSigned ? windowLut.length / 2 : 0;
@@ -11795,7 +11790,7 @@ dwv.image.lut.Window = function (rescaleLut, isSigned)
 };
 
 /**
-* Lookup tables for image colour display. 
+* Lookup tables for image colour display.
 */
 
 dwv.image.lut.range_max = 256;
@@ -11903,7 +11898,7 @@ dwv.image.lut.invPlain = {
     "blue":  dwv.image.lut.buildLut(dwv.image.lut.invId)
 };
 
-//rainbow 
+//rainbow
 dwv.image.lut.rainbow = {
     "blue":  [0, 4, 8, 12, 16, 20, 24, 28, 32, 36, 40, 44, 48, 52, 56, 60, 64, 68, 72, 76, 80, 84, 88, 92, 96, 100, 104, 108, 112, 116, 120, 124, 128, 132, 136, 140, 144, 148, 152, 156, 160, 164, 168, 172, 176, 180, 184, 188, 192, 196, 200, 204, 208, 212, 216, 220, 224, 228, 232, 236, 240, 244, 248, 252, 255, 247, 239, 231, 223, 215, 207, 199, 191, 183, 175, 167, 159, 151, 143, 135, 127, 119, 111, 103, 95, 87, 79, 71, 63, 55, 47, 39, 31, 23, 15, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     "green": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 16, 24, 32, 40, 48, 56, 64, 72, 80, 88, 96, 104, 112, 120, 128, 136, 144, 152, 160, 168, 176, 184, 192, 200, 208, 216, 224, 232, 240, 248, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 253, 251, 249, 247, 245, 243, 241, 239, 237, 235, 233, 231, 229, 227, 225, 223, 221, 219, 217, 215, 213, 211, 209, 207, 205, 203, 201, 199, 197, 195, 193, 192, 189, 186, 183, 180, 177, 174, 171, 168, 165, 162, 159, 156, 153, 150, 147, 144, 141, 138, 135, 132, 129, 126, 123, 120, 117, 114, 111, 108, 105, 102, 99, 96, 93, 90, 87, 84, 81, 78, 75, 72, 69, 66, 63, 60, 57, 54, 51, 48, 45, 42, 39, 36, 33, 30, 27, 24, 21, 18, 15, 12, 9, 6, 3],
@@ -11919,8 +11914,8 @@ dwv.image.lut.hot = {
 
 // hot iron
 dwv.image.lut.hot_iron = {
-    "red":   [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42, 44, 46, 48, 50, 52, 54, 56, 58, 60, 62, 64, 66, 68, 70, 72, 74, 76, 78, 80, 82, 84, 86, 88, 90, 92, 94, 96, 98, 100, 102, 104, 106, 108, 110, 112, 114, 116, 118, 120, 122, 124, 126, 128, 130, 132, 134, 136, 138, 140, 142, 144, 146, 148, 150, 152, 154, 156, 158, 160, 162, 164, 166, 168, 170, 172, 174, 176, 178, 180, 182, 184, 186, 188, 190, 192, 194, 196, 198, 200, 202, 204, 206, 208, 210, 212, 214, 216, 218, 220, 222, 224, 226, 228, 230, 232, 234, 236, 238, 240, 242, 244, 246, 248, 250, 252, 254, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255], 
-    "green": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42, 44, 46, 48, 50, 52, 54, 56, 58, 60, 62, 64, 66, 68, 70, 72, 74, 76, 78, 80, 82, 84, 86, 88, 90, 92, 94, 96, 98, 100, 102, 104, 106, 108, 110, 112, 114, 116, 118, 120, 122, 124, 126, 128, 130, 132, 134, 136, 138, 140, 142, 144, 146, 148, 150, 152, 154, 156, 158, 160, 162, 164, 166, 168, 170, 172, 174, 176, 178, 180, 182, 184, 186, 188, 190, 192, 194, 196, 198, 200, 202, 204, 206, 208, 210, 212, 214, 216, 218, 220, 222, 224, 226, 228, 230, 232, 234, 236, 238, 240, 242, 244, 246, 248, 250, 252, 255], 
+    "red":   [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42, 44, 46, 48, 50, 52, 54, 56, 58, 60, 62, 64, 66, 68, 70, 72, 74, 76, 78, 80, 82, 84, 86, 88, 90, 92, 94, 96, 98, 100, 102, 104, 106, 108, 110, 112, 114, 116, 118, 120, 122, 124, 126, 128, 130, 132, 134, 136, 138, 140, 142, 144, 146, 148, 150, 152, 154, 156, 158, 160, 162, 164, 166, 168, 170, 172, 174, 176, 178, 180, 182, 184, 186, 188, 190, 192, 194, 196, 198, 200, 202, 204, 206, 208, 210, 212, 214, 216, 218, 220, 222, 224, 226, 228, 230, 232, 234, 236, 238, 240, 242, 244, 246, 248, 250, 252, 254, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255],
+    "green": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42, 44, 46, 48, 50, 52, 54, 56, 58, 60, 62, 64, 66, 68, 70, 72, 74, 76, 78, 80, 82, 84, 86, 88, 90, 92, 94, 96, 98, 100, 102, 104, 106, 108, 110, 112, 114, 116, 118, 120, 122, 124, 126, 128, 130, 132, 134, 136, 138, 140, 142, 144, 146, 148, 150, 152, 154, 156, 158, 160, 162, 164, 166, 168, 170, 172, 174, 176, 178, 180, 182, 184, 186, 188, 190, 192, 194, 196, 198, 200, 202, 204, 206, 208, 210, 212, 214, 216, 218, 220, 222, 224, 226, 228, 230, 232, 234, 236, 238, 240, 242, 244, 246, 248, 250, 252, 255],
     "blue":  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 8, 12, 16, 20, 24, 28, 32, 36, 40, 44, 48, 52, 56, 60, 64, 68, 72, 76, 80, 84, 88, 92, 96, 100, 104, 108, 112, 116, 120, 124, 128, 132, 136, 140, 144, 148, 152, 156, 160, 164, 168, 172, 176, 180, 184, 188, 192, 196, 200, 204, 208, 212, 216, 220, 224, 228, 232, 236, 240, 244, 248, 252, 255]
 };
 
@@ -12047,7 +12042,6 @@ dwv.image.getDataFromDicomBuffer = function(buffer)
     // return
     return {"view": view, "info": dicomParser.getDicomElements().dumpToTable()};
 };
-
 ;/** 
  * Image module.
  * @module image
@@ -12063,7 +12057,7 @@ dwv.image = dwv.image || {};
  * @param {Image} image The associated image.
  * @param {Boolean} isSigned Is the data signed.
  * Need to set the window lookup table once created
- * (either directly or with helper methods). 
+ * (either directly or with helper methods).
  */
 dwv.image.View = function(image, isSigned)
 {
@@ -12074,7 +12068,7 @@ dwv.image.View = function(image, isSigned)
      * @type Window
      */
     var windowLuts = {};
-    
+
     /**
      * Window presets.
      * @property windowPresets
@@ -12096,26 +12090,26 @@ dwv.image.View = function(image, isSigned)
      * @type Object
      */
     var currentPosition = {"i":0,"j":0,"k":0};
-    
+
     /**
      * Get the associated image.
      * @method getImage
      * @return {Image} The associated image.
-     */ 
+     */
     this.getImage = function() { return image; };
     /**
      * Set the associated image.
      * @method setImage
      * @param {Image} inImage The associated image.
-     */ 
+     */
     this.setImage = function(inImage) { image = inImage; };
-    
+
     /**
      * Get the window LUT of the image.
      * @method getWindowLut
      * @return {Window} The window LUT of the image.
-     */ 
-    this.getWindowLut = function (rsi) { 
+     */
+    this.getWindowLut = function (rsi) {
         if ( typeof rsi === "undefined" ) {
             var sliceNumber = this.getCurrentPosition().k;
             rsi = image.getRescaleSlopeAndIntercept(sliceNumber);
@@ -12126,20 +12120,20 @@ dwv.image.View = function(image, isSigned)
      * Set the window LUT of the image.
      * @method setWindowLut
      * @param {Window} wlut The window LUT of the image.
-     */ 
-    this.setWindowLut = function (wlut) 
+     */
+    this.setWindowLut = function (wlut)
     {
         var rsi = wlut.getRescaleLut().getRSI();
         windowLuts[rsi.toString()] = wlut;
     };
-    
+
     var self = this;
-    
+
     /**
      * Initialise the view. Only called at construction.
      * @method initialise
      * @private
-     */ 
+     */
     function initialise()
     {
         // create the rescale lookup table
@@ -12151,7 +12145,7 @@ dwv.image.View = function(image, isSigned)
         var windowLut = new dwv.image.lut.Window(rescaleLut, isSigned);
         self.setWindowLut(windowLut);
     }
-    
+
     // default constructor
     initialise();
 
@@ -12159,53 +12153,53 @@ dwv.image.View = function(image, isSigned)
      * Get the window presets.
      * @method getWindowPresets
      * @return {Object} The window presets.
-     */ 
+     */
     this.getWindowPresets = function() { return windowPresets; };
     /**
      * Set the window presets.
      * @method setWindowPresets
      * @param {Object} presets The window presets.
-     */ 
-    this.setWindowPresets = function(presets) { 
+     */
+    this.setWindowPresets = function(presets) {
         windowPresets = presets;
         this.setWindowLevel(presets[0].center, presets[0].width);
     };
-    
+
     /**
      * Get the colour map of the image.
      * @method getColourMap
      * @return {Object} The colour map of the image.
-     */ 
+     */
     this.getColourMap = function() { return colourMap; };
     /**
      * Set the colour map of the image.
      * @method setColourMap
      * @param {Object} map The colour map of the image.
-     */ 
-    this.setColourMap = function(map) { 
+     */
+    this.setColourMap = function(map) {
         colourMap = map;
         // TODO Better handle this...
         if( this.getImage().getPhotometricInterpretation() === "MONOCHROME1") {
             colourMap = dwv.image.lut.invPlain;
         }
-        this.fireEvent({"type": "colour-change", 
+        this.fireEvent({"type": "colour-change",
            "wc": this.getWindowLut().getCenter(),
            "ww": this.getWindowLut().getWidth() });
     };
-    
+
     /**
      * Is the data signed data.
      * @method isSigned
      * @return {Boolean} The signed data flag.
-     */ 
+     */
     this.isSigned = function() { return isSigned; };
-    
+
     /**
      * Get the current position.
      * @method getCurrentPosition
      * @return {Object} The current position.
-     */ 
-    this.getCurrentPosition = function() { 
+     */
+    this.getCurrentPosition = function() {
         // return a clone to avoid reference problems
         return {"i": currentPosition.i, "j": currentPosition.j, "k": currentPosition.k};
     };
@@ -12213,8 +12207,8 @@ dwv.image.View = function(image, isSigned)
      * Set the current position. Returns false if not in bounds.
      * @method setCurrentPosition
      * @param {Object} pos The current position.
-     */ 
-    this.setCurrentPosition = function(pos) { 
+     */
+    this.setCurrentPosition = function(pos) {
         if( !image.getGeometry().getSize().isInBounds(pos.i,pos.j,pos.k) ) {
             return false;
         }
@@ -12223,13 +12217,13 @@ dwv.image.View = function(image, isSigned)
         // only display value for monochrome data
         if( image.getPhotometricInterpretation().match(/MONOCHROME/) !== null )
         {
-            this.fireEvent({"type": "position-change", 
+            this.fireEvent({"type": "position-change",
                 "i": pos.i, "j": pos.j, "k": pos.k,
                 "value": image.getRescaledValue(pos.i,pos.j,pos.k)});
         }
         else
         {
-            this.fireEvent({"type": "position-change", 
+            this.fireEvent({"type": "position-change",
                 "i": pos.i, "j": pos.j, "k": pos.k});
         }
         // slice change event (used to trigger redraw)
@@ -12238,20 +12232,20 @@ dwv.image.View = function(image, isSigned)
         }
         return true;
     };
-    
+
     /**
      * Append another view to this one.
      * @method append
      * @param {Object} rhs The view to append.
      */
     this.append = function( rhs )
-    {  
+    {
        // append images
        this.getImage().appendSlice( rhs.getImage() );
        // init to update self
        this.setWindowLut(rhs.getWindowLut());
     };
-    
+
     /**
      * Set the view window/level.
      * @method setWindowLevel
@@ -12296,13 +12290,13 @@ dwv.image.View = function(image, isSigned)
      * Get the view listeners.
      * @method getListeners
      * @return {Object} The view listeners.
-     */ 
+     */
     this.getListeners = function() { return listeners; };
     /**
      * Set the view listeners.
      * @method setListeners
      * @param {Object} list The view listeners.
-     */ 
+     */
     this.setListeners = function(list) { listeners = list; };
 };
 
@@ -12330,7 +12324,7 @@ dwv.image.View.prototype.setWindowLevelMinMax = function()
  * @param {Number} sliceNumber The slice position.
  */
 dwv.image.View.prototype.generateImageData = function( array )
-{        
+{
     var sliceNumber = this.getCurrentPosition().k;
     var image = this.getImage();
     var pxValue = 0;
@@ -12349,8 +12343,8 @@ dwv.image.View.prototype.generateImageData = function( array )
         sliceOffset = (sliceNumber || 0) * sliceSize;
         var iMax = sliceOffset + sliceSize;
         for(var i=sliceOffset; i < iMax; ++i)
-        {        
-            pxValue = parseInt( windowLut.getValue( 
+        {
+            pxValue = parseInt( windowLut.getValue(
                     image.getValueAtOffset(i) ), 10 );
             array.data[index] = colourMap.red[pxValue];
             array.data[index+1] = colourMap.green[pxValue];
@@ -12359,7 +12353,7 @@ dwv.image.View.prototype.generateImageData = function( array )
             index += 4;
         }
         break;
-    
+
     case "RGB":
         // the planar configuration defines the memory layout
         if( planarConfig !== 0 && planarConfig !== 1 ) {
@@ -12372,38 +12366,38 @@ dwv.image.View.prototype.generateImageData = function( array )
         var posB = sliceOffset + 2;
         var stepPos = 3;
         // RRRR...GGGG...BBBB...
-        if (planarConfig === 1) { 
+        if (planarConfig === 1) {
             posR = sliceOffset;
             posG = sliceOffset + sliceSize;
             posB = sliceOffset + 2 * sliceSize;
             stepPos = 1;
         }
-        
+
         var redValue = 0;
         var greenValue = 0;
         var blueValue = 0;
         for(var j=0; j < sliceSize; ++j)
-        {        
-            redValue = parseInt( windowLut.getValue( 
+        {
+            redValue = parseInt( windowLut.getValue(
                     image.getValueAtOffset(posR) ), 10 );
-            greenValue = parseInt( windowLut.getValue( 
+            greenValue = parseInt( windowLut.getValue(
                     image.getValueAtOffset(posG) ), 10 );
-            blueValue = parseInt( windowLut.getValue( 
+            blueValue = parseInt( windowLut.getValue(
                     image.getValueAtOffset(posB) ), 10 );
-            
+
             array.data[index] = redValue;
             array.data[index+1] = greenValue;
             array.data[index+2] = blueValue;
             array.data[index+3] = 0xff;
             index += 4;
-            
+
             posR += stepPos;
             posG += stepPos;
             posB += stepPos;
         }
         break;
-    
-    default: 
+
+    default:
         throw new Error("Unsupported photometric interpretation: "+photoInterpretation);
     }
 };
@@ -12436,7 +12430,7 @@ dwv.image.View.prototype.removeEventListener = function(type, listener)
         return;
     }
     for(var i=0; i < listeners[type].length; ++i)
-    {   
+    {
         if( listeners[type][i] === listener ) {
             listeners[type].splice(i,1);
         }
@@ -12455,7 +12449,7 @@ dwv.image.View.prototype.fireEvent = function(event)
         return;
     }
     for(var i=0; i < listeners[event.type].length; ++i)
-    {   
+    {
         listeners[event.type][i](event);
     }
 };
@@ -12480,7 +12474,7 @@ dwv.image.ViewFactory.prototype.create = function (dicomElements, pixelBuffer)
     // create the image
     var imageFactory = new dwv.image.ImageFactory();
     var image = imageFactory.create(dicomElements, pixelBuffer);
-    
+
     // PixelRepresentation
     var isSigned = false;
     var pixelRepresentation = dicomElements.getFromKey("x00280103");
@@ -12507,7 +12501,7 @@ dwv.image.ViewFactory.prototype.create = function (dicomElements, pixelBuffer)
                 }
                 windowPresets.push({
                     "center": center,
-                    "width": width, 
+                    "width": width,
                     "name": name
                 });
             }
@@ -12521,7 +12515,8 @@ dwv.image.ViewFactory.prototype.create = function (dicomElements, pixelBuffer)
     }
 
     return view;
-};;/** 
+};
+;/** 
  * I/O module.
  * @module io
  */
@@ -12563,36 +12558,36 @@ dwv.io.File = function ()
      * @type Array
      */
     var progressList = [];
-    
+
     /**
      * Set the number of data to load.
      * @method setNToLoad
-     */ 
-    this.setNToLoad = function (n) { 
+     */
+    this.setNToLoad = function (n) {
         nToLoad = n;
         for ( var i = 0; i < nToLoad; ++i ) {
             progressList[i] = 0;
         }
     };
-    
+
     /**
      * Increment the number of loaded data
      * and call onloadend if loaded all data.
      * @method addLoaded
-     */ 
+     */
     this.addLoaded = function () {
         nLoaded++;
         if ( nLoaded === nToLoad ) {
             this.onloadend();
         }
     };
-    
+
     /**
      * Get the global load percent including the provided one.
      * @method getGlobalPercent
      * @param {Number} n The number of the loaded data.
      * @param {Number} percent The percentage of data 'n' that has been loaded.
-     * @return {Number} The accumulated percentage. 
+     * @return {Number} The accumulated percentage.
      */
     this.getGlobalPercent = function (n, percent) {
         progressList[n] = percent/nToLoad;
@@ -12607,10 +12602,10 @@ dwv.io.File = function ()
 /**
  * Handle a load event.
  * @method onload
- * @param {Object} event The load event, event.target 
+ * @param {Object} event The load event, event.target
  *  should be the loaded data.
  */
-dwv.io.File.prototype.onload = function (/*event*/) 
+dwv.io.File.prototype.onload = function (/*event*/)
 {
     // default does nothing.
 };
@@ -12618,7 +12613,7 @@ dwv.io.File.prototype.onload = function (/*event*/)
  * Handle a load end event.
  * @method onloadend
  */
-dwv.io.File.prototype.onloadend = function () 
+dwv.io.File.prototype.onloadend = function ()
 {
     // default does nothing.
 };
@@ -12626,7 +12621,7 @@ dwv.io.File.prototype.onloadend = function ()
  * Handle a progress event.
  * @method onprogress
  */
-dwv.io.File.prototype.onprogress = function () 
+dwv.io.File.prototype.onprogress = function ()
 {
     // default does nothing.
 };
@@ -12636,7 +12631,7 @@ dwv.io.File.prototype.onprogress = function ()
  * @param {Object} event The error event, event.message
  *  should be the error message.
  */
-dwv.io.File.prototype.onerror = function (/*event*/) 
+dwv.io.File.prototype.onerror = function (/*event*/)
 {
     // default does nothing.
 };
@@ -12650,8 +12645,8 @@ dwv.io.File.prototype.onerror = function (/*event*/)
  */
 dwv.io.File.createErrorHandler = function (file, text, baseHandler) {
     return function (event) {
-        baseHandler( {'name': "RequestError", 
-            'message': "An error occurred while reading the " + text + " file: " + file + 
+        baseHandler( {'name': "RequestError",
+            'message': "An error occurred while reading the " + text + " file: " + file +
             " ("+event.getMessage() + ")" } );
     };
 };
@@ -12668,7 +12663,7 @@ dwv.io.File.createProgressHandler = function (n, calculator, baseHandler) {
         if( event.lengthComputable )
         {
             var percent = Math.round((event.loaded / event.total) * 100);
-            var ev = {type: "load-progress", lengthComputable: true, 
+            var ev = {type: "load-progress", lengthComputable: true,
                 loaded: calculator(n, percent), total: 100};
             baseHandler(ev);
         }
@@ -12680,7 +12675,7 @@ dwv.io.File.createProgressHandler = function (n, calculator, baseHandler) {
  * @method load
  * @param {Array} ioArray The list of files to load.
  */
-dwv.io.File.prototype.load = function (ioArray) 
+dwv.io.File.prototype.load = function (ioArray)
 {
     // closure to self for handlers
     var self = this;
@@ -12693,7 +12688,7 @@ dwv.io.File.prototype.load = function (ioArray)
         self.onload(data);
         self.addLoaded();
     };
-    
+
     // DICOM reader loader
     var onLoadDicomReader = function (event)
     {
@@ -12741,7 +12736,7 @@ dwv.io.File.prototype.load = function (ioArray)
     {
         var file = ioArray[i];
         var reader = new FileReader();
-        reader.onprogress = dwv.io.File.createProgressHandler(i, 
+        reader.onprogress = dwv.io.File.createProgressHandler(i,
                 self.getGlobalPercent, self.onprogress);
         if ( file.name.split('.').pop().toLowerCase() === "json" )
         {
@@ -12809,36 +12804,36 @@ dwv.io.Url = function ()
      * @type Array
      */
     var progressList = [];
-    
+
     /**
      * Set the number of data to load.
      * @method setNToLoad
-     */ 
+     */
     this.setNToLoad = function (n) {
         nToLoad = n;
         for ( var i = 0; i < nToLoad; ++i ) {
             progressList[i] = 0;
         }
     };
-    
+
     /**
      * Increment the number of loaded data
      * and call onloadend if loaded all data.
      * @method addLoaded
-     */ 
+     */
     this.addLoaded = function () {
         nLoaded++;
         if ( nLoaded === nToLoad ) {
             this.onloadend();
         }
     };
-    
+
     /**
      * Get the global load percent including the provided one.
      * @method getGlobalPercent
      * @param {Number} n The number of the loaded data.
      * @param {Number} percent The percentage of data 'n' that has been loaded.
-     * @return {Number} The accumulated percentage. 
+     * @return {Number} The accumulated percentage.
      */
     this.getGlobalPercent = function (n, percent) {
         progressList[n] = percent/nToLoad;
@@ -12853,10 +12848,10 @@ dwv.io.Url = function ()
 /**
  * Handle a load event.
  * @method onload
- * @param {Object} event The load event, event.target 
+ * @param {Object} event The load event, event.target
  *  should be the loaded data.
  */
-dwv.io.Url.prototype.onload = function (/*event*/) 
+dwv.io.Url.prototype.onload = function (/*event*/)
 {
     // default does nothing.
 };
@@ -12864,7 +12859,7 @@ dwv.io.Url.prototype.onload = function (/*event*/)
  * Handle a load end event.
  * @method onloadend
  */
-dwv.io.Url.prototype.onloadend = function () 
+dwv.io.Url.prototype.onloadend = function ()
 {
     // default does nothing.
 };
@@ -12872,17 +12867,17 @@ dwv.io.Url.prototype.onloadend = function ()
  * Handle a progress event.
  * @method onprogress
  */
-dwv.io.File.prototype.onprogress = function () 
+dwv.io.File.prototype.onprogress = function ()
 {
     // default does nothing.
 };
 /**
  * Handle an error event.
  * @method onerror
- * @param {Object} event The error event, event.message 
+ * @param {Object} event The error event, event.message
  *  should be the error message.
  */
-dwv.io.Url.prototype.onerror = function (/*event*/) 
+dwv.io.Url.prototype.onerror = function (/*event*/)
 {
     // default does nothing.
 };
@@ -12896,8 +12891,8 @@ dwv.io.Url.prototype.onerror = function (/*event*/)
  */
 dwv.io.Url.createErrorHandler = function (url, text, baseHandler) {
     return function (/*event*/) {
-        baseHandler( {'name': "RequestError", 
-            'message': "An error occurred while retrieving the " + text + " file (via http): " + url + 
+        baseHandler( {'name': "RequestError",
+            'message': "An error occurred while retrieving the " + text + " file (via http): " + url +
             " (status: "+this.status + ")" } );
     };
 };
@@ -12914,7 +12909,7 @@ dwv.io.Url.createProgressHandler = function (n, calculator, baseHandler) {
         if( event.lengthComputable )
         {
             var percent = Math.round((event.loaded / event.total) * 100);
-            var ev = {type: "load-progress", lengthComputable: true, 
+            var ev = {type: "load-progress", lengthComputable: true,
                     loaded: calculator(n, percent), total: 100};
             baseHandler(ev);
         }
@@ -12926,7 +12921,7 @@ dwv.io.Url.createProgressHandler = function (n, calculator, baseHandler) {
  * @method load
  * @param {Array} ioArray The list of urls to load.
  */
-dwv.io.Url.prototype.load = function (ioArray) 
+dwv.io.Url.prototype.load = function (ioArray)
 {
     // closure to self for handlers
     var self = this;
@@ -12969,7 +12964,7 @@ dwv.io.Url.prototype.load = function (ioArray)
             self.onerror(error);
         }
     };
-    
+
     // binary request
     var onLoadBinaryRequest = function (/*event*/)
     {
@@ -12978,7 +12973,7 @@ dwv.io.Url.prototype.load = function (ioArray)
         var isJpeg = view.getUint32(0) === 0xffd8ffe0;
         var isPng = view.getUint32(0) === 0x89504e47;
         var isGif = view.getUint32(0) === 0x47494638;
-        
+
         // check possible extension
         // (responseURL is supported on major browsers but not IE...)
         if ( !isJpeg && !isPng && !isGif && this.responseURL )
@@ -12988,7 +12983,7 @@ dwv.io.Url.prototype.load = function (ioArray)
             isPng = (ext === "png");
             isGif = (ext === "gif");
         }
-        
+
         // non DICOM
         if( isJpeg || isPng || isGif )
         {
@@ -13030,7 +13025,7 @@ dwv.io.Url.prototype.load = function (ioArray)
         var request = new XMLHttpRequest();
         request.open('GET', url, true);
         if ( !isText ) {
-            request.responseType = "arraybuffer"; 
+            request.responseType = "arraybuffer";
             request.onload = onLoadBinaryRequest;
             request.onerror = dwv.io.Url.createErrorHandler(url, "binary", self.onerror);
         }
@@ -13038,7 +13033,7 @@ dwv.io.Url.prototype.load = function (ioArray)
             request.onload = onLoadTextRequest;
             request.onerror = dwv.io.Url.createErrorHandler(url, "text", self.onerror);
         }
-        request.onprogress = dwv.io.File.createProgressHandler(i, 
+        request.onprogress = dwv.io.File.createProgressHandler(i,
             self.getGlobalPercent, self.onprogress);
         request.send(null);
     }
@@ -13050,7 +13045,7 @@ dwv.io.Url.prototype.load = function (ioArray)
 var dwv = dwv || {};
 dwv.math = dwv.math || {};
 
-/** 
+/**
  * Circular Bucket Queue.
  *
  * Returns input'd points in sorted order. All operations run in roughly O(1)
@@ -13058,7 +13053,7 @@ dwv.math = dwv.math || {};
  *
  * If the most recent point had a cost of c, any points added should have a cost
  * c' in the range c <= c' <= c + (capacity - 1).
- * 
+ *
  * @class BucketQueue
  * @namespace dwv.math
  * @constructor
@@ -13070,14 +13065,14 @@ dwv.math.BucketQueue = function(bits, cost_functor)
     this.bucketCount = 1 << bits; // # of buckets = 2^bits
     this.mask = this.bucketCount - 1; // 2^bits - 1 = index mask
     this.size = 0;
-    
+
     this.loc = 0; // Current index in bucket list
-    
+
     // Cost defaults to item value
     this.cost = (typeof(cost_functor) !== 'undefined') ? cost_functor : function(item) {
         return item;
     };
-    
+
     this.buckets = this.buildArray(this.bucketCount);
 };
 
@@ -13086,7 +13081,7 @@ dwv.math.BucketQueue.prototype.push = function(item) {
     var bucket = this.getBucket(item);
     item.next = this.buckets[bucket];
     this.buckets[bucket] = item;
-    
+
     this.size++;
 };
 
@@ -13094,17 +13089,17 @@ dwv.math.BucketQueue.prototype.pop = function() {
     if ( this.size === 0 ) {
         throw new Error("Cannot pop, bucketQueue is empty.");
     }
-    
+
     // Find first empty bucket
     while ( this.buckets[this.loc] === null ) {
         this.loc = (this.loc + 1) % this.bucketCount;
     }
-    
+
     // All items in bucket have same cost, return the first one
     var ret = this.buckets[this.loc];
     this.buckets[this.loc] = ret.next;
     ret.next = null;
-    
+
     this.size--;
     return ret;
 };
@@ -13114,23 +13109,23 @@ dwv.math.BucketQueue.prototype.remove = function(item) {
     if ( !item ) {
         return false;
     }
-    
+
     // To find node, go to bucket and search through unsorted list.
     var bucket = this.getBucket(item);
     var node = this.buckets[bucket];
-    
+
     while ( node !== null && !item.equals(node.next) ) {
         node = node.next;
     }
-    
+
     if ( node === null ) {
         // Item not in list, ergo item not in queue
         return false;
-    } 
+    }
     else {
         // Found item, do standard list node deletion
         node.next = node.next.next;
-        
+
         this.size--;
         return true;
     }
@@ -13148,11 +13143,11 @@ dwv.math.BucketQueue.prototype.getBucket = function(item) {
 dwv.math.BucketQueue.prototype.buildArray = function(newSize) {
     // Create array and initialze pointers to null
     var buckets = new Array(newSize);
-    
+
     for ( var i = 0; i < buckets.length; i++ ) {
         buckets[i] = null;
     }
-    
+
     return buckets;
 };
 ;/** 
@@ -13168,7 +13163,7 @@ var dwv = dwv || {};
  */
 dwv.math = dwv.math || {};
 
-/** 
+/**
  * Immutable 2D point.
  * @class Point2D
  * @namespace dwv.math
@@ -13178,42 +13173,42 @@ dwv.math = dwv.math || {};
  */
 dwv.math.Point2D = function (x,y)
 {
-    /** 
+    /**
      * Get the X position of the point.
      * @method getX
      * @return {Number} The X position of the point.
      */
     this.getX = function () { return x; };
-    /** 
+    /**
      * Get the Y position of the point.
      * @method getY
-     * @return {Number} The Y position of the point. 
+     * @return {Number} The Y position of the point.
      */
     this.getY = function () { return y; };
 }; // Point2D class
 
-/** 
+/**
  * Check for Point2D equality.
  * @method equals
  * @param {Point2D} rhs The other Point2D to compare to.
  * @return {Boolean} True if both points are equal.
- */ 
+ */
 dwv.math.Point2D.prototype.equals = function (rhs) {
     return rhs !== null &&
         this.getX() === rhs.getX() &&
         this.getY() === rhs.getY();
 };
 
-/** 
+/**
  * Get a string representation of the Point2D.
  * @method toString
  * @return {String} The Point2D as a string.
- */ 
+ */
 dwv.math.Point2D.prototype.toString = function () {
     return "(" + this.getX() + ", " + this.getY() + ")";
 };
 
-/** 
+/**
  * Mutable 2D point.
  * @class FastPoint2D
  * @namespace dwv.math
@@ -13227,28 +13222,28 @@ dwv.math.FastPoint2D = function (x,y)
     this.y = y;
 }; // FastPoint2D class
 
-/** 
+/**
  * Check for FastPoint2D equality.
  * @method equals
  * @param {FastPoint2D} other The other FastPoint2D to compare to.
  * @return {Boolean} True if both points are equal.
- */ 
+ */
 dwv.math.FastPoint2D.prototype.equals = function (rhs) {
     return rhs !== null &&
         this.x === rhs.x &&
         this.y === rhs.y;
 };
 
-/** 
+/**
  * Get a string representation of the FastPoint2D.
  * @method toString
  * @return {String} The Point2D as a string.
- */ 
+ */
 dwv.math.FastPoint2D.prototype.toString = function () {
     return "(" + this.x + ", " + this.y + ")";
 };
 
-/** 
+/**
  * Immutable 3D point.
  * @class Point3D
  * @namespace dwv.math
@@ -13259,32 +13254,32 @@ dwv.math.FastPoint2D.prototype.toString = function () {
  */
 dwv.math.Point3D = function (x,y,z)
 {
-    /** 
+    /**
      * Get the X position of the point.
      * @method getX
      * @return {Number} The X position of the point.
      */
     this.getX = function () { return x; };
-    /** 
+    /**
      * Get the Y position of the point.
      * @method getY
-     * @return {Number} The Y position of the point. 
+     * @return {Number} The Y position of the point.
      */
     this.getY = function () { return y; };
-    /** 
+    /**
      * Get the Z position of the point.
      * @method getZ
-     * @return {Number} The Z position of the point. 
+     * @return {Number} The Z position of the point.
      */
     this.getZ = function () { return z; };
 }; // Point3D class
 
-/** 
+/**
  * Check for Point3D equality.
  * @method equals
  * @param {Point3D} rhs The other Point3D to compare to.
  * @return {Boolean} True if both points are equal.
- */ 
+ */
 dwv.math.Point3D.prototype.equals = function (rhs) {
     return rhs !== null &&
         this.getX() === rhs.getX() &&
@@ -13292,18 +13287,18 @@ dwv.math.Point3D.prototype.equals = function (rhs) {
         this.getZ() === rhs.getZ();
 };
 
-/** 
+/**
  * Get a string representation of the Point3D.
  * @method toString
  * @return {String} The Point3D as a string.
- */ 
+ */
 dwv.math.Point3D.prototype.toString = function () {
-    return "(" + this.getX() + 
+    return "(" + this.getX() +
         ", " + this.getY() +
         ", " + this.getZ() + ")";
 };
 
-/** 
+/**
  * Immutable 3D index.
  * @class Index3D
  * @namespace dwv.math
@@ -13314,32 +13309,32 @@ dwv.math.Point3D.prototype.toString = function () {
  */
 dwv.math.Index3D = function (i,j,k)
 {
-    /** 
+    /**
      * Get the column index.
      * @method getI
      * @return {Number} The column index.
      */
     this.getI = function () { return i; };
-    /** 
+    /**
      * Get the row index.
      * @method getJ
-     * @return {Number} The row index. 
+     * @return {Number} The row index.
      */
     this.getJ = function () { return j; };
-    /** 
+    /**
      * Get the slice index.
      * @method getK
-     * @return {Number} The slice index. 
+     * @return {Number} The slice index.
      */
     this.getK = function () { return k; };
 }; // Index3D class
 
-/** 
+/**
  * Check for Index3D equality.
  * @method equals
  * @param {Index3D} rhs The other Index3D to compare to.
  * @return {Boolean} True if both points are equal.
- */ 
+ */
 dwv.math.Index3D.prototype.equals = function (rhs) {
     return rhs !== null &&
         this.getI() === rhs.getI() &&
@@ -13347,18 +13342,16 @@ dwv.math.Index3D.prototype.equals = function (rhs) {
         this.getK() === rhs.getK();
 };
 
-/** 
+/**
  * Get a string representation of the Index3D.
  * @method toString
  * @return {String} The Index3D as a string.
- */ 
+ */
 dwv.math.Index3D.prototype.toString = function () {
-    return "(" + this.getI() + 
+    return "(" + this.getI() +
         ", " + this.getJ() +
         ", " + this.getK() + ")";
 };
-
-
 ;/** 
  * Math module.
  * @module math
@@ -13370,7 +13363,7 @@ dwv.math = dwv.math || {};
 var __twothirdpi = ( 2 / (3 * Math.PI) );
 
 /**
- * 
+ *
  */
 dwv.math.computeGreyscale = function(data, width, height) {
     // Returns 2D augmented array containing greyscale data
@@ -13406,12 +13399,12 @@ dwv.math.computeGreyscale = function(data, width, height) {
     };
 
     greyscale.gradMagnitude = function(x,y) {
-        var dx = this.dx(x,y); 
+        var dx = this.dx(x,y);
         var dy = this.dy(x,y);
         return Math.sqrt(dx*dx + dy*dy);
     };
 
-    greyscale.laplace = function(x,y) { 
+    greyscale.laplace = function(x,y) {
         // Laplacian of Gaussian
         var lap = -16 * this[y][x];
         lap += this[y-2][x];
@@ -13427,7 +13420,7 @@ dwv.math.computeGreyscale = function(data, width, height) {
 };
 
 /**
- * 
+ *
  */
 dwv.math.computeGradient = function(greyscale) {
     // Returns a 2D array of gradient magnitude values for greyscale. The values
@@ -13439,7 +13432,7 @@ dwv.math.computeGradient = function(greyscale) {
 
     var x = 0;
     var y = 0;
-    
+
     for (y = 0; y < greyscale.length-1; y++) {
         gradient[y] = [];
 
@@ -13467,7 +13460,7 @@ dwv.math.computeGradient = function(greyscale) {
 };
 
 /**
- * 
+ *
  */
 dwv.math.computeLaplace = function(greyscale) {
     // Returns a 2D array of Laplacian of Gaussian values
@@ -13498,7 +13491,7 @@ dwv.math.computeLaplace = function(greyscale) {
         laplace[y][greyscale[y].length-2] = 1;
         laplace[y][greyscale[y].length-1] = 1;
     }
-    
+
     laplace[greyscale.length-2] = [];
     laplace[greyscale.length-1] = [];
     for (var j = 1; j < greyscale.length; j++) {
@@ -13549,7 +13542,7 @@ dwv.math.computeGradY = function(greyscale) {
 
 dwv.math.gradUnitVector = function(gradX, gradY, px, py, out) {
     // Returns the gradient vector at (px,py), scaled to a magnitude of 1
-    var ox = gradX[py][px]; 
+    var ox = gradX[py][px];
     var oy = gradY[py][px];
 
     var gvm = Math.sqrt(ox*ox + oy*oy);
@@ -13560,7 +13553,7 @@ dwv.math.gradUnitVector = function(gradX, gradY, px, py, out) {
 };
 
 dwv.math.gradDirection = function(gradX, gradY, px, py, qx, qy) {
-    var __dgpuv = new dwv.math.FastPoint2D(-1, -1); 
+    var __dgpuv = new dwv.math.FastPoint2D(-1, -1);
     var __gdquv = new dwv.math.FastPoint2D(-1, -1);
     // Compute the gradiant direction, in radians, between to points
     dwv.math.gradUnitVector(gradX, gradY, px, py, __dgpuv);
@@ -13571,7 +13564,7 @@ dwv.math.gradDirection = function(gradX, gradY, px, py, qx, qy) {
 
     // Make sure dp is positive, to keep things consistant
     if (dp < 0) {
-        dp = -dp; 
+        dp = -dp;
         dq = -dq;
     }
 
@@ -13589,7 +13582,7 @@ dwv.math.computeSides = function(dist, gradX, gradY, greyscale) {
     // These greyscale values are the intensity just a little bit along the
     // gradient vector, in either direction, from the supplied point. These
     // values are used when using active-learning Intelligent Scissors
-    
+
     var sides = {};
     sides.inside = [];
     sides.outside = [];
@@ -13643,14 +13636,14 @@ dwv.math.gaussianBlur = function(buffer, out) {
  * @class Scissors
  * @namespace dwv.math
  * @constructor
- * 
+ *
  * Ref: Eric N. Mortensen, William A. Barrett, Interactive Segmentation with
  *   Intelligent Scissors, Graphical Models and Image Processing, Volume 60,
  *   Issue 5, September 1998, Pages 349-384, ISSN 1077-3169,
  *   DOI: 10.1006/gmip.1998.0480.
- * 
+ *
  * (http://www.sciencedirect.com/science/article/B6WG4-45JB8WN-9/2/6fe59d8089fd1892c2bfb82283065579)
- * 
+ *
  * Highly inspired from http://code.google.com/p/livewire-javascript/
  */
 dwv.math.Scissors = function()
@@ -13739,7 +13732,7 @@ dwv.math.Scissors.prototype.setData = function(data) {
     this.gradient = dwv.math.computeGradient(this.greyscale);
     this.gradX = dwv.math.computeGradX(this.greyscale);
     this.gradY = dwv.math.computeGradY(this.greyscale);
-    
+
     var sides = dwv.math.computeSides(this.edgeWidth, this.gradX, this.gradY, this.greyscale);
     this.inside = sides.inside;
     this.outside = sides.outside;
@@ -13878,7 +13871,7 @@ dwv.math.Scissors.prototype.setPoint = function(sp) {
     this.setWorking(true);
 
     this.curPoint = sp;
-    
+
     var x = 0;
     var y = 0;
 
@@ -13965,7 +13958,7 @@ var dwv = dwv || {};
  */
 dwv.math = dwv.math || {};
 
-/** 
+/**
  * Circle shape.
  * @class Circle
  * @namespace dwv.math
@@ -14014,7 +14007,7 @@ dwv.math.Circle = function(centre, radius)
     };
 }; // Circle class
 
-/** 
+/**
  * Ellipse shape.
  * @class Ellipse
  * @namespace dwv.math
@@ -14101,7 +14094,7 @@ dwv.math.Line = function(begin, end)
      * @type Number
      */
     var length = Math.sqrt( dx * dx + dy * dy );
-        
+
     /**
      * Get the begin point of the line.
      * @method getBegin
@@ -14152,8 +14145,8 @@ dwv.math.Line = function(begin, end)
      */
     this.getMidpoint = function()
     {
-        return new dwv.math.Point2D( 
-            parseInt( (begin.getX()+end.getX()) / 2, 10 ), 
+        return new dwv.math.Point2D(
+            parseInt( (begin.getX()+end.getX()) / 2, 10 ),
             parseInt( (begin.getY()+end.getY()) / 2, 10 ) );
     };
     /**
@@ -14162,7 +14155,7 @@ dwv.math.Line = function(begin, end)
      * @return {Number} The slope of the line.
      */
     this.getSlope = function()
-    { 
+    {
         return dy / dx;
     };
     /**
@@ -14171,7 +14164,7 @@ dwv.math.Line = function(begin, end)
      * @return {Number} The inclination of the line.
      */
     this.getInclination = function()
-    { 
+    {
         // tan(theta) = slope
         var angle = Math.atan2( dy, dx ) * 180 / Math.PI;
         // shift?
@@ -14221,7 +14214,7 @@ dwv.math.Rectangle = function(begin, end)
         begin = new dwv.math.Point2D( begin.getX(), end.getY() );
         end = new dwv.math.Point2D( end.getX(), tmpY );
     }
-    
+
     /**
      * Rectangle surface.
      * @property surface
@@ -14299,19 +14292,19 @@ dwv.math.ROI = function()
      * @type Array
      */
     var points = [];
-    
+
     /**
      * Get a point of the list at a given index.
      * @method getPoint
      * @param {Number} index The index of the point to get (beware, no size check).
      * @return {Object} The Point2D at the given index.
-     */ 
+     */
     this.getPoint = function(index) { return points[index]; };
     /**
      * Get the length of the point list.
      * @method getLength
      * @return {Number} The length of the point list.
-     */ 
+     */
     this.getLength = function() { return points.length; };
     /**
      * Add a point to the ROI.
@@ -14333,7 +14326,7 @@ dwv.math.ROI = function()
  * @namespace dwv.math
  * @constructor
  * @param {Array} inputPointArray The list of Point2D that make the path (optional).
- * @param {Array} inputControlPointIndexArray The list of control point of path, 
+ * @param {Array} inputControlPointIndexArray The list of control point of path,
  *  as indexes (optional).
  * Note: first and last point do not need to be equal.
  */
@@ -14359,7 +14352,7 @@ dwv.math.Path = function(inputPointArray, inputControlPointIndexArray)
  * @method getPoint
  * @param {Number} index The index of the point to get (beware, no size check).
  * @return {Object} The Point2D at the given index.
- */ 
+ */
 dwv.math.Path.prototype.getPoint = function(index) {
     return this.pointArray[index];
 };
@@ -14369,7 +14362,7 @@ dwv.math.Path.prototype.getPoint = function(index) {
  * @method isControlPoint
  * @param {Object} point The Point2D to check.
  * @return {Boolean} True if a control point.
- */ 
+ */
 dwv.math.Path.prototype.isControlPoint = function(point) {
     var index = this.pointArray.indexOf(point);
     if( index !== -1 ) {
@@ -14384,8 +14377,8 @@ dwv.math.Path.prototype.isControlPoint = function(point) {
  * Get the length of the path.
  * @method getLength
  * @return {Number} The length of the path.
- */ 
-dwv.math.Path.prototype.getLength = function() { 
+ */
+dwv.math.Path.prototype.getLength = function() {
     return this.pointArray.length;
 };
 
@@ -14418,7 +14411,7 @@ dwv.math.Path.prototype.addControlPoint = function(point) {
  * @method addPoints
  * @param {Array} points The list of Point2D to add.
  */
-dwv.math.Path.prototype.addPoints = function(newPointArray) { 
+dwv.math.Path.prototype.addPoints = function(newPointArray) {
     this.pointArray = this.pointArray.concat(newPointArray);
 };
 
@@ -14459,7 +14452,7 @@ dwv.math.getStats = function (array)
     var sumSqr = 0;
     var stdDev = 0;
     var variance = 0;
-    
+
     var val = 0;
     for ( var i = 0; i < array.length; ++i ) {
         val = array[i];
@@ -14472,16 +14465,16 @@ dwv.math.getStats = function (array)
         sum += val;
         sumSqr += val * val;
     }
-    
+
     mean = sum / array.length;
     // see http://en.wikipedia.org/wiki/Algorithms_for_calculating_variance
     variance = sumSqr / array.length - mean * mean;
     stdDev = Math.sqrt(variance);
-    
+
     return { 'min': min, 'max': max, 'mean': mean, 'stdDev': stdDev };
 };
 
-/** 
+/**
  * Unique ID generator.
  * @class IdGenerator
  * @namespace dwv.math
@@ -14558,7 +14551,7 @@ dwv.tool.DrawGroupCommand = function (group, name, layer)
  * @method onExecute
  * @param {Object} event The execute event with type and id.
  */
-dwv.tool.DrawGroupCommand.prototype.onExecute = function (/*event*/) 
+dwv.tool.DrawGroupCommand.prototype.onExecute = function (/*event*/)
 {
     // default does nothing.
 };
@@ -14567,7 +14560,7 @@ dwv.tool.DrawGroupCommand.prototype.onExecute = function (/*event*/)
  * @method onUndo
  * @param {Object} event The undo event with type and id.
  */
-dwv.tool.DrawGroupCommand.prototype.onUndo = function (/*event*/) 
+dwv.tool.DrawGroupCommand.prototype.onUndo = function (/*event*/)
 {
     // default does nothing.
 };
@@ -14624,7 +14617,7 @@ dwv.tool.MoveGroupCommand = function (group, name, translation, layer)
  * @method onExecute
  * @param {Object} event The execute event with type and id.
  */
-dwv.tool.MoveGroupCommand.prototype.onExecute = function (/*event*/) 
+dwv.tool.MoveGroupCommand.prototype.onExecute = function (/*event*/)
 {
     // default does nothing.
 };
@@ -14633,7 +14626,7 @@ dwv.tool.MoveGroupCommand.prototype.onExecute = function (/*event*/)
  * @method onUndo
  * @param {Object} event The undo event with type and id.
  */
-dwv.tool.MoveGroupCommand.prototype.onUndo = function (/*event*/) 
+dwv.tool.MoveGroupCommand.prototype.onUndo = function (/*event*/)
 {
     // default does nothing.
 };
@@ -14684,7 +14677,7 @@ dwv.tool.ChangeGroupCommand = function (name, func, startAnchor, endAnchor, laye
  * @method onExecute
  * @param {Object} event The execute event with type and id.
  */
-dwv.tool.ChangeGroupCommand.prototype.onExecute = function (/*event*/) 
+dwv.tool.ChangeGroupCommand.prototype.onExecute = function (/*event*/)
 {
     // default does nothing.
 };
@@ -14693,7 +14686,7 @@ dwv.tool.ChangeGroupCommand.prototype.onExecute = function (/*event*/)
  * @method onUndo
  * @param {Object} event The undo event with type and id.
  */
-dwv.tool.ChangeGroupCommand.prototype.onUndo = function (/*event*/) 
+dwv.tool.ChangeGroupCommand.prototype.onUndo = function (/*event*/)
 {
     // default does nothing.
 };
@@ -14743,7 +14736,7 @@ dwv.tool.DeleteGroupCommand = function (group, name, layer)
  * @method onExecute
  * @param {Object} event The execute event with type and id.
  */
-dwv.tool.DeleteGroupCommand.prototype.onExecute = function (/*event*/) 
+dwv.tool.DeleteGroupCommand.prototype.onExecute = function (/*event*/)
 {
     // default does nothing.
 };
@@ -14752,7 +14745,7 @@ dwv.tool.DeleteGroupCommand.prototype.onExecute = function (/*event*/)
  * @method onUndo
  * @param {Object} event The undo event with type and id.
  */
-dwv.tool.DeleteGroupCommand.prototype.onUndo = function (/*event*/) 
+dwv.tool.DeleteGroupCommand.prototype.onUndo = function (/*event*/)
 {
     // default does nothing.
 };
@@ -14786,7 +14779,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
      * @type Boolean
      */
     var started = false;
-    
+
     /**
      * Shape factory list
      * @property shapeFactoryList
@@ -14814,7 +14807,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
      * @type String
      */
     this.shapeName = 0;
-    
+
     /**
      * List of points.
      * @property points
@@ -14822,7 +14815,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
      * @type Array
      */
     var points = [];
-    
+
     /**
      * Last selected point.
      * @property lastPoint
@@ -14830,7 +14823,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
      * @type Object
      */
     var lastPoint = null;
-    
+
     /**
      * Shape editor.
      * @property shapeEditor
@@ -14838,7 +14831,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
      * @type Object
      */
     var shapeEditor = new dwv.tool.ShapeEditor(app);
-    
+
     // associate the event listeners of the editor
     //  with those of the draw tool
     shapeEditor.setDrawEventCallback(fireEvent);
@@ -14874,7 +14867,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
      * @type Object
      */
     var drawLayer = null;
-    
+
     /**
      * The associated draw layer.
      * @property drawLayer
@@ -14892,16 +14885,16 @@ dwv.tool.Draw = function (app, shapeFactoryList)
         // determine if the click happened in an existing shape
         var stage = app.getDrawStage();
         var kshape = stage.getIntersection({
-            x: event._xs, 
+            x: event._xs,
             y: event._ys
         });
-        
+
         if ( kshape ) {
             var group = kshape.getParent();
             var selectedShape = group.find(".shape")[0];
             // reset editor if click on other shape
             // (and avoid anchors mouse down)
-            if ( selectedShape && selectedShape !== shapeEditor.getShape() ) { 
+            if ( selectedShape && selectedShape !== shapeEditor.getShape() ) {
                 shapeEditor.disable();
                 shapeEditor.setShape(selectedShape);
                 shapeEditor.setImage(app.getImage());
@@ -14997,7 +14990,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
             command.execute();
             // save it in undo stack
             app.getUndoStack().add(command);
-            
+
             // set shape on
             var shape = group.getChildren( function (node) {
                 return node.name() === 'shape';
@@ -15007,7 +15000,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
         // reset flag
         started = false;
     };
-    
+
     /**
      * Handle mouse out event.
      * @method mouseout
@@ -15062,7 +15055,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
         gui = new dwv.gui.Draw(app);
         gui.setup(this.shapeFactoryList);
     };
-    
+
     /**
      * Enable the tool.
      * @method enable
@@ -15104,7 +15097,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
         // draw
         drawLayer.draw();
     };
-    
+
     /**
      * Set shape off properties.
      * @method setShapeOff
@@ -15129,7 +15122,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
         return { 'x': stage.offset().x + index.x / stage.scale().x,
             'y': stage.offset().y + index.y / stage.scale().y };
     }
-    
+
     /**
      * Set shape on properties.
      * @method setShapeOn
@@ -15149,7 +15142,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
         shape.draggable(true);
         var dragStartPos = null;
         var dragLastPos = null;
-        
+
         // command name based on shape type
         var cmdName = "shape";
         if ( shape instanceof Kinetic.Line ) {
@@ -15169,10 +15162,10 @@ dwv.tool.Draw = function (app, shapeFactoryList)
         else if ( shape instanceof Kinetic.Ellipse ) {
             cmdName = "ellipse";
         }
-        
+
         // shape colour
         var colour = shape.stroke();
-        
+
         // drag start event handling
         shape.on('dragstart', function (event) {
             // save start position
@@ -15197,11 +15190,11 @@ dwv.tool.Draw = function (app, shapeFactoryList)
             var pos = getRealPosition( offset );
             var translation;
             if ( dragLastPos ) {
-                translation = {'x': pos.x - dragLastPos.x, 
+                translation = {'x': pos.x - dragLastPos.x,
                     'y': pos.y - dragLastPos.y};
             }
             else {
-                translation = {'x': pos.x - dragStartPos.x, 
+                translation = {'x': pos.x - dragStartPos.x,
                         'y': pos.y - dragStartPos.y};
             }
             dragLastPos = pos;
@@ -15237,7 +15230,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
             if ( Math.abs( pos.x - trash.x() ) < 10 &&
                     Math.abs( pos.y - trash.y() ) < 10   ) {
                 // compensate for the drag translation
-                var delTranslation = {'x': pos.x - dragStartPos.x, 
+                var delTranslation = {'x': pos.x - dragStartPos.x,
                         'y': pos.y - dragStartPos.y};
                 var group = this.getParent();
                 group.getChildren().each( function (shape) {
@@ -15260,7 +15253,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
             }
             else {
                 // save drag move
-                var translation = {'x': pos.x - dragStartPos.x, 
+                var translation = {'x': pos.x - dragStartPos.x,
                         'y': pos.y - dragStartPos.y};
                 if ( translation.x !== 0 || translation.y !== 0 ) {
                     var mvcmd = new dwv.tool.MoveGroupCommand(this.getParent(), cmdName, translation, drawLayer);
@@ -15329,7 +15322,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
             return;
         }
         for ( var i = 0; i < listeners[type].length; ++i )
-        {   
+        {
             if ( listeners[type][i] === listener ) {
                 listeners[type].splice(i,1);
             }
@@ -15359,7 +15352,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
             return;
         }
         for ( var i=0; i < listeners[event.type].length; ++i )
-        {   
+        {
             listeners[event.type][i](event);
         }
     }
@@ -15462,7 +15455,7 @@ dwv.tool.ShapeEditor = function (app)
      * @type Function
      */
     var drawEventCallback = null;
-    
+
     /**
      * Set the shape to edit.
      * @method setShape
@@ -15476,7 +15469,7 @@ dwv.tool.ShapeEditor = function (app)
             addAnchors();
         }
     };
-    
+
     /**
      * Set the associated image.
      * @method setImage
@@ -15485,16 +15478,16 @@ dwv.tool.ShapeEditor = function (app)
     this.setImage = function ( img ) {
         image = img;
     };
-    
+
     /**
      * Get the edited shape.
      * @method getShape
      * @return {Object} The edited shape.
      */
-    this.getShape = function () { 
+    this.getShape = function () {
         return shape;
     };
-    
+
     /**
      * Get the active flag.
      * @method isActive
@@ -15512,7 +15505,7 @@ dwv.tool.ShapeEditor = function (app)
     this.setDrawEventCallback = function ( callback ) {
         drawEventCallback = callback;
     };
-    
+
     /**
      * Enable the editor. Redraws the layer.
      * @method enable
@@ -15526,7 +15519,7 @@ dwv.tool.ShapeEditor = function (app)
             }
         }
     };
-    
+
     /**
      * Disable the editor. Redraws the layer.
      * @method disable
@@ -15540,7 +15533,7 @@ dwv.tool.ShapeEditor = function (app)
             }
         }
     };
-    
+
     /**
      * Reset the anchors.
      * @method resetAnchors
@@ -15553,7 +15546,7 @@ dwv.tool.ShapeEditor = function (app)
         // set them visible
         setAnchorsVisible( true );
     };
-    
+
     /**
      * Apply a function on all anchors.
      * @param {Object} func A f(shape) function.
@@ -15564,7 +15557,7 @@ dwv.tool.ShapeEditor = function (app)
             anchors.each( func );
         }
     }
-    
+
     /**
      * Set anchors visibility.
      * @method setAnchorsVisible
@@ -15583,7 +15576,7 @@ dwv.tool.ShapeEditor = function (app)
      */
     this.setAnchorsActive = function ( flag ) {
         var func = null;
-        if ( flag ) { 
+        if ( flag ) {
             func = function (anchor) {
                 setAnchorOn( anchor );
             };
@@ -15605,7 +15598,7 @@ dwv.tool.ShapeEditor = function (app)
             anchor.remove();
         });
     }
-    
+
     /**
      * Add the shape anchors.
      * @method addAnchors
@@ -15674,7 +15667,7 @@ dwv.tool.ShapeEditor = function (app)
         // add group to layer
         shape.getLayer().add( group );
     }
-    
+
     /**
      * Create shape editor controls, i.e. the anchors.
      * @method addAnchor
@@ -15706,7 +15699,7 @@ dwv.tool.ShapeEditor = function (app)
         // add the anchor to the group
         group.add(anchor);
     }
-    
+
     /**
      * Get a simple clone of the input anchor.
      * @param {Object} anchor The anchor to clone.
@@ -15733,14 +15726,14 @@ dwv.tool.ShapeEditor = function (app)
         };
         return clone;
     }
-    
+
     /**
      * Set the anchor on listeners.
      * @param {Object} anchor The anchor to set on.
      */
     function setAnchorOn( anchor ) {
         var startAnchor = null;
-        
+
         // command name based on shape type
         var cmdName = "shape";
         if ( shape instanceof Kinetic.Line ) {
@@ -15817,7 +15810,7 @@ dwv.tool.ShapeEditor = function (app)
             }
         });
     }
-    
+
     /**
      * Set the anchor off listeners.
      * @param {Object} anchor The anchor to set off.
@@ -15839,7 +15832,7 @@ var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
 var Kinetic = Kinetic || {};
 
-/** 
+/**
  * Ellipse factory.
  * @class EllipseFactory
  * @namespace dwv.tool
@@ -15847,19 +15840,19 @@ var Kinetic = Kinetic || {};
  */
 dwv.tool.EllipseFactory = function ()
 {
-    /** 
+    /**
      * Get the number of points needed to build the shape.
      * @method getNPoints
      * @return {Number} The number of points.
      */
     this.getNPoints = function () { return 2; };
-    /** 
+    /**
      * Get the timeout between point storage.
      * @method getTimeout
      * @return {Number} The timeout in milliseconds.
      */
     this.getTimeout = function () { return 0; };
-};  
+};
 
 /**
  * Create an ellipse shape to be displayed.
@@ -15867,7 +15860,7 @@ dwv.tool.EllipseFactory = function ()
  * @param {Array} points The points from which to extract the ellipse.
  * @param {Object} style The drawing style.
  * @param {Object} image The associated image.
- */ 
+ */
 dwv.tool.EllipseFactory.prototype.create = function (points, style, image)
 {
     // calculate radius
@@ -15912,7 +15905,7 @@ dwv.tool.EllipseFactory.prototype.create = function (points, style, image)
  * @static
  * @param {Object} anchor The active anchor.
  * @param {Object} image The associated image.
- */ 
+ */
 dwv.tool.UpdateEllipse = function (anchor, image)
 {
     // parent group
@@ -15956,13 +15949,13 @@ dwv.tool.UpdateEllipse = function (anchor, image)
         bottomRight.x( anchor.x() );
         bottomRight.y( anchor.y() );
         bottomLeft.y( anchor.y() );
-        topRight.x( anchor.x() ); 
+        topRight.x( anchor.x() );
         break;
     case 'bottomLeft':
         bottomLeft.x( anchor.x() );
         bottomLeft.y( anchor.y() );
         bottomRight.y( anchor.y() );
-        topLeft.x( anchor.x() ); 
+        topLeft.x( anchor.x() );
         break;
     default :
         console.error('Unhandled anchor id: '+anchor.id());
@@ -16033,7 +16026,7 @@ dwv.tool.Filter = function ( filterList, app )
      * @type Boolean
      */
     this.displayed = false;
-    
+
     /**
      * Setup the filter GUI.
      * @method setup
@@ -16079,7 +16072,7 @@ dwv.tool.Filter = function ( filterList, app )
         // init all filters
         for( key in this.filterList ) {
             this.filterList[key].init();
-        }    
+        }
         // init html
         if ( gui ) {
             gui.initialise();
@@ -16190,7 +16183,7 @@ dwv.tool.filter.Threshold = function ( app )
      * @type Object
      */
     var gui = new dwv.gui.Threshold(app);
-    
+
     /**
      * Setup the filter GUI.
      * @method setup
@@ -16209,7 +16202,7 @@ dwv.tool.filter.Threshold = function ( app )
     {
         gui.display(bool);
     };
-    
+
     /**
      * Initialise the filter.
      * @method init
@@ -16218,7 +16211,7 @@ dwv.tool.filter.Threshold = function ( app )
     {
         gui.initialise();
     };
-    
+
     /**
      * Run the filter.
      * @method run
@@ -16234,7 +16227,7 @@ dwv.tool.filter.Threshold = function ( app )
         // save command in undo stack
         app.getUndoStack().add(command);
     };
-    
+
 }; // class dwv.tool.filter.Threshold
 
 
@@ -16253,7 +16246,7 @@ dwv.tool.filter.Sharpen = function ( app )
      * @type Object
      */
     var gui = new dwv.gui.Sharpen(app);
-    
+
     /**
      * Setup the filter GUI.
      * @method setup
@@ -16272,7 +16265,7 @@ dwv.tool.filter.Sharpen = function ( app )
     {
         gui.display(bool);
     };
-    
+
     /**
      * Initialise the filter.
      * @method init
@@ -16281,7 +16274,7 @@ dwv.tool.filter.Sharpen = function ( app )
     {
         // nothing to do...
     };
-    
+
     /**
      * Run the filter.
      * @method run
@@ -16313,7 +16306,7 @@ dwv.tool.filter.Sobel = function ( app )
      * @type Object
      */
     var gui = new dwv.gui.Sobel(app);
-    
+
     /**
      * Setup the filter GUI.
      * @method setup
@@ -16332,7 +16325,7 @@ dwv.tool.filter.Sobel = function ( app )
     {
         gui.display(bool);
     };
-    
+
     /**
      * Initialise the filter.
      * @method init
@@ -16341,7 +16334,7 @@ dwv.tool.filter.Sobel = function ( app )
     {
         // nothing to do...
     };
-    
+
     /**
      * Run the filter.
      * @method run
@@ -16367,7 +16360,7 @@ dwv.tool.filter.Sobel = function ( app )
  * @param {Object} app The associated application.
  */
 dwv.tool.RunFilterCommand = function (filter, app) {
-    
+
     /**
      * Get the command name.
      * @method getName
@@ -16384,7 +16377,7 @@ dwv.tool.RunFilterCommand = function (filter, app) {
         filter.setOriginalImage(app.getImage());
         app.setImage(filter.update());
         app.render();
-    }; 
+    };
     /**
      * Undo the command.
      * @method undo
@@ -16393,7 +16386,7 @@ dwv.tool.RunFilterCommand = function (filter, app) {
         app.setImage(filter.getOriginalImage());
         app.render();
     };
-    
+
 }; // RunFilterCommand class
 ;/** 
  * Info module.
@@ -16442,7 +16435,7 @@ dwv.info.Windowing = function ( div )
         // add list to div
         div.appendChild(ul);
     };
-    
+
     /**
      * Update the windowing info div.
      * @method update
@@ -16460,7 +16453,7 @@ dwv.info.Windowing = function ( div )
         dwv.html.cleanNode(liww);
         liww.appendChild(document.createTextNode("WindowWidth = "+event.ww));
     };
-    
+
 }; // class dwv.info.Windowing
 
 /**
@@ -16497,7 +16490,7 @@ dwv.info.Position = function ( div )
         // add list to div
         div.appendChild(ul);
     };
-    
+
     /**
      * Update the position info div.
      * @method update
@@ -16537,7 +16530,7 @@ dwv.info.MiniColourMap = function ( div, app )
      * @method create
      */
     this.create = function ()
-    {    
+    {
         // clean div
         var elems = div.getElementsByClassName("colour-map-info");
         if ( elems.length !== 0 ) {
@@ -16551,7 +16544,7 @@ dwv.info.MiniColourMap = function ( div, app )
         // add canvas to div
         div.appendChild(canvas);
     };
-    
+
     /**
      * Update the mini colour map info div.
      * @method update
@@ -16559,28 +16552,28 @@ dwv.info.MiniColourMap = function ( div, app )
      * Warning: expects the mini colour map div to exist (use after createMiniColourMap).
      */
     this.update = function (event)
-    {    
+    {
         var windowCenter = event.wc;
         var windowWidth = event.ww;
-        
+
         var canvas = div.getElementsByClassName("colour-map-info")[0];
         var context = canvas.getContext('2d');
-        
+
         // fill in the image data
         var colourMap = app.getViewController().getColourMap();
         var imageData = context.getImageData(0,0,canvas.width, canvas.height);
-        
+
         var c = 0;
         var minInt = app.getImage().getRescaledDataRange().min;
         var range = app.getImage().getRescaledDataRange().max - minInt;
         var incrC = range / canvas.width;
         var y = 0;
-        
+
         var yMax = 255;
         var yMin = 0;
         var xMin = windowCenter - 0.5 - (windowWidth-1) / 2;
-        var xMax = windowCenter - 0.5 + (windowWidth-1) / 2;    
-        
+        var xMax = windowCenter - 0.5 + (windowWidth-1) / 2;
+
         var index;
         for( var j=0; j<canvas.height; ++j ) {
             c = minInt;
@@ -16649,17 +16642,17 @@ dwv.info.Plot = function (div, app)
     {
         var wc = event.wc;
         var ww = event.ww;
-        
+
         var half = parseInt( (ww-1) / 2, 10 );
         var center = parseInt( (wc-0.5), 10 );
         var min = center - half;
         var max = center + half;
-        
+
         var markings = [
             { "color": "#faa", "lineWidth": 1, "xaxis": { "from": min, "to": min } },
             { "color": "#aaf", "lineWidth": 1, "xaxis": { "from": max, "to": max } }
         ];
-    
+
         $.plot(div, [ app.getImage().getHistogram() ], {
             "bars": { "show": true },
             "grid": { "markings": markings, "backgroundcolour": null },
@@ -16677,7 +16670,7 @@ var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
 var Kinetic = Kinetic || {};
 
-/** 
+/**
  * Line factory.
  * @class LineFactory
  * @namespace dwv.tool
@@ -16685,19 +16678,19 @@ var Kinetic = Kinetic || {};
  */
 dwv.tool.LineFactory = function ()
 {
-    /** 
+    /**
      * Get the number of points needed to build the shape.
      * @method getNPoints
      * @return {Number} The number of points.
      */
     this.getNPoints = function () { return 2; };
-    /** 
+    /**
      * Get the timeout between point storage.
      * @method getTimeout
      * @return {Number} The timeout in milliseconds.
      */
     this.getTimeout = function () { return 0; };
-};  
+};
 
 /**
  * Create a line shape to be displayed.
@@ -16705,14 +16698,14 @@ dwv.tool.LineFactory = function ()
  * @param {Array} points The points from which to extract the line.
  * @param {Object} style The drawing style.
  * @param {Object} image The associated image.
- */ 
+ */
 dwv.tool.LineFactory.prototype.create = function (points, style, image)
 {
     // physical shape
     var line = new dwv.math.Line(points[0], points[1]);
     // draw shape
     var kshape = new Kinetic.Line({
-        points: [line.getBegin().getX(), line.getBegin().getY(), 
+        points: [line.getBegin().getX(), line.getBegin().getY(),
                  line.getEnd().getX(), line.getEnd().getY() ],
         stroke: style.getLineColour(),
         strokeWidth: style.getScaledStrokeWidth(),
@@ -16747,7 +16740,7 @@ dwv.tool.LineFactory.prototype.create = function (points, style, image)
  * @static
  * @param {Object} anchor The active anchor.
  * @param {Object} image The associated image.
- */ 
+ */
 dwv.tool.UpdateLine = function (anchor, image)
 {
     // parent group
@@ -16793,7 +16786,7 @@ dwv.tool.UpdateLine = function (anchor, image)
     var str = quant.length.toPrecision(4) + " mm";
     var dX = line.getBegin().getX() > line.getEnd().getX() ? 0 : -1;
     var dY = line.getBegin().getY() > line.getEnd().getY() ? -1 : 0.5;
-    var textPos = { 
+    var textPos = {
         'x': line.getEnd().getX() + dX * 25,
         'y': line.getEnd().getY() + dY * 15, };
     ktext.position( textPos );
@@ -16835,7 +16828,7 @@ dwv.tool.Livewire = function(app)
      * @type Boolean
      */
     this.started = false;
-    
+
     /**
      * Draw command.
      * @property command
@@ -16856,7 +16849,7 @@ dwv.tool.Livewire = function(app)
      * @type Style
      */
     this.style = new dwv.html.Style();
-    
+
     /**
      * Path storage. Paths are stored in reverse order.
      * @property path
@@ -16885,7 +16878,7 @@ dwv.tool.Livewire = function(app)
      * @type Number
      */
     var tolerance = 5;
-    
+
     /**
      * Clear the parent points list.
      * @method clearParentPoints
@@ -16897,7 +16890,7 @@ dwv.tool.Livewire = function(app)
             parentPoints[i] = [];
         }
     }
-    
+
     /**
      * Clear the stored paths.
      * @method clearPaths
@@ -16907,7 +16900,7 @@ dwv.tool.Livewire = function(app)
         path = new dwv.math.Path();
         currentPath = new dwv.math.Path();
     }
-    
+
     /**
      * Scissor representation.
      * @property scissors
@@ -16915,7 +16908,7 @@ dwv.tool.Livewire = function(app)
      * @type Scissors
      */
     var scissors = new dwv.math.Scissors();
-    
+
     /**
      * Handle mouse down event.
      * @method mousedown
@@ -16980,8 +16973,8 @@ dwv.tool.Livewire = function(app)
         {
             console.log("Getting ready...");
             results = scissors.doWork();
-            
-            if( results.length === 0 ) { 
+
+            if( results.length === 0 ) {
                 stop = true;
             }
             else {
@@ -16994,17 +16987,17 @@ dwv.tool.Livewire = function(app)
             }
         }
         console.log("Ready!");
-        
+
         // get the path
         currentPath = new dwv.math.Path();
         stop = false;
         while (p && !stop) {
             currentPath.addPoint(new dwv.math.Point2D(p.x, p.y));
-            if(!parentPoints[p.y]) { 
+            if(!parentPoints[p.y]) {
                 stop = true;
             }
-            else { 
-                if(!parentPoints[p.y][p.x]) { 
+            else {
+                if(!parentPoints[p.y][p.x]) {
                     stop = true;
                 }
                 else {
@@ -17013,7 +17006,7 @@ dwv.tool.Livewire = function(app)
             }
         }
         currentPath.appenPath(path);
-        
+
         // remove previous draw
         if ( shapeGroup ) {
             shapeGroup.destroy();
@@ -17035,7 +17028,7 @@ dwv.tool.Livewire = function(app)
     this.mouseup = function(/*event*/){
         // nothing to do
     };
-    
+
     /**
      * Handle mouse out event.
      * @method mouseout
@@ -17045,7 +17038,7 @@ dwv.tool.Livewire = function(app)
         // treat as mouse up
         self.mouseup(event);
     };
-    
+
     /**
      * Handle touch start event.
      * @method touchstart
@@ -17094,7 +17087,7 @@ dwv.tool.Livewire = function(app)
         gui = new dwv.gui.Livewire(app);
         gui.setup();
     };
-    
+
     /**
      * Enable the tool.
      * @method enable
@@ -17120,17 +17113,17 @@ dwv.tool.Livewire = function(app)
             // init html
             gui.initialise();
         }
-        
+
         //scissors = new dwv.math.Scissors();
         var size = app.getImage().getGeometry().getSize();
         scissors.setDimensions(
                 size.getNumberOfColumns(),
                 size.getNumberOfRows() );
         scissors.setData(app.getImageData().data);
-        
+
         return true;
     };
-    
+
 }; // Livewire class
 
 /**
@@ -17143,9 +17136,9 @@ dwv.tool.Livewire.prototype.getHelp = function()
     return {
         'title': "Livewire",
         'brief': "The Livewire tool is a semi-automatic segmentation tool " +
-            "that proposes to the user paths that follow intensity edges." + 
-            "Click once to initialise and then move the mouse to see " + 
-            "the proposed paths. Click again to build your contour. " + 
+            "that proposes to the user paths that follow intensity edges." +
+            "Click once to initialise and then move the mouse to see " +
+            "the proposed paths. Click again to build your contour. " +
             "The process stops when you click on the first root point. " +
             "BEWARE: the process can take time!"
     };
@@ -17169,7 +17162,7 @@ var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
 var Kinetic = Kinetic || {};
 
-/** 
+/**
  * Protractor factory.
  * @class ProtractorFactory
  * @namespace dwv.tool
@@ -17177,19 +17170,19 @@ var Kinetic = Kinetic || {};
  */
 dwv.tool.ProtractorFactory = function ()
 {
-    /** 
+    /**
      * Get the number of points needed to build the shape.
      * @method getNPoints
      * @return {Number} The number of points.
      */
     this.getNPoints = function () { return 3; };
-    /** 
+    /**
      * Get the timeout between point storage.
      * @method getTimeout
      * @return {Number} The timeout in milliseconds.
      */
     this.getTimeout = function () { return 500; };
-};  
+};
 
 /**
  * Create a protractor shape to be displayed.
@@ -17198,7 +17191,7 @@ dwv.tool.ProtractorFactory = function ()
  * @param {Array} points The points from which to extract the protractor.
  * @param {Object} style The drawing style.
  * @param {Object} image The associated image.
- */ 
+ */
 dwv.tool.ProtractorFactory.prototype.create = function (points, style/*, image*/)
 {
     // physical shape
@@ -17270,7 +17263,7 @@ dwv.tool.ProtractorFactory.prototype.create = function (points, style/*, image*/
  * @static
  * @param {Object} anchor The active anchor.
  * @param {Object} image The associated image.
- */ 
+ */
 dwv.tool.UpdateProtractor = function (anchor/*, image*/)
 {
     // parent group
@@ -17356,7 +17349,7 @@ var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
 var Kinetic = Kinetic || {};
 
-/** 
+/**
  * Rectangle factory.
  * @class RectangleFactory
  * @namespace dwv.tool
@@ -17364,19 +17357,19 @@ var Kinetic = Kinetic || {};
  */
 dwv.tool.RectangleFactory = function ()
 {
-    /** 
+    /**
      * Get the number of points needed to build the shape.
      * @method getNPoints
      * @return {Number} The number of points.
      */
     this.getNPoints = function () { return 2; };
-    /** 
+    /**
      * Get the timeout between point storage.
      * @method getTimeout
      * @return {Number} The timeout in milliseconds.
      */
     this.getTimeout = function () { return 0; };
-};  
+};
 
 /**
  * Create a rectangle shape to be displayed.
@@ -17384,7 +17377,7 @@ dwv.tool.RectangleFactory = function ()
  * @param {Array} points The points from which to extract the rectangle.
  * @param {Object} style The drawing style.
  * @param {Object} image The associated image.
- */ 
+ */
 dwv.tool.RectangleFactory.prototype.create = function (points, style, image)
 {
     // physical shape
@@ -17427,7 +17420,7 @@ dwv.tool.RectangleFactory.prototype.create = function (points, style, image)
  * @static
  * @param {Object} anchor The active anchor.
  * @param {Object} image The associated image.
- */ 
+ */
 dwv.tool.UpdateRect = function (anchor, image)
 {
     // parent group
@@ -17471,13 +17464,13 @@ dwv.tool.UpdateRect = function (anchor, image)
         bottomRight.x( anchor.x() );
         bottomRight.y( anchor.y() );
         bottomLeft.y( anchor.y() );
-        topRight.x( anchor.x() ); 
+        topRight.x( anchor.x() );
         break;
     case 'bottomLeft':
         bottomLeft.x( anchor.x() );
         bottomLeft.y( anchor.y() );
         bottomRight.y( anchor.y() );
-        topLeft.x( anchor.x() ); 
+        topLeft.x( anchor.x() );
         break;
     default :
         console.error('Unhandled anchor id: '+anchor.id());
@@ -17509,7 +17502,7 @@ var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
 var Kinetic = Kinetic || {};
 
-/** 
+/**
  * ROI factory.
  * @class RoiFactory
  * @namespace dwv.tool
@@ -17517,19 +17510,19 @@ var Kinetic = Kinetic || {};
  */
 dwv.tool.RoiFactory = function ()
 {
-    /** 
+    /**
      * Get the number of points needed to build the shape.
      * @method getNPoints
      * @return {Number} The number of points.
      */
     this.getNPoints = function () { return 50; };
-    /** 
+    /**
      * Get the timeout between point storage.
      * @method getTimeout
      * @return {Number} The timeout in milliseconds.
      */
     this.getTimeout = function () { return 100; };
-};  
+};
 
 /**
  * Create a roi shape to be displayed.
@@ -17537,7 +17530,7 @@ dwv.tool.RoiFactory = function ()
  * @param {Array} points The points from which to extract the line.
  * @param {Object} style The drawing style.
  * @param {Object} image The associated image.
- */ 
+ */
 dwv.tool.RoiFactory.prototype.create = function (points, style /*, image*/)
 {
     // physical shape
@@ -17564,7 +17557,7 @@ dwv.tool.RoiFactory.prototype.create = function (points, style /*, image*/)
     group.name("roi-group");
     group.add(kshape);
     return group;
-}; 
+};
 
 /**
  * Update a roi shape.
@@ -17572,7 +17565,7 @@ dwv.tool.RoiFactory.prototype.create = function (points, style /*, image*/)
  * @static
  * @param {Object} anchor The active anchor.
  * @param {Object} image The associated image.
- */ 
+ */
 dwv.tool.UpdateRoi = function (anchor /*, image*/)
 {
     // parent group
@@ -17688,7 +17681,7 @@ dwv.tool.Scroll = function(app)
             self.started = false;
         }
     };
-    
+
     /**
      * Handle mouse out event.
      * @method mouseout
@@ -17772,7 +17765,7 @@ dwv.tool.Scroll = function(app)
         gui = new dwv.gui.Scroll(app);
         gui.setup();
     };
-    
+
     /**
      * Enable the tool.
      * @method enable
@@ -17794,7 +17787,7 @@ dwv.tool.Scroll = function(app)
         }
         return true;
     };
-    
+
 }; // Scroll class
 
 /**
@@ -17815,7 +17808,6 @@ dwv.tool.Scroll.prototype.getHelp = function()
         }
     };
 };
-
 ;/** 
  * Tool module.
  * @module tool
@@ -17857,7 +17849,7 @@ dwv.tool.Toolbox = function( toolList, app )
      * @type String
      */
     var defaultToolName = null;
-    
+
     /**
      * Get the list of tools.
      * @method getToolList
@@ -17904,7 +17896,7 @@ dwv.tool.Toolbox = function( toolList, app )
             gui.display(bool);
         }
     };
-    
+
     /**
      * Initialise the tool box.
      * @method init
@@ -17996,7 +17988,7 @@ dwv.tool = dwv.tool || {};
  * @constructor
  */
 dwv.tool.UndoStack = function (app)
-{ 
+{
     /**
      * Undo GUI.
      * @property gui
@@ -18010,14 +18002,14 @@ dwv.tool.UndoStack = function (app)
      * @type Array
      */
     var stack = [];
-    
+
     /**
      * Get the stack.
      * @method getStack
      * @return {Array} The list of stored commands.
      */
     this.getStack = function () { return stack; };
-    
+
     /**
      * Current command index.
      * @property curCmdIndex
@@ -18032,7 +18024,7 @@ dwv.tool.UndoStack = function (app)
      * @param {Object} cmd The command to add.
      */
     this.add = function(cmd)
-    { 
+    {
         // clear commands after current index
         stack = stack.slice(0,curCmdIndex);
         // store command
@@ -18045,29 +18037,29 @@ dwv.tool.UndoStack = function (app)
     };
 
     /**
-     * Undo the last command. 
+     * Undo the last command.
      * @method undo
      */
     this.undo = function()
-    { 
+    {
         // a bit inefficient...
         if( curCmdIndex > 0 )
         {
             // decrement command index
-            --curCmdIndex; 
+            --curCmdIndex;
             // undo last command
             stack[curCmdIndex].undo();
             // disable last in display history
             gui.enableInUndoHtml(false);
         }
-    }; 
+    };
 
     /**
      * Redo the last command.
      * @method redo
      */
     this.redo = function()
-    { 
+    {
         if( curCmdIndex < stack.length )
         {
             // run last command
@@ -18139,7 +18131,7 @@ dwv.tool.WindowLevel = function(app)
      * @type Boolean
      */
     this.started = false;
-    
+
     /**
      * Handle mouse down event.
      * @method mousedown
@@ -18154,7 +18146,7 @@ dwv.tool.WindowLevel = function(app)
         // update GUI
         app.getViewController().setCurrentPosition2D(event._x, event._y);
     };
-    
+
     /**
      * Handle mouse move event.
      * @method mousemove
@@ -18177,7 +18169,7 @@ dwv.tool.WindowLevel = function(app)
         self.x0 = event._x;
         self.y0 = event._y;
     };
-    
+
     /**
      * Handle mouse up event.
      * @method mouseup
@@ -18199,7 +18191,7 @@ dwv.tool.WindowLevel = function(app)
             }
         }
     };
-    
+
     /**
      * Handle mouse out event.
      * @method mouseout
@@ -18209,7 +18201,7 @@ dwv.tool.WindowLevel = function(app)
         // treat as mouse up
         self.mouseup(event);
     };
-    
+
     /**
      * Handle touch start event.
      * @method touchstart
@@ -18218,7 +18210,7 @@ dwv.tool.WindowLevel = function(app)
     this.touchstart = function(event){
         self.mousedown(event);
     };
-    
+
     /**
      * Handle touch move event.
      * @method touchmove
@@ -18227,7 +18219,7 @@ dwv.tool.WindowLevel = function(app)
     this.touchmove = function(event){
         self.mousemove(event);
     };
-    
+
     /**
      * Handle touch end event.
      * @method touchend
@@ -18236,7 +18228,7 @@ dwv.tool.WindowLevel = function(app)
     this.touchend = function(event){
         self.mouseup(event);
     };
-    
+
     /**
      * Handle double click event.
      * @method dblclick
@@ -18247,9 +18239,9 @@ dwv.tool.WindowLevel = function(app)
         app.getViewController().setWindowLevel(
             parseInt(app.getImage().getRescaledValue(
                 event._x, event._y, app.getViewController().getCurrentPosition().k), 10),
-            parseInt(app.getViewController().getWindowLevel().width, 10) );    
+            parseInt(app.getViewController().getWindowLevel().width, 10) );
     };
-    
+
     /**
      * Handle key down event.
      * @method keydown
@@ -18259,7 +18251,7 @@ dwv.tool.WindowLevel = function(app)
         // let the app handle it
         app.onKeydown(event);
     };
-    
+
     /**
      * Setup the tool GUI.
      * @method setup
@@ -18269,7 +18261,7 @@ dwv.tool.WindowLevel = function(app)
         gui = new dwv.gui.WindowLevel(app);
         gui.setup();
     };
-    
+
     /**
      * Display the tool.
      * @method display
@@ -18287,7 +18279,7 @@ dwv.tool.WindowLevel = function(app)
             }
         }
     };
-    
+
     /**
      * Initialise the tool.
      * @method init
@@ -18387,7 +18379,7 @@ dwv.tool.ZoomAndPan = function(app)
         var point0 = new dwv.math.Point2D(event._x, event._y);
         var point1 = new dwv.math.Point2D(event._x1, event._y1);
         self.line0 = new dwv.math.Line(point0, point1);
-        self.midPoint = self.line0.getMidpoint();         
+        self.midPoint = self.line0.getMidpoint();
     };
 
     /**
@@ -18425,7 +18417,7 @@ dwv.tool.ZoomAndPan = function(app)
         var point1 = new dwv.math.Point2D(event._x1, event._y1);
         var newLine = new dwv.math.Line(point0, point1);
         var lineRatio = newLine.getLength() / self.line0.getLength();
-        
+
         if( lineRatio === 1 )
         {
             // scroll mode
@@ -18452,7 +18444,7 @@ dwv.tool.ZoomAndPan = function(app)
             }
         }
     };
-    
+
     /**
      * Handle mouse up event.
      * @method mouseup
@@ -18465,7 +18457,7 @@ dwv.tool.ZoomAndPan = function(app)
             self.started = false;
         }
     };
-    
+
     /**
      * Handle mouse out event.
      * @method mouseout
@@ -18535,7 +18527,7 @@ dwv.tool.ZoomAndPan = function(app)
         var step = event.wheelDelta / 1200;
         app.stepZoom(step, event._xs, event._ys);
     };
-    
+
     /**
      * Handle key down event.
      * @method keydown
@@ -18554,7 +18546,7 @@ dwv.tool.ZoomAndPan = function(app)
         gui = new dwv.gui.ZoomAndPan(app);
         gui.setup();
     };
-    
+
     /**
      * Enable the tool.
      * @method enable
@@ -18595,7 +18587,8 @@ dwv.tool.ZoomAndPan.prototype.getHelp = function()
  */
 dwv.tool.ZoomAndPan.prototype.init = function() {
     return true;
-};;/** 
+};
+;/** 
  * Utility module.
  * @module utils
  */
@@ -18626,7 +18619,7 @@ dwv.utils.capitaliseFirstLetter = function (string)
 
 /**
  * Split query string:
- *  'root?key0=val00&key0=val01&key1=val10' returns 
+ *  'root?key0=val00&key0=val01&key1=val10' returns
  *  { base : root, query : [ key0 : [val00, val01], key1 : val1 ] }
  * Returns an empty object if the input string is not correct (null, empty...)
  *  or if it is not a query string (no question mark).
@@ -18659,7 +18652,7 @@ dwv.utils.splitQueryString = function (inputStr)
 
 /**
  * Split key/value string:
- *  key0=val00&key0=val01&key1=val10 returns 
+ *  key0=val00&key0=val01&key1=val10 returns
 *   { key0 : [val00, val01], key1 : val1 }
  * @method splitKeyValueString
  * @static
@@ -18678,7 +18671,7 @@ dwv.utils.splitKeyValueString = function (inputStr)
         {
             var pair = pairs[i].split('=');
             // if the key does not exist, create it
-            if ( !result[pair[0]] ) 
+            if ( !result[pair[0]] )
             {
                 result[pair[0]] = pair[1];
             }

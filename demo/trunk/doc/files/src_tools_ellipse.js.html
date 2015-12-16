@@ -186,7 +186,7 @@ var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
 var Kinetic = Kinetic || {};
 
-/** 
+/**
  * Ellipse factory.
  * @class EllipseFactory
  * @namespace dwv.tool
@@ -194,19 +194,19 @@ var Kinetic = Kinetic || {};
  */
 dwv.tool.EllipseFactory = function ()
 {
-    /** 
+    /**
      * Get the number of points needed to build the shape.
      * @method getNPoints
      * @return {Number} The number of points.
      */
     this.getNPoints = function () { return 2; };
-    /** 
+    /**
      * Get the timeout between point storage.
      * @method getTimeout
      * @return {Number} The timeout in milliseconds.
      */
     this.getTimeout = function () { return 0; };
-};  
+};
 
 /**
  * Create an ellipse shape to be displayed.
@@ -214,7 +214,7 @@ dwv.tool.EllipseFactory = function ()
  * @param {Array} points The points from which to extract the ellipse.
  * @param {Object} style The drawing style.
  * @param {Object} image The associated image.
- */ 
+ */
 dwv.tool.EllipseFactory.prototype.create = function (points, style, image)
 {
     // calculate radius
@@ -259,7 +259,7 @@ dwv.tool.EllipseFactory.prototype.create = function (points, style, image)
  * @static
  * @param {Object} anchor The active anchor.
  * @param {Object} image The associated image.
- */ 
+ */
 dwv.tool.UpdateEllipse = function (anchor, image)
 {
     // parent group
@@ -303,13 +303,13 @@ dwv.tool.UpdateEllipse = function (anchor, image)
         bottomRight.x( anchor.x() );
         bottomRight.y( anchor.y() );
         bottomLeft.y( anchor.y() );
-        topRight.x( anchor.x() ); 
+        topRight.x( anchor.x() );
         break;
     case &#x27;bottomLeft&#x27;:
         bottomLeft.x( anchor.x() );
         bottomLeft.y( anchor.y() );
         bottomRight.y( anchor.y() );
-        topLeft.x( anchor.x() ); 
+        topLeft.x( anchor.x() );
         break;
     default :
         console.error(&#x27;Unhandled anchor id: &#x27;+anchor.id());

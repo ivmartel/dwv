@@ -189,7 +189,7 @@ dwv.math = dwv.math || {};
 var __twothirdpi = ( 2 / (3 * Math.PI) );
 
 /**
- * 
+ *
  */
 dwv.math.computeGreyscale = function(data, width, height) {
     // Returns 2D augmented array containing greyscale data
@@ -225,12 +225,12 @@ dwv.math.computeGreyscale = function(data, width, height) {
     };
 
     greyscale.gradMagnitude = function(x,y) {
-        var dx = this.dx(x,y); 
+        var dx = this.dx(x,y);
         var dy = this.dy(x,y);
         return Math.sqrt(dx*dx + dy*dy);
     };
 
-    greyscale.laplace = function(x,y) { 
+    greyscale.laplace = function(x,y) {
         // Laplacian of Gaussian
         var lap = -16 * this[y][x];
         lap += this[y-2][x];
@@ -246,7 +246,7 @@ dwv.math.computeGreyscale = function(data, width, height) {
 };
 
 /**
- * 
+ *
  */
 dwv.math.computeGradient = function(greyscale) {
     // Returns a 2D array of gradient magnitude values for greyscale. The values
@@ -258,7 +258,7 @@ dwv.math.computeGradient = function(greyscale) {
 
     var x = 0;
     var y = 0;
-    
+
     for (y = 0; y &lt; greyscale.length-1; y++) {
         gradient[y] = [];
 
@@ -286,7 +286,7 @@ dwv.math.computeGradient = function(greyscale) {
 };
 
 /**
- * 
+ *
  */
 dwv.math.computeLaplace = function(greyscale) {
     // Returns a 2D array of Laplacian of Gaussian values
@@ -317,7 +317,7 @@ dwv.math.computeLaplace = function(greyscale) {
         laplace[y][greyscale[y].length-2] = 1;
         laplace[y][greyscale[y].length-1] = 1;
     }
-    
+
     laplace[greyscale.length-2] = [];
     laplace[greyscale.length-1] = [];
     for (var j = 1; j &lt; greyscale.length; j++) {
@@ -368,7 +368,7 @@ dwv.math.computeGradY = function(greyscale) {
 
 dwv.math.gradUnitVector = function(gradX, gradY, px, py, out) {
     // Returns the gradient vector at (px,py), scaled to a magnitude of 1
-    var ox = gradX[py][px]; 
+    var ox = gradX[py][px];
     var oy = gradY[py][px];
 
     var gvm = Math.sqrt(ox*ox + oy*oy);
@@ -379,7 +379,7 @@ dwv.math.gradUnitVector = function(gradX, gradY, px, py, out) {
 };
 
 dwv.math.gradDirection = function(gradX, gradY, px, py, qx, qy) {
-    var __dgpuv = new dwv.math.FastPoint2D(-1, -1); 
+    var __dgpuv = new dwv.math.FastPoint2D(-1, -1);
     var __gdquv = new dwv.math.FastPoint2D(-1, -1);
     // Compute the gradiant direction, in radians, between to points
     dwv.math.gradUnitVector(gradX, gradY, px, py, __dgpuv);
@@ -390,7 +390,7 @@ dwv.math.gradDirection = function(gradX, gradY, px, py, qx, qy) {
 
     // Make sure dp is positive, to keep things consistant
     if (dp &lt; 0) {
-        dp = -dp; 
+        dp = -dp;
         dq = -dq;
     }
 
@@ -408,7 +408,7 @@ dwv.math.computeSides = function(dist, gradX, gradY, greyscale) {
     // These greyscale values are the intensity just a little bit along the
     // gradient vector, in either direction, from the supplied point. These
     // values are used when using active-learning Intelligent Scissors
-    
+
     var sides = {};
     sides.inside = [];
     sides.outside = [];
@@ -462,14 +462,14 @@ dwv.math.gaussianBlur = function(buffer, out) {
  * @class Scissors
  * @namespace dwv.math
  * @constructor
- * 
+ *
  * Ref: Eric N. Mortensen, William A. Barrett, Interactive Segmentation with
  *   Intelligent Scissors, Graphical Models and Image Processing, Volume 60,
  *   Issue 5, September 1998, Pages 349-384, ISSN 1077-3169,
  *   DOI: 10.1006/gmip.1998.0480.
- * 
+ *
  * (http://www.sciencedirect.com/science/article/B6WG4-45JB8WN-9/2/6fe59d8089fd1892c2bfb82283065579)
- * 
+ *
  * Highly inspired from http://code.google.com/p/livewire-javascript/
  */
 dwv.math.Scissors = function()
@@ -558,7 +558,7 @@ dwv.math.Scissors.prototype.setData = function(data) {
     this.gradient = dwv.math.computeGradient(this.greyscale);
     this.gradX = dwv.math.computeGradX(this.greyscale);
     this.gradY = dwv.math.computeGradY(this.greyscale);
-    
+
     var sides = dwv.math.computeSides(this.edgeWidth, this.gradX, this.gradY, this.greyscale);
     this.inside = sides.inside;
     this.outside = sides.outside;
@@ -697,7 +697,7 @@ dwv.math.Scissors.prototype.setPoint = function(sp) {
     this.setWorking(true);
 
     this.curPoint = sp;
-    
+
     var x = 0;
     var y = 0;
 

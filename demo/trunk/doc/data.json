@@ -1479,7 +1479,7 @@
             "namespace": "dwv.image",
             "file": "src/image/image.js",
             "line": 77,
-            "description": "Image class.\nUsable once created, optional are:\n- rescale slope and intercept (default 1:0), \n- photometric interpretation (default MONOCHROME2),\n- planar configuration (default RGBRGB...).",
+            "description": "Image class.\nUsable once created, optional are:\n- rescale slope and intercept (default 1:0),\n- photometric interpretation (default MONOCHROME2),\n- planar configuration (default RGBRGB...).",
             "is_constructor": 1,
             "params": [
                 {
@@ -1974,7 +1974,7 @@
                 },
                 {
                     "name": "inputControlPointIndexArray",
-                    "description": "The list of control point of path, \n as indexes (optional).\nNote: first and last point do not need to be equal.",
+                    "description": "The list of control point of path,\n as indexes (optional).\nNote: first and last point do not need to be equal.",
                     "type": "Array"
                 }
             ]
@@ -3544,7 +3544,7 @@
         {
             "file": "src/app/application.js",
             "line": 1189,
-            "description": "Mou(se) and (T)ouch event handler. This function just determines the mouse/touch \nposition relative to the canvas element. It then passes it to the current tool.",
+            "description": "Mou(se) and (T)ouch event handler. This function just determines the mouse/touch\nposition relative to the canvas element. It then passes it to the current tool.",
             "itemtype": "method",
             "name": "onMouch",
             "access": "private",
@@ -4931,7 +4931,7 @@
         {
             "file": "src/dicom/dictionary.js",
             "line": 8,
-            "description": "DICOM tag dictionary.\nGenerated using xml standard conversion\n from https://github.com/ivmartel/dcmbench/tree/master/view/part06\n with http://medical.nema.org/medical/dicom/current/source/docbook/part06/part06.xml\nConversion changes: \n- (vr) \"See Note\" -> \"NONE\", \"OB or OW\" -> \"ox\", \"US or SS\" -> \"xs\"\n- added \"GenericGroupLength\" element to each group\nLocal changes:\n- tag numbers with 'xx' were replaced with '00', 'xxx' with '001' and 'xxxx' with '0004'",
+            "description": "DICOM tag dictionary.\nGenerated using xml standard conversion\n from https://github.com/ivmartel/dcmbench/tree/master/view/part06\n with http://medical.nema.org/medical/dicom/current/source/docbook/part06/part06.xml\nConversion changes:\n- (vr) \"See Note\" -> \"NONE\", \"OB or OW\" -> \"ox\", \"US or SS\" -> \"xs\"\n- added \"GenericGroupLength\" element to each group\nLocal changes:\n- tag numbers with 'xx' were replaced with '00', 'xxx' with '001' and 'xxxx' with '0004'",
             "class": "dwv.browser",
             "module": "dicom",
             "namespace": "dwv.dicom"
@@ -5659,7 +5659,7 @@
         {
             "file": "src/gui/html.js",
             "line": 426,
-            "description": "Decode a Key/Value pair uri. If a key is repeated, the result \nbe an array of base + each key.",
+            "description": "Decode a Key/Value pair uri. If a key is repeated, the result\nbe an array of base + each key.",
             "itemtype": "method",
             "name": "decodeKeyValueUri",
             "static": 1,
@@ -9034,7 +9034,7 @@
             "params": [
                 {
                     "name": "event",
-                    "description": "The load event, event.target \n should be the loaded data.",
+                    "description": "The load event, event.target\n should be the loaded data.",
                     "type": "Object"
                 }
             ],
@@ -9244,7 +9244,7 @@
             "params": [
                 {
                     "name": "event",
-                    "description": "The load event, event.target \n should be the loaded data.",
+                    "description": "The load event, event.target\n should be the loaded data.",
                     "type": "Object"
                 }
             ],
@@ -9281,7 +9281,7 @@
             "params": [
                 {
                     "name": "event",
-                    "description": "The error event, event.message \n should be the error message.",
+                    "description": "The error event, event.message\n should be the error message.",
                     "type": "Object"
                 }
             ],
@@ -13827,7 +13827,7 @@
         {
             "file": "src/utils/string.js",
             "line": 30,
-            "description": "Split query string:\n 'root?key0=val00&key0=val01&key1=val10' returns \n { base : root, query : [ key0 : [val00, val01], key1 : val1 ] }\nReturns an empty object if the input string is not correct (null, empty...)\n or if it is not a query string (no question mark).",
+            "description": "Split query string:\n 'root?key0=val00&key0=val01&key1=val10' returns\n { base : root, query : [ key0 : [val00, val01], key1 : val1 ] }\nReturns an empty object if the input string is not correct (null, empty...)\n or if it is not a query string (no question mark).",
             "itemtype": "method",
             "name": "splitQueryString",
             "static": 1,
@@ -13849,7 +13849,7 @@
         {
             "file": "src/utils/string.js",
             "line": 63,
-            "description": "Split key/value string:\n key0=val00&key0=val01&key1=val10 returns \n  { key0 : [val00, val01], key1 : val1 }",
+            "description": "Split key/value string:\n key0=val00&key0=val01&key1=val10 returns\n  { key0 : [val00, val01], key1 : val1 }",
             "itemtype": "method",
             "name": "splitKeyValueString",
             "static": 1,
@@ -14051,7 +14051,7 @@
             "line": " src/dicom/dicomParser.js:1146"
         },
         {
-            "message": "Missing item type\nDICOM tag dictionary.\nGenerated using xml standard conversion\n from https://github.com/ivmartel/dcmbench/tree/master/view/part06\n with http://medical.nema.org/medical/dicom/current/source/docbook/part06/part06.xml\nConversion changes: \n- (vr) \"See Note\" -> \"NONE\", \"OB or OW\" -> \"ox\", \"US or SS\" -> \"xs\"\n- added \"GenericGroupLength\" element to each group\nLocal changes:\n- tag numbers with 'xx' were replaced with '00', 'xxx' with '001' and 'xxxx' with '0004'",
+            "message": "Missing item type\nDICOM tag dictionary.\nGenerated using xml standard conversion\n from https://github.com/ivmartel/dcmbench/tree/master/view/part06\n with http://medical.nema.org/medical/dicom/current/source/docbook/part06/part06.xml\nConversion changes:\n- (vr) \"See Note\" -> \"NONE\", \"OB or OW\" -> \"ox\", \"US or SS\" -> \"xs\"\n- added \"GenericGroupLength\" element to each group\nLocal changes:\n- tag numbers with 'xx' were replaced with '00', 'xxx' with '001' and 'xxxx' with '0004'",
             "line": " src/dicom/dictionary.js:8"
         },
         {

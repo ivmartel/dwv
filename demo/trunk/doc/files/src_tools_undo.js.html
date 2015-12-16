@@ -192,7 +192,7 @@ dwv.tool = dwv.tool || {};
  * @constructor
  */
 dwv.tool.UndoStack = function (app)
-{ 
+{
     /**
      * Undo GUI.
      * @property gui
@@ -206,14 +206,14 @@ dwv.tool.UndoStack = function (app)
      * @type Array
      */
     var stack = [];
-    
+
     /**
      * Get the stack.
      * @method getStack
      * @return {Array} The list of stored commands.
      */
     this.getStack = function () { return stack; };
-    
+
     /**
      * Current command index.
      * @property curCmdIndex
@@ -228,7 +228,7 @@ dwv.tool.UndoStack = function (app)
      * @param {Object} cmd The command to add.
      */
     this.add = function(cmd)
-    { 
+    {
         // clear commands after current index
         stack = stack.slice(0,curCmdIndex);
         // store command
@@ -241,29 +241,29 @@ dwv.tool.UndoStack = function (app)
     };
 
     /**
-     * Undo the last command. 
+     * Undo the last command.
      * @method undo
      */
     this.undo = function()
-    { 
+    {
         // a bit inefficient...
         if( curCmdIndex &gt; 0 )
         {
             // decrement command index
-            --curCmdIndex; 
+            --curCmdIndex;
             // undo last command
             stack[curCmdIndex].undo();
             // disable last in display history
             gui.enableInUndoHtml(false);
         }
-    }; 
+    };
 
     /**
      * Redo the last command.
      * @method redo
      */
     this.redo = function()
-    { 
+    {
         if( curCmdIndex &lt; stack.length )
         {
             // run last command

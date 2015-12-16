@@ -209,7 +209,7 @@ dwv.gui.base.Loadbox = function (app, loaders)
         // loader select
         var loaderSelector = dwv.html.createHtmlSelect(&quot;loaderSelect&quot;, app.getLoaders());
         loaderSelector.onchange = app.onChangeLoader;
-        
+
         // node
         var node = app.getElement(&quot;loaderlist&quot;);
         // clear it
@@ -221,7 +221,7 @@ dwv.gui.base.Loadbox = function (app, loaders)
         // refresh
         dwv.gui.refreshElement(node);
     };
-    
+
     /**
      * Display a loader.
      * @param {String} name The name of the loader to show.
@@ -238,7 +238,7 @@ dwv.gui.base.Loadbox = function (app, loaders)
             }
         }
     };
-    
+
 }; // class dwv.gui.base.Loadbox
 
 /**
@@ -263,13 +263,13 @@ dwv.gui.base.FileLoad = function (app)
         fileLoadInput.className = &quot;imagefiles&quot;;
         fileLoadInput.setAttribute(&quot;data-clear-btn&quot;,&quot;true&quot;);
         fileLoadInput.setAttribute(&quot;data-mini&quot;,&quot;true&quot;);
-    
+
         // associated div
         var fileLoadDiv = document.createElement(&quot;div&quot;);
         fileLoadDiv.className = &quot;imagefilesdiv&quot;;
         fileLoadDiv.style.display = &quot;none&quot;;
         fileLoadDiv.appendChild(fileLoadInput);
-        
+
         // node
         var node = app.getElement(&quot;loaderlist&quot;);
         // append
@@ -277,7 +277,7 @@ dwv.gui.base.FileLoad = function (app)
         // refresh
         dwv.gui.refreshElement(node);
     };
-    
+
     /**
      * Display the file load HTML.
      * @method display
@@ -290,7 +290,7 @@ dwv.gui.base.FileLoad = function (app)
         var filediv = node.getElementsByClassName(&quot;imagefilesdiv&quot;)[0];
         filediv.style.display = bool ? &quot;&quot; : &quot;none&quot;;
     };
-    
+
 }; // class dwv.gui.base.FileLoad
 
 /**
@@ -314,13 +314,13 @@ dwv.gui.base.UrlLoad = function (app)
         urlLoadInput.className = &quot;imageurl&quot;;
         urlLoadInput.setAttribute(&quot;data-clear-btn&quot;,&quot;true&quot;);
         urlLoadInput.setAttribute(&quot;data-mini&quot;,&quot;true&quot;);
-    
+
         // associated div
         var urlLoadDiv = document.createElement(&quot;div&quot;);
         urlLoadDiv.className = &quot;imageurldiv&quot;;
         urlLoadDiv.style.display = &quot;none&quot;;
         urlLoadDiv.appendChild(urlLoadInput);
-    
+
         // node
         var node = app.getElement(&quot;loaderlist&quot;);
         // append
@@ -328,7 +328,7 @@ dwv.gui.base.UrlLoad = function (app)
         // refresh
         dwv.gui.refreshElement(node);
     };
-    
+
     /**
      * Display the url load HTML.
      * @method display

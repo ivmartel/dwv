@@ -214,7 +214,7 @@ dwv.tool.Livewire = function(app)
      * @type Boolean
      */
     this.started = false;
-    
+
     /**
      * Draw command.
      * @property command
@@ -235,7 +235,7 @@ dwv.tool.Livewire = function(app)
      * @type Style
      */
     this.style = new dwv.html.Style();
-    
+
     /**
      * Path storage. Paths are stored in reverse order.
      * @property path
@@ -264,7 +264,7 @@ dwv.tool.Livewire = function(app)
      * @type Number
      */
     var tolerance = 5;
-    
+
     /**
      * Clear the parent points list.
      * @method clearParentPoints
@@ -276,7 +276,7 @@ dwv.tool.Livewire = function(app)
             parentPoints[i] = [];
         }
     }
-    
+
     /**
      * Clear the stored paths.
      * @method clearPaths
@@ -286,7 +286,7 @@ dwv.tool.Livewire = function(app)
         path = new dwv.math.Path();
         currentPath = new dwv.math.Path();
     }
-    
+
     /**
      * Scissor representation.
      * @property scissors
@@ -294,7 +294,7 @@ dwv.tool.Livewire = function(app)
      * @type Scissors
      */
     var scissors = new dwv.math.Scissors();
-    
+
     /**
      * Handle mouse down event.
      * @method mousedown
@@ -359,8 +359,8 @@ dwv.tool.Livewire = function(app)
         {
             console.log(&quot;Getting ready...&quot;);
             results = scissors.doWork();
-            
-            if( results.length === 0 ) { 
+
+            if( results.length === 0 ) {
                 stop = true;
             }
             else {
@@ -373,17 +373,17 @@ dwv.tool.Livewire = function(app)
             }
         }
         console.log(&quot;Ready!&quot;);
-        
+
         // get the path
         currentPath = new dwv.math.Path();
         stop = false;
         while (p &amp;&amp; !stop) {
             currentPath.addPoint(new dwv.math.Point2D(p.x, p.y));
-            if(!parentPoints[p.y]) { 
+            if(!parentPoints[p.y]) {
                 stop = true;
             }
-            else { 
-                if(!parentPoints[p.y][p.x]) { 
+            else {
+                if(!parentPoints[p.y][p.x]) {
                     stop = true;
                 }
                 else {
@@ -392,7 +392,7 @@ dwv.tool.Livewire = function(app)
             }
         }
         currentPath.appenPath(path);
-        
+
         // remove previous draw
         if ( shapeGroup ) {
             shapeGroup.destroy();
@@ -414,7 +414,7 @@ dwv.tool.Livewire = function(app)
     this.mouseup = function(/*event*/){
         // nothing to do
     };
-    
+
     /**
      * Handle mouse out event.
      * @method mouseout
@@ -424,7 +424,7 @@ dwv.tool.Livewire = function(app)
         // treat as mouse up
         self.mouseup(event);
     };
-    
+
     /**
      * Handle touch start event.
      * @method touchstart
@@ -473,7 +473,7 @@ dwv.tool.Livewire = function(app)
         gui = new dwv.gui.Livewire(app);
         gui.setup();
     };
-    
+
     /**
      * Enable the tool.
      * @method enable
@@ -499,17 +499,17 @@ dwv.tool.Livewire = function(app)
             // init html
             gui.initialise();
         }
-        
+
         //scissors = new dwv.math.Scissors();
         var size = app.getImage().getGeometry().getSize();
         scissors.setDimensions(
                 size.getNumberOfColumns(),
                 size.getNumberOfRows() );
         scissors.setData(app.getImageData().data);
-        
+
         return true;
     };
-    
+
 }; // Livewire class
 
 /**
@@ -522,9 +522,9 @@ dwv.tool.Livewire.prototype.getHelp = function()
     return {
         &#x27;title&#x27;: &quot;Livewire&quot;,
         &#x27;brief&#x27;: &quot;The Livewire tool is a semi-automatic segmentation tool &quot; +
-            &quot;that proposes to the user paths that follow intensity edges.&quot; + 
-            &quot;Click once to initialise and then move the mouse to see &quot; + 
-            &quot;the proposed paths. Click again to build your contour. &quot; + 
+            &quot;that proposes to the user paths that follow intensity edges.&quot; +
+            &quot;Click once to initialise and then move the mouse to see &quot; +
+            &quot;the proposed paths. Click again to build your contour. &quot; +
             &quot;The process stops when you click on the first root point. &quot; +
             &quot;BEWARE: the process can take time!&quot;
     };

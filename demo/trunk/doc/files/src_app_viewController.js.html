@@ -192,7 +192,7 @@ dwv.ViewController = function ( view )
     // Window/level presets
     var presets = null;
 
-    /** 
+    /**
      * Get the window/level presets.
      * @method getPresets
      * @return {Object} The presets.
@@ -208,7 +208,7 @@ dwv.ViewController = function ( view )
     {
         return view.getCurrentPosition();
     };
-    
+
     /**
      * Set the current position.
      * @method setCurrentPosition
@@ -229,13 +229,13 @@ dwv.ViewController = function ( view )
       */
     this.setCurrentPosition2D = function (i, j)
     {
-        return view.setCurrentPosition({ 
-            &quot;i&quot;: i, 
-            &quot;j&quot;: j, 
+        return view.setCurrentPosition({
+            &quot;i&quot;: i,
+            &quot;j&quot;: j,
             &quot;k&quot;: view.getCurrentPosition().k
         });
     };
-    
+
     /**
      * Increment the current slice number.
      * @method incrementSliceNb
@@ -246,7 +246,7 @@ dwv.ViewController = function ( view )
         return view.setCurrentPosition({
             &quot;i&quot;: view.getCurrentPosition().i,
             &quot;j&quot;: view.getCurrentPosition().j,
-            &quot;k&quot;: view.getCurrentPosition().k + 1 
+            &quot;k&quot;: view.getCurrentPosition().k + 1
         });
     };
 
@@ -260,7 +260,7 @@ dwv.ViewController = function ( view )
         return view.setCurrentPosition({
             &quot;i&quot;: view.getCurrentPosition().i,
             &quot;j&quot;: view.getCurrentPosition().j,
-            &quot;k&quot;: view.getCurrentPosition().k - 1 
+            &quot;k&quot;: view.getCurrentPosition().k - 1
         });
     };
 
@@ -274,7 +274,7 @@ dwv.ViewController = function ( view )
         return view.setCurrentPosition({
             &quot;i&quot;: view.getCurrentPosition().i,
             &quot;j&quot;: view.getCurrentPosition().j,
-            &quot;k&quot;:  0 
+            &quot;k&quot;:  0
         });
     };
 
@@ -285,9 +285,9 @@ dwv.ViewController = function ( view )
      */
     this.getWindowLevel = function ()
     {
-        return { 
+        return {
             &quot;width&quot;: view.getWindowLut().getWidth(),
-            &quot;center&quot;: view.getWindowLut().getCenter() 
+            &quot;center&quot;: view.getWindowLut().getCenter()
         };
     };
 
@@ -309,7 +309,7 @@ dwv.ViewController = function ( view )
      * @param {Boolean} full If true, shows all presets.
      */
     this.updatePresets = function (image)
-    {    
+    {
         // store the manual preset
         var manual = null;
         if ( presets ) {
@@ -317,7 +317,7 @@ dwv.ViewController = function ( view )
         }
         // reinitialize the presets
         presets = {};
-        
+
         // DICOM presets
         var dicomPresets = view.getWindowPresets();
         if ( dicomPresets ) {
@@ -325,9 +325,9 @@ dwv.ViewController = function ( view )
                 presets[dicomPresets[i].name.toLowerCase()] = dicomPresets[i];
             }
         }
-        
+
         // Image presets
-        
+
         // min/max preset
         var range = image.getRescaledDataRange();
         var width = range.max - range.min;
@@ -340,7 +340,7 @@ dwv.ViewController = function ( view )
                 presets[key] = dwv.tool.defaultpresets[modality][key];
             }
         }
-        
+
         // Manual preset
         if ( manual ){
             presets.manual = manual;
@@ -381,9 +381,8 @@ dwv.ViewController = function ( view )
         // enable it
         this.setColourMap( dwv.tool.colourMaps[name] );
     };
-    
-}; // class dwv.ViewController
 
+}; // class dwv.ViewController
 
     </pre>
 </div>
