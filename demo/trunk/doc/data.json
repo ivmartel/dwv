@@ -65,6 +65,18 @@
                 "dwv.dicom": 1
             }
         },
+        "src/dicom/dicomWriter.js": {
+            "name": "src/dicom/dicomWriter.js",
+            "modules": {},
+            "classes": {
+                "dwv.dicom.DataWriter": 1,
+                "dwv.dicom.DicomWriter": 1
+            },
+            "fors": {},
+            "namespaces": {
+                "dwv.dicom": 1
+            }
+        },
         "src/dicom/dictionary.js": {
             "name": "src/dicom/dictionary.js",
             "modules": {},
@@ -632,15 +644,17 @@
             "classes": {
                 "dwv.dicom.DataReader": 1,
                 "dwv.dicom.DicomParser": 1,
-                "dwv.dicom.DicomElementsWrapper": 1
+                "dwv.dicom.DicomElementsWrapper": 1,
+                "dwv.dicom.DataWriter": 1,
+                "dwv.dicom.DicomWriter": 1
             },
             "fors": {},
             "namespaces": {
                 "dwv.dicom": 1
             },
             "tag": "module",
-            "file": "src/dicom/dicomParser.js",
-            "line": 1039,
+            "file": "src/dicom/dicomWriter.js",
+            "line": 88,
             "description": "DICOM module."
         },
         "browser": {
@@ -960,6 +974,50 @@
                 {
                     "name": "dicomElements",
                     "description": "The elements to wrap.",
+                    "type": "Array"
+                }
+            ]
+        },
+        "dwv.dicom.DataWriter": {
+            "name": "dwv.dicom.DataWriter",
+            "shortname": "dwv.dicom.DataWriter",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "dicom",
+            "namespace": "dwv.dicom",
+            "file": "src/dicom/dicomWriter.js",
+            "line": 8,
+            "description": "Data writer.",
+            "is_constructor": 1,
+            "params": [
+                {
+                    "name": "buffer",
+                    "description": "The input array buffer.\nExample usage:\n  var parser = new dwv.dicom.DicomParser();\n  parser.parse(this.response);\n  \n  var writer = new dwv.dicom.DicomWriter(parser.getRawDicomElements());\n  var blob = new Blob([writer.getBuffer()], {type: 'application/dicom'});\n  \n  var element = document.getElementById(\"download\");\n  element.href = URL.createObjectURL(blob);\n  element.download = \"anonym.dcm\";",
+                    "type": "Array"
+                }
+            ]
+        },
+        "dwv.dicom.DicomWriter": {
+            "name": "dwv.dicom.DicomWriter",
+            "shortname": "dwv.dicom.DicomWriter",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "dicom",
+            "namespace": "dwv.dicom",
+            "file": "src/dicom/dicomWriter.js",
+            "line": 88,
+            "description": "DICOM writer.",
+            "is_constructor": 1,
+            "params": [
+                {
+                    "name": "dicomElements",
+                    "description": "The wrapped elements to wrap.",
                     "type": "Array"
                 }
             ]
