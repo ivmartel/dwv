@@ -176,7 +176,7 @@ dwv.io.File.prototype.load = function (ioArray)
     {
         try {
             //onLoad( dwv.image.getDataFromDicomBuffer(event.target.result) );
-            dwv.image.getDataFromDicomBuffer(event.target.result, onLoad)
+            dwv.image.getDataFromDicomBuffer(event.target.result, onLoad);
         } catch(error) {
             self.onerror(error);
         }
