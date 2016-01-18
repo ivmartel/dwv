@@ -59,7 +59,7 @@ dwv.image.filter.Threshold = function()
      * @return {String} The name of the filter.
      */
     this.getName = function() { return "Threshold"; };
-    
+
     /**
      * Original image.
      * @property originalImage
@@ -85,7 +85,7 @@ dwv.image.filter.Threshold = function()
  * Transform the main image using this filter.
  * @method update
  * @return {Object} The transformed image.
- */ 
+ */
 dwv.image.filter.Threshold.prototype.update = function ()
 {
     var image = this.getOriginalImage();
@@ -141,11 +141,11 @@ dwv.image.filter.Sharpen = function()
  * Transform the main image using this filter.
  * @method update
  * @return {Object} The transformed image.
- */ 
+ */
 dwv.image.filter.Sharpen.prototype.update = function()
 {
     var image = this.getOriginalImage();
-    
+
     return image.convolute2D(
         [  0, -1,  0,
           -1,  5, -1,
@@ -191,11 +191,11 @@ dwv.image.filter.Sobel = function()
  * Transform the main image using this filter.
  * @method update
  * @return {Object} The transformed image.
- */ 
+ */
 dwv.image.filter.Sobel.prototype.update = function()
 {
     var image = this.getOriginalImage();
-    
+
     var gradX = image.convolute2D(
         [ 1,  0,  -1,
           2,  0,  -2,
@@ -205,7 +205,6 @@ dwv.image.filter.Sobel.prototype.update = function()
         [  1,  2,  1,
            0,  0,  0,
           -1, -2, -1 ] );
-    
+
     return gradX.compose( gradY, function (x,y) { return Math.sqrt(x*x+y*y); } );
 };
-

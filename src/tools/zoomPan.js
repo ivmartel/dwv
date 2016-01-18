@@ -66,7 +66,7 @@ dwv.tool.ZoomAndPan = function(app)
         var point0 = new dwv.math.Point2D(event._x, event._y);
         var point1 = new dwv.math.Point2D(event._x1, event._y1);
         self.line0 = new dwv.math.Line(point0, point1);
-        self.midPoint = self.line0.getMidpoint();         
+        self.midPoint = self.line0.getMidpoint();
     };
 
     /**
@@ -104,7 +104,7 @@ dwv.tool.ZoomAndPan = function(app)
         var point1 = new dwv.math.Point2D(event._x1, event._y1);
         var newLine = new dwv.math.Line(point0, point1);
         var lineRatio = newLine.getLength() / self.line0.getLength();
-        
+
         if( lineRatio === 1 )
         {
             // scroll mode
@@ -131,7 +131,7 @@ dwv.tool.ZoomAndPan = function(app)
             }
         }
     };
-    
+
     /**
      * Handle mouse up event.
      * @method mouseup
@@ -144,7 +144,7 @@ dwv.tool.ZoomAndPan = function(app)
             self.started = false;
         }
     };
-    
+
     /**
      * Handle mouse out event.
      * @method mouseout
@@ -214,7 +214,7 @@ dwv.tool.ZoomAndPan = function(app)
         var step = event.wheelDelta / 1200;
         app.stepZoom(step, event._xs, event._ys);
     };
-    
+
     /**
      * Handle key down event.
      * @method keydown
@@ -233,7 +233,7 @@ dwv.tool.ZoomAndPan = function(app)
         gui = new dwv.gui.ZoomAndPan(app);
         gui.setup();
     };
-    
+
     /**
      * Enable the tool.
      * @method enable

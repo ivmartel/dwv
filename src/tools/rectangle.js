@@ -6,7 +6,7 @@ var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
 var Kinetic = Kinetic || {};
 
-/** 
+/**
  * Rectangle factory.
  * @class RectangleFactory
  * @namespace dwv.tool
@@ -14,19 +14,19 @@ var Kinetic = Kinetic || {};
  */
 dwv.tool.RectangleFactory = function ()
 {
-    /** 
+    /**
      * Get the number of points needed to build the shape.
      * @method getNPoints
      * @return {Number} The number of points.
      */
     this.getNPoints = function () { return 2; };
-    /** 
+    /**
      * Get the timeout between point storage.
      * @method getTimeout
      * @return {Number} The timeout in milliseconds.
      */
     this.getTimeout = function () { return 0; };
-};  
+};
 
 /**
  * Create a rectangle shape to be displayed.
@@ -34,7 +34,7 @@ dwv.tool.RectangleFactory = function ()
  * @param {Array} points The points from which to extract the rectangle.
  * @param {Object} style The drawing style.
  * @param {Object} image The associated image.
- */ 
+ */
 dwv.tool.RectangleFactory.prototype.create = function (points, style, image)
 {
     // physical shape
@@ -77,7 +77,7 @@ dwv.tool.RectangleFactory.prototype.create = function (points, style, image)
  * @static
  * @param {Object} anchor The active anchor.
  * @param {Object} image The associated image.
- */ 
+ */
 dwv.tool.UpdateRect = function (anchor, image)
 {
     // parent group
@@ -121,13 +121,13 @@ dwv.tool.UpdateRect = function (anchor, image)
         bottomRight.x( anchor.x() );
         bottomRight.y( anchor.y() );
         bottomLeft.y( anchor.y() );
-        topRight.x( anchor.x() ); 
+        topRight.x( anchor.x() );
         break;
     case 'bottomLeft':
         bottomLeft.x( anchor.x() );
         bottomLeft.y( anchor.y() );
         bottomRight.y( anchor.y() );
-        topLeft.x( anchor.x() ); 
+        topLeft.x( anchor.x() );
         break;
     default :
         console.error('Unhandled anchor id: '+anchor.id());

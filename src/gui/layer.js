@@ -68,7 +68,7 @@ dwv.html.Layer = function(canvas)
      * @type Array
      */
     var imageData = null;
-    
+
     /**
      * The layer origin.
      * @property origin
@@ -99,9 +99,9 @@ dwv.html.Layer = function(canvas)
     this.getZoom = function () {
         return zoom;
     };
-    
+
     var trans = {'x': 0, 'y': 0};
-    
+
     /**
      * Set the canvas width.
      * @method setWidth
@@ -118,7 +118,7 @@ dwv.html.Layer = function(canvas)
     this.setHeight = function ( height ) {
         canvas.height = height;
     };
-    
+
     /**
      * Set the layer zoom.
      * @method setZoom
@@ -132,11 +132,11 @@ dwv.html.Layer = function(canvas)
         // The zoom is the ratio between the differences from the center
         // to the origins:
         // centerX - originX = ( centerX - originX0 ) * zoomX
-        // (center in ~world coordinate system)  
+        // (center in ~world coordinate system)
         //originX = (centerX / zoomX) + originX - (centerX / newZoomX);
         //originY = (centerY / zoomY) + originY - (centerY / newZoomY);
-        
-        // center in image coordinate system        
+
+        // center in image coordinate system
         origin.x = centerX - (centerX - origin.x) * (newZoomX / zoom.x);
         origin.y = centerY - (centerY - origin.y) * (newZoomY / zoom.y);
 
@@ -144,7 +144,7 @@ dwv.html.Layer = function(canvas)
         zoom.x = newZoomX;
         zoom.y = newZoomY;
     };
-    
+
     /**
      * Set the layer translation.
      * Translation is according to the last one.
@@ -157,7 +157,7 @@ dwv.html.Layer = function(canvas)
         trans.x = tx;
         trans.y = ty;
     };
-    
+
     /**
      * Set the image data array.
      * @method setImageData
@@ -169,11 +169,11 @@ dwv.html.Layer = function(canvas)
         // update the cached canvas
         cacheCanvas.getContext("2d").putImageData(imageData, 0, 0);
     };
-    
+
     /**
      * Reset the layout.
      * @method resetLayout
-     */ 
+     */
     this.resetLayout = function(izoom)
     {
         origin.x = 0;
@@ -183,16 +183,16 @@ dwv.html.Layer = function(canvas)
         trans.x = 0;
         trans.y = 0;
     };
-    
+
     /**
      * Transform a display position to an index.
      * @method displayToIndex
-     */ 
+     */
     this.displayToIndex = function ( point2D ) {
         return {'x': ( (point2D.x - origin.x) / zoom.x ) - trans.x,
             'y': ( (point2D.y - origin.y) / zoom.y ) - trans.y};
     };
-    
+
     /**
      * Draw the content (imageData) of the layer.
      * The imageData variable needs to be set
@@ -208,19 +208,19 @@ dwv.html.Layer = function(canvas)
         context.clearRect( 0, 0, canvas.width, canvas.height );
         // restore the transform
         context.restore();
-        
+
         // draw the cached canvas on the context
         // transform takes as input a, b, c, d, e, f to create
         // the transform matrix (column-major order):
         // [ a c e ]
         // [ b d f ]
         // [ 0 0 1 ]
-        context.setTransform( zoom.x, 0, 0, zoom.y, 
-            origin.x + (trans.x * zoom.x), 
+        context.setTransform( zoom.x, 0, 0, zoom.y,
+            origin.x + (trans.x * zoom.x),
             origin.y + (trans.y * zoom.y) );
         context.drawImage( cacheCanvas, 0, 0 );
     };
-    
+
     /**
      * Initialise the layer: set the canvas and context
      * @method initialise
@@ -260,7 +260,7 @@ dwv.html.Layer = function(canvas)
         cacheCanvas.width = inputWidth;
         cacheCanvas.height = inputHeight;
     };
-    
+
     /**
      * Fill the full context with the current style.
      * @method fillContext
@@ -269,7 +269,7 @@ dwv.html.Layer = function(canvas)
     {
         context.fillRect( 0, 0, canvas.width, canvas.height );
     };
-    
+
     /**
      * Clear the context and reset the image data.
      * @method clear
@@ -303,7 +303,7 @@ dwv.html.Layer = function(canvas)
                 // 4 component data: RGB + alpha
                 offMerge = 4 * ( parseInt( (origin.x + i * zoom.x), 10 ) + offMergeJ );
                 offThis = 4 * ( i + offThisJ );
-                // merge non transparent 
+                // merge non transparent
                 alpha = mergeImageData.data[offMerge+3];
                 if( alpha !== 0 ) {
                     imageData.data[offThis] = mergeImageData.data[offMerge];
@@ -318,7 +318,7 @@ dwv.html.Layer = function(canvas)
         // draw the layer
         this.draw();
     };
-    
+
     /**
      * Set the line colour for the layer.
      * @method setLineColour
@@ -329,7 +329,7 @@ dwv.html.Layer = function(canvas)
         context.fillStyle = colour;
         context.strokeStyle = colour;
     };
-    
+
     /**
      * Display the layer.
      * @method setStyleDisplay
@@ -346,7 +346,7 @@ dwv.html.Layer = function(canvas)
             canvas.style.display = "none";
         }
     };
-    
+
     /**
      * Check if the layer is visible.
      * @method isVisible
@@ -361,7 +361,7 @@ dwv.html.Layer = function(canvas)
             return true;
         }
     };
-    
+
     /**
      * Align on another layer.
      * @method align

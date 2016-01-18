@@ -1,4 +1,4 @@
-/** 
+/**
  * Application launcher.
  */
 
@@ -20,7 +20,7 @@ $(document).ready( function()
         "gui": ["tool", "load", "help", "undo", "version", "tags"],
         "isMobile": true
     });
-    
+
     // example app listening
     //var listener = function (event) { console.log("event: "+event.type); };
     //myapp.addEventListener("load-end", listener);

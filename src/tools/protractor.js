@@ -6,7 +6,7 @@ var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
 var Kinetic = Kinetic || {};
 
-/** 
+/**
  * Protractor factory.
  * @class ProtractorFactory
  * @namespace dwv.tool
@@ -14,19 +14,19 @@ var Kinetic = Kinetic || {};
  */
 dwv.tool.ProtractorFactory = function ()
 {
-    /** 
+    /**
      * Get the number of points needed to build the shape.
      * @method getNPoints
      * @return {Number} The number of points.
      */
     this.getNPoints = function () { return 3; };
-    /** 
+    /**
      * Get the timeout between point storage.
      * @method getTimeout
      * @return {Number} The timeout in milliseconds.
      */
     this.getTimeout = function () { return 500; };
-};  
+};
 
 /**
  * Create a protractor shape to be displayed.
@@ -35,7 +35,7 @@ dwv.tool.ProtractorFactory = function ()
  * @param {Array} points The points from which to extract the protractor.
  * @param {Object} style The drawing style.
  * @param {Object} image The associated image.
- */ 
+ */
 dwv.tool.ProtractorFactory.prototype.create = function (points, style/*, image*/)
 {
     // physical shape
@@ -107,7 +107,7 @@ dwv.tool.ProtractorFactory.prototype.create = function (points, style/*, image*/
  * @static
  * @param {Object} anchor The active anchor.
  * @param {Object} image The associated image.
- */ 
+ */
 dwv.tool.UpdateProtractor = function (anchor/*, image*/)
 {
     // parent group

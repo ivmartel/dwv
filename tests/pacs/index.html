@@ -23,82 +23,82 @@ ul li p {font-size:80%;}
 <script type="text/javascript">
 var dataDicom = [
     {
-    title: "Baby MRI", 
-    uri: "http://x.babymri.org/?53320924&.dcm", 
-    img: "babymri.png", 
+    title: "Baby MRI",
+    uri: "http://x.babymri.org/?53320924&.dcm",
+    img: "babymri.png",
     desc: "Brain MR, 256*256*1, LittleEndianExplicit [1.2.840.10008.1.2.1], bits: 16-12-11"
     },
     {
-    title: "Multiple Baby MRI", 
+    title: "Multiple Baby MRI",
     uri: "http://x.babymri.org/?key=53320924&key=53321068&key=53322843&key=53322987&key=53323131",
     uriargs: "&dwvReplaceMode=void",
-    img: "babymri.png", 
+    img: "babymri.png",
     desc: "Brain MR, 256*256*5, LittleEndianExplicit [1.2.840.10008.1.2.1], bits: 16-12-11"
     }];
 var dataDicomSop = [
     {
-    title: "Toutatix", 
-    uri: "https://github.com/ivmartel/dwv/raw/master/tests/pacs/data/?file=osirix-toutatix-100.dcm&file=osirix-toutatix-101.dcm", 
+    title: "Toutatix",
+    uri: "https://github.com/ivmartel/dwv/raw/master/tests/pacs/data/?file=osirix-toutatix-100.dcm&file=osirix-toutatix-101.dcm",
     uriargs: "&dwvReplaceMode=void",
-    img: "toutatix.png", 
+    img: "toutatix.png",
     desc: "Chest CT(A), 512*512*1, LittleEndianExplicit [1.2.840.10008.1.2.1], bits: 16-12-11, from the Osirix examples, hosted on the dwv github."
     },
     {
-    title: "Goudurix", 
-    uri: "https://github.com/ivmartel/dwv/raw/master/tests/pacs/data/osirix-goudurix.dcm", 
-    img: "goudurix.png", 
+    title: "Goudurix",
+    uri: "https://github.com/ivmartel/dwv/raw/master/tests/pacs/data/osirix-goudurix.dcm",
+    img: "goudurix.png",
     desc: "Chest CT(A), 512*512*1, LittleEndianExplicit [1.2.840.10008.1.2.1], bits: 16-12-11, from the Osirix examples, hosted on the dwv github.",
     },
     {
-    title: "US", 
-    uri: "https://github.com/ivmartel/dwv/raw/master/tests/pacs/data/gdcm-US-RGB-8-epicard.dcm", 
-    img: "us.png", 
+    title: "US",
+    uri: "https://github.com/ivmartel/dwv/raw/master/tests/pacs/data/gdcm-US-RGB-8-epicard.dcm",
+    img: "us.png",
     desc: "US, 640*480*1, BigEndianExplicit [1.2.840.10008.1.2.2], bits: 8-8-7, from the GDCM examples, hosted on the dwv github.",
     },
     {
-    title: "Cerebrix", 
-    uri: "https://github.com/ivmartel/dwv/raw/master/tests/pacs/data/osirix-cerebrix.dcm", 
-    img: "cerebrix.png", 
+    title: "Cerebrix",
+    uri: "https://github.com/ivmartel/dwv/raw/master/tests/pacs/data/osirix-cerebrix.dcm",
+    img: "cerebrix.png",
     desc: "Brain SC (Secondary Capture), 176*224*1, JPEG2000 [1.2.840.10008.1.2.4.91], bits: 16-16-15, from the Osirix examples, hosted on the dwv github.",
     },
     {
-    title: "Aneurix (direct link)", 
-    uri: "http://dicom.vital-it.ch:8089/wado?requestType=WADO&contentType=application/dicom&studyUID=2.16.840.1.113669.632.20.1211.10000744858&seriesUID=1.3.6.1.4.1.19291.2.1.2.2413568109772100001&objectUID=1.3.6.1.4.1.19291.2.1.3.2413568110716100007", 
-    img: "vitalitch0.png", 
+    title: "Aneurix (direct link)",
+    uri: "http://dicom.vital-it.ch:8089/wado?requestType=WADO&contentType=application/dicom&studyUID=2.16.840.1.113669.632.20.1211.10000744858&seriesUID=1.3.6.1.4.1.19291.2.1.2.2413568109772100001&objectUID=1.3.6.1.4.1.19291.2.1.3.2413568110716100007",
+    img: "vitalitch0.png",
     desc: "Via wado, 176*224*1, JPEG2000 [1.2.840.10008.1.2.4.91], bits: 16-16-15, from the dicom.vital-it.ch examples.",
     },
     {
-    title: "Aneurix (from manifest)", 
-    uri: "http://dicom.vital-it.ch:8089/weasis-pacs-connector/manifest?patientID=FhM2hk", 
+    title: "Aneurix (from manifest)",
+    uri: "http://dicom.vital-it.ch:8089/weasis-pacs-connector/manifest?patientID=FhM2hk",
     uriargs: "&type=manifest&nslices=10",
-    img: "vitalitch0.png", 
+    img: "vitalitch0.png",
     desc: "Via wado, 176*224*1, JPEG2000 [1.2.840.10008.1.2.4.91], from the dicom.vital-it.ch examples.",
     },
     {
-    title: "Anonymous", 
-    uri: "http://dicom.vital-it.ch:8089/wado?requestType=WADO&contentType=application/dicom&studyUID=1.2.840.113564.3.1.2.20110912134402.100261&seriesUID=1.2.840.113564.1921680151.20110912125724093870&objectUID=1.2.840.113564.1921680151.20110912125724093880.2003000225000", 
-    img: "vitalitch3.png", 
+    title: "Anonymous",
+    uri: "http://dicom.vital-it.ch:8089/wado?requestType=WADO&contentType=application/dicom&studyUID=1.2.840.113564.3.1.2.20110912134402.100261&seriesUID=1.2.840.113564.1921680151.20110912125724093870&objectUID=1.2.840.113564.1921680151.20110912125724093880.2003000225000",
+    img: "vitalitch3.png",
     desc: "Via wado, 2018x4915x1, LittleEndianExplicit [1.2.840.10008.1.2.1], MONOCHROME1, bits: 16-12-11, from the dicom.vital-it.ch examples.",
     comment: "Carefull, big!"
     }
     ];
 var dataImg = [
     {
-    title: "JPEG", 
-    uri: "http://upload.wikimedia.org/wikipedia/commons/c/c6/PET-image.jpg", 
-    img: "brainpet-jpg.png", 
+    title: "JPEG",
+    uri: "http://upload.wikimedia.org/wikipedia/commons/c/c6/PET-image.jpg",
+    img: "brainpet-jpg.png",
     desc: "Brain PET from wikipedia (http://en.wikipedia.org/wiki/File:PET-image.jpg), 531*600*1."
     },
     {
-    title: "PNG", 
-    uri: "http://upload.wikimedia.org/wikipedia/commons/7/7f/Brain_MRI_112010_rgbca.png", 
-    img: "brainmri-png.png", 
+    title: "PNG",
+    uri: "http://upload.wikimedia.org/wikipedia/commons/7/7f/Brain_MRI_112010_rgbca.png",
+    img: "brainmri-png.png",
     desc: "Brain MRI from wikipedia (http://en.wikipedia.org/wiki/File:Brain_MRI_112010_rgbca.png), 389*504*1."
     },
     {
-    title: "JPG", 
-    uri: "http://upload.wikimedia.org/wikipedia/commons/0/0e/Acute_leukemia-ALL.jpg", 
-    img: "acute_leukemia.png", 
+    title: "JPG",
+    uri: "http://upload.wikimedia.org/wikipedia/commons/0/0e/Acute_leukemia-ALL.jpg",
+    img: "acute_leukemia.png",
     desc: "Acute Leukimia from wikipedia (http://en.wikipedia.org/wiki/File:Acute_leukemia-ALL.jpg), 347*395*1."
     }
     ];
@@ -115,7 +115,7 @@ function setDwv(obj)
 }
 function getDwvBaseUrl(flag)
 {
-    var path = "../../viewers"; 
+    var path = "../../viewers";
     if( flag === "dwvmobile" ) path += "/mobile";
     else if( flag === "dwvstatic" ) path += "/static";
     else if( flag === "dwvsimple" ) path += "/simple";
@@ -150,14 +150,14 @@ function createAndPutHtml(data, id)
             comment.appendChild(document.createTextNode(" "+data[i].comment));
             desc.appendChild(comment);
         }
-        
+
         // link
         var link = document.createElement("a");
         link.href = getDwvUrl(data[i].uri);
         if( data[i].uriargs ) link.href += data[i].uriargs;
         link.className = "dwvlink";
         link.appendChild(image);
-        
+
         // list item
         var li = document.createElement("li");
         li.appendChild(link);
@@ -200,8 +200,8 @@ be on a web interface to a PACS system. Click on the list item to launch DWV wit
 
 <br style="clear:both">
 
-<p>The folowing items link to data available online but not in a secured way due to 
-<a href="http://en.wikipedia.org/wiki/Same_origin_policy">same origin policy</a>. 
+<p>The folowing items link to data available online but not in a secured way due to
+<a href="http://en.wikipedia.org/wiki/Same_origin_policy">same origin policy</a>.
 To see them start Google Chrome with <code>--disable-web-security</code>
 (do not forget to <b>remove</b> that flag for normal browsing).</p>
 

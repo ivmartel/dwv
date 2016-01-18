@@ -25,7 +25,7 @@ QUnit.test("Test Point2D.", function (assert) {
     var p2 = new dwv.math.Point2D(2,1);
     assert.equal(p0.equals(p2), false, "equals false");
     // to string
-    assert.equal(p0.toString(), "(1, 2)", "toString");        
+    assert.equal(p0.toString(), "(1, 2)", "toString");
 });
 
 QUnit.test("Test FastPoint2D.", function (assert) {
@@ -48,5 +48,5 @@ QUnit.test("Test FastPoint2D.", function (assert) {
     var p2 = new dwv.math.FastPoint2D(4,3);
     assert.equal(p0.equals(p2), false, "equals false");
     // to string
-    assert.equal(p0.toString(), "(3, 4)", "toString");        
+    assert.equal(p0.toString(), "(3, 4)", "toString");
 });

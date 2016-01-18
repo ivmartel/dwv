@@ -39,7 +39,7 @@ dwv.tool.WindowLevel = function(app)
      * @type Boolean
      */
     this.started = false;
-    
+
     /**
      * Handle mouse down event.
      * @method mousedown
@@ -54,7 +54,7 @@ dwv.tool.WindowLevel = function(app)
         // update GUI
         app.getViewController().setCurrentPosition2D(event._x, event._y);
     };
-    
+
     /**
      * Handle mouse move event.
      * @method mousemove
@@ -77,7 +77,7 @@ dwv.tool.WindowLevel = function(app)
         self.x0 = event._x;
         self.y0 = event._y;
     };
-    
+
     /**
      * Handle mouse up event.
      * @method mouseup
@@ -99,7 +99,7 @@ dwv.tool.WindowLevel = function(app)
             }
         }
     };
-    
+
     /**
      * Handle mouse out event.
      * @method mouseout
@@ -109,7 +109,7 @@ dwv.tool.WindowLevel = function(app)
         // treat as mouse up
         self.mouseup(event);
     };
-    
+
     /**
      * Handle touch start event.
      * @method touchstart
@@ -118,7 +118,7 @@ dwv.tool.WindowLevel = function(app)
     this.touchstart = function(event){
         self.mousedown(event);
     };
-    
+
     /**
      * Handle touch move event.
      * @method touchmove
@@ -127,7 +127,7 @@ dwv.tool.WindowLevel = function(app)
     this.touchmove = function(event){
         self.mousemove(event);
     };
-    
+
     /**
      * Handle touch end event.
      * @method touchend
@@ -136,7 +136,7 @@ dwv.tool.WindowLevel = function(app)
     this.touchend = function(event){
         self.mouseup(event);
     };
-    
+
     /**
      * Handle double click event.
      * @method dblclick
@@ -147,9 +147,9 @@ dwv.tool.WindowLevel = function(app)
         app.getViewController().setWindowLevel(
             parseInt(app.getImage().getRescaledValue(
                 event._x, event._y, app.getViewController().getCurrentPosition().k), 10),
-            parseInt(app.getViewController().getWindowLevel().width, 10) );    
+            parseInt(app.getViewController().getWindowLevel().width, 10) );
     };
-    
+
     /**
      * Handle key down event.
      * @method keydown
@@ -159,7 +159,7 @@ dwv.tool.WindowLevel = function(app)
         // let the app handle it
         app.onKeydown(event);
     };
-    
+
     /**
      * Setup the tool GUI.
      * @method setup
@@ -169,7 +169,7 @@ dwv.tool.WindowLevel = function(app)
         gui = new dwv.gui.WindowLevel(app);
         gui.setup();
     };
-    
+
     /**
      * Display the tool.
      * @method display
@@ -187,7 +187,7 @@ dwv.tool.WindowLevel = function(app)
             }
         }
     };
-    
+
     /**
      * Initialise the tool.
      * @method init

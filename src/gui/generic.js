@@ -111,7 +111,7 @@ dwv.gui.base.Slider = function (app)
         // default values
         var min = 0;
         var max = 1;
-        
+
         // jquery-mobile range slider
         // minimum input
         var inputMin = document.createElement("input");
@@ -147,7 +147,7 @@ dwv.gui.base.Slider = function (app)
         // refresh
         dwv.gui.refreshElement(app.getElement("toolList"));
     };
-    
+
     /**
      * Initialise the slider HTML.
      * @method initialise
@@ -156,7 +156,7 @@ dwv.gui.base.Slider = function (app)
     {
         var min = app.getImage().getDataRange().min;
         var max = app.getImage().getDataRange().max;
-        
+
         // minimum input
         var inputMin = document.getElementById("threshold-min");
         inputMin.max = max;
@@ -194,7 +194,7 @@ dwv.gui.base.DicomTags = function (app)
             return;
         }
         // remove possible previous
-        while (node.hasChildNodes()) { 
+        while (node.hasChildNodes()) {
             node.removeChild(node.firstChild);
         }
         // tag list table (without the pixel data)
@@ -214,5 +214,5 @@ dwv.gui.base.DicomTags = function (app)
         // refresh
         dwv.gui.refreshElement(node);
     };
-    
+
 }; // class dwv.gui.base.DicomTags

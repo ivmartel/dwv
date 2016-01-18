@@ -20,7 +20,7 @@ QUnit.test("Test listeners.", function (assert) {
     image0.setMeta( { BitsStored: 8 } );
     // create a view
     var view0 = new dwv.image.View(image0);
-    
+
     // listeners
     var listener1 = function(event){
         assert.equal( event.wc, 0, "Expected call to listener1.");
@@ -58,7 +58,7 @@ QUnit.test("Test generate data MONO.", function (assert) {
     // create the image data
     // TODO Uint8ClampedArray not in phantom??
     var imageData = {'width': size0, 'height': size0, 'data': new Uint8Array(size0*size0*4) };
-    
+
     // default window level
     view0.setWindowLevelMinMax();
     // call generate data
@@ -102,7 +102,7 @@ QUnit.test("Test generate data RGB.", function (assert) {
     // create the image data
     // TODO Uint8ClampedArray not in phantom??
     var imageData = {'width': size0, 'height': size0, 'data': new Uint8Array(size0*size0*4) };
-    
+
     // default window level
     view0.setWindowLevel(127, 255);
     // call generate data
@@ -118,7 +118,7 @@ QUnit.test("Test generate data RGB.", function (assert) {
         }
     }
     assert.equal( testContent0, true, "check image data non planar" );
-    
+
     var buffer1 = [];
     index = 0;
     // 0, 85, 170, 255
@@ -135,7 +135,7 @@ QUnit.test("Test generate data RGB.", function (assert) {
     image1.setMeta( { 'BitsStored': 8 } );
     // create a view
     var view1 = new dwv.image.View(image1);
-    
+
     // default window level
     view1.setWindowLevel(127, 255);
     // call generate data
@@ -168,27 +168,27 @@ QUnit.test("Test generate data timing.", function (assert) {
     var view0 = new dwv.image.View(image0);
     // create the image data
     var imageData = {"width": size0, "height": size0, "data": new Uint8Array(size0*size0*4) };
-    
+
     // default window level
     view0.setWindowLevelMinMax();
-    
+
     // start time
-    var start0 = new Date(); 
+    var start0 = new Date();
     // call generate data
     view0.generateImageData(imageData);
-    // time taken 
+    // time taken
     var time0 = (new Date()) - start0;
     // check time taken
     assert.ok( time0 < 90, "First generateImageData: "+time0+"ms.");
-    
+
     // Change the window level
     view0.setWindowLevel(4000, 200);
-    
+
     // start time
     var start1 = (new Date()).getMilliseconds();
     // call generate data
     view0.generateImageData(imageData);
-    // time taken 
+    // time taken
     var time1 = (new Date()).getMilliseconds() - start1;
     // check time taken
     assert.ok( time1 < 90, "Second generateImageData: "+time1+"ms.");

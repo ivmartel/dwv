@@ -135,4 +135,3 @@ QUnit.test("Test Path.", function (assert) {
     // check if control point
     assert.equal(path0.isControlPoint(p0), 1, "isControlPoint");
 });
-

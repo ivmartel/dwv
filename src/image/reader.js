@@ -187,4 +187,3 @@ dwv.image.getDataFromDicomBuffer = function(buffer, onLoad)
     pool.addWorkerTask(workerTask);
     
 };
-

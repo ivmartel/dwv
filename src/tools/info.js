@@ -45,7 +45,7 @@ dwv.info.Windowing = function ( div )
         // add list to div
         div.appendChild(ul);
     };
-    
+
     /**
      * Update the windowing info div.
      * @method update
@@ -63,7 +63,7 @@ dwv.info.Windowing = function ( div )
         dwv.html.cleanNode(liww);
         liww.appendChild(document.createTextNode("WindowWidth = "+event.ww));
     };
-    
+
 }; // class dwv.info.Windowing
 
 /**
@@ -100,7 +100,7 @@ dwv.info.Position = function ( div )
         // add list to div
         div.appendChild(ul);
     };
-    
+
     /**
      * Update the position info div.
      * @method update
@@ -140,7 +140,7 @@ dwv.info.MiniColourMap = function ( div, app )
      * @method create
      */
     this.create = function ()
-    {    
+    {
         // clean div
         var elems = div.getElementsByClassName("colour-map-info");
         if ( elems.length !== 0 ) {
@@ -154,7 +154,7 @@ dwv.info.MiniColourMap = function ( div, app )
         // add canvas to div
         div.appendChild(canvas);
     };
-    
+
     /**
      * Update the mini colour map info div.
      * @method update
@@ -162,28 +162,28 @@ dwv.info.MiniColourMap = function ( div, app )
      * Warning: expects the mini colour map div to exist (use after createMiniColourMap).
      */
     this.update = function (event)
-    {    
+    {
         var windowCenter = event.wc;
         var windowWidth = event.ww;
-        
+
         var canvas = div.getElementsByClassName("colour-map-info")[0];
         var context = canvas.getContext('2d');
-        
+
         // fill in the image data
         var colourMap = app.getViewController().getColourMap();
         var imageData = context.getImageData(0,0,canvas.width, canvas.height);
-        
+
         var c = 0;
         var minInt = app.getImage().getRescaledDataRange().min;
         var range = app.getImage().getRescaledDataRange().max - minInt;
         var incrC = range / canvas.width;
         var y = 0;
-        
+
         var yMax = 255;
         var yMin = 0;
         var xMin = windowCenter - 0.5 - (windowWidth-1) / 2;
-        var xMax = windowCenter - 0.5 + (windowWidth-1) / 2;    
-        
+        var xMax = windowCenter - 0.5 + (windowWidth-1) / 2;
+
         var index;
         for( var j=0; j<canvas.height; ++j ) {
             c = minInt;
@@ -252,17 +252,17 @@ dwv.info.Plot = function (div, app)
     {
         var wc = event.wc;
         var ww = event.ww;
-        
+
         var half = parseInt( (ww-1) / 2, 10 );
         var center = parseInt( (wc-0.5), 10 );
         var min = center - half;
         var max = center + half;
-        
+
         var markings = [
             { "color": "#faa", "lineWidth": 1, "xaxis": { "from": min, "to": min } },
             { "color": "#aaf", "lineWidth": 1, "xaxis": { "from": max, "to": max } }
         ];
-    
+
         $.plot(div, [ app.getImage().getHistogram() ], {
             "bars": { "show": true },
             "grid": { "markings": markings, "backgroundcolour": null },

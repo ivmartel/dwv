@@ -27,16 +27,16 @@ dwv.gui.base.Undo = function (app)
      */
     this.setup = function ()
     {
-        var paragraph = document.createElement("p");  
+        var paragraph = document.createElement("p");
         paragraph.appendChild(document.createTextNode("History:"));
         paragraph.appendChild(document.createElement("br"));
-        
+
         var select = document.createElement("select");
         select.className = "history_list";
         select.name = "history_list";
         select.multiple = "multiple";
         paragraph.appendChild(select);
-    
+
         // node
         var node = app.getElement("history");
         // clear it
@@ -48,7 +48,7 @@ dwv.gui.base.Undo = function (app)
         // refresh
         dwv.gui.refreshElement(node);
     };
-    
+
     /**
      * Clear the command list of the undo HTML.
      * @method cleanUndoHtml
@@ -65,7 +65,7 @@ dwv.gui.base.Undo = function (app)
         // refresh
         dwv.gui.refreshElement(select);
     };
-    
+
     /**
      * Add a command to the undo HTML.
      * @method addCommandToUndoHtml
@@ -93,7 +93,7 @@ dwv.gui.base.Undo = function (app)
         // refresh
         dwv.gui.refreshElement(select);
     };
-    
+
     /**
      * Enable the last command of the undo HTML.
      * @method enableInUndoHtml
@@ -104,7 +104,7 @@ dwv.gui.base.Undo = function (app)
         var select = app.getElement("history_list");
         // enable or not (order is important)
         var option;
-        if( enable ) 
+        if( enable )
         {
             // increment selected index
             select.selectedIndex++;
@@ -112,7 +112,7 @@ dwv.gui.base.Undo = function (app)
             option = select.options[select.selectedIndex];
             option.disabled = false;
         }
-        else 
+        else
         {
             // disable option
             option = select.options[select.selectedIndex];

@@ -6,7 +6,7 @@ var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
 var Kinetic = Kinetic || {};
 
-/** 
+/**
  * Line factory.
  * @class LineFactory
  * @namespace dwv.tool
@@ -14,19 +14,19 @@ var Kinetic = Kinetic || {};
  */
 dwv.tool.LineFactory = function ()
 {
-    /** 
+    /**
      * Get the number of points needed to build the shape.
      * @method getNPoints
      * @return {Number} The number of points.
      */
     this.getNPoints = function () { return 2; };
-    /** 
+    /**
      * Get the timeout between point storage.
      * @method getTimeout
      * @return {Number} The timeout in milliseconds.
      */
     this.getTimeout = function () { return 0; };
-};  
+};
 
 /**
  * Create a line shape to be displayed.
@@ -34,14 +34,14 @@ dwv.tool.LineFactory = function ()
  * @param {Array} points The points from which to extract the line.
  * @param {Object} style The drawing style.
  * @param {Object} image The associated image.
- */ 
+ */
 dwv.tool.LineFactory.prototype.create = function (points, style, image)
 {
     // physical shape
     var line = new dwv.math.Line(points[0], points[1]);
     // draw shape
     var kshape = new Kinetic.Line({
-        points: [line.getBegin().getX(), line.getBegin().getY(), 
+        points: [line.getBegin().getX(), line.getBegin().getY(),
                  line.getEnd().getX(), line.getEnd().getY() ],
         stroke: style.getLineColour(),
         strokeWidth: style.getScaledStrokeWidth(),
@@ -76,7 +76,7 @@ dwv.tool.LineFactory.prototype.create = function (points, style, image)
  * @static
  * @param {Object} anchor The active anchor.
  * @param {Object} image The associated image.
- */ 
+ */
 dwv.tool.UpdateLine = function (anchor, image)
 {
     // parent group
@@ -122,7 +122,7 @@ dwv.tool.UpdateLine = function (anchor, image)
     var str = quant.length.toPrecision(4) + " mm";
     var dX = line.getBegin().getX() > line.getEnd().getX() ? 0 : -1;
     var dY = line.getBegin().getY() > line.getEnd().getY() ? -1 : 0.5;
-    var textPos = { 
+    var textPos = {
         'x': line.getEnd().getX() + dX * 25,
         'y': line.getEnd().getY() + dY * 15, };
     ktext.position( textPos );

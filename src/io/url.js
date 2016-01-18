@@ -40,36 +40,36 @@ dwv.io.Url = function ()
      * @type Array
      */
     var progressList = [];
-    
+
     /**
      * Set the number of data to load.
      * @method setNToLoad
-     */ 
+     */
     this.setNToLoad = function (n) {
         nToLoad = n;
         for ( var i = 0; i < nToLoad; ++i ) {
             progressList[i] = 0;
         }
     };
-    
+
     /**
      * Increment the number of loaded data
      * and call onloadend if loaded all data.
      * @method addLoaded
-     */ 
+     */
     this.addLoaded = function () {
         nLoaded++;
         if ( nLoaded === nToLoad ) {
             this.onloadend();
         }
     };
-    
+
     /**
      * Get the global load percent including the provided one.
      * @method getGlobalPercent
      * @param {Number} n The number of the loaded data.
      * @param {Number} percent The percentage of data 'n' that has been loaded.
-     * @return {Number} The accumulated percentage. 
+     * @return {Number} The accumulated percentage.
      */
     this.getGlobalPercent = function (n, percent) {
         progressList[n] = percent/nToLoad;
@@ -84,10 +84,10 @@ dwv.io.Url = function ()
 /**
  * Handle a load event.
  * @method onload
- * @param {Object} event The load event, event.target 
+ * @param {Object} event The load event, event.target
  *  should be the loaded data.
  */
-dwv.io.Url.prototype.onload = function (/*event*/) 
+dwv.io.Url.prototype.onload = function (/*event*/)
 {
     // default does nothing.
 };
@@ -95,7 +95,7 @@ dwv.io.Url.prototype.onload = function (/*event*/)
  * Handle a load end event.
  * @method onloadend
  */
-dwv.io.Url.prototype.onloadend = function () 
+dwv.io.Url.prototype.onloadend = function ()
 {
     // default does nothing.
 };
@@ -103,17 +103,17 @@ dwv.io.Url.prototype.onloadend = function ()
  * Handle a progress event.
  * @method onprogress
  */
-dwv.io.File.prototype.onprogress = function () 
+dwv.io.File.prototype.onprogress = function ()
 {
     // default does nothing.
 };
 /**
  * Handle an error event.
  * @method onerror
- * @param {Object} event The error event, event.message 
+ * @param {Object} event The error event, event.message
  *  should be the error message.
  */
-dwv.io.Url.prototype.onerror = function (/*event*/) 
+dwv.io.Url.prototype.onerror = function (/*event*/)
 {
     // default does nothing.
 };
@@ -127,8 +127,8 @@ dwv.io.Url.prototype.onerror = function (/*event*/)
  */
 dwv.io.Url.createErrorHandler = function (url, text, baseHandler) {
     return function (/*event*/) {
-        baseHandler( {'name': "RequestError", 
-            'message': "An error occurred while retrieving the " + text + " file (via http): " + url + 
+        baseHandler( {'name': "RequestError",
+            'message': "An error occurred while retrieving the " + text + " file (via http): " + url +
             " (status: "+this.status + ")" } );
     };
 };
@@ -145,7 +145,7 @@ dwv.io.Url.createProgressHandler = function (n, calculator, baseHandler) {
         if( event.lengthComputable )
         {
             var percent = Math.round((event.loaded / event.total) * 100);
-            var ev = {type: "load-progress", lengthComputable: true, 
+            var ev = {type: "load-progress", lengthComputable: true,
                     loaded: calculator(n, percent), total: 100};
             baseHandler(ev);
         }
@@ -157,7 +157,7 @@ dwv.io.Url.createProgressHandler = function (n, calculator, baseHandler) {
  * @method load
  * @param {Array} ioArray The list of urls to load.
  */
-dwv.io.Url.prototype.load = function (ioArray) 
+dwv.io.Url.prototype.load = function (ioArray)
 {
     // closure to self for handlers
     var self = this;
@@ -200,7 +200,7 @@ dwv.io.Url.prototype.load = function (ioArray)
             self.onerror(error);
         }
     };
-    
+
     // binary request
     var onLoadBinaryRequest = function (/*event*/)
     {
@@ -209,7 +209,7 @@ dwv.io.Url.prototype.load = function (ioArray)
         var isJpeg = view.getUint32(0) === 0xffd8ffe0;
         var isPng = view.getUint32(0) === 0x89504e47;
         var isGif = view.getUint32(0) === 0x47494638;
-        
+
         // check possible extension
         // (responseURL is supported on major browsers but not IE...)
         if ( !isJpeg && !isPng && !isGif && this.responseURL )
@@ -219,7 +219,7 @@ dwv.io.Url.prototype.load = function (ioArray)
             isPng = (ext === "png");
             isGif = (ext === "gif");
         }
-        
+
         // non DICOM
         if( isJpeg || isPng || isGif )
         {
@@ -261,7 +261,7 @@ dwv.io.Url.prototype.load = function (ioArray)
         var request = new XMLHttpRequest();
         request.open('GET', url, true);
         if ( !isText ) {
-            request.responseType = "arraybuffer"; 
+            request.responseType = "arraybuffer";
             request.onload = onLoadBinaryRequest;
             request.onerror = dwv.io.Url.createErrorHandler(url, "binary", self.onerror);
         }
@@ -269,7 +269,7 @@ dwv.io.Url.prototype.load = function (ioArray)
             request.onload = onLoadTextRequest;
             request.onerror = dwv.io.Url.createErrorHandler(url, "text", self.onerror);
         }
-        request.onprogress = dwv.io.File.createProgressHandler(i, 
+        request.onprogress = dwv.io.File.createProgressHandler(i,
             self.getGlobalPercent, self.onprogress);
         request.send(null);
     }

@@ -49,7 +49,7 @@ dwv.tool.ShapeEditor = function (app)
      * @type Function
      */
     var drawEventCallback = null;
-    
+
     /**
      * Set the shape to edit.
      * @method setShape
@@ -63,7 +63,7 @@ dwv.tool.ShapeEditor = function (app)
             addAnchors();
         }
     };
-    
+
     /**
      * Set the associated image.
      * @method setImage
@@ -72,16 +72,16 @@ dwv.tool.ShapeEditor = function (app)
     this.setImage = function ( img ) {
         image = img;
     };
-    
+
     /**
      * Get the edited shape.
      * @method getShape
      * @return {Object} The edited shape.
      */
-    this.getShape = function () { 
+    this.getShape = function () {
         return shape;
     };
-    
+
     /**
      * Get the active flag.
      * @method isActive
@@ -99,7 +99,7 @@ dwv.tool.ShapeEditor = function (app)
     this.setDrawEventCallback = function ( callback ) {
         drawEventCallback = callback;
     };
-    
+
     /**
      * Enable the editor. Redraws the layer.
      * @method enable
@@ -113,7 +113,7 @@ dwv.tool.ShapeEditor = function (app)
             }
         }
     };
-    
+
     /**
      * Disable the editor. Redraws the layer.
      * @method disable
@@ -127,7 +127,7 @@ dwv.tool.ShapeEditor = function (app)
             }
         }
     };
-    
+
     /**
      * Reset the anchors.
      * @method resetAnchors
@@ -140,7 +140,7 @@ dwv.tool.ShapeEditor = function (app)
         // set them visible
         setAnchorsVisible( true );
     };
-    
+
     /**
      * Apply a function on all anchors.
      * @param {Object} func A f(shape) function.
@@ -151,7 +151,7 @@ dwv.tool.ShapeEditor = function (app)
             anchors.each( func );
         }
     }
-    
+
     /**
      * Set anchors visibility.
      * @method setAnchorsVisible
@@ -170,7 +170,7 @@ dwv.tool.ShapeEditor = function (app)
      */
     this.setAnchorsActive = function ( flag ) {
         var func = null;
-        if ( flag ) { 
+        if ( flag ) {
             func = function (anchor) {
                 setAnchorOn( anchor );
             };
@@ -192,7 +192,7 @@ dwv.tool.ShapeEditor = function (app)
             anchor.remove();
         });
     }
-    
+
     /**
      * Add the shape anchors.
      * @method addAnchors
@@ -261,7 +261,7 @@ dwv.tool.ShapeEditor = function (app)
         // add group to layer
         shape.getLayer().add( group );
     }
-    
+
     /**
      * Create shape editor controls, i.e. the anchors.
      * @method addAnchor
@@ -293,7 +293,7 @@ dwv.tool.ShapeEditor = function (app)
         // add the anchor to the group
         group.add(anchor);
     }
-    
+
     /**
      * Get a simple clone of the input anchor.
      * @param {Object} anchor The anchor to clone.
@@ -320,14 +320,14 @@ dwv.tool.ShapeEditor = function (app)
         };
         return clone;
     }
-    
+
     /**
      * Set the anchor on listeners.
      * @param {Object} anchor The anchor to set on.
      */
     function setAnchorOn( anchor ) {
         var startAnchor = null;
-        
+
         // command name based on shape type
         var cmdName = "shape";
         if ( shape instanceof Kinetic.Line ) {
@@ -404,7 +404,7 @@ dwv.tool.ShapeEditor = function (app)
             }
         });
     }
-    
+
     /**
      * Set the anchor off listeners.
      * @param {Object} anchor The anchor to set off.

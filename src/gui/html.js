@@ -23,7 +23,7 @@ dwv.html.appendCell = function (row, content)
     var cell = row.insertCell(-1);
     var str = content;
     // special care for arrays
-    if ( content instanceof Array || 
+    if ( content instanceof Array ||
             content instanceof Uint8Array ||
             content instanceof Uint16Array ||
             content instanceof Uint32Array ) {
@@ -195,7 +195,7 @@ dwv.html.getHtmlSearchForm = function (htmlTableToSearch)
         dwv.html.filterTable(input, htmlTableToSearch);
     };
     form.appendChild(input);
-    
+
     return form;
 };
 
@@ -405,7 +405,7 @@ dwv.html.createHtmlSelect = function (name, list) {
  *  [dwv root]?input=encodeURI([root]?key0=value0&key1=value1)
  * or
  *  [dwv root]?input=encodeURI([manifest link])&type=manifest
- *  
+ *
  * @method getUriParam
  * @static
  * @param {String } uri The URI to decode.
@@ -424,8 +424,8 @@ dwv.html.getUriParam = function (uri)
 };
 
 /**
- * Decode a Key/Value pair uri. If a key is repeated, the result 
- * be an array of base + each key. 
+ * Decode a Key/Value pair uri. If a key is repeated, the result
+ * be an array of base + each key.
  * @method decodeKeyValueUri
  * @static
  * @param {String} uri The uri to decode.
@@ -445,7 +445,7 @@ dwv.html.decodeKeyValueUri = function (uri, replaceMode)
     var queryUri = decodeURIComponent(uri);
     // get key/value pairs from input URI
     var inputQueryPairs = dwv.utils.splitQueryString(queryUri);
-    if ( Object.keys(inputQueryPairs).length === 0 ) 
+    if ( Object.keys(inputQueryPairs).length === 0 )
     {
         result.push(queryUri);
     }
@@ -462,8 +462,8 @@ dwv.html.decodeKeyValueUri = function (uri, replaceMode)
                 break;
             }
         }
-    
-        if ( !repeatKey ) 
+
+        if ( !repeatKey )
         {
             result.push(queryUri);
         }
@@ -474,7 +474,7 @@ dwv.html.decodeKeyValueUri = function (uri, replaceMode)
             var baseUrl = inputQueryPairs.base;
             // do not add '?' when the repeatKey is 'file'
             // root/path/to/?file=0.jpg&file=1.jpg
-            if ( repeatKey !== "file" ) { 
+            if ( repeatKey !== "file" ) {
                 baseUrl += "?";
             }
             var gotOneArg = false;
@@ -510,7 +510,7 @@ dwv.html.decodeKeyValueUri = function (uri, replaceMode)
 };
 
 /**
- * Decode a manifest uri. 
+ * Decode a manifest uri.
  * @method decodeManifestUri
  * @static
  * @param {String} uri The uri to decode.
@@ -531,17 +531,17 @@ dwv.html.decodeManifestUri = function (uri, nslices, callback)
         var urls = dwv.html.decodeManifest(this.responseXML, nslices);
         callback(urls);
     };
-    
+
     var request = new XMLHttpRequest();
     request.open('GET', decodeURIComponent(uri), true);
-    request.responseType = "xml"; 
+    request.responseType = "xml";
     request.onload = onLoadRequest;
     request.onerror = onErrorRequest;
     request.send(null);
 };
 
 /**
- * Decode an XML manifest. 
+ * Decode an XML manifest.
  * @method decodeManifest
  * @static
  * @param {Object} manifest The manifest to decode.
@@ -580,7 +580,7 @@ dwv.html.decodeManifest = function (manifest, nslices)
     }
     for ( var i = 0; i < max; ++i ) {
         var sopInstanceUID = instanceList[i].getAttribute("SOPInstanceUID");
-        var link = rootURL + 
+        var link = rootURL +
         "&studyUID=" + studyUID +
         "&seriesUID=" + seriesUID +
         "&objectUID=" + sopInstanceUID;

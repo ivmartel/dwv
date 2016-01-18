@@ -45,7 +45,7 @@ dwv.tool.Filter = function ( filterList, app )
      * @type Boolean
      */
     this.displayed = false;
-    
+
     /**
      * Setup the filter GUI.
      * @method setup
@@ -91,7 +91,7 @@ dwv.tool.Filter = function ( filterList, app )
         // init all filters
         for( key in this.filterList ) {
             this.filterList[key].init();
-        }    
+        }
         // init html
         if ( gui ) {
             gui.initialise();
@@ -202,7 +202,7 @@ dwv.tool.filter.Threshold = function ( app )
      * @type Object
      */
     var gui = new dwv.gui.Threshold(app);
-    
+
     /**
      * Setup the filter GUI.
      * @method setup
@@ -221,7 +221,7 @@ dwv.tool.filter.Threshold = function ( app )
     {
         gui.display(bool);
     };
-    
+
     /**
      * Initialise the filter.
      * @method init
@@ -230,7 +230,7 @@ dwv.tool.filter.Threshold = function ( app )
     {
         gui.initialise();
     };
-    
+
     /**
      * Run the filter.
      * @method run
@@ -246,7 +246,7 @@ dwv.tool.filter.Threshold = function ( app )
         // save command in undo stack
         app.getUndoStack().add(command);
     };
-    
+
 }; // class dwv.tool.filter.Threshold
 
 
@@ -265,7 +265,7 @@ dwv.tool.filter.Sharpen = function ( app )
      * @type Object
      */
     var gui = new dwv.gui.Sharpen(app);
-    
+
     /**
      * Setup the filter GUI.
      * @method setup
@@ -284,7 +284,7 @@ dwv.tool.filter.Sharpen = function ( app )
     {
         gui.display(bool);
     };
-    
+
     /**
      * Initialise the filter.
      * @method init
@@ -293,7 +293,7 @@ dwv.tool.filter.Sharpen = function ( app )
     {
         // nothing to do...
     };
-    
+
     /**
      * Run the filter.
      * @method run
@@ -325,7 +325,7 @@ dwv.tool.filter.Sobel = function ( app )
      * @type Object
      */
     var gui = new dwv.gui.Sobel(app);
-    
+
     /**
      * Setup the filter GUI.
      * @method setup
@@ -344,7 +344,7 @@ dwv.tool.filter.Sobel = function ( app )
     {
         gui.display(bool);
     };
-    
+
     /**
      * Initialise the filter.
      * @method init
@@ -353,7 +353,7 @@ dwv.tool.filter.Sobel = function ( app )
     {
         // nothing to do...
     };
-    
+
     /**
      * Run the filter.
      * @method run
@@ -379,7 +379,7 @@ dwv.tool.filter.Sobel = function ( app )
  * @param {Object} app The associated application.
  */
 dwv.tool.RunFilterCommand = function (filter, app) {
-    
+
     /**
      * Get the command name.
      * @method getName
@@ -396,7 +396,7 @@ dwv.tool.RunFilterCommand = function (filter, app) {
         filter.setOriginalImage(app.getImage());
         app.setImage(filter.update());
         app.render();
-    }; 
+    };
     /**
      * Undo the command.
      * @method undo
@@ -405,5 +405,5 @@ dwv.tool.RunFilterCommand = function (filter, app) {
         app.setImage(filter.getOriginalImage());
         app.render();
     };
-    
+
 }; // RunFilterCommand class
