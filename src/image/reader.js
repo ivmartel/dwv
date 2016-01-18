@@ -165,25 +165,33 @@ dwv.image.getDataFromDicomBuffer = function(buffer, onLoad)
     // parse the buffer
     dicomParser.parse(buffer);
 
-    var script = '../../src/dicom/decode-jpeg2000.js';
     var callback = function(e) {
-        console.log("worker done.");
-        //console.log(e);
-        
         // create the view
         var viewFactory = new dwv.image.ViewFactory();
         var view = viewFactory.create( dicomParser.getDicomElements(), e.data );
         // return
-        //return {"view": view, "info": dicomParser.getDicomElements().dumpToTable()};
         onLoad({"view": view, "info": dicomParser.getDicomElements().dumpToTable()});
     };
     var startMessage = dicomParser.pixelBuffer;
     
-    /*var worker = new Worker(script);
-    worker.addEventListener('message', callback, false);
-    worker.postMessage(startMessage);*/
-
-    var workerTask = new WorkerTask(script,callback,startMessage);
-    pool.addWorkerTask(workerTask);
+    var script = null;
+    var syntax = dwv.dicom.cleanString(dicomParser.getRawDicomElements().x00020010.value[0]);
+    if ( dwv.dicom.isJpeg2000TransferSyntax(syntax) ) {
+        script = '../../src/dicom/decode-jpeg2000.js';
+    }
+    else if (dwv.dicom.isJpegLosslessTransferSyntax(syntax) ) {
+        script = '../../src/dicom/decode-jpegloss.js';
+    }
+    else if (dwv.dicom.isJpegBaselineTransferSyntax(syntax) ) {
+        script = '../../src/dicom/decode-jpegbaseline.js';
+    }
+    
+    if ( script !== null ) {
+        var workerTask = new WorkerTask(script,callback,startMessage);
+        pool.addWorkerTask(workerTask);
+    }
+    else {
+        callback({data: startMessage});
+    }
     
 };

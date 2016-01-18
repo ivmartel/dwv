@@ -4,6 +4,8 @@
  */
 var dwv = dwv || {};
 dwv.dicom = dwv.dicom || {};
+
+/*
 // JPEG Baseline
 var hasJpegBaselineDecoder = (typeof JpegImage !== "undefined");
 var JpegImage = JpegImage || {};
@@ -15,6 +17,7 @@ jpeg.lossless = jpeg.lossless || {};
 // JPEG 2000
 var hasJpeg2000Decoder = (typeof JpxImage !== "undefined");
 var JpxImage = JpxImage || {};
+*/
 
 /**
  * Clean string: trim and remove ending.
@@ -1006,23 +1009,15 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
     }
 
     // uncompress data if needed
-    var decoder = null;
+    /*var decoder = null;
     if( isJpegLossless ) {
         if ( !hasJpegLosslessDecoder ) {
             throw new Error("No JPEG Lossless decoder provided");
         }
-        /*var buf = new Uint8Array(this.pixelBuffer);
+        var buf = new Uint8Array(this.pixelBuffer);
         decoder = new jpeg.lossless.Decoder(buf.buffer);
         var decoded = decoder.decode();
-        this.pixelBuffer = new Uint16Array(decoded.buffer);*/
-        
-        /*var worker = new Worker('../../src/dicom/decode-jpegloss.js');
-        worker.addEventListener('message', function(e) {
-            console.log("worker done.");
-            console.log(e);
-            this.pixelBuffer = e.data;
-        }, false);
-        worker.postMessage(this.pixelBuffer);*/
+        this.pixelBuffer = new Uint16Array(decoded.buffer);
     }
     else if ( isJpegBaseline ) {
         if ( !hasJpegBaselineDecoder ) {
@@ -1037,11 +1032,11 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
             throw new Error("No JPEG 2000 decoder provided");
         }
         // decompress pixel buffer into Int16 image
-        /*decoder = new JpxImage();
+        decoder = new JpxImage();
         decoder.parse( this.pixelBuffer );
         // set the pixel buffer
-        this.pixelBuffer = decoder.tiles[0].items;*/
-    }
+        this.pixelBuffer = decoder.tiles[0].items;
+    }*/
 };
 
 /**
