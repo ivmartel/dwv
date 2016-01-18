@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>src/io/url.js - dwv</title>
+    <title>src/dicom/decode-jpegloss.js - dwv</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
     <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
@@ -176,287 +176,29 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-<h1 class="file-heading">File: src/io/url.js</h1>
+<h1 class="file-heading">File: src/dicom/decode-jpegloss.js</h1>
 
 <div class="file">
     <pre class="code prettyprint linenums">
-/** 
- * I/O module.
- * @module io
- */
-var dwv = dwv || {};
 /**
- * Namespace for I/O functions.
- * @class io
- * @namespace dwv
- * @static
+ * JPEG Lossless decoder worker.
  */
-dwv.io = dwv.io || {};
+// Do not warn if these variables were not defined before.
+/* global importScripts, self, jpeg */
 
-/**
- * Url loader.
- * @class Url
- * @namespace dwv.io
- * @constructor
- */
-dwv.io.Url = function ()
-{
-    /**
-     * Number of data to load.
-     * @property nToLoad
-     * @private
-     * @type Number
-     */
-    var nToLoad = 0;
-    /**
-     * Number of loaded data.
-     * @property nLoaded
-     * @private
-     * @type Number
-     */
-    var nLoaded = 0;
-    /**
-     * List of progresses.
-     * @property progressList
-     * @private
-     * @type Array
-     */
-    var progressList = [];
+importScripts(&#x27;../../ext/rii-mango/lossless-min.js&#x27;); 
 
-    /**
-     * Set the number of data to load.
-     * @method setNToLoad
-     */
-    this.setNToLoad = function (n) {
-        nToLoad = n;
-        for ( var i = 0; i &lt; nToLoad; ++i ) {
-            progressList[i] = 0;
-        }
-    };
-
-    /**
-     * Increment the number of loaded data
-     * and call onloadend if loaded all data.
-     * @method addLoaded
-     */
-    this.addLoaded = function () {
-        nLoaded++;
-        if ( nLoaded === nToLoad ) {
-            this.onloadend();
-        }
-    };
-
-    /**
-     * Get the global load percent including the provided one.
-     * @method getGlobalPercent
-     * @param {Number} n The number of the loaded data.
-     * @param {Number} percent The percentage of data &#x27;n&#x27; that has been loaded.
-     * @return {Number} The accumulated percentage.
-     */
-    this.getGlobalPercent = function (n, percent) {
-        progressList[n] = percent/nToLoad;
-        var totPercent = 0;
-        for ( var i = 0; i &lt; progressList.length; ++i ) {
-            totPercent += progressList[i];
-        }
-        return totPercent;
-    };
-}; // class Url
-
-/**
- * Handle a load event.
- * @method onload
- * @param {Object} event The load event, event.target
- *  should be the loaded data.
- */
-dwv.io.Url.prototype.onload = function (/*event*/)
-{
-    // default does nothing.
-};
-/**
- * Handle a load end event.
- * @method onloadend
- */
-dwv.io.Url.prototype.onloadend = function ()
-{
-    // default does nothing.
-};
-/**
- * Handle a progress event.
- * @method onprogress
- */
-dwv.io.File.prototype.onprogress = function ()
-{
-    // default does nothing.
-};
-/**
- * Handle an error event.
- * @method onerror
- * @param {Object} event The error event, event.message
- *  should be the error message.
- */
-dwv.io.Url.prototype.onerror = function (/*event*/)
-{
-    // default does nothing.
-};
-
-/**
- * Create an error handler from a base one and locals.
- * @method createErrorHandler
- * @param {String} url The related url.
- * @param {String} text The text to insert in the message.
- * @param {Function} baseHandler The base handler.
- */
-dwv.io.Url.createErrorHandler = function (url, text, baseHandler) {
-    return function (/*event*/) {
-        baseHandler( {&#x27;name&#x27;: &quot;RequestError&quot;,
-            &#x27;message&#x27;: &quot;An error occurred while retrieving the &quot; + text + &quot; file (via http): &quot; + url +
-            &quot; (status: &quot;+this.status + &quot;)&quot; } );
-    };
-};
-
-/**
- * Create an progress handler from a base one and locals.
- * @method createProgressHandler
- * @param {Number} n The number of the loaded data.
- * @param {Function} calculator The load progress accumulator.
- * @param {Function} baseHandler The base handler.
- */
-dwv.io.Url.createProgressHandler = function (n, calculator, baseHandler) {
-    return function (event) {
-        if( event.lengthComputable )
-        {
-            var percent = Math.round((event.loaded / event.total) * 100);
-            var ev = {type: &quot;load-progress&quot;, lengthComputable: true,
-                    loaded: calculator(n, percent), total: 100};
-            baseHandler(ev);
-        }
-    };
-};
-
-/**
- * Load a list of URLs.
- * @method load
- * @param {Array} ioArray The list of urls to load.
- */
-dwv.io.Url.prototype.load = function (ioArray)
-{
-    // closure to self for handlers
-    var self = this;
-    // set the number of data to load
-    this.setNToLoad( ioArray.length );
-
-    // call the listeners
-    var onLoad = function (data)
-    {
-        self.onload(data);
-        self.addLoaded();
-    };
-
-    // DICOM request
-    var onLoadDicomRequest = function (response)
-    {
-        try {
-            //onLoad( dwv.image.getDataFromDicomBuffer(response) );
-            dwv.image.getDataFromDicomBuffer(response, onLoad);
-        } catch (error) {
-            self.onerror(error);
-        }
-    };
-
-    // image request
-    var onLoadImage = function (/*event*/)
-    {
-        try {
-            onLoad( dwv.image.getDataFromImage(this) );
-        } catch (error) {
-            self.onerror(error);
-        }
-    };
-
-    // text request
-    var onLoadTextRequest = function (/*event*/)
-    {
-        try {
-            onLoad( this.responseText );
-        } catch (error) {
-            self.onerror(error);
-        }
-    };
-
-    // binary request
-    var onLoadBinaryRequest = function (/*event*/)
-    {
-        // find the image type from its signature
-        var view = new DataView(this.response);
-        var isJpeg = view.getUint32(0) === 0xffd8ffe0;
-        var isPng = view.getUint32(0) === 0x89504e47;
-        var isGif = view.getUint32(0) === 0x47494638;
-
-        // check possible extension
-        // (responseURL is supported on major browsers but not IE...)
-        if ( !isJpeg &amp;&amp; !isPng &amp;&amp; !isGif &amp;&amp; this.responseURL )
-        {
-            var ext = this.responseURL.split(&#x27;.&#x27;).pop().toLowerCase();
-            isJpeg = (ext === &quot;jpg&quot;) || (ext === &quot;jpeg&quot;);
-            isPng = (ext === &quot;png&quot;);
-            isGif = (ext === &quot;gif&quot;);
-        }
-
-        // non DICOM
-        if( isJpeg || isPng || isGif )
-        {
-            // image data as string
-            var bytes = new Uint8Array(this.response);
-            var imageDataStr = &#x27;&#x27;;
-            for( var i = 0; i &lt; bytes.byteLength; ++i ) {
-                imageDataStr += String.fromCharCode(bytes[i]);
-            }
-            // image type
-            var imageType = &quot;unknown&quot;;
-            if(isJpeg) {
-                imageType = &quot;jpeg&quot;;
-            }
-            else if(isPng) {
-                imageType = &quot;png&quot;;
-            }
-            else if(isGif) {
-                imageType = &quot;gif&quot;;
-            }
-            // temporary image object
-            var tmpImage = new Image();
-            tmpImage.src = &quot;data:image/&quot; + imageType + &quot;;base64,&quot; + window.btoa(imageDataStr);
-            tmpImage.onload = onLoadImage;
-        }
-        else
-        {
-            onLoadDicomRequest(this.response);
-        }
-    };
-
-    // loop on I/O elements
-    for (var i = 0; i &lt; ioArray.length; ++i)
-    {
-        var url = ioArray[i];
-        // read as text according to extension
-        var isText = ( url.split(&#x27;.&#x27;).pop().toLowerCase() === &quot;json&quot; );
-
-        var request = new XMLHttpRequest();
-        request.open(&#x27;GET&#x27;, url, true);
-        if ( !isText ) {
-            request.responseType = &quot;arraybuffer&quot;;
-            request.onload = onLoadBinaryRequest;
-            request.onerror = dwv.io.Url.createErrorHandler(url, &quot;binary&quot;, self.onerror);
-        }
-        else {
-            request.onload = onLoadTextRequest;
-            request.onerror = dwv.io.Url.createErrorHandler(url, &quot;text&quot;, self.onerror);
-        }
-        request.onprogress = dwv.io.File.createProgressHandler(i,
-            self.getGlobalPercent, self.onprogress);
-        request.send(null);
-    }
-};
+self.addEventListener(&#x27;message&#x27;, function (e) {
+    
+    // decode DICOM buffer
+    var buf = new Uint8Array(e.data);
+    var decoder = new jpeg.lossless.Decoder(buf.buffer);
+    var decoded = decoder.decode();
+    // post decoded data
+    var res = new Uint16Array(decoded.buffer);
+    self.postMessage(res);
+    
+}, false);
 
     </pre>
 </div>
