@@ -357,8 +357,7 @@ dwv.io.Url.prototype.load = function (ioArray)
     var onLoadDicomRequest = function (response)
     {
         try {
-            //onLoad( dwv.image.getDataFromDicomBuffer(response) );
-            dwv.image.getDataFromDicomBuffer(response, onLoad);
+            onLoad( dwv.image.getDataFromDicomBuffer(response) );
         } catch (error) {
             self.onerror(error);
         }

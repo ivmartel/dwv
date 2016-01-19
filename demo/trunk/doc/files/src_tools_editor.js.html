@@ -555,7 +555,7 @@ dwv.tool.ShapeEditor = function (app)
             chgcmd.onExecute = drawEventCallback;
             chgcmd.onUndo = drawEventCallback;
             chgcmd.execute();
-            app.getUndoStack().add(chgcmd);
+            app.addToUndoStack(chgcmd);
             // reset start anchor
             startAnchor = endAnchor;
         });

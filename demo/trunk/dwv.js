@@ -202,11 +202,15 @@ dwv.App = function ()
     this.getToolboxController = function () { return toolboxController; };
 
     /**
-     * Get the undo stack.
-     * @method getUndoStack
-     * @return {Object} The undo stack.
+     * Add a command to the undo stack.
+     * @method addToUndoStack
+     * @param {Object} The command to add.
      */
-    this.getUndoStack = function () { return undoStack; };
+    this.addToUndoStack = function (cmd) { 
+        if ( undoStack !== null ) {
+            undoStack.add(cmd);
+        }
+    };
 
     /**
      * Get the data loaders.
@@ -1568,7 +1572,7 @@ dwv.State = function (app)
                     cmd.onUndo = eventCallback;
                 }
                 cmd.execute();
-                app.getUndoStack().add(cmd);
+                app.addToUndoStack(cmd);
             }
         }
     };
@@ -1854,71 +1858,12 @@ dwv.ViewController = function ( view )
     };
 
 }; // class dwv.ViewController
-;/**
- * JPEG 2000 decoder worker.
- */
-// Do not warn if these variables were not defined before.
-/* global importScripts, self, JpxImage */
-
-importScripts('../../ext/pdfjs/jpx.js'); 
-importScripts('../../ext/pdfjs/util.js'); 
-importScripts('../../ext/pdfjs/arithmetic_decoder.js'); 
-
-self.addEventListener('message', function (e) {
-    
-    // decode DICOM buffer
-    var decoder = new JpxImage();
-    decoder.parse( e.data );
-    // post decoded data
-    var res = decoder.tiles[0].items;
-    self.postMessage(res);
-    
-}, false);
-;/**
- * JPEG Baseline decoder worker.
- */
-// Do not warn if these variables were not defined before.
-/* global importScripts, self, JpegImage */
-
-importScripts('../../ext/notmasteryet/jpg.js'); 
-
-self.addEventListener('message', function (e) {
-    
-    // decode DICOM buffer
-    var decoder = new JpegImage();
-    decoder.parse( e.data );
-    // post decoded data
-    var res = decoder.getData(decoder.width,decoder.height);
-    self.postMessage(res);
-    
-}, false);
-;/**
- * JPEG Lossless decoder worker.
- */
-// Do not warn if these variables were not defined before.
-/* global importScripts, self, jpeg */
-
-importScripts('../../ext/rii-mango/lossless-min.js'); 
-
-self.addEventListener('message', function (e) {
-    
-    // decode DICOM buffer
-    var buf = new Uint8Array(e.data);
-    var decoder = new jpeg.lossless.Decoder(buf.buffer);
-    var decoded = decoder.decode();
-    // post decoded data
-    var res = new Uint16Array(decoded.buffer);
-    self.postMessage(res);
-    
-}, false);
 ;/** 
  * DICOM module.
  * @module dicom
  */
 var dwv = dwv || {};
 dwv.dicom = dwv.dicom || {};
-
-/*
 // JPEG Baseline
 var hasJpegBaselineDecoder = (typeof JpegImage !== "undefined");
 var JpegImage = JpegImage || {};
@@ -1930,7 +1875,6 @@ jpeg.lossless = jpeg.lossless || {};
 // JPEG 2000
 var hasJpeg2000Decoder = (typeof JpxImage !== "undefined");
 var JpxImage = JpxImage || {};
-*/
 
 /**
  * Clean string: trim and remove ending.
@@ -2922,7 +2866,7 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
     }
 
     // uncompress data if needed
-    /*var decoder = null;
+    var decoder = null;
     if( isJpegLossless ) {
         if ( !hasJpegLosslessDecoder ) {
             throw new Error("No JPEG Lossless decoder provided");
@@ -2949,7 +2893,7 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
         decoder.parse( this.pixelBuffer );
         // set the pixel buffer
         this.pixelBuffer = decoder.tiles[0].items;
-    }*/
+    }
 };
 
 /**
@@ -12286,89 +12230,6 @@ dwv.image.getDataFromImage = function(image)
     return {"view": view, "info": info};
 };
 
-
-
-function ThreadPool(size) {
-    var self = this;
- 
-    // set some defaults
-    this.taskQueue = [];
-    this.workerQueue = [];
-    this.poolSize = size;
- 
-    this.addWorkerTask = function(workerTask) {
-        if (self.workerQueue.length > 0) {
-            // get the worker from the front of the queue
-            var workerThread = self.workerQueue.shift();
-            workerThread.run(workerTask);
-        } else {
-            // no free workers,
-            self.taskQueue.push(workerTask);
-        }
-    };
- 
-    this.init = function() {
-        // create 'size' number of worker threads
-        for (var i = 0 ; i < size ; i++) {
-            self.workerQueue.push(new WorkerThread(self));
-        }
-    };
- 
-    this.freeWorkerThread = function(workerThread) {
-        if (self.taskQueue.length > 0) {
-            // don't put back in queue, but execute next task
-            var workerTask = self.taskQueue.shift();
-            workerThread.run(workerTask);
-        } else {
-            self.workerQueue.push(workerThread);
-        }
-    };
-}
- 
-// runner work tasks in the pool
-function WorkerThread(parentPool) {
- 
-    var self = this;
- 
-    this.parentPool = parentPool;
-    this.workerTask = {};
- 
-    this.run = function(workerTask) {
-        this.workerTask = workerTask;
-        // create a new web worker
-        if (this.workerTask.script !== null) {
-            var worker = new Worker(workerTask.script);
-            worker.addEventListener('message', dummyCallback, false);
-            worker.postMessage(workerTask.startMessage);
-        }
-    };
- 
-    // for now assume we only get a single callback from a worker
-    // which also indicates the end of this worker.
-    function dummyCallback(event) {
-        // pass to original callback
-        self.workerTask.callback(event);
- 
-        // we should use a separate thread to add the worker
-        self.parentPool.freeWorkerThread(self);
-        
-        this.terminate();
-    }
- 
-}
- 
-// task to run
-function WorkerTask(script, callback, msg) {
- 
-    this.script = script;
-    this.callback = callback;
-    this.startMessage = msg;
-}
-
-var pool = new ThreadPool(15);
-pool.init();
-
-
 /**
  * Get data from an input buffer using a DICOM parser.
  * @method getDataFromDicomBuffer
@@ -12376,42 +12237,17 @@ pool.init();
  * @param {Array} buffer The input data buffer.
  * @return {Mixed} The corresponding view and info.
  */
-dwv.image.getDataFromDicomBuffer = function(buffer, onLoad)
+dwv.image.getDataFromDicomBuffer = function(buffer)
 {
     // DICOM parser
     var dicomParser = new dwv.dicom.DicomParser();
     // parse the buffer
     dicomParser.parse(buffer);
-
-    var callback = function(e) {
-        // create the view
-        var viewFactory = new dwv.image.ViewFactory();
-        var view = viewFactory.create( dicomParser.getDicomElements(), e.data );
-        // return
-        onLoad({"view": view, "info": dicomParser.getDicomElements().dumpToTable()});
-    };
-    var startMessage = dicomParser.pixelBuffer;
-    
-    var script = null;
-    var syntax = dwv.dicom.cleanString(dicomParser.getRawDicomElements().x00020010.value[0]);
-    if ( dwv.dicom.isJpeg2000TransferSyntax(syntax) ) {
-        script = '../../src/dicom/decode-jpeg2000.js';
-    }
-    else if (dwv.dicom.isJpegLosslessTransferSyntax(syntax) ) {
-        script = '../../src/dicom/decode-jpegloss.js';
-    }
-    else if (dwv.dicom.isJpegBaselineTransferSyntax(syntax) ) {
-        script = '../../src/dicom/decode-jpegbaseline.js';
-    }
-    
-    if ( script !== null ) {
-        var workerTask = new WorkerTask(script,callback,startMessage);
-        pool.addWorkerTask(workerTask);
-    }
-    else {
-        callback({data: startMessage});
-    }
-    
+    // create the view
+    var viewFactory = new dwv.image.ViewFactory();
+    var view = viewFactory.create( dicomParser.getDicomElements(), dicomParser.getPixelBuffer() );
+    // return
+    return {"view": view, "info": dicomParser.getDicomElements().dumpToTable()};
 };
 ;/** 
  * Image module.
@@ -13064,8 +12900,7 @@ dwv.io.File.prototype.load = function (ioArray)
     var onLoadDicomReader = function (event)
     {
         try {
-            //onLoad( dwv.image.getDataFromDicomBuffer(event.target.result) );
-            dwv.image.getDataFromDicomBuffer(event.target.result, onLoad);
+            onLoad( dwv.image.getDataFromDicomBuffer(event.target.result) );
         } catch(error) {
             self.onerror(error);
         }
@@ -13311,8 +13146,7 @@ dwv.io.Url.prototype.load = function (ioArray)
     var onLoadDicomRequest = function (response)
     {
         try {
-            //onLoad( dwv.image.getDataFromDicomBuffer(response) );
-            dwv.image.getDataFromDicomBuffer(response, onLoad);
+            onLoad( dwv.image.getDataFromDicomBuffer(response) );
         } catch (error) {
             self.onerror(error);
         }
@@ -14903,7 +14737,7 @@ dwv.tool.DrawGroupCommand = function (group, name, layer)
         // draw
         layer.draw();
         // callback
-        this.onExecute({'type': 'draw-create', 'id': group.id});
+        this.onExecute({'type': 'draw-create', 'id': group.id()});
     };
     /**
      * Undo the command.
@@ -14915,7 +14749,7 @@ dwv.tool.DrawGroupCommand = function (group, name, layer)
         // draw
         layer.draw();
         // callback
-        this.onUndo({'type': 'draw-delete', 'id': group.id});
+        this.onUndo({'type': 'draw-delete', 'id': group.id()});
     };
 }; // DrawGroupCommand class
 
@@ -14966,7 +14800,7 @@ dwv.tool.MoveGroupCommand = function (group, name, translation, layer)
         // draw
         layer.draw();
         // callback
-        this.onExecute({'type': 'draw-move', 'id': group.id});
+        this.onExecute({'type': 'draw-move', 'id': group.id()});
     };
     /**
      * Undo the command.
@@ -14981,7 +14815,7 @@ dwv.tool.MoveGroupCommand = function (group, name, translation, layer)
         // draw
         layer.draw();
         // callback
-        this.onUndo({'type': 'draw-move', 'id': group.id});
+        this.onUndo({'type': 'draw-move', 'id': group.id()});
     };
 }; // MoveGroupCommand class
 
@@ -15088,7 +14922,7 @@ dwv.tool.DeleteGroupCommand = function (group, name, layer)
         // draw
         layer.draw();
         // callback
-        this.onExecute({'type': 'draw-delete', 'id': group.id});
+        this.onExecute({'type': 'draw-delete', 'id': group.id()});
     };
     /**
      * Undo the command.
@@ -15100,7 +14934,7 @@ dwv.tool.DeleteGroupCommand = function (group, name, layer)
         // draw
         layer.draw();
         // callback
-        this.onUndo({'type': 'draw-create', 'id': group.id});
+        this.onUndo({'type': 'draw-create', 'id': group.id()});
     };
 }; // DeleteGroupCommand class
 
@@ -15362,7 +15196,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
             // execute it
             command.execute();
             // save it in undo stack
-            app.getUndoStack().add(command);
+            app.addToUndoStack(command);
 
             // set shape on
             var shape = group.getChildren( function (node) {
@@ -15622,7 +15456,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
                 delcmd.onExecute = fireEvent;
                 delcmd.onUndo = fireEvent;
                 delcmd.execute();
-                app.getUndoStack().add(delcmd);
+                app.addToUndoStack(delcmd);
             }
             else {
                 // save drag move
@@ -15632,7 +15466,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
                     var mvcmd = new dwv.tool.MoveGroupCommand(this.getParent(), cmdName, translation, drawLayer);
                     mvcmd.onExecute = fireEvent;
                     mvcmd.onUndo = fireEvent;
-                    app.getUndoStack().add(mvcmd);
+                    app.addToUndoStack(mvcmd);
                     // the move is handled by kinetic, trigger an event manually
                     fireEvent({'type': 'draw-move'});
                 }
@@ -16152,7 +15986,7 @@ dwv.tool.ShapeEditor = function (app)
             chgcmd.onExecute = drawEventCallback;
             chgcmd.onUndo = drawEventCallback;
             chgcmd.execute();
-            app.getUndoStack().add(chgcmd);
+            app.addToUndoStack(chgcmd);
             // reset start anchor
             startAnchor = endAnchor;
         });
@@ -16598,7 +16432,7 @@ dwv.tool.filter.Threshold = function ( app )
         var command = new dwv.tool.RunFilterCommand(filter, app);
         command.execute();
         // save command in undo stack
-        app.getUndoStack().add(command);
+        app.addToUndoStack(command);
     };
 
 }; // class dwv.tool.filter.Threshold
@@ -16659,7 +16493,7 @@ dwv.tool.filter.Sharpen = function ( app )
         var command = new dwv.tool.RunFilterCommand(filter, app);
         command.execute();
         // save command in undo stack
-        app.getUndoStack().add(command);
+        app.addToUndoStack(command);
     };
 
 }; // dwv.tool.filter.Sharpen
@@ -16719,7 +16553,7 @@ dwv.tool.filter.Sobel = function ( app )
         var command = new dwv.tool.RunFilterCommand(filter, app);
         command.execute();
         // save command in undo stack
-        app.getUndoStack().add(command);
+        app.addToUndoStack(command);
     };
 
 }; // class dwv.tool.filter.Sobel
@@ -17311,7 +17145,7 @@ dwv.tool.Livewire = function(app)
                 self.mousemove(event);
                 console.log("Done.");
                 // save command in undo stack
-                app.getUndoStack().add(command);
+                app.addToUndoStack(command);
                 // set flag
                 self.started = false;
             }
