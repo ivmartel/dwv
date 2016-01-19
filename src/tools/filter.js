@@ -244,7 +244,7 @@ dwv.tool.filter.Threshold = function ( app )
         var command = new dwv.tool.RunFilterCommand(filter, app);
         command.execute();
         // save command in undo stack
-        app.getUndoStack().add(command);
+        app.addToUndoStack(command);
     };
 
 }; // class dwv.tool.filter.Threshold
@@ -305,7 +305,7 @@ dwv.tool.filter.Sharpen = function ( app )
         var command = new dwv.tool.RunFilterCommand(filter, app);
         command.execute();
         // save command in undo stack
-        app.getUndoStack().add(command);
+        app.addToUndoStack(command);
     };
 
 }; // dwv.tool.filter.Sharpen
@@ -365,7 +365,7 @@ dwv.tool.filter.Sobel = function ( app )
         var command = new dwv.tool.RunFilterCommand(filter, app);
         command.execute();
         // save command in undo stack
-        app.getUndoStack().add(command);
+        app.addToUndoStack(command);
     };
 
 }; // class dwv.tool.filter.Sobel

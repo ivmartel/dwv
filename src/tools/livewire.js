@@ -144,7 +144,7 @@ dwv.tool.Livewire = function(app)
                 self.mousemove(event);
                 console.log("Done.");
                 // save command in undo stack
-                app.getUndoStack().add(command);
+                app.addToUndoStack(command);
                 // set flag
                 self.started = false;
             }

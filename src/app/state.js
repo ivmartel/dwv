@@ -75,7 +75,7 @@ dwv.State = function (app)
                     cmd.onUndo = eventCallback;
                 }
                 cmd.execute();
-                app.getUndoStack().add(cmd);
+                app.addToUndoStack(cmd);
             }
         }
     };

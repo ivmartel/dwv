@@ -202,11 +202,15 @@ dwv.App = function ()
     this.getToolboxController = function () { return toolboxController; };
 
     /**
-     * Get the undo stack.
-     * @method getUndoStack
-     * @return {Object} The undo stack.
+     * Add a command to the undo stack.
+     * @method addToUndoStack
+     * @param {Object} The command to add.
      */
-    this.getUndoStack = function () { return undoStack; };
+    this.addToUndoStack = function (cmd) { 
+        if ( undoStack !== null ) {
+            undoStack.add(cmd);
+        }
+    };
 
     /**
      * Get the data loaders.

@@ -489,7 +489,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
             // execute it
             command.execute();
             // save it in undo stack
-            app.getUndoStack().add(command);
+            app.addToUndoStack(command);
 
             // set shape on
             var shape = group.getChildren( function (node) {
@@ -749,7 +749,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
                 delcmd.onExecute = fireEvent;
                 delcmd.onUndo = fireEvent;
                 delcmd.execute();
-                app.getUndoStack().add(delcmd);
+                app.addToUndoStack(delcmd);
             }
             else {
                 // save drag move
@@ -759,7 +759,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
                     var mvcmd = new dwv.tool.MoveGroupCommand(this.getParent(), cmdName, translation, drawLayer);
                     mvcmd.onExecute = fireEvent;
                     mvcmd.onUndo = fireEvent;
-                    app.getUndoStack().add(mvcmd);
+                    app.addToUndoStack(mvcmd);
                     // the move is handled by kinetic, trigger an event manually
                     fireEvent({'type': 'draw-move'});
                 }
