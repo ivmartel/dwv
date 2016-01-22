@@ -250,6 +250,89 @@ dwv.image.getDataFromImage = function(image)
     return {&quot;view&quot;: view, &quot;info&quot;: info};
 };
 
+
+
+function ThreadPool(size) {
+    var self = this;
+ 
+    // set some defaults
+    this.taskQueue = [];
+    this.workerQueue = [];
+    this.poolSize = size;
+ 
+    this.addWorkerTask = function(workerTask) {
+        if (self.workerQueue.length &gt; 0) {
+            // get the worker from the front of the queue
+            var workerThread = self.workerQueue.shift();
+            workerThread.run(workerTask);
+        } else {
+            // no free workers,
+            self.taskQueue.push(workerTask);
+        }
+    };
+ 
+    this.init = function() {
+        // create &#x27;size&#x27; number of worker threads
+        for (var i = 0 ; i &lt; size ; i++) {
+            self.workerQueue.push(new WorkerThread(self));
+        }
+    };
+ 
+    this.freeWorkerThread = function(workerThread) {
+        if (self.taskQueue.length &gt; 0) {
+            // don&#x27;t put back in queue, but execute next task
+            var workerTask = self.taskQueue.shift();
+            workerThread.run(workerTask);
+        } else {
+            self.workerQueue.push(workerThread);
+        }
+    };
+}
+ 
+// runner work tasks in the pool
+function WorkerThread(parentPool) {
+ 
+    var self = this;
+ 
+    this.parentPool = parentPool;
+    this.workerTask = {};
+ 
+    this.run = function(workerTask) {
+        this.workerTask = workerTask;
+        // create a new web worker
+        if (this.workerTask.script !== null) {
+            var worker = new Worker(workerTask.script);
+            worker.addEventListener(&#x27;message&#x27;, dummyCallback, false);
+            worker.postMessage(workerTask.startMessage);
+        }
+    };
+ 
+    // for now assume we only get a single callback from a worker
+    // which also indicates the end of this worker.
+    function dummyCallback(event) {
+        // pass to original callback
+        self.workerTask.callback(event);
+ 
+        // we should use a separate thread to add the worker
+        self.parentPool.freeWorkerThread(self);
+        
+        this.terminate();
+    }
+ 
+}
+ 
+// task to run
+function WorkerTask(script, callback, msg) {
+ 
+    this.script = script;
+    this.callback = callback;
+    this.startMessage = msg;
+}
+
+var pool = new ThreadPool(15);
+pool.init();
+
+
 /**
  * Get data from an input buffer using a DICOM parser.
  * @method getDataFromDicomBuffer
@@ -257,17 +340,42 @@ dwv.image.getDataFromImage = function(image)
  * @param {Array} buffer The input data buffer.
  * @return {Mixed} The corresponding view and info.
  */
-dwv.image.getDataFromDicomBuffer = function(buffer)
+dwv.image.getDataFromDicomBuffer = function(buffer, onLoad)
 {
     // DICOM parser
     var dicomParser = new dwv.dicom.DicomParser();
     // parse the buffer
     dicomParser.parse(buffer);
-    // create the view
-    var viewFactory = new dwv.image.ViewFactory();
-    var view = viewFactory.create( dicomParser.getDicomElements(), dicomParser.getPixelBuffer() );
-    // return
-    return {&quot;view&quot;: view, &quot;info&quot;: dicomParser.getDicomElements().dumpToTable()};
+
+    var callback = function(e) {
+        // create the view
+        var viewFactory = new dwv.image.ViewFactory();
+        var view = viewFactory.create( dicomParser.getDicomElements(), e.data );
+        // return
+        onLoad({&quot;view&quot;: view, &quot;info&quot;: dicomParser.getDicomElements().dumpToTable()});
+    };
+    var startMessage = dicomParser.pixelBuffer;
+    
+    var script = null;
+    var syntax = dwv.dicom.cleanString(dicomParser.getRawDicomElements().x00020010.value[0]);
+    if ( dwv.dicom.isJpeg2000TransferSyntax(syntax) ) {
+        script = &#x27;../../src/dicom/decode-jpeg2000.js&#x27;;
+    }
+    else if (dwv.dicom.isJpegLosslessTransferSyntax(syntax) ) {
+        script = &#x27;../../src/dicom/decode-jpegloss.js&#x27;;
+    }
+    else if (dwv.dicom.isJpegBaselineTransferSyntax(syntax) ) {
+        script = &#x27;../../src/dicom/decode-jpegbaseline.js&#x27;;
+    }
+    
+    if ( script !== null ) {
+        var workerTask = new WorkerTask(script,callback,startMessage);
+        pool.addWorkerTask(workerTask);
+    }
+    else {
+        callback({data: startMessage});
+    }
+    
 };
 
     </pre>
