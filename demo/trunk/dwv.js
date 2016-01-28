@@ -1854,63 +1854,6 @@ dwv.ViewController = function ( view )
     };
 
 }; // class dwv.ViewController
-;/**
- * JPEG 2000 decoder worker.
- */
-// Do not warn if these variables were not defined before.
-/* global importScripts, self, JpxImage */
-
-importScripts('../../ext/pdfjs/jpx.js'); 
-importScripts('../../ext/pdfjs/util.js'); 
-importScripts('../../ext/pdfjs/arithmetic_decoder.js'); 
-
-self.addEventListener('message', function (e) {
-    
-    // decode DICOM buffer
-    var decoder = new JpxImage();
-    decoder.parse( e.data );
-    // post decoded data
-    var res = decoder.tiles[0].items;
-    self.postMessage(res);
-    
-}, false);
-;/**
- * JPEG Baseline decoder worker.
- */
-// Do not warn if these variables were not defined before.
-/* global importScripts, self, JpegImage */
-
-importScripts('../../ext/notmasteryet/jpg.js'); 
-
-self.addEventListener('message', function (e) {
-    
-    // decode DICOM buffer
-    var decoder = new JpegImage();
-    decoder.parse( e.data );
-    // post decoded data
-    var res = decoder.getData(decoder.width,decoder.height);
-    self.postMessage(res);
-    
-}, false);
-;/**
- * JPEG Lossless decoder worker.
- */
-// Do not warn if these variables were not defined before.
-/* global importScripts, self, jpeg */
-
-importScripts('../../ext/rii-mango/lossless-min.js'); 
-
-self.addEventListener('message', function (e) {
-    
-    // decode DICOM buffer
-    var buf = new Uint8Array(e.data);
-    var decoder = new jpeg.lossless.Decoder(buf.buffer);
-    var decoded = decoder.decode();
-    // post decoded data
-    var res = new Uint16Array(decoded.buffer);
-    self.postMessage(res);
-    
-}, false);
 ;/** 
  * DICOM module.
  * @module dicom
@@ -12395,13 +12338,13 @@ dwv.image.getDataFromDicomBuffer = function(buffer, onLoad)
     var script = null;
     var syntax = dwv.dicom.cleanString(dicomParser.getRawDicomElements().x00020010.value[0]);
     if ( dwv.dicom.isJpeg2000TransferSyntax(syntax) ) {
-        script = '../../src/dicom/decode-jpeg2000.js';
+        script = '../../ext/pdfjs/decode-jpeg2000.js';
     }
     else if (dwv.dicom.isJpegLosslessTransferSyntax(syntax) ) {
-        script = '../../src/dicom/decode-jpegloss.js';
+        script = '../../ext/rii-mango/decode-jpegloss.js';
     }
     else if (dwv.dicom.isJpegBaselineTransferSyntax(syntax) ) {
-        script = '../../src/dicom/decode-jpegbaseline.js';
+        script = '../../ext/notmasteryet/decode-jpegbaseline.js';
     }
     
     if ( script !== null ) {

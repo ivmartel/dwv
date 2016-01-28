@@ -359,13 +359,13 @@ dwv.image.getDataFromDicomBuffer = function(buffer, onLoad)
     var script = null;
     var syntax = dwv.dicom.cleanString(dicomParser.getRawDicomElements().x00020010.value[0]);
     if ( dwv.dicom.isJpeg2000TransferSyntax(syntax) ) {
-        script = &#x27;../../src/dicom/decode-jpeg2000.js&#x27;;
+        script = &#x27;../../ext/pdfjs/decode-jpeg2000.js&#x27;;
     }
     else if (dwv.dicom.isJpegLosslessTransferSyntax(syntax) ) {
-        script = &#x27;../../src/dicom/decode-jpegloss.js&#x27;;
+        script = &#x27;../../ext/rii-mango/decode-jpegloss.js&#x27;;
     }
     else if (dwv.dicom.isJpegBaselineTransferSyntax(syntax) ) {
-        script = &#x27;../../src/dicom/decode-jpegbaseline.js&#x27;;
+        script = &#x27;../../ext/notmasteryet/decode-jpegbaseline.js&#x27;;
     }
     
     if ( script !== null ) {

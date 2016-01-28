@@ -50,27 +50,6 @@
                 "dwv": 1
             }
         },
-        "src/dicom/decode-jpeg2000.js": {
-            "name": "src/dicom/decode-jpeg2000.js",
-            "modules": {},
-            "classes": {},
-            "fors": {},
-            "namespaces": {}
-        },
-        "src/dicom/decode-jpegbaseline.js": {
-            "name": "src/dicom/decode-jpegbaseline.js",
-            "modules": {},
-            "classes": {},
-            "fors": {},
-            "namespaces": {}
-        },
-        "src/dicom/decode-jpegloss.js": {
-            "name": "src/dicom/decode-jpegloss.js",
-            "modules": {},
-            "classes": {},
-            "fors": {},
-            "namespaces": {}
-        },
         "src/dicom/dicomParser.js": {
             "name": "src/dicom/dicomParser.js",
             "modules": {
@@ -4104,30 +4083,6 @@
                 }
             ],
             "class": "dwv.ViewController",
-            "module": "tool",
-            "namespace": "dwv"
-        },
-        {
-            "file": "src/dicom/decode-jpeg2000.js",
-            "line": 1,
-            "description": "JPEG 2000 decoder worker.",
-            "class": "dwv.dicom.DataReader",
-            "module": "tool",
-            "namespace": "dwv"
-        },
-        {
-            "file": "src/dicom/decode-jpegbaseline.js",
-            "line": 1,
-            "description": "JPEG Baseline decoder worker.",
-            "class": "dwv.dicom.DataReader",
-            "module": "tool",
-            "namespace": "dwv"
-        },
-        {
-            "file": "src/dicom/decode-jpegloss.js",
-            "line": 1,
-            "description": "JPEG Lossless decoder worker.",
-            "class": "dwv.dicom.DataReader",
             "module": "tool",
             "namespace": "dwv"
         },
@@ -14132,18 +14087,6 @@
         {
             "message": "Missing item type\nInit the Window/Level display",
             "line": " src/app/application.js:677"
-        },
-        {
-            "message": "Missing item type\nJPEG 2000 decoder worker.",
-            "line": " src/dicom/decode-jpeg2000.js:1"
-        },
-        {
-            "message": "Missing item type\nJPEG Baseline decoder worker.",
-            "line": " src/dicom/decode-jpegbaseline.js:1"
-        },
-        {
-            "message": "Missing item type\nJPEG Lossless decoder worker.",
-            "line": " src/dicom/decode-jpegloss.js:1"
         },
         {
             "message": "Missing item type\nGet the group-element key used to store DICOM elements.",
