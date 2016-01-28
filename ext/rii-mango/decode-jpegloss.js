@@ -4,7 +4,7 @@
 // Do not warn if these variables were not defined before.
 /* global importScripts, self, jpeg */
 
-importScripts('../../ext/rii-mango/lossless-min.js'); 
+importScripts('lossless-min.js'); 
 
 self.addEventListener('message', function (e) {
     

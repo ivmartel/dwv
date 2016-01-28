@@ -177,13 +177,13 @@ dwv.image.getDataFromDicomBuffer = function(buffer, onLoad)
     var script = null;
     var syntax = dwv.dicom.cleanString(dicomParser.getRawDicomElements().x00020010.value[0]);
     if ( dwv.dicom.isJpeg2000TransferSyntax(syntax) ) {
-        script = '../../src/dicom/decode-jpeg2000.js';
+        script = '../../ext/pdfjs/decode-jpeg2000.js';
     }
     else if (dwv.dicom.isJpegLosslessTransferSyntax(syntax) ) {
-        script = '../../src/dicom/decode-jpegloss.js';
+        script = '../../ext/rii-mango/decode-jpegloss.js';
     }
     else if (dwv.dicom.isJpegBaselineTransferSyntax(syntax) ) {
-        script = '../../src/dicom/decode-jpegbaseline.js';
+        script = '../../ext/notmasteryet/decode-jpegbaseline.js';
     }
     
     if ( script !== null ) {
