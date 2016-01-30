@@ -583,6 +583,15 @@
             "modules": {
                 "utils": 1
             },
+            "classes": {},
+            "fors": {},
+            "namespaces": {
+                "dwv": 1
+            }
+        },
+        "src/utils/thread.js": {
+            "name": "src/utils/thread.js",
+            "modules": {},
             "classes": {
                 "dwv.utils": 1
             },
@@ -841,7 +850,7 @@
                 "dwv": 1
             },
             "tag": "module",
-            "file": "src/utils/string.js",
+            "file": "src/utils/thread.js",
             "line": 6,
             "description": "Utility module."
         }
@@ -2612,7 +2621,7 @@
             "extension_for": [],
             "module": "utils",
             "namespace": "dwv",
-            "file": "src/utils/string.js",
+            "file": "src/utils/thread.js",
             "line": 6,
             "description": "Namespace for utility functions.",
             "static": 1
@@ -8529,7 +8538,7 @@
         },
         {
             "file": "src/image/reader.js",
-            "line": 154,
+            "line": 76,
             "description": "Get data from an input buffer using a DICOM parser.",
             "itemtype": "method",
             "name": "getDataFromDicomBuffer",
@@ -13925,6 +13934,20 @@
             "class": "dwv.utils",
             "module": "utils",
             "namespace": "dwv"
+        },
+        {
+            "file": "src/utils/thread.js",
+            "line": 14,
+            "description": "Thread Pool\nHighly inspired from http://www.smartjava.org/content/html5-easily-parallelize-jobs-using-web-workers-and-threadpool",
+            "params": [
+                {
+                    "name": "size",
+                    "description": ""
+                }
+            ],
+            "class": "dwv.utils",
+            "module": "utils",
+            "namespace": "dwv"
         }
     ],
     "warnings": [
@@ -14171,6 +14194,10 @@
         {
             "message": "Missing item type\nSet the anchor off listeners.",
             "line": " src/tools/editor.js:408"
+        },
+        {
+            "message": "Missing item type\nThread Pool\nHighly inspired from http://www.smartjava.org/content/html5-easily-parallelize-jobs-using-web-workers-and-threadpool",
+            "line": " src/utils/thread.js:14"
         }
     ]
 }

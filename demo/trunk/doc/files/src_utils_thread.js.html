@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>src/image/reader.js - dwv</title>
+    <title>src/utils/thread.js - dwv</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
     <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
@@ -176,128 +176,103 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-<h1 class="file-heading">File: src/image/reader.js</h1>
+<h1 class="file-heading">File: src/utils/thread.js</h1>
 
 <div class="file">
     <pre class="code prettyprint linenums">
 /** 
- * Image module.
- * @module image
+ * Utility module.
+ * @module utils
  */
 var dwv = dwv || {};
 /**
- * Namespace for image related functions.
- * @class image
+ * Namespace for utility functions.
+ * @class utils
  * @namespace dwv
  * @static
  */
-dwv.image = dwv.image || {};
+dwv.utils = dwv.utils || {};
 
 /**
- * Get data from an input image using a canvas.
- * @method getDataFromImage
- * @static
- * @param {Image} image The image.
- * @return {Mixed} The corresponding view and info.
+ * Thread Pool
+ * Highly inspired from http://www.smartjava.org/content/html5-easily-parallelize-jobs-using-web-workers-and-threadpool
+ * @param size
  */
-dwv.image.getDataFromImage = function(image)
-{
-    // draw the image in the canvas in order to get its data
-    var canvas = document.createElement(&#x27;canvas&#x27;);
-    canvas.width = image.width;
-    canvas.height = image.height;
-    var ctx = canvas.getContext(&#x27;2d&#x27;);
-    ctx.drawImage(image, 0, 0, image.width, image.height);
-    // get the image data
-    var imageData = ctx.getImageData(0, 0, image.width, image.height);
-    // remove alpha
-    // TODO support passing the full image data
-    var buffer = [];
-    var j = 0;
-    for( var i = 0; i &lt; imageData.data.length; i+=4 ) {
-        buffer[j] = imageData.data[i];
-        buffer[j+1] = imageData.data[i+1];
-        buffer[j+2] = imageData.data[i+2];
-        j+=3;
-    }
-    // create dwv Image
-    var imageSize = new dwv.image.Size(image.width, image.height);
-    // TODO: wrong info...
-    var imageSpacing = new dwv.image.Spacing(1,1);
-    var sliceIndex = image.index ? image.index : 0;
-    var origin = new dwv.math.Point3D(0,0,sliceIndex);
-    var geometry = new dwv.image.Geometry(origin, imageSize, imageSpacing );
-    var dwvImage = new dwv.image.Image( geometry, buffer );
-    dwvImage.setPhotometricInterpretation(&quot;RGB&quot;);
-    // meta information
-    var meta = {};
-    meta.BitsStored = 8;
-    dwvImage.setMeta(meta);
-    // view
-    var view = new dwv.image.View(dwvImage);
-    view.setWindowLevelMinMax();
-    // properties
-    var info = {};
-    if( image.file )
-    {
-        info.fileName = { &quot;value&quot;: image.file.name };
-        info.fileType = { &quot;value&quot;: image.file.type };
-        info.fileLastModifiedDate = { &quot;value&quot;: image.file.lastModifiedDate };
-    }
-    info.imageWidth = { &quot;value&quot;: image.width };
-    info.imageHeight = { &quot;value&quot;: image.height };
-    // return
-    return {&quot;view&quot;: view, &quot;info&quot;: info};
-};
-
-
-var pool = new dwv.utils.ThreadPool(15);
-pool.init();
-
-
-/**
- * Get data from an input buffer using a DICOM parser.
- * @method getDataFromDicomBuffer
- * @static
- * @param {Array} buffer The input data buffer.
- * @return {Mixed} The corresponding view and info.
- */
-dwv.image.getDataFromDicomBuffer = function(buffer, onLoad)
-{
-    // DICOM parser
-    var dicomParser = new dwv.dicom.DicomParser();
-    // parse the buffer
-    dicomParser.parse(buffer);
-
-    var callback = function(e) {
-        // create the view
-        var viewFactory = new dwv.image.ViewFactory();
-        var view = viewFactory.create( dicomParser.getDicomElements(), e.data );
-        // return
-        onLoad({&quot;view&quot;: view, &quot;info&quot;: dicomParser.getDicomElements().dumpToTable()});
+dwv.utils.ThreadPool = function (size) {
+    var self = this;
+ 
+    // set some defaults
+    this.taskQueue = [];
+    this.workerQueue = [];
+    this.poolSize = size;
+ 
+    this.addWorkerTask = function(workerTask) {
+        if (self.workerQueue.length &gt; 0) {
+            // get the worker from the front of the queue
+            var workerThread = self.workerQueue.shift();
+            workerThread.run(workerTask);
+        } else {
+            // no free workers,
+            self.taskQueue.push(workerTask);
+        }
     };
-    var startMessage = dicomParser.pixelBuffer;
-    
-    var script = null;
-    var syntax = dwv.dicom.cleanString(dicomParser.getRawDicomElements().x00020010.value[0]);
-    if ( dwv.dicom.isJpeg2000TransferSyntax(syntax) ) {
-        script = &#x27;../../ext/pdfjs/decode-jpeg2000.js&#x27;;
+ 
+    this.init = function() {
+        // create &#x27;size&#x27; number of worker threads
+        for (var i = 0 ; i &lt; size ; i++) {
+            self.workerQueue.push(new dwv.utils.WorkerThread(self));
+        }
+    };
+ 
+    this.freeWorkerThread = function(workerThread) {
+        if (self.taskQueue.length &gt; 0) {
+            // don&#x27;t put back in queue, but execute next task
+            var workerTask = self.taskQueue.shift();
+            workerThread.run(workerTask);
+        } else {
+            self.workerQueue.push(workerThread);
+        }
+    };
+};
+ 
+// runner work tasks in the pool
+dwv.utils.WorkerThread = function (parentPool) {
+ 
+    var self = this;
+ 
+    this.parentPool = parentPool;
+    this.workerTask = {};
+ 
+    this.run = function(workerTask) {
+        this.workerTask = workerTask;
+        // create a new web worker
+        if (this.workerTask.script !== null) {
+            var worker = new Worker(workerTask.script);
+            worker.addEventListener(&#x27;message&#x27;, dummyCallback, false);
+            worker.postMessage(workerTask.startMessage);
+        }
+    };
+ 
+    // for now assume we only get a single callback from a worker
+    // which also indicates the end of this worker.
+    function dummyCallback(event) {
+        // pass to original callback
+        self.workerTask.callback(event);
+ 
+        // we should use a separate thread to add the worker
+        self.parentPool.freeWorkerThread(self);
+        
+        this.terminate();
     }
-    else if (dwv.dicom.isJpegLosslessTransferSyntax(syntax) ) {
-        script = &#x27;../../ext/rii-mango/decode-jpegloss.js&#x27;;
-    }
-    else if (dwv.dicom.isJpegBaselineTransferSyntax(syntax) ) {
-        script = &#x27;../../ext/notmasteryet/decode-jpegbaseline.js&#x27;;
-    }
-    
-    if ( script !== null ) {
-        var workerTask = new dwv.utils.WorkerTask(script,callback,startMessage);
-        pool.addWorkerTask(workerTask);
-    }
-    else {
-        callback({data: startMessage});
-    }
-    
+ 
+};
+ 
+// task to run
+dwv.utils.WorkerTask = function (script, callback, msg) {
+ 
+    this.script = script;
+    this.callback = callback;
+    this.startMessage = msg;
 };
 
     </pre>
