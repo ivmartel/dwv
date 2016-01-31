@@ -5,20 +5,6 @@
 var dwv = dwv || {};
 dwv.dicom = dwv.dicom || {};
 
-/*
-// JPEG Baseline
-var hasJpegBaselineDecoder = (typeof JpegImage !== "undefined");
-var JpegImage = JpegImage || {};
-// JPEG Lossless
-var hasJpegLosslessDecoder = (typeof jpeg !== "undefined") &&
-    (typeof jpeg.lossless !== "undefined");
-var jpeg = jpeg || {};
-jpeg.lossless = jpeg.lossless || {};
-// JPEG 2000
-var hasJpeg2000Decoder = (typeof JpxImage !== "undefined");
-var JpxImage = JpxImage || {};
-*/
-
 /**
  * Clean string: trim and remove ending.
  * @method cleanString
@@ -392,6 +378,27 @@ dwv.dicom.isJpeglsTransferSyntax = function(syntax)
 dwv.dicom.isJpeg2000TransferSyntax = function(syntax)
 {
     return syntax.match(/1.2.840.10008.1.2.4.9/) !== null;
+};
+
+/**
+ * Tell if a given syntax needs decompression.
+ * @method syntaxNeedsDecompression
+ * @param {String} The transfer syntax to test.
+ * @returns {String} The name of the decompression algorithm.
+ */
+dwv.dicom.getSyntaxDecompressionName = function(syntax)
+{
+    var algo = null;
+    if ( dwv.dicom.isJpeg2000TransferSyntax(syntax) ) {
+        algo = "jpeg2000";
+    }
+    else if ( dwv.dicom.isJpegBaselineTransferSyntax(syntax) ) {
+        algo = "jpeg-baseline";
+    }
+    else if ( dwv.dicom.isJpeglsTransferSyntax(syntax) ) {
+        algo = "jpeg-lossless";
+    }
+    return algo;
 };
 
 /**
@@ -799,9 +806,6 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
 {
     var offset = 0;
     var implicit = false;
-    var isJpegBaseline = false;
-    var isJpegLossless = false;
-    var isJpeg2000 = false;
     // default readers
     var metaReader = new dwv.dicom.DataReader(buffer);
     var dataReader = new dwv.dicom.DataReader(buffer);
@@ -858,13 +862,11 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
     }
     // JPEG baseline
     else if( dwv.dicom.isJpegBaselineTransferSyntax(syntax) ) {
-        isJpegBaseline = true;
-        console.log("JPEG Baseline compressed DICOM data: " + syntax);
+        // nothing to do!
     }
     // JPEG Lossless
     else if( dwv.dicom.isJpegLosslessTransferSyntax(syntax) ) {
-        isJpegLossless = true;
-        console.log("JPEG Lossless compressed DICOM data: " + syntax);
+        // nothing to do!
     }
     // non supported JPEG
     else if( dwv.dicom.isJpegNonSupportedTransferSyntax(syntax) ) {
@@ -872,13 +874,11 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
     }
     // JPEG-LS
     else if( dwv.dicom.isJpeglsTransferSyntax(syntax) ) {
-        //console.log("JPEG-LS compressed DICOM data: " + syntax);
         throw new Error("Unsupported DICOM transfer syntax (JPEG-LS): "+syntax);
     }
     // JPEG 2000
     else if( dwv.dicom.isJpeg2000TransferSyntax(syntax) ) {
-        console.log("JPEG 2000 compressed DICOM data: " + syntax);
-        isJpeg2000 = true;
+        // nothing to do!
     }
     // MPEG2 Image Compression
     else if( syntax === "1.2.840.10008.1.2.4.100" ) {
@@ -933,10 +933,9 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
             // Item
             if( tagName === "xFFFEE000" ) {
                 if( dataElement.data.length === 4 ) {
-                    console.log("Skipping Basic Offset Table.");
+                    // do nothing
                 }
                 else if( dataElement.data.length !== 0 ) {
-                    console.log("Concatenating multiple pixel data items, length: "+dataElement.data.length);
                     // concat does not work on typed arrays
                     //this.pixelBuffer = this.pixelBuffer.concat( dataElement.data );
                     // manual concat...
@@ -1007,36 +1006,6 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
             this.dicomElements.x00280008.value[0] > 1 ) {
         throw new Error("Unsupported multi-frame data");
     }
-
-    // uncompress data if needed
-    /*var decoder = null;
-    if( isJpegLossless ) {
-        if ( !hasJpegLosslessDecoder ) {
-            throw new Error("No JPEG Lossless decoder provided");
-        }
-        var buf = new Uint8Array(this.pixelBuffer);
-        decoder = new jpeg.lossless.Decoder(buf.buffer);
-        var decoded = decoder.decode();
-        this.pixelBuffer = new Uint16Array(decoded.buffer);
-    }
-    else if ( isJpegBaseline ) {
-        if ( !hasJpegBaselineDecoder ) {
-            throw new Error("No JPEG Baseline decoder provided");
-        }
-        decoder = new JpegImage();
-        decoder.parse( this.pixelBuffer );
-        this.pixelBuffer = decoder.getData(decoder.width,decoder.height);
-    }
-    else if( isJpeg2000 ) {
-        if ( !hasJpeg2000Decoder ) {
-            throw new Error("No JPEG 2000 decoder provided");
-        }
-        // decompress pixel buffer into Int16 image
-        decoder = new JpxImage();
-        decoder.parse( this.pixelBuffer );
-        // set the pixel buffer
-        this.pixelBuffer = decoder.tiles[0].items;
-    }*/
 };
 
 /**
