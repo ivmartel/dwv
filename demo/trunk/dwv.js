@@ -26,6 +26,9 @@ dwv.App = function ()
     var dataHeight = 0;
     // Number of slices to load
     var nSlicesToLoad = 0;
+    
+    // Data decoders scripts
+    var decoderScripts = [];
 
     // Container div id
     var containerDivId = null;
@@ -227,6 +230,11 @@ dwv.App = function ()
      */
     this.init = function ( config ) {
         containerDivId = config.containerDivId;
+        // data decoders
+        var pathToRoot = "../..";
+        decoderScripts.jpeg2000 = pathToRoot + "/ext/pdfjs/decode-jpeg2000.js";
+        decoderScripts["jpeg-lossless"] = pathToRoot + "/ext/rii-mango/decode-jpegloss.js";
+        decoderScripts["jpeg-baseline"] = pathToRoot + "/ext/notmasteryet/decode-jpegbaseline.js";
         // tools
         if ( config.tools && config.tools.length !== 0 ) {
             // setup the tool list
@@ -509,6 +517,7 @@ dwv.App = function ()
         nSlicesToLoad = files.length;
         // create IO
         var fileIO = new dwv.io.File();
+        fileIO.setDecoderScripts(decoderScripts);
         fileIO.onload = function (data) {
 
             var isFirst = true;
@@ -567,6 +576,7 @@ dwv.App = function ()
         nSlicesToLoad = urls.length;
         // create IO
         var urlIO = new dwv.io.Url();
+        urlIO.setDecoderScripts(decoderScripts);
         urlIO.onload = function (data) {
             var isFirst = true;
             if ( image ) {
@@ -1861,20 +1871,6 @@ dwv.ViewController = function ( view )
 var dwv = dwv || {};
 dwv.dicom = dwv.dicom || {};
 
-/*
-// JPEG Baseline
-var hasJpegBaselineDecoder = (typeof JpegImage !== "undefined");
-var JpegImage = JpegImage || {};
-// JPEG Lossless
-var hasJpegLosslessDecoder = (typeof jpeg !== "undefined") &&
-    (typeof jpeg.lossless !== "undefined");
-var jpeg = jpeg || {};
-jpeg.lossless = jpeg.lossless || {};
-// JPEG 2000
-var hasJpeg2000Decoder = (typeof JpxImage !== "undefined");
-var JpxImage = JpxImage || {};
-*/
-
 /**
  * Clean string: trim and remove ending.
  * @method cleanString
@@ -2248,6 +2244,27 @@ dwv.dicom.isJpeglsTransferSyntax = function(syntax)
 dwv.dicom.isJpeg2000TransferSyntax = function(syntax)
 {
     return syntax.match(/1.2.840.10008.1.2.4.9/) !== null;
+};
+
+/**
+ * Tell if a given syntax needs decompression.
+ * @method syntaxNeedsDecompression
+ * @param {String} The transfer syntax to test.
+ * @returns {String} The name of the decompression algorithm.
+ */
+dwv.dicom.getSyntaxDecompressionName = function(syntax)
+{
+    var algo = null;
+    if ( dwv.dicom.isJpeg2000TransferSyntax(syntax) ) {
+        algo = "jpeg2000";
+    }
+    else if ( dwv.dicom.isJpegBaselineTransferSyntax(syntax) ) {
+        algo = "jpeg-baseline";
+    }
+    else if ( dwv.dicom.isJpegLosslessTransferSyntax(syntax) ) {
+        algo = "jpeg-lossless";
+    }
+    return algo;
 };
 
 /**
@@ -2655,9 +2672,6 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
 {
     var offset = 0;
     var implicit = false;
-    var isJpegBaseline = false;
-    var isJpegLossless = false;
-    var isJpeg2000 = false;
     // default readers
     var metaReader = new dwv.dicom.DataReader(buffer);
     var dataReader = new dwv.dicom.DataReader(buffer);
@@ -2714,13 +2728,11 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
     }
     // JPEG baseline
     else if( dwv.dicom.isJpegBaselineTransferSyntax(syntax) ) {
-        isJpegBaseline = true;
-        console.log("JPEG Baseline compressed DICOM data: " + syntax);
+        // nothing to do!
     }
     // JPEG Lossless
     else if( dwv.dicom.isJpegLosslessTransferSyntax(syntax) ) {
-        isJpegLossless = true;
-        console.log("JPEG Lossless compressed DICOM data: " + syntax);
+        // nothing to do!
     }
     // non supported JPEG
     else if( dwv.dicom.isJpegNonSupportedTransferSyntax(syntax) ) {
@@ -2728,13 +2740,11 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
     }
     // JPEG-LS
     else if( dwv.dicom.isJpeglsTransferSyntax(syntax) ) {
-        //console.log("JPEG-LS compressed DICOM data: " + syntax);
         throw new Error("Unsupported DICOM transfer syntax (JPEG-LS): "+syntax);
     }
     // JPEG 2000
     else if( dwv.dicom.isJpeg2000TransferSyntax(syntax) ) {
-        console.log("JPEG 2000 compressed DICOM data: " + syntax);
-        isJpeg2000 = true;
+        // nothing to do!
     }
     // MPEG2 Image Compression
     else if( syntax === "1.2.840.10008.1.2.4.100" ) {
@@ -2789,10 +2799,9 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
             // Item
             if( tagName === "xFFFEE000" ) {
                 if( dataElement.data.length === 4 ) {
-                    console.log("Skipping Basic Offset Table.");
+                    // do nothing
                 }
                 else if( dataElement.data.length !== 0 ) {
-                    console.log("Concatenating multiple pixel data items, length: "+dataElement.data.length);
                     // concat does not work on typed arrays
                     //this.pixelBuffer = this.pixelBuffer.concat( dataElement.data );
                     // manual concat...
@@ -2863,36 +2872,6 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
             this.dicomElements.x00280008.value[0] > 1 ) {
         throw new Error("Unsupported multi-frame data");
     }
-
-    // uncompress data if needed
-    /*var decoder = null;
-    if( isJpegLossless ) {
-        if ( !hasJpegLosslessDecoder ) {
-            throw new Error("No JPEG Lossless decoder provided");
-        }
-        var buf = new Uint8Array(this.pixelBuffer);
-        decoder = new jpeg.lossless.Decoder(buf.buffer);
-        var decoded = decoder.decode();
-        this.pixelBuffer = new Uint16Array(decoded.buffer);
-    }
-    else if ( isJpegBaseline ) {
-        if ( !hasJpegBaselineDecoder ) {
-            throw new Error("No JPEG Baseline decoder provided");
-        }
-        decoder = new JpegImage();
-        decoder.parse( this.pixelBuffer );
-        this.pixelBuffer = decoder.getData(decoder.width,decoder.height);
-    }
-    else if( isJpeg2000 ) {
-        if ( !hasJpeg2000Decoder ) {
-            throw new Error("No JPEG 2000 decoder provided");
-        }
-        // decompress pixel buffer into Int16 image
-        decoder = new JpxImage();
-        decoder.parse( this.pixelBuffer );
-        // set the pixel buffer
-        this.pixelBuffer = decoder.tiles[0].items;
-    }*/
 };
 
 /**
@@ -12176,10 +12155,10 @@ dwv.image = dwv.image || {};
  * Get data from an input image using a canvas.
  * @method getDataFromImage
  * @static
- * @param {Image} image The image.
+ * @param {Image} Image The DOM Image.
  * @return {Mixed} The corresponding view and info.
  */
-dwv.image.getDataFromImage = function(image)
+dwv.image.getViewFromDOMImage = function (image)
 {
     // draw the image in the canvas in order to get its data
     var canvas = document.createElement('canvas');
@@ -12229,54 +12208,57 @@ dwv.image.getDataFromImage = function(image)
     return {"view": view, "info": info};
 };
 
-
-var pool = new dwv.utils.ThreadPool(15);
-pool.init();
-
-
 /**
- * Get data from an input buffer using a DICOM parser.
- * @method getDataFromDicomBuffer
- * @static
- * @param {Array} buffer The input data buffer.
- * @return {Mixed} The corresponding view and info.
+ * 
  */
-dwv.image.getDataFromDicomBuffer = function(buffer, onLoad)
-{
-    // DICOM parser
-    var dicomParser = new dwv.dicom.DicomParser();
-    // parse the buffer
-    dicomParser.parse(buffer);
+dwv.image.DicomBufferToView = function (decoderScripts) {
 
-    var callback = function(e) {
-        // create the view
-        var viewFactory = new dwv.image.ViewFactory();
-        var view = viewFactory.create( dicomParser.getDicomElements(), e.data );
-        // return
-        onLoad({"view": view, "info": dicomParser.getDicomElements().dumpToTable()});
+    // thread pool
+    var pool = new dwv.utils.ThreadPool(15);
+    pool.init();
+
+    /**
+     * Get data from an input buffer using a DICOM parser.
+     * @method getDataFromDicomBuffer
+     * @static
+     * @param {Array} buffer The input data buffer.
+     * @param {Object} callback The callback on the conversion.
+     * @return {Mixed} The corresponding view and info.
+     */
+    this.convert = function(buffer, callback)
+    {
+        // DICOM parser
+        var dicomParser = new dwv.dicom.DicomParser();
+        // parse the buffer
+        dicomParser.parse(buffer);
+    
+        // worker callback
+        var workerCallback = function(e) {
+            // create the view
+            var viewFactory = new dwv.image.ViewFactory();
+            var view = viewFactory.create( dicomParser.getDicomElements(), e.data );
+            // return
+            callback({"view": view, "info": dicomParser.getDicomElements().dumpToTable()});
+        };
+        var startMessage = dicomParser.pixelBuffer;
+        
+        var syntax = dwv.dicom.cleanString(dicomParser.getRawDicomElements().x00020010.value[0]);
+        var algoName = dwv.dicom.getSyntaxDecompressionName(syntax);
+        var needDecompression = (algoName !== null);
+        
+        if ( needDecompression ) {
+            var script = decoderScripts[algoName];
+            if ( typeof script === "undefined" ) {
+                throw new Error("No script provided to decompress '" + algoName + "' data.");
+            }
+            var workerTask = new dwv.utils.WorkerTask(script,workerCallback,startMessage);
+            pool.addWorkerTask(workerTask);
+        }
+        else {
+            workerCallback({data: startMessage});
+        }
     };
-    var startMessage = dicomParser.pixelBuffer;
-    
-    var script = null;
-    var syntax = dwv.dicom.cleanString(dicomParser.getRawDicomElements().x00020010.value[0]);
-    if ( dwv.dicom.isJpeg2000TransferSyntax(syntax) ) {
-        script = '../../ext/pdfjs/decode-jpeg2000.js';
-    }
-    else if (dwv.dicom.isJpegLosslessTransferSyntax(syntax) ) {
-        script = '../../ext/rii-mango/decode-jpegloss.js';
-    }
-    else if (dwv.dicom.isJpegBaselineTransferSyntax(syntax) ) {
-        script = '../../ext/notmasteryet/decode-jpegbaseline.js';
-    }
-    
-    if ( script !== null ) {
-        var workerTask = new dwv.utils.WorkerTask(script,callback,startMessage);
-        pool.addWorkerTask(workerTask);
-    }
-    else {
-        callback({data: startMessage});
-    }
-    
+
 };
 ;/** 
  * Image module.
@@ -12794,7 +12776,14 @@ dwv.io.File = function ()
      * @type Array
      */
     var progressList = [];
-
+    /**
+     * List of data decoders scripts.
+     * @property decoderScripts
+     * @private
+     * @type Array
+     */
+    var decoderScripts = [];
+    
     /**
      * Set the number of data to load.
      * @method setNToLoad
@@ -12813,6 +12802,7 @@ dwv.io.File = function ()
      */
     this.addLoaded = function () {
         nLoaded++;
+        console.log("nLoaded: "+nLoaded);
         if ( nLoaded === nToLoad ) {
             this.onloadend();
         }
@@ -12826,12 +12816,26 @@ dwv.io.File = function ()
      * @return {Number} The accumulated percentage.
      */
     this.getGlobalPercent = function (n, percent) {
-        progressList[n] = percent/nToLoad;
+        console.log("n: "+n + ", percent: "+percent);
+        progressList[n] = percent;
         var totPercent = 0;
         for ( var i = 0; i < progressList.length; ++i ) {
             totPercent += progressList[i];
         }
-        return totPercent;
+        return totPercent/nToLoad;
+    };
+    
+    /**
+     * 
+     */
+    this.setDecoderScripts = function (list) {
+        decoderScripts = list;
+    };
+    /**
+     * 
+     */
+    this.getDecoderScripts = function () {
+        return decoderScripts;
     };
 }; // class File
 
@@ -12919,45 +12923,45 @@ dwv.io.File.prototype.load = function (ioArray)
     this.setNToLoad( ioArray.length );
 
     // call the listeners
-    var onLoad = function (data)
+    var onLoadView = function (data)
     {
         self.onload(data);
         self.addLoaded();
     };
 
-    // DICOM reader loader
-    var onLoadDicomReader = function (event)
+    // DICOM buffer to dwv.image.View (asynchronous)
+    var db2v = new dwv.image.DicomBufferToView(this.getDecoderScripts());
+    var onLoadDicomBuffer = function (event)
     {
         try {
-            //onLoad( dwv.image.getDataFromDicomBuffer(event.target.result) );
-            dwv.image.getDataFromDicomBuffer(event.target.result, onLoad);
+            db2v.convert(event.target.result, onLoadView);
+        } catch (error) {
+            self.onerror(error);
+        }
+    };
+
+    // DOM Image buffer to dwv.image.View 
+    var onLoadDOMImageBuffer = function (/*event*/)
+    {
+        try {
+            onLoadView( dwv.image.getViewFromDOMImage(this) );
+        } catch (error) {
+            self.onerror(error);
+        }
+    };
+
+    // load text buffer
+    var onLoadTextBuffer = function (event)
+    {
+        try {
+            self.onload( event.target.result );
         } catch(error) {
             self.onerror(error);
         }
     };
 
-    // image loader
-    var onLoadImage = function (/*event*/)
-    {
-        try {
-            onLoad( dwv.image.getDataFromImage(this) );
-        } catch(error) {
-            self.onerror(error);
-        }
-    };
-
-    // text reader loader
-    var onLoadTextReader = function (event)
-    {
-        try {
-            onLoad( event.target.result );
-        } catch(error) {
-            self.onerror(error);
-        }
-    };
-
-    // image reader loader
-    var onLoadImageReader = function (event)
+    // raw image to DOM Image
+    var onLoadRawImageBuffer = function (event)
     {
         var theImage = new Image();
         theImage.src = event.target.result;
@@ -12965,7 +12969,7 @@ dwv.io.File.prototype.load = function (ioArray)
         theImage.file = this.file;
         theImage.index = this.index;
         // triggered by ctx.drawImage
-        theImage.onload = onLoadImage;
+        theImage.onload = onLoadDOMImageBuffer;
     };
 
     // loop on I/O elements
@@ -12977,7 +12981,7 @@ dwv.io.File.prototype.load = function (ioArray)
                 self.getGlobalPercent, self.onprogress);
         if ( file.name.split('.').pop().toLowerCase() === "json" )
         {
-            reader.onload = onLoadTextReader;
+            reader.onload = onLoadTextBuffer;
             reader.onerror = dwv.io.File.createErrorHandler(file, "text", self.onerror);
             reader.readAsText(file);
         }
@@ -12987,13 +12991,13 @@ dwv.io.File.prototype.load = function (ioArray)
             reader.file = file;
             reader.index = i;
             // callbacks
-            reader.onload = onLoadImageReader;
+            reader.onload = onLoadRawImageBuffer;
             reader.onerror = dwv.io.File.createErrorHandler(file, "image", self.onerror);
             reader.readAsDataURL(file);
         }
         else
         {
-            reader.onload = onLoadDicomReader;
+            reader.onload = onLoadDicomBuffer;
             reader.onerror = dwv.io.File.createErrorHandler(file, "DICOM", self.onerror);
             reader.readAsArrayBuffer(file);
         }
@@ -13041,6 +13045,13 @@ dwv.io.Url = function ()
      * @type Array
      */
     var progressList = [];
+    /**
+     * List of data decoders scripts.
+     * @property decoderScripts
+     * @private
+     * @type Array
+     */
+    var decoderScripts = [];
 
     /**
      * Set the number of data to load.
@@ -13079,6 +13090,19 @@ dwv.io.Url = function ()
             totPercent += progressList[i];
         }
         return totPercent;
+    };
+    
+    /**
+     * 
+     */
+    this.setDecoderScripts = function (list) {
+        decoderScripts = list;
+    };
+    /**
+     * 
+     */
+    this.getDecoderScripts = function () {
+        return decoderScripts;
     };
 }; // class Url
 
@@ -13166,45 +13190,45 @@ dwv.io.Url.prototype.load = function (ioArray)
     this.setNToLoad( ioArray.length );
 
     // call the listeners
-    var onLoad = function (data)
+    var onLoadView = function (data)
     {
         self.onload(data);
         self.addLoaded();
     };
 
-    // DICOM request
-    var onLoadDicomRequest = function (response)
+    // DICOM buffer to dwv.image.View (asynchronous)
+    var db2v = new dwv.image.DicomBufferToView(this.getDecoderScripts());
+    var onLoadDicomBuffer = function (response)
     {
         try {
-            //onLoad( dwv.image.getDataFromDicomBuffer(response) );
-            dwv.image.getDataFromDicomBuffer(response, onLoad);
+            db2v.convert(response, onLoadView);
         } catch (error) {
             self.onerror(error);
         }
     };
 
-    // image request
-    var onLoadImage = function (/*event*/)
+    // DOM Image buffer to dwv.image.View
+    var onLoadDOMImageBuffer = function (/*event*/)
     {
         try {
-            onLoad( dwv.image.getDataFromImage(this) );
+            onLoadView( dwv.image.getViewFromDOMImage(this) );
         } catch (error) {
             self.onerror(error);
         }
     };
 
-    // text request
-    var onLoadTextRequest = function (/*event*/)
+    // load text buffer
+    var onLoadTextBuffer = function (/*event*/)
     {
         try {
-            onLoad( this.responseText );
+            self.onload( this.responseText );
         } catch (error) {
             self.onerror(error);
         }
     };
 
-    // binary request
-    var onLoadBinaryRequest = function (/*event*/)
+    // load binary buffer
+    var onLoadBinaryBuffer = function (/*event*/)
     {
         // find the image type from its signature
         var view = new DataView(this.response);
@@ -13245,11 +13269,11 @@ dwv.io.Url.prototype.load = function (ioArray)
             // temporary image object
             var tmpImage = new Image();
             tmpImage.src = "data:image/" + imageType + ";base64," + window.btoa(imageDataStr);
-            tmpImage.onload = onLoadImage;
+            tmpImage.onload = onLoadDOMImageBuffer;
         }
         else
         {
-            onLoadDicomRequest(this.response);
+            onLoadDicomBuffer(this.response);
         }
     };
 
@@ -13264,11 +13288,11 @@ dwv.io.Url.prototype.load = function (ioArray)
         request.open('GET', url, true);
         if ( !isText ) {
             request.responseType = "arraybuffer";
-            request.onload = onLoadBinaryRequest;
+            request.onload = onLoadBinaryBuffer;
             request.onerror = dwv.io.Url.createErrorHandler(url, "binary", self.onerror);
         }
         else {
-            request.onload = onLoadTextRequest;
+            request.onload = onLoadTextBuffer;
             request.onerror = dwv.io.Url.createErrorHandler(url, "text", self.onerror);
         }
         request.onprogress = dwv.io.File.createProgressHandler(i,

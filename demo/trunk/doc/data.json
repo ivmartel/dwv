@@ -934,7 +934,7 @@
             "module": "dicom",
             "namespace": "dwv.dicom",
             "file": "src/dicom/dicomParser.js",
-            "line": 53,
+            "line": 39,
             "description": "Data reader.",
             "is_constructor": 1,
             "params": [
@@ -961,7 +961,7 @@
             "module": "dicom",
             "namespace": "dwv.dicom",
             "file": "src/dicom/dicomParser.js",
-            "line": 469,
+            "line": 476,
             "description": "DicomParser class.",
             "is_constructor": 1
         },
@@ -976,7 +976,7 @@
             "module": "dicom",
             "namespace": "dwv.dicom",
             "file": "src/dicom/dicomParser.js",
-            "line": 1042,
+            "line": 1011,
             "description": "DicomElements wrapper.",
             "is_constructor": 1,
             "params": [
@@ -2631,7 +2631,7 @@
     "classitems": [
         {
             "file": "src/app/application.js",
-            "line": 85,
+            "line": 88,
             "description": "Get the version of the application.",
             "itemtype": "method",
             "name": "getVersion",
@@ -2644,7 +2644,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 92,
+            "line": 95,
             "description": "Get the image.",
             "itemtype": "method",
             "name": "getImage",
@@ -2657,7 +2657,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 98,
+            "line": 101,
             "description": "Set the view.",
             "itemtype": "method",
             "name": "setImage",
@@ -2673,7 +2673,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 108,
+            "line": 111,
             "description": "Restore the original image.",
             "itemtype": "method",
             "name": "restoreOriginalImage",
@@ -2682,7 +2682,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 117,
+            "line": 120,
             "description": "Get the image data array.",
             "itemtype": "method",
             "name": "getImageData",
@@ -2695,7 +2695,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 123,
+            "line": 126,
             "description": "Get the number of slices to load.",
             "itemtype": "method",
             "name": "getNSlicesToLoad",
@@ -2708,7 +2708,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 130,
+            "line": 133,
             "description": "Get the main scale.",
             "itemtype": "method",
             "name": "getScale",
@@ -2721,7 +2721,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 137,
+            "line": 140,
             "description": "Get the scale center.",
             "itemtype": "method",
             "name": "getScaleCenter",
@@ -2734,7 +2734,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 144,
+            "line": 147,
             "description": "Get the translation.",
             "itemtype": "method",
             "name": "getTranslation",
@@ -2747,7 +2747,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 151,
+            "line": 154,
             "description": "Get the view controller.",
             "itemtype": "method",
             "name": "getViewController",
@@ -2760,7 +2760,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 158,
+            "line": 161,
             "description": "Get the image layer.",
             "itemtype": "method",
             "name": "getImageLayer",
@@ -2773,7 +2773,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 164,
+            "line": 167,
             "description": "Get the draw layer.",
             "itemtype": "method",
             "name": "getDrawLayer",
@@ -2786,7 +2786,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 177,
+            "line": 180,
             "description": "Get the draw stage.",
             "itemtype": "method",
             "name": "getDrawStage",
@@ -2799,7 +2799,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 184,
+            "line": 187,
             "description": "Get the app style.",
             "itemtype": "method",
             "name": "getStyle",
@@ -2812,7 +2812,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 191,
+            "line": 194,
             "description": "Get the toolbox.",
             "itemtype": "method",
             "name": "getToolbox",
@@ -2825,7 +2825,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 197,
+            "line": 200,
             "description": "Get the toolbox controller.",
             "itemtype": "method",
             "name": "getToolboxController",
@@ -2838,7 +2838,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 204,
+            "line": 207,
             "description": "Get the undo stack.",
             "itemtype": "method",
             "name": "getUndoStack",
@@ -2851,7 +2851,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 211,
+            "line": 214,
             "description": "Get the data loaders.",
             "itemtype": "method",
             "name": "getLoaders",
@@ -2864,7 +2864,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 224,
+            "line": 227,
             "description": "Initialise the HTML for the application.",
             "itemtype": "method",
             "name": "init",
@@ -2873,7 +2873,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 395,
+            "line": 403,
             "description": "Get a HTML element associated to the application.",
             "itemtype": "method",
             "name": "getElement",
@@ -2891,7 +2891,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 406,
+            "line": 414,
             "description": "Reset the application.",
             "itemtype": "method",
             "name": "reset",
@@ -2900,7 +2900,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 431,
+            "line": 439,
             "description": "Reset the layout of the application.",
             "itemtype": "method",
             "name": "resetLayout",
@@ -2909,7 +2909,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 450,
+            "line": 458,
             "description": "Add an event listener on the app.",
             "itemtype": "method",
             "name": "addEventListener",
@@ -2930,7 +2930,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 464,
+            "line": 472,
             "description": "Remove an event listener from the app.",
             "itemtype": "method",
             "name": "removeEventListener",
@@ -2951,7 +2951,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 483,
+            "line": 491,
             "description": "Load a list of files.",
             "itemtype": "method",
             "name": "loadFiles",
@@ -2967,7 +2967,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 500,
+            "line": 508,
             "description": "Load a list of image files.",
             "itemtype": "method",
             "name": "loadImageFiles",
@@ -2983,7 +2983,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 539,
+            "line": 548,
             "description": "Load a State file.",
             "itemtype": "method",
             "name": "loadStateFile",
@@ -2999,7 +2999,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 558,
+            "line": 567,
             "description": "Load a list of URLs.",
             "itemtype": "method",
             "name": "loadURL",
@@ -3015,7 +3015,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 597,
+            "line": 607,
             "description": "Load a State url.",
             "itemtype": "method",
             "name": "loadStateUrl",
@@ -3031,7 +3031,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 616,
+            "line": 626,
             "description": "Fit the display to the given size. To be called once the image is loaded.",
             "itemtype": "method",
             "name": "fitToSize",
@@ -3040,7 +3040,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 659,
+            "line": 669,
             "description": "Toggle the display of the information layer.",
             "itemtype": "method",
             "name": "toggleInfoLayerDisplay",
@@ -3049,14 +3049,14 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 677,
+            "line": 687,
             "description": "Init the Window/Level display",
             "class": "dwv.App",
             "namespace": "dwv"
         },
         {
             "file": "src/app/application.js",
-            "line": 692,
+            "line": 702,
             "description": "Add layer mouse and touch listeners.",
             "itemtype": "method",
             "name": "addLayerListeners",
@@ -3065,7 +3065,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 714,
+            "line": 724,
             "description": "Remove layer mouse and touch listeners.",
             "itemtype": "method",
             "name": "removeLayerListeners",
@@ -3074,7 +3074,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 736,
+            "line": 746,
             "description": "Render the current image.",
             "itemtype": "method",
             "name": "render",
@@ -3083,7 +3083,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 745,
+            "line": 755,
             "description": "Zoom to the layers.",
             "itemtype": "method",
             "name": "zoom",
@@ -3109,7 +3109,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 761,
+            "line": 771,
             "description": "Add a step to the layers zoom.",
             "itemtype": "method",
             "name": "stepZoom",
@@ -3135,7 +3135,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 777,
+            "line": 787,
             "description": "Apply a translation to the layers.",
             "itemtype": "method",
             "name": "translate",
@@ -3156,7 +3156,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 789,
+            "line": 799,
             "description": "Add a translation to the layers.",
             "itemtype": "method",
             "name": "stepTranslate",
@@ -3177,7 +3177,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 805,
+            "line": 815,
             "description": "Handle window/level change.",
             "itemtype": "method",
             "name": "onWLChange",
@@ -3193,7 +3193,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 815,
+            "line": 825,
             "description": "Handle colour map change.",
             "itemtype": "method",
             "name": "onColourChange",
@@ -3209,7 +3209,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 825,
+            "line": 835,
             "description": "Handle slice change.",
             "itemtype": "method",
             "name": "onSliceChange",
@@ -3225,7 +3225,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 845,
+            "line": 855,
             "description": "Handle key down event.\n- CRTL-Z: undo\n- CRTL-Y: redo\nDefault behavior. Usually used in tools.",
             "itemtype": "method",
             "name": "onKeydown",
@@ -3241,7 +3241,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 865,
+            "line": 875,
             "description": "Handle resize.\nFit the display to the window. To be called once the image is loaded.",
             "itemtype": "method",
             "name": "onResize",
@@ -3257,7 +3257,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 876,
+            "line": 886,
             "description": "Handle zoom reset.",
             "itemtype": "method",
             "name": "onZoomReset",
@@ -3273,7 +3273,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 886,
+            "line": 896,
             "description": "Handle loader change.",
             "itemtype": "method",
             "name": "onChangeLoader",
@@ -3289,7 +3289,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 896,
+            "line": 906,
             "description": "Handle change url event.",
             "itemtype": "method",
             "name": "onChangeURL",
@@ -3305,7 +3305,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 906,
+            "line": 916,
             "description": "Handle input urls.",
             "itemtype": "method",
             "name": "onInputURLs",
@@ -3321,7 +3321,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 916,
+            "line": 926,
             "description": "Handle change files event.",
             "itemtype": "method",
             "name": "onChangeFiles",
@@ -3337,7 +3337,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 929,
+            "line": 939,
             "description": "Handle state save event.",
             "itemtype": "method",
             "name": "onStateSave",
@@ -3353,7 +3353,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 942,
+            "line": 952,
             "description": "Handle colour map change.",
             "itemtype": "method",
             "name": "onChangeColourMap",
@@ -3369,7 +3369,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 952,
+            "line": 962,
             "description": "Handle window/level preset change.",
             "itemtype": "method",
             "name": "onChangeWindowLevelPreset",
@@ -3385,7 +3385,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 970,
+            "line": 980,
             "description": "Handle tool change.",
             "itemtype": "method",
             "name": "onChangeTool",
@@ -3401,7 +3401,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 980,
+            "line": 990,
             "description": "Handle shape change.",
             "itemtype": "method",
             "name": "onChangeShape",
@@ -3417,7 +3417,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 990,
+            "line": 1000,
             "description": "Handle filter change.",
             "itemtype": "method",
             "name": "onChangeFilter",
@@ -3433,7 +3433,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1000,
+            "line": 1010,
             "description": "Handle filter run.",
             "itemtype": "method",
             "name": "onRunFilter",
@@ -3449,7 +3449,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1010,
+            "line": 1020,
             "description": "Handle line colour change.",
             "itemtype": "method",
             "name": "onChangeLineColour",
@@ -3465,7 +3465,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1020,
+            "line": 1030,
             "description": "Handle min/max slider change.",
             "itemtype": "method",
             "name": "onChangeMinMax",
@@ -3481,7 +3481,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1030,
+            "line": 1040,
             "description": "Handle undo.",
             "itemtype": "method",
             "name": "onUndo",
@@ -3497,7 +3497,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1040,
+            "line": 1050,
             "description": "Handle redo.",
             "itemtype": "method",
             "name": "onRedo",
@@ -3513,7 +3513,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1050,
+            "line": 1060,
             "description": "Handle toggle of info layer.",
             "itemtype": "method",
             "name": "onToggleInfoLayer",
@@ -3529,7 +3529,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1060,
+            "line": 1070,
             "description": "Handle display reset.",
             "itemtype": "method",
             "name": "onDisplayReset",
@@ -3545,7 +3545,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1078,
+            "line": 1088,
             "description": "Fire an event: call all associated listeners.",
             "itemtype": "method",
             "name": "fireEvent",
@@ -3561,7 +3561,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1094,
+            "line": 1104,
             "description": "Generate the image data and draw it.",
             "itemtype": "method",
             "name": "generateAndDrawImage",
@@ -3570,7 +3570,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1108,
+            "line": 1118,
             "description": "Apply the stored zoom to the layers.",
             "itemtype": "method",
             "name": "zoomLayers",
@@ -3579,7 +3579,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1139,
+            "line": 1149,
             "description": "Apply the stored translation to the layers.",
             "itemtype": "method",
             "name": "translateLayers",
@@ -3588,7 +3588,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1159,
+            "line": 1169,
             "description": "Add image listeners.",
             "itemtype": "method",
             "name": "addImageInfoListeners",
@@ -3599,7 +3599,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1174,
+            "line": 1184,
             "description": "Remove image listeners.",
             "itemtype": "method",
             "name": "removeImageInfoListeners",
@@ -3610,7 +3610,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1189,
+            "line": 1199,
             "description": "Mou(se) and (T)ouch event handler. This function just determines the mouse/touch\nposition relative to the canvas element. It then passes it to the current tool.",
             "itemtype": "method",
             "name": "onMouch",
@@ -3628,7 +3628,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1264,
+            "line": 1274,
             "description": "Handle a drag over.",
             "itemtype": "method",
             "name": "onDragOver",
@@ -3646,7 +3646,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1282,
+            "line": 1292,
             "description": "Handle a drag leave.",
             "itemtype": "method",
             "name": "onDragLeave",
@@ -3664,7 +3664,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1300,
+            "line": 1310,
             "description": "Handle a drop event.",
             "itemtype": "method",
             "name": "onDrop",
@@ -3682,7 +3682,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1315,
+            "line": 1325,
             "description": "Handle an error: display it to the user.",
             "itemtype": "method",
             "name": "handleError",
@@ -3700,7 +3700,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1336,
+            "line": 1346,
             "description": "Handle a load progress.",
             "itemtype": "method",
             "name": "onLoadProgress",
@@ -3718,7 +3718,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1352,
+            "line": 1362,
             "description": "Create the application layers.",
             "itemtype": "method",
             "name": "createLayers",
@@ -3741,7 +3741,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1393,
+            "line": 1403,
             "description": "Post load application initialisation. To be called once the DICOM has been parsed.",
             "itemtype": "method",
             "name": "postLoadInit",
@@ -4097,7 +4097,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 22,
+            "line": 8,
             "description": "Clean string: trim and remove ending.",
             "itemtype": "method",
             "name": "cleanString",
@@ -4118,7 +4118,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 43,
+            "line": 29,
             "description": "Is the Native endianness Little Endian.",
             "itemtype": "property",
             "name": "isNativeLittleEndian",
@@ -4128,7 +4128,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 68,
+            "line": 54,
             "description": "Is the Native endianness Little Endian.",
             "itemtype": "property",
             "name": "isNativeLittleEndian",
@@ -4141,7 +4141,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 76,
+            "line": 62,
             "description": "Flag to know if the TypedArray data needs flipping.",
             "itemtype": "property",
             "name": "needFlip",
@@ -4154,7 +4154,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 84,
+            "line": 70,
             "description": "The main data view.",
             "itemtype": "property",
             "name": "view",
@@ -4167,7 +4167,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 92,
+            "line": 78,
             "description": "Flip an array's endianness.\nInspired from https://github.com/kig/DataStream.js.",
             "itemtype": "method",
             "name": "flipArrayEndianness",
@@ -4184,7 +4184,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 112,
+            "line": 98,
             "description": "Read Uint16 (2 bytes) data.",
             "itemtype": "method",
             "name": "readUint16",
@@ -4205,7 +4205,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 121,
+            "line": 107,
             "description": "Read Uint32 (4 bytes) data.",
             "itemtype": "method",
             "name": "readUint32",
@@ -4226,7 +4226,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 130,
+            "line": 116,
             "description": "Read Int32 (4 bytes) data.",
             "itemtype": "method",
             "name": "readInt32",
@@ -4247,7 +4247,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 139,
+            "line": 125,
             "description": "Read Uint8 array.",
             "itemtype": "method",
             "name": "readUint8Array",
@@ -4273,7 +4273,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 149,
+            "line": 135,
             "description": "Read Int8 array.",
             "itemtype": "method",
             "name": "readInt8Array",
@@ -4299,7 +4299,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 159,
+            "line": 145,
             "description": "Read Uint16 array.",
             "itemtype": "method",
             "name": "readUint16Array",
@@ -4325,7 +4325,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 173,
+            "line": 159,
             "description": "Read Int16 array.",
             "itemtype": "method",
             "name": "readInt16Array",
@@ -4351,7 +4351,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 187,
+            "line": 173,
             "description": "Read Uint32 array.",
             "itemtype": "method",
             "name": "readUint32Array",
@@ -4377,7 +4377,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 212,
+            "line": 198,
             "description": "Read Int32 array.",
             "itemtype": "method",
             "name": "readInt32Array",
@@ -4403,7 +4403,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 237,
+            "line": 223,
             "description": "Read Float32 array.",
             "itemtype": "method",
             "name": "readFloat32Array",
@@ -4429,7 +4429,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 262,
+            "line": 248,
             "description": "Read Float64 array.",
             "itemtype": "method",
             "name": "readFloat64Array",
@@ -4455,7 +4455,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 287,
+            "line": 273,
             "description": "Read data as an hexadecimal string.",
             "itemtype": "method",
             "name": "readHex",
@@ -4476,7 +4476,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 299,
+            "line": 285,
             "description": "Read data as a string.",
             "itemtype": "method",
             "name": "readString",
@@ -4502,7 +4502,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 316,
+            "line": 302,
             "description": "Get the group-element key used to store DICOM elements.",
             "params": [
                 {
@@ -4526,7 +4526,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 327,
+            "line": 313,
             "description": "Split a group-element key used to store DICOM elements.",
             "params": [
                 {
@@ -4544,7 +4544,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 337,
+            "line": 323,
             "description": "Tell if a given syntax is a JPEG baseline one.",
             "itemtype": "method",
             "name": "isJpegBaselineTransferSyntax",
@@ -4565,7 +4565,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 349,
+            "line": 335,
             "description": "Tell if a given syntax is a non supported JPEG one.",
             "itemtype": "method",
             "name": "isJpegNonSupportedTransferSyntax",
@@ -4586,7 +4586,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 363,
+            "line": 349,
             "description": "Tell if a given syntax is a JPEG Lossless one.",
             "itemtype": "method",
             "name": "isJpegLosslessTransferSyntax",
@@ -4607,7 +4607,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 375,
+            "line": 361,
             "description": "Tell if a given syntax is a JPEG-LS one.",
             "itemtype": "method",
             "name": "isJpeglsTransferSyntax",
@@ -4628,7 +4628,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 386,
+            "line": 372,
             "description": "Tell if a given syntax is a JPEG 2000 one.",
             "itemtype": "method",
             "name": "isJpeg2000TransferSyntax",
@@ -4649,7 +4649,28 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 397,
+            "line": 383,
+            "description": "Tell if a given syntax needs decompression.",
+            "itemtype": "method",
+            "name": "syntaxNeedsDecompression",
+            "params": [
+                {
+                    "name": "The",
+                    "description": "transfer syntax to test.",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "The name of the decompression algorithm.",
+                "type": "String"
+            },
+            "class": "dwv.dicom.DataReader",
+            "module": "dicom",
+            "namespace": "dwv.dicom"
+        },
+        {
+            "file": "src/dicom/dicomParser.js",
+            "line": 404,
             "description": "Get the transfer syntax name.",
             "itemtype": "method",
             "name": "getTransferSyntaxName",
@@ -4670,7 +4691,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 477,
+            "line": 484,
             "description": "The list of DICOM elements.",
             "itemtype": "property",
             "name": "dicomElements",
@@ -4681,7 +4702,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 483,
+            "line": 490,
             "description": "The pixel buffer.",
             "itemtype": "property",
             "name": "pixelBuffer",
@@ -4692,7 +4713,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 490,
+            "line": 497,
             "description": "Unknown tags count.",
             "itemtype": "property",
             "name": "unknownCount",
@@ -4703,7 +4724,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 496,
+            "line": 503,
             "description": "Get the next unknown tags count.",
             "itemtype": "method",
             "name": "getNextUnknownCount",
@@ -4717,7 +4738,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 507,
+            "line": 514,
             "description": "Get the raw DICOM data elements.",
             "itemtype": "method",
             "name": "getRawDicomElements",
@@ -4731,7 +4752,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 517,
+            "line": 524,
             "description": "Get the DICOM data elements.",
             "itemtype": "method",
             "name": "getDicomElements",
@@ -4745,7 +4766,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 527,
+            "line": 534,
             "description": "Get the DICOM data pixel buffer.",
             "itemtype": "method",
             "name": "getPixelBuffer",
@@ -4759,7 +4780,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 537,
+            "line": 544,
             "description": "Append a DICOM element to the dicomElements member object.\nAllows for easy retrieval of DICOM tag values from the tag name.\nIf tags have same name (for the 'unknown' private tags cases), a number is appended\nmaking the name unique.",
             "itemtype": "method",
             "name": "appendDicomElement",
@@ -4781,7 +4802,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 587,
+            "line": 594,
             "description": "Append an element to a sequence.",
             "itemtype": "method",
             "name": "appendElementToSequence",
@@ -4813,7 +4834,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 625,
+            "line": 632,
             "description": "Read a DICOM tag.",
             "itemtype": "method",
             "name": "readTag",
@@ -4836,7 +4857,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 644,
+            "line": 651,
             "description": "Read a DICOM data element.",
             "itemtype": "method",
             "name": "readDataElement",
@@ -4864,7 +4885,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 792,
+            "line": 799,
             "description": "Parse the complete DICOM file (given as input to the class).\nFills in the member object 'dicomElements'.",
             "itemtype": "method",
             "name": "parse",
@@ -4880,7 +4901,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 1051,
+            "line": 1020,
             "description": "Get a DICOM Element value from a group/element key.",
             "itemtype": "method",
             "name": "getFromKey",
@@ -4906,7 +4927,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 1077,
+            "line": 1046,
             "description": "Dump the DICOM tags to an array.",
             "return": {
                 "description": "",
@@ -4918,7 +4939,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 1112,
+            "line": 1081,
             "description": "Dump the DICOM tags to a string.",
             "return": {
                 "description": "The dumped file.",
@@ -4930,7 +4951,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 1149,
+            "line": 1118,
             "params": [
                 {
                     "name": "group",
@@ -4950,7 +4971,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 1404,
+            "line": 1373,
             "description": "Get a DICOM Element value from a group and an element.",
             "itemtype": "method",
             "name": "getFromGroupElement",
@@ -4976,7 +4997,7 @@
         },
         {
             "file": "src/dicom/dicomParser.js",
-            "line": 1418,
+            "line": 1387,
             "description": "Get a DICOM Element value from a tag name.\nUses the DICOM dictionary.",
             "itemtype": "method",
             "name": "getFromName",
@@ -8523,8 +8544,8 @@
             "static": 1,
             "params": [
                 {
-                    "name": "image",
-                    "description": "The image.",
+                    "name": "Image",
+                    "description": "The DOM Image.",
                     "type": "Image"
                 }
             ],
@@ -8538,7 +8559,14 @@
         },
         {
             "file": "src/image/reader.js",
-            "line": 76,
+            "line": 71,
+            "class": "dwv.image",
+            "module": "image",
+            "namespace": "dwv"
+        },
+        {
+            "file": "src/image/reader.js",
+            "line": 80,
             "description": "Get data from an input buffer using a DICOM parser.",
             "itemtype": "method",
             "name": "getDataFromDicomBuffer",
@@ -8548,6 +8576,11 @@
                     "name": "buffer",
                     "description": "The input data buffer.",
                     "type": "Array"
+                },
+                {
+                    "name": "callback",
+                    "description": "The callback on the conversion.",
+                    "type": "Object"
                 }
             ],
             "return": {
@@ -9048,7 +9081,20 @@
         },
         {
             "file": "src/io/file.js",
-            "line": 44,
+            "line": 43,
+            "description": "List of data decoders scripts.",
+            "itemtype": "property",
+            "name": "decoderScripts",
+            "access": "private",
+            "tagname": "",
+            "type": "Array",
+            "class": "dwv.io.File",
+            "module": "io",
+            "namespace": "dwv.io"
+        },
+        {
+            "file": "src/io/file.js",
+            "line": 51,
             "description": "Set the number of data to load.",
             "itemtype": "method",
             "name": "setNToLoad",
@@ -9058,7 +9104,7 @@
         },
         {
             "file": "src/io/file.js",
-            "line": 55,
+            "line": 62,
             "description": "Increment the number of loaded data\nand call onloadend if loaded all data.",
             "itemtype": "method",
             "name": "addLoaded",
@@ -9068,7 +9114,7 @@
         },
         {
             "file": "src/io/file.js",
-            "line": 67,
+            "line": 75,
             "description": "Get the global load percent including the provided one.",
             "itemtype": "method",
             "name": "getGlobalPercent",
@@ -9094,7 +9140,21 @@
         },
         {
             "file": "src/io/file.js",
-            "line": 84,
+            "line": 92,
+            "class": "dwv.io.File",
+            "module": "io",
+            "namespace": "dwv.io"
+        },
+        {
+            "file": "src/io/file.js",
+            "line": 98,
+            "class": "dwv.io.File",
+            "module": "io",
+            "namespace": "dwv.io"
+        },
+        {
+            "file": "src/io/file.js",
+            "line": 106,
             "description": "Handle a load event.",
             "itemtype": "method",
             "name": "onload",
@@ -9111,7 +9171,7 @@
         },
         {
             "file": "src/io/file.js",
-            "line": 94,
+            "line": 116,
             "description": "Handle a load end event.",
             "itemtype": "method",
             "name": "onloadend",
@@ -9121,7 +9181,7 @@
         },
         {
             "file": "src/io/file.js",
-            "line": 102,
+            "line": 124,
             "description": "Handle a progress event.",
             "itemtype": "method",
             "name": "onprogress",
@@ -9131,7 +9191,7 @@
         },
         {
             "file": "src/io/file.js",
-            "line": 110,
+            "line": 132,
             "description": "Handle an error event.",
             "itemtype": "method",
             "name": "onerror",
@@ -9148,7 +9208,7 @@
         },
         {
             "file": "src/io/file.js",
-            "line": 121,
+            "line": 143,
             "description": "Create an error handler from a base one and locals.",
             "itemtype": "method",
             "name": "createErrorHandler",
@@ -9175,7 +9235,7 @@
         },
         {
             "file": "src/io/file.js",
-            "line": 136,
+            "line": 158,
             "description": "Create an progress handler from a base one and locals.",
             "itemtype": "method",
             "name": "createProgressHandler",
@@ -9202,7 +9262,7 @@
         },
         {
             "file": "src/io/file.js",
-            "line": 155,
+            "line": 177,
             "description": "Load a list of files.",
             "itemtype": "method",
             "name": "load",
@@ -9258,7 +9318,20 @@
         },
         {
             "file": "src/io/url.js",
-            "line": 44,
+            "line": 43,
+            "description": "List of data decoders scripts.",
+            "itemtype": "property",
+            "name": "decoderScripts",
+            "access": "private",
+            "tagname": "",
+            "type": "Array",
+            "class": "dwv.io.Url",
+            "module": "io",
+            "namespace": "dwv.io"
+        },
+        {
+            "file": "src/io/url.js",
+            "line": 51,
             "description": "Set the number of data to load.",
             "itemtype": "method",
             "name": "setNToLoad",
@@ -9268,7 +9341,7 @@
         },
         {
             "file": "src/io/url.js",
-            "line": 55,
+            "line": 62,
             "description": "Increment the number of loaded data\nand call onloadend if loaded all data.",
             "itemtype": "method",
             "name": "addLoaded",
@@ -9278,7 +9351,7 @@
         },
         {
             "file": "src/io/url.js",
-            "line": 67,
+            "line": 74,
             "description": "Get the global load percent including the provided one.",
             "itemtype": "method",
             "name": "getGlobalPercent",
@@ -9304,7 +9377,21 @@
         },
         {
             "file": "src/io/url.js",
-            "line": 84,
+            "line": 90,
+            "class": "dwv.io.Url",
+            "module": "io",
+            "namespace": "dwv.io"
+        },
+        {
+            "file": "src/io/url.js",
+            "line": 96,
+            "class": "dwv.io.Url",
+            "module": "io",
+            "namespace": "dwv.io"
+        },
+        {
+            "file": "src/io/url.js",
+            "line": 104,
             "description": "Handle a load event.",
             "itemtype": "method",
             "name": "onload",
@@ -9321,7 +9408,7 @@
         },
         {
             "file": "src/io/url.js",
-            "line": 94,
+            "line": 114,
             "description": "Handle a load end event.",
             "itemtype": "method",
             "name": "onloadend",
@@ -9331,7 +9418,7 @@
         },
         {
             "file": "src/io/url.js",
-            "line": 102,
+            "line": 122,
             "description": "Handle a progress event.",
             "itemtype": "method",
             "name": "onprogress",
@@ -9341,7 +9428,7 @@
         },
         {
             "file": "src/io/url.js",
-            "line": 110,
+            "line": 130,
             "description": "Handle an error event.",
             "itemtype": "method",
             "name": "onerror",
@@ -9358,7 +9445,7 @@
         },
         {
             "file": "src/io/url.js",
-            "line": 121,
+            "line": 141,
             "description": "Create an error handler from a base one and locals.",
             "itemtype": "method",
             "name": "createErrorHandler",
@@ -9385,7 +9472,7 @@
         },
         {
             "file": "src/io/url.js",
-            "line": 136,
+            "line": 156,
             "description": "Create an progress handler from a base one and locals.",
             "itemtype": "method",
             "name": "createProgressHandler",
@@ -9412,7 +9499,7 @@
         },
         {
             "file": "src/io/url.js",
-            "line": 155,
+            "line": 175,
             "description": "Load a list of URLs.",
             "itemtype": "method",
             "name": "load",
@@ -13961,15 +14048,19 @@
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/dicom/dicomParser.js:316"
+            "line": " src/dicom/dicomParser.js:302"
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/dicom/dicomParser.js:327"
+            "line": " src/dicom/dicomParser.js:313"
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/dicom/dicomParser.js:337"
+            "line": " src/dicom/dicomParser.js:323"
+        },
+        {
+            "message": "replacing incorrect tag: returns with return",
+            "line": " src/dicom/dicomParser.js:335"
         },
         {
             "message": "replacing incorrect tag: returns with return",
@@ -13977,55 +14068,55 @@
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/dicom/dicomParser.js:363"
+            "line": " src/dicom/dicomParser.js:361"
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/dicom/dicomParser.js:375"
+            "line": " src/dicom/dicomParser.js:372"
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/dicom/dicomParser.js:386"
+            "line": " src/dicom/dicomParser.js:383"
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/dicom/dicomParser.js:397"
+            "line": " src/dicom/dicomParser.js:404"
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/dicom/dicomParser.js:496"
+            "line": " src/dicom/dicomParser.js:503"
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/dicom/dicomParser.js:507"
+            "line": " src/dicom/dicomParser.js:514"
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/dicom/dicomParser.js:517"
+            "line": " src/dicom/dicomParser.js:524"
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/dicom/dicomParser.js:527"
+            "line": " src/dicom/dicomParser.js:534"
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/dicom/dicomParser.js:625"
+            "line": " src/dicom/dicomParser.js:632"
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/dicom/dicomParser.js:644"
+            "line": " src/dicom/dicomParser.js:651"
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/dicom/dicomParser.js:1077"
+            "line": " src/dicom/dicomParser.js:1046"
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/dicom/dicomParser.js:1112"
+            "line": " src/dicom/dicomParser.js:1081"
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src/dicom/dicomParser.js:1149"
+            "line": " src/dicom/dicomParser.js:1118"
         },
         {
             "message": "unknown tag: input",
@@ -14109,27 +14200,27 @@
         },
         {
             "message": "Missing item type\nInit the Window/Level display",
-            "line": " src/app/application.js:677"
+            "line": " src/app/application.js:687"
         },
         {
             "message": "Missing item type\nGet the group-element key used to store DICOM elements.",
-            "line": " src/dicom/dicomParser.js:316"
+            "line": " src/dicom/dicomParser.js:302"
         },
         {
             "message": "Missing item type\nSplit a group-element key used to store DICOM elements.",
-            "line": " src/dicom/dicomParser.js:327"
+            "line": " src/dicom/dicomParser.js:313"
         },
         {
             "message": "Missing item type\nDump the DICOM tags to an array.",
-            "line": " src/dicom/dicomParser.js:1077"
+            "line": " src/dicom/dicomParser.js:1046"
         },
         {
             "message": "Missing item type\nDump the DICOM tags to a string.",
-            "line": " src/dicom/dicomParser.js:1112"
+            "line": " src/dicom/dicomParser.js:1081"
         },
         {
             "message": "Missing item type",
-            "line": " src/dicom/dicomParser.js:1149"
+            "line": " src/dicom/dicomParser.js:1118"
         },
         {
             "message": "Missing item type\nDICOM tag dictionary.\nGenerated using xml standard conversion\n from https://github.com/ivmartel/dcmbench/tree/master/view/part06\n with http://medical.nema.org/medical/dicom/current/source/docbook/part06/part06.xml\nConversion changes:\n- (vr) \"See Note\" -> \"NONE\", \"OB or OW\" -> \"ox\", \"US or SS\" -> \"xs\"\n- added \"GenericGroupLength\" element to each group\nLocal changes:\n- tag numbers with 'xx' were replaced with '00', 'xxx' with '001' and 'xxxx' with '0004'",
@@ -14158,6 +14249,26 @@
         {
             "message": "Missing item type\nLookup tables for image colour display.",
             "line": " src/image/luts.js:223"
+        },
+        {
+            "message": "Missing item type",
+            "line": " src/image/reader.js:71"
+        },
+        {
+            "message": "Missing item type",
+            "line": " src/io/file.js:92"
+        },
+        {
+            "message": "Missing item type",
+            "line": " src/io/file.js:98"
+        },
+        {
+            "message": "Missing item type",
+            "line": " src/io/url.js:90"
+        },
+        {
+            "message": "Missing item type",
+            "line": " src/io/url.js:96"
         },
         {
             "message": "Missing item type",
