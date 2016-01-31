@@ -40,6 +40,13 @@ dwv.io.Url = function ()
      * @type Array
      */
     var progressList = [];
+    /**
+     * List of data decoders scripts.
+     * @property decoderScripts
+     * @private
+     * @type Array
+     */
+    var decoderScripts = [];
 
     /**
      * Set the number of data to load.
@@ -78,6 +85,19 @@ dwv.io.Url = function ()
             totPercent += progressList[i];
         }
         return totPercent;
+    };
+    
+    /**
+     * 
+     */
+    this.setDecoderScripts = function (list) {
+        decoderScripts = list;
+    };
+    /**
+     * 
+     */
+    this.getDecoderScripts = function () {
+        return decoderScripts;
     };
 }; // class Url
 
@@ -165,45 +185,45 @@ dwv.io.Url.prototype.load = function (ioArray)
     this.setNToLoad( ioArray.length );
 
     // call the listeners
-    var onLoad = function (data)
+    var onLoadView = function (data)
     {
         self.onload(data);
         self.addLoaded();
     };
 
-    // DICOM request
-    var onLoadDicomRequest = function (response)
+    // DICOM buffer to dwv.image.View (asynchronous)
+    var db2v = new dwv.image.DicomBufferToView(this.getDecoderScripts());
+    var onLoadDicomBuffer = function (response)
     {
         try {
-            //onLoad( dwv.image.getDataFromDicomBuffer(response) );
-            dwv.image.getDataFromDicomBuffer(response, onLoad);
+            db2v.convert(response, onLoadView);
         } catch (error) {
             self.onerror(error);
         }
     };
 
-    // image request
-    var onLoadImage = function (/*event*/)
+    // DOM Image buffer to dwv.image.View
+    var onLoadDOMImageBuffer = function (/*event*/)
     {
         try {
-            onLoad( dwv.image.getDataFromImage(this) );
+            onLoadView( dwv.image.getViewFromDOMImage(this) );
         } catch (error) {
             self.onerror(error);
         }
     };
 
-    // text request
-    var onLoadTextRequest = function (/*event*/)
+    // load text buffer
+    var onLoadTextBuffer = function (/*event*/)
     {
         try {
-            onLoad( this.responseText );
+            self.onload( this.responseText );
         } catch (error) {
             self.onerror(error);
         }
     };
 
-    // binary request
-    var onLoadBinaryRequest = function (/*event*/)
+    // load binary buffer
+    var onLoadBinaryBuffer = function (/*event*/)
     {
         // find the image type from its signature
         var view = new DataView(this.response);
@@ -244,11 +264,11 @@ dwv.io.Url.prototype.load = function (ioArray)
             // temporary image object
             var tmpImage = new Image();
             tmpImage.src = "data:image/" + imageType + ";base64," + window.btoa(imageDataStr);
-            tmpImage.onload = onLoadImage;
+            tmpImage.onload = onLoadDOMImageBuffer;
         }
         else
         {
-            onLoadDicomRequest(this.response);
+            onLoadDicomBuffer(this.response);
         }
     };
 
@@ -263,11 +283,11 @@ dwv.io.Url.prototype.load = function (ioArray)
         request.open('GET', url, true);
         if ( !isText ) {
             request.responseType = "arraybuffer";
-            request.onload = onLoadBinaryRequest;
+            request.onload = onLoadBinaryBuffer;
             request.onerror = dwv.io.Url.createErrorHandler(url, "binary", self.onerror);
         }
         else {
-            request.onload = onLoadTextRequest;
+            request.onload = onLoadTextBuffer;
             request.onerror = dwv.io.Url.createErrorHandler(url, "text", self.onerror);
         }
         request.onprogress = dwv.io.File.createProgressHandler(i,

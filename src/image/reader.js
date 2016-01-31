@@ -15,10 +15,10 @@ dwv.image = dwv.image || {};
  * Get data from an input image using a canvas.
  * @method getDataFromImage
  * @static
- * @param {Image} image The image.
+ * @param {Image} Image The DOM Image.
  * @return {Mixed} The corresponding view and info.
  */
-dwv.image.getDataFromImage = function(image)
+dwv.image.getViewFromDOMImage = function (image)
 {
     // draw the image in the canvas in order to get its data
     var canvas = document.createElement('canvas');
@@ -68,52 +68,55 @@ dwv.image.getDataFromImage = function(image)
     return {"view": view, "info": info};
 };
 
-
-var pool = new dwv.utils.ThreadPool(15);
-pool.init();
-
-
 /**
- * Get data from an input buffer using a DICOM parser.
- * @method getDataFromDicomBuffer
- * @static
- * @param {Array} buffer The input data buffer.
- * @return {Mixed} The corresponding view and info.
+ * 
  */
-dwv.image.getDataFromDicomBuffer = function(buffer, onLoad)
-{
-    // DICOM parser
-    var dicomParser = new dwv.dicom.DicomParser();
-    // parse the buffer
-    dicomParser.parse(buffer);
+dwv.image.DicomBufferToView = function (decoderScripts) {
 
-    var callback = function(e) {
-        // create the view
-        var viewFactory = new dwv.image.ViewFactory();
-        var view = viewFactory.create( dicomParser.getDicomElements(), e.data );
-        // return
-        onLoad({"view": view, "info": dicomParser.getDicomElements().dumpToTable()});
+    // thread pool
+    var pool = new dwv.utils.ThreadPool(15);
+    pool.init();
+
+    /**
+     * Get data from an input buffer using a DICOM parser.
+     * @method getDataFromDicomBuffer
+     * @static
+     * @param {Array} buffer The input data buffer.
+     * @param {Object} callback The callback on the conversion.
+     * @return {Mixed} The corresponding view and info.
+     */
+    this.convert = function(buffer, callback)
+    {
+        // DICOM parser
+        var dicomParser = new dwv.dicom.DicomParser();
+        // parse the buffer
+        dicomParser.parse(buffer);
+    
+        // worker callback
+        var workerCallback = function(e) {
+            // create the view
+            var viewFactory = new dwv.image.ViewFactory();
+            var view = viewFactory.create( dicomParser.getDicomElements(), e.data );
+            // return
+            callback({"view": view, "info": dicomParser.getDicomElements().dumpToTable()});
+        };
+        var startMessage = dicomParser.pixelBuffer;
+        
+        var syntax = dwv.dicom.cleanString(dicomParser.getRawDicomElements().x00020010.value[0]);
+        var algoName = dwv.dicom.getSyntaxDecompressionName(syntax);
+        var needDecompression = (algoName !== null);
+        
+        if ( needDecompression ) {
+            var script = decoderScripts[algoName];
+            if ( typeof script === "undefined" ) {
+                throw new Error("No script provided to decompress '" + algoName + "' data.");
+            }
+            var workerTask = new dwv.utils.WorkerTask(script,workerCallback,startMessage);
+            pool.addWorkerTask(workerTask);
+        }
+        else {
+            workerCallback({data: startMessage});
+        }
     };
-    var startMessage = dicomParser.pixelBuffer;
-    
-    var script = null;
-    var syntax = dwv.dicom.cleanString(dicomParser.getRawDicomElements().x00020010.value[0]);
-    if ( dwv.dicom.isJpeg2000TransferSyntax(syntax) ) {
-        script = '../../ext/pdfjs/decode-jpeg2000.js';
-    }
-    else if (dwv.dicom.isJpegLosslessTransferSyntax(syntax) ) {
-        script = '../../ext/rii-mango/decode-jpegloss.js';
-    }
-    else if (dwv.dicom.isJpegBaselineTransferSyntax(syntax) ) {
-        script = '../../ext/notmasteryet/decode-jpegbaseline.js';
-    }
-    
-    if ( script !== null ) {
-        var workerTask = new dwv.utils.WorkerTask(script,callback,startMessage);
-        pool.addWorkerTask(workerTask);
-    }
-    else {
-        callback({data: startMessage});
-    }
-    
+
 };

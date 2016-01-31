@@ -26,6 +26,9 @@ dwv.App = function ()
     var dataHeight = 0;
     // Number of slices to load
     var nSlicesToLoad = 0;
+    
+    // Data decoders scripts
+    var decoderScripts = [];
 
     // Container div id
     var containerDivId = null;
@@ -227,6 +230,11 @@ dwv.App = function ()
      */
     this.init = function ( config ) {
         containerDivId = config.containerDivId;
+        // data decoders
+        var pathToRoot = "../..";
+        decoderScripts.jpeg2000 = pathToRoot + "/ext/pdfjs/decode-jpeg2000.js";
+        decoderScripts["jpeg-lossless"] = pathToRoot + "/ext/rii-mango/decode-jpegloss.js";
+        decoderScripts["jpeg-baseline"] = pathToRoot + "/ext/notmasteryet/decode-jpegbaseline.js";
         // tools
         if ( config.tools && config.tools.length !== 0 ) {
             // setup the tool list
@@ -509,6 +517,7 @@ dwv.App = function ()
         nSlicesToLoad = files.length;
         // create IO
         var fileIO = new dwv.io.File();
+        fileIO.setDecoderScripts(decoderScripts);
         fileIO.onload = function (data) {
 
             var isFirst = true;
@@ -567,6 +576,7 @@ dwv.App = function ()
         nSlicesToLoad = urls.length;
         // create IO
         var urlIO = new dwv.io.Url();
+        urlIO.setDecoderScripts(decoderScripts);
         urlIO.onload = function (data) {
             var isFirst = true;
             if ( image ) {
