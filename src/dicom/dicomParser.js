@@ -395,7 +395,7 @@ dwv.dicom.getSyntaxDecompressionName = function(syntax)
     else if ( dwv.dicom.isJpegBaselineTransferSyntax(syntax) ) {
         algo = "jpeg-baseline";
     }
-    else if ( dwv.dicom.isJpeglsTransferSyntax(syntax) ) {
+    else if ( dwv.dicom.isJpegLosslessTransferSyntax(syntax) ) {
         algo = "jpeg-lossless";
     }
     return algo;
