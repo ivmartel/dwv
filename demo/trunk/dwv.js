@@ -19069,8 +19069,6 @@ dwv.utils.WorkerThread = function (parentPool) {
         self.workerTask.callback(event);
         // tell the parent pool this thread is free
         self.parentPool.freeWorkerThread(self);
-        // ?
-        this.terminate();
     }
  
 };

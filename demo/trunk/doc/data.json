@@ -859,7 +859,7 @@
             },
             "tag": "module",
             "file": "src/utils/thread.js",
-            "line": 127,
+            "line": 125,
             "description": "Utility module."
         }
     },
@@ -2689,7 +2689,7 @@
             "module": "utils",
             "namespace": "dwv.utils",
             "file": "src/utils/thread.js",
-            "line": 127,
+            "line": 125,
             "description": "Worker task.",
             "is_constructor": 1,
             "params": [
