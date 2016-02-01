@@ -593,11 +593,15 @@
             "name": "src/utils/thread.js",
             "modules": {},
             "classes": {
-                "dwv.utils": 1
+                "dwv.utils": 1,
+                "dwv.utils.ThreadPool": 1,
+                "dwv.utils.WorkerThread": 1,
+                "dwv.utils.WorkerTask": 1
             },
             "fors": {},
             "namespaces": {
-                "dwv": 1
+                "dwv": 1,
+                "dwv.utils": 1
             }
         }
     },
@@ -843,15 +847,19 @@
             "submodules": {},
             "elements": {},
             "classes": {
-                "dwv.utils": 1
+                "dwv.utils": 1,
+                "dwv.utils.ThreadPool": 1,
+                "dwv.utils.WorkerThread": 1,
+                "dwv.utils.WorkerTask": 1
             },
             "fors": {},
             "namespaces": {
-                "dwv": 1
+                "dwv": 1,
+                "dwv.utils": 1
             },
             "tag": "module",
             "file": "src/utils/thread.js",
-            "line": 6,
+            "line": 127,
             "description": "Utility module."
         }
     },
@@ -2625,6 +2633,82 @@
             "line": 6,
             "description": "Namespace for utility functions.",
             "static": 1
+        },
+        "dwv.utils.ThreadPool": {
+            "name": "dwv.utils.ThreadPool",
+            "shortname": "dwv.utils.ThreadPool",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "utils",
+            "namespace": "dwv.utils",
+            "file": "src/utils/thread.js",
+            "line": 14,
+            "description": "Thread Pool.",
+            "is_constructor": 1,
+            "params": [
+                {
+                    "name": "size",
+                    "description": "The size of the pool.",
+                    "type": "Number"
+                }
+            ]
+        },
+        "dwv.utils.WorkerThread": {
+            "name": "dwv.utils.WorkerThread",
+            "shortname": "dwv.utils.WorkerThread",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "utils",
+            "namespace": "dwv.utils",
+            "file": "src/utils/thread.js",
+            "line": 77,
+            "description": "Worker thread.",
+            "is_constructor": 1,
+            "params": [
+                {
+                    "name": "parentPool",
+                    "description": "The parent pool.",
+                    "type": "Object"
+                }
+            ]
+        },
+        "dwv.utils.WorkerTask": {
+            "name": "dwv.utils.WorkerTask",
+            "shortname": "dwv.utils.WorkerTask",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "utils",
+            "namespace": "dwv.utils",
+            "file": "src/utils/thread.js",
+            "line": 127,
+            "description": "Worker task.",
+            "is_constructor": 1,
+            "params": [
+                {
+                    "name": "script",
+                    "description": "The worker script.",
+                    "type": "String"
+                },
+                {
+                    "name": "parentPool",
+                    "description": "The worker callback.",
+                    "type": "Function"
+                },
+                {
+                    "name": "message",
+                    "description": "The data to pass to the worker.",
+                    "type": "Object"
+                }
+            ]
         }
     },
     "elements": {},
@@ -14024,17 +14108,78 @@
         },
         {
             "file": "src/utils/thread.js",
-            "line": 14,
-            "description": "Thread Pool\nHighly inspired from http://www.smartjava.org/content/html5-easily-parallelize-jobs-using-web-workers-and-threadpool",
+            "line": 32,
+            "description": "Initialise.",
+            "itemtype": "method",
+            "name": "init",
+            "class": "dwv.utils.ThreadPool",
+            "module": "utils",
+            "namespace": "dwv.utils"
+        },
+        {
+            "file": "src/utils/thread.js",
+            "line": 43,
+            "description": "Add a worker task to the queue.\nWill be run when a thread is made available.",
+            "itemtype": "method",
+            "name": "addWorkerTask",
+            "return": {
+                "description": "workerTask The task to add.",
+                "type": "Object"
+            },
+            "class": "dwv.utils.ThreadPool",
+            "module": "utils",
+            "namespace": "dwv.utils"
+        },
+        {
+            "file": "src/utils/thread.js",
+            "line": 60,
+            "description": "Free a worker thread.",
+            "itemtype": "method",
+            "name": "freeWorkerThread",
             "params": [
                 {
-                    "name": "size",
-                    "description": ""
+                    "name": "workerThread",
+                    "description": "The thread to free.",
+                    "type": "Object"
                 }
             ],
-            "class": "dwv.utils",
+            "class": "dwv.utils.ThreadPool",
             "module": "utils",
-            "namespace": "dwv"
+            "namespace": "dwv.utils"
+        },
+        {
+            "file": "src/utils/thread.js",
+            "line": 92,
+            "description": "Run a worker task",
+            "itemtype": "method",
+            "name": "run",
+            "params": [
+                {
+                    "name": "workerTask",
+                    "description": "The task to run.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.utils.WorkerThread",
+            "module": "utils",
+            "namespace": "dwv.utils"
+        },
+        {
+            "file": "src/utils/thread.js",
+            "line": 109,
+            "description": "Handle once the task is done.\nFor now assume we only get a single callback from a worker\nwhich also indicates the end of this worker.",
+            "itemtype": "method",
+            "name": "ontaskend",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The callback event.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.utils.WorkerThread",
+            "module": "utils",
+            "namespace": "dwv.utils"
         }
     ],
     "warnings": [
@@ -14305,10 +14450,6 @@
         {
             "message": "Missing item type\nSet the anchor off listeners.",
             "line": " src/tools/editor.js:408"
-        },
-        {
-            "message": "Missing item type\nThread Pool\nHighly inspired from http://www.smartjava.org/content/html5-easily-parallelize-jobs-using-web-workers-and-threadpool",
-            "line": " src/utils/thread.js:14"
         }
     ]
 }

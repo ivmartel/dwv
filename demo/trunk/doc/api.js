@@ -91,7 +91,10 @@ YUI.add("yuidoc-meta", function(Y) {
         "dwv.tool.filter.Sharpen",
         "dwv.tool.filter.Sobel",
         "dwv.tool.filter.Threshold",
-        "dwv.utils"
+        "dwv.utils",
+        "dwv.utils.ThreadPool",
+        "dwv.utils.WorkerTask",
+        "dwv.utils.WorkerThread"
     ],
     "modules": [
         "browser",
