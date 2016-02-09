@@ -263,6 +263,7 @@ dwv.image.Image = function(geometry, buffer)
      * Append a slice to the image.
      * @method appendSlice
      * @param {Image} The slice to append.
+     * @return {Number} The number of the inserted slice.
      */
     this.appendSlice = function(rhs)
     {
@@ -329,6 +330,9 @@ dwv.image.Image = function(geometry, buffer)
         // copy to class variables
         buffer = newBuffer;
         originalBuffer = new Int16Array(newBuffer);
+
+        // return the appended slice number
+        return newSliceNb;
     };
 
     /**

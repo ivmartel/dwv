@@ -163,14 +163,21 @@ dwv.image.View = function(image, isSigned)
      * Set the current position. Returns false if not in bounds.
      * @method setCurrentPosition
      * @param {Object} pos The current position.
+     * @param {Boolean} silent If true, does not fire a slice-change event.
      */
-    this.setCurrentPosition = function(pos) {
+    this.setCurrentPosition = function(pos, silent) {
+        // default silent flag to false
+        if ( typeof silent === "undefined" ) {
+            silent = false;
+        }
+        // check if possible
         if( !image.getGeometry().getSize().isInBounds(pos.i,pos.j,pos.k) ) {
             return false;
         }
         var oldPosition = currentPosition;
         currentPosition = pos;
-        // only display value for monochrome data
+
+        // fire a 'position-change' event
         if( image.getPhotometricInterpretation().match(/MONOCHROME/) !== null )
         {
             this.fireEvent({"type": "position-change",
@@ -182,10 +189,15 @@ dwv.image.View = function(image, isSigned)
             this.fireEvent({"type": "position-change",
                 "i": pos.i, "j": pos.j, "k": pos.k});
         }
-        // slice change event (used to trigger redraw)
-        if( oldPosition.k !== currentPosition.k ) {
-            this.fireEvent({"type": "slice-change"});
+
+        // fire a slice change event (used to trigger redraw)
+        if ( !silent ) {
+          if( oldPosition.k !== currentPosition.k ) {
+              this.fireEvent({"type": "slice-change"});
+          }
         }
+
+        // all good
         return true;
     };
 
@@ -197,7 +209,14 @@ dwv.image.View = function(image, isSigned)
     this.append = function( rhs )
     {
        // append images
-       this.getImage().appendSlice( rhs.getImage() );
+       var newSLiceNumber = this.getImage().appendSlice( rhs.getImage() );
+       // update position if a slice was appended before
+       if ( newSLiceNumber <= this.getCurrentPosition().k ) {
+           this.setCurrentPosition(
+             {"i": this.getCurrentPosition().i,
+             "j": this.getCurrentPosition().j,
+             "k": this.getCurrentPosition().k + 1}, true );
+       }
        // init to update self
        this.setWindowLut(rhs.getWindowLut());
     };
