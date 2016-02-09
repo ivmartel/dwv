@@ -26,9 +26,6 @@ dwv.App = function ()
     var dataHeight = 0;
     // Number of slices to load
     var nSlicesToLoad = 0;
-    
-    // Data decoders scripts
-    var decoderScripts = [];
 
     // Container div id
     var containerDivId = null;
@@ -205,11 +202,15 @@ dwv.App = function ()
     this.getToolboxController = function () { return toolboxController; };
 
     /**
-     * Get the undo stack.
-     * @method getUndoStack
-     * @return {Object} The undo stack.
+     * Add a command to the undo stack.
+     * @method addToUndoStack
+     * @param {Object} The command to add.
      */
-    this.getUndoStack = function () { return undoStack; };
+    this.addToUndoStack = function (cmd) { 
+        if ( undoStack !== null ) {
+            undoStack.add(cmd);
+        }
+    };
 
     /**
      * Get the data loaders.
@@ -230,11 +231,6 @@ dwv.App = function ()
      */
     this.init = function ( config ) {
         containerDivId = config.containerDivId;
-        // data decoders
-        var pathToRoot = "../..";
-        decoderScripts.jpeg2000 = pathToRoot + "/ext/pdfjs/decode-jpeg2000.js";
-        decoderScripts["jpeg-lossless"] = pathToRoot + "/ext/rii-mango/decode-jpegloss.js";
-        decoderScripts["jpeg-baseline"] = pathToRoot + "/ext/notmasteryet/decode-jpegbaseline.js";
         // tools
         if ( config.tools && config.tools.length !== 0 ) {
             // setup the tool list
@@ -517,7 +513,6 @@ dwv.App = function ()
         nSlicesToLoad = files.length;
         // create IO
         var fileIO = new dwv.io.File();
-        fileIO.setDecoderScripts(decoderScripts);
         fileIO.onload = function (data) {
 
             var isFirst = true;
@@ -576,7 +571,6 @@ dwv.App = function ()
         nSlicesToLoad = urls.length;
         // create IO
         var urlIO = new dwv.io.Url();
-        urlIO.setDecoderScripts(decoderScripts);
         urlIO.onload = function (data) {
             var isFirst = true;
             if ( image ) {
@@ -1578,7 +1572,7 @@ dwv.State = function (app)
                     cmd.onUndo = eventCallback;
                 }
                 cmd.execute();
-                app.getUndoStack().add(cmd);
+                app.addToUndoStack(cmd);
             }
         }
     };
@@ -1870,6 +1864,17 @@ dwv.ViewController = function ( view )
  */
 var dwv = dwv || {};
 dwv.dicom = dwv.dicom || {};
+// JPEG Baseline
+var hasJpegBaselineDecoder = (typeof JpegImage !== "undefined");
+var JpegImage = JpegImage || {};
+// JPEG Lossless
+var hasJpegLosslessDecoder = (typeof jpeg !== "undefined") &&
+    (typeof jpeg.lossless !== "undefined");
+var jpeg = jpeg || {};
+jpeg.lossless = jpeg.lossless || {};
+// JPEG 2000
+var hasJpeg2000Decoder = (typeof JpxImage !== "undefined");
+var JpxImage = JpxImage || {};
 
 /**
  * Clean string: trim and remove ending.
@@ -2244,27 +2249,6 @@ dwv.dicom.isJpeglsTransferSyntax = function(syntax)
 dwv.dicom.isJpeg2000TransferSyntax = function(syntax)
 {
     return syntax.match(/1.2.840.10008.1.2.4.9/) !== null;
-};
-
-/**
- * Tell if a given syntax needs decompression.
- * @method syntaxNeedsDecompression
- * @param {String} The transfer syntax to test.
- * @returns {String} The name of the decompression algorithm.
- */
-dwv.dicom.getSyntaxDecompressionName = function(syntax)
-{
-    var algo = null;
-    if ( dwv.dicom.isJpeg2000TransferSyntax(syntax) ) {
-        algo = "jpeg2000";
-    }
-    else if ( dwv.dicom.isJpegBaselineTransferSyntax(syntax) ) {
-        algo = "jpeg-baseline";
-    }
-    else if ( dwv.dicom.isJpegLosslessTransferSyntax(syntax) ) {
-        algo = "jpeg-lossless";
-    }
-    return algo;
 };
 
 /**
@@ -2672,6 +2656,9 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
 {
     var offset = 0;
     var implicit = false;
+    var isJpegBaseline = false;
+    var isJpegLossless = false;
+    var isJpeg2000 = false;
     // default readers
     var metaReader = new dwv.dicom.DataReader(buffer);
     var dataReader = new dwv.dicom.DataReader(buffer);
@@ -2728,11 +2715,13 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
     }
     // JPEG baseline
     else if( dwv.dicom.isJpegBaselineTransferSyntax(syntax) ) {
-        // nothing to do!
+        isJpegBaseline = true;
+        console.log("JPEG Baseline compressed DICOM data: " + syntax);
     }
     // JPEG Lossless
     else if( dwv.dicom.isJpegLosslessTransferSyntax(syntax) ) {
-        // nothing to do!
+        isJpegLossless = true;
+        console.log("JPEG Lossless compressed DICOM data: " + syntax);
     }
     // non supported JPEG
     else if( dwv.dicom.isJpegNonSupportedTransferSyntax(syntax) ) {
@@ -2740,11 +2729,13 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
     }
     // JPEG-LS
     else if( dwv.dicom.isJpeglsTransferSyntax(syntax) ) {
+        //console.log("JPEG-LS compressed DICOM data: " + syntax);
         throw new Error("Unsupported DICOM transfer syntax (JPEG-LS): "+syntax);
     }
     // JPEG 2000
     else if( dwv.dicom.isJpeg2000TransferSyntax(syntax) ) {
-        // nothing to do!
+        console.log("JPEG 2000 compressed DICOM data: " + syntax);
+        isJpeg2000 = true;
     }
     // MPEG2 Image Compression
     else if( syntax === "1.2.840.10008.1.2.4.100" ) {
@@ -2799,9 +2790,10 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
             // Item
             if( tagName === "xFFFEE000" ) {
                 if( dataElement.data.length === 4 ) {
-                    // do nothing
+                    console.log("Skipping Basic Offset Table.");
                 }
                 else if( dataElement.data.length !== 0 ) {
+                    console.log("Concatenating multiple pixel data items, length: "+dataElement.data.length);
                     // concat does not work on typed arrays
                     //this.pixelBuffer = this.pixelBuffer.concat( dataElement.data );
                     // manual concat...
@@ -2871,6 +2863,36 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
     if ( typeof this.dicomElements.x00280008 !== 'undefined' &&
             this.dicomElements.x00280008.value[0] > 1 ) {
         throw new Error("Unsupported multi-frame data");
+    }
+
+    // uncompress data if needed
+    var decoder = null;
+    if( isJpegLossless ) {
+        if ( !hasJpegLosslessDecoder ) {
+            throw new Error("No JPEG Lossless decoder provided");
+        }
+        var buf = new Uint8Array(this.pixelBuffer);
+        decoder = new jpeg.lossless.Decoder(buf.buffer);
+        var decoded = decoder.decode();
+        this.pixelBuffer = new Uint16Array(decoded.buffer);
+    }
+    else if ( isJpegBaseline ) {
+        if ( !hasJpegBaselineDecoder ) {
+            throw new Error("No JPEG Baseline decoder provided");
+        }
+        decoder = new JpegImage();
+        decoder.parse( this.pixelBuffer );
+        this.pixelBuffer = decoder.getData(decoder.width,decoder.height);
+    }
+    else if( isJpeg2000 ) {
+        if ( !hasJpeg2000Decoder ) {
+            throw new Error("No JPEG 2000 decoder provided");
+        }
+        // decompress pixel buffer into Int16 image
+        decoder = new JpxImage();
+        decoder.parse( this.pixelBuffer );
+        // set the pixel buffer
+        this.pixelBuffer = decoder.tiles[0].items;
     }
 };
 
@@ -11146,6 +11168,7 @@ dwv.image.Image = function(geometry, buffer)
      * Append a slice to the image.
      * @method appendSlice
      * @param {Image} The slice to append.
+     * @return {Number} The number of the inserted slice.
      */
     this.appendSlice = function(rhs)
     {
@@ -11212,6 +11235,9 @@ dwv.image.Image = function(geometry, buffer)
         // copy to class variables
         buffer = newBuffer;
         originalBuffer = new Int16Array(newBuffer);
+
+        // return the appended slice number
+        return newSliceNb;
     };
 
     /**
@@ -12155,10 +12181,10 @@ dwv.image = dwv.image || {};
  * Get data from an input image using a canvas.
  * @method getDataFromImage
  * @static
- * @param {Image} Image The DOM Image.
+ * @param {Image} image The image.
  * @return {Mixed} The corresponding view and info.
  */
-dwv.image.getViewFromDOMImage = function (image)
+dwv.image.getDataFromImage = function(image)
 {
     // draw the image in the canvas in order to get its data
     var canvas = document.createElement('canvas');
@@ -12209,56 +12235,23 @@ dwv.image.getViewFromDOMImage = function (image)
 };
 
 /**
- * 
+ * Get data from an input buffer using a DICOM parser.
+ * @method getDataFromDicomBuffer
+ * @static
+ * @param {Array} buffer The input data buffer.
+ * @return {Mixed} The corresponding view and info.
  */
-dwv.image.DicomBufferToView = function (decoderScripts) {
-
-    // thread pool
-    var pool = new dwv.utils.ThreadPool(15);
-    pool.init();
-
-    /**
-     * Get data from an input buffer using a DICOM parser.
-     * @method getDataFromDicomBuffer
-     * @static
-     * @param {Array} buffer The input data buffer.
-     * @param {Object} callback The callback on the conversion.
-     * @return {Mixed} The corresponding view and info.
-     */
-    this.convert = function(buffer, callback)
-    {
-        // DICOM parser
-        var dicomParser = new dwv.dicom.DicomParser();
-        // parse the buffer
-        dicomParser.parse(buffer);
-    
-        // worker callback
-        var workerCallback = function(e) {
-            // create the view
-            var viewFactory = new dwv.image.ViewFactory();
-            var view = viewFactory.create( dicomParser.getDicomElements(), e.data );
-            // return
-            callback({"view": view, "info": dicomParser.getDicomElements().dumpToTable()});
-        };
-        var startMessage = dicomParser.pixelBuffer;
-        
-        var syntax = dwv.dicom.cleanString(dicomParser.getRawDicomElements().x00020010.value[0]);
-        var algoName = dwv.dicom.getSyntaxDecompressionName(syntax);
-        var needDecompression = (algoName !== null);
-        
-        if ( needDecompression ) {
-            var script = decoderScripts[algoName];
-            if ( typeof script === "undefined" ) {
-                throw new Error("No script provided to decompress '" + algoName + "' data.");
-            }
-            var workerTask = new dwv.utils.WorkerTask(script,workerCallback,startMessage);
-            pool.addWorkerTask(workerTask);
-        }
-        else {
-            workerCallback({data: startMessage});
-        }
-    };
-
+dwv.image.getDataFromDicomBuffer = function(buffer)
+{
+    // DICOM parser
+    var dicomParser = new dwv.dicom.DicomParser();
+    // parse the buffer
+    dicomParser.parse(buffer);
+    // create the view
+    var viewFactory = new dwv.image.ViewFactory();
+    var view = viewFactory.create( dicomParser.getDicomElements(), dicomParser.getPixelBuffer() );
+    // return
+    return {"view": view, "info": dicomParser.getDicomElements().dumpToTable()};
 };
 ;/** 
  * Image module.
@@ -12425,14 +12418,21 @@ dwv.image.View = function(image, isSigned)
      * Set the current position. Returns false if not in bounds.
      * @method setCurrentPosition
      * @param {Object} pos The current position.
+     * @param {Boolean} silent If true, does not fire a slice-change event.
      */
-    this.setCurrentPosition = function(pos) {
+    this.setCurrentPosition = function(pos, silent) {
+        // default silent flag to false
+        if ( typeof silent === "undefined" ) {
+            silent = false;
+        }
+        // check if possible
         if( !image.getGeometry().getSize().isInBounds(pos.i,pos.j,pos.k) ) {
             return false;
         }
         var oldPosition = currentPosition;
         currentPosition = pos;
-        // only display value for monochrome data
+
+        // fire a 'position-change' event
         if( image.getPhotometricInterpretation().match(/MONOCHROME/) !== null )
         {
             this.fireEvent({"type": "position-change",
@@ -12444,10 +12444,15 @@ dwv.image.View = function(image, isSigned)
             this.fireEvent({"type": "position-change",
                 "i": pos.i, "j": pos.j, "k": pos.k});
         }
-        // slice change event (used to trigger redraw)
-        if( oldPosition.k !== currentPosition.k ) {
-            this.fireEvent({"type": "slice-change"});
+
+        // fire a slice change event (used to trigger redraw)
+        if ( !silent ) {
+          if( oldPosition.k !== currentPosition.k ) {
+              this.fireEvent({"type": "slice-change"});
+          }
         }
+
+        // all good
         return true;
     };
 
@@ -12459,7 +12464,14 @@ dwv.image.View = function(image, isSigned)
     this.append = function( rhs )
     {
        // append images
-       this.getImage().appendSlice( rhs.getImage() );
+       var newSLiceNumber = this.getImage().appendSlice( rhs.getImage() );
+       // update position if a slice was appended before
+       if ( newSLiceNumber <= this.getCurrentPosition().k ) {
+           this.setCurrentPosition(
+             {"i": this.getCurrentPosition().i,
+             "j": this.getCurrentPosition().j,
+             "k": this.getCurrentPosition().k + 1}, true );
+       }
        // init to update self
        this.setWindowLut(rhs.getWindowLut());
     };
@@ -12776,14 +12788,7 @@ dwv.io.File = function ()
      * @type Array
      */
     var progressList = [];
-    /**
-     * List of data decoders scripts.
-     * @property decoderScripts
-     * @private
-     * @type Array
-     */
-    var decoderScripts = [];
-    
+
     /**
      * Set the number of data to load.
      * @method setNToLoad
@@ -12802,7 +12807,6 @@ dwv.io.File = function ()
      */
     this.addLoaded = function () {
         nLoaded++;
-        console.log("nLoaded: "+nLoaded);
         if ( nLoaded === nToLoad ) {
             this.onloadend();
         }
@@ -12816,26 +12820,12 @@ dwv.io.File = function ()
      * @return {Number} The accumulated percentage.
      */
     this.getGlobalPercent = function (n, percent) {
-        console.log("n: "+n + ", percent: "+percent);
-        progressList[n] = percent;
+        progressList[n] = percent/nToLoad;
         var totPercent = 0;
         for ( var i = 0; i < progressList.length; ++i ) {
             totPercent += progressList[i];
         }
-        return totPercent/nToLoad;
-    };
-    
-    /**
-     * 
-     */
-    this.setDecoderScripts = function (list) {
-        decoderScripts = list;
-    };
-    /**
-     * 
-     */
-    this.getDecoderScripts = function () {
-        return decoderScripts;
+        return totPercent;
     };
 }; // class File
 
@@ -12923,45 +12913,44 @@ dwv.io.File.prototype.load = function (ioArray)
     this.setNToLoad( ioArray.length );
 
     // call the listeners
-    var onLoadView = function (data)
+    var onLoad = function (data)
     {
         self.onload(data);
         self.addLoaded();
     };
 
-    // DICOM buffer to dwv.image.View (asynchronous)
-    var db2v = new dwv.image.DicomBufferToView(this.getDecoderScripts());
-    var onLoadDicomBuffer = function (event)
+    // DICOM reader loader
+    var onLoadDicomReader = function (event)
     {
         try {
-            db2v.convert(event.target.result, onLoadView);
-        } catch (error) {
-            self.onerror(error);
-        }
-    };
-
-    // DOM Image buffer to dwv.image.View 
-    var onLoadDOMImageBuffer = function (/*event*/)
-    {
-        try {
-            onLoadView( dwv.image.getViewFromDOMImage(this) );
-        } catch (error) {
-            self.onerror(error);
-        }
-    };
-
-    // load text buffer
-    var onLoadTextBuffer = function (event)
-    {
-        try {
-            self.onload( event.target.result );
+            onLoad( dwv.image.getDataFromDicomBuffer(event.target.result) );
         } catch(error) {
             self.onerror(error);
         }
     };
 
-    // raw image to DOM Image
-    var onLoadRawImageBuffer = function (event)
+    // image loader
+    var onLoadImage = function (/*event*/)
+    {
+        try {
+            onLoad( dwv.image.getDataFromImage(this) );
+        } catch(error) {
+            self.onerror(error);
+        }
+    };
+
+    // text reader loader
+    var onLoadTextReader = function (event)
+    {
+        try {
+            onLoad( event.target.result );
+        } catch(error) {
+            self.onerror(error);
+        }
+    };
+
+    // image reader loader
+    var onLoadImageReader = function (event)
     {
         var theImage = new Image();
         theImage.src = event.target.result;
@@ -12969,7 +12958,7 @@ dwv.io.File.prototype.load = function (ioArray)
         theImage.file = this.file;
         theImage.index = this.index;
         // triggered by ctx.drawImage
-        theImage.onload = onLoadDOMImageBuffer;
+        theImage.onload = onLoadImage;
     };
 
     // loop on I/O elements
@@ -12981,7 +12970,7 @@ dwv.io.File.prototype.load = function (ioArray)
                 self.getGlobalPercent, self.onprogress);
         if ( file.name.split('.').pop().toLowerCase() === "json" )
         {
-            reader.onload = onLoadTextBuffer;
+            reader.onload = onLoadTextReader;
             reader.onerror = dwv.io.File.createErrorHandler(file, "text", self.onerror);
             reader.readAsText(file);
         }
@@ -12991,13 +12980,13 @@ dwv.io.File.prototype.load = function (ioArray)
             reader.file = file;
             reader.index = i;
             // callbacks
-            reader.onload = onLoadRawImageBuffer;
+            reader.onload = onLoadImageReader;
             reader.onerror = dwv.io.File.createErrorHandler(file, "image", self.onerror);
             reader.readAsDataURL(file);
         }
         else
         {
-            reader.onload = onLoadDicomBuffer;
+            reader.onload = onLoadDicomReader;
             reader.onerror = dwv.io.File.createErrorHandler(file, "DICOM", self.onerror);
             reader.readAsArrayBuffer(file);
         }
@@ -13045,13 +13034,6 @@ dwv.io.Url = function ()
      * @type Array
      */
     var progressList = [];
-    /**
-     * List of data decoders scripts.
-     * @property decoderScripts
-     * @private
-     * @type Array
-     */
-    var decoderScripts = [];
 
     /**
      * Set the number of data to load.
@@ -13090,19 +13072,6 @@ dwv.io.Url = function ()
             totPercent += progressList[i];
         }
         return totPercent;
-    };
-    
-    /**
-     * 
-     */
-    this.setDecoderScripts = function (list) {
-        decoderScripts = list;
-    };
-    /**
-     * 
-     */
-    this.getDecoderScripts = function () {
-        return decoderScripts;
     };
 }; // class Url
 
@@ -13190,45 +13159,44 @@ dwv.io.Url.prototype.load = function (ioArray)
     this.setNToLoad( ioArray.length );
 
     // call the listeners
-    var onLoadView = function (data)
+    var onLoad = function (data)
     {
         self.onload(data);
         self.addLoaded();
     };
 
-    // DICOM buffer to dwv.image.View (asynchronous)
-    var db2v = new dwv.image.DicomBufferToView(this.getDecoderScripts());
-    var onLoadDicomBuffer = function (response)
+    // DICOM request
+    var onLoadDicomRequest = function (response)
     {
         try {
-            db2v.convert(response, onLoadView);
+            onLoad( dwv.image.getDataFromDicomBuffer(response) );
         } catch (error) {
             self.onerror(error);
         }
     };
 
-    // DOM Image buffer to dwv.image.View
-    var onLoadDOMImageBuffer = function (/*event*/)
+    // image request
+    var onLoadImage = function (/*event*/)
     {
         try {
-            onLoadView( dwv.image.getViewFromDOMImage(this) );
+            onLoad( dwv.image.getDataFromImage(this) );
         } catch (error) {
             self.onerror(error);
         }
     };
 
-    // load text buffer
-    var onLoadTextBuffer = function (/*event*/)
+    // text request
+    var onLoadTextRequest = function (/*event*/)
     {
         try {
-            self.onload( this.responseText );
+            onLoad( this.responseText );
         } catch (error) {
             self.onerror(error);
         }
     };
 
-    // load binary buffer
-    var onLoadBinaryBuffer = function (/*event*/)
+    // binary request
+    var onLoadBinaryRequest = function (/*event*/)
     {
         // find the image type from its signature
         var view = new DataView(this.response);
@@ -13269,11 +13237,11 @@ dwv.io.Url.prototype.load = function (ioArray)
             // temporary image object
             var tmpImage = new Image();
             tmpImage.src = "data:image/" + imageType + ";base64," + window.btoa(imageDataStr);
-            tmpImage.onload = onLoadDOMImageBuffer;
+            tmpImage.onload = onLoadImage;
         }
         else
         {
-            onLoadDicomBuffer(this.response);
+            onLoadDicomRequest(this.response);
         }
     };
 
@@ -13288,11 +13256,11 @@ dwv.io.Url.prototype.load = function (ioArray)
         request.open('GET', url, true);
         if ( !isText ) {
             request.responseType = "arraybuffer";
-            request.onload = onLoadBinaryBuffer;
+            request.onload = onLoadBinaryRequest;
             request.onerror = dwv.io.Url.createErrorHandler(url, "binary", self.onerror);
         }
         else {
-            request.onload = onLoadTextBuffer;
+            request.onload = onLoadTextRequest;
             request.onerror = dwv.io.Url.createErrorHandler(url, "text", self.onerror);
         }
         request.onprogress = dwv.io.File.createProgressHandler(i,
@@ -14792,7 +14760,7 @@ dwv.tool.DrawGroupCommand = function (group, name, layer)
         // draw
         layer.draw();
         // callback
-        this.onExecute({'type': 'draw-create', 'id': group.id});
+        this.onExecute({'type': 'draw-create', 'id': group.id()});
     };
     /**
      * Undo the command.
@@ -14804,7 +14772,7 @@ dwv.tool.DrawGroupCommand = function (group, name, layer)
         // draw
         layer.draw();
         // callback
-        this.onUndo({'type': 'draw-delete', 'id': group.id});
+        this.onUndo({'type': 'draw-delete', 'id': group.id()});
     };
 }; // DrawGroupCommand class
 
@@ -14855,7 +14823,7 @@ dwv.tool.MoveGroupCommand = function (group, name, translation, layer)
         // draw
         layer.draw();
         // callback
-        this.onExecute({'type': 'draw-move', 'id': group.id});
+        this.onExecute({'type': 'draw-move', 'id': group.id()});
     };
     /**
      * Undo the command.
@@ -14870,7 +14838,7 @@ dwv.tool.MoveGroupCommand = function (group, name, translation, layer)
         // draw
         layer.draw();
         // callback
-        this.onUndo({'type': 'draw-move', 'id': group.id});
+        this.onUndo({'type': 'draw-move', 'id': group.id()});
     };
 }; // MoveGroupCommand class
 
@@ -14977,7 +14945,7 @@ dwv.tool.DeleteGroupCommand = function (group, name, layer)
         // draw
         layer.draw();
         // callback
-        this.onExecute({'type': 'draw-delete', 'id': group.id});
+        this.onExecute({'type': 'draw-delete', 'id': group.id()});
     };
     /**
      * Undo the command.
@@ -14989,7 +14957,7 @@ dwv.tool.DeleteGroupCommand = function (group, name, layer)
         // draw
         layer.draw();
         // callback
-        this.onUndo({'type': 'draw-create', 'id': group.id});
+        this.onUndo({'type': 'draw-create', 'id': group.id()});
     };
 }; // DeleteGroupCommand class
 
@@ -15251,7 +15219,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
             // execute it
             command.execute();
             // save it in undo stack
-            app.getUndoStack().add(command);
+            app.addToUndoStack(command);
 
             // set shape on
             var shape = group.getChildren( function (node) {
@@ -15511,7 +15479,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
                 delcmd.onExecute = fireEvent;
                 delcmd.onUndo = fireEvent;
                 delcmd.execute();
-                app.getUndoStack().add(delcmd);
+                app.addToUndoStack(delcmd);
             }
             else {
                 // save drag move
@@ -15521,7 +15489,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
                     var mvcmd = new dwv.tool.MoveGroupCommand(this.getParent(), cmdName, translation, drawLayer);
                     mvcmd.onExecute = fireEvent;
                     mvcmd.onUndo = fireEvent;
-                    app.getUndoStack().add(mvcmd);
+                    app.addToUndoStack(mvcmd);
                     // the move is handled by kinetic, trigger an event manually
                     fireEvent({'type': 'draw-move'});
                 }
@@ -16041,7 +16009,7 @@ dwv.tool.ShapeEditor = function (app)
             chgcmd.onExecute = drawEventCallback;
             chgcmd.onUndo = drawEventCallback;
             chgcmd.execute();
-            app.getUndoStack().add(chgcmd);
+            app.addToUndoStack(chgcmd);
             // reset start anchor
             startAnchor = endAnchor;
         });
@@ -16487,7 +16455,7 @@ dwv.tool.filter.Threshold = function ( app )
         var command = new dwv.tool.RunFilterCommand(filter, app);
         command.execute();
         // save command in undo stack
-        app.getUndoStack().add(command);
+        app.addToUndoStack(command);
     };
 
 }; // class dwv.tool.filter.Threshold
@@ -16548,7 +16516,7 @@ dwv.tool.filter.Sharpen = function ( app )
         var command = new dwv.tool.RunFilterCommand(filter, app);
         command.execute();
         // save command in undo stack
-        app.getUndoStack().add(command);
+        app.addToUndoStack(command);
     };
 
 }; // dwv.tool.filter.Sharpen
@@ -16608,7 +16576,7 @@ dwv.tool.filter.Sobel = function ( app )
         var command = new dwv.tool.RunFilterCommand(filter, app);
         command.execute();
         // save command in undo stack
-        app.getUndoStack().add(command);
+        app.addToUndoStack(command);
     };
 
 }; // class dwv.tool.filter.Sobel
@@ -17200,7 +17168,7 @@ dwv.tool.Livewire = function(app)
                 self.mousemove(event);
                 console.log("Done.");
                 // save command in undo stack
-                app.getUndoStack().add(command);
+                app.addToUndoStack(command);
                 // set flag
                 self.started = false;
             }
@@ -18948,145 +18916,4 @@ dwv.utils.splitKeyValueString = function (inputStr)
         }
     }
     return result;
-};
-;/** 
- * Utility module.
- * @module utils
- */
-var dwv = dwv || {};
-/**
- * Namespace for utility functions.
- * @class utils
- * @namespace dwv
- * @static
- */
-dwv.utils = dwv.utils || {};
-
-/**
- * Thread Pool.
- * @class ThreadPool
- * @namespace dwv.utils
- * @constructor
- * Highly inspired from http://www.smartjava.org/content/html5-easily-parallelize-jobs-using-web-workers-and-threadpool
- * @param {Number} size The size of the pool.
- */
-dwv.utils.ThreadPool = function (size) {
-    // closure to self
-    var self = this;
-    // task queue
-    this.taskQueue = [];
-    // worker queue
-    this.workerQueue = [];
-    // pool size
-    this.poolSize = size;
- 
-    /**
-     * Initialise.
-     * @method init
-     */
-    this.init = function () {
-        // create 'size' number of worker threads
-        for (var i = 0; i < size; ++i) {
-            self.workerQueue.push(new dwv.utils.WorkerThread(self));
-        }
-    };
- 
-    /**
-     * Add a worker task to the queue.
-     * Will be run when a thread is made available.
-     * @method addWorkerTask
-     * @return {Object} workerTask The task to add.
-     */
-    this.addWorkerTask = function (workerTask) {
-        if (self.workerQueue.length > 0) {
-            // get the worker thread from the front of the queue
-            var workerThread = self.workerQueue.shift();
-            workerThread.run(workerTask);
-        } else {
-            // no free workers, add to queue
-            self.taskQueue.push(workerTask);
-        }
-    };
- 
-    /**
-     * Free a worker thread.
-     * @method freeWorkerThread
-     * @param {Object} workerThread The thread to free.
-     */
-    this.freeWorkerThread = function (workerThread) {
-        if (self.taskQueue.length > 0) {
-            // don't put back in queue, but execute next task
-            var workerTask = self.taskQueue.shift();
-            workerThread.run(workerTask);
-        } else {
-            // no task to run, add to queue
-            self.workerQueue.push(workerThread);
-        }
-    };
-};
- 
-/**
- * Worker thread.
- * @class WorkerThread
- * @namespace dwv.utils
- * @constructor
- * @param {Object} parentPool The parent pool.
- */
-dwv.utils.WorkerThread = function (parentPool) {
-    // closure to self
-    var self = this;
-    // parent pool
-    this.parentPool = parentPool;
-    // associated task
-    this.workerTask = {};
- 
-    /**
-     * Run a worker task
-     * @method run
-     * @param {Object} workerTask The task to run.
-     */
-    this.run = function (workerTask) {
-        // closure to task
-        this.workerTask = workerTask;
-        // create a new web worker
-        if (this.workerTask.script !== null) {
-            var worker = new Worker(workerTask.script);
-            worker.addEventListener('message', ontaskend, false);
-            // launch the worker
-            worker.postMessage(workerTask.startMessage);
-        }
-    };
- 
-    /**
-     * Handle once the task is done.
-     * For now assume we only get a single callback from a worker
-     * which also indicates the end of this worker.
-     * @method ontaskend
-     * @param {Object} event The callback event.
-     */
-    function ontaskend(event) {
-        // pass to original callback
-        self.workerTask.callback(event);
-        // tell the parent pool this thread is free
-        self.parentPool.freeWorkerThread(self);
-    }
- 
-};
- 
-/**
- * Worker task.
- * @class WorkerTask
- * @namespace dwv.utils
- * @constructor
- * @param {String} script The worker script.
- * @param {Function} parentPool The worker callback.
- * @param {Object} message The data to pass to the worker.
- */
-dwv.utils.WorkerTask = function (script, callback, message) {
-    // worker script
-    this.script = script;
-    // worker callback
-    this.callback = callback;
-    // worker start message
-    this.startMessage = message;
 };

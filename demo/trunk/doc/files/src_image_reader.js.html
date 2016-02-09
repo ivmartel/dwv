@@ -128,9 +128,6 @@
                                 <li><a href="../classes/dwv.tool.ZoomAndPan.html">dwv.tool.ZoomAndPan</a></li>
                                 <li><a href="../classes/dwv.ToolboxController.html">dwv.ToolboxController</a></li>
                                 <li><a href="../classes/dwv.utils.html">dwv.utils</a></li>
-                                <li><a href="../classes/dwv.utils.ThreadPool.html">dwv.utils.ThreadPool</a></li>
-                                <li><a href="../classes/dwv.utils.WorkerTask.html">dwv.utils.WorkerTask</a></li>
-                                <li><a href="../classes/dwv.utils.WorkerThread.html">dwv.utils.WorkerThread</a></li>
                                 <li><a href="../classes/dwv.ViewController.html">dwv.ViewController</a></li>
                             </ul>
                 
@@ -200,10 +197,10 @@ dwv.image = dwv.image || {};
  * Get data from an input image using a canvas.
  * @method getDataFromImage
  * @static
- * @param {Image} Image The DOM Image.
+ * @param {Image} image The image.
  * @return {Mixed} The corresponding view and info.
  */
-dwv.image.getViewFromDOMImage = function (image)
+dwv.image.getDataFromImage = function(image)
 {
     // draw the image in the canvas in order to get its data
     var canvas = document.createElement(&#x27;canvas&#x27;);
@@ -254,56 +251,23 @@ dwv.image.getViewFromDOMImage = function (image)
 };
 
 /**
- * 
+ * Get data from an input buffer using a DICOM parser.
+ * @method getDataFromDicomBuffer
+ * @static
+ * @param {Array} buffer The input data buffer.
+ * @return {Mixed} The corresponding view and info.
  */
-dwv.image.DicomBufferToView = function (decoderScripts) {
-
-    // thread pool
-    var pool = new dwv.utils.ThreadPool(15);
-    pool.init();
-
-    /**
-     * Get data from an input buffer using a DICOM parser.
-     * @method getDataFromDicomBuffer
-     * @static
-     * @param {Array} buffer The input data buffer.
-     * @param {Object} callback The callback on the conversion.
-     * @return {Mixed} The corresponding view and info.
-     */
-    this.convert = function(buffer, callback)
-    {
-        // DICOM parser
-        var dicomParser = new dwv.dicom.DicomParser();
-        // parse the buffer
-        dicomParser.parse(buffer);
-    
-        // worker callback
-        var workerCallback = function(e) {
-            // create the view
-            var viewFactory = new dwv.image.ViewFactory();
-            var view = viewFactory.create( dicomParser.getDicomElements(), e.data );
-            // return
-            callback({&quot;view&quot;: view, &quot;info&quot;: dicomParser.getDicomElements().dumpToTable()});
-        };
-        var startMessage = dicomParser.pixelBuffer;
-        
-        var syntax = dwv.dicom.cleanString(dicomParser.getRawDicomElements().x00020010.value[0]);
-        var algoName = dwv.dicom.getSyntaxDecompressionName(syntax);
-        var needDecompression = (algoName !== null);
-        
-        if ( needDecompression ) {
-            var script = decoderScripts[algoName];
-            if ( typeof script === &quot;undefined&quot; ) {
-                throw new Error(&quot;No script provided to decompress &#x27;&quot; + algoName + &quot;&#x27; data.&quot;);
-            }
-            var workerTask = new dwv.utils.WorkerTask(script,workerCallback,startMessage);
-            pool.addWorkerTask(workerTask);
-        }
-        else {
-            workerCallback({data: startMessage});
-        }
-    };
-
+dwv.image.getDataFromDicomBuffer = function(buffer)
+{
+    // DICOM parser
+    var dicomParser = new dwv.dicom.DicomParser();
+    // parse the buffer
+    dicomParser.parse(buffer);
+    // create the view
+    var viewFactory = new dwv.image.ViewFactory();
+    var view = viewFactory.create( dicomParser.getDicomElements(), dicomParser.getPixelBuffer() );
+    // return
+    return {&quot;view&quot;: view, &quot;info&quot;: dicomParser.getDicomElements().dumpToTable()};
 };
 
     </pre>
