@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <title>Google Picker Example</title>
+
+    <!-- Local -->
+    <script type="text/javascript" src="dwv/src/app/application.js"></script>
+    <script type="text/javascript" src="dwv/src/app/toolboxController.js"></script>
+    <script type="text/javascript" src="dwv/src/app/viewController.js"></script>
+    <script type="text/javascript" src="dwv/src/dicom/dicomParser.js"></script>
+    <script type="text/javascript" src="dwv/src/dicom/dictionary.js"></script>
+    <script type="text/javascript" src="dwv/src/gui/filter.js"></script>
+    <script type="text/javascript" src="dwv/src/gui/browser.js"></script>
+    <script type="text/javascript" src="dwv/src/gui/generic.js"></script>
+    <script type="text/javascript" src="dwv/src/gui/help.js"></script>
+    <script type="text/javascript" src="dwv/src/gui/html.js"></script>
+    <script type="text/javascript" src="dwv/src/gui/layer.js"></script>
+    <script type="text/javascript" src="dwv/src/gui/loader.js"></script>
+    <script type="text/javascript" src="dwv/src/gui/style.js"></script>
+    <script type="text/javascript" src="dwv/src/gui/tools.js"></script>
+    <script type="text/javascript" src="dwv/src/gui/undo.js"></script>
+    <script type="text/javascript" src="dwv/src/image/filter.js"></script>
+    <script type="text/javascript" src="dwv/src/image/geometry.js"></script>
+    <script type="text/javascript" src="dwv/src/image/image.js"></script>
+    <script type="text/javascript" src="dwv/src/image/luts.js"></script>
+    <script type="text/javascript" src="dwv/src/image/view.js"></script>
+    <script type="text/javascript" src="dwv/src/image/reader.js"></script>
+    <script type="text/javascript" src="dwv/src/io/file.js"></script>
+    <script type="text/javascript" src="dwv/src/io/url.js"></script>
+    <script type="text/javascript" src="dwv/src/math/bucketQueue.js"></script>
+    <script type="text/javascript" src="dwv/src/math/point.js"></script>
+    <script type="text/javascript" src="dwv/src/math/scissors.js"></script>
+    <script type="text/javascript" src="dwv/src/math/shapes.js"></script>
+    <script type="text/javascript" src="dwv/src/math/stats.js"></script>
+    <script type="text/javascript" src="dwv/src/tools/draw.js"></script>
+    <script type="text/javascript" src="dwv/src/tools/ellipse.js"></script>
+    <script type="text/javascript" src="dwv/src/tools/filter.js"></script>
+    <script type="text/javascript" src="dwv/src/tools/info.js"></script>
+    <script type="text/javascript" src="dwv/src/tools/line.js"></script>
+    <script type="text/javascript" src="dwv/src/tools/livewire.js"></script>
+    <script type="text/javascript" src="dwv/src/tools/rectangle.js"></script>
+    <script type="text/javascript" src="dwv/src/tools/roi.js"></script>
+    <script type="text/javascript" src="dwv/src/tools/scroll.js"></script>
+    <script type="text/javascript" src="dwv/src/tools/toolbox.js"></script>
+    <script type="text/javascript" src="dwv/src/tools/undo.js"></script>
+    <script type="text/javascript" src="dwv/src/tools/windowLevel.js"></script>
+    <script type="text/javascript" src="dwv/src/tools/zoomPan.js"></script>
+    <script type="text/javascript" src="dwv/src/utils/string.js"></script>
+    <!-- Launch the app -->
+    <script type="text/javascript" src="appgui.js"></script>
+    <script type="text/javascript" src="gdrive.js"></script>
+    <!-- The Google API Loader script. -->
+    <script type="text/javascript" src="https://apis.google.com/js/client.js"></script>
+    <script type="text/javascript" src="https://apis.google.com/js/api.js?onload=loadAuthApi"></script>
+
+  </head>
+  <body>
+
+    <!-- DWV -->
+    <div id="dwv">
+
+    <!-- Toolbar -->
+    <div class="toolbar"></div>
+    <!-- Layer Container -->
+    <div class="layerContainer">
+    <canvas class="imageLayer">Only for HTML5 compatible browsers...</canvas>
+    </div><!-- /layerContainer -->
+
+    </div><!-- /dwv -->
+
+  </body>
+</html>
