@@ -7,8 +7,8 @@
       "scripts": ["/resources/chrome-background.js"]
     }
   },
-  "icons": { 
-    "16": "/resources/dwv-16.png", 
+  "icons": {
+    "16": "/resources/dwv-16.png",
     "60": "/resources/dwv-60.png",
     "128": "/resources/dwv-128.png"
   }

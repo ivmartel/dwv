@@ -37,9 +37,9 @@ dwv.gui.base.appendHelpHtml = function(toolList, mobile, app)
     if( mobile ) {
         actionType = "touch";
     }
-    
+
     var toolHelpDiv = document.createElement("div");
-    
+
     // current location
     var loc = window.location.pathname;
     var dir = loc.substring(0, loc.lastIndexOf('/'));
@@ -64,15 +64,15 @@ dwv.gui.base.appendHelpHtml = function(toolList, mobile, app)
             for( var i=0; i<keys.length; ++i )
             {
                 var action = tool.getHelp()[actionType][keys[i]];
-                
+
                 var img = document.createElement("img");
                 img.src = dir + "/../../resources/"+keys[i]+".png";
                 img.style.float = "left";
                 img.style.margin = "0px 15px 15px 0px";
-                
+
                 var br = document.createElement("br");
                 br.style.clear = "both";
-                
+
                 var para = document.createElement("p");
                 para.appendChild(img);
                 para.appendChild(document.createTextNode(action));
@@ -80,7 +80,7 @@ dwv.gui.base.appendHelpHtml = function(toolList, mobile, app)
                 docDiv.appendChild(para);
             }
         }
-        
+
         // different div structure for mobile or static
         if( mobile )
         {
@@ -97,17 +97,17 @@ dwv.gui.base.appendHelpHtml = function(toolList, mobile, app)
             toolHelpDiv.appendChild(docDiv);
         }
     }
-    
+
     var helpNode = app.getElement("help");
 
     var dwvLink = document.createElement("a");
     dwvLink.href = "https://github.com/ivmartel/dwv/wiki";
     dwvLink.title = "DWV wiki on github.";
     dwvLink.appendChild(document.createTextNode("DWV"));
-    
+
     var dwvExampleLink = document.createElement("a");
     var inputIdx = document.URL.indexOf("?input=");
-    dwvExampleLink.href = document.URL.substr(0, inputIdx+7) + 
+    dwvExampleLink.href = document.URL.substr(0, inputIdx+7) +
         "http%3A%2F%2Fx.babymri.org%2F%3F53320924%26.dcm";
     dwvExampleLink.title = "Brain MRI in DWV.";
     dwvExampleLink.target = "_top";
@@ -122,18 +122,18 @@ dwv.gui.base.appendHelpHtml = function(toolList, mobile, app)
     headPara.appendChild(dwvLink);
     headPara.appendChild(document.createTextNode(" can load DICOM data " +
         "either from a local file or from an URL. All DICOM tags are available " +
-        "in a searchable table, press the 'tags' or grid button. " + 
-        "You can choose to display the image information overlay by pressing the " + 
+        "in a searchable table, press the 'tags' or grid button. " +
+        "You can choose to display the image information overlay by pressing the " +
         "'info' or i button. For some example data, check this "));
     headPara.appendChild(dwvExampleLink);
     headPara.appendChild(document.createTextNode(" from the " ));
     headPara.appendChild(bbmriLink);
     headPara.appendChild(document.createTextNode(" database." ));
     helpNode.appendChild(headPara);
-    
+
     var toolPara = document.createElement("p");
-    toolPara.appendChild(document.createTextNode("Each tool defines the possible " + 
-        "user interactions. The default tool is the window/level one. " + 
+    toolPara.appendChild(document.createTextNode("Each tool defines the possible " +
+        "user interactions. The default tool is the window/level one. " +
         "Here are the available tools:"));
     helpNode.appendChild(toolPara);
     helpNode.appendChild(toolHelpDiv);

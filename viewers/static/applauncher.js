@@ -1,4 +1,4 @@
-/** 
+/**
  * Application launcher.
  */
 
@@ -10,7 +10,7 @@ $(document).ready( function()
 {
     // gui setup
     dwv.gui.setup();
-    
+
     // main application
     var myapp = new dwv.App();
     // initialise the application
@@ -23,7 +23,7 @@ $(document).ready( function()
         "gui": ["tool", "load", "help", "undo", "version", "tags"],
         "isMobile": false
     });
-    
+
     // help
     // TODO Seems accordion only works when at end...
     $("#accordion").accordion({ collapsible: "true", active: "false", heightStyle: "content" });

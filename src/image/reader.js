@@ -87,4 +87,3 @@ dwv.image.getDataFromDicomBuffer = function(buffer)
     // return
     return {"view": view, "info": dicomParser.getDicomElements().dumpToTable()};
 };
-

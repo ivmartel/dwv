@@ -29,7 +29,7 @@ dwv.gui.base.Loadbox = function (app, loaders)
         // loader select
         var loaderSelector = dwv.html.createHtmlSelect("loaderSelect", app.getLoaders());
         loaderSelector.onchange = app.onChangeLoader;
-        
+
         // node
         var node = app.getElement("loaderlist");
         // clear it
@@ -41,7 +41,7 @@ dwv.gui.base.Loadbox = function (app, loaders)
         // refresh
         dwv.gui.refreshElement(node);
     };
-    
+
     /**
      * Display a loader.
      * @param {String} name The name of the loader to show.
@@ -58,7 +58,7 @@ dwv.gui.base.Loadbox = function (app, loaders)
             }
         }
     };
-    
+
 }; // class dwv.gui.base.Loadbox
 
 /**
@@ -83,13 +83,13 @@ dwv.gui.base.FileLoad = function (app)
         fileLoadInput.className = "imagefiles";
         fileLoadInput.setAttribute("data-clear-btn","true");
         fileLoadInput.setAttribute("data-mini","true");
-    
+
         // associated div
         var fileLoadDiv = document.createElement("div");
         fileLoadDiv.className = "imagefilesdiv";
         fileLoadDiv.style.display = "none";
         fileLoadDiv.appendChild(fileLoadInput);
-        
+
         // node
         var node = app.getElement("loaderlist");
         // append
@@ -97,7 +97,7 @@ dwv.gui.base.FileLoad = function (app)
         // refresh
         dwv.gui.refreshElement(node);
     };
-    
+
     /**
      * Display the file load HTML.
      * @method display
@@ -110,7 +110,7 @@ dwv.gui.base.FileLoad = function (app)
         var filediv = node.getElementsByClassName("imagefilesdiv")[0];
         filediv.style.display = bool ? "" : "none";
     };
-    
+
 }; // class dwv.gui.base.FileLoad
 
 /**
@@ -134,13 +134,13 @@ dwv.gui.base.UrlLoad = function (app)
         urlLoadInput.className = "imageurl";
         urlLoadInput.setAttribute("data-clear-btn","true");
         urlLoadInput.setAttribute("data-mini","true");
-    
+
         // associated div
         var urlLoadDiv = document.createElement("div");
         urlLoadDiv.className = "imageurldiv";
         urlLoadDiv.style.display = "none";
         urlLoadDiv.appendChild(urlLoadInput);
-    
+
         // node
         var node = app.getElement("loaderlist");
         // append
@@ -148,7 +148,7 @@ dwv.gui.base.UrlLoad = function (app)
         // refresh
         dwv.gui.refreshElement(node);
     };
-    
+
     /**
      * Display the url load HTML.
      * @method display

@@ -55,7 +55,7 @@ dwv.html.Style = function ()
      * @type Number
      */
     var strokeWidth = 2;
-    
+
     /**
      * Get the font family.
      * @method getFontFamily
@@ -69,7 +69,7 @@ dwv.html.Style = function ()
      * @return {Number} The font size.
      */
     this.getFontSize = function () { return fontSize; };
-    
+
     /**
      * Get the stroke width.
      * @method getStrokeWidth
@@ -104,7 +104,7 @@ dwv.html.Style = function ()
      * @param {String} scale The display scale.
      */
     this.setScale = function (scale) { displayScale = scale; };
-    
+
     /**
      * Scale an input value.
      * @method scale
@@ -120,7 +120,7 @@ dwv.html.Style = function ()
  */
 dwv.html.Style.prototype.getFontStr = function ()
 {
-    return ("normal " + this.getFontSize() + "px sans-serif"); 
+    return ("normal " + this.getFontSize() + "px sans-serif");
 };
 
 /**
@@ -130,7 +130,7 @@ dwv.html.Style.prototype.getFontStr = function ()
  */
 dwv.html.Style.prototype.getLineHeight = function ()
 {
-    return ( this.getFontSize() + this.getFontSize() / 5 ); 
+    return ( this.getFontSize() + this.getFontSize() / 5 );
 };
 
 /**
@@ -138,8 +138,8 @@ dwv.html.Style.prototype.getLineHeight = function ()
  * @method getScaledFontSize
  * @return {Number} The scaled font size.
  */
-dwv.html.Style.prototype.getScaledFontSize = function () 
-{ 
+dwv.html.Style.prototype.getScaledFontSize = function ()
+{
     return this.scale( this.getFontSize() );
 };
 
@@ -148,7 +148,7 @@ dwv.html.Style.prototype.getScaledFontSize = function ()
  * @method getScaledStrokeWidth
  * @return {Number} The scaled stroke width.
  */
-dwv.html.Style.prototype.getScaledStrokeWidth = function () 
-{ 
-    return this.scale( this.getStrokeWidth() ); 
+dwv.html.Style.prototype.getScaledStrokeWidth = function ()
+{
+    return this.scale( this.getStrokeWidth() );
 };

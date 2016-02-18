@@ -40,36 +40,36 @@ dwv.io.File = function ()
      * @type Array
      */
     var progressList = [];
-    
+
     /**
      * Set the number of data to load.
      * @method setNToLoad
-     */ 
-    this.setNToLoad = function (n) { 
+     */
+    this.setNToLoad = function (n) {
         nToLoad = n;
         for ( var i = 0; i < nToLoad; ++i ) {
             progressList[i] = 0;
         }
     };
-    
+
     /**
      * Increment the number of loaded data
      * and call onloadend if loaded all data.
      * @method addLoaded
-     */ 
+     */
     this.addLoaded = function () {
         nLoaded++;
         if ( nLoaded === nToLoad ) {
             this.onloadend();
         }
     };
-    
+
     /**
      * Get the global load percent including the provided one.
      * @method getGlobalPercent
      * @param {Number} n The number of the loaded data.
      * @param {Number} percent The percentage of data 'n' that has been loaded.
-     * @return {Number} The accumulated percentage. 
+     * @return {Number} The accumulated percentage.
      */
     this.getGlobalPercent = function (n, percent) {
         progressList[n] = percent/nToLoad;
@@ -84,10 +84,10 @@ dwv.io.File = function ()
 /**
  * Handle a load event.
  * @method onload
- * @param {Object} event The load event, event.target 
+ * @param {Object} event The load event, event.target
  *  should be the loaded data.
  */
-dwv.io.File.prototype.onload = function (/*event*/) 
+dwv.io.File.prototype.onload = function (/*event*/)
 {
     // default does nothing.
 };
@@ -95,7 +95,7 @@ dwv.io.File.prototype.onload = function (/*event*/)
  * Handle a load end event.
  * @method onloadend
  */
-dwv.io.File.prototype.onloadend = function () 
+dwv.io.File.prototype.onloadend = function ()
 {
     // default does nothing.
 };
@@ -103,7 +103,7 @@ dwv.io.File.prototype.onloadend = function ()
  * Handle a progress event.
  * @method onprogress
  */
-dwv.io.File.prototype.onprogress = function () 
+dwv.io.File.prototype.onprogress = function ()
 {
     // default does nothing.
 };
@@ -113,7 +113,7 @@ dwv.io.File.prototype.onprogress = function ()
  * @param {Object} event The error event, event.message
  *  should be the error message.
  */
-dwv.io.File.prototype.onerror = function (/*event*/) 
+dwv.io.File.prototype.onerror = function (/*event*/)
 {
     // default does nothing.
 };
@@ -127,8 +127,8 @@ dwv.io.File.prototype.onerror = function (/*event*/)
  */
 dwv.io.File.createErrorHandler = function (file, text, baseHandler) {
     return function (event) {
-        baseHandler( {'name': "RequestError", 
-            'message': "An error occurred while reading the " + text + " file: " + file + 
+        baseHandler( {'name': "RequestError",
+            'message': "An error occurred while reading the " + text + " file: " + file +
             " ("+event.getMessage() + ")" } );
     };
 };
@@ -145,7 +145,7 @@ dwv.io.File.createProgressHandler = function (n, calculator, baseHandler) {
         if( event.lengthComputable )
         {
             var percent = Math.round((event.loaded / event.total) * 100);
-            var ev = {type: "load-progress", lengthComputable: true, 
+            var ev = {type: "load-progress", lengthComputable: true,
                 loaded: calculator(n, percent), total: 100};
             baseHandler(ev);
         }
@@ -157,7 +157,7 @@ dwv.io.File.createProgressHandler = function (n, calculator, baseHandler) {
  * @method load
  * @param {Array} ioArray The list of files to load.
  */
-dwv.io.File.prototype.load = function (ioArray) 
+dwv.io.File.prototype.load = function (ioArray)
 {
     // closure to self for handlers
     var self = this;
@@ -170,7 +170,7 @@ dwv.io.File.prototype.load = function (ioArray)
         self.onload(data);
         self.addLoaded();
     };
-    
+
     // DICOM reader loader
     var onLoadDicomReader = function (event)
     {
@@ -218,7 +218,7 @@ dwv.io.File.prototype.load = function (ioArray)
     {
         var file = ioArray[i];
         var reader = new FileReader();
-        reader.onprogress = dwv.io.File.createProgressHandler(i, 
+        reader.onprogress = dwv.io.File.createProgressHandler(i,
                 self.getGlobalPercent, self.onprogress);
         if ( file.name.split('.').pop().toLowerCase() === "json" )
         {

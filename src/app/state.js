@@ -38,7 +38,7 @@ dwv.State = function (app)
         }
         // return a JSON string
         return JSON.stringify( {
-            "window-center": app.getViewController().getWindowLevel().center, 
+            "window-center": app.getViewController().getWindowLevel().center,
             "window-width": app.getViewController().getWindowLevel().width,
             "position": app.getViewController().getCurrentPosition(),
             "scale": app.getScale(),
@@ -75,7 +75,7 @@ dwv.State = function (app)
                     cmd.onUndo = eventCallback;
                 }
                 cmd.execute();
-                app.getUndoStack().add(cmd);
+                app.addToUndoStack(cmd);
             }
         }
     };

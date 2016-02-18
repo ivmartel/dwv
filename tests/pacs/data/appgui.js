@@ -19,7 +19,7 @@ dwv.browser.check();
 dwv.addDataLine = function (id, fileroot, doc)
 {
     var mainDiv = document.getElementById("data-lines");
-    
+
     // dwv container
     var dwvDiv = document.createElement("div");
     dwvDiv.id = id;
@@ -30,7 +30,7 @@ dwv.addDataLine = function (id, fileroot, doc)
     layConDiv.appendChild(imgCanvas);
     dwvDiv.appendChild(layConDiv);
     mainDiv.appendChild(dwvDiv);
-    
+
     // dwv application
     var config = {
         "containerDivId": id,
@@ -40,7 +40,7 @@ dwv.addDataLine = function (id, fileroot, doc)
     var app = new dwv.App();
     app.init(config);
     app.loadURL([url]);
-    
+
     // parsing timing
     var request = new XMLHttpRequest();
     request.open('GET', url, true);
@@ -54,13 +54,13 @@ dwv.addDataLine = function (id, fileroot, doc)
         console.timeEnd("parse::"+fileroot);
     };
     request.send(null);
-    
+
     // image
     var image = document.createElement("img");
     image.src = fileroot + ".jpg";
     image.setAttribute("class", "snapshot");
     mainDiv.appendChild(image);
-    
+
     // doc
     var docDiv = document.createElement("div");
     docDiv.setAttribute("class", "doc");
@@ -75,7 +75,7 @@ dwv.addDataLine = function (id, fileroot, doc)
         spanValue.setAttribute("class", "value");
         spanValue.appendChild( document.createTextNode(doc[keys[i]]) );
         if ( keys[i] === "origin" ) {
-            
+
             var spanOrig = document.createElement("span");
             spanOrig.setAttribute("class", "path");
             spanOrig.setAttribute("title", doc.path);
@@ -97,7 +97,7 @@ dwv.addDataLine = function (id, fileroot, doc)
     }
     docDiv.appendChild(docUl);
     mainDiv.appendChild(docDiv);
-    
+
     // separator
     var sepDiv = document.createElement("div");
     sepDiv.setAttribute("class", "separator");

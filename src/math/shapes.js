@@ -11,7 +11,7 @@ var dwv = dwv || {};
  */
 dwv.math = dwv.math || {};
 
-/** 
+/**
  * Circle shape.
  * @class Circle
  * @namespace dwv.math
@@ -60,7 +60,7 @@ dwv.math.Circle = function(centre, radius)
     };
 }; // Circle class
 
-/** 
+/**
  * Ellipse shape.
  * @class Ellipse
  * @namespace dwv.math
@@ -147,7 +147,7 @@ dwv.math.Line = function(begin, end)
      * @type Number
      */
     var length = Math.sqrt( dx * dx + dy * dy );
-        
+
     /**
      * Get the begin point of the line.
      * @method getBegin
@@ -198,8 +198,8 @@ dwv.math.Line = function(begin, end)
      */
     this.getMidpoint = function()
     {
-        return new dwv.math.Point2D( 
-            parseInt( (begin.getX()+end.getX()) / 2, 10 ), 
+        return new dwv.math.Point2D(
+            parseInt( (begin.getX()+end.getX()) / 2, 10 ),
             parseInt( (begin.getY()+end.getY()) / 2, 10 ) );
     };
     /**
@@ -208,7 +208,7 @@ dwv.math.Line = function(begin, end)
      * @return {Number} The slope of the line.
      */
     this.getSlope = function()
-    { 
+    {
         return dy / dx;
     };
     /**
@@ -217,7 +217,7 @@ dwv.math.Line = function(begin, end)
      * @return {Number} The inclination of the line.
      */
     this.getInclination = function()
-    { 
+    {
         // tan(theta) = slope
         var angle = Math.atan2( dy, dx ) * 180 / Math.PI;
         // shift?
@@ -267,7 +267,7 @@ dwv.math.Rectangle = function(begin, end)
         begin = new dwv.math.Point2D( begin.getX(), end.getY() );
         end = new dwv.math.Point2D( end.getX(), tmpY );
     }
-    
+
     /**
      * Rectangle surface.
      * @property surface
@@ -345,19 +345,19 @@ dwv.math.ROI = function()
      * @type Array
      */
     var points = [];
-    
+
     /**
      * Get a point of the list at a given index.
      * @method getPoint
      * @param {Number} index The index of the point to get (beware, no size check).
      * @return {Object} The Point2D at the given index.
-     */ 
+     */
     this.getPoint = function(index) { return points[index]; };
     /**
      * Get the length of the point list.
      * @method getLength
      * @return {Number} The length of the point list.
-     */ 
+     */
     this.getLength = function() { return points.length; };
     /**
      * Add a point to the ROI.
@@ -379,7 +379,7 @@ dwv.math.ROI = function()
  * @namespace dwv.math
  * @constructor
  * @param {Array} inputPointArray The list of Point2D that make the path (optional).
- * @param {Array} inputControlPointIndexArray The list of control point of path, 
+ * @param {Array} inputControlPointIndexArray The list of control point of path,
  *  as indexes (optional).
  * Note: first and last point do not need to be equal.
  */
@@ -405,7 +405,7 @@ dwv.math.Path = function(inputPointArray, inputControlPointIndexArray)
  * @method getPoint
  * @param {Number} index The index of the point to get (beware, no size check).
  * @return {Object} The Point2D at the given index.
- */ 
+ */
 dwv.math.Path.prototype.getPoint = function(index) {
     return this.pointArray[index];
 };
@@ -415,7 +415,7 @@ dwv.math.Path.prototype.getPoint = function(index) {
  * @method isControlPoint
  * @param {Object} point The Point2D to check.
  * @return {Boolean} True if a control point.
- */ 
+ */
 dwv.math.Path.prototype.isControlPoint = function(point) {
     var index = this.pointArray.indexOf(point);
     if( index !== -1 ) {
@@ -430,8 +430,8 @@ dwv.math.Path.prototype.isControlPoint = function(point) {
  * Get the length of the path.
  * @method getLength
  * @return {Number} The length of the path.
- */ 
-dwv.math.Path.prototype.getLength = function() { 
+ */
+dwv.math.Path.prototype.getLength = function() {
     return this.pointArray.length;
 };
 
@@ -464,7 +464,7 @@ dwv.math.Path.prototype.addControlPoint = function(point) {
  * @method addPoints
  * @param {Array} points The list of Point2D to add.
  */
-dwv.math.Path.prototype.addPoints = function(newPointArray) { 
+dwv.math.Path.prototype.addPoints = function(newPointArray) {
     this.pointArray = this.pointArray.concat(newPointArray);
 };
 

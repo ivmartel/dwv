@@ -1,5 +1,5 @@
 --
--- DICOM Web Viewer (DWV) lua script for integration in a Conquest PACS server. 
+-- DICOM Web Viewer (DWV) lua script for integration in a Conquest PACS server.
 --
 -- Usage:
 -- 1. copy this file onto your web server
@@ -97,7 +97,7 @@ body { background-color: #222; color: white;
 ]])
 
 print([[
-<!-- Third party --> 
+<!-- Third party -->
 <script type="text/javascript" src="/dwv/ext/jquery/jquery-2.1.4.min.js"></script>
 <script type="text/javascript" src="/dwv/ext/jquery-ui/jquery-ui-1.11.2.min.js"></script>
 <script type="text/javascript" src="/dwv/ext/flot/jquery.flot.min.js"></script>
@@ -186,7 +186,7 @@ print([[
 </div>
 
 <!-- Toolbox -->
-<div class="toolList" title="Toolbox"></div> 
+<div class="toolList" title="Toolbox"></div>
 
 <!-- History -->
 <div class="history" title="History"></div>
