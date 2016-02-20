@@ -583,12 +583,23 @@
             "modules": {
                 "utils": 1
             },
-            "classes": {
-                "dwv.utils": 1
-            },
+            "classes": {},
             "fors": {},
             "namespaces": {
                 "dwv": 1
+            }
+        },
+        "src/utils/uri.js": {
+            "name": "src/utils/uri.js",
+            "modules": {},
+            "classes": {
+                "dwv.utils": 1,
+                "dwv.utils.base": 1
+            },
+            "fors": {},
+            "namespaces": {
+                "dwv": 1,
+                "dwv.utils": 1
             }
         }
     },
@@ -834,15 +845,17 @@
             "submodules": {},
             "elements": {},
             "classes": {
-                "dwv.utils": 1
+                "dwv.utils": 1,
+                "dwv.utils.base": 1
             },
             "fors": {},
             "namespaces": {
-                "dwv": 1
+                "dwv": 1,
+                "dwv.utils": 1
             },
             "tag": "module",
-            "file": "src/utils/string.js",
-            "line": 6,
+            "file": "src/utils/uri.js",
+            "line": 13,
             "description": "Utility module."
         }
     },
@@ -2612,9 +2625,24 @@
             "extension_for": [],
             "module": "utils",
             "namespace": "dwv",
-            "file": "src/utils/string.js",
+            "file": "src/utils/uri.js",
             "line": 6,
             "description": "Namespace for utility functions.",
+            "static": 1
+        },
+        "dwv.utils.base": {
+            "name": "dwv.utils.base",
+            "shortname": "dwv.utils.base",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "utils",
+            "namespace": "dwv.utils",
+            "file": "src/utils/uri.js",
+            "line": 13,
+            "description": "Namespace for base utils functions.",
             "static": 1
         }
     },
@@ -2867,7 +2895,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 399,
+            "line": 386,
             "description": "Get a HTML element associated to the application.",
             "itemtype": "method",
             "name": "getElement",
@@ -2885,7 +2913,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 410,
+            "line": 397,
             "description": "Reset the application.",
             "itemtype": "method",
             "name": "reset",
@@ -2894,7 +2922,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 435,
+            "line": 422,
             "description": "Reset the layout of the application.",
             "itemtype": "method",
             "name": "resetLayout",
@@ -2903,7 +2931,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 454,
+            "line": 441,
             "description": "Add an event listener on the app.",
             "itemtype": "method",
             "name": "addEventListener",
@@ -2924,7 +2952,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 468,
+            "line": 455,
             "description": "Remove an event listener from the app.",
             "itemtype": "method",
             "name": "removeEventListener",
@@ -2945,7 +2973,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 487,
+            "line": 474,
             "description": "Load a list of files.",
             "itemtype": "method",
             "name": "loadFiles",
@@ -2961,7 +2989,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 504,
+            "line": 491,
             "description": "Load a list of image files.",
             "itemtype": "method",
             "name": "loadImageFiles",
@@ -2977,7 +3005,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 543,
+            "line": 530,
             "description": "Load a State file.",
             "itemtype": "method",
             "name": "loadStateFile",
@@ -2993,7 +3021,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 562,
+            "line": 549,
             "description": "Load a list of URLs.",
             "itemtype": "method",
             "name": "loadURL",
@@ -3009,7 +3037,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 601,
+            "line": 588,
             "description": "Load a State url.",
             "itemtype": "method",
             "name": "loadStateUrl",
@@ -3025,7 +3053,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 620,
+            "line": 607,
             "description": "Fit the display to the given size. To be called once the image is loaded.",
             "itemtype": "method",
             "name": "fitToSize",
@@ -3034,7 +3062,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 663,
+            "line": 650,
             "description": "Toggle the display of the information layer.",
             "itemtype": "method",
             "name": "toggleInfoLayerDisplay",
@@ -3043,14 +3071,14 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 681,
+            "line": 668,
             "description": "Init the Window/Level display",
             "class": "dwv.App",
             "namespace": "dwv"
         },
         {
             "file": "src/app/application.js",
-            "line": 696,
+            "line": 683,
             "description": "Add layer mouse and touch listeners.",
             "itemtype": "method",
             "name": "addLayerListeners",
@@ -3059,7 +3087,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 718,
+            "line": 705,
             "description": "Remove layer mouse and touch listeners.",
             "itemtype": "method",
             "name": "removeLayerListeners",
@@ -3068,7 +3096,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 740,
+            "line": 727,
             "description": "Render the current image.",
             "itemtype": "method",
             "name": "render",
@@ -3077,7 +3105,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 749,
+            "line": 736,
             "description": "Zoom to the layers.",
             "itemtype": "method",
             "name": "zoom",
@@ -3103,7 +3131,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 765,
+            "line": 752,
             "description": "Add a step to the layers zoom.",
             "itemtype": "method",
             "name": "stepZoom",
@@ -3129,7 +3157,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 781,
+            "line": 768,
             "description": "Apply a translation to the layers.",
             "itemtype": "method",
             "name": "translate",
@@ -3150,7 +3178,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 793,
+            "line": 780,
             "description": "Add a translation to the layers.",
             "itemtype": "method",
             "name": "stepTranslate",
@@ -3171,7 +3199,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 809,
+            "line": 796,
             "description": "Handle window/level change.",
             "itemtype": "method",
             "name": "onWLChange",
@@ -3187,7 +3215,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 819,
+            "line": 806,
             "description": "Handle colour map change.",
             "itemtype": "method",
             "name": "onColourChange",
@@ -3203,7 +3231,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 829,
+            "line": 816,
             "description": "Handle slice change.",
             "itemtype": "method",
             "name": "onSliceChange",
@@ -3219,7 +3247,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 849,
+            "line": 836,
             "description": "Handle key down event.\n- CRTL-Z: undo\n- CRTL-Y: redo\nDefault behavior. Usually used in tools.",
             "itemtype": "method",
             "name": "onKeydown",
@@ -3235,7 +3263,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 869,
+            "line": 856,
             "description": "Handle resize.\nFit the display to the window. To be called once the image is loaded.",
             "itemtype": "method",
             "name": "onResize",
@@ -3251,7 +3279,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 880,
+            "line": 867,
             "description": "Handle zoom reset.",
             "itemtype": "method",
             "name": "onZoomReset",
@@ -3267,7 +3295,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 890,
+            "line": 877,
             "description": "Handle loader change.",
             "itemtype": "method",
             "name": "onChangeLoader",
@@ -3283,7 +3311,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 900,
+            "line": 887,
             "description": "Handle change url event.",
             "itemtype": "method",
             "name": "onChangeURL",
@@ -3299,7 +3327,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 910,
+            "line": 897,
             "description": "Handle input urls.",
             "itemtype": "method",
             "name": "onInputURLs",
@@ -3315,7 +3343,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 920,
+            "line": 907,
             "description": "Handle change files event.",
             "itemtype": "method",
             "name": "onChangeFiles",
@@ -3331,7 +3359,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 933,
+            "line": 920,
             "description": "Handle state save event.",
             "itemtype": "method",
             "name": "onStateSave",
@@ -3347,7 +3375,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 946,
+            "line": 933,
             "description": "Handle colour map change.",
             "itemtype": "method",
             "name": "onChangeColourMap",
@@ -3363,7 +3391,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 956,
+            "line": 943,
             "description": "Handle window/level preset change.",
             "itemtype": "method",
             "name": "onChangeWindowLevelPreset",
@@ -3379,7 +3407,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 974,
+            "line": 961,
             "description": "Handle tool change.",
             "itemtype": "method",
             "name": "onChangeTool",
@@ -3395,7 +3423,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 984,
+            "line": 971,
             "description": "Handle shape change.",
             "itemtype": "method",
             "name": "onChangeShape",
@@ -3411,7 +3439,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 994,
+            "line": 981,
             "description": "Handle filter change.",
             "itemtype": "method",
             "name": "onChangeFilter",
@@ -3427,7 +3455,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1004,
+            "line": 991,
             "description": "Handle filter run.",
             "itemtype": "method",
             "name": "onRunFilter",
@@ -3443,7 +3471,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1014,
+            "line": 1001,
             "description": "Handle line colour change.",
             "itemtype": "method",
             "name": "onChangeLineColour",
@@ -3459,7 +3487,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1024,
+            "line": 1011,
             "description": "Handle min/max slider change.",
             "itemtype": "method",
             "name": "onChangeMinMax",
@@ -3475,7 +3503,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1034,
+            "line": 1021,
             "description": "Handle undo.",
             "itemtype": "method",
             "name": "onUndo",
@@ -3491,7 +3519,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1044,
+            "line": 1031,
             "description": "Handle redo.",
             "itemtype": "method",
             "name": "onRedo",
@@ -3507,7 +3535,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1054,
+            "line": 1041,
             "description": "Handle toggle of info layer.",
             "itemtype": "method",
             "name": "onToggleInfoLayer",
@@ -3523,7 +3551,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1064,
+            "line": 1051,
             "description": "Handle display reset.",
             "itemtype": "method",
             "name": "onDisplayReset",
@@ -3539,7 +3567,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1082,
+            "line": 1069,
             "description": "Fire an event: call all associated listeners.",
             "itemtype": "method",
             "name": "fireEvent",
@@ -3555,7 +3583,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1098,
+            "line": 1085,
             "description": "Generate the image data and draw it.",
             "itemtype": "method",
             "name": "generateAndDrawImage",
@@ -3564,7 +3592,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1112,
+            "line": 1099,
             "description": "Apply the stored zoom to the layers.",
             "itemtype": "method",
             "name": "zoomLayers",
@@ -3573,7 +3601,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1143,
+            "line": 1130,
             "description": "Apply the stored translation to the layers.",
             "itemtype": "method",
             "name": "translateLayers",
@@ -3582,7 +3610,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1163,
+            "line": 1150,
             "description": "Add image listeners.",
             "itemtype": "method",
             "name": "addImageInfoListeners",
@@ -3593,7 +3621,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1178,
+            "line": 1165,
             "description": "Remove image listeners.",
             "itemtype": "method",
             "name": "removeImageInfoListeners",
@@ -3604,7 +3632,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1193,
+            "line": 1180,
             "description": "Mou(se) and (T)ouch event handler. This function just determines the mouse/touch\nposition relative to the canvas element. It then passes it to the current tool.",
             "itemtype": "method",
             "name": "onMouch",
@@ -3622,7 +3650,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1268,
+            "line": 1255,
             "description": "Handle a drag over.",
             "itemtype": "method",
             "name": "onDragOver",
@@ -3640,7 +3668,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1286,
+            "line": 1273,
             "description": "Handle a drag leave.",
             "itemtype": "method",
             "name": "onDragLeave",
@@ -3658,7 +3686,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1304,
+            "line": 1291,
             "description": "Handle a drop event.",
             "itemtype": "method",
             "name": "onDrop",
@@ -3676,7 +3704,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1319,
+            "line": 1306,
             "description": "Handle an error: display it to the user.",
             "itemtype": "method",
             "name": "handleError",
@@ -3694,7 +3722,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1340,
+            "line": 1327,
             "description": "Handle a load progress.",
             "itemtype": "method",
             "name": "onLoadProgress",
@@ -3712,7 +3740,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1356,
+            "line": 1343,
             "description": "Create the application layers.",
             "itemtype": "method",
             "name": "createLayers",
@@ -3735,7 +3763,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1397,
+            "line": 1384,
             "description": "Post load application initialisation. To be called once the DICOM has been parsed.",
             "itemtype": "method",
             "name": "postLoadInit",
@@ -5698,102 +5726,6 @@
         {
             "file": "src/gui/html.js",
             "line": 403,
-            "description": "Get a list of parameters from an input URI that looks like:\n [dwv root]?input=encodeURI([root]?key0=value0&key1=value1)\nor\n [dwv root]?input=encodeURI([manifest link])&type=manifest",
-            "itemtype": "method",
-            "name": "getUriParam",
-            "static": 1,
-            "params": [
-                {
-                    "name": "uri",
-                    "description": "The URI to decode.",
-                    "type": "String"
-                }
-            ],
-            "return": {
-                "description": "The parameters found in the input uri.",
-                "type": "Object"
-            },
-            "class": "dwv.html",
-            "module": "html",
-            "namespace": "dwv"
-        },
-        {
-            "file": "src/gui/html.js",
-            "line": 426,
-            "description": "Decode a Key/Value pair uri. If a key is repeated, the result\nbe an array of base + each key.",
-            "itemtype": "method",
-            "name": "decodeKeyValueUri",
-            "static": 1,
-            "params": [
-                {
-                    "name": "uri",
-                    "description": "The uri to decode.",
-                    "type": "String"
-                },
-                {
-                    "name": "replaceMode",
-                    "description": "The key replace more.",
-                    "type": "String"
-                }
-            ],
-            "class": "dwv.html",
-            "module": "html",
-            "namespace": "dwv"
-        },
-        {
-            "file": "src/gui/html.js",
-            "line": 512,
-            "description": "Decode a manifest uri.",
-            "itemtype": "method",
-            "name": "decodeManifestUri",
-            "static": 1,
-            "params": [
-                {
-                    "name": "uri",
-                    "description": "The uri to decode.",
-                    "type": "String"
-                },
-                {
-                    "name": "nslices",
-                    "description": "The number of slices to load.",
-                    "type": "Number"
-                },
-                {
-                    "name": "The",
-                    "description": "function to call with the decoded urls.",
-                    "type": "Function"
-                }
-            ],
-            "class": "dwv.html",
-            "module": "html",
-            "namespace": "dwv"
-        },
-        {
-            "file": "src/gui/html.js",
-            "line": 543,
-            "description": "Decode an XML manifest.",
-            "itemtype": "method",
-            "name": "decodeManifest",
-            "static": 1,
-            "params": [
-                {
-                    "name": "manifest",
-                    "description": "The manifest to decode.",
-                    "type": "Object"
-                },
-                {
-                    "name": "nslices",
-                    "description": "The number of slices to load.",
-                    "type": "Number"
-                }
-            ],
-            "class": "dwv.html",
-            "module": "html",
-            "namespace": "dwv"
-        },
-        {
-            "file": "src/gui/html.js",
-            "line": 593,
             "description": "Display or not an element.",
             "itemtype": "method",
             "name": "displayElement",
@@ -5816,7 +5748,7 @@
         },
         {
             "file": "src/gui/html.js",
-            "line": 605,
+            "line": 415,
             "description": "Toggle the display of an element.",
             "itemtype": "method",
             "name": "toggleDisplay",
@@ -5834,7 +5766,7 @@
         },
         {
             "file": "src/gui/html.js",
-            "line": 621,
+            "line": 431,
             "description": "Append an element.",
             "itemtype": "method",
             "name": "appendElement",
@@ -5857,7 +5789,7 @@
         },
         {
             "file": "src/gui/html.js",
-            "line": 636,
+            "line": 446,
             "description": "Create an element.",
             "itemtype": "method",
             "name": "createElement",
@@ -13897,28 +13829,6 @@
         {
             "file": "src/utils/string.js",
             "line": 30,
-            "description": "Split query string:\n 'root?key0=val00&key0=val01&key1=val10' returns\n { base : root, query : [ key0 : [val00, val01], key1 : val1 ] }\nReturns an empty object if the input string is not correct (null, empty...)\n or if it is not a query string (no question mark).",
-            "itemtype": "method",
-            "name": "splitQueryString",
-            "static": 1,
-            "params": [
-                {
-                    "name": "inputStr",
-                    "description": "The string to split.",
-                    "type": "String"
-                }
-            ],
-            "return": {
-                "description": "The split string.",
-                "type": "Object"
-            },
-            "class": "dwv.utils",
-            "module": "utils",
-            "namespace": "dwv"
-        },
-        {
-            "file": "src/utils/string.js",
-            "line": 63,
             "description": "Split key/value string:\n key0=val00&key0=val01&key1=val10 returns\n  { key0 : [val00, val01], key1 : val1 }",
             "itemtype": "method",
             "name": "splitKeyValueString",
@@ -13937,6 +13847,127 @@
             "class": "dwv.utils",
             "module": "utils",
             "namespace": "dwv"
+        },
+        {
+            "file": "src/utils/uri.js",
+            "line": 21,
+            "description": "Split an input URI:\n 'root?key0=val00&key0=val01&key1=val10' returns\n { base : root, query : [ key0 : [val00, val01], key1 : val1 ] }\nReturns an empty object if the input string is not correct (null, empty...)\n or if it is not a query string (no question mark).",
+            "itemtype": "method",
+            "name": "splitUri",
+            "static": 1,
+            "params": [
+                {
+                    "name": "inputStr",
+                    "description": "The string to split.",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "The split string.",
+                "type": "Object"
+            },
+            "class": "dwv.utils.base",
+            "module": "utils",
+            "namespace": "dwv.utils"
+        },
+        {
+            "file": "src/utils/uri.js",
+            "line": 54,
+            "description": "Get the query part, split into an array, of an input URI.\nThe URI scheme is: 'base?query#fragment'",
+            "itemtype": "method",
+            "name": "getUriQuery",
+            "static": 1,
+            "params": [
+                {
+                    "name": "uri",
+                    "description": "The input URI.",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "The query part, split into an array, of the input URI.",
+                "type": "Object"
+            },
+            "class": "dwv.utils.base",
+            "module": "utils",
+            "namespace": "dwv.utils"
+        },
+        {
+            "file": "src/utils/uri.js",
+            "line": 74,
+            "description": "Generic URI query decoder. \nSupports manifest:\n  [dwv root]?input=encodeURIComponent('[manifest file]')&type=manifest\nor encoded URI with base and key value/pairs:\n  [dwv root]?input=encodeURIComponent([root]?key0=value0&key1=value1)",
+            "class": "dwv.utils.base",
+            "module": "utils",
+            "namespace": "dwv.utils"
+        },
+        {
+            "file": "src/utils/uri.js",
+            "line": 93,
+            "description": "Decode a Key/Value pair URI. If a key is repeated, the result\nbe an array of base + each key.",
+            "itemtype": "method",
+            "name": "decodeKeyValueUri",
+            "static": 1,
+            "params": [
+                {
+                    "name": "uri",
+                    "description": "The URI to decode.",
+                    "type": "String"
+                },
+                {
+                    "name": "replaceMode",
+                    "description": "The key replace more.\n  replaceMode can be:\n  - key (default): keep the key\n  - other than key: do not use the key\n  'file' is a special case where the '?' of the query is not kept.",
+                    "type": "String"
+                }
+            ],
+            "class": "dwv.utils.base",
+            "module": "utils",
+            "namespace": "dwv.utils"
+        },
+        {
+            "file": "src/utils/uri.js",
+            "line": 183,
+            "description": "Decode a manifest query.",
+            "itemtype": "method",
+            "name": "decodeManifestQuery",
+            "static": 1,
+            "params": [
+                {
+                    "name": "query",
+                    "description": "The manifest query: {input, nslices},\n  with input the input URI and nslices the number of slices.",
+                    "type": "Object"
+                },
+                {
+                    "name": "The",
+                    "description": "function to call with the decoded urls.",
+                    "type": "Function"
+                }
+            ],
+            "class": "dwv.utils.base",
+            "module": "utils",
+            "namespace": "dwv.utils"
+        },
+        {
+            "file": "src/utils/uri.js",
+            "line": 220,
+            "description": "Decode an XML manifest.",
+            "itemtype": "method",
+            "name": "decodeManifest",
+            "static": 1,
+            "params": [
+                {
+                    "name": "manifest",
+                    "description": "The manifest to decode.",
+                    "type": "Object"
+                },
+                {
+                    "name": "nslices",
+                    "description": "The number of slices to load.",
+                    "type": "Number"
+                }
+            ],
+            "class": "dwv.utils.base",
+            "module": "utils",
+            "namespace": "dwv.utils"
         }
     ],
     "warnings": [
@@ -14098,7 +14129,7 @@
         },
         {
             "message": "Missing item type\nInit the Window/Level display",
-            "line": " src/app/application.js:681"
+            "line": " src/app/application.js:668"
         },
         {
             "message": "Missing item type\nGet the group-element key used to store DICOM elements.",
@@ -14183,6 +14214,10 @@
         {
             "message": "Missing item type\nSet the anchor off listeners.",
             "line": " src/tools/editor.js:408"
+        },
+        {
+            "message": "Missing item type\nGeneric URI query decoder. \nSupports manifest:\n  [dwv root]?input=encodeURIComponent('[manifest file]')&type=manifest\nor encoded URI with base and key value/pairs:\n  [dwv root]?input=encodeURIComponent([root]?key0=value0&key1=value1)",
+            "line": " src/utils/uri.js:74"
         }
     ]
 }
