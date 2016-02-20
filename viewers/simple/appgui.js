@@ -11,6 +11,9 @@ dwv.tool.defaultpresets.CT = {
     "bone": {"center": 500, "width": 2000},
 };
 
+// decode query
+dwv.utils.decodeQuery = dwv.utils.base.decodeQuery;
+
 // Window
 dwv.gui.getWindowSize = function () {
     return { 'width': ($(window).width()), 'height': ($(window).height() - 147) };

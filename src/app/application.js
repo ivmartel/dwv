@@ -360,29 +360,16 @@ dwv.App = function ()
         }
         // possible load from URL
         if ( typeof config.skipLoadUrl === "undefined" ) {
-            var query = dwv.html.getUriParam(window.location.href);
+            var query = dwv.utils.getUriQuery(window.location.href);
             // check query
             if ( query && typeof query.input !== "undefined" ) {
-                // manifest
-                if ( query.type && query.type === "manifest" ) {
-                    var finalUri = "";
-                    if ( query.input[0] === '/' ) {
-                        finalUri = window.location.protocol + "//" + window.location.host;
-                    }
-                    finalUri += query.input;
-                    dwv.html.decodeManifestUri( finalUri, query.nslices, this.onInputURLs );
-                }
-                // urls
-                else {
-                    var urls = dwv.html.decodeKeyValueUri( query.input, query.dwvReplaceMode );
-                    this.loadURL(urls);
-                    if ( typeof query.state !== "undefined" ) {
-                        var onLoadEnd = function (/*event*/) {
-                            loadStateUrl([query.state]);
-                        };
-                        this.addEventListener( "load-end", onLoadEnd );
-
-                    }
+                dwv.utils.decodeQuery(query, this.onInputURLs);
+                // optional display state
+                if ( typeof query.state !== "undefined" ) {
+                    var onLoadEnd = function (/*event*/) {
+                        loadStateUrl([query.state]);
+                    };
+                    this.addEventListener( "load-end", onLoadEnd );
                 }
             }
         }
