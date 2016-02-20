@@ -550,8 +550,9 @@ dwv.App = function ()
      * Load a list of URLs.
      * @method loadURL
      * @param {Array} urls The list of urls to load.
+     * @param {Array} requestHeaders An array of {name, value} to use as request headers.
      */
-    this.loadURL = function(urls)
+    this.loadURL = function(urls, requestHeaders)
     {
         // clear variables
         this.reset();
@@ -582,7 +583,7 @@ dwv.App = function ()
         urlIO.onloadend = function (/*event*/) { fireEvent({ 'type': 'load-end' }); };
         urlIO.onprogress = onLoadProgress;
         // main load (asynchronous)
-        urlIO.load(urls);
+        urlIO.load(urls, requestHeaders);
     };
 
     /**
@@ -898,10 +899,11 @@ dwv.App = function ()
      * Handle input urls.
      * @method onInputURLs
      * @param {Array} urls The list of input urls.
+     * @param {Array} requestHeaders An array of {name, value} to use as request headers.
      */
-    this.onInputURLs = function (urls)
+    this.onInputURLs = function (urls, requestHeaders)
     {
-        self.loadURL(urls);
+        self.loadURL(urls, requestHeaders);
     };
 
     /**

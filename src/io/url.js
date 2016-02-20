@@ -156,8 +156,9 @@ dwv.io.Url.createProgressHandler = function (n, calculator, baseHandler) {
  * Load a list of URLs.
  * @method load
  * @param {Array} ioArray The list of urls to load.
+ * @param {Array} requestHeaders An array of {name, value} to use as request headers.
  */
-dwv.io.Url.prototype.load = function (ioArray)
+dwv.io.Url.prototype.load = function (ioArray, requestHeaders)
 {
     // closure to self for handlers
     var self = this;
@@ -260,6 +261,14 @@ dwv.io.Url.prototype.load = function (ioArray)
 
         var request = new XMLHttpRequest();
         request.open('GET', url, true);
+        if ( typeof requestHeaders !== "undefined" ) {
+            for (var j = 0; j < requestHeaders.length; ++j) { 
+                if ( typeof requestHeaders[j].name !== "undefined" &&
+                    typeof requestHeaders[j].value !== "undefined" ) {
+                    request.setRequestHeader(requestHeaders[j].name, requestHeaders[j].value);
+                }
+            }
+        }
         if ( !isText ) {
             request.responseType = "arraybuffer";
             request.onload = onLoadBinaryRequest;
