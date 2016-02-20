@@ -550,8 +550,9 @@ dwv.App = function ()
      * Load a list of URLs.
      * @method loadURL
      * @param {Array} urls The list of urls to load.
+     * @param {Array} requestHeaders An array of {name, value} to use as request headers.
      */
-    this.loadURL = function(urls)
+    this.loadURL = function(urls, requestHeaders)
     {
         // clear variables
         this.reset();
@@ -582,7 +583,7 @@ dwv.App = function ()
         urlIO.onloadend = function (/*event*/) { fireEvent({ 'type': 'load-end' }); };
         urlIO.onprogress = onLoadProgress;
         // main load (asynchronous)
-        urlIO.load(urls);
+        urlIO.load(urls, requestHeaders);
     };
 
     /**
@@ -898,10 +899,11 @@ dwv.App = function ()
      * Handle input urls.
      * @method onInputURLs
      * @param {Array} urls The list of input urls.
+     * @param {Array} requestHeaders An array of {name, value} to use as request headers.
      */
-    this.onInputURLs = function (urls)
+    this.onInputURLs = function (urls, requestHeaders)
     {
-        self.loadURL(urls);
+        self.loadURL(urls, requestHeaders);
     };
 
     /**
@@ -12947,8 +12949,9 @@ dwv.io.Url.createProgressHandler = function (n, calculator, baseHandler) {
  * Load a list of URLs.
  * @method load
  * @param {Array} ioArray The list of urls to load.
+ * @param {Array} requestHeaders An array of {name, value} to use as request headers.
  */
-dwv.io.Url.prototype.load = function (ioArray)
+dwv.io.Url.prototype.load = function (ioArray, requestHeaders)
 {
     // closure to self for handlers
     var self = this;
@@ -13051,6 +13054,14 @@ dwv.io.Url.prototype.load = function (ioArray)
 
         var request = new XMLHttpRequest();
         request.open('GET', url, true);
+        if ( typeof requestHeaders !== "undefined" ) {
+            for (var j = 0; j < requestHeaders.length; ++j) { 
+                if ( typeof requestHeaders[j].name !== "undefined" &&
+                    typeof requestHeaders[j].value !== "undefined" ) {
+                    request.setRequestHeader(requestHeaders[j].name, requestHeaders[j].value);
+                }
+            }
+        }
         if ( !isText ) {
             request.responseType = "arraybuffer";
             request.onload = onLoadBinaryRequest;
