@@ -1,4 +1,4 @@
-/** 
+/**
  * Application GUI.
  */
 
@@ -10,6 +10,9 @@ dwv.tool.defaultpresets.CT = {
     "lung": {"center": -500, "width": 1500},
     "bone": {"center": 500, "width": 2000},
 };
+
+// decode query
+dwv.utils.decodeQuery = dwv.utils.base.decodeQuery;
 
 // Window
 dwv.gui.getWindowSize = dwv.gui.base.getWindowSize;
@@ -24,7 +27,7 @@ dwv.gui.Slider = null;
 // Tags table
 dwv.gui.DicomTags = null;
 
-// Toolbox 
+// Toolbox
 dwv.gui.Toolbox = function (app)
 {
     this.setup = function (/*list*/)

@@ -1,4 +1,4 @@
-/** 
+/**
  * Application launcher.
  */
 
@@ -14,13 +14,14 @@ $(document).ready( function()
     myapp.init({
         "containerDivId": "dwv",
         "fitToWindow": true,
+        "gui": ["tool", "load", "help", "undo", "version", "tags"],
+        "loaders": ["File", "Url"],
         "tools": ["Scroll", "Window/Level", "Zoom/Pan", "Draw", "Livewire", "Filter"],
         "filters": ["Threshold", "Sharpen", "Sobel"],
         "shapes": ["Line", "Protractor", "Rectangle", "Roi", "Ellipse"],
-        "gui": ["tool", "load", "help", "undo", "version", "tags"],
         "isMobile": true
     });
-    
+
     // example app listening
     //var listener = function (event) { console.log("event: "+event.type); };
     //myapp.addEventListener("load-end", listener);
