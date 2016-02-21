@@ -13898,13 +13898,25 @@
             "file": "src/utils/uri.js",
             "line": 74,
             "description": "Generic URI query decoder. \nSupports manifest:\n  [dwv root]?input=encodeURIComponent('[manifest file]')&type=manifest\nor encoded URI with base and key value/pairs:\n  [dwv root]?input=encodeURIComponent([root]?key0=value0&key1=value1)",
+            "params": [
+                {
+                    "name": "query",
+                    "description": "The query part to the input URI.",
+                    "type": "String"
+                },
+                {
+                    "name": "callback",
+                    "description": "The function to call with the decoded file urls.",
+                    "type": "Function"
+                }
+            ],
             "class": "dwv.utils.base",
             "module": "utils",
             "namespace": "dwv.utils"
         },
         {
             "file": "src/utils/uri.js",
-            "line": 93,
+            "line": 95,
             "description": "Decode a Key/Value pair URI. If a key is repeated, the result\nbe an array of base + each key.",
             "itemtype": "method",
             "name": "decodeKeyValueUri",
@@ -13921,13 +13933,16 @@
                     "type": "String"
                 }
             ],
+            "return": {
+                "description": "The list of input file urls."
+            },
             "class": "dwv.utils.base",
             "module": "utils",
             "namespace": "dwv.utils"
         },
         {
             "file": "src/utils/uri.js",
-            "line": 183,
+            "line": 186,
             "description": "Decode a manifest query.",
             "itemtype": "method",
             "name": "decodeManifestQuery",
@@ -13950,7 +13965,7 @@
         },
         {
             "file": "src/utils/uri.js",
-            "line": 220,
+            "line": 223,
             "description": "Decode an XML manifest.",
             "itemtype": "method",
             "name": "decodeManifest",

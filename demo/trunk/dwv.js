@@ -18754,6 +18754,8 @@ dwv.utils.getUriQuery = function (uri)
  *   [dwv root]?input=encodeURIComponent('[manifest file]')&type=manifest
  * or encoded URI with base and key value/pairs:
  *   [dwv root]?input=encodeURIComponent([root]?key0=value0&key1=value1)
+ *  @param {String} query The query part to the input URI.
+ *  @param {Function} callback The function to call with the decoded file urls. 
  */
 dwv.utils.base.decodeQuery = function (query, callback)
 {
@@ -18778,6 +18780,7 @@ dwv.utils.base.decodeQuery = function (query, callback)
  *   - key (default): keep the key
  *   - other than key: do not use the key
  *   'file' is a special case where the '?' of the query is not kept. 
+ * @return The list of input file urls.
  */
 dwv.utils.decodeKeyValueUri = function (uri, replaceMode)
 {
