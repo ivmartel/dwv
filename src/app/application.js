@@ -213,19 +213,6 @@ dwv.App = function ()
     };
 
     /**
-     * Get the data loaders.
-     * @method getLoaders
-     * @return {Object} The loaders.
-     */
-    this.getLoaders = function ()
-    {
-        return {
-            'file': dwv.io.File,
-            'url': dwv.io.Url
-        };
-    };
-
-    /**
      * Initialise the HTML for the application.
      * @method init
      */
@@ -251,22 +238,13 @@ dwv.App = function ()
                         // setup the shape list
                         var shapeList = {};
                         for ( var s = 0; s < config.shapes.length; ++s ) {
-                            switch( config.shapes[s] ) {
-                            case "Line":
-                                shapeList.Line = dwv.tool.LineFactory;
-                                break;
-                            case "Protractor":
-                                shapeList.Protractor = dwv.tool.ProtractorFactory;
-                                break;
-                            case "Rectangle":
-                                shapeList.Rectangle = dwv.tool.RectangleFactory;
-                                break;
-                            case "Roi":
-                                shapeList.Roi = dwv.tool.RoiFactory;
-                                break;
-                            case "Ellipse":
-                                shapeList.Ellipse = dwv.tool.EllipseFactory;
-                                break;
+                            var shapeName = config.shapes[s];
+                            var shapeFactoryClass = shapeName+"Factory";
+                            if (typeof dwv.tool[shapeFactoryClass] !== "undefined") {
+                                shapeList[shapeName] = dwv.tool[shapeFactoryClass];
+                            }
+                            else {
+                                console.warn("Could not initialise unknown shape: "+shapeName);
                             }
                         }
                         toolList.Draw = new dwv.tool.Draw(this, shapeList);
@@ -284,16 +262,12 @@ dwv.App = function ()
                         // setup the filter list
                         var filterList = {};
                         for ( var f = 0; f < config.filters.length; ++f ) {
-                            switch( config.filters[f] ) {
-                            case "Threshold":
-                                filterList.Threshold = new dwv.tool.filter.Threshold(this);
-                                break;
-                            case "Sharpen":
-                                filterList.Sharpen = new dwv.tool.filter.Sharpen(this);
-                                break;
-                            case "Sobel":
-                                filterList.Sobel = new dwv.tool.filter.Sobel(this);
-                                break;
+                            var filterName = config.filters[f];
+                            if (typeof dwv.tool.filter[filterName] !== "undefined") {
+                                filterList[filterName] = new dwv.tool.filter[filterName](this);
+                            }
+                            else {
+                                console.warn("Could not initialise unknown filter: "+filterName);
                             }
                         }
                         toolList.Filter = new dwv.tool.Filter(filterList, this);
@@ -314,15 +288,24 @@ dwv.App = function ()
             }
             // load
             if ( config.gui.indexOf("load") !== -1 ) {
-                var fileLoadGui = new dwv.gui.FileLoad(this);
-                var urlLoadGui = new dwv.gui.UrlLoad(this);
-                loadbox = new dwv.gui.Loadbox(this,
-                    {"file": fileLoadGui, "url": urlLoadGui} );
+                var loaderList = {};
+                for ( var l = 0; l < config.loaders.length; ++l ) {
+                    var loaderName = config.loaders[l];
+                    var loaderClass = loaderName + "Load";
+                    if (typeof dwv.gui[loaderClass] !== "undefined") {
+                        loaderList[loaderName] = new dwv.gui[loaderClass](this);
+                    }
+                    else {
+                        console.warn("Could not initialise unknown loader: "+loaderName);
+                    }
+                }
+                loadbox = new dwv.gui.Loadbox(this, loaderList);
                 loadbox.setup();
-                fileLoadGui.setup();
-                urlLoadGui.setup();
-                fileLoadGui.display(true);
-                urlLoadGui.display(false);
+                var loaderKeys = Object.keys(loaderList);
+                for ( var lk = 0; lk < loaderKeys.length; ++lk ) {
+                    loaderList[loaderKeys[lk]].setup();
+                }
+                loadbox.displayLoader(loaderKeys[0]);
             }
             // undo
             if ( config.gui.indexOf("undo") !== -1 ) {

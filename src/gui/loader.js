@@ -27,7 +27,7 @@ dwv.gui.base.Loadbox = function (app, loaders)
     this.setup = function ()
     {
         // loader select
-        var loaderSelector = dwv.html.createHtmlSelect("loaderSelect", app.getLoaders());
+        var loaderSelector = dwv.html.createHtmlSelect("loaderSelect", loaders);
         loaderSelector.onchange = app.onChangeLoader;
 
         // node
