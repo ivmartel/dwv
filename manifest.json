@@ -1,7 +1,7 @@
 {
   "name": "dwv",
   "description": "Dicom Web Viewer.",
-  "version": "0.13.0",
+  "version": "0.14.0-beta",
   "app": {
     "background": {
       "scripts": ["/resources/chrome-background.js"]
