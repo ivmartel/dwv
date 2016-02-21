@@ -2874,19 +2874,6 @@
         {
             "file": "src/app/application.js",
             "line": 215,
-            "description": "Get the data loaders.",
-            "itemtype": "method",
-            "name": "getLoaders",
-            "return": {
-                "description": "The loaders.",
-                "type": "Object"
-            },
-            "class": "dwv.App",
-            "namespace": "dwv"
-        },
-        {
-            "file": "src/app/application.js",
-            "line": 228,
             "description": "Initialise the HTML for the application.",
             "itemtype": "method",
             "name": "init",
@@ -2895,7 +2882,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 386,
+            "line": 369,
             "description": "Get a HTML element associated to the application.",
             "itemtype": "method",
             "name": "getElement",
@@ -2913,7 +2900,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 397,
+            "line": 380,
             "description": "Reset the application.",
             "itemtype": "method",
             "name": "reset",
@@ -2922,7 +2909,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 422,
+            "line": 405,
             "description": "Reset the layout of the application.",
             "itemtype": "method",
             "name": "resetLayout",
@@ -2931,7 +2918,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 441,
+            "line": 424,
             "description": "Add an event listener on the app.",
             "itemtype": "method",
             "name": "addEventListener",
@@ -2952,7 +2939,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 455,
+            "line": 438,
             "description": "Remove an event listener from the app.",
             "itemtype": "method",
             "name": "removeEventListener",
@@ -2973,7 +2960,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 474,
+            "line": 457,
             "description": "Load a list of files.",
             "itemtype": "method",
             "name": "loadFiles",
@@ -2989,7 +2976,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 491,
+            "line": 474,
             "description": "Load a list of image files.",
             "itemtype": "method",
             "name": "loadImageFiles",
@@ -3005,7 +2992,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 530,
+            "line": 513,
             "description": "Load a State file.",
             "itemtype": "method",
             "name": "loadStateFile",
@@ -3021,7 +3008,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 549,
+            "line": 532,
             "description": "Load a list of URLs.",
             "itemtype": "method",
             "name": "loadURL",
@@ -3042,7 +3029,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 589,
+            "line": 572,
             "description": "Load a State url.",
             "itemtype": "method",
             "name": "loadStateUrl",
@@ -3058,7 +3045,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 608,
+            "line": 591,
             "description": "Fit the display to the given size. To be called once the image is loaded.",
             "itemtype": "method",
             "name": "fitToSize",
@@ -3067,7 +3054,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 651,
+            "line": 634,
             "description": "Toggle the display of the information layer.",
             "itemtype": "method",
             "name": "toggleInfoLayerDisplay",
@@ -3076,14 +3063,14 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 669,
+            "line": 652,
             "description": "Init the Window/Level display",
             "class": "dwv.App",
             "namespace": "dwv"
         },
         {
             "file": "src/app/application.js",
-            "line": 684,
+            "line": 667,
             "description": "Add layer mouse and touch listeners.",
             "itemtype": "method",
             "name": "addLayerListeners",
@@ -3092,7 +3079,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 706,
+            "line": 689,
             "description": "Remove layer mouse and touch listeners.",
             "itemtype": "method",
             "name": "removeLayerListeners",
@@ -3101,7 +3088,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 728,
+            "line": 711,
             "description": "Render the current image.",
             "itemtype": "method",
             "name": "render",
@@ -3110,7 +3097,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 737,
+            "line": 720,
             "description": "Zoom to the layers.",
             "itemtype": "method",
             "name": "zoom",
@@ -3136,7 +3123,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 753,
+            "line": 736,
             "description": "Add a step to the layers zoom.",
             "itemtype": "method",
             "name": "stepZoom",
@@ -3162,7 +3149,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 769,
+            "line": 752,
             "description": "Apply a translation to the layers.",
             "itemtype": "method",
             "name": "translate",
@@ -3183,7 +3170,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 781,
+            "line": 764,
             "description": "Add a translation to the layers.",
             "itemtype": "method",
             "name": "stepTranslate",
@@ -3204,7 +3191,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 797,
+            "line": 780,
             "description": "Handle window/level change.",
             "itemtype": "method",
             "name": "onWLChange",
@@ -3220,7 +3207,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 807,
+            "line": 790,
             "description": "Handle colour map change.",
             "itemtype": "method",
             "name": "onColourChange",
@@ -3236,7 +3223,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 817,
+            "line": 800,
             "description": "Handle slice change.",
             "itemtype": "method",
             "name": "onSliceChange",
@@ -3252,7 +3239,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 837,
+            "line": 820,
             "description": "Handle key down event.\n- CRTL-Z: undo\n- CRTL-Y: redo\nDefault behavior. Usually used in tools.",
             "itemtype": "method",
             "name": "onKeydown",
@@ -3268,7 +3255,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 857,
+            "line": 840,
             "description": "Handle resize.\nFit the display to the window. To be called once the image is loaded.",
             "itemtype": "method",
             "name": "onResize",
@@ -3284,7 +3271,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 868,
+            "line": 851,
             "description": "Handle zoom reset.",
             "itemtype": "method",
             "name": "onZoomReset",
@@ -3300,7 +3287,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 878,
+            "line": 861,
             "description": "Handle loader change.",
             "itemtype": "method",
             "name": "onChangeLoader",
@@ -3316,7 +3303,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 888,
+            "line": 871,
             "description": "Handle change url event.",
             "itemtype": "method",
             "name": "onChangeURL",
@@ -3332,7 +3319,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 898,
+            "line": 881,
             "description": "Handle input urls.",
             "itemtype": "method",
             "name": "onInputURLs",
@@ -3353,7 +3340,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 909,
+            "line": 892,
             "description": "Handle change files event.",
             "itemtype": "method",
             "name": "onChangeFiles",
@@ -3369,7 +3356,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 922,
+            "line": 905,
             "description": "Handle state save event.",
             "itemtype": "method",
             "name": "onStateSave",
@@ -3385,7 +3372,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 935,
+            "line": 918,
             "description": "Handle colour map change.",
             "itemtype": "method",
             "name": "onChangeColourMap",
@@ -3401,7 +3388,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 945,
+            "line": 928,
             "description": "Handle window/level preset change.",
             "itemtype": "method",
             "name": "onChangeWindowLevelPreset",
@@ -3417,7 +3404,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 963,
+            "line": 946,
             "description": "Handle tool change.",
             "itemtype": "method",
             "name": "onChangeTool",
@@ -3433,7 +3420,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 973,
+            "line": 956,
             "description": "Handle shape change.",
             "itemtype": "method",
             "name": "onChangeShape",
@@ -3449,7 +3436,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 983,
+            "line": 966,
             "description": "Handle filter change.",
             "itemtype": "method",
             "name": "onChangeFilter",
@@ -3465,7 +3452,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 993,
+            "line": 976,
             "description": "Handle filter run.",
             "itemtype": "method",
             "name": "onRunFilter",
@@ -3481,7 +3468,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1003,
+            "line": 986,
             "description": "Handle line colour change.",
             "itemtype": "method",
             "name": "onChangeLineColour",
@@ -3497,7 +3484,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1013,
+            "line": 996,
             "description": "Handle min/max slider change.",
             "itemtype": "method",
             "name": "onChangeMinMax",
@@ -3513,7 +3500,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1023,
+            "line": 1006,
             "description": "Handle undo.",
             "itemtype": "method",
             "name": "onUndo",
@@ -3529,7 +3516,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1033,
+            "line": 1016,
             "description": "Handle redo.",
             "itemtype": "method",
             "name": "onRedo",
@@ -3545,7 +3532,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1043,
+            "line": 1026,
             "description": "Handle toggle of info layer.",
             "itemtype": "method",
             "name": "onToggleInfoLayer",
@@ -3561,7 +3548,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1053,
+            "line": 1036,
             "description": "Handle display reset.",
             "itemtype": "method",
             "name": "onDisplayReset",
@@ -3577,7 +3564,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1071,
+            "line": 1054,
             "description": "Fire an event: call all associated listeners.",
             "itemtype": "method",
             "name": "fireEvent",
@@ -3593,7 +3580,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1087,
+            "line": 1070,
             "description": "Generate the image data and draw it.",
             "itemtype": "method",
             "name": "generateAndDrawImage",
@@ -3602,7 +3589,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1101,
+            "line": 1084,
             "description": "Apply the stored zoom to the layers.",
             "itemtype": "method",
             "name": "zoomLayers",
@@ -3611,7 +3598,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1132,
+            "line": 1115,
             "description": "Apply the stored translation to the layers.",
             "itemtype": "method",
             "name": "translateLayers",
@@ -3620,7 +3607,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1152,
+            "line": 1135,
             "description": "Add image listeners.",
             "itemtype": "method",
             "name": "addImageInfoListeners",
@@ -3631,7 +3618,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1167,
+            "line": 1150,
             "description": "Remove image listeners.",
             "itemtype": "method",
             "name": "removeImageInfoListeners",
@@ -3642,7 +3629,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1182,
+            "line": 1165,
             "description": "Mou(se) and (T)ouch event handler. This function just determines the mouse/touch\nposition relative to the canvas element. It then passes it to the current tool.",
             "itemtype": "method",
             "name": "onMouch",
@@ -3660,7 +3647,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1257,
+            "line": 1240,
             "description": "Handle a drag over.",
             "itemtype": "method",
             "name": "onDragOver",
@@ -3678,7 +3665,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1275,
+            "line": 1258,
             "description": "Handle a drag leave.",
             "itemtype": "method",
             "name": "onDragLeave",
@@ -3696,7 +3683,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1293,
+            "line": 1276,
             "description": "Handle a drop event.",
             "itemtype": "method",
             "name": "onDrop",
@@ -3714,7 +3701,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1308,
+            "line": 1291,
             "description": "Handle an error: display it to the user.",
             "itemtype": "method",
             "name": "handleError",
@@ -3732,7 +3719,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1329,
+            "line": 1312,
             "description": "Handle a load progress.",
             "itemtype": "method",
             "name": "onLoadProgress",
@@ -3750,7 +3737,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1345,
+            "line": 1328,
             "description": "Create the application layers.",
             "itemtype": "method",
             "name": "createLayers",
@@ -3773,7 +3760,7 @@
         },
         {
             "file": "src/app/application.js",
-            "line": 1386,
+            "line": 1369,
             "description": "Post load application initialisation. To be called once the DICOM has been parsed.",
             "itemtype": "method",
             "name": "postLoadInit",
@@ -14144,7 +14131,7 @@
         },
         {
             "message": "Missing item type\nInit the Window/Level display",
-            "line": " src/app/application.js:669"
+            "line": " src/app/application.js:652"
         },
         {
             "message": "Missing item type\nGet the group-element key used to store DICOM elements.",
