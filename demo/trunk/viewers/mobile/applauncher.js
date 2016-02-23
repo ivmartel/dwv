@@ -8,7 +8,10 @@ dwv.browser.check();
 // launch when page is loaded
 $(document).ready( function()
 {
-    // main application
+        var gAuth = new dwv.google.Auth();
+        gAuth.loadSilent();
+
+        // main application
     var myapp = new dwv.App();
     // initialise the application
     myapp.init({
