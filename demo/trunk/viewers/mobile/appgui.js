@@ -24,8 +24,24 @@ dwv.tool.defaultpresets.CT = {
     "head": {"center": 90, "width": 350}
 };
 
-// decode query
-dwv.utils.decodeQuery = dwv.utils.base.decodeQuery;
+//decode query
+dwv.utils.decodeQuery = function (query, callback)
+{
+    if (query.type === "gdrive") {
+        var gAuth = new dwv.google.Auth();
+        var gDrive = new dwv.google.Drive();
+        gDrive.setIds( query.input.split(',') );
+        // pipeline
+        gAuth.onload = gDrive.load;
+        gDrive.onload = dwv.google.getAuthorizedCallback(callback);
+        // launch
+        gAuth.load();
+    }
+    else {
+        // default
+        dwv.utils.base.decodeQuery(query, callback);
+    }
+};
 
 // Window
 dwv.gui.getWindowSize = function () {
