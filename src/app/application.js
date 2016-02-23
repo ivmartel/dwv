@@ -538,7 +538,7 @@ dwv.App = function ()
     this.loadURL = function(urls, requestHeaders)
     {
         // clear variables
-        this.reset();
+        self.reset();
         nSlicesToLoad = urls.length;
         // create IO
         var urlIO = new dwv.io.Url();
