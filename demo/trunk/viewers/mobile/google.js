@@ -270,6 +270,10 @@ dwv.gui.GoogleDriveLoad = function (app)
      */
     this.setup = function()
     {
+        // behind the scenes authentification to avoid popup blocker
+        var gAuth = new dwv.google.Auth();
+        gAuth.loadSilent();
+
         // associated div
         var gdriveLoadDiv = document.createElement("div");
         gdriveLoadDiv.className = "gdrivediv";
