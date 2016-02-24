@@ -35,7 +35,7 @@ dwv.utils.decodeQuery = function (query, callback)
         gAuth.onload = gDrive.load;
         gDrive.onload = dwv.google.getAuthorizedCallback(callback);
         // launch
-        gAuth.load();
+        gAuth.loadSilent();
     }
     else {
         // default
