@@ -60,8 +60,14 @@ dwv.gui.DicomTags = dwv.gui.base.DicomTags;
 dwv.gui.Loadbox = dwv.gui.base.Loadbox;
 // File loader
 dwv.gui.FileLoad = dwv.gui.base.FileLoad;
+dwv.gui.FileLoad.prototype.onchange = function (/*event*/) {
+    $("#popupOpen").popup("close");
+};
 // Url loader
-dwv.gui.UrlLoad =  dwv.gui.base.UrlLoad;
+dwv.gui.UrlLoad = dwv.gui.base.UrlLoad;
+dwv.gui.UrlLoad.prototype.onchange = function (/*event*/) {
+    $("#popupOpen").popup("close");
+};
 
 // Toolbox
 dwv.gui.Toolbox = function (app)
