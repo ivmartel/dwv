@@ -53,9 +53,9 @@ dwv.google.Auth = function ()
     */
     function onApiLoad() {
         var callback = handleResult;
-        if ( immediate ) {
-            callback = function() {};
-        }
+        //if ( immediate ) {
+        //    callback = function() {};
+        //}
         // see https://developers.google.com/api-client-library/...
         //   ...javascript/reference/referencedocs#gapiauthauthorizeparams
         gapi.auth.authorize({
