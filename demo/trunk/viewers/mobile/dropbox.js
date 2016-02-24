@@ -49,6 +49,9 @@ dwv.gui.DropboxLoad = function (app)
         filediv.style.display = bool ? "" : "none";
         
         if (bool) {
+            // jquery mobile dependent
+            $("#popupOpen").popup("close");
+
             var options = {
                 // Required. Called when a user selects an item in the Chooser.
                 success: function (files) {

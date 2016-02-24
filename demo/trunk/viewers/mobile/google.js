@@ -257,7 +257,7 @@ dwv.google.getAuthorizedCallback = function (callback) {
 };
 
 /**
- * FileLoad base gui.
+ * GoogleDriveLoad gui.
  * @class GoogleDriveLoad
  * @namespace dwv.gui
  * @constructor
@@ -300,6 +300,9 @@ dwv.gui.GoogleDriveLoad = function (app)
         filediv.style.display = bool ? "" : "none";
         
         if (bool) {
+            // jquery mobile dependent
+            $("#popupOpen").popup("close");
+            
             var gAuth = new dwv.google.Auth();
             var gPicker = new dwv.google.Picker();
             var gDrive = new dwv.google.Drive();
