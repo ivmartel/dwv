@@ -43,19 +43,15 @@ dwv.google.Auth = function ()
      };
 
     /**
-    * Callback to be overloaded.
+    * Callback to be overloaded. Default does nothing.
     * No input parameters.
     */
-    this.onload = null;
+    this.onload = function () {};
 
     /**
     * Authentificate.
     */
     function onApiLoad() {
-        var callback = handleResult;
-        //if ( immediate ) {
-        //    callback = function() {};
-        //}
         // see https://developers.google.com/api-client-library/...
         //   ...javascript/reference/referencedocs#gapiauthauthorizeparams
         gapi.auth.authorize({
@@ -63,7 +59,7 @@ dwv.google.Auth = function ()
             'scope': self.scope,
             'immediate': immediate
             },
-            callback
+            handleResult
         );
     }
 
@@ -274,11 +270,6 @@ dwv.gui.GoogleDriveLoad = function (app)
      */
     this.setup = function()
     {
-        // behind the scenes authentification to avoid popup blocker
-        var gAuth = new dwv.google.Auth();
-        gAuth.onload = function () {};
-        gAuth.loadSilent();
-
         // associated div
         var gdriveLoadDiv = document.createElement("div");
         gdriveLoadDiv.className = "gdrivediv";
