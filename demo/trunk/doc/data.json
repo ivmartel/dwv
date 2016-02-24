@@ -1248,7 +1248,7 @@
             "module": "gui",
             "namespace": "dwv.gui.base",
             "file": "src/gui/loader.js",
-            "line": 116,
+            "line": 130,
             "description": "UrlLoad base gui.",
             "is_constructor": 1
         },
@@ -6248,7 +6248,22 @@
         },
         {
             "file": "src/gui/loader.js",
-            "line": 72,
+            "line": 75,
+            "description": "Internal file input change handler.",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The change event.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.gui.base.FileLoad",
+            "module": "gui",
+            "namespace": "dwv.gui.base"
+        },
+        {
+            "file": "src/gui/loader.js",
+            "line": 86,
             "description": "Setup the file load HTML to the page.",
             "itemtype": "method",
             "name": "setup",
@@ -6258,7 +6273,7 @@
         },
         {
             "file": "src/gui/loader.js",
-            "line": 101,
+            "line": 115,
             "description": "Display the file load HTML.",
             "itemtype": "method",
             "name": "display",
@@ -6275,7 +6290,22 @@
         },
         {
             "file": "src/gui/loader.js",
-            "line": 124,
+            "line": 141,
+            "description": "Internal url input change handler.",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The change event.",
+                    "type": "Object"
+                }
+            ],
+            "class": "dwv.gui.base.UrlLoad",
+            "module": "gui",
+            "namespace": "dwv.gui.base"
+        },
+        {
+            "file": "src/gui/loader.js",
+            "line": 152,
             "description": "Setup the url load HTML to the page.",
             "itemtype": "method",
             "name": "setup",
@@ -6285,7 +6315,7 @@
         },
         {
             "file": "src/gui/loader.js",
-            "line": 152,
+            "line": 180,
             "description": "Display the url load HTML.",
             "itemtype": "method",
             "name": "display",
@@ -14175,6 +14205,14 @@
         {
             "message": "Missing item type\nDisplay a loader.",
             "line": " src/gui/loader.js:45"
+        },
+        {
+            "message": "Missing item type\nInternal file input change handler.",
+            "line": " src/gui/loader.js:75"
+        },
+        {
+            "message": "Missing item type\nInternal url input change handler.",
+            "line": " src/gui/loader.js:141"
         },
         {
             "message": "Missing item type\nAppend an origin to the geometry.",

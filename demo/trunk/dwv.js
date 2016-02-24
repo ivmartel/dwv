@@ -9395,6 +9395,20 @@ dwv.gui.base.Loadbox = function (app, loaders)
  */
 dwv.gui.base.FileLoad = function (app)
 {
+    // closure to self
+    var self = this;
+    
+    /**
+     * Internal file input change handler.
+     * @param {Object} event The change event.
+     */
+    function onchangeinternal(event) {
+        if (typeof self.onchange == "function") {
+            self.onchange(event);
+        }
+        app.onChangeFiles(event);
+    }
+    
     /**
      * Setup the file load HTML to the page.
      * @method setup
@@ -9403,7 +9417,7 @@ dwv.gui.base.FileLoad = function (app)
     {
         // input
         var fileLoadInput = document.createElement("input");
-        fileLoadInput.onchange = app.onChangeFiles;
+        fileLoadInput.onchange = onchangeinternal;
         fileLoadInput.type = "file";
         fileLoadInput.multiple = true;
         fileLoadInput.className = "imagefiles";
@@ -9447,6 +9461,20 @@ dwv.gui.base.FileLoad = function (app)
  */
 dwv.gui.base.UrlLoad = function (app)
 {
+    // closure to self
+    var self = this;
+    
+    /**
+     * Internal url input change handler.
+     * @param {Object} event The change event.
+     */
+    function onchangeinternal(event) {
+        if (typeof self.onchange == "function") {
+            self.onchange(event);
+        }
+        app.onChangeURL(event);
+    }
+    
     /**
      * Setup the url load HTML to the page.
      * @method setup
@@ -9455,7 +9483,7 @@ dwv.gui.base.UrlLoad = function (app)
     {
         // input
         var urlLoadInput = document.createElement("input");
-        urlLoadInput.onchange = app.onChangeURL;
+        urlLoadInput.onchange = onchangeinternal;
         urlLoadInput.type = "url";
         urlLoadInput.className = "imageurl";
         urlLoadInput.setAttribute("data-clear-btn","true");
