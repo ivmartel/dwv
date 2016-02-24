@@ -53,9 +53,9 @@ dwv.google.Auth = function ()
     */
     function onApiLoad() {
         var callback = handleResult;
-        //if ( immediate ) {
-        //    callback = function() {};
-        //}
+        if ( immediate ) {
+            callback = function() {};
+        }
         // see https://developers.google.com/api-client-library/...
         //   ...javascript/reference/referencedocs#gapiauthauthorizeparams
         gapi.auth.authorize({
@@ -275,6 +275,7 @@ dwv.gui.GoogleDriveLoad = function (app)
     this.setup = function()
     {
         // behind the scenes authentification to avoid popup blocker
+        console.log("Silent auth...");
         var gAuth = new dwv.google.Auth();
         gAuth.loadSilent();
 
