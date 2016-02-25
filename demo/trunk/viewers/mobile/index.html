@@ -75,6 +75,18 @@ body { margin: 10px; padding: 0; }
 <!-- Toolbar -->
 <div class="toolbar"></div>
 
+<!-- Auth popup -->
+<div data-role="popup" id="popupAuth">
+<a href="#" data-rel="back" data-role="button"
+  data-icon="delete" data-iconpos="notext" class="ui-btn-right">Close</a>
+<div style="padding:10px 20px;">
+<h3>Google Drive Authorization</h3>
+<p>Please authorize DWV to access your Goole Drive.
+<br>This is only needed the first time you connect.</p>
+<button id="gauth-button" class="ui-btn">Authorize</button>
+</div>
+</div><!-- /popup -->
+
 <!-- Open popup -->
 <div data-role="popup" id="popupOpen">
 <a href="#" data-rel="back" data-role="button"

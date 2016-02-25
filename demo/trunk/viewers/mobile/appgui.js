@@ -33,9 +33,18 @@ dwv.utils.decodeQuery = function (query, callback)
         gDrive.setIds( query.input.split(',') );
         // pipeline
         gAuth.onload = gDrive.load;
+        gAuth.onfail = function () {
+            $("#popupAuth").popup("open");
+            var authorizeButton = document.getElementById('gauth-button');
+            // explicit auth from button to allow popup
+            authorizeButton.onclick = function() {
+                $("#popupAuth").popup("close");
+                gAuth.load();
+            }
+        }
         gDrive.onload = dwv.google.getAuthorizedCallback(callback);
         // launch with silent auth
-        gAuth.load();
+        gAuth.loadSilent();
     }
     else {
         // default

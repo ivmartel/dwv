@@ -23,7 +23,7 @@ dwv.google.Auth = function ()
 
     // The Client ID obtained from the Google Developers Console. Replace with your own Client ID.
     this.clientId = "544445548355-7pli7rbg578hslnngnkj7ledcg6g5ejo.apps.googleusercontent.com";
-    // Scope to use to access user's Drive items.
+    // The scope to use to access user's Drive items.
     this.scope = ['https://www.googleapis.com/auth/drive.readonly'];
 
     /**
@@ -43,10 +43,16 @@ dwv.google.Auth = function ()
      };
 
     /**
-    * Callback to be overloaded. Default does nothing.
-    * No input parameters.
+    * Called if the authentification is successful. 
+    * Default does nothing. No input parameters.
     */
     this.onload = function () {};
+
+    /**
+    * Callback to be overloaded.
+    * Default does nothing. No input parameters.
+    */
+    this.onfail = function () {};
 
     /**
     * Authentificate.
@@ -73,6 +79,9 @@ dwv.google.Auth = function ()
         if (authResult && !authResult.error) {
             self.onload();
         }
+        else {
+            self.onfail();
+        }
     }
 };
 
@@ -93,7 +102,7 @@ dwv.google.Picker = function ()
     };
 
     /**
-    * Callback to be overloaded.
+    * Called after user picked files.
     * @param {Array} ids The list of picked files ids.
     */
     this.onload = null;
@@ -185,7 +194,7 @@ dwv.google.Drive = function ()
     };
 
     /**
-    * Callback to be overloaded.
+    * Called after drive response with the file urls.
     * @param {Array} urls The list of files urls corresponding to the input ids.
     */
     this.onload = null;
