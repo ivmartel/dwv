@@ -195,6 +195,12 @@ dwv.io.Url.prototype.load = function (ioArray, requestHeaders)
     // text request
     var onLoadTextRequest = function (/*event*/)
     {
+        // status 200: "OK"
+        if (this.status !== 200) {
+            this.onerror();
+            return;
+        }
+
         try {
             onLoad( this.responseText );
         } catch (error) {
@@ -205,6 +211,12 @@ dwv.io.Url.prototype.load = function (ioArray, requestHeaders)
     // binary request
     var onLoadBinaryRequest = function (/*event*/)
     {
+        // status 200: "OK"
+        if (this.status !== 200) {
+            this.onerror();
+            return;
+        }
+        
         // find the image type from its signature
         var view = new DataView(this.response);
         var isJpeg = view.getUint32(0) === 0xffd8ffe0;
