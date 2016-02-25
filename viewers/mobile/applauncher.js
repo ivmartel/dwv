@@ -15,7 +15,7 @@ $(document).ready( function()
         "containerDivId": "dwv",
         "fitToWindow": true,
         "gui": ["tool", "load", "help", "undo", "version", "tags"],
-        "loaders": ["File", "Url"],
+        "loaders": ["File", "Url", "GoogleDrive"],
         "tools": ["Scroll", "Window/Level", "Zoom/Pan", "Draw", "Livewire", "Filter"],
         "filters": ["Threshold", "Sharpen", "Sobel"],
         "shapes": ["Line", "Protractor", "Rectangle", "Roi", "Ellipse"],

@@ -85,6 +85,11 @@ body { margin: 10px; padding: 0; }
 <script type="text/javascript" src="../../src/utils/string.js"></script>
 <script type="text/javascript" src="../../src/utils/uri.js"></script>
 
+<!-- Google -->
+<script type="text/javascript" src="https://apis.google.com/js/client.js"></script>
+<script type="text/javascript" src="https://apis.google.com/js/api.js"></script>
+<script type="text/javascript" src="google.js"></script>
+
 <!-- Launch the app -->
 <script type="text/javascript" src="appgui.js"></script>
 <script type="text/javascript" src="applauncher.js"></script>
@@ -109,6 +114,18 @@ body { margin: 10px; padding: 0; }
 
 <!-- Toolbar -->
 <div class="toolbar"></div>
+
+<!-- Auth popup -->
+<div data-role="popup" id="popupAuth">
+<a href="#" data-rel="back" data-role="button"
+  data-icon="delete" data-iconpos="notext" class="ui-btn-right">Close</a>
+<div style="padding:10px 20px;">
+<h3>Google Drive Authorization</h3>
+<p>Please authorize DWV to access your Goole Drive.
+<br>This is only needed the first time you connect.</p>
+<button id="gauth-button" class="ui-btn">Authorize</button>
+</div>
+</div><!-- /popup -->
 
 <!-- Open popup -->
 <div data-role="popup" id="popupOpen">
