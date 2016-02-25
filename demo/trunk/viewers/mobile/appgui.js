@@ -40,8 +40,8 @@ dwv.utils.decodeQuery = function (query, callback)
             authorizeButton.onclick = function() {
                 $("#popupAuth").popup("close");
                 gAuth.load();
-            }
-        }
+            };
+        };
         gDrive.onload = dwv.google.getAuthorizedCallback(callback);
         // launch with silent auth
         gAuth.loadSilent();
